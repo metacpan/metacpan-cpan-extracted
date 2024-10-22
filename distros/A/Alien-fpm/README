@@ -1,15 +1,15 @@
 NAME
-    Alien::fpm = Find or install fpm
+    Alien::fpm - Find or install fpm
 
 SYNOPSIS
-    use Alien::fpm;
+     use Alien::fpm;
 
-    use Env qw( @PATH @GEM_PATH );
+     use Env qw( @PATH @GEM_PATH );
 
-    unshift @PATH, Alien::fpm->bin_dir; unshift @GEM_PATH,
-    Alien::fpm->fpm_gem_home;
+     unshift @PATH, Alien::fpm->bin_dir;
+     unshift @GEM_PATH, Alien::fpm->fpm_gem_home;
 
-    system('fpm --verbose -s cpan -t rpm Fennec');
+     system('fpm --verbose -s cpan -t rpm Fennec');
 
 DESCRIPTION
     This package can be used by other Perl modules that require fpm.

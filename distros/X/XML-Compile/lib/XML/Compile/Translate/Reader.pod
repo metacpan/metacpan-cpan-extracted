@@ -59,6 +59,84 @@ each attribute, and you must return list of pairs of derived information.
 When the returned is empty, the attribute data is lost.  The value may
 be a complex structure.
 
+B<. Example: anyAttribute in a READER>
+
+Say your schema looks like this:
+
+ <schema targetNamespace="http://mine"
+    xmlns:me="http://mine" ...>
+   <element name="el">
+     <complexType>
+       <attribute name="a" type="xs:int" />
+       <anyAttribute namespace="##targetNamespace"
+          processContents="lax">
+     </complexType>
+   </element>
+   <simpleType name="non-empty">
+     <restriction base="NCName" />
+   </simpleType>
+ </schema>
+
+Then, in an application, you write:
+
+ my $r = $schema->compile
+  ( READER => pack_type('http://mine', 'el')
+  , anyAttribute => 'ALL'
+  );
+ # or lazy: READER => '{http://mine}el'
+
+ my $h = $r->( <<'__XML' );
+   <el xmlns:me="http://mine">
+     <a>42</a>
+     <b type="me:non-empty">
+        everything
+     </b>
+   </el>
+ __XML
+
+ use Data::Dumper 'Dumper';
+ print Dumper $h;
+ __XML__
+
+The output is something like
+
+ $VAR1 =
+  { a => 42
+  , '{http://mine}a' => ... # XML::LibXML::Node with <a>42</a>
+  , '{http://mine}b' => ... # XML::LibXML::Node with <b>everything</b>
+  };
+
+You can improve the reader with a callback.  When you know that the
+extra attribute is always of type C<non-empty>, then you can do
+
+ my $read = $schema->compile
+  ( READER => '{http://mine}el'
+  , anyAttribute => \&filter
+  );
+
+ my $anyAttRead = $schema->compile
+  ( READER => '{http://mine}non-empty'
+  );
+
+ sub filter($$$$)
+ {   my ($fqn, $xml, $path, $translator) = @_;
+     return () if $fqn ne '{http://mine}b';
+     (b => $anyAttRead->($xml));
+ }
+
+ my $h = $r->( see above );
+ print Dumper $h;
+
+Which will result in
+
+ $VAR1 =
+  { a => 42
+  , b => 'everything'
+  };
+
+The filter will be called twice, but return nothing in the first
+case.  You can implement any kind of complex processing in the filter.
+
 =head3 option any_element
 
 By default, the C<any> definition in a schema will ignore all elements
@@ -164,6 +242,14 @@ clone, not the original as provided by the user.  When C<undef>
 is returned, the whole node will disappear.
 
 This hook offers a predefined C<PRINT_PATH>.
+
+B<. Example: to trace the paths>
+
+ $schema->addHook
+   ( action => 'READER'
+   , path   => qr/./
+   , before => 'PRINT_PATH'
+   );
 
 =head3 hooks executed as replacement
 
@@ -305,12 +391,12 @@ with some extra checks.
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile distribution version 1.63,
-built on July 02, 2019. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile distribution version 1.64,
+built on October 21, 2024. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 
-Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2006-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

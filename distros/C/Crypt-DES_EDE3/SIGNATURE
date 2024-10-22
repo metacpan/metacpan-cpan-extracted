@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 6c7c3f646f5edd332380ec45a3d069c1524fde485cebc180779f50b6c8c0bb43 Changes
+SHA256 fc96d87c346aea24cd76d6ca8427e45efcbdcee4f8df43a694fcd2f79f9d2a20 LICENSE
+SHA256 ad68cd54c4e2afc04b0934d693a92eacb571c075a4b4c1cfbf3afe205a7e6a7a MANIFEST
+SHA256 4e66d2623a6b7742bcbb91b933f02c31290124cf1885641ad31a0451cfd162f9 META.json
+SHA256 ce0e4622a59021ef284ca08c11d1eb3075f634d87d364dad36daecd316b8c64c META.yml
+SHA256 fcfa1a1ab8db5d6a3c6f34ca39f6e7f9aa18bd7501cc8112a52dad93d3a75105 Makefile.PL
+SHA256 9c05f61823e0b9289bcc08c6b30096d5768279a97abebaffaba08f79003dd4f6 README
+SHA256 2e8eab286bab780404bc5579f0163b8193950ab11ba12f235392e39a6cf97a50 dist.ini
+SHA256 d74d6cc2548aca195c10f38859763cd140a285895a44c7cd538b0102f0137738 lib/Crypt/DES_EDE3.pm
+SHA256 19bad8bcbc09a483e4f2979907385b621eea40043187a1fea9b9684bb1d1324b t/test.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmcXAk8ACgkQ1fh7LgYG
+pfnyNxAAyxCgQRsCWamnJnjvab8NPbwDlxdNjbX9WVBL/xJVaqp6bU0K7oU6rSJI
+3vl6SAC2teIxVeBf3sq3VTx57441dLcUFm6raKvOKbEn5wzcIEJt64WxoY7LxIj8
+14Au80l528k5l/fQL1swjdRvWIPpqner3VslQOAt3nRyu2agiujjFLYk1ciQ7UG7
+CkoDbKJ73veIvCabFQvBdR6maqFjP0f0dOTjneD4Lb2RNF/e/Hp01Saz5mlCVOzs
+PthLxXNVz7B1khCD7UwxPRl9mKLvOTnSfosi/2egZKTjSw86eAdMQT4NfpPxWGwf
+3oVtZerYp56PWPuOW/o4cQMLZy8ltkZe7BqGpfPMjo55qSJCnC0xJTS20aZv+CIQ
+fAbux8hLCOLF8vJU/eWHWu5FibvWUqvNw4ySy0egIFb8SlBzuN6gCzlUbC1KzmE/
+E7nVWkqu+56M2H4eOM2/+kuHU7ne2WxpT24GspfyIavAV9Rx/G7s9n/gb110SZQY
+0Ljm3aYJ2EPO2SiY6k6v4NbIzVh/XrswVBIuPQZy4qdrLlsS7k3OWdCIPBnNKRDN
+xuRP9/9cXhpODEl/LIhq8svbcyf36oqgpz5OOQeMESP/QljvkrKPWHvCOe0OUllG
+gZYfhsLn4SNiNSTj+hfMSUBCdfMkJheDgkdfsqLub2m9aSACOnQ=
+=WV4b
+-----END PGP SIGNATURE-----

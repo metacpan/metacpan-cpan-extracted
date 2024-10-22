@@ -6,11 +6,14 @@ use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
+my $__dummy; # to defeat non-closure optimsation
+
 {
    my $f1 = Future->new;
 
+   my $cb;
    my $called = 0;
-   my $fseq = $f1->followed_by( sub {
+   my $fseq = $f1->followed_by( $cb = sub {
       $called++;
       ref_is( $_[0], $f1, 'followed_by block passed $f1' );
       return $_[0];
@@ -22,6 +25,9 @@ use Future;
    is_oneref( $fseq, '$fseq has refcount 1 initially' );
    # Two refs; one in lexical $f1, one in $fseq's cancellation closure
    is_refcount( $f1, 2, '$f1 has refcount 2 initially' );
+   # We're looking for *at least* two refs; PP has 2, XS has 3
+   # TODO: This'll be a lot nicer with https://github.com/Test-More/Test2-Suite/issues/259
+   ok( refcount( $cb ) > 1, '$cb has refcount > 1 captured by followed_by callback' );
 
    is( $called, 0, '$called before $f1 done' );
 
@@ -34,6 +40,7 @@ use Future;
 
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
    is_oneref( $f1, '$f1 has refcount 1 before EOF' );
+   is_oneref( $cb, '$cb has refcount 1 before EOF' );
 }
 
 {
@@ -113,12 +120,14 @@ use Future;
 {
    my $f1 = Future->done;
 
+   my $cb;
    my $called = 0;
    my $fseq = $f1->followed_by(
-      sub { $called++; return $_[0] }
+      $cb = sub { $called++; return $_[0] }
    );
 
    is( $called, 1, 'followed_by block invoked immediately for already-done' );
+   is_oneref( $cb, '$cb has refcount 1 before EOF' );
 }
 
 # immediately done

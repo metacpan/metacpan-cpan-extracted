@@ -26,25 +26,25 @@ sub getConfig {
 sub ftpConfig {
   my ($self, $hostname, $server, $username, $password) = @_;
 
-  if (!$self->{exp}) {
-    my $login = $self->login();
-    croak $login->{reason} if $login->{success} == 0;
-  }
-
   $server   //= $ENV{PDK_FTP_SERVER};
   $username //= $ENV{PDK_FTP_USERNAME};
   $password //= $ENV{PDK_FTP_PASSWORD};
 
   croak "请正确提供 FTP 服务器地址、账户和密码或者设置相关环境变量!" unless $username and $password and $server;
 
+  if (!$self->{exp}) {
+    my $login = $self->login();
+    croak $login->{reason} if $login->{success} == 0;
+  }
+
   my $host    = $self->{host};
   my $command = "put config.cfg $self->{month}/$self->{date}/";
 
-  if ($hostname) {
-    $command .= $hostname . '_' . $host . '.cfg';
+  if (!!$hostname) {
+    $command .= $hostname . '_' . $host . '.txt';
   }
   else {
-    $command .= $host . '.cfg';
+    $command .= $host . '.txt';
   }
 
   my $exp    = $self->{exp};
@@ -53,8 +53,9 @@ sub ftpConfig {
   my $ftp_cmd = "ftp $server vpn-instance default";
   $self->dump("生成 FTP 备份指令：$ftp_cmd");
 
-  $self->dump("准备连接 FTP 服务器");
   $self->send("$ftp_cmd\n");
+  $self->dump("准备连接 FTP 服务器");
+
   my @ret = $exp->expect(
     15,
     [
@@ -72,12 +73,12 @@ sub ftpConfig {
     ],
     [
       eof => sub {
-        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话丢失，连接被意外关闭！\n" . $exp->before());
+        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话丢失，连接被意外关闭！" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话超时！\n" . $exp->before());
+        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话超时！");
       }
     ],
   );
@@ -99,12 +100,12 @@ sub ftpConfig {
     ],
     [
       eof => sub {
-        croak("执行[ftpConfig/检查是否成功登录FTP]，与设备 $self->{host} 会话丢失！\n" . $exp->before());
+        croak("执行[ftpConfig/检查是否成功登录FTP]，与设备 $self->{host} 会话丢失！" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[ftpConfig/检查是否成功登录FTP]，与设备 $self->{host} 会话超时！\n" . $exp->before());
+        croak("执行[ftpConfig/检查是否成功登录FTP]，与设备 $self->{host} 会话超时！");
       }
     ],
   );
@@ -127,12 +128,12 @@ sub ftpConfig {
     ],
     [
       eof => sub {
-        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话丢失！\n" . $exp->before());
+        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话丢失！" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话超时！\n" . $exp->before());
+        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话超时！");
       }
     ],
   );

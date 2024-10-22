@@ -1,14 +1,14 @@
-# Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2006-2024 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution XML-Compile.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package XML::Compile::Schema;
-use vars '$VERSION';
-$VERSION = '1.63';
+package XML::Compile::Schema;{
+our $VERSION = '1.64';
+}
 
 use base 'XML::Compile';
 
@@ -276,21 +276,21 @@ sub compile($$@)
 # also used in ::Cache init()
 sub _namespaceTable($;$$)
 {   my ($self, $table, $reset_count, $block_default) = @_;
-    $table = { reverse @$table }
+    $table       = +{ reverse @$table }
         if ref $table eq 'ARRAY';
 
-    $table->{$_}    = { uri => $_, prefix => $table->{$_} }
+    $table->{$_} = +{ uri => $_, prefix => $table->{$_} }
         for grep ref $table->{$_} ne 'HASH', keys %$table;
 
     if($reset_count)
     {   $_->{used} = 0 for values %$table;
     }
 
-    $table->{''}    = {uri => '', prefix => '', used => 0}
+    $table->{''}   = +{ uri => '', prefix => '', used => 0 }
         if $block_default && !grep $_->{prefix} eq '', values %$table;
 
     # very strong preference for 'xsi'
-    $table->{&SCHEMA2001i} = {uri => SCHEMA2001i, prefix => 'xsi', used => 0};
+    $table->{&SCHEMA2001i} = +{ uri => SCHEMA2001i, prefix => 'xsi', used => 0 };
 
     $table;
 }

@@ -1,14 +1,14 @@
-# Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2006-2024 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution XML-Compile.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package XML::Compile::Translate::Template;
-use vars '$VERSION';
-$VERSION = '1.63';
+package XML::Compile::Translate::Template;{
+our $VERSION = '1.64';
+}
 
 use base 'XML::Compile::Translate';
 
@@ -673,7 +673,7 @@ sub toPerl($%)
     # remove leading  'type =>'
     for(my $linenr = 0; $linenr < @lines; $linenr++)
     {   next if $lines[$linenr] =~ m/^\s*\#/;
-        next unless $lines[$linenr] =~ s/.*? \=\>\s*//;
+        next if $lines[$linenr] !~ s/.*? \=\>\s*//;
         $lines[$linenr] =~ m/\S/ or splice @lines, $linenr, 1;
         last;
     }
@@ -735,7 +735,7 @@ sub _perlAny($$)
         # seperator blank, sometimes
         unshift @sub, ''
             if $sub[0] =~ m/^\s*[#{]/   # } 
-            || (@subs && $subs[-1] =~ m/[}\]]\,\s*$/);
+            || (@subs && $subs[-1] =~ m/[}\]].*[}\]]\,\s*$/);
 
         push @subs, @sub;
     }
@@ -771,7 +771,7 @@ sub _perlAny($$)
         {   s/^(.)/  $1/ for @subs;
             $subs[0]  =~ s/^[ ]{0,3}/[ {/;
             if($subs[-1] =~ m/\#\s/ || $self->{_style}==2)
-                 { push @subs, "}, ], " }
+                 { push @subs,   '}, ], ' }
             else { $subs[-1] .= ' }, ], ' }
             push @lines, "$tag =>", @subs;
         }
@@ -929,7 +929,7 @@ sub _xmlAny($$$$)
 
     if($ast->{_TYPE} && $args->{show_type})
     {   my $pref = $self->prefixed($ast->{_TYPE});
-        push @res, $doc->createAttribute("$xsi:type" => $pref);
+        push @res, $doc->createAttribute("$xsi:type" => $pref // '');
     }
 
     return @res

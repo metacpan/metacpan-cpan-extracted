@@ -4,6 +4,12 @@
 #define SVt_REGEXP SVt_PVMG
 #endif
 
+typedef struct hs_pprivate {
+  hs_database_t *database;
+  hs_scratch_t  *scratch;
+} hs_pprivate_t;
+#define HS_PPRIVATE(re) ((hs_pprivate_t*)(re->pprivate))
+
 START_EXTERN_C
 EXTERN_C const regexp_engine pcre2_engine;
 #if PERL_VERSION < 12

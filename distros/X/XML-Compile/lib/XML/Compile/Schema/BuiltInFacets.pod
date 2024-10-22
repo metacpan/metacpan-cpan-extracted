@@ -7,7 +7,7 @@ XML::Compile::Schema::BuiltInFacets - handling of built-in facet checks
 =head1 INHERITANCE
 
  XML::Compile::Schema::BuiltInFacets
-   is a Exporter
+   is an Exporter
 
 =head1 SYNOPSIS
 
@@ -32,12 +32,12 @@ The content is not for end-users, but called by the schema translator.
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile distribution version 1.63,
-built on July 02, 2019. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile distribution version 1.64,
+built on October 21, 2024. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 
-Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2006-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -61,6 +61,22 @@ unsigned rhash_ctz(unsigned x)
 #  endif /* _MSC_VER >= 1300... */
 #endif /* rhash_ctz */
 
+#ifndef rhash_popcount
+/**
+ * Returns the number of 1-bits in x.
+ *
+ * @param x the value to process
+ * @return the number of 1-bits
+ */
+unsigned rhash_popcount(unsigned x)
+{
+    x -= (x >>1) & 0x55555555;
+    x = ((x >> 2) & 0x33333333) + (x & 0x33333333);
+    x = ((x >> 4) + x) & 0x0f0f0f0f;
+    return (x * 0x01010101) >> 24;
+}
+#endif /* rhash_popcount */
+
 /**
  * Copy a memory block with simultaneous exchanging byte order.
  * The byte order is changed from little-endian 32-bit integers
@@ -74,7 +90,7 @@ unsigned rhash_ctz(unsigned x)
 void rhash_swap_copy_str_to_u32(void* to, int index, const void* from, size_t length)
 {
 	/* if all pointers and length are 32-bits aligned */
-	if ( 0 == (( (int)((char*)to - (char*)0) | ((char*)from - (char*)0) | index | length ) & 3) ) {
+	if ( 0 == (( (uintptr_t)to | (uintptr_t)from | (uintptr_t)index | length ) & 3) ) {
 		/* copy memory as 32-bit words */
 		const uint32_t* src = (const uint32_t*)from;
 		const uint32_t* end = (const uint32_t*)((const char*)src + length);
@@ -101,7 +117,7 @@ void rhash_swap_copy_str_to_u32(void* to, int index, const void* from, size_t le
 void rhash_swap_copy_str_to_u64(void* to, int index, const void* from, size_t length)
 {
 	/* if all pointers and length are 64-bits aligned */
-	if ( 0 == (( (int)((char*)to - (char*)0) | ((char*)from - (char*)0) | index | length ) & 7) ) {
+	if ( 0 == (( (uintptr_t)to | (uintptr_t)from | (uintptr_t)index | length ) & 7) ) {
 		/* copy aligned memory block as 64-bit integers */
 		const uint64_t* src = (const uint64_t*)from;
 		const uint64_t* end = (const uint64_t*)((const char*)src + length);
@@ -124,7 +140,7 @@ void rhash_swap_copy_str_to_u64(void* to, int index, const void* from, size_t le
 void rhash_swap_copy_u64_to_str(void* to, const void* from, size_t length)
 {
 	/* if all pointers and length are 64-bits aligned */
-	if ( 0 == (( (int)((char*)to - (char*)0) | ((char*)from - (char*)0) | length ) & 7) ) {
+	if ( 0 == (( (uintptr_t)to | (uintptr_t)from | length ) & 7) ) {
 		/* copy aligned memory block as 64-bit integers */
 		const uint64_t* src = (const uint64_t*)from;
 		const uint64_t* end = (const uint64_t*)((const char*)src + length);

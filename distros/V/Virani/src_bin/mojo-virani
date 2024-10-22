@@ -154,7 +154,7 @@ sub the_stuff {
 			);
 		};
 		if ($@) {
-			$c->render( text => "PCAP generation died... please see syslog\n", status => 400, );
+			$c->render( text => "PCAP generation died... please see syslog\n", status => 418, );
 			$virani->verbose( 'err', 'get_pcap_local failed: ' . $@ );
 			return;
 		}

@@ -610,11 +610,11 @@ const GetChildTracks = function(path, nnodes) {
     var tracks = [];
     nodes.splice(0, 1);
     nodes.forEach(function (node) {
-        if (node.childNodes.length == 1) {
-            var newnodes = node.childNodes[0].childNodes[0].childNodes[0].childNodes;
+        if (node.childNodes.length === 1) {
+            var newnodes = node.childNodes[0].childNodes;
             var nodearr = [];
             for (var i = newnodes.length; i--; nodearr.unshift(newnodes[i]));
-            var felm = nodearr[0].childNodes[0].textContent;
+            var felm = node.childNodes[0].childNodes[0].childNodes[0].textContent
             var ttracks = GetChildTracks(path + felm, nodearr);
             tracks = tracks.concat(ttracks);
         }

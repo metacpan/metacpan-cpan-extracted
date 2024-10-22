@@ -1,4 +1,19 @@
 Revision history for App-MHFS, note the CHANGELOG.md of the repository is much more comprehensive
+v0.6.0  2024-10-21
+        Kodi JSON API `/kodi/movies` and `/kodi/tv`
+            - TMDB metadata and art fetching
+            - Supports multiple editions of movies and multiple files per movie.
+              Multi-part rar is not supported yet.
+            - movies loads from multiple file sources
+        Kodi video add-on
+        Promise system (MHFS::Promise) to reduce callback hell.
+        MHFS::Process - Fix incorrect fcntl error handling and usage for turning on
+          O_NONBLOCK, fixes [GH#1](https://github.com/G4Vi/MHFS/issues/1)
+        Web Music Player stack overflow on emscripten 3.1.27 and higher by
+          hardcoding stack size to 128KB.
+        Web Music Player adding collections (Parent nodes of disc dirs) to playlist
+        MHFS::Settings - change default receive request timeout from 75 to 10 seconds
+
 v0.5.0  2022-11-14
         use compile time eval for proper `use` error handling in Makefile.PL. Move MHFS::EventLoop::Poll::Linux
         archname requirement to MHFS::EventLoop::Poll::Linux::Timer. Reduce redundancy of turning on

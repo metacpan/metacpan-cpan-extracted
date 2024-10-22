@@ -8,18 +8,25 @@ use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
+my $__dummy; # to defeat non-closure optimsation
+
 # catch success
 {
    my $f1 = Future->new;
 
+   my $cb;
    my $fseq = $f1->catch(
-      test => sub { die "catch of successful future should not be invoked" },
+      test => $cb = sub {
+         $__dummy++;
+         die "catch of successful future should not be invoked";
+      },
    );
 
    ok( defined $fseq, '$fseq defined' );
    isa_ok( $fseq, [ "Future" ], '$fseq' );
 
    is_oneref( $fseq, '$fseq has refcount 1 initially' );
+   is_refcount( $cb, 2, '$cb has refcount 2 captured by catch callback' );
 
    $f1->done( results => "here" );
 
@@ -27,6 +34,26 @@ use Future;
 
    undef $f1;
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
+   is_oneref( $cb, '$cb has refcount 1 before EOF' );
+}
+
+# catch immediate (RT145699)
+{
+   my $f1 = Future->new;
+
+   $f1->done();
+
+   my $cb;
+   my $fseq = $f1->catch(
+      test => $cb = sub {
+         $__dummy++;
+         die "catch of successful future should not be invoked";
+      },
+   );
+
+   undef $f1;
+   is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
+   is_oneref( $cb, '$cb has refcount 1 before EOF' );
 }
 
 # catch matching failure

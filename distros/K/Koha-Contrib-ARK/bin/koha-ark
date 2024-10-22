@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package Main;
-$Main::VERSION = '1.1.0';
+$Main::VERSION = '1.1.1';
 # PODNAME: koha-ark
 # ABSTRACT: Manage ARK identifiers in a Koha Catalog
 
@@ -53,7 +53,7 @@ koha-ark - Manage ARK identifiers in a Koha Catalog
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 DESCRIPTION
 
@@ -152,13 +152,14 @@ records are scanned. If an invalid ARK is found, it's fixed (with --doit).
  koha-ark update --noverbose --doit
  koha-ark update --debug
  koha-ark check
+ koha-ark check --where "biblionumber BETWEEN 1000 AND 2000"
  koha-ark fix
 
 =head1 PARAMETERS
 
 =over
 
-=item B<--fromwhere>
+=item B<--where>
 
 WHERE clause of the SELECT biblio_metadata used to retrieved biblio records
 from C<biblio_metadata> table. For example: C<biblionumber BETWEEN 100 AND 200>

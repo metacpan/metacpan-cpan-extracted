@@ -35,7 +35,7 @@ PDK::Device::Base - Provides basic interaction functionality with network device
   $device->runCommands(['show ver', 'show lldp n']);
 
   # Write configuration information to a text file
-  $device->write_file($device->getConfig(), '192.168.1.1_startup.cfg');
+  $device->write_file($device->getConfig(), '192.168.1.1_startup.txt');
 
 =head1 DESCRIPTION
 
@@ -253,7 +253,7 @@ Write the configuration to the specified file.
 
 Parameters:
   - $config: The configuration content to be written.
-  - $name: Optional, the filename (defaults to hostname plus ".cfg").
+  - $name: Optional, the filename (defaults to hostname plus ".txt").
 
 =back
 

@@ -6,6 +6,8 @@ use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
+use constant FUTURE_HAS_CONVERGENT_ALSO => ( !defined $Future::XS::VERSION or $Future::XS::VERSION >= 0.13 );
+
 # One done
 {
    my $f1 = Future->new;
@@ -183,6 +185,26 @@ use Future;
    ok( $future->is_ready, '$future is ready after final cancellation' );
 
    like( scalar $future->failure, qr/ cancelled/, 'Failure mentions cancelled' );
+}
+
+# 'also' subs don't get cancelled
+if( FUTURE_HAS_CONVERGENT_ALSO ) {
+   my $falso = Future->new;
+   my $calso;
+   $falso->on_cancel( sub { $calso++ } );
+
+   my $future = Future->needs_any( also => $falso );
+
+   $future->cancel;
+
+   is( $calso, undef, '$future->cancel does not cancel $falso' );
+
+   my $f1 = Future->new;
+
+   $future = Future->needs_any( $f1, also => $falso );
+
+   $f1->done;
+   is( $calso, undef, '$f1->done does not cancel $falso' );
 }
 
 # needs_any on none

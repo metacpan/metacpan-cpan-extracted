@@ -14,6 +14,9 @@ share/public_html/static/hls.js
 share/public_html/static/hls_player.html
 share/public_html/static/jsmpeg.min.js
 share/public_html/static/jsmpeg_player.html
+share/public_html/static/kodi/addons.xml
+share/public_html/static/kodi/addons.xml.md5
+share/public_html/static/kodi/plugin.video.mhfs/plugin.video.mhfs-0.1.0.zip
 share/public_html/static/mp4_player.html
 share/public_html/static/music_inc/drflac.js
 share/public_html/static/music_inc/drflac.wasm
@@ -43,6 +46,7 @@ share/public_html/static/music_worklet_inprogress/decoder/src/mhfs_cl.h
 share/public_html/static/music_worklet_inprogress/decoder/src/mhfs_cl_decoder.h
 share/public_html/static/music_worklet_inprogress/decoder/src/mhfs_cl_misc.h
 share/public_html/static/music_worklet_inprogress/decoder/src/mhfs_cl_track.h
+share/public_html/static/music_worklet_inprogress/decoder/stack_size_name.pl
 share/public_html/static/music_worklet_inprogress/index.html
 share/public_html/static/music_worklet_inprogress/music.css
 share/public_html/static/music_worklet_inprogress/music_inc_module.js

@@ -3,14 +3,11 @@
 #
 #  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
 
-package Test::Future;
+package Test::Future 0.51;
 
-use v5.10;
-use strict;
+use v5.14;
 use warnings;
 use base qw( Test::Builder::Module );
-
-our $VERSION = '0.50';
 
 our @EXPORT = qw(
    no_pending_futures
@@ -26,14 +23,16 @@ C<Test::Future> - unit test assertions for L<Future> instances
 
 =head1 SYNOPSIS
 
- use Test::More tests => 2;
- use Test::Future;
+=for highlighter language=perl
 
- no_pending_futures {
-    my $f = some_function();
+   use Test::More tests => 2;
+   use Test::Future;
 
-    is( $f->get, "result", 'Result of the some_function()' );
- } 'some_function() leaves no pending Futures';
+   no_pending_futures {
+      my $f = some_function();
+
+      is( $f->get, "result", 'Result of the some_function()' );
+   } 'some_function() leaves no pending Futures';
 
 =head1 DESCRIPTION
 
@@ -48,7 +47,7 @@ code based on, or using L<Future> instances or subclasses.
 
 =head2 no_pending_futures
 
-   no_pending_futures( \&code, $name )
+   no_pending_futures( \&code, $name );
 
 I<Since version 0.29.>
 

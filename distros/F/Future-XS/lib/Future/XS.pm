@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package Future::XS 0.12;
+package Future::XS 0.13;
 
 use v5.14;
 use warnings;
@@ -28,6 +28,8 @@ require Future::Exception;
 C<Future::XS> - experimental XS implementation of C<Future>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    my $future = Future::XS->new;
 
@@ -68,6 +70,8 @@ versions.
 
 Attempts to access a future instance created in one thread from another thread
 will raise an exception:
+
+=for highlighter
 
    Future::XS instance IO::Async::Future=SCALAR(0x...) is not available in this thread at ...
 

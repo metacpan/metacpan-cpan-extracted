@@ -13,19 +13,43 @@ has prompt => (is => 'ro', required => 1, default => '^>>.*?#\s*$',);
 sub errCodes {
   my $self = shift;
 
-  return [qr/^Error:.*?$/m,];
+  return [qr/^Error:.*?$/mi,];
 }
 
 sub waitfor {
-  my ($self, $prompt) = @_;
+  my ($self, $prompt, $params) = @_;
+
+  croak "当同时定义 prompt 和 params 时，'params' 必须是一个哈希引用" if $prompt && $prompt && ref($params) ne 'HASH';
 
   my $buff = "";
+
   $prompt //= $self->{prompt};
 
   my $exp = $self->{exp};
 
-  my @ret = $exp->expect(
-    15,
+  my $exp_rule;
+  if ($prompt && !$params) {
+    $exp_rule = [
+      qr/$prompt/mi => sub {
+        $buff .= $exp->before() . $exp->match();
+      }
+    ];
+  }
+  elsif ($prompt && $params) {
+    $exp_rule = [
+      qr/$prompt/mi => sub {
+        my $send     = $params->{send}     // '';
+        my $continue = $params->{continue} // 0;
+        my $cache    = $params->{cache}    // 1;
+
+        $self->send($send)                      if !!$send;
+        $buff .= $exp->before() . $exp->match() if !!$cache;
+        exp_continue                            if !!$continue;
+      }
+    ];
+  }
+
+  my $handles = [
     [
       qr/Confirm saving without first applying changes/i => sub {
         $self->send("y\r");
@@ -49,9 +73,6 @@ sub waitfor {
     ],
     [
       qr/(Display|Include) private keys/i => sub {
-        my $passphrase = $self->{passphrase} || $ENV{PDK_FTP_PASSPHRASE};
-        $self->{passphrase} = $passphrase if $self->{passphrase} ne $passphrase;
-
         $self->send(!!$passphrase ? "y\r" : "n\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
@@ -65,21 +86,20 @@ sub waitfor {
       }
     ],
     [
-      qr/$prompt/mi => sub {
-        $buff .= $exp->before() . $exp->match();
-      }
-    ],
-    [
       eof => sub {
-        croak("执行[waitfor]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[waitfor]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
       }
     ],
-  );
+  ];
+
+  splice(@{$handles}, -2, 0, $exp_rule);
+
+  my @ret = $exp->expect($self->{timeout}, @{$handles});
 
   croak($ret[3]) if defined $ret[1];
 
@@ -117,18 +137,16 @@ sub getConfig {
 sub ftpConfig {
   my ($self, $hostname, $server, $username, $password) = @_;
 
-  if (!$self->{exp}) {
-    my $login = $self->login();
-    croak $login->{reason} if $login->{success} == 0;
-  }
-
   $server   //= $ENV{PDK_FTP_SERVER};
   $username //= $ENV{PDK_FTP_USERNAME};
   $password //= $ENV{PDK_FTP_PASSWORD};
 
   croak "请正确提供 FTP 服务器地址、账户和密码!" unless $username and $password and $server;
 
-  my $passphrase = $self->{passphrase} || $ENV{PDK_FTP_PASSPHRASE} || $self->{$password};
+  if (!$self->{exp}) {
+    my $login = $self->login();
+    croak $login->{reason} if $login->{success} == 0;
+  }
 
   my $host    = $self->{host};
   my $command = "$self->{month}/$self->{date}/";
@@ -192,12 +210,12 @@ sub ftpConfig {
     ],
     [
       eof => sub {
-        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
       }
     ],
   );
@@ -219,12 +237,12 @@ sub ftpConfig {
     ],
     [
       eof => sub {
-        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
       }
     ],
   );

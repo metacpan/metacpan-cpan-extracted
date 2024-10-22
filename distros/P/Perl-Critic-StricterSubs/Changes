@@ -1,5 +1,13 @@
 Revision history for Perl module Perl::Critic::StricterSubs
 
+0.08 2024-10-21
+
+    Minimum Perl version is now 5.10.1, the same as Perl::Critic itself.
+
+    [Enhancments]
+    RequireExplicitInclusion no longer will throw a warning on STDIN,
+    STDOUT and STDERR, such as with STDOUT->autoflush. (GH #21)
+
 0.07 2024-09-30
 
     [Enhancements]

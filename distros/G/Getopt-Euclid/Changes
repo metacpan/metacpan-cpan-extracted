@@ -1,5 +1,13 @@
 Revision history for Getopt-Euclid
 
+0.4.8  2024-10-22
+  - another set of test failures on perls without '.' in @INC
+  - Promoting previous trial release to stable
+
+0.4.7  2024-08-28 (TRIAL RELEASE)
+  - Don't fail tests on perl >= 5.41.3 (removal of apostrophe as
+    package separator (GH PR #2, thanks to jkeenan)
+
 0.4.6  2023-06-28
   - David Precious (BIGPRESH) taking on maintainership
   - Avoid test failures on perls without '.' in @INC (reported by TODDR in

@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
-use v5.10;
-use strict;
+use v5.14;
 use warnings;
 
 # By default Test2::V0 will want to export a 'call' but that will clash with

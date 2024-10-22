@@ -9,7 +9,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 use File::Basename qw( basename );
 use File::Spec;
@@ -23,6 +23,8 @@ XSLoader::load( __PACKAGE__, $VERSION );
 C<Devel::MAT::Dumper> - write a heap dump file for later analysis
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Devel::MAT::Dumper;
 
@@ -48,6 +50,8 @@ elsewhere.
 =cut
 
 =head1 IMPORT OPTIONS
+
+=for highlighter
 
 The following C<import> options control the behaviour of the module. They may
 primarily be useful when used in the C<-M> perl option:
@@ -250,6 +254,8 @@ sub import
 }
 
 =head1 FUNCTIONS
+
+=for highlighter language=perl
 
 These functions are not exported, they must be called fully-qualified.
 

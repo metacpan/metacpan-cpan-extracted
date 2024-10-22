@@ -69,7 +69,7 @@ You will probably need more than one attempt to produce the correct
 output... Only use this when you are sure that the receiving party
 is broken.
 
-=head3 Producting CDATA blocks (writer)
+=head3 Producing CDATA blocks (writer)
 
 To get CDATA blocks, the solution is very close to the example in the
 previous section:
@@ -85,6 +85,24 @@ utf8 when it is utf8.  For instance:
    use File::Slurp::Tiny;
    my $content = read_file $filename, binmode => 'utf8';
    my $cdata   = $doc->createCDATASection($content);
+
+When using SOAP (with or without WSDL) you need to do something like
+this:
+
+   use XML::LibXML;   # for ::Document
+   my $wsdl     = ...usual...
+
+   my $doc      = XML::LibXML::Document->new('1.0', 'UTF-8');
+   my %data     = (
+      _doc     => $doc,
+      password => $doc->createCDATASection($password),
+   );
+   $wsdl->call(Login => \%data);
+
+The XML which is sent is usually created inside the client library, but
+you need to create the CDATA block inside the same document structure.
+But the C<_doc> provides a way to use your own document object.  Do not
+reuse it over multiple calls!
 
 =head2 Schemas
 
@@ -253,12 +271,12 @@ Try turning on debugging with:
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile distribution version 1.63,
-built on July 02, 2019. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile distribution version 1.64,
+built on October 21, 2024. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 
-Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2006-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

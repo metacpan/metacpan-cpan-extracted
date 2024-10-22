@@ -166,9 +166,9 @@ CONSTRUCTORS
 
  new
 
-       $future = Future->new
+       $future = Future->new;
     
-       $future = $orig->new
+       $future = $orig->new;
 
     Returns a new Future instance to represent a leaf future. It will be
     marked as ready by any of the done, fail, or cancel methods. It can be
@@ -183,9 +183,9 @@ CONSTRUCTORS
 
  fail (class method)
 
-       $future = Future->done( @values )
+       $future = Future->done( @values );
     
-       $future = Future->fail( $exception, $category, @details )
+       $future = Future->fail( $exception, $category, @details );
 
     Since version 0.26.
 
@@ -194,7 +194,7 @@ CONSTRUCTORS
 
  wrap
 
-       $future = Future->wrap( @values )
+       $future = Future->wrap( @values );
 
     Since version 0.14.
 
@@ -208,14 +208,14 @@ CONSTRUCTORS
 
  call
 
-       $future = Future->call( \&code, @args )
+       $future = Future->call( \&code, @args );
 
     Since version 0.15.
 
     A convenient wrapper for calling a CODE reference that is expected to
     return a future. In normal circumstances is equivalent to
 
-       $future = $code->( @args )
+       $future = $code->( @args );
 
     except that if the code throws an exception, it is wrapped in a new
     immediate fail future. If the return value from the code is not a
@@ -234,7 +234,7 @@ INSPECTION METHODS
 
  is_ready
 
-       $ready = $future->is_ready
+       $ready = $future->is_ready;
 
     Returns true on a leaf future if a result has been provided to the done
     method, failed using the fail method, or cancelled using the cancel
@@ -245,14 +245,14 @@ INSPECTION METHODS
 
  is_done
 
-       $done = $future->is_done
+       $done = $future->is_done;
 
     Returns true on a future if it is ready and completed successfully.
     Returns false if it is still pending, failed, or was cancelled.
 
  is_failed
 
-       $failed = $future->is_failed
+       $failed = $future->is_failed;
 
     Since version 0.26.
 
@@ -261,13 +261,13 @@ INSPECTION METHODS
 
  is_cancelled
 
-       $cancelled = $future->is_cancelled
+       $cancelled = $future->is_cancelled;
 
     Returns true if the future has been cancelled by cancel.
 
  state
 
-       $str = $future->state
+       $str = $future->state;
 
     Since version 0.36.
 
@@ -282,7 +282,7 @@ IMPLEMENTATION METHODS
 
  done
 
-       $future->done( @result )
+       $future->done( @result );
 
     Marks that the leaf future is now ready, and provides a list of values
     as a result. (The empty list is allowed, and still indicates the future
@@ -297,7 +297,7 @@ IMPLEMENTATION METHODS
 
  fail
 
-       $future->fail( $exception, $category, @details )
+       $future->fail( $exception, $category, @details );
 
     Marks that the leaf future has failed, and provides an exception value.
     This exception will be thrown by the get method if called.
@@ -325,7 +325,7 @@ IMPLEMENTATION METHODS
 
  die
 
-       $future->die( $message, $category, @details )
+       $future->die( $message, $category, @details );
 
     Since version 0.09.
 
@@ -337,7 +337,7 @@ IMPLEMENTATION METHODS
 
  on_cancel
 
-       $future->on_cancel( $code )
+       $future->on_cancel( $code );
 
     If the future is not yet ready, adds a callback to be invoked if the
     future is cancelled by the cancel method. If the future is already
@@ -346,7 +346,7 @@ IMPLEMENTATION METHODS
     If the future is later cancelled, the callbacks will be invoked in the
     reverse order to that in which they were registered.
 
-       $on_cancel->( $future )
+       $on_cancel->( $future );
 
     If passed another Future instance, the passed instance will be
     cancelled when the original future is cancelled. In this case, the
@@ -362,7 +362,7 @@ USER METHODS
 
  on_ready
 
-       $future->on_ready( $code )
+       $future->on_ready( $code );
 
     If the future is not yet ready, adds a callback to be invoked when the
     future is ready. If the future is already ready, invokes it
@@ -372,7 +372,7 @@ USER METHODS
     The invoked code can then obtain the list of results by calling the get
     method.
 
-       $on_ready->( $future )
+       $on_ready->( $future );
 
     If passed another Future instance, the passed instance will have its
     done, fail or cancel methods invoked when the original future completes
@@ -382,9 +382,9 @@ USER METHODS
 
  result
 
-       @result = $future->result
+       @result = $future->result;
     
-       $result = $future->result
+       $result = $future->result;
 
     Since version 0.44.
 
@@ -403,9 +403,9 @@ USER METHODS
 
  get
 
-       @result = $future->get
+       @result = $future->get;
     
-       $result = $future->get
+       $result = $future->get;
 
     If the future is ready, returns the result or throws the failure
     exception as per "result".
@@ -415,7 +415,7 @@ USER METHODS
 
  await
 
-       $f = $f->await
+       $f = $f->await;
 
     Since version 0.44.
 
@@ -439,7 +439,7 @@ USER METHODS
 
  block_until_ready
 
-       $f = $f->block_until_ready
+       $f = $f->block_until_ready;
 
     Since version 0.40.
 
@@ -447,7 +447,7 @@ USER METHODS
 
  unwrap
 
-       @values = Future->unwrap( @values )
+       @values = Future->unwrap( @values );
 
     Since version 0.26.
 
@@ -463,7 +463,7 @@ USER METHODS
 
  on_done
 
-       $future->on_done( $code )
+       $future->on_done( $code );
 
     If the future is not yet ready, adds a callback to be invoked when the
     future is ready, if it completes successfully. If the future completed
@@ -472,7 +472,7 @@ USER METHODS
 
     The callback will be passed the result passed to the done method.
 
-       $on_done->( @result )
+       $on_done->( @result );
 
     If passed another Future instance, the passed instance will have its
     done method invoked when the original future completes successfully.
@@ -481,9 +481,9 @@ USER METHODS
 
  failure
 
-       $exception = $future->failure
+       $exception = $future->failure;
     
-       $exception, $category, @details = $future->failure
+       $exception, $category, @details = $future->failure;
 
     If the future is ready, returns the exception passed to the fail method
     or undef if the future completed successfully via the done method.
@@ -507,7 +507,7 @@ USER METHODS
 
  on_fail
 
-       $future->on_fail( $code )
+       $future->on_fail( $code );
 
     If the future is not yet ready, adds a callback to be invoked when the
     future is ready, if it fails. If the future has already failed, invokes
@@ -517,7 +517,7 @@ USER METHODS
     The callback will be passed the exception and other details passed to
     the fail method.
 
-       $on_fail->( $exception, $category, @details )
+       $on_fail->( $exception, $category, @details );
 
     If passed another Future instance, the passed instance will have its
     fail method invoked when the original future fails.
@@ -531,7 +531,7 @@ USER METHODS
 
  cancel
 
-       $future->cancel
+       $future->cancel;
 
     Requests that the future be cancelled, immediately marking it as ready.
     This will invoke all of the code blocks registered by on_cancel, in the
@@ -582,7 +582,7 @@ SEQUENCING METHODS
 
  then
 
-       $future = $f1->then( \&done_code )
+       $future = $f1->then( \&done_code );
 
     Since version 0.13.
 
@@ -594,11 +594,11 @@ SEQUENCING METHODS
     immediately fail with the same failure and the code will not be
     invoked.
 
-       $f2 = $done_code->( @result )
+       $f2 = $done_code->( @result );
 
  else
 
-       $future = $f1->else( \&fail_code )
+       $future = $f1->else( \&fail_code );
 
     Since version 0.13.
 
@@ -610,11 +610,11 @@ SEQUENCING METHODS
     immediately succeed with the same result and the code will not be
     invoked.
 
-       $f2 = $fail_code->( $exception, $category, @details )
+       $f2 = $fail_code->( $exception, $category, @details );
 
  then (2 arguments)
 
-       $future = $f1->then( \&done_code, \&fail_code )
+       $future = $f1->then( \&done_code, \&fail_code );
 
     The then method can also be passed the $fail_code block as well, giving
     a combination of then and else behaviour.
@@ -627,7 +627,7 @@ SEQUENCING METHODS
        $future = $f1->catch(
           name => \&code,
           name => \&code, ...
-       )
+       );
 
     Since version 0.33.
 
@@ -639,7 +639,7 @@ SEQUENCING METHODS
     invoked, being passed the same arguments as a plain else call would
     take, and is expected to return a Future in the same way.
 
-       $f2 = $code->( $exception, $category, @details )
+       $f2 = $code->( $exception, $category, @details );
 
     If $f1 does not fail, fails without a category name at all, or fails
     with a category name that does not match any given to the catch method,
@@ -652,7 +652,7 @@ SEQUENCING METHODS
        $future = $f1->catch(
           name => \&code, ...
           \&fail_code,
-       )
+       );
 
     This feature is currently still a work-in-progress. It currently can
     only cope with category names that are literal strings, which are all
@@ -663,7 +663,7 @@ SEQUENCING METHODS
 
  then (multiple arguments)
 
-       $future = $f1->then( \&done_code, @catch_list, \&fail_code )
+       $future = $f1->then( \&done_code, @catch_list, \&fail_code );
 
     Since version 0.33.
 
@@ -673,7 +673,7 @@ SEQUENCING METHODS
 
  transform
 
-       $future = $f1->transform( %args )
+       $future = $f1->transform( %args );
 
     Returns a new sequencing Future that wraps the one given as $f1. With
     no arguments this will be a trivial wrapper; $future will complete or
@@ -698,16 +698,16 @@ SEQUENCING METHODS
 
  then_with_f
 
-       $future = $f1->then_with_f( ... )
+       $future = $f1->then_with_f( ... );
 
     Since version 0.21.
 
     Returns a new sequencing Future that behaves like then, but also passes
     the original future, $f1, to any functions it invokes.
 
-       $f2 = $done_code->( $f1, @result )
-       $f2 = $catch_code->( $f1, $category, @details )
-       $f2 = $fail_code->( $f1, $category, @details )
+       $f2 = $done_code->( $f1, @result );
+       $f2 = $catch_code->( $f1, $category, @details );
+       $f2 = $fail_code->( $f1, $category, @details );
 
     This is useful for conditional execution cases where the code block may
     just return the same result of the original future. In this case it is
@@ -717,9 +717,9 @@ SEQUENCING METHODS
 
  then_fail
 
-       $future = $f->then_done( @result )
+       $future = $f->then_done( @result );
     
-       $future = $f->then_fail( $exception, $category, @details )
+       $future = $f->then_fail( $exception, $category, @details );
 
     Since version 0.22.
 
@@ -728,7 +728,7 @@ SEQUENCING METHODS
 
  else_with_f
 
-       $future = $f1->else_with_f( \&code )
+       $future = $f1->else_with_f( \&code );
 
     Since version 0.21.
 
@@ -736,7 +736,7 @@ SEQUENCING METHODS
     Identical to else, except that the code reference will be passed both
     the original future, $f1, and its exception and other details.
 
-       $f2 = $code->( $f1, $exception, $category, @details )
+       $f2 = $code->( $f1, $exception, $category, @details );
 
     This is useful for conditional execution cases where the code block may
     just return the same result of the original future. In this case it is
@@ -746,9 +746,9 @@ SEQUENCING METHODS
 
  else_fail
 
-       $future = $f->else_done( @result )
+       $future = $f->else_done( @result );
     
-       $future = $f->else_fail( $exception, $category, @details )
+       $future = $f->else_fail( $exception, $category, @details );
 
     Since version 0.22.
 
@@ -757,7 +757,7 @@ SEQUENCING METHODS
 
  catch_with_f
 
-       $future = $f1->catch_with_f( ... )
+       $future = $f1->catch_with_f( ... );
 
     Since version 0.33.
 
@@ -766,7 +766,7 @@ SEQUENCING METHODS
 
  followed_by
 
-       $future = $f1->followed_by( \&code )
+       $future = $f1->followed_by( \&code );
 
     Returns a new sequencing Future that runs the code regardless of
     success or failure. Once $f1 is ready the code reference will be
@@ -774,11 +774,11 @@ SEQUENCING METHODS
     $f2. Once $f2 completes the sequence future will then be marked as
     complete with whatever result $f2 gave.
 
-       $f2 = $code->( $f1 )
+       $f2 = $code->( $f1 );
 
  without_cancel
 
-       $future = $f1->without_cancel
+       $future = $f1->without_cancel;
 
     Since version 0.30.
 
@@ -792,9 +792,13 @@ SEQUENCING METHODS
     the original $f1 instance is cancelled then the returned $future will
     have to be cancelled too.
 
+    Also note that for the common case of using these with convergent
+    futures such as "needs_any", the "also" ability of version 0.51 may be
+    a better solution.
+
  retain
 
-       $f = $f->retain
+       $f = $f->retain;
 
     Since version 0.36.
 
@@ -826,9 +830,48 @@ CONVERGENT FUTURES
     as the prototype for constructing the return value, so it respects
     subclassing correctly, or failing that a plain Future.
 
+    Except for wait_all, it is possible that the result of the convergent
+    future is already determined by the completion of at least one
+    component future while others remain pending. In this situation, any
+    other components that are still pending will normally be cancelled.
+    Also, if the convergent future itself is cancelled then all of its
+    components will be cancelled.
+
+    Since version 0.51 it is possible to request that individual components
+    not be cancelled in this manner. Any component future prefixed with the
+    string "also" is not cancelled when the convergent is. This is somewhat
+    equivalent to using "without_cancel", but more performant as it does
+    not have to create the intermediate future inbetween just for the
+    purpose of ignoring a cancel method.
+
+    For example here, the futures $f3 and $f4 will not be cancelled, but
+    the other three might be:
+
+       Future->needs_all(
+          $f1,
+          $f2,
+          also => $f3,
+          also => $f4,
+          $f5,
+       );
+
+    This makes it possible to observe futures in shared caches, or other
+    situations where there may be multiple futures waiting for the result
+    of a given initial component, but that component should not be
+    cancelled just because any particular observer is stopped.
+
+       my $f = Future->wait_any(
+          timeout_future( delay => 10 ),
+    
+          also => ( $cache{$key} //= get_key_async($key) ),
+       );
+    
+       # if $f is cancelled now, its timeout is cancelled but the
+       # (possibly-shared) future in the %cache hash is not.
+
  wait_all
 
-       $future = Future->wait_all( @subfutures )
+       $future = Future->wait_all( @subfutures );
 
     Returns a new Future instance that will indicate it is ready once all
     of the sub future objects given to it indicate that they are ready,
@@ -843,7 +886,7 @@ CONVERGENT FUTURES
 
  wait_any
 
-       $future = Future->wait_any( @subfutures )
+       $future = Future->wait_any( @subfutures );
 
     Returns a new Future instance that will indicate it is ready once any
     of the sub future objects given to it indicate that they are ready,
@@ -861,7 +904,7 @@ CONVERGENT FUTURES
 
  needs_all
 
-       $future = Future->needs_all( @subfutures )
+       $future = Future->needs_all( @subfutures );
 
     Returns a new Future instance that will indicate it is ready once all
     of the sub future objects given to it indicate that they have completed
@@ -883,7 +926,7 @@ CONVERGENT FUTURES
 
  needs_any
 
-       $future = Future->needs_any( @subfutures )
+       $future = Future->needs_any( @subfutures );
 
     Returns a new Future instance that will indicate it is ready once any
     of the sub future objects given to it indicate that they have completed
@@ -917,23 +960,23 @@ METHODS ON CONVERGENT FUTURES
 
  pending_futures
 
-       @f = $future->pending_futures
+       @f = $future->pending_futures;
 
  ready_futures
 
-       @f = $future->ready_futures
+       @f = $future->ready_futures;
 
  done_futures
 
-       @f = $future->done_futures
+       @f = $future->done_futures;
 
  failed_futures
 
-       @f = $future->failed_futures
+       @f = $future->failed_futures;
 
  cancelled_futures
 
-       @f = $future->cancelled_futures
+       @f = $future->cancelled_futures;
 
     Return a list of all the pending, ready, done, failed, or cancelled
     component futures. In scalar context, each will yield the number of
@@ -947,7 +990,7 @@ SUBCLASSING METHODS
 
  set_udata
 
-       $future = $future->set_udata( $name, $value )
+       $future = $future->set_udata( $name, $value );
 
     Since version 0.49
 
@@ -960,7 +1003,7 @@ SUBCLASSING METHODS
 
  udata
 
-       $value = $future->udata( $name )
+       $value = $future->udata( $name );
 
     Since version 0.49
 
@@ -973,9 +1016,9 @@ TRACING METHODS
 
  label
 
-       $future = $future->set_label( $label )
+       $future = $future->set_label( $label );
     
-       $label = $future->label
+       $label = $future->label;
 
     Since version 0.28.
 
@@ -988,9 +1031,9 @@ TRACING METHODS
 
  rtime
 
-       [ $sec, $usec ] = $future->btime
+       [ $sec, $usec ] = $future->btime;
     
-       [ $sec, $usec ] = $future->rtime
+       [ $sec, $usec ] = $future->rtime;
 
     Since version 0.28.
 
@@ -1008,7 +1051,7 @@ TRACING METHODS
 
  elapsed
 
-       $sec = $future->elapsed
+       $sec = $future->elapsed;
 
     Since version 0.28.
 
@@ -1018,7 +1061,7 @@ TRACING METHODS
 
  wrap_cb
 
-       $cb = $future->wrap_cb( $operation_name, $cb )
+       $cb = $future->wrap_cb( $operation_name, $cb );
 
     Since version 0.31.
 

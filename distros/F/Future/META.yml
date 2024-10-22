@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,32 +16,33 @@ name: Future
 provides:
   Future:
     file: lib/Future.pm
-    version: '0.50'
+    version: '0.51'
   Future::Exception:
     file: lib/Future/Exception.pm
-    version: '0.50'
+    version: '0.51'
   Future::Mutex:
     file: lib/Future/Mutex.pm
-    version: '0.50'
+    version: '0.51'
   Future::PP:
     file: lib/Future/PP.pm
-    version: '0.50'
+    version: '0.51'
   Future::Utils:
     file: lib/Future/Utils.pm
-    version: '0.50'
+    version: '0.51'
   Test::Future:
     file: lib/Test/Future.pm
-    version: '0.50'
+    version: '0.51'
   Test::Future::Deferred:
     file: lib/Test/Future/Deferred.pm
-    version: '0.50'
+    version: '0.51'
 requires:
   Carp: '1.25'
+  List::Util: '1.29'
   Test::Builder::Module: '0'
   Time::HiRes: '0'
-  perl: '5.010'
+  perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.50'
+version: '0.51'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -79,6 +79,10 @@ struct FutureXSRevocation
 #define CB_NONSEQ_CODE(cb)  \
   ({ if((cb)->flags & CB_SEQ_ANY) croak("ARGH: CB_NONSEQ_CODE on SEQ"); (cb)->code;})
 
+enum {
+  SUBFLAG_NO_CANCEL = (1<<0),
+};
+
 struct FutureXS
 {
   unsigned int ready : 1;
@@ -102,6 +106,7 @@ struct FutureXS
    * allocated when required
    */
   AV *subs;
+  U8 *subflags;
   Size_t pending_subs;
 
   /* For without_cancel, purely to keep a strongref */
@@ -177,6 +182,7 @@ SV *Future_new(pTHX_ const char *cls)
   self->udata = NULL;
 
   self->subs = NULL;
+  self->subflags = NULL;
 
   self->precedent_f = NULL;
 
@@ -321,6 +327,7 @@ void Future_destroy(pTHX_ SV *f)
   UNREF(self->constructed_at);
 
   UNREF(self->subs);
+  Safefree(self->subflags);
 
   UNREF(self->precedent_f);
 
@@ -1106,8 +1113,11 @@ void Future_cancel(pTHX_ SV *f)
   AV *on_cancel = self->on_cancel;
 
   if(self->subs) {
-    for(Size_t i = 0; i < av_count(self->subs); i++)
-      future_cancel(AvARRAY(self->subs)[i]);
+    for(Size_t i = 0; i < av_count(self->subs); i++) {
+      U8 flags = self->subflags[i];
+      if(!(flags & SUBFLAG_NO_CANCEL))
+        future_cancel(AvARRAY(self->subs)[i]);
+    }
   }
 
   // TODO: maybe we need to clear these out from self before we do this, in
@@ -1216,14 +1226,18 @@ static SV *S_future_new_subsv(pTHX_ const char *cls, SV **subs, size_t n)
   /* Find the best prototype; pick the first derived instance if there is
    * one */
   SV *proto = NULL;
+  size_t subcount = 0;
   for(Size_t i = 0; i < n; i++) {
+    if(!SvROK(subs[i]) && SvPOK(subs[i]) && strEQ(SvPVX(subs[i]), "also"))
+      i++;
+
     if(!SvROK(subs[i]) || !SvOBJECT(SvRV(subs[i])))
       croak("Expected a Future, got %" SVf, SVfARG(subs[i]));
 
-    if(SvSTASH(SvRV(subs[i])) != future_stash) {
+    subcount++;
+
+    if(!proto && SvSTASH(SvRV(subs[i])) != future_stash)
       proto = subs[i];
-      break;
-    }
   }
 
   SV *f = proto ? future_new_proto(proto) : future_new(cls);
@@ -1231,9 +1245,18 @@ static SV *S_future_new_subsv(pTHX_ const char *cls, SV **subs, size_t n)
 
   if(!self->subs)
     self->subs = newAV();
+  av_extend(self->subs, subcount);
+  if(!self->subflags)
+    Newx(self->subflags, subcount, U8);
 
-  for(Size_t i = 0; i < n; i++)
-    av_push(self->subs, newSVsv(subs[i]));
+  for(Size_t i = 0, subi = 0; i < n; i++, subi++) {
+    U8 flags = 0;
+    if(!SvROK(subs[i]) && SvPOK(subs[i]) && strEQ(SvPVX(subs[i]), "also"))
+      flags |= SUBFLAG_NO_CANCEL, i++;
+
+    av_store(self->subs, subi, newSVsv(subs[i]));
+    self->subflags[subi] = flags;
+  }
 
   return f;
 }
@@ -1264,7 +1287,9 @@ static void S_cancel_pending_subs(pTHX_ struct FutureXS *self)
 
   for(Size_t i = 0; i < av_count(self->subs); i++) {
     SV *sub = AvARRAY(self->subs)[i];
-    if(!future_is_ready(sub))
+    U8 flags = self->subflags[i];
+
+    if(!(flags & SUBFLAG_NO_CANCEL) && !future_is_ready(sub))
       future_cancel(sub);
   }
 }
@@ -1297,6 +1322,10 @@ SV *Future_new_waitallv(pTHX_ const char *cls, SV **subs, size_t n)
 {
   SV *f = future_new_subsv(cls, subs, n);
   struct FutureXS *self = get_future(f);
+
+  /* Reïnit subs + n */
+  subs = AvARRAY(self->subs);
+  n    = av_count(self->subs);
 
   self->pending_subs = 0;
   for(Size_t i = 0; i < n; i++) {
@@ -1371,6 +1400,10 @@ SV *Future_new_waitanyv(pTHX_ const char *cls, SV **subs, size_t n)
 {
   SV *f = future_new_subsv(cls, subs, n);
   struct FutureXS *self = get_future(f);
+
+  /* Reïnit subs + n */
+  subs = AvARRAY(self->subs);
+  n    = av_count(self->subs);
 
   if(!n) {
     future_failp(f, "Cannot ->wait_any with no subfutures");
@@ -1473,6 +1506,10 @@ SV *Future_new_needsallv(pTHX_ const char *cls, SV **subs, size_t n)
   SV *f = future_new_subsv(cls, subs, n);
   struct FutureXS *self = get_future(f);
 
+  /* Reïnit subs + n */
+  subs = AvARRAY(self->subs);
+  n    = av_count(self->subs);
+
   if(!n) {
     future_donev(f, NULL, 0);
     return f;
@@ -1572,6 +1609,10 @@ SV *Future_new_needsanyv(pTHX_ const char *cls, SV **subs, size_t n)
 {
   SV *f = future_new_subsv(cls, subs, n);
   struct FutureXS *self = get_future(f);
+
+  /* Reïnit subs + n */
+  subs = AvARRAY(self->subs);
+  n    = av_count(self->subs);
 
   if(!n) {
     future_failp(f, "Cannot ->needs_any with no subfutures");

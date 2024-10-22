@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK;
 # ABSTRACT: ARK Management
-$Koha::Contrib::ARK::VERSION = '1.1.0';
+$Koha::Contrib::ARK::VERSION = '1.1.1';
 use Moose;
 use Modern::Perl;
 use JSON;
@@ -279,7 +279,9 @@ sub run {
                 if ( $self->cmd ne 'check' && $self->current->{modified} ) {
                     $self->writer->write($biblio, $record);
                 }
-                push @{$self->explain->{result}->{records}}, $self->current;
+                if ($self->cmd eq 'check' || $self->current->{modified}) {
+                    push @{$self->explain->{result}->{records}}, $self->current;
+                }
             }
             my $count = $self->reader->count;
             next unless $progress;
@@ -305,7 +307,7 @@ Koha::Contrib::ARK - ARK Management
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 ATTRIBUTES
 

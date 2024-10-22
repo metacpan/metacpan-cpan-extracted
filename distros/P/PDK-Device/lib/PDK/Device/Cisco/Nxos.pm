@@ -7,13 +7,8 @@ use Carp   qw'croak';
 extends 'PDK::Device::Cisco';
 use namespace::autoclean;
 
-sub ftp_config {
+sub ftpConfig {
   my ($self, $hostname, $server, $username, $password) = @_;
-
-  if (!$self->{exp}) {
-    my $login = $self->login();
-    croak $login->{reason} if $login->{success} == 0;
-  }
 
   $server   //= $ENV{PDK_FTP_SERVER};
   $username //= $ENV{PDK_FTP_USERNAME};
@@ -21,24 +16,29 @@ sub ftp_config {
 
   croak "请正确提供 FTP 服务器地址、账户和密码，或者设置相关的环境变量！" unless $username && $password && $server;
 
+  if (!$self->{exp}) {
+    my $login = $self->login();
+    croak $login->{reason} if $login->{success} == 0;
+  }
+
   my $host = $self->{host};
 
   my $command = "copy running-config ftp://$username\@$server/$self->{month}/$self->{date}/";
 
   if (!!$hostname) {
-    $command .= "${hostname}_${host}.cfg";
+    $command .= "${hostname}_${host}.txt";
   }
   else {
-    $command .= "$host.cfg";
+    $command .= "$host.txt";
   }
 
   my $exp    = $self->{exp};
   my $result = $exp->match() || '';
 
   my $vrf = 'default';
-  $self->dump("准备连接到 FTP 服务器");
 
   $self->send("$command\n");
+  $self->dump("准备连接到 FTP 服务器");
 
   my @ret = $exp->expect(
     15,
@@ -57,12 +57,12 @@ sub ftp_config {
     ],
     [
       eof => sub {
-        croak("执行[$command/尝试FTP备份配置]，与设备 $self->{host} 会话丢失，连接被意外关闭！原因：\n" . $exp->before());
+        croak("执行[$command/尝试FTP备份配置]，与设备 $self->{host} 会话丢失，连接被意外关闭！原因：" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[$command/尝试FTP备份配置]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！原因：\n" . $exp->before());
+        croak("执行[$command/尝试FTP备份配置]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
       }
     ],
   );
@@ -90,12 +90,12 @@ sub ftp_config {
     ],
     [
       eof => sub {
-        croak("执行[$command/检查备份任务是否完成]，与设备 $self->{host} 会话丢失，连接被意外关闭！原因：\n" . $exp->before());
+        croak("执行[$command/检查备份任务是否完成]，与设备 $self->{host} 会话丢失，连接被意外关闭！原因：" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[$command/检查备份任务是否完成]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！原因：\n" . $exp->before());
+        croak("执行[$command/检查备份任务是否完成]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
       }
     ],
   );

@@ -2,7 +2,11 @@
 
 use strict;
 use warnings;
+use 5.010;
+
 use Test::More;
+use Test::Warnings;
+
 use English qw(-no_match_vars);
 
 # common P::C testing tools
@@ -31,7 +35,7 @@ for my $s (values %$subtests) {
 }
 my $npolicies = scalar keys %$subtests; # one can() test per policy
 
-plan tests => $nsubtests + $npolicies;
+plan tests => $nsubtests + $npolicies + 1;
 
 for my $policy ( sort keys %$subtests ) {
     can_ok( "Perl::Critic::Policy::$policy", 'violates' );

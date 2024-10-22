@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use base 'Perl::Critic::Policy';
 
+use List::MoreUtils qw( any );
 use Readonly;
 
 use Perl::Critic::Utils qw(
@@ -28,7 +29,7 @@ use Perl::Critic::StricterSubs::Utils qw(
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 my $expl =
     'Without importing a package, it is unlikely that references to things inside it even exist.';
@@ -306,8 +307,10 @@ sub _find_violations {
 
         next if exists $self->{_ignore_modules}->{ $package };
 
-        my $desc = qq{Use of "$call" without including "$package"};
-        push @violations, $self->violation( $desc, $expl, $call );
+        if ( not ( $call eq 'STDIN' || $call eq 'STDOUT' || $call eq 'STDERR' ) ) {
+            my $desc = qq{Use of "$call" without including "$package"};
+            push @violations, $self->violation( $desc, $expl, $call );
+        }
     }
 
     return @violations;
@@ -320,11 +323,8 @@ sub _is_ignored_module {
     my $ignore_hash = ($self->{_ignore_modules} //= {});
     return if $ignore_hash->{ $package };
 
-    my $ignore_regex_list = ($self->{_ignore_modules_regexes} //= []);
-    for my $i ( @{$ignore_regex_list} ) {
-        if ( $package =~ m/$i/smx ) {
-            return 1;
-        }
+    if ( my $ignore_regex_list = $self->{_ignore_modules_regexes} ) {
+        return any { $package =~ /$_/smx } @{$ignore_regex_list};
     }
 
     return 0;

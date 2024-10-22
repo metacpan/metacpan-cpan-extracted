@@ -1,6 +1,6 @@
 package Catalyst::View::BasePerRequest;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 our $DEFAULT_FACTORY = 'Catalyst::View::BasePerRequest::Lifecycle::Request';
 
 use Moose;
@@ -140,11 +140,11 @@ sub build {
 
 sub build_factory {
   my ($class, $factory_class, $app, $merged_args) = @_;
-  return my $factory = bless +{
-    class=>$class,
-    app=>$app, 
-    merged_args=>$merged_args,
-  }, $factory_class;
+  return $factory_class->new(
+    class => $class,
+    app => $app,
+    merged_args => $merged_args
+  );
 }
 
 sub render {
@@ -790,6 +790,16 @@ By default we create response helpers for all the status codes in L<HTTP::Status
 if you set the C<status_codes> configuration key (see L</status_codes>) you can limit the
 generated helpers to specific codes.  This can be useful since most views are only meaningful
 with a limited set of response codes.
+
+=head1 APPLICATION CONTEXT
+
+Generally views using this will need to be called in request context (that is with 
+a L<Catalyst> context, or C<'$c'>).  However if you call the view in application context
+you will get the underlying factory object. Useful if you need access to any complex
+constructs built at startup.
+
+If none of this makes sense to you, you don't need to worry about it.  It's advanced
+edge case stuff.   Added because I found a use case around view inheritance.
 
 =head1 RUNTIME HOOKS
  

@@ -52,4 +52,20 @@ my $expected = q[
   is $res->headers->header('location'), 'abc';
 }
 
+{
+  ok my $factory = Example->view('Hello');
+  is $factory->app, 'Example';
+  is $factory->class, 'Example::View::Hello';
+  is_deeply $factory->merged_args, +{
+    catalyst_component_name => "Example::View::Hello",
+    content_type => "text/html",
+    from_config => "now",
+    status_codes => {
+      200 => 1,
+      201 => 1,
+      400 => 1,
+    },
+  };
+}
+
 done_testing

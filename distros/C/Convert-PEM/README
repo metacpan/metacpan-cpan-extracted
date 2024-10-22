@@ -5,6 +5,7 @@ SYNOPSIS
         use Convert::PEM;
         my $pem = Convert::PEM->new(
                        Name => "DSA PRIVATE KEY",
+                       Macro => "DSAPrivateKey",
                        ASN => qq(
                            DSAPrivateKey SEQUENCE {
                                version INTEGER,
@@ -84,7 +85,7 @@ USAGE
 
         An ASN.1 description of the content to be either encoded or decoded.
 
-        *ASN* is a required argument.
+        *ASN* is an optional argument.
 
     *   Macro
 
@@ -104,7 +105,30 @@ USAGE
         *Convert::PEM* to use the "Foo" macro definition by using the
         *Macro* parameter and setting the value to "Foo".
 
-        *Macro* is an optional argument.
+        *Macro* is an optional argument when an ASN.1 description is
+        provided.
+
+    *   InForm
+
+        Specify what type of file to expect when using the *read* method.
+        Value may be either PEM or DER. Default is "PEM".
+
+        If "DER" is specified, encryption options are ignored when using the
+        *read* method and file is read as an unencrypted blob. This option
+        does not affect the *decode* behavior.
+
+        *InForm* is an optional argument.
+
+    *   OutForm
+
+        Specify what type of file the *write* method should output. Value
+        may be either PEM or DER. Default is "PEM".
+
+        If "DER" is specified, encryption options are ignored when using the
+        *write* method and the file is written as an uncrypted blob. This
+        option does not affect the *encode* behavior.
+
+        *OutForm* is an optional argument.
 
   $obj = $pem->decode(%args)
     Decodes, and, optionally, decrypts a PEM file, returning the object as
@@ -142,34 +166,56 @@ USAGE
 
     *   Content
 
+        This method requires either Content or DER. An error will be
+        generated if one of these arguments are not present.
+
         A hash reference that will be passed to *Convert::ASN1::encode*, and
         which should correspond to the ASN.1 description you gave to the
         *new* method. The hash reference should have the exact same format
         as that returned from the *read* method.
 
-        This argument is mandatory.
+        This is required unless DER is specified.
+
+    *   DER
+
+        A string containing actual binary of the contents to be encoded.
+        This bypasses ASN.1 encoding.
+
+        May be used in lieu of Content. If specified, will override Content.
 
     *   Password
 
         A password used to encrypt the contents of the PEM file. This is an
         optional argument; if not provided the contents will be unencrypted.
 
+    *   Cipher
+
+        The Cipher to use if a password is provided. This is an optional
+        argument; if not provided, the default of DES-EDE3-CBC will be used
+        or the cipher configured is $Convert::PEM::DefaultCipher. See below
+        for a list of supported ciphers.
+
   $obj = $pem->read(%args)
     Reads, decodes, and, optionally, decrypts a PEM file, returning the
-    object as decoded by *Convert::ASN1*. This is implemented as a wrapper
-    around *decode*, with the bonus of reading the PEM file from disk for
-    you.
+    object as decoded by *Convert::ASN1* (or binary blob if ASN.1
+    description was not provided). This is implemented as a wrapper around
+    *decode*, with the bonus of reading the PEM file from disk for you.
 
     If an error occurs while reading the file or decrypting/decoding the
     contents, the function returns *undef*, and you should check the error
     message using the *errstr* method (below).
 
     In addition to the arguments that can be passed to the *decode* method
-    (minus the *Content* method), *%args* can contain:
+    (minus the *Content* argument), *%args* can contain:
 
     *   Filename
 
         The location of the PEM file that you wish to read.
+
+    *   InForm
+
+        Specify what file type to read. Description can be found under *new*
+        method. If specified, will override InForm provided in *new* method.
 
   $pem->write(%args)
     Constructs the contents for the PEM file from an object: ASN.1-encodes
@@ -187,6 +233,46 @@ USAGE
 
         The location on disk where you'd like the PEM file written.
 
+    *   OutForm
+
+        Specify format to write out. Description can be found under *new*
+        method. If specified, will override OutForm provided in *new*
+        method.
+
+  $pem->from_der(%args)
+    Method used internally, but may be accessed directly decode an ASN.1
+    string into a perl structure object. If the Convert::PEM object has no
+    ASN.1 definition, this method has no effect.
+
+    *   DER
+
+        Binary string to convert to an object.
+
+        This option is required.
+
+    *   Macro
+
+        If the object has an ASN definition, a Macro may be specified. If
+        specified, it will override the object's Macro if one exists.
+
+        Macro is an optional argument.
+
+  $pem->to_der(%args)
+    Method used internally, but may be accessed directly to encode Content
+    into binary data. If the Convert::PEM object has no ASN.1 definition,
+    this method has no effect.
+
+    *   Content
+
+        An object to be ASN.1 encoded to a binary string.
+
+    *   Macro
+
+        If the object has an ASN definition, a Macro may be specified. If
+        specified, it will override the object's Macro if one exists.
+
+        Macro is an optional argument.
+
   $pem->errstr
     Returns the value of the last error that occurred. This should only be
     considered meaningful when you've received *undef* from one of the
@@ -201,6 +287,102 @@ USAGE
 
         $pem->asn->configure( decode => { bigint => 'Math::Pari' },
                               encode => { bigint => 'Math::Pari' } );
+
+CONFIGURATION
+    To support any encryption/decryption, the appropriate cipher module
+    needs to be installed.
+
+    Some settings may be viewed or configured through variables or methods.
+
+    Configuration settings are global to the package. If a setting is
+    changed, it affects all Convert::PEM objects.
+
+  $Convert::PEM::DefaultCipher *or* $OBJ->DefaultCipher(*[NEW_CIPHER]*)
+    Used to configure a default cipher when writing to the disk. When using
+    the method form " $OBJ-"DefaultCipher([NEW_CIPHER]) >, if NEW_CIPHER is
+    not specified, will return the current setting. If the specified cipher
+    is not recognized/valid, an error will be raised.
+
+    To list supported ciphers, use "Convert::PEM::list_ciphers". Here is a
+    list of supported Ciphers:
+
+    *   DES-CBC
+
+    *   DES-EDE3-CBC
+
+    *   AES-128-CBC
+
+    *   AES-192-CBC
+
+    *   AES-256-CBC
+
+    *   CAMELLIA-128-CBC
+
+    *   CAMELLIA-192-CBC
+
+    *   CAMELLIA-256-CBC
+
+    *   IDEA-CBC
+
+    *   SEED-CBC
+
+  Convert::PEM->has_cipher(*$cipher_name*)
+    Will see if the cipher is supported and is configured with an encryption
+    module.
+
+  Convert::PEM->has_cipher_module(*$cipher_name*)
+    Will see if the cipher is supported and if the configured encryption
+    module is usable. If it is not usable, will return "undef". If it is
+    usable, will return the name of the cipher module.
+
+  Convert::PEM->set_cipher_module($cipher,$module[,$all])
+    This function/method is used to specify a module name for a supported
+    cipher. It accepts 2 or 3 arguments.
+
+            Convert::PEM->set_cipher_module(<cipher_name>, <module_name>[,0])
+            or
+            $OBJ->set_cipher_module(<cipher_name>, <module_name>[,0])
+
+    "cipher_name"
+        A supported cipher name. Use Convert::PEM::list_ciphers() to
+        retrieve a list of supported ciphers.
+
+    "module_name"
+        A cipher module. The module must support the following methods:
+
+                $cipher_object = Cipher->new($key)
+                $cipher_object->encrypt($plaintext)
+                $cipher_object->decrypt($ciphertext)
+                $cipher_object->blocksize()
+
+    "all"
+        An optional boolean argument. If true will replace the modules for
+        all supported ciphers matching the cipher being set. Default is
+        true. If setting a cipher, only set this to false if it is desired
+        to use a separate cipher for different key lengths of the same
+        algorithm.
+
+  Convert::PEM->list_cipher_modules([$cipher_name])
+    If a *cipher_name* is provided, will return the module configured for
+    the matching cipher name or "undef" if cipher is not supported. If
+    *cipher_name* is not provided, will return a list of modules names
+    configured as an array in array context or as a colon separated list in
+    scalar context.
+
+    Here is a list of the cipher modules used by default.
+
+    *   Crypt::DES
+
+    *   Crypt::DES_EDE3
+
+    *   Crypt::Rijndael - "AES-128-CBC, AES-192-CBC and AES-256-CBC"
+
+    *   Crypt::Camellia - "CAMELLIA-128-CBC, CAMELLIA-192-CBC and
+        CAMELLIA-256-CBC"
+
+    *   Crypt::IDEA
+
+    *   Crypt::SEED
 
 ERROR HANDLING
     If an error occurs in any of the above methods, the method will return

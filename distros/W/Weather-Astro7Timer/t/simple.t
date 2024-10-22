@@ -63,14 +63,15 @@ $content = '<product name="astro"></product>';
 $mock->override(
     get => sub {return HTTP::Response->new(200, 'SUCCESS', undef, $content)});
 
-subtest 'get xml / internal' => sub {
+subtest 'get xml / internal / png' => sub {
     my $weather = Weather::Astro7Timer->new();
     my %out     = $weather->get(%opt, output => 'internal');
-    my %out2     = $weather->get(%opt, output => 'xml');
+    my %out2    = $weather->get(%opt, output => 'xml');
+    my %out3    = $weather->get(%opt, output => 'png');
 
     is(\%out, {data => $content}, 'Internal output');
     is(\%out2, {name => 'astro'}, 'XML output');
+    is(\%out3, {data => $content}, 'Png output');
 };
-
 
 done_testing;

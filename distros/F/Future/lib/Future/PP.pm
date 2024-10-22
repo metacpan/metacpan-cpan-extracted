@@ -3,17 +3,16 @@
 #
 #  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
-package Future::PP;
+package Future::PP 0.51;
 
-use v5.10;
-use strict;
+use v5.14;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.50';
 our @ISA = qw( Future::_base );
 
 use Carp qw(); # don't import croak
+use List::Util 1.29 qw( pairs pairkeys );
 use Scalar::Util qw( weaken blessed reftype );
 use Time::HiRes qw( gettimeofday );
 
@@ -735,33 +734,57 @@ sub without_cancel
    return $new;
 }
 
+# $self->{subs} is an even-sized list of *pairs*, ( $subf, $flags, $subf, $flags, ... )
+#   pairkeys @{ $self->{subs} }  yields just the futures
+
+use constant {
+   SUBFLAG_NO_CANCEL => (1<<0),
+};
+
 sub _new_convergent
 {
    shift; # ignore this class
    my ( $subs ) = @_;
 
-   foreach my $sub ( @$subs ) {
+   my @flaggedsubs;
+
+   for ( my $i = 0; $i < @$subs; $i++ ) {
+      my $flags = 0;
+      $flags |= SUBFLAG_NO_CANCEL, $i++ if !blessed $subs->[$i] and $subs->[$i] eq "also";
+
+      my $sub = $subs->[$i];
       blessed $sub and $sub->isa( "Future" ) or Carp::croak "Expected a Future, got $sub";
+
+      push @flaggedsubs, ( $sub, $flags );
    }
 
    # Find the best prototype. Ideally anything derived if we can find one.
    my $self;
-   ref($_) eq "Future" or $self = $_->new, last for @$subs;
+   ref($_) eq "Future" or $self = $_->new, last for pairkeys @flaggedsubs;
 
    # No derived ones; just have to be a basic class then
    $self ||= Future->new;
 
-   $self->{subs} = $subs;
+   $self->{subs} = \@flaggedsubs;
 
-   # This might be called by a DESTROY during global destruction so it should
-   # be as defensive as possible (see RT88967)
-   $self->on_cancel( sub {
-      foreach my $sub ( @$subs ) {
-         $sub->cancel if $sub and !$sub->{ready};
-      }
-   } );
+   $self->on_cancel( \&_cancel_subs );
+
+   @$subs = pairkeys @flaggedsubs;
 
    return $self;
+}
+
+# This might be called by a DESTROY during global destruction so it should
+# be as defensive as possible (see RT88967)
+sub _cancel_subs
+{
+   my $self = shift;
+   my $subs = $self->{subs} or return;
+
+   foreach ( pairs @$subs ) {
+      my ( $sub, $flags ) = @$_;
+      $sub->cancel if !( $flags & SUBFLAG_NO_CANCEL ) and $sub and !$sub->{ready};
+   }
 }
 
 sub wait_all
@@ -794,7 +817,7 @@ sub wait_all
       $pending--;
       $pending and return;
 
-      $self->{result} = [ @subs ];
+      $self->{result} = [ pairkeys @{ $self->{subs} } ];
       $self->_mark_ready( "wait_all" );
    };
 
@@ -825,9 +848,7 @@ sub wait_any
    }
 
    if( $immediate_ready ) {
-      foreach my $sub ( @subs ) {
-         $sub->{ready} or $sub->cancel;
-      }
+      $self->_cancel_subs;
 
       if( $immediate_ready->{failure} ) {
          $self->{failure} = [ @{ $immediate_ready->{failure} } ];
@@ -858,9 +879,7 @@ sub wait_any
          $self->{result}  = [ @{ $_[0]->{result} } ];
       }
 
-      foreach my $sub ( @subs ) {
-         $sub->{ready} or $sub->cancel;
-      }
+      $self->_cancel_subs;
 
       $self->_mark_ready( "wait_any" );
    };
@@ -896,9 +915,7 @@ sub needs_all
    }
 
    if( $immediate_failure ) {
-      foreach my $sub ( @subs ) {
-         $sub->{ready} or $sub->cancel;
-      }
+      $self->_cancel_subs;
 
       $self->{failure} = [ @$immediate_failure ];
       $self->_mark_ready( "needs_all" );
@@ -922,23 +939,19 @@ sub needs_all
 
       if( $_[0]->{cancelled} ) {
          $self->{failure} = [ "A component future was cancelled" ];
-         foreach my $sub ( @subs ) {
-            $sub->cancel if !$sub->{ready};
-         }
+         $self->_cancel_subs;
          $self->_mark_ready( "needs_all" );
       }
       elsif( $_[0]->{failure} ) {
          $self->{failure} = [ @{ $_[0]->{failure} } ];
-         foreach my $sub ( @subs ) {
-            $sub->cancel if !$sub->{ready};
-         }
+         $self->_cancel_subs;
          $self->_mark_ready( "needs_all" );
       }
       else {
          $pending--;
          $pending and return;
 
-         $self->{result} = [ map { @{ $_->{result} } } @subs ];
+         $self->{result} = [ map { @{ $_->{result} } } pairkeys @{ $self->{subs} } ];
          $self->_mark_ready( "needs_all" );
       }
    };
@@ -1014,9 +1027,7 @@ sub needs_any
       }
       else {
          $self->{result} = [ @{ $_[0]->{result} } ];
-         foreach my $sub ( @subs ) {
-            $sub->cancel if !$sub->{ready};
-         }
+         $self->_cancel_subs;
          $self->_mark_ready( "needs_any" );
       }
    };
@@ -1032,35 +1043,35 @@ sub pending_futures
 {
    my $self = shift;
    $self->{subs} or Carp::croak "Cannot call ->pending_futures on a non-convergent Future";
-   return grep { not $_->{ready} } @{ $self->{subs} };
+   return grep { not $_->{ready} } pairkeys @{ $self->{subs} };
 }
 
 sub ready_futures
 {
    my $self = shift;
    $self->{subs} or Carp::croak "Cannot call ->ready_futures on a non-convergent Future";
-   return grep { $_->{ready} } @{ $self->{subs} };
+   return grep { $_->{ready} } pairkeys @{ $self->{subs} };
 }
 
 sub done_futures
 {
    my $self = shift;
    $self->{subs} or Carp::croak "Cannot call ->done_futures on a non-convergent Future";
-   return grep { $_->{ready} and not $_->{failure} and not $_->{cancelled} } @{ $self->{subs} };
+   return grep { $_->{ready} and not $_->{failure} and not $_->{cancelled} } pairkeys @{ $self->{subs} };
 }
 
 sub failed_futures
 {
    my $self = shift;
    $self->{subs} or Carp::croak "Cannot call ->failed_futures on a non-convergent Future";
-   return grep { $_->{ready} and $_->{failure} } @{ $self->{subs} };
+   return grep { $_->{ready} and $_->{failure} } pairkeys @{ $self->{subs} };
 }
 
 sub cancelled_futures
 {
    my $self = shift;
    $self->{subs} or Carp::croak "Cannot call ->cancelled_futures on a non-convergent Future";
-   return grep { $_->{ready} and $_->{cancelled} } @{ $self->{subs} };
+   return grep { $_->{ready} and $_->{cancelled} } pairkeys @{ $self->{subs} };
 }
 
 sub btime

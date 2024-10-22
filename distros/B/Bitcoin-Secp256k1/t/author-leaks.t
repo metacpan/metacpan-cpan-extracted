@@ -26,6 +26,12 @@ Test::MemoryGrowth::no_growth {
 	my $public_key = $secp->create_public_key($private_key);
 	$public_key = $secp->compress_public_key($public_key, !!0);
 
+	my $result = eval {
+		$secp->combine_public_keys($public_key, "\x02" . "\xff" x 32);
+		1;
+	};
+	die 'valid pub?' if $result;
+
 	my $signature = $secp->sign_message($private_key, $message);
 	die 'invalid sig?' unless $secp->verify_message($public_key, $signature, $message);
 }

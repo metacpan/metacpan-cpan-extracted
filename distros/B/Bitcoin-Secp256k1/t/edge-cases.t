@@ -67,5 +67,10 @@ subtest 'should die on invalid multiplication' => sub {
 	like $ex, qr/multiplication arguments are not valid/, 'exception ok';
 };
 
+subtest 'should die on invalid combination of public keys' => sub {
+	my $ex = dies { $secp->combine_public_keys($t{pubkey}, "\02" . "\xff" x 32) };
+	like $ex, qr/the input does not appear to be a valid public key/, 'exception ok';
+};
+
 done_testing;
 

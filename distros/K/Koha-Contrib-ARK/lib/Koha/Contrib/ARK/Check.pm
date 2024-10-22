@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Check;
 # ABSTRACT: Check Koha ARK field
-$Koha::Contrib::ARK::Check::VERSION = '1.1.0';
+$Koha::Contrib::ARK::Check::VERSION = '1.1.1';
 use Moose;
 use Modern::Perl;
 
@@ -77,7 +77,7 @@ Koha::Contrib::ARK::Check - Check Koha ARK field
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 AUTHOR
 

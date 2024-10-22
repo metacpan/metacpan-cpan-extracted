@@ -10,13 +10,9 @@ use Carp;
 
 Weather::Astro7Timer - Simple client for the 7Timer.info Weather Forecast service
 
-=head1 VERSION
-
-Version 0.01
-
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 =head1 SYNOPSIS
 
@@ -25,7 +21,7 @@ our $VERSION = '0.1';
   # Get ASTRO weather for the Stonehenge area
 
   my %report = $w7t->get(
-      product => 'astro',    # Forecast type (astro, civil, civillight, meteo, two)
+      product => 'astro',    # Forecast type (astro, civil, civillight, meteo)
       lat     => 51.2,       # Latitude
       lon     => -1.8,       # Longitude
   );
@@ -52,6 +48,19 @@ our $VERSION = '0.1';
           ...
       ]
   };
+
+  # You can get a png image instead...
+
+  my $data = $w7t->get(
+      product => 'civil',
+      lat     => 51.2,
+      lon     => -1.8,
+      output  => 'png'
+  );
+
+  # ... and write it out to a file
+  open(my $fh, '>', "civil.png") or die $!; print $fh $data; close($fh);
+
 
 =head1 DESCRIPTION
 
@@ -113,7 +122,8 @@ Optional parameters:
 
 Fetches a forecast report for the requested for the requested location.
 Returns a string containing the JSON or XML data, except in array context, in which case,
-as a convenience, it will use L<JSON> or L<XML::Simple> to decode it directly to a Perl hash.
+as a convenience, it will use L<JSON> or L<XML::Simple> to decode it directly to a Perl hash
+(in the case of C<png> output, the hash will containg a single key C<data> with the png data).
 For an explanation to the returned data, refer to the L<official API documentation|http://www.7timer.info/doc.php>.
 
 If the request is not successful, it will C<die> throwing the C<< HTTP::Response->status_line >>.
@@ -138,7 +148,7 @@ Required parameters:
 
 =item * C<meteo> : A detailed meteorogical forecast including relative humidity and wind profile from 950hPa to 200hPa.
 
-=item * C<two> : A two week overview forecast.
+=item * C<two> : A two week overview forecast (may be unmaintained).
 
 =back
 
@@ -152,10 +162,9 @@ Optional parameters (see the API documentation for further details):
 
 =item * C<unit> : C<metric> (default) or C<british> units.
 
-=item * C<output> : Output format, supports C<json> (default) or C<xml>, although
-C<internal> will also work, returning png image.
+=item * C<output> : Output format, supports C<json> (default), C<xml> or C<png>.
 
-=item * C<tzshift> : Timezone offset in hours ( -23 to 23).
+=item * C<tzshift> : Timezone offset in hours (-23 to 23).
 
 =item * C<ac> : Altitude correction (e.g. temp) for high peaks. Default C<0>, accepts
 C<2> or C<7> (in km). Only for C<astro> product.
@@ -206,6 +215,7 @@ sub get {
     my %args = @_;
     $args{lang}   ||= 'en';
     $args{output} ||= 'json';
+    $args{output} = 'internal' if $args{output} eq 'png';
 
     my $resp = $self->get_response(%args);
 

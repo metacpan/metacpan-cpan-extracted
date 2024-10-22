@@ -9,7 +9,7 @@ use TestTools;
 use XML::Compile::Schema;
 use XML::Compile::Tester;
 
-use Test::More tests => 25;
+use Test::More tests => 33;
 
 my $TestNS2 = "http://second-ns";
 
@@ -78,11 +78,18 @@ my $schema  = XML::Compile::Schema->new( <<__SCHEMA__ );
   </complexType>
 </element>
 
+<element name="test5">
+  <complexType>
+    <sequence>
+      <element ref="first:test1" maxOccurs="unbounded" />
+    </sequence>
+  </complexType>
+</element>
+
 </schema>
 
 </schemas>
 __SCHEMA__
-
 ok(defined $schema);
 
 #
@@ -125,4 +132,23 @@ test_rw($schema, test3 => <<__XML, \%r3_a);
   <g3_b>32</g3_b>
   <g3_a>33</g3_a>
 </test3>
+__XML
+
+#
+# ref repeat
+#
+
+my %r5_a = (a1_a => 40, e1_a => 41, e1_b => 42);
+my %r5_b = (a1_a => 43, e1_a => 44, e1_b => 45);
+test_rw($schema, "{$TestNS2}test5" => <<__XML, {test1 => [ \%r5_a, \%r5_b ]});
+<test5>
+   <test1 a1_a="40">
+      <e1_a>41</e1_a>
+      <e1_b>42</e1_b>
+   </test1>
+   <test1 a1_a="43">
+      <e1_a>44</e1_a>
+      <e1_b>45</e1_b>
+   </test1>
+</test5>
 __XML

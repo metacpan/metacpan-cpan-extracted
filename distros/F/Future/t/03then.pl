@@ -10,9 +10,10 @@ use Future;
 {
    my $f1 = Future->new;
 
+   my $cb;
    my $f2;
    my $fseq = $f1->then(
-      sub {
+      $cb = sub {
          is( $_[0], "f1 result", 'then done block passed result of $f1' );
          return $f2 = Future->new;
       }
@@ -22,6 +23,7 @@ use Future;
    isa_ok( $fseq, [ "Future" ], '$fseq' );
 
    is_oneref( $fseq, '$fseq has refcount 1 initially' );
+   is_refcount( $cb, 2, '$cb has refcount 2 captured by then callback' );
 
    ok( !$f2, '$f2 not yet defined before $f1 done' );
 
@@ -41,6 +43,7 @@ use Future;
 
    undef $f2;
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
+   is_oneref( $cb, '$cb has refcount 1 before EOF' );
 }
 
 # then failure in f1
@@ -93,9 +96,10 @@ use Future;
 {
    my $f1 = Future->done( "Result" );
 
+   my $cb;
    my $f2;
    my $fseq = $f1->then(
-      sub { return $f2 = Future->new }
+      $cb = sub { return $f2 = Future->new }
    );
 
    ok( defined $f2, '$f2 defined for immediate done' );
@@ -104,6 +108,7 @@ use Future;
 
    ok( $fseq->is_ready, '$fseq already ready for immediate done' );
    is( scalar $fseq->result, "Final", '$fseq->result for immediate done' );
+   is_oneref( $cb, '$cb has refcount 1 before EOF' );
 }
 
 # immediately fail

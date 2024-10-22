@@ -1,14 +1,14 @@
-# Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2006-2024 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution XML-Compile.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package XML::Compile::Util;
-use vars '$VERSION';
-$VERSION = '1.63';
+package XML::Compile::Util;{
+our $VERSION = '1.64';
+}
 
 use base 'Exporter';
 
@@ -107,4 +107,5 @@ sub add_duration($;$)
       , $mon  + $sign*($3//0)
       , $year + $sign*($2//0)
 }
+
 1;

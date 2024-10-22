@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Action;
 # ABSTRACT: ARK Action roles
-$Koha::Contrib::ARK::Action::VERSION = '1.1.0';
+$Koha::Contrib::ARK::Action::VERSION = '1.1.1';
 use Moose::Role;
 use Modern::Perl;
 
@@ -29,7 +29,7 @@ Koha::Contrib::ARK::Action - ARK Action roles
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 ATTRIBUTES
 

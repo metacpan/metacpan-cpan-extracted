@@ -1,6 +1,6 @@
 package SPVM::Net::DNS::Native;
 
-our $VERSION = "0.001";
+our $VERSION = "0.002";
 
 1;
 
@@ -28,11 +28,15 @@ Net::DNS::Native class in L<SPVM> has methods to perform non-blocking L<getaddri
 
 =head1 Class Methods
 
+=head2 new
+
 C<static method new : Net::DNS::Native ();>
 
 Creates a new L<Net::DNS::Native|SPVM::Net::DNS::Native> object and returns it.
 
 =head1 Instance Methods
+
+=head2 getaddrinfo
 
 C<method getaddrinfo : void ($node : string, $service : string, $hints : L<Sys::Socket::Addrinfo|SPVM::Sys::Socket::Addrinfo>, $res_ref : L<Sys::Socket::AddrinfoLinkedList|SPVM::Sys::Socket::AddrinfoLinkedList>[]);>
 

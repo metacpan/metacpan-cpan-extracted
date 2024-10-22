@@ -4,13 +4,13 @@
       "Reini Urban <rurban@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 8.0404, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "re-engine-Hyperscan",
    "no_index" : {
@@ -31,12 +31,20 @@
             "Devel::CheckLib" : "1.00",
             "ExtUtils::MakeMaker" : "6.31"
          }
-      },
-      "runtime" : {
-         "requires" : {}
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rurban/re-engine-Hyperscan/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/rurban/re-engine-Hyperscan/"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Reader;
 # ABSTRACT: Read Koha biblio records with/without ARK
-$Koha::Contrib::ARK::Reader::VERSION = '1.1.0';
+$Koha::Contrib::ARK::Reader::VERSION = '1.1.1';
 use Moose;
 use Moose::Util::TypeConstraints;
 use Modern::Perl;
@@ -96,7 +96,7 @@ Koha::Contrib::ARK::Reader - Read Koha biblio records with/without ARK
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 ATTRIBUTES
 

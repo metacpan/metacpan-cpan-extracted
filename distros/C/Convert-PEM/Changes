@@ -1,7 +1,61 @@
 Revision history for Convert::PEM
 
-0.09 -- Tue Oct 15 22:59:26 ADT 2024
+0.12 -- Mon Oct 21 22:46:47 ADT 2024
 
+    [Changes Since 0.09]
+    - Release 0.11-TRIAL as 0.12 
+    - Added extra cipher support from @jeremy-church - see release 0.10
+    - Miscellaneous cleanups
+
+    [Detailed Changes]
+    - ae82ce2 v0.11
+    - 43861a2 Bump repo version
+    - 4e8c59d openssl version differences - only test in author testing
+    - 9b3e183 v0.10
+
+0.11 -- Sun Oct 20 20:35:17 ADT 2024
+
+    [Changes Since 0.08]
+    - Added extra cipher support from @jeremy-church - see release 0.09
+    - Miscellaneous cleanups
+
+    [Detailed Changes]
+    - 43861a2 Bump repo version
+    - 4e8c59d openssl version differences - only test in author testing
+    - 9b3e183 v0.10
+
+0.10 -- Sun Oct 20 11:57:20 ADT 2024
+
+    - Merge PR#1 from @jeremy-church to add extra cipher support
+    - Add DES support
+    - Add AES 128/192/256 support
+    - Add IDEA support
+    - Add SEED Support
+    - Add Camellia 128/192/256 support
+    - Add tests and test files for additional ciphers and alternate cipher modules (if available)
+    - Add supporting function(s)/method(s) for additional ciphers
+    - Add tests to verify OpenSSL can read files encrypted by Convert::PEM (if available)
+    - Change key bytes_to_key in Convert::PEM::CBC to match openssl algorithm
+    - Make some modifications to accommodate SEED and IDEA (realy old) cipher modules
+    - Make ASN optional
+    - Add DER support and documentation
+    - Add other access methods to documentation
+    - Additional encode/decode testing with DER
+
+    [Detailed Changes]
+    - c4128fd no need to use eval for blocksize call
+    - 0cdf983 Remove execution attributes on test files
+    - aa16478 Move the pem and der files to a sub directory
+    - e7b4d1a Fix spelling typos
+    - f047d32 rand is not secure for crypto operations
+    - 3e2847b DES and IDEA are deprecated in OpenSSL versions
+    - bd40886 Replace tabs with spaces
+    - 7971073 Added changes
+    - 53a3142 Additional documentation and make ASN optional.
+    - 879b190 Add support for additional ciphers.
+    - 6c68073 typo fix
+
+0.09 -- Tue Oct 15 22:59:26 ADT 2024
     - 55f01eb Bump Repo Version
     - 4072ab2 Fixes RT#27574: encode test occasionlly fails
     - 204ffeb Convert build to Dist::Zilla

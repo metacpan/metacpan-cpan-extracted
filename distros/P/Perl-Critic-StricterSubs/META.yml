@@ -6,10 +6,11 @@ build_requires:
   Module::Build: '0.4'
   Perl::Critic::TestUtils: '1.082'
   Test::More: '0'
+  Test::Warnings: '0'
 configure_requires:
   Module::Build: '0.4'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,25 +19,25 @@ name: Perl-Critic-StricterSubs
 provides:
   Perl::Critic::Policy::Modules::RequireExplicitInclusion:
     file: lib/Perl/Critic/Policy/Modules/RequireExplicitInclusion.pm
-    version: '0.07'
+    version: '0.08'
   Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs:
     file: lib/Perl/Critic/Policy/Subroutines/ProhibitCallsToUndeclaredSubs.pm
-    version: '0.07'
+    version: '0.08'
   Perl::Critic::Policy::Subroutines::ProhibitCallsToUnexportedSubs:
     file: lib/Perl/Critic/Policy/Subroutines/ProhibitCallsToUnexportedSubs.pm
-    version: '0.07'
+    version: '0.08'
   Perl::Critic::Policy::Subroutines::ProhibitExportingUndeclaredSubs:
     file: lib/Perl/Critic/Policy/Subroutines/ProhibitExportingUndeclaredSubs.pm
-    version: '0.07'
+    version: '0.08'
   Perl::Critic::Policy::Subroutines::ProhibitQualifiedSubDeclarations:
     file: lib/Perl/Critic/Policy/Subroutines/ProhibitQualifiedSubDeclarations.pm
-    version: '0.07'
+    version: '0.08'
   Perl::Critic::StricterSubs:
     file: lib/Perl/Critic/StricterSubs.pm
-    version: '0.07'
+    version: '0.08'
   Perl::Critic::StricterSubs::Utils:
     file: lib/Perl/Critic/StricterSubs/Utils.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   Carp: '0'
   English: '0'
@@ -55,4 +56,5 @@ resources:
   homepage: http://perlcritic.com
   license: http://dev.perl.org/licenses/
   repository: git://github.com/Perl-Critic/Perl-Critic-StricterSubs.git
-version: '0.07'
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

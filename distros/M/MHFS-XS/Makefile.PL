@@ -1,7 +1,5 @@
 use 5.020002;
 use ExtUtils::MakeMaker;
-use File::Basename;
-use Cwd qw(abs_path);
 use Config;
 use Alien::Base::Wrapper ();
 
@@ -37,5 +35,12 @@ my %stuff = Alien::Base::Wrapper->new('Alien::libFLAC')->mm_args2(
         },
     },
 );
+
+# 32-bit arm needs -latomic for miniaudio
+if(($Config{archname} =~ /arm/) && ($Config{archname} !~ /64/)) {
+    $stuff{LIBS} //= [''];
+    print "adding atomic ".$Config{archname}."\n";
+    $stuff{LIBS}[0] .= ' -latomic';
+}
 
 WriteMakefile(%stuff);

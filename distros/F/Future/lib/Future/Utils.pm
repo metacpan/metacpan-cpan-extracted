@@ -1,15 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2024 -- leonerd@leonerd.org.uk
 
-package Future::Utils;
+package Future::Utils 0.51;
 
-use v5.10;
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.50';
 
 use Exporter 'import';
 # Can't import the one from Exporter as it relies on package inheritance
@@ -42,72 +39,81 @@ C<Future::Utils> - utility functions for working with C<Future> objects
 
 =head1 SYNOPSIS
 
- use Future::Utils qw( call_with_escape );
+=for highlighter language=perl
 
- my $result_f = call_with_escape {
-    my $escape_f = shift;
-    my $f = ...
-       $escape_f->done( "immediate result" );
-       ...
- };
+   use Future::Utils qw( call_with_escape );
 
-Z<>
-
- use Future::Utils qw( repeat try_repeat try_repeat_until_success );
-
- my $eventual_f = repeat {
-    my $trial_f = ...
-    return $trial_f;
- } while => sub { my $f = shift; return want_more($f) };
-
- my $eventual_f = repeat {
-    ...
-    return $trial_f;
- } until => sub { my $f = shift; return acceptable($f) };
-
- my $eventual_f = repeat {
-    my $item = shift;
-    ...
-    return $trial_f;
- } foreach => \@items;
-
- my $eventual_f = try_repeat {
-    my $trial_f = ...
-    return $trial_f;
- } while => sub { ... };
-
- my $eventual_f = try_repeat_until_success {
-    ...
-    return $trial_f;
- };
-
- my $eventual_f = try_repeat_until_success {
-    my $item = shift;
-    ...
-    return $trial_f;
- } foreach => \@items;
+   my $result_f = call_with_escape {
+      my $escape_f = shift;
+      my $f = ...
+      $escape_f->done( "immediate result" );
+      ...
+   };
 
 Z<>
 
- use Future::Utils qw( fmap_concat fmap_scalar fmap_void );
+   use Future::Utils qw( repeat try_repeat try_repeat_until_success );
 
- my $result_f = fmap_concat {
-    my $item = shift;
-    ...
-    return $item_f;
- } foreach => \@items, concurrent => 4;
+   my $eventual_f = repeat {
+      my $trial_f = ...
+      return $trial_f;
+   } while => sub { my $f = shift; return want_more($f) };
 
- my $result_f = fmap_scalar {
-    my $item = shift;
-    ...
-    return $item_f;
- } foreach => \@items, concurrent => 8;
+   my $eventual_f = repeat {
+      ...
+      return $trial_f;
+   } until => sub { my $f = shift; return acceptable($f) };
 
- my $done_f = fmap_void {
-    my $item = shift;
-    ...
-    return $item_f;
- } foreach => \@items, concurrent => 10;
+   my $eventual_f = repeat {
+      my $item = shift;
+      ...
+      return $trial_f;
+   } foreach => \@items;
+
+   my $eventual_f = try_repeat {
+      my $trial_f = ...
+      return $trial_f;
+   } while => sub { ... };
+
+   my $eventual_f = try_repeat_until_success {
+      ...
+      return $trial_f;
+   };
+
+   my $eventual_f = try_repeat_until_success {
+      my $item = shift;
+      ...
+      return $trial_f;
+   } foreach => \@items;
+
+Z<>
+
+   use Future::Utils qw( fmap_concat fmap_scalar fmap_void );
+
+   my $result_f = fmap_concat {
+      my $item = shift;
+      ...
+      return $item_f;
+   } foreach => \@items, concurrent => 4;
+
+   my $result_f = fmap_scalar {
+      my $item = shift;
+      ...
+      return $item_f;
+   } foreach => \@items, concurrent => 8;
+
+   my $done_f = fmap_void {
+      my $item = shift;
+      ...
+      return $item_f;
+   } foreach => \@items, concurrent => 10;
+
+=head1 DESCRIPTION
+
+This module provides a number of utility functions for working with L<Future>
+instances, that cannot generally be provided as methods on the C<Future> class
+itself (mostly as they are prototyped to take a block of code as the first
+argument).
 
 Unless otherwise noted, the following functions require at least version
 I<0.08>.
@@ -118,7 +124,7 @@ I<0.08>.
 
 =head2 call
 
-   $f = call { CODE }
+   $f = call { CODE };
 
 I<Since version 0.22.>
 
@@ -141,7 +147,7 @@ sub call(&)
 
 =head2 call_with_escape
 
-   $f = call_with_escape { CODE }
+   $f = call_with_escape { CODE };
 
 I<Since version 0.22.>
 
@@ -156,7 +162,7 @@ This can be used to implement short-circuit return from an iterating loop or
 complex sequence of code, or immediate fail that bypasses failure handling
 logic in the code itself, or several other code patterns.
 
- $f = $code->( $escape_f )
+   $f = $code->( $escape_f );
 
 (This can be considered similar to C<call-with-escape-continuation> as found
 in some Scheme implementations).
@@ -195,14 +201,14 @@ will be constructed by cloning the first non-immediate trial C<Future>.
 
 =head2 repeat+while
 
-   $future = repeat { CODE } while => CODE
+   $future = repeat { CODE } while => CODE;
 
 Repeatedly calls the C<CODE> block while the C<while> condition returns a true
 value. Each time the trial future completes, the C<while> condition is passed
 the trial future.
 
- $trial_f = $code->( $previous_trial_f )
- $again = $while->( $trial_f )
+   $trial_f = $code->( $previous_trial_f );
+   $again = $while->( $trial_f );
 
 If the C<$code> block dies entirely and throws an exception, this will be
 caught and considered as an immediately-failed C<Future> with the exception as
@@ -210,18 +216,18 @@ the future's failure. The exception will not be propagated to the caller.
 
 =head2 repeat+until
 
-   $future = repeat { CODE } until => CODE
+   $future = repeat { CODE } until => CODE;
 
 Repeatedly calls the C<CODE> block until the C<until> condition returns a true
 value. Each time the trial future completes, the C<until> condition is passed
 the trial future.
 
- $trial_f = $code->( $previous_trial_f )
- $accept = $until->( $trial_f )
+   $trial_f = $code->( $previous_trial_f );
+   $accept = $until->( $trial_f );
 
 =head2 repeat+foreach
 
-   $future = repeat { CODE } foreach => ARRAY, otherwise => CODE
+   $future = repeat { CODE } foreach => ARRAY, otherwise => CODE;
 
 I<Since version 0.13.>
 
@@ -234,8 +240,8 @@ result of the future returned from C<otherwise>.
 
 The referenced array may be modified by this operation.
 
- $trial_f = $code->( $item, $previous_trial_f )
- $final_f = $otherwise->( $last_trial_f )
+   $trial_f = $code->( $item, $previous_trial_f );
+   $final_f = $otherwise->( $last_trial_f );
 
 The C<otherwise> code is optional; if not supplied then the result of the
 eventual future will simply be that of the last trial. If there was no trial,
@@ -244,13 +250,13 @@ future with an empty result is returned.
 
 =head2 repeat+foreach+while
 
-   $future = repeat { CODE } foreach => ARRAY, while => CODE, ...
+   $future = repeat { CODE } foreach => ARRAY, while => CODE, ...;
 
 I<Since version 0.13.>
 
 =head2 repeat+foreach+until
 
-   $future = repeat { CODE } foreach => ARRAY, until => CODE, ...
+   $future = repeat { CODE } foreach => ARRAY, until => CODE, ...;
 
 I<Since version 0.13.>
 
@@ -266,7 +272,7 @@ executed.
 
 =head2 repeat+generate
 
-   $future = repeat { CODE } generate => CODE, otherwise => CODE
+   $future = repeat { CODE } generate => CODE, otherwise => CODE;
 
 I<Since version 0.13.>
 
@@ -277,10 +283,10 @@ passed the last trial future, if there was one, otherwise C<undef> if the
 generator never returned a value. The result of the eventual future will be
 the result of the future returned from C<otherwise>.
 
- $trial_f = $code->( $item, $previous_trial_f )
- $final_f = $otherwise->( $last_trial_f )
+   $trial_f = $code->( $item, $previous_trial_f );
+   $final_f = $otherwise->( $last_trial_f );
 
- ( $item ) = $generate->()
+   ( $item ) = $generate->();
 
 The generator is called in list context but should return only one item per
 call. Subsequent values will be ignored. When it has no more items to return
@@ -412,7 +418,7 @@ sub repeat(&@)
 
 =head2 try_repeat
 
-   $future = try_repeat { CODE } ...
+   $future = try_repeat { CODE } ...;
 
 I<Since version 0.18.>
 
@@ -435,7 +441,7 @@ sub try_repeat(&@)
 
 =head2 try_repeat_until_success
 
-   $future = try_repeat_until_success { CODE } ...
+   $future = try_repeat_until_success { CODE } ...;
 
 I<Since version 0.18.>
 
@@ -500,7 +506,7 @@ Provides the list of items to iterate over, by calling the generator function
 once for each required item. The function should return a single item, or an
 empty list to indicate it has no more items.
 
- ( $item ) = $generate->()
+   ( $item ) = $generate->();
 
 This function will be invoked each time any previous item future has completed
 and may be called again even after it has returned empty.
@@ -523,7 +529,7 @@ return subclasses, or specific instances.
 In each case, the main code block will be called once for each item in the
 list, passing in the item as the only argument:
 
- $item_f = $code->( $item )
+   $item_f = $code->( $item );
 
 The expected return value from each item's future, and the value returned from
 the result future will differ in each function's case; they are documented
@@ -648,7 +654,7 @@ sub _fmap
 
 =head2 fmap_concat
 
-   $future = fmap_concat { CODE } ...
+   $future = fmap_concat { CODE } ...;
 
 I<Since version 0.14.>
 
@@ -681,7 +687,7 @@ sub fmap_concat(&@)
 
 =head2 fmap_scalar
 
-   $future = fmap_scalar { CODE } ...
+   $future = fmap_scalar { CODE } ...;
 
 I<Since version 0.14.>
 
@@ -707,7 +713,7 @@ sub fmap_scalar(&@)
 
 =head2 fmap_void
 
-   $future = fmap_void { CODE } ...
+   $future = fmap_void { CODE } ...;
 
 I<Since version 0.14.>
 

@@ -49,7 +49,17 @@ static int max_string;
 #  define PMAT_NVSIZE 10
 #endif
 
-#if (PERL_REVISION == 5) && (PERL_VERSION >= 26)
+#if (PERL_REVISION == 5) && (PERL_VERSION >= 38)
+#  define SAVEt_ARG0_MAX  SAVEt_REGCONTEXT
+#  define SAVEt_ARG1_MAX  SAVEt_FREERCPV
+#  define SAVEt_ARG2_MAX  SAVEt_RCPV
+#  define SAVEt_MAX       SAVEt_HINTS_HH
+#elif (PERL_REVISION == 5) && (PERL_VERSION >= 34)
+#  define SAVEt_ARG0_MAX  SAVEt_REGCONTEXT
+#  define SAVEt_ARG1_MAX  SAVEt_STRLEN_SMALL
+#  define SAVEt_ARG2_MAX  SAVEt_APTR
+#  define SAVEt_MAX       SAVEt_HINTS_HH
+#elif (PERL_REVISION == 5) && (PERL_VERSION >= 26)
 #  define SAVEt_ARG0_MAX  SAVEt_REGCONTEXT
 #  define SAVEt_ARG1_MAX  SAVEt_FREEPADNAME
 #  define SAVEt_ARG2_MAX  SAVEt_APTR
@@ -1438,6 +1448,9 @@ static void dumpfh(FILE *fh)
       case SAVEt_PARSER:
       case SAVEt_SHARED_PVREF:
       case SAVEt_SPTR:
+#if (PERL_REVISION == 5) && (PERL_VERSION >= 38)
+      case SAVEt_FREERCPV:
+#endif
 
       case SAVEt_DESTRUCTOR:
       case SAVEt_DESTRUCTOR_X:
@@ -1458,6 +1471,9 @@ static void dumpfh(FILE *fh)
       case SAVEt_SAVESWITCHSTACK:
       case SAVEt_VPTR:
       case SAVEt_ADELETE:
+#if (PERL_REVISION == 5) && (PERL_VERSION >= 38)
+      case SAVEt_RCPV:
+#endif
 
       case SAVEt_DELETE:
         /* ignore */

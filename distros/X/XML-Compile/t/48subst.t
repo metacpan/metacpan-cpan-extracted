@@ -10,7 +10,7 @@ use TestTools;
 use XML::Compile::Schema;
 use XML::Compile::Tester;
 
-use Test::More tests => 57;
+use Test::More tests => 65;
 use Log::Report 'try';
 
 set_compile_defaults
@@ -40,6 +40,15 @@ my $schema   = XML::Compile::Schema->new( <<__SCHEMA );
     <sequence>
       <element ref="one:head" minOccurs="0" maxOccurs="3" />
       <element name="id2" type="int" />
+    </sequence>
+  </complexType>
+</element>
+
+<element name="test3">
+  <complexType>
+    <sequence>
+      <element ref="one:head" maxOccurs="unbounded" />
+      <element name="id3" type="int" />
     </sequence>
   </complexType>
 </element>
@@ -156,6 +165,24 @@ test_rw($schema, test2 => <<__XML, \%t5);
 </test2>
 __XML
 
+# Optional and unbounded
+
+my %t6 =
+ ( head =>
+   [ {alt2 => {a2 => 70}}
+   , {alt1 => {a1 => 71}}
+   ]
+ , id3 => 72
+ );
+
+test_rw($schema, test3 => <<__XML, \%t6);
+<test3>
+  <alt2><a2>70</a2></alt2>
+  <alt1><a1>71</a1></alt1>
+  <id3>72</id3>
+</test3>
+__XML
+
 ### multi-level
 $schema->importDefinitions( <<__EXTRA );
 <schema targetNamespace="$TestNS2"
@@ -167,13 +194,15 @@ $schema->importDefinitions( <<__EXTRA );
 </schema>
 __EXTRA
 
-my %t6 = (head => [ {alt3 => 61} ], id2 => 62);
-test_rw($schema, test2 => <<__XML, \%t6);
+my %t7 = (head => [ {alt3 => 61} ], id2 => 62);
+test_rw($schema, test2 => <<__XML, \%t7);
 <test2>
   <alt3>61</alt3>
   <id2>62</id2>
 </test2>
 __XML
+
+
 
 my $out = templ_perl $schema, "{$TestNS}test2", skip_header => 1
  , abstract_types => 1;

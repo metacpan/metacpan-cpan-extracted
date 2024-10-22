@@ -1,16 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package Future;
+package Future 0.51;
 
-use v5.10;
-use strict;
+use v5.14;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
-
-our $VERSION = '0.50';
 
 # we are not overloaded, but we want to check if other objects are
 require overload;
@@ -48,6 +45,8 @@ use Time::HiRes qw( tv_interval );
 C<Future> - represent an operation awaiting completion
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    my $future = Future->new;
 
@@ -164,6 +163,8 @@ or cancelled. By enabling debug tracing of objects, this fact can be checked.
 If a future object is destroyed without having been completed or cancelled, a
 warning message is printed.
 
+=for highlighter
+
    $ PERL_FUTURE_DEBUG=1 perl -MFuture -E 'my $f = Future->new'
    Future=HASH(0xaa61f8) was constructed at -e line 1 and was lost near -e line 0 before it was ready.
 
@@ -207,13 +208,15 @@ subclass if your internals are different from that of this module.
 
 =head1 CONSTRUCTORS
 
+=for highlighter language=perl
+
 =cut
 
 =head2 new
 
-   $future = Future->new
+   $future = Future->new;
 
-   $future = $orig->new
+   $future = $orig->new;
 
 Returns a new C<Future> instance to represent a leaf future. It will be marked
 as ready by any of the C<done>, C<fail>, or C<cancel> methods. It can be
@@ -251,9 +254,9 @@ sub CvNAME_FILE_LINE
 
 =head2 fail I<(class method)>
 
-   $future = Future->done( @values )
+   $future = Future->done( @values );
 
-   $future = Future->fail( $exception, $category, @details )
+   $future = Future->fail( $exception, $category, @details );
 
 I<Since version 0.26.>
 
@@ -262,7 +265,7 @@ as done or failed.
 
 =head2 wrap
 
-   $future = Future->wrap( @values )
+   $future = Future->wrap( @values );
 
 I<Since version 0.14.>
 
@@ -291,14 +294,14 @@ sub wrap
 
 =head2 call
 
-   $future = Future->call( \&code, @args )
+   $future = Future->call( \&code, @args );
 
 I<Since version 0.15.>
 
 A convenient wrapper for calling a C<CODE> reference that is expected to
 return a future. In normal circumstances is equivalent to
 
-   $future = $code->( @args )
+   $future = $code->( @args );
 
 except that if the code throws an exception, it is wrapped in a new immediate
 fail future. If the return value from the code is not a blessed C<Future>
@@ -335,7 +338,7 @@ modifying it or otherwise causing side-effects.
 
 =head2 is_ready
 
-   $ready = $future->is_ready
+   $ready = $future->is_ready;
 
 Returns true on a leaf future if a result has been provided to the C<done>
 method, failed using the C<fail> method, or cancelled using the C<cancel>
@@ -350,7 +353,7 @@ depending on its component futures.
 
 =head2 is_done
 
-   $done = $future->is_done
+   $done = $future->is_done;
 
 Returns true on a future if it is ready and completed successfully. Returns
 false if it is still pending, failed, or was cancelled.
@@ -359,7 +362,7 @@ false if it is still pending, failed, or was cancelled.
 
 =head2 is_failed
 
-   $failed = $future->is_failed
+   $failed = $future->is_failed;
 
 I<Since version 0.26.>
 
@@ -370,7 +373,7 @@ still pending, completed successfully, or was cancelled.
 
 =head2 is_cancelled
 
-   $cancelled = $future->is_cancelled
+   $cancelled = $future->is_cancelled;
 
 Returns true if the future has been cancelled by C<cancel>.
 
@@ -380,7 +383,7 @@ Returns true if the future has been cancelled by C<cancel>.
 
 =head2 state
 
-   $str = $future->state
+   $str = $future->state;
 
 I<Since version 0.36.>
 
@@ -399,7 +402,7 @@ interfaces.
 
 =head2 done
 
-   $future->done( @result )
+   $future->done( @result );
 
 Marks that the leaf future is now ready, and provides a list of values as a
 result. (The empty list is allowed, and still indicates the future as ready).
@@ -421,7 +424,7 @@ C<resolve>.
 
 =head2 fail
 
-   $future->fail( $exception, $category, @details )
+   $future->fail( $exception, $category, @details );
 
 Marks that the leaf future has failed, and provides an exception value. This
 exception will be thrown by the C<get> method if called. 
@@ -454,7 +457,7 @@ I<Since version 0.45:> this method is also available under the name C<reject>.
 
 =head2 die
 
-   $future->die( $message, $category, @details )
+   $future->die( $message, $category, @details );
 
 I<Since version 0.09.>
 
@@ -480,7 +483,7 @@ sub die :method
 
 =head2 on_cancel
 
-   $future->on_cancel( $code )
+   $future->on_cancel( $code );
 
 If the future is not yet ready, adds a callback to be invoked if the future is
 cancelled by the C<cancel> method. If the future is already ready the method
@@ -489,7 +492,7 @@ is ignored.
 If the future is later cancelled, the callbacks will be invoked in the reverse
 order to that in which they were registered.
 
-   $on_cancel->( $future )
+   $on_cancel->( $future );
 
 If passed another C<Future> instance, the passed instance will be cancelled
 when the original future is cancelled. In this case, the reference is only
@@ -510,7 +513,7 @@ objects returned by such an interface.
 
 =head2 on_ready
 
-   $future->on_ready( $code )
+   $future->on_ready( $code );
 
 If the future is not yet ready, adds a callback to be invoked when the future
 is ready. If the future is already ready, invokes it immediately.
@@ -518,7 +521,7 @@ is ready. If the future is already ready, invokes it immediately.
 In either case, the callback will be passed the future object itself. The
 invoked code can then obtain the list of results by calling the C<get> method.
 
-   $on_ready->( $future )
+   $on_ready->( $future );
 
 If passed another C<Future> instance, the passed instance will have its
 C<done>, C<fail> or C<cancel> methods invoked when the original future
@@ -532,9 +535,9 @@ Returns the C<$future>.
 
 =head2 result
 
-   @result = $future->result
+   @result = $future->result;
 
-   $result = $future->result
+   $result = $future->result;
 
 I<Since version 0.44.>
 
@@ -556,9 +559,9 @@ If the future was cancelled or is not yet ready an exception is thrown.
 
 =head2 get
 
-   @result = $future->get
+   @result = $future->get;
 
-   $result = $future->get
+   $result = $future->get;
 
 If the future is ready, returns the result or throws the failure exception as
 per L</result>.
@@ -572,7 +575,7 @@ the result returned as above.
 
 =head2 await
 
-   $f = $f->await
+   $f = $f->await;
 
 I<Since version 0.44.>
 
@@ -597,7 +600,7 @@ will throw an exception if called on a still-pending instance.
 
 =head2 block_until_ready
 
-   $f = $f->block_until_ready
+   $f = $f->block_until_ready;
 
 I<Since version 0.40.>
 
@@ -613,7 +616,7 @@ sub block_until_ready
 
 =head2 unwrap
 
-   @values = Future->unwrap( @values )
+   @values = Future->unwrap( @values );
 
 I<Since version 0.26.>
 
@@ -645,7 +648,7 @@ sub unwrap
 
 =head2 on_done
 
-   $future->on_done( $code )
+   $future->on_done( $code );
 
 If the future is not yet ready, adds a callback to be invoked when the future
 is ready, if it completes successfully. If the future completed successfully,
@@ -654,7 +657,7 @@ all.
 
 The callback will be passed the result passed to the C<done> method.
 
-   $on_done->( @result )
+   $on_done->( @result );
 
 If passed another C<Future> instance, the passed instance will have its
 C<done> method invoked when the original future completes successfully.
@@ -665,9 +668,9 @@ Returns the C<$future>.
 
 =head2 failure
 
-   $exception = $future->failure
+   $exception = $future->failure;
 
-   $exception, $category, @details = $future->failure
+   $exception, $category, @details = $future->failure;
 
 If the future is ready, returns the exception passed to the C<fail> method or
 C<undef> if the future completed successfully via the C<done> method.
@@ -692,7 +695,7 @@ statement:
 
 =head2 on_fail
 
-   $future->on_fail( $code )
+   $future->on_fail( $code );
 
 If the future is not yet ready, adds a callback to be invoked when the future
 is ready, if it fails. If the future has already failed, invokes it
@@ -702,7 +705,7 @@ at all.
 The callback will be passed the exception and other details passed to the
 C<fail> method.
 
-   $on_fail->( $exception, $category, @details )
+   $on_fail->( $exception, $category, @details );
 
 If passed another C<Future> instance, the passed instance will have its
 C<fail> method invoked when the original future fails.
@@ -718,7 +721,7 @@ Returns the C<$future>.
 
 =head2 cancel
 
-   $future->cancel
+   $future->cancel;
 
 Requests that the future be cancelled, immediately marking it as ready. This
 will invoke all of the code blocks registered by C<on_cancel>, in the reverse
@@ -745,6 +748,8 @@ I<Since version 0.45:> if a non-future result is returned it will be wrapped
 in a new immediate Future instance. This behaviour can be disabled by setting
 the C<PERL_FUTURE_STRICT> environment variable to a true value at compiletime:
 
+=for highlighter
+
    $ PERL_FUTURE_STRICT=1 perl ...
 
 The combined future will then wait for the result of this second one. If the
@@ -756,6 +761,8 @@ that exception as its message and no further values.
 Note that since the code is invoked in scalar context, you cannot directly
 return a list of values this way. Any list-valued results must be done by
 returning a C<Future> instance.
+
+=for highlighter language=perl
 
    sub {
       ...
@@ -770,7 +777,7 @@ silently dropped), this method warns in void context.
 
 =head2 then
 
-   $future = $f1->then( \&done_code )
+   $future = $f1->then( \&done_code );
 
 I<Since version 0.13.>
 
@@ -781,11 +788,11 @@ sequence future will then be marked as complete with whatever result C<$f2>
 gave. If C<$f1> fails then the sequence future will immediately fail with the
 same failure and the code will not be invoked.
 
-   $f2 = $done_code->( @result )
+   $f2 = $done_code->( @result );
 
 =head2 else
 
-   $future = $f1->else( \&fail_code )
+   $future = $f1->else( \&fail_code );
 
 I<Since version 0.13.>
 
@@ -796,11 +803,11 @@ sequence future will then be marked as complete with whatever result C<$f2>
 gave. If C<$f1> succeeds then the sequence future will immediately succeed
 with the same result and the code will not be invoked.
 
-   $f2 = $fail_code->( $exception, $category, @details )
+   $f2 = $fail_code->( $exception, $category, @details );
 
 =head2 then I<(2 arguments)>
 
-   $future = $f1->then( \&done_code, \&fail_code )
+   $future = $f1->then( \&done_code, \&fail_code );
 
 The C<then> method can also be passed the C<$fail_code> block as well, giving
 a combination of C<then> and C<else> behaviour.
@@ -815,7 +822,7 @@ Javascript's Q or Promises/A libraries.
    $future = $f1->catch(
       name => \&code,
       name => \&code, ...
-   )
+   );
 
 I<Since version 0.33.>
 
@@ -827,7 +834,7 @@ string names given, then the corresponding code is invoked, being passed the
 same arguments as a plain C<else> call would take, and is expected to return a
 C<Future> in the same way.
 
-   $f2 = $code->( $exception, $category, @details )
+   $f2 = $code->( $exception, $category, @details );
 
 If C<$f1> does not fail, fails without a category name at all, or fails with a
 category name that does not match any given to the C<catch> method, then the
@@ -840,7 +847,7 @@ failure if no other handler matches.
    $future = $f1->catch(
       name => \&code, ...
       \&fail_code,
-   )
+   );
 
 This feature is currently still a work-in-progress. It currently can only cope
 with category names that are literal strings, which are all distinct. A later
@@ -851,7 +858,7 @@ L<https://rt.cpan.org/Ticket/Display.html?id=103545>.
 
 =head2 then I<(multiple arguments)>
 
-   $future = $f1->then( \&done_code, @catch_list, \&fail_code )
+   $future = $f1->then( \&done_code, @catch_list, \&fail_code );
 
 I<Since version 0.33.>
 
@@ -863,7 +870,7 @@ method.
 
 =head2 transform
 
-   $future = $f1->transform( %args )
+   $future = $f1->transform( %args );
 
 Returns a new sequencing C<Future> that wraps the one given as C<$f1>. With no
 arguments this will be a trivial wrapper; C<$future> will complete or fail
@@ -915,16 +922,16 @@ sub transform
 
 =head2 then_with_f
 
-   $future = $f1->then_with_f( ... )
+   $future = $f1->then_with_f( ... );
 
 I<Since version 0.21.>
 
 Returns a new sequencing C<Future> that behaves like C<then>, but also passes
 the original future, C<$f1>, to any functions it invokes.
 
-   $f2 = $done_code->( $f1, @result )
-   $f2 = $catch_code->( $f1, $category, @details )
-   $f2 = $fail_code->( $f1, $category, @details )
+   $f2 = $done_code->( $f1, @result );
+   $f2 = $catch_code->( $f1, $category, @details );
+   $f2 = $fail_code->( $f1, $category, @details );
 
 This is useful for conditional execution cases where the code block may just
 return the same result of the original future. In this case it is more
@@ -936,9 +943,9 @@ efficient to return the original future itself.
 
 =head2 then_fail
 
-   $future = $f->then_done( @result )
+   $future = $f->then_done( @result );
 
-   $future = $f->then_fail( $exception, $category, @details )
+   $future = $f->then_fail( $exception, $category, @details );
 
 I<Since version 0.22.>
 
@@ -963,7 +970,7 @@ sub then_fail
 
 =head2 else_with_f
 
-   $future = $f1->else_with_f( \&code )
+   $future = $f1->else_with_f( \&code );
 
 I<Since version 0.21.>
 
@@ -971,7 +978,7 @@ Returns a new sequencing C<Future> that runs the code if the first fails.
 Identical to C<else>, except that the code reference will be passed both the
 original future, C<$f1>, and its exception and other details.
 
-   $f2 = $code->( $f1, $exception, $category, @details )
+   $f2 = $code->( $f1, $exception, $category, @details );
 
 This is useful for conditional execution cases where the code block may just
 return the same result of the original future. In this case it is more
@@ -983,9 +990,9 @@ efficient to return the original future itself.
 
 =head2 else_fail
 
-   $future = $f->else_done( @result )
+   $future = $f->else_done( @result );
 
-   $future = $f->else_fail( $exception, $category, @details )
+   $future = $f->else_fail( $exception, $category, @details );
 
 I<Since version 0.22.>
 
@@ -1010,7 +1017,7 @@ sub else_fail
 
 =head2 catch_with_f
 
-   $future = $f1->catch_with_f( ... )
+   $future = $f1->catch_with_f( ... );
 
 I<Since version 0.33.>
 
@@ -1021,7 +1028,7 @@ the original future, C<$f1>, to any functions it invokes.
 
 =head2 followed_by
 
-   $future = $f1->followed_by( \&code )
+   $future = $f1->followed_by( \&code );
 
 Returns a new sequencing C<Future> that runs the code regardless of success or
 failure. Once C<$f1> is ready the code reference will be invoked and is passed
@@ -1029,13 +1036,13 @@ one argument, C<$f1>. It should return a future, C<$f2>. Once C<$f2> completes
 the sequence future will then be marked as complete with whatever result
 C<$f2> gave.
 
-   $f2 = $code->( $f1 )
+   $f2 = $code->( $f1 );
 
 =cut
 
 =head2 without_cancel
 
-   $future = $f1->without_cancel
+   $future = $f1->without_cancel;
 
 I<Since version 0.30.>
 
@@ -1049,11 +1056,15 @@ Note that this only prevents cancel propagating from C<$future> to C<$f1>; if
 the original C<$f1> instance is cancelled then the returned C<$future> will
 have to be cancelled too.
 
+Also note that for the common case of using these with convergent futures such
+as L</needs_any>, the C<"also"> ability of version 0.51 may be a better
+solution.
+
 =cut
 
 =head2 retain
 
-   $f = $f->retain
+   $f = $f->retain;
 
 I<Since version 0.36.>
 
@@ -1092,11 +1103,49 @@ components. The first derived class component future will be used as the
 prototype for constructing the return value, so it respects subclassing
 correctly, or failing that a plain C<Future>.
 
+Except for C<wait_all>, it is possible that the result of the convergent
+future is already determined by the completion of at least one component
+future while others remain pending. In this situation, any other components
+that are still pending will normally be cancelled. Also, if the convergent
+future itself is cancelled then all of its components will be cancelled.
+
+I<Since version 0.51> it is possible to request that individual components
+not be cancelled in this manner. Any component future prefixed with the string
+C<"also"> is not cancelled when the convergent is. This is somewhat equivalent
+to using L</without_cancel>, but more performant as it does not have to create
+the intermediate future inbetween just for the purpose of ignoring a C<cancel>
+method.
+
+For example here, the futures C<$f3> and C<$f4> will not be cancelled, but the
+other three might be:
+
+   Future->needs_all(
+      $f1,
+      $f2,
+      also => $f3,
+      also => $f4,
+      $f5,
+   );
+
+This makes it possible to observe futures in shared caches, or other
+situations where there may be multiple futures waiting for the result of a
+given initial component, but that component should not be cancelled just
+because any particular observer is stopped.
+
+   my $f = Future->wait_any(
+      timeout_future( delay => 10 ),
+
+      also => ( $cache{$key} //= get_key_async($key) ),
+   );
+
+   # if $f is cancelled now, its timeout is cancelled but the
+   # (possibly-shared) future in the %cache hash is not.
+
 =cut
 
 =head2 wait_all
 
-   $future = Future->wait_all( @subfutures )
+   $future = Future->wait_all( @subfutures );
 
 Returns a new C<Future> instance that will indicate it is ready once all of
 the sub future objects given to it indicate that they are ready, either by
@@ -1112,7 +1161,7 @@ This constructor would primarily be used by users of asynchronous interfaces.
 
 =head2 wait_any
 
-   $future = Future->wait_any( @subfutures )
+   $future = Future->wait_any( @subfutures );
 
 Returns a new C<Future> instance that will indicate it is ready once any of
 the sub future objects given to it indicate that they are ready, either by
@@ -1131,7 +1180,7 @@ This constructor would primarily be used by users of asynchronous interfaces.
 
 =head2 needs_all
 
-   $future = Future->needs_all( @subfutures )
+   $future = Future->needs_all( @subfutures );
 
 Returns a new C<Future> instance that will indicate it is ready once all of the
 sub future objects given to it indicate that they have completed successfully,
@@ -1154,7 +1203,7 @@ This constructor would primarily be used by users of asynchronous interfaces.
 
 =head2 needs_any
 
-   $future = Future->needs_any( @subfutures )
+   $future = Future->needs_any( @subfutures );
 
 Returns a new C<Future> instance that will indicate it is ready once any of
 the sub future objects given to it indicate that they have completed
@@ -1189,23 +1238,23 @@ the component futures stored by it.
 
 =head2 pending_futures
 
-   @f = $future->pending_futures
+   @f = $future->pending_futures;
 
 =head2 ready_futures
 
-   @f = $future->ready_futures
+   @f = $future->ready_futures;
 
 =head2 done_futures
 
-   @f = $future->done_futures
+   @f = $future->done_futures;
 
 =head2 failed_futures
 
-   @f = $future->failed_futures
+   @f = $future->failed_futures;
 
 =head2 cancelled_futures
 
-   @f = $future->cancelled_futures
+   @f = $future->cancelled_futures;
 
 Return a list of all the pending, ready, done, failed, or cancelled
 component futures. In scalar context, each will yield the number of such
@@ -1222,7 +1271,7 @@ instead provided for authors of classes that subclass from C<Future> itself.
 
 =head2 set_udata
 
-   $future = $future->set_udata( $name, $value )
+   $future = $future->set_udata( $name, $value );
 
 I<Since version 0.49>
 
@@ -1236,7 +1285,7 @@ a hash reference.
 
 =head2 udata
 
-   $value = $future->udata( $name )
+   $value = $future->udata( $name );
 
 I<Since version 0.49>
 
@@ -1251,9 +1300,9 @@ L</set_udata>.
 
 =head2 label
 
-   $future = $future->set_label( $label )
+   $future = $future->set_label( $label );
 
-   $label = $future->label
+   $label = $future->label;
 
 I<Since version 0.28.>
 
@@ -1267,9 +1316,9 @@ in debugging messages or other tooling, or similar purposes.
 
 =head2 rtime
 
-   [ $sec, $usec ] = $future->btime
+   [ $sec, $usec ] = $future->btime;
 
-   [ $sec, $usec ] = $future->rtime
+   [ $sec, $usec ] = $future->rtime;
 
 I<Since version 0.28.>
 
@@ -1288,7 +1337,7 @@ set in the environment.
 
 =head2 elapsed
 
-   $sec = $future->elapsed
+   $sec = $future->elapsed;
 
 I<Since version 0.28.>
 
@@ -1308,7 +1357,7 @@ sub elapsed
 
 =head2 wrap_cb
 
-   $cb = $future->wrap_cb( $operation_name, $cb )
+   $cb = $future->wrap_cb( $operation_name, $cb );
 
 I<Since version 0.31.>
 

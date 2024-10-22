@@ -23,7 +23,6 @@ use Moose;
 use String::CamelCase;
 use Template::EmbeddedPerl;
 use Moose::Util::MetaRole;
-use MooseX::MethodAttributes;
 
 Moose::Util::MetaRole::apply_metaroles(
   for => __PACKAGE__,
@@ -34,7 +33,7 @@ Moose::Util::MetaRole::apply_metaroles(
 
 extends 'Catalyst::View::BasePerRequest';
 
-our $VERSION = 0.001007;
+our $VERSION = 0.001008;
 eval $VERSION;
 
 # Args that get passed cleanly to Template::EmbeddedPerl
@@ -129,15 +128,11 @@ sub build_temple {
 
   my @parent_compiled = ();
   foreach my $parent_class (@$parent_views) {
-    my ($data, $path) = $parent_class->find_template($app, $temple_args{template_extension});
-    my $local_template = bless +{
-      %$temple,
-      preamble=>'',
-      sandbox_ns=>"${parent_class}::EmbeddedPerl::SandBox"
-    }, ref $temple;
-    my $obj = $local_template->from_string($data);
-
-    push @parent_compiled, $obj;  
+    my $parent_view = $parent_class;
+    $parent_view =~ s/${app}::View:://g;
+    my $parent_factory = $app->view($parent_view);
+    my $doc = $parent_factory->merged_args->{_doc}[0];
+    push @parent_compiled, $doc;
   }
 
   return ($temple, [$compiled, @parent_compiled]);

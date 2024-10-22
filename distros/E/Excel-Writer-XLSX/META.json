@@ -48,6 +48,6 @@
          "url" : "http://github.com/jmcnamara/excel-writer-xlsx"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

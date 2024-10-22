@@ -1,5 +1,14 @@
 Revision history for re::engine::Hyperscan
 
+0.03 Mon Oct 21 03:01:38 PM CEST 2024
+
+    - compilable with perl 5.38 (rt #156269)
+
+0.02
+
+    - major fixes to enable the compiler
+    - add META_MERGE resources, esp. for the bugtracker
+
 0.01 Fri Apr 7 19:27:31 2017 +0200 rurban
 
     - Started from re-engine-PCRE2.

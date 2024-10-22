@@ -1,19 +1,23 @@
 package Catalyst::View::BasePerRequest::Lifecycle::Request;
 
-use warnings;
-use strict;
+use Moose;
 use Scalar::Util ();
 use Module::Runtime ();
 
+has 'class' => (is=>'ro', required=>1);
+has 'app' => (is=>'ro', required=>1);
+has 'merged_args' => (is=>'ro', required=>1);
+
 sub ACCEPT_CONTEXT {
   my ($factory, $c, @args) = @_;
+  return $factory unless ref($c); # Return the factory if called in application context
   my $key = Scalar::Util::refaddr($factory) || $factory;
   return $c->stash->{"__BasePerRequest_${key}"} ||= $factory->build($c, @args);
 }
 
 sub build {
   my ($factory, $c, @args) = @_;
-  my $class = $factory->{class};
+  my $class = $factory->class;
   @args = $class->prepare_build_args($c, @args) if $class->can('prepare_build_args');
   my %build_args = $factory->prepare_build_args($c, @args);  
   my $view = eval {
@@ -37,8 +41,8 @@ sub do_handle_build_view_exception {
 sub prepare_build_args {
   my ($factory, $c, @args) = @_;
   my %args = $factory->prepare_args(@args);
-  my %merged_args = %{$factory->{merged_args}||+{}};
-  return (%merged_args, %args, app=>$factory->{app}, ctx=>$c);
+  my %merged_args = %{$factory->merged_args||+{}};
+  return (%merged_args, %args, app=>$factory->app, ctx=>$c);
 }
 
 sub prepare_args {

@@ -1,10 +1,12 @@
 package Convert::PEM::CBC;
 use strict;
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.12'; # VERSION
 use Carp qw( croak );
 use Digest::MD5 qw( md5 );
 use base qw( Class::ErrorHandler );
+use Crypt::PRNG qw( random_bytes );
+
 
 sub new {
     my $class = shift;
@@ -15,8 +17,7 @@ sub new {
 sub init {
     my $cbc = shift;
     my %param = @_;
-    $cbc->{iv} = exists $param{IV} ? $param{IV} :
-        pack("C*", map { rand 255 } 1..8);
+    $cbc->{iv} = exists $param{IV} ? $param{IV} : random_bytes(8);
     croak "init: Cipher is required"
         unless my $cipher = $param{Cipher};
     if (ref($cipher)) {
@@ -41,21 +42,28 @@ sub iv     { $_[0]->{iv} }
 
 sub encrypt {
     my $cbc = shift;
-    my($text) = @_;
+    my ($text) = @_;
     my $cipher = $cbc->{cipher};
-    my $bs = $cipher->blocksize;
-    my @blocks = $text =~ /(.{1,$bs})/ogs;
+    ## special stuff for the old SEED package
+    my $seed = ref($cipher) eq "Crypt::SEED";
+    my $bs = ($seed ? 16 : $cipher->blocksize())
+        or return $cbc->error("This cipher does not support the blocksize method");
+    my @blocks = $text =~ /(.{1,$bs})/gs;
     my $last = pop @blocks if length($blocks[-1]) < $bs;
     my $iv = $cbc->{iv};
     my $buf = '';
     for my $block (@blocks) {
-        $buf .= $iv = $cipher->encrypt($iv ^ $block);
+        $buf .= $iv = $seed
+            ? $cipher->encrypt($iv ^ $block,0)
+            : $cipher->encrypt($iv ^ $block);
     }
     $last = pack("C*", ($bs) x $bs) unless $last && length $last;
     if (length $last) {
         $last .= pack("C*", ($bs-length($last)) x ($bs-length($last)))
             if length($last) < $bs;
-        $buf .= $iv = $cipher->encrypt($iv ^ $last);
+        $buf .= $iv = $seed
+            ? $cipher->encrypt($iv ^ $last,0)
+            : $cipher->encrypt($iv ^ $last);
     }
     $cbc->{iv} = $iv;
     $buf;
@@ -63,21 +71,29 @@ sub encrypt {
 
 sub decrypt {
     my $cbc = shift;
-    my($text) = @_;
+    my ($text) = @_;
     my $cipher = $cbc->{cipher};
-    my $bs = $cipher->blocksize;
-    my @blocks = $text =~ /(.{1,$bs})/ogs;
+    ## special stuff for the old SEED package
+    my $seed = ref($cipher) eq "Crypt::SEED";
+    my $bs = ($seed ? 16 : $cipher->blocksize())
+        or return $cbc->error("This cipher does not support the blocksize method");
+    my @blocks = $text =~ /(.{1,$bs})/gs;
     my $last = length($blocks[-1]) < $bs ?
         join '', splice(@blocks, -2) : pop @blocks;
     my $iv = $cbc->{iv};
     my $buf = '';
+    ## more special stuff for the old SEED package
     for my $block (@blocks) {
-        $buf .= $iv ^ $cipher->decrypt($block);
+        $buf .= $iv ^ ($seed
+            ? $cipher->decrypt($block,0)
+            : $cipher->decrypt($block));
         $iv = $block;
     }
     $last = pack "a$bs", $last;
     if (length($last)) {
-        my $tmp = $iv ^ $cipher->decrypt($last);
+        my $tmp = $iv ^ ($seed
+            ? $cipher->decrypt($last,0)
+            : $cipher->decrypt($last));
         $iv = $last;
         $last = $tmp;
         my $cut = ord substr $last, -1;
@@ -91,10 +107,10 @@ sub decrypt {
 }
 
 sub bytes_to_key {
-    my($key, $salt, $md, $ks) = @_;
-    my $ckey = $md->($key, $salt);
+    my ($key, $salt, $md, $ks) = @_;
+    my $ckey = $md->($key . substr($salt,0,8));
     while (length($ckey) < $ks) {
-        $ckey .= $md->($ckey, $key, $salt);
+        $ckey .= $md->($ckey, $key, substr($salt,0,8));
     }
     substr $ckey, 0, $ks;
 }
@@ -121,7 +137,7 @@ Convert::PEM::CBC - Cipher Block Chaining Mode implementation
 
 I<Convert::PEM::CBC> implements the CBC (Cipher Block Chaining)
 mode for encryption/decryption ciphers; the CBC is designed for
-compatability with OpenSSL and may not be compatible with other
+compatibility with OpenSSL and may not be compatible with other
 implementations (such as SSH).
 
 =head1 USAGE

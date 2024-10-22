@@ -1,5 +1,5 @@
 package Bitcoin::Secp256k1;
-$Bitcoin::Secp256k1::VERSION = '0.002';
+$Bitcoin::Secp256k1::VERSION = '0.003';
 use v5.10;
 use strict;
 use warnings;
@@ -162,6 +162,21 @@ sub multiply_private_key
 	my ($self, $private_key, $tweak) = @_;
 
 	return $self->_privkey_mul($private_key, $tweak);
+}
+
+sub combine_public_keys
+{
+	my ($self, @public_keys) = @_;
+
+	$self->_clear;
+	foreach my $pub (@public_keys) {
+		$self->_pubkey($pub);
+		$self->_push_pubkey;
+	}
+
+	$self->_pubkey_combine;
+
+	return $self->_pubkey;
 }
 
 1;
@@ -344,6 +359,14 @@ Same as L</add_private_key>, but performs multiplication instead of addition.
 	$tweaked = $secp256k1->multiply_public_key($public_key, $tweak)
 
 Same as L</add_public_key>, but performs multiplication instead of addition.
+
+=head3 combine_public_keys
+
+	$combined = $secp256k1->combine_public_keys(@pubkeys)
+
+Combines C<@pubkeys> together, returning a new pubkey.
+
+If the arguments or the resulting key are not valid, an exception will be thrown.
 
 =head1 IMPLEMENTATION
 

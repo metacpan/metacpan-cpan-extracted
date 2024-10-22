@@ -29,7 +29,7 @@ PDK::Device::H3C - A module for interacting with H3C devices
   # FTP configuration backup
   my $backup = $device->ftpConfig('hostname', 'ftp_server', 'ftp_username', 'ftp_password');
 
-  # Write content to a file (filename is optional, defaults to device IP address, e.g., 192.168.1.1.cfg)
+  # Write content to a file (filename is optional, defaults to device IP address, e.g., 192.168.1.1.txt)
   $device->write_file('content', 'filename');
 
 =head1 DESCRIPTION

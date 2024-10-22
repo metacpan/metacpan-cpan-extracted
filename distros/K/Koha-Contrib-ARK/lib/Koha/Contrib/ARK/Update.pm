@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Update;
 # ABSTRACT: Update Koha ARK fields
-$Koha::Contrib::ARK::Update::VERSION = '1.1.0';
+$Koha::Contrib::ARK::Update::VERSION = '1.1.1';
 use Moose;
 use Modern::Perl;
 
@@ -56,7 +56,7 @@ Koha::Contrib::ARK::Update - Update Koha ARK fields
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 AUTHOR
 

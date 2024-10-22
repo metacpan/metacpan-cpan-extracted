@@ -49,6 +49,17 @@ The I<namespace> component is important, because only spec conformant
 namespaces will be used. The elements and attributes are added in
 random order.
 
+B<. Example: specify anyAttribute>
+
+ use XML::Compile::Util qw/pack_type/;
+
+ my $attr = $doc->createAttributeNS($somens, $sometype, 42);
+ my $h = { a => 12     # normal element or attribute
+         , "{$somens}$sometype"        => $attr # anyAttribute
+         , pack_type($somens, $mytype) => $attr # nicer
+         , "$prefix:$sometype"         => $attr # [1.28]
+         };
+
 =head2 Mixed elements
 
 [0.79] ComplexType and ComplexContent components can be declared with the
@@ -115,6 +126,36 @@ node will be cancelled.
 
 On the moment, the only predefined C<before> hook is C<PRINT_PATH>.
 
+B<. Example: before hook on user-provided HASH.>
+
+ sub beforeOnComplex($$$$)
+ {   my ($doc, $values, $path, $fulltype) = @_;
+
+     my %copy = %$values;
+     $copy{extra} = 42;
+     delete $copy{superfluous};
+     $copy{count} =~ s/\D//g;    # only digits
+     \%copy;
+ }
+
+B<. Example: before hook on simpleType data>
+
+ sub beforeOnSimple($$$$)
+ {   my ($doc, $value, $path, $fulltype) = @_;
+     $value * 100;    # convert euro to euro-cents
+ }
+
+B<. Example: before hook with object for complexType>
+
+ sub beforeOnObject($$$$)
+ {   my ($doc, $obj, $path, $fulltype) = @_;
+
+     +{ name     => $obj->name
+      , price    => $obj->euro
+      , currency => 'EUR'
+      };
+ }
+
 =head3 hooks replacing the usual XML node generation
 
 Only one C<replace> hook can be defined.  It must return a
@@ -130,6 +171,15 @@ hook had not been active.
 
 On the moment, the only predefined C<replace> hook is C<SKIP>.
 
+B<. Example: replace hook>
+
+ sub replace($$$$$)
+ {  my ($doc, $values, $path, $tag, $r, $fulltype) = @_
+    my $node = $doc->createElement($tag);
+    $node->appendText($values->{text});
+    $node;
+ }
+
 =head3 hooks executed after the node was created
 
 The C<after> hooks, will each get a chance to modify the
@@ -138,10 +188,44 @@ the new XML node has to be returned.
 
 On the moment, the only predefined C<after> hook is C<PRINT_PATH>.
 
+B<. Example: add an extra sibbling after the usual process>
+
+ sub after($$$$)
+ {   my ($doc, $node, $path, $values, $fulltype) = @_;
+     my $child = $doc->createAttributeNS($myns, earth => 42);
+     $node->addChild($child);
+     $node;
+ }
+
 =head3 fixing bad schemas
 
 When a schema makes a mess out of things, we can fix that with hooks.
 Also, when you need things that XML::Compile does not support (yet).
+
+B<. Example: creating nodes with text>
+
+ {  my $text;
+
+    sub before($$$)
+    {   my ($doc, $values, $path) = @_;
+        my %copy = %$values;
+        $text = delete $copy{text};
+        \%copy;
+    }
+
+    sub after($$$)
+    {   my ($doc, $node, $path) = @_;
+        $node->addChild($doc->createTextNode($text));
+        $node;
+    }
+
+    $schema->addHook
+     ( action => 'WRITER'
+     , type   => 'mixed'
+     , before => \&before
+     , after  => \&after
+     );
+ }
 
 =head2 Typemaps
 
@@ -229,12 +313,12 @@ writer considerably.
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile distribution version 1.63,
-built on July 02, 2019. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile distribution version 1.64,
+built on October 21, 2024. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 
-Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2006-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

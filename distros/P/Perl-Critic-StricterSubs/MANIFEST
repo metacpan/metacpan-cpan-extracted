@@ -11,6 +11,7 @@ LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
+perlcriticrc
 README
 t/20_policies.t
 t/Modules/RequireExplicitInclusion.run

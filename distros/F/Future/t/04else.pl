@@ -6,16 +6,20 @@ use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
+my $__dummy; # to defeat non-closure optimsation
+
 # else success
 {
    my $f1 = Future->new;
 
+   my $cb;
    my $fseq = $f1->else(
-      sub { die "else of successful future should not be invoked" }
+      $cb = sub { $__dummy++; die "else of successful future should not be invoked" }
    );
 
    ok( defined $fseq, '$fseq defined' );
    isa_ok( $fseq, [ "Future" ], '$fseq' );
+   is_refcount( $cb, 2, '$cb has refcount 2 captured by else callback' );
 
    is_oneref( $fseq, '$fseq has refcount 1 initially' );
 
@@ -25,6 +29,7 @@ use Future;
 
    undef $f1;
    is_oneref( $fseq, '$fseq has refcount 1 before EOF' );
+   is_oneref( $cb, '$cb has refcount 1 before EOF' );
 }
 
 # else failure
@@ -97,9 +102,10 @@ use Future;
 {
    my $f1 = Future->fail( "Failure\n" );
 
+   my $cb;
    my $f2;
    my $fseq = $f1->else(
-      sub { return $f2 = Future->new }
+      $cb = sub { return $f2 = Future->new }
    );
 
    ok( defined $f2, '$f2 defined for immediate fail' );
@@ -108,6 +114,7 @@ use Future;
 
    ok( $fseq->is_ready, '$fseq already ready for immediate fail' );
    is( scalar $fseq->failure, "Another failure\n", '$fseq->failure for immediate fail' );
+   is_oneref( $cb, '$cb has refcount 1 before EOF' );
 }
 
 # immediate done

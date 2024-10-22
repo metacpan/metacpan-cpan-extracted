@@ -6,6 +6,8 @@ use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
+use constant FUTURE_HAS_CONVERGENT_ALSO => ( !defined $Future::XS::VERSION or $Future::XS::VERSION >= 0.13 );
+
 {
    my $f1 = Future->new;
    my $f2 = Future->new;
@@ -124,6 +126,19 @@ use Future;
 
    is( $c1, 1,     '$future->cancel marks subs cancelled' );
    is( $c2, undef, '$future->cancel ignores ready subs' );
+}
+
+# 'also' subs don't get cancelled
+if( FUTURE_HAS_CONVERGENT_ALSO ) {
+   my $falso = Future->new;
+   my $calso;
+   $falso->on_cancel( sub { $calso++ } );
+
+   my $future = Future->wait_all( also => $falso );
+
+   $future->cancel;
+
+   is( $calso, undef, '$future->cancel does not cancel $falso' );
 }
 
 # cancelled convergent

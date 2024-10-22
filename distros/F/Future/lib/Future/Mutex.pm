@@ -3,13 +3,10 @@
 #
 #  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
-package Future::Mutex;
+package Future::Mutex 0.51;
 
-use v5.10;
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.50';
 
 use Future;
 
@@ -18,6 +15,8 @@ use Future;
 C<Future::Mutex> - mutual exclusion lock around code that returns L<Future>s
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Future::Mutex;
 
@@ -67,7 +66,7 @@ such as communications with external services or executing other programs.
 
 =head2 new
 
-   $mutex = Future::Mutex->new( count => $n )
+   $mutex = Future::Mutex->new( count => $n );
 
 Returns a new C<Future::Mutex> instance. It is initially unlocked.
 
@@ -102,7 +101,7 @@ sub new
 
 =head2 enter
 
-   $f = $mutex->enter( \&code )
+   $f = $mutex->enter( \&code );
 
 Returns a new C<Future> that represents the eventual result of calling the
 code. If the mutex is currently unlocked, the code will be invoked
@@ -147,7 +146,7 @@ sub enter
 
 =head2 available
 
-   $avail = $mutex->available
+   $avail = $mutex->available;
 
 Returns true if the mutex is currently unlocked, or false if it is locked.
 

@@ -51,7 +51,7 @@ BOOT:
 # perl bindings for Hi-level functions
 
 SV *
-rhash_msg_raw(hash_id, message)
+rhash_msg_wrapper(hash_id, message)
 		unsigned	hash_id
 	PROTOTYPE: $$
 	PREINIT:
@@ -64,14 +64,14 @@ rhash_msg_raw(hash_id, message)
 		verify_single_bit_hash_id(hash_id, cv);
 		res = rhash_msg(hash_id, message, length, out);
 		if(res < 0) {
-			croak("%s: %s", "rhash_msg_raw", strerror(errno));
+			croak("%s: %s", "rhash_msg_wrapper", strerror(errno));
 		}
 		RETVAL = newSVpv((char*)out, rhash_get_digest_size(hash_id));
 	OUTPUT:
 		RETVAL
 
 SV *
-rhash_file_raw(hash_id, filepath)
+rhash_file_wrapper(hash_id, filepath)
 		unsigned hash_id
 		char * filepath
 	PROTOTYPE: $$
@@ -92,9 +92,27 @@ rhash_file_raw(hash_id, filepath)
 # perl bindings for Low-level functions
 
 struct rhash_context *
-rhash_init(hash_id)
-		unsigned hash_id
+rhash_init_multi_wrapper(AV* array)
 	PROTOTYPE: $
+	PREINIT:
+		unsigned hash_ids[64];
+		size_t length = 0;
+		int i;
+	CODE:
+		for (i = 0; i <= av_len(array); i++) {
+			SV** elem = av_fetch(array, i, 0);
+			if (elem != NULL) {
+				if (length >= (sizeof(hash_ids)/sizeof(*hash_ids)))
+					croak("too many hash identifiers passed");
+				hash_ids[length] = (unsigned)SvNV(*elem);
+				length++;
+			}
+		}
+		if (length == 0)
+			croak("at least one hash identifier must be passed");
+		RETVAL = rhash_init_multi(length, hash_ids);
+	OUTPUT:
+		RETVAL
 
 int
 rhash_update(ctx, message)
@@ -129,7 +147,7 @@ rhash_free(ctx)
 	PROTOTYPE: $
 
 SV *
-rhash_print(ctx, hash_id, flags = 0)
+rhash_print_wrapper(ctx, hash_id, flags = 0)
 		struct rhash_context * ctx
 		unsigned hash_id
 		int flags
@@ -148,7 +166,7 @@ rhash_print(ctx, hash_id, flags = 0)
 		RETVAL
 
 SV *
-rhash_print_magnet(ctx, filename, hash_mask)
+rhash_print_magnet_wrapper(ctx, filename, hash_mask)
 		struct rhash_context * ctx
 		SV * filename
 		SV * hash_mask
@@ -189,12 +207,31 @@ rhash_get_hashed_length(ctx)
 		RETVAL
 
 ##############################################################################
-# Hash information functions
+# Information functions
 
 int
 count()
 	CODE:
 		RETVAL = rhash_count();
+	OUTPUT:
+		RETVAL
+
+SV *
+librhash_version_string()
+	PREINIT:
+		unsigned version;
+	CODE:
+		version = rhash_get_version();
+		RETVAL = allocate_string_buffer(20);
+		sprintf(SvPVX(RETVAL), "%u.%u.%u", (version >> 24) & 255, (version >> 16) & 255, (version >> 8) & 255);
+		SvCUR_set(RETVAL, strlen(SvPVX(RETVAL)));
+	OUTPUT:
+		RETVAL
+
+int
+librhash_version()
+	CODE:
+		RETVAL = rhash_get_version();
 	OUTPUT:
 		RETVAL
 

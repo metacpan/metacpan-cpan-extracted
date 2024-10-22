@@ -726,8 +726,8 @@ method can be called to create an example which demonstrates how data
 of the specified $element shown as XML or Perl is organized in practice.
 
 The 'TREE' template returns the intermediate parse tree, which gets
-formatted into the XML or Perl example.  This is not a very stable
-interface: it may change without much notice.
+formatted into the XML or Perl example.  This is not a stable interface:
+it may change without much notice.
 
 Some %options are explained in L<XML::Compile::Translate|XML::Compile::Translate>.  There are
 some extra %options defined for the final output process.
@@ -818,7 +818,7 @@ for each processed schema component.
 
 If your program imports the same string or file definitions multiple
 times, it will re-use the schema information from the first import.
-This removal of dupplications will not work for open files or pre-parsed
+This removal of duplications will not work for open files or pre-parsed
 XML structures.
 
 As an extension to the handling L<dataToXML()|XML::Compile/"Compilers"> provides, you can specify an
@@ -1339,7 +1339,7 @@ In Perl representation:
 =head4 repetative groups
 
 [behavioral change in 0.93]
-In contrast to the normal partical blocks, as described above, do the
+In contrast to the normal particle blocks, as described above, do the
 groups have names.  In this case, we do not need to take the name of
 the first element, but can use the group name.  It will still have C<gr_>
 appended, because groups can have the same name as an element or a type(!)
@@ -1385,6 +1385,11 @@ something like this:
 
 Each HASH has only one key.
 
+=head3 List type
+
+List simpleType objects are also represented as ARRAY, like elements
+with a minOccurs or maxOccurs unequal 1.
+
 B<. Example: with a list of ints>
 
   <test5>3 8 12</test5>
@@ -1392,6 +1397,15 @@ B<. Example: with a list of ints>
 as Perl structure:
 
   test5 => [3, 8, 12]
+
+=head3 Using substitutionGroup constructs
+
+A substitution group is kind-of choice between alternative (complex)
+types.  However, in this case roles have reversed: instead a C<choice>
+which lists the alternatives, here the alternative elements register
+themselves as valid for an abstract (I<head>) element.  All alternatives
+should be extensions of the head element's type, but there is no way to
+check that.
 
 B<. Example: substitutionGroup>
 
@@ -1424,242 +1438,6 @@ The HASH repesentation is respectively
 
  product => {name => 'Ball', euro  => 12}
  product => {name => 'Ball', dollar => 6}
-
-B<. Example: of HOOKs:>
-
- my $hook = { type    => '{my_ns}my_type'
-            , before  => sub { ... }
-            , action  => 'WRITER'
-            };
-
- my $hook = { path    => qr/\(volume\)/
-            , replace => 'SKIP'
-            , action  => 'READER'
-            };
-
- # path contains "volume" or id is 'aap' or id is 'noot'
- my $hook = { path    => qr/\bvolume\b/
-            , id      => [ 'aap', 'noot' ]
-            , before  => [ sub {...}, sub { ... } ]
-            , after   => sub { ... }
-            };
-
-B<. Example: use of the type selector>
-
- type => 'int'
- type => '{http://www.w3.org/2000/10/XMLSchema}int'
- type => qr/\}xml_/   # type start with xml_
- type => [ qw/int float/ ];
-
- use XML::Compile::Util qw/pack_type SCHEMA2000/;
- type => pack_type(SCHEMA2000, 'int')
-
- # with XML::Compile::Cache
- $schema->addPrefixes(xsd => SCHEMA2000);
- type => 'xsd:int'
-
-B<. Example: type hook with XML::Compile::Cache>
-
- use XML::Compile::Util qw/SCHEMA2001/;
- my $schemas = XML::Compile::Cache->new(...);
- $schemas->addPrefixes(xsd => SCHEMA2001, mine => 'http://somens');
- $schemas->addHook(type => 'xsd:int', ...);
- $schemas->addHook(type => 'mine:sometype', ...);
-
-B<. Example: use of the ID selector>
-
- # default schema types have id's with same name
- id => 'ABC'
- id => 'http://www.w3.org/2001/XMLSchema#int'
- id => qr/\#xml_/   # id which start with xml_
- id => [ qw/ABC fgh/ ];
-
- use XML::Compile::Util qw/pack_id SCHEMA2001/;
- id => pack_id(SCHEMA2001, 'ABC')
-
-B<. Example: anyAttribute in a READER>
-
-Say your schema looks like this:
-
- <schema targetNamespace="http://mine"
-    xmlns:me="http://mine" ...>
-   <element name="el">
-     <complexType>
-       <attribute name="a" type="xs:int" />
-       <anyAttribute namespace="##targetNamespace"
-          processContents="lax">
-     </complexType>
-   </element>
-   <simpleType name="non-empty">
-     <restriction base="NCName" />
-   </simpleType>
- </schema>
-
-Then, in an application, you write:
-
- my $r = $schema->compile
-  ( READER => pack_type('http://mine', 'el')
-  , anyAttribute => 'ALL'
-  );
- # or lazy: READER => '{http://mine}el'
-
- my $h = $r->( <<'__XML' );
-   <el xmlns:me="http://mine">
-     <a>42</a>
-     <b type="me:non-empty">
-        everything
-     </b>
-   </el>
- __XML
-
- use Data::Dumper 'Dumper';
- print Dumper $h;
- __XML__
-
-The output is something like
-
- $VAR1 =
-  { a => 42
-  , '{http://mine}a' => ... # XML::LibXML::Node with <a>42</a>
-  , '{http://mine}b' => ... # XML::LibXML::Node with <b>everything</b>
-  };
-
-You can improve the reader with a callback.  When you know that the
-extra attribute is always of type C<non-empty>, then you can do
-
- my $read = $schema->compile
-  ( READER => '{http://mine}el'
-  , anyAttribute => \&filter
-  );
-
- my $anyAttRead = $schema->compile
-  ( READER => '{http://mine}non-empty'
-  );
-
- sub filter($$$$)
- {   my ($fqn, $xml, $path, $translator) = @_;
-     return () if $fqn ne '{http://mine}b';
-     (b => $anyAttRead->($xml));
- }
-
- my $h = $r->( see above );
- print Dumper $h;
-
-Which will result in
-
- $VAR1 =
-  { a => 42
-  , b => 'everything'
-  };
-
-The filter will be called twice, but return nothing in the first
-case.  You can implement any kind of complex processing in the filter.
-
-B<. Example: to trace the paths>
-
- $schema->addHook
-   ( action => 'READER'
-   , path   => qr/./
-   , before => 'PRINT_PATH'
-   );
-
-B<. Example: specify anyAttribute>
-
- use XML::Compile::Util qw/pack_type/;
-
- my $attr = $doc->createAttributeNS($somens, $sometype, 42);
- my $h = { a => 12     # normal element or attribute
-         , "{$somens}$sometype"        => $attr # anyAttribute
-         , pack_type($somens, $mytype) => $attr # nicer
-         , "$prefix:$sometype"         => $attr # [1.28]
-         };
-
-B<. Example: before hook on user-provided HASH.>
-
- sub beforeOnComplex($$$$)
- {   my ($doc, $values, $path, $fulltype) = @_;
-
-     my %copy = %$values;
-     $copy{extra} = 42;
-     delete $copy{superfluous};
-     $copy{count} =~ s/\D//g;    # only digits
-     \%copy;
- }
-
-B<. Example: before hook on simpleType data>
-
- sub beforeOnSimple($$$$)
- {   my ($doc, $value, $path, $fulltype) = @_;
-     $value * 100;    # convert euro to euro-cents
- }
-
-B<. Example: before hook with object for complexType>
-
- sub beforeOnObject($$$$)
- {   my ($doc, $obj, $path, $fulltype) = @_;
-
-     +{ name     => $obj->name
-      , price    => $obj->euro
-      , currency => 'EUR'
-      };
- }
-
-B<. Example: replace hook>
-
- sub replace($$$$$)
- {  my ($doc, $values, $path, $tag, $r, $fulltype) = @_
-    my $node = $doc->createElement($tag);
-    $node->appendText($values->{text});
-    $node;
- }
-
-B<. Example: add an extra sibbling after the usual process>
-
- sub after($$$$)
- {   my ($doc, $node, $path, $values, $fulltype) = @_;
-     my $child = $doc->createAttributeNS($myns, earth => 42);
-     $node->addChild($child);
-     $node;
- }
-
-B<. Example: creating nodes with text>
-
- {  my $text;
-
-    sub before($$$)
-    {   my ($doc, $values, $path) = @_;
-        my %copy = %$values;
-        $text = delete $copy{text};
-        \%copy;
-    }
-
-    sub after($$$)
-    {   my ($doc, $node, $path) = @_;
-        $node->addChild($doc->createTextNode($text));
-        $node;
-    }
-
-    $schema->addHook
-     ( action => 'WRITER'
-     , type   => 'mixed'
-     , before => \&before
-     , after  => \&after
-     );
- }
-
-=head3 List type
-
-List simpleType objects are also represented as ARRAY, like elements
-with a minOccurs or maxOccurs unequal 1.
-
-=head3 Using substitutionGroup constructs
-
-A substitution group is kind-of choice between alternative (complex)
-types.  However, in this case roles have reversed: instead a C<choice>
-which lists the alternatives, here the alternative elements register
-themselves as valid for an abstract (I<head>) element.  All alternatives
-should be extensions of the head element's type, but there is no way to
-check that.
 
 =head3 Wildcards via any and anyAttribute
 
@@ -1756,6 +1534,25 @@ evaluated before the global hooks.
  my $reader = $schema->compile(READER => $type
   , hook => HOOK, hooks => [ HOOK, HOOK, ...]);
 
+B<. Example: of HOOKs:>
+
+ my $hook = { type    => '{my_ns}my_type'
+            , before  => sub { ... }
+            , action  => 'WRITER'
+            };
+
+ my $hook = { path    => qr/\(volume\)/
+            , replace => 'SKIP'
+            , action  => 'READER'
+            };
+
+ # path contains "volume" or id is 'aap' or id is 'noot'
+ my $hook = { path    => qr/\bvolume\b/
+            , id      => [ 'aap', 'noot' ]
+            , before  => [ sub {...}, sub { ... } ]
+            , after   => sub { ... }
+            };
+
 =head3 General syntax
 
 Each hook has three kinds of parameters:
@@ -1816,6 +1613,28 @@ If you use L<XML::Compile::Cache|XML::Compile::Cache> [release 0.90], then you c
 C<prefix:type> as type specification as well.  You have to explicitly
 define prefix to namespace beforehand.
 
+B<. Example: use of the type selector>
+
+ type => 'int'
+ type => '{http://www.w3.org/2000/10/XMLSchema}int'
+ type => qr/\}xml_/   # type start with xml_
+ type => [ qw/int float/ ];
+
+ use XML::Compile::Util qw/pack_type SCHEMA2000/;
+ type => pack_type(SCHEMA2000, 'int')
+
+ # with XML::Compile::Cache
+ $schema->addPrefixes(xsd => SCHEMA2000);
+ type => 'xsd:int'
+
+B<. Example: type hook with XML::Compile::Cache>
+
+ use XML::Compile::Util qw/SCHEMA2001/;
+ my $schemas = XML::Compile::Cache->new(...);
+ $schemas->addPrefixes(xsd => SCHEMA2001, mine => 'http://somens');
+ $schemas->addHook(type => 'xsd:int', ...);
+ $schemas->addHook(type => 'mine:sometype', ...);
+
 =head3 Hooks on extended type
 
 [1.48] This hook will match all elements which use a type which is equal or
@@ -1836,6 +1655,17 @@ Matching based on IDs can reach more schema elements: some types are
 anonymous but still have an ID.  Best is to base selection on the full
 ID name, like C<ns#id>, to avoid all kinds of name-space conflicts in
 the future.
+
+B<. Example: use of the ID selector>
+
+ # default schema types have id's with same name
+ id => 'ABC'
+ id => 'http://www.w3.org/2001/XMLSchema#int'
+ id => qr/\#xml_/   # id which start with xml_
+ id => [ qw/ABC fgh/ ];
+
+ use XML::Compile::Util qw/pack_id SCHEMA2001/;
+ id => pack_id(SCHEMA2001, 'ABC')
 
 =head3 Hooks on matching paths
 
@@ -2148,12 +1978,12 @@ then still only one prefix is added.
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile distribution version 1.63,
-built on July 02, 2019. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile distribution version 1.64,
+built on October 21, 2024. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 
-Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2006-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -1,4 +1,6 @@
 /* -*- c-basic-offset:4 -*- */
+//#define PLUGGABLE_RE_EXTENSION
+#define PERL_EXT_RE_BUILD
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -36,12 +38,12 @@ HS_comp(pTHX_ SV * const pattern, U32 flags)
     SV  *wrapped, *wrapped_unset;
 
     /* hs_compile */
-    unsigned int options = HS_FLAG_SOM_LEFTMOST|HS_FLAG_SINGLEMATCH;
+    unsigned int options = HS_FLAG_SOM_LEFTMOST;
     hs_database_t *database;
+    hs_scratch_t *scratch = NULL;
     hs_compile_error_t *compile_err;
     hs_error_t rc;
 
-    hs_scratch_t *scratch = NULL;
     int nparens = 0;
 
 #ifdef RXf_PMf_EXTENDED_MORE
@@ -94,6 +96,7 @@ HS_comp(pTHX_ SV * const pattern, U32 flags)
     }
 #ifdef RXf_PMf_NOCAPTURE
     if (flags & RXf_PMf_NOCAPTURE) {
+        options |= HS_FLAG_SINGLEMATCH;
         options &= ~HS_FLAG_SOM_LEFTMOST;
     }
 #endif
@@ -195,9 +198,6 @@ HS_comp(pTHX_ SV * const pattern, U32 flags)
     re->precomp = SAVEPVN(exp, plen);
 #endif
 
-    /* Store our private object */
-    re->pprivate = database;
-
     re->nparens = re->lastparen = re->lastcloseparen = nparens;
     /*Newxz(re->offs, nparens + 1, regexp_paren_pair);*/
     
@@ -205,7 +205,10 @@ HS_comp(pTHX_ SV * const pattern, U32 flags)
         croak("Hyperscan scratch memory error %d\n", rc);
         return 0;
     }
-    re->paren_names = (HV*)scratch;
+    /* Store our private objects */
+    re->pprivate = malloc(sizeof(hs_pprivate_t));
+    HS_PPRIVATE(re)->database = database;
+    HS_PPRIVATE(re)->scratch  = scratch;
 
     return rx;
 }
@@ -246,7 +249,7 @@ static int HS_found_cb(unsigned int id, unsigned long long from,
                        unsigned long long to, unsigned int flags, void *ctx) {
     const REGEXP *rx = (const REGEXP*)ctx;
     regexp * re = RegSV(rx);
-    hs_database_t *ri = re->pprivate;
+    hs_database_t *ri = HS_PPRIVATE(re)->database;
     int i = re->nparens;
 
     DEBUG_r(printf("Hyperscan match %u at offset %llu until %llu\n",
@@ -274,8 +277,8 @@ HS_exec(pTHX_ REGEXP * const rx, char *stringarg, char *strend,
 #endif
 {
     regexp * re = RegSV(rx);
-    hs_database_t *ri = re->pprivate;
-    hs_scratch_t *scratch = (hs_scratch_t *)re->paren_names;
+    hs_database_t *ri     = HS_PPRIVATE(re)->database;
+    hs_scratch_t *scratch = HS_PPRIVATE(re)->scratch;
     int rc;
     I32 i;
 
@@ -329,8 +332,9 @@ void
 HS_free(pTHX_ REGEXP * const rx)
 {
     regexp * re = RegSV(rx);
-    hs_free_database(re->pprivate);
-    hs_free_scratch((hs_scratch_t *)(re->paren_names));
+    hs_free_database(HS_PPRIVATE(re)->database);
+    hs_free_scratch (HS_PPRIVATE(re)->scratch);
+    free(HS_PPRIVATE(re));
 }
 
 void *

@@ -4,7 +4,7 @@ use 5.010;
 
 WriteMakefile
  ( NAME	 	=> 'XML::Compile'
- , VERSION	=> '1.63'
+ , VERSION	=> '1.64'
 
  , PREREQ_PM    =>
    { XML::LibXML               => 2.0107
@@ -56,7 +56,7 @@ DISTDIR         = ../public_html/xml-compile/source
 SKIP_LINKS      = XML::LibXML
 
 # for POD
-EXTENDS			= ../XML-Compile-SOAP:../XML-Compile-SOAP12:../XML-Compile-SOAP-Daemon:../../perl/XMLDumper:../XML-Compile-Cache:../../perl/XMLSimple:../XML-Compile-Tester:../XML-Rewrite:../../perl/XMLRPC:../../perl/XMLSOAPEv:../../perl/XMLC14N:../../perl/XMLWSS:../../perl/WSSSIG:../XML-Compile-WSDL11:../XML-Compile-SOAP-Mojolicious:../XML-Compile-Licensed
+EXTENDS			= ../XML-Compile-SOAP:../XML-Compile-SOAP12:../XML-Compile-SOAP-Daemon:/p/XMLDumper:../XML-Compile-Cache:../XML-LibXML-Simple:../XML-Compile-Tester:../XML-Rewrite:../XML-Compile-RPC:../XML-Compile-SOAP-AnyEvent:../XML-Compile-C14N:../XML-Compile-WSS:../XML-Compile-WSS-Signature:../XML-Compile-WSDL11:../XML-Compile-SOAP-Mojolicious:../XML-Compile-Licensed
 FIRST_YEAR      = 2006
 EMAIL           = markov@cpan.org
 WEBSITE         = http://perl.overmeer.net/xml-compile/

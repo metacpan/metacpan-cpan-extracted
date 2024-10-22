@@ -1,4 +1,7 @@
 Revision history for MHFS-XS, note the CHANGELOG.md of the repository is much more comprehensive
+v0.2.4  2024-10-21
+        Link `-latomic` on 32-bit ARM
+
 v0.2.3  2022-12-03
         Disable unused miniaudio APIs to remove threading requirement
 

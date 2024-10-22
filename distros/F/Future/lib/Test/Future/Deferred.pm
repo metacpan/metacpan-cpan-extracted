@@ -3,24 +3,27 @@
 #
 #  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
 
-package Test::Future::Deferred;
+package Test::Future::Deferred 0.51;
 
-use v5.10;
-use strict;
+use v5.14;
 use warnings;
 use base qw( Future );
 
-our $VERSION = '0.50';
+use Carp;
 
 =head1 NAME
 
 C<Test::Future::Deferred> - a future which completes later
 
- my $future = Test::Future::Deferred->done_later( 1, 2, 3 );
+=head1 SYNOPSIS
 
- # Future is not ready yet
+=for highlighter language=perl
 
- my @result = $future->get;
+   my $future = Test::Future::Deferred->done_later( 1, 2, 3 );
+
+   # Future is not ready yet
+
+   my @result = $future->get;
 
 =head1 DESCRIPTION
 
@@ -47,7 +50,9 @@ sub await
       my ( $f, $method, @args ) = @$d;
       $f->$method( @args );
    }
-   # TODO: detect if still not done with no more deferrals
+
+   $_[0]->is_ready or
+      croak "$_[0] ran out of things to do and is still not ready";
 }
 
 =head1 METHODS
@@ -56,7 +61,7 @@ sub await
 
 =head2 done_later
 
-   $f->done_later( @args )
+   $f->done_later( @args );
 
 Equivalent to invoking the regular C<done> method as part of the C<await>
 operation called on the toplevel future. This makes the future complete with
@@ -73,7 +78,7 @@ sub done_later
 
 =head2 fail_later
 
-   $f->fail_later( $message, $category, @details )
+   $f->fail_later( $message, $category, @details );
 
 Equivalent to invoking the regular C<fail> method as part of the C<await>
 operation called on the toplevel future. This makes the future complete with

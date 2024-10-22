@@ -6,7 +6,20 @@ Mark Overmeer.
 
 Plans and unwanted limitations? see README.todo
 
-version 1.63: Tue 02 Jul 2019 04:35:01 PM CEST
+version 1.64: Mon 21 Oct 15:39:09 CEST 2024
+
+	Fixes:
+	- accept empty groups.
+	- #! of bin/schema2example [Andrius Merkys]
+	- hooks did not run on restriction/extension types. GitHUB issue #6 [Frank Seitz]
+
+	Improvements:
+	- spell fixes from Debian. GitHUB issue #4 [Utkarsh Gupta]
+	- explain use of CDATA in WSDLs in the FAQ.
+	- template compact output sometimes removes a useless empty line.
+	- additional element group tests
+
+version 1.63: Tue 02 Jul 16:35:01 CEST 2019
 
 	Improvements:
 	- dataToXML auto-detects XML string when it starts with a BOM.

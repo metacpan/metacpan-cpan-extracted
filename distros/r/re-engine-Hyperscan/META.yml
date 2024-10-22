@@ -9,7 +9,7 @@ configure_requires:
   Devel::CheckLib: '1.00'
   ExtUtils::MakeMaker: '6.31'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 8.0404, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,6 +19,9 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '0.01'
+resources:
+  bugtracker: https://github.com/rurban/re-engine-Hyperscan/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/rurban/re-engine-Hyperscan/
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

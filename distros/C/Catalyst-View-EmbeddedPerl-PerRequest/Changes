@@ -1,5 +1,9 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest
 
+0.001008  21 October 2024
+          - some initialization optimizations
+          - fixes to dependencies
+
 0.001007  20 October 2024
           - experimental support for inheritance
           - exterimental support for Helper attribute and export trait

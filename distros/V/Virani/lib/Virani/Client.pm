@@ -13,11 +13,11 @@ Virani::Client - Client for remotely accessing Virani vis HTTP or HTTPS.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.0.2
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 =head1 SYNOPSIS
 
@@ -241,10 +241,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Virani>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Virani>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Virani>
@@ -257,7 +253,7 @@ L<https://metacpan.org/release/Virani>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2023 by Zane C. Bowers-Hadley.
+This software is Copyright (c) 2024 by Zane C. Bowers-Hadley.
 
 This is free software, licensed under:
 

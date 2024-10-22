@@ -6,6 +6,11 @@ use Test2::V0 0.000148; # is_refcount
 
 use Future;
 
+use constant FUTURE_HAS_STATE_NAMES => ( !defined $Future::XS::VERSION or $Future::XS::VERSION >= 0.12 );
+if( defined $Future::XS::VERSION and !FUTURE_HAS_STATE_NAMES ) {
+   diag( "Skipping tests on state transition exception messages because Future::XS ($Future::XS::VERSION) is too old" );
+}
+
 # done
 {
    my $future = Future->new;
@@ -87,6 +92,18 @@ use Future;
    ok( $f2->is_ready, 'Chained ->on_ready for immediate future' );
    ok( $f2->is_done, 'Chained ->on_ready is done for immediate future' );
    is( [ $f2->result ], [ already => "done" ], 'Results from chained via ->on_ready for immediate future' );
+}
+
+# State change while done
+if(FUTURE_HAS_STATE_NAMES)
+{
+   my $fdone = Future->done( result => 1 );
+
+   like( dies { $fdone->done( "result 2" ) }, qr/^Future=\S+ is already done and cannot be ->done at /,
+      '->done while done dies' );
+   like( dies { $fdone->fail( "Oopsie 2\n" ) }, qr/^Future=\S+ is already done and cannot be ->fail'ed at /,
+      '->fail while done dies' );
+   # ->cancel while done is fine
 }
 
 # references are not retained in results
@@ -207,6 +224,18 @@ use Future;
    is( [ $f1->failure ], [ "Already broken" ], 'Results from chained via ->on_done for immediate future' );
    ok( $f2->is_ready, 'Chained ->on_ready for immediate future' );
    is( [ $f2->failure ], [ "Already broken" ], 'Results from chained via ->on_ready for immediate future' );
+}
+
+# State change while failed
+if(FUTURE_HAS_STATE_NAMES)
+{
+   my $ffail = Future->fail( "Oopsie 1\n" );
+
+   like( dies { $ffail->done( "result 2" ) }, qr/^Future=\S+ is already failed and cannot be ->done at /,
+      '->done while failed dies' );
+   like( dies { $ffail->fail( "Oopsie 2\n" ) }, qr/^Future=\S+ is already failed and cannot be ->fail'ed at /,
+      '->fail while failed dies' );
+   # ->cancel while failed is fine
 }
 
 # die

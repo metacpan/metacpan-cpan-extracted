@@ -22,6 +22,7 @@ requires:
   SPVM::Go: '0.008'
   SPVM::Sys: '0.528'
   SPVM::Thread: '0.001'
-resources: {}
-version: '0.001'
+resources:
+  repository: https://github.com/yuki-kimoto/SPVM-Net-DNS-Native.git
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

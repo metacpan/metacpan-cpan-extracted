@@ -9,13 +9,15 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 =head1 NAME
 
 C<Devel::MAT::Dumper::Helper> - give XS modules extensions for memory dumping
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
 In F<Build.PL>
 
@@ -24,6 +26,8 @@ In F<Build.PL>
    }
 
 In your module's XS source:
+
+=for highlighter language=c
 
    #ifdef HAVE_DMD_HELPER
    #  define WANT_DMD_API_044
@@ -106,6 +110,8 @@ my $DMD_helper_h = do {
 
 =head1 FUNCTIONS
 
+=for highlighter language=perl
+
 =cut
 
 =head2 write_DMD_helper_h
@@ -176,6 +182,8 @@ sub extend_module_build
 }
 
 =head1 XS MACROS
+
+=for highlighter language=c
 
 The header file provides the following macros, which may be used by the XS
 module.

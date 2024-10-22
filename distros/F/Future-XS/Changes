@@ -1,5 +1,9 @@
 Revision history for Future-XS
 
+0.13    2024-10-21
+        [CHANGES]
+         * Implement the 'also' API for convergent Futures of Future v0.51
+
 0.12    2023-12-27
         [BUGFIXES]
          * Ensure the "not yet ready ..." exception is thrown from the correct

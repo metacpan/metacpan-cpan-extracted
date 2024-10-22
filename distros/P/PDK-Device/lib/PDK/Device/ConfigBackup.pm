@@ -2,44 +2,40 @@ package PDK::Device::ConfigBackup;
 
 use v5.30;
 use Moose;
+use Carp qw(croak);
+use Parallel::ForkManager;
+use Thread::Queue;
 use namespace::autoclean;
 
-use Carp       qw(croak);
-use POSIX      qw(WNOHANG strftime);
-use File::Path qw(make_path);
-use Parallel::ForkManager;
-use Try::Tiny;
-use Thread::Queue;
+with 'PDK::Device::Concern::Dumper';
 
 
-has now => (
-  is      => 'ro',
+has queue => (
+  is      => 'rw',
   default => sub {
-    my $time = `date "+%Y-%m-%d %H:%M:%S"`;
-    chomp($time);
-    return $time;
+    my $value = $ENV{PDK_DEVICE_QUEUE};
+    PDK::Device::Concern::Dumper::_debug_init("从环境变量中加载并设置 queue：($value)") if defined $value;
+    return $value // 10;
   },
 );
 
-has month => (
-  is      => 'ro',
+has workdir => (
+  is      => 'rw',
   default => sub {
-    my $month = `date +%Y-%m`;
-    chomp($month);
-    return $month;
+    my $value = $ENV{PDK_DEVICE_BACKUP_HOME};
+    PDK::Device::Concern::Dumper::_debug_init("从环境变量中加载并设置 workdir：($value)") if defined $value;
+    return $value // glob("~");
   },
 );
 
-has date => (
-  is      => 'ro',
+has debug => (
+  is      => 'rw',
   default => sub {
-    my $date = `date +%Y-%m-%d`;
-    chomp($date);
-    return $date;
+    my $value = $ENV{PDK_DEVICE_BACKUP_DEBUG};
+    PDK::Device::Concern::Dumper::_debug_init("从环境变量中加载并设置 debug：($value)") if defined $value;
+    return $value // 0;
   },
 );
-
-has workdir => (is => 'rw', default => sub { $ENV{PDK_DEVICE_BACKUP_HOME} // glob("~") },);
 
 has result => (
   is      => 'rw',
@@ -48,101 +44,24 @@ has result => (
   },
 );
 
-has debug => (is => 'rw', default => 0,);
-
-
-sub dump {
-  my ($self, $msg) = @_;
-
-  $self->{debug} ||= $ENV{PDK_DEVICE_BACKUP_DEBUG};
-  return unless $self->{debug};
-
-  if ($self->{debug} == 1) {
-    say "[debug] $msg;";
-  }
-  elsif ($self->{debug} > 1) {
-    my $workdir = "$self->{workdir}/dump/$self->{month}/$self->{date}";
-    make_path($workdir) unless -d $workdir;
-
-    my $filename = "$workdir/dump_log.txt";
-    open(my $fh, '>>', $filename)            or croak "无法打开文件 $filename 进行写入: $!";
-    say $fh $self->now . " - [debug] $msg ;" or croak "写入文件 $filename 失败: $!";
-    close($fh)                               or croak "关闭文件句柄 $filename 失败: $!";
-  }
-}
-
-sub initPdkDevice {
-  my ($self, $param) = @_;
-
-  my $username = $param->{username} || $ENV{PDK_DEVICE_USERNAME};
-  my $password = $param->{password} || $ENV{PDK_DEVICE_PASSWORD};
-  my $host     = $param->{ip};
-
-  croak "必须提供设备登录(IP)所需账户密码或设置相关的环境变量：PDK_DEVICE_USERNAME，PDK_DEVICE_PASSWORD;"
-    unless ($username && $password && $host);
-
-  my $class = $param->{pdk_device_module};
-  eval "use $class; 1" or die "加载模块失败: $class";
-
-  $self->dump("尝试自动加载模块并初始化对象($param->{name}/$host)：$class");
-  my $device = $class->new(host => $host, username => $username, password => $password) or die "实例化模块失败: $class";
-
-  return $device;
-}
-
-sub assignAttributes {
-  my ($self, $items) = @_;
-
-  croak "必须提供基于哈希对象的数组引用" if ref($items) ne 'ARRAY';
-
-  my %os_to_module = (
-    qr/^Cisco|ios/i   => 'PDK::Device::Cisco',
-    qr/^nx-os/i       => 'PDK::Device::Cisco::Nxos',
-    qr/^PAN-OS/i      => 'PDK::Device::Paloalto',
-    qr/^Radware/i     => 'PDK::Device::Radware',
-    qr/^H3C|Comware/i => 'PDK::Device::H3c',
-    qr/^Hillstone/i   => 'PDK::Device::Hillstone',
-    qr/^junos/i       => 'PDK::Device::Juniper',
-  );
-
-  for my $item (@$items) {
-    croak "设备属性必须包含 'ip' 和 'name' 属性" unless exists $item->{ip} && exists $item->{name};
-
-    $item->{username} ||= $ENV{PDK_DEVICE_USERNAME};
-    $item->{password} ||= $ENV{PDK_DEVICE_PASSWORD};
-
-    my ($module) = grep { $item->{os} =~ $_ } keys %os_to_module;
-    croak "暂不兼容的 OS：$item->{os}" unless !!$module;
-    $item->{pdk_device_module} = $os_to_module{$module};
-    $item->{name} =~ s/\..*$//;
-  }
-  $self->dump("尝试自动装配 {pdk_device_module} 并修正设备主机名");
-
-  return $items;
-}
-
 sub getConfigJob {
   my ($self, $devices) = @_;
 
-  try {
+  eval {
     $devices = $self->assignAttributes($devices);
     my $count = scalar(@{$devices});
     $self->dump("开始任务：并行执行 ($count) 台设备的配置获取任务");
-  }
-  catch {
-    croak "自动加载并装配模块抛出异常: $_";
   };
+  if (!!$@) {
+    croak "自动加载并装配模块抛出异常: $@";
+  }
 
-  my $pm = Parallel::ForkManager->new(10);
-
+  my $pm    = Parallel::ForkManager->new(10);
   my $queue = Thread::Queue->new();
 
   $pm->run_on_finish(sub {
     my (undef, undef, undef, undef, undef, $data) = @_;
-
-    if (defined $data) {
-      $queue->enqueue($data);
-    }
+    $queue->enqueue($data) if defined $data;
   });
 
   foreach my $device (@{$devices}) {
@@ -169,25 +88,21 @@ sub getConfigJob {
 sub ftpConfigJob {
   my ($self, $devices) = @_;
 
-  try {
+  eval {
     $devices = $self->assignAttributes($devices);
     my $count = scalar(@{$devices});
     $self->dump("开始任务：并行执行 ($count) 台设备的配置获取任务");
-  }
-  catch {
-    croak "自动加载并装配模块抛出异常: $_";
   };
+  if (!!$@) {
+    croak "自动加载并装配模块抛出异常: $@";
+  }
 
-  my $pm = Parallel::ForkManager->new(10);
-
+  my $pm    = Parallel::ForkManager->new(10);
   my $queue = Thread::Queue->new();
 
   $pm->run_on_finish(sub {
     my (undef, undef, undef, undef, undef, $data) = @_;
-
-    if (defined $data) {
-      $queue->enqueue($data);
-    }
+    $queue->enqueue($data) if defined $data;
   });
 
   foreach my $device (@{$devices}) {
@@ -214,25 +129,21 @@ sub ftpConfigJob {
 sub execCommandsJob {
   my ($self, $devices, $commands) = @_;
 
-  try {
+  eval {
     $devices = $self->assignAttributes($devices);
     my $count = scalar(@{$devices});
     $self->dump("开始任务：并行执行 ($count) 台设备的配置下发任务，各设备推送的脚本一致");
-  }
-  catch {
-    croak "自动加载并装配模块抛出异常: $_";
   };
+  if (!!$@) {
+    croak "自动加载并装配模块抛出异常: $@";
+  }
 
-  my $pm = Parallel::ForkManager->new(10);
-
+  my $pm    = Parallel::ForkManager->new(10);
   my $queue = Thread::Queue->new();
 
   $pm->run_on_finish(sub {
     my (undef, undef, undef, undef, undef, $data) = @_;
-
-    if (defined $data) {
-      $queue->enqueue($data);
-    }
+    $queue->enqueue($data) if defined $data;
   });
 
   foreach my $device (@{$devices}) {
@@ -266,25 +177,21 @@ sub runCommandsJob {
     }
   }
 
-  try {
+  eval {
     $devices = $self->assignAttributes($devices);
     my $count = scalar(@{$devices});
     $self->dump("开始任务：并行执行 ($count) 台设备的配置下发任务，推送的脚本各自独立");
-  }
-  catch {
-    croak "自动加载并装配模块抛出异常: $_";
   };
+  if (!!$@) {
+    croak "自动加载并装配模块抛出异常: $@";
+  }
 
-  my $pm = Parallel::ForkManager->new(10);
-
+  my $pm    = Parallel::ForkManager->new(10);
   my $queue = Thread::Queue->new();
 
   $pm->run_on_finish(sub {
     my (undef, undef, undef, undef, undef, $data) = @_;
-
-    if (defined $data) {
-      $queue->enqueue($data);
-    }
+    $queue->enqueue($data) if defined $data;
   });
 
   foreach my $device (@{$devices}) {
@@ -313,7 +220,8 @@ sub ftpConfig {
   my ($self, $param) = @_;
   $self->dump("开始任务：对设备($param->{name}/$param->{ip})执行 FTP 备份操作");
 
-  try {
+  my $result;
+  eval {
     my $device     = $self->initPdkDevice($param);
     my $hostname   = $param->{name};
     my $ftp_server = $param->{ftp_server} // $ENV{PDK_FTP_SERVER};
@@ -321,37 +229,44 @@ sub ftpConfig {
     croak "启用 FTP 备份配置，必须正确配置 FTP 服务器地址和设备名称" unless $ftp_server && $hostname;
 
     $device->ftpConfig($hostname, $ftp_server);
-    return {success => 1};
-  }
-  catch {
-    return {success => 0, reason => $_};
+    $result = {success => 1};
   };
+  if (!!$@) {
+    $result = {success => 0, reason => $@};
+  }
+
+  return $result;
 }
 
 sub getConfig {
   my ($self, $param) = @_;
   $self->dump("开始任务：对设备($param->{name}/$param->{ip})执行配置获取操作");
 
-  try {
+  my $result;
+  eval {
     my $device = $self->initPdkDevice($param);
-    return $device->getConfig();
-  }
-  catch {
-    return {success => 0, reason => $_};
+    $result = $device->getConfig();
   };
+  if (!!$@) {
+    $result = {success => 0, reason => $@};
+  }
+  return $result;
 }
 
 sub execCommands {
   my ($self, $param, $commands) = @_;
   $self->dump("开始任务：对设备($param->{name}/$param->{ip})执行命令下发操作");
 
-  try {
+  my $result;
+  eval {
     my $device = $self->initPdkDevice($param);
-    return $device->execCommands($commands);
-  }
-  catch {
-    return {success => 0, reason => $_};
+    $result = $device->execCommands($commands);
   };
+  if (!!$@) {
+    $result = {success => 0, reason => $@};
+  }
+
+  return $result;
 }
 
 sub startFtpConfig {
@@ -363,6 +278,7 @@ sub startFtpConfig {
 
   my $result = $self->ftpConfig($param);
   my $status = $self->{result}{ftpConfig};
+
   if ($result->{success}) {
     push @{$status->{success}}, $self->now . " - 设备 $name($ip) FTP 备份成功";
   }
@@ -382,9 +298,10 @@ sub startExecCommands {
 
   my $result = $self->execCommands($param, $commands);
   my $status = $self->{result}{execCommands};
+
   if ($result->{success}) {
     push @{$status->{success}}, $self->now . " - 设备 $name($ip) 配置下发成功";
-    my $filename = "${name}_${ip}_execCommands.cfg";
+    my $filename = "${name}_${ip}_execCommands.txt";
     $self->write_file($result->{result}, $filename);
   }
   else {
@@ -396,6 +313,7 @@ sub startExecCommands {
 
 sub startGetConfig {
   my ($self, $param) = @_;
+
   $self->dump("激活任务：对设备($param->{name}/$param->{ip})配置获取并记录结果");
 
   my $name = $param->{name};
@@ -403,9 +321,10 @@ sub startGetConfig {
 
   my $result = $self->getConfig($param);
   my $status = $self->{result}{getConfig};
+
   if ($result->{success}) {
     push @{$status->{success}}, $self->now . " - 设备 $name($ip) 配置备份成功";
-    my $filename = "${name}_${ip}_getConfig.cfg";
+    my $filename = "${name}_${ip}_getConfig.txt";
     $self->write_file($result->{config}, $filename);
   }
   else {
@@ -413,27 +332,6 @@ sub startGetConfig {
   }
 
   return $status;
-}
-
-sub write_file {
-  my ($self, $content, $filename) = @_;
-
-  croak("请正确设置需要保存的内容和文件名") unless $content && $filename;
-
-  my $workdir = "$self->{workdir}/$self->{month}/$self->{date}";
-  make_path($workdir) unless -d $workdir;
-
-  $self->dump("准备将配置文件写入工作目录: ($workdir)");
-
-  $filename = "$workdir/$filename";
-
-  open(my $fh, '>>', $filename) or croak "无法打开文件 $filename 进行写入: $!";
-  print $fh $content            or croak "写入文件 $filename 失败: $!";
-  close($fh)                    or croak "关闭文件句柄 $filename 失败: $!";
-
-  $self->dump("已将配置文件写入文本文件: $filename");
-
-  return {success => 1};
 }
 
 __PACKAGE__->meta->make_immutable;

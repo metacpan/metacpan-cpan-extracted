@@ -14,32 +14,31 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "torrent.h"
+#include "hex.h"
+#include "util.h"
 #include <assert.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>  /* time() */
 
-#include "byte_order.h"
-#include "algorithms.h"
-#include "hex.h"
-#include "torrent.h"
-
 #ifdef USE_OPENSSL
-#define SHA1_INIT(ctx) ((pinit_t)ctx->sha_init)(&ctx->sha1_context)
-#define SHA1_UPDATE(ctx, msg, size) ((pupdate_t)ctx->sha_update)(&ctx->sha1_context, (msg), (size))
-#define SHA1_FINAL(ctx, result) ((pfinal_t)ctx->sha_final)(&ctx->sha1_context, (result))
+#define SHA1_INIT(ctx) ((pinit_t)ctx->sha1_methods.init)(&ctx->sha1_context)
+#define SHA1_UPDATE(ctx, msg, size) ((pupdate_t)ctx->sha1_methods.update)(&ctx->sha1_context, (msg), (size))
+#define SHA1_FINAL(ctx, result) ((pfinal_t)ctx->sha1_methods.final)(&ctx->sha1_context, (result))
 #else
 #define SHA1_INIT(ctx) rhash_sha1_init(&ctx->sha1_context)
 #define SHA1_UPDATE(ctx, msg, size) rhash_sha1_update(&ctx->sha1_context, (msg), (size))
 #define SHA1_FINAL(ctx, result) rhash_sha1_final(&ctx->sha1_context, (result))
 #endif
 
-#define BT_MIN_HASH_LENGTH 16384
+#define BT_MIN_PIECE_LENGTH 16384
 /** size of a SHA1 hash in bytes */
 #define BT_HASH_SIZE 20
 /** number of SHA1 hashes to store together in one block */
 #define BT_BLOCK_SIZE 256
+#define BT_BLOCK_SIZE_IN_BYTES (BT_BLOCK_SIZE * BT_HASH_SIZE)
 
 /**
  * Initialize torrent context before calculating hash.
@@ -49,19 +48,14 @@
 void bt_init(torrent_ctx* ctx)
 {
 	memset(ctx, 0, sizeof(torrent_ctx));
-	ctx->piece_length = BT_MIN_HASH_LENGTH;
-	assert(BT_MIN_HASH_LENGTH == bt_default_piece_length(0));
+	ctx->piece_length = BT_MIN_PIECE_LENGTH;
+	assert(BT_MIN_PIECE_LENGTH == bt_default_piece_length(0, 0));
 
 #ifdef USE_OPENSSL
-	{
-		/* get the methods of the selected SHA1 algorithm */
-		rhash_hash_info* sha1_info = &rhash_info_table[3];
-		assert(sha1_info->info->hash_id == RHASH_SHA1);
-		assert(sha1_info->context_size <= (sizeof(sha1_ctx) + sizeof(unsigned long)));
-		ctx->sha_init = sha1_info->init;
-		ctx->sha_update = sha1_info->update;
-		ctx->sha_final = sha1_info->final;
-	}
+	/* get the methods of the selected SHA1 algorithm */
+	assert(rhash_info_table[3].info->hash_id == RHASH_SHA1);
+	assert(rhash_info_table[3].context_size <= (sizeof(sha1_ctx) + sizeof(unsigned long)));
+	rhash_load_sha1_methods(&ctx->sha1_methods, METHODS_SELECTED);
 #endif
 
 	SHA1_INIT(ctx);
@@ -139,9 +133,11 @@ static int bt_store_piece_sha1(torrent_ctx* ctx)
 	unsigned char* hash;
 
 	if ((ctx->piece_count % BT_BLOCK_SIZE) == 0) {
-		block = (unsigned char*)malloc(BT_HASH_SIZE * BT_BLOCK_SIZE);
-		if (block == NULL || !bt_vector_add_ptr(&ctx->hash_blocks, block)) {
-			if (block) free(block);
+		block = (unsigned char*)malloc(BT_BLOCK_SIZE_IN_BYTES);
+		if (!block)
+			return 0;
+		if (!bt_vector_add_ptr(&ctx->hash_blocks, block)) {
+			free(block);
 			return 0;
 		}
 	} else {
@@ -160,7 +156,7 @@ static int bt_store_piece_sha1(torrent_ctx* ctx)
 typedef struct bt_file_info
 {
 	uint64_t size;
-	char path[1];
+	char path[];
 } bt_file_info;
 
 /**
@@ -190,7 +186,7 @@ int bt_add_file(torrent_ctx* ctx, const char* path, uint64_t filesize)
 	/* recalculate piece length (but only if hashing not started yet) */
 	if (ctx->piece_count == 0 && ctx->index == 0) {
 		/* note: in case of batch of files should use a total batch size */
-		ctx->piece_length = bt_default_piece_length(filesize);
+		ctx->piece_length = bt_default_piece_length(filesize, ctx->options & BT_OPT_TRANSMISSION);
 	}
 	return 1;
 }
@@ -257,7 +253,9 @@ void bt_final(torrent_ctx* ctx, unsigned char result[20])
 static int bt_str_ensure_length(torrent_ctx* ctx, size_t length)
 {
 	char* new_str;
-	if (length >= ctx->content.allocated && !ctx->error) {
+	if (ctx->error)
+		return 0;
+	if (length >= ctx->content.allocated) {
 		length++; /* allocate one character more */
 		if (length < 64) length = 64;
 		else length = (length + 255) & ~255;
@@ -282,27 +280,29 @@ static int bt_str_ensure_length(torrent_ctx* ctx, size_t length)
 static void bt_str_append(torrent_ctx* ctx, const char* text)
 {
 	size_t length = strlen(text);
-
-	if (!bt_str_ensure_length(ctx, ctx->content.length + length)) return;
+	if (!bt_str_ensure_length(ctx, ctx->content.length + length + 1))
+		return;
 	assert(ctx->content.str != 0);
-	memcpy(ctx->content.str + ctx->content.length, text, length);
+	memcpy(ctx->content.str + ctx->content.length, text, length + 1);
 	ctx->content.length += length;
-	ctx->content.str[ctx->content.length] = '\0';
 }
 
 /**
  * B-encode given integer.
  *
  * @param ctx the torrent algorithm context
+ * @param name B-encoded string to prepend the number or NULL
  * @param number the integer to output
  */
 static void bt_bencode_int(torrent_ctx* ctx, const char* name, uint64_t number)
 {
 	char* p;
-	if (name) bt_str_append(ctx, name);
+	if (name)
+		bt_str_append(ctx, name);
 
 	/* add up to 20 digits and 2 letters */
-	if (!bt_str_ensure_length(ctx, ctx->content.length + 22)) return;
+	if (!bt_str_ensure_length(ctx, ctx->content.length + 22))
+		return;
 	p = ctx->content.str + ctx->content.length;
 	*(p++) = 'i';
 	p += rhash_sprintI64(p, number);
@@ -316,23 +316,25 @@ static void bt_bencode_int(torrent_ctx* ctx, const char* name, uint64_t number)
  * B-encode a string.
  *
  * @param ctx the torrent algorithm context
+ * @param name B-encoded string to prepend or NULL
  * @param str the string to encode
  */
 static void bt_bencode_str(torrent_ctx* ctx, const char* name, const char* str)
 {
-	size_t len = strlen(str);
-	int num_len;
+	const size_t string_length = strlen(str);
+	int number_length;
 	char* p;
 
-	if (name) bt_str_append(ctx, name);
-	if (!bt_str_ensure_length(ctx, ctx->content.length + len + 21)) return;
-
+	if (name)
+		bt_str_append(ctx, name);
+	if (!bt_str_ensure_length(ctx, ctx->content.length + string_length + 21))
+		return;
 	p = ctx->content.str + ctx->content.length;
-	p += (num_len = rhash_sprintI64(p, len));
-	ctx->content.length += len + num_len + 1;
+	p += (number_length = rhash_sprintI64(p, string_length));
+	ctx->content.length += string_length + number_length + 1;
 
 	*(p++) = ':';
-	memcpy(p, str, len + 1); /* copy with trailing '\0' */
+	memcpy(p, str, string_length + 1); /* copy with trailing '\0' */
 }
 
 /**
@@ -342,47 +344,71 @@ static void bt_bencode_str(torrent_ctx* ctx, const char* name, const char* str)
  */
 static void bt_bencode_pieces(torrent_ctx* ctx)
 {
-	size_t pieces_length = ctx->piece_count * BT_HASH_SIZE;
-	int num_len;
-	int size, i;
+	const size_t pieces_length = ctx->piece_count * BT_HASH_SIZE;
+	size_t bytes_left, i;
+	int number_length;
 	char* p;
 
 	if (!bt_str_ensure_length(ctx, ctx->content.length + pieces_length + 21))
 		return;
-
 	p = ctx->content.str + ctx->content.length;
-	p += (num_len = rhash_sprintI64(p, pieces_length));
-	ctx->content.length += pieces_length + num_len + 1;
+	p += (number_length = rhash_sprintI64(p, pieces_length));
+	ctx->content.length += pieces_length + number_length + 1;
 
 	*(p++) = ':';
 	p[pieces_length] = '\0'; /* terminate with \0 just in case */
 
-	for (size = (int)ctx->piece_count, i = 0; size > 0;
-		size -= BT_BLOCK_SIZE, i++)
+	for (bytes_left = pieces_length, i = 0; bytes_left > 0; i++)
 	{
-		memcpy(p, ctx->hash_blocks.array[i],
-			(size < BT_BLOCK_SIZE ? size : BT_BLOCK_SIZE) * BT_HASH_SIZE);
-		p += BT_BLOCK_SIZE * BT_HASH_SIZE;
+		size_t size = (bytes_left < BT_BLOCK_SIZE_IN_BYTES ? bytes_left : BT_BLOCK_SIZE_IN_BYTES);
+		memcpy(p, ctx->hash_blocks.array[i], size);
+		bytes_left -= size;
+		p += size;
 	}
 }
 
 /**
  * Calculate default torrent piece length, using uTorrent algorithm.
  * Algorithm:
- *  length = 16K for total_size < 16M,
- *  length = 8M for total_size >= 4G,
- *  length = top_bit(total_size) / 1024 otherwise.
+ *   piece_length = 16K for total_size < 16M,
+ *   piece_length = 8M for total_size >= 4G,
+ *   piece_length = top_bit(total_size) / 512 otherwise.
  *
- * @param total_size total hashed batch size of torrent file
+ * @param total_size total torrent batch size
  * @return piece length used by torrent file
  */
-size_t bt_default_piece_length(uint64_t total_size)
+static size_t utorr_piece_length(uint64_t total_size)
 {
-	uint64_t hi_bit;
-	if (total_size < 16777216) return BT_MIN_HASH_LENGTH;
-	if (total_size >= I64(4294967296) ) return 8388608;
-	for (hi_bit = 16777216 << 1; hi_bit <= total_size; hi_bit <<= 1);
-	return (size_t)(hi_bit >> 10);
+	size_t size = (size_t)(total_size >> 9) | 16384;
+	size_t hi_bit;
+	for (hi_bit = 8388608; hi_bit > size; hi_bit >>= 1);
+	return hi_bit;
+}
+
+#define MB I64(1048576)
+
+/**
+ * Calculate default torrent piece length, using transmission algorithm.
+ * Algorithm:
+ *   piece_length = (size >= 2G ? 2M : size >= 1G ? 1M :
+ *       size >= 512M ? 512K : size >= 350M ? 256K :
+ *       size >= 150M ? 128K : size >= 50M ? 64K : 32K);
+ *
+ * @param total_size total torrent batch size
+ * @return piece length used by torrent file
+ */
+static size_t transmission_piece_length(uint64_t total_size)
+{
+	static const uint64_t sizes[6] = { 50 * MB, 150 * MB, 350 * MB, 512 * MB, 1024 * MB, 2048 * MB };
+	int i;
+	for (i = 0; i < 6 && total_size >= sizes[i]; i++);
+	return (32 * 1024) << i;
+}
+
+size_t bt_default_piece_length(uint64_t total_size, int transmission)
+{
+	return (transmission ?
+		transmission_piece_length(total_size) : utorr_piece_length(total_size));
 }
 
 /* get file basename */
@@ -428,7 +454,7 @@ static void bt_generate_torrent(torrent_ctx* ctx)
 		if (ctx->files.size == 1) {
 			total_size = ((bt_file_info*)ctx->files.array[0])->size;
 		}
-		ctx->piece_length = bt_default_piece_length(total_size);
+		ctx->piece_length = bt_default_piece_length(total_size, ctx->options & BT_OPT_TRANSMISSION);
 	}
 
 	if ((ctx->options & BT_OPT_INFOHASH_ONLY) == 0) {
@@ -495,13 +521,17 @@ static void bt_generate_torrent(torrent_ctx* ctx)
 
 	if (ctx->options & BT_OPT_PRIVATE) {
 		bt_str_append(ctx, "7:privatei1e");
+	} else if (ctx->options & BT_OPT_TRANSMISSION) {
+		bt_str_append(ctx, "7:privatei0e");
 	}
 	bt_str_append(ctx, "ee");
 
 	/* calculate BTIH */
 	SHA1_INIT(ctx);
-	SHA1_UPDATE(ctx, (unsigned char*)ctx->content.str + info_start_pos,
-		ctx->content.length - info_start_pos - 1);
+	if (ctx->content.str) {
+		SHA1_UPDATE(ctx, (unsigned char*)ctx->content.str + info_start_pos,
+			ctx->content.length - info_start_pos - 1);
+	}
 	SHA1_FINAL(ctx, ctx->btih);
 }
 
@@ -567,6 +597,17 @@ void bt_set_piece_length(torrent_ctx* ctx, size_t piece_length)
 }
 
 /**
+ * Set length of a file piece by the total batch size.
+ *
+ * @param ctx the torrent algorithm context
+ * @param total_size total batch size
+ */
+void bt_set_total_batch_size(torrent_ctx* ctx, uint64_t total_size)
+{
+	ctx->piece_length = bt_default_piece_length(total_size, ctx->options & BT_OPT_TRANSMISSION);
+}
+
+/**
  * Add a tracker announce-URL to the torrent file.
  *
  * @param ctx the torrent algorithm context
@@ -598,3 +639,268 @@ size_t bt_get_text(torrent_ctx* ctx, char** pstr)
 	*pstr = ctx->content.str;
 	return ctx->content.length;
 }
+
+#if !defined(NO_IMPORT_EXPORT)
+
+# define EXPORT_ALIGNER 7
+# define GET_EXPORT_ALIGNED(size) (((size) + EXPORT_ALIGNER) & ~EXPORT_ALIGNER)
+# define GET_EXPORT_PADDING(size) (-(size) & EXPORT_ALIGNER)
+# define GET_EXPORT_STR_LEN(length) GET_EXPORT_ALIGNED((length) + 1)
+# define GET_EXPORT_SIZED_STR_LEN(length) GET_EXPORT_STR_LEN((length) + sizeof(size_t))
+# define IS_EXPORT_ALIGNED(size) (((size) & EXPORT_ALIGNER) == 0)
+# define BT_CTX_OSSL_FLAG 0x10
+
+static void bt_export_str(char* out, const char* str, size_t length)
+{
+	assert(!!out);
+	*(size_t*)(out) = length;
+	out += sizeof(size_t);
+	memcpy(out, str, length + 1);
+}
+
+typedef struct bt_export_header {
+	size_t torrent_ctx_size;
+	size_t files_size;
+	size_t announce_size;
+	size_t program_name_length;
+	size_t content_length;
+} bt_export_header;
+
+/**
+ * Export algorithm context to a memory region, or calculate the
+ * size required for context export.
+ *
+ * @param ctx the algorithm context containing current hashing state
+ * @param out pointer to the memory region or NULL
+ * @param size size of memory region
+ * @return the size of the exported data on success, 0 on fail.
+ */
+size_t bt_export(const torrent_ctx* ctx, void* out, size_t size)
+{
+	const size_t head_size = sizeof(bt_export_header);
+	const size_t ctx_head_size = offsetof(torrent_ctx, hash_blocks);
+	const size_t hashes_size = ctx->piece_count * BT_HASH_SIZE;
+	size_t exported_size = head_size + ctx_head_size + hashes_size;
+	const size_t padding_size = GET_EXPORT_PADDING(exported_size);
+	const size_t program_name_length = (ctx->program_name ? strlen(ctx->program_name) : 0);
+	char* out_ptr = (char*)out;
+	size_t i;
+	assert((exported_size + padding_size) == GET_EXPORT_ALIGNED(exported_size));
+	if (out_ptr) {
+		bt_export_header* header = (bt_export_header*)out_ptr;
+		size_t hash_data_left = hashes_size;
+		if (size < exported_size)
+			return 0;
+		header->torrent_ctx_size = sizeof(torrent_ctx);
+		header->files_size = ctx->files.size;
+		header->announce_size = ctx->announce.size;
+		header->program_name_length = program_name_length;
+		header->content_length = ctx->content.length;
+		out_ptr += head_size;
+
+		memcpy(out_ptr, ctx, ctx_head_size);
+		out_ptr += ctx_head_size;
+
+		for (i = 0; i < ctx->hash_blocks.size && hash_data_left; i++) {
+			size_t left = (hash_data_left < BT_BLOCK_SIZE_IN_BYTES ? hash_data_left : BT_BLOCK_SIZE_IN_BYTES);
+			memcpy(out_ptr, ctx->hash_blocks.array[i], left);
+			out_ptr += left;
+			hash_data_left -= left;
+		}
+		out_ptr += padding_size;
+	}
+	exported_size += padding_size;
+	assert(IS_EXPORT_ALIGNED(exported_size));
+
+	for (i = 0; i < ctx->files.size; i++) {
+		bt_file_info* info = (bt_file_info*)(ctx->files.array[i]);
+		size_t length = strlen(info->path);
+		const size_t aligned_length = GET_EXPORT_SIZED_STR_LEN(length);
+		if (!length)
+			continue;
+		exported_size += sizeof(uint64_t) + aligned_length;
+		if (out_ptr) {
+			if (size < exported_size)
+				return 0;
+			*(uint64_t*)out_ptr = info->size;
+			out_ptr += sizeof(uint64_t);
+			bt_export_str(out_ptr, info->path, length);
+			out_ptr += aligned_length;
+		}
+	}
+	assert(IS_EXPORT_ALIGNED(exported_size));
+
+	for (i = 0; i < ctx->announce.size; i++) {
+		size_t length = strlen(ctx->announce.array[i]);
+		const size_t aligned_length = GET_EXPORT_SIZED_STR_LEN(length);
+		if (!length)
+			continue;
+		exported_size += aligned_length;
+		if (out_ptr) {
+			if (size < exported_size)
+				return 0;
+			bt_export_str(out_ptr, ctx->announce.array[i], length);
+			out_ptr += aligned_length;
+		}
+	}
+	assert(IS_EXPORT_ALIGNED(exported_size));
+
+	if (program_name_length > 0) {
+		const size_t aligned_length = GET_EXPORT_STR_LEN(program_name_length);
+		exported_size += aligned_length;
+		if (out_ptr) {
+			if (size < exported_size)
+				return 0;
+			strcpy(out_ptr, ctx->program_name);
+			out_ptr += aligned_length;
+		}
+		assert(IS_EXPORT_ALIGNED(exported_size));
+	}
+
+	if (ctx->content.length > 0) {
+		const size_t aligned_length = GET_EXPORT_STR_LEN(ctx->content.length);
+		exported_size += aligned_length;
+		if (out_ptr) {
+			if (size < exported_size)
+				return 0;
+			assert(ctx->content.str != NULL);
+			memcpy(out_ptr, ctx->content.str, ctx->content.length + 1);
+			out_ptr += aligned_length;
+		}
+		assert(IS_EXPORT_ALIGNED(exported_size));
+	}
+	assert(!out || (size_t)(out_ptr - (char*)out) == exported_size);
+
+#if defined(USE_OPENSSL)
+	if (out_ptr && ARE_OPENSSL_METHODS(ctx->sha1_methods)) {
+		size_t* error_ptr = (size_t*)((char*)out + head_size + offsetof(torrent_ctx, error));
+		*error_ptr |= BT_CTX_OSSL_FLAG;
+		RHASH_ASSERT(sizeof(*error_ptr) == sizeof(ctx->error));
+	}
+#endif
+	return exported_size;
+}
+
+/**
+ * Import algorithm context from a memory region.
+ *
+ * @param ctx pointer to the algorithm context
+ * @param in pointer to the data to import
+ * @param size size of data to import
+ * @return the size of the imported data on success, 0 on fail.
+ */
+size_t bt_import(torrent_ctx* ctx, const void* in, size_t size)
+{
+	const size_t head_size = sizeof(bt_export_header);
+	const size_t ctx_head_size = offsetof(torrent_ctx, hash_blocks);
+	size_t imported_size = head_size + ctx_head_size;
+	const char* in_ptr = (const char*)in;
+	size_t padding_size;
+	size_t hash_data_left;
+	size_t length;
+	size_t i;
+	const bt_export_header* header = (const bt_export_header*)in_ptr;
+	if (size < imported_size)
+		return 0;
+	if (header->torrent_ctx_size != sizeof(torrent_ctx))
+		return 0;
+	in_ptr += sizeof(bt_export_header);
+
+	memset(ctx, 0, sizeof(torrent_ctx));
+	memcpy(ctx, in_ptr, ctx_head_size);
+	in_ptr += ctx_head_size;
+
+	hash_data_left = ctx->piece_count * BT_HASH_SIZE;
+	imported_size += hash_data_left;
+	padding_size = GET_EXPORT_PADDING(imported_size);
+	imported_size += padding_size;
+	assert(IS_EXPORT_ALIGNED(imported_size));
+	if (size < imported_size)
+		return 0;
+
+	while (hash_data_left) {
+		size_t left = (hash_data_left < BT_BLOCK_SIZE_IN_BYTES ? hash_data_left : BT_BLOCK_SIZE_IN_BYTES);
+		unsigned char* block = (unsigned char*)malloc(BT_BLOCK_SIZE_IN_BYTES);
+		if (!block)
+			return 0;
+		if (!bt_vector_add_ptr(&ctx->hash_blocks, block)) {
+			free(block);
+			return 0;
+		}
+		memcpy(block, in_ptr, left);
+		in_ptr += left;
+		hash_data_left -= left;
+	}
+	in_ptr += padding_size;
+	assert((size_t)(in_ptr - (char*)in) == imported_size);
+	assert(IS_EXPORT_ALIGNED(imported_size));
+
+	for (i = 0; i < header->files_size; i++) {
+		uint64_t filesize;
+		imported_size += sizeof(uint64_t);
+		if (size < (imported_size + sizeof(size_t)))
+			return 0;
+		filesize = *(uint64_t*)in_ptr;
+		in_ptr += sizeof(uint64_t);
+		length = *(size_t*)in_ptr;
+		imported_size += GET_EXPORT_SIZED_STR_LEN(length);
+		if (!length || size < imported_size)
+			return 0;
+		if (!bt_add_file(ctx, in_ptr + sizeof(size_t), filesize))
+			return 0;
+		in_ptr += GET_EXPORT_SIZED_STR_LEN(length);
+	}
+	assert((size_t)(in_ptr - (char*)in) == imported_size);
+	assert(IS_EXPORT_ALIGNED(imported_size));
+
+	for (i = 0; i < header->announce_size; i++) {
+		if (size < (imported_size + sizeof(size_t)))
+			return 0;
+		length = *(size_t*)in_ptr;
+		imported_size += GET_EXPORT_SIZED_STR_LEN(length);
+		if (!length || size < imported_size)
+			return 0;
+		if (!bt_add_announce(ctx, in_ptr + sizeof(size_t)))
+			return 0;
+		in_ptr += GET_EXPORT_SIZED_STR_LEN(length);
+	}
+	assert((size_t)(in_ptr - (char*)in) == imported_size);
+	assert(IS_EXPORT_ALIGNED(imported_size));
+
+	length = header->program_name_length;
+	if (length) {
+		imported_size += GET_EXPORT_STR_LEN(length);
+		if (size < imported_size)
+			return 0;
+		if (!bt_set_program_name(ctx, in_ptr))
+			return 0;
+		in_ptr += GET_EXPORT_STR_LEN(length);
+		assert((size_t)(in_ptr - (char*)in) == imported_size);
+		assert(IS_EXPORT_ALIGNED(imported_size));
+	}
+
+#if defined(USE_OPENSSL)
+	/* must restore ctx->error flag before calling bt_str_ensure_length() */
+	if ((ctx->error & BT_CTX_OSSL_FLAG) != 0) {
+		ctx->error &= ~BT_CTX_OSSL_FLAG;
+		rhash_load_sha1_methods(&ctx->sha1_methods, METHODS_OPENSSL);
+	} else {
+		rhash_load_sha1_methods(&ctx->sha1_methods, METHODS_RHASH);
+	}
+#endif
+
+	length = header->content_length;
+	if (length) {
+		imported_size += GET_EXPORT_STR_LEN(length);
+		if (size < imported_size)
+			return 0;
+		if (!bt_str_ensure_length(ctx, length))
+			return 0;
+		memcpy(ctx->content.str, in_ptr, length);
+		in_ptr += GET_EXPORT_STR_LEN(length);
+		assert((size_t)(in_ptr - (char*)in) == imported_size);
+		assert(IS_EXPORT_ALIGNED(imported_size));
+	}
+	return imported_size;
+}
+#endif /* !defined(NO_IMPORT_EXPORT) */

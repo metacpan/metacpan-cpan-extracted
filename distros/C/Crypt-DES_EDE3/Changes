@@ -2,6 +2,26 @@ $Id: Changes,v 1.2 2001/09/15 03:41:51 btrott Exp $
 
 Revision history for Crypt::DES_EDE3
 
+0.03 -- Mon Oct 21 22:39:27 ADT 2024
+    [Change Log]
+    - Release 0.02-TRIAL as 0.03
+    - Basically a rerelease of 0.01 packaged with Dist::Zilla
+
+    [Detailed Changes]
+    - 658af68 v0.02
+    - e81a2bb Move tests to a test directory
+    - 7dc5eb0 Convert to Dist::Zilla for the build
+    - 90b588f (tag: 0.01) Import 0.01 from CPAN
+
+0.02 -- Sun Oct 20 15:53:39 ADT 2024
+    [Change Log]
+    - Basically a rerelease of 0.01 packaged with Dist::Zilla
+
+    [Detailed Changes]
+    - e81a2bb Move tests to a test directory
+    - 7dc5eb0 Convert to Dist::Zilla for the build
+    - 90b588f (tag: 0.01) Import 0.01 from CPAN
+
 0.01  2001.09.14
     - Initial distribution, extracted from Crypt::OpenPGP and Convert::PEM
       distributions.

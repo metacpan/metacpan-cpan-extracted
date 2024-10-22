@@ -1,5 +1,10 @@
 Revision history for Devel-MAT-Dumper
 
+0.50    2024-10-21
+        [BUGFIXES]
+         * Account for new SAVEt_* stack constants defined by Perl 5.34 and
+           Perl 5.38.
+
 0.49    2024-08-29
         [CHANGES]
          * Updates for perl 5.41.3: perl removed `SAVEt_LONG`

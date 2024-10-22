@@ -25,5 +25,5 @@ resources:
   bugtracker: https://github.com/G4Vi/MHFS/issues
   homepage: https://github.com/G4Vi/MHFS
   repository: https://github.com/G4Vi/MHFS.git
-version: v0.2.3
+version: v0.2.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,13 +1,13 @@
-# Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2006-2024 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 use warnings;
 use strict;
 
-package TestTools;
-use vars '$VERSION';
-$VERSION = '1.63';
+package TestTools;{
+our $VERSION = '1.64';
+}
 
 use base 'Exporter';
 

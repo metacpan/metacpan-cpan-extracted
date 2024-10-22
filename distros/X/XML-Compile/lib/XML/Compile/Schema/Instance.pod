@@ -22,7 +22,7 @@ process it.
 
 =item $obj-E<gt>B<new>($top, %options)
 
-Get's the top of an XML::LibXML tree, which must be a schema element.
+Gets the top of an XML::LibXML tree, which must be a schema element.
 The tree is parsed: the information collected.
 
  -Option                --Default
@@ -176,12 +176,12 @@ anyway).
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile distribution version 1.63,
-built on July 02, 2019. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile distribution version 1.64,
+built on October 21, 2024. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 
-Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2006-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

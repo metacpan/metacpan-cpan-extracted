@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Fix;
 # ABSTRACT: Fix Koha ARK field
-$Koha::Contrib::ARK::Fix::VERSION = '1.1.0';
+$Koha::Contrib::ARK::Fix::VERSION = '1.1.1';
 use Moose;
 use Modern::Perl;
 
@@ -58,7 +58,7 @@ Koha::Contrib::ARK::Fix - Fix Koha ARK field
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 AUTHOR
 

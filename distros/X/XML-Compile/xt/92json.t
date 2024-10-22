@@ -112,6 +112,8 @@ SKIP: foreach my $json_module (@json_modules)
     $has{$json_module}
         or skip "Skip tests with $json_module", 1;
 
+	diag "Running tests for $json_module";
+
     $json_serializer = $json_module->new->utf8->canonical->allow_nonref;
     if($json_serializer->can('allow_bignum'))
     {   $json_serializer->allow_bignum;

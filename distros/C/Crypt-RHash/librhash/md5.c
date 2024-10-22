@@ -19,13 +19,13 @@
 #include "md5.h"
 
 /**
- * Initialize context before calculaing hash.
+ * Initialize context before calculating hash.
  *
  * @param ctx context to initialize
  */
 void rhash_md5_init(md5_ctx* ctx)
 {
-	ctx->length = 0;
+	memset(ctx, 0, sizeof(*ctx));
 
 	/* initialize state */
 	ctx->hash[0] = 0x67452301;

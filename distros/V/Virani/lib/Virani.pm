@@ -22,11 +22,11 @@ Virani - PCAP retrieval for a FPC setup writing to PCAP files.
 
 =head1 VERSION
 
-Version 1.1.0
+Version 1.2.0
 
 =cut
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.2.0';
 
 =head1 SYNOPSIS
 
@@ -1301,10 +1301,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Virani>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Virani>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Virani>
@@ -1317,7 +1313,7 @@ L<https://metacpan.org/release/Virani>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2023 by Zane C. Bowers-Hadley.
+This software is Copyright (c) 2024 by Zane C. Bowers-Hadley.
 
 This is free software, licensed under:
 

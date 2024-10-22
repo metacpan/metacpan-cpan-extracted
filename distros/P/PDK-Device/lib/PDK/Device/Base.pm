@@ -2,9 +2,12 @@ package PDK::Device::Base;
 
 use v5.30;
 use Moose::Role;
-use Carp qw(croak);
+use Carp       qw(croak);
+use File::Path qw(make_path);
 use Expect;
 use namespace::autoclean;
+
+with 'PDK::Device::Concern::Dumper';
 
 requires 'errCodes';
 requires 'waitfor';
@@ -18,54 +21,40 @@ has proto => (is => 'ro', isa => 'Str', default => 'ssh',);
 
 has prompt => (is => 'ro', required => 0, default => '\S+[#>\]]\s*$',);
 
-has enPrompt => (is => 'ro', required => 0,);
-
-has enCommand => (is => 'ro', required => 0,);
-
-has username => (is => 'ro', required => 0,);
-
-has password => (is => 'ro', required => 0,);
-
-has enPassword => (is => 'ro', required => 0,);
-
-has passphrase => (is => 'ro', required => 0,);
+has [qw(enPrompt enCommand)] => (is => 'ro', required => 0,);
 
 has mode => (is => 'ro', default => 'normal',);
 
-has catchError => (is => 'ro', default => 1,);
-
-has enabled => (is => 'rw', default => 0,);
-
-has status => (is => 'rw', default => 0,);
-
-has month => (
-  is      => 'ro',
-  default => sub {
-    my $month = `date +%Y-%m`;
-    chomp($month);
-    return $month;
-  },
-);
-
-has date => (
-  is      => 'ro',
-  default => sub {
-    my $date = `date +%Y-%m-%d`;
-    chomp($date);
-    return $date;
-  },
-);
-
-has workdir => (is => 'rw', default => sub { $ENV{PDK_DEVICE_CONFIG_HOME} // glob("~") },);
-
-has debug => (is => 'rw', default => 0,);
-
-sub now {
-  shift;
-  my $now = `date "+%Y-%m-%d %H:%M:%S"`;
-  chomp($now);
-  return $now;
+for my $attr (qw(username password enPassword passphrase)) {
+  has $attr => (
+    is      => 'ro',
+    default => sub {
+      my $value = $ENV{"PDK_DEVICE_" . uc($attr)};
+      PDK::Device::Concern::Dumper::_debug_init("从环境变量中加载并设置 $attr：($value)") if defined $value;
+      return $value;
+    },
+  );
 }
+
+has timeout => (
+  is      => 'ro',
+  default => sub {
+    my $value = $ENV{PDK_DEVICE_TIMEOUT};
+    PDK::Device::Concern::Dumper::_debug_init("从环境变量中加载并设置 timeout：($value)") if defined $value;
+    return $value // 45;
+  },
+);
+
+has catchError => (
+  is      => 'ro',
+  default => sub {
+    my $value = $ENV{PDK_DEVICE_CATCH_ERROR};
+    PDK::Device::Concern::Dumper::_debug_init("从环境变量中加载并设置 catchError：($value)") if defined $value;
+    return $value // 1;
+  },
+);
+
+has [qw(enabled status)] => (is => 'rw', default => 0,);
 
 sub login {
   my $self = shift;
@@ -88,23 +77,23 @@ sub login {
   if (!!$@) {
     chomp($@);
 
-    if ($@ =~ /RSA modulus too small/mi) {
+    if ($@ =~ /RSA modulus too small/i) {
       eval { $self->connect('-v -1'); };
     }
-    elsif ($@ =~ /Selected cipher type <unknown> not supported by server/mi) {
+    elsif ($@ =~ /Selected cipher type <unknown> not supported by server/i) {
       eval { $self->connect('-c des'); };
     }
-    elsif ($@ =~ /no matching key exchange method found./mi) {
+    elsif ($@ =~ /no matching key exchange method found./i) {
       eval { $self->connect('-c des'); };
     }
-    elsif ($@ =~ /Connection refused/mi) {
-      $self->dump("SSH会话($self->{host})异常, 尝试（仅支持默认端口自动切换）切换 [telnet] 登录");
+    elsif ($@ =~ /Connection refused/i) {
+      $self->dump("SSH登录($self->{host})异常, 尝试（仅支持默认端口自动切换）切换[telnet]登录");
       eval {
         $self->{proto} = 'telnet';
         $self->connect();
       };
     }
-    elsif ($@ =~ /IDENTIFICATION CHANGED/mi) {
+    elsif ($@ =~ /IDENTIFICATION CHANGED/i) {
       $self->dump("尝试刷新SSH密钥-> /usr/bin/ssh-keygen -R $self->{host}");
       system("/usr/bin/ssh-keygen -R $self->{host}");
       eval { $self->connect(); };
@@ -112,6 +101,7 @@ sub login {
 
     if (!!$@) {
       chomp($@);
+      warn("捕获到异常：$@");
       return {success => 0, reason => $@};
     }
   }
@@ -125,36 +115,12 @@ sub connect {
 
   $args //= "";
 
-  my $username = $self->{username};
-  my $password = $self->{password};
-  my $debug    = $self->{debug};
-  my $prompt   = $self->{prompt};
-  my $enPrompt = $self->{enPrompt};
-
-  if ($debug == 0 && $ENV{PDK_DEVICE_DEBUG}) {
-    $self->{debug} = $debug = $ENV{PDK_DEVICE_DEBUG};
-    $self->dump("从环境变量中加载并设置调试级别：($ENV{PDK_DEVICE_DEBUG})");
-  }
-
-  unless (!!$username) {
-    $self->dump("从环境变量中加载并设置用户名：($ENV{PDK_DEVICE_USERNAME})");
-    $self->{username} = $username = $ENV{PDK_DEVICE_USERNAME};
-  }
-
-  unless (!!$password) {
-    $self->dump("从环境变量中加载并设置密码：($ENV{PDK_DEVICE_PASSWORD})");
-    $self->{password} = $password = $ENV{PDK_DEVICE_PASSWORD};
-  }
-
-  croak("请正确提供设备登录所需账户密码凭证，或设置对象的环境变量:PDK_DEVICE_USERNAME, PDK_DEVICE_PASSWORD") unless $username && $password;
-
+  my $username   = $self->{username};
+  my $password   = $self->{password};
   my $passphrase = $self->{passphrase};
-  unless (!!$passphrase) {
-    if ($ENV{PDK_DEVICE_PASSPHRASE}) {
-      $self->dump("从环境变量中加载并设置密钥：($ENV{PDK_DEVICE_PASSPHRASE})");
-      $self->{passphrase} = $passphrase = $ENV{PDK_DEVICE_PASSPHRASE};
-    }
-  }
+  my $prompt     = $self->{prompt};
+  my $enPrompt   = $self->{enPrompt};
+  my $debug      = $self->{debug};
 
   my $exp = Expect->new();
   $exp->raw_pty(1);
@@ -168,8 +134,8 @@ sub connect {
 
   my $command = $self->_spawn_command($args);
 
-  $exp->spawn($command) or croak "执行[connect/启动脚本阶段]，Can't spawn $command: $!";
-  $self->dump("正在发起脚本执行：$command");
+  $exp->spawn($command) or die "执行[connect/启动脚本阶段]，Can't spawn $command: $!";
+  $self->dump("正在启动脚本执行：$command");
 
   my @ret = $exp->expect(
     30,
@@ -203,12 +169,12 @@ sub connect {
     ],
     [
       eof => sub {
-        croak("执行[connect/尝试登录设备阶段]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+        croak("执行[connect/尝试登录设备阶段]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[connect/尝试登录设备阶段]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+        croak("执行[connect/尝试登录设备阶段]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
       }
     ]
   );
@@ -230,12 +196,12 @@ sub connect {
     ],
     [
       eof => sub {
-        croak("执行[connect/验证登录状态]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+        croak("执行[connect/验证登录状态]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[connect/验证登录状态]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+        croak("执行[connect/验证登录状态]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
       }
     ]
   );
@@ -254,6 +220,7 @@ sub send {
   my ($self, $command) = @_;
 
   my $exp = $self->{exp};
+  croak("下发脚本前需要提前登录设备") unless !!$exp;
 
   if ($self->{debug} == 1) {
     my $cmd = $command;
@@ -277,11 +244,9 @@ sub enable {
   my $self = shift;
 
   my $username  = $self->{username};
-  my $enPasswd  = $self->{enPassword};
+  my $enPasswd  = $self->{enPassword} // $self->{password};
   my $enCommand = $self->{enCommand};
   my $prompt    = $self->{prompt};
-
-  $enPasswd ||= $ENV{PDK_DEVICE_ENPASSWORD} || $self->{password};
 
   my $exp = $self->{exp};
   $self->dump("尝试切换到特权模式");
@@ -303,12 +268,12 @@ sub enable {
     ],
     [
       eof => sub {
-        croak("执行[enable/尝试切换特权模式]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+        croak("执行[enable/尝试切换特权模式]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[enable/尝试切换特权模式]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+        croak("执行[enable/尝试切换特权模式]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
       }
     ],
   );
@@ -336,13 +301,12 @@ sub enable {
     ],
     [
       eof => sub {
-
-        croak("执行[enable/检查是否成功切换特权模式]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：\n" . $exp->before());
+        croak("执行[enable/检查是否成功切换特权模式]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[enable/检查是否成功切换特权模式]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！具体原因：\n" . $exp->before());
+        croak("执行[enable/检查是否成功切换特权模式]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
       }
     ],
   );
@@ -359,6 +323,7 @@ sub execCommands {
   if (not defined $self->{exp} and $self->{status} == 0) {
     $self->dump("执行[execCommands/未登录设备]，尝试自动登录设备中");
     my $login = $self->login();
+
     if ($login->{success} == 0) {
       my $snapshot = "执行[execCommands/自动登录设备]，尝试（首次）登录设备失败";
       if (my $exp = $self->{exp}) {
@@ -378,12 +343,9 @@ sub execCommands {
     return {success => 0, failCommand => join(", ", @{$commands}), snapshot => $snapshot, reason => $reason};
   }
 
-  my $result = $self->{exp} ? join('', grep defined $self->{exp}->match, $self->{exp}->after) : '';
+  my $result
+    = $self->{exp} ? join('', grep defined $self->{exp}->before, $self->{exp}->match, $self->{exp}->after) : '';
   my $errors = $self->errCodes();
-
-  if (exists $ENV{PDK_DEVICE_CATCH_ERROR} and $ENV{PDK_DEVICE_CATCH_ERROR} =~ /^\d+$/) {
-    $self->{catchError} = ($ENV{PDK_DEVICE_CATCH_ERROR} == 1) ? 1 : 0;
-  }
 
   $self->dump("执行[execCommands/通过前置检查]，正式进入配置下发阶段");
   for my $cmd (@{$commands}) {
@@ -394,18 +356,18 @@ sub execCommands {
 
     $self->send("$cmd\n");
     eval {
-      $self->dump("等待脚本指令 $cmd 回显");
+      $self->dump("执行[execCommands/等待脚本指令回显] $cmd");
       $buff = $self->waitfor();
     };
 
     if (!!$@) {
       chomp($@);
       my $snapshot = $result . $buff;
-      my $reason   = "执行[execCommands/等待脚本回显]，捕捉到异常: \n" . $@;
+      my $reason   = "执行[execCommands/等待脚本回显]，捕捉到异常: $@";
       return {success => 0, failCommand => $cmd, reason => $reason, snapshot => $snapshot};
     }
 
-    if ($self->{catchError} == 1) {
+    if ($self->{catchError}) {
       for my $error (@{$errors}) {
         if ($buff =~ /$error/i) {
           my $snapshot = "执行[execCommands/异常码字典拦截]，捕捉到异常: \n" . $result . $buff;
@@ -418,53 +380,6 @@ sub execCommands {
   }
 
   return {success => 1, result => $result};
-}
-
-sub dump {
-  my ($self, $msg) = @_;
-
-  $msg .= ';' unless $msg =~ /(,|，|！|!|。|.)$/;
-
-  if ($self->{debug} == 1) {
-    say "[debug] $msg";
-  }
-  elsif ($self->{debug} > 1) {
-    my $workdir = "$self->{workdir}/dump/$self->{month}/$self->{date}";
-
-    use File::Path qw(make_path);
-    make_path($workdir) unless -d $workdir;
-
-    my $filename = "$workdir/$self->{host}.txt";
-
-    open(my $fh, '>>', $filename) or croak "无法打开文件 $filename 进行写入: $!";
-    my $text = $self->now() . " - [debug] $msg\n";
-    print $fh $text or croak "写入文件 $filename 失败: $!";
-    close($fh)      or croak "关闭文件句柄 $filename 失败: $!";
-  }
-}
-
-sub write_file {
-  my ($self, $config, $name) = @_;
-
-  croak("必须提供非空配置信息") unless !!$config;
-
-  $name //= $self->{host} . ".cfg";
-
-  my $workdir = "$self->{workdir}/$self->{month}/$self->{date}";
-  use File::Path qw(make_path);
-  make_path($workdir) unless -d $workdir;
-
-  $self->dump("准备将配置文件写入工作目录: ($workdir)");
-
-  my $filename = "$workdir/$name";
-
-  open(my $fh, '>', $filename) or croak "无法打开文件 $filename 进行写入: $!";
-  print $fh $config            or croak "写入文件 $filename 失败: $!";
-  close($fh)                   or croak "关闭文件句柄 $filename 失败: $!";
-
-  $self->dump("已将配置文件写入文本文件: $filename");
-
-  return {success => 1};
 }
 
 sub _spawn_command {
@@ -499,10 +414,11 @@ sub _debug {
   my ($self, $level) = @_;
 
   $level //= 1;
+  return if $level == 0 || $level == 1;
+
   $level = 3 if $level > 3;
 
   my $workdir = "$self->{workdir}/debug/$self->{month}/$self->{date}";
-  use File::Path qw(make_path);
   make_path($workdir) unless -d $workdir;
 
   my $exp = $self->{exp};
@@ -518,6 +434,13 @@ sub _debug {
   }
 
   $exp->log_file("$workdir/$self->{host}.log");
+}
+
+sub BUILD {
+  my $self = shift;
+
+  croak("请正确提供设备登录所需账户密码凭证，或设置对象的环境变量:PDK_DEVICE_USERNAME, PDK_DEVICE_PASSWORD")
+    unless $self->{username} && $self->{password};
 }
 
 1;

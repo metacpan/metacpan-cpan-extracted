@@ -18,8 +18,8 @@ BEGIN
  {  
      # old libxml2 versions break on regex 123\\s+(\\d+\\s)*456
      # there are so many bugs in old libxml2 releases!
-     my $xml2_version = XML::LibXML::LIBXML_DOTTED_VERSION();
-     $xml2_version lt '2.7'
+     my $xml2_version = XML::LibXML::LIBXML_VERSION();
+     $xml2_version lt '20700'
          and plan skip_all => "Your libxml2 is too old (version $xml2_version)";
 
      plan tests => 60;

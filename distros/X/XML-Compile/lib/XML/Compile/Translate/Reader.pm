@@ -1,14 +1,14 @@
-# Copyrights 2006-2019 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2006-2024 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution XML-Compile.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package XML::Compile::Translate::Reader;
-use vars '$VERSION';
-$VERSION = '1.63';
+package XML::Compile::Translate::Reader;{
+our $VERSION = '1.64';
+}
 
 use base 'XML::Compile::Translate';
 
@@ -585,6 +585,7 @@ sub makeElementAbstract
 # Be warned that the location reported in 'path' may not be the actual
 # location, caused by the cashing of compiled schema components.  The
 # path you see is the first path where that element was encountered.
+
 sub _not_processed($$)
 {   my ($child, $path) = @_;
     error __x"element `{name}' not processed for {path} at {where}"
@@ -594,7 +595,7 @@ sub _not_processed($$)
 
 sub makeComplexElement
 {   my ($self, $path, $tag, $elems, $attrs, $attrs_any,undef,$is_nillable) = @_;
-#my @e = @$elems; my @a = @$attrs;
+my @e = @$elems; my @a = @$attrs;
 
     my @elems = odd_elements @$elems;
     my @attrs = (odd_elements(@$attrs), @$attrs_any);
@@ -618,6 +619,9 @@ sub makeComplexElement
           my $node    = $tree->node;
           my %complex = ((map $_->($tree), @elems), (map $_->($node), @attrs));
 
+#if($tree->currentChild)
+#{   warn "COMPLEX ELEMS($tag) @e;@a";
+#}
           _not_processed $tree->currentChild, $path
               if $tree->currentChild;
 
@@ -668,8 +672,10 @@ sub makeMixedElement
 {   my ($self, $path, $tag, $elems, $attrs, $attrs_any,undef,$is_nillable) = @_;
     my @attrs = (odd_elements(@$attrs), @$attrs_any);
     my $mixed = $self->{mixed_elements}
-         or panic "how to handle mixed?";
-$is_nillable and panic "nillable mixed not yet supported";
+        or panic "how to handle mixed?";
+
+    $is_nillable
+        and panic "nillable mixed not yet supported";
 
       ref $mixed eq 'CODE'
     ? sub { my $tree = shift or return;

@@ -34,7 +34,7 @@ no_index:
 provides:
   Alien::fpm:
     file: lib/Alien/fpm.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Alien::Base: '0'
   base: '0'
@@ -44,7 +44,7 @@ resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://gitlab.com/NicholasBHubbard/Alien-fpm/-/issues
   repository: https://gitlab.com/NicholasBHubbard/Alien-fpm
-version: '0.01'
+version: '0.02'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

@@ -5,7 +5,8 @@ use strict;
 
 use Crypt::DES;
 use vars qw( $VERSION );
-$VERSION = '0.01';
+
+our $VERSION = '0.03'; #VERSION
 
 sub new {
     my $class = shift;

@@ -104,6 +104,13 @@ package MHFS::EventLoop::Poll::Base {
     use constant POLLRDHUP => 0;
     use constant ALWAYSMASK => (POLLRDHUP | POLLHUP);
 
+    sub _decode_status {
+        my ($rc) = @_;
+        print "$rc: normal exit with code ". WEXITSTATUS($rc)."\n" if WIFEXITED(  $rc);
+        print "$rc: terminated with signal ".WTERMSIG(   $rc)."\n" if WIFSIGNALED($rc);
+        print "$rc: stopped with signal ".   WSTOPSIG(   $rc)."\n" if WIFSTOPPED( $rc);
+    }
+
     sub new {
         my ($class) = @_;
         my %self = ('poll' => IO::Poll->new(), 'fh_map' => {}, 'timers' => [], 'children' => {}, 'deadchildren' => []);
@@ -114,7 +121,7 @@ package MHFS::EventLoop::Poll::Base {
                 my ($wstatus, $exitcode) = ($?, $?>> 8);
                 if(defined $self{'children'}{$child}) {
                     say "PID $child reaped (func) $exitcode";
-                    push @{$self{'deadchildren'}}, [$self{'children'}{$child}, $child, $exitcode];
+                    push @{$self{'deadchildren'}}, [$self{'children'}{$child}, $child, $wstatus];
                     $self{'children'}{$child} = undef;
                 }
                 else {
@@ -539,8 +546,9 @@ package MHFS::Util {
     use POSIX ();
     use Cwd qw(abs_path getcwd);
     use Encode qw(decode encode);
-    use URI::Escape qw(uri_escape);
-    our @EXPORT = ('LOCK_GET_LOCKDATA', 'LOCK_WRITE', 'UNLOCK_WRITE', 'write_file', 'read_file', 'shellcmd_unlock', 'ASYNC', 'FindFile', 'space2us', 'escape_html', 'function_exists', 'shell_escape', 'pid_running', 'escape_html_noquote', 'output_dir_versatile', 'do_multiples', 'getMIME', 'get_printable_utf8', 'small_url_encode', 'uri_escape_path', 'round', 'ceil_div', 'get_SI_size');
+    use URI::Escape qw(uri_escape uri_escape_utf8);
+    use MIME::Base64 qw(encode_base64url decode_base64url);
+    our @EXPORT = ('LOCK_GET_LOCKDATA', 'LOCK_WRITE', 'UNLOCK_WRITE', 'write_file', 'read_file', 'shellcmd_unlock', 'ASYNC', 'FindFile', 'space2us', 'escape_html', 'function_exists', 'shell_escape', 'pid_running', 'escape_html_noquote', 'output_dir_versatile', 'do_multiples', 'getMIME', 'get_printable_utf8', 'small_url_encode', 'uri_escape_path', 'uri_escape_path_utf8', 'round', 'ceil_div', 'get_SI_size', 'decode_UTF_8', 'encode_UTF_8', 'str_to_base64url', 'base64url_to_str');
     # single threaded locks
     sub LOCK_GET_LOCKDATA {
         my ($filename) = @_;
@@ -940,10 +948,13 @@ package MHFS::Util {
     }
 
     sub uri_escape_path {
+        my ($b_path) = @_;
+        uri_escape($b_path, qr/[^A-Za-z0-9\-\._~\/]/)
+    }
+
+    sub uri_escape_path_utf8 {
         my ($path) = @_;
-        my @components = split('/', $path);
-        my @encodedcomponents = map(uri_escape($_), @components);
-        return join('/', @encodedcomponents);
+        uri_escape_utf8($path, qr/[^A-Za-z0-9\-\._~\/]/)
     }
 
     sub round {
@@ -963,6 +974,151 @@ package MHFS::Util {
         else {
             return sprintf("%.2f MiB", $mebibytes);
         }
+    }
+
+    sub decode_UTF_8 {
+        my ($input) = @_;
+        my $output = decode('UTF-8', $input, Encode::FB_QUIET);
+        if (length($input)) {
+            return undef;
+        }
+        return $output;
+    }
+
+    sub encode_UTF_8 {
+        my ($input) = @_;
+        my $b_output = encode('UTF-8', $input, Encode::FB_QUIET);
+        if (length($input)) {
+            return undef;
+        }
+        $b_output
+    }
+
+    sub str_to_base64url {
+        my ($str) = @_;
+        my $bstr = encode('UTF-8', $str, Encode::FB_DEFAULT);
+        encode_base64url($bstr)
+    }
+
+    sub base64url_to_str {
+        my ($base64url) = @_;
+        my $bstr = decode_base64url($base64url);
+        decode_UTF_8($bstr)
+    }
+
+    1;
+}
+
+package MHFS::Promise::FakeException {
+
+    sub new {
+        my ($class, $reason) = @_;
+        return bless \$reason, $class;
+    }
+
+    1;
+}
+
+package MHFS::Promise {
+    use strict; use warnings;
+    use feature 'say';
+    use constant {
+        MHFS_PROMISE_PENDING => 0,
+        MHFS_PROMISE_SUCCESS => 1,
+        MHFS_PROMISE_FAILURE => 2,
+        MHFS_PROMISE_ADOPT   => 3
+    };
+
+    sub finale {
+        my ($self) = @_;
+        my $success = $self->{state} == MHFS_PROMISE_SUCCESS;
+        foreach my $item (@{$self->{waiters}}) {
+            $self->handle($item);
+        }
+        $self->{waiters} = [];
+    }
+
+    sub _new {
+        my ($class, $evp) = @_;
+        my %self = ( 'evp' => $evp, 'waiters' => [], 'state' => MHFS_PROMISE_PENDING);
+        bless \%self, $class;
+        $self{fulfill} = sub {
+            my $value = $_[0];
+            if(ref($value) eq $class) {
+                $self{state} = MHFS_PROMISE_ADOPT;
+                say "adopting promise";
+            } else {
+                $self{state} = MHFS_PROMISE_SUCCESS;
+                #say "resolved with " . ($_[0] // 'undef');
+            }
+            $self{end_value} = $_[0];
+            finale(\%self);
+        };
+        $self{reject} = sub {
+            $self{state} = MHFS_PROMISE_FAILURE;
+            $self{end_value} = $_[0];
+            finale(\%self);
+        };
+        return \%self;
+    }
+
+    sub new {
+        my ($class, $evp, $cb) = @_;
+        my $self = _new(@_);
+        $cb->($self->{fulfill}, $self->{reject});
+        return $self;
+    }
+
+    sub throw {
+        return MHFS::Promise::FakeException->new(@_);
+    }
+
+    sub handleResolved {
+        my ($self, $deferred) = @_;
+        $self->{evp}->add_timer(0, 0, sub {
+            my $success = $self->{state} == MHFS_PROMISE_SUCCESS;
+            my $value = $self->{end_value};
+            if($success && $deferred->{onFulfilled}) {
+                $value = $deferred->{onFulfilled}($value);
+                if(ref($value) eq 'MHFS::Promise::FakeException') {
+                    $success = 0;
+                    $value = $$value;
+                }
+            } elsif(!$success && $deferred->{onRejected}) {
+                $value = $deferred->{onRejected}->($value);
+                if(ref($value) ne 'MHFS::Promise::FakeException') {
+                    $success = 1;
+                } else {
+                    $value = $$value;
+                }
+            }
+            if($success) {
+                $deferred->{promise}{fulfill}->($value);
+            } else {
+                $deferred->{promise}{reject}->($value);
+            }
+            return undef;
+        });
+    }
+
+    sub handle {
+        my ($self, $deferred) = @_;
+        while($self->{state} == MHFS_PROMISE_ADOPT) {
+            $self = $self->{end_value};
+        }
+        if($self->{state} == MHFS_PROMISE_PENDING) {
+            push(@{$self->{'waiters'}}, $deferred);
+        } else {
+            $self->handleResolved($deferred);
+        }
+    }
+
+    sub then {
+        my ($self, $onFulfilled, $onRejected) = @_;
+        my $promise = MHFS::Promise->_new($self->{evp});
+        my %handler = ( 'promise' => $promise, onFulfilled => $onFulfilled, onRejected => $onRejected);
+        $self->handle(\%handler);
+        return $promise;
     }
 
     1;
@@ -1014,7 +1170,7 @@ package MHFS::HTTP::Server::Client::Request {
         $self{'rl'} = 0;
         # we want the request
         $client->SetEvents(POLLIN | MHFS::EventLoop::Poll->ALWAYSMASK );
-        $self{'recvrequesttimerid'} = $client->AddClientCloseTimer($client->{'server'}{'settings'}{'recvrequestimeout'}, $client->{'CONN-ID'});
+        $self{'recvrequesttimerid'} = $client->AddClientCloseTimer($client->{'server'}{'settings'}{'recvrequestimeout'}, $client->{'CONN-ID'}, 1);
         return \%self;
     }
 
@@ -1283,6 +1439,7 @@ package MHFS::HTTP::Server::Client::Request {
             307 => "HTTP/1.1 307 Temporary Redirect\r\n",
             403 => "HTTP/1.1 403 Forbidden\r\n",
             404 => "HTTP/1.1 404 File Not Found\r\n",
+            408 => "HTTP/1.1 408 Request Timeout\r\n",
             416 => "HTTP/1.1 416 Range Not Satisfiable\r\n",
             503 => "HTTP/1.1 503 Service Unavailable\r\n"
         );
@@ -1347,6 +1504,13 @@ package MHFS::HTTP::Server::Client::Request {
         my ($self) = @_;
         my $msg = "404 Not Found";
         $self->SendHTML($msg, {'code' => 404});
+    }
+
+    sub Send408 {
+        my ($self) = @_;
+        my $msg = "408 Request Timeout";
+        $self->{'outheaders'}{'Connection'} = 'close';
+        $self->SendHTML($msg, {'code' => 408});
     }
 
     sub Send416 {
@@ -1894,7 +2058,7 @@ package MHFS::HTTP::Server::Client {
 
     # add a connection timeout timer
     sub AddClientCloseTimer {
-        my ($self, $timelength, $id) = @_;
+        my ($self, $timelength, $id, $is_requesttimeout) = @_;
         weaken($self); #don't allow this timer to keep the client object alive
         my $server = $self->{'server'};
         say "CCT | add timer: $id";
@@ -1903,7 +2067,13 @@ package MHFS::HTTP::Server::Client {
                 say "CCT | $id self undef";
                 return undef;
             }
-            #(defined $self) or return undef;
+            # Commented out as with connection reuse on, Apache 2.4.10 seems sometimes
+            # pass 408 on to the next client.
+            #if($is_requesttimeout) {
+            #    say "CCT | \$timelength ($timelength) exceeded, sending 408";
+            #    $self->{request}->Send408;
+            #    CT_WRITE($self);
+            #}
             say "CCT | \$timelength ($timelength) exceeded, closing CONN $id";
             say "-------------------------------------------------";
             $server->{'evp'}->remove($self->{'sock'});
@@ -2399,15 +2569,16 @@ package MHFS::Process {
         }
 
         if($handlesettings->{'O_NONBLOCK'}) {
-            my $flags = 0;
             # stderr
-            (0 == fcntl($err, Fcntl::F_GETFL, $flags)) or die;#return undef;
-            $flags |= Fcntl::O_NONBLOCK;
-            (0 == fcntl($err, Fcntl::F_SETFL, $flags)) or die;#return undef;
+            {
+                my $flags =  fcntl($err, Fcntl::F_GETFL, 0) or die "$!";
+                fcntl($err, Fcntl::F_SETFL, $flags | Fcntl::O_NONBLOCK) or die "$!";
+            }
             # stdout
-            (0 == fcntl($out, Fcntl::F_GETFL, $flags)) or die;#return undef;
-            $flags |= Fcntl::O_NONBLOCK;
-            (0 == fcntl($out, Fcntl::F_SETFL, $flags)) or die;#return undef;
+            {
+                my $flags =  fcntl($out, Fcntl::F_GETFL, 0) or die "$!";
+                fcntl($out, Fcntl::F_SETFL, $flags | Fcntl::O_NONBLOCK) or die "$!";
+            }
             # stdin
             defined($in->blocking(0)) or die($!);
             #(0 == fcntl($in, Fcntl::F_GETFL, $flags)) or die("$!");#return undef;
@@ -2500,6 +2671,7 @@ package MHFS::Process {
             return 1;
         },
         'SIGCHLD' => sub {
+            $context->{exit_status} = $_[0];
             my $obuf;
             my $handle = $process->{'fd'}{'stdout'}{'fd'};
             while(read($handle, $obuf, 100000)) {
@@ -2611,7 +2783,10 @@ package MHFS::Process {
         pipe(my $errreader, my $errwriter) or die("pipe failed $!");
         # the childs stderr will be UTF-8 text
         binmode($errreader, ':encoding(UTF-8)');
-        my $pid = fork();
+        my $pid = fork() // do {
+            say "failed to fork";
+            return undef;
+        };
         if($pid == 0) {
             close($inwriter);
             close($outreader);
@@ -2648,7 +2823,7 @@ package MHFS::Process {
         return _new_ex(\&_new_child, $mpa, {
             'at_exit' => sub {
                 my ($context) = @_;
-                $handler->($context->{'stdout'}, $context->{'stderr'});
+                $handler->($context->{'stdout'}, $context->{'stderr'}, $context->{exit_status});
             }
         });
     }
@@ -2685,8 +2860,9 @@ package MHFS::Settings {
     use strict; use warnings;
     use feature 'say';
     use Scalar::Util qw(reftype);
+    use MIME::Base64 qw(encode_base64url);
     use File::Basename;
-    use Digest::MD5 qw(md5_hex);
+    use Digest::MD5 qw(md5);
     use Storable qw(freeze);
     use Cwd qw(abs_path);
     use File::ShareDir qw(dist_dir);
@@ -2787,7 +2963,27 @@ package MHFS::Settings {
             say "only local sources supported right now";
             return undef;
         }
-        return substr(md5_hex('local:'.$source->{folder}), 0, 8);
+        return encode_base64url(md5('local:'.$source->{folder}));
+    }
+
+    sub add_source {
+        my ($sources, $source) = @_;
+        my $id = calc_source_id($source);
+        my $len = 6;
+        my $shortid = substr($id, 0, $len);
+        if (exists $sources->{$shortid}) {
+            my $oldid = calc_source_id($sources->{$shortid});
+            while(1) {
+                $len++;
+                substr($oldid, 0, $len) eq substr($id, 0, $len) or last;
+                length($id) > $len or die "matching hash";
+            }
+            $sources->{substr($oldid, 0, $len)} = $sources->{$shortid};
+            delete $sources->{$shortid};
+            $shortid = substr($id, 0, $len);
+        }
+        $sources->{$shortid} = $source;
+        return $shortid;
     }
 
     sub load {
@@ -2951,8 +3147,15 @@ package MHFS::Settings {
                     }
                     $tohash = {type => 'local',  folder => $source};
                 }
-                my $sid = calc_source_id($tohash);
-                $sources{$sid} = $tohash;
+                if ($tohash->{type} eq 'local') {
+                    my $absfolder = abs_path($tohash->{folder});
+                    $absfolder // do {
+                        say __PACKAGE__.": skipping source $tohash->{folder} - abs_path failed";
+                        next;
+                    };
+                    $tohash->{folder} = $absfolder;
+                }
+                my $sid = add_source(\%sources, $tohash);
                 push @subsrcs, $sid;
             }
             $mediasources{$lib} = \@subsrcs;
@@ -2960,8 +3163,7 @@ package MHFS::Settings {
         $SETTINGS->{'MEDIASOURCES'} = \%mediasources;
 
         my $videotmpdirsrc = {type => 'local',  folder => $SETTINGS->{'VIDEO_TMPDIR'}};
-        my $vtempsrcid = calc_source_id($videotmpdirsrc);
-        $sources{$vtempsrcid} = $videotmpdirsrc;
+        my $vtempsrcid = add_source(\%sources, $videotmpdirsrc);
         $SETTINGS->{'VIDEO_TMPDIR_QS'} = 'sid='.$vtempsrcid;
         $SETTINGS->{'SOURCES'} = \%sources;
 
@@ -2971,7 +3173,7 @@ package MHFS::Settings {
         # specify timeouts in seconds
         $SETTINGS->{'TIMEOUT'} ||= 75;
         # time to recieve the requestline and headers before closing the conn
-        $SETTINGS->{'recvrequestimeout'} ||= $SETTINGS->{'TIMEOUT'};
+        $SETTINGS->{'recvrequestimeout'} ||= 10;
         # maximum time allowed between sends
         $SETTINGS->{'sendresponsetimeout'} ||= $SETTINGS->{'TIMEOUT'};
 
@@ -3581,7 +3783,6 @@ package MHFS::Plugin::MusicLibrary {
         my ($files, $where) = @_;
         $where //= '';
         my $buf = '';
-        #my $name_unencoded = decode('UTF-8', $files->[0]);
         my $name_unencoded = $files->[3];
         my $name = ${escape_html_noquote($name_unencoded)};
         if($files->[2]) {
@@ -3632,7 +3833,6 @@ package MHFS::Plugin::MusicLibrary {
                 next;
             }
             my $node = $nodestack[@nodestack - 1];
-            #my $newnode = {'name' => decode('UTF-8', $file->[0])};
             my $newnode = {'name' =>$file->[3]};
             if($file->[2]) {
                 $newnode->{'files'} = [];
@@ -5154,17 +5354,157 @@ M3U8END
     1;
 }
 
+package MHFS::Plugin::Kodi::Movies {
+    use strict; use warnings;
+
+    sub TO_JSON {
+        my ($self) = @_;
+        {movies => MHFS::Plugin::Kodi::_format_movies($self->{movies})}
+    }
+
+    sub TO_HTML {
+        my ($self) = @_;
+        my $movies = $self->TO_JSON()->{movies};
+        my $buf = '<style>ul{list-style: none;} li{margin: 10px 0;}</style><ul>';
+        foreach my $movie (@$movies) {
+            $buf .= MHFS::Plugin::Kodi::_html_list_item($movie->{id}, 1);
+        }
+        $buf .= '</ul>';
+        $buf
+    }
+    1;
+}
+
+package MHFS::Plugin::Kodi::Movie {
+    use strict; use warnings;
+
+    sub TO_JSON {
+        my ($self) = @_;
+        my %movie = %{$self->{movie}};
+        $movie{editions} = MHFS::Plugin::Kodi::_format_movie_editions($movie{editions});
+        {movie => \%movie}
+    }
+
+    sub TO_HTML {
+        my ($self) = @_;
+        my $editions = $self->TO_JSON()->{movie}{editions};
+        my $buf = '<style>ul{list-style: none;} li{margin: 10px 0;}</style><ul>';
+        foreach my $edition (@$editions) {
+            $buf .= MHFS::Plugin::Kodi::_html_list_item($edition->{id}, 1, $edition->{name});
+        }
+        $buf .= '</ul>';
+        $buf
+    }
+    1;
+}
+
+package MHFS::Plugin::Kodi::MovieEditions {
+    use strict; use warnings;
+
+    sub TO_JSON {
+        my ($self) = @_;
+        {editions => MHFS::Plugin::Kodi::_format_movie_editions($self->{editions})}
+    }
+
+    sub TO_HTML {
+        my ($self) = @_;
+        my $editions = $self->TO_JSON()->{editions};
+        my $buf = '<style>ul{list-style: none;} li{margin: 10px 0;}</style><ul>';
+        foreach my $edition (@$editions) {
+            $buf .= MHFS::Plugin::Kodi::_html_list_item("../".$edition->{id}, 1, $edition->{name});
+        }
+        $buf .= '</ul>';
+        $buf
+    }
+    1;
+}
+
+package MHFS::Plugin::Kodi::MovieEdition {
+    use strict; use warnings;
+
+    sub TO_JSON {
+        my ($self) = @_;
+        {edition => MHFS::Plugin::Kodi::_format_movie_edition($self->{source}, $self->{editionname}, $self->{edition})}
+    }
+
+    sub TO_HTML {
+        my ($self) = @_;
+        my $parts = $self->TO_JSON()->{edition}{parts};
+        my $buf = '<style>ul{list-style: none;} li{margin: 10px 0;}</style><ul>';
+        foreach my $part (@$parts) {
+            $buf .= MHFS::Plugin::Kodi::_html_list_item($part->{id}, 1, $part->{name});
+        }
+        $buf .= '</ul>';
+        $buf
+    }
+    1;
+}
+
+package MHFS::Plugin::Kodi::MoviePart {
+    use strict; use warnings;
+    use File::Basename qw(basename);
+
+    sub TO_JSON {
+        my ($self) = @_;
+        {part => MHFS::Plugin::Kodi::_format_movie_part($self->{editionname}, $self->{partname}, $self->{part})}
+    }
+    sub TO_HTML {
+        my ($self) = @_;
+        my $part = $self->TO_JSON()->{part};
+        my $buf = '<style>ul{list-style: none;} li{margin: 10px 0;}</style><ul>';
+        $buf .= MHFS::Plugin::Kodi::_html_list_item("../".$part->{id}, 0, $part->{name});
+        if (exists $part->{subs}) {
+            foreach my $sub (@{$part->{subs}}) {
+                $buf .= MHFS::Plugin::Kodi::_html_list_item($sub, 0, basename($sub));
+            }
+        }
+        $buf .= '</ul>';
+        $buf
+    }
+    1;
+}
+
+package MHFS::Plugin::Kodi::MovieSubtitle {
+    use strict; use warnings;
+    use File::Basename qw(basename);
+    sub TO_JSON {
+        my ($self) = @_;
+        {subtitle => $self->{subtitle}}
+    }
+    sub TO_HTML {
+        my ($self) = @_;
+        my $buf = '<style>ul{list-style: none;} li{margin: 10px 0;}</style><ul>';
+        my $subname = basename($self->{subtitle});
+        $buf .= MHFS::Plugin::Kodi::_html_list_item("../$subname", 0, $subname);
+        $buf .= '</ul>';
+        $buf
+    }
+    1;
+}
+
 package MHFS::Plugin::Kodi {
     use strict; use warnings;
     use feature 'say';
     use File::Basename qw(basename);
-    use Cwd qw(abs_path);
+    use Cwd qw(abs_path getcwd);
     use URI::Escape qw(uri_escape);
-    use Encode qw(decode);
+    use Encode qw(decode encode);
+    use File::Path qw(make_path);
+    use Data::Dumper qw(Dumper);
+    use Scalar::Util qw(weaken);
+    use MIME::Base64 qw(encode_base64url decode_base64url);
+    use Devel::Peek qw(Dump);
+    MHFS::Util->import(qw(decode_UTF_8 encode_UTF_8 base64url_to_str str_to_base64url uri_escape_path_utf8));
+    BEGIN {
+        if( ! (eval "use JSON; 1")) {
+            eval "use JSON::PP; 1" or die "No implementation of JSON available";
+            warn __PACKAGE__.": Using PurePerl version of JSON (JSON::PP)";
+        }
+    }
 
     # format tv library for kodi http
     sub route_tv {
-        my ($request, $absdir, $kodidir) = @_;
+        my ($self, $request, $absdir, $kodidir) = @_;
         # read in the shows
         my $tvdir = abs_path($absdir);
         if(! defined $tvdir) {
@@ -5189,7 +5529,13 @@ package MHFS::Plugin::Kodi {
                 $showname =~ s/\./ /g;
                 if(! $shows{$showname}) {
                     $shows{$showname} = [];
-                    push @diritems, {'item' => $showname, 'isdir' => 1}
+                    my %diritem = ('item' => $showname, 'isdir' => 1);
+                    my $plot = $self->{tvmeta}."/$showname/plot.txt";
+                    if(-f $plot) {
+                        my $plotcontents = MHFS::Util::read_file($plot);
+                        $diritem{plot} = $plotcontents;
+                    }
+                    push @diritems, \%diritem;
                 }
                 push @{$shows{$showname}}, "$tvdir/$filename";
             }
@@ -5260,142 +5606,683 @@ package MHFS::Plugin::Kodi {
         }
 
         # generate the directory html
-        my $buf = '';
-        foreach my $show (@diritems) {
-            my $showname = $show->{'item'};
-            my $url = uri_escape($showname);
-            $url .= '/' if($show->{'isdir'});
-            $buf .= '<a href="' . $url .'">'.${MHFS::Util::escape_html_noquote(decode('UTF-8', $showname, Encode::LEAVE_SRC))} .'</a><br><br>';
+        if(exists $request->{qs}{fmt} && $request->{qs}{fmt} eq 'html') {
+            my $buf = '';
+            foreach my $show (@diritems) {
+                my $showname = $show->{'item'};
+                my $url = uri_escape($showname);
+                $url .= '/' if($show->{'isdir'});
+                $buf .= '<a href="' . $url .'">'.${MHFS::Util::escape_html_noquote(decode('UTF-8', $showname, Encode::LEAVE_SRC))} .'</a><br><br>';
+            }
+            $request->SendHTML($buf);
+        } else {
+            $request->SendAsJSON(\@diritems);
         }
-        $request->SendHTML($buf);
+    }
+
+    sub readsubdir{
+        my ($subtitles, $source, $b_path) = @_;
+        opendir( my $dh, $b_path ) or return;
+        while(my $b_filename = readdir($dh)) {
+            next if(($b_filename eq '.') || ($b_filename eq '..'));
+            my $filename = decode_UTF_8($b_filename) or do {
+                warn "$b_filename is not, UTF-8, skipping";
+                next;
+            };
+            my $b_nextpath = "$b_path/$b_filename";
+            my $nextsource = "$source/$filename";
+            if(-f $b_nextpath && $filename =~ /\.(?:srt|sub|idx)$/) {
+                push @$subtitles, $nextsource;
+                next;
+            } elsif (-d _) {
+                readsubdir($subtitles, $nextsource, $b_nextpath);
+            }
+        }
+    }
+
+    sub readmoviedir {
+        my ($self, $movies, $source, $b_moviedir) = @_;
+        opendir(my $dh, $b_moviedir ) or do {
+            warn "Error in opening dir $b_moviedir\n";
+            return undef;
+        };
+        while(my $b_edition = readdir($dh)) {
+            next if(($b_edition eq '.') || ($b_edition eq '..'));
+            my $edition = decode_UTF_8($b_edition) or do {
+                warn "$b_edition is not, UTF-8, skipping";
+                next;
+            };
+            # recurse on collections
+            if ($edition =~ /(?:Duology|Trilogy|Quadrilogy)/) {
+                next if ($edition =~ /\.nfo$/);
+                $self->readmoviedir($movies, "$source/$edition", "$b_moviedir/$b_edition");
+                next;
+            }
+            -s "$b_moviedir/$b_edition" or next;
+            my $isdir = -d _;
+            $isdir || -f _ or next;
+            $isdir ||= 0;
+            my %edition;
+            if (!$isdir) {
+                if ($edition !~ /\.(?:avi|mkv|mp4|m4v)$/) {
+                    warn "Skipping $edition, not a movie file" if ($edition !~ /\.(?:txt)$/);
+                    next;
+                }
+                $edition{''} = {};
+            } else {
+                my $b_path = "$b_moviedir/$b_edition";
+                my @videos;
+                my @subtitles;
+                my @subtitledirs;
+                opendir(my $dh, $b_path) or die('failed to open dir');
+                while(my $b_editionitem = readdir($dh)) {
+                    next if(($b_editionitem eq '.') || ($b_editionitem eq '..'));
+                    my $editionitem = decode_UTF_8($b_editionitem) or do {
+                        warn "$b_editionitem is not, UTF-8, skipping";
+                        next;
+                    };
+                    my $type;
+                    if ($b_editionitem =~ /\.(?:avi|mkv|mp4|m4v)$/) {
+                        $type = 'video' if ($b_editionitem !~ /sample(?:\-[a-z]+)?\.(?:avi|mkv|mp4)$/);
+                    } elsif ($b_editionitem =~ /\.(?:srt|sub|idx)$/) {
+                        $type = 'subtitle';
+                    } elsif ($b_editionitem =~ /^Subs$/i) {
+                        $type = 'subtitledir';
+                    }
+                    $type or next;
+                    if (-f "$b_path/$b_editionitem") {
+                        push @videos, $editionitem if($type eq 'video');
+                        push @subtitles, $editionitem if($type eq 'subtitle');
+                    } elsif (-d _ && $type eq 'subtitledir') {
+                        push @subtitledirs, $editionitem;
+                    }
+                }
+                closedir($dh);
+                if (!@videos) {
+                    warn "not adding edition $edition, no videos found";
+                    next;
+                }
+                foreach my $subdir (@subtitledirs) {
+                    readsubdir(\@subtitles, $subdir, "$b_path/$subdir");
+                }
+                foreach my $videofile (@videos) {
+                    my ($withoutext) = $videofile =~ /^(.+)\.[^\.]+$/;
+                    my %relevantsubs;
+                    for my $i (reverse 0 .. $#subtitles) {
+                        if (basename($subtitles[$i]) =~ /^\Q$withoutext\E/i) {
+                            $relevantsubs{splice(@subtitles, $i, 1)} = undef;
+                        }
+                    }
+                    $edition{"/$videofile"} = scalar %relevantsubs ? {subs => \%relevantsubs} : {};
+                }
+                if(@subtitles) {
+                    warn "$edition: unmatched subtitle $_" foreach @subtitles;
+                }
+            }
+            my $showname;
+            my $withoutyear;
+            my $year;
+            if($edition =~ /^(.+)[\.\s]+\(?(\d{4})([^p]|$)/) {
+                $showname = "$1 ($2)";
+                $withoutyear = $1;
+                $year = $2;
+                $withoutyear =~ s/\./ /g;
+            }
+            elsif ($edition =~ /(.+)\s?\[(\d{4})\]/) {
+                $showname = "$1 ($2)";
+                $withoutyear = $1;
+                $year = $2;
+                $withoutyear =~ s/\./ /g;
+            }
+            elsif($edition =~ /^(.+)[\.\s](?i:DVDRip)[\.\s]./) {
+                $showname = $1;
+            }
+            elsif($edition =~ /^(.+)[\.\s](?:DVD|RERIP|BRrip)/) {
+                $showname = $1;
+            }
+            elsif($edition =~ /^(.+)\s\(PSP.+\)/) {
+                $showname = $1;
+            }
+            elsif($edition =~ /^(.+)\.VHS/) {
+                $showname = $1;
+            }
+            elsif($edition =~ /^(.+)[\.\s]+\d{3,4}p\./) {
+                $showname = $1;
+            }
+            elsif($edition =~ /^(.+)\.[a-zA-Z\d]{3,4}$/) {
+                $showname = $1;
+            }
+            else{
+                $showname = $edition;
+            }
+            $showname =~ s/\./ /g;
+            if(! $movies->{$showname}) {
+                my %diritem;
+                if(defined $year) {
+                    $diritem{name} = $withoutyear;
+                    $diritem{year} = $year;
+                }
+                if (my $b_showname = encode_UTF_8($showname)) {
+                    my $plot = $self->{moviemeta}."/$b_showname/plot.txt";
+                    if(-f $plot) {
+                        my $plotcontents = MHFS::Util::read_file($plot);
+                        $diritem{plot} = $plotcontents;
+                    }
+                } else {
+                    warn "$showname is not UTF-8, not reading plot";
+                }
+                $movies->{$showname} = \%diritem;
+            }
+            $movies->{$showname}{editions}{"$source/$edition"} = \%edition;
+        }
+        closedir($dh);
+    }
+
+    sub _build_movie_library {
+        my ($self, $sources) = @_;
+        my %movies;
+        foreach my $source (@$sources) {
+            if ($self->{server}{settings}{SOURCES}{$source}{type} ne 'local') {
+                warn "skipping source $source, only local implemented";
+                next;
+            }
+            my $b_moviedir = $self->{server}{settings}{SOURCES}{$source}{folder};
+            $self->readmoviedir(\%movies, $source, $b_moviedir);
+        }
+        \%movies
+    }
+
+    # returns undef on not found
+    sub _search_movie_library {
+        my ($self, $movies, $movieid, $source, $editionname, $partname, $subfile) = @_;
+        unless(exists $movies->{$movieid}) {
+            warn "movie not found";
+            return undef;
+        }
+        $movies = $movies->{$movieid};
+        if (!$source) {
+            return bless {movie => $movies}, 'MHFS::Plugin::Kodi::Movie';
+        }
+        $movies = $movies->{editions};
+        if(!$editionname) {
+            my %editions = map { $_ =~ /^$source/ ? ($_ => $movies->{$_}) : () } keys %$movies;
+            return bless {editions => \%editions}, 'MHFS::Plugin::Kodi::MovieEditions';
+        }
+        unless(exists $movies->{"$source/$editionname"}) {
+            warn "movie source not found";
+            return undef;
+        }
+        $movies = $movies->{"$source/$editionname"};
+        unless(defined $partname) {
+            return bless {source => $source, editionname => $editionname, edition => $movies}, 'MHFS::Plugin::Kodi::MovieEdition';
+        }
+        unless(exists $movies->{$partname}) {
+            warn "movie part not found";
+            return undef;
+        }
+        my $b_moviedir = $self->{server}{settings}{SOURCES}{$source}{folder};
+        my $b_editionname = encode_UTF_8($editionname) or do {
+            warn "$editionname is not UTF-8";
+            return undef;
+        };
+        my $b_editiondir = "$b_moviedir/$b_editionname";
+        $movies = $movies->{$partname};
+        if (!$subfile) {
+            my $b_partname = encode_UTF_8($partname) // do {
+                warn "$partname is not UTF-8";
+                return undef;
+            };
+            return bless {b_path => "$b_editiondir$b_partname", editionname => $editionname, partname => $partname, part => $movies}, 'MHFS::Plugin::Kodi::MoviePart';
+        }
+        unless(exists $movies->{subs} && exists $movies->{subs}{$subfile}) {
+            warn "subtitle file not found";
+            return undef;
+        }
+        my $b_subfile = encode_UTF_8($subfile) or do {
+            warn "$subfile is not UTF-8";
+            return undef;
+        };
+        return bless {b_path => "$b_editiondir/$b_subfile", subtitle => $subfile}, 'MHFS::Plugin::Kodi::MovieSubtitle';
+    }
+
+    sub _format_movie_subs {
+        my ($subs) = @_;
+        my @subs = map {
+            # kodi needs a basename with a parsable extension
+            my ($loc, $filename) = $_ =~ /^(.+\/|)([^\/]+)$/;
+            $loc = str_to_base64url($loc);
+            "$loc-sb/$filename"
+        } keys %$subs;
+        \@subs
+    }
+
+    sub _format_movie_part {
+        my ($editionname, $name, $paart) = @_;
+        my $b64_name = str_to_base64url($name);
+        my %part = (
+            id => "$b64_name-pt",
+            name => basename("$editionname$name")
+        );
+        if (exists $paart->{subs}) {
+            $part{subs} = _format_movie_subs($paart->{subs});
+        }
+        \%part
+    }
+
+    sub _format_movie_edition {
+        my ($sourcename, $editionname, $ediition) = @_;
+        my @sortedkeys = sort {basename($a) cmp basename($b)} keys %$ediition;
+        my @parts = map {
+            _format_movie_part($editionname, $_, $ediition->{$_})
+        } @sortedkeys;
+        my $editionid = "$sourcename/".str_to_base64url($editionname);
+        my %edition = ( id => $editionid, name => basename($editionname), parts => \@parts);
+        \%edition
+    }
+
+    # transform $diritems{movie}{editions}{source/name}{|parts}
+    # to        $diritems{movie}{editions}[{name, parts}]
+    sub _format_movie_editions {
+        my ($ediitions) = @_;
+        my @sortedkeys = sort {basename($a) cmp basename($b)} keys %$ediitions;
+        my @editions = map {
+            my ($sourcename, $editionname) = split('/', $_, 2);
+            _format_movie_edition($sourcename, $editionname, $ediitions->{$_})
+        } @sortedkeys;
+        \@editions
+    }
+
+    sub _format_movies {
+        my ($moovies) = @_;
+        my @sortedkeys = sort {basename($a) cmp basename($b)} keys %$moovies;
+        my @movies = map {
+            my %movie = %{$moovies->{$_}};
+            $movie{id} = $_;
+            $movie{editions} = _format_movie_editions($movie{editions});
+            \%movie
+        } @sortedkeys;
+        \@movies
+    }
+
+    sub _html_list_item {
+        my ($item, $isdir, $label) = @_;
+        $label //= $item;
+        my $url = uri_escape_path_utf8($item);
+        $url .= '/?fmt=html' if($isdir);
+        '<li><a href="' . $url .'">'. ${MHFS::Util::escape_html_noquote($label)} .'</a></li>'
     }
 
     # format movies library for kodi http
     sub route_movies {
-        my ($request, $absdir, $kodidir) = @_;
-        # read in the shows
-        my $moviedir = abs_path($absdir);
-        if(! defined $moviedir) {
+        my ($self, $request, $sources, $kodidir) = @_;
+        my $request_path = decode_UTF_8($request->{path}{unsafepath}) or do {
+            warn "$request->{path}{unsafepath} is not, UTF-8, 404";
+            $request->Send404;
+            return;
+        };
+        # build the movie library
+        if(! exists $self->{movies} || $request_path eq $kodidir) {
+            $self->{movies} = $self->_build_movie_library($sources);
+        }
+        my $movies = $self->{movies};
+        unless ($movies) {
             $request->Send404;
             return;
         }
-        my $dh;
-        if(! opendir ( $dh, $moviedir )) {
-            warn "Error in opening dir $moviedir\n";
-            $request->Send404;
-            return;
-        }
-        my %shows = ();
-        my @diritems;
-        while( (my $filename = readdir($dh))) {
-            next if(($filename eq '.') || ($filename eq '..'));
-            next if(!(-s "$moviedir/$filename"));
-            my $showname;
-            # extract the showname
-            if($filename =~ /^(.+)[\.\s]+\(?(\d{4})([^p]|$)/) {
-                $showname = "$1 ($2)";
-            }
-            elsif($filename =~ /^(.+)(\.DVDRip)\.[a-zA-Z]{3,4}$/) {
-                $showname = $1;
-            }
-            elsif($filename =~ /^(.+)\.VHS/) {
-                $showname = $1;
-            }
-            elsif($filename =~ /^(.+)[\.\s]+\d{3,4}p\.[a-zA-Z]{3,4}$/) {
-                $showname = $1;
-            }
-            elsif($filename =~ /^(.+)\.[a-zA-Z]{3,4}$/) {
-                $showname = $1;
-            }
-            else{
-                #next;
-                $showname = $filename;
-            }
-            if($showname) {
-                $showname =~ s/\./ /g;
-                if(! $shows{$showname}) {
-                    $shows{$showname} = [];
-                    push @diritems, {'item' => $showname, 'isdir' => 1}
-                }
-                push @{$shows{$showname}}, "$moviedir/$filename";
-            }
-        }
-        closedir($dh);
-
-        # locate the content
-        if($request->{'path'}{'unsafepath'} ne $kodidir) {
-            my $fullshowname = substr($request->{'path'}{'unsafepath'}, length($kodidir)+1);
-            say "fullshowname $fullshowname";
-            my $slash = index($fullshowname, '/');
-            @diritems = ();
-            my $showname = ($slash != -1) ? substr($fullshowname, 0, $slash) : $fullshowname;
-            my $showfilename = ($slash != -1) ? substr($fullshowname, $slash+1) : undef;
-            say "showname $showname";
-
-            my $showitems = $shows{$showname};
-            if(!$showitems) {
+        # find the movie item
+        my $movieitem;
+        if($request_path ne $kodidir) {
+            my $fullmoviepath = substr($request_path, length($kodidir)+1);
+            say "fullmoviepath $fullmoviepath";
+            my ($movieid, $source, $b64_editionname, $b64_partname, $b64_subpath, $subname, $slurp) = split('/', $fullmoviepath, 7);
+            if ($slurp) {
+                say "too many parts";
                 $request->Send404;
                 return;
             }
-            my @initems = @{$showitems};
-            my @outitems;
-            # TODO replace basename usage?
-            while(@initems) {
-                my $item = shift @initems;
-                $item = abs_path($item);
-                if(! $item) {
-                    say "bad item";
-                }
-                elsif(rindex($item, $moviedir, 0) != 0) {
-                    say "bad item, path traversal?";
-                }
-                elsif(-f $item) {
-                    my $filebasename = basename($item);
-                    if(!$showfilename) {
-                        push @diritems, {'item' => $filebasename, 'isdir' => 0};
-                    }
-                    elsif($showfilename eq $filebasename) {
-                        if(index($request->{'path'}{'unsafecollapse'}, '/', length($request->{'path'}{'unsafecollapse'})-1) == -1) {
-                            say "found show filename";
-                            $request->SendFile($item);
-                        }
-                        else {
-                            $request->Send404;
-                        }
+            say "movieid $movieid";
+            my $editionname;
+            my $partname;
+            my $subfile;
+            if ($source) {
+                say "source $source";
+                if ($b64_editionname) {
+                    $editionname = base64url_to_str($b64_editionname) or do {
+                        warn "$b64_editionname does not decode to a valid string";
+                        $request->Send404;
                         return;
+                    };
+                    say "editionname $editionname";
+                    if ($b64_partname) {
+                        if (length($b64_partname) < 3) {
+                            warn "$b64_partname has invalid format";
+                            $request->Send404;
+                            return;
+                        }
+                        $b64_partname = substr($b64_partname, 0, -3);
+                        $partname = base64url_to_str($b64_partname) // do {
+                            warn "$b64_partname does not decode to a valid string";;
+                            $request->Send404;
+                            return;
+                        };
+                        say "partname $partname";
+                        if ($b64_subpath && $subname) {
+                            if (length($b64_subpath) < 3) {
+                                warn "$b64_subpath has invalid format";
+                                $request->Send404;
+                                return;
+                            }
+                            $b64_subpath = substr($b64_subpath, 0, -3);
+                            my $subpath = base64url_to_str($b64_subpath) // do {
+                                warn "$b64_subpath does not decode to a valid string";
+                                $request->Send404;
+                                return;
+                            };
+                            $subfile = "$subpath$subname";
+                            say "subfile $subfile";
+                        }
                     }
                 }
-                elsif(-d _) {
-                    opendir(my $dh, $item) or die('failed to open dir');
-                    my @newitems;
-                    while(my $newitem = readdir($dh)) {
-                        next if(($newitem eq '.') || ($newitem eq '..'));
-                        push @newitems, "$item/$newitem";
-                    }
-                    closedir($dh);
-                    unshift @initems, @newitems;
+            }
+            $movieitem = $self->_search_movie_library($movies, $movieid, $source, $editionname, $partname, $subfile);
+            if (!$movieitem) {
+                $request->Send404;
+                return;
+            }
+            elsif (substr($request->{'path'}{'unescapepath'}, -1) ne '/') {
+                # redirect if we aren't accessing a file
+                if (!exists $movieitem->{b_path}) {
+                    $request->SendRedirect(301, substr($request->{'path'}{'unescapepath'}, rindex($request->{'path'}{'unescapepath'}, '/')+1).'/');
+                } else {
+                    $request->SendFile($movieitem->{b_path});
+                }
+                return;
+            }
+        } else {
+            $movieitem = bless {movies => $movies}, 'MHFS::Plugin::Kodi::Movies';
+        }
+        # render
+        if(exists $request->{qs}{fmt} && $request->{qs}{fmt} eq 'html') {
+            my $buf = $movieitem->TO_HTML;
+            $request->SendHTML($buf);
+        } else {
+            my $diritems = $movieitem->TO_JSON;
+            $request->SendAsJSON($diritems);
+        }
+    }
+
+    sub route_kodi {
+        my ($self, $request, $kodidir) = @_;
+        my $request_path = decode_UTF_8($request->{path}{unsafepath}) or do {
+            warn "$request->{path}{unsafepath} is not, UTF-8, 404";
+            $request->Send404;
+            return;
+        };
+        my $baseurl = $request->getAbsoluteURL;
+        my $repo_addon_version = '0.1.0';
+        my $repo_addon_name = "repository.mhfs-$repo_addon_version.zip";
+        if ($request_path eq $kodidir) {
+            my $html = <<"END_HTML";
+<style>ul{list-style: none;} li{margin: 10px 0;}</style>
+<h1>MHFS Kodi Setup Instructions</h1>
+<ol>
+  <li>Open Kodi</li>
+  <li>Go to <b>Settings->File manager</b>, <b>Add source</b> (you may have to double-click), and add <b>$baseurl$kodidir</b> (the URL of this page) as a source.</li>
+  <li>Go to <b>Settings->Add-ons->Install from zip file</b>, open the source you just added, and select <b>$repo_addon_name</b>. The repository add-on should install.</li>
+  <li>From <b>Settings->Add-ons</b> (you should still be on that page), <b>Install from repository->MHFS Repository->Video add-ons->MHFS Video</b> and click <b>Install</b>. The plugin addon should install.</li>
+  <li>Click <b>Configure</b> (or open the MHFS Video settings) and fill in <b>$baseurl</b> (the URL of the MHFS server you want to connect to).</li>
+  <li>MHFS Video should now be installed, you should be able to access it from <b>Add-ons->Video add-ons->MHFS Video</b> on the main menu</li>
+</ol>
+<ul>
+<a href="$repo_addon_name">$repo_addon_name</a>
+</ul>
+END_HTML
+            $request->SendHTML($html);
+            return;
+        } elsif (substr($request_path, length($kodidir)+1) ne $repo_addon_name ||
+                 substr($request->{'path'}{'unescapepath'}, -1) eq '/') {
+            $request->Send404;
+            return;
+        }
+        my $xml = <<"END_XML";
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="repository.mhfs"
+       name="MHFS Repository"
+       version="$repo_addon_name"
+       provider-name="G4Vi">
+  <extension point="xbmc.addon.repository" name="MHFS Repository">
+    <dir>
+      <info>$baseurl/static/kodi/addons.xml</info>
+      <checksum>$baseurl/static/kodi/addons.xml.md5</checksum>
+      <datadir zip="true">$baseurl/static/kodi</datadir>
+    </dir>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">MHFS Repository</summary>
+    <description lang="en_GB">TODO</description>
+    <disclaimer></disclaimer>
+    <platform>all</platform>
+    <language></language>
+    <license>GPL-2.0-or-later</license>
+    <forum>https://github.com/G4Vi/MHFS/issues</forum>
+    <website>computoid.com</website>
+    <source>https://github.com/G4Vi/MHFS</source>
+  </extension>
+</addon>
+END_XML
+        my $tmpdir = $request->{client}{server}{settings}{GENERIC_TMPDIR};
+        say "tmpdir $tmpdir";
+        my $addondir = "$tmpdir/repository.mhfs";
+        make_path($addondir);
+        open(my $fh, '>', "$addondir/addon.xml") or do {
+            warn "failed to open $addondir/addon.xml";
+            $request->Send404;
+            return;
+        };
+        print $fh $xml;
+        close($fh) or do {
+            warn "failed to close";
+            $request->Send404;
+            return;
+        };
+        _zip_Promise($request->{client}{server}, $tmpdir, ['repository.mhfs'])->then(sub {
+            $request->SendBytes('application/zip', $_[0]);
+        }, sub {
+            warn $_[0];
+            $request->Send404;
+        });
+    }
+
+    sub _zip {
+        my ($server, $start_in, $params, $on_success, $on_failure) = @_;
+        MHFS::Process->new_output_child($server->{evp}, sub {
+            # done in child
+            my ($datachannel) = @_;
+            chdir($start_in);
+            open(STDOUT, ">&", $datachannel) or die("Can't dup \$datachannel to STDOUT");
+            exec('zip', '-r', '-', @$params);
+            #exec('zip', '-r', 'repository.mhfs.zip', 'repository.mhfs');
+            die "failed to run zip";
+        }, sub {
+            my ($out, $err, $status) = @_;
+            if ($status != 0) {
+                $on_failure->('failed to zip');
+                return;
+            }
+            $on_success->($out);
+        }) // $on_failure->('failed to fork');
+    }
+
+    sub _zip_Promise {
+        my ($server, $start_in, $params) = @_;
+        return MHFS::Promise->new($server->{evp}, sub {
+            my ($resolve, $reject) = @_;
+            _zip($server, $start_in, $params, sub {
+                $resolve->($_[0]);
+            }, sub {
+                $reject->($_[0]);
+            });
+        });
+    }
+
+    sub _curl {
+        my ($server, $params, $cb) = @_;
+        my $process;
+        my @cmd = ('curl', @$params);
+        print "$_ " foreach @cmd;
+        print "\n";
+        $process = MHFS::Process->new_io_process($server->{evp}, \@cmd, sub {
+            my ($output, $error) = @_;
+            $cb->($output);
+        });
+
+        if(! $process) {
+            $cb->(undef);
+        }
+
+        return $process;
+    }
+
+    sub _TMDB_api {
+        my ($server, $route, $qs, $cb) = @_;
+        my $url = 'https://api.themoviedb.org/3/' . $route;
+        $url .= '?api_key=' . $server->{settings}{TMDB} . '&';
+        if($qs){
+            foreach my $key (keys %{$qs}) {
+                my @values;
+                if(ref($qs->{$key}) ne 'ARRAY') {
+                    push @values, $qs->{$key};
                 }
                 else {
-                    say "bad item unknown filetype " . $item;
+                    @values = @{$qs->{$key}};
+                }
+                foreach my $value (@values) {
+                    $url .= uri_escape($key).'='.uri_escape($value) . '&';
                 }
             }
         }
+        chop $url;
+        return _curl($server, [$url], sub {
+            $cb->(decode_json($_[0]));
+        });
+    }
 
-        # redirect if the slash wasn't there
-        if(index($request->{'path'}{'unescapepath'}, '/', length($request->{'path'}{'unescapepath'})-1) == -1) {
-            $request->SendRedirect(301, substr($request->{'path'}{'unescapepath'}, rindex($request->{'path'}{'unescapepath'}, '/')+1).'/');
+    sub _TMDB_api_promise {
+        my ($server, $route, $qs) = @_;
+        return MHFS::Promise->new($server->{evp}, sub {
+            my ($resolve, $reject) = @_;
+            _TMDB_api($server, $route, $qs, sub {
+                $resolve->($_[0]);
+            });
+        });
+    }
+
+    sub _DownloadFile {
+        my ($server, $url, $dest, $cb) = @_;
+        return _curl($server, ['-k', $url, '-o', $dest], $cb);
+    }
+
+    sub _DownloadFile_promise {
+        my ($server, $url, $dest) = @_;
+        return MHFS::Promise->new($server->{evp}, sub {
+            my ($resolve, $reject) = @_;
+            _DownloadFile($server, $url, $dest, sub {
+                $resolve->();
+            });
+        });
+    }
+
+    sub DirectoryRoute {
+        my ($path_without_end_slash, $cb) = @_;
+        return ([
+            $path_without_end_slash, sub {
+                my ($request) = @_;
+                $request->SendRedirect(301, substr($path_without_end_slash, rindex($path_without_end_slash, '/')+1).'/');
+            }
+        ], [
+            "$path_without_end_slash/*", $cb
+        ]);
+    }
+
+    sub route_metadata {
+        my ($self, $request) = @_;
+        while(1) {
+            if($request->{'path'}{'unsafepath'} !~ m!^/kodi/metadata/(movies|tv)/(thumb|fanart|plot)/(.+)$!) {
+                last;
+            }
+            my ($mediatype, $metadatatype, $medianame) = ($1, $2, $3);
+            say "mt $mediatype mmt $metadatatype mn $medianame";
+            my %allmediaparams  = ( 'movies' => {
+                'meta' => $self->{moviemeta},
+                'search' => 'movie',
+            }, 'tv' => {
+                'meta' => $self->{tvmeta},
+                'search' => 'tv'
+            });
+            my $params = $allmediaparams{$mediatype};
+            if(index($medianame, '/') != -1 || $medianame =~ /^.(.)?$/) {
+                last;
+            }
+            my $metadir = $params->{meta} . '/' . $medianame;
+            # fast path, exists on disk
+            if (-d $metadir) {
+                my %acceptable = ( 'thumb' => ['png', 'jpg'], 'fanart' => ['png', 'jpg'], 'plot' => ['txt']);
+                if(exists $acceptable{$metadatatype}) {
+                    foreach my $totry (@{$acceptable{$metadatatype}}) {
+                        my $path = $metadir.'/'.$metadatatype.".$totry";
+                        if(-f $path) {
+                            $request->SendLocalFile($path);
+                            return;
+                        }
+                    }
+                }
+            }
+            # slow path, download it
+            $request->{client}{server}{settings}{TMDB} or last;
+            my $searchname = $medianame;
+            $searchname =~ s/\s\(\d\d\d\d\)// if($mediatype eq 'movies');
+            say "searchname $searchname";
+            weaken($request);
+            _TMDB_api_promise($request->{client}{server}, 'search/'.$params->{search}, {'query' => $searchname})->then( sub {
+                if($metadatatype eq 'plot' || ! -f "$metadir/plot.txt") {
+                    make_path($metadir);
+                    MHFS::Util::write_file("$metadir/plot.txt", $_[0]->{results}[0]{overview});
+                }
+                if($metadatatype eq 'plot') {
+                    $request->SendLocalFile("$metadir/plot.txt");
+                    return;
+                }
+                # thumb or fanart
+                my $imagepartial = ($metadatatype eq 'thumb') ? $_[0]->{results}[0]{poster_path} : $_[0]->{results}[0]{backdrop_path};
+                if (!$imagepartial || $imagepartial !~ /(\.[^\.]+)$/) {
+                    return MHFS::Promise::throw('path not matched');
+                }
+                my $ext = $1;
+                make_path($metadir);
+                return MHFS::Promise->new($request->{client}{server}{evp}, sub {
+                    my ($resolve, $reject) = @_;
+                    if(! defined $self->{tmdbconfig}) {
+                        $resolve->(_TMDB_api_promise($request->{client}{server}, 'configuration')->then( sub {
+                            $self->{tmdbconfig} = $_[0];
+                            return $_[0];
+                        }));
+                    } else {
+                        $resolve->();
+                    }
+                })->then( sub {
+                    return _DownloadFile_promise($request->{client}{server}, $self->{tmdbconfig}{images}{secure_base_url}.'original'.$imagepartial, "$metadir/$metadatatype$ext")->then(sub {
+                        $request->SendLocalFile("$metadir/$metadatatype$ext");
+                        return;
+                    });
+                });
+            })->then(undef, sub {
+                say $_[0];
+                $request->Send404;
+                return;
+            });
             return;
         }
-
-        # generate the directory html
-        my $buf = '';
-        foreach my $show (@diritems) {
-            my $showname = $show->{'item'};
-            my $url = uri_escape($showname);
-            $url .= '/' if($show->{'isdir'});
-            $buf .= '<a href="' . $url .'">'. ${MHFS::Util::escape_html_noquote(decode('UTF-8', $showname, Encode::LEAVE_SRC))} .'</a><br><br>';
-        }
-        $request->SendHTML($buf);
+        $request->Send404;
     }
 
     sub new {
@@ -5404,25 +6291,27 @@ package MHFS::Plugin::Kodi {
         bless $self, $class;
 
         my @subsystems = ('video');
+        $self->{moviemeta} = $settings->{'DATADIR'}.'/movies';
+        $self->{tvmeta} = $settings->{'DATADIR'}.'/tv';
+        make_path($self->{moviemeta}, $self->{tvmeta});
 
         $self->{'routes'} = [
-            [
-                '/kodi/*', sub {
-                    my ($request) = @_;
-                    my @pathcomponents = split('/', $request->{'path'}{'unsafepath'});
-                    if(scalar(@pathcomponents) >= 3) {
-                        if($pathcomponents[2] eq 'movies') {
-                            route_movies($request, $settings->{'MEDIALIBRARIES'}{'movies'}, '/kodi/movies');
-                            return;
-                        }
-                        elsif($pathcomponents[2] eq 'tv') {
-                            route_tv($request, $settings->{'MEDIALIBRARIES'}{'tv'}, '/kodi/tv');
-                            return;
-                        }
-                    }
-                    $request->Send404;
-                }
-            ],
+            DirectoryRoute('/kodi/movies', sub {
+                my ($request) = @_;
+                route_movies($self, $request, $settings->{'MEDIASOURCES'}{'movies'}, '/kodi/movies');
+            }),
+            DirectoryRoute('/kodi/tv', sub {
+                my ($request) = @_;
+                route_tv($self, $request, $settings->{'MEDIALIBRARIES'}{'tv'}, '/kodi/tv');
+            }),
+            ['/kodi/metadata/*', sub {
+                my ($request) = @_;
+                route_metadata($self, $request);
+            }],
+            DirectoryRoute('/kodi', sub {
+                my ($request) = @_;
+                route_kodi($self, $request, '/kodi');
+            }),
         ];
 
         return $self;
@@ -6991,7 +7880,7 @@ package MHFS::Plugin::VideoLibrary {
 }
 
 package App::MHFS; #Media Http File Server
-use version; our $VERSION = version->declare("v0.5.0");
+use version; our $VERSION = version->declare("v0.6.0");
 use strict; use warnings;
 use feature 'say';
 use Getopt::Long qw(GetOptions);

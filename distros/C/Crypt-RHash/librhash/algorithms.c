@@ -14,14 +14,11 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <stdio.h>
-#include <assert.h>
-
+#include "algorithms.h"
 #include "byte_order.h"
 #include "rhash.h"
-#include "algorithms.h"
 
-/* header files of all supported hash sums */
+/* header files of all supported hash functions */
 #include "aich.h"
 #include "blake2b.h"
 #include "blake2s.h"
@@ -45,6 +42,11 @@
 #include "whirlpool.h"
 
 #ifdef USE_OPENSSL
+# include "plug_openssl.h"
+#endif /* USE_OPENSSL */
+#include <assert.h>
+
+#ifdef USE_OPENSSL
 /* note: BTIH and AICH depends on the used SHA1 algorithm */
 # define NEED_OPENSSL_INIT (RHASH_MD4 | RHASH_MD5 | \
 	RHASH_SHA1 | RHASH_SHA224 | RHASH_SHA256 | RHASH_SHA384 | RHASH_SHA512 | \
@@ -52,6 +54,7 @@
 #else
 # define NEED_OPENSSL_INIT 0
 #endif /* USE_OPENSSL */
+
 #ifdef GENERATE_GOST94_LOOKUP_TABLE
 # define NEED_GOST94_INIT (RHASH_GOST94 | RHASH_GOST94_CRYPTOPRO)
 #else
@@ -77,10 +80,10 @@ rhash_info info_md4 = { RHASH_MD4, F_LE32, 16, "MD4", "md4" };
 rhash_info info_md5 = { RHASH_MD5, F_LE32, 16, "MD5", "md5" };
 rhash_info info_sha1 = { RHASH_SHA1,      F_BE32, 20, "SHA1", "sha1" };
 rhash_info info_tiger = { RHASH_TIGER,    F_LE64, 24, "TIGER", "tiger" };
-rhash_info info_tth  = { RHASH_TTH,       F_BS32, 24, "TTH", "tree:tiger" };
-rhash_info info_btih = { RHASH_BTIH,      0, 20, "BTIH", "btih" };
+rhash_info info_tth  = { RHASH_TTH,       F_BS32 | F_SPCEXP, 24, "TTH", "tree:tiger" };
+rhash_info info_btih = { RHASH_BTIH,      F_SPCEXP, 20, "BTIH", "btih" };
 rhash_info info_ed2k = { RHASH_ED2K,      F_LE32, 16, "ED2K", "ed2k" };
-rhash_info info_aich = { RHASH_AICH,      F_BS32, 20, "AICH", "aich" };
+rhash_info info_aich = { RHASH_AICH,      F_BS32 | F_SPCEXP, 20, "AICH", "aich" };
 rhash_info info_whirlpool = { RHASH_WHIRLPOOL, F_BE64, 64, "WHIRLPOOL", "whirlpool" };
 rhash_info info_rmd160 = { RHASH_RIPEMD160,  F_LE32, 20, "RIPEMD-160", "ripemd160" };
 rhash_info info_gost12_256 = { RHASH_GOST12_256, F_LE64, 32, "GOST12-256", "gost12-256" };
@@ -104,8 +107,8 @@ rhash_info info_sha3_384 = { RHASH_SHA3_384, F_LE64, 48, "SHA3-384", "sha3-384" 
 rhash_info info_sha3_512 = { RHASH_SHA3_512, F_LE64, 64, "SHA3-512", "sha3-512" };
 
 /* some helper macros */
-#define dgshft(name) (((char*)&((name##_ctx*)0)->hash) - (char*)0)
-#define dgshft2(name, field) (((char*)&((name##_ctx*)0)->field) - (char*)0)
+#define dgshft(name) ((uintptr_t)((char*)&((name##_ctx*)0)->hash))
+#define dgshft2(name, field) ((uintptr_t)((char*)&((name##_ctx*)0)->field))
 #define ini(name) ((pinit_t)(name##_init))
 #define upd(name) ((pupdate_t)(name##_update))
 #define fin(name) ((pfinal_t)(name##_final))
@@ -157,8 +160,8 @@ void rhash_init_algorithms(unsigned mask)
 {
 	(void)mask; /* unused now */
 
-	/* verify that RHASH_HASH_COUNT is the index of the major bit of RHASH_ALL_HASHES */
-	assert(1 == (RHASH_ALL_HASHES >> (RHASH_HASH_COUNT - 1)));
+	/* check RHASH_HASH_COUNT */
+	assert(rhash_popcount(RHASH_ALL_HASHES) == RHASH_HASH_COUNT);
 
 #ifdef GENERATE_GOST94_LOOKUP_TABLE
 	rhash_gost94_init_table();
@@ -178,6 +181,34 @@ const rhash_info* rhash_info_by_id(unsigned hash_id)
 	/* check that one and only one bit is set */
 	if (!hash_id || (hash_id & (hash_id - 1)) != 0) return NULL;
 	return rhash_info_table[rhash_ctz(hash_id)].info;
+}
+
+/**
+ * Return array of hash identifiers of supported hash functions.
+ * If the all_id is different from RHASH_ALL_HASHES,
+ * then return hash identifiers of legacy hash functions
+ * to support old library clients.
+ *
+ * @param all_id constant used to get all hash identifiers
+ * @param count pointer to store the number of returned ids to
+ * @return array of hash identifiers
+ */
+const unsigned* rhash_get_all_hash_ids(size_t* count)
+{
+	static const unsigned all_ids[] = {
+		RHASH_CRC32, RHASH_MD4, RHASH_MD5, RHASH_SHA1,
+		RHASH_TIGER, RHASH_TTH, RHASH_BTIH, RHASH_ED2K,
+		RHASH_AICH, RHASH_WHIRLPOOL, RHASH_RIPEMD160,
+		RHASH_GOST94, RHASH_GOST94_CRYPTOPRO, RHASH_HAS160,
+		RHASH_GOST12_256, RHASH_GOST12_512,
+		RHASH_SHA224, RHASH_SHA256, RHASH_SHA384, RHASH_SHA512,
+		RHASH_EDONR256, RHASH_EDONR512,
+		RHASH_SHA3_224, RHASH_SHA3_256, RHASH_SHA3_384, RHASH_SHA3_512,
+		RHASH_CRC32C, RHASH_SNEFRU128, RHASH_SNEFRU256,
+		RHASH_BLAKE2S, RHASH_BLAKE2B
+	};
+	*count = RHASH_HASH_COUNT;
+	return all_ids;
 }
 
 /* CRC32 helper functions */
@@ -263,3 +294,80 @@ static void rhash_crc32c_final(uint32_t* crc32c, unsigned char* result)
 	result[2] = (unsigned char)(*crc32c >> 8), result[3] = (unsigned char)(*crc32c);
 #endif
 }
+
+#if !defined(NO_IMPORT_EXPORT)
+/**
+ * Export a hash function context to a memory region,
+ * or calculate the size required for context export.
+ *
+ * @param hash_id identifier of the hash function
+ * @param ctx the algorithm context containing current hashing state
+ * @param out pointer to the memory region or NULL
+ * @param size size of memory region
+ * @return the size of the exported data on success, 0 on fail.
+ */
+size_t rhash_export_alg(unsigned hash_id, const void* ctx, void* out, size_t size)
+{
+	switch (hash_id)
+	{
+		case RHASH_TTH:
+			return rhash_tth_export((const tth_ctx*)ctx, out, size);
+		case RHASH_BTIH:
+			return bt_export((const torrent_ctx*)ctx, out, size);
+		case RHASH_AICH:
+			return rhash_aich_export((const aich_ctx*)ctx, out, size);
+	}
+	return 0;
+}
+
+/**
+ * Import a hash function context from a memory region.
+ *
+ * @param hash_id identifier of the hash function
+ * @param ctx pointer to the algorithm context
+ * @param in pointer to the data to import
+ * @param size size of data to import
+ * @return the size of the imported data on success, 0 on fail.
+ */
+size_t rhash_import_alg(unsigned hash_id, void* ctx, const void* in, size_t size)
+{
+	switch (hash_id)
+	{
+		case RHASH_TTH:
+			return rhash_tth_import((tth_ctx*)ctx, in, size);
+		case RHASH_BTIH:
+			return bt_import((torrent_ctx*)ctx, in, size);
+		case RHASH_AICH:
+			return rhash_aich_import((aich_ctx*)ctx, in, size);
+	}
+	return 0;
+}
+#endif /* !defined(NO_IMPORT_EXPORT) */
+
+#ifdef USE_OPENSSL
+void rhash_load_sha1_methods(rhash_hashing_methods* methods, int methods_type)
+{
+	int use_openssl;
+	switch (methods_type) {
+		case METHODS_OPENSSL:
+			use_openssl = 1;
+			break;
+		case METHODS_SELECTED:
+			assert(rhash_info_table[3].info->hash_id == RHASH_SHA1);
+			use_openssl = ARE_OPENSSL_METHODS(rhash_info_table[3]);
+			break;
+		default:
+			use_openssl = 0;
+			break;
+	}
+	if (use_openssl) {
+		methods->init = rhash_ossl_sha1_init();
+		methods->update = rhash_ossl_sha1_update();
+		methods->final = rhash_ossl_sha1_final();
+	} else {
+		methods->init = (pinit_t)&rhash_sha1_init;
+		methods->update = (pupdate_t)&rhash_sha1_update;
+		methods->final = (pfinal_t)&rhash_sha1_final;
+	}
+}
+#endif

@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Writer;
 # ABSTRACT: Write biblio records into Koha Catalog
-$Koha::Contrib::ARK::Writer::VERSION = '1.1.0';
+$Koha::Contrib::ARK::Writer::VERSION = '1.1.1';
 use Moose;
 use Modern::Perl;
 use C4::Biblio qw/ ModBiblio /;
@@ -39,7 +39,7 @@ Koha::Contrib::ARK::Writer - Write biblio records into Koha Catalog
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 ATTRIBUTES
 

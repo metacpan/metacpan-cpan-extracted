@@ -55,9 +55,18 @@ enum rhash_ids
 	RHASH_BLAKE2B   = 0x40000000,
 
 	/**
+	 * The number of supported hash functions.
+	 */
+	RHASH_HASH_COUNT = 31,
+
+	/* bit-flag for extra hash identifiers */
+	RHASH_EXTENDED_BIT = (int)0x80000000,
+
+	/**
 	 * The bit-mask containing all supported hash functions.
 	 */
-	RHASH_ALL_HASHES = RHASH_CRC32 | RHASH_CRC32C | RHASH_MD4 | RHASH_MD5 |
+	RHASH_ALL_HASHES =
+		RHASH_CRC32 | RHASH_CRC32C | RHASH_MD4 | RHASH_MD5 |
 		RHASH_ED2K | RHASH_SHA1 |RHASH_TIGER | RHASH_TTH |
 		RHASH_GOST94 | RHASH_GOST94_CRYPTOPRO | RHASH_GOST12_256 | RHASH_GOST12_512 |
 		RHASH_BTIH | RHASH_AICH | RHASH_WHIRLPOOL | RHASH_RIPEMD160 |
@@ -67,12 +76,7 @@ enum rhash_ids
 		RHASH_EDONR256 | RHASH_EDONR512 | RHASH_BLAKE2S | RHASH_BLAKE2B,
 
 	RHASH_GOST = RHASH_GOST94, /* deprecated constant name */
-	RHASH_GOST_CRYPTOPRO = RHASH_GOST94_CRYPTOPRO, /* deprecated constant name */
-
-	/**
-	 * The number of supported hash functions.
-	 */
-	RHASH_HASH_COUNT = 31
+	RHASH_GOST_CRYPTOPRO = RHASH_GOST94_CRYPTOPRO /* deprecated constant name */
 };
 
 /**
@@ -129,7 +133,7 @@ RHASH_API int rhash_msg(unsigned hash_id, const void* message, size_t length, un
  * @param hash_id id of hash function to compute
  * @param filepath path to the file to process
  * @param result buffer to receive message digest
- * @return 0 on success, -1 on error and errno is set
+ * @return 0 on success, -1 on fail with error code stored in errno
  */
 RHASH_API int rhash_file(unsigned hash_id, const char* filepath, unsigned char* result);
 
@@ -140,7 +144,7 @@ RHASH_API int rhash_file(unsigned hash_id, const char* filepath, unsigned char* 
  * @param hash_id id of hash function to compute
  * @param filepath path to the file to process
  * @param result buffer to receive the binary message digest value
- * @return 0 on success, -1 on error and errno is set
+ * @return 0 on success, -1 on fail with error code stored in errno
  */
 RHASH_API int rhash_wfile(unsigned hash_id, const wchar_t* filepath, unsigned char* result);
 #endif
@@ -149,11 +153,26 @@ RHASH_API int rhash_wfile(unsigned hash_id, const wchar_t* filepath, unsigned ch
 /* LOW-LEVEL LIBRHASH INTERFACE */
 
 /**
- * Allocate and initialize RHash context for calculating message digests.
+ * Allocate and initialize RHash context for calculating a single or multiple hash functions.
  * The context after usage must be freed by calling rhash_free().
  *
- * @param hash_id union of bit-flags, containing ids of hash functions to calculate.
- * @return initialized rhash context, NULL on error and errno is set
+ * @param count the size of the hash_ids array, the count must be greater than zero
+ * @param hash_ids array of identifiers of hash functions. Each element must
+ *        be an identifier of one hash function
+ * @return initialized rhash context, NULL on fail with error code stored in errno
+ */
+RHASH_API rhash rhash_init_multi(size_t count, const unsigned hash_ids[]);
+
+/**
+ * Allocate and initialize RHash context for calculating a single hash function.
+ *
+ * This function also supports a deprecated way to initialize rhash context
+ * for multiple hash functions, by passing a bitwise union of several hash
+ * identifiers. Only single-bit identifiers (not greater than RHASH_SNEFRU256)
+ * can be used in such bitwise union.
+ *
+ * @param hash_id identifier of a hash function
+ * @return initialized rhash context, NULL on fail with error code stored in errno
  */
 RHASH_API rhash rhash_init(unsigned hash_id);
 
@@ -164,7 +183,7 @@ RHASH_API rhash rhash_init(unsigned hash_id);
  * @param ctx the rhash context
  * @param message message chunk
  * @param length length of the message chunk
- * @return 0 on success; On fail return -1 and set errno
+ * @return 0 on success, -1 on fail with error code stored in errno
  */
 RHASH_API int rhash_update(rhash ctx, const void* message, size_t length);
 
@@ -177,7 +196,7 @@ RHASH_API int rhash_update(rhash ctx, const void* message, size_t length);
  *
  * @param ctx rhash context
  * @param fd descriptor of the file to hash
- * @return 0 on success, -1 on error and errno is set
+ * @return 0 on success, -1 on fail with error code stored in errno
  */
 RHASH_API int rhash_file_update(rhash ctx, FILE* fd);
 
@@ -186,7 +205,7 @@ RHASH_API int rhash_file_update(rhash ctx, FILE* fd);
  *
  * @param ctx the rhash context
  * @param first_result optional buffer to store a calculated message digest with the lowest available id
- * @return 0 on success; On fail return -1 and set errno
+ * @return 0 on success, -1 on fail with error code stored in errno
  */
 RHASH_API int rhash_final(rhash ctx, unsigned char* first_result);
 
@@ -201,7 +220,7 @@ RHASH_API void rhash_reset(rhash ctx);
 /**
  * Free RHash context memory.
  *
- * @param ctx the context to free.
+ * @param ctx the context to free
  */
 RHASH_API void rhash_free(rhash ctx);
 
@@ -215,8 +234,33 @@ RHASH_API void rhash_free(rhash ctx);
  * @param callback pointer to the callback function
  * @param callback_data pointer to data passed to the callback
  */
-RHASH_API void  rhash_set_callback(rhash ctx, rhash_callback_t callback, void* callback_data);
+RHASH_API void rhash_set_callback(rhash ctx, rhash_callback_t callback, void* callback_data);
 
+/**
+ * Export RHash context data to a memory region.
+ * The size of the memory required for export
+ * is returned by rhash_export(ctx, NULL, 0).
+ *
+ * @param ctx the rhash context to export
+ * @param out pointer to a memory region, or NULL
+ * @param size the size of a memory region
+ * @return the size of exported data on success export.
+ *         The size of memory required for export if out is NULL.
+ *         0 on fail with error code stored in errno
+ */
+RHASH_API size_t rhash_export(rhash ctx, void* out, size_t size);
+
+/**
+ * Import rhash context from a memory region.
+ * The returned rhash context must be released after usage
+ * by rhash_free().
+ *
+ * @param in pointer to a memory region
+ * @param size the size of a memory region
+ * @return imported rhash context on success,
+ *         NULL on fail with error code stored in errno
+ */
+RHASH_API rhash rhash_import(const void* in, size_t size);
 
 /* INFORMATION FUNCTIONS */
 
@@ -225,7 +269,7 @@ RHASH_API void  rhash_set_callback(rhash ctx, rhash_callback_t callback, void* c
  *
  * @return the number of supported hash functions
  */
-RHASH_API int  rhash_count(void);
+RHASH_API int rhash_count(void);
 
 /**
  * Returns the size of binary message digest for given hash function.
@@ -233,7 +277,7 @@ RHASH_API int  rhash_count(void);
  * @param hash_id the id of the hash function
  * @return the size of the message digest in bytes
  */
-RHASH_API int  rhash_get_digest_size(unsigned hash_id);
+RHASH_API int rhash_get_digest_size(unsigned hash_id);
 
 /**
  * Returns the length of message digest string in its default output format.
@@ -241,7 +285,7 @@ RHASH_API int  rhash_get_digest_size(unsigned hash_id);
  * @param hash_id the id of the hash function
  * @return the length of the message digest
  */
-RHASH_API int  rhash_get_hash_length(unsigned hash_id);
+RHASH_API int rhash_get_hash_length(unsigned hash_id);
 
 /**
  * Detect default message digest output format for the given hash algorithm.
@@ -249,7 +293,7 @@ RHASH_API int  rhash_get_hash_length(unsigned hash_id);
  * @param hash_id the id of hash algorithm
  * @return 1 for base32 format, 0 for hexadecimal
  */
-RHASH_API int  rhash_is_base32(unsigned hash_id);
+RHASH_API int rhash_is_base32(unsigned hash_id);
 
 /**
  * Returns the name of the given hash function.
@@ -349,7 +393,7 @@ RHASH_API size_t rhash_print_bytes(char* output,
  *               flags RHPR_UPPERCASE, RHPR_HEX, RHPR_BASE32, RHPR_BASE64, etc.
  * @return the number of written characters on success or 0 on fail
  */
-RHASH_API size_t rhash_print(char* output, rhash ctx, unsigned hash_id,
+RHASH_API size_t rhash_print(char* output, rhash context, unsigned hash_id,
 	int flags);
 
 /**
@@ -385,19 +429,12 @@ typedef unsigned long rhash_uptr_t;
 #endif
 
 /**
- * The value returned by rhash_transmit on error.
+ * The value returned by rhash_ctrl on error.
  */
-#define RHASH_ERROR ((rhash_uptr_t)-1)
-/**
- * Convert a pointer to rhash_uptr_t.
- */
-#define RHASH_STR2UPTR(str) ((rhash_uptr_t)(char*)(str))
-/**
- * Convert a rhash_uptr_t to a void* pointer.
- */
-#define RHASH_UPTR2PVOID(u) ((void*)((u) + 0))
+#define RHASH_ERROR ((size_t)-1)
 
 /**
+ * Deprecated function.
  * Process a rhash message.
  *
  * @param msg_id message identifier
@@ -409,60 +446,159 @@ typedef unsigned long rhash_uptr_t;
 RHASH_API rhash_uptr_t rhash_transmit(
 	unsigned msg_id, void* dst, rhash_uptr_t ldata, rhash_uptr_t rdata);
 
-/* rhash message constants */
+/**
+ * Perform a generic or rhash context specific control command.
+ *
+ * @param context rhash context
+ * @param cmd control command id
+ * @param size the size of the data or command specific argument
+ * @param data command specific data
+ * @return command specific return value
+ */
+RHASH_API size_t rhash_ctrl(rhash context, int cmd, size_t size, void* data);
 
+/* Commands for rhash_ctrl() */
 #define RMSG_GET_CONTEXT 1
 #define RMSG_CANCEL      2
 #define RMSG_IS_CANCELED 3
 #define RMSG_GET_FINALIZED 4
 #define RMSG_SET_AUTOFINAL 5
+#define RMSG_GET_ALL_ALGORITHMS 14
+#define RMSG_GET_CTX_ALGORITHMS 15
+#define RMSG_GET_OPENSSL_SUPPORTED 16
+#define RMSG_GET_OPENSSL_AVAILABLE 17
+#define RMSG_GET_OPENSSL_ENABLED 18
+#define RMSG_SET_OPENSSL_ENABLED 19
+#define RMSG_GET_LIBRHASH_VERSION 20
+
+/* Deprecated message ids for rhash_transmit() */
 #define RMSG_SET_OPENSSL_MASK 10
 #define RMSG_GET_OPENSSL_MASK 11
 #define RMSG_GET_OPENSSL_SUPPORTED_MASK 12
 #define RMSG_GET_OPENSSL_AVAILABLE_MASK 13
-#define RMSG_GET_LIBRHASH_VERSION 20
 
 /* HELPER MACROS */
 
 /**
  * Get a pointer to the context of the specified hash function.
  */
-#define rhash_get_context_ptr(ctx, hash_id) RHASH_UPTR2PVOID(rhash_transmit(RMSG_GET_CONTEXT, ctx, hash_id, 0))
+#define rhash_get_context(ctx, hash_id, ptr) \
+	rhash_ctrl(ctx, RMSG_GET_CONTEXT, hash_id, ptr)
 /**
  * Cancel file processing.
  */
-#define rhash_cancel(ctx) rhash_transmit(RMSG_CANCEL, ctx, 0, 0)
+#define rhash_cancel(ctx) \
+	rhash_ctrl(ctx, RMSG_CANCEL, 0, NULL)
 /**
  * Return non-zero if a message digest calculation was canceled, zero otherwise.
  */
-#define rhash_is_canceled(ctx) rhash_transmit(RMSG_IS_CANCELED, ctx, 0, 0)
+#define rhash_is_canceled(ctx) \
+	rhash_ctrl(ctx, RMSG_IS_CANCELED, 0, NULL)
 /**
  * Return non-zero if rhash_final was called for rhash_context.
  */
-#define rhash_get_finalized(ctx) rhash_transmit(RMSG_GET_FINALIZED, ctx, 0, 0)
+#define rhash_get_finalized(ctx) \
+	rhash_ctrl(ctx, RMSG_GET_FINALIZED, 0, NULL)
 
 /**
  * Turn on/off the auto-final flag for the given rhash_context. By default
  * auto-final is on, which means rhash_final is called automatically, if
  * needed when a message digest is retrieved by rhash_print call.
  */
-#define rhash_set_autofinal(ctx, on) rhash_transmit(RMSG_SET_AUTOFINAL, ctx, on, 0)
+#define rhash_set_autofinal(ctx, on) \
+	rhash_ctrl(ctx, RMSG_SET_AUTOFINAL, on, NULL)
 
 /**
+ * Fill the hash_ids array by identifiers of all algorithms supported
+ * by the library. The hash_ids array must have space to store
+ * at least count of unsigned elements.
+ * Returns RHASH_ERROR if the count and the hash_ids pointer are non-zero
+ * and the count is smaller then the number of supported algorithms,
+ * otherwise returns the number of algorithms.
+ */
+#define rhash_get_all_algorithms(count, hash_ids) \
+	rhash_ctrl(NULL, RMSG_GET_ALL_ALGORITHMS, count, hash_ids)
+
+/**
+ * Fill the hash_ids array by identifiers of algorithms associated with the given
+ * rhash context. The hash_ids array must have space to store
+ * at least count of unsigned elements.
+ * Returns RHASH_ERROR if hash_ids is not NULL and count is non-zero,
+ * and the count is smaller then the number of algorithms in context,
+ * otherwise returns the number of algorithms.
+ */
+#define rhash_get_ctx_algorithms(ctx, count, hash_ids) \
+	rhash_ctrl(ctx, RMSG_GET_CTX_ALGORITHMS, count, hash_ids)
+
+/**
+ * Get array of ids of algorithms supported by the OpenSSL plugin.
+ * Do not use this macro, unless reading detailed plugin info.
+ * Returns RHASH_ERROR if hash_ids is not NULL and count is non-zero,
+ * and count is lesser than the number of enabled algorithms,
+ * returns the number of supported algorithms otherwize.
+ */
+#define rhash_get_openssl_supported(count, hash_ids) \
+	rhash_ctrl(NULL, RMSG_GET_OPENSSL_SUPPORTED, count, hash_ids)
+
+/**
+ * Get array of ids of algorithms available from OpenSSL library.
+ * Returns RHASH_ERROR if hash_ids is not NULL and count is non-zero,
+ * and count is lesser than the number of enabled algorithms,
+ * returns 0 if dynamic OpenSSL library is not found or not loaded,
+ * returns the number of enabled algorithms otherwize.
+ */
+#define rhash_get_openssl_available(count, hash_ids) \
+	rhash_ctrl(NULL, RMSG_GET_OPENSSL_AVAILABLE, count, hash_ids)
+
+/**
+ * Get array of ids of "enabled" OpenSSL algorithms, which means
+ * the algorithms selected to be calculated by OpenSSL library.
+ * Returns RHASH_ERROR if hash_ids is not NULL and count is non-zero,
+ * and count is lesser than the number of enabled algorithms,
+ * returns the number of enabled algorithms otherwize.
+ */
+#define rhash_get_openssl_enabled(count, hash_ids) \
+	rhash_ctrl(NULL, RMSG_GET_OPENSSL_ENABLED, count, hash_ids)
+
+/**
+ * Set array of algorithms to be calculated by OpenSSL library.
+ * The call rhash_set_openssl_enabled(0, NULL) made before rhash_library_init(),
+ * disables loading of the OpenSSL dynamic library.
+ * Returns RHASH_ERROR if hash_ids is NULL and count is non-zero, 0 otherwise.
+ */
+#define rhash_set_openssl_enabled(count, hash_ids) \
+	rhash_ctrl(NULL, RMSG_SET_OPENSSL_ENABLED, count, hash_ids)
+
+/**
+ * Return non-zero if LibRHash has been compiled with OpenSSL support,
+ * and zero otherwise.
+ */
+#define rhash_is_openssl_supported() (rhash_get_openssl_supported(0, NULL))
+
+/**
+ * Return librhash version.
+ */
+#define rhash_get_version() \
+	rhash_ctrl(NULL, RMSG_GET_LIBRHASH_VERSION, 0, NULL)
+
+/* Deprecated macros to work with hash masks */
+
+/**
+ * Deprecated macro.
  * Set the bit-mask of hash algorithms to be calculated by OpenSSL library.
- * The call rhash_set_openssl_mask(0) made before rhash_library_init(),
- * turns off loading of the OpenSSL dynamic library.
- * This call works if the LibRHash was compiled with OpenSSL support.
+ * Return RHASH_ERROR if LibRHash is compiled without OpenSSL support.
  */
 #define rhash_set_openssl_mask(mask) rhash_transmit(RMSG_SET_OPENSSL_MASK, NULL, mask, 0)
 
 /**
+ * Deprecated macro.
  * Return current bit-mask of hash algorithms selected to be calculated by OpenSSL
  * library. Return RHASH_ERROR if LibRHash is compiled without OpenSSL support.
  */
 #define rhash_get_openssl_mask() rhash_transmit(RMSG_GET_OPENSSL_MASK, NULL, 0, 0)
 
 /**
+ * Deprecated macro.
  * Return the bit-mask of algorithms that can be provided by the OpenSSL plugin,
  * if the library is compiled with OpenSSL support, 0 otherwise. This bit-mask is
  * a constant value computed at compile-time.
@@ -470,27 +606,12 @@ RHASH_API rhash_uptr_t rhash_transmit(
 #define rhash_get_openssl_supported_mask() rhash_transmit(RMSG_GET_OPENSSL_SUPPORTED_MASK, NULL, 0, 0)
 
 /**
+ * Deprecated macro.
  * Return the bit-mask of algorithms that are successfully loaded from
  * OpenSSL library. If the library is not loaded or not supported by LibRHash,
  * then return 0.
  */
 #define rhash_get_openssl_available_mask() rhash_transmit(RMSG_GET_OPENSSL_AVAILABLE_MASK, NULL, 0, 0)
-
-/**
- * Return librhash version.
- */
-#define rhash_get_version() rhash_transmit(RMSG_GET_LIBRHASH_VERSION, NULL, 0, 0)
-
-/**
- * Return non-zero if LibRHash has been compiled with OpenSSL support,
- * and zero otherwise.
- */
-#define rhash_is_openssl_supported() (rhash_get_openssl_mask() != RHASH_ERROR)
-
-/**
- * Legacy macro. The bit mask of hash algorithms implemented by OpenSSL.
- */
-# define RHASH_OPENSSL_SUPPORTED_HASHES (rhash_get_openssl_supported_mask())
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
-use v5.10;
-use strict;
+use v5.14;
 use warnings;
 
 use Test2::V0;
@@ -139,7 +138,7 @@ use Future::Utils qw( repeat try_repeat try_repeat_until_success );
    my $attempt = 0;
    my $future = try_repeat {
       if( ++$attempt < 3 ) {
-         return FUture->new->fail( "Too low" );
+         return Future->new->fail( "Too low" );
       }
       else {
          return Future->done( $attempt );

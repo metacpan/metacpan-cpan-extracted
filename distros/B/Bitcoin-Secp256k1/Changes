@@ -1,5 +1,9 @@
 Revision history for Bitcoin-Secp256k1
 
+0.003 - 2024-10-22
+	[New interface]
+	- Added method combine_public_keys
+
 0.002 - 2024-09-20
 	- Module should now be buildable on threaded perls
 	- Module should now be buildable on all major OSes

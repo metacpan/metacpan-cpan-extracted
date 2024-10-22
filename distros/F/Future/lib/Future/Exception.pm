@@ -3,19 +3,18 @@
 #
 #  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
 
-package Future::Exception;
+package Future::Exception 0.51;
 
-use v5.10;
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.50';
 
 =head1 NAME
 
 C<Future::Exception> - an exception type for failed L<Future>s
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Scalar::Util qw( blessed );
    use Syntax::Keyword::Try;
@@ -55,7 +54,7 @@ use overload
 
 =head2 from_future
 
-   $e = Future::Exception->from_future( $f )
+   $e = Future::Exception->from_future( $f );
 
 Constructs a new C<Future::Exception> wrapping the given failed future.
 
@@ -72,9 +71,9 @@ sub new { my $class = shift; bless [ @_ ], $class; }
 
 =head1 ACCESSORS
 
-   $message  = $e->message
-   $category = $e->category
-   @details  = $e->details
+   $message  = $e->message;
+   $category = $e->category;
+   @details  = $e->details;
 
 Additionally, the object will stringify to return the message value, for the
 common use-case of printing, regexp testing, or other behaviours.
@@ -91,7 +90,7 @@ sub details  { my $self = shift; @{$self}[2..$#$self] }
 
 =head2 throw
 
-   Future::Exception->throw( $message, $category, @details )
+   Future::Exception->throw( $message, $category, @details );
 
 I<Since version 0.41.>
 
@@ -117,7 +116,7 @@ sub throw
 
 =head2 as_future
 
-   $f = $e->as_future
+   $f = $e->as_future;
 
 Returns a new C<Future> object in a failed state matching the exception.
 

@@ -43,8 +43,6 @@ librhash/plug_openssl.c
 librhash/plug_openssl.h
 librhash/rhash.c
 librhash/rhash.h
-librhash/rhash_timing.c
-librhash/rhash_timing.h
 librhash/rhash_torrent.c
 librhash/rhash_torrent.h
 librhash/ripemd-160.c
@@ -59,8 +57,10 @@ librhash/sha512.c
 librhash/sha512.h
 librhash/snefru.c
 librhash/snefru.h
-librhash/test_hashes.c
-librhash/test_hashes.h
+librhash/test_lib.c
+librhash/test_lib.h
+librhash/test_utils.c
+librhash/test_utils.h
 librhash/tiger.c
 librhash/tiger.h
 librhash/tiger_sbox.c

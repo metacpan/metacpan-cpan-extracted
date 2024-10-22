@@ -8,11 +8,14 @@ my @extra_exported_runtime_methods = ("UTF8ToString", "addFunction", "removeFunc
 open(my $emcc, "-|", 'emcc', '--version') or die("Failed to open emcc");
 my $combine_extra;
 my $line = <$emcc>;
-if($line =~ /\s+(\d+)\.(\d+)\.(\d+)\s+/) {
+if($line =~ /\s+(\d+)\.(\d+)\.(\d+)/) {
     my ($maj, $min, $patch) = ($1, $2, $3);
     $combine_extra = ($maj > 2) || (($maj == 2) && (($min > 0) || ($patch >= 18)));
 }
-defined($combine_extra) or die("Failed to find version");
+if(!defined($combine_extra)) {
+    warn "warn: Failed to find version, assuming combine_extra";
+    $combine_extra = 1;
+}
 
 # build the arrays
 if($combine_extra) {

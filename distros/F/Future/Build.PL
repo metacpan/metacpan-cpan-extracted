@@ -55,10 +55,11 @@ my $build = Module::Build->new(
    },
    requires => {
       'Carp' => '1.25', # new message format with trailing period
+      'List::Util' => '1.29',
       'Test::Builder::Module' => 0,
       'Time::HiRes' => 0,
 
-      'perl' => '5.010', # //
+      'perl' => '5.014',
    },
    test_requires => {
       'Test2::V0' => '0.000148',
