@@ -1,6 +1,6 @@
 package Catalyst::View::BasePerRequest;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 our $DEFAULT_FACTORY = 'Catalyst::View::BasePerRequest::Lifecycle::Request';
 
 use Moose;
@@ -239,16 +239,6 @@ sub flatten_rendered {
   return join '', grep { defined($_) } @_;
 }
 
-sub content {
-  my ($self, $name, $options) = @_;
-  my %options = $options ? %$options : ();
-  my $default = exists($options{default}) ? $options{default} : '';
-
-  return exists($self->ctx->stash->{view_blocks}{$name}) ? 
-    $self->ctx->stash->{view_blocks}{$name} :
-      $default;
-}
-
 sub render_content_value {
   my $self = shift;
   if((ref($_[0])||'') eq 'CODE') {
@@ -258,47 +248,83 @@ sub render_content_value {
   }
 }
 
-sub flatten_rendered_for_content_blocks { return shift->flatten_rendered(@_) }
+sub flatten_rendered_for_content_blocks {
+  my $self = shift;
+  return $self->flatten_rendered(@_);
+}
 
+# Get a content block, with optional default value
+sub content {
+  my $self = shift;
+  my $name = shift;
+  my $default = ref($_[-1])||'' eq 'CODE' ? pop : sub { '' };
+  my @args = @_;
+
+  return $default->(@args) unless exists $self->ctx->stash->{view_blocks}{$name};
+
+  my $proto = $self->ctx->stash->{view_blocks}{$name};
+
+  return $self->flatten_rendered_for_content_blocks($proto->(@args));
+}
+
+# Define a content block
 sub content_for {
-  my ($self, $name, $value) = @_;
-  Module::Runtime::use_module($self->_content_exception_class)
-    ->throw(content_name=>$name, content_msg=>'Content block is already defined') if $self->_content_exists($name);
-  $self->ctx->stash->{view_blocks}{$name} = $self->render_content_value($value);
+  my ($self, $name, $proto) = @_;
+  my $value = ref($proto)||'' eq 'CODE' ? $proto : sub { $proto };
+  $self->throw_content_block_error($name, "Can't create content block '$name', it's already defined.")
+    if exists $self->ctx->stash->{view_blocks}{$name};
+  $self->ctx->stash->{view_blocks}{$name} = $value;
   return;
 }
 
-sub content_append {
-  my ($self, $name, $value) = @_;
-  Module::Runtime::use_module($self->_content_exception_class)
-    ->throw(content_name=>$name, content_msg=>'Content block doesnt exist for appending') unless $self->_content_exists($name);
-  $self->ctx->stash->{view_blocks}{$name} .= $self->render_content_value($value);
-  return;
-}
-
-sub content_prepend {
-  my ($self, $name, $value) = @_;
-  Module::Runtime::use_module($self->_content_exception_class)
-    ->throw(content_name=>$name, content_msg=>'Content block doesnt exist for prepending') unless $self->_content_exists($name);
-  $self->ctx->stash->{view_blocks}{$name} = $self->render_content_value($value) . $self->ctx->stash->{view_blocks}{$name};
-  return;
-}
-
-
+# Replace a content block
 sub content_replace {
-  my ($self, $name, $value) = @_;
-  Module::Runtime::use_module($self->_content_exception_class)
-    ->throw(content_name=>$name, content_msg=>'Content block doesnt exist for replacing') unless $self->_content_exists($name);
-  $self->ctx->stash->{view_blocks}{$name} = $self->render_content_value($value);
+  my ($self, $name, $proto) = @_;
+  my $value = ref($proto)||'' eq 'CODE' ? $proto : sub { $proto };
+  $self->throw_content_block_error($name, "Can't replace content block '$name', it's not defined.")
+    unless exists $self->ctx->stash->{view_blocks}{$name};
+  $self->ctx->stash->{view_blocks}{$name} = $value;
   return;
 }
 
+# wrap a content block
 sub content_around {
-  my ($self, $name, $value) = @_;
-  Module::Runtime::use_module($self->_content_exception_class)
-    ->throw(content_name=>$name, content_msg=>'Content block doesnt exist') unless $self->_content_exists($name);
-  $self->ctx->stash->{view_blocks}{$name} = $self->render_content_value($value, $self->ctx->stash->{view_blocks}{$name});
+  my ($self, $name, $wrapper) = @_;
+  $self->throw_content_block_error($name, "Content must be a coderef")
+    unless ref($wrapper)||'' eq 'CODE';
+  $self->throw_content_block_error($name, "Can't wrap  content block '$name', it's not defined.")
+    unless exists $self->ctx->stash->{view_blocks}{$name};
+  my $existing = $self->ctx->stash->{view_blocks}{$name};
+  $self->ctx->stash->{view_blocks}{$name} = sub { $wrapper->($existing, @_) };
   return;
+}
+
+# Prepend to a content block (must have same args as orginal block)
+sub content_prepend {
+  my ($self, $name, $proto) = @_;
+  my $value = ref($proto)||'' eq 'CODE' ? $proto : sub { $proto };
+  $self->throw_content_block_error($name, "Can't prepend to content block '$name', it's not defined.")
+    unless exists $self->ctx->stash->{view_blocks}{$name};
+  my $existing = $self->ctx->stash->{view_blocks}{$name};
+  $self->ctx->stash->{view_blocks}{$name} = sub { return $self->flatten_rendered_for_content_blocks($value->(@_), $existing->(@_)) };
+  return;
+}
+
+# Append to a content block (must have same args as orginal block)
+sub content_append {
+  my ($self, $name, $proto) = @_;
+  my $value = ref($proto)||'' eq 'CODE' ? $proto : sub { $proto };
+  $self->throw_content_block_error($name, "Can't append to content block '$name', it's not defined.")
+    unless exists $self->ctx->stash->{view_blocks}{$name};
+  my $existing = $self->ctx->stash->{view_blocks}{$name};
+  $self->ctx->stash->{view_blocks}{$name} = sub { return $self->flatten_rendered_for_content_blocks($existing->(@_), $value->(@_)) };
+  return;
+}
+
+sub throw_content_block_error {
+  my ($self, $name, $msg) = @_;
+  Module::Runtime::use_module($self->_content_exception_class)
+    ->throw(content_name=>$name, content_msg=>$msg);
 }
 
 sub _content_exception_class { return 'Catalyst::View::BasePerRequest::Exception::ContentBlockError' }
@@ -603,19 +629,29 @@ wish to separate template / text from data.  Example:
     __PACKAGE__->config(content_type=>'text/html', status_codes=>[200]);
     __PACKAGE__->meta->make_immutable();
 
+
+=head2 content_for
+
+    $self->content_for($name, $string);
+    $self->content_for($name, $\&callback);
+
+Sets a named content block or throws an exception if the content block already exists.
+
+    $self->content_for('hello', sub {
+      my ($name) = @_;
+      return "Hello $name!";
+    });
+
 =head2 content
 
 Examples:
 
-    $self->content($name);
-    $self->content($name, +{ default=>'No main content' });
+    $self->content($name, ?@args, ?\&default);
 
 Gets a content block string by '$name'.  If the block has not been defined returns either
-a zero length string or whatever you set the default key of the hashref options to.
+a zero length string or whatever you set the default code block to be. Examples:
 
-=head2 content_for
-
-Sets a named content block or throws an exception if the content block already exists.
+    $self->content('hello', 'John', sub { return "$name!" });
 
 =head2 content_append
 
@@ -630,7 +666,7 @@ Replaces a named content block or throws an exception if the content block doesn
 Wraps an existing content with new content.  Throws an exception if the named content block doesn't exist.
 
     $self->content_around('footer', sub {
-      my $footer = shift;
+      my $footer = $_[0]->();
       return "wrapped $footer end wrap";
     });
 

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.03
+    Version 1.04
 
 SYNOPSIS
 
@@ -168,6 +168,10 @@ BUGS
     https://rt.cpan.org/NoAuth/ReportBug.html?Queue=String-Random-Regexp-regxstring.
     I will be notified, and then you'll automatically be notified of
     progress on your bug as I make changes.
+
+SEE ALSO
+
+    Mock::Data::Regex which is implemented in Pure-Perl.
 
 SUPPORT
 

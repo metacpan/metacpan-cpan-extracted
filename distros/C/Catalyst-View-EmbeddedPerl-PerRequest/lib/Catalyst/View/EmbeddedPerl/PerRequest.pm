@@ -33,7 +33,7 @@ Moose::Util::MetaRole::apply_metaroles(
 
 extends 'Catalyst::View::BasePerRequest';
 
-our $VERSION = 0.001008;
+our $VERSION = 0.001010;
 eval $VERSION;
 
 # Args that get passed cleanly to Template::EmbeddedPerl
@@ -108,7 +108,6 @@ sub modify_temple_args {
   $temple_args{prepend} = $class->prepare_prepend_arg($app, $temple_args{prepend});
   $temple_args{sandbox_ns} ||= "${class}::EmbeddedPerl::SandBox";
   $temple_args{template_extension} = 'epl' unless $temple_args{template_extension};
-  $temple_args{use_cache} = 1;
   return %temple_args;
 }
 
@@ -119,7 +118,6 @@ sub prepare_prepend_arg {
 
 sub build_temple {
   my ($class, $app, $parent_views, %temple_args) = @_;
-
   my ($data, $path) = $class->find_template($app, $temple_args{template_extension});
   $temple_args{source} = $path;
 
@@ -128,13 +126,17 @@ sub build_temple {
 
   my @parent_compiled = ();
   foreach my $parent_class (@$parent_views) {
-    my $parent_view = $parent_class;
-    $parent_view =~ s/${app}::View:://g;
-    my $parent_factory = $app->view($parent_view);
-    my $doc = $parent_factory->merged_args->{_doc}[0];
-    push @parent_compiled, $doc;
+    my ($parent_template, $ppath) = $parent_class->find_template($app, $temple_args{template_extension});
+    my %parent_temple_args = (
+      %temple_args,
+      source => $ppath,
+      preamble => '',
+      sandbox_ns => "${parent_class}::EmbeddedPerl::SandBox",
+    );
+    my $parent_temple = Template::EmbeddedPerl->new(%parent_temple_args);
+    my $parent_compiled = $parent_temple->from_string($parent_template);   
+    push @parent_compiled, $parent_compiled;
   }
-
   return ($temple, [$compiled, @parent_compiled]);
 }
 
@@ -212,7 +214,6 @@ sub build_helpers {
     };
   }
 
-
   return %helpers;
 }
 
@@ -225,6 +226,7 @@ sub default_helpers {
     content_append => sub { my ($self, $c, @args) = @_; return $self->content_append(@args); },
     content_prepend => sub { my ($self, $c, @args) = @_; return $self->content_prepend(@args); },
     content_replace => sub { my ($self, $c, @args) = @_; return $self->content_replace(@args); },
+    content_around => sub { my ($self, $c, @args) = @_; return $self->content_around(@args); },
   );
 }
 
@@ -267,7 +269,7 @@ sub render_template {
   my $rendered_template = '';
   my @docs = @{$self->_doc};
   foreach my $doc (@docs) {
-    my $ns = $doc->{yat}->{sandbox_ns};  
+    my $ns = $doc->{yat}->{sandbox_ns}; 
     no strict 'refs';
     no warnings 'redefine';
     local *{"${ns}::__SELF"} = sub { $self };
@@ -315,7 +317,8 @@ sub view {
 # Rendered is always a string, never an array so no need to flatten
 around 'flatten_rendered' => sub {
   my ($orig, $self, @args) = @_;
-  return $args[0];
+  return $args[0] if scalar(@args) == 1;
+  return $self->safe_concat(@args);
 };
 
 __PACKAGE__->meta->make_immutable;
@@ -477,7 +480,7 @@ Used to capture blocks of template.  SEE:
 
 L<Catalyst::View::BasePerRequest/content>, L<Catalyst::View::BasePerRequest/content_for>,
 L<Catalyst::View::BasePerRequest/content_append>, L<Catalyst::View::BasePerRequest/content_prepend>,
-L<Catalyst::View::BasePerRequest/content_replace>.
+L<Catalyst::View::BasePerRequest/content_replace>, L<Catalyst::View::BasePerRequest/content_around>.
 
 =head2 Response Helpers
 
@@ -807,6 +810,10 @@ and keep your code DRY.
   # Other shared view features such as methods, attributes, etc.
 
   __PACKAGE__->meta->make_immutable;
+  __PACKAGE__->config(
+    prepend => 'use v5.40',
+    content_type=>'text/html; charset=UTF-8'
+  );
 
 In your view modules:
 
@@ -816,6 +823,28 @@ In your view modules:
   extends 'MyApp::View';
 
   __PACKAGE__->meta->make_immutable;
+
+=head2 Using 'tags' for HTML snippets in helpers
+
+Sometimes you want a helper that can construct safe HTML:
+
+  sub hello_name :Helper ($self, $name) {
+    my $t = $self->tags;
+    return $t->div({class=>"container"}, sub {
+      return $t->h1($self->text("hello ${name}!")),
+        $t->hr;
+     }),
+  }
+
+Used in a template like:
+
+  %= hello_name('John')
+
+Results in:
+
+  <div class='container'>Hello John!<div>
+
+See L<Valiant::HTML::Util::TagBuilder> whose methods are proxied by this class.
 
 =head1 SEE ALSO
 

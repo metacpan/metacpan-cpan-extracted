@@ -1,93 +1,85 @@
+=encoding utf8
+
 =head1 NAME
 
-PDK::Device::Hillstone - A Perl module for interacting with Hillstone devices
+PDK::Device::Hillstone - A module for interacting with Hillstone devices
 
 =head1 SYNOPSIS
 
-    use PDK::Device::Hillstone;
-    my $device = PDK::Device::Hillstone->new();
-    my $config = $device->getConfig();
+  use PDK::Device::Hillstone;
+
+  my $device = PDK::Device::Hillstone->new(
+    host     => '192.168.1.1',
+    username => 'admin',
+    password => 'hillstone_password'
+  );
+
+  # Log in to the device
+  $device->login();
+
+  # Execute commands
+  $device->execCommands(['show version', 'show interface']);
+
+  # Retrieve running configuration
+  my $config = $device->getConfig();
+
+  # FTP configuration backup (Note: This method currently returns getConfig result)
+  my $backup = $device->ftpConfig('ftp_server', 'hostname', 'ftp_username', 'ftp_password');
 
 =head1 DESCRIPTION
 
-This module is used to automate interactions with Hillstone devices using an interactive CLI session through the Expect module.
+This module provides functionality to interact with Hillstone devices, including executing commands and retrieving configurations. It extends the PDK::Device::Base role and is tailored for Hillstone-specific operations.
 
 =head1 ATTRIBUTES
 
-=head2 prompt
+=over 4
 
-The default prompt used for detecting Hillstone CLI output.
+=item B<prompt>
+
+The device's default prompt, defaults to '^.*?($$(?:M|B|F)$$)?[>#]\s*$'. This pattern is designed to handle various Hillstone device prompts.
+
+=back
 
 =head1 METHODS
 
-=head2 errCodes
-
-Returns a reference to an array of regular expressions representing possible error patterns in command execution. These patterns can be used to detect errors like incomplete commands or unrecognized keywords.
-
-    $device->errCodes();
-
-Returns:
-
-    [
-        qr/incomplete|ambiguous|unrecognized keyword|\^-----/,
-        qr/syntax error|missing argument|unknown command|^Error:/,
-    ]
-
-=head2 waitfor
-
-Waits for a specified or default prompt from the device and captures the output until that prompt appears.
-
-    $device->waitfor($prompt);
-
 =over 4
 
-=item * C<$prompt> - (Optional) A custom prompt to wait for. Defaults to the prompt attribute.
+=item B<errCodes>
+
+Returns a list of possible error patterns for checking errors during command execution. These include patterns for incomplete commands, ambiguous commands, unrecognized keywords, syntax errors, and other common errors.
+
+=item B<waitfor($prompt, $params)>
+
+Waits for a specific prompt match and handles device responses interactively.
+
+Parameters:
+  - $prompt: The prompt to match (optional)
+  - $params: A hash reference containing send command and other options (optional)
+    - send: The command to send
+    - continue: Whether to continue execution (default: false)
+    - cache: Whether to cache the output (default: true)
+
+Returns: The output of the command execution
+
+=item B<getConfig>
+
+Retrieves the running configuration of the device. It executes commands to set terminal width, disable screen length limitations, display the current configuration, and save the configuration.
+
+Returns: A hash reference containing a success flag and configuration content.
+
+=item B<ftpConfig($server, $hostname, $username, $password)>
+
+This method is currently a placeholder and returns the result of getConfig. It does not perform an actual FTP backup.
+
+Parameters:
+  - $server: FTP server address
+  - $hostname: Optional hostname
+  - $username: FTP username
+  - $password: FTP password
+
+Returns: The result of getConfig method.
 
 =back
-
-Returns:
-
-    The captured output from the device.
-
-=head2 getConfig
-
-Retrieves the current running configuration from the Hillstone device.
-
-    my $config = $device->getConfig();
-
-Returns:
-
-    A hash reference containing the configuration details or an error if the retrieval fails.
-
-    {
-        success => 1,
-        config  => $config_content,
-    }
-
-=head2 ftpConfig
-
-(BETA) Backup the configuration to an FTP server. This method is under development and not yet finalized for use.
-
-=over 4
-
-=item * C<$server>   - The FTP server address.
-
-=item * C<$hostname> - (Optional) Hostname for the backup file.
-
-=item * C<$username> - The FTP username.
-
-=item * C<$password> - The FTP password.
-
-=back
-
-Returns:
-
-    A hash reference with the success status and details of the operation.
-
-    {
-        success => 1,
-        config  => $ftp_result,
-    }
 
 =head1 AUTHOR
 
@@ -100,5 +92,9 @@ Copyright (C) 2024 WENWU YAN
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
+
+=head1 SEE ALSO
+
+L<PDK::Device::Base>, L<Moose>, L<Expect>
 
 =cut

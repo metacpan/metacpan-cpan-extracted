@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2024 -- leonerd@leonerd.org.uk
 
-package Net::Async::HTTP 0.49;
+package Net::Async::HTTP 0.50;
 
 use v5.14;
 use warnings;
@@ -54,6 +54,8 @@ struct Ready => [qw( future connecting )];
 C<Net::Async::HTTP> - use HTTP with C<IO::Async>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Future::AsyncAwait;
 
@@ -688,7 +690,7 @@ operations on it. This code is expected to return a C<Future>; only once that
 has completed will the request cycle continue. If it fails, that failure is
 propagated to the caller.
 
-   $f = $on_ready->( $connection )
+   $f = $on_ready->( $connection );
 
 =item on_redirect => CODE
 
@@ -696,7 +698,7 @@ Optional. A callback that is invoked if a redirect response is received,
 before the new location is fetched. It will be passed the response and the new
 URL.
 
-   $on_redirect->( $response, $location )
+   $on_redirect->( $response, $location );
 
 =item on_body_write => CODE
 
@@ -705,7 +707,7 @@ body content. This may be used to implement an upload progress indicator or
 similar. It will be passed the total number of bytes of body content written
 so far (i.e. excluding bytes consumed in the header).
 
-   $on_body_write->( $written )
+   $on_body_write->( $written );
 
 =item max_redirects => INT
 
@@ -722,13 +724,13 @@ request. If not specified, will use the configured defaults.
 On a timeout, the returned future will fail with either C<timeout> or
 C<stall_timeout> as the operation name.
 
-   ( $message, "timeout" ) = $f->failure
+   ( $message, "timeout" ) = $f->failure;
 
 =back
 
 =head2 do_request (void)
 
-   $http->do_request( %args )
+   $http->do_request( %args );
 
 When not returning a future, the following extra arguments are used as
 callbacks instead:
@@ -741,7 +743,7 @@ A callback that is invoked when a response to this request has been received.
 It will be passed an L<HTTP::Response> object containing the response the
 server sent.
 
-   $on_response->( $response )
+   $on_response->( $response );
 
 =item on_header => CODE
 
@@ -751,23 +753,23 @@ handling chunks of body content. This C<CODE> reference will be invoked with
 no arguments once the end of the request has been reached, and whatever it
 returns will be used as the result of the returned C<Future>, if there is one.
 
-   $on_body_chunk = $on_header->( $header )
+   $on_body_chunk = $on_header->( $header );
 
-      $on_body_chunk->( $data )
-      $response = $on_body_chunk->()
+      $on_body_chunk->( $data );
+      $response = $on_body_chunk->();
 
 =item on_error => CODE
 
 A callback that is invoked if an error occurs while trying to send the request
 or obtain the response. It will be passed an error message.
 
-   $on_error->( $message )
+   $on_error->( $message );
 
 If this is invoked because of a received C<4xx> or C<5xx> error code in an
 HTTP response, it will be invoked with the response and request objects as
 well.
 
-   $on_error->( $message, $response, $request )
+   $on_error->( $message, $response, $request );
 
 =back
 
@@ -1205,7 +1207,7 @@ add extra functionallity.
 
 =head2 prepare_request
 
-   $http->prepare_request( $request )
+   $http->prepare_request( $request );
 
 Called just before the C<HTTP::Request> object is sent to the server.
 
@@ -1233,7 +1235,7 @@ sub prepare_request
 
 =head2 process_response
 
-   $http->process_response( $response )
+   $http->process_response( $response );
 
 Called after a non-redirect C<HTTP::Response> has been received from a server.
 The originating request will be set in the object.

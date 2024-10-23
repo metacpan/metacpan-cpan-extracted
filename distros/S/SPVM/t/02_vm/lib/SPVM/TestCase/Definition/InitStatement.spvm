@@ -1,0 +1,45 @@
+class TestCase::Definition::InitStatement {
+  use TestCase::Definition::InitStatement::Data;
+  
+  our $FOO : int;
+  
+  our $BAR : int;
+  
+  our $BAZ : int;
+  
+  INIT {
+    # Call a default INIT block
+    Int->INIT;
+    
+    $FOO = 1;
+    
+    $BAZ = 1;
+  }
+  
+  INIT {
+    $BAR = 1;
+    $BAZ = 2;
+  }
+  
+  # Array store undef
+  static method test : int () {
+    
+    unless ($FOO == 1) {
+      return 0;
+    }
+    
+    unless ($BAR == 1) {
+      return 0;
+    }
+    
+    unless ($BAZ == 2) {
+      return 0;
+    }
+    
+    unless ($TestCase::Definition::InitStatement::Data::FOO == 1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+}

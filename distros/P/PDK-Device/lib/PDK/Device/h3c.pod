@@ -1,4 +1,4 @@
-=pod
+=encoding utf8
 
 =head1 NAME
 
@@ -24,17 +24,14 @@ PDK::Device::H3C - A module for interacting with H3C devices
   $device->runCommands(['display version']);
 
   # Retrieve running configuration
-  my $config = $device->getConfig('hostname');
+  my $config = $device->getConfig();
 
   # FTP configuration backup
   my $backup = $device->ftpConfig('hostname', 'ftp_server', 'ftp_username', 'ftp_password');
 
-  # Write content to a file (filename is optional, defaults to device IP address, e.g., 192.168.1.1.txt)
-  $device->write_file('content', 'filename');
-
 =head1 DESCRIPTION
 
-This module provides functionality to interact with H3C devices, including executing commands, retrieving configurations, and backing up configurations via FTP.
+This module provides functionality to interact with H3C devices, including executing commands, retrieving configurations, and backing up configurations via FTP. It extends the PDK::Device::Base role and is tailored for H3C-specific operations.
 
 =head1 ATTRIBUTES
 
@@ -42,15 +39,7 @@ This module provides functionality to interact with H3C devices, including execu
 
 =item B<prompt>
 
-The device's default prompt, defaults to '\S+[#>]\s*\z'.
-
-=item B<enPrompt>
-
-Enable mode prompt, defaults to '\S+[>]\s*\z'.
-
-=item B<enCommand>
-
-Command to switch to enable mode, defaults to 'system-view'.
+The device's default prompt, defaults to '^\s*(\x00)?[<\[].*?[>\]]\s*$'. This pattern is designed to handle older H3C devices that may have '^@' in their prompts.
 
 =back
 
@@ -60,40 +49,45 @@ Command to switch to enable mode, defaults to 'system-view'.
 
 =item B<errCodes>
 
-Returns a list of possible error codes for checking errors during command execution.
+Returns a list of possible error patterns for checking errors during command execution. These include patterns for ambiguous commands, incomplete commands, unrecognized commands, and other common errors.
 
-=item B<waitfor>
+=item B<waitfor($prompt, $params)>
 
-Waits for a specific prompt match, automatically executing the script interactively.
+Waits for a specific prompt match and handles device responses interactively.
 
-=item B<write_file>
+Parameters:
+  - $prompt: The prompt to match (optional)
+  - $params: A hash reference containing send command and other options (optional)
+    - send: The command to send
+    - continue: Whether to continue execution (default: false)
+    - cache: Whether to cache the output (default: true)
 
-Writes configuration information to a text file.
+Returns: The output of the command execution
 
-=item B<runCommands>
+=item B<runCommands($commands)>
 
-Executes a series of commands and configures the sending mode.
+Executes a series of commands in configuration mode. It automatically adds 'system-view' at the beginning if not present, and 'save force' at the end if not already included.
 
-  Parameters:
-  - $commands: List of commands (array reference).
+Parameters:
+  - $commands: An array reference containing the list of commands
 
 =item B<getConfig>
 
-Retrieves the running configuration of the device.
+Retrieves the running configuration of the device. It executes commands to disable screen length limitations, display the current configuration, and force a configuration save.
 
-  Returns: A hash reference containing a success flag and configuration content.
+Returns: A hash reference containing a success flag and configuration content.
 
-=item B<ftpConfig>
+=item B<ftpConfig($hostname, $server, $username, $password)>
 
-Backs up the running configuration via FTP.
+Backs up the running configuration to an FTP server.
 
-  Parameters:
-  - $hostname: Optional hostname.
-  - $server: FTP server address.
-  - $username: FTP username.
-  - $password: FTP password.
+Parameters:
+  - $hostname: Optional hostname
+  - $server: FTP server address (if not provided, uses the PDK_FTP_SERVER environment variable)
+  - $username: FTP username (if not provided, uses the PDK_FTP_USERNAME environment variable)
+  - $password: FTP password (if not provided, uses the PDK_FTP_PASSWORD environment variable)
 
-  Returns: A hash reference indicating the result of executing the command.
+Returns: A hash reference containing a success flag and the FTP operation result.
 
 =back
 
@@ -111,6 +105,6 @@ by the Free Software Foundation; or the Artistic License.
 
 =head1 SEE ALSO
 
-L<Moose>, L<Expect>
+L<PDK::Device::Base>, L<Moose>, L<Expect>
 
 =cut

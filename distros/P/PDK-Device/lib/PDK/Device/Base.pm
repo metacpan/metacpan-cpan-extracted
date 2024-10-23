@@ -9,9 +9,7 @@ use namespace::autoclean;
 
 with 'PDK::Device::Concern::Dumper';
 
-requires 'errCodes';
-requires 'waitfor';
-requires 'getConfig';
+requires qw(errCodes waitfor getConfig);
 
 has host => (is => 'ro', isa => 'Str', required => 1,);
 
@@ -252,7 +250,6 @@ sub enable {
   $self->dump("尝试切换到特权模式");
 
   $self->send("$enCommand\n");
-
   my @ret = $exp->expect(
     15,
     [
@@ -343,9 +340,11 @@ sub execCommands {
     return {success => 0, failCommand => join(", ", @{$commands}), snapshot => $snapshot, reason => $reason};
   }
 
+  my $errors = $self->errCodes();
   my $result
     = $self->{exp} ? join('', grep defined $self->{exp}->before, $self->{exp}->match, $self->{exp}->after) : '';
-  my $errors = $self->errCodes();
+  $result =~ s/\x0D//g;
+  $result =~ s/\x00//g;
 
   $self->dump("执行[execCommands/通过前置检查]，正式进入配置下发阶段");
   for my $cmd (@{$commands}) {
@@ -370,7 +369,7 @@ sub execCommands {
     if ($self->{catchError}) {
       for my $error (@{$errors}) {
         if ($buff =~ /$error/i) {
-          my $snapshot = "执行[execCommands/异常码字典拦截]，捕捉到异常: \n" . $result . $buff;
+          my $snapshot = "执行[execCommands/异常码字典拦截]，捕捉到异常: " . $result . $buff;
           return {success => 0, failCommand => $cmd, reason => $error, snapshot => $snapshot};
         }
       }
@@ -422,7 +421,6 @@ sub _debug {
   make_path($workdir) unless -d $workdir;
 
   my $exp = $self->{exp};
-
   if ($level == 2) {
     $self->dump("当前 debug 级别将打开日志记录功能，并同步脚本执行回显到控制台");
     $exp->log_stdout(1);

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use utf8; # allow for utf8 in code (we have regex strings in utf8)
 

@@ -16,11 +16,11 @@ sub render {
   my ($self, $c) = @_;
   return $c->view(Layout => title=>'Hello', sub {
     my $layout = shift;
-    $self->content_for('css', "<style>...</style>");
+    $self->content_for('css', sub {"<style>...</style>"});
     $self->content_prepend('css', '<!-- 111 -->');
     $self->content_append('css', '<!-- 222 -->');
     $self->content_around('css', sub {
-      my $css = shift;
+      my $css = $_[0]->();
       return "wrapped $css end wrap";
     });
 

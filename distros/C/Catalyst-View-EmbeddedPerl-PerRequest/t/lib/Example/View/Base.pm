@@ -3,7 +3,7 @@ package Example::View::Base;
 use Moose;
 use MooseX::MethodAttributes;
 
-extends 'Catalyst::View::EmbeddedPerl::PerRequest';
+extends 'Example::View::Empty';
 
 has aaa => (is => 'ro', export=>1);
 
@@ -25,7 +25,6 @@ sub helpers {
 
 __PACKAGE__->meta->make_immutable;
 __PACKAGE__->config(
-  auto_escape => 1,
   helpers => {
     test_name3 => sub { 'joe3' }
   }
@@ -41,7 +40,7 @@ __DATA__
     </style>
     % })\
   </head>
-  <body>
+  <body><%= ccc() %>
     <%= $self->title %>\
     <%= $content =%>
   </body>

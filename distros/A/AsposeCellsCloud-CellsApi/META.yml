@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 24.9
+    version: 24.10
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Role:
@@ -665,6 +665,12 @@ provides:
     file: lib/AsposeCellsCloud/Object/AddTextOptions.pm
   AsposeCellsCloud::Object::BaseOperateOptions:
     file: lib/AsposeCellsCloud/Object/BaseOperateOptions.pm
+  AsposeCellsCloud::Object::RemoveCharactersByCharacter:
+    file: lib/AsposeCellsCloud/Object/RemoveCharactersByCharacter.pm
+  AsposeCellsCloud::Object::RemoveCharactersByPosition:
+    file: lib/AsposeCellsCloud/Object/RemoveCharactersByPosition.pm
+  AsposeCellsCloud::Object::RemoveCharactersOptions:
+    file: lib/AsposeCellsCloud/Object/RemoveCharactersOptions.pm
   AsposeCellsCloud::Object::ScopeItem:
     file: lib/AsposeCellsCloud/Object/ScopeItem.pm
   AsposeCellsCloud::Object::ScopeOptions:
@@ -1371,6 +1377,8 @@ provides:
     file: lib/AsposeCellsCloud/Request/PostTrimContentRequest.pm
   AsposeCellsCloud::Request::PostUpdateWordCaseRequest:
     file: lib/AsposeCellsCloud/Request/PostUpdateWordCaseRequest.pm
+  AsposeCellsCloud::Request::PostRemoveCharactersRequest:
+    file: lib/AsposeCellsCloud/Request/PostRemoveCharactersRequest.pm
   AsposeCellsCloud::Request::GetWorkbookDefaultStyleRequest:
     file: lib/AsposeCellsCloud/Request/GetWorkbookDefaultStyleRequest.pm
   AsposeCellsCloud::Request::GetWorkbookTextItemsRequest:
@@ -1562,5 +1570,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 24.9
+version: 24.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

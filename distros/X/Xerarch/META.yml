@@ -1,5 +1,5 @@
 ---
-abstract: 'The great new Xerarch!'
+abstract: Xerarch
 author:
   - 'LNATION <email@lnation.org>'
 build_requires:
@@ -19,7 +19,7 @@ no_index:
     - t
     - inc
 requires:
-  meta: '0'
+  meta: '0.008'
   perl: '5.006'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

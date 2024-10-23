@@ -7,7 +7,7 @@ use Perl::Critic::Utils;
 
 use parent qw{ Perl::Critic::PolicyParameter::Behavior };
 
-our $VERSION = '1.154';
+our $VERSION = '1.156';
 
 #-----------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ sub _parse {
 #-----------------------------------------------------------------------------
 
 sub initialize_parameter {
-    my ($self, $parameter, $specification) = @_;
+    my (undef, $parameter, undef) = @_;
 
     $parameter->_set_parser(\&_parse);
 

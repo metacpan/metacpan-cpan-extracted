@@ -1,8 +1,8 @@
-=pod
+=encoding utf8
 
 =head1 NAME
 
-PDK::Device::Base - Provides basic interaction functionality with network devices, including login, sending commands, and error handling.
+PDK::Device::Base - A Moose role providing basic interaction functionality with network devices
 
 =head1 SYNOPSIS
 
@@ -39,11 +39,11 @@ PDK::Device::Base - Provides basic interaction functionality with network device
 
 =head1 DESCRIPTION
 
-PDK::Device::Base provides basic interaction functionality with network devices, including login, sending commands, and error handling.
+PDK::Device::Base is a Moose role that provides basic interaction functionality with network devices. It includes methods for logging in, sending commands, error handling, and managing device connections. This module is designed to be used as a base for specific device type implementations.
 
 =head1 ENVIRONMENT VARIABLES
 
-PDK-Device supports the following environment variables:
+PDK::Device::Base supports the following environment variables:
 
 =over 4
 
@@ -177,46 +177,6 @@ Debug switch, defaults to 0 (disabled).
 =item login
 
 Attempts to log in to the device. If already logged in, it returns a success status directly.
-
-=over 4
-
-=item Exception reconnection scenarios
-
-1. **Network connection lost**:
-   - When the device loses network connection, login will fail. This will trigger reconnection logic.
-   - If SSH (preferred) connection fails (port unreachable but machine online), it will attempt to log in via Telnet.
-   - Automatic fixing of SSH protocol compatibility issues.
-   - Automatic updating of SSH keys, such as when the machine is replaced and the key corruption warning appears.
-
-2. **Device unresponsive**:
-   - If the device does not respond during the login process (timeout), it will attempt to reconnect and log in.
-
-3. **Authentication failure**:
-   - If login fails due to incorrect username, password, or enable password, the system will allow a certain number of retries.
-
-=item Basic implementation logic
-
-1. **Check current status**:
-   - If already logged in, return a success status to avoid unnecessary retries.
-
-2. **Send login command**:
-   - Send a login request to the device using the configured credentials (username and password).
-
-3. **Capture exceptions**:
-   - The login request may fail due to network issues, timeouts, or authentication errors. These exceptions will be captured and logged.
-
-4. **Reconnection mechanism**:
-   - After capturing an exception, the system will enter reconnection logic. Based on the configured retry count, it will wait a certain amount of time before retrying login.
-   - Each retry will attempt to reconnect to the device and send a login request.
-
-5. **Limit retry count**:
-   - To avoid long retry loops, the system will limit the maximum retry count (e.g., 5 times), and return a failure status after exceeding this count.
-
-6. **Return status**:
-   - If login is successful, return `{ success => 1 }`.
-   - If all retries fail, return `{ success => 0, reason => 'Error reason' }`, and log detailed retry information.
-
-=back
 
 =item connect($args)
 

@@ -7,7 +7,7 @@
 */
 
 /*
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 */
 
 #ifdef __cplusplus
@@ -40,13 +40,16 @@ void MyFree( void *p ) {
     free( p );
 }
 
+/* NOTE: the ... in the function signature below
+          denotes optional; parameters: int debug
+*/
+
 MODULE = String::Random::Regexp::regxstring		PACKAGE = String::Random::Regexp::regxstring
 
 PROTOTYPES: ENABLE
 
 AV *
-generate_random_strings_xs(SV *regx_SV, int N, ... /*optional params: int debug*/)
-
+generate_random_strings_xs(SV *regx_SV, int N, ...)
     PROTOTYPE: @
 
     PREINIT:

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use meta;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub import {
 	my $caller = caller();
@@ -51,11 +51,11 @@ sub import {
 
 =head1 NAME
 
-Xerarch - The great new Xerarch!
+Xerarch - Xerarch
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -69,7 +69,7 @@ Version 0.01
 
 	1;
 
-    	my $pkg = My::Package->new();
+	my $pkg = My::Package->new();
 
 	$pkg->xerarch();
 

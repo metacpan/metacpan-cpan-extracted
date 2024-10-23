@@ -4,7 +4,7 @@ String::Random::Regexp::regxstring - Generate random strings from a regular expr
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # SYNOPSIS
 
@@ -158,6 +158,10 @@ regular expressions like `a|b|c|d`. They must appear equally often.
 Please report any bugs or feature requests to `bug-string-random-regexp-regxstring at rt.cpan.org`, or through
 the web interface at [https://rt.cpan.org/NoAuth/ReportBug.html?Queue=String-Random-Regexp-regxstring](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=String-Random-Regexp-regxstring).  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
+
+# SEE ALSO
+
+[Mock::Data::Regex](https://metacpan.org/pod/Mock%3A%3AData%3A%3ARegex) which is implemented in Pure-Perl.
 
 # SUPPORT
 

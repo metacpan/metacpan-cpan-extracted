@@ -6,11 +6,11 @@ use File::Basename;
 use File::Spec::Functions qw(splitdir catdir curdir catfile abs2rel);
 use Carp qw(croak carp confess);
 use Devel::InnerPackage;
-use vars qw($VERSION $MR);
+use Scalar::Util qw( blessed );
 
 use if $] > 5.017, 'deprecate';
 
-$VERSION = '5.2';
+our $VERSION = '5.2';
 
 BEGIN {
     eval {  require Module::Runtime };
@@ -35,7 +35,7 @@ sub new {
 
 }
 
-### Eugggh, this code smells 
+### Eugggh, this code smells
 ### This is what happens when you keep adding patches
 ### *sigh*
 
@@ -59,13 +59,22 @@ sub plugins {
     }
 
     # default search path is '<Module>::<Name>::Plugin'
-    $self->{'search_path'} ||= ["${pkg}::Plugin"]; 
+    $self->{'search_path'} ||= ["${pkg}::Plugin"];
 
     # default error handler
     $self->{'on_require_error'} ||= sub { my ($plugin, $err) = @_; carp "Couldn't require $plugin : $err"; return 0 };
     $self->{'on_instantiate_error'} ||= sub { my ($plugin, $err) = @_; carp "Couldn't instantiate $plugin: $err"; return 0 };
 
+    # before and after instantiation hooks
+    $self->{'before_instantiate'} ||= sub { 1 };
+    $self->{'after_instantiate'}  ||= sub { return $_[1] };
+
     # default whether to follow symlinks
+    # because the default behavior is changed in the Perl-CORE module File::Find VERSION >= '1.39',
+    # in lower versions of File::Find, 'follow_symlinks' is (independent from the callers setting of 
+    # 'follow_symlinks') hardcoded set to 0 on Windows so we force File::Find to fall back to the old
+    # behavior, if not otherwise told 
+    $self->{'follow_symlinks'} = 0 if ($File::Find::VERSION >= '1.39' && $^O eq 'MSWin32' && ! exists $self->{'follow_symlinks'} );
     $self->{'follow_symlinks'} = 1 unless exists $self->{'follow_symlinks'};
 
     # check to see if we're running under test
@@ -82,7 +91,7 @@ sub plugins {
     my @plugins = $self->search_directories(@SEARCHDIR);
     push(@plugins, $self->handle_inc_hooks($_, @SEARCHDIR)) for @{$self->{'search_path'}};
     push(@plugins, $self->handle_innerpackages($_)) for @{$self->{'search_path'}};
-    
+
     # return blank unless we've found anything
     return () unless @plugins;
 
@@ -100,14 +109,20 @@ sub plugins {
         my @objs   = ();
         foreach my $package (sort keys %plugins) {
             next unless $package->can($method);
-            my $obj = eval { $package->$method(@_) };
+            $self->{'before_instantiate'}->($package)
+                or next;
+            my $obj = eval { $package->$method(@_) }; # We dont actually care what ->$method() returns
             $self->{'on_instantiate_error'}->($package, $@) if $@;
-            push @objs, $obj if $obj;           
+            if ($obj) {
+                $obj = $self->{'after_instantiate'}->($package,$obj)
+                    or next; # Again, we dont actually care if we get a blessed reference or not
+                push @objs, $obj;
+            }
         }
         return @objs;
-    } else { 
+    } else {
         # no? just return the names
-        my @objs= sort keys %plugins;
+        my @objs = sort keys %plugins;
         return @objs;
     }
 }
@@ -115,8 +130,8 @@ sub plugins {
 sub _setup_exceptions {
     my $self = shift;
 
-    my %only;   
-    my %except; 
+    my %only;
+    my %except;
     my $only;
     my $except;
 
@@ -129,7 +144,7 @@ sub _setup_exceptions {
             $only{$self->{'only'}} = 1;
         }
     }
-        
+
 
     if (defined $self->{'except'}) {
         if (ref($self->{'except'}) eq 'ARRAY') {
@@ -144,7 +159,7 @@ sub _setup_exceptions {
     $self->{_exceptions}->{only}        = $only;
     $self->{_exceptions}->{except_hash} = \%except;
     $self->{_exceptions}->{except}      = $except;
-        
+
 }
 
 sub _is_legit {
@@ -161,9 +176,11 @@ sub _is_legit {
 
     return 0 if     (keys %except &&  $except{$plugin}   );
     return 0 if     (defined $except &&  $plugin =~ m!$except! );
-    
+
     return 0 if     defined $self->{max_depth} && $depth>$self->{max_depth};
     return 0 if     defined $self->{min_depth} && $depth<$self->{min_depth};
+
+    return 0 if     $plugin =~ /(^|::).AppleDouble/;
 
     return 1;
 }
@@ -199,10 +216,10 @@ sub search_paths {
 
         my @files = $self->find_files($sp);
 
-        # foreach one we've found 
+        # foreach one we've found
         foreach my $file (@files) {
             # untaint the file; accept .pm only
-            next unless ($file) = ($file =~ /(.*$file_regex)$/); 
+            next unless ($file) = ($file =~ /(.*$file_regex)$/);
             # parse the file to get the name
             my ($name, $directory, $suffix) = fileparse($file, $file_regex);
 
@@ -237,10 +254,10 @@ sub search_paths {
             my @dirs = ();
             if ($directory) {
                 ($directory) = ($directory =~ /(.*)/);
-                @dirs = grep(length($_), splitdir($directory)) 
+                @dirs = grep(length($_), splitdir($directory))
                     unless $directory eq curdir();
                 for my $d (reverse @dirs) {
-                    my $pkg_dir = pop @pkg_dirs; 
+                    my $pkg_dir = pop @pkg_dirs;
                     last unless defined $pkg_dir;
                     $d =~ s/\Q$pkg_dir\E/$pkg_dir/i;  # Correct case
                 }
@@ -274,7 +291,7 @@ sub _is_editor_junk {
     # saved.
     return 1 if $name =~ /^\.#/;
     # Vim can leave these files behind if it crashes.
-    return 1 if $name =~ /\.sw[po]$/;
+    return 1 if $name =~ /^[._].*\.s[a-w][a-z]$/;
 
     return 0;
 }
@@ -284,12 +301,12 @@ sub handle_finding_plugin {
     my $plugin  = shift;
     my $plugins = shift;
     my $no_req  = shift || 0;
-    
+
     return unless $self->_is_legit($plugin);
     unless (defined $self->{'instantiate'} || $self->{'require'}) {
         push @$plugins, $plugin;
         return;
-    } 
+    }
 
     $self->{before_require}->($plugin) || return if defined $self->{before_require};
     unless ($no_req) {
@@ -299,7 +316,7 @@ sub handle_finding_plugin {
         $@      = $tmp;
         if ($err) {
             if (defined $self->{on_require_error}) {
-                $self->{on_require_error}->($plugin, $err) || return; 
+                $self->{on_require_error}->($plugin, $err) || return;
             } else {
                 return;
             }
@@ -321,9 +338,9 @@ sub find_files {
     my @files = ();
     { # for the benefit of perl 5.6.1's Find, localize topic
         local $_;
-        File::Find::find( { no_chdir => 1, 
-                            follow   => $self->{'follow_symlinks'}, 
-                            wanted   => sub { 
+        File::Find::find( { no_chdir => 1,
+                            follow   => $self->{'follow_symlinks'},
+                            wanted   => sub {
                              # Inlined from File::Find::Rule C< name => '*.pm' >
                              return unless $File::Find::name =~ /$file_regex/;
                              (my $path = $File::Find::name) =~ s#^\\./##;
@@ -343,7 +360,7 @@ sub handle_inc_hooks {
 
     my @plugins;
     for my $dir ( @SEARCHDIR ) {
-        next unless ref $dir && eval { $dir->can( 'files' ) };
+        next unless blessed( $dir ) && $dir->can( 'files' );
 
         foreach my $plugin ( $dir->files ) {
             $plugin =~ s/\.pm$//;
@@ -384,18 +401,18 @@ Simple use Module::Pluggable -
 
     package MyClass;
     use Module::Pluggable::Object;
-    
+
     my $finder = Module::Pluggable::Object->new(%opts);
     print "My plugins are: ".join(", ", $finder->plugins)."\n";
 
 =head1 DESCRIPTION
 
-Provides a simple but, hopefully, extensible way of having 'plugins' for 
+Provides a simple but, hopefully, extensible way of having 'plugins' for
 your module. Obviously this isn't going to be the be all and end all of
 solutions but it works for me.
 
-Essentially all it does is export a method into your namespace that 
-looks through a search path for .pm files and turn those into class names. 
+Essentially all it does is export a method into your namespace that
+looks through a search path for .pm files and turn those into class names.
 
 Optionally it instantiates those classes for you.
 
@@ -425,5 +442,5 @@ None known.
 
 L<Module::Pluggable>
 
-=cut 
+=cut
 

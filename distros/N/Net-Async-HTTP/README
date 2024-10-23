@@ -394,7 +394,7 @@ METHODS
       cycle continue. If it fails, that failure is propagated to the
       caller.
 
-         $f = $on_ready->( $connection )
+         $f = $on_ready->( $connection );
 
     on_redirect => CODE
 
@@ -402,7 +402,7 @@ METHODS
       received, before the new location is fetched. It will be passed the
       response and the new URL.
 
-         $on_redirect->( $response, $location )
+         $on_redirect->( $response, $location );
 
     on_body_write => CODE
 
@@ -412,7 +412,7 @@ METHODS
       body content written so far (i.e. excluding bytes consumed in the
       header).
 
-         $on_body_write->( $written )
+         $on_body_write->( $written );
 
     max_redirects => INT
 
@@ -429,11 +429,11 @@ METHODS
       On a timeout, the returned future will fail with either timeout or
       stall_timeout as the operation name.
 
-         ( $message, "timeout" ) = $f->failure
+         ( $message, "timeout" ) = $f->failure;
 
  do_request (void)
 
-       $http->do_request( %args )
+       $http->do_request( %args );
 
     When not returning a future, the following extra arguments are used as
     callbacks instead:
@@ -444,7 +444,7 @@ METHODS
       received. It will be passed an HTTP::Response object containing the
       response the server sent.
 
-         $on_response->( $response )
+         $on_response->( $response );
 
     on_header => CODE
 
@@ -455,10 +455,10 @@ METHODS
       request has been reached, and whatever it returns will be used as the
       result of the returned Future, if there is one.
 
-         $on_body_chunk = $on_header->( $header )
+         $on_body_chunk = $on_header->( $header );
       
-            $on_body_chunk->( $data )
-            $response = $on_body_chunk->()
+            $on_body_chunk->( $data );
+            $response = $on_body_chunk->();
 
     on_error => CODE
 
@@ -466,13 +466,13 @@ METHODS
       the request or obtain the response. It will be passed an error
       message.
 
-         $on_error->( $message )
+         $on_error->( $message );
 
       If this is invoked because of a received 4xx or 5xx error code in an
       HTTP response, it will be invoked with the response and request
       objects as well.
 
-         $on_error->( $message, $response, $request )
+         $on_error->( $message, $response, $request );
 
  GET, HEAD, PUT, ...
 
@@ -509,13 +509,13 @@ SUBCLASS METHODS
 
  prepare_request
 
-       $http->prepare_request( $request )
+       $http->prepare_request( $request );
 
     Called just before the HTTP::Request object is sent to the server.
 
  process_response
 
-       $http->process_response( $response )
+       $http->process_response( $response );
 
     Called after a non-redirect HTTP::Response has been received from a
     server. The originating request will be set in the object.

@@ -1,4 +1,4 @@
-pod
+=encoding utf8
 
 =head1 NAME
 
@@ -36,17 +36,18 @@ Returns an array reference of regular expressions representing possible error pa
 
 =head2 waitfor
 
-  $device->waitfor( $prompt );
+  $device->waitfor( $prompt, $params );
 
-Waits for a specific prompt (or uses the default prompt) and captures the output from the device. This method handles pagination (C<--More-->) and confirmation prompts (e.g., "Are you sure to continue") and returns the captured output.
+Waits for a specific prompt (or uses the default prompt) and captures the output from the device. This method handles pagination (C<---- More ---->>) and confirmation prompts.
 
-=over 4
+Parameters:
+  - $prompt: Optional, specifies the prompt to wait for. If not provided, the default device prompt is used.
+  - $params: Optional hash reference with the following keys:
+    - send: Command to send
+    - continue: Whether to continue execution (default: false)
+    - cache: Whether to cache the output (default: true)
 
-=item *
-
-C<$prompt> - Optional, specifies the prompt to wait for. If not provided, the default device prompt is used.
-
-=back
+Returns: The captured output from the device.
 
 =head2 runCommands
 
@@ -54,19 +55,16 @@ C<$prompt> - Optional, specifies the prompt to wait for. If not provided, the de
 
 Executes a series of commands on the device. This method automatically ensures that configuration mode is entered, and the configuration is saved after the commands are executed.
 
-=over 4
-
-=item *
-
-C<\@commands> - An array reference containing the list of commands to execute.
-
-=back
+Parameters:
+  - \@commands: An array reference containing the list of commands to execute.
 
 =head2 getConfig
 
   $device->getConfig();
 
-Fetches the current configuration of the device. This method runs commands to display the current configuration and returns the output. The result is returned as a hash reference containing a success flag and the configuration content.
+Fetches the current configuration of the device. This method runs commands to display the current configuration and returns the output.
+
+Returns: A hash reference containing a success flag and the configuration content.
 
 =head2 ftpConfig
 
@@ -74,27 +72,13 @@ Fetches the current configuration of the device. This method runs commands to di
 
 Backs up the current device configuration to an FTP server. This method connects to the specified FTP server, uploads the device's configuration, and returns the result.
 
-=over 4
+Parameters:
+  - $hostname: Optional, specifies a custom hostname to use in the backup filename.
+  - $server: The FTP server address. If not provided, it is loaded from the environment variable C<PDK_FTP_SERVER>.
+  - $username: The FTP username. If not provided, it is loaded from the environment variable C<PDK_FTP_USERNAME>.
+  - $password: The FTP password. If not provided, it is loaded from the environment variable C<PDK_FTP_PASSWORD>.
 
-=item *
-
-C<$hostname> - Optional, specifies a custom hostname to use in the backup filename.
-
-=item *
-
-C<$server> - The FTP server address. If not provided, it is loaded from the environment variable C<PDK_FTP_SERVER>.
-
-=item *
-
-C<$username> - The FTP username. If not provided, it is loaded from the environment variable C<PDK_FTP_USERNAME>.
-
-=item *
-
-C<$password> - The FTP password. If not provided, it is loaded from the environment variable C<PDK_FTP_PASSWORD>.
-
-=back
-
-The method ensures that the FTP connection is established, uploads the configuration file, and verifies the successful completion of the transfer.
+Returns: A hash reference containing a success flag and the FTP operation result.
 
 =head1 ERROR HANDLING
 
@@ -113,22 +97,6 @@ Failed logins or incorrect credentials.
 =item *
 
 Unexpected disconnections during command execution.
-
-=back
-
-=head1 RETURN VALUES
-
-Methods typically return a hash reference with the following keys:
-
-=over 4
-
-=item *
-
-C<success> - A boolean indicating whether the method completed successfully.
-
-=item *
-
-C<config> - A string containing the captured output or configuration.
 
 =back
 
@@ -163,5 +131,9 @@ Copyright (C) 2024 WENWU YAN
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
+
+=head1 SEE ALSO
+
+L<PDK::Device::Base>, L<Moose>, L<Expect>
 
 =cut

@@ -7,7 +7,11 @@ examples/PUT.pl
 lib/Net/Async/HTTP.pm
 lib/Net/Async/HTTP/Connection.pm
 lib/Net/Async/HTTP/StallTimer.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01request.t
 t/02uri.t
@@ -52,7 +56,3 @@ t/99pod.t
 t/privkey.pem
 t/regen-certs.sh
 t/server.pem
-README
-LICENSE
-META.yml
-META.json

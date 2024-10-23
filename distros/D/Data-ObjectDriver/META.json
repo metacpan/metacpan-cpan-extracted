@@ -4,7 +4,7 @@
       "& COPYRIGHT"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.20",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -132,7 +132,7 @@
    "provides" : {
       "Data::ObjectDriver" : {
          "file" : "lib/Data/ObjectDriver.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       },
       "Data::ObjectDriver::BaseObject" : {
          "file" : "lib/Data/ObjectDriver/BaseObject.pm"
@@ -225,7 +225,7 @@
          "web" : "https://github.com/sixapart/data-objectdriver"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_authority" : "cpan:SIXAPART",
    "x_contributors" : [
       "Adam Thomason <athomason@sixapart.com>",
@@ -238,6 +238,7 @@
       "Garth Webb <gwebb@sixapart.com>",
       "Graham Blankenbaker <gblankenbaker@sixapart.com>",
       "Jonathan Steinert <jsteinert@sixapart.com>",
+      "Keita Jamadam Sugama <sugama@jamadam.com>",
       "Kenichi Ishigaki <ishigaki@cpan.org>",
       "Kevin Goess <kgoess@sixapart.com>",
       "Mark Paschal <mpaschal@sixapart.com>",
@@ -258,6 +259,6 @@
       "ambs <ambs@cpan.org>",
       "ziguzagu <ziguzagu@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

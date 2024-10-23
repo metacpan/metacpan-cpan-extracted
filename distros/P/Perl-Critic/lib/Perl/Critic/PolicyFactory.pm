@@ -29,7 +29,7 @@ use Perl::Critic::Utils::Constants qw{ :profile_strictness };
 
 use Exception::Class;   # this must come after "use P::C::Exception::*"
 
-our $VERSION = '1.154';
+our $VERSION = '1.156';
 
 #-----------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ my @site_policy_names;
 # called "test" mode.
 sub import {
 
-    my ( $class, %args ) = @_;
+    my ( undef, %args ) = @_;
     my $test_mode = $args{-test};
     my $extra_test_policies = $args{'-extra-test-policies'};
 

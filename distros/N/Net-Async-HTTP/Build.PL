@@ -27,7 +27,7 @@ my $build = Module::Build->new(
    recommends => {
       'Compress::Raw::Zlib' => '2.057', # Fails with Compress::Raw::Zlib 2.056 or before
    },
-   build_requires => {
+   test_requires => {
       'HTTP::Cookies' => 0,
       'IO::Async::Test' => 0,
       'Test::Metrics::Any' => 0,

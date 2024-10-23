@@ -14,7 +14,7 @@ sub render {
         <title>@{[ $self->title ]}</title>
         @{[ $self->content('css') ]}
       </head>
-      <body>$inner: @{[ $c->stash->{stash_var} ]}, @{[ $self->content('non', {default=>'nope'}) ]}</body>
+      <body>$inner: @{[ $c->stash->{stash_var} ]}, @{[ $self->content('non', sub {'nope'}) ]}</body>
     </html>";
 }
 

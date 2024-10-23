@@ -7,7 +7,7 @@ use 5.030000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Moose based OOB modules for network automation!",
+  "ABSTRACT" => "A Perl module for managing network device connections and operation",
   "AUTHOR" => "WENWU.YAN <968828\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "PDK::Device",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Data::Dumper" => 0,
     "Expect" => 0,
     "File::Path" => 0,
     "Moose" => 0,
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => ""
   }
@@ -39,6 +40,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Data::Dumper" => 0,
   "Expect" => 0,
   "File::Path" => 0,
   "Moose" => 0,

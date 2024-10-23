@@ -1,4 +1,4 @@
-=pod
+=encoding utf8
 
 =head1 NAME
 
@@ -49,21 +49,43 @@ Command to switch to enable mode (default: 'enable').
 
 Returns an array of regexes for common error patterns (e.g., "Permission denied", "Invalid command").
 
-=item waitfor
+=item waitfor($prompt, $params)
 
 Waits for the specified prompt and handles device responses interactively.
 
-=item runCommands
+Parameters:
+  $prompt - The prompt to match (optional)
+  $params - A hash reference containing send command and other options (optional)
+    send     - The command to send
+    continue - Whether to continue execution (default: false)
+    cache    - Whether to cache the output (default: true)
+
+Returns: The output of the command execution
+
+=item runCommands($commands)
 
 Executes a list of commands in configuration mode, automatically adding commands like "configure terminal" and "copy running-config startup-config" if needed.
+
+Parameters:
+  $commands - An array reference containing the list of commands
+
+Returns: None
 
 =item getConfig
 
 Retrieves the device's running configuration, excluding specific lines (e.g., "ntp clock-period").
 
-=item ftpConfig
+Returns: A hash reference containing a success flag and the configuration content
+
+=item ftpConfig($hostname, $server)
 
 Backs up the running configuration to an FTP server.
+
+Parameters:
+  $hostname - Optional hostname
+  $server   - FTP server address (if not provided, uses the PDK_FTP_SERVER environment variable)
+
+Returns: The result of the command execution
 
 =back
 

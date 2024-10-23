@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw( :severities split_nodes_on_comma hashify );
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.154';
+our $VERSION = '1.156';
 
 #-----------------------------------------------------------------------------
 
@@ -55,8 +55,18 @@ sub violates {
     my $num_args;
     if ($elem->prototype) {
         my $prototype = $elem->prototype();
-        $prototype =~ s/ \\ [[] .*? []] /*/smxg;    # Allow for grouping
-        $num_args = $prototype =~ tr/$@%&*_+/$@%&*_+/;    # RT 56627
+        if ($prototype =~ /[[:alpha:]]/smx) {  # signature (probably)
+            if ( $self->{_skip_object} ) {
+                state $c = qr/\Q$CLASS/smx;
+                state $s = qr/\Q$SELF/smx;
+                state $invocant = qr/^(?:$c|$s),?/smx;
+                $prototype =~ s/$invocant//smx;
+            }
+            $num_args = $prototype =~ tr/$@%/$@%/;
+        } else {  # prototype
+            $prototype =~ s/ \\ [[] .*? []] /*/smxg;    # Allow for grouping
+            $num_args = $prototype =~ tr/$@%&*_+/$@%&*_+/;    # RT 56627
+        }
     } else {
         $num_args = _count_args($self->{_skip_object}, $elem->block->schildren);
     }

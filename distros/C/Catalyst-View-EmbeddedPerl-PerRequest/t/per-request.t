@@ -70,7 +70,7 @@ use_ok 'Catalyst::View::EmbeddedPerl::PerRequest';
       p { color: red; }
     </style>
   </head>
-  <body>
+  <body>ccc1
     Inherited Title    
 joe1
 joe2
@@ -88,6 +88,4 @@ ccc1
 done_testing;
 
 __END__
-
-
 

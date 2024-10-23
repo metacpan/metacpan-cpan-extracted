@@ -1,0 +1,120 @@
+=encoding utf8
+
+=head1 NAME
+
+PDK::Device::Concern::Dumper - A Moose role for debugging and logging network device interactions
+
+=head1 SYNOPSIS
+
+  package MyDeviceHandler;
+  use Moose;
+  with 'PDK::Device::Concern::Dumper';
+
+  # Use the methods provided by the role
+  $self->dump("Debugging information");
+  $self->write_file($config, "device_config.txt");
+  $device = $self->initPdkDevice({ ip => '192.168.1.1', name => 'router1' });
+
+=head1 DESCRIPTION
+
+PDK::Device::Concern::Dumper is a Moose role that provides debugging and logging functionality for network device interactions. It includes methods for getting the current time, dumping debug information, writing configurations to files, initializing PDK device objects, and assigning appropriate PDK device modules based on device operating systems.
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item month
+
+Current month in YYYY-MM format.
+
+=item date
+
+Current date in YYYY-MM-DD format.
+
+=item workdir
+
+Working directory for logs and configuration files. Defaults to the value of PDK_DEVICE_HOME environment variable or the user's home directory.
+
+=item debug
+
+Debug level, obtained from PDK_DEVICE_DEBUG environment variable. Defaults to 0.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item now()
+
+Returns the current time as a string in YYYY-MM-DD HH:MM:SS format.
+
+=item dump($msg)
+
+Outputs debug information based on the current debug level. If debug level is 1, it prints to console. If greater than 1, it writes to a log file.
+
+=item write_file($config, $name)
+
+Writes the given configuration to a file.
+
+Parameters:
+  - $config: The configuration content to write.
+  - $name: Optional filename (defaults to "$self->{host}.txt").
+
+Returns a hash reference with a 'success' key.
+
+=item initPdkDevice($param)
+
+Initializes a PDK device object based on the provided parameters.
+
+Parameters:
+  - $param: A hash reference containing device information (ip, username, password, etc.).
+
+Returns the initialized device object.
+
+=item assignAttributes($devices)
+
+Assigns appropriate PDK device modules to a list of devices based on their operating system.
+
+Parameters:
+  - $devices: An array reference of hash references or a single hash reference representing devices.
+
+Returns the processed device list.
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item PDK_DEVICE_HOME
+
+Sets the working directory for logs and configuration files.
+
+=item PDK_DEVICE_DEBUG
+
+Sets the debug level.
+
+=item PDK_DEVICE_USERNAME
+
+Default username for device connections.
+
+=item PDK_DEVICE_PASSWORD
+
+Default password for device connections.
+
+=back
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=cut

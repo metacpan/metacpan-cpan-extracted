@@ -57,7 +57,7 @@ plugin 'Build::SearchDep' => (
   public_l => 1,
 );
 
-my $min_target_version = '6.1';
+my $min_target_version = '7.1';
 
 plugin 'PkgConfig' => (
     pkg_name => 'proj',
@@ -283,8 +283,8 @@ share {
     my $sqlite_exe = path ('Alien::sqlite'->dist_dir . "/bin/sqlite3$exe_extension");
     push @sqlite_extra_args, (
       "-DEXE_SQLITE3=$sqlite_exe",
-      "-DSQLITE3_LIBRARY=$libfile",
-      "-DSQLITE3_INCLUDE_DIR=$sqlite_include",
+      "-DSQLite3_LIBRARY=$libfile",
+      "-DSQLite3_INCLUDE_DIR=$sqlite_include",
     );
     push @alien_rpaths, Alien::sqlite->dist_dir . '/lib';
   }
@@ -331,8 +331,6 @@ share {
     '-DBUILD_TESTING=OFF',
     '-DBUILD_SHARED_LIBS=ON',
     @sqlite_extra_args,
-    #'-DSQLITE3_INCLUDE_DIR=??',
-    #'-DSQLITE3_LIBRARY=??',
     "-DENABLE_CURL=$enable_curl",
     $enable_curl eq 'ON' ? @curl_extra_args : (),
     "-DENABLE_TIFF=$enable_tiff",

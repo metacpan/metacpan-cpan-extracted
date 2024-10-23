@@ -6,7 +6,7 @@ use 5.016;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Exporter;
 # export our only sub by default:
@@ -62,7 +62,7 @@ String::Random::Regexp::regxstring - Generate random strings from a regular expr
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 SYNOPSIS
 
@@ -231,7 +231,9 @@ Please report any bugs or feature requests to C<bug-string-random-regexp-regxstr
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=String-Random-Regexp-regxstring>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
+=head1 SEE ALSO
 
+L<Mock::Data::Regex> which is implemented in Pure-Perl.
 
 
 =head1 SUPPORT

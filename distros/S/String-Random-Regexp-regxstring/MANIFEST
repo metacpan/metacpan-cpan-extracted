@@ -10,6 +10,7 @@ regxstring.cpp
 regxstring.h
 regxstring_impl.cpp
 regxstring_impl.h
+String-Random-Regexp-regxstring.c
 String-Random-Regexp-regxstring.xs
 t/000-load.t
 t/050-usage.t

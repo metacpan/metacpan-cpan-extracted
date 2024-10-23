@@ -37,10 +37,6 @@ DESCRIPTION
     Perl-Critic called "perlcritic-gui". You can get a free community
     edition of ActivePerl from <http://www.activestate.com>.
 
-PREREQUISITES
-    Perl::Critic runs on Perl back to Perl 5.10.1. It relies on the PPI
-    module to do the heavy work of parsing Perl.
-
 INTERFACE SUPPORT
     The "Perl::Critic" module is considered to be a public class. Any
     changes to its interface will go through a deprecation cycle.
@@ -580,6 +576,9 @@ EXTENDING THE CRITIC
     with the Perl::Critic team, just contact "<team@perlcritic.com>".
 
 PREREQUISITES
+    Perl::Critic runs on Perl back to Perl 5.10.1. It relies on the PPI
+    module to do the heavy work of parsing Perl.
+
     Perl::Critic requires the following modules:
 
     B::Keywords

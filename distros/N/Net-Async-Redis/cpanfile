@@ -4,7 +4,7 @@ requires 'curry', 0;
 requires 'Path::Tiny', 0;
 requires 'Dir::Self', 0;
 requires 'Object::Pad', '>= 0.800';
-requires 'Future', '>= 0.47';
+requires 'Future', '>= 0.51';
 requires 'Future::AsyncAwait', '>= 0.48';
 requires 'Future::Queue', '>= 0.50';
 requires 'Syntax::Keyword::Try', '>= 0.21';

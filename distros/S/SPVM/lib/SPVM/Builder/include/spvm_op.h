@@ -249,7 +249,6 @@ enum {
   SPVM_OP_C_ID_DEREFERENCE,
   SPVM_OP_C_ID_EVAL_ERROR_ID,
   SPVM_OP_C_ID_SEQUENCE,
-  SPVM_OP_C_ID_INIT_BLOCK,
 };
 
 const char* const* SPVM_OP_C_ID_NAMES(void);
@@ -396,6 +395,8 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
 SPVM_OP* SPVM_OP_attach_anon_method_fields(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_OP* op_anon_method_fields);
 
 SPVM_OP* SPVM_OP_build_init_block(SPVM_COMPILER* compiler, SPVM_OP* op_init, SPVM_OP* op_block);
+
+SPVM_OP* SPVM_OP_build_init_statement(SPVM_COMPILER* compiler, SPVM_OP* op_init, SPVM_OP* op_block);
 
 SPVM_OP* SPVM_OP_build_CONSTVALUE(SPVM_COMPILER* compiler, SPVM_OP* op_const);
 

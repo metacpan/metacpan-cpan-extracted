@@ -17,7 +17,9 @@ Name | Type | Description | Notes
 **stream_format** | **string** | The format of the input file stream.  |
 **region** | **string** | The regional settings for workbook. |
 **page_wide_fit_on_per_sheet** | **boolean** | The page wide fit on worksheet. |
-**page_tall_fit_on_per_sheet** | **boolean** | The page tall fit on worksheet. |  
+**page_tall_fit_on_per_sheet** | **boolean** | The page tall fit on worksheet. |
+**sheet_name** | **string** |  |
+**page_index** | **int** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

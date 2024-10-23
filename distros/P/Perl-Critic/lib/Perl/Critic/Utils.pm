@@ -22,7 +22,7 @@ use Perl::Critic::Utils::PPI qw< is_ppi_expression_or_generic_statement >;
 
 use Exporter 'import';
 
-our $VERSION = '1.154';
+our $VERSION = '1.156';
 
 #-----------------------------------------------------------------------------
 # Exportable symbols here.
@@ -207,11 +207,6 @@ Readonly::Scalar our $RIGHT_PAREN  => q{)};
 Readonly::Scalar our $EMPTY        => q{};
 Readonly::Scalar our $TRUE         => 1;
 Readonly::Scalar our $FALSE        => 0;
-
-#-----------------------------------------------------------------------------
-
-#TODO: Should this include punctuations vars?
-
 
 
 #-----------------------------------------------------------------------------
@@ -887,11 +882,11 @@ sub is_in_void_context {
                 $parent->isa('PPI::Structure::Block')
             and $token->statement()->snext_sibling();
 
-        my $grand_parent = $parent->parent();
-        if ($grand_parent) {
+        my $grandparent = $parent->parent();
+        if ($grandparent) {
             return if
                     $parent->isa('PPI::Structure::Block')
-                and not $grand_parent->isa('PPI::Statement::Compound');
+                and not $grandparent->isa('PPI::Statement::Compound');
         }
     }
 

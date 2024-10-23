@@ -73,7 +73,7 @@ sub waitfor {
     ],
     [
       qr/(Display|Include) private keys/i => sub {
-        $self->send(!!$passphrase ? "y\r" : "n\r");
+        $self->send($self->{passphrase} ? "y\r" : "n\r");
         $buff .= $exp->before() . $exp->match();
         exp_continue;
       }
@@ -190,14 +190,14 @@ sub ftpConfig {
     ],
     [
       qr/(Display|Include) private keys/i => sub {
-        $self->send($passphrase ? "y\r" : "n\r");
+        $self->send($self->{passphrase} ? "y\r" : "n\r");
         $result .= $exp->before() . $exp->match();
         exp_continue;
       }
     ],
     [
       qr/(Enter|Reconfirm) passphrase/i => sub {
-        $self->send("$passphrase\r");
+        $self->send("$self->{passphrase}\r");
         $result .= $exp->before() . $exp->match();
         exp_continue;
       }

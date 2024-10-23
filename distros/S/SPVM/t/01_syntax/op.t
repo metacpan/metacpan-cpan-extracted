@@ -90,6 +90,18 @@ use Test::More;
   }
 }
 
+# Class Definition
+{
+  {
+    my $source = 'class MyClass { INIT { } }';
+    compile_ok($source);
+  }
+  
+  {
+    my $source = 'class MyClass { INIT { } INIT { } }';
+    compile_ok($source);
+  }
+}
 
 # Interface Definition
 {
@@ -144,6 +156,11 @@ use Test::More;
   }
   
   {
+    my $source = 'class MyClass : interface_t { INIT { } INIT { } }';
+    compile_ok($source);
+  }
+  
+  {
     my $source = 'class MyClass : interface_t { method DESTROY : void (); }';
     compile_ok($source);
   }
@@ -158,6 +175,19 @@ use Test::More;
     compile_ok($source);
   }
   
+}
+
+# Multi-Numerci Type Definition
+{
+  {
+    my $source = 'class MyClass_1i : mulnum_t { INIT { } has x : int; }';
+    compile_ok($source);
+  }
+  
+  {
+    my $source = 'class MyClass_1i { INIT { } INIT { } has x : int; }';
+    compile_ok($source);
+  }
 }
 
 # Pointer Class

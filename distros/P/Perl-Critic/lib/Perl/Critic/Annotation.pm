@@ -12,7 +12,7 @@ use Readonly;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '1.154';
+our $VERSION = '1.156';
 
 Readonly::Scalar my $LAST_ELEMENT => -1;
 
@@ -20,7 +20,7 @@ Readonly::Scalar my $LAST_ELEMENT => -1;
 # CLASS methods
 
 sub create_annotations {
-    my ($class, $doc) = @_;
+    my (undef, $doc) = @_;
 
     my @annotations;
     my $comment_elements_ref  = $doc->find('PPI::Token::Comment') || return;

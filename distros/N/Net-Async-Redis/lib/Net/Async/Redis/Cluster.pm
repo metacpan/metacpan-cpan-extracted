@@ -2,7 +2,7 @@ package Net::Async::Redis::Cluster;
 
 use Full::Class qw(:v1), extends => qw(Net::Async::Redis::Commands);
 
-our $VERSION = '6.002'; # VERSION
+our $VERSION = '6.003'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
@@ -692,7 +692,7 @@ async sub find_node {
     my @slots = map { $self->hash_slot_for_key($_) } @keys;
     my %slots = map { $_ => 1 } @slots;
     die 'Multiple slots for command' if keys(%slots) > 1;
-    my $slot = $cmd[0] =~ /^p?(?:un)?s?subscribe/i ? 0 : shift(@slots);
+    my $slot = $cmd[0] =~ /^p?(?:un)?subscribe/i ? 0 : shift(@slots);
     $log->tracef('Look up hash slot for %s - %d', \@keys, $slot);
     return $self->node_for_slot($slot);
 }

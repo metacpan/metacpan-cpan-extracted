@@ -1,8 +1,8 @@
-=pod
+=encoding utf8
 
 =head1 NAME
 
-PDK::Device::Paloalto - A module to interact with Palo Alto devices, including configuration retrieval and command execution.
+PDK::Device::Paloalto - Module for managing Palo Alto Networks devices
 
 =head1 SYNOPSIS
 
@@ -11,43 +11,110 @@ PDK::Device::Paloalto - A module to interact with Palo Alto devices, including c
   my $device = PDK::Device::Paloalto->new(
     host     => '192.168.1.1',
     username => 'admin',
-    password => 'password'
+    password => 'paloalto_password'
   );
 
+  # Log in to the device
   $device->login();
-  $device->getConfig();
+
+  # Execute commands
+  $device->execCommands(['show system info', 'show interface all']);
+
+  # Retrieve running configuration
+  my $config = $device->getConfig();
 
 =head1 DESCRIPTION
 
-The C<PDK::Device::Paloalto> module provides methods to interact with Palo Alto devices using CLI commands. It allows retrieving configurations, executing commands, and interacting with the device's CLI in an automated way.
+This module provides functionality to interact with Palo Alto Networks devices, including executing commands and retrieving configurations. It extends the PDK::Device::Base role and is tailored for Palo Alto-specific operations.
 
 =head1 ATTRIBUTES
 
 =over 4
 
-=item prompt
+=item B<prompt>
 
-The regular expression that matches the device's prompt, set by default to capture both active, passive, or suspended states.
+The device's default prompt, defaults to '^.*?$$(?:active|passive|suspended)$$[>#]\s*$'. This pattern is designed to handle various Palo Alto device prompts, including active, passive, and suspended states.
 
 =back
 
 =head1 METHODS
 
+=head2 errCodes
+
+  $device->errCodes();
+
+Returns an array reference of regular expressions representing possible error patterns that may occur during command execution. These include patterns for unknown commands, invalid syntax, and other common errors.
+
+=head2 waitfor($prompt, $params)
+
+Waits for a specific prompt match and handles device responses interactively.
+
+Parameters:
+  - $prompt: The prompt to match (optional)
+  - $params: A hash reference containing send command and other options (optional)
+    - send: The command to send
+    - continue: Whether to continue execution (default: false)
+    - cache: Whether to cache the output (default: true)
+
+Returns: The output of the command execution
+
+This method handles pagination ("lines X-Y") and confirmation prompts ("are you sure?").
+
+=head2 getConfig
+
+  $device->getConfig();
+
+Retrieves the running configuration of the device. It executes a series of commands to set the CLI pager off, set the config output format, enter configuration mode, show the configuration, and exit.
+
+Returns: A hash reference containing a success flag and configuration content.
+
+=head1 ERROR HANDLING
+
+The module uses C<croak> to throw exceptions when errors occur, including:
+
 =over 4
 
-=item errCodes
+=item *
 
-Returns a list of regular expressions that match common error messages such as C<"Unknown command"> or C<"Invalid syntax">.
+Connection timeouts to the device.
 
-=item waitfor
+=item *
 
-Waits for a specific prompt while interacting with the device in an automated manner. It processes output until the expected prompt is matched.
+Unexpected disconnections during command execution.
 
-=item getConfig
+=item *
 
-Retrieves the device's current configuration by executing a sequence of commands, including disabling the pager and setting the output format to the C<set> format.
+Invalid syntax or unknown commands.
 
 =back
+
+=head1 DEPENDENCIES
+
+This module depends on the following Perl modules:
+
+=over 4
+
+=item *
+
+C<Moose> - For object-oriented programming.
+
+=item *
+
+C<Expect> - For interacting with devices through terminal sessions.
+
+=item *
+
+C<Carp> - For error handling with C<croak>.
+
+=item *
+
+C<namespace::autoclean> - For keeping the namespace clean.
+
+=back
+
+=head1 INHERITANCE
+
+This module inherits from C<PDK::Device::Base>.
 
 =head1 AUTHOR
 
@@ -60,5 +127,9 @@ Copyright (C) 2024 WENWU YAN
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
+
+=head1 SEE ALSO
+
+L<PDK::Device::Base>, L<Moose>, L<Expect>
 
 =cut

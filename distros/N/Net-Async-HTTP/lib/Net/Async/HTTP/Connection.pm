@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2008-2023 -- leonerd@leonerd.org.uk
 
-package Net::Async::HTTP::Connection 0.49;
+package Net::Async::HTTP::Connection 0.50;
 
 use v5.14;
 use warnings;

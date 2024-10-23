@@ -2,12 +2,11 @@ package Devel::InnerPackage;
 
 use strict;
 use Exporter 5.57 'import';
-use vars qw($VERSION @EXPORT_OK);
 
 use if $] > 5.017, 'deprecate';
 
-$VERSION = '0.4';
-@EXPORT_OK = qw(list_packages);
+our $VERSION = '0.4';
+our @EXPORT_OK = qw(list_packages);
 
 =pod
 
@@ -71,7 +70,7 @@ sub list_packages {
             {
                 $cand =~ s!::$!!;
                 my @children = list_packages($pack.$cand);
-    
+
                 push @packs, "$pack$cand" unless $cand =~ /^::/ ||
                     !__PACKAGE__->_loaded($pack.$cand); # or @children;
                 push @packs, @children;
@@ -120,7 +119,7 @@ Distributed under the same terms as Perl itself.
 
 None known.
 
-=cut 
+=cut
 
 
 

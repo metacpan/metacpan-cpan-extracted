@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst-View-BasePerRequest.
 
+0.012 - 2024-10-22
+  - Update content blocks to accept arguments
+
 0.011 - 2024-10-21
   - Return the factory when calling view via the application
     not the context.  Has some edge use cases when you want acces

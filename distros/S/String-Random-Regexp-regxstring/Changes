@@ -27,3 +27,13 @@ Revision history for String-Random-Regexp-regxstring
 
 1.03    10/10/2024
         Refreshed.
+
+1.04    22/10/2024
+        The comment in the function signature of file
+        String-Random-Regexp-regxstring.xs (function
+        generate_random_strings_xs) caused trouble with
+        latest Perl versions (e.g. 5.41.5).
+        I have removed the C-style comment
+        in the XS function signature and that
+        keeps the XS compiler happy for newer Perl versions.
+        Added SEE ALSO in documentation.

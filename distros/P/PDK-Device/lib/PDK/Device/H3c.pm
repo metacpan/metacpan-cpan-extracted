@@ -102,6 +102,7 @@ sub waitfor {
   $buff =~ s/\cM+[ ]+\cM//g;
   $buff =~ s/\cM{2}//g;
   $buff =~ s/\cM//g;
+  $buff =~ s/\x00//g;
 
   return $buff;
 }

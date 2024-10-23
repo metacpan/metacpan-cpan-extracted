@@ -1,5 +1,5 @@
 {
-   "abstract" : "The great new Xerarch!",
+   "abstract" : "Xerarch",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "meta" : "0",
+            "meta" : "0.008",
             "perl" : "5.006"
          }
       },
@@ -43,6 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

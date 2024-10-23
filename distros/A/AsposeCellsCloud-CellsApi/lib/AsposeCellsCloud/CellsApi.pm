@@ -10261,6 +10261,41 @@ sub post_update_word_case{
 }
 
 #
+# PostRemoveCharactersRequest
+#
+# 
+# 
+# @removeCharactersOptions  RemoveCharactersOptions (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostRemoveCharactersRequest',
+            description => 'PostRemoveCharacters Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_remove_characters' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_remove_characters{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
 # GetWorkbookDefaultStyleRequest
 #
 # Retrieve the description of the default style for the workbook .

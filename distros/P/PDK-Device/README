@@ -1,7 +1,7 @@
 This archive contains the distribution PDK-Device,
-version 0.011:
+version 0.012:
 
-  Moose based OOB modules for network automation!
+  A Perl module for managing network device connections and operation
 
 This software is copyright (c) 2024 by WENWU.YAN.
 

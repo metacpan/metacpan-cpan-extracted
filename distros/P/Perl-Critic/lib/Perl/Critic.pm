@@ -19,7 +19,7 @@ use Perl::Critic::Statistics;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '1.154';
+our $VERSION = '1.156';
 
 Readonly::Array our @EXPORT_OK => qw(critique);
 
@@ -264,12 +264,6 @@ Perl::Critic API, but it should give you a good idea of what it does.
 Also, ActivePerl includes a very slick graphical interface to Perl-Critic
 called C<perlcritic-gui>.  You can get a free community edition of ActivePerl
 from L<http://www.activestate.com>.
-
-
-=head1 PREREQUISITES
-
-Perl::Critic runs on Perl back to Perl 5.10.1. It relies on the L<PPI>
-module to do the heavy work of parsing Perl.
 
 
 =head1 INTERFACE SUPPORT
@@ -829,6 +823,9 @@ just contact C<< <team@perlcritic.com> >>.
 
 
 =head1 PREREQUISITES
+
+Perl::Critic runs on Perl back to Perl 5.10.1. It relies on the L<PPI>
+module to do the heavy work of parsing Perl.
 
 Perl::Critic requires the following modules:
 

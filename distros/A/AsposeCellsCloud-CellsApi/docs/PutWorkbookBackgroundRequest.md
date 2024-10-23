@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **name** | **string** | The file name. |
 **pic_path** | **string** | The picture full path. |
+**image_adapt_option** | **string** |  |
 **folder** | **string** | The folder where the file is situated. |
 **storage_name** | **string** | The storage name where the file is situated. |
 **file** | **string** | File to upload |  

@@ -150,7 +150,7 @@ sub ftpConfig {
 
   $server ||= $ENV{PDK_FTP_SERVER};
 
-  croak "请正确提供 FTP 服务器地址!" unless !!$server;
+  croak "请正确提供 FTP 服务器地址!" unless $server;
 
   if (!$self->{exp}) {
     my $login = $self->login();

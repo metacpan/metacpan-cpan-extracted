@@ -1,3 +1,9 @@
+0.013     2024-10-22 18:21:46 EDT
+  - Upgrade share install to version 1.2.0 of hiredis. Older (non-broken) system install versions are still supported.
+
+0.012     2020-08-26 12:02:08 EDT (TRIAL RELEASE)
+  - Upgrade share install to version 1.0.0 of hiredis. Older (non-broken) system install versions are still supported.
+
 0.011     2020-08-26 12:00:56 EDT
   - Revert share install to version 0.14.1 of hiredis until Protocol::Redis::XS can be fixed to work with 1.0.0.
 

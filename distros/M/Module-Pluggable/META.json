@@ -4,13 +4,13 @@
       "Simon Wistow <simon@thegestalt.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Module-Pluggable",
    "no_index" : {
@@ -52,8 +52,9 @@
             "File::Find" : "0",
             "File::Spec" : "3.00",
             "File::Spec::Functions" : "0",
+            "Scalar::Util" : "0",
             "if" : "0",
-            "perl" : "5.00503",
+            "perl" : "5.006",
             "strict" : "0"
          }
       },
@@ -73,7 +74,7 @@
             "warnings" : "0"
          },
          "suggests" : {
-            "App::Fatpacker" : "0.010000"
+            "App::FatPacker" : "0.010000"
          }
       }
    },
@@ -89,6 +90,6 @@
          "web" : "https://github.com/simonwistow/Module-Pluggable"
       }
    },
-   "version" : "5.2",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "6.1",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }
