@@ -24,11 +24,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 our $alternatives;
 our $abbreviations;
@@ -87,8 +87,8 @@ but that can't be guaranteed to work.
 =cut
 
 sub new {
-	my($proto, %args) = @_;
-	my $class = ref($proto) || $proto;
+	my $class = shift;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if(!defined($class)) {
 		# Using Geo::Coder::Free->new not Geo::Coder::Free::new
@@ -114,6 +114,7 @@ sub new {
 		}
 	}
 	my $rc = {
+		%args,
 		maxmind => Geo::Coder::Free::MaxMind->new(%args),
 		alternatives => $alternatives
 	};

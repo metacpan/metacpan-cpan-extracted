@@ -1,7 +1,7 @@
 This archive contains the distribution PDK-Device,
-version 0.012:
+version 0.013:
 
-  A Perl module for managing network device connections and operation
+  Interacts with network devices, managing connections, commands, and configuration backups.
 
 This software is copyright (c) 2024 by WENWU.YAN.
 

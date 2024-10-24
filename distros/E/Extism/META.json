@@ -28,7 +28,7 @@
       "configure" : {
          "requires" : {
             "Alien::Base::Wrapper" : "1.97",
-            "Alien::libextism" : "v0.1.0",
+            "Alien::libextism" : "v0.1.1",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
@@ -55,6 +55,6 @@
          "web" : "https://github.com/extism/perl-sdk"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

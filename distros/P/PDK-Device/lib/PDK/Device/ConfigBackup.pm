@@ -361,10 +361,11 @@ sub dump {
     say $text;
   }
   elsif ($self->debug > 1) {
-    my $workdir = "$self->{workdir}/dump/$self->{month}/$self->{date}";
+    my $basedir = $ENV{PDK_DEVICE_HOME} // glob("~");
+    my $workdir = "$basedir/dump/$self->{month}/$self->{date}";
     make_path($workdir) unless -d $workdir;
 
-    my $filename = "$workdir/dump_log.txt";
+    my $filename = "$workdir/backup_dump.txt";
     open(my $fh, '>>', $filename) or croak "无法打开文件 $filename 进行写入: $!";
     print $fh "$text\n"           or croak "写入文件 $filename 失败: $!";
     close($fh)                    or croak "关闭文件句柄 $filename 失败: $!";

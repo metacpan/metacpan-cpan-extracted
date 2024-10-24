@@ -1,0 +1,25 @@
+NAME
+
+    Device::Chip::From::Sensirion - a collection of chip drivers for
+    Sensirion sensors
+
+DESCRIPTION
+
+    This distribution contains a number of Device::Chip drivers for various
+    sensor chips manufactured by Sensirion.
+
+    It also acts as a base class, providing common functionality for
+    often-used operations.
+
+METHODS
+
+ get_serial_number
+
+       $bytes = await $chip->get_serial_number;
+
+    Returns a 6-byte encoding of the chip's internal serial number.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

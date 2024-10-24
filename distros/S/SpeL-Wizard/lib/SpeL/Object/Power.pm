@@ -18,8 +18,18 @@ sub read {
   my $self = shift;
   my ( $level ) = @_;
 
-  return $SpeL::I18n::lh->maketext( "Power",
-					     $self->{Lit} // $self->{Group}->read( $level + 1 ) ) . ', ';
+  if( exists $self->{Transpose} ) {
+    return $SpeL::I18n::lh->maketext( "Transposed" ) . ',';
+  }
+
+  if ( exists $self->{Lit} ) {
+    return $SpeL::I18n::lh->maketext( "Power",
+				      '"' . $self->{Lit} . '"' ) . ', ';
+  }
+  else {
+    return $SpeL::I18n::lh->maketext( "Power",
+				      $self->{Group}->read( $level + 1 ) ) . ', ';
+  }
 }
 
 1;
@@ -36,7 +46,7 @@ SpeL::Object::Power - LaTeX power object
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

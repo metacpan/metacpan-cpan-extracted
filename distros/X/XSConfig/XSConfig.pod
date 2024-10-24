@@ -4,7 +4,7 @@ XSConfig - Fast XS drop-in replacement for Config.pm with perfect hashing.
 
 =head1 VERSION
 
-Version 6.27
+Version 6.28
 
 =head1 SYNOPSIS
 
@@ -135,7 +135,7 @@ Reini Urban C<< <rurban at cpanel.net> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015, Daniel Dragan
+Copyright (C) 2024, Daniel Dragan
 Copyright (C) 2015, cPanel Inc
  
 This is free software; you can redistribute it and/or modify it under

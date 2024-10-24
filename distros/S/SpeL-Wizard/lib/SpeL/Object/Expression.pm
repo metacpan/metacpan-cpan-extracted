@@ -8,14 +8,20 @@ use SpeL::Object::MathUnit;
 use SpeL::Object::Variable;
 use SpeL::Object::Function;
 use SpeL::Object::Fraction;
+use SpeL::Object::Bracketconstruction;
 use SpeL::Object::Expressionrest;
 use SpeL::Object::Limitsexpression;
+use SpeL::Object::Underbrace;
+use SpeL::Object::Overbrace;
 use SpeL::Object::Number;
+use SpeL::Object::Num;
+use SpeL::Object::Qty;
 use SpeL::Object::Unop;
 use SpeL::Object::MathEnvironmentInner;
 use SpeL::Object::Matrix;
 use SpeL::Object::Interval;
 use SpeL::Object::Command;
+use SpeL::Object::Unit;
 
 use parent 'Exporter';
 use Carp;
@@ -77,7 +83,7 @@ SpeL::Object::Expression - LaTeX expression object
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

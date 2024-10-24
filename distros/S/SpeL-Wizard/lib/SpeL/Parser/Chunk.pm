@@ -35,7 +35,13 @@ our $elements = do {
 
       #                           & not \&   \,\quad\qquad  whitespace   comment
       #      <token: ws>             (?: (?<!\\)\& | \\, | \\quad | \\qquad | ~ | \\\s | [\s\n] | (\%[^\n]*\n) )*
-      <token: ws>          (?: \\, | \\quad | \\qquad | ~ | \\\s | [\s\n] | (\%[^\n]*\n) )*
+      <token: ws>
+                (?: \\, | \\quad | \\qquad | ~ | \\\s | [\s\n] | (\%[^\n]*\n) )* |
+                \\hskip \s* (:?\d+)?(?:\.\d+)? \s* <texunit> |
+		\\relax
+
+      <token: texunit>
+                pt | mm | cm | in | ex | em | mu | sp
 
       <objrule: SpeL::Object::ElementList = ElementList>
                 <[Element]>*
@@ -44,36 +50,37 @@ our $elements = do {
 
       <objrule: SpeL::Object::Element = Element>
                 <!egroup> <!stray_etag>
-                ( <MATCH=VerbatimEnv> |
-                  <MATCH=Env>  |
-                  <MATCH=Group>  |
-                  <MATCH=MathInl> |
-                  <MATCH=MathEnvSimple> |
-                  <MATCH=MathEnv> |
-                  <percent> |
-                  <MATCH=Item> |
-                  <MATCH=Command> |
-                  <Parameter> |
-                  <sup> |
-                  <sub> |
-                  <sep> |
-                  <smallspace> |
-                  <eol> |
-		  \| <Docstrip=(?:[^|]+)> \| |
-		  <MATCH=TokenSequence> )
+                (?: <MATCH=VerbatimEnv> |
+                    <MATCH=Env>  |
+                    <MATCH=Group>  |
+		    <MATCH=Qty> |
+		    <MATCH=Num> |
+		    <MATCH=Unit> |
+                    <MATCH=MathInl> |
+                    <MATCH=MathEnvSimple> |
+                    <MATCH=MathEnv> |
+                    <MATCH=Item> |
+                    <MATCH=Command> |
+                    <Parameter> |
+                    <sup> |
+                    <sub> |
+                    <sep> |
+                    <smallspace> |
+                    <eol> |
+		    \| <Docstrip=(?:[^|]+)> \| |
+		    <MATCH=TokenSequence> )
 	       
 
       <objrule: SpeL::Object::Element = BareElement>
                 <!egroup> <!stray_etag>
-                ( <MATCH=VerbatimEnv> |
-                  <MATCH=Env>  |
-                  <MATCH=Group>  |
-                  <percent> |
-                  <MATCH=Item> |
-                  <MATCH=Command> |
-                  <sep> |
-                  <eol> |
-                  <MATCH=BareTokenSequence> )
+                (?: <MATCH=VerbatimEnv> |
+                    <MATCH=Env>  |
+                    <MATCH=Group>  |
+                    <MATCH=Item> |
+                    <MATCH=Command> |
+                    <sep> |
+                    <eol> |
+                    <MATCH=BareTokenSequence> )
 
       <objrule: SpeL::Object::MathUnit = MathUnit>
                 <!stray_etag> 
@@ -92,11 +99,15 @@ our $elements = do {
 
       <objtoken: SpeL::Object::RelOperator = RelOperator>
                 = |
+                \\approx |
+                \\equiv |
                 \\ne\b |
                 \> |
 		\< |
                 \\gt\b |
+		\\gg\b |
                 \\lt\b |
+		\\ll\b |
                 \\ge\b |
                 \\le\b |
 	        \\in\b |
@@ -116,99 +127,141 @@ our $elements = do {
       <objrule: SpeL::Object::Expression = Expression>
                 <!egroup> <!stray_etag>
                 <!RelOperator>
-                ( ( <Begintext=Textinmathcommand> <Rest=Expression>? ) |
-		  ( <Component=Number> <Rest=Expressionrest> ) |
-		  ( <Sign> <Component=Number> <Rest=Expressionrest> ) |
-		  ( <Sign>? <obracket> <Component=MathUnit> <cbracket> <Rest=Expressionrest> ) |
-		  ( <Sign>? <Component=Function> <Rest=Expressionrest> ) |
-		  ( <Sign>? <Component=Fraction> <Rest=Expressionrest> ) |
-		  ( <Sign>? <Component=Variable> <Rest=Expressionrest> ) |
-		  ( <Sign>? <Component=Limitsexpression> <Rest=Expression> ) |
-		  ( <Sign>? <Component=Unop> <Rest=Expressionrest> ) |
+                ( <Begintext=Textinmathcommand> <Rest=Expression>? |
+		  <Component=Number> <Rest=Expressionrest> |
+		  <Sign> <Component=Number> <Rest=Expressionrest> |
+		  <Component=Num> <Rest=Expressionrest> |
+		  <Component=Qty> <Rest=Expressionrest> |
+		  <Component=Unit> <Rest=Expressionrest> |
+		  <Sign>? <Component=Function> <Rest=Expressionrest> |
+		  <Sign>? <Component=Variable> <Rest=Expressionrest> |
+		  <Sign>? <Component=Bracketconstruction> <Rest=Expressionrest> |
+		  <Sign>? <Component=Fraction> <Rest=Expressionrest> |
+		  <Sign>? <Component=Limitsexpression> <Rest=Expression> |
+		  <Sign>? <Component=Unop> <Rest=Expressionrest> |
 		  <Interval> |
-		  ( (?:\\left)? \| <Absval=Expression> (?:\\right)? \| ) |
-		  ( <Ellipsis=(\\[lvcd]dots)> <Rest=Expressionrest> ) |
-		  ( <Component=MathEnvInner> <Rest=Expressionrest> ) |
-		  ( <Component=Matrix> <Rest=Expressionrest> ) |
-		  ( <Sign>? <Component=Mathcommand> <Rest=Expressionrest> ) )
+		  <Component=Underbrace> <Rest=Expressionrest> |
+		  <Component=Overbrace> <Rest=Expressionrest> |
+		  <Ellipsis=(\\[lvcd]dots)> <Rest=Expressionrest> |
+		  <Component=MathEnvInner> <Rest=Expressionrest> |
+		  <Component=Matrix> <Rest=Expressionrest> |
+		  <Sign>? <Component=Mathcommand> <Rest=Expressionrest> )
 
+      <objrule: SpeL::Object::Bracketconstruction = Bracketconstruction>
+                  <obracket> <Component=MathUnit> <cbracket> |
+                  <obracket=(?:\()> <Component=MathUnit> <cbracket=(?:\))> |
+                  <obracket=(?:\[)> <Component=MathUnit> <cbracket=(?:\])> |
+		  <obracket=(?:\|)> <Component=MathUnit> <cbracket=(?:\|)> |
+		  <obracket=(?:\\\|)> <Component=MathUnit> <cbracket=(?:\\\|)> |
+                  <obracket=(?:\\\{)> <Component=MathUnit> <cbracket=(?:\\\})>
+
+      <objrule: SpeL::Object::Bracketconstruction = Mathargconstruction>
+                  <obracket=(?:\()> <Component=MathUnit> <cbracket=(?:\))> |
+                  <obracket=(?:\[)> <Component=MathUnit> <cbracket=(?:\])> |
+                  <obracket=(?:\{)> <Component=MathUnit> <cbracket=(?:\})>
+		  
       <token: obracket>
-                ( (?:\\left)? <.ws> (?:\(|\[|\\\{) ) |
-                ( \\left <.ws> \. )
+                \\left <.ws> (?:\(|\[|\\\{|\||\\\|) |
+                \\left <.ws> \.
 
       <token: cbracket>
-                ( (?:\\right)? <.ws> (?:\)|\]|\\\}) ) |
-                ( \\right <.ws> \. )
+                (?:\\right) <.ws> (?:\)|\]|\\\}|\||\\\|) |
+                \\right <.ws> \. 
 
       <objrule: SpeL::Object::Fraction = Fraction>
                 \\frac \{ (?: <num=Number> | <num=Expression> ) \}
                        \{ (?: <den=Number> | <den=Expression> ) \}
 
       <objrule: SpeL::Object::Expressionrest = Expressionrest>
-                ( <Endtext=Textinmathcommand> ) |
-                ( <Op=Subscript> <Remainder=Expressionrest> ) |
-                ( <Op=Power> <Remainder=Expressionrest> ) |
-		( <Op=Unop> <Remainder=Expressionrest> ) |
-                ( <Op=Binop> <Remainder=Expression> ) |
-		( <Op=Arrow> <Remainder=Expression> ) |
-                <ws>
+                <Endtext=Textinmathcommand> |
+                <Op=Subscript> <Remainder=Expressionrest> |
+                <Op=Power> <Remainder=Expressionrest> |
+		<Op=Faculty> <Remainder=Expressionrest> |
+		<Op=Unop> <Remainder=Expressionrest> |
+                <Op=Binop> <Remainder=Expression> |
+		<Op=Arrow> <Remainder=Expression> |
+                <ws>?
 
       <objtoken: SpeL::Object::Power = Power>
-                ( <sup> <Lit=(\w)> ) |
-		( <sup> <Group=MathGroup> )
+		<sup> <.ws> \{ <.ws> <Transpose=transpose> <.ws> \} |
+                <sup> <Lit=(\w|[+-])> |
+                <sup> <Group=Variable> |
+		<sup> <Group=MathGroup>
 
       <objtoken: SpeL::Object::Subscript = Subscript>
-                ( <sub> <Lit=(\w)> ) |
-		( <sub> <Group=MathGroup> )
+                <sub> <Lit=(\w|[+-])> |
+                <sub> <Group=Variable> |
+		<sub> <Group=MathGroup>
 
       <objrule: SpeL::Object::Unop = Unop>
-                ( <Op=(?:\\overline)> \{ <Arg=Expression> \} ) |
-                ( <Op=(?:\\overline)> <Arg=Variable> )
+                <Op=(?:\\overline)> \{ <Arg=Expression> \} |
+                <Op=(?:\\overline)> <Arg=Variable>
 
       <objrule: SpeL::Object::Binop = Binop>
                 <Op=(?:[+-/])> |
                 <Op=(?:\\pm)> |
                 <Op=(?:\\times)> |
+                <Op=(?:\\cdots)> |
                 <Op=(?:\\cdot)> |
                 <Op=(?:\\mid)> |
+		<Op=(?:\\sim)> |
 		<Op=Komma> |
 		<Op=Semicolon> |
 		<Com=Textinmathcommand> |
                 <Op=ws>
+		
+      <objrule: SpeL::Object::Num = Num>
+                \\ num <.ws> \{ <Value=Scientificnumber> \}
 
+      <objrule: SpeL::Object::Qty = Qty>
+                \\ qty <.ws> \{ <Value=Scientificnumber> \} <.ws> <Units=SIUnits>
+
+      <objrule: SpeL::Object::Unit = Unit>
+                \\ unit <.ws> <Units=SIUnits>
+
+      <objrule: SpeL::Object::SIUnits = SIUnits>
+                (?<braceunit>
+	          \{
+		    (?: (?> [^{}]+ ) | (?&braceunit))*
+		  \}
+	        )
+                
       <objrule: SpeL::Object::Arrow = Arrow>
                 <Op=(?:\\Rightarrow)> |
                 <Op=(?:\\Leftarrow)> |
                 <Op=(?:\\Leftrightarrow)> 
 
+      <objtoken: SpeL::Object::Faculty = Faculty>
+		\!
+		
       <objtoken: SpeL::Object::Squareroot = Sqrt>
-                ( \\sqrt <.ws> \[ <N=Expression> \] <.ws> \{ <Argument=Expression> \} ) |
-                ( \\sqrt <.ws> \{ <Argument=Expression> \} )
+                \\sqrt <.ws> \[ <N=Expression> \] <.ws> \{ <Argument=Expression> \} |
+                \\sqrt <.ws> \{ <Argument=Expression> \} 
 
       <objtoken: SpeL::Object::Command = Command>
-                <!RelOperator> 
-                \\ ( (?!\\)(?!end)(?!begin)(?!par)(?!item)(?!left)(?!right) <Name=ComName> ) <Options>? <[Args]>* <trailingws=ws>
+                <!RelOperator>
+                \\ ( (?!\\)(?!end)(?!begin)(?!par)(?!item)(?!left)(?!right)(?!hskip) <Name=ComName> ) <Options>? <[Args]>* <trailingws=ws>
 
       <objtoken: SpeL::Object::Command = Mathcommand> 
-	        ( <!RelOperator>	
-  		  \\ <Name=(?:mbox)> <[Args]>* <trailingws=ws> ) |
-		( <!RelOperator>
-                \\ ( (?!\\)(?!end)(?!begin)(?!par)(?!item)(?!left)(?!right) <Name=ComName> ) <Options>? <[Args=Mathargs]>* <trailingws=ws> )
+	        <!RelOperator>	
+                \\ <Name=(?:mbox)> <[Args]>* <trailingws=ws> |
+		<!RelOperator>
+                \\ ( (?!\\)(?!end)(?!begin)(?!par)(?!item)(?!left)(?!right)(?!hskip)(?!underbrace)(?!overbrace) <Name=ComName> ) <Options>? <[Args=Mathargs]>* <trailingws=ws>
  
       <objtoken: SpeL::Object::Command = Textinmathcommand>
 	        <!RelOperator>	
-		\\ <Name=(?:text)> <[Args]>* <trailingws=ws>
+		\\ <Name=(?:text)> <[Args]> <trailingws=ws>
 
 
       <objtoken: SpeL::Object::VerbatimEnvironment = VerbatimEnv>
                 \\ begin <.ws> \{ <verbatimtag> \}
  		  <verbatimcontent>
-                \\ end \{ <.everbatimtag( :verbatimtag )> \} <trailingws=ws>
+                \\ end <.ws> \{ <.everbatimtag( :verbatimtag )> \} <trailingws=ws>
 
       <objtoken: SpeL::Object::Environment = Env>
                 <!math_envtag> \\ begin <.ws> \{ <tag> \} <Options>? <[Args]>* <trailingws=ws>
                   <ElementList> <.ws>
-                \\ end \{ <.etag( :tag )> \}
+                \\ end <.ws> \{ <.etag( :tag )> \}
                 |
                 <!math_envtag> \\ begin <.ws> \{ <tag> \} <Options>? <[Args]>* <trailingws=ws>
                   <ElementList> <.ws>
@@ -220,31 +273,29 @@ our $elements = do {
                 \\\]
 
       <objtoken: SpeL::Object::MathEnvironment = MathEnv>
-#		<debug: step>
-                \\ begin \{ <mathtag> \} <Options>? <[Args]>* <trailingws=ws>
+                \\ begin <.ws> \{ <mathtag> \} <Args>? <Options>? <[Args]>* <trailingws=ws>
 		<[MathUnit]>+ % <.eol> <.ws>
-                \\ end \{ <.mathetag( :mathtag )> \}
+                \\ end <.ws> \{ <.mathetag( :mathtag )> \}
                 |
-                \\ begin \{ <mathtag> \} <Options>? <[Args]>* <trailingws=ws>
+                \\ begin <.ws> \{ <mathtag> \} <Args>? <Options>? <[Args]>* <trailingws=ws>
                   <[MathUnit]>+ % <.eol> <.ws>
 		  <matchline> <matchpos> <fatal: (?{"Missing \\end{$MATCH{mathtag}} at @{[ SpeL::Parser::Chunk::_report( \%MATCH ) ]}"})>
-#		<debug: off>
 		
       <objtoken: SpeL::Object::MathEnvironmentInner = MathEnvInner>
-                \\ begin \{ <mathtaginner> \} <Options>? <[Args]>* <trailingws=ws>
+                \\ begin <.ws> \{ <mathtaginner> \} <Options>? <[Args]>* <trailingws=ws>
                   <[MathUnit]>+ % <.eol> <.ws>
-                \\ end \{ <.mathetaginner( :mathtaginner )> \}
+                \\ end <.ws> \{ <.mathetaginner( :mathtaginner )> \}
                 |
-                \\ begin \{ <mathtaginner> \} <Options>? <[Args]>* <trailingws=ws>
+                \\ begin <.ws> \{ <mathtaginner> \} <Options>? <[Args]>* <trailingws=ws>
                   <[MathUnit]>+ % <.eol> <.ws>
                 <matchline> <matchpos> <fatal: (?{"Missing \\end{$MATCH{mathtaginner}} at @{[ SpeL::Parser::Chunk::_report( \%MATCH ) ]}"})>
 
      <objtoken: SpeL::Object::Matrix = Matrix>
-                \\ begin \{ <matrixtag> \} <Options>? <[Args]>* <trailingws=ws>
+                \\ begin <.ws> \{ <matrixtag> \} <Options>? <[Args]>* <trailingws=ws>
                   <[MathUnit]>+ % <.eol> <.ws>
-                \\ end \{ <.matrixetag( :matrixtag )> \}
+                \\ end <.ws> \{ <.matrixetag( :matrixtag )> \}
                 |
-                \\ begin \{ <matrixtag> \} <Options>? <[Args]>* <trailingws=ws>
+                \\ begin <.ws> \{ <matrixtag> \} <Options>? <[Args]>* <trailingws=ws>
                   <[MathUnit]>+ % <.eol> <.ws>
                 <matchline> <matchpos> <fatal: (?{"Missing \\end{$MATCH{matrixtag}} at @{[ SpeL::Parser::Chunk::_report( \%MATCH ) ]}"})>
 
@@ -269,35 +320,35 @@ our $elements = do {
       <objrule: SpeL::Object::Interval>    <Intervalstart=(?:\[|\]|\()> <left=Expression> , <right=Expression> <Intervalend=(?:\[|\]|\))>
 
       
-      <token: BeginEnvLit>    \\ begin \{ <\:env> \}
+      <token: BeginEnvLit>    \\ begin <.ws> \{ <\:env> \}
 
-      <token: EndEnvLit>      \\ end \{ <\:env> \}
+      <token: EndEnvLit>      \\ end <.ws> \{ <\:env> \}
 
       <token: bgroup>         \{
 
       <token: egroup>         \}
 
-      <token: percent>        \\ \%
-
       <token: equals>         = <ws>
 
+      <token: transpose>      \\ transpose
+      
       <token: stray_etag>     \\ end \{
 
-      <rule: math_envtag>     \\ begin \{ <mathtag> \}
+      <rule: math_envtag>     \\ begin <.ws> \{ <mathtag> \}
 
       <token: tag>            [^][\$&%#_{}~^\s]++
 
       <token: verbatimtag>    <MATCH=tag> <require: (?{ $^N =~ $gobblematcher }) >
 
-      <rule: mathtaginner>    ( array\*? | aligned*? )
+      <rule: mathtaginner>    array\*? | aligned\*?
 
       <rule: mathetaginner>   (??{quotemeta $ARG{mathtaginner}})
 
-      <rule: matrixtag>       (?:[bBpvV]|small)matrix\*?
+      <rule: matrixtag>       (?:[bBpvV]|small)?matrix\*?
 
       <rule: matrixetag>      (??{quotemeta $ARG{matrixtag}})
 
-      <rule: mathtag>         ( equation\*? | eqnarray\*? | align\*? | alignat\*? | gather\*? )
+      <rule: mathtag>         equation\*? | eqnarray\*? | alignat\*? | align\*? | gather\*?
 
       <rule: mathetag>        (??{quotemeta $ARG{mathtag}})
 
@@ -324,7 +375,7 @@ our $elements = do {
       <token: Mathargs>            <.ws> \{ <MATCH=MathUnit> \}
 
       <objrule: SpeL::Object::Option = Option>
-                (<Name=OptName> =)? <Value=BareElement>
+                (<Name=OptName> =)? <Value=BareElement>?
 
       <rule: OptName>            [^][|\$%#_{}~^,=\s\\-]++
 
@@ -333,33 +384,25 @@ our $elements = do {
       <token: Parameter>       [#]+ \d+
 
       <objrule: SpeL::Object::Limitsexpression = Limitsexpression>
-                <Limitscommand> <.sub> <LBound=Bound> <.sup> <UBound=Bound>
-                |
-                <Limitscommand> <.sup> <UBound=Bound> <.sub> <LBound=Bound>
-  	        |
-                <Limitscommand> <.sup> <UBound=Bound>
-                |
-                <Limitscommand> <.sub> <LBound=Bound>
-                |
+                <Limitscommand> <.sub> <LBound=Bound> <.sup> <UBound=Bound> |
+                <Limitscommand> <.sup> <UBound=Bound> <.sub> <LBound=Bound> |
+                <Limitscommand> <.sup> <UBound=Bound> |
+                <Limitscommand> <.sub> <LBound=Bound> |
                 <Limitscommand>
 
       <token: Bound>
-                <MATCH=MathGroup>
-                |
-                <MATCH=Number>
-                |
-                <MATCH=Command>
-                |
-                <MATCH=Variable>
-                |
+                <MATCH=MathGroup> |
+                <MATCH=Number> |
+                <MATCH=Variable> |
+                <MATCH=Command> |
                 <MATCH=Singletoken>
 
       <objtoken: SpeL::Object::Limitscommand = Limitscommand>
-                \\ int
-                |
-                \\ sum
-                |
-                \\ lim
+                \\ int |
+                \\ sum |
+                \\ lim |
+		\\ max |
+		\\ min 
 
       <objtoken: SpeL::Object::TokenSequence = BareTokenSequence>
                 [^][|\$%&#_{}^\\]++
@@ -372,54 +415,67 @@ our $elements = do {
 		    \\ \` |
 		    \\ \, |
 		    \\ \{ |
-                    \\ \} )+ )
+                    \\ \} |
+		    \\ \$ |
+		    \\ %  |
+		    \\ _  )+ )
 
 
       <objrule: SpeL::Object::Function = Function>
                 <Sqrt> |
-                <Trig> <Power>? <obracket> <Argument=Expression> <cbracket> |
-                <Trig> <Power>? \{ <Argument=Expression> \} |
-                <Trig> <Power>? (?<!\{) <Argument=Expression> |
-                <Name=Variable> <Power>? <obracket> <Argument=Expression> <cbracket>
+                <Name=Trig> <Power>? <.ws> <Argument=Mathargconstruction> |
+                <Name=Trig> <Power>? (?<!\{) <Argument=Expression> |
+		<Name=Log> <Power>? <.ws> <Argument=Mathargconstruction> |
+                <Name=Log> <Power>? (?<!\{) <Argument=Expression> |
+                <Name=Variable> <Power>? <.ws> <Argument=Mathargconstruction>
 
 
-      <token: Trig>
-                \\ (sin | cos | tan | cot | sec | csc |
-                    arcsin | arccos | arctan | arccot |
-                    sinh | cosh | tanh | coth)
+      <objtoken: SpeL::Object::Trig = Trig>
+                \\ <Op=(?: sin | cos | tan | cot | sec | csc |
+                    arcsin | asin | arccos | acos | arctan | atan | arccot | acot |
+                    sinh | cosh | tanh | coth)>
 
+      <objrule: SpeL::Object::Log = Log>
+                \\ <Op=(?:log|ln)> (?: <.sub> <base=Bound>)?
+
+      <objrule: SpeL::Object::Underbrace = Underbrace>
+                \\ underbrace <group=Mathargs> <sub> <under=Mathargs>
+
+      <objrule: SpeL::Object::Overbrace = Overbrace>
+                \\ overbrace <group=Mathargs> <sup> <over=Mathargs>
+		  
       <objtoken: SpeL::Object::Variable = Variable>
-                ( <Alphabet> | <Greek> ) <trailingws=ws>
+                ( <Alphabet> | <Greek> ) <Subscript>?  <trailingws=ws>
 
       <token: Alphabet>
                 [a-zA-Z]
 
       <token: Greek>
- 		\\alpha |
-		\\beta |
-		\\[gG]amma |
-		\\[dD]elta
-                \\(?:var)?epsilon |
-                \\zeta |
-                \\eta |
-                \\[tT]heta |
-                \\vartheta |
-                \\iota |
-                \\kappa
-                \\[lL]ambda |
-                \\mu |
-                \\nu |
-                \\[xX]i |
-                \\[pP]i |
+ 		\\(?:mit|mup)?[aA]lpha |
+		\\(?:mit|mup)?[bB]eta |
+		\\(?:mit|mup)?[gG]amma |
+		\\(?:mit|mup)?[dD]elta |
+                \\(?:mit|mup)?(?:var)?epsilon |
+                \\(?:mit|mup)?[zZ]eta |
+                \\(?:mit|mup)?[eE]ta |
+                \\(?:mit|mup)?[tT]heta |
+                \\(?:mit|mup)?vartheta |
+                \\(?:mit|mup)?iota |
+                \\(?:mit|mup)?[kK]appa
+                \\(?:mit|mup)?[lL]ambda |
+                \\(?:mit|mup)?[mM]u |
+                \\(?:mit|mup)?[nN]u |
+                \\(?:mit|mup)?[xX]i |
+                \\(?:mit|mup)?[pP]i |
                 \\(?:var)?rho |
-                \\[sS]igma |
-                \\tau |
-                \\[uU]psilon |
-                \\[pP]hi |
-                \\varphi |
-                \\chi |
-                \\[pP]si |
-                \\[oO]mega
+                \\(?:mit|mup)?[sS]igma |
+                \\(?:mit|mup)?[tT]au |
+                \\(?:mit|mup)?[uU]psilon |
+                \\(?:mit|mup)?[pP]hi |
+                \\(?:mit|mup)?varphi |
+                \\(?:mit|mup)?[cC]hi |
+                \\(?:mit|mup)?[pP]si |
+                \\(?:mit|mup)?[oO]mega
 
       <token: Sign>
                 ([+-]) |
@@ -431,11 +487,19 @@ our $elements = do {
 
       <token: imag>  j | i
 
+      <objtoken: SpeL::Object::Integernumber = Integernumber>
+                <Sign=([+-]?)> <Value=(\d+)> <trailingws=ws>
+
       <objtoken: SpeL::Object::Realnumber = Realnumber>
-                <Sign=([+-]?)> ( <Value=( (\d+)(?:(?:\.|,)\d+)?
-                                 | ((?:\.|,)\d+)
+                <Sign=([+-]?)> <Value=( (\d+)(?:(?:\.|,)\d+)?
+		                 | ((?:\.|,)\d+)
                                  | \\ pi ({})?
-                                 | \\ infty ({})? )> ) <trailingws=ws>
+                                 | \\ infty ({})? )> <trailingws=ws>
+
+      <objtoken: SpeL::Object::Scientificnumber = Scientificnumber>
+                <Sign=([+-]?)> (?: <Value=( (\d+)(?:(?:\.|,)\d+)?
+                         		  | ((?:\.|,)\d+) )> )?
+		               (?: [eE] <Exponent=Integernumber>)? <trailingws=ws>
 
       <objtoken: SpeL::Object::TokenSequence = Singletoken>
                 \w | \\_
@@ -486,31 +550,152 @@ sub new {
 
 sub parseDocumentString {
   my $self = shift;
-  my ( $document, $filename ) = @_;
+  my ( $document, $filename, $debug ) = @_;
 
   # preprocess macros and environments that are in the list
   # say STDERR "Before cleansing:\n" . $document;
   # Final prep to accomdate for docstrip '{Change History}'
- 
-  foreach my $arr (@$prepmacrolist) {
-    # say STDERR "REGEXP = " . $regexp;
-    if ( $arr->[1] eq 'keep' ) {
-      $document =~ s/$arr->[0]/$2/g;
+
+  $debug = 0 unless( defined( $debug ) );
+  
+  if ( $debug ) {
+    say STDERR "=== Original ======================================================";
+    say STDERR $document;
+  }
+  
+  foreach my $entry (@$prepmacrolist) {
+    
+    my $mac_regexp = qr/ ( \\ $entry->{macro} ) /x;
+    my $optarg_regexp = qr/ (
+			      \[
+			      [^]]*
+			      \]
+			    )? /x;
+    my $mandarg_regexp = qr/ (?<braceunit>
+			     \{
+			       (?:
+				 (?> [^{}]+ )
+			       |
+				 (?&braceunit)
+			       )*
+			     \}
+			   )
+			 /x;
+
+    my $regexp = $mac_regexp;
+    my $i = 1;
+    my $optargcount = 0;
+    if ( $entry->{argc}
+	 ne '-NoValue-'
+	 and
+	 $entry->{argc} > 0 ) {
+      if ( $entry->{optarg} ne '-NoValue-' ) {
+	$regexp .= qr/ \s* /x . $optarg_regexp;
+	$optargcount = 1;
+	++$i;
+      }
+      for( ; $i <= $entry->{argc}; ++$i ) {
+	$regexp .= qr/ \s* /x . $mandarg_regexp;
+      }
     }
-    else {
-      $document =~ s/$arr->[0]//g;
+
+    while( 1 ) {
+      my @matches = $document =~ /$regexp/;
+      last unless( scalar @matches );
+      
+      my $replacement = $entry->{replacement};
+      my $m = 1;
+      foreach( $m = 1; $m < @matches; ++$m ) {
+	if ( defined $matches[$m] ) {
+	  my $r = $matches[$m];
+	  $r = substr( $r, 1, length( $r ) -2 );
+	  $replacement =~ s/##$m/$r/;
+	}
+	else {
+	  # this only occurs for $m = 1, i.e. when the optional
+	  # argument was not specified in the text, therefore,
+	  # we replace it by the default
+	  $replacement =~ s/##$m/$entry->{optarg}/;
+	}
+      }
+      $document =~ s/$regexp/$replacement/;
+    }
+    #     $document =~ s/$arr->[0]/$2/g;
+    #   }
+    #   else {
+    #     $document =~ s/$arr->[0]//g;
+    #   }
+  }
+
+  
+  foreach my $entry (@$prepenvlist) {
+    
+    my $envbegin_regexp  = qr/ \\ begin \{ $entry->{env} \} /x;
+    my $envend_regexp  = qr/ \\ end \{ $entry->{env} \} /x;
+    my $optarg_regexp = qr/ (
+			      \[
+			      [^]]*
+			      \]
+			    )?
+			  /x;
+    my $mandarg_regexp = qr/ (?<braceunit>
+			      \{
+			      (?:
+				(?> [^{}]+ )
+			      |
+				(?&braceunit)
+			      )*
+			      \}
+			    )
+			  /x;
+    my $envcontent_regexp = qr/ ( .* ) /sx;
+    
+    my $regexp = $envbegin_regexp;
+    my $i = 1;
+    my $optargcount = 0;
+    if ( $entry->{argc}
+	 ne '-NoValue-'
+	 and
+	 $entry->{argc} > 0 ) {
+      if ( $entry->{optarg} ne '-NoValue-' ) {
+	$regexp .= qr/ \s* /x . $optarg_regexp;
+	$optargcount = 1;
+	++$i;
+      }
+      for( ; $i <= $entry->{argc}; ++$i ) {
+	$regexp .= qr/ \s* /x . $mandarg_regexp;
+      }
+    }
+    $regexp .= $envcontent_regexp;
+    $regexp .= $envend_regexp;
+    
+    while( 1 ) {
+      my @matches = $document =~ /$regexp/;
+      last unless( scalar @matches );
+      
+      my $replacement = $entry->{replacement};
+      my $m = 1;
+      foreach( $m = 1; $m < @matches; ++$m ) {
+	if ( defined $matches[$m] ) {
+	  my $r = $matches[$m];
+	  $r = substr( $r, 1, length( $r ) -2 );
+	  $replacement =~ s/##$m/$r/;
+	}
+	else {
+	  # this only occurs for $m = 1, i.e. when the optional
+	  # argument was not specified in the text, therefore,
+	  # we replace it by the default
+	  $replacement =~ s/##$m/$entry->{optarg}/;
+	}
+      }
+      $document =~ s/$regexp/$replacement/;
     }
   }
-  foreach my $arr (@$prepenvlist) {
-    # say STDERR "REGEXP = " . $arr->[0];
-    if ( $arr->[1] eq 'keep' ) {
-      $document =~ s/$arr->[0]/$+/g;
-    }
-    else {
-      $document =~ s/$arr->[0]//g;
-    }
+  if ( $debug ) {
+    say STDERR "=== Prepped  ======================================================";
+    say STDERR $document;
   }
-  # say STDERR "After cleansing:\n" . $document;
+
   
   # Parse the document
   my $doc = SpeL::Object::Document->new();
@@ -530,6 +715,12 @@ sub parseDocumentString {
     die( "Error: failed to parse $filename\n" .
 	 "=> " . join( "\n   ", @! ) . "\n" );
   }
+  
+  if ( $debug ) {
+    say STDERR "=== Parsed   ======================================================";
+    say STDERR Data::Dumper->Dump( [ $doc ], [ 'tree' ] );
+  }
+
   return $doc;
 }
 
@@ -537,7 +728,7 @@ sub parseDocumentString {
 
 sub parseDocument {
   my $self = shift;
-  my ( $filename ) = @_;
+  my ( $filename, $debug ) = @_;
 
   $self->{path} = dirname( $filename );
 
@@ -558,7 +749,7 @@ sub parseDocument {
   # parse
   my $document = join( '', @{$self->{lines}} );
   $document =~ s/^\{(.*)\}$/$1/s; # solve docstrip's problem of {Change History}
-  $self->{tree} = $self->parseDocumentString( $document, $filename, 1 );
+  $self->{tree} = $self->parseDocumentString( $document, $filename, $debug );
 
   delete $self->{lines};
   delete $self->{lineinfo};
@@ -598,7 +789,7 @@ SpeL::Parser::Chunk - LaTeX file parser
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 
@@ -606,7 +797,7 @@ version 20240620.1922
 
 creates a new Chunk parser
 
-=head2 parseDocumentString( document, filename )
+=head2 parseDocumentString( document, filename, debug )
 
 parses a document string
 
@@ -615,6 +806,8 @@ parses a document string
 =item document: the string containing the document to parse
 
 =item filename of that document (used for error reporting)
+
+=item filename of the chunk to debug (only relevant in debugging mode)
 
 =back
 

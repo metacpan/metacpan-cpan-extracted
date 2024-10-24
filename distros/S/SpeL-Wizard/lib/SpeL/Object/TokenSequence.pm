@@ -17,7 +17,12 @@ sub read {
   my $self = shift;
   my ( $level ) = @_;
 
-  return $self->{''};
+  my $tokensequence = $self->{''};
+  $tokensequence =~ s/~+/ /g;
+  $tokensequence =~ s/\\\$/dollar/g;
+  $tokensequence =~ s/\\%/ percent/g;
+  $tokensequence =~ s/\\_/_/g;
+  return $tokensequence;
 }
 
 1;
@@ -34,7 +39,7 @@ SpeL::Object::TokenSequence - LaTeX token sequence object
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

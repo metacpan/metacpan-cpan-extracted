@@ -1,3 +1,23 @@
+-   4.0.1 Wed Oct 23 23:03:01 EDT 2024
+
+    Fixes to setup-dist shell script for creating the placeholder
+    FindBin/libs.pm file with the correct version.
+
+-   4.0.0 Wed Oct 23 00:59:04 EDT 2024
+
+    Remove all use of abs_path, including FindBin; this will
+    now handle symlinks properly using rel2abs.
+
+    Replace FindBin with FindBin::Bin & FindBin::Parents
+    modeled after their Raku counterparts.
+
+    Update the test numbers a bit to test the separte modules
+    with 0*.t; push tests and MANIFEST into the version dir's.
+
+    Update the dist prepare script to extrac its package 
+    line from the installed lib/FindBin/libs.pm so that the
+    Makefile.PL can use VERSION_FROM again. 
+
 -   3.0.2 Fri Sep 16 07:45:00 PM EDT 2022
 
     Bin=X uses dirname( X ) if X is a file, otherwise if X is

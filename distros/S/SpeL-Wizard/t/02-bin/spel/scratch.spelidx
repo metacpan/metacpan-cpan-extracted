@@ -2,4 +2,10 @@ format|ogg
 audiodir|spel
 chunkdir|spel
 language|english
+macpp|emph|1|-NoValue-|##1
+macad|ktickdc|-NoValue-|-NoValue-|K tick DC
+macad|unitof|1|-NoValue-|@{i18n(Unitof,##1)}
+macad|text|1|-NoValue-|##1
+macpp|ds|-NoValue-|-NoValue-|
+macpp|mathit|1|-NoValue-|\text{##1}
 chunk|scratch

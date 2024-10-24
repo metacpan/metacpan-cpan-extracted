@@ -11,6 +11,9 @@
 # All other users (including Commercial, Charity, Educational, Government)
 # must apply in writing for a licence for use from Nigel Horne at <njh at nigelhorne.com>.
 
+# -f:	force a build, otherwise it won't build on CPAN smokers or if the
+#	database already exists
+
 # Set OSM_HOME, OPENADDR_HOME, DR5HN_HOME and WHOSONFIRST_HOME to the directories where the data will be downloaded
 
 # see bin/download_databases which will download the databases and call this script
@@ -830,6 +833,13 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 15639
 		}, {
+			'LAT' => 40.154989,
+			'LON' =>  -76.304266,
+			'CITY' => 'LITITZ',
+			'COUNTY' => 'LANCASTER',
+			'STATE' => 'PA',
+			'COUNTRY' => 'US',
+		}, {
 			'LAT' => 39.999154,
 			'LON' => -79.046526,
 			'NAME' => 'SOUTH SOMERSET SERVICE PLAZA',
@@ -850,6 +860,14 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'VA',
 			'COUNTRY' => 'US',
 			'POSTCODE' => 22306
+		}, {
+			'LAT' => 39.142146,
+			'LON' => -77.866468,
+			'NAME' => 'SHENANDOAH COOL SPRINGS BATTLEFIELD',
+			'CITY' => 'BLUEMONT',
+			'COUNTY' => 'CLARKE',
+			'STATE' => 'VA',
+			'COUNTRY' => 'US',
 		}, {
 			'LAT' => 38.873934,
 			'LON' => -77.461939,
@@ -893,6 +911,15 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20176
 		}, {
+			'LAT' => 39.04071,
+			'LON' => -77.61682,
+			'STREET' => 'OATLANDS PLANTATION LN',
+			'CITY' => 'OATLANDS',
+			'COUNTY' => 'LOUDOUN',
+			'STATE' => 'VA',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20175
+		}, {
 			'LAT' => 39.136193,
 			'LON' => -77.693198,
 			'STREET' => 'PURCELLVILLE GATEWAY DR',
@@ -904,7 +931,6 @@ my %known_places = (	# Places I've checked with my GPS
 		}, {
 			'LAT' => 38.25075,
 			'LON' => -76.9602533333333,
-			'STREET' => '',
 			'CITY' => 'COLONIAL BEACH',
 			'COUNTY' => 'WESTMORELAND',
 			'STATE' => 'VA',
@@ -1061,9 +1087,14 @@ BEGIN {
 	};
 }
 
-exit(0) if($ENV{'AUTOMATED_TESTING'});
+my $force_flag;
+if(defined($ARGV[0]) && ($ARGV[0] eq '-f')) {
+	$force_flag++;
+} elsif($ENV{'AUTOMATED_TESTING'}) {
+	exit(0);
+}
 
-if($^O ne 'solaris') {
+if(($^O ne 'solaris') && ($^O ne 'haiku')) {
 	eval {
 		require File::Open::NoCache::ReadOnly;
 		require IO::AIO;
@@ -1131,8 +1162,13 @@ if($sqlite_file && $db_file) {
 	die 'Choose only one database driver';
 }
 
-exit(0) if($sqlite_file && (-r $sqlite_file));
-exit(0) if($db_file && (-r $db_file));
+if($force_flag) {
+	unlink $sqlite_file if($sqlite_file && (-r $sqlite_file));
+	unlink $db_file if($db_file && (-r $db_file));
+} else {
+	exit(0) if($sqlite_file && (-r $sqlite_file));	# Database has already been built
+	exit(0) if($db_file && (-r $db_file));
+}
 
 my %db_tie;
 my $dbh;
@@ -2574,7 +2610,7 @@ print __LINE__, ": add_record = $add_record (city/state/country = $city/$state/$
 		# 'regions',
 		# 'subregions'
 
-	my $filename = File::Spec->catfile($dr5hn, 'countries+states+cities.json');
+	my $filename = File::Spec->catfile($dr5hn, 'json', 'countries+states+cities.json');
 
 	$| = 1;
 	printf "%-70s\r", $filename;

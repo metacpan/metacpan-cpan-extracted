@@ -22,11 +22,11 @@ or by using the app GPSCF which are included here.
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
@@ -60,9 +60,10 @@ Geo::Coder::Free::Local provides an interface to your own location data.
 
 =cut
 
-sub new {
-	my($proto, %args) = @_;
-	my $class = ref($proto) || $proto;
+sub new
+{
+	my $class = shift;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if(!defined($class)) {
 		# Geo::Coder::Free::Local->new not Geo::Coder::Free::Local::new
@@ -152,22 +153,30 @@ sub geocode {
 		my $rc = Geo::Location::Point->new($row);
 		my $str = lc($rc->as_string());
 
+		# ::diag("Compare $str->$lc") if(($location =~ /MINSTER CEME/i) && ($str =~ /MINSTER CEME/i));
 		# ::diag("Compare $str->$lc");
 		# print "Compare $str->$lc\n";
 		if($str eq $lc) {
-			foreach my $column ('name', 'state_district') {
-				if((!defined($rc->{$column})) && exists($rc->{$column})) {
-					delete $rc->{$column};
-				}
-			}
+			# This looks pointless and I can't recall why I put it in
+			# foreach my $column ('name', 'state_district') {
+				# if((!defined($rc->{$column})) && exists($rc->{$column})) {
+					# delete $rc->{$column};
+				# }
+			# }
+			# ::diag("$location: linear search suceeded");
 			return $rc;
 		}
 		if($str =~ /, us$/) {
 			if("${str}a" eq $lc) {
 				return $rc;
 			}
+		} elsif($lc =~ /(.+), (England|UK)$/i) {
+			if($str eq "$1, gb") {
+				return $rc;
+			}
 		}
 	}
+	# ::diag("$location: linear search failed");
 
 	# ::diag(__PACKAGE__, ': ', __LINE__, ': ', $location);
 
@@ -200,11 +209,11 @@ sub geocode {
 			# Carp::croak($ap->report());
 			# ::diag('Address parse failed: ', $ap->report());
 		# } else {
-		if(!$ap->parse($l)) {
+		if($ap->parse($l) == 0) {
 			# ::diag(__PACKAGE__, ': ', __LINE__, ': ', $location);
 			my %c = $ap->components();
 			# ::diag(Data::Dumper->new([\%c])->Dump());
-			my %addr = ( 'location' => $l );
+			my %addr = ('location' => $l);
 			my $street = $c{'street_name'};
 			if(my $type = $c{'street_type'}) {
 				if(my $a = Geo::Coder::Free::_abbreviate($type)) {
@@ -396,7 +405,7 @@ sub geocode {
 	}
 
 	# Finally try libpostal,
-	# which is good but uses a lot of memory and can take a very long time to load
+	# which is good but uses a lot of memory and can take a very long time to parse data
 	if($libpostal_is_installed == LIBPOSTAL_UNKNOWN) {
 		if(eval { require Geo::libpostal; } ) {
 			Geo::libpostal->import();
@@ -409,6 +418,7 @@ sub geocode {
 	# ::diag(__PACKAGE__, ': ', __LINE__, ": libpostal_is_installed = $libpostal_is_installed ($location)");
 	# print(__PACKAGE__, ': ', __LINE__, ": libpostal_is_installed = $libpostal_is_installed ($location)\n");
 
+	# TODO: cache calls to this
 	if(($libpostal_is_installed == LIBPOSTAL_INSTALLED) && (my %addr = Geo::libpostal::parse_address($location))) {
 		if($addr{'house_number'} && !$addr{'number'}) {
 			$addr{'number'} = delete $addr{'house_number'};
@@ -777,11 +787,14 @@ __DATA__
 "RESIDENCE INN BY MARRIOTT",6364,"FRANTZ RD","DUBLIN",,"OH","US",40.097097,-83.123745
 "TOWPATH TRAVEL PLAZA",,,"BROADVIEW HEIGHTS","CUYAHOGA","OH","US",41.291654,-81.675815
 "NEW STANTON SERVICE PLAZA",,,"HEMPFIELD",,"PA","US",40.206267,-79.565682
+"",,"","LITITZ","LANCASTER","PA","US",40.154989, -76.304266
 "SOUTH SOMERSET SERVICE PLAZA",,,"SOMERSET","SOMERSET","PA","US",39.999154,-79.046526
 "HUNTLEY MEADOWS PARK",3701,"LOCKHEED BLVD","ALEXANDRIA","","VA","US",38.75422, -77.1058666666667
+"SHENANDOAH COOL SPRINGS BATTLEFIELD",,"","BLUEMONT","CLARKE","VA","US",39.142146,-77.866468
 "",14900,"CONFERENCE CENTER DR","CHANTILLY","FAIRFAX","VA","US",38.873934,-77.461939
 "THE PURE PASTY COMPANY",128C,"MAPLE AVE W","VIENNA","FAIRFAX","VA","US",44.40662476,-68.59610059
 "",818,"FERNDALE TERRACE NE","LEESBURG","LOUDOUN","VA","US",39.124843,-77.535445
+"",,"OATLANDS PLANTATION LN","OATLANDS","LOUDOUN","VA","US",39.04071,-77.61682
 "",,"PURCELLVILLE GATEWAY DR","PURCELLVILLE","LOUDOUN","VA","US",39.136193,-77.693198
 "THE CAPITAL GRILLE RESTAURANT",1861,,"MCLEAN","FAIRFAX","VA","US",38.915635,-77.22573
 "",,"","COLONIAL BEACH","WESTMORELAND","VA","US",38.25075,-76.9602533333333

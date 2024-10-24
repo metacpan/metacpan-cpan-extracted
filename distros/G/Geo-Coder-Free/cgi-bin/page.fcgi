@@ -26,7 +26,7 @@ use CGI::Info;
 use CGI::Lingua;
 use Database::Abstraction;
 use File::Basename;
-# use CGI::Alert 'you@example.com';
+# use CGI::Alert $ENV{'SERVER_ADMIN'} || 'you@example.com';
 use FCGI;
 use FCGI::Buffer;
 use Log::Any::Adapter;
@@ -64,7 +64,7 @@ if($ENV{'HTTP_USER_AGENT'}) {
 
 Log::WarnDie->filter(\&filter);
 
-my $vwflog = File::Spec->catfile($info->logdir(), 'vwf.log');
+my $vwflog;	# Location of the vwf.log file, read in from the config file - default = logdir/vwf.log
 
 my $infocache;
 my $linguacache;
@@ -125,7 +125,13 @@ $SIG{TERM} = \&sig_handler;
 $SIG{PIPE} = 'IGNORE';
 $ENV{'PATH'} = '/usr/local/bin:/bin:/usr/bin';	# For insecurity
 
-$SIG{__WARN__} = sub { Log::WarnDie->dispatcher(undef); die @_ };
+$SIG{__WARN__} = sub {
+	if(open(my $fout, '>>', File::Spec->catfile($tmpdir, "$script_name.stderr"))) {
+		print $fout @_;
+	}
+	Log::WarnDie->dispatcher(undef);
+	CORE::die @_
+};
 
 my $request = FCGI::Request();
 
@@ -241,6 +247,7 @@ sub doit
 		syslog => $syslog,
 	});
 
+	$vwflog ||= ($config->vwflog() || File::Spec->catfile($info->logdir(), 'vwf.log'));
 	if($vwflog && open(my $fout, '>>', $vwflog)) {
 		print $fout
 			'"', $info->domain_name(), '",',

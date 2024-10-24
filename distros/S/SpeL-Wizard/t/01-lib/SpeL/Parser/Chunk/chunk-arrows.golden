@@ -4,15 +4,13 @@ $tex = bless( {
     'ElementList' => bless( {
       'Element' => [
         bless( {
-          'Args' => [
-            bless( {
-              'Element' => [
-                bless( {
-                  '' => '2'
-                }, 'SpeL::Object::TokenSequence' )
-              ]
-            }, 'SpeL::Object::ElementList' )
-          ],
+          'Args' => bless( {
+            'Element' => [
+              bless( {
+                '' => '2'
+              }, 'SpeL::Object::TokenSequence' )
+            ]
+          }, 'SpeL::Object::ElementList' ),
           'MathUnit' => [
             bless( {
               '' => '\\jz > 0    \\Rightarrow    \\jz^2 > 0    ~~\\Leftrightarrow~~    -1

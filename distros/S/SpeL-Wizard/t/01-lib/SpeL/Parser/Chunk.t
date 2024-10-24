@@ -25,7 +25,7 @@ $SpeL::I18n::lh = SpeL::I18n->get_handle( 'en' );
 my $parser = SpeL::Parser::Chunk->new();
 pass( "Parser creation" );
 
-foreach my $testfile ( @files ) {
+foreach my $testfile ( sort @files ) {
   $testfile =~ qr{(?<base>.*)\.(?<ext>[^\.]+)$};
   $base = $+{base};
   eval {
@@ -53,7 +53,7 @@ foreach my $testfile ( @files ) {
   };
 }
 
-foreach my $testfile ( @badfiles ) {
+foreach my $testfile ( sort @badfiles ) {
   $testfile =~ qr{(?<base>.*)\.(?<ext>[^\.]+)$};
   $base = $+{base};
   eval {
@@ -85,7 +85,7 @@ foreach my $testfile ( @badfiles ) {
 }
 
 
-foreach my $testfile ( @gooddocs ) {
+foreach my $testfile ( sort @gooddocs ) {
   $testfile =~ qr{(?<base>.*)\.(?<ext>[^\.]+)$};
   $base = $+{base};
   eval {

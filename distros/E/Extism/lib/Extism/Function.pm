@@ -12,7 +12,8 @@ use Exporter 'import';
 use Carp qw(croak);
 use Data::Dumper;
 
-use version 0.77; our $VERSION = qv(v0.0.1);
+use version 0.77;
+our $VERSION = qv(v0.2.0);
 
 
 use constant {
@@ -71,9 +72,9 @@ sub new {
     my $output_types_array = pack('L*', @outputs);
     my $output_types_ptr = unpack('Q', pack('P', $output_types_array));
     my $function = function_new($name, $input_types_ptr, scalar(@inputs), $output_types_ptr, scalar(@outputs), \%hostdata);
-    $function or return undef;
+    $function or croak("Failed to create function, is the name valid?");
     my $functionref = bless \$function, $class;
-    defined $namespace and $functionref->($namespace);
+    defined $namespace and $functionref->set_namespace($namespace);
     return $functionref;
 }
 
@@ -88,9 +89,9 @@ sub set_namespace {
     function_set_namespace($$self, $namespace);
 }
 
-
 sub load_raw_array {
   my ($ptr, $elm_size, $n) = @_;
+  $n or return [];
   my $input_array = unpack('P'.($elm_size * $n), pack('Q', $ptr));
   my @input_packed = unpack("(a$elm_size)*", $input_array);
   return \@input_packed;
@@ -98,9 +99,8 @@ sub load_raw_array {
 
 sub host_function_caller_perl {
     my ($current_plugin, $input_ptr, $input_len, $output_ptr, $output_len, $user_data) = @_;
-    #print Dumper(\@_);
     local $Extism::CurrentPlugin::instance = $current_plugin;
-    my $input_packed = \@{load_raw_array($input_ptr, 16, $input_len)};
+    my $input_packed = load_raw_array($input_ptr, 16, $input_len);
     my @input = map {
       my $type = unpack('L', $_);
       my $value = substr($_, 8);
@@ -126,6 +126,7 @@ sub host_function_caller_perl {
     }
     my @outputs = $user_data->{func}(@input);
     scalar(@outputs) <= $output_len or croak "host function returned too many outputs";
+    $output_len or return;
     {
         my $i = 0;
         foreach my $item (@{$user_data->{conversions}{outputs}}) {

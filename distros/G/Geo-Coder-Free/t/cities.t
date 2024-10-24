@@ -14,21 +14,28 @@ BEGIN {
 }
 
 CITIES: {
-	my $cities = new_ok('Geo::Coder::Free::DB::MaxMind::cities' => [
-		directory => 'lib/Geo/Coder/Free/MaxMind/databases',
-		logger => new_ok('MyLogger'),
-		no_entry => 1
-	]);
+	SKIP: {
+		if(!$ENV{'NO_NETWORK_TESTING'}) {
+			my $cities = new_ok('Geo::Coder::Free::DB::MaxMind::cities' => [{
+				directory => 'lib/Geo/Coder/Free/MaxMind/databases',
+				logger => new_ok('MyLogger'),
+				no_entry => 1
+			}]);
 
-	# diag($cities->population(Country => 'gb', City => 'ramsgate'));
-	cmp_ok($cities->population(Country => 'gb', City => 'ramsgate'), '==', 38624, 'Reading the population of a town/city');
+			# diag($cities->population(Country => 'gb', City => 'ramsgate'));
+			cmp_ok($cities->population(Country => 'gb', City => 'ramsgate'), '==', 38624, 'Reading the population of a town/city');
 
-	my $ramsgate = $cities->fetchrow_hashref({ Country => 'gb', City => 'ramsgate' });
-	if($ramsgate->{'latitude'}) {
-		delta_within($ramsgate->{latitude}, 51.33, 1e-2);
-		delta_within($ramsgate->{longitude}, 1.43, 1e-2);
-	} else {
-		delta_within($ramsgate->{Latitude}, 51.33, 1e-2);
-		delta_within($ramsgate->{Longitude}, 1.43, 1e-2);
+			my $ramsgate = $cities->fetchrow_hashref({ Country => 'gb', City => 'ramsgate' });
+			if($ramsgate->{'latitude'}) {
+				delta_within($ramsgate->{latitude}, 51.33, 1e-2);
+				delta_within($ramsgate->{longitude}, 1.43, 1e-2);
+			} else {
+				delta_within($ramsgate->{Latitude}, 51.33, 1e-2);
+				delta_within($ramsgate->{Longitude}, 1.43, 1e-2);
+			}
+		} else {
+			diag('Network testing disabled');
+			skip('Network testing disabled', 5);
+		}
 	}
 }

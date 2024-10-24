@@ -5,7 +5,8 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-use version 0.77; our $VERSION = qv(v0.0.1);
+use version 0.77;
+our $VERSION = qv(v0.2.0);
 
 require XSLoader;
 XSLoader::load('Extism::XS', $VERSION);

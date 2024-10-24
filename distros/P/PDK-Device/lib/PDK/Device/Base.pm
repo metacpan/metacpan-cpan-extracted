@@ -76,16 +76,20 @@ sub login {
     chomp($@);
 
     if ($@ =~ /RSA modulus too small/i) {
+      $self->{status} = 0;
       eval { $self->connect('-v -1'); };
     }
     elsif ($@ =~ /Selected cipher type <unknown> not supported by server/i) {
+      $self->{status} = 0;
       eval { $self->connect('-c des'); };
     }
     elsif ($@ =~ /no matching key exchange method found./i) {
+      $self->{status} = 0;
       eval { $self->connect('-c des'); };
     }
     elsif ($@ =~ /Connection refused/i) {
       $self->dump("SSH登录($self->{host})异常, 尝试（仅支持默认端口自动切换）切换[telnet]登录");
+      $self->{status} = 0;
       eval {
         $self->{proto} = 'telnet';
         $self->connect();
@@ -94,6 +98,7 @@ sub login {
     elsif ($@ =~ /IDENTIFICATION CHANGED/i) {
       $self->dump("尝试刷新SSH密钥-> /usr/bin/ssh-keygen -R $self->{host}");
       system("/usr/bin/ssh-keygen -R $self->{host}");
+      $self->{status} = 0;
       eval { $self->connect(); };
     }
 
@@ -162,16 +167,19 @@ sub connect {
     ],
     [
       qr/REMOTE HOST IDENTIFICATION HAS CHANGED!/mi => sub {
+        $self->{status} = -1;
         croak("IDENTIFICATION CHANGED!");
       }
     ],
     [
       eof => sub {
+        $self->{status} = -1;
         croak("执行[connect/尝试登录设备阶段]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
+        $self->{status} = -1;
         croak("执行[connect/尝试登录设备阶段]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
       }
     ]
@@ -194,11 +202,13 @@ sub connect {
     ],
     [
       eof => sub {
+        $self->{status} = -1;
         croak("执行[connect/验证登录状态]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
+        $self->{status} = -1;
         croak("执行[connect/验证登录状态]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
       }
     ]
@@ -218,7 +228,7 @@ sub send {
   my ($self, $command) = @_;
 
   my $exp = $self->{exp};
-  croak("下发脚本前需要提前登录设备") unless !!$exp;
+  croak("下发脚本前需要确保已成功登录设备") if !$exp || $self->{status} == -1;
 
   if ($self->{debug} == 1) {
     my $cmd = $command;
@@ -422,11 +432,11 @@ sub _debug {
 
   my $exp = $self->{exp};
   if ($level == 2) {
-    $self->dump("当前 debug 级别将打开日志记录功能，并同步脚本执行回显到控制台");
+    $self->dump("当前(debug)级别将打开日志记录功能，并同步脚本执行回显到控制台");
     $exp->log_stdout(1);
   }
   elsif ($level == 3) {
-    $self->dump("当前 debug 级别将打开日志记录功能，观察更详细的 Expect 信息");
+    $self->dump("当前(debug)级别将打开日志记录功能，观察更详细的 Expect 信息");
     $exp->log_stdout(1);
     $exp->debug($level);
   }

@@ -53,7 +53,7 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::No404s" : "0",
             "Test::Portability::Files" : "0",
-            "Test::Spelling" : "0.12",
+            "Test::Spelling" : "0.17",
             "perl" : "5.006"
          }
       },
@@ -86,6 +86,7 @@
             "Test::DZil" : "0",
             "Test::Deep" : "0",
             "Test::More" : "0.96",
+            "Test::Portability::Files" : "0",
             "Test::Warnings" : "0.009",
             "perl" : "5.006"
          }
@@ -174,12 +175,12 @@
    "provides" : {
       "Dist::Zilla::Plugin::PortabilityTests" : {
          "file" : "lib/Dist/Zilla/Plugin/PortabilityTests.pm",
-         "version" : "2.001002",
+         "version" : "2.001003",
          "x_deprecated" : 1
       },
       "Dist::Zilla::Plugin::Test::Portability" : {
          "file" : "lib/Dist/Zilla/Plugin/Test/Portability.pm",
-         "version" : "2.001002"
+         "version" : "2.001003"
       }
    },
    "release_status" : "stable",
@@ -197,10 +198,10 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "2.001002",
+   "version" : "2.001003",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.041004"
+         "version" : "5.041005"
       },
       "plugins" : [
          {
@@ -413,7 +414,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::MinimumVersion",
-            "version" : "2.000010"
+            "version" : "2.000011"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
@@ -444,7 +445,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::PodSpelling",
-            "version" : "2.007005"
+            "version" : "2.007006"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Pod::No404s",
@@ -480,7 +481,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::Portability",
-            "version" : "2.001002"
+            "version" : "2.001003"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::CleanNamespaces",
@@ -877,7 +878,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20240920"
+                  "Module::CoreList" : "5.20241020"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1095,7 +1096,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v2.001002",
+                  "tag" : "v2.001003",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1245,6 +1246,17 @@
             "version" : "6.032"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "TestRequires",
+            "version" : "6.032"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::Deprecated",
             "config" : {
                "Dist::Zilla::Plugin::Deprecated" : {
@@ -1357,7 +1369,7 @@
       "Kent Fredric <kentfredric@gmail.com>",
       "Peter Vereshagin <peter@vereshagin.org>"
    ],
-   "x_generated_by_perl" : "v5.41.4",
+   "x_generated_by_perl" : "v5.41.5",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0

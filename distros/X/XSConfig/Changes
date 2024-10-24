@@ -1,4 +1,7 @@
 Revision history for XSConfig
+6.28    Thu, Oct 24, 2024  12:48:16 AM
+        -update canned keys for newer perls
+
 6.27    Wed, Jul 11, 2018  4:17:07 PM
         -Fixed CPAN RT#125756, DynaLoader.pm broken on 5.8 with XSConfig
 

@@ -1,4 +1,4 @@
-=pod
+=encoding utf8
 
 =head1 NAME
 
@@ -76,11 +76,11 @@ Returns the next unparsed line in the configuration and marks it as parsed.
 
   my $unparsed_line = $reader->nextUnParsedLine;
 
-=head2 backtrack
+=head2 moveBack
 
 Moves the cursor backward by one position and resets the parse flag for that line.
 
-  $reader->backtrack;
+  $reader->moveBack;
 
 =head2 ignore
 
@@ -108,7 +108,7 @@ Sets the parse flag for the current cursor position.
 
 =head1 AUTHOR
 
-WENWU YAN <968828@gmail.com>
+WENWU YAN E<lt>968828@gmail.comE<gt>
 
 =head1 LICENSE
 

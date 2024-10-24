@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Read an new location and print out in forms suitable
+# Read a new location and print out in forms suitable
 #	to add to createdatabase.PL and lib/Geo/Coder/Free/Local.pm
 
 use strict;
@@ -40,15 +40,17 @@ chomp($postcode);
 print "createdatabase.PL:\n",
 	"\t\t'LAT' => $lat,\n",
 	"\t\t'LON' => $long,\n";
-if($name) {
+if($name && length($name)) {
 	print "\t\t'NAME' => '$name',\n";
 }
-if($number) {
+if($number && length($number)) {
 	print "\t\t'NUMBER' => $number,\n";
 }
-print "\t\t'STREET' => '$street',\n",
-	"\t\t'CITY' => '$city',\n";
-if($county) {
+if($street && length($street)) {
+	print "\t\t'STREET' => '$street',\n";
+}
+print "\t\t'CITY' => '$city',\n";
+if($county && length($county)) {
 	print "\t\t'COUNTY' => '$county',\n";
 }
 print "\t\t'STATE' => '$state',\n",

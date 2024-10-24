@@ -1,0 +1,18 @@
+Changes
+lib/Geo/Coder/GeoApify.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/10-compile.t
+t/20-new.t
+t/comment-spelling.t
+t/eof.t
+t/eol.t
+t/geoapify.t
+t/pod-snippets.t
+t/pod-spelling.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -3,6 +3,7 @@ package Extism::Plugin;
 use 5.016;
 use strict;
 use warnings;
+use Carp qw(croak);
 use Extism::XS qw(
     plugin_new
     plugin_new_error_free
@@ -17,12 +18,14 @@ use Extism::XS qw(
     plugin_config
     plugin_cancel_handle
     );
+use Extism::Plugin::CallException;
 use Extism::Plugin::CancelHandle;
 use Data::Dumper qw(Dumper);
 use Devel::Peek qw(Dump);
 use JSON::PP qw(encode_json);
 use Scalar::Util qw(reftype);
-use version 0.77; our $VERSION = qv(v0.0.1);
+use version 0.77;
+our $VERSION = qv(v0.2.0);
 
 sub new {
     my ($name, $wasm, $options) = @_;
@@ -45,12 +48,9 @@ sub new {
     if (! $plugin) {
         my $errmsg = unpack('p', $errptr);
         plugin_new_error_free(unpack('Q', $errptr));
-        return undef unless wantarray;
-        return (undef, $errmsg);
+        croak $errmsg;
     }
-    my $pluginobj = \$plugin;
-    my $realplugin = bless $pluginobj, $name;
-    return $realplugin;
+    bless \$plugin, $name
 }
 
 # call PLUGIN,FUNCNAME,INPUT
@@ -68,8 +68,7 @@ sub call {
     }
     my $rc = plugin_call($$self, $func_name, $input, length($input));
     if ($rc != 0) {
-        return undef unless wantarray;
-        return (undef, $rc, plugin_error($$self));
+        die Extism::Plugin::CallException->new($rc, plugin_error($$self));
     }
     my $output_size = plugin_output_length($$self);
     my $output_ptr = plugin_output_data($$self);

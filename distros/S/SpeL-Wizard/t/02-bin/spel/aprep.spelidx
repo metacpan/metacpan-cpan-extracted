@@ -1,0 +1,6 @@
+format|ogg
+audiodir|spel
+chunkdir|spel
+macpp|testmacro|3|default value|dit is ##1 en dit is ##2 en ten slotte ##3!
+language|english
+chunk|chunk-aprep

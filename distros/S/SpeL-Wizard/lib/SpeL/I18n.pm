@@ -13,14 +13,21 @@ our %Lexicon =
    '_AUTO'            => 1,
    'title'            => 'title',
    'author'           => 'author',
+   'page'             => 'page',
    'part'             => 'part',
    'chapter'          => 'chapter', 
+   'appendix'         => 'appendix', 
    'section'          => 'section',
    'subsection'       => 'subsection',
    'subsubsection'    => 'subsection',
    'subsubsubsection' => 'subsection',
    'footnote'         => 'footnote',
-   'dotdotdot'        => 'dot dot dot',
+   'figure'           => 'figure',
+   'table'            => 'table',
+   'equation'         => 'equation',
+   'exercise'         => 'exercise',
+   'listing'          => 'listing',
+   'dotdotdot'        => 'and so on until',
    'pi'               => 'pie',
    'infty'            => 'infinity',
    '+'                => 'plus',
@@ -29,14 +36,21 @@ our %Lexicon =
    '%'                => 'percent',
    '*'                => 'times',
    '='                => ',equals,',
+   'approx'           => ',approximately equals,',
    'notequal'         => ',not equal to,',
+   'equivalent'       => 'is equivalent with',
    '<'                => 'is smaller than',
+   '<<'               => 'is much smaller than',
    '>'                => 'is greater than',
+   '>>'               => 'is much greater than',
    '<='               => 'is smaller than or equal to',
    '>='               => 'is greater than or equal to',
    '==>'              => ',resulting in',
    '<=='              => ',and this results from',
    '<=>'              => ',and this is equivalent with',
+   'log'              => 'the logarithm',
+   'logn'             => 'the base [_1] logarithm',
+   'ln'               => 'the natural logarithm',
    'sin'              => 'sine' ,
    'cos'              => 'cosine',
    'tan'              => 'tangent',
@@ -79,15 +93,19 @@ our %Lexicon =
    'Function'         => '[_1] of [_2]',
    'Int'              => 'the integral',
    'Limit'            => 'the limit',
+   'Max'              => 'the maximum',
+   'Min'              => 'the minimum',
    'Limitsexpression' => sub {
      my $lh = $_[0];
      $_[1] = $lh->maketext( $_[1] );
      # with ubound
      defined( $_[3] ) and do {
-       return "$_[1] from $_[2] to $_[3] of";
+       return "$_[1] from $_[2] to $_[3], of:";
      };
-     return "$_[1] for $_[2] of";
+     return "$_[1] for $_[2], of:";
    },
+   'Overbrace'        => '[_1]',
+   'Underbrace'       => '[_1]',
    'matrix'           => 'a matrix with elements',
    'bmatrix'          => 'a matrix with elements',
    'pmatrix'          => 'a matrix with elements',
@@ -99,6 +117,8 @@ our %Lexicon =
      my $lh = $_[0];
      return $_[1] . ' bar';
    },
+   'Intpower'         => 'to the power of',
+   'Faculty'          => 'faculty',
    'Power'            => sub {
      my $lh = $_[0];
      ( $_[1] eq '1' ) and do { return '' };
@@ -106,6 +126,8 @@ our %Lexicon =
      ( $_[1] eq '3' ) and do { return ' cube' };
      return ' to the power of ' . $_[1];
    },
+   'Transposed'       => 'transposed',
+   'Cancels'          => 'which cancels',
    'Sum'              => 'the summation',
    'Squareroot'       => sub {
      my $lh = $_[0];
@@ -116,9 +138,16 @@ our %Lexicon =
    'Div' => '[_1], over [_2]',
    'In' => ' element of ',
    'Leadsto' => ' is associated with ',
+   'To' => ' going to ',
    'Absval' => sub {
      # my $lh = $_[0];
      return ' the absolute value of ' . $_[1];
+   },
+   'Norm' => sub {
+     return ' the norm of ' . $_[1];
+   },
+   'Subjectto' => sub {
+     return $_[1] . " subject to ";
    },
    'Re' => sub {
      # my $lh = $_[0];
@@ -142,7 +171,9 @@ our %Lexicon =
    },
    'Setenum' => 'a set consisting of [_1]',
    'Setdesc' => 'a set containing elements [_1]',
-   'Arg'     => 'arg [_1]'
+   'Arg'     => 'arg [_1]',
+   'Unitof'  => 'the unit of [_1]',
+   'Sim'     => 'is proportional to',
   );
 
 our $lh;
@@ -162,7 +193,7 @@ SpeL::I18n - Base class for localizations
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 SYNOPSYS
 

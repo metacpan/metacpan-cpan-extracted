@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 50;
+plan tests => 62;
 
 my @module_files = (
     'SpeL/I18n.pm',
@@ -14,6 +14,7 @@ my @module_files = (
     'SpeL/I18n/nl.pm',
     'SpeL/Object/Arrow.pm',
     'SpeL/Object/Binop.pm',
+    'SpeL/Object/Bracketconstruction.pm',
     'SpeL/Object/Command.pm',
     'SpeL/Object/Document.pm',
     'SpeL/Object/Element.pm',
@@ -21,13 +22,16 @@ my @module_files = (
     'SpeL/Object/Environment.pm',
     'SpeL/Object/Expression.pm',
     'SpeL/Object/Expressionrest.pm',
+    'SpeL/Object/Faculty.pm',
     'SpeL/Object/Fraction.pm',
     'SpeL/Object/Function.pm',
     'SpeL/Object/Group.pm',
+    'SpeL/Object/Integernumber.pm',
     'SpeL/Object/Interval.pm',
     'SpeL/Object/Item.pm',
     'SpeL/Object/Limitscommand.pm',
     'SpeL/Object/Limitsexpression.pm',
+    'SpeL/Object/Log.pm',
     'SpeL/Object/MathElement.pm',
     'SpeL/Object/MathElementList.pm',
     'SpeL/Object/MathEnvironment.pm',
@@ -38,16 +42,24 @@ my @module_files = (
     'SpeL/Object/MathUnit.pm',
     'SpeL/Object/Mathtotextcommand.pm',
     'SpeL/Object/Matrix.pm',
+    'SpeL/Object/Num.pm',
     'SpeL/Object/Number.pm',
     'SpeL/Object/Operator.pm',
     'SpeL/Object/Option.pm',
+    'SpeL/Object/Overbrace.pm',
     'SpeL/Object/Power.pm',
+    'SpeL/Object/Qty.pm',
     'SpeL/Object/Realnumber.pm',
     'SpeL/Object/RelOperator.pm',
     'SpeL/Object/Relation.pm',
+    'SpeL/Object/SIUnits.pm',
+    'SpeL/Object/Scientificnumber.pm',
     'SpeL/Object/Squareroot.pm',
     'SpeL/Object/Subscript.pm',
     'SpeL/Object/TokenSequence.pm',
+    'SpeL/Object/Trig.pm',
+    'SpeL/Object/Underbrace.pm',
+    'SpeL/Object/Unit.pm',
     'SpeL/Object/Unop.pm',
     'SpeL/Object/Variable.pm',
     'SpeL/Object/VerbatimEnvironment.pm',

@@ -21,8 +21,8 @@ sub read {
 
   $SpeL::I18n::lh->maketext( 'Limitsexpression',
 			     $self->{Limitscommand}->read( $level + 1 ),
-			     $self->{LBound}->read( $level + 1 ),
-			     $self->{UBound}->read( $level + 1 ) );
+			     defined( $self->{LBound} ) ? $self->{LBound}->read( $level + 1 ) : undef,
+			     defined( $self->{UBound} ) ? $self->{UBound}->read( $level + 1 ) : undef );
 }
 
 
@@ -40,7 +40,7 @@ SpeL::Object::Limitsexpression - LaTeX limitsexpression object
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

@@ -76,6 +76,7 @@ conf/GSLAL032003003
 \.db$
 \.sql$
 \.csv\.gz$
+\.dat$
 \bcodes.txt
 \bcounties.txt
 \bstates.txt

@@ -24,7 +24,7 @@ BEGIN {
 	# Test for broken smokers that don't set AUTOMATED_TESTING
 	if(my $reporter = $ENV{'PERL_CPAN_REPORTER_CONFIG'}) {
 		if($reporter =~ /smoker/i) {
-			warn 'AUTOMATED_TESTING added for you';
+			warn 'AUTOMATED_TESTING added for you' if(!defined($ENV{'AUTOMATED_TESTING'}));
 			$ENV{'AUTOMATED_TESTING'} = 1;
 		}
 	}
@@ -43,8 +43,9 @@ BEGIN {
 	}
 }
 
-if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'TRAVIS_PERL_VERSION'}) || defined($ENV{'APPVEYOR'})) {
+if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'CIRCLECI'}) || defined($ENV{'TRAVIS_PERL_VERSION'}) || defined($ENV{'APPVEYOR'})) {
 	# Prevent downloading and installing stuff
+	warn 'AUTOMATED_TESTING added for you' if(!defined($ENV{'AUTOMATED_TESTING'}));
 	$ENV{'AUTOMATED_TESTING'} = 1;
 }
 
@@ -89,55 +90,59 @@ foreach my $dir(@dirs) {
 	}
 }
 
-my %urls = (
-	'http://download.geonames.org/export/dump/admin1CodesASCII.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db',
-	'http://download.geonames.org/export/dump/admin2Codes.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db',
-	# 'https://geocode.nigelhorne.com/lib/Geo/Coder/Free/MaxMind/databases/cities.sql' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql',
-	# 'http://download.maxmind.com/download/worldcities/worldcitiespop.txt.gz' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
-	# This data are 7 years out of date, and are unconsistent with the Geonames database
-	'https://github.com/apache/commons-csv/blob/master/src/test/resources/org/apache/commons/csv/perf/worldcitiespop.txt.gz?raw=true' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
-	# 'http://download.geonames.org/export/dump/allCountries.zip' => 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.zip',
-	'http://download.geonames.org/export/dump/allCountries.zip' => 'downloads/allCountries.zip',
-);
-
-# unlink('lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
-if(eval { require HTTP::Cache::Transparent; }) {
-	HTTP::Cache::Transparent->import();
-	my $cache_dir;
-	if(my $e = $ENV{'CACHE_DIR'}) {
-		$cache_dir = File::Spec->catfile($e, 'http-cache-transparent');
-	} else {
-		require File::HomeDir;
-		File::HomeDir->import();
-
-		# $cache_dir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
-		$cache_dir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
-	}
-
-	if(!-d $cache_dir) {
-		print "Creating the cache directory $cache_dir\n";
-		mkdir $cache_dir, 02755 || die "$cache_dir: $@";
-	}
-	HTTP::Cache::Transparent::init({
-		BasePath => $cache_dir,
-		# Verbose => $opts{'v'} ? 1 : 0,
-		Verbose => 1,
-		NoUpdate => 60 * 60 * 24,
-		MaxAge => 30 * 24
-	}) || die "$0: $cache_dir: $!";
-} else {
-	print "Consider installing HTTP::Cache::Transparent to reduce downloads\n";
-}
-
+my %urls;
 my $use_withcache;
-if(eval { require LWP::Simple::WithCache; }) {
-	LWP::Simple::WithCache->import();
-	$use_withcache = 1;
-} else {
-	require LWP::Simple;
-	LWP::Simple->import();
 
-	print "Consider installing LWP::Simple::WithCache to reduce downloads\n";
+if(!$ENV{'NO_NETWORK_TESTING'}) {
+	%urls = (
+		'http://download.geonames.org/export/dump/admin1CodesASCII.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db',
+		'http://download.geonames.org/export/dump/admin2Codes.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db',
+		# 'https://geocode.nigelhorne.com/lib/Geo/Coder/Free/MaxMind/databases/cities.sql' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql',
+		# 'http://download.maxmind.com/download/worldcities/worldcitiespop.txt.gz' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
+		# This data are 7 years out of date, and are unconsistent with the Geonames database
+		'https://github.com/apache/commons-csv/blob/master/src/test/resources/org/apache/commons/csv/perf/worldcitiespop.txt.gz?raw=true' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
+		# 'http://download.geonames.org/export/dump/allCountries.zip' => 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.zip',
+		'http://download.geonames.org/export/dump/allCountries.zip' => 'downloads/allCountries.zip',
+	);
+
+	# unlink('lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
+	if(eval { require HTTP::Cache::Transparent; }) {
+		HTTP::Cache::Transparent->import();
+		my $cache_dir;
+		if(my $e = $ENV{'CACHE_DIR'}) {
+			$cache_dir = File::Spec->catfile($e, 'http-cache-transparent');
+		} else {
+			require File::HomeDir;
+			File::HomeDir->import();
+
+			# $cache_dir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
+			$cache_dir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
+		}
+
+		if(!-d $cache_dir) {
+			print "Creating the cache directory $cache_dir\n";
+			mkdir $cache_dir, 02755 || die "$cache_dir: $@";
+		}
+		HTTP::Cache::Transparent::init({
+			BasePath => $cache_dir,
+			# Verbose => $opts{'v'} ? 1 : 0,
+			Verbose => 1,
+			NoUpdate => 60 * 60 * 24,
+			MaxAge => 30 * 24
+		}) || die "$0: $cache_dir: $!";
+	} else {
+		print "Consider installing HTTP::Cache::Transparent to reduce downloads\n";
+	}
+
+	if(eval { require LWP::Simple::WithCache; }) {
+		LWP::Simple::WithCache->import();
+		$use_withcache = 1;
+	} else {
+		require LWP::Simple;
+		LWP::Simple->import();
+
+		print "Consider installing LWP::Simple::WithCache to reduce downloads\n";
+	}
 }
 
 foreach my $url(keys %urls) {
@@ -191,8 +196,9 @@ foreach my $url(keys %urls) {
 	die $file if(!-r $file);
 }
 
-if(!(-r 'downloads/allCountries.txt')) {
-	my $zip = 'downloads/allCountries.zip';
+my $zip = 'downloads/allCountries.zip';
+
+if((!(-r 'downloads/allCountries.txt')) && (-r $zip)) {
 	print "Inflating $zip\n";
 
 	eval 'require IO::Uncompress::Unzip';
@@ -261,7 +267,7 @@ my $build_requires = {
 	'Try::Tiny' => 0
 };
 
-if($^O ne 'solaris') {
+if(($^O ne 'solaris') && ($^O ne 'haiku')) {
 	$build_requires->{'File::Open::NoCache::ReadOnly'} = 0.02;
 	$build_requires->{'IO::AIO'} = 0;
 }
@@ -278,6 +284,7 @@ my $test_requires = {
 	'Data::Throttler' => 0,
 	'Test::Carp' => 0,
 	'Test::Deep' => 0,
+	'Test::DescribeMe' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
@@ -297,6 +304,15 @@ if($ENV{'AUTHOR_TESTING'}) {
 	$test_requires->{'Template::Plugin::EnvHash'} = 0;
 	$test_requires->{'Test::Pod::LinkCheck'} = 0;
 	$test_requires->{'Taint::Runtime'} = 0;
+}
+
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
 }
 
 WriteMakefile(
@@ -336,8 +352,7 @@ WriteMakefile(
 		'Storable' => 0,
 		'Text::CSV' => 0,
 		'Text::xSV::Slurp' => 0,
-	},
-	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
+	}, dist => $dist,
 	clean		=> { FILES => 'Geo-Coder-Free-*' },
 	EXE_FILES => [ 'bin/address_lookup' ],
 	# META_ADD => {

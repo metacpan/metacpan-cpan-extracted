@@ -90,14 +90,16 @@ AUTHOR
 
     Maintained by Michael G Schwern until September 2005.
 
-    Now maintained by Tony Bowden.
+    Maintained by Tony Bowden until August 2021
+
+    Now maintained by Ryan Sherer
 
 BUGS and QUERIES
     Please direct all correspondence regarding this module to:
     bug-Class-Data-Inheritable@rt.cpan.org
 
 COPYRIGHT and LICENSE
-    Copyright (c) 2000-2005, Damian Conway and Michael G Schwern. All Rights
+    Copyright (c) 2000-2021, Damian Conway, Michael G Schwern, Tony Bowden, and Ryan Sherer. All Rights
     Reserved.
 
     This module is free software. It may be used, redistributed and/or

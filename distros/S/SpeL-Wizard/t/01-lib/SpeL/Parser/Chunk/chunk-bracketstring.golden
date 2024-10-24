@@ -10,55 +10,63 @@ $tex = bless( {
   ',
               'Left' => bless( {
                 'Component' => bless( {
-                  '' => '\\cos x+j\\sin x',
-                  'Left' => bless( {
-                    'Component' => bless( {
-                      'Argument' => bless( {
-                        'Component' => bless( {
-                          'Alphabet' => 'x',
-                          'trailingws' => ''
-                        }, 'SpeL::Object::Variable' ),
-                        'Rest' => bless( {
-                          'Op' => bless( {
-                            'Op' => '+'
-                          }, 'SpeL::Object::Binop' ),
-                          'Remainder' => bless( {
-                            'Component' => bless( {
-                              'Alphabet' => 'j',
-                              'trailingws' => ''
-                            }, 'SpeL::Object::Variable' ),
-                            'Rest' => bless( {
-                              'Op' => bless( {
-                                'Op' => ''
-                              }, 'SpeL::Object::Binop' ),
-                              'Remainder' => bless( {
-                                'Component' => bless( {
-                                  'Argument' => bless( {
-                                    'Component' => bless( {
-                                      'Alphabet' => 'x',
-                                      'trailingws' => ''
-                                    }, 'SpeL::Object::Variable' ),
-                                    'Rest' => bless( {
-                                      'ws' => ''
-                                    }, 'SpeL::Object::Expressionrest' )
-                                  }, 'SpeL::Object::Expression' ),
-                                  'Trig' => '\\sin'
-                                }, 'SpeL::Object::Function' ),
-                                'Rest' => bless( {
-                                  'ws' => ''
-                                }, 'SpeL::Object::Expressionrest' )
-                              }, 'SpeL::Object::Expression' )
-                            }, 'SpeL::Object::Expressionrest' )
-                          }, 'SpeL::Object::Expression' )
-                        }, 'SpeL::Object::Expressionrest' )
-                      }, 'SpeL::Object::Expression' ),
-                      'Trig' => '\\cos'
-                    }, 'SpeL::Object::Function' ),
-                    'Rest' => bless( {
-                      'ws' => ''
-                    }, 'SpeL::Object::Expressionrest' )
-                  }, 'SpeL::Object::Expression' )
-                }, 'SpeL::Object::Relation' ),
+                  'Component' => bless( {
+                    '' => '\\cos x+j\\sin x',
+                    'Left' => bless( {
+                      'Component' => bless( {
+                        'Argument' => bless( {
+                          'Component' => bless( {
+                            'Alphabet' => 'x',
+                            'trailingws' => ''
+                          }, 'SpeL::Object::Variable' ),
+                          'Rest' => bless( {
+                            'Op' => bless( {
+                              'Op' => '+'
+                            }, 'SpeL::Object::Binop' ),
+                            'Remainder' => bless( {
+                              'Component' => bless( {
+                                'Alphabet' => 'j',
+                                'trailingws' => ''
+                              }, 'SpeL::Object::Variable' ),
+                              'Rest' => bless( {
+                                'Op' => bless( {
+                                  'Op' => ''
+                                }, 'SpeL::Object::Binop' ),
+                                'Remainder' => bless( {
+                                  'Component' => bless( {
+                                    'Argument' => bless( {
+                                      'Component' => bless( {
+                                        'Alphabet' => 'x',
+                                        'trailingws' => ''
+                                      }, 'SpeL::Object::Variable' ),
+                                      'Rest' => bless( {
+                                        'ws' => ''
+                                      }, 'SpeL::Object::Expressionrest' )
+                                    }, 'SpeL::Object::Expression' ),
+                                    'Name' => bless( {
+                                      'Op' => 'sin'
+                                    }, 'SpeL::Object::Trig' )
+                                  }, 'SpeL::Object::Function' ),
+                                  'Rest' => bless( {
+                                    'ws' => ''
+                                  }, 'SpeL::Object::Expressionrest' )
+                                }, 'SpeL::Object::Expression' )
+                              }, 'SpeL::Object::Expressionrest' )
+                            }, 'SpeL::Object::Expression' )
+                          }, 'SpeL::Object::Expressionrest' )
+                        }, 'SpeL::Object::Expression' ),
+                        'Name' => bless( {
+                          'Op' => 'cos'
+                        }, 'SpeL::Object::Trig' )
+                      }, 'SpeL::Object::Function' ),
+                      'Rest' => bless( {
+                        'ws' => ''
+                      }, 'SpeL::Object::Expressionrest' )
+                    }, 'SpeL::Object::Expression' )
+                  }, 'SpeL::Object::Relation' ),
+                  'cbracket' => '\\right)',
+                  'obracket' => '\\left('
+                }, 'SpeL::Object::Bracketconstruction' ),
                 'Rest' => bless( {
                   'Op' => bless( {
                     'Lit' => 'n',
@@ -67,9 +75,7 @@ $tex = bless( {
                   'Remainder' => bless( {
                     'ws' => ''
                   }, 'SpeL::Object::Expressionrest' )
-                }, 'SpeL::Object::Expressionrest' ),
-                'cbracket' => '\\right)',
-                'obracket' => '\\left('
+                }, 'SpeL::Object::Expressionrest' )
               }, 'SpeL::Object::Expression' ),
               'RelationChain' => [
                 {
@@ -80,27 +86,34 @@ $tex = bless( {
                     'Component' => bless( {
                       'Argument' => bless( {
                         'Component' => bless( {
-                          'Alphabet' => 'n',
-                          'trailingws' => ''
-                        }, 'SpeL::Object::Variable' ),
-                        'Rest' => bless( {
-                          'Op' => bless( {
-                            'Op' => ''
-                          }, 'SpeL::Object::Binop' ),
-                          'Remainder' => bless( {
+                          '' => 'nx',
+                          'Left' => bless( {
                             'Component' => bless( {
-                              'Alphabet' => 'x',
+                              'Alphabet' => 'n',
                               'trailingws' => ''
                             }, 'SpeL::Object::Variable' ),
                             'Rest' => bless( {
-                              'ws' => ''
+                              'Op' => bless( {
+                                'Op' => ''
+                              }, 'SpeL::Object::Binop' ),
+                              'Remainder' => bless( {
+                                'Component' => bless( {
+                                  'Alphabet' => 'x',
+                                  'trailingws' => ''
+                                }, 'SpeL::Object::Variable' ),
+                                'Rest' => bless( {
+                                  'ws' => ''
+                                }, 'SpeL::Object::Expressionrest' )
+                              }, 'SpeL::Object::Expression' )
                             }, 'SpeL::Object::Expressionrest' )
                           }, 'SpeL::Object::Expression' )
-                        }, 'SpeL::Object::Expressionrest' )
-                      }, 'SpeL::Object::Expression' ),
-                      'Trig' => '\\cos',
-                      'cbracket' => ')',
-                      'obracket' => '('
+                        }, 'SpeL::Object::Relation' ),
+                        'cbracket' => ')',
+                        'obracket' => '('
+                      }, 'SpeL::Object::Bracketconstruction' ),
+                      'Name' => bless( {
+                        'Op' => 'cos'
+                      }, 'SpeL::Object::Trig' )
                     }, 'SpeL::Object::Function' ),
                     'Rest' => bless( {
                       'Op' => bless( {
@@ -119,27 +132,34 @@ $tex = bless( {
                             'Component' => bless( {
                               'Argument' => bless( {
                                 'Component' => bless( {
-                                  'Alphabet' => 'n',
-                                  'trailingws' => ''
-                                }, 'SpeL::Object::Variable' ),
-                                'Rest' => bless( {
-                                  'Op' => bless( {
-                                    'Op' => ''
-                                  }, 'SpeL::Object::Binop' ),
-                                  'Remainder' => bless( {
+                                  '' => 'nx',
+                                  'Left' => bless( {
                                     'Component' => bless( {
-                                      'Alphabet' => 'x',
+                                      'Alphabet' => 'n',
                                       'trailingws' => ''
                                     }, 'SpeL::Object::Variable' ),
                                     'Rest' => bless( {
-                                      'ws' => ''
+                                      'Op' => bless( {
+                                        'Op' => ''
+                                      }, 'SpeL::Object::Binop' ),
+                                      'Remainder' => bless( {
+                                        'Component' => bless( {
+                                          'Alphabet' => 'x',
+                                          'trailingws' => ''
+                                        }, 'SpeL::Object::Variable' ),
+                                        'Rest' => bless( {
+                                          'ws' => ''
+                                        }, 'SpeL::Object::Expressionrest' )
+                                      }, 'SpeL::Object::Expression' )
                                     }, 'SpeL::Object::Expressionrest' )
                                   }, 'SpeL::Object::Expression' )
-                                }, 'SpeL::Object::Expressionrest' )
-                              }, 'SpeL::Object::Expression' ),
-                              'Trig' => '\\sin',
-                              'cbracket' => ')',
-                              'obracket' => '('
+                                }, 'SpeL::Object::Relation' ),
+                                'cbracket' => ')',
+                                'obracket' => '('
+                              }, 'SpeL::Object::Bracketconstruction' ),
+                              'Name' => bless( {
+                                'Op' => 'sin'
+                              }, 'SpeL::Object::Trig' )
                             }, 'SpeL::Object::Function' ),
                             'Rest' => bless( {
                               'ws' => ''

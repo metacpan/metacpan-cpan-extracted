@@ -1,4 +1,4 @@
-=pod
+=encoding utf8
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ PDK::Content::Role - A Moose role for content parsing and management
   sub nextLine { ... }
   sub prevLine { ... }
   sub nextUnParsedLine { ... }
-  sub backtrack { ... }
+  sub moveBack { ... }
   sub ignore { ... }
   sub getUnParsedLines { ... }
 
@@ -30,27 +30,27 @@ PDK::Content::Role is a Moose role that defines a common interface for content p
 
 =head2 id
 
-An integer representing the unique identifier of the device. This attribute is required and read-only.
+An integer representing the unique identifier of the content. This attribute is required and read-only.
 
 =head2 name
 
-A string representing the name of the device, used for display and identification. This attribute is required and read-only.
+A string representing the name of the content, used for display and identification. This attribute is required and read-only.
 
 =head2 type
 
-A string representing the type or category of the device. This attribute is required and read-only.
+A string representing the type or category of the content. This attribute is required and read-only.
 
 =head2 sign
 
-A string representing the configuration signature, used to verify the integrity of the configuration. This attribute is required and read-only.
+A string representing the configuration signature, used to verify the integrity of the content. This attribute is required and read-only.
 
 =head2 timestamp
 
-A string representing the timestamp of when the configuration was created or modified. This attribute is required and read-only.
+A string representing the timestamp of when the content was created or modified. This attribute is required and read-only.
 
 =head2 lineParsedFlags
 
-An arrayref of integers representing the parse status of each line in the configuration. It is built using the C<_buildLineParsedFlags> method, which must be implemented by the consuming class.
+An arrayref of integers representing the parse status of each line in the content. It is built using the C<_buildLineParsedFlags> method, which must be implemented by the consuming class.
 
 =head2 debug
 
@@ -88,7 +88,7 @@ Method to move to the previous line and return its content.
 
 Method to find and return the next unparsed line, skipping already parsed lines.
 
-=head2 backtrack
+=head2 moveBack
 
 Method to return to the previous parsing position.
 
@@ -102,7 +102,7 @@ Method to return all unparsed lines.
 
 =head1 AUTHOR
 
-[Your Name or Organization]
+WENWU YAN E<lt>968828@gmail.comE<gt>
 
 =head1 LICENSE
 

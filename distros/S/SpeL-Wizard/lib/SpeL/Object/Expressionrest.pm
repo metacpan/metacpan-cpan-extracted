@@ -9,6 +9,7 @@ use SpeL::Object::Subscript;
 use SpeL::Object::Binop;
 use SpeL::Object::Unop;
 use SpeL::Object::Arrow;
+use SpeL::Object::Faculty;
 use SpeL::Object::Power;
 use SpeL::Object::Subscript;
 use SpeL::Object::Command;
@@ -47,7 +48,7 @@ SpeL::Object::Expressionrest - LaTeX expressionrest object
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

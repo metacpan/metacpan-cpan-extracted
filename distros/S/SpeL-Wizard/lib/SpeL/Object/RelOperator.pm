@@ -28,13 +28,18 @@ sub read {
 
   # say STDERR Data::Dumper->Dump( [ $self ], [ 'self' ] );
   $self->{''} eq '='        and return $SpeL::I18n::lh->maketext( '=' );
+  $self->{''} eq '\approx'  and return $SpeL::I18n::lh->maketext( 'approx' );
+  $self->{''} eq '\equiv'   and return $SpeL::I18n::lh->maketext( 'equivalent' );
   $self->{''} =~ /\\ne/     and return $SpeL::I18n::lh->maketext( 'notequal' );
   $self->{''} =~ /<|\\lt/   and return $SpeL::I18n::lh->maketext( '<' );
+  $self->{''} eq '\ll'      and return $SpeL::I18n::lh->maketext( '<<' );
   $self->{''} =~ />|\\gt/   and return $SpeL::I18n::lh->maketext( '>' );
+  $self->{''} eq '\gg'      and return $SpeL::I18n::lh->maketext( '>>' );
   $self->{''} eq '\le'      and return $SpeL::I18n::lh->maketext( '<=' );
   $self->{''} eq '\ge'      and return $SpeL::I18n::lh->maketext( '>=' );
   $self->{''} eq '\in'      and return $SpeL::I18n::lh->maketext( 'In' );
   $self->{''} eq '\leadsto' and return $SpeL::I18n::lh->maketext( 'Leadsto' );
+  $self->{''} eq '\to'      and return $SpeL::I18n::lh->maketext( 'To' );
   $self->{''} eq '&'        and return ',, ';
                                      
   return 'Error: RelOperator';
@@ -54,7 +59,7 @@ SpeL::Object::RelOperator - LaTeX relational operator object
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

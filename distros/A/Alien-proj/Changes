@@ -1,5 +1,10 @@
 Revision history for Alien::proj
 
+1.29 2024-10-24
+    - Use Alien::Build::Plugin::Build::SearchDep only for shared aliens.
+      This should avoid issues with system libs overriding shared aliens
+      in later compilations.
+
 1.28 2024-10-23
     - Set minimum Proj version to 7.1.  This is needed for PDL.
 

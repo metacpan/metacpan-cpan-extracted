@@ -3,6 +3,7 @@ bin/address_lookup
 bin/create_db
 bin/create_sqlite
 bin/download_databases
+bin/gedcom_lookup
 bin/geodecode
 bin/testcgibin
 cgi-bin/page.fcgi
@@ -41,7 +42,6 @@ t/admin2.t
 t/bin.t
 t/cities.t
 t/comment-spelling.t
-t/coverage.t
 t/critic.t
 t/dr5hn.t
 t/eof.t
@@ -54,6 +54,7 @@ t/links.t
 t/local.t
 t/manifest.t
 t/maxmind.t
+t/modules-used.t
 t/namespaces.t
 t/no404s.t
 t/noopentickets.t
@@ -61,16 +62,16 @@ t/noplan.t
 t/openaddr.t
 t/osm.t
 t/pod-cm.t
+t/pod-coverage.t
+t/pod-snippets.t
 t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/prereq.t
 t/scantext.t
-t/snippets.t
 t/strict.t
 t/unused.t
-t/used.t
 t/vars.t
 t/version.t
 t/whosonfirst.t

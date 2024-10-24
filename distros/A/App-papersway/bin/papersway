@@ -149,6 +149,13 @@ $wmipc->subscribe({
 	    }
 	}
 
+	# Title changes -- relevant for the caffeinated window.
+	elsif ($e->{change} && $e->{change} eq "title"
+	       && $caffe_id && $caffe_id == $e->{container}{id}) {
+	    # Call register_caffeinated to update $caffe_name and bar display.
+	    register_caffeinated($e->{container});
+	}
+
 	# Other container changes we need to handle outside of any callback.
 	elsif ($e->{change} && $e->{change} eq "close") {
 	    clear_caffeinated()
@@ -496,7 +503,7 @@ sub normalise_ws_cols {
     # Simple class to batch up commands before sending them.
     # Currently used only within process_msg subroutine.
     package App::papersway::cmds;
-$App::papersway::cmds::VERSION = '1.003';
+$App::papersway::cmds::VERSION = '1.004';
 sub new { bless { cmds => [], need_signal => 0 } => shift };
     sub cmd { my $self = shift; push $self->{cmds}->@*, @_ }
     sub need_signal { shift->{need_signal}++ }
@@ -607,7 +614,8 @@ sub process_msg {
 	$mv->($dir eq "right" ? $i+1 : $i-1, $move eq "move");
 	$ws->{last_dir} = $dir eq "right" ? 1 : -1;
 	$cmds->run;
-    } elsif ($cmd =~ /^cols (incr|decr)$/) {
+    } elsif ($cmd =~ /^cols (incr|decr)$/
+	     && ($ws->{ncols} > 2 || $1 eq "incr")) {
 	$ws->{ncols} += $1 eq "incr" ? 1 : -1;
 	normalise_ws_cols();
 	signal_i3status();
@@ -887,7 +895,7 @@ papersway - PaperWM-like scrollable tiling window management for Sway/i3wm
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 

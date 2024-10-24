@@ -1,0 +1,8 @@
+format|ogg
+audiodir|spel
+chunkdir|spel
+language|english
+macpp|emph|1|-NoValue-|##1
+macad|ktickdc|-NoValue-|-NoValue-|K tick DC
+macad|unitof|1|-NoValue-|@{i18n(Unitof,##1)}
+chunk|long

@@ -7,6 +7,7 @@ lib/Extism.pm
 lib/Extism/CurrentPlugin.pm
 lib/Extism/Function.pm
 lib/Extism/Plugin.pm
+lib/Extism/Plugin/CallException.pm
 lib/Extism/Plugin/CancelHandle.pm
 lib/Extism/ppport.h
 lib/Extism/XS.pm
@@ -21,6 +22,7 @@ t/02-extism.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+unreachable.wasm
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

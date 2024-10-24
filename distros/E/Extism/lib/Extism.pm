@@ -8,7 +8,7 @@ use Extism::Plugin;
 use Extism::Function ':all';
 use Exporter 'import';
 use version 0.77;
-our $VERSION = qv(v0.1.0);
+our $VERSION = qv(v0.2.0);
 
 sub log_custom {
   my ($level) = @_;

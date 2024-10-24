@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 20240620.1922
+    version 20241023.0918
 
 METHODS
 
@@ -26,7 +26,7 @@ METHODS
 
     test: runs the parsing in test mode if true
 
- parseChunks( verbosity, test )
+ parseChunks( verbosity, test, debug )
 
     parses the chunks file
 

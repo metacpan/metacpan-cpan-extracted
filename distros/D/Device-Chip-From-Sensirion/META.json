@@ -1,0 +1,61 @@
+{
+   "abstract" : "a collection of chip drivers for F<Sensirion> sensors",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Device-Chip-From-Sensirion",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Device::Chip" : "0.03",
+            "Device::Chip::Sensor" : "0.23",
+            "Future::AsyncAwait" : "0.47",
+            "Object::Pad" : "0.800",
+            "Sublike::Extended" : "0.29",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0",
+            "Test::Device::Chip::Adapter" : "0.24"
+         }
+      }
+   },
+   "provides" : {
+      "Device::Chip::From::Sensirion" : {
+         "file" : "lib/Device/Chip/From/Sensirion.pm",
+         "version" : "0.02"
+      },
+      "Device::Chip::SCD4x" : {
+         "file" : "lib/Device/Chip/SCD4x.pm",
+         "version" : "0.02"
+      },
+      "Device::Chip::SGP4x" : {
+         "file" : "lib/Device/Chip/SGP4x.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

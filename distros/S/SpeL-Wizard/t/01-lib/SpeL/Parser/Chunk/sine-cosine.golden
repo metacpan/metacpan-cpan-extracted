@@ -27,14 +27,23 @@ $tex = bless( {
                   'Component' => bless( {
                     'Argument' => bless( {
                       'Component' => bless( {
-                        'Greek' => '\\alpha',
-                        'trailingws' => ''
-                      }, 'SpeL::Object::Variable' ),
-                      'Rest' => bless( {
-                        'ws' => ''
-                      }, 'SpeL::Object::Expressionrest' )
-                    }, 'SpeL::Object::Expression' ),
-                    'Trig' => '\\sin'
+                        '' => '\\alpha',
+                        'Left' => bless( {
+                          'Component' => bless( {
+                            'Greek' => '\\alpha',
+                            'trailingws' => ''
+                          }, 'SpeL::Object::Variable' ),
+                          'Rest' => bless( {
+                            'ws' => ''
+                          }, 'SpeL::Object::Expressionrest' )
+                        }, 'SpeL::Object::Expression' )
+                      }, 'SpeL::Object::Relation' ),
+                      'cbracket' => '}',
+                      'obracket' => '{'
+                    }, 'SpeL::Object::Bracketconstruction' ),
+                    'Name' => bless( {
+                      'Op' => 'sin'
+                    }, 'SpeL::Object::Trig' )
                   }, 'SpeL::Object::Function' ),
                   'Rest' => bless( {
                     'ws' => ''
@@ -81,123 +90,143 @@ $tex = bless( {
                       }, 'SpeL::Object::Binop' ),
                       'Remainder' => bless( {
                         'Component' => bless( {
-                          '' => '\\cos{\\frac{25\\pi}{16}}
+                          'Component' => bless( {
+                            '' => '\\cos{\\frac{25\\pi}{16}}
 + \\jz \\sin{\\frac{25\\pi}{16}} ',
-                          'Left' => bless( {
-                            'Component' => bless( {
-                              'Argument' => bless( {
-                                'Component' => bless( {
-                                  'den' => bless( {
-                                    'Realnumber' => bless( {
-                                      'Sign' => '',
-                                      'Value' => '16',
-                                      'trailingws' => ''
-                                    }, 'SpeL::Object::Realnumber' )
-                                  }, 'SpeL::Object::Number' ),
-                                  'num' => bless( {
-                                    'Component' => bless( {
-                                      'Realnumber' => bless( {
-                                        'Sign' => '',
-                                        'Value' => '25',
-                                        'trailingws' => ''
-                                      }, 'SpeL::Object::Realnumber' )
-                                    }, 'SpeL::Object::Number' ),
-                                    'Rest' => bless( {
-                                      'Op' => bless( {
-                                        'Op' => ''
-                                      }, 'SpeL::Object::Binop' ),
-                                      'Remainder' => bless( {
-                                        'Component' => bless( {
+                            'Left' => bless( {
+                              'Component' => bless( {
+                                'Argument' => bless( {
+                                  'Component' => bless( {
+                                    '' => '\\frac{25\\pi}{16}',
+                                    'Left' => bless( {
+                                      'Component' => bless( {
+                                        'den' => bless( {
                                           'Realnumber' => bless( {
                                             'Sign' => '',
-                                            'Value' => '\\pi',
+                                            'Value' => '16',
                                             'trailingws' => ''
                                           }, 'SpeL::Object::Realnumber' )
                                         }, 'SpeL::Object::Number' ),
-                                        'Rest' => bless( {
-                                          'ws' => ''
-                                        }, 'SpeL::Object::Expressionrest' )
-                                      }, 'SpeL::Object::Expression' )
-                                    }, 'SpeL::Object::Expressionrest' )
-                                  }, 'SpeL::Object::Expression' )
-                                }, 'SpeL::Object::Fraction' ),
-                                'Rest' => bless( {
-                                  'ws' => ''
-                                }, 'SpeL::Object::Expressionrest' )
-                              }, 'SpeL::Object::Expression' ),
-                              'Trig' => '\\cos'
-                            }, 'SpeL::Object::Function' ),
-                            'Rest' => bless( {
-                              'Op' => bless( {
-                                'Op' => '+'
-                              }, 'SpeL::Object::Binop' ),
-                              'Remainder' => bless( {
-                                'Component' => bless( {
-                                  'Name' => 'jz',
-                                  'trailingws' => ' '
-                                }, 'SpeL::Object::Command' ),
-                                'Rest' => bless( {
-                                  'Op' => bless( {
-                                    'Op' => ''
-                                  }, 'SpeL::Object::Binop' ),
-                                  'Remainder' => bless( {
-                                    'Component' => bless( {
-                                      'Argument' => bless( {
-                                        'Component' => bless( {
-                                          'den' => bless( {
+                                        'num' => bless( {
+                                          'Component' => bless( {
                                             'Realnumber' => bless( {
                                               'Sign' => '',
-                                              'Value' => '16',
+                                              'Value' => '25',
                                               'trailingws' => ''
                                             }, 'SpeL::Object::Realnumber' )
                                           }, 'SpeL::Object::Number' ),
-                                          'num' => bless( {
-                                            'Component' => bless( {
-                                              'Realnumber' => bless( {
-                                                'Sign' => '',
-                                                'Value' => '25',
-                                                'trailingws' => ''
-                                              }, 'SpeL::Object::Realnumber' )
-                                            }, 'SpeL::Object::Number' ),
-                                            'Rest' => bless( {
-                                              'Op' => bless( {
-                                                'Op' => ''
-                                              }, 'SpeL::Object::Binop' ),
-                                              'Remainder' => bless( {
-                                                'Component' => bless( {
+                                          'Rest' => bless( {
+                                            'Op' => bless( {
+                                              'Op' => ''
+                                            }, 'SpeL::Object::Binop' ),
+                                            'Remainder' => bless( {
+                                              'Component' => bless( {
+                                                'Realnumber' => bless( {
+                                                  'Sign' => '',
+                                                  'Value' => '\\pi',
+                                                  'trailingws' => ''
+                                                }, 'SpeL::Object::Realnumber' )
+                                              }, 'SpeL::Object::Number' ),
+                                              'Rest' => bless( {
+                                                'ws' => ''
+                                              }, 'SpeL::Object::Expressionrest' )
+                                            }, 'SpeL::Object::Expression' )
+                                          }, 'SpeL::Object::Expressionrest' )
+                                        }, 'SpeL::Object::Expression' )
+                                      }, 'SpeL::Object::Fraction' ),
+                                      'Rest' => bless( {
+                                        'ws' => ''
+                                      }, 'SpeL::Object::Expressionrest' )
+                                    }, 'SpeL::Object::Expression' )
+                                  }, 'SpeL::Object::Relation' ),
+                                  'cbracket' => '}',
+                                  'obracket' => '{'
+                                }, 'SpeL::Object::Bracketconstruction' ),
+                                'Name' => bless( {
+                                  'Op' => 'cos'
+                                }, 'SpeL::Object::Trig' )
+                              }, 'SpeL::Object::Function' ),
+                              'Rest' => bless( {
+                                'Op' => bless( {
+                                  'Op' => '+'
+                                }, 'SpeL::Object::Binop' ),
+                                'Remainder' => bless( {
+                                  'Component' => bless( {
+                                    'Name' => 'jz',
+                                    'trailingws' => ' '
+                                  }, 'SpeL::Object::Command' ),
+                                  'Rest' => bless( {
+                                    'Op' => bless( {
+                                      'Op' => ''
+                                    }, 'SpeL::Object::Binop' ),
+                                    'Remainder' => bless( {
+                                      'Component' => bless( {
+                                        'Argument' => bless( {
+                                          'Component' => bless( {
+                                            '' => '\\frac{25\\pi}{16}',
+                                            'Left' => bless( {
+                                              'Component' => bless( {
+                                                'den' => bless( {
                                                   'Realnumber' => bless( {
                                                     'Sign' => '',
-                                                    'Value' => '\\pi',
+                                                    'Value' => '16',
                                                     'trailingws' => ''
                                                   }, 'SpeL::Object::Realnumber' )
                                                 }, 'SpeL::Object::Number' ),
-                                                'Rest' => bless( {
-                                                  'ws' => ''
-                                                }, 'SpeL::Object::Expressionrest' )
-                                              }, 'SpeL::Object::Expression' )
-                                            }, 'SpeL::Object::Expressionrest' )
-                                          }, 'SpeL::Object::Expression' )
-                                        }, 'SpeL::Object::Fraction' ),
-                                        'Rest' => bless( {
-                                          'ws' => ''
-                                        }, 'SpeL::Object::Expressionrest' )
-                                      }, 'SpeL::Object::Expression' ),
-                                      'Trig' => '\\sin'
-                                    }, 'SpeL::Object::Function' ),
-                                    'Rest' => bless( {
-                                      'ws' => ''
-                                    }, 'SpeL::Object::Expressionrest' )
-                                  }, 'SpeL::Object::Expression' )
-                                }, 'SpeL::Object::Expressionrest' )
-                              }, 'SpeL::Object::Expression' )
-                            }, 'SpeL::Object::Expressionrest' )
-                          }, 'SpeL::Object::Expression' )
-                        }, 'SpeL::Object::Relation' ),
+                                                'num' => bless( {
+                                                  'Component' => bless( {
+                                                    'Realnumber' => bless( {
+                                                      'Sign' => '',
+                                                      'Value' => '25',
+                                                      'trailingws' => ''
+                                                    }, 'SpeL::Object::Realnumber' )
+                                                  }, 'SpeL::Object::Number' ),
+                                                  'Rest' => bless( {
+                                                    'Op' => bless( {
+                                                      'Op' => ''
+                                                    }, 'SpeL::Object::Binop' ),
+                                                    'Remainder' => bless( {
+                                                      'Component' => bless( {
+                                                        'Realnumber' => bless( {
+                                                          'Sign' => '',
+                                                          'Value' => '\\pi',
+                                                          'trailingws' => ''
+                                                        }, 'SpeL::Object::Realnumber' )
+                                                      }, 'SpeL::Object::Number' ),
+                                                      'Rest' => bless( {
+                                                        'ws' => ''
+                                                      }, 'SpeL::Object::Expressionrest' )
+                                                    }, 'SpeL::Object::Expression' )
+                                                  }, 'SpeL::Object::Expressionrest' )
+                                                }, 'SpeL::Object::Expression' )
+                                              }, 'SpeL::Object::Fraction' ),
+                                              'Rest' => bless( {
+                                                'ws' => ''
+                                              }, 'SpeL::Object::Expressionrest' )
+                                            }, 'SpeL::Object::Expression' )
+                                          }, 'SpeL::Object::Relation' ),
+                                          'cbracket' => '}',
+                                          'obracket' => '{'
+                                        }, 'SpeL::Object::Bracketconstruction' ),
+                                        'Name' => bless( {
+                                          'Op' => 'sin'
+                                        }, 'SpeL::Object::Trig' )
+                                      }, 'SpeL::Object::Function' ),
+                                      'Rest' => bless( {
+                                        'ws' => ''
+                                      }, 'SpeL::Object::Expressionrest' )
+                                    }, 'SpeL::Object::Expression' )
+                                  }, 'SpeL::Object::Expressionrest' )
+                                }, 'SpeL::Object::Expression' )
+                              }, 'SpeL::Object::Expressionrest' )
+                            }, 'SpeL::Object::Expression' )
+                          }, 'SpeL::Object::Relation' ),
+                          'cbracket' => '\\right)',
+                          'obracket' => '\\left('
+                        }, 'SpeL::Object::Bracketconstruction' ),
                         'Rest' => bless( {
                           'ws' => ''
-                        }, 'SpeL::Object::Expressionrest' ),
-                        'cbracket' => '\\right)',
-                        'obracket' => '\\left('
+                        }, 'SpeL::Object::Expressionrest' )
                       }, 'SpeL::Object::Expression' )
                     }, 'SpeL::Object::Expressionrest' )
                   }, 'SpeL::Object::Expression' )

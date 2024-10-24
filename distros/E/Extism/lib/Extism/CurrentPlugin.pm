@@ -10,7 +10,8 @@ use Extism::XS qw(current_plugin_memory
     current_plugin_memory_free
     CopyToPtr);
 
-use version 0.77; our $VERSION = qv(v0.0.1);
+use version 0.77;
+our $VERSION = qv(v0.2.0);
 
 # These functions are only valid within a host function
 # instance is set by Extism::Function::host_function_caller_perl, valid only for

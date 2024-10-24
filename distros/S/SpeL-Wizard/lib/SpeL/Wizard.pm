@@ -83,7 +83,8 @@ sub parseAuxFile {
 
 sub parseChunks {
   my $this = shift;
-  my ( $verbosity, $test ) = @_;
+  my ( $verbosity, $test, $debug ) = @_;
+  $debug =~ s/\.tex$// if( defined( $debug ) );
   
   my ( $volume, $path, $file ) = File::Spec->splitpath( $this->{argument} );
 
@@ -98,7 +99,7 @@ sub parseChunks {
   my $chunks;
   my $spelIdxFile = _openIOFile( "$spelIdxFileName", '<', "input file" );
   while( my $line = <$spelIdxFile> ) {
-    unless( $line =~ /(?:^format)|(?:^audiodir)|(?:^chunkdir)|(?:^mac)|(?:^env)|(?:^language)/ ) {
+    unless( $line =~ /(?:^format)|(?:^audiodir)|(?:^server)|(?:^chunkdir)|(?:^mac)|(?:^env)|(?:^language)/ ) {
       # count number of chunks to read
       ++$nrLines;
       # register in database
@@ -125,6 +126,7 @@ sub parseChunks {
   my $tts = $this->{config}->{engine}->{tts};
   my $audiodir;
   my $chunkdir;
+  my $server;
   my $exec;
   my $format;
   my $language;
@@ -133,13 +135,16 @@ sub parseChunks {
 
   my $m3u_db = {};
   my $m3u_db_active = [];
-  
+
+  my $fullFilePath;
+
+  my $ran_at_least_once = 0;
   while( my $line = <$spelIdxFile> ) {
 
     # parse the line
     chomp $line;
     my ($label, $rest ) = split( /\|/, $line );
-
+    
     if ( $label eq 'format' ) {
       $format = $rest;
       $exec = "$tts.pl";
@@ -168,95 +173,40 @@ sub parseChunks {
       next;
     }
 
+    if ( $label eq 'server' ) {
+      $server = $rest;
+      next;
+    }
+
     if ( $label eq 'chunkdir' ) {
       $chunkdir = $rest;
       next;
     }
 
     if ( $label eq 'envpp' ) {
-      my ( undef, $env, $argcount, $optarg, $action ) = split( /\|/, $line );
-
-      my $envbegin_regexp  = qr/ \\ begin \{ $env \} /x;
-      my $optarg_regexp = qr/ (?:
-				\[
-				[^]]*
-				\]
-			      )?
-			    /x;
-      my $mndarg_regexp = qr/ (
-				\{
-				(
-				  (?:
-				    (?> [^{}]+ )
-				  |
-				    (?1)
-				  )*
-				)
-				\}
-			      )
-			    /x;
-      my $envcontent_regexp = qr/ ( .* ) /sx;
-      my $envend_regexp  = qr/ \\ end \{ $env \} /x;
-
-      my $regexp = $envbegin_regexp;
-      if ( $argcount ne '-NoValue-'
-	   and
-	   $argcount > 0 ) {
-	if ( $optarg ne '-NoValue-' ) {
-	  $regexp .= $optarg_regexp;
-	  --$argcount;
-	}
-	for( my $i = 1; $i <= $argcount; ++$i ) {
-	  $regexp .= $mndarg_regexp;
-	}
-      }
-      $regexp .= $envcontent_regexp . $envend_regexp;
-
+      my ( undef, $env, $argcount, $optarg, $replacement ) = split( /\|/, $line );
+      
       push @{$SpeL::Parser::Chunk::prepenvlist},
-	[ $regexp, $action ];
+	{
+	 env  => $env,
+	 argc => $argcount,
+	 optarg => $optarg,
+	 replacement => $replacement,
+	};
       
       next;
     }
     
     if ( $label eq 'macpp' ) {
-      my ( undef, $macro, $argcount, $optarg, $action ) = split( /\|/, $line );
-
-      my $macro_regexp  = qr/ \\
-			      $macro /x;
-      my $optarg_regexp = qr/ (?:
-				\[
-				[^]]*
-				\]
-			      )?
-			    /x;
-      my $mndarg_regexp = qr/ (
-				\{
-				(
-				  (?:
-				    (?> [^{}]+ )
-				  |
-				    (?1)
-				  )*
-				)
-				\}
-			      )
-			    /x;
-
-      my $regexp = $macro_regexp;
-      if ( $argcount ne '-NoValue-'
-	   and
-	   $argcount > 0 ) {
-	if ( $optarg ne '-NoValue-' ) {
-	  $regexp .= $optarg_regexp;
-	  --$argcount;
-	}
-	for( my $i = 1; $i <= $argcount; ++$i ) {
-	  $regexp .= $mndarg_regexp;
-	}
-      }
+      my ( undef, $macro, $argcount, $optarg, $replacement ) = split( /\|/, $line );
 
       push @{$SpeL::Parser::Chunk::prepmacrolist},
-	[ $regexp, $action ];
+	{
+	 macro       => $macro,
+	 argc        => $argcount,
+	 optarg      => $optarg,
+	 replacement => $replacement,
+	};
       
       next;
     }
@@ -267,7 +217,7 @@ sub parseChunks {
 	{
 	 argc   => $argcount,
 	 optarg => $optarg,
-	 reader => $reader
+	 reader => $reader,
 	};
       next;
     }
@@ -286,6 +236,9 @@ sub parseChunks {
     }
 
     my $filetoread = $rest;
+
+    next if( defined( $debug ) and ( $debug ne $filetoread ) );
+    $ran_at_least_once = 1;
     
     die( "Error: $spelIdxFileName damaged - format not specified\n" )
       unless defined $format;
@@ -297,7 +250,7 @@ sub parseChunks {
       unless defined $language;
 
     # make the path OS ready
-    my $fullFilePath = File::Spec->catpath( $volume, $path,
+    $fullFilePath = File::Spec->catpath( $volume, $path,
 					    File::Spec->catfile( $audiodir, split( /\//, $filetoread ) ));
 
     # read the text from the chunk file
@@ -311,7 +264,7 @@ sub parseChunks {
       sprintf( "[%3d%%]\r", 100 * $linenr / $nrLines )
       if( $verbosity >= 1 );
     
-    $this->{chunkParser}->parseDocument( $chunkFileName );
+    $this->{chunkParser}->parseDocument( $chunkFileName, $debug );
 
     print STDERR
       "  Parsed  " . pack( "A50", $fullFilePath . ".tex" ) .
@@ -339,6 +292,9 @@ sub parseChunks {
 	{
 	  $text = $SpeL::I18n::lh->maketext( 'chapter' ) . " $1: ";
 
+	  # make the activestack empty again
+	  @$m3u_db_active = ();
+	  
 	  next;
 	};
       /^((?:sub)*section)\s+(.*)/ and do
@@ -358,6 +314,32 @@ sub parseChunks {
 
 	  # generate the level and labe text
 	  $text = $SpeL::I18n::lh->maketext( $level ) . " $label: ";
+
+	  # say STDERR Data::Dumper->Dump( [ $m3u_db_active ], [ qw(dba) ] );
+	  
+	  next;
+	};
+      /^((?:sub)?paragraph)$/ and do
+	{
+	  my $level = $1;
+	  
+	  # count the number of matches of sub in the paragraph and
+	  # add three to it, as 0, 1 an 2 are taken by the sections,
+	  # therefore a paragraph is 3 and a subparagraph 4
+	  my $count = () = $level =~ /sub/g;
+	  $count += scalar @{$m3u_db_active};
+	  
+	  # pop as many actives of the activestack until stack has appropriate length
+	  pop @$m3u_db_active while( $count < $#$m3u_db_active );
+
+	  # register yourself on the activestack
+	  $m3u_db_active->[$count] = $rest;
+	  
+	  # make sure every chunk and section registers on the m3u_db for all activestack levels
+	  # see elsewhere in the code
+
+	  # a paragraph is not numbered and therefore does not need a lead-in.
+	  $text = '';
 
 	  # say STDERR Data::Dumper->Dump( [ $m3u_db_active ], [ qw(dba) ] );
 	  
@@ -405,8 +387,8 @@ sub parseChunks {
 	  $text =~ s/$key/$replace/gi;
 	}
       }
-      
-      
+
+
       my $text_md5_hex = "";
       if ( defined( $text ) )
 	{
@@ -452,7 +434,14 @@ sub parseChunks {
 	  IPC::Run::run( $command, '>', \$out )
 	    or die( "Error: could not start '$exec' with voice '$voice' " .
 		    "(exit value $?)\n" );
-	  _writeToFile( "$fullFilePath.md5", $text_md5_hex );
+	  # only write md5 file if audio generation was successful
+	  if( -e "$fullFilePath.$format" ) {
+	    _writeToFile( "$fullFilePath.md5", $text_md5_hex );
+	  }
+	  else {
+	    die( "Error: audio generation was not successful.\n" .
+		 "       Check your text-to-speech setup\n" );
+	  }
 	}
       else
 	{
@@ -468,12 +457,19 @@ sub parseChunks {
       }
       
       # update the global m3u file
-      print $m3uFile "$fullFilePath.$format\n";
+      # deze moet aangepast worden voor server-use
+      print $m3uFile ( ( $server eq 'local' ) ? "" : "$server/" ) . "$fullFilePath.$format\n";
     }
   }
-
+  die( "Error: nothing to read (wrong debug request?)\n" ) unless( $ran_at_least_once );
+    
   $spelIdxFile->close();
   $m3uFile->close();
+
+  print STDERR
+    "  Parsing " . pack( "A50", $fullFilePath . ".tex" ) .
+    sprintf( "[%3d%%]\r", 100 )
+    if( $verbosity >= 1 );
 
   say STDERR "- Generating m3u playlists";
   
@@ -483,10 +479,18 @@ sub parseChunks {
     my $fn = File::Spec->catpath( $volume, $path,
 				  File::Spec->catfile( $audiodir, $key . ".m3u" ) );
     say STDERR "  - Generating $fn";
-    _writeToFile( $fn,
-		  "#EXTM3U\n" .
-		  "#EXTINF: section playlist generated with SpeLbox\n" .
-		  join( "\n", @$list ) );
+    if ( $server eq 'local' ) {
+      _writeToFile( $fn,
+		    "#EXTM3U\n" .
+		    "#EXTINF: section playlist generated with SpeLbox\n" .
+		    join( "\n", @$list ) );
+    }
+    else {
+      _writeToFile( $fn,
+		    "#EXTM3U\n" .
+		    "#EXTINF: section playlist generated with SpeLbox\n" .
+		    join( "\n", map { "$server/$audiodir/" . $_; } @$list ) );
+    }
   }
   # say STDERR Data::Dumper->Dump( [ $m3u_db ], [ qw( m3u_db ) ] );
 
@@ -545,7 +549,7 @@ Spel Wizard class - engine to build audio files from the spel files generated by
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 
@@ -573,7 +577,7 @@ parses the aux file
 
 =back
 
-=head2 parseChunks( verbosity, test )
+=head2 parseChunks( verbosity, test, debug )
 
 parses the chunks file
 

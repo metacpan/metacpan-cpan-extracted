@@ -19,7 +19,12 @@ sub read {
   my $self = shift;
   my ( $level ) = @_;
 
-  return ' ' . $self->{Lit} // $self->{Group}->read( $level + 1 );
+  if ( defined $self->{Lit} ) {
+    return ' "' . $self->{Lit} . '"';
+  }
+  else {
+    return ' ' . $self->{Group}->read( $level + 1 );
+  }
 }
 
 1;
@@ -36,7 +41,7 @@ SpeL::Object::Subscript - LaTeX subscript object
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

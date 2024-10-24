@@ -19,11 +19,19 @@ sub read {
   my $self = shift;
   my ( $level ) = @_;
 
-  exists $self->{Greek} and do {
+  my $line;
+  if( exists $self->{Greek} ) {
+    $self->{Greek} =~ s/\\(?:mit|mup)?//;
     $self->{Greek} =~ s/\\(?:var)?//;
-    return $SpeL::I18n::lh->maketext( $self->{Greek} );
-  };
-  return $self->{Alphabet};
+    $line = $SpeL::I18n::lh->maketext( lc( $self->{Greek} ) );
+  }
+  else {
+    $line = '"' . $self->{Alphabet} . '"';
+  }
+  if ( exists $self->{Subscript} ) {
+    $line .= $self->{Subscript}->read( $level + 1 );
+  }
+  return $line;
 }
 
 1;
@@ -40,7 +48,7 @@ SpeL::Object::Variable - LaTeX variable (math) object
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

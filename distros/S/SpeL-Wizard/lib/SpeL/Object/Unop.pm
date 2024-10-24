@@ -20,7 +20,15 @@ sub read {
   $self->{Op} =~ /^\\overline$/ and
     return
     $SpeL::I18n::lh->maketext( 'Overline',
-				       $self->{Arg}->read( $level + 1 ) );
+			       $self->{Arg}->read( $level + 1 ) );
+  $self->{Op} =~ /^\\log$/ and
+    return
+    $SpeL::I18n::lh->maketext( 'log',
+			       $self->{Arg}->read( $level + 1 ) );
+  $self->{Op} =~ /^\\ln$/ and
+    return
+    $SpeL::I18n::lh->maketext( 'ln',
+			       $self->{Arg}->read( $level + 1 ) );
 
   return 'Error: Unary operator not implemented yet';
 }
@@ -39,7 +47,7 @@ SpeL::Object::Unop - LaTeX operator object
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

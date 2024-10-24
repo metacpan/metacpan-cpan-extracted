@@ -1,5 +1,10 @@
 Revision history for App::papersway
 
+1.004     2024-10-23 20:29:58+08:00 Asia/Shanghai
+    - Update --i3status output when title of the caffeinated window changes.
+    - Don't allow reducing the number of columns below two.
+      If you reduce to a single column accidentally, it's confusing.
+
 1.003     2024-10-17 10:15:39+08:00 Asia/Shanghai
     - Clear caffeinated status when we receive a close event for the
       caffeinated window.

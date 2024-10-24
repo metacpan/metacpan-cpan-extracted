@@ -15,7 +15,6 @@ use SpeL::Object::TokenSequence;
 use SpeL::Object::Variable;
 use SpeL::Object::Realnumber;
 
-;
 use parent 'Exporter';
 use Carp;
 
@@ -58,7 +57,7 @@ SpeL::Object::Element - LaTeX element object
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

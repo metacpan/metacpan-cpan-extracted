@@ -13,6 +13,8 @@ use SpeL::I18n;
 use Data::Dumper;
 
 use SpeL::Object::Squareroot;
+use SpeL::Object::Log;
+use SpeL::Object::Trig;
 
 
 
@@ -30,15 +32,9 @@ sub read {
     $power = $self->{Power}->read( $level + 1 );
   }
     
-  exists $self->{Trig} and do {
-    $self->{Trig} =~ s/^\\//;
-    return $SpeL::I18n::lh->maketext( "Function",
-				      $SpeL::I18n::lh->maketext( $self->{Trig} ) . $power,
-				      $self->{Argument}->read( $level + 1 ) ) . ', ';
-  };
   return
     $SpeL::I18n::lh->maketext( "Function",
-			       $self->{Name}->read()
+			       $self->{Name}->read( $level + 1 )
 			       . $power,
 			       $self->{Argument}->read( $level + 1 ) )
     . ', ';
@@ -58,7 +54,7 @@ SpeL::Object::Function - LaTeX function (math) object
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

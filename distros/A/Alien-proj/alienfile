@@ -34,7 +34,7 @@ $have{$lib} = eval "require $lib";
 if ($have{$lib}) {
     #say 'Adding libtiff dependency';
     unshift @PATH, $lib->bin_dir;
-    push @dep_aliens, $lib;
+    push @dep_aliens, $lib if $lib->install_type eq 'share';
     my $p;
     if ($on_windows && $lib->install_type eq 'system') {
       #  dirty hack for strawberry perl
@@ -50,12 +50,6 @@ if ($have{$lib}) {
 }
 
 say "Alien::sqlite has sqlite version " . Alien::sqlite->version;
-
-plugin 'Build::SearchDep' => (
-  aliens   => [ @dep_aliens ],
-  public_I => 1,
-  public_l => 1,
-);
 
 my $min_target_version = '7.1';
 
@@ -106,6 +100,12 @@ share {
   #        . 'Alien::libtiff'->libs;
   #  say "libtiff libs: $ENV{TIFF_LIBS}";
   #}
+
+  plugin 'Build::SearchDep' => (
+    aliens   => [ @dep_aliens ],
+    public_I => 1,
+    public_l => 1,
+  );
 
 
   if ($on_windows) {

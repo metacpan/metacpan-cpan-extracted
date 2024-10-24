@@ -15,19 +15,24 @@ $tex = bless( {
                 'Component' => bless( {
                   'Argument' => bless( {
                     'Component' => bless( {
-                      'Alphabet' => 's',
-                      'trailingws' => ''
-                    }, 'SpeL::Object::Variable' ),
-                    'Rest' => bless( {
-                      'ws' => ''
-                    }, 'SpeL::Object::Expressionrest' )
-                  }, 'SpeL::Object::Expression' ),
+                      '' => 's',
+                      'Left' => bless( {
+                        'Component' => bless( {
+                          'Alphabet' => 's',
+                          'trailingws' => ''
+                        }, 'SpeL::Object::Variable' ),
+                        'Rest' => bless( {
+                          'ws' => ''
+                        }, 'SpeL::Object::Expressionrest' )
+                      }, 'SpeL::Object::Expression' )
+                    }, 'SpeL::Object::Relation' ),
+                    'cbracket' => ')',
+                    'obracket' => '('
+                  }, 'SpeL::Object::Bracketconstruction' ),
                   'Name' => bless( {
                     'Alphabet' => 'F',
                     'trailingws' => ''
-                  }, 'SpeL::Object::Variable' ),
-                  'cbracket' => ')',
-                  'obracket' => '('
+                  }, 'SpeL::Object::Variable' )
                 }, 'SpeL::Object::Function' ),
                 'Rest' => bless( {
                   'ws' => ''
@@ -67,19 +72,24 @@ $tex = bless( {
                       'Component' => bless( {
                         'Argument' => bless( {
                           'Component' => bless( {
-                            'Alphabet' => 't',
-                            'trailingws' => ''
-                          }, 'SpeL::Object::Variable' ),
-                          'Rest' => bless( {
-                            'ws' => ''
-                          }, 'SpeL::Object::Expressionrest' )
-                        }, 'SpeL::Object::Expression' ),
+                            '' => 't',
+                            'Left' => bless( {
+                              'Component' => bless( {
+                                'Alphabet' => 't',
+                                'trailingws' => ''
+                              }, 'SpeL::Object::Variable' ),
+                              'Rest' => bless( {
+                                'ws' => ''
+                              }, 'SpeL::Object::Expressionrest' )
+                            }, 'SpeL::Object::Expression' )
+                          }, 'SpeL::Object::Relation' ),
+                          'cbracket' => ')',
+                          'obracket' => '('
+                        }, 'SpeL::Object::Bracketconstruction' ),
                         'Name' => bless( {
                           'Alphabet' => 'f',
                           'trailingws' => ''
-                        }, 'SpeL::Object::Variable' ),
-                        'cbracket' => ')',
-                        'obracket' => '('
+                        }, 'SpeL::Object::Variable' )
                       }, 'SpeL::Object::Function' ),
                       'Rest' => bless( {
                         'Op' => bless( {

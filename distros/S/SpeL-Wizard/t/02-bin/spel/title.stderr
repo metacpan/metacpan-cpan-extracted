@@ -1,15 +1,0 @@
-spel-wizard.pl - v0.9 - Walter Daems <walter.daems@uantwerpen.be>
-=================================================================
-- Reading configuration file from /home/wdaems/perl5/lib/perl5/auto/share/dist/SpeL-Wizard/tts.conf
-- no t/02-bin/spel/title.aux available at /home/wdaems/lab/spelbox/perl/lib/SpeL/Wizard.pm line 96.
-- Treating t/02-bin/spel/spel/title.tex                            
-  Parsing t/02-bin/spel/spel/title.tex                      [  0%]  Parsed  t/02-bin/spel/spel/title.tex                      [  0%]$Parsetree = bless( {
-  'Element' => [
-    bless( {
-      '' => 'What is the answer to the question of life?
-'
-    }, 'SpeL::Object::TokenSequence' )
-  ]
-}, 'SpeL::Object::ElementList' );
-
-Done.

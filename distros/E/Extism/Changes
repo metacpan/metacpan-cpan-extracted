@@ -1,5 +1,12 @@
 Revision history for Extism
 
+v0.2.0  2024-10-23
+        Add configure check to bail out on unsupported platforms
+        Update to work with latest libextism
+        Test unreachable
+        Switch error handling method to throw exceptions
+        Fix setting namespace when creating a function
+
 v0.1.0  2024-06-05
         First version, released on an unsuspecting world.
 

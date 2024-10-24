@@ -104,9 +104,10 @@ my %WriteMakefileArgs = (
     "Test::DZil" => 0,
     "Test::Deep" => 0,
     "Test::More" => "0.96",
+    "Test::Portability::Files" => 0,
     "Test::Warnings" => "0.009"
   },
-  "VERSION" => "2.001002",
+  "VERSION" => "2.001003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -129,6 +130,7 @@ my %FallbackPrereqs = (
   "Test::DZil" => 0,
   "Test::Deep" => 0,
   "Test::More" => "0.96",
+  "Test::Portability::Files" => 0,
   "Test::Warnings" => "0.009",
   "namespace::autoclean" => 0,
   "strict" => 0,

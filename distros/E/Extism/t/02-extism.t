@@ -7,7 +7,7 @@ use Extism ':all';
 use JSON::PP qw(encode_json decode_json);
 use File::Temp qw(tempfile);
 use Devel::Peek qw(Dump);
-plan tests => 40;
+plan tests => 45;
 
 # ...
 ok(Extism::version());
@@ -23,7 +23,10 @@ ok(Extism::version());
             my $tempfunc = sub {
                 $log_text .= $_[0];
             };
-            Extism::Plugin->new('');
+            eval {
+                Extism::Plugin->new('');
+                fail('Extism::Plugin->new("") should throw an exception');
+            };
             Extism::log_drain($tempfunc);
             $log_text or $rc = 1;
             POSIX::_exit($rc);
@@ -33,16 +36,12 @@ ok(Extism::version());
     }
 }
 
-# test failing plugin new in scalar and list context
-{
+# test failing plugin throws an exception
+eval {
     my $notplugin = Extism::Plugin->new('');
-    ok(!defined $notplugin);
-}
-{
-    my ($notplugin, $error) = Extism::Plugin->new('');
-    ok(!defined $notplugin);
-    ok($error);
-}
+    fail('Extism::Plugin->new("") should throw an exception');
+};
+ok($@);
 
 # test succeeding plugin new in scalar and list context
 # also text various Plugin:: functions
@@ -65,7 +64,7 @@ my $wasm = do { local(@ARGV, $/) = 'count_vowels.wasm'; <> };
     ok($plugin->reset());
 }
 {
-    my ($plugin, $error) = Extism::Plugin->new($wasm, {wasi => 1});
+    my $plugin = Extism::Plugin->new($wasm, {wasi => 1});
     ok($plugin);
     my ($output) = $plugin->call('count_vowels', "this is a test");
     ok($output);
@@ -79,18 +78,31 @@ my $wasm = do { local(@ARGV, $/) = 'count_vowels.wasm'; <> };
     Extism::log_file($filename, "error");
     my $failwasm = do { local(@ARGV, $/) = 'fail.wasm'; <> };
     my $failplugin = Extism::Plugin->new($failwasm, {wasi => 1});
-    my $failed = $failplugin->call('run_test', "");
-    ok(!$failed);
+    eval {
+        my $failed = $failplugin->call('run_test', "");
+        fail('calling run_test in failplugin should throw an exception');
+    };
+    ok($@);
     my $rc = read($error_fh, my $filler, 1);
     ok($rc == 1);
     unlink($filename);
     Extism::log_file("/dev/stdout", "error");
-    my ($res, $rca, $info) = $failplugin->call('run_test', "");
-    ok($rca == 1);
-    is($info, 'Some error message');
+    eval {
+        $failplugin->call('run_test', "");
+        fail('calling run_test in failplugin should throw an exception');
+    };
+    ok($@);
+    ok($@->{code} == 1);
+    is($@->{message}, 'Some error message');
 }
 
 # test basic host functions
+eval {
+    my $badname = Extism::Function->new("\x{D800}", [], [], sub {});
+    fail('Function->new should throw an exception when an invalid name is passed');
+};
+ok($@);
+
 my $voidfunction = Extism::Function->new("hello_void", [], [], sub {
     print "hello_void\n";
     return;
@@ -101,6 +113,9 @@ my $paramsfunction = Extism::Function->new("hello_params", [Extism_F64, Extism_I
     return 18446744073709551615;
 });
 ok($paramsfunction);
+my $withnamespace = Extism::Function->new("with_namespace", [], [], sub {
+}, 'namespace');
+ok($withnamespace);
 my $hostwasm = do { local(@ARGV, $/) = 'host.wasm'; <> };
 my $fplugin = Extism::Plugin->new($hostwasm, {functions => [$voidfunction, $paramsfunction], wasi => 1});
 ok($fplugin);
@@ -180,3 +195,21 @@ ok($decoded[1]{total} == 6);
 # Verify both sets of results are the same
 is($highlevel[0], $lowlevel[0]);
 is($highlevel[1], $lowlevel[1]);
+
+# test unreachable plugin
+my $unreachable = encode_json({
+    wasm => [
+        {
+            path => 'unreachable.wasm',
+        }
+    ],
+});
+my $uplugin = Extism::Plugin->new($unreachable, {wasi => 1});
+ok($uplugin);
+eval {
+    $uplugin->call('do_unreachable');
+    fail('calling do_unreachable should throw an exception');
+};
+ok($@);
+ok($@->{code} != 0);
+ok($@->{message});

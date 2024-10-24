@@ -24,7 +24,7 @@ pass( "Module loading" );
 my $parser = SpeL::Parser::Auxiliary->new();
 pass( "Parser creation" );
 
-foreach my $testfile ( @goodfiles ) {
+foreach my $testfile ( sort @goodfiles ) {
   # say STDERR $testfile;
   $testfile =~ qr{(?<base>.*)\.(?<ext>[^\.]+)$};
   $base = $+{base};

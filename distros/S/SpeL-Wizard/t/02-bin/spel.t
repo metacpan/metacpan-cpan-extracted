@@ -18,7 +18,7 @@ my @testfiles = glob "$path/*.spelidx";
 
 plan tests => scalar @testfiles;
 
-foreach my $file ( @testfiles ) {
+foreach my $file ( sort @testfiles ) {
   $file =~ qr{(?<base>.*)\.(?<ext>[^\.]+)$};
   $base = $+{base};
   system( "perl bin/spel-wizard.pl -v -v --test $base > $base.brown 2> $base.stderr" );

@@ -1,3 +1,6 @@
+0.10  Thu Oct 24 01:40:24 UTC 2024
+    - don't use vars, use our (thanks haarg)
+
 0.09  Fri Jul 30 22:42:00 UTC 2021
     - Update spelling errors to resolve #83824 and #86563
 

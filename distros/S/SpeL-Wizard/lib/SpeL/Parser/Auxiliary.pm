@@ -21,13 +21,13 @@ our $grammar = do {
 
       <nocontext:>
 
-      <token: line> ( <newlabel> | <bibcite> | <.otherwise> ) \n
+      <token: line> ( <newlabel> | <bibcite> | <input> | <.otherwise> ) \n
 
       <token: newlabel> \\ newlabel <label=Arg> \{ <[args=Arg]>{5} \}
 
-      <token: label> [^\}]+
-
       <token: bibcite> \\ bibcite <label=Arg> <text=Arg>
+
+      <token: input> \\ \@ input <file=Arg>
 
       <token: otherwise> [^\n]*
 
@@ -127,14 +127,16 @@ sub object {
 
 sub database {
   my $self = shift;
-  my $db = {};
+  my $db = { bibcite => {},
+	     newlabel => {} };
   for my $line ( @{$self->{tree}->{line}} ) {
     if ( ref( $line ) eq 'HASH' ) {
       foreach my $key ( (keys %$line)[0] ) {
 	$key =~ /bibcite/ and do {
 	  $db->{$key}->{$line->{$key}->{label}} = $line->{$key}->{text};
+	  last;
 	};
-	$key =~ /newlabel/ and do{
+	$key =~ /newlabel/ and do {
 	  # if the caption text field of the label contains curly brackets,
 	  # the field will be the hash of the Regexp::Grammars parser and
 	  # we need to replace it by its context field:
@@ -144,6 +146,17 @@ sub database {
 	    $line->{$key}->{args}->[2] =~ s/^\{(.*)\}$/$1/;
 	  }
 	  $db->{$key}->{$line->{$key}->{label}} = $line->{$key}->{args};
+	  last;
+	};
+	$key =~ /input/ and do {
+	  my $auxparser = SpeL::Parser::Auxiliary->new();
+	  $auxparser->parseAuxFile( $line->{$key}->{file} );
+	  $db =
+	    {
+	     bibcite  => { %{$db->{bibcite}}, %{$auxparser->database()->{bibcite}} },
+	     newlabel => { %{$db->{newlabel}}, %{$auxparser->database()->{newlabel}} },
+	    };
+	  last;
 	};
       }
     }
@@ -178,7 +191,7 @@ SpeL::Parser::Auxiliary - Aux file parser
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

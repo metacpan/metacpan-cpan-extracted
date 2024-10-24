@@ -20,6 +20,8 @@ sub read {
   $self->{''} =~ /int/ and return $SpeL::I18n::lh->maketext( 'Int' );
   $self->{''} =~ /sum/ and return $SpeL::I18n::lh->maketext( 'Sum' );
   $self->{''} =~ /lim/ and return $SpeL::I18n::lh->maketext( 'Limit' );
+  $self->{''} =~ /max/ and return $SpeL::I18n::lh->maketext( 'Max' );
+  $self->{''} =~ /min/ and return $SpeL::I18n::lh->maketext( 'Min' );
 }
 
 
@@ -37,7 +39,7 @@ SpeL::Object::Limitscommand - LaTeX limitscommand object
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

@@ -1,0 +1,1 @@
+We use the tts=festival key with the voice en1_mbrola. For a text.tex source file, this flow just takes two commands (with dollar being your shell prompt):

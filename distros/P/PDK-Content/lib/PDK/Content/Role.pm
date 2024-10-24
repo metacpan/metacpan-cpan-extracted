@@ -16,8 +16,7 @@ has timestamp => (is => 'ro', isa => 'Str', required => 1,);
 
 has lineParsedFlags => (is => 'ro', isa => 'ArrayRef[Int]', builder => '_buildLineParsedFlags',);
 
-has debug => (is => 'ro', isa => 'Int', required => 0,);
-
+has debug => (is => 'rw', default => sub { return $ENV{PDK_CONTENT_DEBUG} // 0; },);
 
 requires 'config';
 requires 'confContent';
@@ -26,8 +25,9 @@ requires 'goToHead';
 requires 'nextLine';
 requires 'prevLine';
 requires 'nextUnParsedLine';
-requires 'backtrack';
+requires 'moveBack';
 requires 'ignore';
 requires 'getUnParsedLines';
 
 1;
+

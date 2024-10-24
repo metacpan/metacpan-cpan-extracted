@@ -28,8 +28,12 @@ sub read {
       return ' ' . $SpeL::I18n::lh->maketext( 'In' ) . ' ';
     $self->{Op} =~ /^\\mid$/ and
       return ' ' . $SpeL::I18n::lh->maketext( 'Mid' ) . ' ';
+    $self->{Op} =~ /^\\cdots$/ and
+      return ' ' . $SpeL::I18n::lh->maketext( 'dotdotdot' ) . ' ';
     $self->{Op} =~ /^\\times|\\cdot$/ and
       return ' ' . $SpeL::I18n::lh->maketext( '*' ) . ' ';
+    $self->{Op} =~ /^\\sim$/ and
+      return ' ' . $SpeL::I18n::lh->maketext( 'Sim' ) . ' ';
     return ' ' . $SpeL::I18n::lh->maketext( '*' ) . ' ';
   }
   if ( exists $self->{Pause} ) {
@@ -54,7 +58,7 @@ SpeL::Object::Binop - LaTeX operator object
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 METHODS
 

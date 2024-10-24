@@ -28,15 +28,19 @@ my $author  = 'Walter Daems <walter.daems@uantwerpen.be>';
 
 my $opt_help;
 my $opt_man;
+my $opt_showconfig = 0;
 my $opt_verbose = 0;
 my $opt_test = 0;
+my $opt_debug;
 
 
 my $result = 
-  GetOptions( "help"      => \$opt_help,
-	      "man"       => \$opt_man,
-	      "verbose"   => sub{++$opt_verbose},
-	      "test"      => \$opt_test )
+  GetOptions( "help"       => \$opt_help,
+	      "man"        => \$opt_man,
+	      "showconfig" => \$opt_showconfig,
+	      "verbose"    => sub{++$opt_verbose},
+	      "test"       => \$opt_test,
+	      "debug=s"    => \$opt_debug )
   || pod2usage( -exitval => 1,
 		-output  => \*STDERR );
 pod2usage( -exitval => 100, -verbose => 1 ) if ($opt_help);
@@ -46,8 +50,9 @@ my $argument = $ARGV[0] if( @ARGV == 1 );
 
 pod2usage( -message => "Incorrect number of arguments",
 	   -exitval => 1,
-	   -output  => \*STDERR ) unless( defined( $argument ) );
-
+	   -output  => \*STDERR ) unless( $opt_showconfig
+					  or
+					  defined( $argument ) );
 
 ###################
 # Read config file
@@ -78,6 +83,11 @@ say STDERR $openingline . "\n" .
 
 say STDERR "- Reading configuration file from $configfilename";
 
+if( $opt_showconfig ) {
+  say STDERR Data::Dumper->Dump( [ $config ], [ qw(Configuration) ] );
+  exit(0);
+}
+
 my $spelWizard = SpeL::Wizard->new( $argument, $config );
 
 ###################
@@ -96,7 +106,7 @@ eval {
 
 # parse the spelidx file / generate the audio / generate the playlist
 eval {
-  $spelWizard->parseChunks( $opt_verbose, $opt_test );
+  $spelWizard->parseChunks( $opt_verbose, $opt_test, $opt_debug );
   1;
 } or do {
   say STDERR "$@";
@@ -128,7 +138,7 @@ spel-wizard.pl - converts spelchunks to to plain text
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 SYNOPSIS
 

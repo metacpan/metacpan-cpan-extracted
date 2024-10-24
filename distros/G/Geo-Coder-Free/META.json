@@ -42,6 +42,7 @@
             "JSON::MaybeXS" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent::Throttled" : "0",
+            "Redis" : "0",
             "Try::Tiny" : "0",
             "autodie" : "0"
          }
@@ -87,6 +88,7 @@
             "Data::Throttler" : "0",
             "Test::Carp" : "0",
             "Test::Deep" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
@@ -107,6 +109,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.36",
+   "version" : "0.37",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

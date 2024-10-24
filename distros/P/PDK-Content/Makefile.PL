@@ -18,8 +18,10 @@ my %WriteMakefileArgs = (
   "NAME" => "PDK::Content",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Data::Dumper" => 0,
     "DateTime" => 0,
     "Digest::MD5" => 0,
+    "File::Path" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
     "namespace::autoclean" => 0,
@@ -29,7 +31,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,8 +40,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Data::Dumper" => 0,
   "DateTime" => 0,
   "Digest::MD5" => 0,
+  "File::Path" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
   "Test::More" => 0,

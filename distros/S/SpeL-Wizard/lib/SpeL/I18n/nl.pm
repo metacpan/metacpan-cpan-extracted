@@ -13,14 +13,21 @@ our %Lexicon =
    '_AUTO'            => 1,
    'title'            => 'titel',
    'author'           => 'auteur',
+   'page'             => 'pagina',
    'part'             => 'deel',
    'chapter'          => 'hoofdstuk',
+   'appendix'         => 'appendix', 
    'section'          => 'sectie',
    'subsection'       => 'subsectie',
    'subsubsection'    => 'subsectie',
    'subsubsubsection' => 'subsectie',
    'footnote'         => 'voetnoot',
-   'dotdotdot'        => 'puntje-puntje-puntje',
+   'figure'           => 'figuur',
+   'table'            => 'tabel',
+   'equation'         => 'vergelijking',
+   'exercise'         => 'oefening',
+   'listing'          => 'listing',
+   'dotdotdot'        => 'enzovoort tot',
    'pi'               => 'pi',
    'infty'            => 'oneindig',
    '+'                => 'plus',
@@ -29,14 +36,21 @@ our %Lexicon =
    '%'                => 'procent',
    '*'                => 'maal',
    '='                => ',is gelijk aan,',
+   'approx'           => ',is bij benadering gelijk aan,',
    'notequal'         => ',is niet gelijk aan,',
+   'equivalent'       => 'is equivalent met',
    '<'                => 'is kleiner dan',
+   '<<'               => 'is veel kleiner dan',
    '>'                => 'is groter dan',
+   '>>'               => 'is veel groter dan',
    '<='               => 'is kleiner dan of gelijk aan',
    '>='               => 'is groter dan of gelijk aan',
    '==>'              => ', en hieruit volgt',
    '<=='              => ', en dit volgt uit',
    '<=>'              => ', wat equivalent is met',
+   'log'              => 'de logaritme',
+   'logn'             => 'de logaritme met basis [_1]',
+   'ln'               => 'de natuurlijke logaritme',
    'sin'              => 'sinus',
    'cos'              => 'cosinus',
    'tan'              => 'tangens',
@@ -78,16 +92,20 @@ our %Lexicon =
    'And'              => 'en',
    'Function'         => '[_1] van [_2]',
    'Int'              => 'de integraal',
+   'Max'              => 'het maximum',
+   'Min'              => 'het minimum',
    'Limit'            => 'de limiet',
    'Limitsexpression' => sub {
      my $lh = $_[0];
      $_[1] = $lh->maketext( $_[1] );
      # with ubound
      defined( $_[3] ) and do {
-       return "$_[1] van $_[2] tot $_[3] van";
+       return "$_[1] van $_[2] tot $_[3], van:";
      };
-     return "$_[1] voor $_[2] van";
+     return "$_[1] voor $_[2], van:";
    },
+   'Overbrace'        => '[_1]',
+   'Underbrace'       => '[_1]',
    'matrix'           => 'een matrix met elementen',
    'bmatrix'          => 'een matrix met elementen',
    'pmatrix'          => 'een matrix met elementen',
@@ -99,6 +117,8 @@ our %Lexicon =
      my $lh = $_[0];
      return $_[1] . ' streep';
    },
+   'Intpower'         => 'tot de macht',
+   'Faculty'          => 'faculteit',
    'Power'    => sub {
      my $lh = $_[0];
      ( $_[1] eq '1' ) and do { return '' };
@@ -107,6 +127,8 @@ our %Lexicon =
      ( $_[1] =~ /^1\d$/ ) and do { return " tot de $_[1]de macht" };
      return ' tot de macht ' . $_[1];
    },
+   'Transposed'       => 'transpose',
+   'Cancels'          => 'wat wegvalt',
    'Sum'      => ' de som',
    'Squareroot'       => sub {
      my $lh = $_[0];
@@ -120,9 +142,16 @@ our %Lexicon =
    'Div' => '[_1], gedeeld door [_2]',
    'In' => ' element van ',
    'Leadsto' => ' wordt geassocieerd met ',
+   'To' => ' strevende naar ',
    'Absval' => sub {
      my $lh = $_[0];
      return ' de absoluute waarde van ' . $_[1];
+   },
+   'Norm' => sub {
+     return ' de norm van ' . $_[1];
+   },
+   'Subjectto' => sub {
+     return $_[1] . " waarbij ";
    },
    'Re' => sub {
      # my $lh = $_[0];
@@ -146,7 +175,9 @@ our %Lexicon =
    },
    'Setenum' => 'een verzameling bestaande uit [_1]',
    'Setdesc' => 'een verzameling met elementen [_1]',
-   'Arg'     => 'arg [_1]'
+   'Arg'     => 'arg [_1]',
+   'Unitof'  => 'de eenheid van [_1]',
+   'Sim'     => 'is evenredig met',
   );
 
 1;
@@ -163,7 +194,7 @@ SpeL::I18n::nl - class for Dutch localization
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 SYNOPSYS
 

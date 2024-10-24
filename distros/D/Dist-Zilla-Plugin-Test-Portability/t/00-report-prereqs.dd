@@ -30,7 +30,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::Spelling' => '0.12',
+                                      'Test::Spelling' => '0.17',
                                       'perl' => '5.006'
                                     }
                     },
@@ -63,6 +63,7 @@ do { my $x = {
                                    'Test::DZil' => '0',
                                    'Test::Deep' => '0',
                                    'Test::More' => '0.96',
+                                   'Test::Portability::Files' => '0',
                                    'Test::Warnings' => '0.009',
                                    'perl' => '5.006'
                                  }

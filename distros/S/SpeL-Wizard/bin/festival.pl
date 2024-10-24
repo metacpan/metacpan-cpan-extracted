@@ -68,7 +68,7 @@ festival.pl - script converting textfile named $1
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 AUTHOR
 

@@ -8,11 +8,11 @@ use JSON::MaybeXS;
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =cut
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 use Geo::Coder::Free::Display;
 

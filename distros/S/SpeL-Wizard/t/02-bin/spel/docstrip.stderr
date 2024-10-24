@@ -1,23 +1,0 @@
-spel-wizard.pl - v0.9 - Walter Daems <walter.daems@uantwerpen.be>
-=================================================================
-- Reading configuration file from /home/wdaems/perl5/lib/perl5/auto/share/dist/SpeL-Wizard/tts.conf
-- no t/02-bin/spel/docstrip.aux available at /home/wdaems/lab/spelbox/perl/lib/SpeL/Wizard.pm line 96.
-- Treating t/02-bin/spel/spel/docstrip.tex                         
-  Parsing t/02-bin/spel/spel/docstrip.tex                   [  0%]  Parsed  t/02-bin/spel/spel/docstrip.tex                   [  0%]$Parsetree = bless( {
-  'Element' => [
-    bless( {
-      '' => 'Using the package is very simple. Just load the package\'s
-style file using an appropriate '
-    }, 'SpeL::Object::TokenSequence' ),
-    bless( {
-      'Docstrip' => '\\usepackage[extramath]{spel}'
-    }, 'SpeL::Object::Element' ),
-    bless( {
-      '' => '.
-
-'
-    }, 'SpeL::Object::TokenSequence' )
-  ]
-}, 'SpeL::Object::ElementList' );
-
-Done.

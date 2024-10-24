@@ -8,6 +8,26 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 ## [Unreleased]
 
+## [30.0.0] - 2024-10-24
+### Added
+- [PHP, Java, Ruby, JavaScript] update dependency messages up to v26
+- [Python] Added type annotations ([#283](https://github.com/cucumber/gherkin/pull/283))
+- [Python] Switch to pyproject.toml ([#290](https://github.com/cucumber/gherkin/pull/290))
+
+### Changed
+- [.NET] Drop unsupported frameworks. Now supported target frameworks are .NET 8, .NET Standard 2.0 ([#265](https://github.com/cucumber/gherkin/pull/265))
+- [.NET] Adopt File Scoped Namespaces c# feature ([#271](https://github.com/cucumber/gherkin/pull/271))
+- [.NET] Adopt c# 12 primary constructors ([#272](https://github.com/cucumber/gherkin/pull/272))
+- [.NET] Adopt c# 10 ImplicitUsings
+- [.NET] Replace TinyJson to System.Text.Json
+- [.NET] Enable warnings as errors
+- [Ruby] Initial rubocop autofixes (Mainly to style) ([#266](https://github.com/cucumber/gherkin/pull/266))
+- [.NET] Update System.Text.Json to 6.0.10
+
+### Removed
+- [Python] Drop compatibility for python 2 and python 3.8. Supported python versions: 3.9, 3.10, 3.11, 3.12, 3.13
+- [Python] Removed installation of `gherkin` script. It was used for internal acceptance tests only.
+
 ## [29.0.0] - 2024-08-12
 ### Added
 - (i18n) Added Gujarati translation for "Rule" ([#249](https://github.com/cucumber/gherkin/pull/249))
@@ -668,7 +688,8 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 ### Changed
 - First release
 
-[Unreleased]: https://github.com/cucumber/gherkin/compare/v29.0.0...HEAD
+[Unreleased]: https://github.com/cucumber/gherkin/compare/v30.0.0...HEAD
+[30.0.0]: https://github.com/cucumber/gherkin/compare/v29.0.0...v30.0.0
 [29.0.0]: https://github.com/cucumber/gherkin/compare/v28.0.0...v29.0.0
 [28.0.0]: https://github.com/cucumber/gherkin/compare/v27.0.0...v28.0.0
 [27.0.0]: https://github.com/cucumber/gherkin/compare/v26.2.0...v27.0.0

@@ -8,7 +8,6 @@ build_requires:
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
   Alien::Build::Plugin::PkgConfig::PPWrapper: '0'
   Alien::cmake3: '0.02'
-  Alien::libtiff: '0'
   Alien::sqlite: '1.06'
   Archive::Tar: '0'
   Config: '0'
@@ -63,13 +62,12 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-proj/issues/
   repository: https://github.com/shawnlaffan/perl-alien-proj
-version: '1.28'
+version: '1.29'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.83'
   requires:
     share:
       Alien::cmake3: '0.02'
-      Alien::libtiff: '0'
       Alien::sqlite: '0'
       Archive::Tar: '0'
       Config: '0'

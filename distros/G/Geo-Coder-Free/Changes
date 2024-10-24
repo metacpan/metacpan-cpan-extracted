@@ -1,5 +1,15 @@
 Revision history for Geo-Coder-Free
 
+0.37	Wed Oct 23 10:09:54 EDT 2024
+	Allow new() to take HASH ref
+	Slight speed improvements in Local.pm
+	Support CircleCI
+	Fix testing on a NO_NETWORK_TESTING system
+	Port to Haiku
+	Added the -f flag to createdatabase.PL to force building
+		the database, e.g. after running wof_update
+	DR5HN now puts JSON in its own directory
+
 0.36	Fri Jul  5 08:56:52 EDT 2024
 	Handle wide characters
 	Latest VWF

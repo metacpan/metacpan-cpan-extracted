@@ -20,11 +20,11 @@ my ( $textfilename, $audiofilename, $engvoice ) = @ARGV;
 my $format = $audiofilename;
 $format =~ s/.+\.([^\.]+)/$1/;
 foreach ( $format ) {
-  'mp3' and do {
+  /^mp3$/ and do {
     $format = 'mp3';
     last;
   };
-  'ogg' and do {
+  /^ogg$/ and do {
     $format = 'ogg_vorbis';
     last;
   };
@@ -43,19 +43,26 @@ $textfile->open( "<$textfilename" )
   or die( "Error: cannot open '$textfilename'\n" );
 my $text = do { local $/; <$textfile> };
 
+# Prepare for ssml
+# put harness around letters to spell...
+$text =~ s/\"a\"/"ey"/g;
+# say STDERR "|$text|";
+
 # Run polly, run!
 my $command = [
-	       "aws",
-	       "polly",
-	       "synthesize-speech",
-	       "--output-format",
+	       'aws',
+	       'polly',
+	       'synthesize-speech',
+	       '--output-format',
 	       $format,
-	       "--engine",
+	       '--engine',
 	       $engine,
-	       "--voice-id",
+	       '--voice-id',
 	       $voice,
-	       "--text",
-	       "$text",
+	       '--text',
+	       $text,
+	       # '--text-type',
+	       # 'ssml',
 	       $audiofilename
 	      ];
 my $out;
@@ -75,7 +82,7 @@ awspollymp3.pl - script converting textfile named $1
 
 =head1 VERSION
 
-version 20240620.1922
+version 20241023.0918
 
 =head1 AUTHOR
 

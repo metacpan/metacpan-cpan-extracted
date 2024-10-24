@@ -91,7 +91,7 @@ EOW
         "Mike Doherty <doherty\@cpan.org>"
       ],
       "dist_name" => "Dist-Zilla-Plugin-Test-Portability",
-      "dist_version" => "2.001002",
+      "dist_version" => "2.001003",
       "license" => "perl",
       "module_name" => "Dist::Zilla::Plugin::Test::Portability",
       "recursive_test_files" => 1,
@@ -118,6 +118,7 @@ EOW
         "Test::DZil" => 0,
         "Test::Deep" => 0,
         "Test::More" => "0.96",
+        "Test::Portability::Files" => 0,
         "Test::Warnings" => "0.009",
         "perl" => "5.006"
       }
@@ -133,6 +134,7 @@ EOW
       "Test::DZil" => 0,
       "Test::Deep" => 0,
       "Test::More" => "0.96",
+      "Test::Portability::Files" => 0,
       "Test::Warnings" => "0.009",
       "perl" => "5.006"
     );

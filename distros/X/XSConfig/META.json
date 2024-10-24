@@ -41,7 +41,7 @@
    "provides" : {
       "XSConfig" : {
          "file" : "Config.pm",
-         "version" : "6.27"
+         "version" : "6.28"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "url" : "https://github.com/perl11/p5-Config"
       }
    },
-   "version" : "6.27",
+   "version" : "6.28",
    "x_serialization_backend" : "JSON version 2.97001"
 }

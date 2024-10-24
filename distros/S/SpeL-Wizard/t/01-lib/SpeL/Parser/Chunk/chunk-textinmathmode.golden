@@ -11,16 +11,14 @@ $tex = bless( {
               'Left' => bless( {
                 'Component' => bless( {
                   'Alphabet' => 'z',
-                  'trailingws' => ''
-                }, 'SpeL::Object::Variable' ),
-                'Rest' => bless( {
-                  'Op' => bless( {
+                  'Subscript' => bless( {
                     'Lit' => '1',
                     'sub' => '_'
                   }, 'SpeL::Object::Subscript' ),
-                  'Remainder' => bless( {
-                    'ws' => ''
-                  }, 'SpeL::Object::Expressionrest' )
+                  'trailingws' => ' '
+                }, 'SpeL::Object::Variable' ),
+                'Rest' => bless( {
+                  'ws' => ''
                 }, 'SpeL::Object::Expressionrest' )
               }, 'SpeL::Object::Expression' ),
               'RelationChain' => [
@@ -76,16 +74,14 @@ $tex = bless( {
                               'Remainder' => bless( {
                                 'Component' => bless( {
                                   'Alphabet' => 'z',
-                                  'trailingws' => ''
-                                }, 'SpeL::Object::Variable' ),
-                                'Rest' => bless( {
-                                  'Op' => bless( {
+                                  'Subscript' => bless( {
                                     'Lit' => '2',
                                     'sub' => '_'
                                   }, 'SpeL::Object::Subscript' ),
-                                  'Remainder' => bless( {
-                                    'ws' => ''
-                                  }, 'SpeL::Object::Expressionrest' )
+                                  'trailingws' => ' '
+                                }, 'SpeL::Object::Variable' ),
+                                'Rest' => bless( {
+                                  'ws' => ''
                                 }, 'SpeL::Object::Expressionrest' )
                               }, 'SpeL::Object::Expression' )
                             }, 'SpeL::Object::Expressionrest' )

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Test::Portability; # git description: v2.001001-5-g5dd4329
+package Dist::Zilla::Plugin::Test::Portability; # git description: v2.001002-4-g5c51a04
 # ABSTRACT: Author tests for portability
 
-our $VERSION = '2.001002';
+our $VERSION = '2.001003';
 
 use Moose;
 with qw/
@@ -134,7 +134,7 @@ Dist::Zilla::Plugin::Test::Portability - Author tests for portability
 
 =head1 VERSION
 
-version 2.001002
+version 2.001003
 
 =for test_synopsis BEGIN { die "SKIP: synopsis isn't perl code" }
 
