@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Update;
 # ABSTRACT: Update Koha ARK fields
-$Koha::Contrib::ARK::Update::VERSION = '1.1.1';
+$Koha::Contrib::ARK::Update::VERSION = '1.1.2';
 use Moose;
 use Modern::Perl;
 
@@ -8,10 +8,14 @@ with 'Koha::Contrib::ARK::Action';
 
 
 sub action {
-    my ($self, $biblionumber, $record) = @_;
+    my $self = shift;
+    my $ark = $self->ark;
+    my $current = $ark->current;
+    my $biblio = $current->{biblio};
+    my $record = $biblio->{record};
 
     my $a = $self->ark->c->{ark};
-    my $ark = $self->ark->build_ark($biblionumber, $record);
+    my $ark_value = $current->{ark};
     my $kfield = $a->{koha}->{ark};
     if ( $kfield->{letter} ) { # datafield
         if ( my $field = $record->field($kfield->{tag}) ) {
@@ -20,12 +24,12 @@ sub action {
                 $self->ark->what_append('remove_existing') unless $keep;
                 $keep;
             } @{$field->subf};
-            push @subf, [ $kfield->{letter} => $ark ];
+            push @subf, [ $kfield->{letter} => $ark_value ];
             $field->subf( \@subf );
         }
         else {
             $record->append( MARC::Moose::Field::Std->new(
-                tag => $kfield->{tag}, subf => [ [ $kfield->{letter} => $ark ] ] ) );
+                tag => $kfield->{tag}, subf => [ [ $kfield->{letter} => $ark_value ] ] ) );
         }
     }
     else {
@@ -34,7 +38,7 @@ sub action {
             $self->ark->what_append('remove_existing');
         }
         $record->append( MARC::Moose::Field::Control->new(
-            tag => $kfield->{tag}, value => $ark ) );
+            tag => $kfield->{tag}, value => $ark_value ) );
     }
     $self->ark->what_append('add');
     $self->ark->current_modified();
@@ -56,7 +60,7 @@ Koha::Contrib::ARK::Update - Update Koha ARK fields
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 AUTHOR
 

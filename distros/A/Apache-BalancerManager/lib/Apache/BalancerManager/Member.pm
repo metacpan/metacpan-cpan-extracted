@@ -1,8 +1,5 @@
 package Apache::BalancerManager::Member;
-{
-  $Apache::BalancerManager::Member::VERSION = '0.001002';
-}
-
+$Apache::BalancerManager::Member::VERSION = '0.002000';
 # ABSTRACT: ClientSide representation of Apache BalancerManager Member
 
 use Moo;
@@ -34,6 +31,7 @@ has manager => (
       _nonce         => 'nonce',
       _url           => 'url',
       _get           => '_get',
+      _post          => '_post',
    },
 );
 
@@ -44,23 +42,28 @@ sub update {
    my $self = shift;
 
    my $uri = URI->new($self->_url);
-   $uri->query_form({
-      lf    => $self->load_factor,
-      ls    => $self->lb_set,
-      wr    => $self->route,
-      rr    => $self->route_redirect,
-      dw    => ( $self->status ? 'Enable' : 'Disable' ),
+   my $form = {
+      w_status_D => ( $self->status ? 0 : 1 ),
+      w_status_I => 0,
+      w_status_N => 0,
+      w_status_H => 0,
+      w_status_R => 0,
+      w_status_S => 0,
+      w_lf    => $self->load_factor,
+      w_ls    => $self->lb_set,
+      w_wr    => $self->route,
+      w_rr    => $self->route_redirect,
       w     => $self->location,
       b     => $self->_balancer_name,
       nonce => $self->_nonce,
-   });
-   $self->_get($uri);
+   };
+   $self->_post($uri, $form);
 }
 
 1;
 
-
 __END__
+
 =pod
 
 =head1 NAME
@@ -128,16 +131,25 @@ object.
    $member->disable;
    $member->update;
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
+=item *
+
+Wes Malone <wesm@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -1,5 +1,5 @@
 package Data::Frame::Role;
-$Data::Frame::Role::VERSION = '0.006002';
+$Data::Frame::Role::VERSION = '0.006003';
 # ABSTRACT: For creating roles in Data::Frame
 
 use Data::Frame::Setup ();
@@ -23,7 +23,7 @@ Data::Frame::Role - For creating roles in Data::Frame
 
 =head1 VERSION
 
-version 0.006002
+version 0.006003
 
 =head1 SYNOPSIS
 

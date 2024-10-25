@@ -637,12 +637,14 @@ t/02_vm/05_op/array_big_size.t
 t/02_vm/05_op/array_initialization.t
 t/02_vm/05_op/array_length.t
 t/02_vm/05_op/array_middle_size.t
+t/02_vm/05_op/as_bool.t
 t/02_vm/05_op/assign.t
 t/02_vm/05_op/basic_type_id.t
 t/02_vm/05_op/bit_operator.t
 t/02_vm/05_op/class_var_access.t
 t/02_vm/05_op/comparison_operator.t
 t/02_vm/05_op/compile_type_name.t
+t/02_vm/05_op/condition_evaluation.t
 t/02_vm/05_op/constant.t
 t/02_vm/05_op/copy.t
 t/02_vm/05_op/decrement.t
@@ -674,7 +676,6 @@ t/02_vm/05_op/string_concatenation.t
 t/02_vm/05_op/string_data.t
 t/02_vm/05_op/subtraction.t
 t/02_vm/05_op/type_cast.t
-t/02_vm/05_op/type_conversion_bool.t
 t/02_vm/05_op/type_initial_value.t
 t/02_vm/05_op/type_name.t
 t/02_vm/05_op/unary_minus.t
@@ -893,6 +894,7 @@ t/02_vm/lib/SPVM/TestCase/Operator/ArrayBigSize.spvm
 t/02_vm/lib/SPVM/TestCase/Operator/ArrayInit.spvm
 t/02_vm/lib/SPVM/TestCase/Operator/ArrayLength.spvm
 t/02_vm/lib/SPVM/TestCase/Operator/ArrayMiddleSize.spvm
+t/02_vm/lib/SPVM/TestCase/Operator/AsBool.spvm
 t/02_vm/lib/SPVM/TestCase/Operator/Assign.spvm
 t/02_vm/lib/SPVM/TestCase/Operator/BasicTypeId.spvm
 t/02_vm/lib/SPVM/TestCase/Operator/BitOperator.spvm
@@ -900,6 +902,7 @@ t/02_vm/lib/SPVM/TestCase/Operator/ClassVar.spvm
 t/02_vm/lib/SPVM/TestCase/Operator/ComparisonOperator.spvm
 t/02_vm/lib/SPVM/TestCase/Operator/CompileTypeName.spvm
 t/02_vm/lib/SPVM/TestCase/Operator/Concat.spvm
+t/02_vm/lib/SPVM/TestCase/Operator/ConditionEvaluation.spvm
 t/02_vm/lib/SPVM/TestCase/Operator/Constant.spvm
 t/02_vm/lib/SPVM/TestCase/Operator/Copy.spvm
 t/02_vm/lib/SPVM/TestCase/Operator/Data/Weaken.spvm

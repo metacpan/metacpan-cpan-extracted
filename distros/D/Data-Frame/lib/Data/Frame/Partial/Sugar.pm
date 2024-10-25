@@ -1,12 +1,12 @@
 package Data::Frame::Partial::Sugar;
-$Data::Frame::Partial::Sugar::VERSION = '0.006002';
+$Data::Frame::Partial::Sugar::VERSION = '0.006003';
 # ABSTRACT: Partial class for data frame syntax sugar
 
 use Data::Frame::Role;
 use namespace::autoclean;
 
 package Tie::Data::Frame {
-$Tie::Data::Frame::VERSION = '0.006002';
+$Tie::Data::Frame::VERSION = '0.006003';
 
     use Scalar::Util qw(weaken);
     use Types::PDL qw(Piddle);
@@ -109,7 +109,7 @@ Data::Frame::Partial::Sugar - Partial class for data frame syntax sugar
 
 =head1 VERSION
 
-version 0.006002
+version 0.006003
 
 =head1 SYNOPSIS
 

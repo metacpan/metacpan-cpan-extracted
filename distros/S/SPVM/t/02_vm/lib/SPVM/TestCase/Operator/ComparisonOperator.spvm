@@ -2,6 +2,982 @@ class TestCase::Operator::ComparisonOperator {
   use TestCase::Minimal;
   use Point;
   
+  static method numeric_eq  : int () {
+    my $test_case : TestCase::Minimal = undef;
+    
+    # undef
+    {
+      unless (undef == undef) {
+        return 0;
+      }
+      
+      unless ($test_case == undef) {
+        return 0;
+      }
+      
+      unless (undef == $test_case) {
+        return 0;
+      }
+    }
+    
+    # byte
+    {
+      unless ((byte)3 == (byte)3) {
+        return 0;
+      }
+      
+      if ((byte)3 == (byte)2) {
+        return 0;
+      }
+    }
+    
+    # short
+    {
+      unless ((short)3 == (short)3) {
+        return 0;
+      }
+      
+      if ((short)3 == (short)2) {
+        return 0;
+      }
+    }
+    
+    # int
+    {
+      unless (3 == 3) {
+        return 0;
+      }
+      
+      my $ret = 3 == 3;
+      unless ($ret isa int && $ret == 1) {
+        return 0;
+      }
+      
+      if (3 == 2) {
+        return 0;
+      }
+    }
+    
+    # long
+    {
+      unless ((long)3 == (long)3) {
+        return 0;
+      }
+      
+      if ((long)3 == (long)2) {
+        return 0;
+      }
+    }
+    
+    # float
+    {
+      unless (0.5f == 0.5f) {
+        return 0;
+      }
+      
+      if (0.5f == 0.25f) {
+        return 0;
+      }
+      
+      my $nan = (float)0.0 / (float)0.0;
+      if ($nan == $nan) {
+        return 0;
+      }
+      
+      if ($nan == (float)0.0) {
+        return 0;
+      }
+      
+      if ($nan == (float)1.0) {
+        return 0;
+      }
+    }
+    
+    # double
+    {
+      unless (0.5 == 0.5) {
+        return 0;
+      }
+      
+      if (0.5 == 0.25) {
+        return 0;
+      }
+      
+      my $nan = (double)0.0 / (double)0.0;
+      if ($nan == $nan) {
+        return 0;
+      }
+      
+      if ($nan == (double)0.0) {
+        return 0;
+      }
+      
+      if ($nan == (double)1.0) {
+        return 0;
+      }
+    }
+    
+    # object
+    {
+      {
+        my $object1 = TestCase::Minimal->new;
+        
+        unless ($object1 == $object1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $object1 = TestCase::Minimal->new;
+        my $object2 = TestCase::Minimal->new;
+        
+        if ($object1 == $object2) {
+          return 0;
+        }
+      }
+    }
+    
+    # reference
+    {
+      {
+        my $ref1 = TestCase::Minimal->new;
+        
+        unless ($ref1 == $ref1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $ref1 = TestCase::Minimal->new;
+        my $ref2 = TestCase::Minimal->new;
+        
+        if ($ref1 == $ref2) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  # If a != b
+  static method numeric_ne  : int () {
+    my $test_case : TestCase::Minimal = TestCase::Minimal->new;
+    
+    # undef
+    {
+      if (undef != undef) {
+        return 0;
+      }
+      
+      unless ($test_case != undef) {
+        return 0;
+      }
+      
+      unless (undef != $test_case) {
+        return 0;
+      }
+    }
+    
+    # byte
+    {
+      if ((byte)3 != (byte)3) {
+        return 0;
+      }
+      
+      unless ((byte)3 != (byte)2) {
+        return 0;
+      }
+    }
+    
+    # short
+    {
+      if ((int)(short)3 != (int)(short)3) {
+        return 0;
+      }
+      
+      unless ((int)(short)3 != (int)(short)2) {
+        return 0;
+      }
+    }
+    
+    # int
+    {
+      if ((int)3 != (int)3) {
+        return 0;
+      }
+      
+      unless ((int)3 != (int)2) {
+        return 0;
+      }
+    }
+    
+    # long
+    {
+      if ((long)3 != (long)3) {
+        return 0;
+      }
+      
+      unless ((long)3 != (long)2) {
+        return 0;
+      }
+    }
+    
+    # float
+    {
+      if (0.5f != 0.5f) {
+        return 0;
+      }
+      
+      unless (0.5f != 0.25f) {
+        return 0;
+      }
+      
+      my $nan = (float)0.0 / (float)0.0;
+      unless ($nan != $nan) {
+        return 0;
+      }
+      
+      unless ($nan != (float)0.0) {
+        return 0;
+      }
+      
+      unless ($nan != (float)1.0) {
+        return 0;
+      }
+    }
+    
+    # double
+    {
+      if (0.5 != 0.5) {
+        return 0;
+      }
+      
+      unless (0.5 != 0.25) {
+        return 0;
+      }
+      
+      my $nan = (double)0.0 / (double)0.0;
+      unless ($nan != $nan) {
+        return 0;
+      }
+      
+      unless ($nan != (double)0.0) {
+        return 0;
+      }
+      
+      unless ($nan != (double)1.0) {
+        return 0;
+      }
+    }
+    
+    # object
+    {
+      {
+        my $object1 = TestCase::Minimal->new;
+        
+        if ($object1 != $object1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $object1 = TestCase::Minimal->new;
+        my $object2 = TestCase::Minimal->new;
+        
+        unless ($object1 != $object2) {
+          return 0;
+        }
+      }
+    }
+    
+    # reference
+    {
+      {
+        my $value = 1;
+        my $ref1 : int* = \$value;
+        
+        if ($ref1 != $ref1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $value1 = 1;
+        my $ref1 = \$value1;
+        my $value2 = 2;
+        my $ref2 = \$value2;
+        
+        unless ($ref1 != $ref2) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  # If a > b
+  static method numeric_gt  : int () {
+    
+    # byte
+    {
+      unless ((byte)3 > (byte)1) {
+        return 0;
+      }
+      
+      if ((byte)3 > (byte)3) {
+        return 0;
+      }
+      
+      if ((byte)3 > (byte)4) {
+        return 0;
+      }
+    }
+    
+    # short
+    {
+      unless ((int)(short)3 > (int)(short)1) {
+        return 0;
+      }
+      
+      if ((int)(short)3 > (int)(short)3) {
+        return 0;
+      }
+      
+      if ((int)(short)3 > (int)(short)4) {
+        return 0;
+      }
+    }
+    
+    # int
+    {
+      unless (3 > 1) {
+        return 0;
+      }
+      
+      if (3 > 3) {
+        return 0;
+      }
+      
+      if (3 > 4) {
+        return 0;
+      }
+    }
+    
+    # long
+    {
+      unless ((long)3 > (long)1) {
+        return 0;
+      }
+      
+      if ((long)3 > (long)3) {
+        return 0;
+      }
+      
+      if ((long)3 > (long)4) {
+        return 0;
+      }
+    }
+    
+    # float
+    {
+      unless ((float)3 > (float)1) {
+        return 0;
+      }
+      
+      if ((float)3 > (float)3) {
+        return 0;
+      }
+      
+      if ((float)3 > (float)4) {
+        return 0;
+      }
+      
+      my $nan = (float)0.0 / (float)0.0;
+      if ($nan > $nan) {
+        return 0;
+      }
+      
+      if ($nan > (float)0.0) {
+        return 0;
+      }
+      
+      if ($nan > (float)1.0) {
+        return 0;
+      }
+    }
+    
+    # double
+    {
+      unless ((double)3 > (double)1) {
+        return 0;
+      }
+      
+      if ((double)3 > (double)3) {
+        return 0;
+      }
+      
+      if ((double)3 > (double)4) {
+        return 0;
+      }
+      
+      my $nan = (double)0.0 / (double)0.0;
+      if ($nan > $nan) {
+        return 0;
+      }
+      
+      if ($nan > (double)0.0) {
+        return 0;
+      }
+      
+      if ($nan > (double)1.0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  # If a >= b
+  static method numeric_ge  : int () {
+    
+    # byte
+    {
+      unless ((byte)3 >= (byte)1) {
+        return 0;
+      }
+      
+      unless ((byte)3 >= (byte)3) {
+        return 0;
+      }
+      
+      if ((byte)3 >= (byte)4) {
+        return 0;
+      }
+    }
+    
+    # short
+    {
+      unless ((int)(short)3 >= (int)(short)1) {
+        return 0;
+      }
+      
+      unless ((int)(short)3 >= (int)(short)3) {
+        return 0;
+      }
+      
+      if ((int)(short)3 >= (int)(short)4) {
+        return 0;
+      }
+    }
+    
+    # int
+    {
+      unless (3 >= 1) {
+        return 0;
+      }
+      
+      unless (3 >= 3) {
+        return 0;
+      }
+      
+      if (3 >= 4) {
+        return 0;
+      }
+    }
+    
+    # long
+    {
+      unless ((long)3 >= (long)1) {
+        return 0;
+      }
+      
+      unless ((long)3 >= (long)3) {
+        return 0;
+      }
+      
+      if ((long)3 >= (long)4) {
+        return 0;
+      }
+    }
+    
+    # float
+    {
+      unless ((float)3 >= (float)1) {
+        return 0;
+      }
+      
+      unless ((float)3 >= (float)3) {
+        return 0;
+      }
+      
+      if ((float)3 >= (float)4) {
+        return 0;
+      }
+      
+      my $nan = (float)0.0 / (float)0.0;
+      if ($nan >= $nan) {
+        return 0;
+      }
+      
+      if ($nan >= (float)0.0) {
+        return 0;
+      }
+      
+      if ($nan >= (float)1.0) {
+        return 0;
+      }
+    }
+    
+    # double
+    {
+      unless ((double)3 >= (double)1) {
+        return 0;
+      }
+      
+      unless ((double)3 >= (double)3) {
+        return 0;
+      }
+      
+      if ((double)3 >= (double)4) {
+        return 0;
+      }
+      
+      my $nan = (double)0.0 / (double)0.0;
+      if ($nan >= $nan) {
+        return 0;
+      }
+      
+      if ($nan >= (double)0.0) {
+        return 0;
+      }
+      
+      if ($nan >= (double)1.0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  # If a < b
+  static method numeric_lt  : int () {
+    
+    # byte
+    {
+      if ((byte)3 < (byte)1) {
+        return 0;
+      }
+      
+      if ((byte)3 < (byte)3) {
+        return 0;
+      }
+      
+      unless ((byte)3 < (byte)4) {
+        return 0;
+      }
+    }
+    
+    # short
+    {
+      if ((int)(short)3 < (int)(short)1) {
+        return 0;
+      }
+      
+      if ((int)(short)3 < (int)(short)3) {
+        return 0;
+      }
+      
+      unless ((int)(short)3 < (int)(short)4) {
+        return 0;
+      }
+    }
+    
+    # int
+    {
+      if (3 < 1) {
+        return 0;
+      }
+      
+      if (3 < 3) {
+        return 0;
+      }
+      
+      unless (3 < 4) {
+        return 0;
+      }
+    }
+    
+    # long
+    {
+      if ((long)3 < (long)1) {
+        return 0;
+      }
+      
+      if ((long)3 < (long)3) {
+        return 0;
+      }
+      
+      unless ((long)3 < (long)4) {
+        return 0;
+      }
+    }
+    
+    # float
+    {
+      if ((float)3 < (float)1) {
+        return 0;
+      }
+      
+      if ((float)3 < (float)3) {
+        return 0;
+      }
+      
+      unless ((float)3 < (float)4) {
+        return 0;
+      }
+      
+      my $nan = (float)0.0 / (float)0.0;
+      if ($nan < $nan) {
+        return 0;
+      }
+      
+      if ($nan < (float)0.0) {
+        return 0;
+      }
+      
+      if ($nan < (float)1.0) {
+        return 0;
+      }
+    }
+    
+    # double
+    {
+      if ((double)3 < (double)1) {
+        return 0;
+      }
+      
+      if ((double)3 < (double)3) {
+        return 0;
+      }
+      
+      unless ((double)3 < (double)4) {
+        return 0;
+      }
+      
+      my $nan = (double)0.0 / (double)0.0;
+      if ($nan < $nan) {
+        return 0;
+      }
+      
+      if ($nan < (double)0.0) {
+        return 0;
+      }
+      
+      if ($nan < (double)1.0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method numeric_le  : int () {
+    
+    # byte
+    {
+      if ((byte)3 <= (byte)1) {
+        return 0;
+      }
+      
+      unless ((byte)3 <= (byte)3) {
+        return 0;
+      }
+      
+      unless ((byte)3 <= (byte)4) {
+        return 0;
+      }
+    }
+    
+    # short
+    {
+      if ((int)(short)3 <= (int)(short)1) {
+        return 0;
+      }
+      
+      unless ((int)(short)3 <= (int)(short)3) {
+        return 0;
+      }
+      
+      unless ((int)(short)3 <= (int)(short)4) {
+        return 0;
+      }
+    }
+    
+    # int
+    {
+      if (3 <= 1) {
+        return 0;
+      }
+      
+      unless (3 <= 3) {
+        return 0;
+      }
+      
+      unless (3 <= 4) {
+        return 0;
+      }
+    }
+    
+    # long
+    {
+      if ((long)3 <= (long)1) {
+        return 0;
+      }
+      
+      unless ((long)3 <= (long)3) {
+        return 0;
+      }
+      
+      unless ((long)3 <= (long)4) {
+        return 0;
+      }
+    }
+    
+    # float
+    {
+      if ((float)3 <= (float)1) {
+        return 0;
+      }
+      
+      unless ((float)3 <= (float)3) {
+        return 0;
+      }
+      
+      unless ((float)3 <= (float)4) {
+        return 0;
+      }
+      
+      my $nan = (float)0.0 / (float)0.0;
+      if ($nan <= $nan) {
+        return 0;
+      }
+      
+      if ($nan <= (float)0.0) {
+        return 0;
+      }
+      
+      if ($nan <= (float)1.0) {
+        return 0;
+      }
+    }
+    
+    # double
+    {
+      if ((double)3 <= (double)1) {
+        return 0;
+      }
+      
+      unless ((double)3 <= (double)3) {
+        return 0;
+      }
+      
+      unless ((double)3 <= (double)4) {
+        return 0;
+      }
+      
+      my $nan = (double)0.0 / (double)0.0;
+      if ($nan <= $nan) {
+        return 0;
+      }
+      
+      if ($nan <= (double)0.0) {
+        return 0;
+      }
+      
+      if ($nan <= (double)1.0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method numeric_cmp  : int () {
+    
+    # byte
+    {
+      {
+        my $ret = (byte)3 <=> (byte)1;
+        unless ($ret == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $ret = (byte)1 <=> (byte)3;
+        unless ($ret == -1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $ret = (byte)3 <=> (byte)3;
+        unless ($ret == 0) {
+          return 0;
+        }
+      }
+    }
+    
+    # short
+    {
+      {
+        my $ret = (short)3 <=> (short)1;
+        unless ($ret == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $ret = (short)1 <=> (short)3;
+        unless ($ret == -1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $ret = (short)3 <=> (short)3;
+        unless ($ret == 0) {
+          return 0;
+        }
+      }
+    }
+    
+    # int
+    {
+      {
+        my $ret = (int)3 <=> (int)1;
+        unless ($ret == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $ret = (int)1 <=> (int)3;
+        unless ($ret == -1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $ret = (int)3 <=> (int)3;
+        unless ($ret == 0) {
+          return 0;
+        }
+      }
+    }
+    
+    # long
+    {
+      {
+        my $ret = (long)3 <=> (long)1;
+        unless ($ret == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $ret = (long)1 <=> (long)3;
+        unless ($ret == -1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $ret = (long)3 <=> (long)3;
+        unless ($ret == 0) {
+          return 0;
+        }
+      }
+    }
+    
+    # float
+    {
+      {
+        my $ret = (float)3 <=> (float)1;
+        unless ($ret == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $ret = (float)1 <=> (float)3;
+        unless ($ret == -1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $ret = (float)3 <=> (float)3;
+        unless ($ret == 0) {
+          return 0;
+        }
+      }
+      
+      my $nan = (float)0.0 / (float)0.0;
+      if ($nan <=> $nan) {
+        return 0;
+      }
+      
+      if ($nan <=> (float)0.0) {
+        return 0;
+      }
+      
+      if ($nan <=> (float)1.0) {
+        return 0;
+      }
+    }
+    
+    # double
+    {
+      {
+        my $ret = (double)3 <=> (double)1;
+        unless ($ret == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $ret = (double)1 <=> (double)3;
+        unless ($ret == -1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $ret = (double)3 <=> (double)3;
+        unless ($ret == 0) {
+          return 0;
+        }
+      }
+      
+      my $nan = (double)0.0 / (double)0.0;
+      if ($nan <=> $nan) {
+        return 0;
+      }
+      
+      if ($nan <=> (double)0.0) {
+        return 0;
+      }
+      
+      if ($nan <=> (double)1.0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
   static method string_eq : int () {
     my $string = "abc";
     my $string_same = "abc";
@@ -264,27 +1240,34 @@ class TestCase::Operator::ComparisonOperator {
     my $string_undef : string;
     
     # lt
-    unless ($string lt $string_same) {
-      return 1;
+    if ($string lt $string_same) {
+      return 0;
     }
-    unless ($string lt (byte[])$string_same) {
-      return 1;
+    
+    if ($string lt (byte[])$string_same) {
+      return 0;
     }
-    unless ((byte[])$string lt $string_same) {
-      return 1;
+    
+    if ((byte[])$string lt $string_same) {
+      return 0;
     }
+    
     unless (!($string lt $string_short)) {
       return 0;
     }
+    
     unless ($string lt $string_long) {
       return 0;
     }
+    
     unless ($string lt $string_different_short) {
       return 0;
     }
+    
     unless ($string lt $string_different_long) {
       return 0;
     }
+    
     unless (!($string lt $string_empty)) {
       return 0;
     }
@@ -449,1443 +1432,5 @@ class TestCase::Operator::ComparisonOperator {
     
     return 1;
   }
-
-  # Bool
-  static method bool_true_byte : int () {
-    if ((int)(byte)1) {
-      return 1;
-    }
-    
-    return 0;
-  }
   
-  static method bool_true_short : int () {
-    if ((int)(short)1) {
-      return 1;
-    }
-    
-    return 0;
-  }
-
-  static method bool_true_int : int () {
-    if (1) {
-      return 1;
-    }
-    
-    return 0;
-  }
-  
-  static method bool_true_long : int () {
-    if (1L) {
-      return 1;
-    }
-    
-    return 0;
-  }
-  
-  static method bool_true_float : int () {
-    if (1.0f) {
-      return 1;
-    }
-    
-    return 0;
-  }
-  
-  static method bool_true_double : int () {
-    if (1.0) {
-      return 1;
-    }
-    
-    return 0;
-  }
-
-  static method bool_true_object : int () {
-    if (TestCase::Minimal->new) {
-      return 1;
-    }
-    
-    return 0;
-  }
-
-  static method bool_true_ref : int () {
-    my $value = 1;
-    my $vaelu_ref = \$value;
-    if ($vaelu_ref) {
-      return 1;
-    }
-    
-    return 0;
-  }
-
-
-  static method bool_false_byte : int () {
-    if ((int)(byte)0) {
-      return 0;
-    }
-    
-    return 1;
-  }
-  
-  static method bool_false_short : int () {
-    if ((int)(short)0) {
-      return 0;
-    }
-    
-    return 1;
-  }
-  
-  static method bool_false_int : int () {
-    if (0) {
-      return 0;
-    }
-    
-    return 1;
-  }
-  
-  static method bool_false_long : int () {
-    if (0L) {
-      return 0;
-    }
-    
-    return 1;
-  }
-  
-  static method bool_false_float : int () {
-    if (0.0f) {
-      return 0;
-    }
-    
-    return 1;
-  }
-  
-  static method bool_false_double : int () {
-    if (0.0) {
-      return 0;
-    }
-    
-    return 1;
-  }
-  
-  static method bool_false_object : int () {
-    my $object : Point;
-    if ($object) {
-      return 0;
-    }
-    
-    return 1;
-  }
-
-  static method bool_else : int () {
-    if (0) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-    
-    return 0;
-  }
-
-  static method bool_elsif : int () {
-    if (0) {
-      return 0;
-    }
-    elsif(1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-    
-    return 0;
-  }
-
-  static method bool_elsbool_2 : int () {
-    if (0) {
-      return 0;
-    }
-    elsif(0) {
-      return 0;
-    }
-    elsif(1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-    
-    return 0;
-  }
-  
-  static method bool_duplicate : int () {
-    
-    if (1) {
-      if (0) {
-        return 0;
-      }
-      elsif (1) {
-        return 1;
-      }
-      else {
-        return 0;
-      }
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  # eq 
-  static method numeric_eq_undef  : int () {
-    my $test_case : TestCase::Minimal = undef;
-    
-    if (undef == undef) {
-      if ($test_case == undef) {
-        if (undef == $test_case) {
-          return 1;
-        }
-      }
-    }
-    
-    return 0;
-  }
-
-  static method numeric_eq_byte_same  : int () {
-    
-    if ((byte)3 == (byte)3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  static method numeric_eq_byte_different  : int () {
-    
-    if ((byte)3 == (byte)2) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-  
-  static method numeric_eq_short_same  : int () {
-    
-    if ((short)3 == (short)3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  static method numeric_eq_short_different  : int () {
-    
-    if ((short)3 == (short)2) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-  
-  static method numeric_eq_int_same  : int () {
-    
-    unless (3 == 3) {
-      return 0;
-    }
-
-    my $ret = 3 == 3;
-    unless ($ret isa int && $ret == 1) {
-      return 0;
-    }
-    
-    return 1;
-  }
-  
-  static method numeric_eq_int_different  : int () {
-    
-    if (3 == 2) {
-      return 0;
-    }
-    
-    return 1;
-  }
-  
-  static method numeric_eq_long_same  : int () {
-    
-    if ((long)3 == (long)3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  static method numeric_eq_long_different  : int () {
-    
-    if ((long)3 == (long)2) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-  
-  static method numeric_eq_float_same  : int () {
-    
-    if (0.5f == 0.5f) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  static method numeric_eq_float_different  : int () {
-    
-    if (0.5f == 0.25f) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-  
-  static method numeric_eq_double_same  : int () {
-    
-    if (0.5 == 0.5) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  static method numeric_eq_double_different  : int () {
-    
-    if (0.5 == 0.25) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-  
-  static method numeric_eq_object_same  : int () {
-    
-    my $object1 = TestCase::Minimal->new;
-    
-    if ($object1 == $object1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_eq_object_different  : int () {
-    my $object1 = TestCase::Minimal->new;
-    my $object2 = TestCase::Minimal->new;
-    
-    if ($object1 == $object2) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_eq_ref_same  : int () {
-    
-    my $ref1 = TestCase::Minimal->new;
-    
-    if ($ref1 == $ref1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_eq_ref_different  : int () {
-    my $ref1 = TestCase::Minimal->new;
-    my $ref2 = TestCase::Minimal->new;
-    
-    if ($ref1 == $ref2) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  # If a != b
-  static method numeric_ne_undef  : int () {
-    my $test_case : TestCase::Minimal = TestCase::Minimal->new;
-    
-    if (undef != undef) {
-    
-    }
-    else {
-      if ($test_case != undef) {
-        if (undef != $test_case) {
-          return 1;
-        }
-      }
-    }
-    
-    return 0;
-  }
-  static method numeric_ne_byte_same  : int () {
-    
-    if ((byte)3 != (byte)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-  
-  static method numeric_ne_byte_different  : int () {
-    
-    if ((byte)3 != (byte)2) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  static method numeric_ne_short_same  : int () {
-    
-    if ((int)(short)3 != (int)(short)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-  
-  static method numeric_ne_short_different  : int () {
-    
-    if ((int)(short)3 != (int)(short)2) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  static method numeric_ne_int_same  : int () {
-    
-    if ((int)3 != (int)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-  
-  static method numeric_ne_int_different  : int () {
-    
-    if ((int)3 != (int)2) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  static method numeric_ne_long_same  : int () {
-    
-    if ((long)3 != (long)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-  
-  static method numeric_ne_long_different  : int () {
-    
-    if ((long)3 != (long)2) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  static method numeric_ne_float_same  : int () {
-    
-    if (0.5f != 0.5f) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-  
-  static method numeric_ne_float_different  : int () {
-    
-    if (0.5f != 0.25f) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  static method numeric_ne_double_same  : int () {
-    
-    if (0.5 != 0.5) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-  
-  static method numeric_ne_double_different  : int () {
-    
-    if (0.5 != 0.25) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  static method numeric_ne_object_same  : int () {
-    
-    my $object1 = TestCase::Minimal->new;
-    
-    if ($object1 != $object1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_ne_object_different  : int () {
-    my $object1 = TestCase::Minimal->new;
-    my $object2 = TestCase::Minimal->new;
-    
-    if ($object1 != $object2) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_ne_ref_same  : int () {
-    
-    my $value = 1;
-    my $ref1 : int* = \$value;
-    
-    if ($ref1 != $ref1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_ne_ref_different  : int () {
-    my $value1 = 1;
-    my $ref1 = \$value1;
-    my $value2 = 2;
-    my $ref2 = \$value2;
-    
-    if ($ref1 != $ref2) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  # If a > b
-  static method numeric_gt_byte_left_big  : int () {
-    
-    if ((byte)3 > (byte)1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_gt_byte_same  : int () {
-    
-    if ((byte)3 > (byte)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_gt_byte_right_big  : int () {
-    
-    if ((byte)3 > (byte)4) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_gt_short_left_big  : int () {
-    
-    if ((int)(short)3 > (int)(short)1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_gt_short_same  : int () {
-    
-    if ((int)(short)3 > (int)(short)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_gt_short_right_big  : int () {
-    
-    if ((int)(short)3 > (int)(short)4) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-  
-  static method numeric_gt_int_left_big  : int () {
-    
-    if (3 > 1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_gt_int_same  : int () {
-    
-    if (3 > 3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_gt_int_right_big  : int () {
-    
-    if (3 > 4) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_gt_long_left_big  : int () {
-    
-    if ((long)3 > (long)1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_gt_long_same  : int () {
-    
-    if ((long)3 > (long)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_gt_long_right_big  : int () {
-    
-    if ((long)3 > (long)4) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_gt_float_left_big  : int () {
-    
-    if ((float)3 > (float)1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_gt_float_same  : int () {
-    
-    if ((float)3 > (float)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_gt_float_right_big  : int () {
-    
-    if ((float)3 > (float)4) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_gt_double_left_big  : int () {
-    
-    if ((double)3 > (double)1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_gt_double_same  : int () {
-    
-    if ((double)3 > (double)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_gt_double_right_big  : int () {
-    
-    if ((double)3 > (double)4) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  # If a >= b
-  static method numeric_ge_byte_left_big  : int () {
-    
-    if ((byte)3 >= (byte)1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_ge_byte_same  : int () {
-    
-    if ((byte)3 >= (byte)3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_ge_byte_right_big  : int () {
-    
-    if ((byte)3 >= (byte)4) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_ge_short_left_big  : int () {
-    
-    if ((int)(short)3 >= (int)(short)1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_ge_short_same  : int () {
-    
-    if ((int)(short)3 >= (int)(short)3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_ge_short_right_big  : int () {
-    
-    if ((int)(short)3 >= (int)(short)4) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-  
-  static method numeric_ge_int_left_big  : int () {
-    
-    if (3 >= 1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_ge_int_same  : int () {
-    
-    if (3 >= 3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_ge_int_right_big  : int () {
-    
-    if (3 >= 4) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_ge_long_left_big  : int () {
-    
-    if ((long)3 >= (long)1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_ge_long_same  : int () {
-    
-    if ((long)3 >= (long)3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_ge_long_right_big  : int () {
-    
-    if ((long)3 >= (long)4) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_ge_float_left_big  : int () {
-    
-    if ((float)3 >= (float)1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_ge_float_same  : int () {
-    
-    if ((float)3 >= (float)3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_ge_float_right_big  : int () {
-    
-    if ((float)3 >= (float)4) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_ge_double_left_big  : int () {
-    
-    if ((double)3 >= (double)1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_ge_double_same  : int () {
-    
-    if ((double)3 >= (double)3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_ge_double_right_big  : int () {
-    
-    if ((double)3 >= (double)4) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  # If a < b
-  static method numeric_lt_byte_left_big  : int () {
-    
-    if ((byte)3 < (byte)1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_lt_byte_same  : int () {
-    
-    if ((byte)3 < (byte)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_lt_byte_right_big  : int () {
-    
-    if ((byte)3 < (byte)4) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_lt_short_left_big  : int () {
-    
-    if ((int)(short)3 < (int)(short)1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_lt_short_same  : int () {
-    
-    if ((int)(short)3 < (int)(short)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_lt_short_right_big  : int () {
-    
-    if ((int)(short)3 < (int)(short)4) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  static method numeric_lt_int_left_big  : int () {
-    
-    if (3 < 1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_lt_int_same  : int () {
-    
-    if (3 < 3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_lt_int_right_big  : int () {
-    
-    if (3 < 4) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_lt_long_left_big  : int () {
-    
-    if ((long)3 < (long)1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_lt_long_same  : int () {
-    
-    if ((long)3 < (long)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_lt_long_right_big  : int () {
-    
-    if ((long)3 < (long)4) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_lt_float_left_big  : int () {
-    
-    if ((float)3 < (float)1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_lt_float_same  : int () {
-    
-    if ((float)3 < (float)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_lt_float_right_big  : int () {
-    
-    if ((float)3 < (float)4) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_lt_double_left_big  : int () {
-    
-    if ((double)3 < (double)1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_lt_double_same  : int () {
-    
-    if ((double)3 < (double)3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_lt_double_right_big  : int () {
-    
-    if ((double)3 < (double)4) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  # If a <= b
-  static method numeric_le_byte_left_big  : int () {
-    
-    if ((byte)3 <= (byte)1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_le_byte_same  : int () {
-    
-    if ((byte)3 <= (byte)3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_le_byte_right_big  : int () {
-    
-    if ((byte)3 <= (byte)4) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_le_short_left_big  : int () {
-    
-    if ((int)(short)3 <= (int)(short)1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_le_short_same  : int () {
-    
-    if ((int)(short)3 <= (int)(short)3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_le_short_right_big  : int () {
-    
-    if ((int)(short)3 <= (int)(short)4) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  static method numeric_le_int_left_big  : int () {
-    
-    if (3 <= 1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_le_int_same  : int () {
-    
-    if (3 <= 3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_le_int_right_big  : int () {
-    
-    if (3 <= 4) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_le_long_left_big  : int () {
-    
-    if ((long)3 <= (long)1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_le_long_same  : int () {
-    
-    if ((long)3 <= (long)3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_le_long_right_big  : int () {
-    
-    if ((long)3 <= (long)4) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_le_float_left_big  : int () {
-    
-    if ((float)3 <= (float)1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_le_float_same  : int () {
-    
-    if ((float)3 <= (float)3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_le_float_right_big  : int () {
-    
-    if ((float)3 <= (float)4) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_le_double_left_big  : int () {
-    
-    if ((double)3 <= (double)1) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  static method numeric_le_double_same  : int () {
-    
-    if ((double)3 <= (double)3) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_le_double_right_big  : int () {
-    
-    if ((double)3 <= (double)4) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  static method numeric_cmp_byte  : int () {
-    
-    {
-      my $ret = (byte)3 <=> (byte)1;
-      unless ($ret == 1) {
-        return 0;
-      }
-    }
-
-    {
-      my $ret = (byte)1 <=> (byte)3;
-      unless ($ret == -1) {
-        return 0;
-      }
-    }
-
-    {
-      my $ret = (byte)3 <=> (byte)3;
-      unless ($ret == 0) {
-        return 0;
-      }
-    }
-
-    return 1;
-  }
-
-  static method numeric_cmp_short  : int () {
-    
-    {
-      my $ret = (short)3 <=> (short)1;
-      unless ($ret == 1) {
-        return 0;
-      }
-    }
-
-    {
-      my $ret = (short)1 <=> (short)3;
-      unless ($ret == -1) {
-        return 0;
-      }
-    }
-
-    {
-      my $ret = (short)3 <=> (short)3;
-      unless ($ret == 0) {
-        return 0;
-      }
-    }
-
-    return 1;
-  }
-
-  static method numeric_cmp_int  : int () {
-    
-    {
-      my $ret = (int)3 <=> (int)1;
-      unless ($ret == 1) {
-        return 0;
-      }
-    }
-
-    {
-      my $ret = (int)1 <=> (int)3;
-      unless ($ret == -1) {
-        return 0;
-      }
-    }
-
-    {
-      my $ret = (int)3 <=> (int)3;
-      unless ($ret == 0) {
-        return 0;
-      }
-    }
-
-    return 1;
-  }
-
-  static method numeric_cmp_long  : int () {
-    
-    {
-      my $ret = (long)3 <=> (long)1;
-      unless ($ret == 1) {
-        return 0;
-      }
-    }
-
-    {
-      my $ret = (long)1 <=> (long)3;
-      unless ($ret == -1) {
-        return 0;
-      }
-    }
-
-    {
-      my $ret = (long)3 <=> (long)3;
-      unless ($ret == 0) {
-        return 0;
-      }
-    }
-
-    return 1;
-  }
-
-  static method numeric_cmp_float  : int () {
-    
-    {
-      my $ret = (float)3 <=> (float)1;
-      unless ($ret == 1) {
-        return 0;
-      }
-    }
-
-    {
-      my $ret = (float)1 <=> (float)3;
-      unless ($ret == -1) {
-        return 0;
-      }
-    }
-
-    {
-      my $ret = (float)3 <=> (float)3;
-      unless ($ret == 0) {
-        return 0;
-      }
-    }
-
-    return 1;
-  }
-
-  static method numeric_cmp_double  : int () {
-    
-    {
-      my $ret = (double)3 <=> (double)1;
-      unless ($ret == 1) {
-        return 0;
-      }
-    }
-
-    {
-      my $ret = (double)1 <=> (double)3;
-      unless ($ret == -1) {
-        return 0;
-      }
-    }
-
-    {
-      my $ret = (double)3 <=> (double)3;
-      unless ($ret == 0) {
-        return 0;
-      }
-    }
-
-    return 1;
-  }
 }

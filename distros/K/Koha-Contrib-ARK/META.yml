@@ -28,7 +28,7 @@ requires:
   Try::Tiny: '0'
 resources:
   repository: http://git.tamil.fr/git/Koha-Contrib-ARK
-version: 1.1.1
+version: 1.1.2
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

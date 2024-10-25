@@ -14,13 +14,7 @@ class CreateClassInstanceHandler(AbstractCommandHandler):
             clazz = command.payload[0]
             if len(command.payload) > 1:
                 method_arguments = command.payload[1:]
-                sig = signature(clazz)
-                if len(sig.parameters) != len(method_arguments):
-                    raise Exception("Number of arguments for create class instance are not matching!")
-                try:
-                    return clazz(*method_arguments)
-                except:
-                    raise Exception("Error while creating class instance!")
+                return clazz(*method_arguments)
             return clazz()
         except Exception as e:
             exc_type, exc_value = type(e), e

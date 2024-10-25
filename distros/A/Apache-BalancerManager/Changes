@@ -1,5 +1,9 @@
 Revision history for Apache-BalancerManager
 
+0.002000  2024-10-24 17:02:47-05:00 America/Chicago
+ - Update for modern httpd (at least > 2.4.41)
+ - Use cpanfile
+
 0.001002  2013-01-04 09:45:07 CST6CDT
  - Fix missing deps
 

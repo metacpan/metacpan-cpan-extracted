@@ -539,7 +539,7 @@ Compilation Erorrs:
 
 The type of I<LEFT_OPERAND> must be an L<integer type|SPVM::Document::Language::Types/"Integer Types">. Otherwise, a compilation error occurs.
 
-The type of I<RIGHT_OPERAND> must be an L<integer types within int|SPVM::Document::Language::Types/"Integer Types within int">. Otherwise, a compilation error occurs.
+The type of I<RIGHT_OPERAND> must be an L<integer types|SPVM::Document::Language::Types/"Integer Types"> within int. Otherwise, a compilation error occurs.
 
 Examples:
 
@@ -566,7 +566,7 @@ Compilation Errors:
 
 The type of I<LEFT_OPERAND> must be an L<integer type|SPVM::Document::Language::Types/"Integer Types">. Otherwise, a compilation error occurs.
 
-The type of I<RIGHT_OPERAND> must be an L<integer types within int|SPVM::Document::Language::Types/"Integer Types within int">. Otherwise, a compilation error occurs.
+The type of I<RIGHT_OPERAND> must be an L<integer types|SPVM::Document::Language::Types/"Integer Types"> within int. Otherwise, a compilation error occurs.
 
 Examples:
 
@@ -599,7 +599,7 @@ Compilation Errors:
 
 The type of I<LEFT_OPERAND> must be an L<integer type|SPVM::Document::Language::Types/"Integer Types">. Otherwise, a compilation error occurs.
 
-The type of I<RIGHT_OPERAND> must be an L<integer types within int|SPVM::Document::Language::Types/"Integer Types within int">. Otherwise, a compilation error occurs.
+The type of I<RIGHT_OPERAND> must be an L<integer types|SPVM::Document::Language::Types/"Integer Types"> within int. Otherwise, a compilation error occurs.
 
 Examples:
 
@@ -3241,6 +3241,22 @@ Examples:
 =head2 Scope Operations
 
 See the doc of L<scope|SPVM::Document::Language::GarbageCollection/"Scope"> about scope operations.
+
+=head2 as_bool Operator
+
+C<as_bool> operator converts a value to 1 or 0.
+
+  as_bool OPERAND
+
+This operator is the alias for the following code.
+
+  (byte)!!OPERAND
+
+The return type is C<byte> type.
+
+Compilation Errors:
+
+The type of I<OPERAND> must be a numeric type or an object type. Otherwise an compilation error occurs.
 
 =head1 Method Call
 

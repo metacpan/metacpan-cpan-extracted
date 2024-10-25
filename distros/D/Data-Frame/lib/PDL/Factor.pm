@@ -1,5 +1,5 @@
 package PDL::Factor;
-$PDL::Factor::VERSION = '0.006002';
+$PDL::Factor::VERSION = '0.006003';
 # ABSTRACT: PDL subclass for keeping categorical data
 
 use 5.016;
@@ -188,7 +188,7 @@ sub levels {
 
 sub initialize {
     my ($class) = @_;
-    return bless( { PDL => PDL::Core::null }, $class );
+    return bless( { PDL => PDL::Core::null }, ref $class || $class );
 }
 
 
@@ -334,7 +334,7 @@ PDL::Factor - PDL subclass for keeping categorical data
 
 =head1 VERSION
 
-version 0.006002
+version 0.006003
 
 =head1 SYNOPSIS
 

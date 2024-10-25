@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Reader;
 # ABSTRACT: Read Koha biblio records with/without ARK
-$Koha::Contrib::ARK::Reader::VERSION = '1.1.1';
+$Koha::Contrib::ARK::Reader::VERSION = '1.1.2';
 use Moose;
 use Moose::Util::TypeConstraints;
 use Modern::Perl;
@@ -72,13 +72,10 @@ sub read {
 
     $self->count( $self->count + 1 );
 
-    my ($biblio, $record);
-    if ($biblio = Koha::Biblios->find( $biblionumber )) {
-        $record = MARC::Moose::Record::new_from($biblio->metadata->record(), 'Legacy');
-    } 
-    $self->ark->set_current( $biblio, $record );
+    my $biblio = Koha::Biblios->find($biblionumber);
+    $self->ark->set_current($biblio);
 
-    return ($biblio, $record);
+    return 1;
 }
 
 
@@ -96,7 +93,7 @@ Koha::Contrib::ARK::Reader - Read Koha biblio records with/without ARK
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 ATTRIBUTES
 

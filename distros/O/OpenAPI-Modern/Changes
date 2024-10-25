@@ -1,5 +1,8 @@
 Revision history for OpenAPI-Modern
 
+0.072     2024-10-24 16:36:44Z
+          - fix module loading, for downstream dependencies (broken in 0.071)
+
 0.071     2024-10-20 23:18:32Z
           - fix tests that changed their output with JSON::Schema::Modern 0.592
 

@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Writer;
 # ABSTRACT: Write biblio records into Koha Catalog
-$Koha::Contrib::ARK::Writer::VERSION = '1.1.1';
+$Koha::Contrib::ARK::Writer::VERSION = '1.1.2';
 use Moose;
 use Modern::Perl;
 use C4::Biblio qw/ ModBiblio /;
@@ -12,16 +12,22 @@ has ark => ( is => 'rw', isa => 'Koha::Contrib::ARK' );
 
 
 sub write {
-    my ($self, $biblio, $record) = @_;
+    my $self = shift;
+
+    my $ark = $self->ark;
+    return unless $ark->doit;
+
+    my $current = $ark->current;
+    my $biblio = $current->{biblio};
+    my $record = $biblio->{record};
 
     return unless $record;
 
-    my $a = $self->ark;
-    if ($a->doit) {
-        ModBiblio( $record->as('Legacy'), $biblio->biblionumber, $biblio->frameworkcode);
-    }
-    $a->current->{after} = Koha::Contrib::ARK::tojson($record)
-        if $a->debug;
+    ModBiblio(
+        $record->as('Legacy'),
+        $biblio->biblionumber,
+        $biblio->frameworkcode
+    );
 }
 
 
@@ -39,7 +45,7 @@ Koha::Contrib::ARK::Writer - Write biblio records into Koha Catalog
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 ATTRIBUTES
 

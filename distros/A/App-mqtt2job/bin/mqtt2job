@@ -1,0 +1,192 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Net::MQTT::Simple;
+use JSON;
+use DateTime;
+use Try::Tiny;
+use File::Temp;
+use Capture::Tiny ':all';
+
+use App::mqtt2job qw/ helper_v1 ha_helper_cfg /;
+
+package MQTT::Job::Options;
+
+use Moose;
+with 'MooseX::Getopt';
+
+# required options
+has 'mqtt_server'   => (is => "rw", isa => "Str", required => 1 );
+has 'base_topic'    => (is => "rw", isa => "Str", required => 1 );
+has 'job_dir'       => (is => "rw", isa => "Str", required => 1 );
+
+# optional
+has 'mqtt_port'     => (is => "rw", isa => "Int", default => 1883  );
+has 'shebang'       => (is => "rw", isa => "Str", default => $^X );
+has 'suffix'        => (is => "rw", isa => "Str", default => "pl" );
+has 'process_name'  => (is => "rw", isa => "Str", default => "mqtt2job" );
+has 'helper_script' => (is => "rw", isa => "Str", default => "helper_v1" );
+has 'no_unlink'     => (is => "rw", isa => "Bool" );
+
+# helper modes
+has 'ha_helper'     => (is => "rw", isa => "Bool" );
+has 'task'          => (is => "rw", isa => "Str", default => "unknown_task" );
+has 'cmd'           => (is => "rw", isa => "Str", default => "unknown_cmd" );
+
+# TODO 
+#has 'max_velocity'  => (is => "rw", isa => "Int", default => 59  ); # limit triggers to ~once per minute
+#has 'timeout'       => (is => "rw", isa => "Int", default => 30  ); # Terminate a job if it runs longer than x seconds
+#has 'allowed_tpl'   => (is => "rw", isa => "Str" ); # command template (e.g. regex/string)
+#has 'allowed_file'  => (is => "rw", isa => "Str" ); # file containing allowed cmds, timeouts, and max velocities
+#has 'cert'          => (is => "rw", isa => "Str" ); # provide cert for request validity check
+#has 'cron_pattern'  => (is => "rw", isa => "Bool" ); # use cron pattern to generate ha_helper template
+
+package main;
+
+# PODNAME: mqtt2job
+# ABSTRACT: Subscribe to an MQTT topic and trigger job execution
+
+my $opt = MQTT::Job::Options->new_with_options;
+$0 = $opt->process_name;
+
+my $mqtt = Net::MQTT::Simple->new($opt->mqtt_server . ":" . $opt->mqtt_port);
+
+my $on_exit = sub {
+    my $no_warn = shift;
+    printf STDERR "\nProcess %s terminating, disconnecting from %s:%s\n", $0, $opt->mqtt_server, $opt->mqtt_port unless $no_warn;
+    $mqtt->disconnect;
+    exit;
+};
+
+# clean up on exit
+$SIG{INT} = $on_exit;
+$SIG{USR1} = $on_exit;
+
+if ($opt->ha_helper) {
+    warn( sprintf("Did not find %s in %s directory\n", $opt->cmd, $opt->job_dir) ) unless _cmd_ok($opt->cmd);
+    print ha_helper_cfg({ task => $opt->task, cmd => $opt->cmd, base_topic => $opt->base_topic });
+    $on_exit->(1);
+}
+
+$mqtt->subscribe($opt->base_topic, \&_on_message);
+$mqtt->run;
+
+sub _on_message {
+    my ($topic, $message) = @_;
+    my $dt = DateTime->now();
+    my $obj = undef;
+
+    try {
+        $obj = decode_json($message);
+    };
+
+    my $msg = "";
+
+    # check command and that it exists where expected
+    if ($obj->{cmd} && _cmd_ok($obj->{cmd})) {
+        
+        # copy options into obj array
+        foreach my $from_opt (qw/ mqtt_server mqtt_port base_topic job_dir shebang suffix no_unlink helper_script/) {
+	        $obj->{$from_opt} = $opt->$from_opt;
+		}
+
+        my $helper_script = undef;
+
+        if (my $cr = __PACKAGE__->can($opt->helper_script)) {
+            $helper_script = $cr->($obj);
+        } else {
+            warn("Cannot use helper script of [" . $opt->helper_script . "], falling back\n");
+            $helper_script = helper_v1($obj);
+        }
+        
+        # Yee-ha!
+        my ($msg, $exit) = tee_merged {
+            system($opt->shebang, $helper_script, "&");
+        };
+
+        $msg .= ($exit == 0) ? " - ok" : " - failed";
+    } else {
+        $msg = "Unknown command requested";
+    }
+
+    print STDERR "$msg: $topic - $message\n";
+}
+
+sub _cmd_ok {
+    my $cmd = shift;
+    # example command checker
+    $cmd =~ s/[^\w\-\.]//g;
+    return (-f $opt->job_dir . "/" . $cmd) ? 1 : undef;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mqtt2job - Subscribe to an MQTT topic and trigger job execution
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+  mqtt2job --mqtt_server mqtt.example.com --base_topic my/topic --job_dir /apps
+
+=head1 DESCRIPTION
+
+Subscribes to the my/topic/job mqtt topic and upon receiving a 
+correctly formatted json message will fork and run the requested 
+job in a wrapper script providing it is present and executable in 
+the job_dir directory. 
+
+This wrapper will generate two child mqtt messages under the base 
+topic, at my/topic/status. Message one is sent when the job is 
+initiated. The second is sent when the job has completed (or timed 
+out). This second message will also include any output from the job 
+amongst various other metadata (e.g. execution datetime, duration, 
+timeout condition, etc.)
+
+=head1 NAME
+
+App::mqtt2job - Subscribe to an MQTT topic and trigger job execution
+
+=head1 FOR THE LOVE OF ALL THAT IS SACRED, WHY?
+
+This is part one of my "Cursed Solutions" series, URL to be added
+later when I've uploaded it.
+
+=head1 COPYRIGHT
+
+Copyright 2024 -- Chris Carline
+
+=head1 LICENSE
+
+This software is licensed under the same terms as Perl.
+
+=head1 NO WARRANTY
+
+This software is provided "as is" without any express or implied
+warranty. Using it for any reason whatsoever is probably an 
+extremely bad idea and it should only ever be considered if you 
+understand the potential consequences. In no event shall the 
+author be held liable for any damages arising from the use of 
+this software. It is provided for demonstration purposes only.
+
+=head1 AUTHOR
+
+Chris Carline <chris@carline.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Chris Carline.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -4,7 +4,7 @@
 ######################################################################
 ###
 ###
-### PGPLOT interface to PDL::Graphics::Simple.  
+### PGPLOT interface to PDL::Graphics::Simple.
 ###
 ### See the PDL::Graphics::Simple docs for details
 ###
@@ -60,19 +60,19 @@ sub check {
     $mod->{disp_dev} = $ENV{PDL_SIMPLE_DEVICE} || $ENV{PGPLOT_DEV};
     $mod->{disp_dev} =~ s#^/+##;
   } else {
-    TRY:for my $try(qw/XWINDOW XSERVE CGW GW/){
-      if($mod->{devices}->{$try}) { 
+    TRY:for my $try (qw/XWINDOW XSERVE CGW GW/) {
+      if ($mod->{devices}->{$try}) {
         $mod->{disp_dev} = $try;
         last TRY;
       }
     }
   }
-  unless(exists($mod->{disp_dev})){
+  unless (exists($mod->{disp_dev})) {
     $mod->{ok} = 0;
     $mod->{msg} = "Couldn't identify a PGPLOT display device -- giving up.\n";
     return 0;
   }
-  unless( $mod->{devices}{VCPS} ) {
+  unless ($mod->{devices}{VCPS}) {
     $mod->{ok} = 0;
     $mod->{msg} = "Couldn't find the VCPS file-output device -- giving up.\n";
     return 0;
@@ -170,7 +170,7 @@ our $pgplot_methods = {
     'image'  => 'imag',
     'contours' => 'cont',
     fits => 'fits_imag',
-    'circles'=> sub { 
+    'circles'=> sub {
 	my ($me,$ipo,$data,$ppo) = @_;
 	$ppo->{filltype}='outline';
 	$me->{obj}->tcircle(@$data, $ppo);
@@ -187,31 +187,28 @@ our $pgplot_methods = {
 	    $me->{obj}->text( $s, $data->[0]->at($i), $data->[1]->at($i), {JUSTIFICATION=>$j} );
 	}
     }
-	
 };
 
 sub plot {
     my $me = shift;
     my $ipo = shift;
     my $po = {};
-    $po->{title} =  $ipo->{title}    if(defined($ipo->{title}));
-    $po->{xtitle}=  $ipo->{xlabel}   if(defined($ipo->{xlabel}));
-    $po->{ytitle}=  $ipo->{ylabel}   if(defined($ipo->{ylabel}));
-    $po->{justify}= $ipo->{justify}  if(defined($ipo->{justify})); 
+    $po->{title}   = $ipo->{title}   if defined $ipo->{title};
+    $po->{xtitle}  = $ipo->{xlabel}  if defined $ipo->{xlabel};
+    $po->{ytitle}  = $ipo->{ylabel}  if defined $ipo->{ylabel};
+    $po->{justify} = $ipo->{justify} if defined $ipo->{justify};
 
     my %color_opts;
-    if (defined($ipo->{crange})) {
+    if (defined $ipo->{crange}) {
 	$color_opts{MIN} = $ipo->{crange}[0] if defined $ipo->{crange}[0];
 	$color_opts{MAX} = $ipo->{crange}[1] if defined $ipo->{crange}[1];
     }
 
-    my $more = 0;
-
-    if($ipo->{oplot}  and   $me->{opt}->{type} =~ m/^f/i) {
+    if ($ipo->{oplot}  and   $me->{opt}->{type} =~ m/^f/i) {
 	die "The PGPLOT engine does not yet support oplot for files.  Instead, \nglom all your lines together into one call to plot.\n";
     }
 
-    unless($ipo->{oplot}) {
+    unless ($ipo->{oplot}) {
 	$me->{curvestyle} = 0;
 	$me->{logaxis} = $ipo->{logaxis};
 	$po->{axis} = 0;
@@ -228,7 +225,7 @@ sub plot {
 	$me->{obj}->env(@range_vals, $po) if grep defined, @range_vals;
     }
 
-    # ppo is "post-plot options", which are really a mix of plot and curve options.  
+    # ppo is "post-plot options", which are really a mix of plot and curve options.
     # Currently we don't parse any plot options into it (they're handled by the "env"
     # call) but if we end up doing so, it should go here.  The linestyle and color
     # are curve options that are autoincremented each curve.
@@ -310,7 +307,7 @@ sub plot {
 	    $yp = 0.6 * $yrdiff + $ipo->{yrange}->[0];
 	}
 	print "keys is [".join(",",@{$me->{keys}})."]; xp is $xp; yp is $yp\n";
-	$me->{obj}->legend( 
+	$me->{obj}->legend(
 	    $me->{keys},
 	    $xp, $yp,
 	    { Color     => [ (xvals(0+@{$me->{keys}}) % 7 + 1)->list ],

@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK;
 # ABSTRACT: ARK Management
-$Koha::Contrib::ARK::VERSION = '1.1.1';
+$Koha::Contrib::ARK::VERSION = '1.1.2';
 use Moose;
 use Modern::Perl;
 use JSON;
@@ -91,13 +91,53 @@ has current => (
 
 
 sub set_current {
-    my ($self, $biblio, $record) = @_;
+    my ($self, $biblio) = @_;
+
     my $current = {
-        biblionumber => $biblio ? $biblio->biblionumber : 0,
+        biblio => $biblio,
         modified => 0,
     };
-    $current->{ record } = tojson($record) if $record && $self->debug;
     $self->current($current);
+
+    return unless $biblio;
+
+
+    my $record = MARC::Moose::Record::new_from($biblio->metadata->record(), 'Legacy');
+    return unless $record;
+
+    $biblio->{record} = $record;
+    $current->{biblionumber} = $biblio->biblionumber;
+    $current->{before} = tojson($record) if $self->debug;
+    $current->{ark} = $self->build_ark($biblio->biblionumber, $record);
+    
+    #$self->what_append('generated', $ark);
+}
+
+
+sub build_ark {
+    my ($self, $biblionumber, $record) = @_;
+
+    my $a = $self->c->{ark};
+    my $ark = $a->{ARK};
+    for my $var ( qw/ NMHA NAAN / ) {
+        my $value = $a->{$var};
+        $ark =~ s/{$var}/$value/;
+    }
+    my $kfield = $a->{koha}->{id};
+    my $id = $record->field($kfield->{tag});
+    if ( $id ) {
+        $id = $kfield->{letter}
+            ? $id->subfield($kfield->{letter})
+            : $id->value;
+        $id =~ s/^ *//; $id =~ s/ *$//; # trim left/right
+    }
+    unless ($id) {
+        $self->what_append('use_biblionumber');
+        $id = $biblionumber;
+    }
+    $ark =~ s/{id}/$id/;
+
+    return $ark;
 }
 
 
@@ -134,7 +174,8 @@ sub dump_explain {
 sub BUILD {
     my $self = shift;
 
-    my $dt = DateTime->now();
+    my $tz = DateTime::TimeZone->new( name => 'local' );
+    my $dt = DateTime->now( time_zone => $tz );;
     my $explain = {
         action => $self->cmd,
         timestamp => '"' . $dt->ymd . " " . $dt->hms . '"',
@@ -216,33 +257,6 @@ sub BUILD {
 }
 
 
-sub build_ark {
-    my ($self, $biblionumber, $record) = @_;
-
-    my $a = $self->c->{ark};
-    my $ark = $a->{ARK};
-    for my $var ( qw/ NMHA NAAN / ) {
-        my $value = $a->{$var};
-        $ark =~ s/{$var}/$value/;
-    }
-    my $kfield = $a->{koha}->{id};
-    my $id = $record->field($kfield->{tag});
-    if ( $id ) {
-        $id = $kfield->{letter}
-            ? $id->subfield($kfield->{letter})
-            : $id->value;
-        $id =~ s/^ *//; $id =~ s/ *$//; # trim left/right
-    }
-    unless ($id) {
-        $self->what_append('use_biblionumber');
-        $id = $biblionumber;
-    }
-    $ark =~ s/{id}/$id/;
-    $self->what_append('generated', $ark);
-    return $ark;
-}
-
-
 sub tojson {
     my $record = shift;
     my $rec = {
@@ -273,14 +287,18 @@ sub run {
         $progress = Term::ProgressBar->new({ count => $self->reader->total })
             if $self->verbose;
         my $next_update = 0;
-        while ( my ($biblio, $record) = $self->reader->read() ) {
-            if ( $record ) {
-                $self->action->action($biblio->biblionumber, $record);
-                if ( $self->cmd ne 'check' && $self->current->{modified} ) {
-                    $self->writer->write($biblio, $record);
-                }
+        while ( $self->reader->read() ) {
+            my $current = $self->current;
+            if ( $current->{biblionumber} ) {
+                $self->action->action();
+                my $modified = $current->{modified};
+                $current->{after} = Koha::Contrib::ARK::tojson($current->{biblio}->{record})
+                    if $self->debug && $modified;
+                $self->writer->write()
+                    if $self->cmd ne 'check' && $modified;
                 if ($self->cmd eq 'check' || $self->current->{modified}) {
-                    push @{$self->explain->{result}->{records}}, $self->current;
+                    delete $current->{$_} for qw/ biblio /;
+                    push @{$self->explain->{result}->{records}}, $current;
                 }
             }
             my $count = $self->reader->count;
@@ -307,7 +325,7 @@ Koha::Contrib::ARK - ARK Management
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 ATTRIBUTES
 
@@ -342,7 +360,7 @@ What happens on the current biblio record?
 
 =head1 METHODS
 
-=head2 set_current($biblio, $record)
+=head2 set_current($biblio)
 
 Set the current biblio record. Called by the biblio records reader.
 
@@ -350,10 +368,6 @@ Set the current biblio record. Called by the biblio records reader.
 
 Set an error code $id to the L<explain> processing status. $more can contain
 more information.
-
-=head2 build_ark($biblionumber, $record)
-
-Build ARK for biblio record $record (which has $biblionumber unique ID)
 
 =head1 AUTHOR
 

@@ -51,6 +51,7 @@ class GetTypeHandler(AbstractCommandHandler):
             return self._get_type_from_nested_payload(command.payload)
 
     def _get_type_from_nested_payload(self, payload):
-        for i in range(len(payload) - 1):
-            loaded_module = import_module(".".join(payload[:i + 1]))
-        return getattr(loaded_module, payload[-1])
+        module_name = ".".join(payload[:-1])
+        class_name = payload[-1]
+        loaded_module = import_module(module_name)
+        return getattr(loaded_module, class_name)

@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -42,10 +42,10 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Greple" : "8.53",
-            "App::optex::textconv" : "0.13",
+            "App::Greple" : "9.1702",
+            "App::optex::textconv" : "1.07",
             "Archive::Zip" : "1.37",
-            "perl" : "v5.14.0"
+            "perl" : "v5.18.2"
          }
       },
       "test" : {
@@ -57,7 +57,7 @@
    "provides" : {
       "App::Greple::msdoc" : {
          "file" : "lib/App/Greple/msdoc.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -72,11 +72,11 @@
          "web" : "https://github.com/kaz-utashiro/greple-msdoc"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

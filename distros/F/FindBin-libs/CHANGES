@@ -1,3 +1,7 @@
+-   4.0.2 Fri Oct 25 00:33:15 EDT 2024
+
+    Avoid undef value in m// with defined check.
+
 -   4.0.1 Wed Oct 23 23:03:01 EDT 2024
 
     Fixes to setup-dist shell script for creating the placeholder

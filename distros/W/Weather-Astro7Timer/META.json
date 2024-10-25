@@ -54,6 +54,6 @@
          "web" : "https://github.com/dkechag/Weather-Astro7Timer"
       }
    },
-   "version" : "0.2",
+   "version" : "0.3",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

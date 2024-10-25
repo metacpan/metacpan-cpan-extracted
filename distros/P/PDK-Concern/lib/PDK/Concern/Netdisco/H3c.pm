@@ -35,14 +35,16 @@ sub gen_iface_desc {
     }
     else {
       $self->dump("未匹配正则格式跳过解析：$line");
+      warn("未匹配正则格式跳过解析：$line");
       next;
     }
 
     $self->dump("打印解析到的数据：\n" . Dumper($local_port, $neighbor, $remote_port));
 
-    next if $remote_port !~ /eth/i;
+    next if $remote_port !~ /eth|twe|ten|gig/i;
 
     $neighbor = "AP-${neighbor}" if $line =~ /Smartrate-Ethernet1\/0\/1/;
+    $neighbor =~ s/(?:\.|\().*$//;
 
     $local_port  = $self->refine_if($local_port);
     $remote_port = $self->refine_if($remote_port);
@@ -52,7 +54,7 @@ sub gen_iface_desc {
     push @commands, ("interface $local_port", "description TO_${neighbor}_${remote_port}");
   }
 
-  push @commands, ('quit', 'save force');
+  push @commands, ('quit', 'quit', 'save force');
 
   $self->dump("邻居拓扑解析完毕并生成接口描述脚本:\n" . Dumper @commands);
 

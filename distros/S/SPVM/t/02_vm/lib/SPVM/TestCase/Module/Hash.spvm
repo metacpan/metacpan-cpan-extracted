@@ -157,7 +157,7 @@ class TestCase::Module::Hash {
       
       eval { $hash->get_byte("foo"); }
       
-      unless (Fn->contains($@, "The type of the value for the key \"foo\" must be the Byte class.")) {
+      unless ($@) {
         return 0;
       }
     }
@@ -177,8 +177,23 @@ class TestCase::Module::Hash {
         return 0;
       }
       my $value = $hash->get_short("foo");
-
+      
       unless ($value == Fn->INT16_MAX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $hash = Hash->new;
+      
+      $hash->set_byte(foo => (byte)Fn->INT8_MAX);
+      
+      unless ($hash->get("foo") isa Byte) {
+        return 0;
+      }
+      my $value = $hash->get_short("foo");
+      
+      unless ($value == Fn->INT8_MAX) {
         return 0;
       }
     }
@@ -191,7 +206,7 @@ class TestCase::Module::Hash {
       
       eval { $hash->get_short("foo"); }
       
-      unless (Fn->contains($@, "The type of the value for the key \"foo\" must be the Short class.")) {
+      unless ($@) {
         return 0;
       }
     }
@@ -211,8 +226,38 @@ class TestCase::Module::Hash {
         return 0;
       }
       my $value = $hash->get_int("foo");
-
+      
       unless ($value == Fn->INT32_MAX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $hash = Hash->new;
+      
+      $hash->set_short(foo => (short)Fn->SHORT_MAX);
+      
+      unless ($hash->get("foo") isa Short) {
+        return 0;
+      }
+      my $value = $hash->get_int("foo");
+      
+      unless ($value == Fn->SHORT_MAX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $hash = Hash->new;
+      
+      $hash->set_byte(foo => (byte)Fn->INT8_MAX);
+      
+      unless ($hash->get("foo") isa Byte) {
+        return 0;
+      }
+      my $value = $hash->get_int("foo");
+      
+      unless ($value == Fn->INT8_MAX) {
         return 0;
       }
     }
@@ -225,7 +270,7 @@ class TestCase::Module::Hash {
       
       eval { $hash->get_int("foo"); }
       
-      unless (Fn->contains($@, "The type of the value for the key \"foo\" must be the Int class.")) {
+      unless ($@) {
         return 0;
       }
     }
@@ -251,6 +296,51 @@ class TestCase::Module::Hash {
       }
     }
     
+    {
+      my $hash = Hash->new;
+      
+      $hash->set_int(foo => (int)Fn->INT_MAX);
+      
+      unless ($hash->get("foo") isa Int) {
+        return 0;
+      }
+      my $value = $hash->get_long("foo");
+      
+      unless ($value == Fn->INT_MAX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $hash = Hash->new;
+      
+      $hash->set_short(foo => (short)Fn->SHORT_MAX);
+      
+      unless ($hash->get("foo") isa Short) {
+        return 0;
+      }
+      my $value = $hash->get_long("foo");
+      
+      unless ($value == Fn->SHORT_MAX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $hash = Hash->new;
+      
+      $hash->set_byte(foo => (byte)Fn->INT8_MAX);
+      
+      unless ($hash->get("foo") isa Byte) {
+        return 0;
+      }
+      my $value = $hash->get_long("foo");
+      
+      unless ($value == Fn->INT8_MAX) {
+        return 0;
+      }
+    }
+    
     # Excetpions
     {
       my $hash = Hash->new;
@@ -259,7 +349,7 @@ class TestCase::Module::Hash {
       
       eval { $hash->get_long("foo"); }
       
-      unless (Fn->contains($@, "The type of the value for the key \"foo\" must be the Long class.")) {
+      unless ($@) {
         return 0;
       }
     }
@@ -293,7 +383,7 @@ class TestCase::Module::Hash {
       
       eval { $hash->get_float("foo"); }
       
-      unless (Fn->contains($@, "The type of the value for the key \"foo\" must be the Float class.")) {
+      unless ($@) {
         return 0;
       }
     }
@@ -327,7 +417,7 @@ class TestCase::Module::Hash {
       
       eval { $hash->get_double("foo"); }
       
-      unless (Fn->contains($@, "The type of the value for the key \"foo\" must be the Double class.")) {
+      unless ($@) {
         return 0;
       }
     }
@@ -375,7 +465,7 @@ class TestCase::Module::Hash {
       
       eval { $hash->get_string("foo"); }
       
-      unless (Fn->contains($@, "The type of the value for the key \"foo\" must be string type.")) {
+      unless ($@) {
         return 0;
       }
     }

@@ -12,7 +12,7 @@ use Test2::V0;
 use Test2::Tools::DataFrame;
 use Test2::Tools::PDL;
 
-subtest constrution => sub {
+subtest construction => sub {
     my $df = Data::Frame->new(
             columns => [ a => pdl( [ 0 .. 9 ] ),
                          b => pdl->new([1]),

@@ -6,6 +6,7 @@ from javonet.utils.Type import Type
 from javonet.utils.StringEncodingMode import StringEncodingMode
 
 
+
 class CommandDeserializer:
     position = 0
     buffer = []

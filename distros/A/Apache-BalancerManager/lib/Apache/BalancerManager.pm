@@ -1,8 +1,5 @@
 package Apache::BalancerManager;
-{
-  $Apache::BalancerManager::VERSION = '0.001002';
-}
-
+$Apache::BalancerManager::VERSION = '0.002000';
 # ABSTRACT: Interact with the Apache BalancerManager
 
 use Moo;
@@ -23,7 +20,7 @@ has name => (
 sub _build_name {
    my $ret = $_[0]->_scraped_content->{name_stuff};
 
-   $ret =~ s(^LoadBalancer Status for balancer://)();
+   $ret =~ s(^balancer://)();
 
    return $ret
 }
@@ -78,7 +75,7 @@ has _scraper => (
 
 sub _build_scraper {
    return scraper {
-      process 'h3', name_stuff => 'TEXT';
+      process 'h3 > a', name_stuff => 'TEXT';
       process '//table[2]/tr' => 'data[]' => scraper {
          process '//td[1]/a/@href', 'link' => 'TEXT';
          process '//td[1]/a', 'location' => 'TEXT';
@@ -88,8 +85,10 @@ sub _build_scraper {
          process '//td[5]', 'lb_set' => 'TEXT';
          process '//td[6]', status => 'TEXT';
          process '//td[7]', times_elected => 'TEXT';
-         process '//td[8]', to => 'TEXT';
-         process '//td[9]', from => 'TEXT';
+         process '//td[8]', busy => 'TEXT';
+         process '//td[9]', load => 'TEXT';
+         process '//td[10]', to => 'TEXT';
+         process '//td[11]', from => 'TEXT';
       };
    };
 }
@@ -112,10 +111,23 @@ has _user_agent => (
    lazy => 1,
    init_arg => 'user_agent',
    builder => '_build_user_agent',
-   handles => { _get => 'get' },
+   handles => {
+      _get => 'get',
+      _post => 'post',
+   },
 );
 
-sub _build_user_agent { require LWP::UserAgent; LWP::UserAgent->new }
+sub _build_user_agent {
+   my $self = shift;
+   require LWP::UserAgent;
+   require URI;
+   my $uri = URI->new($self->url);
+   my $ua = LWP::UserAgent->new;
+   # since httpd 2.4.41 referer is required for XSS protection
+   $ua->default_header(Referer => $self->url);
+   $ua->default_header(Host => $uri->host);
+   $ua
+}
 
 has _members => (
    is => 'ro',
@@ -149,8 +161,8 @@ sub member_count { scalar @{$_[0]->_members} }
 
 1;
 
-
 __END__
+
 =pod
 
 =head1 NAME
@@ -215,16 +227,25 @@ returns the L<Apache::BalancerManager::Member> with the passed index
 returns the number of L<Apache::BalancerManager::Member>'s that the load
 balancer contains
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
+=item *
+
+Wes Malone <wesm@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

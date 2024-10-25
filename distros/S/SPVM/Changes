@@ -1,3 +1,65 @@
+0.990025 2023-10-25
+  [Test Improvement]
+    * Add tests for NaN comparison and NaN condition evaluation.
+  [New Features]
+    * Add as_bool operator.
+    * Add is_numeric_type type native API.
+    * Add is_class_type type native API.
+  [Internal Changes]
+    * SPVM_OP_C_ID_BOOL is renamed to SPVM_OP_C_ID_CONDITION_EVALUATION.
+  [Exception Message Improvement]
+    * Improve exception messages in Hash class.
+  [Changes]
+    * Hash#get_int method can get a value from Byte, Short, Int object.
+    * Hash#get_short method can get a value from Byte, Short object.
+    * Hash#get_long method can get a value from Byte, Short, Int, Long object.
+  [Bug Fix]
+    * Fix a bug that get_type_width type native API did not work well when the argument type is a multi-numeric reference type.
+  [Changes]
+    * Improve the type check of the invocant in get_field_byte_by_name native API. The invocant must be a class type.
+    * Improve the type check of the invocant in get_field_short_by_name native API. The invocant must be a class type.
+    * Improve the type check of the invocant in get_field_int_by_name native API. The invocant must be a class type.
+    * Improve the type check of the invocant in get_field_long_by_name native API. The invocant must be a class type.
+    * Improve the type check of the invocant in get_field_double_by_name native API. The invocant must be a class type.
+    * Improve the type check of the invocant in get_field_object_by_name native API. The invocant must be a class type.
+    * Improve the type check of the invocant in set_field_byte_by_name native API. The invocant must be a class type.
+    * Improve the type check of the invocant in set_field_short_by_name native API. The invocant must be a class type.
+    * Improve the type check of the invocant in set_field_int_by_name native API. The invocant must be a class type.
+    * Improve the type check of the invocant in set_field_long_by_name native API. The invocant must be a class type.
+    * Improve the type check of the invocant in set_field_float_by_name native API. The invocant must be a class type.
+    * Improve the type check of the invocant in set_field_double_by_name native API. The invocant must be a class type.
+    * Improve the type check of the invocant in set_field_object_by_name native API. The invocant must be a class type.
+  [Changes with Potentially Incompatible Change]
+    * Improve the type check of the field in get_field_byte_by_name native API. The field must be byte type.
+    * Improve the type check of the field in get_field_short_by_name native API. The field must be within short type.
+    * Improve the type check of the field in get_field_int_by_name native API. The field must be within int type.
+    * Improve the type check of the field in get_field_long_by_name native API. The field must be within long type.
+    * Improve the type check of the field in get_field_float_by_name native API. The field must be within float type.
+    * Improve the type check of the field in get_field_double_by_name native API. The field must be within double type.
+    * Improve the type check of the field in get_field_object_by_name native API. The field must be an object type.
+    * Improve the type check of the field in get_field_object_ref_by_name native API. The field must be an object type.
+    * Improve the type check of the field in set_field_byte_by_name native API. The field must be byte or large type.
+    * Improve the type check of the field in set_field_short_by_name native API. The field must be short or large type.
+    * Improve the type check of the field in set_field_int_by_name native API. The field must be int or large type.
+    * Improve the type check of the field in set_field_long_by_name native API. The field must be long or large type.
+    * Improve the type check of the field in set_field_float_by_name native API. The field must be float or large type.
+    * Improve the type check of the field in set_field_double_by_name native API. The field must be double or large type.
+    * Improve the type check of the field in set_field_object_by_name native API. The field must be an object type.
+    * Improve the type check of the class_var in get_class_var_byte_by_name native API. The class variable must be byte type.
+    * Improve the type check of the class_var in get_class_var_short_by_name native API. The class variable must be within short type.
+    * Improve the type check of the class_var in get_class_var_int_by_name native API. The class variable must be within int type.
+    * Improve the type check of the class_var in get_class_var_long_by_name native API. The class variable must be within long type.
+    * Improve the type check of the class_var in get_class_var_float_by_name native API. The class variable must be within float type.
+    * Improve the type check of the class_var in get_class_var_double_by_name native API. The class variable must be within double type.
+    * Improve the type check of the class_var in get_class_var_double_by_name native API. The class variable must be an object type.
+    
+    * Improve the type check of the class_var in set_class_var_byte_by_name native API. The class variable must be byte or larger type.
+    * Improve the type check of the class_var in set_class_var_short_by_name native API. The class variable must be short or larger type.
+    * Improve the type check of the class_var in set_class_var_int_by_name native API. The class variable must be int or larger type.
+    * Improve the type check of the class_var in set_class_var_long_by_name native API. The class variable must be long or larger type.
+    * Improve the type check of the class_var in set_class_var_float_by_name native API. The class variable must be float or larger type.
+    * Improve the type check of the class_var in set_class_var_double_by_name native API. The class variable must be double type.
+    * Improve the type check of the class_var in set_class_var_double_by_name native API. The class variable must be an object type.
 0.990024 2023-10-23
   [New Features]
     * Allow multiple INIT blocks.

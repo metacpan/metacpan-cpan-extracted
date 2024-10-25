@@ -425,16 +425,16 @@ sub plot {
 
     my $plot;
 
-    if($ipo->{oplot} and defined($me->{last_plot})) {
+    if ($ipo->{oplot} and defined($me->{last_plot})) {
 	$plot = $me->{last_plot};
     } else {
 	$me->{curvestyle} = 0;
 
-	if( $me->{multi} ) {
+	if ($me->{multi}) {
 	    # Multiplot - handle logic and plot placement
 
 	    # Advance to the next plot position. Erase the window if necessary.
-	    if($me->{next_plotno}  and  $me->{next_plotno} >= $me->{multi}->[0] * $me->{multi}->[1]) {
+	    if ($me->{next_plotno}  and  $me->{next_plotno} >= $me->{multi}->[0] * $me->{multi}->[1]) {
 		map {$_->destroy} @{$me->{widgets}};
 		$me->{widgets} = [];
 		$me->{next_plotno} = 0;
@@ -474,87 +474,88 @@ sub plot {
       }
     }
 
-    ## Set global plot options: titles, axis labels, and ranges.
-    $plot->hide;
-    $plot->lock;
-    $plot->title(     $ipo->{title}   )  if(defined($ipo->{title}));
-    $plot->x->label(  $ipo->{xlabel}  )  if(defined($ipo->{xlabel}));
-    $plot->y->label(  $ipo->{ylabel}  )  if(defined($ipo->{ylabel}));
+    if (!$ipo->{oplot}) {
+      ## Set global plot options: titles, axis labels, and ranges.
+      $plot->hide;
+      $plot->lock;
+      $plot->title(     $ipo->{title}   )  if(defined($ipo->{title}));
+      $plot->x->label(  $ipo->{xlabel}  )  if(defined($ipo->{xlabel}));
+      $plot->y->label(  $ipo->{ylabel}  )  if(defined($ipo->{ylabel}));
 
-    $plot->x->scaling(sc::Log()) if($ipo->{logaxis}=~ m/x/i);
-    $plot->y->scaling(sc::Log()) if($ipo->{logaxis}=~ m/y/i);
+      $plot->x->scaling(sc::Log()) if($ipo->{logaxis}=~ m/x/i);
+      $plot->y->scaling(sc::Log()) if($ipo->{logaxis}=~ m/y/i);
 
-    $plot->x->min($ipo->{xrange}[0]) if(defined($ipo->{xrange}) and defined($ipo->{xrange}[0]));
-    $plot->x->max($ipo->{xrange}[1]) if(defined($ipo->{xrange}) and defined($ipo->{xrange}[1]));
-    $plot->y->min($ipo->{yrange}[0]) if(defined($ipo->{yrange}) and defined($ipo->{yrange}[0]));
-    $plot->y->max($ipo->{yrange}[1]) if(defined($ipo->{yrange}) and defined($ipo->{yrange}[1]));
+      $plot->x->min($ipo->{xrange}[0]) if(defined($ipo->{xrange}) and defined($ipo->{xrange}[0]));
+      $plot->x->max($ipo->{xrange}[1]) if(defined($ipo->{xrange}) and defined($ipo->{xrange}[1]));
+      $plot->y->min($ipo->{yrange}[0]) if(defined($ipo->{yrange}) and defined($ipo->{yrange}[0]));
+      $plot->y->max($ipo->{yrange}[1]) if(defined($ipo->{yrange}) and defined($ipo->{yrange}[1]));
 
-    ##############################
-    # I couldn't find a way to scale the plot to make the plot area justified, so
-    # we cheat and adjust the axis values instead.
-    # This is a total hack, but at least it produces justified plots.
-    if( !!($ipo->{justify}) ) {
-	my ($dmin,$pmin,$dmax,$pmax,$xscale,$yscale);
+      ##############################
+      # I couldn't find a way to scale the plot to make the plot area justified, so
+      # we cheat and adjust the axis values instead.
+      # This is a total hack, but at least it produces justified plots.
+      if ($ipo->{justify}) {
+        my ($dmin,$pmin,$dmax,$pmax,$xscale,$yscale);
 
-	($dmin,$dmax) = $plot->x->minmax;
-	$pmin = $plot->x->reals_to_pixels($dmin);
-	$pmax = $plot->x->reals_to_pixels($dmax);
-	$xscale = ($pmax-$pmin)/($dmax-$dmin);
+        ($dmin,$dmax) = $plot->x->minmax;
+        $pmin = $plot->x->reals_to_pixels($dmin);
+        $pmax = $plot->x->reals_to_pixels($dmax);
+        $xscale = ($pmax-$pmin)/($dmax-$dmin);
 
-	($dmin,$dmax) = $plot->y->minmax;
-	$pmin = $plot->y->reals_to_pixels($dmin);
-	$pmax = $plot->y->reals_to_pixels($dmax);
-	$yscale = ($pmax-$pmin)/($dmax-$dmin);
+        ($dmin,$dmax) = $plot->y->minmax;
+        $pmin = $plot->y->reals_to_pixels($dmin);
+        $pmax = $plot->y->reals_to_pixels($dmax);
+        $yscale = ($pmax-$pmin)/($dmax-$dmin);
 
-	my $ratio = $yscale / $xscale;
-	if($ratio > 1) {
-	    # More Y pixels per datavalue than X pixels.  Hence we expand the Y range.
-	    my $ycen = ($dmax+$dmin)/2;
-	    my $yof =  ($dmax-$dmin)/2;
-	    my $new_yof = $yof * $yscale/$xscale;
-	    $plot->y->min($ycen-$new_yof);
-	    $plot->y->max($ycen+$new_yof);
-	} elsif($ratio < 1) {
-	    # More X pixels per datavalue than Y pixels.  Hence we expand the X range.
-	    ($dmin,$dmax) = $plot->x->minmax;
-	    my $xcen = ($dmax+$dmin)/2;
-	    my $xof =  ($dmax-$dmin)/2;
-	    my $new_xof = $xof * $xscale/$yscale;
-	    $plot->x->min($xcen-$new_xof);
-	    $plot->x->max($xcen+$new_xof);
-	}
+        my $ratio = $yscale / $xscale;
+        if($ratio > 1) {
+            # More Y pixels per datavalue than X pixels.  Hence we expand the Y range.
+            my $ycen = ($dmax+$dmin)/2;
+            my $yof =  ($dmax-$dmin)/2;
+            my $new_yof = $yof * $yscale/$xscale;
+            $plot->y->min($ycen-$new_yof);
+            $plot->y->max($ycen+$new_yof);
+        } elsif($ratio < 1) {
+            # More X pixels per datavalue than Y pixels.  Hence we expand the X range.
+            ($dmin,$dmax) = $plot->x->minmax;
+            my $xcen = ($dmax+$dmin)/2;
+            my $xof =  ($dmax-$dmin)/2;
+            my $new_xof = $xof * $xscale/$yscale;
+            $plot->x->min($xcen-$new_xof);
+            $plot->x->max($xcen+$new_xof);
+        }
+      }
     }
-
 
     ##############################
     # Rubber meets the road -- loop over data blocks and
     # ship out each curve to the appropriate dispatcher in the $types table
     for my $block (@_) {
-	my $co = shift @$block;
+      my ($co, @rest) = @$block;
 
-	# Parse out curve style (for points type selection)
-	if (defined $co->{style}) {
-	    $me->{curvestyle} = $co->{style};
-	} else {
-	    $me->{curvestyle}++;
-	}
+      # Parse out curve style (for points type selection)
+      if (defined $co->{style}) {
+        $me->{curvestyle} = $co->{style};
+      } else {
+        $me->{curvestyle}++;
+      }
 
-	my $cprops = [
-	    color        => $colors[   ($me->{curvestyle}-1) % @colors ],
-	    linePattern  => $patterns[ ($me->{curvestyle}-1) % @patterns ],
-	    lineWidth    => $co->{width} || 1
-	    ];
+      my $cprops = [
+        color        => $colors[   ($me->{curvestyle}-1) % @colors ],
+        linePattern  => $patterns[ ($me->{curvestyle}-1) % @patterns ],
+        lineWidth    => $co->{width} || 1
+      ];
 
-	my $with = $co->{with};
-	my $type = $types->{$with};
-	die "$with is not yet implemented in PDL::Graphics::Simple for Prima.\n"
-	    if !defined $type;
-	if ( ref($type) eq 'CODE' ) {
-	    $type->($me, $plot, $block, $cprops, $co, $ipo);
-	} else {
-	    my $pt = ref($type) eq 'ARRAY' ? $type->[ ($me->{curvestyle}-1) % (0+@{$type}) ] : ppair->can($type)->();
-	    $plot->dataSets()->{ 1+keys(%{$plot->dataSets()}) } = ds::Pair(@$block, plotType => $pt, @$cprops);
-	}
+      my $with = $co->{with};
+      my $type = $types->{$with};
+      die "$with is not yet implemented in PDL::Graphics::Simple for Prima.\n"
+          if !defined $type;
+      if ( ref($type) eq 'CODE' ) {
+        $type->($me, $plot, \@rest, $cprops, $co, $ipo);
+      } else {
+        my $pt = ref($type) eq 'ARRAY' ? $type->[ ($me->{curvestyle}-1) % (0+@{$type}) ] : ppair->can($type)->();
+        $plot->dataSets()->{ 1+keys(%{$plot->dataSets()}) } = ds::Pair(@rest, plotType => $pt, @$cprops);
+      }
     }
 
     if ($me->{type} !~ m/f/i) {

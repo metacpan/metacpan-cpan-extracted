@@ -1,0 +1,59 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Steven Lembark <lembark@wrkhors.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "FindBin-libs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Basename" : "0",
+            "File::Copy::Recursive::Reduced" : "0.006000",
+            "File::Spec::Functions" : "0",
+            "List::Util" : "0",
+            "strict" : "0",
+            "version" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "3.073000",
+            "Data::Dump" : "0",
+            "File::Basename" : "0",
+            "File::Copy::Recursive::Reduced" : "0.002000",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "0",
+            "Symbol" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v4.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -1,5 +1,8 @@
 Revision history of Data-Frame
 
+0.006003    2024-10-24
+    - allow PDL::{Factor,Logical,SV} "initialize" to be instance methods
+
 0.006002    2022-01-03 14:33:22-0500
     - Fix PDL::Factor's ngood, nbad methods for newer PDL versions.
       See <https://github.com/EntropyOrg/p5-Data-Frame/pull/34>.

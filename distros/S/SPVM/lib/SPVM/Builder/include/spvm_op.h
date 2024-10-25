@@ -226,7 +226,7 @@ enum {
   SPVM_OP_C_ID_MAKE_READ_ONLY,
   SPVM_OP_C_ID_COPY,
   SPVM_OP_C_ID_TYPE_CAST,
-  SPVM_OP_C_ID_BOOL,
+  SPVM_OP_C_ID_CONDITION_EVALUATION,
   SPVM_OP_C_ID_ISA,
   SPVM_OP_C_ID_ISA_ERROR,
   SPVM_OP_C_ID_IS_TYPE,
@@ -249,6 +249,7 @@ enum {
   SPVM_OP_C_ID_DEREFERENCE,
   SPVM_OP_C_ID_EVAL_ERROR_ID,
   SPVM_OP_C_ID_SEQUENCE,
+  SPVM_OP_C_ID_AS_BOOL,
 };
 
 const char* const* SPVM_OP_C_ID_NAMES(void);
@@ -420,7 +421,7 @@ SPVM_OP* SPVM_OP_build_interface_statement(SPVM_COMPILER* compiler, SPVM_OP* op_
 
 SPVM_OP* SPVM_OP_build_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_call_method, SPVM_OP* op_invocant, SPVM_OP* op_name_method, SPVM_OP* op_list_operands);
 
-SPVM_OP* SPVM_OP_build_type_cast(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPVM_OP* op_type, SPVM_OP* op_operand, SPVM_OP* op_attributes);
+SPVM_OP* SPVM_OP_build_type_cast(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPVM_OP* op_type, SPVM_OP* op_operand);
 
 SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumeration, SPVM_OP* op_enumeration_block, SPVM_OP* op_descripters);
 
@@ -457,6 +458,8 @@ SPVM_OP* SPVM_OP_build_alias(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* 
 SPVM_OP* SPVM_OP_build_basic_type_id(SPVM_COMPILER* compiler, SPVM_OP* op_basic_type_id, SPVM_OP* op_type);
 
 SPVM_OP* SPVM_OP_build_extends(SPVM_COMPILER* compiler, SPVM_OP* op_extends, SPVM_OP* op_name_parent_class);
+
+SPVM_OP* SPVM_OP_build_as_bool(SPVM_COMPILER* compiler, SPVM_OP* op_as_bool, SPVM_OP* op_operand);
 
 SPVM_OP* SPVM_OP_new_op_bool(SPVM_COMPILER* compiler, SPVM_OP* op_operand, const char* file, int32_t line);
 

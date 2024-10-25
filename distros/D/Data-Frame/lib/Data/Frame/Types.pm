@@ -1,5 +1,5 @@
 package Data::Frame::Types;
-$Data::Frame::Types::VERSION = '0.006002';
+$Data::Frame::Types::VERSION = '0.006003';
 # ABSTRACT: Custom Type::Tiny types
 
 use strict;
@@ -54,7 +54,7 @@ Data::Frame::Types - Custom Type::Tiny types
 
 =head1 VERSION
 
-version 0.006002
+version 0.006003
 
 =head1 DESCRIPTION 
 

@@ -1,0 +1,37 @@
+---
+abstract: 'Subscribe to an MQTT topic and trigger job execution'
+author:
+  - 'Chris Carline <chris@carline.org>'
+build_requires:
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-mqtt2job
+requires:
+  Capture::Tiny: '0'
+  DateTime: '0'
+  Exporter: '0'
+  File::Temp: '0'
+  JSON: '0'
+  Moose: '0'
+  MooseX::Getopt: '0'
+  Net::MQTT::Simple: '0'
+  Template: '0'
+  Try::Tiny: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/seesee/App-mqtt2job/issues
+  homepage: https://github.com/seesee/App-mqtt2job
+  repository: https://github.com/seesee/App-mqtt2job.git
+version: '0.02'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

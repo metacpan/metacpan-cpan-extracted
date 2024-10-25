@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Carp;
+use Time::Local;
 
 =head1 NAME
 
@@ -12,9 +13,11 @@ Weather::Astro7Timer - Simple client for the 7Timer.info Weather Forecast servic
 
 =cut
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 =head1 SYNOPSIS
+
+  use Weather::Astro7Timer;
 
   my $w7t = Weather::Astro7Timer->new();
 
@@ -287,6 +290,75 @@ sub _output {
 sub products {
     return qw/astro two civil civillight meteo/;
 }
+
+=head1 HELPER FUNCTIONS
+
+=head2 C<init_to_ts>
+
+    my $timestamp = Weather::Astro7Timer::init_to_ts($report{init});
+
+Returns a unix timestamp from the init date. For the subsequent entries of the
+timeseries you can add C<timepoint> * 3600 to the timestamp.
+
+=head2 C<ts_to_date>
+
+    my $datetime = Weather::Astro7Timer::ts_to_date($timestamp, $utc?);
+
+For convenience, C<ts_to_date> will convert a timestamp (e.g. returned by
+C<init_to_ts>) to a date/time format C<YYYY-MM-DD HH:mm:ss> in your local time zone,
+or C<YYYY-MM-DD HH:mm:ssZ> in UTC if the second argument is true. For example:
+
+ my $datetime = Weather::Astro7Timer::ts_to_date(
+    Weather::Astro7Timer::init_to_ts($report{init}) +
+        $report{dataseries}->[0]->{timepoint} * 3600
+ );
+
+
+=cut
+
+sub init_to_ts {
+    my $init = shift;
+
+    return unless $init =~ /^(\d{4})(\d\d)(\d\d)(\d\d)$/;
+    return timegm(0,0,$4,$3,$2-1,$1) 
+}
+
+sub ts_to_date {
+    my $ts = shift;
+    my $gm = shift;
+    $gm = $gm ? 'Z' : '';
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) =
+        $gm ? gmtime($ts) : localtime($ts);
+    $mon++;
+    $year += 1900;
+    return sprintf "%04d-%02d-%02d %02d:%02d:%02d%s", $year, $mon, $mday,
+        $hour, $min, $sec, $gm;
+}
+
+=head1 OTHER PERL WEATHER MODULES
+
+A quick listing of Perl modules for current weather and forecasts from various sources:
+
+=head2 OpenWeatherMap
+
+OpenWeatherMap uses various weather sources combined with their own ML and offers
+a couple of free endpoints (the v2.5 current weather and 5d/3h forecast) with generous
+request limits. Their newer One Call 3.0 API also offers some free usage (1000 calls/day)
+and the cost is per call above that. If you want access to history APIs, extended
+hourly forecasts etc, there are monthly subscriptions. L<Weather::OWM> is from the
+same author as this module and simplar in use.
+
+=head2 Apple WeatherKit
+
+An alternative source for multi-source forecasts is Apple's WeatherKit (based on
+the old Dark Sky weather API). It offers 500k calls/day for free, but requires a
+paid Apple developer account. You can use L<Weather::WeatherKit>, which is very
+similar to this module (same author).
+
+=head2 YR.no
+
+Finally, the Norwegian Meteorological Institute offers the free YR.no service, which
+can be accessed via L<Weather::YR>, although I am not affiliated with that module.
 
 =head1 AUTHOR
 

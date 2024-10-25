@@ -96,7 +96,6 @@ is_deeply \@args, [
 ];
 }
 eval { $a = xvals(50); lines $a sin($a/3), {xlabel=>"Abscissa", ylabel=>"Ordinate"} };
-plan skip_all => 'No plotting engines installed' if $@ =~ /Sorry, all known/;
 is($@, '', "simple lines plot succeeded");
 ok( defined($PDL::Graphics::Simple::global_object), "Global convenience object got spontaneously set" );
 ask_yn q{  test>  $a = xvals(50); lines $a sin($a/3);
@@ -140,6 +139,8 @@ my $r9 = rvals(9,9);
 my $r9minus = -$r9;
 my $s9 = sequence(9,9);
 my $xyr9 = pdl(xvals(9,9),yvals(9,9),$r9)*20;
+my $sqpoly = pdl('1 5; 3 5; 3 3; 1 3; 1 5; 5 5; 7 5; 7 3; 5 3; 5 5');
+my $pen = pdl('1 1 1 1 0 1 1 1 1 0');
 # Test imag
 my $x100 = xvals(100,100);
 my $y100 = yvals(100,100);
@@ -165,6 +166,17 @@ for my $engine (@engines) {
 	  skip "Skipping tests for engine $engine (not working)", $tests_per_engine - 2;
       }
       $pgplot_ran ||= $engine eq 'pgplot';
+
+# overplot
+      eval { $w=PDL::Graphics::Simple->new(engine=>$engine); };
+      is($@, '', "window open OK");
+      my ($sq1, $p1) = (pdl('-3 1; -1 1; -1 -1; -3 -1; -3 1'), pdl('1 1 1 1 0'));
+      $w->plot(with=>'polylines', $sq1, $p1,
+        {xrange=>[-4,4],yrange=>[-4,4],j=>1});
+      my $sq2 = pdl('1 1; 3 1; 3 -1; 1 -1; 1 1');
+      $w->oplot(with=>'polylines', $sq2, $p1);
+      ask_yn
+qq{Testing $engine engine: You should see 2 squares}, "oplot OK";
 
       eval { $w = PDL::Graphics::Simple->new(engine=>$engine, multi=>[2,2], size=>[6,6]) };
       is($@, '', "constructor for $engine worked OK");
@@ -425,15 +437,16 @@ is_deeply $new[1], {
       is($@, '', "Multiplot declaration was OK");
       $w->image( $r9,{wedge=>1} ); $w->image( $r9minus,{wedge=>1} );
       $w->plot(with=>'image', $r9, with=>'contours', $r9, {j=>1});
-      $w->image( $xyr9 );
-      ask_yn qq{Testing $engine engine: You should see two bullseyes across the top (one in
+      $w->plot(with=>'image', $xyr9, with=>'polylines', $sqpoly, $pen,
+        {xrange=>[0,8],yrange=>[0,8],j=>1});
+      ask_yn
+qq{Testing $engine engine: You should see two bullseyes across the top (one in
 negative print), a bullseye with contours at bottom left, and an RGB
 blur (if supported by the engine - otherwise a modified gradient) at
-bottom right.  The top two panels should have colorbar wedges to the
+bottom right w/2 squares. The top two panels should have colorbar wedges to the
 right of the image.}, "multiplot OK";
     }
 }
-
 
 # Continue the simple engine and convenience interfaces
 {

@@ -29,9 +29,9 @@ has date => (
   },
 );
 
-has workdir => (is => 'rw', default => sub { $ENV{PDK_CONCERN_HOME} // glob("~") },);
+has workdir => (is => 'rw', default => sub { $ENV{PDK_CONCERN_NETDISCO_HOME} // glob("~") },);
 
-has debug => (is => 'rw', default => sub { $ENV{PDK_CONCERN_DEBUG} // 0 },);
+has debug => (is => 'rw', default => sub { $ENV{PDK_CONCERN_NETDISCO_DEBUG} // 0 },);
 
 sub now {
   my $now = `date "+%Y-%m-%d %H:%M:%S"`;
@@ -42,21 +42,20 @@ sub now {
 sub dump {
   my ($self, $msg) = @_;
 
-  $msg .= ';' unless $msg =~ /[,，！!。.]$/;
+  $msg .= ';' unless $msg =~ /^\s*$/ || $msg =~ /[,，！!。.]$/;
 
+  my $text = $self->now() . " - [debug] $msg";
   if ($self->debug == 1) {
-    say $self->now . " - [debug] $msg";
+    say $text;
   }
   elsif ($self->debug > 1) {
     my $workdir = "$self->{workdir}/$self->{month}/$self->{date}";
     make_path($workdir) unless -d $workdir;
 
     my $filename = "$workdir/$self->{device}->{host}.txt";
-
     open(my $fh, '>>', $filename) or croak "无法打开文件 $filename 进行写入: $!";
-    my $text = $self->now . " - [debug] $msg\n";
-    print $fh $text or croak "写入文件 $filename 失败: $!";
-    close($fh)      or croak "关闭文件句柄 $filename 失败: $!";
+    print $fh "$text\n"           or croak "写入文件 $filename 失败: $!";
+    close($fh)                    or croak "关闭文件句柄 $filename 失败: $!";
   }
 }
 
@@ -102,22 +101,16 @@ sub explore_topology {
 sub refine_if {
   my ($self, $name) = @_;
 
-  state $replacements = {
-    'Ten-GigabitEthernet' => 'TE',
-    'GigabitEthernet'     => 'GE',
-    'Smartrate-Ethernet'  => 'SE',
-    'Ethernet'            => 'Eth',
-    'xethernet'           => 'XE',
-    'ethernet'            => 'E',
-    'xge'                 => 'TE',
-    'ge'                  => 'G',
-    'Twe'                 => 'TW',
-    'eth'                 => 'Eth',
-  };
-
-  for my $pattern (keys %$replacements) {
-    $name =~ s/$pattern/$replacements->{$pattern}/gi;
-  }
+  $name =~ s/Ten-GigabitEthernet/TE/gi;
+  $name =~ s/GigabitEthernet/GE/gi;
+  $name =~ s/Smartrate-Ethernet/SE/gi;
+  $name =~ s/Ethernet/Eth/gi;
+  $name =~ s/xethernet/XE/gi;
+  $name =~ s/ethernet/E/gi;
+  $name =~ s/xge/TE/gi;
+  $name =~ s/ge/G/gi;
+  $name =~ s/Twe/TW/gi;
+  $name =~ s/eth/Eth/gi;
 
   return $name;
 }

@@ -92,7 +92,6 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'File::Spec' => '0',
-                                   'JSON::Schema::Modern' => '0.593',
                                    'Module::Metadata' => '0',
                                    'Mojolicious' => '0',
                                    'Test2::API' => '0',

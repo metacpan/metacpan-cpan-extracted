@@ -1,5 +1,5 @@
 package PDL::SV;
-$PDL::SV::VERSION = '0.006002';
+$PDL::SV::VERSION = '0.006003';
 # ABSTRACT: PDL subclass for keeping scalar data (like strings)
 
 use 5.016;
@@ -122,7 +122,7 @@ sub new {
 
 sub initialize {
     my ($class) = @_;
-    return bless( { PDL => PDL::Core::null, _internal => [] }, $class );
+    return bless( { PDL => PDL::Core::null, _internal => [] }, ref $class || $class );
 }
 
 # code modified from <https://metacpan.org/pod/Hash::Path>
@@ -444,7 +444,7 @@ PDL::SV - PDL subclass for keeping scalar data (like strings)
 
 =head1 VERSION
 
-version 0.006002
+version 0.006003
 
 =head1 SYNOPSIS
 

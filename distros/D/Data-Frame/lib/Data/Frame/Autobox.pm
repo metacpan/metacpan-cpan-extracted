@@ -1,5 +1,5 @@
 package Data::Frame::Autobox;
-$Data::Frame::Autobox::VERSION = '0.006002';
+$Data::Frame::Autobox::VERSION = '0.006003';
 # ABSTRACT: Autobox arrays and hashes for Data::Frame
 
 use strict;
@@ -20,7 +20,7 @@ sub import {
 
 
 package Data::Frame::Autobox::ARRAY;
-$Data::Frame::Autobox::ARRAY::VERSION = '0.006002';
+$Data::Frame::Autobox::ARRAY::VERSION = '0.006003';
 use List::AllUtils;
 use POSIX qw(ceil);
 
@@ -93,7 +93,7 @@ sub setdiff {
  
 
 package Data::Frame::Autobox::HASH;
-$Data::Frame::Autobox::HASH::VERSION = '0.006002';
+$Data::Frame::Autobox::HASH::VERSION = '0.006003';
 use Carp;
 use Ref::Util;
 use List::AllUtils qw(pairmap);
@@ -173,7 +173,7 @@ Data::Frame::Autobox - Autobox arrays and hashes for Data::Frame
 
 =head1 VERSION
 
-version 0.006002
+version 0.006003
 
 =head1 SYNOPSIS
 

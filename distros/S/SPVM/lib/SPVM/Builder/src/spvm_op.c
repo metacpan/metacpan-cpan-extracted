@@ -226,7 +226,7 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "MAKE_READ_ONLY",
     "COPY",
     "TYPE_CAST",
-    "BOOL",
+    "CONDITION_EVALUATION",
     "ISA",
     "ISA_ERROR",
     "IS_TYPE",
@@ -249,6 +249,7 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "DEREFERENCE",
     "EVAL_ERROR_ID",
     "SEQUENCE",
+    "AS_BOOL",
   };
   
   return id_names;
@@ -634,7 +635,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_decl->file, op_decl->line);
           SPVM_OP* op_type_for_cast = SPVM_OP_new_op_type(compiler, class_var_type->unresolved_basic_type_name, class_var_type->basic_type, class_var_type->dimension, class_var_type->flag, op_decl->file, op_decl->line);
           
-          SPVM_OP_build_type_cast(compiler, op_type_cast, op_type_for_cast, op_var_assign_value, NULL);
+          SPVM_OP_build_type_cast(compiler, op_type_cast, op_type_for_cast, op_var_assign_value);
           
           SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_decl->file, op_decl->line);
           SPVM_OP_build_assign(compiler, op_assign, op_var_class_var, op_type_cast);
@@ -763,7 +764,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_decl->file, op_decl->line);
           SPVM_OP* op_type_for_cast = SPVM_OP_new_op_type(compiler, field_type->unresolved_basic_type_name, field_type->basic_type, field_type->dimension, field_type->flag, op_decl->file, op_decl->line);
           
-          SPVM_OP_build_type_cast(compiler, op_type_cast, op_type_for_cast, op_var_assign_value, NULL);
+          SPVM_OP_build_type_cast(compiler, op_type_cast, op_type_for_cast, op_var_assign_value);
           
           SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_decl->file, op_decl->line);
           SPVM_OP_build_assign(compiler, op_assign, op_field_access, op_type_cast);
@@ -2215,7 +2216,7 @@ SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_ini
         SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_array_init->file, op_array_init->line);
         SPVM_OP* op_type_for_cast = SPVM_OP_new_op_any_object_type(compiler, op_array_init->file, op_array_init->line);
         SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_element_element);
-        SPVM_OP_build_type_cast(compiler, op_type_cast, op_type_for_cast, op_element_element, NULL);
+        SPVM_OP_build_type_cast(compiler, op_type_cast, op_type_for_cast, op_element_element);
         SPVM_OP_replace_op(compiler, op_stab, op_type_cast);
       }
     }
@@ -2361,7 +2362,7 @@ SPVM_OP* SPVM_OP_build_isweak_field(SPVM_COMPILER* compiler, SPVM_OP* op_isweak,
   return op_field_access;
 }
 
-SPVM_OP* SPVM_OP_build_type_cast(SPVM_COMPILER* compiler, SPVM_OP* op_type_cast, SPVM_OP* op_type, SPVM_OP* op_operand, SPVM_OP* op_attributes) {
+SPVM_OP* SPVM_OP_build_type_cast(SPVM_COMPILER* compiler, SPVM_OP* op_type_cast, SPVM_OP* op_type, SPVM_OP* op_operand) {
   
   SPVM_OP_insert_child(compiler, op_type_cast, op_type_cast->last, op_operand);
   SPVM_OP_insert_child(compiler, op_type_cast, op_type_cast->last, op_type);
@@ -3177,9 +3178,28 @@ SPVM_OP* SPVM_OP_build_array_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_elem
   return op_type;
 }
 
+SPVM_OP* SPVM_OP_build_as_bool(SPVM_COMPILER* compiler, SPVM_OP* op_as_bool, SPVM_OP* op_operand) {
+  
+  SPVM_OP* op_logical_not1 = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_LOGICAL_NOT, op_as_bool->file, op_as_bool->line);
+  
+  op_logical_not1 = SPVM_OP_build_logical_not(compiler, op_logical_not1, op_operand);
+  
+  SPVM_OP* op_logical_not2 = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_LOGICAL_NOT, op_as_bool->file, op_as_bool->line);
+  
+  op_logical_not2 = SPVM_OP_build_logical_not(compiler, op_logical_not2, op_logical_not1);
+  
+  SPVM_OP* op_byte_type = SPVM_OP_new_op_byte_type(compiler, op_as_bool->file, op_as_bool->line);
+    
+  SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_as_bool->file, op_as_bool->line);
+  
+  op_type_cast = SPVM_OP_build_type_cast(compiler, op_type_cast, op_byte_type, op_logical_not2);
+  
+  return op_type_cast;
+}
+
 SPVM_OP* SPVM_OP_new_op_bool(SPVM_COMPILER* compiler, SPVM_OP* op_operand, const char* file, int32_t line) {
   
-  SPVM_OP* op_bool = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_BOOL, file, line);
+  SPVM_OP* op_bool = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONDITION_EVALUATION, file, line);
   SPVM_OP_insert_child(compiler, op_bool, op_bool->last, op_operand);
   
   return op_bool;

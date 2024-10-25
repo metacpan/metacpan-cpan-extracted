@@ -4,7 +4,6 @@ author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
   File::Spec: '0'
-  JSON::Schema::Modern: '0.593'
   Module::Metadata: '0'
   Mojolicious: '0'
   Test2::API: '0'
@@ -54,13 +53,13 @@ no_index:
 provides:
   JSON::Schema::Modern::Document::OpenAPI:
     file: lib/JSON/Schema/Modern/Document/OpenAPI.pm
-    version: '0.071'
+    version: '0.072'
   JSON::Schema::Modern::Vocabulary::OpenAPI:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
-    version: '0.071'
+    version: '0.072'
   OpenAPI::Modern:
     file: lib/OpenAPI/Modern.pm
-    version: '0.071'
+    version: '0.072'
 requires:
   Carp: '0'
   Encode: '2.89'
@@ -96,7 +95,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/OpenAPI-Modern
   repository: https://github.com/karenetheridge/OpenAPI-Modern.git
-version: '0.071'
+version: '0.072'
 x_Dist_Zilla:
   perl:
     version: '5.041005'
@@ -316,7 +315,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::Portability:
           options: 'test_one_dot = 0'
       name: '@Author::ETHER/Test::Portability'
-      version: '2.001002'
+      version: '2.001003'
     -
       class: Dist::Zilla::Plugin::Test::CleanNamespaces
       config:
@@ -767,7 +766,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.071
+          tag: v0.072
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

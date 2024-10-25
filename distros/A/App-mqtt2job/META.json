@@ -1,0 +1,62 @@
+{
+   "abstract" : "Subscribe to an MQTT topic and trigger job execution",
+   "author" : [
+      "Chris Carline <chris@carline.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-mqtt2job",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "DateTime" : "0",
+            "Exporter" : "0",
+            "File::Temp" : "0",
+            "JSON" : "0",
+            "Moose" : "0",
+            "MooseX::Getopt" : "0",
+            "Net::MQTT::Simple" : "0",
+            "Template" : "0",
+            "Try::Tiny" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/seesee/App-mqtt2job/issues"
+      },
+      "homepage" : "https://github.com/seesee/App-mqtt2job",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/seesee/App-mqtt2job.git",
+         "web" : "https://github.com/seesee/App-mqtt2job"
+      }
+   },
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

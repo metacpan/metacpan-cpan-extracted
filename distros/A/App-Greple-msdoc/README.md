@@ -5,7 +5,7 @@ msdoc - Greple module for access MS office docx/pptx/xlsx documents
 
 # VERSION
 
-Version 1.06
+Version 1.07
 
 # SYNOPSIS
 
@@ -54,19 +54,36 @@ _.xlsx_ file, and double newlines for _.docx_ file.  Use
 
     Extract indented XML document, not a plain text.
 
+- **--indent-fold**
+
+    Indent and fold long lines.
+    This option requires [ansicolumn(1)](http://man.he.net/man1/ansicolumn) command installed.
+
 - **--indent-mark**=_string_
 
     Set indentation string.  Default is `| `.
 
 # INSTALL
 
+## CPANMINUS
+
 cpanm App::Greple::msdoc
 
 # SEE ALSO
 
+[App::Greple](https://metacpan.org/pod/App%3A%3AGreple),
+[https://github.com/kaz-utashiro/greple](https://github.com/kaz-utashiro/greple)
+
+[App::Greple::msdoc](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amsdoc),
 [https://github.com/kaz-utashiro/greple-msdoc](https://github.com/kaz-utashiro/greple-msdoc)
 
+[App::optex::textconv](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv),
 [https://github.com/kaz-utashiro/optex-textconv](https://github.com/kaz-utashiro/optex-textconv)
+
+[App::ansicolumn](https://metacpan.org/pod/App%3A%3Aansicolumn),
+
+[https://qiita.com/kaz-utashiro/items/30594c16ed6d931324f9](https://qiita.com/kaz-utashiro/items/30594c16ed6d931324f9)
+(in Japanese)
 
 # AUTHOR
 
@@ -74,7 +91,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2018-2022 Kazumasa Utashiro.
+Copyright 2018-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

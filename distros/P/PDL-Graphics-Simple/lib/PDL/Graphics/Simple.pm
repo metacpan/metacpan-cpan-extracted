@@ -271,7 +271,7 @@ use PDL::Options q/iparse/;
 use File::Temp qw/tempfile tempdir/;
 use Scalar::Util q/looks_like_number/;
 
-our $VERSION = '1.013';
+our $VERSION = '1.014';
 $VERSION =~ s/_//g;
 
 ##############################
@@ -414,6 +414,9 @@ This enables plotting multiple plots on a single screen.  You feed in
 a single array ref containing (nx, ny).  Subsequent calls to plot
 send graphics to subsequent locations on the window.  The ordering
 is always horizontal first, and left-to-right, top-to-bottom.
+
+B<NOTE> for multiplotting: C<oplot> does not work and will cause an
+exception. This is a limitation imposed by Gnuplot.
 
 =back
 
@@ -849,8 +852,7 @@ sub _translate_plot {
       @$po{keys %$h} = values %$h;
   }
 
-  my $called_from_imag = $po->{called_from_imag};
-  delete $po->{called_from_imag};
+  my $called_from_imag = delete $po->{called_from_imag};
 
   $po = $plot_options->options($po);
   $po->{oplot} = 1 if $held;
@@ -949,7 +951,6 @@ sub _translate_plot {
         )  {
         push @args, shift;
     }
-
 
     ##############################
     # Most array refs get immediately converted to
@@ -1078,6 +1079,7 @@ sub _translate_plot {
 sub plot {
   my $obj = &_invocant_or_global;
   my @args = _translate_plot(@$obj{qw(held keys)}, @_);
+  barf "Can't oplot in multiplot" if $obj->{params}{multi} and $args[1]{oplot};
   $obj->{obj}{keys} = $obj->{keys} = shift @args;
   $obj->{obj}->plot(@args);
 }
@@ -1099,16 +1101,8 @@ so that the plot will be overlain on the previous one.
 =cut
 
 sub oplot {
-    my $h;
-
-    if(ref($_[$#_]) eq 'HASH') {
-	$h = $_[$#_];
-    } else {
-	$h = {};
-	push @_, $h;
-    }
-    $h->{replot} = 1;
-
+    push @_, {} if ref($_[-1]) ne 'HASH';
+    $_[-1]{oplot} = 1;
     plot(@_);
 }
 
@@ -1515,7 +1509,12 @@ C<oplot>, C<xrange>, C<yrange>, C<crange>, C<wedge>, and C<justify>
 parameters are always both present and defined.
 
 If the C<oplot> plot option is set, then the plot should be overlain on
-a previous plot - otherwise the module should display a fresh plot.
+a previous plot, not losing any range settings, nor obeying any given.
+B<NOTE> that if any data given to the original plot or any overplots might
+be changed before plot updates happen, it is the user's responsibility
+to pass in copies, since some engines (Prima and Gnuplot) only store
+data by reference for performance reasons.
+Otherwise the module should display a fresh plot.
 
 Each curve block consists of an ARRAY ref with a hash in the 0 element
 and all required data in the following elements, one PDL per

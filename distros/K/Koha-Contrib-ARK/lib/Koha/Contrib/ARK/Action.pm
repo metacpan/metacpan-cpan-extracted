@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Action;
 # ABSTRACT: ARK Action roles
-$Koha::Contrib::ARK::Action::VERSION = '1.1.1';
+$Koha::Contrib::ARK::Action::VERSION = '1.1.2';
 use Moose::Role;
 use Modern::Perl;
 
@@ -29,7 +29,7 @@ Koha::Contrib::ARK::Action - ARK Action roles
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 ATTRIBUTES
 
@@ -39,7 +39,7 @@ L<Koha::Contrib::ARK> object.
 
 =head1 METHODS
 
-=head2 action($biblionumber, $record)
+=head2 action()
 
 Do something with Koha biblio record.
 

@@ -254,8 +254,13 @@ lib/Javonet/Binaries/Nodejs/core/referenceCache/ReferencesCache.js
 lib/Javonet/Binaries/Nodejs/core/transmitter/Transmitter.js
 lib/Javonet/Binaries/Nodejs/core/transmitter/TransmitterWrapper.js
 lib/Javonet/Binaries/Nodejs/core/typeCache/TypeCache.js
+lib/Javonet/Binaries/Nodejs/core/webSocketClient/WebSocketClient.js
 lib/Javonet/Binaries/Nodejs/utils/Command.js
 lib/Javonet/Binaries/Nodejs/utils/CommandType.js
+lib/Javonet/Binaries/Nodejs/utils/connectionData/IConnectionData.js
+lib/Javonet/Binaries/Nodejs/utils/connectionData/InMemoryConnectionData.js
+lib/Javonet/Binaries/Nodejs/utils/connectionData/TcpConnectionData.js
+lib/Javonet/Binaries/Nodejs/utils/connectionData/WsConnectionData.js
 lib/Javonet/Binaries/Nodejs/utils/ConnectionType.js
 lib/Javonet/Binaries/Nodejs/utils/exception/ExceptionSerializer.js
 lib/Javonet/Binaries/Nodejs/utils/exception/ExceptionThrower.js
@@ -263,7 +268,6 @@ lib/Javonet/Binaries/Nodejs/utils/ExceptionType.js
 lib/Javonet/Binaries/Nodejs/utils/RuntimeName.js
 lib/Javonet/Binaries/Nodejs/utils/RuntimeNameHandler.js
 lib/Javonet/Binaries/Nodejs/utils/StringEncodingMode.js
-lib/Javonet/Binaries/Nodejs/utils/TcpConnectionData.js
 lib/Javonet/Binaries/Nodejs/utils/Type.js
 lib/Javonet/Binaries/Nodejs/utils/uuid/REGEX.js
 lib/Javonet/Binaries/Nodejs/utils/uuid/rng.js

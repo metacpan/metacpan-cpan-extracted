@@ -304,16 +304,16 @@ sub plot {
     my $ipo = shift;
 
     my $po = {
-	title    => $ipo->{title},
-	xlab     => $ipo->{xlabel},
-	ylab     => $ipo->{ylabel},
-	key      => $ipo->{key},
-	xrange   => $ipo->{xrange},
-	yrange   => $ipo->{yrange},
-	cbrange  => $ipo->{crange},
-	colorbox => $ipo->{wedge},
-	justify  => $ipo->{justify}>0 ? $ipo->{justify} : undef,
-	clut   => 'sepia',
+        title    => $ipo->{title},
+        xlab     => $ipo->{xlabel},
+        ylab     => $ipo->{ylabel},
+        key      => $ipo->{key},
+        xrange   => $ipo->{xrange},
+        yrange   => $ipo->{yrange},
+        cbrange  => $ipo->{crange},
+        colorbox => $ipo->{wedge},
+        justify  => $ipo->{justify}>0 ? $ipo->{justify} : undef,
+        clut   => 'sepia',
     };
 
     if ( defined($ipo->{legend}) ) {
@@ -337,7 +337,7 @@ sub plot {
 
     $po->{logscale} = [$ipo->{logaxis}] if $ipo->{logaxis};
 
-    unless($ipo->{oplot}) {
+    unless ($ipo->{oplot}) {
 	$me->{curvestyle} = 0;
     }
 
@@ -348,7 +348,7 @@ sub plot {
       my @blocks = ref($ct) eq 'CODE' ? $ct->($me, $po, @$block) : [{%{$block->[0]}, with=>$ct}, @$block[1..$#$block]];
       # Now parse out curve options and deal with line styles...
       for my $b (@blocks) {
-        my $co = shift @$b;
+        my ($co, @rest) = @$b;
         my $gco = { with => $co->{with} };
         unless($co->{with} eq 'labels') {
           $me->{curvestyle} = $co->{style} // ($me->{curvestyle}//0)+1;
@@ -359,7 +359,7 @@ sub plot {
           }
         }
         $gco->{legend} = $co->{key} if defined $co->{key};
-        push @arglist, $gco, @$b;
+        push @arglist, $gco, @rest;
       }
     }
 
@@ -375,7 +375,6 @@ sub plot {
     } else {
 	$me->{obj}->plot(@arglist);
     }
-
 
     if ($me->{nplots}) {
 	$me->{plot_no}++;

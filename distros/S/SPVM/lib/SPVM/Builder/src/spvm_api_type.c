@@ -27,6 +27,8 @@ SPVM_API_TYPE* SPVM_API_TYPE_new_api() {
     SPVM_API_TYPE_is_any_object_type,
     SPVM_API_TYPE_is_object_array_type,
     SPVM_API_TYPE_is_any_object_array_type,
+    SPVM_API_TYPE_is_numeric_type,
+    SPVM_API_TYPE_is_class_type,
   };
   
   SPVM_API_TYPE* native_apis = calloc(1, sizeof(native_apis_init));
@@ -43,111 +45,45 @@ void SPVM_API_TYPE_free_api(SPVM_API_TYPE* api) {
 
 int32_t SPVM_API_TYPE_is_object_type(SPVM_RUNTIME* runtime, SPVM_RUNTIME_BASIC_TYPE* basic_type, int32_t type_dimension, int32_t type_flag) {
   
-  int32_t is_object_type;
-  if (type_dimension == 0) {
-    int32_t basic_type_category = basic_type->category;
-    
-    switch (basic_type_category) {
-      case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING:
-      case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS:
-      case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE:
-      case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT:
-      {
-        is_object_type = 1;
-        break;
-      }
-      default: {
-        is_object_type = 0;
-      }
-    }
-  }
-  else if (type_dimension >= 1) {
-    is_object_type = 1;
-  }
-  else {
-    assert(0);
-  }
+  SPVM_COMPILER* compiler = runtime->compiler;
+  
+  int32_t is_object_type = SPVM_TYPE_is_object_type(compiler, basic_type->id, type_dimension, type_flag);
   
   return is_object_type;
 }
 
 int32_t SPVM_API_TYPE_is_any_object_type(SPVM_RUNTIME* runtime, SPVM_RUNTIME_BASIC_TYPE* basic_type, int32_t type_dimension, int32_t type_flag) {
   
-  int32_t is_any_object_type;
-  if (type_dimension == 0) {
-    int32_t basic_type_category = basic_type->category;
-    
-    switch (basic_type_category) {
-      case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT:
-      {
-        is_any_object_type = 1;
-        break;
-      }
-      default: {
-        is_any_object_type = 0;
-      }
-    }
-  }
-  else if (type_dimension >= 1) {
-    is_any_object_type = 1;
-  }
-  else {
-    assert(0);
-  }
+  SPVM_COMPILER* compiler = runtime->compiler;
+  
+  int32_t is_any_object_type = SPVM_TYPE_is_any_object_type(compiler, basic_type->id, type_dimension, type_flag);
   
   return is_any_object_type;
 }
 
 int32_t SPVM_API_TYPE_is_object_array_type(SPVM_RUNTIME* runtime, SPVM_RUNTIME_BASIC_TYPE* basic_type, int32_t type_dimension, int32_t type_flag) {
   
-  if (type_dimension > 0) {
-    if (SPVM_API_TYPE_is_object_type(runtime, basic_type, type_dimension - 1, type_flag)) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  else {
-    return 0;
-  }
+  SPVM_COMPILER* compiler = runtime->compiler;
+  
+  int32_t is_object_array_type = SPVM_TYPE_is_object_array_type(compiler, basic_type->id, type_dimension, type_flag);
+  
+  return is_object_array_type;
 }
 
 int32_t SPVM_API_TYPE_is_any_object_array_type(SPVM_RUNTIME* runtime, SPVM_RUNTIME_BASIC_TYPE* basic_type, int32_t type_dimension, int32_t type_flag) {
   
-  int32_t is_any_object_array_type;
-  if (type_dimension == 1) {
-    int32_t basic_type_category = basic_type->category;
-    
-    switch (basic_type_category) {
-      case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT:
-      {
-        is_any_object_array_type = 1;
-        break;
-      }
-      default: {
-        is_any_object_array_type = 0;
-      }
-    }
-  }
-  else {
-    is_any_object_array_type = 0;
-  }
+  SPVM_COMPILER* compiler = runtime->compiler;
+  
+  int32_t is_any_object_array_type = SPVM_TYPE_is_any_object_array_type(compiler, basic_type->id, type_dimension, type_flag);
   
   return is_any_object_array_type;
 }
 
 int32_t SPVM_API_TYPE_get_type_width(SPVM_RUNTIME* runtime, SPVM_RUNTIME_BASIC_TYPE* basic_type, int32_t type_dimension, int32_t type_flag) {
   
-  int32_t basic_type_category = basic_type->category;
+  SPVM_COMPILER* compiler = runtime->compiler;
   
-  int32_t type_width = -1;
-  if (basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM) {
-    type_width = basic_type->fields_length;
-  }
-  else {
-    type_width = 1;
-  }
+  int32_t type_width = SPVM_TYPE_get_type_width(compiler, basic_type->id, type_dimension, type_flag);
   
   return type_width;
 }
@@ -192,5 +128,23 @@ int32_t SPVM_API_TYPE_can_assign(SPVM_RUNTIME* runtime, SPVM_RUNTIME_BASIC_TYPE*
   }
   
   return isa;
+}
+
+int32_t SPVM_API_TYPE_is_numeric_type(SPVM_RUNTIME* runtime, SPVM_RUNTIME_BASIC_TYPE* basic_type, int32_t type_dimension, int32_t type_flag) {
+  
+  SPVM_COMPILER* compiler = runtime->compiler;
+  
+  int32_t is_numeric_type = SPVM_TYPE_is_numeric_type(compiler, basic_type->id, type_dimension, type_flag);
+  
+  return is_numeric_type;
+}
+
+int32_t SPVM_API_TYPE_is_class_type(SPVM_RUNTIME* runtime, SPVM_RUNTIME_BASIC_TYPE* basic_type, int32_t type_dimension, int32_t type_flag) {
+  
+  SPVM_COMPILER* compiler = runtime->compiler;
+  
+  int32_t is_class_type = SPVM_TYPE_is_class_type(compiler, basic_type->id, type_dimension, type_flag);
+  
+  return is_class_type;
 }
 

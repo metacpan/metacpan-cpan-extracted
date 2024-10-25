@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Fix;
 # ABSTRACT: Fix Koha ARK field
-$Koha::Contrib::ARK::Fix::VERSION = '1.1.1';
+$Koha::Contrib::ARK::Fix::VERSION = '1.1.2';
 use Moose;
 use Modern::Perl;
 
@@ -8,22 +8,25 @@ with 'Koha::Contrib::ARK::Action';
 
 
 sub action {
-    my ($self, $biblionumber, $record) = @_;
+    my $self = shift;
+    my $ark = $self->ark;
+    my $current = $ark->current;
+    my $biblio = $current->{biblio};
+    my $record = $biblio->{record};
 
     return unless $record;
 
-    my $ark = $self->ark;
     my $ka = $ark->c->{ark}->{koha}->{ark};
     my ($tag, $letter) = ($ka->{tag}, $ka->{letter});
 
     # Is a bad ARK found in the correct field?
-    my $ark_value = $self->ark->build_ark($biblionumber, $record);
+    my $ark_value = $current->{ark};
     my $field = $record->field($tag);
     return unless $field;
     my $current_ark = $letter ? $field->subfield($letter) : $field->value;
     return if $current_ark eq $ark_value;
 
-    my $more = "Replace \"$current_ark\" with \"$ark_value\"";
+    my $more = "Replace $current_ark with $ark_value";
     $self->ark->what_append('fix', $more);
     $self->ark->current_modified();
 
@@ -58,7 +61,7 @@ Koha::Contrib::ARK::Fix - Fix Koha ARK field
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 AUTHOR
 

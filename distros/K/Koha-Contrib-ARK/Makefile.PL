@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "Term::ProgressBar" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "1.1.1",
+  "VERSION" => "1.1.2",
   "test" => {
     "TESTS" => ""
   }

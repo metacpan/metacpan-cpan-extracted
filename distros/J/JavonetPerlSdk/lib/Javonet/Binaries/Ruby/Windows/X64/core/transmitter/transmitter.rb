@@ -22,20 +22,8 @@ class Transmitter
     end
   end
 
-  def self.activate_with_license_file()
-    return activate()
-  end
-
-  def self.activate_with_credentials(licenseKey)
-    return activate(licenseKey)
-  end
-
-  def self.activate_with_credentials_and_proxy(licenseKey, proxyHost, proxyUserName, proxyPassword)
-    return activate(licenseKey, proxyHost, proxyUserName, proxyPassword)
-  end
-
-  private_class_method def self.activate(licenseKey = "", proxyHost = "", proxyUserName = "", proxyUserPassword = "")
-    activation_result = TransmitterWrapper.Activate(licenseKey, proxyHost, proxyUserName, proxyUserPassword)
+  def self.activate(license_key)
+    activation_result = TransmitterWrapper.Activate(license_key, "", "", "")
     if activation_result < 0
       error_message = get_native_error
       raise Exception.new "Javonet activation result: " + activation_result.to_s + ". Native error message: " + error_message
@@ -48,8 +36,8 @@ class Transmitter
     TransmitterWrapper.GetNativeError
   end
 
-  def self.set_config_source(configPath)
-    set_config_result = TransmitterWrapper.SetConfigSource(configPath)
+  def self.set_config_source(config_path)
+    set_config_result = TransmitterWrapper.SetConfigSource(config_path)
     if set_config_result < 0
       error_message = get_native_error
       raise Exception.new "Javonet set config source result: " + set_config_result.to_s + ". Native error message: " + error_message

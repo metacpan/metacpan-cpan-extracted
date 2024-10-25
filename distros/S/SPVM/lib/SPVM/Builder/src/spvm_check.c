@@ -1611,7 +1611,7 @@ void SPVM_CHECK_check_ast_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic
             }
             break;
           }
-          case SPVM_OP_C_ID_BOOL: {
+          case SPVM_OP_C_ID_CONDITION_EVALUATION: {
             SPVM_OP* op_operand = op_cur->first;
             SPVM_TYPE* operand_type = SPVM_CHECK_get_type(compiler, op_cur->first);
             
@@ -2472,6 +2472,53 @@ void SPVM_CHECK_check_ast_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* basic
               SPVM_COMPILER_error(compiler, "The type of the operand of copy operator must be string type, a numeric type, or a multi-numeric type.\n  at %s line %d", op_cur->file, op_cur->line);
               return;
             }
+            
+            break;
+          }
+          case SPVM_OP_C_ID_AS_BOOL: {
+            SPVM_TYPE* operand_type = SPVM_CHECK_get_type(compiler, op_cur->first);
+            
+            int32_t is_allowed_type
+              =  SPVM_TYPE_is_object_type(compiler, operand_type->basic_type->id, operand_type->dimension, operand_type->flag)
+              || SPVM_TYPE_is_numeric_type(compiler, operand_type->basic_type->id, operand_type->dimension, operand_type->flag);
+            
+            if (!is_allowed_type) {
+              SPVM_COMPILER_error(compiler, "The type of the operand of as_bool operator must be a numeric type or an object type.\n  at %s line %d", op_cur->file, op_cur->line);
+              return;
+            }
+            
+            SPVM_OP* op_as_bool = op_cur;
+            
+            if (SPVM_TYPE_is_integer_type(compiler, operand_type->basic_type->id, operand_type->dimension, operand_type->flag)) {
+              SPVM_CHECK_perform_integer_promotional_conversion(compiler, op_cur->first);
+              if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
+                return;
+              }
+            }
+            
+            SPVM_OP* op_operand = op_cur->first;
+            
+            SPVM_OP_cut_op(compiler, op_cur->first);
+            
+            SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
+            
+            SPVM_OP* op_logical_not1 = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_LOGICAL_NOT, op_as_bool->file, op_as_bool->line);
+            
+            op_logical_not1 = SPVM_OP_build_logical_not(compiler, op_logical_not1, op_operand);
+            
+            SPVM_OP* op_logical_not2 = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_LOGICAL_NOT, op_as_bool->file, op_as_bool->line);
+            
+            op_logical_not2 = SPVM_OP_build_logical_not(compiler, op_logical_not2, op_logical_not1);
+            
+            SPVM_OP* op_byte_type = SPVM_OP_new_op_byte_type(compiler, op_as_bool->file, op_as_bool->line);
+              
+            SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_as_bool->file, op_as_bool->line);
+            
+            op_type_cast = SPVM_OP_build_type_cast(compiler, op_type_cast, op_byte_type, op_logical_not2);
+            
+            SPVM_OP_replace_op(compiler, op_stab, op_type_cast);
+            
+            op_cur = op_type_cast;
             
             break;
           }
@@ -3530,7 +3577,7 @@ void SPVM_CHECK_check_ast_assign_unassigned_op_to_var(SPVM_COMPILER* compiler, S
               case SPVM_OP_C_ID_IS_TYPE:
               case SPVM_OP_C_ID_IS_ERROR:
               case SPVM_OP_C_ID_IS_COMPILE_TYPE:
-              case SPVM_OP_C_ID_BOOL:
+              case SPVM_OP_C_ID_CONDITION_EVALUATION:
               {
                 convert_to_assign = 1;
                 break;
@@ -4031,7 +4078,7 @@ void SPVM_CHECK_perform_numeric_to_string_conversion(SPVM_COMPILER* compiler, SP
   
   SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_operand->file, op_operand->line);
   SPVM_OP* op_dist_type = SPVM_CHECK_new_op_type_shared(compiler, dist_type, op_operand->file, op_operand->line);
-  SPVM_OP_build_type_cast(compiler, op_type_cast, op_dist_type, op_operand, NULL);
+  SPVM_OP_build_type_cast(compiler, op_type_cast, op_dist_type, op_operand);
   
   SPVM_OP_replace_op(compiler, op_stab, op_type_cast);
 }
@@ -4054,7 +4101,7 @@ void SPVM_CHECK_perform_integer_promotional_conversion(SPVM_COMPILER* compiler, 
     
     SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_operand->file, op_operand->line);
     SPVM_OP* op_dist_type = SPVM_CHECK_new_op_type_shared(compiler, dist_type, op_operand->file, op_operand->line);
-    SPVM_OP_build_type_cast(compiler, op_type_cast, op_dist_type, op_operand, NULL);
+    SPVM_OP_build_type_cast(compiler, op_type_cast, op_dist_type, op_operand);
     
     SPVM_TYPE* type = SPVM_CHECK_get_type(compiler, op_type_cast);
     
@@ -4090,7 +4137,7 @@ void SPVM_CHECK_perform_binary_numeric_conversion(SPVM_COMPILER* compiler, SPVM_
     
     SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_left_operand->file, op_left_operand->line);
     SPVM_OP* op_dist_type = SPVM_CHECK_new_op_type_shared(compiler, dist_type, op_left_operand->file, op_left_operand->line);
-    SPVM_OP_build_type_cast(compiler, op_type_cast, op_dist_type, op_left_operand, NULL);
+    SPVM_OP_build_type_cast(compiler, op_type_cast, op_dist_type, op_left_operand);
     
     SPVM_OP_replace_op(compiler, op_stab, op_type_cast);
   }
@@ -4100,7 +4147,7 @@ void SPVM_CHECK_perform_binary_numeric_conversion(SPVM_COMPILER* compiler, SPVM_
     
     SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_right_operand->file, op_right_operand->line);
     SPVM_OP* op_dist_type = SPVM_CHECK_new_op_type_shared(compiler, dist_type, op_right_operand->file, op_right_operand->line);
-    SPVM_OP_build_type_cast(compiler, op_type_cast, op_dist_type, op_right_operand, NULL);
+    SPVM_OP_build_type_cast(compiler, op_type_cast, op_dist_type, op_right_operand);
     SPVM_OP_replace_op(compiler, op_stab, op_type_cast);
   }
 }
@@ -4256,7 +4303,7 @@ SPVM_OP* SPVM_CHECK_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_type, 
     
     SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, file, line);
     SPVM_OP* op_dist_type = SPVM_CHECK_new_op_type_shared(compiler, dist_type, file, line);
-    SPVM_OP_build_type_cast(compiler, op_type_cast, op_dist_type, op_src, NULL);
+    SPVM_OP_build_type_cast(compiler, op_type_cast, op_dist_type, op_src);
     
     SPVM_OP_replace_op(compiler, op_stab, op_type_cast);
     return op_type_cast;
@@ -4271,14 +4318,14 @@ int32_t SPVM_CHECK_get_typed_var_index(SPVM_COMPILER* compiler, SPVM_LIST* runti
   
   SPVM_TYPE* var_decl_type = var_decl->type;
 
-  int32_t var_width = SPVM_TYPE_get_width(compiler, var_decl_type->basic_type->id, var_decl_type->dimension, var_decl_type->flag);
+  int32_t var_type_width = SPVM_TYPE_get_type_width(compiler, var_decl_type->basic_type->id, var_decl_type->dimension, var_decl_type->flag);
   
   // Search free memory
   int32_t found = 0;
   for (int32_t typed_var_index = 0; typed_var_index < runtime_vars->length; typed_var_index++) {
-    if (typed_var_index + var_width <= runtime_vars->length) {
+    if (typed_var_index + var_type_width <= runtime_vars->length) {
       int32_t is_used = 0;
-      for (int32_t i = 0; i < var_width; i++) {
+      for (int32_t i = 0; i < var_type_width; i++) {
         int32_t var_decl_id = (intptr_t)SPVM_LIST_get(runtime_vars, typed_var_index + i);
         if (var_decl_id >= 0) {
           is_used = 1;
@@ -4288,7 +4335,7 @@ int32_t SPVM_CHECK_get_typed_var_index(SPVM_COMPILER* compiler, SPVM_LIST* runti
       if (!is_used) {
         found = 1;
         found_typed_var_index = typed_var_index;
-        for (int32_t i = 0; i < var_width; i++) {
+        for (int32_t i = 0; i < var_type_width; i++) {
           runtime_vars->values[typed_var_index + i] = (void*)(intptr_t)var_decl->index;
         }
         break;
@@ -4303,7 +4350,7 @@ int32_t SPVM_CHECK_get_typed_var_index(SPVM_COMPILER* compiler, SPVM_LIST* runti
   // Add stack
   if (!found) {
     found_typed_var_index = runtime_vars->length;
-    for (int32_t i = 0; i < var_width; i++) {
+    for (int32_t i = 0; i < var_type_width; i++) {
       SPVM_LIST_push(runtime_vars, (void*)(intptr_t)var_decl->index);
     }
   }
@@ -4383,7 +4430,7 @@ SPVM_TYPE* SPVM_CHECK_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_NUMERIC_COMPARISON_LT:
     case SPVM_OP_C_ID_NUMERIC_COMPARISON_LE:
     case SPVM_OP_C_ID_NUMERIC_COMPARISON_CMP:
-    case SPVM_OP_C_ID_BOOL:
+    case SPVM_OP_C_ID_CONDITION_EVALUATION:
     case SPVM_OP_C_ID_STRING_COMPARISON_EQ:
     case SPVM_OP_C_ID_STRING_COMPARISON_NE:
     case SPVM_OP_C_ID_STRING_COMPARISON_GT:

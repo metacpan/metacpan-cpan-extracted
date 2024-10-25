@@ -34,7 +34,6 @@
          "requires" : {
             "File::Temp" : "0",
             "PDL" : "2.089",
-            "PDL::Graphics::Gnuplot" : "2.029",
             "Time::HiRes" : "0"
          }
       },
@@ -55,6 +54,6 @@
          "url" : "git://github.com/PDLPorters/PDL-Graphics-Simple.git"
       }
    },
-   "version" : "1.013",
+   "version" : "1.014",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

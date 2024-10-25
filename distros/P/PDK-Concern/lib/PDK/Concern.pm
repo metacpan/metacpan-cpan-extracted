@@ -3,5 +3,6 @@ use warnings;
 
 package PDK::Concern;
 
-# ABSTRACT: Based Moose for network device discovery and management
 1;
+
+# ABSTRACT: Based Moose for network device discovery and management

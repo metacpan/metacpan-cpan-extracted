@@ -10,36 +10,55 @@ let Receiver
 class Interpreter {
     handler = new Handler()
 
-    execute(command, connectionType, tcpAddress) {
-        let commandSerializer = new CommandSerializer()
-        let byteMessage = commandSerializer.serialize(command,connectionType, tcpAddress)
-        let responseByteArray
+    async executeAsync(command, connectionData) {
+        try {
+            const messageByteArray = new CommandSerializer().serialize(command, connectionData)
 
-        if (command.runtimeName === Runtime.Nodejs && connectionType === ConnectionType.IN_MEMORY)
-        {
-            // lazy receiver loading
-            if (!Receiver) {
-                Receiver = require('../receiver/Receiver')
-            }
-            responseByteArray = Receiver.sendCommand(byteMessage)
+            if (connectionData.connectionType === ConnectionType.WEB_SOCKET) {
+                const { WebSocketClient } = require("../webSocketClient/WebSocketClient");
+                const wsClient = new WebSocketClient(connectionData.hostname, null)
 
-        }
-        else {
-            // lazy transmitter loading
-            if (!Transmitter) {
-                Transmitter = require('../transmitter/Transmitter')
+                const responseByteArray = await wsClient.send(messageByteArray)
+                return new CommandDeserializer(responseByteArray).deserialize()
             }
-            responseByteArray = Transmitter.sendCommand(byteMessage)
+            else {
+                return this.execute(command, connectionData)
+            }
+        } catch (error) {
+            // TODO: handle error exception log?
         }
-        return new CommandDeserializer(responseByteArray).deserialize()
+    }
+    
+    execute(command, connectionData) {
+        try {
+            let messageByteArray = new CommandSerializer().serialize(command, connectionData)
+            let responseByteArray
+            
+            if (command.runtimeName === Runtime.Nodejs && connectionData.connectionType === ConnectionType.IN_MEMORY)
+            {
+                // lazy receiver loading
+                if (!Receiver) {
+                    Receiver = require('../receiver/Receiver')
+                }
+                responseByteArray = Receiver.sendCommand(messageByteArray)
+
+            }
+            else {
+                // lazy transmitter loading
+                if (!Transmitter) {
+                    Transmitter = require('../transmitter/Transmitter')
+                }
+                responseByteArray = Transmitter.sendCommand(messageByteArray)
+            }
+            return new CommandDeserializer(responseByteArray).deserialize()
+        } catch (error) {
+            // TODO: handle error exception log?
+        }
     }
 
-    process(byteArray) {
-        let commandDeserializer = new CommandDeserializer(byteArray)
-        let receivedCommand = commandDeserializer.deserialize()
-        let responseCommand = this.handler.handleCommand(receivedCommand)
-        let commandSerializer = new CommandSerializer()
-        return commandSerializer.serialize(responseCommand, ConnectionType.IN_MEMORY)
+    process(messageByteArray) {
+        let receivedCommand = new CommandDeserializer(messageByteArray).deserialize()
+        return this.handler.handleCommand(receivedCommand)
     }
 }
 

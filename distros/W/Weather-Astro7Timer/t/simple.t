@@ -63,6 +63,16 @@ $content = '<product name="astro"></product>';
 $mock->override(
     get => sub {return HTTP::Response->new(200, 'SUCCESS', undef, $content)});
 
+subtest 'ts_to_date' => sub {
+    is(Weather::Astro7Timer::ts_to_date(1000000, 1), '1970-01-12 13:46:40Z', 'UTC Date OK');
+    like(Weather::Astro7Timer::ts_to_date(1000000), qr/1970-01-1\d \d\d:\d\d:40/, 'Date OK');
+};
+
+subtest 'init_to_ts' => sub {
+    is(Weather::Astro7Timer::init_to_ts('2023032606'), 1679810400, 'TS OK');
+    is(Weather::Astro7Timer::init_to_ts('20230326'), (), 'TS NOT OK');
+};
+
 subtest 'get xml / internal / png' => sub {
     my $weather = Weather::Astro7Timer->new();
     my %out     = $weather->get(%opt, output => 'internal');

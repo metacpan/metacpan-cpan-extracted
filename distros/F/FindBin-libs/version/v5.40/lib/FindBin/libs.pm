@@ -2,7 +2,7 @@
 # housekeeping
 ########################################################################
 
-package FindBin::libs   v4.0.1;
+package FindBin::libs   v4.0.2;
 use v5.40;
 
 use File::Basename;
@@ -282,7 +282,9 @@ sub import
     my @libz
     = map
     {
-        m{ (.+) }xs
+        defined
+        ? m{ (.+) }xs
+        : ()
     }
     $find_libs->();
 

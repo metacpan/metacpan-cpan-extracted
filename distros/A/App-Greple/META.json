@@ -59,7 +59,7 @@
    "provides" : {
       "App::Greple" : {
          "file" : "lib/App/Greple.pm",
-         "version" : "9.1701"
+         "version" : "9.1702"
       },
       "App::Greple::Common" : {
          "file" : "lib/App/Greple/Common.pm"
@@ -125,13 +125,13 @@
          "web" : "https://github.com/kaz-utashiro/greple"
       }
    },
-   "version" : "9.1701",
+   "version" : "9.1702",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",
       "Mohammad S Anwar <Mohammad.Anwar@yahoo.com>",
       "Toshifumi Sakaguchi <sischkg@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.12",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0
 }

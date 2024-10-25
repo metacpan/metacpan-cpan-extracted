@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,17 +26,17 @@ no_index:
 provides:
   App::Greple::msdoc:
     file: lib/App/Greple/msdoc.pm
-    version: '1.06'
+    version: '1.07'
 requires:
-  App::Greple: '8.53'
-  App::optex::textconv: '0.13'
+  App::Greple: '9.1702'
+  App::optex::textconv: '1.07'
   Archive::Zip: '1.37'
-  perl: v5.14.0
+  perl: v5.18.2
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple-msdoc/issues
   homepage: https://github.com/kaz-utashiro/greple-msdoc
   repository: https://github.com/kaz-utashiro/greple-msdoc.git
-version: '1.06'
+version: '1.07'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

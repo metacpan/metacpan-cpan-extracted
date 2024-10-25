@@ -31,6 +31,8 @@ subtest construction => sub {
     pdl_is( $l3, PDL::Logical->new( [ [ 0, 1, 1 ], [ 1, 0, 0 ] ] ),
         'new($aref_nd)' );
     pdl_is( $l3->shape, pdl( [ 3, 2 ] ) );
+
+    isa_ok $l1a->initialize, 'PDL::Logical';
 };
 
 done_testing;

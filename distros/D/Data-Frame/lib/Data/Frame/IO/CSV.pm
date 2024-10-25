@@ -1,5 +1,5 @@
 package Data::Frame::IO::CSV;
-$Data::Frame::IO::CSV::VERSION = '0.006002';
+$Data::Frame::IO::CSV::VERSION = '0.006003';
 # ABSTRACT: Partial class for data frame's conversion from/to CSV
 
 use Data::Frame::Role;
@@ -25,7 +25,8 @@ use Data::Frame::Util qw(guess_and_convert_to_pdl);
 use Data::Frame::Types qw(DataType);
 
 
-classmethod from_csv ($file, :$header=true, :$sep=",", :$quote='"',                      :$na=[qw(NA BAD)], :$col_names=undef, :$row_names=undef,
+classmethod from_csv ($file, :$header=true, :$sep=",", :$quote='"',
+                      :$na=[qw(NA BAD)], :$col_names=undef, :$row_names=undef,
                       Map[Str, DataType] :$dtype={},
                       :$strings_as_factors=false
   ) {
@@ -162,7 +163,8 @@ classmethod from_csv ($file, :$header=true, :$sep=",", :$quote='"',             
 }
 
 
-method to_csv ($file, :$sep=',', :$quote='"', :$na='NA',               :$col_names=true, :$row_names=true) {
+method to_csv ($file, :$sep=',', :$quote='"', :$na='NA',
+               :$col_names=true, :$row_names=true) {
     my $csv = Text::CSV->new(
         {
             binary    => 1,
@@ -218,7 +220,7 @@ Data::Frame::IO::CSV - Partial class for data frame's conversion from/to CSV
 
 =head1 VERSION
 
-version 0.006002
+version 0.006003
 
 =head1 METHODS
 

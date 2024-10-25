@@ -15,9 +15,11 @@ passing in switches. The one used here was chosen because it supports
 qw( ... ) syntax with optional parameters (e.g., qw(export) and 
 qw(export=foo)).
 
-Versions of the module support Perl v5.8 - v5.13, v5.14 - v5.27,
-and v5.28+. The 5.8-10 and v.14-28 versions are unmaintained 
-other than the tests which are common to all versions.
+Older versions of the module support earlier versions of perl
+(see ./versions for list of Perl versions supported). Older
+versions of modules are left in the ./versions directory for 
+backwards compatibility for anyone stuck on those versions; they
+are unmaintained execpt for bugfixes specific to the version.
 
 Installation:
 
@@ -25,6 +27,6 @@ Installation:
     make all test install;
     perldoc FindBin::libs;
 
-also see the examples for come common use cases.
+also see ./examples for come common use cases.
 
 Zei gesund

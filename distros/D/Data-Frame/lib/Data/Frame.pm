@@ -1,5 +1,5 @@
 package Data::Frame;
-$Data::Frame::VERSION = '0.006002';
+$Data::Frame::VERSION = '0.006003';
 # ABSTRACT: data frame implementation
 
 use 5.016;
@@ -159,7 +159,8 @@ sub BUILD {
 }
 
 
-method _format_cell ($col, $ridx,                     :$na='BAD', :$isbad=$col->isbad)
+method _format_cell ($col, $ridx,
+                     :$na='BAD', :$isbad=$col->isbad)
 {
     my $is_numeric = $self->_is_numeric_column($col);
     if ($isbad->at($ridx)) {
@@ -1095,7 +1096,7 @@ Data::Frame - data frame implementation
 
 =head1 VERSION
 
-version 0.006002
+version 0.006003
 
 =head1 STATUS
 

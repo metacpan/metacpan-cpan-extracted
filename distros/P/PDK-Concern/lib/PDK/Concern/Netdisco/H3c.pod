@@ -2,19 +2,19 @@
 
 =head1 NAME
 
-PDK::Concern::H3c::Netdisco - Explore and manage LLDP topology for H3C devices
+PDK::Concern::Netdisco::H3c - Explore and manage LLDP topology for H3C devices
 
 =head1 SYNOPSIS
 
-  use PDK::Concern::H3c::Netdisco;
+  use PDK::Concern::Netdisco::H3c;
 
   my $h3c_device = PDK::Device::H3c->new(...);
-  my $netdisco = PDK::Concern::H3c::Netdisco->new(device => $h3c_device);
+  my $netdisco = PDK::Concern::Netdisco::H3c->new(device => $h3c_device);
   my $result = $netdisco->explore_topology();
 
 =head1 DESCRIPTION
 
-PDK::Concern::H3c::Netdisco provides functionality to explore LLDP (Link Layer Discovery Protocol) topology
+PDK::Concern::Netdisco::H3c provides functionality to explore LLDP (Link Layer Discovery Protocol) topology
 for H3C devices and generate interface descriptions based on the discovered neighbors. This module
 is designed to work with H3C network devices and automate the process of updating interface
 descriptions based on LLDP information.
@@ -23,7 +23,7 @@ descriptions based on LLDP information.
 
 =head2 new(device => $h3c_device)
 
-Creates a new instance of the PDK::Concern::H3c::Netdisco class.
+Creates a new instance of the PDK::Concern::Netdisco::H3c class.
 
 =over 4
 
@@ -33,7 +33,7 @@ A required parameter. Must be an instance of PDK::Device::H3c.
 
 =back
 
-  my $netdisco = PDK::Concern::H3c::Netdisco->new(device => $h3c_device);
+  my $netdisco = PDK::Concern::Netdisco::H3c->new(device => $h3c_device);
 
 =head2 explore_topology()
 
@@ -96,7 +96,7 @@ This module requires the following modules:
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-PDK::Concern::H3c::Netdisco requires no configuration files or environment variables.
+PDK::Concern::Netdisco::H3c requires no configuration files or environment variables.
 
 =head1 AUTHOR
 

@@ -20,7 +20,6 @@ use Test::Needs;
 use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep; # import symbols: ignore, re etc
-use JSON::Schema::Modern;
 use JSON::Schema::Modern::Document::OpenAPI;
 use OpenAPI::Modern;
 use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };

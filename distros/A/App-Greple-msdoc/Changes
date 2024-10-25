@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-msdoc
 
+1.07 2024-10-25T06:29:23Z
+
+    - Introduce --indent-fold option.
+
 1.06 2022-10-08T04:41:27Z
 
     - Deprecate --text option.

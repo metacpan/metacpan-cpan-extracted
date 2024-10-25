@@ -1,6 +1,6 @@
 package Koha::Contrib::ARK::Check;
 # ABSTRACT: Check Koha ARK field
-$Koha::Contrib::ARK::Check::VERSION = '1.1.1';
+$Koha::Contrib::ARK::Check::VERSION = '1.1.2';
 use Moose;
 use Modern::Perl;
 
@@ -8,22 +8,25 @@ with 'Koha::Contrib::ARK::Action';
 
 
 sub action {
-    my ($self, $biblionumber, $record) = @_;
+    my $self = shift;
+    my $ark = $self->ark;
+    my $current = $ark->current;
+    my $biblio = $current->{biblio};
+    my $record = $biblio->{record};
 
     return unless $record;
 
-    my $ark = $self->ark;
-    my $ka = $self->ark->c->{ark}->{koha}->{ark};
+    my $ka = $ark->c->{ark}->{koha}->{ark};
     my ($tag, $letter) = ($ka->{tag}, $ka->{letter});
 
-    my $ark_value = $self->ark->build_ark($biblionumber, $record);
     # Searching ARK everywhere
+    my $ark_value = $current->{ark};
     my $found = 0;
 
     # Is a bad ARK found in the correct field?
     if (my $field = $record->field($tag)) {
         my $value = $letter ? $field->subfield($letter) : $field->value;
-        $self->ark->what_append('found_bad_ark', "Found \"$value\" in place of \"$ark_value\"")
+        $self->ark->what_append('found_bad_ark', "Found $value")
             if $value ne $ark_value;
     }
 
@@ -77,7 +80,7 @@ Koha::Contrib::ARK::Check - Check Koha ARK field
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 AUTHOR
 

@@ -90,6 +90,6 @@
          "web" : "https://github.com/simonwistow/Module-Pluggable"
       }
    },
-   "version" : "6.1",
+   "version" : "6.2",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

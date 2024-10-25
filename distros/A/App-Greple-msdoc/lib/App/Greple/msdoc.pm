@@ -4,7 +4,7 @@ msdoc - Greple module for access MS office docx/pptx/xlsx documents
 
 =head1 VERSION
 
-Version 1.06
+Version 1.07
 
 =head1 SYNOPSIS
 
@@ -55,6 +55,11 @@ Specify the separator string placed between each component strings.
 
 Extract indented XML document, not a plain text.
 
+=item B<--indent-fold>
+
+Indent and fold long lines.
+This option requires L<ansicolumn(1)> command installed.
+
 =item B<--indent-mark>=I<string>
 
 Set indentation string.  Default is C<| >.
@@ -63,13 +68,25 @@ Set indentation string.  Default is C<| >.
 
 =head1 INSTALL
 
+=head2 CPANMINUS
+
 cpanm App::Greple::msdoc
 
 =head1 SEE ALSO
 
+L<App::Greple>,
+L<https://github.com/kaz-utashiro/greple>
+
+L<App::Greple::msdoc>,
 L<https://github.com/kaz-utashiro/greple-msdoc>
 
+L<App::optex::textconv>,
 L<https://github.com/kaz-utashiro/optex-textconv>
+
+L<App::ansicolumn>,
+
+L<https://qiita.com/kaz-utashiro/items/30594c16ed6d931324f9>
+(in Japanese)
 
 =head1 AUTHOR
 
@@ -77,7 +94,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2018-2022 Kazumasa Utashiro.
+Copyright 2018-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -86,7 +103,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::msdoc;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use strict;
 use warnings;
@@ -100,7 +117,7 @@ our @EXPORT      = ();
 our %EXPORT_TAGS = ();
 our @EXPORT_OK   = ();
 
-use App::Greple::Common;
+use App::Greple::Common qw(&FILELABEL);
 use Data::Dumper;
 
 our $indent_mark = "| ";
@@ -228,5 +245,9 @@ builtin indent-mark=s $indent_mark
 ## --dump
 ##
 option --dump --le &sub{} --need 0 --all --exit=0
+
+option --indent-fold \
+    --indent \
+    --of "ansifold --autoindent '(.*<w:t>|([|][ ])*)' -s -w=2-"
 
 #  LocalWords:  msdoc Greple greple Mmsdoc docx ppt xml pptx xlsx xl

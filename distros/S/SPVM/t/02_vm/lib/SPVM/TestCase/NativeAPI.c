@@ -533,6 +533,30 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_type_ids(SPVM_ENV* env, SPVM
   if ((void*)&env->api->type->is_any_object_type != &env_array[3]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->api->type->is_object_array_type != &env_array[4]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->api->type->is_any_object_array_type != &env_array[5]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->type->is_numeric_type != &env_array[6]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->type->is_class_type != &env_array[7]) { stack[0].ival = 0; return 0; }
+  
+  {
+    void* basic_type = env->get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_INT);
+    
+    int32_t ret = env->api->type->is_numeric_type(env->runtime, basic_type, 0, 0);
+    
+    if (!ret) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    void* basic_type = env->get_basic_type_by_id(env, stack, SPVM_NATIVE_C_BASIC_TYPE_ID_INT_CLASS);
+    
+    int32_t ret = env->api->type->is_class_type(env->runtime, basic_type, 0, 0);
+    
+    if (!ret) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
   
   stack[0].ival = 1;
   
@@ -769,11 +793,18 @@ int32_t SPVM__TestCase__NativeAPI__get_class_var_byte_by_name_test(SPVM_ENV* env
   
   int32_t error_id = 0;
   
-  int8_t value = env->get_class_var_byte_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  {
+    int8_t value = env->get_class_var_byte_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT8_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
   
-  stack[0].bval = value;
-
+  stack[0].ival = 1;
+  
   return 0;
 }
 
@@ -793,11 +824,28 @@ int32_t SPVM__TestCase__NativeAPI__get_class_var_short_by_name_test(SPVM_ENV* en
   
   int32_t error_id = 0;
   
-  int16_t value = env->get_class_var_short_by_name(env, stack, "TestCase::NativeAPI", "$SHORT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-
-  stack[0].sval = value;
-
+  {
+    int16_t value = env->get_class_var_short_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT8_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    int16_t value = env->get_class_var_short_by_name(env, stack, "TestCase::NativeAPI", "$SHORT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
+  
   return 0;
 }
 
@@ -817,11 +865,38 @@ int32_t SPVM__TestCase__NativeAPI__get_class_var_int_by_name_test(SPVM_ENV* env,
   
   int32_t error_id = 0;
   
-  int32_t value = env->get_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$INT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  {
+    int32_t value = env->get_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT8_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
   
-  stack[0].ival = value;
-
+  {
+    int32_t value = env->get_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$SHORT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    int32_t value = env->get_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$INT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT32_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
+  
   return 0;
 }
 
@@ -841,11 +916,48 @@ int32_t SPVM__TestCase__NativeAPI__get_class_var_long_by_name_test(SPVM_ENV* env
   
   int32_t error_id = 0;
   
-  int64_t value = env->get_class_var_long_by_name(env, stack, "TestCase::NativeAPI", "$LONG_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  {
+    int64_t value = env->get_class_var_long_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT8_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
   
-  stack[0].lval = value;
-
+  {
+    int64_t value = env->get_class_var_long_by_name(env, stack, "TestCase::NativeAPI", "$SHORT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    int64_t value = env->get_class_var_long_by_name(env, stack, "TestCase::NativeAPI", "$INT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT32_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    int64_t value = env->get_class_var_long_by_name(env, stack, "TestCase::NativeAPI", "$LONG_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT64_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
+  
   return 0;
 }
 
@@ -865,11 +977,58 @@ int32_t SPVM__TestCase__NativeAPI__get_class_var_float_by_name_test(SPVM_ENV* en
   
   int32_t error_id = 0;
   
-  float value = env->get_class_var_float_by_name(env, stack, "TestCase::NativeAPI", "$FLOAT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  {
+    float value = env->get_class_var_float_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT8_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
   
-  stack[0].fval = value;
-
+  {
+    float value = env->get_class_var_float_by_name(env, stack, "TestCase::NativeAPI", "$SHORT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    float value = env->get_class_var_float_by_name(env, stack, "TestCase::NativeAPI", "$INT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    float value = env->get_class_var_float_by_name(env, stack, "TestCase::NativeAPI", "$LONG_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    float value = env->get_class_var_float_by_name(env, stack, "TestCase::NativeAPI", "$FLOAT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == FLT_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
+  
   return 0;
 }
 
@@ -889,11 +1048,68 @@ int32_t SPVM__TestCase__NativeAPI__get_class_var_double_by_name_test(SPVM_ENV* e
   
   int32_t error_id = 0;
   
-  double value = env->get_class_var_double_by_name(env, stack, "TestCase::NativeAPI", "$DOUBLE_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
+  {
+    double value = env->get_class_var_double_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT8_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
   
-  stack[0].dval = value;
-
+  {
+    double value = env->get_class_var_double_by_name(env, stack, "TestCase::NativeAPI", "$SHORT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    double value = env->get_class_var_double_by_name(env, stack, "TestCase::NativeAPI", "$INT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT32_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    double value = env->get_class_var_double_by_name(env, stack, "TestCase::NativeAPI", "$LONG_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == INT32_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    double value = env->get_class_var_double_by_name(env, stack, "TestCase::NativeAPI", "$FLOAT_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == FLT_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    double value = env->get_class_var_double_by_name(env, stack, "TestCase::NativeAPI", "$DOUBLE_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(value == DBL_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
+  
   return 0;
 }
 
@@ -912,7 +1128,7 @@ int32_t SPVM__TestCase__NativeAPI__get_class_var_double_by_name_test_exception(S
 int32_t SPVM__TestCase__NativeAPI__get_class_var_object_test(SPVM_ENV* env, SPVM_VALUE* stack) {
 
   int32_t error_id = 0;
-
+  
   void* value = env->get_class_var_object_by_name(env, stack, "TestCase::NativeAPI", "$MINIMAL_VALUE", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
@@ -936,8 +1152,23 @@ int32_t SPVM__TestCase__NativeAPI__get_class_var_object_by_name_test_exception(S
 int32_t SPVM__TestCase__NativeAPI__set_class_var_byte_by_name_test(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
-
+  
   env->set_class_var_byte_by_name(env, stack, "TestCase::NativeAPI", "$BYTE_VALUE", INT8_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_byte_by_name(env, stack, "TestCase::NativeAPI", "$SHORT_VALUE", INT8_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_byte_by_name(env, stack, "TestCase::NativeAPI", "$INT_VALUE", INT8_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_byte_by_name(env, stack, "TestCase::NativeAPI", "$LONG_VALUE", INT8_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_byte_by_name(env, stack, "TestCase::NativeAPI", "$FLOAT_VALUE", INT8_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_byte_by_name(env, stack, "TestCase::NativeAPI", "$DOUBLE_VALUE", INT8_MIN, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   return 0;
@@ -954,8 +1185,20 @@ int32_t SPVM__TestCase__NativeAPI__set_class_var_byte_by_name_test_exception(SPV
 
 int32_t SPVM__TestCase__NativeAPI__set_class_var_short_by_name_test(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
-
+  
   env->set_class_var_short_by_name(env, stack, "TestCase::NativeAPI", "$SHORT_VALUE", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_short_by_name(env, stack, "TestCase::NativeAPI", "$INT_VALUE", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_short_by_name(env, stack, "TestCase::NativeAPI", "$LONG_VALUE", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_short_by_name(env, stack, "TestCase::NativeAPI", "$FLOAT_VALUE", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_short_by_name(env, stack, "TestCase::NativeAPI", "$DOUBLE_VALUE", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   return 0;
@@ -972,8 +1215,17 @@ int32_t SPVM__TestCase__NativeAPI__set_class_var_short_by_name_test_exception(SP
 
 int32_t SPVM__TestCase__NativeAPI__set_class_var_int_by_name_test(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
-
+  
   env->set_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$INT_VALUE", INT32_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$LONG_VALUE", INT32_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$FLOAT_VALUE", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_int_by_name(env, stack, "TestCase::NativeAPI", "$DOUBLE_VALUE", INT32_MIN, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   return 0;
@@ -994,6 +1246,12 @@ int32_t SPVM__TestCase__NativeAPI__set_class_var_long_by_name_test(SPVM_ENV* env
   env->set_class_var_long_by_name(env, stack, "TestCase::NativeAPI", "$LONG_VALUE", INT64_MIN, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
+  env->set_class_var_long_by_name(env, stack, "TestCase::NativeAPI", "$FLOAT_VALUE", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_long_by_name(env, stack, "TestCase::NativeAPI", "$DOUBLE_VALUE", INT32_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
   return 0;
 }
 
@@ -1008,8 +1266,11 @@ int32_t SPVM__TestCase__NativeAPI__set_class_var_long_by_name_test_exception(SPV
 
 int32_t SPVM__TestCase__NativeAPI__set_class_var_float_by_name_test(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
-
+  
   env->set_class_var_float_by_name(env, stack, "TestCase::NativeAPI", "$FLOAT_VALUE", FLT_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_class_var_float_by_name(env, stack, "TestCase::NativeAPI", "$DOUBLE_VALUE", FLT_MIN, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   return 0;
@@ -1182,6 +1443,21 @@ int32_t SPVM__TestCase__NativeAPI__native_set_field_byte_by_name(SPVM_ENV* env, 
   env->set_field_byte_by_name(env, stack, object, "byte_value", INT8_MIN, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
+  env->set_field_byte_by_name(env, stack, object, "short_value", INT8_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_byte_by_name(env, stack, object, "int_value", INT8_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_byte_by_name(env, stack, object, "long_value", INT8_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_byte_by_name(env, stack, object, "float_value", INT8_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_byte_by_name(env, stack, object, "double_value", INT8_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
   return 0;
 }
 
@@ -1203,6 +1479,18 @@ int32_t SPVM__TestCase__NativeAPI__native_set_field_short_by_name(SPVM_ENV* env,
   void* object = stack[0].oval;
   
   env->set_field_short_by_name(env, stack, object, "short_value", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_short_by_name(env, stack, object, "int_value", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_short_by_name(env, stack, object, "long_value", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_short_by_name(env, stack, object, "float_value", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_short_by_name(env, stack, object, "double_value", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   return 0;
@@ -1227,6 +1515,15 @@ int32_t SPVM__TestCase__NativeAPI__native_set_field_int_by_name(SPVM_ENV* env, S
   env->set_field_int_by_name(env, stack, object, "int_value", INT32_MIN, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
+  env->set_field_int_by_name(env, stack, object, "long_value", INT32_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_int_by_name(env, stack, object, "float_value", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_int_by_name(env, stack, object, "double_value", INT32_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
   return 0;
 }
 
@@ -1249,6 +1546,12 @@ int32_t SPVM__TestCase__NativeAPI__native_set_field_long_by_name(SPVM_ENV* env, 
   env->set_field_long_by_name(env, stack, object, "long_value", INT64_MIN, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
+  env->set_field_long_by_name(env, stack, object, "float_value", INT16_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_long_by_name(env, stack, object, "double_value", INT32_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
   return 0;
 }
 
@@ -1269,6 +1572,9 @@ int32_t SPVM__TestCase__NativeAPI__native_set_field_float_by_name(SPVM_ENV* env,
   void* object = stack[0].oval;
   
   env->set_field_float_by_name(env, stack, object, "float_value", FLT_MIN, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  env->set_field_float_by_name(env, stack, object, "double_value", FLT_MIN, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   return 0;
@@ -1356,16 +1662,17 @@ int32_t SPVM__TestCase__NativeAPI__native_get_field_byte_by_name(SPVM_ENV* env, 
   int32_t error_id = 0;
   void* object = stack[0].oval;
   
-  int8_t byte_value = env->get_field_byte_by_name(env, stack, object, "byte_value", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  
-  if (byte_value == INT8_MIN) {
-    stack[0].ival = 1;
+  {
+    int8_t byte_value = env->get_field_byte_by_name(env, stack, object, "byte_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(byte_value == INT8_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
-  else {
-    stack[0].ival = 0;
-  }
   
+  stack[0].ival = 1;
   return 0;
 }
 
@@ -1377,85 +1684,118 @@ int32_t SPVM__TestCase__NativeAPI__native_get_field_byte_by_name_exception(SPVM_
   int8_t byte_value = env->get_field_byte_by_name(env, stack, object, "not_found", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  if (byte_value == INT8_MIN) {
-    stack[0].ival = 1;
-  }
-  else {
+  if (!(byte_value == INT8_MIN)) {
     stack[0].ival = 0;
+    return 0;
   }
   
+  stack[0].ival = 1;
   return 0;
 }
 
 int32_t SPVM__TestCase__NativeAPI__native_get_field_short_by_name(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
-
+  
   void* object = stack[0].oval;
   
-  int16_t short_value = env->get_field_short_by_name(env, stack, object, "short_value", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  
-  if (short_value == INT16_MIN) {
-    stack[0].ival = 1;
+  {
+    int16_t short_value = env->get_field_short_by_name(env, stack, object, "short_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(short_value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
-  else {
-    stack[0].ival = 0;
+  
+  {
+    int16_t short_value = env->get_field_short_by_name(env, stack, object, "byte_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(short_value == INT8_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
   
+  stack[0].ival = 1;
   return 0;
 }
 
 int32_t SPVM__TestCase__NativeAPI__native_get_field_short_by_name_exception(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
-
+  
   void* object = stack[0].oval;
   
-  int16_t short_value = env->get_field_short_by_name(env, stack, object, "not_found", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  
-  if (short_value == INT16_MIN) {
-    stack[0].ival = 1;
+  {
+    int16_t short_value = env->get_field_short_by_name(env, stack, object, "not_found", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(short_value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
-  else {
-    stack[0].ival = 0;
-  }
   
+  stack[0].ival = 1;
   return 0;
 }
 
 int32_t SPVM__TestCase__NativeAPI__native_get_field_int_by_name(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
-
+  
   void* object = stack[0].oval;
   
-  int32_t int_value = env->get_field_int_by_name(env, stack, object, "int_value", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  
-  if (int_value == INT32_MIN) {
-    stack[0].ival = 1;
+  {
+    int32_t int_value = env->get_field_int_by_name(env, stack, object, "byte_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(int_value == INT8_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
-  else {
-    stack[0].ival = 0;
+  
+  {
+    int32_t int_value = env->get_field_int_by_name(env, stack, object, "short_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(int_value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
   
+  {
+    int32_t int_value = env->get_field_int_by_name(env, stack, object, "int_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(int_value == INT32_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
   return 0;
 }
 
 int32_t SPVM__TestCase__NativeAPI__native_get_field_int_by_name_exception(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
-
+  
   void* object = stack[0].oval;
   
-  int32_t int_value = env->get_field_int_by_name(env, stack, object, "not_found", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  
-  if (int_value == INT32_MIN) {
-    stack[0].ival = 1;
+  {
+    int32_t int_value = env->get_field_int_by_name(env, stack, object, "not_found", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(int_value == INT32_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
-  else {
-    stack[0].ival = 0;
-  }
   
+  stack[0].ival = 1;
   return 0;
 }
 
@@ -1464,106 +1804,232 @@ int32_t SPVM__TestCase__NativeAPI__native_get_field_long_by_name(SPVM_ENV* env, 
   
   void* object = stack[0].oval;
   
-  int64_t long_value = env->get_field_long_by_name(env, stack, object, "long_value", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  
-  if (long_value == INT64_MIN) {
-    stack[0].ival = 1;
+  {
+    int64_t long_value = env->get_field_long_by_name(env, stack, object, "byte_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(long_value == INT8_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
-  else {
-    stack[0].ival = 0;
+  
+  {
+    int64_t long_value = env->get_field_long_by_name(env, stack, object, "short_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(long_value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
   
+  {
+    int64_t long_value = env->get_field_long_by_name(env, stack, object, "int_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(long_value == INT32_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    int64_t long_value = env->get_field_long_by_name(env, stack, object, "long_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(long_value == INT64_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
   return 0;
 }
 
 int32_t SPVM__TestCase__NativeAPI__native_get_field_long_by_name_exception(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
-
+  
   void* object = stack[0].oval;
   
-  int64_t long_value = env->get_field_long_by_name(env, stack, object, "not_found", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  
-  if (long_value == INT64_MIN) {
-    stack[0].ival = 1;
+  {
+    int64_t long_value = env->get_field_long_by_name(env, stack, object, "not_found", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(long_value == INT64_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
-  else {
-    stack[0].ival = 0;
-  }
   
+  stack[0].ival = 1;
   return 0;
 }
 
 int32_t SPVM__TestCase__NativeAPI__native_get_field_float_by_name(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
-
+  
   void* object = stack[0].oval;
   
-  float float_value = env->get_field_float_by_name(env, stack, object, "float_value", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  
-  if (float_value == FLT_MIN) {
-    stack[0].ival = 1;
+  {
+    float float_value = env->get_field_float_by_name(env, stack, object, "byte_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(float_value == INT8_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
-  else {
-    stack[0].ival = 0;
+  
+  {
+    float float_value = env->get_field_float_by_name(env, stack, object, "short_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(float_value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
   
+  {
+    float float_value = env->get_field_float_by_name(env, stack, object, "int_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(float_value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    float float_value = env->get_field_float_by_name(env, stack, object, "long_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(float_value == INT32_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    float float_value = env->get_field_float_by_name(env, stack, object, "float_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(float_value == FLT_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
   return 0;
 }
 
 int32_t SPVM__TestCase__NativeAPI__native_get_field_float_by_name_exception(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
-
+  
   void* object = stack[0].oval;
   
-  float float_value = env->get_field_float_by_name(env, stack, object, "not_found", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  
-  if (float_value == FLT_MIN) {
-    stack[0].ival = 1;
+  {
+    float float_value = env->get_field_float_by_name(env, stack, object, "not_found", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(float_value == FLT_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
-  else {
-    stack[0].ival = 0;
-  }
   
+  stack[0].ival = 1;
   return 0;
 }
 
 int32_t SPVM__TestCase__NativeAPI__native_get_field_double_by_name(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
-
+  
   void* object = stack[0].oval;
   
-  double double_value = env->get_field_double_by_name(env, stack, object, "double_value", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  
-  if (double_value == DBL_MIN) {
-    stack[0].ival = 1;
+  {
+    double double_value = env->get_field_double_by_name(env, stack, object, "byte_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(double_value == INT8_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
-  else {
-    stack[0].ival = 0;
+  
+  {
+    double double_value = env->get_field_double_by_name(env, stack, object, "short_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(double_value == INT16_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
   
+  {
+    double double_value = env->get_field_double_by_name(env, stack, object, "int_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(double_value == INT32_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    double double_value = env->get_field_double_by_name(env, stack, object, "long_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(double_value == INT32_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    double double_value = env->get_field_double_by_name(env, stack, object, "float_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(double_value == FLT_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  {
+    double double_value = env->get_field_double_by_name(env, stack, object, "double_value", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(double_value == DBL_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
+  }
+  
+  stack[0].ival = 1;
   return 0;
 }
 
 int32_t SPVM__TestCase__NativeAPI__native_get_field_double_by_name_exception(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t error_id = 0;
-
+  
   void* object = stack[0].oval;
   
-  double double_value = env->get_field_double_by_name(env, stack, object, "not_found", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  
-  if (double_value == DBL_MIN) {
-    stack[0].ival = 1;
+  {
+    double double_value = env->get_field_double_by_name(env, stack, object, "not_found", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    if (!(double_value == DBL_MIN)) {
+      stack[0].ival = 0;
+      return 0;
+    }
   }
-  else {
-    stack[0].ival = 0;
-  }
   
+  stack[0].ival = 1;
   return 0;
 }
 
@@ -1582,13 +2048,12 @@ int32_t SPVM__TestCase__NativeAPI__native_get_field_object_by_name(SPVM_ENV* env
   
   int32_t x = env->get_field_int(env, stack, object_minimal, field_minimal_x);
   
-  if (x == 5) {
-    stack[0].ival = 1;
-  }
-  else {
+  if (!(x == 5)) {
     stack[0].ival = 0;
+    return 0;
   }
   
+  stack[0].ival = 1;
   return 0;
 }
 
@@ -1600,13 +2065,12 @@ int32_t SPVM__TestCase__NativeAPI__native_get_field_string_chars_by_name(SPVM_EN
   const char* string_chars = env->get_field_string_chars_by_name(env, stack, string_chars_simple, "string_value", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; };
   
-  if (strcmp(string_chars, "abc") == 0) {
-    stack[0].ival = 1;
-  }
-  else {
+  if (!(strcmp(string_chars, "abc") == 0)) {
     stack[0].ival = 0;
+    return 0;
   }
   
+  stack[0].ival = 1;
   return 0;
 }
 
@@ -1616,13 +2080,12 @@ int32_t SPVM__TestCase__NativeAPI__native_get_field_string_chars_by_name_excepti
   void* string_chars_simple = stack[0].oval;
   
   const char* string_chars = env->get_field_string_chars_by_name(env, stack, string_chars_simple, "not_found", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    stack[0].ival = 1;
-  }
-  else {
+  if (!error_id) {
     stack[0].ival = 0;
+    return 0;
   }
   
+  stack[0].ival = 1;
   return 0;
 }
 
@@ -1641,13 +2104,12 @@ int32_t SPVM__TestCase__NativeAPI__native_get_field_object_by_name_exception(SPV
   
   int32_t x = env->get_field_int(env, stack, object_minimal, field_minimal_x);
   
-  if (x == 5) {
-    stack[0].ival = 1;
-  }
-  else {
+  if (!(x == 5)) {
     stack[0].ival = 0;
+    return 0;
   }
   
+  stack[0].ival = 1;
   return 0;
 }
 

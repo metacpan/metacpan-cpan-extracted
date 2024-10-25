@@ -5,9 +5,9 @@ require_relative '../../utils/string_encoding_mode'
 
 class CommandDeserializer
 
-  def initialize(buffer, byte_array_len)
+  def initialize(buffer)
     @buffer = buffer
-    @byte_array_len = byte_array_len
+    @byte_array_len = buffer.length
     @command = Command.new(buffer[0], buffer[10], [])
     @position = 11
   end
