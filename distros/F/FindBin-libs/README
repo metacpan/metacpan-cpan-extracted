@@ -15,6 +15,12 @@ passing in switches. The one used here was chosen because it supports
 qw( ... ) syntax with optional parameters (e.g., qw(export) and 
 qw(export=foo)).
 
+Note that the lookup can be for any basename, not just a directory.
+This makes the module useful for finding config files, named pipes,
+whatever you like. The test for returning content is "-e", not "-d",
+which means you may need some add'l tests in your code to validate
+what was found. 
+
 Older versions of the module support earlier versions of perl
 (see ./versions for list of Perl versions supported). Older
 versions of modules are left in the ./versions directory for 

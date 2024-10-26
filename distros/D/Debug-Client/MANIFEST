@@ -1,4 +1,3 @@
-.travis.yml
 Changes
 eg/debugger.pl
 inc/Module/Install.pm
@@ -14,7 +13,6 @@ lib/Debug/Client.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
-README
 README.md
 t/00-check-deps.t
 t/00-report-prereqs.t
@@ -47,6 +45,7 @@ t/28-get_h_var.t
 t/29-options.t
 t/40-test_1415-old.t
 t/40-test_1415.t
+t/41-eg.t
 t/99-perldb.t
 t/eg/01-add.pl
 t/eg/02-sub.pl

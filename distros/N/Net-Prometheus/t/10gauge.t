@@ -151,4 +151,34 @@ sub HASHfromSample
    );
 }
 
+# Remove and clear
+{
+   my $gauge = Net::Prometheus::Gauge->new(
+      name   => "removal_test",
+      help   => "A gauge for testing removal",
+      labels => [qw( x )],
+   );
+
+   $gauge->set( { x => "one" }, 1 );
+   $gauge->set( { x => "two" }, 2 );
+   $gauge->set( { x => "three" }, 3 );
+
+   is( [ map { $_->labels } $gauge->samples ],
+      # Grr sorting
+      [ [ x => "one" ], [ x => "three" ], [ x => "two" ] ],
+      'labels before ->remove' );
+
+   $gauge->remove( { x => "one" } );
+
+   is( [ map { $_->labels } $gauge->samples ],
+      [ [ x => "three" ], [ x => "two" ] ],
+      'labels after ->remove' );
+
+   $gauge->clear;
+
+   is( [ map { $_->labels } $gauge->samples ],
+      [],
+      'labels after ->clear' );
+}
+
 done_testing;

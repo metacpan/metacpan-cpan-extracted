@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Registry 0.13;
+package Net::Prometheus::Registry 0.14;
 
 use v5.14;
 use warnings;
@@ -29,6 +29,8 @@ accessed by instance methods.
 my @COLLECTORS;
 
 =head1 CONSTRUCTOR
+
+=for highlighter language=perl
 
 =cut
 

@@ -14,8 +14,10 @@ t/assert_arrayref_nonempty.t
 t/assert_arrayref_of.t
 t/assert_cmp.t
 t/assert_coderef.t
+t/assert_context_list.t
 t/assert_context_nonvoid.t
 t/assert_context_scalar.t
+t/assert_context_void.t
 t/assert_datetime.t
 t/assert_defined.t
 t/assert_empty.t

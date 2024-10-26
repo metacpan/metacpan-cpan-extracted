@@ -13,11 +13,11 @@ App::FileCleanerByDiskUage - Removes files based on disk space usage till it dro
 
 =head1 VERSION
 
-Version 0.3.0
+Version 0.4.0
 
 =cut
 
-our $VERSION = '0.3.0';
+our $VERSION = '0.4.0';
 
 =head1 SYNOPSIS
 
@@ -294,10 +294,11 @@ sub clean {
 	my @files_info;
 	foreach my $file (@files) {
 		my %file_info;
+		my $not_used;
 		(
-			$file_info{dev},   $file_info{ino},     $file_info{mode}, $file_info{nlink}, $file_info{uid},
-			$file_info{gid},   $file_info{rdev},    $file_info{size}, $file_info{atime}, $file_info{mtime},
-			$file_info{ctime}, $file_info{blksize}, $file_info{blocks}
+			$not_used, $not_used, $not_used, $not_used, $not_used,
+			$not_used, $not_used, $not_used, $not_used, $file_info{mtime},
+			$not_used, $not_used, $not_used
 		) = stat($file);
 		$file_info{name} = $file;
 		push( @files_info, \%file_info );

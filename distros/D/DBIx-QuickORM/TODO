@@ -1,0 +1,84 @@
+ * $sel = $source->select(\%where)->aggregate(
+        select => [as => [func => field], ...],
+        group_by => [...],
+   );
+
+ * $select->relation('foo')
+ * $select->each(sub { $_ })
+ * $select->delete
+ * $select->update(...)
+ * $select->select(...) alias for $select->and
+ * $select->find(...)   does an 'and' with the new where, and returns a row, dies if there are multiple rows
+
+ * 'select' subclasses that have relation accessors? - YES Do it
+
+ * $source/$select->shotgun(
+    max => N, # Max number of connections to use concurrently
+    method => 'auto', 'forked', 'aside', 'async',
+    # 'auto' defaults to aside falls back to forked
+    # 'async' - uses aside AND async
+    name1 => \%where1,
+    name2 => [\%where2, $order_by],
+    name3 => \@select_args,
+ )
+ * $orm->shotgun(
+    source1 => { name => \%where, ... },
+    source2 => ...,
+ );
+
+# Document that $orm->select(TABLE) is the primary API
+
+Serializer hooks, easy to pass rows between processes.
+
+Audit error messages
+
+Readonly json and DateTime
+
+my $row = ...;
+
+txn {
+    $row->foo # NO!
+    $row->reset/refresh;
+    $row->foo # YES
+}
+
+
+
+my $row = undef;
+txn {
+    $row = insert(...);
+    $txn->rollback;
+}
+
+$row->foo # NO!
+
+
+
+my $row = ...;
+
+txn {
+    my $row = find(...);
+    $row->foo # Yes
+}
+
+
+
+my $row = ...;
+$row->mutate_but_not_save;
+
+txn {
+    $row = find(...);
+    $row->foo # Complain
+}
+
+
+
+
+
+ORM {
+    schema
+    db
+    connection
+    transactions
+    cache
+}

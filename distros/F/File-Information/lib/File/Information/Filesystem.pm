@@ -2,7 +2,7 @@
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
-# ABSTRACT: generic module for extrating information from filesystems
+# ABSTRACT: generic module for extracting information from filesystems
 
 
 package File::Information::Filesystem;
@@ -15,7 +15,7 @@ use parent 'File::Information::Base';
 
 use Carp;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my %_properties = (
     dev_disk_by_uuid        => {rawtype => 'uuid'},
@@ -75,11 +75,11 @@ __END__
 
 =head1 NAME
 
-File::Information::Filesystem - generic module for extrating information from filesystems
+File::Information::Filesystem - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

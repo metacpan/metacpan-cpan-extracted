@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::ProcessCollector 0.13;
+package Net::Prometheus::ProcessCollector 0.14;
 
 use v5.14;
 use warnings;
@@ -15,6 +15,8 @@ use Net::Prometheus::Types qw( MetricSamples Sample );
 C<Net::Prometheus::ProcessCollector> - obtain a process collector for the OS
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Net::Prometheus::ProcessCollector;
 

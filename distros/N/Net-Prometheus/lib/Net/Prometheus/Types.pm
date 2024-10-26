@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Types 0.13;
+package Net::Prometheus::Types 0.14;
 
 use v5.14;
 use warnings;
@@ -18,6 +18,8 @@ use Struct::Dumb qw( readonly_struct );
 C<Net::Prometheus::Types> - a collection of support structure types
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Net::Prometheus::Types qw( Sample );
 

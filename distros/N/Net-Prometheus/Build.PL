@@ -22,6 +22,8 @@ my $build = Module::Build->new(
    },
    requires => {
       'perl' => '5.014',
+      'meta' => '0.009',
+
       'List::Util' => '1.33',
       'Ref::Util' => 0,
       'Struct::Dumb' => 0,

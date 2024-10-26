@@ -3,13 +3,16 @@
 #
 #  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Metric 0.13;
+package Net::Prometheus::Metric 0.14;
 
 use v5.14;
 use warnings;
 
 use Carp;
 our @CARP_NOT = qw( Net::Prometheus );
+
+use meta 0.009;  # GvCVu bugfix
+no warnings 'meta::experimental';
 
 use Ref::Util qw( is_hashref );
 
@@ -22,6 +25,8 @@ use constant CHILDCLASS => "Net::Prometheus::Metric::_Child";
 C<Net::Prometheus::Metric> - the base class for observed metrics
 
 =head1 DESCRIPTION
+
+=for highlighter language=perl
 
 This class provides the basic methods shared by the concrete subclasses,
 
@@ -207,7 +212,7 @@ sub labels
 
    my $labelkey = join "\x00", map {
       # Encode \x00 or \x01 as \x{01}0 or \x{01}1 in order to escape the \x00
-      # but preserve full leixcal ordering
+      # but preserve full lexical ordering
       my $value = $_;
       $value =~ s/\x01/\x011/g;
       $value =~ s/\x00/\x010/g;
@@ -246,14 +251,17 @@ sub MAKE_child_class
 {
    my $class = shift;
 
-   my $childclass = "${class}::_Child";
-
-   no strict 'refs';
-
-   # The careful ordering of these two lines should make it possible to
+   # The careful ordering of these two changes should make it possible to
    #   further subclass metrics and metric child classes recursively
-   @{"${childclass}::ISA"} = $class->CHILDCLASS;
-   *{"${class}::CHILDCLASS"} = sub() { $childclass };
+   my $childclass_metapkg = meta::get_package( "${class}::_Child" );
+   @{ $childclass_metapkg->get_or_add_symbol( '@ISA' )->reference } =
+      $class->CHILDCLASS;
+
+   my $class_metapkg = meta::get_package( $class );
+   $class_metapkg->add_named_sub( CHILDCLASS => sub() { "${class}::_Child" } );
+
+   # All Metric subclasses should support ->remove
+   $class->MAKE_child_method( 'remove' );
 }
 
 # A metaclass method for declaring what Metric subclass methods are proxied
@@ -263,20 +271,22 @@ sub MAKE_child_method
    my $class = shift;
    my ( $method ) = @_;
 
-   no strict 'refs';
-   *{"${class}::${method}"} = sub {
+   my $class_metapkg = meta::get_package( $class );
+
+   $class_metapkg->add_named_sub( $method => sub {
       my $self = shift;
       my @values = splice @_, 0, is_hashref( $_[0] ) ? 1 : $self->labelcount;
 
       $self->labels( @values )->$method( @_ );
-   };
+   } );
+
+   my $childclass_metapkg = meta::get_package( "${class}::_Child" );
 
    my $childmethod = "_${method}_child";
-
-   *{"${class}::_Child::${method}"} = sub {
+   $childclass_metapkg->add_named_sub( $method => sub {
       my $self = shift;
       $self->metric->$childmethod( $self->labelkey, @_ );
-   };
+   } );
 }
 
 =head2 make_sample
@@ -333,6 +343,38 @@ from this metric.
 sub samples
 {
    croak "Abstract Net::Prometheus::Metric->samples invoked directly";
+}
+
+=head2 remove
+
+   $metric->remove( @values );
+
+   $metric->remove( { name => $value, name => $value, ... } );
+
+I<Since version 0.14.>
+
+Removes a single labelset from the metric. This stops it being reported by
+future calls to L</samples>.
+
+=cut
+
+# created by MAKE_child_class
+
+=head2 clear
+
+   $metric->clear;
+
+I<Since version 0.14.>
+
+Removes all the labelsets from the metric, resetting it back to an initial
+empty state.
+
+=cut
+
+# must be created by each child class
+sub clear
+{
+   croak "Abstract Net::Prometheus::Metric->clear invoked directly";
 }
 
 =head1 AUTHOR

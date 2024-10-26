@@ -12,7 +12,7 @@ use App::mqtt2job qw/ helper_v1 /;
 my $sleep = $ARGV[0] || 0;
 sleep($sleep);
 
-like(helper_v1(), qr/\.pl$/, "Generated script template scalar" );
+like(helper_v1({rm => 1}), qr/\.pl$/, "Generated script template scalar" );
 
 done_testing();
 

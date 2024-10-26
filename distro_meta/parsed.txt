@@ -94845,3 +94845,17 @@ E/ET/ETJ/PDL-Graphics-Simple-1.014.tar.gz
 K/KI/KIMOTO/SPVM-0.990025.tar.gz
 B/BR/BRIANDFOY/Text-MultiMarkdown-1.003.tar.gz
 D/DK/DKECHAG/Weather-Astro7Timer-0.3.tar.gz
+W/WA/WATERKIP/AnyEvent-I3X-Workspace-OnDemand-0.004.tar.gz
+G/GD/GDT/CSAF-0.24.tar.gz
+V/VV/VVELOX/App-FileCleanerByDiskUage-0.4.0.tar.gz
+C/CH/CHRISC/App-mqtt2job-0.03.tar.gz
+U/UT/UTASHIRO/App-week-1.05.tar.gz
+B/BR/BRIANDFOY/Business-ISBN-Data-20241025.001.tar.gz
+H/HA/HAIJENP/Cache-Memcached-PDeque-0.01.tar.gz
+P/PE/PETDANCE/Carp-Assert-More-2.5.0.tar.gz
+E/EX/EXODIST/DBIx-QuickORM-0.000001.tar.gz
+S/SZ/SZABGAB/Debug-Client-0.32.tar.gz
+L/LI/LION/File-Information-v0.03.tar.gz
+L/LE/LEMBARK/FindBin-libs-v4.0.3.tar.gz
+P/PE/PEVANS/Net-Prometheus-0.14.tar.gz
+K/KI/KIMOTO/SPVM-0.990025001.tar.gz

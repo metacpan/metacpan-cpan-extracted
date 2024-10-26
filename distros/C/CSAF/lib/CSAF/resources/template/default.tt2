@@ -256,179 +256,180 @@
 {{/product_tree.product_groups}}
 [% END %]
 
-
+[% IF vulnerabilities.size %]
 <h2>Vulnerabilities</h2>
 
-[% FOREACH vulnerability IN vulnerabilities.each %]
+  [% FOREACH vulnerability IN vulnerabilities.each %]
 
-  <h3>[% vulnerability.title %][% IF vulnerability.cve %] ([% vulnerability.cve %])[% END %]</h3>
+    <h3>[% vulnerability.title %][% IF vulnerability.cve %] ([% vulnerability.cve %])[% END %]</h3>
 
-  [% FOREACH note IN vulnerability.notes.get_category('summary')     %][% PROCESS vulnerability_note %][% END %]
-  [% FOREACH note IN vulnerability.notes.get_category('details')     %][% PROCESS vulnerability_note %][% END %]
-  [% FOREACH note IN vulnerability.notes.get_category('general')     %][% PROCESS vulnerability_note %][% END %]
-  [% FOREACH note IN vulnerability.notes.get_category('description') %][% PROCESS vulnerability_note %][% END %]
-  [% FOREACH note IN vulnerability.notes.get_category('faq')         %][% PROCESS vulnerability_note %][% END %]
-  [% FOREACH note IN vulnerability.notes.get_category('unknown')     %][% PROCESS vulnerability_note %][% END %]
+    [% FOREACH note IN vulnerability.notes.get_category('summary')     %][% PROCESS vulnerability_note %][% END %]
+    [% FOREACH note IN vulnerability.notes.get_category('details')     %][% PROCESS vulnerability_note %][% END %]
+    [% FOREACH note IN vulnerability.notes.get_category('general')     %][% PROCESS vulnerability_note %][% END %]
+    [% FOREACH note IN vulnerability.notes.get_category('description') %][% PROCESS vulnerability_note %][% END %]
+    [% FOREACH note IN vulnerability.notes.get_category('faq')         %][% PROCESS vulnerability_note %][% END %]
+    [% FOREACH note IN vulnerability.notes.get_category('unknown')     %][% PROCESS vulnerability_note %][% END %]
 
-  <table>
-    [% IF vulnerability.cwe.id %]
-    <tr>
-      <th>CWE:</th>
-      <td>
-        [% vulnerability.cwe.id %] : [% vulnerability.cwe.name %]
-      </td>
-    </tr>
-    [% END %]
-    [% FOREACH id IN vulnerability.ids.each %]
-    <tr>
-      <th>ID:</th>
-      <td>[% id.text %] ([% id.system_name %])</td>
-    </tr>
-    [% END %]
-    [% IF vulnerability.discovery_date %]
-    <tr>
-      <th>Discovery date:</th>
-      <td>[% vulnerability.discovery_date.datetime() %]</td>
-    </tr>
-    [% END %]
-    [% IF vulnerability.release_date %]
-    <tr>
-      <th>Release date:</th>
-      <td>[% vulnerability.release_date.datetime() %]</td>
-    </tr>
-    [% END %]
-  </table>
-
-  <h4>Product status</h4>
-
-  [% IF vulnerability.product_status.known_affected.size %]
-    <h5>Known affected</h5>
     <table>
-      [% PROCESS product_status_header %]
-      <tbody>
-      [% FOREACH product_id IN vulnerability.product_status.known_affected %]
-        [% PROCESS product_status_row %]
+      [% IF vulnerability.cwe.id %]
+      <tr>
+        <th>CWE:</th>
+        <td>
+          [% vulnerability.cwe.id %] : [% vulnerability.cwe.name %]
+        </td>
+      </tr>
       [% END %]
-      </tbody>
-    </table>
-  [% END %]
-
-  [% IF vulnerability.product_status.first_affected.size %]
-    <h5>First affected</h5>
-    <table>
-      [% PROCESS product_status_header %]
-      <tbody>
-      [% FOREACH product_id IN vulnerability.product_status.first_affected %]
-        [% PROCESS product_status_row %]
+      [% FOREACH id IN vulnerability.ids.each %]
+      <tr>
+        <th>ID:</th>
+        <td>[% id.text %] ([% id.system_name %])</td>
+      </tr>
       [% END %]
-      </tbody>
-    </table>
-  [% END %]
-
-  [% IF vulnerability.product_status.last_affected.size %]
-    <h5>Last affected</h5>
-    <table>
-      [% PROCESS product_status_header %]
-      <tbody>
-      [% FOREACH product_id IN vulnerability.product_status.last_affected %]
-        [% PROCESS product_status_row %]
+      [% IF vulnerability.discovery_date %]
+      <tr>
+        <th>Discovery date:</th>
+        <td>[% vulnerability.discovery_date.datetime() %]</td>
+      </tr>
       [% END %]
-      </tbody>
+      [% IF vulnerability.release_date %]
+      <tr>
+        <th>Release date:</th>
+        <td>[% vulnerability.release_date.datetime() %]</td>
+      </tr>
+      [% END %]
     </table>
-  [% END %]
 
-  [% IF vulnerability.product_status.known_not_affected.size %]
-    <h5>Known not affected</h5>
-    <ul>
-      [% FOREACH product_id IN vulnerability.product_status.known_not_affected %]
+    <h4>Product status</h4>
+
+    [% IF vulnerability.product_status.known_affected.size %]
+      <h5>Known affected</h5>
+      <table>
+        [% PROCESS product_status_header %]
+        <tbody>
+        [% FOREACH product_id IN vulnerability.product_status.known_affected %]
+          [% PROCESS product_status_row %]
+        [% END %]
+        </tbody>
+      </table>
+    [% END %]
+
+    [% IF vulnerability.product_status.first_affected.size %]
+      <h5>First affected</h5>
+      <table>
+        [% PROCESS product_status_header %]
+        <tbody>
+        [% FOREACH product_id IN vulnerability.product_status.first_affected %]
+          [% PROCESS product_status_row %]
+        [% END %]
+        </tbody>
+      </table>
+    [% END %]
+
+    [% IF vulnerability.product_status.last_affected.size %]
+      <h5>Last affected</h5>
+      <table>
+        [% PROCESS product_status_header %]
+        <tbody>
+        [% FOREACH product_id IN vulnerability.product_status.last_affected %]
+          [% PROCESS product_status_row %]
+        [% END %]
+        </tbody>
+      </table>
+    [% END %]
+
+    [% IF vulnerability.product_status.known_not_affected.size %]
+      <h5>Known not affected</h5>
+      <ul>
+        [% FOREACH product_id IN vulnerability.product_status.known_not_affected %]
+          <li>[% product_id | product_name %]</li>
+        [% END %]
+      </ul>
+    [% END %]
+
+    [% IF vulnerability.product_status.recommended.size %]
+      <h5>Recommended</h5>
+      <ul>
+        [% FOREACH product_id IN vulnerability.product_status.recommended %]
+          <li>[% product_id | product_name %]</li>
+        [% END %]
+      </ul>
+    [% END %]
+
+    [% IF vulnerability.product_status.fixed.size %]
+      <h5>Fixed</h5>
+      <ul>
+      [% FOREACH product_id IN vulnerability.product_status.fixed %]
         <li>[% product_id | product_name %]</li>
       [% END %]
-    </ul>
-  [% END %]
+      </ul>
+    [% END %]
 
-  [% IF vulnerability.product_status.recommended.size %]
-    <h5>Recommended</h5>
-    <ul>
-      [% FOREACH product_id IN vulnerability.product_status.recommended %]
+    [% IF vulnerability.product_status.first_fixed.size %]
+      <h5>First fixed</h5>
+      <ul>
+      [% FOREACH product_id IN vulnerability.product_status.first_fixed %]
         <li>[% product_id | product_name %]</li>
       [% END %]
-    </ul>
-  [% END %]
-
-  [% IF vulnerability.product_status.fixed.size %]
-    <h5>Fixed</h5>
-    <ul>
-    [% FOREACH product_id IN vulnerability.product_status.fixed %]
-      <li>[% product_id | product_name %]</li>
+      </ul>
     [% END %]
-    </ul>
-  [% END %]
 
-  [% IF vulnerability.product_status.first_fixed.size %]
-    <h5>First fixed</h5>
-    <ul>
-    [% FOREACH product_id IN vulnerability.product_status.first_fixed %]
-      <li>[% product_id | product_name %]</li>
+    [% IF vulnerability.product_status.under_investigation.size %]
+      <h5>Under investgation</h5>
+      <ul>
+      [% FOREACH product_id IN vulnerability.product_status.under_investigation %]
+        <li>[% product_id | product_name %]</li>
+      [% END %]
+      </ul>
     [% END %]
-    </ul>
-  [% END %]
 
-  [% IF vulnerability.product_status.under_investigation.size %]
-    <h5>Under investgation</h5>
-    <ul>
-    [% FOREACH product_id IN vulnerability.product_status.under_investigation %]
-      <li>[% product_id | product_name %]</li>
+    [% IF vulnerability.remediations.size %]
+      <h4>Remediations</h4>
+      [% FOREACH remediation IN vulnerability.remediations.get_category('vendor_fix')     %][% PROCESS remediation %][% END %]
+      [% FOREACH remediation IN vulnerability.remediations.get_category('mitigation')     %][% PROCESS remediation %][% END %]
+      [% FOREACH remediation IN vulnerability.remediations.get_category('workaround')     %][% PROCESS remediation %][% END %]
+      [% FOREACH remediation IN vulnerability.remediations.get_category('none_available') %][% PROCESS remediation %][% END %]
+      [% FOREACH remediation IN vulnerability.remediations.get_category('no_fix_planned') %][% PROCESS remediation %][% END %]
+      [% FOREACH remediation IN vulnerability.remediations.get_category('unknown')        %][% PROCESS remediation %][% END %]
     [% END %]
-    </ul>
-  [% END %]
 
-  [% IF vulnerability.remediations.size %]
-    <h4>Remediations</h4>
-    [% FOREACH remediation IN vulnerability.remediations.get_category('vendor_fix')     %][% PROCESS remediation %][% END %]
-    [% FOREACH remediation IN vulnerability.remediations.get_category('mitigation')     %][% PROCESS remediation %][% END %]
-    [% FOREACH remediation IN vulnerability.remediations.get_category('workaround')     %][% PROCESS remediation %][% END %]
-    [% FOREACH remediation IN vulnerability.remediations.get_category('none_available') %][% PROCESS remediation %][% END %]
-    [% FOREACH remediation IN vulnerability.remediations.get_category('no_fix_planned') %][% PROCESS remediation %][% END %]
-    [% FOREACH remediation IN vulnerability.remediations.get_category('unknown')        %][% PROCESS remediation %][% END %]
-  [% END %]
-
-  [% IF vulnerability.acknowledgments.size %]
-    <h4>Acknowledgments</h4>
-    <ul>
-    [% FOREACH acknowledgment IN vulnerability.acknowledgments.each %]
-      [% PROCESS acknowledgment %]
+    [% IF vulnerability.acknowledgments.size %]
+      <h4>Acknowledgments</h4>
+      <ul>
+      [% FOREACH acknowledgment IN vulnerability.acknowledgments.each %]
+        [% PROCESS acknowledgment %]
+      [% END %]
+      </ul>
     [% END %]
-    </ul>
-  [% END %]
 
-  [% IF vulnerability.involvements.size %]
-    <h4>Involvement</h4>      
-    <ul>
-    [% FOREACH involvement IN vulnerability.involvements.each %]
-      <li>
-        [% IF involvement.date %][% involvement.date.datetime() %][% END %] [% involment.party.upper %] [% IF involvement.status %][% involment.status.replace('_', ' ') %][% END %] [% IF involment.summary %]: [% involment.summary %][% END %]
-      </li>
+    [% IF vulnerability.involvements.size %]
+      <h4>Involvement</h4>      
+      <ul>
+      [% FOREACH involvement IN vulnerability.involvements.each %]
+        <li>
+          [% IF involvement.date %][% involvement.date.datetime() %][% END %] [% involment.party.upper %] [% IF involvement.status %][% involment.status.replace('_', ' ') %][% END %] [% IF involment.summary %]: [% involment.summary %][% END %]
+        </li>
+      [% END %]
+      </ul>
     [% END %]
-    </ul>
-  [% END %]
 
-  [% IF vulnerability.references.size %]
-    <h4>References</h4>
-    <ul>
-    [% FOREACH reference IN vulnerability.references.each %]
-        [% PROCESS reference %]
+    [% IF vulnerability.references.size %]
+      <h4>References</h4>
+      <ul>
+      [% FOREACH reference IN vulnerability.references.each %]
+          [% PROCESS reference %]
+      [% END %]
+      </ul>
     [% END %]
-    </ul>
-  [% END %]
 
-  [% IF vulnerability.threats.size %]
-    <h4>Threats</h4>
-    [% FOREACH threat IN vulnerability.threats.get_category('exploit_status') %][% PROCESS threat %][% END %]
-    [% FOREACH threat IN vulnerability.threats.get_category('impact')         %][% PROCESS threat %][% END %]
-    [% FOREACH threat IN vulnerability.threats.get_category('target_set')     %][% PROCESS threat %][% END %]
-    [% FOREACH threat IN vulnerability.threats.get_category('unknown')        %][% PROCESS threat %][% END %]
-  [% END %]
+    [% IF vulnerability.threats.size %]
+      <h4>Threats</h4>
+      [% FOREACH threat IN vulnerability.threats.get_category('exploit_status') %][% PROCESS threat %][% END %]
+      [% FOREACH threat IN vulnerability.threats.get_category('impact')         %][% PROCESS threat %][% END %]
+      [% FOREACH threat IN vulnerability.threats.get_category('target_set')     %][% PROCESS threat %][% END %]
+      [% FOREACH threat IN vulnerability.threats.get_category('unknown')        %][% PROCESS threat %][% END %]
+    [% END %]
 
+  [% END %]
 [% END %]
 
 [% IF document.acknowledgments.size %]

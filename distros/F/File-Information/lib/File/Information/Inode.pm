@@ -2,7 +2,7 @@
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
-# ABSTRACT: generic module for extrating information from filesystems
+# ABSTRACT: generic module for extracting information from filesystems
 
 
 package File::Information::Inode;
@@ -17,7 +17,7 @@ use Carp;
 use File::Spec;
 use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S_IWGRP S_IWOTH SEEK_SET);
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
 my $HAVE_UUID_TINY          = eval {require UUID::Tiny; 1;};
@@ -49,7 +49,9 @@ my %_wk_tagged_as_tags = (
 
 my %_properties = (
     (map {$_ => {loader => \&_load_stat}}qw(st_dev st_ino st_mode st_nlink st_uid st_gid st_rdev st_size st_blksize st_blocks st_atime st_mtime st_ctime stat_readonly stat_cachehash)),
-    magic_mediatype => {loader => \&_load_magic, rawtype => 'mediatype'},
+    magic_mediatype         => {loader => \&_load_magic, rawtype => 'mediatype'},
+    magic_valuefile_version => {loader => \&_load_magic, rawtype => 'uuid'},
+    magic_valuefile_format  => {loader => \&_load_magic, rawtype => 'ise'},
 );
 
 $_properties{$_}{rawtype} = 'unixts' foreach qw(st_atime st_mtime st_ctime);
@@ -64,8 +66,10 @@ if ($HAVE_XATTR) {
     $_properties{'xattr_dublincore_'.($_ =~ tr/.-/__/r)}   = {loader => \&_load_xattr, xattr_key => 'dublincore.'.$_} foreach qw(title creator subject description publisher contributor date type format identifier source language relation coverage rights);
 
     $_properties{'xattr_utag_'.($_ =~ tr/.-/__/r)} = {loader => \&_load_xattr, rawtype => 'ise', xattr_key => 'utag.'.$_} foreach qw(ise write-mode final-mode);
-    $_properties{'xattr_utag_final_'.($_ =~ tr/.-/__/r)} = {loader => \&_load_xattr, lifecycle => 'final', xattr_key => 'utag.final.'.$_} foreach qw(file.size file.encoding);
+    $_properties{'xattr_utag_final_'.($_ =~ tr/.-/__/r)} = {loader => \&_load_xattr, lifecycle => 'final', xattr_key => 'utag.final.'.$_} foreach qw(file.size file.encoding file.hash);
     $_properties{'xattr_utag_final_file_encoding'}{parts} = [qw(ise mediatype)];
+    $_properties{'xattr_utag_final_file_hash'}{parsing} = 'utag';
+    $_properties{'xattr_utag_final_file_hash_size'} = {loader => \&_load_xattr, lifecycle => 'final', xattr_key => 'utag.final.hash'};
 }
 
 if ($HAVE_UUID_TINY) {
@@ -74,6 +78,18 @@ if ($HAVE_UUID_TINY) {
             my $lifecycle = $opts{lifecycle};
             my $digest = $self->digest('sha-3-512', as => 'utag', lifecycle => $lifecycle, default => undef);
             if (defined $digest) {
+                my $uuid = UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_SHA1(), '66d488c0-3b19-4e6c-856f-79edf2484f37', $digest);
+                (($self->{properties_values} //= {})->{$lifecycle} //= {})->{$key} = {raw => $uuid};
+            }
+        }, rawtype => 'uuid'};
+    $_properties{content_sha_1_160_sha_3_512_uuid} = {loader => sub {
+            my ($self, $key, %opts) = @_;
+            my $lifecycle = $opts{lifecycle};
+            my $digest_sha_1_160 = $self->digest('sha-1-160', as => 'utag', lifecycle => $lifecycle, default => undef);
+            my $digest_sha_3_512 = $self->digest('sha-3-512', as => 'utag', lifecycle => $lifecycle, default => undef);
+            if (defined($digest_sha_1_160) && defined($digest_sha_3_512)) {
+                my $digest = $digest_sha_1_160.' '.$digest_sha_3_512;
+                $digest =~ s/^v0 /v0m /;
                 my $uuid = UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_SHA1(), '66d488c0-3b19-4e6c-856f-79edf2484f37', $digest);
                 (($self->{properties_values} //= {})->{$lifecycle} //= {})->{$key} = {raw => $uuid};
             }
@@ -161,6 +177,13 @@ if ($HAVE_DATA_IDENTIFIER) {
         # Final states:
         'f418cdb9-64a7-4f15-9a18-63f7755c5b47' => {displayname => 'final'},
         'cb9c2c8a-b6bd-4733-80a4-5bd65af6b957' => {displayname => 'auto-final'},
+
+        # ValueFile:
+        '54bf8af4-b1d7-44da-af48-5278d11e8f32' => {displayname => 'ValueFile'},
+        'e5da6a39-46d5-48a9-b174-5c26008e208e' => {displayname => 'tagpool-source-format'},
+        'afdb46f2-e13f-4419-80d7-c4b956ed85fa' => {displayname => 'tagpool-taglist-format-v1'},
+        '25990339-3913-4b5a-8bcf-5042ef6d8b5e' => {displayname => 'tagpool-httpd-htdirectories-format'},
+        '11431b85-41cd-4be5-8d88-a769ebbd603f' => {displayname => 'tagpool-directory-info-format'},
 
         #'' => {displayname => ''},
     );
@@ -415,11 +438,14 @@ sub _load_stat {
 }
 
 sub _load_xattr {
-    my ($self, $key) = @_;
+    my ($self, $key, %opts) = @_;
     my $info = $self->{properties}{$key};
-    my $pv = ($self->{properties_values} //= {})->{$info->{lifecycle} // 'current'} //= {};
+    my $lifecycle = $info->{lifecycle} // 'current';
+    my $pv = ($self->{properties_values} //= {})->{$lifecycle} //= {};
     my $value;
     my $fh;
+
+    return unless ($opts{lifecycle} // 'current') eq $lifecycle;
 
     croak 'Not supported, requires File::ExtAttr' unless $HAVE_XATTR;
 
@@ -437,6 +463,39 @@ sub _load_xattr {
         for (my $i = 0; $i < scalar(@{$parts}); $i++) {
             if (defined($values[$i]) && length($values[$i])) {
                 $out->{$parts->[$i]} = $values[$i];
+            }
+        }
+    }
+
+    if (defined(my $parsing = $info->{parsing})) {
+        if ($parsing eq 'utag') {
+            my $v = $value;
+            my %digest;
+            my $given_size;
+
+            eval {
+                while ($v =~ s/^(v0m?) ([a-z]+)-([0-9]+)-([0-9]+) bytes 0-([0-9]+)\/([0-9]+) ([0-9a-f]+)( |$)//) {
+                    my ($type, $name, $version, $bits, $end, $size, $hash, $mark) = ($1, $2, $3, $4, $5, $6, $7, $8);
+                    next if $end != ($size - 1);
+                    die if (length($hash) * 4) != $bits;
+                    die if $type eq 'v0' && length($mark);
+
+                    $given_size //= $size;
+                    die unless $given_size == $size;
+                    $digest{join('-', $name, $version, $bits)} = $hash;
+
+                    #warn sprintf('<%s> | <%s> <%s> <%u> | <%u> <%u> | <%s> | <%s>', $type, $name, $version, $bits, $end, $size, $hash, $mark);
+                }
+            };
+
+            $pv->{xattr_utag_final_file_hash_size} = {raw => $given_size} if defined $given_size;
+            $self->{digest} //= {};
+
+            {
+                my $digests = $self->{digest}{$lifecycle} //= {};
+                foreach my $algo (keys %digest) {
+                    $digests->{$algo} //= $digest{$algo};
+                }
             }
         }
     }
@@ -701,6 +760,10 @@ sub _load_magic {
         } else {
             $media_type = 'application/x-archive';
         }
+    } elsif ($data =~ /^!!ValueFile ([0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12})\s+(!null|[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[0-2](?:\.(?:0|[1-9][0-9]*))+|[a-zA-Z][a-zA-Z0-9\+\.\-]+[^\s%]+)[\s\r\n]/) {
+        my ($version, $format) = ($1, $2);
+        $pv->{magic_valuefile_version} = {raw => $version};
+        $pv->{magic_valuefile_format}  = {raw => $format} unless $format =~ /^!/;
     } else {
         foreach my $magic (sort {length($b) <=> length($a)} keys %_magic_map) {
             if (substr($data, 0, length($magic)) eq $magic) {
@@ -723,11 +786,11 @@ __END__
 
 =head1 NAME
 
-File::Information::Inode - generic module for extrating information from filesystems
+File::Information::Inode - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

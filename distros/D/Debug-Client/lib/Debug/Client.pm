@@ -10,7 +10,7 @@ no if $] > 5.017010, warnings => 'experimental::smartmatch';
 use English qw( -no_match_vars );
 local $OUTPUT_AUTOFLUSH = 1;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Term::ReadLine;
 if ( $OSNAME eq 'MSWin32' ) {
@@ -234,28 +234,12 @@ sub set_breakpoint {
 	$self->_prompt;
 
 	# if it was successful no reply
-	given ( $self->{buffer} ) {
-		when ( $_ =~ /^Subroutine [\w:]+ not found[.]/sxm ) {
-			return 0;
-		}
-		when ( $_ =~ /^Line \d+ not breakable[.]/sxm ) {
-			return 0;
-		}
-		when ( $_ =~ /^\d+ levels deep in subroutine calls!/sxm ) {
-			return 0;
-		}
-		when ( $_ =~ /^Already in/m ) {
-			return 1;
-		}
-		when ( $_ =~ /\S/sxm ) {
-
-			# say 'Non-whitespace charter found';
-			return 0;
-		}
-		default {
-			return 1;
-		}
-	}
+	return 0 if $self->{buffer} =~ /^Subroutine [\w:]+ not found[.]/sxm;
+	return 0 if $self->{buffer} =~ /^Line \d+ not breakable[.]/sxm;
+	return 0 if $self->{buffer} =~ /^\d+ levels deep in subroutine calls!/sxm;
+	return 1 if $self->{buffer} =~ /^Already in/m;
+	return 0 if $self->{buffer} =~ /\S/sxm; # say 'Non-whitespace charter found';
+	return 1;
 }
 
 #######
@@ -690,10 +674,6 @@ __END__
 
 Debug::Client - debugger client side code for Padre, The Perl IDE.
 
-=head1 VERSION
-
-This document describes Debug::Client version: 0.30
-
 =head1 SYNOPSIS
 
   use Debug::Client;
@@ -1108,7 +1088,7 @@ Alexandr Ciornii E<lt>alexchorny@gmail.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2008-2011 Gabor Szabo
+Copyright 2008-2021 Gabor Szabo
 
 Some parts Copyright E<copy> 2011-2014 Kevin Dawson and CONTRIBUTORS as listed above.
 

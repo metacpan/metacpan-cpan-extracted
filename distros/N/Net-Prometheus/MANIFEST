@@ -18,7 +18,11 @@ lib/Net/Prometheus/ProcessCollector/linux.pm
 lib/Net/Prometheus/Registry.pm
 lib/Net/Prometheus/Summary.pm
 lib/Net/Prometheus/Types.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01metric.t
 t/02labels.t
@@ -38,7 +42,3 @@ t/41process-collector-linux.t
 t/50perl-collector.t
 t/51perl-collector-detail.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

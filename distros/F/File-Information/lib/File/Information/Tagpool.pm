@@ -2,7 +2,7 @@
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
-# ABSTRACT: generic module for extrating information from filesystems
+# ABSTRACT: generic module for extracting information from filesystems
 
 
 package File::Information::Tagpool;
@@ -20,7 +20,7 @@ use Scalar::Util qw(weaken);
 
 use File::Information::Lock;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; require File::ValueFile::Simple::Writer; 1;};
 my $HAVE_UUID_TINY = eval {require UUID::Tiny; 1;};
@@ -366,11 +366,11 @@ __END__
 
 =head1 NAME
 
-File::Information::Tagpool - generic module for extrating information from filesystems
+File::Information::Tagpool - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

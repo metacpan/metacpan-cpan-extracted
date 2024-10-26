@@ -4,21 +4,21 @@ author:
   - 'Kevin Dawson <bowtie@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
-  File::HomeDir: 1
-  File::Temp: 0.2304
-  List::Util: 1.38
-  Test::CheckDeps: 0.01
-  Test::Class: 0.42
-  Test::Deep: 0.112
-  Test::More: 1.001003
-  Test::Requires: 0.07
-  parent: 0.228
-  version: 0.9908
+  File::HomeDir: '1'
+  File::Temp: '0.2304'
+  List::Util: '1.38'
+  Test::CheckDeps: '0.01'
+  Test::Class: '0.42'
+  Test::Deep: '0.112'
+  Test::More: '1.001003'
+  Test::Requires: '0.07'
+  parent: '0.228'
+  version: '0.9908'
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.21'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,23 +30,23 @@ no_index:
     - inc
     - t
 recommends:
-  ExtUtils::MakeMaker: 6.66
-  File::Spec::Functions: 3.4
-  List::Util : 1.27
-  Test::Pod: 1.48
-  Test::Pod::Coverage: 1.08
+  ExtUtils::MakeMaker: '6.66'
+  File::Spec::Functions: '3.4'
+  'List::Util ': '1.27'
+  Test::Pod: '1.48'
+  Test::Pod::Coverage: '1.08'
 requires:
-  Carp: 1.3301
-  Exporter: 5.70
-  IO::Socket::IP: 0.29
-  PadWalker: 1.98
-  Term::ReadLine: 1.14
-  Term::ReadLine::Gnu: 1.20
-  constant: 1.27
+  Carp: '1.3301'
+  Exporter: '5.70'
+  IO::Socket::IP: '0.29'
+  PadWalker: '1.98'
+  Term::ReadLine: '1.14'
+  Term::ReadLine::Gnu: '1.24'
+  constant: '1.27'
   perl: 5.10.1
 resources:
   bugtracker: https://github.com/PadreIDE/Debug-Client/issues
   homepage: https://github.com/PadreIDE/Debug-Client
   license: http://dev.perl.org/licenses/
   repository: git://github.com/PadreIDE/Debug-Client.git
-version: 0.31
+version: '0.31'

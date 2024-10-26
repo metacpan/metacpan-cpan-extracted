@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Gauge 0.13;
+package Net::Prometheus::Gauge 0.14;
 
 use v5.14;
 use warnings;
@@ -20,6 +20,8 @@ __PACKAGE__->MAKE_child_class;
 C<Net::Prometheus::Gauge> - a snapshot value-reporting metric
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Net::Prometheus;
 
@@ -182,6 +184,22 @@ sub _dec_child
    defined $delta or $delta = 1;
 
    $self->{values}{$labelkey} -= $delta;
+}
+
+# remove is generated automatically
+sub _remove_child
+{
+   my $self = shift;
+   my ( $labelkey ) = @_;
+
+   delete $self->{values}{$labelkey};
+}
+
+sub clear
+{
+   my $self = shift;
+
+   undef %{ $self->{values} };
 }
 
 sub samples

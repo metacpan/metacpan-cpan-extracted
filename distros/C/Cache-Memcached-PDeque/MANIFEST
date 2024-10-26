@@ -1,0 +1,16 @@
+Changes
+lib/Cache/Memcached/PDeque.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/basic.t
+t/foreach.t
+t/fork.t
+t/priority.t
+t/test_from_pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

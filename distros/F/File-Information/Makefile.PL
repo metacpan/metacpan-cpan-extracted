@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "generic module for extrating information from filesystems",
+  "ABSTRACT" => "generic module for extracting information from filesystems",
   "AUTHOR" => "L\x{f6}wenfelsen UG (haftungsbeschr\x{e4}nkt) <support\@loewenfelsen.net>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.02",
+  "VERSION" => "v0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }

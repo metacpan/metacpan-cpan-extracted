@@ -2,7 +2,7 @@
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
-# ABSTRACT: generic module for extrating information from filesystems
+# ABSTRACT: generic module for extracting information from filesystems
 
 
 package File::Information::Lock;
@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 
 sub new {
@@ -60,11 +60,11 @@ __END__
 
 =head1 NAME
 
-File::Information::Lock - generic module for extrating information from filesystems
+File::Information::Lock - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

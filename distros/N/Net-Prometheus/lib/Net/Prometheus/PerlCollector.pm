@@ -3,13 +3,13 @@
 #
 #  (C) Paul Evans, 2018-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::PerlCollector 0.13;
+package Net::Prometheus::PerlCollector 0.14;
 
 use v5.14;
 use warnings;
 
 BEGIN {
-   our $VERSION = '0.13';
+   our $VERSION = '0.14';
 }
 
 use constant HAVE_XS => defined eval {
@@ -28,6 +28,8 @@ C<Net::Prometheus::PerlCollector> - obtain statistics about the perl interpreter
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
    use Net::Prometheus;
    use Net::Prometheus::PerlCollector;
 
@@ -42,6 +44,8 @@ itself.
 =head2 Metrics
 
 The following metrics are collected:
+
+=for highlighter
 
 =over 2
 
@@ -85,10 +89,14 @@ the heap has grown very large, containing a great number of SVs.
 
 Extra detail can be obtained about the types of heap objects by setting
 
+=for highlighter language=perl
+
    $Net::Prometheus::PerlCollector::DETAIL = 1;
 
 This will be slightly more expensive to count, but will yield in addition a
 detailed breakdown by object type.
+
+=for highlighter
 
    # HELP perl_heap_svs_by_type Number of SVs classified by type
    # TYPE perl_heap_svs_by_type gauge
@@ -122,10 +130,14 @@ program, so should only be enabled under carefully-controlled conditions.
 The value of this variable can be overridden on a per-collection basis by
 passing the option
 
+=for highlighter language=perl
+
    Net::Prometheus->render( { perl_collector_detail => 1 } );  # or 2
 
 This may be more convenient for short-term traces from exporters that parse
 HTTP query parameters into collector options.
+
+=for highlighter
 
    GET .../metrics?perl_collector_detail=1
 

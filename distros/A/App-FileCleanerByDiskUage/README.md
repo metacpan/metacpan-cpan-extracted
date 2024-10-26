@@ -74,3 +74,17 @@ perl Makefile.PL
 make
 make install
 ```
+
+## FreeBSD
+
+```
+pkg install p5-JSON p5-File-Find-Rule p5-Filesys-Df p5-Net-Server p5-App-cpanminus
+cpanm  App::FileCleanerByDiskUage
+```
+
+## Debian
+
+```
+apt-get install libjson-perl libfile-find-rule-perl libfilesys-df-perl libnet-server-perl cpanminus
+cpanm  App::FileCleanerByDiskUage
+```

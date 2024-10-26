@@ -14,8 +14,10 @@ our @EXPORT_OK = qw/ helper_v1 ha_helper_cfg /;
 sub helper_v1 {
     my ($obj) = @_;
 
+    my $unlink = $obj->{rm} ? 1 : 0;
+
     # helper scripts need to be saved, so set up & prepare a filehandle
-    my $fh = File::Temp->new( SUFFIX => "." . ($obj->{suffix} || "pl"), UNLINK => 0 );
+    my $fh = File::Temp->new( SUFFIX => "." . ($obj->{suffix} || "pl"), UNLINK => $unlink );
     $obj->{wrapper_location} = $fh->filename;
     
     my $tt = Template->new();
@@ -23,7 +25,7 @@ sub helper_v1 {
     
     $tt->process( _helper_v1(), $obj, \$ttout );
 
-    return _save($fh, $ttout);
+    return _save($fh, $ttout, $obj->{rm});
 }
 
 sub ha_helper_cfg {
@@ -39,7 +41,6 @@ sub ha_helper_cfg {
 
 sub _save {
     my ($fh, $output) = @_;
-    print STDERR "Filename: " . $fh->filename . "\n";
     print $fh $output;
     return $fh;
 }
@@ -95,16 +96,14 @@ sub _ha_helper_cfg {
     my $tpl = undef;
 $tpl = <<'_HA_CFG_TPL';
 =====================================================================
-TRIGGER:
+TRIGGER: (automation)
 =====================================================================
 alias: mqtt2job [% task %]
 description: ""
 triggers:
-  - minutes: "30"
+  - seconds: "0"
     trigger: time_pattern
-    enabled: false
-  - minutes: "0"
-    trigger: time_pattern
+    enabled: true
 conditions: []
 actions:
   - action: mqtt.publish
@@ -114,7 +113,7 @@ actions:
       payload: |-
         { 
           "cmd": "[% cmd %]",
-          "args": "", 
+          "args": "[% args %]", 
           "dt": "{{ now().strftime("%Y-%m-%d %H:%M:%S") }}",
           "task": "[% task %]",
           "status": "queue"
@@ -122,7 +121,7 @@ actions:
 mode: single
 
 =====================================================================
-SENSORS:
+SENSORS: (configuration.yaml)
 =====================================================================
   sensor:
     - name: "[% task %] status"
@@ -142,7 +141,7 @@ SENSORS:
       value_template: "{{ value_json.last_line }}"
 
 =====================================================================
-CARD:
+CARD: (dashboard, uses button-card from HACS)
 =====================================================================
 type: custom:button-card
 show_state: false
@@ -182,7 +181,7 @@ styles:
     - height: auto
 
 =====================================================================
-WIDGET:
+WIDGET: (hidden dashboard)
 =====================================================================
 title: [% task %]
 path: [% task %]
@@ -216,7 +215,7 @@ App::mqtt2job - Helper module for mqtt2job
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

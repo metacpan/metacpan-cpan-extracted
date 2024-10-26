@@ -31,7 +31,12 @@ has tests => (
 my $VERS_REGEXP = qr{^vers:[a-z\\.\\-\\+][a-z0-9\\.\\-\\+]*/.+};
 
 
+# 6.2.1 Unused Definition of Product ID (*)
+
 sub TEST_6_2_1 { }
+
+
+# 6.2.2 Missing Remediation
 
 sub TEST_6_2_2 {
 
@@ -71,6 +76,9 @@ sub TEST_6_2_2 {
 
 }
 
+
+# 6.2.3 Missing Score
+
 sub TEST_6_2_3 {
 
     my $self = shift;
@@ -109,6 +117,9 @@ sub TEST_6_2_3 {
 
 }
 
+
+# 6.2.4 Build Metadata in Revision History
+
 sub TEST_6_2_4 {
 
     my $self = shift;
@@ -133,6 +144,9 @@ sub TEST_6_2_4 {
 
 }
 
+
+# 6.2.5 Older Initial Release Date than Revision History
+
 sub TEST_6_2_5 {
 
     my $self = shift;
@@ -155,6 +169,9 @@ sub TEST_6_2_5 {
 
 }
 
+
+# 6.2.6 Older Current Release Date than Revision History
+
 sub TEST_6_2_6 {
 
     my $self = shift;
@@ -176,6 +193,9 @@ sub TEST_6_2_6 {
     }
 
 }
+
+
+# 6.2.7 Missing Date in Involvements
 
 sub TEST_6_2_7 {
 
@@ -205,8 +225,18 @@ sub TEST_6_2_7 {
 
 }
 
+
+# 6.2.8 Use of MD5 as the only Hash Algorithm
+
 sub TEST_6_2_8 { shift->_TEST_weak_algo('md5') }
+
+
+# 6.2.9 Use of SHA-1 as the only Hash Algorithm
+
 sub TEST_6_2_9 { shift->_TEST_weak_algo('sha1') }
+
+
+# 6.2.10 Missing TLP label
 
 sub TEST_6_2_10 {
 
@@ -223,6 +253,9 @@ sub TEST_6_2_10 {
     }
 
 }
+
+
+# 6.2.11 Missing Canonical URL
 
 sub TEST_6_2_11 {
 
@@ -277,6 +310,9 @@ sub TEST_6_2_11 {
 
 }
 
+
+# 6.2.12 Missing Document Language
+
 sub TEST_6_2_12 {
 
     my $self = shift;
@@ -293,7 +329,13 @@ sub TEST_6_2_12 {
 
 }
 
+
+# 6.2.13 Sorting
+
 sub TEST_6_2_13 { DEBUG and shift->log->info('6.2.13 Sorting => TODO Unimplementable test') }
+
+
+# 6.2.14 Use of Private Language
 
 sub TEST_6_2_14 {
 
@@ -348,6 +390,9 @@ sub TEST_6_2_14 {
 
 }
 
+
+# 6.2.15 Use of Default Language
+
 sub TEST_6_2_15 {
 
     my $self = shift;
@@ -377,6 +422,9 @@ sub TEST_6_2_15 {
     }
 
 }
+
+
+# 6.2.16 Missing Product Identification Helper
 
 sub TEST_6_2_16 {
 
@@ -427,6 +475,9 @@ sub TEST_6_2_16 {
 
 }
 
+
+# 6.2.17 CVE in field IDs
+
 sub TEST_6_2_17 {
 
     my $self = shift;
@@ -455,6 +506,9 @@ sub TEST_6_2_17 {
 
 }
 
+
+# 6.2.18 Product Version Range without vers
+
 sub TEST_6_2_18 {
 
     my $self = shift;
@@ -464,6 +518,9 @@ sub TEST_6_2_18 {
     $self->_TEST_6_2_18_branches($self->csaf->product_tree->branches, "/product_tree/branches");
 
 }
+
+
+# 6.2.19 CVSS for Fixed Products
 
 sub TEST_6_2_19 {
 
@@ -559,7 +616,10 @@ sub TEST_6_2_19 {
 
 }
 
+
+# 6.2.20 Additional Properties
 sub TEST_6_2_20 { DEBUG and shift->log->info('6.2.20 Additional Properties => Test implemented in "CSAF::Parser"') }
+
 
 sub _TEST_6_2_18_branches {
 

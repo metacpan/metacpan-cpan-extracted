@@ -2,7 +2,7 @@
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
-# ABSTRACT: generic module for extrating information from filesystems
+# ABSTRACT: generic module for extracting information from filesystems
 
 
 package File::Information;
@@ -20,7 +20,7 @@ use File::Information::Inode;
 use File::Information::Filesystem;
 use File::Information::Tagpool;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; 1;};
 
@@ -123,6 +123,12 @@ sub lifecycles {
 sub digest_info {
     my ($self, @algos) = @_;
     my @ret;
+
+    if (scalar(@algos) == 1 && $algos[0] =~ /^v0m / && wantarray) {
+        while ($algos[-1] =~ s#^v0m (\S+) bytes [0-9]+-[0-9]*/(?:[0-9]+|\*) [0-9a-f\.]+ ##) {
+            unshift(@algos, $1);
+        }
+    }
 
     unless ($self->{hash_info}) {
         my %hashes = map {$_ => {
@@ -344,11 +350,11 @@ __END__
 
 =head1 NAME
 
-File::Information - generic module for extrating information from filesystems
+File::Information - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -516,7 +522,8 @@ Most commonly this is used to compare to when checking if a object is corrupted.
 Returns information on one or more digests. If no digest is given returns infos for all known ones.
 
 The digest can be given in the universal tag format (preferred), one of it's aliases (dissuaded),
-or a complete digest-and-value string in universal tag format (only version C<v0>).
+or a complete digest-and-value string in universal tag format (only version C<v0> or
+C<v0m> if only one digest is given and the method is called in list context).
 
 The return value is a hashref or an array of hashrefs which contain the following keys:
 

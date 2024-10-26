@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::ProcessCollector::linux 0.13;
+package Net::Prometheus::ProcessCollector::linux 0.14;
 
 use v5.14;
 use warnings;
@@ -19,6 +19,8 @@ use constant {
 C<Net::Prometheus::ProcessCollector::linux> - Process Collector for F<linux> OS
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Net::Prometheus;
    use Net::Prometheus::ProcessCollector::linux;
@@ -42,7 +44,7 @@ the one actually running the code.
 
 Note also that scraping processes owned by other users may not be possible for
 non-root users. In particular, most systems do not let non-root users see the
-L</proc/self/fd> directory of processes they don't own. In this case, the
+F</proc/self/fd> directory of processes they don't own. In this case, the
 C<process_open_fds> metric will not be returned.
 
 =cut

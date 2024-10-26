@@ -5,6 +5,7 @@ package FindBin::Parents  v0.1.0;
 use v5.40;
 use parent qw( Exporter );
 
+use Carp            qw( croak   );
 use List::Util      qw( reduce  );
 use Storable        qw( dclone  );
 
@@ -49,6 +50,9 @@ sub clear_parent_cache()
 
 sub dir_paths( $path, $assume_dir = 1 )
 {
+    $path
+    or croak 'Bogus dir_paths: false path argument.';
+
     my $dirz
     = $path2dirz{ $path . $; . $assume_dir }
     ||= do
@@ -61,7 +65,7 @@ sub dir_paths( $path, $assume_dir = 1 )
 
         # ditch the starting directory.
 
-        my @dirz    = splitdir rel2abs $dir;
+        my @dirz    = splitdir rel2abs canonpath $dir;
 
         # fix for File::Spec::VMS missing the leading empty
         # string on a split. this can be removed once File::Spec
@@ -77,11 +81,11 @@ sub dir_paths( $path, $assume_dir = 1 )
             reverse
             map
             {
-                catpath $vol => $_
+                catpath $vol => $_, ''
             }
             map
             {
-                $tmp    = canonpath catdir $tmp, $_
+                $tmp    = catdir $tmp, $_
             }
             ( '' => @dirz )
         ]

@@ -1,5 +1,10 @@
 Revision history for Net-Prometheus
 
+0.14    2024-10-25
+        [CHANGES]
+         * Added `->remove` and `->clear` methods to all metric types
+         * Use `meta` module instead of globrefs and `no strict 'refs'`
+
 0.13    2024-07-16
         [CHANGES]
          * Module style updates:

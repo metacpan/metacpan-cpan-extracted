@@ -3,12 +3,15 @@
 #
 #  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus 0.13;
+package Net::Prometheus 0.14;
 
 use v5.14;
 use warnings;
 
 use Carp;
+
+use meta 0.008;
+no warnings 'meta::experimental';
 
 use List::Util 1.29 qw( pairmap );
 
@@ -29,6 +32,8 @@ use Net::Prometheus::Types qw( MetricSamples );
 C<Net::Prometheus> - export monitoring metrics for F<prometheus>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Net::Prometheus;
 
@@ -625,16 +630,17 @@ sub export_to_IO_Async
       }, $class;
    }
 
+   my $metapkg = meta::get_this_package;
+
    foreach my $method (qw( new_gauge new_counter new_summary new_histogram )) {
-      no strict 'refs';
-      *$method = sub {
+      $metapkg->add_named_sub( $method => sub {
          my $self = shift;
          $self->{prometheus}->$method(
             namespace => $self->{namespace},
             subsystem => $self->{subsystem},
             @_,
          );
-      };
+      } );
    }
 }
 

@@ -1,5 +1,8 @@
 Revision history for App-FileCleanerByDiskUage
 
+0.4.0   2024-10-25/10:30
+        - Remove unneeded info from %file_info to reduce memory usage.
+
 0.3.0   2023-11-11/15:00
         - Add PID file to prevent multiple instances from starting up if calling via cron.
 		- convert to use Pod::Usage

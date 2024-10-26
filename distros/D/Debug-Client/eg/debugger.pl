@@ -77,44 +77,34 @@ while (1) {
 		$input = $last_step;
 	}
 
-	given ($input) {
-		when ( [ 'h', '?' ] ) {
-			help();
-		}
-		when ('s') {
-			$last_step = 's';
-			my $out = $debugger->step_in;
-			print $out;
-		}
-		when ('n') {
-			$last_step = 'n';
-			my $out = $debugger->step_over;
-			print $out;
-		}
-		when ('r') {
-			my $out = $debugger->step_out;
-			print $out;
-		}
-		when ('T') {
-			my $out = $debugger->get_stack_trace;
-			print $out;
-		}
-		when ('.') {
-			my $out = $debugger->show_line;
-			print $out;
-		}
-		when ('q') {
-			last;
-		}
-		when (qr/^c   (?:\s+(\w+))?  $/x) {
-			my $out = $debugger->run($1);
-			print $out;
-		}
-		default {
-			#my $out = $debugger->execute_code($input);
-			#print $out;
-			print "Invalid command\n";
-		}
+	if ($input eq 'h' or $input eq '?') {
+		help();
+	} elsif ($input	eq 's') {
+		$last_step = 's';
+		my $out = $debugger->step_in;
+		print $out;
+	} elsif ($input eq 'n') {
+		$last_step = 'n';
+		my $out = $debugger->step_over;
+		print $out;
+	} elsif ($input eq 'r') {
+		my $out = $debugger->step_out;
+		print $out;
+	} elsif ($input eq 'T') {
+		my $out = $debugger->get_stack_trace;
+		print $out;
+	} elsif ($input eq '.') {
+		my $out = $debugger->show_line;
+		print $out;
+	} elsif ($input eq 'q') {
+		last;
+	} elsif ($input =~ qr/^c   (?:\s+(\w+))?  $/x) {
+		my $out = $debugger->run($1);
+		print $out;
+	} else {
+		#my $out = $debugger->execute_code($input);
+		#print $out;
+		print "Invalid command\n";
 	}
 }
 

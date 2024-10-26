@@ -157,7 +157,7 @@ if ($help) {
 
 	print "\n\n";
 
-	pod2usage( -exitval => 255, -verbose => 2 );
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT );
 }
 
 my $results = App::FileCleanerByDiskUage->clean(

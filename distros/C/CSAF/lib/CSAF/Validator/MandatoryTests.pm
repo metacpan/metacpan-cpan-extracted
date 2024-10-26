@@ -42,6 +42,8 @@ my $SEMVER_REGEXP
     = qr{^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$};
 
 
+# 6.1.1 Missing Definition of Product ID
+
 sub TEST_6_1_1 {
 
     my $self = shift;
@@ -205,6 +207,9 @@ sub TEST_6_1_1 {
 
 }
 
+
+# 6.1.2 Multiple Definition of Product ID
+
 sub TEST_6_1_2 {
 
     my $self = shift;
@@ -282,6 +287,9 @@ sub TEST_6_1_2 {
 
 }
 
+
+# 6.1.3 Circular Definition of Product ID
+
 sub TEST_6_1_3 {
 
     my $self = shift;
@@ -311,6 +319,9 @@ sub TEST_6_1_3 {
     });
 
 }
+
+
+# 6.1.4 Missing Definition of Product Group ID
 
 sub TEST_6_1_4 {
 
@@ -348,6 +359,9 @@ sub TEST_6_1_4 {
 
 }
 
+
+# 6.1.5 Multiple Definition of Product Group ID
+
 sub TEST_6_1_5 {
 
     my $self = shift;
@@ -376,6 +390,9 @@ sub TEST_6_1_5 {
     });
 
 }
+
+
+# 6.1.6 Contradicting Product Status
 
 sub TEST_6_1_6 {
 
@@ -416,6 +433,9 @@ sub TEST_6_1_6 {
 
 }
 
+
+# 6.1.7 Multiple Scores with same Version per Product
+
 sub TEST_6_1_7 {
 
     my $self = shift;
@@ -449,6 +469,9 @@ sub TEST_6_1_7 {
     });
 
 }
+
+
+# 6.1.8 Invalid CVSS
 
 sub TEST_6_1_8 {
 
@@ -512,6 +535,9 @@ sub TEST_6_1_8 {
 
 }
 
+
+# 6.1.9 Invalid CVSS computation
+
 sub TEST_6_1_9 {
 
     my $self = shift;
@@ -532,15 +558,15 @@ sub TEST_6_1_9 {
 
                 my $cvss = CVSS->from_vector_string($cvss_v2->vectorString);
 
-                my @scores = (qw[
+                my @scores = qw(
                     baseScore
                     temporalScore
                     environmentalScore
-                ]);
+                );
 
                 foreach my $score (@scores) {
 
-                    if ($cvss_v2->$score && $cvss->$score ne $cvss_v2->$score) {
+                    if ($cvss_v2->$score && $cvss->$score != $cvss_v2->$score) {
                         $self->add_message(
                             category => 'mandatory',
                             path     => "/vulnerabilities/$vuln_idx/score/$score_idx/cvss_v2",
@@ -566,16 +592,32 @@ sub TEST_6_1_9 {
 
                 my @scores = (qw[
                     baseScore
-                    baseSeverity
                     temporalScore
-                    temporalSeverity
                     environmentalScore
-                    environmentalSeverity
                 ]);
+
+                my @severities = qw(
+                    baseSeverity
+                    temporalSeverity
+                    environmentalSeverity
+                );
 
                 foreach my $score (@scores) {
 
-                    if ($cvss_v3->$score && $cvss->$score ne $cvss_v3->$score) {
+                    if ($cvss_v3->$score && $cvss->$score != $cvss_v3->$score) {
+                        $self->add_message(
+                            category => 'mandatory',
+                            path     => "/vulnerabilities/$vuln_idx/score/$score_idx/cvss_v3",
+                            code     => '6.1.9',
+                            message  => 'Invalid CVSS computation'
+                        );
+                    }
+
+                }
+
+                foreach my $severity (@severities) {
+
+                    if ($cvss_v3->$severity && $cvss->$severity ne $cvss_v3->$severity) {
                         $self->add_message(
                             category => 'mandatory',
                             path     => "/vulnerabilities/$vuln_idx/score/$score_idx/cvss_v3",
@@ -591,6 +633,9 @@ sub TEST_6_1_9 {
         });
     });
 }
+
+
+# 6.1.10 Inconsistent CVSS
 
 sub TEST_6_1_10 {
 
@@ -699,6 +744,9 @@ sub TEST_6_1_10 {
 
 }
 
+
+# 6.1.11 CWE
+
 sub TEST_6_1_11 {
 
     my $self = shift;
@@ -740,6 +788,9 @@ sub TEST_6_1_11 {
 
 }
 
+
+# 6.1.12 Language
+
 sub TEST_6_1_12 {    # TODO INCOMPLETE
 
     my $self = shift;
@@ -768,6 +819,9 @@ sub TEST_6_1_12 {    # TODO INCOMPLETE
     }
 
 }
+
+
+# 6.1.13 PURL
 
 sub TEST_6_1_13 {
 
@@ -809,6 +863,9 @@ sub TEST_6_1_13 {
     });
 
 }
+
+
+# 6.1.14 Sorted Revision History
 
 sub TEST_6_1_14 {
 
@@ -865,6 +922,9 @@ sub TEST_6_1_14 {
 
 }
 
+
+# 6.1.15 Translator
+
 sub TEST_6_1_15 {
 
     my $self = shift;
@@ -881,6 +941,9 @@ sub TEST_6_1_15 {
     }
 
 }
+
+
+# 6.1.16 Latest Document Version
 
 sub TEST_6_1_16 {
 
@@ -912,6 +975,9 @@ sub TEST_6_1_16 {
 
 }
 
+
+# 6.1.17 Document Status Draft
+
 sub TEST_6_1_17 {
 
     my $self = shift;
@@ -931,6 +997,9 @@ sub TEST_6_1_17 {
     }
 
 }
+
+
+# 6.1.18 Released Revision History
 
 sub TEST_6_1_18 {
 
@@ -962,6 +1031,9 @@ sub TEST_6_1_18 {
 
 }
 
+
+# 6.1.19 Revision History Entries for Pre-release Versions
+
 sub TEST_6_1_19 {
 
     my $self = shift;
@@ -987,6 +1059,9 @@ sub TEST_6_1_19 {
 
 }
 
+
+# 6.1.20 Non-draft Document Version
+
 sub TEST_6_1_20 {
 
     my $self = shift;
@@ -1010,6 +1085,9 @@ sub TEST_6_1_20 {
 
 
 }
+
+
+# 6.1.21 Missing Item in Revision History
 
 sub TEST_6_1_21 {
 
@@ -1036,6 +1114,9 @@ sub TEST_6_1_21 {
     }
 
 }
+
+
+# 6.1.22 Multiple Definition in Revision History
 
 sub TEST_6_1_22 {
 
@@ -1064,6 +1145,9 @@ sub TEST_6_1_22 {
 
 }
 
+
+# 6.1.23 Multiple Use of Same CVE
+
 sub TEST_6_1_23 {
 
     my $self = shift;
@@ -1090,6 +1174,9 @@ sub TEST_6_1_23 {
     });
 
 }
+
+
+# 6.1.24 Multiple Definition in Involvements
 
 sub TEST_6_1_24 {
 
@@ -1124,6 +1211,9 @@ sub TEST_6_1_24 {
     });
 
 }
+
+
+# 6.1.25 Multiple Use of Same Hash Algorithm
 
 sub TEST_6_1_25 {    # TODO INCOMPLETE
 
@@ -1183,6 +1273,9 @@ sub TEST_6_1_25 {    # TODO INCOMPLETE
 
 }
 
+
+# 6.1.26 Prohibited Document Category Name
+
 sub TEST_6_1_26 {
 
     my $self = shift;
@@ -1225,6 +1318,9 @@ sub TEST_6_1_26 {
     }
 }
 
+
+# 6.1.27.1 Document Notes
+
 sub TEST_6_1_27_1 {
 
     my $self = shift;
@@ -1254,6 +1350,9 @@ sub TEST_6_1_27_1 {
 
 }
 
+
+# 6.1.27.2 Document References
+
 sub TEST_6_1_27_2 {
 
     my $self = shift;
@@ -1280,6 +1379,9 @@ sub TEST_6_1_27_2 {
 
 }
 
+
+# 6.1.27.3 Vulnerabilities
+
 sub TEST_6_1_27_3 {
 
     my $self = shift;
@@ -1297,6 +1399,9 @@ sub TEST_6_1_27_3 {
     }
 
 }
+
+
+# 6.1.27.4 Product Tree
 
 sub TEST_6_1_27_4 {
 
@@ -1317,6 +1422,9 @@ sub TEST_6_1_27_4 {
     }
 
 }
+
+
+# 6.1.27.5 Vulnerability Notes
 
 sub TEST_6_1_27_5 {
 
@@ -1341,6 +1449,9 @@ sub TEST_6_1_27_5 {
 
 }
 
+
+# 6.1.27.6 Product Status
+
 sub TEST_6_1_27_6 {
 
     my $self = shift;
@@ -1363,6 +1474,9 @@ sub TEST_6_1_27_6 {
     });
 
 }
+
+
+# 6.1.27.7 VEX Product Status
 
 sub TEST_6_1_27_7 {
 
@@ -1393,7 +1507,11 @@ sub TEST_6_1_27_7 {
 
     });
 
+
 }
+
+
+# 6.1.27.8 Vulnerability ID
 
 sub TEST_6_1_27_8 {
 
@@ -1417,6 +1535,9 @@ sub TEST_6_1_27_8 {
     });
 
 }
+
+
+# 6.1.27.9 Impact Statement
 
 sub TEST_6_1_27_9 {
 
@@ -1502,6 +1623,9 @@ sub TEST_6_1_27_9 {
 
 }
 
+
+# 6.1.27.10 Action Statement
+
 sub TEST_6_1_27_10 {
 
     my $self = shift;
@@ -1562,6 +1686,9 @@ sub TEST_6_1_27_10 {
 
 }
 
+
+# 6.1.27.11 Vulnerabilities
+
 sub TEST_6_1_27_11 {
 
     my $self = shift;
@@ -1581,6 +1708,9 @@ sub TEST_6_1_27_11 {
 
 }
 
+
+# 6.1.28 Translation
+
 sub TEST_6_1_28 {
 
     my $self = shift;
@@ -1598,6 +1728,9 @@ sub TEST_6_1_28 {
     }
 
 }
+
+
+# 6.1.29 Remediation without Product Reference
 
 sub TEST_6_1_29 {
 
@@ -1643,6 +1776,9 @@ sub TEST_6_1_29 {
 
 }
 
+
+# 6.1.30 Mixed Integer and Semantic Versioning
+
 sub TEST_6_1_30 {
 
     my $self = shift;
@@ -1687,6 +1823,9 @@ sub TEST_6_1_30 {
 
 }
 
+
+# 6.1.31 Version Range in Product Version
+
 sub TEST_6_1_31 {
 
     my $self = shift;
@@ -1696,6 +1835,9 @@ sub TEST_6_1_31 {
     $self->_TEST_6_1_31_branches($self->csaf->product_tree->branches, "/product_tree/branches");
 
 }
+
+
+# 6.1.32 Flag without Product Reference
 
 sub TEST_6_1_32 {
 
@@ -1750,6 +1892,9 @@ sub TEST_6_1_32 {
     });
 
 }
+
+
+# 6.1.33 Multiple Flags with VEX Justification Codes per Product
 
 sub TEST_6_1_33 {
 
@@ -1816,6 +1961,7 @@ sub TEST_6_1_33 {
     });
 
 }
+
 
 sub _TEST_6_1_13_branches {
 

@@ -41,6 +41,36 @@ sub HASHfromSample
    );
 }
 
+# Remove and clear
+{
+   my $summary = Net::Prometheus::Summary->new(
+      name   => "removal_test",
+      help   => "A summary for testing removal",
+      labels => [qw( x )],
+   );
+
+   $summary->observe( { x => "one" }, 1 );
+   $summary->observe( { x => "two" }, 2 );
+   $summary->observe( { x => "three" }, 3 );
+
+   is( [ map { $_->varname =~ m/_count/ ? $_->labels : () } $summary->samples ],
+      # Grr sorting
+      [ [ x => "one" ], [ x => "three" ], [ x => "two" ] ],
+      'labels before ->remove' );
+
+   $summary->remove( { x => "one" } );
+
+   is( [ map { $_->varname =~ m/_count/ ? $_->labels : () } $summary->samples ],
+      [ [ x => "three" ], [ x => "two" ] ],
+      'labels after ->remove' );
+
+   $summary->clear;
+
+   is( [ map { $_->varname =~ m/_count/ ? $_->labels : () } $summary->samples ],
+      [],
+      'labels after ->clear' );
+}
+
 # exceptions
 {
    ok( dies {

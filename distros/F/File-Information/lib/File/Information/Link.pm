@@ -2,7 +2,7 @@
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
-# ABSTRACT: generic module for extrating information from filesystems
+# ABSTRACT: generic module for extracting information from filesystems
 
 
 package File::Information::Link;
@@ -20,7 +20,7 @@ use File::Basename ();
 
 use File::Information::Inode;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my $HAVE_XML_SIMPLE = eval {require XML::Simple; 1;};
 my $HAVE_URI_FILE = eval {require URI::file; 1;};
@@ -212,11 +212,11 @@ __END__
 
 =head1 NAME
 
-File::Information::Link - generic module for extrating information from filesystems
+File::Information::Link - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

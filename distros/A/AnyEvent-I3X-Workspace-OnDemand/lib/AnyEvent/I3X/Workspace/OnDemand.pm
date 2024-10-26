@@ -1,5 +1,5 @@
 package AnyEvent::I3X::Workspace::OnDemand;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use v5.26;
 use Object::Pad;
 
@@ -27,6 +27,11 @@ field $log_all_events :param = undef;
 field $socket :param = undef;
 
 field %workspace;
+field %output;
+field %mode;
+field %window;
+field %barconfig_update;
+field %binding;
 field %tick;
 field %shutdown;
 
@@ -41,59 +46,51 @@ ADJUSTPARAMS {
 
   $debug = 1 if $log_all_events;
 
-  if (ref $args->{workspace} eq 'HASH') {
-    %workspace = %{ delete $args->{workspace} };
-  }
-  if (ref $args->{swallows} eq 'ARRAY') {
-    @swallows = @{ delete $args->{swallows} };
-  }
-  if (ref $args->{tick} eq 'HASH') {
-    %tick = %{ delete $args->{tick} };
-  }
-  if (ref $args->{shutdown} eq 'HASH') {
-    %shutdown = @{ delete $args->{shutdown} };
-  }
-  if (ref $args->{groups} eq 'ARRAY') {
-    @groups = @{ delete $args->{groups} };
-  }
+  # i3
+  %workspace = %{ delete $args->{workspace} }
+    if ref $args->{workspace} eq 'HASH';
+  %barconfig_update = %{ delete $args->{barconfig_update} }
+    if ref $args->{barconfig_update} eq 'HASH';
 
+  %tick     = %{ delete $args->{tick} }     if ref $args->{tick} eq 'HASH';
+  %shutdown = %{ delete $args->{shutdown} } if ref $args->{shutdown} eq 'HASH';
+  %output   = %{ delete $args->{output} }   if ref $args->{output} eq 'HASH';
+  %mode     = %{ delete $args->{mode} }     if ref $args->{mode} eq 'HASH';
+  %window   = %{ delete $args->{window} }   if ref $args->{window} eq 'HASH';
+  %binding  = %{ delete $args->{binding} }  if ref $args->{binding} eq 'HASH';
+
+  # us
+  @groups   = @{ delete $args->{groups} } if ref $args->{groups} eq 'ARRAY';
+  @swallows = @{ delete $args->{swallows} }
+    if ref $args->{swallows} eq 'ARRAY';
 }
 
-method log_all_events($event) {
-    return unless $log_all_events;
+method log_event($type, $event) {
 
-    my $e;
-    if ($debug) {
-        $e = Dumper $event;
-    }
-    elsif ($event->{payload}) {
-        $e = "Processing tick with payload $event->{payload}";
-    }
-    elsif ($event->{container}) {
-        $e = "Processing window with payload $event->{change}";
-    }
-    elsif ($event->{change}) {
-        $e = "Processing shutdown with payload $event->{change}";
-    }
-    else {
-        $e = "Processing event $event->{change} on $event->{current}{name}";
-    }
+  my $msg;
+  if ($type eq 'tick') {
+    $msg = "Processing tick with payload $event->{payload}";
+  }
+  elsif ($type eq 'workspace') {
+    $msg = "Processing workspace event $event->{change} on $event->{current}{name}";
+  }
+  else {
+    $msg = "Processing $type with payload $event->{change}";
+  }
 
-    $self->log($e);
-    open my $fh, '>>', $log_all_events;
-    print $fh $e;
-    print $fh $/;
-    close($fh);
+  $self->log($msg);
+
+  return unless $log_all_events;
+
+  open my $fh, '>>', $log_all_events;
+  print $fh join($/, $msg, Dumper $event, "");
+  close($fh);
 }
 
 ADJUST {
 
   $i3 = $socket ? i3($socket) : i3();
   $i3->connect->recv or die "Error connecting to i3";
-
-  if ($log_all_events) {
-      use Data::Dumper;
-  }
 
   $c = Data::Compare->new();
 
@@ -111,9 +108,7 @@ ADJUST {
       $current_workspace = $event->{current}{name};
       $name              = $current_workspace;
 
-      $self->log("Processing event $type for $name");
-
-      $self->log_all_events($event);
+      $self->log_event('workspace', $event);
 
       # It doesn't have anything, skip skip next;
       return if $type eq 'reload';
@@ -164,11 +159,9 @@ ADJUST {
       $payload = "__EMPTY__" unless length($payload);
       $event->{payload} = $payload;
 
-      $self->log("Processing tick event $payload");
-      $self->log_all_events($event);
+      $self->log_event('tick', $event);
 
       if ($payload =~ /^group:([[:word:]]+)$/) {
-
         # Skip if we have no groups
         return unless any { $_ eq $1 } @groups;
         $self->switch_to_group($1);
@@ -186,13 +179,69 @@ ADJUST {
   $self->subscribe(
     shutdown => sub {
       my $event   = shift;
+      $self->log_event('shutdown', $event);
 
       my $payload = $event->{change};
-      $self->log("Processing shutdown event $payload");
-
-      $self->log_all_events($event);
-
       if (my $sub = $shutdown{$payload}) {
+        $sub->($self, $i3, $event);
+      }
+    }
+  );
+
+  $self->subscribe(
+    barconfig_update => sub {
+      my $event   = shift;
+
+      $self->log_event('barconfig_update', $event);
+
+      # This event consists of a single serialized map reporting on options
+      # from the barconfig of the specified bar_id that were updated in i3.
+      # This event is the same as a GET_BAR_CONFIG reply for the bar with the
+      # given id.
+      warn "barconfig_update is currently not supported", $/
+        if %barconfig_update;
+    }
+  );
+
+  $self->subscribe(
+    output => sub {
+      my $event   = shift;
+      $self->log_event('output', $event);
+
+      my $payload = $event->{change};
+      if (my $sub = $output{$payload}) {
+        $sub->($self, $i3, $event);
+      }
+    }
+  );
+  $self->subscribe(
+    mode => sub {
+      my $event   = shift;
+      $self->log_event('mode', $event);
+
+      my $payload = $event->{change};
+      if (my $sub = $mode{$payload}) {
+        $sub->($self, $i3, $event);
+      }
+    }
+  );
+  $self->subscribe(
+    window => sub {
+      my $event   = shift;
+      $self->log_event('window', $event);
+
+      my $payload = $event->{change};
+      if (my $sub = $window{$payload}) {
+        $sub->($self, $i3, $event);
+      }
+    }
+  );
+  $self->subscribe(
+    binding => sub {
+      my $event   = shift;
+      $self->log_event('binding', $event);
+      my $payload = $event->{change};
+      if (my $sub = $binding{$payload}) {
         $sub->($self, $i3, $event);
       }
     }
@@ -362,10 +411,25 @@ method swallow_to_exec ($name, $node) {
     return;
   }
 
-  $self->command("exec $_")
-    for map { $_->{cmd} =~ s/^exec (?:--no-startup-id )?//r; }
-    grep    { $c->Cmp($targets[0], $_->{match}) } @swallows;
+  my @cmds;
+  foreach (@swallows) {
+      if (!exists $_->{on}) {
+          push(@cmds, $_);
+          next;
+      }
+      if (($_->{on}{workspace} // '') eq $current_workspace) {
+          push(@cmds, $_);
+          next;
+      }
+      if(($_->{on}{group} // '') eq $current_group) {
+          push(@cmds, $_);
+          next;
+      }
+  }
 
+  $self->command("exec $_")
+    for map { $_->{cmd} =~ s/^(?:exec\b\s+)//r; }
+    grep    { $c->Cmp($targets[0], $_->{match}) } @cmds;
 }
 
 method start_apps_of_layout ($name) {
@@ -399,7 +463,7 @@ AnyEvent::I3X::Workspace::OnDemand - An I3 workspace loader
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

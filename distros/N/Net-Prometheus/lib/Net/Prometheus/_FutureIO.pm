@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::_FutureIO 0.13;
+package Net::Prometheus::_FutureIO 0.14;
 
 use v5.14;
 use warnings;

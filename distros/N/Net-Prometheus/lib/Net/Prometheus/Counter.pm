@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Counter 0.13;
+package Net::Prometheus::Counter 0.14;
 
 use v5.14;
 use warnings;
@@ -20,6 +20,8 @@ __PACKAGE__->MAKE_child_class;
 C<Net::Prometheus::Counter> - a monotonically-increasing counter metric
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Net::Prometheus;
 
@@ -95,6 +97,22 @@ sub _inc_child
       croak "Cannot increment a counter by a negative value";
 
    $self->{values}{$labelkey} += $delta;
+}
+
+# remove is generated automatically
+sub _remove_child
+{
+   my $self = shift;
+   my ( $labelkey ) = @_;
+
+   delete $self->{values}{$labelkey};
+}
+
+sub clear
+{
+   my $self = shift;
+
+   undef %{ $self->{values} };
 }
 
 sub samples

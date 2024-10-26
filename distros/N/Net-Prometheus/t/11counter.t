@@ -37,4 +37,34 @@ sub HASHfromSample
    );
 }
 
+# Remove and clear
+{
+   my $counter = Net::Prometheus::Counter->new(
+      name   => "removal_test",
+      help   => "A counter for testing removal",
+      labels => [qw( x )],
+   );
+
+   $counter->inc( { x => "one" }, 1 );
+   $counter->inc( { x => "two" }, 2 );
+   $counter->inc( { x => "three" }, 3 );
+
+   is( [ map { $_->labels } $counter->samples ],
+      # Grr sorting
+      [ [ x => "one" ], [ x => "three" ], [ x => "two" ] ],
+      'labels before ->remove' );
+
+   $counter->remove( { x => "one" } );
+
+   is( [ map { $_->labels } $counter->samples ],
+      [ [ x => "three" ], [ x => "two" ] ],
+      'labels after ->remove' );
+
+   $counter->clear;
+
+   is( [ map { $_->labels } $counter->samples ],
+      [],
+      'labels after ->clear' );
+}
+
 done_testing;

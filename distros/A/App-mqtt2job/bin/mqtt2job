@@ -33,6 +33,7 @@ has 'no_unlink'     => (is => "rw", isa => "Bool" );
 has 'ha_helper'     => (is => "rw", isa => "Bool" );
 has 'task'          => (is => "rw", isa => "Str", default => "unknown_task" );
 has 'cmd'           => (is => "rw", isa => "Str", default => "unknown_cmd" );
+has 'args'          => (is => "rw", isa => "Str", default => "" );
 
 # TODO 
 #has 'max_velocity'  => (is => "rw", isa => "Int", default => 59  ); # limit triggers to ~once per minute
@@ -65,7 +66,7 @@ $SIG{USR1} = $on_exit;
 
 if ($opt->ha_helper) {
     warn( sprintf("Did not find %s in %s directory\n", $opt->cmd, $opt->job_dir) ) unless _cmd_ok($opt->cmd);
-    print ha_helper_cfg({ task => $opt->task, cmd => $opt->cmd, base_topic => $opt->base_topic });
+    print ha_helper_cfg({ task => $opt->task, cmd => $opt->cmd, args => $opt->args, base_topic => $opt->base_topic });
     $on_exit->(1);
 }
 
@@ -101,11 +102,9 @@ sub _on_message {
         }
         
         # Yee-ha!
-        my ($msg, $exit) = tee_merged {
-            system($opt->shebang, $helper_script, "&");
-        };
+        system(join(" ", $opt->shebang, $helper_script, "&"));
 
-        $msg .= ($exit == 0) ? " - ok" : " - failed";
+        $msg .=  "- running $helper_script";
     } else {
         $msg = "Unknown command requested";
     }
@@ -132,7 +131,7 @@ mqtt2job - Subscribe to an MQTT topic and trigger job execution
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

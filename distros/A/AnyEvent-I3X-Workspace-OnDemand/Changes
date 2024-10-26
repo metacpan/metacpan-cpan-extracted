@@ -1,5 +1,10 @@
 Revision history for AnyEvent-I3X-Workspace-OnDemand
 
+0.004     2024-10-25 17:14:27Z
+
+    * Start commands on a workspace or group
+    * Add (basic) support for all event types
+
 0.003     2024-04-25 17:57:03Z
 
     * Support shutdown events

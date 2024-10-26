@@ -42,6 +42,6 @@ requires:
 resources:
   bugtracker: https://github.com/giterlizzi/perl-CSAF/issues
   repository: git://github.com/giterlizzi/perl-CSAF
-version: '0.23'
+version: '0.24'
 x_purl: pkg:cpan/GDT/CSAF
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

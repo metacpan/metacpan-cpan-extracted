@@ -2,7 +2,7 @@
 # housekeeping
 ########################################################################
 
-package FindBin::libs   v4.0.2;
+package FindBin::libs   v4.0.3;
 use v5.40;
 
 use File::Basename;
@@ -63,7 +63,7 @@ my $empty   = q{};
 # directory path for it on VMS. Fix is to unshift a leading
 # '' into @dirpath where the leading entry is true.
 
-my $append_dir
+my $append_base
 = sub
 {
     my $dir             = shift;
@@ -101,7 +101,7 @@ my $find_libs
             (
                 catpath
                 (
-                    $vol => $_->$append_dir( $base ) 
+                    $vol => $_->$append_base( $base ) 
                 ) => 1
             )
         }
@@ -114,7 +114,7 @@ my $find_libs
         }
         map
         {
-            $_->$append_dir( $base )
+            $_->$append_base( $base )
         }
         @dirz;
 
@@ -125,7 +125,7 @@ my $find_libs
         {
             map
             {
-                my $sub = $_->$append_dir( $subdir );
+                my $sub = $_->$append_base( $subdir );
 
                 $subonly
                 ? $sub
@@ -274,14 +274,15 @@ sub import
 {
     &$handle_args;
 
-    # HAK ALERT: the regex does nothing for security,
-    # just dodges -T. putting this down here instead
-    # of inside find_libs allows people to use saner
-    # untainting plans via find_libs.
-
     my @libz
     = map
     {
+        # HAK ALERT: the regex does nothing for security,
+        # just dodges -T.
+        #
+        # undef happens when nothing matches and the list
+        # returned is empty. this just leaves @libz empty.
+
         defined
         ? m{ (.+) }xs
         : ()

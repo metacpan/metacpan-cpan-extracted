@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Histogram 0.13;
+package Net::Prometheus::Histogram 0.14;
 
 use v5.14;
 use warnings;
@@ -29,6 +29,8 @@ __PACKAGE__->MAKE_child_class;
 C<Net::Prometheus::Histogram> - count the distribution of numeric observations
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use Net::Prometheus;
    use Time::HiRes qw( time );
@@ -193,6 +195,24 @@ sub _observe_child
    $buckets->[scalar @$bounds]++;
 
    $self->{sums}{$labelkey} += $value;
+}
+
+# remove is generated automatically
+sub _remove_child
+{
+   my $self = shift;
+   my ( $labelkey ) = @_;
+
+   delete $self->{bucketcounts}{$labelkey};
+   delete $self->{sums}{$labelkey};
+}
+
+sub clear
+{
+   my $self = shift;
+
+   undef %{ $self->{bucketcounts} };
+   undef %{ $self->{sums} };
 }
 
 sub samples

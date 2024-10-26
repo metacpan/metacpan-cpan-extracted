@@ -71,7 +71,7 @@
          "web" : "https://github.com/giterlizzi/perl-CSAF"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_purl" : "pkg:cpan/GDT/CSAF",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -2,7 +2,7 @@
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
-# ABSTRACT: generic module for extrating information from filesystems
+# ABSTRACT: generic module for extracting information from filesystems
 
 
 package File::Information::Base;
@@ -22,7 +22,7 @@ use constant { # Taken from Data::Identifier
     WK_FINAL    => 'f418cdb9-64a7-4f15-9a18-63f7755c5b47',
 };
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 our %_digest_name_converter = ( # stolen from Data::URIID::Result
     fc('md5')   => 'md-5-128',
@@ -98,21 +98,21 @@ my %_ise_keys = map {$_ => 1} qw(ise uuid oid uri);
 my %_data_identifier_keys = map {$_ => 1} keys %_ise_keys;
 
 my %_properties = (
-    uuid        => {loader => \&_load_aggreate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag uuid(xattr_utag_ise) :self dev_disk_by_uuid tagpool_pool_uuid)], rawtype => 'uuid'},
-    oid         => {loader => \&_load_aggreate, sources => [qw(::Inode oid(xattr_utag_ise))], rawtype => 'oid'},
-    uri         => {loader => \&_load_aggreate, sources => [qw(::Inode uri(xattr_utag_ise))], rawtype => 'uri'},
-    ise         => {loader => \&_load_aggreate, sources => [qw(:self uuid oid uri ::Inode xattr_utag_ise)], rawtype => 'ise'},
+    uuid        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag uuid(xattr_utag_ise) :self dev_disk_by_uuid tagpool_pool_uuid)], rawtype => 'uuid'},
+    oid         => {loader => \&_load_aggregate, sources => [qw(::Inode oid(xattr_utag_ise))], rawtype => 'oid'},
+    uri         => {loader => \&_load_aggregate, sources => [qw(::Inode uri(xattr_utag_ise))], rawtype => 'uri'},
+    ise         => {loader => \&_load_aggregate, sources => [qw(:self uuid oid uri ::Inode xattr_utag_ise)], rawtype => 'ise'},
 
-    size        => {loader => \&_load_aggreate, sources => [qw(::Inode tagpool_file_size xattr_utag_final_file_size st_size)]},
-    title       => {loader => \&_load_aggreate, sources => [qw(::Inode tagpool_file_title        tagpool_directory_title         xattr_dublincore_title dotcomments_caption)]},
-    comment     => {loader => \&_load_aggreate, sources => [qw(::Inode tagpool_file_comment      tagpool_directory_comment       xattr_xdg_comment      dotcomments_note)]},
-    description => {loader => \&_load_aggreate, sources => [qw(::Inode tagpool_file_description  tagpool_directory_description   xattr_dublincore_description)]},
-    displayname => {loader => \&_load_aggreate, sources => [qw(:self   title link_basename_clean dev_disk_by_label dev_mapper_name dev_name)]},
-    mediatype   => {loader => \&_load_aggreate, sources => [qw(::Inode tagpool_file_mediatype xattr_utag_final_file_encoding magic_mediatype)], rawtype => 'mediatype'},
-    writemode   => {loader => \&_load_aggreate, sources => [qw(::Inode tagpool_file_write_mode xattr_utag_write_mode)], rawtype => 'ise'},
+    size        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_size xattr_utag_final_file_size st_size)]},
+    title       => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_title        tagpool_directory_title         xattr_dublincore_title dotcomments_caption)]},
+    comment     => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_comment      tagpool_directory_comment       xattr_xdg_comment      dotcomments_note)]},
+    description => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_description  tagpool_directory_description   xattr_dublincore_description)]},
+    displayname => {loader => \&_load_aggregate, sources => [qw(:self   title link_basename_clean dev_disk_by_label dev_mapper_name dev_name)]},
+    mediatype   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_mediatype xattr_utag_final_file_encoding magic_mediatype)], rawtype => 'mediatype'},
+    writemode   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_write_mode xattr_utag_write_mode)], rawtype => 'ise'},
 
-    thumbnail   => {loader => \&_load_aggreate, sources => [qw(::Link link_thumbnail ::Inode tagpool_file_thumbnail)], rawtype => 'filename'},
-    finalmode   => {loader => \&_load_aggreate, sources => [qw(::Inode tagpool_file_finalmode xattr_utag_final_mode)], rawtype => 'ise'},
+    thumbnail   => {loader => \&_load_aggregate, sources => [qw(::Link link_thumbnail ::Inode tagpool_file_thumbnail)], rawtype => 'filename'},
+    finalmode   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_finalmode xattr_utag_final_mode)], rawtype => 'ise'},
     readonly    => {loader => \&_load_readonly, rawtype => 'bool'},
 
     # TODO: displaycolour icontext charset (hash) (mediatype / encoding)
@@ -388,7 +388,7 @@ sub digest_info {
 }
 
 # ----------------
-sub _load_aggreate {
+sub _load_aggregate {
     my ($self, $key, %opts) = @_;
     my $pv = ($self->{properties_values} //= {})->{$opts{lifecycle}} //= {};
     my $info = $_properties{$key};
@@ -417,7 +417,7 @@ sub _load_aggreate {
             $pv->{$key} = {raw => $value} if defined($value) && !ref($value) && $value =~ $re;
         } else {
             #warn sprintf('%s <- %s %s %s', $key, $current, $source, $opts{lifecycle});
-            next unless defined $current->get($source, %opts, default => undef);
+            next unless defined $current->get($source, %opts, default => undef, as => 'raw');
             $pv->{$key} = eval {$current->{properties_values}{$opts{lifecycle}}{$source}};
         }
 
@@ -454,11 +454,11 @@ __END__
 
 =head1 NAME
 
-File::Information::Base - generic module for extrating information from filesystems
+File::Information::Base - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,57 @@
+Cache-Memcached-PDeque
+
+This is an implementation of a double-ended queue, with support for priorities.
+
+A double-ended queue, abbreviated to deque, is an abstract data type that
+combines the functionality of a queue and a stack, allowing elements to be added
+to, and removed from, both the front and the back.
+
+In addition, this implementation adds support for associating a priority with an
+element, making it possible to serve elements with a higher priority before
+elements with a lower priority.
+
+The storage backend for this implementation is Memcached, an in-memory key-
+value store for small chunks of arbitrary data (strings, objects).
+Cache::Memecached::Fast is used for access to Memcached.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Cache::Memcached::PDeque
+
+A man page will also be available.
+
+    man Cache::Memcached::PDeque
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Cache-Memcached-PDeque
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Cache-Memcached-PDeque
+
+    Search CPAN
+        https://metacpan.org/release/Cache-Memcached-PDeque
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2024 by Peter Haijen.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

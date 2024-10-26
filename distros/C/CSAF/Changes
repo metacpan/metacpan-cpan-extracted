@@ -1,5 +1,11 @@
 Revision history for CSAF.
 
+0.24 2024-10-26
+    - Improved default HTML template
+    - Improved "6.1.9 Invalid CVSS computation" (mandatory test)
+    - Added "6.3.9 Branch Categories" (informative test)
+    - Added "6.3.10 Usage of Product Version Range" (informative test)
+
 0.23 2024-10-18
     - Added "CVSS" module prerequisite
     - Added "csaf2html(1)" command

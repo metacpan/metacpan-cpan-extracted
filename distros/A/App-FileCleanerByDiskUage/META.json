@@ -52,6 +52,6 @@
          "web" : "https://github.com/LilithSec/App-FileCleanerByDiskUage"
       }
    },
-   "version" : "v0.3.0",
+   "version" : "v0.4.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

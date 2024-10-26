@@ -6,6 +6,9 @@ use warnings;
 use utf8;
 use version;
 
+use List::Util qw(first);
+use CSAF::Util qw(uniq);
+
 use Moo;
 extends 'CSAF::Validator::Base';
 
@@ -20,9 +23,9 @@ has tests => (
 my $VERS_REGEXP = qr{^vers:[a-z\\.\\-\\+][a-z0-9\\.\\-\\+]*/.+};
 
 
-sub TEST_6_3_1 {
+# 6.3.1 Use of CVSS v2 as the only Scoring System
 
-    # 6.3.1 Use of CVSS v2 as the only Scoring System
+sub TEST_6_3_1 {
 
     my $self = shift;
 
@@ -50,9 +53,10 @@ sub TEST_6_3_1 {
 
 }
 
-sub TEST_6_3_2 {
 
-    # 6.3.2 Use of CVSS v3.0
+# 6.3.2 Use of CVSS v3.0
+
+sub TEST_6_3_2 {
 
     my $self = shift;
 
@@ -90,9 +94,10 @@ sub TEST_6_3_2 {
 
 }
 
-sub TEST_6_3_3 {
 
-    # 6.3.3 Missing CVE
+# 6.3.3 Missing CVE
+
+sub TEST_6_3_3 {
 
     my $self = shift;
 
@@ -114,9 +119,10 @@ sub TEST_6_3_3 {
 
 }
 
-sub TEST_6_3_4 {
 
-    # 6.3.4 Missing CWE
+# 6.3.4 Missing CWE
+
+sub TEST_6_3_4 {
 
     my $self = shift;
 
@@ -138,9 +144,10 @@ sub TEST_6_3_4 {
 
 }
 
-sub TEST_6_3_5 {
 
-    # 6.3.5 Use of Short Hash
+# 6.3.5 Use of Short Hash
+
+sub TEST_6_3_5 {
 
     my $self = shift;
 
@@ -180,15 +187,51 @@ sub TEST_6_3_5 {
 
 }
 
-sub TEST_6_3_6  { }
-sub TEST_6_3_7  { }
-sub TEST_6_3_8  { }
-sub TEST_6_3_9  { }
-sub TEST_6_3_10 { }
+
+# 6.3.6 Use of non-self referencing URLs Failing to Resolve
+
+sub TEST_6_3_6 { }
+
+
+# 6.3.7 Use of self referencing URLs Failing to Resolve
+sub TEST_6_3_7 { }
+
+
+# 6.3.8 Spell check
+
+sub TEST_6_3_8 { }
+
+
+# 6.3.9 Branch Categories
+
+sub TEST_6_3_9 {
+
+    my $self = shift;
+
+    return if (not $self->csaf->product_tree);
+
+    $self->_TEST_6_3_9_branches($self->csaf->product_tree->branches, "/product_tree/branches", []);
+
+}
+
+
+# 6.3.10 Usage of Product Version Range
+
+sub TEST_6_3_10 {
+
+
+    my $self = shift;
+
+    return if (not $self->csaf->product_tree);
+
+    $self->_TEST_6_3_10_branches($self->csaf->product_tree->branches, "/product_tree/branches");
+
+}
+
+
+# 6.3.11 Usage of V as Version Indicator
 
 sub TEST_6_3_11 {
-
-    # 6.3.11 Usage of V as Version Indicator
 
     my $self = shift;
 
@@ -197,6 +240,7 @@ sub TEST_6_3_11 {
     $self->_TEST_6_3_11_branches($self->csaf->product_tree->branches, "/product_tree/branches");
 
 }
+
 
 sub _TEST_6_3_5_branches {
 
@@ -244,6 +288,72 @@ sub _TEST_6_3_5_product_identification_helper {
 
     });
 
+}
+
+sub _TEST_6_3_9_branches {
+
+    my ($self, $branches, $path, $categories) = @_;
+
+    my @sorted_categories = qw[vendor product_name product_version];
+
+    $branches->each(sub {
+
+        my ($branch, $idx) = @_;
+
+        push @{$categories}, $branch->category if $branch->category eq 'vendor';
+        push @{$categories}, $branch->category if $branch->category eq 'product_name';
+        push @{$categories}, $branch->category if $branch->category eq 'product_version';
+
+        $self->_TEST_6_3_9_branches($branch->branches, "$path/$idx/branches", $categories);
+
+        my $is_invalid = undef;
+
+        my @uniq_categories = uniq(@{$categories});
+
+        for my $category (@sorted_categories) {
+            $is_invalid = 1 if (!first { $_ eq $category } @{$categories});
+        }
+
+        for (my $i = 0; $i < @uniq_categories; $i++) {
+            $is_invalid = 1 if ($uniq_categories[$i] ne $sorted_categories[$i]);
+        }
+
+        if ($is_invalid) {
+            $self->add_message(
+                type     => 'info',
+                category => 'informative',
+                path     => "$path/category",
+                code     => '6.3.9',
+                message  => 'Branch Categories'
+            );
+        }
+
+    });
+}
+
+sub _TEST_6_3_10_branches {
+
+    my ($self, $branches, $path) = @_;
+
+    $branches->each(sub {
+
+        my ($branch, $idx) = @_;
+
+        $self->_TEST_6_3_10_branches($branch->branches, "$path/$idx/branches");
+
+        if ($branch->category eq 'product_version_range') {
+
+            $self->add_message(
+                type     => 'info',
+                category => 'informative',
+                path     => "$path/category",
+                code     => '6.3.10',
+                message  => 'Usage of Product Version Range'
+            );
+
+        }
+
+    });
 }
 
 sub _TEST_6_3_11_branches {

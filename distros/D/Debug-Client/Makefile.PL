@@ -15,7 +15,7 @@ requires 'Term::ReadLine' => '1.14';
 requires 'constant'       => '1.27';
 
 requires 'Term::ReadLine'       => '1.14';
-requires 'Term::ReadLine::Gnu'  => '1.20' if !win32;
+requires 'Term::ReadLine::Gnu'  => '1.24' if !win32;
 
 test_requires 'File::HomeDir'   => '1';
 test_requires 'File::Temp'      => '0.2304';
@@ -45,3 +45,4 @@ repository 'git://github.com/PadreIDE/Debug-Client.git';
 no_index 'directory' => qw{ eg t };
 
 WriteAll
+

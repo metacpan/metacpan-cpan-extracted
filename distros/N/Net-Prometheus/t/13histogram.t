@@ -69,6 +69,36 @@ sub HASHfromSample
    );
 }
 
+# Remove and clear
+{
+   my $histogram = Net::Prometheus::Histogram->new(
+      name   => "removal_test",
+      help   => "A histogram for testing removal",
+      labels => [qw( x )],
+   );
+
+   $histogram->observe( { x => "one" }, 1 );
+   $histogram->observe( { x => "two" }, 2 );
+   $histogram->observe( { x => "three" }, 3 );
+
+   is( [ map { $_->varname =~ m/_count/ ? $_->labels : () } $histogram->samples ],
+      # Grr sorting
+      [ [ x => "one" ], [ x => "three" ], [ x => "two" ] ],
+      'labels before ->remove' );
+
+   $histogram->remove( { x => "one" } );
+
+   is( [ map { $_->varname =~ m/_count/ ? $_->labels : () } $histogram->samples ],
+      [ [ x => "three" ], [ x => "two" ] ],
+      'labels after ->remove' );
+
+   $histogram->clear;
+
+   is( [ map { $_->varname =~ m/_count/ ? $_->labels : () } $histogram->samples ],
+      [],
+      'labels after ->clear' );
+}
+
 # exceptions
 {
    ok( dies {

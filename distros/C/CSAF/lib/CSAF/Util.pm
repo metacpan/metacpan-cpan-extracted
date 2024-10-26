@@ -21,7 +21,7 @@ our @EXPORT_OK = (qw[
     schema_cache_path resources_path tt_templates_path
     parse_datetime tracking_id_to_well_filename
     collect_product_ids file_read file_write product_in_group_exists
-    list_cves gpg_sign gpg_verify log_formatter
+    list_cves gpg_sign gpg_verify log_formatter uniq
 ]);
 
 my %LOG_LEVELS = (
@@ -53,6 +53,12 @@ sub list_cves {
 
     return wantarray ? @cves : "@cves";
 
+}
+
+# List::Util::uniq is included in the core module since Perl v5.26.0
+sub uniq {
+    my %seen;
+    grep !$seen{$_}++, @_;
 }
 
 sub parse_datetime {

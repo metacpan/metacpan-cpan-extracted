@@ -1,0 +1,56 @@
+---
+abstract: 'Actively maintained Object Relational Mapping that makes getting started Quick and has a rich feature set.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2::Require::Module: '0'
+  Test2::Tools::QuickDB: '0'
+  Test2::Tools::Subtest: '0'
+  Test2::Util: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  ok: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-QuickORM
+requires:
+  Carp: '0'
+  Class::Method::Modifiers: '0'
+  Cpanel::JSON::XS: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  DateTime::Format::SQLite: '0'
+  Hash::Util: '0'
+  IO::Select: '0'
+  Importer: '0'
+  List::Util: '0'
+  Module::Pluggable: '0'
+  POSIX: '0'
+  Role::Tiny: '0'
+  Role::Tiny::With: '0'
+  Scalar::Util: '0'
+  Scope::Guard: '0'
+  Storable: '0'
+  Sub::Util: '0'
+  Time::HiRes: '0'
+  UUID: '0'
+  base: '0'
+  constant: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/exodist/DBIx-QuickORM/issues
+  repository: https://github.com/exodist/DBIx-QuickORM/
+version: '0.000001'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
