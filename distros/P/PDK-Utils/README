@@ -1,7 +1,7 @@
 This archive contains the distribution PDK-Utils,
-version 0.001:
+version 0.003:
 
-  Utility functions for PDK
+  A flexible, nested caching utility for Perl applications
 
 This software is copyright (c) 2024 by WENWU.YAN.
 

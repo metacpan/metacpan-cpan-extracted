@@ -2,7 +2,7 @@ package DBIx::QuickORM::BuilderState;
 use strict;
 use warnings;
 
-our $VERSION = '0.000001';
+our $VERSION = '0.000002';
 
 use Carp qw/croak confess/;
 use Scalar::Util qw/blessed weaken/;

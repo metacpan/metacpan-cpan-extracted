@@ -1,0 +1,117 @@
+=encoding utf8
+
+=head1 NAME
+
+PDK::Content::Reader - A module for reading and parsing configuration content
+
+=head1 SYNOPSIS
+
+  use PDK::Content::Reader;
+
+  my $reader = PDK::Content::Reader->new(
+    id => 1,
+    name => 'device1',
+    type => 'router',
+    config => ['line1', 'line2', 'line3']
+  );
+
+  while (my $line = $reader->nextUnParsedLine) {
+    # Process the line
+    print "Parsed line: $line\n";
+  }
+
+=head1 DESCRIPTION
+
+PDK::Content::Reader is a Moose-based module designed to read and parse configuration content. It provides methods for navigating through the configuration lines, tracking parsed and unparsed lines, and managing the parsing state.
+
+This module implements the PDK::Content::Role and provides additional functionality for content reading and parsing.
+
+=head1 ATTRIBUTES
+
+=head2 config
+
+An arrayref of strings representing the configuration lines. This attribute is required and read-only.
+
+=head2 confContent
+
+A string representation of the entire configuration content. It's lazily built from the C<config> attribute.
+
+=head2 cursor
+
+An integer representing the current position in the configuration. Initialized to 0.
+
+=head2 sign
+
+A string representing the configuration signature. It's lazily built using MD5 hash of the configuration content.
+
+=head2 timestamp
+
+A string representing the timestamp of when the object was created. It's lazily built using the current date and time.
+
+=head2 lineParsedFlags
+
+An arrayref of integers representing the parse status of each line in the configuration. 0 indicates unparsed, 1 indicates parsed.
+
+=head1 METHODS
+
+=head2 goToHead
+
+Resets the cursor to the beginning of the configuration (position 0).
+
+=head2 nextLine
+
+Returns the next line in the configuration and moves the cursor forward.
+
+  my $line = $reader->nextLine;
+
+=head2 prevLine
+
+Moves the cursor backward by one position.
+
+  $reader->prevLine;
+
+=head2 nextUnParsedLine
+
+Returns the next unparsed line in the configuration and marks it as parsed.
+
+  my $unparsed_line = $reader->nextUnParsedLine;
+
+=head2 moveBack
+
+Moves the cursor backward by one position and resets the parse flag for that line.
+
+  $reader->moveBack;
+
+=head2 ignore
+
+Ignores the current line and moves to the next one.
+
+  my $next_line = $reader->ignore;
+
+=head2 getUnParsedLines
+
+Returns a string containing all unparsed lines in the configuration.
+
+  my $unparsed = $reader->getUnParsedLines;
+
+=head2 getParseFlag
+
+Returns the parse flag for the current cursor position.
+
+  my $flag = $reader->getParseFlag;
+
+=head2 setParseFlag
+
+Sets the parse flag for the current cursor position.
+
+  $reader->setParseFlag(1);
+
+=head1 AUTHOR
+
+WENWU YAN E<lt>968828@gmail.comE<gt>
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

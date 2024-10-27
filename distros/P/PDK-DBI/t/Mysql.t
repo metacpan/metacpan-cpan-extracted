@@ -7,6 +7,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Data::Printer;
+use Data::Dumper;
 use PDK::DBI::Mysql;
 
 my $db_params = {host => '127.0.0.1', port => 3306, dbname => 'eve_ng_db', user => 'root', password => 'eve-ng'};

@@ -25,7 +25,7 @@ subtest 'getFormatedDate 方法测试' => sub {
   $date = PDK::Utils::Date->new;
   my $time = 1387431015;
 
-  is($date->getFormatedDate($time), '2013-12-19 05:30:15', '使用指定时间戳格式化日期');
+  is($date->getFormatedDate($time), '2013-12-19 13:30:15', '使用指定时间戳格式化日期');
 
   my $current_formatted_date = $date->getFormatedDate();
   note("当前格式化日期: " . Dumper($current_formatted_date));

@@ -1,5 +1,6 @@
 package PDK::DBI::Role;
 
+use utf8;
 use v5.30;
 use Moose::Role;
 use Carp qw(croak);
@@ -10,6 +11,8 @@ has dsn => (is => 'ro', isa => 'Str', required => 1,);
 has user => (is => 'ro', isa => 'Str', required => 1,);
 
 has password => (is => 'ro', isa => 'Str', required => 1,);
+
+has port => (is => 'ro', isa => 'Int', required => 0,);
 
 has dbi => (is => 'ro', lazy => 1, builder => '_buildDbi',);
 
@@ -97,3 +100,5 @@ sub batchInsert {
 }
 
 1;
+
+# ABSTRACT: Moose package for database operations

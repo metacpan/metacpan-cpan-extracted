@@ -2,7 +2,7 @@ package DBIx::QuickORM;
 use strict;
 use warnings;
 
-our $VERSION = '0.000001';
+our $VERSION = '0.000002';
 
 use Carp qw/croak confess/;
 use Sub::Util qw/set_subname/;
@@ -1490,7 +1490,7 @@ B<THIS IS A VERY EARLY VERSION!>
 
 =item About 90% of the functionality from the features section is written.
 
-=item About 80% of the featrues have been listed.
+=item About 80% of the features have been listed.
 
 =item About 40% of the written code is tested.
 
@@ -1507,7 +1507,7 @@ B<The API can and will change!>
 
 =head1 DESCRIPTION
 
-An actively maintained ORM tool that is qucik and easy to start with, but
+An actively maintained ORM tool that is quick and easy to start with, but
 powerful and expandable for long term and larger projects. An alternative to
 L<DBIx::Class>, but not a drop-in replacement.
 
@@ -1515,7 +1515,7 @@ L<DBIx::Class>, but not a drop-in replacement.
 
 The primary scope of this project is to write a good ORM for perl. It is very
 easy to add scope, and try to focus on things outside this scope. I am not
-opposed to such things being written around the ORM fucntionality, afterall the
+opposed to such things being written around the ORM functionality, afterall the
 project has a lot of useful code, and knowledge of the database. But the
 primary focus must always be the ORM functionality, and it must not suffer in
 favor of functionality beyond that scope.
@@ -1560,7 +1560,7 @@ interface is unintuitive, and the internals are very opaque.
 My goal is to start with the interface, make it approachable, easy to start,
 etc. I also want the interface to be intuitive to use. I also want
 expandability. I also want to make sure I adopt the good ideas and capabilities
-from DBIx::Class. Only a fol would say DBIx::Class has nothing of value.
+from DBIx::Class. Only a fool would say DBIx::Class has nothing of value.
 
 =back
 
@@ -1643,7 +1643,7 @@ You can also turn any select into an async:
 DBIx::QuickORM calls this an 'aside'. See L<DBIx::QuickORM::Select::Aside> for
 more detail.
 
-In this case we have 2 queries executing simeltaniously.
+In this case we have 2 queries executing simultaneously.
 
     my $aside  = $orm->aside(\%where)->start;    # Runs async query on a new connection
     my $select = $orm->select(\%where);
@@ -1714,7 +1714,7 @@ the DB it will store the right type, and in perl you will get a UUID object.
 =item L<DBIx::QuickORM::Conflator::UUID>
 
 Inflates to an object of this class, deflates to whatever the database column
-type is. Object stringifies as a UUID string, and you can get botht he string
+type is. Object stringifies as a UUID string, and you can get both the string
 and binary value from it through accessors.
 
 If generating the SQL to populate the db this will tell it the column should be

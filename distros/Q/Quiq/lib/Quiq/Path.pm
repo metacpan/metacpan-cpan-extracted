@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.220';
+our $VERSION = '1.221';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -1182,6 +1182,14 @@ führt die Methode eine Tilde-Expansion durch.
 sub size {
     my $this = shift;
     my $file = $this->expandTilde(shift);
+
+    if (!-f $file) {
+        $this->throw(
+            'PATH-00099: File not found',
+            Path => $file,
+        );
+    }
+
     return -s $file;
 }
 
@@ -4217,7 +4225,7 @@ sub uid {
 
 =head1 VERSION
 
-1.220
+1.221
 
 =head1 AUTHOR
 

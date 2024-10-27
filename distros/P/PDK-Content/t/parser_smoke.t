@@ -1,11 +1,15 @@
 #!/usr/bin/env perl
 
+use utf8;
 use v5.30;
+use utf8;
 use strict;
 use warnings;
 use Test::More;
 
 use PDK::Content::Parser;
+binmode STDOUT, ':utf8';
+binmode STDERR, ':utf8';
 
 my $text;
 

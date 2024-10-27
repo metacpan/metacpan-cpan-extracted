@@ -7,7 +7,6 @@ META.yml
 Makefile.PL
 README
 README.md
-TODO
 cpanfile
 data
 dist.ini

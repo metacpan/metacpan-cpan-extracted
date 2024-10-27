@@ -4,10 +4,11 @@ BEGIN { unshift @INC, 'lib'; }
 
 use Cache::Memcached::PDeque;
 use Data::Dump qw(dd quote pp);
-use Test::More tests => 29;
+use Test::More tests => 40;
 
 my $dq = Cache::Memcached::PDeque->new( name => 'aName', max_prio => 2 );
 
+# Add and remove some elements
 ok $dq->push('a');
 ok $dq->unshift('b');
 ok $dq->push('c');
@@ -16,18 +17,41 @@ is $dq->pop(), 'c';
 is $dq->pop(), 'a';
 is $dq->shift(), 'b';
 
-ok $dq->push_with_priority(1, 'l1'); # ('l1')
-ok $dq->push_with_priority(1, 'l2'); # ('l1','l2')
-ok $dq->push_with_priority(2, 'h1'); # ('h1','l1','l2')
-ok $dq->push_with_priority(1, 'l3'); # ('h1','l1','l2','l3')
-ok $dq->push_with_priority(2, 'h2'); # ('h1','h2','l1','l2','l3')
+is $dq->size, 0;
+
+# Remove all elements
+ok $dq->push(1, 'l1'); # ('l1')
+ok $dq->push(1, 'l2'); # ('l1','l2')
+ok $dq->push(2, 'h1'); # ('h1','l1','l1')
+is $dq->size, 3;
+
+ok $dq->clear;
+is $dq->size, 0;
+
+# Make use of priorities
+ok $dq->push(1, 'l1'); # ('l1')
+ok $dq->push(2, 'h1'); # ('h1','l1')
+
+is $dq->size,    2, 'Two elements, but:';
+is $dq->size(1), 1, 'Only 1 element with priority 1';
+is $dq->size(2), 1, 'Only 1 element with priority 2';
 
 is $dq->shift(), 'h1';
-is $dq->shift(), 'h2';
 is $dq->shift(), 'l1';
-is $dq->shift(), 'l2';
-is $dq->shift(), 'l3';
 
+is $dq->size, 0;
+
+# Make use of priorities for adding and removing
+ok $dq->push(1, 'l1'); # ('l1')
+ok $dq->push(2, 'h1'); # ('h1')
+
+is $dq->shift(1), 'l1';
+is $dq->shift(1), undef, 'undef'; # No elements with priority 1
+is $dq->shift(2), 'h1';
+
+is $dq->size, 0;
+
+# Complex structures are supported
 my @list = ( 1, 'a', 2, 'b', 3, 'c' );
 ok $dq->push(\@list);
 my $href = $dq->pop;

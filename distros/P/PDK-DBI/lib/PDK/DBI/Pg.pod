@@ -22,67 +22,67 @@ PDK::DBI::Pg - Moose-based wrapper for PostgreSQL database operations using DBIx
 
 =head1 DESCRIPTION
 
-PDK::DBI::Pg 是一个基于 Moose 的模块，为 PostgreSQL 数据库操作提供高级接口。它使用 DBIx::Custom 处理底层数据库连接和查询，并实现事务管理和连接池。
+PDK::DBI::Pg is a Moose-based module that provides a high-level interface for PostgreSQL database operations. It uses DBIx::Custom to handle the underlying database connections and queries, and implements transaction management and connection pooling.
 
 =head1 ATTRIBUTES
 
 =head2 option
 
-只读的 HashRef，用于存储数据库连接选项。
+Read-only HashRef for storing database connection options.
 
 =head1 METHODS
 
 =head2 new(%params)
 
-构造函数，用于创建新的 PDK::DBI::Pg 对象。接受以下参数：
+Constructor for creating a new PDK::DBI::Pg object. Accepts the following parameters:
 
 =over 4
 
-=item * host - 数据库主机
+=item * host - Database host
 
-=item * port - 数据库端口
+=item * port - Database port
 
-=item * dbname - 数据库名称
+=item * dbname - Database name
 
-=item * user - 数据库用户名
+=item * user - Database username
 
-=item * password - 数据库密码
+=item * password - Database password
 
-=item * dsn - 数据源名称（可选，如果未提供则自动生成）
+=item * dsn - Data Source Name (optional; automatically generated if not provided)
 
-=item * option - 附加数据库连接选项的 HashRef
+=item * option - HashRef for additional database connection options
 
 =back
 
 =head2 clone()
 
-创建当前对象的新实例，复制连接信息（dsn、用户、密码和选项）。
+Creates a new instance of the current object, copying connection information (dsn, user, password, and options).
 
-返回值：新的 PDK::DBI::Pg 对象。
+Returns: A new PDK::DBI::Pg object.
 
 =head2 batchExecute($params, $sql)
 
-执行批量 SQL 操作。
+Executes a batch SQL operation.
 
 =over 4
 
-=item * $params - SQL 查询参数的 ArrayRef
+=item * $params - ArrayRef of SQL query parameters
 
-=item * $sql - SQL 查询字符串
+=item * $sql - SQL query string
 
 =back
 
 =head2 disconnect()
 
-关闭数据库连接。
+Closes the database connection.
 
 =head2 reconnect()
 
-断开并重新建立数据库连接。
+Disconnects and re-establishes the database connection.
 
 =head1 INHERITED METHODS
 
-以下方法从 DBIx::Custom 继承，可以直接在 PDK::DBI::Pg 对象上调用：
+The following methods are inherited from DBIx::Custom and can be called directly on PDK::DBI::Pg objects:
 
 =over 4
 
@@ -102,11 +102,11 @@ PDK::DBI::Pg 是一个基于 Moose 的模块，为 PostgreSQL 数据库操作提
 
 =head1 TRANSACTION HANDLING
 
-所有数据库操作（execute、delete、update、insert、batchExecute）都自动包装在事务中。如果操作过程中发生错误，事务将回滚。
+All database operations (execute, delete, update, insert, batchExecute) are automatically wrapped in transactions. If an error occurs during the operation, the transaction will roll back.
 
 =head1 EXAMPLES
 
-=head2 连接数据库
+=head2 Connecting to the database
 
   my $db = PDK::DBI::Pg->new(
     host     => 'localhost',
@@ -116,27 +116,27 @@ PDK::DBI::Pg 是一个基于 Moose 的模块，为 PostgreSQL 数据库操作提
     password => 'password'
   );
 
-=head2 执行 SELECT 查询
+=head2 Executing a SELECT query
 
   my $results = $db->execute("SELECT * FROM users WHERE status = ?", ['active'])->all;
 
-=head2 插入数据
+=head2 Inserting data
 
-  $db->insert('users', {name => '张三', email => 'zhangsan@example.com'});
+  $db->insert('users', {name => 'John Doe', email => 'john@example.com'});
 
-=head2 更新数据
+=head2 Updating data
 
   $db->update('users', {status => 'inactive'}, {id => 1});
 
-=head2 删除数据
+=head2 Deleting data
 
   $db->delete('users', {id => 1});
 
-=head2 批量执行
+=head2 Batch execution
 
   my $params = [
-    ['张三', 'zhangsan@example.com'],
-    ['李四', 'lisi@example.com']
+    ['John Doe', 'john@example.com'],
+    ['Jane Smith', 'jane@example.com']
   ];
   $db->batchExecute($params, "INSERT INTO users (name, email) VALUES (?, ?)");
 

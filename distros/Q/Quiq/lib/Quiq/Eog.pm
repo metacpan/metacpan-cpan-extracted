@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.220';
+our $VERSION = '1.221';
 
 use Quiq::Trash;
 use Quiq::Shell;
@@ -217,6 +217,11 @@ Zielverzeichnis.
 
 =over 4
 
+=item -addExtension => $ext
+
+Füge am Ende der Verarbeitung die Endung $ext zum Namen des
+Quellverzeichnisses $srcDir I<nach Rückfrage> hinzu.
+
 =item -nameToNumber => [$width,$step]
 
 Wandele den Basisnamen der Bilddatei im Zielverzeichnis in eine Nummer.
@@ -241,6 +246,10 @@ einem Quellverzeichnis, nicht mit mehreren Verzeichnissen/Dateinamen.
 
 Ist der Trash bei Aufruf der Methode nicht leer, wird gefragt, ob
 die Dateien im Trash vorab gelöscht werden sollen.
+
+=head4 Example
+
+  perl -MQuiq::Eog -E 'Quiq::Eog->transferImages("2024-10-16","ok",-addExtension=>"bak")'
 
 =cut
 
@@ -267,9 +276,11 @@ sub transferImages {
 
     # Optionen
 
+    my $addExtension = undef;
     my $nameToNumber = undef;
 
     $class->parameters(0,0,\@_,
+        -addExtension => \$addExtension,
         -nameToNumber => \$nameToNumber,
     );
 
@@ -315,6 +326,17 @@ sub transferImages {
         }
     }
 
+    if (my $ext = $addExtension) {
+        my $answ = Quiq::Terminal->askUser(
+            "Add Extension .$ext?",
+            -values => 'y/n',
+            -default => 'y',
+        );
+        if ($answ eq 'y') {
+            $p->rename($srcDir,"$srcDir.$ext");
+        }
+    }
+
     return;
 }
 
@@ -322,7 +344,7 @@ sub transferImages {
 
 =head1 VERSION
 
-1.220
+1.221
 
 =head1 AUTHOR
 

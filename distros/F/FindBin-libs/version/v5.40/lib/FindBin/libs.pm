@@ -2,7 +2,7 @@
 # housekeeping
 ########################################################################
 
-package FindBin::libs   v4.0.3;
+package FindBin::libs   v4.0.4;
 use v5.40;
 
 use File::Basename;
@@ -63,15 +63,17 @@ my $empty   = q{};
 # directory path for it on VMS. Fix is to unshift a leading
 # '' into @dirpath where the leading entry is true.
 
-my $append_base
-= sub
+my $append_subdir
+= sub( $path, @subz )
 {
-    my $dir             = shift;
-    my ( $vol, $dirs )  = splitpath $dir, 1;
-    my $subpath         = catdir $dirs, @_;
-    my $path            = catpath $vol, $subpath;
+    my ( $vol, $dir )   = splitpath $path, 1;
 
-    $path
+    catpath
+    (
+        $vol
+      , catdir( $dir => @subz )
+      , ''
+    )
 };
 
 my $find_libs
@@ -99,10 +101,7 @@ my $find_libs
         = map
         {
             (
-                catpath
-                (
-                    $vol => $_->$append_base( $base ) 
-                ) => 1
+                catpath( $vol => $_, '' ) => 1
             )
         }
         $ignorz->@*;
@@ -114,7 +113,7 @@ my $find_libs
         }
         map
         {
-            $_->$append_base( $base )
+            $_->$append_subdir( $base )
         }
         @dirz;
 
@@ -125,7 +124,7 @@ my $find_libs
         {
             map
             {
-                my $sub = $_->$append_base( $subdir );
+                my $sub = $_->$append_subdir( $subdir );
 
                 $subonly
                 ? $sub

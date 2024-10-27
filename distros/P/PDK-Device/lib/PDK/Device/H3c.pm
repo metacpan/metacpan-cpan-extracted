@@ -1,17 +1,18 @@
 package PDK::Device::H3c;
 
+use utf8;
 use v5.30;
 use Moose;
 use Expect qw(exp_continue);
 use Carp   qw(croak);
 use namespace::autoclean;
 
-with 'PDK::Device::Base';
+with 'PDK::Device::Role';
 
-has prompt => (is => 'ro', required => 1, default => '^\s*(\x00)?[<\[].*?[>\]]\s*$',);
+has prompt => (is => 'ro', required => 1, default => '^\s*(\x00)?[<\[].*?[>\]]\s*$', );
 
 sub errCodes {
-  my $self = shift;
+  shift;
 
   return [
     qr/(Ambiguous|Incomplete|not recognized|Unrecognized)/i,
@@ -88,7 +89,7 @@ sub waitfor {
     ],
     [
       timeout => sub {
-        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ],
   ];
@@ -108,23 +109,23 @@ sub waitfor {
 }
 
 sub runCommands {
-  my ($self, $commands) = @_;
+  my ($self, @commands) = @_;
 
-  croak "执行[runCommands]，必须提供一组待下发脚本" unless ref $commands eq 'ARRAY';
+  my @cmds = @commands == 1 && ref $commands[0] eq 'ARRAY' ? @{$commands[0]} : @commands;
 
   $self->{mode} = 'deployCommands';
 
-  unshift @$commands, 'system-view' if $commands->[0] !~ /^sy/i;
+  unshift @cmds, 'system-view' if $cmds[0] !~ /^sy/i;
 
-  push @$commands, 'save force' unless $commands->[-1] =~ /^(sa|write)/i;
+  push @cmds, 'save force' unless $cmds[-1] =~ /^(sa|write)/i;
 
-  $self->execCommands($commands);
+  $self->execCommands(@cmds);
 }
 
 sub getConfig {
   my $self = shift;
 
-  my $commands = ["screen-length disable", "dis current-configuration", "save force"];
+  my $commands = ["screen-length disable", "dis current-configuration", "save force" ];
 
   my $config = $self->execCommands($commands);
 
@@ -156,7 +157,7 @@ sub ftpConfig {
   my $host    = $self->{host};
   my $command = "put startup.cfg $self->{month}/$self->{date}/";
 
-  $command .= $hostname ? $hostname . '_' . $host . '.txt' : $host . '.txt';
+  $command .= $hostname ? "$hostname\_$host.txt'" : "$host.txt";
 
   my $exp    = $self->{exp};
   my $result = $exp ? ($exp->match() || '') : '';
@@ -164,7 +165,7 @@ sub ftpConfig {
   $self->dump("正在连接 FTP 服务器");
   $self->send("ftp $server\n");
   my @ret = $exp->expect(
-    15,
+    30,
     [
       qr/User \(/mi => sub {
         $result .= $exp->before() . $exp->match();
@@ -180,20 +181,19 @@ sub ftpConfig {
     ],
     [
       eof => sub {
-        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
+        croak("[ftpConfig/登录FTP服务器] 与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        croak("[ftpConfig/登录FTP服务器] 与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ],
   );
-
   croak($ret[3]) if defined $ret[1];
 
   @ret = $exp->expect(
-    10,
+    30,
     [
       qr/(ftp: Login failed.|Username)/i => sub {
         croak("FTP 会话丢失: username or password is wrong!");
@@ -207,16 +207,15 @@ sub ftpConfig {
     ],
     [
       eof => sub {
-        croak("执行[ftpConfig/检查是否成功登录FTP]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：" . $exp->before());
+        croak("[ftpConfig/检查是否成功登录FTP] 与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[ftpConfig/检查是否成功登录FTP]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        croak("[ftpConfig/检查是否成功登录FTP] 与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ],
   );
-
   croak($ret[3]) if defined $ret[1];
 
   $self->dump("正在执行FTP备份任务");
@@ -236,19 +235,18 @@ sub ftpConfig {
     ],
     [
       eof => sub {
-        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
+        croak("[ftpConfig/检查备份任务是否成功] 与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        croak("[ftpConfig/检查备份任务是否成功] 与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ],
   );
-
   croak($ret[3]) if defined $ret[1];
-  $self->send("quit\n");
 
+  $self->send("quit\n");
   return {success => 1, config => $result};
 }
 

@@ -33,7 +33,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.220';
+our $VERSION = '1.221';
 
 use Quiq::Path;
 use Fcntl ();
@@ -182,7 +182,7 @@ sub close {
 
 =head1 VERSION
 
-1.220
+1.221
 
 =head1 AUTHOR
 

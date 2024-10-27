@@ -1,5 +1,6 @@
-package PDK::Device::Base;
+package PDK::Device::Role;
 
+use utf8;
 use v5.30;
 use Moose::Role;
 use Carp       qw(croak);
@@ -36,6 +37,7 @@ for my $attr (qw(username password enPassword passphrase)) {
 
 has timeout => (
   is      => 'ro',
+  isa     => 'Int',
   default => sub {
     my $value = $ENV{PDK_DEVICE_TIMEOUT};
     PDK::Device::Concern::Dumper::_debug_init("从环境变量中加载并设置 timeout：($value)") if defined $value;
@@ -45,6 +47,7 @@ has timeout => (
 
 has catchError => (
   is      => 'ro',
+  isa     => 'Int',
   default => sub {
     my $value = $ENV{PDK_DEVICE_CATCH_ERROR};
     PDK::Device::Concern::Dumper::_debug_init("从环境变量中加载并设置 catchError：($value)") if defined $value;
@@ -58,7 +61,7 @@ sub login {
   my $self = shift;
 
   if ($self->{status} == 1) {
-    $self->dump("已经登录设备 $self->{host}，无需再次登录");
+    $self->dump("已成功登录设备 $self->{host} (当前登录用户 $self->{username})，无需再次登录");
     return {success => 1};
   }
 
@@ -109,7 +112,7 @@ sub login {
     }
   }
 
-  $self->dump("成功登录网络设备 $self->{host}");
+  $self->dump("成功登录网络设备 $self->{host}，当前登录用户 $self->{username}");
   return {success => 1};
 }
 
@@ -133,11 +136,10 @@ sub connect {
 
   $self->{exp} = $exp;
 
-  $self->_debug($debug) if !!$debug;
+  $self->_debug($debug);
 
   my $command = $self->_spawn_command($args);
-
-  $exp->spawn($command) or die "执行[connect/启动脚本阶段]，Can't spawn $command: $!";
+  $exp->spawn($command) or croak "执行[connect/启动脚本阶段]，Can't spawn $command: $!";
   $self->dump("正在启动脚本执行：$command");
 
   my @ret = $exp->expect(
@@ -180,11 +182,10 @@ sub connect {
     [
       timeout => sub {
         $self->{status} = -1;
-        croak("执行[connect/尝试登录设备阶段]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        croak("执行[connect/尝试登录设备阶段]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ]
   );
-
   croak($ret[3]) if defined $ret[1];
 
   @ret = $exp->expect(
@@ -209,11 +210,10 @@ sub connect {
     [
       timeout => sub {
         $self->{status} = -1;
-        croak("执行[connect/验证登录状态]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        croak("执行[connect/验证登录状态]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ]
   );
-
   croak($ret[3]) if defined $ret[1];
 
   if ($enPrompt && $exp->match() =~ /$enPrompt/mi) {
@@ -275,12 +275,14 @@ sub enable {
     ],
     [
       eof => sub {
+        $self->{enabled} = -1;
         croak("执行[enable/尝试切换特权模式]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[enable/尝试切换特权模式]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        $self->{enabled} = -1;
+        croak("执行[enable/尝试切换特权模式]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ],
   );
@@ -313,7 +315,7 @@ sub enable {
     ],
     [
       timeout => sub {
-        croak("执行[enable/检查是否成功切换特权模式]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        croak("执行[enable/检查是否成功切换特权模式]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ],
   );
@@ -325,7 +327,9 @@ sub enable {
 }
 
 sub execCommands {
-  my ($self, $commands) = @_;
+  my ($self, @commands) = @_;
+
+  my @cmds = @commands == 1 && ref $commands[0] eq 'ARRAY' ? @{$commands[0]} : @commands;
 
   if (not defined $self->{exp} and $self->{status} == 0) {
     $self->dump("执行[execCommands/未登录设备]，尝试自动登录设备中");
@@ -336,7 +340,7 @@ sub execCommands {
       if (my $exp = $self->{exp}) {
         $snapshot .= $exp->before;
       }
-      return {success => 0, failCommand => join(", ", @{$commands}), snapshot => $snapshot, reason => $login->{reason}};
+      return {success => 0, failCommand => join(", ", @cmds), snapshot => $snapshot, reason => $login->{reason}};
     }
   }
   elsif ($self->{exp} and $self->{status} == -1) {
@@ -346,18 +350,19 @@ sub execCommands {
     if ($exp = $self->{exp}) {
       $snapshot .= $exp->before;
     }
-    my $reason = "执行[execCommands/自动登录设备]，尝试（非首次）登录设备失败。";
-    return {success => 0, failCommand => join(", ", @{$commands}), snapshot => $snapshot, reason => $reason};
+    my $reason = "执行[execCommands/自动登录设备]，尝试（非首次）登录设备失败";
+    return {success => 0, failCommand => join(", ", @cmds), snapshot => $snapshot, reason => $reason};
   }
 
   my $errors = $self->errCodes();
   my $result
     = $self->{exp} ? join('', grep defined $self->{exp}->before, $self->{exp}->match, $self->{exp}->after) : '';
+
   $result =~ s/\x0D//g;
   $result =~ s/\x00//g;
 
   $self->dump("执行[execCommands/通过前置检查]，正式进入配置下发阶段");
-  for my $cmd (@{$commands}) {
+  for my $cmd (@cmds) {
     next if $cmd =~ /^\s*$/;
     next if $cmd =~ /^[#!;]/;
 
@@ -422,7 +427,7 @@ sub _spawn_command {
 sub _debug {
   my ($self, $level) = @_;
 
-  $level //= 1;
+  $level //= 0;
   return if $level == 0 || $level == 1;
 
   $level = 3 if $level > 3;
@@ -452,3 +457,6 @@ sub BUILD {
 }
 
 1;
+
+# ABSTRACT: A Moose role for managing device connections and configurations using Expect.
+

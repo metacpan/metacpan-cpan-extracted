@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-PDK::Utils::Ip - IP地址和掩码处理工具类
+PDK::Utils::Ip - Utility class for IP address and mask handling
 
 =head1 VERSION
 
-版本 1.0
+Version 1.0
 
 =head1 SYNOPSIS
 
@@ -16,206 +16,206 @@ PDK::Utils::Ip - IP地址和掩码处理工具类
 
     my $ip_utils = PDK::Utils::Ip->new();
 
-    # 从IP范围获取整数范围
+    # Get integer range from IP range
     my ($min, $max) = $ip_utils->getRangeFromIpRange('192.168.1.1', '192.168.1.10');
 
-    # 从IP和掩码获取范围
+    # Get range from IP and mask
     my $set = $ip_utils->getRangeFromIpMask('192.168.1.1', 24);
 
-    # 获取网络IP
+    # Get network IP
     my $net_ip = $ip_utils->getNetIpFromIpMask('192.168.1.1', 24);
 
 =head1 METHODS
 
 =head2 getRangeFromIpRange($ipMin, $ipMax)
 
-从IP范围获取整数范围。
+Get integer range from an IP range.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<$ipMin> - 最小IP地址
+=item * C<$ipMin> - Minimum IP address
 
-=item * C<$ipMax> - 最大IP地址
+=item * C<$ipMax> - Maximum IP address
 
 =back
 
-返回值:
+Returns:
 
-标量上下文：C<PDK::Utils::Set>对象
+Scalar context: C<PDK::Utils::Set> object
 
-列表上下文：(最小值, 最大值)
+List context: (minimum, maximum)
 
 =head2 getRangeFromIpMask($ip, $mask)
 
-从IP和掩码获取范围。
+Get range from IP and mask.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<$ip> - IP地址或IP范围
+=item * C<$ip> - IP address or IP range
 
-=item * C<$mask> - 掩码（可选，默认为32）
+=item * C<$mask> - Mask (optional, default is 32)
 
 =back
 
-返回值:
+Returns:
 
-标量上下文：C<PDK::Utils::Set>对象
+Scalar context: C<PDK::Utils::Set> object
 
-列表上下文：(最小值, 最大值)
+List context: (minimum, maximum)
 
 =head2 getNetIpFromIpMask($ip, $mask)
 
-从IP和掩码获取网络IP。
+Get network IP from IP and mask.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<$ip> - IP地址
+=item * C<$ip> - IP address
 
-=item * C<$mask> - 掩码（可选，默认为32）
+=item * C<$mask> - Mask (optional, default is 32)
 
 =back
 
-返回值:
+Returns:
 
-网络IP地址
+Network IP address
 
 =head2 changeIntToIp($num)
 
-将整数转换为IP地址。
+Convert an integer to an IP address.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<$num> - 整数形式的IP
+=item * C<$num> - Integer form of IP
 
 =back
 
-返回值:
+Returns:
 
-点分十进制形式的IP地址
+Dotted-decimal form of IP address
 
 =head2 changeIpToInt($ip)
 
-将IP地址转换为整数。
+Convert an IP address to an integer.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<$ip> - 点分十进制形式的IP地址
+=item * C<$ip> - Dotted-decimal form of IP address
 
 =back
 
-返回值:
+Returns:
 
-整数形式的IP
+Integer form of IP
 
-异常:
+Exception:
 
-如果IP格式非法，抛出异常。
+Throws an exception if the IP format is invalid.
 
 =head2 changeMaskToNumForm($mask)
 
-将掩码转换为数字形式。
+Convert a mask to numeric form.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<$mask> - 掩码（可以是点分十进制或数字形式）
+=item * C<$mask> - Mask (can be in dotted-decimal or numeric form)
 
 =back
 
-返回值:
+Returns:
 
-数字形式的掩码（0-32）
+Numeric form of mask (0-32)
 
-异常:
+Exception:
 
-如果掩码格式非法或值超出范围，抛出异常。
+Throws an exception if the mask format is invalid or out of range.
 
 =head2 changeWildcardToMaskForm($wildcard)
 
-将反掩码转换为掩码形式。
+Convert a wildcard mask to standard mask form.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<$wildcard> - 反掩码
+=item * C<$wildcard> - Wildcard mask
 
 =back
 
-返回值:
+Returns:
 
-掩码形式，如果转换失败则返回C<undef>。
+Mask form, or C<undef> if conversion fails.
 
 =head2 changeMaskToIpForm($mask)
 
-将数字形式的掩码转换为IP形式。
+Convert a numeric mask to IP form.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<$mask> - 掩码（数字形式或IP形式）
+=item * C<$mask> - Mask (numeric or IP form)
 
 =back
 
-返回值:
+Returns:
 
-IP形式的掩码
+IP form of the mask
 
-异常:
+Exception:
 
-如果掩码格式非法或值超出范围，抛出异常。
+Throws an exception if the mask format is invalid or out of range.
 
 =head2 getIpMaskFromRange($min, $max)
 
-从IP范围获取IP/掩码表示。
+Get IP/mask representation from IP range.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<$min> - 最小IP（整数形式）
+=item * C<$min> - Minimum IP (integer form)
 
-=item * C<$max> - 最大IP（整数形式）
+=item * C<$max> - Maximum IP (integer form)
 
 =back
 
-返回值:
+Returns:
 
-IP/掩码表示或IP范围
+IP/mask representation or IP range
 
-异常:
+Exception:
 
-如果C<$max>未定义，抛出异常。
+Throws an exception if C<$max> is undefined.
 
 =head2 getRangeFromService($service)
 
-从服务描述获取范围。
+Get range from service description.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<$service> - 服务描述（格式：协议/端口）
+=item * C<$service> - Service description (format: protocol/port)
 
 =back
 
-返回值:
+Returns:
 
-标量上下文：C<PDK::Utils::Set>对象
+Scalar context: C<PDK::Utils::Set> object
 
-列表上下文：(最小值, 最大值)
+List context: (minimum, maximum)
 
 =head1 AUTHOR
 

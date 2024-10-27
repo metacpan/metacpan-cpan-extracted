@@ -1,7 +1,7 @@
 This archive contains the distribution PDK-DBI,
-version 0.001:
+version 0.003:
 
-  PDK::DBI- A Moose-based wrapper for MySQL|Postgresql database operations using DBIx::Custom
+  Moose package for database operations
 
 This software is copyright (c) 2024 by WENWU.YAN.
 

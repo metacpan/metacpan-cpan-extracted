@@ -1,7 +1,7 @@
 This archive contains the distribution PDK-Device,
-version 0.013:
+version 0.015:
 
-  Interacts with network devices, managing connections, commands, and configuration backups.
+  A Moose role for managing device connections and configurations using Expect.
 
 This software is copyright (c) 2024 by WENWU.YAN.
 

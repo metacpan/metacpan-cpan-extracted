@@ -26,12 +26,13 @@ my %WriteMakefileArgs = (
     "Moose::Role" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +50,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

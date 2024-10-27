@@ -22,6 +22,7 @@ if($ENV{AUTHOR_TESTING}) {
 
 my $test_requires = {
 	'Test::Deep' => 0,
+	'Test::DescribeMe' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
@@ -47,6 +48,15 @@ if($online_tests) {
 	unlink('t/online.enabled');
 }
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
     NAME		=> 'Geo::Coder::List',
     AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
@@ -60,11 +70,11 @@ WriteMakefile(
     TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
 	'Carp' => 0,
-	'LWP::Protocol::https' => 0,
-	'Time::HiRes' => 0,
 	'HTML::Entities' => 0,
-    },
-    dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	'LWP::Protocol::https' => 0,
+	'Scalar::Util' => 0,
+	'Time::HiRes' => 0
+    }, dist => $dist,
     clean		=> { FILES => 'Geo::Coder::List-*' },
     META_MERGE		=> {
 	'meta-spec' => { version => 2 },
@@ -84,15 +94,13 @@ WriteMakefile(
 
 sub are_online
 {
-	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'TRAVIS_PERL_VERSION'});
-	return 0 if(!-t STDIN);
+	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'CIRCLECI'} || $ENV{'TRAVIS_PERL_VERSION'} || $ENV{'AUTOMATED_TESTING'} || $ENV{'NONINTERACTIVE_TESTING'} || (!-t STDIN));
 
-	my $s = IO::Socket::INET->new(
+	if(my $s = IO::Socket::INET->new(
 		PeerAddr => 'openstreetmap.org:443',
 		Timeout => 10
-	);
-	if($s) {
-		if($ENV{'PERL_MM_USE_DEFAULT'} || $ENV{'AUTOMATED_TESTING'}) {
+	))  {
+		if($ENV{'PERL_MM_USE_DEFAULT'}) {
 			close($s);
 			return 0;
 		}

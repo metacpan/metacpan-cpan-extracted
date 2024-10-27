@@ -7,7 +7,7 @@ use 5.030000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Interacts with network devices, managing connections, commands, and configuration backups.",
+  "ABSTRACT" => "A Moose role for managing device connections and configurations using Expect.",
   "AUTHOR" => "WENWU.YAN <968828\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -29,9 +29,10 @@ my %WriteMakefileArgs = (
     "Thread::Queue" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => ""
   }
@@ -51,6 +52,7 @@ my %FallbackPrereqs = (
   "Thread::Queue" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

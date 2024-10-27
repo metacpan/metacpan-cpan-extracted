@@ -187,10 +187,10 @@ use Getopt::Long;
 use File::Slurp;
 use Sagan::Monitoring;
 use MIME::Base64;
-use Gzip::Faster;
+use IO::Compress::Gzip qw(gzip $GzipError);
 
 sub version {
-	print "sagan_stat_check v. 0.2.0\n";
+	print "sagan_stat_check v. 0.3.0\n";
 }
 
 sub help {
@@ -346,18 +346,14 @@ if ($version) {
 if ($print_cache) {
 	my $cache = read_file('/var/cache/sagan_monitoring.json');
 
-	if ($compress) {
-		my $compressed = encode_base64( gzip($cache) );
-		$compressed =~ s/\n//g;
-		$compressed = $compressed . "\n";
+	# compress and write to the cache file for it
+	my $compressed_string;
+	gzip \$cache => \$compressed_string;
+	my $compressed = encode_base64($compressed_string);
+	$compressed =~ s/\n//g;
+	$compressed = $compressed . "\n";
+	print $compressed;
 
-		if ( length($compressed) < length($cache) ) {
-			print $compressed;
-			exit;
-		}
-	}
-
-	print $cache;
 	exit;
 }
 

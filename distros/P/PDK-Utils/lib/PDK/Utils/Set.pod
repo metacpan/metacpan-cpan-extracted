@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-PDK::Utils::Set - 处理数值范围集合的模块
+PDK::Utils::Set - A module for handling sets of numeric ranges
 
 =head1 VERSION
 
-版本 1.0
+Version 1.0
 
 =head1 SYNOPSIS
 
@@ -16,90 +16,90 @@ PDK::Utils::Set - 处理数值范围集合的模块
 
     my $set = PDK::Utils::Set->new(mins => [1, 5], maxs => [3, 7]);
 
-    # 添加范围到集合
+    # Add a range to the set
     $set->addToSet(8, 10);
 
-    # 合并另一个集合
+    # Merge another set
     my $set2 = PDK::Utils::Set->new(mins => [6], maxs => [9]);
     $set->mergeToSet($set2);
 
-    # 获取集合的长度
+    # Get the length of the set
     my $length = $set->length;
 
-    # 输出集合内容
+    # Output the contents of the set
     $set->dump;
 
 =head1 ATTRIBUTES
 
 =head2 mins
 
-类型: ArrayRef[Int]
+Type: ArrayRef[Int]
 
-描述: 最小值数组。
+Description: An array of minimum values.
 
 =head2 maxs
 
-类型: ArrayRef[Int]
+Type: ArrayRef[Int]
 
-描述: 最大值数组。
+Description: An array of maximum values.
 
 =head1 METHODS
 
 =head2 BUILDARGS
 
-处理构造函数参数，根据不同输入情况构造对象参数。
+Processes constructor parameters to construct object parameters based on different input situations.
 
 =head2 BUILD
 
-初始化对象并验证属性的构造函数。
+Initializes the object and validates the attributes in the constructor.
 
 =head2 length
 
-返回最小值和最大值的长度。
+Returns the length of the minimum and maximum values.
 
 =head2 min
 
-返回最小值数组的第一个元素。
+Returns the first element of the minimum value array.
 
 =head2 max
 
-返回最大值数组的最后一个元素。
+Returns the last element of the maximum value array.
 
 =head2 dump
 
-输出最小值和最大值的对。
+Outputs the pairs of minimum and maximum values.
 
 =head2 addToSet($MIN, $MAX)
 
-将最小值和最大值添加到集合中。
+Adds the minimum and maximum values to the set.
 
 =head2 mergeToSet($setObj)
 
-合并另一个集合到当前集合。
+Merges another set into the current set.
 
 =head2 compare($setObj)
 
-比较两个集合的关系。
+Compares the relationship between two sets.
 
 =head2 isEqual($setObj)
 
-检查两个集合是否相等。
+Checks if two sets are equal.
 
 =head2 notEqual($setObj)
 
-检查两个集合是否不相等。
+Checks if two sets are not equal.
 
 =head2 isContain($setObj)
 
-检查当前集合是否包含另一个集合。
+Checks if the current set contains another set.
 
 =head2 isBelong($setObj)
 
-检查当前集合是否属于另一个集合。
+Checks if the current set belongs to another set.
 
 =head2 interSet($setObj)
 
-计算当前集合和另一个集合的交集。
+Calculates the intersection between the current set and another set.
 
 =head1 AUTHOR
 

@@ -8,7 +8,7 @@ PDK::DBI::Role - Moose role for database operations in Netdisco applications
 
   package MyNetdiscoDB;
   use Moose;
-  with 'Netdisco::DBI::Role';
+  with 'PDK::DBI::Role';
 
   # Implement required methods
   sub clone { ... }
@@ -19,74 +19,73 @@ PDK::DBI::Role - Moose role for database operations in Netdisco applications
 
 =head1 DESCRIPTION
 
-PDK::DBI::Role 是一个 Moose 角色，为应用程序提供数据库操作功能。它定义了通用的数据库连接属性和方法，
-特别是用于批量插入操作的功能。
+PDK::DBI::Role is a Moose role that provides database operation capabilities for applications. It defines common database connection attributes and methods, particularly for batch insert operations.
 
 =head1 ATTRIBUTES
 
 =head2 dsn
 
-数据源名称（Data Source Name）。
+Data Source Name (DSN).
 
 =head2 user
 
-数据库用户名。
+Database username.
 
 =head2 password
 
-数据库密码。
+Database password.
 
 =head2 dbi
 
-DBI 对象，延迟构建。
+DBI object, lazily built.
 
 =head1 REQUIRED METHODS
 
-使用此角色的类必须实现以下方法：
+Classes using this role must implement the following methods:
 
 =head2 clone
 
-创建对象的副本。
+Creates a copy of the object.
 
 =head2 batchExecute
 
-执行批量 SQL 操作。
+Executes batch SQL operations.
 
 =head1 METHODS
 
 =head2 getAttrMembers($attrTypes, $dataObj)
 
-获取数据对象的属性成员。
+Gets the attribute members of a data object.
 
-参数：
-  - $attrTypes: 属性类型的哈希引用
-  - $dataObj: 数据对象
+Parameters:
+  - $attrTypes: HashRef of attribute types
+  - $dataObj: Data object
 
-返回值：属性成员的哈希引用，或在列表上下文中返回 ($attrMembers, $max, $min)
+Returns: HashRef of attribute members, or in list context, returns ($attrMembers, $max, $min).
 
 =head2 parseColumnMap($columnMap)
 
-解析列映射。
+Parses the column map.
 
-参数：
-  - $columnMap: 列映射的数组引用
+Parameters:
+  - $columnMap: ArrayRef of column mappings
 
-返回值：包含单个属性、列表属性和属性类型的三个哈希引用
+Returns: Three HashRefs containing single attributes, list attributes, and attribute types.
 
 =head2 batchInsert($columnMap, $tableName, $dataObjs)
 
-执行批量插入操作。
+Executes a batch insert operation.
 
-参数：
-  - $columnMap: 列映射的数组引用
-  - $tableName: 要插入数据的表名
-  - $dataObjs: 要插入的数据对象的哈希引用或数组引用
+Parameters:
+  - $columnMap: ArrayRef of column mappings
+  - $tableName: Name of the table to insert data into
+  - $dataObjs: HashRef or ArrayRef of data objects to insert
 
-返回值：无
+Returns: None.
 
 =head1 EXAMPLES
 
-=head2 定义使用该角色的类
+=head2 Defining a class that uses this role
 
   package MyNetdiscoDB;
   use Moose;
@@ -101,10 +100,10 @@ DBI 对象，延迟构建。
 
   sub batchExecute {
     my ($self, $params, $sql) = @_;
-    # 实现批量执行逻辑
+    # Implement batch execution logic
   }
 
-=head2 使用 batchInsert 方法
+=head2 Using the batchInsert method
 
   my $db = MyNetdiscoDB->new(
     dsn      => 'dbi:mysql:database=Netdisco;host=localhost',

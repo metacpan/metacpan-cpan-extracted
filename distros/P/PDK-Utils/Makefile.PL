@@ -7,7 +7,7 @@ use 5.030000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Utility functions for PDK",
+  "ABSTRACT" => "A flexible, nested caching utility for Perl applications",
   "AUTHOR" => "WENWU.YAN <968828\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.030000",
   "NAME" => "PDK::Utils",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Email::Sender::Simple" => 0,
     "Email::Sender::Transport::SMTP" => 0,
     "Email::Simple" => 0,
@@ -24,16 +25,17 @@ my %WriteMakefileArgs = (
     "POSIX" => 0,
     "experimental" => 0,
     "namespace::autoclean" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "utf8" => 0
   },
   "TEST_REQUIRES" => {
     "Data::Dumper" => 0,
     "Data::Printer" => 0,
     "Test::More" => 0,
-    "Test::Simple" => 0
+    "Test::Simple" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +43,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Data::Dumper" => 0,
   "Data::Printer" => 0,
   "Email::Sender::Simple" => 0,
@@ -53,6 +56,7 @@ my %FallbackPrereqs = (
   "experimental" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

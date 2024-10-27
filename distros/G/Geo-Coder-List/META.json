@@ -35,6 +35,7 @@
             "Carp" : "0",
             "HTML::Entities" : "0",
             "LWP::Protocol::https" : "0",
+            "Scalar::Util" : "0",
             "Time::HiRes" : "0",
             "perl" : "5.010001"
          }
@@ -42,6 +43,7 @@
       "test" : {
          "requires" : {
             "Test::Deep" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
@@ -61,6 +63,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-List"
       }
    },
-   "version" : "0.33",
+   "version" : "0.34",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

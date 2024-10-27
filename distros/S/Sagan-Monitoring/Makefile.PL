@@ -11,6 +11,7 @@ my %WriteMakefileArgs = (
 	LICENSE            => 'artistic_2',
 	MIN_PERL_VERSION   => '5.006',
 	INST_SCRIPT        => 'bin',
+	EXE_FILES          => ['src_bin/sagan_stat_check'],
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => '0',
 	},
@@ -24,8 +25,7 @@ my %WriteMakefileArgs = (
 		'Carp'                => '0',
 		'File::Slurp'         => '0',
 		'Time::Piece'         => '0',
-		'MIME::Base64'        => '3.16',
-		'Gzip::Faster'        => '0.21',
+		'MIME::Base64'        => '0',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'Sagan-Monitoring-*' },

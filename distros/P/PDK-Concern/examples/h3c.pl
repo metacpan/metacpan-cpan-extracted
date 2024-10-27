@@ -10,6 +10,6 @@ use Data::Dumper;
 use Data::Printer;
 
 my $ip = '192.168.10.101';
-my $d = PDK::Device::H3c->new(host => $ip);
+my $d  = PDK::Device::H3c->new(host => $ip);
 my $nd = PDK::Concern::Netdisco::H3c->new(device => $d);
 say Dumper $nd->explore_topology;

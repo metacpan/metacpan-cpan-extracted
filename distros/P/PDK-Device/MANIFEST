@@ -9,7 +9,6 @@ examples/go.pl
 examples/nd.pl
 examples/pdk.env.sample
 lib/PDK/Device.pm
-lib/PDK/Device/Base.pm
 lib/PDK/Device/Cisco.pm
 lib/PDK/Device/Cisco/Ios.pm
 lib/PDK/Device/Cisco/Ios.pod
@@ -21,6 +20,7 @@ lib/PDK/Device/Concern/Netdisco.pm
 lib/PDK/Device/Concern/Netdisco.pod
 lib/PDK/Device/ConfigBackup.pm
 lib/PDK/Device/ConfigBackup.pod
+lib/PDK/Device/Dumper.pod
 lib/PDK/Device/H3c.pm
 lib/PDK/Device/Hillstone.pm
 lib/PDK/Device/Hillstone.pod
@@ -28,10 +28,15 @@ lib/PDK/Device/Huawei.pm
 lib/PDK/Device/Huawei.pod
 lib/PDK/Device/Huawei/Usg.pm
 lib/PDK/Device/Huawei/Usg.pod
+lib/PDK/Device/Ios.pod
+lib/PDK/Device/Netdisco.pod
+lib/PDK/Device/Nxos.pod
 lib/PDK/Device/Paloalto.pm
 lib/PDK/Device/Paloalto.pod
 lib/PDK/Device/Radware.pm
 lib/PDK/Device/Radware.pod
-lib/PDK/Device/base.pod
+lib/PDK/Device/Role.pm
+lib/PDK/Device/Role.pod
+lib/PDK/Device/Usg.pod
 lib/PDK/Device/cisco.pod
 lib/PDK/Device/h3c.pod

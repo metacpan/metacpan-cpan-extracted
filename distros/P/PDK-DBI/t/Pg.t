@@ -9,7 +9,7 @@ use Test::Exception;
 use Data::Printer;
 use PDK::DBI::Pg;
 
-my $db_params = {host => '127.0.0.1', port => 5432, dbname => 'netdisco', user => 'netdisco', password => 'Cisc0123'};
+my $db_params = {host => '127.0.0.1', dbname => 'netdisco', user => 'netdisco', password => 'Cisc0123'};
 
 subtest 'PDK::DBI::Pg 对象创建' => sub {
   my ($dbi, $dbi2, $dbi3);

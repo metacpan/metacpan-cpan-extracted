@@ -16,11 +16,11 @@ Sagan::Monitoring - LibreNMS JSON SNMP extend and Nagios style check for Sagan s
 
 =head1 VERSION
 
-Version 1.2.0
+Version 1.3.0
 
 =cut
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.3.0';
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 ---
-abstract: 'Utility functions for PDK'
+abstract: 'A flexible, nested caching utility for Perl applications'
 author:
   - 'WENWU.YAN <968828@gmail.com>'
 build_requires:
@@ -7,6 +7,8 @@ build_requires:
   Data::Printer: '0'
   Test::More: '0'
   Test::Simple: '0'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -17,6 +19,7 @@ meta-spec:
   version: '1.4'
 name: PDK-Utils
 requires:
+  Carp: '0'
   Email::Sender::Simple: '0'
   Email::Sender::Transport::SMTP: '0'
   Email::Simple: '0'
@@ -25,9 +28,8 @@ requires:
   experimental: '0'
   namespace::autoclean: '0'
   perl: v5.30.0
-  strict: '0'
-  warnings: '0'
-version: '0.001'
+  utf8: '0'
+version: '0.003'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

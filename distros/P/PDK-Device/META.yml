@@ -1,5 +1,5 @@
 ---
-abstract: 'Interacts with network devices, managing connections, commands, and configuration backups.'
+abstract: 'A Moose role for managing device connections and configurations using Expect.'
 author:
   - 'WENWU.YAN <968828@gmail.com>'
 build_requires: {}
@@ -26,8 +26,9 @@ requires:
   namespace::autoclean: '0'
   perl: v5.30.0
   strict: '0'
+  utf8: '0'
   warnings: '0'
-version: '0.013'
+version: '0.015'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

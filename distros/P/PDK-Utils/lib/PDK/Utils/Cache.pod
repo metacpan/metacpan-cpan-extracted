@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-PDK::Utils::Cache - 简单的缓存实现
+PDK::Utils::Cache - A simple cache implementation
 
 =head1 VERSION
 
-版本 1.0
+Version 1.0
 
 =head1 SYNOPSIS
 
@@ -16,93 +16,93 @@ PDK::Utils::Cache - 简单的缓存实现
 
     my $cache = PDK::Utils::Cache->new();
 
-    # 设置缓存值
+    # Set a cache value
     $cache->set('user', 'name', 'Alice');
 
-    # 获取缓存值
+    # Get a cache value
     my $name = $cache->get('user', 'name');
 
-    # 清除特定缓存
+    # Clear a specific cache entry
     $cache->clear('user', 'name');
 
-    # 清除整个缓存
+    # Clear the entire cache
     $cache->clear();
 
 =head1 ATTRIBUTES
 
 =head2 cache
 
-类型: HashRef[Ref]
+Type: HashRef[Ref]
 
-描述: 用于存储缓存数据的哈希引用。
+Description: A hash reference used to store cache data.
 
 =head1 METHODS
 
 =head2 get(@keys)
 
-从缓存中检索值。
+Retrieves a value from the cache.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<@keys> - 一个或多个键，表示缓存中的路径。
+=item * C<@keys> - One or more keys representing the path in the cache.
 
 =back
 
-返回值:
+Return value:
 
-找到的值或 C<undef>（如果未找到）。
+The found value or C<undef> (if not found).
 
 =head2 set(@keys, $value)
 
-在缓存中设置值。
+Sets a value in the cache.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<@keys> - 一个或多个键，表示缓存中的路径。
+=item * C<@keys> - One or more keys representing the path in the cache.
 
-=item * C<$value> - 要存储的值。
+=item * C<$value> - The value to be stored.
 
 =back
 
-抛出:
+Throws:
 
-如果没有提供足够的参数，则抛出异常。
+An exception if insufficient parameters are provided.
 
 =head2 clear(@keys)
 
-清除整个缓存或特定键。
+Clears the entire cache or a specific key.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<@keys> - （可选）要清除的特定路径。
+=item * C<@keys> - (Optional) The specific path to clear.
 
 =back
 
-注意:
+Note:
 
-如果不提供键，则清除整个缓存。
+If no keys are provided, the entire cache is cleared.
 
 =head2 locate(@keys)
 
-在缓存中定位特定节点。
+Locates a specific node in the cache.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<@keys> - 表示缓存中路径的键序列。
+=item * C<@keys> - A sequence of keys representing the path in the cache.
 
 =back
 
-返回值:
+Return value:
 
-找到的引用或 C<undef>（如果路径不存在）。
+The found reference or C<undef> (if the path doesn't exist).
 
 =head1 AUTHOR
 

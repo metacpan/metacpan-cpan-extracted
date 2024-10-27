@@ -1,19 +1,20 @@
 package PDK::Device::Radware;
 
+use utf8;
 use v5.30;
 use Moose;
 use Expect qw'exp_continue';
 use Carp   qw'croak';
 use namespace::autoclean;
 
-with 'PDK::Device::Base';
+with 'PDK::Device::Role';
 
-has prompt => (is => 'ro', required => 1, default => '^>>.*?#\s*$',);
+has prompt => (is => 'ro', required => 1, default => '^>>.*?#\s*$', );
 
 sub errCodes {
   my $self = shift;
 
-  return [qr/^Error:.*?$/mi,];
+  return [qr/^Error:.*?$/mi, ];
 }
 
 sub waitfor {
@@ -87,12 +88,12 @@ sub waitfor {
     ],
     [
       eof => sub {
-        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：" . $exp->before());
+        croak("[waitfor/自动交互执行回显] 与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        croak("[waitfor/自动交互执行回显] 与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ],
   ];
@@ -109,21 +110,23 @@ sub waitfor {
 }
 
 sub runCommands {
-  my ($self, $commands) = @_;
+  my ($self, @commands) = @_;
 
-  croak "执行[runCommands]，必须提供一组待下发脚本" unless ref $commands eq 'ARRAY';
+  my @cmds = @commands == 1 && ref $commands[0] eq 'ARRAY' ? @{$commands[0]} : @commands;
 
-  unshift @$commands, 'cd' unless $commands->[0] =~ /^cd/mi;
+  $self->{mode} = 'deployCommands';
 
-  push @$commands, 'apply', 'save' unless $commands->[-1] =~ /^(apply|save)/mi;
+  unshift @cmds, 'cd' if $cmds[0] !~ /^cd/mi;
 
-  $self->execCommands($commands);
+  push @cmds, 'apply', 'save' unless $cmds[-1] =~ /^(apply|save)/mi;
+
+  $self->execCommands(@cmds);
 }
 
 sub getConfig {
   my $self = shift;
 
-  my $commands = ["cfg/dump", "cd",];
+  my $commands = ["cfg/dump", "cd", ];
 
   my $config = $self->execCommands($commands);
 
@@ -151,12 +154,7 @@ sub ftpConfig {
   my $host    = $self->{host};
   my $command = "$self->{month}/$self->{date}/";
 
-  if (!!$hostname) {
-    $command .= "${hostname}_$host.tar.gz";
-  }
-  else {
-    $command .= "$host.tar.gz";
-  }
+  $command .= $hostname ? "${hostname}_$host.tar.gz" : "$host.tar.gz";
 
   my $exp    = $self->{exp};
   my $result = $exp ? ($exp->match() || '') : '';
@@ -210,16 +208,15 @@ sub ftpConfig {
     ],
     [
       eof => sub {
-        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：" . $exp->before());
+        croak("[ftpConfig/登录FTP服务器] 与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[ftpConfig/登录FTP服务器]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        croak("[ftpConfig/登录FTP服务器] 与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ],
   );
-
   croak($ret[3]) if defined $ret[1];
 
   @ret = $exp->expect(
@@ -237,12 +234,12 @@ sub ftpConfig {
     ],
     [
       eof => sub {
-        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：" . $exp->before());
+        croak("[ftpConfig/检查备份任务是否成功] 与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[ftpConfig/检查备份任务是否成功]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        croak("[ftpConfig/检查备份任务是否成功] 与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ],
   );

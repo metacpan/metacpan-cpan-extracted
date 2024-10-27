@@ -2,14 +2,9 @@
 
 use strict;
 use warnings;
+
+use Test::DescribeMe qw(author);
 use Test::Most;
-
-if(!$ENV{'AUTHOR_TESTING'}) {
-	plan(skip_all => 'Author tests not required for installation');
-}
-
-eval 'use Test::ConsistentVersion';
-
-plan(skip_all => 'Test::ConsistentVersion required for checking versions') if $@;
+use Test::Needs 'Test::ConsistentVersion';
 
 Test::ConsistentVersion::check_consistent_versions();

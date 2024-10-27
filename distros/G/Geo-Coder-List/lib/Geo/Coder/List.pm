@@ -5,8 +5,9 @@ use 5.10.1;
 use warnings;
 use strict;
 use Carp;
-use Time::HiRes;
 use HTML::Entities;
+use Time::HiRes;
+use Scalar::Util;
 
 use constant DEBUG => 0;	# Default debugging level
 
@@ -19,11 +20,11 @@ Geo::Coder::List - Call many Geo-Coders
 
 =head1 VERSION
 
-Version 0.33
+Version 0.34
 
 =cut
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 our %locations;	# L1 cache, always used
 
 =head1 SYNOPSIS
@@ -58,10 +59,11 @@ so be careful to only use with those services that allow it.
 
 =cut
 
-sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
+sub new
+{
+	my $class = shift;
 
+	# Handle hash or hashref arguments
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if(!defined($class)) {
@@ -69,11 +71,12 @@ sub new {
 		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		# return;
 		$class = __PACKAGE__;
-	} elsif(ref($class)) {
-		# clone the given object
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
 	}
 
+	# Return the blessed object
 	return bless { debug => DEBUG, geo_coders => [], %args }, $class;
 }
 
@@ -128,24 +131,14 @@ if the value was retrieved from the cache the value will be undefined.
     if(defined($location->{'geocoder'})) {
         print 'Location information retrieved using ', $location->{'geocoder'}, "\n";
     }
+
 =cut
 
 sub geocode {
 	my $self = shift;
-	my %params;
+	my $params = $self->_get_params('location', @_);
 
-	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
-	} elsif(ref($_[0])) {
-		Carp::carp(__PACKAGE__, ' usage: geocode(location => $location) given ', ref($_[0]));
-		return;
-	} elsif(@_ % 2 == 0) {
-		%params = @_;
-	} else {
-		$params{'location'} = shift;
-	}
-
-	my $location = $params{'location'};
+	my $location = $params->{'location'};
 
 	if((!defined($location)) || (length($location) == 0)) {
 		Carp::carp(__PACKAGE__, ' usage: geocode(location => $location)');
@@ -243,7 +236,7 @@ sub geocode {
 				die 'lost username' if(!defined($geocoder->username()));
 				@rc = $geocoder->geocode($location);
 			} else {
-				@rc = $geocoder->geocode(%params);
+				@rc = $geocoder->geocode(%{$params});
 			}
 		};
 		if($@) {
@@ -393,10 +386,17 @@ sub geocode {
 						$long = $l->{lng};
 						$l->{'debug'} = __LINE__;
 					} elsif($l->{features}) {
-						# Geo::Coder::Mapbox
-						$lat = $l->{features}[0]->{center}[1];
-						$long = $l->{features}[0]->{center}[0];
-						$l->{'debug'} = __LINE__;
+						if($l->{features}[0]->{center}) {
+							# Geo::Coder::Mapbox
+							$lat = $l->{features}[0]->{center}[1];
+							$long = $l->{features}[0]->{center}[0];
+							$l->{'debug'} = __LINE__;
+						} elsif($l->{'features'}[0]{'geometry'}{'coordinates'}) {
+							# Geo::Coder::GeoApify
+							$lat = $l->{'features'}[0]{'geometry'}{'coordinates'}[1];
+							$long = $l->{'features'}[0]{'geometry'}{'coordinates'}[0];
+							$l->{'debug'} = __LINE__;
+						}
 					} else {
 						$l->{'debug'} = __LINE__;
 					}
@@ -478,26 +478,23 @@ to set the proxy information from environment variables:
     $ua->env_proxy(1);
     $geocoder_list->ua($ua);
 
-Note that unlike Geo::Coders there is no read method since that would be pointless.
+Note that unlike Geo::Coders,
+there is no read method since that would be pointless.
 
 =cut
 
-sub ua {
-	my $self = shift;
+sub ua
+{
+	my($self, $ua) = @_;
+	return unless $ua;
 
-	if(my $ua = shift) {
-		foreach my $g(@{$self->{geocoders}}) {
-			my $geocoder = $g;
-			if(ref($g) eq 'HASH') {
-				$geocoder = $g->{'geocoder'};
-				if(!defined($geocoder)) {
-					Carp::croak('No geocoder found');
-				}
-			}
-			$geocoder->ua($ua);
-		}
-		return $ua;
+	foreach my $g(@{$self->{geocoders}}) {
+		my $geocoder = (ref($g) eq 'HASH') ? $g->{geocoder} : $g;
+		Carp::croak('No geocoder found') unless defined $geocoder;
+		$geocoder->ua($ua);
 	}
+
+	return $ua;
 }
 
 =head2 reverse_geocode
@@ -510,30 +507,21 @@ Similar to geocode except it expects a latitude/longitude parameter.
 
 sub reverse_geocode {
 	my $self = shift;
-	my %params;
+	my $params = $self->_get_params('latlng', @_);
 
-	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
-	} elsif(ref($_[0])) {
-		Carp::croak('Usage: reverse_geocode(location => $location)');
-	} elsif(@_ % 2 == 0) {
-		%params = @_;
-	} else {
-		$params{'latlng'} = shift;
-	}
-
-	my $latlng = $params{'latlng'}
+	my $latlng = $params->{'latlng'}
 		or Carp::croak('Usage: reverse_geocode(latlng => $location)');
 
-	my $latitude;
-	my $longitude;
-
+	my ($latitude, $longitude) = split(/,/, $latlng);
 	if($latlng) {
 		($latitude, $longitude) = split(/,/, $latlng);
+		$params->{'lat'} //= $latitude;
+		$params->{'lon'} //= $longitude;
 	} else {
-		$latitude //= $params{'lat'};
-		$longitude //= $params{'lon'};
-		$longitude //= $params{'long'};
+		$latitude //= $params->{'lat'};
+		$longitude //= $params->{'lon'};
+		$longitude //= $params->{'long'};
+		$latlng = $params->{'latlng'} = "$latitude,$longitude";
 	}
 
 	if(my $rc = $self->_cache($latlng)) {
@@ -555,7 +543,7 @@ sub reverse_geocode {
 		print 'trying ', ref($geocoder), "\n" if($self->{'debug'});
 		if(wantarray) {
 			my @rc;
-			if(my @locs = $geocoder->reverse_geocode(%params)) {
+			if(my @locs = $geocoder->reverse_geocode(%{$params})) {
 				print Data::Dumper->new([\@locs])->Dump() if($self->{'debug'} >= 2);
 				foreach my $loc(@locs) {
 					if(my $name = $loc->{'display_name'}) {
@@ -596,24 +584,22 @@ sub reverse_geocode {
 							}
 						}
 						CORE::push @rc, $name;
+					} elsif($loc->{features}) {
+						# Geo::Coder::Apify
+						return CORE::push @rc, $loc->{features}[0]->{properties}{formatted};
 					}
 				}
 			}
-			if(wantarray) {
-				$self->_cache($latlng, \@rc);
-				return @rc;
-			}
-			if(scalar($rc[0])) {	# check it's not an empty hash
-				$self->_cache($latlng, $rc[0]);
-				return $rc[0];
-			}
-		} elsif(my $rc = $self->_cache($latlng) // $geocoder->reverse_geocode(%params)) {
+			$self->_cache($latlng, \@rc);
+			return @rc;
+		} elsif(my $rc = $self->_cache($latlng) // $geocoder->reverse_geocode(%{$params})) {
 			return $rc if(!ref($rc));
 			print Data::Dumper->new([$rc])->Dump() if($self->{'debug'} >= 2);
 			if(my $name = $rc->{'display_name'}) {
 				# OSM
 				return $self->_cache($latlng, $name);
-			} elsif($rc->{'city'}) {
+			}
+			if($rc->{'city'}) {
 				# Geo::Coder::CA
 				my $name;
 				if(my $usa = $rc->{'usa'}) {
@@ -649,6 +635,10 @@ sub reverse_geocode {
 					}
 				}
 				return $self->_cache($latlng, $name);
+			}
+			if($rc->{features}) {
+				# Geo::Coder::Apify
+				return $self->_cache($latlng, $rc->{features}[0]->{properties}{formatted});
 			}
 		}
 	}
@@ -761,6 +751,36 @@ sub _cache {
 		}
 	}
 	return $rc;
+}
+
+# Helper routine to parse the arguments given to a function,
+#	allowing the caller to call the function in anyway that they want
+#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
+#	when called _get_params('arg', @_);
+sub _get_params
+{
+	shift;  # Discard the first argument (typically $self)
+	my $default = shift;
+
+	# Directly return hash reference if the first parameter is a hash reference
+	return $_[0] if ref $_[0] eq 'HASH';
+
+	my %rc;
+	my $num_args = scalar @_;
+
+	# Populate %rc based on the number and type of arguments
+	if(($num_args == 1) && (defined $default)) {
+		# %rc = ($default => shift);
+		return { $default => shift };
+	} elsif(($num_args % 2) == 0) {
+		%rc = @_;
+	} elsif($num_args == 1) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
+	} elsif($num_args == 0 && defined $default) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '($default => \$val)');
+	}
+
+	return \%rc;
 }
 
 =head1 AUTHOR

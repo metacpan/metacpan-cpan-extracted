@@ -1,5 +1,6 @@
 package PDK::Utils::Set;
 
+use utf8;
 use v5.30;
 use Moose;
 use POSIX qw(floor ceil);

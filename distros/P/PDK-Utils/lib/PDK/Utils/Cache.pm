@@ -1,5 +1,6 @@
 package PDK::Utils::Cache;
 
+use utf8;
 use v5.30;
 use Moose;
 use namespace::autoclean;
@@ -63,3 +64,4 @@ __PACKAGE__->meta->make_immutable;
 
 1;
 
+# ABSTRACT: A flexible, nested caching utility for Perl applications

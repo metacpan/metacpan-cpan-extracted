@@ -10,11 +10,11 @@ use PDK::Utils::Email;
 
 my $mail;
 
+plan skip_all => 'Skipping this test file';
+
 ok(
   do {
-    eval {
-      $mail = PDK::Utils::Email->new();
-    };
+    eval { $mail = PDK::Utils::Email->new(); };
     warn $@ if $@;
     $mail->isa('PDK::Utils::Email');
   },

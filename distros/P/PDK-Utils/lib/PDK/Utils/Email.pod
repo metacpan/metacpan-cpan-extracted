@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-PDK::Utils::Mail - 发送邮件的模块
+PDK::Utils::Mail - Module for sending emails
 
 =head1 VERSION
 
-版本 1.0
+Version 1.0
 
 =head1 SYNOPSIS
 
@@ -23,8 +23,8 @@ PDK::Utils::Mail - 发送邮件的模块
 
     $mailer->sendmail(
         to      => 'recipient@example.com',
-        subject => '邮件主题',
-        msg     => '这是邮件内容',
+        subject => 'Email Subject',
+        msg     => 'This is the email content',
         cc      => 'cc@example.com',
     );
 
@@ -32,55 +32,55 @@ PDK::Utils::Mail - 发送邮件的模块
 
 =head2 smtp
 
-类型: Str
+Type: Str
 
-描述: SMTP服务器地址，必填。
+Description: SMTP server address (required).
 
 =head2 username
 
-类型: Str
+Type: Str
 
-描述: SMTP认证用户名。
+Description: SMTP authentication username.
 
 =head2 password
 
-类型: Str
+Type: Str
 
-描述: SMTP认证密码。
+Description: SMTP authentication password.
 
 =head2 from
 
-类型: Str
+Type: Str
 
-描述: 发件人邮箱地址，必填。
+Description: Sender's email address (required).
 
 =head2 charset
 
-类型: Str
+Type: Str
 
-描述: 字符集，默认通过_buildCharset方法构建。
+Description: Character set, defaults to constructed by the _buildCharset method.
 
 =head2 displayFormat
 
-类型: Str
+Type: Str
 
-描述: 邮件显示格式，默认为HTML。
+Description: Email display format, defaults to HTML.
 
 =head1 METHODS
 
 =head2 _buildCharset
 
-构建字符集，基于环境变量LANG。
+Constructs the character set based on the LANG environment variable.
 
 =head2 sendmail(%param)
 
-发送邮件。参数可以是哈希或哈希引用，必须包含目标地址(to)。
+Sends an email. Parameters can be a hash or a hash reference, and must include the recipient address (to).
 
-参数：
-- to: 收件人地址，必填。
-- subject: 邮件主题。
-- msg: 邮件内容。
-- cc: 抄送地址。
+Parameters:
+- to: Recipient address (required).
+- subject: Email subject.
+- msg: Email content.
+- cc: CC address.
 
 =head1 AUTHOR
 

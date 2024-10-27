@@ -1,0 +1,103 @@
+=encoding utf8
+
+=head1 NAME
+
+PDK::Content::Dumper - A Moose role for debugging and file operations
+
+=head1 SYNOPSIS
+
+  package MyApp;
+  use Moose;
+  with 'PDK::Content::Dumper';
+
+  # Now your class has debug and file writing capabilities
+  $self->dump("Debug message");
+  $self->write_file($config, "config.txt");
+
+=head1 DESCRIPTION
+
+PDK::Content::Dumper is a Moose role that provides debugging and file operation capabilities. It offers methods for outputting debug information and writing configurations to files, with customizable debug levels and working directories.
+
+=head1 ATTRIBUTES
+
+=head2 month
+
+A read-only attribute that returns the current month in YYYY-MM format.
+
+=head2 date
+
+A read-only attribute that returns the current date in YYYY-MM-DD format.
+
+=head2 workdir
+
+A read-write attribute representing the working directory. It prioritizes the PDK_CONTENT_HOME environment variable, defaulting to the user's home directory if not set.
+
+=head2 debug
+
+A read-write attribute representing the debug level. It's set from the PDK_CONTENT_DEBUG environment variable, defaulting to 0 if not set.
+
+=head1 METHODS
+
+=head2 now
+
+  my $timestamp = $self->now();
+
+Returns the current timestamp in YYYY-MM-DD HH:MM:SS format.
+
+=head2 dump($message)
+
+  $self->dump("Debug information");
+
+Outputs debug information based on the current debug level. If debug level is 1, it prints to console. If greater than 1, it writes to a file.
+
+=head2 write_file($config, $name)
+
+  $self->write_file($config_content, "config_file.txt");
+
+Writes the given configuration content to a file in the working directory. Returns a hashref with a 'success' key.
+
+=head1 PRIVATE METHODS
+
+=head2 _debug_init($message)
+
+An internal method used for initializing debug output. It prints to STDERR if PDK_CONTENT_DEBUG is set.
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item PDK_CONTENT_HOME
+
+Sets the working directory for file operations.
+
+=item PDK_CONTENT_DEBUG
+
+Sets the debug level. 0 disables debug output, 1 enables console output, and >1 enables file output.
+
+=back
+
+=head1 DEPENDENCIES
+
+This module requires the following modules:
+
+=over 4
+
+=item * Moose::Role
+
+=item * Carp
+
+=item * File::Path
+
+=item * namespace::autoclean
+
+=back
+
+=head1 AUTHOR
+
+WENWU YAN E<lt>968828@gmail.comE<gt>
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

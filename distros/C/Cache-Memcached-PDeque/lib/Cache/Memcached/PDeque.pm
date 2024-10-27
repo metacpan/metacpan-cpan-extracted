@@ -17,11 +17,11 @@ Cache::Memcached::PDeque - Implements a priority deque using memcached as storag
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -36,28 +36,30 @@ our $VERSION = '0.01';
   $dq->unshift('b'); # ('b','a')
   $dq->push('c');    # ('b','a','c')
 
+  $dq->size;        # returns 3
+
   $dq->pop();       # returns 'c'
   $dq->pop();       # returns 'a'
   $dq->shift();     # returns 'b'
 
   # Make use of priorities
-  $dq->push_with_priority(1,'l1'); # ('l1')
-  $dq->push_with_priority(1,'l2'); # ('l1','l2')
-  $dq->push_with_priority(2,'h1'); # ('h1','l1','l2')
-  $dq->push_with_priority(1,'l3'); # ('h1','l1','l2','l3')
-  $dq->push_with_priority(2,'h2'); # ('h1','h2','l1','l2','l3')
+  $dq->push(1,'l1'); # ('l1')
+  $dq->push(2,'h1'); # ('h1','l1')
+
+  $dq->size;        # returns 2, but:
+  $dq->size(1);     # returns 1 - only 1 element with priority 1
 
   $dq->shift();     # returns 'h1'
-  $dq->shift();     # returns 'h2'
   $dq->shift();     # returns 'l1'
-  $dq->shift();     # returns 'l2'
-  $dq->shift();     # returns 'l3'
 
   # Complex structures are supported
   my @list = ( 1, 'a', 2, 'b', 3, 'c' );
   $dq->push(\@list);   # Push reference to a list
   my $href = $dq->pop; # Get back reference to a list
   
+  # Removes all elements
+  $dq->clear;
+
 =head1 DESCRIPTION
 
 This is an implementation of a double-ended queue, with support for priorities.
@@ -194,32 +196,65 @@ The following public methods are available.
 Please note that any methods starting with an underscore '_' are considered private, are undocumented, and are
 subject to change without notice. Do not use private methods.
 
+=cut
+
+=head3 clear
+
+  $dq->clear;
+
+  Removes all elements.
+
+=cut
+
+sub clear {
+  my ( $self ) = @_;
+
+  $self->_lock(0, timeout => 0);
+  foreach my $prio ( 1 .. $self->max_prio ) {
+    $self->_lock($prio, timeout => 0);
+
+    # Delete all elements with $prio
+    my $href  = $self->memcached->get_multi(($prio . ':head',$prio . ':tail'));
+    my @keys = map { $prio . ':' . $_ } $href->{$prio . ':head'} .. $href->{$prio . ':tail'};
+    $self->memcached->delete_multi( @keys );
+
+    # Reset size, head and tail
+    $self->memcached->set_multi([$prio . ':size', 0],
+                                [$prio . ':head', $initial_head_tail],
+                                [$prio . ':tail', $initial_head_tail]);
+
+    $self->_unlock($prio, timeout => 0);
+  }
+
+  $self->memcached->set('size', 0);
+
+  $self->_unlock(0, timeout => 0);
+}
+
 =head3 size
 
   my $size = $dq->size;
 
   Returns the number of elements in $dq.
 
+  my $size = $dq->size($priority);
+
+  Returns the number of elements in $dq with the given priority.
+
 =cut
 
 sub size {
-  my ( $self ) = @_;
-  return int($self->memcached->get('size'));
+  my ( $self, $prio ) = @_;
+
+  return int($self->memcached->get('size')) unless defined $prio;
+
+  assert($prio >= 1 && $prio <= $self->max_prio) if DEBUG;
+  return int($self->memcached->get($prio . ':size'));
 }
 
-=head3 push_with_priority
-
-  $dq->push_with_priority($priority, $element);
-
-  Adds $element after all elements with a higher or equal priority, and before all elements with a lower priority.
-
-=cut
-
 # Add element at back
-sub push_with_priority {
-   my ( $self, $priority, $data ) = @_;
-
-  assert($priority >= 1 && $priority <= $self->max_prio) if DEBUG;
+sub _push_with_priority {
+  my ( $self, $priority, $data ) = @_;
 
   try {
     $self->_lock($priority);
@@ -243,27 +278,27 @@ sub push_with_priority {
 
   Adds $element after all elements.
 
+  $dq->push($priority, $element);
+
+  Adds $element after all elements with a higher or equal priority, and before all elements with a lower priority.
+
 =cut
 
 sub push {
-  my ( $self, $data ) = @_;
-  my $prio = defined $self->prioritizer ? $self->prioritizer->($data) : 1;
-  return $self->push_with_priority($prio, $data);
+  if ( 3 == scalar @_ ) {
+    my ( $self, $prio, $data ) = @_;
+    assert($prio >= 1 && $prio <= $self->max_prio) if DEBUG;
+    return $self->_push_with_priority($prio, $data);
+  } else {
+    my ( $self, $data ) = @_;
+    my $prio = defined $self->prioritizer ? $self->prioritizer->($data) : 1;
+    return $self->_push_with_priority($prio, $data);
+  }
 }
 
-=head3 unshift_with_priority
-
-  $dq->unshift_with_priority($priority, $element);
-
-  Inserts $element after all elements with a higher priority, and before all elements with a lower or equal priority.
-
-=cut
-
 # Add element at front
-sub unshift_with_priority {
-   my ( $self, $priority, $data ) = @_;
-
-  assert($priority >= 1 && $priority <= $self->max_prio) if DEBUG;
+sub _unshift_with_priority {
+  my ( $self, $priority, $data ) = @_;
 
   try {
     $self->_lock( $priority );
@@ -290,24 +325,20 @@ sub unshift_with_priority {
 =cut
 
 sub unshift {
-  my ( $self, $data ) = @_;
-  my $prio = defined $self->prioritizer ? $self->prioritizer->($data) : $self->max_prio;
-  return $self->unshift_with_priority($prio, $data);
+  if ( 3 == scalar @_ ) {
+    my ( $self, $prio, $data ) = @_;
+    assert($prio >= 1 && $prio <= $self->max_prio) if DEBUG;
+    return $self->_unshift_with_priority($prio, $data);
+  } else {
+    my ( $self, $data ) = @_;
+    my $prio = defined $self->prioritizer ? $self->prioritizer->($data) : $self->max_prio;
+    return $self->_unshift_with_priority($prio, $data);
+  }
 }
 
-=head3 pop_with_priority
-
-  my $element = $dq->pop_with_priority($priority);
-
-  Returns the last element with the given priority.
-
-=cut
-
 # Remove last element (FILO)
-sub pop_with_priority {
+sub _pop_with_priority {
   my ( $self, $priority ) = @_;
-
-  assert($priority >= 1 && $priority <= $self->max_prio) if DEBUG;
 
   try {
     $self->_lock($priority);
@@ -347,31 +378,30 @@ sub pop_with_priority {
 
   Returns the last element.
 
+  my $element = $dq->pop($priority);
+
+  Returns the last element with the given priority.
+
 =cut
 
 sub pop {
-  my ( $self ) = @_;
-
-  for ( my $prio=1; $prio<=$self->max_prio; $prio++ ) {
-    my $result = $self->pop_with_priority($prio);
-    return $result if defined $result;
+  if ( 1 == scalar @_ ) {
+    my ( $self ) = @_;
+    for ( my $prio=1; $prio<$self->max_prio; $prio++ ) {
+      my $result = $self->_pop_with_priority($prio);
+      return $result if defined $result;
+    }
+    return $self->_pop_with_priority($self->max_prio);
+  } else {
+    my ( $self, $prio ) = @_;
+    assert($prio >= 1 && $prio <= $self->max_prio) if DEBUG;
+    return $self->_pop_with_priority($prio);
   }
-  return undef;
 }
 
-=head3 shift_with_priority
-
-  my $element = $dq->shift_with_priority($priority);
-
-  Returns the first element with the given priority.
-
-=cut
-
 # Remove first element (FIFO)
-sub shift_with_priority {
+sub _shift_with_priority {
   my ( $self, $priority ) = @_;
-
-  assert($priority >= 1 && $priority <= $self->max_prio) if DEBUG;
 
   try {
     $self->_lock($priority);
@@ -411,16 +441,25 @@ sub shift_with_priority {
 
   Returns the first element.
 
+  my $element = $dq->shift($priority);
+
+  Returns the first element with the given priority.
+
 =cut
 
 sub shift {
-  my ( $self ) = @_;
-
-  for ( my $prio=$self->max_prio; $prio>=1; $prio-- ) {
-    my $result = $self->shift_with_priority($prio);
-    return $result if defined $result;
+  if ( 1 == scalar @_ ) {
+    my ( $self ) = @_;
+    for ( my $prio=$self->max_prio; $prio>=2; $prio-- ) {
+      my $result = $self->_shift_with_priority($prio);
+      return $result if defined $result;
+    }
+    return $self->_shift_with_priority(1);
+  } else {
+    my ( $self, $prio ) = @_;
+    assert($prio >= 1 && $prio <= $self->max_prio) if DEBUG;
+    return $self->_shift_with_priority($prio);
   }
-  return undef;
 }
 
 =head3 foreach

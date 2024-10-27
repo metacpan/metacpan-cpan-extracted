@@ -1,12 +1,12 @@
 package PDK::Utils::Email;
 
+use utf8;
 use v5.30;
 use Moose;
-
+use Carp                  qw(croak);
 use Email::Sender::Simple qw(sendmail);
 use Email::Sender::Transport::SMTP;
 use Email::Simple;
-
 use namespace::autoclean;
 
 has smtp => (is => 'ro', isa => 'Str',);
@@ -24,16 +24,10 @@ has from => (is => 'ro', isa => 'Str',);
 sub send_mail {
   my $self = shift;
 
-  my %params;
-  if (ref($_[0]) eq 'HASH') {
-    %params = %{$_[0]};
-  }
-  else {
-    %params = @_;
-  }
+  my %params = @_ == 1 && ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
 
-  confess("请提供收件人地址") if not defined $params{to};
-  confess("必须提供邮件内容") if not defined $params{body};
+  croak("请提供收件人地址") if not defined $params{to};
+  croak("必须提供邮件内容") if not defined $params{body};
 
   my $to
     = join(',', keys %{{map { lc($_) => undef } grep { defined $_ and $_ !~ /^\s*$/ } split(/[,;|，]/, $params{to})}});
@@ -41,7 +35,7 @@ sub send_mail {
   my $from    = $self->{from}    || $params{from} || $ENV{PDK_SMTP_SENDER};
   my $subject = $params{subject} || $ENV{PDK_SMTP_SUBJECT};
 
-  confess("构造函数必须填写 from, subject，或设置相应的环境变量：PDK_SMTP_SENDER, PDK_SMTP_SUBJECT") unless ($from and $subject);
+  croak("构造函数必须填写 from, subject，或设置相应的环境变量：PDK_SMTP_SENDER, PDK_SMTP_SUBJECT") unless ($from and $subject);
 
   my $email = Email::Simple->create(header => [To => $to, From => $from, Subject => $subject,], body => $params{body},);
 
@@ -55,7 +49,7 @@ sub send_mail {
 
   eval { sendmail($email, {transport => $transport}); };
 
-  if ($@) {
+  if (!!$@) {
     chomp($@);
     confess("发送邮件失败: $@");
   }

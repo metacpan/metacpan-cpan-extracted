@@ -26,7 +26,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.220';
+our $VERSION = '1.221';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -1657,7 +1657,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.220
+1.221
 
 =head1 AUTHOR
 

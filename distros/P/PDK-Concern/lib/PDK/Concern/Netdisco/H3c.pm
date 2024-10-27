@@ -1,5 +1,6 @@
 package PDK::Concern::Netdisco::H3c;
 
+use utf8;
 use v5.30;
 use Moose;
 use Data::Dumper;
@@ -48,6 +49,8 @@ sub gen_iface_desc {
 
     $local_port  = $self->refine_if($local_port);
     $remote_port = $self->refine_if($remote_port);
+
+    $remote_port =~ s/\s+//g;
 
     $remote_port = uc $remote_port;
 

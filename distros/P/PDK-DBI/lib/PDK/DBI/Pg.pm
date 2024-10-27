@@ -1,5 +1,6 @@
 package PDK::DBI::Pg;
 
+use utf8;
 use v5.30;
 use Moose;
 use DBIx::Custom;
@@ -37,7 +38,8 @@ around BUILDARGS => sub {
 
   my %param = @args == 1 && ref $args[0] eq 'HASH' ? %{$args[0]} : @args;
 
-  if (not defined $param{dsn} and defined $param{host} and defined $param{port} and defined $param{dbname}) {
+  if (not defined $param{dsn} and defined $param{host} and defined $param{dbname}) {
+    $param{port} //= '5432';
     $param{dsn} = "dbi:Pg:dbname=$param{dbname};host=$param{host};port=$param{port}";
   }
 

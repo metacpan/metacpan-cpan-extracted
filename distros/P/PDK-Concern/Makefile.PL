@@ -24,9 +24,10 @@ my %WriteMakefileArgs = (
     "Moose::Role" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => ""
   }
@@ -41,6 +42,7 @@ my %FallbackPrereqs = (
   "Moose::Role" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

@@ -1,3 +1,15 @@
+1.221 2024-10-26
+================
+
+[Quiq::Eog]
+* transferImages(): Option -addExtension hinzugefügt
+
+[Quiq::Path]
+* size(): Test auf Existenz der Datei hinzugefügt
+
+[Quiq::Xml]
+* Klasse hinzugefügt
+
 1.220 2024-09-24
 ================
 

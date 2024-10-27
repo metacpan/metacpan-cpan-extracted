@@ -1,12 +1,13 @@
 package PDK::Device::Cisco;
 
+use utf8;
 use v5.30;
 use Moose;
 use Expect qw(exp_continue);
 use Carp   qw(croak);
 use namespace::autoclean;
 
-with 'PDK::Device::Base';
+with 'PDK::Device::Role';
 
 
 has prompt => (is => 'ro', required => 1, default => '^\s*\S+[#>]\s*$',);
@@ -89,12 +90,12 @@ sub waitfor {
     ],
     [
       eof => sub {
-        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
+        croak("[waitfor/自动交互执行回显] 与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        croak("[waitfor/自动交互执行回显] 与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ],
   ];
@@ -115,23 +116,23 @@ sub waitfor {
 }
 
 sub runCommands {
-  my ($self, $commands) = @_;
+  my ($self, @commands) = @_;
 
-  croak "执行[runCommands]，必须提供一组待下发脚本" unless ref $commands eq 'ARRAY';
+  my @cmds = @commands == 1 && ref $commands[0] eq 'ARRAY' ? @{$commands[0]} : @commands;
 
   $self->{mode} = 'deployCommands';
 
-  unshift @$commands, 'configure terminal' if $commands->[0] !~ /conf/i;
+  unshift @cmds, 'configure terminal' if $cmds[0] !~ /conf/i;
 
-  push @$commands, 'copy running-config startup-config' unless $commands->[-1] =~ /(copy run|write)/i;
+  push @cmds, 'copy running-config startup-config' unless $cmds[-1] =~ /(copy run|write)/i;
 
-  $self->execCommands($commands);
+  $self->execCommands(@cmds);
 }
 
 sub getConfig {
   my $self = shift;
 
-  my $commands = ["terminal width 511", "terminal length 0", "show run | exclude !Time", "copy run start",];
+  my $commands = ["terminal width 511", "terminal length 0", "show run | exclude !Time", "copy run start", ];
 
   my $config = $self->execCommands($commands);
 
@@ -150,7 +151,7 @@ sub ftpConfig {
 
   $server ||= $ENV{PDK_FTP_SERVER};
 
-  croak "请正确提供 FTP 服务器地址!" unless $server;
+  croak "请正确提供 FTP 服务器地址!" unless !!$server;
 
   if (!$self->{exp}) {
     my $login = $self->login();
@@ -160,12 +161,12 @@ sub ftpConfig {
   my $host    = $self->{host};
   my $command = "copy running-config ftp://$server/$self->{month}/$self->{date}/";
 
-  $command .= $hostname ? $hostname . '_' . $host . '.txt' : $host . '.txt';
+  $command .= $hostname ? "$hostname\_$host.txt'" : "$host.txt";
 
   $self->dump("正在执行FTP备份任务");
-  my $result = $self->execCommands([$command]);
+  my $result = $self->execCommands($command);
   if ($result->{success} == 0) {
-    croak "执行[ftpConfig/配置备份异常]，$result->{reason}";
+    croak "[ftpConfig/配置备份异常]，$result->{reason}";
   }
   else {
     $self->dump("FTP备份任务成功执行完毕");

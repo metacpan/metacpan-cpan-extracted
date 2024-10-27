@@ -1,0 +1,56 @@
+=encoding utf8
+
+=head1 NAME
+
+PDK::Content::Parser - A content parsing module extending PDK::Content::Reader
+
+=head1 SYNOPSIS
+
+  use PDK::Content::Parser;
+
+  my $parser = PDK::Content::Parser->new(
+    config => ['line1', 'line2', 'line3'],
+  );
+
+  # Use methods inherited from PDK::Content::Reader
+  $parser->nextLine();
+  $parser->prevLine();
+  # ...
+
+=head1 DESCRIPTION
+
+PDK::Content::Parser is a Moose-based Perl module that extends the functionality of PDK::Content::Reader. It is designed to provide additional parsing capabilities for content processing tasks.
+
+This module modifies some of the attributes inherited from PDK::Content::Reader, making them optional instead of required.
+
+=head1 ATTRIBUTES
+
+=head2 id
+
+An optional identifier for the parser instance.
+
+=head2 name
+
+An optional name for the parser instance.
+
+=head2 type
+
+An optional type designation for the parser instance.
+
+=head1 INHERITANCE
+
+This module inherits all methods and additional attributes from L<PDK::Content::Reader>. Refer to the documentation of PDK::Content::Reader for more details on available methods and attributes.
+
+=head1 METHODS
+
+All methods are inherited from PDK::Content::Reader. This module does not introduce any new methods.
+
+=head1 AUTHOR
+
+WENWU YAN E<lt>968828@gmail.comE<gt>
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

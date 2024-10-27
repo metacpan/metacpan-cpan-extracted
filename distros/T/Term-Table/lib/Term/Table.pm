@@ -2,7 +2,7 @@ package Term::Table;
 use strict;
 use warnings;
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 use Term::Table::Cell();
 

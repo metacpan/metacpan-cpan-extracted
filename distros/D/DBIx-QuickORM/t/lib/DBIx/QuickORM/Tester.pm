@@ -2,6 +2,7 @@ package DBIx::QuickORM::Tester;
 use strict;
 use warnings;
 
+use Test2::V0;
 use Test2::Tools::QuickDB;
 use Test2::Tools::Subtest qw/subtest_buffered/;
 

@@ -40,25 +40,16 @@ OSM: {
 
 		ok(!defined($geocoderlist->geocode()));
 
-		my $location = $geocoderlist->geocode('Silver Spring, MD, USA');
-		ok(defined($location));
-		ok(ref($location) eq 'HASH');
-		delta_within($location->{geometry}{location}{lat}, 38.99, 1e-1);
-		delta_within($location->{geometry}{location}{lng}, -77.02, 1e-1);
-		sleep(1);	# Don't get blacklisted
+		check($geocoderlist, 'Silver Spring, MD, USA', 38.99, -77.02);
 
 		my $ua = LWP::UserAgent::Throttled->new();
 		$ua->throttle({ 'nominatim.openstreetmap.org' => 1 });
 		$ua->env_proxy(1);
 		$geocoderlist->ua($ua);
 
-		$location = $geocoderlist->geocode('10 Downing St, London, UK');
-		ok(defined($location));
-		ok(ref($location) eq 'HASH');
-		delta_within($location->{geometry}{location}{lat}, 51.50, 1e-1);
-		delta_within($location->{geometry}{location}{lng}, -0.13, 1e-1);
+		check($geocoderlist, '10 Downing St, London, England', 51.5, -0.13);
 
-		$location = $geocoderlist->geocode('Rochester, Kent, England');
+		my $location = $geocoderlist->geocode('Rochester, Kent, England');
 		ok(defined($location));
 		ok(ref($location) eq 'HASH');
 		delta_within($location->{geometry}{location}{lat}, 51.38, 1e-1);
@@ -66,16 +57,15 @@ OSM: {
 		ok($location->{address}{country_code} eq 'gb');
 		ok($location->{address}{country} eq 'United Kingdom');
 
-		$location = $geocoderlist->geocode(location => '8600 Rockville Pike, Bethesda MD, 20894 USA');
+		$location = $geocoderlist->geocode(location => '8600 Rockville Pike, Bethesda MD, 20894, USA');
 		ok(defined($location));
 		ok(ref($location) eq 'HASH');
 		delta_within($location->{geometry}{location}{lat}, 39.00, 1e-1);
 		delta_within($location->{geometry}{location}{lng}, -77.10, 1e-1);
-
-		like($geocoderlist->reverse_geocode('39.00,-77.10'), qr/Bethesda/i, 'test reverse geocode');
-
 		ok($location->{address}{country_code} eq 'us');
 		like($location->{address}{country}, qr/^United States/, 'check USA');
+
+		like($geocoderlist->reverse_geocode('39.00,-77.10'), qr/Bethesda/i, 'test reverse geocode');
 
 		my @locations = $geocoderlist->geocode('Vessels, Misc Ships at Sea or Abroad, England');
 		my $count = scalar(@locations);
@@ -113,4 +103,16 @@ OSM: {
 		ok(scalar(@locations) == $count);
 		is($locations[0]->{'geocoder'}, 'cache', 'Verify subsequent reads are cached');
 	}
+}
+
+sub check
+{
+	my($geocoderlist, $location, $lat, $long) = @_;
+
+	my $rc = $geocoderlist->geocode($location);
+	isnt($rc, undef, "Find $location");
+	ok(ref($rc) eq 'HASH');
+	delta_within($rc->{geometry}{location}{lat}, $lat, 1e-1);
+	delta_within($rc->{geometry}{location}{lng}, $long, 1e-1);
+	sleep(1);	# Don't get blacklisted
 }

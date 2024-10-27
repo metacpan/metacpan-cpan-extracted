@@ -5,7 +5,6 @@ META.yml
 Makefile.PL
 README
 dist.ini
-lib/PDK/DBI.pm
 lib/PDK/DBI/Mysql.pm
 lib/PDK/DBI/Mysql.pod
 lib/PDK/DBI/Pg.pm

@@ -1,5 +1,6 @@
 package PDK::Content::Dumper;
 
+use utf8;
 use v5.30;
 use Moose::Role;
 use Carp       qw(croak);
@@ -65,9 +66,9 @@ sub dump {
 
     my $name     = $self->{name} // $self->now;
     my $filename = "$workdir/$name\_dump.txt";
-    open(my $fh, '>>', $filename) or croak "无法打开文件 $filename 进行写入: $!";
-    print $fh "$text\n"           or croak "写入文件 $filename 失败: $!";
-    close($fh)                    or croak "关闭文件句柄 $filename 失败: $!";
+    open(my $fh, '>>encoding(UTF-8)', $filename) or croak "无法打开文件 $filename 进行写入: $!";
+    print $fh "$text\n"                          or croak "写入文件 $filename 失败: $!";
+    close($fh)                                   or croak "关闭文件句柄 $filename 失败: $!";
   }
 }
 
@@ -78,12 +79,13 @@ sub write_file {
 
   my $workdir = "$self->{workdir}/$self->{month}/$self->{date}";
   make_path($workdir) unless -d $workdir;
-  my $filename = "$workdir/$name";
+
   $self->dump("准备将配置文件写入工作目录: ($workdir)");
 
-  open(my $fh, '>', $filename) or croak "无法打开文件 $filename 进行写入: $!";
-  print $fh $config            or croak "写入文件 $filename 失败: $!";
-  close($fh)                   or croak "关闭文件句柄 $filename 失败: $!";
+  my $filename = "$workdir/$name";
+  open(my $fh, '>>:encoding(UTF-8)', $filename) or croak "无法打开文件 $filename 进行写入: $!";
+  print $fh $config                             or croak "写入文件 $filename 失败: $!";
+  close($fh)                                    or croak "关闭文件句柄 $filename 失败: $!";
 
   $self->dump("成功写入文本数据到文件: $filename");
 
@@ -94,6 +96,7 @@ sub _debug_init {
   my ($msg) = @_;
   my $now = `date "+%Y-%m-%d %H:%M:%S"`;
   chomp($now);
+  binmode(STDERR, ':utf8');
   my $text = $now . " - [debug] $msg\n";
   print STDERR $text if $ENV{PDK_CONTENT_DEBUG};
 }

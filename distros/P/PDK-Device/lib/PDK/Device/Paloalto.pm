@@ -1,19 +1,20 @@
 package PDK::Device::Paloalto;
 
+use utf8;
 use v5.30;
 use Moose;
 use Expect qw(exp_continue);
 use Carp   qw(croak);
 use namespace::autoclean;
 
-with 'PDK::Device::Base';
+with 'PDK::Device::Role';
 
 has prompt => (is => 'ro', required => 1, default => '^.*?\((?:active|passive|suspended)\)[>#]\s*$',);
 
 sub errCodes {
-  my $self = shift;
+  shift;
 
-  return [qr/(Unknown command|Invalid syntax)/i, qr/^Error:/mi,];
+  return [qr/(Unknown command|Invalid syntax)/i, qr/^Error:/mi, ];
 }
 
 sub waitfor {
@@ -66,12 +67,12 @@ sub waitfor {
     ],
     [
       eof => sub {
-        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：" . $exp->before());
+        croak("[waitfor/自动交互执行回显] 与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        croak("[waitfor/自动交互执行回显] 与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ],
   ];

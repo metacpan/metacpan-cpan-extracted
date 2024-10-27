@@ -43,32 +43,18 @@ use Getopt::Long;
 use JSON;
 use HV::Monitor;
 use MIME::Base64;
-use Gzip::Faster;
+use IO::Compress::Gzip qw(gzip $GzipError);
+use Pod::Usage;
 
 sub version {
-	print "hv_monitor v. 0.0.1\n";
+	print 'hv_monitor v. ' . $HV::Monitor::VERSION . "\n";
 }
 
-sub help {
-	&version;
-
-	print '
--b <backend>    The backend to use.
-
--c              gzip the json and then base64 encode it
-
-
-Backends include by default...
-CBSD - Default on FreeBSD
-Libvirt - Default on Linux
-';
-}
 
 my $backend;
 if ( $^O eq 'freebsd' ) {
 	$backend = 'CBSD';
-}
-elsif ( $^O eq 'linux' ) {
+} elsif ( $^O eq 'linux' ) {
 	$backend = 'Libvirt';
 }
 
@@ -87,6 +73,18 @@ GetOptions(
 	'c'       => \$compress,
 );
 
+if ($version) {
+		print 'hv_monitor v. ' . $HV::Monitor::VERSION . "\n";
+}
+
+if ($help) {
+        pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT, );
+}
+
+if ($version) {
+	exit 255;
+}
+
 my $hm = HV::Monitor->new( { backend => $backend } );
 
 eval { $hm->load; };
@@ -102,14 +100,10 @@ if ( !$compress ) {
 	exit;
 }
 
-my $compressed = encode_base64( gzip($data) );
+# compress and write to the cache file for it
+my $compressed_string;
+gzip \$data => \$compressed_string;
+my $compressed = encode_base64($compressed_string);
 $compressed =~ s/\n//g;
 $compressed = $compressed . "\n";
-
-# check which is smaller and prints it
-if ( length($compressed) > length($data) ) {
-	print $data;
-}
-else {
-	print $compressed;
-}
+print $compressed;

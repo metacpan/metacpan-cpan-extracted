@@ -69,7 +69,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "ok" => 0
   },
-  "VERSION" => "0.000001",
+  "VERSION" => "0.000002",
   "test" => {
     "TESTS" => "t/*.t t/unit/*.t t/unit/QuickORM/*.t t/unit/QuickORM/Builder/*.t t/unit/QuickORM/Cache/*.t t/unit/QuickORM/Conflator/*.t t/unit/QuickORM/Conflator/JSON/*.t t/unit/QuickORM/Conflator/UUID/*.t t/unit/QuickORM/DB/*.t t/unit/QuickORM/Role/*.t t/unit/QuickORM/Row/*.t t/unit/QuickORM/SQLSpec/*.t t/unit/QuickORM/Select/*.t t/unit/QuickORM/Table/*.t t/unit/QuickORM/Util/*.t"
   }

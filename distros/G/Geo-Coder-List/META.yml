@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::Deep: '0'
+  Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
@@ -26,10 +27,11 @@ requires:
   Carp: '0'
   HTML::Entities: '0'
   LWP::Protocol::https: '0'
+  Scalar::Util: '0'
   Time::HiRes: '0'
   perl: '5.010001'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-List
   repository: git://github.com/nigelhorne/Geo-Coder-List.git
-version: '0.33'
+version: '0.34'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,17 +1,18 @@
 package PDK::Device::Hillstone;
 
+use utf8;
 use v5.30;
 use Moose;
 use Expect qw'exp_continue';
 use Carp   qw'croak';
 use namespace::autoclean;
 
-with 'PDK::Device::Base';
+with 'PDK::Device::Role';
 
-has prompt => (is => 'ro', required => 1, default => '^.*?(\((?:M|B|F)\))?[>#]\s*$',);
+has prompt => (is => 'ro', required => 1, default => '^.*?(\((?:M|B|F)\))?[>#]\s*$', );
 
 sub errCodes {
-  my $self = shift;
+  shift;
 
   return [
     qr/incomplete|ambiguous|unrecognized keyword|\^-----/,
@@ -68,12 +69,12 @@ sub waitfor {
     ],
     [
       eof => sub {
-        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因：" . $exp->before());
+        croak("[waitfor/自动交互执行回显] 与设备 $self->{host} 会话丢失，连接被意外关闭！具体原因" . $exp->before());
       }
     ],
     [
       timeout => sub {
-        croak("执行[waitfor/自动交互执行回显]，与设备 $self->{host} 会话超时，请检查网络连接或服务器状态！");
+        croak("[waitfor/自动交互执行回显] 与设备 $self->{host} 会话超时，请检查网络连接或服务器状态");
       }
     ],
   ];
@@ -93,7 +94,7 @@ sub waitfor {
 sub getConfig {
   my $self = shift;
 
-  my $commands = ["terminal width 512", "terminal length 0", "show configuration running", "save all"];
+  my $commands = ["terminal width 512", "terminal length 0", "show configuration running", "save all" ];
 
   my $config = $self->execCommands($commands);
 
@@ -110,7 +111,7 @@ sub getConfig {
 
 sub ftpConfig {
   my ($self, $server, $hostname, $username, $password) = @_;
-  return $self->getConfig;
+  croak("山石防火墙暂不支持 FTP 配置备份");
 }
 
 __PACKAGE__->meta->make_immutable;

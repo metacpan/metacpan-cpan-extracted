@@ -9,7 +9,7 @@ Geo::Coder::List - Call many Geo-Coders
 
 # VERSION
 
-Version 0.32
+Version 0.34
 
 # SYNOPSIS
 
@@ -95,7 +95,8 @@ to set the proxy information from environment variables:
     $ua->env_proxy(1);
     $geocoder_list->ua($ua);
 
-Note that unlike Geo::Coders there is no read method since that would be pointless.
+Note that unlike Geo::Coders,
+there is no read method since that would be pointless.
 
 ## reverse\_geocode
 

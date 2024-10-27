@@ -1,5 +1,6 @@
 package PDK::Utils::Ip;
 
+use utf8;
 use v5.30;
 use Moose;
 use namespace::autoclean;

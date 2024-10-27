@@ -65,7 +65,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.220';
+our $VERSION = '1.221';
 
 use Quiq::Path;
 use Quiq::Hash;
@@ -201,7 +201,7 @@ sub udl {
 
 =head1 VERSION
 
-1.220
+1.221
 
 =head1 AUTHOR
 

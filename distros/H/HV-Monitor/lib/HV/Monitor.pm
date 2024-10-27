@@ -11,11 +11,11 @@ HV::Monitor - A generalized module for gathering stats for a hypervisor.
 
 =head1 VERSION
 
-Version 0.0.6
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.6';
+our $VERSION = '0.1.0';
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,6 @@
 package PDK::Device::Concern::Netdisco;
 
+use utf8;
 use v5.30;
 use Moose;
 use Carp       qw(croak);
@@ -41,16 +42,17 @@ has debug => (
 has result => (is => 'rw', default => sub { {success => [], fail => []} },);
 
 sub exploreTopologyJob {
-  my ($self, $devices) = @_;
+  my ($self, @args) = @_;
+
+  my @devices = @args == 1 && ref $args[0] eq 'ARRAY' ? @{$args[0]} : @args;
 
   eval {
-    $devices = ref($devices) eq 'ARRAY' ? $devices : [$devices];
-    $devices = $self->assignAttributes($devices);
-    my $count = scalar(@{$devices});
-    $self->dump("开始邻居发现任务：并行执行 ($count) 台设备的接口描述自动修正任务");
+    @devices = $self->assignPdkModules(@devices);
+    my $count = scalar(@devices);
+    $self->dump("[exploreTopologyJob] 开始邻居发现任务：并行执行 ($count) 台设备的接口描述自动修正任务");
   };
   if (!!$@) {
-    croak "自动加载并装配模块抛出异常: $@";
+    croak "[exploreTopologyJob] 自动加载并装配模块抛出异常: $@";
   }
 
   my $pm    = Parallel::ForkManager->new($self->{queue});
@@ -61,8 +63,8 @@ sub exploreTopologyJob {
     $queue->enqueue($data) if defined $data;
   });
 
-  foreach my $device (@{$devices}) {
-    $self->dump("开始子任务：发起设备 ($device->{name}/$device->{ip}) 邻居发现任务");
+  foreach my $device (@devices) {
+    $self->dump("[exploreTopologyJob] 开始子任务：发起设备 ($device->{name}/$device->{ip}) 邻居发现任务");
     $pm->start and next;
     my $status = $self->startExploreTopology($device);
     $pm->finish(0, $status);
@@ -73,20 +75,20 @@ sub exploreTopologyJob {
   while (my $data = $queue->dequeue_nb()) {
     push @{$result->{$_}}, @{$data->{$_}} for qw(success fail);
   }
-  $self->dump("邻居发现任务执行完毕，正在将运行结果写入日志文件中");
+  $self->dump("[exploreTopologyJob] 邻居发现任务执行完毕，正在将运行结果写入日志文件中");
 
   for my $type (qw(success fail)) {
     if (@{$result->{$type}}) {
       my $text = join("\n", @{$result->{$type}});
       my $flag = $type eq 'success' ? '成功' : '失败';
-      $self->write_file($text, "邻居发现自动修正接口描述${flag}_设备清单");
+      $self->write_file($text, "邻居发现自动修正接口描述${flag}_设备清单.txt");
     }
   }
 }
 
 sub startExploreTopology {
   my ($self, $param) = @_;
-  $self->dump("激活邻居发现和接口修正任务：对设备($param->{name}/$param->{ip})自动进行邻居发现");
+  $self->dump("[startExploreTopology] 激活邻居发现和接口修正任务：对设备($param->{name}/$param->{ip})自动进行邻居发现");
 
   my $name = $param->{name};
   my $ip   = $param->{ip};
@@ -97,11 +99,11 @@ sub startExploreTopology {
     push @{$status->{success}}, $self->now . " - 设备 $name($ip) 邻居发现成功";
     my $filename = "${name}_${ip}_netdisco.txt";
     $self->write_file($result->{result}, $filename);
-    $self->dump("邻居发现和接口修正成功：已完成设备 $name($ip) 邻居发现并自动修正接口描述");
+    $self->dump("[startExploreTopology] 邻居发现和接口修正成功：已完成设备 $name($ip) 邻居发现并自动修正接口描述");
   }
   else {
     push @{$status->{fail}}, $self->now . " - 设备 $name($ip) 邻居发现失败: $result->{reason}";
-    $self->dump("邻居发现和接口修正失败：设备 $name($ip) 邻居发现并自动修正接口描述异常: $result->{reason}");
+    $self->dump("[startExploreTopology] 邻居发现和接口修正失败：设备 $name($ip) 邻居发现并自动修正接口描述异常: $result->{reason}");
   }
 
   return $status;
@@ -109,7 +111,7 @@ sub startExploreTopology {
 
 sub exploreTopology {
   my ($self, $param) = @_;
-  $self->dump("开始任务：对设备($param->{name}/$param->{ip})自动进行邻居发现");
+  $self->dump("[exploreTopology] 开始任务：对设备($param->{name}/$param->{ip})自动进行邻居发现");
 
   my $result;
   eval {
@@ -123,7 +125,7 @@ sub exploreTopology {
       $result = $self->explore_cisco($device);
     }
     else {
-      my $msg = "暂不支持解析模块的邻居发现：$pdk_device_module";
+      my $msg = "[exploreTopology] 暂不支持解析模块的邻居发现：$pdk_device_module";
       $self->dump($msg);
       warn $msg;
       $result = {success => 0, reason => $msg};
@@ -143,7 +145,7 @@ sub explore_h3c {
     my $nd = PDK::Concern::Netdisco::H3c->new(device => $device);
     return $nd->explore_topology();
   } or do {
-    die "无法正常加载模块(PDK::Concern::Netdisco::H3c)并初始化对象：$@";
+    croak "无法正常加载模块(PDK::Concern::Netdisco::H3c)并初始化对象：$@";
   };
 }
 
@@ -154,7 +156,7 @@ sub explore_cisco {
     my $nd = PDK::Concern::Netdisco::Cisco->new(device => $device);
     return $nd->explore_topology();
   } or do {
-    die "无法正常加载模块(PDK::Concern::Netdisco::Cisco)并初始化对象：$@";
+    croak "无法正常加载模块(PDK::Concern::Netdisco::Cisco)并初始化对象：$@";
   };
 }
 
@@ -173,9 +175,9 @@ sub dump {
     make_path($workdir) unless -d $workdir;
 
     my $filename = "$workdir/netdisco_dump.txt";
-    open(my $fh, '>>', $filename) or croak "无法打开文件 $filename 进行写入: $!";
-    print $fh "$text\n"           or croak "写入文件 $filename 失败: $!";
-    close($fh)                    or croak "关闭文件句柄 $filename 失败: $!";
+    open(my $fh, '>>:encoding(UTF-8)', $filename) or croak "无法打开文件 $filename 进行写入: $!";
+    print $fh "$text\n"                           or croak "写入文件 $filename 失败: $!";
+    close($fh)                                    or croak "关闭文件句柄 $filename 失败: $!";
   }
 }
 

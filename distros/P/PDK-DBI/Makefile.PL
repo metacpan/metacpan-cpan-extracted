@@ -7,7 +7,7 @@ use 5.030000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "PDK::DBI- A Moose-based wrapper for MySQL|Postgresql database operations using DBIx::Custom",
+  "ABSTRACT" => "Moose package for database operations",
   "AUTHOR" => "WENWU.YAN <968828\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -22,15 +22,17 @@ my %WriteMakefileArgs = (
     "Moose" => 0,
     "Moose::Role" => 0,
     "namespace::autoclean" => 0,
+    "utf8" => 0
+  },
+  "TEST_REQUIRES" => {
+    "Data::Dumper" => 0,
+    "Data::Printer" => 0,
+    "Test::Exception" => 0,
+    "Test::More" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "TEST_REQUIRES" => {
-    "Data::Printer" => 0,
-    "Test::Exception" => 0,
-    "Test::More" => 0
-  },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,6 +42,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "DBIx::Custom" => 0,
+  "Data::Dumper" => 0,
   "Data::Printer" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
@@ -47,6 +50,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

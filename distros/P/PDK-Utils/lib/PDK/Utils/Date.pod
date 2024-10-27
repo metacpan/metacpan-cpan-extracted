@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-PDK::Utils::Date - 日期格式化工具类
+PDK::Utils::Date - Date formatting utility class
 
 =head1 VERSION
 
-版本 1.0
+Version 1.0
 
 =head1 SYNOPSIS
 
@@ -16,35 +16,35 @@ PDK::Utils::Date - 日期格式化工具类
 
     my $date_utils = PDK::Utils::Date->new();
 
-    # 获取格式化的当前日期
+    # Get formatted current date
     my $formatted_date = $date_utils->getFormatedDate();
 
-    # 获取指定Unix时间戳的格式化日期
+    # Get formatted date for a specified Unix timestamp
     my $formatted_date_with_time = $date_utils->getFormatedDate('yyyy-mm-dd', 1609459200);
 
 =head1 METHODS
 
 =head2 getFormatedDate($format, $time)
 
-获取格式化的日期字符串。
+Get a formatted date string.
 
-参数:
+Parameters:
 
 =over 4
 
-=item * C<$format> - 日期格式字符串（可选，默认为 'yyyy-mm-dd hh:mi:ss'）
+=item * C<$format> - Date format string (optional, default is 'yyyy-mm-dd hh:mi:ss')
 
-=item * C<$time> - Unix 时间戳（可选，默认为当前时间）
+=item * C<$time> - Unix timestamp (optional, default is current time)
 
 =back
 
-返回值:
+Returns:
 
-格式化的日期字符串。
+Formatted date string.
 
-异常:
+Exceptions:
 
-如果格式字符串中没有有效的时间字符，则抛出异常。
+Throws an exception if the format string does not contain valid time characters.
 
 =head1 AUTHOR
 

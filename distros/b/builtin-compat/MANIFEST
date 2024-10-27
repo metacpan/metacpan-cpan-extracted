@@ -7,6 +7,7 @@ t/00-report-versions.t
 t/basic.t
 t/lib/BrokenModule.pm
 t/lib/MyModule.pm
+t/namespace-clean.t
 xt/missing.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

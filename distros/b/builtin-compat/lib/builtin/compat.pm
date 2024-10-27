@@ -2,7 +2,7 @@ package builtin::compat;
 use strict;
 use warnings;
 
-our $VERSION = '0.003002';
+our $VERSION = '0.003003';
 $VERSION =~ tr/_//d;
 
 use namespace::clean ();
@@ -207,6 +207,8 @@ my %EXPORT_OK = map +($_ => 1), @EXPORT_OK;
 our $NO_DISABLE_WARNINGS;
 sub import {
   my $class = shift;
+  return
+    unless @_;
 
   # search for caller that is being compiled. can't just use caller directly,
   # beause it may not be the same level as builtin would use for its lexical
@@ -261,6 +263,8 @@ builtin::compat - Provide builtin functions for older perl versions
     true
     false
     is_bool
+    inf
+    nan
     weaken
     unweaken
     is_weak
@@ -269,10 +273,12 @@ builtin::compat - Provide builtin functions for older perl versions
     reftype
     created_as_string
     created_as_number
+    stringify
     ceil
     floor
     trim
     indexed
+    load_module
   );
 
 =head1 DESCRIPTION

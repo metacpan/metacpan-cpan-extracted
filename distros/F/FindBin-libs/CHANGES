@@ -1,3 +1,7 @@
+-   4.0.4 Fri Oct 25 22:48:57 EDT 2024
+
+    Saner way to add sub-paths; not visible. 
+
 -   4.0.3 Fri Oct 25 22:48:57 EDT 2024
 
     Add missing '' to catpath. 

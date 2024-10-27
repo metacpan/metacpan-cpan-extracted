@@ -1,5 +1,9 @@
 Revision history for HV-Monitor
 
+0.1.0   2024-10-26/13:30
+		-replace Gzip::Faster with IO::Compress::Gzip
+		-use Pod::Usage
+
 0.0.6   2023-01-25/16:15
 		-MANIFEST fix
 

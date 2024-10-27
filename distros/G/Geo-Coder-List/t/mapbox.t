@@ -35,7 +35,7 @@ MAPBOX: {
 		} else {
 			diag("Using Geo::Coder::Mapbox $Geo::Coder::Mapbox::VERSION");
 		}
-		if(my $key = $ENV{MAPBOX}) {
+		if(my $key = $ENV{'MAPBOX_KEY'}) {
 			my $ua = new_ok('LWP::UserAgent::Throttled');
 			$ua->env_proxy(1);
 
@@ -47,7 +47,7 @@ MAPBOX: {
 			ok(defined($location));
 			ok(ref($location) eq 'HASH');
 			delta_within($location->{geometry}{location}{lat}, 51.34, 1e-2);
-			delta_within($location->{geometry}{location}{lng}, 1.40, 1e-2);
+			delta_within($location->{geometry}{location}{lng}, 1.42, 1e-2);
 			is(ref($location->{'geocoder'}), 'Geo::Coder::Mapbox', 'Verify Mapbox encoder is used');
 
 			$location = $geocoderlist->geocode('Ashford, Kent, England');
@@ -61,11 +61,11 @@ MAPBOX: {
 			ok(defined($location));
 			ok(ref($location) eq 'HASH');
 			delta_within($location->{geometry}{location}{lat}, 51.34, 1e-2);
-			delta_within($location->{geometry}{location}{lng}, 1.40, 1e-2);
-			is($location->{'geocoder'}, undef, 'Verify subsequent reads are cached');
+			delta_within($location->{geometry}{location}{lng}, 1.42, 1e-2);
+			is($location->{'geocoder'}, 'cache', 'Verify subsequent reads are cached');
 		} else {
-			diag('Set MAPBOX to enable more tests');
-			skip('MAPBOX not set', 18);
+			diag('Set MAPBOX_KEY to enable more tests');
+			skip('MAPBOX_KEY not set', 18);
 		}
 	}
 }

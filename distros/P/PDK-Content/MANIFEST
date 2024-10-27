@@ -7,8 +7,12 @@ README
 dist.ini
 lib/PDK/Content.pm
 lib/PDK/Content/Dumper.pm
+lib/PDK/Content/Dumper.pod
 lib/PDK/Content/Parser.pm
+lib/PDK/Content/Parser.pod
 lib/PDK/Content/Reader.pm
+lib/PDK/Content/Reader.pod
 lib/PDK/Content/Role.pm
+lib/PDK/Content/Role.pod
 t/parser_smoke.t
 t/reader_smoke.t

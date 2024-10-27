@@ -2,7 +2,7 @@ package DBIx::QuickORM::Util::SchemaBuilder;
 use strict;
 use warnings;
 
-our $VERSION = '0.000001';
+our $VERSION = '0.000002';
 
 use List::Util qw/mesh/;
 

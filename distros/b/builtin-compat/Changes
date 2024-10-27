@@ -1,5 +1,9 @@
 Revision history for builtin-compat
 
+0.003003 - 2024-10-27
+  - fix importing with no arguments deleting existing functions
+  - added missing functions to synopsis
+
 0.003002 - 2024-10-10
   - fix compatibility with builtin::Backport
 

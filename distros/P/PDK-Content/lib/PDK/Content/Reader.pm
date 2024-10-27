@@ -1,6 +1,7 @@
 package PDK::Content::Reader;
 
-use 5.030;
+use utf8;
+use v5.30;
 use Moose;
 use Digest::MD5;
 use DateTime;
@@ -8,18 +9,18 @@ use Carp qw'croak';
 use namespace::autoclean;
 use Data::Dumper;
 
-has config => (is => 'ro', isa => 'ArrayRef[Str]', required => 1, );
+has config => (is => 'ro', isa => 'ArrayRef[Str]', required => 1,);
 
-has confContent => (is => 'ro', isa => 'Str', lazy => 1, builder => '_buildConfContent', );
+has confContent => (is => 'ro', isa => 'Str', lazy => 1, builder => '_buildConfContent',);
 
-has cursor => (is => 'ro', isa => 'Int', default => 0, );
+has cursor => (is => 'ro', isa => 'Int', default => 0,);
 
 with 'PDK::Content::Role';
 with 'PDK::Content::Dumper';
 
-has '+sign' => (required => 0, lazy => 1, builder => '_buildSign', );
+has '+sign' => (required => 0, lazy => 1, builder => '_buildSign',);
 
-has '+timestamp' => (required => 0, builder => '_buildTimestamp', );
+has '+timestamp' => (required => 0, builder => '_buildTimestamp',);
 
 sub _buildSign {
   my $self = shift;
@@ -147,7 +148,7 @@ sub getUnParsedLines {
   my $self = shift;
 
   my $unParsedLines = join('',
-    map { $self->config->[$_] } grep { $self->{lineParsedFlags}->[$_] == 0 } (0 .. scalar(@{$self->config}) - 1) );
+    map { $self->config->[$_] } grep { $self->{lineParsedFlags}->[$_] == 0 } (0 .. scalar(@{$self->config}) - 1));
 
   $self->dump("[getUnParsedLines] 获取所有未解析的行并打印：" . Dumper $unParsedLines);
   return $unParsedLines;
