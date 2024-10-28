@@ -124,4 +124,55 @@ syntax error at unknown line 3
     is( $output, 'The open tag is <%.', 'Testing escaping of open tag' );
 }
 
+# Test 9: Commenting and escaped comments
+{
+    my $template_str = <<'END_TEMPLATE';
+# This is a comment1
+# This is a comment2
+Test1
+# This is a comment2
+# This is a comment2
+# This is a comment2
+Test2
+# This is a comment3
+END_TEMPLATE
+
+    my $compiled = $template->from_string($template_str);
+    my $output   = $compiled->render();
+    is( $output, "Test1\nTest2\n", 'Testing comments, 1' );
+}
+
+# Test 10: Commenting and escaped comments, part 2
+
+{
+    my $template_str = <<'END_TEMPLATE';
+# This is a comment1
+# This is a comment2
+Test1
+# This is a comment2
+\# This is a comment2
+# This is a comment2
+Test2
+# This is a comment3
+END_TEMPLATE
+
+    my $compiled = $template->from_string($template_str);
+    my $output   = $compiled->render();
+    is( $output, "Test1\n# This is a comment2\nTest2\n", 'Testing comments, 2' );
+}
+
+# Test 11: Commenting and escaped comments, part 3
+
+{
+    my $template_str = <<'END_TEMPLATE';
+Test1
+# This is a comment
+\# Not a comment
+END_TEMPLATE
+
+    my $compiled = $template->from_string($template_str);
+    my $output   = $compiled->render();
+    is( $output, "Test1\n# Not a comment\n", 'Testing comments, 3' );
+}
+
 done_testing();

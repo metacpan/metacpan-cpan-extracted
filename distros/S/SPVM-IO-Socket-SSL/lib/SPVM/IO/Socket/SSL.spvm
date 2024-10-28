@@ -1,0 +1,279 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class IO::Socket::SSL extends IO::Socket::IP {
+  version "0.001";
+  
+  use IO::Socket::INET;
+  use Net::SSLeay;
+  use Net::SSLeay::SSL_CTX;
+  use Net::SSLeay::SSL_METHOD;
+  use Net::SSLeay::Constant as SSL;
+  use Net::SSLeay::ERR;
+  use Net::SSLeay::BIO;
+  use Net::SSLeay::PEM;
+  use StringBuffer;
+  use Mozilla::CA;
+  use Go;
+  
+  has ssl : Net::SSLeay;
+  
+  # Class Methods
+  static method new : IO::Socket::SSL ($options : object[] = undef) {
+    
+    my $self = new IO::Socket::SSL;
+    
+    $self->init($options);
+    
+    $self->configure;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  protected method option_names : string[] () {
+    
+    my $option_names = Array->merge_string(
+      $self->SUPER::option_names,
+      new string [0],
+    );
+    
+    return $option_names;
+  }
+  
+  protected method init : void ($options : object[] = undef) {
+    
+    $self->SUPER::init($options);
+    
+  }
+  
+  protected method configure : void () {
+    
+    $self->SUPER::configure;
+    
+    $self->start_SSL;
+    
+    # Client
+    my $peer_address = $self->{PeerAddr};
+    if ($peer_address) {
+      $self->connect_SSL;
+    }
+  }
+  
+  protected method start_SSL : void () {
+    
+    my $host = $self->{PeerAddr};
+    
+    my $ssl_method = Net::SSLeay::SSL_METHOD->SSLv23_client_method;
+    
+    my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+    
+    $ssl_ctx->set_verify(SSL->SSL_VERIFY_PEER);
+    
+    my $ca = Mozilla::CA->SSL_ca;
+
+=pod
+
+    my $bio = Net::SSLeay::BIO->new;
+    
+    $bio->write($ca);
+    
+    my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
+    
+    my $x509_store = $ssl_ctx->get_cert_store;
+    
+    $x509_store->add_cert($x509);
+
+=cut
+
+    $ssl_ctx->set_default_verify_paths;
+    
+    my $verify_param = $ssl_ctx->get0_param;
+    
+    $verify_param->set_hostflags(SSL->X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
+    
+    $verify_param->set1_host($host);
+    
+    my $ssl = Net::SSLeay->new($ssl_ctx);
+    
+    my $socket_fileno = $self->fileno;
+    
+    $ssl->set_fd($socket_fileno);
+    
+    $ssl->set_tlsext_host_name($host);
+    
+    $self->{ssl} = $ssl;
+  }
+  
+  protected method connect_SSL : void () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $timeout = $self->{Timeout};
+    
+    my $fd = $self->{FD};
+    
+    while (1) {
+      eval { $ssl->connect; }
+      
+      if ($@) {
+        my $again = Sys::Socket::Errno->is_connect_again(Sys::Socket::Errno->errno);
+        
+        if ($again) {
+          Go->gosched_io_write($fd, $timeout);
+          next;
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+  }
+  
+  method accept_SSL : void () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $fd = $self->{FD};
+    
+    my $timeout = $self->{Timeout};
+    
+    while (1) {
+      eval { $ssl->accept; }
+      
+      if ($@) {
+        my $again = Sys::Socket::Errno->is_accept_again(Sys::Socket::Errno->errno);
+        
+        if ($again) {
+          Go->gosched_io_read($fd, $timeout);
+          next;
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+  }
+  
+  method accept : IO::Socket::SSL ($peer_ref : Sys::Socket::Sockaddr[] = undef) {
+    my $client = (IO::Socket::SSL)$self->SUPER::accept($peer_ref);
+    
+    $self->accept_SSL;
+    
+    return $client;
+  }
+  
+  method read : int ($buffer : mutable string, $length : int = -1, $offset : int = 0) {
+    
+    my $ssl = $self->{ssl};
+    
+    my $fd = $self->{FD};
+    
+    my $timeout = $self->{Timeout};
+    
+    my $read_length = -1;
+    while (1) {
+      eval { $read_length = $ssl->read($buffer, $length, $offset); }
+      
+      if ($@) {
+        my $again = Sys::Socket::Errno->is_read_again(Sys::Socket::Errno->errno);
+        
+        if ($again) {
+          Go->gosched_io_read($fd, $timeout);
+          next;
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+    
+    return $read_length;
+  }
+  
+  method write : int ($buffer : string, $length : int = -1, $offset : int = 0) {
+    
+    my $ssl = $self->{ssl};
+    
+    my $fd = $self->{FD};
+    
+    my $timeout = $self->{Timeout};
+    
+    my $write_length = -1;
+    while (1) {
+      
+      eval { $write_length = $ssl->write($buffer, $length, $offset); }
+      
+      if ($@) {
+        my $again = Sys::Socket::Errno->is_write_again(Sys::Socket::Errno->errno);
+        
+        if ($again) {
+          Go->gosched_io_write($fd, $timeout);
+          next;
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+    
+    return $write_length;
+  }
+  
+  method close : void () {
+    
+    $self->stop_SSL;
+    
+    $self->SUPER::close;
+    
+  }
+  
+  protected method stop_SSL : void () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $shutdown_ret = $ssl->shutdown;
+    
+    if ($shutdown_ret == 0) {
+      while (1) {
+        my $recv_buffer = (mutable string)new_string_len 100;
+        my $read_length = $ssl->read($recv_buffer);
+        if ($read_length <= 0) {
+          last;
+        }
+      }
+    }
+    
+  }
+  
+  method stat : Sys::IO::Stat () { die "stat method is not allowed in IO::Scoekt::SSL."; }
+  
+  method send : int ($buffer : string, $flags : int = 0, $length : int = -1, $offset : int = 0) {
+    die "send method is not allowed in IO::Scoekt::SSL. Use write method instead.";
+  }
+  
+  method sendto : int ($buffer : string, $flags : int, $to : Sys::Socket::Sockaddr, $length : int = -1, $offset : int = 0) {
+    die "sendto method is not allowed in IO::Scoekt::SSL. Use write method instead.";
+  }
+  
+  method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0, $offset : int = 0) {
+    die "recv method is not allowed in IO::Scoekt::SSL. Use read method instead.";
+  }
+  
+  method recvfrom : int ($buffer : mutable string, $length : int, $flags : int, $from_ref : Sys::Socket::Sockaddr[], $offset : int = 0) {
+    die "recvfrom method is not allowed in IO::Scoekt::SSL. Use read method instead.";
+  }
+}
+

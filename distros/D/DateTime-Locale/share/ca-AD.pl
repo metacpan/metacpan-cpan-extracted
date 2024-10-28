@@ -60,7 +60,7 @@
     yMMMd => "d MMM 'del' y",
     yMd => "d/M/y",
     yQQQ => "QQQ y",
-    yQQQQ => "QQQQ y",
+    yQQQQ => "QQQQ 'del' y",
     "yw-count-one" => "'setmana' w 'del' Y",
     "yw-count-other" => "'setmana' w 'del' Y",
   },
@@ -279,5 +279,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 45,
+  version => 46,
 }

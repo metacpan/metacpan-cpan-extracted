@@ -271,7 +271,7 @@ use PDL::Options q/iparse/;
 use File::Temp qw/tempfile tempdir/;
 use Scalar::Util q/looks_like_number/;
 
-our $VERSION = '1.014';
+our $VERSION = '1.015';
 $VERSION =~ s/_//g;
 
 ##############################

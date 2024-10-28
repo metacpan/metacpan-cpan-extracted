@@ -2,7 +2,7 @@ package DBIx::QuickORM::DB::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000002';
+our $VERSION = '0.000004';
 
 use DBD::Pg qw/PG_ASYNC/;
 

@@ -2,7 +2,7 @@ package DBIx::QuickORM::Conflator::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '0.000002';
+our $VERSION = '0.000004';
 
 use Cpanel::JSON::XS qw/decode_json/;
 

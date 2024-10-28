@@ -53,7 +53,7 @@
     "yw-count-other" => "\N{U+0ead}\N{U+0eb2}\N{U+0e97}\N{U+0eb4}\N{U+0e94}\N{U+0e97}\N{U+0eb5}\N{U+0ec8} w \N{U+0e82}\N{U+0ead}\N{U+0e87}\N{U+0e9b}\N{U+0eb5} Y",
   },
   code => "lo",
-  date_format_full => "EEEE \N{U+0e97}\N{U+0eb5} d MMMM G y",
+  date_format_full => "EEEE, d MMMM y",
   date_format_long => "d MMMM y",
   date_format_medium => "d MMM y",
   date_format_short => "d/M/y",
@@ -267,5 +267,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 45,
+  version => 46,
 }

@@ -507,11 +507,11 @@ Silesian Poland locale.
    1995-12-22T09:05:02 = 22
   -0010-09-15T04:44:23 = 15
 
-=head3 h (h a)
+=head3 h (h a)
 
-   2008-02-05T18:30:30 = 6 po połedniu
-   1995-12-22T09:05:02 = 9 do połedniŏ
-  -0010-09-15T04:44:23 = 4 do połedniŏ
+   2008-02-05T18:30:30 = 6 po połedniu
+   1995-12-22T09:05:02 = 9 do połedniŏ
+  -0010-09-15T04:44:23 = 4 do połedniŏ
 
 =head3 hm (h:mm a)
 

@@ -644,7 +644,7 @@ French Canada locale.
 
 =head3 Prefers 24 hour time?
 
-No
+Yes
 
 =head3 Local first day of the week
 

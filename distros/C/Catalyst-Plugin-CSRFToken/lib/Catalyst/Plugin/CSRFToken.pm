@@ -5,7 +5,7 @@ use WWW::CSRF ();
 use Bytes::Random::Secure ();
 
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
  
 has 'default_csrf_token_secret' => (is=>'ro', required=>1, builder=>'_build_default_csrf_token_secret');
  
@@ -39,12 +39,14 @@ has 'auto_check_csrf_token' => (is=>'ro', required=>1, builder=>'_build_auto_che
   sub _build_auto_check_csrf_token {
     if(my $config = shift->config->{'Plugin::CSRFToken'}) {
       return $config->{auto_check} if exists $config->{auto_check};
+      return $config->{auto_check_csrf_token} if exists $config->{auto_check_csrf_token};
     }
     return 0;
   }
 
 sub default_csrf_session_id {
   my $self = shift;
+  $self->change_session_id unless $self->sessionid;
   return $self->sessionid;
 }
 
@@ -257,7 +259,7 @@ trying to process, typically as a hidden field called 'csrf_token' (althought yo
 that in configuration if needed).
 
 Its probably best to enable 'auto_check_csrf_token' true since that will automatically check
-all POST, bPUT and PATCH request (but of course if you do this you have to be sure to add the token
+all POST, PUT and PATCH request (but of course if you do this you have to be sure to add the token
 to every single form.  If you need to just use this on a few forms (for example you have a 
 large legacy application and need to improve security in steps) you can roll your own handling
 via the C<check_csrf_token> method as in the example given above.

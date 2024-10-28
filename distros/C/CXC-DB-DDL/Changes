@@ -1,5 +1,18 @@
 Revision history for CXC-DB-DDL
 
+0.18      2024-10-27 15:02:46-04:00 America/New_York
+
+  [BUG FIX]
+
+   * resolve a constraint's field names when a CXC::DB::DDL::Table is
+     created so that
+
+       * '-all' is properly converted into the list of the table's fields, and
+       * the field names are always stored as an array
+
+     TODO: make constraints proper objects.
+
+
 0.17      2024-10-01 13:59:14-04:00 America/New_York
 
   [BUG FIX]

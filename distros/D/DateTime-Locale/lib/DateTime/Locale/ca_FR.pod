@@ -663,11 +663,11 @@ Catalan France locale.
    1995-12-22T09:05:02 = 4T 1995
   -0010-09-15T04:44:23 = 3T -10
 
-=head3 yQQQQ (QQQQ y)
+=head3 yQQQQ (QQQQ 'del' y)
 
-   2008-02-05T18:30:30 = 1r trimestre 2008
-   1995-12-22T09:05:02 = 4t trimestre 1995
-  -0010-09-15T04:44:23 = 3r trimestre -10
+   2008-02-05T18:30:30 = 1r trimestre del 2008
+   1995-12-22T09:05:02 = 4t trimestre del 1995
+  -0010-09-15T04:44:23 = 3r trimestre del -10
 
 =head3 yw-count-one ('setmana' w 'del' Y)
 

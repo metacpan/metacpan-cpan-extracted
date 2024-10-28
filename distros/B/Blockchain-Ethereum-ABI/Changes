@@ -1,3 +1,6 @@
+0.018     2024-10-27 22:13:49-03:00 America/Sao_Paulo
+    [Bug Fixes]
+    - Fix no argument function encoding
 0.017     2024-10-10 00:50:34-03:00 America/Sao_Paulo
     - Remove Object::Pad
 0.016     2024-10-04 23:46:49-03:00 America/Sao_Paulo

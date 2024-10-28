@@ -46,5 +46,9 @@ sub test444 :Local Does(RequestModel) QueryModelFor('test3') {
   $c->response->body(Dumper($q->nested_params));
 }
 
+sub omit :Post :Local Does(RequestModel) BodyModel() {
+  my ($self, $c, $q) = @_;
+  $c->response->body(Dumper($q->nested_params));
+}
 
 __PACKAGE__->meta->make_immutable;

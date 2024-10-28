@@ -19,7 +19,7 @@
     GyMMM => "G y MMM",
     GyMMMEd => "G y MMM d, E",
     GyMMMd => "G y MMM d",
-    GyMd => "M/d/y GGGGG",
+    GyMd => "M/d/y G",
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
@@ -37,7 +37,7 @@
     MMdd => "dd/MM",
     Md => "d/M",
     d => "d",
-    h => "h a",
+    h => "h\N{U+202f}a",
     hm => "h:mm a",
     hms => "h:mm:ss a",
     hmsv => "h:mm:ss a v",
@@ -121,11 +121,11 @@
     "\N{U+0d1e}\N{U+0d3e}\N{U+0d2f}\N{U+0d31}\N{U+0d3e}\N{U+0d34}\N{U+0d4d}\N{U+200c}\N{U+0d1a}",
   ],
   era_abbreviated => [
-    "\N{U+0d15}\N{U+0d4d}\N{U+0d30}\N{U+0d3f}.\N{U+0d2e}\N{U+0d41}.",
+    "\N{U+0d2c}\N{U+0d3f}.\N{U+0d38}\N{U+0d3f}.",
     "\N{U+0d0e}\N{U+0d21}\N{U+0d3f}",
   ],
   era_narrow => [
-    "\N{U+0d15}\N{U+0d4d}\N{U+0d30}\N{U+0d3f}.\N{U+0d2e}\N{U+0d41}.",
+    "\N{U+0d2c}\N{U+0d3f}.\N{U+0d38}\N{U+0d3f}.",
     "\N{U+0d0e}\N{U+0d21}\N{U+0d3f}",
   ],
   era_wide => [
@@ -272,5 +272,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 45,
+  version => 46,
 }

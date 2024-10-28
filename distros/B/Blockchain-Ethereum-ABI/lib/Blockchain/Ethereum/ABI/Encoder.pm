@@ -3,11 +3,10 @@ package Blockchain::Ethereum::ABI::Encoder;
 use v5.26;
 use strict;
 use warnings;
-no indirect;
 
 # ABSTRACT: ABI utility for encoding ethereum contract arguments
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.017';          # VERSION
+our $VERSION   = '0.018';          # VERSION
 
 use Carp;
 use Crypt::Digest::Keccak256 qw(keccak256_hex);
@@ -50,9 +49,12 @@ sub generate_function_signature {
     my $self = shift;
 
     croak "Missing function name e.g. ->function('name')" unless $self->{function_name};
+
+    my @instances = $self->{instances}->@*;
+
     my $signature = $self->{function_name} . '(';
-    $signature .= sprintf("%s,", $_->{signature}) for $self->{instances}->@*;
-    chop $signature;
+    $signature .= sprintf("%s,", $_->{signature}) for @instances;
+    chop $signature if scalar @instances;
     return $signature . ')';
 }
 
@@ -67,7 +69,10 @@ sub encode {
 
     my $tuple = Blockchain::Ethereum::ABI::Type::Tuple->new;
     $tuple->{instances} = $self->{instances};
-    my @data = $tuple->encode->@*;
+
+    my $encoded = $tuple->encode;
+    my @data;
+    push @data, $tuple->encode->@* if $encoded;
     unshift @data, $self->encode_function_signature if $self->{function_name};
 
     $self->_clean;
@@ -95,7 +100,7 @@ Blockchain::Ethereum::ABI::Encoder - ABI utility for encoding ethereum contract 
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

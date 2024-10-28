@@ -1588,6 +1588,11 @@ share/jv-ID.pl
 share/jv.pl
 share/ka-GE.pl
 share/ka.pl
+share/kaa-Cyrl-UZ.pl
+share/kaa-Cyrl.pl
+share/kaa-Latn-UZ.pl
+share/kaa-Latn.pl
+share/kaa.pl
 share/kab-DZ.pl
 share/kab.pl
 share/kaj-NG.pl
@@ -1608,6 +1613,10 @@ share/khq-ML.pl
 share/khq.pl
 share/ki-KE.pl
 share/ki.pl
+share/kk-Arab-CN.pl
+share/kk-Arab.pl
+share/kk-Cyrl-KZ.pl
+share/kk-Cyrl.pl
 share/kk-KZ.pl
 share/kk.pl
 share/kkj-CM.pl
@@ -1624,7 +1633,11 @@ share/ko-CN.pl
 share/ko-KP.pl
 share/ko-KR.pl
 share/ko.pl
+share/kok-Deva-IN.pl
+share/kok-Deva.pl
 share/kok-IN.pl
+share/kok-Latn-IN.pl
+share/kok-Latn.pl
 share/kok.pl
 share/kpe-GN.pl
 share/kpe-LR.pl
@@ -1667,6 +1680,8 @@ share/lij-IT.pl
 share/lij.pl
 share/lkt-US.pl
 share/lkt.pl
+share/lld-IT.pl
+share/lld.pl
 share/lmo-IT.pl
 share/lmo.pl
 share/ln-AO.pl
@@ -1681,6 +1696,8 @@ share/lrc-IR.pl
 share/lrc.pl
 share/lt-LT.pl
 share/lt.pl
+share/ltg-LV.pl
+share/ltg.pl
 share/lu-CD.pl
 share/lu.pl
 share/luo-KE.pl
@@ -1706,6 +1723,8 @@ share/mgh-MZ.pl
 share/mgh.pl
 share/mgo-CM.pl
 share/mgo.pl
+share/mhn-IT.pl
+share/mhn.pl
 share/mi-NZ.pl
 share/mi.pl
 share/mic-CA.pl
@@ -2089,6 +2108,7 @@ share/yrl-VE.pl
 share/yrl.pl
 share/yue-Hans-CN.pl
 share/yue-Hans.pl
+share/yue-Hant-CN.pl
 share/yue-Hant-HK.pl
 share/yue-Hant.pl
 share/yue.pl
@@ -2098,11 +2118,15 @@ share/zgh-MA.pl
 share/zgh.pl
 share/zh-Hans-HK.pl
 share/zh-Hans-MO.pl
+share/zh-Hans-MY.pl
 share/zh-Hans-SG.pl
 share/zh-Hans.pl
 share/zh-Hant-HK.pl
 share/zh-Hant-MO.pl
+share/zh-Hant-MY.pl
 share/zh-Hant.pl
+share/zh-Latn-CN.pl
+share/zh-Latn.pl
 share/zh.pl
 share/zu-ZA.pl
 share/zu.pl

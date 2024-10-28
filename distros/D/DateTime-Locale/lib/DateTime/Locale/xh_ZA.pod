@@ -55,7 +55,7 @@ Xhosa South Africa locale.
   Tht
   Sin
   Hl
-  Mgq
+  Mg
   C
 
 
@@ -86,7 +86,7 @@ Xhosa South Africa locale.
   St
   Sin
   Hl
-  Mgq
+  Mg
   C
 
 =head2 Months

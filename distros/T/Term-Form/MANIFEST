@@ -24,6 +24,7 @@ xt/readline_invalid_args.pl
 xt/readline_valid_args.pl
 xt/spelling.t
 xt/synopsis.t
+xt/vars.t
 xt/version1.t
 xt/version2.t
 xt/whitespaces.t

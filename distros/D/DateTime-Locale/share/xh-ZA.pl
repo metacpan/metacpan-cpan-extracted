@@ -76,7 +76,7 @@
     "Tht",
     "Sin",
     "Hl",
-    "Mgq",
+    "Mg",
     "C",
   ],
   day_format_wide => [
@@ -103,7 +103,7 @@
     "St",
     "Sin",
     "Hl",
-    "Mgq",
+    "Mg",
     "C",
   ],
   day_stand_alone_wide => [
@@ -267,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 45,
+  version => 46,
 }

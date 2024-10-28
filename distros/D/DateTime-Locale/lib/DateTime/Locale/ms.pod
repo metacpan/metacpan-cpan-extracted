@@ -477,11 +477,11 @@ Malay locale.
    1995-12-22T09:05:02 = Jum, 22 Dis
   -0010-09-15T04:44:23 = Sab, 15 Sep
 
-=head3 MMMMW-count-other ('week' W 'of' MMMM)
+=head3 MMMMW-count-other ('minggu' W 'daripada' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of Februari
-   1995-12-22T09:05:02 = week 3 of Disember
-  -0010-09-15T04:44:23 = week 2 of September
+   2008-02-05T18:30:30 = minggu 1 daripada Februari
+   1995-12-22T09:05:02 = minggu 3 daripada Disember
+  -0010-09-15T04:44:23 = minggu 2 daripada September
 
 =head3 MMMMd (d MMMM)
 
@@ -609,11 +609,11 @@ Malay locale.
    1995-12-22T09:05:02 = Suku Ke-4 1995
   -0010-09-15T04:44:23 = Suku Ke-3 -10
 
-=head3 yw-count-other ('week' w 'of' Y)
+=head3 yw-count-other ('minggu' w 'daripada' Y)
 
-   2008-02-05T18:30:30 = week 6 of 2008
-   1995-12-22T09:05:02 = week 51 of 1995
-  -0010-09-15T04:44:23 = week 37 of -10
+   2008-02-05T18:30:30 = minggu 6 daripada 2008
+   1995-12-22T09:05:02 = minggu 51 daripada 1995
+  -0010-09-15T04:44:23 = minggu 37 daripada -10
 
 
 =head2 Miscellaneous

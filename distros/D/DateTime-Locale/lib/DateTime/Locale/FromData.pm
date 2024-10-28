@@ -9,7 +9,7 @@ use Params::ValidationCompiler 0.13 qw( validation_for );
 use Specio::Declare;
 use Storable qw( dclone );
 
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 
 my @FormatLengths;
 
@@ -294,7 +294,7 @@ DateTime::Locale::FromData - Class for locale objects instantiated from pre-defi
 
 =head1 VERSION
 
-version 1.43
+version 1.44
 
 =head1 SYNOPSIS
 

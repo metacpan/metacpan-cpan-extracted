@@ -232,7 +232,7 @@ Afrikaans Namibia locale.
 =head3 Wide (format)
 
   voor Christus
-  na Christus
+  ná Christus
 
 =head3 Abbreviated (format)
 

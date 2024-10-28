@@ -35,7 +35,7 @@
     MMMd => "MMM d",
     Md => "M/d",
     d => "d",
-    h => "h a",
+    h => "h\N{U+202f}a",
     hm => "h:mm\N{U+202f}a",
     hms => "h:mm:ss a",
     hmsv => "h:mm:ss a v",
@@ -268,5 +268,5 @@
   time_format_medium => "h:mm:ss\N{U+202f}a",
   time_format_short => "h:mm\N{U+202f}a",
   variant => undef,
-  version => 45,
+  version => 46,
 }

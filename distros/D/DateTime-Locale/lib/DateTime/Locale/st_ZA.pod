@@ -30,11 +30,11 @@ Southern Sotho South Africa locale.
 
 =head3 Wide (format)
 
-  Mmantaha
+  Mantaha
   Labobedi
-  Laboraru
+  Laboraro
   Labone
-  Labohlane
+  Labohlano
   Moqebelo
   Sontaha
 
@@ -61,11 +61,11 @@ Southern Sotho South Africa locale.
 
 =head3 Wide (stand-alone)
 
-  Mmantaha
+  Mantaha
   Labobedi
-  Laboraru
+  Laboraro
   Labone
-  Labohlane
+  Labohlano
   Moqebelo
   Sontaha
 
@@ -93,17 +93,17 @@ Southern Sotho South Africa locale.
 
 =head3 Wide (format)
 
-  Phesekgong
+  Pherekgong
   Hlakola
   Hlakubele
-  Mmese
+  Mmesa
   Motsheanong
   Phupjane
   Phupu
-  Phata
-  Leotshe
+  Phato
+  Lwetse
   Mphalane
-  Pundungwane
+  Pudungwana
   Tshitwe
 
 =head3 Abbreviated (format)
@@ -139,17 +139,17 @@ Southern Sotho South Africa locale.
 
 =head3 Wide (stand-alone)
 
-  Phesekgong
+  Pherekgong
   Hlakola
   Hlakubele
-  Mmese
+  Mmesa
   Motsheanong
   Phupjane
   Phupu
-  Phata
-  Leotshe
+  Phato
+  Lwetse
   Mphalane
-  Pundungwane
+  Pudungwana
   Tshitwe
 
 =head3 Abbreviated (stand-alone)
@@ -249,14 +249,14 @@ Southern Sotho South Africa locale.
 =head3 Full
 
    2008-02-05T18:30:30 = 2008 Hlakola 5, Labobedi
-   1995-12-22T09:05:02 = 1995 Tshitwe 22, Labohlane
-  -0010-09-15T04:44:23 = -10 Leotshe 15, Moqebelo
+   1995-12-22T09:05:02 = 1995 Tshitwe 22, Labohlano
+  -0010-09-15T04:44:23 = -10 Lwetse 15, Moqebelo
 
 =head3 Long
 
    2008-02-05T18:30:30 = 2008 Hlakola 5
    1995-12-22T09:05:02 = 1995 Tshitwe 22
-  -0010-09-15T04:44:23 = -10 Leotshe 15
+  -0010-09-15T04:44:23 = -10 Lwetse 15
 
 =head3 Medium
 
@@ -303,14 +303,14 @@ Southern Sotho South Africa locale.
 =head3 Full
 
    2008-02-05T18:30:30 = 2008 Hlakola 5, Labobedi 18:30:30 UTC
-   1995-12-22T09:05:02 = 1995 Tshitwe 22, Labohlane 09:05:02 UTC
-  -0010-09-15T04:44:23 = -10 Leotshe 15, Moqebelo 04:44:23 UTC
+   1995-12-22T09:05:02 = 1995 Tshitwe 22, Labohlano 09:05:02 UTC
+  -0010-09-15T04:44:23 = -10 Lwetse 15, Moqebelo 04:44:23 UTC
 
 =head3 Long
 
    2008-02-05T18:30:30 = 2008 Hlakola 5 18:30:30 UTC
    1995-12-22T09:05:02 = 1995 Tshitwe 22 09:05:02 UTC
-  -0010-09-15T04:44:23 = -10 Leotshe 15 04:44:23 UTC
+  -0010-09-15T04:44:23 = -10 Lwetse 15 04:44:23 UTC
 
 =head3 Medium
 
@@ -493,7 +493,7 @@ Southern Sotho South Africa locale.
 
    2008-02-05T18:30:30 = Hlakola 5
    1995-12-22T09:05:02 = Tshitwe 22
-  -0010-09-15T04:44:23 = Leotshe 15
+  -0010-09-15T04:44:23 = Lwetse 15
 
 =head3 MMMd (MMM d)
 
@@ -583,7 +583,7 @@ Southern Sotho South Africa locale.
 
    2008-02-05T18:30:30 = 2008 Hlakola
    1995-12-22T09:05:02 = 1995 Tshitwe
-  -0010-09-15T04:44:23 = -10 Leotshe
+  -0010-09-15T04:44:23 = -10 Lwetse
 
 =head3 yMMMd (y MMM d)
 

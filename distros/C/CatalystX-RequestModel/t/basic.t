@@ -70,5 +70,12 @@ ok my $body_parameters = [
   is $data->{password}, 'abc123';  
 }
 
+{
+  ok my $res = request POST '/root/omit', [aaa=>111];
+  ok my $data = eval $res->content;
+
+  is_deeply $data->{omit_array}, [];
+  is_deeply $data->{omit_scalar}, undef;  
+}
 
 done_testing;

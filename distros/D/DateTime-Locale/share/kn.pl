@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "\N{U+0caa}\N{U+0cc2}\N{U+0cb0}\N{U+0ccd}\N{U+0cb5}\N{U+0cbe}\N{U+0cb9}\N{U+0ccd}\N{U+0ca8}",
-    "\N{U+0c85}\N{U+0caa}\N{U+0cb0}\N{U+0cbe}\N{U+0cb9}\N{U+0ccd}\N{U+0ca8}",
+    "AM",
+    "PM",
   ],
   available_formats => {
     Bh => "h B",
@@ -31,11 +31,11 @@
     MMMEd => "E, d MMM",
     "MMMMW-count-other" => "'week' W 'of' MMMM",
     MMMMd => "d MMMM",
-    MMMd => "MMM d",
+    MMMd => "d MMM",
     MMdd => "dd-MM",
     Md => "d/M",
     d => "d",
-    h => "h a",
+    h => "h\N{U+202f}a",
     hm => "h:mm a",
     hms => "h:mm:ss a",
     hmsv => "h:mm:ss a v",
@@ -137,14 +137,14 @@
   glibc_time_format => "%H:%M:%S",
   language => "Kannada",
   month_format_abbreviated => [
-    "\N{U+0c9c}\N{U+0ca8}\N{U+0cb5}\N{U+0cb0}\N{U+0cbf}",
-    "\N{U+0cab}\N{U+0cc6}\N{U+0cac}\N{U+0ccd}\N{U+0cb0}\N{U+0cb5}\N{U+0cb0}\N{U+0cbf}",
+    "\N{U+0c9c}\N{U+0ca8}",
+    "\N{U+0cab}\N{U+0cc6}\N{U+0cac}\N{U+0ccd}\N{U+0cb0}",
     "\N{U+0cae}\N{U+0cbe}\N{U+0cb0}\N{U+0ccd}\N{U+0c9a}\N{U+0ccd}",
     "\N{U+0c8f}\N{U+0caa}\N{U+0ccd}\N{U+0cb0}\N{U+0cbf}",
     "\N{U+0cae}\N{U+0cc7}",
     "\N{U+0c9c}\N{U+0cc2}\N{U+0ca8}\N{U+0ccd}",
     "\N{U+0c9c}\N{U+0cc1}\N{U+0cb2}\N{U+0cc8}",
-    "\N{U+0c86}\N{U+0c97}\N{U+0cb8}\N{U+0ccd}\N{U+0c9f}\N{U+0ccd}",
+    "\N{U+0c86}\N{U+0c97}",
     "\N{U+0cb8}\N{U+0cc6}\N{U+0caa}\N{U+0ccd}\N{U+0c9f}\N{U+0cc6}\N{U+0c82}",
     "\N{U+0c85}\N{U+0c95}\N{U+0ccd}\N{U+0c9f}\N{U+0ccb}",
     "\N{U+0ca8}\N{U+0cb5}\N{U+0cc6}\N{U+0c82}",
@@ -269,5 +269,5 @@
   time_format_medium => "hh:mm:ss a",
   time_format_short => "hh:mm a",
   variant => undef,
-  version => 45,
+  version => 46,
 }

@@ -60,7 +60,7 @@
     "yw-count-other" => "w-'\N{U+0439}' '\N{U+0442}\N{U+0438}\N{U+0436}'. Y '\N{U+0440}'.",
   },
   code => "uk",
-  date_format_full => "cccc, d MMMM y\N{U+202f}'\N{U+0440}'.",
+  date_format_full => "EEEE, d MMMM y\N{U+202f}'\N{U+0440}'.",
   date_format_long => "d MMMM y\N{U+202f}'\N{U+0440}'.",
   date_format_medium => "d MMM y\N{U+202f}'\N{U+0440}'.",
   date_format_short => "dd.MM.yy",
@@ -89,11 +89,11 @@
   day_format_wide => [
     "\N{U+043f}\N{U+043e}\N{U+043d}\N{U+0435}\N{U+0434}\N{U+0456}\N{U+043b}\N{U+043e}\N{U+043a}",
     "\N{U+0432}\N{U+0456}\N{U+0432}\N{U+0442}\N{U+043e}\N{U+0440}\N{U+043e}\N{U+043a}",
-    "\N{U+0441}\N{U+0435}\N{U+0440}\N{U+0435}\N{U+0434}\N{U+0443}",
+    "\N{U+0441}\N{U+0435}\N{U+0440}\N{U+0435}\N{U+0434}\N{U+0430}",
     "\N{U+0447}\N{U+0435}\N{U+0442}\N{U+0432}\N{U+0435}\N{U+0440}",
-    "\N{U+043f}\N{U+02bc}\N{U+044f}\N{U+0442}\N{U+043d}\N{U+0438}\N{U+0446}\N{U+044e}",
-    "\N{U+0441}\N{U+0443}\N{U+0431}\N{U+043e}\N{U+0442}\N{U+0443}",
-    "\N{U+043d}\N{U+0435}\N{U+0434}\N{U+0456}\N{U+043b}\N{U+044e}",
+    "\N{U+043f}\N{U+02bc}\N{U+044f}\N{U+0442}\N{U+043d}\N{U+0438}\N{U+0446}\N{U+044f}",
+    "\N{U+0441}\N{U+0443}\N{U+0431}\N{U+043e}\N{U+0442}\N{U+0430}",
+    "\N{U+043d}\N{U+0435}\N{U+0434}\N{U+0456}\N{U+043b}\N{U+044f}",
   ],
   day_stand_alone_abbreviated => [
     "\N{U+043f}\N{U+043d}",
@@ -274,5 +274,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 45,
+  version => 46,
 }

@@ -35,3 +35,4 @@ selectable
 SGR
 SpaceBar
 stackoverflow
+unformatted

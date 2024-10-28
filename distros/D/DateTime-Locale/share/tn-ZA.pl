@@ -82,7 +82,7 @@
     "S",
   ],
   day_format_wide => [
-    "Mosopulogo",
+    "Mosupologo",
     "Labobedi",
     "Laboraro",
     "Labone",
@@ -109,7 +109,7 @@
     "S",
   ],
   day_stand_alone_wide => [
-    "Mosopulogo",
+    "Mosupologo",
     "Labobedi",
     "Laboraro",
     "Labone",
@@ -221,8 +221,8 @@
     "Sedimonthole",
   ],
   name => "Tswana South Africa",
-  native_language => undef,
-  native_name => "Aforika Borwa",
+  native_language => "Setswana",
+  native_name => "Setswana Aforika Borwa",
   native_script => undef,
   native_territory => "Aforika Borwa",
   native_variant => undef,
@@ -269,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 45,
+  version => 46,
 }

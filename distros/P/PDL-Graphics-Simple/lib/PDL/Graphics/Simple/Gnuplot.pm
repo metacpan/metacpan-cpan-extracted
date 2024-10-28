@@ -100,7 +100,7 @@ sub check {
 	$mod->{msg} = $s;
 	die "PDL::Graphics::Simple: $s";
     }
-
+    $mod->{gp_version} = $PDL::Graphics::Gnuplot::gp_version;
     $mod->{ok} = 1;
     return 1;
 }

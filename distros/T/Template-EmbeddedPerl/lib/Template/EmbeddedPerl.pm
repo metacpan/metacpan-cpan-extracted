@@ -1,6 +1,6 @@
 package Template::EmbeddedPerl;
 
-our $VERSION = '0.001007';
+our $VERSION = '0.001009';
 $VERSION = eval $VERSION;
 
 use warnings;
@@ -263,8 +263,9 @@ sub parse_template {
       $segment =~ s/\\${expr_marker}${close_tag}/${expr_marker}${close_tag}/g;
 
       # check the segment for comment lines 
-      $segment =~ s/^([ \t]*?${comment_mark}.*)$/\\/mg;
-      $segment =~ s/^([ \t]*?\\${comment_mark})/${comment_mark}/mg;
+      $segment =~ s/^[ \t]*?${comment_mark}.*$/\\/mg;
+      $segment =~ s/^[ \t]*?\\${comment_mark}/${comment_mark}/mg;
+
 
       push @parsed, ['text', $segment];
     } else {
@@ -315,10 +316,10 @@ sub compile {
       $compiled .= $content . ";";
     } else {
       # if \\n is present in the content, replace it with ''
-      my $escaped_newline_start = $content =~ s/^\\\n//;
-      my $escaped_newline_end = $content =~ s/\\\n$//;
+      my $escaped_newline_start = $content =~ s/^\\\n//mg;
+      my $escaped_newline_end = $content =~ s/\\\n$//mg;
 
-      $content =~ s/^\\\\/\\/;   
+      $content =~ s/^\\\\/\\/mg;   
       $compiled .= "@{[$escaped_newline_start ? qq[\n]:'' ]} \$_O .= \"" . quotemeta($content) . "\";@{[$escaped_newline_end ? qq[\n]:'' ]}";
     }
   }
@@ -767,6 +768,7 @@ Obviously this only works usefully in a persistent environment like mod_perl or 
 
 Defaults to '#'. Indicates the beginning of a comment in the template which is to be removed
 from the output.
+
 =back
 
 =head2 from_string

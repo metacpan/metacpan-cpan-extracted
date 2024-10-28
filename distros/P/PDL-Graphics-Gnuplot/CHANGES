@@ -1,3 +1,7 @@
+2.031 2024-10-28
+- add default SIG{TERM,INT,QUIT,HUP} handler to close more gracefully
+- handle glx etc warnings from Gnuplot (https://github.com/PDLPorters/PDL-Graphics-Simple/issues/10) - thanks @eserte for report
+
 2.030 2024-09-29
 - require PDL version that has raster2fits; previously didn't require one with t_raster2fits which test used
 

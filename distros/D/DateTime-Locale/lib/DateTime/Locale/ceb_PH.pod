@@ -101,7 +101,7 @@ Cebuano Philippines locale.
   Hunyo
   Hulyo
   Agosto
-  Septiyembre
+  Septyembre
   Oktubre
   Nobyembre
   Disyembre
@@ -147,7 +147,7 @@ Cebuano Philippines locale.
   Hunyo
   Hulyo
   Agosto
-  Septiyembre
+  Septyembre
   Oktubre
   Nobyembre
   Disyembre
@@ -250,13 +250,13 @@ Cebuano Philippines locale.
 
    2008-02-05T18:30:30 = Martes, Pebrero 5, 2008
    1995-12-22T09:05:02 = Biyernes, Disyembre 22, 1995
-  -0010-09-15T04:44:23 = Sabado, Septiyembre 15, -10
+  -0010-09-15T04:44:23 = Sabado, Septyembre 15, -10
 
 =head3 Long
 
    2008-02-05T18:30:30 = Pebrero 5, 2008
    1995-12-22T09:05:02 = Disyembre 22, 1995
-  -0010-09-15T04:44:23 = Septiyembre 15, -10
+  -0010-09-15T04:44:23 = Septyembre 15, -10
 
 =head3 Medium
 
@@ -304,13 +304,13 @@ Cebuano Philippines locale.
 
    2008-02-05T18:30:30 = Martes, Pebrero 5, 2008, 6:30:30 PM UTC
    1995-12-22T09:05:02 = Biyernes, Disyembre 22, 1995, 9:05:02 AM UTC
-  -0010-09-15T04:44:23 = Sabado, Septiyembre 15, -10, 4:44:23 AM UTC
+  -0010-09-15T04:44:23 = Sabado, Septyembre 15, -10, 4:44:23 AM UTC
 
 =head3 Long
 
    2008-02-05T18:30:30 = Pebrero 5, 2008, 6:30:30 PM UTC
    1995-12-22T09:05:02 = Disyembre 22, 1995, 9:05:02 AM UTC
-  -0010-09-15T04:44:23 = Septiyembre 15, -10, 4:44:23 AM UTC
+  -0010-09-15T04:44:23 = Septyembre 15, -10, 4:44:23 AM UTC
 
 =head3 Medium
 
@@ -481,19 +481,19 @@ Cebuano Philippines locale.
 
    2008-02-05T18:30:30 = semana 1 sa Pebrero
    1995-12-22T09:05:02 = semana 3 sa Disyembre
-  -0010-09-15T04:44:23 = semana 2 sa Septiyembre
+  -0010-09-15T04:44:23 = semana 2 sa Septyembre
 
 =head3 MMMMW-count-other ('semana' W 'sa' MMMM)
 
    2008-02-05T18:30:30 = semana 1 sa Pebrero
    1995-12-22T09:05:02 = semana 3 sa Disyembre
-  -0010-09-15T04:44:23 = semana 2 sa Septiyembre
+  -0010-09-15T04:44:23 = semana 2 sa Septyembre
 
 =head3 MMMMd (MMMM d)
 
    2008-02-05T18:30:30 = Pebrero 5
    1995-12-22T09:05:02 = Disyembre 22
-  -0010-09-15T04:44:23 = Septiyembre 15
+  -0010-09-15T04:44:23 = Septyembre 15
 
 =head3 MMMd (MMM d)
 
@@ -583,7 +583,7 @@ Cebuano Philippines locale.
 
    2008-02-05T18:30:30 = Pebrero 2008
    1995-12-22T09:05:02 = Disyembre 1995
-  -0010-09-15T04:44:23 = Septiyembre -10
+  -0010-09-15T04:44:23 = Septyembre -10
 
 =head3 yMMMd (MMM d, y)
 

@@ -1,6 +1,13 @@
 The following logs changes for the CPAN distribution Template-EmbeddedPerl
 
-0.001006  20 October 2024
+0.001009  27 October 2024
+          - More fixes for commenting and escaping comments
+
+0.001008  27 October 2024
+          - Fixed issue with broken display when one text segment has
+            several comment blocks.
+
+0.001007  20 October 2024
           - When using auto exscape with auto flatten, we don't accidently
             remove the 'safe' marker when flattening.
 

@@ -2,7 +2,7 @@ package DBIx::QuickORM::SQLSpec::Params;
 use strict;
 use warnings;
 
-our $VERSION = '0.000002';
+our $VERSION = '0.000004';
 
 sub new {
     my $class = shift;

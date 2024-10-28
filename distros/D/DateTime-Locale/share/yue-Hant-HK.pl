@@ -222,9 +222,9 @@
   ],
   name => "Cantonese Hong Kong SAR China Traditional",
   native_language => "\N{U+7cb5}\N{U+8a9e}",
-  native_name => "\N{U+7cb5}\N{U+8a9e} \N{U+4e2d}\N{U+83ef}\N{U+4eba}\N{U+6c11}\N{U+5171}\N{U+548c}\N{U+570b}\N{U+9999}\N{U+6e2f}\N{U+7279}\N{U+5225}\N{U+884c}\N{U+653f}\N{U+5340} \N{U+7e41}\N{U+9ad4}",
+  native_name => "\N{U+7cb5}\N{U+8a9e} \N{U+4e2d}\N{U+570b}\N{U+9999}\N{U+6e2f}\N{U+7279}\N{U+5225}\N{U+884c}\N{U+653f}\N{U+5340} \N{U+7e41}\N{U+9ad4}",
   native_script => "\N{U+7e41}\N{U+9ad4}",
-  native_territory => "\N{U+4e2d}\N{U+83ef}\N{U+4eba}\N{U+6c11}\N{U+5171}\N{U+548c}\N{U+570b}\N{U+9999}\N{U+6e2f}\N{U+7279}\N{U+5225}\N{U+884c}\N{U+653f}\N{U+5340}",
+  native_territory => "\N{U+4e2d}\N{U+570b}\N{U+9999}\N{U+6e2f}\N{U+7279}\N{U+5225}\N{U+884c}\N{U+653f}\N{U+5340}",
   native_variant => undef,
   quarter_format_abbreviated => [
     "\N{U+7b2c}1\N{U+5b63}",
@@ -269,5 +269,5 @@
   time_format_medium => "ah:mm:ss",
   time_format_short => "ah:mm",
   variant => undef,
-  version => 45,
+  version => 46,
 }

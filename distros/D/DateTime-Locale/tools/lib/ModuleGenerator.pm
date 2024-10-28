@@ -23,6 +23,7 @@ use Scalar::Util qw( reftype );
 use Specio::Declare;
 use Specio::Library::Builtins;
 use Specio::Library::Path::Tiny;
+use Specio::Library::Perl 0.42;
 use Specio::Subs qw( Specio::Library::Builtins );
 use Text::Template;
 
@@ -101,6 +102,13 @@ has _locales => (
     builder => '_build_locales',
 );
 
+has _version => (
+    is      => 'ro',
+    isa     => t('LaxVersionStr'),
+    lazy    => 1,
+    builder => '_build_version',
+);
+
 sub run ($self) {
     binmode STDOUT, ':encoding(UTF-8)'
         or confess $!;
@@ -130,6 +138,7 @@ sub _build_locales ($self) {
             code       => $code,
             cldr_root  => $self->_cldr_root,
             glibc_root => $self->_glibc_root,
+            version    => $self->_version,
         );
 
         ## no critic (InputOutput::RequireCheckedSyscalls)
@@ -142,6 +151,15 @@ sub _build_locales ($self) {
     }
 
     return \@locales;
+}
+
+sub _build_version ($self) {
+    my $file
+        = path(
+        qw( source-data cldr-json cldr-json cldr-core supplemental languageData.json )
+        );
+    my $data = decode_json( $file->slurp_raw );
+    return $data->{supplemental}{version}{_cldrVersion};
 }
 
 sub _write_data_files ($self) {

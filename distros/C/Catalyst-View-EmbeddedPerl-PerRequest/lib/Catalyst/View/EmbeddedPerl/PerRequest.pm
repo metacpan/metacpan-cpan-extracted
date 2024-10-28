@@ -33,7 +33,7 @@ Moose::Util::MetaRole::apply_metaroles(
 
 extends 'Catalyst::View::BasePerRequest';
 
-our $VERSION = 0.001010;
+our $VERSION = 0.001011;
 eval $VERSION;
 
 # Args that get passed cleanly to Template::EmbeddedPerl
@@ -86,7 +86,7 @@ sub modify_init_args {
   %temple_args = $class->modify_temple_args($app, %temple_args);
 
   foreach my $exported_attr (@exported_attributes) {
-    $temple_args{prepend} .= "my \$$exported_attr = \$self->$exported_attr; ";
+    $temple_args{prepend} .= ";my \$$exported_attr = \$self->$exported_attr; ";
   }
 
   # Finally, build the temple object

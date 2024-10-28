@@ -1,9 +1,19 @@
+0.000004  2024-10-27 23:40:03-07:00 America/Los_Angeles
+
+    - Fix some DB specific tests
+    - Add report on module and database versions
+
+0.000003  2024-10-27 09:33:28-07:00 America/Los_Angeles
+
+    - Add missing deps
+    - Include minimum versions for some deps
+
 0.000002  2024-10-26 21:01:35-07:00 America/Los_Angeles
 
- - Fix #3
- - Some doc fixes
- - Fix some tests
+    - Fix #3
+    - Some doc fixes
+    - Fix some tests
 
 0.000001  2024-10-26 00:33:57-07:00 America/Los_Angeles
 
- - Initial upload of incomplete project to cpan
+    - Initial upload of incomplete project to cpan

@@ -6,7 +6,7 @@ use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use List::Util qw( any );
 use Ref::Util  qw( is_ref is_arrayref is_coderef);
@@ -74,6 +74,12 @@ has name => (
           : $self->_name;
     },
 );
+
+
+
+
+
+
 
 has temporary => (
     is      => 'ro',
@@ -163,6 +169,7 @@ has fields => (
 
 
 
+
 around BUILDARGS => sub ( $orig, $self, @args ) {
 
     my \%args = $self->$orig( @args );
@@ -186,6 +193,27 @@ around BUILDARGS => sub ( $orig, $self, @args ) {
     return \%args;
 };
 
+sub BUILD ( $self, $args ) {
+
+    # convert constraints' fields into array refs if required; handle
+    # a scalar of '-all' as well.  ATM, constraints are hashes which
+    # pass the CXC::DB::DDL::Types::Constraint constraint.
+    for my $constraint ( $self->constraints->@* ) {
+
+        my $fields = $constraint->{fields};
+
+        # only worry about scalars
+        next if !defined( $fields ) || ref $fields;
+
+        $constraint->{fields} =
+          # replace fields => '-all' with all of the fields (->field_names() returns a copy)
+          $fields eq '-all'
+          ? $self->field_names
+          # otherwise turn it into an array
+          : [$fields];
+    }
+
+}
 
 
 
@@ -197,7 +225,8 @@ around BUILDARGS => sub ( $orig, $self, @args ) {
 
 
 
-sub to_sqlt ( $self, $dbh, $schema ) {    ## no critic(Subroutines::ProhibitExcessComplexity)
+
+sub to_sqlt ( $self, $dbh, $schema ) {
 
     my %extra;
 
@@ -253,12 +282,6 @@ sub to_sqlt ( $self, $dbh, $schema ) {    ## no critic(Subroutines::ProhibitExce
 
         my %attr = $constraint->%*;
 
-        # replace fields => '-all' with all of the fields.
-        if ( defined( my $fields = $attr{fields} ) ) {
-            $attr{fields} = $self->field_names
-              if !ref $fields && $fields eq '-all';
-        }
-
         # if name is not specified, create one from the field names
         $attr{name} //= join(
             '_',
@@ -267,9 +290,8 @@ sub to_sqlt ( $self, $dbh, $schema ) {    ## no critic(Subroutines::ProhibitExce
             lc( $attr{type} =~ s/\s+/_/gr ),
             defined( $attr{fields} )
             ? (
-                is_arrayref( $attr{fields} )
-                ? $attr{fields}->@*
-                : $attr{fields} )
+                $attr{fields}->@*
+              )
             : (),
         );
 
@@ -399,7 +421,7 @@ CXC::DB::DDL::Table - CXC::DB::DDL Table class
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 OBJECT ATTRIBUTES
 
@@ -414,6 +436,10 @@ The L</name> attribute is scanned for the schema,
 under the assumption that the form is
 
   <schema>.<table name>
+
+=head2 temporary
+
+true if the table should be created as a temporary table
 
 =head2 indexes
 
@@ -493,6 +519,7 @@ delete the table from the database
 Add the table to the schema (a L<SQL::Translator::Schema> object).
 
 =for Pod::Coverage BUILDARGS
+BUILD
 
 =head1 SUPPORT
 

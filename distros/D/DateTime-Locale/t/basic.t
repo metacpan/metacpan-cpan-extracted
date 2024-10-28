@@ -14,6 +14,8 @@ my %locale_codes = map { $_ => 1 } DateTime::Locale->codes;
 # These are locales that are missing English name data in the JSON source
 # files.
 my %is_locale_without_en_data = map { $_ => 1 } qw(
+    lld
+    mhn
     skr
 );
 
@@ -48,8 +50,16 @@ my %is_locale_without_native_data = map { $_ => 1 } qw(
     iu-CA
     iu-Latn
     iu-Latn-CA
+    kaa-Latn
+    kaa-Latn-UZ
+    kk-Arab
+    kk-Arab-CN
     la
     la-VA
+    ltg
+    ltg-LV
+    mhn
+    mhn-IT
     mn-Mong
     mn-Mong-CN
     ms-Arab
@@ -58,13 +68,10 @@ my %is_locale_without_native_data = map { $_ => 1 } qw(
     nmg
     nr
     nr-ZA
-    nso
     sid
     sid-ET
     tig
     tig-ER
-    tn
-    tn-BW
     ts
     ts-ZA
     tyv
@@ -337,7 +344,7 @@ sub check_und {
         MMMd                => 'MMM d',
         Md                  => 'MM-dd',
         d                   => 'd',
-        h                   => 'h a',
+        h                   => "h\N{U+202F}a",
         hm                  => 'h:mm a',
         hms                 => 'h:mm:ss a',
         hmsv                => 'h:mm:ss a v',
@@ -416,7 +423,7 @@ sub check_en_GB {
         'Ehms-alt-ascii'    => 'E h:mm:ss a',
         Gy                  => 'y G',
         GyMMM               => 'MMM y G',
-        GyMMMEEEEd          => 'EEEE d MMM y G',
+        GyMMMEEEEd          => 'EEEE, d MMM y G',
         GyMMMEd             => 'E, d MMM y G',
         GyMMMd              => 'd MMM y G',
         GyMd                => 'dd/MM/y G',
@@ -426,10 +433,10 @@ sub check_en_GB {
         Hmsv                => 'HH:mm:ss v',
         Hmv                 => 'HH:mm v',
         M                   => 'L',
-        MEd                 => 'E, dd/MM',
+        MEd                 => 'E dd/MM',
         MMM                 => 'LLL',
         MMMEEEEd            => 'EEEE d MMM',
-        MMMEd               => 'E, d MMM',
+        MMMEd               => 'E d MMM',
         MMMMEEEEd           => 'EEEE d MMMM',
         'MMMMW-count-one'   => q{'week' W 'of' MMMM},
         'MMMMW-count-other' => q{'week' W 'of' MMMM},
@@ -453,10 +460,10 @@ sub check_en_GB {
         yM                  => 'MM/y',
         yMEd                => 'E, dd/MM/y',
         yMMM                => 'MMM y',
-        yMMMEEEEd           => 'EEEE d MMM y',
+        yMMMEEEEd           => 'EEEE, d MMM y',
         yMMMEd              => 'E, d MMM y',
         yMMMM               => 'MMMM y',
-        yMMMMEEEEd          => 'EEEE d MMMM y',
+        yMMMMEEEEd          => 'EEEE, d MMMM y',
         yMMMd               => 'd MMM y',
         yMd                 => 'dd/MM/y',
         yQQQ                => 'QQQ y',

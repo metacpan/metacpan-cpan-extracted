@@ -30,7 +30,7 @@ Tswana locale.
 
 =head3 Wide (format)
 
-  Mosopulogo
+  Mosupologo
   Labobedi
   Laboraro
   Labone
@@ -61,7 +61,7 @@ Tswana locale.
 
 =head3 Wide (stand-alone)
 
-  Mosopulogo
+  Mosupologo
   Labobedi
   Laboraro
   Labone
@@ -630,7 +630,7 @@ Yes
 
 =head3 Local first day of the week
 
-1 (Mosopulogo)
+1 (Mosupologo)
 
 =head2 Strftime Patterns
 

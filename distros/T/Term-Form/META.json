@@ -38,8 +38,8 @@
             "Carp" : "0",
             "Exporter" : "0",
             "List::Util" : "1.33",
-            "Term::Choose" : "1.764",
-            "Term::Choose::Util" : "0.141",
+            "Term::Choose" : "1.767",
+            "Term::Choose::Util" : "0.143",
             "parent" : "0",
             "perl" : "5.010000",
             "strict" : "0",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/kuerbis/Term-Form"
       }
    },
-   "version" : "0.557",
+   "version" : "0.558",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

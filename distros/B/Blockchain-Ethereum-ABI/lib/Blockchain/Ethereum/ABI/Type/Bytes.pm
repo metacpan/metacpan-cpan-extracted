@@ -3,11 +3,10 @@ package Blockchain::Ethereum::ABI::Type::Bytes;
 use v5.26;
 use strict;
 use warnings;
-no indirect;
 
 # ABSTRACT: Solidity bytes type interface
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.017';          # VERSION
+our $VERSION   = '0.018';          # VERSION
 
 use parent 'Blockchain::Ethereum::ABI::Type';
 
@@ -71,7 +70,7 @@ Blockchain::Ethereum::ABI::Type::Bytes - Solidity bytes type interface
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

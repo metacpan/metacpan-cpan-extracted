@@ -128,7 +128,7 @@
   ],
   era_wide => [
     "voor Christus",
-    "na Christus",
+    "n\N{U+00e1} Christus",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -270,5 +270,5 @@
   time_format_medium => "h:mm:ss\N{U+202f}a",
   time_format_short => "h:mm\N{U+202f}a",
   variant => undef,
-  version => 45,
+  version => 46,
 }

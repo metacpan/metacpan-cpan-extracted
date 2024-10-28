@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.163';
+our $VERSION = '0.164';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -419,7 +419,7 @@ sub __copy_table {
             push @$tmp_row, $str;
         }
         push @$tbl_copy, $tmp_row;
-        if ( @$tbl_copy == $self->{max_rows} ) {
+        if ( @$tbl_copy == $self->{max_rows} ) { ###
             last;
         }
         if ( $progress->{count_progress_bars} ) {         #
@@ -940,7 +940,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.163
+Version 0.164
 
 =cut
 

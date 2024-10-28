@@ -101,7 +101,7 @@ Kinyarwanda locale.
   Kamena
   Nyakanga
   Kanama
-  Nzeli
+  Nzeri
   Ukwakira
   Ugushyingo
   Ukuboza
@@ -147,7 +147,7 @@ Kinyarwanda locale.
   Kamena
   Nyakanga
   Kanama
-  Nzeli
+  Nzeri
   Ukwakira
   Ugushyingo
   Ukuboza
@@ -250,13 +250,13 @@ Kinyarwanda locale.
 
    2008-02-05T18:30:30 = 2008 Gashyantare 5, Kuwa kabiri
    1995-12-22T09:05:02 = 1995 Ukuboza 22, Kuwa gatanu
-  -0010-09-15T04:44:23 = -10 Nzeli 15, Kuwa gatandatu
+  -0010-09-15T04:44:23 = -10 Nzeri 15, Kuwa gatandatu
 
 =head3 Long
 
    2008-02-05T18:30:30 = 2008 Gashyantare 5
    1995-12-22T09:05:02 = 1995 Ukuboza 22
-  -0010-09-15T04:44:23 = -10 Nzeli 15
+  -0010-09-15T04:44:23 = -10 Nzeri 15
 
 =head3 Medium
 
@@ -304,13 +304,13 @@ Kinyarwanda locale.
 
    2008-02-05T18:30:30 = 2008 Gashyantare 5, Kuwa kabiri 18:30:30 UTC
    1995-12-22T09:05:02 = 1995 Ukuboza 22, Kuwa gatanu 09:05:02 UTC
-  -0010-09-15T04:44:23 = -10 Nzeli 15, Kuwa gatandatu 04:44:23 UTC
+  -0010-09-15T04:44:23 = -10 Nzeri 15, Kuwa gatandatu 04:44:23 UTC
 
 =head3 Long
 
    2008-02-05T18:30:30 = 2008 Gashyantare 5 18:30:30 UTC
    1995-12-22T09:05:02 = 1995 Ukuboza 22 09:05:02 UTC
-  -0010-09-15T04:44:23 = -10 Nzeli 15 04:44:23 UTC
+  -0010-09-15T04:44:23 = -10 Nzeri 15 04:44:23 UTC
 
 =head3 Medium
 
@@ -481,13 +481,13 @@ Kinyarwanda locale.
 
    2008-02-05T18:30:30 = week 1 of Gashyantare
    1995-12-22T09:05:02 = week 3 of Ukuboza
-  -0010-09-15T04:44:23 = week 2 of Nzeli
+  -0010-09-15T04:44:23 = week 2 of Nzeri
 
 =head3 MMMMd (MMMM d)
 
    2008-02-05T18:30:30 = Gashyantare 5
    1995-12-22T09:05:02 = Ukuboza 22
-  -0010-09-15T04:44:23 = Nzeli 15
+  -0010-09-15T04:44:23 = Nzeri 15
 
 =head3 MMMd (MMM d)
 
@@ -577,19 +577,19 @@ Kinyarwanda locale.
 
    2008-02-05T18:30:30 = 2008 Gashyantare
    1995-12-22T09:05:02 = 1995 Ukuboza
-  -0010-09-15T04:44:23 = -10 Nzeli
+  -0010-09-15T04:44:23 = -10 Nzeri
 
-=head3 yMMMd (y MMM d)
+=head3 yMMMd (d MMMM y)
 
-   2008-02-05T18:30:30 = 2008 gas. 5
-   1995-12-22T09:05:02 = 1995 uku. 22
-  -0010-09-15T04:44:23 = -10 nze. 15
+   2008-02-05T18:30:30 = 5 Gashyantare 2008
+   1995-12-22T09:05:02 = 22 Ukuboza 1995
+  -0010-09-15T04:44:23 = 15 Nzeri -10
 
-=head3 yMd (y-MM-dd)
+=head3 yMd (dd-MM-y)
 
-   2008-02-05T18:30:30 = 2008-02-05
-   1995-12-22T09:05:02 = 1995-12-22
-  -0010-09-15T04:44:23 = -10-09-15
+   2008-02-05T18:30:30 = 05-02-2008
+   1995-12-22T09:05:02 = 22-12-1995
+  -0010-09-15T04:44:23 = 15-09--10
 
 =head3 yQQQ (y QQQ)
 

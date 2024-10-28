@@ -45,7 +45,18 @@ sub handle_data_encoded {
     my $data_name = $attr_rules->{name};
     $attr_rules = $self->default_attr_rules($attr_rules);
 
-    next unless exists $context->{$data_name}; # required handled by Moo/se required attribute
+    # required handled by Moo/se required attribute. This means the attribute
+    # doesn't exist in the request body.  We have some special handling for
+    # indexed attributes when omit_empty is set to 0.
+
+    unless( exists $context->{$data_name} ) {
+      $response->{$data_name} = []
+        if $attr_rules->{indexed} &&
+        exists($attr_rules->{omit_empty}) &&
+        !$attr_rules->{omit_empty};
+      next;
+    }
+    next unless exists $context->{$data_name}; 
 
     if( !$indexed && $attr_rules->{indexed}) {
       $context->{$data_name} = $self->normalize_always_array($context->{$data_name}) if ($attr_rules->{always_array}||'');

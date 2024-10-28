@@ -231,7 +231,7 @@ Basque Spain locale.
 
 =head3 Wide (format)
 
-  K.a.
+  Kristo aurretik
   Kristo ondoren
 
 =head3 Abbreviated (format)

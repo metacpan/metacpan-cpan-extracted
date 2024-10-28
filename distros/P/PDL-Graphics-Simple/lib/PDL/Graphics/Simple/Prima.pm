@@ -97,7 +97,7 @@ sub check {
       lp::DashDot(), lp::DashDotDot(),
     );
     _load_types();
-
+    $mod->{prima_version} = $Prima::VERSION;
     $mod->{ok} =1;
     return 1;
 }

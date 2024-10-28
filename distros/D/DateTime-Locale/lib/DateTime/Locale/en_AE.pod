@@ -678,7 +678,7 @@ No
 
 =head3 Local first day of the week
 
-6 (Saturday)
+1 (Monday)
 
 =head2 Strftime Patterns
 

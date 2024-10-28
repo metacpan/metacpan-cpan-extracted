@@ -97,7 +97,7 @@ Ewe locale.
   dzodze
   tedoxe
   afɔfĩe
-  dama
+  dame
   masa
   siamlɔm
   deasiamime
@@ -143,7 +143,7 @@ Ewe locale.
   dzodze
   tedoxe
   afɔfĩe
-  dama
+  dame
   masa
   siamlɔm
   deasiamime

@@ -248,9 +248,9 @@ English United Kingdom locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Tuesday 5 February 2008
-   1995-12-22T09:05:02 = Friday 22 December 1995
-  -0010-09-15T04:44:23 = Saturday 15 September -10
+   2008-02-05T18:30:30 = Tuesday, 5 February 2008
+   1995-12-22T09:05:02 = Friday, 22 December 1995
+  -0010-09-15T04:44:23 = Saturday, 15 September -10
 
 =head3 Long
 
@@ -302,9 +302,9 @@ English United Kingdom locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Tuesday 5 February 2008, 18:30:30 UTC
-   1995-12-22T09:05:02 = Friday 22 December 1995, 09:05:02 UTC
-  -0010-09-15T04:44:23 = Saturday 15 September -10, 04:44:23 UTC
+   2008-02-05T18:30:30 = Tuesday, 5 February 2008, 18:30:30 UTC
+   1995-12-22T09:05:02 = Friday, 22 December 1995, 09:05:02 UTC
+  -0010-09-15T04:44:23 = Saturday, 15 September -10, 04:44:23 UTC
 
 =head3 Long
 
@@ -417,11 +417,11 @@ English United Kingdom locale.
    1995-12-22T09:05:02 = Dec 1995 AD
   -0010-09-15T04:44:23 = Sept -10 BC
 
-=head3 GyMMMEEEEd (EEEE d MMM y G)
+=head3 GyMMMEEEEd (EEEE, d MMM y G)
 
-   2008-02-05T18:30:30 = Tuesday 5 Feb 2008 AD
-   1995-12-22T09:05:02 = Friday 22 Dec 1995 AD
-  -0010-09-15T04:44:23 = Saturday 15 Sept -10 BC
+   2008-02-05T18:30:30 = Tuesday, 5 Feb 2008 AD
+   1995-12-22T09:05:02 = Friday, 22 Dec 1995 AD
+  -0010-09-15T04:44:23 = Saturday, 15 Sept -10 BC
 
 =head3 GyMMMEd (E, d MMM y G)
 
@@ -477,11 +477,11 @@ English United Kingdom locale.
    1995-12-22T09:05:02 = 12
   -0010-09-15T04:44:23 = 9
 
-=head3 MEd (E, dd/MM)
+=head3 MEd (E dd/MM)
 
-   2008-02-05T18:30:30 = Tue, 05/02
-   1995-12-22T09:05:02 = Fri, 22/12
-  -0010-09-15T04:44:23 = Sat, 15/09
+   2008-02-05T18:30:30 = Tue 05/02
+   1995-12-22T09:05:02 = Fri 22/12
+  -0010-09-15T04:44:23 = Sat 15/09
 
 =head3 MMM (LLL)
 
@@ -495,11 +495,11 @@ English United Kingdom locale.
    1995-12-22T09:05:02 = Friday 22 Dec
   -0010-09-15T04:44:23 = Saturday 15 Sept
 
-=head3 MMMEd (E, d MMM)
+=head3 MMMEd (E d MMM)
 
-   2008-02-05T18:30:30 = Tue, 5 Feb
-   1995-12-22T09:05:02 = Fri, 22 Dec
-  -0010-09-15T04:44:23 = Sat, 15 Sept
+   2008-02-05T18:30:30 = Tue 5 Feb
+   1995-12-22T09:05:02 = Fri 22 Dec
+  -0010-09-15T04:44:23 = Sat 15 Sept
 
 =head3 MMMMEEEEd (EEEE d MMMM)
 
@@ -639,11 +639,11 @@ English United Kingdom locale.
    1995-12-22T09:05:02 = Dec 1995
   -0010-09-15T04:44:23 = Sept -10
 
-=head3 yMMMEEEEd (EEEE d MMM y)
+=head3 yMMMEEEEd (EEEE, d MMM y)
 
-   2008-02-05T18:30:30 = Tuesday 5 Feb 2008
-   1995-12-22T09:05:02 = Friday 22 Dec 1995
-  -0010-09-15T04:44:23 = Saturday 15 Sept -10
+   2008-02-05T18:30:30 = Tuesday, 5 Feb 2008
+   1995-12-22T09:05:02 = Friday, 22 Dec 1995
+  -0010-09-15T04:44:23 = Saturday, 15 Sept -10
 
 =head3 yMMMEd (E, d MMM y)
 
@@ -657,11 +657,11 @@ English United Kingdom locale.
    1995-12-22T09:05:02 = December 1995
   -0010-09-15T04:44:23 = September -10
 
-=head3 yMMMMEEEEd (EEEE d MMMM y)
+=head3 yMMMMEEEEd (EEEE, d MMMM y)
 
-   2008-02-05T18:30:30 = Tuesday 5 February 2008
-   1995-12-22T09:05:02 = Friday 22 December 1995
-  -0010-09-15T04:44:23 = Saturday 15 September -10
+   2008-02-05T18:30:30 = Tuesday, 5 February 2008
+   1995-12-22T09:05:02 = Friday, 22 December 1995
+  -0010-09-15T04:44:23 = Saturday, 15 September -10
 
 =head3 yMMMd (d MMM y)
 

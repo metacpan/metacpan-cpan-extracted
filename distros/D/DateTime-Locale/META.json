@@ -63,7 +63,7 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
             "Test::Portability::Files" : "0",
-            "Test::Spelling" : "0.12",
+            "Test::Spelling" : "0.17",
             "Test::Version" : "2.05",
             "Text::Template" : "0",
             "utf8" : "0"
@@ -114,27 +114,27 @@
    "provides" : {
       "DateTime::Locale" : {
          "file" : "lib/DateTime/Locale.pm",
-         "version" : "1.43"
+         "version" : "1.44"
       },
       "DateTime::Locale::Base" : {
          "file" : "lib/DateTime/Locale/Base.pm",
-         "version" : "1.43"
+         "version" : "1.44"
       },
       "DateTime::Locale::Catalog" : {
          "file" : "lib/DateTime/Locale/Catalog.pm",
-         "version" : "1.43"
+         "version" : "1.44"
       },
       "DateTime::Locale::Data" : {
          "file" : "lib/DateTime/Locale/Data.pm",
-         "version" : "1.43"
+         "version" : "1.44"
       },
       "DateTime::Locale::FromData" : {
          "file" : "lib/DateTime/Locale/FromData.pm",
-         "version" : "1.43"
+         "version" : "1.44"
       },
       "DateTime::Locale::Util" : {
          "file" : "lib/DateTime/Locale/Util.pm",
-         "version" : "1.43"
+         "version" : "1.44"
       }
    },
    "release_status" : "stable",
@@ -150,7 +150,7 @@
       },
       "x_MailingList" : "datetime@perl.org"
    },
-   "version" : "1.43",
+   "version" : "1.44",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -3750,6 +3750,7 @@
                      "Dondertaxtsees",
                      "Donnerstag",
                      "Donneschdeg",
+                     "Doshambeh",
                      "Doy",
                      "Drugi",
                      "Du",
@@ -3773,6 +3774,7 @@
                      "Du\u0254\u0331\u0254\u0331\u014b",
                      "Dwe",
                      "Dwo",
+                     "Dwoada",
                      "Dwowda",
                      "Dydd",
                      "Dzi",
@@ -4458,6 +4460,7 @@
                      "Jpi",
                      "Jtn",
                      "Jtt",
+                     "Ju",
                      "Jue",
                      "Jueves",
                      "Jug",
@@ -5138,6 +5141,7 @@
                      "Mangal",
                      "Mangalwaar",
                      "Manipuri",
+                     "Mantaha",
                      "Mantaxtsees",
                      "Manth",
                      "Manthole",
@@ -5324,10 +5328,12 @@
                      "Mose",
                      "Mosegemanye",
                      "Mosopulogo",
+                     "Mosupologo",
                      "Mot",
                      "Motsheanong",
                      "Motsheganang",
                      "Mozambique",
+                     "Mo\u0161upologo",
                      "Mpal",
                      "Mpalakazi",
                      "Mpan",
@@ -6668,6 +6674,7 @@
                      "YY",
                      "Yaijire",
                      "Yak",
+                     "Yakshambeh",
                      "Yakut",
                      "Yambo",
                      "Yan",
@@ -7249,6 +7256,7 @@
                      "dam",
                      "dama",
                      "dap",
+                     "daripada",
                      "dasara",
                      "dasp\u00f2",
                      "dat",
@@ -8923,6 +8931,7 @@
                      "mto",
                      "mua",
                      "mua-CM",
+                     "muajit",
                      "mugore",
                      "muk",
                      "muk\u0169i",
@@ -9691,6 +9700,7 @@
                      "selmana",
                      "semaine",
                      "semana",
+                     "semane",
                      "sen",
                      "send",
                      "sentabr",
@@ -10082,6 +10092,7 @@
                      "tomon",
                      "tongersdei",
                      "tor",
+                     "torbee",
                      "torek",
                      "tors",
                      "torsdag",
@@ -10164,6 +10175,7 @@
                      "t\u00e1anin",
                      "t\u00e1araa",
                      "t\u00e1na",
+                     "t\u00e3",
                      "t\u00e8si\u02bce",
                      "t\u00ee",
                      "t\u00eermeh",
@@ -14957,7 +14969,7 @@
                }
             },
             "name" : "@DROLSKY/Test::PodSpelling",
-            "version" : "2.007005"
+            "version" : "2.007006"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
@@ -14991,11 +15003,12 @@
             "class" : "Dist::Zilla::Plugin::Test::CPAN::Changes",
             "config" : {
                "Dist::Zilla::Plugin::Test::CPAN::Changes" : {
-                  "changelog" : "Changes"
+                  "changelog" : "Changes",
+                  "filename" : "xt/release/cpan-changes.t"
                }
             },
             "name" : "@DROLSKY/Test::CPAN::Changes",
-            "version" : "0.012"
+            "version" : "0.013"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON",
@@ -15041,7 +15054,7 @@
                }
             },
             "name" : "@DROLSKY/Test::Portability",
-            "version" : "2.001001"
+            "version" : "2.001003"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -15090,7 +15103,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -15359,7 +15372,7 @@
             "class" : "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.0",
                   "repo_root" : "."
                }
             },
@@ -15375,7 +15388,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.0",
                   "repo_root" : "."
                }
             },
@@ -15418,7 +15431,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.0",
                   "repo_root" : "."
                }
             },
@@ -15448,7 +15461,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -15465,12 +15478,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.43",
+                  "tag" : "v1.44",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -15490,7 +15503,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.0",
                   "repo_root" : "."
                }
             },
@@ -15531,7 +15544,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -15551,7 +15564,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.45.2",
+                  "git_version" : "2.47.0",
                   "repo_root" : "."
                }
             },
@@ -15698,7 +15711,7 @@
       "yasu47b <nakayamayasuhiro1986@gmail.com>"
    ],
    "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

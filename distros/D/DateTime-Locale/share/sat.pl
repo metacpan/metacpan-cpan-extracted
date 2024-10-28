@@ -34,7 +34,7 @@
     MMMd => "MMM d",
     Md => "MM-dd",
     d => "d",
-    h => "h a",
+    h => "h\N{U+202f}a",
     hm => "h:mm a",
     hms => "h:mm:ss a",
     hmsv => "h:mm:ss a v",
@@ -116,15 +116,15 @@
     "\N{U+1c65}\N{U+1c64}\N{U+1c78}\N{U+1c5c}\N{U+1c6e}",
   ],
   era_abbreviated => [
-    "\N{U+1c65}\N{U+1c6e}\N{U+1c68}\N{U+1c62}\N{U+1c5f} \N{U+1c5e}\N{U+1c5f}\N{U+1c66}\N{U+1c5f}",
+    "\N{U+1c75}\N{U+1c64} \N{U+1c65}\N{U+1c64}",
     "\N{U+1c64}\N{U+1c65}\N{U+1c63}\N{U+1c64}",
   ],
   era_narrow => [
-    "\N{U+1c65}\N{U+1c6e}\N{U+1c68}\N{U+1c62}\N{U+1c5f} \N{U+1c5e}\N{U+1c5f}\N{U+1c66}\N{U+1c5f}",
+    "\N{U+1c75}\N{U+1c64} \N{U+1c65}\N{U+1c64}",
     "\N{U+1c64}\N{U+1c65}\N{U+1c63}\N{U+1c64}",
   ],
   era_wide => [
-    "\N{U+1c65}\N{U+1c6e}\N{U+1c68}\N{U+1c62}\N{U+1c5f} \N{U+1c5e}\N{U+1c5f}\N{U+1c66}\N{U+1c5f}",
+    "\N{U+1c75}\N{U+1c64} \N{U+1c65}\N{U+1c64}",
     "\N{U+1c64}\N{U+1c65}\N{U+1c63}\N{U+1c64}",
   ],
   first_day_of_week => 1,
@@ -267,5 +267,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 45,
+  version => 46,
 }

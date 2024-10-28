@@ -12,7 +12,7 @@ use ShellQuote::Any::Tiny;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-09-19'; # DATE
 our $DIST = 'App-findsort'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my %Opts = (
     sort  => undef,
@@ -65,22 +65,25 @@ while (!eof($findh)) {
 close $findh;
 my $exit = $? >> 8;
 
-if (!$Opts{sort}) {
-    # no sorting needed
-} elsif ($Opts{sort} eq 'mtime') {
-    @files = sort { (-M $b) <=> (-M $a) } @files;
-} elsif ($Opts{sort} eq '-mtime') {
-    @files = sort { (-M $a) <=> (-M $b) } @files;
-} elsif ($Opts{sort} eq 'ctime') {
-    @files = sort { (-C $b) <=> (-C $a) } @files;
-} elsif ($Opts{sort} eq '-ctime') {
-    @files = sort { (-C $a) <=> (-C $b) } @files;
-} elsif ($Opts{sort} eq 'size') {
-    @files = sort { (-s $a) <=> (-s $b) } @files;
-} elsif ($Opts{sort} eq '-size') {
-    @files = sort { (-s $b) <=> (-s $a) } @files;
-} else {
-    die "findsort: Unknown -sort value: $Opts{sort}\n";
+{
+    no warnings 'uninitialized';
+    if (!$Opts{sort}) {
+        # no sorting needed
+    } elsif ($Opts{sort} eq 'mtime') {
+        @files = sort { (-M $b) <=> (-M $a) } @files;
+    } elsif ($Opts{sort} eq '-mtime') {
+        @files = sort { (-M $a) <=> (-M $b) } @files;
+    } elsif ($Opts{sort} eq 'ctime') {
+        @files = sort { (-C $b) <=> (-C $a) } @files;
+    } elsif ($Opts{sort} eq '-ctime') {
+        @files = sort { (-C $a) <=> (-C $b) } @files;
+    } elsif ($Opts{sort} eq 'size') {
+        @files = sort { (-s $a) <=> (-s $b) } @files;
+    } elsif ($Opts{sort} eq '-size') {
+        @files = sort { (-s $b) <=> (-s $a) } @files;
+    } else {
+        die "findsort: Unknown -sort value: $Opts{sort}\n";
+    }
 }
 
 print map { "$_\n" } @files;
@@ -101,7 +104,7 @@ findsort - Unix find wrapper that has sorting option
 
 =head1 VERSION
 
-This document describes version 0.001 of findsort (from Perl distribution App-findsort), released on 2024-09-19.
+This document describes version 0.002 of findsort (from Perl distribution App-findsort), released on 2024-09-19.
 
 =head1 SYNOPSIS
 

@@ -2,18 +2,12 @@ use 5.10.0;
 use strict;
 use warnings;
 use Time::Piece;
-use Test::More tests => 8;
+use Test::More tests => 14;
 
-my $v             = -1;
-my $v_pod         = -1;
-my $v_linux       = -1;
-my $v_win32       = -1;
-my $v_const       = -1;
-my $v_cwdefault   = -1;
-my $v_cwwide      = -1;
-my $v_changes     = -1;
-my $release_date  = -1;
 
+
+my $v = -1;
+my $v_pod = -1;
 open my $fh, '<', 'lib/Term/Choose.pm' or die $!;
 while ( my $line = <$fh> ) {
     if ( $line =~ /^our\s\$VERSION\s=\s'(\d\.\d\d\d(?:_\d\d)?)';/ ) {
@@ -26,46 +20,41 @@ while ( my $line = <$fh> ) {
     }
 }
 close $fh;
+is( $v, $v_pod, 'Version in POD Term::Choose OK' );
 
-open $fh, '<', 'lib/Term/Choose/Linux.pm' or die $!;
-while ( my $line = <$fh> ) {
-    if ( $line =~ /^our\s\$VERSION\s=\s'(\d\.\d\d\d(?:_\d\d)?)';/ ) {
-        $v_linux = $1;
-    }
-}
-close $fh;
 
-open $fh, '<', 'lib/Term/Choose/Win32.pm' or die $!;
-while ( my $line = <$fh> ) {
-    if ( $line =~ /^our\s\$VERSION\s=\s'(\d\.\d\d\d(?:_\d\d)?)';/ ) {
-        $v_win32 = $1;
-    }
-}
-close $fh;
 
-open $fh, '<', 'lib/Term/Choose/Constants.pm' or die $!;
-while ( my $line = <$fh> ) {
-    if ( $line =~ /^our\s\$VERSION\s=\s'(\d\.\d\d\d(?:_\d\d)?)';/ ) {
-        $v_const = $1;
-    }
-}
-close $fh;
 
-open $fh, '<', 'lib/Term/Choose/LineFold/CharWidthDefault.pm' or die $!;
-while ( my $line = <$fh> ) {
-    if ( $line =~ /^our\s\$VERSION\s=\s'(\d\.\d\d\d(?:_\d\d)?)';/ ) {
-        $v_cwdefault = $1;
+my @modules = qw(
+    lib/Term/Choose/Constants.pm
+    lib/Term/Choose/LineFold.pm
+    lib/Term/Choose/LineFold/CharWidthAmbiguousWide.pm
+    lib/Term/Choose/LineFold/CharWidthDefault.pm
+    lib/Term/Choose/Linux.pm
+    lib/Term/Choose/Opt/Mouse.pm
+    lib/Term/Choose/Opt/Search.pm
+    lib/Term/Choose/Opt/SkipItems.pm
+    lib/Term/Choose/Screen.pm
+    lib/Term/Choose/ValidateOptions.pm
+    lib/Term/Choose/Win32.pm
+);
+for my $module ( @modules ) {
+    my $v_module = -1;
+    open $fh, '<', $module or die $!;
+    while ( my $line = <$fh> ) {
+        if ( $line =~ /^our\s\$VERSION\s=\s'(\d\.\d\d\d(?:_\d\d)?)';/ ) {
+            $v_module = $1;
+        }
     }
+    close $fh;
+    is( $v, $v_module, 'Version in $module OK' );
 }
-close $fh;
 
-open $fh, '<', 'lib/Term/Choose/LineFold/CharWidthAmbiguousWide.pm' or die $!;
-while ( my $line = <$fh> ) {
-    if ( $line =~ /^our\s\$VERSION\s=\s'(\d\.\d\d\d(?:_\d\d)?)';/ ) {
-        $v_cwwide = $1;
-    }
-}
-close $fh;
+
+
+
+my $release_date = -1;
+my $v_changes = -1;
 
 open my $fh_ch, '<', 'Changes' or die $!;
 while ( my $line = <$fh_ch> ) {
@@ -76,15 +65,11 @@ while ( my $line = <$fh_ch> ) {
     }
 }
 close $fh_ch;
+is( $v, $v_changes, 'Version in "Changes" OK' );
+
+
+
 
 my $t = localtime;
 my $today = $t->ymd;
-
-is( $v,            $v_pod,         'Version in POD Term::Choose OK' );
-is( $v,            $v_linux,       'Version in Term::Choose::Linux OK' );
-is( $v,            $v_win32,       'Version in Term::Choose::Win32 OK' );
-is( $v,            $v_const,       'Version in Term::Choose::Constants OK' );
-is( $v,            $v_cwdefault,   'Version in Term::Choose::LineFold::CharWidthDefault OK' );
-is( $v,            $v_cwwide,      'Version in Term::Choose::LineFold::CharWidthAmbiguousWide OK' );
-is( $v,            $v_changes,     'Version in "Changes" OK' );
-is( $release_date, $today,         'Release date in Changes is date from today' );
+is( $release_date, $today, 'Release date in Changes is date from today' );

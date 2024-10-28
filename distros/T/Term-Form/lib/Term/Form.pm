@@ -4,13 +4,14 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.557';
+our $VERSION = '0.558';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form );
 
 use Carp       qw( croak );
 use List::Util qw( any );
 
+use Term::Choose                  qw( choose ); ###
 use Term::Choose::LineFold        qw( line_fold print_columns cut_to_printwidth );
 use Term::Choose::Constants       qw( :all );
 use Term::Choose::Screen          qw( :all );
@@ -801,7 +802,18 @@ sub fill_form {
     croak "'fill_form' requires an ARRAY reference as its argument." if ref $orig_list ne 'ARRAY';
     $opt = {} if ! defined $opt;
     croak "'fill_form': the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
-    return [] if ! @$orig_list; ##
+    if ( ! @$orig_list ) { ###
+        # Choose
+        my $choice = choose(
+            [ undef, 'Continue' ],
+            { prompt => 'No fields!', undef => 'Back', layout => 2 }
+        );
+        if ( ! defined $choice ) {
+            return;
+        }
+        return [];
+    }
+    #return [] if ! @$orig_list;
     if ( %$opt ) {
         my $caller = 'fill_form';
         validate_options( _valid_options( $caller ), $opt, $caller );
@@ -1161,7 +1173,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.557
+Version 0.558
 
 =cut
 

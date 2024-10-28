@@ -137,7 +137,7 @@
     "Before Christ",
     "Anno Domini",
   ],
-  first_day_of_week => 6,
+  first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
   glibc_date_format => "%m/%d/%y",
   glibc_datetime_format => "%a %b %e %H:%M:%S %Y",
@@ -277,5 +277,5 @@
   time_format_medium => "h:mm:ss\N{U+202f}a",
   time_format_short => "h:mm\N{U+202f}a",
   variant => undef,
-  version => 45,
+  version => 46,
 }

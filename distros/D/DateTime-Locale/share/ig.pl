@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "A.M.",
-    "P.M.",
+    "N\N{U+2019}\N{U+1ee5}t\N{U+1ee5}t\N{U+1ee5}",
+    "N\N{U+2019}abal\N{U+1ecb}",
   ],
   available_formats => {
     Bh => "h B",
@@ -35,7 +35,7 @@
     MMMd => "d MMM",
     Md => "d/M",
     d => "d",
-    h => "h a",
+    h => "h\N{U+202f}a",
     hm => "h:mm a",
     hms => "h:mm:ss a",
     hmsv => "h:mm:ss a v",
@@ -117,12 +117,12 @@
     "S\N{U+1ecd}ndee",
   ],
   era_abbreviated => [
-    "T.K.",
-    "A.K.",
+    "BC",
+    "AD",
   ],
   era_narrow => [
-    "T.K.",
-    "A.K.",
+    "BC",
+    "AD",
   ],
   era_wide => [
     "Tupu Kraist",
@@ -169,7 +169,7 @@
     "Maach\N{U+1ecb}",
     "Epreel",
     "Mee",
-    "Juun",
+    "Jun",
     "Jula\N{U+1ecb}",
     "\N{U+1ecc}g\N{U+1ecd}\N{U+1ecd}st",
     "Septemba",
@@ -211,7 +211,7 @@
     "Maach\N{U+1ecb}",
     "Epreel",
     "Mee",
-    "Juun",
+    "Jun",
     "Jula\N{U+1ecb}",
     "\N{U+1ecc}g\N{U+1ecd}\N{U+1ecd}st",
     "Septemba",
@@ -226,10 +226,10 @@
   native_territory => undef,
   native_variant => undef,
   quarter_format_abbreviated => [
-    "\N{U+1ecc}1",
-    "\N{U+1ecc}2",
-    "\N{U+1ecc}3",
-    "\N{U+1ecc}4",
+    "Q1",
+    "Q2",
+    "Q3",
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
@@ -244,10 +244,10 @@
     "\N{U+1ecc}kara 4",
   ],
   quarter_stand_alone_abbreviated => [
-    "\N{U+1ecc}1",
-    "\N{U+1ecc}2",
-    "\N{U+1ecc}3",
-    "\N{U+1ecc}4",
+    "Q1",
+    "Q2",
+    "Q3",
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 45,
+  version => 46,
 }

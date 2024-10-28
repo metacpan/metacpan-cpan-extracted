@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.142';
+our $VERSION = '0.143';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -1000,7 +1000,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.142
+Version 0.143
 
 =cut
 
@@ -1113,7 +1113,7 @@ I<margin> expects a reference to an array with four elements in the following or
 
 - right margin (number of terminal columns)
 
-- botton margin (number of terminal lines)
+- bottom margin (number of terminal lines)
 
 - left margin (number of terminal columns)
 

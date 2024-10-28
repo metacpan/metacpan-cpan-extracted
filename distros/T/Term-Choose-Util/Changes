@@ -1,6 +1,10 @@
 Revision history for Term::Choose::Util
 
 
+0.143   2024-10-28
+        - Term::Choose minimum version 1.767.
+        - Fixed spelling in pod.
+
 0.142   2024-06-01
         - Update 'choose_directories' and 'choose_a_file'.
 

@@ -4,14 +4,14 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.557';
+our $VERSION = '0.558';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
 use parent qw( Term::Form );
 
 use Carp       qw( croak );
-use List::Util qw( none any );
+use List::Util qw( none );
 
 use Term::Choose::LineFold        qw( line_fold print_columns );
 use Term::Choose::Constants       qw( :all );
@@ -483,7 +483,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.557
+Version 0.558
 
 =cut
 

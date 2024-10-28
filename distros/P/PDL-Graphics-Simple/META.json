@@ -54,6 +54,6 @@
          "url" : "git://github.com/PDLPorters/PDL-Graphics-Simple.git"
       }
    },
-   "version" : "1.014",
+   "version" : "1.015",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

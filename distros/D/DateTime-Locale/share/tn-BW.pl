@@ -82,7 +82,7 @@
     "S",
   ],
   day_format_wide => [
-    "Mosopulogo",
+    "Mosupologo",
     "Labobedi",
     "Laboraro",
     "Labone",
@@ -109,7 +109,7 @@
     "S",
   ],
   day_stand_alone_wide => [
-    "Mosopulogo",
+    "Mosupologo",
     "Labobedi",
     "Laboraro",
     "Labone",
@@ -221,10 +221,10 @@
     "Sedimonthole",
   ],
   name => "Tswana Botswana",
-  native_language => undef,
-  native_name => "",
+  native_language => "Setswana",
+  native_name => "Setswana Botswana",
   native_script => undef,
-  native_territory => undef,
+  native_territory => "Botswana",
   native_variant => undef,
   quarter_format_abbreviated => [
     "Q1",
@@ -269,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 45,
+  version => 46,
 }

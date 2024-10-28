@@ -405,11 +405,11 @@ Turkmen Turkmenistan locale.
    1995-12-22T09:05:02 = B.e. dek 1995
   -0010-09-15T04:44:23 = B.e.öň sen -10
 
-=head3 GyMMMEd (G d MMM y E)
+=head3 GyMMMEd (G d MMM y, E)
 
-   2008-02-05T18:30:30 = B.e. 5 few 2008 siş
-   1995-12-22T09:05:02 = B.e. 22 dek 1995 ann
-  -0010-09-15T04:44:23 = B.e.öň 15 sen -10 şen
+   2008-02-05T18:30:30 = B.e. 5 few 2008, siş
+   1995-12-22T09:05:02 = B.e. 22 dek 1995, ann
+  -0010-09-15T04:44:23 = B.e.öň 15 sen -10, şen
 
 =head3 GyMMMd (G d MMM y)
 

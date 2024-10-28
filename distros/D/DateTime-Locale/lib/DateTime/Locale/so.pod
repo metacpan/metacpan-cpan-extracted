@@ -93,18 +93,18 @@ Somali locale.
 
 =head3 Wide (format)
 
-  Bisha Koobaad
-  Bisha Labaad
-  Bisha Saddexaad
-  Bisha Afraad
-  Bisha Shanaad
-  Bisha Lixaad
-  Bisha Todobaad
-  Bisha Sideedaad
-  Bisha Sagaalaad
-  Bisha Tobnaad
-  Bisha Kow iyo Tobnaad
-  Bisha Laba iyo Tobnaad
+  Janaayo
+  Febraayo
+  Maarso
+  Abriil
+  Maayo
+  Juun
+  Luulyo
+  Agosto
+  Sebtembar
+  Oktoobar
+  Noofeembar
+  Diseembar
 
 =head3 Abbreviated (format)
 
@@ -143,9 +143,9 @@ Somali locale.
   Febraayo
   Maarso
   Abriil
-  May
+  Maayo
   Juun
-  Luuliyo
+  Luulyo
   Ogosto
   Sebteembar
   Oktoobar
@@ -248,15 +248,15 @@ Somali locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Talaado, Bisha Labaad 5, 2008
-   1995-12-22T09:05:02 = Jimco, Bisha Laba iyo Tobnaad 22, 1995
-  -0010-09-15T04:44:23 = Sabti, Bisha Sagaalaad 15, -10
+   2008-02-05T18:30:30 = Talaado, Febraayo 5, 2008
+   1995-12-22T09:05:02 = Jimco, Diseembar 22, 1995
+  -0010-09-15T04:44:23 = Sabti, Sebtembar 15, -10
 
 =head3 Long
 
-   2008-02-05T18:30:30 = Bisha Labaad 5, 2008
-   1995-12-22T09:05:02 = Bisha Laba iyo Tobnaad 22, 1995
-  -0010-09-15T04:44:23 = Bisha Sagaalaad 15, -10
+   2008-02-05T18:30:30 = Febraayo 5, 2008
+   1995-12-22T09:05:02 = Diseembar 22, 1995
+  -0010-09-15T04:44:23 = Sebtembar 15, -10
 
 =head3 Medium
 
@@ -302,15 +302,15 @@ Somali locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Talaado, Bisha Labaad 5, 2008 6:30:30 GD UTC
-   1995-12-22T09:05:02 = Jimco, Bisha Laba iyo Tobnaad 22, 1995 9:05:02 GH UTC
-  -0010-09-15T04:44:23 = Sabti, Bisha Sagaalaad 15, -10 4:44:23 GH UTC
+   2008-02-05T18:30:30 = Talaado, Febraayo 5, 2008 6:30:30 GD UTC
+   1995-12-22T09:05:02 = Jimco, Diseembar 22, 1995 9:05:02 GH UTC
+  -0010-09-15T04:44:23 = Sabti, Sebtembar 15, -10 4:44:23 GH UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = Bisha Labaad 5, 2008 6:30:30 GD UTC
-   1995-12-22T09:05:02 = Bisha Laba iyo Tobnaad 22, 1995 9:05:02 GH UTC
-  -0010-09-15T04:44:23 = Bisha Sagaalaad 15, -10 4:44:23 GH UTC
+   2008-02-05T18:30:30 = Febraayo 5, 2008 6:30:30 GD UTC
+   1995-12-22T09:05:02 = Diseembar 22, 1995 9:05:02 GH UTC
+  -0010-09-15T04:44:23 = Sebtembar 15, -10 4:44:23 GH UTC
 
 =head3 Medium
 
@@ -479,27 +479,27 @@ Somali locale.
 
 =head3 MMMMEd (E, MMMM d)
 
-   2008-02-05T18:30:30 = Tldo, Bisha Labaad 5
-   1995-12-22T09:05:02 = Jmc, Bisha Laba iyo Tobnaad 22
-  -0010-09-15T04:44:23 = Sbti, Bisha Sagaalaad 15
+   2008-02-05T18:30:30 = Tldo, Febraayo 5
+   1995-12-22T09:05:02 = Jmc, Diseembar 22
+  -0010-09-15T04:44:23 = Sbti, Sebtembar 15
 
 =head3 MMMMW-count-one ('toddobaadka' W 'ee' MMMM)
 
-   2008-02-05T18:30:30 = toddobaadka 1 ee Bisha Labaad
-   1995-12-22T09:05:02 = toddobaadka 3 ee Bisha Laba iyo Tobnaad
-  -0010-09-15T04:44:23 = toddobaadka 2 ee Bisha Sagaalaad
+   2008-02-05T18:30:30 = toddobaadka 1 ee Febraayo
+   1995-12-22T09:05:02 = toddobaadka 3 ee Diseembar
+  -0010-09-15T04:44:23 = toddobaadka 2 ee Sebtembar
 
 =head3 MMMMW-count-other ('toddobaadka' W 'ee' MMMM)
 
-   2008-02-05T18:30:30 = toddobaadka 1 ee Bisha Labaad
-   1995-12-22T09:05:02 = toddobaadka 3 ee Bisha Laba iyo Tobnaad
-  -0010-09-15T04:44:23 = toddobaadka 2 ee Bisha Sagaalaad
+   2008-02-05T18:30:30 = toddobaadka 1 ee Febraayo
+   1995-12-22T09:05:02 = toddobaadka 3 ee Diseembar
+  -0010-09-15T04:44:23 = toddobaadka 2 ee Sebtembar
 
 =head3 MMMMd (MMMM d)
 
-   2008-02-05T18:30:30 = Bisha Labaad 5
-   1995-12-22T09:05:02 = Bisha Laba iyo Tobnaad 22
-  -0010-09-15T04:44:23 = Bisha Sagaalaad 15
+   2008-02-05T18:30:30 = Febraayo 5
+   1995-12-22T09:05:02 = Diseembar 22
+  -0010-09-15T04:44:23 = Sebtembar 15
 
 =head3 MMMd (MMM d)
 
@@ -519,11 +519,11 @@ Somali locale.
    1995-12-22T09:05:02 = 22
   -0010-09-15T04:44:23 = 15
 
-=head3 h (h a)
+=head3 h (h a)
 
-   2008-02-05T18:30:30 = 6 GD
-   1995-12-22T09:05:02 = 9 GH
-  -0010-09-15T04:44:23 = 4 GH
+   2008-02-05T18:30:30 = 6 GD
+   1995-12-22T09:05:02 = 9 GH
+  -0010-09-15T04:44:23 = 4 GH
 
 =head3 hm (h:mm a)
 
@@ -587,9 +587,9 @@ Somali locale.
 
 =head3 yMMMM (MMMM y)
 
-   2008-02-05T18:30:30 = Bisha Labaad 2008
-   1995-12-22T09:05:02 = Bisha Laba iyo Tobnaad 1995
-  -0010-09-15T04:44:23 = Bisha Sagaalaad -10
+   2008-02-05T18:30:30 = Febraayo 2008
+   1995-12-22T09:05:02 = Diseembar 1995
+  -0010-09-15T04:44:23 = Sebtembar -10
 
 =head3 yMMMd (MMM d, y)
 

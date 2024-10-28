@@ -14,8 +14,7 @@ Socket::More::Resolver::AE - Resolver AnyEvent integration
 
 =head1 DESCRIPTION
 
-Built in driver for integrating L<Socket::More::Resolver> into the
-L<Mojo::IOLoop>.
+Built in driver for integrating L<Socket::More::Resolver> into L<AnyEvent>.
 
 If the event loop module is already in memory, it should automatically be
 detected when using L<Socket::More::Resolver>;

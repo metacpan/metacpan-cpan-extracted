@@ -25,5 +25,5 @@ requires:
   perl: '5.036000'
 resources:
   repository: git://github.com/drclaw1394/perl-socket-more-resolver.git
-version: v0.1.0
+version: v0.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -248,9 +248,9 @@ English India locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Tuesday 5 February, 2008
-   1995-12-22T09:05:02 = Friday 22 December, 1995
-  -0010-09-15T04:44:23 = Saturday 15 September, -10
+   2008-02-05T18:30:30 = Tuesday, 5 February 2008
+   1995-12-22T09:05:02 = Friday, 22 December 1995
+  -0010-09-15T04:44:23 = Saturday, 15 September -10
 
 =head3 Long
 
@@ -302,9 +302,9 @@ English India locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Tuesday 5 February, 2008, 6:30:30 pm UTC
-   1995-12-22T09:05:02 = Friday 22 December, 1995, 9:05:02 am UTC
-  -0010-09-15T04:44:23 = Saturday 15 September, -10, 4:44:23 am UTC
+   2008-02-05T18:30:30 = Tuesday, 5 February 2008, 6:30:30 pm UTC
+   1995-12-22T09:05:02 = Friday, 22 December 1995, 9:05:02 am UTC
+  -0010-09-15T04:44:23 = Saturday, 15 September -10, 4:44:23 am UTC
 
 =head3 Long
 
@@ -417,11 +417,11 @@ English India locale.
    1995-12-22T09:05:02 = Dec 1995 AD
   -0010-09-15T04:44:23 = Sept -10 BC
 
-=head3 GyMMMEEEEd (EEEE d MMM, y G)
+=head3 GyMMMEEEEd (EEEE, d MMM y G)
 
-   2008-02-05T18:30:30 = Tuesday 5 Feb, 2008 AD
-   1995-12-22T09:05:02 = Friday 22 Dec, 1995 AD
-  -0010-09-15T04:44:23 = Saturday 15 Sept, -10 BC
+   2008-02-05T18:30:30 = Tuesday, 5 Feb 2008 AD
+   1995-12-22T09:05:02 = Friday, 22 Dec 1995 AD
+  -0010-09-15T04:44:23 = Saturday, 15 Sept -10 BC
 
 =head3 GyMMMEd (E, d MMM y G)
 
@@ -489,11 +489,11 @@ English India locale.
    1995-12-22T09:05:02 = Dec
   -0010-09-15T04:44:23 = Sept
 
-=head3 MMMEEEEd (EEEE d MMM)
+=head3 MMMEEEEd (EEEE, d MMM)
 
-   2008-02-05T18:30:30 = Tuesday 5 Feb
-   1995-12-22T09:05:02 = Friday 22 Dec
-  -0010-09-15T04:44:23 = Saturday 15 Sept
+   2008-02-05T18:30:30 = Tuesday, 5 Feb
+   1995-12-22T09:05:02 = Friday, 22 Dec
+  -0010-09-15T04:44:23 = Saturday, 15 Sept
 
 =head3 MMMEd (E, d MMM)
 
@@ -501,11 +501,11 @@ English India locale.
    1995-12-22T09:05:02 = Fri, 22 Dec
   -0010-09-15T04:44:23 = Sat, 15 Sept
 
-=head3 MMMMEEEEd (EEEE d MMMM)
+=head3 MMMMEEEEd (EEEE, d MMMM)
 
-   2008-02-05T18:30:30 = Tuesday 5 February
-   1995-12-22T09:05:02 = Friday 22 December
-  -0010-09-15T04:44:23 = Saturday 15 September
+   2008-02-05T18:30:30 = Tuesday, 5 February
+   1995-12-22T09:05:02 = Friday, 22 December
+  -0010-09-15T04:44:23 = Saturday, 15 September
 
 =head3 MMMMW-count-one ('week' W 'of' MMMM)
 
@@ -639,11 +639,11 @@ English India locale.
    1995-12-22T09:05:02 = Dec 1995
   -0010-09-15T04:44:23 = Sept -10
 
-=head3 yMMMEEEEd (EEEE d MMM, y)
+=head3 yMMMEEEEd (EEEE, d MMM y)
 
-   2008-02-05T18:30:30 = Tuesday 5 Feb, 2008
-   1995-12-22T09:05:02 = Friday 22 Dec, 1995
-  -0010-09-15T04:44:23 = Saturday 15 Sept, -10
+   2008-02-05T18:30:30 = Tuesday, 5 Feb 2008
+   1995-12-22T09:05:02 = Friday, 22 Dec 1995
+  -0010-09-15T04:44:23 = Saturday, 15 Sept -10
 
 =head3 yMMMEd (E, d MMM, y)
 
@@ -657,11 +657,11 @@ English India locale.
    1995-12-22T09:05:02 = December 1995
   -0010-09-15T04:44:23 = September -10
 
-=head3 yMMMMEEEEd (EEEE d MMMM, y)
+=head3 yMMMMEEEEd (EEEE, d MMMM y)
 
-   2008-02-05T18:30:30 = Tuesday 5 February, 2008
-   1995-12-22T09:05:02 = Friday 22 December, 1995
-  -0010-09-15T04:44:23 = Saturday 15 September, -10
+   2008-02-05T18:30:30 = Tuesday, 5 February 2008
+   1995-12-22T09:05:02 = Friday, 22 December 1995
+  -0010-09-15T04:44:23 = Saturday, 15 September -10
 
 =head3 yMMMd (d MMM y)
 

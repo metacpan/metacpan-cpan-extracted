@@ -30,7 +30,7 @@
     MMM => "LLL",
     MMMEd => "E, MMM d",
     MMMMEd => "E, MMMM d",
-    "MMMMW-count-one" => "'ika'-W 'linggo' 'ng' MMMM",
+    "MMMMW-count-one" => "'linggo' W 'ng' MMMM",
     "MMMMW-count-other" => "'linggo' W 'ng' MMMM",
     MMMMd => "MMMM d",
     MMMd => "MMM d",
@@ -271,5 +271,5 @@
   time_format_medium => "h:mm:ss\N{U+202f}a",
   time_format_short => "h:mm\N{U+202f}a",
   variant => undef,
-  version => 45,
+  version => 46,
 }

@@ -21,45 +21,44 @@ name: Blockchain-Ethereum-ABI
 provides:
   Blockchain::Ethereum::ABI:
     file: lib/Blockchain/Ethereum/ABI.pm
-    version: '0.017'
+    version: '0.018'
   Blockchain::Ethereum::ABI::Decoder:
     file: lib/Blockchain/Ethereum/ABI/Decoder.pm
-    version: '0.017'
+    version: '0.018'
   Blockchain::Ethereum::ABI::Encoder:
     file: lib/Blockchain/Ethereum/ABI/Encoder.pm
-    version: '0.017'
+    version: '0.018'
   Blockchain::Ethereum::ABI::Type:
     file: lib/Blockchain/Ethereum/ABI/Type.pm
-    version: '0.017'
+    version: '0.018'
   Blockchain::Ethereum::ABI::Type::Address:
     file: lib/Blockchain/Ethereum/ABI/Type/Address.pm
-    version: '0.017'
+    version: '0.018'
   Blockchain::Ethereum::ABI::Type::Array:
     file: lib/Blockchain/Ethereum/ABI/Type/Array.pm
-    version: '0.017'
+    version: '0.018'
   Blockchain::Ethereum::ABI::Type::Bytes:
     file: lib/Blockchain/Ethereum/ABI/Type/Bytes.pm
-    version: '0.017'
+    version: '0.018'
   Blockchain::Ethereum::ABI::Type::Int:
     file: lib/Blockchain/Ethereum/ABI/Type/Int.pm
-    version: '0.017'
+    version: '0.018'
   Blockchain::Ethereum::ABI::Type::String:
     file: lib/Blockchain/Ethereum/ABI/Type/String.pm
-    version: '0.017'
+    version: '0.018'
   Blockchain::Ethereum::ABI::Type::Tuple:
     file: lib/Blockchain/Ethereum/ABI/Type/Tuple.pm
-    version: '0.017'
+    version: '0.018'
 requires:
   Crypt::Digest::Keccak256: '0.078'
   Math::BigInt: '1.999811'
   Module::Load: '0.36'
   Scalar::Util: '1.63'
-  indirect: '0.39'
   perl: v5.26.0
 resources:
   homepage: https://github.com/refeco/Blockchain-Ethereum-ABI
   repository: https://github.com/refeco/Blockchain-Ethereum-ABI.git
-version: '0.017'
+version: '0.018'
 x_authority: cpan:REFECO
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.74'

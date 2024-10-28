@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "\N{U+05dc}\N{U+05e4}\N{U+05e0}\N{U+05d4}\N{U+05f4}\N{U+05e6}",
-    "\N{U+05d0}\N{U+05d7}\N{U+05d4}\N{U+05f4}\N{U+05e6}",
+    "AM",
+    "PM",
   ],
   available_formats => {
     Bh => "h B",
@@ -19,7 +19,7 @@
     GyMMM => "MMM y G",
     GyMMMEd => "E, d \N{U+05d1}MMM y G",
     GyMMMd => "d \N{U+05d1}MMM y G",
-    GyMd => "d/M/y GGGGG",
+    GyMd => "d/M/y G",
     H => "H",
     Hm => "H:mm",
     Hms => "H:mm:ss",
@@ -272,5 +272,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 45,
+  version => 46,
 }

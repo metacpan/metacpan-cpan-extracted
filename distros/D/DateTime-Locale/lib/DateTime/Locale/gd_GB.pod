@@ -260,9 +260,9 @@ Scottish Gaelic United Kingdom locale.
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 5 Gearr 2008
-   1995-12-22T09:05:02 = 22 Dùbh 1995
-  -0010-09-15T04:44:23 = 15 Sult -10
+   2008-02-05T18:30:30 = 5mh Gearr 2008
+   1995-12-22T09:05:02 = 22mh Dùbh 1995
+  -0010-09-15T04:44:23 = 15mh Sult -10
 
 =head3 Short
 
@@ -314,9 +314,9 @@ Scottish Gaelic United Kingdom locale.
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 5 Gearr 2008 18:30:30
-   1995-12-22T09:05:02 = 22 Dùbh 1995 09:05:02
-  -0010-09-15T04:44:23 = 15 Sult -10 04:44:23
+   2008-02-05T18:30:30 = 5mh Gearr 2008 18:30:30
+   1995-12-22T09:05:02 = 22mh Dùbh 1995 09:05:02
+  -0010-09-15T04:44:23 = 15mh Sult -10 04:44:23
 
 =head3 Short
 
@@ -597,11 +597,11 @@ Scottish Gaelic United Kingdom locale.
    1995-12-22T09:05:02 = Dùbh 1995
   -0010-09-15T04:44:23 = Sult -10
 
-=head3 yMMMEd (E, d'mh' MMM y)
+=head3 yMMMEd (E, d MMM y)
 
-   2008-02-05T18:30:30 = DiM, 5mh Gearr 2008
-   1995-12-22T09:05:02 = Dih, 22mh Dùbh 1995
-  -0010-09-15T04:44:23 = DiS, 15mh Sult -10
+   2008-02-05T18:30:30 = DiM, 5 Gearr 2008
+   1995-12-22T09:05:02 = Dih, 22 Dùbh 1995
+  -0010-09-15T04:44:23 = DiS, 15 Sult -10
 
 =head3 yMMMM (LLLL y)
 
@@ -609,11 +609,11 @@ Scottish Gaelic United Kingdom locale.
    1995-12-22T09:05:02 = An Dùbhlachd 1995
   -0010-09-15T04:44:23 = An t-Sultain -10
 
-=head3 yMMMd (d'mh' MMM y)
+=head3 yMMMd (d MMM y)
 
-   2008-02-05T18:30:30 = 5mh Gearr 2008
-   1995-12-22T09:05:02 = 22mh Dùbh 1995
-  -0010-09-15T04:44:23 = 15mh Sult -10
+   2008-02-05T18:30:30 = 5 Gearr 2008
+   1995-12-22T09:05:02 = 22 Dùbh 1995
+  -0010-09-15T04:44:23 = 15 Sult -10
 
 =head3 yMd (d/M/y)
 

@@ -85,7 +85,7 @@ sub check {
 	$mod->{msg} = "No PostScript found";
 	return 0;
     }
-
+    $mod->{plplot_version} = PDL::Graphics::PLplot::plgver();
     $mod->{ok} = 1;
     return 1;
 }

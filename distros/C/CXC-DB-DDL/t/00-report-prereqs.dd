@@ -122,6 +122,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Data::Dump' => '0',
                                    'Data::Dumper' => '0',
                                    'Exporter::Shiny' => '0',
                                    'ExtUtils::MakeMaker' => '0',

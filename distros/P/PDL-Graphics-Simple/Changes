@@ -1,3 +1,6 @@
+1.015 2024-10-28
+- tests report versions of underlying graphics engines
+
 1.014 2024-10-25
 - exception when oplot in multiplot mode
 - oplot now leaves {x,y}range alone

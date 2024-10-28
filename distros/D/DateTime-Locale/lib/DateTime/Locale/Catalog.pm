@@ -3,7 +3,7 @@ package DateTime::Locale::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 
 1;
 
@@ -21,7 +21,7 @@ DateTime::Locale::Catalog - Provides a catalog of all valid locale names
 
 =head1 VERSION
 
-version 1.43
+version 1.44
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ The available locales are:
 =end :locales
 
  Locale code      Locale name (in English)                          Native locale name
- ================================================================================================================
+ ===================================================================================================================================================================
  aa               Afar
  aa-DJ            Afar Djibouti
  aa-ER            Afar Eritrea
@@ -120,8 +120,8 @@ The available locales are:
  bal              Baluchi                                           بلۆچی
  bal-Arab         Baluchi Arabic                                    بلۆچی
  bal-Arab-PK      Baluchi Pakistan Arabic                           بلۆچی
- bal-Latn         Baluchi Latin                                     بلۆچی
- bal-Latn-PK      Baluchi Pakistan Latin                            بلۆچی
+ bal-Latn         Baluchi Latin                                     Balóchi Látin Engrézi (Látin) Engrézi (Látin, Amrikáay Tepákén Están) syáhag: Látini
+ bal-Latn-PK      Baluchi Pakistan Latin                            Balóchi Pákestán Látin Engrézi (Látin) Engrézi (Látin, Amrikáay Tepákén Están) syáhag: Látini
  bas              Basaa                                             Ɓàsàa
  bas-CM           Basaa Cameroon                                    Ɓàsàa Kàmɛ̀rûn
  be               Belarusian                                        беларуская
@@ -205,7 +205,7 @@ The available locales are:
  cs               Czech                                             čeština
  cs-CZ            Czech Czechia                                     čeština Česko
  csw              Swampy Cree                                       ᓀᐦᐃᓇᐍᐏᐣ
- csw-CA           Swampy Cree Canada                                ᓀᐦᐃᓇᐍᐏᐣ ᑲᓇᑕ
+ csw-CA           Swampy Cree Canada                                ᓀᐦᐃᓇᐍᐏᐣ ᑳᓇᑕ
  cu               Church Slavic
  cu-RU            Church Slavic Russia
  cv               Chuvash                                           чӑваш
@@ -241,9 +241,9 @@ The available locales are:
  dz-BT            Dzongkha Bhutan                                   རྫོང་ཁ འབྲུག
  ebu              Embu                                              Kĩembu
  ebu-KE           Embu Kenya                                        Kĩembu Kenya
- ee               Ewe                                               Eʋegbe
- ee-GH            Ewe Ghana                                         Eʋegbe Ghana nutome
- ee-TG            Ewe Togo                                          Eʋegbe Togo nutome
+ ee               Ewe                                               eʋegbe
+ ee-GH            Ewe Ghana                                         eʋegbe Ghana nutome
+ ee-TG            Ewe Togo                                          eʋegbe Togo nutome
  el               Greek                                             Ελληνικά
  el-CY            Greek Cyprus                                      Ελληνικά Κύπρος
  el-GR            Greek Greece                                      Ελληνικά Ελλάδα
@@ -491,7 +491,7 @@ The available locales are:
  ga-GB            Irish United Kingdom                              Gaeilge an Ríocht Aontaithe
  ga-IE            Irish Ireland                                     Gaeilge Éire
  gaa              Ga                                                Gã
- gaa-GH           Ga Ghana                                          Gã
+ gaa-GH           Ga Ghana                                          Gã Ghana
  gd               Scottish Gaelic                                   Gàidhlig
  gd-GB            Scottish Gaelic United Kingdom                    Gàidhlig An Rìoghachd Aonaichte
  gez              Geez
@@ -539,7 +539,7 @@ The available locales are:
  hy               Armenian                                          հայերեն
  hy-AM            Armenian Armenia                                  հայերեն Հայաստան
  ia               Interlingua                                       interlingua
- ia-001           Interlingua world                                 interlingua Mundo
+ ia-001           Interlingua world                                 interlingua mundo
  id               Indonesian                                        Indonesia
  id-ID            Indonesian Indonesia                              Indonesia Indonesia
  ie               Interlingue                                       Interlingue
@@ -573,6 +573,11 @@ The available locales are:
  jv-ID            Javanese Indonesia                                Jawa Indonésia
  ka               Georgian                                          ქართული
  ka-GE            Georgian Georgia                                  ქართული საქართველო
+ kaa              Kara-Kalpak                                       қарақалпақша
+ kaa-Cyrl         Kara-Kalpak Cyrillic                              қарақалпақша кирилл жазыўы
+ kaa-Cyrl-UZ      Kara-Kalpak Uzbekistan Cyrillic                   қарақалпақша Өзбекстан кирилл жазыўы
+ kaa-Latn         Kara-Kalpak Latin
+ kaa-Latn-UZ      Kara-Kalpak Uzbekistan Latin
  kab              Kabyle                                            Taqbaylit
  kab-DZ           Kabyle Algeria                                    Taqbaylit Lezzayer
  kaj              Jju                                               Kaje
@@ -594,6 +599,10 @@ The available locales are:
  ki               Kikuyu                                            Gikuyu
  ki-KE            Kikuyu Kenya                                      Gikuyu Kenya
  kk               Kazakh                                            қазақ тілі
+ kk-Arab          Kazakh Arabic
+ kk-Arab-CN       Kazakh China Arabic
+ kk-Cyrl          Kazakh Cyrillic                                   қазақ тілі кирилл жазуы
+ kk-Cyrl-KZ       Kazakh Kazakhstan Cyrillic                        қазақ тілі Қазақстан кирилл жазуы
  kk-KZ            Kazakh Kazakhstan                                 қазақ тілі Қазақстан
  kkj              Kako                                              kakɔ
  kkj-CM           Kako Cameroon                                     kakɔ Kamɛrun
@@ -610,7 +619,10 @@ The available locales are:
  ko-KP            Korean North Korea                                한국어 조선민주주의인민공화국
  ko-KR            Korean South Korea                                한국어 대한민국
  kok              Konkani                                           कोंकणी
- kok-IN           Konkani India                                     कोंकणी भारत
+ kok-Deva         Konkani Devanagari                                कोंकणी देवनागरी
+ kok-Deva-IN      Konkani India Devanagari                          कोंकणी भारत देवनागरी
+ kok-Latn         Konkani Latin                                     Konknni Romi
+ kok-Latn-IN      Konkani India Latin                               Konknni Bharot Romi
  kpe              Kpelle                                            Kpɛlɛɛ
  kpe-GN           Kpelle Guinea                                     Kpɛlɛɛ
  kpe-LR           Kpelle Liberia                                    Kpɛlɛɛ
@@ -626,7 +638,7 @@ The available locales are:
  ksh              Colognian                                         Kölsch
  ksh-DE           Colognian Germany                                 Kölsch Doütschland
  ku               Kurdish                                           kurdî (kurmancî)
- ku-TR            Kurdish Türkiye                                   kurdî (kurmancî) Tirkiye
+ ku-TR            Kurdish Türkiye                                   kurdî (kurmancî) Tirkîye
  kw               Cornish                                           kernewek
  kw-GB            Cornish United Kingdom                            kernewek Rywvaneth Unys
  kxv              Kuvi                                              kuvi
@@ -652,6 +664,8 @@ The available locales are:
  lij-IT           Ligurian Italy                                    ligure Italia
  lkt              Lakota                                            Lakȟólʼiyapi
  lkt-US           Lakota United States                              Lakȟólʼiyapi Mílahaŋska Tȟamákȟočhe
+ lld                                                                ladin
+ lld-IT           Italy                                             ladin Talia
  lmo              Lombard                                           Lombard
  lmo-IT           Lombard Italy                                     Lombard Italia
  ln               Lingala                                           lingála
@@ -666,6 +680,8 @@ The available locales are:
  lrc-IR           Northern Luri Iran                                لۊری شومالی
  lt               Lithuanian                                        lietuvių
  lt-LT            Lithuanian Lithuania                              lietuvių Lietuva
+ ltg              Latgalian
+ ltg-LV           Latgalian Latvia
  lu               Luba-Katanga                                      Tshiluba
  lu-CD            Luba-Katanga Congo - Kinshasa                     Tshiluba Ditunga wa Kongu
  luo              Luo                                               Dholuo
@@ -691,6 +707,8 @@ The available locales are:
  mgh-MZ           Makhuwa-Meetto Mozambique                         Makua Umozambiki
  mgo              Metaʼ                                             metaʼ
  mgo-CM           Metaʼ Cameroon                                    metaʼ Kamalun
+ mhn
+ mhn-IT           Italy
  mi               Māori                                             Māori
  mi-NZ            Māori New Zealand                                 Māori Aotearoa
  mic              Mi'kmaw                                           Lʼnuiʼsuti
@@ -765,8 +783,8 @@ The available locales are:
  nqo-GN           N’Ko Guinea                                       ߒߞߏ ߖߌ߬ߣߍ߫
  nr               South Ndebele
  nr-ZA            South Ndebele South Africa
- nso              Northern Sotho
- nso-ZA           Northern Sotho South Africa                       Afrika Borwa
+ nso              Northern Sotho                                    Sesotho sa Leboa
+ nso-ZA           Northern Sotho South Africa                       Sesotho sa Leboa Afrika Borwa
  nus              Nuer                                              Thok Nath
  nus-SS           Nuer South Sudan                                  Thok Nath
  nv               Navajo                                            Diné Bizaad
@@ -850,8 +868,8 @@ The available locales are:
  ru-MD            Russian Moldova                                   русский Молдова
  ru-RU            Russian Russia                                    русский Россия
  ru-UA            Russian Ukraine                                   русский Украина
- rw               Kinyarwanda                                       Kinyarwanda
- rw-RW            Kinyarwanda Rwanda                                Kinyarwanda U Rwanda
+ rw               Kinyarwanda                                       Ikinyarwanda
+ rw-RW            Kinyarwanda Rwanda                                Ikinyarwanda U Rwanda
  rwk              Rwa                                               Kiruwa
  rwk-TZ           Rwa Tanzania                                      Kiruwa Tanzania
  sa               Sanskrit                                          संस्कृत भाषा
@@ -945,8 +963,8 @@ The available locales are:
  ssy              Saho                                              Saho
  ssy-ER           Saho Eritrea                                      Saho
  st               Southern Sotho                                    Sesotho
- st-LS            Southern Sotho Lesotho                            Sesotho
- st-ZA            Southern Sotho South Africa                       Sesotho
+ st-LS            Southern Sotho Lesotho                            Sesotho Lesotho
+ st-ZA            Southern Sotho South Africa                       Sesotho Afrika Borwa
  su               Sundanese                                         Basa Sunda
  su-Latn          Sundanese Latin                                   Basa Sunda Latin
  su-Latn-ID       Sundanese Indonesia Latin                         Basa Sunda Indonesia Latin
@@ -985,9 +1003,9 @@ The available locales are:
  tig-ER           Tigre Eritrea
  tk               Turkmen                                           türkmen dili
  tk-TM            Turkmen Turkmenistan                              türkmen dili Türkmenistan
- tn               Tswana
- tn-BW            Tswana Botswana
- tn-ZA            Tswana South Africa                               Aforika Borwa
+ tn               Tswana                                            Setswana
+ tn-BW            Tswana Botswana                                   Setswana Botswana
+ tn-ZA            Tswana South Africa                               Setswana Aforika Borwa
  to               Tongan                                            lea fakatonga
  to-TO            Tongan Tonga                                      lea fakatonga Tonga
  tok              Toki Pona                                         toki pona
@@ -1074,7 +1092,8 @@ The available locales are:
  yue-Hans         Cantonese Simplified                              粤语 简体
  yue-Hans-CN      Cantonese China Simplified                        粤语 中华人民共和国 简体
  yue-Hant         Cantonese Traditional                             粵語 繁體
- yue-Hant-HK      Cantonese Hong Kong SAR China Traditional         粵語 中華人民共和國香港特別行政區 繁體
+ yue-Hant-CN      Cantonese China Traditional                       粵語 中國 繁體
+ yue-Hant-HK      Cantonese Hong Kong SAR China Traditional         粵語 中國香港特別行政區 繁體
  za               Zhuang                                            Vahcuengh
  za-CN            Zhuang China                                      Vahcuengh Cunghgoz
  zgh              Standard Moroccan Tamazight                       ⵜⴰⵎⴰⵣⵉⵖⵜ
@@ -1084,11 +1103,15 @@ The available locales are:
  zh-Hans-CN       Chinese China Simplified                          中文 中国 简体
  zh-Hans-HK       Chinese Hong Kong SAR China Simplified            中文 中国香港特别行政区 简体
  zh-Hans-MO       Chinese Macao SAR China Simplified                中文 中国澳门特别行政区 简体
+ zh-Hans-MY       Chinese Malaysia Simplified                       中文 马来西亚 简体
  zh-Hans-SG       Chinese Singapore Simplified                      中文 新加坡 简体
  zh-Hant          Chinese Traditional                               中文 繁體
  zh-Hant-HK       Chinese Hong Kong SAR China Traditional           中文 中國香港特別行政區 繁體字
  zh-Hant-MO       Chinese Macao SAR China Traditional               中文 中國澳門特別行政區 繁體字
+ zh-Hant-MY       Chinese Malaysia Traditional                      中文 馬來西亞 繁體
  zh-Hant-TW       Chinese Taiwan Traditional                        中文 台灣 繁體
+ zh-Latn          Chinese Latin                                     中文 拉丁文
+ zh-Latn-CN       Chinese China Latin                               中文 中国 拉丁文
  zu               Zulu                                              isiZulu
  zu-ZA            Zulu South Africa                                 isiZulu iNingizimu Afrika
 

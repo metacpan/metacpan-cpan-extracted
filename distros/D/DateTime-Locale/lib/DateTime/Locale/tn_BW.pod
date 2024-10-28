@@ -30,7 +30,7 @@ Tswana Botswana locale.
 
 =head3 Wide (format)
 
-  Mosopulogo
+  Mosupologo
   Labobedi
   Laboraro
   Labone
@@ -61,7 +61,7 @@ Tswana Botswana locale.
 
 =head3 Wide (stand-alone)
 
-  Mosopulogo
+  Mosupologo
   Labobedi
   Laboraro
   Labone

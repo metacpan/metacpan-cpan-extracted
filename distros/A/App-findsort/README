@@ -2,7 +2,7 @@ NAME
     App::findsort - Unix find wrapper to add sorting
 
 VERSION
-    This document describes version 0.001 of App::findsort (from Perl
+    This document describes version 0.002 of App::findsort (from Perl
     distribution App-findsort), released on 2024-09-19.
 
 SYNOPSIS

@@ -483,11 +483,11 @@ Albanian Kosovo locale.
    1995-12-22T09:05:02 = pre, 22 dhjetor
   -0010-09-15T04:44:23 = sht, 15 shtator
 
-=head3 MMMMW-count-one ('java' W 'e' MMMM)
+=head3 MMMMW-count-one ('java' W 'e' 'muajit' MMMM)
 
-   2008-02-05T18:30:30 = java 1 e shkurt
-   1995-12-22T09:05:02 = java 3 e dhjetor
-  -0010-09-15T04:44:23 = java 2 e shtator
+   2008-02-05T18:30:30 = java 1 e muajit shkurt
+   1995-12-22T09:05:02 = java 3 e muajit dhjetor
+  -0010-09-15T04:44:23 = java 2 e muajit shtator
 
 =head3 MMMMW-count-other ('java' W 'e' MMMM)
 

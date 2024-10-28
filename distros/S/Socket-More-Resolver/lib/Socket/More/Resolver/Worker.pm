@@ -49,11 +49,11 @@ unless(caller){
   #$out->autoflush;
 
   #Simply loop over inputs and outputs
-  DEBUG and say "Worker waiting for line ...";
+  DEBUG and say STDERR "Worker waiting for line ...";
   my $counter=0;
   while(<$in>){
 
-    DEBUG and say "Worker got line...";
+    DEBUG and say STDERR "Worker got line...";
     $0="S::M::R::W-".$counter++;
     #parse
     # Host, port, hints
@@ -63,7 +63,7 @@ unless(caller){
     my ($cmd, $req_id)=unpack "l> l>", $bin;
     $bin=substr $bin, 8;
 
-    DEBUG and say "WORKER $$ REQUEST,  ID: $req_id";
+    DEBUG and say STDERR "WORKER $$ REQUEST,  ID: $req_id";
 
     my $return_out=pack "l> l>", $cmd, $req_id;
     if($cmd == CMD_SPAWN){
@@ -72,19 +72,19 @@ unless(caller){
       if($pid){
         #Parent
         # return message back to API with PID of offspring 
-        DEBUG and say "FORKED WORKER... in parent child is $pid";
+        DEBUG and say STDERR "FORKED WORKER... in parent child is $pid";
         $return_out.=pack "l>", $pid;
       }
       else {
         #child.
 
         $0="S::M::R::W";
-        DEBUG and say "FORKED WORKER... child with fds";
+        DEBUG and say STDERR "FORKED WORKER... child with fds";
         my ($in_fd, $out_fd)=unpack "l> l>", $bin;
         close $in;
         close $out;
         
-        DEBUG and say "infd $in_fd, out_fd $out_fd";
+        DEBUG and say STDERR "infd $in_fd, out_fd $out_fd";
         open $in,  "<&=$in_fd" or die $!;
         open $out, ">&=$out_fd" or die $!;
 
@@ -98,7 +98,7 @@ unless(caller){
       my @results;
       my $port=pop @e;
       my $host=pop @e;
-      DEBUG and say "WORKER $$ PROCESSIG GAI REQUEST, id: $req_id";
+      DEBUG and say STDERR "WORKER $$ PROCESSIG GAI REQUEST, id: $req_id";
       my $rc;
 
 
@@ -118,7 +118,9 @@ unless(caller){
         }
       }
       else {
+        use Data::Dumper;
         require Socket::More::Lookup;
+        DEBUG and say STDERR "host $host, port $port";
         $rc=Socket::More::Lookup::getaddrinfo($host, $port, \@e, \@results);
         unless (defined $rc){
           $results[0]=[$!, -1, -1, -1, "", ""];
@@ -128,10 +130,12 @@ unless(caller){
           $return_out.=pack($gai_data_pack, @$_);
         }
       }
+      use Data::Dumper;
+      DEBUG and say STDERR Dumper @results;
     }
 
     elsif($cmd==CMD_GNI){
-      DEBUG and say "WORKER $$ PROCESSIG GNI REQUEST, id: $req_id";
+      DEBUG and say STDERR "WORKER $$ PROCESSIG GNI REQUEST, id: $req_id";
       my @e=unpack "l>/a* l>", $bin;
       if($use_core){
         require Socket;
@@ -141,7 +145,19 @@ unless(caller){
       else {
         require Socket::More::Lookup;
         my $rc=Socket::More::Lookup::getnameinfo($e[0],my $host="", my $service="", $e[1]);
-        $return_out.=pack "l> l>/a* l>/a*",$rc, $host, $service;
+
+        DEBUG and say STDERR "worker side rc $rc";
+        DEBUG and say STDERR "worker side host $host";
+        DEBUG and say STDERR "worker side service Service $service";
+
+        unless (defined $rc){
+          $return_out.=pack "l> l>/a* l>/a*",$!, $host, $service;
+
+        }
+        else {
+
+          $return_out.=pack "l> l>/a* l>/a*",0, $host, $service;
+        }
       }
     }
 
@@ -153,7 +169,7 @@ unless(caller){
     elsif($cmd==CMD_REAP){
       #
       my @pids=unpack "l>/l>*", $bin;
-      DEBUG and say "WORKER $$ REAP HANDLER @pids";
+      DEBUG and say STDERR "WORKER $$ REAP HANDLER @pids";
       my @reaped;
       for(@pids){
         my $ret;
@@ -166,7 +182,7 @@ unless(caller){
         }
         push @reaped, $ret;
       }
-      DEBUG and say "WORKER Reaped @reaped";
+      DEBUG and say STDERR "WORKER Reaped @reaped";
       $return_out.=pack "l>/l>*", @reaped;
     }
 
@@ -174,14 +190,14 @@ unless(caller){
       die "Unkown command";
     }
 
-    DEBUG and say "** BEFORE WORKER WRITE $$";
+    DEBUG and say STDERR "** BEFORE WORKER WRITE $$";
     syswrite $out, unpack("H*", $return_out)."\n" or say $!;
-    DEBUG and say "** AFTER WORKER WRITE $$";
+    DEBUG and say STDERR "** AFTER WORKER WRITE $$";
 
     last unless $run;
   }
 
-  DEBUG and say "** EXITING WORKER $$";
+  DEBUG and say STDERR "** EXITING WORKER $$";
 }
 
 1;

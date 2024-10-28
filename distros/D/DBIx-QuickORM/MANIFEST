@@ -59,6 +59,7 @@ lib/DBIx/QuickORM/Util.pm
 lib/DBIx/QuickORM/Util/HashBase.pm
 lib/DBIx/QuickORM/Util/Mask.pm
 lib/DBIx/QuickORM/Util/SchemaBuilder.pm
+t/00-report.t
 t/HashBase.t
 t/SQLAbstract.t
 t/aside.t

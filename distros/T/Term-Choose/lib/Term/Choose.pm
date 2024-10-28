@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.765';
+our $VERSION = '1.767';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -1280,7 +1280,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.765
+Version 1.767
 
 =cut
 
@@ -1680,12 +1680,11 @@ I<margin> expects a reference to an array with four elements in the following or
 
 - right margin (number of terminal columns)
 
-- botton margin (number of terminal lines)
+- bottom margin (number of terminal lines)
 
 - left margin (number of terminal columns)
 
-I<margin> does not affect the I<info> and I<prompt> string. To add margins to the I<info> and I<prompt> string see
-I<tabs_info> and I<tabs_prompt>.
+See also L</tabs_info> and L</tabs_prompt>.
 
 Allowed values: 0 or greater. Elements beyond the fourth are ignored.
 
@@ -1939,7 +1938,7 @@ The escape sequences to enable the I<mouse> mode are always hardcoded.
 =head2 Other environment variables
 
 If the environment variable C<TC_RESET_AUTO_UP> existed when calling C<choose>: C<TC_RESET_AUTO_UP> is set to C<0> if
-the C<LINE_FEED>/C<CARRIAGE_RETURN> key was the only key pressed and C<TC_RESET_AUTO_UP> is set ot C<1> if other keys
+the C<LINE_FEED>/C<CARRIAGE_RETURN> key was the only key pressed and C<TC_RESET_AUTO_UP> is set to C<1> if other keys
 than C<LINE_FEED>/C<CARRIAGE_RETURN> were also pressed.
 
 =head2 MSWin32

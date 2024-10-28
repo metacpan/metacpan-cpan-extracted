@@ -50,7 +50,7 @@
     yMMMM => "MMMM y",
     yMMMd => "d MMM y",
     yMd => "d/M/y",
-    yQQQ => "y QQQ",
+    yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
     "yw-count-one" => "'wiki' w 'ya' Y",
     "yw-count-other" => "'wiki' w 'ya' Y",
@@ -270,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 45,
+  version => 46,
 }

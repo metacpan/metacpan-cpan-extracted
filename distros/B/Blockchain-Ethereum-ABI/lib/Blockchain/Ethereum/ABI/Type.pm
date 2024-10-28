@@ -3,11 +3,10 @@ package Blockchain::Ethereum::ABI::Type;
 use v5.26;
 use strict;
 use warnings;
-no indirect;
 
 # ABSTRACT: Type interface
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.017';          # VERSION
+our $VERSION   = '0.018';          # VERSION
 
 use Carp;
 use Module::Load;
@@ -231,7 +230,7 @@ Blockchain::Ethereum::ABI::Type - Type interface
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

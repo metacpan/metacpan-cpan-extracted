@@ -153,10 +153,9 @@ has _first_day_of_week => (
 );
 
 has version => (
-    is      => 'ro',
-    isa     => t('LaxVersionStr'),
-    lazy    => 1,
-    builder => '_build_version',
+    is       => 'ro',
+    isa      => t('LaxVersionStr'),
+    required => 1,
 );
 
 has data_hash => (
@@ -315,10 +314,6 @@ sub _extract_glibc_value ( $self, $key, $raw ) {
     return $val;
 }
 
-sub _build_version ($self) {
-    return $self->_cldr_json_data->{identity}{version}{_cldrVersion};
-}
-
 sub _build_json_file ($self) {
     my $code_file = $self->_gregorian_file_for_code( $self->code );
     return $code_file if -f $code_file;
@@ -370,6 +365,7 @@ sub _build_parent_locale ($self) {
         code       => $self->_parent_code,
         cldr_root  => $self->_cldr_root,
         glibc_root => $self->_glibc_root,
+        version    => $self->version,
     );
 }
 

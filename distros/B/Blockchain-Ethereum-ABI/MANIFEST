@@ -35,6 +35,7 @@ t/complex.t
 t/data-validation.t
 t/decode.t
 t/int.t
+t/no_params.t
 t/readme.t
 t/release-dist-manifest.t
 t/release-test-legal.t

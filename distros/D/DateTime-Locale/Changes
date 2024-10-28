@@ -1,3 +1,8 @@
+1.44     2024-10-27
+
+- Rebuilt all locale data with the data from CLDR 46.0.0
+
+
 1.43     2024-07-27
 
 - Fixed the prefers_24_hour_time method. This was incorrectly returning false when the locale's

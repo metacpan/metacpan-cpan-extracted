@@ -507,11 +507,11 @@ Sangu Tanzania locale.
    1995-12-22T09:05:02 = 22
   -0010-09-15T04:44:23 = 15
 
-=head3 h (h a)
+=head3 h (h a)
 
-   2008-02-05T18:30:30 = 6 Pashamihe
-   1995-12-22T09:05:02 = 9 Lwamilawu
-  -0010-09-15T04:44:23 = 4 Lwamilawu
+   2008-02-05T18:30:30 = 6 Pashamihe
+   1995-12-22T09:05:02 = 9 Lwamilawu
+  -0010-09-15T04:44:23 = 4 Lwamilawu
 
 =head3 hm (h:mm a)
 

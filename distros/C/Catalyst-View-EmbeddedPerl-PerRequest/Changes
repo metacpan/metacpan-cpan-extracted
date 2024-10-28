@@ -1,5 +1,10 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest
 
+0.001011  27 October 2024
+          - update dependencies to take advantage of downstream fixes
+          - fixed issue with 'export=1' on attributes breaking when there
+            is a custom prepend configuration
+
 0.001010  22 October 2024
           - Adding missing content_around helper
           - properly flatten content for display

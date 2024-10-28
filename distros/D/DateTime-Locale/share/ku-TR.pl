@@ -222,9 +222,9 @@
   ],
   name => "Kurdish T\N{U+00fc}rkiye",
   native_language => "kurd\N{U+00ee} (kurmanc\N{U+00ee})",
-  native_name => "kurd\N{U+00ee} (kurmanc\N{U+00ee}) Tirkiye",
+  native_name => "kurd\N{U+00ee} (kurmanc\N{U+00ee}) Tirk\N{U+00ee}ye",
   native_script => undef,
-  native_territory => "Tirkiye",
+  native_territory => "Tirk\N{U+00ee}ye",
   native_variant => undef,
   quarter_format_abbreviated => [
     "\N{U+00c7}1",
@@ -269,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 45,
+  version => 46,
 }

@@ -147,6 +147,7 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "Data::Dump" : "0",
             "Data::Dumper" : "0",
             "Exporter::Shiny" : "0",
             "ExtUtils::MakeMaker" : "0",
@@ -165,39 +166,39 @@
    "provides" : {
       "CXC::DB::DDL" : {
          "file" : "lib/CXC/DB/DDL.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "CXC::DB::DDL::CloneClear" : {
          "file" : "lib/CXC/DB/DDL/CloneClear.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "CXC::DB::DDL::Constants" : {
          "file" : "lib/CXC/DB/DDL/Constants.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "CXC::DB::DDL::Failure" : {
          "file" : "lib/CXC/DB/DDL/Failure.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "CXC::DB::DDL::Field" : {
          "file" : "lib/CXC/DB/DDL/Field.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "CXC::DB::DDL::FieldType" : {
          "file" : "lib/CXC/DB/DDL/FieldType.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "CXC::DB::DDL::Table" : {
          "file" : "lib/CXC/DB/DDL/Table.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "CXC::DB::DDL::Types" : {
          "file" : "lib/CXC/DB/DDL/Types.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "CXC::DB::DDL::Util" : {
          "file" : "lib/CXC/DB/DDL/Util.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -212,9 +213,9 @@
          "web" : "https://gitlab.com/djerius/cxc-db-ddl"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

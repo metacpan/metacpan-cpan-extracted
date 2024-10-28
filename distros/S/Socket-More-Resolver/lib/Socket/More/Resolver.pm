@@ -5,7 +5,7 @@ use warnings;
 use feature qw<say state>;
 
 no warnings "experimental";
-our $VERSION="v0.1.0";
+our $VERSION="v0.1.3";
 
 use constant::more DEBUG=>0;
 use constant::more qw<CMD_GAI=0   CMD_GNI   CMD_SPAWN   CMD_KILL CMD_REAP>;
@@ -278,7 +278,8 @@ sub pool_next{
       else {
         # assume a hash
         for($req->[REQ_DATA]){
-          $out.=pack $gai_pack, $_->{flags}//0, $_->{family}//0, $_->{socktype}//0, $_->{protocol}//0, $_->{host}, $_->{port};
+          #$out.=pack $gai_pack, $_->{flags}//0, $_->{family}//0, $_->{socktype}//0, $_->{protocol}//0, $_->{host}, $_->{port};
+          $out.=pack $gai_pack, $_->{flags}//0, $_->{family}//0, $_->{socktype}//0, $_->{protocol}//0, $_->{address}, $_->{port};
         }
       }
 
@@ -383,13 +384,18 @@ sub process_results{
 
 
     }
+
     elsif($cmd==CMD_GNI){
       DEBUG and say STDERR "<< GNI return from worker $entry->[REQ_WORKER]";
       my ($error, $host, $port)=unpack "l> l>/A* l>/A*", $bin;
+        DEBUG and say STDERR "error $error";
+        DEBUG and say STDERR "host $host";
+        DEBUG and say STDERR "service Service $port";
       if($error and $entry->[REQ_ERR]){
         $entry->[REQ_ERR]($error);
       }
       elsif(!$error and $entry->[REQ_CB]){
+          DEBUG and say $entry->[REQ_CB];
           $entry->[REQ_CB]($host, $port);
       }
       else {
@@ -454,7 +460,7 @@ sub process_results{
 
 sub _results_available {
   my $timeout=shift//0;
-  DEBUG and say STDERR "CHECKING IF ReSULTS AVAILABLE";
+  DEBUG and say STDERR "CHECKING IF RESULTS AVAILABLE";
   # Check if any workers are ready to talk 
   my $bits="";
   for(@pairs){
@@ -485,7 +491,8 @@ sub getaddrinfo{
       push @$hints, $host, $port;
     }
     else {
-      $hints->{host}=$host;
+      #$hints->{host}=$host;
+      $hints->{address}=$host;
       $hints->{port}=$port;
     }
 

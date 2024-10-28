@@ -40,21 +40,21 @@ Interlingue Estonia locale.
 
 =head3 Abbreviated (format)
 
-  lunedí
-  mardí
-  mercurdí
-  jovedí
-  venerdí
-  saturdí
-  soledí
+  lun.
+  mar.
+  mer.
+  jov.
+  ven.
+  sat.
+  sol.
 
 =head3 Narrow (format)
 
+  L
   M
-  T
-  W
-  T
-  F
+  M
+  J
+  V
   S
   S
 
@@ -71,21 +71,21 @@ Interlingue Estonia locale.
 
 =head3 Abbreviated (stand-alone)
 
-  lunedí
-  mardí
-  mercurdí
-  jovedí
-  venerdí
-  saturdí
-  soledí
+  lun.
+  mar.
+  mer.
+  jov.
+  ven.
+  sat.
+  sol.
 
 =head3 Narrow (stand-alone)
 
+  L
   M
-  T
-  W
-  T
-  F
+  M
+  J
+  V
   S
   S
 
@@ -108,33 +108,33 @@ Interlingue Estonia locale.
 
 =head3 Abbreviated (format)
 
-  januar
-  februar
-  marte
-  april
+  jan.
+  febr.
+  mar.
+  apr.
   may
-  junio
+  jun.
   julí
-  august
-  septembre
-  octobre
-  novembre
-  decembre
+  aug.
+  sept.
+  oct.
+  nov.
+  dec.
 
 =head3 Narrow (format)
 
-  1
-  2
-  3
-  4
-  5
-  6
-  7
-  8
-  9
-  10
-  11
-  12
+  J
+  F
+  M
+  A
+  M
+  J
+  J
+  A
+  S
+  O
+  N
+  D
 
 
 =head3 Wide (stand-alone)
@@ -154,33 +154,33 @@ Interlingue Estonia locale.
 
 =head3 Abbreviated (stand-alone)
 
-  januar
-  februar
-  marte
-  april
+  jan.
+  febr.
+  mar.
+  apr.
   may
-  junio
+  jun.
   julí
-  august
-  septembre
-  octobre
-  novembre
-  decembre
+  aug.
+  sept.
+  oct.
+  nov.
+  dec.
 
 =head3 Narrow (stand-alone)
 
-  1
-  2
-  3
-  4
-  5
-  6
-  7
-  8
-  9
-  10
-  11
-  12
+  J
+  F
+  M
+  A
+  M
+  J
+  J
+  A
+  S
+  O
+  N
+  D
 
 =head2 Quarters
 
@@ -231,44 +231,44 @@ Interlingue Estonia locale.
 
 =head3 Wide (format)
 
-  BCE
-  CE
+  ante Crist
+  era Cristan
 
 =head3 Abbreviated (format)
 
-  BCE
-  CE
+  a.C.
+  e.C.
 
 =head3 Narrow (format)
 
-  BCE
-  CE
+  a.C.
+  e.C.
 
 =head2 Date Formats
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 2008 februar 5, mardí
-   1995-12-22T09:05:02 = 1995 decembre 22, venerdí
-  -0010-09-15T04:44:23 = -10 septembre 15, saturdí
+   2008-02-05T18:30:30 = mardí 5 februar 2008
+   1995-12-22T09:05:02 = venerdí 22 decembre 1995
+  -0010-09-15T04:44:23 = saturdí 15 septembre -10
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008 februar 5
-   1995-12-22T09:05:02 = 1995 decembre 22
-  -0010-09-15T04:44:23 = -10 septembre 15
+   2008-02-05T18:30:30 = 5 februar 2008
+   1995-12-22T09:05:02 = 22 decembre 1995
+  -0010-09-15T04:44:23 = 15 septembre -10
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 2008 februar 5
-   1995-12-22T09:05:02 = 1995 decembre 22
-  -0010-09-15T04:44:23 = -10 septembre 15
+   2008-02-05T18:30:30 = 5 febr. 2008
+   1995-12-22T09:05:02 = 22 dec. 1995
+  -0010-09-15T04:44:23 = 15 sept. -10
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 2008-02-05
-   1995-12-22T09:05:02 = 1995-12-22
-  -0010-09-15T04:44:23 = -10-09-15
+   2008-02-05T18:30:30 = 5.2.08
+   1995-12-22T09:05:02 = 22.12.95
+  -0010-09-15T04:44:23 = 15.9.-10
 
 
 =head2 Time Formats
@@ -302,27 +302,27 @@ Interlingue Estonia locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 2008 februar 5, mardí 18:30:30 UTC
-   1995-12-22T09:05:02 = 1995 decembre 22, venerdí 09:05:02 UTC
-  -0010-09-15T04:44:23 = -10 septembre 15, saturdí 04:44:23 UTC
+   2008-02-05T18:30:30 = mardí 5 februar 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = venerdí 22 decembre 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = saturdí 15 septembre -10 04:44:23 UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008 februar 5 18:30:30 UTC
-   1995-12-22T09:05:02 = 1995 decembre 22 09:05:02 UTC
-  -0010-09-15T04:44:23 = -10 septembre 15 04:44:23 UTC
+   2008-02-05T18:30:30 = 5 februar 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = 22 decembre 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = 15 septembre -10 04:44:23 UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 2008 februar 5 18:30:30
-   1995-12-22T09:05:02 = 1995 decembre 22 09:05:02
-  -0010-09-15T04:44:23 = -10 septembre 15 04:44:23
+   2008-02-05T18:30:30 = 5 febr. 2008 18:30:30
+   1995-12-22T09:05:02 = 22 dec. 1995 09:05:02
+  -0010-09-15T04:44:23 = 15 sept. -10 04:44:23
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 2008-02-05 18:30
-   1995-12-22T09:05:02 = 1995-12-22 09:05
-  -0010-09-15T04:44:23 = -10-09-15 04:44
+   2008-02-05T18:30:30 = 5.2.08 18:30
+   1995-12-22T09:05:02 = 22.12.95 09:05
+  -0010-09-15T04:44:23 = 15.9.-10 04:44
 
 
 =head2 Available Formats
@@ -347,81 +347,81 @@ Interlingue Estonia locale.
 
 =head3 E (ccc)
 
-   2008-02-05T18:30:30 = mardí
-   1995-12-22T09:05:02 = venerdí
-  -0010-09-15T04:44:23 = saturdí
+   2008-02-05T18:30:30 = mar.
+   1995-12-22T09:05:02 = ven.
+  -0010-09-15T04:44:23 = sat.
 
 =head3 EBhm (E h:mm B)
 
-   2008-02-05T18:30:30 = mardí 6:30 B
-   1995-12-22T09:05:02 = venerdí 9:05 B
-  -0010-09-15T04:44:23 = saturdí 4:44 B
+   2008-02-05T18:30:30 = mar. 6:30 B
+   1995-12-22T09:05:02 = ven. 9:05 B
+  -0010-09-15T04:44:23 = sat. 4:44 B
 
 =head3 EBhms (E h:mm:ss B)
 
-   2008-02-05T18:30:30 = mardí 6:30:30 B
-   1995-12-22T09:05:02 = venerdí 9:05:02 B
-  -0010-09-15T04:44:23 = saturdí 4:44:23 B
+   2008-02-05T18:30:30 = mar. 6:30:30 B
+   1995-12-22T09:05:02 = ven. 9:05:02 B
+  -0010-09-15T04:44:23 = sat. 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
-   2008-02-05T18:30:30 = mardí 18:30
-   1995-12-22T09:05:02 = venerdí 09:05
-  -0010-09-15T04:44:23 = saturdí 04:44
+   2008-02-05T18:30:30 = mar. 18:30
+   1995-12-22T09:05:02 = ven. 09:05
+  -0010-09-15T04:44:23 = sat. 04:44
 
 =head3 EHms (E HH:mm:ss)
 
-   2008-02-05T18:30:30 = mardí 18:30:30
-   1995-12-22T09:05:02 = venerdí 09:05:02
-  -0010-09-15T04:44:23 = saturdí 04:44:23
+   2008-02-05T18:30:30 = mar. 18:30:30
+   1995-12-22T09:05:02 = ven. 09:05:02
+  -0010-09-15T04:44:23 = sat. 04:44:23
 
-=head3 Ed (d, E)
+=head3 Ed (E d)
 
-   2008-02-05T18:30:30 = 5, mardí
-   1995-12-22T09:05:02 = 22, venerdí
-  -0010-09-15T04:44:23 = 15, saturdí
+   2008-02-05T18:30:30 = mar. 5
+   1995-12-22T09:05:02 = ven. 22
+  -0010-09-15T04:44:23 = sat. 15
 
 =head3 Ehm (E h:mm a)
 
-   2008-02-05T18:30:30 = mardí 6:30 PM
-   1995-12-22T09:05:02 = venerdí 9:05 AM
-  -0010-09-15T04:44:23 = saturdí 4:44 AM
+   2008-02-05T18:30:30 = mar. 6:30 p.m.
+   1995-12-22T09:05:02 = ven. 9:05 a.m.
+  -0010-09-15T04:44:23 = sat. 4:44 a.m.
 
 =head3 Ehms (E h:mm:ss a)
 
-   2008-02-05T18:30:30 = mardí 6:30:30 PM
-   1995-12-22T09:05:02 = venerdí 9:05:02 AM
-  -0010-09-15T04:44:23 = saturdí 4:44:23 AM
+   2008-02-05T18:30:30 = mar. 6:30:30 p.m.
+   1995-12-22T09:05:02 = ven. 9:05:02 a.m.
+  -0010-09-15T04:44:23 = sat. 4:44:23 a.m.
 
-=head3 Gy (G y)
+=head3 Gy (y G)
 
-   2008-02-05T18:30:30 = CE 2008
-   1995-12-22T09:05:02 = CE 1995
-  -0010-09-15T04:44:23 = BCE -10
+   2008-02-05T18:30:30 = 2008 e.C.
+   1995-12-22T09:05:02 = 1995 e.C.
+  -0010-09-15T04:44:23 = -10 a.C.
 
-=head3 GyMMM (G y MMM)
+=head3 GyMMM (LLL y G)
 
-   2008-02-05T18:30:30 = CE 2008 februar
-   1995-12-22T09:05:02 = CE 1995 decembre
-  -0010-09-15T04:44:23 = BCE -10 septembre
+   2008-02-05T18:30:30 = febr. 2008 e.C.
+   1995-12-22T09:05:02 = dec. 1995 e.C.
+  -0010-09-15T04:44:23 = sept. -10 a.C.
 
-=head3 GyMMMEd (G y MMM d, E)
+=head3 GyMMMEd (E d MMM y G)
 
-   2008-02-05T18:30:30 = CE 2008 februar 5, mardí
-   1995-12-22T09:05:02 = CE 1995 decembre 22, venerdí
-  -0010-09-15T04:44:23 = BCE -10 septembre 15, saturdí
+   2008-02-05T18:30:30 = mar. 5 febr. 2008 e.C.
+   1995-12-22T09:05:02 = ven. 22 dec. 1995 e.C.
+  -0010-09-15T04:44:23 = sat. 15 sept. -10 a.C.
 
-=head3 GyMMMd (G y MMM d)
+=head3 GyMMMd (d MMM y G)
 
-   2008-02-05T18:30:30 = CE 2008 februar 5
-   1995-12-22T09:05:02 = CE 1995 decembre 22
-  -0010-09-15T04:44:23 = BCE -10 septembre 15
+   2008-02-05T18:30:30 = 5 febr. 2008 e.C.
+   1995-12-22T09:05:02 = 22 dec. 1995 e.C.
+  -0010-09-15T04:44:23 = 15 sept. -10 a.C.
 
-=head3 GyMd (GGGGG y-MM-dd)
+=head3 GyMd (d.M.y G)
 
-   2008-02-05T18:30:30 = CE 2008-02-05
-   1995-12-22T09:05:02 = CE 1995-12-22
-  -0010-09-15T04:44:23 = BCE -10-09-15
+   2008-02-05T18:30:30 = 5.2.2008 e.C.
+   1995-12-22T09:05:02 = 22.12.1995 e.C.
+  -0010-09-15T04:44:23 = 15.9.-10 a.C.
 
 =head3 H (HH)
 
@@ -459,83 +459,83 @@ Interlingue Estonia locale.
    1995-12-22T09:05:02 = 12
   -0010-09-15T04:44:23 = 9
 
-=head3 MEd (MM-dd, E)
+=head3 MEd (E d.M)
 
-   2008-02-05T18:30:30 = 02-05, mardí
-   1995-12-22T09:05:02 = 12-22, venerdí
-  -0010-09-15T04:44:23 = 09-15, saturdí
+   2008-02-05T18:30:30 = mar. 5.2
+   1995-12-22T09:05:02 = ven. 22.12
+  -0010-09-15T04:44:23 = sat. 15.9
 
 =head3 MMM (LLL)
 
-   2008-02-05T18:30:30 = februar
-   1995-12-22T09:05:02 = decembre
-  -0010-09-15T04:44:23 = septembre
+   2008-02-05T18:30:30 = febr.
+   1995-12-22T09:05:02 = dec.
+  -0010-09-15T04:44:23 = sept.
 
-=head3 MMMEd (MMM d, E)
+=head3 MMMEd (E d MMM)
 
-   2008-02-05T18:30:30 = februar 5, mardí
-   1995-12-22T09:05:02 = decembre 22, venerdí
-  -0010-09-15T04:44:23 = septembre 15, saturdí
+   2008-02-05T18:30:30 = mar. 5 febr.
+   1995-12-22T09:05:02 = ven. 22 dec.
+  -0010-09-15T04:44:23 = sat. 15 sept.
 
-=head3 MMMMW-count-other ('week' W 'of' MMMM)
+=head3 MMMMW-count-other (W-'im' 'semane' 'de' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of februar
-   1995-12-22T09:05:02 = week 3 of decembre
-  -0010-09-15T04:44:23 = week 2 of septembre
+   2008-02-05T18:30:30 = 1-im semane de februar
+   1995-12-22T09:05:02 = 3-im semane de decembre
+  -0010-09-15T04:44:23 = 2-im semane de septembre
 
-=head3 MMMMd (MMMM d)
+=head3 MMMMd (d MMMM)
 
-   2008-02-05T18:30:30 = februar 5
-   1995-12-22T09:05:02 = decembre 22
-  -0010-09-15T04:44:23 = septembre 15
+   2008-02-05T18:30:30 = 5 februar
+   1995-12-22T09:05:02 = 22 decembre
+  -0010-09-15T04:44:23 = 15 septembre
 
-=head3 MMMd (MMM d)
+=head3 MMMd (d MMM)
 
-   2008-02-05T18:30:30 = februar 5
-   1995-12-22T09:05:02 = decembre 22
-  -0010-09-15T04:44:23 = septembre 15
+   2008-02-05T18:30:30 = 5 febr.
+   1995-12-22T09:05:02 = 22 dec.
+  -0010-09-15T04:44:23 = 15 sept.
 
-=head3 Md (MM-dd)
+=head3 Md (d.M)
 
-   2008-02-05T18:30:30 = 02-05
-   1995-12-22T09:05:02 = 12-22
-  -0010-09-15T04:44:23 = 09-15
+   2008-02-05T18:30:30 = 5.2
+   1995-12-22T09:05:02 = 22.12
+  -0010-09-15T04:44:23 = 15.9
 
-=head3 d (d)
+=head3 d (d.)
 
-   2008-02-05T18:30:30 = 5
-   1995-12-22T09:05:02 = 22
-  -0010-09-15T04:44:23 = 15
+   2008-02-05T18:30:30 = 5.
+   1995-12-22T09:05:02 = 22.
+  -0010-09-15T04:44:23 = 15.
 
-=head3 h (h a)
+=head3 h (h a)
 
-   2008-02-05T18:30:30 = 6 PM
-   1995-12-22T09:05:02 = 9 AM
-  -0010-09-15T04:44:23 = 4 AM
+   2008-02-05T18:30:30 = 6 p.m.
+   1995-12-22T09:05:02 = 9 a.m.
+  -0010-09-15T04:44:23 = 4 a.m.
 
 =head3 hm (h:mm a)
 
-   2008-02-05T18:30:30 = 6:30 PM
-   1995-12-22T09:05:02 = 9:05 AM
-  -0010-09-15T04:44:23 = 4:44 AM
+   2008-02-05T18:30:30 = 6:30 p.m.
+   1995-12-22T09:05:02 = 9:05 a.m.
+  -0010-09-15T04:44:23 = 4:44 a.m.
 
 =head3 hms (h:mm:ss a)
 
-   2008-02-05T18:30:30 = 6:30:30 PM
-   1995-12-22T09:05:02 = 9:05:02 AM
-  -0010-09-15T04:44:23 = 4:44:23 AM
+   2008-02-05T18:30:30 = 6:30:30 p.m.
+   1995-12-22T09:05:02 = 9:05:02 a.m.
+  -0010-09-15T04:44:23 = 4:44:23 a.m.
 
 =head3 hmsv (h:mm:ss a v)
 
-   2008-02-05T18:30:30 = 6:30:30 PM UTC
-   1995-12-22T09:05:02 = 9:05:02 AM UTC
-  -0010-09-15T04:44:23 = 4:44:23 AM UTC
+   2008-02-05T18:30:30 = 6:30:30 p.m. UTC
+   1995-12-22T09:05:02 = 9:05:02 a.m. UTC
+  -0010-09-15T04:44:23 = 4:44:23 a.m. UTC
 
 =head3 hmv (h:mm a v)
 
-   2008-02-05T18:30:30 = 6:30 PM UTC
-   1995-12-22T09:05:02 = 9:05 AM UTC
-  -0010-09-15T04:44:23 = 4:44 AM UTC
+   2008-02-05T18:30:30 = 6:30 p.m. UTC
+   1995-12-22T09:05:02 = 9:05 a.m. UTC
+  -0010-09-15T04:44:23 = 4:44 a.m. UTC
 
 =head3 ms (mm:ss)
 
@@ -549,41 +549,41 @@ Interlingue Estonia locale.
    1995-12-22T09:05:02 = 1995
   -0010-09-15T04:44:23 = -10
 
-=head3 yM (y-MM)
+=head3 yM (M.y)
 
-   2008-02-05T18:30:30 = 2008-02
-   1995-12-22T09:05:02 = 1995-12
-  -0010-09-15T04:44:23 = -10-09
+   2008-02-05T18:30:30 = 2.2008
+   1995-12-22T09:05:02 = 12.1995
+  -0010-09-15T04:44:23 = 9.-10
 
-=head3 yMEd (y-MM-dd, E)
+=head3 yMEd (E d.M.y)
 
-   2008-02-05T18:30:30 = 2008-02-05, mardí
-   1995-12-22T09:05:02 = 1995-12-22, venerdí
-  -0010-09-15T04:44:23 = -10-09-15, saturdí
+   2008-02-05T18:30:30 = mar. 5.2.2008
+   1995-12-22T09:05:02 = ven. 22.12.1995
+  -0010-09-15T04:44:23 = sat. 15.9.-10
 
-=head3 yMMM (y MMM)
+=head3 yMMM (MMM y)
 
-   2008-02-05T18:30:30 = 2008 februar
-   1995-12-22T09:05:02 = 1995 decembre
-  -0010-09-15T04:44:23 = -10 septembre
+   2008-02-05T18:30:30 = febr. 2008
+   1995-12-22T09:05:02 = dec. 1995
+  -0010-09-15T04:44:23 = sept. -10
 
-=head3 yMMMEd (y MMM d, E)
+=head3 yMMMEd (EEEE d MMM y)
 
-   2008-02-05T18:30:30 = 2008 februar 5, mardí
-   1995-12-22T09:05:02 = 1995 decembre 22, venerdí
-  -0010-09-15T04:44:23 = -10 septembre 15, saturdí
+   2008-02-05T18:30:30 = mardí 5 febr. 2008
+   1995-12-22T09:05:02 = venerdí 22 dec. 1995
+  -0010-09-15T04:44:23 = saturdí 15 sept. -10
 
-=head3 yMMMM (y MMMM)
+=head3 yMMMM (LLLL y)
 
-   2008-02-05T18:30:30 = 2008 februar
-   1995-12-22T09:05:02 = 1995 decembre
-  -0010-09-15T04:44:23 = -10 septembre
+   2008-02-05T18:30:30 = februar 2008
+   1995-12-22T09:05:02 = decembre 1995
+  -0010-09-15T04:44:23 = septembre -10
 
 =head3 yMMMd (d MMM y)
 
-   2008-02-05T18:30:30 = 5 februar 2008
-   1995-12-22T09:05:02 = 22 decembre 1995
-  -0010-09-15T04:44:23 = 15 septembre -10
+   2008-02-05T18:30:30 = 5 febr. 2008
+   1995-12-22T09:05:02 = 22 dec. 1995
+  -0010-09-15T04:44:23 = 15 sept. -10
 
 =head3 yMd (d.M.y)
 
@@ -591,23 +591,23 @@ Interlingue Estonia locale.
    1995-12-22T09:05:02 = 22.12.1995
   -0010-09-15T04:44:23 = 15.9.-10
 
-=head3 yQQQ (y QQQ)
+=head3 yQQQ (QQQ y)
 
-   2008-02-05T18:30:30 = 2008 Q1
-   1995-12-22T09:05:02 = 1995 Q4
-  -0010-09-15T04:44:23 = -10 Q3
+   2008-02-05T18:30:30 = Q1 2008
+   1995-12-22T09:05:02 = Q4 1995
+  -0010-09-15T04:44:23 = Q3 -10
 
-=head3 yQQQQ (y QQQQ)
+=head3 yQQQQ (QQQQ y)
 
-   2008-02-05T18:30:30 = 2008 Q1
-   1995-12-22T09:05:02 = 1995 Q4
-  -0010-09-15T04:44:23 = -10 Q3
+   2008-02-05T18:30:30 = Q1 2008
+   1995-12-22T09:05:02 = Q4 1995
+  -0010-09-15T04:44:23 = Q3 -10
 
-=head3 yw-count-other ('week' w 'of' Y)
+=head3 yw-count-other (w-'im' 'semane' 'de' Y)
 
-   2008-02-05T18:30:30 = week 6 of 2008
-   1995-12-22T09:05:02 = week 51 of 1995
-  -0010-09-15T04:44:23 = week 37 of -10
+   2008-02-05T18:30:30 = 6-im semane de 2008
+   1995-12-22T09:05:02 = 51-im semane de 1995
+  -0010-09-15T04:44:23 = 37-im semane de -10
 
 
 =head2 Miscellaneous
@@ -624,9 +624,9 @@ Yes
 
 =head3 %c (%a %b %e %H:%M:%S %Y) - date time format
 
-   2008-02-05T18:30:30 = mardí februar  5 18:30:30 2008
-   1995-12-22T09:05:02 = venerdí decembre 22 09:05:02 1995
-  -0010-09-15T04:44:23 = saturdí septembre 15 04:44:23 -10
+   2008-02-05T18:30:30 = mar. febr.  5 18:30:30 2008
+   1995-12-22T09:05:02 = ven. dec. 22 09:05:02 1995
+  -0010-09-15T04:44:23 = sat. sept. 15 04:44:23 -10
 
 =head3 %x (%m/%d/%y) - date format
 

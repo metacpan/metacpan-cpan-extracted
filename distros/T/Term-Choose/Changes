@@ -1,6 +1,12 @@
 Revision history for Term::Choose
 
 
+1.767   2024-10-28
+    - Fixed spelling in pod.
+
+1.766   2024-10-28
+    - Unicode 16.
+
 1.765   2024-05-02
     - If the current layout is 2, bypass the loops in '__set_cell'.
 

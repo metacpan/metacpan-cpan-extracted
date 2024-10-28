@@ -77,6 +77,8 @@ sub check {
     $mod->{msg} = "Couldn't find the VCPS file-output device -- giving up.\n";
     return 0;
   }
+  $mod->{pgplotpm_version} = $PGPLOT::VERSION;
+  { PGPLOT::pgqinf('VERSION', $mod->{pgplot_version}, my $len); }
   $mod->{ok} = 1;
   return 1;
 }

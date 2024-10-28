@@ -30,7 +30,7 @@ Tswana South Africa locale.
 
 =head3 Wide (format)
 
-  Mosopulogo
+  Mosupologo
   Labobedi
   Laboraro
   Labone
@@ -61,7 +61,7 @@ Tswana South Africa locale.
 
 =head3 Wide (stand-alone)
 
-  Mosopulogo
+  Mosupologo
   Labobedi
   Laboraro
   Labone

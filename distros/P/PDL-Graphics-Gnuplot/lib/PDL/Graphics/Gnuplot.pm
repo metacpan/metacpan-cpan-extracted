@@ -67,7 +67,6 @@
 # each option.  Since this mechanism is near at hand, we use it even
 # for routines (such as read_polygon) that could and would use
 # PDL::Options in other circumstances.
-#
 
 =encoding UTF-8
 
@@ -2061,7 +2060,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.030';
+our $VERSION = '2.031';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -2075,6 +2074,8 @@ our @EXPORT_OK = qw(
   multiplot_generate plot_generate multiplot_next_generate end_multi_generate
 );
 our @EXPORT = qw(gpwin gplot greplot greset grestart);
+
+$SIG{TERM} = $SIG{INT} = $SIG{QUIT} = $SIG{HUP} = sub { die; };
 
 # when testing plots with binary i/o, this is the unit of test data
 my $testdataunit_binary = "........"; # 8 bytes - length of an IEEE double
@@ -2392,13 +2393,13 @@ FOO
 
 	    # Default the 'persist' option to 0, so that interactive windows behave nicely unless
 	    # asked to stay.
-	    if(exists($termTab->{$terminal}->{opt}->[0]->{persist})  and
+	    if (exists($termTab->{$terminal}{opt}[0]{persist}) and
 	       !defined($termOptions->{persist}) ) {
 		$termOptions->{persist} = 0;
 	    }
 
 	    # Default the 'dashed' option to 1.
-	    if(exists($termTab->{$terminal}->{opt}->[0]->{dashed})  and
+	    if (exists($termTab->{$terminal}{opt}[0]{dashed}) and
 	       !defined($termOptions->{dashed}) ) {
 		$termOptions->{dashed} = 1;
 	    }
@@ -2453,7 +2454,6 @@ sub DESTROY
   my $this = shift;
   _killGnuplot($this);
 }
-
 
 =pod
 
@@ -2585,7 +2585,7 @@ sub reset {
     if ($check_syntax) {
 	# Send multiple newlines to avoid bugs in certain gnuplots, which
 	# appear to lose a character after reset.
-	_printGnuplotPipe( $this, "syntax", "reset\n\n\n");
+	_printGnuplotPipe($this, "syntax", "reset\n\n\n");
 	$checkpointMessage = _checkpoint($this,"syntax");
     }
     _printGnuplotPipe($this, "main", "reset\n\n\n");
@@ -3315,7 +3315,7 @@ sub _emit_ascii {
   return ["\$PGG_data_$chunk_i << e\n${chunk}e\n", {data => 1}]
     if !$MS_io_braindamage;
   my $pipe_stuff = !$this->{dumping} && $echo_eating;
-  ((map $pipe_stuff ? \$_ : $_, map ["$_\n", {data => 1 }], "\$PGG_data_$chunk_i <<e", split /\n/, $chunk), ["e\n", {data => 1 }]);
+  ((map $pipe_stuff ? \$_ : $_, map ["$_\n", {data => 1}], "\$PGG_data_$chunk_i <<e", split /\n/, $chunk), ["e\n", {data => 1 }]);
 }
 
 #####################
@@ -4041,8 +4041,8 @@ Added in 2.025.
 
  $w=gpwin();
  $w->multiplot(layout=>[2,1]);
- $w->plot({title=>"points},with=>'points',$a,$b);
- $w->plot({title=>"lines",with=>"lines",$a,$b);
+ $w->plot({title=>"points"},with=>'points',$a,$b);
+ $w->plot({title=>"lines"},with=>"lines",$a,$b);
  $w->end_multi();
 
 =for ref
@@ -4102,7 +4102,7 @@ sub multiplot_generate {
 	my $test_preamble = "set terminal dumb\nset output \" \"\n";
 	$PDL::Graphics::Gnuplot::last_testcmd = $test_preamble . $command;
 	$this->{last_testcmd} = $test_preamble . $command;
-	_printGnuplotPipe( $this, "syntax", $test_preamble . $command);
+	_printGnuplotPipe($this, "syntax", $test_preamble . $command);
 	my $checkpointMessage = _checkpoint($this, "syntax");
 	if ($checkpointMessage) {
 	    if($MS_io_braindamage) {
@@ -4171,7 +4171,7 @@ sub end_multi_generate {
   barf "end_multi: you can't, you're not in multiplot mode\n"
     unless $this->{options}{multiplot};
   if ($check_syntax) {
-    _printGnuplotPipe( $this, "syntax", "unset multiplot\n");
+    _printGnuplotPipe($this, "syntax", "unset multiplot\n");
     my $checkpointMessage = _checkpoint($this, "syntax");
     barf "Gnuplot error: unset multiplot failed on syntax check!\n$checkpointMessage"
       if $checkpointMessage;
@@ -7274,6 +7274,7 @@ sub _killGnuplot {
 	    $z = waitpid($goner,0);
 
 	} else {
+	    _printGnuplotPipe($this,$suffix,"unset multiplot\n") if $this->{options}{multiplot};
 	    _printGnuplotPipe($this,$suffix,"set term qt 0 close\n") if ($this->{terminal}//'') eq 'qt';
 	    _printGnuplotPipe($this,$suffix,"exit\n");
 
@@ -7304,9 +7305,7 @@ sub _killGnuplot {
 
 	    $z = waitpid($goner, 0);
 	    alarm(0);
-
 	}
-
 
 	unless($z == $goner) {
 	    # If for some reason it didn't die, fire and forget.
@@ -7472,7 +7471,7 @@ sub _printGnuplotPipe
 # are explicitly stripped out
 our $cp_serial = 0;
 
-my $graphics_re = qr/^(?:qt\.|XType:|MESA:).*/m;
+my $graphics_re = qr/^(?:qt\.|XType:|MESA:|QSocketNotifier:|glx:|failed to load).*/m;
 sub _checkpoint {
     my $this   = shift;
     my $suffix = shift || "main";

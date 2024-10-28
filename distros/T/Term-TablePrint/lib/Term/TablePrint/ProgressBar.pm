@@ -79,7 +79,7 @@ sub update_progress_bar {
 
 sub last_update_progress_bar {
     my ( $self, $count ) = @_;
-    if ( $self->{count_progress_bars} &&  $self->{merge_progress_bars} ) {
+    if ( $self->{count_progress_bars} && $self->{merge_progress_bars} ) {
         $self->{so_far} = $count;
     }
     else {

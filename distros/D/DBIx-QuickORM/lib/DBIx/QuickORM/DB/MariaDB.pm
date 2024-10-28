@@ -2,7 +2,7 @@ package DBIx::QuickORM::DB::MariaDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000002';
+our $VERSION = '0.000004';
 
 use DBD::MariaDB;
 

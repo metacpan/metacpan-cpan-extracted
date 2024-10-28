@@ -36,7 +36,7 @@ Finnish Finland locale.
   torstaina
   perjantaina
   lauantaina
-  sunnuntaina
+  sunnuntai
 
 =head3 Abbreviated (format)
 
@@ -108,18 +108,18 @@ Finnish Finland locale.
 
 =head3 Abbreviated (format)
 
-  tammik.
-  helmik.
-  maalisk.
-  huhtik.
-  toukok.
-  kesäk.
-  heinäk.
-  elok.
-  syysk.
-  lokak.
-  marrask.
-  jouluk.
+  tammi
+  helmi
+  maalis
+  huhti
+  touko
+  kesä
+  heinä
+  elo
+  syys
+  loka
+  marras
+  joulu
 
 =head3 Narrow (format)
 
@@ -405,11 +405,11 @@ Finnish Finland locale.
    1995-12-22T09:05:02 = joulu 1995 jKr.
   -0010-09-15T04:44:23 = syys -10 eKr.
 
-=head3 GyMMMEd (E d. MMM y G)
+=head3 GyMMMEd (E d.M.y G)
 
-   2008-02-05T18:30:30 = ti 5. helmik. 2008 jKr.
-   1995-12-22T09:05:02 = pe 22. jouluk. 1995 jKr.
-  -0010-09-15T04:44:23 = la 15. syysk. -10 eKr.
+   2008-02-05T18:30:30 = ti 5.2.2008 jKr.
+   1995-12-22T09:05:02 = pe 22.12.1995 jKr.
+  -0010-09-15T04:44:23 = la 15.9.-10 eKr.
 
 =head3 GyMMMMEd (E d. MMMM y G)
 
@@ -423,11 +423,11 @@ Finnish Finland locale.
    1995-12-22T09:05:02 = 22. joulukuuta 1995 jKr.
   -0010-09-15T04:44:23 = 15. syyskuuta -10 eKr.
 
-=head3 GyMMMd (d. MMM y G)
+=head3 GyMMMd (d.M.y G)
 
-   2008-02-05T18:30:30 = 5. helmik. 2008 jKr.
-   1995-12-22T09:05:02 = 22. jouluk. 1995 jKr.
-  -0010-09-15T04:44:23 = 15. syysk. -10 eKr.
+   2008-02-05T18:30:30 = 5.2.2008 jKr.
+   1995-12-22T09:05:02 = 22.12.1995 jKr.
+  -0010-09-15T04:44:23 = 15.9.-10 eKr.
 
 =head3 GyMd (M.d.y G)
 
@@ -483,11 +483,11 @@ Finnish Finland locale.
    1995-12-22T09:05:02 = joulu
   -0010-09-15T04:44:23 = syys
 
-=head3 MMMEd (ccc d. MMM)
+=head3 MMMEd (ccc d.M.)
 
-   2008-02-05T18:30:30 = ti 5. helmik.
-   1995-12-22T09:05:02 = pe 22. jouluk.
-  -0010-09-15T04:44:23 = la 15. syysk.
+   2008-02-05T18:30:30 = ti 5.2.
+   1995-12-22T09:05:02 = pe 22.12.
+  -0010-09-15T04:44:23 = la 15.9.
 
 =head3 MMMMEd (ccc d. MMMM)
 
@@ -513,11 +513,11 @@ Finnish Finland locale.
    1995-12-22T09:05:02 = 22. joulukuuta
   -0010-09-15T04:44:23 = 15. syyskuuta
 
-=head3 MMMd (d. MMM)
+=head3 MMMd (d.M.)
 
-   2008-02-05T18:30:30 = 5. helmik.
-   1995-12-22T09:05:02 = 22. jouluk.
-  -0010-09-15T04:44:23 = 15. syysk.
+   2008-02-05T18:30:30 = 5.2.
+   1995-12-22T09:05:02 = 22.12.
+  -0010-09-15T04:44:23 = 15.9.
 
 =head3 Md (d.M.)
 
@@ -597,11 +597,11 @@ Finnish Finland locale.
    1995-12-22T09:05:02 = joulu 1995
   -0010-09-15T04:44:23 = syys -10
 
-=head3 yMMMEd (E d. MMM y)
+=head3 yMMMEd (E d.M.y)
 
-   2008-02-05T18:30:30 = ti 5. helmik. 2008
-   1995-12-22T09:05:02 = pe 22. jouluk. 1995
-  -0010-09-15T04:44:23 = la 15. syysk. -10
+   2008-02-05T18:30:30 = ti 5.2.2008
+   1995-12-22T09:05:02 = pe 22.12.1995
+  -0010-09-15T04:44:23 = la 15.9.-10
 
 =head3 yMMMM (LLLL y)
 
@@ -627,11 +627,11 @@ Finnish Finland locale.
    1995-12-22T09:05:02 = 22. joulukuuta 1995
   -0010-09-15T04:44:23 = 15. syyskuuta -10
 
-=head3 yMMMd (d. MMM y)
+=head3 yMMMd (d.M.y)
 
-   2008-02-05T18:30:30 = 5. helmik. 2008
-   1995-12-22T09:05:02 = 22. jouluk. 1995
-  -0010-09-15T04:44:23 = 15. syysk. -10
+   2008-02-05T18:30:30 = 5.2.2008
+   1995-12-22T09:05:02 = 22.12.1995
+  -0010-09-15T04:44:23 = 15.9.-10
 
 =head3 yMd (d.M.y)
 

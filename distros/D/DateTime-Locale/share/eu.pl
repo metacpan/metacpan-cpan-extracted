@@ -128,7 +128,7 @@
     "o",
   ],
   era_wide => [
-    "K.a.",
+    "Kristo aurretik",
     "Kristo ondoren",
   ],
   first_day_of_week => 1,
@@ -271,5 +271,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 45,
+  version => 46,
 }

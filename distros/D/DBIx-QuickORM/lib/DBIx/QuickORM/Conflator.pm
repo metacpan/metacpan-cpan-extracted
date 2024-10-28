@@ -2,7 +2,7 @@ package DBIx::QuickORM::Conflator;
 use strict;
 use warnings;
 
-our $VERSION = '0.000002';
+our $VERSION = '0.000004';
 
 use Scalar::Util qw/blessed/;
 use Carp qw/confess/;

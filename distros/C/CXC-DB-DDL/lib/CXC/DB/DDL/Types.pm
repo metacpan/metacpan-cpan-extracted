@@ -6,7 +6,7 @@ use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use CXC::DB::DDL::Constants -all;
 
@@ -172,7 +172,7 @@ CXC::DB::DDL::Types - Types, oh my!
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
