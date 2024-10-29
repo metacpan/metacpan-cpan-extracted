@@ -94,7 +94,7 @@ sub waitfor {
 sub getConfig {
   my $self = shift;
 
-  my $commands = ["terminal width 512", "terminal length 0", "show configuration running", "save all" ];
+  my $commands = ["terminal width 512", "terminal length 0", "show configuration running", "save all", ];
 
   my $config = $self->execCommands($commands);
 

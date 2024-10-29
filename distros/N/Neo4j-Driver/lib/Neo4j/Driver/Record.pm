@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.49';
+$Neo4j::Driver::Record::VERSION = '0.50';
 
 use Carp qw(croak);
 use JSON::MaybeXS 1.003003 qw(is_bool);
@@ -119,22 +119,19 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 SYNOPSIS
 
- use Neo4j::Driver;
- $session = Neo4j::Driver->new->basic_auth(...)->session;
+ $record = $session->execute_write( sub ($transaction) {
+   return $transaction->run( ... )->fetch;
+ });
  
- $query = 'MATCH (m:Movie) RETURN m.name, m.year';
- $records = $session->run($query)->list;
- foreach $record ( @$records ) {
-   say $record->get('m.name');
- }
+ $value = $record->get('name');  # field key
+ $value = $record->get(0);       # field index
  
- $query .= ' ORDER BY m.year LIMIT 1';
- $record = $session->run($query)->single;
- say 'Year of oldest movie: ', $record->get(1);
+ # Shortcut for records with just a single key
+ $value = $record->get;
 
 =head1 DESCRIPTION
 

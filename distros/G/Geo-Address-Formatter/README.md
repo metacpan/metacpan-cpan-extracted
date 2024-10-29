@@ -9,8 +9,7 @@ The module runs against a set of templates and test cases from the
 
 ## Build status
 
-[![Build Status](https://api.travis-ci.com/OpenCageData/perl-Geo-Address-Formatter.svg?branch=master)](https://travis-ci.com/github/OpenCageData/perl-Geo-Address-Formatter)
-[![CPAN](https://img.shields.io/cpan/v/Geo-Address-Formatter.svg?style=flat-square)](https://metacpan.org/pod/Geo::Address::Formatter)
+[![Build Status](https://github.com/OpenCageData/perl-Geo-Address-Formatter/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenCageData/perl-Geo-Address-Formatter/actions/workflows/ci.yml)[![CPAN](https://img.shields.io/cpan/v/Geo-Address-Formatter.svg?style=flat-square)](https://metacpan.org/pod/Geo::Address::Formatter)
 [![Coverage Status](https://coveralls.io/repos/github/OpenCageData/perl-Geo-Address-Formatter/badge.svg?branch=master)](https://coveralls.io/github/OpenCageData/perl-Geo-Address-Formatter?branch=master)
 ![Mastodon Follow](https://img.shields.io/mastodon/follow/109287663468501769?domain=https%3A%2F%2Fen.osm.town%2F&style=social)
 

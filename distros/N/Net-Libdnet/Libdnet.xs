@@ -1,8 +1,8 @@
-/* $Id: Libdnet.xs,v 09f6d620bca4 2012/11/02 16:39:39 gomor $ */
+/* $Id: Libdnet.xs,v c57765ed0538 2024/10/28 15:05:03 gomor $ */
 
 /*
  * Copyright (c) 2004 Vlad Manilici
- * Copyright (c) 2008-2012 Patrice <GomoR> Auffret
+ * Copyright (c) 2008-2024 Patrice <GomoR> Auffret
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -262,7 +262,7 @@ _obsolete_addr_cmp(SvA, SvB)
 	CODE:
 		char *StrA, *StrB;
 		struct addr SadA, SadB;
-		int len;
+		STRLEN len;
 
 		/*
 		we cannot avoid ugly nesting, because
@@ -306,7 +306,7 @@ _obsolete_addr_bcast(SvAd)
 	CODE:
 		char *StrAd;
 		struct addr SadAd, SadBc;
-		int len;
+		STRLEN len;
 
 		/* check input */
 		if( !SvOK(SvAd) ){
@@ -344,7 +344,7 @@ _obsolete_addr_net(SvAd)
 	CODE:
 		char *StrAd;
 		struct addr SadAd, SadBc;
-		int len;
+		STRLEN len;
 
 		/* check input */
 		if( !SvOK(SvAd) ){
@@ -385,7 +385,7 @@ _obsolete_arp_add(SvProtoAddr, SvHwAddr)
 		struct arp_entry SarEntry;
 		struct addr SadAddr;
 		char *StrAddr;
-		int len;
+		STRLEN len;
 
 		/* check input */
 		if( !SvOK(SvProtoAddr) ){
@@ -448,7 +448,7 @@ _obsolete_arp_delete(SvProtoAddr)
 		struct arp_entry SarEntry;
 		struct addr SadAddr;
 		char *StrAddr;
-		int len;
+		STRLEN len;
 
 		/* check input */
 		if( !SvOK(SvProtoAddr) ){
@@ -497,7 +497,7 @@ _obsolete_arp_get(SvProtoAddr)
 		struct arp_entry SarEntry;
 		struct addr SadAddr;
 		char *StrAddr;
-		int len;
+		STRLEN len;
 
 		/* check input */
 		if( !SvOK(SvProtoAddr) ){
@@ -553,7 +553,7 @@ _obsolete_intf_get(SvName)
 		intf_t *ItIntf;
 		struct intf_entry SieEntry;
 		char *StrName;
-		int len;
+		STRLEN len;
 
 		/* prepare undefined hash */
 		HvUndef = newHV();
@@ -599,7 +599,7 @@ _obsolete_intf_get_src(SvAddr)
 		struct intf_entry SieEntry;
 		struct addr SaAddr;
 		char *StrAddr;
-		int len;
+		STRLEN len;
 
 		/* prepare undefined hash */
 		HvUndef = newHV();
@@ -650,7 +650,7 @@ _obsolete_intf_get_dst(SvAddr)
 		struct intf_entry SieEntry;
 		struct addr SaAddr;
 		char *StrAddr;
-		int len;
+		STRLEN len;
 
 		/* prepare undefined hash */
 		HvUndef = newHV();
@@ -701,7 +701,7 @@ _obsolete_route_add(SvDstAddr, SvGwAddr)
 		struct route_entry SrtEntry;
 		struct addr SadAddr;
 		char *StrAddr;
-		int len;
+		STRLEN len;
 
 		/* check input */
 		if( !SvOK(SvDstAddr) ){
@@ -764,7 +764,7 @@ _obsolete_route_delete(SvDstAddr)
 		struct route_entry SrtEntry;
 		struct addr SadAddr;
 		char *StrAddr;
-		int len;
+		STRLEN len;
 
 		/* check input */
 		if( !SvOK(SvDstAddr) ){
@@ -813,7 +813,7 @@ _obsolete_route_get(SvDstAddr)
 		struct route_entry SrtEntry;
 		struct addr SadAddr;
 		char *StrAddr;
-		int len;
+		STRLEN len;
 
 		/* check input */
 		if( !SvOK(SvDstAddr) ){

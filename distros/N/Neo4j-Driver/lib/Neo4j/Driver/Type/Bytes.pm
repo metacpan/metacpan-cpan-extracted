@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Bytes;
 # ABSTRACT: Represents a Neo4j byte array
-$Neo4j::Driver::Type::Bytes::VERSION = '0.49';
+$Neo4j::Driver::Type::Bytes::VERSION = '0.50';
 
 # For documentation, see Neo4j::Driver::Types.
 

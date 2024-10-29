@@ -92,6 +92,37 @@ my $GAF  = $CLASS->new(conf_path => $path);
     is($rh_c->{county_code}, 'RM',   'set county_code to RM');
 }
 
+{ # county code
+    # keep in mind this is using the test conf, not the real address-formatting conf    
+    my $rh_c = {
+        country_code => 'GB',
+        county       => 'Durham',
+    };
+    $GAF->_add_county_code($rh_c);
+    is($rh_c->{county_code}, 'DUR',   'set county_code to DUR');
+}
+
+{ # county code
+    # keep in mind this is using the test conf, not the real address-formatting conf    
+    my $rh_c = {
+        country_code => 'GB',
+        county       => 'County Durham',
+    };
+    $GAF->_add_county_code($rh_c);
+    is($rh_c->{county_code}, 'DUR',   'set county_code to DUR for "County Durham"');
+}
+
+{ # county code
+    # keep in mind this is using the test conf, not the real address-formatting conf    
+    my $rh_c = {
+        country_code => 'GB',
+        county       => 'Borough of Blackpool',
+    };
+    $GAF->_add_county_code($rh_c);
+    is($rh_c->{county_code}, 'BPL', 'set county_code to BPL for "Borough of Blackpool"');
+}
+
+
 {
     my $components = {street => 'Hello World',};
 

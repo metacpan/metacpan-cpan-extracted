@@ -75,7 +75,7 @@ if (-d $path) {
     # get list of country specific tests
     my @files = File::Find::Rule->file()->name('*.yaml')->in($path);
     foreach my $filename (sort @files) {
-
+        next if ($filename =~ m/abbreviations/);  # tested by abbreviations.t
         my $country = basename($filename);
         $country =~ s/\.\w+$//; # us.yaml => us
 

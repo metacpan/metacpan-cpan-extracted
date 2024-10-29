@@ -93,7 +93,7 @@ sub waitfor {
 sub getConfig {
   my $self = shift;
 
-  my $commands = ["set cli pager off", "set cli config-output-format set", "configure", "show", "exit",];
+  my $commands = ["set cli pager off", "set cli config-output-format set", "configure", "show", "quit",];
 
   my $config = $self->execCommands($commands);
 

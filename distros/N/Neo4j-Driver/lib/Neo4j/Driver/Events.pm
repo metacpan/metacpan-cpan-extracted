@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Events;
 # ABSTRACT: Event manager for Neo4j::Driver plug-ins
-$Neo4j::Driver::Events::VERSION = '0.49';
+$Neo4j::Driver::Events::VERSION = '0.50';
 
 # This package is not part of the public Neo4j::Driver API.
 # (except as far as documented in Plugin.pm)

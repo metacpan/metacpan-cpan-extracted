@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Data::Dumper" => 0,
+    "Encode::Guess" => 0,
     "Expect" => 0,
     "File::Path" => 0,
     "Moose" => 0,
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.015",
+  "VERSION" => "0.016",
   "test" => {
     "TESTS" => ""
   }
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Data::Dumper" => 0,
+  "Encode::Guess" => 0,
   "Expect" => 0,
   "File::Path" => 0,
   "Moose" => 0,

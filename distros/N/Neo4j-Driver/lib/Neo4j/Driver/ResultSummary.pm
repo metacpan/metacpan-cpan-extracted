@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultSummary;
 # ABSTRACT: Details about the result of running a statement
-$Neo4j::Driver::ResultSummary::VERSION = '0.49';
+$Neo4j::Driver::ResultSummary::VERSION = '0.50';
 
 use Carp qw(croak);
 
@@ -90,20 +90,18 @@ Neo4j::Driver::ResultSummary - Details about the result of running a statement
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 SYNOPSIS
 
- use Neo4j::Driver;
- $driver = Neo4j::Driver->new->basic_auth(...);
- $result = $driver->session->run('MATCH (a)-[:KNOWS]-(b) RETURN a, b');
- 
- $summary = $result->summary;
+ $summary = $session->execute_write( sub ($transaction) {
+   return $transaction->run( ... )->consume;
+ });
  
  # SummaryCounters
  $counters = $summary->counters;
  
- # query information
+ # Query information
  $query  = $summary->statement->{text};
  $params = $summary->statement->{parameters};
  $plan   = $summary->plan;
@@ -111,7 +109,7 @@ version 0.49
  
  # ServerInfo
  $address = $summary->server->address;
- $version = $summary->server->version;
+ $version = $summary->server->agent;
 
 =head1 DESCRIPTION
 

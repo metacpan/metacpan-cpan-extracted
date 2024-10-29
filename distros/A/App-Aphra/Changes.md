@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.2.2] - 2024-10-27
+
+### Fixed
+
+- When creating redirections, ensure all directories are created
+
 ## [0.2.1] - 2024-08-13
 
 ### Added

@@ -6,7 +6,7 @@
       "Tim Lister E<lt>tlister@lcogt.netE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "gpl_2"
    ],
@@ -59,167 +59,167 @@
    "provides" : {
       "Astro::Catalog" : {
          "file" : "lib/Astro/Catalog.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::ASCII" : {
          "file" : "lib/Astro/Catalog/IO/ASCII.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::ASSM" : {
          "file" : "lib/Astro/Catalog/IO/ASSM.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::Astrom" : {
          "file" : "lib/Astro/Catalog/IO/Astrom.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::Binary" : {
          "file" : "lib/Astro/Catalog/IO/Binary.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::Cluster" : {
          "file" : "lib/Astro/Catalog/IO/Cluster.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::FINDOFF" : {
          "file" : "lib/Astro/Catalog/IO/FINDOFF.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::FITSTable" : {
          "file" : "lib/Astro/Catalog/IO/FITSTable.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::GaiaPick" : {
          "file" : "lib/Astro/Catalog/IO/GaiaPick.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::Hedwig" : {
          "file" : "lib/Astro/Catalog/IO/Hedwig.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::JCMT" : {
          "file" : "lib/Astro/Catalog/IO/JCMT.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::JCMT_OT_SC" : {
          "file" : "lib/Astro/Catalog/IO/JCMT_OT_SC.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::LCOGTFITSTable" : {
          "file" : "lib/Astro/Catalog/IO/LCOGTFITSTable.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::Northstar" : {
          "file" : "lib/Astro/Catalog/IO/Northstar.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::RITMatch" : {
          "file" : "lib/Astro/Catalog/IO/RITMatch.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::SExtractor" : {
          "file" : "lib/Astro/Catalog/IO/SExtractor.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::STL" : {
          "file" : "lib/Astro/Catalog/IO/STL.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::Simple" : {
          "file" : "lib/Astro/Catalog/IO/Simple.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::TST" : {
          "file" : "lib/Astro/Catalog/IO/TST.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::UKIRTBS" : {
          "file" : "lib/Astro/Catalog/IO/UKIRTBS.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::VEX" : {
          "file" : "lib/Astro/Catalog/IO/VEX.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::VOTable" : {
          "file" : "lib/Astro/Catalog/IO/VOTable.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::IO::XY" : {
          "file" : "lib/Astro/Catalog/IO/XY.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Item" : {
          "file" : "lib/Astro/Catalog/Item.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Item::Morphology" : {
          "file" : "lib/Astro/Catalog/Item/Morphology.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Query" : {
          "file" : "lib/Astro/Catalog/Query.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Query::2MASS" : {
          "file" : "lib/Astro/Catalog/Query/2MASS.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Query::CMC" : {
          "file" : "lib/Astro/Catalog/Query/CMC.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Query::GSC" : {
          "file" : "lib/Astro/Catalog/Query/GSC.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Query::MPC" : {
          "file" : "lib/Astro/Catalog/Query/MPC.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Query::SIMBAD" : {
          "file" : "lib/Astro/Catalog/Query/SIMBAD.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Query::Sesame" : {
          "file" : "lib/Astro/Catalog/Query/Sesame.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Query::SkyCat" : {
          "file" : "lib/Astro/Catalog/Query/SkyCat.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Query::SuperCOSMOS" : {
          "file" : "lib/Astro/Catalog/Query/SuperCOSMOS.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Query::USNOA2" : {
          "file" : "lib/Astro/Catalog/Query/USNOA2.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Query::Vizier" : {
          "file" : "lib/Astro/Catalog/Query/Vizier.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Star" : {
          "file" : "lib/Astro/Catalog/Star.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Star::Morphology" : {
          "file" : "lib/Astro/Catalog/Star/Morphology.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Transport::REST" : {
          "file" : "lib/Astro/Catalog/Transport/REST.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Astro::Catalog::Transport::WebService" : {
          "file" : "lib/Astro/Catalog/Transport/WebService.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       },
       "Tk::AstroCatalog" : {
          "file" : "lib/Tk/AstroCatalog.pm",
-         "version" : "4.37"
+         "version" : "4.38"
       }
    },
    "release_status" : "stable",
@@ -232,6 +232,6 @@
          "url" : "https://github.com/timj/perl-Astro-Catalog.git"
       }
    },
-   "version" : "4.37",
+   "version" : "4.38",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

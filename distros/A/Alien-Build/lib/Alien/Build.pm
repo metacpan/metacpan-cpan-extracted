@@ -12,7 +12,7 @@ use Config ();
 use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '2.83'; # VERSION
+our $VERSION = '2.84'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -256,6 +256,21 @@ sub install_type
   my($self) = @_;
   $self->{runtime_prop}->{install_type} ||= $self->probe;
 }
+
+
+sub is_system_install
+{
+  my($self) = @_;
+  $self->install_type eq 'system';
+}
+
+
+sub is_share_install
+{
+  my($self) = @_;
+  $self->install_type eq 'share';
+}
+
 
 
 sub download_rule
@@ -1400,7 +1415,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 2.83
+version 2.84
 
 =head1 SYNOPSIS
 
@@ -2096,6 +2111,18 @@ Except that it will be created if it does not already exist.
 This will return the install type.  (See the like named install property
 above for details).  This method will call C<probe> if it has not already
 been called.
+
+=head2 is_system_install
+
+ my $boolean = $build->is_system_install;
+
+Returns true if the alien is a system install type.  
+
+=head2 is_share_install
+
+ my $boolean = $build->is_share_install;
+
+Returns true if the alien is a share install type.
 
 =head2 download_rule
 

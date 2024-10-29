@@ -1,5 +1,5 @@
 #
-# $Id: Route.pm,v 09f6d620bca4 2012/11/02 16:39:39 gomor $
+# $Id: Route.pm,v c57765ed0538 2024/10/28 15:05:03 gomor $
 #
 package Net::Libdnet::Route;
 use strict; use warnings;
@@ -92,6 +92,6 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the BSD license. See LICENSE file in the source distribution archive.
 
-Copyright (c) 2008-2012, Patrice <GomoR> Auffret
+Copyright (c) 2008-2024, Patrice <GomoR> Auffret
 
 =cut

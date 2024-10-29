@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-09-19'; # DATE
 our $DIST = 'App-findsort'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Unix find wrapper to add sorting
@@ -22,7 +22,7 @@ App::findsort - Unix find wrapper to add sorting
 
 =head1 VERSION
 
-This document describes version 0.002 of App::findsort (from Perl distribution App-findsort), released on 2024-09-19.
+This document describes version 0.003 of App::findsort (from Perl distribution App-findsort), released on 2024-09-19.
 
 =head1 SYNOPSIS
 

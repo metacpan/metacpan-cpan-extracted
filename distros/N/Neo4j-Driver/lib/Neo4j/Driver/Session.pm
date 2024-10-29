@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.49';
+$Neo4j::Driver::Session::VERSION = '0.50';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -207,23 +207,22 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 SYNOPSIS
 
- use Neo4j::Driver;
- $session = Neo4j::Driver->new->basic_auth(...)->session;
+ $session = Neo4j::Driver->new(...)->session;
  
- # managed transaction function
+ # Managed transaction function
  @records = $session->execute_read( sub ($transaction) {
-   $transaction->run('MATCH (m:Movie) RETURN m')->list;
+   $transaction->run( ... )->list;
  });
  
- # unmanaged explicit transaction
+ # Unmanaged explicit transaction
  $transaction = $session->begin_transaction;
  
- # autocommit transaction
- $result = $session->run('MATCH (m:Movie) RETURN m.name, m.year');
+ # Autocommit transaction
+ $result = $session->run( ... );
 
 =head1 DESCRIPTION
 

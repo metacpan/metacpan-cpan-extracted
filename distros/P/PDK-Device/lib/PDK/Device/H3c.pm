@@ -125,7 +125,7 @@ sub runCommands {
 sub getConfig {
   my $self = shift;
 
-  my $commands = ["screen-length disable", "dis current-configuration", "save force" ];
+  my $commands = ["screen-length disable", "dis current-configuration", "save force", ];
 
   my $config = $self->execCommands($commands);
 
@@ -157,7 +157,7 @@ sub ftpConfig {
   my $host    = $self->{host};
   my $command = "put startup.cfg $self->{month}/$self->{date}/";
 
-  $command .= $hostname ? "$hostname\_$host.txt'" : "$host.txt";
+  $command .= $hostname ? "$hostname\_$host.txt" : "$host.txt";
 
   my $exp    = $self->{exp};
   my $result = $exp ? ($exp->match() || '') : '';

@@ -1,5 +1,12 @@
 Revision history for Perl application App::SourcePlot
 
+1.32 2024-10-28
+
+    - Plot and edit windows are now resizable.
+    - Added --telposition command line option.
+    - Added --samp command line option.
+    - Updated the included JCMT pointing catalog.
+
 1.31 2023-04-18
 
     - Updated the included JCMT pointing catalog.

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::DateTime;
 # ABSTRACT: Represents a Neo4j temporal instant value
-$Neo4j::Driver::Type::DateTime::VERSION = '0.49';
+$Neo4j::Driver::Type::DateTime::VERSION = '0.50';
 
 # For documentation, see Neo4j::Driver::Types.
 

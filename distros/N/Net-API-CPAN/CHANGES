@@ -1,5 +1,8 @@
 Revision history for Perl module Net::API::CPAN
 
+v0.1.5 2024-10-28T20:28:51+0900
+    - Correcting an issue with SSL certificate of fastapi.metacpan.org
+
 v0.1.4 2023-11-24T12:23:28+0900
     - Addition of field maturity in Net::API::CPAN::Release::Recent. See <https://github.com/metacpan/metacpan-api/issues/1146>
 

@@ -8,22 +8,22 @@ use Test::Number::Delta within => 0.0001;
 use App::SourcePlot::Source;
 use Astro::Telescope;
 
-my $jcmt = new Astro::Telescope('JCMT');
+my $jcmt = Astro::Telescope->new('JCMT');
 
 my @col = qw/LST EL AZ PA ELEX ELEY AZX AZY/;
 my $n = 0;
 
 foreach (<DATA>) {
-  chomp;
-  my ($date, $time, $ra, $dec, $sys, @ref) = split;
-  $n ++;
+    chomp;
+    my ($date, $time, $ra, $dec, $sys, @ref) = split;
+    $n ++;
 
-  my $s = new App::SourcePlot::Source('test', $ra, $dec, $sys);
-  my @out = $s->calcPoint($date, $time, $jcmt);
+    my $s = App::SourcePlot::Source->new('test', $ra, $dec, $sys);
+    my @out = $s->calcPoint($date, $time, $jcmt);
 
-  for (my $i = 0; $i < 8; $i ++) {
-    delta_ok($out[$i], $ref[$i], $col[$i] . '_' . $n);
-  }
+    for (my $i = 0; $i < 8; $i ++) {
+        delta_ok($out[$i], $ref[$i], $col[$i] . '_' . $n);
+    }
 }
 
 # The following test data was created from App::SourcePlot::Source before

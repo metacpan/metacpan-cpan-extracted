@@ -1,5 +1,15 @@
 Revision history for Astro::Catalog
 
+4.38 2024-10-28
+
+  - Added --epoch option to the catalog_convert script.
+  - IO module for VOTable should be slightly more tolerant
+    and not attempt to write non-equatorial sources.
+  - Tk::AstroCatalog should not add planets to JCMT catalogs.
+  - The Item constructor argument Coords should be processed
+    first in case other accessors require coordinates to
+    already be in place.
+
 4.37 2023-04-18
 
   - Tk::AstroCatalog window now resizable.

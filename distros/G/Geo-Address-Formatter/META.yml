@@ -8,11 +8,12 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0.88'
   Test::NoWarnings: '0'
+  Test::Perl::Critic: '0'
   Test::Warn: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +22,7 @@ name: Geo-Address-Formatter
 provides:
   Geo::Address::Formatter:
     file: lib/Geo/Address/Formatter.pm
-    version: '1.9982'
+    version: '1.9983'
 requires:
   Clone: '0.46'
   Data::Dumper: '0'
@@ -31,12 +32,12 @@ requires:
   Scalar::Util: '0'
   Text::Hogan: '2.03'
   Try::Catch: '0'
-  YAML::LibYAML: '0.86'
+  YAML::LibYAML: '0.89'
   perl: '5.012'
 resources:
   homepage: https://github.com/OpenCageData/perl-Geo-Address-Formatter
   repository: https://github.com/OpenCageData/perl-Geo-Address-Formatter.git
-version: '1.9982'
-x_generated_by_perl: v5.26.3
+version: '1.9983'
+x_generated_by_perl: v5.34.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

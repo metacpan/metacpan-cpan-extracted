@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result;
 # ABSTRACT: Result of running a Cypher statement (a stream of records)
-$Neo4j::Driver::Result::VERSION = '0.49';
+$Neo4j::Driver::Result::VERSION = '0.50';
 
 use parent 'Neo4j::Driver::StatementResult';
 
@@ -225,27 +225,35 @@ Neo4j::Driver::Result - Result of running a Cypher statement (a stream of record
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 SYNOPSIS
 
- use Neo4j::Driver;
- $session = Neo4j::Driver->new->basic_auth(...)->session;
+ $result = $session->run( ... );
  
- # stream result records
- $result = $session->run('MATCH (a:Actor) RETURN a.name, a.born');
+ # Stream result records
  while ( $record = $result->fetch ) {
    ...
  }
  
- # list result records
- $result = $session->run('MATCH (m:Movie) RETURN m.name, m.year');
- $record_count = $result->size;
+ # List result records
  @records = $result->list;
+ $records = $result->list;  # array ref
+ $record_count = $result->size;
  
- # shortcut for results with a single record only
- $query = 'MATCH (m:Movie) WHERE id(m) = {id} RETURN m.name';
- $name = $session->run($query, id => 12)->single->get('m.name');
+ # Shortcut for results with a single record only
+ $record = $result->single;
+ 
+ @field_keys = $result->keys;
+ $summary = $result->consume;
+ 
+ # For error checking, call any method on the result to ensure
+ # the statement has executed before leaving the try block
+ try {
+   $result = $transaction->run( ... );
+   $result->has_next;
+ }
+ catch ($e) { ... }
 
 =head1 DESCRIPTION
 
@@ -260,15 +268,18 @@ buffered locally in the driver. Once I<all> data on the result stream
 has been retrieved from the server and buffered locally, the stream
 becomes B<detached.>
 
-Results received over HTTP always contain the complete list of
-records, which is kept buffered in the driver. HTTP result streams
-are thus immediately detached and valid indefinitely.
-
-Result streams received on Bolt are valid until the next statement
+Result streams are valid until the next statement
 is run on the same session or (if the result was retrieved within
 an explicit transaction) until the transaction is closed, whichever
 comes first. When a result stream has become invalid I<before> it
 was detached, calling any methods in this class may fail.
+
+Some result handlers may automatically detach a result stream
+immediately when the result is made available by the server.
+Such result streams are valid indefinitely.
+In driver S<version 0.xx,> this happens for all HTTP results.
+This behaviour is subject to change in future versions and
+shouldn't be relied upon.
 
 To obtain a query result, call L<Neo4j::Driver::Transaction/"run">.
 
@@ -318,8 +329,8 @@ detach the result, but will never exhaust it.
 
  @keys = $result->keys;
 
-Retrieve the column names of the records this result contains.
-In scalar context, return the number of columns.
+Retrieve the column names (field keys) of the records this result
+contains. In scalar context, return the number of columns.
 
 =head2 list
 

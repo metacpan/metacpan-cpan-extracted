@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 ##----------------------------------------------------------------------------
-## Meta CPAN API - ~/lib//mnt/src/perl/Net-API-CPAN/scripts/cpanapi
+## Meta CPAN API - ~/scripts/cpanapi
 ## Version v0.1.2
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>

@@ -4,7 +4,7 @@ use Moose::Role;
 use Valiant::HTML::Util::Form;
 use Valiant::HTML::Util::Pager;
 
-our $VERSION = '0.001005';
+our $VERSION = '0.001006';
 eval $VERSION;
 
 # https://metacpan.org/pod/Valiant::HTML::Util::TagBuilder
@@ -17,7 +17,7 @@ my @FORM_TAGS = qw( field_value field_id field_name button_tag checkbox_tag fiel
         options_from_collection_for_select );
 
 # https://metacpan.org/pod/Valiant::HTML::Util::Form
-my @FORM = qw( form_for fields_for );
+my @FORM = qw( form_for fields_for form_with fields );
 
 # https://metacpan.org/pod/Valiant::HTML::Util::Pager
 my @PAGER = qw( pager_for );
@@ -136,7 +136,7 @@ From L<Valiant::HTML::Util::FormTags>
 
 From L<Valiant::HTML::Util::Form>
 
-    form_for fields_for
+    form_for fields_for form_with fields
 
 You will also have all the methods that are public for L<Catalyst::View::EmbeddedPerl::PerRequest>.
 

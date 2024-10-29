@@ -9,7 +9,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '2.83'; # VERSION
+our $VERSION = '2.84'; # VERSION
 
 
 sub new
@@ -201,7 +201,7 @@ sub mm_postamble
                 "_alien/mm/prefix :\n" .
                 "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e prefix \$(INSTALLDIRS) $dirs\n\n";
 
-  # set verson
+  # set version
   $postamble .= "alien_version : _alien/mm/version\n\n" .
                 "_alien/mm/version : _alien/mm/prefix\n" .
                 "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e version \$(VERSION)\n\n";
@@ -414,7 +414,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 2.83
+version 2.84
 
 =head1 SYNOPSIS
 

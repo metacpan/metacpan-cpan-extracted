@@ -6,13 +6,12 @@ use warnings;
 
 use File::Which;
 use Getopt::Long;
-use PerlIO::fgets;
 use ShellQuote::Any::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-09-19'; # DATE
 our $DIST = 'App-findsort'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my %Opts = (
     sort  => undef,
@@ -55,8 +54,8 @@ open my $findh, "$cmd |" or die "findsort: Can't run find: $!\n"; ## no critic: 
 my @files;
 while (!eof($findh)) {
     no warnings 'uninitialized'; # "Use of uninitialized value in subroutine entry" at line below
-    defined(my $line = fgets($findh, 32))
-        or die "findsort: fgets failed: $!\n";
+    defined(my $line = <$findh>)
+        or die "findsort: getline() failed: $!\n";
 
     chomp $line;
     push @files, $line;
@@ -104,7 +103,7 @@ findsort - Unix find wrapper that has sorting option
 
 =head1 VERSION
 
-This document describes version 0.002 of findsort (from Perl distribution App-findsort), released on 2024-09-19.
+This document describes version 0.003 of findsort (from Perl distribution App-findsort), released on 2024-09-19.
 
 =head1 SYNOPSIS
 

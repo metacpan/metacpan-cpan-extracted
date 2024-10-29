@@ -6,49 +6,49 @@ use Test::More tests => 1 + 20 * 97 * 4;
 use Test::Number::Delta within => 0.01;
 
 use Astro::Telescope;
-my $jcmt = new Astro::Telescope('JCMT');
+my $jcmt = Astro::Telescope->new('JCMT');
 
 require_ok('App::SourcePlot::Source');
 
-my $mw = new TestMainWindow();
+my $mw = TestMainWindow->new();
 my $n = 0;
 
 while (1) {
-  $n ++;
-  my $line = <DATA>;
-  last unless $line;
-  chomp $line;
-  my ($date, $time, $ra, $dec, $sys, $num_points) = split ' ', $line;
-  $line = <DATA>; chomp $line;
-  my @time_el_ref = split ' ', $line;
-  $line = <DATA>; chomp $line;
-  my @az_pa_ref = split ' ', $line;
+    $n ++;
+    my $line = <DATA>;
+    last unless $line;
+    chomp $line;
+    my ($date, $time, $ra, $dec, $sys, $num_points) = split ' ', $line;
+    $line = <DATA>;
+    chomp $line;
+    my @time_el_ref = split ' ', $line;
+    $line = <DATA>;
+    chomp $line;
+    my @az_pa_ref = split ' ', $line;
 
-  unless ((scalar @time_el_ref) == (2 * $num_points)
-      and (scalar @az_pa_ref)   == (2 * $num_points)) {
+    unless ((scalar @time_el_ref) == (2 * $num_points)
+            and (scalar @az_pa_ref) == (2 * $num_points)) {
+        fail('Wrong number of points read from data block.');
+        next;
+    }
 
-    fail('Wrong number of points read from data block.');
-    next;
-  }
+    my $s = App::SourcePlot::Source->new('test', $ra, $dec, $sys);
+    $s->calcPoints($date, $time, $num_points, $mw, $jcmt);
+    my @time_el_calc = $s->time_ele_points();
+    my @az_pa_calc = $s->az_pa_points();
 
-  my $s = new App::SourcePlot::Source('test', $ra, $dec, $sys);
-  $s->calcPoints($date, $time, $num_points, $mw, $jcmt);
-  my @time_el_calc = $s->time_ele_points();
-  my @az_pa_calc = $s->az_pa_points();
+    unless ((scalar @time_el_calc) == (2 * $num_points)
+            and (scalar @az_pa_calc) == (2 * $num_points)) {
+        fail('Wrong number of points returned by calculation.');
+        next;
+    }
 
-  unless ((scalar @time_el_calc) == (2 * $num_points)
-      and (scalar @az_pa_calc)   == (2 * $num_points)) {
-
-    fail('Wrong number of points returned by calculation.');
-    next;
-  }
-
-  for (my $i = 0; $i < $num_points; $i ++) {
-    delta_ok($time_el_calc[2 * $i],     $time_el_ref[2 * $i],     "Test $n point $i LST");
-    delta_ok($time_el_calc[2 * $i + 1], $time_el_ref[2 * $i + 1], "Test $n point $i EL");
-    delta_ok(  $az_pa_calc[2 * $i],       $az_pa_ref[2 * $i],     "Test $n point $i AZ");
-    delta_ok(  $az_pa_calc[2 * $i + 1],   $az_pa_ref[2 * $i + 1], "Test $n point $i PA");
-  }
+    for (my $i = 0; $i < $num_points; $i ++) {
+        delta_ok($time_el_calc[2 * $i],     $time_el_ref[2 * $i],     "Test $n point $i LST");
+        delta_ok($time_el_calc[2 * $i + 1], $time_el_ref[2 * $i + 1], "Test $n point $i EL");
+        delta_ok(  $az_pa_calc[2 * $i],       $az_pa_ref[2 * $i],     "Test $n point $i AZ");
+        delta_ok(  $az_pa_calc[2 * $i + 1],   $az_pa_ref[2 * $i + 1], "Test $n point $i PA");
+    }
 }
 
 # Dummy class to give to calcPoints as a "Main Window".
@@ -56,8 +56,8 @@ while (1) {
 package TestMainWindow;
 
 sub new {
-  my $class = shift;
-  return bless {}, $class;
+    my $class = shift;
+    return bless {}, $class;
 }
 
 sub update {

@@ -5,7 +5,7 @@ package Workflow::Inotify;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.5'; ## no critic (RequireInterpolation)
+our $VERSION = '1.0.6';  ## no critic (RequireInterpolation)
 
 1;
 
@@ -36,17 +36,18 @@ See L<Workflow::Inotify::Handler>
 The C<inotify.pl> script reads a C<.ini> style configuration file and
 installs handlers implemented by Perl classes to process kernel events
 generated from file or directory changes. Using L<Linux::Inotify2>,
-the script creates instantiates one or more handlers which process
+the script instantiates one or more handlers which process
 directory events and then daemonizes this script.
 
 =head2 The Configuration File
 
 The configuration file is a C<.ini> style configuration file
 consisting of a C<[global]> section and one or more sections named
-using the convention: C<[watch_{name}]>.
+using the convention: C<[watch_{name}]> where C<{name}> is the snake
+case representation of the directory to watch.
 
-Boolean values can be set as '0', '1', 'true', 'false', 'on', 'off',
-'yes', or 'no'. Take your pick.
+Boolean values in the configuration file can be set as '0', '1',
+'true', 'false', 'on', 'off', 'yes', or 'no'. Take your pick.
 
 Example:
 
@@ -58,7 +59,7 @@ Example:
  
  [watch_tmp]
  dir = /tmp
- mask = IN_MOVE_TO | IN_CLOSE_WRITE
+ mask = IN_MOVED_TO | IN_CLOSE_WRITE
  handler = Workflow::Inotify::Handler
 
 Sections are described below.
@@ -97,7 +98,8 @@ Example:
  perl5lib = $HOME/lib/perl5:/usr/local/lib/perl5
 
 Words that begin with '$' are interpretted to be environment variables
-(for this variable only).
+(for this variable only). You can also use '~' to denote your home
+directory ($HOME) if it is defined.
 
 =item * verbose
 
@@ -150,6 +152,32 @@ Example:
 
  handler = Workflow::Inotify::Handler
 
+A typical handler might look something like this:
+
+
+ package MyHandler;
+ 
+ use strict;
+ use warnings;
+ 
+ use Data::Dumper;
+
+ use parent qw(Workflow::Inotify::Handler);
+ 
+ sub new {
+   my ( $class, @args ) = @_;
+ 
+   return $class->SUPER::new(@args);
+ }
+ 
+ sub handler {
+   my ( $self, $event ) = @_;
+ 
+   return print {*STDERR} Dumper( [ event => $event ] );
+ }
+
+1;
+
 =back
 
 =back
@@ -158,7 +186,7 @@ Example:
 
 You can create a section in the configuration file that is named for
 the handler class. For example, if your handler class is
-C<Worflow::S3::Uploader>, then create a section in the configuration
+C<Workflow::S3::Uploader>, then create a section in the configuration
 file named C<workflow_s3_uploader>. Place any values you wish in that
 section. The configuration object is passed to your handler's C<new()>
 method so you can access the values as needed. The configuration
@@ -172,7 +200,7 @@ See L<Workflow::Inotify::Handler> for more details.
 
 =head1 VERSION
 
-This documentation refers to version 1.0.5
+This documentation refers to version 1.0.6
 
 =head1 REPOSITORY
 
@@ -184,6 +212,6 @@ Rob Lauer - <rlauer6@comcast.net>
 
 =head1 SEE ALSO 
 
-L<Linux::Inotify2>, L<Config::IniFiles>
+L<Linux::Inotify2>, L<Config::IniFiles>, L<Workflow::Inotify::Handler>
 
 =cut

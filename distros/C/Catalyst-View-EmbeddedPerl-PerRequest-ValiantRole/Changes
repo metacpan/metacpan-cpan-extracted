@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest-ValiantRole
 
+0.001006  28 October 2024
+          - added form_with and fields as proxies
+
 0.001005  20 October 2024
           - Fixed issues with auto-escaping
 

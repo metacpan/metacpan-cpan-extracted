@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/davorg-cpan/app-aphra/issues
   repository: https://github.com/davorg-cpan/app-aphra.git
-version: v0.2.1
+version: v0.2.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

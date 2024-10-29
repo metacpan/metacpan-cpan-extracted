@@ -8,7 +8,7 @@ use Carp;
 use Scalar::Util qw(refaddr);
 
 our @EXPORT  = qw(stream);
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.3';
 
 # ABSTRACT: Simple, fast, functional processing of list data
 
@@ -390,7 +390,7 @@ This is useful when using C<List::Stream::reduce>, when you've reduced to a sing
     my @data   = (1, 2, 3, 4);
     my $stream = stream(@data)->map(sub { $_ + 1 });
     my $first  = $stream->first;
-    say $first; # 1
+    say $first; # 2
 
 Since reduce reduces the stream to a single element, C<first> can be used to get the reduced value.
 

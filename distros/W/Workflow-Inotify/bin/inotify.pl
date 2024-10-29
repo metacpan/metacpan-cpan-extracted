@@ -5,14 +5,17 @@ use warnings;
 
 use Carp;
 use Config::IniFiles;
+use Cwd;
 use Data::Dumper;
 use English qw(-no_match_vars);
-use Getopt::Long;
+use Getopt::Long qw(:config no_ignore_case);
 use IO::Handle;
 use Linux::Inotify2;
 use List::Util qw(none any);
 use Proc::Daemon;
 use Proc::PID::File;
+use Pod::Usage;
+use Workflow::Inotify::Handler qw(boolean);
 
 use Readonly;
 
@@ -34,7 +37,7 @@ Readonly::Hash our %EVENTS => (
   IN_OPEN          => IN_OPEN,
 );
 
-our $VERSION = '1.0.5'; ## no critic (RequireInterpolationOfMetachars)
+our $VERSION = '1.0.6';  ## no critic (RequireInterpolationOfMetachars)
 
 our %WATCH_HANDLERS;
 our $KEEP_GOING = $TRUE;
@@ -59,7 +62,7 @@ sub setup_signal_handlers {
 
     print {*STDERR} "...re-reading config file\n";
 
-    init_from_config();
+    $CONFIG = init_from_config( \%OPTIONS );
 
     print {*STDERR} "...setting up handlers\n";
 
@@ -93,7 +96,8 @@ sub msg {
 ########################################################################
   my (@msg) = @_;
 
-  return if !$VERBOSE;
+  return
+    if !$VERBOSE;
 
   return print {*STDERR} "@msg\n";
 }
@@ -167,8 +171,7 @@ sub setup_watch_handlers {
     die "your class must have a handler() method\n"
       if !$handler->can('handler');
 
-    msg( sprintf '...setting up handler for [%s] =>  [%s]',
-      $dir, ref $handler );
+    msg( sprintf '...setting up handler for [%s] =>  [%s]', $dir, ref $handler );
 
     my $w = $INOTIFY->watch(
       $dir,
@@ -195,41 +198,20 @@ sub cleanup_handlers {
 }
 
 ########################################################################
-sub boolean {
-########################################################################
-  my ( $value, @default ) = @_;
-
-  my $default_value;
-
-  if (@default) {
-    $default_value = $default[0];
-  }
-
-  $value =~ s/\s*([^ ]+)\s*/$1/xsm;
-
-  return $default_value
-    if !defined $value
-    && defined $default_value;
-
-  return $FALSE
-    if !defined $value || any { $value eq $_ } qw( 0 false off no );
-
-  return $TRUE
-    if any { $value eq $_ } qw( 1 true on yes );
-
-  die "invalid value ($value) for boolean variable";
-}
-
-########################################################################
 sub init_from_config {
 ########################################################################
-  $CONFIG = Config::IniFiles->new( -file => $OPTIONS{config} );
+  my ($options) = @_;
 
-  $VERBOSE = boolean( $CONFIG->val( global => 'verbose' ), $TRUE );
+  my $config = Config::IniFiles->new( -file => $options->{config} );
 
-  my $perl5lib = $CONFIG->val( global => 'perl5lib' );
+  $VERBOSE = boolean( $config->val( global => 'verbose' ), $TRUE );
+
+  my $perl5lib = $config->val( global => 'perl5lib' );
 
   if ($perl5lib) {
+    if ( $ENV{HOME} ) {
+      $perl5lib =~ s/[~]/\$HOME/xsmg;
+    }
 
     while ( $perl5lib =~ /\$(\w+)/xsm ) {
       my $env = $ENV{$1};
@@ -240,53 +222,52 @@ sub init_from_config {
 
     for my $inc ( split /:/xsm, $perl5lib ) {
       if ( none { $inc eq $_ } @INC ) {
-        push @INC, $inc;
+        unshift @INC, $inc;
       }
     }
   }
 
-  return;
+  return $config;
 }
 
 ########################################################################
 sub help {
 ########################################################################
-  return print <<"END_OF_HELP";
-usage: $PROGRAM_NAME options
-
-Options
--------
--h, --help     help
--c, --config   path to configuration file
--l, --logfile  path to logfile
-
-Notes
------
-STDERR, STDOUT redirected to logfile if logfile is provide
-
-See 'perldoc Workflow::Inotify' for details regarding usage and
-configuration.
-
-END_OF_HELP
+  return pod2usage(1);
 }
 
 ########################################################################
 sub main {
 ########################################################################
-  GetOptions( \%OPTIONS, 'logfile=s', 'config=s', 'help' );
+  my @option_specs = qw(
+    logfile|l=s
+    config|c=s
+    daemonize|d
+    help|h
+  );
+
+  my $retval = GetOptions( \%OPTIONS, @option_specs );
 
   return help()
-    if $OPTIONS{help};
+    if !$retval || $OPTIONS{help};
 
   die "no config file found!\n"
     if !-s $OPTIONS{config};
 
-  init_from_config();
+  $CONFIG = init_from_config( \%OPTIONS );
 
-  my $daemonize = boolean( $CONFIG->val( global => 'daemonize', $FALSE ) );
+  my $logfile = $OPTIONS{LOGFILE} // $CONFIG->val( global => 'logfile' );
+
+  my $daemonize = $OPTIONS{daemonize} // boolean( $CONFIG->val( global => 'daemonize' ), $TRUE );
 
   if ($daemonize) {
-    Proc::Daemon::Init;
+
+    my $daemon = Proc::Daemon->new(
+      work_dir => cwd,
+      $logfile ? () : ( dont_close_fh => ['STDERR'] )
+    );
+
+    $daemon->Init();
   }
 
   setup_signal_handlers();
@@ -294,19 +275,16 @@ sub main {
   autoflush STDOUT $TRUE;
   autoflush STDERR $TRUE;
 
-  $OPTIONS{logfile} //= $CONFIG->val( global => 'logfile' );
+  # see perldoc Proc::Daemon for a description of how Proc::Daemon
+  # closes all file handles
 
-  # note that version 0.14 of Proc::Daemon will open STDOUT/STDERR and
-  # redirect to a file for you, CentOS 5 has version 0.03 which opens
-  # STDOUT/STDERR to /dev/null thus we need to re-open...
-
-  if ( $OPTIONS{logfile} ) {
-    open STDOUT, '+>>', $OPTIONS{logfile};
-    open STDERR, '+>>&STDOUT'; ## no critic (ProhibitAmpersandSigils)
+  if ($logfile) {
+    open STDOUT, '+>>', $logfile;
+    open STDERR, '+>>', \&STDOUT;
   }
 
   # If already running, then exit
-  if ( $daemonize && Proc::PID::File->running() ) {
+  if ( $daemonize && Proc::PID::File->running( dir => cwd ) ) {
     msg('already running...');
     exit 0;
   }
@@ -362,11 +340,39 @@ sub run {
 
   cleanup_handlers();
 
-  return;
+  return 0;
 }
 
-main();
+exit main();
 
 1;
 
+## no critic
+
 __END__
+
+=pod
+
+=head1 USAGE
+
+inotify.pl options
+
+Linux inotify handler.  See man inotify.pl for detailed documentation.
+
+=head1 OPTIONS
+
+ Options
+ -------
+ -h, --help      help
+ -c, --config    path to configuration file
+ -l, --logfile   path to logfile, overrides value in config file
+ -d, --daemonize overrides value in config file (default: true)
+ 
+ Notes
+ -----
+ STDERR and STDOUT will be redirected to a logfile if a logfile is provided
+ 
+ See 'perldoc Workflow::Inotify' for details regarding usage and
+ configuration.
+
+=cut

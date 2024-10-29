@@ -11,7 +11,7 @@ use Text::ParseWords qw/shellwords/;
 use Alien::Util;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '2.83'; # VERSION
+our $VERSION = '2.84'; # VERSION
 
 
 sub import {
@@ -214,6 +214,22 @@ sub install_type {
   my $type = $self->config('install_type');
   return @_ ? $type eq $_[0] : $type;
 }
+
+
+
+sub is_system_install
+{
+  my($self) = @_;
+  $self->install_type('system');
+}
+
+
+sub is_share_install
+{
+  my($self) = @_;
+  $self->install_type('share');
+}
+
 
 sub _pkgconfig_keyword {
   my $self = shift;
@@ -604,7 +620,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 2.83
+version 2.84
 
 =head1 SYNOPSIS
 
@@ -843,8 +859,15 @@ behaviour to the C<< <=> >> and C<cmp> operators.
  my $bool = Alien::MyLibrary->install_type($install_type);
 
 Returns the install type that was used when C<Alien::MyLibrary> was
-installed.  If a type is provided (the second form in the synopsis)
-returns true if the actual install type matches.  Types include:
+installed.  
+
+If a type is provided (the second form in the synopsis)
+returns true if the actual install type matches.  
+For this use case it is recommended to use C<is_system_install> 
+or C<is_share_install> instead as these are less prone to 
+typographical errors.
+
+Types include:
 
 =over 4
 
@@ -859,6 +882,18 @@ it was built from source code, either downloaded from the Internet
 or bundled with C<Alien::MyLibrary>.
 
 =back
+
+=head2 is_system_install
+
+ my $type = $build->is_system_install;
+
+Returns true if the alien is a system install type.  
+
+=head2 is_share_install
+
+ my $type = $build->is_share_install;
+
+Returns true if the alien is a share install type.  
 
 =head2 config
 

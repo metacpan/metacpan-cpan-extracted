@@ -47,6 +47,14 @@ Output writing options, formatted as for input options.
 
 This option can be specified to allow OUTFILE to overwrite an existing file.
 
+=item B<--epoch>
+
+Apply the given epoch (in ISO8601 format) to items with coordinates of type
+"RADEC" in the input catalog, replacing such coordinates with the apparent
+position of the item at this time in J2000.  This can be used to convert
+a catalog with proper motion and parallax values to one without.  The current
+time can be used by specifying the epoch as "now".
+
 =back
 
 =head1 FORMATS
@@ -109,7 +117,7 @@ use Pod::Usage;
 use Astro::Catalog;
 
 my ($option_help, $option_clobber, $option_infmt, $option_inopt,
-    $option_outfmt, $option_outopt);
+    $option_outfmt, $option_outopt, $option_epoch);
 GetOptions(
     'help' => \$option_help,
     'clobber' => \$option_clobber,
@@ -117,6 +125,7 @@ GetOptions(
     'inopt=s' => \$option_inopt,
     'outfmt=s' => \$option_outfmt,
     'outopt=s' => \$option_outopt,
+    'epoch=s' => \$option_epoch,
 ) or pod2usage(-verbose => 0);
 
 pod2usage(-verbose => 2) if $option_help;
@@ -189,6 +198,8 @@ my %out_opt = (((exists $FORMAT{$out_format} and exists $FORMAT{$out_format}->{'
 # Read and re-write catalog.
 my $cat = new Astro::Catalog(%in_param, Format => $in_format, ReadOpt => \%in_opt);
 
+_convert_to_epoch($option_epoch, $cat) if defined $option_epoch;
+
 $cat->write_catalog(File => $out_file, Format => $out_format, %out_opt)
     or die $cat->errstr;
 
@@ -212,6 +223,45 @@ sub _parse_options {
     return () unless defined $value;
 
     return map {split '=', $_, 2} split ',', $value;
+}
+
+sub _convert_to_epoch {
+    my $epoch_str = shift;
+    my $cat = shift;
+
+    my $epoch;
+    if ($epoch_str =~ /^now$/i) {
+        require DateTime;
+        $epoch = DateTime->now(time_zone => 'UTC');
+    }
+    else {
+        require DateTime::Format::ISO8601;
+        $epoch = DateTime::Format::ISO8601->parse_datetime($epoch_str);
+    }
+
+    foreach my $item ($cat->stars) {
+        my $coord = $item->coords;
+        next unless $coord->type eq 'RADEC';
+
+        $coord->datetime($epoch);
+        my ($ra, $dec) = $coord->radec;
+
+        my $fixed = Astro::Coords->new(
+            name => $coord->name,
+            type => 'J2000',
+            ra => $ra,
+            dec => $dec,
+            rv => $coord->rv,
+            vdefn => $coord->vdefn,
+            vframe => $coord->vframe,
+        );
+
+        foreach my $method (qw/telescope/) {
+            $fixed->$method($coord->$method());
+        }
+
+        $item->coords($fixed);
+    }
 }
 
 __END__

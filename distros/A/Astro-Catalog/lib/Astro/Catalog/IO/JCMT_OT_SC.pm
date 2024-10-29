@@ -19,7 +19,7 @@ use Astro::Catalog::Item;
 
 use parent qw/Astro::Catalog::IO::ASCII/;
 
-our $VERSION = '4.37';
+our $VERSION = '4.38';
 
 our $BASE_TAG = 'SCIENCE';
 

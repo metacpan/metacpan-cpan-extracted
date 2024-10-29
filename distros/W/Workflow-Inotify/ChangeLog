@@ -1,3 +1,27 @@
+Sun Oct 27 15:30:28 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.6]:
+	* VERSION: bump
+	* README.md: generated
+	* NEWS.md: explain enhancements
+	* src/main/perl/lib/Workflow/Inotify/Handler.pm.in
+	- whitespace
+	- pod updates
+	(get_app_config)
+	- lc or not section names
+	* src/main/perl/bin/t/00-workflow-inotify.t: new
+	* src/main/perl/bin/t/01-workflow-inotify.t: new
+	* src/main/perl/bin/Makefile.am: test target
+	* src/main/perl/lib/Workflow/Inotify.pm.in
+	- pod tweaks
+	* src/main/perl/bin/inotify.pl.in
+	(boolean): removed, import from above
+	(init_from_config)
+	- use ~ for home
+	- unshift paths to @INC
+	(main): --daemonize
+	(help): pod2usage()
+
 Sat Apr  8 09:37:54 2023  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.0.5]:

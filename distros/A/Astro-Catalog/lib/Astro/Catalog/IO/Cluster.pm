@@ -37,7 +37,7 @@ use base qw/Astro::Catalog::IO::ASCII/;
 
 use Data::Dumper;
 
-our $VERSION = '4.37';
+our $VERSION = '4.38';
 
 =begin __PRIVATE_METHODS__
 

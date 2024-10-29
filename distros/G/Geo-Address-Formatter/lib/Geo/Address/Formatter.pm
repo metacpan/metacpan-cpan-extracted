@@ -1,5 +1,5 @@
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.9982';
+$Geo::Address::Formatter::VERSION = '1.9983';
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 use strict;
@@ -483,7 +483,7 @@ sub _minimal_components {
     my $self                = shift;
     my $rh_components       = shift || return;
     my @required_components = qw(road postcode); #FIXME - should be in conf
-    my $missing             = 0;                 # number of required components missing
+    my $missing             = 0;  # num required components that are missing
 
     my $minimal_threshold = 2;
     foreach my $c (@required_components) {
@@ -623,7 +623,7 @@ sub _add_code {
         my $name    = $rh_components->{$keyname};
         my $uc_name = uc($name);
 
-    LOCCODE: foreach my $abbrv (keys %$mapping) {
+        LOCCODE: foreach my $abbrv (keys %$mapping) {
 
             my @confnames; # can have multiple names for the place
                            # for example in different languages
@@ -746,13 +746,14 @@ sub _abbreviate {
         foreach my $lang (@langs) {
             # do we have abbrv for this lang?
             if (defined($self->{abbreviations}->{$lang})) {
-
+                # we have abbreviations
                 my $rh_abbr = $self->{abbreviations}->{$lang};
+
                 foreach my $comp_name (keys %$rh_abbr) {
                     next if (!defined($rh_comp->{$comp_name}));
                     foreach my $long (keys %{$rh_abbr->{$comp_name}}) {
                         my $short = $rh_abbr->{$comp_name}->{$long};
-                        $rh_comp->{$comp_name} =~ s/\b$long\b/$short/;
+                        $rh_comp->{$comp_name} =~ s/(^|\s)$long\b/$1$short/;
                     }
                 }
             } else {
@@ -760,7 +761,6 @@ sub _abbreviate {
             }
         }
     }
-
     return $rh_comp;
 }
 
@@ -854,7 +854,7 @@ sub _render_template {
 # Text::Hogan apparently caches lambdas when rendering templates. In the past
 # we needed our lambda 'first', example
 #   {{#first}} {{{city}}} || {{{town}}} {{/first}}
-# to evaluate the componentes. Whenever the lambda was called with different
+# to evaluate the components. Whenever the lambda was called with different
 # component values it consumed memory. Now replace with a simpler implementation
 #
 sub _replace_template_lambdas {
@@ -955,7 +955,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.9982
+version 1.9983
 
 =head1 SYNOPSIS
 
@@ -1012,7 +1012,7 @@ Possible options are:
 
     'country', which should be an uppercase ISO 3166-1:alpha-2 code
     e.g. 'GB' for Great Britain, 'DE' for Germany, etc.
-    If ommited we try to find the country in the address components.
+    If omitted we try to find the country in the address components.
 
     'only_address', same as only_address global option but set at formatting level
 
@@ -1053,7 +1053,7 @@ Ed Freyfogle
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Opencage GmbH.
+This software is copyright (c) 2024 by Opencage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

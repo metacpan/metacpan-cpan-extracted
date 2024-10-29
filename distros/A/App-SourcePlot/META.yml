@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.3'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,13 +21,19 @@ name: App-SourcePlot
 provides:
   App::SourcePlot:
     file: lib/App/SourcePlot.pm
-    version: '1.31'
+    version: '1.32'
   App::SourcePlot::Plotter::Tk:
     file: lib/App/SourcePlot/Plotter/Tk.pm
-    version: '1.31'
+    version: '1.32'
   App::SourcePlot::Source:
     file: lib/App/SourcePlot/Source.pm
-    version: '1.31'
+    version: '1.32'
+  App::SourcePlot::TelPosn::JCMT:
+    file: lib/App/SourcePlot/TelPosn/JCMT.pm
+    version: '1.32'
+  App::SourcePlot::VO::SAMP:
+    file: lib/App/SourcePlot/VO/SAMP.pm
+    version: '1.32'
 requires:
   Astro::Catalog: '2.01'
   Astro::Coords: '0.13'
@@ -45,5 +51,5 @@ resources:
   homepage: https://github.com/eaobservatory/perl-App-SourcePlot/tree/master
   license: http://opensource.org/licenses/gpl-3.0.html
   repository: https://github.com/eaobservatory/perl-App-SourcePlot.git
-version: '1.31'
+version: '1.32'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

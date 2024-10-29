@@ -5,17 +5,17 @@ use v5.30;
 use Moose::Role;
 use namespace::autoclean;
 
-has id => (is => 'ro', isa => 'Int', required => 1,);
+has id => (is => 'ro', isa => 'Int', required => 1, );
 
-has name => (is => 'ro', isa => 'Str', required => 1,);
+has name => (is => 'ro', isa => 'Str', required => 1, );
 
-has type => (is => 'ro', isa => 'Str', required => 1,);
+has type => (is => 'ro', isa => 'Str', required => 1, );
 
-has sign => (is => 'ro', isa => 'Str', required => 1,);
+has sign => (is => 'ro', isa => 'Str', required => 1, );
 
-has timestamp => (is => 'ro', isa => 'Str', required => 1,);
+has timestamp => (is => 'ro', isa => 'Str', required => 1, );
 
-has lineParsedFlags => (is => 'ro', isa => 'ArrayRef[Int]', builder => '_buildLineParsedFlags',);
+has lineParsedFlags => (is => 'ro', isa => 'ArrayRef[Int]', builder => '_buildLineParsedFlags', );
 
 requires 'config';
 requires 'confContent';

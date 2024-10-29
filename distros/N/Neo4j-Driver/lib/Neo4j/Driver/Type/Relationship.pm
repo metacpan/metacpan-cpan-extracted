@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Relationship;
 # ABSTRACT: Describes a relationship from a Neo4j graph
-$Neo4j::Driver::Type::Relationship::VERSION = '0.49';
+$Neo4j::Driver::Type::Relationship::VERSION = '0.50';
 
 # For documentation, see Neo4j::Driver::Types.
 

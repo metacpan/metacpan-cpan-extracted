@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Meta CPAN API - ~/lib/Net/API/CPAN.pm
-## Version v0.1.4
+## Version v0.1.5
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/25
-## Modified 2023/11/24
+## Modified 2024/10/28
 ## All rights reserved
 ## 
 ## 
@@ -28,7 +28,7 @@ BEGIN
         METACPAN_CLIENTINFO_URI => 'https://clientinfo.metacpan.org',
     };
     our $MODULE_RE = qr/[a-zA-Z_][a-zA-Z0-9_]+(?:\:{2}[a-zA-Z0-9_]+)*/;
-    our $VERSION = 'v0.1.4';
+    our $VERSION = 'v0.1.5';
 };
 
 use strict;
@@ -45,6 +45,13 @@ our $UA_OPTS =
     max_body_in_memory_size => 102400,
     timeout => 15,
     use_promise => 0,
+    ssl_opts =>
+    {
+        # Somehow, there is an issue with the fastapi.metacpan.org SSL certificate, so we need to enforce that we trust it.
+        # We get the fingerprint with: echo | openssl s_client -connect fastapi.metacpan.org:443 | openssl x509 -noout -fingerprint
+        # See: <https://stackoverflow.com/questions/62038223/perl-iosocketssl-ssl-connect-attempt-failed>
+        SSL_fingerprint => 'sha1$D9ECEAB9F351B5B21EF2A102B24DF58A2D026988',
+    },
 };
 
 our $TYPE2CLASS =
@@ -2299,7 +2306,7 @@ Net::API::CPAN - Meta CPAN API
 
 =head1 VERSION
 
-    v0.1.4
+    v0.1.5
 
 =head1 DESCRIPTION
 

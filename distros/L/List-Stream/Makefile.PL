@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.024;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "List-Stream",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.024",
   "NAME" => "List::Stream",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -22,7 +23,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.0.1",
+  "VERSION" => "0.0.3",
   "test" => {
     "TESTS" => "t/*.t"
   }

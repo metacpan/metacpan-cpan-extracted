@@ -8,14 +8,14 @@ components:
     postcode : 190000
     road : Гороховая улица
     # Saint Petersburg
-    state : Санкт-Петербург 
+    state : Санкт-Петербург
     state_district : Адмиралтейский район
     # Russian Federation
-    country : Российская Федерация 
+    country : Российская Федерация
     country_code : ru
 expected:  |
     Efes Istambul
-    Гороховая улица 23
+    Гороховая улица, 23
     Сенной округ
     Санкт-Петербург
     Российская Федерация

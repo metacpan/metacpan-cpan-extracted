@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [6.1.1] - 2024-10-28
+### Changed
+- [Python] Use the new action cucumber/action-publish-pypi in release process ([#147](https://github.com/cucumber/tag-expressions/pull/147) [#172](https://github.com/cucumber/tag-expressions/pull/172) [#178](https://github.com/cucumber/tag-expressions/pull/178))
+- [Ruby] Fixed up remaining simple cops and began to reduce complexity of code ([#158](https://github.com/cucumber/tag-expressions/pull/158))
+
 ## [6.1.0] - 2024-01-10
 ### Added
 - [Python] Support the feature of escaping also in Python ([#144](https://github.com/cucumber/tag-expressions/pull/144))
@@ -29,34 +34,28 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [5.0.6] - 2023-08-13
 ### Fixed
 - [Perl] Fixed test failures when running tests out-of-tree by
-resticting testdata based tests to run in development only
-(by [ehuelsmann](https://github.com/ehuelsmann))
+restricting testdata based tests to run in development only ([ehuelsmann](https://github.com/ehuelsmann))
 
 ## [5.0.5] - 2023-08-11
 ### Fixed
-- [Perl] Fixed inclusion of CHANGELOG.md causing release to fail
-(by [ehuelsmann](https://github.com/ehuelsmann))
+- [Perl] Fixed inclusion of CHANGELOG.md causing release to fail([ehuelsmann](https://github.com/ehuelsmann))
 
 ## [5.0.4] - 2023-08-10
 ### Fixed
-- [Perl] Corrected working directory for CPAN upload action
-(by [ehuelsmann](https://github.com/ehuelsmann))
+- [Perl] Corrected working directory for CPAN upload action ([ehuelsmann](https://github.com/ehuelsmann))
 
 ## [5.0.3] - 2023-08-10
 ### Fixed
-- [Perl] Fixed CPAN upload in release process
-(by [ehuelsmann](https://github.com/ehuelsmann))
+- [Perl] Fixed CPAN upload in release process ([ehuelsmann](https://github.com/ehuelsmann))
 
 ## [5.0.2] - 2023-07-15
 ### Added
 - [Python] Make tests pass against shared test data (except: backslash-escaped)
-([#18](https://github.com/cucumber/tag-expressions/issues/18)
-by [jenisys](https://github.com/jenisys))
+([#18](https://github.com/cucumber/tag-expressions/issues/18) [jenisys](https://github.com/jenisys))
 
 ### Fixed
-- [All] `Not.to_string()` conversion has unneeded double-parenthesis if binary operator is contained
-([#94](https://github.com/cucumber/tag-expressions/issues/94)
-by [jenisys](https://github.com/jenisys))
+- `Not.to_string()` conversion has unneeded double-parenthesis if binary operator is contained
+([#94](https://github.com/cucumber/tag-expressions/issues/94) [jenisys](https://github.com/jenisys))
 
 ## [5.0.1] - 2023-01-03
 ### Fixed
@@ -74,8 +73,7 @@ by [jenisys](https://github.com/jenisys))
 
 ### Fixed
 - [Perl] Fixed missing dependency as well as new syntax in the tests
-([cucumber/tag-expressions#15](https://github.com/cucumber/tag-expressions/pull/15)
-[ehuelsmann](https://github.com/ehuelsmann))
+([#15](https://github.com/cucumber/tag-expressions/pull/15) [ehuelsmann](https://github.com/ehuelsmann))
 - Document escaping. ([#16](https://github.com/cucumber/tag-expressions/issues/16), [#17](https://github.com/cucumber/tag-expressions/pull/17))
 - [Ruby], [Perl] Empty expression evaluates to true
 - [Go] Fix module name ([#82](https://github.com/cucumber/tag-expressions/pull/82))
@@ -109,15 +107,13 @@ by [jenisys](https://github.com/jenisys))
 ## [3.0.0] - 2020-06-11
 ### Added
 - [Java] Enable consumers to find our version at runtime using `clazz.getPackage().getImplementationVersion()` by upgrading to `cucumber-parent:2.1.0`
-([#976](https://github.com/cucumber/cucumber/pull/976)
-[aslakhellesoy](https://github.com/aslakhellesoy))
+([#976](https://github.com/cucumber/cucumber/pull/976) [aslakhellesoy](https://github.com/aslakhellesoy))
 
 ### Changed
 - [Java] Updated `TagExpressionParser` to use a static method to parse a tag expression and return an `Expression` object to the user.
 - [Java] Reduced public API to the bare minimum required.
 - [Java] Added more informative error messages for `TagExpressionParser` through the `TagExpressionException`.
-([#1005](https://github.com/cucumber/cucumber/pull/1005)
-[cyocum](https://github.com/cyocum)
+([#1005](https://github.com/cucumber/cucumber/pull/1005) [cyocum](https://github.com/cyocum)
 
 ## [2.0.4] - 2020-01-10
 ### Changed
@@ -201,7 +197,8 @@ by [aslakhellesoy](https://github.com/aslakhellesoy))
 ### Added
 - First stable release!
 
-[Unreleased]: https://github.com/cucumber/tag-expressions/compare/v6.1.0...HEAD
+[Unreleased]: https://github.com/cucumber/tag-expressions/compare/v6.1.1...HEAD
+[6.1.1]: https://github.com/cucumber/tag-expressions/compare/v6.1.0...v6.1.1
 [6.1.0]: https://github.com/cucumber/tag-expressions/compare/v6.0.0...v6.1.0
 [6.0.0]: https://github.com/cucumber/tag-expressions/compare/v5.0.6...v6.0.0
 [5.0.6]: https://github.com/cucumber/tag-expressions/compare/v5.0.5...v5.0.6

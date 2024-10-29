@@ -34,7 +34,7 @@ use base qw/Astro::Catalog::IO::ASCII/;
 
 use Data::Dumper;
 
-our $VERSION = '4.37';
+our $VERSION = '4.38';
 
 =begin __PRIVATE_METHODS__
 
@@ -84,18 +84,26 @@ sub _read_catalog {
     # Get the DEFINITIONS element and its contents.
     my $definitions = ( $votable->get_DEFINITIONS())[0];
 
-    # Get the coordinate system (COOSYS) and its contents.
-    my $coosys = ( $definitions->get_COOSYS())[0];
+    my ($equinox, $epoch);
+    if (defined $definitions) {
+        # Get the coordinate system (COOSYS) and its contents.
+        my $coosys = ( $definitions->get_COOSYS())[0];
 
-    # ...and the equinox and epoch and system. I LOVE VOTABLE.
-    my $equinox = $coosys->get_equinox();
-    my $epoch = $coosys->get_epoch();
-    my $system = $coosys->get_system();
-    if( $system =~ /fk4/i ) {
-        $equinox = "B" . $equinox;
+        # ...and the equinox and epoch and system. I LOVE VOTABLE.
+        $equinox = $coosys->get_equinox();
+        $epoch = $coosys->get_epoch();
+        my $system = $coosys->get_system();
+        if( $system =~ /fk4/i ) {
+            $equinox = "B" . $equinox;
+        }
+        else {
+            $equinox = "J" . $equinox;
+        }
     }
     else {
-        $equinox = "J" . $equinox;
+        # Assume J2000 by default?
+        $equinox = 'J2000';
+        $epoch = '2000.0';
     }
 
     # Get the TABLE element.
@@ -121,10 +129,18 @@ sub _read_catalog {
     # loop round UCDs and try and figure out what everthing is so
     # we can stuff the table contents into the relevant places
     my %contents;
+    my $units = ['sexagesimal', 'sexagesimal'];
     foreach my $i (0 ... $#field_ucds) {
-        $contents{"id"} = $i if $field_ucds[$i] =~ "ID_MAIN";
-        $contents{"ra"} = $i if $field_ucds[$i] =~ "POS_EQ_RA_MAIN";
-        $contents{"dec"} = $i if $field_ucds[$i] =~ "POS_EQ_DEC_MAIN";
+        $contents{"id"} = $i if $field_ucds[$i] =~ "ID_MAIN"
+                             or $field_ucds[$i] =~ /META.ID.*MAIN/i;
+        if ($field_ucds[$i] =~ /POS.EQ.RA.*MAIN/i) {
+            $contents{"ra"} = $i;
+            $units->[0] = 'degrees' if $field_units[$i] =~ /^deg/i;
+        }
+        if ($field_ucds[$i] =~ /POS.EQ.DEC.*MAIN/i) {
+            $contents{"dec"} = $i;
+            $units->[1] = 'degrees' if $field_units[$i] =~ /^deg/i;
+        }
         $contents{"quality"} = $i if $field_ucds[$i] =~ "CODE_QUALITY";
         if ($field_ucds[$i] =~ "PHOT_") {
             $contents{$field_ucds[$i]} = $i;
@@ -199,7 +215,7 @@ sub _read_catalog {
             epoch => $epoch,
             pm => \@pm,
             parallax => $parallax,
-            units => 's',
+            units => $units,
         );
 
         # create a star
@@ -327,6 +343,13 @@ sub _write_catalog {
         # Check to see if we should be writing out the proper motions
         # and parallax.
         my $coords = ${$stars}[$star]->coords;
+
+        my $name = $coords->name;
+        my $type = $coords->type;
+        unless ($coords->type eq 'RADEC') {
+            warnings::warnif "Coordinate of type '$type' for target '$name' not currently supported\n";
+            next;
+        }
 
         if (scalar $coords->pm) {
             push @field_names, "RA Proper Motion";

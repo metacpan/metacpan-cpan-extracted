@@ -161,7 +161,7 @@ sub ftpConfig {
   my $host    = $self->{host};
   my $command = "copy running-config ftp://$server/$self->{month}/$self->{date}/";
 
-  $command .= $hostname ? "$hostname\_$host.txt'" : "$host.txt";
+  $command .= $hostname ? "$hostname\_$host.txt" : "$host.txt";
 
   $self->dump("正在执行FTP备份任务");
   my $result = $self->execCommands($command);

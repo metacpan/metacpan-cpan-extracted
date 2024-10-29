@@ -27,7 +27,7 @@ sub ftpConfig {
 
   my $command = "copy running-config ftp://$username\@$server/$self->{month}/$self->{date}/";
 
-  $command .= $hostname ? "$hostname\_$host.txt'" : "$host.txt";
+  $command .= $hostname ? "$hostname\_$host.txt" : "$host.txt";
 
   my $exp    = $self->{exp};
   my $result = $exp->match() || '';

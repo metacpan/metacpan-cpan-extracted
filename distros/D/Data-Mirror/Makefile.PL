@@ -40,9 +40,12 @@ my %WriteMakefileArgs = (
     "vars" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0
+    "LWP::Online" => 0,
+    "LWP::Protocol::https" => 0,
+    "Test::More" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,6 +64,8 @@ my %FallbackPrereqs = (
   "HTTP::Date" => 0,
   "IO::File" => 0,
   "JSON::XS" => 0,
+  "LWP::Online" => 0,
+  "LWP::Protocol::https" => 0,
   "LWP::UserAgent" => 0,
   "List::Util" => 0,
   "POSIX" => 0,
@@ -72,7 +77,8 @@ my %FallbackPrereqs = (
   "open" => 0,
   "strict" => 0,
   "utf8" => 0,
-  "vars" => 0
+  "vars" => 0,
+  "warnings" => 0
 );
 
 

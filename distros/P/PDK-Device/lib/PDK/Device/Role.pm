@@ -107,7 +107,7 @@ sub login {
 
     if (!!$@) {
       chomp($@);
-      warn("捕获到异常：$@");
+      warn("捕获到异常：$@") if $self->debug == 0;
       return {success => 0, reason => $@};
     }
   }
@@ -459,4 +459,3 @@ sub BUILD {
 1;
 
 # ABSTRACT: A Moose role for managing device connections and configurations using Expect.
-

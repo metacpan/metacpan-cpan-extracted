@@ -2,3 +2,12 @@ IT:
     RI: Rieti
     RM: Roma
     RN: Rimini
+GB:
+    BPL:
+      default: Blackpool
+      alt: Borough of Blackpool
+    DUD: Dudley
+    DUR:
+      default: Durham
+      alt: County Durham
+    EAL: London Borough of Ealing

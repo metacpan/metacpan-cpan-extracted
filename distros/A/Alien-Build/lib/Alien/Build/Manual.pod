@@ -14,7 +14,7 @@ Alien::Build::Manual - The Alien::Build Manual
 
 =head1 VERSION
 
-version 2.83
+version 2.84
 
 =head1 SYNOPSIS
 

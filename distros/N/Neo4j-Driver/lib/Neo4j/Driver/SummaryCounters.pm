@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::SummaryCounters;
 # ABSTRACT: Statement statistics
-$Neo4j::Driver::SummaryCounters::VERSION = '0.49';
+$Neo4j::Driver::SummaryCounters::VERSION = '0.50';
 
 sub new {
 	my ($class, $stats) = @_;
@@ -65,21 +65,21 @@ Neo4j::Driver::SummaryCounters - Statement statistics
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 SYNOPSIS
 
- use Neo4j::Driver;
- $driver = Neo4j::Driver->new->basic_auth(...);
- 
- $transaction = $driver->session->begin_transaction;
- $transaction->{return_stats} = 1;
- $query = 'MATCH (n:Novel {name:"1984"}) SET n.writer = "Orwell"';
- $result = $transaction->run($query);
- 
- $counters = $result->summary->counters;
- $database_modified = $counters->contains_updates;
- die "That didn't work out." unless $database_modified;
+  # $session = Neo4j::Driver->new({ ... })->session;
+  
+  $counters = $session->execute_write( sub ($transaction) {
+    my $query = <<~'END';
+      MATCH (m:Movie) WHERE m.released > 2000
+      SET m.new = true
+      END
+    return $transaction->run($query)->consume->counters;
+  });
+  
+  say sprintf '%i nodes updated.', $counters->properties_set;
 
 =head1 DESCRIPTION
 
@@ -87,6 +87,10 @@ Contains counters for various operations that a statement triggered.
 
 To obtain summary counters, call
 L<Neo4j::Driver::ResultSummary/"counters">.
+
+Note that these statistics can be misleading in certain error
+conditions. In particular, using them to verify whether database
+modifications were successful is not advisable.
 
 =head1 ATTRIBUTES
 
@@ -105,20 +109,6 @@ attributes.
  my $properties_set        = $counters->properties_set;
  my $relationships_created = $counters->relationships_created;
  my $relationships_deleted = $counters->relationships_deleted;
-
-=head1 BUGS
-
-These counters may not be useful for verifying that writing to the
-database was successful. For one thing, explicit transactions may
-later be rolled back, rendering these statistics outdated. For
-another, certain error conditions produce misleading statistics: It
-was observed that deleting a node that has relationships fails in a
-Cypher shell with an obscure error message, while it succeeds when
-executed over HTTP with this driver. However, the HTTP response then
-reports that the node was deleted, but that the relationship wasn't, which
-is obviously inconsistent. Not quite sure what is going on there. To
-verify that modifying the database was successful, it would therefore
-probably make more sense to run a MATCH query, tedious or not.
 
 =head1 SEE ALSO
 

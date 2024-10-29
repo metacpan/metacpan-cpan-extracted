@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP::LWP;
 # ABSTRACT: HTTP network adapter for libwww-perl
-$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.49';
+$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.50';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP);
@@ -158,7 +158,7 @@ Neo4j::Driver::Net::HTTP::LWP - HTTP network adapter for libwww-perl
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 SYNOPSIS
 
@@ -244,10 +244,6 @@ configures it using the given L<Neo4j::Driver>.
 
 Returns the L<LWP::UserAgent> instance in use.
 Meant to facilitate reuse.
-
-=head1 BUGS
-
-The C<fetch_event()> method has not yet been optimised.
 
 =head1 SEE ALSO
 

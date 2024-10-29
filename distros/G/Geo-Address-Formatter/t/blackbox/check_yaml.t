@@ -51,6 +51,8 @@ if (-d $path) {
         ok(scalar(@files), 'found at least one yaml file');
 
         foreach my $filename (sort @files) {
+            # to check just one file
+            # next if ($filename !~ m/de.yaml/);
             note('checking ' . $filename);
 
             # special test for main conf file
@@ -67,6 +69,25 @@ if (-d $path) {
                             warn $line;
                             $no_bad_parens = 0;
                             last; # bail out
+                        }
+                    }
+
+                    # check for text in a {{#first}} block
+                    if ($line =~ m/\{\{\#first\}\}/){
+                        while ($line =~ m/\#first\}\}(.*?)\{\{\/first/){
+                            my $text_in_sub = 0;
+                            my $fblock = $1;
+                            my @pieces = split(/ \|\| /, $fblock);
+                            foreach my $piece (@pieces){
+                                $piece =~ s/^\s//;
+                                $piece =~ s/\s$//;
+                                if (($piece !~ m/^\{\{/) || ($piece !~ m/\}\}$/)){
+                                    warn "text in first block $fblock";
+                                    $text_in_sub = 1;
+                                }
+                            }
+                            ok($text_in_sub == 0, "no text in first block");
+                            last;
                         }
                     }
                 }
@@ -92,6 +113,20 @@ if (-d $path) {
                     unlike($text, qr/\t/, 'there is a TAB in the YAML file. That will cause parsing errors');
                 }
 
+                if ($text =~ m/\s+\n/) {
+                    my $line_count = 0;
+                    my $pbool = 0;
+                    foreach my $l (split(/\n/, $text)){
+                        $line_count++;
+                        if ($l =~ m/\s+$/){
+                            if ($pbool == 0){  # print only first time
+                                print STDERR "whitespace at end of line in $filename \n";
+                                $pbool = 1;
+                            }
+                            print STDERR "\tline $line_count : $l \n";
+                        }
+                    }
+                }
                 if ($text !~ m/\n$/) {
                     like($text, qr!\n$!, 'file doesnt end in newline. This will cause parsing errors');
                 }

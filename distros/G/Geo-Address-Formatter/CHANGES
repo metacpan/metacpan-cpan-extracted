@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.9983 2024-10-28
+      - more tests for abbreviations (one yaml file per language)
+      - change regex used in abbreviations
+
 1.9982 2023-06-08
       - no longer use File::Find::Rule to find config files (still used in tests)
       - simplify the logic of reading config files

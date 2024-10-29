@@ -37,6 +37,7 @@ has workdir => (
 
 has debug => (
   is      => 'rw',
+  isa     => 'Int',
   default => sub {
     my $value = $ENV{PDK_CONTENT_DEBUG};
     _debug_init("从环境变量中加载并设置 debug：($value)") if defined $value;
@@ -64,6 +65,13 @@ sub dump {
     my $workdir = "$self->{workdir}/dump/$self->{month}/$self->{date}";
     make_path($workdir) unless -d $workdir;
 
+    my $enc = Encode::Guess->guess($text);
+    ref($enc) or croak "无法猜测编码: $enc";
+    eval { $text = $enc->decode($text); };
+    if (!!$@) {
+      warn("字符串($text)解码失败：$@") if $self->debug == 0;
+    }
+
     my $name     = $self->{name} // $self->now;
     my $filename = "$workdir/$name\_dump.txt";
     open(my $fh, '>>encoding(UTF-8)', $filename) or croak "无法打开文件 $filename 进行写入: $!";
@@ -80,6 +88,12 @@ sub write_file {
   my $workdir = "$self->{workdir}/$self->{month}/$self->{date}";
   make_path($workdir) unless -d $workdir;
 
+  my $enc = Encode::Guess->guess($config);
+  ref($enc) or croak "无法猜测编码: $enc";
+  eval { $config = $enc->decode($config); };
+  if (!!$@) {
+    warn("字符串($config)解码失败：$@") if $self->debug == 0;
+  }
   $self->dump("准备将配置文件写入工作目录: ($workdir)");
 
   my $filename = "$workdir/$name";

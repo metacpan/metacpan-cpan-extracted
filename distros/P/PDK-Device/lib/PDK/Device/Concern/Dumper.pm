@@ -6,6 +6,7 @@ use Moose::Role;
 use Carp       qw(croak);
 use File::Path qw(make_path);
 use namespace::autoclean;
+use Encode::Guess;
 
 
 has month => (
@@ -66,6 +67,13 @@ sub dump {
     my $workdir = "$basedir/dump/$self->{month}/$self->{date}";
     make_path($workdir) unless -d $workdir;
 
+    my $enc = Encode::Guess->guess($text);
+    ref($enc) or croak "无法猜测编码: $enc";
+    eval { $text = $enc->decode($text); };
+    if (!!$@) {
+      warn("字符串($text)解码失败：$@") if $self->debug == 0;
+    }
+
     my $filename = "$workdir/$self->{host}_dump.txt";
     open(my $fh, '>>encoding(UTF-8)', $filename) or croak "无法打开文件 $filename 进行写入: $!";
     print $fh "$text\n"                          or croak "写入文件 $filename 失败: $!";
@@ -81,9 +89,16 @@ sub write_file {
 
   my $workdir = "$self->{workdir}/$self->{month}/$self->{date}";
   make_path($workdir) unless -d $workdir;
-  my $filename = "$workdir/$name";
-  $self->dump("准备将配置文件写入工作目录: ($workdir)");
 
+  my $enc = Encode::Guess->guess($config);
+  ref($enc) or croak "无法猜测编码: $enc";
+  eval { $config = $enc->decode($config); };
+  if (!!$@) {
+    warn("字符串($config)解码失败：$@") if $self->debug == 0;
+  }
+
+  $self->dump("准备将配置文件写入工作目录: ($workdir)");
+  my $filename = "$workdir/$name";
   open(my $fh, '>>:encoding(UTF-8)', $filename) or croak "无法打开文件 $filename 进行写入: $!";
   print $fh $config                             or croak "写入文件 $filename 失败: $!";
   close($fh)                                    or croak "关闭文件句柄 $filename 失败: $!";

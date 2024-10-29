@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.49';
+$Neo4j::Driver::VERSION = '0.50';
 
 use Carp qw(croak);
 
@@ -235,7 +235,7 @@ use parent 'URI::_server';
 # The server methods need to be available for bolt: URI instances
 # even when the Neo4j-Bolt distribution is not installed.
 
- 
+
 1;
 
 __END__
@@ -250,27 +250,28 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 SYNOPSIS
 
- use Neo4j::Driver;
  $uri = 'bolt://localhost';  # requires Neo4j::Bolt
  $uri = 'http://localhost';
- $driver = Neo4j::Driver->new($uri)->basic_auth('neo4j', 'password');
  
- sub say_friends_of ($person) {
-   $query = 'MATCH (a:Person)-[:KNOWS]->(f) '
-             . 'WHERE a.name = $name RETURN f.name';
-   @records = $driver->session->execute_read( sub ($tx) {
-     $tx->run($query, { name => $person })->list;
-   });
-   foreach $record ( @records ) {
-     say $record->get('f.name');
-   }
+ $driver = Neo4j::Driver->new({ uri => $uri, ... });
+ $driver->basic_auth( $user, $password );
+ $session = $driver->session;
+ 
+ $query = <<~ END;
+   MATCH (someone :Person)-[:KNOWS]->(friend)
+   WHERE someone.name = \$name
+   RETURN friend.name
+   END
+ @records = $session->execute_read( sub ($tx) {
+   $tx->run($query, { name => 'Alice' })->list;
+ });
+ foreach my $record ( @records ) {
+   say $record->get('friend.name');
  }
- 
- say_friends_of 'Alice';
 
 =head1 DESCRIPTION
 
@@ -377,7 +378,7 @@ as a hash reference. See L<Neo4j::Driver::Config> for a
 list of supported options. Alternatively, instead of the hash
 reference, the Neo4j server URI may be given as a scalar string.
 
- $driver = Neo4j::Driver->new('http://localhost');
+ $driver = Neo4j::Driver->new('bolt://localhost');
 
 If C<new()> is called with no arguments, a default configuration
 will be used for the driver.
@@ -430,17 +431,6 @@ These warnings may be disabled if desired.
 
  no warnings 'deprecated';
  no warnings 'ambiguous';
-
-=head1 BUGS
-
-See the F<TODO> document and Github for known issues and planned
-improvements. Please report new issues and other feedback on Github.
-
-Just like the official Neo4j drivers, this driver has been designed to strike
-a balance between an idiomatic API for Perl and a uniform surface across all
-languages. Differences between this driver and the official Neo4j drivers in
-either the API or the behaviour are generally to be regarded as bugs unless
-there is a compelling reason for a different approach in Perl.
 
 =head1 SEE ALSO
 

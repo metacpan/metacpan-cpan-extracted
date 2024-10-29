@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Libdnet.
 
+0.990 Mon 28 Oct 16:01:32 CET 2024
+   - bugfix: applied https://rt.cpan.org/Ticket/Display.html?id=156137
+
 0.99 Tue 18 Sep 17:03:16 CEST 2018
    - bugfix: applied https://rt.cpan.org/Public/Bug/Display.html?id=126967
 

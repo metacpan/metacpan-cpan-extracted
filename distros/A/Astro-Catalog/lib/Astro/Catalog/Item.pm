@@ -52,7 +52,7 @@ use Astro::FluxColor;
 # Register an Astro::Catalog::Item warning category
 use warnings::register;
 
-our $VERSION = '4.37';
+our $VERSION = '4.38';
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -1476,6 +1476,13 @@ sub configure {
             dec => $dec);
         delete $check{ra};
         delete $check{dec};
+    }
+
+    # If we have "coords", process this first, as some of the other
+    # accessors assign information to the coords object.
+    if (exists $check{'coords'}) {
+        $self->coords($check{'coords'});
+        delete $check{'coords'};
     }
 
     # Loop over the allowed keys storing the values

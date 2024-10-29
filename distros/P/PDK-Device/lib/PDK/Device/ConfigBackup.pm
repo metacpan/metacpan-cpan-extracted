@@ -81,6 +81,13 @@ sub getConfigJob {
   while (my $data = $queue->dequeue_nb()) {
     push @{$result->{$_}}, @{$data->{$_}} for qw(success fail);
   }
+
+  for my $type (qw(success fail)) {
+    if (my $count = @{$result->{$type}}) {
+      unshift @{$result->{$type}}, sprintf "[getConfigJob] 配置备份任务执行完毕，执行%s共计：%d", $type eq 'success' ? '成功' : '异常',
+        $count;
+    }
+  }
   $self->dump("[getConfigJob] 配置备份任务执行完毕，正在将运行结果写入日志文件中");
 
   for my $type (qw(success fail)) {
@@ -126,6 +133,13 @@ sub ftpConfigJob {
   while (my $data = $queue->dequeue_nb()) {
     push @{$result->{$_}}, @{$data->{$_}} for qw(success fail);
   }
+
+  for my $type (qw(success fail)) {
+    if (my $count = @{$result->{$type}}) {
+      unshift @{$result->{$type}}, sprintf "[ftpConfigJob] FTP配置备份任务执行完毕，执行%s共计：%d", $type eq 'success' ? '成功' : '异常',
+        $count;
+    }
+  }
   $self->dump("[ftpConfigJob] FTP配置备份任务执行完毕，正在将运行结果写入日志文件中");
 
   for my $type (qw(success fail)) {
@@ -170,6 +184,13 @@ sub execCommandsJob {
   my $result = $self->{result}{execCommands};
   while (my $data = $queue->dequeue_nb()) {
     push @{$result->{$_}}, @{$data->{$_}} for qw(success fail);
+  }
+
+  for my $type (qw(success fail)) {
+    if (my $count = @{$result->{$type}}) {
+      unshift @{$result->{$type}}, sprintf "[execCommandsJob] 脚本自动下发任务执行完毕，执行%s共计：%d",
+        $type eq 'success' ? '成功' : '异常', $count;
+    }
   }
   $self->dump("[execCommandsJob] 脚本自动下发任务执行完毕，正在将运行结果写入日志文件中");
 
@@ -227,6 +248,13 @@ sub runCommandsJob {
   my $result = $self->{result}{execCommands};
   while (my $data = $queue->dequeue_nb()) {
     push @{$result->{$_}}, @{$data->{$_}} for qw(success fail);
+  }
+
+  for my $type (qw(success fail)) {
+    if (my $count = @{$result->{$type}}) {
+      unshift @{$result->{$type}}, sprintf "[runCommandsJob] 脚本自动下发(高权模式)任务执行完毕，执行%s共计：%d",
+        $type eq 'success' ? '成功' : '异常', $count;
+    }
   }
   $self->dump("[runCommandsJob] 脚本自动下发(高权模式)任务执行完毕，正在将运行结果写入日志文件中");
 
@@ -378,6 +406,13 @@ sub dump {
     my $basedir = $ENV{PDK_DEVICE_HOME} // glob("~");
     my $workdir = "$basedir/dump/$self->{month}/$self->{date}";
     make_path($workdir) unless -d $workdir;
+
+    my $enc = Encode::Guess->guess($text);
+    ref($enc) or croak "无法猜测编码: $enc";
+    eval { $text = $enc->decode($text); };
+    if (!!$@) {
+      warn("字符串($text)解码失败：$@") if $self->debug == 0;
+    }
 
     my $filename = "$workdir/backup_dump.txt";
     open(my $fh, '>>encoding(UTF-8)', $filename) or croak "无法打开文件 $filename 进行写入: $!";

@@ -13,7 +13,7 @@ Neo4j::Driver::Types - Type mapping from Neo4j to Perl and vice versa
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 MAPPING
 
@@ -212,10 +212,8 @@ version of L<Neo4j::Driver>:
 =over
 
 =item *
-Byte arrays are not supported as query parameters.
-
-=item *
-Temporal and spatial values are not supported as query parameters.
+Byte arrays, spatial values, and temporal values cannot be used as
+query parameters. This is due to a limitation in the Neo4j server.
 
 =item *
 The use of L<builtin::true|builtin/"true"> and
@@ -235,11 +233,11 @@ and limitations related to types are known for JSON:
 =over
 
 =item *
-Byte arrays are not supported as query parameters.
 Byte arrays are coded as lists of integers in JSON results.
 
 =item *
-Temporal and spatial values are not supported as query parameters.
+Byte arrays, spatial values, and temporal values cannot be used as
+query parameters. This is due to a limitation in the Neo4j server.
 
 =item *
 The use of L<builtin::true|builtin/"true"> and

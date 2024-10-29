@@ -20,7 +20,9 @@ use base qw(Exporter);
 use open qw(:std :utf8);
 use strict;
 use utf8;
-use vars qw(%EXPORT_TAGS $TTL_SECONDS $UA $JSON $VERSION $CSV);
+use vars qw($VERSION %EXPORT_TAGS $TTL_SECONDS $UA $JSON $CSV);
+
+$VERSION = '0.07';
 
 $EXPORT_TAGS{'all'} = [qw(
     mirror_str
@@ -185,7 +187,7 @@ sub filename {
             sha256_hex(
                 getlogin(),
                 ':',
-                ($url->isa('URI') ? $url->as_string : $url),
+                ($url->isa('URI') ? $url->canonical->as_string : $url),
             ),
             'dat'
         ))
@@ -223,7 +225,7 @@ Data::Mirror - a simple way to efficiently retrieve data from the World Wide Web
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -269,14 +271,14 @@ The return value will be C<undef> if there's an error. The module will C<carp()>
 so you can catch any errors.
 
 I<Note: it's possible that the remote resource will actually be someting that
-evaluates to C<undef> (for example, a JSON document that is exactly C<"null">, or
-a YAML document that is exactly C<"~">), or if there is an error parsing the
+evaluates to C<undef> (for example, a JSON document that is exactly C<"null">,
+or a YAML document that is exactly C<"~">), or if there is an error parsing the
 resource once retrieved. Consider wrapping the method call in C<eval> if you
 need to distinguish between these scenarios.>
 
 By default, if the locally cached version of the resource is younger than
-C<$Data::Mirror::TTL_SECONDS> old, C<Data::Mirror> will just use it and won't try to
-refresh it, but you can override that per-request by passing the C<$ttl>
+C<$Data::Mirror::TTL_SECONDS> old, C<Data::Mirror> will just use it and won't
+try to refresh it, but you can override that per-request by passing the C<$ttl>
 argument:
 
     $value = Data::Mirror::mirror_TYPE($url, $ttl);
@@ -394,7 +396,7 @@ Gavin Brown <gavin.brown@fastmail.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Gavin Brown.
+This software is copyright (c) 2024 by Gavin Brown.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

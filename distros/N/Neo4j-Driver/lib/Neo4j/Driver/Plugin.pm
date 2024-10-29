@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Driver::Plugin;
 # ABSTRACT: Plug-in interface for Neo4j::Driver
-$Neo4j::Driver::Plugin::VERSION = '0.49';
+$Neo4j::Driver::Plugin::VERSION = '0.50';
 
 1;
 
@@ -20,7 +20,7 @@ Neo4j::Driver::Plugin - Plug-in interface for Neo4j::Driver
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 SYNPOSIS
 
@@ -509,19 +509,12 @@ At least scheme, host, and port must be included.
 
 =head2 Result handler API
 
-Making a Neo4j result handler API available to plug-ins will
-require significant internal changes to the driver. These
-are currently being postponed, at least until most of the
-L<deprecated functionality|Neo4j::Driver::Deprecations> has
-been removed from the driver's code base.
-
-Even then, the result handler API may have low priority.
-However, new plug-in events are anticipated in a future version
-that should enable clients to achieve some of the same goals.
-
-In the meantime, the result handler API remains not formally
+The result handler API remains not formally
 specified. It is an internal API that is evolving and may be
 subject to unannounced change; see L</"USE OF INTERNAL APIS">.
+Specifying a Neo4j result handler API for the use of plug-ins
+and/or adding new plug-in events that may enable clients to
+achieve some of the same goals has low priority.
 
 A few notes on the result handler API that may or may not be
 accurate by the time you read this:

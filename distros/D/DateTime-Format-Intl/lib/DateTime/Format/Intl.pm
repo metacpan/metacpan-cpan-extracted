@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Intl - ~/lib/DateTime/Format/Intl.pm
-## Version v0.1.4
+## Version v0.1.5
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/09/16
-## Modified 2024/10/10
+## Modified 2024/10/12
 ## All rights reserved
 ## 
 ## 
@@ -29,7 +29,7 @@ BEGIN
     use Locale::Unicode::Data;
     use Scalar::Util ();
     use Want;
-    our $VERSION = 'v0.1.4';
+    our $VERSION = 'v0.1.5';
     our $CACHE = {};
     our $LAST_CACHE_CLEAR = time();
     our $MAX_CACHE_SIZE = 30;
@@ -578,7 +578,7 @@ sub new
             {
                 # Define the combine mode as the most comprehensive mode of either date or time style specified
                 my $datetime_mode = $number2mode->{ _max( $mode2number->{ $dateStyle }, $mode2number->{ $timeStyle } ) };
-                my $code_datetime = $cldr->can( "datetime_format_${datetime_mode}" ) ||
+                my $code_datetime = $unicode->can( "datetime_format_${datetime_mode}" ) ||
                     return( $self->error( "No method datetime_format_${datetime_mode} found in ", ref( $unicode ) ) );
                 $pattern = $code_datetime->( $unicode );
                 return( $self->pass_error( $unicode->error ) ) if( !defined( $date_pattern ) && $unicode->error );
@@ -5165,7 +5165,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.1.4
+    v0.1.5
 
 =head1 DESCRIPTION
 
@@ -5205,7 +5205,7 @@ Whatever value you provide, does not actually have any influence on the algorith
 
 =item * C<calendar>
 
-The calendar to use, such as C<chinese>, C<gregorian> (or C<gregory>), C<persian>, and so on. For a list of calendar types, see L<Intl.Locale.prototype.getCalendars()|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/getCalendars#supported_calendar_types>, and the perl module L<Locale::Intl>. This option can also be set through the C<ca> Unicode extension key; if both are provided, this options property takes precedence. See L<Locale::Unicode/ca>
+The calendar to use, such as C<chinese>, C<gregorian> (or C<gregory>), C<persian>, and so on. For a list of calendar types, see L<Intl.Locale.prototype.getCalendars()|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/getCalendars#supported_calendar_types>, and the method L<getAllCalendars|Locale::Intl/getAllCalendars> in the perl module L<Locale::Intl>. This option can also be set through the C<ca> Unicode extension key; if both are provided, this options property takes precedence. See L<Locale::Unicode/ca>
 
 For example, a Japanese locale with the C<japanese> calendar extension set:
 
@@ -5517,7 +5517,7 @@ Same as L<formatToParts|/formatToParts>
 
 This C<formatRange()> method takes 2 L<DateTime> objects, and formats the range between 2 dates and returns a string.
 
-The format used is the most concise way based on the locales and options provided when instantiating the new L<DateTime::Format::Intl> object. When no option were provided upon object instantiation, it default to a short version of the date format using L<date_format_short|DateTime::Locale::FromData/date_format_short>), which, in turn, gets interpreted in various formats depending on the locale chosen. In British English, this would be C<10/05/2024> for May 10th, 2024.
+The format used is the most concise way based on the locales and options provided when instantiating the new L<DateTime::Format::Intl> object. When no option were provided upon object instantiation, it default to a short version of the date format using L<date_format_short|DateTime::Locale::FromCLDR/date_format_short>), which, in turn, gets interpreted in various formats depending on the locale chosen. In British English, this would be C<10/05/2024> for May 10th, 2024.
 
 =head2 formatRangeToParts
 

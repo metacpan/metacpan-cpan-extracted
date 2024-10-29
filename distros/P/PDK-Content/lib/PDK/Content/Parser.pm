@@ -7,11 +7,11 @@ use namespace::autoclean;
 
 extends 'PDK::Content::Reader';
 
-has '+id' => (required => 0,);
+has '+id' => (required => 0, );
 
-has '+name' => (required => 0,);
+has '+name' => (required => 0, );
 
-has '+type' => (required => 0,);
+has '+type' => (required => 0, );
 
 
 __PACKAGE__->meta->make_immutable;

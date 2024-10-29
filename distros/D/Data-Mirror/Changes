@@ -1,4 +1,11 @@
-0.05 - 2025-07-05:
+0.07 - 2024-10-18:
+  - correctly set $VERSION in Mirror.pm so the user agent string is valid.
+  - canonicalise URL when generating filename.
+
+0.06 - 2024-10-18:
+  - use LWP::Online to skip tests when running without connectivity.
+
+0.05 - 2024-07-05:
   - add the mirrored() and stale() functions.
 
 0.04 - 2024-06-03:

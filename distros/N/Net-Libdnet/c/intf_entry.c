@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- * Copyright (c) 2008-2012 Patrice <GomoR> Auffret
+ * Copyright (c) 2008-2024 Patrice <GomoR> Auffret
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions

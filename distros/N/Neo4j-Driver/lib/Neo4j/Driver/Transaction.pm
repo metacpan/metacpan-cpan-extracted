@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.49';
+$Neo4j::Driver::Transaction::VERSION = '0.50';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -296,28 +296,38 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 SYNOPSIS
 
- use Neo4j::Driver;
- $session = Neo4j::Driver->new->basic_auth(...)->session;
+ # Managed transaction function
+ $session->execute_write( sub ($transaction) {
+   $transaction->run( ... );
+   # Automatic commit upon subroutine return
+   
+   if ( my $failure = ... ) {
+     die;   # any exception will cause a rollback
+     $transaction->rollback;  # explicit rollback
+   }
+ });
  
- # Commit
- $tx = $session->begin_transaction;
- $node_id = $tx->run(
-   'CREATE (p:Person) RETURN id(p)'
- )->single->get;
- $tx->run(
-   'MATCH (p) WHERE id(p) = {id} SET p.name = {name}',
-   {id => $node_id, name => 'Douglas'}
- );
- $tx->commit;
+ # Unmanaged explicit transaction
+ $transaction = $session->begin_transaction;
+ $transaction->run( ... );
+ if ( my $success = ... ) {
+   $transaction->commit;
+ } else {
+   $transaction->rollback;
+ }
  
- # Rollback
- $tx = $session->begin_transaction;
- $tx->run('CREATE (a:Universal:Answer {value:42})');
- $tx->rollback;
+ # Query parameters
+ $query = "RETURN \$param";
+ $transaction->run( $query, { param => $value, ... } );
+ $transaction->run( $query,   param => $value, ...   );
+ 
+ # Neo4j v2 syntax for query parameters
+ $driver->config( cypher_params => v2 );
+ $query = "RETURN {param}";
 
 =head1 DESCRIPTION
 
@@ -328,9 +338,9 @@ object corresponds to a server transaction.
 Statements may be run lazily. Most of the time, you will not notice
 this, because the driver automatically waits for statements to
 complete at specific points to fulfill its contracts. If you require
-execution of a statement to have completed, you need to use the
-L<Result|Neo4j::Driver::Result>, for example by calling
-one of the methods C<fetch()>, C<list()> or C<summary()>.
+execution of a statement to have completed (S<e. g.> to check for
+statement errors), you need to call any method in the
+L<Result|Neo4j::Driver::Result>, such as C<has_next()>.
 
 Neo4j drivers allow the creation of different kinds of transactions.
 See L<Neo4j::Driver::Session> for details.
@@ -345,7 +355,7 @@ L<Neo4j::Driver::Transaction> implements the following methods.
 
 Commits an unmanaged transaction.
 
-After committing the transaction is closed and can no longer be used.
+After committing, the transaction is closed and can no longer be used.
 
 =head2 is_open
 
@@ -354,9 +364,10 @@ After committing the transaction is closed and can no longer be used.
 Report whether this transaction is still open, which means commit
 or rollback has not happened and the transaction has not timed out.
 
-Bolt transactions by default have no timeout, while the default
-C<dbms.rest.transaction.idle_timeout> for HTTP transactions is
-S<60 seconds.>
+Bolt transactions by default have no timeout. If necessary, the
+timeout for idle HTTP transactions may be configured in the Neo4j
+server using the setting C<dbms.rest.transaction.idle_timeout> or
+C<server.http.transaction_idle_timeout>, depending on the version.
 
 =head2 rollback
 
@@ -369,7 +380,8 @@ used.
 
 =head2 run
 
- $result = $transaction->run($query, %params);
+ $result = $transaction->run($query);
+ $result = $transaction->run($query, \%params);
 
 Run a statement and return the L<Result|Neo4j::Driver::Result>.
 This method takes an optional set of parameters that will be injected
@@ -394,8 +406,8 @@ shown in the following example:
  $parameters = {
    number =>  0 + $scalar,
    string => '' . $scalar,
-   true   => \1,
-   false  => \0,
+   true   => builtin::true,   # or JSON::PP::true
+   false  => builtin::false,  # or JSON::PP::false
    null   => undef,
    list   => [ ],
    map    => { },
@@ -428,23 +440,24 @@ See L<Neo4j::Driver::Plugin/"error"> for accessing error details.
 
 Statement errors occur when the statement is executed on the server.
 This may not necessarily have happened by the time C<run()> returns.
-If you use L<C<try>|perlsyn/"Try"> to handle errors, make sure
-you actually I<use> the L<Result|Neo4j::Driver::Result> within
-the C<try> block, for example by retrieving a record or calling
-the method C<has_next()>.
+If you use L<C<try>/C<catch>|Feature::Compat::Try> to handle errors,
+make sure you actually I<use> the L<Result|Neo4j::Driver::Result>
+within the C<try> block, for example by retrieving a record or
+calling the method C<has_next()>.
 
 Transactions are rolled back and closed automatically if the Neo4j
 server encounters an error when running a query. However, if an
-I<internal> error occurs in the driver or in one of its supporting
-modules, unmanaged transactions may remain open.
+error with the network connection to the server occurs, or if an
+internal error occurs in the driver or in one of its supporting
+modules, I<unmanaged> transactions may remain open.
 
 Typically, no particular handling of error conditions is required.
-But if you wrap your transaction in a C<try> (or C<eval>) block,
+But if you use L<C<try>/C<catch>|Feature::Compat::Try>,
 you intend to continue using the same session even after an error
 condition, I<and> you want to be absolutely sure the session is in
 a defined state, you can roll back a failed transaction manually:
 
- use feature 'try';
+ use Feature::Compat::Try;
  $tx = $session->begin_transaction;
  try {
    ...;
@@ -474,8 +487,6 @@ L<ITransaction (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/b64c7dfe
 L<Sessions & Transactions (Python)|https://neo4j.com/docs/api/python-driver/5.2/api.html#transaction>
 
 =item * Neo4j L<Transactional Cypher HTTP API|https://neo4j.com/docs/http-api/5/actions/>
-
-=item * L<Feature::Compat::Try>
 
 =back
 

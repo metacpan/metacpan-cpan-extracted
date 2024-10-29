@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.83
+    version 2.84
 
 SYNOPSIS
 
@@ -655,6 +655,18 @@ METHODS
     This will return the install type. (See the like named install property
     above for details). This method will call probe if it has not already
     been called.
+
+ is_system_install
+
+     my $boolean = $build->is_system_install;
+
+    Returns true if the alien is a system install type.
+
+ is_share_install
+
+     my $boolean = $build->is_share_install;
+
+    Returns true if the alien is a share install type.
 
  download_rule
 

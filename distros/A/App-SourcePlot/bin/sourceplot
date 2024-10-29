@@ -2,11 +2,11 @@
 
 =head1 NAME
 
-sourceplot - display a plot of astronomical sources on adjustable axes
+sourceplot - Display a plot of astronomical sources on adjustable axes
 
 =head1 SYNOPSIS
 
-    sourceplot [--help | --version] [--date YYYY-MM-DD]
+    sourceplot [--help | --version] [--date YYYY-MM-DD] [--telposition TELESCOPE] [--samp]
 
 =head1 PURPOSE
 
@@ -42,6 +42,15 @@ Show version information.
 =item --date YYYY-MM-DD
 
 Select initial date.
+
+=item --telposition TELESCOPE
+
+Indicate current pointing position of given telescope, if available.
+
+=item --samp
+
+Enable SAMP interface.  Will attempt to register with a SAMP hub and
+listen for C<table.load.votable> messages.
 
 =back
 
@@ -267,28 +276,49 @@ sourceplot when it starts up.
 use strict;
 use warnings;
 
-our $VERSION = '1.31';
+our $VERSION = '1.32';
 
 use Pod::Usage;
 use Getopt::Long;
 use App::SourcePlot;
 
-my ($option_help, $option_version, $option_date);
-GetOptions('help|man' => \$option_help,
-           'version' => \$option_version,
-           'date=s' => \$option_date)
-  or pod2usage(-verbose => 0);
+my ($option_help, $option_version, $option_date, $option_telposn, $option_samp);
+GetOptions(
+    'help|man' => \$option_help,
+    'version' => \$option_version,
+    'date=s' => \$option_date,
+    'telposition=s' => \$option_telposn,
+    'samp' => \$option_samp,
+) or pod2usage(-verbose => 0);
 pod2usage(-verbose => 2) if $option_help;
 
 if ($option_version) {
-  print 'SourcePlot launch script version ' . $VERSION . "\n";
-  print 'Using App::SourcePlot application version ' . $App::SourcePlot::VERSION . "\n";
-  exit(0);
+    print 'SourcePlot launch script version ' . $VERSION . "\n";
+    print 'Using App::SourcePlot application version ' . $App::SourcePlot::VERSION . "\n";
+    exit(0);
 }
 
-my %arg = ();
+my %arg = (
+    plugins => [],
+);
 
 $arg{'date'} = $option_date if defined $option_date;
+
+unless (defined $option_telposn) {
+}
+elsif ('JCMT' eq uc $option_telposn) {
+    require App::SourcePlot::TelPosn::JCMT;
+    $arg{'telposn'} = App::SourcePlot::TelPosn::JCMT->new;
+}
+else {
+    print "Unable to obtain position of telescope $option_telposn\n";
+    exit(1);
+}
+
+if ($option_samp) {
+    require App::SourcePlot::VO::SAMP;
+    push @{$arg{'plugins'}}, App::SourcePlot::VO::SAMP->new();
+}
 
 App::SourcePlot::run_sourceplot_gui(%arg);
 

@@ -12,7 +12,7 @@ extends 'PDK::Device::Huawei';
 sub getConfig {
   my $self = shift;
 
-  my $commands = ["screen-width 512", "screen-length 512 temporary", "dis current-configuration", "save" ];
+  my $commands = ["screen-width 512", "screen-length 512 temporary", "dis current-configuration", "save", ];
 
   my $config = $self->execCommands($commands);
 
@@ -42,7 +42,7 @@ sub ftpConfig {
   my $host    = $self->{host};
   my $command = "put config.cfg $self->{month}/$self->{date}/";
 
-  $command .= $hostname ? "$hostname\_$host.txt'" : "$host.txt";
+  $command .= $hostname ? "$hostname\_$host.txt" : "$host.txt";
 
   my $exp    = $self->{exp};
   my $result = $exp ? $exp->match() || '' : '';

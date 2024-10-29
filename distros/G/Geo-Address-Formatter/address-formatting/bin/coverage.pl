@@ -24,13 +24,16 @@ if ($help) {
     exit(0);
 }
 
-# get the list of countries
+# get the list of countries (ISO codes)
 my %countries;
 my $country_file = dirname(__FILE__) . "/../conf/country_codes.yaml";
 open my $FH, "<:encoding(UTF-8)", $country_file or die "unable to open $country_file $!";
 while (my $line = <$FH>){
     chomp($line);
     if ($line =~ m/^(\w\w): \# (.*)$/){
+        $countries{$1} = $2;
+    }
+    elsif ($line =~ m/^"(\w\w)": \# (.*)$/){  # deal with "NO" quoting in yaml
         $countries{$1} = $2;
     }
 }
@@ -50,10 +53,13 @@ foreach my $f (sort @files){
     $f =~ s/\.yaml//;
     $f = uc($f);
     $test_countries{$f} = 1;
+    if (!defined($countries{$f})){
+        print STDERR "have a test for $f but it is not a known territory\n";
+    }
 }
 my $test_countries = scalar(keys %test_countries);
 my $test_perc = int(100 * $test_countries / $total_countries );
-print "We have tests for " .  $test_countries . ' ('
+print "We have at least one test for " .  $test_countries . ' ('
     . $test_perc . '%) territories' .  "\n";
 if ($details){
     print "We need tests for:\n";

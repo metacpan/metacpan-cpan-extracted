@@ -1,6 +1,9 @@
-#!perl -w
+#!/usr/bin/perl
+use LWP::Online qw(online);
 use Test::More;
+use LWP::Protocol::https; # ensure this is installed otherwise tests will fail.
 use vars qw($result);
+use warnings;
 use strict;
 
 BEGIN { use_ok(q{Data::Mirror}, qw(:all)) }
@@ -9,6 +12,11 @@ BEGIN { use_ok(q{Data::Mirror}, qw(:all)) }
 # speed up repeated runs by caching everything for a day
 #
 $Data::Mirror::TTL_SECONDS = 86400;
+
+if (!online()) {
+    done_testing();
+    exit;
+}
 
 #
 # string mirror

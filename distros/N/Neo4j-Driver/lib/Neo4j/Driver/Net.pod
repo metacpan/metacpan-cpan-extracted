@@ -13,7 +13,7 @@ Neo4j::Driver::Net - Explains the design of the networking modules
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 OVERVIEW
 
@@ -47,9 +47,7 @@ information on this topic.
 
 =head1 SYNPOSIS
 
- $helper = Neo4j::Driver::Net::HTTP->new({
-   net_module => 'Local::Neo4jUserAgentHTTP',
- });
+ $helper = Neo4j::Driver::Net::HTTP->new($driver);
  
  $helper->_set_database($db_name);
  $helper->{active_tx} = ...;
@@ -60,7 +58,7 @@ information on this topic.
  $json_coder = $helper->{http_agent}->json_coder;
  $json_coder->decode( $helper->{http_agent}->fetch_all );
 
-B<WARNING:> Some of these calls are private APIs.
+B<WARNING:> Most of these calls are private APIs.
 See L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS">.
 
 =head1 FEATURES
@@ -131,27 +129,12 @@ as a simple state machine in the backend Bolt library (see
 L<Bolt Protocol Server State Spec|https://7687.org/bolt/bolt-protocol-server-state-specification-4.html#appendix---bolt-message-state-transitions>),
 L<Neo4j::Bolt> currently doesn't allow users to directly observe
 state changes, so it is currently somewhat difficult to determine
-the Bolt connection state. The driver attempts to infer it based
-on the behaviour of L<Neo4j::Bolt>, and mostly gets it right, but
-there may be some as-yet-unknown issues. Bug reports are welcome.
-
-One key difference between HTTP and Bolt is the handling of
-transaction state in case of Neo4j errors. According to
-L<Neo4j Status Codes|https://neo4j.com/docs/status-codes/4.2/>,
-the effect of errors is always a transaction rollback. On HTTP,
-these rollbacks take place immediately. On Bolt, however, the
-transaction is typically only marked as uncommittable on the Neo4j
-server, but the Bolt connection is not actually put into the
-C<FAILED> state immediately. To try and work around this difference
-between HTTP and Bolt, this driver's Bolt network controller always
-attempts an explicit transaction rollback if faced with any error
-condition. Again, this approach mostly gets it right, but there
-may be some remaining issues, particularly when network errors and
-server errors happen simultaneously.
+the Bolt connection state. This driver infers it based
+on the behaviour of L<Neo4j::Bolt>.
 
 =head1 COMPATIBILITY
 
-L<Neo4j::Driver> S<version 0.21> is compatible with
+L<Neo4j::Driver> S<version 0.50> is compatible with
 S<L<Neo4j::Bolt> 0.01> or later.
 Note that some L<Neo4j::Bolt> and L<Neo4j::Client> versions are
 broken, or simply incompatible with each other. Recommended pairs
@@ -166,15 +149,15 @@ of known-good module versions are as follows:
   0.20    0.17  3.4
   0.12     -    3.4  (system libneo4j-client)
 
-When using HTTP, S<L<Neo4j::Driver> 0.21> supports determining the
+When using HTTP, S<L<Neo4j::Driver> 0.50> supports determining the
 version of any Neo4j server via L<Neo4j::Driver::Session/"server">.
 This even works on S<Neo4j 1.x>, but running statements on
 S<Neo4j 1.x> will fail, because it lacks the transactional API.
 
-S<L<Neo4j::Driver> 0.21> is compatible with Neo4j S<versions 2.x>,
-S<3.x, and 4.x>. It supports HTTP responses in the
-L<formats|https://neo4j.com/docs/http-api/4.2/actions/result-format/>
-JSON and Jolt (both strict mode and sparse mode).
+S<L<Neo4j::Driver> 0.50> is compatible with Neo4j S<versions 2.x>,
+3.x, S<4.x, and 5.x>. It supports HTTP responses in the
+L<formats|https://neo4j.com/docs/http-api/4.4/actions/result-format/>
+JSON and Jolt (strict and sparse, line-delimited and sequenced).
 Only HTTP 1.1 is supported.
 
 For Bolt as well as HTTP, future versions of the driver will tend
@@ -184,11 +167,6 @@ is likely to only be dropped with major updates to the driver
 (such as S<0.x to 1.x>).
 
 =head1 BUGS AND LIMITATIONS
-
-As described above, there may be cases in which the state of a
-Bolt connection is not determined correctly, leading to unexpected
-failures. If such bugs do exist, they are expected to mostly happen
-in rare edge cases, but please be sure to report any problems.
 
 Clock synchronisation using the HTTP C<Date> header does not take
 into account network delays. In case of high network latency, the
@@ -212,13 +190,11 @@ metadata (L<#12306|https://github.com/neo4j/neo4j/issues/12306>).
 
 =back
 
-As of S<Neo4j 4.2>, the Jolt documentation for byte arrays
-doesn't match the implementation
-(L<#12660|https://github.com/neo4j/neo4j/issues/12660>). Future
-Neo4j versions might fix the implementation to match the docs.
+For further limitations related to data types, see
+L<Neo4j::Driver::Types/"BUGS AND LIMITATIONS">.
 
-Neo4j spatial and temporal types are not currently implemented
-in all response format parsers.
+Should you discover any other issues with the driver, please be sure
+to report them on GitHub.
 
 =head2 IPv6 / dual-stack support
 
@@ -251,6 +227,12 @@ Specifying C<127.0.0.1> instead of C<localhost> seems to avoid
 this problem entirely. The same seems to be true for C<::1>
 (not sure why).
 
+The algorithm known as L<Happy Eyeballs
+(RFC 8305)|https://datatracker.ietf.org/doc/html/rfc8305>
+can prevent this kind of issue, but L<IO::Socket::IP> doesn't
+currently implement it
+(L<RT 78136|https://rt.cpan.org/Ticket/Display.html?id=78136>).
+
 This issue never seemed to occur with Neo4j 3.5, which raises
 the question which of the changes that came with S<version 4.0>
 may have caused this. While I don't have the answer, it seems
@@ -275,7 +257,7 @@ see L<Neo4j::Driver::Deprecations/"Custom networking modules">.
 
 By default, Bolt networking uses the amazing XS module
 L<Neo4j::Bolt> by Mark A. Jensen (MAJENSEN), which in turn uses the
-S<C library> L<libneo4j-client|https://neo4j-client.net/>
+S<C library> L<libneo4j-omni|https://majensen.github.io/libneo4j-omni/>
 to actually connect to the Neo4j server. Updates and improvements
 are quite possibly best made directly in those libraries, so that
 not only L<Neo4j::Driver>, but also other users benefit from them.
@@ -297,9 +279,9 @@ see L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS">.
 =head2 Custom HTTP networking modules
 
 L<Neo4j::Driver> includes a default HTTP network adapter.
-The included adapter may change in future. As of S<version 0.21>,
-the default adapter uses L<LWP> directly. Earlier versions used
-L<REST::Client>.
+The included adapter may change in future. As of S<version 0.50>,
+the default adapter uses L<LWP> directly. Versions earlier
+S<than 0.21> used L<REST::Client>.
 
 The driver's test suite still uses the former C<net_module>
 option internally. Modules to be used as C<net_module> must

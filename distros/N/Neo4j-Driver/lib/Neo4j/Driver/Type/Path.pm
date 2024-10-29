@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Path;
 # ABSTRACT: Directed sequence of relationships between two nodes
-$Neo4j::Driver::Type::Path::VERSION = '0.49';
+$Neo4j::Driver::Type::Path::VERSION = '0.50';
 
 # For documentation, see Neo4j::Driver::Types.
 

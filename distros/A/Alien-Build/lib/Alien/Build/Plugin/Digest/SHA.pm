@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Plugin to check SHA digest with Digest::SHA
-our $VERSION = '2.83'; # VERSION
+our $VERSION = '2.84'; # VERSION
 
 
 sub init
@@ -57,7 +57,7 @@ Alien::Build::Plugin::Digest::SHA - Plugin to check SHA digest with Digest::SHA
 
 =head1 VERSION
 
-version 2.83
+version 2.84
 
 =head1 SYNOPSIS
 

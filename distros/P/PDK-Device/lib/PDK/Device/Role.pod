@@ -2,12 +2,12 @@
 
 =head1 NAME
 
-PDK::Device::Base - A Moose role providing basic interaction functionality with network devices
+PDK::Device::Role - A Moose role providing basic interaction functionality with network devices
 
 =head1 SYNOPSIS
 
   package PDK::Device::Cisco;
-  with "PDK::Device::Base";
+  with "PDK::Device::Role";
 
   # Initialize the object
   my $device = PDK::Device::Cisco->new(
@@ -39,11 +39,11 @@ PDK::Device::Base - A Moose role providing basic interaction functionality with 
 
 =head1 DESCRIPTION
 
-PDK::Device::Base is a Moose role that provides basic interaction functionality with network devices. It includes methods for logging in, sending commands, error handling, and managing device connections. This module is designed to be used as a base for specific device type implementations.
+PDK::Device::Role is a Moose role that provides basic interaction functionality with network devices. It includes methods for logging in, sending commands, error handling, and managing device connections. This module is designed to be used as a Role for specific device type implementations.
 
 =head1 ENVIRONMENT VARIABLES
 
-PDK::Device::Base supports the following environment variables:
+PDK::Device::Role supports the following environment variables:
 
 =over 4
 

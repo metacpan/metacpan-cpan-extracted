@@ -4,13 +4,14 @@ use strict;
 use warnings;
 
 use Config::IniFiles;
+use Data::Dumper;
+use List::Util qw(any);
 
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_accessors(qw(config));
 
-our $VERSION = '1.0.5'; ## no critic (RequireInterpolation)
+use parent qw(Exporter Class::Accessor::Fast);
 
-use List::Util qw(any);
 use Readonly;
 
 Readonly our $TRUE  => 1;
@@ -18,7 +19,7 @@ Readonly our $FALSE => 0;
 
 our @EXPORT_OK = qw(boolean);
 
-use parent qw(Exporter Class::Accessor::Fast);
+our $VERSION = '1.0.6';  ## no critic (RequireInterpolation)
 
 ########################################################################
 sub boolean {
@@ -71,11 +72,17 @@ sub get_app_config {
 ########################################################################
   my ($self) = @_;
 
-  my $section_name = lc ref $self;
+  my $section_name = ref $self;
   $section_name =~ s/::/_/xsmg;
 
+  my $config = $self->get_config;
+
+  if ( $config->SectionExists( lc $section_name ) ) {
+    $section_name = lc $section_name;
+  }
+
   return
-    if !$self->get_config->SectionExists($section_name);
+    if !$config->SectionExists($section_name);
 
   my %section_config;
 
@@ -86,7 +93,7 @@ sub get_app_config {
   my @extra_vars = keys %section_config;
 
   if (@extra_vars) {
-    no strict 'refs'; ## no critic (ProhibitNoStrict)
+    no strict 'refs';  ## no critic (ProhibitNoStrict)
 
     for (@extra_vars) {
       die "attempt to redefine $_\n"
@@ -108,8 +115,7 @@ sub handler {
 ########################################################################
   my ( $self, $event ) = @_;
 
-  return print {*STDERR} sprintf "event: %s file: %s\n", $event->mask,
-    $event->fullname;
+  return print {*STDERR} sprintf "event: %s file: %s\n", $event->mask, $event->fullname;
 }
 
 1;
@@ -173,12 +179,11 @@ C<Config::IniFiles> object passed in the constructor.
  my $user_name = $self->get_config()->val(application => 'user_name');
 
 I<BONUS>: If you add a section to the configuration file using the
-canonical form (lower and snake cased) of your handler's name, the
-second argument to the constructor will be a hash containing all of
-the values in that section which will be used by the default C<new()>
-method to create accessors for each value. Accessors are named using
-the best practice of separater setters and getters for each value
-(e.g. C<get_foo(), C<set_foo()>).
+canonical form (replace all ':: with '_') of your handler's name the
+configuration variables defined in that section will be used by the
+default C<new()> method to create accessors for each value. Accessors
+are named using the best practice of separate setters and getters for
+each value (e.g. C<get_foo()>, C<set_foo()>).
 
  [workflow_s3_uploader]
  bucket        = foo

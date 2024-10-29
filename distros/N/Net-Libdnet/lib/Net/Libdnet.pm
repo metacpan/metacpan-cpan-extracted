@@ -1,8 +1,8 @@
 #
-# $Id: Libdnet.pm,v c0d1c989fec0 2018/09/18 15:03:40 gomor $
+# $Id: Libdnet.pm,v c57765ed0538 2024/10/28 15:05:03 gomor $
 #
 # Copyright (c) 2004 Vlad Manilici
-# Copyright (c) 2008-2012 Patrice <GomoR> Auffret
+# Copyright (c) 2008-2024 Patrice <GomoR> Auffret
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,7 +33,7 @@ use strict; use warnings;
 
 use base qw(Exporter DynaLoader);
 
-our $VERSION = '0.99';
+our $VERSION = '0.990';
 
 our %EXPORT_TAGS = (
    obsolete => [qw(
@@ -631,7 +631,7 @@ You may distribute this module under the terms of the BSD license. See LICENSE f
 
 Copyright (c) 2004, Vlad Manilici
 
-Copyright (c) 2008-2012, Patrice <GomoR> Auffret
+Copyright (c) 2008-2024, Patrice <GomoR> Auffret
 
 =head1 SEE ALSO
 

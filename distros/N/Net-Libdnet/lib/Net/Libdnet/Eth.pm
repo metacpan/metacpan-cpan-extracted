@@ -1,5 +1,5 @@
 #
-# $Id: Eth.pm,v c181470c4357 2018/09/18 14:59:41 gomor $
+# $Id: Eth.pm,v c57765ed0538 2024/10/28 15:05:03 gomor $
 #
 package Net::Libdnet::Eth;
 use strict; use warnings;
@@ -92,6 +92,6 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the BSD license. See LICENSE file in the source distribution archive.
 
-Copyright (c) 2008-2012, Patrice <GomoR> Auffret
+Copyright (c) 2008-2024, Patrice <GomoR> Auffret
 
 =cut

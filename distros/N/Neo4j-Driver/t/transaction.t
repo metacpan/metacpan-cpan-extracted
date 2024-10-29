@@ -49,7 +49,7 @@ END
 	} qr/Odd number of elements .* parameter hash/i, 'param list uneven';
 	throws_ok {
 		$r = $s->run($q, a => $a)->has_next;
-	} qr/\bParameterMissing.* b\b|\bold parameter syntax\b|\bInvalid input '\{'/si, 'missing param';
+	} qr/\bParameterMissing.* b\b|\bold parameter syntax\b|\bInvalid input '[{}]'/si, 'missing param';
 	throws_ok {
 		$r = $s->run($q, [a => $a, b => $b]);
 	} qr/parameters must be .* hash or hashref/i, 'param arrayref';

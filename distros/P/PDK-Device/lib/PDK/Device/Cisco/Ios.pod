@@ -1,0 +1,82 @@
+=encoding utf8
+
+=head1 NAME
+
+PDK::Device::Cisco::Ios - A module for interacting with Cisco IOS devices
+
+=head1 SYNOPSIS
+
+  use PDK::Device::Cisco::Ios;
+
+  my $device = PDK::Device::Cisco::Ios->new(
+    host     => '192.168.1.1',
+    username => 'admin',
+    password => 'password'
+  );
+
+  $device->login();
+  # Use inherited methods from PDK::Device::Cisco
+
+=head1 DESCRIPTION
+
+PDK::Device::Cisco::Ios is a Moose-based module that extends PDK::Device::Cisco to provide specific functionality for Cisco IOS devices. Currently, this module serves as a framework for inheritance and can be extended in the future to include IOS-specific features and operations.
+
+=head1 INHERITANCE
+
+This module inherits from L<PDK::Device::Cisco>.
+
+=head1 METHODS
+
+This module currently does not define any additional methods beyond those inherited from PDK::Device::Cisco. Future versions may include IOS-specific methods as needed.
+
+=head1 ATTRIBUTES
+
+This module currently does not define any additional attributes beyond those inherited from PDK::Device::Cisco. Future versions may include IOS-specific attributes as needed.
+
+=head1 DEPENDENCIES
+
+This module requires the following Perl modules:
+
+=over 4
+
+=item Moose
+
+=item Expect
+
+=item Carp
+
+=item namespace::autoclean
+
+=back
+
+=head1 FUTURE DEVELOPMENT
+
+This module is designed as a framework for Cisco IOS-specific operations. Future versions may include:
+
+=over 4
+
+=item * IOS-specific configuration methods
+
+=item * IOS-specific troubleshooting tools
+
+=item * IOS-specific feature management
+
+=back
+
+=head1 SEE ALSO
+
+L<PDK::Device::Cisco>
+
+=head1 AUTHOR
+
+WENWU YAN <968828@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2024 WENWU YAN
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=cut

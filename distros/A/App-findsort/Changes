@@ -1,8 +1,13 @@
-0.002   2024-09-19  Released-By: PERLANCAR; Urgency: medium
+0.003   2024-09-19  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Fix reading output from find().
+
+
+0.002   2024-09-19  Released-By: PERLANCAR; Urgency: medium; Broken: yes
 
         - Remove perl undef warning.
 
 
-0.001   2024-09-19  Released-By: PERLANCAR
+0.001   2024-09-19  Released-By: PERLANCAR; Broken: yes
 
         - First release.

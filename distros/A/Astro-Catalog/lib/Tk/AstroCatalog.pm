@@ -33,11 +33,12 @@ my @COLOR_LIST = (
     '#ff00ff', '#ffffff', '#ff5555', '#55ff55', '#55ffff', '#ffff55');
 my $COLOR_INDEX = 0;
 
-our $VERSION = '4.37';
+our $VERSION = '4.38';
 
 # Kluge - this is the format of the catalog to be read
 # Needs to be given as an option on the FileSelect widget.
 our $FORMAT = 'JCMT';
+our $FORMAT_OPT = {incplanets => 0};
 
 =head1 PUBLIC METHODS
 
@@ -580,6 +581,7 @@ sub makeCatalog {
         # No filename for default
         $self->Catalog($self->CatClass->new(
             Format => $FORMAT,
+            ReadOpt => $FORMAT_OPT,
         ));
         $self->fillWithSourceList('full');
     });
@@ -603,7 +605,8 @@ sub makeCatalog {
             $self->file($file);
             $self->Catalog($self->CatClass->new(
                 File =>$self->file,
-                Format => $FORMAT
+                Format => $FORMAT,
+                ReadOpt => $FORMAT_OPT,
             ));
 
             # Propagate previous info
@@ -636,13 +639,15 @@ sub makeCatalog {
         $self->file($catEnt->get);
         if ($catEnt->get eq 'default') {
             $self->Catalog($self->CatClass->new(
-                Format => $FORMAT
+                Format => $FORMAT,
+                ReadOpt => $FORMAT_OPT,
             ));
         }
         else {
             $self->Catalog($self->CatClass->new(
                 File => $self->file,
-                Format => $FORMAT
+                Format => $FORMAT,
+                ReadOpt => $FORMAT_OPT,
             ));
         }
         # Propagate previous info
@@ -663,7 +668,8 @@ sub makeCatalog {
         $self->file($catEnt->get);
         $self->Catalog($self->CatClass->new(
             File => $self->file,
-            Format => $FORMAT
+            Format => $FORMAT,
+            ReadOpt => $FORMAT_OPT,
         ));
     }
     $self->fillWithSourceList('full');

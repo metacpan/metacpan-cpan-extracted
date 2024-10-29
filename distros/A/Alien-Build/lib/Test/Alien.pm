@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is interpolate_run_ok plugin_ok );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '2.83'; # VERSION
+our $VERSION = '2.84'; # VERSION
 
 
 our @aliens;
@@ -835,7 +835,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 2.83
+version 2.84
 
 =head1 SYNOPSIS
 
@@ -924,7 +924,7 @@ be used, via either C<XS> or L<FFI::Platypus>.  It also provides a mechanism for
 testing binaries that are provided by the various L<Alien> modules (for example
 L<Alien::gmake> and L<Alien::patch>).
 
-L<Alien> modules can actually be useable without a compiler, or without L<FFI::Platypus>
+L<Alien> modules can actually be usable without a compiler, or without L<FFI::Platypus>
 (for example, if the library is provided by the system, and you are using L<FFI::Platypus>,
 or if you are building from source and you are using C<XS>), so tests with missing
 prerequisites are automatically skipped.  For example, L</xs_ok> will automatically skip

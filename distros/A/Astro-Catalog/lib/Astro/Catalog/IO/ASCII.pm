@@ -21,7 +21,7 @@ use warnings::register;
 use Carp;
 use strict;
 
-our $VERSION = '4.37';
+our $VERSION = '4.38';
 our $DEBUG = 0;
 
 =head1 METHODS
