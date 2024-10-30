@@ -1,4 +1,16 @@
-0.01 2023-08-19
+0.003 2024-10-30
+  [New Features]
+    * Add Net::SSLeay::SSL_METHOD#SSLv23_method method.
+    * Add Net::SSLeay::SSL_METHOD#TLS_method method.
+    
+0.002 2024-10-30
+  [New Features]
+    * Add Net::SSLeay::SSL_CTX#set_options
+    * Add Net::SSLeay::SSL_CTX#get_options
+    * Add Net::SSLeay::SSL_CTX#clear_options
+    * Add SPVM::Net::SSLeay::ConfigBuilder class to detect OpenSSL/LibreSSL include and lib directory.
+    
+0.001 2023-08-19
   [Changes]
     * First release.
   

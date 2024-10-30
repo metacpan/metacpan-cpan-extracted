@@ -68,10 +68,14 @@ sub dump {
     make_path($workdir) unless -d $workdir;
 
     my $enc = Encode::Guess->guess($text);
-    ref($enc) or croak "无法猜测编码: $enc";
-    eval { $text = $enc->decode($text); };
-    if (!!$@) {
-      warn("字符串($text)解码失败：$@") if $self->debug == 0;
+    if (ref $enc) {
+      eval { $text = $enc->decode($text); };
+      if (!!$@) {
+        warn("[dump] 字符串解码失败：$@");
+      }
+    }
+    else {
+      warn("[dump] 无法猜测编码: $enc");
     }
 
     my $filename = "$workdir/$self->{host}_dump.txt";
@@ -91,19 +95,23 @@ sub write_file {
   make_path($workdir) unless -d $workdir;
 
   my $enc = Encode::Guess->guess($config);
-  ref($enc) or croak "无法猜测编码: $enc";
-  eval { $config = $enc->decode($config); };
-  if (!!$@) {
-    warn("字符串($config)解码失败：$@") if $self->debug == 0;
+  if (ref($enc)) {
+    eval { $config = $enc->decode($config); };
+    if (!!$@) {
+      $self->dump("[write_file] $name 字符串解码失败：$@");
+    }
   }
+  else {
+    $self->dump("[write_file] $name 无法猜测编码: $enc");
+  }
+  $self->dump("[write_file] 准备将数据写入本地文件: ($workdir/$name)");
 
-  $self->dump("准备将配置文件写入工作目录: ($workdir)");
   my $filename = "$workdir/$name";
   open(my $fh, '>>:encoding(UTF-8)', $filename) or croak "无法打开文件 $filename 进行写入: $!";
   print $fh $config                             or croak "写入文件 $filename 失败: $!";
   close($fh)                                    or croak "关闭文件句柄 $filename 失败: $!";
 
-  $self->dump("成功写入文本数据到文件: $filename");
+  $self->dump("[write_file] 成功写入文本数据到文件: $filename");
 
   return {success => 1};
 }
@@ -111,7 +119,7 @@ sub write_file {
 sub initPdkDevice {
   my ($self, $param) = @_;
 
-  croak "\$param必须是一个哈希引用" unless ref($param) eq 'HASH';
+  croak "[initPdkDevice] \$param必须是一个哈希引用" unless ref($param) eq 'HASH';
   my $host = $param->{ip} or croak "必须正确提供目标设备的IP地址";
 
   my $username = $param->{username} || $ENV{PDK_DEVICE_USERNAME};
@@ -121,10 +129,11 @@ sub initPdkDevice {
     unless ($username && $password);
 
   my $class = $param->{pdk_device_module};
-  eval "use $class; 1" or croak "加载模块失败: $class";
+  eval "use $class; 1" or croak "[initPdkDevice] 加载模块失败: $class";
 
   $self->dump("[initPdkDevice] 尝试自动加载模块 $class，并初始化对象($param->{name}/$host)");
-  my $device = $class->new(host => $host, username => $username, password => $password) or croak "实例化模块失败: $class";
+  my $device = $class->new(host => $host, username => $username, password => $password)
+    or croak "[initPdkDevice] 实例化模块失败: $class";
 
   return $device;
 }
@@ -133,6 +142,9 @@ sub assignPdkModules {
   my ($self, @args) = @_;
 
   my @devices = @args == 1 && ref $args[0] eq 'ARRAY' ? @{$args[0]} : @args;
+
+  my $msg = sprintf("[assignPdkModules] 自动装配 PDK 模块中，共计: %d 台设备", scalar @devices);
+  $self->dump($msg);
 
   state $os_to_module = {
     qr/^Cisco|ios/i   => 'PDK::Device::Cisco',
@@ -155,9 +167,11 @@ sub assignPdkModules {
     $device->{pdk_device_module} = $os_to_module->{$module};
 
     $device->{name} =~ s/\..*$//;
-
-    $self->dump("[assignPdkModules] $device->{name} 成功装配 PDK：$device->{pdk_device_module}");
+    $self->dump("[assignPdkModules] ($device->{name}/$device->{ip}) 成功装配 PDK：$device->{pdk_device_module}");
   }
+
+  $msg = sprintf("[assignPdkModules] 已完成自动装配 PDK 模块，共计: %d 台设备", scalar @devices);
+  $self->dump($msg);
 
   return wantarray ? @devices : $devices[0];
 }

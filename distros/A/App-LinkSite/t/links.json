@@ -1,0 +1,99 @@
+{
+  "name": "Dave Cross",
+  "handle": "davorg",
+  "image": "davorg.jpg",
+  "og_image": "og.png",
+  "site_url": "https://some-site.com/",
+  "desc": "I make things from software. Some of them are useful.<br>And I've been known to write a book or two.",
+  "ga4": "Your Google Analytics key",
+  "font_awesome_kit": "Your Font Awesome ID",
+  "social": [{
+    "service": "facebook"
+  }, {
+    "service": "x-twitter"
+  }, {
+    "service": "instagram"
+  }, {
+    "service": "tiktok"
+  }, {
+    "service": "linkedin"
+  }, {
+    "service": "github"
+  }, {
+    "service": "medium"
+  }, {
+    "service": "reddit"
+  }, {
+    "service": "mastodon",
+    "url": "https://fosstodon.org/@davorg"
+  }, {
+    "service": "threads"
+  }, {
+    "service": "letterboxd",
+    "handle": "realdavorg"
+  }, {
+    "service": "quora",
+    "handle": "Dave-Cross"
+  }, {
+    "service": "bluesky",
+    "handle" : "davorg.davecross.co.uk"
+  }, {
+    "service": "lastfm"
+  }],
+  "links": [{
+    "title": "It Came From Rockwell",
+    "subtitle": "About the Rockwell Space Shuttle advert in OMNI #1",
+    "link": "https://itcamefromrockwell.com/"
+  }, {
+    "title": "GitHub Sponsor Page",
+    "link": "https://github.com/sponsors/davorg/"
+  }, {
+    "title": "Talks",
+    "subtitle" : "Various talks I've given (work in progress)",
+    "link": "https://talks.davecross.co.uk/"
+  }, {
+    "title": "George and the Smart Home",
+    "subtitle" : "A children's book",
+    "link": "https://george.davecross.co.uk/"
+  }, {
+    "title": "GitHub Actions Essentials",
+    "subtitle" : "A book for techies",
+    "link": "https://actions.davecross.co.uk/"
+  }, {
+    "title": "Books I've written",
+    "link": "https://davecross.co.uk/books/"
+  }, {
+    "title": "Royal Relations",
+    "subtitle" : "All one big happy family",
+    "link": "https://rels.lineofsuccession.co.uk/"
+  }, {
+    "title": "dev.to",
+    "subtitle": "A developer's blog",
+    "link": "https://dev.to/davorg"
+  }, {
+    "title": "Web site",
+    "link": "https://davecross.co.uk/"
+  }, {
+    "title": "Perl Hacks",
+    "subtitle": "Stuff about Perl",
+    "link": "https://perlhacks.com/"
+  }, {
+    "title": "Substack",
+    "subtitle": "An infrequent newsletter",
+    "link": "https://davecross.substack.com/"
+  }, {
+    "title": "Line of Succession",
+    "subtitle": "See the British line of succession on dates in the past",
+    "link": "https://lineofsuccession.co.uk/"
+  }, {
+    "title" : "Redbubble shop",
+    "subtitle" : "T-shirts and stuff",
+    "link": "https://www.redbubble.com/people/davorg/"
+  }, {
+    "title": "Blog",
+    "link": "https://blog.dave.org.uk/"
+  }, {
+    "title": "Email",
+    "link": "mailto:me@example.com"
+  }]
+}

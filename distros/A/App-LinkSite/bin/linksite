@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use feature 'say';
+
+use Getopt::Long;
+use File::Basename;
+
+use App::LinkSite;
+
+my %opt;
+GetOptions(\%opt, 'help', 'version');
+
+if (keys %opt) {
+  my $me = basename $0;
+  if ($opt{version}) {
+    say "$me $App::LinkSite::VERSION";
+    say '' if $opt{help};
+  }
+
+  if ($opt{help}) {
+    say "Usage: $me";
+    say "\nCreate a link site from a simple input file. See 'man $me' for details";
+  }
+
+  exit;
+}
+
+
+App::LinkSite->new->run;
+
+=head1 linksite
+
+Create a link site from a simple input file.
+
+This program parses a JSON file (called C<links.json>) and turns the data
+into a link site (a bit like LinkTree).
+
+For more information see https://linksite.davecross.co.uk/.
+
+=cut

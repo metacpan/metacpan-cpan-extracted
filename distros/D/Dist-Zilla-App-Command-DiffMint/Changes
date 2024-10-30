@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist-Zilla-App-Command-DiffMint
 
+v0.3.1  2024-10-30
+  - fix pager
+
 v0.3.0  2024-10-20
   - allow running in a directory without a dist.ini
   - fix detection of encoding

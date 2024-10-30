@@ -1,5 +1,15 @@
 Revision history for Astro::WaveBand
 
+0.12 2024-10-29
+
+  - Add RXH3 receiver for JCMT.
+
+  - Add format option to numeric accessors, allowing
+    values to be formated to a number of d.p. with units.
+
+  - Add species and transition accessor (initial
+    unprocessed string implementation).
+
 0.11 2023-11-24
 
   - Add Kuntur receiver for JCMT.

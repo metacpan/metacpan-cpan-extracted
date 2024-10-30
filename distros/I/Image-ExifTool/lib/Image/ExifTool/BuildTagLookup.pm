@@ -35,7 +35,7 @@ use Image::ExifTool::Sony;
 use Image::ExifTool::Validate;
 use Image::ExifTool::MacOS;
 
-$VERSION = '3.54';
+$VERSION = '3.58';
 @ISA = qw(Exporter);
 
 sub NumbersFirst($$);
@@ -95,16 +95,11 @@ my %tweakOrder = (
     Lytro   => 'SigmaRaw',
     PhotoMechanic => 'FotoStation',
     Microsoft     => 'PhotoMechanic',
-   'Microsoft::MP'=> 'Microsoft::MP1',
     GIMP    => 'Microsoft',
-   'Nikon::CameraSettingsD300' => 'Nikon::ShotInfoD300b',
-   'Pentax::LensData' => 'Pentax::LensInfo2',
-   'Sony::SRF2' => 'Sony::SRF',
     DarwinCore => 'AFCP',
-   'MWG::Regions' => 'MWG::Composite',
-   'MWG::Keywords' => 'MWG::Regions',
-   'MWG::Collections' => 'MWG::Keywords',
-   'GoPro::fdsc' => 'GoPro::KBAT',
+    MWG     => 'Shortcuts',
+    'FujiFilm::RAF' => 'FujiFilm::RAFHeader',
+    'FujiFilm::RAFData' => 'FujiFilm::RAF',
 );
 
 # list of all recognized Format strings
@@ -430,11 +425,11 @@ parameters, as well as proprietary information written by many camera
 models.  Tags with a question mark after their name are not extracted unless
 the L<Unknown|../ExifTool.html#Unknown> option is set.
 
-When writing, ExifTool creates both QuickTime and XMP tags by default, but
-the group may be specified to write one or the other separately.  If no
-location is specified, newly created QuickTime tags are added in the
-L<ItemList|Image::ExifTool::TagNames/QuickTime ItemList Tags> location if
-possible, otherwise in
+When writing video files, ExifTool creates both QuickTime and XMP tags by
+default, but the group may be specified to write one or the other
+separately.  If no location is specified, newly created QuickTime tags are
+added in the L<ItemList|Image::ExifTool::TagNames/QuickTime ItemList Tags>
+location if possible, otherwise in
 L<UserData|Image::ExifTool::TagNames/QuickTime UserData Tags>, and
 finally in L<Keys|Image::ExifTool::TagNames/QuickTime Keys Tags>,
 but this order may be changed by setting the PREFERRED level of the
@@ -485,7 +480,7 @@ the original size by padding with nulls if necessary.
 
 See
 L<https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/>
-for the official specification.
+for the official QuickTime specification.
 },
     Photoshop => q{
 Photoshop tags are found in PSD and PSB files, as well as inside embedded
@@ -607,7 +602,8 @@ running ExifTool the old information may be removed permanently using the
     DNG => q{
 The main DNG tags are found in the EXIF table.  The tables below define only
 information found within structures of these main DNG tag values.  See
-L<http://www.adobe.com/products/dng/> for the official DNG specification.
+L<https://helpx.adobe.com/camera-raw/digital-negative.html> for the official
+DNG specification.
 },
     MPEG => q{
 The MPEG format doesn't specify any file-level meta information.  In lieu of
@@ -672,6 +668,18 @@ Tags in these tables are referred to as "pseudo" tags because their
 information is not stored in the file itself.  As such, B<Writable> tags in
 these tables may be changed without having to rewrite the file.
 },
+    GM => q{
+These tags are extracted from GM/Cosworth PDR (Performance Data Recorder)
+information found in videos from General Motors cars such as Corvette and
+Camero.
+
+Use the API L<PrintCSV|../ExifTool.html#PrintCSV> option to output all timed
+PDR data in CSV format at greatly increased speed and with much lower memory
+usage.  This option prints the numerical values for each channel in CSV
+format, suitable for import into RaceRender.  In this output, the gear
+numbers for Neutral and Reverse are changed to -1 and -100 respectively for
+compatibility with RaceRender.
+},
     PodTrailer => q{
 ~head1 NOTES
 
@@ -708,7 +716,7 @@ my %shortcutNotes = (
         color space when deleting all other metadata
     },
     CommonIFD0 => q{
-        common metadata tags found in IFD0 of TIFF-format images.  Used to simpify
+        common metadata tags found in IFD0 of TIFF-format images.  Used to simplify
         deletion of all metadata from these images.  See
         L<FAQ number 7|../faq.html#Q7> for details
     },
@@ -852,7 +860,7 @@ sub new
         my ($tagID, $binaryTable, $noID, $hexID, $isIPTC, $isXMP);
         $isIPTC = 1 if $writeProc and $writeProc eq \&Image::ExifTool::IPTC::WriteIPTC;
         # generate flattened tag names for structure fields if this is an XMP table
-        if ($$table{GROUPS} and $$table{GROUPS}{0} eq 'XMP') {
+        if ($$table{GROUPS} and $$table{GROUPS}{0} eq 'XMP' or $$vars{ADD_FLATTENED}) {
             Image::ExifTool::XMP::AddFlattenedTags($table);
             $isXMP = 1;
         }
@@ -900,6 +908,9 @@ TagID:  foreach $tagID (@keys) {
                 @infoArray = GetTagInfoList($table,$tagID);
             }
             foreach $tagInfo (@infoArray) {
+                if ($binaryTable and $$tagInfo{Writable} and $$tagInfo{Writable} ne '1') {
+                    warn("$tableName $$tagInfo{Name} Writable should be 1, not $$tagInfo{Writable}\n");
+                }
                 my $name = $$tagInfo{Name};
                 if ($$tagInfo{WritePseudo}) {
                     push @writePseudo, $name;
@@ -1526,7 +1537,8 @@ TagID:  foreach $tagID (@keys) {
         my $fullName = ($strName =~ / / ? '' : 'XMP ') . "$strName Struct";
         my $info = $tagNameInfo{$fullName} = [ ];
         my $tag;
-        foreach $tag (sort keys %$struct) {
+        my $order = $$struct{SORT_ORDER} || [ sort keys %$struct ];
+        foreach $tag (@$order) {
             my $tagInfo = $$struct{$tag};
             next unless ref $tagInfo eq 'HASH' and $tag ne 'NAMESPACE' and $tag ne 'GROUPS';
             warn "WARNING: $strName Struct containes $tag\n" if $Image::ExifTool::specialTags{$tag};
@@ -1539,6 +1551,8 @@ TagID:  foreach $tagID (@keys) {
                     push @vals, $writable;
                     $structs{$writable} = 1;
                     $writable = "=$writable";
+                } elsif (defined $$tagInfo{Writable}) {
+                    $writable = 'no';
                 } else {
                     $writable = 'string';
                 }
@@ -1548,7 +1562,7 @@ TagID:  foreach $tagID (@keys) {
             # handle PrintConv lookups in Structure elements
             my $printConv = $$tagInfo{PrintConv};
             if (ref $printConv eq 'HASH') {
-                foreach (sort keys %$printConv) {
+                foreach (sort { NumbersFirst($a,$b) } keys %$printConv) {
                     next if /^(OTHER|BITMASK)$/;
                     push @vals, "$_ = $$printConv{$_}";
                 }
@@ -1822,24 +1836,7 @@ sub TweakOrder($$)
     local $_;
     my ($sortedTables, $tweakOrder) = @_;
     my @tweak = sort keys %$tweakOrder;
-    my (%addedMain, @sorted);
-    # flag files which have a "Main" table
-    foreach (@$sortedTables) {
-        $addedMain{$1} = 0 if /^Image::ExifTool::(\w+)::(\w+)/ and $2 eq 'Main';
-    }
-    # make sure that the main table always comes first in each file
-    foreach (@$sortedTables) {
-        if (/^Image::ExifTool::(\w+)::(\w+)/) {
-            if ($addedMain{$1}) {
-                next if $2 eq 'Main';   # don't add again
-            } elsif (defined $addedMain{$1}) {
-                push @sorted, "Image::ExifTool::${1}::Main" if $2 ne 'Main';
-                $addedMain{$1} = 1;
-            }
-        }
-        push @sorted, $_;
-    }
-    @$sortedTables = @sorted;
+    my (@sorted, %hasMain, %module, $entry);
     # apply manual tweaks
     while (@tweak) {
         my $table = shift @tweak;
@@ -1857,6 +1854,31 @@ sub TweakOrder($$)
             unshift @after, pop @notMoving;
         }
         @$sortedTables = (@notMoving, @moving, @after);
+    }
+    # flag modules which have a "Main" table, and organize tables by module name
+    foreach (@$sortedTables) {
+        if (not /^Image::ExifTool::(\w+)::(\w+)/) {
+            push @sorted, $_;
+        } else {
+            $hasMain{$1} = 1 if $2 eq 'Main';
+            push @sorted, $module{$1} = [ ] unless $module{$1};
+            push @{$module{$1}}, $_;
+        }
+    }
+    # force MWG::Composite table first
+    my @mwg = ( 'Image::ExifTool::MWG::Composite' );
+    /Composite/ or push @mwg, $_ foreach @{$module{MWG}};
+    @{$module{MWG}} = @mwg;
+    # make sure that the main table always comes first in each file
+    # and that all other tables from this group follow
+    @$sortedTables = ( );
+    foreach $entry (@sorted) {
+        ref $entry or push(@$sortedTables, $entry), next;
+        $$entry[0] =~ /^Image::ExifTool::(\w+)::(\w+)/ or die 'Internal error';
+        my $main = "Image::ExifTool::$1::Main";
+        # main table must come first (even if it doesn't exist)
+        push @$sortedTables, $main if $hasMain{$1};
+        $_ eq $main or push(@$sortedTables, $_) foreach @$entry;
     }
 }
 

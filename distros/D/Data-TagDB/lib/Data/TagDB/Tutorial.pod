@@ -1,0 +1,294 @@
+# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024 Philipp Schafft
+
+# licensed under Artistic License 2.0 (see LICENSE file)
+
+# ABSTRACT: Work with Tag databases
+# PODNAME: Data::TagDB::Tutorial
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::TagDB::Tutorial - Work with Tag databases
+
+=head1 VERSION
+
+version v0.05
+
+=head1 Overview
+
+L<Data::TagDB> allows to store semantic data (universal tags) in a SQL based database.
+
+The database contains tags and links connected to those tags. Tags generally represent a subject,
+while links represent connection between subjects.
+
+=head2 Tags
+
+A tag (in universal tags) represents any kind of subject. Most tags fall into one of two categories:
+I<abstract> and I<specific>.
+
+I<Abstract> tags are generally concepts like "tree" or "colour".
+I<Specific> tags represent instances of those. For example the planet Earth, the tree in front of the building, or the file containing yesterday's work.
+
+Tags itself do not hold any data. All data is stored in I<links>.
+
+See also L<Data::TagDB::Tutorial::WellKnown>.
+
+=head2 Links
+
+I<Links> store the data in database. There are two types of links: I<relations> and I<metadata>.
+
+=head3 Relations
+
+I<Relations> provide a relation between two tags. An example would be "The colour of the house is blue.".
+In this case the relation consists of three parts:
+The I<tag> they are applied to ("the house"),
+the I<relation> that connects both tags ("the colour is"),
+and the I<related> tag that is applied ("blue").
+
+B<Note:>
+Each I<link> (and therefore also each I<relation>) as a property I<tag> and I<relation>.
+This double use of terms can cause confusion.
+
+B<Note:>
+All parts of a relation are tags. Non of it's properties are special.
+
+In addition each relation also includes a I<context> and I<filter>.
+
+The I<context> is used to provide a scope in which the link is valid. For example a context could be "English", or "the 90s".
+If the I<context> is C<undef> the link is valid without any restrictions.
+
+The I<filter> provides a way to limit the scope to which a relation is applied to. This is only used by special relations.
+Therefore the I<filter> property is virtually always C<undef>.
+
+=head3 Metadata
+
+I<Metadata> are considered degenerated I<relations>. They provide additional information about a tag like I<relations>, however
+they do not point to a I<related> tag but to raw data.
+
+The I<related> property is replaced by three new properties: I<type>, I<encoding>, and I<data>.
+
+I<data> provides a raw bit string while I<type> and I<encoding> define how the bit string is to be understood.
+I<type> defines the type of data that is stored. For example "string" or "integer".
+I<encoding> defines the way the value of the given type is stored. For example "ASCII digits" or "32 bit unsigned integer".
+
+B<Note:>
+Both I<type> and I<encoding> are often C<undef>.
+If they are C<undef> the default values are used. A I<relation> can define a default type,
+and a I<type> can define a default encoding.
+
+B<Note:>
+L<Data::TagDB> and L<Data::TagDB::Metadata> use the property C<data_raw> for the raw bitstring that is stored in the relation.
+The virtual member I<data> is added that contains a decoded copy of C<data_raw>.
+
+Beside I<type>, I<encoding>, and I<data> metadata has the same I<tag>, I<relation>, and I<context> properties as relations.
+I<filter> is always C<undef> for I<metadata> and skipped in the API.
+
+=head2 Identifiers
+
+To allow tags to be recalled L</Metadata> is set on them containing I<identifiers>.
+This is done using the standard tag C<also-shares-identifier> as I<relation>.
+The I<type> is set to the corresponding type of the identifier.
+
+B<Note:>
+L<Data::TagDB> implements helper functions. It is generally not needed to interact with identifiers on the
+link level. However it is critical to have some basic understanding.
+
+Identifiers may or may not be globally unique (the identifier is not never reused, not even in other databases).
+An example for globally unique identifiers are UUIDs. An example for non-unique identifiers are tag names.
+
+Any locally unique (never reused in the same database, but may be used in other databases) identifier
+must have I<context> set to the context to which they are unique.
+Examples of such locally unique identifiers are are classic numeric primary keys as common in SQL based databases.
+
+B<Note:>
+Locally unique identifiers are dissuaded for reasons of their added complexity. They are also prone to incorrect implementations.
+
+B<Note:>
+Non-unique identifiers may have I<context> set. This can for example be used to define tag names in multiple languages.
+
+B<Recommendation:>
+It is strongly recommended to use a new random UUID for new tags as a globally unique identifier.
+(Tags generated using a generator have an UUID already set. See L<Data::TagDB::Factory> for details.)
+While L<Data::TagDB> does not require a UUID to be set other software may.
+It is also recommended to set a tag name.
+If the name of the tag is subject to translation it is recommended to set it with the I<context> set
+to C<default-context>.
+
+=head1 Database connection
+
+=head2 Database creation
+
+To use a database it must be opened first. If it does not yet exist it needs to be created.
+Creating a database also opens it. To do this you need the migrations module:
+
+    use Data::TagDB::Migration;
+    my Data::TagDB $db = Data::TagDB::Migration->create(...);
+
+For example:
+
+    my Data::TagDB $db = Data::TagDB::Migration->create('dbi:SQLite:dbname=MyDB.sqlite3');
+
+After you initially created a database it is good to import some basic data.
+This is used to provide structure to the database. The easiest way to do is using the migration module again like this:
+
+    $db->migration->include(qw(Data::TagDB::WellKnown ...));
+
+L<Data::TagDB::Migration/include> allows importing data known by other modules. See it's documentation for what it can include.
+It is however recommended to at least include from L<Data::TagDB::WellKnown> as this enables all features supported by L<Data::TagDB>.
+
+After the database is set up the handle can be used normally.
+
+=head2 Opening and closing a database
+
+Once a database has been created it can be opened like this:
+
+    use Data::TagDB;
+    my Data::TagDB $db = Data::TagDB->new('dbi:SQLite:dbname=MyDB.sqlite3');
+
+After the database has been opened it can be used. When done it is best to close it:
+
+    $db->disconnect;
+
+But it is also closed when the handle is destroyed.
+
+=head1 Tag creation
+
+To fill the database with actual data there are two operations. Creating tags, and adding links to the tags.
+
+To create a tag there are two ways. A tag can be manually created using L<Data::TagDB/create_tag> or
+using L<Data::TagDB::Factory>.
+
+Manual creation is most similar to creating a object in any database. You are free to do what you like
+but you are also responsible to create a valid record. It is also faster.
+
+When using L<Data::TagDB::Factory> the tag is created using a I<generator>. This will automatically
+fill in some more data and ensure the record is valid. But it is also slower.
+
+=head2 Manual creation
+
+To manually create a tag use L<Data::TagDB/create_tag>.
+The method takes two lists:
+the unique identifiers for the tag and additional identifiers.
+The unique identifiers are similar to a primary key. Only one tag can at any time have them (in any database). But it is possible to have more than one.
+Additional identifiers are optional. They often include the name of the tag. They don't need to be unique.
+
+A common call looks like:
+
+    my Data::TagDB::Tag $tag = $db->create_tag([$db->wk->uuid => $uuid], [$db->wk->tagname => $name]);
+
+If the tag already exists the function ensures that all identifiers are present in the database before returning.
+
+=head2 Using a generator
+
+A generator is usually used when a tag of a given type is created. It can be understood as a rule on transforming a so called I<hint> into a tag.
+The generator normally sets the identifiers, the type, and maybe additional names and references.
+
+The easiest way is to use a generator build into L<Data::TagDB::Factory>. But it is also possible to define own generators.
+
+An example call would be:
+
+    my Data::TagDB::Tag $tag = $db->factory->create_colour('#c0c0c0');
+
+If a tag is already in the database the generator will add anything that is missing and return the tag.
+
+=head1 Query a tag
+
+To query a tag you need to to have an instance of L<Data::TagDB::Tag>.
+The easiest way to find a tag is by one of it's identifiers.
+
+A typical call looks like:
+
+    my Data::TagDB::Tag $tag = $db->tag_by_id(uuid => $uuid);
+
+Every query fundamentally works by asking the database for links (relations and metadata).
+However, for some basic tasks the module has some base implementations build in.
+
+=head2 Basic getters
+
+A common example is to query the tag for it's I<displayname>.
+The I<displayname> is often used when the tag needs to be displayed to a user.
+
+A common call will look like:
+
+    my $displayname = $tag->displayname;
+
+The function always returns a string. (See L<Data::TagDB::Tag/displayname>)
+
+Those basic getters may also cache the result for speed.
+They also often employ relative complex rules.
+For example the displayname getter will try different values (like title, name) to find the result.
+And if none is found it will fall back to some alternatives (such as any identifier).
+
+=head2 Individual queries
+
+To perform individual queries you can all L<Data::TagDB/relation>, L<Data::TagDB/metadata>, or L<Data::TagDB/link>.
+These functions are similar to a C<SELECT> on an SQL based database.
+They take a list of query parameters to filter the result. An L<Data::TagDB::Iterator> is then returned with the results.
+
+A common call looks like:
+
+    my Data::TagDB::Iterator $iter = $db->relation(tag => $tag, relation => $db->wk->also_list_contains_also);
+
+This will list the content of C<$tag> if C<$tag> is a list.
+
+The list will contain elements of L<Data::TagDB::Relation>. If we want all tags that are contained we find them in the related property.
+
+We can collect them into an array like this:
+
+    my @list = $iter->collect('related');
+
+This however will force all entries to be loaded into memory. It may be better to do:
+
+    $iter->foreach(sub {
+        my ($entry) = @_;
+        my Data::TagDB::Tag $member_tag = $entry->related;
+        # ...
+    });
+
+=head1 Performance
+
+There are two main ways to improve performance. Caching and transactions.
+
+=head2 Transactions
+
+Transactions improve the by the database not needing to lock and unlock constantly.
+This is mostly noticeable for write operations but is also valid for reading.
+
+To support transactions L<Data::TagDB/begin_work>, L<Data::TagDB/commit>, and L<Data::TagDB/rollback> are provided.
+They are proxy methods for L<DBI/begin_work>, L<DBI/commit>, and L<DBI/rollback>.
+
+=head2 Caching
+
+Caches can be used to keep tags instances from being destroyed.
+This is done by first creating a new cache:
+
+    my Data::TagDB::Cache $cache = $db->create_cache;
+
+And then adding any tags to keep them alive:
+
+    $cache->add($tag0, $tag1, ...);
+
+You can have any amount of caches. E.g. if the the software uses a single database connection but handles multiple requests one could
+have one global cache to cache the most relevant tags, and one per request cache to cache tags relevant to the request.
+
+One the cache is destroyed, the tags will also be released (unless otherwise in use or hold by another cache).
+
+=head1 AUTHOR
+
+Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

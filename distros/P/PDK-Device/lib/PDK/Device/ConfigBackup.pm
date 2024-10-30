@@ -408,10 +408,14 @@ sub dump {
     make_path($workdir) unless -d $workdir;
 
     my $enc = Encode::Guess->guess($text);
-    ref($enc) or croak "无法猜测编码: $enc";
-    eval { $text = $enc->decode($text); };
-    if (!!$@) {
-      warn("字符串($text)解码失败：$@") if $self->debug == 0;
+    if (ref $enc) {
+      eval { $text = $enc->decode($text); };
+      if (!!$@) {
+        $self->dump("[dump] 字符串解码失败：$@");
+      }
+    }
+    else {
+      $self->dump("[dump] 无法猜测编码: $enc");
     }
 
     my $filename = "$workdir/backup_dump.txt";

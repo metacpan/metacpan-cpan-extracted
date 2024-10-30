@@ -4,6 +4,8 @@
 package Audio::Nama;
 use File::Copy;
 use Modern::Perl '2020'; no warnings 'uninitialized';
+use vars '$VERSION';
+
 
 sub save_state {
 	logsub((caller(0))[3]);
@@ -116,7 +118,7 @@ sub save_system_state {
 	# save history -- 50 entries, maximum
 
 	my @history;
-	@history = $term->GetHistory if $term;
+	@history = $text->{term}->GetHistory if $text->{term};
 	my %seen;
 	$text->{command_history} = [];
 	map { push @{$text->{command_history}}, $_ 
@@ -446,7 +448,7 @@ sub restore_state_from_file {
 
 	# restore command history
 	
-	$term->SetHistory(@{$text->{command_history}})
+	$text->{term}->SetHistory(@{$text->{command_history}})
 		if (ref $text->{command_history}) =~ /ARRAY/;
 
 ;
@@ -460,8 +462,6 @@ sub restore_state_from_file {
 	my $fname = $file->midi_store;
 	midish_cmd(qq<load "$fname">);
 	
-	# disable hotkeys
-	delete $text->{hotkey_mode};
 } 
 sub convert_rw {
 	my $h = shift;

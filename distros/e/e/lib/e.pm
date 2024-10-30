@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.31
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.32
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,7 +45,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.31';
+our $VERSION = '1.32';
 
 =head1 SYNOPSIS
 
@@ -468,7 +468,7 @@ Turn string into a L<Mojo::File> object.
 
 =cut
 
-=head2 Math Help
+=head2 List Support
 
 =head3 max
 
@@ -483,6 +483,22 @@ Get the smallest number in a list.
 
     $ perl -Me -e 'say max 2,4,1,3'
     1
+
+=head3 sum
+
+Adds a list of numbers.
+
+    $ perl -Me -e 'say sum 1..10'
+    55
+
+=head3 uniq
+
+Get the unique values in a list.
+
+    $ perl -Me -e 'say for uniq 2,4,4,6'
+    2
+    4
+    6
 
 =cut
 
@@ -942,7 +958,7 @@ sub import {
         },
 
         ######################################
-        #            Math Help
+        #            List Support
         ######################################
 
         max => sub {
@@ -959,6 +975,29 @@ sub import {
             }
 
             List::Util::min( @_ );
+        },
+
+        sum => sub {
+            if ( !$imported{$caller}{"List::Util"}++ ) {
+                require List::Util;
+            }
+
+            List::Util::sum( @_ );
+        },
+
+        uniq => sub {
+            if ( !$imported{$caller}{"List::Util"}++ ) {
+                require List::Util;
+            }
+
+            # Since uniq is missing in some recent versions.
+            if ( List::Util->can( "uniq" ) ) {
+                List::Util::uniq( @_ );
+            }
+            else {
+                my %h;
+                grep { !$h{$_}++ } @_;
+            }
         },
 
         ######################################

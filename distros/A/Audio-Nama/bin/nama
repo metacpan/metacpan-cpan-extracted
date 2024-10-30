@@ -962,19 +962,19 @@ rewind 6.5
 
 =back
 
-=head4 B<jump-to-start> (beg) - Set the playback head to the start. A synonym for setpos 0.
+=head4 B<to-start> (beg) - Set the playback head to the start. A synonym for setpos 0.
 
 =over 8
 
-jump-to-start 
+to-start 
 
 =back
 
-=head4 B<jump-to-end> (end) - Set the playback head to end minus 10 seconds.
+=head4 B<to-end> (end) - Set the playback head to end minus 10 seconds.
 
 =over 8
 
-jump-to-end 
+to-end 
 
 =back
 
@@ -1628,22 +1628,21 @@ show-latency-all
 
 =head2 Track commands
 
-=head4 B<set-region> (srg) - Specify a playback region for the current track using marks or time positions
+=head4 B<set-region> (srg) - Specify a playback region for the current track using marks. 
 Can be reversed with remove-region.
 
 
 =over 8
 
-set-region <string:start-mark-name|decimal:time> <string:end-mark-name|decimal:time>
+set-region <string:start_mark_name> <string:end_mark_name>
 
 sax            # Select "sax" as the current track.
-set-region 2.5 120.5 # Play the audio from 2.5 to 120.5 seconds. **Must be decimal notation**
-# or you can use marks:
 setpos 2.5     # Move the playhead to 2.5 seconds.
 mark sax_start # Create a mark
 sp 120.5       # Move playhead to 120.5 seconds.
 mark sax_end   # Create another mark
 set-region sax_start sax_end 
+#  Play only the audio from 2.5 to 120.5 seconds.
 
 
 =back
@@ -1657,13 +1656,9 @@ definition. The original track is untouched.
 add-region <string:start_mark_name> | <float:start_time> <string:end_mark_name> | <float:end_time> [ <string:region_name> ]
 
 sax # Select "sax" as the current track.
-add-region 24.4 66.7 solo 
-# Clone the "sax" track as "solo"
-# selecting the region from 24.4 to 66.7 seconds.
-# Decimals are required, integers are interpreted as mark indices
-add-region solo-start solo-end
-# Clone track, selecting the region defined from solo-start 
-# mark to solo-end mark. 
+add-region sax_start 66.7 trimmed_sax 
+# Create "trimmed_sax", a copy of "sax" with a region defined
+# from mark "sax_start" to 66.7 seconds. 
 
 
 =back
@@ -1877,7 +1872,7 @@ new-branch <string:new-branch_name> [<string:existing_branch_name>]
 
 =back
 
-=head4 B<save-state> (save) - Save the project settings as file or git snapshot
+=head4 B<save-state> (keep save) - Save the project settings as file or git snapshot
 
 =over 8
 
@@ -2175,51 +2170,29 @@ list-effects
 
 =head2 General commands
 
-=head4 B<hotkeys-param> (hkp) - Enable hotkeys for adjusting effect parameters
+=head4 B<hotkeys> (hk) - Use this command to set the hotkey mode. (You may also use the hash symbol '#'.)
+Hit the Escape key to return to command mode.
+
 
 =over 8
 
-hotkeys-param 
+hotkeys 
 
 =back
 
-=head4 B<hotkeys-jump> (hkj) - Enable hotkeys for changing the playback position (default)
+=head4 B<hotkeys-always> (hka) - Activate hotkeys mode after each command.
 
 =over 8
 
-hotkeys-jump 
+hotkeys-always 
 
 =back
 
-=head4 B<hotkeys-bump> (hkb) - Enable hotkeys for re-positioning marks
-
-=over 8
-
-hotkeys-bump 
-
-=back
-
-=head4 B<hotkeys-off> (hko) - Restore default key bindings
+=head4 B<hotkeys-off> (hko) - Disable hotkeys always mode
 
 =over 8
 
 hotkeys-off 
-
-=back
-
-=head4 B<hotkeys-on> (hk) - Restore hotkey mode
-
-=over 8
-
-hotkeys-on 
-
-=back
-
-=head4 B<toggle-hotkeys> (th) - Flipflop hotkey mode
-
-=over 8
-
-toggle-hotkeys 
 
 =back
 
@@ -2328,13 +2301,13 @@ tmk 2 # Move to the mark with the index 2.
 
 =back
 
-=head4 B<add-mark> (mark amk k) - Drop a new mark at the current playback position. This will fail, if a mark is already placed on that exact position.
+=head4 B<add-mark> (mark amk k) - Drop a new mark at the current playback position. this will fail, if a mark is already placed on that exact position.
 
 =over 8
 
-add-mark [ <string:mark_id> ] [<string:attr>]...
+add-mark [ <string:mark_id> ]
 
-mark start # create a mark named "start" at the current position.
+mark start # Create a mark named "start" at the current position.
 
 
 =back
@@ -3289,44 +3262,6 @@ by creating a sequence.
 
 =back
 
-=head2 Mark commands
-
-=head4 B<retain> (clip-start cls keep) - Use current position to mark start of a clip
-
-=over 8
-
-retain 
-
-=back
-
-=head4 B<discard> (clip-end cle skip) - Use current position to mark end of a clip
-
-=over 8
-
-discard 
-
-=back
-
-=head2 Sequence commands
-
-=head4 B<gather> (gth) - Compose a sequence from the current track clip marks
-
-=over 8
-
-gather 
-
-=back
-
-=head4 B<toggle-snip> (tgs) - Drop clip mark at the current position to toggle snip state 
-from 'skip' to 'keep' and vice versa
-
-
-=over 8
-
-toggle-snip 
-
-=back
-
 =head4 B<compose> (compose-sequence compose-into-sequence) - Compose a new sequence using the region(s) of the named track
 defined by mark pair(s). If the sequence of that name exists, 
 append the regions to that sequence (compose-into-sequence).
@@ -3579,52 +3514,6 @@ set-sample-rate <integer:sample-rate>
 
 =back
 
-=head2 Transport commands
-
-=head4 B<set-playback-jump> (spj j=) - Set the jump size for transport hotkeys
-
-=over 8
-
-set-playback-jump <float:seconds>
-
-=back
-
-=head2 Mark commands
-
-=head4 B<set-mark-bump> (smb b=) - Set the size of the mark bump
-
-=over 8
-
-set-mark-bump <float:seconds>
-
-=back
-
-=head4 B<set-mark-replay> (smr) - Set how far to rewind playhead for review after setting or bumping a mark
-
-=over 8
-
-set-mark-replay <float:seconds>
-
-=back
-
-=head2 Effect commands
-
-=head4 B<set-param-increment> (spi m=) - Set the parameter increment as a value, e.g. "m=0.2"
-
-=over 8
-
-set-param-increment <float:time>
-
-=back
-
-=head4 B<set-param-exp> (spe m x=) - Set the parameter increment as an exponent, e.g. "x=-2" sets 0.01
-
-=over 8
-
-set-param-exp <integer:exponent>
-
-=back
-
 =head1 REALTIME OPERATION
 
 Nama selects realtime or nonrealtime parameters based on the
@@ -3745,4 +3634,5 @@ S. Massy ++
 Copyright (c) 2009-2017 by Joel Roth.
 
 This is free software; you can redistribute it and/or modify
-it under the terms of the "L<Perl Artistic License|perlartistic>".
+it under the terms of the GNU General Public License,
+Version 3.

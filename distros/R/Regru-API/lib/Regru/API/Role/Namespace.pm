@@ -7,8 +7,8 @@ use warnings;
 use Moo::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.052'; # VERSION
-our $AUTHORITY = 'cpan:CHIM'; # AUTHORITY
+our $VERSION = '0.053'; # VERSION
+our $AUTHORITY = 'cpan:OLEG'; # AUTHORITY
 
 requires 'available_methods';
 
@@ -26,7 +26,7 @@ Regru::API::Role::Namespace - something that can treat as a namespace
 
 =head1 VERSION
 
-version 0.052
+version 0.053
 
 =head1 SYNOPSIS
 

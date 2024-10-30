@@ -7,6 +7,7 @@
 
 package Audio::Nama;
 use Modern::Perl '2020'; use Carp;
+use vars '$VERSION';
 use Socket qw(getnameinfo NI_NUMERICHOST) ;
 
 sub is_test_script { $config->{opts}->{J} }
@@ -38,7 +39,7 @@ sub apply_ecasound_test_args {
 	@ARGV = grep { $_ ne q(-E) } @ARGV
 }
 
-sub initializations {
+sub definitions {
 
 	$| = 1;     # flush STDOUT buffer on every write
 
@@ -68,7 +69,6 @@ sub initializations {
 @persistent_vars = qw(
 	$project->{nama_version}
 	$project->{save_file_version_number}
-	$project->{mark_sequence_counter}
 	$project->{timebase}
 	$project->{command_buffer}
 	$project->{track_version_comments}
@@ -76,7 +76,7 @@ sub initializations {
 	$project->{bunch}
 	$project->{current_op}
 	$project->{current_param}
-	$project->{param_stepsize}
+	$project->{current_stepsize}
 	$project->{playback_position}
 	$project->{sample_rate}
 	$project->{waveform}
@@ -89,18 +89,17 @@ sub initializations {
 	$mode->{midi_transport_sync}
 	$gui->{_seek_unit}
 	$text->{command_history}
-	$text->{hotkey_mode}
 	$this_track_name
 	$this_op
 );
 
 
-	$text->{wrap} = Text::Format->new( {
+	$text->{wrap} = new Text::Format {
 		columns 		=> 75,
 		firstIndent 	=> 0,
 		bodyIndent		=> 0,
 		tabstop			=> 4,
-	});
+	};
 
 	####### Initialize singletons #######
 
@@ -227,9 +226,9 @@ sub initializations {
 				my $delay = shift();
 				modify_effect($id,2,undef,$delay)
 			},
-		playback_jump_seconds => 1,
-		mark_bump_seconds => 0.1,
-		seek_end_margin	=>10,
+		hotkey_beep					=> 'beep -f 250 -l 200',
+	#	this causes beeping during make test
+	#	beep_command					=> 'beep -f 350 -l 700',
 		midi_record_buffer => 'midi_record',
 		midi_default_input_channel => 'keyboard',
 		ecasound_channel_ops 		=> {map{$_,1} qw(chcopy chmove chorder chmix chmute)},
@@ -286,12 +285,10 @@ sub initialize_interfaces {
 	
 	logsub((caller(0))[3]);
 	
-	if ( $config->{opts}->{g} and Audio::Nama::Graphical::initialize_tk() ){ 
- 		say("Starting in graphical mode, terminal is also available.");
+	if ( ! $config->{opts}->{t} and Audio::Nama::Graphical::initialize_tk() ){ 
 		$ui = Audio::Nama::Graphical->new();
 	} else {
-		say( "Unable to load perl Tk module.") if $config->{opts}->{g};
- 		say("Starting in console mode.");
+		pager_newline( "Unable to load perl Tk module. Starting in console mode.") if $config->{opts}->{g};
 		$ui = Audio::Nama::Text->new();
 		can_load( modules =>{ Event => undef})
 			or die "Perl Module 'Event' not found. Please install it and try again. Stopping.";

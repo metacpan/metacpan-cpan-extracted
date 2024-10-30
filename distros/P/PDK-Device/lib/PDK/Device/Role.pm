@@ -18,15 +18,16 @@ has port => (is => 'ro', isa => 'Int', required => 0,);
 
 has proto => (is => 'ro', isa => 'Str', default => 'ssh',);
 
-has prompt => (is => 'ro', required => 0, default => '\S+[#>\]]\s*$',);
+has prompt => (is => 'ro', isa => 'Str', required => 0, default => '\S+[#>\]]\s*$',);
 
-has [qw(enPrompt enCommand)] => (is => 'ro', required => 0,);
+has [qw(enPrompt enCommand)] => (is => 'ro', isa => 'Str', required => 0,);
 
-has mode => (is => 'ro', default => 'normal',);
+has mode => (is => 'ro', isa => 'Str', default => 'normal',);
 
 for my $attr (qw(username password enPassword passphrase)) {
   has $attr => (
     is      => 'ro',
+    isa     => 'Str',
     default => sub {
       my $value = $ENV{"PDK_DEVICE_" . uc($attr)};
       PDK::Device::Concern::Dumper::_debug_init("从环境变量中加载并设置 $attr：($value)") if defined $value;
@@ -55,7 +56,7 @@ has catchError => (
   },
 );
 
-has [qw(enabled status)] => (is => 'rw', default => 0,);
+has [qw(enabled status)] => (is => 'rw', isa => 'Int', default => 0,);
 
 sub login {
   my $self = shift;
@@ -446,7 +447,7 @@ sub _debug {
     $exp->debug($level);
   }
 
-  $exp->log_file("$workdir/$self->{host}.log");
+  $exp->log_file("$workdir/$self->{host}.txt");
 }
 
 sub BUILD {
@@ -459,3 +460,4 @@ sub BUILD {
 1;
 
 # ABSTRACT: A Moose role for managing device connections and configurations using Expect.
+

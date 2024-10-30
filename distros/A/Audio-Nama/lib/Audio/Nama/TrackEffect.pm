@@ -5,7 +5,6 @@ use Role::Tiny;
 use Audio::Nama::Effect qw(fxn);
 use Audio::Nama::Globals qw($project);
 use Try::Tiny;
-use List::MoreUtils qw(first_index);
 
 # current operator and current parameter for the track
 sub op { $project->{current_op}->{$_[0]->name} //= $_[0]->{ops}->[-1] }
@@ -13,14 +12,12 @@ sub op { $project->{current_op}->{$_[0]->name} //= $_[0]->{ops}->[-1] }
 sub param { $project->{current_param}->{$_[0]->op} //= 1 }
 
 sub stepsize {
-	$project->{param_stepsize}->{$_[0]->op}->[$_[0]->param] //= 0.01 
+	$project->{current_stepsize}->{$_[0]->op}->[$_[0]->param] //= 0.01 
 	# TODO use hint if available
 }
 sub pos {
 	my $track = shift;
-	my $op = $track->op;
-	my $index = first_index {$_ eq $op } @{$track->ops};
-	return($index || 0);
+	first_index{$_ eq $track->op} @{$track->ops};
 }
 sub user_ops_o {
 	my $track = shift;

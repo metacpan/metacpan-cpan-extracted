@@ -59,6 +59,10 @@ i.orng          { color: #c60 }
 web hosting which disables an "unlimited traffic" web site if a single bot hammers
 the site with a moderate load.  An alternate ExifTool homepage is available at
 <a href="http://exiftool.sourceforge.net/">http://exiftool.sourceforge.net/</a></i></p> -->
+
+<p><i class=orng><b>Note:</b> IP's that agressively download multiple copies of
+the distribution files or access web pages too quickly will be blocked.</i></p>
+
 <div class=wide><table class=links><tr>
 <th><a href="install.html" class=wt>&nbsp;Installing&nbsp;</a></th>
 <th><a href="TagNames/index.html" class=wt>&nbsp;Tag&nbsp;Names&nbsp;</a></th>
@@ -94,9 +98,9 @@ the site with a moderate load.  An alternate ExifTool homepage is available at
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-12.76.tar.gz">
-Download        Version 12.76</a> (5.1 MB) -
-<a href="history.html">Jan. 31, 2024</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-13.00.tar.gz">
+Download        Version 13.00</a> (7.2 MB) -
+<a href="history.html">Oct. 29, 2024</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -142,33 +146,36 @@ as well as the maker notes of many digital cameras by
 <a href="TagNames/Sigma.html">Sigma/Foveon</a> and
 <a href="TagNames/Sony.html">Sony</a>.</p>
 
-<p>ExifTool is also available as a <b>stand-alone Windows executable</b> and a
+<p>ExifTool is also available as a <b>Windows executable</b> and a
 <b>MacOS package</b>:  <i>(Note that these versions contain the executable
 only, and do not include the HTML documentation or other files of the full
 distribution above.)</i></p>
 
-<blockquote><table class='dl lg'><tr><td><b>
-<a name="alone">Windows Executable:</a>
-<a href="exiftool-12.76.zip">
-         exiftool-12.76.zip</a> (7.0 MB)</b></td></tr></table></blockquote>
+<blockquote><table class='dl lg'><tr><td rowspan=2><b><a name="alone">Windows</a></b></td><td><b>
+32-bit: <a href="exiftool-13.00_32.zip">
+         exiftool-13.00_32.zip</a> (10.8 MB)</b></td></tr>
+<tr><td><b>64-bit:
+<a href="exiftool-13.00_64.zip">
+         exiftool-13.00_64.zip</a> (10.6 MB)</b></td></tr>
+         </table></blockquote>
 
-<p><b>The stand-alone Windows executable</b> does not require Perl. Just
-download and un-zip the archive then double-click on
-"<code>exiftool(-k).exe</code>" to read the application documentation,
-drag-and-drop files and folders to view meta information, or rename to
-"<code>exiftool.exe</code>" for command-line use.  Runs on all versions
-of Windows.</p>
+<p><b>The Windows executable</b> archives include Perl. Just download and un-zip
+the appropriate archive then double-click on "<code>exiftool(-k).exe</code>" to read the
+application documentation, drag-and-drop files and folders to view meta
+information, or rename to "<code>exiftool.exe</code>" for command-line use.
+Note that if you move the .exe to another folder, you <b>must also move
+the "<code>exiftool_files</code>" folder</b> to the same location.</p>
 
-<p><i>(Note: Oliver Betz provides an
-<a href="https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows">alternate ExifTool Windows installer</a>
-that avoids some problems of the self-extracting archive version above.  Please post
-<a href="https://exiftool.org/forum/index.php/topic,10128.0.html">here</a>
-if you have any problems/comments with this version.)</i></p>
+<p><i>(The Windows packages are based on work by Oliver Betz, and use his
+launcher.  <a href="https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows">Oliver
+also provides self-installing versions of these executables</a>.
+See <a href="https://exiftool.org/forum/index.php/topic,10128.0.html">this forum post</a>
+if you have any problems/comments with these versions.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 MacOS Package:
-<a href="ExifTool-12.76.dmg">
-         ExifTool-12.76.dmg</a> (3.3 MB)</b></td></tr></table></blockquote>
+<a href="ExifTool-13.00.pkg">
+         ExifTool-13.00.pkg</a> (5.2 MB)</b></td></tr></table></blockquote>
 
 <p><b>The MacOS package</b> installs the ExifTool command-line application and
 libraries in /usr/local/bin. After installing, type "<code>exiftool</code>" in a
@@ -179,9 +186,12 @@ installing ExifTool on Windows, MacOS and Unix systems.</p>
 
 <ul>
 <li><a href="checksums.txt">Click here
-for the SHA1 and MD5 checksums to verify these distribution packages</a>.</li>
+for the SHA256 (recommended), SHA1 and MD5 checksums to verify these
+distribution packages</a>.</li>
 <li>The version number of the latest ExifTool release may be found
-<a href="ver.txt">here</a>.</li>
+<a href="ver.txt">here</a>, and the name of the most recent
+<a href="geolocation.html#Alt">alternate geolocation database</a>
+is <a href="geo.txt">here</a>.</li>
 </ul>
 
 <h2><a name="features">Features</a></h2>
@@ -212,10 +222,14 @@ for the SHA1 and MD5 checksums to verify these distribution packages</a>.</li>
     <a href="TagNames/AFCP.html">AFCP</a> and more...</li>
 <li>Reads and writes maker notes of many digital cameras</li>
 <li>Reads <a href="TagNames/QuickTime.html#Stream">timed metadata</a> (eg. GPS track) from MOV/MP4/M2TS/AVI videos</li>
+<li>Reads <a href="TagNames/GM.html">GM PDR data</a> from videos written by cars such as Corvette and Camero</li>
 <li>Numerous output formatting options (including tab-delimited, HTML, XML and JSON)</li>
 <li>Multi-lingual output (cs, de, en, en-ca, en-gb, es, fi, fr, it, ja, ko, nl, pl, ru, sk, sv, tr, zh-cn or zh-tw)</li>
+<li><a href="#diff">Compares two files for metadata differences</a></li>
 <li><a href="geotag.html">Geotags images</a> from GPS track log files (with time drift correction!)</li>
 <li><a href="geotag.html#Reverse">Generates track logs</a> from geotagged images</li>
+<li><a href="geolocation.html">Geolocation feature</a> identifies nearest city, state/province, county and country based on GPS position</li>
+<li><a href="geolocation.html">Reverse Geolocation</a> determines GPS position from city, state/province, country name, etc.</li>
 <li><a href="#shift">Shifts date/time values</a> to fix timestamps in images</li>
 <li><a href="#filename">Renames files and organizes in directories</a> (by date
     or by any other meta information)</li>
@@ -356,7 +370,7 @@ metadata types for each file format.  C2PA metadata is not currently <b>W</b>rit
 <tr><td>ERF</td><td>R/W</td><td>Epson RAW Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/D</td><td>R/W <a href="TagNames/Olympus.html">Olympus</a></td></tr>
 <tr><td><a href="TagNames/EXE.html">EXE, DLL</a></td><td>R</td><td>DOS/Windows executable and library files</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/EXE.html">EXE</a></td></tr>
 <tr><td><a href="TagNames/EXIF.html">EXIF</a></td><td>R/W/C</td><td>Exchangeable Image File Format metadata (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R/W/C</td><td>-</td><td>-</td><td>-</td><td>R/D</td><td>-</td></tr>
-<tr><td><a href="TagNames/OpenEXR.html">EXR</a></td><td>R</td><td>Open EXR (Extended Range)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/OpenEXR.html">OpenEXR</a></td></tr>
+<tr><td><a href="TagNames/OpenEXR.html">EXR</a></td><td>R</td><td>Open EXR (Extended Range)</td><td>R</td><td>-</td><td>R</td><td>-</td><td>-</td><td>R <a href="TagNames/OpenEXR.html">OpenEXR</a></td></tr>
 <tr><td>EXV</td><td>R/W/C</td><td>Exiv2 metadata file (<a href="TagNames/JPEG.html">JPEG</a>-based)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/D</td><td><a href="#JPEG">Supported JPEG Meta Information</a></td></tr>
 <tr><td>F4A, F4B, F4P, F4V</td><td>R/W</td><td>Adobe Flash Player 9+ Audio/Video (<a href="TagNames/QuickTime.html">QuickTime</a>-based)</td><td>R/W<span class=sup>3</span></td><td>R/W<span class=sup>3</span></td><td>R/W/C</td><td>-</td><td>R/D</td><td>R/W/C <a href="TagNames/QuickTime.html">QuickTime</a></td></tr>
 <tr><td>FFF</td><td>R/W<span class=sup>6</span></td><td>Hasselblad Flexible File Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/D</td><td>-</td></tr>
@@ -423,9 +437,11 @@ metadata types for each file format.  C2PA metadata is not currently <b>W</b>rit
 <tr><td><a href="TagNames/MRC.html">MRC</a></td><td>R</td><td>Medical Research Council</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/MRC.html">MRC</a></td></tr>
 <tr><td><a href="TagNames/MXF.html">MXF</a></td><td>R</td><td>Material Exchange Format</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/MXF.html">MXF</a></td></tr>
 <tr><td>NEF</td><td>R/W</td><td>Nikon (RAW) Electronic Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/D</td><td>R/W <a href="TagNames/Nikon.html">Nikon</a> <a href="TagNames/NikonCapture.html">NikonCapture</a></td></tr>
+<tr><td>NKA</td><td>R</td><td>Nikon NX Studio Adjustments</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R XML</td></tr>
 <tr><td>NKSC</td><td>R/W</td><td>Nikon Sidecar (<a href="TagNames/XMP.html">XMP</a>-based)</td><td>-</td><td>-</td><td>R/W/C</td><td>-</td><td>-</td><td>-</td></tr>
 <tr><td><a href="TagNames/iWork.html">NMBTEMPLATE</a></td><td>R</td><td>Apple iWork '09 Numbers Template</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/iWork.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
 <tr><td>NRW</td><td>R/W</td><td>Nikon RAW (2) (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/D</td><td>R/W <a href="TagNames/Nikon.html">Nikon</a> <a href="TagNames/NikonCapture.html">NikonCapture</a></td></tr>
+<tr><td>NXD</td><td>R</td><td>Nikon Capture NX-D adjustments (XMP-based)</td><td>-</td><td>-</td><td>R</td><td>-</td><td>-</td><td>-</td></tr>
 <tr><td><a href="TagNames/iWork.html">NUMBERS</a></td><td>R</td><td>Apple iWork '09 Numbers spreadsheet</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/iWork.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
 <tr><td><a href="TagNames/EXE.html#ELF">O</a></td><td>R</td><td>Unix compiled code Object</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/EXE.html#ELF">EXE</a></td></tr>
 <tr><td>ODB, ODC, ODF, ODG,<br>ODI, ODP, ODS, ODT</td><td>R</td><td>Open Document Database/Chart/Formula/Graphics/<br>Image/Presentation/Spreadsheet/Text (ZIP/XML-based)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R XML <a href="TagNames/ZIP.html">ZIP</a></td></tr>
@@ -434,7 +450,7 @@ metadata types for each file format.  C2PA metadata is not currently <b>W</b>rit
 <tr><td>ONP</td><td>R</td><td>ON1 Presets</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/JSON.html">JSON</a> <a href="TagNames/PLIST.html">PLIST</a></td></tr>
 <tr><td><a href="TagNames/Opus.html">OPUS</a></td><td>R</td><td>Ogg Opus audio</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R</td><td>R <a href="TagNames/FLAC.html">FLAC</a> <a href="TagNames/ID3.html">ID3</a> <a href="TagNames/ID3.html#Lyrics3">Lyrics3</a> <a href="TagNames/Opus.html">Opus</a> <a href="TagNames/Vorbis.html">Vorbis</a></td></tr>
 <tr><td>ORF, ORI</td><td>R/W</td><td>Olympus RAW Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/D</td><td>R/W <a href="TagNames/Olympus.html">Olympus</a></td></tr>
-<tr><td><a href="TagNames/Font.html">OTF</a></td><td>R</td><td>Open Type Font</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Font.html">Font</a></td></tr>
+<tr><td><a href="TagNames/Font.html">OTF</a></td><td>R</td><td>Open Type Font</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R</td><td>R <a href="TagNames/Font.html">Font</a></td></tr>
 <tr><td>PAC</td><td>R</td><td>Lossless Predictive Audio Compression (<a href="TagNames/RIFF.html">RIFF</a>-based)</td><td>R<span class=sup>3</span></td><td>-</td><td>R</td><td>-</td><td>R</td><td>R <a href="TagNames/RIFF.html">RIFF</a></td></tr>
 <tr><td><a href="TagNames/iWork.html">PAGES</a></td><td>R</td><td>Apple iWork '09 Pages document</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/iWork.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
 <tr><td><a href="TagNames/PhotoCD.html">PCD</a></td><td>R</td><td>Kodak Photo CD Image Pac</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/PhotoCD.html">PhotoCD</a></td></tr>
@@ -484,7 +500,7 @@ metadata types for each file format.  C2PA metadata is not currently <b>W</b>rit
 <tr><td>THM</td><td>R/W</td><td>Thumbnail image (<a href="TagNames/JPEG.html">JPEG</a>)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/D</td><td><a href="#JPEG">Supported JPEG Meta Information</a></td></tr>
 <tr><td><a href="TagNames/OOXML.html">THMX</a></td><td>R</td><td>Office Open XML Theme</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/OOXML.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
 <tr><td><a href="TagNames/EXIF.html">TIFF, TIF</a></td><td>R/W</td><td>Tagged Image File Format</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/D</td><td>R/W/C <a href="TagNames/GeoTiff.html">GeoTIFF</a><span class=sup>1</span>, R/W <a href="#Trailers">Trailers</a></td></tr>
-<tr><td><a href="TagNames/Font.html">TTF, TTC</a></td><td>R</td><td>True Type Font/Collection</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Font.html">Font</a></td></tr>
+<tr><td><a href="TagNames/Font.html">TTF, TTC</a></td><td>R</td><td>True Type Font/Collection</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R</td><td>R <a href="TagNames/Font.html">Font</a></td></tr>
 <tr><td><a href="TagNames/Torrent.html">TORRENT</a></td><td>R</td><td>BitTorrent description file</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Torrent.html">Torrent</a></td></tr>
 <tr><td><a href="TagNames/Text.html">TXT</a></td><td>R</td><td>Text files</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Text.html">Text</a></td></tr>
 <tr><td><a href="TagNames/VCard.html">VCF, VCARD</a></td><td>R</td><td>Virtual Card</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/VCard.html">VCard</a></td></tr>
@@ -602,11 +618,12 @@ some optional Perl modules may be added to enable certain ExifTool features (for
 details, see the DEPENDENCIES section of the README file included in the full
 distribution).</p>
 
-<p><b>Windows users:</b> A <a href="#alone">stand-alone Windows executable</a>
+<p><b>Windows users:</b> A <a href="#alone">Windows executable</a>
 version of ExifTool is available which doesn't require Perl.  You can also use
 the pure Perl version if you already have Perl installed. (You can get a good,
 free Perl interpreter from
-<a href="http://www.activestate.com/activeperl/">activeperl.com</a>.)</p>
+<a href="http://www.activestate.com/activeperl/">activeperl.com</a> or
+<a href="https://strawberryperl.com/">strawberryperl.com</a>.)</p>
 
 <p><b>Everyone else (Mac, Unix, etc):</b> Don't worry, you already have
 Perl installed.</p>
@@ -640,7 +657,7 @@ exiftool</code>". Alternately, you may be able to rename it to
 requires that the proper Windows associations have been made for the
 "<code>.pl</code>" extension.</p>
 
-<p>The stand-alone version ("<code>exiftool(-k).exe</code>") should be
+<p>The ExifTool .exe file ("<code>exiftool(-k).exe</code>") should be
 renamed to "<code>exiftool.exe</code>" to allow it to be run by typing
 "<code>exiftool</code>" at the command line.</p>
 
@@ -653,14 +670,14 @@ PATH, then its directory must be specified on the command line (eg. by typing
 <p>Note that when typing commands in the "cmd.exe" shell, you should use double
 quotes instead of single quotes as shown in some examples.</p>
 
-<p><b>ii) Stand-alone version in the Windows GUI:</b></p>
+<p><b>ii) Running in the Windows GUI (not from command line):</b></p>
 
 <p>Double-click on "<code>exiftool(-k).exe</code>" to read the application
 documentation, or drag-and-drop files and folders to run exiftool on the
 selected files.</p>
 
-<p>Simple options may be added inside brackets in the name of the stand-alone
-executable.  (But note that the characters <code>/\?*:|"&lt;&gt;</code> may not
+<p>Simple options may be added inside brackets in the name of the .exe file.
+(But note that the characters <code>/\?*:|"&lt;&gt;</code> may not
 be used because they are invalid in Windows file names.)  In this way, the
 behaviour of the drag-and-drop application can be customized.  For example:</p>
 
@@ -763,6 +780,57 @@ more information:  Right-click on the window's title bar then select
 href="htmldump.html">HtmlDump</a> (<code>-htmlDump</code>) options print additional
 information that can be very useful for debugging or when decoding new tags.</p>
 
+<a name='diff'><h3>Compare Two Files for Metadata Differences</h3></a>
+
+<p>The <code>-diff</code> option provides a method to show the metadata differences
+between two files.  For example, here is a comparison of two files excluding System
+and Composite tags:</p>
+
+<blockquote>&gt; <code>exiftool a.jpg -diff b.jpg --system:all -e</code><br>&nbsp;
+<table class='box sm tight'><tr><td>
+<pre class=blk>======== diff < a.jpg > b.jpg
+< [IFD0]          Modify Date                     : 2024:09:05 14:37:40 
+>                                                 : 2024:09:05 14:41:05
+< [ExifIFD]       Exposure Time                   : 1/400
+>                                                 : 1/1000
+< [ExifIFD]       F Number                        : 4.0
+>                                                 : 5.6
+< [ExifIFD]       Date/Time Original              : 2024:09:05 14:37:40
+>                                                 : 2024:09:05 14:41:05
+< [ExifIFD]       Create Date                     : 2024:09:05 14:37:40
+>                                                 : 2024:09:05 14:41:05
+< [ExifIFD]       Brightness Value                : 8.49765625
+>                                                 : 10.728125
+< [ExifIFD]       Max Aperture Value              : 2.8
+>                                                 : 4.0
+< [ExifIFD]       Focal Length                    : 9.0 mm
+>                                                 : 32.7 mm
+< [ExifIFD]       Focal Length In 35mm Format     : 24 mm
+>                                                 : 89 mm
+< [Sony]          Camera Temperature              : 36 C
+>                                                 : 35 C
+< [Sony]          Exposure Time                   : 1/400
+>                                                 : 1/1000
+< [Sony]          Sony Max Aperture Value         : 3.0
+>                                                 : 4.1
+< [Sony]          Lens Zoom Position              : 0%
+>                                                 : 59%
+< [Sony]          Brightness Value                : 8.49765625
+>                                                 : 10.728125
+< [Sony]          WB RGB Levels                   : 578 256 478
+>                                                 : 592 256 466
+< [Sony]          Focal Length                    : 9.0 mm
+>                                                 : 32.7 mm
+< [IFD1]          Thumbnail Length                : 12771
+>                                                 : 5940
+< [MPImage1]      MP Image Length                 : 7696566
+>                                                 : 5839721
+< [MPImage2]      MP Image Length                 : 1167032
+>                                                 : 492263
+< [MPImage2]      MP Image Start                  : 7699456
+>                                                 : 5840896
+</pre></td></tr></table></blockquote>
+
 <h2><a name="tagnames">Tag Names Explained</a></h2>
 
 <p>A tag name is a "handle" that is used to refer to a specific piece of meta
@@ -847,21 +915,21 @@ of the group names in each family:</p>
 <td class=sm>AAC, AFCP, AIFF, APE, APP0, APP1, APP11, APP12, APP13, APP14, APP15, APP2,
 APP3, APP4, APP5, APP6, APP7, APP8, APP9, ASF, Audible, Canon, CanonVRD,
 Composite, DICOM, DNG, DV, DjVu, Ducky, EXE, EXIF, ExifTool, FITS, FLAC,
-FLIR, File, Flash, FlashPix, Font, FotoStation, GIF, GIMP, GeoTiff, GoPro,
-H264, HTML, ICC_Profile, ID3, IPTC, ISO, ITC, JFIF, JPEG, JSON, JUMBF,
-Jpeg2000, LNK, Leaf, Lytro, M2TS, MIE, MIFF, MISB, MNG, MOI, MPC, MPEG, MPF,
-MXF, MakerNotes, Matroska, Meta, Ogg, OpenEXR, Opus, PDF, PICT, PLIST, PNG,
-PSP, Palm, PanasonicRaw, Parrot, PhotoCD, PhotoMechanic, Photoshop,
-PostScript, PrintIM, QuickTime, RAF, RIFF, RSRC, RTF, Radiance, Rawzor,
-Real, Red, SVG, SigmaRaw, Sony, Stim, Theora, Torrent, Trailer, VCard,
-Vorbis, WTV, XML, XMP, ZIP
+FLIR, File, Flash, FlashPix, Font, FotoStation, GIF, GIMP, GM, GeoTiff,
+GoPro, H264, HTML, ICC_Profile, ID3, IPTC, ISO, ITC, JFIF, JPEG, JSON,
+JUMBF, Jpeg2000, LNK, Leaf, Lytro, M2TS, MIE, MIFF, MISB, MNG, MOI, MPC,
+MPEG, MPF, MXF, MakerNotes, Matroska, Meta, Ogg, OpenEXR, Opus, PDF, PICT,
+PLIST, PNG, PSP, Palm, PanasonicRaw, Parrot, PhotoCD, PhotoMechanic,
+Photoshop, PostScript, PrintIM, QuickTime, RAF, RIFF, RSRC, RTF, Radiance,
+Rawzor, Real, Red, SVG, SigmaRaw, Sony, Stim, Theora, Torrent, Trailer,
+VCard, Vorbis, WTV, XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td class=sm>AAC, AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, AdobeDNG, Apple,
 Audible, CBOR, CIFF, CameraIFD, Canon, CanonCustom, CanonDR4, CanonRaw,
 CanonVRD, Casio, Chapter#, Composite, DICOM, DJI, DNG, DV, DjVu, DjVu-Meta,
 Ducky, EPPIM, EXE, EXIF, ExifIFD, ExifTool, FITS, FLAC, FLIR, File, Flash,
-FlashPix, Font, FotoStation, FujiFilm, FujiIFD, GE, GIF, GIMP, GPS,
+FlashPix, Font, FotoStation, FujiFilm, FujiIFD, GE, GIF, GIMP, GM, GPS,
 GSpherical, Garmin, GeoTiff, GlobParamIFD, GoPro, GraphConv, H264, HP, HTC,
 HTML, HTML-dc, HTML-ncc, HTML-office, HTML-prod, HTML-vw96, HTTP-equiv,
 ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-meta, ICC-view, ICC_Profile,
@@ -875,27 +943,27 @@ MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview,
 MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF, MISB, MNG, MOBI, MOI,
 MPC, MPEG, MPF0, MPImage, MS-DOC, MXF, MacOS, MakerNotes, MakerUnknown,
 Matroska, MediaJukebox, Meta, MetaIFD, Microsoft, Minolta, MinoltaRaw,
-Motorola, NITF, Nikon, NikonCapture, NikonCustom, NikonScan, NikonSettings,
-NineEdits, Nintendo, Ocad, Ogg, Olympus, OpenEXR, Opus, PDF, PICT, PNG,
-PNG-cICP, PNG-pHYs, PSP, Palm, Panasonic, PanasonicRaw, Parrot, Pentax,
-PhaseOne, PhotoCD, PhotoMechanic, Photoshop, PictureInfo, PostScript,
-PreviewIFD, PrintIM, ProfileIFD, Qualcomm, QuickTime, RAF, RAF2, RIFF,
-RMETA, RSRC, RTF, Radiance, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP,
-Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Reconyx, Red, Ricoh, SPIFF, SR2,
-SR2DataIFD, SR2SubIFD, SRF#, SVG, Samsung, Sanyo, Scalado, Sigma, SigmaRaw,
-Sony, SonyIDC, Stim, SubIFD, System, Theora, Torrent, Track#, UserData,
-VCalendar, VCard, VNote, Version0, Vorbis, WTV, XML, XMP, XMP-DICOM,
-XMP-Device, XMP-GAudio, XMP-GCamera, XMP-GCreations, XMP-GDepth, XMP-GFocus,
-XMP-GImage, XMP-GPano, XMP-GSpherical, XMP-LImage, XMP-MP, XMP-MP1,
-XMP-PixelLive, XMP-aas, XMP-acdsee, XMP-album, XMP-apple-fi, XMP-ast,
-XMP-aux, XMP-cc, XMP-cell, XMP-crd, XMP-creatorAtom, XMP-crs, XMP-dc,
-XMP-dex, XMP-digiKam, XMP-drone-dji, XMP-dwc, XMP-et, XMP-exif, XMP-exifEX,
-XMP-expressionmedia, XMP-extensis, XMP-fpv, XMP-getty, XMP-hdr, XMP-hdrgm,
-XMP-ics, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft,
-XMP-mwg-coll, XMP-mwg-kw, XMP-mwg-rs, XMP-nine, XMP-panorama, XMP-pdf,
-XMP-pdfx, XMP-photomech, XMP-photoshop, XMP-plus, XMP-pmi, XMP-prism,
-XMP-prl, XMP-prm, XMP-pur, XMP-rdf, XMP-sdc, XMP-swf, XMP-tiff, XMP-x,
-XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpDSA, XMP-xmpMM, XMP-xmpNote,
+Motorola, NITF, Nextbase, Nikon, NikonCapture, NikonCustom, NikonScan,
+NikonSettings, NineEdits, Nintendo, Ocad, Ogg, Olympus, OpenEXR, Opus, PDF,
+PICT, PNG, PNG-cICP, PNG-pHYs, PSP, Palm, Panasonic, PanasonicRaw, Parrot,
+Pentax, PhaseOne, PhotoCD, PhotoMechanic, Photoshop, PictureInfo,
+PostScript, PreviewIFD, PrintIM, ProfileIFD, Qualcomm, QuickTime, RAF, RAF2,
+RIFF, RMETA, RSRC, RTF, Radiance, Rawzor, Real, Real-CONT, Real-MDPR,
+Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Reconyx, Red, Ricoh,
+SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Samsung, Sanyo, Scalado,
+Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD, System, Theora, Torrent,
+Track#, UserData, VCalendar, VCard, VNote, Version0, Vorbis, WTV, XML, XMP,
+XMP-DICOM, XMP-Device, XMP-GAudio, XMP-GCamera, XMP-GCreations, XMP-GDepth,
+XMP-GFocus, XMP-GImage, XMP-GPano, XMP-GSpherical, XMP-LImage, XMP-MP,
+XMP-MP1, XMP-PixelLive, XMP-aas, XMP-acdsee, XMP-album, XMP-apple-fi,
+XMP-ast, XMP-aux, XMP-cc, XMP-cell, XMP-crd, XMP-creatorAtom, XMP-crs,
+XMP-dc, XMP-dex, XMP-digiKam, XMP-drone-dji, XMP-dwc, XMP-et, XMP-exif,
+XMP-exifEX, XMP-expressionmedia, XMP-extensis, XMP-fpv, XMP-getty, XMP-hdr,
+XMP-hdrgm, XMP-ics, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
+XMP-microsoft, XMP-mwg-coll, XMP-mwg-kw, XMP-mwg-rs, XMP-nine, XMP-panorama,
+XMP-pdf, XMP-pdfx, XMP-photomech, XMP-photoshop, XMP-plus, XMP-pmi,
+XMP-prism, XMP-prl, XMP-prm, XMP-pur, XMP-rdf, XMP-sdc, XMP-swf, XMP-tiff,
+XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpDSA, XMP-xmpMM, XMP-xmpNote,
 XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP, iTunes
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
@@ -918,8 +986,8 @@ rational64s, float, double, ifd, unicode, complex, int64u, int64s, ifd64</td></t
 <td>ID-xxx (where xxx is the tag ID.  Numerical ID's are given in hex with a
 leading "0x" if the <a href="ExifTool.html#HexTagIDs">HexTagIDs API option</a>
 is set, as are characters in non-numerical ID's which are not valid in a group
-name.  Note that unlike other group names, family 7 group names are case
-sensitive.)</td></tr>
+name.  Either decimal or hexadecimal ID's may be used when writing.  Note that
+unlike other group names, family 7 group names are case sensitive.)</td></tr>
 <tr><td><b>8&nbsp;(File&nbsp;Number)</b></td>
 <td>File# (for files loaded via <code>-file<i>NUM</i></code> option)</td></tr>
 </table></blockquote>
@@ -1046,6 +1114,10 @@ for proper rendering of the image.</li>
 
 <h2><font color='#cc6600'><a name="problems">Known Problems</a></font></h2>
 <ul>
+<li><span class=red>[2024-08-01]</span>
+<b>ExifTool for Windows</b> supports a maximum path length of 246 characters
+for files.  Longer path lengths give an "Error opening file" message.
+</li>
 <li><span class=red>[2023-10-02]</span>
 <b>Panasonic PHOTOfunSTUDIO 9.5</b> has problems displaying some ExifTool-edited
 FZ1000 RW2 images, although other software (such as Adobe Lightroom, Digikam and
@@ -1136,8 +1208,16 @@ secure the calling application must either place file names after the
 "<code>--</code>" option, or ensure that input file names do not start with a
 dash (U+002D) or a Unicode minus sign (U+2212).  One way to accomplish this is
 to prefix input file names with a known directory name, eg.)
-<code>"./FILENAME"</code>.</p> <p>As well, untrusted window title strings should
-not be used with the <code>-progress:TITLE</code> option.</p>
+<code>"./FILENAME"</code>.</p>
+
+<p>On startup, ExifTool executes user-defined code from the .ExifTool_config
+file located in the ExifTool directory, the directory specified by the
+EXIFTOOL_HOME, HOME or HOMEDRIVE+HOMEPATH environment variables, or the current
+working directory. So care must be taken to make sure that any such file
+contains only trusted code.</p>
+
+<p>As well, untrusted window title strings should not be used with the
+<code>-progress:TITLE</code> option.</p>
 
 <h2><a name="shift">Date/Time Shift Feature</a></h2>
 
@@ -1237,7 +1317,9 @@ bypassed in processing so they are never even extracted -- specifying
 <code>--XMP-crs:all</code> and <code>-XMP-crd:all</code> may speed processing
 significantly by avoiding processing of bulky Adobe image-editing information.
 The <a href="ExifTool.html#IgnoreTags">API IgnoreTags option</a> (added in
-ExifTool 12.43) may also be used for significant speed benefits in some cases.</p>
+ExifTool 12.43) may also be used for significant speed benefits in some cases,
+especially when memory usage is significant because this may significantly
+reduced the required memory.</p>
 
 <p>The <code>-fast</code> option can significantly increase speed when
 extracting information from JPEG images which are piped across a slow network
@@ -1266,7 +1348,7 @@ to meta information.  Here is an example of a very simple script that uses
 Image::ExifTool to print out all recognized meta information in a file:</p>
 
 <blockquote><table class=box><tr><td><pre class=blk>
-<span class=com>#!/usr/bin/perl -w</span>
+<span class=com>#!/usr/bin/env perl</span>
 use Image::ExifTool ':Public';
 my $file = shift or die "Please specify filename";
 my $info = <a href="ExifTool.html#ImageInfo">ImageInfo</a>($file);
@@ -1330,7 +1412,7 @@ binary data.  The simple script above does not handle this case.</p>
 <li><a href="http://wxutils.com/wxeti.php">wxETI</a>: A wxWidgets-based Windows interface for Exiftool</li>
 <li><a href="https://exiftool.org/gui/">ExifTool GUI for Windows</a>: [unsupported] GUI for viewing meta information with some editing features</li>
 <li><a href="https://github.com/FrankBijnen/ExifToolGui/releases/">ExifTool GUI v6 for Windows</a>: Updated version of ExifTool GUI (<a href="https://github.com/FrankBijnen/ExifToolGui/">source</a>, <a href="https://htmlpreview.github.io/?https://github.com/FrankBijnen/ExifToolGui/blob/main/Docs/ExifToolGUI_V6.md">documentation</a>)</li>
-<li><a href="https://www.logipole.com/metadata++-en.htm">Metadata++</a>: View, edit, extract, copy metadata metadata</li>
+<li><a href="https://www.logipole.com/index.html">Metadata++</a>: View, edit, extract, copy metadata metadata</li>
 <!-- dead <li><a href="http://www.thezeal.com/software/?Exif_Stats_Utility">Exif Stats Utility</a>: Analyzes images to tabulate apertures, exposure times, etc</li> -->
 <li><a href="http://aeropic.free.fr/H&amp;B/AUTO_ISO_patcher/">Auto ISO Tool</a>: GUI front-end for ExifTool to patch Canon ISO information</li>
 <!-- dead <li><a href="http://home.roadrunner.com/~dick/ExifAuto.htm">ExifAuto</a>: GUI front-end for ExifTool to perform simple operations</li> -->
@@ -1355,6 +1437,7 @@ binary data.  The simple script above does not handle this case.</p>
 <li><a href="https://onedrive.live.com/?authkey=%21ACLDz87Pi7VH%5FWA&amp;id=6266D5E1E0FBB1B8%2193728&amp;cid=6266D5E1E0FBB1B8">PictureTools</a>: Tools for viewing pictures and editing EXIF data or renaming files</li>
 <li><a href="https://nordlien.github.io/PhotoTags-Synchronizer/">PhotoTags-Synchronizer</a>: Windows GUI for tagging and synchronizing metadata</li>
 <li><a href="https://github.com/electro-logic/DngOpcodesEditor">DNG Opcodes Editor</a>: Change DNG opcodes and see the effect on the image in real-time</li>
+<li><a href="https://phototoolbox.fotoblog-reiseberichte.de/index.php/en/welcome-to-the-photography-toolbox-homepage/">Photography Toolbox</a>: Organize your digital photographs</li>
 </ul>
 
 <p><b><a name="related_mac">MacOS</a></b></p>
@@ -1423,6 +1506,7 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="https://bizgraphic.ch/Reader/">Digi-libris</a>: Metadata centric software for the automatic organization of your own catalogue</li>
 <li><a href="http://ronmevissen.com/FreezeFrame">FreezeFrame</a>: Photo/video library manager (requires Java 8)</li>
 <li><a href="https://github.com/JorgenMygindPilgaard/MemoryMate">MemoryMate</a>: Maintain photo and video metadata for family collections</li>
+<li><a href="https://blog.mapillary.com/update/2023/09/07/Mapillary-Desktop-Uploader-4.0.html">Mapillary Desktop Uploader</a>: Upload street-level imagery to an open platform database</li>
 </ul>
 
 <p><b><a name="related_online">Online</a></b></p>
@@ -1471,6 +1555,7 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="https://exiftool.org/gui/articles/delphi01.html">How to call ExifTool from Delphi</a>, by Bogdan Hrastnik</li>
 <li><a href="https://github.com/philvl/ZExifTool">Qt5 and Qt6 interface for ExifTool</a>, by Philippe Vianney-Liaud</li>
 <li><a href="https://github.com/JoshOBrien/exiftoolr">exiftoolr</a>: ExifTool functionality from R</li>
+<!-- <li><a href="https://github.com/jabberjabberjabber/LLavaImageTagger">LLavaImageTagger</a>: AI image processing generates metadata in images</li> -->
 </ul>
 
 <h3><a name="other_links">Other Links</a></h3>
@@ -1582,11 +1667,11 @@ book.</p>
 <h2><a name="contact">Contact Me</a></h2>
 
 <p>If you have any comments, suggestions or questions, please post to the
-<a href="https://exiftool.org/forum/">ExifTool Forum</a> so
-other people may benefit from your experiences.  (I check the forum at least as
-often as my email.)  Otherwise, if you must contact me directly, my e-mail
-address is on the first line of the README file in the full distribution. 
-Thanks. &nbsp; - <i>Phil Harvey</i></p>
+<a href="https://exiftool.org/forum/">ExifTool Forum</a> so other people may
+benefit from your experiences.  (I will respond in the forum more quickly than
+by email.)  Otherwise, if you must contact me directly, my e-mail address is on
+the first line of the README file in the full distribution. Thanks. &nbsp; -
+<i>Phil Harvey</i></p>
 
 <div class=wide><table class=links><tr>
 <th><a href="install.html" class=wt>&nbsp;Installing&nbsp;</a></th>

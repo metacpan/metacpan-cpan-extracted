@@ -22,7 +22,7 @@ my %fatpacked;
 
 $fatpacked{"App/cpanminus.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'APP_CPANMINUS';
   package App::cpanminus;
-  our $VERSION = "1.7047";
+  our $VERSION = "1.7048";
   
   =encoding utf8
   
@@ -23329,10 +23329,9 @@ $fatpacked{"version.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VERSION
       warnings::register_categories(qw/version/);
   }
   
-  use vars qw(@ISA $VERSION $CLASS $STRICT $LAX *declare *qv);
-  
-  $VERSION = 0.9912;
-  $CLASS = 'version';
+  our $VERSION = 0.9929;
+  our $CLASS = 'version';
+  our (@ISA, $STRICT, $LAX);
   
   # !!!!Delete this next block completely when adding to Perl core!!!!
   {
@@ -23354,6 +23353,7 @@ $fatpacked{"version.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VERSION
   	    *version::stringify = \&version::vpp::stringify;
   	    *{'version::(""'} = \&version::vpp::stringify;
   	    *{'version::(<=>'} = \&version::vpp::vcmp;
+  	    *{'version::(cmp'} = \&version::vpp::vcmp;
   	    *version::parse = \&version::vpp::parse;
   	}
       }
@@ -23372,6 +23372,7 @@ $fatpacked{"version.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VERSION
   	    *version::stringify = \&version::vxs::stringify;
   	    *{'version::(""'} = \&version::vxs::stringify;
   	    *{'version::(<=>'} = \&version::vxs::VCMP;
+  	    *{'version::(cmp'} = \&version::vxs::VCMP;
   	    *version::parse = \&version::vxs::parse;
   	}
       }
@@ -23382,7 +23383,11 @@ $fatpacked{"version.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VERSION
   *version::is_lax = \&version::regex::is_lax;
   *version::is_strict = \&version::regex::is_strict;
   *LAX = \$version::regex::LAX;
+  *LAX_DECIMAL_VERSION = \$version::regex::LAX_DECIMAL_VERSION;
+  *LAX_DOTTED_DECIMAL_VERSION = \$version::regex::LAX_DOTTED_DECIMAL_VERSION;
   *STRICT = \$version::regex::STRICT;
+  *STRICT_DECIMAL_VERSION = \$version::regex::STRICT_DECIMAL_VERSION;
+  *STRICT_DOTTED_DECIMAL_VERSION = \$version::regex::STRICT_DOTTED_DECIMAL_VERSION;
   
   sub import {
       no strict 'refs';
@@ -23451,9 +23456,7 @@ $fatpacked{"version/regex.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'V
   
   use strict;
   
-  use vars qw($VERSION $CLASS $STRICT $LAX);
-  
-  $VERSION = 0.9912;
+  our $VERSION = 0.9929;
   
   #--------------------------------------------------------------------------#
   # Version regexp components
@@ -23506,19 +23509,19 @@ $fatpacked{"version/regex.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'V
   
   # Strict decimal version number.
   
-  my $STRICT_DECIMAL_VERSION =
+  our $STRICT_DECIMAL_VERSION =
       qr/ $STRICT_INTEGER_PART $FRACTION_PART? /x;
   
   # Strict dotted-decimal version number.  Must have both leading "v" and
   # at least three parts, to avoid confusion with decimal syntax.
   
-  my $STRICT_DOTTED_DECIMAL_VERSION =
+  our $STRICT_DOTTED_DECIMAL_VERSION =
       qr/ v $STRICT_INTEGER_PART $STRICT_DOTTED_DECIMAL_PART{2,} /x;
   
   # Complete strict version number syntax -- should generally be used
   # anchored: qr/ \A $STRICT \z /x
   
-  $STRICT =
+  our $STRICT =
       qr/ $STRICT_DECIMAL_VERSION | $STRICT_DOTTED_DECIMAL_VERSION /x;
   
   #--------------------------------------------------------------------------#
@@ -23529,8 +23532,8 @@ $fatpacked{"version/regex.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'V
   # allowing an alpha suffix or allowing a leading or trailing
   # decimal-point
   
-  my $LAX_DECIMAL_VERSION =
-      qr/ $LAX_INTEGER_PART (?: \. | $FRACTION_PART $LAX_ALPHA_PART? )?
+  our $LAX_DECIMAL_VERSION =
+      qr/ $LAX_INTEGER_PART (?: $FRACTION_PART | \. )? $LAX_ALPHA_PART?
   	|
   	$FRACTION_PART $LAX_ALPHA_PART?
       /x;
@@ -23541,7 +23544,7 @@ $fatpacked{"version/regex.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'V
   # enough, without the leading "v", Perl takes .1.2 to mean v0.1.2,
   # so when there is no "v", the leading part is optional
   
-  my $LAX_DOTTED_DECIMAL_VERSION =
+  our $LAX_DOTTED_DECIMAL_VERSION =
       qr/
   	v $LAX_INTEGER_PART (?: $LAX_DOTTED_DECIMAL_PART+ $LAX_ALPHA_PART? )?
   	|
@@ -23554,8 +23557,8 @@ $fatpacked{"version/regex.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'V
   # The string 'undef' is a special case to make for easier handling
   # of return values from ExtUtils::MM->parse_version
   
-  $LAX =
-      qr/ undef | $LAX_DECIMAL_VERSION | $LAX_DOTTED_DECIMAL_VERSION /x;
+  our $LAX =
+      qr/ undef | $LAX_DOTTED_DECIMAL_VERSION | $LAX_DECIMAL_VERSION /x;
   
   #--------------------------------------------------------------------------#
   
@@ -23691,9 +23694,11 @@ $fatpacked{"version/vpp.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VER
   use warnings::register;
   
   use Config;
-  use vars qw($VERSION $CLASS @ISA $LAX $STRICT $WARN_CATEGORY);
-  $VERSION = 0.9912;
-  $CLASS = 'version::vpp';
+  
+  our $VERSION = 0.9929;
+  our $CLASS = 'version::vpp';
+  our ($LAX, $STRICT, $WARN_CATEGORY);
+  
   if ($] > 5.015) {
       warnings::register_categories(qw/version/);
       $WARN_CATEGORY = 'version';
@@ -24069,7 +24074,7 @@ $fatpacked{"version/vpp.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VER
   	$$rv->{width} = $width;
       }
   
-      while (isDIGIT($pos)) {
+      while (isDIGIT($pos) || $pos eq '_') {
   	$pos++;
       }
       if (!isALPHA($pos)) {
@@ -24090,6 +24095,7 @@ $fatpacked{"version/vpp.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VER
    		if ( !$qv && $s > $start && $saw_decimal == 1 ) {
   		    $mult *= 100;
    		    while ( $s < $end ) {
+  			next if $s eq '_';
   			$orev = $rev;
    			$rev += $s * $mult;
    			$mult /= 10;
@@ -24109,6 +24115,7 @@ $fatpacked{"version/vpp.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VER
     		}
    		else {
    		    while (--$end >= $s) {
+  			next if $end eq '_';
   			$orev = $rev;
    			$rev += $end * $mult;
    			$mult *= 10;
@@ -24130,14 +24137,7 @@ $fatpacked{"version/vpp.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VER
   		last;
   	    }
   	    elsif ( $pos eq '.' ) {
-  		$pos++;
-  		if ($qv) {
-  		    # skip leading zeros
-  		    while ($pos eq '0') {
-  			$pos++;
-  		    }
-  		}
-  		$s = $pos;
+  		$s = ++$pos;
   	    }
   	    elsif ( $pos eq '_' && isDIGIT($pos+1) ) {
   		$s = ++$pos;
@@ -24153,7 +24153,7 @@ $fatpacked{"version/vpp.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VER
   		last;
   	    }
   	    if ( $qv ) {
-  		while ( isDIGIT($pos) ) {
+  		while ( isDIGIT($pos) || $pos eq '_') {
   		    $pos++;
   		}
   	    }
@@ -24273,7 +24273,7 @@ $fatpacked{"version/vpp.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VER
       my $s = scan_version($value, \$self, $qv);
   
       if ($s) { # must be something left over
-  	warn("Version string '%s' contains invalid data; "
+  	warn(sprintf "Version string '%s' contains invalid data; "
   		   ."ignoring: '%s'", $value, $s);
       }
   
@@ -24288,7 +24288,6 @@ $fatpacked{"version/vpp.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VER
   	require Carp;
   	Carp::croak("Invalid version object");
       }
-      my $width = $self->{width} || 3;
       my $alpha = $self->{alpha} || "";
       my $len = $#{$self->{version}};
       my $digit = $self->{version}[0];
@@ -24298,28 +24297,12 @@ $fatpacked{"version/vpp.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VER
   	warnings::warn($WARN_CATEGORY, 'alpha->numify() is lossy');
       }
   
-      for ( my $i = 1 ; $i < $len ; $i++ ) {
+      for ( my $i = 1 ; $i <= $len ; $i++ ) {
   	$digit = $self->{version}[$i];
-  	if ( $width < 3 ) {
-  	    my $denom = 10**(3-$width);
-  	    my $quot = int($digit/$denom);
-  	    my $rem = $digit - ($quot * $denom);
-  	    $string .= sprintf("%0".$width."d_%d", $quot, $rem);
-  	}
-  	else {
-  	    $string .= sprintf("%03d", $digit);
-  	}
+  	$string .= sprintf("%03d", $digit);
       }
   
-      if ( $len > 0 ) {
-  	$digit = $self->{version}[$len];
-  	if ( $alpha && $width == 3 ) {
-  	    $string .= "_";
-  	}
-  	$string .= sprintf("%0".$width."d", $digit);
-      }
-      else # $len = 0
-      {
+      if ( $len == 0 ) {
   	$string .= sprintf("000");
       }
   
@@ -24332,26 +24315,14 @@ $fatpacked{"version/vpp.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VER
   	require Carp;
   	Carp::croak("Invalid version object");
       }
-      my $alpha = $self->{alpha} || "";
-      my $qv = $self->{qv} || "";
   
       my $len = $#{$self->{version}};
       my $digit = $self->{version}[0];
       my $string = sprintf("v%d", $digit );
   
-      for ( my $i = 1 ; $i < $len ; $i++ ) {
+      for ( my $i = 1 ; $i <= $len ; $i++ ) {
   	$digit = $self->{version}[$i];
   	$string .= sprintf(".%d", $digit);
-      }
-  
-      if ( $len > 0 ) {
-  	$digit = $self->{version}[$len];
-  	if ( $alpha ) {
-  	    $string .= sprintf("_%0d", $digit);
-  	}
-  	else {
-  	    $string .= sprintf(".%0d", $digit);
-  	}
       }
   
       if ( $len <= 2 ) {
@@ -24377,8 +24348,8 @@ $fatpacked{"version/vpp.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VER
   }
   
   sub vcmp {
-      require UNIVERSAL;
       my ($left,$right,$swap) = @_;
+      die "Usage: version::vcmp(lobj, robj, ...)" if @_ < 2;
       my $class = ref($left);
       unless ( UNIVERSAL::isa($right, $class) ) {
   	$right = $class->new($right);
@@ -24405,20 +24376,6 @@ $fatpacked{"version/vpp.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VER
       while ( $i <= $m && $retval == 0 ) {
   	$retval = $left->{version}[$i] <=> $right->{version}[$i];
   	$i++;
-      }
-  
-      # tiebreaker for alpha with identical terms
-      if ( $retval == 0
-  	&& $l == $r
-  	&& $left->{version}[$m] == $right->{version}[$m]
-  	&& ( $lalpha || $ralpha ) ) {
-  
-  	if ( $lalpha && !$ralpha ) {
-  	    $retval = -1;
-  	}
-  	elsif ( $ralpha && !$lalpha) {
-  	    $retval = +1;
-  	}
       }
   
       # possible match except for trailing 0's
@@ -24542,6 +24499,7 @@ $fatpacked{"version/vpp.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'VER
   	    $magic = $magic->MOREMAGIC;
   	}
       }
+      $tvalue =~ tr/_//d;
       return $tvalue;
   }
   

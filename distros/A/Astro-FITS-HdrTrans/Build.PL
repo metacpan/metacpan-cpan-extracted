@@ -33,13 +33,13 @@ my $build = Module::Build->new
                    'Brad Cavanagh <b.cavanagh@jach.hawaii.edu>',
                    'Malcolm J. Currie <mjc@star.rl.ac.uk>',
                   ],
-   dist_version => '1.65',
+   dist_version_from => 'lib/Astro/FITS/HdrTrans.pm',
    script_files => [ qw/
                          translatehdr
                        / ],
    meta_merge => {
                resources =>  {
-                              repository => "git://github.com/Starlink/perl-Astro-FITS-HdrTrans.git",
+                              repository => "https://github.com/Starlink/perl-Astro-FITS-HdrTrans.git",
                              },
                 },
    recommends => {

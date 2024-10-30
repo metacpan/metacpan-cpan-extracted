@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::findsort",
   "PREREQ_PM" => {
     "File::Which" => 0,
+    "Filesys::DiskUsage" => 0,
     "Getopt::Long" => "2.50",
     "ShellQuote::Any::Tiny" => 0,
     "strict" => 0,
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Which" => 0,
+  "Filesys::DiskUsage" => 0,
   "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

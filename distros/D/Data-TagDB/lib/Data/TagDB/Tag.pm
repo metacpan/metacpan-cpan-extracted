@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use URI;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 my $HAVE_DATA_IDENTIFIER = eval {require Data::Identifier; 1;};
 
@@ -471,7 +471,7 @@ Data::TagDB::Tag - Work with Tag databases
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 

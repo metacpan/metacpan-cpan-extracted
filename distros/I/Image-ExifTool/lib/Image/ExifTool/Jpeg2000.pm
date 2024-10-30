@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.39';
+$VERSION = '1.41';
 
 sub ProcessJpeg2000Box($$$);
 sub ProcessJUMD($$$);
@@ -574,6 +574,7 @@ my %j2cMarker = (
     2 => {
         Name => 'CompatibleBrands',
         Format => 'undef[$size-8]',
+        List => 1, # (for documentation only)
         # ignore any entry with a null, and return others as a list
         ValueConv => 'my @a=($val=~/.{4}/sg); @a=grep(!/\0/,@a); \@a',
     },
@@ -727,7 +728,6 @@ my %j2cMarker = (
         {
             Name => 'ColorSpecData',
             Format => 'undef[$size-3]',
-            Writable => 'undef',
             Protected => 1,
             Binary => 1,
         },
@@ -1443,7 +1443,7 @@ sub ProcessBrotli($$$)
             }
         } elsif ($type eq 'jumb') {
             return undef if $isWriting; # (can't yet write JUMBF)
-            Image::ExifTool::ProcessJUMB($et, \%dirInfo, $tagTablePtr); # (untested)
+            Image::ExifTool::Jpeg2000::ProcessJUMB($et, \%dirInfo, $tagTablePtr); # (untested)
         }
         if ($isWriting) {
             return undef unless defined $dat;
@@ -1544,7 +1544,7 @@ sub ProcessJP2($$)
 
     # check to be sure this is a valid JPG2000 file
     return 0 unless $raf->Read($hdr,12) == 12;
-    unless ($hdr eq "\0\0\0\x0cjP  \x0d\x0a\x87\x0a" or     # (ref 1)
+    unless ($hdr eq "\0\0\0\x0cjP  \x0d\x0a\x87\x0a" or       # (ref 1)
             $hdr eq "\0\0\0\x0cjP\x1a\x1a\x0d\x0a\x87\x0a" or # (ref 2)
             $$et{IsJXL})
     {

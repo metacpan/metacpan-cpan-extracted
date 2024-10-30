@@ -9,7 +9,7 @@ __PACKAGE__->load_components('Candy');
 
 sub base() { $_[1] || 'IRC::Schema::Result' }
 
-sub perl_version() { return 10 if $] >= 5.010 }
+sub perl_version() { return 34 if $] >= 5.034 }
 sub autotable() { 1 }
 sub gen_table {
    my $self = shift;

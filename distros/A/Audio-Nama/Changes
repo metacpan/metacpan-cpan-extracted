@@ -1,16 +1,15 @@
 Changes to Audio::Nama
 
-1.307 Dec 14, 2023
-   
-   * Replace Module::Install with Module::Build
+1.505 Oct 29, 2024
 
-1.302 Dec 14, 2023
+    * generate distribution with Module::Build (replacing Module::Install)
 
-   * hotkey development
-   * attributes for marks
-   * clip-here and gather commands for trimming audio files
-   * metronome development
-   * many bug fixes
+1.500 Oct 29, 2024
+
+    * fix aux send failure
+    * merge development code (tempo)
+    * revert development dead end (hotkeys)
+    * new starting point for maintenance and development
 
 1.214 Sep 26, 2019
 

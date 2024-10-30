@@ -15,7 +15,7 @@ use Carp;
 
 use parent 'Data::TagDB::WeakBaseObject';
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 my %wk_ise = (
     # Hints as taken from tagdb-cgi-import;
@@ -39,6 +39,7 @@ my %wk_ise = (
 
 
     # Other stuff:
+    default_context             => '6ba648c2-3657-47c2-8541-9b73c3a9b2b4',
     default_type                => '87c4892f-ae39-476e-8ed0-d9ed321dafe9',
     default_encoding            => '8440eabd-5d73-4679-8f06-abaa06cf04ac',
     specialises                 => '923b43ae-a50e-4db3-8655-ed931d0dd6d4',
@@ -72,10 +73,11 @@ my %wk_ise = (
     generator                   => '8a1cb2d6-df2f-46db-89c3-a75168adebf6',
     icon                        => 'caf11e36-d401-4521-8f10-f6b36125415c',
     fetch_file_uri              => '96674c6c-cf5e-40cd-af1e-63b86e741f4f',
-    taglist                     => '03cadc6f-2609-4527-b296-2590d737e99a',
+    specific_taglist            => '03cadc6f-2609-4527-b296-2590d737e99a',
     also_list_contains_also     => '4c9656eb-c130-42b7-9348-a1fee3f42050',
     encoding_file_name_extension   => '3d737a5c-9389-4ae7-80ff-5f64c6b3b7f1',
     x11_colour_name             => '135032f7-cc60-46ee-8f64-1724c2a56fa2',
+    also_has_role               => 'd2750351-aed7-4ade-aa80-c32436cc6030',
     also_has_comment            => '11d8962c-0a71-4d00-95ed-fa69182788a8',
     also_has_description        => '30710bdb-6418-42fb-96db-2278f3bfa17f',
     also_has_proto_title        => 'a845bfb7-130f-4f55-8a6d-ea3e5b1c2a09',
@@ -84,6 +86,7 @@ my %wk_ise = (
     gamebook_has_title          => '1357f4c9-0419-4493-8d2c-97c6a40a9bc9',
     ascii_code_point            => 'f4b073ff-0b53-4034-b4e4-4affe5caf72c',
     unicode_code_point          => '5f167223-cc9c-4b2f-9928-9fe1b253b560',
+    proto_file                  => '52a516d0-25d8-47c7-a6ba-80983e576c54',
 
 
     # Number related:
@@ -101,6 +104,10 @@ my %wk_ise = (
     wd_sRGB_colour_hex_triplet  => 'bcff702a-5d22-5e56-abaf-bda489b8438e', # P465
 );
 
+my %aliases = (
+    taglist => 'specific_taglist',
+);
+
 my %wk_tagname = (
     # first some simple ones:
     (map {$_ => $_ =~ tr/_/-/r}
@@ -113,11 +120,14 @@ my %wk_tagname = (
 
 
         # Others:
+        qw(default_context),
+        qw(also_has_role),
         qw(also_has_title),
         qw(tagpool_title tagpool_description tagpool_tag_icontext tagpool_type_icontext),
         qw(gamebook_has_title),
         qw(icon fetch_file_uri),
         qw(has_colour_value also_shares_colour primary_colour displaycolour),
+        qw(proto_file),
     )
 );
 
@@ -138,8 +148,8 @@ my %wk_sid = (
     # unsigned-integer              13
     #unassigned                     14
     #unassigned                     15
-    # default-context               16
-    # proto-file                    17
+    default_context             =>  16,
+    proto_file                  =>  17,
     final_file_size             =>  18,
     # text-fragment                 19
     also_list_contains_also     =>  20,
@@ -150,7 +160,7 @@ my %wk_sid = (
     # marked_as                     25
     # roaraudio-error-number        26
     small_identifier            =>  27,
-    #unassigned                     28
+    also_has_role               =>  28,
     #unassigned                     29
     #unassigned                     30
     #unassigned                     31
@@ -226,6 +236,8 @@ sub AUTOLOAD {
     our $AUTOLOAD;
     my $name = $AUTOLOAD =~ s/^.*:://r;
 
+    $name = $aliases{$name} // $name;
+
     $self->_call($name, @args);
 }
 
@@ -243,7 +255,7 @@ Data::TagDB::WellKnown - Work with Tag databases
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -254,6 +266,10 @@ version v0.04
     my Data::TagDB::WellKnown $wk = $db->wk;
 
     my Data::TagDB::Tag $tag = $wk->...;
+
+This package provides access to well known tags.
+
+See also L<Data::TagDB::Tutorial::WellKnown>.
 
 =head1 AUTHOR
 

@@ -25,9 +25,7 @@ use Carp;
 # Inherit from ESO
 use base qw/ Astro::FITS::HdrTrans::ESO /;
 
-use vars qw/ $VERSION /;
-
-$VERSION = "1.65";
+our $VERSION = "1.66";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant

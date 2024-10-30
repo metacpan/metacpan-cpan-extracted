@@ -2,6 +2,7 @@
         "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
 <html>
 <head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
   <title>Geotagging with ExifTool</title>
 <link rel=stylesheet type='text/css' href='style.css' title='Style'>
 <style type="text/css">
@@ -9,6 +10,7 @@
 pre   { color: #800; margin-left: 4em }
 .nr   { white-space: nowrap }
 .prog { padding: 0.5em; border: 1px solid gray; background: #fee }
+.indent { margin-left: 22% }
 -->
 </style>
 </head>
@@ -18,6 +20,7 @@ pre   { color: #800; margin-left: 4em }
 <br>&nbsp; - <a href="#geotag">Geotag</a>
 <br>&nbsp; - <a href="#geosync">Geosync</a>
 <br>&nbsp; - <a href="#geotime">Geotime</a>
+<br><a href="#Geolocation">Writing Geolocation</a>
 <br><a href="#CSVFormat">CSV File Format</a>
 <br><a href="#Examples">Examples</a>
 <br><a href="#Options">Options</a>
@@ -36,12 +39,13 @@ is used to determine the GPS position at the time of the image, then the
 following tags are written to the image (if the corresponding information
 is available):</p>
 
-<pre>GPSLatitude     GPSLongitude       GPSAltitude          GPSDateStamp
-GPSLatitudeRef  GPSLongitudeRef    GPSAltitudeRef       GPSTimeStamp
-GPSTrack        GPSSpeed           GPSImgDirection      GPSPitch        
-GPSTrackRef     GPSSpeedRef        GPSImgDirectionRef   GPSRoll
-GPSCoordinates  AmbientTemperature CameraElevationAngle
-</pre>
+<center><table>
+<tr><td>GPSLatitude</td><td>GPSLongitude</td><td>GPSAltitude</td><td>CameraElevationAngle</td></tr>
+<tr><td>GPSLatitudeRef</td><td>GPSLongitudeRef</td><td>GPSAltitudeRef</td><td>GPSDateStamp</td></tr>
+<tr><td>GPSTrack</td><td>GPSSpeed</td><td>GPSImgDirection</td><td>GPSTimeStamp</td></tr>
+<tr><td>GPSTrackRef</td><td>GPSSpeedRef</td><td>GPSImgDirectionRef</td><td>GPSPitch</td></tr>
+<tr><td>GPSCoordinates</td><td>AmbientTemperature</td><td>GPSHPositioningError</td><td>GPSRoll</td></tr>
+</table></center>
 
 <blockquote class=lt><i>Note: GPSPitch and GPSRoll are not standard tags, and
 must be <a href="#Orient">user-defined</a>.  GPSCoordinates is written to
@@ -229,6 +233,19 @@ be specified when geotagging via the API (the default value of
 <code>Geosync</code> (the exiftool application reorders the assignments to
 ensure this).
 </blockquote>
+
+<a name="Geolocation"></a>
+<h3>Writing Geolocation Tags while Geotagging</h3>
+
+<p>Geolocation city, state/province and country tags may be written automatically
+based on the geotagged GPS position by setting the Geolocate tag to "geotag".
+For example:</p>
+
+<pre>exiftool -geotag track.gpx -geolocate=geotag c:\images</pre>
+
+<p>See the
+<a href="geolocation.html#Geotag">"While geotagging" section of the Geolocation page</a>
+for more information.</p>
 
 <a name="CSVFormat"></a>
 <h3>ExifTool CSV Log File Format</h3>
@@ -528,7 +545,7 @@ examples.</blockquote>
 <h3>Tips</h3>
 
 <a name="TP1"></a>
-<p>1. <b>Time Synchronization</b></p>
+<p><b>1. Time Synchronization</b></p>
 
 <blockquote>One way to accurately synchronize your images with GPS time is to
 take a picture of the time displayed on your GPS unit while you are out
@@ -743,7 +760,7 @@ forum post</a> for more useful tips about creating KML files.</p>
 
 <hr>
 <i>Created Apr 2, 2009</i><br>
-<i>Last revised Oct 13, 2023</i>
+<i>Last revised Apr 23, 2024</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

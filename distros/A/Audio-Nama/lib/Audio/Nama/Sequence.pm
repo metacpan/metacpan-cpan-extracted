@@ -179,25 +179,5 @@ sub compose_sequence {
 	map{ $sequence->append_item($_) } @clips;
 	$sequence
 }
-sub gather {
-	my @list = grep{ $_->clip } Audio::Nama::Mark::all(); 
-	my $old = $this_track->name;
-	my $track = $this_track;
-	my $first = $list[0];
-	if ($first->discard){ @list = (0, @list, $track->length) }
-	my @pairs;
-	# assuming we're keeping from beginning, first mark is # discard
-	while ( scalar @list ){ push @pairs, [splice( @list, 0, 2)] }
-	Audio::Nama::compose_sequence($track->name, $track, \@pairs);
-	nama_cmd($old);
-}
-sub delete_sequence {
-	my $sequence_name = shift;
-	$bn{$sequence_name}->remove;
-	my @affected = grep{$_->source_type eq 'bus' and $_->source_id eq $sequence_name } all_tracks();
-	nama_cmd($_->name. ' source 1; play') for @affected;
-		
-}
-
 1
 __END__

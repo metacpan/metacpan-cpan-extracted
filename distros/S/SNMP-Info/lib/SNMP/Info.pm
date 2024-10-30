@@ -26,7 +26,7 @@ our
     ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG, %SPEED_MAP,
      $NOSUCH, $BIGINT, $REPEATERS);
 
-$VERSION = '3.972000';
+$VERSION = '3.972002';
 
 =head1 NAME
 
@@ -34,7 +34,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.972000
+SNMP::Info - Version 3.972002
 
 =head1 AUTHOR
 
@@ -800,6 +800,10 @@ See documentation in L<SNMP::Info::Layer3::BayRS> for details.
 Subclass for BlueCoat SG series proxy devices.
 
 See documentation in L<SNMP::Info::Layer3::BlueCoatSG> for details.
+
+=item SNMP::Info::Layer3::C1300
+
+See documentation in L<SNMP::Info::Layer3::C1300> for details.
 
 =item SNMP::Info::Layer3::C3550
 
@@ -1908,6 +1912,7 @@ sub device_type {
 
         return $objtype unless ( defined $desc and length($desc) );
 
+        $objtype = 'SNMP::Info::Layer3::C1300' if $desc =~ /Catalyst 1300 Series Managed Switch/;
         $objtype = 'SNMP::Info::Layer3::C3550' if $desc =~ /(C3550|C3560)/;
         $objtype = 'SNMP::Info::Layer3::C4000' if $desc =~ /Catalyst 4[05]00/;
         $objtype = 'SNMP::Info::Layer3::Foundry' if $desc =~ /foundry/i;

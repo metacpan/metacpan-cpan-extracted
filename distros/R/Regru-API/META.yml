@@ -19,7 +19,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,52 +39,52 @@ no_index:
 provides:
   Regru::API:
     file: lib/Regru/API.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::Bill:
     file: lib/Regru/API/Bill.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::DNSSEC:
     file: lib/Regru/API/DNSSEC.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::Domain:
     file: lib/Regru/API/Domain.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::Folder:
     file: lib/Regru/API/Folder.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::Hosting:
     file: lib/Regru/API/Hosting.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::Response:
     file: lib/Regru/API/Response.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::Role::Client:
     file: lib/Regru/API/Role/Client.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::Role::Loggable:
     file: lib/Regru/API/Role/Loggable.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::Role::Namespace:
     file: lib/Regru/API/Role/Namespace.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::Role::Serializer:
     file: lib/Regru/API/Role/Serializer.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::Role::UserAgent:
     file: lib/Regru/API/Role/UserAgent.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::Service:
     file: lib/Regru/API/Service.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::Shop:
     file: lib/Regru/API/Shop.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::User:
     file: lib/Regru/API/User.pm
-    version: '0.052'
+    version: '0.053'
   Regru::API::Zone:
     file: lib/Regru/API/Zone.pm
-    version: '0.052'
+    version: '0.053'
 requires:
   Carp: '0'
   Class::Load: '0'
@@ -103,8 +103,7 @@ resources:
   bugtracker: https://github.com/regru/regru-api-perl/issues
   homepage: https://metacpan.org/release/Regru-API
   repository: git://github.com/regru/regru-api-perl.git
-version: '0.052'
-x_authority: cpan:CHIM
-x_generated_by_perl: v5.26.1
+version: '0.053'
+x_authority: cpan:OLEG
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
-x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

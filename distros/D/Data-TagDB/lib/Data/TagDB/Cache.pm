@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 
 
@@ -83,7 +83,7 @@ Data::TagDB::Cache - Work with Tag databases
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -109,7 +109,7 @@ Returns the current L<Data::TagDB> object.
     $cache->add($tag0, $tag1, ...);
 
 Adds any number of tags to the cache.
-If any passed tag is C<undef> it is ignored. This allows to pass thins like C<$link-E<gt>context> without a manual check for C<undef>.
+If any passed tag is C<undef> it is ignored. This allows to pass things like C<$link-E<gt>context> without a manual check for C<undef>.
 
 =head2 clear
 

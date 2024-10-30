@@ -48,7 +48,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '2.93';
+$VERSION = '3.04';
 
 sub ProcessMOV($$;$);
 sub ProcessKeys($$$);
@@ -58,11 +58,17 @@ sub ProcessEncodingParams($$$);
 sub ProcessSampleDesc($$$);
 sub ProcessHybrid($$$);
 sub ProcessRights($$$);
+sub ProcessNextbase($$$);
+sub Process_mrlh($$$);
+sub Process_mrlv($$$);
+sub Process_mrld($$$);
 # ++vvvvvvvvvvvv++ (in QuickTimeStream.pl)
 sub Process_mebx($$$);
 sub Process_3gf($$$);
 sub Process_gps0($$$);
 sub Process_gsen($$$);
+sub Process_gdat($$$);
+sub Process_nbmt($$$);
 sub ProcessKenwood($$$);
 sub ProcessLIGO_JSON($$$);
 sub ProcessRIFFTrailer($$$);
@@ -88,6 +94,7 @@ sub UnpackLang($;$);
 sub WriteKeys($$$);
 sub WriteQuickTime($$$);
 sub WriteMOV($$);
+sub WriteNextbase($$$);
 sub GetLangInfo($$);
 sub CheckQTValue($$$);
 
@@ -231,7 +238,11 @@ my %useExt = ( GLV => 'MP4' );
 
 # information for int32u date/time tags (time zero is Jan 1, 1904)
 my %timeInfo = (
-    Notes => 'converted from UTC to local time if the QuickTimeUTC option is set',
+    Notes => q{
+        converted from UTC to local time if the QuickTimeUTC option is set.  This
+        tag is part of a binary data structure so it may not be deleted -- instead
+        the value is set to zero if the tag is deleted individually
+    },
     Shift => 'Time',
     Writable => 1,
     Permanent => 1,
@@ -496,6 +507,11 @@ my %eeBox2 = (
 # image types in AVIF and HEIC files
 my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
 
+my %userDefined = (
+    ALBUMARTISTSORT => 'AlbumArtistSort',
+    ASIN => 'ASIN',
+);
+
 # QuickTime atoms
 %Image::ExifTool::QuickTime::Main = (
     PROCESS_PROC => \&ProcessMOV,
@@ -656,6 +672,14 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
             Name => 'SensorData', # sensor data for the 360Fly
             Condition => '$$valPt=~/^\xef\xe1\x58\x9a\xbb\x77\x49\xef\x80\x95\x27\x75\x9e\xb1\xdc\x6f/ and $$self{OPTIONS}{ExtractEmbedded}',
             SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Tags360Fly' },
+        },{
+            Name => 'SensorData',
+            Condition => '$$valPt=~/^\xef\xe1\x58\x9a\xbb\x77\x49\xef\x80\x95\x27\x75\x9e\xb1\xdc\x6f/',
+            Notes => 'raw 360Fly sensor data without ExtractEmbedded option',
+            RawConv => q{
+                $self->WarnOnce('Use the ExtractEmbedded option to decode timed SensorData',3);
+                return \$val;
+            },
         },
         { #https://c2pa.org/specifications/
             Name => 'JUMBF',
@@ -685,18 +709,9 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
                 Start => 27,
             },
         },
-        {
-            Name => 'SensorData',
-            Condition => '$$valPt=~/^\xef\xe1\x58\x9a\xbb\x77\x49\xef\x80\x95\x27\x75\x9e\xb1\xdc\x6f/',
-            Notes => 'raw 360Fly sensor data without ExtractEmbedded option',
-            RawConv => q{
-                $self->WarnOnce('Use the ExtractEmbedded option to decode timed SensorData',3);
-                return \$val;
-            },
-        },
         { #PH (Canon CR3)
             Name => 'PreviewImage',
-            Condition => '$$valPt=~/^\xea\xf4\x2b\x5e\x1c\x98\x4b\x88\xb9\xfb\xb7\xdc\x40\x6e\x4d\x16/',
+            Condition => '$$valPt=~/^\xea\xf4\x2b\x5e\x1c\x98\x4b\x88\xb9\xfb\xb7\xdc\x40\x6e\x4d\x16.{32}/s',
             Groups => { 2 => 'Preview' },
             PreservePadding => 1,
             # 0x00 - undef[16]: UUID
@@ -711,6 +726,25 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
             # 0x3c - int32u: preview length
             RawConv => '$val = substr($val, 0x30); $self->ValidateImage(\$val, $tag)',
         },
+        { #PH (Garmin MP4)
+            Name => 'ThumbnailImage',
+            Condition => '$$valPt=~/^\x11\x6e\x40\xdc\xb1\x86\x46\xe4\x84\x7c\xd9\xc0\xc3\x49\x10\x81.{8}\xff\xd8\xff/s',
+            Groups => { 2 => 'Preview' },
+            Binary => 1,
+            # 0x00 - undef[16]: UUID
+            # 0x10 - int32u[2]: ThumbnailLength
+            # 0x14 - int16u[2]: width/height of image (160/120)
+            RawConv => q{
+                my $len = Get32u(\$val, 0x10);
+                return undef unless length($val) >= $len + 0x18;
+                return substr($val, 0x18, $len);
+            },
+        },
+        # also seen 120-byte record in Garmin MP4's, starting like this (model name at byte 9):
+        # 0000: 47 52 4d 4e 00 00 00 01 00 44 43 35 37 00 00 00 [GRMN.....DC57...]
+        # 0000: 47 52 4d 4e 00 00 00 01 00 44 43 36 36 57 00 00 [GRMN.....DC66W..]
+        # and this in Garmin, followed by 8 bytes of 0's:
+        # 0000: db 11 98 3d 8f 65 43 8c bb b8 e1 ac 56 fe 6b 04
         { #8
             Name => 'UUID-Unknown',
             %unknownInfo,
@@ -835,6 +869,20 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
     },
     # gpsa - seen hex "01 20 00 00" (DuDuBell M1, VSYS M6L)
     # gsea - 20 bytes hex "05 00's..." (DuDuBell M1) "05 08 02 01 ..." (VSYS M6L)
+    gdat => {   # Base64-encoded JSON-format timed GPS (Nextbase software)
+        Name => 'GPSData',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::QuickTime::Stream',
+            ProcessProc => \&Process_gdat,
+        },
+    },
+    nbmt => { # (Nextbase)
+        Name => 'NextbaseMeta',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::QuickTime::Stream',
+            ProcessProc => \&Process_nbmt,
+        },
+    },
    'GPS ' => {  # GPS data written by 70mai dashcam (parsed in QuickTimeStream.pl)
         Name => 'GPSDataList2',
         Unknown => 1,
@@ -853,6 +901,7 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
         Writable => 1,
     },
     # '35AX'? - seen "AT" (Yada RoadCam Pro 4K dashcam)
+    cust => 'CustomInfo', # 70mai A810
 );
 
 # stuff seen in 'skip' atom (70mai Pro Plus+ MP4 videos)
@@ -887,6 +936,7 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
     2 => {
         Name => 'CompatibleBrands',
         Format => 'undef[$size-8]',
+        List => 1, # (for documentation only)
         # ignore any entry with a null, and return others as a list
         ValueConv => 'my @a=($val=~/.{4}/sg); @a=grep(!/\0/,@a); \@a',
     },
@@ -1376,6 +1426,8 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
         %durationInfo,
         # this is int64u if MovieHeaderVersion == 1 (ref 13)
         Hook => '$$self{MovieHeaderVersion} and $format = "int64u", $varSize += 4',
+        # (Note: this Duration seems to be the time of the key frame in
+        #  the NRT Metadata track of iPhone live-photo MOV videos)
     },
     5 => {
         Name => 'PreferredRate',
@@ -2091,7 +2143,20 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
         RawConv => 'substr($val, 16)',
         RawConvInv => '"VIRBactioncamera$val"',
     },{
+        Name => 'GarminModel', # (NC)
+        Condition => '$$valPt =~ /^\xf7\x6c\xd7\x6a\x07\x5b\x4a\x1e\xb3\x1c\x0e\x7f\xab\x7e\x09\xd4/',
+        Writable => 0,
+        RawConv => q{
+            return undef unless length($val) > 25;
+            my $len = unpack('x24C', $val);
+            return undef unless length($val) >= 25 + $len;
+            return substr($val, 25, $len);
+        },
+    },{
         # have seen "28 f3 11 e2 b7 91 4f 6f 94 e2 4f 5d ea cb 3c 01" for RicohThetaZ1 accelerometer RADT data (not yet decoded)
+        # also seen in Garmin MP4:
+        # 51 0b 63 46 6c fd 4a 17 87 42 ea c9 ea ae b3 bd - seems to contain a duplicate of the trak atom
+        # b3 e8 21 f4 fe 33 4e 10 8f 92 f5 e1 d4 36 c9 8a - 8 bytes of zeros
         Name => 'UUID-Unknown',
         Writable => 0,
         %unknownInfo,
@@ -2278,6 +2343,14 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
         Binary => 1,
     }],
     # ---- Ricoh ----
+    RICO => { #PH (G900SE)
+        Name => 'RicohInfo',
+        Condition => '$$valPt =~ /^\xff\xe1..Exif\0\0/s',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::JPEG::Main',
+            ProcessProc => \&Image::ExifTool::ProcessJPEG,
+        }
+    },
     RTHU => { #PH (GR)
         Name => 'PreviewImage',
         Groups => { 2 => 'Preview' },
@@ -2399,6 +2472,30 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
         Groups => { 2 => 'Preview' },
         Binary => 1,
     },
+    # ---- Nextbase ----
+    info => 'FirmwareVersion',
+   'time' => {
+        Name => 'TimeStamp',
+        Format => 'int32u', # (followed by 4 unknown bytes 00 0d 00 00)
+        Writable => 0,
+        Groups => { 2 => 'Time' },
+        ValueConv => '$val =~ s/ .*//; ConvertUnixTime($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    infi => {
+        Name => 'CameraInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Nextbase' },
+    },
+    finm => {
+        Name => 'OriginalFileName',
+        Writable => 0,
+    },
+    # AMBA ? - (133 bytes)
+    # nbpl ? - "FP-433-KC"
+    nbpl => { Name => 'Unknown_nbpl', Unknown => 1, Hidden => 1 },
+    # maca ? - b8 2d 28 15 f1 48
+    # sern ? - 0d 69 42 74
+    # nbid ? - 0d 69 42 74 65 df 72 65 03 de c0 fb 01 01 00 00
     # ---- Unknown ----
     # CDET - 128 bytes (unknown origin)
     # mtyp - 4 bytes all zero (some drone video)
@@ -2456,7 +2553,7 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
     TTID => { Name => 'TomTomID', ValueConv => 'unpack("x4H*",$val)' },
     TTVI => { Name => 'TomTomVI', Format => 'int32u', Unknown => 1 }, # seen: "0 1 61 508 508"
     # TTVD seen: "normal 720p 60fps 60fps 16/9 wide 1x"
-    TTVD => { Name => 'TomTomVD', ValueConv => 'my @a = ($val =~ /[\x20-\x7f]+/g); "@a"' },
+    TTVD => { Name => 'TomTomVD', ValueConv => 'my @a = ($val =~ /[\x20-\x7f]+/g); "@a"', List => 1 },
 );
 
 # User-specific media data atoms (ref 11)
@@ -2851,8 +2948,12 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
         Format => 'int8u',
         Writable => 'int8u',
         Protected => 1,
-        ValueConv => '$val * 90',
-        ValueConvInv => 'int($val / 90 + 0.5)',
+        PrintConv => {
+            0 => 'Horizontal (Normal)',
+            1 => 'Rotate 270 CW',
+            2 => 'Rotate 180',
+            3 => 'Rotate 90 CW',
+        },
     },
     ispe => {
         Name => 'ImageSpatialExtent',
@@ -3251,6 +3352,7 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
         PrintConv => '"Track $val"',
     },
     # cdep (Structural Dependency QT tag?)
+    # fall - ? int32u, seen: 2
 );
 
 # track aperture mode dimensions atoms
@@ -3347,7 +3449,7 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::iTunesInfo' },
     },
     aART => { Name => 'AlbumArtist', Groups => { 2 => 'Author' } },
-    covr => { Name => 'CoverArt',    Groups => { 2 => 'Preview' } },
+    covr => { Name => 'CoverArt',    Groups => { 2 => 'Preview' }, Binary => 1 },
     cpil => { #10
         Name => 'Compilation',
         Format => 'int8u', #27 (ref 23 contradicts what AtomicParsley actually writes, which is int8s)
@@ -6418,6 +6520,9 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
     },
     ownr => 'Owner', #PH (obscure) (ref ChrisAdan private communication)
     'xid ' => 'ISRC', #PH
+    # found in DJI Osmo Action4 video
+    tnal => { Name => 'ThumbnailImage',  Binary => 1, Groups => { 2 => 'Preview' } },
+    snal => { Name => 'PreviewImage',    Binary => 1, Groups => { 2 => 'Preview' } },
 );
 
 # tag decoded from timed face records
@@ -6450,7 +6555,7 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
     PROCESS_PROC => \&ProcessKeys,
     WRITE_PROC => \&WriteKeys,
     CHECK_PROC => \&CheckQTValue,
-    VARS => { LONG_TAGS => 7 },
+    VARS => { LONG_TAGS => 8 },
     WRITABLE => 1,
     # (not PREFERRED when writing)
     GROUPS => { 1 => 'Keys' },
@@ -6504,6 +6609,8 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
         PrintConv => '$val * 1e6 . " microseconds"',
         PrintConvInv => '$val =~ s/ .*//; $val * 1e-6',
     },
+  # 'camera.focal_length.35mm_equivalent' - not top level (written to Keys in video track)
+  # 'camera.lens_model'                   - not top level (written to Keys in video track)
     'location.ISO6709' => {
         Name => 'GPSCoordinates',
         Groups => { 2 => 'Location' },
@@ -6566,7 +6673,12 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
 #
     'com.apple.photos.captureMode' => 'CaptureMode',
     'com.android.version' => 'AndroidVersion',
-    'com.android.capture.fps' => 'AndroidCaptureFPS',
+    'com.android.capture.fps' => { Name  => 'AndroidCaptureFPS', Writable => 'float' },
+    'com.android.manufacturer' => 'AndroidMake',
+    'com.android.model' => 'AndroidModel',
+    'com.xiaomi.preview_video_cover' => { Name => 'XiaomiPreviewVideoCover', Writable => 'int32s' },
+    'xiaomi.exifInfo.videoinfo' => 'XiaomiExifInfo',
+    'com.xiaomi.hdr10' => { Name => 'XiaomiHDR10', Writable => 'int32s' },
 #
 # also seen
 #
@@ -6634,6 +6746,13 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
         Avoid => 1,
         %iso8601Date,
     },
+    # (mdta)com.apple.quicktime.scene-illuminance
+    'scene-illuminance' => {
+        Name => 'SceneIlluminance',
+        Notes => 'milli-lux',
+        ValueConv => 'unpack("N", $val)',
+        Writable => 0, # (don't make this writable because it is found in timed metadata)
+    },
 #
 # seen in Apple ProRes RAW file
 #
@@ -6655,7 +6774,7 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
 %Image::ExifTool::QuickTime::iTunesInfo = (
     PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 1 => 'iTunes', 2 => 'Audio' },
-    VARS => { LONG_TAGS => 0 }, # (hack for discrepancy in the way long tags are counted in BuildTagLookup)
+    VARS => { LONG_TAGS => 1 }, # (hack for discrepancy in the way long tags are counted in BuildTagLookup)
     NOTES => q{
         ExifTool will extract any iTunesInfo tags that exist, even if they are not
         defined in this table.  These tags belong to the family 1 "iTunes" group,
@@ -6731,6 +6850,17 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
     BARCODE             => 'Barcode',
     LABEL               => 'Label',
     MOOD                => 'Mood',
+    DIRECTOR            => 'Director',
+    DIRECTOR_OF_PHOTOGRAPHY => 'DirectorOfPhotography',
+    PRODUCTION_DESIGNER => 'ProductionDesigner',
+    COSTUME_DESIGNER    => 'CostumeDesigner',
+    SCREENPLAY_BY       => 'ScreenplayBy',
+    EDITED_BY           => 'EditedBy',
+    PRODUCER            => 'Producer',
+    IMDB_ID             => { },
+    TMDB_ID             => { },
+    Actors              => { },
+    TIPL                => { },
     popularimeter       => 'Popularimeter',
     'Dynamic Range (DR)'=> 'DynamicRange',
     initialkey          => 'InitialKey',
@@ -7272,6 +7402,7 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
     # alac - 28 bytes
     # adrm - AAX DRM atom? 148 bytes
     # aabd - AAX unknown 17kB (contains 'aavd' strings)
+    # dapa - ? 203 bytes
 );
 
 # AMR decode config box (ref 3)
@@ -7786,20 +7917,9 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
 #
     ftab => { Name => 'FontTable',  Format => 'undef', ValueConv => 'substr($val, 5)' },
     name => { Name => 'OtherName',  Format => 'undef', ValueConv => 'substr($val, 4)' },
-    # mrlh = GM header?
-    # mrlv = GM data
-    # mrld = GM data (448-byte records):
-    #            0 - int32u count
-    #            4 - int32u ? (related to units) 0=none,1=m/km,2=L,3=kph,4=C,7=deg,8=rpm,9=kPa,10=G,11=V,15=Nm,16=%
-    #            8 - int32u ? (0,1,3,4,5)
-    #           12 - string[64] units
-    #           76 - int32u ? (1,3,7,15)
-    #           80 - int32u 0
-    #           84 - undef[4] ?
-    #           88 - int16u[6] ?
-    #           100 - undef[32] ?
-    #           132 - string[64] measurement name
-    #           196 - string[64] measurement name
+    mrlh => { Name => 'MarlinHeader',    SubDirectory => { TagTable => 'Image::ExifTool::GM::mrlh' } },
+    mrlv => { Name => 'MarlinValues',    SubDirectory => { TagTable => 'Image::ExifTool::GM::mrlv' } },
+    mrld => { Name => 'MarlinDictionary',SubDirectory => { TagTable => 'Image::ExifTool::GM::mrld' } },
 );
 
 # MP4 data information box (ref 5)
@@ -8087,13 +8207,95 @@ my %isImageData = ( av01 => 1, avc1 => 1, hvc1 => 1, lhv1 => 1, hvt1 => 1 );
     },
 );
 
+# Nextbase tags (ref PH)
+%Image::ExifTool::QuickTime::Nextbase = (
+    GROUPS => { 1 => 'Nextbase', 2 => 'Camera' },
+    PROCESS_PROC => \&ProcessNextbase,
+    WRITE_PROC => \&WriteNextbase,
+    VARS => { LONG_TAGS => 3 },
+    NOTES => q{
+        Tags found in 'infi' atom from some Nextbase videos.  As well as these tags,
+        other existing tags are also extracted.  These tags are not currently
+        writable but they may all be removed by deleting the Nextbase group.
+    },
+   'Wi-Fi SSID' => { },
+   'Wi-Fi Password' => { },
+   'Wi-Fi MAC Address' => { },
+   'Model' => { },
+   'Firmware' => { },
+   'Serial No' => { Name => 'SerialNumber' },
+   'FCC-ID' => { },
+   'Battery Status' => { },
+   'SD Card Manf ID' => { },
+   'SD Card OEM ID' => { },
+   'SD Card Model No' => { },
+   'SD Card Serial No' => { },
+   'SD Card Manf Date' => { },
+   'SD Card Type' => { },
+   'SD Card Used Space' => { },
+   'SD Card Class' => { },
+   'SD Card Size' => { },
+   'SD Card Format' => { },
+   'Wi-Fi SSID' => { },
+   'Wi-Fi Password' => { },
+   'Wi-Fi MAC Address' => { },
+   'Bluetooth Name' => { },
+   'Bluetooth MAC Address' => { },
+   'Resolution' => { },
+   'Exposure' => { },
+   'Video Length' => { },
+   'Audio' => { },
+   'Time Stamp' => { Name => 'VideoTimeStamp' },
+   'Speed Stamp' => { },
+   'GPS Stamp' => { },
+   'Model Stamp' => { },
+   'Dual Files' => { },
+   'Time Lapse' => { },
+   'Number / License Plate' => { },
+   'G Sensor' => { },
+   'Image Stabilisation' => { },
+   'Extreme Weather Mode' => { },
+   'Screen Saver' => { },
+   'Alerts' => { },
+   'Recording History' => { },
+   'Parking Mode' => { },
+   'Language' => { },
+   'Country' => { },
+   'Time Zone / DST' => { Groups => { 2 => 'Time' } },
+   'Time & Date' => { Name => 'TimeAndDate', Groups => { 2 => 'Time' } },
+   'Speed Units' => { },
+   'Device Sounds' => { },
+   'Screen Dimming' => { },
+   'Auto Power Off' => { },
+   'Keep User Settings' => { },
+   'System Info' => { },
+   'Format SD Card' => { },
+   'Default Settings' => { },
+   'Emergency SOS' => { },
+   'Reversing Camera' => { },
+   'what3words' => { Name => 'What3Words' },
+   'MyNextbase - Pairing' => { },
+   'MyNextbase - Paired Device Name' => { },
+   'Alexa' => { },
+   'Alexa - Pairing' => { },
+   'Alexa - Paired Device Name' => { },
+   'Alexa - Privacy Mode' => { },
+   'Alexa - Wake Word Language' => { },
+   'Firmware Version' => { },
+   'RTOS' => { },
+   'Linux' => { },
+   'NBCD' => { },
+   'Alexa' => { },
+   '2nd Cam' => { Name => 'SecondCam' },
+);
+
 # QuickTime composite tags
 %Image::ExifTool::QuickTime::Composite = (
     GROUPS => { 2 => 'Video' },
     Rotation => {
         Notes => q{
-            writing this tag updates QuickTime MatrixStructure for all tracks with a
-            non-zero image size
+            degrees of clockwise camera rotation. Writing this tag updates QuickTime
+            MatrixStructure for all tracks with a non-zero image size
         },
         Require => {
             0 => 'QuickTime:MatrixStructure',
@@ -8808,12 +9010,20 @@ sub HandleItemInfo($)
                 if ($$item{Extents} and @{$$item{Extents}}) {
                     $len += $$_[2] foreach @{$$item{Extents}};
                 }
-                $et->VPrint(0, "$$et{INDENT}Item $id) '${type}' ($len bytes)\n");
+                my $enc = $$item{ContentEncoding} ? ", $$item{ContentEncoding} encoded" : '';
+                $et->VPrint(0, "$$et{INDENT}Item $id) '${type}' ($len bytes$enc)\n");
             }
             # get ExifTool name for this item
             my $name = { Exif => 'EXIF', 'application/rdf+xml' => 'XMP', jpeg => 'PreviewImage' }->{$type} || '';
             my ($warn, $extent);
-            $warn = "Can't currently decode encoded $type metadata" if $$item{ContentEncoding};
+            if ($$item{ContentEncoding}) {
+                if ($$item{ContentEncoding} ne 'deflate') {
+                    # (other possible values are 'gzip' and 'compress', but I don't have samples of these)
+                    $warn = "Can't currently decode $$item{ContentEncoding} encoded $type metadata";
+                } elsif (not eval { require Compress::Zlib }) {
+                    $warn = "Install Compress::Zlib to decode deflated $type metadata";
+                }
+            }
             $warn = "Can't currently decode protected $type metadata" if $$item{ProtectionIndex};
             $warn = "Can't currently extract $type with construction method $$item{ConstructionMethod}" if $$item{ConstructionMethod};
             $et->WarnOnce($warn) if $warn and $name;
@@ -8873,6 +9083,22 @@ sub HandleItemInfo($)
             next unless defined $buff;
             $buff = $val . $buff if length $val;
             next unless length $buff;   # ignore empty directories
+            if ($$item{ContentEncoding}) {
+                my ($v2, $stat);
+                my $inflate = Compress::Zlib::inflateInit();
+                $inflate and ($v2, $stat) = $inflate->inflate($buff);
+                if ($inflate and $stat == Compress::Zlib::Z_STREAM_END()) {
+                    $buff = $v2;
+                    my $len = length $buff;
+                    $et->VPrint(0, "$$et{INDENT}Inflated Item $id) '${type}' ($len bytes)\n");
+                    $et->VerboseDump(\$buff);
+                } else {
+                    $warn = "Error inflating $name metadata";
+                    $et->WarnOnce($warn);
+                    $et->VPrint(0, "$$et{INDENT}    [not extracted]  ($warn)\n") if $verbose > 2;
+                    next;
+                }
+            }
             my ($start, $subTable, $proc);
             my $pos = $$item{Extents}[0][1] + $base;
             if ($name eq 'EXIF' and length $buff >= 4) {
@@ -8936,7 +9162,7 @@ sub HandleItemInfo($)
             $et->ProcessDirectory(\%dirInfo, $subTable, $proc);
             delete $$et{DOC_NUM};
         }
-        $raf->Seek($curPos, 0);     # seek back to original position
+        $raf->Seek($curPos, 0) or $et->Warn('Seek error'), last;     # seek back to original position
         pop @{$$et{PATH}};
     }
     # process the item properties now that we should know their associations and document numbers
@@ -9150,6 +9376,23 @@ sub ProcessRights($$$)
 }
 
 #------------------------------------------------------------------------------
+# Process Nextbase 'infi' atom (ref PH)
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessNextbase($$$)
+{
+    my ($et, $dirInfo, $tagTbl) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    $et->VerboseDir('Nextbase', undef, length($$dataPt));
+    while ($$dataPt =~ /(.*?): +(.*)\x0d/g) {
+        my ($id, $val) = ($1, $2);
+        $$tagTbl{$id} or AddTagToTable($tagTbl, $id, { Name => Image::ExifTool::MakeTagName($id) });
+        $et->HandleTag($tagTbl, $id, $val, Size => length($val));
+    }
+    return 1;
+}
+
+#------------------------------------------------------------------------------
 # Process iTunes Encoding Params (ref PH)
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success
@@ -9259,7 +9502,7 @@ sub ProcessKeys($$$)
             $$newInfo{KeysID} = $tag;  # save original ID for use in family 7 group name
             AddTagToTable($itemList, $id, $newInfo);
             $msg or $msg = '';
-            $out and print $out "$$et{INDENT}Added ItemList Tag $id = ($ns) $tag$msg\n";
+            $out and print $out "$$et{INDENT}Added ItemList Tag $id = ($ns) $full$msg\n";
         }
         $pos += $len;
         ++$index;
@@ -9291,11 +9534,12 @@ sub ProcessMOV($$;$)
     my $dataPt = $$dirInfo{DataPt};
     my $verbose = $et->Options('Verbose');
     my $validate = $$et{OPTIONS}{Validate};
-    my $dataPos = $$dirInfo{Base} || 0;
+    my $dirBase = $$dirInfo{Base} || 0;
+    my $dataPos = $dirBase;
     my $dirID = $$dirInfo{DirID} || '';
     my $charsetQuickTime = $et->Options('CharsetQuickTime');
     my ($buff, $tag, $size, $track, $isUserData, %triplet, $doDefaultLang, $index);
-    my ($dirEnd, $unkOpt, %saveOptions, $atomCount);
+    my ($dirEnd, $unkOpt, %saveOptions, $atomCount, $warnStr, $trailer);
 
     my $topLevel = not $$et{InQuickTime};
     $$et{InQuickTime} = 1;
@@ -9324,6 +9568,17 @@ sub ProcessMOV($$;$)
         $tagTablePtr = GetTagTable('Image::ExifTool::QuickTime::Main');
     }
     ($size, $tag) = unpack('Na4', $buff);
+    my $fast = $$et{OPTIONS}{FastScan} || 0;
+    # check for Insta360 trailer
+    if ($topLevel and not $fast) {
+        my $pos = $raf->Tell();
+        if ($raf->Seek(-40, 2) and $raf->Read($buff, 40) == 40 and
+            substr($buff, 8) eq '8db42d694ccc418790edff439fe026bf')
+        {
+            $trailer = [ 'Insta360', $raf->Tell() - unpack('V',$buff) ];
+        }
+        $raf->Seek($pos,0) or return 0;
+    }
     if ($dataPt) {
         $verbose and $et->VerboseDir($$dirInfo{DirName});
     } else {
@@ -9333,7 +9588,7 @@ sub ProcessMOV($$;$)
         if ($tag eq 'ftyp' and $size >= 12) {
             # read ftyp atom to see what type of file this is
             if ($raf->Read($buff, $size-8) == $size-8) {
-                $raf->Seek(-($size-8), 1);
+                $raf->Seek(-($size-8), 1) or $et->Warn('Seek error'), return 0;
                 my $type = substr($buff, 0, 4);
                 $$et{save_ftyp} = $type;
                 # see if we know the extension for this file type
@@ -9362,7 +9617,6 @@ sub ProcessMOV($$;$)
         # have XMP take priority except for HEIC
         $$et{PRIORITY_DIR} = 'XMP' unless $fileType and $fileType eq 'HEIC';
     }
-    my $fast = $$et{OPTIONS}{FastScan} || 0;
     $$raf{NoBuffer} = 1 if $fast;   # disable buffering in FastScan mode
 
     my $ee = $$et{OPTIONS}{ExtractEmbedded};
@@ -9375,6 +9629,8 @@ sub ProcessMOV($$;$)
         $index = $$tagTablePtr{VARS}{START_INDEX};
         $atomCount = $$tagTablePtr{VARS}{ATOM_COUNT};
     }
+    my $lastTag = '';
+    my $lastPos = 0;
     for (;;) {
         my ($eeTag, $ignore);
         last if defined $atomCount and --$atomCount < 0;
@@ -9384,7 +9640,7 @@ sub ProcessMOV($$;$)
                     # a zero size isn't legal for contained atoms, but Canon uses it to
                     # terminate the CNTH atom (eg. CanonEOS100D.mov), so tolerate it here
                     my $pos = $raf->Tell() - 4;
-                    $raf->Seek(0,2);
+                    $raf->Seek(0,2) or $et->Warn('Seek error'), return 0;
                     my $str = $$dirInfo{DirName} . ' with ' . ($raf->Tell() - $pos) . ' bytes';
                     $et->VPrint(0,"$$et{INDENT}\[Terminator found in $str remaining]");
                 } else {
@@ -9393,7 +9649,7 @@ sub ProcessMOV($$;$)
                     if ($$tagTablePtr{"$tag-size"}) {
                         my $pos = $raf->Tell();
                         unless ($fast) {
-                            $raf->Seek(0, 2);
+                            $raf->Seek(0, 2) or $et->Warn('Seek error'), return 0;
                             $et->HandleTag($tagTablePtr, "$tag-size", $raf->Tell() - $pos);
                         }
                         $et->HandleTag($tagTablePtr, "$tag-offset", $pos) if $$tagTablePtr{"$tag-offset"};
@@ -9401,22 +9657,24 @@ sub ProcessMOV($$;$)
                 }
                 last;
             }
-            $size == 1 or $et->Warn('Invalid atom size'), last;
+            $size == 1 or $warnStr = 'Invalid atom size', last;
             # read extended atom size
-            $raf->Read($buff, 8) == 8 or $et->Warn('Truncated atom header'), last;
+            $raf->Read($buff, 8) == 8 or $warnStr = 'Truncated atom header', last;
             $dataPos += 8;
             my ($hi, $lo) = unpack('NN', $buff);
             if ($hi or $lo > 0x7fffffff) {
                 if ($hi > 0x7fffffff) {
-                    $et->Warn('Invalid atom size');
+                    $warnStr = 'Invalid atom size';
                     last;
                 } elsif (not $et->Options('LargeFileSupport')) {
-                    $et->Warn('End of processing at large atom (LargeFileSupport not enabled)');
+                    $warnStr = 'End of processing at large atom (LargeFileSupport not enabled)';
                     last;
+                } elsif ($et->Options('LargeFileSupport') eq '2') {
+                    $et->WarnOnce('Processing large atom (LargeFileSupport is 2)');
                 }
             }
             $size = $hi * 4294967296 + $lo - 16;
-            $size < 0 and $et->Warn('Invalid extended size'), last;
+            $size < 0 and $warnStr = 'Invalid extended size', last;
         } else {
             $size -= 8;
         }
@@ -9507,7 +9765,7 @@ sub ProcessMOV($$;$)
         if ($size > 0x2000000) {    # start to get worried above 32 MiB
             # check for RIFF trailer (written by Auto-Vox dashcam)
             if ($buff =~ /^(gpsa|gps0|gsen|gsea)...\0/s) { # (yet seen only gpsa as first record)
-                $et->VPrint(0, "Found RIFF trailer");
+                $et->VPrint(0, sprintf("Found RIFF trailer at offset 0x%x",$lastPos));
                 if ($et->Options('ExtractEmbedded')) {
                     $raf->Seek(-8, 1) or last;  # seek back to start of trailer
                     my $tbl = GetTagTable('Image::ExifTool::QuickTime::Stream');
@@ -9515,6 +9773,11 @@ sub ProcessMOV($$;$)
                 } else {
                     EEWarn($et);
                 }
+                last;
+            } elsif ($buff eq 'CCCCCCCC') {
+                $et->VPrint(0, sprintf("Found Kenwood trailer at offset 0x%x",$lastPos));
+                my $tbl = GetTagTable('Image::ExifTool::QuickTime::Stream');
+                ProcessKenwoodTrailer($et, { RAF => $raf }, $tbl);
                 last;
             }
             $ignore = 1;
@@ -9572,12 +9835,12 @@ ItemID:         foreach $id (reverse sort { $a <=> $b } keys %$items) {
             my $missing = $size - $raf->Read($val, $size);
             if ($missing) {
                 my $t = PrintableTagID($tag,2);
-                $et->Warn("Truncated '${t}' data (missing $missing bytes)");
+                $warnStr = "Truncated '${t}' data (missing $missing bytes)";
                 last;
             }
             # use value to get tag info if necessary
             $tagInfo or $tagInfo = $et->GetTagInfo($tagTablePtr, $tag, \$val);
-            my $hasData = ($$dirInfo{HasData} and $val =~ /\0...data\0/s);
+            my $hasData = ($$dirInfo{HasData} and $val =~ /^....data\0/s);
             if ($verbose and not $hasData) {
                 my $tval;
                 if ($tagInfo and $$tagInfo{Format}) {
@@ -9887,15 +10150,32 @@ ItemID:         foreach $id (reverse sort { $a <=> $b } keys %$items) {
             ) if $verbose;
             if ($size and (not $raf->Seek($size-1, 1) or $raf->Read($buff, 1) != 1)) {
                 my $t = PrintableTagID($tag,2);
-                $et->Warn("Truncated '${t}' data");
+                $warnStr = sprintf("Truncated '${t}' data at offset 0x%x", $lastPos);
                 last;
             }
         }
         $dataPos += $size + 8;  # point to start of next atom data
         last if $dirEnd and $dataPos >= $dirEnd; # (note: ignores last value if 0 bytes)
+        $lastPos = $raf->Tell() + $dirBase;
+        if ($trailer and $lastPos >= $$trailer[1]) {
+            $et->Warn(sprintf('%s trailer at offset 0x%x', @$trailer), 1);
+            last;
+        }
         $raf->Read($buff, 8) == 8 or last;
+        $lastTag = $tag if $$tagTablePtr{$tag} and $tag ne 'free'; # (Insta360 sometimes puts free block before trailer)
         ($size, $tag) = unpack('Na4', $buff);
         ++$index if defined $index;
+    }
+    if ($warnStr) {
+        # assume this is an unknown trailer if it comes immediately after
+        # mdat or moov and has a tag name we don't recognize
+        if (($lastTag eq 'mdat' or $lastTag eq 'moov') and
+            (not $$tagTablePtr{$tag} or ref $$tagTablePtr{$tag} eq 'HASH' and $$tagTablePtr{$tag}{Unknown}))
+        {
+            $et->Warn('Unknown trailer with '.lcfirst($warnStr));
+        } else {
+            $et->Warn($warnStr);
+        }
     }
     # tweak file type based on track content ("iso*" and "dash" ftyp only)
     if ($topLevel and $$et{FileType} and $$et{FileType} eq 'MP4' and
@@ -9919,7 +10199,10 @@ QTLang: foreach $tag (@{$$et{QTLang}}) {
             for ($i=0, $key=$name; $$infoHash{$key}; ++$i, $key="$name ($i)") {
                 next QTLang if $et->GetGroup($key, 0) eq 'QuickTime';
             }
-            $et->FoundTag($tagInfo, $$et{VALUE}{$tag});
+            $key = $et->FoundTag($tagInfo, $$et{VALUE}{$tag});
+            # copy extra tag information (groups, etc) to the synthetic tag
+            $$et{TAG_EXTRA}{$key} = $$et{TAG_EXTRA}{$tag};
+            $et->VPrint(0, "(synthesized default-language tag for QuickTime:$$tagInfo{Name})");
         }
         delete $$et{QTLang};
     }

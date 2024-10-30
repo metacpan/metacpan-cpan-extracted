@@ -26,9 +26,7 @@ use Carp;
 # Inherit from UIST
 use base qw/ Astro::FITS::HdrTrans::UIST /;
 
-use vars qw/ $VERSION /;
-
-$VERSION = "1.65";
+our $VERSION = "1.66";
 
 my %CONST_MAP = ( OBSERVATION_MODE => 'spectroscopy',
                 );

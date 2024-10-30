@@ -44,7 +44,7 @@
    "provides" : {
       "e" : {
          "file" : "lib/e.pm",
-         "version" : "1.31"
+         "version" : "1.32"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "url" : "https://github.com/poti1/e"
       }
    },
-   "version" : "1.31",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "1.32",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

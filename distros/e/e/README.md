@@ -26,7 +26,7 @@
               ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
                 ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                    ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.31
+                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.32
                       ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                       ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                             ⠈    ⠈⠓  ⠈
@@ -442,7 +442,7 @@ Turn string into a [Mojo::File](https://metacpan.org/pod/Mojo%3A%3AFile) object.
 
     $ perl -Me -e 'say r j f("hello.json")->slurp'
 
-## Math Help
+## List Support
 
 ### max
 
@@ -457,6 +457,22 @@ Get the smallest number in a list.
 
     $ perl -Me -e 'say max 2,4,1,3'
     1
+
+### sum
+
+Adds a list of numbers.
+
+    $ perl -Me -e 'say sum 1..10'
+    55
+
+### uniq
+
+Get the unique values in a list.
+
+    $ perl -Me -e 'say for uniq 2,4,4,6'
+    2
+    4
+    6
 
 ## Output
 

@@ -4,8 +4,373 @@ ExifTool Version History
 
 RSS feed: https://exiftool.org/rss.xml
 
-Note: The most recent production release is Version 12.76. (Other versions are
+Note: The most recent production release is Version 13.00. (Other versions are
 considered development releases, and are not uploaded to MetaCPAN.)
+
+Oct. 29, 2024 - Version 13.00 (production release)
+
+  - Added support for reading GPS from Autel Evo II drone videos
+  - Added a new PhaseOne RawFormat value
+  - Updated XMP-exifEX tags, exif2xmp.args and xmp2exif.args according to the
+    2024 EXIF for XMP specification
+  - Updated Geolocation databases from current geonames.org files
+  - Updated the MIME types for a couple of font formats
+  - Enhanced -diff option to work with -ec (C-style escape of special chars)
+  - Changed name of EXIF Title tag to ImageTitle to correspond with specifiation
+  - Reverted a geotag warning message to remove debugging information that was
+    added in version 12.67 and moved this information into a -v3 verbose message
+  - Patched Perl bug which gave "Can't spawn" warning in Windows if control-C
+    was pressed while displaying the exiftool application help
+  - Fixed API StructFormat JSONQ setting to properly quote values in structures
+  - Fixed incorrect AudioStreamType for M2TS videos containing a PGS stream
+  - Fixed -diff option so "same tags" messages are only shown when -v is added
+    (as per the documentation)
+
+Oct. 18, 2024 - Version 12.99
+
+  - Added -diff option to compare the metadata in two files
+  - Added a new Canon lens (thanks Norbert Wasser)
+  - Decode GPS from 70mai A810 dashcam videos
+  - Decode a new QuickTime tag
+  - Patched to recognize C2PA APP11 JUMBF header with incorrect byte order
+    written by buggy Microsoft software
+  - Patched to maintain order of entries in a JSON object when reading
+  - Patched to maintain order of CSV columns when setting tags from a CSV file
+  - Patched to maintain order of XMP lang-alt entries when writing/copying
+  - Fixed typo in an APP12 tag name
+  - API Changes:
+      - Structured values returned as HASH references with the Struct option may
+        contain a new "_ordered_keys_" entry used to preserve the order of the
+        entries
+      - Added the OrderedKeys method to return the ordered or sorted keys from a
+        returned structure value
+
+Oct. 8, 2024 - Version 12.98
+
+  - Added write support for PDF files with huge offsets
+  - Added a number of new Sony LensType values (thanks Jos Roost)
+  - Require -v4 or higher to output "JPG RST" lines
+  - Patched problem with -fast option when reading HEIC file via a pipe
+  - Patched to avoid hang when reading some corrupted XMP
+
+Sept. 25, 2024 - Version 12.97
+
+  - Added ability to ignore up to 4095 bytes of garbage at the end of an INDD
+    file with the -m option
+  - Added a new Canon RFLensType value (thanks Norbert Wasser)
+  - Added a new Nikon Z LensID
+  - Decode a number of new Nikon Z6_3 tags (thanks Warren Hatch)
+  - Decode a few more FujiFilm tags (thanks Greybeard)
+  - Enhanced %C format code to allow file-name collisions to be avoided by using
+    a colon instead of a decimal in the format modifier
+  - Fixed bug which could result in hang when using %C code in an output file
+    name
+
+Sept. 1, 2024 - Version 12.96
+
+  - More improvements to handling of trailers on video files (and add ability to
+    write videos which have an unknown trailer)
+  - Fixed problem geotagging from some newer Google Takeout files
+
+Aug. 30, 2024 - Version 12.95
+
+  - Added a couple of new CanonModelID values
+  - Decode ColorData for a couple of new Canon models
+  - Fixed problem writing video files which have some known trailer types
+
+Aug. 29, 2024 - Version 12.94
+
+  - Added ability to geotag from new-format Google Takeout JSON files
+  - Added a few new Android and Xiaomi QuickTime Keys tags
+  - Added ability to read C2PA JUMBF metadata from TTF/OTF files
+  - Internal changes to code for creating new directories
+  - Changed Windows packages to have the application help text file in the
+    exiftool_files folder instead of writing it to a temporary directory
+  - Removed new QuickTime Keys tags added in 12.93 because these aren't used in
+    top-level metadata (written to the video track by Apple devices)
+  - Fixed the group names for synthesized default-language QuickTime tags and
+    added a verbose message when generating these tags
+  - Fixed warning in Geolocation.t self test
+
+Aug. 20, 2024 - Version 12.93
+
+  - Added a new Nikon LensID
+  - Added a couple of new OpenEXR Compression types
+  - Added a couple of new QuickTime Keys tags
+  - Decode timed metadata from E-ACE B44 dashcam videos
+  - Made "Unrecognized" Samsung Meta warnings minor
+  - Fixed bug in -listg6 option which resulted in "uninitialized value" warnings
+  - Fixed decoding of Func1Button and Func2Button for the Nikon Z6/Z7
+  - Fixed bug reading JUMB metadata from JXL images
+
+July 24, 2024 - Version 12.92
+
+  - Removed -w from exiftool shebang due to compatibility issues on some systems
+
+July 24, 2024 - Version 12.91
+
+  - Added a couple of new OpenEXR Compression values (github#276)
+  - Updated 2 test files that were causing failed tests (ExifTool itself is
+    unchanged)
+
+July 24, 2024 - Version 12.90
+
+  - Added support for reading Samsung trailer from PNG images
+  - Decode two more formats of timed GPS from MP4 videos
+  - Decode a few more Samung trailer tags (thanks Neal Krawetz)
+  - Decode Canon AntiFlicker tag
+  - Drop Nikon ShotInfo record when copying MakerNotes from NEF to JPG if it is
+    larger than 50000 bytes (then MakerNotes would be too large for a single
+    JPEG segment)
+  - Changed exiftool shebang to use env: "#!/usr/bin/env perl -w"
+  - Revert change of 12.84 to iterate through sub-documents with the -p option
+    only if -ee is used
+
+July 12, 2024 - Version 12.89
+
+  - Added new Sony lenses and updated decoding of some tags (thanks Jos Roost)
+  - Minor change to description of NKA files
+  - Fixed Archive::Zip problem in Windows executable version
+
+July 11, 2024 - Version 12.88 - "New Windows/MacOS packages"
+
+  - NOTE: The install procedure for the Windows executable has changed!
+  - Windows EXE version now uses Oliver Betz's bundle with Strawberry Perl and
+    comes in 32- and 64-bit versions
+  - MacOS distribution now uses a flattened package
+  - Added ability to read/write deflate-compressed XMP in HEIC files
+  - Added a new Canon LensType (thanks Norbert Wasser)
+  - Added a new XMP-GCamera tag (thanks Herb)
+  - Added a new Nikon LensID
+  - Added a few new Canon AFAreaMode values (thanks Wernfried)
+  - Added config_files/onone.config to the distribution
+  - Decode timed accelerometer readings from NextBase 622GW videos
+  - Decode Pentax K-3III CameraOrentation (thanks Peter)
+  - Improved German translation for LensModel
+  - Enhanced the API StructFormat JSONQ setting to quote all JSON values, even
+    if they aren't in a structure
+  - Changed -geolocate option so specifying the Keys group writes
+    Keys:GPSPosition only if an input city is specified, and Keys:LocationName
+    only for input GPS coordinates
+  - Tweaked API Geolocation option recognized space-separated lat/lon even when
+    there is no decimal point in the numbers
+  - API Changes:
+      - Changed LargeFileSupport default to 2 and added a warning if a large
+        chunk is encountered.  Set to 1 to avoid the warning.
+
+June 13, 2024 - Version 12.87
+
+  - Added ability to write Google Container XMP tags (using the namespace prefix
+    'GContainer' to avoid conflict with the Google Device Container prefix)
+  - Decode a few new tags for the Canon EOS R5 (thanks John Moyer)
+  - Decode battery information for the Pentax K-3 III (thanks Peter)
+  - Decode RAFCompression from FujiFilm RAF images (thanks Albert Shan)
+  - Avoid reporting FileSize for pipes
+  - Updated Geolocation databases from current geonames.org files
+  - Enhanced Geolocation feature to allow lat/lon to be input with a space
+    separator instead of a comma
+  - Skip over Matroska Cluster if necessary to read Tags when referenced from
+    SeekHead
+  - Changed conversion for Matroska SeekID (now in hex with tag name in
+    brackets) and SeekPosition (now returns an absolute offset)
+  - Fixed problem writing XMP-Device:EarthPos coordinates
+  - Fixed typo in a value of Canon:DigitalLensOptimizer (thanks Martin B.)
+  - Fixed decoding of Matroska VideoScanType
+  - Fixed misleading error message when -o option was used to write to an
+    unsupported file type
+
+June 7, 2024 - Version 12.86
+
+  - Added a new value for a couple of Olympus tags (thanks Herb)
+  - Improved handling of ID3 user-defined tags
+  - Decode all JPEG segments from RICO box in Ricoh MOV videos
+  - Decode a few new values for some tags written by Canon EOS R cameras (thanks
+    John Moyer and Martin B.)
+  - Patched some Olympus WB_RBLevels tags to allow 4 values to be written as per
+    some newer models
+  - Fixed issue when writing IPTC date tags with a date/time value containing
+    subseconds with 4 or more digits
+
+May 21, 2024 - Version 12.85
+
+  - Added GeolocationFeatureType tag
+  - Added read support for Nikon NKA and NXD adjustment files
+  - Added a new Apple:ImageCaptureType value, and changed another one
+  - Decode a few new Pentax tags
+  - Decode a few new Canon tags
+  - Decode some Ricoh Exif metadata from MOV videos
+  - Extract ID3 UserDefinedText and UserDefinedURL tags by name
+  - Make $advFmtSelf available for user-defined helper functions
+  - Documented API GeoDir pseudo option feature
+  - Tolerate pad byte at end of HIF file when writing
+  - Raised priority of FileName, BaseName, Directory and FileType tags so they
+    don't get hidden by other tags in the file which may have these names
+  - Changed decoding of QuickTime Rotation (irot) to correspond with
+    EXIF:Orientation (previously this was oddly reported as degrees of
+    counterclockwise rotation)
+  - Fixed a typo in the print conversion value for a couple of DPX tags
+  - Fixed problem writing some QuickTime tags with very large (> 16 MB) values
+  - Fixed bug in build_geolocation utility that resulted in incorrect population
+    numbers when run under ActivePerl
+
+Apr. 23, 2024 - Version 12.84
+
+  - Added ability to read speed and accuracy_horizontal when geotagging from
+    OpenTracks GPX files
+  - Decode a few more Apple tags and a new CanonVRD tag
+  - Enhanced Geolocation feature with the ability to return any number of nearby
+    cities
+  - Allow coordinates to be entered without comma separator for the Geolocation
+    feature as long as both coordinates have a decimal point
+  - Changed -p option to iterate through sub-documents if they exist even if -ee
+    isn't used
+  - Fixed long-standing bug in Windows version that didn't properly handle dates
+    older than 50 years when writing FileModifyDate or FileCreateDate
+  - Fixed API TimeZone option to work in Windows
+  - Fixed problem where the SetTags helper function didn't properly copy tags
+    which have print conversions
+  - Fixed problem where a new subregion couldn't be added through a user-defined
+    Geolocation database entry
+  - Fixed problem where the API GeolocFeature option didn't work for some
+    features if a user-generated custom database was used
+
+Apr. 18, 2024 - Version 12.83
+
+  - Added SetTags helper function for use in advanced formatting expressions
+  - Added a couple of new tags from the DNG 1.7.1 specification
+  - Added a new Nikon Z lens
+  - Added a couple of new QuickTime tags
+  - Added a few more XMP-GCamera tags
+  - Added build_geolocation utility to the full distribution
+  - Decode a new CanonVRD tag and rename another one
+  - Updates to Sony maker note decoding for newer models (thanks Jos Roost)
+  - Minor change in -p option to avoid adding the trailing newline if the -b
+    option is also used
+  - Minor changes to GM PDR decoding for Gear and angle measurements
+  - Removed Geolocation alternate language support from the standard
+    distribution, and added PPLX feature codes
+  - Set family 1 group name for NextBase 'nbmt' information to "Nextbase"
+  - Fixed incorrect ID of a DNG tag
+  - API Changes:
+      - Added IgnoreGroups option
+
+Apr. 5, 2024 - Version 12.82 - "GM PDR"
+
+  - Added support for reading GM PDR data from MP4 videos written by cars such
+    as Corvettes and Cameros
+  - Added support for reading timed GPS from Wolfbox dashcam videos
+  - Added "Unknown trailer" to QuickTime warnings originating from an unknown
+    trailer
+  - Added a new Nikon LensID
+  - Extract PreviewImage from Chigee AIO-5 dashcam videos
+  - Changed name and print conversion of a recently added FujiFilm tag
+  - Only issue "Tag not defined" warnings for the first sub-document when using
+    the -p option
+  - Fixed a Nikon Z lens name (github #250)
+  - Fixed Windows version so -sort works properly with -listgeo
+  - API Changes:
+      - Added PrintCSV option for optimized extraction of GM PDR data in CSV
+        format
+
+Mar. 27, 2024 - Version 12.81
+
+  - Added ability to read EXIF and XMP from EXR images
+  - Added ability to delete unknown trailer when writing MOV/MP4 videos
+  - Added ability to write a couple of Stable Diffusion PNG tags
+  - Added ability to write one of the Microsoft Xtra Description tags (github
+    #248)
+  - Added support for using alternate city names in reverse Geolocation
+  - Added support for reading timed GPS from DOD LS600W TS videos
+  - Added support for new version of Canon DR4 files
+  - Added a number of new iTunesInfo tags
+  - Added a new Olympus LensType
+  - Decode a number of new Nikon tags (thanks Warren Hatch)
+  - Allow regular expressions to be used when writing Geolocate tag
+  - Enhanced writing of Geolocate tag to also write Keys:LocationName
+  - Cache the results of the last reverse geolocation search to speed batch
+    processing when multiple files have the same search parameters
+  - Patched problem that could cause runtime errors with some invaid tag names
+  - Fixed a couple of newly added FujiFilm tags
+  - Fixed decoding of FujiFilm AFAreaZoneSize
+  - API Changes:
+      - Added GeolocAltNames option
+
+Mar. 19, 2024 - Version 12.80
+
+  - Added GeolocationFeatureCode tag
+  - Added XMP-acdsee-rs tags and a new XMP-xmpDM tag
+  - Added ACDSeeRegion2MWGRegion conversion to config_files/acdsee.config
+  - Added GPSAltitudeRef to XMP-iptcExt LocationDetails structure
+  - Added a couple of new FujiFilm tags and a new CropMode value
+  - Added conversion for XMP-aux:ApproximateFocusDistance "infinity"
+  - Improved Geolocation regular expressions to allow negative matches
+  - Improved accuracy of Geolocation distance/bearing calculations
+  - Changed structure of Geolocation database (now version 1.02)
+  - Minor change to key format for user-defined Geolocation name translations
+  - Ignore API Geolocation option when copying tags if none of the Geolocation
+    tags are being copied
+  - Fixed case/spacing of "C2PA" in some CBOR tag descriptions
+  - Fixed bug extracting binary data from EXR files
+  - API Changes:
+      - Added GeolocFeature option
+
+Mar. 15, 2024 - Version 12.79
+
+  - Improvements to new Geolocation feature:
+      - Added reverse Geolocation ability (obtain GPS coordinates from city
+        name), with support for regular expressions
+      - Added ability to geolocate while geotagging
+      - Added -listgeo option to list the Geolocation database
+      - Added the ability to include user-defined cities in the Geolocation
+        database
+      - Added the ability to write XMP-iptcExt LocationShown tags using Geolocate
+        feature
+      - Added the ability to specify which tags to read from file for the API
+        Geolocation option
+      - Added language translations for Geolocation names
+      - Increased resolution of Geolocation GPS positions and stored populations
+  - API Changes:
+      - Save necessary data members to allow GetInfo to be accessed by
+        user-defined tags
+
+Mar. 5, 2024 - Version 12.78 - "Geolocation"
+
+  - Added new Geolocation feature and write-only Geolocate tag
+  - Added new config file entry (@Image::ExifTool::UserDefined::Arguments) to
+    allow default command-line arguments to be specified
+  - Added print conversion for TIFF-EPStandardID
+  - Added ability to delete Nextbase information from MP4 videos
+  - Decode timed GPS from MP4 videos written by Nextbase software
+  - Decode a number of new tags from Nextbase MP4 videos
+  - Decode a few new tags from Garmin MP4 videos
+  - Extract PreviewJXL images from DNG 1.7 files
+  - Generate Validate, ImageDataHash and UserParam tags earlier to allow them to
+    be used in UserDefined Composite tags
+  - Enhanced the -c option so a minus sign in the format specification prints a
+    signed coordinate without a leading "+" for positive numbers
+  - Changed formatting of some Accelerometer tags for consistency
+  - Changed behaviour of -ee3 option to do a brute-force scan for freeGPS in the
+    media data even when referenced by 'gps ' atom
+  - Other internal changes to decoding of timed GPS from videos
+  - Fixed problem were ExifTool would give up on extracting some types of timed
+    GPS from videos after 100 void fixes
+  - Fixed bug that could cause runtime error when reading Ogg files
+  - Fixed issue where some tags from alternate files using the -fileNUM option
+    weren't generated as requested
+  - API Changes:
+      - Added Geolocation, GeolocMaxDist and GeolocMinPop API options
+
+Feb. 16, 2024 - Version 12.77
+
+  - Added new Olympus CameraType and LensType value (thanks herb)
+  - Added a new Canon Irix LensType
+  - Added the ability to delete MacOS XAttrMDItemWhereFroms
+  - Decode a few new Canon DPP tags (thanks John Moyer)
+  - Decode timed GPS from Adzome GS65H MOV videos
+  - Improved handling of XML-unfriendly characters in JSON field names (fixes
+    issue where -X option could produce invalid XML when reading JSON with the
+    -struct option)
+  - Fixed decoding of ShutterCount for Canon G5X-ii CR3 files
 
 Jan. 31, 2024 - Version 12.76 (production release)
 
@@ -19,6 +384,7 @@ Jan. 30, 2024 - Version 12.75 (production release)
   - CORRUPTION WARNING: Fixed bug introduced in 12.45 which could result in
     corrupted Sony ARW images from some newer models when rewriting lossless
     compressed ARW images which were previously edited by 12.44 or earlier
+    (the corruption is repairable, but requires a special version of ExifTool)
   - Added ability to read C2PA JUMBF metadata from PDF and SVG files
   - Added ability to extract JUMBF metadata as a block
   - Added read support for C2PA (JUMBF-format) files
@@ -547,7 +913,7 @@ Oct. 13, 2022 - Version 12.48
     "Z" are actually in Zulu time -- a bit of a mess really)
   - Prevent dynamically-generated Unknown tags from being extracted when the
     -validate option is used without -u
-  - Patched to better handle irregular timestamps in streaming GPS of NextBase
+  - Patched to better handle irregular timestamps in streaming GPS of Nextbase
     dashcam videos
   - Fixed incompatibility with Sigma Photo Pro which could result in Sigma Photo
     Pro corrupting an ExifTool-edited X3F image (the section length in the
@@ -1419,7 +1785,7 @@ Mar. 19, 2020 - Version 11.92
   - Added a new Nikon LensID (thanks Wolfgang Exler)
   - Decode a few new Leica tags (thanks Tim Gray)
   - Decode AccelerometerData from Samsung Gear 360 videos
-  - Fixed a couple of problems decoding timed GPS metadata from NextBase dashcam
+  - Fixed a couple of problems decoding timed GPS metadata from Nextbase dashcam
     videos
   - Fixed problem where -X option could produce invalid XML when reading
     corrupted XMP
@@ -2308,7 +2674,7 @@ Oct. 16, 2018 - Version 11.14
 
 Oct. 9, 2018 - Version 11.13
 
-  - Decode GPS from NextBase 512G dashcam MOV videos (different than 512GW)
+  - Decode GPS from Nextbase 512G dashcam MOV videos (different than 512GW)
   - Added a new Canon LensType (thanks LibRaw)
   - Minor improvements to verbose dump of streaming GPS metadata
   - Reverted change of version 10.71 which resulted in Windows not recognizing
@@ -2327,7 +2693,7 @@ Oct. 2, 2018 - Version 11.12
   - Added a new Sony/Minolta LensType (thanks LibRaw and Jos Roost)
   - Added a new Nikon LensID
   - Decode a few new Sony SRF2 tags (thanks LibRaw)
-  - Decode GPS from NextBase 512GW dashcam MOV videos
+  - Decode GPS from Nextbase 512GW dashcam MOV videos
   - Validate MS-DOC FIB before extracting contained tags
   - Fixed bug extracting GPSSpeed for some dashcam models
 

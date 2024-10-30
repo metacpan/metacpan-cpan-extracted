@@ -38,6 +38,9 @@ use Audio::Nama::Object qw(
 				predecessor
 
 );
+*this_op			= \&Audio::Nama::this_op;
+*this_param			= \&Audio::Nama::this_param;
+*this_stepsize		= \&Audio::Nama::this_stepsize;
 our %by_id;
 our $AUTOLOAD;
 import_engine_subs();
@@ -55,7 +58,7 @@ sub initialize {
 sub AUTOLOAD {
 	my $self = shift;
 	#say "got self: $self", Audio::Nama::Dumper $self;
-	confess 'not object' unless ref $self;
+	die 'not object' unless ref $self;
 	# get tail of method call
 	my ($call) = $AUTOLOAD =~ /([^:]+)$/;
 	# see if this can be satisfied by a field from
@@ -174,7 +177,7 @@ sub remove_name { my $self = shift; delete $self->{name} }
 sub set_name    { my $self = shift; $self->{name} = shift }
 sub set_surname { my $self = shift; $self->{surname} = shift}
 sub is_controller { my $self = shift; $self->parent } 
-sub is_channel_op { my $self = shift; $config->{ecasound_channel_ops}->{$self->type} }
+sub is_channel_op { my $self = shift; $Audio::Nama::config->{ecasound_channel_ops}->{$self->type} }
 
 
 sub has_read_only_param {
@@ -272,7 +275,7 @@ sub trackname { $_[0]->track->name }
 
 sub ladspa_id {
 	my $self = shift;
-	$fx_cache->{ladspa_label_to_unique_id}->{$self->type} 
+	$Audio::Nama::fx_cache->{ladspa_label_to_unique_id}->{$self->type} 
 }
 sub nameline {
 	my $self = shift;
@@ -467,6 +470,9 @@ sub import_engine_subs {
 	*sleeper			= \&Audio::Nama::sleeper;
 	*nama_cmd    = \&Audio::Nama::nama_cmd;
 	*pager				= \&Audio::Nama::pager;
+	*this_op			= \&Audio::Nama::this_op;
+	*this_param			= \&Audio::Nama::this_param;
+	*this_stepsize		= \&Audio::Nama::this_stepsize;
 }
 
 use Exporter qw(import);
@@ -502,17 +508,10 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 
 					set_current_op
 					set_current_param
-					this_param
-					this_op
-					this_op_o
-					param_stepsize
-					set_param_value
-
+					set_current_stepsize
 					increment_param
-					increment_param_1
-					increment_param_10
-					decrement_param_1
-					decrement_param_10
+					decrement_param
+					set_parameter_value
 
 ) ] );
 
@@ -573,17 +572,7 @@ sub add_effect {
 	#logsub((caller(0))[3]);
 	my $args = shift;
 	my $added = _add_effect($args);
-	initialize_current_param_and_stepsize(@$added);
 	$added->[0]->id
-}
-sub initialize_current_param_and_stepsize {
-	for my $FX (@_){
-		my $param_count = $FX->about->{count};
-		$project->{current_param}->{$FX->id} //=  $param_count ? 1 : 0;
-		for (1..$param_count){
-			$project->{param_stepsize}->{$FX->id}->{$_} //= 1;
-		}
-	}
 }
 sub _add_effect {
 	my $p = shift;
@@ -760,7 +749,7 @@ sub modify_multiple_effects {
 		map{ 	my $parameter = $_;
 				modify_effect($op_id, $parameter, $sign, $value);
 				set_current_op($op_id);
-				set_current_param($parameter);
+				set_current_param($parameter);	
 		} @$parameters;
 	} @$op_ids;
 }
@@ -1137,27 +1126,21 @@ sub set_current_op {
 	return unless $FX;
 	$project->{current_op}->{$FX->trackname} = $op_id;
 }
-sub set_current_param { $project->{current_param}->{this_op()} = $_[0] }
-
-sub this_op    	   { $this_track and $this_track->op }
-sub this_op_o 	   { $this_track and $this_track->op and fxn($this_track->op) }
-sub this_param     { $project->{current_param}->{ this_op() } }
-sub param_stepsize { $project->{param_stepsize}->{this_op() }->[ this_param() ] } 
-
-sub set_param_value {
-	#return if cannot_modify_parameter();
+sub set_current_param {
+	my $parameter = shift;
+	$project->{current_param}->{Audio::Nama::this_op()} = $parameter;
+}
+sub set_current_stepsize {
+	my $stepsize = shift;
+	$project->{current_stepsize}->{Audio::Nama::this_op()}->[this_param()] = $stepsize;
+}
+sub increment_param { modify_effect(Audio::Nama::this_op(), this_param(),'+',this_stepsize())}
+sub decrement_param { modify_effect(Audio::Nama::this_op(), this_param(),'-',this_stepsize())}
+sub set_parameter_value {
 	my $value = shift;
-	modify_effect(this_op(), this_param(), undef, $value)
+	modify_effect(Audio::Nama::this_op(), this_param(), undef, $value)
 }
-sub increment_param {
-	return if cannot_modify_parameter();
-	my $multiplier = shift;
-	modify_effect(this_op(), this_param(), '+', $multiplier * param_stepsize())
-}
-sub increment_param_1    { increment_param(  1) }
-sub increment_param_10   { increment_param( 10) }
-sub decrement_param_1    { increment_param( -1) }
-sub decrement_param_10   { increment_param(-10) }
+
 
 sub check_fx_consistency {
 
@@ -1320,14 +1303,6 @@ sub ecasound_format {
 	$cmd .= ':'.join ',' ,@{$self->{params}} if $self->{params} and @{$self->{params}} > 0;
 	$cmd
 }
-# sub no_params {
-# 	my $self = shift;
-# 	$self->about->{count} == 0
-# }
-# sub cannot_modify_parameter {
-# 	$self->no_params or $self->is_read_only(current_param())
-# }
-
 
 } # end package Effect
 

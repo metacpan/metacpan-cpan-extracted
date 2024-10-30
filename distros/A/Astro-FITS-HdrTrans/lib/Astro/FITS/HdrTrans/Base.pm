@@ -28,10 +28,9 @@ use warnings;
 use Carp;
 use Math::Trig qw/ deg2rad /;
 
-use vars qw/ $VERSION /;
 use Astro::FITS::HdrTrans ();   # for the generic header list
 
-$VERSION = "1.65";
+our $VERSION = "1.66";
 
 =head1 PUBLIC METHODS
 

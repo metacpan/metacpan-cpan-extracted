@@ -57,7 +57,6 @@ $jack
 $fx
 $fx_cache
 $text
-$term
 $gui
 $midi
 $help
@@ -97,7 +96,6 @@ $jack
 $fx
 $fx_cache
 $text
-$term
 $gui
 $midi
 $help
@@ -165,7 +163,7 @@ $this_track_name
 
 	)],
 );
-our $ui = 'bullwinkle';  # required for testing
+our $ui = 'bullwinkle';  # for testing
 {
 	my %seen;
 	push @{$EXPORT_TAGS{all}}, grep {!$seen{$_}++} @{$EXPORT_TAGS{$_}} foreach
@@ -213,7 +211,7 @@ with object properties as need be.
 
 =over
 
-=item F<var_namarc>
+=item F<var_config>
 
 Maps keys in F<.namarc> (e.g. I<mix_to_disk_format>) to the
 corresponding Nama internal scalar (e.g. C<$config-E<gt>{mix_to_disk_format}>
@@ -223,7 +221,7 @@ corresponding Nama internal scalar (e.g. C<$config-E<gt>{mix_to_disk_format}>
 List of allowed singleton hash keys. 
 
 Keys of variables appearing in ./var_singletons 
-should be listed in var_keys or in var_namarc.
+should be listed in var_keys or in var_config.
 Undeclared keys will trigger warnings during build.
 
 =back

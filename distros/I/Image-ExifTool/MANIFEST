@@ -15,6 +15,7 @@ arg_files/xmp2exif.args
 arg_files/xmp2gps.args
 arg_files/xmp2iptc.args
 arg_files/xmp2pdf.args
+build_geolocation
 config_files/acdsee.config
 config_files/age.config
 config_files/bibble.config
@@ -27,6 +28,7 @@ config_files/frameCount.config
 config_files/gps2utm.config
 config_files/guano.config
 config_files/nksc.config
+config_files/onone.config
 config_files/photoshop_paths.config
 config_files/picasa_faces.config
 config_files/pix4d.config
@@ -80,6 +82,7 @@ html/TagNames/FujiFilm.html
 html/TagNames/GE.html
 html/TagNames/GIF.html
 html/TagNames/GIMP.html
+html/TagNames/GM.html
 html/TagNames/GPS.html
 html/TagNames/GeoTiff.html
 html/TagNames/GoPro.html
@@ -188,6 +191,7 @@ html/TagNames/iWork.html
 html/TagNames/index.html
 html/TagNames/style.css
 html/ancient_history.html
+html/build_geolocation.txt
 html/canon_raw.html
 html/commentary.html
 html/config.html
@@ -195,6 +199,7 @@ html/data_members.html
 html/exiftool_pod.html
 html/faq.html
 html/filename.html
+html/geolocation.html
 html/geotag.html
 html/history.html
 html/htmldump.html
@@ -292,8 +297,11 @@ lib/Image/ExifTool/FujiFilm.pm
 lib/Image/ExifTool/GE.pm
 lib/Image/ExifTool/GIF.pm
 lib/Image/ExifTool/GIMP.pm
+lib/Image/ExifTool/GM.pm
 lib/Image/ExifTool/GPS.pm
 lib/Image/ExifTool/GeoTiff.pm
+lib/Image/ExifTool/Geolocation.dat
+lib/Image/ExifTool/Geolocation.pm
 lib/Image/ExifTool/Geotag.pm
 lib/Image/ExifTool/GoPro.pm
 lib/Image/ExifTool/H264.pm
@@ -599,6 +607,14 @@ t/GeoTiff.t
 t/GeoTiff_2.out
 t/GeoTiff_3.out
 t/GeoTiff_4.out
+t/Geolocation.t
+t/Geolocation_2.out
+t/Geolocation_3.out
+t/Geolocation_4.out
+t/Geolocation_5.out
+t/Geolocation_6.out
+t/Geolocation_7.out
+t/Geolocation_8.out
 t/Geotag.t
 t/Geotag_10.out
 t/Geotag_11.out

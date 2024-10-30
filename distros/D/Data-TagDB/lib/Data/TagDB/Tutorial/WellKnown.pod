@@ -1,0 +1,525 @@
+# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024 Philipp Schafft
+
+# licensed under Artistic License 2.0 (see LICENSE file)
+
+# ABSTRACT: Work with Tag databases
+# PODNAME: Data::TagDB::Tutorial::WellKnown
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::TagDB::Tutorial::WellKnown - Work with Tag databases
+
+=head1 VERSION
+
+version v0.05
+
+=head1 Overview
+
+This documentation lists a set of well known tags that are commonly found in databases.
+It is by no mean an exhaustive list.
+
+Tags listed here are included in L<Data::TagDB::WellKnown> unless marked otherwise.
+
+B<Note:> This document however uses the standard spelling using C<->. To access the tag via L<Data::TagDB::WellKnown>
+one must convert all C<-> to C<_>. For example:
+
+    my Data::TagDB::Tag $tag = $wk->also_shares_identifier; # also-shares-identifier
+
+See L<Data::TagDB::WellKnown> for details.
+
+=head1 Tags
+
+=head2 also-has-comment
+
+UUID: 11d8962c-0a71-4d00-95ed-fa69182788a8
+
+This tag is used as a relation denoting a comment on the tag or it's subject.
+This can be used in any link (relation or metadata).
+It should be used with I<context> set to a valid context (such as the application context, a user/account, or an instance).
+
+Other relations might L<specialise|/specialises> on this.
+
+See also
+L</also-has-description>,
+L</also-has-title>.
+
+=head2 also-has-description
+
+UUID: 30710bdb-6418-42fb-96db-2278f3bfa17f
+
+This tag is used as a relation denoting a description for the tag or it's subject.
+This can be used in any link (relation or metadata).
+It should be used with I<context> set to a valid context (such as the application context, instance, or language).
+
+Other relations might L<specialise|/specialises> on this.
+
+See also
+L</also-has-comment>,
+L</also-has-title>.
+
+=for comment also-has-proto-title        => 'a845bfb7-130f-4f55-8a6d-ea3e5b1c2a09',
+
+=head2 also-has-role
+
+UUID: d2750351-aed7-4ade-aa80-c32436cc6030
+
+This tag is used as a relation to denote a role (type) the tag has.
+This is an inclusive relation, meaning the tag may also have any number of other
+(more specific or more generic) roles.
+
+See also L</has-type>.
+
+=for comment also-has-subtitle           => 'df70343f-0c5f-4d76-93b6-4376f680f567',
+
+=head2 also-has-title
+
+UUID: f7fd59e6-6727-4128-a0a7-cbc702dc09b8
+
+This tag defines a relation that provides the title of subject of the current tag.
+This relation can be used in any link (relation or metadata).
+It should be used with I<context> set to a valid context (such as the application context, instance, or language).
+
+B<Note:>
+This is not to be confused with the name of the subject or the subject's job title.
+This relation is meant to provide the title of a creative work such as a book.
+
+See also
+L</also-has-comment>,
+L</also-has-description>.
+
+=head2 also-list-contains-also
+
+UUID: 4c9656eb-c130-42b7-9348-a1fee3f42050
+
+This tag is used in as a relation on tag lists. It denotes an element in the list.
+This tag specifically makes no assumption on how the I<related> tag is included in the list.
+(Such as the order, or if it has other qualifiers.)
+
+The tag this tag is used as a relation on has the role of a L</specific-taglist>
+(for example a directory or a shopping list).
+
+=for comment also-shares-colour          => 'c6e83600-fd96-4b71-b216-21f0c4d73ca6',
+
+=head2 also-shares-identifier
+
+UUID: ddd60c5c-2934-404f-8f2d-fcb4da88b633
+
+This tag is used as a relation in a metadata to assign an identifier to the tag.
+The type of the identifier must be set.
+
+=for comment ascii-code-point            => 'f4b073ff-0b53-4034-b4e4-4affe5caf72c',
+
+=for comment ascii-decimal-integer-encoding   => '84c0547d-4cce-4ece-8d47-57ca8b3a7763',
+
+=for comment ascii-uri-encoding          => '61ae4438-e519-4af2-9286-afe8e03bf932',
+
+=head2 colour-value
+
+UUID: c64b5209-b975-4e59-9467-3c3b3f136b4e
+
+This tag is used as a type for colour values in metadata.
+
+The default I<encoding> (in case I<encoding> is C<undef>) is L</hex-rgb-encoding>.
+
+=head2 default-context
+
+UUID: 6ba648c2-3657-47c2-8541-9b73c3a9b2b4
+
+This tag is used as a context and can be used in any link.
+The meaning of this context is to provide a fallback for more specific contexts without
+representing a universally true value.
+
+Examples of this include internationalisation:
+names (or any string) may be given in different languages using different contexts.
+However if the user is not in any of those language contexts an implementation can fall
+back to the value given with the default context.
+
+B<Note:>
+Links with I<context> set to C<undef> are B<always> valid. So they should be handled
+by software in parallel to other contexts, not as an alternative.
+
+A implementation may use a logic like:
+
+=over
+
+=item *
+
+Take all links with a context matching any context the application and/or the user is part of.
+
+=item *
+
+If the list is empty use all links with the context set to to the I<default-context>.
+
+=item *
+
+Unconditionally add all links with the context set to C<undef>.
+
+=back
+
+=head2 default-encoding
+
+UUID: 8440eabd-5d73-4679-8f06-abaa06cf04ac
+
+This tag is used as a relation on types to denote the default encoding
+used when the encoding of a metadata is set to C<undef>.
+
+=head2 default-type
+
+UUID: 87c4892f-ae39-476e-8ed0-d9ed321dafe9
+
+This tag is used as a relation on relations to denote the default type
+used when the type of a metadata is set to C<undef>.
+
+=head2 displaycolour
+
+UUID: a7cfbcb0-45e2-46b9-8f60-646ab2c18b0b
+
+This relation is used to denote a colour that is used with the tag to provide a visual aid for the user.
+This can for example be used to assign a colour to be displayed alongside a note so it is easier for
+the user to spot the right note they are looking for.
+
+This relation should virtually always be used with a I<context> that is non-C<undef>.
+Most commonly the I<context> set on the link is the tag of the user (or account) who set the colour.
+This links the value to said user.
+Another common value for I<context> is L</default-context>. This denotes the displaycolour the
+creator/publisher prefers. But it can still be overridden by a user.
+
+The default type (when used in metadata without a I<type> set) is L</colour-value>.
+
+=for comment encoding-file-name-extension   => '3d737a5c-9389-4ae7-80ff-5f64c6b3b7f1',
+
+=for comment fetch-file-uri              => '96674c6c-cf5e-40cd-af1e-63b86e741f4f',
+
+=head2 final-file-encoding
+
+UUID: 448c50a8-c847-4bc7-856e-0db5fea8f23b
+
+This relation is used on (proto-)files to denote the encoding the file will have when reaching
+it's final state.
+In most cases this will be used with relations with I<related> set to a tag representing a media-subtype.
+However this can also point to a more or less specific value.
+
+See also
+L<File::Information/lifecycles>,
+L</final-file-hash>,
+L</final-file-size>.
+
+=head2 final-file-hash
+
+UUID: 79385945-0963-44aa-880a-bca4a42e9002
+
+This relation is used on (proto-)files to denote the hash (digest) the file will have when reaching
+it's final state.
+When stored as a metadata the default is to store the value in the universal tag format for hashes.
+
+See also
+L<File::Information/lifecycles>,
+L<File::Information/digest_info>,
+L</final-file-encoding>,
+L</final-file-size>.
+
+=head2 final-file-size
+
+UUID: 1cd4a6c6-0d7c-48d1-81e7-4e8d41fdb45d
+
+This relation is used on (proto-)files to denote the size the file will have when reaching
+it's final state. When stored as a metadata the default is to store the value in bytes.
+
+See also
+L<File::Information/lifecycles>,
+L</final-file-hash>,
+L</final-file-encoding>.
+
+=for comment flagged-as                  => 'a1c478b5-0a85-4b5b-96da-d250db14a67c',
+
+=head2 for-type
+
+UUID: bc2d2e7c-8aa4-420e-ac07-59c422034de9
+
+Used as a relation on a L</generator> to denote the type generated by the generator.
+
+=head2 four
+
+UUID: 79422b2c-b6f6-547f-949f-0cba44fa69b7
+
+The number four (C<4>).
+
+=for comment gamebook-has-title          => '1357f4c9-0419-4493-8d2c-97c6a40a9bc9',
+
+=for comment generalises                 => 'c8530d1b-d600-47e5-bc06-7b01416c79eb',
+
+=head2 generalises
+
+UUID: c8530d1b-d600-47e5-bc06-7b01416c79eb
+
+This is the L</inverse> of L</specialises>. See them for details.
+
+=head2 generated-by
+
+UUID: 8efbc13b-47e5-4d92-a960-bd9a2efa9ccb
+
+Relation used on generated tags to denote the generator they are generated with.
+
+See also L</generator-request>, L</generator>.
+
+=head2 generator
+
+UUID: 8a1cb2d6-df2f-46db-89c3-a75168adebf6
+
+Base type/role to be used with generators.
+
+See also L</for-type>, L</using-namespace>.
+
+=head2 generator-request
+
+UUID: ab573786-73bc-4f5c-9b03-24ef8a70ae45
+
+Relation used with metadata to store the request to the generator for any generated tag.
+The nature of the stored data is subject to the generator.
+
+See also L</generated-by>, L</generator>.
+
+=for comment has-colour-value            => '4c771f95-9c12-4fc7-9cf6-1d5dee7024f9',
+
+=for comment has-prime-factor            => '7f55c943-06a4-42e4-9c02-f8d2d00479a0',
+
+=head2 has-type
+
+UUID: 7f265548-81dc-4280-9550-1bd0aa4bf748
+
+Used as a relation to denote the type of a tag. The type of the tag is part of it roles.
+
+See also L</also-has-role>.
+
+=head2 hex-rgb-encoding
+
+UUID: 66d561ee-c06f-408f-a56c-a009439283bb
+
+This is an encoding for a colour in RGB colour space.
+
+The value is encoded in hash-and-hex notation or "#RRGGBB".
+The length of the value is always exactly 7 characters (also 7 bytes) long.
+The value must be in all lower case. But parsers should also support upper case and mixed case.
+Parsers must not support named colours or similar.
+
+See also L</colour-value>.
+
+=for comment hrair                       => '7cb67873-33bc-4a93-b53f-072ce96c6f1a',
+
+=for comment icon                        => 'caf11e36-d401-4521-8f10-f6b36125415c',
+
+=for comment implies                     => 'e48cd5c6-83d7-411e-9640-cb370f3502fc',
+
+=for comment important                   => 'e6135f02-28c1-4973-986c-ab7a6421c0a0',
+
+=head2 inverse-relation
+
+UUID: 1eae4688-f66c-4c77-bc9b-bb38be88240a
+
+This tag is used as a relation set on relations. It denotes a second relation
+that is B<exactly> inverse to the relation it is set on.
+
+Formally speaking this means that:
+Relations X and Y are inverse if and only if the relations
+I<A X B> and I<B Y A> are only both true or neither of them.
+
+B<Example:>
+Parent and child are inverse relations because when A is a child of B, B is the parent of A.
+And if B is the parent of A, A is always a child of B.
+So child and parent are inverse.
+
+Not inverse are parent and son-of: If A is the son-of B, then B is the parent of A.
+But because B is the parent of A, A may or may not be the son-of B (it could also be a daughter).
+So son-of and parent are not inverse.
+
+B<Note:>
+Implementations are free to insert inverse relations at will in order to autocomplete the data.
+However the value of I<filter> in a relation is not well defined for inverse relations.
+Implementations should therefore skip generating any inverse relation if I<filter> is not C<undef>.
+
+=head2 namespace
+
+UUID: d9bd807e-57cb-4736-9317-bf6bba5db48a
+
+Type (role) used for namespaces.
+See also L</has-type> and L</using-namespace>.
+
+=for comment no-direct                   => '05648b38-e73c-485c-b536-286ce0918193',
+
+=head2 oid
+
+UUID: d08dc905-bbf6-4183-b219-67723c3c8374
+
+Used as an type of identifiers (see also: L</also-shares-identifier>).
+This identifier denotes a globally unique identifier.
+OIDs are common with LDAP.
+
+=head2 one
+
+UUID: bd27669b-201e-51ed-9eb8-774ba7fef7ad
+
+The number one (C<1>).
+
+=for comment owned-by                    => '0ad7f760-8ee7-4367-97f2-ada06864325e',
+
+=for comment primary-colour              => 'd0421d68-8d37-4f78-b800-cae3e896bea5',
+
+=head2 proto-file
+
+UUID: 52a516d0-25d8-47c7-a6ba-80983e576c54
+
+This tag is used as a role for tags that implement a basic file like interface.
+Normally a more specific role is used, such as I<inode>.
+
+See also
+L</final-file-encoding>,
+L</final-file-hash>,
+L</final-file-size>.
+
+=head2 small-identifier
+
+UUID: f87a38cb-fd13-4e15-866c-e49901adbec5
+
+Used as an type of identifiers (see also: L</also-shares-identifier>).
+This identifier type denotes a globally unique identifier for the tag
+that is globally registered. Small identifiers are used to provide a a basic
+vocabulary.
+
+=head2 specialises
+
+UUID: 923b43ae-a50e-4db3-8655-ed931d0dd6d4
+
+This tag is used as a relation on tags denoting a I<related> tag that this more generic than
+the current one. The current tag inherits all properties of the I<related> tag
+(unless flagged otherwise).
+
+This type of relation is often seen on types.
+
+B<Example:>
+Fish I<specialises> animal. So every fish is also an animal.
+
+See also L</generalises> (which is the L</inverse>).
+
+=head2 specific-taglist
+
+UUID: 03cadc6f-2609-4527-b296-2590d737e99a
+
+This tag is used as a role for list of tags. Normally a more specific type is used (such
+as a directory).
+
+See also L</also-list-contains-also>.
+
+=for comment string-ise-oid-encoding     => '5af917c5-67fd-4019-be38-4093fde9b612',
+
+=for comment string-ise-uuid-encoding    => 'b448c181-606e-460a-a8cd-8b60aeefe6bb',
+
+=for comment subject-type                => 'e8c156be-4fe7-4b13-b4fa-e207213caef8',
+
+=for comment tag-links                   => 'd926eb95-6984-415f-8892-233c13491931',
+
+=head2 tagname
+
+UUID: bfae7574-3dae-425d-89b1-9c087c140c23
+
+Used as an type of identifiers (see also: L</also-shares-identifier>).
+This identifier type denotes a name for the tag. It is often displayed alongside the tag.
+
+=for comment tagpool-description         => 'ca33b058-b4ce-4059-9f0b-61ca0fd39c35',
+
+=for comment tagpool-tagged-as           => '703cbb5d-eb4a-4718-9e60-adbef6f71869',
+
+=for comment tagpool-tag-icontext        => '922257e5-8fda-405c-aced-44a378acbdcf',
+
+=for comment tagpool-title               => '361fda18-50ce-4421-b378-881179b0318a',
+
+=for comment tagpool-type-icontext       => '962af011-3e8e-4468-9b2e-9d4df93c0d9c',
+
+=head2 three
+
+UUID: be6d8e00-a6c1-5c44-8ffc-f7393e14aa23
+
+The number three (C<3>).
+
+=head2 two
+
+UUID: 73415b5a-31fb-5b5a-bb82-8ea5eb3b12f7
+
+The number two (C<2>).
+
+=for comment unicode-code-point          => '5f167223-cc9c-4b2f-9928-9fe1b253b560',
+
+=head2 unicode-string
+
+UUID: eacbf914-52cf-4192-a42c-8ecd27c85ee1
+
+This tag is the base type for all strings that can be represented using Unicode.
+This is commonly used as L</default-type> for relations.
+
+The default encoding for this type is L</utf-8-string-encoding>.
+
+=head2 uri
+
+UUID: a8d1637d-af19-49e9-9ef8-6bc1fbcf6439
+
+Used as an type of identifiers (see also: L</also-shares-identifier>).
+This identifier denotes a globally unique identifier, commonly found in RDF data.
+
+=head2 using-namespace
+
+UUID: 3c9f40b4-2b98-44ce-b4dc-97649eb528ae
+
+Used as a relation on a L</generator> to denote the namespace used by the generator.
+
+=head2 utf-8-string-encoding
+
+UUID: ec6cd46a-aef5-495d-830b-acb3347a34ec
+
+This tag represents the encoding for UTF-8 strings.
+It is commonly used with the type L</unicode-string>.
+
+=head2 uuid
+
+UUID: 8be115d2-dc2f-4a98-91e1-a6e3075cbc31
+
+Used as an type of identifiers (see also: L</also-shares-identifier>).
+This identifier type denotes a globally unique identifier for the tag.
+It is recommended that every tag has a UUID.
+
+=head2 wikidata-identifier
+
+UUID: ce7aae1e-a210-4214-926a-0ebca56d77e3
+
+Used as an type of identifiers (see also: L</also-shares-identifier>).
+This identifier type is used to store tag identifiers from Wikidata.
+It B<must not> be used for QIDs from other services/databases.
+
+See also L<Data::TagDB::Factory/create_wikidata>
+
+=for comment x11-colour-name             => '135032f7-cc60-46ee-8f64-1724c2a56fa2',
+
+=head2 zero
+
+UUID: dd8e13d3-4b0f-5698-9afa-acf037584b20
+
+The number zero (C<0>).
+
+=head1 AUTHOR
+
+Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

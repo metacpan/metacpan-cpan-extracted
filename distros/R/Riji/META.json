@@ -4,7 +4,7 @@
       "Masayuki Matsuki <y.songmu@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -87,7 +87,7 @@
    "provides" : {
       "Riji" : {
          "file" : "lib/Riji.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.1.0"
       },
       "Riji::CLI" : {
          "file" : "lib/Riji/CLI.pm"
@@ -130,11 +130,12 @@
       },
       "homepage" : "https://github.com/Songmu/p5-Riji",
       "repository" : {
-         "url" : "git://github.com/Songmu/p5-Riji.git",
+         "type" : "git",
+         "url" : "https://github.com/Songmu/p5-Riji.git",
          "web" : "https://github.com/Songmu/p5-Riji"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.1.0",
    "x_contributors" : [
       "Takuya Tsuchida <tsucchi@cpan.org>",
       "hitode909 <hitode909@gmail.com>",
@@ -142,6 +143,6 @@
       "monmon <lesamoureuses@gmail.com>",
       "trapple <trapplejp@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

@@ -1,7 +1,7 @@
 use v5.20; use warnings; use experimental qw(signatures postderef);
 package Dist::Zilla::App::Command::DiffMint;
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.3.1';
 
 use Dist::Zilla::App -command;
 
@@ -64,7 +64,7 @@ sub execute ($self, $opt, $arg) {
     : die q[Error: option 'color' expects "always", "auto", or "never", not "] . $opt->color . qq["!\n];
 
   my $out;
-  if (!$opt->no_pager && !-t *STDOUT) {
+  if (!$opt->no_pager && -t *STDOUT) {
     my $pager = $ENV{PAGER} || 'less';
     local $ENV{LESS} = $ENV{LESS} || 'SRFX';
     open $out, '|-', $pager

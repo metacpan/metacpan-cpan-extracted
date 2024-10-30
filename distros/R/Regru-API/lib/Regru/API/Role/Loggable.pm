@@ -9,8 +9,8 @@ use namespace::autoclean;
 use Data::Dumper;
 use Carp;
 
-our $VERSION = '0.052'; # VERSION
-our $AUTHORITY = 'cpan:CHIM'; # AUTHORITY
+our $VERSION = '0.053'; # VERSION
+our $AUTHORITY = 'cpan:OLEG'; # AUTHORITY
 
 sub debug_warn {
     my ($self, @garbage) = @_;
@@ -40,7 +40,7 @@ Regru::API::Role::Loggable - something that produces a debug messages
 
 =head1 VERSION
 
-version 0.052
+version 0.053
 
 =head1 SYNOPSIS
 

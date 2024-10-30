@@ -1,6 +1,5 @@
 package Audio::Nama;
-use vars qw($VERSION);
-$VERSION = "1.307";
+our $VERSION = "1.505";
 use Modern::Perl '2020';
 #use Carp::Always;
 no warnings qw(uninitialized syntax);
@@ -150,7 +149,7 @@ use Audio::Nama::Tempo ();
 
 sub main { 
 	say eval join(get_data_section('banner'), qw(" "));
-	startup();
+	bootstrap_environment() ;
 	load_project(name => shift @ARGV,
 				 create => delete $config->{opts}->{c}); 
 				 		 # remove option for next project load
@@ -160,11 +159,12 @@ sub main {
 	$ui->loop();
 }
 
-sub startup {
-	initializations();
+sub bootstrap_environment {
+	definitions();
 	process_command_line_options();
 	start_logging();
 	setup_grammar();
+	setup_hotkey_grammar();
 	initialize_interfaces();
 }
 sub kill_and_reap {
@@ -191,22 +191,13 @@ sub cleanup_exit {
 	delete $project->{events};
 	#project_snapshot(); 
 	Audio::Nama::Engine::sync_action('kill_and_reap');
-	$term->rl_deprep_terminal() if defined $term;
+	$text->{term}->rl_deprep_terminal() if defined $text->{term};
 	exit;
 }
 END { }
 
 1;
 __DATA__
-
-=head1 NAME
-
-=encoding UTF-8
-
-B<Nama> - multitrack recorder and digital audio workstation
-
-See `man nama` for details.
-
 @@ commands_yml
 ---
 help:
@@ -295,12 +286,12 @@ rewind:
   short: rw
   parameters: <float:decrement_seconds>
   example: rewind 6.5 # Move backwards 6.5 seconds from the current position.
-jump_to_start:
+to_start:
   type: transport
   what: Set the playback head to the start. A synonym for setpos 0.
   short: beg
   parameters: none
-jump_to_end:
+to_end:
   type: transport
   what: Set the playback head to end minus 10 seconds.
   short: end
@@ -754,19 +745,18 @@ show_latency_all:
 set_region:
   type: track
   what: |
-    Specify a playback region for the current track using marks or time positions
+    Specify a playback region for the current track using marks. 
     Can be reversed with remove-region.
   short: srg
-  parameters: <string:start-mark-name|decimal:time> <string:end-mark-name|decimal:time>
+  parameters: <string:start_mark_name> <string:end_mark_name>
   example: |
     sax            # Select "sax" as the current track.
-    set_region 2.5 120.5 # Play the audio from 2.5 to 120.5 seconds. **Must be decimal notation**
-    ! or you can use marks:
     setpos 2.5     # Move the playhead to 2.5 seconds.
     mark sax_start # Create a mark
     sp 120.5       # Move playhead to 120.5 seconds.
     mark sax_end   # Create another mark
     set-region sax_start sax_end 
+    !  Play only the audio from 2.5 to 120.5 seconds.
 add_region:
   type: track
   what: |
@@ -775,13 +765,9 @@ add_region:
   parameters: <string:start_mark_name> | <float:start_time> <string:end_mark_name> | <float:end_time> [ <string:region_name> ]
   example: |
     sax # Select "sax" as the current track.
-    add-region 24.4 66.7 solo 
-    ! Clone the "sax" track as "solo"
-    ! selecting the region from 24.4 to 66.7 seconds.
-    ! Decimals are required, integers are interpreted as mark indices
-    add-region solo-start solo-end
-    ! Clone track, selecting the region defined from solo-start 
-    ! mark to solo-end mark. 
+    add-region sax_start 66.7 trimmed_sax 
+    ! Create "trimmed_sax", a copy of "sax" with a region defined
+    ! from mark "sax_start" to 66.7 seconds. 
 remove_region:
   type: track
   what: |
@@ -916,7 +902,7 @@ new_branch:
 save_state:
   type: project
   what: Save the project settings as file or git snapshot
-  short: save
+  short: keep save
   parameters: [ <string:settings_target> [ <string:message> ] ]
 get_state:
   type: project
@@ -1109,35 +1095,23 @@ list_effects:
   what: Print a short list of all effects on the current track, only including unique ID and effect name.
   short: lfx
   parameters: none
-hotkeys_param:
+hotkeys:
   type: general
-  what: Enable hotkeys for adjusting effect parameters
-  short: hkp
+  what: |
+    Use this command to set the hotkey mode. (You may also use the hash symbol '#'.)
+    Hit the Escape key to return to command mode.
+  short: hk 
   parameters: none
-hotkeys_jump:
-  type: general
-  what: Enable hotkeys for changing the playback position (default)
-  short: hkj 
-  parameters: none
-hotkeys_bump:
-  type: general
-  what: Enable hotkeys for re-positioning marks 
-  short: hkb 
+hotkeys_always:
+  type: general 
+  what: Activate hotkeys mode after each command.
+  short: hka 
   parameters: none
 hotkeys_off:
   type: general
-  what: restore default key bindings
+  what: disable hotkeys always mode
   short: hko
   parameters: none
-hotkeys_on:
-  type: general
-  what: restore hotkey mode
-  short: hk
-  parameters: none
-toggle_hotkeys:
-  type: general
-  what: flipflop hotkey mode
-  short: th
 hotkeys_list:
   type: general
   what: list hotkey bindings
@@ -1210,11 +1184,11 @@ to_mark:
     tmk 2 # Move to the mark with the index 2.
 add_mark:
   type: mark
-  what: Drop a new mark at the current playback position. This will fail, if a mark is already placed on that exact position.
+  what: Drop a new mark at the current playback position. this will fail, if a mark is already placed on that exact position.
   short: mark amk k
-  parameters: [ <string:mark_id> ] [<string:attr>]...
+  parameters: [ <string:mark_id> ]
   example: |
-    mark start # create a mark named "start" at the current position.
+    mark start # Create a mark named "start" at the current position.
 remove_mark:
   type: mark
   what: Remove a mark
@@ -1801,24 +1775,6 @@ snip:
     This removes cut1 and cut2 regions from the current track
     by creating a sequence. 
   parameters: <mark_pair1> [<mark_pair2>...]
-retain:
-  type: mark
-  short: clip-start cls keep
-  what:  Use current position to mark start of a clip
-discard:
-  type: mark
-  short: clip-end cle skip
-  what: Use current position to mark end of a clip 
-gather:
-  short: gth
-  type: sequence
-  what: compose a sequence from the current track clip marks
-toggle_snip:
-  type: sequence
-  short: tgs
-  what: |
-    drop clip mark at the current position to toggle snip state 
-    from 'skip' to 'keep' and vice versa
 compose:
   type: sequence
   short: compose_sequence compose_into_sequence
@@ -1966,32 +1922,6 @@ set_sample_rate:
   short: ssr
   what: configure the sample rate for the current project or report sample rate if no parameter
   parameters: <integer:sample-rate>
-set_playback_jump:
-  type: transport
-  short: spj j=
-  what: Set the jump size for transport hotkeys
-  parameters: <float:seconds>
-set_mark_bump:
-  type: mark 
-  short: smb b=
-  what: Set the size of the mark bump
-  parameters: <float:seconds>
-set_mark_replay:
-  type: mark 
-  short: smr
-  what: Set how far to rewind playhead for review after setting or bumping a mark 
-  parameters: <float:seconds>
-set_param_increment:
-  type: effect
-  short: spi m=
-  what: Set the parameter increment as a value, e.g. "m=0.2"
-  parameters: <float:time>
-set_param_exp:
-  type: effect
-  short: spe m x=
-  what: Set the parameter increment as an exponent, e.g. "x=-2" sets 0.01
-  parameters: <integer:exponent>
-
 ...
 
 @@ grammar
@@ -2225,8 +2155,8 @@ samples: /\d+sa/ {
  	$return = $samples/$Audio::Nama::project->{sample_rate}
 }
 min_sec: /\d+/ ':' /\d+/ { $item[1] * 60 + $item[3] }
-jump_to_start: _jump_to_start { Audio::Nama::jump_to_start(); 1 }
-jump_to_end: _jump_to_end { Audio::Nama::jump_to_end(); 1 }
+to_start: _to_start { Audio::Nama::to_start(); 1 }
+to_end: _to_end { Audio::Nama::to_end(); 1 }
 add_track: _add_track new_track_name {
 	Audio::Nama::add_track($item{new_track_name});
     1
@@ -2333,13 +2263,13 @@ add_region: _add_region beginning ending track_name(?) {
 shift_track: _shift_track start_position {
 	my $pos = $item{start_position};
 	if ( $pos =~ /\d+\.\d+/ ){
-		Audio::Nama::pager($Audio::Nama::this_track->name. ": Shifting start time to $pos seconds");
+		Audio::Nama::pager($Audio::Nama::this_track->name, ": Shifting start time to $pos seconds");
 		$Audio::Nama::this_track->set(playat => $pos);
 		1;
 	}
 	elsif ( $Audio::Nama::Mark::by_name{$pos} ){
 		my $time = Audio::Nama::Mark::mark_time( $pos );
-		Audio::Nama::pager($Audio::Nama::this_track->name. qq(: Shifting start time to mark "$pos", $time seconds));
+		Audio::Nama::pager($Audio::Nama::this_track->name, qq(: Shifting start time to mark "$pos", $time seconds));
 		$Audio::Nama::this_track->set(playat => $pos);
 		1;
 	} else { 
@@ -2537,9 +2467,6 @@ remove_mark: _remove_mark {
 	return unless (ref $Audio::Nama::this_mark) =~ /Mark/;
 	$Audio::Nama::this_mark->remove;
 	1;}
-discard: _discard { Audio::Nama::discard() }
-retain:  _retain  { Audio::Nama::retain()  }
-gather:  _gather  { Audio::Nama::gather() }
 add_mark: _add_mark ident { Audio::Nama::drop_mark $item{ident}; 1}
 add_mark: _add_mark {  Audio::Nama::drop_mark(); 1}
 next_mark: _next_mark { Audio::Nama::next_mark(); 1}
@@ -2571,11 +2498,24 @@ to_mark: _to_mark ident {
 	1;}
 modify_mark: _modify_mark sign value {
 	my $newtime = eval($Audio::Nama::this_mark->{time} . $item{sign} . $item{value});
-	Audio::Nama::modify_mark($Audio::Nama::this_mark, $newtime); 1
-}
+	$Audio::Nama::this_mark->set( time => $newtime );
+	Audio::Nama::pager($Audio::Nama::this_mark->name, ": set to ", Audio::Nama::d2( $newtime), "\n");
+	Audio::Nama::pager("adjusted to ",$Audio::Nama::this_mark->time, "\n") 
+		if $Audio::Nama::this_mark->time != $newtime;
+	Audio::Nama::set_position($Audio::Nama::this_mark->time);
+	Audio::Nama::request_setup();
+	1;
+	}
 modify_mark: _modify_mark value {
-	Audio::Nama::modify_mark($Audio::Nama::this_mark, $item{value} ); 1
-}		
+	$Audio::Nama::this_mark->set( time => $item{value} );
+	my $newtime = $item{value};
+	Audio::Nama::pager($Audio::Nama::this_mark->name, ": set to ", Audio::Nama::d2($newtime),"\n");
+	Audio::Nama::pager("adjusted to ",$Audio::Nama::this_mark->time, "\n")
+		if $Audio::Nama::this_mark->time != $newtime;
+	Audio::Nama::set_position($Audio::Nama::this_mark->time);
+	Audio::Nama::request_setup();
+	1;
+	}		
 remove_effect: _remove_effect remove_target(s) {
 	Audio::Nama::mute();
 	map{ 
@@ -2847,7 +2787,7 @@ import_audio: _import_audio path {
 }
 frequency: value
 list_history: _list_history {
-	my @history = $Audio::Nama::term->GetHistory;
+	my @history = $Audio::Nama::text->{term}->GetHistory;
 	my %seen;
 	Audio::Nama::pager( grep{ ! $seen{$_} and $seen{$_}++ } @history );
 }
@@ -3345,19 +3285,10 @@ remove_fader_effect: _remove_fader_effect fader_role {
 	1
 }
 fader_role: 'vol'|'pan'|'fader'
-hotkeys_bump:    _hotkeys_bump  { Audio::Nama::setup_hotkeys('bump' ); 1}
-hotkeys_jump:    _hotkeys_jump  { Audio::Nama::setup_hotkeys('jump' ); 1}
-hotkeys_param:   _hotkeys_param { Audio::Nama::setup_hotkeys('param'); 1}
-hotkeys_list:    _hotkeys_list  { Audio::Nama::list_hotkeys() ; 1 } 
-hotkeys_off:     _hotkeys_off   {
-   	Audio::Nama::exit_hotkey_mode();
-}
-hotkeys_on:     _hotkeys_on   {
-   	Audio::Nama::setup_hotkeys(); 1
-}
-toggle_hotkeys:     _toggle_hotkeys   {
-   	Audio::Nama::toggle_hotkeys(); 1
-}
+hotkeys: _hotkeys { Audio::Nama::setup_hotkeys()}
+hotkeys_always: _hotkeys_always { $Audio::Nama::config->{hotkeys_always}++; Audio::Nama::setup_hotkeys(); }
+hotkeys_off: _hotkeys_off { undef $Audio::Nama::config->{hotkeys_always}; 1 }
+hotkeys_list: _hotkeys_list { Audio::Nama::list_hotkeys() ; 1 } 
 select_sequence: _select_sequence existing_sequence_name { 
 	$Audio::Nama::this_sequence = $Audio::Nama::bn{$item{existing_sequence_name}}
 } 
@@ -3417,7 +3348,9 @@ remove_from_sequence: _remove_from_sequence position(s) {
 		: Audio::Nama::throw("skipping index $_: out of bounds")
 	for reverse @positions
 }
-delete_sequence: _delete_sequence existing_sequence_name { Audio::Nama::delete_sequence($item{existing_sequence_name}) }
+delete_sequence: _delete_sequence existing_sequence_name {
+	$Audio::Nama::bn{$item{existing_sequence_name}}->remove
+}
 position: dd { $Audio::Nama::this_sequence->verify_item($item{dd}) and $item{dd} }
 add_spacer: _add_spacer value position {
 	$Audio::Nama::this_sequence->new_spacer(
@@ -3436,7 +3369,6 @@ add_spacer: _add_spacer value {
 	Audio::Nama::request_setup();
 	1
 }
-toggle_snip: _toggle_snip {Audio::Nama::toggle_snip }
 snip: _snip track_identifier mark_pair(s) { 
 	my $track = $item{track_identifier};
 	my @pairs = $item{'mark_pair(s)'};
@@ -3523,13 +3455,6 @@ bus_off: _bus_off
 	print "bus_name: $bus_name\n";
 	$Audio::Nama::bn{$bus_name}->tracks_off 
 }
-set_param_increment: _set_param_increment value {Audio::Nama::set_param_stepsize($item{value}    )} 
-set_param_exp:       _set_param_exp       exp   {Audio::Nama::set_param_stepsize(10**$item{exp});1} 
-set_playback_jump: _set_playback_jump seconds {Audio::Nama::set_playback_jump($item{seconds})} 
-set_mark_bump: _set_mark_bump seconds {        Audio::Nama::set_mark_bump(    $item{seconds})} 
-seconds: value
-exp: /[-+]?\d/ 
-set_mark_replay: _set_mark_replay seconds { Audio::Nama::set_mark_replay($item{seconds})}
 
 command: help
 command: help_effect
@@ -3543,8 +3468,8 @@ command: getpos
 command: setpos
 command: forward
 command: rewind
-command: jump_to_start
-command: jump_to_end
+command: to_start
+command: to_end
 command: ecasound_start
 command: ecasound_stop
 command: restart_ecasound
@@ -3647,12 +3572,9 @@ command: position_effect
 command: show_effect
 command: dump_effect
 command: list_effects
-command: hotkeys_param
-command: hotkeys_jump
-command: hotkeys_bump
+command: hotkeys
+command: hotkeys_always
 command: hotkeys_off
-command: hotkeys_on
-command: toggle_hotkeys
 command: hotkeys_list
 command: add_insert
 command: set_insert_wetness
@@ -3762,10 +3684,6 @@ command: add_spacer
 command: convert_to_sequence
 command: merge_sequence
 command: snip
-command: retain
-command: discard
-command: gather
-command: toggle_snip
 command: compose
 command: undo
 command: redo
@@ -3789,11 +3707,6 @@ command: select_track
 command: edit_tempo_map
 command: set_tempo
 command: set_sample_rate
-command: set_playback_jump
-command: set_mark_bump
-command: set_mark_replay
-command: set_param_increment
-command: set_param_exp
 _help: /help\b/ | /h\b/ { "help" } 
 _help_effect: /help_effect\b/ | /hfx\b/ | /he\b/ { "help_effect" } 
 _find_effect: /find_effect\b/ | /ffx\b/ | /fe\b/ { "find_effect" } 
@@ -3806,8 +3719,8 @@ _getpos: /getpos\b/ | /gp\b/ { "getpos" }
 _setpos: /setpos\b/ | /sp\b/ { "setpos" } 
 _forward: /forward\b/ | /fw\b/ { "forward" } 
 _rewind: /rewind\b/ | /rw\b/ { "rewind" } 
-_jump_to_start: /jump_to_start\b/ | /beg\b/ { "jump_to_start" } 
-_jump_to_end: /jump_to_end\b/ | /end\b/ { "jump_to_end" } 
+_to_start: /to_start\b/ | /beg\b/ { "to_start" } 
+_to_end: /to_end\b/ | /end\b/ { "to_end" } 
 _ecasound_start: /ecasound_start\b/ { "ecasound_start" } 
 _ecasound_stop: /ecasound_stop\b/ { "ecasound_stop" } 
 _restart_ecasound: /restart_ecasound\b/ { "restart_ecasound" } 
@@ -3881,7 +3794,7 @@ _tag: /tag\b/ { "tag" }
 _branch: /branch\b/ | /br\b/ { "branch" } 
 _list_branches: /list_branches\b/ | /lb\b/ | /lbr\b/ { "list_branches" } 
 _new_branch: /new_branch\b/ | /nbr\b/ { "new_branch" } 
-_save_state: /save_state\b/ | /save\b/ { "save_state" } 
+_save_state: /save_state\b/ | /keep\b/ | /save\b/ { "save_state" } 
 _get_state: /get_state\b/ | /get\b/ | /recall\b/ | /retrieve\b/ { "get_state" } 
 _list_projects: /list_projects\b/ | /lp\b/ { "list_projects" } 
 _new_project: /new_project\b/ | /create\b/ { "new_project" } 
@@ -3910,12 +3823,9 @@ _position_effect: /position_effect\b/ | /pfx\b/ { "position_effect" }
 _show_effect: /show_effect\b/ | /sfx\b/ { "show_effect" } 
 _dump_effect: /dump_effect\b/ | /dfx\b/ { "dump_effect" } 
 _list_effects: /list_effects\b/ | /lfx\b/ { "list_effects" } 
-_hotkeys_param: /hotkeys_param\b/ | /hkp\b/ { "hotkeys_param" } 
-_hotkeys_jump: /hotkeys_jump\b/ | /hkj\b/ { "hotkeys_jump" } 
-_hotkeys_bump: /hotkeys_bump\b/ | /hkb\b/ { "hotkeys_bump" } 
+_hotkeys: /hotkeys\b/ | /hk\b/ { "hotkeys" } 
+_hotkeys_always: /hotkeys_always\b/ | /hka\b/ { "hotkeys_always" } 
 _hotkeys_off: /hotkeys_off\b/ | /hko\b/ { "hotkeys_off" } 
-_hotkeys_on: /hotkeys_on\b/ | /hk\b/ { "hotkeys_on" } 
-_toggle_hotkeys: /toggle_hotkeys\b/ | /th\b/ { "toggle_hotkeys" } 
 _hotkeys_list: /hotkeys_list\b/ | /hkl\b/ | /lhk\b/ { "hotkeys_list" } 
 _add_insert: /add_insert\b/ | /ain\b/ { "add_insert" } 
 _set_insert_wetness: /set_insert_wetness\b/ | /wet\b/ { "set_insert_wetness" } 
@@ -4025,10 +3935,6 @@ _add_spacer: /add_spacer\b/ | /asp\b/ { "add_spacer" }
 _convert_to_sequence: /convert_to_sequence\b/ | /csq\b/ { "convert_to_sequence" } 
 _merge_sequence: /merge_sequence\b/ | /msq\b/ { "merge_sequence" } 
 _snip: /snip\b/ { "snip" } 
-_retain: /retain\b/ | /clip-start\b/ | /cls\b/ | /keep\b/ { "retain" } 
-_discard: /discard\b/ | /clip-end\b/ | /cle\b/ | /skip\b/ { "discard" } 
-_gather: /gather\b/ | /gth\b/ { "gather" } 
-_toggle_snip: /toggle_snip\b/ | /tgs\b/ { "toggle_snip" } 
 _compose: /compose\b/ | /compose_sequence\b/ | /compose_into_sequence\b/ { "compose" } 
 _undo: /undo\b/ { "undo" } 
 _redo: /redo\b/ { "redo" } 
@@ -4052,11 +3958,24 @@ _select_track: /select_track\b/ { "select_track" }
 _edit_tempo_map: /edit_tempo_map\b/ | /etm\b/ { "edit_tempo_map" } 
 _set_tempo: /set_tempo\b/ | /tempo\b/ | /tp\b/ { "set_tempo" } 
 _set_sample_rate: /set_sample_rate\b/ | /ssr\b/ { "set_sample_rate" } 
-_set_playback_jump: /set_playback_jump\b/ | /spj\b/ | /j=\b/ { "set_playback_jump" } 
-_set_mark_bump: /set_mark_bump\b/ | /smb\b/ | /b=\b/ { "set_mark_bump" } 
-_set_mark_replay: /set_mark_replay\b/ | /smr\b/ { "set_mark_replay" } 
-_set_param_increment: /set_param_increment\b/ | /spi\b/ | /m=\b/ { "set_param_increment" } 
-_set_param_exp: /set_param_exp\b/ | /spe\b/ | /m\b/ | /x=\b/ { "set_param_exp" } 
+@@ hotkey_grammar
+command: set_current_effect
+command: set_stepsize
+command: set_jumpsize
+command: set_parameter
+command: cancel
+cancel: /.+Escape/
+foo: /./
+set_current_effect: 'f' effect_id 'Enter' {Audio::Nama::set_current_op($item{effect_id}) }
+effect_id: lower_case_effect_id { $return = uc $item{lower_case_effect_id} }
+lower_case_effect_id: /[a-z]+/
+set_stepsize: 'm' digit  { Audio::Nama::set_current_stepsize(10**$item{digit})}
+set_stepsize: 'm-' digit { Audio::Nama::set_current_stepsize(10**-$item{digit})}
+set_parameter: '=' value 'Enter' {Audio::Nama::set_parameter_value($item{value})}
+set_jumpsize: 'j' value 'Enter' {$Audio::Nama::text->{hotkey_playback_jumpsize} = $item{value}}
+digit: /\d/
+value: /[+-]?([\d_]+(\.\d*)?|\.\d+)([eE][+-]?\d+)?/
+
 @@ ecasound_chain_operator_hints_yml
 ---
 -
@@ -4555,108 +4474,82 @@ _set_param_exp: /set_param_exp\b/ | /spe\b/ | /m\b/ | /x=\b/ { "set_param_exp" }
 ;
 @@ default_namarc
 #
-#  Nama Configuration file
+#         Nama Configuration file
 #
-#  This file has been auto-generated by Nama
-#  It will not be overwritten, so edit it as you like.
+#         This file has been auto-generated by Nama
+#         It will not be overwritten, so edit it as you like.
 #
-#  Notes
+#         Notes
 #
-#  - The format of this file is YAML, preprocessed to allow
-#    comments. Note: TAB characters are not allowed,
-#    and will cause a fatal error. 
+#        - The format of this file is YAML, preprocessed to allow
+#           comments.
 #
-#  - A value _must_ be supplied for each 'leaf' field.
-#    For example "mixer_out_format: cd-stereo"
+#        - A value _must_ be supplied for each 'leaf' field.
+#          For example "mixer_out_format: cd-stereo"
 #
-#  - A value must _not_ be supplied for nodes, i.e.
-#    'device:'. The value for 'device' is the entire indented
-#    data structure that follows in subsequent lines.
+#        - A value must _not_ be supplied for nodes, i.e.
+#          'device:'. The value for 'device' is the entire indented
+#          data structure that follows in subsequent lines.
 #
-#  - white space *is* significant. Two spaces indent is
-#    required for each sublevel.
+#        - white space *is* significant. Two spaces indent is
+#          required for each sublevel.
 #
-#  - You may use the tilde symbol '~' to represent a null (undef) value
-#    For example "execute_on_project_load: ~"
+#        - You may use the tilde symbol '~' to represent a null (undef) value
+#          For example "execute_on_project_load: ~"
 #
-#   - This file is distinct from .ecasoundrc (not used by Nama.)
+#         - This file is distinct from .ecasoundrc (which in
+#           general you will not need to run Nama.)
 
 
-# project root directory, all project files stored here
+# project root directory
+
+# all project directories (or their symlinks) will live here
 
 project_root: ~                  # replaced during first run
 
-# [ audio devices ] 
+# define abbreviations
 
-alsa_capture_device: consumer # 'consumer' is defined below
-alsa_playback_device: consumer
+abbreviations:  
+  24-mono: s24_le,1,frequency
+  24-stereo: s24_le,2,frequency,i
+  cd-mono: s16_le,1,44100
+  cd-stereo: s16_le,2,44100,i
+  frequency: 44100
 
-# Naming ALSA audio devices, reference for "device" section below
+# define audio devices
 
-# syntax:  alsa,pcm_device_name 
-# example: alsa,default
-# pcm_device_name can be 'default' or any virtual devices you 
-# have defined in .asoundrc. (see https://alsa.opensrc.org/Asoundrc)
-
-# syntax: alsaplugin,card_number,device_number[,subdevice_number] (sample rate conversion)
-# syntax: alsahw,card_number,device_number[,subdevice_number] (no sample rate conversion)
-# example: alsaplugin,1,0 (second soundcard, device 0)
-
-# Specifying audio format for recording and soundcard input/output
-
-# syntax: bit_configuration,channel_count,frequency
-# example: s16_le,2,44100 (16-bits little-endian, two channels, 44.1 kHz)
-# example: s16_le,2,frequency
-# You may use the 'frequency' token, defined in the "abbreviations" section below.
-# Set 'frequency' to specify the sample rate for your project. 
-
-# onboard soundcard, card number 0
-
-devices:
-  consumer:  
-    ecasound_id: alsa,default
-    input_format: 16-bit-stereo
-    output_format: 16-bit-stereo
-
-# multi-channel soundcard, card number 1, with 12 input and 10 output channels
-
-  multi:
-    ecasound_id: alsaplugin,1,0 # second card
-    input_format: s32_le,12,frequency 
-    output_format: s32_le,10,frequency
-
-# other device settings (don't change them)
-
+devices: 
   jack:
-    signal_format: f32_le,N,frequency
+    signal_format: f32_le,N,frequency # do not change this
+  consumer:
+    ecasound_id: alsa,default
+    input_format: cd-stereo
+    output_format: cd-stereo
+    hardware_latency: 0
+  multi:
+    ecasound_id: alsa,ice1712
+    input_format: s32_le,12,frequency
+    output_format: s32_le,10,frequency
+    hardware_latency: 0
   null:
     ecasound_id: null
     output_format: ~
 
-# audio formats
+# ALSA soundcard device assignments and formats
 
-# If your card allow, you'll get most boom-for-buck in 
-# raising channel bandwidth to 24 bits
+alsa_capture_device: consumer       # for ALSA/OSS
+alsa_playback_device: consumer      # for ALSA/OSS
+mixer_out_format: cd-stereo         # for ALSA/OSS
 
-mix_to_disk_format:   16-bit-n-channel
-mixer_out_format:     16-bit-stereo
-raw_to_disk_format:   16-bit-n-channel
-cache_to_disk_format: 16-bit-n-channel
+# soundcard_channels: 10            # GUI input/output channel selection range
 
-abbreviations:  
-  frequency:        44100
-  24-bit-mono:      s24_le,1,frequency
-  24-bit-stereo:    s24_le,2,frequency,i
-  24-bit-n-channel: s24_le,N,frequency,i
-  16-bit-mono:      s16_le,1,frequency
-  16-bit-stereo:    s16_le,2,frequency,i
-  16-bit-n-channel: s16_le,N,frequency,i
-  cd-mono:          s16_le,1,44100
-  cd-stereo:        s16_le,2,44100,i
+# audio file format templates
 
-mixdown_encodings: mp3 ogg  # files are automatically generated on mixdown
-                            # lame required for mp3
-                            # oggenc required for ogg
+mix_to_disk_format: s16_le,N,frequency,i
+raw_to_disk_format: s16_le,N,frequency,i
+cache_to_disk_format: s16_le,N,frequency,i
+
+mixdown_encodings: mp3 ogg
 
 sample_rate: frequency
 
@@ -4664,24 +4557,22 @@ realtime_profile: nonrealtime # other choices: realtime or auto
 
 use_metronome: 0
 
-# The following buffer sizes apply only with ALSA (not when using JACK) 
-
+# The buffer size settings below apply only when JACK is *not* used
 ecasound_buffersize:
   realtime:
     default: 256
   nonrealtime:
     default: 1024
-
-ecasound_globals: # best not to change these
+ecasound_globals:
   common: -z:mixmode,sum
   realtime: -z:db,100000 -z:nointbuf
   nonrealtime: -z:nodb -z:intbuf
 
-waveform_height: 200 # gui display
+waveform_height: 200
 
 # ecasound_tcp_port: 2868  
 
-# effects for use in mastering mode, you may have to install them
+# effects for use in mastering mode
 
 eq: Parametric1 1 0 0 40 1 0 0 200 1 0 0 600 1 0 0 3300 1 0
 
@@ -4697,63 +4588,31 @@ spatialiser: matrixSpatialiser 0
 
 limiter: tap_limiter 0 0
 
-mark_replay_seconds: 2.5
-
-playback_jump_seconds: 10
-
-beep:
-  command: beep # or ecasound
-# percent volume is for ecasound only
-#                Hz  sec vol %
-  clip_start:    880 0.1 5
-  clip_end:      440 0.1 5 
-  end_of_list:   250 0.2 5
-  command_error: 350 0.7 5
-
 hotkeys:
-  common: 
-    Space: toggle_transport
-    Backspace: backspace
-    F1: clip_here
-    Insert: previous_track
-    Delete: next_track
-    Keypad0: replay
-    [: back(30)
-    ]: forward(30)
-    {: back(120)
-    }: forward(120)
-    (: backward(300)
-    ): forward(300)
-  jump:
-    Home: jump_to_start
-    End: jump_to_end
-    PageUp: previous_mark
-    PageDown: next_mark
-    Right: jump_forward_1
-    Up: jump_forward_10
-    Left: jump_back_1
-    Down: jump_back_10
-
-  bump:
-    Home: jump_to_start
-    End: jump_to_end
-    PageUp: previous_mark
-    PageDown: next_mark
-    Right: bump_mark_forward_1
-    Up: bump_mark_forward_10
-    Left: bump_mark_back_1
-    Down: bump_mark_back_10
-
-  param:
-    Home: previous_effect
-    End: next_effect
-    PageUp: previous_param
-    PageDown: next_param
-
-    Left: decrement_param_1
-    Right: increment_param_1
-    Up: increment_param_10
-    Down: decrement_param_10
+  Escape: exit_hotkey_mode
+  Insert: previous_track
+  Delete: next_track
+  Home: previous_effect
+  End: next_effect
+  PageUp: previous_param
+  PageDown: next_param
+  Left: previous_param
+  Right: next_param
+  Up: increment_param
+  Down: decrement_param
+  j: decrement_param
+  k: increment_param
+  h: previous_param
+  l: next_param
+  a: previous_track
+  s: previous_effect
+  d: next_effect
+  f: next_track
+  i: previous_track
+  o: next_track
+  I: previous_effect
+  O: next_effect
+  Space: toggle_transport
 
 alias:
   command:
@@ -4761,8 +4620,7 @@ alias:
     pcv: promote_current_version
     djp: disable_jack_polling
   effect:
-    reverb: gverb # now superseded by nicknames, see 'h nick'
-
+    reverb: gverb
 
 # end
 
@@ -5508,13 +5366,11 @@ doxctl
 @@ banner
       ////////////////////////////////////////////////////////////////////
      /                                                                  /
-    /    Nama multitrack recorder v. $VERSION (c)2008-2023 Joel Roth      /
+    /    Nama multitrack recorder v. $VERSION (c)2008-2019 Joel Roth      /
    /                                                                  /
   /    Audio processing by Ecasound, courtesy of Kai Vehmanen        /
  /                                                                  /
 ////////////////////////////////////////////////////////////////////
-
-Type 'h' for help.
 
 Starting...
 
@@ -7291,26 +7147,3 @@ verse2:   12 120          # back to 4/4 (implied)
 chorus2:  16 140          # jump to 140 bpm                                                                                                                            
 outro:    6 140                                                                                                                                                        
           2 140-80        # ritardando over the last 2 bars    
-
-@@ hotkey_grammar
-command: set_current_effect
-command: set_stepsize
-command: set_jumpsize
-command: set_parameter
-command: cancel
-cancel: /.+Escape/
-foo: /./
-set_current_effect: 'f' effect_id 'Enter' {Audio::Nama::set_current_op($item{effect_id}) }
-set_hotkey_mode: 'o' hotkey_mode { $Audio::Nama::mode->{hotkey_mode} = $item{hotkey_mode} }
-hotkey_mode: /[jmp]/
-effect_id: lower_case_effect_id { $return = uc $item{lower_case_effect_id} }
-lower_case_effect_id: /[a-z]+/
-set_stepsize: 'm' digit          { Audio::Nama::set_stepsize( $item{digit})  }
-set_stepsize: 'm-' digit         { Audio::Nama::set_stepsize(-$item{digit})  }
-set_parameter: '=' value 'Enter' { Audio::Nama::set_stepsize( $item{value})  }
-set_jumpsize: 't' value 'Enter' {$Audio::Nama::config->{hotkey_playback_jumpsize_seconds} = $item{value}}
-digit: /\d/
-value: /[+-]?([\d_]+(\.\d*)?|\.\d+)([eE][+-]?\d+)?/
-
-
-=cut

@@ -1,5 +1,5 @@
 This archive contains the distribution PDK-Device,
-version 0.016:
+version 0.018:
 
   A Moose role for managing device connections and configurations using Expect.
 

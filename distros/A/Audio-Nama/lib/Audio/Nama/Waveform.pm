@@ -2,6 +2,7 @@ package Audio::Nama::Waveform;
 use Audio::Nama::Globals qw($project $config $gui %ti);
 use Audio::Nama::Util qw(join_path);
 use Modern::Perl '2020';
+our $VERSION = 1.0;
 use Try::Tiny;
 use vars qw(%by_name);
 use Audio::Nama::Object qw(wav track project start end);

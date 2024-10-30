@@ -36,7 +36,7 @@ use vars qw/ $VERSION $DEBUG @ISA /;
 use Exporter 'import';
 our @EXPORT_OK = qw( translate_from_FITS translate_to_FITS );
 
-$VERSION = '1.65';
+$VERSION = '1.66';
 $DEBUG   = 0;
 
 # The reference list of classes we can try This list should be
@@ -171,8 +171,10 @@ my @generic_headers = qw(
                           SLIT_NAME
                           SLIT_WIDTH
                           SPECIES
+                          SPECTRUM_NUMBER
                           SPEED_GAIN
                           STANDARD
+                          SUBSYSTEM_NUMBER
                           SUBSYSTEM_IDKEY
                           SURVEY
                           SWITCH_MODE

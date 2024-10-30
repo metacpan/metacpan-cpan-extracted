@@ -64,6 +64,18 @@ The Net::SSLeay::SSL_CTX class of L<SPVM> has methods to manipulate SSL/TLS cont
 
   method set_ciphersuites : int ($str : string);
 
+=head2 set_options
+
+C<method set_options : long ($options : long);>
+
+=head2 get_options
+
+C<native method get_options : long ();>
+
+=head2 clear_options
+
+C<native method clear_options : long ($options : long);>
+
 =head1 Copyright & License
 
 Copyright (c) 2023 Yuki Kimoto

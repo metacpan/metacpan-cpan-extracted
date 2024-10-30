@@ -67,10 +67,11 @@
    "provides" : {
       "Audio::Nama" : {
          "file" : "lib/Audio/Nama.pm",
-         "version" : "1.307"
+         "version" : "1.505"
       },
       "Audio::Nama::AnalyseLV2" : {
-         "file" : "lib/Audio/Nama/AnalyseLV2.pm"
+         "file" : "lib/Audio/Nama/AnalyseLV2.pm",
+         "version" : "1"
       },
       "Audio::Nama::Assign" : {
          "file" : "lib/Audio/Nama/Assign.pm",
@@ -382,13 +383,16 @@
          "version" : "1"
       },
       "Audio::Nama::TrackRegion" : {
-         "file" : "lib/Audio/Nama/TrackRegion.pm"
+         "file" : "lib/Audio/Nama/TrackRegion.pm",
+         "version" : "1"
       },
       "Audio::Nama::TrackWaveform" : {
-         "file" : "lib/Audio/Nama/TrackWaveform.pm"
+         "file" : "lib/Audio/Nama/TrackWaveform.pm",
+         "version" : "1"
       },
       "Audio::Nama::Util" : {
-         "file" : "lib/Audio/Nama/Util.pm"
+         "file" : "lib/Audio/Nama/Util.pm",
+         "version" : "1"
       },
       "Audio::Nama::VersionTrack" : {
          "file" : "lib/Audio/Nama/Track.pm",
@@ -399,10 +403,12 @@
          "version" : "1.001"
       },
       "Audio::Nama::WavModify" : {
-         "file" : "lib/Audio/Nama/WavModify.pm"
+         "file" : "lib/Audio/Nama/WavModify.pm",
+         "version" : "1"
       },
       "Audio::Nama::Waveform" : {
-         "file" : "lib/Audio/Nama/Waveform.pm"
+         "file" : "lib/Audio/Nama/Waveform.pm",
+         "version" : "1"
       },
       "Audio::Nama::WetTrack" : {
          "file" : "lib/Audio/Nama/Track.pm",
@@ -415,6 +421,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.307",
+   "version" : "1.505",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -34,8 +34,8 @@ subtest Channel => sub { # {{{
 
    is( $result_class->table, 'Channels', 'table gets set correctly');
 
-   is( $result_class->test_perl_version, 'station', 'perl version gets set from base class') if $] >= 5.010;
-   is( $result_class->test_experimental->(1), 2, 'experimental gets set from base class') if $] >= 5.020;
+   is( $result_class->test_perl_version, 'station', 'perl version gets set from base class') if $] >= 5.034;
+   is( $result_class->test_experimental, 1, 'experimental gets set from base class') if $] >= 5.034;
    is( IRC::Schema->resultset('Channel')->test_experimental->(2), 3, 'experimental gets set from base class of rs') if $] >= 5.020;
 }; # }}}
 

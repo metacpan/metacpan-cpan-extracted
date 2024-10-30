@@ -15,6 +15,7 @@ subtest 'Generic behaviour' => sub {
         add_aaaa
         add_cname
         add_caa
+        add_https
         add_mx
         add_ns
         add_txt
@@ -60,7 +61,7 @@ SKIP: {
             plan skip_all => '.';
         }
         else {
-            plan tests => 17;
+            plan tests => 18;
         }
 
         my $resp;
@@ -98,6 +99,16 @@ SKIP: {
             value           => 'ca.example.com',
         );
         ok $resp->is_success,                                   'add_caa() success';
+
+        # /zone/add_https
+        $resp = $client->add_https(
+            domains         => [ { dname => 'test.ru' } ],
+            subdomain       => '@',
+            priority        => 1,
+            target          => '.',
+            value           => 'alpn=h2,h3',
+        );
+        ok $resp->is_success,                                   'add_https() success';
 
         # /zone/add_mx
         $resp = $client->add_mx(

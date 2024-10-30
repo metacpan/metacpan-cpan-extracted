@@ -1,0 +1,55 @@
+name: Build and deploy site
+
+on:
+  push:
+    branchs:
+      - 'main'
+    paths:
+      - 'links.json'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: davorg/links:latest
+
+    steps:
+      - name: Orientation
+        run: |
+          pwd
+          ls
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Orientation 2
+        run: |
+          pwd
+          ls
+
+      - name: Create page
+        env:
+          LINKSITE_DEBUG: 1
+        run: |
+          linksite
+
+      - name: Build pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
+
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+

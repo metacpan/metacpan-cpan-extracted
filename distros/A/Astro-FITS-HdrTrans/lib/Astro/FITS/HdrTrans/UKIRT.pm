@@ -24,9 +24,7 @@ use Carp;
 # inherit from the JAC translation class.
 use base qw/ Astro::FITS::HdrTrans::JAC /;
 
-use vars qw/ $VERSION /;
-
-$VERSION = "1.65";
+our $VERSION = "1.66";
 
 # In each class we have three sets of data.
 #   - constant mappings

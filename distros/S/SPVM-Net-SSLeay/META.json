@@ -50,6 +50,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Net-SSLeay"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

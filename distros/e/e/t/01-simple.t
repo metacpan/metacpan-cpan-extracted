@@ -254,18 +254,25 @@ is
   "f - basename";
 
 ######################################
-#            Math Help
+#            List Support
 ######################################
 
 is
-    max(10,20,9,15),
-    20,
-    "max - sanity check";
+  max( 10, 20, 9, 15 ), 20,
+  "max - sanity check";
 
 is
-    min(10,20,9,15),
-    9,
-    "min - sanity check";
+  min( 10, 20, 9, 15 ), 9,
+  "min - sanity check";
+
+is
+  sum( 1 .. 10 ), 55,
+  "sum - sanity check";
+
+is_deeply
+  [ uniq 2, 4, 4, 6 ],
+  [ 2, 4, 6 ],
+  "uniq - sanity check";
 
 ######################################
 #             Output

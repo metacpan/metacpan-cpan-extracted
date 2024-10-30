@@ -33,5 +33,10 @@ class Net::SSLeay::SSL_CTX {
   native method set_ciphersuites : int ($str : string);
   
   native method get_cert_store : Net::SSLeay::X509_STORE ();
-
+  
+  native method set_options : long ($options : long);
+  
+  native method get_options : long ();
+  
+  native method clear_options : long ($options : long);
 }

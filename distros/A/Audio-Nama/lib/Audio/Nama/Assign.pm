@@ -1,7 +1,6 @@
 package Audio::Nama::Assign;
 use Modern::Perl '2020';
 our $VERSION = 1.0;
-use 5.008;
 use feature 'state';
 use strict;
 use warnings;
@@ -81,15 +80,14 @@ use Carp;
 	$volume_control_operator 		$config->{volume_control_operator}
 	$serialize_formats  	        $config->{serialize_formats}
 	$use_git						$config->{use_git}
+	$beep_command 					$config->{beep_command}
+	$hotkey_beep					$config->{hotkey_beep}
 	$eager							$mode->{eager}
 	$waveform_height 				$config->{waveform_height}
 	$alias							$config->{alias}
 	$hotkeys						$config->{hotkeys}
 	$new_track_rw					$config->{new_track_rw}
-	$playback_jump_seconds		$config->{playback_jump_seconds}
-	$mark_bump_seconds				$config->{mark_bump_seconds}
-	$mark_replay_seconds			$config->{mark_replay_seconds}
-	$seek_end_margin			   $config->{seek_end_margin}
+	$hotkeys_always					$config->{hotkeys_always}
 	$use_pager     					$config->{use_pager}
 	$use_placeholders  				$config->{use_placeholders}
     $edit_playback_end_margin  		$config->{edit_playback_end_margin}
@@ -109,13 +107,12 @@ use Carp;
 	$osc_reply_port 				$config->{osc_reply_port}
 	$remote_control_port 			$config->{remote_control_port}
 	$engines						$config->{engines}
-	$default_waveform_height 		$config->{default_waveform_height}
-	$loop_chain_channel_width 		$config->{loop_chain_channel_width}
+	$default_waveform_height 			$config->{default_waveform_height}
+	$loop_chain_channel_width 	$config->{loop_chain_channel_width}
 	$waveform_pixels_per_second		$config->{waveform_pixels_per_second}
-	$display_waveform				$config->{display_waveform}
+	$display_waveform					$config->{display_waveform}
 	$ticks_per_quarter_note 		$config->{ticks_per_quarter_note}
 	$use_metronome					$config->{use_metronome}
-	%beep							$config->{beep}
 
 ) };
 sub var_map {  $var_map } # to allow outside access while keeping
@@ -275,7 +272,6 @@ $jack
 $fx
 $fx_cache
 $text
-$term
 $gui
 $midi
 $help

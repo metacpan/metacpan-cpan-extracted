@@ -1,5 +1,5 @@
-.github/workflows/linux-ubuntu-latest-32bit.yml
-.github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
+.gitattributes
+.github/workflows/linux-ubuntu-latest-perl-v5.20.3.yml
 .github/workflows/linux-ubuntu-latest.yml
 .github/workflows/macos-latest.yml
 .github/workflows/windows-latest.yml
@@ -15,6 +15,7 @@ lib/SPVM/Net/SSLeay/BIO.c
 lib/SPVM/Net/SSLeay/BIO.config
 lib/SPVM/Net/SSLeay/BIO.pm
 lib/SPVM/Net/SSLeay/BIO.spvm
+lib/SPVM/Net/SSLeay/ConfigBuilder.pm
 lib/SPVM/Net/SSLeay/Constant.c
 lib/SPVM/Net/SSLeay/Constant.config
 lib/SPVM/Net/SSLeay/Constant.pm

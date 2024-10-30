@@ -24,7 +24,7 @@ use Data::TagDB::MultiIterator;
 use Data::TagDB::WellKnown;
 use Data::URIID::Colour;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 
 
@@ -258,6 +258,22 @@ sub factory {
     my ($self) = @_;
     require Data::TagDB::Factory;
     return $self->{factory} //= Data::TagDB::Factory->_new(db => $self);
+}
+
+
+sub begin_work {
+    my ($self, @args) = @_;
+    return $self->dbh->begin_work(@args);
+}
+
+sub commit {
+    my ($self, @args) = @_;
+    return $self->dbh->commit(@args);
+}
+
+sub rollback {
+    my ($self, @args) = @_;
+    return $self->dbh->rollback(@args);
 }
 
 # ---- Virtual methods ----
@@ -511,7 +527,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -530,10 +546,16 @@ This module implements SQL based universal tag databases. Such databases can be 
 This module and it's submodule implement creation of databases, migration (to most current scheme),
 adding data and reading data from the database.
 
+For an introduction see L<Data::TagDB::Tutorial>.
+
 The instances of L<Data::TagDB::Tag> repesent any kind of object (may it be file, user account or a real life object like a tree).
 It provides some convenience functions such as to query objects for their name.
 
 L<Data::TagDB::Factory> (via L</factory>) is provided for easy creation of new tags.
+
+B<Note:>
+Correct transaction management can improve performance I<significantly>. Sometimes the improvement can be by a factor of a few thousand.
+Applications should therefore consider to group requests into transactions. This is also true for ready only requests.
 
 =head1 METHODS
 
@@ -561,14 +583,14 @@ This disconnects from the database backend. It also renders this object useless.
 
 =head2 tag_by_id
 
-    my Data::TagDB::Tag $tag = $db->tag_by_hint($type => $id);
+    my Data::TagDB::Tag $tag = $db->tag_by_id($type => $id);
     # or:
-    my Data::TagDB::Tag $tag = $db->tag_by_hint($hint => $id);
+    my Data::TagDB::Tag $tag = $db->tag_by_id($hint => $id);
     # or:
     my Data::Identifier $id = ...;
-    my Data::TagDB::Tag $tag = $db->tag_by_hint($id);
+    my Data::TagDB::Tag $tag = $db->tag_by_id($id);
     # e.g:
-    my Data::TagDB::Tag $tag = $db->tag_by_hint(uuid => 'abc...');
+    my Data::TagDB::Tag $tag = $db->tag_by_id(uuid => 'abc...');
 
 Gets a tag by an an identifier of the provided type. The type must be a C<Data::TagDB::Tag> or a
 a string that is a valid hint.
@@ -694,6 +716,21 @@ See also L<Data::TagDB::Migration>.
 
 Get a factory object used to create tags.
 See also L<Data::TagDB::Factory> for details.
+
+=head2 begin_work, commit, rollback
+
+    my $rc = $db->begin_work;
+    # ...
+    my $rc = $db->commit;
+    # or:
+    my $rc = $db->rollback;
+
+Those methods are provided as proxy to L<DBI>'s.
+The correct use of transactions can improve the speed (both for reading and writing)
+significantly. Specifically tag databases are subject to many improvements of correct transaction
+mangement.
+
+For details see also: L<DBI/begin_work>, L<DBI/commit>, L<DBI/rollback>.
 
 =head2 tag_by_hint
 

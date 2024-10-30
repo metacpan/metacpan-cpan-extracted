@@ -18,6 +18,8 @@ lib/Data/TagDB/Migration.pm
 lib/Data/TagDB/MultiIterator.pm
 lib/Data/TagDB/Relation.pm
 lib/Data/TagDB/Tag.pm
+lib/Data/TagDB/Tutorial.pod
+lib/Data/TagDB/Tutorial/WellKnown.pod
 lib/Data/TagDB/WeakBaseObject.pm
 lib/Data/TagDB/WellKnown.pm
 t/01_load.t

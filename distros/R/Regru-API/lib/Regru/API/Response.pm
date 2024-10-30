@@ -9,8 +9,8 @@ use Try::Tiny;
 use Carp;
 use namespace::autoclean;
 
-our $VERSION = '0.052'; # VERSION
-our $AUTHORITY = 'cpan:CHIM'; # AUTHORITY
+our $VERSION = '0.053'; # VERSION
+our $AUTHORITY = 'cpan:OLEG'; # AUTHORITY
 
 with qw(
     Regru::API::Role::Serializer
@@ -96,7 +96,7 @@ Regru::API::Response - REG.API v2 response wrapper
 
 =head1 VERSION
 
-version 0.052
+version 0.053
 
 =head1 SYNOPSIS
 

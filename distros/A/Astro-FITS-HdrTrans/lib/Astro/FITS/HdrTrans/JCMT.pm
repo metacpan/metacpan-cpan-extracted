@@ -14,7 +14,7 @@ use Astro::Telescope;
 use DateTime;
 use DateTime::TimeZone;
 
-our $VERSION = '1.65';
+our $VERSION = '1.66';
 
 use base qw/ Astro::FITS::HdrTrans::JAC /;
 
@@ -168,7 +168,7 @@ sub to_TAU {
   my $self = shift;
   my $FITS_headers = shift;
 
-  my $tau = 0.0;
+  my $tau = undef;
   for my $src (qw/ TAU225 WVMTAU /) {
     my $st = $src . "ST";
     my $en = $src . "EN";
@@ -178,12 +178,14 @@ sub to_TAU {
     my $startval = $startvals[0];
     my $endval = $endvals[-1];
 
-    if (defined $startval && defined $endval) {
+    my $have_start = ((defined $startval) and ($startval != 0.0));
+    my $have_end = ((defined $endval) and ($endval != 0.0));
+    if ($have_start and $have_end) {
       $tau = ($startval + $endval) / 2;
       last;
-    } elsif (defined $startval) {
+    } elsif ($have_start) {
       $tau = $startval;
-    } elsif (defined $endval) {
+    } elsif ($have_end) {
       $tau = $endval;
     }
   }

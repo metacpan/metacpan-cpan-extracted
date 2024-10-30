@@ -22,19 +22,13 @@ my %WriteMakefileArgs = (
     "Moose" => 0,
     "Moose::Role" => 0,
     "namespace::autoclean" => 0,
-    "utf8" => 0
-  },
-  "TEST_REQUIRES" => {
-    "Data::Dumper" => 0,
-    "Data::Printer" => 0,
-    "Test::Exception" => 0,
-    "Test::More" => 0,
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => ""
   }
 );
 
@@ -42,12 +36,8 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "DBIx::Custom" => 0,
-  "Data::Dumper" => 0,
-  "Data::Printer" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
-  "Test::Exception" => 0,
-  "Test::More" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
   "utf8" => 0,

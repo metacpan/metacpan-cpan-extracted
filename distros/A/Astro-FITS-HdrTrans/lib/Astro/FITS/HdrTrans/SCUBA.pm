@@ -20,9 +20,7 @@ use Carp;
 # Inherit from Base
 use base qw/ Astro::FITS::HdrTrans::JAC /;
 
-use vars qw/ $VERSION /;
-
-$VERSION = "1.65";
+our $VERSION = "1.66";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant

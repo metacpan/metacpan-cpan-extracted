@@ -324,3 +324,50 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__get_cert_store(SPVM_ENV* env, SPVM_VALUE* st
   
   return 0;
 }
+
+int32_t SPVM__Net__SSLeay__SSL_CTX__set_options(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  SSL_CTX* ssl_ctx = env->get_pointer(env, stack, obj_self);
+  
+  int64_t options = stack[1].lval;
+  
+  int64_t ret = SSL_CTX_set_options(ssl_ctx, options);
+  
+  stack[0].lval = ret;
+  
+  return 0;
+}
+
+int32_t SPVM__Net__SSLeay__SSL_CTX__get_options(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  SSL_CTX* ssl_ctx = env->get_pointer(env, stack, obj_self);
+  
+  int64_t ret = SSL_CTX_get_options(ssl_ctx);
+  
+  stack[0].lval = ret;
+  
+  return 0;
+}
+
+int32_t SPVM__Net__SSLeay__SSL_CTX__clear_options(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  SSL_CTX* ssl_ctx = env->get_pointer(env, stack, obj_self);
+  
+  int64_t options = stack[1].lval;
+  
+  int64_t ret = SSL_CTX_clear_options(ssl_ctx, options);
+  
+  stack[0].lval = ret;
+  
+  return 0;
+}
+

@@ -34,9 +34,7 @@ use base qw/ Astro::FITS::HdrTrans::JCMT /;
 # Speed of light in km/s.
 use constant CLIGHT => 2.99792458e5;
 
-use vars qw/ $VERSION /;
-
-$VERSION = "1.65";
+our $VERSION = "1.66";
 
 # Cache UTC definition
 our $UTC = DateTime::TimeZone->new( name => 'UTC' );
@@ -72,6 +70,8 @@ my %UNIT_MAP = (
                 SPECIES            => 'MOLECULE',
                 VELOCITY_TYPE      => 'DOPPLER',
                 SIDEBAND_MODE      => 'SB_MODE',
+                SPECTRUM_NUMBER    => 'SPECID',
+                SUBSYSTEM_NUMBER   => 'SUBSYSNR',
                 OBSERVED_SIDEBAND  => 'OBS_SB',
                 TRACKING_SIDEBAND  => 'TRACK_SB',
                );
@@ -163,26 +163,26 @@ sub to_DR_RECIPE {
      $dr = 'REDUCE_SCIENCE';
   }
 
-  my $obstype = lc( $class->to_OBSERVATION_TYPE( $FITS_headers ) );
+  my $obstype = $class->to_OBSERVATION_TYPE( $FITS_headers );
   my $pol = $class->to_POLARIMETER( $FITS_headers );
   my $standard = $class->to_STANDARD( $FITS_headers );
   my $utdate = $class->to_UTDATE( $FITS_headers );
   my $freq_sw = $class->_is_FSW( $FITS_headers );
 
-  if ($utdate < 20080701) {
-    if ($obstype eq 'skydip' && $dr eq 'REDUCE_SCIENCE') {
+  if ((defined $utdate) and $utdate < 20080701) {
+    if ((defined $obstype) && $obstype =~ /skydip/i && $dr eq 'REDUCE_SCIENCE') {
       $dr = "REDUCE_SKYDIP";
     }
   }
 
-  my $is_sci = ( $obstype =~ /science|raster|scan|grid|jiggle/ );
+  my $is_sci = ( (defined $obstype) and $obstype =~ /science|raster|scan|grid|jiggle/i );
 
   if ( $standard && $is_sci ) {
     $dr = "REDUCE_STANDARD";
   }
 
   # Append unless we have already appended
-  if ( $utdate > 20081115 && $pol && $is_sci ) {
+  if ((defined $utdate) && $utdate > 20081115 && $pol && $is_sci ) {
     $dr .= "_POL" unless $dr =~ /_POL$/;
   }
 
@@ -226,7 +226,8 @@ sub to_POLARIMETER {
   my $inbeam = $FITS_headers->{INBEAM};
   my $utdate = $class->to_UTDATE( $FITS_headers );
 
-  if ( $utdate > 20081115 &&
+  if ( (defined $utdate) &&
+       $utdate > 20081115 &&
        defined( $inbeam ) &&
        $inbeam =~ /pol/i ) {
     return 1;
@@ -347,11 +348,12 @@ sub to_SAMPLE_MODE {
   my $FITS_headers = shift;
 
   my $sam_mode;
-  if( defined( $FITS_headers->{'SAM_MODE'} ) &&
-      uc( $FITS_headers->{'SAM_MODE'} ) eq 'RASTER' ) {
-    $sam_mode = 'scan';
-  } else {
-    $sam_mode = lc( $FITS_headers->{'SAM_MODE'} );
+  if( defined $FITS_headers->{'SAM_MODE'} ) {
+    if (( uc $FITS_headers->{'SAM_MODE'} ) eq 'RASTER' ) {
+      $sam_mode = 'scan';
+    } else {
+      $sam_mode = lc( $FITS_headers->{'SAM_MODE'} );
+    }
   }
   return $sam_mode;
 }
@@ -461,7 +463,7 @@ sub to_OBSERVATION_ID {
   } else {
     $self->_fix_dates( $FITS_headers );
 
-    my $backend = lc( $self->to_BACKEND( $FITS_headers ) );
+    my $backend = $self->to_BACKEND( $FITS_headers );
     my $obsnum = $self->to_OBSERVATION_NUMBER( $FITS_headers );
     my $dateobs = $self->to_UTSTART( $FITS_headers );
 
@@ -472,7 +474,7 @@ sub to_OBSERVATION_ID {
       $datetime =~ s/-//g;
       $datetime =~ s/://g;
 
-      $return = join '_', $backend, $obsnum, $datetime;
+      $return = join '_', (lc $backend), $obsnum, $datetime;
     }
   }
 
@@ -695,11 +697,6 @@ sub from_TRANSITION {
 
     my $transition = $generic_headers->{'TRANSITION'};
 
-    if (defined $transition) {
-        # Restore whitespace issue to allow comparison of untranslated header.
-        $transition =~ s/ - /  - /;
-    }
-
     return (TRANSITI => $transition);
 }
 
@@ -723,7 +720,7 @@ sub to_VELOCITY {
   my $FITS_headers = shift;
   my $frameset = shift;
 
-  my $velocity = 0;
+  my $velocity = undef;
   if ( defined( $frameset ) &&
        UNIVERSAL::isa( $frameset, "Starlink::AST::FrameSet" ) ) {
 

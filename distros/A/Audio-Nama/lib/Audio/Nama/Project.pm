@@ -38,10 +38,8 @@ sub project_dir {
 }
 # we prepend a slash 
 sub bus_track_display { 
-	my ($busname, $trackname) = ($this_bus, $this_track ? $this_track->name : '');
-	my $out = ($busname eq "Main" or $busname eq $trackname) ? "": "$busname/";
-	$out .= $trackname;
-	$out
+	my ($busname, $trackname) = ($this_bus, $this_track && $this_track->name || '');
+	($busname eq "Main" ? "": "$busname/" ). $trackname
 }
 sub list_projects {
 	my $projects = join "\n", sort map{
@@ -108,6 +106,7 @@ sub initialize_project_data {
 	}
 
 	Audio::Nama::ChainSetup::initialize();
+	reset_hotkey_buffers();
 	reset_command_buffer();
 	$this_engine->reset_ecasound_selections_cache();
 
@@ -130,7 +129,7 @@ sub load_project {
 	if (not $project->{name} or not -d project_dir() and not $args{create})
 	{
 		no warnings 'uninitialized';
-		Audio::Nama::pager_newline(qq(\nProject "$project->{name}" not found. Loading project "Untitled".)); 
+		Audio::Nama::pager_newline(qq(Project "$project->{name}" not found. Loading project "untitled".)); 
 		load_project(name => 'Untitled', create => 1);
 
 	}
@@ -315,7 +314,7 @@ sub new_project_template {
 
 	# Throw away command history
 	
-	$term->SetHistory();
+	$text->{term}->SetHistory();
 	
 	# Buses needn't set version info either
 	

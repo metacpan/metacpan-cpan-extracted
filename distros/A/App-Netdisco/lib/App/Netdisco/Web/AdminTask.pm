@@ -14,6 +14,10 @@ sub add_job {
     my $net = NetAddr::IP->new($device);
     return if
       ($device and (!$net or $net->num == 0 or $net->addr eq '0.0.0.0'));
+    return if
+      (($action eq 'discover' or $action eq 'pingsweep') and $device and
+        (($net->version == 6 and $net->masklen != 128)
+         or ($net->version == 4 and $net->masklen < 22)));
 
     my @hostlist = $device ? ($net->hostenum) : (undef);
     @hostlist = ($device) if $action eq 'pingsweep';
@@ -66,7 +70,7 @@ post "/admin/discodevs" => require_role admin => sub {
       : redirect uri_for('/')->path;
 };
 
-ajax qr{/ajax/control/admin/(?:\w+/)?renumber} => 'admin' => sub {
+ajax qr{/ajax/control/admin/(?:\w+/)?renumber} => require_role admin => sub {
     send_error('Missing device', 400) unless param('device');
     send_error('Missing new IP', 400) unless param('newip');
 

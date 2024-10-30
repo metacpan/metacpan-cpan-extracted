@@ -19,9 +19,10 @@ name: App-findsort
 provides:
   App::findsort:
     file: lib/App/findsort.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   File::Which: '0'
+  Filesys::DiskUsage: '0'
   Getopt::Long: '2.50'
   ShellQuote::Any::Tiny: '0'
   perl: '5.010001'
@@ -31,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-findsort
   homepage: https://metacpan.org/release/App-findsort
   repository: git://github.com/perlancar/perl-App-findsort.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

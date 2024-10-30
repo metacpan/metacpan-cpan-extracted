@@ -1,5 +1,13 @@
 Revision history for Astro::FITS::HdrTrans
 
+1.66 2024-10-29
+
+    - Add SPECID, SUBSYSNR for ACSIS.
+    - Avoid some undefined value warnings.
+    - Remove temporary whitespace in TRANSITION reverse translation.
+    - Change default opacity, velocity to undef for JCMT.
+    - Check for non-zero opacity values for JCMT.
+
 1.65 2022-06-17
 
     - Add SB_MODE, OBS_SB and TRACK_SB for ACSIS.

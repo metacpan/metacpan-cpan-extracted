@@ -1,10 +1,10 @@
 package CPAN::Test::Dummy::MultiPkgVer;
 use strict;
 use 5.008_001;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 package CPAN::Test::Dummy::MultiPkgVer::Inner;
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 package CPAN::Test::Dummy::MultiPkgVer;
 

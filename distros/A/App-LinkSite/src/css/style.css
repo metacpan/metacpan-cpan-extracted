@@ -1,0 +1,42 @@
+header {
+  padding-top: 5%;
+}
+
+#img img {
+  border-radius: 50%;
+  width: 7%;
+}
+
+#social {
+  padding-top: 2%;
+}
+
+#social i {
+  border: solid transparent 10px;
+  color: #4B9CD3;
+}
+
+#links {
+  border
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+footer {
+  margin-top: 3%;
+  padding-top: 1%;
+  border-top: solid 1px black;
+  padding-bottom: 1em;
+}
+
+li a.text-decoration-none:hover {
+  text-decoration: underline;
+}
+
+li.new-link::before {
+  content: 'New! ';
+  color: red;
+  font-variant: small-caps;
+  font-weight: bold;
+}

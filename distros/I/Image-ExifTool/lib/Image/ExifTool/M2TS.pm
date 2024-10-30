@@ -32,7 +32,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.24';
+$VERSION = '1.26';
 
 # program map table "stream_type" lookup (ref 6/1/9)
 my %streamType = (
@@ -82,7 +82,7 @@ my %streamType = (
     0x86 => 'DTS-HD Audio',
     0x87 => 'E-AC-3 Audio',
     0x8a => 'DTS Audio',
-    0x90 => 'PGS Audio', #https://www.avsforum.com/threads/bass-eq-for-filtered-movies.2995212/page-399
+    0x90 => 'Presentation Graphic Stream (subtitle)', #https://en.wikipedia.org/wiki/Program-specific_information
     0x91 => 'A52b/AC-3 Audio',
     0x92 => 'DVD_SPU vls Subtitle',
     0x94 => 'SDDS Audio',
@@ -328,6 +328,14 @@ sub ParsePID($$$$$)
                 $more = 1;  # read past unknown 0x15 packets if ExtractEmbedded > 2
             }
         }
+# still have a lot of questions about how to decode this...
+# (see https://exiftool.org/forum/index.php?topic=16486 and ../testpics/gps_video/forum16486.ts)
+#    } elsif ($type == 6) {
+#        my @a = unpack('x17x2NNx2nx2nx2nx2Cx2a4x2a5x2Nx2Nx2nx2Nx2Nx2Nx2nx2nx2Nx2nx2n', $$dataPt . "        ");
+#        my $hi = shift @a;
+#        $a[0] = Image::ExifTool::ConvertUnixTime(($a[0] + $hi * 4294967296) * 1e-6, undef, 6);
+#        print "@a\n";
+#        $more = 1;
     } elsif ($type < 0) {
         if ($$dataPt =~ /^(.{164})?(.{24})A[NS][EW]/s) {
             # (Blueskysea B4K, Novatek NT96670)
@@ -379,7 +387,7 @@ sub ParsePID($$$$$)
                 $et->HandleTag($tagTbl, Accelerometer => "@acc");
             }
             SetByteOrder('MM');
-            $$et{HasINNOV} = 1; # (necessary to skip over empty/unknown INNOV records)
+            $$et{FoundGoodGPS} = 1; # (necessary to skip over empty/unknown INNOV records)
             $more = 1;
         } elsif ($$dataPt =~ /^\$(GPSINFO|GSNRINFO),/) {
             # $GPSINFO,0x0004,2021.08.09 13:27:36,2341.54561,12031.70135,8.0,51,153,0,0,\x0d
@@ -481,7 +489,35 @@ sub ParsePID($$$$$)
             $et->HandleTag($tagTbl, GPSTrackRef  => 'T');
             SetByteOrder('MM');
             $more = 1;
-        } elsif ($$et{HasINNOV}) {
+        } elsif (length($$dataPt) >= 64 and substr($$dataPt, 32, 2) eq '$S') {
+            # DOD_LS600W.TS
+            my $tagTbl = GetTagTable('Image::ExifTool::QuickTime::Stream');
+            # find the earliest sample time in the cyclical list
+            my ($n, $last) = (32, "\0");
+            for (my $i=32; $i<length($$dataPt)-32; $i+=32) {
+                last unless substr($$dataPt, $n, 2) eq '$S';
+                my $dateTime = substr($$dataPt, $i+6, 8);
+                $last gt $dateTime and $n = $i, last;  # earliest sample if time goes backwards
+                $last = $dateTime;
+            }
+            for (my $i=32; $i<length($$dataPt)-32; $i+=32, $n+=32) {
+                $n = 32 if $n > length($$dataPt)-32;
+                last unless substr($$dataPt, $n, 2) eq '$S';
+                my @a = unpack("x${n}nnnnCCCCnCNNC", $$dataPt);
+                $a[8] /= 10;    # 1/10 sec
+                $a[2] += (36000 - 65536) if $a[2] & 0x8000; # convert signed integer into range 0-36000
+                $$et{DOC_NUM} = ++$$et{DOC_COUNT};
+                $et->HandleTag($tagTbl, GPSDateTime  => sprintf('%.4d:%.2d:%.2d %.2d:%.2d:%04.1fZ', @a[3..8]));
+                $et->HandleTag($tagTbl, GPSLatitude  => $a[10] * 1e-7);
+                $et->HandleTag($tagTbl, GPSLongitude => $a[11] * 1e-7);
+                $et->HandleTag($tagTbl, GPSSpeed     => $a[1] * 0.036); # convert from metres per 100 s
+                $et->HandleTag($tagTbl, GPSTrack     => $a[2] / 100);
+            }
+            # Note: 10 bytes after last GPS record look like a single 3-axis accelerometer reading:
+            # eg. fd ff 00 00 ff ff 00 00 01 00 
+            $$et{FoundGoodGPS} = 1; # so we skip over unrecognized packets
+            $more = 1;
+        } elsif ($$et{FoundGoodGPS}) {
             $more = 1;
         }
         delete $$et{DOC_NUM};
@@ -538,7 +574,7 @@ sub ProcessM2TS($$)
     my %needPID = ( 0 => 1 );       # lookup for stream PID's that we still need to parse
     # PID's that may contain GPS info
     my %gpsPID = (
-        0x0300 => 1,    # Novatek INNOVV
+        0x0300 => 1,    # Novatek INNOVV, DOD_LS600W
         0x01e4 => 1,    # vsys a6l dashcam
         0x0e1b => 1,    # Jomise T860S-GM dashcam
     );

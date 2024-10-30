@@ -232,9 +232,9 @@ sub output_object_text {   # text for user display
 sub source_status {
 	my $track = shift;
 	no warnings 'uninitialized';
-	return $track->current_wav if $track->rw eq PLAY and scalar $track->versions->@*; # files to play
+	return $track->current_wav if $track->play;
 	my $bus = $bn{$track->source_id}; 
-	return join " ", $bus->name, $bus->display_type if $track->source_type eq 'bus' and defined $bus; 
+	return join " ", $bus->name, $bus->display_type if $track->source_type eq 'bus';
 	return "track ".$track->source_id  if $track->source_type eq 'track';
 	return 'jack client '.$track->source_id if $track->source_type eq 'jack_client';
 	if($track->source_type eq 'soundcard')
@@ -322,7 +322,7 @@ sub import_audio  {
 		return;
 	}
 	my ($depth,$width,$freq) = split ',', Audio::Nama::wav_format($path);
-	Audio::Nama::pager_newline("format: ". Audio::Nama::wav_format($path));
+	Audio::Nama::pager_newline("format: ", Audio::Nama::wav_format($path));
 	$frequency ||= $freq;
 	if ( ! $frequency ){
 		Audio::Nama::throw("Cannot detect sample rate of $path. Skipping.",

@@ -39,7 +39,7 @@ use SNMP::Info::Layer3;
 
 our ($VERSION, %MIBS, %FUNCS, %GLOBALS, %MUNGE);
 
-$VERSION = '3.972000';
+$VERSION = '3.972002';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -200,5 +200,9 @@ to a hash.
 =head2 Table Methods imported from SNMP::Info::Layer3
 
 See documentation in L<SNMP::Info::Layer3/"TABLE METHODS"> for details.
+
+=head2 AUTHOR
+
+Written and contributed by Muris Boric. Many thanks!
 
 =cut

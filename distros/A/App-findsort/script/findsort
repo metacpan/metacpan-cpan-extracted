@@ -9,9 +9,9 @@ use Getopt::Long;
 use ShellQuote::Any::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-09-19'; # DATE
+our $DATE = '2024-09-24'; # DATE
 our $DIST = 'App-findsort'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my %Opts = (
     sort  => undef,
@@ -32,7 +32,7 @@ findsort options:
   -help           Show this message and exit.
   -version        Show program version and exit.
   -sort=SORT      Pick a sorting order. Available: mtime, -mtime, ctime, -ctime,
-                  size, -size. The "-" prefix means descending order.
+                  size, -size, du, -du. The "-" prefix means descending order.
 
 All the other options will be passed to find.
 _
@@ -80,6 +80,14 @@ my $exit = $? >> 8;
         @files = sort { (-s $a) <=> (-s $b) } @files;
     } elsif ($Opts{sort} eq '-size') {
         @files = sort { (-s $b) <=> (-s $a) } @files;
+    } elsif ($Opts{sort} eq 'du' || $Opts{sort} eq '-du') {
+        require Filesys::DiskUsage;
+        my @sizes = map { Filesys::DiskUsage::du($_) } @files;
+        if ($Opts{sort} eq 'du') {
+            @files = map { $files[$_] } sort { $sizes[$a] <=> $sizes[$b] } 0 .. $#files;
+        } else {
+            @files = map { $files[$_] } sort { $sizes[$b] <=> $sizes[$a] } 0 .. $#files;
+        }
     } else {
         die "findsort: Unknown -sort value: $Opts{sort}\n";
     }
@@ -103,7 +111,7 @@ findsort - Unix find wrapper that has sorting option
 
 =head1 VERSION
 
-This document describes version 0.003 of findsort (from Perl distribution App-findsort), released on 2024-09-19.
+This document describes version 0.004 of findsort (from Perl distribution App-findsort), released on 2024-09-24.
 
 =head1 SYNOPSIS
 
@@ -126,6 +134,48 @@ combine commands is limited.
 =head2 -version
 
 =head2 -sort
+
+Specify sort order. Choices:
+
+=over
+
+=item * mtime
+
+Sort by oldest modification time first.
+
+=item * -mtime
+
+Sort by newest modification time first.
+
+=item * ctime
+
+Sort by oldest creation time first.
+
+=item * -ctime
+
+Sort by newest modification time first.
+
+=item * size
+
+Sort by smallest file first. Size is from `stat()`, so for directory this won't
+total the total contents inside.
+
+=item * -size
+
+Sort by largest file first. Size is from `stat()`, so for directory this won't
+total the total contents inside.
+
+=item * du
+
+Sort by smallest disk usage first. Size is from L<Filesys::DiskUsage>, so for
+directory this will total the total contents inside.
+
+=item * -du
+
+Sort by largest disk usage first. Size is from L<Filesys::DiskUsage>, so for
+directory this will total the total contents inside.
+
+=back
 
 =head1 ENVIRONMENT
 

@@ -29,9 +29,7 @@ use base qw/ Astro::FITS::HdrTrans::FITS /;
 use Scalar::Util qw/ looks_like_number /;
 use Astro::FITS::HdrTrans::FITS;
 
-use vars qw/ $VERSION /;
-
-$VERSION = "1.65";
+our $VERSION = "1.66";
 
 # in each class we have three sets of data.
 #   - constant mappings

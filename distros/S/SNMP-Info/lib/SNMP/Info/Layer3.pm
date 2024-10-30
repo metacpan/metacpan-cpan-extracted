@@ -54,7 +54,7 @@ use SNMP::Info::DocsisHE;
 
 our ($VERSION, %GLOBALS, %FUNCS, %MIBS, %MUNGE);
 
-$VERSION = '3.972000';
+$VERSION = '3.972002';
 
 %MIBS = (
     %SNMP::Info::MIBS,
@@ -293,7 +293,8 @@ sub i_subinterfaces {
       my ( $higher, $lower ) = split /\./, $idx;
       next if ( $higher == 0 or $lower == 0 );
 
-      if ( $iftype->{ $higher } eq 'l2vlan' or $iftype->{ $higher } eq 'l3ipvlan') {
+      if ( $iftype->{ $higher } and
+            ($iftype->{ $higher } eq 'l2vlan' or $iftype->{ $higher } eq 'l3ipvlan') ) {
           push @{ $ret->{ $lower } }, $higher;
       }
   }

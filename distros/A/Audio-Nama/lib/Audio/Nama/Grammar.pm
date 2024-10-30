@@ -56,8 +56,8 @@ sub process_line {
 	my ($user_input) = @_;
 	logpkg(__FILE__,__LINE__,'debug',"user input: $user_input");
 	if (defined $user_input and $user_input !~ /^\s*$/) {
-		$term->addhistory($user_input) 
-			unless $user_input eq $text->{previous_cmd} or ! $term;
+		$text->{term}->addhistory($user_input) 
+			unless $user_input eq $text->{previous_cmd} or ! $text->{term};
 		$text->{previous_cmd} = $user_input;
 		
 		# convert hyphenated commands to underscore form
@@ -75,6 +75,7 @@ sub process_line {
 		# from the index
 		$this_track = $tn{Main} if ! $this_track or
 			(ref $this_track and ! $tn{$this_track->name});
+		setup_hotkeys() if $config->{hotkeys_always};
 	}
 	if (! $this_engine->started() ){
 		my $result = check_fx_consistency();
@@ -107,7 +108,7 @@ sub nama_cmd {
 			{
 				throw("bad command: $input_was\n"); 
 				$was_error++;
-				command_error_beep();
+				system($config->{beep_command}) if $config->{beep_command};
 				last;
 			};
 		}
@@ -120,7 +121,6 @@ sub nama_cmd {
 	# select chain operator if appropriate
 	# and there is a current track
 
-	stty(); # try to fix terminal echo
 	$this_engine->valid_setup() or return;
 	if ($this_track){
 		my $FX = fxn($this_track->op);
@@ -426,9 +426,9 @@ sub showlist {
 	my @list = grep{ ! $_->hide } Audio::Nama::all_tracks();
 	my $section = [undef,undef,@list];
 	my ($screen_lines, $columns);
-	if( $term )
+	if( $text->{term} )
 	{
-		($screen_lines, $columns) = $term->get_screen_size();
+		($screen_lines, $columns) = $text->{term}->get_screen_size();
 	}
 
 	return $section if scalar @list <= $screen_lines - 5
@@ -459,6 +459,7 @@ sub t_load_project {
 	return if $this_engine->started() and Audio::Nama::ChainSetup::really_recording();
 	my $name = shift;
 	my %args = @_;
+	pager("input name: $name\n");
 	$name = sanitize($name);
 	throw("Project $name does not exist\n"), return
 		unless -d join_path(project_root(), $name) or $args{create};
@@ -523,8 +524,8 @@ sub destroy_current_wav {
 		throw($this_track->name, 
 			": No current version (track set to OFF?) Skipping."), return;
 	my $wav = $this_track->full_path;
-	my $reply = $term->readline("delete WAV file $wav? [n] ");
-	#my $reply = chr($term->read_key()); 
+	my $reply = $text->{term}->readline("delete WAV file $wav? [n] ");
+	#my $reply = chr($text->{term}->read_key()); 
 	if ( $reply =~ /y/i ){
 		# remove version comments, if any
 		delete $project->{track_version_comments}{$this_track->name}{$this_track->version};
@@ -532,7 +533,7 @@ sub destroy_current_wav {
 		unlink $wav or warn "couldn't unlink $wav: $!\n";
 		refresh_wav_cache();
 	}
-	$term->remove_history($term->where_history);
+	$text->{term}->remove_history($text->{term}->where_history);
 	$this_track->set(version => $this_track->last); 
 	1;
 }
@@ -554,7 +555,7 @@ sub remove_track_cmd {
 	
 	# avoid having ownerless SlaveTracks.  
  	Audio::Nama::ChainSetup::remove_temporary_tracks();
-		$quiet or pager( "Removing track ".$track->name. ".  WAV files will be kept. Other data will be lost.");
+		$quiet or pager( "Removing track ",$track->name, ".  WAV files will be kept. Other data will be lost.");
 		remove_submix_helper_tracks($track->name);
 		$track->remove;
 		$this_track = $tn{Main};

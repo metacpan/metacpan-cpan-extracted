@@ -4,9 +4,13 @@
 class Net::SSLeay::SSL_METHOD {
   
   # Class Methods
+  native static method SSLv23_method : Net::SSLeay::SSL_METHOD ();
+  
   native static method SSLv23_client_method : Net::SSLeay::SSL_METHOD ();
   
   native static method SSLv23_server_method : Net::SSLeay::SSL_METHOD ();
+  
+  native static method TLS_method : Net::SSLeay::SSL_METHOD ();
   
   native static method TLS_client_method : Net::SSLeay::SSL_METHOD ();
   

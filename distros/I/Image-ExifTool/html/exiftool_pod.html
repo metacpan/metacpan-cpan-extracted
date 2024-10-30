@@ -82,7 +82,7 @@
 
 <h2 id="Other">Other</h2>
 
-<p><b>exiftool</b> [ <b>-ver</b> | <b>-list</b>[<b>w</b>|<b>f</b>|<b>r</b>|<b>wf</b>|<b>g</b>[<i>NUM</i>]|<b>d</b>|<b>x</b>] ]</p>
+<p><b>exiftool</b> [ <b>-ver</b> | <b>-list</b>[<b>w</b>|<b>f</b>|<b>r</b>|<b>wf</b>|<b>g</b>[<i>NUM</i>]|<b>d</b>|<b>x</b>|<b>geo</b>] ]</p>
 
 <p>For specific examples, see the <a href="#READING-EXAMPLES">EXAMPLES</a> sections below.</p>
 
@@ -100,50 +100,50 @@
 
 <pre><code>  File Types
   ------------+-------------+-------------+-------------+------------
-  360   r/w   | DOCX  r     | ITC   r     | O     r     | RSRC  r
-  3FR   r     | DPX   r     | J2C   r     | ODP   r     | RTF   r
-  3G2   r/w   | DR4   r/w/c | JNG   r/w   | ODS   r     | RW2   r/w
-  3GP   r/w   | DSS   r     | JP2   r/w   | ODT   r     | RWL   r/w
-  7Z    r     | DV    r     | JPEG  r/w   | OFR   r     | RWZ   r
-  A     r     | DVB   r/w   | JSON  r     | OGG   r     | RM    r
-  AA    r     | DVR-MS r    | JXL   r     | OGV   r     | SEQ   r
-  AAC   r     | DYLIB r     | K25   r     | ONP   r     | SKETCH r
-  AAE   r     | EIP   r     | KDC   r     | OPUS  r     | SO    r
-  AAX   r/w   | EPS   r/w   | KEY   r     | ORF   r/w   | SR2   r/w
-  ACR   r     | EPUB  r     | LA    r     | ORI   r/w   | SRF   r
-  AFM   r     | ERF   r/w   | LFP   r     | OTF   r     | SRW   r/w
-  AI    r/w   | EXE   r     | LIF   r     | PAC   r     | SVG   r
-  AIFF  r     | EXIF  r/w/c | LNK   r     | PAGES r     | SWF   r
-  APE   r     | EXR   r     | LRV   r/w   | PBM   r/w   | THM   r/w
-  ARQ   r/w   | EXV   r/w/c | M2TS  r     | PCD   r     | TIFF  r/w
-  ARW   r/w   | F4A/V r/w   | M4A/V r/w   | PCX   r     | TORRENT r
-  ASF   r     | FFF   r/w   | MACOS r     | PDB   r     | TTC   r
-  AVI   r     | FITS  r     | MAX   r     | PDF   r/w   | TTF   r
-  AVIF  r/w   | FLA   r     | MEF   r/w   | PEF   r/w   | TXT   r
-  AZW   r     | FLAC  r     | MIE   r/w/c | PFA   r     | VCF   r
-  BMP   r     | FLIF  r/w   | MIFF  r     | PFB   r     | VNT   r
-  BPG   r     | FLV   r     | MKA   r     | PFM   r     | VRD   r/w/c
-  BTF   r     | FPF   r     | MKS   r     | PGF   r     | VSD   r
-  C2PA  r     | FPX   r     | MKV   r     | PGM   r/w   | WAV   r
-  CHM   r     | GIF   r/w   | MNG   r/w   | PLIST r     | WDP   r/w
-  COS   r     | GLV   r/w   | MOBI  r     | PICT  r     | WEBP  r/w
-  CR2   r/w   | GPR   r/w   | MODD  r     | PMP   r     | WEBM  r
-  CR3   r/w   | GZ    r     | MOI   r     | PNG   r/w   | WMA   r
-  CRM   r/w   | HDP   r/w   | MOS   r/w   | PPM   r/w   | WMV   r
-  CRW   r/w   | HDR   r     | MOV   r/w   | PPT   r     | WPG   r
-  CS1   r/w   | HEIC  r/w   | MP3   r     | PPTX  r     | WTV   r
-  CSV   r     | HEIF  r/w   | MP4   r/w   | PS    r/w   | WV    r
-  CUR   r     | HTML  r     | MPC   r     | PSB   r/w   | X3F   r/w
-  CZI   r     | ICC   r/w/c | MPG   r     | PSD   r/w   | XCF   r
-  DCM   r     | ICO   r     | MPO   r/w   | PSP   r     | XISF  r
-  DCP   r/w   | ICS   r     | MQV   r/w   | QTIF  r/w   | XLS   r
-  DCR   r     | IDML  r     | MRC   r     | R3D   r     | XLSX  r
-  DFONT r     | IIQ   r/w   | MRW   r/w   | RA    r     | XMP   r/w/c
-  DIVX  r     | IND   r/w   | MXF   r     | RAF   r/w   | ZIP   r
-  DJVU  r     | INSP  r/w   | NEF   r/w   | RAM   r     |
-  DLL   r     | INSV  r     | NKSC  r/w   | RAR   r     |
-  DNG   r/w   | INX   r     | NRW   r/w   | RAW   r/w   |
-  DOC   r     | ISO   r     | NUMBERS r   | RIFF  r     |
+  360   r/w   | DOCX  r     | ITC   r     | NUMBERS r   | RAW   r/w
+  3FR   r     | DPX   r     | J2C   r     | NXD   r     | RIFF  r
+  3G2   r/w   | DR4   r/w/c | JNG   r/w   | O     r     | RSRC  r
+  3GP   r/w   | DSS   r     | JP2   r/w   | ODP   r     | RTF   r
+  7Z    r     | DV    r     | JPEG  r/w   | ODS   r     | RW2   r/w
+  A     r     | DVB   r/w   | JSON  r     | ODT   r     | RWL   r/w
+  AA    r     | DVR-MS r    | JXL   r/w   | OFR   r     | RWZ   r
+  AAC   r     | DYLIB r     | K25   r     | OGG   r     | RM    r
+  AAE   r     | EIP   r     | KDC   r     | OGV   r     | SEQ   r
+  AAX   r/w   | EPS   r/w   | KEY   r     | ONP   r     | SKETCH r
+  ACR   r     | EPUB  r     | LA    r     | OPUS  r     | SO    r
+  AFM   r     | ERF   r/w   | LFP   r     | ORF   r/w   | SR2   r/w
+  AI    r/w   | EXE   r     | LIF   r     | ORI   r/w   | SRF   r
+  AIFF  r     | EXIF  r/w/c | LNK   r     | OTF   r     | SRW   r/w
+  APE   r     | EXR   r     | LRV   r/w   | PAC   r     | SVG   r
+  ARQ   r/w   | EXV   r/w/c | M2TS  r     | PAGES r     | SWF   r
+  ARW   r/w   | F4A/V r/w   | M4A/V r/w   | PBM   r/w   | THM   r/w
+  ASF   r     | FFF   r/w   | MACOS r     | PCD   r     | TIFF  r/w
+  AVI   r     | FITS  r     | MAX   r     | PCX   r     | TORRENT r
+  AVIF  r/w   | FLA   r     | MEF   r/w   | PDB   r     | TTC   r
+  AZW   r     | FLAC  r     | MIE   r/w/c | PDF   r/w   | TTF   r
+  BMP   r     | FLIF  r/w   | MIFF  r     | PEF   r/w   | TXT   r
+  BPG   r     | FLV   r     | MKA   r     | PFA   r     | VCF   r
+  BTF   r     | FPF   r     | MKS   r     | PFB   r     | VNT   r
+  C2PA  r     | FPX   r     | MKV   r     | PFM   r     | VRD   r/w/c
+  CHM   r     | GIF   r/w   | MNG   r/w   | PGF   r     | VSD   r
+  COS   r     | GLV   r/w   | MOBI  r     | PGM   r/w   | WAV   r
+  CR2   r/w   | GPR   r/w   | MODD  r     | PLIST r     | WDP   r/w
+  CR3   r/w   | GZ    r     | MOI   r     | PICT  r     | WEBP  r/w
+  CRM   r/w   | HDP   r/w   | MOS   r/w   | PMP   r     | WEBM  r
+  CRW   r/w   | HDR   r     | MOV   r/w   | PNG   r/w   | WMA   r
+  CS1   r/w   | HEIC  r/w   | MP3   r     | PPM   r/w   | WMV   r
+  CSV   r     | HEIF  r/w   | MP4   r/w   | PPT   r     | WPG   r
+  CUR   r     | HTML  r     | MPC   r     | PPTX  r     | WTV   r
+  CZI   r     | ICC   r/w/c | MPG   r     | PS    r/w   | WV    r
+  DCM   r     | ICO   r     | MPO   r/w   | PSB   r/w   | X3F   r/w
+  DCP   r/w   | ICS   r     | MQV   r/w   | PSD   r/w   | XCF   r
+  DCR   r     | IDML  r     | MRC   r     | PSP   r     | XISF  r
+  DFONT r     | IIQ   r/w   | MRW   r/w   | QTIF  r/w   | XLS   r
+  DIVX  r     | IND   r/w   | MXF   r     | R3D   r     | XLSX  r
+  DJVU  r     | INSP  r/w   | NEF   r/w   | RA    r     | XMP   r/w/c
+  DLL   r     | INSV  r     | NKA   r     | RAF   r/w   | ZIP   r
+  DNG   r/w   | INX   r     | NKSC  r/w   | RAM   r     |
+  DOC   r     | ISO   r     | NRW   r/w   | RAR   r     |
 
   Meta Information
   ----------------------+----------------------+---------------------
@@ -253,7 +253,8 @@
 
 <p><a href="#Special-features">Special features</a></p>
 
-<pre><code>  -geotag TRKFILE                  Geotag images from specified GPS log
+<pre><code>  -diff FILE2                      Compare metadata with another file
+  -geotag TRKFILE                  Geotag images from specified GPS log
   -globalTimeShift SHIFT           Shift all formatted date/time values
   -use MODULE                      Add features from plug-in module</code></pre>
 
@@ -268,7 +269,7 @@
   -common_args                     Define common arguments
   -config CFGFILE                  Specify configuration file name
   -echo[NUM] TEXT                  Echo text to stdout or stderr
-  -efile[NUM][!] ERRFILE           Save names of files with errors
+  -efile[NUM][!] TXTFILE           Save names of files with errors
   -execute[NUM]                    Execute multiple commands on one line
   -fileNUM ALTFILE                 Load tags from alternate file
   -list_dir                        List directories, not their contents
@@ -307,7 +308,7 @@
 <dt id="TAG---VALUE"><b>-</b><i>TAG</i>[+-^]<b>=</b>[<i>VALUE</i>]</dt>
 <dd>
 
-<p>Write a new value for the specified tag (eg. <code>-comment=wow</code>), or delete the tag if no <i>VALUE</i> is given (eg. <code>-comment=</code>). <code>+=</code> and <code>-=</code> are used to add or remove existing entries from a list, or to shift date/time values (see <a>Image::ExifTool::Shift.pl</a> and note 6 below for more details). <code>+=</code> may also be used to increment numerical values (or decrement if <i>VALUE</i> is negative), and <code>-=</code> may be used to conditionally delete or replace a tag (see <a href="#WRITING-EXAMPLES">&quot;WRITING EXAMPLES&quot;</a> for examples). <code>^=</code> is used to write an empty string instead of deleting the tag when no <i>VALUE</i> is given, but otherwise it is equivalent to <code>=</code>. (Note that the caret must be quoted on the Windows command line.)</p>
+<p>Write a new value for the specified tag (eg. <code>-comment=wow</code>), or delete the tag if no <i>VALUE</i> is given (eg. <code>-comment=</code>). <code>+=</code> and <code>-=</code> are used to add or remove existing entries from a list, or to shift date/time values (see <a>Image::ExifTool::Shift.pl</a> and notes 6 and 7 below for more details). <code>+=</code> may also be used to increment numerical values (or decrement if <i>VALUE</i> is negative), and <code>-=</code> may be used to conditionally delete or replace a tag (see <a href="#WRITING-EXAMPLES">&quot;WRITING EXAMPLES&quot;</a> for examples). <code>^=</code> is used to write an empty string instead of deleting the tag when no <i>VALUE</i> is given, but otherwise it is equivalent to <code>=</code>. (Note that the caret must be quoted on the Windows command line.)</p>
 
 <p><i>TAG</i> may contain one or more leading family 0, 1, 2 or 7 group names, prefixed by optional family numbers, and separated colons. If no group name is specified, the tag is created in the preferred group, and updated in any other location where a same-named tag already exists. The preferred group in JPEG and TIFF-format images is the first group in the following list where <i>TAG</i> is valid: 1) EXIF, 2) IPTC, 3) XMP.</p>
 
@@ -339,6 +340,8 @@
 <p>5) The &quot;APP&quot; group names (&quot;APP0&quot; through &quot;APP15&quot;) are used to delete JPEG application segments which are not associated with another deletable group. For example, specifying <code>-APP14:All=</code> will NOT delete the APP14 &quot;Adobe&quot; segment because this is accomplished with <code>-Adobe:All</code>. But note that these unnamed APP segments may not be excluded with <code>--APPxx:all</code> when deleting all information.</p>
 
 <p>6) When shifting a value, the shift is applied to the original value of the tag, overriding any other values previously assigned to the tag on the same command line. To shift a date/time value and copy it to another tag in the same operation, use the <b>-globalTimeShift</b> option.</p>
+
+<p>7) The <code>+=</code> operator may not be used to shift a List-type date/time tag (eg. XMP-dc:Date) because <code>+=</code> is used to add elements to the list. Instead, the <b>-globalTimeShift</b> option should be used.</p>
 
 <p>Special feature: Integer values may be specified in hexadecimal with a leading <code>0x</code>, and simple rational values may be specified as fractions.</p>
 
@@ -388,7 +391,7 @@
 
 <p>7) Structured tags are copied by default when copying tags. See the <b>-struct</b> option for details.</p>
 
-<p>8) With the redirection feature, copying a tag directly (ie. &quot;&#39;-<i>DSTTAG</i>&lt;<i>SRCTAG</i>&#39;&quot;) is not the same as interpolating its value inside a string (ie. &quot;&#39;-<i>DSTTAG</i>&lt;$<i>SRCTAG</i>&#39;&quot;) for source tags which are list-type tags, <a>shortcut tags</a>, tag names containing wildcards, or UserParam variables. When copying directly, the values of each matching source tag are copied individually to the destination tag (as if they were separate assignments). However, when interpolated inside a string, list items and the values of shortcut tags are concatenated (with a separator set by the <b>-sep</b> option), and wildcards are not allowed. Also, UserParam variables are available only when interpolated in a string. Another difference is that a minor warning is generated if a tag doesn&#39;t exist when interpolating its value in a string (with <code>$</code>), but isn&#39;t when copying the tag directly.</p>
+<p>8) With the redirection feature, copying a tag directly (ie. &quot;&#39;-<i>DSTTAG</i>&lt;<i>SRCTAG</i>&#39;&quot;) is not the same as interpolating its value inside a string (ie. &quot;&#39;-<i>DSTTAG</i>&lt;$<i>SRCTAG</i>&#39;&quot;) for source tags which are list-type tags, <a>shortcut tags</a>, or tag names containing wildcards. When copying directly, the values of each matching source tag are copied individually to the destination tag (as if they were separate assignments). However, when interpolated inside a string, list items and the values of shortcut tags are concatenated (with a separator set by the <b>-sep</b> option), and wildcards are not allowed.Another difference is that a minor warning is generated if a tag doesn&#39;t exist when interpolating its value in a string (with <code>$</code>), but isn&#39;t when copying the tag directly.</p>
 
 <p>Finally, the behaviour is different when a destination tag or group of <code>All</code> is used. When copying directly, a destination group and/or tag name of <code>All</code> writes to the same family 1 group and/or tag name as the source. But when interpolated in a string, the identity of the source tags are lost and the value is written to all possible groups/tags. For example, the string form must be used in the following command since the intent is to set the value of all existing date/time tags from <code>CreateDate</code>:</p>
 
@@ -446,7 +449,7 @@
 
 <p>1) To avoid loss of precision, the default coordinate format is different when copying tags using the <b>-tagsFromFile</b> option.</p>
 
-<p>2) If the hemisphere is known, a reference direction (N, S, E or W) is appended to each printed coordinate, but adding a <code>+</code> to the format specifier (eg. <code>%+.6f</code>) prints a signed coordinate instead.</p>
+<p>2) If the hemisphere is known, a reference direction (N, S, E or W) is appended to each printed coordinate, but adding a <code>+</code> or <code>-</code> to the format specifier (eg. <code>%+.6f</code> or <code>%-.6f</code>) prints a signed coordinate instead. (<code>+</code> adds a leading &quot;+&quot; for positive coordinates, but <code>-</code> does not.)</p>
 
 <p>3) This print formatting may be disabled with the <b>-n</b> option to extract coordinates as signed decimal degrees.</p>
 
@@ -676,7 +679,7 @@
 <dt id="p---STR-or-FMTFILE--printFormat"><b>-p</b>[-] <i>STR</i> or <i>FMTFILE</i> (<b>-printFormat</b>)</dt>
 <dd>
 
-<p>Print output in the format specified by the given string or file. The argument is interpreted as a string unless a file of that name exists, in which case the string is loaded from the contents of the file. Tag names in the format string or file begin with a <code>$</code> symbol and may contain leading group names and/or a trailing <code>#</code> (to disable print conversion). Case is not significant. Braces <code>{}</code> may be used around the tag name to separate it from subsequent text (and must be used if subsequent text begins with an alphanumeric character, hyphen, underline, colon or number sign). Use <code>$$</code> to represent a <code>$</code> symbol, and <code>$/</code> for a newline. When the string argument is used (ie. <i>STR</i>), a newline is added to the end of the string unless <b>-p-</b> is specified.</p>
+<p>Print output in the format specified by the given string or file. The argument is interpreted as a string unless a file of that name exists, in which case the string is loaded from the contents of the file. Tag names in the format string or file begin with a <code>$</code> symbol and may contain leading group names and/or a trailing <code>#</code> (to disable print conversion). Case is not significant. Braces <code>{}</code> may be used around the tag name to separate it from subsequent text (and must be used if subsequent text begins with an alphanumeric character, hyphen, underline, colon or number sign). Use <code>$$</code> to represent a <code>$</code> symbol, and <code>$/</code> for a newline. When the string argument is used (ie. <i>STR</i>), a newline is added to the end of the string unless <b>-p-</b> is specified or the <b>-b</b> option is used.</p>
 
 <p>Multiple <b>-p</b> options may be used. Lines beginning with <code>#[HEAD]</code> and <code>#[TAIL]</code> are output before the first processed file and after the last processed file respectively. Lines beginning with <code>#[SECT]</code> and <code>#[ENDS]</code> are output before and after each section of files. A section is defined as a group of consecutive files with the same section header (eg. files are grouped by directory if <code>#[SECT]</code> contains <code>$directory</code>). Lines beginning with <code>#[BODY]</code> and lines not beginning with <code>#</code> are output for each processed file. Lines beginning with <code>#[IF]</code> are not output, but all BODY lines are skipped if any tag on an IF line doesn&#39;t exist. Other lines beginning with <code>#</code> are ignored. (To output a line beginning with <code>#</code>, use <code>#[BODY]#</code>.) For example, this format file:</p>
 
@@ -692,7 +695,7 @@
 
 <p>produces output like this:</p>
 
-<pre><code>    -- Generated by ExifTool 12.76 --
+<pre><code>    -- Generated by ExifTool 13.00 --
     File: a.jpg - 2003:10:31 15:44:19
     (f/5.6, 1/60s, ISO 100)
     File: b.jpg - 2006:05:23 11:57:38
@@ -848,7 +851,9 @@
     -w H%-lc.txt      # H.txt, H-b.txt, H-c.txt ...
     -w I.%.3uc.txt    # I.AAA.txt, I.AAB.txt, I.AAC.txt ...</code></pre>
 
-<p>A special feature allows the copy number to be incremented for each processed file by using %C (upper case) instead of %c. This allows a sequential number to be added to output file names, even if the names are different. For %C, a copy number of zero is not omitted as it is with %c. A leading &#39;-&#39; causes the number to be reset at the start of each new directory, and &#39;+&#39; has no effect. The number before the decimal place gives the starting index, the number after the decimal place gives the field width. The following examples show the output filenames when used with the command <code>exiftool rose.jpg star.jpg jet.jpg ...</code>:</p>
+<p>A special feature allows the copy number to be incremented for each processed file by using %C (upper case) instead of %c. This allows a sequential number to be added to output file names, even if the names are different. For %C, a copy number of zero is not omitted as it is with %c. A leading &#39;-&#39; causes the number to be reset at the start of each new directory (in the original directory structure if the files are being moved), and &#39;+&#39; has no effect. The number before the decimal place gives the starting index, the number after the decimal place gives the field width. To preserve synchronization with the processed file number, by default the copy number is not incremented to avoid file name collisions, so any existing same-named file will cause an error. However using a colon instead of a decimal point causes the number to be incremented to avoid collisions with existing files.</p>
+
+<p>The following examples show the output filenames when used with the command <code>exiftool rose.jpg star.jpg jet.jpg ...</code>:</p>
 
 <pre><code>    -w %C%f.txt       # 0rose.txt, 1star.txt, 2jet.txt
     -w %f-%10C.txt    # rose-10.txt, star-11.txt, jet-12.txt
@@ -964,7 +969,7 @@
 <dt id="fileOrder-NUM---TAG"><b>-fileOrder</b>[<i>NUM</i>] [-]<i>TAG</i></dt>
 <dd>
 
-<p>Set file processing order according to the sorted value of the specified <i>TAG</i>. For example, to process files in order of date:</p>
+<p>Set file processing order according to the sorted value of the specified <i>TAG</i>. Without this option, files are processed in the order returned by the system, which is commonly by file name, but this is filesystem dependent. For example, to process files in order of date:</p>
 
 <pre><code>    exiftool -fileOrder DateTimeOriginal DIR</code></pre>
 
@@ -1012,7 +1017,7 @@
 
 <p>4) The condition accesses only tags from the file being processed unless the <b>-fileNUM</b> option is used to read an alternate file and the corresponding family 8 group name is specified for the tag. See the <b>-fileNUM</b> option details for more information.</p>
 
-<p>5) The <b>-a</b> option has no effect on the evaluation of the expression, and the values of duplicate tags are accessible only by specifying a group name (such as a family 4 instance number, eg. <code>$Copy1:TAG</code>, <code>$Copy2:TAG</code>, etc).</p>
+<p>5) The <b>-a</b> (Duplicates) option is implied when <b>-if</b> is used without a fast <i>NUM</i>, and the values of duplicate tags are accessible by specifying a group name in the expression (such as a family 4 instance number, eg. <code>$Copy1:TAG</code>, <code>$Copy2:TAG</code>, etc).</p>
 
 <p>6) A special &quot;OK&quot; UserParam is available to test the success of the previous command when <b>-execute</b> was used, and may be used like any other tag in the condition (ie. &quot;$OK&quot;).</p>
 
@@ -1151,10 +1156,10 @@
 <p>Pause with the message <code>-- press any key --</code> or <code>-- press RETURN --</code> (depending on your system) before terminating. This option is used to prevent the command window from closing when run as a Windows drag and drop application.</p>
 
 </dd>
-<dt id="list--listw--listf--listr--listwf--listg-NUM--listd--listx"><b>-list</b>, <b>-listw</b>, <b>-listf</b>, <b>-listr</b>, <b>-listwf</b>, <b>-listg</b>[<i>NUM</i>], <b>-listd</b>, <b>-listx</b></dt>
+<dt id="list--listw--listf--listr--listwf--listg-NUM--listd--listx--listgeo"><b>-list</b>, <b>-listw</b>, <b>-listf</b>, <b>-listr</b>, <b>-listwf</b>, <b>-listg</b>[<i>NUM</i>], <b>-listd</b>, <b>-listx</b>, <b>-listgeo</b></dt>
 <dd>
 
-<p>Print a list of all valid tag names (<b>-list</b>), all writable tag names (<b>-listw</b>), all supported file extensions (<b>-listf</b>), all recognized file extensions (<b>-listr</b>), all writable file extensions (<b>-listwf</b>), all tag groups [in a specified family] (<b>-listg</b>[<i>NUM</i>]), all deletable tag groups (<b>-listd</b>), or an XML database of tag details including language translations (<b>-listx</b>). The <b>-list</b>, <b>-listw</b> and <b>-listx</b> options may be followed by an additional argument of the form <code>-GROUP:All</code> to list only tags in a specific group, where <code>GROUP</code> is one or more family 0-2 group names (excepting EXIF IFD groups) separated by colons. With <b>-listg</b>, <i>NUM</i> may be given to specify the group family, otherwise family 0 is assumed. The <b>-l</b> option may be combined with <b>-listf</b>, <b>-listr</b> or <b>-listwf</b> to add file descriptions to the list. The <b>-lang</b> option may be combined with <b>-listx</b> to output descriptions in a single language. Here are some examples:</p>
+<p>Print a list of all valid tag names (<b>-list</b>), all writable tag names (<b>-listw</b>), all supported file extensions (<b>-listf</b>), all recognized file extensions (<b>-listr</b>), all writable file extensions (<b>-listwf</b>), all tag groups [in a specified family] (<b>-listg</b>[<i>NUM</i>]), all deletable tag groups (<b>-listd</b>), an XML database of tag details including language translations (<b>-listx</b>), or the Geolocation database (<b>-listgeo</b>). The <b>-list</b>, <b>-listw</b> and <b>-listx</b> options may be followed by an additional argument of the form <code>-GROUP:All</code> to list only tags in a specific group, where <code>GROUP</code> is one or more family 0-2 group names (excepting EXIF IFD groups) separated by colons. With <b>-listg</b>, <i>NUM</i> may be given to specify the group family, otherwise family 0 is assumed. The <b>-l</b> option may be combined with <b>-listf</b>, <b>-listr</b> or <b>-listwf</b> to add file descriptions to the list. The <b>-lang</b> option may be combined with <b>-listx</b> to output descriptions in a single language, and the <b>-sort</b> and/or <b>-lang</b> options may be combined with <b>-listgeo</b>. Also, the API GeolocMinPop, GeolocFeature and GeolocAltNames options apply to the <b>-listgeo</b> output. Here are some examples:</p>
 
 <pre><code>    -list               # list all tag names
     -list -EXIF:All     # list all EXIF tags
@@ -1166,9 +1171,10 @@
     -listg1             # list all groups in family 1
     -listd              # list all deletable groups
     -listx -EXIF:All    # list database of EXIF tags in XML format
-    -listx -XMP:All -s  # list short XML database of XMP tags</code></pre>
+    -listx -XMP:All -s  # list short XML database of XMP tags
+    -listgeo -lang de   # list geolocation database in German</code></pre>
 
-<p>When combined with <b>-listx</b>, the <b>-s</b> option shortens the output by omitting the descriptions and values (as in the last example above), and <b>-f</b> adds &#39;flags&#39; and &#39;struct&#39; attributes if applicable. The flags are formatted as a comma-separated list of the following possible values: Avoid, Binary, List, Mandatory, Permanent, Protected, Unknown and Unsafe (see the <a>Tag Name documentation</a>). For XMP List tags, the list type (Alt, Bag or Seq) is added to the flags, and flattened structure tags are indicated by a Flattened flag with &#39;struct&#39; giving the ID of the parent structure.</p>
+<p>When combined with <b>-listx</b>, the <b>-s</b> option shortens the output by omitting the descriptions and values (as in the last example above), and <b>-f</b> adds &#39;flags&#39; and &#39;struct&#39; attributes if applicable. The flags are formatted as a comma-separated list of the following possible values: Avoid, Binary, List, Mandatory, Permanent, Protected, Unknown and Unsafe (see the <a>Tag Name documentation</a>). For XMP List tags, the list type (Alt, Bag or Seq) is also given, and flattened structure tags are indicated by a Flattened flag with &#39;struct&#39; giving the ID of the parent structure.</p>
 
 <p>Note that none of the <b>-list</b> options require an input <i>FILE</i>.</p>
 
@@ -1191,6 +1197,16 @@
 
 <dl>
 
+<dt id="diff-FILE2"><b>-diff</b> <i>FILE2</i></dt>
+<dd>
+
+<p>Compare metadata in <i>FILE</i> with <i>FILE2</i>. The <i>FILE2</i> name may include filename formatting codes (see the <b>-w</b> option). All extracted tags from the files are compared, but the extracted tags may be controlled by adding <b>-TAG</b> or <b>--TAG</b> options. For example, below is a command to compare all the same-named files in two different directories, ignoring the System tags:</p>
+
+<pre><code>    exiftool DIR1 -diff DIR2/%f.%e --system:all</code></pre>
+
+<p>The <b>-g</b> and <b>-G</b> options may be used to organize the output by the specified family of groups, with <b>-G1</b> being the default. The <b>-a</b> option is implied. Adding <b>-v</b> includes a count of the number of tags that are the same in each group. The following text formatting options are valid when <b>-diff</b> is used: <b>-c</b>, <b>-charset</b>, <b>-d</b>, <b>-E</b>, <b>-ec</b>, <b>-ex</b>, <b>-L</b>, <b>-lang</b>, <b>-n</b>, <b>-s</b>, <b>-sep</b>, <b>-struct</b> and <b>-w</b>.</p>
+
+</dd>
 <dt id="geotag-TRKFILE"><b>-geotag</b> <i>TRKFILE</i></dt>
 <dd>
 
@@ -1212,6 +1228,8 @@
 <pre><code>    exiftool -geotag &quot;TRACKDIR/*.log&quot; IMAGEDIR</code></pre>
 
 <p>Currently supported track file formats are GPX, NMEA RMC/GGA/GLL, KML, IGC, Garmin XML and TCX, Magellan PMGNTRK, Honeywell PTNTHPR, Bramor gEO, Winplus Beacon TXT, and GPS/IMU CSV files. See <a href="#GEOTAGGING-EXAMPLES">&quot;GEOTAGGING EXAMPLES&quot;</a> for examples. Also see &quot;geotag.html&quot; in the full ExifTool distribution and the <a>Image::ExifTool Options</a> for more details and for information about geotag configuration options.</p>
+
+<p>The API Geolocation option may be set to the value &quot;geotag&quot; to also write the name, province/state and country of the nearest city while geotagging. See <a href="https://exiftool.org/geolocation.html">https://exiftool.org/geolocation.html</a> for details.</p>
 
 </dd>
 <dt id="globalTimeShift-SHIFT"><b>-globalTimeShift</b> <i>SHIFT</i></dt>
@@ -1290,10 +1308,10 @@
 <p>Echo <i>TEXT</i> to stdout (<b>-echo</b> or <b>-echo1</b>) or stderr (<b>-echo2</b>). Text is output as the command line is parsed, before the processing of any input files. <i>NUM</i> may also be 3 or 4 to output text (to stdout or stderr respectively) after processing is complete. For <b>-echo3</b> and <b>-echo4</b>, &quot;${status}&quot; may be used in the <i>TEXT</i> string to represent the numerical exit status of the command (see <a href="#EXIT-STATUS">&quot;EXIT STATUS&quot;</a>).</p>
 
 </dd>
-<dt id="efile-NUM-ERRFILE"><b>-efile</b>[<i>NUM</i>][!] <i>ERRFILE</i></dt>
+<dt id="efile-NUM-TXTFILE"><b>-efile</b>[<i>NUM</i>][!] <i>TXTFILE</i></dt>
 <dd>
 
-<p>Save the names of files giving errors (<i>NUM</i> missing or 1), files that were unchanged (<i>NUM</i> is 2), files that fail the <b>-if</b> condition (<i>NUM</i> is 4), files that were updated (<i>NUM</i> is 8), files that were created (<i>NUM</i> is 16), or any combination thereof by summing <i>NUM</i> (eg. <b>-efile3</b> is the same has having both <b>-efile</b> and <b>-efile2</b> options with the same <i>ERRFILE</i>). By default, file names are appended to any existing <i>ERRFILE</i>, but <i>ERRFILE</i> is overwritten if an exclamation point is added to the option (eg. <b>-efile!</b>). Saves the name of the file specified by the <b>-srcfile</b> option if applicable.</p>
+<p>Save the names of files giving errors (<i>NUM</i> missing or 1), files that were unchanged (<i>NUM</i> is 2), files that fail the <b>-if</b> condition (<i>NUM</i> is 4), files that were updated (<i>NUM</i> is 8), files that were created (<i>NUM</i> is 16), or any combination thereof by summing <i>NUM</i> (eg. <b>-efile3</b> is the same has having both <b>-efile</b> and <b>-efile2</b> options with the same <i>TXTFILE</i>). By default, file names are appended to any existing <i>TXTFILE</i>, but <i>TXTFILE</i> is overwritten if an exclamation point is added to the option (eg. <b>-efile!</b>). Saves the name of the file specified by the <b>-srcfile</b> option if applicable.</p>
 
 </dd>
 <dt id="execute-NUM"><b>-execute</b>[<i>NUM</i>]</dt>
@@ -1420,6 +1438,16 @@
 <p>ExifTool 12.64 adds an API NoDups option which makes the NoDups helper function largely redundant, with all the functionality except the ability to avoid rewriting the file if there are no duplicates, but with the advantage the duplicates may be removed when accumulating list items from multiple sources. An equivalent to the above commands using this feature would be:</p>
 
 <pre><code>    exiftool -tagsfromfile @ -keywords -api nodups a.jpg</code></pre>
+
+<p><code>SetTags</code></p>
+
+<p>Used to set tags in extracted images. With no arguments, copies all tags from the source file to the embedded image:</p>
+
+<pre><code>    exiftool -p &#39;${previewimage;SetTags}&#39; -b a.arw &gt; preview.jpg</code></pre>
+
+<p>Arguments may be added to copy or set specific tags. Arguments take exactly the same form as those on the command line when copying or writing tags, but without the leading dash. For example:</p>
+
+<pre><code>    exiftool -p &#39;${previewimage;SetTags(&quot;comment=test&quot;,&quot;title&lt;filename&quot;)}&#39; ...</code></pre>
 
 <h1 id="WINDOWS-UNICODE-FILE-NAMES">WINDOWS UNICODE FILE NAMES</h1>
 
@@ -1937,6 +1965,12 @@
 <dd>
 
 <p>Geotag an image (<code>a.jpg</code>) from position information in a GPS track log (<code>track.log</code>). Since the <code>Geotime</code> tag is not specified, the value of DateTimeOriginal is used for geotagging. Local system time is assumed unless DateTimeOriginal contains a timezone.</p>
+
+</dd>
+<dt id="exiftool--geotag-track.log--geolocate-geotag-a.jpg">exiftool -geotag track.log -geolocate=geotag a.jpg</dt>
+<dd>
+
+<p>Geotag an image and also write geolocation information of the nearest city (city name, state/province and country). Read here for more details about the Geolocation feature: <a href="https://exiftool.org/geolocation.html#Write">https://exiftool.org/geolocation.html#Write</a></p>
 
 </dd>
 <dt id="exiftool--geotag-t.log--geotime-2009:04:02-13:41:12-05:00-a.jpg">exiftool -geotag t.log -geotime=&#39;2009:04:02 13:41:12-05:00&#39; a.jpg</dt>

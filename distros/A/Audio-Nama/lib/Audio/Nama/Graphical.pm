@@ -3,7 +3,7 @@
 package Audio::Nama::Graphical;  ## gui routines
 use Modern::Perl '2020'; use Carp;
 our $VERSION = 1.071;
-use Audio::Nama::Globals qw($term $prompt);
+use Audio::Nama::Globals qw($text $prompt);
 
 use Module::Load::Conditional qw(can_load);
 use Audio::Nama::Assign qw(:all);
@@ -19,10 +19,10 @@ our @ISA = 'Audio::Nama';      ## default to root namespace, e.g.  Refresh_subs,
 
 sub hello {"make a window";}
 sub loop {
-	$term->Attribs->{already_prompted} = 0;
-	$term->tkRunning(1);
+	$text->{term_attribs}->{already_prompted} = 0;
+	$text->{term}->tkRunning(1);
   	while (1) {
-  		my ($user_input) = $term->readline($prompt) ;
+  		my ($user_input) = $text->{term}->readline($prompt) ;
   		Audio::Nama::process_line( $user_input );
   	}
 }
@@ -205,7 +205,7 @@ sub init_gui {
 				stop_transport() if $this_engine->started;
 				save_state($gui->{_save_id});
 				pager("Exiting... \n");
-				#$term->tkRunning(0);
+				#$text->{term}->tkRunning(0);
 				#$gui->{ew}->destroy;
 				#$gui->{mw}->destroy;
 				#Audio::Nama::nama_cmd('quit');
@@ -353,21 +353,21 @@ sub time_gui {
 	my @minuses = map{ - $_ } reverse @pluses;
 	my @fw = map{ my $d = $_; $gui->{seek_frame}->Button(
 			-text => $d,
-			-command => sub { jump($d * $gui->{_seek_unit} ) },
+			-command => sub { jump($d) },
 			)
 		}  @pluses ;
 	my @rew = map{ my $d = $_; $gui->{seek_frame}->Button(
 			-text => $d,
-			-command => sub { jump($d * $gui->{_seek_unit} ) },
+			-command => sub { jump($d) },
 			)
 		}  @minuses ;
 	my $beg = $gui->{seek_frame}->Button(
 			-text => 'Beg',
-			-command => \&jump_to_start,
+			-command => \&to_start,
 			);
 	my $end = $gui->{seek_frame}->Button(
 			-text => 'End',
-			-command => \&jump_to_end,
+			-command => \&to_end,
 			);
 
 	$gui->{seek_unit} = $gui->{seek_frame}->Button( 

@@ -3,6 +3,8 @@
 # contributed by S. Massy
 #
 package Audio::Nama::AnalyseLV2;
+use Modern::Perl '2020';
+our $VERSION = 1.0;
 use Audio::Nama::Log qw(logpkg);
 # Initialise our global variables:
 # Store the plugin info:

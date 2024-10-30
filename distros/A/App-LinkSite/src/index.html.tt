@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta property="og:title" content="[% site.name %] / @[% site.handle %]">
+    <meta property="og:type" content="website">
+[% IF site.desc -%]
+    <meta property="og:description" content='[% site.desc.replace("\n", ' ') %]'>
+[% END -%]
+[% IF site.og_image -%]
+    <meta property="og:image" content="[% site.site_url %]img/[% site.og_image %]">
+[% END -%]
+    <meta property="og:url" content="[% site.site_url %]">
+[% IF ga4 -%]
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KHXQ2SWP9P"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '[% ga4 %]');
+    </script>
+[% END -%]
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+[% IF site.font_awesome_kit -%]
+    <script src="https://kit.fontawesome.com/[% font_awesome_kit %].js" crossorigin="anonymous"></script>
+[% END -%]
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+          crossorigin="anonymous">
+
+    <title>[% site.name %] / @[% site.handle %]</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="application/ld+json">
+[% site.json_ld %]
+    </script>
+  </head>
+  <body>
+    <div class="container-fluid text-center">
+      <header>
+[% IF site.image -%]
+        <div id="img"><img src="/img/[% site.image %]" alt="[% site.name %] / @[% site.handle %]"></div>
+[% END -%]
+        <div id="name">
+          <h1>[% site.name %] / @[% site.handle %]</h1>
+        </div>
+        <div id="desc">[% site.desc.replace("\n", '<br>') %]</div>
+      </header>
+      <div id="social">
+        <h2>Social</h2>
+        <p>
+[% FOR service IN site.socials;
+     service.mk_social_icon(handle);
+   END -%]
+        </p>
+      </div>
+      <div id="links">
+        <h2>Links</h2>
+        <ul class="list-group">
+[% FOR link IN site.links;
+     link.mk_link;
+   END -%]
+        </ul>
+      </div>
+      <footer>
+        Made by <a href="https://twitter.com/davorg">@davorg</a>.
+        Code on <a href="https://github.com/davorg/links">GitHub</a>.
+      </footer>
+    </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Bootstrap JS -->
+    <script
+      src="https://code.jquery.com/jquery-3.6.1.min.js"
+      integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+[% USE date -%]
+    <!-- Built at: [% date.format %] -->
+  </body>
+</html>

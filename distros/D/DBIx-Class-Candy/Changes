@@ -1,5 +1,8 @@
 Revision history for DBIx-Class-Candy
 
+0.005004  2024-10-29 17:04:32-05:00 America/Chicago
+ - Remove given/when
+
 0.005003  2017-07-14 09:29:22-07:00 America/Los_Angeles
  - Stop depending on String::CamelCase (closes GH#15)
    (Good find Peter Rabbitson!)

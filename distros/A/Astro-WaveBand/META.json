@@ -7,7 +7,7 @@
       "Tim Lister <tlister@lcogt.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
    "provides" : {
       "Astro::WaveBand" : {
          "file" : "lib/Astro/WaveBand.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -44,5 +44,6 @@
          "url" : "https://github.com/timj/perl-Astro-WaveBand.git"
       }
    },
-   "version" : "0.11"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }
