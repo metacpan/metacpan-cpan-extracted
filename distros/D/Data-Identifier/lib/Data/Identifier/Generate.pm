@@ -13,11 +13,11 @@ use warnings;
 
 use Carp;
 use Encode qw(encode);
-use UUID::Tiny ();
+use Digest;
 
 use Data::Identifier;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 
 sub integer {
@@ -162,9 +162,89 @@ sub generic {
 
     {
         my $ns = ref($opts{namespace}) ? $opts{namespace}->uuid(no_defaults => 1) : $opts{namespace};
-        my $uuid = UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_SHA1(), $ns, $opts{input});
+        my $uuid = $pkg->_uuid_v5($ns, $opts{input});
         return Data::Identifier->new(uuid => $uuid, displayname => $opts{displayname});
     }
+}
+
+# ---- Private helpers ----
+
+sub _available_module {
+    my (@modules) = @_;
+    state $tried = {};
+
+    foreach my $module (@modules) {
+        if (exists $tried->{$module}) {
+            next unless $tried->{$module};
+            return $module;
+        } else {
+            my $res = eval {
+                my $modname = $module =~ s#::#/#gr;
+                require $modname.'.pm';
+                1;
+            };
+            $tried->{$module} = $res;
+            return $module if $res;
+        }
+    }
+
+    croak 'Found none of modules ['.join(', ', @modules).']';
+}
+
+sub _finish {
+    my ($raw, $version) = @_;
+    substr($raw, 6, 1, chr((ord(substr($raw, 6, 1)) & 0x0F) | ($version << 4)));
+    substr($raw, 8, 1, chr((ord(substr($raw, 8, 1)) & 0x3F) | 0x80));
+    return join('-', unpack('H8H4H4H4H12', $raw));
+}
+
+sub _random {
+    my ($pkg, %opts) = @_;
+    my $sources = $opts{sources} // (state $default_sources = [qw(Crypt::URandom UUID4::Tiny Math::Random::Secure UUID::URandom UUID::Tiny::Patch::UseMRS)]);
+    my $source = _available_module(@{$sources});
+    my $raw;
+
+    # Secure:
+    if ($source eq 'Crypt::URandom') {
+        $raw = Crypt::URandom::urandom(16);
+    } elsif ($source eq 'UUID4::Tiny') {
+        return UUID4::Tiny::create_uuid_string();
+    } elsif ($source eq 'Math::Random::Secure') {
+        $raw = join('', map {chr Math::Random::Secure::irand(256)} 0..15);
+    } elsif ($source eq 'UUID::URandom') {
+        return UUID::URandom::create_uuid_string();
+    } elsif ($source eq 'UUID::Tiny::Patch::UseMRS') {
+        return UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_RANDOM());
+
+    # Insecure:
+    } elsif ($source eq 'UUID::Tiny') {
+        return UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_RANDOM());
+        #} elsif ($source eq '') {
+    } else {
+        croak 'Invalid/unsupported source';
+    }
+
+    if (defined($raw) && length($raw) == 16) {
+        return _finish($raw, 4);
+    }
+
+    croak 'Bug!';
+}
+
+sub _uuid_v5 {
+    my ($pkg, $ns, $data) = @_;
+    my $digest = Digest->new('SHA-1');
+
+    $ns = $ns->uuid(no_defaults => 1) if ref $ns;
+
+    $ns = pack('H*', $ns =~ tr/-//dr);
+
+    croak 'Invalid namespace given' unless length($ns) == 16;
+
+    $digest->add($ns);
+    $digest->add($data);
+
+    return _finish(substr($digest->digest, 0, 16), 5);
 }
 
 1;
@@ -181,7 +261,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 

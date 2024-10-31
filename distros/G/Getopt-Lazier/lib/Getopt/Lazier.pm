@@ -11,16 +11,16 @@ Getopt::Lazier - Lazy Getopt-like command-line options and argument parser
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 =head1 SYNOPSIS
 
-`my ($opt, @DARG) = Getopt::Lazier->new(@ARGV);`
+   my ($opt, @DARG) = Getopt::Lazier->new(@ARGV);
 
 =head2 EXAMPLE USAGE
 
@@ -30,7 +30,7 @@ our $VERSION = '0.03';
 
    use Data::Dumper; print Dumper([$opt, \@DARG])."\n";
 
-   # perl lazyscript.pl -help a b c d -meow=5345923 -awoo="doggo vibes"
+   # perl lazyscript.pl -help a b c d --meow=5345923 -awoo="doggo vibes" -- --this-aint-no-option
 
    $VAR1 = [
       {
@@ -42,11 +42,12 @@ our $VERSION = '0.03';
          'a',
          'b',
          'c',
-         'd'
+         'd',
+         '--this-aint-no-option'
       ]
    ];
 
-=cut 
+=cut
 
 =head1 SUBROUTINES/METHODS
 
@@ -56,18 +57,20 @@ The laziest way to parse arguments tho
 
 =cut
 
-sub new {    # reimplemented from DocCommon to allow for ENV.
-                       # DNM: I <3 this function.
+sub new {        # DNM: I <3 this function.
    my $self = shift;
    my @ARGA = @_;
    my $opt  = {};
    my @DARG;
    my $var = uc(basename($0));
+   my $cont = 1;
    unshift(@ARGA, split(/\s+/, $ENV{$var})) if ($ENV{$var});
    foreach my $ar (@ARGA) {
-      if ($ar =~ m/^-(.*?)[=|:](.*)/) {
+      if ($cont && $ar eq '--') {
+         $cont = 0;
+      } elsif ($cont && $ar =~ m/^--?(.*?)[=|:](.*)/) {
          ${$opt}{$1} = $2;
-      } elsif ($ar =~ m/^-(.*)$/) {
+      } elsif ($cont && $ar =~ m/^--?(.*)$/) {
          ${$opt}{$1} = 1;
       } else {
          push @DARG, $ar;
@@ -119,7 +122,7 @@ L<https://metacpan.org/release/Getopt-Lazier>
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Dave for the ENV addition.  Also for being awesome. :3 
+Thanks to Dave for the ENV addition.  Also for being awesome. :3
 
 =cut
 =head1 LICENSE AND COPYRIGHT

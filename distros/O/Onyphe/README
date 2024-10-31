@@ -5,7 +5,7 @@
   sudo apt-get install cpanminus libmojolicious-perl libtie-ixhash-perl
   sudo apt-get install liblwp-protocol-https-perl libjson-xs-perl libfile-slurp-perl
   sudo apt-get install libregexp-ipv6-perl libtext-csv-xs-perl
-  sudo cpanm -n Config::INI::Tiny Text::ParseWords Net::IPv4Addr Regexp::IPv4
+  sudo cpanm -n Config::INI::Tiny Text::ParseWords Net::IPv4Addr Regexp::IPv4 Compress::Raw::Zlib
 
 
   2. Installing dependencies for all other systems
@@ -14,7 +14,7 @@
 
   sudo cpanm -n Mojolicious Config::INI::Tiny Tie::IxHash LWP::Protocol::https JSON::XS
   sudo cpanm -n Text::ParseWords File::Slurp
-  sudo cpanm -n Regexp::IPv4 Text::CSV_XS Net::IPv4Addr Regexp::IPv6
+  sudo cpanm -n Regexp::IPv4 Text::CSV_XS Net::IPv4Addr Regexp::IPv6 Compress::Raw::Zlib
 
 
   3. Configure ONYPHE Command Line Interface settings

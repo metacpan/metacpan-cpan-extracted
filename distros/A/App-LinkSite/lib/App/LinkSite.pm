@@ -15,7 +15,7 @@ The main driver class for App::LinkSite.
 use Feature::Compat::Class;
 
 class App::LinkSite {
-  our $VERSION = '0.0.3';
+  our $VERSION = '0.0.5';
   use strict;
   use warnings;
   use feature qw[say signatures];
@@ -27,7 +27,7 @@ class App::LinkSite {
   use File::Find;
   use File::Basename;
   use FindBin '$Bin';
-  use File::ShareDir;
+  use File::ShareDir 'dist_dir';
 
   use App::LinkSite::Site;
   use App::LinkSite::Link;

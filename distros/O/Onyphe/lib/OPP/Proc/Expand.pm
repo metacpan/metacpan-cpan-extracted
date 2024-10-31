@@ -1,5 +1,5 @@
 #
-# $Id: Expand.pm,v cd68184c46bd 2023/03/23 09:32:23 gomor $
+# $Id: Expand.pm,v 462dcd9243b5 2024/10/31 09:09:10 gomor $
 #
 package OPP::Proc::Expand;
 use strict;
@@ -46,7 +46,7 @@ OPP::Proc::Expand - expand processor
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2024, ONYPHE SAS
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

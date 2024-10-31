@@ -17,11 +17,11 @@ Cache::Memcached::PDeque - Implements a priority deque using memcached as storag
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -35,6 +35,9 @@ our $VERSION = '0.02';
   $dq->push('a');    # ('a')
   $dq->unshift('b'); # ('b','a')
   $dq->push('c');    # ('b','a','c')
+
+  $dq->front;       # returns 'b' without altering $dq
+  $dq->back;        # returns 'c' without altering $dq
 
   $dq->size;        # returns 3
 
@@ -57,6 +60,10 @@ our $VERSION = '0.02';
   $dq->push(\@list);   # Push reference to a list
   my $href = $dq->pop; # Get back reference to a list
   
+  # A oneliner to copy all elements to a simple list
+  my @dq;
+  $dq->foreach( sub { my ($e, $p) = @_; push @{$p}, $e }, \@dq);
+
   # Removes all elements
   $dq->clear;
 
@@ -75,6 +82,11 @@ The storage backend for this implementation is Memcached, an in-memory key-value
 
 =head1 METHODS
 
+The following public methods are available.
+
+Please note that any methods starting with an underscore '_' are considered private, are undocumented, and are
+subject to change without notice. Do not use private methods.
+
 =cut
 
 subtype 'Name',
@@ -90,6 +102,11 @@ subtype 'Priority',
   => where { 1 <= $_ && $_ <= $max_prio },
   => message { "$_ is not in range [$1-$max_prio]" };
 
+subtype 'MaxSize',
+  => as 'Int',
+  => where { 0 <= $_ },
+  => message { "$_ must not be negative" };
+
 # A prefix in memcached for everything we create
 our $prefix = 'PDeque';  
 
@@ -101,7 +118,8 @@ our $prefix = 'PDeque';
 our $initial_head_tail = 2**31; 
 
 has 'name'         => ( is => 'ro', isa => 'Name', required => 1 );
-has 'max_prio'    =>  ( is => 'ro', isa => 'Priority', default => 1, writer => '_private_set_max_prio' );
+has 'max_size'     => ( is => 'rw', isa => 'MaxSize', default => 0 );
+has 'max_prio'     => ( is => 'ro', isa => 'Priority', default => 1, writer => '_private_set_max_prio' );
 has 'prioritizer'  => ( is => 'rw', default => undef );
 has 'servers'      => ( is => 'rw', default => sub { return [ '127.0.0.1:11211' ] } );
 
@@ -111,6 +129,7 @@ has 'memcached'    => ( is => 'rw', isa => 'Cache::Memcached::Fast', init_arg =>
 
   my $dq = Cache::Memcached::PDeque->new( 
                                 name => 'aName',
+                                max_size => 0,
                                 max_prio => 1,
                                 prioritizer => undef,
                                 servers => [ '127.0.0.1:11211' ],
@@ -122,6 +141,10 @@ has 'memcached'    => ( is => 'rw', isa => 'Cache::Memcached::Fast', init_arg =>
 
 Set the name of the dqueue; is a required argument.
 This will be part of the prefix used in Memcached. Is should be unique.
+
+=head3 max_size
+
+The maximum number of allowed elements, 0 for unlimited. Defaults to 0.
 
 =head3 max_prio
 
@@ -189,16 +212,7 @@ sub BUILD {
   return $self;
 }
 
-=head2 METHODS
-
-The following public methods are available.
-
-Please note that any methods starting with an underscore '_' are considered private, are undocumented, and are
-subject to change without notice. Do not use private methods.
-
-=cut
-
-=head3 clear
+=head2 clear
 
   $dq->clear;
 
@@ -231,7 +245,19 @@ sub clear {
   $self->_unlock(0, timeout => 0);
 }
 
-=head3 size
+=head2 max_size
+
+  $dq->max_size(25);
+
+  Set the maximum number of elements that are allowed.
+  Setting max_size to '0' (the default) means no limit, and is faster then setting it to a (very) high number.
+  Setting the max_size lower than the current size does not remove any elements.
+
+  my $max = $dq->max_size();
+
+  Get the current maximum number of elements allowed; returns 0 for unlimited.
+
+=head2 size
 
   my $size = $dq->size;
 
@@ -259,9 +285,9 @@ sub _push_with_priority {
   try {
     $self->_lock($priority);
 
-    my $index = $self->memcached->incr($priority . ':tail');
+    my $href = $self->memcached->incr_multi([$priority . ':tail'],[$priority . ':size'],['size']);
+    my $index = $href->{$priority . ':tail'};
     $self->memcached->add($priority . ':' . $index, $data, 0);
-    $self->memcached->incr_multi([$priority . ':size'],['size']);
 
     $self->_unlock($priority);
     return 1;
@@ -272,7 +298,7 @@ sub _push_with_priority {
   }
 }
 
-=head3 push
+=head2 push
 
   $dq->push($element);
 
@@ -287,10 +313,12 @@ sub _push_with_priority {
 sub push {
   if ( 3 == scalar @_ ) {
     my ( $self, $prio, $data ) = @_;
+    return 0 if 0 != $self->max_size && $self->size >= $self->max_size;
     assert($prio >= 1 && $prio <= $self->max_prio) if DEBUG;
     return $self->_push_with_priority($prio, $data);
   } else {
     my ( $self, $data ) = @_;
+    return 0 if 0 != $self->max_size && $self->size >= $self->max_size;
     my $prio = defined $self->prioritizer ? $self->prioritizer->($data) : 1;
     return $self->_push_with_priority($prio, $data);
   }
@@ -316,21 +344,27 @@ sub _unshift_with_priority {
   }
 }
 
-=head3 unshift
+=head2 unshift
 
   $dq->unshift($element);
 
   Insert $element before all elements.
+
+  $dq->unshift($priority, $element);
+
+  Inserts $element after all elements with a higher priority, and before all elements with a lower or equal priority.
 
 =cut
 
 sub unshift {
   if ( 3 == scalar @_ ) {
     my ( $self, $prio, $data ) = @_;
+    return 0 if 0 != $self->max_size && $self->size >= $self->max_size;
     assert($prio >= 1 && $prio <= $self->max_prio) if DEBUG;
     return $self->_unshift_with_priority($prio, $data);
   } else {
     my ( $self, $data ) = @_;
+    return 0 if 0 != $self->max_size && $self->size >= $self->max_size;
     my $prio = defined $self->prioritizer ? $self->prioritizer->($data) : $self->max_prio;
     return $self->_unshift_with_priority($prio, $data);
   }
@@ -343,22 +377,25 @@ sub _pop_with_priority {
   try {
     $self->_lock($priority);
 
-    my $first = $self->memcached->get($priority . ':head');
-    my $index = $self->memcached->get($priority . ':tail');
+    my $href = $self->memcached->get_multi(($priority . ':head',$priority . ':tail'));
+    my $first = $href->{$priority . ':head'};
+    my $index = $href->{$priority . ':tail'};
 
-    my $result = undef;
+    my $result;
 
     if ( $index > $first ) {
       $result = $self->memcached->get($priority . ':' . $index);
       $self->memcached->delete($priority . ':' . $index);
-      $self->memcached->decr('size');
 
-      if ( 0 == $self->memcached->decr($priority . ':size')) {
+      if ( $first+1 == $index ) {
         # Empty, reset head and tail
-        $self->memcached->set_multi([$priority . ':head', $initial_head_tail],[$priority . ':tail', $initial_head_tail]);
+        $self->memcached->set_multi([$priority . ':head', $initial_head_tail],
+                                    [$priority . ':tail', $initial_head_tail],
+                                    [$priority . ':size', 0]);
+        $self->memcached->decr('size');          
       } else {
         # Not empty, simply update new value of tail
-        $self->memcached->set($priority . ':tail', $index-1);
+        $self->memcached->decr_multi(['size'],[$priority . ':size'],[$priority . ':tail']);
       }
     }
 
@@ -368,11 +405,11 @@ sub _pop_with_priority {
 
   } catch {
     $self->_unlock($priority);
-    return undef;
+    return;
   }
 }
 
-=head3 pop
+=head2 pop
 
   my $element = $dq->pop;
 
@@ -406,22 +443,27 @@ sub _shift_with_priority {
   try {
     $self->_lock($priority);
 
-    my $index = $self->memcached->get($priority . ':head');
-    my $last = $self->memcached->get($priority . ':tail');
+    my $href = $self->memcached->get_multi(($priority . ':head',$priority . ':tail'));
+    my $index = $href->{$priority . ':head'};
+    my $last = $href->{$priority . ':tail'};
 
     my $result = undef;
 
     if ( $index++ < $last ) {
       $result = $self->memcached->get($priority . ':' . $index);
       $self->memcached->delete($priority . ':' . $index);
-      $self->memcached->decr('size');
 
-      if ( 0 == $self->memcached->decr($priority . ':size')) {
-        # Empty, reset head and tail
-        $self->memcached->set_multi([$priority . ':head', $initial_head_tail],[$priority . ':tail', $initial_head_tail]);
+      if ( $index == $last ) {
+        # Empty, reset size, head and tail
+        $self->memcached->set_multi([$priority . ':size', 0],
+                                    [$priority . ':head', $initial_head_tail],
+                                    [$priority . ':tail', $initial_head_tail]);
+        # And decrement global size
+        $self->memcached->decr('size');
       } else {
         # Not empty, simply update new value of tail
         $self->memcached->set($priority . ':head', $index);
+        $self->memcached->decr_multi(['size'],[$priority . ':size']);
       }
     }
 
@@ -435,7 +477,7 @@ sub _shift_with_priority {
   }
 }
 
-=head3 shift
+=head2 shift
 
   my $element = $dq->shift;
 
@@ -462,61 +504,125 @@ sub shift {
   }
 }
 
-=head3 foreach
+=head2 front
 
-  sub do_something {
-    my $el = shift;
-    print "square of $el is " . $el ** 2 . "\n";
+  my $element = $dq->front;
+
+  Returns the first element, without removing it from the PDeque.
+
+  my $element = $dq->front($priority);
+
+  Returns the first element with the given priority, without removing it from the PDeque.
+
+=cut
+
+sub front {
+  if ( 1 == scalar @_ ) {
+    my ( $self ) = @_;
+    for (my $prio=$self->max_prio; $prio>=1; $prio--) {
+      $self->_lock($prio);
+      my $href = $self->memcached->get_multi(($prio . ':head',$prio . ':tail'));
+      my $head = $href->{$prio . ':head'};
+      my $tail = $href->{$prio . ':tail'};
+      if ( ++$head <= $tail ) {
+        my $el = $self->memcached->get($prio . ':' . $head);
+        $self->_unlock($prio);
+        return $el;  
+      }
+      $self->_unlock($prio);
+    }
+  } else {
+    my ( $self, $prio ) = @_;
+    assert($prio >= 1 && $prio <= $self->max_prio) if DEBUG;
+    $self->_lock($prio);
+    my $href = $self->memcached->get_multi(($prio . ':head',$prio . ':tail'));
+    my $head = $href->{$prio . ':head'};
+    my $tail = $href->{$prio . ':tail'};
+    if ( ++$head <= $tail ) {
+      my $el = $self->memcached->get($prio . ':' . $head);
+      $self->_unlock($prio);
+      return $el;  
+    }
+    $self->_unlock($prio);
+  }
+}
+
+=head2 back
+
+  my $element = $dq->front;
+
+  Returns the last element, without removing it from the PDeque.
+
+  my $element = $dq->last($priority);
+
+  Returns the last element with the given priority, without removing it from the PDeque.
+
+=cut
+
+sub back {
+  if ( 1 == scalar @_ ) {
+    my ( $self ) = @_;
+    foreach my $prio ( 1 .. $self->max_prio ) {
+      $self->_lock($prio);
+      my $href = $self->memcached->get_multi(($prio . ':head',$prio . ':tail'));
+      my $head = $href->{$prio . ':head'};
+      my $tail = $href->{$prio . ':tail'};
+      if ( $head < $tail ) {
+        my $el = $self->memcached->get($prio . ':' . $tail);
+        $self->_unlock($prio);
+        return $el;  
+      }
+      $self->_unlock($prio);
+    }
+  } else {
+    my ( $self, $prio ) = @_;
+    assert($prio >= 1 && $prio <= $self->max_prio) if DEBUG;
+    $self->_lock($prio);
+    my $href = $self->memcached->get_multi(($prio . ':head',$prio . ':tail'));
+    my $head = $href->{$prio . ':head'};
+    my $tail = $href->{$prio . ':tail'};
+    if ( $head < $tail ) {
+      my $el = $self->memcached->get($prio . ':' . $tail);
+      $self->_unlock($prio);
+      return $el;  
+    }
+    $self->_unlock($prio);
+  }
+}
+
+=head2 foreach
+
+  sub do_square {
+    my ( $el, $param ) = @_;
+    push @{$param}, $el**2;
   }
 
-  $dq->foreach(\&do_something);
+  my @squared;
+  $dq->foreach(\&do_square, \@squared);
 
-  Executes a subroutine on every element.
+  Executes a subroutine on every element. In the example, for each element in $dq, calculate the square
+  value and push that onto @squared.
 
-  (!) Do not attempt to modify $dq from within the do_something() subroutine. This will cause a deadlock.
+  (!) Do not attempt to modify $dq from within the do_square() subroutine. This will cause a deadlock.
 
 =cut
 
 sub foreach {
-  my ( $self, $func ) = @_;
+  my ( $self, $func, $param ) = @_;
 
   $self->_lock(0, timeout => 0);
-  foreach my $prio ( $self->max_prio .. 1 ) {
+    for (my $prio=$self->max_prio; $prio>=1; $prio--) {
     $self->_lock($prio, timeout => 0);
     my $href = $self->memcached->get_multi(($prio . ':head',$prio . ':tail'));
     my $head = $href->{$prio . ':head'};
     my $tail = $href->{$prio . ':tail'};
     while ( ++$head <= $tail ) {
       my $el = $self->memcached->get($prio . ':' . $head);
-      $func->($el);
+      $func->($el, $param );
     }
     $self->_unlock($prio);
   }
   $self->_unlock(0);
-
-}
-
-sub _dump {
-  my ( $self ) = @_;
-  my @result;
-
-  for ( my $prio=$self->max_prio; $prio>=1; $prio-- ) {
-
-    $self->_lock($prio, timeout => 60);
-    #$DB::single = 1;
-
-    my $href  = $self->memcached->get_multi(($prio . ':head',$prio . ':tail'));
-    my $first = $self->memcached->get($prio . ':head');
-    my $last  = $self->memcached->get($prio . ':tail');
-
-    foreach my $i ( $first+1 .. $last ) {
-      CORE::push @result, $self->memcached->get($prio . ':' . $i);
-    }
-
-    $self->_unlock($prio);
-  }
-
-  return @result;
 }
 
 sub _check {
@@ -579,7 +685,7 @@ sub _unlock {
 }
 
 no Moose;
-#__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable;
 
 =head1 AUTHOR
 

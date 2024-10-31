@@ -1,5 +1,5 @@
 #
-# $Id: Exists.pm,v a82704bbf31a 2024/02/04 14:25:56 gomor $
+# $Id: Exists.pm,v 462dcd9243b5 2024/10/31 09:09:10 gomor $
 #
 package OPP::Proc::Exists;
 use strict;
@@ -42,7 +42,7 @@ OPP::Proc::Exists - exists processor
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2024, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2024, ONYPHE SAS
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

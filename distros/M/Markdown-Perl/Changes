@@ -1,5 +1,9 @@
 Revision history for pmarkdown and the Markdown::Perl module.
 
+1.08 - 2024-10-30
+
+ - Add a new yaml_metadata hook to receive the parsed YAML.
+
 1.07 - 2024-05-25
 
  - Allow to specify a link content through the resolve_link_ref hook.

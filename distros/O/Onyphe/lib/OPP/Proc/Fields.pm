@@ -1,5 +1,5 @@
 #
-# $Id: Fields.pm,v 17cc8d9dc427 2023/03/07 06:24:43 gomor $
+# $Id: Fields.pm,v 462dcd9243b5 2024/10/31 09:09:10 gomor $
 #
 package OPP::Proc::Fields;
 use strict;
@@ -51,7 +51,7 @@ OPP::Proc::Fields - fields processor
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2024, ONYPHE SAS
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

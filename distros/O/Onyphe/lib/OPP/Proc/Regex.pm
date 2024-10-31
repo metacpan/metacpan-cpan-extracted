@@ -1,5 +1,5 @@
 #
-# $Id: Regex.pm,v df49b574c57c 2023/03/24 06:37:31 gomor $
+# $Id: Regex.pm,v 462dcd9243b5 2024/10/31 09:09:10 gomor $
 #
 package OPP::Proc::Regex;
 use strict;
@@ -52,7 +52,7 @@ OPP::Proc::Regex - regex processor
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2024, ONYPHE SAS
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

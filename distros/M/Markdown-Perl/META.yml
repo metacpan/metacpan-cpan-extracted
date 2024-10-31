@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
   perl: v5.26.0
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,5 +38,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/pmarkdown/issues
   repository: https://github.com/mkende/pmarkdown
-version: '1.07'
+version: '1.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

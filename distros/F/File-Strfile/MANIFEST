@@ -1,0 +1,23 @@
+bin/pstrfile
+bin/punstr
+Changes
+lib/File/Strfile.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/01_init.t
+t/10_zippy.t
+t/20_v2.t
+t/30_single.t
+t/40_flags.t
+t/data/flags.txt
+t/data/flags.txt.dat
+t/data/single.txt
+t/data/single.txt.dat
+t/data/v2.txt
+t/data/v2.txt.dat
+t/data/zippy.txt
+t/data/zippy.txt.dat

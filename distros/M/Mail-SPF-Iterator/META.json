@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,6 +50,6 @@
          "url" : "https://github.com/noxxi/p5-mail-spf-iterator"
       }
    },
-   "version" : "1.120",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.121",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

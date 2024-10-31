@@ -176,5 +176,3 @@ sub ftpConfig {
 
 __PACKAGE__->meta->make_immutable;
 1;
-
-# ABSTRACT: A Moose role for managing device connections and configurations using Expect.

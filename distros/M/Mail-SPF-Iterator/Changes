@@ -1,3 +1,7 @@
+1.121 2024-10-30
+- call dnspkt->encode before dnspkt->header->id on new Net::DNS::Packet
+  needed since Net::DNS 1.46
+
 1.120 2021-02-26
 - change bugtracker in Makefile.PL to github
 

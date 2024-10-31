@@ -19,7 +19,7 @@ use Scalar::Util 'blessed';
 
 use parent 'Markdown::Perl::Options';
 
-our $VERSION = '1.07';  # Remember to also set the App::pmarkdown version.
+our $VERSION = '1.08';  # Remember to also set the App::pmarkdown version.
 
 our @EXPORT_OK = qw(convert set_options set_mode set_hooks);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -50,7 +50,7 @@ sub set_mode {
   return;
 }
 
-Readonly::Array my @VALID_HOOKS => qw(resolve_link_ref);
+Readonly::Array my @VALID_HOOKS => qw(resolve_link_ref yaml_metadata);
 
 sub set_hooks {
   my ($this, %hooks) = &_get_this_and_args;  ## no critic (ProhibitAmpersandSigils)
@@ -323,6 +323,18 @@ hash-reference containing a C<target> key, pointing to the link destination and
 optionally a C<title> key containing the title of the key. The hash-ref can also
 contain a C<content> key, in which case its value should be a span of HTML which
 will replace whatever would have been used for the link content.
+
+=item *
+
+C<yaml_metadata>: this hook will trigger if there is B<valid> YAML metadata at
+the beginning of the file. This also requires that the
+L<parse_file_metadata option|Markdown::Perl::Options/parse_file_metadata> is set
+to C<yaml> (which is the default in our default mode). The hook will receive a
+hashref or an arrayref with the content of the YAML document.
+
+To allow conditional parsing based on some metadata, if the hook dies, the
+exception will interrupt the processing and be propagated as-is to the initial
+caller.
 
 =back
 

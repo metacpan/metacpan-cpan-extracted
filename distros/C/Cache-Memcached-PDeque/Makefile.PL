@@ -18,7 +18,10 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         'Cache::Memcached::Fast'              => '0.28',
+        'Carp::Assert'                        => '0',
         'Moose'                               => '0',
+        'Moose::Util::TypeConstraints'        => '0',
+        'Try::Tiny'                           => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Cache-Memcached-PDeque-*' },

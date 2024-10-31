@@ -1,0 +1,175 @@
+#!/usr/bin/perl
+use 5.016;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+use File::Strfile;
+
+my $PRGNAM = 'pstrfile';
+my $PRGVER = $File::Strfile::VERSION;
+
+my $HELP_MSG = <<END;
+$PRGNAM - $PRGVER
+Usage: $0 [options] source [out]
+
+Options:
+  -c char  Set delimiting character
+  -V ver   Set strfile version
+  -i       Ignore case when sorting strings
+  -o       Order strings alphabetically
+  -r       Randomize string order
+  -s       Do not print output file info
+  -x       Mark source file as ROT-13 ciphered
+END
+
+sub pstrfile_init {
+
+	my $param = {
+		SrcFile    => '',
+		OutFile    => '',
+		Delimit    => '%',
+		Version    => 1,
+		IgnoreCase => 0,
+		Order      => 0,
+		Random     => 0,
+		Silent     => 0,
+		Rotated    => 0,
+	};
+
+	Getopt::Long::config('bundling');
+	GetOptions(
+		'c=s' => sub { $param->{Delimit} = unpack "a" },
+		'V=i' => \$param->{Version},
+		'i'   => \$param->{IgnoreCase},
+		'o'   => \$param->{Order},
+		'r'   => \$param->{Random},
+		's'   => \$param->{Silent},
+		'x'   => \$param->{Rotated},
+	) or die "Error in command line arguments\n";
+
+	$param->{SrcFile} = shift @ARGV or die $HELP_MSG;
+	$param->{OutFile} = shift @ARGV || "$param->{SrcFile}.dat";
+
+	return $param;
+
+}
+
+sub main {
+
+	my $param = pstrfile_init();
+
+	my $strfile_param = {
+		$param->{Random}                        ? (Random  => 1) : (),
+		$param->{Order}                         ? (Order   => 1) : (),
+		$param->{IgnoreCase} && $param->{Order} ? (FcOrder => 1) : (),
+		$param->{Rotated}                       ? (Rotate  => 1) : (),
+		Version => $param->{Version},
+		Delimit => $param->{Delimit},
+	};
+
+	my $strfile = File::Strfile->new($param->{SrcFile}, $strfile_param);
+
+	$strfile->write_strfile($param->{OutFile});
+
+	unless ($param->{Silent}) {
+		printf "\"%s\" created\n", $param->{OutFile};
+		if ($strfile->get('StrNum') == 1) {
+			printf "There was 1 string\n";
+		} else {
+			printf "There were %d strings\n", $strfile->get('StrNum');
+		}
+		printf "Longest string: %d bytes\n", $strfile->get('LongLen');
+		printf "Shortest string: %d bytes\n", $strfile->get('ShortLen');
+	}
+}
+
+main;
+
+
+
+=head1 NAME
+
+pstrfile - Create a random access file for storing strings (in Perl!)
+
+=head1 SYNOPSIS
+
+  pstrfile [options] source [out]
+
+=head1 DESCRIPTION
+
+B<pstrfile> reads a file containing groups of lines seperated by a line
+containing a single percentage sign '%' and creates a data file which contains
+a header structure and a table of offsets for each group of lines. This allows
+random access of the strings.
+
+The output file, if not specified on the command line, is named
+B<F<source>.dat>.
+
+B<pstrfile> is a re-implementation of the L<strfile(8)> program found on many
+Unices. It is meant to show the capabilities of the L<File::Strfile> Perl
+module.
+
+=head2 Options
+
+=over 4
+
+=item B<-c> I<char>
+
+Change the delimitting character from the percentage sign to I<char>.
+
+=item B<-V> I<ver>
+
+Set outputted strfile version. Valid options are 1 and 2. 1 is the default.
+
+=item B<-i>
+
+Ignore case when sorting strings alphabetically. Used with B<-o>.
+
+=item B<-o>
+
+Order strings in alphabetical order.
+
+=item B<-r>
+
+Order strings in random order. B<-o> takes priority over this option.
+
+=item B<-s>
+
+Run silently, no summary is printed.
+
+=item B<-x>
+
+Indicate F<source> is ROT-13 ciphered.
+
+=back
+
+=head1 EXAMPLES
+
+Here is an example of a typical source strfile:
+
+  A can of ASPARAGUS, 73 pigeons, some LIVE ammo, and a FROZEN DAIQUIRI!!
+  %
+  A dwarf is passing out somewhere in Detroit!
+  %
+  A wide-eyed, innocent UNICORN, poised delicately in a MEADOW filled
+  with LILACS, LOLLIPOPS & small CHILDREN at the HUSH of twilight??
+  %
+  Actually, what I'd like is a little toy spaceship!!
+
+=head1 AUTHORS
+
+Written by Samuel Young E<lt>L<samyoung12788@gmail.com>E<gt>. Some bits were
+shamelessly copied from the original L<strfile(8)> manual page.
+
+=head1 COPYRIGHT
+
+Copyright 2024, Samuel Young
+
+This library is free software; you may redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<File::Strfile>, L<punstr(1)>, L<fortune(6)>, L<strfile(8)>

@@ -181,9 +181,8 @@ sub _word_list {
 =head3 B<parse_file_metadata> I<(enum, default: yaml)>
 
 This option controls whether the parser accepts optional metadata at the
-beginning of the file. Currently, it does nothing with these metadata, even when
-they are accepted. In the future they might be used to build complete HTML file
-instead of just fragment.
+beginning of the file. The module currently does nothing with the metadata
+itself but you can configure a hook to receive the YAML content.
 
 The possible values are:
 

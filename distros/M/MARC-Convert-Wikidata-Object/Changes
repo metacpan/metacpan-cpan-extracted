@@ -1,3 +1,7 @@
+0.07 2024-10-30T22:17:14+01:00
+ - API change: Add 'collective' parameter to ISBN.
+ - API change: Add 'precision' parameter to PublicationDate.
+
 0.06 2024-07-08T17:33:38+02:00
  - API change: Add full_name() method to People.
  - API change: Remove ccnb() and oclc() methods in Object.

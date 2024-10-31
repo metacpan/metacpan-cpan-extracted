@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -95,6 +95,7 @@ sub create {
         '-D',       'source_date_epoch_from_changelog 0',
         '-D',       'use_source_date_epoch_as_buildtime 1',
         '-D',       'clamp_mtime_to_source_date_epoch 1',
+        '--build-in-place',
     );
 
     if ($self->installdirs eq 'site') {
@@ -570,7 +571,7 @@ CPANPLUS::Dist::Debora::Package::RPM - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

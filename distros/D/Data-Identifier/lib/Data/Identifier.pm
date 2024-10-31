@@ -16,9 +16,9 @@ use warnings;
 use Carp;
 use Math::BigInt;
 use URI;
-use UUID::Tiny ();
+use Data::Identifier::Generate;
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -329,6 +329,27 @@ sub new {
 }
 
 
+sub random {
+    my ($pkg, %opts) = @_;
+    my $type = $opts{type} // 'uuid';
+
+    if (ref $type) {
+        if ($type == $well_known_uuid) {
+            $type = 'uuid';
+        } else {
+            croak 'Invalid/Unsupported type';
+        }
+    }
+
+    if ($type ne 'ise' && $type ne 'uuid') {
+        croak 'Invalid/Unsupported type';
+    }
+
+    my $uuid = Data::Identifier::Generate->_random(%opts{'sources'});
+    return $pkg->new(uuid => $uuid, %opts{'displayname'});
+}
+
+
 sub wellknown {
     my ($pkg) = @_;
     state $well_known = {map{$_ => $_} values(%well_known), map {values %{$_}} values(%registered)};
@@ -492,7 +513,7 @@ sub displaycolour { my ($self, %opts) = @_; return $opts{default}; }
 sub icontext { my ($self, %opts) = @_; return $opts{default}; }
 sub description { my ($self, %opts) = @_; return $opts{default}; }
 
-# Private helpers:
+# ---- Private helpers ----
 
 sub _generate {
     my ($self) = @_;
@@ -517,7 +538,7 @@ sub _generate {
                 }
 
                 if (defined $input) {
-                    $self->{id_cache}{WK_UUID()} = UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_SHA1(), $ns, $input);
+                    $self->{id_cache}{WK_UUID()} = Data::Identifier::Generate->_uuid_v5($ns, $input);
                 }
             }
         }
@@ -539,7 +560,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 
@@ -650,6 +671,43 @@ The namespace used by a type. Must be a L<Data::Identifier> or an ISE. Must also
 The name as to be returned by L</displayname>.
 Must be a scalar string value or a code reference that returns a scalar string.
 If it is a code reference the identifier object is passed as C<$_[0]>.
+
+=back
+
+=head2 random
+
+    my Data::Identifier $identifier = Data::Identifier->random([ %opts ]);
+
+Generate a new random identifier.
+This method will C<die> on error.
+
+The following options (all optional) are supported:
+
+=over
+
+=item C<displayname>
+
+The same as the option of the same name in L</new>. See also L</displayname>.
+
+=item C<sources>
+
+The backend data sources to use for generation of the identifier. This is an array reference
+with the names of the modules in order of preference (most preferred first).
+
+Defaults to a list of high quality sources.
+
+Currently supported are at least:
+L<Crypt::URandom>,
+L<UUID4::Tiny>,
+L<Math::Random::Secure>,
+L<UUID::URandom>,
+L<UUID::Tiny::Patch::UseMRS>,
+L<UUID::Tiny> (low quality).
+
+=item C<type>
+
+The type to generate a random identifier in.
+A L<Data::Identifier> or one of the special values C<uuid> or C<ise>.
 
 =back
 

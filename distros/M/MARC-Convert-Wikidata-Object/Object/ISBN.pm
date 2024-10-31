@@ -6,13 +6,17 @@ use warnings;
 use Business::ISBN;
 use Error::Pure qw(err);
 use Mo qw(build is);
-use Mo::utils 0.08 qw(check_isa check_required);
+use Mo::utils 0.08 qw(check_bool check_isa check_required);
 use List::Util qw(none);
 use Readonly;
 
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
+
+has collective => (
+	is => 'ro',
+);
 
 has cover => (
 	is => 'ro',
@@ -38,6 +42,11 @@ sub type {
 
 sub BUILD {
 	my $self = shift;
+
+	if (! defined $self->{'collective'}) {
+		$self->{'collective'} = 0;
+	}
+	check_bool($self, 'collective');
 
 	check_required($self, 'isbn');
 
@@ -74,6 +83,7 @@ MARC::Convert::Wikidata::Object::ISBN - Bibliographic Wikidata object for ISBN n
  use MARC::Convert::Wikidata::Object::ISBN;
 
  my $obj = MARC::Convert::Wikidata::Object::ISBN->new(%params);
+ my $collective = $obj->collective.
  my $cover = $obj->cover;
  my $isbn = $obj->isbn;
  my $publisher = $obj->publisher;
@@ -90,6 +100,16 @@ Constructor.
 Returns instance of object.
 
 =over 8
+
+=item * C<collective>
+
+ISBN collective flag.
+
+Parameter means that ISBN is for collection.
+
+Valid value is boolean (0/1).
+
+Default value is 0.
 
 =item * C<cover>
 
@@ -115,6 +135,14 @@ Instance of MARC::Convert::Wikidata::Object::Publisher.
 Default value is undef.
 
 =back
+
+=head2 C<collective>
+
+ my $collective = $obj->collective.
+
+Get collective flag.
+
+Returns bool (0/1).
 
 =head2 C<cover>
 
@@ -151,6 +179,7 @@ Returns number (10 or 13).
 =head1 ERRORS
 
  new():
+         Parameter 'collective' must be a bool (0/1).
          Parameter 'isbn' is required.
          ISBN '%s' isn't valid.
          ISBN cover '%s' isn't valid.
@@ -179,13 +208,23 @@ Returns number (10 or 13).
 
  # Output:
  # MARC::Convert::Wikidata::Object::ISBN  {
- #     Parents       Mo::Object
- #     public methods (9) : BUILD, can (UNIVERSAL), DOES (UNIVERSAL), err (Error::Pure), check_isa (Mo::utils), check_required (Mo::utils), isa (UNIVERSAL), type, VERSION (UNIVERSAL)
- #     private methods (1) : __ANON__ (Mo::build)
+ #     parents: Mo::Object
+ #     public methods (8):
+ #         BUILD, type
+ #         Error::Pure:
+ #             err
+ #         List::Util:
+ #             none
+ #         Mo::utils:
+ #             check_bool, check_isa, check_required
+ #         Readonly:
+ #             Readonly
+ #     private methods (0)
  #     internals: {
- #         _isbn       Business::ISBN13,
- #         isbn        "978-80-00-05046-1",
- #         publisher   MARC::Convert::Wikidata::Object::Publisher
+ #         _isbn        978-80-00-05046-1 (Business::ISBN13),
+ #         collective   0,
+ #         isbn         "978-80-00-05046-1" (dualvar: 978),
+ #         publisher    MARC::Convert::Wikidata::Object::Publisher
  #     }
  # }
 
@@ -226,6 +265,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

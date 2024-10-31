@@ -53,17 +53,6 @@ sub dump {
     my $workdir = "$self->{workdir}/$self->{month}/$self->{date}";
     make_path($workdir) unless -d $workdir;
 
-    my $enc = Encode::Guess->guess($text);
-    if (ref $enc) {
-      eval { $text = $enc->decode($text); };
-      if (!!$@) {
-        warn("[dump] 字符串解码失败：$@");
-      }
-    }
-    else {
-      warn("[dump] 无法猜测编码: $enc");
-    }
-
     my $filename = "$workdir/$self->{device}{host}.txt";
     open(my $fh, '>>:encoding(UTF-8)', $filename) or croak "无法打开文件 $filename 进行写入: $!";
     print $fh "$text\n"                           or croak "写入文件 $filename 失败: $!";
@@ -128,10 +117,11 @@ sub refine_if {
   $name =~ s/Ethernet/Eth/gi;
   $name =~ s/xethernet/XE/gi;
   $name =~ s/ethernet/E/gi;
-  $name =~ s/xge/TE/gi;
+  $name =~ s/^xge/TE/gi;
+  $name =~ s/^sge/SE/gi;
   $name =~ s/Twe/TW/gi;
   $name =~ s/eth/Eth/gi;
-  $name =~ s/ge/G/gi;
+  $name =~ s/^ge/G/gi;
 
   return $name;
 }
@@ -139,4 +129,3 @@ sub refine_if {
 1;
 
 # ABSTRACT: Based Moose for network device discovery and management
-

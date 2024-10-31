@@ -137,7 +137,6 @@ sub process {
   # Done at a later stage, as escaped characters don’t have their Markdown
   # meaning, we need a way to represent that.
 
-  # Note: for now, nothing is done with the extracted metadata.
   $this->_parse_yaml_metadata() if $this->get_parse_file_metadata eq 'yaml';
 
   while (defined (my $l = $this->next_line())) {
@@ -372,10 +371,13 @@ sub _parse_yaml_metadata {
     my $metadata = eval { YAML::Tiny->read_string($+{YAML}) };
     if ($EVAL_ERROR) {
       pos($this->{md}) = 0;
+      carp 'YAML Metadata (Markdown frontmatter) is invalid' if $this->get_warn_for_unused_input();
       return;
     }
+    if (exists($this->{pmarkdown}{hooks}{yaml_metadata})) {
+      $this->{pmarkdown}{hooks}{yaml_metadata}->($metadata->[0]);
+    }
   }
-
   return;
 }
 

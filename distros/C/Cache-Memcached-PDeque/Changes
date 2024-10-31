@@ -1,5 +1,13 @@
 Revision history for Cache-Memcached-PDeque
 
+0.03    xxxxxxxxxx
+        Added max_size() method to limit # elements.
+        Added front() and back() methods.
+        Added optional parameter to foreach() method.
+        Added test scripts for max_size and threads.
+        Limit calls to memcached to improve performance.
+        Improved documentation.
+
 0.02    2024-10-26
         Made the *_with_priority() methods private.
         Added clear() method.

@@ -4,7 +4,11 @@
 class Net::SSLeay::PEM {
   use Net::SSLeay::BIO;
   use Net::SSLeay::X509;
+  use Net::SSLeay::X509_CRL;
   
   # Class Methods
   native static method read_bio_X509 : Net::SSLeay::X509 ($bp : Net::SSLeay::BIO);
+  
+  native static method read_bio_X509_CRL : Net::SSLeay::X509_CRL ($bp : Net::SSLeay::BIO);
+  
 }

@@ -236,7 +236,7 @@ use warnings;
 
 package Mail::SPF::Iterator;
 
-our $VERSION = '1.120';
+our $VERSION = '1.121';
 
 use fields (
     # values given in or derived from params to new()
@@ -270,6 +270,8 @@ use URI::Escape 'uri_escape';
 use Data::Dumper;
 use base 'Exporter';
 
+# need encode before accessing header->id since Net::DNS 1.46
+our $NEED_ENCODE_BEFORE_ID = $Net::DNS::VERSION>=1.46;
 
 ### check if IPv6 support is in Socket, otherwise try Socket6
 my $can_ip6;
@@ -986,6 +988,8 @@ sub _next_rv_dnsq {
     my @dnsq = @_;
     # track queries for later verification
     $self->{cbq} = [ map {
+	$_->header->rd(1); # make query recursive
+	$_->encode if $NEED_ENCODE_BEFORE_ID;
 	{ q => ($_->question)[0], id => $_->header->id, pkt => $_ }
     } @dnsq ];
     $DEBUG && DEBUG( "need to lookup ".join( " | ",

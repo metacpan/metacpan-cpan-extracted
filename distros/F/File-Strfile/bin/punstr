@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+use 5.016;
+use strict;
+use warnings;
+
+use File::Strfile qw(%STRFLAGS);
+
+my $PRGNAM = 'punstr';
+my $PRGVER = $File::Strfile::VERSION;
+
+my $HELP_MSG = <<END;
+$PRGNAM - $PRGVER
+Usage: $0 source [datafile]
+END
+
+sub punstr_init {
+
+	my $param = {
+		SrcFile  => '',
+		DataFile => '',
+	};
+
+	$param->{SrcFile} = shift @ARGV or die $HELP_MSG;
+	$param->{DataFile} = shift @ARGV || "$param->{SrcFile}.dat";
+
+	return $param;
+
+}
+
+sub main {
+
+	my $param = punstr_init();
+
+	my $strfile = File::Strfile->new($param->{SrcFile},
+		{ DataFile => $param->{DataFile}, }
+	);
+
+	unless ($strfile->get('Flags') & ($STRFLAGS{ORDERED} | $STRFLAGS{RANDOM})) {
+		print "nothing to do -- table in file order\n";
+		return;
+	}
+
+	my $del = $strfile->get('Delimit') . "\n";
+
+	foreach my $str ($strfile->strings()) {
+		print $str, $del;
+	}
+
+}
+
+main;
+
+
+
+=head1 NAME
+
+punstr - Print strfile string list (in Perl!)
+
+=head1 SYNOPSIS
+
+  punstr source [datafile]
+
+=head1 DESCRIPTION
+
+B<punstr> is a program that un-does the work of B<strfile>. It prints each
+string found in F<source> according to the order in the strfile data file.
+
+If F<datafile> is not specified, defaults to B<F<source>.dat>.
+
+B<punstr> is a re-implementation of the unstr program found on many Unices.
+It is meant to show the capabilities of the L<File::Strfile> Perl module.
+
+=head1 AUTHORS
+
+Written by Samuel Young E<lt>L<samyoung12788@gmail.com>E<gt>. Some bits were
+shamelessly copied from the L<strfile(8)> manual page.
+
+=head1 COPYRIGHT
+
+Copyright 2024, Samuel Young
+
+This library is free software; you may redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<File::Strfile>, L<pstrfile(1)>, L<fortune(6)>, L<strfile(8)>
+
+=cut

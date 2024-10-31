@@ -4,7 +4,7 @@ use warnings;
 use English;
 use Error::Pure::Utils qw(clean);
 use MARC::Convert::Wikidata::Object::PublicationDate;
-use Test::More 'tests' => 15;
+use Test::More 'tests' => 19;
 use Test::NoWarnings;
 
 # Test.
@@ -127,6 +127,50 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'latest_date' is in conflict with parameter 'end_time'.\n",
 	"Parameter 'latest_date' is in conflict with parameter 'end_time'.");
+clean();
+
+# Test.
+eval {
+	MARC::Convert::Wikidata::Object::PublicationDate->new(
+		'precision' => 'day',
+		'earliest_date' => '2009',
+	);
+};
+is($EVAL_ERROR, "Parameter 'precision' is in conflict with parameter 'earliest_date'.\n",
+	"Parameter 'precision' is in conflict with parameter 'earliest_date'.");
+clean();
+
+# Test.
+eval {
+	MARC::Convert::Wikidata::Object::PublicationDate->new(
+		'precision' => 'day',
+		'latest_date' => '2012',
+	);
+};
+is($EVAL_ERROR, "Parameter 'precision' is in conflict with parameter 'latest_date'.\n",
+	"Parameter 'precision' is in conflict with parameter 'latest_date'.");
+clean();
+
+# Test.
+eval {
+	MARC::Convert::Wikidata::Object::PublicationDate->new(
+		'precision' => 'day',
+		'start_time' => '2009',
+	);
+};
+is($EVAL_ERROR, "Parameter 'precision' is in conflict with parameter 'start_time'.\n",
+	"Parameter 'precision' is in conflict with parameter 'start_time'.");
+clean();
+
+# Test.
+eval {
+	MARC::Convert::Wikidata::Object::PublicationDate->new(
+		'precision' => 'day',
+		'end_time' => '2012',
+	);
+};
+is($EVAL_ERROR, "Parameter 'precision' is in conflict with parameter 'end_time'.\n",
+	"Parameter 'precision' is in conflict with parameter 'end_time'.");
 clean();
 
 # Test.

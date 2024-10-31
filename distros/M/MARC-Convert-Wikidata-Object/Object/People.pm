@@ -7,7 +7,7 @@ use Mo qw(build default is);
 use Mo::utils 0.21 qw(check_array_object);
 use Mo::utils::Date 0.04 qw(check_date check_date_order);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 has date_of_birth => (
 	is => 'ro',
@@ -308,6 +308,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

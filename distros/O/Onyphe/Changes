@@ -1,5 +1,11 @@
 Revision history for Perl extension Onyphe.
 
+4.16 Thu 31 Oct 10:12:01 CET 2024
+   - New: Onyphe::Api: ASD Mx API
+   - New: Onyphe::Api: Ondemand Resolver Domain Bulk API
+   - New: onyphe: add -aslink argument to force download of results as a link
+   - Bugfix: tests: skip them when no .ini file is found
+
 4.15 Thu 15 Aug 13:22:56 CEST 2024
   - New: Onyphe::Api: Ondemand Scope Port Single API
   - New: Onyphe::Api: ASD Tld API

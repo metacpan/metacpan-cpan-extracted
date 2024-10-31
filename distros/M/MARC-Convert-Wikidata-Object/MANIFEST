@@ -45,9 +45,10 @@ t/MARC-Convert-Wikidata-Object-ExternalId/06-value.t
 t/MARC-Convert-Wikidata-Object-ISBN/01-use.t
 t/MARC-Convert-Wikidata-Object-ISBN/02-version.t
 t/MARC-Convert-Wikidata-Object-ISBN/03-new.t
-t/MARC-Convert-Wikidata-Object-ISBN/04-cover.t
-t/MARC-Convert-Wikidata-Object-ISBN/05-isbn.t
-t/MARC-Convert-Wikidata-Object-ISBN/06-type.t
+t/MARC-Convert-Wikidata-Object-ISBN/04-collective.t
+t/MARC-Convert-Wikidata-Object-ISBN/05-cover.t
+t/MARC-Convert-Wikidata-Object-ISBN/06-isbn.t
+t/MARC-Convert-Wikidata-Object-ISBN/07-type.t
 t/MARC-Convert-Wikidata-Object-Kramerius/01-use.t
 t/MARC-Convert-Wikidata-Object-Kramerius/02-version.t
 t/MARC-Convert-Wikidata-Object-Kramerius/03-new.t
@@ -73,8 +74,9 @@ t/MARC-Convert-Wikidata-Object-PublicationDate/05-date.t
 t/MARC-Convert-Wikidata-Object-PublicationDate/06-earliest_date.t
 t/MARC-Convert-Wikidata-Object-PublicationDate/07-end_time.t
 t/MARC-Convert-Wikidata-Object-PublicationDate/08-latest_date.t
-t/MARC-Convert-Wikidata-Object-PublicationDate/09-sourcing_circumstances.t
-t/MARC-Convert-Wikidata-Object-PublicationDate/10-start_time.t
+t/MARC-Convert-Wikidata-Object-PublicationDate/09-precision.t
+t/MARC-Convert-Wikidata-Object-PublicationDate/10-sourcing_circumstances.t
+t/MARC-Convert-Wikidata-Object-PublicationDate/11-start_time.t
 t/MARC-Convert-Wikidata-Object-Publisher/01-use.t
 t/MARC-Convert-Wikidata-Object-Publisher/02-version.t
 t/MARC-Convert-Wikidata-Object-Publisher/03-new.t

@@ -3,7 +3,12 @@
 
 class Net::SSLeay::X509_STORE {
   use Net::SSLeay::X509;
+  use Net::SSLeay::X509_CRL;
   
   # Instance Methods
   native method add_cert : int ($x : Net::SSLeay::X509);
+  
+  native method set_flags : void ($flags : long);
+  
+  native method add_crl : void ($x : Net::SSLeay::X509_CRL);
 }

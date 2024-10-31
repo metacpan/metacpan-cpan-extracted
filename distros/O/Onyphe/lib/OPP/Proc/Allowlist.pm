@@ -1,5 +1,5 @@
 #
-# $Id: Allowlist.pm,v 1a6ad59d015b 2024/02/16 09:27:25 gomor $
+# $Id: Allowlist.pm,v 462dcd9243b5 2024/10/31 09:09:10 gomor $
 #
 package OPP::Proc::Allowlist;
 use strict;
@@ -138,7 +138,7 @@ OPP::Proc::Allowlist - allowlist processor
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2024, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2024, ONYPHE SAS
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

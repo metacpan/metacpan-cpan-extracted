@@ -1,5 +1,5 @@
 #
-# $Id: Discovery.pm,v 69a3d7308875 2023/04/05 15:11:02 gomor $
+# $Id: Discovery.pm,v 462dcd9243b5 2024/10/31 09:09:10 gomor $
 #
 package OPP::Proc::Discovery;
 use strict;
@@ -83,7 +83,7 @@ OPP::Proc::Discovery - ONYPHE Discovery API processor
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2024, ONYPHE SAS
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

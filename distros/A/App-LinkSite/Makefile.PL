@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 use File::ShareDir::Install;
 
-install_share 'src';
+install_share dist => 'src';
 
 WriteMakefile(
     NAME         => 'App::LinkSite',
@@ -39,3 +39,6 @@ WriteMakefile(
         },
     },
 );
+
+package MY;
+use File::ShareDir::Install qw(postamble);

@@ -403,20 +403,8 @@ sub dump {
     say $text;
   }
   elsif ($self->debug > 1) {
-    my $basedir = $ENV{PDK_DEVICE_HOME} // glob("~");
-    my $workdir = "$basedir/dump/$self->{month}/$self->{date}";
+    my $workdir = "$self->{workdir}/$self->{month}/$self->{date}";
     make_path($workdir) unless -d $workdir;
-
-    my $enc = Encode::Guess->guess($text);
-    if (ref $enc) {
-      eval { $text = $enc->decode($text); };
-      if (!!$@) {
-        $self->dump("[dump] 字符串解码失败：$@");
-      }
-    }
-    else {
-      $self->dump("[dump] 无法猜测编码: $enc");
-    }
 
     my $filename = "$workdir/backup_dump.txt";
     open(my $fh, '>>encoding(UTF-8)', $filename) or croak "无法打开文件 $filename 进行写入: $!";

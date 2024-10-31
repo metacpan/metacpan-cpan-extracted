@@ -19,18 +19,18 @@ sub gen_iface_desc {
   my @commands = ('system-view');
 
   foreach my $line (@{$topology}) {
-    if ($line =~ /display/ || $line !~ /GE|XGE|Ethernet/i) {
+    if ($line =~ /display/ || $line !~ /(S|X)?GE|Ethernet/i) {
       $self->dump("跳过不需要处理的行：$line");
       next;
     }
 
     my ($local_port, $chassis, $remote_port, $neighbor);
 
-    if ($line =~ /^X?GE/) {
+    if ($line =~ /^(S|X)?GE/) {
       ($local_port, $chassis, $remote_port, $neighbor) = split /\s+/, $line;
       $self->dump("匹配单行格式1：$line");
     }
-    elsif ($line =~ /X?GE/) {
+    elsif ($line =~ /(S|X)?GE/) {
       ($neighbor, $local_port, $chassis, $remote_port) = split /\s+/, $line;
       $self->dump("匹配单行格式2：$line");
     }

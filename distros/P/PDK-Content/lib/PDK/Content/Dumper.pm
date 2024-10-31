@@ -62,19 +62,8 @@ sub dump {
     say $text;
   }
   elsif ($self->debug > 1) {
-    my $workdir = "$self->{workdir}/dump/$self->{month}/$self->{date}";
+    my $workdir = "$self->{workdir}/$self->{month}/$self->{date}";
     make_path($workdir) unless -d $workdir;
-
-    my $enc = Encode::Guess->guess($text);
-    if (ref $enc) {
-      eval { $text = $enc->decode($text); };
-      if (!!$@) {
-        warn("[dump] 字符串解码失败：$@");
-      }
-    }
-    else {
-      warn("[dump] 无法猜测编码: $enc");
-    }
 
     my $name     = $self->{name} // $self->now;
     my $filename = "$workdir/$name\_dump.txt";
@@ -102,9 +91,10 @@ sub write_file {
   else {
     $self->dump("[write_file] $name 无法猜测编码: $enc");
   }
-  $self->dump("[write_file] 准备将数据写入本地文件: ($workdir/$name)");
 
   my $filename = "$workdir/$name";
+  $self->dump("[write_file] 准备将数据写入本地文件: ($workdir/$name)");
+
   open(my $fh, '>>:encoding(UTF-8)', $filename) or croak "无法打开文件 $filename 进行写入: $!";
   print $fh $config                             or croak "写入文件 $filename 失败: $!";
   close($fh)                                    or croak "关闭文件句柄 $filename 失败: $!";

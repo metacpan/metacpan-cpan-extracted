@@ -1,5 +1,5 @@
 #
-# $Id: Flatten.pm,v 4d337b0a6526 2023/03/08 08:06:55 gomor $
+# $Id: Flatten.pm,v 462dcd9243b5 2024/10/31 09:09:10 gomor $
 #
 package OPP::Proc::Flatten;
 use strict;
@@ -37,7 +37,7 @@ OPP::Proc::Flatten - flatten processor
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2024, ONYPHE SAS
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -10,8 +10,9 @@ use Mo::utils::Date 0.02 qw(check_date);
 use Readonly;
 
 Readonly::Array our @SOURCING_CIRCUMSTANCES => qw(circa near presumably disputed);
+Readonly::Array our @PRECISION => qw(day month year decade century millenium);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 has copyright => (
 	is => 'ro',
@@ -30,6 +31,10 @@ has end_time => (
 );
 
 has latest_date => (
+	is => 'ro',
+);
+
+has precision => (
 	is => 'ro',
 );
 
@@ -53,6 +58,10 @@ sub BUILD {
 	_check_conflict($self, 'earliest_date', 'end_time');
 	_check_conflict($self, 'latest_date', 'start_time');
 	_check_conflict($self, 'latest_date', 'end_time');
+	_check_conflict($self, 'precision', 'start_time');
+	_check_conflict($self, 'precision', 'end_time');
+	_check_conflict($self, 'precision', 'earliest_date');
+	_check_conflict($self, 'precision', 'latest_date');
 
 	if (! defined $self->{'copyright'}) {
 		$self->{'copyright'} = 0;
@@ -66,6 +75,11 @@ sub BUILD {
 	check_date($self, 'end_time');
 
 	check_date($self, 'latest_date');
+
+	if (! defined $self->{'precision'} && defined $self->{'date'}) {
+		$self->{'precision'} = 'day';
+	}
+	check_strings($self, 'precision', \@PRECISION);
 
 	check_strings($self, 'sourcing_circumstances', \@SOURCING_CIRCUMSTANCES);
 
@@ -107,6 +121,7 @@ MARC::Convert::Wikidata::Object::PublicationDate - Bibliographic Wikidata object
  my $earliest_date = $obj->earliest_date;
  my $end_time = $obj->end_time;
  my $latest_date = $obj->latest_date;
+ my $precision = $obj->precision;
  my $sourcing_circumstances = $obj->sourcing_circumstances;
  my $start_time = $obj->start_time;
 
@@ -122,6 +137,11 @@ Possible scenarios are:
 =item Precise date
 
 We could use 'date' parameter to store publication date.
+
+=item Precise decade
+
+We could use 'date' and 'precision' parameters to store publication date with
+precision (e.g. decade 1910s).
 
 =item Date between
 
@@ -206,6 +226,28 @@ and end_time).
 
 Default value is undef.
 
+=item * C<precision>
+
+Precision for date.
+
+Possible values are:
+
+=over
+
+=item * day (default if 'date' present)
+
+=item * month
+
+=item * year
+
+=item * decade
+
+=item * century
+
+=item * millenium
+
+=back
+
 =item * C<sourcing_circumstances>
 
 Sourcing circumstances string.
@@ -276,6 +318,14 @@ Get latest date.
 
 Returns string.
 
+=head2 C<precision>
+
+ my $precision = $obj->precision;
+
+Get date precision.
+
+Returns string.
+
 =head2 C<sourcing_circumstances>
 
  my $sourcing_circumstances = $obj->sourcing_circumstances;
@@ -299,6 +349,11 @@ Returns string.
                  Parameter 'copyright' must be a bool (0/1).
                          Value: %s
          From Mo::utils::check_strings():
+                 Parameter 'precision' must have strings definition.
+                 Parameter 'precision' must have right string definition.
+                 Parameter 'precision' must be one of defined strings.
+                         String: %s
+                         Possible strings: %s
                  Parameter 'sourcing_circumstances' must have strings definition.
                  Parameter 'sourcing_circumstances' must have right string definition.
                  Parameter 'sourcing_circumstances' must be one of defined strings.
@@ -325,6 +380,10 @@ Returns string.
          Parameter 'earliest_date' is in conflict with parameter 'end_time'.
          Parameter 'latest_date' is in conflict with parameter 'start_time'.
          Parameter 'latest_date' is in conflict with parameter 'end_time'.
+         Parameter 'precision' is in conflict with parameter 'earliest_date'.
+         Parameter 'precision' is in conflict with parameter 'latest_date'.
+         Parameter 'precision' is in conflict with parameter 'start_time'.
+         Parameter 'precision' is in conflict with parameter 'end_time'.
 
 =head1 EXAMPLE1
 
@@ -535,6 +594,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut
