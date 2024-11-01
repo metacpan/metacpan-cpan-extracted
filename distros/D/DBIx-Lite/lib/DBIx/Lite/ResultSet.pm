@@ -1,5 +1,5 @@
 package DBIx::Lite::ResultSet;
-$DBIx::Lite::ResultSet::VERSION = '0.35';
+$DBIx::Lite::ResultSet::VERSION = '0.36';
 use strict;
 use warnings;
 
@@ -15,9 +15,10 @@ sub _new {
     my (%params) = @_;
     
     my $self = {
+        table_alias     => 'me',
         joins           => [],
         where           => [],
-        select          => ['me.*'],
+        select          => undef,
         rows_per_page   => 10,
     };
     
@@ -28,7 +29,7 @@ sub _new {
     
     # optional arguments
     for (grep exists($params{$_}), qw(joins where select group_by having order_by
-        limit offset for rows_per_page page cur_table with from distinct)) {
+        limit offset for rows_per_page page cur_table with from distinct table_alias)) {
         $self->{$_} = delete $params{$_};
     }
     $self->{cur_table} //= $self->{table};
@@ -41,7 +42,7 @@ sub _new {
 }
 
 # create setters
-for my $methname (qw(group_by having order_by limit offset rows_per_page page from distinct)) {
+for my $methname (qw(group_by having order_by limit offset rows_per_page page from distinct table_alias)) {
     no strict 'refs';
     *$methname = sub {
         my $self = shift;
@@ -93,7 +94,7 @@ sub select {
 
 sub select_also {
     my $self = shift;
-    return $self->select(@{$self->{select}}, @_);
+    return $self->select(@{$self->{select} // []}, @_);
 }
 
 sub with {
@@ -151,7 +152,8 @@ sub find {
     # this table
     if (!ref $where && (my @pk = $self->{table}->pk)) {
         # prepend table alias to all pk columns
-        $_ =~ s/^[^.]+$/me\.$&/ for @pk;
+        my $table_alias = $self->{table_alias};
+        $_ =~ s/^[^.]+$/$table_alias\.$&/ for @pk;
         
         $where = { map +(shift(@pk) => $_), @_ };
     }
@@ -171,7 +173,8 @@ sub select_sql {
     # prepare names of columns to be selected
     my @cols = ();
     my $cur_table_prefix = $self->_table_alias($self->{cur_table}{name}, 'select');
-    foreach my $col (grep defined $_, @{$self->{select}}) {
+    my $select = $self->{select} // [$self->{table_alias} . '.*'];
+    foreach my $col (grep defined $_, @$select) {
         # check whether user specified an alias
         my ($expr, $as) = ref $col eq 'ARRAY' ? @$col : ($col, undef);
         
@@ -230,7 +233,7 @@ sub select_sql {
     if ($self->{from}) {
         @from = @{$self->{from}};
     } else {
-        @from = (-join => $self->{table}{name} . "|me", @joins);
+        @from = (-join => $self->{table}{name} . "|" . $self->{table_alias}, @joins);
     }
     
     # paging overrides limit and offset if any
@@ -301,7 +304,8 @@ sub _select_sth_for_object {
     my $cur_table_prefix = $self->_table_alias($self->{cur_table}{name}, 'select');
     my $have_scalar_ref = 0;
     my $have_star = 0;
-    foreach my $col (grep defined $_, @{$self->{select}}) {
+    my $select = $self->{select} // [$self->{table_alias} . '.*'];
+    foreach my $col (grep defined $_, @$select) {
         my $expr = ref($col) eq 'ARRAY' ? $col->[0] : $col;
         if (ref($expr) eq 'SCALAR') {
             $have_scalar_ref = 1;
@@ -629,7 +633,7 @@ sub _table_alias {
         if ($op eq 'select'
             || ($op eq 'update' && $driver_name =~ /^(?:MySQL|Pg)$/i)
             || ($op eq 'delete' && $driver_name =~ /^Pg$/i)) {
-            return 'me';
+            return $self->{table_alias};
         }
     }
     
@@ -728,7 +732,7 @@ DBIx::Lite::ResultSet
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 OVERVIEW
 
@@ -956,6 +960,11 @@ subqueries or CTEs.
 If you supply a scalarref, it will be treated like literal SQL.
 
 Usage of L<from> is not currently compatible with joins.
+
+=head2 table_alias
+
+By default, the table used in the statement will be aliased as L<me>. 
+Use this method to change the alias to something else.
 
 =head1 RETRIEVING RESULTS
 

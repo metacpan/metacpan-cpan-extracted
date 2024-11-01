@@ -68,7 +68,7 @@ if ($real_next) {
         push @results, @msg;
     }
 
-    unless (@results) {
+    unless ( @results || ( $request_args{AddMoreAttach} && $request_args{AddMoreAttach} eq 'Add More Files' ) ) {
         # Flag to show validation passed
         $ARGS{'validation_ok'} = 1;
 
@@ -125,7 +125,7 @@ $next_for_validation ||= $m->caller(1)->path;
 %         }
 %     }
 % }
-
+% $m->callback( CallbackName => 'BeforeListActions', ARGSRef => \%ARGS );
 <& /Elements/ListActions, actions => \@results &>
 <div id="formtools-form-body" class="container p-4 formtools-base-style">
 <form
@@ -139,19 +139,31 @@ $next_for_validation ||= $m->caller(1)->path;
 <input type="hidden" name="_form_tools_next" value="<%$next%>" />
 <%$content|n%>
 
-% if ($enable_persisting) {
-% require List::MoreUtils;
-% foreach my $key (keys %request_args) {
-% next if (ref $request_args{$key} && ref $request_args{$key} ne 'ARRAY');
-% foreach my $val ( ref ($request_args{$key}) ? List::MoreUtils::uniq(@{$request_args{$key}}) : ($request_args{$key})) {
-% next if $forbid_persisting->{$key};
-% next if ($key eq 'user' or $key eq 'pass');
-% next if $key eq 'Submit'; # No need to pass through "Next" button value
-% next if $key =~ /^(?:validation|validation_ok|next_for_validation|sc)$/;
-<input type="hidden" name="<%$key%>" value="<%$val%>" />
-% }
-% }
-% }
+<%perl>
+if ($enable_persisting) {
+    foreach my $key (keys %request_args) {
+        next if (ref $request_args{$key} && ref $request_args{$key} ne 'ARRAY');
+        foreach my $val ( ref ($request_args{$key}) ? @{$request_args{$key}} : ($request_args{$key})) {
+            next if $forbid_persisting->{$key};
+            next if ($key eq 'user' or $key eq 'pass');
+            next if $key eq 'Submit'; # No need to pass through "Next" button value
+            next if $key eq 'Attach';
+            next if $key eq 'AddMoreAttach';
+            next if $key =~ /^(?:validation|validation_ok|next_for_validation|sc)$/;
+
+            # ContentType is added automatically when the Content form input is built,
+            # so we don't need to persist it as a hidden value. This isn't a user-set value.
+            next if $key eq 'ContentType';
+
+            # create_ticket is added automatically on the page that should run CreateTicket.
+            # It is not a user-set value, so doesn't need to be persisted.
+            next if $key eq 'create_ticket';
+
+            $m->out('<input type="hidden" name="' . $key . '" value="' . $m->interp->apply_escapes( $val, 'h' ) . '" />');
+        }
+    }
+}
+</%perl>
 
 </form>
 </div>

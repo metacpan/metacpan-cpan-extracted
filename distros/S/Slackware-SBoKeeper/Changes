@@ -1,0 +1,84 @@
+Revision history for sbokeeper.
+
+1.00 (10/31/2024):
+  Added:
+    * $VERSION to Slackware::SBoKeeper::DataFile.
+    * Slackware::SBoKeeper::DataFile now has POD.
+    * META files.
+  Improvements:
+    * Makefile.PL checks ExtUtils::MakeMaker version before using some features.
+    * Tests now have test plans.
+  Changes:
+    * Rename CHANGELOG to Changes.
+  Removed:
+    * SlackBuild stuff from distribution.
+
+0.04 (10/24/2024):
+  DISCLAIMER:
+    * Previous version data files are not compatible with new version as
+      sbokeeper has changed it's data file format. You will have to rebuild your
+      databases manually.
+  Improvements:
+    * sbokeeper now tries to determine the current Slackware release rather than
+      blindly assuming 15.0. This only really affects determining the default
+      SlackBuild repo path, but maybe it'll be useful in the future.
+    * sbokeeper intelligently determines default SlackBuild repo path based on
+      your installed SlackBuild package management tools. It no longer just
+      blindly defaults to sbopkg's.
+    * tree dies when given package that is not in database.
+  Changes:
+    * depadd now adds dependencies to database if they are not already present.
+    * extradeps command has been renamed to depextra.
+    * missing command has been renamed to depwant.
+    * sbokeeper now uses own format for storing SlackBuild data instead of JSON.
+  Removed:
+    * JSON dependency. Now installable on a stock Slackware system.
+    * -j option.
+
+
+0.03 (10/14/2024):
+  Added:
+    * SlackBuild.
+    * Can now read multiline REQUIRES lines.
+    * sbokeeper now uses getpwuid for home directory if HOME environment
+      variable is unavailable.
+    * 'pull' command: Adds installed SlackBuilds.org packages to your database.
+    * 'diff' command: Show discrepancies between installed SlackBuild packages
+      and packages present in your database.
+    * 'missing' command: Show packages missing dependencies.
+    * 'extradeps' command: Show packages with extraneous dependencies.
+    * -p/--pkgtool-logs option: Specify path to pkgtool package log directory.
+    * -j/--pretty-json option: Outputted JSON can now be formatted prettily.
+    * PkgtoolLogs config option, same thing as -p option.
+    * PrettyJSON config option, same thing as -j option.
+    * 'DATA FILES' section to manual, in case a user wants to edit the JSON
+      data files themselves.
+    * Slackware::SBoKeeper output methods now take prettiness argument.
+    * Slackware::SBoKeeper->missing now returns hash map of packages and their
+      missing dependencies rather than just a list.
+    * Tests for reading/writing JSON data files.
+  Changes:
+    * If no input is given at a y/n prompt, default to no.
+    * y/n prompt no longer breaks line.
+    * Outputted JSON is now canonical (sorted).
+    * read/write tests now run before add/remove tests.
+    * help command is no longer case sensitive.
+    * Packages in package lists are now printed on seperate lines.
+  Fixes:
+    * Stricter REQUIRES checking.
+  Removed:
+    * Removed example sbokeeper.conf. There's no easy way to install it using
+      MakeMaker.
+    * Data::Dumper is now longer used, leftover from early development.
+
+0.02 (10/11/2024):
+  Changes:
+    * Renaming project to sbokeeper, as depsbo sounds too similar to sbodep, a
+      project which does something kind of similar to depsbo. sbokeeper is a
+      more accurate name anyway.
+  Fixes:
+    * tree command no longer tries to print tree for missing dependencies. They
+      are now labelled as missing.
+
+0.01 (10/10/2024)
+  Initial release.

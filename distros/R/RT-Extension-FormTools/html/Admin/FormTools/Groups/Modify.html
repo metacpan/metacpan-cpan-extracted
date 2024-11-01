@@ -1,0 +1,137 @@
+<& /Admin/Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<&| /Widgets/TitleBox, title => '', class => 'formtools-admin-description ml-auto mr-auto' &>
+  <p><&|/l&>Form groups are shown to users on a page in the RT Self Service interface. Below you can manage how the form group details will appear to end users.</&></p>
+  <form name="EditFormGroupBannerMessage" action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Groups/Modify.html" method="post" enctype="multipart/form-data">
+  <input type="hidden" class="hidden" name="id" value="<% $id %>" />
+  <&| /Elements/LabeledValue, Label => loc('Name') &>
+    <input name="Name" class="form-control" value="<% $ARGS{Name} || $form_group_attribute->Description %>"/>
+  </&>
+  <&| /Elements/LabeledValue, Label => loc('Icon') &>
+% if ( $current_form_icon ) {
+    <& /Elements/Forms/ShowFormIcon, FormID => $id &>
+% } else {
+    <p><&|/l&>Upload an icon to be shown to users on the Form Groups page or select a color for the background of graphical box users can click.</&></p>
+% }
+    <div class="row">
+      <div class="col ml-5 mr-5">
+        <div class="custom-file">
+          <input type="file" name="FormGroupUploadIcon" class="custom-file-input" id="formtools-upload-icon" />
+          <label class="custom-file-label" for="formtools-upload-icon"><&|/l&>Upload an icon for this form group</&></label>
+        </div>
+      </div>
+    </div>
+  </&>
+  <&| /Elements/LabeledValue, Label => loc('Description') &>
+    <div class="form-row">
+      <div class="col-12">
+        <input type="hidden" class="hidden" name="DescriptionType" value="text/html" />
+        <textarea autocomplete="off" class="form-control messagebox richtext" cols="80" rows="10" name="Description"><% $ARGS{'Description'} || $form_group->{description} %></textarea>
+      </div>
+    </div>
+  </&>
+  <&| /Elements/LabeledValue, Label => loc('Banner Message') &>
+    <div class="form-row">
+      <div class="col-12">
+        <input type="hidden" class="hidden" name="BannerMessageType" value="text/html" />
+        <textarea autocomplete="off" class="form-control messagebox richtext" cols="80" rows="10" name="BannerMessage"><% $ARGS{'BannerMessage'} || $form_group->{banner_message} %></textarea>
+      </div>
+    </div>
+  </&>
+</&>
+<div class="form-row">
+  <div class="col-12">
+    <& /Elements/Submit, Label => loc('Save'), Name => 'SubmitModify' &>
+  </div>
+</div>
+</form>
+<%INIT>
+use Digest::MD5 'md5_hex';
+
+# Handle id getting submitted twice and becoming an array
+my @id = ( ref $id eq 'ARRAY' ) ? @{$id} : ($id);
+$id = $id[0];
+Abort("No form group id found") unless $id;
+
+my $form_group_attribute = RT::Attribute->new($session{'CurrentUser'});
+my ($ok, $msg) = $form_group_attribute->Load($id);
+
+unless ( $ok ) {
+    Abort("Unable to load form group with id $id");
+}
+
+my $form_group = $form_group_attribute->Content;
+
+my ($title, @results);
+$title = loc("Details for form group [_1]", $form_group_attribute->Description);
+
+if ( $ARGS{SubmitModify} ) {
+    Abort( loc('Permission Denied') )
+        unless $session{'CurrentUser'}->HasRight( Object => $RT::System, Right => 'AdminForm' );
+
+    if ( $form_group_attribute->Description ne $ARGS{Name} ) {
+        my ( $ret, $msg ) = $form_group_attribute->SetDescription( $ARGS{Name} );
+        if ($ret) {
+            push @results, loc('Updated form group Name');
+        }
+        else {
+            push @results, loc( "Could not update form group Name: [_1]", $msg );
+        }
+    }
+
+    if (
+      ( ( $form_group->{description} // '' ) ne $ARGS{Description} )
+      ||
+      ( ( $form_group->{banner_message} // '' ) ne $ARGS{BannerMessage} )
+    ) {
+        $form_group->{banner_message} = $ARGS{BannerMessage};
+        $form_group->{description}    = $ARGS{Description};
+        my ( $ret, $msg ) = $form_group_attribute->SetContent($form_group);
+        if ($ret) {
+            push @results, loc('Updated form group');
+        }
+        else {
+            push @results, loc( "Could not update form group: [_1]", $msg );
+        }
+    }
+}
+
+my ($current_form_icon) = RT::Extension::FormTools::LoadFormIcon( $session{'CurrentUser'}, $form_group_attribute->Id );
+
+if ( my $file_hash = _UploadedFile( 'FormGroupUploadIcon' ) ) {
+
+    my ($form_icon, $msg) = RT::Extension::FormTools::LoadFormIcon( $session{'CurrentUser'}, $form_group_attribute->Id );
+
+    if ( $form_icon ) {
+        # Delete the existing icon
+        my ( $del_ok, $del_msg ) = $form_icon->Delete;
+
+        RT->Logger->error("Unable to delete icon attribute id $ok, $del_msg") unless $del_ok;
+    }
+
+    my $new_form_icon = RT::Attribute->new( $session{CurrentUser} );
+    ( $ok, $msg ) = $new_form_icon->Create(
+        Name        => "FormTools Icon",
+        Description => "Icon for " . $form_group_attribute->Description,
+        Object      => $form_group_attribute,
+        Content     => {
+            type => $file_hash->{ContentType},
+            data => $file_hash->{LargeContent},
+            hash => md5_hex($file_hash->{LargeContent}),
+        },
+    );
+
+    push @results, loc("Unable to set form group icon") unless $ok;
+    RT->Logger->error("Unable to set form group icon: $msg") unless $ok;
+}
+
+MaybeRedirectForResults(
+    Actions   => \@results,
+    Arguments => { id => $id },
+);
+</%INIT>
+<%ARGS>
+$id => undef
+</%ARGS>

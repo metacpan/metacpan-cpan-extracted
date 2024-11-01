@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::FormTools;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 RT->AddStyleSheets('rt-extension-formtools.css');
 RT->AddJavaScript('rt-extension-formtools.js');
@@ -94,9 +94,29 @@ sub _ParseContent {
     *CurrentUserHasRight = sub {
         my $self  = shift;
         my $right = shift;
-        if ( $self->__Value('Name') eq 'FormTools Form' ) {
+        if ( ( $self->__Value('Name') eq 'FormTools Form' ) || ( $self->__Value('Name') eq 'FormTools Group' ) ) {
             return 1 if $self->CurrentUser->HasRight( Object => RT->System, Right => 'AdminForm' );
             $right = 'ShowForm' if $right eq 'display';
+
+            # if this is a form check if the user has right to the group
+            if ( RT->Config->Get('FormToolsEnableGroups') && ( $self->__Value('Name') eq 'FormTools Form' ) ) {
+                my $content;
+                my $form_attribute = RT::Attribute->new( RT->SystemUser );
+                my ( $ret ) = $form_attribute->Load( $self->id );
+                $content = $form_attribute->Content
+                    if $ret;
+                if ( $content && $content->{group} ) {
+                    my $group_attribute = RT::Attribute->new( $self->CurrentUser );
+                    ( $ret ) = $group_attribute->LoadByCols( Name => 'FormTools Group', Description => $content->{group} );
+                    if ( $ret ) {
+                        return
+                            $group_attribute->CurrentUser->HasRight( Object => $group_attribute, Right => $right )
+                            ||
+                            $self->CurrentUser->HasRight( Object => $self, Right => $right );
+                    }
+                }
+            }
+
             return $self->CurrentUser->HasRight( Object => $self, Right => $right );
         }
         return $orig_current_user_has_right->( $self, $right, @_ );
@@ -205,6 +225,16 @@ on this forms page. Include an icon that represents what the form is
 intended for and include a description to help users pick the right form
 for the right task.
 
+=head3 Routing
+
+The routing page allows you to change the default queue that the form will
+create a ticket in when submitted.
+
+You can also add alternate routing based on the values entered for custom
+fields on the form. Select a custom field and comparison logic to evaluate
+the value entered by the user. If the comparison logic matches then the
+ticket will be created in the alternate queue.
+
 =head3 Advanced
 
 The advanced page shows the raw JSON representation of the configured pages
@@ -229,6 +259,38 @@ Once the form is filled out, it will create a ticket, so form users
 also need CreateTicket in the queue where the form will be created.
 FormTools checks this at the beginning of a form and shows the user a
 message if they don't have sufficient rights.
+
+=head2 Form Groups
+
+If you would like to organize your forms by placing them in groups you can
+enable Form Groups by setting C<FormToolsEnableGroups> in your
+F</opt/rt5/etc/RT_SiteConfig.pm>:
+
+    Set( $FormToolsEnableGroups, 1 );
+
+Setting this config option to a true value will enable form group admin pages
+where you can create and maintain form groups.
+
+All forms will be required to placed in a form group.
+
+The list of forms will first show a list of available form groups. Clicking a
+form group will show all available forms in that group.
+
+Users with the ShowForm right for a form group will see the group listed and
+all forms in a group.
+
+Users with the ShowForm right for a form will see the form group listed and
+when clicking the group will only see the forms in that group they have the
+ShowForm right for.
+
+A banner message may be added to a form group that will be displayed to the
+user when listing available forms in that group. A new ShowBanner component
+is available that will also show the banner message on a form page.
+
+As with forms the form group Description tab allows you to upload an icon and
+provide text to show on this form groups listing page. Include an icon that
+represents what the forms in this group are intended for and include a
+description to help users pick the right form group for the right task.
 
 =head1 Internals
 

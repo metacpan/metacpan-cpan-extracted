@@ -73,10 +73,10 @@ ANNOUNCEMENT GROUPS
     The RTAnnounce queue has a custom field called 'Announcement Groups'
     which you can use to manage who will see an announcement. If you set no
     value, all users will see the announcement. If you set one or more RT
-    groups, only memebers of those groups will see it.
+    groups, only members of those groups will see it.
 
 PERMISSIONS
-    By default, the announements are static text. If you give users the
+    By default, the announcements are static text. If you give users the
     ShowTicket right on the RTAnnounce queue, the announcements will have
     links to the source tickets. This will allow users to see the history of
     an announcement or see longer messages that might be truncated on the
@@ -92,6 +92,11 @@ PERMISSIONS
     messages to an email list, you could create a list user in RT and add it
     as a CC to the announcement queue. Then messages posted for announcement
     in RT will also be sent to the notification list.
+
+RT-Extension-FormTools
+    If you would like to show announcements on FormTools form pages look at
+    the configuration option $ShowAnnouncementsInFormTools in the
+    CONFIGURATION section below.
 
 CONFIGURATION
   $RTAnnounceQueue
@@ -125,6 +130,31 @@ CONFIGURATION
     hidden. Users can view the bottom section by scrolling without taking up
     too much room at the top of the page.
 
+  $ShowAnnouncementsInFormTools
+    Set this to true to show announcements on FormTools pages.
+
+    You will need to add a custom field to the queue used for announcements.
+
+    First update the @CustomFieldValuesSources config setting to the
+    following:
+
+        Set(@CustomFieldValuesSources, (qw(RT::CustomFieldValues::AnnounceGroups RT::CustomFieldValues::FormToolsGroups)));
+
+    Then add create a new custom field and apply it to the queue used for
+    announcements:
+
+        Name:                Announcement FormTools Groups
+        Type:                Select multiple values
+        Field values source: RT user defined FormTools groups for the RT Announce plugin
+        Applies to:          Tickets
+
+    When creating a new announcement ticket select values in the new custom
+    field to control where the announcement will be displayed.
+
+    If the custom field is left empty the announcement will only display on
+    the homepage. If one or more values are selected the announcement will
+    only display for the values selected.
+
 AUTHOR
     Best Practical Solutions, LLC <modules@bestpractical.com>
 
@@ -138,7 +168,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Announce>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2012-2020 by Best Practical Solutions,
+    This software is Copyright (c) 2012-2024 by Best Practical Solutions,
     LLC
 
     This is free software, licensed under:

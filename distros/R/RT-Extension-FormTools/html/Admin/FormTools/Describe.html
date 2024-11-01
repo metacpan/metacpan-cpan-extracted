@@ -3,14 +3,14 @@
 <& /Elements/ListActions, actions => \@results &>
 
 <&| /Widgets/TitleBox, title => '', class => 'formtools-admin-description ml-auto mr-auto' &>
-  <p>Forms are shown to users on a page in the RT Self Service interface. Below you can manage how the form details will appear to end users.</p>
+  <p><&|/l&>Forms are shown to users on a page in the RT Self Service interface. Below you can manage how the form details will appear to end users.</&></p>
   <form name="EditFormDescription" action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Describe.html" method="post" enctype="multipart/form-data">
   <input type="hidden" class="hidden" name="id" value="<% $id %>" />
   <&| /Widgets/TitleBox, title => loc('Icon') &>
 % if ( $current_form_icon ) {
 <& /Elements/Forms/ShowFormIcon, FormID => $id &>
 % } else {
-      <p>Upload an icon to be shown to users on the Forms page or select a color for the background of graphical box users can click.</p>
+      <p><&|/l&>Upload an icon to be shown to users on the Forms page or select a color for the background of graphical box users can click.</&></p>
 % }
 
       <div class="row">
@@ -62,7 +62,7 @@ if ( $ARGS{'SubmitDescription'} ) {
     Abort( loc('Permission Denied') )
         unless $session{'CurrentUser'}->HasRight( Object => $RT::System, Right => 'AdminForm' );
 
-    if ( $form->{'form-description'} ne $ARGS{'FormDescription'} ) {
+    if ( ( $form->{'form-description'} // '' ) ne $ARGS{'FormDescription'} ) {
         $form->{'form-description'} = $ARGS{'FormDescription'};
         my ( $ret, $msg ) = $form_attribute->SetContent($form);
         if ($ret) {

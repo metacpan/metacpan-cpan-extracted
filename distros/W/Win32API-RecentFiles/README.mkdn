@@ -32,6 +32,7 @@ This module exports the `SHAddToRecentDocsA`
 
 Adds the filename to the list of recently accessed documents.
 `$filename` must be an ANSI string encoded in the local code page.
+Relative paths will be evaluated against the current directory.
 
 ## `SHAddToRecentDocsU`
 
@@ -43,7 +44,12 @@ Adds the filename to the list of recently accessed documents.
 
     SHAddToRecentDocsW('C\0:\0\\\0...');
 
-`$filename` must be a Unicode string encoded as UTF-16.
+`$filename` must be a sequence of bytes encoded as UTF-16.
+
+# CYGWIN
+
+Programs under Cygwin need to take care to pass native Windows
+filenames and paths with Backslashes (!) tto the API.
 
 # SEE ALSO
 

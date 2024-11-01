@@ -1,0 +1,77 @@
+<& /Admin/Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<&| /Widgets/TitleBox, title => '', class => 'formtools-admin-description ml-auto mr-auto' &>
+  <form name="EditFormGroupBannerMessage" action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Groups/Create.html" method="post" enctype="multipart/form-data">
+    <&| /Elements/LabeledValue, Label => loc('Name') &>
+      <input name="Name" class="form-control" value="<% $ARGS{Name} // '' %>"/>
+    </&>
+    <&| /Elements/LabeledValue, Label => loc('Description') &>
+      <div class="form-row">
+        <div class="col-12">
+          <input type="hidden" class="hidden" name="DescriptionType" value="text/html" />
+          <textarea autocomplete="off" class="form-control messagebox richtext" cols="80" rows="10" name="Description"><% $ARGS{Description} // '' %></textarea>
+        </div>
+      </div>
+    </&>
+</&>
+<div class="form-row">
+  <div class="col-12">
+    <& /Elements/Submit, Label => loc('Create'), Name => 'Create' &>
+  </div>
+</div>
+</form>
+<%INIT>
+Abort( loc('Permission Denied') )
+    unless $session{'CurrentUser'}->HasRight( Object => $RT::System, Right => 'AdminForm' );
+
+my ($title, @results, $id);
+$title = loc('Create form group');
+
+if ( $Create ) {
+    push @results, loc('Missing Name') unless $Name;
+
+    if ( $Name ) {
+        my $form_group = RT::Attribute->new( $session{CurrentUser} );
+        my ( $existing ) = $form_group->LoadByCols( Name => 'FormTools Group', Description => $Name );
+        if ( $existing ) {
+            push @results, loc("Form group '$Name' already exists");
+        }
+        else {
+            # create form group attribute
+            my ( $ret, $msg ) = $form_group->Create(
+                Name        => 'FormTools Group',
+                Description => $Name,
+                Object      => RT->System,
+                Content     => {
+                    banner_message => '',
+                    description    => $ARGS{Description} || '',
+                    disabled       => 0,
+                },
+            );
+            if ( $ret ) {
+                $id = $ret;
+                push @results, loc("Created form group '$Name'");
+            }
+            else {
+                RT->Logger->error( loc( "Couldn't create form group '$Name': [_1]", $msg ) )
+                unless $ret;
+                push @results, loc( "Couldn't create form group '$Name': [_1]", $msg );
+            }
+
+        }
+    }
+}
+
+MaybeRedirectForResults(
+    Actions   => \@results,
+    Arguments => { id => $id },
+    Path      => '/Admin/FormTools/Groups/Modify.html',
+);
+</%INIT>
+<%ARGS>
+$Name        => undef
+$Description => undef
+$Create      => undef
+</%ARGS>

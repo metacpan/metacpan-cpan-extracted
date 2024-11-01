@@ -10,9 +10,44 @@ if ( Menu->child('admin')
 
     $formtools->child( select => title => loc('Select'), path => '/Admin/FormTools/' );
     $formtools->child( create => title => loc('Create'), path => '/Admin/FormTools/Create.html' );
+
+    if ( RT->Config->Get('FormToolsEnableGroups') ) {
+        my $formtool_groups = $formtools->child(
+            formtools => title => loc('Groups'),
+            path      => '/Admin/FormTools/Groups/',
+        );
+
+        $formtool_groups->child( select => title => loc('Select'), path => '/Admin/FormTools/Groups/' );
+        $formtool_groups->child( create => title => loc('Create'), path => '/Admin/FormTools/Groups/Create.html' );
+    }
 }
 
-if ( $m->request_path =~ m{^/Admin/FormTools/} ) {
+if ( $m->request_path =~ m{^/Admin/FormTools/Groups/} ) {
+    my $page = PageMenu();
+    if ( $HTML::Mason::Commands::m->request_args->{'id'} && $HTML::Mason::Commands::m->request_args->{'id'} =~ /^\d+$/ ) {
+        my $forms = $page->child( forms => title => loc('Form Groups'), path => "/Admin/FormTools/Groups/" );
+        $forms->child( select => title => loc('Select'), path => "/Admin/FormTools/Groups/index.html" );
+        $forms->child( create => title => loc('Create'), path => "/Admin/FormTools/Groups/Create.html" );
+    } else {
+        $page->child( select => title => loc('Select'), path => "/Admin/FormTools/Groups/index.html" );
+        $page->child( create => title => loc('Create'), path => "/Admin/FormTools/Groups/Create.html" );
+    }
+
+    if ( ( $HTML::Mason::Commands::DECODED_ARGS->{'id'} || '' ) =~ /^(\d+)$/ ) {
+        my $id  = $1;
+        my $form_attribute = RT::Attribute->new($session{'CurrentUser'});
+        my ($ok, $msg) = $form_attribute->Load($id);
+
+        unless ( $ok ) {
+            RT->Logger->error("Unable to load form group with id $id");
+        }
+
+        $page->child( modify => title => loc('Modify'), path => "/Admin/FormTools/Groups/Modify.html?id=" . $id );
+        $page->child( 'group-rights' => title => loc('Group Rights'), path => "/Admin/FormTools/Groups/GroupRights.html?id=" . $id );
+        $page->child( 'user-rights' => title => loc('User Rights'), path => "/Admin/FormTools/Groups/UserRights.html?id=" . $id );
+    }
+}
+elsif ( $m->request_path =~ m{^/Admin/FormTools/} ) {
     my $page = PageMenu();
     if ( $HTML::Mason::Commands::m->request_args->{'id'} && $HTML::Mason::Commands::m->request_args->{'id'} =~ /^\d+$/ ) {
         my $forms = $page->child( forms => title => loc('Form Tools'), path => "/Admin/FormTools/" );
@@ -34,6 +69,7 @@ if ( $m->request_path =~ m{^/Admin/FormTools/} ) {
 
         $page->child( modify => title => loc('Modify'), path => "/Admin/FormTools/Modify.html?id=" . $id );
         $page->child( description => title => loc('Description'), path => "/Admin/FormTools/Describe.html?id=" . $id );
+        $page->child( routing => title => loc('Routing'), path => "/Admin/FormTools/Routing.html?id=" . $id );
         $page->child( advanced => title => loc('Advanced'), path => "/Admin/FormTools/Advanced.html?id=" . $id );
         $page->child( 'group-rights' => title => loc('Group Rights'), path => "/Admin/FormTools/GroupRights.html?id=" . $id );
         $page->child( 'user-rights' => title => loc('User Rights'), path => "/Admin/FormTools/UserRights.html?id=" . $id );

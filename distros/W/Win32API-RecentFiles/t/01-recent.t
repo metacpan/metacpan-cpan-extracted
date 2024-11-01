@@ -2,6 +2,8 @@
 use 5.020;
 use experimental 'signatures';
 use Win32;
+my %Registry;
+use Win32::TieRegistry ( TiedHash => \%Registry );
 use File::Basename 'basename';
 use Test2::V0 '-no_srand';
 use File::Spec;
@@ -13,8 +15,24 @@ use Win32API::RecentFiles 'SHAddToRecentDocsA', 'SHAddToRecentDocsU', 'SHAddToRe
 my $recent = Win32::GetFolderPath(Win32::CSIDL_RECENT());
 diag "Recent files are in '$recent'";
 
+my $testcount = 3;
+plan $testcount;
+
+# Now, check whether Explorer (and its APIs) even show+create recent documents
+# Skip the test if they don't
+my $recentdocs = 'HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\RecentDocs\\';
+my $rd = $Registry{$recentdocs};
+if( $rd and not $rd->%* ) {
+	SKIP: {
+		skip "No recent documents found in '$recentdocs'", $testcount;
+	};
+	exit
+};
+
+my $is_cygwin = $^O eq 'cygwin';
+
 sub wait_for_file( $filename, $wait=3 ) {
-    my $fn = Win32::GetANSIPathName($filename);
+    my $fn = $is_cygwin ? encode('UTF-8', $filename) : Win32::GetANSIPathName($filename);
     (my $plain_fn = $fn) =~ s/\.txt\././;
     my $timeout = time+$wait;
     while(    ! -f $fn
@@ -26,7 +44,7 @@ sub wait_for_file( $filename, $wait=3 ) {
 }
 
 sub unlink_file( $filename ) {
-    my $fn = Win32::GetANSIPathName($filename);
+    my $fn = $is_cygwin ? encode('UTF-8', $filename) : Win32::GetANSIPathName($filename);
     (my $plain_fn = $fn) =~ s/\.txt\././;
     unlink $fn;
     unlink $plain_fn;
@@ -46,8 +64,7 @@ sub dump_recent( $dir=$recent ) {
 my $fn = basename( $0 );
 my $recent_entry = "$recent\\$fn.lnk";
 unlink $recent_entry;
-my $f = File::Spec->rel2abs($0);
-$f =~ s!/!\\!g; # hack for Cygwin
+my $f = "t\\$fn"; # Windows paths, even for Cygwin!
 SHAddToRecentDocsA($f);
 if(! ok wait_for_file( $recent_entry ), "$recent_entry was added to recent files") {
     dump_recent;
@@ -56,7 +73,7 @@ unlink $recent_entry or warn $^E, $!;
 
 $fn = "Ümloud.txt";
 $recent_entry = "$recent\\$fn.lnk";
-my $fn_wide = encode('UTF16-LE', File::Spec->rel2abs( $fn ));
+my $fn_wide = encode('UTF16-LE', $fn );
 note sprintf "%vX", $fn_wide;
 unlink_file( $recent_entry );
 $f =~ s!/!\\!g; # hack for Cygwin

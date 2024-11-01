@@ -1,5 +1,8 @@
 Revision history for RT-Extension-Announce
 
+1.05 2024-10-31
+ - Support to show announcements for FormTools pages
+
 1.04 2021-04-23
  - Add bootstrap style for RT 5
  - Localize toggle link text

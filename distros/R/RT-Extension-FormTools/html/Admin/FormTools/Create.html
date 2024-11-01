@@ -10,6 +10,18 @@
 
   <& /Elements/LabeledValue, Label => loc('Queue'), LabelTooltip => loc('Tickets will be created in this queue'),
                              RawValue => $m->scomp('/Elements/SelectQueue', Name => 'Queue', Default => $ARGS{Queue}) &>
+
+% if ( RT->Config->Get('FormToolsEnableGroups') ) {
+  <&| /Elements/LabeledValue, Label => loc('Group') &>
+    <select name="Group" id="Group" class="form-control selectpicker">
+      <option value=""><% loc('Select a group') %></option>
+% foreach my $group ( @groups ) {
+      <option value="<% $group %>" <% $group eq $Group ? 'selected' : '' %>><% $group %></option>
+% }
+    </select>
+  </&>
+% }
+
   <div class="form-row">
     <div class="col-12">
       <& /Elements/Submit, Label => loc('Create'), Name => 'Create' &>
@@ -25,9 +37,23 @@ Abort( loc('Permission Denied') )
 my ($title, @results);
 $title = loc('Create form');
 
+my $groups = RT::Attributes->new( $session{'CurrentUser'} );
+$groups->Limit( FIELD => 'Name', VALUE => 'FormTools Group' );
+my ( @unsorted_groups, @groups );
+while ( my $group = $groups->Next ) {
+    my $content = $group->Content;
+    next if $content->{disabled};
+    push @unsorted_groups, $group->Description;
+}
+@groups = sort { $a cmp $b } @unsorted_groups;
+
 if ( $Create ) {
     push @results, loc('Missing Name') unless $Description;
     push @results, loc('Missing Queue') unless $Queue;
+
+    if ( RT->Config->Get('FormToolsEnableGroups') ) {
+        push @results, loc('Missing Group') unless $Group;
+    }
 
     if ( $Description && $Queue ) {
 
@@ -51,7 +77,10 @@ if ( $Create ) {
                     Name        => 'FormTools Form',
                     Description => $ARGS{Description},
                     Object      => RT->System,
-                    Content     => { queue => $queue_obj->Name },
+                    Content     => {
+                        queue => $queue_obj->Name,
+                        group => $Group,
+                    },
                 );
 
                 if ($ret) {
@@ -74,7 +103,7 @@ if ( $Create ) {
     MaybeRedirectForResults(
         Actions   => \@results,
         Path      => '/Admin/FormTools/Create.html',
-        Arguments => { Description => $Description, Queue => $Queue },
+        Arguments => { Description => $Description, Queue => $Queue, Group => $Group },
     );
 }
 </%INIT>
@@ -82,4 +111,5 @@ if ( $Create ) {
 $Description => undef
 $Queue       => undef
 $Create      => undef
+$Group       => ''
 </%ARGS>

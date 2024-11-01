@@ -32,7 +32,10 @@
 #include <errno.h>
 #include <hiredis/alloc.h>
 #ifndef _WIN32
+#include <alloca.h>
 #include <strings.h>
+#else
+#include <malloc.h>
 #endif
 #include <string.h>
 
@@ -75,6 +78,16 @@ static cmddef redis_commands[] = {
 #undef COMMAND
 };
 
+static inline void to_upper(char *dst, const char *src, uint32_t len) {
+    uint32_t i;
+    for (i = 0; i < len; i++) {
+        if (src[i] >= 'a' && src[i] <= 'z')
+            dst[i] = src[i] - ('a' - 'A');
+        else
+            dst[i] = src[i];
+    }
+}
+
 /* Looks up a command or subcommand in the command table. Arg0 and arg1 are used
  * to lookup the command. The function returns CMD_UNKNOWN on failure. On
  * success, the command type is returned and *firstkey and *arity are
@@ -82,13 +95,17 @@ static cmddef redis_commands[] = {
 cmddef *redis_lookup_cmd(const char *arg0, uint32_t arg0_len, const char *arg1,
                          uint32_t arg1_len) {
     int num_commands = sizeof(redis_commands) / sizeof(cmddef);
+    /* Compare command name in uppercase. */
+    char *cmd = alloca(arg0_len);
+    to_upper(cmd, arg0, arg0_len);
+    char *subcmd = NULL; /* Alloca later on demand. */
     /* Find the command using binary search. */
     int left = 0, right = num_commands - 1;
     while (left <= right) {
         int i = (left + right) / 2;
         cmddef *c = &redis_commands[i];
 
-        int cmp = strncasecmp(c->name, arg0, arg0_len);
+        int cmp = strncmp(c->name, cmd, arg0_len);
         if (cmp == 0 && strlen(c->name) > arg0_len)
             cmp = 1; /* "HGETALL" vs "HGET" */
 
@@ -97,11 +114,14 @@ cmddef *redis_lookup_cmd(const char *arg0, uint32_t arg0_len, const char *arg1,
             if (arg1 == NULL) {
                 /* Command has subcommands, but none given. */
                 return NULL;
-            } else {
-                cmp = strncasecmp(c->subname, arg1, arg1_len);
-                if (cmp == 0 && strlen(c->subname) > arg1_len)
-                    cmp = 1;
             }
+            if (subcmd == NULL) {
+                subcmd = alloca(arg1_len);
+                to_upper(subcmd, arg1, arg1_len);
+            }
+            cmp = strncmp(c->subname, subcmd, arg1_len);
+            if (cmp == 0 && strlen(c->subname) > arg1_len)
+                cmp = 1;
         }
 
         if (cmp < 0) {
@@ -177,6 +197,15 @@ char *redis_parse_bulk(char *p, char *end, char **str, uint32_t *len) {
     if (p >= end || *p++ != LF)
         return NULL;
     return p;
+}
+
+static inline int push_keypos(struct cmd *r, char *arg, uint32_t arglen) {
+    struct keypos *kpos = hiarray_push(r->keys);
+    if (kpos == NULL)
+        return 0;
+    kpos->start = arg;
+    kpos->end = arg + arglen;
+    return 1;
 }
 
 /*
@@ -286,11 +315,8 @@ void redis_parse_cmd(struct cmd *r) {
                 /* Keyword found. Now the first key is the next arg. */
                 if ((p = redis_parse_bulk(p, end, &arg, &arglen)) == NULL)
                     goto error;
-                struct keypos *kpos = hiarray_push(r->keys);
-                if (kpos == NULL)
+                if (!push_keypos(r, arg, arglen))
                     goto oom;
-                kpos->start = arg;
-                kpos->end = arg + arglen;
                 goto done;
             }
         }
@@ -333,11 +359,8 @@ void redis_parse_cmd(struct cmd *r) {
         goto error;
     }
 
-    struct keypos *kpos = hiarray_push(r->keys);
-    if (kpos == NULL)
+    if (!push_keypos(r, arg, arglen))
         goto oom;
-    kpos->start = arg;
-    kpos->end = arg + arglen;
 
     /* Special commands where we want all keys (not only the first key). */
     if (redis_argx(r) || redis_argkvx(r)) {
@@ -350,11 +373,8 @@ void redis_parse_cmd(struct cmd *r) {
                 goto error;
             if (redis_argkvx(r) && i % 2 == 0)
                 continue; /* not a key */
-            struct keypos *kpos = hiarray_push(r->keys);
-            if (kpos == NULL)
+            if (!push_keypos(r, arg, arglen))
                 goto oom;
-            kpos->start = arg;
-            kpos->end = arg + arglen;
         }
     }
 

@@ -20,15 +20,13 @@ name: Blockchain-Ethereum-RLP
 provides:
   Blockchain::Ethereum::RLP:
     file: lib/Blockchain/Ethereum/RLP.pm
-    version: '0.010'
+    version: '0.011'
 requires:
-  Object::Pad: '0.814'
-  indirect: '0.39'
   perl: v5.26.0
 resources:
   homepage: https://github.com/refeco/Blockchain-Ethereum-RLP
   repository: https://github.com/refeco/Blockchain-Ethereum-RLP.git
-version: '0.010'
+version: '0.011'
 x_authority: cpan:REFECO
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.74'

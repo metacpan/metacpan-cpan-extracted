@@ -1,0 +1,63 @@
+{
+   "abstract" : "SlackBuild package manager helper",
+   "author" : [
+      "Samuel Young <samyoung12788@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Slackware-SBoKeeper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "List::Util" : "1.33",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/1-1sam/sbokeeper/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/1-1sam/sbokeeper.git",
+         "web" : "https://codeberg.org/1-1sam/sbokeeper"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

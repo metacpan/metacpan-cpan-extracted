@@ -1,11 +1,11 @@
 % my $queue = $m->notes('queue');
 % my $pages = $DECODED_ARGS->{'form_config'}{'formtools-pages'};
-% for my $page ( sort { $pages->{$a}{'sort_order'} <=> $pages->{$b}{'sort_order'} } keys %$pages ) {
+% for my $page ( sort { $pages->{$a}{'sort_order'} <=> $pages->{$b}{'sort_order'} } grep { exists $pages->{$_}{'sort_order'} } keys %$pages ) {
 <%perl>
     my @fields;
     my @elements = @{ $pages->{$page}{'content'} };
     for my $element (@elements) {
-        my $input_name;
+        my ( $input_name, $is_html );
         my $name;
         if ( $name = $element->{'input-name'} ) {
             next if ( $element->{'type'} // '' ) eq 'hidden';
@@ -25,12 +25,21 @@
                         Object      => RT::Ticket->new( $session{CurrentUser} ),
                         CustomField => $cf,
                     );
+                    $is_html = $cf->Type eq 'HTML';
                 }
             }
         }
 
         if ($input_name) {
-            push @fields, { name => $name, value => $DECODED_ARGS->{$input_name} };
+            if ( $input_name eq 'Attach' ) {
+                push @fields, { name => $name, value => $ARGS{AttachedFilenames} };
+            }
+            elsif ( ( ( $input_name eq 'Content' ) || $is_html ) && RT->Config->Get( 'MessageBoxRichText',  $session{'CurrentUser'} ) ) {
+                push @fields, { name => $name, raw_value => $DECODED_ARGS->{$input_name} };
+            }
+            else {
+                push @fields, { name => $name, value => $DECODED_ARGS->{$input_name} };
+            }
         }
     }
 </%perl>
@@ -39,7 +48,7 @@
 <h4><% $pages->{ $page }{'name'} %></h4>
 <div>
 % foreach my $field (@fields) {
-<& /Elements/LabeledValue, Label => loc($field->{name}), ValueSpanClass => 'current-value', Value => ref $field->{value} ? join(', ', @{$field->{value}}) : $field->{value} &>
+<& /Elements/LabeledValue, Label => loc($field->{name}), ValueSpanClass => 'current-value', RawValue => $field->{raw_value}, Value => ref $field->{value} ? join(', ', @{$field->{value}}) : $field->{value} &>
 % }
 </div><br />
 % }

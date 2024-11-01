@@ -1,4 +1,7 @@
 
 <& /SelfService/Elements/Header, Title => loc('Forms Home') &>
 
-<& /Elements/Forms/ListForms &>
+<& /Elements/Forms/ListForms, Group => $Group &>
+<%args>
+$Group => undef
+</%args>

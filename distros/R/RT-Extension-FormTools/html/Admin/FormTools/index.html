@@ -9,6 +9,9 @@
       <tr class="collection-as-table">
         <th class="collection-as-table"><&|/l&>Name</&></th>
         <th class="collection-as-table"><&|/l&>Creates Tickets in Queue</&></th>
+% if ( RT->Config->Get('FormToolsEnableGroups') ) {
+        <th class="collection-as-table"><&|/l&>Group</&></th>
+% }
         <th class="collection-as-table"><&|/l&>Enabled</&></th>
       </tr>
 % my $i = 0;
@@ -17,6 +20,9 @@
       <tr class="<% $i % 2 ? 'oddline' : 'evenline' %>">
         <td class="collection-as-table"><a href="<% RT->Config->Get('WebURL') %>Admin/FormTools/Modify.html?id=<% $form_ref->{'id'} %>"><% $form_ref->{'name'} %></a></td>
         <td class="collection-as-table"><% $form_ref->{'queue_name'} %></td>
+% if ( RT->Config->Get('FormToolsEnableGroups') ) {
+        <td class="collection-as-table"><% $form_ref->{'group'} %></td>
+% }
         <td class="collection-as-table">
           <div class="custom-control custom-checkbox">
             <input type="checkbox" class="custom-control-input checkbox" id="enable-form-<% $form_ref->{'id'} %>" name="enable-form-<% $form_ref->{'id'} %>" value="1" <% $form_ref->{disabled} ? '' : 'checked="checked"' %> />
@@ -123,7 +129,7 @@ while ( my $form = $forms->Next ) {
     push @unsorted_forms, $form_ref;
 }
 
-my @forms = sort { $a->{'name'} cmp $b->{'name'} } @unsorted_forms;
+my @forms = sort { lc $a->{'name'} cmp lc $b->{'name'} } @unsorted_forms;
 
 $m->callback(
     CallbackName     => 'Initial',

@@ -140,6 +140,16 @@
                     </div>
                   </&>
 %               }
+%               if ( $item ne 'Content' ) {
+                  <&| /Elements/LabeledValue, Label => '' &>
+                    <div class="custom-control custom-checkbox">
+                      <input class="custom-control-input" id="<% CSSClass($item) %>-include_in_content" type="checkbox" name="include_in_content" value="1" />
+                      <label class="custom-control-label" for="<% CSSClass($item) %>-include_in_content">
+                        <&|/l&>Include in Content</&>
+                      </label>
+                    </div>
+                  </&>
+%               }
                 </div>
                 <div class="modal-footer">
                   <button type="submit" class="btn btn-primary button form-control"><% loc('Update') %></button>
@@ -245,6 +255,14 @@
                       <input class="custom-control-input" id="<% CSSClass($item) %>-readonly" type="checkbox" name="readonly" value="1" />
                       <label class="custom-control-label" for="<% CSSClass($item) %>-readonly">
                         <&|/l&>Readonly</&>
+                      </label>
+                    </div>
+                  </&>
+                  <&| /Elements/LabeledValue, Label => '' &>
+                    <div class="custom-control custom-checkbox">
+                      <input class="custom-control-input" id="<% CSSClass($item) %>-include_in_content" type="checkbox" name="include_in_content" value="1" />
+                      <label class="custom-control-label" for="<% CSSClass($item) %>-include_in_content">
+                        <&|/l&>Include in Content</&>
                       </label>
                     </div>
                   </&>
@@ -375,6 +393,8 @@
                 <span class="badge badge-primary align-text-bottom">
 %                 if ( $item->{type} eq 'raw_html' ) {
                     <% uc($item->{wrapper} || 'HTML') %>
+%                 } elsif ( ( $item->{comp_name} // '' ) eq 'ShowBanner' ) {
+                    <% loc('Component') %>
 %                 } elsif ( ( $item->{comp_name} // '' ) eq 'ShowChoices' ) {
                     <% loc('Component') %>
 %                 } elsif ( $item->{type} eq 'hidden' ) {
@@ -420,7 +440,7 @@
 %         $i = 0;
 %         for my $item ( grep { $_->{type} ne 'hidden' || $_->{'input-name'} ne 'create_ticket' } @{$form->{'formtools-pages'}{$page_name}{content} || []} ) {
             <div class="modal fade formtools-element-modal" id="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-modal" tabindex="-1" role="dialog" data-type="<% $item->{type} %>" data-name="<% $item->{arguments} && $item->{arguments}{name} ? $item->{arguments}{name} : '' %>">
-              <div class="modal-dialog <% $item->{type} eq 'component' && $item->{comp_name} ne 'ShowChoices' && %dependent_custom_fields && !RT::Extension::FormTools::is_core_field($item->{arguments}{name}) ? 'modal-lg' : '' %>" role="document">
+              <div class="modal-dialog <% $item->{type} eq 'component' && $item->{comp_name} ne 'ShowBanner' && $item->{comp_name} ne 'ShowChoices' && %dependent_custom_fields && !RT::Extension::FormTools::is_core_field($item->{arguments}{name}) ? 'modal-lg' : '' %>" role="document">
                 <div class="modal-content">
                   <form class="formtools-element-form">
                     <div class="modal-header">
@@ -535,6 +555,16 @@
                             <input class="custom-control-input" id="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-readonly" type="checkbox" name="readonly" value="1" <% ( $item->{arguments}{render_as} // '' ) =~ /readonly/ ? q{checked="checked"} : '' |n %> />
                             <label class="custom-control-label" for="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-readonly">
                               <&|/l&>Readonly</&>
+                            </label>
+                          </div>
+                        </&>
+%                     }
+%                     if ( $item->{arguments}{name} ne 'Content' ) {
+                        <&| /Elements/LabeledValue, Label => '' &>
+                          <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input" id="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-include_in_content" type="checkbox" name="include_in_content" value="1" <% ( $item->{arguments}{include_in_content} // '' ) eq '1' ? q{checked="checked"} : '' |n %> />
+                            <label class="custom-control-label" for="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-include_in_content">
+                              <&|/l&>Include in Content</&>
                             </label>
                           </div>
                         </&>
@@ -736,7 +766,7 @@ my $title = loc("Modify form [_1]", $form_attribute->Description);
 my $nav_type = 'pill'; # 'tab' or 'pill'
 
 my @html_components = qw( h1 h2 h3 hr p html );
-my @core_components = qw( Requestors Cc AdminCc Owner Subject Content Due TimeEstimated);
+my @core_components = qw( Requestors Cc AdminCc Owner Subject Content Due TimeEstimated Attach );
 
 my $queue = RT::Queue->new($session{'CurrentUser'});
 $queue->Load($form->{queue});
@@ -763,6 +793,7 @@ while ( my $cf = $cfs->Next ) {
 }
 
 my %other_components = (
+    ShowBanner  => { type => 'component', comp_name => 'ShowBanner' },
     ShowChoices => { type => 'component', comp_name => 'ShowChoices' },
     Hidden      => { type => 'hidden' },
 );

@@ -2,13 +2,14 @@ use strict;
 use warnings;
 package RT::Extension::Announce;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 RT->AddJavaScript('announce.js');
 RT->AddStyleSheets('announce.css');
 
 sub GetAnnouncements {
-    my $current_user = shift;
+    my $current_user     = shift;
+    my $form_tools_group = shift || 'RT Homepage';
 
     my $AnnounceQueue = RT->Config->Get('RTAnnounceQueue') || 'RTAnnounce';
     my $Queue = RT::Queue->new( RT->SystemUser );
@@ -28,7 +29,15 @@ sub GetAnnouncements {
     my @statuses = $Queue->ActiveStatusArray();
     @statuses = map { s/(['\\])/\\$1/g; "Status = '$_'" } @statuses;
     my $status_query = join( ' OR ', @statuses );
-    $tickets->FromSQL("Queue = '$AnnounceQueue' AND ( $status_query )");
+    my $ticket_sql = "Queue = '$AnnounceQueue' AND ( $status_query )";
+    if ( RT->Config->Get('ShowAnnouncementsInFormTools') && RT->Config->Get('FormToolsEnableGroups') ) {
+        my @form_groups = ( "'CF.{Announcement FormTools Groups}' = '$form_tools_group'" );
+        if ( $form_tools_group eq 'RT Homepage' ) {
+            push @form_groups, "'CF.{Announcement FormTools Groups}' IS NULL";
+        }
+        $ticket_sql .= ' AND (  ' . join( ' OR ', @form_groups ) . '  )';
+    }
+    $tickets->FromSQL($ticket_sql);
     return if $tickets->Count == 0;
 
     my $who = $current_user->Name;
@@ -174,12 +183,12 @@ the last updated time and will move the announcement to the top of the list.
 
 The RTAnnounce queue has a custom field called 'Announcement Groups' which
 you can use to manage who will see an announcement. If you set no value, all
-users will see the announcement. If you set one or more RT groups, only memebers
+users will see the announcement. If you set one or more RT groups, only members
 of those groups will see it.
 
 =head1 PERMISSIONS
 
-By default, the announements are static text. If you give
+By default, the announcements are static text. If you give
 users the ShowTicket right on the RTAnnounce queue, the announcements
 will have links to the source tickets. This will allow users to see the
 history of an announcement or see longer messages that might be
@@ -195,6 +204,12 @@ announcement messages to an email list,
 you could create a list user in RT and add it as a CC to the announcement
 queue. Then messages posted for announcement in RT will also be sent to the
 notification list.
+
+=head1 RT-Extension-FormTools
+
+If you would like to show announcements on FormTools form pages look at the
+configuration option C<$ShowAnnouncementsInFormTools> in the CONFIGURATION
+section below.
 
 =head1 CONFIGURATION
 
@@ -231,6 +246,31 @@ The top part of the message will be shown with a scrollbar and the part containe
 the div will be hidden. Users can view the bottom section by scrolling without taking
 up too much room at the top of the page.
 
+=head2 C<$ShowAnnouncementsInFormTools>
+
+Set this to true to show announcements on FormTools pages.
+
+You will need to add a custom field to the queue used for announcements.
+
+First update the C<@CustomFieldValuesSources> config setting to the following:
+
+    Set(@CustomFieldValuesSources, (qw(RT::CustomFieldValues::AnnounceGroups RT::CustomFieldValues::FormToolsGroups)));
+
+Then add create a new custom field and apply it to the queue used for
+announcements:
+
+    Name:                Announcement FormTools Groups
+    Type:                Select multiple values
+    Field values source: RT user defined FormTools groups for the RT Announce plugin
+    Applies to:          Tickets
+
+When creating a new announcement ticket select values in the new custom field to
+control where the announcement will be displayed.
+
+If the custom field is left empty the announcement will only display on the
+homepage. If one or more values are selected the announcement will only display
+for the values selected.
+
 =head1 AUTHOR
 
 Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
@@ -247,7 +287,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2012-2020 by Best Practical Solutions, LLC
+This software is Copyright (c) 2012-2024 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

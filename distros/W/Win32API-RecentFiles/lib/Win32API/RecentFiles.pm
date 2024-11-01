@@ -1,4 +1,4 @@
-package Win32API::RecentFiles 0.03;
+package Win32API::RecentFiles 0.04;
 use 5.020;
 use experimental 'signatures';
 use Exporter 'import';
@@ -7,7 +7,7 @@ our @ISA = qw(Exporter DynaLoader);
 
 our @EXPORT_OK = qw(SHAddToRecentDocsA SHAddToRecentDocsU SHAddToRecentDocsW);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 bootstrap Win32API::RecentFiles;
 1;
@@ -44,6 +44,7 @@ C<SHAddToRecentDocsU> and C<SHAddToRecentDocsW> functions.
   
 Adds the filename to the list of recently accessed documents.
 C<$filename> must be an ANSI string encoded in the local code page.
+Relative paths will be evaluated against the current directory.
 
 =head2 C<SHAddToRecentDocsU>
 
@@ -55,7 +56,12 @@ C<$filename> must be a Unicode string encoded as UTF-8.
 
   SHAddToRecentDocsW('C\0:\0\\\0...');
 
-C<$filename> must be a Unicode string encoded as UTF-16.
+C<$filename> must be a sequence of bytes encoded as UTF-16.
+
+=head1 CYGWIN
+
+Programs under Cygwin need to take care to pass native Windows
+filenames and paths with Backslashes (!) tto the API.
 
 =head1 SEE ALSO
 

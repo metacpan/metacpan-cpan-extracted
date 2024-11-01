@@ -1,26 +1,37 @@
-use v5.26;
+package Blockchain::Ethereum::Keystore::Address;
 
+use v5.26;
 use strict;
 use warnings;
-no indirect;
-use feature 'signatures';
 
-use Object::Pad;
-
-package Blockchain::Ethereum::Keystore::Address;
-class Blockchain::Ethereum::Keystore::Address;
-
+# ABSTRACT: Ethereum address abstraction
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.010';          # VERSION
+our $VERSION   = '0.011';          # VERSION
 
 use Carp;
 use Crypt::Digest::Keccak256 qw(keccak256_hex);
 
-field $address :reader :writer :param;
+sub new {
+    my ($class, %params) = @_;
 
-ADJUST {
+    my $address = $params{address};
+    croak "Required param address not given" unless $address;
 
-    my $unprefixed = $self->address =~ s/^0x//r;
+    my $self = bless {}, $class;
+    $self->{address} = $address;
+    $self->_checksum;
+
+    return $self;
+}
+
+sub address {
+    return shift->{address};
+}
+
+sub _checksum {
+    my ($self) = shift;
+
+    my $unprefixed = $self->no_prefix;
 
     croak 'Invalid address format' unless length($unprefixed) == 40;
 
@@ -30,10 +41,12 @@ ADJUST {
 
     $checksummed_chars .= hex $hashed_chars[$_] >= 8 ? uc $address_chars[$_] : lc $address_chars[$_] for 0 .. length($unprefixed) - 1;
 
-    $self->set_address($checksummed_chars);
+    $self->{address} = "0x$checksummed_chars";
+    return $self;
 }
 
-method no_prefix {
+sub no_prefix {
+    my $self = shift;
 
     my $unprefixed = $self->address =~ s/^0x//r;
     return $unprefixed;
@@ -43,10 +56,9 @@ use overload
     fallback => 1,
     '""'     => \&to_string;
 
-method to_string {
-
-    return $self->address if $self->address =~ /^0x/;
-    return '0x' . $self->address;
+sub to_string {
+    my $self = shift;
+    return $self->address;
 }
 
 1;
@@ -59,11 +71,11 @@ __END__
 
 =head1 NAME
 
-Blockchain::Ethereum::Keystore::Address
+Blockchain::Ethereum::Keystore::Address - Ethereum address abstraction
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -82,7 +94,13 @@ Generate a new address:
 
 =head2 no_prefix
 
-Returns the checksummed address without the 0x prefix
+Removes the 0x prefix
+
+=over 4
+
+=back
+
+Returns the address string without the 0x prefix
 
 =head2 to_string
 

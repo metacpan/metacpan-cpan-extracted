@@ -1,9 +1,12 @@
 Changes
 doc/images/announce-screenshot.png
 etc/initialdata
+html/Callbacks/RT-Extension-Announce/Elements/Forms/ListForms/BeforeFormsTitleBox
 html/Callbacks/RT-Extension-Announce/Elements/PageLayout/BeforeBody
+html/Callbacks/RT-Extension-Announce/FormTools/Form/BeforeListActions
 html/Callbacks/RT-Extension-Announce/m/_elements/menu/MassageMenu
 html/Callbacks/RT-Extension-Announce/Ticket/Create.html/AfterOwner
+html/Elements/Announce/DisplayAnnouncements
 html/m/announcements
 html/NoAuth/css/announce.css
 html/NoAuth/js/announce.js
@@ -22,6 +25,7 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/YAML/Tiny.pm
 lib/RT/CustomFieldValues/AnnounceGroups.pm
+lib/RT/CustomFieldValues/FormToolsGroups.pm
 lib/RT/Extension/Announce.pm
 lib/RT/Extension/Announce/Test.pm
 lib/RT/Extension/Announce/Test.pm.in

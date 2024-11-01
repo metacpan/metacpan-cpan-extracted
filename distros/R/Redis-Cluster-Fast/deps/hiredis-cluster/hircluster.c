@@ -960,8 +960,8 @@ dict *parse_cluster_nodes(redisClusterContext *cc, char *str, int str_len,
                 goto error;
             }
 
-            // the address string is ":0", skip this node.
-            if (sdslen(part[1]) == 2 && strcmp(part[1], ":0") == 0) {
+            // if the address string starts with ":0", skip this node.
+            if (sdslen(part[1]) >= 2 && memcmp(part[1], ":0", 2) == 0) {
                 sdsfreesplitres(part, count_part);
                 count_part = 0;
                 part = NULL;
@@ -1515,7 +1515,13 @@ void redisClusterFree(redisClusterContext *cc) {
     }
 
     if (cc->nodes != NULL) {
-        dictRelease(cc->nodes);
+        /* Clear cc->nodes before releasing the dict since the release procedure
+           might access cc->nodes. When a node and its hiredis context are freed
+           all pending callbacks are executed. Clearing cc->nodes prevents a pending
+           slotmap update command callback to trigger additional slotmap updates. */
+        dict *nodes = cc->nodes;
+        cc->nodes = NULL;
+        dictRelease(nodes);
     }
 
     if (cc->requests != NULL) {
@@ -1945,6 +1951,9 @@ int redisClusterConnect2(redisClusterContext *cc) {
     if (cc == NULL) {
         return REDIS_ERR;
     }
+    /* Clear a previously set shutdown flag since we allow a
+     * reconnection of an async context using this API (legacy). */
+    cc->flags &= ~HIRCLUSTER_FLAG_SHUTDOWN;
 
     return _redisClusterConnect2(cc);
 }
@@ -2230,14 +2239,22 @@ retry:
 
     node = node_get_by_table(cc, (uint32_t)command->slot_num);
     if (node == NULL) {
-        goto error;
+        /* Update the slotmap since the slot is not served. */
+        if (redisClusterUpdateSlotmap(cc) != REDIS_OK) {
+            goto error;
+        }
+        node = node_get_by_table(cc, (uint32_t)command->slot_num);
+        if (node == NULL) {
+            /* Return error since the slot is still not served. */
+            goto error;
+        }
     }
 
     c = ctx_get_by_node(cc, node);
     if (c == NULL || c->err) {
         /* Failed to connect. Maybe there was a failover and this node is gone.
          * Update slotmap to find out. */
-        if (cluster_update_route(cc) != REDIS_OK) {
+        if (redisClusterUpdateSlotmap(cc) != REDIS_OK) {
             goto error;
         }
 
@@ -3031,10 +3048,10 @@ void *redisClusterCommand(redisClusterContext *cc, const char *format, ...) {
     return reply;
 }
 
-void *redisClusterCommandToNode(redisClusterContext *cc, redisClusterNode *node,
-                                const char *format, ...) {
+void *redisClustervCommandToNode(redisClusterContext *cc,
+                                 redisClusterNode *node, const char *format,
+                                 va_list ap) {
     redisContext *c;
-    va_list ap;
     int ret;
     void *reply;
     int updating_slotmap = 0;
@@ -3052,9 +3069,7 @@ void *redisClusterCommandToNode(redisClusterContext *cc, redisClusterNode *node,
         memset(cc->errstr, '\0', sizeof(cc->errstr));
     }
 
-    va_start(ap, format);
     ret = redisvAppendCommand(c, format, ap);
-    va_end(ap);
 
     if (ret != REDIS_OK) {
         __redisClusterSetError(cc, c->err, c->errstr);
@@ -3083,6 +3098,18 @@ void *redisClusterCommandToNode(redisClusterContext *cc, redisClusterNode *node,
             cc->errstr[0] = '\0';
         }
     }
+
+    return reply;
+}
+
+void *redisClusterCommandToNode(redisClusterContext *cc, redisClusterNode *node,
+                                const char *format, ...) {
+    va_list ap;
+    redisReply *reply = NULL;
+
+    va_start(ap, format);
+    reply = redisClustervCommandToNode(cc, node, format, ap);
+    va_end(ap);
 
     return reply;
 }
@@ -3223,7 +3250,6 @@ int redisClustervAppendCommand(redisClusterContext *cc, const char *format,
 
 int redisClusterAppendCommand(redisClusterContext *cc, const char *format,
                               ...) {
-
     int ret;
     va_list ap;
 
@@ -3238,11 +3264,10 @@ int redisClusterAppendCommand(redisClusterContext *cc, const char *format,
     return ret;
 }
 
-int redisClusterAppendCommandToNode(redisClusterContext *cc,
-                                    redisClusterNode *node, const char *format,
-                                    ...) {
+int redisClustervAppendCommandToNode(redisClusterContext *cc,
+                                     redisClusterNode *node, const char *format,
+                                     va_list ap) {
     redisContext *c;
-    va_list ap;
     struct cmd *command = NULL;
     char *cmd = NULL;
     int len;
@@ -3263,10 +3288,7 @@ int redisClusterAppendCommandToNode(redisClusterContext *cc,
         return REDIS_ERR;
     }
 
-    /* Allocate cmd and encode the variadic command */
-    va_start(ap, format);
     len = redisvFormatCommand(&cmd, format, ap);
-    va_end(ap);
 
     if (len == -1) {
         goto oom;
@@ -3303,6 +3325,23 @@ oom:
     command_destroy(command);
     __redisClusterSetError(cc, REDIS_ERR_OOM, "Out of memory");
     return REDIS_ERR;
+}
+
+int redisClusterAppendCommandToNode(redisClusterContext *cc,
+                                    redisClusterNode *node, const char *format,
+                                    ...) {
+    int ret;
+    va_list ap;
+
+    if (cc == NULL || node == NULL || format == NULL) {
+        return REDIS_ERR;
+    }
+
+    va_start(ap, format);
+    ret = redisClustervAppendCommandToNode(cc, node, format, ap);
+    va_end(ap);
+
+    return ret;
 }
 
 int redisClusterAppendCommandArgv(redisClusterContext *cc, int argc,
@@ -3701,6 +3740,11 @@ redisAsyncContext *actx_get_by_node(redisClusterAsyncContext *acc,
     if (acc->onConnect) {
         redisAsyncSetConnectCallback(ac, acc->onConnect);
     }
+#ifndef HIRCLUSTER_NO_NONCONST_CONNECT_CB
+    else if (acc->onConnectNC) {
+        redisAsyncSetConnectCallbackNC(ac, acc->onConnectNC);
+    }
+#endif
 
     if (acc->onDisconnect) {
         redisAsyncSetDisconnectCallback(ac, acc->onDisconnect);
@@ -3761,12 +3805,26 @@ int redisClusterAsyncConnect2(redisClusterAsyncContext *acc) {
 
 int redisClusterAsyncSetConnectCallback(redisClusterAsyncContext *acc,
                                         redisConnectCallback *fn) {
-    if (acc->onConnect == NULL) {
-        acc->onConnect = fn;
-        return REDIS_OK;
-    }
-    return REDIS_ERR;
+    if (acc->onConnect != NULL)
+        return REDIS_ERR;
+#ifndef HIRCLUSTER_NO_NONCONST_CONNECT_CB
+    if (acc->onConnectNC != NULL)
+        return REDIS_ERR;
+#endif
+    acc->onConnect = fn;
+    return REDIS_OK;
 }
+
+#ifndef HIRCLUSTER_NO_NONCONST_CONNECT_CB
+int redisClusterAsyncSetConnectCallbackNC(redisClusterAsyncContext *acc,
+                                          redisConnectCallbackNC *fn) {
+    if (acc->onConnectNC != NULL || acc->onConnect != NULL) {
+        return REDIS_ERR;
+    }
+    acc->onConnectNC = fn;
+    return REDIS_OK;
+}
+#endif
 
 int redisClusterAsyncSetDisconnectCallback(redisClusterAsyncContext *acc,
                                            redisDisconnectCallback *fn) {
@@ -3870,6 +3928,10 @@ static int updateSlotMapAsync(redisClusterAsyncContext *acc,
         /* Don't allow concurrent slot map updates. */
         return REDIS_ERR;
     }
+    if (acc->cc->flags & HIRCLUSTER_FLAG_SHUTDOWN) {
+        /* No slot map updates during a client shutdown. */
+        return REDIS_ERR;
+    }
 
     if (ac == NULL) {
         if (acc->cc->nodes == NULL) {
@@ -3962,7 +4024,8 @@ static void redisClusterAsyncCallback(redisAsyncContext *ac, void *r,
         goto done;
     }
 
-    if (cad->retry_count == NO_RETRY) /* Skip retry handling */
+    /* Skip retry handling when not expected, or during a client shutdown. */
+    if (cad->retry_count == NO_RETRY || cc->flags & HIRCLUSTER_FLAG_SHUTDOWN)
         goto done;
 
     error_type = cluster_reply_error_type(reply);
@@ -4075,13 +4138,19 @@ int redisClusterAsyncFormattedCommand(redisClusterAsyncContext *acc,
     redisAsyncContext *ac;
     struct cmd *command = NULL;
     hilist *commands = NULL;
-    cluster_async_data *cad;
+    cluster_async_data *cad = NULL;
 
     if (acc == NULL) {
         return REDIS_ERR;
     }
 
     cc = acc->cc;
+
+    /* Don't accept new commands when the client is about to be shutdown. */
+    if (cc->flags & HIRCLUSTER_FLAG_SHUTDOWN) {
+        __redisClusterAsyncSetError(acc, REDIS_ERR_OTHER, "client closing");
+        return REDIS_ERR;
+    }
 
     if (cc->err) {
         cc->err = 0;
@@ -4135,6 +4204,9 @@ int redisClusterAsyncFormattedCommand(redisClusterAsyncContext *acc,
 
     node = node_get_by_table(cc, (uint32_t)slot_num);
     if (node == NULL) {
+        /* Initiate a slotmap update since the slot is not served. */
+        throttledUpdateSlotMapAsync(acc, NULL);
+
         /* node_get_by_table() has set the error on cc. */
         __redisClusterAsyncSetError(acc, cc->err, cc->errstr);
         goto error;
@@ -4153,12 +4225,14 @@ int redisClusterAsyncFormattedCommand(redisClusterAsyncContext *acc,
 
     cad->acc = acc;
     cad->command = command;
+    command = NULL; /* Memory ownership moved. */
     cad->callback = fn;
     cad->privdata = privdata;
 
     status = redisAsyncFormattedCommand(ac, redisClusterAsyncCallback, cad, cmd,
                                         len);
     if (status != REDIS_OK) {
+        __redisClusterAsyncSetError(acc, ac->err, ac->errstr);
         goto error;
     }
 
@@ -4173,6 +4247,7 @@ oom:
     // passthrough
 
 error:
+    cluster_async_data_free(cad);
     command_destroy(command);
     if (commands != NULL) {
         listRelease(commands);
@@ -4185,19 +4260,23 @@ int redisClusterAsyncFormattedCommandToNode(redisClusterAsyncContext *acc,
                                             redisClusterCallbackFn *fn,
                                             void *privdata, char *cmd,
                                             int len) {
-    redisClusterContext *cc;
+    redisClusterContext *cc = acc->cc;
     redisAsyncContext *ac;
     int status;
     cluster_async_data *cad = NULL;
     struct cmd *command = NULL;
+
+    /* Don't accept new commands when the client is about to be shutdown. */
+    if (cc->flags & HIRCLUSTER_FLAG_SHUTDOWN) {
+        __redisClusterAsyncSetError(acc, REDIS_ERR_OTHER, "disconnecting");
+        return REDIS_ERR;
+    }
 
     ac = actx_get_by_node(acc, node);
     if (ac == NULL) {
         /* Specific error already set */
         return REDIS_ERR;
     }
-
-    cc = acc->cc;
 
     if (cc->err) {
         cc->err = 0;
@@ -4227,15 +4306,17 @@ int redisClusterAsyncFormattedCommandToNode(redisClusterAsyncContext *acc,
 
     cad->acc = acc;
     cad->command = command;
+    command = NULL; /* Memory ownership moved. */
     cad->callback = fn;
     cad->privdata = privdata;
     cad->retry_count = NO_RETRY;
 
     status = redisAsyncFormattedCommand(ac, redisClusterAsyncCallback, cad, cmd,
                                         len);
-    if (status != REDIS_OK)
+    if (status != REDIS_OK) {
+        __redisClusterAsyncSetError(acc, ac->err, ac->errstr);
         goto error;
-
+    }
     return REDIS_OK;
 
 oom:
@@ -4243,6 +4324,7 @@ oom:
     // passthrough
 
 error:
+    cluster_async_data_free(cad);
     command_destroy(command);
     return REDIS_ERR;
 }
@@ -4374,6 +4456,7 @@ void redisClusterAsyncDisconnect(redisClusterAsyncContext *acc) {
     }
 
     cc = acc->cc;
+    cc->flags |= HIRCLUSTER_FLAG_SHUTDOWN;
 
     if (cc->nodes == NULL) {
         return;
@@ -4387,7 +4470,7 @@ void redisClusterAsyncDisconnect(redisClusterAsyncContext *acc) {
 
         ac = node->acon;
 
-        if (ac == NULL || ac->err) {
+        if (ac == NULL) {
             continue;
         }
 
@@ -4403,6 +4486,7 @@ void redisClusterAsyncFree(redisClusterAsyncContext *acc) {
     }
 
     cc = acc->cc;
+    cc->flags |= HIRCLUSTER_FLAG_SHUTDOWN;
 
     redisClusterFree(cc);
 

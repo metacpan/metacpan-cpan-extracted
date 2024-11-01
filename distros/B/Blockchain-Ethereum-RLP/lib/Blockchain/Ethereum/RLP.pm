@@ -1,18 +1,12 @@
-use v5.26;
+package Blockchain::Ethereum::RLP;
 
+use v5.26;
 use strict;
 use warnings;
-no indirect;
-use feature 'signatures';
 
-use Object::Pad;
 # ABSTRACT: Ethereum RLP encoding/decoding utility
-
-package Blockchain::Ethereum::RLP;
-class Blockchain::Ethereum::RLP;
-
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.010';          # VERSION
+our $VERSION   = '0.011';          # VERSION
 
 use Carp;
 
@@ -28,7 +22,14 @@ use constant {
     INPUT_LENGTH_DELIMITER  => 256,
 };
 
-method encode ($input) {
+sub new {
+    my $class = shift;
+    my $self  = {};
+    return bless $self, $class;
+}
+
+sub encode {
+    my ($self, $input) = @_;
 
     croak 'No input given' unless defined $input;
 
@@ -58,7 +59,8 @@ method encode ($input) {
     return $self->_encode_length($input_length, SINGLE_BYTE_MAX_LENGTH) . $hex;
 }
 
-method _encode_length ($length, $offset) {
+sub _encode_length {
+    my ($self, $length, $offset) = @_;
 
     return chr($length + $offset) if $length <= BYTE_LENGTH_DELIMITER;
 
@@ -70,13 +72,15 @@ method _encode_length ($length, $offset) {
     croak "Input too long";
 }
 
-method _to_binary ($x) {
+sub _to_binary {
+    my ($self, $x) = @_;
 
     return '' unless $x;
     return $self->_to_binary(int($x / INPUT_LENGTH_DELIMITER)) . chr($x % INPUT_LENGTH_DELIMITER);
 }
 
-method decode ($input) {
+sub decode {
+    my ($self, $input) = @_;
 
     return [] unless length $input;
 
@@ -106,7 +110,8 @@ method decode ($input) {
     return \@output;
 }
 
-method _decode_length ($input) {
+sub _decode_length {
+    my ($self, $input) = @_;
 
     my $length = length($input);
     croak "Invalid empty input" unless $length;
@@ -146,7 +151,8 @@ method _decode_length ($input) {
     croak "Invalid RLP input";
 }
 
-method _to_integer ($b) {
+sub _to_integer {
+    my ($self, $b) = @_;
 
     my $length = length($b);
     croak "Invalid empty input" unless $length;
@@ -170,7 +176,7 @@ Blockchain::Ethereum::RLP - Ethereum RLP encoding/decoding utility
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://rt.cpan.org/Publi
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Getopt-Class-v1.1.1/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Getopt-Class-v1.1.2/README.md)
 
 ## Author
 

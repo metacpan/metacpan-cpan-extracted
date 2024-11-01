@@ -1,17 +1,12 @@
-use v5.26;
+package Blockchain::Ethereum::Keystore::Seed;
 
+use v5.26;
 use strict;
 use warnings;
-no indirect;
-use feature 'signatures';
 
-use Object::Pad;
-
-package Blockchain::Ethereum::Keystore::Seed;
-class Blockchain::Ethereum::Keystore::Seed;
-
+# ABSTRACT: Seed abstraction
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.010';          # VERSION
+our $VERSION   = '0.011';          # VERSION
 
 use Carp;
 use Crypt::PRNG     qw(random_bytes);
@@ -19,27 +14,52 @@ use Bitcoin::Crypto qw(btc_extprv);
 
 use Blockchain::Ethereum::Keystore::Key;
 
-field $seed :reader :writer :param     //= undef;
-field $mnemonic :reader :writer :param //= undef;
-field $salt :reader :writer :param     //= undef;
+sub new {
+    my ($class, %params) = @_;
 
-field $_hdw_handler :reader(_hdw_handler) :writer(set_hdw_handler);
+    my $self = bless {}, $class;
+    foreach (qw(seed mnemonic salt)) {
+        $self->{$_} = $params{$_} if exists $params{$_};
+    }
 
-ADJUST {
     if ($self->seed) {
-        $self->set_hdw_handler(btc_extprv->from_seed($self->seed));
+        $self->{hdw_handler} = btc_extprv->from_seed($self->seed);
     } elsif ($self->mnemonic) {
-        $self->set_hdw_handler(btc_extprv->from_mnemonic($self->mnemonic, $self->salt));
+        $self->{hdw_handler} = btc_extprv->from_mnemonic($self->mnemonic, $self->salt);
     }
 
     unless ($self->_hdw_handler) {
         # if the seed is not given, generate a new one
-        $self->set_seed(random_bytes(64));
-        $self->set_hdw_handler(btc_extprv->from_seed($self->seed));
+        $self->{seed}        = random_bytes(64);
+        $self->{hdw_handler} = btc_extprv->from_seed($self->seed);
     }
+
+    return $self;
 }
 
-method derive_key ($index, $account = 0, $purpose = 44, $coin_type = 60, $change = 0) {
+sub seed {
+    shift->{seed};
+}
+
+sub mnemonic {
+    shift->{mnemonic};
+}
+
+sub salt {
+    shift->{salt};
+}
+
+sub _hdw_handler {
+    shift->{hdw_handler};
+}
+
+sub derive_key {
+    my ($self, $index, $account, $purpose, $coin_type, $change) = @_;
+
+    $account   = 0  unless $account;
+    $purpose   = 44 unless $purpose;
+    $coin_type = 60 unless $coin_type;
+    $change    = 0  unless $change;
 
     my $path = Bitcoin::Crypto::BIP44->new(
         index     => $index,
@@ -62,11 +82,11 @@ __END__
 
 =head1 NAME
 
-Blockchain::Ethereum::Keystore::Seed
+Blockchain::Ethereum::Keystore::Seed - Seed abstraction
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

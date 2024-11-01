@@ -1,0 +1,345 @@
+<& /Admin/Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<&| /Widgets/TitleBox, title => '', class => 'formtools-admin-description ml-auto mr-auto' &>
+<form action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Routing.html" method="post" enctype="multipart/form-data">
+  <input type="hidden" class="hidden" name="id" value="<% $id %>" />
+
+  <div class="form-row">
+    <div class="col-2"></div>
+    <div class="col-8 text-center">
+      <&| /Elements/LabeledValue, Label => loc("Default Queue") &>
+        <& /Elements/SelectQueue, Name => 'DefaultQueue', Id => 'default-queue', Default => $queue_obj->id &>
+      </&>
+    </div>
+    <div class="col-2"></div>
+  </div>
+  <div class="form-row">
+    <div class="col-12">
+      <& /Elements/Submit, Label => loc('Update Default Queue'), Name => 'ModifyDefault' &>
+    </div>
+  </div>
+</form>
+% my $route_count = 0;
+% foreach my $route ( @{ $content->{routing} || [] } ) {
+<form action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Routing.html" id="Update-<% $route_count %>" name="BuildQuery" method="post" enctype="multipart/form-data">
+  <input type="hidden" class="hidden" name="id" value="<% $id %>" />
+  <&| /Widgets/TitleBox, title => loc('Update Routing') &>
+  <div class="form-row">
+    <div class="col-1"></div>
+    <div class="col-8 text-center">
+        <strong><% loc('Criteria') %></strong>
+    </div>
+    <div class="col-3 text-center">
+        <strong><% loc('Route to Queue') %></strong>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="col-1 text-end">
+      <div class="form-row">
+        <div class="label mt-1 w-100">&nbsp;</div>
+      </div>
+      <div class="form-row">
+        <div class="label mt-1 w-100"><% loc('and then') %></div>
+      </div>
+      <div class="form-row">
+        <div class="label mt-1 w-100"><% loc('and then') %></div>
+      </div>
+    </div>
+% # need to use id="pick-criteria" to get correct styling for the pick cf fields
+    <div id="pick-criteria" class="col-8">
+      <& /Search/Elements/RoutingPickTicketCFs, CF_ids => \@cf_ids &>
+    </div>
+    <div class="col-3">
+      <&| /Elements/LabeledValue, Label => loc("Queue") &>
+        <& /Elements/SelectQueue, Name => 'Queue-' . $route_count, Id => 'queue' . $route_count, Default => $route->{queue}, ShowNullOption => 0 &>
+      </&>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="col-12">
+      <div class="submit">
+        <div class="buttons">
+          <input type="submit" name="<% 'Delete-' . $route_count %>" value="<% loc('Delete') %>" class="button btn btn-danger form-control">
+          <input type="submit" name="<% 'Update-' . $route_count %>" value="<% loc('Update') %>" class="button btn btn-primary form-control">
+        </div>
+        <div class="submit-clear"></div>
+      </div>
+    </div>
+  </div>
+  </&>
+</form>
+<script type="text/javascript">
+jQuery(function () {
+    var criteria = [
+        <% join ', ', map { '[' . join( ', ', map { '"' . $_ . '"' } @$_ ) . ']' } @{ $route->{criteria} || [] } |n %>
+    ];
+    var $count = 0;
+    jQuery("#Update-<% $route_count %> #SelectCustomFieldField").each(
+        function () {
+            if ( criteria[$count] !== undefined ) {
+                const elem = jQuery(this);
+                elem.val('CF.{' + criteria[$count][0] + '}');
+                elem.selectpicker('refresh');
+                elem.trigger("change");
+                elem.closest(".form-row").find( '[name="CF.{' + criteria[$count][0] + '}Op"]' ).val(criteria[$count][1]);
+                elem.closest(".form-row").find( '[name="CF.{' + criteria[$count][0] + '}Op"]' ).selectpicker('refresh');
+                elem.closest(".form-row").find( '[name="ValueOfCF.{' + criteria[$count][0] + '}"]' ).val(criteria[$count][2]);
+                elem.closest(".form-row").find( '[name="ValueOfCF.{' + criteria[$count][0] + '}"]' ).selectpicker('refresh');
+            }
+            $count++;
+        }
+    );
+});
+</script>
+% $route_count++;
+% }
+
+  <&| /Widgets/TitleBox, title => loc('Add new routing') &>
+<form action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Routing.html" id="AddFormRoute" name="BuildQuery" method="post" enctype="multipart/form-data">
+  <input type="hidden" class="hidden" name="id" value="<% $id %>" />
+  <div class="form-row">
+    <div class="col-1"></div>
+    <div class="col-8 text-center">
+        <strong><% loc('Criteria') %></strong>
+    </div>
+    <div class="col-3 text-center">
+        <strong><% loc('Route to Queue') %></strong>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="col-1 text-end">
+      <div class="form-row">
+        <div class="label mt-1 w-100">&nbsp;</div>
+      </div>
+      <div class="form-row">
+        <div class="label mt-1 w-100"><% loc('and then') %></div>
+      </div>
+      <div class="form-row">
+        <div class="label mt-1 w-100"><% loc('and then') %></div>
+      </div>
+    </div>
+% # need to use id="pick-criteria" to get correct styling for the pick cf fields
+    <div id="pick-criteria" class="col-8">
+      <& /Search/Elements/RoutingPickTicketCFs, CF_ids => \@cf_ids &>
+    </div>
+    <div class="col-3">
+      <&| /Elements/LabeledValue, Label => loc("Queue") &>
+        <& /Elements/SelectQueue, Name => 'Queue', Id => 'queue', Default => $ARGS{Queue} &>
+      </&>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="col-12">
+      <& /Elements/Submit, Label => loc('Add Routing'), Name => 'AddNew' &>
+    </div>
+  </div>
+  </&>
+</form>
+</&>
+<script type="text/javascript">
+jQuery(function () {
+    var criteria = [
+        <% join ', ', map { '[' . join( ', ', map { '"' . $_ . '"' } @$_ ) . ']' } @add_new_routing |n %>
+    ];
+    var $count = 0;
+    jQuery("#AddFormRoute #SelectCustomFieldField").each(
+        function () {
+            if ( criteria[$count] !== undefined ) {
+                const elem = jQuery(this);
+                elem.val('CF.{' + criteria[$count][0] + '}');
+                elem.selectpicker('refresh');
+                elem.trigger("change");
+                elem.closest(".form-row").find( '[name="CF.{' + criteria[$count][0] + '}Op"]' ).val(criteria[$count][1]);
+                elem.closest(".form-row").find( '[name="CF.{' + criteria[$count][0] + '}Op"]' ).selectpicker('refresh');
+                elem.closest(".form-row").find( '[name="ValueOfCF.{' + criteria[$count][0] + '}"]' ).val(criteria[$count][2]);
+                elem.closest(".form-row").find( '[name="ValueOfCF.{' + criteria[$count][0] + '}"]' ).selectpicker('refresh');
+            }
+            $count++;
+        }
+    );
+});
+</script>
+<%INIT>
+Abort("No form id found") unless $id;
+
+my $form_attribute = RT::Attribute->new($session{'CurrentUser'});
+my ( $ok, $msg ) = $form_attribute->Load($id);
+
+unless ( $ok ) {
+    Abort("Unable to load form with id $id");
+}
+
+my ( $title, @results, $maybe_redirect );
+$title = loc("Routing for form [_1]", $form_attribute->Description);
+
+my $content = $form_attribute->Content;
+
+my @add_new_routing;
+if ( $ModifyDefault ) {
+    if ( $ARGS{DefaultQueue} ne $content->{queue} ) {
+        $content->{queue} = $ARGS{DefaultQueue};
+        ( $ok, $msg ) = $form_attribute->SetContent($content);
+        if ($ok) {
+            push @results, loc('Updated default queue');
+            $maybe_redirect = 1;
+        }
+        else {
+            push @results, loc( "Could not update default queue: [_1]", $msg );
+        }
+    }
+}
+elsif ( $AddNew ) {
+    Abort( loc('Permission Denied') )
+        unless $session{'CurrentUser'}->HasRight( Object => $RT::System, Right => 'AdminForm' );
+
+      my %count_for_field;
+      foreach my $cf ( @{ $ARGS{SelectCustomFieldField} || [] } ) {
+          if ( $cf ) {
+              $count_for_field{$cf} ||= 0;
+              my $cf_name = $cf;
+              $cf_name =~ s/^CF.\{//;
+              $cf_name =~ s/\}$//;
+
+              # the first value in the op and val arrays is not a valid value
+              # so increment the count by 1 to get the actual op and value
+              my $cf_ops = $ARGS{ $cf . 'Op' } || [];
+              my $cf_op  = $cf_ops->[ $count_for_field{$cf} + 1] || '';
+
+              my $cf_vals    = $ARGS{ 'ValueOf' . $cf } || [];
+              my ( $cf_val ) = $cf_vals->[ $count_for_field{$cf} + 1 ] || '';
+
+              push @add_new_routing, [ $cf_name, $cf_op, $cf_val ];
+
+              $count_for_field{$cf}++;
+          }
+      }
+
+    my $add_new_queue = $ARGS{Queue};
+    if ( $add_new_queue ) {
+        if ( @add_new_routing ) {
+            my $new_route = {
+                queue => $add_new_queue,
+                criteria => \@add_new_routing,
+            };
+            $content->{routing} ||= [];
+            push @{ $content->{routing} }, $new_route;
+
+            ( $ok, $msg ) = $form_attribute->SetContent($content);
+            if ($ok) {
+                push @results, loc('Added new routing');
+                $maybe_redirect = 1;
+            }
+            else {
+                push @results, loc( "Cannot add new routing: [_1]", $msg );
+            }
+        }
+        else {
+            push @results, loc('Cannot add new routing: No criteria selected');
+        }
+    }
+    else {
+        push @results, loc('Cannot add new routing: No queue selected');
+    }
+}
+elsif ( my ( $modify ) = grep { $_ =~ /^Update-\d+/ } keys %ARGS ) {
+    $modify =~ s/^Update-//;
+    if ( my $new_queue = $ARGS{ 'Queue-' . $modify } ) {
+        $content->{routing}[$modify]{queue} = $new_queue;
+
+        # new criteria
+        my @new_routing;
+        my %count_for_field;
+        foreach my $cf ( @{ $ARGS{SelectCustomFieldField} || [] } ) {
+            if ( $cf ) {
+                $count_for_field{$cf} ||= 0;
+                my $cf_name = $cf;
+                $cf_name =~ s/^CF.\{//;
+                $cf_name =~ s/\}$//;
+
+                # the first value in the op and val arrays is not a valid value
+                # so increment the count by 1 to get the actual op and value
+                my $cf_ops = $ARGS{ $cf . 'Op' } || [];
+                my $cf_op  = $cf_ops->[ $count_for_field{$cf} + 1] || '';
+
+                my $cf_vals    = $ARGS{ 'ValueOf' . $cf } || [];
+                my ( $cf_val ) = $cf_vals->[ $count_for_field{$cf} + 1 ] || '';
+
+                push @new_routing, [ $cf_name, $cf_op, $cf_val ];
+
+                $count_for_field{$cf}++;
+            }
+        }
+        $content->{routing}[$modify]{criteria} = \@new_routing;
+
+        ( $ok, $msg ) = $form_attribute->SetContent($content);
+        if ($ok) {
+            push @results, loc('Updated routing');
+            $maybe_redirect = 1;
+        }
+        else {
+            push @results, loc( "Could not update routing: [_1]", $msg );
+        }
+    }
+}
+elsif ( my ( $delete ) = grep { $_ =~ /^Delete-\d/ } keys %ARGS ) {
+    $delete =~ s/^Delete-//;
+    splice @{ $content->{routing} }, $delete, 1;
+    ( $ok, $msg ) = $form_attribute->SetContent($content);
+    if ($ok) {
+        push @results, loc('Deleted routing');
+        $maybe_redirect = 1;
+    }
+    else {
+        push @results, loc( "Could not delete routing: [_1]", $msg );
+    }
+}
+
+MaybeRedirectForResults(
+    Actions   => \@results,
+    Path      => '/Admin/FormTools/Routing.html',
+    Arguments => { id => $id },
+) if $maybe_redirect;
+
+my $queue_obj = RT::Queue->new( $session{CurrentUser} );
+( $ok, $msg ) = $queue_obj->Load( $content->{queue} );
+
+unless ( $ok ) {
+    RT->Logger->error( 'FormTools unable to load queue: ' . $content->{queue} );
+    Abort('Unable to load form, invalid queue');
+}
+
+# find all custom fields that are on the form
+my @cf_ids;
+foreach my $page ( keys %{ $content->{'formtools-pages'} || {} } ) {
+    my @fields = grep { $_->{comp_name} ? $_->{comp_name} eq 'Field' : 0 }
+        @{ $content->{'formtools-pages'}{$page}{content} || [] };
+    foreach my $field ( @fields ) {
+        unless ( RT::Extension::FormTools::is_core_field( $field->{arguments}{name} ) ) {
+            my $cf_name = $field->{arguments}{name};
+            my $cf = RT::CustomField->new( $session{'CurrentUser'} );
+
+            # try loading CFs for this Queue, followed by Global, followed by any CF of given $cf_name
+            $cf->LoadByName( Name => $cf_name, Queue => $queue_obj->id ) if (defined $queue_obj);
+            $cf->LoadByName( Name => $cf_name, Queue => 0 ) unless ( $cf->id );
+            unless ( $cf->Id ) {
+                $cf->LoadByName( Name => $cf_name );
+            }
+            unless ( $cf->id ) {
+                my $msg = "Could not find a custom field called $cf_name";
+                $msg .= " for the queue " . $queue_obj->Name if (defined $queue_obj);
+                RT->Logger->error('FormTools unable to load custom field: ' . $msg);
+                next;
+            }
+
+            push @cf_ids, $cf->id;
+        }
+    }
+}
+</%INIT>
+<%ARGS>
+$id            => undef
+$AddNew        => undef
+$ModifyDefault => undef
+</%ARGS>

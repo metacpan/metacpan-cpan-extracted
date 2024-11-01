@@ -1,3 +1,6 @@
+#define PERL_NO_GET_CONTEXT
+/* We don't need any interpreter or threads interaction */
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -5,7 +8,7 @@
 
 #include "shlobj.h"
 
-void SHAddToRecentDocsA(SV* _path) {
+void SHAddToRecentDocsA(pTHX_ SV* _path) {
     STRLEN len;
     const char * path = SvPVbyte(_path, len);
     SHAddToRecentDocs(
@@ -14,7 +17,7 @@ void SHAddToRecentDocsA(SV* _path) {
     );
 }
 
-void SHAddToRecentDocsU(SV* _path) {
+void SHAddToRecentDocsU(pTHX_ SV* _path) {
     STRLEN len;
     char* s = SvPVutf8(_path, len);
     STRLEN length = MultiByteToWideChar(CP_UTF8, 0, s, len, 0, 0);
@@ -34,7 +37,7 @@ void SHAddToRecentDocsU(SV* _path) {
     Safefree(path);
 }
 
-void SHAddToRecentDocsW(SV* _path) {
+void SHAddToRecentDocsW(pTHX_ SV* _path) {
     STRLEN len;
     const char * bytes = SvPVbyte(_path, len);
     wchar_t * path;
@@ -64,7 +67,7 @@ SHAddToRecentDocsA (path)
         I32* temp;
         PPCODE:
         temp = PL_markstack_ptr++;
-        SHAddToRecentDocsA(path);
+        SHAddToRecentDocsA(aTHX_ path);
         if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
           PL_markstack_ptr = temp;
@@ -80,7 +83,7 @@ SHAddToRecentDocsW (path)
         I32* temp;
         PPCODE:
         temp = PL_markstack_ptr++;
-        SHAddToRecentDocsW(path);
+        SHAddToRecentDocsW(aTHX_ path);
         if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
           PL_markstack_ptr = temp;
@@ -96,7 +99,7 @@ SHAddToRecentDocsU (_path)
         I32* temp;
         PPCODE:
         temp = PL_markstack_ptr++;
-        SHAddToRecentDocsU(_path);
+        SHAddToRecentDocsU(aTHX_ _path);
         if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
           PL_markstack_ptr = temp;

@@ -1,18 +1,12 @@
-use v5.26;
+package Blockchain::Ethereum::Keystore;
 
+use v5.26;
 use strict;
 use warnings;
-no indirect;
-use feature 'signatures';
 
-use Object::Pad;
 # ABSTRACT: Ethereum wallet management utilities
-
-package Blockchain::Ethereum::Keystore;
-class Blockchain::Ethereum::Keystore;
-
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.010';          # VERSION
+our $VERSION   = '0.011';          # VERSION
 
 1;
 
@@ -28,7 +22,7 @@ Blockchain::Ethereum::Keystore - Ethereum wallet management utilities
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

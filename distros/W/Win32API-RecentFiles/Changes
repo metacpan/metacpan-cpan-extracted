@@ -1,3 +1,7 @@
+0.04 2024-11-01
+    * Use PERL_NO_GET_CONTEXT in XS, thanks LeonT
+    * Update documentation for Cygwin
+
 0.03 2024-08-13
     * Fix SHAddRecentFileW(), add tests for it
     * Make tests more modular and actually test what they should test

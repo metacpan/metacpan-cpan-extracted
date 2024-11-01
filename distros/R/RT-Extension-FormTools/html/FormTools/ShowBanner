@@ -1,0 +1,24 @@
+% if ( $banner_message ) {
+<div class=" form-row">
+    <p><% $banner_message |n %></p>
+    <hr class="w-100" />
+</div>
+% }
+<%INIT>
+my $form_group = $m->notes('form_group');
+
+if ( $form_group ) {
+    my $form_group_attribute = RT::Attribute->new($session{'CurrentUser'});
+    my ($ok, $msg) = $form_group_attribute->LoadByCols( Name => 'FormTools Group', Description => $form_group );
+
+    unless ( $ok ) {
+        Abort("Unable to load form group $form_group: $msg");
+    }
+
+    my $content = $form_group_attribute->Content;
+    $banner_message = $content->{banner_message};
+}
+</%INIT>
+<%ARGS>
+$banner_message => undef
+</%ARGS>

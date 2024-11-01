@@ -53,6 +53,7 @@ typedef struct redis_cluster_fast_s {
     char *hostnames;
     int debug;
     int max_retry;
+    int use_cluster_slots;
     struct timeval connect_timeout;
     struct timeval command_timeout;
     pid_t pid;
@@ -180,6 +181,13 @@ SV *Redis__Cluster__Fast_connect(pTHX_ Redis__Cluster__Fast self) {
         return newSVpvf("%s", "failed to set max retry");
     }
 
+    if (self->use_cluster_slots) {
+        DEBUG_MSG("%s", "use cluster slots");
+        if (redisClusterSetOptionRouteUseSlots(self->acc->cc) != REDIS_OK) {
+            return newSVpvf("%s", "failed to set redisClusterSetOptionRouteUseSlots");
+        }
+    }
+
     if (redisClusterConnect2(self->acc->cc) != REDIS_OK) {
         return newSVpvf("failed to connect: %s", self->acc->cc->errstr);
     }
@@ -233,6 +241,17 @@ void Redis__Cluster__Fast_run_cmd(pTHX_ Redis__Cluster__Fast self, int argc, con
             return;
         }
         redisClusterAsyncDisconnect(self->acc);
+
+        if (event_base_dispatch(self->cluster_event_base) == -1) {
+            reply_t->error = newSVpvf("%s", "event_base_dispatch failed after forking");
+            return;
+        }
+
+        if (redisClusterConnect2(self->acc->cc) != REDIS_OK) {
+            reply_t->error = newSVpvf("failed to re-connect: %s", self->acc->cc->errstr);
+            return;
+        }
+
         self->pid = current_pid;
     }
 
@@ -342,6 +361,11 @@ __set_max_retry(Redis::Cluster::Fast self, int max_retry)
 CODE:
     self->max_retry = max_retry;
     DEBUG_MSG("max_retry %d", max_retry);
+
+void
+__set_route_use_slots(Redis::Cluster::Fast self, int use_slot)
+CODE:
+    self->use_cluster_slots = use_slot;
 
 SV*
 __connect(Redis::Cluster::Fast self)

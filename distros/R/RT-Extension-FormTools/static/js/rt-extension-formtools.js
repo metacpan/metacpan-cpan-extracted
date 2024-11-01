@@ -225,6 +225,16 @@ formTools = {
                     delete value.arguments.render_as;
                 }
             }
+
+            const include = form.find(':input[name=include_in_content]');
+            if ( include.length ) {
+                if ( include.is(':checked') ) {
+                    value.arguments.include_in_content = '1';
+                }
+                else if ( value.arguments.include_in_content === '1' ) {
+                    delete value.arguments.include_in_content;
+                }
+            }
         }
         else if ( value.type === 'hidden' ) {
             value['input-name'] = form.find(':input[name=name]').val();

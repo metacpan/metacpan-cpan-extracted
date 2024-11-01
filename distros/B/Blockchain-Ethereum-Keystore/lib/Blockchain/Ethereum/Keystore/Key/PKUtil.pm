@@ -1,22 +1,18 @@
-use v5.26;
+package Blockchain::Ethereum::Keystore::Key::PKUtil;
 
+use v5.26;
 use strict;
 use warnings;
-no indirect;
-use feature 'signatures';
-
-use Object::Pad;
-
-package Blockchain::Ethereum::Keystore::Key::PKUtil;
-class Blockchain::Ethereum::Keystore::Key::PKUtil
-    :isa(Crypt::Perl::ECDSA::PrivateKey);
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.010';          # VERSION
+our $VERSION   = '0.011';          # VERSION
+
+use parent "Crypt::Perl::ECDSA::PrivateKey";
 
 use Carp;
 
-method _sign ($message) {
+sub _sign {
+    my ($self, $message) = @_;
 
     my $dgst = Crypt::Perl::BigInt->from_bytes($message);
 
@@ -80,7 +76,7 @@ Blockchain::Ethereum::Keystore::Key::PKUtil
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 OVERVIEW
 

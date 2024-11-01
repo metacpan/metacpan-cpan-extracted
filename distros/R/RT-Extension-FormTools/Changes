@@ -1,5 +1,12 @@
 Revision history for RT-Extension-FormTools
 
+1.15 2024-10-31
+ - Support queue routing
+ - Support to group forms
+ - Add ShowBanner component
+ - Add Attach component for uploading attachments
+ - Support to show announcements in forms via RT-Extension-Announce
+
 1.14 2024-10-18
  - Handle correctly setting 'required' when multiple checkboxes selected
  - Fix typo that may cause failures of loading dependent custom fields

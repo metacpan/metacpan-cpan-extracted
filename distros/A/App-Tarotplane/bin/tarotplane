@@ -1,0 +1,150 @@
+#!/usr/bin/perl
+use 5.016;
+use strict;
+use warnings;
+
+use App::Tarotplane;
+
+my $tarotplane = App::Tarotplane->init();
+
+$tarotplane->run();
+
+
+
+=head1 NAME
+
+tarotplane - Curses flashcard program
+
+=head1 SYNOPSIS
+
+  tarotplane [options] file ...
+
+=head1 DESCRIPTION
+
+B<tarotplane> is a TUI flashcard program written in Perl using the Curses
+module. It reads cards from specially formatted text files consisting of terms
+and definitions, then displays them in a TUI.
+
+=head2 Card Files
+
+A B<tarotplane> card file consists of lines that contain terms and their
+respective definitions seperated by a colon (:). Text preceding the colon is
+considered the term, text following the colon is considered the term's
+definition.
+
+Lines starting with a hash (#) are treated as comments and are ignored. Blank
+lines are also ignored.
+
+=head3 Escape Sequences
+
+An escape sequence is a pair of characters, a forward slash (\) and some other
+character, that signals to B<tarotplane> to perform special behavior when
+reading/displaying the card. Below is a list of all the escape sequences
+B<tarotplane> supports:
+
+=over 4
+
+=item \\
+
+Single back slash (\).
+
+=item \:
+
+Colon (:).
+
+=item \n
+
+Force linebreak.
+
+=back
+
+=head2 Controls
+
+The controls for B<tarotplane> can be viewed during runtime by entering '?'.
+
+=over 4
+
+=item B<Right Arrow>, B<l>
+
+Next card.
+
+=item B<Left Arrow>, B<h>
+
+Previous card.
+
+=item B<Space>, B<Up/Down Arrow>, B<j/k>
+
+Flip to other side.
+
+=item B<Page Down>, B<End>
+
+Go to last card.
+
+=item B<Page Up>, B<Home>
+
+Go to first card.
+
+=item B<q>
+
+Quit.
+
+=item B<?>
+
+Help screen for controls.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-o> [I<by>], B<--order>[=I<by>]
+
+Order cards to appear alphabetically. I<by> can either be 'Term' or
+'Definition' (case-insensitive) to specify which sides to compare when ordering.
+If I<by> is not specified, defaults to sorting by terms.
+
+=item B<-r>, B<--random>
+
+Randomizes the order the cards appear in.
+
+=item B<-t>, B<--terms-first>
+
+Show terms first rather than definitions.
+
+=item B<-h>, B<--help>
+
+Print help message and exit.
+
+=item B<-v>, B<--version>
+
+Print version and copyright information, then exit.
+
+=back
+
+=head1 EXAMPLES
+
+An example of a valid card file:
+
+ # Comment
+ # Term: Definition
+ $: Dollar sign
+ ^: Caret
+ !: Exclamation point
+
+ # Note the backslashes
+ \:): Smiley face
+ >\:): Angry face
+
+=head1 AUTHOR
+
+Written by Samuel Young E<lt>L<samyoung12788@gmail.com>E<gt>.
+
+=head1 COPYRIGHT
+
+Copyright 2024, Samuel Young.
+
+This program is free software; you may redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

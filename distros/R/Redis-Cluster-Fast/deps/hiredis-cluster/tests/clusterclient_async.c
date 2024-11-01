@@ -22,6 +22,8 @@
  *           Will send following commands using the `..ToNode()` API and a
  *           cluster node iterator to send each command to all known nodes.
  *
+ * !disconnect - Disconnect the client.
+ *
  * An example input of first sending 2 commands and waiting for their responses,
  * before sending a single command and waiting for its response:
  *
@@ -50,7 +52,7 @@ int num_running = 0;
 int resend_failed_cmd = 0;
 int send_to_all = 0;
 
-void sendNextCommand(int, short, void *);
+void sendNextCommand(evutil_socket_t, short, void *);
 
 void printReply(const redisReply *reply) {
     switch (reply->type) {
@@ -98,7 +100,7 @@ void replyCallback(redisClusterAsyncContext *acc, void *r, void *privdata) {
     }
 }
 
-void sendNextCommand(int fd, short kind, void *arg) {
+void sendNextCommand(evutil_socket_t fd, short kind, void *arg) {
     UNUSED(fd);
     UNUSED(kind);
     redisClusterAsyncContext *acc = arg;
@@ -135,6 +137,8 @@ void sendNextCommand(int fd, short kind, void *arg) {
                            "!all in !resend not supported");
                 send_to_all = 1;
             }
+            if (strcmp(cmd, "!disconnect") == 0)
+                redisClusterAsyncDisconnect(acc);
             continue; /* Skip line */
         }
 
@@ -157,8 +161,15 @@ void sendNextCommand(int fd, short kind, void *arg) {
         } else {
             int status = redisClusterAsyncCommand(
                 acc, replyCallback, (void *)((intptr_t)num_running), cmd);
-            ASSERT_MSG(status == REDIS_OK, acc->errstr);
-            num_running++;
+            if (status == REDIS_OK) {
+                num_running++;
+            } else {
+                printf("error: %s\n", acc->errstr);
+
+                /* Schedule a read from stdin and handle next command. */
+                event_base_once(acc->adapter, -1, EV_TIMEOUT, sendNextCommand,
+                                acc, NULL);
+            }
         }
 
         if (async)
@@ -191,9 +202,25 @@ void eventCallback(const redisClusterContext *cc, int event, void *privdata) {
     printf("Event: %s\n", e);
 }
 
+void connectCallback(const redisAsyncContext *ac, int status) {
+    char *s = "";
+    if (status != REDIS_OK)
+        s = "failed to ";
+    printf("Event: %sconnect to %s:%d\n", s, ac->c.tcp.host, ac->c.tcp.port);
+}
+
+void disconnectCallback(const redisAsyncContext *ac, int status) {
+    char *s = "";
+    if (status != REDIS_OK)
+        s = "failed to ";
+    printf("Event: %sdisconnect from %s:%d\n", s, ac->c.tcp.host,
+           ac->c.tcp.port);
+}
+
 int main(int argc, char **argv) {
     int use_cluster_slots = 1; // Get topology via CLUSTER SLOTS
     int show_events = 0;
+    int show_connection_events = 0;
 
     int optind;
     for (optind = 1; optind < argc && argv[optind][0] == '-'; optind++) {
@@ -201,6 +228,8 @@ int main(int argc, char **argv) {
             use_cluster_slots = 0; // Use the default CLUSTER NODES instead
         } else if (strcmp(argv[optind], "--events") == 0) {
             show_events = 1;
+        } else if (strcmp(argv[optind], "--connection-events") == 0) {
+            show_connection_events = 1;
         } else {
             fprintf(stderr, "Unknown argument: '%s'\n", argv[optind]);
         }
@@ -225,6 +254,10 @@ int main(int argc, char **argv) {
     }
     if (show_events) {
         redisClusterSetEventCallback(acc->cc, eventCallback, NULL);
+    }
+    if (show_connection_events) {
+        redisClusterAsyncSetConnectCallback(acc, connectCallback);
+        redisClusterAsyncSetDisconnectCallback(acc, disconnectCallback);
     }
 
     if (redisClusterConnect2(acc->cc) != REDIS_OK) {

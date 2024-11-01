@@ -8,7 +8,6 @@ requires "CryptX" => "0.078";
 requires "File::Slurp" => "9999.32";
 requires "JSON::MaybeXS" => "1.004005";
 requires "Net::SSH::Perl" => "2.14";
-requires "Object::Pad" => "0.814";
 requires "perl" => "v5.26.0";
 
 on 'test' => sub {

@@ -43,7 +43,8 @@
       "test" : {
          "requires" : {
             "Encode" : "0",
-            "Test2::V0" : "0"
+            "Test2::V0" : "0",
+            "Win32::TieRegistry" : "0"
          }
       }
    },
@@ -61,7 +62,7 @@
          "web" : "https://github.com/Corion/Win32API-RecentFiles"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 0
 }

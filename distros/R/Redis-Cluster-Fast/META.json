@@ -4,7 +4,7 @@
       "plainbanana <plainbanana@mustardon.tokyo>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.22",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -63,7 +63,7 @@
    "provides" : {
       "Redis::Cluster::Fast" : {
          "file" : "lib/Redis/Cluster/Fast.pm",
-         "version" : "0.091"
+         "version" : "0.092"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/plainbanana/Redis-Cluster-Fast"
       }
    },
-   "version" : "0.091",
+   "version" : "0.092",
    "x_contributors" : [
       "Masahiro Honma <hiratara@cpan.org>"
    ],

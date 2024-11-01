@@ -1,0 +1,162 @@
+<div id="announce">
+
+% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') >= 0 ) {
+% my $rows = 1;
+% foreach my $ticket ( @tickets ){
+  <div class="alert alert-danger" role="alert">
+    <div class="row">
+      <div class="col-3 announce_subject announce_cell">
+%     if( $show_ticket_links{$ticket->Id} ){
+        <a class="announce_subject" href="<% RT->Config->Get('WebPath') %>/Ticket/Display.html?id=<% $ticket->Id %>">
+          <% $ticket->Subject %>
+        </a>
+%     } else {
+        <% $ticket->Subject %>
+%     }
+      </div>
+      <div class="col-7 announce_cell">
+%     if ( $show_html ) {
+        <% $content{$ticket->Id} |n %>
+%     } else {
+        <% $content{$ticket->Id} %>
+%     }
+%     if ( $show_ticket_links{$ticket->Id} ) {
+        (<a class="announcements_detail" href="<% RT->Config->Get('WebPath') %>/Ticket/Display.html?id=<% $ticket->Id %>"><% loc('more') %></a>)
+%     }
+      </div>
+      <div class="col-2 date announce_cell text-secondary">
+        <% $ticket->LastUpdatedObj->AsString %>
+      </div>
+    </div>
+  </div>
+% if ( $rows == $ShowTickets && (scalar @tickets) > $ShowTickets ) {
+%   # More announcements, initially hidden.
+  <div id="more_announcements" class="collapse">
+% }
+% $rows++;
+% }
+
+% if ( scalar @tickets > $ShowTickets ){
+    </div>
+    <div class="row mb-3">
+      <div class="col-12 toggle_announcements text-center">
+        <a data-text-more="<% loc('More Announcements') %>" data-text-less="<% loc('Less Announcements') %>" class="button btn btn-default btn-sm" data-toggle="collapse" href="#more_announcements" id="toggle_announcements"><% loc('More Announcements') %></a>
+      </div>
+    </div>
+% }
+
+% } else {
+<table class="announce">
+%my $rows = 1;
+%foreach my $ticket ( @tickets ){
+  <tr><td class="announce_subject announce_cell">
+% if( $show_ticket_links{$ticket->Id} ){
+  <a class="announce_subject"
+     href="<% RT->Config->Get('WebPath') %>/Ticket/Display.html?id=<% $ticket->Id %>">
+  <% $ticket->Subject %></a>
+% }else{
+  <% $ticket->Subject %>
+% }
+  </td>
+  <td class="announce_cell">
+<div id="RTAnnounceScrollable" class="RTAnnounceScrollable">
+% if ( $show_html ) {
+  <% $content{$ticket->Id} |n %>
+% } else {
+  <% $content{$ticket->Id} %>
+% }
+</div>
+%if( $show_ticket_links{$ticket->Id} ){
+ (<a class="announcements_detail" href="<% RT->Config->Get('WebPath') %>/Ticket/Display.html?id=<% $ticket->Id %>">more</a>)
+%}
+</td>
+<td class="date announce_cell">
+<% $ticket->LastUpdatedObj->AsString %>
+</td>
+</tr>
+% if( $rows == $ShowTickets && (scalar @tickets) > $ShowTickets ){
+%   # More announcements, initially hidden.
+<tr><td colspan=2 class="toggle_announcements">
+<a data-text-more="<% loc('More Announcements') %>" data-text-less="<% loc('Less Announcements') %>" href='#' class="toggle_announcements" id="toggle_announcements">More Announcements</a>
+</td>
+</tr>
+<tbody id="more_announcements">
+% }
+%$rows++;
+%}
+%if( scalar @tickets > $ShowTickets ){
+</tbody>
+%}
+</table>
+
+% }
+</div>
+<%INIT>
+if ( exists $ARGS{FormGroupName} ) {
+    # coming from a FormTools callback
+    return unless RT->Config->Get('ShowAnnouncementsInFormTools');
+
+    # show announcements if form groups are not enabled OR they are enabled and a group is selected
+    if ( RT->Config->Get('FormToolsEnableGroups') && ! $ARGS{FormGroupName} ) {
+        return;
+    }
+}
+else {
+    # coming from the BeforeBody callback
+    # Only display on Homepage
+    if ( RT->Config->Get('ShowAnnouncementsInSelfService') ) {
+        return
+        unless ( $m->request_comp->path =~ m{^/(?:SelfService/)?index\.html$} );
+    }
+    else {
+        return unless ( $m->request_comp->path =~ m{^/index\.html$} );
+    }
+}
+
+my @tickets = RT::Extension::Announce::GetAnnouncements( $session{CurrentUser}, $ARGS{FormGroupName} );
+
+# Current user isn't in any groups that can see tickets.
+return if @tickets == 0;
+
+# Don't show links if users can't view the announce tickets.
+my %show_ticket_links;
+my %content;
+my $show_html     = RT::Config->Get('RTAnnounceAllowHTML')    || 0;
+
+my $who = $session{CurrentUser}->Name;
+foreach my $ticket ( @tickets ){
+    if ( $ticket->HasRight( Right     => 'ShowTicket',
+                            Principal => $session{'CurrentUser'} )){
+        $show_ticket_links{$ticket->Id} = 1;
+    }
+    else{
+        $RT::Logger->debug("User $who does not have "
+          . "the ShowTicket right for ticket " . $ticket->Id . "  and will not see links to "
+          . 'this announcement ticket.');
+    }
+
+    my $txns = $ticket->Transactions;
+    for my $type (qw(Create Correspond)) {
+        $txns->Limit( FIELD => 'Type', VALUE => $type );
+    }
+    $txns->OrderBy( FIELD => 'Created', ORDER => 'DESC' );
+    $txns->RowsPerPage(1);
+
+    my $content
+        = $show_html ? $txns->First->Content( Type => 'text/html' ) : $txns->First->Content( Type => 'text/plain' );
+
+    if ( length $content > $MaxMessageLength ) {
+        $content = substr( $content, 0, $MaxMessageLength );
+        # Try to break at a word boundary.
+        $content =~ s/^(.*)\b\w+$/$1/g;
+        $content =~ s/\s+$//g;            # Remove trailing space
+        $content .= chr(8230);            # Ellipsis character
+    }
+    $content{$ticket->Id} = $content;
+}
+
+</%INIT>
+<%ARGS>
+$ShowTickets => 2
+$MaxMessageLength => 300
+</%ARGS>

@@ -1,0 +1,15 @@
+<& PickCFs, %ARGS, TicketSQLField => 'CF', CustomFields => $CustomFields &>
+<%INIT>
+my $CustomFields = RT::CustomFields->new( $session{'CurrentUser'} );
+if ( @$CF_ids ) {
+    $CustomFields->Limit(
+        FIELD     => 'id',
+        OPERATOR  => 'IN',
+        VALUE     => $CF_ids,
+    );
+}
+$CustomFields->OrderBy( FIELD => 'Name', ORDER => 'ASC' );
+</%INIT>
+<%ARGS>
+$CF_ids => []
+</%ARGS>

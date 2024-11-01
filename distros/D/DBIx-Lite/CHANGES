@@ -1,10 +1,26 @@
 ==================================================
-Changes from 2023-09-19 00:00:00 +0000 to present.
+Changes from 2023-11-01 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.35 at 2024-09-18 21:42:39 +0000
+version 0.36 at 2024-10-31 10:04:03 +0000
 -----------------------------------------
+
+  Change: e7ce6958565bb35741e11e6abedf23dc2d8e6ca1
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2024-10-31 11:01:38 +0000
+
+    Add table_alias() 
+
+-----------------------------------------
+version 0.35 at 2024-09-18 21:43:06 +0000
+-----------------------------------------
+
+  Change: 44a1d870107df8ba77f77aa165f24619a69d5dcd
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2024-09-18 23:43:06 +0000
+
+    v0.35 
 
   Change: 15de2fbefbab13d28189a70ed243e4761a108fad
   Author: Alessandro Ranellucci <alessandro@pintle.it>
@@ -47,5 +63,5 @@ version 0.34 at 2024-09-12 00:39:25 +0000
     Add a ->distinct method 
 
 =================================================
-Plus 24 releases after 2023-09-19 00:00:00 +0000.
+Plus 24 releases after 2023-11-01 00:00:00 +0000.
 =================================================

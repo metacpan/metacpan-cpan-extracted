@@ -16,10 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "mit",
   "MIN_PERL_VERSION" => "5.026000",
   "NAME" => "Blockchain::Ethereum::RLP",
-  "PREREQ_PM" => {
-    "Object::Pad" => "0.814",
-    "indirect" => "0.39"
-  },
+  "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "IO::Handle" => 0,
@@ -27,7 +24,7 @@ my %WriteMakefileArgs = (
     "Test::CheckDeps" => "0.010",
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,10 +35,8 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Object::Pad" => "0.814",
   "Test::CheckDeps" => "0.010",
-  "Test::More" => "0.94",
-  "indirect" => "0.39"
+  "Test::More" => "0.94"
 );
 
 

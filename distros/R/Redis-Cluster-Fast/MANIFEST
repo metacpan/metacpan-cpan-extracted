@@ -16,6 +16,7 @@ xt/02_leak.t
 xt/03_fork.t
 xt/04_timeout.t
 xt/05_valgrind.t
+xt/06_route_use_slots.t
 xt/lib/Test/Docker/RedisCluster.pm
 xt/lib/memcheck-extra.supp
 deps/hiredis/CHANGELOG.md
@@ -104,6 +105,7 @@ deps/hiredis-cluster/crc16.c
 deps/hiredis-cluster/dict.c
 deps/hiredis-cluster/dict.h
 deps/hiredis-cluster/examples/src/CMakeLists.txt
+deps/hiredis-cluster/examples/src/clientside_caching_async.c
 deps/hiredis-cluster/examples/src/example.c
 deps/hiredis-cluster/examples/src/example_async.c
 deps/hiredis-cluster/examples/src/example_tls.c
@@ -145,6 +147,8 @@ deps/hiredis-cluster/tests/main_tls.c
 deps/hiredis-cluster/tests/scripts/ask-redirect-connection-error-test.sh
 deps/hiredis-cluster/tests/scripts/ask-redirect-test.sh
 deps/hiredis-cluster/tests/scripts/ask-redirect-using-cluster-nodes-test.sh
+deps/hiredis-cluster/tests/scripts/client-disconnect-test.sh
+deps/hiredis-cluster/tests/scripts/client-disconnect-without-slotmap-update-test.sh
 deps/hiredis-cluster/tests/scripts/cluster-down-test.sh
 deps/hiredis-cluster/tests/scripts/cluster-scale-down-test.sh
 deps/hiredis-cluster/tests/scripts/command-from-callback-test.sh
@@ -161,7 +165,10 @@ deps/hiredis-cluster/tests/scripts/redirect-with-ipv6-test.sh
 deps/hiredis-cluster/tests/scripts/redis-cluster
 deps/hiredis-cluster/tests/scripts/set-get-test.sh
 deps/hiredis-cluster/tests/scripts/simulated-redis.pl
+deps/hiredis-cluster/tests/scripts/slots-not-served-test-async.sh
+deps/hiredis-cluster/tests/scripts/slots-not-served-test.sh
 deps/hiredis-cluster/tests/scripts/timeout-handling-test.sh
+deps/hiredis-cluster/tests/scripts/valkey-cluster
 deps/hiredis-cluster/tests/test_utils.c
 deps/hiredis-cluster/tests/test_utils.h
 deps/hiredis-cluster/tests/ut_parse_cmd.c

@@ -40,9 +40,9 @@
 #define UNUSED(x) (void)(x)
 
 #define HIREDIS_CLUSTER_MAJOR 0
-#define HIREDIS_CLUSTER_MINOR 11
+#define HIREDIS_CLUSTER_MINOR 14
 #define HIREDIS_CLUSTER_PATCH 0
-#define HIREDIS_CLUSTER_SONAME 0.11
+#define HIREDIS_CLUSTER_SONAME 0.14
 
 #define REDIS_CLUSTER_SLOTS 16384
 
@@ -61,11 +61,21 @@
 /* Flag to enable routing table updates using the command 'cluster slots'.
  * Default is the 'cluster nodes' command. */
 #define HIRCLUSTER_FLAG_ROUTE_USE_SLOTS 0x4000
+/* Flag specific to the async API which means that the user requested a
+ * client shutdown by a disconnect or free. */
+#define HIRCLUSTER_FLAG_SHUTDOWN 0x8000
 
 /* Events, for redisClusterSetEventCallback() */
 #define HIRCLUSTER_EVENT_SLOTMAP_UPDATED 1
 #define HIRCLUSTER_EVENT_READY 2
 #define HIRCLUSTER_EVENT_FREE_CONTEXT 3
+
+/* The non-const connect callback API is not available when:
+ *  - using hiredis prior v.1.1.0; or
+ *  - built on Windows since hiredis_cluster.def can't have conditional definitions. */
+#if !(HIREDIS_MAJOR >= 1 && HIREDIS_MINOR >= 1) || _WIN32
+#define HIRCLUSTER_NO_NONCONST_CONNECT_CB
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -159,6 +169,9 @@ typedef struct redisClusterAsyncContext {
 
     /* Called when the first write event was received. */
     redisConnectCallback *onConnect;
+#ifndef HIRCLUSTER_NO_NONCONST_CONNECT_CB
+    redisConnectCallbackNC *onConnectNC;
+#endif
 
 } redisClusterAsyncContext;
 
@@ -235,6 +248,9 @@ void *redisClusterCommandToNode(redisClusterContext *cc, redisClusterNode *node,
 /* Variadic using va_list */
 void *redisClustervCommand(redisClusterContext *cc, const char *format,
                            va_list ap);
+void *redisClustervCommandToNode(redisClusterContext *cc,
+                                 redisClusterNode *node, const char *format,
+                                 va_list ap);
 /* Using argc and argv */
 void *redisClusterCommandArgv(redisClusterContext *cc, int argc,
                               const char **argv, const size_t *argvlen);
@@ -255,6 +271,9 @@ int redisClusterAppendCommandToNode(redisClusterContext *cc,
 /* Variadic using va_list */
 int redisClustervAppendCommand(redisClusterContext *cc, const char *format,
                                va_list ap);
+int redisClustervAppendCommandToNode(redisClusterContext *cc,
+                                     redisClusterNode *node, const char *format,
+                                     va_list ap);
 /* Using argc and argv */
 int redisClusterAppendCommandArgv(redisClusterContext *cc, int argc,
                                   const char **argv, const size_t *argvlen);
@@ -286,6 +305,10 @@ void redisClusterAsyncFree(redisClusterAsyncContext *acc);
 
 int redisClusterAsyncSetConnectCallback(redisClusterAsyncContext *acc,
                                         redisConnectCallback *fn);
+#ifndef HIRCLUSTER_NO_NONCONST_CONNECT_CB
+int redisClusterAsyncSetConnectCallbackNC(redisClusterAsyncContext *acc,
+                                          redisConnectCallbackNC *fn);
+#endif
 int redisClusterAsyncSetDisconnectCallback(redisClusterAsyncContext *acc,
                                            redisDisconnectCallback *fn);
 

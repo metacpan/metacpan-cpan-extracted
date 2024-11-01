@@ -37,8 +37,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Object::Pad" : "0.814",
-            "indirect" : "0.39",
             "perl" : "v5.26.0"
          }
       },
@@ -55,7 +53,7 @@
    "provides" : {
       "Blockchain::Ethereum::RLP" : {
          "file" : "lib/Blockchain/Ethereum/RLP.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -67,7 +65,7 @@
          "web" : "https://github.com/refeco/Blockchain-Ethereum-RLP"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_authority" : "cpan:REFECO",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",

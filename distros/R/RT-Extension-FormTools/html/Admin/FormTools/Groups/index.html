@@ -1,0 +1,129 @@
+<& /Admin/Elements/Header, Title => loc("Admin FormTools Groups") &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<&| /Widgets/TitleBox, title => '', class => 'container formtools-admin-select' &>
+<form method="post" action="<% RT->Config->Get('WebPath') %>/Admin/FormTools/Groups/index.html">
+<table class="table collection collection-as-table" cellspacing="0">
+  <tbody>
+    <tr class="collection-as-table">
+      <th class="collection-as-table"><&|/l&>Name</&></th>
+      <th class="collection-as-table"><&|/l&>Description</&></th>
+      <th class="collection-as-table"><&|/l&>Enabled</&></th>
+    </tr>
+% my $i = 0;
+% for my $group ( @groups ) {
+    <tr class="<% $i % 2 ? 'oddline' : 'evenline' %>">
+      <td class="collection-as-table"><a href="<% RT->Config->Get('WebURL') %>Admin/FormTools/Groups/Modify.html?id=<% $group->{id} %>"><% $group->{name} %></a></td>
+      <td class="collection-as-table"><% $group->{description} |n %></td>
+      <td class="collection-as-table">
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input checkbox" id="enable-form-group-<% $group->{id} %>" name="enable-form-group-<% $group->{id} %>" value="1" <% $group->{disabled} ? '' : 'checked="checked"' %> />
+          <label class="custom-control-label" for="enable-form-group-<% $group->{id} %>"></label>
+        </div>
+      </td>
+    </tr>
+%    ++$i;
+% }
+  </tbody>
+</table>
+<div class="form-row align-items-center">
+  <div class="col-12">
+    <div class="custom-control custom-checkbox text-right">
+      <input type="checkbox" class="custom-control-input checkbox" id="FindDisabledFormGroups" name="FindDisabledFormGroups" value="1" <% $FindDisabledFormGroups ? 'checked="checked"': '' |n%> />
+      <label class="custom-control-label" for="FindDisabledFormGroups"><&|/l&>Include disabled form groups in listing.</&></label>
+    </div>
+  </div>
+</div>
+<div class="form-row align-items-center">
+  <div class="col-12">
+    <div class="text-right">
+      <input type="submit" name="Submit" class="form-control btn btn-primary" value="<&|/l&>Update</&>" />
+    </div>
+  </div>
+</div>
+</form>
+</&>
+<%init>
+my @results;
+
+my $groups = RT::Attributes->new( $session{'CurrentUser'} );
+$groups->Limit( FIELD => 'Name', VALUE => 'FormTools Group' );
+
+my @unsorted_groups;
+
+
+if ( $Submit ) {
+  while ( my $group = $groups->Next ) {
+      my $id      = $group->Id;
+      my $content = $group->Content;
+      my $name    = $group->Description;
+
+      my $changed;
+      if ( $ARGS{"enable-form-group-$id"} ) {
+          if ( $content->{disabled} ) {
+              $content->{disabled} = 0;
+              $changed = 1;
+          }
+      }
+      else {
+          if ( !$content->{disabled} ) {
+              $content->{disabled} = 1;
+              $changed = 1;
+          }
+      }
+
+      if ( $changed ) {
+          my ( $ret, $msg ) = $group->SetContent($content);
+          if ($ret) {
+              if ( $content->{disabled} ) {
+                  push @results, loc('Disabled [_1]', $name);
+              }
+              else {
+                  push @results, loc('Enabled [_1]', $name);
+              }
+          }
+          else {
+              if ( $content->{disabled} ) {
+                  push @results, loc( "Couldn't disable [_1]: [_2]", $name, $msg );
+              }
+              else {
+                  push @results, loc( "Couldn't enable [_1]: [_2]", $name, $msg );
+              }
+          }
+      }
+  }
+}
+
+if ( @results ) {
+  MaybeRedirectForResults(
+      Actions   => \@results,
+      Path      => '/Admin/FormTools/Groups/index.html',
+      Arguments => { FindDisabledFormGroups => $FindDisabledFormGroups },
+  );
+}
+
+while ( my $group = $groups->Next ) {
+    my $content = $group->Content;
+    next if ! $FindDisabledFormGroups && $content->{disabled};
+
+    push @unsorted_groups, {
+        id          => $group->id,
+        name        => $group->Description,
+        description => $content->{description},
+        disabled    => $content->{disabled},
+    };
+}
+
+my @groups = sort { lc $a->{name} cmp lc $b->{name} } @unsorted_groups;
+
+$m->callback(
+    CallbackName => 'Initial',
+    FormsRef     => \@groups,
+    ARGSRef      => \%ARGS
+);
+</%init>
+<%args>
+$Submit                 => undef
+$FindDisabledFormGroups => undef
+</%args>

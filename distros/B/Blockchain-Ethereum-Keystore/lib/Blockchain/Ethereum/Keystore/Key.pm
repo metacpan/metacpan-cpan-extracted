@@ -1,17 +1,12 @@
-use v5.26;
+package Blockchain::Ethereum::Keystore::Key;
 
+use v5.26;
 use strict;
 use warnings;
-no indirect;
-use feature 'signatures';
 
-use Object::Pad;
-
-package Blockchain::Ethereum::Keystore::Key;
-class Blockchain::Ethereum::Keystore::Key;
-
+# ABSTRACT: Ethereum key abstraction
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.010';          # VERSION
+our $VERSION   = '0.011';          # VERSION
 
 use Carp;
 use Crypt::PK::ECC;
@@ -23,25 +18,38 @@ use Crypt::PRNG              qw(random_bytes);
 use Blockchain::Ethereum::Keystore::Key::PKUtil;
 use Blockchain::Ethereum::Keystore::Address;
 
-field $private_key :reader :writer :param //= undef;
-field $_ecc_handler :reader(_ecc_handler) :writer(set_ecc_handler);
+sub new {
+    my ($class, %params) = @_;
+    my $self = bless {}, $class;
 
-ADJUST {
-    # if the private key is not set, generate a new one
-    $self->set_private_key(random_bytes(32)) unless defined $self->private_key;
+    if (exists $params{private_key}) {
+        $self->{private_key} = $params{private_key};
+    } else {
+        $self->{private_key} = random_bytes(32);
+    }
 
     my $importer = Crypt::PK::ECC->new();
     $importer->import_key_raw($self->private_key, 'secp256k1');
 
     # Crypt::PK::ECC does not provide support for deterministic keys
-    $self->set_ecc_handler(bless Crypt::Perl::ECDSA::Parse::private($importer->export_key_der('private')),
-        'Blockchain::Ethereum::Keystore::Key::PKUtil');
+    $self->{ecc_handler} = bless Crypt::Perl::ECDSA::Parse::private($importer->export_key_der('private')),
+        'Blockchain::Ethereum::Keystore::Key::PKUtil';
 
+    return $self;
 }
 
-method sign_transaction ($transaction) {
+sub private_key {
+    return shift->{private_key};
+}
 
-    croak "transaction must be a reference from Blockchain::Ethereum::Transaction"
+sub _ecc_handler {
+    return shift->{ecc_handler};
+}
+
+sub sign_transaction {
+    my ($self, $transaction) = @_;
+
+    croak "transaction must be a reference of Blockchain::Ethereum::Transaction"
         unless ref($transaction) =~ /^\QBlockchain::Ethereum::Transaction/;
 
     # _sign is overriden by Blockchain::ethereum::Keystore::Key::PKUtil
@@ -55,7 +63,8 @@ method sign_transaction ($transaction) {
     return $transaction;
 }
 
-method address {
+sub address {
+    my $self = shift;
 
     my ($x, $y) = Crypt::Perl::ECDSA::Utils::split_G_or_public($self->_ecc_handler->_decompress_public_point);
 
@@ -66,9 +75,8 @@ method address {
     return Blockchain::Ethereum::Keystore::Address->new(address => "0x$hex_address");
 }
 
-method export {
-
-    return $self->private_key;
+sub export {
+    return shift->private_key;
 }
 
 1;
@@ -81,11 +89,11 @@ __END__
 
 =head1 NAME
 
-Blockchain::Ethereum::Keystore::Key
+Blockchain::Ethereum::Keystore::Key - Ethereum key abstraction
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -106,6 +114,16 @@ This is a private key abstraction
 If instantiated without a private key, this module uses L<Crypt::PRNG> for the random key generation
 
 =head1 METHODS
+
+=head2 export
+
+Export the private key bytes (the auto generated if no private key given)
+
+=over 4
+
+=back
+
+Private key bytes
 
 =head2 sign_transaction
 
@@ -131,7 +149,7 @@ L<Blockchain::Ethereum::Keystore::Address>
 
 =head2 export
 
-Export the source/new private key
+Use `private_key` instead this method is deprecated and will be removed.
 
 =over 4
 

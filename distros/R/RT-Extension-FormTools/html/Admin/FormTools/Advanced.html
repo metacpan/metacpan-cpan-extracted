@@ -7,6 +7,17 @@
   <&| /Elements/LabeledValue, Label => loc('Name') &>
     <input name="Description" class="form-control" value="<% $ARGS{Description} // $form_attribute->Description %>"/>
   </&>
+
+% if ( RT->Config->Get('FormToolsEnableGroups') ) {
+  <&| /Elements/LabeledValue, Label => loc('Group') &>
+    <select name="Group" id="Group" class="form-control selectpicker">
+% foreach my $group ( @groups ) {
+      <option value="<% $group %>" <% $group eq $content->{group} ? 'selected' : '' %>><% $group %></option>
+% }
+    </select>
+  </&>
+% }
+
   <&| /Elements/LabeledValue, Label => loc('Content') &>
     <textarea class="form-control" rows="30" name="Content"><% $ARGS{Content} || $encoded_content %></textarea>
   </&>
@@ -63,6 +74,16 @@ my $encoded_content = JSON::to_json($content, { canonical => 1, pretty => 1 } );
 my ($title, @results);
 $title = loc("Modify form [_1]", $form_attribute->Description);
 
+my $groups = RT::Attributes->new( $session{'CurrentUser'} );
+$groups->Limit( FIELD => 'Name', VALUE => 'FormTools Group' );
+my ( @unsorted_groups, @groups );
+while ( my $group = $groups->Next ) {
+    my $content = $group->Content;
+    next if $content->{disabled};
+    push @unsorted_groups, $group->Description;
+}
+@groups = sort { lc $a cmp lc $b } @unsorted_groups;
+
 if ( $Update ) {
     Abort( loc('Permission Denied') )
         unless $session{'CurrentUser'}->HasRight( Object => $RT::System, Right => 'AdminForm' );
@@ -98,20 +119,26 @@ if ( $Update ) {
     }
     # because of different line endings, $encoded_content and submitted
     # $ARGS{Content} could differ even user doesn't change any thing.
-    elsif ( $form_attribute->_SerializeContent($new_content) ne $form_attribute->_SerializeContent($content) ) {
-        my ( $ret, $msg ) = $form_attribute->SetContent($new_content);
-        if ($ret) {
-            push @results, loc('Updated content');
+    else {
+        if ( $ARGS{Group} && ( $ARGS{Group} ne $new_content->{group} ) ) {
+            $new_content->{group} = $ARGS{Group};
+            $ARGS{Content} = JSON::to_json( $new_content, { canonical => 1, pretty => 1 } );
         }
-        else {
-            push @results, loc( "Couldn't update content: [_1]", $msg );
+        if ( $form_attribute->_SerializeContent($new_content) ne $form_attribute->_SerializeContent($content) ) {
+            my ( $ret, $msg ) = $form_attribute->SetContent($new_content);
+            if ($ret) {
+                push @results, loc('Updated content');
+            }
+            else {
+                push @results, loc( "Couldn't update content: [_1]", $msg );
+            }
         }
     }
 
     MaybeRedirectForResults(
         Actions   => \@results,
         Path      => '/Admin/FormTools/Advanced.html',
-        Arguments => { id => $id, Content => $ARGS{Content} },
+        Arguments => { id => $id },
     );
 }
 </%INIT>

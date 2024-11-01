@@ -1,0 +1,1592 @@
+#!/usr/bin/perl
+use 5.016;
+use strict;
+use warnings;
+
+use File::Basename;
+use File::Copy;
+use File::Path qw(make_path);
+use File::Spec;
+use Getopt::Long;
+use List::Util qw(uniq);
+
+use Slackware::SBoKeeper;
+
+my $PRGNAM = 'sbokeeper';
+my $PRGVER = $Slackware::SBoKeeper::VERSION;
+
+my $HELP_MSG = <<END;
+$PRGNAM $PRGVER
+Usage: $0 [options] command [args]
+
+Commands:
+  add       <pkgs>       Add pkgs + dependencies.
+  tack      <pkgs>       Add pkgs (no dependencies).
+  addish    <pkgs>       Add pkgs + dependencies, do not mark as manually added.
+  tackish   <pkgs>       Add pkgs, do not mark as manually added.
+  rm        <pkgs>       Remove pkg(s).
+  deps      <pkg>        Print dependencies for pkg.
+  depadd    <pkg> <deps> Add deps to pkg's dependencies.
+  deprm     <pkg> <deps> Remove deps from pkg's dependencies.
+  pull                   Find and add installed SlackBuilds.org pkgs.
+  diff                   Show discrepancies between installed pkgs and database.
+  depwant                Show missing dependencies for pkgs.
+  depextra               Show extraneous dependencies for pkgs.
+  unmanual  <pkgs>       Unset pkg(s) as manually added.
+  print     <cat>        Print all pkgs in specified category.
+  tree      <pkgs>       Print dependency tree.
+  dump                   Dump database.
+  help      <cmd>        Print cmd help message.
+
+Options:
+  -c <path>   --config=<path>         Specify config file location.
+  -d <path>   --datafile=<path>       Specify data file location.
+  -p <path>   --pkgtool-logs=<path>   Specify path to pkgtool log directory.
+  -s <path>   --sbodir=<path>         Specify SBo directory.
+  -y          --yes                   Automatically agree to all prompts.
+  -h          --help                  Print help message and exit.
+  -v          --version               Print version + copyright info and exit.
+END
+
+my $VERSION_MSG = <<END;
+$PRGNAM $PRGVER
+
+Copyright (C) 2024 Samuel Young
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of either: the GNU General Public License as published by the Free
+Software Foundation; or the Artistic License. 
+
+See <https://dev.perl.org/licenses/> for more information.
+END
+
+my %COMMAND_HELP = (
+	'add' => <<END,
+Usage: add <pkg> ...
+
+Add one or more packages to package database. Automatically add dependencies.
+Packages directly added will be marked as manually added and will not be removed
+when cleaned. If an added package is already present in the database, it will be
+marked as manually added.
+END
+	'tack' => <<END,
+Usage: tack <pkg> ...
+
+Add one or more packages to package database. Does not pull in dependencies.
+Besides that, same behavior as add.
+END
+	'addish' => <<END,
+Usage: addish <pkg> ...
+
+Same thing as add, but added packages are not marked as manually added.
+END
+	'tackish' => <<END,
+Usage: tackish <pkg> ...
+
+Same thing as tack, but added packages are not marked as manually added.
+END
+	'rm' => <<END,
+Usage: rm <pkg> ...
+
+Removes one or more packages from package database. Dependencies are not
+automatically removed.
+END
+	'deps' => <<END,
+Usage: deps <pkg>
+
+Prints list of dependencies for specified package, according to the database.
+Does not print complete dependency tree, for that one should use the tree
+command.
+END
+	'depadd' => <<END,
+Usage: depadd <pkg> <dep> ...
+
+Add one or more deps to pkg's dependencies. Dependencies that are not present in
+the database will automatically be added.
+
+** IMPORTANT**
+Be cautious when using this command. This command provides an easy way for you
+to screw up your package database by introducing circular dependencies which
+sbokeeper cannot handle. When using this command, be sure you are not accidently
+introducing circular dependencies!
+END
+	'deprm' => <<END,
+Usage: deprm <pkg> <dep> ...
+
+Remove one or more deps from pkg's dependencies.
+END
+	'pull' => <<END,
+Usage: pull
+
+Find any SlackBuilds.org packages that are installed on your system but not
+present in your package database and attempt to add them to it. All packages
+added are marked as manually added. Packages that are already present are
+skipped.
+END
+	'diff' => <<END,
+Usage: diff
+
+Prints a list of SlackBuild packages that are present on your system but not in
+your database and vice versa.
+END
+	'depwant' => <<END,
+Usage: depwant
+
+Prints a list of packages that, according to the SlackBuild repo, are missing
+dependencies and prints a list of their dependencies.
+END
+	'depextra' => <<END,
+Usage: depextra
+
+Prints a list of packages with extra dependencies and said extra dependencies.
+Extra dependencies are dependencies listed in the package database that are not
+present in the SlackBuild repo.
+END
+	'unmanual' => <<END,
+Usage: unmanual <pkg> ...
+
+Unset one or more packages as being manually installed, but do not remove them
+from database.
+END
+	'print' => <<END,
+Usage: print [<cat>]
+
+Print the names of each package in specified category. The following are valid
+categories:
+
+  all           All added packages
+  manual        Packages added manually
+  nonmanual     Packages added not manually
+  necessary     Packages added manually, or dependency of a manual package
+  unnecessary   Packages not manually added and not depended on by another
+  missing       Missing dependencies
+
+If category is not specified, defaults to 'all'.
+END
+	'tree' => <<END,
+Usage: tree [<pkgs>] ...
+
+Prints a dependency tree. If pkgs is not specified, prints a dependency tree
+for each manually added package. If pkgs are given, prints a dependency tree of
+each package specified.
+
+Print package tree.
+END
+	'dump' => <<END,
+Usage: dump
+
+Dumps contents of data file to stdout.
+END
+	'help' => <<END,
+Usage: help <cmd>
+
+Print help message for cmd.
+END
+);
+
+my $HOME = $ENV{HOME} || (getpwuid($<))[7]
+	or die "Could not find home directory\n";
+
+my @CONFIG_PATHS = (
+	"$HOME/.config/sbokeeper.conf",
+	"$HOME/.sbokeeper.conf",
+	"/etc/sbokeeper.conf",
+);
+
+my $SLACKWARE_VERSION_FILE = "/etc/slackware-version";
+my $SLACKWARE_VERSION = slackware_version() || '15.0';
+
+my $DEFAULT_DATADIR = "$HOME/.local/share/$PRGNAM";
+my $DEFAULT_PKGTOOL_LOGS = "/var/lib/pkgtools/packages";
+
+# Hash of sbokeeper commands and their respective callbacks. Callback needs to
+# take parameter ref returned by sbokeeper_init as argument.
+my %COMMANDS = (
+	'add'       => \&sbokeeper_add,
+	'tack'      => \&sbokeeper_tack,
+	'addish'    => \&sbokeeper_addish,
+	'tackish'   => \&sbokeeper_tackish,
+	'rm'        => \&sbokeeper_rm,
+	'deps'      => \&sbokeeper_deps,
+	'depadd'    => \&sbokeeper_depadd,
+	'deprm'     => \&sbokeeper_deprm,
+	'pull'      => \&sbokeeper_pull,
+	'diff'      => \&sbokeeper_diff,
+	'depwant'   => \&sbokeeper_depwant,
+	'depextra'  => \&sbokeeper_depextra,
+	'unmanual'  => \&sbokeeper_unmanual,
+	'print'     => \&sbokeeper_print,
+	'tree'      => \&sbokeeper_tree,
+	'dump'      => \&sbokeeper_dump,
+	'help'      => \&sbokeeper_help,
+);
+
+# Hash of config fields and their respective callbacks. Callbacks must look
+# something like this:
+# callback($paramsref, $fstateref)
+# $paramsref is created during sbokeeper_init.
+# $fstate ref looks like this:
+# {
+#   Path  => $config_file_path,
+#   Line  => $current_line_number,
+#   Field => $current_config_field,
+#   Val   => $current_value_of_field,
+# }
+my %CONFIG_READERS = (
+	'DataFile'    => \&config_datafile,
+	'SBoPath'     => \&config_sbopath,
+	'PkgtoolLogs' => \&config_pkgtoollogs,
+);
+
+sub slackware_version {
+
+	# If Slackware version file does not exist, we're probably not on a
+	# Slackware system.
+	unless (-e $SLACKWARE_VERSION_FILE) {
+		return undef;
+	}
+
+	open my $fh, '<', $SLACKWARE_VERSION_FILE
+		or die "Failed to open $SLACKWARE_VERSION_FILE for reading: $!\n";
+
+	my $l = readline $fh;
+	chomp $l;
+
+	# Some Slackware version numbers will have a third number, but we'll ignore
+	# it. Most software uses the major.minor numbering scheme.
+	my ($ver) = $l =~ /^Slackware (\d+\.\d+)/;
+
+	unless ($ver) {
+		warn "Bad $SLACKWARE_VERSION_FILE?\n";
+		return undef;
+	}
+
+	return $ver;
+
+}
+
+sub config_datafile {
+
+	my $params = shift;
+	my $fstate = shift;
+
+	my $config = $fstate->{Path};
+	my $line   = $fstate->{Line};
+	my $field  = $fstate->{Field};
+	my $val    = $fstate->{Val};
+
+	return if $params->{$field};
+
+	$val =~ s/^~/$HOME/;
+
+	die "$config line $line: $field must be absolute path\n"
+		unless File::Spec->file_name_is_absolute($val);
+
+	$params->{$field} = $val;
+
+}
+
+sub config_sbopath {
+
+	my $params = shift;
+	my $fstate = shift;
+
+	my $config = $fstate->{Path};
+	my $line   = $fstate->{Line};
+	my $field  = $fstate->{Field};
+	my $val    = $fstate->{Val};
+
+	return if $params->{$field};
+
+	$val =~ s/^~/$HOME/;
+
+	die "$config line $line: $field must be absolute path\n"
+		unless File::Spec->file_name_is_absolute($val);
+
+	die "$config line $line: $val is not a directory or does not exist\n"
+		unless -d $val;
+
+	$params->{$field} = $val;
+
+}
+
+sub config_pkgtoollogs {
+
+	my $params = shift;
+	my $fstate = shift;
+
+	my $config = $fstate->{Path};
+	my $line   = $fstate->{Line};
+	my $field  = $fstate->{Field};
+	my $val    = $fstate->{Val};
+
+	return if $params->{$field};
+
+	$val =~ s/^~/$HOME/;
+
+	die "$config line $line: $field must be absolute path\n"
+		unless File::Spec->file_name_is_absolute($val);
+
+	die "$config line $line: $val is not a directory or does not exist\n"
+		unless -d $val;
+
+	$params->{$field} = $val;
+
+}
+
+sub read_config {
+
+	my $config = shift;
+	my $params = shift;
+
+	open my $fh, '<', $config
+		or die "Failed to open $config for reading: $!\n";
+
+	my $ln = 0;
+	while (my $l = readline $fh) {
+
+		$ln++;
+
+		# Skip comments and blanks
+		next if substr($l, 0, 1) eq '#' or $l =~ /^\s*$/;
+
+		die "$config line $ln: Missing '='\n" unless $l =~ /=/;
+
+		my ($field, $val) = split '=', $l, 2;
+		$field =~ s/^\s+|\s+$//g;
+		$val   =~ s/^\s+|\s+$//g;
+
+		die "$config line $ln: Value cannot be empty\n"
+			unless $val;
+
+		die "$config line $ln: $field is not a valid field\n"
+			unless defined $CONFIG_READERS{$field};
+
+		$CONFIG_READERS{$field}(
+			$params,
+			{
+				Path  => $config,
+				Line  => $ln,
+				Field => $field,
+				Val   => $val,
+			}
+		);
+	}
+}
+
+sub get_default_sbopath {
+
+	my $logdir = shift;
+
+	# Default repo locations for popular SlackBuild package managers. This sub
+	# finds the first SlackBuild package manager that is installed in the
+	# following list then returns its default repo location.
+	my %sbopaths = (
+		'00_sbopkg'   => "/var/lib/sbopkg/SBo/$SLACKWARE_VERSION",
+		'01_sbotools' => "/usr/sbo/repo",
+		'02_sbpkg'    => "/var/lib/sbpkg/SBo/$SLACKWARE_VERSION",
+		'03_slpkg'    => "/var/lib/slpkg/repos/sbo",
+		# sboui should be last as it is encouraged to be used with other
+		# package management tools, meaning if it is installed along with
+		# another manager it could possibly be using their default repo.
+		'04_sboui'    => "/var/lib/sboui/repo",
+	);
+
+	foreach my $m (sort keys %sbopaths) {
+
+		my $p = $m =~ s/^\d+_//r;
+
+		my ($glob) = glob "$logdir/$p-*";
+
+		next unless $glob;
+		next unless -d $sbopaths{$m};
+
+		return $sbopaths{$m};
+
+	}
+
+	return undef;
+
+}
+
+sub sbokeeper_init {
+
+	my $params = {
+		ConfigFile  => '',
+		DataFile    => '',
+		SBoPath     => '',
+		YesAll      => 0,
+		PkgtoolLogs => '',
+		Command     => '',
+		Args        => [],
+	};
+
+	Getopt::Long::config('bundling');
+	GetOptions(
+		'config|c=s'       => \$params->{ConfigFile},
+		'datafile|d=s'     => \$params->{DataFile},
+		'sbodir|s=s'       => \$params->{SBoPath},
+		'yes|y'            => \$params->{YesAll},
+		'pkgtool-logs|p=s' => \$params->{PkgtoolLogs},
+		'help|h'           => sub { print $HELP_MSG;    exit 0 },
+		'version|v'        => sub { print $VERSION_MSG; exit 0 },
+	) or die "Error in command line arguments\n";
+
+	unless (@ARGV) {
+		die $HELP_MSG;
+	}
+
+	unless ($params->{ConfigFile}) {
+		($params->{ConfigFile}) = grep { -r } @CONFIG_PATHS;
+	}
+
+	if ($params->{ConfigFile}) {
+		read_config($params->{ConfigFile}, $params);
+	}
+
+	$params->{Command} = lc shift @ARGV;
+
+	$params->{Args} = \@ARGV;
+
+	unless ($params->{DataFile}) {
+		make_path($DEFAULT_DATADIR) unless -d $DEFAULT_DATADIR;
+		$params->{DataFile} = "$DEFAULT_DATADIR/data.$PRGNAM";
+	}
+
+	$params->{PkgtoolLogs} = $DEFAULT_PKGTOOL_LOGS unless $params->{PkgtoolLogs};
+
+	unless (-d $params->{PkgtoolLogs}) {
+		die "$params->{PkgtoolLogs} does not exist or is not a directory\n";
+	}
+
+	unless ($params->{SBoPath}) {
+		$params->{SBoPath} = get_default_sbopath($params->{PkgtoolLogs})
+			or die "Cannot determine default path for SBo repo, please use " .
+			       "the 'SBoPath' config option or '-s' CLI option\n";
+	}
+
+	unless (-d $params->{SBoPath}) {
+		die "$params->{SBoPath} does not exit or is not a directory\n";
+	}
+
+	return $params;
+
+}
+
+sub yesno {
+
+	my $prompt = shift;
+
+	while (1) {
+
+		print "$prompt [y/N] ";
+
+		my $l = readline(STDIN);
+		chomp $l;
+
+		if (fc $l eq fc 'y') {
+			return 1;
+		# If no input is given, assume 'no'.
+		} elsif (fc $l eq fc 'n' or $l eq '') {
+			return 0;
+		} else {
+			print "Invalid input '$l'\n"
+		}
+
+	}
+
+}
+
+sub get_installed_slackbuilds {
+
+	my $logdir = shift;
+
+	my @logs = glob "$logdir/*_SBo";
+
+	my @pkgs;
+
+	foreach my $sl (@logs) {
+
+		open my $fh, '<', $sl or die "Failed to open $sl for reading: $!\n";
+
+		# Get package name from slack-desc
+		while (my $l = readline $fh) {
+
+			next unless $l =~ /^PACKAGE DESCRIPTION:/;
+
+			$l = readline $fh;
+
+			my ($p) = split ':', $l;
+
+			push @pkgs, $p;
+
+			last;
+
+		}
+
+		close $fh;
+
+	}
+
+	return @pkgs;
+
+}
+
+# Expand aliases to package lists. Also gets rid of redundant packages and sorts
+# returned list.
+sub alias_expand {
+
+	my $sbokeeper = shift;
+	my $args      = shift;
+
+	my @rtrn;
+	my @alias;
+
+	foreach my $a (@{$args}) {
+		if ($a =~ /^@/) {
+			push @alias, $a;
+		} else {
+			push @rtrn, $a;
+		}
+	}
+
+	foreach my $a (@alias) {
+		# Get rid of '@'
+		$a = substr $a, 1;
+		push @rtrn, $sbokeeper->packages($a);
+	}
+
+	return uniq sort @rtrn;
+
+}
+
+sub backup {
+
+	my $file = shift;
+
+	if (-r $file) {
+		copy($file, "$file.bak")
+			or die "Failed to copy $file to $file.bak: $!\n";
+	}
+
+}
+
+sub print_package_list {
+
+	my $pref = shift;
+	my @list = @_;
+
+	@list = ('(none)') unless @list;
+
+	foreach my $p (@list) {
+		print "$pref$p\n";
+	}
+
+}
+
+sub package_branch {
+
+	my $sbokeeper = shift;
+	my $pkg       = shift;
+	my $str       = shift;
+
+	my $has = $sbokeeper->has($pkg);
+
+	# Add '(missing)' if package is not present in database but depended on by
+	# another package.
+	printf "%s%s %s\n", $str, $pkg, $has ? '' : '(missing?)';
+
+	return unless $has;
+
+	foreach my $d ($sbokeeper->immediate_dependencies($pkg)) {
+		package_branch($sbokeeper, $d, $str . '  ');
+	}
+
+}
+
+sub sbokeeper_add {
+
+	my $params = shift;
+
+	unless (@{$params->{Args}}) {
+		die $COMMAND_HELP{'add'};
+	}
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		-s $params->{DataFile} ? $params->{DataFile} : '',
+		$params->{SBoPath}
+	);
+
+	my @pkgs = alias_expand($sbokeeper, $params->{Args});
+
+	my @add = $sbokeeper->add(\@pkgs, 1);
+
+	printf "The following packages will be added:\n";
+	print_package_list('  ', @add);
+	printf "The following packages will be marked as manually added:\n";
+	print_package_list('  ', grep { $sbokeeper->is_manual($_) } @pkgs);
+	my $ok = $params->{YesAll} ? 1 : yesno("Is this okay?");
+
+	unless ($ok) {
+		print "No packages added\n";
+		return;
+	}
+
+	backup($params->{DataFile});
+	$sbokeeper->write($params->{DataFile});
+
+	printf "%d packages added\n", scalar @add;
+
+}
+
+sub sbokeeper_tack {
+
+	my $params = shift;
+
+	unless (@{$params->{Args}}) {
+		die $COMMAND_HELP{'tack'};
+	}
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		-s $params->{DataFile} ? $params->{DataFile} : '',
+		$params->{SBoPath}
+	);
+
+	my @pkgs = alias_expand($sbokeeper, $params->{Args});
+
+	my @add = $sbokeeper->tack(\@pkgs, 1);
+
+	printf "The following packages will be added:\n";
+	print_package_list('  ', @add);
+	printf "The following packages will be marked as manually added:\n";
+	print_package_list('  ', sort @pkgs);
+	my $ok = $params->{YesAll} ? 1 : yesno("Is this okay?");
+
+	unless ($ok) {
+		print "No packages added\n";
+		return;
+	}
+
+	backup($params->{DataFile});
+	$sbokeeper->write($params->{DataFile});
+
+	printf "%d packages added\n", scalar @add;
+
+}
+
+sub sbokeeper_addish {
+
+	my $params = shift;
+
+	unless (@{$params->{Args}}) {
+		die $COMMAND_HELP{'addish'};
+	}
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		-s $params->{DataFile} ? $params->{DataFile} : '',
+		$params->{SBoPath}
+	);
+
+	my @pkgs = alias_expand($sbokeeper, $params->{Args});
+
+	my @add = $sbokeeper->add(\@pkgs, 0);
+
+	unless (@add) {
+		die "No packages could be added\n";
+	}
+
+	printf "The following packages will be added:\n";
+	print_package_list('  ', @add);
+	my $ok = $params->{YesAll} ? 1 : yesno("Is this okay?");
+
+	unless ($ok) {
+		print "No packages added\n";
+		return;
+	}
+
+	backup($params->{DataFile});
+	$sbokeeper->write($params->{DataFile});
+
+	printf "%d packages added\n", scalar @add;
+
+}
+
+sub sbokeeper_tackish {
+
+	my $params = shift;
+
+	unless (@{$params->{Args}}) {
+		die $COMMAND_HELP{'tackish'};
+	}
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		-s $params->{DataFile} ? $params->{DataFile} : '',
+		$params->{SBoPath}
+	);
+
+	my @pkgs = alias_expand($sbokeeper, $params->{Args});
+
+	my @add = $sbokeeper->tack(\@pkgs, 0);
+
+	unless (@add) {
+		die "No packages could be added\n";
+	}
+
+	printf "The following packages will be added:\n";
+	print_package_list('  ', @add);
+	my $ok = $params->{YesAll} ? 1 : yesno("Is this okay?");
+
+	unless ($ok) {
+		print "No packages added\n";
+		return;
+	}
+
+	backup($params->{DataFile});
+	$sbokeeper->write($params->{DataFile});
+
+	printf "%d packages added\n", scalar @add;
+
+}
+
+sub sbokeeper_rm {
+
+	my $params = shift;
+
+	unless (@{$params->{Args}}) {
+		die $COMMAND_HELP{'rm'};
+	}
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		$params->{DataFile},
+		$params->{SBoPath}
+	);
+
+	my @pkgs = alias_expand($sbokeeper, $params->{Args});
+
+	my @rm = $sbokeeper->remove(\@pkgs);
+
+	unless (@rm) {
+		die "No packages could be removed\n";
+	}
+
+	printf "The following packages will be removed:\n";
+	print_package_list('  ', @rm);
+	my $ok = $params->{YesAll} ? 1 : yesno("Is this okay?");
+
+	unless ($ok) {
+		print "No packages removed\n";
+		return;
+	}
+
+	backup($params->{DataFile});
+	$sbokeeper->write($params->{DataFile});
+
+	printf "%d packages removed\n", scalar @rm;
+
+}
+
+sub sbokeeper_deps {
+
+	my $params = shift;
+
+	unless (@{$params->{Args}}) {
+		die $COMMAND_HELP{'deps'};
+	}
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		$params->{DataFile},
+		$params->{SBoPath}
+	);
+
+	my $pkg = shift @{$params->{Args}};
+
+	unless ($sbokeeper->has($pkg)) {
+		die "$pkg not present in database\n";
+	}
+
+	my @deps = $sbokeeper->immediate_dependencies($pkg);
+
+	print @deps ? "@deps\n" : "No dependencies found\n";
+
+}
+
+sub sbokeeper_depadd {
+
+	my $params = shift;
+
+	unless (scalar @{$params->{Args}} >= 2) {
+		die $COMMAND_HELP{'depadd'};
+	}
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		$params->{DataFile},
+		$params->{SBoPath}
+	);
+
+	my $pkg = shift @{$params->{Args}};
+	my @deps = alias_expand($sbokeeper, $params->{Args});
+
+	my @add = $sbokeeper->add(\@deps, 0);
+	my @depadd = $sbokeeper->depadd($pkg, \@deps);
+
+	if (!@add and !@depadd) {
+		die "No dependencies could be added to $pkg\n";
+	}
+
+	printf "The following packages will be added to your database:\n";
+	print_package_list('  ', @add);
+	printf "The following dependencies will be added to %s:\n", $pkg;
+	print_package_list('  ', @depadd);
+	my $ok = $params->{YesAll} ? 1 : yesno("Is this okay?");
+
+	unless ($ok) {
+		print "No packages changed\n";
+		return;
+	}
+
+	backup($params->{DataFile});
+	$sbokeeper->write($params->{DataFile});
+
+	printf "%d packages added\n", scalar @add;
+	printf "%d dependencies added to %s\n", scalar @depadd, $pkg;
+
+}
+
+sub sbokeeper_deprm {
+
+	my $params = shift;
+
+	unless (scalar @{$params->{Args}} >= 2) {
+		die $COMMAND_HELP{'deprm'};
+	}
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		$params->{DataFile},
+		$params->{SBoPath}
+	);
+
+	my $pkg = shift @{$params->{Args}};
+	my @deps = alias_expand($sbokeeper, $params->{Args});
+
+	my @rm = $sbokeeper->depremove($pkg, \@deps);
+
+	unless (@rm) {
+		die "No dependencies could be removed from $pkg\n";
+	}
+
+	printf "The following dependencies will be removed from %s\n", $pkg;
+	print_package_list('  ', @rm);
+	my $ok = $params->{YesAll} ? 1 : yesno("Is this okay?");
+
+	unless ($ok) {
+		print "No packages changed\n";
+		return;
+	}
+
+	backup($params->{DataFile});
+	$sbokeeper->write($params->{DataFile});
+
+	printf "%d dependencies removed from %s\n", scalar @rm, $pkg;
+
+}
+
+sub sbokeeper_pull {
+
+	my $params = shift;
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		-s $params->{DataFile} ? $params->{DataFile} : '',
+		$params->{SBoPath}
+	);
+
+	my @installed = get_installed_slackbuilds($params->{PkgtoolLogs});
+
+	my @pull;
+
+	foreach my $i (@installed) {
+
+		unless ($sbokeeper->exists($i)) {
+			warn "Could not find $i in SlackBuild repo, skipping\n";
+			next;
+		}
+
+		next if $sbokeeper->has($i);
+
+		push @pull, $i;
+
+	}
+
+	my @add = $sbokeeper->add(\@pull, 1);
+
+	unless (@add) {
+		print "No packages need to be added, doing nothing\n";
+		return;
+	}
+
+	printf "The following packages will be added:\n";
+	print_package_list('  ', @add);
+	my $ok = $params->{YesAll} ? 1 : yesno("Is this okay?");
+
+	unless ($ok) {
+		print "No packages added\n";
+		return;
+	}
+
+	backup($params->{DataFile});
+	$sbokeeper->write($params->{DataFile});
+
+	printf "%d packages added\n", scalar @add;
+
+}
+
+sub sbokeeper_diff {
+
+	my $params = shift;
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		$params->{DataFile},
+		$params->{SBoPath}
+	);
+
+	my %installed = map { $_ => 1 } get_installed_slackbuilds($params->{PkgtoolLogs});
+	my %added     = map { $_ => 1 } $sbokeeper->packages('all');
+
+	my (@idiff, @adiff);
+
+	foreach my $i (keys %installed) {
+		push @idiff, $i unless defined $added{$i};
+	}
+
+	foreach my $a (keys %added) {
+		push @adiff, $a unless defined $installed{$a};
+	}
+
+	if (!@idiff && !@adiff) {
+		print "No package differences found\n";
+		return;
+	}
+
+	if (@idiff) {
+		printf "Packages found installed on system that are not present in database:\n";
+		print_package_list('  ', sort @idiff);
+		printf "\n" if @adiff;
+	}
+
+	if (@adiff) {
+		printf "Packages found in database that are not installed on system:\n";
+		print_package_list('  ', sort @adiff);
+	}
+
+}
+
+sub sbokeeper_depwant {
+
+	my $params = shift;
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		$params->{DataFile},
+		$params->{SBoPath}
+	);
+
+	my %missing = $sbokeeper->missing();
+
+	unless (%missing) {
+		print "There no dependencies missing from your database\n";
+		return;
+	}
+
+	foreach my $p (sort keys %missing) {
+		printf "%s:\n", $p;
+		print_package_list('  ', @{$missing{$p}});
+		print "\n";
+	}
+
+}
+
+sub sbokeeper_depextra {
+
+	my $params = shift;
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		$params->{DataFile},
+		$params->{SBoPath}
+	);
+
+	my %extra = $sbokeeper->extradeps();
+
+	unless (%extra) {
+		print "No packages have extraneous dependencies in your database\n";
+		return;
+	}
+
+	foreach my $p (sort keys %extra) {
+		printf "%s:\n", $p;
+		print_package_list('  ', @{$extra{$p}});
+		print "\n";
+	}
+
+}
+
+sub sbokeeper_unmanual {
+
+	my $params = shift;
+
+	unless (@{$params->{Args}}) {
+		die $COMMAND_HELP{'unmanual'};
+	}
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		$params->{DataFile},
+		$params->{SBoPath}
+	);
+
+	my @pkgs = alias_expand($sbokeeper, $params->{Args});
+
+	foreach my $p (@pkgs) {
+		die "$p is not present in database\n" unless $sbokeeper->has($p);
+	}
+
+	printf "The following packages will have their manually added flag unset\n";
+	print_package_list('  ', @pkgs);
+	my $ok = $params->{YesAll} ? 1 : yesno("Is this okay?");
+
+	unless ($ok) {
+		print "No packages changed\n";
+		return;
+	}
+
+	my $n = 0;
+	foreach my $p (@pkgs) {
+		next unless $sbokeeper->is_manual($p);
+		$sbokeeper->unmanual($p);
+		$n++;
+	}
+
+	backup($params->{DataFile});
+	$sbokeeper->write($params->{DataFile});
+
+	print "$n packages updated\n";
+
+}
+
+sub sbokeeper_print {
+
+	my $params = shift;
+
+	my $cat = $params->{Args}->[0] || 'all';
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		$params->{DataFile},
+		$params->{SBoPath}
+	);
+
+	my @pkgs = $sbokeeper->packages($cat);
+
+	print_package_list('', @pkgs) if @pkgs;
+
+}
+
+sub sbokeeper_tree {
+
+	my $params = shift;
+
+	my $sbokeeper = Slackware::SBoKeeper->new(
+		$params->{DataFile},
+		$params->{SBoPath}
+	);
+
+	my @pkgs;
+	if (@{$params->{Args}}) {
+
+		@pkgs = alias_expand($sbokeeper, $params->{Args});
+
+		foreach my $p (@pkgs) {
+			die "$p is not present in package database\n"
+				unless $sbokeeper->has($p);
+		}
+
+	} else {
+
+		@pkgs = $sbokeeper->packages('manual');
+
+	}
+
+	foreach my $p (@pkgs) {
+		package_branch($sbokeeper, $p, '');
+		print "\n";
+	}
+
+}
+
+sub sbokeeper_dump {
+
+	my $params = shift;
+
+	open my $fh, '<', $params->{DataFile}
+		or die "Failed to open $params->{DataFile} for reading: $!\n";
+
+	while (my $l = readline $fh) {
+		print $l;
+	}
+
+}
+
+sub sbokeeper_help {
+
+	my $params = shift;
+
+	# If no argument was given, just print help message and exit.
+	unless (@{$params->{Args}}) {
+		print $HELP_MSG;
+		exit 0;
+	}
+
+	my $help = lc shift @{$params->{Args}};
+
+	unless (defined $COMMAND_HELP{$help}) {
+		die "$help is not a command\n";
+	}
+
+	print $COMMAND_HELP{$help};
+
+}
+
+sub main {
+
+	my $params = sbokeeper_init;
+
+	unless (defined $COMMANDS{$params->{Command}}) {
+		die "$params->{Command} is not a valid command\n";
+	}
+
+	$COMMANDS{$params->{Command}}($params);
+
+}
+
+main;
+
+1;
+
+
+
+=head1 NAME
+
+sbokeeper - SlackBuild package manager helper
+
+=head1 SYNOPSIS
+
+ sbokeeper [options] command [args]
+
+=head1 DESCRIPTION
+
+B<sbokeeper> is a tool that can help a Slackware system administrator keep
+track of their installed SlackBuilds by maintaining a database of added
+packages and their dependencies. It is B<not> a package manager itself, it
+simply helps in the task of managing SlackBuilds.
+
+The package database is a text file that stores all of B<sbokeeper>'s package
+data. By default, it is stored in I<~/.local/share/sbokeeper/data.sbokeeper>,
+but it can be configured to be stored in another location.
+
+=head1 CONFIGURATION
+
+B<sbokeeper> reads it's configuration from a configuration file. A B<sbokeeper>
+configuration file consists of lines of key-value pairs. A key-value pair
+follows this format:
+
+ Key = Value
+
+Blank lines and lines starting with a hash (#) are ignored.
+
+Unless the B<-c> option is used, B<sbokeeper> will search for a configuration
+file in the following paths in descending order:
+
+=over 4
+
+=item I<~/.config/sbokeeper.conf>
+
+=item I<~/.sbokeeper.conf>
+
+=item I</etc/sbokeeper.conf>
+
+=back
+
+If no configuration file is found, B<sbokeeper> will use default values for
+everything.
+
+The following are valid configuration entries:
+
+=over 4
+
+=item B<DataFile>
+
+Absolute path to file where package database will be stored. A '~' can be
+expanded into the running user's home directory, but other kinds of shell
+expansion are not performed.
+
+Can be overrided by the B<-d> option.
+
+Default value is I<~/.local/share/sbokeeper/data.sbokeeper>.
+
+=item B<SBoPath>
+
+Absolute to path to directory where local SlackBuild repository is kept. The
+directory should look something like this:
+
+ SBoPath
+   academic
+     pkg1
+     pkg2
+     ...
+   business
+     pkg3
+     pkg4
+   ...
+
+The package categories themselves do not actually matter, all that matters is
+that each SlackBuild is inside a directory that is inside B<SBoPath>.
+
+If your SlackBuild repository directory follows the same format as the official
+git repository then you should be good.
+
+A '~' can be expanded into the running user's home directory, but other kinds
+of shell expansion are not performed.
+
+Can be overrided with the B<-s> option.
+
+The default value depends on what SlackBuild package management tools are
+installed on your system. If you are using one the following:
+
+=over 4
+
+=item sbopkg
+
+=item sbotools
+
+=item sbpkg
+
+=item sboui
+
+=back
+
+then B<sbokeeper> will use the first one found's default repo location. If
+none can be found, B<sbokeeper> is going to croak and just tell you to set it
+manually.
+
+=item B<PkgtoolLogs>
+
+Absolute path to directory where B<pkgtool> stores package logs.
+
+'~' can be exapnded into running user's home directory.
+
+Can be overrided with the B<-p> option.
+
+Default value is I</var/lib/pkgtools/packages>.
+
+=back
+
+=head1 COMMANDS
+
+=over 4
+
+=item B<add> I<pkg ...>
+
+Adds packages to package database, along with any of their dependencies.
+Added packages are marked as manually added, dependencies are not. If a package
+that is specified is already present in the database but not marked as manually
+added, it will be marked as manually added.
+
+If add encounters a package that is already present in the package database, it
+will skip adding it. These means that if the package is missing dependencies, it
+will not try to re-add those dependencies. If this poses a problem, the
+B<depwant> command can help users track down missing dependencies.
+
+This command supports aliases.
+
+=item B<tack> I<pkg ...>
+
+Adds package to package database. Does not add any of their dependencies. Added
+packages are marked as manually added. If a package that is specified is already
+present in the database but not marked as manually added, it will be marked as
+manually added.
+
+This command supports aliases.
+
+=item B<addish> I<pkg ...>
+
+Same thing as B<add>, but added packages are not marked as manually added.
+
+This command supports aliases.
+
+=item B<tackish> I<pkg ...>
+
+Same thing as B<tack>, but added packages are not marked as manually added.
+
+This command supports aliases.
+
+=item B<rm> I<pkg ...>
+
+Remove packages from package database. Does not remove dependencies.
+
+This command supports aliases.
+
+=item B<deps> I<pkg>
+
+Prints list of dependencies for I<pkg>. Does not print dependencies of those
+dependencies, for that I'd recommend the B<tree> command. The dependency list
+is according to the dependencies found in the database, not the dependencies
+listed in the SlackBuild repo.
+
+=item B<depadd> I<pkg> I<deps ...>
+
+Add I<deps> to I<pkg>'s dependency list. Dependencies that are not present in
+the database will automatically be added.
+
+B<** IMPORTANT **>
+
+This command provides an easy way for you to introduce circular dependencies
+into your package database, which sbokeeper cannot handle and can leave your
+database unable to be read. Refrain from carelessly using this command!
+
+This command supports aliases for I<deps>, they do not work for I<pkg>.
+
+=item B<deprm> I<pkg> I<deps ...>
+
+Remove I<deps> from I<pkg>'s dependency list.
+
+This command supports aliases for I<deps>, they do not work for I<pkg>.
+
+=item B<pull>
+
+Find any SlackBuilds.org package installed on your system that is not present
+in your package database and tries to add it to your database. All packages that
+are added are marked as manually added. Packages that are already present in
+your database are skipped.
+
+=item B<diff>
+
+Prints a list of SlackBuild packages that are present on your system but not in
+your database and vice versa.
+
+=item B<depwant>
+
+Prints a list of packages that are, according to the SlackBuild repo, missing
+dependencies in your database.
+
+=item B<depextra>
+
+Prints a list of packages with extra dependencies and said extra dependencies.
+Extra dependencies are dependencies listed in the package database that are not
+present in the SlackBuild repo.
+
+=item B<unmanual> I<pkg ...>
+
+Unset packages as being manually installed, but do not remove them from the
+database.
+
+This command supports aliases.
+
+=item B<print> I<cat>
+
+Print list of packages that are a part of the specified category. The following
+are valid categories:
+
+=over 4
+
+=item all
+
+All packages present in the database.
+
+=item manual
+
+Packages that were manually added.
+
+=item nonmanual
+
+Packages that were not manually added.
+
+=item necessary
+
+Packages that were added manually or are a dependency of a manually added
+package.
+
+=item unnecessary
+
+Packages that were not manually added or a dependency of a manually added
+package.
+
+=item missing
+
+Packages that are not present in the database but are needed by packages in the
+database.
+
+=back
+
+If I<cat> is not specified, defaults to 'all'.
+
+=item B<tree> I<pkgs ...>
+
+Prints a dependency tree. If I<pkgs> are not specified, prints a dependency tree
+for each manually added package in the database. If I<pkgs> are specified,
+prints a dependency tree for each package given.
+
+A dependency tree will look something like this:
+
+ libplacebo
+   python3-meson-opt
+     python3-build
+       python3-pyproject-hooks
+         python3-installer
+           python3-flit_core
+     python3-wheel
+       python3-installer
+         python3-flit_core
+   python3-glad
+
+This command supports aliases.
+
+=item B<dump>
+
+Dumps contents of data file to I<stdout>.
+
+=item B<help> I<cmd>
+
+Print help message for specified command.
+
+=back
+
+=head2 Aliases
+
+Some commands can accept aliases as arguments. An alias is an 'at' symbol (@)
+followed by the package category it is aliasing. B<sbokeeper> will convert the
+alias to the list of packages it is meant to represent. For example, if you
+wanted to remove all packages from a package database, you could do:
+
+ sbokeeper rm @all
+
+and @all would be substituted for a list of every package present in the
+database.
+
+The following are valid aliases:
+
+=over 4
+
+=item @all
+
+=item @manual
+
+=item @nonmanual
+
+=item @necessary
+
+=item @unnecessary
+
+=item @missing
+
+=back
+
+Please refer to the documentation for the B<print> command for what each of
+these categories mean.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-c> I<path>, B<--config>=I<path>
+
+Specify the path to the configuration file.
+
+=item B<-d> I<path>, B<--datafile>=I<path>
+
+Specify the path to the data file.
+
+=item B<-p> I<path>, B<--pkgtool-logs>=I<path>
+
+Specify the path to B<pkgtool> package log directory.
+
+=item B<-s> I<path>, B<--sbodir>=I<path>
+
+Specify the path to the local SlackBuild repository.
+
+=item B<-y>, B<--yes>
+
+Automatically agree to any prompts.
+
+=item B<-h>, B<--help>
+
+Print help message and exit.
+
+=item B<-v>, B<--version>
+
+Print version and copyright information, then exit.
+
+=back
+
+=head1 DATA FILES
+
+B<sbokeeper> stores SlackBuild information in data files. B<sbokeeper> is
+designed so that you would ideally never have to edit these files by hand. It is
+strongly discouraged that you edit these files, however if you do anyway,
+carefully make sure that your edits are valid according to the data file format,
+which will be described below.
+
+B<sbokeeper> data files are text files. Data files contain packages, which are
+a series of lines that contain package information ended by a pair of percentage
+signs (%%). A package entry should look something like this:
+
+ PACKAGE: libreoffice
+ DEPS: avahi zulu-openjdk8
+ MANUAL: 1
+ %%
+
+=over 4
+
+=item PACKAGE
+
+Name of the package, which must have a corresponding SlackBuild in the
+configured SlackBuild repo. This must be the first line in a package entry.
+
+=item DEPS
+
+Whitespace-seperated list of packages that PACKAGE depends on. Each package
+must be present in the SlackBuild repo.
+
+=item MANUAL
+
+Specifies whether the package was manually added or not. 1 for yes, 0 for no.
+
+=item %%
+
+Marks the end of the current package entry.
+
+=back
+
+=head1 AUTHOR
+
+Written by Samuel Young E<lt>L<samyoung12788@gmail.com>E<gt>.
+
+=head1 BUGS
+
+B<sbokeeper> is (as of right now) incapable of handling circular dependencies.
+If you stick with the official SlackBuild.org repos, this should not happen in
+the wild. Circular dependencies can easily be introduced if one does not use
+depadd carefully. So beware.
+
+Report bugs on my Codeberg, L<https://codeberg.org/1-1sam>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2024 Samuel Young 
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of either: the GNU General Public License as published by the Free
+Software Foundation; or the Artistic License. 
+
+See L<https://dev.perl.org/licenses/> for more information.
+
+=head1 SEE ALSO
+
+L<sbopkg(1)>, L<sboui(1)>, L<slackpkg(1)>, L<pkgtool(1)>,
+L<Slackware::SBoKeeper>
+
+=cut

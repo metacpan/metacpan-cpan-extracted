@@ -216,16 +216,16 @@ $queue              => undef
 $field_type         => undef
 $input_name         => undef
 @values             => ()
+$Token              => ''
 </%ARGS>
 
 % if ($field_type eq 'core') {
 
 % if ($name eq 'Attach') {
-<div class="custom-file">
-  <input type="file" id="<% $name %>" name="<% $name %>" class="custom-file-input" />
-  <label class="custom-file-label" for="<% $name %>"><&|/l&>Choose file</&></label>
+<div>
+<& /Ticket/Elements/AddAttachments, Token => $Token, QueueObj => $queue, FullWidth => 1 &>
 </div>
-<input type="hidden" class="hidden" name="UpdateAttach" value="1" />
+<input type="hidden" class="hidden" name="Token" value="<% $Token %>" />
 
 % } elsif ($render_as eq 'hidden') {
 

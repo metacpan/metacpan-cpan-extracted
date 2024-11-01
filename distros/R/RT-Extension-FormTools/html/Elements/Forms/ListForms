@@ -1,10 +1,16 @@
+% $m->callback( CallbackName => 'BeforeFormsTitleBox', ARGSRef => \%ARGS );
 <&|/Widgets/TitleBox, title => '', class => 'container formtools-form-list ml-auto mr-auto' &>
+% if ( defined $Group ) {
+%   if ( $banner_message ) {
+<div class="row">
+  <div class="col-12 text-center">
+    <% $banner_message |n %>
+  </div>
+</div>
+%   }
 % my $item_number = 1;
-% while ( my $form_attribute = $forms->Next ) {
-%    next unless $form_attribute->CurrentUserCanSee;
-%    my $form = $form_attribute->Content;
-%    next if $form->{disabled};
-
+% foreach my $form_attribute ( @forms ) {
+% my $form = $form_attribute->Content;
 % if ( $item_number != 1 ) {
 <hr />
 % }
@@ -20,16 +26,109 @@
 </div>
 % $item_number++;
 % }
+% }
+% else {
+% my $item_number = 1;
+% foreach my $group ( @groups ) {
+% if ( $item_number != 1 ) {
+<hr />
+% }
+<div class="row mt-3 mb-3">
+  <div class="col-4">
+    <a href="<% RT->Config->Get('WebPath') %><% $SelfServicePath %>/Forms.html?Group=<% $group->Description %>">
+      <% $m->scomp('/Elements/Forms/ShowFormGraphic', FormObj => $group, ItemNumber => $item_number) |n %>
+    </a>
+  </div>
+  <div class="col my-auto ml-2 mr-2 formtools-form-text">
+      <% $group->Content->{description} |n %>
+  </div>
+</div>
+% $item_number++;
+% }
+% }
 </&>
 <%init>
-my $forms = RT::Attributes->new( $session{CurrentUser} );
-$forms->Limit( FIELD => 'Name', VALUE => 'FormTools Form' );
-
 my $SelfServicePath = '/SelfService';
 
 if ( $session{'CurrentUser'}->Privileged ) {
     $SelfServicePath = '';
 }
+
+my ( @groups,  @forms, $banner_message );
+
+$Group = ''
+    unless RT->Config->Get('FormToolsEnableGroups');
+
+if ( defined $Group ) {
+    my $forms = RT::Attributes->new( $session{'CurrentUser'} );
+    $forms->Limit( FIELD => 'Name', VALUE => 'FormTools Form' );
+    my @unsorted_forms;
+    while ( my $form_attribute = $forms->Next ) {
+        next unless $form_attribute->CurrentUserCanSee;
+
+        my $form = $form_attribute->Content;
+        next if $form->{disabled};
+        next if ( RT->Config->Get('FormToolsEnableGroups') && ( ( $form->{group} // '' ) ne $Group ) );
+
+        push @unsorted_forms, $form_attribute;
+    }
+    @forms = sort { lc $a->Description cmp lc $b->Description } @unsorted_forms;
+
+    if ( RT->Config->Get('FormToolsEnableGroups') ) {
+        # load the group as system user to check for a banner message
+        my $form_group = RT::Attribute->new( RT->SystemUser );
+        my ( $ret ) = $form_group->LoadByCols( Name => 'FormTools Group', Description => $Group );
+        if ( $ret ) {
+            my $form_group_content = $form_group->Content;
+            $banner_message = $form_group_content->{banner_message} || '';
+        }
+        else {
+            $banner_message = '';
+            RT->Logger->error( loc("Couldn't load FormTools Group '$Group'") );
+        }
+    }
+}
+else {
+    # ensure the groups for any forms the user has rights to view are shown
+    my $forms = RT::Attributes->new( $session{'CurrentUser'} );
+    $forms->Limit( FIELD => 'Name', VALUE => 'FormTools Form' );
+    my %show_group;
+    while ( my $form_attribute = $forms->Next ) {
+        next unless $form_attribute->CurrentUserCanSee;
+
+        my $form = $form_attribute->Content;
+        next if $form->{disabled};
+
+        $show_group{ $form->{group} } = 1 if $form->{group};
+    }
+
+    # check what groups the user has rights to see
+    my $groups = RT::Attributes->new( $session{'CurrentUser'} );
+    $groups->Limit( FIELD => 'Name', VALUE => 'FormTools Group' );
+    while ( my $group = $groups->Next ) {
+        next unless $group->CurrentUserCanSee;
+
+        my $content = $group->Content;
+        next if $content->{disabled};
+
+        $show_group{ $group->Description } = 1;
+    }
+
+    # fetch the groups as system user in case a group is only shown because the user has rights to a form in the group
+    $groups = RT::Attributes->new( RT->SystemUser );
+    $groups->Limit( FIELD => 'Name', VALUE => 'FormTools Group' );
+    my @unsorted_groups;
+    while ( my $group = $groups->Next ) {
+        next unless $show_group{ $group->Description };
+
+        my $content = $group->Content;
+        next if $content->{disabled};
+
+        push @unsorted_groups, $group;
+    }
+    @groups = sort { lc $a->Description cmp lc $b->Description } @unsorted_groups;
+}
 </%init>
 <%args>
+$Group => undef
 </%args>

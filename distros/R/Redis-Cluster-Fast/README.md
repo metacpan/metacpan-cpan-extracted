@@ -107,6 +107,12 @@ MOVED, ASK, TRYAGAIN, CLUSTERDOWN.
 
 `max_retry_count` is the maximum number of retries and must be 1 or above.
 
+### route\_use\_slots
+
+A value used as boolean. (default: undef)
+
+The client will call CLUSTER SLOTS instead of CLUSTER NODES.
+
 ## &lt;command>(@args)
 
 To run a Redis command with arguments.

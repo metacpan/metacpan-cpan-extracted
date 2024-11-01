@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-our $VERSION = "0.091";
+our $VERSION = "0.092";
 
 use constant {
     DEFAULT_COMMAND_TIMEOUT => 1.0,
@@ -38,6 +38,8 @@ sub new {
     my $max_retry = $args{max_retry_count};
     $max_retry = DEFAULT_MAX_RETRY_COUNT unless defined $max_retry;
     $self->__set_max_retry($max_retry);
+
+    $self->__set_route_use_slots($args{route_use_slots} ? 1 : 0);
 
     my $error = $self->__connect();
     croak $error if $error;
@@ -192,6 +194,12 @@ The client will retry calling the Redis Command only if it successfully get one 
 MOVED, ASK, TRYAGAIN, CLUSTERDOWN.
 
 C<max_retry_count> is the maximum number of retries and must be 1 or above.
+
+=head3 route_use_slots
+
+A value used as boolean. (default: undef)
+
+The client will call CLUSTER SLOTS instead of CLUSTER NODES.
 
 =head2 <command>(@args)
 

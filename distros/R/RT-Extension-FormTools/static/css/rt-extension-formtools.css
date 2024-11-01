@@ -2,6 +2,10 @@
     max-width: 700px;
 }
 
+#formtools-form-body .button[name="AddMoreAttach"] {
+    margin-top: 0.5em;
+}
+
 div .formtools-content {
     min-height: 400px;
 }

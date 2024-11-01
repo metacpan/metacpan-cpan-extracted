@@ -19,7 +19,7 @@ foreach my $element ( @{$form_config->{'formtools-pages'}{$page}{'content'}} ) {
             . '" value="' . $element->{'input-value'} . '"  />');
     }
     elsif ( $element->{type} eq 'component' ) {
-        $m->comp('/FormTools/' . $element->{comp_name}, %{$element->{arguments}});
+        $m->comp('/FormTools/' . $element->{comp_name}, %{$element->{arguments}}, Token => $ARGS{Token}, AttachedFilenames => $ARGS{AttachedFilenames} );
     }
 
     if ( $element->{type} eq 'hidden'
@@ -211,6 +211,25 @@ else {
     Abort('Form not found');
 }
 
+if ( ref $ARGS{Token} && ref $ARGS{Token} eq 'ARRAY' ) {
+    $ARGS{Token} = $ARGS{Token}->[0];
+}
+if ( $ARGS{Attach} ) {
+    my $cgi_object        = $m->cgi_object;
+    my $attach_filehandle = $cgi_object->upload('Attach');
+    if ( $attach_filehandle ) {
+        ProcessAttachments( ARGSRef => \%ARGS )
+            unless tell($attach_filehandle);
+    }
+}
+elsif ( ! $ARGS{Token} ) {
+    # call ProcessAttachments to generate a unique token for this form load
+    ProcessAttachments( ARGSRef => \%ARGS );
+}
+$ARGS{AttachedFilenames} = join ', ', keys %{ $session{'Attachments'}{ $ARGS{Token} } || {} };
+
+$m->callback( CallbackName => 'AfterFormConfigLoaded', ARGSRef => \%ARGS, FormConfig => $form_config );
+
 no warnings 'redefine';
 my $orig_current_user_has_right = RT::CustomField->can('CurrentUserHasRight');
 local *RT::CustomField::CurrentUserHasRight = sub {
@@ -241,6 +260,7 @@ Abort('Permission Denied') unless $queue_obj->CurrentUserHasRight('CreateTicket'
 
 $m->notes( queue => $queue_obj );
 $m->notes( page_title => $form_config->{'formtools-pages'}{$page}{'name'} );
+$m->notes( form_group => $form_config->{group} );
 
 my $base_path = '/Forms/';
 $base_path = '/SelfService' . $base_path if $SelfService;
@@ -325,6 +345,110 @@ if ( $ARGS{Back} and $ARGS{Back} eq 'Back' ) {
 
 my ($ticket_obj, @results);
 if ( $create_ticket ) {
+    # add include_in_content fields to Content arg
+    my @include_in_content;
+    foreach my $page ( keys %{ $form_config->{'formtools-pages'} || {} } ) {
+        my @include_in_content_fields
+            = grep { $_->{arguments}{include_in_content} }
+                @{ $form_config->{'formtools-pages'}{$page}{content} || [] };
+        foreach my $field ( @include_in_content_fields ) {
+            my $string = ( $field->{arguments}{label} || $field->{arguments}{name} ) . ': ';
+            if ( RT::Extension::FormTools::is_core_field( $field->{arguments}{name} ) ) {
+                $string .= $ARGS{ $field->{arguments}{name} };
+            }
+            else {
+                my $cf_name = $field->{arguments}{name};
+                my $cf = RT::CustomField->new( $session{'CurrentUser'} );
+
+                # try loading CFs for this Queue, followed by Global, followed by any CF of given $cf_name
+                $cf->LoadByName( Name => $cf_name, Queue => $queue_obj->id ) if (defined $queue_obj);
+                $cf->LoadByName( Name => $cf_name, Queue => 0 ) unless ( $cf->id );
+                unless ( $cf->Id ) {
+                    $cf->LoadByName( Name => $cf_name );
+                }
+                unless ( $cf->id ) {
+                    my $msg = "Could not find a custom field called $cf_name";
+                    $msg .= " for the queue ".$queue_obj->Name if (defined $queue_obj);
+                    RT->Logger->error('Could not load custom field to include in content:' . $msg);
+                    next;
+                }
+
+                my $cf_id = $cf->id;
+                my $value = $ARGS{"Object-RT::Ticket--CustomField-$cf_id-Value"}
+                    ||
+                    $ARGS{"Object-RT::Ticket--CustomField-$cf_id-Values"}
+                    || '';
+                $string .= ref($value) eq 'ARRAY' ? join( ', ', @$value )
+                                                  : $value;
+            }
+            push @include_in_content, $string;
+        }
+    }
+    if ( @include_in_content ) {
+        my $separator = RT->Config->Get( 'MessageBoxRichText',  $session{'CurrentUser'} ) ? "<br/>"
+                                                                                          : "\n";
+        $ARGS{Content} ||= '';
+        $ARGS{Content} = join( $separator, @include_in_content ) . $separator . $separator . $ARGS{Content};
+    }
+
+    # if the Content field is not on the last page of the form the ContentType arg will not be set
+    # check if the ContentType arg needs to be set before creating the ticket to ensure Content is formatted correctly
+    if ( $ARGS{Content}
+        && ( ! $ARGS{ContentType} )
+        && ( RT->Config->Get( 'MessageBoxRichText',  $session{'CurrentUser'} ) )
+    ) {
+        $ARGS{ContentType} = 'text/html';
+    }
+
+    # check for queue routing
+    my %compare_for_op = (
+        "LIKE"     => sub { my ( $val, $test ) = @_; return ref $val ? grep { $_ =~ /$test/ } @$val : $val =~ /$test/ },
+        "NOT LIKE" => sub { my ( $val, $test ) = @_; return ref $val ? grep { $_ !~ /$test/ } @$val : $val !~ /$test/ },
+        "="        => sub { my ( $val, $test ) = @_; return ref $val ? grep { $_ eq $test } @$val : $val eq $test },
+        "!="       => sub { my ( $val, $test ) = @_; return ref $val ? grep { $_ ne $test } @$val : $val ne $test },
+        "<"        => sub { my ( $val, $test ) = @_; return ref $val ? grep { $_ < $test } @$val : $val < $test },
+        ">"        => sub { my ( $val, $test ) = @_; return ref $val ? grep { $_ > $test } @$val : $val > $test },
+    );
+    if ( $form_config->{routing} ) {
+        foreach my $route ( @{ $form_config->{routing} || [] } ) {
+            my $match = 1;
+            foreach my $criteria ( @{ $route->{criteria} || [] } ) {
+                my ( $cf_name, $op, $test ) = @$criteria;
+                my $cf = RT::CustomField->new( $session{'CurrentUser'} );
+
+                # try loading CFs for this Queue, followed by Global, followed by any CF of given $cf_name
+                $cf->LoadByName( Name => $cf_name, Queue => $queue_obj->id ) if (defined $queue_obj);
+                $cf->LoadByName( Name => $cf_name, Queue => 0 ) unless ( $cf->id );
+                unless ( $cf->Id ) {
+                    $cf->LoadByName( Name => $cf_name );
+                }
+                unless ( $cf->id ) {
+                    my $msg = "Could not find a custom field called $cf_name";
+                    $msg .= " for the queue ".$queue_obj->Name if (defined $queue_obj);
+                    RT->Logger->error('Could not load custom field to include in content:' . $msg);
+                    next;
+                }
+
+                my $cf_id = $cf->id;
+                my $value = $ARGS{"Object-RT::Ticket--CustomField-$cf_id-Value"}
+                    ||
+                    $ARGS{"Object-RT::Ticket--CustomField-$cf_id-Values"}
+                    || '';
+                $match = $compare_for_op{$op}->( $value, $test );
+                # as soon as one criteria fails we can skip any remaining
+                last unless $match;
+            }
+            if ( $match ) {
+                ( $ok, $msg ) = $queue_obj->Load( $route->{queue} );
+                unless ( $ok ) {
+                    RT->Logger->error('FormTools unable to load queue for alternate queue routing: ' . $route->{queue});
+                    Abort('Unable to load form, invalid alternate queue routing');
+                }
+                # found an alternate queue so skip any remaining routes
+                last;
+            }
+        }
+    }
 
     $m->callback( CallbackName => 'BeforeCreate', ARGSRef => \%ARGS, results => \@results,
                   FormName => $form_name, PageName => $page );

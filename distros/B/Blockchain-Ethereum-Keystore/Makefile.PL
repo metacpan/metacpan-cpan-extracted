@@ -23,8 +23,7 @@ my %WriteMakefileArgs = (
     "CryptX" => "0.078",
     "File::Slurp" => "9999.32",
     "JSON::MaybeXS" => "1.004005",
-    "Net::SSH::Perl" => "2.14",
-    "Object::Pad" => "0.814"
+    "Net::SSH::Perl" => "2.14"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -33,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::CheckDeps" => "0.010",
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +50,6 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => "1.004005",
   "Net::SSH::Perl" => "2.14",
-  "Object::Pad" => "0.814",
   "Test::CheckDeps" => "0.010",
   "Test::More" => "0.94"
 );

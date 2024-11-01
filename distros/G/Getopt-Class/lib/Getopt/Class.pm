@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v1.1.2
+## Version v1.1.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2024/09/05
+## Modified 2024/11/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,7 +25,7 @@ BEGIN
     use Module::Generic::File qw( file );
     use Module::Generic::Scalar;
     use Scalar::Util;
-    our $VERSION = 'v1.1.2';
+    our $VERSION = 'v1.1.3';
 };
 
 use strict;
@@ -1222,7 +1222,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v1.1.2
+    v1.1.3
 
 =head1 DESCRIPTION
 
@@ -1407,6 +1407,43 @@ This type will set the resulting value to be a L<Module::Generic::Scalar> object
 Same as C<scalar>. This type will set the resulting value to be a L<Module::Generic::Scalar> object of the value provided.
 
 =item * C<string-hash>
+
+This type will set the resulting value to be an L<Module::Generic::Hash> object.
+
+It enables the passing of <key=value> pairs as documented in L<Getopt::Long/"Options with hash values">
+
+So you coul do something like:
+
+    use Getopt::Class;
+    my $dict =
+    {
+        help            => { type => 'code', code => sub{ pod2usage(1); }, alias => '?', action => 1 },
+        man             => { type => 'code', code => sub{ pod2usage( -exitstatus => 0, -verbose => 2 ); }, action => 1 },
+        quiet           => { type => 'boolean', default => 0, alias => 'silent' },
+        verbose         => { type => 'boolean', default => \$VERBOSE, alias => 'v' },
+        version         => { type => 'code', code => sub{ printf( "v%.2f\n", $VERSION ); }, action => 1 },
+    
+        dry_run         => { type => 'boolean', default => 0 },
+        name            => { type => 'string', class => [qw( person product )] },
+        created         => { type => 'datetime', class => [qw( person product )] },
+        define          => { type => 'string-hash', default => {} },
+    };
+    
+    # Assuming command line arguments like:
+    prog.pl --create-user --name Bob --langs fr ja --age 30 --created now --debug 3 \
+            --path ./here/some/where --skip ./bad/directory ./not/here ./avoid/me/
+
+    my $opt = Getopt::Class->new({
+        dictionary => $dict,
+    }) || die( Getopt::Class->error, "\n" );
+    my $opts = $opt->exec || die( $opt->error, "\n" );
+    # etc...
+
+And then, call your script like:
+
+    ./my_script.pl --define os=linux --define vendor=ubuntu
+
+And, then you would have an hash reference of two keys and their value: C<os> and C<vendor> available in C<< $opts->{define} >>
 
 =item * C<uri>
 

@@ -1,0 +1,50 @@
+Revision history for perl module App::Tarotplane
+
+1.00 Thu 31 Oct 2024
+  This release features a lot of changes related to the project's structure, as
+  this is intended to be the first release published on CPAN.
+  Changes:
+    - Complete refactor of project structure. Core tarotplane functionality has
+      been split into various App::Tarotplane modules.
+    - Makefile.PL is now used for the build process instead of GNU make.
+    - tarotplane now depends on Perl 5.016.
+    - CHANGELOG renamed to Changes, now follows traditional perl Changes format.
+    - Switched to x.xx version number format.
+  Added:
+    - Tests.
+    - -o option, allows you to order cards alphabetically by either terms or
+      definitions.
+
+0.3.0 Wed 2 Oct 2024
+  Added:
+    - Two new escape sequences:
+      - \n: Force linebreak.
+      - \\: Back slash.
+    - Demo GIF.
+  Changes:
+    - Text::Wrap is now used for line wrapping.
+    - Split words are no longer hyphenated.
+
+0.2.0 Sat 17 Aug 2024
+  Added:
+    - '?' displays help message.
+  Changes:
+    - open is now used for testing file readability.
+    - make now builds manual by default.
+    - New example card in manual.
+    - Option bundling is now used.
+    - Exit when error is found in GetOptions.
+
+0.1.1 Sat 15 Jul 2024
+  Added:
+    - Change log.
+    - $! is now printed when a file cannot be opened during reading process.
+  Fixes:
+    - Grammar issues.
+    - @ARGV is now checked after GetOptions is ran, preventing tarotplane from
+      running when nothing but option arguments are passed.
+  Removed:
+    - -v (verbose) flag from install lines in Makefile.
+
+0.1.0 Sun 7 Jul 2024
+  Initial release.

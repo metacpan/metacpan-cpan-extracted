@@ -1,0 +1,4 @@
+<& /Elements/Announce/DisplayAnnouncements, %ARGS, FormGroupName => $ARGSRef->{Group} &>
+<%ARGS>
+$ARGSRef
+</%ARGS>

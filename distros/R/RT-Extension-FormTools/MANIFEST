@@ -14,8 +14,14 @@ html/Admin/FormTools/Advanced.html
 html/Admin/FormTools/Create.html
 html/Admin/FormTools/Describe.html
 html/Admin/FormTools/GroupRights.html
+html/Admin/FormTools/Groups/Create.html
+html/Admin/FormTools/Groups/GroupRights.html
+html/Admin/FormTools/Groups/index.html
+html/Admin/FormTools/Groups/Modify.html
+html/Admin/FormTools/Groups/UserRights.html
 html/Admin/FormTools/index.html
 html/Admin/FormTools/Modify.html
+html/Admin/FormTools/Routing.html
 html/Admin/FormTools/UserRights.html
 html/Callbacks/FormTools/Elements/Header/Head
 html/Callbacks/FormTools/Elements/Tabs/Privileged
@@ -28,9 +34,11 @@ html/Forms/dhandler
 html/FormTools/Field
 html/FormTools/Form
 html/FormTools/Next
+html/FormTools/ShowBanner
 html/FormTools/ShowChoices
 html/NoAuth/Helpers/FormLogo/dhandler
 html/NoAuth/js/form_tools.js
+html/Search/Elements/RoutingPickTicketCFs
 html/SelfService/Forms.html
 html/SelfService/Forms/dhandler
 inc/Module/Install.pm
