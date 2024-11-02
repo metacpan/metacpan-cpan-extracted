@@ -8,11 +8,11 @@ Astro::Coords::Interpolated - Specify astronomical coordinates using two referen
 =head1 SYNOPSIS
 
   $c = new Astro::Coords::Interpolated( ra1 => '05:22:56',
-					dec1 => '-26:20:44.4',
-					mjd1 => 52440.5,
-					ra2 => '05:23:56',
-					dec2 => '-26:20:50.4',
-					mjd2 => 52441.5,);
+                                        dec1 => '-26:20:44.4',
+                                        mjd1 => 52440.5,
+                                        ra2 => '05:23:56',
+                                        dec2 => '-26:20:50.4',
+                                        mjd2 => 52441.5,);
 
 =head1 DESCRIPTION
 
@@ -25,7 +25,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use base qw/ Astro::Coords /;
 
@@ -42,13 +42,13 @@ use overload '""' => "stringify";
 Instantiate a new object using the supplied options.
 
   $c = new Astro::Coords::Interpolated( ra1 => '05:22:56',
-					dec1 => '-26:20:44.4',
-					mjd1 => 52440.5,
-					ra2 => '05:23:56',
-					dec2 => '-26:20:50.4',
-					mjd2 => 52441.5,
-					units =>
-				      );
+                                        dec1 => '-26:20:44.4',
+                                        mjd1 => 52440.5,
+                                        ra2 => '05:23:56',
+                                        dec2 => '-26:20:50.4',
+                                        mjd2 => 52441.5,
+                                        units =>
+                                      );
 
 Returns undef on error. The positions are assumed to be apparent
 RA/Dec for the telescope location. Units are optional (see
@@ -71,10 +71,10 @@ sub new {
 
   # Convert input args to objects
   $args{ra1} = new Astro::Coords::Angle::Hour($args{ra1}, units => $unit_c1,
-					      range => '2PI' );
+                                              range => '2PI' );
   $args{dec1} = new Astro::Coords::Angle($args{dec1}, units => $unit_c2 );
   $args{ra2} = new Astro::Coords::Angle::Hour($args{ra2}, units => $unit_c1,
-					      range => '2PI' );
+                                              range => '2PI' );
   $args{dec2} = new Astro::Coords::Angle($args{dec2}, units => $unit_c2 );
 
   return bless \%args, $class;
@@ -209,7 +209,7 @@ into the other coordinate systems.
 sub array {
   my $self = shift;
   return ( $self->type, undef, undef,
-	   undef,undef,undef,undef,undef,undef,undef,undef);
+           undef,undef,undef,undef,undef,undef,undef,undef);
 }
 
 =item B<type>

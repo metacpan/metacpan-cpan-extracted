@@ -10,7 +10,7 @@ use Time::Piece qw/ :override /;
 use DateTime;
 use DateTime::TimeZone;
 
-# Need this since the constants from Astro::Coords will 
+# Need this since the constants from Astro::Coords will
 # not be defined if we only require
 BEGIN { use_ok('Astro::Coords') };
 require_ok('Astro::PAL');
@@ -110,42 +110,42 @@ for my $date ($timepiece, $datetime) {
 # between the USNO tables. This discrepancy is always less than 0.06 degrees
 # in elevation (equivalent to the error in time given in the table)
 my @moon_data = (
-		 [0, 10.4 , 257.1, 's'],
-		 [1, -3.8 , 257.6, 's'],
-		 [13, -3.7 , 99.5,  'r'],
-		 [14 ,10.7 , 99.4,  'r'],
-		 [15 ,25.1 , "100.0", 'r'],
-		 [16 ,39.5 , 101.4, 'r'],  ## Fudged from 39.6 (18 seconds)
-		 [17 ,53.9 , 104.7, 'r'],
-		 [18 , "68.0", 112.8, 'r'],
-		 [19 , 80.1, 145.3, 'r'],  ## Fudged from 80.2 (18 seconds)
-		 [20 , "78.0", 229.1, 's'],
-		 [21 , "65.0", 251.9, 's'],
-		 [22 , 50.7, 258.4, 's'],  ## Fudged from 50.8 (14 seconds)
-		 [23 , 36.3, 261.3, 's'],
-		);
+                 [0, 10.4 , 257.1, 's'],
+                 [1, -3.8 , 257.6, 's'],
+                 [13, -3.7 , 99.5,  'r'],
+                 [14 ,10.7 , 99.4,  'r'],
+                 [15 ,25.1 , "100.0", 'r'],
+                 [16 ,39.5 , 101.4, 'r'],  ## Fudged from 39.6 (18 seconds)
+                 [17 ,53.9 , 104.7, 'r'],
+                 [18 , "68.0", 112.8, 'r'],
+                 [19 , 80.1, 145.3, 'r'],  ## Fudged from 80.2 (18 seconds)
+                 [20 , "78.0", 229.1, 's'],
+                 [21 , "65.0", 251.9, 's'],
+                 [22 , 50.7, 258.4, 's'],  ## Fudged from 50.8 (14 seconds)
+                 [23 , 36.3, 261.3, 's'],
+                );
 
 my @sun_data = (
-		[ 5,   -10.7,       110.1, 'r'],
-	#	[ 6,     3.6,       109.8, 'r'], # seems to come out as 3.4
-		[ 7,    17.4,       110.8, 'r'], ## Fudged from 17.5 (14 sec)
-		[ 8,    31.4,       113.4, 'r'],
-		[ 9,    44.9,       118.6, 'r'],
-		[10,    57.4,       '129.0', 'r'],
-		[11,    67.2,       151.2, 'r'],
-		[12,    69.9,       189.8, 's'],
-		[13,    63.1,       221.4, 's'],
-		[14,    51.6,       236.9, 's'],
-		[15,    38.5,       244.3, 's'],
-		[16,    24.8,       '248.0', 's'],
-		[17,    10.8,       249.8, 's'],
-		[18,    -3.3,       250.1, 's'],
-	       );
+                [ 5,   -10.7,       110.1, 'r'],
+        #       [ 6,     3.6,       109.8, 'r'], # seems to come out as 3.4
+                [ 7,    17.4,       110.8, 'r'], ## Fudged from 17.5 (14 sec)
+                [ 8,    31.4,       113.4, 'r'],
+                [ 9,    44.9,       118.6, 'r'],
+                [10,    57.4,       '129.0', 'r'],
+                [11,    67.2,       151.2, 'r'],
+                [12,    69.9,       189.8, 's'],
+                [13,    63.1,       221.4, 's'],
+                [14,    51.6,       236.9, 's'],
+                [15,    38.5,       244.3, 's'],
+                [16,    24.8,       '248.0', 's'],
+                [17,    10.8,       249.8, 's'],
+                [18,    -3.3,       250.1, 's'],
+               );
 
 my $refdate = DateTime->new( year => 2004,
-			     month => 11,
-			     day => 20,
-			     time_zone => 'UTC');
+                             month => 11,
+                             day => 20,
+                             time_zone => 'UTC');
 
 my $moon = new Astro::Coords( planet => 'moon' );
 my $sun  = new Astro::Coords( planet => 'sun' );
@@ -153,19 +153,19 @@ $moon->datetime( $refdate );
 $sun->datetime( $refdate );
 
 my %data = (
-	    moon => { coords => $moon,
-		      data => \@moon_data,
-		      rise => [2004,11,20,13,12],
-		      set => [2004,11,20,0,47],
-		      transit => [2004,11,20,19,23],
-		    },
-	    sun => { coords => $sun,
-		     data => \@sun_data,
-		     rise => [2004,11,20,5,42],
-		     set => [2004,11,20,17,49],
-		     transit => [2004,11,20,11,46],
-		   },
-	   );
+            moon => { coords => $moon,
+                      data => \@moon_data,
+                      rise => [2004,11,20,13,12],
+                      set => [2004,11,20,0,47],
+                      transit => [2004,11,20,19,23],
+                    },
+            sun => { coords => $sun,
+                     data => \@sun_data,
+                     rise => [2004,11,20,5,42],
+                     set => [2004,11,20,17,49],
+                     transit => [2004,11,20,11,46],
+                   },
+           );
 
 for my $targ (sort keys %data) {
   print "# Testing elevations for target $targ\n";
@@ -214,8 +214,8 @@ for my $targ (sort keys %data) {
 
       # Want the answer in decimal hours so that rounding can be
       # implemented
-      my $dechr = $time->hour + ( $time->minute() / 60 ) + 
-	( $time->second() / 3600 );
+      my $dechr = $time->hour + ( $time->minute() / 60 ) +
+        ( $time->second() / 3600 );
 
       # force to 1 decimal place and then convert back to a number
       # for comparison
@@ -252,8 +252,8 @@ my $time = DateTime->new(year => 2005,
                          hour => 8,
                          minute => 11,
                          second => 41,
-			 time_zone => $UTC
-			);
+                         time_zone => $UTC
+                        );
 
 $moon2->telescope($place);
 $moon2->datetime($time);
@@ -267,13 +267,13 @@ is($set, undef, "Moon does not set");
 
 # and another from Beat Vontobel
 $time = DateTime->new ( year => 2005,
-			month =>   1,
-			day =>     7,
-			hour =>    9,
-			minute =>  2,
-			second =>  24,
-			time_zone => $UTC
-		      );
+                        month =>   1,
+                        day =>     7,
+                        hour =>    9,
+                        minute =>  2,
+                        second =>  24,
+                        time_zone => $UTC
+                      );
 
 $moon2->datetime($time);
 $rise = $moon2->rise_time(nearest => 1);
@@ -297,17 +297,17 @@ sub test_time {
 
 
   my $dt = new DateTime( year => $answer->[0],
-			 month => $answer->[1],
-			 day => $answer->[2],
-			 hour => $answer->[3],
-			 minute => $answer->[4],
-			 time_zone => $tz,
-		       );
+                         month => $answer->[1],
+                         day => $answer->[2],
+                         hour => $answer->[3],
+                         minute => $answer->[4],
+                         time_zone => $tz,
+                       );
 
   my $localref;
   $localref = DateTime->from_epoch( epoch => $ref->epoch,
-				    time_zone => $tz,
-				  ) if defined $ref;
+                                    time_zone => $tz,
+                                  ) if defined $ref;
 
   print "# Cf ".(defined $localref ? $localref : 'undef' )." with $dt\n";
   my $sec = (defined $localref ? $localref->second : 0);

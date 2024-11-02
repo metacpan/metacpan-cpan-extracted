@@ -4,7 +4,7 @@
       "Tim Jenness E<lt>tjenness@cpan.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "gpl_3"
    ],
@@ -39,54 +39,55 @@
    "provides" : {
       "Astro::Coords" : {
          "file" : "lib/Astro/Coords.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Astro::Coords::Angle" : {
          "file" : "lib/Astro/Coords/Angle.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Astro::Coords::Angle::Hour" : {
          "file" : "lib/Astro/Coords/Angle/Hour.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Astro::Coords::Calibration" : {
          "file" : "lib/Astro/Coords/Calibration.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Astro::Coords::Elements" : {
          "file" : "lib/Astro/Coords/Elements.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Astro::Coords::Equatorial" : {
          "file" : "lib/Astro/Coords/Equatorial.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Astro::Coords::Fixed" : {
          "file" : "lib/Astro/Coords/Fixed.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Astro::Coords::Interpolated" : {
          "file" : "lib/Astro/Coords/Interpolated.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Astro::Coords::Offset" : {
          "file" : "lib/Astro/Coords/Offset.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Astro::Coords::Planet" : {
          "file" : "lib/Astro/Coords/Planet.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://github.com/timj/perl-Astro-Coords/tree/master",
+      "homepage" : "https://github.com/timj/perl-Astro-Coords/tree/master",
       "license" : [
-         "http://www.gnu.org/licenses/gpl-3.0.txt"
+         "http://opensource.org/licenses/gpl-3.0.html"
       ],
       "repository" : {
          "url" : "https://github.com/timj/perl-Astro-Coords.git"
       }
    },
-   "version" : "0.21"
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

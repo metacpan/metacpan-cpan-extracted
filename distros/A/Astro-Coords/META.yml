@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.3'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,34 +18,34 @@ name: Astro-Coords
 provides:
   Astro::Coords:
     file: lib/Astro/Coords.pm
-    version: '0.21'
+    version: '0.22'
   Astro::Coords::Angle:
     file: lib/Astro/Coords/Angle.pm
-    version: '0.21'
+    version: '0.22'
   Astro::Coords::Angle::Hour:
     file: lib/Astro/Coords/Angle/Hour.pm
-    version: '0.21'
+    version: '0.22'
   Astro::Coords::Calibration:
     file: lib/Astro/Coords/Calibration.pm
-    version: '0.21'
+    version: '0.22'
   Astro::Coords::Elements:
     file: lib/Astro/Coords/Elements.pm
-    version: '0.21'
+    version: '0.22'
   Astro::Coords::Equatorial:
     file: lib/Astro/Coords/Equatorial.pm
-    version: '0.21'
+    version: '0.22'
   Astro::Coords::Fixed:
     file: lib/Astro/Coords/Fixed.pm
-    version: '0.21'
+    version: '0.22'
   Astro::Coords::Interpolated:
     file: lib/Astro/Coords/Interpolated.pm
-    version: '0.21'
+    version: '0.22'
   Astro::Coords::Offset:
     file: lib/Astro/Coords/Offset.pm
-    version: '0.21'
+    version: '0.22'
   Astro::Coords::Planet:
     file: lib/Astro/Coords/Planet.pm
-    version: '0.21'
+    version: '0.22'
 requires:
   Astro::PAL: '0'
   Astro::Telescope: '0.71'
@@ -53,7 +53,8 @@ requires:
   Scalar::Util: '1.13'
   Time::Piece: '1.1'
 resources:
-  homepage: http://github.com/timj/perl-Astro-Coords/tree/master
-  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  homepage: https://github.com/timj/perl-Astro-Coords/tree/master
+  license: http://opensource.org/licenses/gpl-3.0.html
   repository: https://github.com/timj/perl-Astro-Coords.git
-version: '0.21'
+version: '0.22'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

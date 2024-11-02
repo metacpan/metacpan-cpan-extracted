@@ -164,6 +164,18 @@ const char *libneo4j_client_version(void);
 __neo4j_const
 const char *libneo4j_client_id(void);
 
+/**
+ * Struct for representing Neo4j version supported by (this) client
+ * in connection handshake.
+ */
+
+struct version_spec {
+  uint16_t major;
+  uint16_t minor;
+  uint16_t  and_lower;
+};
+
+typedef struct version_spec version_spec_t;
 
 /*
  * =====================================
@@ -206,7 +218,9 @@ int neo4j_client_cleanup(void);
 #define NEO4J_LOG_TRACE 4
 
 /**
- * A logger for neo4j client.
+ * A logger for neo4j-client.
+ * \defgroup logging Logging
+ * @{
  */
 struct neo4j_logger
 {
@@ -308,13 +322,21 @@ void neo4j_std_logger_provider_free(struct neo4j_logger_provider *provider);
 __neo4j_const
 const char *neo4j_log_level_str(uint_fast8_t level);
 
-
+/** @}*/
+    
 /*
  * =====================================
  * I/O
  * =====================================
+ *
+ */
+/**
+ * Input and output streams.
+ * \defgroup IO
+ * @{
  */
 
+    
 /**
  * An I/O stream for neo4j client.
  */
@@ -384,6 +406,8 @@ struct neo4j_iostream
     int (*close)(struct neo4j_iostream *self);
 };
 
+/** @}*/
+    
 /**
  * A factory for establishing communications with neo4j.
  */
@@ -538,6 +562,13 @@ struct neo4j_memory_allocator
  * =====================================
  * values
  * =====================================
+ *
+ */
+
+/**
+ * Neo4j types/values.
+ * \defgroup values
+ * @{
  */
 
 /** The neo4j null value type. */
@@ -1166,7 +1197,7 @@ long long neo4j_time_nsecs(neo4j_value_t value);
 long long neo4j_time_secs_offset(neo4j_value_t value);
 struct timespec *neo4j_time_timespec(neo4j_value_t value);
 
-neo4j_value_t neo4j_localtime(const neo4j_value_t fields[2]);
+neo4j_value_t neo4j_localtime(const neo4j_value_t fields[1]);
 long long neo4j_localtime_nsecs(neo4j_value_t value);
 struct timespec *neo4j_localtime_timespec(neo4j_value_t value);
 
@@ -1192,22 +1223,26 @@ long long neo4j_point2d_srid(neo4j_value_t value);
 double neo4j_point2d_x(neo4j_value_t value);
 double neo4j_point2d_y(neo4j_value_t value);
 
-neo4j_value_t neo4j_point3d(const neo4j_value_t fields[3]);
+neo4j_value_t neo4j_point3d(const neo4j_value_t fields[4]);
 long long neo4j_point3d_srid(neo4j_value_t value);
 double neo4j_point3d_x(neo4j_value_t value);
 double neo4j_point3d_y(neo4j_value_t value);
 double neo4j_point3d_z(neo4j_value_t value);
 
-
-
-
-    
+/** @}*/
 
 
 /*
  * =====================================
  * config
  * =====================================
+ *
+ */
+
+/**
+ * Client configuration.
+ * \defgroup config
+ * @{
  */
 
 /**
@@ -1682,12 +1717,17 @@ ssize_t neo4j_dot_dir(char *buffer, size_t n, const char *append)
  *         on error (errno will be set).
  */
 char *neo4j_adotdir(const char *append);
-
-
+/** @}*/
+  
 /*
  * =====================================
  * connection
  * =====================================
+ */
+/**
+ * Client-server connection.
+ * \defgroup connection
+ * @{
  */
 
 #define NEO4J_DEFAULT_TCP_PORT 7687
@@ -1798,12 +1838,17 @@ const char *neo4j_connection_username(const neo4j_connection_t *connection);
  */
 __neo4j_pure
 bool neo4j_connection_is_secure(const neo4j_connection_t *connection);
-
+/** @}*/
 
 /*
  * =====================================
  * session
  * =====================================
+ */
+/**
+ * Server sessions.
+ * \defgroup session
+ * @{
  */
 
 /**
@@ -1837,11 +1882,18 @@ bool neo4j_credentials_expired(const neo4j_connection_t *connection);
 __neo4j_pure
 const char *neo4j_server_id(const neo4j_connection_t *connection);
 
+/** @}*/
 
 /*
  * =====================================
  * job
  * =====================================
+ */
+
+/**
+ * Job handling - evaluation and serialization.
+ * \defgroup jobs
+ * @{
  */
 
 /**
@@ -1898,10 +1950,17 @@ neo4j_result_stream_t *neo4j_send_to_db(neo4j_connection_t *connection,
 __neo4j_must_check
 int neo4j_set_extra(neo4j_value_t map);
 
+/** @}*/
+
 /*
  * =====================================
  * transactions
  * =====================================
+ */
+/**
+ * Transaction management.
+ * \defgroup transaction
+ * @{
  */
 
 /**
@@ -2067,10 +2126,18 @@ const char *neo4j_tx_commit_bookmark(neo4j_transaction_t *tx);
  */
 void neo4j_free_tx(neo4j_transaction_t *tx);
 
+/** @}*/
+
 /*
  * =====================================
  * result stream
  * =====================================
+ */
+
+/**
+ * Result stream handling
+ * \defgroup result_stream
+ * @{
  */
 
 /**
@@ -2156,11 +2223,18 @@ neo4j_result_t *neo4j_peek(neo4j_result_stream_t *results, unsigned int depth);
  */
 int neo4j_close_results(neo4j_result_stream_t *results);
 
+/** @}*/
 
 /*
  * =====================================
  * result metadata
  * =====================================
+ */
+
+/**
+ * Result metadata handling.
+ * \defgroup result_metadata
+ * @{
  */
 
 /**
@@ -2462,11 +2536,18 @@ struct neo4j_statement_plan *neo4j_statement_plan(
  */
 void neo4j_statement_plan_release(struct neo4j_statement_plan *plan);
 
+/** @}*/
 
 /*
  * =====================================
  * result
  * =====================================
+ */
+
+/**
+ * Results.
+ * \defgroup result
+ * @{
  */
 
 /**
@@ -2500,11 +2581,18 @@ neo4j_result_t *neo4j_retain(neo4j_result_t *result);
  */
 void neo4j_release(neo4j_result_t *result);
 
+/** @}*/
 
 /*
  * =====================================
  * render results
  * =====================================
+ */
+
+/**
+ * Client rendering configuration.
+ * \defgroup render
+ * @{
  */
 
 #define NEO4J_RENDER_DEFAULT 0
@@ -2760,7 +2848,16 @@ void neo4j_config_set_plan_table_colors(neo4j_config_t *config,
 const struct neo4j_plan_table_colors *neo4j_config_get_plan_table_colorization(
         const neo4j_config_t *config);
 
+/**
+ * Set supported versions communicated in the initial client-server
+ * handshake.
+ *
+ * @param [config] The neo4j client configuration to update. 
+ * @param [version_string] The version string, e.g., "5,4.4-4.2,3,2".
+ **/
 
+int neo4j_config_set_supported_versions(neo4j_config_t *config, const char *version_string);
+const char *neo4j_config_get_supported_versions(neo4j_config_t *config);
 
 #define NEO4J_RENDER_MAX_WIDTH 4095
 
@@ -2880,6 +2977,7 @@ __neo4j_must_check
 int neo4j_render_plan_ctable(const neo4j_config_t *config, FILE *stream,
         struct neo4j_statement_plan *plan, unsigned int width);
 
+/** @}*/
 
 /*
  * =====================================

@@ -7,7 +7,7 @@ require_ok('Astro::Coords::Angle');
 require_ok('Astro::Coords::Angle::Hour');
 
 my $ang = new Astro::Coords::Angle( '-00:30:2.0456', units => 'sex',
-				    range => '2PI'
+                                    range => '2PI'
  );
 isa_ok($ang,"Astro::Coords::Angle");
 
@@ -48,7 +48,7 @@ delta_ok($ang->hours, 12, "compare hour to hour");
 
 
 my $ra = new Astro::Coords::Angle::Hour( '12h13m45.6s', units => 'sex',
-				    range => 'PI'
+                                    range => 'PI'
  );
 $ra->str_ndp(1);
 

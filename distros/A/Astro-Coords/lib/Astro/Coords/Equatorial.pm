@@ -7,10 +7,10 @@ Astro::Coords::Equatorial - Manipulate equatorial coordinates
 =head1 SYNOPSIS
 
   $c = new Astro::Coords::Equatorial( name => 'blah',
-				      ra   => '05:22:56',
-				      dec  => '-26:20:40.4',
-				      type => 'B1950'
-				      units=> 'sexagesimal');
+                                      ra   => '05:22:56',
+                                      dec  => '-26:20:40.4',
+                                      type => 'B1950'
+                                      units=> 'sexagesimal');
 
   $c = new Astro::Coords::Equatorial( name => 'Vega',
                                       ra => ,
@@ -52,7 +52,7 @@ use warnings;
 use warnings::register;
 use Carp;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Astro::PAL ();
 use base qw/ Astro::Coords /;
@@ -70,15 +70,15 @@ use overload '""' => "stringify", fallback => 1;
 Instantiate a new object using the supplied options.
 
   $c = new Astro::Coords::Equatorial(
-			  name =>
+                          name =>
                           ra =>
                           dec =>
-			  long =>
-			  lat =>
+                          long =>
+                          lat =>
                           pm =>
                           parallax =>
-			  type =>
-			  units =>
+                          type =>
+                          units =>
                           epoch =>
                          );
 
@@ -297,10 +297,10 @@ sub new {
 
   # Now the actual object
   my $c = bless { ra2000 => new Astro::Coords::Angle::Hour($ra, units => 'rad', range => '2PI'),
-		  dec2000 => new Astro::Coords::Angle($dec, units => 'rad'),
-		  name => $args{name},
-		  pm => $args{pm}, parallax => $args{parallax}
-		}, $class;
+                  dec2000 => new Astro::Coords::Angle($dec, units => 'rad'),
+                  name => $args{name},
+                  pm => $args{pm}, parallax => $args{parallax}
+                }, $class;
 
   # Specify the native encoding
   $c->native( $native );
@@ -403,7 +403,7 @@ sub radec {
   }
 
   return (new Astro::Coords::Angle::Hour($ra, units => 'rad', range => '2PI'),
-	  new Astro::Coords::Angle($dec, units => 'rad'));
+          new Astro::Coords::Angle($dec, units => 'rad'));
 
 }
 
@@ -656,7 +656,7 @@ sub array {
   my $self = shift;
   my ($ra, $dec) = $self->radec2000;
   return ( $self->type, $ra->radians, $dec->radians,
-	   undef, undef, undef, undef, undef, undef, undef, undef);
+           undef, undef, undef, undef, undef, undef, undef, undef);
 }
 
 =item B<type>

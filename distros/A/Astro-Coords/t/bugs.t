@@ -12,9 +12,9 @@ require_ok('Astro::Telescope');
 # The problem is that the 'e|E' caused the code to assume
 # sexagesimal parsing
 my $c = new Astro::Coords( 'ra' => '4.97418832778931',
-			   'name' => 'Enter blank sky coords.',
-			   'type' => 'J2000',
-			   'dec' => '-1.45444100780878e-05');
+                           'name' => 'Enter blank sky coords.',
+                           'type' => 'J2000',
+                           'dec' => '-1.45444100780878e-05');
 isa_ok( $c, "Astro::Coords");
 my ($ra,$dec) = $c->radec;
 $ra->str_ndp(1);

@@ -9,8 +9,7 @@ NAME
         my $alien = Alien::YAMLScript->new;
         say $alien->libs;
         say $alien->cflags;
-
- STATUS
+    =head2 STATUS
 
     This is ALPHA software. Expect things to change.
 

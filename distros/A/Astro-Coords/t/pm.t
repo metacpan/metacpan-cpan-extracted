@@ -22,15 +22,15 @@ print "# Epoch : J". Astro::PAL::palEpj( $t->mjd)."\n";
 # RA/Dec in J2000 at 2004.1457:  6 14 1.777  +15 9 49.17
 # Proper motion: 739, -1248 milliarcsec/yr
 # COCO says                      6 14 1.788  +15 9 49.18
-my $fs = new Astro::Coords( 
-			   name => "LHS216",
-			   ra => '6 14 1.584',
-			   dec => '15 9 54.36',
-			   parallax => 0.3,
-			   pm => [0.739, -1.248 ],
-			   type => 'J2000',
-			   units => 's',
-			  );
+my $fs = new Astro::Coords(
+                           name => "LHS216",
+                           ra => '6 14 1.584',
+                           dec => '15 9 54.36',
+                           parallax => 0.3,
+                           pm => [0.739, -1.248 ],
+                           type => 'J2000',
+                           units => 's',
+                          );
 $fs->datetime( $t );
 $fs->telescope( $tel );
 
@@ -49,7 +49,7 @@ my $c = new Astro::Coords( name => "target",
                            pm => [ (-0.0312 * &Astro::PAL::DS2R * &Astro::PAL::DR2AS), 0.103 ],
                            parallax => 0.062,
                            units => 's',
-			   rv => -34.22,
+                           rv => -34.22,
                          );
 
 # epoch of observation is J1994.35

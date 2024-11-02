@@ -3,7 +3,7 @@
 #usage: perl Config_mini.pl.PL [ignored]
 
 use strict ;
-my $VERSION = '6.28';
+my $VERSION = '6.29';
 use ExtUtils::Command;
 
 my $mini = searchdirs('Config_mini.pl', \@INC);

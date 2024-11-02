@@ -1,15 +1,14 @@
 package DateTime::Format::HTTP;
 use strict;
 use warnings;
-use vars qw( $VERSION );
 
-$VERSION = '0.42';
+our $VERSION = '0.43';
 
 use DateTime;
 use HTTP::Date qw();
 
-use vars qw( @MoY %MoY);
-@MoY = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+our @MoY = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+our %MoY;
 @MoY{@MoY} = (1..12);
 
 sub format_datetime

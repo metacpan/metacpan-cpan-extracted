@@ -24,7 +24,7 @@ use File::Spec;
 # USA
 
 my $file = File::Spec->catfile(File::Spec->curdir, "lib", "Astro",
-			       "Coords.pm");
+                               "Coords.pm");
 
 # Set it up.
 my $build = Module::Build->new
@@ -35,11 +35,11 @@ my $build = Module::Build->new
    author => [
               'Tim Jenness <t.jenness@jach.hawaii.edu>',
              ],
-   dist_version => '0.21',
+   dist_version_from => $file,
    meta_merge => {
                resources =>  {
                               repository => "https://github.com/timj/perl-Astro-Coords.git",
-                              homepage => "http://github.com/timj/perl-Astro-Coords/tree/master",
+                              homepage => "https://github.com/timj/perl-Astro-Coords/tree/master",
                              },
                 },
    requires => {

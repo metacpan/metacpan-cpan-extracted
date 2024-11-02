@@ -14,7 +14,7 @@
 #
 dnl Process this file with autoconf to produce a configure script
 AC_PREREQ([2.69])
-AC_INIT([libneo4j-client],[2.3.0])
+AC_INIT([libneo4j-client],[5.0.4])
 AC_CONFIG_SRCDIR([lib/src/neo4j-client.h.in])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([build-aux/m4])
@@ -25,7 +25,8 @@ AM_MAINTAINER_MODE([enable])
 DECLARE_VERSIONS
 WITH_LIBS
 
-GCC_CFLAGS=" -pipe -Wall -W -Wno-unused-parameter \
+GCC_CFLAGS=" -pipe -DHAVE_BIO_METH_NEW \
+    -Wall -W -Wno-unused-parameter \     
     -Wno-missing-field-initializers -Wpointer-arith -Wstrict-prototypes \
     -Wcast-qual -Wcast-align -Wno-error=unused-function \
     -Wno-error=unused-variable -Wno-error=deprecated-declarations \

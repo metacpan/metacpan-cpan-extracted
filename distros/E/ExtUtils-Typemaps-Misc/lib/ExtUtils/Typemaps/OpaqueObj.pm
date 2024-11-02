@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::OpaqueObj;
-$ExtUtils::Typemaps::OpaqueObj::VERSION = '0.001';
+$ExtUtils::Typemaps::OpaqueObj::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ ExtUtils::Typemaps::OpaqueObj - Typemap for storing objects as a string referenc
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -67,6 +67,20 @@ In your XS:
 =head1 DESCRIPTION
 
 C<ExtUtils::Typemaps::OpaqueObj> is an C<ExtUtils::Typemaps> subclass that stores an object inside a string reference. It is particularly suitable for objects whose entire state is helt in the struct (e.g. no pointers, handles, descriptors, …). In such cases the object will serialize and deserialize cleanly, and is safe with regards to thread cloning.
+
+=head1 INCLUSION
+
+To use this typemap template you need to include it into your local typemap. The easiest way to do that is to use the L<typemap> script in L<App::typemap>. E.g.
+
+ typemap --merge ExtUtils::Typemaps::OpaqueObj
+
+If you author using C<Dist::Zilla> you can use L<Dist::Zilla::Plugin::Typemap> instead.
+
+Alternatively, you can include it at runtime by adding the following to your XS file:
+
+ INCLUDE_COMMAND: $^X -MExtUtils::Typemaps::Cmd -e "print embeddable_typemap('OpaqueObj')"
+
+That does require adding a build time dependency on this module.
 
 =head1 AUTHOR
 

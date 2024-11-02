@@ -41,9 +41,7 @@ use overload
   fallback => 1;
 
 # Package Global variables
-use vars qw/ $VERSION /;
-
-$VERSION = '0.21';
+our $VERSION = '0.22';
 
 =head1 METHODS
 
@@ -117,11 +115,11 @@ sub new {
 
   # Create the object
   my $ang = bless {
-		   ANGLE => $rad,
-		   RANGE => 'NONE',
-		   NDP => undef,  # number of decimal places
-		   DELIM => undef, # string delimiter
-		  }, $class;
+                   ANGLE => $rad,
+                   RANGE => 'NONE',
+                   NDP => undef,  # number of decimal places
+                   DELIM => undef, # string delimiter
+                  }, $class;
 
   # If a range was specified, normalise the angle
   $ang->range( $args{range} ) if exists $args{range};
@@ -403,14 +401,14 @@ sub range {
 
       # Now check validity of string and normalise
       if ($rng eq 'NONE') {
-	# do nothing apart from store it
+        # do nothing apart from store it
       } elsif ($rng eq '2PI') {
-	$self->_setRadians( Astro::PAL::palDranrm( $rad ));
+        $self->_setRadians( Astro::PAL::palDranrm( $rad ));
       } elsif ($rng eq 'PI') {
-	$self->_setRadians( Astro::PAL::palDrange( $rad ));
+        $self->_setRadians( Astro::PAL::palDrange( $rad ));
       } else {
-	warnings::warnif("Supplied range '$rng' not recognized");
-	return;
+        warnings::warnif("Supplied range '$rng' not recognized");
+        return;
       }
       # store it
       $self->{RANGE} = $rng;
@@ -553,9 +551,9 @@ initial state.
     if (@_) {
       my $arg = shift;
       if (defined $arg) {
-	$NDP = $arg;
+        $NDP = $arg;
       } else {
-	$NDP = $DEFAULT_NDP;
+        $NDP = $DEFAULT_NDP;
       }
     }
     return $NDP;
@@ -593,9 +591,9 @@ to the default state.
     if (@_) {
       my $arg = shift;
       if (defined $arg) {
-	$DELIM = $arg;
+        $DELIM = $arg;
       } else {
-	$DELIM = $DEFAULT_DELIM;
+        $DELIM = $DEFAULT_DELIM;
       }
     }
     return $DELIM;

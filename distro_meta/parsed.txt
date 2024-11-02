@@ -94969,3 +94969,16 @@ B/BP/BPS/RT-Extension-Announce-1.05.tar.gz
 S/SA/SAMYOUNG/Slackware-SBoKeeper-1.00.tar.gz
 K/KI/KIMOTO/SPVM-0.990026.tar.gz
 C/CO/CORION/Win32API-RecentFiles-0.04.tar.gz
+I/IN/INGY/Alien-YAMLScript-0.1.81.tar.gz
+N/NH/NHUBBARD/App-sbozyp-0.1.5.tar.gz
+G/GS/GSB/Astro-Coords-0.22.tar.gz
+P/PO/PORTAONE/Authen-Radius-0.33.tar.gz
+C/CK/CKRAS/DateTime-Format-HTTP-0.43.tar.gz
+L/LE/LEONT/ExtUtils-Typemaps-Misc-0.002.tar.gz
+J/JD/JDEGUEST/Module-Generic-v0.37.7.tar.gz
+A/AJ/AJNN/Neo4j-Client-0.54.tar.gz
+J/JB/JBERGER/Physics-Unit-0.60.tar.gz
+K/KI/KIMOTO/SPVM-Net-SSLeay-0.005.tar.gz
+D/DA/DANBERR/Sys-Virt-v10.9.0.tar.gz
+B/BU/BULKDD/XSConfig-6.29.tar.gz
+I/IN/INGY/YAMLScript-0.1.81.tar.gz

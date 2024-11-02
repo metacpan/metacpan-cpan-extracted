@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v0.37.7 2024-11-01T17:34:35+0900
+    - Silencing warnings in _set_get_scalar_as_object
+
 v0.37.6 2024-09-08T17:52:18+0900
     - Corrected unit test
 

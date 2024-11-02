@@ -1,5 +1,5 @@
 ---
-abstract: 'Build and use the libneo4j-client library'
+abstract: 'Build and use the libneo4j-omni library'
 author:
   - 'Mark A. Jensen (majensen -at- cpan -dot- org)'
 build_requires:
@@ -20,7 +20,7 @@ configure_requires:
   File::Which: '0'
   Path::Tiny: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,10 +37,12 @@ requires:
   Env: '0'
   File::Which: '0'
   Path::Tiny: '0'
-resources: {}
-version: '0.52'
+resources:
+  bugtracker: https://github.com/majensen/neoclient/issues
+  repository: https://github.com/majensen/neoclient.git
+version: '0.54'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.37'
+  generated_by: 'Alien::Build::MM version 2.83'
   requires:
     share:
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'

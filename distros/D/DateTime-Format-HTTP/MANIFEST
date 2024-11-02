@@ -8,6 +8,7 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+README.md
 t/basic.t
 t/date.t
 t/pod-coverage.t

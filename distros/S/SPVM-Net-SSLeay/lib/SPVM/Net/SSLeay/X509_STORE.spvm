@@ -4,11 +4,26 @@
 class Net::SSLeay::X509_STORE {
   use Net::SSLeay::X509;
   use Net::SSLeay::X509_CRL;
+  use List;
+  
+  # Fields
+  has certs : List of Net::SSLeay::X509;
+  
+  has crls : List of Net::SSLeay::X509_CRL;
   
   # Instance Methods
+  protected method init : void ($options : object[]) {
+    
+    $self->{certs} = List->new(new Net::SSLeay::X509[0]);
+    
+    $self->{crls} = List->new(new Net::SSLeay::X509_CRL[0]);
+  }
+  
   native method add_cert : int ($x : Net::SSLeay::X509);
   
   native method set_flags : void ($flags : long);
   
   native method add_crl : void ($x : Net::SSLeay::X509_CRL);
+  
+  native method DESTROY : void ();
 }

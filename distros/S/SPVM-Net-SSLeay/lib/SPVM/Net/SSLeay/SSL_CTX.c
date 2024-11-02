@@ -83,7 +83,9 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SSL_CTX* ssl_ctx = env->get_pointer(env, stack, obj_self);
   
-  SSL_CTX_free(ssl_ctx);
+  if (!env->no_free(env, stack, obj_self)) {
+    SSL_CTX_free(ssl_ctx);
+  }
   
   return 0;
 }
@@ -100,6 +102,8 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__get0_param(SPVM_ENV* env, SPVM_VALUE* stack)
   
   void* obj_x509_verify_param = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::X509_VERIFY_PARAM", x509_verify_param, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
+  
+  env->set_no_free(env, stack, obj_x509_verify_param, 1);
   
   stack[0].oval = obj_x509_verify_param;
   
@@ -319,6 +323,8 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__get_cert_store(SPVM_ENV* env, SPVM_VALUE* st
   
   void* obj_x509_store = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::X509_STORE", x509_store, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
+  
+  env->set_no_free(env, stack, obj_x509_store, 1);
   
   stack[0].oval = obj_x509_store;
   

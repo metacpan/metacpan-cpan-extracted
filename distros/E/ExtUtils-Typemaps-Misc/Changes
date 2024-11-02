@@ -1,4 +1,8 @@
 Revision history for ExtUtils-Typemaps-Misc
 
+0.002     2024-11-01 18:02:12+01:00 Europe/Brussels
+          - Add ExtUtils::Typemaps::PackedVal
+          - Make ExtUtils::Typemaps::Misc contain all typemaps in this dist
+
 0.001     2024-06-20 21:43:18+02:00 Europe/Brussels
           Initial release to an unsuspecting world

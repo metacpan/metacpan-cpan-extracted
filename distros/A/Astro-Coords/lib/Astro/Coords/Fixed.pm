@@ -8,13 +8,13 @@ Astro::Coords::Fixed - Manipulate coordinates that are fixed on the sky
 
   $c = new Astro::Coords::Fixed( az => 180,
                                  el => 45,
-				 units => 'degrees');
+                                 units => 'degrees');
 
   $c = new Astro::Coords::Fixed( ha => '02:30:00.0',
-				 dec => '45:30:03',
-				 units => 'sexagesimal',
-				 tel => $telescope,
-			       );
+                                 dec => '45:30:03',
+                                 units => 'sexagesimal',
+                                 tel => $telescope,
+                               );
 
 =head1 DESCRIPTION
 
@@ -36,7 +36,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Astro::PAL ();
 use Astro::Coords::Angle;
@@ -118,7 +118,7 @@ sub new {
 
     # Convert input args to radians
     $az = new Astro::Coords::Angle( $args{az}, units => $unit_c1,
-				    range => '2PI' );
+                                    range => '2PI' );
     $el = new Astro::Coords::Angle( $args{el}, units => $unit_c2);
 
     # native form
@@ -219,8 +219,8 @@ sub summary {
   my $name = $self->name;
   $name = '' unless defined $name;
   return sprintf("%-16s  %-12s  %-13s   AZEL",$name,
-		 $self->az(format=>"s"),
-		 $self->el(format =>"s"));
+                 $self->az(format=>"s"),
+                 $self->el(format =>"s"));
 }
 
 =item B<array>
@@ -239,7 +239,7 @@ sub array {
   my $self = shift;
   my ($az, $el) = $self->azel();
   return ( $self->type, $az->radians, $el->radians,
-	   undef, undef, undef, undef, undef, undef, undef, undef);
+           undef, undef, undef, undef, undef, undef, undef, undef);
 }
 
 =item B<ha>

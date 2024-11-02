@@ -38,9 +38,7 @@ use Astro::PAL;
 use base qw/ Astro::Coords::Angle /;
 
 # Package Global variables
-use vars qw/ $VERSION /;
-
-$VERSION = '0.21';
+our $VERSION = '0.22';
 
 =head1 METHODS
 
@@ -111,9 +109,9 @@ This method has no effect on the base class.
     if (@_) {
       my $arg = shift;
       if (defined $arg) {
-	$NDP = $arg;
+        $NDP = $arg;
       } else {
-	$NDP = $DEFAULT_NDP;
+        $NDP = $DEFAULT_NDP;
       }
     }
     return $NDP;
@@ -135,9 +133,9 @@ any effect on the base class.
     if (@_) {
       my $arg = shift;
       if (defined $arg) {
-	$DELIM = $arg;
+        $DELIM = $arg;
       } else {
-	$DELIM = $DEFAULT_DELIM;
+        $DELIM = $DEFAULT_DELIM;
       }
     }
     return $DELIM;

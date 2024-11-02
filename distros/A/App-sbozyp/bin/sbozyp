@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = '0.0.7';
+our $VERSION = '0.1.5';
 
 use File::Basename qw(basename dirname);
 use File::Temp;
@@ -84,14 +84,16 @@ sub install_command_main {
         'n'      => \my $opt_nodeps
     );
     if ($opt_help) { print $help_msg ; return }
-    @_ == 1 or die "$usage\n";
+    @_ >= 1 or die "$usage\n";
     i_am_root_or_die('the install command requires root');
-    my $pkg = pkg($_[0]);
-    my @queue = $opt_nodeps ? ($pkg) : pkg_queue($pkg);
+    my @pkgs = map { $_ = pkg($_) } @_;
+    my @queue; for my $pkg (@pkgs) {
+        @queue = merge_pkg_queues(@queue, $opt_nodeps ? ($pkg) : pkg_queue($pkg))
+    }
     @queue = manage_install_queue_ui(@queue) unless $opt_noninteractive;
     for my $pkg (@queue) {
         my $installed_version = pkg_installed($pkg);
-        if ($opt_force or !defined($installed_version) or $installed_version ne $pkg->{VERSION}) {
+        if ($opt_force or !defined($installed_version) or version_gt($pkg->{VERSION}, $installed_version)) {
             my $slackware_pkg = build_slackware_pkg($pkg);
             install_slackware_pkg($slackware_pkg);
             if ($CONFIG{CLEANUP}) { sbozyp_unlink($slackware_pkg) }
@@ -118,27 +120,50 @@ sub query_command_main {
     sbozyp_getopts(
         \@_,
         'h|help' => \my $opt_help,
+        '-a'     => \my $opt_listinstalled,
         '-d'     => \my $opt_slackdesc,
         '-i'     => \my $opt_info,
         '-p'     => \my $opt_pkginstalled,
         '-q'     => \my $opt_printqueue,
         '-r'     => \my $opt_readme,
-        '-s'     => \my $opt_slackbuild
+        '-s'     => \my $opt_slackbuild,
+        '-u'     => \my $opt_listneedupgrade
     );
     if ($opt_help) { print $help_msg ; return }
-    @_ == 1 or die "$usage\n";
-    my $pkg = pkg($_[0]);
-    my $exclusive_opts_set = 0; for ($opt_slackdesc,$opt_info,$opt_pkginstalled,$opt_printqueue,$opt_readme,$opt_slackbuild) { $exclusive_opts_set++ if defined }
-    if    ($exclusive_opts_set == 0) { query_pkg_ui($pkg) }
-    elsif ($exclusive_opts_set == 1) {
-        if    ($opt_slackdesc)    { sbozyp_print_file("$pkg->{PKGDIR}/slack-desc")                      }
-        elsif ($opt_info)         { sbozyp_print_file("$pkg->{PKGDIR}/$pkg->{PRGNAM}.info")             }
+    my $opts_set = 0; for ($opt_listinstalled,$opt_slackdesc,$opt_info,$opt_pkginstalled,$opt_printqueue,$opt_readme,$opt_slackbuild,$opt_listneedupgrade) { $opts_set++ if defined }
+    if    ($opts_set > 1)  { sbozyp_die("can only set 1 option but $opts_set were set") }
+    elsif ($opts_set == 0) { @_ == 1 or die "$usage\n"; my $pkg = pkg($_[0]); query_pkg_ui($pkg) }
+    else {
+        my $opt = $opt_listinstalled ? '-a' : $opt_slackdesc ? '-d' : $opt_info ? '-i' : $opt_pkginstalled ? '-p' : $opt_printqueue ? '-q' : $opt_readme ? '-r' : $opt_slackbuild ? '-s' : $opt_listneedupgrade ? '-u' : die;
+        my $pkg;
+        if ($opt_slackdesc || $opt_info || $opt_pkginstalled || $opt_printqueue || $opt_readme || $opt_slackbuild) {
+            @_ == 1 or sbozyp_die("query: option '$opt' requires single PKGNAME argument");
+            $pkg = pkg($_[0]);
+        } else { @_ == 0 or sbozyp_die("query: option '$opt' does not take PKGNAME argument") }
+        # option implementations
+        if ($opt_listinstalled) {
+            my %installed_sbo_pkgs = installed_sbo_pkgs();
+            for my $pkgname (sort keys %installed_sbo_pkgs) {
+                print $pkgname, "\n";
+            }
+        }
+        elsif ($opt_slackdesc)    { sbozyp_print_file("$pkg->{PKGDIR}/slack-desc")                                           }
+        elsif ($opt_info)         { sbozyp_print_file("$pkg->{PKGDIR}/$pkg->{PRGNAM}.info")                                  }
         elsif ($opt_pkginstalled) { if (defined(my $version = pkg_installed($pkg))) { print "$version\n" } else { die "\n" } }
-        elsif ($opt_printqueue)   { print "$_->{PKGNAME}\n" for pkg_queue($pkg)                         }
-        elsif ($opt_readme)       { sbozyp_print_file("$pkg->{PKGDIR}/README")                          }
-        elsif ($opt_slackbuild)   { sbozyp_print_file("$pkg->{PKGDIR}/$pkg->{PRGNAM}.SlackBuild")       }
+        elsif ($opt_printqueue)   { print "$_->{PKGNAME}\n" for pkg_queue($pkg)                                              }
+        elsif ($opt_readme)       { sbozyp_print_file("$pkg->{PKGDIR}/README")                                               }
+        elsif ($opt_slackbuild)   { sbozyp_print_file("$pkg->{PKGDIR}/$pkg->{PRGNAM}.SlackBuild")                            }
+        elsif ($opt_listneedupgrade) {
+            my %installed_sbo_pkgs = installed_sbo_pkgs();
+            for my $pkgname (sort keys %installed_sbo_pkgs) {
+                my $installed_version = $installed_sbo_pkgs{$pkgname};
+                my $available_version = pkg($pkgname)->{VERSION};
+                if (version_gt($available_version, $installed_version)) {
+                    print "$pkgname $installed_version -> $available_version\n"
+                }
+            }
+        }
     }
-    else { sbozyp_die("can only set 1 of options '-d', '-i', '-p', -q', -r', '-s' but $exclusive_opts_set were set") }
 }
 
 sub remove_command_main {
@@ -150,23 +175,25 @@ sub remove_command_main {
         'i'      => \my $opt_noninteractive
     );
     if ($opt_help) { print $help_msg ; return }
-    @_ == 1 or die "$usage\n";
+    @_ >= 1 or die "$usage\n";
     i_am_root_or_die('the remove command requires root');
-    my $pkg = pkg($_[0]);
-    if (!defined pkg_installed($pkg)) {
-        sbozyp_die("the package '$pkg->{PKGNAME}' is not installed");
+    my @pkgs = map { $_ = pkg($_) } @_;
+    for my $pkg (@pkgs) {
+        if (!defined pkg_installed($pkg)) {
+            sbozyp_die("the package '$pkg->{PKGNAME}' is not installed");
+        }
     }
     if (not $opt_noninteractive) {
         my $error_msg = '';
         while (1) {
             clear_terminal();
             if ($error_msg) { print "$error_msg\n\n"; $error_msg = '' };
-            print "sbozyp: are you sure you want to remove package '$pkg->{PKGNAME}'? y/n\n";
+            print "sbozyp: are you sure you want to remove packages: @{[map { q(').$_->{PKGNAME}.q(') } @pkgs]}? y/n\n";
             print '  -> ';
             my $decision = <STDIN>;
             $decision =~ s/^\s+|\s+$//g; # remove leading and trailing whitespace
             if ($decision =~ /^y(?:es)?$/i) {
-                remove_slackware_pkg($pkg->{PRGNAM});
+                remove_slackware_pkg($_->{PRGNAM}) for @pkgs;
                 last;
             } elsif ($decision =~ /^no?$/i) {
                 last;
@@ -174,7 +201,7 @@ sub remove_command_main {
                 $error_msg = "invalid input: '$decision'";
             }
         }
-    } else { remove_slackware_pkg($pkg->{PRGNAM}) }
+    } else { remove_slackware_pkg($_->{PRGNAM}) for @pkgs }
 }
 
 sub search_command_main {
@@ -198,19 +225,6 @@ sub search_command_main {
     } else {
         sbozyp_die("no packages match the regex '$regex_arg'");
     }
-}
-
-sub sync_command_main {
-    my $usage = command_usage('sync');
-    my $help_msg = command_help_msg('sync');
-    sbozyp_getopts(
-        \@_,
-        'h|help' => \my $opt_help,
-    );
-    if ($opt_help) { print $help_msg ; return }
-    @_ == 0 or die "$usage\n";
-    i_am_root_or_die('the sync command requires root');
-    sync_repo();
 }
 
             ####################################################
@@ -503,7 +517,6 @@ sub parse_config_file {
         next unless length; # is there anything left?
         my ($k, $v) = split /\s*=\s*/, $_, 2;
         $k !~ /^\s*$/ && $v !~ /^\s*$/ or sbozyp_die("could not parse line $. '$line_copy': '$config_file'");
-        # TODO: doesnt work with multi-repo: exists $CONFIG{$k} or sbozyp_die("invalid setting on line $. '$k': '$config_file'");
         $CONFIG{$k} = $v;
     }
 }
@@ -582,8 +595,8 @@ sub sync_repo {
     my $local_git_repo = "$CONFIG{REPO_ROOT}/$CONFIG{REPO_NAME}";
     if (repo_is_cloned()) {
         my $repo_git_branch = repo_git_branch();
-        sbozyp_system('git', '-C', $local_git_repo, 'fetch');
-        sbozyp_system('git', '-C', $local_git_repo, 'reset', '--hard', "origin/$repo_git_branch");
+        sbozyp_system("git -C '$local_git_repo' fetch 1>&2");
+        sbozyp_system("git -C '$local_git_repo' reset --hard 'origin/$repo_git_branch' 1>&2");
     } else {
         sbozyp_die("cannot sync non-existent git repository at '$local_git_repo'");
     }
@@ -768,6 +781,50 @@ sub remove_slackware_pkg {
     sbozyp_system("removepkg '$slackware_pkg'");
 }
 
+# versioncmp() is copy and pasted directly from the Sort::Versions CPAN module.
+# We copy and paste this here as we don't wish for sbozyp to have any deps.
+# Note that sbotools also uses Sort::Versions for version comparisons.
+sub versioncmp ($$) {
+    my @A = ($_[0] =~ /([-.]|\d+|[^-.\d]+)/g);
+    my @B = ($_[1] =~ /([-.]|\d+|[^-.\d]+)/g);
+
+    my ($A, $B);
+    while (@A and @B) {
+        $A = shift @A;
+        $B = shift @B;
+        if ($A eq '-' and $B eq '-') {
+            next;
+        } elsif ( $A eq '-' ) {
+            return -1;
+        } elsif ( $B eq '-') {
+            return 1;
+        } elsif ($A eq '.' and $B eq '.') {
+            next;
+        } elsif ( $A eq '.' ) {
+            return -1;
+        } elsif ( $B eq '.' ) {
+            return 1;
+        } elsif ($A =~ /^\d+$/ and $B =~ /^\d+$/) {
+            if ($A =~ /^0/ || $B =~ /^0/) {
+                return $A cmp $B if $A cmp $B;
+            } else {
+                return $A <=> $B if $A <=> $B;
+            }
+        } else {
+            $A = uc $A;
+            $B = uc $B;
+            return $A cmp $B if $A cmp $B;
+        }
+    }
+    @A <=> @B;
+}
+
+sub version_gt {
+    my ($v1, $v2) = @_;
+    my $cmp = versioncmp($v1, $v2);
+    return $cmp == 1;
+}
+
 1;
 
 __END__
@@ -802,21 +859,20 @@ Every command has its own options, these are just the global ones:
 
 Commands are:
 
- install|in          Install or upgrade a package
+ install|in          Install or upgrade packages
  null|nu             Do nothing, useful in conjunction with -C or -S opts
  query|qr            Query for information about a package
- remove|rm           Remove a package
+ remove|rm           Remove packages
  search|se           Search for a package using a Perl regex
 
 Examples:
 
  sbozyp --help
  sbozyp --version
- sbozyp install -S -R $REPO -f system/password-store
+ sbozyp install -S -R $REPO -f xclip system/password-store
  sbozyp query -q password-store
- sbozyp remove password-store
+ sbozyp remove xclip password-store
  sbozyp search system/.+
- sbozyp sync
  sbozyp -R $REPO -C null
 
 =head1 CONFIGURATION
@@ -876,9 +932,9 @@ If C<0> then keep built packages after installation. If C<1> then remove them.
 
 =head2 INSTALL
 
- Usage: sbozyp <install|in> [-h] [-f] [-i] [-n] <pkgname>
+ Usage: sbozyp <install|in> [-h] [-f] [-i] [-n] <pkgname...>
 
-Install or upgrade a package
+Install or upgrade packages
 
 Options are:
 
@@ -891,9 +947,11 @@ Examples:
 
  sbozyp install --help
  sbozyp in password-store
+ sbozyp in xclip mu password-store
  sbozyp in system/password-store
  sbozyp in -f -i -n password-store
  sbozyp -S -R $REPO in -f password-store
+ sbozyp in $(sbozyp -S qr -u | cut -d' ' -f1) ### upgrade all packages
 
 =head2 NULL
 
@@ -915,46 +973,51 @@ Examples:
 
 =head2 QUERY
 
- Usage: sbozyp <query|qr> [-h] [-d] [-i] [-p] [-q] [-r] [-s] <pkgname>
+ Usage: sbozyp <query|qr> [-h] [-a] [-d] [-i] [-p] [-q] [-r] [-s] [-u] PKGNAME?
 
-Query for information about a package
+Query for package related information
 
-If no options are provided, this command will drop you into an interactive
-prompt for viewing package files. Only one of the '-d', '-i', '-p', '-q', '-r',
-'-s' options can be used.
+If only PKGNAME and no options are provided, this command will drop you into an
+interactive prompt for viewing PKGNAME's files.
+
+All options are mutually exclusive meaning only one can be used in a single
+invocation.
 
 Options are:
 
  -h|--help           Print help message
- -d                  Print the packages slack-desc file
- -i                  Print the packages .info file
- -p                  If package is installed print the installed version, else exit with status 1
- -q                  Print the packages dependencies (recursively and in order)
- -r                  Print the packages README file
- -s                  Print the packages .SlackBuild file
+ -a                  Print a list of all SBo packages installed on the system
+ -d                  Print PKGNAME's slack-desc file
+ -i                  Print PKGNAME's info file
+ -p                  If PKGNAME is installed print the installed version, else exit with status 1
+ -q                  Print PKGNAME's dependencies (recursively and in order)
+ -r                  Print PKGNAME's README file
+ -s                  Print PKGNAME's .SlackBuild file
+ -u                  Print a list of all packages that have upgrades available
 
 Examples:
 
  sbozyp query --help
  sbozyp qr system/password-store
  sbozyp qr -q password-store
+ sbozyp qr -u
  sbozyp -S -R $REPO qr password-store
 
 =head2 REMOVE
 
- Usage: sbozyp <remove|rm> [-h] [-i] <pkgname>
+ Usage: sbozyp <remove|rm> [-h] [-i] <pkgname...>
 
-Remove a package
+Remove packages
 
 Options are:
 
- -h|--help           Print this help message
+ -h|--help           Print help message
  -i                  Non-interactive (DANGEROUS)
 
 Examples:
 
  sbozyp remove --help
- sbozyp rm system/password-store
+ sbozyp rm xclip mu system/password-store
  sbozyp rm -i password-store
  sbozyp -S -R $REPO rm password-store
 
@@ -966,7 +1029,7 @@ Search for a package using a Perl regex
 
 Options are:
 
- -h|--help           Print this help message
+ -h|--help           Print help message
  -c                  Match case sensitive
  -n                  Match against CATEGORY/PRGNAM instead of just PRGNAM
 

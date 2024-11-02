@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 43;
+use Test::More tests => 44;
 use Test::Number::Delta;
 use Scalar::Util qw/ looks_like_number /;
 
@@ -31,6 +31,7 @@ is($off->system(), 'B1950');
 delta_ok($off->xoffset->arcsec(), -30);
 delta_ok($off->yoffset->arcsec(), -40);
 delta_ok($off->posang()->degrees(), 80);
+delta_ok($off->distance->arcsec, 50);
 
 # Check offset rotations against those displayed by the OT.
 $off = Astro::Coords::Offset->new(100, 0, posang => 45);

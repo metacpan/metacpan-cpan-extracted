@@ -1,5 +1,9 @@
 Revision history for Astro::Coords
 
+0.22 2024-11-01
+
+  - Added distance method to Astro::Coords::Offset.
+
 0.21 2023-04-17
 
   - Check for requests for more than 9 decimal places, which can cause an

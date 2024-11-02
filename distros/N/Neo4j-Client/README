@@ -1,4 +1,4 @@
-Neo4j::Client - Build and use the libneo4j-client library
+Neo4j::Client - Build and use the libneo4j-omni library
 
 To install:
  $ perl Makefile.PL

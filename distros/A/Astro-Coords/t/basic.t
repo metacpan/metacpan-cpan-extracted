@@ -15,8 +15,8 @@ Astro::Coords::Angle::Hour->NDP(2);
 
 # Simultaneously test negative zero dec and B1950 to J2000 conversion
 my $c = new Astro::Coords( ra => "15:22:33.3",
-	                   dec => "-0:13:4.5",
-			   type => "B1950");
+                           dec => "-0:13:4.5",
+                           type => "B1950");
 
 ok($c, "create object");
 
@@ -36,8 +36,8 @@ is( $c->dec(format=>'s'), "-00:23:35.76","compare J2000 Dec");
 
 # Calculate distance
 my $c2 = new Astro::Coords(ra => "15:22:33.3",
-	                   dec => "-0:14:4.5",
-			   type => "B1950");
+                           dec => "-0:14:4.5",
+                           type => "B1950");
 
 delta_within(scalar($c->distance($c2))*&Astro::PAL::DR2AS, '60.0',
   1.0e-4, "calculate distance");
@@ -61,7 +61,7 @@ is( int($c->az(format=>"d")), 208.0, "compare Az" );
 
 # Get the summary
 my @result = ("RADEC",4.03660853577072,-0.00686380910209873,undef,
-	      undef,undef,undef,undef,undef,undef,undef);
+              undef,undef,undef,undef,undef,undef,undef);
 my @summary = $c->array;
 print "# Compare contents of array() method\n";
 test_array_elem(\@summary,\@result);
@@ -92,7 +92,7 @@ is( int($c->dec_app(format=>"d")), -26);
 
 # Get the summary
 @result = ("mars",undef,undef,undef,undef,undef,undef,undef,undef,
-	      undef,undef);
+              undef,undef);
 @summary = $c->array;
 test_array_elem(\@summary,\@result);
 
@@ -123,7 +123,7 @@ is( int($fc->dec_app(format=>"d")), -26);
 
 # Get the summary
 @result = ("FIXED",$fc->az,$fc->el,undef,undef,undef,undef,undef,undef,
-	      undef,undef);
+              undef,undef);
 @summary = $fc->array;
 test_array_elem(\@summary,\@result);
 
@@ -141,14 +141,14 @@ is( $cal->type, "CAL");
 ok( $cal->isObservable );
 
 
-# Now come up with some coordinates that are not 
+# Now come up with some coordinates that are not
 # always observable
 
 print "# Observability\n";
 
 $c = new Astro::Coords( ra => "15:22:33.3",
-			dec => "-0:13:4.5",
-			type => "J2000");
+                        dec => "-0:13:4.5",
+                        type => "J2000");
 
 $c->telescope( $tel );
 $c->datetime( $date ); # approximately transit
@@ -167,8 +167,8 @@ ok( ! $c->isObservable );
 # Now use coordinates which can be observed with JCMT
 # but not with UKIRT
 $c = new Astro::Coords( ra => "15:22:33.3",
-			dec => "72:13:4.5",
-			type => "J2000");
+                        dec => "72:13:4.5",
+                        type => "J2000");
 
 $c->telescope( $tel );
 $c->datetime( $date );
@@ -180,9 +180,9 @@ ok( !$c->isObservable );
 
 # Verify stringification
 $c = new Astro::Coords( ra => '07 42 16.939',
-			dec => '-14 42 49.05',
-			type => "J2000",
-			name => 'OH231.8');
+                        dec => '-14 42 49.05',
+                        type => "J2000",
+                        name => 'OH231.8');
 
 is( $c->dec(format => 'sex'), "-14:42:49.05","Test Dec stringification");
 is( $c->ra(format => 'sex'), "07:42:16.94","Test RA stringification");
@@ -195,9 +195,9 @@ is($array->[3],'49.05',"test Array seconds");
 
 # And again with values that have caused problems in the past
 $c = new Astro::Coords( ra => '07 42 16.83',
-			dec => '-14 42 52.1',
-			type => "J2000",
-			name => 'OH231.8 [alternative]');
+                        dec => '-14 42 52.1',
+                        type => "J2000",
+                        name => 'OH231.8 [alternative]');
 
 is( $c->dec(format => 'sex'), "-14:42:52.10","Test Dec stringification");
 is( $c->ra(format => 'sex'), "07:42:16.83","Test RA stringification");
@@ -228,12 +228,12 @@ is(sprintf("%.1f",$c->el(format => 'd')), '60.3');
 
 # Done as planet now redo it as interpolated
 $c = new Astro::Coords( mjd1 => 52354.13556712963,
-			mjd2 => 52354.1459837963,
-			ra1  => '02:44:26.06',
-			dec1 => '016:24:56.44',
-			ra2  => '+002:44:27.77',
-			dec2 => '+016:25:04.61',
-		      );
+                        mjd2 => 52354.1459837963,
+                        ra1  => '02:44:26.06',
+                        dec1 => '016:24:56.44',
+                        ra2  => '+002:44:27.77',
+                        dec2 => '+016:25:04.61',
+                      );
 $c->telescope( $tel );
 
 $time = _gmstrptime("2002-03-21T03:16:36");
@@ -244,10 +244,10 @@ is(sprintf("%.1f",$c->el(format => 'd')), '60.3');
 
 
 $c = new Astro::Coords( ra => '04:42:53.60',
-			type => 'J2000',
-			dec => '36:06:53.65',
-			units => 'sexagesimal',
-		      );
+                        type => 'J2000',
+                        dec => '36:06:53.65',
+                        units => 'sexagesimal',
+                      );
 $c->telescope( $tel );
 
 # Time is in UT not localtime
@@ -260,16 +260,16 @@ is(sprintf("%.1f",$c->el(format => 'd')), '44.9');
 
 # Comet Hale Bopp
 $c = new Astro::Coords( elements => {
-				     # from JPL horizons
-				     EPOCH => 52440.0000,
-				     EPOCHPERIH => 50538.179590069,
-				     ORBINC => 89.4475147* &Astro::PAL::DD2R,
-				     ANODE =>  282.218428* &Astro::PAL::DD2R,
-				     PERIH =>  130.7184477* &Astro::PAL::DD2R,
-				     AORQ => 0.9226383480674554,
-				     E => 0.9949722217794675,
-				    },
-		      name => "Hale-Bopp");
+                                     # from JPL horizons
+                                     EPOCH => 52440.0000,
+                                     EPOCHPERIH => 50538.179590069,
+                                     ORBINC => 89.4475147* &Astro::PAL::DD2R,
+                                     ANODE =>  282.218428* &Astro::PAL::DD2R,
+                                     PERIH =>  130.7184477* &Astro::PAL::DD2R,
+                                     AORQ => 0.9226383480674554,
+                                     E => 0.9949722217794675,
+                                    },
+                      name => "Hale-Bopp");
 ok($c,"instantiate element object");
 is($c->name, "Hale-Bopp","check name");
 $c->telescope( $tel );

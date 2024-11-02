@@ -6,7 +6,7 @@ use Carp;
 use base qw(Exporter);
 use vars qw( $VERSION @EXPORT_OK %EXPORT_TAGS $debug);
 
-$VERSION = '0.54';
+$VERSION = '0.60';
 $VERSION = eval $VERSION;
 
 @EXPORT_OK = qw( ScalarFactory GetScalar );
@@ -293,6 +293,389 @@ sub ScalarResolve {
     bless $self, $type;
 }
 
+######### Overloading ######################
+# Doesn't use the existing methods but
+# defines new ones, so as not to interfere 
+# with any existing functionality.
+############################################
+
+our $format_string; # can be set to provide a 
+# parameter for sprintf() in the overloaded
+# ToString function.
+
+sub _overload_ToString {
+    my $self = shift;
+
+    return sprintf($format_string, $self->value) .' '. $self->MyUnit->ToString
+        if defined $format_string;
+
+    return $self->value .' '. $self->MyUnit->ToString;
+}
+
+# regarding string comparators, I think there is an
+# argument that the numerical comparators (<=>) should work 
+# solely on the numeric component, and the string 
+# comparators (cmp) could work on the dimensions and their 
+# degree. For example, "GetScalar('1 m^2') lt GetScalar('1 m^3')" 
+# would be true. This would allow the user some flexibility 
+# in sorting. I've not done it because it would probably
+# require a lot of time discussing and implementing to
+# get right.
+sub _overload_eq {
+    my $self = shift;
+    my $other = GetScalar(shift);
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_eq'
+        if !ref $self || !ref $other;
+
+    return $self->_overload_ToString() eq $other->_overload_ToString();
+}
+
+sub _overload_ne {
+    my $self = shift;
+    my $other = GetScalar(shift);
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_ne'
+        if !ref $self || !ref $other;
+
+    return $self->_overload_ToString() ne $other->_overload_ToString();
+}
+
+# There appears to be a bug in ScalarResolve()
+# if $mu->type comes back with an arrayref,
+# e.g. in the case of ambiguous type for a derived 
+# unit such as ['Energy', 'Torque'], then it crashes,
+# as it doesn't seem to be able to handle that.
+# _ScalarResolve() tries to fix this by checking
+# global variable @type_context to see if the user 
+# has set a preferred type to use (a hacky solution,
+# admittedly); or if not, it just takes the first 
+# entry in the type arrayref so as not to crash.
+our @type_context = ();
+
+# See if the user has set a preferred unit type for
+# the calculations they are performing. 
+sub _DisambiguateType {
+    my $ar = shift;
+
+    if ( scalar(@type_context) ) {        
+        foreach my $type (@{$ar}) {
+            foreach my $preferred (@type_context) {
+                if ( $type eq $preferred ) {
+                    return $type;
+                }
+            }
+        }
+    }
+
+    return $ar->[0];
+}   
+
+sub _ScalarResolve {
+    my $self = shift;
+
+    my $mu = $self->{MyUnit};
+    my $type = $mu->type;
+
+    if ($type) {
+        # the following line is the only change to the original
+        $type = _DisambiguateType($type) if ref($type) eq 'ARRAY';
+        $type = 'dimensionless' if $type eq 'prefix';
+        $type = 'Physics::Unit::' . $type;
+
+        my $newunit = GetMyUnit($type);
+        $self->{value} *= $mu->convert($newunit);
+        $self->{MyUnit} = $newunit;
+        $self->{default_unit} = $newunit;
+    }
+    else {
+        $type = "Physics::Unit::Scalar";
+
+        $self->{value} *= $mu->factor;
+        $mu->factor(1);
+        $self->{default_unit} = $mu;
+    }
+
+    bless $self, $type;
+}
+
+sub _overload_add {
+    my $self = shift;
+    my $other = GetScalar(shift);
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_add'
+        if !ref $self || !ref $other;
+
+    # overloading should return a new object
+    my $n = $self->new();
+
+    # be a bit strict here about what can be added to what else
+    if (    (ref($self) eq ref($other)) || 
+            (ref($self) eq 'Physics::Unit::Dimensionless') || 
+            (ref($other) eq 'Physics::Unit::Dimensionless') ) {
+
+        $n->{value} += $other->{value};
+    }
+    else {
+        carp 'Cannot add a ' . ref($self) . ' to a ' . ref($other);
+    }
+
+    return $n;
+}
+
+sub _overload_subtract {
+    my $self = shift;
+    my $other = GetScalar(shift);
+    my $swapped = shift;
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_subtract'
+        if !ref $self || !ref $other;
+
+    my $n = $self->new();
+
+    if (    (ref($self) eq ref($other)) || 
+            (ref($self) eq 'Physics::Unit::Dimensionless') || 
+            (ref($other) eq 'Physics::Unit::Dimensionless') ) {
+
+        if ( defined($swapped) and ($swapped == 1) ) {
+            $n->{value} = $other->{value} - $n->{value};
+        }
+        else {
+            $n->{value} -= $other->{value};
+        }
+    }
+    else {
+
+        if ( defined($swapped) and ($swapped == 1) ) {
+            carp 'Cannot subtract a ' . ref($self) . ' from a ' . ref($other);
+        }
+        else {
+            carp 'Cannot subtract a ' . ref($other) . ' from a ' . ref($self);
+        }
+    }
+
+    return $n;
+}
+
+sub _overload_times {
+    my $self = shift;
+    my $other = GetScalar(shift);
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_times' 
+        if !ref $self || !ref $other;
+
+    my $value = $self->{value} * $other->{value};
+
+    my $mu = $self->{MyUnit}->copy;
+
+    $mu->times($other->{MyUnit});
+
+    my $newscalar = {
+        value  => $value,
+        MyUnit => $mu,
+    };
+
+    return _ScalarResolve($newscalar);
+}
+
+sub _overload_divide {
+    my $self = shift;
+    my $other = GetScalar(shift);
+    my $swapped = shift;
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_divide'
+        if !ref $self || !ref $other;
+
+    if ( defined($swapped) and ($swapped == 1) ) {
+        my $arg = $self->recip;
+        return $other->times($arg);
+    }
+    else {
+        my $arg = $other->recip;
+        return $self->times($arg);
+    }
+}
+
+sub _overload_power {
+    my $self = shift;
+    my $other = GetScalar(shift);
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_power'
+        if !ref $self || !ref $other;
+    
+    croak "Physics::Unit::Scalar::_overload_power: can only raise to dimensionless powers (got '$other')"
+        if ref($other) ne 'Physics::Unit::Dimensionless';
+
+    my $p = $other->value();
+
+    croak "Physics::Unit::Scalar::_overload_power: can only raise to integer powers currently (got '$p')"
+        unless $p == int($p);
+
+    my $n = $self->new();
+
+    # be explicit about different scenarios
+    if ( $p < -1 ) {
+        $p = abs($p)-1;
+        $n = $n->times($self) while $p--;
+        return $n->recip;
+    }
+    elsif ( $p == -1 ) {
+        return $n->recip;
+    }
+    elsif ( $p == 0 ) {
+        return GetScalar(1);
+    }
+    elsif ( $p == 1 ) {
+        return $n;
+    }
+    else {
+        $p--;
+        $n = $n->times($self) while $p--;
+        return $n;
+    }
+
+}
+
+sub _overload_sin {
+    my $self = shift;
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_sin'
+        if !ref $self;
+
+    carp "Warning: Arguments to sin() would be without dimension, traditionally. (got '$self')"
+        unless ref($self) eq 'Physics::Unit::Dimensionless';
+
+    return sin($self->{value});
+}
+
+sub _overload_cos {
+    my $self = shift;
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_cos'
+        if !ref $self;
+
+    carp "Warning: Arguments to cos() would be without dimension, traditionally. (got '$self')"
+        unless ref($self) eq 'Physics::Unit::Dimensionless';
+
+    return cos($self->{value});
+}
+
+sub _overload_atan2 {
+    my $self = shift;
+    my $other = GetScalar(shift);
+    my $swapped = shift;
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_atan2'
+        if !ref $self || !ref $other;
+
+    my $n;
+
+    if (    (ref($self) eq ref($other)) || 
+            (ref($self) eq 'Physics::Unit::Dimensionless') || 
+            (ref($other) eq 'Physics::Unit::Dimensionless') ) {
+
+        my $atan2v = $swapped ? atan2($other->{value}, $self->{value}) : atan2($self->{value}, $other->{value});
+        $n = GetScalar("$atan2v radians") if defined $atan2v;
+    }
+    else {
+        croak 'Cannot perform atan2 of ' . ref($self) . ' with ' . ref($other);
+    }
+
+    return $n;
+}
+
+sub _overload_exp {
+    my $self = shift;
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_exp'
+        if !ref $self;
+
+    carp "Warning: Arguments to exp() would be without dimension, traditionally. (got '$self')"
+        unless ref($self) eq 'Physics::Unit::Dimensionless';
+
+    return exp($self->{value});
+}
+
+sub _overload_log {
+    my $self = shift;
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_log'
+        if !ref $self;
+
+    carp "Warning: Arguments to log() would be without dimension, traditionally. (got '$self')"
+        unless ref($self) eq 'Physics::Unit::Dimensionless';
+
+    return log($self->{value});
+}
+
+sub _overload_int {
+    my $self = shift;    
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_int'
+        if !ref $self;
+
+    my $n = $self->new();
+
+    $n->{value} = int($n->{value});
+
+    return $n;
+}
+
+sub _overload_abs {
+    my $self = shift;    
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_abs'
+        if !ref $self;
+
+    my $n = $self->new();
+
+    $n->{value} = abs($n->{value});
+
+    return $n;
+}
+
+# by overloading <=>, we will get the other comparison operators too
+sub _overload_spaceship {
+    my $self = shift;   
+    my $other = GetScalar(shift);
+    my $swapped = shift;
+
+    croak 'Invalid arguments to Physics::Unit::Scalar::_overload_spaceship'
+        if !ref $self || !ref $other;
+    
+    if (    (ref($self) eq ref($other)) || 
+            (ref($self) eq 'Physics::Unit::Dimensionless') || 
+            (ref($other) eq 'Physics::Unit::Dimensionless') ) {
+
+        return $swapped ? $other->{value} <=> $self->{value} : $self->{value} <=> $other->{value};
+    }
+    else {
+        # perhaps being a bit strict here
+        croak 'Cannot compare a ' . ref($self) . ' to a ' . ref($other);
+    }
+}
+
+use overload
+    "+"         =>      \&_overload_add,
+    "-"         =>      \&_overload_subtract,
+    "*"         =>      \&_overload_times,
+    "/"         =>      \&_overload_divide,
+    "**"        =>      \&_overload_power,
+    "sin"       =>      \&_overload_sin,
+    "cos"       =>      \&_overload_cos,
+    "atan2"     =>      \&_overload_atan2,
+    "exp"       =>      \&_overload_exp,
+    "log"       =>      \&_overload_log, 
+    "int"       =>      \&_overload_int,
+    "abs"       =>      \&_overload_abs,
+    "<=>"       =>      \&_overload_spaceship,
+    "eq"        =>      \&_overload_eq,
+    "ne"        =>      \&_overload_ne,
+    '""'        =>      \&_overload_ToString,
+    "0+"        =>      sub { $_[0]->value() },
+    "bool"      =>      sub { $_[0]->value() },
+    ;
+
 1;
 
 __END__
@@ -322,13 +705,13 @@ Physics::Unit::Scalar
     print $t->ToString, "\n";              # prints 129600 second
 
     # Speed = Distance / Time
-    $s = $d->div($t);            # $s is a Physics::Unit::Speed object
+    $s = $d->divide($t);            # $s is a Physics::Unit::Speed object
     print $s->ToString, "\n";    # prints 1.2941... mps
 
     # Automatic typing
     $s = new Physics::Unit::Scalar('kg m s');   # Unrecognized type
     print ref $s, "\n";          # $s is a Physics::Unit::Scalar
-    $f = $s->div('3000 s^3');
+    $f = $s->divide('3000 s^3');
     print ref $f, "\n";          # $f is a Physics::Unit::Force
 
 =head1 DESCRIPTION
@@ -363,7 +746,7 @@ correct type automatically.  For example:
   $d = new Physics::Unit::Distance('98 mi');
   $t = new Physics::Unit::Time('36 years');
   # $s will be of type Physics::Unit::Speed.
-  $s = $d->div($t);
+  $s = $d->divide($t);
 
 When a new object is created, this package attempts to determine its
 subclass based on its dimensionality.  Thus, when you multiply two
@@ -491,15 +874,48 @@ Neither the original object nor the argument is changed.
 
 =back
 
+=head1 OVERLOADED OPERATORS
+
+These operators/functions are overloaded: +, -, *, /, **, int, abs, exp, log, 
+sin, cos, atan2, <=>, eq, ne, "", 0+ and bool.
+
+As mentioned above, it is possible to units to be indeterminate from their
+dimensions alone, for example, energy and torque have the same dimensions. For 
+cases where this ambiguity might arise during use of the overloaded interface, 
+a package variable C<@type_context> has been provided so the user can specify. 
+It's not a requirement, but it's possible an inappropriate unit might appear
+if this variable is not set up.
+
+To facilitate output when producing a string representation, the C<$format_string>
+package variable can be given a sprintf-compatible format string to e.g. restrict 
+the number of decimal places.
+
+The following example illustrates usage of the overloaded interface and the 
+variables described above.
+
+    # simple projectile motion simulation on different planets
+    use Physics::Unit::Scalar ':ALL';
+    @Physics::Unit::Scalar::type_context = ('Energy');      # we are working with energy i.e. Joules
+    $Physics::Unit::Scalar::format_string = "%.3f";         # provide a format string for output
+    my $m = GetScalar("1 Kg");                              # mass
+    my $u = GetScalar("1 meter per second");                # initial upward velocity
+    foreach my $body ( qw(mercury earth mars jupiter pluto) ) {
+        my $a = GetScalar("-1 $body-gravity");              # e.g. "-1 earth-gravity" (-1 for direction vector)
+        my $t = GetScalar("0 seconds");                     # start at t = 0s
+        print "On " . ucfirst($body) . ":\n";               # so we know which planet we're on
+        while ( $t < 3.5 ) {                                # simulate for a few seconds
+            my $s = $u * $t + (1/2) * $a * $t**2;           # 'suvat' equations
+            my $v = $u + $a * $t;
+            my $KE = (1/2) * $m * $v**2;                    # kinetic energy
+            my $PE = $m * -1 * $a * $s;                     # potential energy, again -1 for direction
+            my $TE = $KE + $PE;                             # total energy (should be constant)
+            # display with units
+            print "At $t: dist = $s;\tvel = $v;\tKE = $KE;\tPE = $PE;\tTotal energy = $TE\n";
+            $t += 0.1;                                      # increment timestep
+        }
+    }
+
+
 =head1 AUTHOR
 
 Chris Maloney <voldrani@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright 2002-2003 by Chris Maloney
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-

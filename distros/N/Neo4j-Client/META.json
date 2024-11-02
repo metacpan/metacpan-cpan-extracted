@@ -1,16 +1,16 @@
 {
-   "abstract" : "Build and use the libneo4j-client library",
+   "abstract" : "Build and use the libneo4j-omni library",
    "author" : [
       "Mark A. Jensen (majensen -at- cpan -dot- org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Neo4j-Client",
    "no_index" : {
@@ -59,10 +59,18 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "0.52",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/majensen/neoclient/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/majensen/neoclient.git"
+      }
+   },
+   "version" : "0.54",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.37",
+      "generated_by" : "Alien::Build::MM version 2.83",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
@@ -76,5 +84,5 @@
    "x_contributors" : [
       "Mohawk (ETJ)"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

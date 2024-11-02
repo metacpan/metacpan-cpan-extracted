@@ -1,10 +1,10 @@
 #!/usr/bin/perl -w
 use strict;
 use lib 'inc';
-use vars qw( $class );
 use Test::More tests => 3;
 use DateTime;
 
+my $class;
 BEGIN {
     $class = 'DateTime::Format::HTTP';
     use_ok $class;

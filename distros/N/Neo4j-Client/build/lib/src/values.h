@@ -257,7 +257,7 @@ neo4j_value_t neo4j_date(const neo4j_value_t fields[1]);
  * @return The neo4j value encoding the time.
  */
 __neo4j_pure
-neo4j_value_t neo4j_time(const neo4j_value_t fields[1]);
+neo4j_value_t neo4j_time(const neo4j_value_t fields[2]);
 
 /**
  * Construct a neo4j value encoding a localtime.
@@ -360,6 +360,17 @@ neo4j_value_t neo4j_identity(long long identity);
  */
 __neo4j_pure
 neo4j_value_t neo4j_elementid(const char *eid);
+
+/**
+ * Cast a neo4j string into a neo4j element ID.
+ *
+ * @internal
+ *
+ * @param [value] The neo4j string.
+ * @return The input value, modified to have the element ID type.
+ */
+__neo4j_pure
+neo4j_value_t neo4j_string_to_elementid(neo4j_value_t value);
 
 /**
  * Get the signature of a neo4j struct.

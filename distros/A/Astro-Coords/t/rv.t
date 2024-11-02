@@ -20,8 +20,8 @@ delta_ok( $dt->jd, 2452166.5, "Check JD");
 
 # create coordinate object
 my $c = new Astro::Coords( ra => '15 22 33.30',
-			   dec => '-00 14 04.5',
-			   type => 'B1950');
+                           dec => '-00 14 04.5',
+                           type => 'B1950');
 
 $c->telescope( $tel );
 $c->datetime( $dt );
@@ -82,21 +82,21 @@ SKIP: {
   skip "Need Astro::Telescope > v0.50", 2
     unless $Astro::Telescope::VERSION > 0.5;
 
-  $c = new Astro::Coords( 
-			 ra => '3h27m36',
-			 dec => '-63 18 47',
-			 epoch => 1975.0,
-			 type => 'B1975',
-			 name => 'k Ret',
-			);
+  $c = new Astro::Coords(
+                         ra => '3h27m36',
+                         dec => '-63 18 47',
+                         epoch => 1975.0,
+                         type => 'B1975',
+                         name => 'k Ret',
+                        );
 
   $dt = new DateTime( year => 1975, month => 1, day => 3,
-		      hour => 19,	time_zone => 'UTC' );
+                      hour => 19, time_zone => 'UTC' );
   $c->datetime( $dt );
   $tel = new Astro::Telescope( 'Name' => 'test',
-			       'Long' => Astro::Coords::Angle->new( '20 48 42' )->radians,
-			       'Lat'  => Astro::Coords::Angle->new( '-32 22 42' )->radians,
-			       Alt => 0);
+                               'Long' => Astro::Coords::Angle->new( '20 48 42' )->radians,
+                               'Lat'  => Astro::Coords::Angle->new( '-32 22 42' )->radians,
+                               Alt => 0);
   isa_ok( $tel, 'Astro::Telescope' );
   $c->telescope( $tel );
 
@@ -105,9 +105,9 @@ SKIP: {
 
 # Radial velocity and doppler correction
 $c = new Astro::Coords( ra => '16 43 52',
-			dec => '-00 24 3.5',
-			type => 'J2000',
-			redshift => 2 );
+                        dec => '-00 24 3.5',
+                        type => 'J2000',
+                        redshift => 2 );
 
 is($c->redshift, 2, 'Check redshift');
 is($c->vdefn, 'REDSHIFT', 'check velocity definition');
@@ -117,11 +117,11 @@ is($c->rv, 599584.916, 'check optical velocity');
 is( sprintf('%.4f',$c->doppler), '0.3333', 'check doppler correction');
 
 $c = new Astro::Coords( ra => '16 43 52',
-			dec => '-00 24 3.5',
-			type => 'J2000',
-			rv => 20, vdefn => 'RADIO',
-			vframe => 'LSR'
-		      );
+                        dec => '-00 24 3.5',
+                        type => 'J2000',
+                        rv => 20, vdefn => 'RADIO',
+                        vframe => 'LSR'
+                      );
 
 is($c->vdefn, 'RADIO', 'check velocity definition');
 is($c->vframe, 'LSRK', 'check velocity frame');

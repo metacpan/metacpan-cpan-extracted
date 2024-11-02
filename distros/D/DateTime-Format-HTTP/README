@@ -68,7 +68,7 @@ METHODS
     closest to the current date.
 
   format_datetime()
-    The "format_datetime()" method converts a DateTime to a string. If the
+    The format_datetime() method converts a DateTime to a string. If the
     function is called without an argument, it will use the current time.
 
     The string returned is in the format preferred for the HTTP protocol.

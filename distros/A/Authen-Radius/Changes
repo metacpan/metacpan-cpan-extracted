@@ -1,5 +1,8 @@
 Revision history for Perl extension Radius.
 
+0.33 Wed Oct 23 11:35:42 2024
+    - Support for Message-Authenticator of type 'octets' (RT 154336)
+
 0.32 Mon Oct 19 10:54:42 2020
     - Fixed MIN_PERL_VERSION in Makefile.PL, required by ExtUtils::MakeMaker@7.48
 

@@ -2,6 +2,12 @@ Revision history for Perl extension Physics::Unit
 See github repository for detailed revision history:
 https://github.com/Klortho/Physics-Unit
 
+0.60 2024-11-01
+  - Added overload (mjohnson108)
+  - Corrected documentation (manwar)
+  - Corrected examples (mjohnson108)
+  - Added several astronomical units (mjohnson108)
+  - Fix a test that fails on quadmath systems (mjohnson108)
 
 0.54 2016-07-01
   - Added overlooked mm shortcut (djerius)

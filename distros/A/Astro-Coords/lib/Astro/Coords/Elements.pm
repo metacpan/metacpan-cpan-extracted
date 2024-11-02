@@ -21,7 +21,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 # Need working palPlante
 use Astro::PAL 0.95 ();
@@ -54,35 +54,35 @@ reference to a hash containing the following keys:
 
 suitable for the major planets:
 
- EPOCH 		 =  epoch of elements t0 (TT MJD)
+ EPOCH           =  epoch of elements t0 (TT MJD)
  ORBINC          =  inclination i (radians)
- ANODE 		 =  longitude of the ascending node  [$\Omega$] (radians)
- PERIH 		 =  longitude of perihelion  [$\varpi$] (radians)
- AORQ 		 =  mean distance a (AU)
- E 		 =  eccentricity e
- AORL 		 =  mean longitude L (radians)
- DM 		 =  daily motion n (radians)
+ ANODE           =  longitude of the ascending node  [$\Omega$] (radians)
+ PERIH           =  longitude of perihelion  [$\varpi$] (radians)
+ AORQ            =  mean distance a (AU)
+ E               =  eccentricity e
+ AORL            =  mean longitude L (radians)
+ DM              =  daily motion n (radians)
 
 suitable for minor planets:
 
 
- EPOCH 		 =  epoch of elements t0 (TT MJD)
- ORBINC        	 =  inclination i (radians)
- ANODE 		 =  longitude of the ascending node  [$\Omega$] (radians)
- PERIH 		 =  argument of perihelion  [$\omega$] (radians)
- AORQ 		 =  mean distance a (AU)
- E 		 =  eccentricity e
- AORL 		 =  mean anomaly M (radians)
+ EPOCH           =  epoch of elements t0 (TT MJD)
+ ORBINC          =  inclination i (radians)
+ ANODE           =  longitude of the ascending node  [$\Omega$] (radians)
+ PERIH           =  argument of perihelion  [$\omega$] (radians)
+ AORQ            =  mean distance a (AU)
+ E               =  eccentricity e
+ AORL            =  mean anomaly M (radians)
 
 suitable for comets:
 
 
- EPOCH 		 =  epoch of elements t0 (TT MJD)
- ORBINC        	 =  inclination i (radians)
- ANODE 		 =  longitude of the ascending node  [$\Omega$] (radians)
- PERIH 		 =  argument of perihelion  [$\omega$] (radians)
- AORQ 		 =  perihelion distance q (AU)
- E 		 =  eccentricity e
+ EPOCH           =  epoch of elements t0 (TT MJD)
+ ORBINC          =  inclination i (radians)
+ ANODE           =  longitude of the ascending node  [$\Omega$] (radians)
+ PERIH           =  argument of perihelion  [$\omega$] (radians)
+ AORQ            =  perihelion distance q (AU)
+ E               =  eccentricity e
  EPOCHPERIH      =  epoch of perihelion T (TT MJD)
 
 See the documentation to palPlante() and palPertel() for more information.
@@ -113,7 +113,7 @@ sub new {
   if (ref($opts{elements}) eq 'HASH') {
     %elements = %{ $opts{elements} };
   } elsif (ref($opts{elements}) eq 'ARRAY' &&
-	   $opts{elements}->[0] eq 'ELEMENTS') {
+           $opts{elements}->[0] eq 'ELEMENTS') {
 
     my $i = 3;
     for my $key (qw/ EPOCH ORBINC ANODE PERIH AORQ E AORL /) {
@@ -187,7 +187,7 @@ sub new {
   # but complain if we do not have one of them
   croak "Must supply one of EPOCH or EPOCHPERIH - both were undefined"
     if (!exists $elements{EPOCH} &&
-	!exists $elements{EPOCHPERIH});
+        !exists $elements{EPOCHPERIH});
 
   # create the object
   bless { elements => \%elements, name => $opts{name} }, $class;
@@ -260,8 +260,8 @@ sub array {
   }
 
   return ( $self->type, undef, undef,
-	   $epoch, $el{ORBINC}, $el{ANODE}, $el{PERIH},
-	   $el{AORQ}, $el{E}, $el{AORL}, $lastel);
+           $epoch, $el{ORBINC}, $el{ANODE}, $el{PERIH},
+           $el{AORQ}, $el{E}, $el{AORL}, $lastel);
 }
 
 =item B<type>
@@ -350,9 +350,9 @@ sub apparent {
     # synch epoch if need be
     if (!exists $el{EPOCH} || !exists $el{EPOCHPERIH}) {
       if (exists $el{EPOCH}) {
-	$el{EPOCHPERIH} = $el{EPOCH};
+        $el{EPOCHPERIH} = $el{EPOCH};
       } else {
-	$el{EPOCH} = $el{EPOCHPERIH};
+        $el{EPOCH} = $el{EPOCHPERIH};
       }
     }
 
@@ -372,9 +372,9 @@ sub apparent {
 
 #    print "After perturbing: " .Dumper(\%el);
       croak "Error perturbing elements for target ".
-	(defined $self->name ? $self->name : '' )
-	  ." [status=$jstat]"
-	    if $jstat != 0;
+        (defined $self->name ? $self->name : '' )
+          ." [status=$jstat]"
+            if $jstat != 0;
     }
 
 
@@ -392,7 +392,7 @@ sub apparent {
 
     croak "Error determining apparent RA/Dec for target ".
       (defined $self->name ? $self->name : '' )
-	."[status=$j]" if $j != 0;
+        ."[status=$j]" if $j != 0;
 
     # Convert to angle object
     $ra_app = new Astro::Coords::Angle::Hour($ra, units => 'rad', range => '2PI');

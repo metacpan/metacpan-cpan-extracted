@@ -40,7 +40,7 @@ use constant PAZERO => new Astro::Coords::Angle( 0.0, units => 'radians' );
 
 use vars qw/ @PROJ  @SYSTEMS /;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 # Allowed projections
 @PROJ = qw| SIN TAN ARC DIRECT |;
@@ -48,21 +48,21 @@ our $VERSION = '0.21';
 # Allowed coordinate systems  J\d+ and B\d+ are also allowed by the
 # PTCS - these are pattern matches
 @SYSTEMS = (qw|
-	      TRACKING
-	      GAL
-	      ICRS
-	      ICRF
+              TRACKING
+              GAL
+              ICRS
+              ICRF
               |,
-	      qr|J\d+(\.\d)?|,
-	      qr|B\d+(\.\d)?|,
+              qr|J\d+(\.\d)?|,
+              qr|B\d+(\.\d)?|,
             qw|
-	      APP
-	      HADEC
-	      AZEL
-	      MOUNT
-	      OBS
-	      FPLANE
-	      |);
+              APP
+              HADEC
+              AZEL
+              MOUNT
+              OBS
+              FPLANE
+              |);
 
 =head1 METHODS
 
@@ -103,10 +103,10 @@ sub new {
 
   # Aim for case-insensitive keys
   my %merged = (
-		  system => "J2000",
-		  projection => 'TAN',
-		  tracking_system => undef,
-		  posang => undef );
+                  system => "J2000",
+                  projection => 'TAN',
+                  tracking_system => undef,
+                  posang => undef );
 
   for my $k (keys %options) {
     my $lk = lc($k);
@@ -124,12 +124,12 @@ sub new {
 
   # Create the object
   my $off = bless {
-		   OFFSETS => [ $dc1, $dc2 ],
-		   PROJECTION => undef,
-		   POSANG   => PAZERO,
-		   SYSTEM       => undef,
-		   TRACKING_SYSTEM => undef,
-		  }, $class;
+                   OFFSETS => [ $dc1, $dc2 ],
+                   PROJECTION => undef,
+                   POSANG   => PAZERO,
+                   SYSTEM       => undef,
+                   TRACKING_SYSTEM => undef,
+                  }, $class;
 
   # Use accessor to set so that we get validation
   $off->projection( $merged{projection} );
@@ -216,19 +216,19 @@ sub system {
     # a TCS system
     my $match;
     for my $compare (@SYSTEMS) {
-	if ($p =~ /^$compare/) {
-	    if (!defined $match) {
+        if ($p =~ /^$compare/) {
+            if (!defined $match) {
                 if (ref($compare)) {
                    # regex so we just take the input
                    $match = $p;
                 } else {
                    # exact match to start of string so take the TCS value
-   	 	   $match = $compare;
+                   $match = $compare;
                 }
-	    } else {
-		croak "Multiple matches for system '$p'";
-	    }
-	}
+            } else {
+                croak "Multiple matches for system '$p'";
+            }
+        }
     }
     croak "Unknown system '$p'" unless defined $match;
     $self->{SYSTEM} = $match;
@@ -380,8 +380,8 @@ sub invert {
   my $pa = $self->posang->clone;
   $pa = undef if $pa->radians == 0;
   return $self->new( @xy, system => $self->system,
-		     projection => $self->projection,
-		     posang => $pa);
+                     projection => $self->projection,
+                     posang => $pa);
 }
 
 =item B<clone>
@@ -398,9 +398,9 @@ sub clone {
   my $pa = $self->posang->clone;
   $pa = undef if $pa->radians == 0;
   return $self->new( @xy, posang => $pa,
-		     system => $self->system,
-		     projection => $self->projection
-		   );
+                     system => $self->system,
+                     projection => $self->projection
+                   );
 }
 
 =item B<offsets_rotated>
@@ -442,6 +442,26 @@ sub offsets_rotated {
   my $yr = - $x * $sinpa  +  $y * $cospa;
 
   return map {new Astro::Coords::Angle($_, units => 'arcsec')} ($xr, $yr);
+}
+
+=item B<distance>
+
+Calculate the total distance implied by the offsets.  Returned as an
+C<Astro::Coords::Angle> object.
+
+  $dist = $offset->distance;
+
+=cut
+
+sub distance {
+  my $self = shift;
+  my $offset = shift;
+
+  my ($x, $y) = map {$_->arcsec()} $self->offsets();
+
+  my $dist = ($x ** 2 + $y ** 2) ** 0.5;
+
+  return Astro::Coords::Angle->new($dist, units => 'arcsec');
 }
 
 =back

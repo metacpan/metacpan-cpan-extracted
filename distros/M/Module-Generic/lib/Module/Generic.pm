@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.37.6
+## Version v0.37.7
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2024/09/08
+## Modified 2024/11/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.37.6';
+    our $VERSION     = 'v0.37.7';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -5181,19 +5181,24 @@ sub _set_get_scalar_as_object : lvalue
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
             my $ctx = $_;
             my $val;
-            if( ref( $arg ) eq 'SCALAR' || 
-                UNIVERSAL::isa( $arg, 'SCALAR' ) )
+            if( defined( $arg ) && 
+                (
+                    ref( $arg ) eq 'SCALAR' || 
+                    UNIVERSAL::isa( $arg, 'SCALAR' )
+                ) )
             {
                 $val = $$arg;
             }
-            elsif( ref( $arg ) && 
+            elsif( defined( $arg ) &&
+                   ref( $arg ) && 
                    $self->_is_object( $arg ) && 
                    overload::Overloaded( $arg ) && 
                    overload::Method( $arg, '""' ) )
             {
+                no warnings 'uninitialized';
                 $val = "$arg";
             }
-            elsif( ref( $arg ) )
+            elsif( defined( $arg ) && ref( $arg ) )
             {
                 return( $self->error( "I was expecting a string or a scalar reference, but instead got '$arg'" ) );
             }
@@ -9493,7 +9498,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v0.37.6
+    v0.37.7
 
 =head1 DESCRIPTION
 

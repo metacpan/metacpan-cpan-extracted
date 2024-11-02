@@ -17,8 +17,8 @@ my $tel = new Astro::Telescope("JCMT");
 
 # Simultaneously test negative zero dec and B1950 to J2000 conversion
 my $c = new Astro::Coords( ra => "15h22m33.3",
-	                   dec => "-0d13m4.5",
-			   type => "B1950");
+                           dec => "-0d13m4.5",
+                           type => "B1950");
 
 ok($c, "create object");
 print "#J2000: $c\n";

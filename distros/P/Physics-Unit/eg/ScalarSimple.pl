@@ -28,7 +28,7 @@ print "36 years is " . $t->ToString . "\n";
 
 
 # Compute a Speed = Distance / Time
-$speed = $d->div($t);
+$speed = $d->divide($t);
 print "Speed is " . $speed->ToString . "\n";
 
 
@@ -39,6 +39,6 @@ $s = new Physics::Unit::Scalar('kg m s');
 # This calculation produces an object of the correct type
 # automagically:  $f is a Physics::Unit::Force
 
-$f = $s->div('3000 s^3');
+$f = $s->divide('3000 s^3');
 print "Force is " . $f->ToString . "\n";
 

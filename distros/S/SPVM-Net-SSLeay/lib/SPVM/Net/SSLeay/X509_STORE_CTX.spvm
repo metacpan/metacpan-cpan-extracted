@@ -3,4 +3,7 @@
 
 class Net::SSLeay::X509_STORE_CTX {
   
+  # Instance Methods
+  native method DESTROY : void ();
+  
 }

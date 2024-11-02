@@ -1,0 +1,3430 @@
+=head1 NAME
+
+Physics::Unit::UnitsByName
+
+=head1 DESCRIPTION
+
+This document lists the units provided by L<Physics::Unit> sorted by name.
+Since the POD standard does not do tables, they are formatted as HTML
+tables, therefore this is best viewed in a browser-based POD renderer.
+Note that the L<physics-unit> script can produce a very similar HTML file
+in the location of your choosing should this be more convenient.
+
+=head1 UNITS
+
+=begin html
+
+      <table border='1' cellpadding='2'>
+        <tr bgcolor='#003070'>
+          <th>Unit</th>
+          <th>Type</th>
+          <th>Value</th>
+          <th>Expanded</th>
+        </tr>
+        <tr>
+          <td>$</td>
+          <td>Money</td>
+          <td>us-dollar</td>
+          <td>$</td>
+        </tr>
+        <tr>
+          <td>%</td>
+          <td>Dimensionless</td>
+          <td>0.01</td>
+          <td>0.01</td>
+        </tr>
+        <tr>
+          <td>a</td>
+          <td>Distance</td>
+          <td>1e-10 m</td>
+          <td>1e-10 m</td>
+        </tr>
+        <tr>
+          <td>abamp</td>
+          <td>Current</td>
+          <td>10 amps</td>
+          <td>10 amp</td>
+        </tr>
+        <tr>
+          <td>abampere</td>
+          <td>Current</td>
+          <td>10 amps</td>
+          <td>10 amp</td>
+        </tr>
+        <tr>
+          <td>abamperes</td>
+          <td>Current</td>
+          <td>10 amps</td>
+          <td>10 amp</td>
+        </tr>
+        <tr>
+          <td>abamps</td>
+          <td>Current</td>
+          <td>10 amps</td>
+          <td>10 amp</td>
+        </tr>
+        <tr>
+          <td>abcoul</td>
+          <td>Charge</td>
+          <td>10 coulomb</td>
+          <td>10 s amp</td>
+        </tr>
+        <tr>
+          <td>abcoulomb</td>
+          <td>Charge</td>
+          <td>10 coulomb</td>
+          <td>10 s amp</td>
+        </tr>
+        <tr>
+          <td>abcoulombs</td>
+          <td>Charge</td>
+          <td>10 coulomb</td>
+          <td>10 s amp</td>
+        </tr>
+        <tr>
+          <td>abfarad</td>
+          <td>Capacitance</td>
+          <td>giga farad</td>
+          <td>1000000 m^-2 gm^-1 s^4 amp^2</td>
+        </tr>
+        <tr>
+          <td>abfarads</td>
+          <td>Capacitance</td>
+          <td>giga farad</td>
+          <td>1000000 m^-2 gm^-1 s^4 amp^2</td>
+        </tr>
+        <tr>
+          <td>abhenry</td>
+          <td>Inductance</td>
+          <td>nano henry</td>
+          <td>1e-06 m^2 gm s^-2 amp^-2</td>
+        </tr>
+        <tr>
+          <td>abhenrys</td>
+          <td>Inductance</td>
+          <td>nano henry</td>
+          <td>1e-06 m^2 gm s^-2 amp^-2</td>
+        </tr>
+        <tr>
+          <td>abohm</td>
+          <td>Resistance</td>
+          <td>nano ohm</td>
+          <td>1e-06 m^2 gm s^-3 amp^-2</td>
+        </tr>
+        <tr>
+          <td>abohms</td>
+          <td>Resistance</td>
+          <td>nano ohm</td>
+          <td>1e-06 m^2 gm s^-3 amp^-2</td>
+        </tr>
+        <tr>
+          <td>abvolt</td>
+          <td>Electric_potential</td>
+          <td>1e-8 volt</td>
+          <td>1e-05 m^2 gm s^-3 amp^-1</td>
+        </tr>
+        <tr>
+          <td>abvolts</td>
+          <td>Electric_potential</td>
+          <td>1e-8 volt</td>
+          <td>1e-05 m^2 gm s^-3 amp^-1</td>
+        </tr>
+        <tr>
+          <td>acre</td>
+          <td>Area</td>
+          <td>43560 square feet</td>
+          <td>4046.8564224 m^2</td>
+        </tr>
+        <tr>
+          <td>acres</td>
+          <td>Area</td>
+          <td>43560 square feet</td>
+          <td>4046.8564224 m^2</td>
+        </tr>
+        <tr>
+          <td>amp</td>
+          <td>Current</td>
+          <td>ampere</td>
+          <td>amp</td>
+        </tr>
+        <tr>
+          <td>ampere</td>
+          <td>Current</td>
+          <td>ampere</td>
+          <td>amp</td>
+        </tr>
+        <tr>
+          <td>amperes</td>
+          <td>Current</td>
+          <td>ampere</td>
+          <td>amp</td>
+        </tr>
+        <tr>
+          <td>amps</td>
+          <td>Current</td>
+          <td>ampere</td>
+          <td>amp</td>
+        </tr>
+        <tr>
+          <td>amu</td>
+          <td>Mass</td>
+          <td>1.6605402e-27 kg</td>
+          <td>1.6605402e-24 gm</td>
+        </tr>
+        <tr>
+          <td>angstrom</td>
+          <td>Distance</td>
+          <td>1e-10 m</td>
+          <td>1e-10 m</td>
+        </tr>
+        <tr>
+          <td>angstroms</td>
+          <td>Distance</td>
+          <td>1e-10 m</td>
+          <td>1e-10 m</td>
+        </tr>
+        <tr>
+          <td>arcmin</td>
+          <td>Dimensionless</td>
+          <td>deg / 60</td>
+          <td>0.000290888208665722</td>
+        </tr>
+        <tr>
+          <td>arcminute</td>
+          <td>Dimensionless</td>
+          <td>deg / 60</td>
+          <td>0.000290888208665722</td>
+        </tr>
+        <tr>
+          <td>arcminutes</td>
+          <td>Dimensionless</td>
+          <td>deg / 60</td>
+          <td>0.000290888208665722</td>
+        </tr>
+        <tr>
+          <td>arcsec</td>
+          <td>Dimensionless</td>
+          <td>arcmin / 60</td>
+          <td>4.84813681109536e-06</td>
+        </tr>
+        <tr>
+          <td>arcsecond</td>
+          <td>Dimensionless</td>
+          <td>arcmin / 60</td>
+          <td>4.84813681109536e-06</td>
+        </tr>
+        <tr>
+          <td>arcseconds</td>
+          <td>Dimensionless</td>
+          <td>arcmin / 60</td>
+          <td>4.84813681109536e-06</td>
+        </tr>
+        <tr>
+          <td>are</td>
+          <td>Area</td>
+          <td>100 square meters</td>
+          <td>100 m^2</td>
+        </tr>
+        <tr>
+          <td>ares</td>
+          <td>Area</td>
+          <td>100 square meters</td>
+          <td>100 m^2</td>
+        </tr>
+        <tr>
+          <td>astronomical-unit</td>
+          <td>Distance</td>
+          <td>149597870700 m</td>
+          <td>149597870700 m</td>
+        </tr>
+        <tr>
+          <td>atm</td>
+          <td>Pressure</td>
+          <td>101325 pascal</td>
+          <td>101325000 m^-1 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>atmosphere</td>
+          <td>Pressure</td>
+          <td>101325 pascal</td>
+          <td>101325000 m^-1 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>atomic-mass-unit</td>
+          <td>Mass</td>
+          <td>1.6605402e-27 kg</td>
+          <td>1.6605402e-24 gm</td>
+        </tr>
+        <tr>
+          <td>atomic-mass-units</td>
+          <td>Mass</td>
+          <td>1.6605402e-27 kg</td>
+          <td>1.6605402e-24 gm</td>
+        </tr>
+        <tr>
+          <td>atto</td>
+          <td>prefix</td>
+          <td>1e-18</td>
+          <td>1e-18</td>
+        </tr>
+        <tr>
+          <td>au</td>
+          <td>Distance</td>
+          <td>149597870700 m</td>
+          <td>149597870700 m</td>
+        </tr>
+        <tr>
+          <td>bar</td>
+          <td>Pressure</td>
+          <td>1e5 pascal</td>
+          <td>100000000 m^-1 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>barn</td>
+          <td>Area</td>
+          <td>1e-28 square meters</td>
+          <td>1e-28 m^2</td>
+        </tr>
+        <tr>
+          <td>barns</td>
+          <td>Area</td>
+          <td>1e-28 square meters</td>
+          <td>1e-28 m^2</td>
+        </tr>
+        <tr>
+          <td>bars</td>
+          <td>Pressure</td>
+          <td>1e5 pascal</td>
+          <td>100000000 m^-1 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>becquerel</td>
+          <td>Frequency</td>
+          <td>1 hz</td>
+          <td>s^-1</td>
+        </tr>
+        <tr>
+          <td>billion</td>
+          <td>Dimensionless</td>
+          <td>1e9</td>
+          <td>1000000000</td>
+        </tr>
+        <tr>
+          <td>billions</td>
+          <td>Dimensionless</td>
+          <td>1e9</td>
+          <td>1000000000</td>
+        </tr>
+        <tr>
+          <td>billionth</td>
+          <td>Dimensionless</td>
+          <td>1e-9</td>
+          <td>1e-09</td>
+        </tr>
+        <tr>
+          <td>bit</td>
+          <td>Data</td>
+          <td>bit</td>
+          <td>bit</td>
+        </tr>
+        <tr>
+          <td>bits</td>
+          <td>Data</td>
+          <td>bit</td>
+          <td>bit</td>
+        </tr>
+        <tr>
+          <td>bq</td>
+          <td>Frequency</td>
+          <td>1 hz</td>
+          <td>s^-1</td>
+        </tr>
+        <tr>
+          <td>british-thermal-unit</td>
+          <td>Energy</td>
+          <td>1055.056 joule</td>
+          <td>1055056 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>british-thermal-units</td>
+          <td>Energy</td>
+          <td>1055.056 joule</td>
+          <td>1055056 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>britishthermalunit</td>
+          <td>Energy</td>
+          <td>1055.056 joule</td>
+          <td>1055056 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>britishthermalunits</td>
+          <td>Energy</td>
+          <td>1055.056 joule</td>
+          <td>1055056 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>btu</td>
+          <td>Energy</td>
+          <td>1055.056 joule</td>
+          <td>1055056 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>btus</td>
+          <td>Energy</td>
+          <td>1055.056 joule</td>
+          <td>1055056 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>bushel</td>
+          <td>Volume</td>
+          <td>4 pecks</td>
+          <td>0.030283294272 m^3</td>
+        </tr>
+        <tr>
+          <td>bushels</td>
+          <td>Volume</td>
+          <td>4 pecks</td>
+          <td>0.030283294272 m^3</td>
+        </tr>
+        <tr>
+          <td>byte</td>
+          <td>Data</td>
+          <td>8 bits</td>
+          <td>8 bit</td>
+        </tr>
+        <tr>
+          <td>bytes</td>
+          <td>Data</td>
+          <td>8 bits</td>
+          <td>8 bit</td>
+        </tr>
+        <tr>
+          <td>c</td>
+          <td>Speed</td>
+          <td>2.99792458e8 m/sec</td>
+          <td>299792458 m s^-1</td>
+        </tr>
+        <tr>
+          <td>cal</td>
+          <td>Energy</td>
+          <td>4.184 joules</td>
+          <td>4184 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>calorie</td>
+          <td>Energy</td>
+          <td>4.184 joules</td>
+          <td>4184 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>calories</td>
+          <td>Energy</td>
+          <td>4.184 joules</td>
+          <td>4184 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>candela</td>
+          <td>Luminosity</td>
+          <td>candela</td>
+          <td>cd</td>
+        </tr>
+        <tr>
+          <td>candelas</td>
+          <td>Luminosity</td>
+          <td>candela</td>
+          <td>cd</td>
+        </tr>
+        <tr>
+          <td>candle</td>
+          <td>Luminosity</td>
+          <td>candela</td>
+          <td>cd</td>
+        </tr>
+        <tr>
+          <td>candles</td>
+          <td>Luminosity</td>
+          <td>candela</td>
+          <td>cd</td>
+        </tr>
+        <tr>
+          <td>carat</td>
+          <td>Mass</td>
+          <td>200 milligrams</td>
+          <td>0.2 gm</td>
+        </tr>
+        <tr>
+          <td>carats</td>
+          <td>Mass</td>
+          <td>200 milligrams</td>
+          <td>0.2 gm</td>
+        </tr>
+        <tr>
+          <td>cc</td>
+          <td>Volume</td>
+          <td>cubic centimeter</td>
+          <td>1e-06 m^3</td>
+        </tr>
+        <tr>
+          <td>cd</td>
+          <td>Luminosity</td>
+          <td>candela</td>
+          <td>cd</td>
+        </tr>
+        <tr>
+          <td>centi</td>
+          <td>prefix</td>
+          <td>0.01</td>
+          <td>0.01</td>
+        </tr>
+        <tr>
+          <td>centuries</td>
+          <td>Time</td>
+          <td>100 yr</td>
+          <td>3155760000 s</td>
+        </tr>
+        <tr>
+          <td>century</td>
+          <td>Time</td>
+          <td>100 yr</td>
+          <td>3155760000 s</td>
+        </tr>
+        <tr>
+          <td>cg</td>
+          <td>Mass</td>
+          <td>centigram</td>
+          <td>0.01 gm</td>
+        </tr>
+        <tr>
+          <td>cl</td>
+          <td>Volume</td>
+          <td>centiliter</td>
+          <td>1e-05 m^3</td>
+        </tr>
+        <tr>
+          <td>cm</td>
+          <td>Distance</td>
+          <td>centimeter</td>
+          <td>0.01 m</td>
+        </tr>
+        <tr>
+          <td>coul</td>
+          <td>Charge</td>
+          <td>ampere second</td>
+          <td>s amp</td>
+        </tr>
+        <tr>
+          <td>coulomb</td>
+          <td>Charge</td>
+          <td>ampere second</td>
+          <td>s amp</td>
+        </tr>
+        <tr>
+          <td>coulombs</td>
+          <td>Charge</td>
+          <td>ampere second</td>
+          <td>s amp</td>
+        </tr>
+        <tr>
+          <td>cup</td>
+          <td>Volume</td>
+          <td>pint/2</td>
+          <td>0.0002365882365 m^3</td>
+        </tr>
+        <tr>
+          <td>cups</td>
+          <td>Volume</td>
+          <td>pint/2</td>
+          <td>0.0002365882365 m^3</td>
+        </tr>
+        <tr>
+          <td>cycle</td>
+          <td>Dimensionless</td>
+          <td>1</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>cycles</td>
+          <td>Dimensionless</td>
+          <td>1</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>dag</td>
+          <td>Mass</td>
+          <td>decagram</td>
+          <td>10 gm</td>
+        </tr>
+        <tr>
+          <td>day</td>
+          <td>Time</td>
+          <td>24 hr</td>
+          <td>86400 s</td>
+        </tr>
+        <tr>
+          <td>days</td>
+          <td>Time</td>
+          <td>24 hr</td>
+          <td>86400 s</td>
+        </tr>
+        <tr>
+          <td>deca</td>
+          <td>prefix</td>
+          <td>10</td>
+          <td>10</td>
+        </tr>
+        <tr>
+          <td>deci</td>
+          <td>prefix</td>
+          <td>0.1</td>
+          <td>0.1</td>
+        </tr>
+        <tr>
+          <td>deg</td>
+          <td>Dimensionless</td>
+          <td>pi radians / 180</td>
+          <td>0.0174532925199433</td>
+        </tr>
+        <tr>
+          <td>degree</td>
+          <td>Dimensionless</td>
+          <td>pi radians / 180</td>
+          <td>0.0174532925199433</td>
+        </tr>
+        <tr>
+          <td>degree-kelvin</td>
+          <td>Temperature</td>
+          <td>kelvin</td>
+          <td>k</td>
+        </tr>
+        <tr>
+          <td>degree-kelvins</td>
+          <td>Temperature</td>
+          <td>kelvin</td>
+          <td>k</td>
+        </tr>
+        <tr>
+          <td>degree-rankine</td>
+          <td>Temperature</td>
+          <td>5/9 * kelvin</td>
+          <td>0.555555555555556 k</td>
+        </tr>
+        <tr>
+          <td>degrees</td>
+          <td>Dimensionless</td>
+          <td>pi radians / 180</td>
+          <td>0.0174532925199433</td>
+        </tr>
+        <tr>
+          <td>degrees-kelvin</td>
+          <td>Temperature</td>
+          <td>kelvin</td>
+          <td>k</td>
+        </tr>
+        <tr>
+          <td>degrees-rankine</td>
+          <td>Temperature</td>
+          <td>5/9 * kelvin</td>
+          <td>0.555555555555556 k</td>
+        </tr>
+        <tr>
+          <td>deka</td>
+          <td>prefix</td>
+          <td>10</td>
+          <td>10</td>
+        </tr>
+        <tr>
+          <td>demi</td>
+          <td>prefix</td>
+          <td>0.5</td>
+          <td>0.5</td>
+        </tr>
+        <tr>
+          <td>dg</td>
+          <td>Mass</td>
+          <td>decigram</td>
+          <td>0.1 gm</td>
+        </tr>
+        <tr>
+          <td>dl</td>
+          <td>Volume</td>
+          <td>deciliter</td>
+          <td>0.0001 m^3</td>
+        </tr>
+        <tr>
+          <td>dollar</td>
+          <td>Money</td>
+          <td>us-dollar</td>
+          <td>$</td>
+        </tr>
+        <tr>
+          <td>dollars</td>
+          <td>Money</td>
+          <td>us-dollar</td>
+          <td>$</td>
+        </tr>
+        <tr>
+          <td>doz</td>
+          <td>Dimensionless</td>
+          <td>12</td>
+          <td>12</td>
+        </tr>
+        <tr>
+          <td>dozen</td>
+          <td>Dimensionless</td>
+          <td>12</td>
+          <td>12</td>
+        </tr>
+        <tr>
+          <td>dram</td>
+          <td>Mass</td>
+          <td>ounce / 16</td>
+          <td>1.7718451953125 gm</td>
+        </tr>
+        <tr>
+          <td>drams</td>
+          <td>Mass</td>
+          <td>ounce / 16</td>
+          <td>1.7718451953125 gm</td>
+        </tr>
+        <tr>
+          <td>dyne</td>
+          <td>Force</td>
+          <td>gm cm / s^2</td>
+          <td>0.01 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>dynes</td>
+          <td>Force</td>
+          <td>gm cm / s^2</td>
+          <td>0.01 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>e</td>
+          <td>Dimensionless</td>
+          <td>2.7182818284590452354</td>
+          <td>2.71828182845905</td>
+        </tr>
+        <tr>
+          <td>earth-day</td>
+          <td>Time</td>
+          <td>24 hr</td>
+          <td>86400 s</td>
+        </tr>
+        <tr>
+          <td>earth-days</td>
+          <td>Time</td>
+          <td>24 hr</td>
+          <td>86400 s</td>
+        </tr>
+        <tr>
+          <td>earth-gravity</td>
+          <td>Acceleration</td>
+          <td>9.80665 m/s^2</td>
+          <td>9.80665 m s^-2</td>
+        </tr>
+        <tr>
+          <td>earth-to-sun</td>
+          <td>Distance</td>
+          <td>149597870700 m</td>
+          <td>149597870700 m</td>
+        </tr>
+        <tr>
+          <td>eight</td>
+          <td>Dimensionless</td>
+          <td>8</td>
+          <td>8</td>
+        </tr>
+        <tr>
+          <td>eighteen</td>
+          <td>Dimensionless</td>
+          <td>18</td>
+          <td>18</td>
+        </tr>
+        <tr>
+          <td>eighteens</td>
+          <td>Dimensionless</td>
+          <td>18</td>
+          <td>18</td>
+        </tr>
+        <tr>
+          <td>eighties</td>
+          <td>Dimensionless</td>
+          <td>80</td>
+          <td>80</td>
+        </tr>
+        <tr>
+          <td>eights</td>
+          <td>Dimensionless</td>
+          <td>8</td>
+          <td>8</td>
+        </tr>
+        <tr>
+          <td>eighty</td>
+          <td>Dimensionless</td>
+          <td>80</td>
+          <td>80</td>
+        </tr>
+        <tr>
+          <td>electron-volt</td>
+          <td>Energy</td>
+          <td>1.60217733e-19 joule</td>
+          <td>1.60217733e-16 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>electron-volts</td>
+          <td>Energy</td>
+          <td>1.60217733e-19 joule</td>
+          <td>1.60217733e-16 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>electronvolt</td>
+          <td>Energy</td>
+          <td>1.60217733e-19 joule</td>
+          <td>1.60217733e-16 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>electronvolts</td>
+          <td>Energy</td>
+          <td>1.60217733e-19 joule</td>
+          <td>1.60217733e-16 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>elementary-charge</td>
+          <td>Charge</td>
+          <td>1.6021892e-19 coulomb</td>
+          <td>1.6021892e-19 s amp</td>
+        </tr>
+        <tr>
+          <td>eleven</td>
+          <td>Dimensionless</td>
+          <td>11</td>
+          <td>11</td>
+        </tr>
+        <tr>
+          <td>elevens</td>
+          <td>Dimensionless</td>
+          <td>11</td>
+          <td>11</td>
+        </tr>
+        <tr>
+          <td>eq</td>
+          <td>Charge</td>
+          <td>1.6021892e-19 coulomb</td>
+          <td>1.6021892e-19 s amp</td>
+        </tr>
+        <tr>
+          <td>erg</td>
+          <td>Energy</td>
+          <td>1.0e-7 joule</td>
+          <td>0.0001 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>ergs</td>
+          <td>Energy</td>
+          <td>1.0e-7 joule</td>
+          <td>0.0001 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>ev</td>
+          <td>Energy</td>
+          <td>1.60217733e-19 joule</td>
+          <td>1.60217733e-16 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>exa</td>
+          <td>prefix</td>
+          <td>1e+18</td>
+          <td>1e+18</td>
+        </tr>
+        <tr>
+          <td>exbi</td>
+          <td>prefix</td>
+          <td>1.15292150460685e+18</td>
+          <td>1.15292150460685e+18</td>
+        </tr>
+        <tr>
+          <td>f</td>
+          <td>Capacitance</td>
+          <td>amp^2 s^4 / kg m^2</td>
+          <td>0.001 m^-2 gm^-1 s^4 amp^2</td>
+        </tr>
+        <tr>
+          <td>farad</td>
+          <td>Capacitance</td>
+          <td>amp^2 s^4 / kg m^2</td>
+          <td>0.001 m^-2 gm^-1 s^4 amp^2</td>
+        </tr>
+        <tr>
+          <td>farads</td>
+          <td>Capacitance</td>
+          <td>amp^2 s^4 / kg m^2</td>
+          <td>0.001 m^-2 gm^-1 s^4 amp^2</td>
+        </tr>
+        <tr>
+          <td>fathom</td>
+          <td>Distance</td>
+          <td>2 yards</td>
+          <td>1.8288 m</td>
+        </tr>
+        <tr>
+          <td>fathoms</td>
+          <td>Distance</td>
+          <td>2 yards</td>
+          <td>1.8288 m</td>
+        </tr>
+        <tr>
+          <td>feet</td>
+          <td>Distance</td>
+          <td>.3048 m</td>
+          <td>0.3048 m</td>
+        </tr>
+        <tr>
+          <td>femto</td>
+          <td>prefix</td>
+          <td>1e-15</td>
+          <td>1e-15</td>
+        </tr>
+        <tr>
+          <td>fifteen</td>
+          <td>Dimensionless</td>
+          <td>15</td>
+          <td>15</td>
+        </tr>
+        <tr>
+          <td>fifteens</td>
+          <td>Dimensionless</td>
+          <td>15</td>
+          <td>15</td>
+        </tr>
+        <tr>
+          <td>fifth</td>
+          <td>Volume</td>
+          <td>gallon/5</td>
+          <td>0.0007570823568 m^3</td>
+        </tr>
+        <tr>
+          <td>fifths</td>
+          <td>Volume</td>
+          <td>gallon/5</td>
+          <td>0.0007570823568 m^3</td>
+        </tr>
+        <tr>
+          <td>fifties</td>
+          <td>Dimensionless</td>
+          <td>50</td>
+          <td>50</td>
+        </tr>
+        <tr>
+          <td>fifty</td>
+          <td>Dimensionless</td>
+          <td>50</td>
+          <td>50</td>
+        </tr>
+        <tr>
+          <td>five</td>
+          <td>Dimensionless</td>
+          <td>5</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <td>fives</td>
+          <td>Dimensionless</td>
+          <td>5</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <td>floz</td>
+          <td>Volume</td>
+          <td>cup/8</td>
+          <td>2.95735295625e-05 m^3</td>
+        </tr>
+        <tr>
+          <td>fluid-ounce</td>
+          <td>Volume</td>
+          <td>cup/8</td>
+          <td>2.95735295625e-05 m^3</td>
+        </tr>
+        <tr>
+          <td>fluid-ounces</td>
+          <td>Volume</td>
+          <td>cup/8</td>
+          <td>2.95735295625e-05 m^3</td>
+        </tr>
+        <tr>
+          <td>fluidounce</td>
+          <td>Volume</td>
+          <td>cup/8</td>
+          <td>2.95735295625e-05 m^3</td>
+        </tr>
+        <tr>
+          <td>fluidounces</td>
+          <td>Volume</td>
+          <td>cup/8</td>
+          <td>2.95735295625e-05 m^3</td>
+        </tr>
+        <tr>
+          <td>fluidram</td>
+          <td>Volume</td>
+          <td>3.5516 cc</td>
+          <td>3.5516e-06 m^3</td>
+        </tr>
+        <tr>
+          <td>fluidrams</td>
+          <td>Volume</td>
+          <td>3.5516 cc</td>
+          <td>3.5516e-06 m^3</td>
+        </tr>
+        <tr>
+          <td>foot</td>
+          <td>Distance</td>
+          <td>.3048 m</td>
+          <td>0.3048 m</td>
+        </tr>
+        <tr>
+          <td>foot-pound</td>
+          <td>Torque</td>
+          <td>foot pound-force</td>
+          <td>1355.8179483314 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>foot-pounds</td>
+          <td>Torque</td>
+          <td>foot pound-force</td>
+          <td>1355.8179483314 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>footpound</td>
+          <td>Torque</td>
+          <td>foot pound-force</td>
+          <td>1355.8179483314 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>footpounds</td>
+          <td>Torque</td>
+          <td>foot pound-force</td>
+          <td>1355.8179483314 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>forties</td>
+          <td>Dimensionless</td>
+          <td>40</td>
+          <td>40</td>
+        </tr>
+        <tr>
+          <td>fortnight</td>
+          <td>Time</td>
+          <td>2 week</td>
+          <td>1209600 s</td>
+        </tr>
+        <tr>
+          <td>fortnights</td>
+          <td>Time</td>
+          <td>2 week</td>
+          <td>1209600 s</td>
+        </tr>
+        <tr>
+          <td>forty</td>
+          <td>Dimensionless</td>
+          <td>40</td>
+          <td>40</td>
+        </tr>
+        <tr>
+          <td>four</td>
+          <td>Dimensionless</td>
+          <td>4</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>fours</td>
+          <td>Dimensionless</td>
+          <td>4</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>fourteen</td>
+          <td>Dimensionless</td>
+          <td>14</td>
+          <td>14</td>
+        </tr>
+        <tr>
+          <td>fourteens</td>
+          <td>Dimensionless</td>
+          <td>14</td>
+          <td>14</td>
+        </tr>
+        <tr>
+          <td>fourth</td>
+          <td>Dimensionless</td>
+          <td>0.25</td>
+          <td>0.25</td>
+        </tr>
+        <tr>
+          <td>fourths</td>
+          <td>Dimensionless</td>
+          <td>0.25</td>
+          <td>0.25</td>
+        </tr>
+        <tr>
+          <td>fps</td>
+          <td>Speed</td>
+          <td>ft/s</td>
+          <td>0.3048 m s^-1</td>
+        </tr>
+        <tr>
+          <td>ft</td>
+          <td>Distance</td>
+          <td>.3048 m</td>
+          <td>0.3048 m</td>
+        </tr>
+        <tr>
+          <td>ft-lb</td>
+          <td>Torque</td>
+          <td>foot pound-force</td>
+          <td>1355.8179483314 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>ftlb</td>
+          <td>Torque</td>
+          <td>foot pound-force</td>
+          <td>1355.8179483314 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>furlong</td>
+          <td>Distance</td>
+          <td>40 rods</td>
+          <td>201.168 m</td>
+        </tr>
+        <tr>
+          <td>furlongs</td>
+          <td>Distance</td>
+          <td>40 rods</td>
+          <td>201.168 m</td>
+        </tr>
+        <tr>
+          <td>g</td>
+          <td>unknown</td>
+          <td>6.6720e-11  m^3 / kg s^2</td>
+          <td>6.672e-14 m^3 gm^-1 s^-2</td>
+        </tr>
+        <tr>
+          <td>g0</td>
+          <td>Acceleration</td>
+          <td>9.80665 m/s^2</td>
+          <td>9.80665 m s^-2</td>
+        </tr>
+        <tr>
+          <td>gal</td>
+          <td>Volume</td>
+          <td>3.785411784 liter</td>
+          <td>0.003785411784 m^3</td>
+        </tr>
+        <tr>
+          <td>gallon</td>
+          <td>Volume</td>
+          <td>3.785411784 liter</td>
+          <td>0.003785411784 m^3</td>
+        </tr>
+        <tr>
+          <td>gallons</td>
+          <td>Volume</td>
+          <td>3.785411784 liter</td>
+          <td>0.003785411784 m^3</td>
+        </tr>
+        <tr>
+          <td>gauss</td>
+          <td>Magnetic_field</td>
+          <td>1e-4 tesla</td>
+          <td>0.1 gm s^-2 amp^-1</td>
+        </tr>
+        <tr>
+          <td>gev</td>
+          <td>Energy</td>
+          <td>giga electron-volt</td>
+          <td>1.60217733e-07 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>gibi</td>
+          <td>prefix</td>
+          <td>1073741824</td>
+          <td>1073741824</td>
+        </tr>
+        <tr>
+          <td>giga</td>
+          <td>prefix</td>
+          <td>1000000000</td>
+          <td>1000000000</td>
+        </tr>
+        <tr>
+          <td>gill</td>
+          <td>Volume</td>
+          <td>4 fluid-ounces</td>
+          <td>0.00011829411825 m^3</td>
+        </tr>
+        <tr>
+          <td>gills</td>
+          <td>Volume</td>
+          <td>4 fluid-ounces</td>
+          <td>0.00011829411825 m^3</td>
+        </tr>
+        <tr>
+          <td>gm</td>
+          <td>Mass</td>
+          <td>gram</td>
+          <td>gm</td>
+        </tr>
+        <tr>
+          <td>grain</td>
+          <td>Mass</td>
+          <td>.0648 gm</td>
+          <td>0.0648 gm</td>
+        </tr>
+        <tr>
+          <td>grains</td>
+          <td>Mass</td>
+          <td>.0648 gm</td>
+          <td>0.0648 gm</td>
+        </tr>
+        <tr>
+          <td>gram</td>
+          <td>Mass</td>
+          <td>gram</td>
+          <td>gm</td>
+        </tr>
+        <tr>
+          <td>gram-force</td>
+          <td>Force</td>
+          <td>gm g0</td>
+          <td>9.80665 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>gram-weight</td>
+          <td>Force</td>
+          <td>gm g0</td>
+          <td>9.80665 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>grams</td>
+          <td>Mass</td>
+          <td>gram</td>
+          <td>gm</td>
+        </tr>
+        <tr>
+          <td>gravitational-constant</td>
+          <td>unknown</td>
+          <td>6.6720e-11  m^3 / kg s^2</td>
+          <td>6.672e-14 m^3 gm^-1 s^-2</td>
+        </tr>
+        <tr>
+          <td>gray</td>
+          <td>Dose</td>
+          <td>joule / kg</td>
+          <td>m^2 s^-2</td>
+        </tr>
+        <tr>
+          <td>gross</td>
+          <td>Dimensionless</td>
+          <td>144</td>
+          <td>144</td>
+        </tr>
+        <tr>
+          <td>gy</td>
+          <td>Dose</td>
+          <td>joule / kg</td>
+          <td>m^2 s^-2</td>
+        </tr>
+        <tr>
+          <td>h</td>
+          <td>Power</td>
+          <td>6.626196e-34 j/s</td>
+          <td>6.626196e-31 m^2 gm s^-3</td>
+        </tr>
+        <tr>
+          <td>half</td>
+          <td>Dimensionless</td>
+          <td>0.5</td>
+          <td>0.5</td>
+        </tr>
+        <tr>
+          <td>halves</td>
+          <td>Dimensionless</td>
+          <td>0.5</td>
+          <td>0.5</td>
+        </tr>
+        <tr>
+          <td>hectare</td>
+          <td>Area</td>
+          <td>100 ares</td>
+          <td>10000 m^2</td>
+        </tr>
+        <tr>
+          <td>hectares</td>
+          <td>Area</td>
+          <td>100 ares</td>
+          <td>10000 m^2</td>
+        </tr>
+        <tr>
+          <td>hecto</td>
+          <td>prefix</td>
+          <td>100</td>
+          <td>100</td>
+        </tr>
+        <tr>
+          <td>henry</td>
+          <td>Inductance</td>
+          <td>kg m^2 / amp^2 s^2</td>
+          <td>1000 m^2 gm s^-2 amp^-2</td>
+        </tr>
+        <tr>
+          <td>henrys</td>
+          <td>Inductance</td>
+          <td>kg m^2 / amp^2 s^2</td>
+          <td>1000 m^2 gm s^-2 amp^-2</td>
+        </tr>
+        <tr>
+          <td>hertz</td>
+          <td>Frequency</td>
+          <td>1/sec</td>
+          <td>s^-1</td>
+        </tr>
+        <tr>
+          <td>hg</td>
+          <td>Mass</td>
+          <td>hectogram</td>
+          <td>100 gm</td>
+        </tr>
+        <tr>
+          <td>horsepower</td>
+          <td>Power</td>
+          <td>550 foot pound-force / s</td>
+          <td>745699.87158227 m^2 gm s^-3</td>
+        </tr>
+        <tr>
+          <td>hour</td>
+          <td>Time</td>
+          <td>60 min</td>
+          <td>3600 s</td>
+        </tr>
+        <tr>
+          <td>hours</td>
+          <td>Time</td>
+          <td>60 min</td>
+          <td>3600 s</td>
+        </tr>
+        <tr>
+          <td>hp</td>
+          <td>Power</td>
+          <td>550 foot pound-force / s</td>
+          <td>745699.87158227 m^2 gm s^-3</td>
+        </tr>
+        <tr>
+          <td>hr</td>
+          <td>Time</td>
+          <td>60 min</td>
+          <td>3600 s</td>
+        </tr>
+        <tr>
+          <td>hrs</td>
+          <td>Time</td>
+          <td>60 min</td>
+          <td>3600 s</td>
+        </tr>
+        <tr>
+          <td>hundred</td>
+          <td>Dimensionless</td>
+          <td>100</td>
+          <td>100</td>
+        </tr>
+        <tr>
+          <td>hundreds</td>
+          <td>Dimensionless</td>
+          <td>100</td>
+          <td>100</td>
+        </tr>
+        <tr>
+          <td>hundredth</td>
+          <td>Dimensionless</td>
+          <td>0.01</td>
+          <td>0.01</td>
+        </tr>
+        <tr>
+          <td>hundredweight</td>
+          <td>Mass</td>
+          <td>100 lbms</td>
+          <td>45359.237 gm</td>
+        </tr>
+        <tr>
+          <td>hundredweights</td>
+          <td>Mass</td>
+          <td>100 lbms</td>
+          <td>45359.237 gm</td>
+        </tr>
+        <tr>
+          <td>hz</td>
+          <td>Frequency</td>
+          <td>1/sec</td>
+          <td>s^-1</td>
+        </tr>
+        <tr>
+          <td>in</td>
+          <td>Distance</td>
+          <td>ft/12</td>
+          <td>0.0254 m</td>
+        </tr>
+        <tr>
+          <td>inch</td>
+          <td>Distance</td>
+          <td>ft/12</td>
+          <td>0.0254 m</td>
+        </tr>
+        <tr>
+          <td>inches</td>
+          <td>Distance</td>
+          <td>ft/12</td>
+          <td>0.0254 m</td>
+        </tr>
+        <tr>
+          <td>j</td>
+          <td>Energy</td>
+          <td>kg m^2 / s^2</td>
+          <td>1000 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>j-point</td>
+          <td>Mass</td>
+          <td>2 carats</td>
+          <td>0.4 gm</td>
+        </tr>
+        <tr>
+          <td>joule</td>
+          <td>Energy</td>
+          <td>kg m^2 / s^2</td>
+          <td>1000 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>joules</td>
+          <td>Energy</td>
+          <td>kg m^2 / s^2</td>
+          <td>1000 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>jupiter-day</td>
+          <td>Time</td>
+          <td>0.414 earth-days</td>
+          <td>35769.6 s</td>
+        </tr>
+        <tr>
+          <td>jupiter-days</td>
+          <td>Time</td>
+          <td>0.414 earth-days</td>
+          <td>35769.6 s</td>
+        </tr>
+        <tr>
+          <td>jupiter-gravity</td>
+          <td>Acceleration</td>
+          <td>2.36 earth-gravity</td>
+          <td>23.143694 m s^-2</td>
+        </tr>
+        <tr>
+          <td>jupiter-to-sun</td>
+          <td>Distance</td>
+          <td>5.2 au</td>
+          <td>777908927640 m</td>
+        </tr>
+        <tr>
+          <td>k</td>
+          <td>Temperature</td>
+          <td>kelvin</td>
+          <td>k</td>
+        </tr>
+        <tr>
+          <td>karat</td>
+          <td>Mass</td>
+          <td>200 milligrams</td>
+          <td>0.2 gm</td>
+        </tr>
+        <tr>
+          <td>karats</td>
+          <td>Mass</td>
+          <td>200 milligrams</td>
+          <td>0.2 gm</td>
+        </tr>
+        <tr>
+          <td>kcal</td>
+          <td>Energy</td>
+          <td>kilocalorie</td>
+          <td>4184000 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>kelvin</td>
+          <td>Temperature</td>
+          <td>kelvin</td>
+          <td>k</td>
+        </tr>
+        <tr>
+          <td>kelvins</td>
+          <td>Temperature</td>
+          <td>kelvin</td>
+          <td>k</td>
+        </tr>
+        <tr>
+          <td>kg</td>
+          <td>Mass</td>
+          <td>kilogram</td>
+          <td>1000 gm</td>
+        </tr>
+        <tr>
+          <td>kgf</td>
+          <td>Force</td>
+          <td>kilo gram-force</td>
+          <td>9806.65 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>kibi</td>
+          <td>prefix</td>
+          <td>1024</td>
+          <td>1024</td>
+        </tr>
+        <tr>
+          <td>kilo</td>
+          <td>prefix</td>
+          <td>1000</td>
+          <td>1000</td>
+        </tr>
+        <tr>
+          <td>kilohm</td>
+          <td>Resistance</td>
+          <td>kilo ohm</td>
+          <td>1000000 m^2 gm s^-3 amp^-2</td>
+        </tr>
+        <tr>
+          <td>kilohms</td>
+          <td>Resistance</td>
+          <td>kilo ohm</td>
+          <td>1000000 m^2 gm s^-3 amp^-2</td>
+        </tr>
+        <tr>
+          <td>km</td>
+          <td>Distance</td>
+          <td>kilometer</td>
+          <td>1000 m</td>
+        </tr>
+        <tr>
+          <td>knot</td>
+          <td>Speed</td>
+          <td>nm/hr</td>
+          <td>2.77777777777778e-13 m s^-1</td>
+        </tr>
+        <tr>
+          <td>knots</td>
+          <td>Speed</td>
+          <td>nm/hr</td>
+          <td>2.77777777777778e-13 m s^-1</td>
+        </tr>
+        <tr>
+          <td>kph</td>
+          <td>Speed</td>
+          <td>km/hr</td>
+          <td>0.277777777777778 m s^-1</td>
+        </tr>
+        <tr>
+          <td>kps</td>
+          <td>Speed</td>
+          <td>km/s</td>
+          <td>1000 m s^-1</td>
+        </tr>
+        <tr>
+          <td>kwh</td>
+          <td>Energy</td>
+          <td>kilowatt hour</td>
+          <td>3600000000 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>l</td>
+          <td>Volume</td>
+          <td>m^3/1000</td>
+          <td>0.001 m^3</td>
+        </tr>
+        <tr>
+          <td>lb</td>
+          <td>Force</td>
+          <td>slug foot / s^2</td>
+          <td>4448.2216152605 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>lbf</td>
+          <td>Force</td>
+          <td>slug foot / s^2</td>
+          <td>4448.2216152605 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>lbm</td>
+          <td>Mass</td>
+          <td>0.45359237 kg</td>
+          <td>453.59237 gm</td>
+        </tr>
+        <tr>
+          <td>lbms</td>
+          <td>Mass</td>
+          <td>0.45359237 kg</td>
+          <td>453.59237 gm</td>
+        </tr>
+        <tr>
+          <td>lbs</td>
+          <td>Force</td>
+          <td>slug foot / s^2</td>
+          <td>4448.2216152605 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>light-year</td>
+          <td>Distance</td>
+          <td>9.46e15 m</td>
+          <td>9460000000000000 m</td>
+        </tr>
+        <tr>
+          <td>light-years</td>
+          <td>Distance</td>
+          <td>9.46e15 m</td>
+          <td>9460000000000000 m</td>
+        </tr>
+        <tr>
+          <td>lightyear</td>
+          <td>Distance</td>
+          <td>9.46e15 m</td>
+          <td>9460000000000000 m</td>
+        </tr>
+        <tr>
+          <td>lightyears</td>
+          <td>Distance</td>
+          <td>9.46e15 m</td>
+          <td>9460000000000000 m</td>
+        </tr>
+        <tr>
+          <td>liter</td>
+          <td>Volume</td>
+          <td>m^3/1000</td>
+          <td>0.001 m^3</td>
+        </tr>
+        <tr>
+          <td>liters</td>
+          <td>Volume</td>
+          <td>m^3/1000</td>
+          <td>0.001 m^3</td>
+        </tr>
+        <tr>
+          <td>long-ton</td>
+          <td>Mass</td>
+          <td>2240 lbms</td>
+          <td>1016046.9088 gm</td>
+        </tr>
+        <tr>
+          <td>long-tons</td>
+          <td>Mass</td>
+          <td>2240 lbms</td>
+          <td>1016046.9088 gm</td>
+        </tr>
+        <tr>
+          <td>ly</td>
+          <td>Distance</td>
+          <td>9.46e15 m</td>
+          <td>9460000000000000 m</td>
+        </tr>
+        <tr>
+          <td>m</td>
+          <td>Distance</td>
+          <td>meter</td>
+          <td>m</td>
+        </tr>
+        <tr>
+          <td>ma</td>
+          <td>Current</td>
+          <td>milliamp</td>
+          <td>0.001 amp</td>
+        </tr>
+        <tr>
+          <td>mars-day</td>
+          <td>Time</td>
+          <td>1.03 earth-days</td>
+          <td>88992 s</td>
+        </tr>
+        <tr>
+          <td>mars-days</td>
+          <td>Time</td>
+          <td>1.03 earth-days</td>
+          <td>88992 s</td>
+        </tr>
+        <tr>
+          <td>mars-gravity</td>
+          <td>Acceleration</td>
+          <td>0.377 earth-gravity</td>
+          <td>3.69710705 m s^-2</td>
+        </tr>
+        <tr>
+          <td>mars-to-sun</td>
+          <td>Distance</td>
+          <td>1.52 au</td>
+          <td>227388763464 m</td>
+        </tr>
+        <tr>
+          <td>maxwell</td>
+          <td>Magnetic_flux</td>
+          <td>1e-8 weber</td>
+          <td>1e-05 m^2 gm s^-2 amp^-1</td>
+        </tr>
+        <tr>
+          <td>maxwells</td>
+          <td>Magnetic_flux</td>
+          <td>1e-8 weber</td>
+          <td>1e-05 m^2 gm s^-2 amp^-1</td>
+        </tr>
+        <tr>
+          <td>mebi</td>
+          <td>prefix</td>
+          <td>1048576</td>
+          <td>1048576</td>
+        </tr>
+        <tr>
+          <td>mega</td>
+          <td>prefix</td>
+          <td>1000000</td>
+          <td>1000000</td>
+        </tr>
+        <tr>
+          <td>megohm</td>
+          <td>Resistance</td>
+          <td>mega ohm</td>
+          <td>1000000000 m^2 gm s^-3 amp^-2</td>
+        </tr>
+        <tr>
+          <td>megohms</td>
+          <td>Resistance</td>
+          <td>mega ohm</td>
+          <td>1000000000 m^2 gm s^-3 amp^-2</td>
+        </tr>
+        <tr>
+          <td>mercury-day</td>
+          <td>Time</td>
+          <td>175.9 earth-days</td>
+          <td>15197760 s</td>
+        </tr>
+        <tr>
+          <td>mercury-days</td>
+          <td>Time</td>
+          <td>175.9 earth-days</td>
+          <td>15197760 s</td>
+        </tr>
+        <tr>
+          <td>mercury-gravity</td>
+          <td>Acceleration</td>
+          <td>0.378 earth-gravity</td>
+          <td>3.7069137 m s^-2</td>
+        </tr>
+        <tr>
+          <td>mercury-to-sun</td>
+          <td>Distance</td>
+          <td>0.387 au</td>
+          <td>57894375960.9 m</td>
+        </tr>
+        <tr>
+          <td>meter</td>
+          <td>Distance</td>
+          <td>meter</td>
+          <td>m</td>
+        </tr>
+        <tr>
+          <td>meters</td>
+          <td>Distance</td>
+          <td>meter</td>
+          <td>m</td>
+        </tr>
+        <tr>
+          <td>metre</td>
+          <td>Distance</td>
+          <td>meter</td>
+          <td>m</td>
+        </tr>
+        <tr>
+          <td>metres</td>
+          <td>Distance</td>
+          <td>meter</td>
+          <td>m</td>
+        </tr>
+        <tr>
+          <td>metric-ton</td>
+          <td>Mass</td>
+          <td>1000 kg</td>
+          <td>1000000 gm</td>
+        </tr>
+        <tr>
+          <td>metric-tons</td>
+          <td>Mass</td>
+          <td>1000 kg</td>
+          <td>1000000 gm</td>
+        </tr>
+        <tr>
+          <td>mev</td>
+          <td>Energy</td>
+          <td>mega electron-volt</td>
+          <td>1.60217733e-10 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>mg</td>
+          <td>Mass</td>
+          <td>milligram</td>
+          <td>0.001 gm</td>
+        </tr>
+        <tr>
+          <td>mh</td>
+          <td>Inductance</td>
+          <td>millihenry</td>
+          <td>m^2 gm s^-2 amp^-2</td>
+        </tr>
+        <tr>
+          <td>mho</td>
+          <td>Conductance</td>
+          <td>1/ohm</td>
+          <td>0.001 m^-2 gm^-1 s^3 amp^2</td>
+        </tr>
+        <tr>
+          <td>mhos</td>
+          <td>Conductance</td>
+          <td>1/ohm</td>
+          <td>0.001 m^-2 gm^-1 s^3 amp^2</td>
+        </tr>
+        <tr>
+          <td>mi</td>
+          <td>Distance</td>
+          <td>5280 ft</td>
+          <td>1609.344 m</td>
+        </tr>
+        <tr>
+          <td>micro</td>
+          <td>prefix</td>
+          <td>1e-06</td>
+          <td>1e-06</td>
+        </tr>
+        <tr>
+          <td>micron</td>
+          <td>Distance</td>
+          <td>1e-6 m</td>
+          <td>1e-06 m</td>
+        </tr>
+        <tr>
+          <td>microns</td>
+          <td>Distance</td>
+          <td>1e-6 m</td>
+          <td>1e-06 m</td>
+        </tr>
+        <tr>
+          <td>mil</td>
+          <td>Distance</td>
+          <td>in/1000</td>
+          <td>2.54e-05 m</td>
+        </tr>
+        <tr>
+          <td>mile</td>
+          <td>Distance</td>
+          <td>5280 ft</td>
+          <td>1609.344 m</td>
+        </tr>
+        <tr>
+          <td>miles</td>
+          <td>Distance</td>
+          <td>5280 ft</td>
+          <td>1609.344 m</td>
+        </tr>
+        <tr>
+          <td>millenia</td>
+          <td>Time</td>
+          <td>1000 yr</td>
+          <td>31557600000 s</td>
+        </tr>
+        <tr>
+          <td>millenium</td>
+          <td>Time</td>
+          <td>1000 yr</td>
+          <td>31557600000 s</td>
+        </tr>
+        <tr>
+          <td>milli</td>
+          <td>prefix</td>
+          <td>0.001</td>
+          <td>0.001</td>
+        </tr>
+        <tr>
+          <td>million</td>
+          <td>Dimensionless</td>
+          <td>1e6</td>
+          <td>1000000</td>
+        </tr>
+        <tr>
+          <td>millions</td>
+          <td>Dimensionless</td>
+          <td>1e6</td>
+          <td>1000000</td>
+        </tr>
+        <tr>
+          <td>millionth</td>
+          <td>Dimensionless</td>
+          <td>1e-6</td>
+          <td>1e-06</td>
+        </tr>
+        <tr>
+          <td>mils</td>
+          <td>Distance</td>
+          <td>in/1000</td>
+          <td>2.54e-05 m</td>
+        </tr>
+        <tr>
+          <td>min</td>
+          <td>Time</td>
+          <td>60 s</td>
+          <td>60 s</td>
+        </tr>
+        <tr>
+          <td>minim</td>
+          <td>Volume</td>
+          <td>0.059194 cc</td>
+          <td>5.9194e-08 m^3</td>
+        </tr>
+        <tr>
+          <td>minims</td>
+          <td>Volume</td>
+          <td>0.059194 cc</td>
+          <td>5.9194e-08 m^3</td>
+        </tr>
+        <tr>
+          <td>mins</td>
+          <td>Time</td>
+          <td>60 s</td>
+          <td>60 s</td>
+        </tr>
+        <tr>
+          <td>minute</td>
+          <td>Time</td>
+          <td>60 s</td>
+          <td>60 s</td>
+        </tr>
+        <tr>
+          <td>minutes</td>
+          <td>Time</td>
+          <td>60 s</td>
+          <td>60 s</td>
+        </tr>
+        <tr>
+          <td>ml</td>
+          <td>Volume</td>
+          <td>cubic centimeter</td>
+          <td>1e-06 m^3</td>
+        </tr>
+        <tr>
+          <td>mm</td>
+          <td>Distance</td>
+          <td>millimeter</td>
+          <td>0.001 m</td>
+        </tr>
+        <tr>
+          <td>mol</td>
+          <td>Substance</td>
+          <td>mole</td>
+          <td>mol</td>
+        </tr>
+        <tr>
+          <td>mole</td>
+          <td>Substance</td>
+          <td>mole</td>
+          <td>mol</td>
+        </tr>
+        <tr>
+          <td>moles</td>
+          <td>Substance</td>
+          <td>mole</td>
+          <td>mol</td>
+        </tr>
+        <tr>
+          <td>mon</td>
+          <td>Time</td>
+          <td>year / 12</td>
+          <td>2629800 s</td>
+        </tr>
+        <tr>
+          <td>mons</td>
+          <td>Time</td>
+          <td>year / 12</td>
+          <td>2629800 s</td>
+        </tr>
+        <tr>
+          <td>month</td>
+          <td>Time</td>
+          <td>year / 12</td>
+          <td>2629800 s</td>
+        </tr>
+        <tr>
+          <td>months</td>
+          <td>Time</td>
+          <td>year / 12</td>
+          <td>2629800 s</td>
+        </tr>
+        <tr>
+          <td>moon-day</td>
+          <td>Time</td>
+          <td>29.5 earth-days</td>
+          <td>2548800 s</td>
+        </tr>
+        <tr>
+          <td>moon-days</td>
+          <td>Time</td>
+          <td>29.5 earth-days</td>
+          <td>2548800 s</td>
+        </tr>
+        <tr>
+          <td>moon-gravity</td>
+          <td>Acceleration</td>
+          <td>0.166 earth-gravity</td>
+          <td>1.6279039 m s^-2</td>
+        </tr>
+        <tr>
+          <td>moon-to-sun</td>
+          <td>Distance</td>
+          <td>1 au</td>
+          <td>149597870700 m</td>
+        </tr>
+        <tr>
+          <td>mph</td>
+          <td>Speed</td>
+          <td>mi/hr</td>
+          <td>0.44704 m s^-1</td>
+        </tr>
+        <tr>
+          <td>mps</td>
+          <td>Speed</td>
+          <td>meter/s</td>
+          <td>m s^-1</td>
+        </tr>
+        <tr>
+          <td>ms</td>
+          <td>Time</td>
+          <td>millisecond</td>
+          <td>0.001 s</td>
+        </tr>
+        <tr>
+          <td>msec</td>
+          <td>Time</td>
+          <td>millisecond</td>
+          <td>0.001 s</td>
+        </tr>
+        <tr>
+          <td>msecs</td>
+          <td>Time</td>
+          <td>millisecond</td>
+          <td>0.001 s</td>
+        </tr>
+        <tr>
+          <td>mv</td>
+          <td>Electric_potential</td>
+          <td>millivolt</td>
+          <td>m^2 gm s^-3 amp^-1</td>
+        </tr>
+        <tr>
+          <td>na</td>
+          <td>unknown</td>
+          <td>6.022169/mol</td>
+          <td>6.022169 mol^-1</td>
+        </tr>
+        <tr>
+          <td>nano</td>
+          <td>prefix</td>
+          <td>1e-09</td>
+          <td>1e-09</td>
+        </tr>
+        <tr>
+          <td>nautical-mile</td>
+          <td>Distance</td>
+          <td>1852 m</td>
+          <td>1852 m</td>
+        </tr>
+        <tr>
+          <td>nautical-miles</td>
+          <td>Distance</td>
+          <td>1852 m</td>
+          <td>1852 m</td>
+        </tr>
+        <tr>
+          <td>nauticalmile</td>
+          <td>Distance</td>
+          <td>1852 m</td>
+          <td>1852 m</td>
+        </tr>
+        <tr>
+          <td>nauticalmiles</td>
+          <td>Distance</td>
+          <td>1852 m</td>
+          <td>1852 m</td>
+        </tr>
+        <tr>
+          <td>neptune-day</td>
+          <td>Time</td>
+          <td>0.671 earth-days</td>
+          <td>57974.4 s</td>
+        </tr>
+        <tr>
+          <td>neptune-days</td>
+          <td>Time</td>
+          <td>0.671 earth-days</td>
+          <td>57974.4 s</td>
+        </tr>
+        <tr>
+          <td>neptune-gravity</td>
+          <td>Acceleration</td>
+          <td>1.12 earth-gravity</td>
+          <td>10.983448 m s^-2</td>
+        </tr>
+        <tr>
+          <td>neptune-to-sun</td>
+          <td>Distance</td>
+          <td>30.18 au</td>
+          <td>4514863737726 m</td>
+        </tr>
+        <tr>
+          <td>newton</td>
+          <td>Force</td>
+          <td>kg m / s^2</td>
+          <td>1000 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>newtons</td>
+          <td>Force</td>
+          <td>kg m / s^2</td>
+          <td>1000 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>nine</td>
+          <td>Dimensionless</td>
+          <td>9</td>
+          <td>9</td>
+        </tr>
+        <tr>
+          <td>nines</td>
+          <td>Dimensionless</td>
+          <td>9</td>
+          <td>9</td>
+        </tr>
+        <tr>
+          <td>nineteen</td>
+          <td>Dimensionless</td>
+          <td>19</td>
+          <td>19</td>
+        </tr>
+        <tr>
+          <td>nineteens</td>
+          <td>Dimensionless</td>
+          <td>19</td>
+          <td>19</td>
+        </tr>
+        <tr>
+          <td>nineties</td>
+          <td>Dimensionless</td>
+          <td>90</td>
+          <td>90</td>
+        </tr>
+        <tr>
+          <td>ninety</td>
+          <td>Dimensionless</td>
+          <td>90</td>
+          <td>90</td>
+        </tr>
+        <tr>
+          <td>nm</td>
+          <td>Distance</td>
+          <td>nanometer</td>
+          <td>1e-09 m</td>
+        </tr>
+        <tr>
+          <td>nmi</td>
+          <td>Distance</td>
+          <td>1852 m</td>
+          <td>1852 m</td>
+        </tr>
+        <tr>
+          <td>ns</td>
+          <td>Time</td>
+          <td>nanosecond</td>
+          <td>1e-09 s</td>
+        </tr>
+        <tr>
+          <td>nsec</td>
+          <td>Time</td>
+          <td>nanosecond</td>
+          <td>1e-09 s</td>
+        </tr>
+        <tr>
+          <td>nsecs</td>
+          <td>Time</td>
+          <td>nanosecond</td>
+          <td>1e-09 s</td>
+        </tr>
+        <tr>
+          <td>nt</td>
+          <td>Force</td>
+          <td>kg m / s^2</td>
+          <td>1000 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>ohm</td>
+          <td>Resistance</td>
+          <td>kg m^2 / amp^2 s^3</td>
+          <td>1000 m^2 gm s^-3 amp^-2</td>
+        </tr>
+        <tr>
+          <td>ohms</td>
+          <td>Resistance</td>
+          <td>kg m^2 / amp^2 s^3</td>
+          <td>1000 m^2 gm s^-3 amp^-2</td>
+        </tr>
+        <tr>
+          <td>one</td>
+          <td>Dimensionless</td>
+          <td>1</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>ones</td>
+          <td>Dimensionless</td>
+          <td>1</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>ounce</td>
+          <td>Mass</td>
+          <td>lbm/16</td>
+          <td>28.349523125 gm</td>
+        </tr>
+        <tr>
+          <td>ounce-force</td>
+          <td>Force</td>
+          <td>pound-force / 16</td>
+          <td>278.013850953781 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>ounce-troy</td>
+          <td>Mass</td>
+          <td>31.103 gm</td>
+          <td>31.103 gm</td>
+        </tr>
+        <tr>
+          <td>ounces</td>
+          <td>Mass</td>
+          <td>lbm/16</td>
+          <td>28.349523125 gm</td>
+        </tr>
+        <tr>
+          <td>ounces-troy</td>
+          <td>Mass</td>
+          <td>31.103 gm</td>
+          <td>31.103 gm</td>
+        </tr>
+        <tr>
+          <td>oz</td>
+          <td>Mass</td>
+          <td>lbm/16</td>
+          <td>28.349523125 gm</td>
+        </tr>
+        <tr>
+          <td>ozf</td>
+          <td>Force</td>
+          <td>pound-force / 16</td>
+          <td>278.013850953781 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>pa</td>
+          <td>Pressure</td>
+          <td>newton / m^2</td>
+          <td>1000 m^-1 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>parsec</td>
+          <td>Distance</td>
+          <td>3.083e16 m</td>
+          <td>30830000000000000 m</td>
+        </tr>
+        <tr>
+          <td>parsecs</td>
+          <td>Distance</td>
+          <td>3.083e16 m</td>
+          <td>30830000000000000 m</td>
+        </tr>
+        <tr>
+          <td>pascal</td>
+          <td>Pressure</td>
+          <td>newton / m^2</td>
+          <td>1000 m^-1 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>pebi</td>
+          <td>prefix</td>
+          <td>1.12589990684262e+15</td>
+          <td>1.12589990684262e+15</td>
+        </tr>
+        <tr>
+          <td>peck</td>
+          <td>Volume</td>
+          <td>8 quarts</td>
+          <td>0.007570823568 m^3</td>
+        </tr>
+        <tr>
+          <td>pecks</td>
+          <td>Volume</td>
+          <td>8 quarts</td>
+          <td>0.007570823568 m^3</td>
+        </tr>
+        <tr>
+          <td>pennyweight</td>
+          <td>Mass</td>
+          <td>1.555 gm</td>
+          <td>1.555 gm</td>
+        </tr>
+        <tr>
+          <td>pennyweights</td>
+          <td>Mass</td>
+          <td>1.555 gm</td>
+          <td>1.555 gm</td>
+        </tr>
+        <tr>
+          <td>percent</td>
+          <td>Dimensionless</td>
+          <td>0.01</td>
+          <td>0.01</td>
+        </tr>
+        <tr>
+          <td>perch</td>
+          <td>Distance</td>
+          <td>1 rod</td>
+          <td>5.0292 m</td>
+        </tr>
+        <tr>
+          <td>perches</td>
+          <td>Distance</td>
+          <td>1 rod</td>
+          <td>5.0292 m</td>
+        </tr>
+        <tr>
+          <td>peta</td>
+          <td>prefix</td>
+          <td>1e+15</td>
+          <td>1e+15</td>
+        </tr>
+        <tr>
+          <td>pf</td>
+          <td>Capacitance</td>
+          <td>picofarads</td>
+          <td>1e-15 m^-2 gm^-1 s^4 amp^2</td>
+        </tr>
+        <tr>
+          <td>pi</td>
+          <td>Dimensionless</td>
+          <td>3.1415926535897932385</td>
+          <td>3.14159265358979</td>
+        </tr>
+        <tr>
+          <td>pica</td>
+          <td>Distance</td>
+          <td>in/6</td>
+          <td>0.00423333333333333 m</td>
+        </tr>
+        <tr>
+          <td>pico</td>
+          <td>prefix</td>
+          <td>1e-12</td>
+          <td>1e-12</td>
+        </tr>
+        <tr>
+          <td>pint</td>
+          <td>Volume</td>
+          <td>quart/2</td>
+          <td>0.000473176473 m^3</td>
+        </tr>
+        <tr>
+          <td>pints</td>
+          <td>Volume</td>
+          <td>quart/2</td>
+          <td>0.000473176473 m^3</td>
+        </tr>
+        <tr>
+          <td>pluto-day</td>
+          <td>Time</td>
+          <td>6.39 earth-days</td>
+          <td>552096 s</td>
+        </tr>
+        <tr>
+          <td>pluto-days</td>
+          <td>Time</td>
+          <td>6.39 earth-days</td>
+          <td>552096 s</td>
+        </tr>
+        <tr>
+          <td>pluto-gravity</td>
+          <td>Acceleration</td>
+          <td>0.071 earth-gravity</td>
+          <td>0.69627215 m s^-2</td>
+        </tr>
+        <tr>
+          <td>pluto-to-sun</td>
+          <td>Distance</td>
+          <td>39.48 au</td>
+          <td>5906123935236 m</td>
+        </tr>
+        <tr>
+          <td>point</td>
+          <td>Distance</td>
+          <td>pica/12</td>
+          <td>0.000352777777777778 m</td>
+        </tr>
+        <tr>
+          <td>pole</td>
+          <td>Distance</td>
+          <td>1 rod</td>
+          <td>5.0292 m</td>
+        </tr>
+        <tr>
+          <td>poles</td>
+          <td>Distance</td>
+          <td>1 rod</td>
+          <td>5.0292 m</td>
+        </tr>
+        <tr>
+          <td>pound</td>
+          <td>Force</td>
+          <td>slug foot / s^2</td>
+          <td>4448.2216152605 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>pound-force</td>
+          <td>Force</td>
+          <td>slug foot / s^2</td>
+          <td>4448.2216152605 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>pound-mass</td>
+          <td>Mass</td>
+          <td>0.45359237 kg</td>
+          <td>453.59237 gm</td>
+        </tr>
+        <tr>
+          <td>pound-weight</td>
+          <td>Force</td>
+          <td>slug foot / s^2</td>
+          <td>4448.2216152605 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>pounds</td>
+          <td>Force</td>
+          <td>slug foot / s^2</td>
+          <td>4448.2216152605 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>pounds-force</td>
+          <td>Force</td>
+          <td>slug foot / s^2</td>
+          <td>4448.2216152605 m gm s^-2</td>
+        </tr>
+        <tr>
+          <td>pounds-mass</td>
+          <td>Mass</td>
+          <td>0.45359237 kg</td>
+          <td>453.59237 gm</td>
+        </tr>
+        <tr>
+          <td>ps</td>
+          <td>Time</td>
+          <td>picosecond</td>
+          <td>1e-12 s</td>
+        </tr>
+        <tr>
+          <td>psec</td>
+          <td>Time</td>
+          <td>picosecond</td>
+          <td>1e-12 s</td>
+        </tr>
+        <tr>
+          <td>psecs</td>
+          <td>Time</td>
+          <td>picosecond</td>
+          <td>1e-12 s</td>
+        </tr>
+        <tr>
+          <td>psi</td>
+          <td>Pressure</td>
+          <td>pounds per inch^2</td>
+          <td>6894757.29316836 m^-1 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>pt</td>
+          <td>Volume</td>
+          <td>quart/2</td>
+          <td>0.000473176473 m^3</td>
+        </tr>
+        <tr>
+          <td>qt</td>
+          <td>Volume</td>
+          <td>gallon/4</td>
+          <td>0.000946352946 m^3</td>
+        </tr>
+        <tr>
+          <td>quadrillion</td>
+          <td>Dimensionless</td>
+          <td>1e15</td>
+          <td>1000000000000000</td>
+        </tr>
+        <tr>
+          <td>quadrillions</td>
+          <td>Dimensionless</td>
+          <td>1e15</td>
+          <td>1000000000000000</td>
+        </tr>
+        <tr>
+          <td>quadrillionth</td>
+          <td>Dimensionless</td>
+          <td>1e-15</td>
+          <td>1e-15</td>
+        </tr>
+        <tr>
+          <td>quart</td>
+          <td>Volume</td>
+          <td>gallon/4</td>
+          <td>0.000946352946 m^3</td>
+        </tr>
+        <tr>
+          <td>quarts</td>
+          <td>Volume</td>
+          <td>gallon/4</td>
+          <td>0.000946352946 m^3</td>
+        </tr>
+        <tr>
+          <td>quintillion</td>
+          <td>Dimensionless</td>
+          <td>1e18</td>
+          <td>1000000000000000000</td>
+        </tr>
+        <tr>
+          <td>quintillions</td>
+          <td>Dimensionless</td>
+          <td>1e18</td>
+          <td>1000000000000000000</td>
+        </tr>
+        <tr>
+          <td>quintillionth</td>
+          <td>Dimensionless</td>
+          <td>1e-18</td>
+          <td>1e-18</td>
+        </tr>
+        <tr>
+          <td>rad</td>
+          <td>Dose</td>
+          <td>gray / 100</td>
+          <td>0.01 m^2 s^-2</td>
+        </tr>
+        <tr>
+          <td>radian</td>
+          <td>Dimensionless</td>
+          <td>1</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>radians</td>
+          <td>Dimensionless</td>
+          <td>1</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>re</td>
+          <td>Distance</td>
+          <td>6378388 m</td>
+          <td>6378388 m</td>
+        </tr>
+        <tr>
+          <td>rem</td>
+          <td>Dose</td>
+          <td>sievert / 100</td>
+          <td>0.01 m^2 s^-2</td>
+        </tr>
+        <tr>
+          <td>revolution</td>
+          <td>Dimensionless</td>
+          <td>1</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>revolutions</td>
+          <td>Dimensionless</td>
+          <td>1</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>rod</td>
+          <td>Distance</td>
+          <td>5.5 yards</td>
+          <td>5.0292 m</td>
+        </tr>
+        <tr>
+          <td>rods</td>
+          <td>Distance</td>
+          <td>5.5 yards</td>
+          <td>5.0292 m</td>
+        </tr>
+        <tr>
+          <td>rp</td>
+          <td>Distance</td>
+          <td>6356912 m</td>
+          <td>6356912 m</td>
+        </tr>
+        <tr>
+          <td>rpm</td>
+          <td>Frequency</td>
+          <td>revolutions per minute</td>
+          <td>0.0166666666666667 s^-1</td>
+        </tr>
+        <tr>
+          <td>s</td>
+          <td>Time</td>
+          <td>second</td>
+          <td>s</td>
+        </tr>
+        <tr>
+          <td>saturn-day</td>
+          <td>Time</td>
+          <td>0.444 earth-days</td>
+          <td>38361.6 s</td>
+        </tr>
+        <tr>
+          <td>saturn-days</td>
+          <td>Time</td>
+          <td>0.444 earth-days</td>
+          <td>38361.6 s</td>
+        </tr>
+        <tr>
+          <td>saturn-gravity</td>
+          <td>Acceleration</td>
+          <td>0.916 earth-gravity</td>
+          <td>8.9828914 m s^-2</td>
+        </tr>
+        <tr>
+          <td>saturn-to-sun</td>
+          <td>Distance</td>
+          <td>9.57 au</td>
+          <td>1431651622599 m</td>
+        </tr>
+        <tr>
+          <td>score</td>
+          <td>Time</td>
+          <td>20 yr</td>
+          <td>631152000 s</td>
+        </tr>
+        <tr>
+          <td>scores</td>
+          <td>Time</td>
+          <td>20 yr</td>
+          <td>631152000 s</td>
+        </tr>
+        <tr>
+          <td>scruple</td>
+          <td>Mass</td>
+          <td>1.296 gm</td>
+          <td>1.296 gm</td>
+        </tr>
+        <tr>
+          <td>scruples</td>
+          <td>Mass</td>
+          <td>1.296 gm</td>
+          <td>1.296 gm</td>
+        </tr>
+        <tr>
+          <td>sec</td>
+          <td>Time</td>
+          <td>second</td>
+          <td>s</td>
+        </tr>
+        <tr>
+          <td>second</td>
+          <td>Time</td>
+          <td>second</td>
+          <td>s</td>
+        </tr>
+        <tr>
+          <td>seconds</td>
+          <td>Time</td>
+          <td>second</td>
+          <td>s</td>
+        </tr>
+        <tr>
+          <td>secs</td>
+          <td>Time</td>
+          <td>second</td>
+          <td>s</td>
+        </tr>
+        <tr>
+          <td>semi</td>
+          <td>prefix</td>
+          <td>0.5</td>
+          <td>0.5</td>
+        </tr>
+        <tr>
+          <td>seven</td>
+          <td>Dimensionless</td>
+          <td>7</td>
+          <td>7</td>
+        </tr>
+        <tr>
+          <td>sevens</td>
+          <td>Dimensionless</td>
+          <td>7</td>
+          <td>7</td>
+        </tr>
+        <tr>
+          <td>seventeen</td>
+          <td>Dimensionless</td>
+          <td>17</td>
+          <td>17</td>
+        </tr>
+        <tr>
+          <td>seventeens</td>
+          <td>Dimensionless</td>
+          <td>17</td>
+          <td>17</td>
+        </tr>
+        <tr>
+          <td>seventies</td>
+          <td>Dimensionless</td>
+          <td>70</td>
+          <td>70</td>
+        </tr>
+        <tr>
+          <td>seventy</td>
+          <td>Dimensionless</td>
+          <td>70</td>
+          <td>70</td>
+        </tr>
+        <tr>
+          <td>short-ton</td>
+          <td>Mass</td>
+          <td>2000 lbms</td>
+          <td>907184.74 gm</td>
+        </tr>
+        <tr>
+          <td>short-tons</td>
+          <td>Mass</td>
+          <td>2000 lbms</td>
+          <td>907184.74 gm</td>
+        </tr>
+        <tr>
+          <td>siemens</td>
+          <td>Conductance</td>
+          <td>amp^2 s^3 / kg m^2</td>
+          <td>0.001 m^-2 gm^-1 s^3 amp^2</td>
+        </tr>
+        <tr>
+          <td>sievert</td>
+          <td>Dose</td>
+          <td>joule / kg</td>
+          <td>m^2 s^-2</td>
+        </tr>
+        <tr>
+          <td>six</td>
+          <td>Dimensionless</td>
+          <td>6</td>
+          <td>6</td>
+        </tr>
+        <tr>
+          <td>sixes</td>
+          <td>Dimensionless</td>
+          <td>6</td>
+          <td>6</td>
+        </tr>
+        <tr>
+          <td>sixteen</td>
+          <td>Dimensionless</td>
+          <td>16</td>
+          <td>16</td>
+        </tr>
+        <tr>
+          <td>sixteens</td>
+          <td>Dimensionless</td>
+          <td>16</td>
+          <td>16</td>
+        </tr>
+        <tr>
+          <td>sixties</td>
+          <td>Dimensionless</td>
+          <td>60</td>
+          <td>60</td>
+        </tr>
+        <tr>
+          <td>sixty</td>
+          <td>Dimensionless</td>
+          <td>60</td>
+          <td>60</td>
+        </tr>
+        <tr>
+          <td>slug</td>
+          <td>Mass</td>
+          <td>lbm g0 s^2/ft</td>
+          <td>14593.9029372064 gm</td>
+        </tr>
+        <tr>
+          <td>slugs</td>
+          <td>Mass</td>
+          <td>lbm g0 s^2/ft</td>
+          <td>14593.9029372064 gm</td>
+        </tr>
+        <tr>
+          <td>speed-of-light</td>
+          <td>Speed</td>
+          <td>2.99792458e8 m/sec</td>
+          <td>299792458 m s^-1</td>
+        </tr>
+        <tr>
+          <td>sr</td>
+          <td>Dimensionless</td>
+          <td>1</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>statamp</td>
+          <td>Current</td>
+          <td>3.336e-10 amps</td>
+          <td>3.336e-10 amp</td>
+        </tr>
+        <tr>
+          <td>statampere</td>
+          <td>Current</td>
+          <td>3.336e-10 amps</td>
+          <td>3.336e-10 amp</td>
+        </tr>
+        <tr>
+          <td>statamperes</td>
+          <td>Current</td>
+          <td>3.336e-10 amps</td>
+          <td>3.336e-10 amp</td>
+        </tr>
+        <tr>
+          <td>statamps</td>
+          <td>Current</td>
+          <td>3.336e-10 amps</td>
+          <td>3.336e-10 amp</td>
+        </tr>
+        <tr>
+          <td>statcoul</td>
+          <td>Charge</td>
+          <td>3.336e-10 coulomb</td>
+          <td>3.336e-10 s amp</td>
+        </tr>
+        <tr>
+          <td>statcoulomb</td>
+          <td>Charge</td>
+          <td>3.336e-10 coulomb</td>
+          <td>3.336e-10 s amp</td>
+        </tr>
+        <tr>
+          <td>statcoulombs</td>
+          <td>Charge</td>
+          <td>3.336e-10 coulomb</td>
+          <td>3.336e-10 s amp</td>
+        </tr>
+        <tr>
+          <td>statfarad</td>
+          <td>Capacitance</td>
+          <td>1.113e-12 farad</td>
+          <td>1.113e-15 m^-2 gm^-1 s^4 amp^2</td>
+        </tr>
+        <tr>
+          <td>statfarads</td>
+          <td>Capacitance</td>
+          <td>1.113e-12 farad</td>
+          <td>1.113e-15 m^-2 gm^-1 s^4 amp^2</td>
+        </tr>
+        <tr>
+          <td>stathenry</td>
+          <td>Inductance</td>
+          <td>8.987e11 henry</td>
+          <td>898700000000000 m^2 gm s^-2 amp^-2</td>
+        </tr>
+        <tr>
+          <td>stathenrys</td>
+          <td>Inductance</td>
+          <td>8.987e11 henry</td>
+          <td>898700000000000 m^2 gm s^-2 amp^-2</td>
+        </tr>
+        <tr>
+          <td>statohm</td>
+          <td>Resistance</td>
+          <td>8.987e11 ohm</td>
+          <td>898700000000000 m^2 gm s^-3 amp^-2</td>
+        </tr>
+        <tr>
+          <td>statohms</td>
+          <td>Resistance</td>
+          <td>8.987e11 ohm</td>
+          <td>898700000000000 m^2 gm s^-3 amp^-2</td>
+        </tr>
+        <tr>
+          <td>statvolt</td>
+          <td>Electric_potential</td>
+          <td>299.8 volt</td>
+          <td>299800 m^2 gm s^-3 amp^-1</td>
+        </tr>
+        <tr>
+          <td>statvolts</td>
+          <td>Electric_potential</td>
+          <td>299.8 volt</td>
+          <td>299800 m^2 gm s^-3 amp^-1</td>
+        </tr>
+        <tr>
+          <td>steradian</td>
+          <td>Dimensionless</td>
+          <td>1</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>steradians</td>
+          <td>Dimensionless</td>
+          <td>1</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>stone</td>
+          <td>Mass</td>
+          <td>14 lbm</td>
+          <td>6350.29318 gm</td>
+        </tr>
+        <tr>
+          <td>stones</td>
+          <td>Mass</td>
+          <td>14 lbm</td>
+          <td>6350.29318 gm</td>
+        </tr>
+        <tr>
+          <td>sv</td>
+          <td>Dose</td>
+          <td>joule / kg</td>
+          <td>m^2 s^-2</td>
+        </tr>
+        <tr>
+          <td>tablespoon</td>
+          <td>Volume</td>
+          <td>fluid-ounce / 2</td>
+          <td>1.478676478125e-05 m^3</td>
+        </tr>
+        <tr>
+          <td>tablespoons</td>
+          <td>Volume</td>
+          <td>fluid-ounce / 2</td>
+          <td>1.478676478125e-05 m^3</td>
+        </tr>
+        <tr>
+          <td>tbsp</td>
+          <td>Volume</td>
+          <td>fluid-ounce / 2</td>
+          <td>1.478676478125e-05 m^3</td>
+        </tr>
+        <tr>
+          <td>teaspoon</td>
+          <td>Volume</td>
+          <td>tablespoon / 3</td>
+          <td>4.92892159375e-06 m^3</td>
+        </tr>
+        <tr>
+          <td>teaspoons</td>
+          <td>Volume</td>
+          <td>tablespoon / 3</td>
+          <td>4.92892159375e-06 m^3</td>
+        </tr>
+        <tr>
+          <td>tebi</td>
+          <td>prefix</td>
+          <td>1099511627776</td>
+          <td>1099511627776</td>
+        </tr>
+        <tr>
+          <td>ten</td>
+          <td>Dimensionless</td>
+          <td>10</td>
+          <td>10</td>
+        </tr>
+        <tr>
+          <td>tens</td>
+          <td>Dimensionless</td>
+          <td>10</td>
+          <td>10</td>
+        </tr>
+        <tr>
+          <td>tenth</td>
+          <td>Dimensionless</td>
+          <td>0.1</td>
+          <td>0.1</td>
+        </tr>
+        <tr>
+          <td>tera</td>
+          <td>prefix</td>
+          <td>1000000000000</td>
+          <td>1000000000000</td>
+        </tr>
+        <tr>
+          <td>tesla</td>
+          <td>Magnetic_field</td>
+          <td>kg / amp sec^2</td>
+          <td>1000 gm s^-2 amp^-1</td>
+        </tr>
+        <tr>
+          <td>teslas</td>
+          <td>Magnetic_field</td>
+          <td>kg / amp sec^2</td>
+          <td>1000 gm s^-2 amp^-1</td>
+        </tr>
+        <tr>
+          <td>tev</td>
+          <td>Energy</td>
+          <td>tera electron-volt</td>
+          <td>0.000160217733 m^2 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>third</td>
+          <td>Dimensionless</td>
+          <td>1/3</td>
+          <td>0.333333333333333</td>
+        </tr>
+        <tr>
+          <td>thirds</td>
+          <td>Dimensionless</td>
+          <td>1/3</td>
+          <td>0.333333333333333</td>
+        </tr>
+        <tr>
+          <td>thirteen</td>
+          <td>Dimensionless</td>
+          <td>13</td>
+          <td>13</td>
+        </tr>
+        <tr>
+          <td>thirteens</td>
+          <td>Dimensionless</td>
+          <td>13</td>
+          <td>13</td>
+        </tr>
+        <tr>
+          <td>thirties</td>
+          <td>Dimensionless</td>
+          <td>30</td>
+          <td>30</td>
+        </tr>
+        <tr>
+          <td>thirty</td>
+          <td>Dimensionless</td>
+          <td>30</td>
+          <td>30</td>
+        </tr>
+        <tr>
+          <td>thousand</td>
+          <td>Dimensionless</td>
+          <td>1000</td>
+          <td>1000</td>
+        </tr>
+        <tr>
+          <td>thousands</td>
+          <td>Dimensionless</td>
+          <td>1000</td>
+          <td>1000</td>
+        </tr>
+        <tr>
+          <td>thousandth</td>
+          <td>Dimensionless</td>
+          <td>0.001</td>
+          <td>0.001</td>
+        </tr>
+        <tr>
+          <td>three</td>
+          <td>Dimensionless</td>
+          <td>3</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>threes</td>
+          <td>Dimensionless</td>
+          <td>3</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>ton</td>
+          <td>Mass</td>
+          <td>2000 lbms</td>
+          <td>907184.74 gm</td>
+        </tr>
+        <tr>
+          <td>tonne</td>
+          <td>Mass</td>
+          <td>1000 kg</td>
+          <td>1000000 gm</td>
+        </tr>
+        <tr>
+          <td>tonnes</td>
+          <td>Mass</td>
+          <td>1000 kg</td>
+          <td>1000000 gm</td>
+        </tr>
+        <tr>
+          <td>tons</td>
+          <td>Mass</td>
+          <td>2000 lbms</td>
+          <td>907184.74 gm</td>
+        </tr>
+        <tr>
+          <td>torr</td>
+          <td>Pressure</td>
+          <td>(101325 / 760) pascal</td>
+          <td>133322.368421053 m^-1 gm s^-2</td>
+        </tr>
+        <tr>
+          <td>trillion</td>
+          <td>Dimensionless</td>
+          <td>1e12</td>
+          <td>1000000000000</td>
+        </tr>
+        <tr>
+          <td>trillions</td>
+          <td>Dimensionless</td>
+          <td>1e12</td>
+          <td>1000000000000</td>
+        </tr>
+        <tr>
+          <td>trillionth</td>
+          <td>Dimensionless</td>
+          <td>1e-12</td>
+          <td>1e-12</td>
+        </tr>
+        <tr>
+          <td>troy-ounce</td>
+          <td>Mass</td>
+          <td>31.103 gm</td>
+          <td>31.103 gm</td>
+        </tr>
+        <tr>
+          <td>troy-ounces</td>
+          <td>Mass</td>
+          <td>31.103 gm</td>
+          <td>31.103 gm</td>
+        </tr>
+        <tr>
+          <td>troy-pound</td>
+          <td>Mass</td>
+          <td>0.373 kg</td>
+          <td>373 gm</td>
+        </tr>
+        <tr>
+          <td>troy-pounds</td>
+          <td>Mass</td>
+          <td>0.373 kg</td>
+          <td>373 gm</td>
+        </tr>
+        <tr>
+          <td>tsp</td>
+          <td>Volume</td>
+          <td>tablespoon / 3</td>
+          <td>4.92892159375e-06 m^3</td>
+        </tr>
+        <tr>
+          <td>twelve</td>
+          <td>Dimensionless</td>
+          <td>12</td>
+          <td>12</td>
+        </tr>
+        <tr>
+          <td>twelves</td>
+          <td>Dimensionless</td>
+          <td>12</td>
+          <td>12</td>
+        </tr>
+        <tr>
+          <td>twenties</td>
+          <td>Dimensionless</td>
+          <td>20</td>
+          <td>20</td>
+        </tr>
+        <tr>
+          <td>twenty</td>
+          <td>Dimensionless</td>
+          <td>20</td>
+          <td>20</td>
+        </tr>
+        <tr>
+          <td>two</td>
+          <td>Dimensionless</td>
+          <td>2</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td>twos</td>
+          <td>Dimensionless</td>
+          <td>2</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td>u</td>
+          <td>Mass</td>
+          <td>1.6605402e-27 kg</td>
+          <td>1.6605402e-24 gm</td>
+        </tr>
+        <tr>
+          <td>ua</td>
+          <td>Current</td>
+          <td>microamp</td>
+          <td>1e-06 amp</td>
+        </tr>
+        <tr>
+          <td>uf</td>
+          <td>Capacitance</td>
+          <td>microfarad</td>
+          <td>1e-09 m^-2 gm^-1 s^4 amp^2</td>
+        </tr>
+        <tr>
+          <td>ug</td>
+          <td>Mass</td>
+          <td>microgram</td>
+          <td>1e-06 gm</td>
+        </tr>
+        <tr>
+          <td>uh</td>
+          <td>Inductance</td>
+          <td>microhenry</td>
+          <td>0.001 m^2 gm s^-2 amp^-2</td>
+        </tr>
+        <tr>
+          <td>um</td>
+          <td>Distance</td>
+          <td>1e-6 m</td>
+          <td>1e-06 m</td>
+        </tr>
+        <tr>
+          <td>unity</td>
+          <td>Dimensionless</td>
+          <td>1</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>uranus-day</td>
+          <td>Time</td>
+          <td>0.718 earth-days</td>
+          <td>62035.2 s</td>
+        </tr>
+        <tr>
+          <td>uranus-days</td>
+          <td>Time</td>
+          <td>0.718 earth-days</td>
+          <td>62035.2 s</td>
+        </tr>
+        <tr>
+          <td>uranus-gravity</td>
+          <td>Acceleration</td>
+          <td>0.889 earth-gravity</td>
+          <td>8.71811185 m s^-2</td>
+        </tr>
+        <tr>
+          <td>uranus-to-sun</td>
+          <td>Distance</td>
+          <td>19.17 au</td>
+          <td>2867791181319 m</td>
+        </tr>
+        <tr>
+          <td>us</td>
+          <td>Time</td>
+          <td>microsecond</td>
+          <td>1e-06 s</td>
+        </tr>
+        <tr>
+          <td>us-dollar</td>
+          <td>Money</td>
+          <td>us-dollar</td>
+          <td>$</td>
+        </tr>
+        <tr>
+          <td>us-dollars</td>
+          <td>Money</td>
+          <td>us-dollar</td>
+          <td>$</td>
+        </tr>
+        <tr>
+          <td>usec</td>
+          <td>Time</td>
+          <td>microsecond</td>
+          <td>1e-06 s</td>
+        </tr>
+        <tr>
+          <td>usecs</td>
+          <td>Time</td>
+          <td>microsecond</td>
+          <td>1e-06 s</td>
+        </tr>
+        <tr>
+          <td>uv</td>
+          <td>Electric_potential</td>
+          <td>microvolt</td>
+          <td>0.001 m^2 gm s^-3 amp^-1</td>
+        </tr>
+        <tr>
+          <td>v</td>
+          <td>Electric_potential</td>
+          <td>kg m^2 / amp s^3</td>
+          <td>1000 m^2 gm s^-3 amp^-1</td>
+        </tr>
+        <tr>
+          <td>venus-day</td>
+          <td>Time</td>
+          <td>116.8 earth-days</td>
+          <td>10091520 s</td>
+        </tr>
+        <tr>
+          <td>venus-days</td>
+          <td>Time</td>
+          <td>116.8 earth-days</td>
+          <td>10091520 s</td>
+        </tr>
+        <tr>
+          <td>venus-gravity</td>
+          <td>Acceleration</td>
+          <td>0.907 earth-gravity</td>
+          <td>8.89463155 m s^-2</td>
+        </tr>
+        <tr>
+          <td>venus-to-sun</td>
+          <td>Distance</td>
+          <td>0.723 au</td>
+          <td>108159260516.1 m</td>
+        </tr>
+        <tr>
+          <td>volt</td>
+          <td>Electric_potential</td>
+          <td>kg m^2 / amp s^3</td>
+          <td>1000 m^2 gm s^-3 amp^-1</td>
+        </tr>
+        <tr>
+          <td>volts</td>
+          <td>Electric_potential</td>
+          <td>kg m^2 / amp s^3</td>
+          <td>1000 m^2 gm s^-3 amp^-1</td>
+        </tr>
+        <tr>
+          <td>w</td>
+          <td>Power</td>
+          <td>kg m^2 / s^3</td>
+          <td>1000 m^2 gm s^-3</td>
+        </tr>
+        <tr>
+          <td>watt</td>
+          <td>Power</td>
+          <td>kg m^2 / s^3</td>
+          <td>1000 m^2 gm s^-3</td>
+        </tr>
+        <tr>
+          <td>watts</td>
+          <td>Power</td>
+          <td>kg m^2 / s^3</td>
+          <td>1000 m^2 gm s^-3</td>
+        </tr>
+        <tr>
+          <td>wb</td>
+          <td>Magnetic_flux</td>
+          <td>kg m^2 / amp s^2</td>
+          <td>1000 m^2 gm s^-2 amp^-1</td>
+        </tr>
+        <tr>
+          <td>weber</td>
+          <td>Magnetic_flux</td>
+          <td>kg m^2 / amp s^2</td>
+          <td>1000 m^2 gm s^-2 amp^-1</td>
+        </tr>
+        <tr>
+          <td>webers</td>
+          <td>Magnetic_flux</td>
+          <td>kg m^2 / amp s^2</td>
+          <td>1000 m^2 gm s^-2 amp^-1</td>
+        </tr>
+        <tr>
+          <td>week</td>
+          <td>Time</td>
+          <td>7 days</td>
+          <td>604800 s</td>
+        </tr>
+        <tr>
+          <td>weeks</td>
+          <td>Time</td>
+          <td>7 days</td>
+          <td>604800 s</td>
+        </tr>
+        <tr>
+          <td>wk</td>
+          <td>Time</td>
+          <td>7 days</td>
+          <td>604800 s</td>
+        </tr>
+        <tr>
+          <td>yard</td>
+          <td>Distance</td>
+          <td>3 ft</td>
+          <td>0.9144 m</td>
+        </tr>
+        <tr>
+          <td>yards</td>
+          <td>Distance</td>
+          <td>3 ft</td>
+          <td>0.9144 m</td>
+        </tr>
+        <tr>
+          <td>year</td>
+          <td>Time</td>
+          <td>365.25 days</td>
+          <td>31557600 s</td>
+        </tr>
+        <tr>
+          <td>years</td>
+          <td>Time</td>
+          <td>365.25 days</td>
+          <td>31557600 s</td>
+        </tr>
+        <tr>
+          <td>yocto</td>
+          <td>prefix</td>
+          <td>1e-24</td>
+          <td>1e-24</td>
+        </tr>
+        <tr>
+          <td>yotta</td>
+          <td>prefix</td>
+          <td>1e+24</td>
+          <td>1e+24</td>
+        </tr>
+        <tr>
+          <td>yr</td>
+          <td>Time</td>
+          <td>365.25 days</td>
+          <td>31557600 s</td>
+        </tr>
+        <tr>
+          <td>yrs</td>
+          <td>Time</td>
+          <td>365.25 days</td>
+          <td>31557600 s</td>
+        </tr>
+        <tr>
+          <td>zepto</td>
+          <td>prefix</td>
+          <td>1e-21</td>
+          <td>1e-21</td>
+        </tr>
+        <tr>
+          <td>zetta</td>
+          <td>prefix</td>
+          <td>1e+21</td>
+          <td>1e+21</td>
+        </tr>
+      </table>
+
+=end html
+
+=cut

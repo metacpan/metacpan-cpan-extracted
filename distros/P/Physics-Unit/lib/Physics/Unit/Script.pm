@@ -6,8 +6,7 @@ use warnings;
 use Physics::Unit ':ALL';
 use Physics::Unit::Script::GenPages;
 
-our $VERSION = '0.54';
-$VERSION = eval $VERSION;
+our $VERSION = '0.60';
 
 use base 'Exporter';
 our @EXPORT_OK = qw/run_script name_info/;

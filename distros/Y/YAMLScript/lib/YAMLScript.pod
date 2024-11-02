@@ -12,7 +12,6 @@ YAMLScript - Program in YAML — Code is Data
 
     defn main(name='world'):
       say: "Hello, $name!"
-
 =head2 DESCRIPTION
 
 YAMLScript is a functional programming language with a stylized YAML syntax.
@@ -66,7 +65,6 @@ Even though YAMLScript compiles to Clojure, and Clojure compiles to Java, there 
 To see the Clojure code that YAMLScript compiles to, you can use the YAMLScript command line utility, C<ys>, to run:
 
     $ ys --compile file.ys
-
 =head2 PERL USAGE
 
 File C<prog.pl>:
@@ -77,7 +75,6 @@ File C<prog.pl>:
     my $input = do { local $/; open my $fh, '<', 'file.ys'; <$fh> };
     my $data = $ys->load($input);
     print encode_json $data;
-
 File C<file.ys>:
 
     !yamlscript/v0
@@ -88,28 +85,23 @@ File C<file.ys>:
       foo: [1, 2, ! inc(41)]
       bar:: load("other.yaml")
       baz:: "Hello, $name!"
-
 File C<other.yaml>:
 
     oh: Hello
-
 Run:
 
     $ perl prog.pl
     {"foo":[1,2,42],"baz":"Hello, World!","bar":{"oh":"Hello"}}
-
 =head2 INSTALLATION
 
 You can install this module like any other Perl module:
 
     $ cpanm YAMLScript
-
 but you will need to have a system install of C<libyamlscript.so>.
 
 One simple way to do that is with:
 
     $ curl https://yamlscript.org/install | bash
-
 Note: The above command will install the latest version of the YAMLScript command line utility, C<ys>, and the shared library, C<libyamlscript.so>, into C<~/local/bin> and C<~/.local/lib> respectively.
 
 See L<https://github.com/yaml/yamlscript?#installing-yamlscript|https://github.com/yaml/yamlscript?#installing-yamlscript> for more info.

@@ -4,13 +4,13 @@
       "Christopher Maloney <voldrani@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
-      "perl_5"
+      "unrestricted"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Physics-Unit",
    "prereqs" : {
@@ -34,19 +34,19 @@
    "provides" : {
       "Physics::Unit" : {
          "file" : "lib/Physics/Unit.pm",
-         "version" : "0.54"
+         "version" : "0.60"
       },
       "Physics::Unit::Scalar" : {
          "file" : "lib/Physics/Unit/Scalar.pm",
-         "version" : "0.54"
+         "version" : "0.60"
       },
       "Physics::Unit::Script" : {
          "file" : "lib/Physics/Unit/Script.pm",
-         "version" : "0.54"
+         "version" : "0.60"
       },
       "Physics::Unit::Script::GenPages" : {
          "file" : "lib/Physics/Unit/Script/GenPages.pm",
-         "version" : "0.54"
+         "version" : "0.60"
       }
    },
    "release_status" : "stable",
@@ -54,13 +54,10 @@
       "bugtracker" : {
          "web" : "https://github.com/Klortho/Physics-Unit/issues"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "url" : "https://github.com/Klortho/Physics-Unit"
       }
    },
-   "version" : "0.54",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.60",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

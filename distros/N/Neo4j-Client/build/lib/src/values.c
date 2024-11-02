@@ -1555,6 +1555,14 @@ neo4j_value_t neo4j_elementid(const char *value)
     return v;
 }
 
+neo4j_value_t neo4j_string_to_elementid(neo4j_value_t value)
+{
+    REQUIRE(neo4j_type(value) == NEO4J_STRING, neo4j_null);
+    value._type = NEO4J_ELEMENTID;
+    value._vt_off = ELEMENTID_VT_OFF;
+    return value;
+}
+
 
 // struct
 

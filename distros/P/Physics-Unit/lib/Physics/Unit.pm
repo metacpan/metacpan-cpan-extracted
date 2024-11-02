@@ -12,7 +12,7 @@ use vars qw(
     $number_re
 );
 
-$VERSION = '0.54';
+$VERSION = '0.60';
 $VERSION = eval $VERSION;
 
 @EXPORT_OK = qw(
@@ -201,10 +201,22 @@ InitUnit (
 
     ['nautical-mile', 'nmi', 'nauticalmiles',
      'nauticalmile', 'nautical-miles',],        '1852 m',           # exact
-    ['astronomical-unit', 'au',],               '1.49598e11 m',
+    ['astronomical-unit', 'au', 'earth-to-sun'],   '149597870700 m',
     ['light-year', 'ly', 'light-years',
      'lightyear', 'lightyears'],                '9.46e15 m',
     ['parsec', 'parsecs',],                     '3.083e16 m',
+
+    # from https://nssdc.gsfc.nasa.gov/planetary/factsheet/planet_table_ratio.html
+    ['moon-to-sun'],                           '1 au',             # ???
+    ['mercury-to-sun'],                        '0.387 au',
+    ['venus-to-sun'],                          '0.723 au',
+    ['mars-to-sun'],                           '1.52 au',
+    ['jupiter-to-sun'],                        '5.2 au',
+    ['saturn-to-sun'],                         '9.57 au',
+    ['uranus-to-sun'],                         '19.17 au',
+    ['neptune-to-sun'],                        '30.18 au',
+    ['pluto-to-sun'],                          '39.48 au',
+
 
     # equatorial radius of the reference geoid:
     ['re'],                          '6378388 m',    # exact
@@ -213,6 +225,17 @@ InitUnit (
 
     # Acceleration
     ['g0', 'earth-gravity'],                    '9.80665 m/s^2',    # exact
+
+    # from https://nssdc.gsfc.nasa.gov/planetary/factsheet/planet_table_ratio.html
+    ['moon-gravity'],                           '0.166 earth-gravity',
+    ['mercury-gravity'],                        '0.378 earth-gravity',
+    ['venus-gravity'],                          '0.907 earth-gravity',
+    ['mars-gravity'],                           '0.377 earth-gravity',
+    ['jupiter-gravity'],                        '2.36 earth-gravity',
+    ['saturn-gravity'],                         '0.916 earth-gravity',
+    ['uranus-gravity'],                         '0.889 earth-gravity',
+    ['neptune-gravity'],                        '1.12 earth-gravity',
+    ['pluto-gravity'],                          '0.071 earth-gravity',
 
     # Mass
     ['kg',],                                    'kilogram',         # exact
@@ -255,7 +278,7 @@ InitUnit (
     # Time
     ['minute', 'min', 'mins', 'minutes'],               '60 s',
     ['hour', 'hr', 'hrs', 'hours'],                     '60 min',
-    ['day', 'days'],    '24 hr',
+    ['day', 'days', 'earth-day', 'earth-days'],         '24 hr',
     ['week', 'wk', 'weeks'],                            '7 days',
     ['fortnight', 'fortnights'],                        '2 week',
     ['year', 'yr', 'yrs', 'years'],                     '365.25 days',
@@ -268,6 +291,17 @@ InitUnit (
     ['us', 'usec', 'usecs'], 'microsecond',
     ['ns', 'nsec', 'nsecs'], 'nanosecond',
     ['ps', 'psec', 'psecs'], 'picosecond',
+
+    # from https://nssdc.gsfc.nasa.gov/planetary/factsheet/planet_table_ratio.html
+    ['moon-day', 'moon-days',],                         '29.5 earth-days',
+    ['mercury-day', 'mercury-days'],                    '175.9 earth-days',
+    ['venus-day', 'venus-days',],                       '116.8 earth-days',
+    ['mars-day', 'mars-days',],                         '1.03 earth-days',
+    ['jupiter-day', 'jupiter-days',],                   '0.414 earth-days',
+    ['saturn-day', 'saturn-days',],                     '0.444 earth-days',
+    ['uranus-day', 'uranus-days',],                     '0.718 earth-days',
+    ['neptune-day', 'neptune-days',],                   '0.671 earth-days',
+    ['pluto-day', 'pluto-days',],                       '6.39 earth-days',
 
     # Data
     ['byte', 'bytes'], '8 bits',
@@ -1251,7 +1285,7 @@ A prefix Unit is a special-case dimensionless Unit object that
 can be used in expressions attached to other Unit names with no
 intervening whitespace. For example, "kilogram" is a unit expression that uses the
 prefix B<kilo>.  For more details about the use of prefixes, see
-L</"Unit Expressions">, below.
+L</"UNIT EXPRESSIONS">, below.
 
 A base unit is one that defines a new base dimension. For example,
 the Unit B<meter> is a base unit; it defines the dimension for B<Distance>.
@@ -1814,14 +1848,23 @@ Here are some other modules that might fit your needs better than this one:
 
 Written by Chris Maloney <voldrani@gmail.com>
 
-Special thanks for major contributions and encouragement from Joel Berger.
-Thanks also to Ben Bullock, and initial help in formatting for distribution
-from Gene Boggs <cpan@ology.net>.
+=head CONTRIBUTORS
+
+=item * Joel Berger (jberger)
+
+=item * Ben Bullock
+
+=item * Gene Boggs <cpan@ology.net>.
+
+=item * Mohammad Anwar (manwar)
+
+=item * Matt Johnson (mjohnson108)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2002-2003 by Chris Maloney
+Copyright 2002-2024 by Chris Maloney and L</CONTRIBUTORS>
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This work is free. You can redistribute it and/or modify it under the
+terms of the Do What The Fuck You Want To Public License, Version 2,
+as published by Sam Hocevar. See http://www.wtfpl.net/ for more details.
 

@@ -1,3 +1,11 @@
+0.1.5  2024-11-01
+
+   - 'install' and 'remove' commands accept multiple package arguments
+   - Added '-a' and '-u' options for the 'query' command
+   - 'install' command only installs package if newer version is available
+   - Redirect git sync output to STDERR
+   - Documentation upgrades
+
 0.0.7  2024-10-28
 
    - Bug fix in the SlackBuild.

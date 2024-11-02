@@ -31,7 +31,7 @@ END_CODE
 my $build = $class->new(
   module_name => "Physics::Unit",
   dist_author => 'Christopher Maloney <voldrani@gmail.com>',
-  license => "perl",
+  license => "unrestricted",
   build_requires => {
     "Module::Build" => "0.3601",
     "Test::More" => 0
@@ -58,4 +58,3 @@ my $build = $class->new(
 );
 
 $build->create_build_script;
-

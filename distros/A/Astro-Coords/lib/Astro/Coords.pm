@@ -108,7 +108,7 @@ use Carp;
 use vars qw/ $DEBUG /;
 $DEBUG = 0;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Math::Trig qw/ acos /;
 use Astro::PAL ();
@@ -182,11 +182,11 @@ Fixed astronomical oordinate frames can be specified using:
 
   $c = new Astro::Coords( ra =>
                           dec =>
-			  long =>
-			  lat =>
-			  type =>
-			  units =>
-			);
+                          long =>
+                          lat =>
+                          type =>
+                          units =>
+                        );
 
 C<ra> and C<dec> are used for HMSDeg systems (eg type=J2000). Long and
 Lat are used for degdeg systems (eg where type=galactic). C<type> can
@@ -246,8 +246,8 @@ sub new {
        and defined $args{elements}{EPOCH})
        ||  (exists $args{elements}{EPOCHPERIH}
        and defined $args{elements}{EPOCHPERIH}))) ||
-	( ref($args{elements}) eq 'ARRAY' && # ->array() ref
-	  $args{elements}->[0] eq 'ELEMENTS')
+        ( ref($args{elements}) eq 'ARRAY' && # ->array() ref
+          $args{elements}->[0] eq 'ELEMENTS')
      ) {
 
       $obj = new Astro::Coords::Elements( %args );
@@ -697,7 +697,7 @@ sub radec {
   }
 
   return (new Astro::Coords::Angle::Hour( $rm, units => 'rad', range => '2PI'),
-	  new Astro::Coords::Angle( $dm, units => 'rad' ));
+          new Astro::Coords::Angle( $dm, units => 'rad' ));
 }
 
 =item B<ra>
@@ -850,7 +850,7 @@ sub glonglat {
   my ($ra,$dec) = $self->radec;
   my ($long, $lat) = Astro::PAL::palEqgal( $ra, $dec );
   return (new Astro::Coords::Angle($long, units => 'rad', range => '2PI'),
-	  new Astro::Coords::Angle($lat, units => 'rad'));
+          new Astro::Coords::Angle($lat, units => 'rad'));
 }
 
 =item B<sglonglat>
@@ -868,7 +868,7 @@ sub sglonglat {
   my ($glong, $glat) = $self->glonglat();
   my ($sglong, $sglat) = Astro::PAL::palGalsup( $glong, $glat );
   return (new Astro::Coords::Angle($sglong, units => 'rad', range => '2PI'),
-	  new Astro::Coords::Angle($sglat, units => 'rad'));
+          new Astro::Coords::Angle($sglat, units => 'rad'));
 }
 
 =item B<ecllonglat>
@@ -888,7 +888,7 @@ sub ecllonglat {
   my ($ra, $dec) = $self->radec;
   my ($long, $lat) = Astro::PAL::palEqecl( $ra, $dec, $self->_mjd_tt );
   return (new Astro::Coords::Angle($long, units => 'rad', range => '2PI'),
-	  new Astro::Coords::Angle($lat, units => 'rad'));
+          new Astro::Coords::Angle($lat, units => 'rad'));
 }
 
 =item B<radec2000>
@@ -916,7 +916,7 @@ sub radec2000 {
 
   # Create new time
   $self->datetime( DateTime->new( year => 2000, month => 1,
-				  day => 1, hour => 12) );
+                                  day => 1, hour => 12) );
 
   # Ask for the answer
   my ($ra, $dec) = $self->radec( 'J2000' );
@@ -955,7 +955,7 @@ sub radec1950 {
   # No E-terms or precession since we are going to B1950 epoch 1950
   my ($r1950, $d1950, $dr1950, $dd1950) = Astro::PAL::palFk54z($ra,$dec,1950.0);
   return (new Astro::Coords::Angle::Hour( $r1950, units => 'rad', range => '2PI'),
-	  new Astro::Coords::Angle( $d1950, units => 'rad' ));
+          new Astro::Coords::Angle( $d1950, units => 'rad' ));
 }
 
 =item B<pa>
@@ -1015,9 +1015,9 @@ sub isObservable {
       my $el = $self->el;
 
       if ($el > $limits{el}{min} and $el < $limits{el}{max}) {
-	return 1;
+        return 1;
       } else {
-	return 0;
+        return 0;
       }
 
     } elsif ($limits{type} eq 'HADEC') {
@@ -1026,16 +1026,16 @@ sub isObservable {
       my $ha = $self->ha( normalize => 1 );
 
       if ( $ha > $limits{ha}{min} and $ha < $limits{ha}{max}) {
-	my $dec= $self->dec_app;
+        my $dec= $self->dec_app;
 
-	if ($dec > $limits{dec}{min} and $dec < $limits{dec}{max}) {
-	  return 1;
-	} else {
-	  return 0;
-	}
+        if ($dec > $limits{dec}{min} and $dec < $limits{dec}{max}) {
+          return 1;
+        } else {
+          return 0;
+        }
 
       } else {
-	return 0;
+        return 0;
       }
 
     } else {
@@ -1098,7 +1098,7 @@ sub distance {
 
   if (wantarray) {
     return (new Astro::Coords::Angle($xi, units => 'rad'),
-	    new Astro::Coords::Angle($eta, units => 'rad'));
+            new Astro::Coords::Angle($eta, units => 'rad'));
   } else {
     my $dist = ($xi**2 + $eta**2)**0.5;
     return new Astro::Coords::Angle( $dist, units => 'rad' );
@@ -1144,7 +1144,7 @@ sub status {
 
     my $t_el = $self->transit_el(format=>'d');
     $string .= "Transit El:     " . (defined $t_el ? "$t_el deg"
-				     : "<undefined>") ."\n";
+                                     : "<undefined>") ."\n";
     my $ha_set = $self->ha_set( format => 'hour');
     $string .= "Hour Ang. (set):" . (defined $ha_set ? $ha_set : '??')." hrs\n";
 
@@ -1164,7 +1164,7 @@ sub status {
 
   if (defined $self->telescope) {
     my $name = (defined $self->telescope->fullname ?
-		$self->telescope->fullname : $self->telescope->name );
+                $self->telescope->fullname : $self->telescope->name );
     $string .= "Telescope:      $name\n";
     if ($self->isObservable) {
       $string .= "The target is currently observable\n";
@@ -1185,10 +1185,10 @@ sub status {
 Calculate target positions for a range of times.
 
   @data = $c->calculate( start => $start,
-			 end => $end,
-			 inc => $increment,
-		         units => 'deg'
-		       );
+                         end => $end,
+                         inc => $increment,
+                         units => 'deg'
+                       );
 
 The start and end times are either C<Time::Piece> or C<DateTime>
 objects and the increment is either a C<Time::Seconds> object, a
@@ -1237,7 +1237,7 @@ sub calculate {
   my $dateclass = blessed( $opt{start} );
   croak "Start time must be either Time::Piece or DateTime object"
     if (!$dateclass ||
-	($dateclass ne "Time::Piece" && $dateclass ne 'DateTime' ));
+        ($dateclass ne "Time::Piece" && $dateclass ne 'DateTime' ));
 
   my @data;
 
@@ -1423,7 +1423,7 @@ sub ha_set {
   my %opt = @_;
 
   my $horizon = (defined $opt{horizon} ? $opt{horizon} :
-		 $self->_default_horizon );
+                 $self->_default_horizon );
 
   # Get the telescope position
   my $tel = $self->telescope;
@@ -1478,7 +1478,7 @@ sub ha_set {
 
   # return the result (converting if necessary)
   return Astro::Coords::Angle::Hour->new( $ha0, units => 'rad',
-					  range => 'PI')->in_format($opt{format});
+                                          range => 'PI')->in_format($opt{format});
 
 }
 
@@ -1560,9 +1560,9 @@ sub meridian_time {
       my $next_diff = abs( $reftime->epoch - $next->epoch );
 
       if ($prev_diff < $next_diff) {
-	$mtime = $prev;
+        $mtime = $prev;
       } else {
-	$mtime = $next;
+        $mtime = $next;
       }
 
     } elsif (defined $prev) {
@@ -1644,9 +1644,9 @@ sub _calc_mtime {
       # Need to keep jumping forward until we lock on to a meridian
       # time that ismore recent than the ref time
       if ($dtime) {
-	$mtime->add( hours => ($count * $inc));
+        $mtime->add( hours => ($count * $inc));
       } else {
-	$mtime = $mtime + ($count * $inc * Time::Seconds::ONE_HOUR);
+        $mtime = $mtime + ($count * $inc * Time::Seconds::ONE_HOUR);
       }
     }
 
@@ -2323,8 +2323,8 @@ sub _lst {
   # Return the first arg
   # Note that we guarantee a UT time representation
   my $lst = (Astro::PAL::ut2lst( $time->year, $time->mon,
-				 $time->mday, $time->hour,
-				 $time->min, $sec, $long))[0];
+                                 $time->mday, $time->hour,
+                                 $time->min, $sec, $long))[0];
 
   my $lstobject = new Astro::Coords::Angle::Hour( $lst, units => 'rad', range => '2PI');
 
@@ -2488,7 +2488,7 @@ sub _rise_set_time {
 
   # Need the requested horizon
   my $refel = (defined $opt{horizon} ? $opt{horizon} :
-		 $self->_default_horizon );
+                 $self->_default_horizon );
 
   # somewhere to store the times
   my @event;
@@ -2774,66 +2774,66 @@ sub _iterative_el {
     while (abs($el-$refel) > $tol) {
       if (defined $prevel) {
 
-	# should check sign of gradient to make sure we are not
-	# running away to an incorrect gradient. Note that this function
-	# can be highly curved if we are near ante transit.
+        # should check sign of gradient to make sure we are not
+        # running away to an incorrect gradient. Note that this function
+        # can be highly curved if we are near ante transit.
 
-	# There are two constraints that have to be used to control
-	# the convergence
-	#  - make sure we are not diverging with each iteration
-	#  - make sure we are not bouncing around missing the final
-	#    value due to inaccuracies in the time resolution (this is
-	#    important for fast moving objects like the sun). Currently
-	#    we are not really doing anything useful by tweaking by less
-	#    than a second
+        # There are two constraints that have to be used to control
+        # the convergence
+        #  - make sure we are not diverging with each iteration
+        #  - make sure we are not bouncing around missing the final
+        #    value due to inaccuracies in the time resolution (this is
+        #    important for fast moving objects like the sun). Currently
+        #    we are not really doing anything useful by tweaking by less
+        #    than a second
 
-	# The problem is that we can not stop on bracketing the correct
-	# value if we are never going to reach the value itself because
-	# it never rises or never sets
+        # The problem is that we can not stop on bracketing the correct
+        # value if we are never going to reach the value itself because
+        # it never rises or never sets
 
-	#          \   /
-	#           \ /
-	#            -   <--  minimum elevation
-	#                <--  required elevation
+        #          \   /
+        #           \ /
+        #            -   <--  minimum elevation
+        #                <--  required elevation
 
-	# in the above case each step will diverge but will never
-	# straddle
+        # in the above case each step will diverge but will never
+        # straddle
 
-	# The solution is to first iterate by using a divergence
-	# criterion. Then, if we determine that we have straddled the
-	# correct result, we switch to a stopping criterion that
-	# uses the time resolution if we never fully converge (the
-	# important thing is to return a time not an elevation)
+        # The solution is to first iterate by using a divergence
+        # criterion. Then, if we determine that we have straddled the
+        # correct result, we switch to a stopping criterion that
+        # uses the time resolution if we never fully converge (the
+        # important thing is to return a time not an elevation)
 
-	my $diff_to_prev = $prevel - $refel;
-	my $diff_to_curr = $el - $refel;
+        my $diff_to_prev = $prevel - $refel;
+        my $diff_to_curr = $el - $refel;
 
-	# set the straddle parameters
-	if ($diff_to_curr < 0) {
-	  $has_been_low = 1;
-	} else {
-	  $has_been_high = 1;
-	}
+        # set the straddle parameters
+        if ($diff_to_curr < 0) {
+          $has_been_low = 1;
+        } else {
+          $has_been_high = 1;
+        }
 
-	# if we have straddled, stop on increment being small
+        # if we have straddled, stop on increment being small
 
-	# now determine whether we should reverse
-	# if we know we are bouncing around the correct value
-	# we can reverse as soon as the previous el and the current el
-	# are either side of the correct answer
-	my $reverse;
-	if ($has_straddled) {
-	  # we can abort if we are below the time resolution
-	  last if $inc < $smallinc;
+        # now determine whether we should reverse
+        # if we know we are bouncing around the correct value
+        # we can reverse as soon as the previous el and the current el
+        # are either side of the correct answer
+        my $reverse;
+        if ($has_straddled) {
+          # we can abort if we are below the time resolution
+          last if $inc < $smallinc;
 
-	  # reverse
-	  $reverse = 1 if ($diff_to_prev / $diff_to_curr < 0);
-	} else {
-	  # abort if the inc is too small
-	  if ($inc < $smallinc) {
-	    $self->datetime_is_unsafe( $old_unsafe );
-	    return undef;
-	  }
+          # reverse
+          $reverse = 1 if ($diff_to_prev / $diff_to_curr < 0);
+        } else {
+          # abort if the inc is too small
+          if ($inc < $smallinc) {
+            $self->datetime_is_unsafe( $old_unsafe );
+            return undef;
+          }
 
           my $deltat = $epoch - $prevepoch;
           my $deltael = $el - $prevel;
@@ -2859,45 +2859,45 @@ sub _iterative_el {
             # is closer than this el
             $reverse = 1 if abs($diff_to_prev) < abs($diff_to_curr);
           }
-	}
+        }
 
-	# Defer straddled test so we have one gradient-based step past straddling.
+        # Defer straddled test so we have one gradient-based step past straddling.
         $has_straddled = $has_been_low && $has_been_high;
 
-	# reverse
-	if ( $reverse ) {
+        # reverse
+        if ( $reverse ) {
 
-	  # the gap between the previous measurement and the reference
- 	  # is smaller than the current gap. We seem to be diverging.
-	  # Change direction
-	  $sign *= -1;
-	  # and use half the step size
-	  $inc /= 3;
-	}
+          # the gap between the previous measurement and the reference
+          # is smaller than the current gap. We seem to be diverging.
+          # Change direction
+          $sign *= -1;
+          # and use half the step size
+          $inc /= 3;
+        }
       }
 
       # Now calculate a new time
       my $delta = $sign * $inc;
       if (!$use_dt) {
-	$time = $time + $delta;
-	# we have created a new object so need to store it for next time
-	# round
-	$self->datetime( $time );
+        $time = $time + $delta;
+        # we have created a new object so need to store it for next time
+        # round
+        $self->datetime( $time );
       } else {
-	# increment the time (this happens in place so we do not need to
-	# register the change with the datetime method
-	if (abs($delta) > 1) {
-	  $time->add( seconds => "$delta" );
-	} else {
-	  $time->add( nanoseconds => ( $delta * 1E9 ) );
-	}
+        # increment the time (this happens in place so we do not need to
+        # register the change with the datetime method
+        if (abs($delta) > 1) {
+          $time->add( seconds => "$delta" );
+        } else {
+          $time->add( nanoseconds => ( $delta * 1E9 ) );
+        }
 
       }
       # recalculate the elevation, storing the previous as reference
       $prevel = $el;
       $el = $self->el;
       print "# New elevation: ". $self->el(format=>'deg')." \t@ ".$time->datetime." with delta $delta sec\n"
-	if $DEBUG;
+        if $DEBUG;
       $prevepoch = $epoch;
       $epoch = $time->epoch();
     }
@@ -2972,10 +2972,10 @@ sub _extract_event {
     } else {
       # request for not nearest
       if ($opt{event} == 0) {
-	# this is incompatible with nearest=0 so return default
-	return $default;
+        # this is incompatible with nearest=0 so return default
+        return $default;
       } else {
-	return $opt{event};
+        return $opt{event};
       }
     }
 

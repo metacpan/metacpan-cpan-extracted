@@ -35,13 +35,13 @@ header("Physics::Unit::Scalar", "SYNOPSIS");
     print $t->ToString, "\n";              # prints 129600 second
 
     # Speed = Distance / Time
-    $s = $d->div($t);            # $s is a Physics::Unit::Speed object
+    $s = $d->divide($t);            # $s is a Physics::Unit::Speed object
     print $s->ToString, "\n";    # prints 1.2941... mps
 
     # Automatic typing
     $s = new Physics::Unit::Scalar('kg m s');   # Unrecognized type
     print ref $s, "\n";          # $s is a Physics::Unit::Scalar
-    $f = $s->div('3000 s^3');
+    $f = $s->divide('3000 s^3');
     print ref $f, "\n";          # $f is a Physics::Unit::Force
 
 
@@ -51,7 +51,7 @@ header("Physics::Unit::Scalar", "DESCRIPTION");
   $d = new Physics::Unit::Distance('98 mi');
   $t = new Physics::Unit::Time('36 years');
   # $s will be of type Physics::Unit::Speed.
-  $s = $d->div($t);
+  $s = $d->divide($t);
 
   print ref $s, "\n";
 

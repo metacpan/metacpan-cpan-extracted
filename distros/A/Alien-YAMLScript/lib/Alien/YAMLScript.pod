@@ -13,7 +13,6 @@ Alien::YAMLScript - Find or install libyamlscript
     my $alien = Alien::YAMLScript->new;
     say $alien->libs;
     say $alien->cflags;
-
 =head2 STATUS
 
 This is ALPHA software. Expect things to change.

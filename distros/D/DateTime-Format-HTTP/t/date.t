@@ -2,8 +2,8 @@
 use strict;
 use lib 'inc';
 use Test::More tests => 131;
-use vars qw( $class );
 
+my $class;
 BEGIN {
     $class = 'DateTime::Format::HTTP';
     use_ok $class;

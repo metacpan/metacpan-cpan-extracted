@@ -828,6 +828,9 @@ int struct_deserialize(uint16_t nfields, neo4j_iostream_t *stream,
 	    fields[3] = neo4j_elementid( eid );
 
 	}
+        else { // v5.0 node
+            fields[3] = neo4j_string_to_elementid(fields[3]);
+        }
         fields[0] = neo4j_identity(neo4j_int_value(fields[0]));
         if (neo4j_is_null(fields[0]))
         {
@@ -857,6 +860,11 @@ int struct_deserialize(uint16_t nfields, neo4j_iostream_t *stream,
 	    fields[7] = neo4j_elementid( eneid );
 
 	}
+        else { // v5.0 relationship
+            fields[5] = neo4j_string_to_elementid(fields[5]);
+            fields[6] = neo4j_string_to_elementid(fields[6]);
+            fields[7] = neo4j_string_to_elementid(fields[7]);
+        }
         fields[0] = neo4j_identity(neo4j_int_value(fields[0]));
         fields[1] = neo4j_identity(neo4j_int_value(fields[1]));
         fields[2] = neo4j_identity(neo4j_int_value(fields[2]));
@@ -893,6 +901,9 @@ int struct_deserialize(uint16_t nfields, neo4j_iostream_t *stream,
 	    fields[3] = neo4j_elementid( eid );
 
 	}
+        else { // v5.0 node
+            fields[3] = neo4j_string_to_elementid(fields[3]);
+        }
         fields[0] = neo4j_identity(neo4j_int_value(fields[0]));
         if (neo4j_is_null(fields[0]))
         {

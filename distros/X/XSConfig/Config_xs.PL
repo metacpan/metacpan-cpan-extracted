@@ -19,7 +19,7 @@
 #    lib/Config_git.pl
 #
 
-$VERSION = '6.28';
+$VERSION = '6.29';
 my $in_core;
 
 BEGIN {
@@ -181,12 +181,12 @@ targetport  useversionedarchname
         push @cannedkeys , qw(
 
 ARCH    BuiltWithPatchPerl  Mcc PATH    PERL_PATCHLEVEL ansi2knr    arflags
-ccflags_nolargefiles    cf_epoch    charbits    config_heavy    d_accept4
-d_acosh d_asctime64 d_asinh d_atanh d_attribut  d_attribute_deprecated
-d_attribute_format  d_attribute_malloc  d_attribute_nonnull
-d_attribute_noreturn    d_attribute_pure    d_attribute_unused
-d_attribute_visibility  d_attribute_warn_unused_result  d_backtrace d_bcmp
-d_bcopy d_builtin_add_overflow  d_builtin_arith_overflow
+ccflags_nolargefiles    cf_epoch    charbits    compiler_warning
+config_heavy    d_accept4   d_acosh d_asctime64 d_asinh d_atanh d_attribut
+d_attribute_deprecated  d_attribute_format  d_attribute_malloc
+d_attribute_nonnull d_attribute_noreturn    d_attribute_pure
+d_attribute_unused  d_attribute_visibility  d_attribute_warn_unused_result
+d_backtrace d_bcmp  d_bcopy d_builtin_add_overflow  d_builtin_arith_overflow
 d_builtin_choose_expr   d_builtin_expect    d_builtin_mul_overflow
 d_builtin_sub_overflow  d_bzero d_c99_variadic_macros   d_cbrt  d_charvspr
 d_clearenv  d_copysign  d_cplusplus d_ctermid   d_ctime64   d_difftime64
@@ -198,37 +198,38 @@ d_ffs   d_ffsl  d_fma   d_fmax  d_fmin  d_fp_classify   d_fp_classl
 d_fpgetround    d_freelocale    d_fs_data_s d_fstatfs   d_fstatvfs  d_futimes
 d_gai_strerror  d_gdbm_ndbm_h_uses_prototypes   d_gdbmndbm_h_uses_prototypes
 d_getaddrinfo   d_getenv_preserves_other_thread d_getfsstat d_getmnt
-d_getmntent d_getnameinfo   d_gmtime64  d_hasmntopt d_hypot d_ilogb
-d_inc_version_list  d_inetntop  d_inetpton  d_ip_mreq   d_ip_mreq_source
-d_ipv6_mreq d_ipv6_mreq_source  d_isblank   d_isfinitel d_isinfl    d_isless
-d_isnormal  d_j0    d_j0l   d_lc_monetary_2008  d_ldexpl    d_lgamma
-d_lgamma_r  d_libname_unique    d_linkat    d_llrint    d_llrintl   d_llround
-d_llroundl  d_localeconv_l  d_localtime64   d_localtime_r_needs_tzset   d_log1p
-d_log2  d_logb  d_long_double_style_ieee
+d_getmntent d_getnameinfo   d_gmtime64  d_has_C_UTF8    d_hasmntopt d_hypot
+d_ilogb d_inc_version_list  d_inetntop  d_inetpton  d_ip_mreq
+d_ip_mreq_source    d_ipv6_mreq d_ipv6_mreq_source  d_isblank   d_isfinitel
+d_isinfl    d_isless    d_isnormal  d_j0    d_j0l   d_lc_monetary_2008
+d_ldexpl    d_lgamma    d_lgamma_r  d_libname_unique    d_linkat    d_llrint
+d_llrintl   d_llround   d_llroundl  d_localeconv_l  d_localtime64
+d_localtime_r_needs_tzset   d_log1p d_log2  d_logb  d_long_double_style_ieee
 d_long_double_style_ieee_doubledouble   d_long_double_style_ieee_extended
 d_long_double_style_ieee_std    d_long_double_style_vax d_lrint d_lrintl
-d_lround    d_lroundl   d_malloc_good_size  d_malloc_size   d_mbrlen
-d_mbrtowc   d_memchr    d_memcmp    d_memcpy    d_memmem    d_memmove
-d_memrchr   d_memset    d_mkostemp  d_mktime64  d_modfl_pow32_bug
-d_modflproto    d_nan   d_nanosleep d_ndbm  d_ndbm_h_uses_prototypes
-d_nearbyint d_newlocale d_nextafter d_nexttoward    d_nl_langinfo_l
-d_non_int_bitfields d_nv_zero_is_allbits_zero   d_openat
+d_lround    d_lroundl   d_malloc_good_size  d_malloc_size
+d_malloc_usable_size    d_mbrlen    d_mbrtowc   d_memchr    d_memcmp
+d_memcpy    d_memmem    d_memmove   d_memrchr   d_memset    d_mkostemp
+d_mktime64  d_modfl_pow32_bug   d_modflproto    d_nan   d_nanosleep d_ndbm
+d_ndbm_h_uses_prototypes    d_nearbyint d_newlocale d_nextafter d_nexttoward
+d_nl_langinfo_l d_non_int_bitfields d_nv_zero_is_allbits_zero   d_openat
 d_perl_lc_all_category_positions_init   d_perl_lc_all_separator
 d_perl_lc_all_uses_name_value_pairs d_pipe2 d_prctl d_prctl_set_name
 d_printf_format_null    d_pseudofork    d_ptrdiff_t d_querylocale   d_regcomp
 d_remainder d_remquo    d_renameat  d_rint  d_round d_safebcpy  d_safemcpy
-d_sanemcmp  d_scalbn    d_setenv    d_sfio  d_siginfo_si_addr
-d_siginfo_si_band   d_siginfo_si_errno  d_siginfo_si_fd d_siginfo_si_pid
-d_siginfo_si_status d_siginfo_si_uid    d_siginfo_si_value  d_signbit
-d_sin6_scope_id d_sitearch  d_snprintf  d_sockaddr_in6  d_sockaddr_sa_len
-d_sprintf_returns_strlen    d_stat  d_statfs_f_flags    d_statfs_s
-d_static_inline d_statvfs   d_strchr    d_strctcpy  d_strerrm   d_strerror
-d_strerror_l    d_strlcat   d_strlcpy   d_strnlen   d_strtod_l  d_strtold_l
-d_strxfrm_l d_tgamma    d_thread_local  d_thread_safe_nl_langinfo_l d_timegm
-d_trunc d_truncl    d_unlinkat  d_unsetenv  d_uselocale d_ustat d_vendorscript
-d_vms_case_sensitive_symbols    d_volatile  d_vprintf   d_vsnprintf d_wcscmp
-d_wcsxfrm   default_inc_excludes_dot    defvoidused dl_so_eq_ext    doop_cflags
-doubleinfbytes  doublekind  doublemantbits  doublenanbytes  dtrace
+d_sanemcmp  d_scalbn    d_setenv    d_setlocale_accepts_any_locale_name d_sfio
+d_siginfo_si_addr   d_siginfo_si_band   d_siginfo_si_errno  d_siginfo_si_fd
+d_siginfo_si_pid    d_siginfo_si_status d_siginfo_si_uid    d_siginfo_si_value
+d_signbit   d_sin6_scope_id d_sitearch  d_snprintf  d_sockaddr_in6
+d_sockaddr_sa_len   d_sockaddr_storage  d_sprintf_returns_strlen    d_stat
+d_statfs_f_flags    d_statfs_s  d_static_inline d_statvfs   d_strchr
+d_strctcpy  d_strerrm   d_strerror  d_strerror_l    d_strlcat   d_strlcpy
+d_strnlen   d_strtod_l  d_strtold_l d_strxfrm_l d_tgamma    d_thread_local
+d_thread_safe_nl_langinfo_l d_timegm    d_towlower  d_towupper  d_trunc
+d_truncl    d_unlinkat  d_unsetenv  d_uselocale d_ustat d_vendorscript
+d_vms_case_sensitive_symbols    d_volatile  d_vprintf   d_vsnprintf d_wcrtomb
+d_wcscmp    d_wcsxfrm   default_inc_excludes_dot    defvoidused dl_so_eq_ext
+doop_cflags doubleinfbytes  doublekind  doublemantbits  doublenanbytes  dtrace
 dtracexnolibs   extern_C    found_libucb    from    gccansipedantic git_branch
 git_commit_id   git_commit_id_title git_describe    git_snapshot_date
 git_uncommitted_changes gnulibc_version hash_func   html1dir    html1direxp

@@ -1,6 +1,7 @@
 bin/physics-unit
 Build.PL
 Changes
+eg/OverloadExample.pl
 eg/ScalarDocExamples.pl
 eg/ScalarMethods.pl
 eg/ScalarSimple.pl
@@ -14,8 +15,12 @@ lib/Physics/Unit/Scalar.pm
 lib/Physics/Unit/Scalar/Implementation.pod
 lib/Physics/Unit/Script.pm
 lib/Physics/Unit/Script/GenPages.pm
+lib/Physics/Unit/UnitsByName.pod
+lib/Physics/Unit/UnitsByType.pod
+LICENSE
 MANIFEST			This list of files
-README
+README.md
+t/overload.t
 t/scalar.t
 t/unit.t
 META.yml

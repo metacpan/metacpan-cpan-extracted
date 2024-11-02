@@ -23,7 +23,7 @@ BEGIN
         '""'    => 'as_string',
         '=='    => sub{ _obj_eq(@_) },
         '!='    => sub{ !_obj_eq(@_) },
-        bool    => sub{ $_[0] },
+        bool    => sub{1},
         fallback => 1,
     );
     $CALLER_LEVEL = 0;
@@ -175,7 +175,7 @@ sub as_string
 {
     no overloading;
     my $self = shift( @_ );
-    return( $self->{_cache} ) if( $self->{_cache} );
+    return( $self->{_cache} ) if( $self->{_cache} && !CORE::length( $self->{_reset} ) );
     my $str = $self->message;
     if( $self->_can_overload( $str => '""' ) )
     {
@@ -185,6 +185,7 @@ sub as_string
     $str =~ s/\r?\n$//g;
     $str .= sprintf( " within package %s at line %d in file %s\n%s", $self->package, $self->line, $self->file, $self->trace->as_string );
     $self->{_cache} = $str;
+    CORE::delete( $self->{_reset} );
     return( $str );
 }
 
@@ -196,19 +197,19 @@ sub caught
     return( $e );
 }
 
-sub cause { return( shift->_set_get_hash_as_mix_object( 'cause', @_ ) ); }
+sub cause { return( shift->reset(@_)->_set_get_hash_as_mix_object( 'cause', @_ ) ); }
 
-sub code { return( shift->_set_get_scalar( 'code', @_ ) ); }
+sub code { return( shift->reset(@_)->_set_get_scalar( 'code', @_ ) ); }
 
-sub file { return( shift->_set_get_scalar( 'file', @_ ) ); }
+sub file { return( shift->reset(@_)->_set_get_scalar( 'file', @_ ) ); }
 
-sub lang { return( shift->_set_get_scalar( 'lang', @_ ) ); }
+sub lang { return( shift->reset(@_)->_set_get_scalar( 'lang', @_ ) ); }
 
-sub line { return( shift->_set_get_scalar( 'line', @_ ) ); }
+sub line { return( shift->reset(@_)->_set_get_scalar( 'line', @_ ) ); }
 
-sub locale { return( shift->_set_get_scalar( 'lang', @_ ) ); }
+sub locale { return( shift->reset(@_)->_set_get_scalar( 'lang', @_ ) ); }
 
-sub message { return( shift->_set_get_scalar( {
+sub message { return( shift->reset(@_)->_set_get_scalar( {
     field => 'message',
     callbacks => 
     {
@@ -231,7 +232,7 @@ sub message { return( shift->_set_get_scalar( {
     },
 }, @_ ) ); }
 
-sub package { return( shift->_set_get_scalar( 'package', @_ ) ); }
+sub package { return( shift->reset(@_)->_set_get_scalar( 'package', @_ ) ); }
 
 # From perlfunc docmentation on "die":
 # "If LIST was empty or made an empty string, and $@ contains an
@@ -252,6 +253,16 @@ sub PROPAGATE
     return( $self );
 }
 
+sub reset
+{
+    my $self = shift( @_ );
+    if( !CORE::length( $self->{_reset} ) && scalar( @_ ) )
+    {
+        $self->{_reset} = scalar( @_ );
+    }
+    return( $self );
+}
+
 sub rethrow 
 {
     my $self = shift( @_ );
@@ -259,9 +270,9 @@ sub rethrow
     die( $self );
 }
 
-sub retry_after { return( shift->_set_get_scalar( 'retry_after', @_ ) ); }
+sub retry_after { return( shift->reset(@_)->_set_get_scalar( 'retry_after', @_ ) ); }
 
-sub subroutine { return( shift->_set_get_scalar( 'subroutine', @_ ) ); }
+sub subroutine { return( shift->reset(@_)->_set_get_scalar( 'subroutine', @_ ) ); }
 
 sub throw
 {
@@ -283,9 +294,9 @@ sub throw
 }
 
 # Devel::StackTrace has a stringification overloaded so users can use the object to get more information or simply use it as a string to get the stack trace equivalent of doing $trace->as_string
-sub trace { return( shift->_set_get_object( 'trace', 'Devel::StackTrace', @_ ) ); }
+sub trace { return( shift->reset(@_)->_set_get_object( 'trace', 'Devel::StackTrace', @_ ) ); }
 
-sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
+sub type { return( shift->reset(@_)->_set_get_scalar( 'type', @_ ) ); }
 
 sub _obj_eq
 {

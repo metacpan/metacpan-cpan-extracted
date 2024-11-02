@@ -13,15 +13,15 @@ ok(defined $s,   "new Physics::Unit::Speed");
 is(ref($s), 'Physics::Unit::Speed', 'Speed type');
 
 my $m = new Physics::Unit::Mass('205lbm');
-ok(defined $s,   "new Physics::Unit::Mass");
+ok(defined $m,   "new Physics::Unit::Mass");
 is(ref($m), 'Physics::Unit::Mass', 'Mass type');
 
 my $a = new Physics::Unit::Acceleration('205 furlongs/fortnight^2');
-ok(defined $s,   "new Physics::Unit::Acceleration");
+ok(defined $a,   "new Physics::Unit::Acceleration");
 is(ref($a), 'Physics::Unit::Acceleration', 'Acceleration type');
 
 my $i = new Physics::Unit::Time('205 score');
-ok(defined $s,   "new Physics::Unit::Time");
+ok(defined $i,   "new Physics::Unit::Time");
 is(ref($i), 'Physics::Unit::Time', 'Time type');
 
 
@@ -114,4 +114,3 @@ is($d->ToString, '1 meter', '1 meter');
 $d2 = $d->new;
 is(ref $d, 'Physics::Unit::Distance', 'Distance copy constructor');
 is($d->ToString, '1 meter', '1 meter');
-

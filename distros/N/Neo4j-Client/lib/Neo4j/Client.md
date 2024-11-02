@@ -1,6 +1,6 @@
 # NAME
 
-Neo4j::Client - Build and use the libneo4j-client library
+Neo4j::Client - Build and use the libneo4j-omni library
 
 # SYNOPSIS
 
@@ -18,22 +18,22 @@ Neo4j::Client - Build and use the libneo4j-client library
 Chris Leishman's
 [libneo4j-client](https://github.com/cleishm/libneo4j-client) is a C
 library for communication with a Neo4j server via the Bolt
-protocol. A fork at [https://github.com/majensen/libneo4j-client](https://github.com/majensen/libneo4j-client) enables
-the library to run on Neo4j versions up through 5.0.x.
+protocol. A fork at <https://github.com/majensen/libneo4j-omni> enables
+the library to run on Neo4j versions up through 5.x.
 
 Installing this module will attempt to build the API portion of the
-library on your machine. `libneo4j-client`'s interactive shell and
+library on your machine. `libneo4j-omni`'s interactive shell and
 documentation are not built. The install process will use the GNU
 autotools `autoconf-2.69`, `automake-1.16.3`, and `m4-1.4.18-patched`
 which are bundled with this distro and are known to work on this library.
-(These are required to build from ./configure for `libneo4j-client`.)
+(These are required to build from ./configure for `libneo4j-omni`.)
 
 Thanks to the miracle of [Alien::Build](https://metacpan.org/pod/Alien::Build), the library should always
 contain OpenSSL support.
 
 # SEE ALSO
 
-[Neo4j::Bolt](https://github.com/majensen/perlbolt)
+[Neo4j::Bolt](https://metacpan.org/pod/Neo4j::Bolt).
 
 # AUTHOR
 

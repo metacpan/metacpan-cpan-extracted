@@ -144,7 +144,9 @@ is($u->expanded, '8 m s^-1', '8 m s^-1');
 # define your own units
 $Uforce = new Physics::Unit('3 pi kg*nanoparsecs / femtofortnight sec');
 ok(!defined $Uforce->name, '$Uforce->name');
-like($Uforce->expanded, qr/2\.40216521602612\d*e\+0*20 m gm s\^-2/, '$Uforce->expanded');
+#like($Uforce->expanded, qr/2\.40216521602612\d*e\+0*20 m gm s\^-2/, '$Uforce->expanded');
+# Fix this test for quadmath systems: they can represent the entire number without exponential notation
+ok( ($Uforce->expanded =~ m/2\.40216521602612\d*e\+0*20 m gm s\^-2/) || ($Uforce->expanded eq '240216521602612414541.059027777778 m gm s^-2'), '$Uforce->expanded');
 
 $Uaccl1 = new Physics::Unit('meters per second squared');
 ok(!defined $Uaccl1->name, '$Uforce->name');

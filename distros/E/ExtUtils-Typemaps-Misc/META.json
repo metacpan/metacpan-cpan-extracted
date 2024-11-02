@@ -4,7 +4,7 @@
       "Leon Timmermans <fawaka@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,19 +50,23 @@
    "provides" : {
       "ExtUtils::Typemaps::IntObj" : {
          "file" : "lib/ExtUtils/Typemaps/IntObj.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "ExtUtils::Typemaps::Misc" : {
          "file" : "lib/ExtUtils/Typemaps/Misc.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "ExtUtils::Typemaps::OpaqueObj" : {
          "file" : "lib/ExtUtils/Typemaps/OpaqueObj.pm",
-         "version" : "0.001"
+         "version" : "0.002"
+      },
+      "ExtUtils::Typemaps::PackedVal" : {
+         "file" : "lib/ExtUtils/Typemaps/PackedVal.pm",
+         "version" : "0.002"
       },
       "ExtUtils::Typemaps::Slurp" : {
          "file" : "lib/ExtUtils/Typemaps/Slurp.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -76,7 +80,7 @@
          "web" : "https://github.com/Leont/extutils-typemaps-misc"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

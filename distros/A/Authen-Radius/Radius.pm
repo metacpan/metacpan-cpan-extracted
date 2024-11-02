@@ -39,7 +39,7 @@ require Exporter;
             STATUS_SERVER
             COA_REQUEST COA_ACCEPT COA_REJECT COA_ACK COA_NAK);
 
-$VERSION = '0.32';
+$VERSION = '0.33';
 
 my (%dict_id, %dict_name, %dict_val, %dict_vendor_id, %dict_vendor_name );
 my ($request_id) = $$ & 0xff;   # probably better than starting from 0
@@ -329,7 +329,7 @@ sub recv_packet {
     my $rfc3579_msg_auth;
     foreach my $a ($self->get_attributes()) {
         if ($a->{Code} == $RFC3579_MSG_AUTH_ATTR_ID) {
-            $rfc3579_msg_auth = $a->{Value};
+            $rfc3579_msg_auth = $a->{RawValue};
             last;
         }
     }

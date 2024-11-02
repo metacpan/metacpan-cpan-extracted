@@ -1,3 +1,20 @@
+0.005 2024-11-02
+  [Requirement Changes]
+    * Require SPVM 0.990026.
+  [Bug Fix]
+    * Fix a bug that X509 object is not freed.
+    * Fix a bug that X509_CRL object is not freed.
+    * Fix a bug that X509_VERIFY_PARAM object is not freed.
+    * Fix a bug that X509_STORE_CTX object is not freed.
+    * Fix a bug that X509_STORE object is not freed.
+  [Internal Changes]
+    * Add Net::SSLeay::X509_STORE#certs field.
+    * Add Net::SSLeay::X509_STORE#crls field.
+  [Internal Changes]
+    * Add Net::SSLeay::X509_STORE#certs field.
+    * Add Net::SSLeay::X509_STORE#crls field.
+    * Add Net::SSLeay::SSL_CTX#init method.
+    
 0.004 2024-10-31
   [New Features]
     * Add Net::SSLeay::X509_STORE#set_flags method.

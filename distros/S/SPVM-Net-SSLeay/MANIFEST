@@ -40,12 +40,16 @@ lib/SPVM/Net/SSLeay/X509.c
 lib/SPVM/Net/SSLeay/X509.config
 lib/SPVM/Net/SSLeay/X509.pm
 lib/SPVM/Net/SSLeay/X509.spvm
+lib/SPVM/Net/SSLeay/X509_CRL.c
+lib/SPVM/Net/SSLeay/X509_CRL.config
 lib/SPVM/Net/SSLeay/X509_CRL.pm
 lib/SPVM/Net/SSLeay/X509_CRL.spvm
 lib/SPVM/Net/SSLeay/X509_STORE.c
 lib/SPVM/Net/SSLeay/X509_STORE.config
 lib/SPVM/Net/SSLeay/X509_STORE.pm
 lib/SPVM/Net/SSLeay/X509_STORE.spvm
+lib/SPVM/Net/SSLeay/X509_STORE_CTX.c
+lib/SPVM/Net/SSLeay/X509_STORE_CTX.config
 lib/SPVM/Net/SSLeay/X509_STORE_CTX.pm
 lib/SPVM/Net/SSLeay/X509_STORE_CTX.spvm
 lib/SPVM/Net/SSLeay/X509_VERIFY_PARAM.c

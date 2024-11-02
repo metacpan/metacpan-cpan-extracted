@@ -19,9 +19,9 @@ my $end = $start + ONE_DAY;
 my $inc = ONE_HOUR;
 
 my @results = $c->calculate( start=> $start,
-			     end => $end, 
-			     inc => $inc,
-			     units => 'deg');
+                             end => $end,
+                             inc => $inc,
+                             units => 'deg');
 
 is(scalar(@results), 25 , "Test return count");
 
