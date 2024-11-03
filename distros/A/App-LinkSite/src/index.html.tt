@@ -23,7 +23,7 @@
 [% END -%]
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-[% IF site.font_awesome_kit -%]
+[% IF font_awesome_kit -%]
     <script src="https://kit.fontawesome.com/[% font_awesome_kit %].js" crossorigin="anonymous"></script>
 [% END -%]
 

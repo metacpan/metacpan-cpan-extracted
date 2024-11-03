@@ -5,8 +5,8 @@
   "og_image": "og.png",
   "site_url": "https://some-site.com/",
   "desc": "I make things from software. Some of them are useful.<br>And I've been known to write a book or two.",
-  "ga4": "Your Google Analytics key",
-  "font_awesome_kit": "Your Font Awesome ID",
+  "ga4": "GA4-Dummy",
+  "font_awesome_kit": "FA-Dummy",
   "social": [{
     "service": "facebook"
   }, {

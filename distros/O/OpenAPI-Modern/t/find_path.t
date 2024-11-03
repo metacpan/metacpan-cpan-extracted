@@ -604,12 +604,7 @@ YAML
     $expected,
     'path_capture values are returned as-is (even ambiguous type) in the provided options hash',
   );
-  # on perls >= 5.35.9, reading the string form of an integer value no longer sets the flag SVf_POK
-  is(
-    get_type($options->{path_captures}{foo_id}),
-    "$]" >= 5.035009 ? 'integer' : 'ambiguous type',
-    'passed-in path value is preserved as a dualvar',
-  );
+  ok(Scalar::Util::isdual($options->{path_captures}{foo_id}), 'passed-in path value is preserved as a dualvar');
 
   ok(!$openapi->find_path($options = { request => $request, path_captures => { foo_id => 'a' } }),
     'find_path returns false');

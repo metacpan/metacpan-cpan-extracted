@@ -3,7 +3,7 @@ Crypt::HSM::Provider	T_MAGICEXT
 Crypt::HSM::Slot	T_MAGICEXT
 Crypt::HSM::Mechanism	T_MAGICEXT
 Crypt::HSM::Session	T_MAGIC
-Crypt::HSM::Key	T_MAGIC
+Crypt::HSM::Object	T_MAGIC
 Crypt::HSM::Stream	T_MAGIC
 Crypt::HSM::Encrypt	T_MAGIC
 Crypt::HSM::Decrypt	T_MAGIC

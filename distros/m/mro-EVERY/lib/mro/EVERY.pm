@@ -1,9 +1,9 @@
 ########################################################################
 # housekeeping
 ########################################################################
-
-package mro::EVERY v1.0.1;
 use v5.24;
+
+package mro::EVERY v1.0.3;
 use mro;
 
 use Carp            qw( croak           );
@@ -161,11 +161,10 @@ sub import
 }
 
 ########################################################################
-# pseudo-packages
+# downstream packages
 ########################################################################
 
 package EVERY;
-use v5.22;
 use Carp            qw( croak   );
 use List::Util      qw( uniq    );
 
@@ -184,7 +183,6 @@ AUTOLOAD
 }
 
 package EVERY::LAST;
-use v5.22;
 use Carp            qw( croak   );
 use List::Util      qw( uniq    );
 

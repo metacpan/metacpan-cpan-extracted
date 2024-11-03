@@ -31,7 +31,9 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
+
+use parent 'Data::URIID::Base';
 
 my %digest_name_converter = (
     fc('md5')   => 'md-5-128',
@@ -869,18 +871,17 @@ sub _lookup__https {
 }
 
 
-#@returns Data::URIID
-sub extractor {
-    my ($self) = @_;
-    return $self->{extractor};
+sub id_type {
+    my ($self, %opts) = @_;
+    return $self->_cast_ise($self->{primary}{type}, 'ise', %opts);
 }
 
 
 sub _cast_id {
     my ($self, $src, $src_type, %opts) = @_;
-    my $as = $opts{as} // 'string';
+    my $as = $opts{as} // 'raw';
 
-    if ($as eq 'string' || $as eq $src_type) {
+    if ($as eq 'raw' || $as eq 'string' || $as eq $src_type) {
         return $src;
     } elsif ($as eq 'Data::Identifier') {
         require Data::Identifier;
@@ -892,13 +893,6 @@ sub _cast_id {
     }
 }
 
-sub id_type {
-    my ($self, %opts) = @_;
-    return $self->_cast_id($self->{primary}{type}, 'ise', %opts);
-}
-
-
-# %opts is currently private
 sub id {
     my ($self, $type, %opts);
 
@@ -940,43 +934,6 @@ sub id {
 }
 
 
-sub ise {
-    my ($self, %opts) = @_;
-
-    {
-        my $type_name = $self->extractor->ise_to_name(type => $self->id_type);
-        if ($type_name eq 'uuid' || $type_name eq 'oid' || $type_name eq 'uri') {
-            return $self->_cast_id($self->id, $type_name, %opts);
-        }
-    }
-
-    foreach my $type (@{$self->{primary}{ise_order}}) {
-        my $id = eval { $self->id($type) };
-        return $self->_cast_id($id, $type, %opts) if defined $id;
-    }
-
-    croak 'Identifier does not map to an ISE';
-}
-
-sub _as_lookup {
-    my ($self, $lookup_args, %opts) = @_;
-    my Data::URIID $extractor = $self->extractor;
-    my $res;
-    my $old_online;
-
-    if (exists $opts{online}) {
-        $old_online = $extractor->online;
-        $extractor->online($opts{online});
-    }
-
-    $res = $extractor->lookup(@{$lookup_args});
-
-    if (exists $opts{online}) {
-        $extractor->online($old_online);
-    }
-
-    return $res;
-}
 sub _cast {
     my ($self, $key, $value, $source_type, $as, %opts) = @_;
     if ($as eq $source_type) {
@@ -996,6 +953,8 @@ sub _cast {
             return $value->ise;
         } elsif ($as eq 'rgb' && eval {$value->can('rgb')}) {
             return $value->rgb;
+        } elsif (eval {$value->isa('Data::URIID::Base')} && defined(my $r = eval {$value->ise(as => $as)})) {
+            return $r;
         }
 
         if ($as eq __PACKAGE__ && defined(my $ise = eval{$self->attribute($key, %opts, as => 'ise')})) {
@@ -1350,6 +1309,33 @@ sub _id_conv__doi__grove_art_online_identifier {
     $self->{id}{$type_want} = sprintf('10.1093/gao/9781884446054.article.%s', $id);
 }
 
+# --- Overrides for Data::URIID::Base ---
+sub ise {
+    my ($self, %opts) = @_;
+
+    {
+        my $type_name = $self->extractor->ise_to_name(type => $self->id_type);
+        if ($type_name eq 'uuid' || $type_name eq 'oid' || $type_name eq 'uri') {
+            return $self->_cast_ise($self->id, $type_name, %opts);
+        }
+    }
+
+    foreach my $type (@{$self->{primary}{ise_order}}) {
+        my $id = eval { $self->id($type) };
+        return $self->_cast_ise($id, $type, %opts) if defined $id;
+    }
+
+    return $opts{default} if exists $opts{default};
+    croak 'Identifier does not map to an ISE';
+}
+
+sub displayname {
+    my ($self, %opts) = @_;
+    my $v = $self->attribute('displayname', default => undef);
+    return $v if defined $v;
+    return $self->SUPER::displayname(%opts);
+}
+
 1;
 
 __END__
@@ -1364,7 +1350,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 
@@ -1373,13 +1359,11 @@ version v0.09
     my $extractor = Data::URIID->new;
     my $result = $extractor->lookup( $URI );
 
+This module provides access to results from a lookup.
+
+This package inherits from L<Data::URIID::Base>.
+
 =head1 METHODS
-
-=head2 extractor
-
-    my $extractor = $result->extractor;
-
-Returns the L<Data::URIID> object used to create this object.
 
 =head2 id_type
 
@@ -1387,22 +1371,7 @@ Returns the L<Data::URIID> object used to create this object.
 
 This method will return the ISE of the id's type if successful or C<die> otherwise.
 
-The following options are defined. All options are optional.
-
-=over
-
-=item C<as>
-
-Return the value as the given type.
-This is the package name of the type, C<string> for plain perl strings.
-If the given type is not supported for the given attribute the function C<die>s.
-
-=item C<online>
-
-Overrides the L<Data::URIID/"online"> flag used for the lookup if C<as> is set to L<Data::URIID::Result>.
-This is very useful to prevent network traffic for auxiliary lookups.
-
-=back
+This takes the same options as L<Data::URIID::Base/ise>
 
 =head2 id
 
@@ -1414,17 +1383,26 @@ This is very useful to prevent network traffic for auxiliary lookups.
 
 This method will return the id if successful or C<die> otherwise.
 
-This method supports the same options as L</id_type> plus C<type> which gives the type of identifier to be returned.
+The following options are defined. All options are optional.
 
-=head2 ise
+=over
 
-    my $ise = $result->ise;
-    # or:
-    my $ise = $result->ise( [%opts] );
+=item C<as>
 
-This method will return the ISE if successful or C<die> otherwise.
+Return the value as the given type.
+This is the package name of the type, C<raw> for plain perl strings.
+If the given type is not supported for the given attribute the function C<die>s.
 
-This method supports the same options as L</id_type>. All options are optional.
+=item C<online>
+
+Overrides the L<Data::URIID/"online"> flag used for the lookup if C<as> is set to L<Data::URIID::Result>.
+This is very useful to prevent network traffic for auxiliary lookups.
+
+=item C<type>
+
+The type of the identifier to return.
+
+=back
 
 =head2 attribute
 

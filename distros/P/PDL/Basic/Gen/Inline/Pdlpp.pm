@@ -24,7 +24,7 @@ sub register {
 	   };
 }
 
-# handle BLESS, INTERNAL, NOISY - pass everything else up to Inline::C
+# handle BLESS, INTERNAL - pass everything else up to Inline::C
 sub validate {
     my $o = shift;
     $o->{ILSM} ||= {};
@@ -46,18 +46,10 @@ sub validate {
 	    $o->{ILSM}{$key} = $value;
 	    next;
 	}
-	if ($key eq 'NOISY') {
-            $o->{CONFIG}{BUILD_NOISY} = $value;
-	    next;
-	}
 	push @pass_along, $key, $value;
     }
     $o->SUPER::validate(@pass_along);
 }
-
-sub add_list { goto &Inline::C::add_list }
-sub add_string { goto &Inline::C::add_string }
-sub add_text { goto &Inline::C::add_text }
 
 #==============================================================================
 # Parse and compile C code
@@ -84,10 +76,6 @@ The following PP code was generated (caution, can be long)...
 
 END
     return $txt . $o->pd_generate . "\n*** end PP file ****\n";
-}
-
-sub config {
-    my $o = shift;
 }
 
 #==============================================================================
@@ -235,6 +223,41 @@ __END__
 
 Inline::Pdlpp - Write PDL Subroutines inline with PDL::PP
 
+=head1 SYNOPSIS
+
+  use strict; use warnings;
+  use PDL;
+  use Inline Pdlpp => 'DATA';
+
+  # make data with: echo -n 'ATCGZATCG' >input.data
+  # use it with aa_to_int.pl input.data
+
+  my $file; ($file = shift, -f $file) || die "Usage: $0 filename";
+  my $size = -s $file;
+  my $pdl = zeroes(byte, $size);
+  ${$pdl->get_dataref} = do { open my $fh, $file or die "$file: $!"; local $/; <$fh> };
+  $pdl->upd_data;
+  $pdl->inplace->aa_to_int;
+  print $pdl, "\n";
+
+  __DATA__
+  __Pdlpp__
+  pp_def('aa_to_int',
+   Pars => 'i();[o] o()',
+   GenericTypes => ['B'],
+   Inplace => 1,
+   Code => <<'EOF',
+  switch($i()) {
+   case 'A': $o() = 0; break;
+   case 'T': $o() = 1; break;
+   case 'C': $o() = 2; break;
+   case 'G': $o() = 3; break;
+   default: $o() = 255; break;
+  }
+  EOF
+   Doc => "=for ref\n\nConvert amino acid names to integers.\n",
+  );
+
 =head1 DESCRIPTION
 
 C<Inline::Pdlpp> is a module that allows you to write PDL subroutines
@@ -251,10 +274,9 @@ For more information on Inline in general, see L<Inline>.
 Some example scripts demonstrating C<Inline::Pdlpp> usage can be
 found in the F<Example/InlinePdlpp> directory.
 
-
 C<Inline::Pdlpp> is a subclass of L<Inline::C>. Most Kudos goes to Brian I.
 
-=head1 Usage
+=head1 USAGE
 
 You never actually use C<Inline::Pdlpp> directly. It is just a support module
 for using C<Inline.pm> with C<PDL::PP>. So the usage is always:
@@ -265,7 +287,7 @@ or
 
     bind Inline Pdlpp => ...;
 
-=head1 Examples
+=head1 EXAMPLES
 
 Pending availability of full docs a few quick examples
 that illustrate typical usage.
@@ -383,8 +405,56 @@ C<LIBS>, C<AUTO_INCLUDE> and C<BOOT>.
 	   Code => '$pd() = poidev((float) $xm(), &$COMP(idum));',
    );
 
+=head1 MAKING AN INSTALLABLE MODULE
 
-=head1 Pdlpp Configuration Options
+It is possible, using L<Inline::Module>, to create an installable F<.pm>
+file with inline PDL code. L<PDLA::IO::HDF> is a working example. Here's
+how. You make a Perl module as usual, with a package declaration in
+the normal way. Then (assume your package is C<PDLA::IO::HDF::SD>):
+
+  package PDLA::IO::HDF::SD;
+  # ...
+  use FindBin;
+  use Alien::HDF4::Install::Files;
+  use PDLA::IO::HDF::SD::Inline Pdlapp => 'DATA',
+    package => __PACKAGE__, # if you have any pp_addxs - else don't bother
+    %{ Alien::HDF4::Install::Files->Inline('C') }, # EUD returns empty if !"C"
+    typemaps => "$FindBin::Bin/lib/PDLA/IO/HDF/typemap.hdf",
+    ;
+  # ...
+  1;
+  __DATA__
+  __Pdlapp__
+  pp_addhdr(<<'EOH');
+  /* ... */
+  EOH
+  use FindBin;
+  use lib "$FindBin::Bin/../../../../../../..";
+  require 'buildfunc.noinst';
+  # etc
+
+Note that for any files that you need to access for build purposes (they
+won't be touched during post-install runtime), L<FindBin> is useful,
+albeit slightly complicated.
+
+In the main F<.pm> body, L<FindBin> will find the build directory, as
+illustrated above. However, in the "inline" parts, C<FindBin> will be
+within the L<Inline::Module> build directory. At the time of writing,
+this is under F<.inline> within the build directory, in a subdirectory
+named after the package. The example shown above has seven F<..>: two
+for F<.inline/build>, and five more for F<PDLA/IO/HDF/SD/Inline>.
+
+The rest of the requirements are given in the L<Inline::Module>
+documentation.
+
+This technique avoids having to use L<PDL::Core::Dev>, create a
+F<Makefile.PL>, have one directory per F<.pd>, etc. It will even build
+/ install faster, since unlike a build of an L<ExtUtils::MakeMaker>
+distribution with multiple directories, it can be built in parallel. This
+is because the EUMM build changes into each directory, and waits for each
+one to complete. This technique can run concurrently without problems.
+
+=head1 PDLPP CONFIGURATION OPTIONS
 
 For information on how to specify Inline configuration options, see
 L<Inline>. This section describes each of the configuration options
@@ -558,13 +628,19 @@ Christian Soeller <soellermail@excite.com>
 
 =head1 SEE ALSO
 
-L<PDL>
+=over
 
-L<PDL::PP>
+=item L<PDL>
 
-L<Inline>
+=item L<PDL::PP>
 
-L<Inline::C>
+=item L<Inline>
+
+=item L<Inline::C>
+
+=item L<Inline::Module>
+
+=back
 
 =head1 COPYRIGHT
 

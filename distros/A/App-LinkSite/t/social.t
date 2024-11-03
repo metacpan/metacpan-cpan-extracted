@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More;
 use App::LinkSite::Social;
 
 # Test the creation of an App::LinkSite::Social object
@@ -19,3 +19,5 @@ is($social->handle, 'test_handle', 'handle method returns "test_handle"');
 
 # Test the url method
 is($social->url, 'http://example.com', 'url method returns "http://example.com"');
+
+done_testing;

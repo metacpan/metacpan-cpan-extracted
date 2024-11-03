@@ -4,6 +4,7 @@ Basic/Bad/Makefile.PL
 Basic/Constants.pm
 Basic/Core/Basic.pm
 Basic/Core/Char.pm
+Basic/Core/Config.pm
 Basic/Core/Core.pm
 Basic/Core/Core.xs
 Basic/Core/Dbg.pm
@@ -12,6 +13,7 @@ Basic/Core/Exporter.pm
 Basic/Core/IFiles.pm
 Basic/Core/Makefile.PL
 Basic/Core/Overloads.pm
+Basic/Core/pdl.c
 Basic/Core/pdl.h.PL
 Basic/Core/pdlaffine.c
 Basic/Core/pdlapi.c
@@ -25,10 +27,41 @@ Basic/Core/pdlmagic.h
 Basic/Core/pdlperl.h.PL
 Basic/Core/pdlsimple.h.PL
 Basic/Core/pdlutil.c
+Basic/Core/perldl
 Basic/Core/ppport.h
 Basic/Core/typemap
 Basic/Core/Types.pm.PL
 Basic/default.perldlrc
+Basic/Demos/BAD_demo.pm
+Basic/Demos/Demos.pm
+Basic/Demos/General.pm
+Basic/Demos/harness
+Basic/Demos/Makefile.PL
+Basic/Demos/Sound.pm
+Basic/Demos/t/demos.t
+Basic/Doc/Doc.pm
+Basic/Doc/Doc/Config.pm
+Basic/Doc/Doc/Perldl.pm
+Basic/Doc/Makefile.PL
+Basic/Doc/mkpdlfuncpod
+Basic/Doc/pdldoc
+Basic/Doc/README
+Basic/Doc/scantree.pl
+Basic/examples/Benchmark/Bench.pm
+Basic/examples/Benchmark/Bench.xs
+Basic/examples/Benchmark/Makefile.PL
+Basic/examples/Benchmark/README.md
+Basic/examples/Benchmark/time.pl
+Basic/examples/InlinePdlpp/inlpp.pl
+Basic/examples/InlinePdlpp/inlpp_link.pl
+Basic/examples/InlinePdlpp/inlppminimal.pl
+Basic/examples/InlinePdlpp/Module/Makefile.PL
+Basic/examples/InlinePdlpp/Module/MyInlineMod.pm
+Basic/examples/InlinePdlpp/Module/t/myinlinemod.t
+Basic/examples/PDL-Parallel-threads/barrier-sync.pl
+Basic/examples/PDL-Parallel-threads/perl-barrier.pl
+Basic/examples/PDL-Parallel-threads/simple-parallelize.pl
+Basic/examples/PDL-Parallel-threads/test-memory-consumption.pl
 Basic/Gen/Inline/Makefile.PL
 Basic/Gen/Inline/MakePdlppInstallable.pm
 Basic/Gen/Inline/Pdlpp.pm
@@ -41,9 +74,73 @@ Basic/Gen/PP/PDLCode.pm
 Basic/Gen/PP/PdlParObj.pm
 Basic/Gen/PP/Signature.pm
 Basic/Gen/pptemplate
+Basic/IO-FastRaw/FastRaw.pm
+Basic/IO-FastRaw/Makefile.PL
+Basic/IO-FastRaw/t/fastraw.t
+Basic/IO-FITS/FITS.pm
+Basic/IO-FITS/Makefile.PL
+Basic/IO-FITS/t/fits-noafh.t
+Basic/IO-FITS/t/fits.t
+Basic/IO-FITS/t/m51.fits.fz
+Basic/IO-FlexRaw/FlexRaw.pm
+Basic/IO-FlexRaw/Makefile.PL
+Basic/IO-FlexRaw/t/flexraw.t
+Basic/IO-FlexRaw/t/flexraw_fortran.t
+Basic/IO-FlexRaw/t/iotypes.t
+Basic/IO-Misc/Makefile.PL
+Basic/IO-Misc/misc.pd
+Basic/IO-Misc/t/misc.t
+Basic/IO-Pnm/get.c
+Basic/IO-Pnm/get.h
+Basic/IO-Pnm/Makefile.PL
+Basic/IO-Pnm/Pic.pm
+Basic/IO-Pnm/pnm.pd
+Basic/IO-Pnm/t/pic_16bit.t
+Basic/IO-Pnm/t/pnm.t
+Basic/IO-Pnm/t/rim.t
+Basic/IO-Storable/Makefile.PL
+Basic/IO-Storable/storable.pd
+Basic/IO-Storable/t/storable.t
+Basic/IO-Storable/t/storable_new_amd64.dat
+Basic/IO-Storable/t/storable_old_amd64.dat
+Basic/Lib-Compression/compression.pd
+Basic/Lib-Compression/Makefile.PL
+Basic/Lib-Compression/ricecomp.c
+Basic/Lib-Compression/ricecomp.h
+Basic/Lib-Compression/t/basic.t
+Basic/Lib-FFT/fft.pd
+Basic/Lib-FFT/fftn.c
+Basic/Lib-FFT/fftn.h
+Basic/Lib-FFT/Makefile.PL
+Basic/Lib-FFT/t/fft.t
+Basic/Lib-ImageND/imagend.pd
+Basic/Lib-ImageND/Makefile.PL
+Basic/Lib-ImageND/t/imagend.t
+Basic/Lib-ImageRGB/imagergb.pd
+Basic/Lib-ImageRGB/Makefile.PL
+Basic/Lib-ImageRGB/pdlppm.h
+Basic/Lib-ImageRGB/ppm_quant.c
+Basic/Lib-ImageRGB/t/imagergb.t
+Basic/Lib-ImageRGB/t/picnorgb.t
+Basic/Lib-ImageRGB/t/picrgb.t
+Basic/Lib-Transform/Cartography/Cartography.pm
+Basic/Lib-Transform/Cartography/earth_coast.vec.fits
+Basic/Lib-Transform/Cartography/earth_day.jpg
+Basic/Lib-Transform/Cartography/earth_height-2048x1024.jpg
+Basic/Lib-Transform/Cartography/earth_night.jpg
+Basic/Lib-Transform/Cartography/earth_water-2048x1024.png
+Basic/Lib-Transform/Cartography/Makefile.PL
+Basic/Lib-Transform/Cartography_demo.pm
+Basic/Lib-Transform/earth-interp.pl
+Basic/Lib-Transform/earth.txt
+Basic/Lib-Transform/Makefile.PL
+Basic/Lib-Transform/t/transform.t
+Basic/Lib-Transform/transform.pd
+Basic/Lib-Transform/Transform_demo.pm
 Basic/Lite.pm
 Basic/LiteF.pm
 Basic/Lvalue.pm
+Basic/m51.fits
 Basic/Makefile.PL
 Basic/Math/const.c
 Basic/Math/cpoly.c
@@ -82,9 +179,11 @@ Basic/Ops/Makefile.PL
 Basic/Ops/ops.pd
 Basic/Options.pm
 Basic/PDL.pm
+Basic/PDLdb.pl
 Basic/Pod/API.pod
 Basic/Pod/BadValues.pod
 Basic/Pod/Broadcasting.pod
+Basic/Pod/Bugs.pod
 Basic/Pod/Course.pod
 Basic/Pod/Dataflow.pod
 Basic/Pod/DeveloperGuide.pod
@@ -108,6 +207,7 @@ Basic/Primitive/Makefile.PL
 Basic/Primitive/primitive.pd
 Basic/Primitive/xoshiro256plus.c
 Basic/Reduce.pm
+Basic/SIMD.pm
 Basic/Slices/Makefile.PL
 Basic/Slices/slices.pd
 Basic/SourceFilter/Changes
@@ -120,52 +220,81 @@ Basic/SourceFilter/ModuleCompile.pm
 Basic/SourceFilter/NiceSlice.pm
 Basic/SourceFilter/t/niceslice-utilcall.t
 Basic/SourceFilter/t/niceslice.t
+Basic/t/00-report-prereqs.t
+Basic/t/01-pptest.t
+Basic/t/autoload.t
+Basic/t/bad.t
+Basic/t/basic.t
+Basic/t/bigmem.t
+Basic/t/bool.t
+Basic/t/clump.t
+Basic/t/constants.t
+Basic/t/constructor.t
+Basic/t/core.t
+Basic/t/croak.t
+Basic/t/func.pdl
+Basic/t/inline-with.t
+Basic/t/inlinepdlpp.t
+Basic/t/lvalue.t
+Basic/t/math.t
+Basic/t/matrix.t
+Basic/t/matrixops.t
+Basic/t/nat_complex.t
+Basic/t/ops-bitwise.t
+Basic/t/ops.t
+Basic/t/pdl_from_string.t
+Basic/t/pdlchar.t
+Basic/t/pp_croaking.t
+Basic/t/pp_line_numbers.t
+Basic/t/ppt-01_ref_counting.t
+Basic/t/ppt-02_non_threaded.t
+Basic/t/ppt-03_name_munging.t
+Basic/t/ppt-10_physical_piddles.t
+Basic/t/ppt-11_memory_mapped.t
+Basic/t/ppt-20_simd.t
+Basic/t/ppt-30_sharing_from_threads.t
+Basic/t/primitive-append.t
+Basic/t/primitive-clip.t
+Basic/t/primitive-interpolate.t
+Basic/t/primitive-matmult.t
+Basic/t/primitive-misc.t
+Basic/t/primitive-random.t
+Basic/t/primitive-selector.t
+Basic/t/primitive-setops.t
+Basic/t/primitive-stats.t
+Basic/t/primitive-vector.t
+Basic/t/primitive-vsearch.t
+Basic/t/pthread.t
+Basic/t/reduce.t
+Basic/t/scope.t
+Basic/t/slice.t
+Basic/t/subclass.t
+Basic/t/thread.t
+Basic/t/thread_def.t
+Basic/t/tp-deep.t
+Basic/t/tp-eq_pdl.t
+Basic/t/tp-eq_pdl_clean.t
+Basic/t/tp-import_options.t
+Basic/t/tp-is_pdl.t
+Basic/t/ufunc.t
+Basic/TestDeepPDL.pm
+Basic/TestPDL.pm
+Basic/threads.pm
 Basic/Ufunc/Makefile.PL
 Basic/Ufunc/ufunc.pd
-Bugs.pod
+Basic/utils/address-pseudonymise
+Basic/utils/doc-pp
+Basic/utils/perldlpp.pl
 Changes
 COPYING
+cygwin/fix-max-memory.txt
 cygwin/g77_gcc.conf
 cygwin/INSTALL
+cygwin/max_memory.c
 cygwin/README
-Demos/BAD_demo.pm
-Demos/Demos.pm
-Demos/earth-interp.pl
-Demos/earth.txt
-Demos/General.pm
-Demos/harness
-Demos/Makefile.PL
-Demos/Sound.pm
-Demos/t/demos.t
+cygwin/tmalloc.pl
 DEPENDENCIES
-Doc/Doc.pm
-Doc/Doc/Config.pm.PL
-Doc/Doc/Perldl.pm
-Doc/Makefile.PL
-Doc/mkpdlfuncpod
-Doc/README
-Doc/scantree.pl
-Example/address-pseudonymise
-Example/Benchmark/Bench.pm
-Example/Benchmark/Bench.xs
-Example/Benchmark/Makefile.PL
-Example/Benchmark/README.md
-Example/Benchmark/time.pl
-Example/doc-pp
-Example/Fit/lmfit_example.pl
-Example/InlinePdlpp/inlpp.pl
-Example/InlinePdlpp/inlpp_link.pl
-Example/InlinePdlpp/inlppminimal.pl
-Example/InlinePdlpp/Module/Makefile.PL
-Example/InlinePdlpp/Module/MyInlineMod.pm
-Example/InlinePdlpp/Module/t/myinlinemod.t
-Example/Simplex/tsimp2.pl
-Example/Simplex/tsimp_needs_pgplot.pl
 Graphics/Graphics2D.pm
-Graphics/IIS/iis.pd
-Graphics/IIS/libiis.h
-Graphics/IIS/Makefile.PL
-Graphics/IIS/pdliisdisp.c
 Graphics/Limits/Limits.pm
 Graphics/Limits/Makefile.PL
 Graphics/Limits/t/limits_errb.t
@@ -235,24 +364,11 @@ IO/Dicom/Dicom.pm
 IO/Dicom/Makefile.PL
 IO/Dumper.pm
 IO/ENVI/readenvi.pdl
-IO/FastRaw/FastRaw.pm
-IO/FastRaw/Makefile.PL
-IO/FastRaw/t/fastraw.t
-IO/FITS/FITS.pm
-IO/FITS/Makefile.PL
-IO/FITS/t/fits.t
-IO/FITS/t/m51.fits.fz
-IO/FlexRaw/FlexRaw.pm
-IO/FlexRaw/Makefile.PL
-IO/FlexRaw/t/flexraw.t
-IO/FlexRaw/t/flexraw_fortran.t
-IO/FlexRaw/t/iotypes.t
 IO/GD/Changes
 IO/GD/GD.pd
 IO/GD/Makefile.PL
 IO/GD/t/gd_oo_tests.t
 IO/GD/t/gd_tests.t
-IO/GD/TODO
 IO/GD/typemap
 IO/HDF/buildfunc.pm
 IO/HDF/Changes
@@ -276,45 +392,19 @@ IO/IDL/t/basic.t
 IO/IDL/t/test.sav
 IO/IO.pod
 IO/Makefile.PL
-IO/Misc/Makefile.PL
-IO/Misc/misc.pd
-IO/Misc/t/misc.t
-IO/Pnm/get.c
-IO/Pnm/get.h
-IO/Pnm/Makefile.PL
-IO/Pnm/Pic.pm
-IO/Pnm/pnm.pd
-IO/Pnm/t/pic_16bit.t
-IO/Pnm/t/pnm.t
-IO/Pnm/t/rim.t
 IO/STL/Makefile.PL
 IO/STL/owl.stl
 IO/STL/STL.pm
 IO/STL/t/basic.t
 IO/STL/t/cube.stl
 IO/STL/t/cube_binary.stl
-IO/Storable/Makefile.PL
-IO/Storable/storable.pd
-IO/Storable/t/storable.t
-IO/Storable/t/storable_new_amd64.dat
-IO/Storable/t/storable_old_amd64.dat
 IO/t/dumper.t
 Libtmp/CallExt/CallExt.pm
 Libtmp/CallExt/CallExt.xs
 Libtmp/CallExt/Makefile.PL
 Libtmp/CallExt/t/callext.c
 Libtmp/CallExt/t/callext.t
-Libtmp/Compression/compression.pd
-Libtmp/Compression/Makefile.PL
-Libtmp/Compression/ricecomp.c
-Libtmp/Compression/ricecomp.h
-Libtmp/Compression/t/basic.t
 Libtmp/DiskCache.pm
-Libtmp/FFT/fft.pd
-Libtmp/FFT/fftn.c
-Libtmp/FFT/fftn.h
-Libtmp/FFT/Makefile.PL
-Libtmp/FFT/t/fft.t
 Libtmp/Filter/Linear.pm
 Libtmp/Filter/Makefile.PL
 Libtmp/Fit/Gaussian/gauss.c
@@ -424,28 +514,11 @@ Libtmp/Image2D/resample.h
 Libtmp/Image2D/rotate.c
 Libtmp/Image2D/select.c
 Libtmp/Image2D/t/image2d.t
-Libtmp/ImageND/imagend.pd
-Libtmp/ImageND/Makefile.PL
-Libtmp/ImageND/t/imagend.t
-Libtmp/ImageRGB/imagergb.pd
-Libtmp/ImageRGB/Makefile.PL
-Libtmp/ImageRGB/pdlppm.h
-Libtmp/ImageRGB/ppm_quant.c
-Libtmp/ImageRGB/t/imagergb.t
-Libtmp/ImageRGB/t/picnorgb.t
-Libtmp/ImageRGB/t/picrgb.t
 Libtmp/LegacyComplex/complex.pd
 Libtmp/LegacyComplex/Makefile.PL
 Libtmp/LegacyComplex/t/complex.t
 Libtmp/Makefile.PL
-Libtmp/Minuit/FCN.c
-Libtmp/Minuit/FCN.h
-Libtmp/Minuit/Makefile.PL
-Libtmp/Minuit/minuit.pd
-Libtmp/Minuit/minuitlib/futils.f
-Libtmp/Minuit/minuitlib/intracfalse.f
-Libtmp/Minuit/minuitlib/minuit.f
-Libtmp/Minuit/t/minuit.t
+Libtmp/Simplex/Demo.pm
 Libtmp/Simplex/Makefile.PL
 Libtmp/Simplex/Simplex.pm
 Libtmp/Simplex/t/simplex.t
@@ -454,6 +527,7 @@ Libtmp/Slatec/Gaussian.pm
 Libtmp/Slatec/Linfit.pm
 Libtmp/Slatec/LinPred.pm
 Libtmp/Slatec/LM.pm
+Libtmp/Slatec/lmfit_example.pl
 Libtmp/Slatec/Makefile.PL
 Libtmp/Slatec/slatec.pd
 Libtmp/Slatec/slatec/bvalu.f
@@ -575,33 +649,15 @@ Libtmp/Slatec/t/slatec-polyfit-weight.t
 Libtmp/Slatec/t/slatec.t
 Libtmp/t/diskcache.t
 Libtmp/t/func.t
-Libtmp/Transform/Cartography/Cartography.pm
-Libtmp/Transform/Cartography/earth_coast.vec.fits
-Libtmp/Transform/Cartography/earth_day.jpg
-Libtmp/Transform/Cartography/earth_height-2048x1024.jpg
-Libtmp/Transform/Cartography/earth_night.jpg
-Libtmp/Transform/Cartography/earth_water-2048x1024.png
-Libtmp/Transform/Cartography/Makefile.PL
-Libtmp/Transform/Cartography_demo.pm
-Libtmp/Transform/Makefile.PL
-Libtmp/Transform/Proj4/Makefile.PL
-Libtmp/Transform/Proj4/proj4.pd
-Libtmp/Transform/Proj4/t/gis_proj.t
-Libtmp/Transform/Proj4/t/proj_transform.t
-Libtmp/Transform/Proj4/t/proj_transform2.t
-Libtmp/Transform/t/transform.t
-Libtmp/Transform/transform.pd
-Libtmp/Transform/Transform_demo.pm
-m51.fits
+Libtmp/Transform-Proj4/Demo.pm
+Libtmp/Transform-Proj4/Makefile.PL
+Libtmp/Transform-Proj4/proj4.pd
+Libtmp/Transform-Proj4/t/gis_proj.t
+Libtmp/Transform-Proj4/t/proj_transform.t
 macosx/README
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-pdl.c
-PDLdb.pl
-pdldoc
-perldl
-perldl.conf
 Perldl2/Makefile.PL
 Perldl2/pdl2
 Perldl2/Plugin/CleanErrors.pm
@@ -615,64 +671,15 @@ Perldl2/README
 Perldl2/Script.pm
 Perldl2/TODO
 README.md
-t/00-report-prereqs.t
-t/01-pptest.t
-t/autoload.t
-t/bad.t
-t/basic.t
-t/bigmem.t
-t/bool.t
-t/clump.t
-t/config.t
-t/constants.t
-t/constructor.t
-t/core.t
-t/croak.t
-t/func.pdl
-t/inline-with.t
-t/inlinepdlpp.t
-t/lib/My/Test/Primitive.pm
-t/lvalue.t
-t/math.t
-t/matrix.t
-t/matrixops.t
-t/nat_complex.t
-t/ops-bitwise.t
-t/ops.t
-t/pdl_from_string.t
-t/pdlchar.t
-t/pp_croaking.t
-t/pp_line_numbers.t
-t/primitive-append.t
-t/primitive-clip.t
-t/primitive-interpolate.t
-t/primitive-matmult.t
-t/primitive-misc.t
-t/primitive-random.t
-t/primitive-selector.t
-t/primitive-setops.t
-t/primitive-stats.t
-t/primitive-vector.t
-t/primitive-vsearch.t
-t/pthread.t
-t/reduce.t
-t/scope.t
-t/slice.t
-t/subclass.t
-t/thread.t
-t/thread_def.t
-t/ufunc.t
-utils/perldlpp.pl
 win32/INSTALL
 win32/win32f77.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 GENERATED/PDL/Bad.pm                     mod=PDL::Bad pd=Basic/Bad/bad.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Complex.pm                 mod=PDL::Complex pd=Libtmp/LegacyComplex/complex.pd (added by pdlpp_mkgen)
-GENERATED/PDL/Compression.pm             mod=PDL::Compression pd=Libtmp/Compression/compression.pd (added by pdlpp_mkgen)
-GENERATED/PDL/FFT.pm                     mod=PDL::FFT pd=Libtmp/FFT/fft.pd (added by pdlpp_mkgen)
+GENERATED/PDL/Compression.pm             mod=PDL::Compression pd=Basic/Lib-Compression/compression.pd (added by pdlpp_mkgen)
+GENERATED/PDL/FFT.pm                     mod=PDL::FFT pd=Basic/Lib-FFT/fft.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Fit/Gaussian.pm            mod=PDL::Fit::Gaussian pd=Libtmp/Fit/Gaussian/gaussian.pd (added by pdlpp_mkgen)
-GENERATED/PDL/Graphics/IIS.pm            mod=PDL::Graphics::IIS pd=Graphics/IIS/iis.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Graphics/OpenGLQ.pm        mod=PDL::Graphics::OpenGLQ pd=Graphics/TriD/OpenGLQ/openglq.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Graphics/TriD/Rout.pm      mod=PDL::Graphics::TriD::Rout pd=Graphics/TriD/Rout/rout.pd (added by pdlpp_mkgen)
 GENERATED/PDL/GSL/CDF.pm                 mod=PDL::GSL::CDF pd=Libtmp/GSL/CDF/gsl_cdf.pd (added by pdlpp_mkgen)
@@ -711,22 +718,21 @@ GENERATED/PDL/GSLSF/TRANSPORT.pm         mod=PDL::GSLSF::TRANSPORT pd=Libtmp/GSL
 GENERATED/PDL/GSLSF/TRIG.pm              mod=PDL::GSLSF::TRIG pd=Libtmp/GSL/SF/trig/gsl_sf_trig.pd (added by pdlpp_mkgen)
 GENERATED/PDL/GSLSF/ZETA.pm              mod=PDL::GSLSF::ZETA pd=Libtmp/GSL/SF/zeta/gsl_sf_zeta.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Image2D.pm                 mod=PDL::Image2D pd=Libtmp/Image2D/image2d.pd (added by pdlpp_mkgen)
-GENERATED/PDL/ImageND.pm                 mod=PDL::ImageND pd=Libtmp/ImageND/imagend.pd (added by pdlpp_mkgen)
-GENERATED/PDL/ImageRGB.pm                mod=PDL::ImageRGB pd=Libtmp/ImageRGB/imagergb.pd (added by pdlpp_mkgen)
+GENERATED/PDL/ImageND.pm                 mod=PDL::ImageND pd=Basic/Lib-ImageND/imagend.pd (added by pdlpp_mkgen)
+GENERATED/PDL/ImageRGB.pm                mod=PDL::ImageRGB pd=Basic/Lib-ImageRGB/imagergb.pd (added by pdlpp_mkgen)
 GENERATED/PDL/IO/Browser.pm              mod=PDL::IO::Browser pd=IO/Browser/browser.pd (added by pdlpp_mkgen)
 GENERATED/PDL/IO/GD.pm                   mod=PDL::IO::GD pd=IO/GD/GD.pd (added by pdlpp_mkgen)
 GENERATED/PDL/IO/HDF/SD.pm               mod=PDL::IO::HDF::SD pd=IO/HDF/SD/SD.pd (added by pdlpp_mkgen)
 GENERATED/PDL/IO/HDF/VS.pm               mod=PDL::IO::HDF::VS pd=IO/HDF/VS/VS.pd (added by pdlpp_mkgen)
-GENERATED/PDL/IO/Misc.pm                 mod=PDL::IO::Misc pd=IO/Misc/misc.pd (added by pdlpp_mkgen)
-GENERATED/PDL/IO/Pnm.pm                  mod=PDL::IO::Pnm pd=IO/Pnm/pnm.pd (added by pdlpp_mkgen)
-GENERATED/PDL/IO/Storable.pm             mod=PDL::IO::Storable pd=IO/Storable/storable.pd (added by pdlpp_mkgen)
+GENERATED/PDL/IO/Misc.pm                 mod=PDL::IO::Misc pd=Basic/IO-Misc/misc.pd (added by pdlpp_mkgen)
+GENERATED/PDL/IO/Pnm.pm                  mod=PDL::IO::Pnm pd=Basic/IO-Pnm/pnm.pd (added by pdlpp_mkgen)
+GENERATED/PDL/IO/Storable.pm             mod=PDL::IO::Storable pd=Basic/IO-Storable/storable.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Math.pm                    mod=PDL::Math pd=Basic/Math/math.pd (added by pdlpp_mkgen)
 GENERATED/PDL/MatrixOps.pm               mod=PDL::MatrixOps pd=Basic/MatrixOps/matrixops.pd (added by pdlpp_mkgen)
-GENERATED/PDL/Minuit.pm                  mod=PDL::Minuit pd=Libtmp/Minuit/minuit.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Ops.pm                     mod=PDL::Ops pd=Basic/Ops/ops.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Primitive.pm               mod=PDL::Primitive pd=Basic/Primitive/primitive.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Slatec.pm                  mod=PDL::Slatec pd=Libtmp/Slatec/slatec.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Slices.pm                  mod=PDL::Slices pd=Basic/Slices/slices.pd (added by pdlpp_mkgen)
-GENERATED/PDL/Transform.pm               mod=PDL::Transform pd=Libtmp/Transform/transform.pd (added by pdlpp_mkgen)
-GENERATED/PDL/Transform/Proj4.pm         mod=PDL::Transform::Proj4 pd=Libtmp/Transform/Proj4/proj4.pd (added by pdlpp_mkgen)
+GENERATED/PDL/Transform.pm               mod=PDL::Transform pd=Basic/Lib-Transform/transform.pd (added by pdlpp_mkgen)
+GENERATED/PDL/Transform/Proj4.pm         mod=PDL::Transform::Proj4 pd=Libtmp/Transform-Proj4/proj4.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Ufunc.pm                   mod=PDL::Ufunc pd=Basic/Ufunc/ufunc.pd (added by pdlpp_mkgen)

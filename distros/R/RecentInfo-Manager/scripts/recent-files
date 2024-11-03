@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+use 5.020;
+use experimental 'signatures';
+
+# Central command dispatcher like C<git>
+# See https://git-scm.com/docs/git
+
+our $VERSION = '0.01';
+use Getopt::Long (qw(:config pass_through permute)); # stop at the first unknown option or first argument
+use File::Basename;
+
+GetOptions(
+    'v|version'   => \my $do_version,
+    'h|help'      => \my $do_help,
+    'exec-path=s' => \my $exec_path,
+    'base-name=s' => \my $base_name,
+);
+
+if( $do_version ) {
+    my $program = basename($0);
+    say "$program $VERSION";
+    exit;
+}
+
+if( $do_help ) {
+    # Output something helpful here ...
+    pod2usage(1);
+}
+
+$exec_path //= dirname $0;
+$base_name = 'recent-files';
+
+sub find_command( $command, $dir=$exec_path ) {
+    # Consider also using $ENV{PATHEXT} on Windows
+    my @extensions = $^O eq 'MSWin32' ? ('.com', '.exe', '.cmd', '.bat','.pl') : ('', '.pl');
+    my @candidates = grep { -f $_ }
+                     map {
+                         "$dir/$base_name-$command$_"
+                     } @extensions;
+    return $candidates[0] ? $candidates[0] : ();
+}
+
+my ($command, @args) = @ARGV;
+if( $command =~ /^--/ ) {
+    die "Unknown option '$command'\n";
+
+} else {
+    $command //= 'list'; # our default
+
+    my $cmd = find_command( $command );
+    if( ! $cmd ) {
+        # Find and list likely alternatives
+        die "Unknown command '$command'\n";
+    } else {
+        # on Windows, use system() so we can still run .bat files synchronously
+        if( $^O eq 'MSWin32' ) {
+            system( $cmd => @args ) == 0
+                or die "$! / $^E";
+        } else {
+            exec $cmd => @args or die $!;
+        }
+    }
+}
+

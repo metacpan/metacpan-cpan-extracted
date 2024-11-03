@@ -73,7 +73,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.61';
+our $VERSION = '1.62';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -4207,7 +4207,8 @@ _JS_
     $self->_context($old);
     my @certificates;
     foreach my $certificate ( @{$certificates} ) {
-        push @certificates, Firefox::Marionette::Certificate->new(%{$certificate});
+        push @certificates,
+          Firefox::Marionette::Certificate->new( %{$certificate} );
     }
     return @certificates;
 }
@@ -8513,6 +8514,9 @@ sub _proxy_from_env {
                 $build->{proxyAutoconfigUrl} =
                   Firefox::Marionette::Proxy->get_inline_pac($uri);
             }
+            elsif ( $value =~ /^socks(?:[45])?:\/\/(.*?(:\d+)?)$/smx ) {
+                $build->{ $build_key . 'Proxy' } = $1;
+            }
             else {
                 $build->{ $build_key . 'Proxy' } = $uri->host_port();
             }
@@ -12275,7 +12279,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.61
+Version 1.62
 
 =head1 SYNOPSIS
 

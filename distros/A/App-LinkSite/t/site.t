@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More;
 use App::LinkSite::Site;
 
 # Test the creation of an App::LinkSite::Site object
@@ -31,3 +31,5 @@ is($site->og_image, 'test_og_image.png', 'og_image method returns "test_og_image
 
 # Test the site_url method
 is($site->site_url, 'http://example.com', 'site_url method returns "http://example.com"');
+
+done_testing;

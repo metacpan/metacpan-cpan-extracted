@@ -8,9 +8,16 @@ use File::Temp qw( tempdir );
 
 my $tmpdir = tempdir( TMPDIR => 1, CLEANUP => 1 );
 
+sub logger_and_warnings {
+  my @warnings;
+  local $SIG{__WARN__} = sub { push @warnings, @_; };
+  my $logger = Log::Dispatchouli->new($_[0]);
+  return ($logger, @warnings);
+}
+
 {
   {
-    my $logger = Log::Dispatchouli->new({
+    my ($logger, @warnings) = logger_and_warnings({
       log_pid  => 1,
       ident    => 't_file',
       to_file  => 1,
@@ -20,6 +27,9 @@ my $tmpdir = tempdir( TMPDIR => 1, CLEANUP => 1 );
     isa_ok($logger, 'Log::Dispatchouli');
 
     is($logger->ident, 't_file', '$logger->ident is available');
+
+    is(@warnings, 1, "we got a warning");
+    like($warnings[0], qr{to_file.+deprecated}, "...about to_file");
 
     $logger->log([ "point: %s", {x=>1,y=>2} ]);
   }
@@ -34,7 +44,7 @@ my $tmpdir = tempdir( TMPDIR => 1, CLEANUP => 1 );
 
 {
   {
-    my $logger = Log::Dispatchouli->new({
+    my ($logger, @warnings) = logger_and_warnings({
       log_pid  => 0,
       ident    => 'ouli_file',
       to_file  => 1,
@@ -46,6 +56,9 @@ my $tmpdir = tempdir( TMPDIR => 1, CLEANUP => 1 );
     isa_ok($logger, 'Log::Dispatchouli');
 
     is($logger->ident, 'ouli_file', '$logger->ident is available');
+
+    is(@warnings, 1, "we got a warning");
+    like($warnings[0], qr{to_file.+deprecated}, "...about to_file");
 
     $logger->log([ "point: %s", {x=>1,y=>2} ]);
   }

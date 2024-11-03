@@ -13,7 +13,7 @@ configure_requires:
   Module::Build::Tiny: '0.044'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,40 +22,40 @@ name: Crypt-HSM
 provides:
   Crypt::HSM:
     file: lib/Crypt/HSM.pm
-    version: '0.017'
+    version: '0.018'
   Crypt::HSM::Decrypt:
     file: lib/Crypt/HSM/Decrypt.pm
-    version: '0.017'
+    version: '0.018'
   Crypt::HSM::Digest:
     file: lib/Crypt/HSM/Digest.pm
-    version: '0.017'
+    version: '0.018'
   Crypt::HSM::Encrypt:
     file: lib/Crypt/HSM/Encrypt.pm
-    version: '0.017'
-  Crypt::HSM::Key:
-    file: lib/Crypt/HSM/Key.pm
-    version: '0.017'
+    version: '0.018'
   Crypt::HSM::Mechanism:
     file: lib/Crypt/HSM/Mechanism.pm
-    version: '0.017'
+    version: '0.018'
+  Crypt::HSM::Object:
+    file: lib/Crypt/HSM/Object.pm
+    version: '0.018'
   Crypt::HSM::Provider:
     file: lib/Crypt/HSM/Provider.pm
-    version: '0.017'
+    version: '0.018'
   Crypt::HSM::Session:
     file: lib/Crypt/HSM/Session.pm
-    version: '0.017'
+    version: '0.018'
   Crypt::HSM::Sign:
     file: lib/Crypt/HSM/Sign.pm
-    version: '0.017'
+    version: '0.018'
   Crypt::HSM::Slot:
     file: lib/Crypt/HSM/Slot.pm
-    version: '0.017'
+    version: '0.018'
   Crypt::HSM::Stream:
     file: lib/Crypt/HSM/Stream.pm
-    version: '0.017'
+    version: '0.018'
   Crypt::HSM::Verify:
     file: lib/Crypt/HSM/Verify.pm
-    version: '0.017'
+    version: '0.018'
 requires:
   XSLoader: '0'
   perl: '5.006'
@@ -64,7 +64,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-hsm/issues
   repository: git://github.com/Leont/crypt-hsm.git
-version: '0.017'
+version: '0.018'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

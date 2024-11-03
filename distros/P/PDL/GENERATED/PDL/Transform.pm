@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from transform.pd! Don't modify!
 #
 package PDL::Transform;
 
@@ -308,10 +308,26 @@ sub apply {
     unless(defined($me->{func}) and ref($me->{func}) eq 'CODE');
   my $result = $me->{func}->($from,$me->{params});
   $result->is_inplace(0); # clear inplace flag, just in case.
+  if (defined $from->gethdr && $from->hdr->{NAXIS}) {
+    my $nd = $me->{odim} || $me->{idim} || 2;
+    for my $d (1..$nd) {
+      $result->hdr->{"CTYPE$d"} = ( (!defined($me->{otype}) ? "" :
+          ref($me->{otype}) ne 'ARRAY' ? $me->{otype} :
+          $me->{otype}[$d-1])
+         || $from->hdr->{"CTYPE$d"}
+         || "");
+      $result->hdr->{"CUNIT$d"} = ( (!defined($me->{ounit}) ? "" :
+          ref($me->{ounit}) ne 'ARRAY' ? $me->{ounit} :
+          $me->{ounit}[$d-1])
+         || $from->hdr->{"CUNIT$d"}
+         || $from->hdr->{"CTYPE$d"}
+         || "");
+    }
+  }
   return $result;
 }
 
-#line 357 "transform.pd"
+#line 373 "transform.pd"
 
 =head2 invert
 
@@ -347,7 +363,7 @@ sub invert {
   $result->is_inplace(0);  # make sure inplace flag is clear.
   return $result;
 }
-#line 351 "Transform.pm"
+#line 367 "Transform.pm"
 
 
 =head2 map
@@ -695,13 +711,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1531 "transform.pd"
+#line 1547 "transform.pd"
 
 sub PDL::match {
   # Set default for rectification to 0 for simple matching...
   push @_, {} if ref($_[-1]) ne 'HASH';
   my @k = grep(m/^r(e(c(t)?)?)?/,sort keys %{$_[-1]});
-#line 1536 "transform.pd"
+#line 1552 "transform.pd"
   unless(@k) {
       $_[-1]->{rectify} = 0;
   }
@@ -904,15 +920,17 @@ sub map {
               $out->hdr->{"CDELT$d"} = $scale->at($d-1);
               $out->hdr->{"CRVAL$d"} = ( $omin->at($d-1) + $omax->at($d-1) ) /2 ;
               $out->hdr->{"NAXIS$d"} = $out->dim($d-1);
-              $out->hdr->{"CTYPE$d"} = ( (defined($me->{otype}) ?
-                                          $me->{otype}->[$d-1] : "")
-                                         || $in->hdr->{"CTYPE$d"}
-                                         || "");
-              $out->hdr->{"CUNIT$d"} = ( (defined($me->{ounit}) ?
-                                          $me->{ounit}->[$d-1] : "")
-                                         || $in->hdr->{"CUNIT$d"}
-                                         || $in->hdr->{"CTYPE$d"}
-                                         || "");
+              $out->hdr->{"CTYPE$d"} = ( (!defined($me->{otype}) ? "" :
+                  ref($me->{otype}) ne 'ARRAY' ? $me->{otype} :
+                  $me->{otype}[$d-1])
+                 || $in->hdr->{"CTYPE$d"}
+                 || "");
+              $out->hdr->{"CUNIT$d"} = ( (!defined($me->{ounit}) ? "" :
+                  ref($me->{ounit}) ne 'ARRAY' ? $me->{ounit} :
+                  $me->{ounit}[$d-1])
+                 || $in->hdr->{"CUNIT$d"}
+                 || $in->hdr->{"CTYPE$d"}
+                 || "");
           }
           $out->hdr->{"NAXIS"} = $nd;
 
@@ -923,7 +941,7 @@ sub map {
           ### These are the CROTA<n>, PCi_j, and CDi_j.
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(CD|PC)\d+_\d+[A-Z]?$)/, keys %{$out->hdr}
-#line 1760 "transform.pd"
+#line 1778 "transform.pd"
           };
       } else {
           # Non-rectified output -- generate a CDi_j matrix instead of the simple formalism.
@@ -949,15 +967,17 @@ sub map {
               $out->hdr->{"CRPIX$d"} = 1 + ($out->dim($d-1)-1)/2;
               $out->hdr->{"CRVAL$d"} = $midpoint_val->at($d-1);
               $out->hdr->{"NAXIS$d"} = $out->dim($d-1);
-              $out->hdr->{"CTYPE$d"} = ( (defined($me->{otype}) ?
-                                          $me->{otype}->[$d-1] : "")
-                                         || $in->hdr->{"CTYPE$d"}
-                                         || "");
-              $out->hdr->{"CUNIT$d"} = ( (defined($me->{ounit}) ?
-                                          $me->{ounit}->[$d-1] : "")
-                                         || $in->hdr->{"CUNIT$d"}
-                                         || $in->hdr->{"CTYPE$d"}
-                                         || "");
+              $out->hdr->{"CTYPE$d"} = ( (!defined($me->{otype}) ? "" :
+                  ref($me->{otype}) ne 'ARRAY' ? $me->{otype} :
+                  $me->{otype}[$d-1])
+                 || $in->hdr->{"CTYPE$d"}
+                 || "");
+              $out->hdr->{"CUNIT$d"} = ( (!defined($me->{ounit}) ? "" :
+                  ref($me->{ounit}) ne 'ARRAY' ? $me->{ounit} :
+                  $me->{ounit}[$d-1])
+                 || $in->hdr->{"CUNIT$d"}
+                 || $in->hdr->{"CTYPE$d"}
+                 || "");
               for my $e(1..$nd) {
                   $out->hdr->{"CD${d}_${e}"} = $mat->at($d-1,$e-1);
                   print "setting CD${d}_${e} to ".$mat->at($d-1,$e-1)."\n" if($PDL::Transform::debug);
@@ -967,7 +987,7 @@ sub map {
           ## Eliminate competing header pointing tags if they exist
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(PC)\d+_\d+[A-Z]?$)|(CDELT\d*$)/, keys %{$out->hdr}
-#line 1803 "transform.pd"
+#line 1823 "transform.pd"
           };
       }
     }
@@ -1076,7 +1096,7 @@ sub map {
   }
   return $out;
 }
-#line 1080 "Transform.pm"
+#line 1100 "Transform.pm"
 
 *map = \&PDL::map;
 
@@ -1084,7 +1104,7 @@ sub map {
 
 
 
-#line 1918 "transform.pd"
+#line 1938 "transform.pd"
 
 ######################################################################
 
@@ -1124,7 +1144,7 @@ sub unmap {
   return $me->inverse->map($data,@params);
 }
 
-#line 1961 "transform.pd"
+#line 1981 "transform.pd"
 
 =head2 t_inverse
 
@@ -1168,7 +1188,7 @@ sub inverse {
   }, ref $me;
 }
 
-#line 2008 "transform.pd"
+#line 2028 "transform.pd"
 
 =head2 t_compose
 
@@ -1187,7 +1207,7 @@ You can also compose transforms using the overloaded matrix-multiplication
 
 This is accomplished by inserting a splicing code ref into the C<func>
 and C<inv> slots.  It combines multiple compositions into a single
-list of transforms to be executed in order, fram last to first (in
+list of transforms to be executed in order, from last to first (in
 keeping with standard mathematical notation).  If one of the functions is
 itself a composition, it is interpolated into the list rather than left
 separate.  Ultimately, linear transformations may also be combined within
@@ -1215,9 +1235,9 @@ sub compose {
   $me->{name} = "";
   my @clist;
   for my $f (@funcs) {
-    $me->{idim} = $f->{idim} if($f->{idim} > $me->{idim});
-    $me->{odim} = $f->{odim} if($f->{odim} > $me->{odim});
-    if(UNIVERSAL::isa($f,"PDL::Transform::Composition")) {
+    $me->{idim} = $f->{idim} if $f->{idim} > $me->{idim};
+    $me->{odim} = $f->{odim} if $f->{odim} > $me->{odim};
+    if (UNIVERSAL::isa($f,"PDL::Transform::Composition")) {
       if($f->{is_inverse}) {
         for(reverse(@{$f->{params}->{clist}})) {
           push(@clist,$_->inverse);
@@ -1264,7 +1284,7 @@ sub compose {
   return bless($me,'PDL::Transform::Composition');
 }
 
-#line 2107 "transform.pd"
+#line 2127 "transform.pd"
 
 =head2 t_wrap
 
@@ -1331,7 +1351,7 @@ sub _pow_op {
     t_compose(@l);
 }
 
-#line 2180 "transform.pd"
+#line 2200 "transform.pd"
 
 =head2 t_identity
 
@@ -1365,7 +1385,7 @@ sub new {
   return bless $me,$class;
 }
 
-#line 2218 "transform.pd"
+#line 2238 "transform.pd"
 
 =head2 t_lookup
 
@@ -1615,7 +1635,7 @@ sub t_lookup {
   return $me;
 }
 
-#line 2475 "transform.pd"
+#line 2495 "transform.pd"
 
 =head2 t_linear
 
@@ -1709,11 +1729,22 @@ to tell and the default number of dimensions is 2.  This provides a way
 to do, e.g., 3-D scaling: just set C<{s=><scale-factor>, dims=>3}> and
 you are on your way.
 
+=item idim
+
+=item odim
+
+=item iunit
+
+=item ounit
+
+=item itype
+
+=item otype
+
+These are incorporated in the object, though not much is done with them
+yet as of 2.094.
+
 =back
-
-NOTES
-
-the type/unit fields are currently ignored by t_linear.
 
 =cut
 
@@ -1862,6 +1893,11 @@ sub new {
   $me->{params}{idim} = $me->{idim};
   $me->{params}{odim} = $me->{odim};
 
+  for (qw(iunit ounit itype otype)) {
+    next unless defined (my $val = _opt($o,[$_]));
+    $me->{$_} = $val;
+  }
+
   ##############################
   # The meat -- just shift, matrix-multiply, and shift again.
   $me->{func} = sub {
@@ -1924,7 +1960,7 @@ sub stringify {
 }
 }
 
-#line 2787 "transform.pd"
+#line 2823 "transform.pd"
 
 =head2 t_scale
 
@@ -1945,12 +1981,12 @@ sub t_scale {
     my($scale) = shift;
     my($y) = shift;
     return t_linear(scale=>$scale,%{$y})
-#line 2808 "transform.pd"
+#line 2844 "transform.pd"
         if(ref $y eq 'HASH');
     t_linear(Scale=>$scale,$y,@_);
 }
 
-#line 2815 "transform.pd"
+#line 2851 "transform.pd"
 
 =head2 t_offset
 
@@ -1971,13 +2007,13 @@ sub t_offset {
     my($pre) = shift;
     my($y) = shift;
     return t_linear(pre=>$pre,%{$y})
-#line 2836 "transform.pd"
+#line 2872 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(pre=>$pre,$y,@_);
 }
 
-#line 2844 "transform.pd"
+#line 2880 "transform.pd"
 
 =head2 t_rot
 
@@ -1999,13 +2035,13 @@ sub t_rotate    {
     my $rot = shift;
     my($y) = shift;
     return t_linear(rot=>$rot,%{$y})
-#line 2866 "transform.pd"
+#line 2902 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(rot=>$rot,$y,@_);
 }
 
-#line 2876 "transform.pd"
+#line 2912 "transform.pd"
 
 =head2 t_fits
 
@@ -2160,7 +2196,7 @@ sub t_fits {
   return $me;
 }
 
-#line 3039 "transform.pd"
+#line 3075 "transform.pd"
 
 =head2 t_code
 
@@ -2253,7 +2289,7 @@ sub t_code {
   $me;
 }
 
-#line 3138 "transform.pd"
+#line 3174 "transform.pd"
 
 =head2 t_cylindrical
 
@@ -2424,7 +2460,7 @@ sub t_radial {
   $me;
 }
 
-#line 3315 "transform.pd"
+#line 3351 "transform.pd"
 
 =head2 t_quadratic
 
@@ -2539,7 +2575,7 @@ sub t_quadratic {
     $me;
 }
 
-#line 3434 "transform.pd"
+#line 3470 "transform.pd"
 
 =head2 t_cubic
 
@@ -2679,7 +2715,7 @@ sub t_cubic {
     $me;
 }
 
-#line 3580 "transform.pd"
+#line 3616 "transform.pd"
 
 =head2 t_quartic
 
@@ -2798,7 +2834,7 @@ sub t_quartic {
     $me;
 }
 
-#line 3703 "transform.pd"
+#line 3739 "transform.pd"
 
 =head2 t_spherical
 
@@ -2930,7 +2966,7 @@ sub t_spherical {
     $me;
   }
 
-#line 3839 "transform.pd"
+#line 3875 "transform.pd"
 
 =head2 t_projective
 
@@ -3147,7 +3183,7 @@ sub stringify {
   $out .= "fwd ". ((defined ($me->{func})) ? ( (ref($me->{func}) eq 'CODE') ? "ok" : "non-CODE(!!)" ): "missing")."; ";
   $out .= "inv ". ((defined ($me->{inv})) ?  ( (ref($me->{inv}) eq 'CODE') ? "ok" : "non-CODE(!!)" ):"missing").".\n";
 }
-#line 3151 "Transform.pm"
+#line 3187 "Transform.pm"
 
 # Exit with OK status
 

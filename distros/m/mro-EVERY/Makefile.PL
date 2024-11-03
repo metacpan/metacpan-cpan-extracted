@@ -11,8 +11,8 @@ WriteMakefile
         NAME            mro::EVERY
         LICENSE         perl
     ) 
-  , VERSION_FROM	=> 'lib/mro/EVERY.pm'
-  , ABSTRACT_FROM	=> 'lib/mro/EVERY.pm'
+  , VERSION_FROM    => 'lib/mro/EVERY.pm'
+  , ABSTRACT_FROM   => 'lib/mro/EVERY.pm'
   , AUTHOR          => 'Steven Lembark <lembark@wrkhors.com>'
   , PREREQ_PM       =>
     {
@@ -22,11 +22,11 @@ WriteMakefile
         qw
         (
 
-			mro			0
-			Cwd			0
-            Carp        0
-            List::Util  1.45
-            Symbol      0
+            mro             0
+            Cwd             0
+            Carp            0
+            List::Util      1.45
+            Symbol          0
         )
     }
 );

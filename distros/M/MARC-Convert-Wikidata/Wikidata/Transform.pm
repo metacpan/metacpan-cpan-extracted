@@ -37,7 +37,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 # Constructor.
 sub new {
@@ -150,10 +150,12 @@ sub _cover {
 		if (! defined $cover) {
 			next;
 		}
-		if ($cover ne 'hardback' && $cover ne 'paperback') {
-			warn encode_utf8("Book cover '$cover' doesn't exist.\n");
-		} else {
+		if ($cover eq 'hardback' || $cover eq 'paperback') {
 			push @ret_cover, $cover;
+		} elsif ($cover eq 'collective') {
+			# nothing
+		} else {
+			warn encode_utf8("Book cover '$cover' doesn't exist.\n");
 		}
 	}
 
@@ -210,7 +212,7 @@ sub _isbns {
 			next;
 		}
 		my @publishers = $isbn_field->subfield('q');
-		my ($publisher, $cover);
+		my ($publisher, $cover, $collective) = (undef, undef, 0);
 		foreach my $pub (@publishers) {
 			$pub = clean_cover($pub);
 			if (! defined $pub) {
@@ -218,11 +220,14 @@ sub _isbns {
 			}
 			if (any { $pub eq $_ } @COVERS) {
 				$cover = $pub;
+			} elsif ($pub eq 'collective') {
+				$collective = 1;
 			} else {
 				$publisher = $pub;
 			}
 		}
 		my $isbn_o = MARC::Convert::Wikidata::Object::ISBN->new(
+			'collective' => $collective,
 			defined $cover ? (
 				'cover' => $cover,
 			) : (),

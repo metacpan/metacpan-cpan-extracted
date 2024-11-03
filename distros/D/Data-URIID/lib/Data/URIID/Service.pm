@@ -24,7 +24,9 @@ use DateTime::Format::ISO8601;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
+
+use parent 'Data::URIID::Base';
 
 my @musicbrainz_wikidata_relations = qw(P434 P435 P436 P966 P982 P1004 P1330 P1407 P4404 P5813 P6423 P8052);
 
@@ -385,12 +387,14 @@ sub _own_well_known {
                 {uuid => '7f265548-81dc-4280-9550-1bd0aa4bf748', sid => 4, name => 'has-type'},
                 {uuid => 'a8d1637d-af19-49e9-9ef8-6bc1fbcf6439', sid => 5, name => 'uri'},
                 {uuid => 'd08dc905-bbf6-4183-b219-67723c3c8374', sid => 6, name => 'oid'},
+                # Unassigned: 7
                 {uuid => 'd0a4c6e2-ce2f-4d4c-b079-60065ac681f1', sid => 8, name => 'language-tag-identifier'},
                 {uuid => 'ce7aae1e-a210-4214-926a-0ebca56d77e3', sid => 9, name => 'wikidata-identifier'},
                 {uuid => '923b43ae-a50e-4db3-8655-ed931d0dd6d4', sid => 10, name => 'specialises'},
                 {uuid => 'eacbf914-52cf-4192-a42c-8ecd27c85ee1', sid => 11, name => 'unicode-string'},
                 {uuid => '928d02b0-7143-4ec9-b5ac-9554f02d3fb1', sid => 12, name => 'integer'},
                 {uuid => 'dea3782c-6bcb-4ce9-8a39-f8dab399d75d', sid => 13, name => 'unsigned-integer'},
+                # Unassigned: 14 - 15
                 {uuid => '6ba648c2-3657-47c2-8541-9b73c3a9b2b4', sid => 16, name => 'default-context'},
                 {uuid => '52a516d0-25d8-47c7-a6ba-80983e576c54', sid => 17, name => 'proto-file'},
                 {uuid => '1cd4a6c6-0d7c-48d1-81e7-4e8d41fdb45d', sid => 18, name => 'final-file-size'},
@@ -403,6 +407,8 @@ sub _own_well_known {
                 {uuid => '59cfe520-ba32-48cc-b654-74f7a05779db', sid => 25, name => 'marked-as'},
                 {uuid => '2bffc55d-7380-454e-bd53-c5acd525d692', sid => 26, name => 'roaraudio-error-number'},
                 {uuid => 'f87a38cb-fd13-4e15-866c-e49901adbec5', sid => 27, name => 'small-identifier'},
+                {uuid => 'd2750351-aed7-4ade-aa80-c32436cc6030', sid => 28, name => 'also-has-role'},
+                # Unassigned: 29 - 31
                 {uuid => '448c50a8-c847-4bc7-856e-0db5fea8f23b', sid => 32, name => 'final-file-encoding'},
                 {uuid => '79385945-0963-44aa-880a-bca4a42e9002', sid => 33, name => 'final-file-hash'},
                 {uuid => '3fde5688-6e34-45e9-8f33-68f079b152c8', sid => 34, name => 'SEEK_SET'},
@@ -412,9 +418,12 @@ sub _own_well_known {
                 {uuid => 'ae8ec1de-38ec-4c58-bbd7-7ff43e1100fc', sid => 38, name => 'in-reply-to'},
                 {uuid => '8a31868b-0a26-42e0-ac54-819a9ed9dcab', sid => 39, name => 'in-response-to'},
                 {uuid => 'ffa893a2-9a0e-4013-96b4-307e2bca15b9', sid => 40, name => 'has-message-body'},
+                {uuid => 'b72508ba-7fb9-42ae-b4cf-b850b53a16c2', sid => 41, name => 'account'},
+                # Unassigned: 42 - 47
                 {uuid => 'dd8e13d3-4b0f-5698-9afa-acf037584b20', sid => 48, name => 'zero'},
                 {uuid => 'bd27669b-201e-51ed-9eb8-774ba7fef7ad', sid => 49, name => 'one'},
                 {uuid => '73415b5a-31fb-5b5a-bb82-8ea5eb3b12f7', sid => 50, name => 'two'},
+                # Unassigned: 51
                 {uuid => 'e425be57-58cb-43fb-ba85-c1a55a6a2ebd', sid => 52, name => 'ancestor-of'},
                 {uuid => 'cdee05f4-91ec-4809-a157-8c58dcb23715', sid => 53, name => 'descendant-of'},
                 {uuid => '26bda7b1-4069-4003-925c-2dbf47833a01', sid => 54, name => 'sibling-of'},
@@ -429,6 +438,10 @@ sub _own_well_known {
                 {uuid => 'f9bb5cd8-d8e6-4f29-805f-cc6f2b74802d', sid => 63, name => 'grey'},
                 {uuid => 'dd708015-0fdd-4543-9751-7da42d19bc6a', sid => 64, name => 'Sun'},
                 {uuid => '23026974-b92f-4820-80f6-c12f4dd22fca', sid => 65, name => 'Luna'},
+                # Unassigned: 66 - 76
+                {uuid => 'f6249973-59a9-47e2-8314-f7cf9a5f77bf', sid => 77, name => 'person'},
+                {uuid => '5501e545-f39a-4d62-9f65-792af6b0ccba', sid => 78, name => 'body'},
+                {uuid => 'a331f2c5-20e5-4aa2-b277-8e63fd03438d', sid => 79, name => 'character'},
                 {uuid => '838eede5-3f93-46a9-8e10-75165d10caa1', sid => 80, name => 'cat'},
                 {uuid => '252314f9-1467-48bf-80fd-f8b74036189f', sid => 81, name => 'dog'},
                 {uuid => '571fe2aa-95f6-4b16-a8d2-1ff4f78bdad1', sid => 82, name => 'lion'},
@@ -437,6 +450,7 @@ sub _own_well_known {
                 {uuid => '914b3a09-4e01-4afc-a065-513c199b6c24', sid => 85, name => 'squirrel'},
                 {uuid => '95f1b56e-c576-4f32-ac9b-bfdd397c36a6', sid => 86, name => 'wolf'},
                 {uuid => 'dcf8f4f0-c15e-44bd-ad76-0d483079db16', sid => 87, name => 'human'},
+                # Unassigned: 88
                 {uuid => 'f901e5e0-e217-41c8-b752-f7287af6e6c3', sid => 89, name => 'mammal'},
                 {uuid => '7ed4160e-06d6-44a2-afe8-457e2228304d', sid => 90, name => 'vertebrate'},
                 {uuid => '0510390c-9604-4362-b603-ea09e48de7b7', sid => 91, name => 'animal'},
@@ -450,15 +464,18 @@ sub _own_well_known {
                 {uuid => '5ecb4562-dad7-431d-94a6-d301dcea8d37', sid => 99, name => 'parent'},
                 {uuid => '1a9215b2-ad06-4f4f-a1e7-4cbb908f7c7c', sid => 100, name => 'child'},
                 {uuid => 'a7cfbcb0-45e2-46b9-8f60-646ab2c18b0b', sid => 101, name => 'displaycolour'},
+                # Unassigned: 102
                 {uuid => 'd926eb95-6984-415f-8892-233c13491931', sid => 103, name => 'tag-links'},
                 {uuid => '2c07ddc1-bdb8-435a-9614-4e6782a5101f', sid => 104, name => 'tag-linked-by'},
                 {uuid => '4efce01d-411e-5e9c-9ed9-640ecde31d1d', sid => 105, name => 'parallel'},
                 {uuid => '9aad6c99-67cd-45fd-a8a6-760d863ce9b5', sid => 106, name => 'also-where'},
                 {uuid => '8efbc13b-47e5-4d92-a960-bd9a2efa9ccb', sid => 107, name => 'generated-by'},
+                # Unassigned: 108
                 {uuid => '83e3acbb-eb8d-4dfb-8f2f-ae81cc436d4b', sid => 109, name => 'batch'},
                 {uuid => 'b17f36c6-c397-4e84-bd32-1eccb3f00671', sid => 110, name => 'set'},
                 {uuid => 'aa9d311a-89b7-44cc-a356-c3fc93dfa951', sid => 111, name => 'category'},
                 {uuid => '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a', sid => 112, name => 'chat-0-word-identifier'},
+                # Unassigned: 113 - 118
                 {uuid => 'c9ec3bea-558e-4992-9b76-91f128b6cf29', sid => 119, name => 'red'},
                 {uuid => 'c0e957d0-b5cf-4e53-8e8a-ff0f5f2f3f03', sid => 120, name => 'green'},
                 {uuid => '3dcef9a3-2ecc-482d-a98b-afffbc2f64b9', sid => 121, name => 'blue'},
@@ -467,16 +484,21 @@ sub _own_well_known {
                 {uuid => '2892c143-2ae7-48f1-95f4-279e059e7fc3', sid => 124, name => 'yellow'},
                 {uuid => '5c41829f-5062-4868-9c31-2ec98414c53d', sid => 125, name => 'orange'},
                 {uuid => 'c90acb33-b8ea-4f55-bd86-beb7fa5cf80a', sid => 126, name => 'savannah'},
+                # Unassigned: 127 - 131
                 {uuid => 'caf11e36-d401-4521-8f10-f6b36125415c', sid => 132, name => 'icon'},
                 {uuid => 'e7330249-53b8-4dab-aa43-b5bfa331a8e5', sid => 133, name => 'thumbnail'},
                 {uuid => '2ec4a6b0-e6bf-40cd-96a2-490cbc8d6c4b', sid => 134, name => 'empty-set'},
+                # Unassigned: 135 - 143
                 {uuid => 'be6d8e00-a6c1-5c44-8ffc-f7393e14aa23', sid => 144, name => 'three'},
                 {uuid => '79422b2c-b6f6-547f-949f-0cba44fa69b7', sid => 145, name => 'four'},
+                # Unassigned: 146 - 158
                 {uuid => '7cb67873-33bc-4a93-b53f-072ce96c6f1a', sid => 159, name => 'hrair'},
                 {uuid => '82d529be-0f00-4b4f-a43f-4a22de5f5312', sid => 160, name => 'gtin'},
                 {uuid => 'e8c156be-4fe7-4b13-b4fa-e207213caef8', sid => 161, name => 'subject-type'},
+                # Unassigned: 163 - 175
                 {uuid => 'c44ee482-0fb7-421b-9aad-a6c8f099a4b6', sid => 176, name => 'Universe'},
                 {uuid => '0ac40a25-d20f-42ed-ae1c-64e62a56d673', sid => 177, name => 'Observable universe'},
+                # Unassigned: 178 - 188
                 {uuid => '8a1cb2d6-df2f-46db-89c3-a75168adebf6', sid => 189, name => 'generator'},
                 {uuid => '3c9f40b4-2b98-44ce-b4dc-97649eb528ae', sid => 190, name => 'using-namespace'},
                 {uuid => 'bc2d2e7c-8aa4-420e-ac07-59c422034de9', sid => 191, name => 'for-type'},
@@ -608,19 +630,6 @@ sub _offline_lookup {
     return undef unless $func;
 
     return $self->$func($result, %opts);
-}
-
-
-#@returns Data::URIID
-sub extractor {
-    my ($self) = @_;
-    return $self->{extractor} // croak(sprintf('Invalid access to %s belonging to no longer existing instance of Data::URIID', __PACKAGE__));
-}
-
-
-sub ise {
-    my ($self) = @_;
-    return $self->{ise};
 }
 
 
@@ -1155,6 +1164,13 @@ sub _online_lookup__iconclass {
     return \%res;
 }
 
+# --- Overrides for Data::URIID::Base ---
+
+sub displayname {
+    my ($self, %opts) = @_;
+    return $self->name;
+}
+
 1;
 
 __END__
@@ -1169,7 +1185,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 
@@ -1182,19 +1198,11 @@ version v0.09
     my $name = $service->name;
     my $ise = $service->ise;
 
+This module represents a single service.
+
+This package inherits from L<Data::URIID::Base>.
+
 =head1 METHODS
-
-=head2 extractor
-
-    my $extractor = $service->extractor;
-
-Returns the L<Data::URIID> object used to create this object.
-
-=head2 ise
-
-    my $ise = $service->ise;
-
-Returns the ISE of this service.
 
 =head2 name
 

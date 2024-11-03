@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+use 5.020;
+use experimental 'signatures';
+
+our $VERSION = '0.01';
+
+use Getopt::Long;
+use Pod::Usage;
+use RecentInfo::Manager 'recent_files';
+use PerlX::Maybe;
+use URI;
+use URI::file;
+use File::Spec;
+
+GetOptions(
+    'f|file=s'     => \my $filename,
+    'a|app=s'      => \my $app,
+    't|mimetype=s' => \my $mimetype,
+    'n|count=s'    => \my $count,
+    'r|relative:s' => \my $relative,
+    'b|below:s'    => \my $below,
+) or pod2usage(2);
+
+$count //= 10;
+if( defined $relative ) {
+    $relative ||= '.';
+    $relative = File::Spec->rel2abs( $relative );
+}
+if( defined $below ) {
+    $below ||= '.';
+    $below = File::Spec->rel2abs( $below );
+}
+my @res = recent_files({
+    maybe app => $app,
+    maybe mime_type => $mimetype,
+}, {
+    maybe filename => $filename,
+});
+
+if( $below ) {
+    @res = grep { m!\A\Q$below! } @res;
+};
+
+if( $count and @res ) {
+    @res = splice @res, -$count;
+}
+
+if( $relative ) {
+    @res = map { File::Spec->abs2rel( $_, $relative )} @res;
+};
+
+say $_ for @res;

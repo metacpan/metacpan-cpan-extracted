@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from ops.pd! Don't modify!
 #
 package PDL::Ops;
 
@@ -1613,22 +1613,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-
 sub PDL::log10 {
-    my $x = shift;
-    if ( ! UNIVERSAL::isa($x,"PDL") ) { return log($x) / log(10); }
-    my $y;
-    if ( $x->is_inplace ) { $x->set_inplace(0); $y = $x; }
-    elsif( ref($x) eq "PDL"){
-    	#PDL Objects, use nullcreate:
-	$y = PDL->nullcreate($x);
-    }else{
-    	#PDL-Derived Object, use copy: (Consistent with
-	#  Auto-creation docs in Objects.pod)
-	$y = $x->copy;
-    }
+    my ($x, $y) = @_;
+    return log($x) / log(10) if !UNIVERSAL::isa($x,"PDL");
+    barf "inplace but output given" if $x->is_inplace and defined $y;
+    if ($x->is_inplace) { $x->set_inplace(0); $y = $x; }
+    elsif (!defined $y) { $y = $x->initialize; }
     &PDL::_log10_int( $x, $y );
-    return $y;
+    $y;
 };
 
 
@@ -1784,7 +1776,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 568 "ops.pd"
+#line 560 "ops.pd"
 
 =head2 abs
 
@@ -1798,7 +1790,7 @@ sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
 
 #line 184 "ops.pd"
 BEGIN { $OVERLOADS{'abs'} = sub { PDL::abs($_[0]) } }
-#line 1802 "Ops.pm"
+#line 1794 "Ops.pm"
 
 
 =head2 abs2
@@ -1899,7 +1891,7 @@ sub PDL::i2C ($) {
 
 
 
-#line 626 "ops.pd"
+#line 618 "ops.pd"
 
 # This is to used warn if an operand is non-numeric or non-PDL.
 sub warn_non_numeric_op_wrapper {
@@ -1940,7 +1932,7 @@ Doug Burke (burke@ifa.hawaii.edu),
 and Craig DeForest (deforest@boulder.swri.edu).
 
 =cut
-#line 1944 "Ops.pm"
+#line 1936 "Ops.pm"
 
 # Exit with OK status
 

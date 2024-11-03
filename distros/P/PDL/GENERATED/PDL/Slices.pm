@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from slices.pd! Don't modify!
 #
 package PDL::Slices;
 
@@ -755,7 +755,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1042 "slices.pd"
+#line 1040 "slices.pd"
 sub PDL::rld {
   my ($x,$y) = @_;
   my ($c,$sm) = @_ == 3 ? ($_[2], $_[2]->dim(0)) : (PDL->null, $x->sumover->max->sclr);
@@ -825,7 +825,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1083 "slices.pd"
+#line 1081 "slices.pd"
 sub PDL::rle {
   my $c = shift;
   my ($x,$y) = @_==2 ? @_ : (null,null);
@@ -913,7 +913,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1208 "slices.pd"
+#line 1206 "slices.pd"
 sub PDL::rldvec {
   my ($a,$b,$c) = @_;
   ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
@@ -996,7 +996,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1281 "slices.pd"
+#line 1279 "slices.pd"
 sub PDL::rldseq {
   my ($a,$b,$c) = @_;
   ($c,my $sm) = defined($c) ? ($c,$c->dim(1)) : (PDL->null,$a->sumover->max->sclr);
@@ -1011,7 +1011,7 @@ sub PDL::rldseq {
 
 
 
-#line 1316 "slices.pd"
+#line 1314 "slices.pd"
 
 =head2 rleND
 
@@ -1138,7 +1138,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1475 "slices.pd"
+#line 1473 "slices.pd"
 
 =head2 reorder
 
@@ -1301,7 +1301,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1648 "slices.pd"
+#line 1646 "slices.pd"
 
 =head2 using
 
@@ -1548,7 +1548,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1998 "slices.pd"
+#line 1996 "slices.pd"
 
 =head2 dice
 
@@ -1873,7 +1873,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2317 "slices.pd"
+#line 2315 "slices.pd"
 sub PDL::slice {
     my ($source, @others) = @_;
     for my $i(0..$#others) {
@@ -1979,7 +1979,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 2532 "slices.pd"
+#line 2530 "slices.pd"
 sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
 #line 1985 "Slices.pm"
 
@@ -1991,7 +1991,7 @@ sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
 
 
 
-#line 2582 "slices.pd"
+#line 2580 "slices.pd"
 
 =head1 BUGS
 

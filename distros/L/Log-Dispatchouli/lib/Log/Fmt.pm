@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Fmt 3.007;
+package Log::Fmt 3.008;
 # ABSTRACT: a little parser and emitter of structured log lines
 
 use experimental 'postderef'; # Not dangerous.  Is accepted without changed.
@@ -221,7 +221,7 @@ Log::Fmt - a little parser and emitter of structured log lines
 
 =head1 VERSION
 
-version 3.007
+version 3.008
 
 =head1 OVERVIEW
 
@@ -288,7 +288,7 @@ Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo SIGNES.
+This software is copyright (c) 2024 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

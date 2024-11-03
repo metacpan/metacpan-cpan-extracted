@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://www.freedesktop.org/standards/shared-mime-info"
+           targetNamespace="http://www.freedesktop.org/standards/shared-mime-info"
+           >
+
+<xs:element name="mime-type" />
+
+</xs:schema>

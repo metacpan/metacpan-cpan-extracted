@@ -71,7 +71,6 @@ sub apply_profile {
    $repl->eval('package main');
 
    $repl->eval('use PDL');
-   $repl->eval('use PDL::Config');
    $repl->eval('use PDL::Dbg');
    $repl->eval('use PDL::Doc::Perldl');
    $repl->eval('use PDL::IO::Dumper');
@@ -128,6 +127,16 @@ sub apply_profile {
       require GraphViz2;
       my $gv = GraphViz2->from_graph(PDL::Core::pdumpgraphvizify($g));
       $gv->run(format => $format, output_file => $file);
+    }
+   } );
+
+   $repl->eval( q{
+    sub x {
+      require Data::Dumper;
+      local $Data::Dumper::Indent = 1;
+      local $Data::Dumper::Sortkeys = 1;
+      local $Data::Dumper::Terse = 1;
+      print Data::Dumper::Dumper(@_);
     }
    } );
 

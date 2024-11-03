@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Log::Dispatchouli::Global 3.007;
+package Log::Dispatchouli::Global 3.008;
 # ABSTRACT: a system for sharing a global, dynamically-scoped logger
 
 use Carp ();
@@ -280,7 +280,7 @@ Log::Dispatchouli::Global - a system for sharing a global, dynamically-scoped lo
 
 =head1 VERSION
 
-version 3.007
+version 3.008
 
 =head1 DESCRIPTION
 
@@ -450,7 +450,7 @@ Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo SIGNES.
+This software is copyright (c) 2024 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from imagergb.pd! Don't modify!
 #
 package PDL::ImageRGB;
 

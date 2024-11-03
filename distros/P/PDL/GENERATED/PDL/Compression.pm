@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from compression.pd! Don't modify!
 #
 package PDL::Compression;
 
@@ -72,7 +72,7 @@ use warnings;
 
 =for sig
 
-  Signature: (in(n); [o]out(m=CALC($SIZE(n))); int[o]len(); int blocksize)
+  Signature: (in(n); [o]out(m=CALC(ceil($SIZE(n) * 1.01))); indx[o]len(); int blocksize)
 
 =for ref
 
@@ -161,7 +161,7 @@ sub PDL::rice_compress {
 
 =for sig
 
-  Signature: (in(n); [o]out(m); IV dim0 => m; int blocksize)
+  Signature: (in(n); indx len(); [o]out(m); IV dim0 => m; int blocksize)
 
 =for ref
 

@@ -94982,3 +94982,15 @@ K/KI/KIMOTO/SPVM-Net-SSLeay-0.005.tar.gz
 D/DA/DANBERR/Sys-Virt-v10.9.0.tar.gz
 B/BU/BULKDD/XSConfig-6.29.tar.gz
 I/IN/INGY/YAMLScript-0.1.81.tar.gz
+D/DA/DAVECROSS/App-LinkSite-0.0.7.tar.gz
+L/LE/LEONT/Crypt-HSM-0.018.tar.gz
+L/LI/LION/Data-Identifier-v0.06.tar.gz
+L/LI/LION/Data-URIID-v0.10.tar.gz
+D/DD/DDICK/Firefox-Marionette-1.62.tar.gz
+E/ET/ETJ/PDL-2.094.tar.gz
+E/ET/ETHER/OpenAPI-Modern-0.073.tar.gz
+R/RJ/RJBS/Log-Dispatchouli-3.008.tar.gz
+S/SK/SKIM/MARC-Convert-Wikidata-0.17.tar.gz
+L/LE/LEMBARK/mro-EVERY-v1.0.3.tar.gz
+C/CO/CORION/RecentInfo-Manager-0.01.tar.gz
+D/DK/DKECHAG/Weather-API-Base-0.1.tar.gz

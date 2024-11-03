@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:bookmark="http://www.freedesktop.org/standards/desktop-bookmarks"
+    xmlns:mime="http://www.freedesktop.org/standards/shared-mime-info"
+    targetNamespace="http://www.freedesktop.org/standards/desktop-bookmarks"
+    >
+
+<xs:import
+    namespace="http://www.freedesktop.org/standards/shared-mime-info"
+    schemaLocation="shared-mime-info.xsd"
+    />
+
+<xs:complexType name="groupType">
+  <xs:simpleContent>
+    <xs:extension base="xs:string" />
+  </xs:simpleContent>
+</xs:complexType>
+
+<xs:complexType name="applicationType">
+  <xs:simpleContent>
+    <xs:extension base="xs:string">
+      <xs:attribute type="xs:string" name="exec" use="required"/>
+      <xs:attribute type="xs:string" name="name" use="required"/>
+      <xs:attribute type="xs:string" name="modified" use="required"/>
+      <xs:attribute type="xs:integer" name="count" use="required"/>
+    </xs:extension>
+  </xs:simpleContent>
+</xs:complexType>
+
+<xs:element name="group" type="bookmark:groupType" />
+<xs:element name="application" type="bookmark:applicationType" />
+
+<xs:complexType name="groupsType">
+  <xs:sequence>
+    <xs:element ref="bookmark:group" minOccurs="0" maxOccurs="unbounded" />
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="applicationsType">
+    <xs:sequence>
+      <xs:element ref="bookmark:application" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+</xs:complexType>
+
+<xs:element name="groups" type="bookmark:groupsType" />
+<xs:element name="applications" type="bookmark:applicationsType" />
+
+</xs:schema>

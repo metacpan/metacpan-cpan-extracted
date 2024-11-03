@@ -13,12 +13,14 @@ use v5.14;
 use strict;
 use warnings;
 
+use parent qw(Data::Identifier::Interface::Known);
+
 use Carp;
 use Math::BigInt;
 use URI;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -103,7 +105,8 @@ $_->register foreach values %well_known;
         '59cfe520-ba32-48cc-b654-74f7a05779db'  =>  25, # marked-as
         '2bffc55d-7380-454e-bd53-c5acd525d692'  =>  26, # roaraudio-error-number
         WK_SID()                                =>  27,
-        # Unassigned: 28, 29, 30, 31
+        'd2750351-aed7-4ade-aa80-c32436cc6030'  =>  28, # also-has-role
+        # Unassigned: 29, 30, 31
         '448c50a8-c847-4bc7-856e-0db5fea8f23b'  =>  32, # final-file-encoding
         '79385945-0963-44aa-880a-bca4a42e9002'  =>  33, # final-file-hash
         '3fde5688-6e34-45e9-8f33-68f079b152c8'  =>  34, # SEEK_SET
@@ -163,6 +166,7 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
         'a1c478b5-0a85-4b5b-96da-d250db14a67c'  => 'flagged-as',
         '59cfe520-ba32-48cc-b654-74f7a05779db'  => 'marked-as',
         '2bffc55d-7380-454e-bd53-c5acd525d692'  => 'roaraudio-error-number',
+        'd2750351-aed7-4ade-aa80-c32436cc6030'  => 'also-has-role',
         '448c50a8-c847-4bc7-856e-0db5fea8f23b'  => 'final-file-encoding',
         '79385945-0963-44aa-880a-bca4a42e9002'  => 'final-file-hash',
         '3fde5688-6e34-45e9-8f33-68f079b152c8'  => 'SEEK_SET',
@@ -182,7 +186,7 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
 }
 
 # Call this after after we loaded all our stuff and before anyone else will register stuff:
-__PACKAGE__->wellknown;
+__PACKAGE__->_known_provider('wellknown');
 
 
 sub new {
@@ -201,7 +205,9 @@ sub new {
                 }
             } elsif ($id->isa('URI')) {
                 $type = 'uri';
-            } elsif ($id->isa('Data::URIID::Colour') || $id->isa('Data::URIID::Service')) {
+            } elsif ($id->isa('Data::URIID::Base') || $id->isa('Data::URIID::Colour') || $id->isa('Data::URIID::Service')) {
+                #$opts{displayname} //= $id->name if $id->isa('Data::URIID::Service');
+                $opts{displayname} //= $id->displayname(default => undef, no_defaults => 1);
                 $type = 'ise';
                 $id   = $id->ise;
             } elsif ($id->isa('Data::URIID::Result')) {
@@ -350,11 +356,10 @@ sub random {
 }
 
 
-sub wellknown {
-    my ($pkg) = @_;
-    state $well_known = {map{$_ => $_} values(%well_known), map {values %{$_}} values(%registered)};
 
-    return values %{$well_known};
+sub wellknown {
+    my ($pkg, @args) = @_;
+    return $pkg->known('wellknown', @args);
 }
 
 
@@ -467,6 +472,108 @@ sub ise {
 }
 
 
+sub as {
+    my ($self, $as, %opts) = @_;
+
+    $as = $opts{rawtype} if $as eq 'raw' && defined($opts{rawtype});
+
+    return $self if ($as =~ /^[A-Z]/ || $as =~ /::/) && eval {$self->isa($as)};
+
+    $self = __PACKAGE__->new(from => $self) unless eval {$self->isa(__PACKAGE__)};
+
+    if ($as eq 'uuid' || $as eq 'oid' || $as eq 'uri' || $as eq 'sid' || $as eq 'ise') {
+        my $func = $self->can($as);
+        return $self->$func(%opts);
+    } elsif ($as eq __PACKAGE__) {
+        return $self;
+    } elsif ($as eq 'URI') {
+        my $had_default = exists $opts{default};
+        my $default = delete $opts{default};
+        my $val = $self->uri(%opts, default => undef);
+
+        return URI->new($val) if defined $val;
+        if ($had_default) {
+            return $default if ref $default;
+            return URI->new($default);
+        }
+        croak 'No value for URI';
+    } elsif ($as eq 'Data::URIID::Result' && defined($opts{extractor})) {
+        return $opts{extractor}->lookup($self->type->uuid => $self->id);
+    } elsif ($as eq 'Data::URIID::Service' && defined($opts{extractor})) {
+        return $opts{extractor}->service($self->uuid);
+    } elsif ($as eq 'Business::ISBN' && $self->type->eq('gtin')) {
+        require Business::ISBN;
+        my $val = Business::ISBN->new($self->id);
+        return $val if defined($val) && $val->is_valid;
+    }
+
+    return $opts{default} if exists $opts{default};
+    croak 'Unknown/Unsupported as: '.$as;
+}
+
+
+sub eq {
+    my ($self, $other) = @_;
+
+    foreach my $e ($self, $other) {
+        if (defined($e) && !scalar(eval {$e->isa(__PACKAGE__)})) {
+            if (defined $well_known{$e}) {
+                $e = $well_known{$e}
+            } else {
+                $e = Data::Identifier->new(from => $e);
+            }
+        }
+    }
+
+    if (defined($self)) {
+        return undef unless defined $other;
+        return 1 if $self == $other;
+        return undef unless $self->type->eq($other->type);
+        return $self->id eq $other->id;
+    } else {
+        return !defined($other);
+    }
+}
+
+
+sub cmp {
+    my ($self, $other) = @_;
+
+    foreach my $e ($self, $other) {
+        if (defined($e) && !scalar(eval {$e->isa(__PACKAGE__)})) {
+            if (defined $well_known{$e}) {
+                $e = $well_known{$e}
+            } else {
+                $e = Data::Identifier->new(from => $e);
+            }
+        }
+    }
+
+    if (defined($self)) {
+        return undef unless defined $other;
+        return 0 if $self == $other;
+        if ((my $r = $self->type->cmp($other->type)) != 0) {
+            return $r;
+        }
+
+        {
+            my $self_id = $self->id;
+            my $other_id = $other->id;
+
+            if ((my ($sa, $sb) = $self_id =~ /^([^0-9]*)([0-9]+)$/) && (my ($oa, $ob) = $other_id =~ /^([^0-9]*)([0-9]+)$/)) {
+                my $r = $sa cmp $oa;
+                return $r if $r;
+                return $sb <=> $ob;
+            }
+
+            return $self_id cmp $other_id;
+        }
+    } else {
+        return !defined($other);
+    }
+}
+
+
 sub namespace {
     my ($self) = @_;
     return $self->{namespace} // croak 'No namespace';
@@ -546,6 +653,25 @@ sub _generate {
     $self->{_generate} = undef;
 }
 
+sub _known_provider {
+    my ($pkg, $class, %opts) = @_;
+    croak 'Unsupported options passed' if scalar(keys %opts);
+
+    if ($class eq 'wellknown') {
+        state $wellknown = do {
+            my %hash = map{$_ => $_} values(%well_known), map {values %{$_}} values(%registered);
+            [values %hash];
+        };
+
+        return ($wellknown, rawtype => __PACKAGE__);
+    } elsif ($class eq 'registered' || $class eq ':all') {
+        my %hash = map{$_ => $_} values(%well_known), map {values %{$_}} values(%registered);
+        return ([values %hash], rawtype => __PACKAGE__);
+    }
+
+    croak 'Unsupported class';
+}
+
 1;
 
 __END__
@@ -560,7 +686,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
@@ -592,6 +718,8 @@ B<Note:> This module performs basic deduplication and normalisation. This means 
 might not always get back exactly the identifier you passed in but an equivalent one.
 Also note that deduplication is done with performance in mind. This means that there is no
 guarantee for two equal identifiers to become deduplicated. See also L</register>.
+
+This package inherits from L<Data::Identifier::Interface::Known>.
 
 =head1 METHODS
 
@@ -711,13 +839,41 @@ A L<Data::Identifier> or one of the special values C<uuid> or C<ise>.
 
 =back
 
-=head2 wellknown
+=head2 known
 
-    my @wellknown = Data::Identifier->wellknown;
+    my @list = Data::Identifier->known($class [, %opts ] );
+
+This module implements L<Data::Identifier::Interface::Known/known>. See there for details.
+
+Supported classes:
+
+=over
+
+=item C<wellknown>
 
 Returns a list with all well known identifiers.
 
-This is mostly useful to prime a database.
+This is useful to prime a database.
+
+=item C<registered>
+
+Returns the list of all currently registered identifiers.
+
+=item C<:all>
+
+Returns the list of all currently known identifiers.
+
+=back
+
+=head2 wellknown
+
+    my @wellknown = Data::Identifier->wellknown(%opts);
+
+This is an alias for:
+
+    my @wellknown = Data::Identifier->known('wellknown', %opts);
+
+See also L</known>.
 
 =head2 type
 
@@ -763,6 +919,110 @@ Note: This does not apply to C<sid()> as small-identifiers cannot be generated. 
 Returns the ISE (UUID, OID, or URI) for the current identifier or die if no ISE is known nor can be calculated.
 
 Supports all options also supported by L</uuid>, L</oid>, and L</uri>.
+
+=head2 as
+
+    my $res = $identifier->as($as, %opts);
+    # or:
+    my $res = $identifier->Data::Identifier::as($as, %opts); # $identifier is an alien type
+
+This method converts the given identifier to another type of object.
+
+C<$as> must be a name of the package (containing C<::> or starting with an uppercase letter),
+or one of the special values.
+
+Currently the following packages are supported:
+L<URI>,
+L<Data::Identifier>,
+L<Data::URIID::Result>,
+L<Data::URIID::Service>,
+L<Business::ISBN>.
+Other packages might be supported. Packages need to be installed in order to be supported.
+Also some packages need special options to be passed to be available.
+
+The folliwng special values are supported:
+C<uuid>, C<oid>, C<uri>, C<sid>, C<ise>, and C<raw>.
+All but C<raw> are aliases to the corresponding functions.
+C<raw> is an alias for the type set with the C<rawtype> option (see below).
+
+If C<$identifier> is or may not be an L<Data::Identifier> this method can be called like
+C<$identifier-E<gt>Data::Identifier::as($as...)>.
+In that case C<$identifier> is parsed as with C<from> in L</new>.
+
+If C<$identifier> is a C<$as> (see also C<rawtype> below) then C<$identifier> is returned as-is,
+even if C<$as> would not be supported otherwise.
+
+The following options (all optional) are supported:
+
+=over
+
+=item C<default>
+
+Same as in L</uuid>.
+
+=item C<no_defaults>
+
+Same as in L</uuid>.
+
+=item C<rawtype>
+
+If C<$as> is given as C<raw> then this value is used for C<$as>.
+This c*can be used to ease implementation of other methods that are required to accept C<raw>.
+
+=item C<extractor>
+
+An instance of L<Data::URIID>. This is used to create instances of related packages
+such as L<Data::URIID::Result>.
+
+=back
+
+=head2 eq
+
+    my $bool = $identifier->eq($other); # $identifier must be non-undef
+    # or:
+    my $bool = Data::Identifier::eq($identifier, $other); # $identifier can be undef
+
+Compares two identifiers to be equal.
+
+If both identifiers are C<undef> they are considered equal.
+
+If C<$identifier> or C<$other> is not an instance of L<Data::Identifier> or C<undef>
+then it is checked against the list of well known identifiers (see L</new>).
+If it has still no match L</new> with the virtual type C<from> is used.
+
+=head2 cmp
+
+    my $val = $identifier->cmp($other); # $identifier musst be non-undef
+    # or:
+    my $val = Data::Identifier::cmp($identifier, $other); # $identifier can be undef
+
+Compares the identifiers similar to C<cmp>. This method can be used to order identifiers.
+To check for them to be equal see L</eq>.
+
+The parameters are parsed the same way as L</eq>.
+
+If this method is used for sorting the exact resulting order is not defined. However:
+
+=over
+
+=item *
+
+The order is stable
+
+=item *
+
+Identifiers are ordered by type first
+
+=item *
+
+If the all identifiers have the same type this method tries to be smart about ordering
+(ordering numeric values correctly).
+
+=item *
+
+The order is the same for C<$a-E<gt>cmp($b)> as for C<- $b-E<gt>cmp($a)>.
+
+=back
 
 =head2 namespace
 

@@ -756,6 +756,16 @@ anyway.  (see L</get_dataref>.)
 
 sub topdl {PDL->topdl(@_)}
 
+####################### Subclass as hashref #######################
+{ package # hide from PAUSE
+    PDL::Hash;
+our @ISA = qw/PDL/;
+sub initialize {
+  my ($class) = @_;
+  bless { PDL => PDL->null }, ref $class || $class;
+}
+}
+
 ####################### Overloaded operators #######################
 
 { package # hide from MetaCPAN
@@ -1506,12 +1516,6 @@ Returns the memory address of the ndarray's C<struct>.
 
 Returns the value of the ndarray C<struct>'s C<data> member.
 
-=head2 freedata
-
-=for ref
-
-Frees the C<datasv> if possible. Useful in memory-mapping functionality.
-
 =head2 set_donttouchdata
 
 =for ref
@@ -1519,15 +1523,6 @@ Frees the C<datasv> if possible. Useful in memory-mapping functionality.
 Sets the C<PDL_DONTTOUCHDATA> flag and the C<nbytes> to the given
 value. Useful in memory-mapping functionality.
 The C<nbytes> can be omitted, in which case only the flag is set.
-
-=head2 set_data_by_offset
-
-=for ref
-
-Sets the ndarray's C<data> and C<datasv> to those of the given ndarray,
-but the C<data> points to the other ndarray's C<data> plus the given
-offset.
-Sets the C<PDL_DONTTOUCHDATA> flag. Useful in memory-mapping functionality.
 
 =head2 nbytes
 
@@ -2168,17 +2163,19 @@ Not exported, and not inserted into the C<PDL> namespace.
 sub pdump {
   my ($pdl) = @_;
   my @dims = $pdl->dims_nophys;
+  my $svaddr = $pdl->address_datasv;
   my @lines = (
     "State: ${\join '|', $pdl->flags}",
     "Dims: (@dims)",
     "BroadcastIds: (@{[$pdl->broadcastids_nophys]})",
+    !$svaddr ? () : sprintf("datasv: 0x%x, refcnt: %d", $svaddr, $pdl->datasv_refcount),
+    sprintf("data: 0x%x, nbytes: %d, nvals: %d", $pdl->address_data, $pdl->nbytes, $pdl->nelem_nophys),
   );
   push @lines, sprintf "Vaffine: 0x%x (parent)", $pdl->vaffine_from if $pdl->has_vafftrans;
   push @lines, !$pdl->badflag ? () : (
     "Badvalue (".($pdl->has_badvalue ? 'bespoke' : 'orig')."): " . $pdl->badvalue
     );
-  push @lines, !$pdl->allocated ? '(not allocated)' : join "\n  ",
-    sprintf("data: 0x%x, nbytes: %d, nvals: %d", $pdl->address_data, $pdl->nbytes, $pdl->nelem_nophys),
+  push @lines, !$pdl->allocated ? '(not allocated)' :
     "First values: (@{[$pdl->firstvals_nophys]})",
     ;
   if (my $trans = $pdl->trans_parent) {
@@ -2420,7 +2417,7 @@ test for approximately equal values (relaxed C<==>)
 
 C<approx> is a relaxed form of the C<==> operator and
 often more appropriate for floating point types (C<float>
-and C<double>).
+C<double> and C<ldouble>).
 
 Usage:
 
@@ -2442,8 +2439,7 @@ sub PDL::approx {
   my ($x,$y,$eps) = @_;
   $eps = $approx unless defined $eps;  # the default eps
   $approx = $eps;    # remember last eps
-  # NOTE: ($x-$y)->abs breaks for non-ndarray inputs
-  return abs($x-$y) < $eps;
+  PDL->topdl($x)->approx_artol($y, $eps);
 }
 
 =head2 mslice
@@ -4143,59 +4139,40 @@ sub PDL::fhdr {
     return \%hdr;
 }
 
+sub _file_map_sv {
+  require File::Map;
+  my ($svref, $fh, $len, $shared, $writable) = @_;
+  my $prot = File::Map::PROT_READ() | ($writable ? File::Map::PROT_WRITE() : 0);
+  my $flags = ($shared ? File::Map::MAP_SHARED() : File::Map::MAP_PRIVATE());
+  printf STDERR "_file_map_sv: calling sys_map(%s,%d,%d,%d,%s,%d)\n",
+    $svref, $len, $prot, $flags, $fh, 0 if $PDL::debug;
+  File::Map::sys_map($$svref, $len, $prot, $flags, $fh, 0);
+  printf STDERR "_file_map_sv: length \$\$svref is %d.\n",
+    length $$svref if $PDL::debug;
+}
+
+sub _file_map_open {
+  require Fcntl;
+  my ($name, $len, $shared, $writable, $creat, $perms, $trunc) = @_;
+  my $mode = ($writable && $shared ? Fcntl::O_RDWR() : Fcntl::O_RDONLY());
+  $mode |= Fcntl::O_CREAT() if $creat;
+  sysopen my $fh, $name, $mode, $perms
+    or die "Error opening file '$name': $!\n";
+  binmode $fh;
+  if ($trunc) {
+    truncate $fh,0 or die "truncate('$name',0) failed: $!";
+    truncate $fh,$len or die "truncate('$name',$len) failed: $!";
+  }
+  $fh;
+}
+
 sub PDL::set_data_by_file_map {
-   require Fcntl;
-   require File::Map;
-   my ($pdl,$name,$len,$shared,$writable,$creat,$mode,$trunc) = @_;
-   my $pdl_dataref = $pdl->get_dataref();
-
-   sysopen(my $fh, $name, ($writable && $shared ? Fcntl::O_RDWR() : Fcntl::O_RDONLY()) | ($creat ? Fcntl::O_CREAT() : 0), $mode)
-      or die "Error opening file '$name'\n";
-
-   binmode $fh;
-
-   if ($trunc) {
-      truncate($fh,0) or die "set_data_by_file_map: truncate('$name',0) failed, $!";
-      truncate($fh,$len) or die "set_data_by_file_map: truncate('$name',$len) failed, $!";
-   }
-
-   if ($len) {
-
-      if ($PDL::debug) {
-         printf STDERR
-         "set_data_by_file_map: calling sys_map(%s,%d,%d,%d,%s,%d)\n",
-         $pdl_dataref,
-         $len,
-         File::Map::PROT_READ() | ($writable ?  File::Map::PROT_WRITE() : 0),
-         ($shared ? File::Map::MAP_SHARED() : File::Map::MAP_PRIVATE()),
-         $fh,
-         0;
-      }
-
-      File::Map::sys_map(
-         ${$pdl_dataref},
-         $len,
-         File::Map::PROT_READ() | ($writable ?  File::Map::PROT_WRITE() : 0),
-         ($shared ? File::Map::MAP_SHARED() : File::Map::MAP_PRIVATE()),
-         $fh,
-         0
-      );
-
-      $pdl->upd_data(1);
-
-      if ($PDL::debug) {
-         printf STDERR "set_data_by_file_map: length \${\$pdl_dataref} is %d.\n", length ${$pdl_dataref};
-      }
-      $pdl->set_donttouchdata($len);
-
-   } else {
-
-      #  Special case: zero-length file
-      $_[0] = undef;
-   }
-
-   # PDLDEBUG_f(printf("PDL::MMap: mapped to %p\n",$pdl->data));
-   close $fh ;
+  my ($pdl,$name,$len,$shared,$writable,$creat,$perms,$trunc) = @_;
+  my $fh = _file_map_open($name,$len,$shared,$writable,$creat,$perms,$trunc);
+  return $_[0] = undef if !$len;
+  _file_map_sv($pdl->get_dataref,$fh,$len,$shared,$writable);
+  $pdl->upd_data(1);
+  $pdl->set_donttouchdata($len);
 }
 
 1;

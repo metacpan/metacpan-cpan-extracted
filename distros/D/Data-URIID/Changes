@@ -1,0 +1,5 @@
+v0.10  2024-11-02Z
+    - Feature: Added Data::URIID::Base
+    - Fix: Only allow $extractor->service() on services that exist to begin with
+    - Updated list of well known objects
+    - Improved documentation

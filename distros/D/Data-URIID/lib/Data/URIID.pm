@@ -21,7 +21,7 @@ use I18N::LangTags::Detect;
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 my %names = (
     service => {
@@ -289,7 +289,7 @@ sub known {
         @list = values %{$names{$class // ''} // croak 'Invalid class'};
     }
 
-    # Experimental in v0.09, therefore not yet listedin POD.
+    # Experimental in v0.10, therefore not yet listed in POD.
     if (defined(my $as = $opts{as})) {
         if ($as eq 'ise') {
             # no-op
@@ -343,6 +343,8 @@ sub service {
     $service = $service->ise if ref $service;
     $service = $self->name_to_ise(service => $service);
 
+    croak 'Not a known service: '.$service unless defined $ises{service}{$service};
+
     return $cache->{$service} //= Data::URIID::Service->new(
         extractor   => $self,
         ise         => $service,
@@ -365,7 +367,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 
@@ -376,6 +378,31 @@ version v0.09
     my $result = $extractor->lookup( $uri );
 
     my $id = $result->id( $type );
+
+This module provides a way to extract knowledge (mainly identifier) from a given URL, a QR Code,
+or similar objects.
+
+The main usages for this module are:
+
+=over
+
+=item *
+
+Provide information to display the object in question to the user (such as name, location, icons, thumbnails, and more)
+
+=item *
+
+Provide required identifiers and URLs to link the object with many services.
+
+=back
+
+In order to do so, an extractor (instance of this package) is created.
+On that extractor L</lookup> is called for every input to process resulting in a L<Data::URIID::Result> object holding the acquired knowledge.
+
+The module supports both online and offline lookups. See L</online>.
+
+B<Note:>
+Future versions of this module will depend on L<Data::Identifier>.
 
 =head1 METHODS
 

@@ -17,7 +17,7 @@ use Digest;
 
 use Data::Identifier;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 
 sub integer {
@@ -219,6 +219,9 @@ sub _random {
     # Insecure:
     } elsif ($source eq 'UUID::Tiny') {
         return UUID::Tiny::create_uuid_as_string(UUID::Tiny::UUID_RANDOM());
+    } elsif ($source eq 'Data::UUID') {
+        require Data::UUID;
+        return Data::UUID->create_str;
         #} elsif ($source eq '') {
     } else {
         croak 'Invalid/unsupported source';
@@ -261,7 +264,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

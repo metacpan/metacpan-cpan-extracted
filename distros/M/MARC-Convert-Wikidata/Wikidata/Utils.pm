@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_edition_number
 	clean_title look_for_external_id);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -30,16 +30,23 @@ sub clean_cover {
 	$ret_cover =~ s/^\s*//ms;
 	$ret_cover =~ s/^\(\s*//ms;
 	$ret_cover =~ s/\s*\)$//ms;
+
+	# Hardback
 	my $c = decode_utf8('(v|V)áz');
 	$ret_cover =~ s/^$c\.?$/hardback/ms;
 	$c = decode_utf8('(v|V)ázáno');
 	$ret_cover =~ s/^$c$/hardback/ms;
+
+	# Paperback
 	$c = decode_utf8('(b|B)rož');
 	$ret_cover =~ s/^$c\.?$/paperback/ms;
 	$c = decode_utf8('(b|B)rožováno');
 	$ret_cover =~ s/^$c$/paperback/ms;
 
-	if (none { $ret_cover eq $_ } @COVERS) {
+	# Collective.
+	$ret_cover =~ s/soubor/collective/ms;
+
+	if (none { $ret_cover eq $_ } (@COVERS, 'collective')) {
 		if ($DEBUG) {
 			warn "Book cover '$ret_cover' couldn't clean.";
 		}
@@ -124,7 +131,7 @@ sub clean_edition_number {
 	# Edition.
 	my $v1 = decode_utf8('Vydání');
 	my $v2 = decode_utf8('vydání');
-	$ret_edition_number =~ s/\s*(Vyd\.|vyd\.|$v1|$v2|Vydanie|vyd)//gx;
+	$ret_edition_number =~ s/\s*(Vyd\.|vyd\.|$v1|$v2|Vydanie|vyd|published)//gx;
 
 	$ret_edition_number =~ s/\s*rozmn\.//ms;
 	my $re = decode_utf8('souborné');
@@ -139,6 +146,8 @@ sub clean_edition_number {
 
 	# Extended.
 	$re = decode_utf8('přeprac');
+	$ret_edition_number =~ s/\s*$re\.//ms;
+	$re = decode_utf8('nezměn');
 	$ret_edition_number =~ s/\s*$re\.//ms;
 	$re = decode_utf8('přepracované');
 	$ret_edition_number =~ s/\s*$re//ms;
@@ -166,6 +175,10 @@ sub clean_edition_number {
 	$re = decode_utf8('revidované');
 	$ret_edition_number =~ s/\s*$re//ms;
 	$ret_edition_number =~ s/\s*zcela//ms;
+	$re = decode_utf8('v této');
+	$ret_edition_number =~ s/\s*$re//ms;
+	$re = decode_utf8('podobě');
+	$ret_edition_number =~ s/\s*$re//ms;
 
 	# Czech.
 	$re = decode_utf8('(v|V) českém jazyce');
@@ -188,6 +201,7 @@ sub clean_edition_number {
 	my $dict_hr = {
 		decode_utf8('První') => 1,
 		decode_utf8('první') => 1,
+		'First' => 1,
 		decode_utf8('prvé') => 1,
 		decode_utf8('Druhé') => 2,
 		decode_utf8('druhé') => 2,
@@ -369,8 +383,10 @@ sub clean_publisher_place {
 		decode_utf8('Jihlavě') => 'Jihlava',
 		decode_utf8('Jimramově') => 'Jimramov',
 		decode_utf8('Karlových Varech') => 'Karlovy Vary',
+		decode_utf8('Kolíně') => decode_utf8('Kolín'),
 		decode_utf8('Kroměříži') => decode_utf8('Kroměříž'),
 		decode_utf8('Hoře Kutné') => decode_utf8('Kutná Hora'),
+		decode_utf8('Kutné Hoře') => decode_utf8('Kutná Hora'),
 		'Liberci' => 'Liberec',
 		decode_utf8('Litoměřicích') => decode_utf8('Litoměřice'),
 		decode_utf8('Náchodě') => decode_utf8('Náchod'),
@@ -792,6 +808,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut

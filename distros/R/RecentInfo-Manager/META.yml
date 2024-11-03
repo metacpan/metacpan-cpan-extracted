@@ -1,0 +1,45 @@
+---
+abstract: unknown
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RecentInfo-Manager
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Date::Format::ISO8601: '0'
+  Exporter: '5'
+  File::Basename: '0'
+  File::Spec: '0'
+  IO::AtomicFile: '0'
+  List::Util: '0'
+  MIME::Detect: '0'
+  Module::Load: '0'
+  Moo: '2'
+  PerlX::Maybe: '0'
+  URI::file: '0'
+  XML::LibXML: '0'
+  XML::LibXML::PrettyPrint: '0'
+  experimental: '0.032'
+  perl: '5.020'
+  stable: '0.032'
+resources:
+  bugtracker: https://github.com/Corion/RecentInfo-Manager/issues
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/RecentInfo-Manager.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

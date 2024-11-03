@@ -15,7 +15,7 @@ The main driver class for App::LinkSite.
 use Feature::Compat::Class;
 
 class App::LinkSite {
-  our $VERSION = '0.0.5';
+  our $VERSION = '0.0.7';
   use strict;
   use warnings;
   use feature qw[say signatures];

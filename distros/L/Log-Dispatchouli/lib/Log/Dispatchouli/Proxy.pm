@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli::Proxy 3.007;
+package Log::Dispatchouli::Proxy 3.008;
 # ABSTRACT: a simple wrapper around Log::Dispatch
 
 use experimental 'postderef'; # Not dangerous.  Is accepted without changed.
@@ -201,7 +201,7 @@ Log::Dispatchouli::Proxy - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.007
+version 3.008
 
 =head1 DESCRIPTION
 
@@ -244,7 +244,7 @@ Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo SIGNES.
+This software is copyright (c) 2024 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

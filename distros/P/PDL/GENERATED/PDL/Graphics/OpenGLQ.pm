@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from openglq.pd! Don't modify!
 #
 package PDL::Graphics::OpenGLQ;
 

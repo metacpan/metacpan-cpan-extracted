@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from proj4.pd! Don't modify!
 #
 package PDL::Transform::Proj4;
 
@@ -18,26 +18,22 @@ use DynaLoader;
 
 
 
-BEGIN {
-use PDL::LiteF;
-use PDL::NiceSlice;
-use PDL::Transform;
-use Alien::proj;
-if ($^O =~ /MSWin32/ and $Alien::proj::VERSION le '1.25') {
-  $ENV{PATH} = join ';', (Alien::proj->bin_dirs, $ENV{PATH});
-}
-
-
-}
 
 
 
-#line 210 "proj4.pd"
+
+#line 167 "proj4.pd"
 
 # PDL::Transform::Proj4
 #
 # Judd Taylor, USF IMaRS
 # 4 Apr 2006
+
+use strict;
+use warnings;
+use PDL::LiteF;
+use PDL::Transform;
+use Alien::proj;
 
 =head1 NAME
 
@@ -50,22 +46,24 @@ PDL::Transform::Proj4 - PDL::Transform interface to the Proj4 projection library
  use PDL::Transform::Cartography;
  use PDL::Transform::Proj4;
  use PDL::Graphics::Simple;
- $x = earth_coast();
- $x = graticule(10,2)->glue(1,$x);
- $t = t_proj( proj_params => "+proj=ortho +ellps=WGS84 +lon_0=-90 +lat_0=40" );
+ $e = earth_image('day');
+ ($c, $pen) = graticule(10,2)->glue(1,earth_coast())->clean_lines;
+ $t = t_proj(proj_params => "+proj=ortho +ellps=WGS84 +lon_0=0 +lat_0=40");
  $w = pgswin();
- $w->plot(with=>'polylines', $t->apply($x)->clean_lines);
+ $w->plot(with=>'fits', $e->map($t),
+   with=>'polylines', clean_lines($c->apply($t), $pen), {j=>1});
 
  # Using the aliased functions:
  # Make an orthographic map of Earth
  use PDL::Transform::Cartography;
  use PDL::Transform::Proj4;
  use PDL::Graphics::Simple;
- $x = earth_coast();
- $x = graticule(10,2)->glue(1,$x);
- $t = t_proj_ortho( ellps => 'WGS84', lon_0 => -90, lat_0 => 40 )
+ $e = earth_image('day');
+ ($c, $pen) = graticule(10,2)->glue(1,earth_coast())->clean_lines;
+ $t = t_proj_ortho( ellps => 'WGS84', lon_0=>0, lat_0=>40 );
  $w = pgswin();
- $w->plot(with=>'polylines', $t->apply($x)->clean_lines);
+ $w->plot(with=>'fits', $e->map($t),
+   with=>'polylines', clean_lines($c->apply($t), $pen), {j=>1});
 
 =head1 DESCRIPTION
 
@@ -83,6 +81,10 @@ with just the B<proj_params> option defined.
 
 When options are used, they must be used with a '+' before them when placed in the proj_params string,
 but that is not required otherwise. See the SYNOPSIS above.
+
+Please note that unlike PROJ, all angles in these operations are
+in degrees. This is correctly (as of PDL 2.094) reflected in the
+PDL::Transform subclass objects.
 
 =head2 ALIASED INTERFACE
 
@@ -176,7 +178,7 @@ Arithmetic mean of the major and minor axis, Ra = (a + b)/2.
 
 =head3 R_g
 
-Geometric mean of the major and minor axis, Rg = (ab)1/2.
+Geometric mean of the major and minor axis, Rg = (ab)/2.
 
 =head3 R_h
 
@@ -212,232 +214,113 @@ Eccentricity squared +es=e2
 
 =cut
 
-sub new
-{
-    my $proto = shift;
-    my $sub = "PDL::Transform::Proj4::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $class = ref($proto) || $proto;
-    my $self  = $class->SUPER::new( @_ );
+# Projection options available to all projections:
+our @GENERAL_PARAMS = qw(proj x_0 y_0 lat_0 lon_0 units init);
+# Options for the Earth figure: (ellipsoid, etc):
+our @EARTH_PARAMS = qw(ellps R R_A R_V R_a R_g R_h R_lat_a R_lat_g b f rf e es);
+# Options that have no value (like "+over"):
+our @BOOL_PARAMS = qw( no_defs over geoc );
 
-    bless ($self, $class);
+# The meat -- just copy and paste from Transform.pm :)
+#    (and do some proj stuff here as well)
+sub _proj4_fwd {
+  my ($in, $opt) = @_;
+  my $out = $in->new_or_inplace();
+  # Always set the badflag to 1 here, to handle possible bad projection values:
+  $out->badflag(1);
+  $out->inplace(1);
+  fwd_transform( $out, $opt->{proj_params} );
+}
+sub _proj4_inv {
+  my ($in, $opt) = @_;
+  my $out = $in->new_or_inplace();
+  # Always set the badflag to 1 here, to handle possible bad projection values:
+  $out->badflag(1);
+  $out->inplace(1);
+  inv_transform( $out, $opt->{proj_params} );
+}
 
+sub new {
+    my $self  = shift->SUPER::new( @_ );
     my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-
+    $o = {@_} if !ref $o;
     $self->{name} = "Proj4";
-
-    # Grab our options:
-
-    # Used in the general sense:
-    $self->{params}->{proj_params} = PDL::Transform::_opt( $o, ['proj_params','params'] );
-
-    # Projection options available to all projections:
-    $self->{general_params} = [ qw( proj x_0 y_0 lat_0 lon_0 units init ) ];
-    foreach my $param ( @{ $self->{general_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-
-    # Options that have no value (like "+over"):
-    $self->{bool_params} = [ qw( no_defs over geoc ) ];
-    foreach my $param ( @{ $self->{bool_params} } )
-        { $self->{params}->{$param} = ( PDL::Transform::_opt( $o, [ $param ] ) ) ? 'ON' : undef; }
-
-    # Options for the Earth figure: (ellipsoid, etc):
-    $self->{earth_params} = [ qw( ellps R R_A R_V R_a R_g R_h R_lat_a R_lat_g b f rf e es ) ];
-    foreach my $param ( @{ $self->{earth_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-
+    $self->{params}{proj_params} = PDL::Transform::_opt( $o, ['proj_params','params'] );
+    foreach my $param ( @BOOL_PARAMS ) {
+        my $val = PDL::Transform::_opt( $o, [ $param ] );
+        $self->{params}{$param} = 'ON' if $val;
+    }
+    foreach my $param (@GENERAL_PARAMS, @EARTH_PARAMS) {
+        my $val = PDL::Transform::_opt( $o, [ $param ] );
+        $self->{params}{$param} = $val if defined $val;
+    }
     # First process the old params that may already be in the string:
     # These override the specific params set above:
-    if( defined( $self->{params}->{proj_params} ) )
-    {
-        $self->{orig_proj_params} = $self->{params}->{proj_params};
-
+    if (defined( $self->{params}{proj_params} )) {
+        $self->{orig_proj_params} = $self->{params}{proj_params};
         my @params = split( /\s+/, $self->{orig_proj_params} );
-        foreach my $param ( @params )
-        {
-            if( $param =~ /^\+(\S+)=(\S+)/ )
-            {
+        foreach my $param ( @params ) {
+            if ($param =~ /^\+(\S+)=(\S+)/) {
                 my ($name, $val) = ($1, $2);
-                $self->{params}->{$name} = $val;
-                #print STDERR "$sub: $name => $val\n";
-            }
-            elsif( $param =~ /^\+(\S+)/ )
-            {   # Boolean option
-                $self->{params}->{$1} = 'ON';
+                $self->{params}{$name} = $val;
+            } elsif ($param =~ /^\+(\S+)/) {   # Boolean option
+                $self->{params}{$1} = 'ON';
             }
         }
     }
-
-    # Update the proj_string to current options:
-    #
-    $self->update_proj_string();
-
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-
-    ##############################
-    # The meat -- just copy and paste from Transform.pm :)
-    #    (and do some proj stuff here as well)
-
-    # Forward transformation:
-    $self->{func} = sub
-    {
-        my $in = shift;
-        my $opt = shift;
-        my $out = $in->new_or_inplace();
-        # Always set the badflag to 1 here, to handle possible bad projection values:
-        $out->badflag(1);
-        $out->inplace(1);
-        PDL::Transform::Proj4::fwd_transform( $out, $opt->{proj_params} );
-    };
-
-    # Inverse transformation:
-    $self->{inv} = sub
-    {
-        my $in = shift;
-        my $opt = shift;
-        my $out = $in->new_or_inplace();
-        # Always set the badflag to 1 here, to handle possible bad projection values:
-        $out->badflag(1);
-        $out->inplace(1);
-        PDL::Transform::Proj4::inv_transform( $out, $opt->{proj_params} );
-    };
-
+    @$self{qw(idim odim)} = (2, 2);
+    # Update proj_string to current options:
+    $self->update_proj_string if $self->{params}{proj};
+    $self->{func} = \&_proj4_fwd; # Forward transformation
+    $self->{inv} = \&_proj4_inv; # Inverse transformation
     return $self;
 } # End of new()...
 
-sub update_proj_string
-{
+sub update_proj_string {
     my $self = shift;
-    my $sub = "PDL::Transform::Proj4::update_proj_string()";
-
     # (Re)Generate the proj_params string from the options passed:
-    #
-    delete( $self->{params}->{proj_params} );
-    my $proj_string = "";
-
-    foreach my $param ( sort keys %{ $self->{params} } )
-#line 503 "proj4.pd"
-    {
-        next unless defined( $self->{params}->{$param} );
-
-        $proj_string .= ( $self->{params}->{$param} eq 'ON' )
-                        ? "+$param " : " +$param=" . $self->{params}->{$param} . " ";
-        #print STDERR "$sub: Adding \'$proj_string\'...\n";
-    }
-
-    #print STDERR "$sub: Final proj_params: \'$proj_string\'\n";
-
-    $self->{params}->{proj_params} = $proj_string;
+    my @params = map "+$_".($self->{params}{$_} eq 'ON' ? '' : "=$self->{params}{$_}"),
+      sort grep $_ ne 'proj_params' && defined $self->{params}{$_}, keys %{$self->{params}};
+#line 425 "proj4.pd"
+    $self->{params}{proj_params} = "@params";
+  my ($iunit, $ounit) = PDL::Transform::Proj4::units($self->{params}{proj_params});
+  @$self{qw(iunit ounit)} = ([($iunit)x2], [($ounit)x2]);
 } # End of update_proj_string()...
 
-sub proj_params
-{
+sub proj_params {
     my $self = shift;
-    $self->update_proj_string();
-    return $self->{params}->{proj_params};
+    $self->update_proj_string;
+    return $self->{params}{proj_params};
 } # End of proj_params()...
 
-# Returns a string with information about what parameters proj will
-# actually use, this includes defaults, and +init=file stuff. It's
-# the same as running 'proj -v'. It uses the proj command line, so
-# it might not work with all shells. I've tested it with bash.
-sub get_proj_info
-{
-    my $params = shift;
-    my @a = split(/\n/, `echo | proj -v $params`);
-    pop(@a);
-    return join("\n", @a);
-}
-
-sub t_proj
-{
+sub t_proj {
     PDL::Transform::Proj4->new( @_ );
 } # End of t_proj()...
 
-1;
-#line 368 "Proj4.pm"
-
-
-=head1 FUNCTIONS
-
-=cut
-
-
-
-
-
-
-=head2 fwd_transform
-
-=for sig
-
-  Signature: (lonlat(n=2); [o] xy(n); char* params)
-
-=for ref
-
-PROJ forward transformation $params is a string of the projection
-transformation parameters.
-
-Returns a pdl with x, y values at positions 0, 1. The units are dependent
-on PROJ behavior. They will be PDL->null if an error has occurred.
-
-=for bad
-
-Ignores bad elements of $lat and $lon, and sets the corresponding elements
-of $x and $y to BAD
-
-=for bad
-
-fwd_transform processes bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
+sub _make_class {
+  my ($name, $full_name, $can_inv, $param_list) = @_;
+  eval <<"EOF";
+package PDL::Transform::Proj4::${name};
+our \@ISA = 'PDL::Transform::Proj4';
+our \@PARAM_LIST = $param_list;
+sub new {
+  my \$self  = shift->SUPER::new( \@_ );
+  my \$o = \$_[0];
+  \$o = {\@_} if !ref \$o;
+  \$self->{name} = \$self->{params}{proj} = q{$name};
+  foreach my \$param (\@PARAM_LIST) {
+      my \$val = PDL::Transform::_opt( \$o, [ \$param ] );
+      \$self->{params}{\$param} = \$val if defined \$val;
+  }
+  delete \$self->{inv} if !$can_inv;
+  \$self->update_proj_string;
+  return \$self;
+}
+EOF
+}
+#line 322 "Proj4.pm"
 
 *fwd_transform = \&PDL::fwd_transform;
-
-
-
-
-
-
-=head2 inv_transform
-
-=for sig
-
-  Signature: (xy(n=2); [o] lonlat(n); char* params)
-
-=for ref
-
-PROJ inverse transformation $params is a string of the projection
-transformation parameters.
-
-Returns a pdl with lon, lat values at positions 0, 1. The units are
-dependent on PROJ behavior. They will be PDL->null if an error has
-occurred.
-
-=for bad
-
-Ignores bad elements of $lat and $lon, and sets the corresponding elements
-of $x and $y to BAD
-
-=for bad
-
-inv_transform processes bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
 
 
 
@@ -448,7 +331,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 192 "proj4.pd"
+#line 149 "proj4.pd"
 
 =head2 proj_version
 
@@ -457,122 +340,41 @@ Not exported.
 
 =cut
 
-#line 201 "proj4.pd"
+#line 158 "proj4.pd"
 sub load_projection_information {+{
   'adams_hemi' => {
     'CATEGORIES' => [
       'Misc',
-      'Sph',
-      'No',
-      'inv'
+      'Sph'
     ],
     'CODE' => 'adams_hemi',
-    'INVERSE' => 1,
+    'INVERSE' => 0,
     'NAME' => 'Adams Hemisphere in a Square',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
   'adams_ws1' => {
     'CATEGORIES' => [
       'Misc',
-      'Sph',
-      'No',
-      'inv'
+      'Sph'
     ],
     'CODE' => 'adams_ws1',
-    'INVERSE' => 1,
+    'INVERSE' => 0,
     'NAME' => 'Adams World in a Square I',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
   'adams_ws2' => {
     'CATEGORIES' => [
       'Misc',
-      'Sph',
-      'No',
-      'inv'
+      'Sph'
     ],
     'CODE' => 'adams_ws2',
-    'INVERSE' => 1,
+    'INVERSE' => 0,
     'NAME' => 'Adams World in a Square II',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -586,31 +388,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Albers Equal Area',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lat_2'
@@ -627,31 +404,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Azimuthal Equidistant',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_0',
         'guam'
@@ -663,31 +415,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Affine transformation',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -700,31 +427,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Airy',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'no_cut',
         'lat_b'
@@ -740,31 +442,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Aitoff',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -776,31 +453,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Modified Stereographic of Alaska',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -813,31 +465,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Apian Globular I',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -850,31 +477,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'August Epicycloidal',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -883,31 +485,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Axis ordering',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -920,31 +497,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Bacon Globular',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -957,31 +509,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Bertin 1953',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -994,31 +521,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Bipolar conic of western hemisphere',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1031,31 +533,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Boggs Eumorphic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1069,31 +546,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Bonne (Werner lat_1=90)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1'
       ]
@@ -1109,31 +561,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Cal Coop Ocean Fish Invest Lines/Stations',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1142,31 +569,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Geodetic/cartesian conversions',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1180,31 +582,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Cassini',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1217,31 +594,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Central Cylindrical',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1255,31 +607,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Central Conic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1'
       ]
@@ -1295,31 +622,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Equal Area Cylindrical',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_ts'
       ]
@@ -1334,31 +636,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Chamberlin Trimetric',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lon_1',
@@ -1377,31 +654,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Colombia Urban',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'h_0'
       ]
@@ -1416,31 +668,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Collignon',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1453,31 +680,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Compact Miller',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1490,31 +692,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Craster Parabolic (Putnins P4)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1523,31 +700,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Deformation model',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1556,31 +708,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Kinematic grid shift',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1593,31 +720,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Denoyer Semi-Elliptical',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1630,31 +732,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Eckert I',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1667,31 +744,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Eckert II',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1704,31 +756,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Eckert III',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1741,31 +768,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Eckert IV',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1778,31 +780,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Eckert V',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1815,31 +792,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Eckert VI',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1852,31 +804,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Equidistant Cylindrical (Plate Carree)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_ts',
         'lat_00'
@@ -1893,31 +820,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Equidistant Conic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lat_2'
@@ -1934,31 +836,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Equal Earth',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -1971,31 +848,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Extended Transverse Mercator',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2008,31 +860,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Euler',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lat_2'
@@ -2048,31 +875,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Fahey',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2085,31 +887,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Foucaut',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2122,31 +899,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Foucaut Sinusoidal',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2159,31 +911,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Gall (Gall Stereographic)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2192,31 +919,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Geocentric Latitude',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2225,31 +927,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Geographic Offset',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2263,31 +940,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Geostationary Satellite View',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'h'
       ]
@@ -2302,31 +954,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Ginsburg VIII (TsNIIGAiK)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2339,31 +966,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'General Sinusoidal Series',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'm',
         'n'
@@ -2379,31 +981,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Gnomonic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2416,31 +993,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Goode Homolosine',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2449,31 +1001,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Generic grid shift',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2485,31 +1012,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Modified Stereographic of 48 U.S.',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2521,31 +1023,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Modified Stereographic of 50 U.S.',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2559,31 +1036,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Gauss-Schreiber Transverse Mercator (aka Gauss-Laborde Reunion)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_0',
         'lon_0',
@@ -2594,39 +1046,12 @@ sub load_projection_information {+{
   'guyou' => {
     'CATEGORIES' => [
       'Misc',
-      'Sph',
-      'No',
-      'inv'
+      'Sph'
     ],
     'CODE' => 'guyou',
-    'INVERSE' => 1,
+    'INVERSE' => 0,
     'NAME' => 'Guyou',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2639,31 +1064,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Hammer & Eckert-Greifendorff',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'W',
         'M'
@@ -2679,31 +1079,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Hatano Asymmetrical Equal Area',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2716,31 +1091,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'HEALPix',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'rot_xy'
       ]
@@ -2751,31 +1101,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => '3(6)-, 4(8)- and 7(14)-parameter Helmert shift',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2784,31 +1109,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Horizontal grid shift',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2817,31 +1117,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Horner polynomial evaluation',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2854,31 +1129,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Interrupted Goode Homolosine',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2891,31 +1141,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Interrupted Goode Homolosine Oceanic View',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2928,31 +1153,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Interrupted Mollweide',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -2965,31 +1165,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Interrupted Mollweide Oceanic View',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3003,31 +1178,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'International Map of the World Polyconic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lat_2',
@@ -3043,31 +1193,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Icosahedral Snyder Equal Area',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3080,31 +1205,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Kavrayskiy V',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3117,31 +1217,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Kavrayskiy VII',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3154,31 +1229,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Krovak',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3191,31 +1241,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Laborde',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_0'
       ]
@@ -3231,31 +1256,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Lambert Azimuthal Equal Area',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3268,31 +1268,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Lagrange',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'W'
       ]
@@ -3307,31 +1282,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Larrivee',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3344,31 +1294,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Laskowski',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3378,31 +1303,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Lat/long (Geodetic alias)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3416,31 +1316,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Lambert Conformal Conic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lat_2',
@@ -3459,31 +1334,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Lambert Conformal Conic Alternative',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_0'
       ]
@@ -3499,31 +1349,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Lambert Equal Area Conic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'south'
@@ -3538,31 +1363,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Lee Oblated Stereographic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3572,31 +1372,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Lat/long (Geodetic)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3609,31 +1384,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Loximuthal',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3647,31 +1397,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Space oblique for LANDSAT',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lsat',
         'path'
@@ -3687,31 +1412,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'McBryde-Thomas Flat-Pole Sine (No. 2)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3724,31 +1424,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'McBryde-Thomas Flat-Polar Sine (No. 1)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3761,31 +1436,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'McBride-Thomas Flat-Polar Parabolic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3798,31 +1448,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'McBryde-Thomas Flat-Polar Quartic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3835,31 +1460,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'McBryde-Thomas Flat-Polar Sinusoidal',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3873,31 +1473,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Mercator',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_ts'
       ]
@@ -3911,31 +1486,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Miller Oblated Stereographic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3948,31 +1498,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Miller Cylindrical',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -3986,31 +1511,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Space oblique for MISR',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'path'
       ]
@@ -4025,31 +1525,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Modified Krovak',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4062,31 +1537,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Mollweide',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4095,31 +1545,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Molodensky-Badekas transformation',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4128,31 +1553,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Molodensky transform',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4165,31 +1565,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Murdoch I',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lat_2'
@@ -4205,31 +1580,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Murdoch II',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lat_2'
@@ -4245,31 +1595,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Murdoch III',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lat_2'
@@ -4285,31 +1610,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Natural Earth',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4322,31 +1622,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Natural Earth 2',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4359,31 +1634,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Nell',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4396,31 +1646,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Nell-Hammer',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4433,31 +1658,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Nicolosi Globular',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4466,31 +1666,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'No operation',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4503,31 +1678,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Near-sided perspective',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'h'
       ]
@@ -4541,31 +1691,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'New Zealand Map Grid',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4578,31 +1703,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'General Oblique Transformation',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'o_proj',
         'o_lat_p',
@@ -4627,31 +1727,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Oblique Cylindrical Equal Area',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lat_2',
@@ -4669,31 +1744,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Oblated Equal Area',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'n',
         'm',
@@ -4712,31 +1762,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Oblique Mercator',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'alpha',
         'gamma',
@@ -4758,31 +1783,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Ortelius Oval',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4796,31 +1796,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Orthographic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4832,31 +1807,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Patterson Cylindrical',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4869,31 +1819,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Perspective Conic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lat_2'
@@ -4903,39 +1828,12 @@ sub load_projection_information {+{
   'peirce_q' => {
     'CATEGORIES' => [
       'Misc',
-      'Sph',
-      'No',
-      'inv'
+      'Sph'
     ],
     'CODE' => 'peirce_q',
-    'INVERSE' => 1,
+    'INVERSE' => 0,
     'NAME' => 'Peirce Quincuncial',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4944,31 +1842,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Transformation pipeline manager',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -4982,31 +1855,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Polyconic (American)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5015,31 +1863,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Retrieve coordinate value from pipeline stack',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5048,31 +1871,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Save coordinate value on pipeline stack',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5085,31 +1883,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Putnins P1',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5122,31 +1895,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Putnins P2',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5159,31 +1907,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Putnins P3',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5196,31 +1919,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Putnins P3\'',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5233,31 +1931,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Putnins P4\'',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5270,31 +1943,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Putnins P5',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5307,31 +1955,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Putnins P5\'',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5344,31 +1967,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Putnins P6',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5381,31 +1979,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Putnins P6\'',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5418,31 +1991,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Quadrilateralized Spherical Cube',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5455,31 +2003,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Quartic Authalic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5492,31 +2015,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'rHEALPix',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'north_square',
         'south_square'
@@ -5532,31 +2030,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Robinson',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5569,31 +2042,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Roussilhe Stereographic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5606,31 +2054,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Rectangular Polyconic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_ts'
       ]
@@ -5646,31 +2069,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'S2',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5682,31 +2080,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Spherical Cross-track Height',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'plat_0',
         'plon_0',
@@ -5720,31 +2093,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Set coordinate value',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5758,31 +2106,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Sinusoidal (Sanson-Flamsteed)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5796,31 +2119,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Space Oblique Mercator',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'inc_angle',
         'ps_rev',
@@ -5837,31 +2135,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Swiss. Obl. Mercator',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5875,31 +2148,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Stereographic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_ts'
       ]
@@ -5915,31 +2163,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Oblique Stereographic Alternative',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5952,31 +2175,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Transverse Central Cylindrical',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -5989,31 +2187,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Transverse Cylindrical Equal Area',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6026,31 +2199,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Times',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6059,31 +2207,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Triangulation based transformation',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6096,31 +2219,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Tissot',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lat_2'
@@ -6137,31 +2235,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Transverse Mercator',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'approx'
       ]
@@ -6176,31 +2249,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Tobler-Mercator',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6209,31 +2257,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Geocentric/Topocentric conversion',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6246,31 +2269,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Two Point Equidistant',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lon_1',
@@ -6288,31 +2286,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Tilted perspective',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'tilt',
         'azi',
@@ -6325,31 +2298,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Unit conversion',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6362,31 +2310,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Universal Polar Stereographic',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'south'
       ]
@@ -6401,31 +2324,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Urmaev V',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'n',
         'q',
@@ -6442,31 +2340,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Urmaev Flat-Polar Sinusoidal',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'n'
       ]
@@ -6481,31 +2354,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Universal Transverse Mercator (UTM)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'zone',
         'south',
@@ -6522,31 +2370,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'van der Grinten (I)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6559,31 +2382,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'van der Grinten II',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6596,31 +2394,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'van der Grinten III',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6633,31 +2406,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'van der Grinten IV',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6669,31 +2417,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Vertical Offset and Slope',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_0',
         'lon_0',
@@ -6708,31 +2431,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Vertical grid shift',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6745,31 +2443,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Vitkovsky I',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1',
         'lat_2'
@@ -6785,31 +2458,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Wagner I (Kavrayskiy VI)',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6822,31 +2470,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Wagner II',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6859,31 +2482,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Wagner III',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_ts'
       ]
@@ -6898,31 +2496,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Wagner IV',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6935,31 +2508,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Wagner V',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -6972,31 +2520,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Wagner VI',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -7009,31 +2532,6 @@ sub load_projection_information {+{
     'INVERSE' => 0,
     'NAME' => 'Wagner VII',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -7046,31 +2544,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Web Mercator / Pseudo Mercator',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -7083,31 +2556,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Werenskiold I',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   },
@@ -7120,31 +2568,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Winkel I',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_ts'
       ]
@@ -7159,31 +2582,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Winkel II',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1'
       ]
@@ -7198,31 +2596,6 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Winkel Tripel',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => [
         'lat_1'
       ]
@@ -7233,38 +2606,13 @@ sub load_projection_information {+{
     'INVERSE' => 1,
     'NAME' => 'Geocentric grid shift',
     'PARAMS' => {
-      'EARTH' => [
-        'ellps',
-        'b',
-        'f',
-        'rf',
-        'e',
-        'es',
-        'R',
-        'R_A',
-        'R_V',
-        'R_a',
-        'R_g',
-        'R_h',
-        'R_lat_g'
-      ],
-      'GENERAL' => [
-        'x_0',
-        'y_0',
-        'lon_0',
-        'units',
-        'init',
-        'no_defs',
-        'geoc',
-        'over'
-      ],
       'PROJ' => []
     }
   }
 }
 }
 
-#line 547 "proj4.pd"
+#line 466 "proj4.pd"
 
 =head1 FUNCTIONS
 
@@ -7274,48 +2622,45 @@ This is the main entry point for the generalized interface. See above on its usa
 
 =cut
 
-#line 634 "proj4.pd"
+#line 483 "proj4.pd"
 =head2 t_proj_adams_hemi
 
-Autogenerated transformation function for Proj4 projection code adams_hemi.
+Proj4 projection code C<adams_hemi>, full name "Adams Hemisphere in a Square".
 
-The full name for this projection is Adams Hemisphere in a Square.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_adams_hemi
-    { 'PDL::Transform::Proj4::adams_hemi'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_adams_hemi {'PDL::Transform::Proj4::adams_hemi'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_adams_ws1
 
-Autogenerated transformation function for Proj4 projection code adams_ws1.
+Proj4 projection code C<adams_ws1>, full name "Adams World in a Square I".
 
-The full name for this projection is Adams World in a Square I.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_adams_ws1
-    { 'PDL::Transform::Proj4::adams_ws1'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_adams_ws1 {'PDL::Transform::Proj4::adams_ws1'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_adams_ws2
 
-Autogenerated transformation function for Proj4 projection code adams_ws2.
+Proj4 projection code C<adams_ws2>, full name "Adams World in a Square II".
 
-The full name for this projection is Adams World in a Square II.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_adams_ws2
-    { 'PDL::Transform::Proj4::adams_ws2'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_adams_ws2 {'PDL::Transform::Proj4::adams_ws2'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_aea
 
-Autogenerated transformation function for Proj4 projection code aea.
+Proj4 projection code C<aea>, full name "Albers Equal Area".
 
-The full name for this projection is Albers Equal Area.
+Categories: Conic Sph Ell.
 
 Projection Parameters
 
@@ -7331,15 +2676,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_aea
-    { 'PDL::Transform::Proj4::aea'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_aea {'PDL::Transform::Proj4::aea'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_aeqd
 
-Autogenerated transformation function for Proj4 projection code aeqd.
+Proj4 projection code C<aeqd>, full name "Azimuthal Equidistant".
 
-The full name for this projection is Azimuthal Equidistant.
+Categories: Azi Sph Ell.
 
 Projection Parameters
 
@@ -7355,27 +2699,23 @@ Projection Parameters
 
 =cut
 
-sub t_proj_aeqd
-    { 'PDL::Transform::Proj4::aeqd'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_aeqd {'PDL::Transform::Proj4::aeqd'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_affine
 
-Autogenerated transformation function for Proj4 projection code affine.
-
-The full name for this projection is Affine transformation.
+Proj4 projection code C<affine>, full name "Affine transformation".
 
 =cut
 
-sub t_proj_affine
-    { 'PDL::Transform::Proj4::affine'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_affine {'PDL::Transform::Proj4::affine'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_airy
 
-Autogenerated transformation function for Proj4 projection code airy.
+Proj4 projection code C<airy>, full name "Airy".
 
-The full name for this projection is Airy.
+Categories: B<no inverse> Misc Sph.
 
 Projection Parameters
 
@@ -7391,123 +2731,111 @@ Projection Parameters
 
 =cut
 
-sub t_proj_airy
-    { 'PDL::Transform::Proj4::airy'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_airy {'PDL::Transform::Proj4::airy'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_aitoff
 
-Autogenerated transformation function for Proj4 projection code aitoff.
+Proj4 projection code C<aitoff>, full name "Aitoff".
 
-The full name for this projection is Aitoff.
+Categories: Misc Sph.
 
 =cut
 
-sub t_proj_aitoff
-    { 'PDL::Transform::Proj4::aitoff'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_aitoff {'PDL::Transform::Proj4::aitoff'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_alsk
 
-Autogenerated transformation function for Proj4 projection code alsk.
+Proj4 projection code C<alsk>, full name "Modified Stereographic of Alaska".
 
-The full name for this projection is Modified Stereographic of Alaska.
+Categories: Azi(mod).
 
 =cut
 
-sub t_proj_alsk
-    { 'PDL::Transform::Proj4::alsk'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_alsk {'PDL::Transform::Proj4::alsk'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_apian
 
-Autogenerated transformation function for Proj4 projection code apian.
+Proj4 projection code C<apian>, full name "Apian Globular I".
 
-The full name for this projection is Apian Globular I.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_apian
-    { 'PDL::Transform::Proj4::apian'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_apian {'PDL::Transform::Proj4::apian'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_august
 
-Autogenerated transformation function for Proj4 projection code august.
+Proj4 projection code C<august>, full name "August Epicycloidal".
 
-The full name for this projection is August Epicycloidal.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_august
-    { 'PDL::Transform::Proj4::august'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_august {'PDL::Transform::Proj4::august'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_axisswap
 
-Autogenerated transformation function for Proj4 projection code axisswap.
-
-The full name for this projection is Axis ordering.
+Proj4 projection code C<axisswap>, full name "Axis ordering".
 
 =cut
 
-sub t_proj_axisswap
-    { 'PDL::Transform::Proj4::axisswap'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_axisswap {'PDL::Transform::Proj4::axisswap'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_bacon
 
-Autogenerated transformation function for Proj4 projection code bacon.
+Proj4 projection code C<bacon>, full name "Bacon Globular".
 
-The full name for this projection is Bacon Globular.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_bacon
-    { 'PDL::Transform::Proj4::bacon'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_bacon {'PDL::Transform::Proj4::bacon'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_bertin1953
 
-Autogenerated transformation function for Proj4 projection code bertin1953.
+Proj4 projection code C<bertin1953>, full name "Bertin 1953".
 
-The full name for this projection is Bertin 1953.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_bertin1953
-    { 'PDL::Transform::Proj4::bertin1953'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_bertin1953 {'PDL::Transform::Proj4::bertin1953'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_bipc
 
-Autogenerated transformation function for Proj4 projection code bipc.
+Proj4 projection code C<bipc>, full name "Bipolar conic of western hemisphere".
 
-The full name for this projection is Bipolar conic of western hemisphere.
+Categories: Conic Sph.
 
 =cut
 
-sub t_proj_bipc
-    { 'PDL::Transform::Proj4::bipc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_bipc {'PDL::Transform::Proj4::bipc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_boggs
 
-Autogenerated transformation function for Proj4 projection code boggs.
+Proj4 projection code C<boggs>, full name "Boggs Eumorphic".
 
-The full name for this projection is Boggs Eumorphic.
+Categories: B<no inverse> PCyl Sph.
 
 =cut
 
-sub t_proj_boggs
-    { 'PDL::Transform::Proj4::boggs'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_boggs {'PDL::Transform::Proj4::boggs'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_bonne
 
-Autogenerated transformation function for Proj4 projection code bonne.
+Proj4 projection code C<bonne>, full name "Bonne (Werner lat_1=90)".
 
-The full name for this projection is Bonne (Werner lat_1=90).
+Categories: Conic Sph Ell.
 
 Projection Parameters
 
@@ -7521,63 +2849,56 @@ Projection Parameters
 
 =cut
 
-sub t_proj_bonne
-    { 'PDL::Transform::Proj4::bonne'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_bonne {'PDL::Transform::Proj4::bonne'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_calcofi
 
-Autogenerated transformation function for Proj4 projection code calcofi.
+Proj4 projection code C<calcofi>, full name "Cal Coop Ocean Fish Invest Lines/Stations".
 
-The full name for this projection is Cal Coop Ocean Fish Invest Lines/Stations.
+Categories: Cyl Sph Ell.
 
 =cut
 
-sub t_proj_calcofi
-    { 'PDL::Transform::Proj4::calcofi'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_calcofi {'PDL::Transform::Proj4::calcofi'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_cart
 
-Autogenerated transformation function for Proj4 projection code cart.
-
-The full name for this projection is Geodetic/cartesian conversions.
+Proj4 projection code C<cart>, full name "Geodetic/cartesian conversions".
 
 =cut
 
-sub t_proj_cart
-    { 'PDL::Transform::Proj4::cart'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_cart {'PDL::Transform::Proj4::cart'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_cass
 
-Autogenerated transformation function for Proj4 projection code cass.
+Proj4 projection code C<cass>, full name "Cassini".
 
-The full name for this projection is Cassini.
+Categories: Cyl Sph Ell.
 
 =cut
 
-sub t_proj_cass
-    { 'PDL::Transform::Proj4::cass'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_cass {'PDL::Transform::Proj4::cass'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_cc
 
-Autogenerated transformation function for Proj4 projection code cc.
+Proj4 projection code C<cc>, full name "Central Cylindrical".
 
-The full name for this projection is Central Cylindrical.
+Categories: Cyl Sph.
 
 =cut
 
-sub t_proj_cc
-    { 'PDL::Transform::Proj4::cc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_cc {'PDL::Transform::Proj4::cc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_ccon
 
-Autogenerated transformation function for Proj4 projection code ccon.
+Proj4 projection code C<ccon>, full name "Central Conic".
 
-The full name for this projection is Central Conic.
+Categories: Central Conic Sph.
 
 Projection Parameters
 
@@ -7591,15 +2912,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_ccon
-    { 'PDL::Transform::Proj4::ccon'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_ccon {'PDL::Transform::Proj4::ccon'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_cea
 
-Autogenerated transformation function for Proj4 projection code cea.
+Proj4 projection code C<cea>, full name "Equal Area Cylindrical".
 
-The full name for this projection is Equal Area Cylindrical.
+Categories: Cyl Sph Ell.
 
 Projection Parameters
 
@@ -7613,15 +2933,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_cea
-    { 'PDL::Transform::Proj4::cea'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_cea {'PDL::Transform::Proj4::cea'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_chamb
 
-Autogenerated transformation function for Proj4 projection code chamb.
+Proj4 projection code C<chamb>, full name "Chamberlin Trimetric".
 
-The full name for this projection is Chamberlin Trimetric.
+Categories: B<no inverse> Misc Sph.
 
 Projection Parameters
 
@@ -7645,15 +2964,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_chamb
-    { 'PDL::Transform::Proj4::chamb'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_chamb {'PDL::Transform::Proj4::chamb'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_col_urban
 
-Autogenerated transformation function for Proj4 projection code col_urban.
+Proj4 projection code C<col_urban>, full name "Colombia Urban".
 
-The full name for this projection is Colombia Urban.
+Categories: Misc.
 
 Projection Parameters
 
@@ -7667,159 +2985,142 @@ Projection Parameters
 
 =cut
 
-sub t_proj_col_urban
-    { 'PDL::Transform::Proj4::col_urban'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_col_urban {'PDL::Transform::Proj4::col_urban'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_collg
 
-Autogenerated transformation function for Proj4 projection code collg.
+Proj4 projection code C<collg>, full name "Collignon".
 
-The full name for this projection is Collignon.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_collg
-    { 'PDL::Transform::Proj4::collg'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_collg {'PDL::Transform::Proj4::collg'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_comill
 
-Autogenerated transformation function for Proj4 projection code comill.
+Proj4 projection code C<comill>, full name "Compact Miller".
 
-The full name for this projection is Compact Miller.
+Categories: Cyl Sph.
 
 =cut
 
-sub t_proj_comill
-    { 'PDL::Transform::Proj4::comill'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_comill {'PDL::Transform::Proj4::comill'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_crast
 
-Autogenerated transformation function for Proj4 projection code crast.
+Proj4 projection code C<crast>, full name "Craster Parabolic (Putnins P4)".
 
-The full name for this projection is Craster Parabolic (Putnins P4).
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_crast
-    { 'PDL::Transform::Proj4::crast'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_crast {'PDL::Transform::Proj4::crast'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_defmodel
 
-Autogenerated transformation function for Proj4 projection code defmodel.
-
-The full name for this projection is Deformation model.
+Proj4 projection code C<defmodel>, full name "Deformation model".
 
 =cut
 
-sub t_proj_defmodel
-    { 'PDL::Transform::Proj4::defmodel'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_defmodel {'PDL::Transform::Proj4::defmodel'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_deformation
 
-Autogenerated transformation function for Proj4 projection code deformation.
-
-The full name for this projection is Kinematic grid shift.
+Proj4 projection code C<deformation>, full name "Kinematic grid shift".
 
 =cut
 
-sub t_proj_deformation
-    { 'PDL::Transform::Proj4::deformation'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_deformation {'PDL::Transform::Proj4::deformation'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_denoy
 
-Autogenerated transformation function for Proj4 projection code denoy.
+Proj4 projection code C<denoy>, full name "Denoyer Semi-Elliptical".
 
-The full name for this projection is Denoyer Semi-Elliptical.
+Categories: B<no inverse> PCyl Sph.
 
 =cut
 
-sub t_proj_denoy
-    { 'PDL::Transform::Proj4::denoy'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_denoy {'PDL::Transform::Proj4::denoy'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_eck1
 
-Autogenerated transformation function for Proj4 projection code eck1.
+Proj4 projection code C<eck1>, full name "Eckert I".
 
-The full name for this projection is Eckert I.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_eck1
-    { 'PDL::Transform::Proj4::eck1'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_eck1 {'PDL::Transform::Proj4::eck1'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_eck2
 
-Autogenerated transformation function for Proj4 projection code eck2.
+Proj4 projection code C<eck2>, full name "Eckert II".
 
-The full name for this projection is Eckert II.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_eck2
-    { 'PDL::Transform::Proj4::eck2'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_eck2 {'PDL::Transform::Proj4::eck2'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_eck3
 
-Autogenerated transformation function for Proj4 projection code eck3.
+Proj4 projection code C<eck3>, full name "Eckert III".
 
-The full name for this projection is Eckert III.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_eck3
-    { 'PDL::Transform::Proj4::eck3'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_eck3 {'PDL::Transform::Proj4::eck3'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_eck4
 
-Autogenerated transformation function for Proj4 projection code eck4.
+Proj4 projection code C<eck4>, full name "Eckert IV".
 
-The full name for this projection is Eckert IV.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_eck4
-    { 'PDL::Transform::Proj4::eck4'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_eck4 {'PDL::Transform::Proj4::eck4'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_eck5
 
-Autogenerated transformation function for Proj4 projection code eck5.
+Proj4 projection code C<eck5>, full name "Eckert V".
 
-The full name for this projection is Eckert V.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_eck5
-    { 'PDL::Transform::Proj4::eck5'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_eck5 {'PDL::Transform::Proj4::eck5'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_eck6
 
-Autogenerated transformation function for Proj4 projection code eck6.
+Proj4 projection code C<eck6>, full name "Eckert VI".
 
-The full name for this projection is Eckert VI.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_eck6
-    { 'PDL::Transform::Proj4::eck6'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_eck6 {'PDL::Transform::Proj4::eck6'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_eqc
 
-Autogenerated transformation function for Proj4 projection code eqc.
+Proj4 projection code C<eqc>, full name "Equidistant Cylindrical (Plate Carree)".
 
-The full name for this projection is Equidistant Cylindrical (Plate Carree).
+Categories: Cyl Sph.
 
 Projection Parameters
 
@@ -7835,15 +3136,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_eqc
-    { 'PDL::Transform::Proj4::eqc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_eqc {'PDL::Transform::Proj4::eqc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_eqdc
 
-Autogenerated transformation function for Proj4 projection code eqdc.
+Proj4 projection code C<eqdc>, full name "Equidistant Conic".
 
-The full name for this projection is Equidistant Conic.
+Categories: Conic Sph Ell.
 
 Projection Parameters
 
@@ -7859,39 +3159,36 @@ Projection Parameters
 
 =cut
 
-sub t_proj_eqdc
-    { 'PDL::Transform::Proj4::eqdc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_eqdc {'PDL::Transform::Proj4::eqdc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_eqearth
 
-Autogenerated transformation function for Proj4 projection code eqearth.
+Proj4 projection code C<eqearth>, full name "Equal Earth".
 
-The full name for this projection is Equal Earth.
+Categories: PCyl Sph Ell.
 
 =cut
 
-sub t_proj_eqearth
-    { 'PDL::Transform::Proj4::eqearth'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_eqearth {'PDL::Transform::Proj4::eqearth'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_etmerc
 
-Autogenerated transformation function for Proj4 projection code etmerc.
+Proj4 projection code C<etmerc>, full name "Extended Transverse Mercator".
 
-The full name for this projection is Extended Transverse Mercator.
+Categories: Cyl Sph.
 
 =cut
 
-sub t_proj_etmerc
-    { 'PDL::Transform::Proj4::etmerc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_etmerc {'PDL::Transform::Proj4::etmerc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_euler
 
-Autogenerated transformation function for Proj4 projection code euler.
+Proj4 projection code C<euler>, full name "Euler".
 
-The full name for this projection is Euler.
+Categories: Conic Sph.
 
 Projection Parameters
 
@@ -7907,87 +3204,76 @@ Projection Parameters
 
 =cut
 
-sub t_proj_euler
-    { 'PDL::Transform::Proj4::euler'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_euler {'PDL::Transform::Proj4::euler'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_fahey
 
-Autogenerated transformation function for Proj4 projection code fahey.
+Proj4 projection code C<fahey>, full name "Fahey".
 
-The full name for this projection is Fahey.
+Categories: Pcyl Sph.
 
 =cut
 
-sub t_proj_fahey
-    { 'PDL::Transform::Proj4::fahey'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_fahey {'PDL::Transform::Proj4::fahey'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_fouc
 
-Autogenerated transformation function for Proj4 projection code fouc.
+Proj4 projection code C<fouc>, full name "Foucaut".
 
-The full name for this projection is Foucaut.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_fouc
-    { 'PDL::Transform::Proj4::fouc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_fouc {'PDL::Transform::Proj4::fouc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_fouc_s
 
-Autogenerated transformation function for Proj4 projection code fouc_s.
+Proj4 projection code C<fouc_s>, full name "Foucaut Sinusoidal".
 
-The full name for this projection is Foucaut Sinusoidal.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_fouc_s
-    { 'PDL::Transform::Proj4::fouc_s'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_fouc_s {'PDL::Transform::Proj4::fouc_s'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_gall
 
-Autogenerated transformation function for Proj4 projection code gall.
+Proj4 projection code C<gall>, full name "Gall (Gall Stereographic)".
 
-The full name for this projection is Gall (Gall Stereographic).
+Categories: Cyl Sph.
 
 =cut
 
-sub t_proj_gall
-    { 'PDL::Transform::Proj4::gall'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_gall {'PDL::Transform::Proj4::gall'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_geoc
 
-Autogenerated transformation function for Proj4 projection code geoc.
-
-The full name for this projection is Geocentric Latitude.
+Proj4 projection code C<geoc>, full name "Geocentric Latitude".
 
 =cut
 
-sub t_proj_geoc
-    { 'PDL::Transform::Proj4::geoc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_geoc {'PDL::Transform::Proj4::geoc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_geogoffset
 
-Autogenerated transformation function for Proj4 projection code geogoffset.
-
-The full name for this projection is Geographic Offset.
+Proj4 projection code C<geogoffset>, full name "Geographic Offset".
 
 =cut
 
-sub t_proj_geogoffset
-    { 'PDL::Transform::Proj4::geogoffset'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_geogoffset {'PDL::Transform::Proj4::geogoffset'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_geos
 
-Autogenerated transformation function for Proj4 projection code geos.
+Proj4 projection code C<geos>, full name "Geostationary Satellite View".
 
-The full name for this projection is Geostationary Satellite View.
+Categories: Azi Sph Ell.
 
 Projection Parameters
 
@@ -8001,27 +3287,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_geos
-    { 'PDL::Transform::Proj4::geos'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_geos {'PDL::Transform::Proj4::geos'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_gins8
 
-Autogenerated transformation function for Proj4 projection code gins8.
+Proj4 projection code C<gins8>, full name "Ginsburg VIII (TsNIIGAiK)".
 
-The full name for this projection is Ginsburg VIII (TsNIIGAiK).
+Categories: B<no inverse> PCyl Sph.
 
 =cut
 
-sub t_proj_gins8
-    { 'PDL::Transform::Proj4::gins8'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_gins8 {'PDL::Transform::Proj4::gins8'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_gn_sinu
 
-Autogenerated transformation function for Proj4 projection code gn_sinu.
+Proj4 projection code C<gn_sinu>, full name "General Sinusoidal Series".
 
-The full name for this projection is General Sinusoidal Series.
+Categories: PCyl Sph.
 
 Projection Parameters
 
@@ -8037,75 +3321,67 @@ Projection Parameters
 
 =cut
 
-sub t_proj_gn_sinu
-    { 'PDL::Transform::Proj4::gn_sinu'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_gn_sinu {'PDL::Transform::Proj4::gn_sinu'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_gnom
 
-Autogenerated transformation function for Proj4 projection code gnom.
+Proj4 projection code C<gnom>, full name "Gnomonic".
 
-The full name for this projection is Gnomonic.
+Categories: Azi Sph.
 
 =cut
 
-sub t_proj_gnom
-    { 'PDL::Transform::Proj4::gnom'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_gnom {'PDL::Transform::Proj4::gnom'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_goode
 
-Autogenerated transformation function for Proj4 projection code goode.
+Proj4 projection code C<goode>, full name "Goode Homolosine".
 
-The full name for this projection is Goode Homolosine.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_goode
-    { 'PDL::Transform::Proj4::goode'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_goode {'PDL::Transform::Proj4::goode'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_gridshift
 
-Autogenerated transformation function for Proj4 projection code gridshift.
-
-The full name for this projection is Generic grid shift.
+Proj4 projection code C<gridshift>, full name "Generic grid shift".
 
 =cut
 
-sub t_proj_gridshift
-    { 'PDL::Transform::Proj4::gridshift'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_gridshift {'PDL::Transform::Proj4::gridshift'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_gs48
 
-Autogenerated transformation function for Proj4 projection code gs48.
+Proj4 projection code C<gs48>, full name "Modified Stereographic of 48 U.S.".
 
-The full name for this projection is Modified Stereographic of 48 U.S..
+Categories: Azi(mod).
 
 =cut
 
-sub t_proj_gs48
-    { 'PDL::Transform::Proj4::gs48'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_gs48 {'PDL::Transform::Proj4::gs48'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_gs50
 
-Autogenerated transformation function for Proj4 projection code gs50.
+Proj4 projection code C<gs50>, full name "Modified Stereographic of 50 U.S.".
 
-The full name for this projection is Modified Stereographic of 50 U.S..
+Categories: Azi(mod).
 
 =cut
 
-sub t_proj_gs50
-    { 'PDL::Transform::Proj4::gs50'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_gs50 {'PDL::Transform::Proj4::gs50'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_gstmerc
 
-Autogenerated transformation function for Proj4 projection code gstmerc.
+Proj4 projection code C<gstmerc>, full name "Gauss-Schreiber Transverse Mercator (aka Gauss-Laborde Reunion)".
 
-The full name for this projection is Gauss-Schreiber Transverse Mercator (aka Gauss-Laborde Reunion).
+Categories: Cyl Sph Ell.
 
 Projection Parameters
 
@@ -8123,27 +3399,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_gstmerc
-    { 'PDL::Transform::Proj4::gstmerc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_gstmerc {'PDL::Transform::Proj4::gstmerc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_guyou
 
-Autogenerated transformation function for Proj4 projection code guyou.
+Proj4 projection code C<guyou>, full name "Guyou".
 
-The full name for this projection is Guyou.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_guyou
-    { 'PDL::Transform::Proj4::guyou'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_guyou {'PDL::Transform::Proj4::guyou'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_hammer
 
-Autogenerated transformation function for Proj4 projection code hammer.
+Proj4 projection code C<hammer>, full name "Hammer & Eckert-Greifendorff".
 
-The full name for this projection is Hammer & Eckert-Greifendorff.
+Categories: Misc Sph.
 
 Projection Parameters
 
@@ -8159,27 +3433,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_hammer
-    { 'PDL::Transform::Proj4::hammer'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_hammer {'PDL::Transform::Proj4::hammer'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_hatano
 
-Autogenerated transformation function for Proj4 projection code hatano.
+Proj4 projection code C<hatano>, full name "Hatano Asymmetrical Equal Area".
 
-The full name for this projection is Hatano Asymmetrical Equal Area.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_hatano
-    { 'PDL::Transform::Proj4::hatano'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_hatano {'PDL::Transform::Proj4::hatano'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_healpix
 
-Autogenerated transformation function for Proj4 projection code healpix.
+Proj4 projection code C<healpix>, full name "HEALPix".
 
-The full name for this projection is HEALPix.
+Categories: Sph Ell.
 
 Projection Parameters
 
@@ -8193,99 +3465,85 @@ Projection Parameters
 
 =cut
 
-sub t_proj_healpix
-    { 'PDL::Transform::Proj4::healpix'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_healpix {'PDL::Transform::Proj4::healpix'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_helmert
 
-Autogenerated transformation function for Proj4 projection code helmert.
-
-The full name for this projection is 3(6)-, 4(8)- and 7(14)-parameter Helmert shift.
+Proj4 projection code C<helmert>, full name "3(6)-, 4(8)- and 7(14)-parameter Helmert shift".
 
 =cut
 
-sub t_proj_helmert
-    { 'PDL::Transform::Proj4::helmert'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_helmert {'PDL::Transform::Proj4::helmert'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_hgridshift
 
-Autogenerated transformation function for Proj4 projection code hgridshift.
-
-The full name for this projection is Horizontal grid shift.
+Proj4 projection code C<hgridshift>, full name "Horizontal grid shift".
 
 =cut
 
-sub t_proj_hgridshift
-    { 'PDL::Transform::Proj4::hgridshift'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_hgridshift {'PDL::Transform::Proj4::hgridshift'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_horner
 
-Autogenerated transformation function for Proj4 projection code horner.
-
-The full name for this projection is Horner polynomial evaluation.
+Proj4 projection code C<horner>, full name "Horner polynomial evaluation".
 
 =cut
 
-sub t_proj_horner
-    { 'PDL::Transform::Proj4::horner'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_horner {'PDL::Transform::Proj4::horner'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_igh
 
-Autogenerated transformation function for Proj4 projection code igh.
+Proj4 projection code C<igh>, full name "Interrupted Goode Homolosine".
 
-The full name for this projection is Interrupted Goode Homolosine.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_igh
-    { 'PDL::Transform::Proj4::igh'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_igh {'PDL::Transform::Proj4::igh'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_igh_o
 
-Autogenerated transformation function for Proj4 projection code igh_o.
+Proj4 projection code C<igh_o>, full name "Interrupted Goode Homolosine Oceanic View".
 
-The full name for this projection is Interrupted Goode Homolosine Oceanic View.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_igh_o
-    { 'PDL::Transform::Proj4::igh_o'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_igh_o {'PDL::Transform::Proj4::igh_o'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_imoll
 
-Autogenerated transformation function for Proj4 projection code imoll.
+Proj4 projection code C<imoll>, full name "Interrupted Mollweide".
 
-The full name for this projection is Interrupted Mollweide.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_imoll
-    { 'PDL::Transform::Proj4::imoll'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_imoll {'PDL::Transform::Proj4::imoll'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_imoll_o
 
-Autogenerated transformation function for Proj4 projection code imoll_o.
+Proj4 projection code C<imoll_o>, full name "Interrupted Mollweide Oceanic View".
 
-The full name for this projection is Interrupted Mollweide Oceanic View.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_imoll_o
-    { 'PDL::Transform::Proj4::imoll_o'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_imoll_o {'PDL::Transform::Proj4::imoll_o'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_imw_p
 
-Autogenerated transformation function for Proj4 projection code imw_p.
+Proj4 projection code C<imw_p>, full name "International Map of the World Polyconic".
 
-The full name for this projection is International Map of the World Polyconic.
+Categories: Mod. Polyconic Ell.
 
 Projection Parameters
 
@@ -8303,63 +3561,58 @@ Projection Parameters
 
 =cut
 
-sub t_proj_imw_p
-    { 'PDL::Transform::Proj4::imw_p'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_imw_p {'PDL::Transform::Proj4::imw_p'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_isea
 
-Autogenerated transformation function for Proj4 projection code isea.
+Proj4 projection code C<isea>, full name "Icosahedral Snyder Equal Area".
 
-The full name for this projection is Icosahedral Snyder Equal Area.
+Categories: Sph.
 
 =cut
 
-sub t_proj_isea
-    { 'PDL::Transform::Proj4::isea'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_isea {'PDL::Transform::Proj4::isea'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_kav5
 
-Autogenerated transformation function for Proj4 projection code kav5.
+Proj4 projection code C<kav5>, full name "Kavrayskiy V".
 
-The full name for this projection is Kavrayskiy V.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_kav5
-    { 'PDL::Transform::Proj4::kav5'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_kav5 {'PDL::Transform::Proj4::kav5'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_kav7
 
-Autogenerated transformation function for Proj4 projection code kav7.
+Proj4 projection code C<kav7>, full name "Kavrayskiy VII".
 
-The full name for this projection is Kavrayskiy VII.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_kav7
-    { 'PDL::Transform::Proj4::kav7'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_kav7 {'PDL::Transform::Proj4::kav7'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_krovak
 
-Autogenerated transformation function for Proj4 projection code krovak.
+Proj4 projection code C<krovak>, full name "Krovak".
 
-The full name for this projection is Krovak.
+Categories: PCyl Ell.
 
 =cut
 
-sub t_proj_krovak
-    { 'PDL::Transform::Proj4::krovak'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_krovak {'PDL::Transform::Proj4::krovak'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_labrd
 
-Autogenerated transformation function for Proj4 projection code labrd.
+Proj4 projection code C<labrd>, full name "Laborde".
 
-The full name for this projection is Laborde.
+Categories: Cyl Sph.
 
 Projection Parameters
 
@@ -8373,27 +3626,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_labrd
-    { 'PDL::Transform::Proj4::labrd'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_labrd {'PDL::Transform::Proj4::labrd'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_laea
 
-Autogenerated transformation function for Proj4 projection code laea.
+Proj4 projection code C<laea>, full name "Lambert Azimuthal Equal Area".
 
-The full name for this projection is Lambert Azimuthal Equal Area.
+Categories: Azi Sph Ell.
 
 =cut
 
-sub t_proj_laea
-    { 'PDL::Transform::Proj4::laea'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_laea {'PDL::Transform::Proj4::laea'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_lagrng
 
-Autogenerated transformation function for Proj4 projection code lagrng.
+Proj4 projection code C<lagrng>, full name "Lagrange".
 
-The full name for this projection is Lagrange.
+Categories: Misc Sph.
 
 Projection Parameters
 
@@ -8407,51 +3658,45 @@ Projection Parameters
 
 =cut
 
-sub t_proj_lagrng
-    { 'PDL::Transform::Proj4::lagrng'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_lagrng {'PDL::Transform::Proj4::lagrng'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_larr
 
-Autogenerated transformation function for Proj4 projection code larr.
+Proj4 projection code C<larr>, full name "Larrivee".
 
-The full name for this projection is Larrivee.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_larr
-    { 'PDL::Transform::Proj4::larr'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_larr {'PDL::Transform::Proj4::larr'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_lask
 
-Autogenerated transformation function for Proj4 projection code lask.
+Proj4 projection code C<lask>, full name "Laskowski".
 
-The full name for this projection is Laskowski.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_lask
-    { 'PDL::Transform::Proj4::lask'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_lask {'PDL::Transform::Proj4::lask'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_latlon
 
-Autogenerated transformation function for Proj4 projection code latlon.
-
-The full name for this projection is Lat/long (Geodetic alias).
+Proj4 projection code C<latlon>, full name "Lat/long (Geodetic alias)".
 
 =cut
 
-sub t_proj_latlon
-    { 'PDL::Transform::Proj4::latlon'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_latlon {'PDL::Transform::Proj4::latlon'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_lcc
 
-Autogenerated transformation function for Proj4 projection code lcc.
+Proj4 projection code C<lcc>, full name "Lambert Conformal Conic".
 
-The full name for this projection is Lambert Conformal Conic.
+Categories: Conic Sph Ell.
 
 Projection Parameters
 
@@ -8471,15 +3716,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_lcc
-    { 'PDL::Transform::Proj4::lcc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_lcc {'PDL::Transform::Proj4::lcc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_lcca
 
-Autogenerated transformation function for Proj4 projection code lcca.
+Proj4 projection code C<lcca>, full name "Lambert Conformal Conic Alternative".
 
-The full name for this projection is Lambert Conformal Conic Alternative.
+Categories: Conic Sph Ell.
 
 Projection Parameters
 
@@ -8493,15 +3737,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_lcca
-    { 'PDL::Transform::Proj4::lcca'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_lcca {'PDL::Transform::Proj4::lcca'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_leac
 
-Autogenerated transformation function for Proj4 projection code leac.
+Proj4 projection code C<leac>, full name "Lambert Equal Area Conic".
 
-The full name for this projection is Lambert Equal Area Conic.
+Categories: Conic Sph Ell.
 
 Projection Parameters
 
@@ -8517,51 +3760,45 @@ Projection Parameters
 
 =cut
 
-sub t_proj_leac
-    { 'PDL::Transform::Proj4::leac'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_leac {'PDL::Transform::Proj4::leac'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_lee_os
 
-Autogenerated transformation function for Proj4 projection code lee_os.
+Proj4 projection code C<lee_os>, full name "Lee Oblated Stereographic".
 
-The full name for this projection is Lee Oblated Stereographic.
+Categories: Azi(mod).
 
 =cut
 
-sub t_proj_lee_os
-    { 'PDL::Transform::Proj4::lee_os'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_lee_os {'PDL::Transform::Proj4::lee_os'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_lonlat
 
-Autogenerated transformation function for Proj4 projection code lonlat.
-
-The full name for this projection is Lat/long (Geodetic).
+Proj4 projection code C<lonlat>, full name "Lat/long (Geodetic)".
 
 =cut
 
-sub t_proj_lonlat
-    { 'PDL::Transform::Proj4::lonlat'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_lonlat {'PDL::Transform::Proj4::lonlat'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_loxim
 
-Autogenerated transformation function for Proj4 projection code loxim.
+Proj4 projection code C<loxim>, full name "Loximuthal".
 
-The full name for this projection is Loximuthal.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_loxim
-    { 'PDL::Transform::Proj4::loxim'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_loxim {'PDL::Transform::Proj4::loxim'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_lsat
 
-Autogenerated transformation function for Proj4 projection code lsat.
+Proj4 projection code C<lsat>, full name "Space oblique for LANDSAT".
 
-The full name for this projection is Space oblique for LANDSAT.
+Categories: Cyl Sph Ell.
 
 Projection Parameters
 
@@ -8577,75 +3814,69 @@ Projection Parameters
 
 =cut
 
-sub t_proj_lsat
-    { 'PDL::Transform::Proj4::lsat'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_lsat {'PDL::Transform::Proj4::lsat'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_mbt_fps
 
-Autogenerated transformation function for Proj4 projection code mbt_fps.
+Proj4 projection code C<mbt_fps>, full name "McBryde-Thomas Flat-Pole Sine (No. 2)".
 
-The full name for this projection is McBryde-Thomas Flat-Pole Sine (No. 2).
+Categories: Cyl Sph.
 
 =cut
 
-sub t_proj_mbt_fps
-    { 'PDL::Transform::Proj4::mbt_fps'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_mbt_fps {'PDL::Transform::Proj4::mbt_fps'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_mbt_s
 
-Autogenerated transformation function for Proj4 projection code mbt_s.
+Proj4 projection code C<mbt_s>, full name "McBryde-Thomas Flat-Polar Sine (No. 1)".
 
-The full name for this projection is McBryde-Thomas Flat-Polar Sine (No. 1).
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_mbt_s
-    { 'PDL::Transform::Proj4::mbt_s'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_mbt_s {'PDL::Transform::Proj4::mbt_s'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_mbtfpp
 
-Autogenerated transformation function for Proj4 projection code mbtfpp.
+Proj4 projection code C<mbtfpp>, full name "McBride-Thomas Flat-Polar Parabolic".
 
-The full name for this projection is McBride-Thomas Flat-Polar Parabolic.
+Categories: Cyl Sph.
 
 =cut
 
-sub t_proj_mbtfpp
-    { 'PDL::Transform::Proj4::mbtfpp'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_mbtfpp {'PDL::Transform::Proj4::mbtfpp'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_mbtfpq
 
-Autogenerated transformation function for Proj4 projection code mbtfpq.
+Proj4 projection code C<mbtfpq>, full name "McBryde-Thomas Flat-Polar Quartic".
 
-The full name for this projection is McBryde-Thomas Flat-Polar Quartic.
+Categories: Cyl Sph.
 
 =cut
 
-sub t_proj_mbtfpq
-    { 'PDL::Transform::Proj4::mbtfpq'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_mbtfpq {'PDL::Transform::Proj4::mbtfpq'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_mbtfps
 
-Autogenerated transformation function for Proj4 projection code mbtfps.
+Proj4 projection code C<mbtfps>, full name "McBryde-Thomas Flat-Polar Sinusoidal".
 
-The full name for this projection is McBryde-Thomas Flat-Polar Sinusoidal.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_mbtfps
-    { 'PDL::Transform::Proj4::mbtfps'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_mbtfps {'PDL::Transform::Proj4::mbtfps'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_merc
 
-Autogenerated transformation function for Proj4 projection code merc.
+Proj4 projection code C<merc>, full name "Mercator".
 
-The full name for this projection is Mercator.
+Categories: Cyl Sph Ell.
 
 Projection Parameters
 
@@ -8659,39 +3890,36 @@ Projection Parameters
 
 =cut
 
-sub t_proj_merc
-    { 'PDL::Transform::Proj4::merc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_merc {'PDL::Transform::Proj4::merc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_mil_os
 
-Autogenerated transformation function for Proj4 projection code mil_os.
+Proj4 projection code C<mil_os>, full name "Miller Oblated Stereographic".
 
-The full name for this projection is Miller Oblated Stereographic.
+Categories: Azi(mod).
 
 =cut
 
-sub t_proj_mil_os
-    { 'PDL::Transform::Proj4::mil_os'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_mil_os {'PDL::Transform::Proj4::mil_os'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_mill
 
-Autogenerated transformation function for Proj4 projection code mill.
+Proj4 projection code C<mill>, full name "Miller Cylindrical".
 
-The full name for this projection is Miller Cylindrical.
+Categories: Cyl Sph.
 
 =cut
 
-sub t_proj_mill
-    { 'PDL::Transform::Proj4::mill'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_mill {'PDL::Transform::Proj4::mill'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_misrsom
 
-Autogenerated transformation function for Proj4 projection code misrsom.
+Proj4 projection code C<misrsom>, full name "Space oblique for MISR".
 
-The full name for this projection is Space oblique for MISR.
+Categories: Cyl Sph Ell.
 
 Projection Parameters
 
@@ -8705,63 +3933,54 @@ Projection Parameters
 
 =cut
 
-sub t_proj_misrsom
-    { 'PDL::Transform::Proj4::misrsom'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_misrsom {'PDL::Transform::Proj4::misrsom'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_mod_krovak
 
-Autogenerated transformation function for Proj4 projection code mod_krovak.
+Proj4 projection code C<mod_krovak>, full name "Modified Krovak".
 
-The full name for this projection is Modified Krovak.
+Categories: PCyl Ell.
 
 =cut
 
-sub t_proj_mod_krovak
-    { 'PDL::Transform::Proj4::mod_krovak'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_mod_krovak {'PDL::Transform::Proj4::mod_krovak'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_moll
 
-Autogenerated transformation function for Proj4 projection code moll.
+Proj4 projection code C<moll>, full name "Mollweide".
 
-The full name for this projection is Mollweide.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_moll
-    { 'PDL::Transform::Proj4::moll'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_moll {'PDL::Transform::Proj4::moll'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_molobadekas
 
-Autogenerated transformation function for Proj4 projection code molobadekas.
-
-The full name for this projection is Molodensky-Badekas transformation.
+Proj4 projection code C<molobadekas>, full name "Molodensky-Badekas transformation".
 
 =cut
 
-sub t_proj_molobadekas
-    { 'PDL::Transform::Proj4::molobadekas'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_molobadekas {'PDL::Transform::Proj4::molobadekas'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_molodensky
 
-Autogenerated transformation function for Proj4 projection code molodensky.
-
-The full name for this projection is Molodensky transform.
+Proj4 projection code C<molodensky>, full name "Molodensky transform".
 
 =cut
 
-sub t_proj_molodensky
-    { 'PDL::Transform::Proj4::molodensky'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_molodensky {'PDL::Transform::Proj4::molodensky'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_murd1
 
-Autogenerated transformation function for Proj4 projection code murd1.
+Proj4 projection code C<murd1>, full name "Murdoch I".
 
-The full name for this projection is Murdoch I.
+Categories: Conic Sph.
 
 Projection Parameters
 
@@ -8777,15 +3996,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_murd1
-    { 'PDL::Transform::Proj4::murd1'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_murd1 {'PDL::Transform::Proj4::murd1'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_murd2
 
-Autogenerated transformation function for Proj4 projection code murd2.
+Proj4 projection code C<murd2>, full name "Murdoch II".
 
-The full name for this projection is Murdoch II.
+Categories: Conic Sph.
 
 Projection Parameters
 
@@ -8801,15 +4019,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_murd2
-    { 'PDL::Transform::Proj4::murd2'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_murd2 {'PDL::Transform::Proj4::murd2'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_murd3
 
-Autogenerated transformation function for Proj4 projection code murd3.
+Proj4 projection code C<murd3>, full name "Murdoch III".
 
-The full name for this projection is Murdoch III.
+Categories: Conic Sph.
 
 Projection Parameters
 
@@ -8825,87 +4042,78 @@ Projection Parameters
 
 =cut
 
-sub t_proj_murd3
-    { 'PDL::Transform::Proj4::murd3'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_murd3 {'PDL::Transform::Proj4::murd3'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_natearth
 
-Autogenerated transformation function for Proj4 projection code natearth.
+Proj4 projection code C<natearth>, full name "Natural Earth".
 
-The full name for this projection is Natural Earth.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_natearth
-    { 'PDL::Transform::Proj4::natearth'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_natearth {'PDL::Transform::Proj4::natearth'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_natearth2
 
-Autogenerated transformation function for Proj4 projection code natearth2.
+Proj4 projection code C<natearth2>, full name "Natural Earth 2".
 
-The full name for this projection is Natural Earth 2.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_natearth2
-    { 'PDL::Transform::Proj4::natearth2'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_natearth2 {'PDL::Transform::Proj4::natearth2'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_nell
 
-Autogenerated transformation function for Proj4 projection code nell.
+Proj4 projection code C<nell>, full name "Nell".
 
-The full name for this projection is Nell.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_nell
-    { 'PDL::Transform::Proj4::nell'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_nell {'PDL::Transform::Proj4::nell'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_nell_h
 
-Autogenerated transformation function for Proj4 projection code nell_h.
+Proj4 projection code C<nell_h>, full name "Nell-Hammer".
 
-The full name for this projection is Nell-Hammer.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_nell_h
-    { 'PDL::Transform::Proj4::nell_h'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_nell_h {'PDL::Transform::Proj4::nell_h'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_nicol
 
-Autogenerated transformation function for Proj4 projection code nicol.
+Proj4 projection code C<nicol>, full name "Nicolosi Globular".
 
-The full name for this projection is Nicolosi Globular.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_nicol
-    { 'PDL::Transform::Proj4::nicol'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_nicol {'PDL::Transform::Proj4::nicol'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_noop
 
-Autogenerated transformation function for Proj4 projection code noop.
-
-The full name for this projection is No operation.
+Proj4 projection code C<noop>, full name "No operation".
 
 =cut
 
-sub t_proj_noop
-    { 'PDL::Transform::Proj4::noop'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_noop {'PDL::Transform::Proj4::noop'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_nsper
 
-Autogenerated transformation function for Proj4 projection code nsper.
+Proj4 projection code C<nsper>, full name "Near-sided perspective".
 
-The full name for this projection is Near-sided perspective.
+Categories: Azi Sph.
 
 Projection Parameters
 
@@ -8919,27 +4127,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_nsper
-    { 'PDL::Transform::Proj4::nsper'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_nsper {'PDL::Transform::Proj4::nsper'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_nzmg
 
-Autogenerated transformation function for Proj4 projection code nzmg.
+Proj4 projection code C<nzmg>, full name "New Zealand Map Grid".
 
-The full name for this projection is New Zealand Map Grid.
+Categories: fixed Earth.
 
 =cut
 
-sub t_proj_nzmg
-    { 'PDL::Transform::Proj4::nzmg'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_nzmg {'PDL::Transform::Proj4::nzmg'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_ob_tran
 
-Autogenerated transformation function for Proj4 projection code ob_tran.
+Proj4 projection code C<ob_tran>, full name "General Oblique Transformation".
 
-The full name for this projection is General Oblique Transformation.
+Categories: Misc Sph.
 
 Projection Parameters
 
@@ -8971,15 +4177,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_ob_tran
-    { 'PDL::Transform::Proj4::ob_tran'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_ob_tran {'PDL::Transform::Proj4::ob_tran'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_ocea
 
-Autogenerated transformation function for Proj4 projection code ocea.
+Proj4 projection code C<ocea>, full name "Oblique Cylindrical Equal Area".
 
-The full name for this projection is Oblique Cylindrical Equal Area.
+Categories: Cyl Sphlonc= alpha=.
 
 Projection Parameters
 
@@ -8999,15 +4204,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_ocea
-    { 'PDL::Transform::Proj4::ocea'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_ocea {'PDL::Transform::Proj4::ocea'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_oea
 
-Autogenerated transformation function for Proj4 projection code oea.
+Proj4 projection code C<oea>, full name "Oblated Equal Area".
 
-The full name for this projection is Oblated Equal Area.
+Categories: Misc Sph.
 
 Projection Parameters
 
@@ -9025,15 +4229,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_oea
-    { 'PDL::Transform::Proj4::oea'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_oea {'PDL::Transform::Proj4::oea'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_omerc
 
-Autogenerated transformation function for Proj4 projection code omerc.
+Proj4 projection code C<omerc>, full name "Oblique Mercator".
 
-The full name for this projection is Oblique Mercator.
+Categories: Cyl Sph Ell no_rot.
 
 Projection Parameters
 
@@ -9061,51 +4264,47 @@ Projection Parameters
 
 =cut
 
-sub t_proj_omerc
-    { 'PDL::Transform::Proj4::omerc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_omerc {'PDL::Transform::Proj4::omerc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_ortel
 
-Autogenerated transformation function for Proj4 projection code ortel.
+Proj4 projection code C<ortel>, full name "Ortelius Oval".
 
-The full name for this projection is Ortelius Oval.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_ortel
-    { 'PDL::Transform::Proj4::ortel'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_ortel {'PDL::Transform::Proj4::ortel'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_ortho
 
-Autogenerated transformation function for Proj4 projection code ortho.
+Proj4 projection code C<ortho>, full name "Orthographic".
 
-The full name for this projection is Orthographic.
+Categories: Azi Sph Ell.
 
 =cut
 
-sub t_proj_ortho
-    { 'PDL::Transform::Proj4::ortho'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_ortho {'PDL::Transform::Proj4::ortho'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_patterson
 
-Autogenerated transformation function for Proj4 projection code patterson.
+Proj4 projection code C<patterson>, full name "Patterson Cylindrical".
 
-The full name for this projection is Patterson Cylindrical.
+Categories: Cyl.
 
 =cut
 
-sub t_proj_patterson
-    { 'PDL::Transform::Proj4::patterson'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_patterson {'PDL::Transform::Proj4::patterson'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_pconic
 
-Autogenerated transformation function for Proj4 projection code pconic.
+Proj4 projection code C<pconic>, full name "Perspective Conic".
 
-The full name for this projection is Perspective Conic.
+Categories: Conic Sph.
 
 Projection Parameters
 
@@ -9121,207 +4320,184 @@ Projection Parameters
 
 =cut
 
-sub t_proj_pconic
-    { 'PDL::Transform::Proj4::pconic'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_pconic {'PDL::Transform::Proj4::pconic'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_peirce_q
 
-Autogenerated transformation function for Proj4 projection code peirce_q.
+Proj4 projection code C<peirce_q>, full name "Peirce Quincuncial".
 
-The full name for this projection is Peirce Quincuncial.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_peirce_q
-    { 'PDL::Transform::Proj4::peirce_q'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_peirce_q {'PDL::Transform::Proj4::peirce_q'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_pipeline
 
-Autogenerated transformation function for Proj4 projection code pipeline.
-
-The full name for this projection is Transformation pipeline manager.
+Proj4 projection code C<pipeline>, full name "Transformation pipeline manager".
 
 =cut
 
-sub t_proj_pipeline
-    { 'PDL::Transform::Proj4::pipeline'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_pipeline {'PDL::Transform::Proj4::pipeline'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_poly
 
-Autogenerated transformation function for Proj4 projection code poly.
+Proj4 projection code C<poly>, full name "Polyconic (American)".
 
-The full name for this projection is Polyconic (American).
+Categories: Conic Sph Ell.
 
 =cut
 
-sub t_proj_poly
-    { 'PDL::Transform::Proj4::poly'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_poly {'PDL::Transform::Proj4::poly'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_pop
 
-Autogenerated transformation function for Proj4 projection code pop.
-
-The full name for this projection is Retrieve coordinate value from pipeline stack.
+Proj4 projection code C<pop>, full name "Retrieve coordinate value from pipeline stack".
 
 =cut
 
-sub t_proj_pop
-    { 'PDL::Transform::Proj4::pop'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_pop {'PDL::Transform::Proj4::pop'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_push
 
-Autogenerated transformation function for Proj4 projection code push.
-
-The full name for this projection is Save coordinate value on pipeline stack.
+Proj4 projection code C<push>, full name "Save coordinate value on pipeline stack".
 
 =cut
 
-sub t_proj_push
-    { 'PDL::Transform::Proj4::push'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_push {'PDL::Transform::Proj4::push'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_putp1
 
-Autogenerated transformation function for Proj4 projection code putp1.
+Proj4 projection code C<putp1>, full name "Putnins P1".
 
-The full name for this projection is Putnins P1.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_putp1
-    { 'PDL::Transform::Proj4::putp1'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_putp1 {'PDL::Transform::Proj4::putp1'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_putp2
 
-Autogenerated transformation function for Proj4 projection code putp2.
+Proj4 projection code C<putp2>, full name "Putnins P2".
 
-The full name for this projection is Putnins P2.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_putp2
-    { 'PDL::Transform::Proj4::putp2'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_putp2 {'PDL::Transform::Proj4::putp2'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_putp3
 
-Autogenerated transformation function for Proj4 projection code putp3.
+Proj4 projection code C<putp3>, full name "Putnins P3".
 
-The full name for this projection is Putnins P3.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_putp3
-    { 'PDL::Transform::Proj4::putp3'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_putp3 {'PDL::Transform::Proj4::putp3'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_putp3p
 
-Autogenerated transformation function for Proj4 projection code putp3p.
+Proj4 projection code C<putp3p>, full name "Putnins P3'".
 
-The full name for this projection is Putnins P3'.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_putp3p
-    { 'PDL::Transform::Proj4::putp3p'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_putp3p {'PDL::Transform::Proj4::putp3p'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_putp4p
 
-Autogenerated transformation function for Proj4 projection code putp4p.
+Proj4 projection code C<putp4p>, full name "Putnins P4'".
 
-The full name for this projection is Putnins P4'.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_putp4p
-    { 'PDL::Transform::Proj4::putp4p'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_putp4p {'PDL::Transform::Proj4::putp4p'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_putp5
 
-Autogenerated transformation function for Proj4 projection code putp5.
+Proj4 projection code C<putp5>, full name "Putnins P5".
 
-The full name for this projection is Putnins P5.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_putp5
-    { 'PDL::Transform::Proj4::putp5'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_putp5 {'PDL::Transform::Proj4::putp5'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_putp5p
 
-Autogenerated transformation function for Proj4 projection code putp5p.
+Proj4 projection code C<putp5p>, full name "Putnins P5'".
 
-The full name for this projection is Putnins P5'.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_putp5p
-    { 'PDL::Transform::Proj4::putp5p'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_putp5p {'PDL::Transform::Proj4::putp5p'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_putp6
 
-Autogenerated transformation function for Proj4 projection code putp6.
+Proj4 projection code C<putp6>, full name "Putnins P6".
 
-The full name for this projection is Putnins P6.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_putp6
-    { 'PDL::Transform::Proj4::putp6'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_putp6 {'PDL::Transform::Proj4::putp6'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_putp6p
 
-Autogenerated transformation function for Proj4 projection code putp6p.
+Proj4 projection code C<putp6p>, full name "Putnins P6'".
 
-The full name for this projection is Putnins P6'.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_putp6p
-    { 'PDL::Transform::Proj4::putp6p'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_putp6p {'PDL::Transform::Proj4::putp6p'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_qsc
 
-Autogenerated transformation function for Proj4 projection code qsc.
+Proj4 projection code C<qsc>, full name "Quadrilateralized Spherical Cube".
 
-The full name for this projection is Quadrilateralized Spherical Cube.
+Categories: Azi Sph.
 
 =cut
 
-sub t_proj_qsc
-    { 'PDL::Transform::Proj4::qsc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_qsc {'PDL::Transform::Proj4::qsc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_qua_aut
 
-Autogenerated transformation function for Proj4 projection code qua_aut.
+Proj4 projection code C<qua_aut>, full name "Quartic Authalic".
 
-The full name for this projection is Quartic Authalic.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_qua_aut
-    { 'PDL::Transform::Proj4::qua_aut'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_qua_aut {'PDL::Transform::Proj4::qua_aut'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_rhealpix
 
-Autogenerated transformation function for Proj4 projection code rhealpix.
+Proj4 projection code C<rhealpix>, full name "rHEALPix".
 
-The full name for this projection is rHEALPix.
+Categories: Sph Ell.
 
 Projection Parameters
 
@@ -9337,39 +4513,36 @@ Projection Parameters
 
 =cut
 
-sub t_proj_rhealpix
-    { 'PDL::Transform::Proj4::rhealpix'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_rhealpix {'PDL::Transform::Proj4::rhealpix'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_robin
 
-Autogenerated transformation function for Proj4 projection code robin.
+Proj4 projection code C<robin>, full name "Robinson".
 
-The full name for this projection is Robinson.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_robin
-    { 'PDL::Transform::Proj4::robin'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_robin {'PDL::Transform::Proj4::robin'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_rouss
 
-Autogenerated transformation function for Proj4 projection code rouss.
+Proj4 projection code C<rouss>, full name "Roussilhe Stereographic".
 
-The full name for this projection is Roussilhe Stereographic.
+Categories: Azi Ell.
 
 =cut
 
-sub t_proj_rouss
-    { 'PDL::Transform::Proj4::rouss'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_rouss {'PDL::Transform::Proj4::rouss'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_rpoly
 
-Autogenerated transformation function for Proj4 projection code rpoly.
+Proj4 projection code C<rpoly>, full name "Rectangular Polyconic".
 
-The full name for this projection is Rectangular Polyconic.
+Categories: B<no inverse> Conic Sph.
 
 Projection Parameters
 
@@ -9383,27 +4556,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_rpoly
-    { 'PDL::Transform::Proj4::rpoly'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_rpoly {'PDL::Transform::Proj4::rpoly'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_s2
 
-Autogenerated transformation function for Proj4 projection code s2.
+Proj4 projection code C<s2>, full name "S2".
 
-The full name for this projection is S2.
+Categories: Misc Sph Ell.
 
 =cut
 
-sub t_proj_s2
-    { 'PDL::Transform::Proj4::s2'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_s2 {'PDL::Transform::Proj4::s2'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_sch
 
-Autogenerated transformation function for Proj4 projection code sch.
+Proj4 projection code C<sch>, full name "Spherical Cross-track Height".
 
-The full name for this projection is Spherical Cross-track Height.
+Categories: Misc.
 
 Projection Parameters
 
@@ -9423,39 +4594,34 @@ Projection Parameters
 
 =cut
 
-sub t_proj_sch
-    { 'PDL::Transform::Proj4::sch'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_sch {'PDL::Transform::Proj4::sch'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_set
 
-Autogenerated transformation function for Proj4 projection code set.
-
-The full name for this projection is Set coordinate value.
+Proj4 projection code C<set>, full name "Set coordinate value".
 
 =cut
 
-sub t_proj_set
-    { 'PDL::Transform::Proj4::set'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_set {'PDL::Transform::Proj4::set'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_sinu
 
-Autogenerated transformation function for Proj4 projection code sinu.
+Proj4 projection code C<sinu>, full name "Sinusoidal (Sanson-Flamsteed)".
 
-The full name for this projection is Sinusoidal (Sanson-Flamsteed).
+Categories: PCyl Sph Ell.
 
 =cut
 
-sub t_proj_sinu
-    { 'PDL::Transform::Proj4::sinu'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_sinu {'PDL::Transform::Proj4::sinu'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_som
 
-Autogenerated transformation function for Proj4 projection code som.
+Proj4 projection code C<som>, full name "Space Oblique Mercator".
 
-The full name for this projection is Space Oblique Mercator.
+Categories: Cyl Sph Ell.
 
 Projection Parameters
 
@@ -9473,27 +4639,25 @@ Projection Parameters
 
 =cut
 
-sub t_proj_som
-    { 'PDL::Transform::Proj4::som'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_som {'PDL::Transform::Proj4::som'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_somerc
 
-Autogenerated transformation function for Proj4 projection code somerc.
+Proj4 projection code C<somerc>, full name "Swiss. Obl. Mercator".
 
-The full name for this projection is Swiss. Obl. Mercator.
+Categories: Cyl Ell.
 
 =cut
 
-sub t_proj_somerc
-    { 'PDL::Transform::Proj4::somerc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_somerc {'PDL::Transform::Proj4::somerc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_stere
 
-Autogenerated transformation function for Proj4 projection code stere.
+Proj4 projection code C<stere>, full name "Stereographic".
 
-The full name for this projection is Stereographic.
+Categories: Azi Sph Ell.
 
 Projection Parameters
 
@@ -9507,75 +4671,67 @@ Projection Parameters
 
 =cut
 
-sub t_proj_stere
-    { 'PDL::Transform::Proj4::stere'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_stere {'PDL::Transform::Proj4::stere'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_sterea
 
-Autogenerated transformation function for Proj4 projection code sterea.
+Proj4 projection code C<sterea>, full name "Oblique Stereographic Alternative".
 
-The full name for this projection is Oblique Stereographic Alternative.
+Categories: Azimuthal Sph Ell.
 
 =cut
 
-sub t_proj_sterea
-    { 'PDL::Transform::Proj4::sterea'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_sterea {'PDL::Transform::Proj4::sterea'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_tcc
 
-Autogenerated transformation function for Proj4 projection code tcc.
+Proj4 projection code C<tcc>, full name "Transverse Central Cylindrical".
 
-The full name for this projection is Transverse Central Cylindrical.
+Categories: B<no inverse> Cyl Sph.
 
 =cut
 
-sub t_proj_tcc
-    { 'PDL::Transform::Proj4::tcc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_tcc {'PDL::Transform::Proj4::tcc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_tcea
 
-Autogenerated transformation function for Proj4 projection code tcea.
+Proj4 projection code C<tcea>, full name "Transverse Cylindrical Equal Area".
 
-The full name for this projection is Transverse Cylindrical Equal Area.
+Categories: Cyl Sph.
 
 =cut
 
-sub t_proj_tcea
-    { 'PDL::Transform::Proj4::tcea'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_tcea {'PDL::Transform::Proj4::tcea'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_times
 
-Autogenerated transformation function for Proj4 projection code times.
+Proj4 projection code C<times>, full name "Times".
 
-The full name for this projection is Times.
+Categories: Cyl Sph.
 
 =cut
 
-sub t_proj_times
-    { 'PDL::Transform::Proj4::times'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_times {'PDL::Transform::Proj4::times'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_tinshift
 
-Autogenerated transformation function for Proj4 projection code tinshift.
-
-The full name for this projection is Triangulation based transformation.
+Proj4 projection code C<tinshift>, full name "Triangulation based transformation".
 
 =cut
 
-sub t_proj_tinshift
-    { 'PDL::Transform::Proj4::tinshift'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_tinshift {'PDL::Transform::Proj4::tinshift'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_tissot
 
-Autogenerated transformation function for Proj4 projection code tissot.
+Proj4 projection code C<tissot>, full name "Tissot".
 
-The full name for this projection is Tissot.
+Categories: Conic Sph.
 
 Projection Parameters
 
@@ -9591,15 +4747,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_tissot
-    { 'PDL::Transform::Proj4::tissot'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_tissot {'PDL::Transform::Proj4::tissot'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_tmerc
 
-Autogenerated transformation function for Proj4 projection code tmerc.
+Proj4 projection code C<tmerc>, full name "Transverse Mercator".
 
-The full name for this projection is Transverse Mercator.
+Categories: Cyl Sph Ell.
 
 Projection Parameters
 
@@ -9613,39 +4768,34 @@ Projection Parameters
 
 =cut
 
-sub t_proj_tmerc
-    { 'PDL::Transform::Proj4::tmerc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_tmerc {'PDL::Transform::Proj4::tmerc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_tobmerc
 
-Autogenerated transformation function for Proj4 projection code tobmerc.
+Proj4 projection code C<tobmerc>, full name "Tobler-Mercator".
 
-The full name for this projection is Tobler-Mercator.
+Categories: Cyl Sph.
 
 =cut
 
-sub t_proj_tobmerc
-    { 'PDL::Transform::Proj4::tobmerc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_tobmerc {'PDL::Transform::Proj4::tobmerc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_topocentric
 
-Autogenerated transformation function for Proj4 projection code topocentric.
-
-The full name for this projection is Geocentric/Topocentric conversion.
+Proj4 projection code C<topocentric>, full name "Geocentric/Topocentric conversion".
 
 =cut
 
-sub t_proj_topocentric
-    { 'PDL::Transform::Proj4::topocentric'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_topocentric {'PDL::Transform::Proj4::topocentric'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_tpeqd
 
-Autogenerated transformation function for Proj4 projection code tpeqd.
+Proj4 projection code C<tpeqd>, full name "Two Point Equidistant".
 
-The full name for this projection is Two Point Equidistant.
+Categories: Misc Sph.
 
 Projection Parameters
 
@@ -9665,15 +4815,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_tpeqd
-    { 'PDL::Transform::Proj4::tpeqd'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_tpeqd {'PDL::Transform::Proj4::tpeqd'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_tpers
 
-Autogenerated transformation function for Proj4 projection code tpers.
+Proj4 projection code C<tpers>, full name "Tilted perspective".
 
-The full name for this projection is Tilted perspective.
+Categories: Azi Sph.
 
 Projection Parameters
 
@@ -9691,27 +4840,23 @@ Projection Parameters
 
 =cut
 
-sub t_proj_tpers
-    { 'PDL::Transform::Proj4::tpers'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_tpers {'PDL::Transform::Proj4::tpers'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_unitconvert
 
-Autogenerated transformation function for Proj4 projection code unitconvert.
-
-The full name for this projection is Unit conversion.
+Proj4 projection code C<unitconvert>, full name "Unit conversion".
 
 =cut
 
-sub t_proj_unitconvert
-    { 'PDL::Transform::Proj4::unitconvert'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_unitconvert {'PDL::Transform::Proj4::unitconvert'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_ups
 
-Autogenerated transformation function for Proj4 projection code ups.
+Proj4 projection code C<ups>, full name "Universal Polar Stereographic".
 
-The full name for this projection is Universal Polar Stereographic.
+Categories: Azi Ell.
 
 Projection Parameters
 
@@ -9725,15 +4870,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_ups
-    { 'PDL::Transform::Proj4::ups'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_ups {'PDL::Transform::Proj4::ups'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_urm5
 
-Autogenerated transformation function for Proj4 projection code urm5.
+Proj4 projection code C<urm5>, full name "Urmaev V".
 
-The full name for this projection is Urmaev V.
+Categories: B<no inverse> PCyl Sph.
 
 Projection Parameters
 
@@ -9751,15 +4895,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_urm5
-    { 'PDL::Transform::Proj4::urm5'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_urm5 {'PDL::Transform::Proj4::urm5'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_urmfps
 
-Autogenerated transformation function for Proj4 projection code urmfps.
+Proj4 projection code C<urmfps>, full name "Urmaev Flat-Polar Sinusoidal".
 
-The full name for this projection is Urmaev Flat-Polar Sinusoidal.
+Categories: PCyl Sph.
 
 Projection Parameters
 
@@ -9773,15 +4916,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_urmfps
-    { 'PDL::Transform::Proj4::urmfps'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_urmfps {'PDL::Transform::Proj4::urmfps'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_utm
 
-Autogenerated transformation function for Proj4 projection code utm.
+Proj4 projection code C<utm>, full name "Universal Transverse Mercator (UTM)".
 
-The full name for this projection is Universal Transverse Mercator (UTM).
+Categories: Cyl Ell.
 
 Projection Parameters
 
@@ -9799,63 +4941,58 @@ Projection Parameters
 
 =cut
 
-sub t_proj_utm
-    { 'PDL::Transform::Proj4::utm'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_utm {'PDL::Transform::Proj4::utm'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_vandg
 
-Autogenerated transformation function for Proj4 projection code vandg.
+Proj4 projection code C<vandg>, full name "van der Grinten (I)".
 
-The full name for this projection is van der Grinten (I).
+Categories: Misc Sph.
 
 =cut
 
-sub t_proj_vandg
-    { 'PDL::Transform::Proj4::vandg'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_vandg {'PDL::Transform::Proj4::vandg'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_vandg2
 
-Autogenerated transformation function for Proj4 projection code vandg2.
+Proj4 projection code C<vandg2>, full name "van der Grinten II".
 
-The full name for this projection is van der Grinten II.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_vandg2
-    { 'PDL::Transform::Proj4::vandg2'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_vandg2 {'PDL::Transform::Proj4::vandg2'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_vandg3
 
-Autogenerated transformation function for Proj4 projection code vandg3.
+Proj4 projection code C<vandg3>, full name "van der Grinten III".
 
-The full name for this projection is van der Grinten III.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_vandg3
-    { 'PDL::Transform::Proj4::vandg3'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_vandg3 {'PDL::Transform::Proj4::vandg3'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_vandg4
 
-Autogenerated transformation function for Proj4 projection code vandg4.
+Proj4 projection code C<vandg4>, full name "van der Grinten IV".
 
-The full name for this projection is van der Grinten IV.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_vandg4
-    { 'PDL::Transform::Proj4::vandg4'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_vandg4 {'PDL::Transform::Proj4::vandg4'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_vertoffset
 
-Autogenerated transformation function for Proj4 projection code vertoffset.
+Proj4 projection code C<vertoffset>, full name "Vertical Offset and Slope".
 
-The full name for this projection is Vertical Offset and Slope.
+Categories: Transfmation.
 
 Projection Parameters
 
@@ -9877,27 +5014,23 @@ Projection Parameters
 
 =cut
 
-sub t_proj_vertoffset
-    { 'PDL::Transform::Proj4::vertoffset'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_vertoffset {'PDL::Transform::Proj4::vertoffset'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_vgridshift
 
-Autogenerated transformation function for Proj4 projection code vgridshift.
-
-The full name for this projection is Vertical grid shift.
+Proj4 projection code C<vgridshift>, full name "Vertical grid shift".
 
 =cut
 
-sub t_proj_vgridshift
-    { 'PDL::Transform::Proj4::vgridshift'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_vgridshift {'PDL::Transform::Proj4::vgridshift'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_vitk1
 
-Autogenerated transformation function for Proj4 projection code vitk1.
+Proj4 projection code C<vitk1>, full name "Vitkovsky I".
 
-The full name for this projection is Vitkovsky I.
+Categories: Conic Sph.
 
 Projection Parameters
 
@@ -9913,39 +5046,36 @@ Projection Parameters
 
 =cut
 
-sub t_proj_vitk1
-    { 'PDL::Transform::Proj4::vitk1'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_vitk1 {'PDL::Transform::Proj4::vitk1'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_wag1
 
-Autogenerated transformation function for Proj4 projection code wag1.
+Proj4 projection code C<wag1>, full name "Wagner I (Kavrayskiy VI)".
 
-The full name for this projection is Wagner I (Kavrayskiy VI).
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_wag1
-    { 'PDL::Transform::Proj4::wag1'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_wag1 {'PDL::Transform::Proj4::wag1'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_wag2
 
-Autogenerated transformation function for Proj4 projection code wag2.
+Proj4 projection code C<wag2>, full name "Wagner II".
 
-The full name for this projection is Wagner II.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_wag2
-    { 'PDL::Transform::Proj4::wag2'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_wag2 {'PDL::Transform::Proj4::wag2'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_wag3
 
-Autogenerated transformation function for Proj4 projection code wag3.
+Proj4 projection code C<wag3>, full name "Wagner III".
 
-The full name for this projection is Wagner III.
+Categories: PCyl Sph.
 
 Projection Parameters
 
@@ -9959,87 +5089,80 @@ Projection Parameters
 
 =cut
 
-sub t_proj_wag3
-    { 'PDL::Transform::Proj4::wag3'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_wag3 {'PDL::Transform::Proj4::wag3'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_wag4
 
-Autogenerated transformation function for Proj4 projection code wag4.
+Proj4 projection code C<wag4>, full name "Wagner IV".
 
-The full name for this projection is Wagner IV.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_wag4
-    { 'PDL::Transform::Proj4::wag4'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_wag4 {'PDL::Transform::Proj4::wag4'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_wag5
 
-Autogenerated transformation function for Proj4 projection code wag5.
+Proj4 projection code C<wag5>, full name "Wagner V".
 
-The full name for this projection is Wagner V.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_wag5
-    { 'PDL::Transform::Proj4::wag5'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_wag5 {'PDL::Transform::Proj4::wag5'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_wag6
 
-Autogenerated transformation function for Proj4 projection code wag6.
+Proj4 projection code C<wag6>, full name "Wagner VI".
 
-The full name for this projection is Wagner VI.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_wag6
-    { 'PDL::Transform::Proj4::wag6'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_wag6 {'PDL::Transform::Proj4::wag6'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_wag7
 
-Autogenerated transformation function for Proj4 projection code wag7.
+Proj4 projection code C<wag7>, full name "Wagner VII".
 
-The full name for this projection is Wagner VII.
+Categories: B<no inverse> Misc Sph.
 
 =cut
 
-sub t_proj_wag7
-    { 'PDL::Transform::Proj4::wag7'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_wag7 {'PDL::Transform::Proj4::wag7'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_webmerc
 
-Autogenerated transformation function for Proj4 projection code webmerc.
+Proj4 projection code C<webmerc>, full name "Web Mercator / Pseudo Mercator".
 
-The full name for this projection is Web Mercator / Pseudo Mercator.
+Categories: Cyl Ell.
 
 =cut
 
-sub t_proj_webmerc
-    { 'PDL::Transform::Proj4::webmerc'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_webmerc {'PDL::Transform::Proj4::webmerc'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_weren
 
-Autogenerated transformation function for Proj4 projection code weren.
+Proj4 projection code C<weren>, full name "Werenskiold I".
 
-The full name for this projection is Werenskiold I.
+Categories: PCyl Sph.
 
 =cut
 
-sub t_proj_weren
-    { 'PDL::Transform::Proj4::weren'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_weren {'PDL::Transform::Proj4::weren'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_wink1
 
-Autogenerated transformation function for Proj4 projection code wink1.
+Proj4 projection code C<wink1>, full name "Winkel I".
 
-The full name for this projection is Winkel I.
+Categories: PCyl Sph.
 
 Projection Parameters
 
@@ -10053,15 +5176,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_wink1
-    { 'PDL::Transform::Proj4::wink1'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_wink1 {'PDL::Transform::Proj4::wink1'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_wink2
 
-Autogenerated transformation function for Proj4 projection code wink2.
+Proj4 projection code C<wink2>, full name "Winkel II".
 
-The full name for this projection is Winkel II.
+Categories: PCyl Sph.
 
 Projection Parameters
 
@@ -10075,15 +5197,14 @@ Projection Parameters
 
 =cut
 
-sub t_proj_wink2
-    { 'PDL::Transform::Proj4::wink2'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_wink2 {'PDL::Transform::Proj4::wink2'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_wintri
 
-Autogenerated transformation function for Proj4 projection code wintri.
+Proj4 projection code C<wintri>, full name "Winkel Tripel".
 
-The full name for this projection is Winkel Tripel.
+Categories: Misc Sph.
 
 Projection Parameters
 
@@ -10097,7986 +5218,561 @@ Projection Parameters
 
 =cut
 
-sub t_proj_wintri
-    { 'PDL::Transform::Proj4::wintri'->new( @_ ); }
-#line 634 "proj4.pd"
+sub t_proj_wintri {'PDL::Transform::Proj4::wintri'->new(@_)}
+#line 483 "proj4.pd"
 
 =head2 t_proj_xyzgridshift
 
-Autogenerated transformation function for Proj4 projection code xyzgridshift.
-
-The full name for this projection is Geocentric grid shift.
+Proj4 projection code C<xyzgridshift>, full name "Geocentric grid shift".
 
 =cut
 
-sub t_proj_xyzgridshift
-    { 'PDL::Transform::Proj4::xyzgridshift'->new( @_ ); }
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    adams_hemi
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::adams_hemi;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::adams_hemi::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Adams Hemisphere in a Square";
-    $self->{proj_code} = "adams_hemi";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::adams_hemi::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    adams_ws1
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::adams_ws1;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::adams_ws1::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Adams World in a Square I";
-    $self->{proj_code} = "adams_ws1";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::adams_ws1::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    adams_ws2
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::adams_ws2;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::adams_ws2::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Adams World in a Square II";
-    $self->{proj_code} = "adams_ws2";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::adams_ws2::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    aea
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::aea;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::aea::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Albers Equal Area";
-    $self->{proj_code} = "aea";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lat_2 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::aea::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    aeqd
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::aeqd;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::aeqd::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Azimuthal Equidistant";
-    $self->{proj_code} = "aeqd";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_0 guam ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::aeqd::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    affine
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::affine;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::affine::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Affine transformation";
-    $self->{proj_code} = "affine";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::affine::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    airy
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::airy;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::airy::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Airy";
-    $self->{proj_code} = "airy";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( no_cut lat_b ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::airy::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    aitoff
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::aitoff;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::aitoff::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Aitoff";
-    $self->{proj_code} = "aitoff";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::aitoff::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    alsk
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::alsk;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::alsk::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Modified Stereographic of Alaska";
-    $self->{proj_code} = "alsk";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::alsk::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    apian
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::apian;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::apian::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Apian Globular I";
-    $self->{proj_code} = "apian";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::apian::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    august
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::august;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::august::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "August Epicycloidal";
-    $self->{proj_code} = "august";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::august::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    axisswap
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::axisswap;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::axisswap::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Axis ordering";
-    $self->{proj_code} = "axisswap";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::axisswap::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    bacon
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::bacon;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::bacon::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Bacon Globular";
-    $self->{proj_code} = "bacon";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::bacon::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    bertin1953
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::bertin1953;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::bertin1953::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Bertin 1953";
-    $self->{proj_code} = "bertin1953";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::bertin1953::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    bipc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::bipc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::bipc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Bipolar conic of western hemisphere";
-    $self->{proj_code} = "bipc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::bipc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    boggs
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::boggs;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::boggs::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Boggs Eumorphic";
-    $self->{proj_code} = "boggs";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::boggs::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    bonne
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::bonne;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::bonne::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Bonne (Werner lat_1=90)";
-    $self->{proj_code} = "bonne";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::bonne::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    calcofi
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::calcofi;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::calcofi::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Cal Coop Ocean Fish Invest Lines/Stations";
-    $self->{proj_code} = "calcofi";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::calcofi::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    cart
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::cart;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::cart::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Geodetic/cartesian conversions";
-    $self->{proj_code} = "cart";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::cart::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    cass
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::cass;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::cass::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Cassini";
-    $self->{proj_code} = "cass";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::cass::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    cc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::cc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::cc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Central Cylindrical";
-    $self->{proj_code} = "cc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::cc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    ccon
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::ccon;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::ccon::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Central Conic";
-    $self->{proj_code} = "ccon";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::ccon::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    cea
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::cea;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::cea::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Equal Area Cylindrical";
-    $self->{proj_code} = "cea";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_ts ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::cea::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    chamb
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::chamb;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::chamb::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Chamberlin Trimetric";
-    $self->{proj_code} = "chamb";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lon_1 lat_2 lon_2 lat_3 lon_3 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::chamb::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    col_urban
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::col_urban;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::col_urban::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Colombia Urban";
-    $self->{proj_code} = "col_urban";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( h_0 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::col_urban::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    collg
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::collg;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::collg::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Collignon";
-    $self->{proj_code} = "collg";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::collg::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    comill
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::comill;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::comill::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Compact Miller";
-    $self->{proj_code} = "comill";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::comill::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    crast
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::crast;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::crast::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Craster Parabolic (Putnins P4)";
-    $self->{proj_code} = "crast";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::crast::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    defmodel
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::defmodel;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::defmodel::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Deformation model";
-    $self->{proj_code} = "defmodel";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::defmodel::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    deformation
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::deformation;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::deformation::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Kinematic grid shift";
-    $self->{proj_code} = "deformation";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::deformation::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    denoy
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::denoy;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::denoy::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Denoyer Semi-Elliptical";
-    $self->{proj_code} = "denoy";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::denoy::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    eck1
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::eck1;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::eck1::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Eckert I";
-    $self->{proj_code} = "eck1";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::eck1::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    eck2
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::eck2;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::eck2::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Eckert II";
-    $self->{proj_code} = "eck2";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::eck2::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    eck3
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::eck3;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::eck3::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Eckert III";
-    $self->{proj_code} = "eck3";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::eck3::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    eck4
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::eck4;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::eck4::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Eckert IV";
-    $self->{proj_code} = "eck4";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::eck4::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    eck5
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::eck5;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::eck5::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Eckert V";
-    $self->{proj_code} = "eck5";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::eck5::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    eck6
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::eck6;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::eck6::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Eckert VI";
-    $self->{proj_code} = "eck6";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::eck6::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    eqc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::eqc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::eqc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Equidistant Cylindrical (Plate Carree)";
-    $self->{proj_code} = "eqc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_ts lat_00 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::eqc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    eqdc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::eqdc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::eqdc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Equidistant Conic";
-    $self->{proj_code} = "eqdc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lat_2 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::eqdc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    eqearth
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::eqearth;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::eqearth::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Equal Earth";
-    $self->{proj_code} = "eqearth";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::eqearth::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    etmerc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::etmerc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::etmerc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Extended Transverse Mercator";
-    $self->{proj_code} = "etmerc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::etmerc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    euler
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::euler;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::euler::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Euler";
-    $self->{proj_code} = "euler";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lat_2 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::euler::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    fahey
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::fahey;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::fahey::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Fahey";
-    $self->{proj_code} = "fahey";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::fahey::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    fouc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::fouc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::fouc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Foucaut";
-    $self->{proj_code} = "fouc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::fouc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    fouc_s
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::fouc_s;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::fouc_s::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Foucaut Sinusoidal";
-    $self->{proj_code} = "fouc_s";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::fouc_s::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    gall
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::gall;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::gall::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Gall (Gall Stereographic)";
-    $self->{proj_code} = "gall";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::gall::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    geoc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::geoc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::geoc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Geocentric Latitude";
-    $self->{proj_code} = "geoc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::geoc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    geogoffset
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::geogoffset;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::geogoffset::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Geographic Offset";
-    $self->{proj_code} = "geogoffset";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::geogoffset::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    geos
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::geos;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::geos::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Geostationary Satellite View";
-    $self->{proj_code} = "geos";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( h ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::geos::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    gins8
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::gins8;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::gins8::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Ginsburg VIII (TsNIIGAiK)";
-    $self->{proj_code} = "gins8";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::gins8::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    gn_sinu
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::gn_sinu;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::gn_sinu::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "General Sinusoidal Series";
-    $self->{proj_code} = "gn_sinu";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( m n ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::gn_sinu::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    gnom
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::gnom;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::gnom::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Gnomonic";
-    $self->{proj_code} = "gnom";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::gnom::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    goode
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::goode;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::goode::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Goode Homolosine";
-    $self->{proj_code} = "goode";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::goode::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    gridshift
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::gridshift;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::gridshift::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Generic grid shift";
-    $self->{proj_code} = "gridshift";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::gridshift::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    gs48
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::gs48;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::gs48::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Modified Stereographic of 48 U.S.";
-    $self->{proj_code} = "gs48";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::gs48::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    gs50
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::gs50;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::gs50::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Modified Stereographic of 50 U.S.";
-    $self->{proj_code} = "gs50";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::gs50::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    gstmerc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::gstmerc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::gstmerc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Gauss-Schreiber Transverse Mercator (aka Gauss-Laborde Reunion)";
-    $self->{proj_code} = "gstmerc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_0 lon_0 k_0 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::gstmerc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    guyou
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::guyou;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::guyou::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Guyou";
-    $self->{proj_code} = "guyou";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::guyou::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    hammer
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::hammer;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::hammer::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Hammer & Eckert-Greifendorff";
-    $self->{proj_code} = "hammer";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( W M ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::hammer::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    hatano
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::hatano;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::hatano::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Hatano Asymmetrical Equal Area";
-    $self->{proj_code} = "hatano";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::hatano::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    healpix
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::healpix;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::healpix::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "HEALPix";
-    $self->{proj_code} = "healpix";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( rot_xy ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::healpix::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    helmert
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::helmert;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::helmert::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "3(6)-, 4(8)- and 7(14)-parameter Helmert shift";
-    $self->{proj_code} = "helmert";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::helmert::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    hgridshift
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::hgridshift;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::hgridshift::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Horizontal grid shift";
-    $self->{proj_code} = "hgridshift";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::hgridshift::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    horner
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::horner;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::horner::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Horner polynomial evaluation";
-    $self->{proj_code} = "horner";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::horner::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    igh
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::igh;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::igh::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Interrupted Goode Homolosine";
-    $self->{proj_code} = "igh";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::igh::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    igh_o
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::igh_o;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::igh_o::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Interrupted Goode Homolosine Oceanic View";
-    $self->{proj_code} = "igh_o";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::igh_o::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    imoll
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::imoll;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::imoll::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Interrupted Mollweide";
-    $self->{proj_code} = "imoll";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::imoll::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    imoll_o
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::imoll_o;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::imoll_o::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Interrupted Mollweide Oceanic View";
-    $self->{proj_code} = "imoll_o";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::imoll_o::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    imw_p
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::imw_p;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::imw_p::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "International Map of the World Polyconic";
-    $self->{proj_code} = "imw_p";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lat_2 lon_1 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::imw_p::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    isea
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::isea;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::isea::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Icosahedral Snyder Equal Area";
-    $self->{proj_code} = "isea";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::isea::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    kav5
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::kav5;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::kav5::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Kavrayskiy V";
-    $self->{proj_code} = "kav5";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::kav5::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    kav7
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::kav7;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::kav7::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Kavrayskiy VII";
-    $self->{proj_code} = "kav7";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::kav7::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    krovak
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::krovak;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::krovak::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Krovak";
-    $self->{proj_code} = "krovak";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::krovak::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    labrd
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::labrd;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::labrd::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Laborde";
-    $self->{proj_code} = "labrd";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_0 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::labrd::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    laea
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::laea;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::laea::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Lambert Azimuthal Equal Area";
-    $self->{proj_code} = "laea";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::laea::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    lagrng
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::lagrng;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::lagrng::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Lagrange";
-    $self->{proj_code} = "lagrng";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( W ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::lagrng::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    larr
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::larr;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::larr::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Larrivee";
-    $self->{proj_code} = "larr";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::larr::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    lask
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::lask;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::lask::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Laskowski";
-    $self->{proj_code} = "lask";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::lask::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    latlon
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::latlon;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::latlon::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Lat/long (Geodetic alias)";
-    $self->{proj_code} = "latlon";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::latlon::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    lcc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::lcc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::lcc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Lambert Conformal Conic";
-    $self->{proj_code} = "lcc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lat_2 lat_0 k_0 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::lcc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    lcca
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::lcca;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::lcca::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Lambert Conformal Conic Alternative";
-    $self->{proj_code} = "lcca";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_0 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::lcca::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    leac
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::leac;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::leac::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Lambert Equal Area Conic";
-    $self->{proj_code} = "leac";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 south ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::leac::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    lee_os
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::lee_os;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::lee_os::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Lee Oblated Stereographic";
-    $self->{proj_code} = "lee_os";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::lee_os::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    lonlat
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::lonlat;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::lonlat::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Lat/long (Geodetic)";
-    $self->{proj_code} = "lonlat";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::lonlat::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    loxim
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::loxim;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::loxim::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Loximuthal";
-    $self->{proj_code} = "loxim";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::loxim::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    lsat
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::lsat;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::lsat::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Space oblique for LANDSAT";
-    $self->{proj_code} = "lsat";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lsat path ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::lsat::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    mbt_fps
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::mbt_fps;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::mbt_fps::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "McBryde-Thomas Flat-Pole Sine (No. 2)";
-    $self->{proj_code} = "mbt_fps";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::mbt_fps::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    mbt_s
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::mbt_s;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::mbt_s::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "McBryde-Thomas Flat-Polar Sine (No. 1)";
-    $self->{proj_code} = "mbt_s";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::mbt_s::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    mbtfpp
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::mbtfpp;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::mbtfpp::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "McBride-Thomas Flat-Polar Parabolic";
-    $self->{proj_code} = "mbtfpp";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::mbtfpp::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    mbtfpq
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::mbtfpq;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::mbtfpq::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "McBryde-Thomas Flat-Polar Quartic";
-    $self->{proj_code} = "mbtfpq";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::mbtfpq::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    mbtfps
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::mbtfps;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::mbtfps::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "McBryde-Thomas Flat-Polar Sinusoidal";
-    $self->{proj_code} = "mbtfps";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::mbtfps::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    merc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::merc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::merc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Mercator";
-    $self->{proj_code} = "merc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_ts ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::merc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    mil_os
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::mil_os;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::mil_os::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Miller Oblated Stereographic";
-    $self->{proj_code} = "mil_os";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::mil_os::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    mill
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::mill;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::mill::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Miller Cylindrical";
-    $self->{proj_code} = "mill";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::mill::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    misrsom
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::misrsom;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::misrsom::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Space oblique for MISR";
-    $self->{proj_code} = "misrsom";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( path ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::misrsom::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    mod_krovak
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::mod_krovak;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::mod_krovak::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Modified Krovak";
-    $self->{proj_code} = "mod_krovak";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::mod_krovak::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    moll
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::moll;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::moll::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Mollweide";
-    $self->{proj_code} = "moll";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::moll::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    molobadekas
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::molobadekas;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::molobadekas::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Molodensky-Badekas transformation";
-    $self->{proj_code} = "molobadekas";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::molobadekas::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    molodensky
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::molodensky;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::molodensky::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Molodensky transform";
-    $self->{proj_code} = "molodensky";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::molodensky::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    murd1
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::murd1;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::murd1::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Murdoch I";
-    $self->{proj_code} = "murd1";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lat_2 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::murd1::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    murd2
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::murd2;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::murd2::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Murdoch II";
-    $self->{proj_code} = "murd2";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lat_2 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::murd2::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    murd3
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::murd3;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::murd3::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Murdoch III";
-    $self->{proj_code} = "murd3";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lat_2 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::murd3::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    natearth
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::natearth;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::natearth::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Natural Earth";
-    $self->{proj_code} = "natearth";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::natearth::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    natearth2
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::natearth2;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::natearth2::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Natural Earth 2";
-    $self->{proj_code} = "natearth2";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::natearth2::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    nell
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::nell;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::nell::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Nell";
-    $self->{proj_code} = "nell";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::nell::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    nell_h
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::nell_h;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::nell_h::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Nell-Hammer";
-    $self->{proj_code} = "nell_h";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::nell_h::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    nicol
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::nicol;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::nicol::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Nicolosi Globular";
-    $self->{proj_code} = "nicol";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::nicol::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    noop
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::noop;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::noop::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "No operation";
-    $self->{proj_code} = "noop";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::noop::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    nsper
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::nsper;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::nsper::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Near-sided perspective";
-    $self->{proj_code} = "nsper";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( h ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::nsper::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    nzmg
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::nzmg;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::nzmg::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "New Zealand Map Grid";
-    $self->{proj_code} = "nzmg";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::nzmg::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    ob_tran
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::ob_tran;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::ob_tran::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "General Oblique Transformation";
-    $self->{proj_code} = "ob_tran";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( o_proj o_lat_p o_lon_p o_alpha o_lon_c o_lat_c o_lon_1 o_lat_1 o_lon_2 o_lat_2 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::ob_tran::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    ocea
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::ocea;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::ocea::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Oblique Cylindrical Equal Area";
-    $self->{proj_code} = "ocea";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lat_2 lon_1 lon_2 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::ocea::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    oea
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::oea;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::oea::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Oblated Equal Area";
-    $self->{proj_code} = "oea";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( n m theta ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::oea::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    omerc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::omerc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::omerc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Oblique Mercator";
-    $self->{proj_code} = "omerc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( alpha gamma no_off lonc lon_1 lat_1 lon_2 lat_2 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::omerc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    ortel
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::ortel;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::ortel::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Ortelius Oval";
-    $self->{proj_code} = "ortel";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::ortel::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    ortho
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::ortho;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::ortho::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Orthographic";
-    $self->{proj_code} = "ortho";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::ortho::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    patterson
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::patterson;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::patterson::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Patterson Cylindrical";
-    $self->{proj_code} = "patterson";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::patterson::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    pconic
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::pconic;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::pconic::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Perspective Conic";
-    $self->{proj_code} = "pconic";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lat_2 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::pconic::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    peirce_q
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::peirce_q;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::peirce_q::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Peirce Quincuncial";
-    $self->{proj_code} = "peirce_q";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::peirce_q::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    pipeline
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::pipeline;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::pipeline::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Transformation pipeline manager";
-    $self->{proj_code} = "pipeline";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::pipeline::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    poly
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::poly;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::poly::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Polyconic (American)";
-    $self->{proj_code} = "poly";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::poly::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    pop
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::pop;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::pop::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Retrieve coordinate value from pipeline stack";
-    $self->{proj_code} = "pop";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::pop::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    push
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::push;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::push::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Save coordinate value on pipeline stack";
-    $self->{proj_code} = "push";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::push::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    putp1
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::putp1;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::putp1::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Putnins P1";
-    $self->{proj_code} = "putp1";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::putp1::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    putp2
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::putp2;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::putp2::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Putnins P2";
-    $self->{proj_code} = "putp2";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::putp2::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    putp3
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::putp3;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::putp3::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Putnins P3";
-    $self->{proj_code} = "putp3";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::putp3::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    putp3p
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::putp3p;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::putp3p::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Putnins P3'";
-    $self->{proj_code} = "putp3p";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::putp3p::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    putp4p
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::putp4p;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::putp4p::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Putnins P4'";
-    $self->{proj_code} = "putp4p";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::putp4p::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    putp5
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::putp5;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::putp5::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Putnins P5";
-    $self->{proj_code} = "putp5";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::putp5::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    putp5p
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::putp5p;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::putp5p::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Putnins P5'";
-    $self->{proj_code} = "putp5p";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::putp5p::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    putp6
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::putp6;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::putp6::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Putnins P6";
-    $self->{proj_code} = "putp6";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::putp6::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    putp6p
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::putp6p;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::putp6p::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Putnins P6'";
-    $self->{proj_code} = "putp6p";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::putp6p::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    qsc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::qsc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::qsc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Quadrilateralized Spherical Cube";
-    $self->{proj_code} = "qsc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::qsc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    qua_aut
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::qua_aut;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::qua_aut::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Quartic Authalic";
-    $self->{proj_code} = "qua_aut";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::qua_aut::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    rhealpix
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::rhealpix;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::rhealpix::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "rHEALPix";
-    $self->{proj_code} = "rhealpix";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( north_square south_square ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::rhealpix::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    robin
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::robin;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::robin::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Robinson";
-    $self->{proj_code} = "robin";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::robin::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    rouss
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::rouss;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::rouss::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Roussilhe Stereographic";
-    $self->{proj_code} = "rouss";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::rouss::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    rpoly
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::rpoly;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::rpoly::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Rectangular Polyconic";
-    $self->{proj_code} = "rpoly";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_ts ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::rpoly::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    s2
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::s2;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::s2::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "S2";
-    $self->{proj_code} = "s2";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::s2::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    sch
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::sch;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::sch::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Spherical Cross-track Height";
-    $self->{proj_code} = "sch";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( plat_0 plon_0 phdg_0 h_0 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::sch::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    set
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::set;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::set::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Set coordinate value";
-    $self->{proj_code} = "set";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::set::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    sinu
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::sinu;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::sinu::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Sinusoidal (Sanson-Flamsteed)";
-    $self->{proj_code} = "sinu";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::sinu::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    som
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::som;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::som::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Space Oblique Mercator";
-    $self->{proj_code} = "som";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( inc_angle ps_rev asc_lon ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::som::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    somerc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::somerc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::somerc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Swiss. Obl. Mercator";
-    $self->{proj_code} = "somerc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::somerc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    stere
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::stere;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::stere::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Stereographic";
-    $self->{proj_code} = "stere";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_ts ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::stere::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    sterea
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::sterea;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::sterea::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Oblique Stereographic Alternative";
-    $self->{proj_code} = "sterea";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::sterea::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    tcc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::tcc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::tcc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Transverse Central Cylindrical";
-    $self->{proj_code} = "tcc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::tcc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    tcea
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::tcea;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::tcea::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Transverse Cylindrical Equal Area";
-    $self->{proj_code} = "tcea";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::tcea::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    times
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::times;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::times::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Times";
-    $self->{proj_code} = "times";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::times::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    tinshift
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::tinshift;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::tinshift::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Triangulation based transformation";
-    $self->{proj_code} = "tinshift";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::tinshift::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    tissot
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::tissot;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::tissot::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Tissot";
-    $self->{proj_code} = "tissot";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lat_2 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::tissot::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    tmerc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::tmerc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::tmerc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Transverse Mercator";
-    $self->{proj_code} = "tmerc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( approx ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::tmerc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    tobmerc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::tobmerc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::tobmerc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Tobler-Mercator";
-    $self->{proj_code} = "tobmerc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::tobmerc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    topocentric
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::topocentric;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::topocentric::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Geocentric/Topocentric conversion";
-    $self->{proj_code} = "topocentric";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::topocentric::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    tpeqd
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::tpeqd;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::tpeqd::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Two Point Equidistant";
-    $self->{proj_code} = "tpeqd";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lon_1 lat_2 lon_2 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::tpeqd::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    tpers
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::tpers;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::tpers::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Tilted perspective";
-    $self->{proj_code} = "tpers";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( tilt azi h ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::tpers::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    unitconvert
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::unitconvert;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::unitconvert::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Unit conversion";
-    $self->{proj_code} = "unitconvert";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::unitconvert::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    ups
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::ups;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::ups::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Universal Polar Stereographic";
-    $self->{proj_code} = "ups";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( south ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::ups::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    urm5
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::urm5;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::urm5::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Urmaev V";
-    $self->{proj_code} = "urm5";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( n q alpha ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::urm5::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    urmfps
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::urmfps;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::urmfps::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Urmaev Flat-Polar Sinusoidal";
-    $self->{proj_code} = "urmfps";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( n ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::urmfps::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    utm
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::utm;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::utm::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Universal Transverse Mercator (UTM)";
-    $self->{proj_code} = "utm";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( zone south approx ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::utm::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    vandg
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::vandg;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::vandg::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "van der Grinten (I)";
-    $self->{proj_code} = "vandg";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::vandg::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    vandg2
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::vandg2;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::vandg2::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "van der Grinten II";
-    $self->{proj_code} = "vandg2";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::vandg2::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    vandg3
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::vandg3;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::vandg3::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "van der Grinten III";
-    $self->{proj_code} = "vandg3";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::vandg3::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    vandg4
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::vandg4;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::vandg4::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "van der Grinten IV";
-    $self->{proj_code} = "vandg4";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::vandg4::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    vertoffset
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::vertoffset;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::vertoffset::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Vertical Offset and Slope";
-    $self->{proj_code} = "vertoffset";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_0 lon_0 dh slope_lat slope_lon ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::vertoffset::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    vgridshift
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::vgridshift;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::vgridshift::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Vertical grid shift";
-    $self->{proj_code} = "vgridshift";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::vgridshift::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    vitk1
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::vitk1;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::vitk1::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Vitkovsky I";
-    $self->{proj_code} = "vitk1";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 lat_2 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::vitk1::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    wag1
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::wag1;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::wag1::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Wagner I (Kavrayskiy VI)";
-    $self->{proj_code} = "wag1";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::wag1::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    wag2
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::wag2;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::wag2::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Wagner II";
-    $self->{proj_code} = "wag2";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::wag2::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    wag3
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::wag3;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::wag3::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Wagner III";
-    $self->{proj_code} = "wag3";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_ts ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::wag3::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    wag4
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::wag4;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::wag4::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Wagner IV";
-    $self->{proj_code} = "wag4";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::wag4::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    wag5
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::wag5;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::wag5::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Wagner V";
-    $self->{proj_code} = "wag5";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::wag5::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    wag6
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::wag6;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::wag6::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Wagner VI";
-    $self->{proj_code} = "wag6";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::wag6::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    wag7
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::wag7;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::wag7::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Wagner VII";
-    $self->{proj_code} = "wag7";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::wag7::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    webmerc
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::webmerc;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::webmerc::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Web Mercator / Pseudo Mercator";
-    $self->{proj_code} = "webmerc";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::webmerc::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    weren
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::weren;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::weren::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Werenskiold I";
-    $self->{proj_code} = "weren";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::weren::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    wink1
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::wink1;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::wink1::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Winkel I";
-    $self->{proj_code} = "wink1";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_ts ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::wink1::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    wink2
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::wink2;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::wink2::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Winkel II";
-    $self->{proj_code} = "wink2";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::wink2::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    wintri
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::wintri;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::wintri::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Winkel Tripel";
-    $self->{proj_code} = "wintri";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw( lat_1 ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::wintri::new()...
-
-1;
-#line 570 "proj4.pd"
-
-# Autogenerated code for the Proj4 projection code:
-#    xyzgridshift
-#
-package # hide from PAUSE
-  PDL::Transform::Proj4::xyzgridshift;
-use strict;
-use warnings;
-our @ISA = ( 'PDL::Transform::Proj4' );
-
-sub new
-{
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $sub = "PDL::Transform::Proj4::xyzgridshift::new()";
-    #print STDERR "$sub: ARGS: [" . join(", ", @_ ) . "]\n";
-    my $self  = $class->SUPER::new( @_ );
-    bless ($self, $class);
-    my $o = $_[0];
-    unless( (ref $o) )
-        { $o = {@_}; }
-    #use Data::Dumper;
-    #my $dd2 = Data::Dumper->new( [$o], ["$sub: o"] );
-    #$dd2->Indent(1);
-    #print STDERR $dd2->Dump();
-    $self->{name} = "Geocentric grid shift";
-    $self->{proj_code} = "xyzgridshift";
-    # Make sure proj is set in the options:
-    $self->{params}->{proj} = $self->{proj_code};
-    # Grab our projection specific options:
-    #
-    $self->{projection_params} = [ qw(  ) ];
-    foreach my $param ( @{ $self->{projection_params} } )
-        { $self->{params}->{$param} = PDL::Transform::_opt( $o, [ $param ] ); }
-    $self->update_proj_string();
-    #my $dd = Data::Dumper->new( [$self->{params}], ["$sub: params"] );
-    #$dd->Indent(1);
-    #print STDERR $dd->Dump();
-    #print STDERR "$sub: Final proj_params: \'" . $self->{params}->{proj_params} . "\'\n";
-    return $self;
-} # End of PDL::Transform::xyzgridshift::new()...
-
-1;
-#line 657 "proj4.pd"
+sub t_proj_xyzgridshift {'PDL::Transform::Proj4::xyzgridshift'->new(@_)}
+#line 498 "proj4.pd"
 
+_make_class(q{adams_hemi}, q{Adams Hemisphere in a Square}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{adams_ws1}, q{Adams World in a Square I}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{adams_ws2}, q{Adams World in a Square II}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{aea}, q{Albers Equal Area}, 1, q{qw(lat_1 lat_2)});
+
+#line 498 "proj4.pd"
+_make_class(q{aeqd}, q{Azimuthal Equidistant}, 1, q{qw(lat_0 guam)});
+
+#line 498 "proj4.pd"
+_make_class(q{affine}, q{Affine transformation}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{airy}, q{Airy}, 0, q{qw(no_cut lat_b)});
+
+#line 498 "proj4.pd"
+_make_class(q{aitoff}, q{Aitoff}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{alsk}, q{Modified Stereographic of Alaska}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{apian}, q{Apian Globular I}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{august}, q{August Epicycloidal}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{axisswap}, q{Axis ordering}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{bacon}, q{Bacon Globular}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{bertin1953}, q{Bertin 1953}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{bipc}, q{Bipolar conic of western hemisphere}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{boggs}, q{Boggs Eumorphic}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{bonne}, q{Bonne (Werner lat_1=90)}, 1, q{qw(lat_1)});
+
+#line 498 "proj4.pd"
+_make_class(q{calcofi}, q{Cal Coop Ocean Fish Invest Lines/Stations}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{cart}, q{Geodetic/cartesian conversions}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{cass}, q{Cassini}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{cc}, q{Central Cylindrical}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{ccon}, q{Central Conic}, 1, q{qw(lat_1)});
+
+#line 498 "proj4.pd"
+_make_class(q{cea}, q{Equal Area Cylindrical}, 1, q{qw(lat_ts)});
+
+#line 498 "proj4.pd"
+_make_class(q{chamb}, q{Chamberlin Trimetric}, 0, q{qw(lat_1 lon_1 lat_2 lon_2 lat_3 lon_3)});
+
+#line 498 "proj4.pd"
+_make_class(q{col_urban}, q{Colombia Urban}, 1, q{qw(h_0)});
+
+#line 498 "proj4.pd"
+_make_class(q{collg}, q{Collignon}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{comill}, q{Compact Miller}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{crast}, q{Craster Parabolic (Putnins P4)}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{defmodel}, q{Deformation model}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{deformation}, q{Kinematic grid shift}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{denoy}, q{Denoyer Semi-Elliptical}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{eck1}, q{Eckert I}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{eck2}, q{Eckert II}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{eck3}, q{Eckert III}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{eck4}, q{Eckert IV}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{eck5}, q{Eckert V}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{eck6}, q{Eckert VI}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{eqc}, q{Equidistant Cylindrical (Plate Carree)}, 1, q{qw(lat_ts lat_00)});
+
+#line 498 "proj4.pd"
+_make_class(q{eqdc}, q{Equidistant Conic}, 1, q{qw(lat_1 lat_2)});
+
+#line 498 "proj4.pd"
+_make_class(q{eqearth}, q{Equal Earth}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{etmerc}, q{Extended Transverse Mercator}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{euler}, q{Euler}, 1, q{qw(lat_1 lat_2)});
+
+#line 498 "proj4.pd"
+_make_class(q{fahey}, q{Fahey}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{fouc}, q{Foucaut}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{fouc_s}, q{Foucaut Sinusoidal}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{gall}, q{Gall (Gall Stereographic)}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{geoc}, q{Geocentric Latitude}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{geogoffset}, q{Geographic Offset}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{geos}, q{Geostationary Satellite View}, 1, q{qw(h)});
+
+#line 498 "proj4.pd"
+_make_class(q{gins8}, q{Ginsburg VIII (TsNIIGAiK)}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{gn_sinu}, q{General Sinusoidal Series}, 1, q{qw(m n)});
+
+#line 498 "proj4.pd"
+_make_class(q{gnom}, q{Gnomonic}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{goode}, q{Goode Homolosine}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{gridshift}, q{Generic grid shift}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{gs48}, q{Modified Stereographic of 48 U.S.}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{gs50}, q{Modified Stereographic of 50 U.S.}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{gstmerc}, q{Gauss-Schreiber Transverse Mercator (aka Gauss-Laborde Reunion)}, 1, q{qw(lat_0 lon_0 k_0)});
+
+#line 498 "proj4.pd"
+_make_class(q{guyou}, q{Guyou}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{hammer}, q{Hammer & Eckert-Greifendorff}, 1, q{qw(W M)});
+
+#line 498 "proj4.pd"
+_make_class(q{hatano}, q{Hatano Asymmetrical Equal Area}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{healpix}, q{HEALPix}, 1, q{qw(rot_xy)});
+
+#line 498 "proj4.pd"
+_make_class(q{helmert}, q{3(6)-, 4(8)- and 7(14)-parameter Helmert shift}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{hgridshift}, q{Horizontal grid shift}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{horner}, q{Horner polynomial evaluation}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{igh}, q{Interrupted Goode Homolosine}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{igh_o}, q{Interrupted Goode Homolosine Oceanic View}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{imoll}, q{Interrupted Mollweide}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{imoll_o}, q{Interrupted Mollweide Oceanic View}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{imw_p}, q{International Map of the World Polyconic}, 1, q{qw(lat_1 lat_2 lon_1)});
+
+#line 498 "proj4.pd"
+_make_class(q{isea}, q{Icosahedral Snyder Equal Area}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{kav5}, q{Kavrayskiy V}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{kav7}, q{Kavrayskiy VII}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{krovak}, q{Krovak}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{labrd}, q{Laborde}, 1, q{qw(lat_0)});
+
+#line 498 "proj4.pd"
+_make_class(q{laea}, q{Lambert Azimuthal Equal Area}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{lagrng}, q{Lagrange}, 1, q{qw(W)});
+
+#line 498 "proj4.pd"
+_make_class(q{larr}, q{Larrivee}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{lask}, q{Laskowski}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{latlon}, q{Lat/long (Geodetic alias)}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{lcc}, q{Lambert Conformal Conic}, 1, q{qw(lat_1 lat_2 lat_0 k_0)});
+
+#line 498 "proj4.pd"
+_make_class(q{lcca}, q{Lambert Conformal Conic Alternative}, 1, q{qw(lat_0)});
+
+#line 498 "proj4.pd"
+_make_class(q{leac}, q{Lambert Equal Area Conic}, 1, q{qw(lat_1 south)});
+
+#line 498 "proj4.pd"
+_make_class(q{lee_os}, q{Lee Oblated Stereographic}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{lonlat}, q{Lat/long (Geodetic)}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{loxim}, q{Loximuthal}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{lsat}, q{Space oblique for LANDSAT}, 1, q{qw(lsat path)});
+
+#line 498 "proj4.pd"
+_make_class(q{mbt_fps}, q{McBryde-Thomas Flat-Pole Sine (No. 2)}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{mbt_s}, q{McBryde-Thomas Flat-Polar Sine (No. 1)}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{mbtfpp}, q{McBride-Thomas Flat-Polar Parabolic}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{mbtfpq}, q{McBryde-Thomas Flat-Polar Quartic}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{mbtfps}, q{McBryde-Thomas Flat-Polar Sinusoidal}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{merc}, q{Mercator}, 1, q{qw(lat_ts)});
+
+#line 498 "proj4.pd"
+_make_class(q{mil_os}, q{Miller Oblated Stereographic}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{mill}, q{Miller Cylindrical}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{misrsom}, q{Space oblique for MISR}, 1, q{qw(path)});
+
+#line 498 "proj4.pd"
+_make_class(q{mod_krovak}, q{Modified Krovak}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{moll}, q{Mollweide}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{molobadekas}, q{Molodensky-Badekas transformation}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{molodensky}, q{Molodensky transform}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{murd1}, q{Murdoch I}, 1, q{qw(lat_1 lat_2)});
+
+#line 498 "proj4.pd"
+_make_class(q{murd2}, q{Murdoch II}, 1, q{qw(lat_1 lat_2)});
+
+#line 498 "proj4.pd"
+_make_class(q{murd3}, q{Murdoch III}, 1, q{qw(lat_1 lat_2)});
+
+#line 498 "proj4.pd"
+_make_class(q{natearth}, q{Natural Earth}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{natearth2}, q{Natural Earth 2}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{nell}, q{Nell}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{nell_h}, q{Nell-Hammer}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{nicol}, q{Nicolosi Globular}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{noop}, q{No operation}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{nsper}, q{Near-sided perspective}, 1, q{qw(h)});
+
+#line 498 "proj4.pd"
+_make_class(q{nzmg}, q{New Zealand Map Grid}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{ob_tran}, q{General Oblique Transformation}, 1, q{qw(o_proj o_lat_p o_lon_p o_alpha o_lon_c o_lat_c o_lon_1 o_lat_1 o_lon_2 o_lat_2)});
+
+#line 498 "proj4.pd"
+_make_class(q{ocea}, q{Oblique Cylindrical Equal Area}, 1, q{qw(lat_1 lat_2 lon_1 lon_2)});
+
+#line 498 "proj4.pd"
+_make_class(q{oea}, q{Oblated Equal Area}, 1, q{qw(n m theta)});
+
+#line 498 "proj4.pd"
+_make_class(q{omerc}, q{Oblique Mercator}, 1, q{qw(alpha gamma no_off lonc lon_1 lat_1 lon_2 lat_2)});
+
+#line 498 "proj4.pd"
+_make_class(q{ortel}, q{Ortelius Oval}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{ortho}, q{Orthographic}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{patterson}, q{Patterson Cylindrical}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{pconic}, q{Perspective Conic}, 1, q{qw(lat_1 lat_2)});
+
+#line 498 "proj4.pd"
+_make_class(q{peirce_q}, q{Peirce Quincuncial}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{pipeline}, q{Transformation pipeline manager}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{poly}, q{Polyconic (American)}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{pop}, q{Retrieve coordinate value from pipeline stack}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{push}, q{Save coordinate value on pipeline stack}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{putp1}, q{Putnins P1}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{putp2}, q{Putnins P2}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{putp3}, q{Putnins P3}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{putp3p}, q{Putnins P3'}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{putp4p}, q{Putnins P4'}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{putp5}, q{Putnins P5}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{putp5p}, q{Putnins P5'}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{putp6}, q{Putnins P6}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{putp6p}, q{Putnins P6'}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{qsc}, q{Quadrilateralized Spherical Cube}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{qua_aut}, q{Quartic Authalic}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{rhealpix}, q{rHEALPix}, 1, q{qw(north_square south_square)});
+
+#line 498 "proj4.pd"
+_make_class(q{robin}, q{Robinson}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{rouss}, q{Roussilhe Stereographic}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{rpoly}, q{Rectangular Polyconic}, 0, q{qw(lat_ts)});
+
+#line 498 "proj4.pd"
+_make_class(q{s2}, q{S2}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{sch}, q{Spherical Cross-track Height}, 1, q{qw(plat_0 plon_0 phdg_0 h_0)});
+
+#line 498 "proj4.pd"
+_make_class(q{set}, q{Set coordinate value}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{sinu}, q{Sinusoidal (Sanson-Flamsteed)}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{som}, q{Space Oblique Mercator}, 1, q{qw(inc_angle ps_rev asc_lon)});
+
+#line 498 "proj4.pd"
+_make_class(q{somerc}, q{Swiss. Obl. Mercator}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{stere}, q{Stereographic}, 1, q{qw(lat_ts)});
+
+#line 498 "proj4.pd"
+_make_class(q{sterea}, q{Oblique Stereographic Alternative}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{tcc}, q{Transverse Central Cylindrical}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{tcea}, q{Transverse Cylindrical Equal Area}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{times}, q{Times}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{tinshift}, q{Triangulation based transformation}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{tissot}, q{Tissot}, 1, q{qw(lat_1 lat_2)});
+
+#line 498 "proj4.pd"
+_make_class(q{tmerc}, q{Transverse Mercator}, 1, q{qw(approx)});
+
+#line 498 "proj4.pd"
+_make_class(q{tobmerc}, q{Tobler-Mercator}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{topocentric}, q{Geocentric/Topocentric conversion}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{tpeqd}, q{Two Point Equidistant}, 1, q{qw(lat_1 lon_1 lat_2 lon_2)});
+
+#line 498 "proj4.pd"
+_make_class(q{tpers}, q{Tilted perspective}, 1, q{qw(tilt azi h)});
+
+#line 498 "proj4.pd"
+_make_class(q{unitconvert}, q{Unit conversion}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{ups}, q{Universal Polar Stereographic}, 1, q{qw(south)});
+
+#line 498 "proj4.pd"
+_make_class(q{urm5}, q{Urmaev V}, 0, q{qw(n q alpha)});
+
+#line 498 "proj4.pd"
+_make_class(q{urmfps}, q{Urmaev Flat-Polar Sinusoidal}, 1, q{qw(n)});
+
+#line 498 "proj4.pd"
+_make_class(q{utm}, q{Universal Transverse Mercator (UTM)}, 1, q{qw(zone south approx)});
+
+#line 498 "proj4.pd"
+_make_class(q{vandg}, q{van der Grinten (I)}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{vandg2}, q{van der Grinten II}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{vandg3}, q{van der Grinten III}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{vandg4}, q{van der Grinten IV}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{vertoffset}, q{Vertical Offset and Slope}, 1, q{qw(lat_0 lon_0 dh slope_lat slope_lon)});
+
+#line 498 "proj4.pd"
+_make_class(q{vgridshift}, q{Vertical grid shift}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{vitk1}, q{Vitkovsky I}, 1, q{qw(lat_1 lat_2)});
+
+#line 498 "proj4.pd"
+_make_class(q{wag1}, q{Wagner I (Kavrayskiy VI)}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{wag2}, q{Wagner II}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{wag3}, q{Wagner III}, 1, q{qw(lat_ts)});
+
+#line 498 "proj4.pd"
+_make_class(q{wag4}, q{Wagner IV}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{wag5}, q{Wagner V}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{wag6}, q{Wagner VI}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{wag7}, q{Wagner VII}, 0, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{webmerc}, q{Web Mercator / Pseudo Mercator}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{weren}, q{Werenskiold I}, 1, q{qw()});
+
+#line 498 "proj4.pd"
+_make_class(q{wink1}, q{Winkel I}, 1, q{qw(lat_ts)});
+
+#line 498 "proj4.pd"
+_make_class(q{wink2}, q{Winkel II}, 1, q{qw(lat_1)});
+
+#line 498 "proj4.pd"
+_make_class(q{wintri}, q{Winkel Tripel}, 1, q{qw(lat_1)});
+
+#line 498 "proj4.pd"
+_make_class(q{xyzgridshift}, q{Geocentric grid shift}, 1, q{qw()});
+
+#line 525 "proj4.pd"
 
 =head1 AUTHOR
 
@@ -18084,7 +5780,7 @@ Judd Taylor, Orbital Systems, Ltd.
 judd dot t at orbitalsystems dot com
 
 =cut
-#line 18088 "Proj4.pm"
+#line 5784 "Proj4.pm"
 
 # Exit with OK status
 

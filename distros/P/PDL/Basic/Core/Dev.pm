@@ -88,19 +88,6 @@ my $MY_DIR2 = dirname(dirname($MY_FILE));
 my $IS_INST = $MY_DIR2 =~ /PDL\W*$/i;
 sub whereami_any { $MY_DIR2 } # something containing "Core/Dev.pm"
 
-# To access PDL's configuration use %PDL::Config. Makefile.PL has been set up
-# to create this variable so it is available during 'perl Makefile.PL' and
-# it can be eval-ed during 'make'
-unless ( %PDL::Config ) {
-  require File::Spec::Functions;
-  my $dir = File::Spec::Functions::catdir($MY_DIR2, $IS_INST ? () : qw(Core));
-  eval { require "$dir/Config.pm" };
-  die "Unable to find PDL's configuration info\n [$@]" if $@;
-}
-
-my $inc = $PDL::Config{MALLOCDBG}{include} || '';
-my $libs = $PDL::Config{MALLOCDBG}{libs} || '';
-
 =head2 isbigendian
 
 =for ref
@@ -230,8 +217,8 @@ sub _stdargs {
     OBJECT       => join(' ', @objs),
     PM 	=> {"$pref.pm" => "\$(INST_LIBDIR)/$pref.pm"},
     MAN3PODS => {"$pref.pm" => "\$(INST_MAN3DIR)/$mod.\$(MAN3EXT)"},
-    INC          => PDL_INCLUDE()." $inc",
-    LIBS         => [$libs],
+    INC          => PDL_INCLUDE(),
+    LIBS         => [''],
     clean        => {FILES => "$pref.pm @cfiles"},
     ($internal
       ? (NO_MYMETA => 1)
@@ -274,7 +261,7 @@ sub pdlpp_mkgen {
     push @pairs, [$_, $name];
   }
   my %added = ();
-  my @in = map "-I".File::Spec::Functions::rel2abs($_), @INC, 'inc';
+  my @in = map "-I".File::Spec::Functions::rel2abs($_), @INC;
   for (@pairs) {
     my ($pd, $mod) = @$_;
     (my $prefix = $mod) =~ s|::|/|g;
@@ -338,7 +325,7 @@ a perl configure clone
     $have_GL = 0;
   }
   $maybe =
-    trylink 'libwhatever', $inc, $body, $libs, $cflags,
+    trylink 'libwhatever', '', $body, $libs, $cflags,
         {MakeMaker=>1, Hide=>0, Clean=>1};
 
 Try to link some C-code making up the body of a function
@@ -392,8 +379,7 @@ specs have been processed by MakeMaker.
 =item Hide
 
 Controls if linking output etc is hidden from the user or not.
-On by default except within the build of the PDL distribution
-where the config value set in F<perldl.conf> prevails.
+On by default but overridable with environment variable C<HIDE_TRYLINK> if set.
 
 =item Clean
 
@@ -420,8 +406,7 @@ sub trylink {
   # check if MakeMaker should be used to preprocess the libs
   for my $key(keys %$opt) {$opt->{lc $key} = $opt->{$key}}
   my $mmprocess = exists $opt->{makemaker} && $opt->{makemaker};
-  my $hide = exists $opt->{hide} ? $opt->{hide} :
-    exists $PDL::Config{HIDE_TRYLINK} ? $PDL::Config{HIDE_TRYLINK} : 1;
+  my $hide = $opt->{hide} // $ENV{HIDE_TRYLINK} // 1;
   my $clean = exists $opt->{clean} ? $opt->{clean} : 1;
   if ($mmprocess) {
       require ExtUtils::MakeMaker;

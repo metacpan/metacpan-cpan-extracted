@@ -204,6 +204,9 @@ new_from_specification(invoc, ...)
         XSRETURN(1);
       }
     }
+    IV i; for (i = 0; i < items; i++)
+      if (!SvOK(ST(i)))
+        barf("Arg %"IVdf" is undefined", i);
     IV argstart = 1, type = PDL_D;
     if (items > 1 && sv_derived_from(ST(1), "PDL::Type")) {
       argstart++;
@@ -368,10 +371,18 @@ address(self)
 IV
 address_data(self)
   pdl *self;
-  CODE:
-    RETVAL = PTR2IV(self->data);
-  OUTPUT:
-    RETVAL
+CODE:
+  RETVAL = PTR2IV(self->data);
+OUTPUT:
+  RETVAL
+
+IV
+address_datasv(p)
+  pdl *p
+CODE:
+  RETVAL = PTR2IV(p->datasv);
+OUTPUT:
+  RETVAL
 
 PDL_Indx
 nelem_nophys(x)
@@ -459,20 +470,6 @@ nbytes(self)
   OUTPUT:
     RETVAL
 
-# Free the datasv if possible
-void
-freedata(it)
-      pdl *it
-      CODE:
-	if(it->datasv) {
-		PDLDEBUG_f(printf("pdl=%p SvREFCNT_dec datasv=%p\n",it,it->datasv));
-		SvREFCNT_dec(it->datasv);
-		it->datasv=0;
-		it->data=0;
-	} else if(it->data) {
-		die("Trying to free data of pdl with data != 0 and datasv==0");
-	}
-
 IV
 datasv_refcount(p)
   pdl *p
@@ -481,20 +478,6 @@ datasv_refcount(p)
     RETVAL = SvREFCNT((SV*)p->datasv);
   OUTPUT:
     RETVAL
-
-int
-set_data_by_offset(it,orig,offset)
-      pdl *it
-      pdl *orig
-      STRLEN offset
-      CODE:
-              it->data = ((char *) orig->data) + offset;
-	      it->datasv = orig->sv;
-              (void)SvREFCNT_inc(it->datasv);
-              it->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-              RETVAL = 1;
-      OUTPUT:
-              RETVAL
 
 PDL_Indx
 nelem(x)
@@ -652,10 +635,10 @@ ind_sizes(x)
 void
 inc_sizes(x)
   pdl_trans *x;
-  PPCODE:
-    PDL_Indx i, max = x->vtable->nind_ids;
-    EXTEND(SP, max);
-    for(i=0; i<max; i++) mPUSHi(x->inc_sizes[i]);
+PPCODE:
+  PDL_Indx i, max = x->vtable->nind_ids; /* CORE21 rename nind_ids */
+  EXTEND(SP, max);
+  for(i=0; i<max; i++) mPUSHi(x->inc_sizes[i]);
 
 MODULE = PDL::Core     PACKAGE = PDL::Trans::VTable
 
@@ -1030,34 +1013,39 @@ initialize(class)
     RETVAL
 
 # undocumented for present. returns PDL still needing dims and datatype
+# offset is in bytes, not elements
 SV *
-new_around_datasv(class, datasv_pointer)
+new_around_datasv(class, datasv_pointer, offset=0)
   SV *class
   IV datasv_pointer
-  CODE:
-    HV *bless_stash = SvROK(class)
-      ? SvSTASH(SvRV(class)) /* a reference to a class */
-      : gv_stashsv(class, 0); /* a class name */
-    RETVAL = newSV(0);
-    pdl *n = pdl_pdlnew();
-    if (!n) pdl_pdl_barf("Error making null pdl");
-    pdl_SetSV_PDL(RETVAL,n);   /* set a null PDL to this SV * */
-    RETVAL = sv_bless(RETVAL, bless_stash); /* bless appropriately  */
-    /* set the datasv to what was supplied */
-    n->datasv = (void*)datasv_pointer;
-    SvREFCNT_inc((SV*)(datasv_pointer));
-    n->data = SvPV_nolen((SV*)datasv_pointer);
-    n->nbytes = SvCUR((SV*)datasv_pointer);
-    n->state |= PDL_ALLOCATED;
-  OUTPUT:
-    RETVAL
+  IV offset
+CODE:
+  if (offset < 0)
+    pdl_pdl_barf("Tried to new_around_datasv with negative offset=%" IVdf, offset);
+  STRLEN sv_len = SvCUR((SV*)datasv_pointer);
+  if (offset >= sv_len)
+    pdl_pdl_barf("Tried to new_around_datasv with offset=%" IVdf " >= %zd", offset, sv_len);
+  HV *bless_stash = SvROK(class)
+    ? SvSTASH(SvRV(class)) /* a reference to a class */
+    : gv_stashsv(class, 0); /* a class name */
+  pdl *n = pdl_pdlnew();
+  if (!n) pdl_pdl_barf("Error making null pdl");
+  RETVAL = newSV(0);
+  pdl_SetSV_PDL(RETVAL,n);   /* set a null PDL to this SV * */
+  RETVAL = sv_bless(RETVAL, bless_stash); /* bless appropriately  */
+  /* set the datasv to what was supplied */
+  n->datasv = (void*)datasv_pointer;
+  SvREFCNT_inc((SV*)(datasv_pointer));
+  n->data = SvPV_nolen((SV*)datasv_pointer) + offset;
+  n->nbytes = sv_len - offset;
+  n->state |= PDL_ALLOCATED;
+OUTPUT:
+  RETVAL
 
 SV *
 get_dataref(self)
 	pdl *self
 	CODE:
-	if(self->state & PDL_DONTTOUCHDATA)
-	  croak("Trying to get dataref to magical (mmaped?) pdl");
 	PDLDEBUG_f(printf("get_dataref %p\n", self));
 	pdl_barf_if_error(pdl_make_physical(self));
 	if (!self->datasv) {

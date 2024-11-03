@@ -1,9 +1,10 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli 3.007;
+package Log::Dispatchouli 3.008;
 # ABSTRACT: a simple wrapper around Log::Dispatch
 
-use experimental 'postderef'; # Not dangerous.  Is accepted without changed.
+# Not dangerous.  Accepted without change.
+use experimental 'postderef', 'signatures';
 
 use Carp ();
 use File::Spec ();
@@ -109,7 +110,8 @@ our @CARP_NOT = qw(Log::Dispatchouli::Proxy);
 #pod   to_stderr   - log to STDERR; default: false
 #pod   facility    - to which syslog facility to send logs; default: none
 #pod
-#pod   to_file     - log to PROGRAM_NAME.YYYYMMDD in the log path; default: false
+#pod   to_file     - DEPRECATED: this option will be removed in 2025
+#pod                 log to PROGRAM_NAME.YYYYMMDD in the log path; default: false
 #pod   log_file    - a leaf name for the file to log to with to_file
 #pod   log_path    - path in which to log to file; defaults to DISPATCHOULI_PATH
 #pod                 environment variable or, failing that, to your system's tmpdir
@@ -117,7 +119,10 @@ our @CARP_NOT = qw(Log::Dispatchouli::Proxy);
 #pod   file_format - this optional coderef is passed the message to be logged
 #pod                 and returns the text to write out
 #pod
-#pod   log_pid     - if true, prefix all log entries with the pid; default: true
+#pod   log_pid     - if 1, prefix all log entries with the pid; default: true
+#pod                 can also be a comma-delimited list of log targets where pid is
+#pod                 logged, like "stderr,syslog"; mostly useful for logging pid in
+#pod                 syslog, but not on standard I/O
 #pod   fail_fatal  - a boolean; if true, failure to log is fatal; default: true
 #pod   muted       - a boolean; if true, only fatals are logged; default: false
 #pod   debug       - a boolean; if true, log_debug method is not a no-op
@@ -157,6 +162,8 @@ sub new {
   } => $class;
 
   if ($arg->{to_file}) {
+    Carp::carp("to_file argument for Log::Dispatchouli is deprecated and will be removed in late 2025");
+
     require Log::Dispatch::File;
     my $log_file = File::Spec->catfile(
       ($arg->{log_path} || $self->env_value('PATH') || File::Spec->tmpdir),
@@ -177,10 +184,12 @@ sub new {
         filename  => $log_file,
         mode      => 'append',
         callbacks => do {
+          my $log_pid = $self->log_pid_for('file');
+
           if (my $format = $arg->{file_format}) {
             sub {
               my $message = {@_}->{message};
-              $message = "[$$] $message" if $self->{log_pid};
+              $message = "[$$] $message" if $log_pid;
               $format->($message)
             };
           } else {
@@ -188,7 +197,7 @@ sub new {
             # 2008-11-21
             sub {
               my $message = {@_}->{message};
-              $message = "[$$] $message" if $self->{log_pid};
+              $message = "[$$] $message" if $log_pid;
               (localtime) . " $message\n";
             };
           }
@@ -213,8 +222,9 @@ sub new {
         name      => 'self',
         min_level => 'debug',
         array     => $self->{events},
-        ($self->{log_pid} ? (callbacks => sub { "[$$] ". {@_}->{message} })
-                          : ())
+        ($self->log_pid_for('self')
+          ? (callbacks => sub { "[$$] ". {@_}->{message} })
+          : ())
       ),
     );
   }
@@ -241,21 +251,33 @@ sub new {
   return $self;
 }
 
+sub log_pid_for ($self, $output) {
+  my $log_pid = $self->{log_pid};
+  return undef unless $log_pid;
+
+  return 1 if $log_pid eq 1;
+
+  $self->{log_pid_for} = { map {; $_ => 1 } split /,/, $log_pid };
+
+  return $self->{log_pid_for}{$output} ? 1 : undef;
+}
+
 for my $dest (qw(out err)) {
   my $name = "std$dest";
-  my $code = sub {
-    return if $_[0]->dispatcher->output($name);
+  my $code = sub ($self) {
+    return if $self->dispatcher->output($name);
 
-    my $callback = $_[0]->{log_pid} ? sub { "[$$] " . ({@_}->{message}) . "\n" }
-                                    : sub {           ({@_}->{message}) . "\n" };
+    my $callback = $self->log_pid_for($name)
+                 ? sub { "[$$] " . ({@_}->{message}) . "\n" }
+                 : sub {           ({@_}->{message}) . "\n" };
 
-    $_[0]->dispatcher->add(
-      $_[0]->stdio_dispatcher_class->new(
+    $self->dispatcher->add(
+      $self->stdio_dispatcher_class->new(
         name      => "std$dest",
         min_level => 'debug',
         stderr    => ($dest eq 'err' ? 1 : 0),
         callbacks => $callback,
-        ($_[0]{quiet_fatal}{"std$dest"} ? (max_level => 'info') : ()),
+        ($self->{quiet_fatal}{"std$dest"} ? (max_level => 'info') : ()),
       ),
     );
   };
@@ -271,10 +293,10 @@ sub setup_syslog_output {
   $self->{dispatcher}->add(
     Log::Dispatch::Syslog->new(
       name      => 'syslog',
-      min_level => 'debug',
-      facility  => $arg{facility},
       ident     => $arg{ident},
-      logopt    => ($self->{log_pid} ? 'pid' : ''),
+      facility  => $arg{facility},
+      logopt    => ($self->log_pid_for('syslog') ? 'pid' : ''),
+      min_level => 'debug',
       socket    => $arg{socket} || 'native',
       callbacks => sub {
         ( my $m = {@_}->{message} ) =~ s/\n/<LF>/g;
@@ -866,7 +888,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.007
+version 3.008
 
 =head1 SYNOPSIS
 
@@ -928,7 +950,8 @@ Valid arguments are:
   to_stderr   - log to STDERR; default: false
   facility    - to which syslog facility to send logs; default: none
 
-  to_file     - log to PROGRAM_NAME.YYYYMMDD in the log path; default: false
+  to_file     - DEPRECATED: this option will be removed in 2025
+                log to PROGRAM_NAME.YYYYMMDD in the log path; default: false
   log_file    - a leaf name for the file to log to with to_file
   log_path    - path in which to log to file; defaults to DISPATCHOULI_PATH
                 environment variable or, failing that, to your system's tmpdir
@@ -936,7 +959,10 @@ Valid arguments are:
   file_format - this optional coderef is passed the message to be logged
                 and returns the text to write out
 
-  log_pid     - if true, prefix all log entries with the pid; default: true
+  log_pid     - if 1, prefix all log entries with the pid; default: true
+                can also be a comma-delimited list of log targets where pid is
+                logged, like "stderr,syslog"; mostly useful for logging pid in
+                syslog, but not on standard I/O
   fail_fatal  - a boolean; if true, failure to log is fatal; default: true
   muted       - a boolean; if true, only fatals are logged; default: false
   debug       - a boolean; if true, log_debug method is not a no-op
@@ -1381,7 +1407,7 @@ Sawyer X <xsawyerx@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Ricardo SIGNES.
+This software is copyright (c) 2024 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

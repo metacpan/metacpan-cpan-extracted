@@ -1,3 +1,10 @@
+0.17 2024-11-02T18:32:52+01:00
+ - Add another publication place cleanup use case.
+ - Add another edition number cleanup use case.
+ - Add processing of collective ISBN.
+ - Implement collective to clean_cover().
+ - Rewrite Kramerius of MZK to Kramerius of CDL.
+
 0.16 2024-09-19T10:23:56+02:00
  - Add support for new use case of number of pages.
  - Fix error in case of not detected publishing house.

@@ -3569,6 +3569,63 @@ By using L<PDL::Slices/xchg> etc. it is possible to use I<any> dimension.
 EOF
 );
 
+pp_def('approx_artol',
+  Pars => 'got(); expected(); sbyte [o] result()',
+  OtherPars => 'double atol; double rtol',
+  OtherParsDefaults => { atol => 1e-6, rtol => 0 },
+  GenericTypes => [ppdefs_all],
+  ArgOrder => 1,
+  HandleBad => 1,
+  Code => <<'EOF',
+double atol2 = $COMP(atol)*$COMP(atol), rtol2 = $COMP(rtol)*$COMP(rtol);
+char got_badflag = !!$PDLSTATEISBAD(got), exp_badflag = !!$PDLSTATEISBAD(expected);
+broadcastloop %{
+$GENERIC() expctd = $expected();
+if (PDL_ISNAN_$PPSYM()($got()) && PDL_ISNAN_$PPSYM()(expctd)) { $result() = 1; continue; }
+if (PDL_ISNAN_$PPSYM()($got()) || PDL_ISNAN_$PPSYM()(expctd)) { $result() = 0; continue; }
+PDL_IF_BAD(
+  if ((got_badflag && $ISBAD(got())) && (exp_badflag && $ISBADVAR(expctd,expected))) { $result() = 1; continue; }
+  if ((got_badflag && $ISBAD(got())) || (exp_badflag && $ISBADVAR(expctd,expected))) { $result() = 0; continue; }
+,)
+if ($got() == expctd) { $result() = 1; continue; }
+$GENERIC() diff = $got() - expctd;
+double abs_diff2 = PDL_IF_GENTYPE_REAL(
+  diff * diff,
+  (creall(diff) * creall(diff)) + (cimagl(diff) * cimagl(diff))
+);
+if (abs_diff2 <= atol2)                 { $result() = 1; continue; }
+double rel_diff2 = rtol2 * PDL_IF_GENTYPE_REAL(
+  expctd * expctd,
+  (creall(expctd) * creall(expctd)) + (cimagl(expctd) * cimagl(expctd))
+);
+if (abs_diff2 <= rel_diff2)             { $result() = 1; continue; }
+$result() = 0;
+%}
+EOF
+  Doc => <<'EOF',
+=for ref
+
+Returns C<sbyte> mask whether C<< abs($got()-$expected())> <= >> either
+absolute or relative (C<rtol> * C<$expected()>) tolerances.
+
+Relative tolerance defaults to zero, and absolute tolerance defaults to
+C<1e-6>, for compatibility with L<PDL::Core/approx>.
+
+Works with complex numbers, and to avoid expensive C<sqrt>ing uses the
+squares of the input quantities and differences. Bear this in mind for
+numbers outside the range (for C<double>) of about C<1e-154..1e154>.
+
+Handles C<NaN>s by showing them approximately equal (i.e. true in the
+output) if both values are C<NaN>, and not otherwise.
+
+Adapted from code by Edward Baudrez, test changed from C<< < >> to C<< <= >>.
+EOF
+  BadDoc => <<'EOF',
+Handles bad values similarly to C<NaN>s, above. This includes if only
+one of the two input ndarrays has their badflag true.
+EOF
+);
+
 pp_add_exported("", 'where');
 pp_addpm(<<'EOD');
 =head2 where

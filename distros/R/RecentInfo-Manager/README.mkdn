@@ -1,0 +1,56 @@
+
+[![Windows](https://github.com/Corion/RecentInfo-Manager/workflows/windows/badge.svg)](https://github.com/Corion/RecentInfo-Manager/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/RecentInfo-Manager/workflows/macos/badge.svg)](https://github.com/Corion/RecentInfo-Manager/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/RecentInfo-Manager/workflows/linux/badge.svg)](https://github.com/Corion/RecentInfo-Manager/actions?query=workflow%3Alinux)
+
+# SYNOPSIS
+
+    use RecentInfo::Manager 'add_recent_file';
+    add_recent_file('output.pdf');
+
+    # oo interface
+    my $mgr = RecentInfo::Manager->new();
+    $mgr->load();
+    $mgr->add('output.pdf');
+    $mgr->save;
+
+# FUNCTIONS
+
+## `add_recent_file $filename, $file_options`
+
+    add_recent_file( 'output.pdf', { mime_type => 'application/pdf' } );
+
+Adds `output.pdf` as a recently used (or created) file for the current
+application. If the MIME filetype is not given, it is inferred from
+the filename.
+
+## `remove_recent_file $filename`
+
+    remove_recent_file( 'oops.xls' );
+
+Removes the given file from the list of recently accessed files.
+
+## `recent_files $options`
+
+    my @entries = recent_files( { mime_type => 'application/pdf' });
+
+Returns a list of filenames of the recently accessed files.
+In the options hash, you can pass in the following keys:
+
+- **mime\_type** - search for the given MIME type. `*` is a wildcard.
+- **app** - search for the given application name.
+
+# METHODS
+
+The module also acts as a factory for OS-specific implementations.
+
+## `->new`
+
+    my $mgr = RecentInfo::Manager->new();
+    $mgr->load();
+    $mgr->add('output.pdf');
+    $mgr->save;
+
+# SEE ALSO
+
+[Mac::RecentDocuments](https://metacpan.org/pod/Mac%3A%3ARecentDocuments) - recent documents for old MacOS

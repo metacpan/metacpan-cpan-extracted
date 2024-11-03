@@ -1,0 +1,6 @@
+v0.06  2024-11-02Z
+    - Added methods: eq, cmp, as
+    - Feature: Added Data::Identifier::Interface::Known
+    - Updated list of well known
+    - Improved support for Data::URIID
+    - Improved documentation

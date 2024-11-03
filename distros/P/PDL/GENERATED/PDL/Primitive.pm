@@ -1,9 +1,9 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from primitive.pd! Don't modify!
 #
 package PDL::Primitive;
 
-our @EXPORT_OK = qw(inner outer matmult innerwt inner2 inner2d inner2t crossp norm indadd conv1d in uniq uniqind uniqvec hclip lclip clip clip wtstat statsover stats histogram whistogram histogram2d whistogram2d fibonacci append axisvalues cmpvec eqvec enumvec enumvecg vsearchvec unionvec intersectvec setdiffvec union_sorted intersect_sorted setdiff_sorted vcos srandom random randsym grandom vsearch vsearch_sample vsearch_insert_leftmost vsearch_insert_rightmost vsearch_match vsearch_bin_inclusive vsearch_bin_exclusive interpolate interpol interpND one2nd which which_both whichover where where_both whereND whichND setops intersect );
+our @EXPORT_OK = qw(inner outer matmult innerwt inner2 inner2d inner2t crossp norm indadd conv1d in uniq uniqind uniqvec hclip lclip clip clip wtstat statsover stats histogram whistogram histogram2d whistogram2d fibonacci append axisvalues cmpvec eqvec enumvec enumvecg vsearchvec unionvec intersectvec setdiffvec union_sorted intersect_sorted setdiff_sorted vcos srandom random randsym grandom vsearch vsearch_sample vsearch_insert_leftmost vsearch_insert_rightmost vsearch_match vsearch_bin_inclusive vsearch_bin_exclusive interpolate interpol interpND one2nd which which_both whichover approx_artol where where_both whereND whichND setops intersect );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -3392,7 +3392,47 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 3573 "primitive.pd"
+
+=head2 approx_artol
+
+=for sig
+
+  Signature: (got(); expected(); sbyte [o] result(); double atol; double rtol)
+
+=for ref
+
+Returns C<sbyte> mask whether C<< abs($got()-$expected())> <= >> either
+absolute or relative (C<rtol> * C<$expected()>) tolerances.
+
+Relative tolerance defaults to zero, and absolute tolerance defaults to
+C<1e-6>, for compatibility with L<PDL::Core/approx>.
+
+Works with complex numbers, and to avoid expensive C<sqrt>ing uses the
+squares of the input quantities and differences. Bear this in mind for
+numbers outside the range (for C<double>) of about C<1e-154..1e154>.
+
+Handles C<NaN>s by showing them approximately equal (i.e. true in the
+output) if both values are C<NaN>, and not otherwise.
+
+Adapted from code by Edward Baudrez, test changed from C<< < >> to C<< <= >>.
+
+=for bad
+
+Handles bad values similarly to C<NaN>s, above. This includes if only
+one of the two input ndarrays has their badflag true.
+
+=cut
+
+
+
+
+*approx_artol = \&PDL::approx_artol;
+
+
+
+
+
+#line 3629 "primitive.pd"
 
 =head2 where
 
@@ -3446,7 +3486,7 @@ sub PDL::where {
 }
 *where = \&PDL::where;
 
-#line 3629 "primitive.pd"
+#line 3685 "primitive.pd"
 
 =head2 where_both
 
@@ -3483,7 +3523,7 @@ sub PDL::where_both {
 }
 *where_both = \&PDL::where_both;
 
-#line 3667 "primitive.pd"
+#line 3723 "primitive.pd"
 
 =head2 whereND
 
@@ -3566,7 +3606,7 @@ sub PDL::whereND :lvalue {
 }
 *whereND = \&PDL::whereND;
 
-#line 3752 "primitive.pd"
+#line 3808 "primitive.pd"
 
 =head2 whichND
 
@@ -3669,7 +3709,7 @@ sub PDL::whichND {
   return $ind;
 }
 
-#line 3860 "primitive.pd"
+#line 3916 "primitive.pd"
 
 =head2 setops
 
@@ -3850,7 +3890,7 @@ sub PDL::setops {
 
 }
 
-#line 4043 "primitive.pd"
+#line 4099 "primitive.pd"
 
 =head2 intersect
 
@@ -3886,7 +3926,7 @@ sub PDL::intersect {
 
 }
 
-#line 4079 "primitive.pd"
+#line 4135 "primitive.pd"
 
 =head1 AUTHOR
 
@@ -3903,7 +3943,7 @@ the copyright notice should be included in the file.
 Updated for CPAN viewing compatibility by David Mertens.
 
 =cut
-#line 3907 "Primitive.pm"
+#line 3947 "Primitive.pm"
 
 # Exit with OK status
 

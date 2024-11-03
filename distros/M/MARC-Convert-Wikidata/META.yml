@@ -36,7 +36,7 @@ requires:
   Error::Pure: 0
   MARC::Convert::Wikidata::Object: 0.05
   MARC::Convert::Wikidata::Object::ExternalId: 0
-  MARC::Convert::Wikidata::Object::ISBN: 0
+  MARC::Convert::Wikidata::Object::ISBN: 0.07
   MARC::Convert::Wikidata::Object::Kramerius: 0
   MARC::Convert::Wikidata::Object::People: 0
   MARC::Convert::Wikidata::Object::Publisher: 0
@@ -54,4 +54,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/MARC-Convert-Wikidata
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Convert-Wikidata
-version: '0.16'
+version: '0.17'

@@ -15,7 +15,7 @@ requires "URI" => "1.5";
 requires "URI::Escape" => "3.31";
 requires "UUID::Tiny" => "1.04";
 requires "perl" => "v5.16.0";
-recommends "Data::Identifier" => "v0.2.0";
+recommends "Data::Identifier" => "v0.6.0";
 
 on 'test' => sub {
   requires "Test::Exception" => "0.30";

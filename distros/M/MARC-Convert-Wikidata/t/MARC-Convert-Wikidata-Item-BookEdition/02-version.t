@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($MARC::Convert::Wikidata::Item::BookEdition::VERSION, 0.16, 'Version.');
+is($MARC::Convert::Wikidata::Item::BookEdition::VERSION, 0.17, 'Version.');

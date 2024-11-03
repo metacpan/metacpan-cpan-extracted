@@ -9,6 +9,7 @@ build_requires:
   File::Path: '0'
   IPC::Cmd: '0.72'
   Pod::Select: '0'
+  Test::Deep: '0'
   Test::Exception: '0'
   Test::Warn: '0'
 configure_requires:
@@ -30,9 +31,9 @@ no_index:
     - t
     - inc
   file:
-    - Doc/scantree.pl
+    - Basic/Doc/scantree.pl
 recommends:
-  Alien::proj: '1.27'
+  Alien::proj: '1.29'
   ExtUtils::F77: '1.26'
   Inline: '0.83'
   Inline::C: '0.62'
@@ -41,6 +42,7 @@ recommends:
   PGPLOT: '2.29'
   Term::ReadKey: '2.34'
 requires:
+  Alien::proj: '1.29'
   Data::Dumper: '2.121'
   File::Map: '0.57'
   File::Which: '0'
@@ -52,11 +54,11 @@ requires:
   Scalar::Util: '0'
   Storable: '1.03'
   Text::Balanced: '2.05'
-  perl: '5.010'
+  perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#pdl
   bugtracker: https://github.com/PDLPorters/pdl/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/pdl.git
-version: '2.093'
+version: '2.094'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

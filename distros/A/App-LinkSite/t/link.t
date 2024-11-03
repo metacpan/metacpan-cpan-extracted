@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More;
 use App::LinkSite::Link;
 
 # Test the creation of an App::LinkSite::Link object
@@ -23,3 +23,5 @@ is($link->link, 'http://example.com', 'link method returns "http://example.com"'
 
 # Test the is_new method
 is($link->is_new, 1, 'is_new method returns 1');
+
+done_testing;

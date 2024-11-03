@@ -14,7 +14,7 @@ use parent qw(Digest::base);
 
 use Carp;
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 
 # Private constructor:
@@ -62,7 +62,7 @@ Data::URIID::Digest - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 
@@ -71,6 +71,10 @@ version v0.09
     my $extractor = Data::URIID->new;
     my $result = $extractor->lookup( $URI );
     my $digest = $result->digest('sha-3-512', as => 'Digest');
+
+This is an internal module. It is used to emulate an object created by L<Digest>.
+
+This module inherits from L<Digest::base>.
 
 =head1 AUTHOR
 

@@ -1,5 +1,5 @@
 package Crypt::HSM::Provider;
-$Crypt::HSM::Provider::VERSION = '0.017';
+$Crypt::HSM::Provider::VERSION = '0.018';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ Crypt::HSM::Provider - A PKCS11 provider
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -45,6 +45,10 @@ This returns a L<Crypt::HSM::Slot|Crypt::HSM::Slot> for the slot with the given 
 =head2 info()
 
 This returns a hash with information about the HSM.
+
+=head2 wait_for_event(@flags)
+
+This will wait until an event happens (e.g. a token becomes available in a slot). It currently supports only one flag C<'dont-block'>. It returns a L<Crypt::HSM::Slot|Crypt::HSM::Slot>, or if C<'dont-block'> is passed and no event is pending it returns C<undef>.
 
 =head1 AUTHOR
 

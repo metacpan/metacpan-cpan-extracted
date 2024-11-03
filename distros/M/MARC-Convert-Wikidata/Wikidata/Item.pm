@@ -26,7 +26,7 @@ Readonly::Hash our %EXT_ID_MAPPING => (
 	'lccn' => 'P243',
 );
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 # Constructor.
 sub new {
@@ -247,6 +247,12 @@ sub wikidata_isbn_10 {
 		if ($isbn->type != 10) {
 			next;
 		}
+
+		# Skip collective ISBNs.
+		if ($isbn->collective) {
+			next;
+		}
+
 		my $publisher = $self->_isbn_publisher($isbn);
 		my $cover_qid = $self->_isbn_cover($isbn);
 		push @ret, Wikibase::Datatype::Statement->new(
@@ -298,6 +304,12 @@ sub wikidata_isbn_13 {
 		if ($isbn->type != 13) {
 			next;
 		}
+
+		# Skip collective ISBNs.
+		if ($isbn->collective) {
+			next;
+		}
+
 		my $publisher = $self->_isbn_publisher($isbn);
 		my $cover_qid = $self->_isbn_cover($isbn);
 		push @ret, Wikibase::Datatype::Statement->new(
@@ -425,6 +437,8 @@ sub wikidata_krameriuses {
 
 	my @krameriuses;
 	foreach my $k (@{$self->{'transform_object'}->krameriuses}) {
+
+		# Rewriting to Czech Digital Library
 		if ($k->kramerius_id eq 'mzk') {
 			push @krameriuses, Wikibase::Datatype::Statement->new(
 				'references' => [$self->wikidata_reference],
@@ -433,7 +447,7 @@ sub wikidata_krameriuses {
 					'datavalue' => Wikibase::Datatype::Value::String->new(
 						'value' => $k->object_id,
 					),
-					'property' => 'P8752',
+					'property' => 'P13032',
 				),
 			),
 		} else {
