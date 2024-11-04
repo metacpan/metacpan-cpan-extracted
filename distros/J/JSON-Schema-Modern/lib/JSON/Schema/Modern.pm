@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.592-2-g4504fd72
+package JSON::Schema::Modern; # git description: v0.593-16-gd92d7960
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.593';
+our $VERSION = '0.594';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -21,13 +21,12 @@ use Mojo::JSON ();  # for JSON_XS, MOJO_NO_JSON_XS environment variables
 use Carp qw(croak carp);
 use List::Util 1.55 qw(pairs first uniqint pairmap uniq any);
 use Ref::Util 0.100 qw(is_ref is_plain_hashref);
-use Scalar::Util 'refaddr';
+use builtin::compat qw(refaddr load_module);
 use Mojo::URL;
 use Safe::Isa;
 use Path::Tiny;
 use Storable 'dclone';
 use File::ShareDir 'dist_dir';
-use Module::Runtime qw(use_module require_module);
 use MooX::TypeTiny 0.002002;
 use Types::Standard 1.016003 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional Slurpy ArrayRef Undef ClassName Tuple Map);
 use Digest::MD5 'md5';
@@ -821,7 +820,7 @@ has _vocabulary_classes => (
   default => sub {
     +{
       map { my $class = $_; pairmap { $a => [ $b, $class ] } $class->vocabulary }
-        map use_module('JSON::Schema::Modern::Vocabulary::'.$_),
+        map load_module('JSON::Schema::Modern::Vocabulary::'.$_),
           qw(Core Applicator Validation FormatAssertion FormatAnnotation Content MetaData Unevaluated)
     }
   },
@@ -832,7 +831,7 @@ sub _get_vocabulary_class { $_[0]->__vocabulary_classes->{$_[1]} }
 sub add_vocabulary ($self, $classname) {
   return if grep $_->[1] eq $classname, values $self->__vocabulary_classes->%*;
 
-  $vocabulary_class_type->(use_module($classname));
+  $vocabulary_class_type->(load_module($classname));
 
   # uri => version, uri => version
   foreach my $pair (pairs $classname->vocabulary) {
@@ -855,7 +854,7 @@ has _metaschema_vocabulary_classes => (
   reader => '__metaschema_vocabulary_classes',
   lazy => 1,
   default => sub {
-    my @modules = map use_module('JSON::Schema::Modern::Vocabulary::'.$_),
+    my @modules = map load_module('JSON::Schema::Modern::Vocabulary::'.$_),
       qw(Core Validation FormatAnnotation Applicator Content MetaData Unevaluated);
     +{
       'https://json-schema.org/draft/2020-12/schema' => [ 'draft2020-12', [ @modules ] ],
@@ -1215,7 +1214,7 @@ sub THAW ($class, $serializer, $data) {
   my $self = bless($data, $class);
 
   # load all vocabulary classes, both those used by loaded schemas, as well as all the core modules
-  require_module($_)
+  load_module($_)
     foreach uniq(
       (map $_->{vocabularies}->@*, $self->_canonical_resources),
       (map $_->[1], values $self->__vocabulary_classes->%*));
@@ -1239,7 +1238,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.593
+version 0.594
 
 =head1 SYNOPSIS
 
@@ -1866,14 +1865,13 @@ See also L<OpenAPI::Modern/CACHING>.
 =head2 Types
 
 Perl is a more loosely-typed language than JSON. This module delves into a value's internal
-representation in an attempt to derive the true "intended" type of the value. However, if a value is
-used in another context (for example, a numeric value is concatenated into a string, or a numeric
-string is used in an arithmetic operation), additional flags can be added onto the variable causing
-it to resemble the other type. This should not be an issue if data validation is occurring
+representation in an attempt to derive the true "intended" type of the value.
+This should not be an issue if data validation is occurring
 immediately after decoding a JSON payload, or if the JSON string itself is passed to this module.
-If you are still having difficulties, make sure you are using Perl's fastest and most trusted and
+If you are having difficulties, make sure you are using Perl's fastest and most trusted and
 reliable JSON decoder, L<Cpanel::JSON::XS>.
-Other JSON decoders are known to produce data with incorrect data types.
+Other JSON decoders are known to produce data with incorrect data types,
+and data from other sources may also be problematic.
 
 For more information, see L<Cpanel::JSON::XS/MAPPING>.
 

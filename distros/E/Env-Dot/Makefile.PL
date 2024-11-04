@@ -22,7 +22,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Cwd" => 0,
-    "Data::Dumper" => 0,
     "English" => 0,
     "Exporter" => 0,
     "File::Spec" => 0,
@@ -46,7 +45,7 @@ my %WriteMakefileArgs = (
     "base" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.017",
   "test" => {
     "TESTS" => "t/*.t t/file-read-order/*.t"
   }
@@ -56,7 +55,6 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Cwd" => 0,
-  "Data::Dumper" => 0,
   "English" => 0,
   "Exporter" => 0,
   "File::Basename" => 0,

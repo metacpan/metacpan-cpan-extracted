@@ -16,9 +16,9 @@ use POSIX qw(strftime);
 use String::ShellQuote;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-16'; # DATE
+our $DATE = '2024-10-22'; # DATE
 our $DIST = 'Git-Bunch'; # DIST
-our $VERSION = '0.630'; # VERSION
+our $VERSION = '0.631'; # VERSION
 
 our @EXPORT_OK = qw(check_bunch sync_bunch exec_bunch);
 
@@ -27,7 +27,7 @@ our %SPEC;
 $SPEC{":package"} = {
     v => 1.1,
     summary => 'Manage gitbunch directory (directory which contain git repos)',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 A _gitbunch_ or _bunch_ directory is just a term I coined to refer to a
 directory which contains, well, a bunch of git repositories. It can also contain
@@ -58,14 +58,14 @@ dot-dirs inside the bunch.
 
 See also <prog:rsybak>, which I wrote to backup everything else.
 
-_
+MARKDOWN
     links => [
         {
             url => 'prog:rsybak',
         },
         {
             url => 'http://joeyh.name/code/mr/',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 You probably want to use this instead. _mr_ supports other control version
 software aside from git, doesn't restrict you to put all your repos in one
@@ -78,7 +78,7 @@ uncommitted changes; 2) synchronize (pull/push) to other locations. I put all my
 data in one big gitbunch directory; I find it simpler. gitbunch works for me and
 I use it daily.
 
-_
+MARKDOWN
         },
     ],
 };
@@ -118,12 +118,12 @@ our %common_args = (
     exclude_non_git_dirs => {
         summary      => 'Exclude non-git dirs from processing',
         schema       => ['bool'],
-        description  => <<'_',
+        description  => <<'MARKDOWN',
 
 This only applies to and `sync_bunch` operations. Operations like `check_bunch`
 and `exec_bunch` already ignore these and only operate on git repos.
 
-_
+MARKDOWN
         cmdline_aliases => {
             include_non_git_dirs => {
                 summary => 'Alias for --no-exclude-non-git-dirs',
@@ -136,12 +136,12 @@ _
     exclude_files    => {
         summary      => 'Exclude files from processing',
         schema       => ['bool'],
-    description      => <<'_',
+    description      => <<'MARKDOWN',
 
 This only applies to `sync_bunch` operations. Operations like `check_bunch` and
 `exec_bunch` already ignore these and only operate on git repos.
 
-_
+MARKDOWN
         cmdline_aliases => {
             include_files => {
                 summary => 'Alias for --no-exclude-files',
@@ -158,13 +158,13 @@ _
     },
     min_repo_access_time => {
         summary => 'Limit to repos that are accessed (mtime, committed, status-ed, pushed) recently',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 This can significantly reduce the time to process the bunch if you are only
 interested in recent repos (which is most of the time unless you are doing a
 full check/sync).
 
-_
+MARKDOWN
         schema => ['date*', 'x.perl.coerce_rules' => ['!From_float::epoch', 'From_float::epoch_always', 'From_str::natural']],
         cmdline_aliases => {
             recent => {is_flag=>1, summary=>'Shortcut for --min-repo-access-time="2 weeks ago"', code=>sub { $_[0]{min_repo_access_time} = time() - 14*86400} },
@@ -419,14 +419,14 @@ $SPEC{check_bunch} = {
     v             => 1.1,
     summary       =>
         'Check status of git repositories inside gitbunch directory',
-    description   => <<'_',
+    description   => <<'MARKDOWN',
 
 Will perform a 'git status' for each git repositories inside the bunch and
 report which repositories are clean/unclean.
 
 Will die if can't chdir into bunch or git repository.
 
-_
+MARKDOWN
     args          => {
         %common_args,
     },
@@ -538,11 +538,11 @@ $SPEC{list_bunch_contents} = {
     v             => 1.1,
     summary       =>
         'List contents inside gitbunch directory',
-    description   => <<'_',
+    description   => <<'MARKDOWN',
 
 Will list each repo or non-repo dir/file.
 
-_
+MARKDOWN
     args          => {
         %common_args,
         %sort_args,
@@ -758,7 +758,7 @@ $SPEC{sync_bunch} = {
     v             => 1.1,
     summary       =>
         'Synchronize bunch to another bunch',
-    description   => <<'_',
+    description   => <<'MARKDOWN',
 
 For each git repository in the bunch, will perform a 'git pull/push' for each
 branch. If repository in destination doesn't exist, it will be rsync-ed first
@@ -771,7 +771,7 @@ file or subdirectory) between source and target is checked first. If target
 contains the newer newest mtime, rsync-ing for that non-repo file/dir will be
 aborted. Note: you can use `--skip-mtime-check` option to skip this check.
 
-_
+MARKDOWN
     args          => {
         %common_args,
         %target_args,
@@ -784,30 +784,30 @@ _
             summary      => 'Whether or not, when rsync-ing from source, '.
                 'we use -a (= -rlptgoD) or -rlptD (-a minus -go)',
             schema       => ['bool' => default => 0],
-            description  => <<'_',
+            description  => <<'MARKDOWN',
 
 Sometimes using -a results in failure to preserve permission modes on
 sshfs-mounted filesystem, while -rlptD succeeds, so by default we don't maintain
 ownership. If you need to maintain ownership (e.g. you run as root and the repos
 are not owned by root), turn this option on.
 
-_
+MARKDOWN
         },
         rsync_del => {
             summary => 'Whether to use --del rsync option',
             schema => 'bool',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 When rsync-ing non-repos, by default `--del` option is not used for more safety
 because rsync is a one-way action. To add rsync `--del` option, enable this
 
-_
+MARKDOWN
         },
         skip_mtime_check => {
             summary => 'Whether or not, when rsync-ing non-repos, '.
                 'we check mtime first',
             schema => ['bool'],
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 By default when we rsync a non-repo file/dir from source to target and both
 exist, to protect wrong direction of sync-ing we find the newest mtime in source
@@ -816,14 +816,14 @@ with the newest mtime). If target contains the newer mtime, the sync for that
 non-repo file/dir is aborted. If you want to force the rsync anyway, use this
 option.
 
-_
+MARKDOWN
             cmdline_aliases => {M=>{}},
         },
         create_bare_target => {
             summary      => 'Whether to create bare git repo '.
                 'when target does not exist',
             schema       => ['bool'],
-            description  => <<'_',
+            description  => <<'MARKDOWN',
 
 When target repo does not exist, gitbunch can either copy the source repo using
 `rsync` (the default, if this setting is undefined), or it can create target
@@ -838,7 +838,7 @@ space-efficient.
 
 Non-repos will still be copied/rsync-ed.
 
-_
+MARKDOWN
             cmdline_aliases => {
                 # old name, deprecated since v0.29, remove in later releases
                 use_bare => {},
@@ -847,7 +847,7 @@ _
         backup => {
             summary     => 'Whether doing backup to target',
             schema      => ['bool'],
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 This setting lets you express that you want to perform synchronizing to a backup
 target, and that you do not do work on the target. Thus, you do not care about
@@ -858,7 +858,7 @@ untracked files/dirs) and then `git checkout .` (to discard all uncommitted
 changes). This setting will also implicitly turn on `create_bare` setting
 (unless that setting has been explicitly enabled/disabled).
 
-_
+MARKDOWN
         },
         action => {
             schema => ['str*', in=>[
@@ -1102,12 +1102,12 @@ $SPEC{exec_bunch} = {
     v             => 1.1,
     summary       =>
         'Execute a command for each repo in the bunch',
-    description   => <<'_',
+    description   => <<'MARKDOWN',
 
 For each git repository in the bunch, will chdir to it and execute specified
 command.
 
-_
+MARKDOWN
     args          => {
         %common_args,
         command   => {
@@ -1142,16 +1142,28 @@ sub exec_bunch {
     my @entries = _list(\%args);
     @entries = _sort_entries_by_recent(@entries) if $args{min_repo_access_time};
     #log_trace("entries: %s", \@entries);
-  REPO:
+
+    my @filtered_entries;
     for my $e (@entries) {
-        next REPO if _skip_process_repo($e, \%args, ".");
+        next if _skip_process_repo($e, \%args, ".");
+        push @filtered_entries, $e;
+    }
+
+  REPO:
+    for my $e (@filtered_entries) {
         my $repo = $e->{name};
         $CWD = $i++ ? "../$repo" : $repo;
         if ($args{-dry_run}) {
-            log_info("[DRY-RUN] Executing command (%s, %s) on $repo ...", $command_opts, $command);
+            log_info("[DRY-RUN] [%d/%d] Executing command (%s, %s) on $repo ...",
+                     $i,
+                     scalar(@filtered_entries),
+                     $command_opts, $command);
             next REPO;
         }
-        log_info("Executing command (%s, %s) on $repo ...", $command_opts, $command);
+        log_info("[%d/%d] Executing command (%s, %s) on $repo ...",
+                 $i,
+                 scalar(@filtered_entries),
+                 $command_opts, $command);
         system($command_opts, $command);
         $exit = $? >> 8;
         if ($exit) {
@@ -1172,7 +1184,7 @@ sub exec_bunch {
 $SPEC{commit_bunch} = {
     v => 1.1,
     summary => 'Commit all uncommitted repos in the bunch',
-    description   => <<'_',
+    description   => <<'MARKDOWN',
 
 For each git repository in the bunch, will first check whether the repo is
 "uncommitted" state, which means either has the status of "Needs commit" or "Has
@@ -1183,7 +1195,7 @@ flag is not specified, will just show the status of these repos for you. If the
 specified in `--message` (or just "Committed using 'gitbunch commit'" as the
 default message).
 
-_
+MARKDOWN
     args          => {
         %common_args,
         message => {
@@ -1228,6 +1240,7 @@ sub commit_bunch {
             next unless $repo_res->[1] =~ /^(Needs commit|Has untracked files)$/;
             push @repos, $repo_name;
         }
+        log_info "Numbers of repo to commit: %d", scalar(@repos);
 
         my $cmd = $args{-dry_run} ?
             "pwd; git status; hr" :
@@ -1253,7 +1266,7 @@ Git::Bunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.630 of Git::Bunch (from Perl distribution Git-Bunch), released on 2023-07-16.
+This document describes version 0.631 of Git::Bunch (from Perl distribution Git-Bunch), released on 2024-10-22.
 
 =head1 SYNOPSIS
 
@@ -1907,7 +1920,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

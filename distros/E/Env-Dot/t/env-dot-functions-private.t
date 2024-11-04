@@ -10,7 +10,7 @@ use FileHandle ();
 use File::Path qw( make_path );
 use File::Spec ();
 use File::Temp ();
-use Cwd        qw( getcwd );
+use Cwd        qw( getcwd abs_path );
 
 use Env::Dot::Functions ();
 
@@ -23,7 +23,7 @@ sub create_case_one {
         CLEANUP  => 1,
         DIR      => File::Spec->tmpdir,
     );
-    my $dir_path = $dir->{'DIRNAME'};
+    my $dir_path = abs_path( $dir->dirname );
     note "Created temp dir: $dir_path";
     make_path( File::Spec->catdir( $dir_path, 'root', 'dir', 'subdir' ) );
 

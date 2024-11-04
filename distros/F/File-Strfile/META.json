@@ -48,6 +48,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/1-1sam/File-Strfile/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/1-1sam/File-Strfile.git",
+         "web" : "https://codeberg.org/1-1sam/File-Strfile"
+      }
+   },
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

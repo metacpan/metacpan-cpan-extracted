@@ -1,11 +1,12 @@
 package Mojo::Leds::Page;
-$Mojo::Leds::Page::VERSION = '1.15';
+$Mojo::Leds::Page::VERSION = '1.16';
 use 5.014;    # because s///r usage
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Util qw(class_to_path);
 
 sub route {
     my $s = shift;
+    my $respond_to_opt = shift || {};
 
     my $format = $s->accepts;
     $format = $format->[0] || 'html' if ( ref($format) eq 'ARRAY' );
@@ -22,7 +23,8 @@ sub route {
         json => sub { $s->render( json => $s->render_json ) },
         css  => sub { $s->render_static_file },
         js   => sub { $s->render_static_file },
-        any  => { text => '', status => 204 }
+        any  => { text => '', status => 204 },
+        %$respond_to_opt,
     );
 
 }
@@ -80,17 +82,49 @@ sub render_static_file {
 
 =head1 NAME
 
-Mojo::Leds::Page - Standard page controller for Mojo::Leds
+Mojo::Leds::Page - Controller for handling page routes
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 SYNOPSIS
 
+  use Mojo::Leds::Page;
+
 =head1 DESCRIPTION
 
+This module provides a controller for handling different formats of page routes in a Mojolicious application.
+
+=head2 METHODS
+
+=head3 route
+
+  $s->route($respond_to_opt);
+
+This method handles routing for different formats (html, json, css, js) based on the request. It sets the appropriate format in the stash and responds accordingly.
+
+=over 4
+
+=item *
+
+C<$respond_to_opt> - Optional hash reference for additional respond_to options.
+
+=back
+
 =encoding UTF-8
+
+=head1 NAME
+
+Mojo::Leds::Page - Controller for handling page routes
+
+=head1 AUTHOR
+
+Emiliano Bruni <info@ebruni.it>
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
@@ -107,5 +141,6 @@ the same terms as the Perl 5 programming language system itself.
 
 __END__
 
-# ABSTRACT: Standard page controller for Mojo::Leds
+# ABSTRACT: Controller for handling page routes
+
 

@@ -16,7 +16,7 @@
    The problem there is that perl has, in stringifying $nv, rounded it to
    too few significant digits - thereby breaking the equivalence.
 
-   Perl can also present more siginificant digits than are needed. The
+   Perl can also present more significant digits than are needed. The
    following example pertains to perls whose NV type is "double", though
    the same sort of thing occurs with other NV types.
 

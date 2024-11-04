@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.593';
+our $VERSION = '0.594';
 
 use 5.020;
 use Moo;
@@ -23,14 +23,14 @@ use JSON::Schema::Modern::Annotation;
 use JSON::Schema::Modern::Error;
 use JSON::PP ();
 use List::Util 1.50 qw(any uniq all);
-use Scalar::Util qw(refaddr blessed);
+use builtin::compat qw(refaddr blessed);
 use Safe::Isa;
 use namespace::clean;
 
 use overload
   'bool'  => sub { $_[0]->valid },
   '&'     => \&combine,
-  '0+'    => sub { Scalar::Util::refaddr($_[0]) },
+  '0+'    => sub { refaddr($_[0]) },
   '""' => sub { $_[0]->stringify },
   fallback => 1;
 
@@ -263,7 +263,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.593
+version 0.594
 
 =head1 SYNOPSIS
 

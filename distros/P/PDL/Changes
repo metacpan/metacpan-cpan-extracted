@@ -1,7 +1,11 @@
+2.095 2024-11-03
+- add PDL_GENTYPE_IS_{REAL,FLOATREAL,COMPLEX,SIGNED,UNSIGNED}_##ppsym (#502)
+- fix some architectures convert()ing -5 to ushort as 0 (#502) - thanks @sebastic for report
+
 2.094 2024-11-02
 - split Graphics/IIS out to separate PDL::Graphics::IIS distro
 - split Libtmp/Minuit out to separate PDL::Minuit distro
-- Transform::Proj4 add NoPthread as using non-thread-safe API
+- Transform::Proj4 now thread-safe
 - Transform::Proj4 use Alien::proj better for build (#499) - thanks @shawnlaffan
 - perldl/pdl2 now have "x" command that Data::Dumper-s argument
 - Transform::Proj4 objects have correct units

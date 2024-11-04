@@ -1,5 +1,5 @@
 package Mojo::Leds::Plugin::CommonRoutes;
-$Mojo::Leds::Plugin::CommonRoutes::VERSION = '1.15';
+$Mojo::Leds::Plugin::CommonRoutes::VERSION = '1.16';
 # ABSTRACT: Add routes to get app informations (library version, routes,...)
 
 use Mojo::Base 'Mojolicious::Plugin';
@@ -121,7 +121,7 @@ Mojo::Leds::Plugin::CommonRoutes - Add routes to get app informations (library v
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 AUTHOR
 

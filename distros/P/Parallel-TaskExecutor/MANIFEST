@@ -13,5 +13,6 @@ t/110-many-run.t
 t/200-executor-wait.t
 t/300-catch-error.t
 t/400-deletion-order.t
+t/500-signal.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

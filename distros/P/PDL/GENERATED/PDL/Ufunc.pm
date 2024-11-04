@@ -2447,7 +2447,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1228 "ufunc.pd"
+#line 1223 "ufunc.pd"
 
 =head1 AUTHOR
 

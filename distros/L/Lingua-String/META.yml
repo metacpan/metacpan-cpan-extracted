@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::Carp: '0'
+  Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
@@ -25,9 +26,10 @@ requires:
   Carp: '0'
   Exporter: '0'
   HTML::Entities: '0'
+  Scalar::Util: '0'
   perl: '5.006002'
 resources:
   bugtracker: https://github.com/nigelhorne/Lingua-String/issues
   repository: git://github.com/nigelhorne/Lingua-String.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

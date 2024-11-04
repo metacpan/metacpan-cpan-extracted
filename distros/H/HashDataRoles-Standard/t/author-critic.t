@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/HashData/Array.pm','lib/HashData/DBI.pm','lib/HashData/Hash.pm','lib/HashData/Sample/DeNiro.pm','lib/HashData/Test/Source/Array.pm','lib/HashData/Test/Source/DBI.pm','lib/HashData/Test/Source/Hash.pm','lib/HashData/Test/Source/LinesInDATA.pm','lib/HashDataRole/Source/Array.pm','lib/HashDataRole/Source/DBI.pm','lib/HashDataRole/Source/Hash.pm','lib/HashDataRole/Source/LinesInDATA.pm','lib/HashDataRoles/Standard.pm'];
+my $filenames = ['lib/HashData/Array.pm','lib/HashData/DBI.pm','lib/HashData/Hash.pm','lib/HashData/Sample/DeNiro.pm','lib/HashData/Test/Source/Array.pm','lib/HashData/Test/Source/DBI.pm','lib/HashData/Test/Source/Hash.pm','lib/HashData/Test/Source/Iterator.pm','lib/HashData/Test/Source/LinesInDATA.pm','lib/HashDataRole/Source/Array.pm','lib/HashDataRole/Source/DBI.pm','lib/HashDataRole/Source/Hash.pm','lib/HashDataRole/Source/Iterator.pm','lib/HashDataRole/Source/LinesInDATA.pm','lib/HashDataRoles/Standard.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

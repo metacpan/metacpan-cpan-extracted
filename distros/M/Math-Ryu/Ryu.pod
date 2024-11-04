@@ -79,9 +79,9 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
 =head1 FUNCTIONS
 
    $str = nv2s($nv);
-    Treats the argument as an NV, even if it's not.
-    You can check that the argument $nv is an NV by checking that the
-    condition (!ryu_SvPOK($nv) && ryu_SvNOK($nv)) is TRUE.
+    Treats the argument as an NV, even if the arg's NOK flag is unset.
+    You can first check that treating $nv as an NV is appropriate by
+    verifying that is_NV($nv), documented below, returns a TRUE value.
     $str is a string in floating point format that accurately and
     succinctly represents the value held by $nv. When $str is correctly
     assigned to a perl number, that number will be equivalent to $nv.
@@ -133,7 +133,7 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
 
   $bool = is_NV($arg);
     Returns 1 if $arg should be deemed an NV (perl scalar floating
-    value) for the purposes of this module.
+    point value) for the purposes of this module.
     Else returns 0.
     (If is_NV($arg) returns 0, then calling nv2s($arg) might not
     return a useful representation.)
@@ -155,7 +155,9 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
 
   $bool = ryu_SvIOK($sv);
   $bool = ryu_SvNOK($sv);
-    Return 1 if the IOK (respectively, NOK) flag of $sv is set.
+  $bool = ryu_SvPOK($sv);
+  $bool = ryu_SvIOKp($sv);
+    Return 1 if (respectively) the IOK or NOK or POK or IOKp) flag of $sv is set.
     Else return 0.
 
   $nv = s2d($str); # string to double
@@ -232,6 +234,14 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
    enclosed in brackets, just as with pany() and sany() - though again
    this may well be unnecessary if the argument(s) don't include
    an object constructor.
+
+=head1 DISPLAYING INFS AND NANS
+
+  Originally, infinities and nans were displayed by nv2s() as "inf",
+  "-inf", or "nan". And this is still the guaranteed case if
+  $Math::Ryu::PERL_INFNAN is set to 0 (which is its initial value).
+  If the value of $Math::Ryu::PERL_INFNAN is set to a TRUE value, then
+  infinities and nans will be stringified according to perl's rules.
 
 =head1 LICENSE
 

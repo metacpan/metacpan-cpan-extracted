@@ -65,7 +65,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 DynaLoader::bootstrap Math::Ryu $VERSION;
 
@@ -77,7 +77,7 @@ my @tagged = qw(
   n2s
   s2d
   fmtpy fmtpy_pp
-  ryu_lln ryu_SvIOK ryu_SvNOK
+  ryu_lln ryu_SvIOK ryu_SvNOK ryu_SvPOK ryu_SvIOKp
   );
 
 @Math::Ryu::EXPORT = ();
@@ -86,6 +86,22 @@ my @tagged = qw(
 
 my $double_inf = 2 ** 1500;
 my $double_nan = $double_inf / $double_inf;
+
+# If $Math::Ryu::PERL_INFNAN is set to 0, then the string "inf" represents
+# positive infinity, the string "-inf" represents negative infinity, and the
+# string "nan" represents a NaN (not a number).
+# If $Math::Ryu::PERL_INFNAN is set to a true value then the strings will be
+# whatever perl uses to signify positive infinity, negative infinity and nan.
+
+$Math::Ryu::PERL_INFNAN = 0; # Default setting. You can override this
+                             # setting in your code.
+
+$Math::Ryu::pinf = 1e5000;
+$Math::Ryu::ninf = -$Math::Ryu::pinf;
+$Math::Ryu::nanv =  $Math::Ryu::pinf / $Math::Ryu::pinf;
+$Math::Ryu::pinf = "$Math::Ryu::pinf";
+$Math::Ryu::ninf = "$Math::Ryu::ninf";
+$Math::Ryu::nanv = "$Math::Ryu::nanv";
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
@@ -100,7 +116,7 @@ sub n2s {
   my $arg = shift;
   die "The n2s() function does not accept ", ref($arg), " references"
     if ref($arg);
-  if(!_SvPOK($arg)) {
+  if(!ryu_SvPOK($arg)) {
     return $arg if ryu_SvIOK($arg);
     return _from_NV($arg) if _NV_fits_IV($arg);
   }
@@ -273,12 +289,12 @@ sub is_NV {
   my $arg = shift;
 
   return 1
-    if(PV_NV_BUG && _SvPOK($arg) && ryu_SvNOK($arg) && !_SvIOKp($arg));
+    if(PV_NV_BUG && ryu_SvPOK($arg) && ryu_SvNOK($arg) && !ryu_SvIOKp($arg));
 
   if(ryu_lln($arg)) { # Wraps the perl API function looks_like_number(),
                       # which differs from Scalar::Util::looks_like_number().
     return 0
-      if(_SvPOK($arg) || ryu_SvIOK($arg));
+      if(ryu_SvPOK($arg) || ryu_SvIOK($arg));
 
     # At this point we know that $arg looks like a number
     # and neither its POK flag nor its IOK flag is set.

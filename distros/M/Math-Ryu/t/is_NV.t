@@ -30,6 +30,10 @@ is(is_NV($nv2), 1, 'NV');
 my $ref = \$nv2;
 is(is_NV($ref), 0, 'reference to NV');
 
+$s2 = "$nv2";
+is(is_NV($nv2), 1, 'NV that has been interpolated');
+is(is_NV($s2),  0, 'stringification of NV');
+
 my $undef;
 is(is_NV($undef), 0, 'undef');
 

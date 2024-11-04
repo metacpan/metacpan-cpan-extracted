@@ -1,5 +1,5 @@
 package Mojo::Leds::Rest::MongoDB;
-$Mojo::Leds::Rest::MongoDB::VERSION = '1.15';
+$Mojo::Leds::Rest::MongoDB::VERSION = '1.16';
 use Mojo::Base 'Mojo::Leds::Rest';
 use boolean;
 
@@ -225,7 +225,7 @@ Mojo::Leds::Rest::MongoDB - A RESTFul interface to MongoDB
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 SYNOPSIS
 

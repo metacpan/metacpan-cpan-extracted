@@ -1,0 +1,19 @@
+Akamai::PropertyFetcher - Akamaiのプロパティアクティブバージョン情報を取得するモジュール
+
+インストール方法:
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+使い方:
+    use Akamai::PropertyFetcher;
+
+    my $fetcher = Akamai::PropertyFetcher->new(
+        config_file   => "$ENV{HOME}/.edgerc",
+        max_processes => 4
+    );
+    $fetcher->retrieve_property_data();
+
+詳細はドキュメントを参照してください。
+

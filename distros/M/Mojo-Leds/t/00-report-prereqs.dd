@@ -1,8 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0',
-                                        'perl' => '5.001600'
+                                        'ExtUtils::MakeMaker' => '0'
                                       }
                       },
        'develop' => {
@@ -26,7 +25,7 @@ do { my $x = {
                                       'Scalar::Util' => '0',
                                       'Tie::IxHash' => '0',
                                       'boolean' => '0',
-                                      'perl' => '5.014',
+                                      'perl' => '5.016',
                                       're' => '0'
                                     }
                     },
@@ -39,7 +38,6 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Test::More' => '0',
                                    'lib' => '0',
-                                   'perl' => '5.014',
                                    'strict' => '0',
                                    'warnings' => '0'
                                  }

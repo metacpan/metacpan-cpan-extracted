@@ -2,7 +2,7 @@
 use 5.020;
 use experimental 'signatures';
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use Getopt::Long;
 use Pod::Usage;

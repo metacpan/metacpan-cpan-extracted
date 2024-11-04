@@ -1,3 +1,9 @@
+1.06
+     - Wrap and export SvPOK (as ryu_SvPOK) and SvIOKp (as ryu_SvIOKp).
+     - Optionally allow (via setting of $Math::Ryu::PERL_INFNAN) infs and nans to be
+       stringified to the same as perl provides. Previously they have been stringified
+       strictly as "inf", "-inf" and "nan" - which could differ from perl's presentation.
+
 1.05
      - In 1.04, I failed to amend pany() and sany() to allow for the "PV_NV_BUG". This
        is now fixed.

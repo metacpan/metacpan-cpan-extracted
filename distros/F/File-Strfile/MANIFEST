@@ -13,8 +13,10 @@ t/10_zippy.t
 t/20_v2.t
 t/30_single.t
 t/40_flags.t
+t/50_nonalpha.t
 t/data/flags.txt
 t/data/flags.txt.dat
+t/data/nonalpha.txt
 t/data/single.txt
 t/data/single.txt.dat
 t/data/v2.txt

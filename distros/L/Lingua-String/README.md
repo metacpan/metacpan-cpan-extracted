@@ -4,7 +4,7 @@ Lingua::String - Class to contain a string in many different languages
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 

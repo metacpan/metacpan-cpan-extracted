@@ -1,2 +1,10 @@
+0.03 2024-11-03
+    * Re-release to fix botched CPAN upload
+
+0.02 2024-11-03
+    * Fix POD
+    * Fix META.* to imply we need dynamic configuration to discriminate between
+      Windows and other OSes
+
 0.01 2024-11-03
     * Released on an unsuspecting world

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Test::Carp;
-use Test::Most tests => 7;
+use Test::Most tests => 9;
 
 BEGIN {
 	use_ok('Lingua::String');
@@ -12,7 +12,9 @@ BEGIN {
 CARP: {
 	my $str = new_ok('Lingua::String');
 
-	does_carp_that_matches(sub { $str->set() }, qr/usage/);
+	does_croak_that_matches(sub { $str->set() }, qr/Usage/);
+	does_carp_that_matches(sub { $str->set('lang' => 'foo') }, qr/usage/);
+	does_carp_that_matches(sub { $str->set('foo' => 'bar') }, qr/usage/);
 
 	delete $ENV{'LC_MESSAGES'};
 	delete $ENV{'LC_ALL'};

@@ -1,9 +1,9 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "manage recent documents",
    "author" : [
       "Max Maischein <corion@cpan.org>"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -71,7 +71,7 @@
          "web" : "https://github.com/Corion/RecentInfo-Manager"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

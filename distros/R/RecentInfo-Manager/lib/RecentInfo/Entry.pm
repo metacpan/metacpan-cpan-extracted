@@ -1,10 +1,16 @@
-package RecentInfo::Entry 0.01;
+package RecentInfo::Entry 0.03;
 use 5.020;
 use Moo 2;
 use XML::LibXML;
 use experimental 'signatures';
 use Carp 'croak';
 use URI;
+
+=head1 NAME
+
+RecentInfo::Entry - recent files XBEL entry
+
+=cut
 
 has ['href'] => (
     is => 'ro',
@@ -134,3 +140,31 @@ sub from_XML_fragment( $class, $frag ) {
 }
 
 1;
+=head1 REPOSITORY
+
+The public repository of this module is
+L<https://github.com/Corion/RecentInfo-Manager>.
+
+=head1 SUPPORT
+
+The public support forum of this module is L<https://perlmonks.org/>.
+
+=head1 BUG TRACKER
+
+Please report bugs in this module via Github
+at L<https://github.com/Corion/RecentInfo-Manager/issues>
+
+=head1 AUTHOR
+
+Max Maischein C<corion@cpan.org>
+
+=head1 COPYRIGHT (c)
+
+Copyright 2024-2024 by Max Maischein C<corion@cpan.org>.
+
+=head1 LICENSE
+
+This module is released under the same terms as Perl itself.
+
+=cut
+

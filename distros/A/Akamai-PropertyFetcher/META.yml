@@ -1,0 +1,27 @@
+---
+abstract: "AkamaiÃ£ƒ—Ã£ƒÂ­Ã£ƒ‘Ã£ƒ†Ã£‚Â£Ã£Â®Ã£‚Â¢Ã£‚Â¯Ã£ƒ†Ã£‚Â£Ã£ƒ–Ã£ƒÃ£ƒÂ¼Ã£‚Â¸Ã£ƒÂ§Ã£ƒÂ³Ã¦ƒ\NÃ¥Â Â±Ã£‚’Ã¥–Ã¥Â¾—Ã£™Ã£‚‹Ã£ƒÂ¢Ã£‚Â¸Ã£ƒÂ¥Ã£ƒÂ¼Ã£ƒÂ«"
+author:
+  - 'Kawamura Shingo <pannakoota@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Akamai-PropertyFetcher
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Akamai::Edgegrid: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  JSON: '0'
+  Parallel::ForkManager: '0'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,9 @@
+Akamai-PropertyFetcher-0.01/META.json
+Akamai-PropertyFetcher-0.01/META.yml
+lib/Akamai/PropertyFetcher.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

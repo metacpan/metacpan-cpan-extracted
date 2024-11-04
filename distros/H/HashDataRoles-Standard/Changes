@@ -1,6 +1,11 @@
+0.005   2024-11-04  Released-By: PERLANCAR; Urgency: medium
+
+        - Add role: Source::Iterator.
+
+
 0.004   2024-05-06  Released-By: PERLANCAR; Urgency: medium
 
-        - [bugfix] Source::LinesInData role didn't save the original DATA's
+        - [bugfix] Source::LinesInDATA role didn't save the original DATA's
           beginning position.
 
 

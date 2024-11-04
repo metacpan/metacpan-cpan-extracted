@@ -44,7 +44,7 @@ if ($have_spatialite && Alien::spatialite->version ge 5) {
   else {
     log "Prepending Alien::spatialite bin dir to path";
     unshift @PATH, Alien::spatialite->bin_dir;
-    push @alien_deps, 'Alien::spatialite';
+    push @alien_deps, 'Alien::spatialite' if Alien::spatialite->install_type eq 'share';
   }
 }
 else {
@@ -132,7 +132,7 @@ share {
       if not Alien::proj->atleast_version ('6.0.0');  
 
     plugin 'Build::SearchDep' => (
-      aliens   => [@alien_deps],
+      aliens   => [grep {$_->install_type eq 'share'} @alien_deps],
       public_I => 1,
       public_l => 1,
     );

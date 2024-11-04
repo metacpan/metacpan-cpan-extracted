@@ -11,7 +11,7 @@ use FileHandle ();
 use File::Path qw( make_path );
 use File::Spec ();
 use File::Temp ();
-use Cwd        qw( getcwd );
+use Cwd        qw( getcwd abs_path );
 
 use FindBin qw( $RealBin );
 my $lib_path;
@@ -32,7 +32,7 @@ sub create_subtest_files {
         CLEANUP  => 1,
         DIR      => File::Spec->tmpdir,
     );
-    my $dir_path = $dir->{'DIRNAME'};
+    my $dir_path = abs_path( $dir->dirname );
     make_path( File::Spec->catdir( $dir_path, 'root', 'dir', 'subdir' ) );
 
     if ($root_env) {

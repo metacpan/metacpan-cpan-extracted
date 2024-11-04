@@ -24,6 +24,19 @@ my %WriteMakefileArgs = (
 		'Getopt::Long' => '0',
 		'List::Util'   => '0',
 	},
+	META_MERGE => {
+		'meta-spec' => { version => 2 },
+		resources => {
+				repository => {
+				url => 'https://codeberg.org/1-1sam/File-Strfile.git',
+				web => 'https://codeberg.org/1-1sam/File-Strfile',
+				type => 'git',
+			},
+			bugtracker => {
+				web => 'https://codeberg.org/1-1sam/File-Strfile/issues',
+			},
+		},
+	},
 	EXE_FILES => [
 		'bin/pstrfile',
 		'bin/punstr',
@@ -49,5 +62,7 @@ delete $WriteMakefileArgs{MIN_PERL_VERSION}
 	unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
 delete $WriteMakefileArgs{LICENSE}
 	unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
+delete $WriteMakefileArgs{META_MERGE}
+	unless eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);

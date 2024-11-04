@@ -1,5 +1,5 @@
 package File::Strfile;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use 5.016;
 use strict;
 use warnings;
@@ -203,7 +203,8 @@ sub order {
 	my $self = shift;
 	my $fc   = shift;
 
-	my @strings = $self->strings();
+	# Ignore leading non-alphanumeric characters.
+	my @strings = map { s/^[\W_]+//r } $self->strings();
 	@strings = map { fc } @strings if $fc;
 
 	my @offsets =
@@ -375,7 +376,9 @@ consists of a collection of strings seperated by delimiting lines, which are
 lines containing only a single delimiting character, typically a percentage (%)
 sign. The strfile data
 files are usually stored in the same directory as the source files, with the
-same name but with the ".dat" suffix added.
+same name but with the ".dat" suffix added. They contain a header that describes
+the strfile database and a table of offsets pointing to each string in the
+source file.
 
 This module only provides an interface for manipulating strfile data files, not
 the source text files themselves.
@@ -399,18 +402,18 @@ read_strfile(). Some fields can be overrided by passing additional options.
 
 =item Version
 
-strfile version. Can be one of the following:
+Set version for outputted strfile. The following are acceptable version numbers:
 
 =over 4
 
 =item 1
 
-Original strfile version. Stored string offsets as unsigned 64-bit integars.
+Original strfile version. Stores string offsets as unsigned 64-bit integars.
 Most common. Default.
 
 =item 2
 
-Newer strfile version. Stored string offsets as unsigned 32-bit integars.
+Newer strfile version. Stores string offsets as unsigned 32-bit integars.
 
 =back
 
@@ -457,7 +460,8 @@ Get $n-th string from string file. Returns undef if $n-th string does not exist.
 
 =head2 $strfile->strings()
 
-Returns list of all strings in strfile.
+Returns list of all strings in strfile, in the order specified by the offset
+table.
 
 =head2 $strfile->strings_like($re)
 
@@ -534,15 +538,15 @@ Hash of strfile flags and their bitmasks.
 
 =over 4
 
-=item RANDOM, 0x1
+=item RANDOM => 0x1
 
 Strings were randomly sorted.
 
-=item ORDERED, 0x2
+=item ORDERED => 0x2
 
 Strings were sorted alphabetically. Takes priority over Random.
 
-=item ROTATED, 0x4
+=item ROTATED => 0x4
 
 Strings are ROT-13 ciphered.
 

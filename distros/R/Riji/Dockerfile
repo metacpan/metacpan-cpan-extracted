@@ -13,13 +13,15 @@ RUN apt-get update && \
     apt-get install -yq \
       perl \
       build-essential \
-      git \
-      cpanminus && \
+      curl \
+      git && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    cpanm -qn . && \
-    rm -rf /root/.cpanm /riji
+    sh -c 'curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | \
+           perl - install --without-test -g .' && \
+    rm -rf /root/.perl-cpm /riji
 
 WORKDIR /riji
 
-ENTRYPOINT [ "riji" ]
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+ENTRYPOINT [ "entrypoint.sh" ]

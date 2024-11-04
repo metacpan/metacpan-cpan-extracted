@@ -104,12 +104,12 @@ int ryu_SvNOK(SV * sv) {
     return 0;
 }
 
-int _SvPOK(SV * sv) {
+int ryu_SvPOK(SV * sv) {
     if(SvPOK(sv)) return 1;
     return 0;
 }
 
-int _SvIOKp(SV * sv) {
+int ryu_SvIOKp(SV * sv) {
     if(SvIOKp(sv)) return 1;
     return 0;
 }
@@ -293,9 +293,11 @@ SV * fmtpy(pTHX_ SV * in) {
     if(s[0] == 'I') {
       if(is_neg) {
         s--;
+        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return get_sv("Math::Ryu::ninf", 0);
         return newSVpv("-inf", 0);
       }
       else {
+        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return get_sv("Math::Ryu::pinf", 0);
         return newSVpv("inf", 0);
       }
     }
@@ -304,6 +306,7 @@ SV * fmtpy(pTHX_ SV * in) {
         s--;
         croak("rubbish input of '%s'", s);
       }
+      if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return get_sv("Math::Ryu::nanv", 0);
       return newSVpv("nan", 0);
     }
     /* mantissa is single-digit */
@@ -428,11 +431,11 @@ ryu_SvNOK (sv)
 	SV *	sv
 
 int
-_SvPOK (sv)
+ryu_SvPOK (sv)
 	SV *	sv
 
 int
-_SvIOKp (sv)
+ryu_SvIOKp (sv)
 	SV *	sv
 
 int ryu_lln (sv)

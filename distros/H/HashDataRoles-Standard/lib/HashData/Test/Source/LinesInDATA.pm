@@ -2,9 +2,9 @@
 package HashData::Test::Source::LinesInDATA;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-06'; # DATE
+our $DATE = '2024-11-04'; # DATE
 our $DIST = 'HashDataRoles-Standard'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Role::Tiny::With;
 
@@ -23,7 +23,7 @@ HashData::Test::Source::LinesInDATA - A test HashData module
 
 =head1 VERSION
 
-This document describes version 0.004 of HashData::Test::Source::LinesInDATA (from Perl distribution HashDataRoles-Standard), released on 2024-05-06.
+This document describes version 0.005 of HashData::Test::Source::LinesInDATA (from Perl distribution HashDataRoles-Standard), released on 2024-11-04.
 
 =head1 HOMEPAGE
 
@@ -57,7 +57,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

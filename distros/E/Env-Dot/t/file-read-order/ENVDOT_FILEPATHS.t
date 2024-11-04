@@ -35,9 +35,16 @@ BEGIN {
       ( File::Spec->catdir( $this, 'dummy.env-interpolation' ), File::Spec->catdir( $this, 'dummy.env-static' ), );
 }
 
+my %DOS_PLATFORMS = (
+    'dos'     => 'MS-DOS/PC-DOS',
+    'os2'     => 'OS/2',
+    'MSWin32' => 'Windows',
+    'cygwin'  => 'Cygwin',
+);
+
 sub concat_filepaths {
     my @paths = @_;
-    if ( $OSNAME eq 'MSWin32' ) {
+    if ( exists $DOS_PLATFORMS{$OSNAME} ) {
         return join q{;}, @paths;
     }
     else {

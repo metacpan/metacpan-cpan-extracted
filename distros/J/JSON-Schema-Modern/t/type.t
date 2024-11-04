@@ -24,17 +24,19 @@ my %inflated_data = (
   object => [ {}, { a => 1 } ],
   array => [ [], [ 1 ] ],
   number => [ 3.1, 1.23456789012e10, Math::BigFloat->new('0.123') ],
-  integer => [ 0, -1, 2, 2.0, 2**31-1, 2**31, 2**63-1, 2**63, 2**64, 2**65, 1000000000000000, Math::BigInt->new('1e20') ],
+  integer => [ 0, -1, 2, 2.0, 2**31-1, 2**31, 2**63-1, 2**63, 2**64, 2**65, 1000000000000000,
+    Math::BigInt->new('1e20'), Math::BigInt->new('1'), Math::BigInt->new('1.0'),
+    Math::BigFloat->new('2e1'), Math::BigFloat->new('1'), Math::BigFloat->new('1.0') ],
   string => [ '', '0', '-1', '2', '2.0', '3.1', 'école', 'ಠ_ಠ' ],
 );
 
 my %json_data = (
-  null => [ 'null'],
+  null => [ 'null' ],
   boolean => [ 'false', 'true' ],
   object => [ '{}', '{"a":1}' ],
   array => [ '[]', '[1]' ],
   number => [ '3.1', '1.23456789012e10' ],
-  integer => [ '0', '-1', '2.0', (map $_.'', 2**31-1, 2**31, 2**63-1, 2**63, 2**64, 2**65), '1000000000000000' ],
+  integer => [ '0', '-1', '2.0', (map $_.'', 2**31-1, 2**31, 2**63-1, 2**63, 2**64, 2**65), '1000000000000000', '2e1' ],
   string => [ '""', '"0"', '"-1"', '"2.0"', '"3.1"',
     qq{"\x{c3}\x{a9}cole"}, qq{"\x{e0}\x{b2}\x{a0}_\x{e0}\x{b2}\x{a0}"} ],
 );
@@ -90,64 +92,155 @@ foreach my $type (sort keys %json_data) {
   };
 }
 
-subtest 'type: integers and numbers' => sub {
-  my @ints = my @copied_ints = (1, -2.0, 9223372036854775800000008);
-  my @numbers = my @copied_numbers = (-2.1);
-  ok(is_type('integer', $_), json_sprintf('is_type(\'integer\', %s) is true', $_))
-    foreach (@ints, map $decoder->decode("$_"), @copied_ints);
-  is(get_type($_), 'integer', json_sprintf('get_type(%s) is integer', $_))
-    foreach (@ints, map $decoder->decode("$_"), @copied_ints);
-  ok(is_type('number', $_), json_sprintf('is_type(\'number\', %s) is true', $_))
-    foreach (@ints, @numbers, map $decoder->decode("$_"), @copied_ints, @copied_numbers);
-  is(get_type($_), 'number', json_sprintf('get_type(%s) is number', $_))
-    foreach (@numbers, map $decoder->decode("$_"), @copied_numbers);
+my %draft4_inflated_data = (
+  number => [ 3.1, 1.23456789012e10, Math::BigFloat->new('0.123'), 2.0 ],
+  integer => [ 0, -1, 2, Math::BigInt->new('2'), Math::BigInt->new('1.0') ],
+);
 
-  my @not_ints = my @copied_not_ints = ('1', '2.0', 3.1, '4.2');
-  ok(!is_type('integer', $_), json_sprintf('is_type(\'integer\', %s) is false', $_))
-    foreach (@not_ints, map $decoder->decode($decoder->encode($_)), @copied_not_ints);
-  isnt(get_type($_), 'integer', json_sprintf('get_type(%s) is not integer', $_))
-    foreach (@not_ints, map $decoder->decode($decoder->encode($_)), @copied_not_ints);
-};
+my %draft4_json_data = (
+  number => [ '3.1', '1.23456789012e10' ],
+  integer => [ '0', '-1', '3' ],
+);
 
-subtest 'type: integers and numbers in draft4' => sub {
-  # in draft4, an integer is "A JSON number without a fraction or exponent part."
-  # Note that integers larger than $Config{ivsize} are stored as NV, not IV, so we are unable to
-  # detect them. But coming from json, Math::BigFloat objects can make this distinction.
-  my @ints = my @copied_ints = (1);
-  my @numbers = my @copied_numbers = (2.0, -2.1);
-  ok(is_type('integer', $_, { legacy_ints => 1 }), json_sprintf('is_type(\'integer\', %s, { legacy_ints => 1 }) is true', $_))
-    foreach (@ints, map $decoder->decode("$_"), @copied_ints);
-  is(get_type($_, { legacy_ints => 1 }), 'integer', json_sprintf('get_type(%s, { legacy_ints => 1 }) is integer', $_))
-    foreach (@ints, map $decoder->decode("$_"), @copied_ints);
+subtest 'integers and numbers in draft4' => sub {
+  foreach my $type (sort keys %draft4_inflated_data) {
+    foreach my $value ($draft4_inflated_data{$type}->@*) {
+      my $value_copy = $value;
+      ok(is_type($type, $value, { legacy_ints => 1 }), json_sprintf(('is_type("'.$type.'", %s) is true'), $value_copy ));
+      ok(is_type('number', $value, { legacy_ints => 1 }), json_sprintf(('is_type("number", %s) is true'), $value_copy ))
+        if $type eq 'integer';
+      is(get_type($value, { legacy_ints => 1 }), $type, json_sprintf(('get_type(%s) = '.$type), $value_copy));
 
-  # we provide the explicit strings here because an integer NV is not stringified with .0 intact
-  ok(is_type('number', $_, { legacy_ints => 1 }), json_sprintf('is_type(\'number\', %s, { legacy_ints => 1 }) is true', $_))
-    foreach (@ints, @numbers, map $decoder->decode($_), '1', '2.0', '-2.1', '9223372036854775800000008');
-  is(get_type($_, { legacy_ints => 1 }), 'number', json_sprintf('get_type(%s, { legacy_ints => 1 }) is number', $_))
-    foreach (@numbers, map $decoder->decode($_), '2.0', '-2.1', '9223372036854775800000008');
+      foreach my $other_type (qw(null boolean object array string), sort keys %draft4_inflated_data) {
+        next if $other_type eq $type;
+        next if $type eq 'integer' and $other_type eq 'number';
 
-  my @not_ints = my @copied_not_ints = ('1', '2.0', 3.1, '4.2');
-  ok(!is_type('integer', $_, { legacy_ints => 1 }), json_sprintf('is_type(\'integer\', %s, { legacy_ints => 1 }) is false', $_))
-    foreach (@not_ints, map $decoder->decode($decoder->encode($_)), @copied_not_ints);
-  isnt(get_type($_, { legacy_ints => 1 }), 'integer', json_sprintf('get_type(%s, { legacy_ints => 1 }) is not integer', $_))
-    foreach (@not_ints, map $decoder->decode($decoder->encode($_)), @copied_not_ints);
+        ok(!is_type($other_type, $value, { legacy_ints => 1 }),
+          json_sprintf('is_type("'.$other_type.'", %s) is false', $value));
+      }
+
+      ok(!isdual($value), 'data is not tampered with while it is tested (not dualvar)');
+    }
+
+    foreach my $value ($draft4_json_data{$type}->@*) {
+      $value = $decoder->decode($value);
+      my $value_copy = $value;
+      ok(is_type($type, $value, { legacy_ints => 1 }), json_sprintf(('is_type("'.$type.'", %s) is true'), $value_copy ));
+      ok(is_type('number', $value, { legacy_ints => 1 }), json_sprintf(('is_type("number", %s) is true'), $value_copy ))
+        if $type eq 'integer';
+      is(get_type($value, { legacy_ints => 1 }), $type, json_sprintf(('get_type(%s) = '.$type), $value_copy));
+
+      foreach my $other_type (qw(null boolean object array string), sort keys %draft4_json_data) {
+        next if $other_type eq $type;
+        next if $type eq 'integer' and $other_type eq 'number';
+
+        ok(!is_type($other_type, $value, { legacy_ints => 1 }),
+          json_sprintf('is_type("'.$other_type.'", %s) is false', $value));
+      }
+
+      ok(!isdual($value), 'data is not tampered with while it is tested (not dualvar)');
+    }
+  }
 };
 
 ok(!is_type('foo', 'wharbarbl'), 'non-existent type does not result in exception');
 
 subtest 'ambiguous types' => sub {
-  is(get_type(dualvar(5, 'five')), 'ambiguous type', 'dualvars are ambiguous');
+  subtest 'integers' => sub {
+    my $integer = dualvar(5, 'five');
+    is(get_type($integer), 'ambiguous type', 'dualvar integers with different values are ambiguous');
+    ok(!is_type($_, $integer), "dualvar integers with different values are not ${_}s") foreach qw(integer number string);
 
-  SKIP: {
-    skip 'on perls >= 5.35.9, reading the string form of an integer value no longer sets the flag SVf_POK', 1
-      if "$]" >= 5.035009;
+    $integer = 5;
+    ()= sprintf('%s', $integer);
 
-    my $number = 5;
+    # legacy behaviour (this only happens for IVs, not NVs)
+    SKIP: {
+      skip 'on perls < 5.35.9, reading the string form of an integer value sets the flag SVf_POK', 1
+        if "$]" >= 5.035009;
+
+      is(get_type($integer), 'string', 'older perls only: integer that is later used as a string is now identified as a string');
+      ok(is_type('integer', $integer), 'integer that is later used as a string is still an integer');
+      ok(is_type('number', $integer), 'integer that is later used as a string is still a number');
+      ok(is_type('string', $integer), 'older perls only: integer that is later used as a string is now a string');
+    }
+
+    # modern behaviour
+    SKIP: {
+      skip 'on perls < 5.35.9, reading the string form of an integer value sets the flag SVf_POK', 1
+        if "$]" < 5.035009;
+
+      is(get_type($integer), 'integer', 'integer that is later used as a string is still identified as a integer');
+      ok(is_type('integer', $integer), 'integer that is later used as a string is still an integer');
+      ok(is_type('number', $integer), 'integer that is later used as a string is still a number');
+      ok(!is_type('string', $integer), 'integer that is later used as a string is not a string');
+    }
+  };
+
+  subtest 'numbers' => sub {
+    my $number = dualvar(5.1, 'five');
+    is(get_type($number), 'ambiguous type', 'dualvar numbers are ambiguous in get_type');
+    ok(!is_type($_, $number), "dualvar numbers are not ${_}s") foreach qw(integer number string);
+
+    $number = 5.1;
     ()= sprintf('%s', $number);
 
-    is(get_type($number), 'ambiguous type', 'number that is later treated as a string results in an ambiguous type');
-    ok(!is_type($_, $number), "ambiguous types are not accepted by is_type('$_')") foreach qw(integer number string);
-  }
+    is(get_type($number), 'number', 'number that is later used as a string is still identified as a number');
+    ok(!is_type('integer', $number), 'number that is later used as a string is not an integer');
+    ok(is_type('number', $number), 'number that is later used as a string is still a number');
+    ok(!is_type('string', $number), 'number that is later used as a string is not a string');
+  };
+
+  subtest 'strings' => sub {
+    my $string = dualvar(5.1, 'five');
+    is(get_type($string), 'ambiguous type', 'dualvar strings are ambiguous in get_type');
+    ok(!is_type($_, $string), "dualvar strings are not ${_}s") foreach qw(integer number string);
+
+    $string = '5';
+    ()= 0+$string;
+
+    is(get_type($string), 'string', 'string that is later used as an integer is still identified as a string');
+
+    # legacy behaviour
+    SKIP: {
+      skip 'on perls < 5.35.9, reading the string form of an integer value sets the flag SVf_POK', 1
+        if "$]" >= 5.035009;
+      ok(is_type('integer', $string), 'older perls only: string that is later used as an integer becomes an integer');
+      ok(is_type('number', $string), 'older perls only: string that is later used as an integer becomes a number');
+    }
+
+    # modern behaviour
+    SKIP: {
+      skip 'on perls < 5.35.9, reading the integer form of a string value sets the flag SVf_IOK', 1
+        if "$]" < 5.035009;
+      ok(!is_type('integer', $string), 'string that is later used as an integer is not an integer');
+      ok(!is_type('number', $string), 'string that is later used as an integer is not a number');
+    }
+
+    ok(is_type('string', $string), 'string that is later used as an integer is still a string');
+
+    $string = '5.1';
+    ()= 0+$string;
+
+    is(get_type($string), 'string', 'string that is later used as a number is still identified as a string');
+    ok(!is_type('integer', $string), 'string that is later used as a number is not an integer');
+
+    # legacy behaviour
+    SKIP: {
+      skip 'on perls < 5.35.9, reading the string form of an integer value sets the flag SVf_POK', 1
+        if "$]" >= 5.035009;
+      ok(is_type('number', $string), 'older perls only: string that is later used as a number becomes a number');
+    }
+
+    # modern behaviour
+    SKIP: {
+      skip 'on perls < 5.35.9, reading the numeric form of a string value sets the flag SVf_NOK', 1
+        if "$]" < 5.035009;
+      ok(!is_type('number', $string), 'string that is later used as a number is not a number');
+    }
+
+    ok(is_type('string', $string), 'string that is later used as a number is still a string');
+  };
 };
 
 subtest 'is_type and get_type for references' => sub {
@@ -161,6 +254,7 @@ subtest 'is_type and get_type for references' => sub {
     [ qr/foo/, 'Regexp' ],
     [ *STDIN{IO}, 'IO::File' ],
     [ bless({}, 'Foo'), 'Foo' ],
+    [ bless({}, '0'), '0' ],
   ) {
     is(get_type($test->[0]), $test->[1], $test->[1].' type is reported without exception');
     ok(is_type($test->[1], $test->[0]), 'value is a '.$test->[1]);

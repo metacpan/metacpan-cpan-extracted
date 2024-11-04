@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 32;
+use Test::Most tests => 34;
 use Test::NoWarnings;
 
 BEGIN {
@@ -59,4 +59,10 @@ STRING: {
 	$str = new_ok('Lingua::String' => [ 'One' ]);
 	is($str->en(), 'One', 'Default language is set on single argument');
 	is($str->as_string({ lang => 'de' }), undef, 'German');
+
+	delete $ENV{'LC_MESSAGES'};
+	$ENV{'LANGUAGE'} = 'en';
+	$str = new_ok('Lingua::String' => [ 'One' ]);
+	$str->set('House');
+	cmp_ok($str->en('House'), 'eq', 'House', 'Setting language from LANGUAGE works with AUTOLOAD');
 }

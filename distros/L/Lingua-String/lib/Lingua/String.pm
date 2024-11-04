@@ -2,8 +2,10 @@ package Lingua::String;
 
 use strict;
 use warnings;
+
 use Carp;
 use HTML::Entities;
+use Scalar::Util;
 
 # TODO: Investigate Locale::Maketext
 
@@ -13,18 +15,18 @@ Lingua::String - Class to contain a string in many different languages
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use overload (
-        # '==' => \&equal,
-        # '!=' => \&not_equal,
-        '""' => \&as_string,
-        bool => sub { 1 },
-        fallback => 1   # So that boolean tests don't cause as_string to be called
+	# '==' => \&equal,
+	# '!=' => \&not_equal,
+	'""' => \&as_string,
+	bool => sub { 1 },
+	fallback => 1   # So that boolean tests don't cause as_string to be called
 );
 
 =head1 SYNOPSIS
@@ -63,15 +65,15 @@ Create a Lingua::String object.
 =cut
 
 sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
-
+	my $class = shift;
 	my %args;
+
+	# Handle hash or hashref arguments
 	if(ref($_[0]) eq 'HASH') {
 		%args = %{$_[0]};
 	} elsif((scalar(@_) == 1) && (my $lang = _get_language())) {
 		%args = ($lang => $_[0]);
-	} elsif(scalar(@_) % 2 == 0) {
+	} elsif((scalar(@_) % 2) == 0) {
 		%args = @_;
 	} else {
 		Carp::carp(__PACKAGE__, ': usage: new(%args)');
@@ -82,15 +84,19 @@ sub new {
 		# Using Lingua::String->new(), not Lingua::String::new()
 		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		# return;
+
+		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
-	} elsif(ref($class)) {
-		# clone the given object
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
 	}
 
+	# Return the blessed object
 	if(scalar(%args)) {
 		return bless { strings => \%args }, $class;
 	}
+
 	return bless { }, $class;
 }
 
@@ -106,30 +112,18 @@ Autoload will do this for you as
 
 =cut
 
-sub set {
+sub set
+{
 	my $self = shift;
+	my $params = $self->_get_params('string', @_);
 
-	my %params;
-	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
-	} elsif(scalar(@_) % 2 == 0) {
-		%params = @_;
-	} else {
-		$params{'string'} = shift;
-	}
-
-	my $lang = $params{'lang'};
-
+	my $lang = $params->{'lang'} || $self->_get_language();
 	if(!defined($lang)) {
-		$lang ||= $self->_get_language();
-		if(!defined($lang)) {
-			Carp::carp(__PACKAGE__, ': usage: set(string => string, lang => $language)');
-			return;
-		}
+		Carp::carp(__PACKAGE__, ': usage: set(string => string, lang => $language)');
+		return;
 	}
 
-	my $string = $params{'string'};
-
+	my $string = $params->{'string'};
 	if(!defined($string)) {
 		Carp::carp(__PACKAGE__, ': usage: set(string => string, lang => $language)');
 		return;
@@ -142,12 +136,12 @@ sub set {
 
 # https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
 # https://www.gnu.org/software/gettext/manual/html_node/The-LANGUAGE-variable.html
-sub _get_language {
-	if($ENV{'LANGUAGE'}) {
-		if($ENV{'LANGUAGE'} =~ /^([a-z]{2})/i) {
-			return lc($1);
-		}
+sub _get_language
+{
+	if(($ENV{'LANGUAGE'}) && ($ENV{'LANGUAGE'} =~ /^([a-z]{2})/i)) {
+		return lc($1);
 	}
+
 	foreach my $variable('LC_ALL', 'LC_MESSAGES', 'LANG') {
 		my $val = $ENV{$variable};
 		next unless(defined($val));
@@ -156,9 +150,11 @@ sub _get_language {
 			return lc($1);
 		}
 	}
-	if(defined($ENV{'LANG'}) && (($ENV{'LANG'} =~ /^C\./) || ($ENV{'LANG'} eq 'C'))) {
-		return 'en';
-	}
+
+	# if(defined($ENV{'LANG'}) && (($ENV{'LANG'} =~ /^C\./) || ($ENV{'LANG'} eq 'C'))) {
+		# return 'en';
+	# }
+	return 'en' if defined $ENV{'LANG'} && $ENV{'LANG'} =~ /^C(\.|$)/;
 	return;	# undef
 }
 
@@ -189,13 +185,11 @@ sub as_string {
 	} else {
 		$params{'lang'} = shift;
 	}
-	my $lang = $params{'lang'} || $self->_get_language();
 
-	if(!defined($lang)) {
-		Carp::carp(__PACKAGE__, ': usage: as_string(lang => $language)');
-		return;
+	if(my $lang = ($params{'lang'} || $self->_get_language())) {
+		return $self->{'strings'}->{$lang};
 	}
-	return $self->{'strings'}->{$lang};
+	Carp::carp(__PACKAGE__, ': usage: as_string(lang => $language)');
 }
 
 =head2 encode
@@ -219,23 +213,57 @@ sub encode {
 	return $self;
 }
 
-sub AUTOLOAD {
+sub AUTOLOAD
+{
 	our $AUTOLOAD;
-	my $key = $AUTOLOAD;
+	my $self = shift or return;
 
-	$key =~ s/.*:://;
+	# Extract the key name from the AUTOLOAD variable
+	my ($key) = $AUTOLOAD =~ /::(\w+)$/;
 
-	return if($key eq 'DESTROY');
+	# Skip if called on destruction
+	return if $key eq 'DESTROY';
 
-	my $self = shift;
-
-	return if(ref($self) ne __PACKAGE__);
+	# Ensure the key is called on the correct package object
+	return unless ref($self) eq __PACKAGE__;
 
 	if(my $value = shift) {
+		# Set the requested language ($key) to the given string ($value)
 		$self->{'strings'}->{$key} = $value;
 	}
 
+	# Get the requested language ($key)
 	return $self->{'strings'}->{$key};
+}
+
+# Helper routine to parse the arguments given to a function,
+#	allowing the caller to call the function in anyway that they want
+#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
+#	when called _get_params('arg', @_);
+sub _get_params
+{
+	shift;  # Discard the first argument (typically $self)
+	my $default = shift;
+
+	# Directly return hash reference if the first parameter is a hash reference
+	return $_[0] if ref $_[0] eq 'HASH';
+
+	my %rc;
+	my $num_args = scalar @_;
+
+	# Populate %rc based on the number and type of arguments
+	if(($num_args == 1) && (defined $default)) {
+		# %rc = ($default => shift);
+		return { $default => shift };
+	} elsif($num_args == 1) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
+	} elsif($num_args == 0 && defined $default) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '($default => \$val)');
+	} elsif(($num_args % 2) == 0) {
+		%rc = @_;
+	}
+
+	return \%rc;
 }
 
 =head1 AUTHOR

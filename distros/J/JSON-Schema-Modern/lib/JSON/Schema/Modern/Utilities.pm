@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.593';
+our $VERSION = '0.594';
 
 use 5.020;
 use strictures 2;
@@ -18,9 +18,11 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use B;
 use Carp 'croak';
 use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
-use Scalar::Util qw(blessed looks_like_number);
+use builtin::compat 'blessed';
+use Scalar::Util 'looks_like_number';
 use Storable 'dclone';
 use Feature::Compat::Try;
+use builtin::compat qw(created_as_number created_as_string);
 use namespace::clean;
 
 use Exporter 'import';
@@ -54,6 +56,8 @@ use constant { true => JSON::PP::true, false => JSON::PP::false };
 
 # supports the six core types, plus integer (which is also a number)
 # we do NOT check stringy_numbers here -- you must do that in the caller
+# note that sometimes a value may return true for more than one type, e.g. integer+number,
+# or number+string, depending on its internal flags.
 # pass { legacy_ints => 1 } in $config to use draft4 integer behaviour
 sub is_type ($type, $value, $config = {}) {
   if ($type eq 'null') {
@@ -73,24 +77,37 @@ sub is_type ($type, $value, $config = {}) {
     return 0 if not defined $value;
     my $flags = B::svref_2object(\$value)->FLAGS;
 
+    # dualvars with the same string and (stringified) numeric value could be either a string or a
+    # number, and before 5.36 we can't tell the difference, so we will answer yes for both.
+    # in 5.36+, stringified numbers still get a PV but don't have POK set, whereas
+    # numified strings do have POK set, so we can tell which one came first.
+
     if ($type eq 'string') {
-      return !is_ref($value) && $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
+      # like created_as_string, but rejects dualvars with stringwise-unequal string and numeric parts
+      return !is_ref($value)
+        && $flags & B::SVf_POK
+        && (!($flags & (B::SVf_IOK | B::SVf_NOK))
+          || do { no warnings 'numeric'; 0+$value eq $value });
     }
 
     if ($type eq 'number') {
-      # floats in json will always be parsed into Math::BigFloat
-      return is_bignum($value)
-        || !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
+      # floats in json will always be parsed into Math::BigFloat, when allow_bignum is enabled
+      return is_bignum($value) || created_as_number($value);
     }
 
     if ($type eq 'integer') {
       if ($config->{legacy_ints}) {
-        return !is_bignum($value)
-          && !($flags & B::SVf_POK) && ($flags & B::SVf_IOK) && !($flags & B::SVf_NOK);
+        # in draft4, an integer is "A JSON number without a fraction or exponent part.",
+        # therefore 2.0 is NOT an integer
+        return ref($value) eq 'Math::BigInt'
+          || ($flags & B::SVf_IOK) && !($flags & B::SVf_NOK) && created_as_number($value);
       }
       else {
+        # note: values that are larger than $Config{ivsize} will be represented as an NV, not IV,
+        # therefore they will fail this check
         return is_bignum($value) && $value->is_int
-          || !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK)) && int($value) == $value;
+          # if dualvar, PV and stringified NV/IV must be identical
+          || created_as_number($value) && int($value) == $value;
       }
     }
   }
@@ -111,34 +128,55 @@ sub get_type ($value, $config = {}) {
   return 'null' if not defined $value;
   return 'array' if is_plain_arrayref($value);
 
-  # floats in json will always be parsed into Math::BigFloat
-  return is_bignum($value) ? (!$config->{legacy_ints} && $value->is_int ? 'integer' : 'number')
-      : (blessed($value) ? '' : 'reference to ').ref($value)
-    if is_ref($value);
+  # floats in json will always be parsed into Math::BigFloat, when allow_bignum is enabled
+  if (is_ref($value)) {
+    my $ref = ref($value);
+    return $ref eq 'Math::BigInt' ? 'integer'
+      # note: this will be wrong for Math::BigFloat->new('1.0') in draft4
+      : $ref eq 'Math::BigFloat' ? ($value->is_int ? 'integer' : 'number')
+      : (defined blessed($value) ? '' : 'reference to ').$ref;
+  }
 
   my $flags = B::svref_2object(\$value)->FLAGS;
-  return 'string' if $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
+
+  # dualvars with the same string and (stringified) numeric value could be either a string or a
+  # number, and before 5.36 we can't tell the difference, so we choose number because it has been
+  # evaluated as a number already.
+  # in 5.36+, stringified numbers still get a PV but don't have POK set, whereas
+  # numified strings do have POK set, so we can tell which one came first.
+
+  # like created_as_string, but rejects dualvars with stringwise-unequal string and numeric parts
+  return 'string'
+    if $flags & B::SVf_POK
+      && (!($flags & (B::SVf_IOK | B::SVf_NOK))
+        || do { no warnings 'numeric'; 0+$value eq $value });
 
   if ($config->{legacy_ints}) {
-    return 'integer' if !($flags & B::SVf_POK) && ($flags & B::SVf_IOK) && !($flags & B::SVf_NOK);
-    return 'number' if !($flags & B::SVf_POK) && !($flags & B::SVf_IOK) && ($flags & B::SVf_NOK);
+    # in draft4, an integer is "A JSON number without a fraction or exponent part.",
+    # therefore 2.0 is NOT an integer
+    return ($flags & B::SVf_IOK) && !($flags & B::SVf_NOK) ? 'integer' : 'number'
+      if created_as_number($value);
   }
   else {
-    return int($value) == $value ? 'integer' : 'number'
-      if !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
+    # note: values that are larger than $Config{ivsize} will be represented as an NV, not IV,
+    # therefore they will fail this check
+    return int($value) == $value ? 'integer' : 'number' if created_as_number($value);
   }
 
-  # this might be a PVIV or PVNV
+  # this might be a scalar with POK|IOK or POK|NOK set
   return 'ambiguous type';
 }
 
 # lifted from JSON::MaybeXS
+# note: unlike builtin::compat on older perls, we do not accept
+# dualvar(0,"") or dualvar(1,"1") because JSON::PP and Cpanel::JSON::XS
+# do not encode these as booleans.
 use constant HAVE_BUILTIN => $] ge '5.036';
 use if HAVE_BUILTIN, experimental => 'builtin';
 sub is_bool ($value) {
   HAVE_BUILTIN and builtin::is_bool($value)
   or
-  !!Scalar::Util::blessed($value)
+  !!blessed($value)
     and ($value->isa('JSON::PP::Boolean')
       or $value->isa('Cpanel::JSON::XS::Boolean')
       or $value->isa('JSON::XS::Boolean'));
@@ -153,11 +191,14 @@ sub is_bignum ($value) {
 # $state hashref supports the following fields:
 # - path: location of the first difference
 # - error: description of the difference
-# - stringy_numbers: strings will be typed as numbers if looks_like_number() is true
+# - stringy_numbers: strings will also be compared numerically
 sub is_equal ($x, $y, $state = {}) {
   $state->{path} //= '';
 
   my @types = map get_type($_), $x, $y;
+
+  $state->{error} = 'ambiguous type encountered', return 0
+    if grep $types[$_] eq 'ambiguous type', 0..1;
 
   if ($state->{scalarref_booleans}) {
     ($x, $types[0]) = (0+!!$$x, 'boolean') if $types[0] eq 'reference to SCALAR';
@@ -166,9 +207,10 @@ sub is_equal ($x, $y, $state = {}) {
 
   if ($state->{stringy_numbers}) {
     ($x, $types[0]) = (0+$x, int(0+$x) == $x ? 'integer' : 'number')
-      if ($types[0] eq 'string' or $types[0] eq 'ambiguous type') and looks_like_number($x);
+      if $types[0] eq 'string' and looks_like_number($x);
+
     ($y, $types[1]) = (0+$y, int(0+$y) == $y ? 'integer' : 'number')
-      if ($types[1] eq 'string' or $types[1] eq 'ambiguous type') and looks_like_number($y);
+      if $types[1] eq 'string' and looks_like_number($y);
   }
 
   $state->{error} = "wrong type: $types[0] vs $types[1]", return 0 if $types[0] ne $types[1];
@@ -213,7 +255,7 @@ sub is_equal ($x, $y, $state = {}) {
 # if second arrayref is provided, it is populated with the indices of identical items
 # $state hashref supports the following fields:
 # - scalarref_booleans: treats \0 and \1 as boolean values
-# - stringy_numbers: strings will be typed as numbers if looks_like_number() is true
+# - stringy_numbers: strings will also be compared numerically
 sub is_elements_unique ($array, $equal_indices = undef, $state = {}) {
   my %s = $state->%{qw(scalarref_booleans stringy_numbers)};
   foreach my $idx0 (0 .. $array->$#*-1) {
@@ -433,7 +475,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.593
+version 0.594
 
 =head1 SYNOPSIS
 

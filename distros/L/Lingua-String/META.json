@@ -35,12 +35,14 @@
             "Carp" : "0",
             "Exporter" : "0",
             "HTML::Entities" : "0",
+            "Scalar::Util" : "0",
             "perl" : "5.006002"
          }
       },
       "test" : {
          "requires" : {
             "Test::Carp" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0"
@@ -61,6 +63,6 @@
          "x_repository" : "https://github.com/nigelhorne/Lingua-String"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

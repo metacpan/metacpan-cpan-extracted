@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.593';
+our $VERSION = '0.594';
 
 use 5.020;
 use Moo;
@@ -20,10 +20,11 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use MooX::TypeTiny;
 use Types::Standard qw(Str Bool Enum Tuple);
 use Types::Common::Numeric qw(PositiveInt);
+use builtin::compat 'refaddr';
 use namespace::clean;
 
 use overload
-  '0+' => sub { Scalar::Util::refaddr($_[0]) },
+  '0+' => sub { refaddr($_[0]) },
   '""' => sub { $_[0]->stringify },
   fallback => 1;
 
@@ -72,7 +73,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.593
+version 0.594
 
 =head1 SYNOPSIS
 

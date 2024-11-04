@@ -1,10 +1,16 @@
 Revision history for JSON-Schema-Modern
 
+0.594     2024-11-03 17:01:42Z
+          - improved handling of numeric type checking in draft4
+          - numeric type checking is relaxed, now allowing for dualvars
+            arising from the simple case of using a number in string context
+            or a string in numeric context (only a problem in perls <5.36)
+
 0.593     2024-10-14 18:43:23Z
           - fix new integer type tests that fail on perls < 5.35.9
 
 0.592     2024-10-13 19:43:20Z
-          - support added for the draft4, draft6 specifiction versions
+          - support added for the draft4, draft6 specification versions
 
 0.591     2024-10-06 21:06:15Z
           - new --dump-identifiers option in json-schema-eval executable

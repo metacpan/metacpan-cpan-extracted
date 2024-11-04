@@ -1,13 +1,25 @@
 Revision history for Env-Dot
 
+0.017     2024-11-03 21:50:44+01:00 Europe/Stockholm
+            * Remove fatpacker instruction from README.
+            * Remove whitespace.
+            * Start embedding version numbers in every file.
+            * Add App::RewriteVersion 1.000 to Prereqs / DevelopSuggests.
+            * Remove generating cpanfile.
+            * Add changes to Dzil::Plugin::Test::Perl::Critic config.
+
+0.017_002 2024-10-15 22:32:22+02:00 Europe/Stockholm (TRIAL RELEASE)
+
+0.017_001 2024-10-13 19:56:58+02:00 Europe/Stockholm (TRIAL RELEASE)
+
 0.016     2024-10-07 11:33:09+02:00 Europe/Stockholm
-			* Add Twata <twata_1@yahoo.co.jp> as a contributor. [rt.cpan.org #155711]
-				* Windows compatibility. Big thanks.
+            * Add Twata <twata_1@yahoo.co.jp> as a contributor. [rt.cpan.org #155711]
+                * Windows compatibility. Big thanks.
 
 0.016_02  2024-10-06 10:27:25+02:00 Europe/Stockholm (TRIAL RELEASE)
             * Remove filepath from dies test because of Windows.
-			* Add warning that script/envdot is not Windows compatible.
-			* Add GitHub Action for Windows build.
+            * Add warning that script/envdot is not Windows compatible.
+            * Add GitHub Action for Windows build.
             * Modify interpret_dotenv_filepath_var() to handle Win32 and Unix.
             * Add more diag to tests.
             * Add Test::Deny|Require::Platform packages. Remove Test::Require::OS::* packages.

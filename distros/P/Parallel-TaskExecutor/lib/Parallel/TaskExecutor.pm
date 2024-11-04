@@ -20,7 +20,7 @@ our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 our @CARP_NOT = 'Parallel::TaskExecutor::Task';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';  # Remember to change it in Task.pm too.
 
 =pod
 
@@ -77,7 +77,8 @@ can be created in total by this object instance.
 =back
 
 But all the options that can be passed to run() can also be passed to new() and
-they will apply to all the calls to this object.
+they will apply to all the calls to this object (unless overridden in a specific
+call to run()).
 
 =cut
 
@@ -240,7 +241,7 @@ sub _fork_and_run {
 
 Fork a new child process and use it to execute the given I<$sub>. The execution
 can be tracked using the returned I<$task> object of type
-L<Parallel::TaskManager::Task>.
+L<Parallel::TaskExecutor::Task>.
 
 If there are already B<max_parallel_tasks> tasks running, then the call will
 block until the count of running tasks goes below that limit.
@@ -393,6 +394,41 @@ sub _remove_done_tasks {
   }
   debug("Removed ${done} done tasks") if $done;
   return;
+}
+
+=pod
+
+=head2 signal_all()
+
+  $executor->signal_all('HUP');
+
+Sends the given signal all the tasks. See L<Parallel::TaskExecutor::Task/signal>
+for more details.
+
+=cut
+
+sub signal_all {
+  my ($this, $signal) = @_;
+  # See the comment in wait() for why $c can never be undef although it is a weak
+  # reference.
+  kill $signal, map { $_->pid() } values %{$this->{tasks}}, values %{$this->{zombies}};
+  return;
+}
+
+=pod
+
+=head2 kill_all()
+
+  $executor->kill_all();
+
+Same as L<signal_all()|/signal_all> but sends the C<SIGKILL> signal by default.
+You can still pass a specific signal if you want.
+
+=cut
+
+sub kill_all {
+  my ($this, $signal) = (@_, 'KILL');
+  return $this->signal_all($signal);
 }
 
 1;

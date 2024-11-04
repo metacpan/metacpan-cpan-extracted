@@ -1,0 +1,46 @@
+{
+   "abstract" : "Akamaiãã­ããã£ã®ã¢ã¯ãã£ããã¼ã¸ã§ã³æå ±ãåå¾ããã¢ã¸ã¥ã¼ã«",
+   "author" : [
+      "Kawamura Shingo <pannakoota@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Akamai-PropertyFetcher",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Akamai::Edgegrid" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "JSON" : "0",
+            "Parallel::ForkManager" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

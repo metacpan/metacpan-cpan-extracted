@@ -3432,7 +3432,7 @@ one of the two input ndarrays has their badflag true.
 
 
 
-#line 3629 "primitive.pd"
+#line 3630 "primitive.pd"
 
 =head2 where
 
@@ -3486,7 +3486,7 @@ sub PDL::where {
 }
 *where = \&PDL::where;
 
-#line 3685 "primitive.pd"
+#line 3686 "primitive.pd"
 
 =head2 where_both
 
@@ -3523,7 +3523,7 @@ sub PDL::where_both {
 }
 *where_both = \&PDL::where_both;
 
-#line 3723 "primitive.pd"
+#line 3724 "primitive.pd"
 
 =head2 whereND
 
@@ -3606,7 +3606,7 @@ sub PDL::whereND :lvalue {
 }
 *whereND = \&PDL::whereND;
 
-#line 3808 "primitive.pd"
+#line 3809 "primitive.pd"
 
 =head2 whichND
 
@@ -3709,7 +3709,7 @@ sub PDL::whichND {
   return $ind;
 }
 
-#line 3916 "primitive.pd"
+#line 3917 "primitive.pd"
 
 =head2 setops
 
@@ -3890,7 +3890,7 @@ sub PDL::setops {
 
 }
 
-#line 4099 "primitive.pd"
+#line 4100 "primitive.pd"
 
 =head2 intersect
 
@@ -3926,7 +3926,7 @@ sub PDL::intersect {
 
 }
 
-#line 4135 "primitive.pd"
+#line 4136 "primitive.pd"
 
 =head1 AUTHOR
 

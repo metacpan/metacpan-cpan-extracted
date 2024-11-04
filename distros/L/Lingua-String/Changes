@@ -1,5 +1,10 @@
 Revision history for Lingua-String
 
+0.05	Sun Nov  3 22:40:01 EST 2024
+	Use Test::DescribeMe to simplify tests
+	Use gtar to create a distribution on Macs
+	Added better coveralls and codecov support
+
 0.04	Mon Jun  3 13:37:29 EDT 2024
 	Fix synopsis
 	Calling new on an object now returns a clone rather than setting the defaults in the new object
