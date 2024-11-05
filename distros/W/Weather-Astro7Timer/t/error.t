@@ -37,15 +37,14 @@ subtest 'Wrong input' => sub {
 };
 
 my $mock = Test2::Mock->new(
-    class => 'LWP::UserAgent',
-    track => 1,
+    class    => 'LWP::UserAgent',
     override => [
-        get => sub { return HTTP::Response->new(401, 'ERROR', undef, '{}') },
+        get => sub {return HTTP::Response->new(401, 'ERROR', undef, '{}')},
     ],
 );
 
 subtest 'Error response' => sub {
-    ok(lives {$weather = Weather::Astro7Timer->new()}, "New object");
+    ok(lives {$weather = Weather::Astro7Timer->new(error => 'die')}, "New object");
     like(dies {$weather->get(lat => 0, lon => 0, product => 'civil')},
         qr/401 ERROR/, "LWP Error response");
 };

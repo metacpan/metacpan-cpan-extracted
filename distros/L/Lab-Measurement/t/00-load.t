@@ -52,6 +52,9 @@ sub skip_modules {
     }
 }
 
+# this module is designed to fail
+skip_modules('Lab/Measurement.pm');
+
 diag("checking installed modules");
 
 my %depencencies = (

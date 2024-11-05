@@ -14,7 +14,7 @@ use MARC::Leader;
 use Mo::utils 0.08 qw(check_isa check_required);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 # Constructor.
 sub new {
@@ -25,6 +25,9 @@ sub new {
 
 	# Cover callback.
 	$self->{'callback_cover'} = undef;
+
+	# Cycles callback.
+	$self->{'callback_cycles'} = undef;
 
 	# Lang callback.
 	$self->{'callback_lang'} = undef;
@@ -109,6 +112,7 @@ sub wikidata {
 	# Parameters.
 	my %params = (
 		'callback_cover' => $self->{'callback_cover'},
+		'callback_cycles' => $self->{'callback_cycles'},
 		'callback_lang' => $self->{'callback_lang'},,
 		'callback_publisher_place' => $self->{'callback_publisher_place'},,
 		'callback_people' => $self->{'callback_people'},
@@ -523,6 +527,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.17
+0.18
 
 =cut

@@ -1,3 +1,26 @@
+0.006 2024-11-05
+  [Requirement Changes]
+    * Require SPVM 0.990028.
+  [Internal Changes]
+    * Add private Net::SSLeay::X509_CRL#new_with_pointer method.
+    * Add private Net::SSLeay::X509#new_with_pointer method.
+    * Add private Net::SSLeay::X509_STORE#new_with_pointer method.
+    * Add private Net::SSLeay::X509_STORE#new_with_pointer method.
+    * Use more constructors.
+    * Rename Net::SSLeay::X509_STORE#certs field to certs_list.
+    * Rename Net::SSLeay::X509_STORE#crls field to crls_list.
+  [Bug Fix]
+    * Fix a bug that Net::SSLeay::SSL_CTX#add_cert method's memory bug.
+    * Fix a bug that Net::SSLeay::SSL_CTX#add_crl method's memory bug.
+    * Fix a bug that the return value of Net::SSLeay::ERR#error_string is not shortened before \0.
+  [Document Improvement]
+    * Improve docs for Net::SSLeay::BIO class.
+    * Improve docs for Net::SSLeay class.
+    * Add docs for SPVM::Net::SSLeay::ConfigBuilder.
+    * Improve docs for Net::SSLeay::Constant.
+    * Add docs for Net::SSLeay::PEM.
+    * Add docs for Net::SSLeay::SSL_METHOD.
+    
 0.005 2024-11-02
   [Requirement Changes]
     * Require SPVM 0.990026.

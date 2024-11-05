@@ -2,6 +2,19 @@
 # MIT License
 
 class Net::SSLeay::X509_VERIFY_PARAM {
+  allow Net::SSLeay::SSL_CTX;
+  
+  use Fn;
+  
+  # Class Methods
+  private static method new_with_pointer : Net::SSLeay::X509_VERIFY_PARAM ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::X509_VERIFY_PARAM;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
   
   # Instance Methods
   native method set_hostflags : void ($flags : int);

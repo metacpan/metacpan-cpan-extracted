@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use Data::Kramerius;
 use Error::Pure qw(err);
 use List::Util qw(any);
-use MARC::Convert::Wikidata::Object 0.05;
+use MARC::Convert::Wikidata::Object 0.08;
 use MARC::Convert::Wikidata::Object::ExternalId 0.05;
 use MARC::Convert::Wikidata::Object::ISBN;
 use MARC::Convert::Wikidata::Object::Kramerius;
@@ -37,7 +37,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 # Constructor.
 sub new {
@@ -166,6 +166,32 @@ sub _cover {
 	}
 
 	return $ret_cover[0];
+}
+
+sub _cycles {
+	my $self = shift;
+
+	my @cycle_787 = $self->{'marc_record'}->field('787');
+	my @cycles;
+	foreach my $cycle_787 (@cycle_787) {
+		if ($cycle_787->subfield('i') =~ m/^Z cyklu:/ms) {
+			my $cycle_name = $cycle_787->subfield('t');
+			my $cycle_ordinal = $cycle_787->subfield('g');
+
+			# XXX Over all publishers.
+			foreach my $publisher ($self->_publishers) {
+				push @cycles, MARC::Convert::Wikidata::Object::Series->new(
+					'name' => $cycle_name,
+					defined $publisher ? (
+						'publisher' => $publisher,
+					) : (),
+					'series_ordinal' => $cycle_ordinal,
+				);
+			}
+		}
+	}
+
+	return @cycles;
 }
 
 sub _dml {
@@ -319,6 +345,7 @@ sub _process_object {
 		'authors_of_introduction' => $self->{'_people'}->{'authors_of_introduction'},
 		'compilers' => $self->{'_people'}->{'compilers'},
 		'cover' => $self->_cover,
+		'cycles' => [$self->_cycles],
 		'directors' => $self->{'_people'}->{'directors'},
 		$self->_dml ? ('dml' => $self->_dml) : (),
 		$self->_edition_number ? ('edition_number' => $self->_edition_number) : (),

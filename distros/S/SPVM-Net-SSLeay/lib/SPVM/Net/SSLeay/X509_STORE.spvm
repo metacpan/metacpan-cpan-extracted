@@ -2,21 +2,36 @@
 # MIT License
 
 class Net::SSLeay::X509_STORE {
+  allow Net::SSLeay::SSL_CTX;
+  
   use Net::SSLeay::X509;
   use Net::SSLeay::X509_CRL;
   use List;
+  use Fn;
   
   # Fields
-  has certs : List of Net::SSLeay::X509;
+  has certs_list : List of Net::SSLeay::X509;
   
-  has crls : List of Net::SSLeay::X509_CRL;
+  has crls_list : List of Net::SSLeay::X509_CRL;
+  
+  # Class Methods
+  private static method new_with_pointer : Net::SSLeay::X509_STORE ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::X509_STORE;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    $self->init($options);
+    
+    return $self;
+  }
   
   # Instance Methods
-  protected method init : void ($options : object[]) {
+  protected method init : void ($options : object[] = undef) {
     
-    $self->{certs} = List->new(new Net::SSLeay::X509[0]);
+    $self->{certs_list} = List->new(new Net::SSLeay::X509[0]);
     
-    $self->{crls} = List->new(new Net::SSLeay::X509_CRL[0]);
+    $self->{crls_list} = List->new(new Net::SSLeay::X509_CRL[0]);
   }
   
   native method add_cert : int ($x : Net::SSLeay::X509);

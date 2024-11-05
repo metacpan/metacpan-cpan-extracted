@@ -24,6 +24,8 @@ class TransmitterWrapper:
         python_lib_path = file_path + f'/Binaries/Native/Linux/{arch}/libJavonetPythonRuntimeNative.so'
     elif platform.system() == 'Darwin':
         python_lib_path = file_path + f'/Binaries/Native/MacOs/{arch}/libJavonetPythonRuntimeNative.dylib'
+    else:
+        raise RuntimeError("Unsupported OS: " + platform.system())
 
     python_lib = cdll.LoadLibrary(python_lib_path)
     python_lib.SetCallback(callbackFunction)
@@ -69,10 +71,11 @@ class TransmitterWrapper:
             get_native_error.argtypes = []
             error_message = get_native_error()
             raise RuntimeError(
-                "Javonet activation result: " + str(activation_result) + ". Native error message: " + str(error_message))
+                "Javonet activation result: " + str(activation_result) + ". Native error message: " + str(
+                    error_message))
         else:
             return activation_result
-        
+
     @staticmethod
     def set_config_source(sourcePath):
         set_config_source = TransmitterWrapper.python_lib.SetConfigSource
@@ -87,6 +90,7 @@ class TransmitterWrapper:
             get_native_error.argtypes = []
             error_message = get_native_error()
             raise RuntimeError(
-                "Javonet set config source result: " + str(set_config_result) + ". Native error message: " + str(error_message))
+                "Javonet set config source result: " + str(set_config_result) + ". Native error message: " + str(
+                    error_message))
         else:
             return set_config_result

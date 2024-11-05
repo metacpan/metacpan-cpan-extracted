@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Test and measure with Perl",
-  "AUTHOR" => "Andreas K. H\x{fc}ttel <mail\@akhuettel.de>, Mia Schambeck <mia.schambeck\@mailbox.org>, Simon Reinhardt <simon.reinhardt\@physik.uni-r.de>, Erik Fabrizzi <erik.fabrizzi\@stud.uni-regensburg.de>",
+  "AUTHOR" => "Andreas K. H\x{fc}ttel <mail\@akhuettel.de>, Simon Reinhardt <simon.reinhardt\@physik.uni-r.de>, Erik Fabrizzi <erik.fabrizzi\@stud.uni-regensburg.de>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IO::Select" => 0,
     "IO::Socket::INET" => 0,
-    "JSON" => 0,
+    "JSON::PP" => 0,
     "LWP::Simple" => 0,
     "LWP::UserAgent" => 0,
     "List::MoreUtils" => 0,
@@ -58,6 +58,7 @@ my %WriteMakefileArgs = (
     "Sys::Hostname" => 0,
     "Term::ReadKey" => "2.30",
     "Test::More" => "1.001014",
+    "Tie::IxHash" => 0,
     "Time::HiRes" => 0,
     "Time::Seconds" => 0,
     "Try::Tiny" => "0.22",
@@ -90,7 +91,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "parent" => 0
   },
-  "VERSION" => "3.910",
+  "VERSION" => "3.920",
   "test" => {
     "TESTS" => "t/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/DataFile/Gnuplot/*.t t/Moose/Instrument/*.t t/Moose/Instrument/OI_Mercury/*.t"
   }
@@ -123,7 +124,7 @@ my %FallbackPrereqs = (
   "IO::Select" => 0,
   "IO::Socket::INET" => 0,
   "IO::Uncompress::Bunzip2" => 0,
-  "JSON" => 0,
+  "JSON::PP" => 0,
   "LWP::Simple" => 0,
   "LWP::UserAgent" => 0,
   "List::MoreUtils" => 0,
@@ -154,6 +155,7 @@ my %FallbackPrereqs = (
   "Test::More" => "1.001014",
   "Test::Tester" => 0,
   "Text::Diff" => 0,
+  "Tie::IxHash" => 0,
   "Time::HiRes" => 0,
   "Time::Seconds" => 0,
   "Try::Tiny" => "0.22",

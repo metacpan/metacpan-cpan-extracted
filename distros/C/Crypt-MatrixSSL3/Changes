@@ -1,7 +1,10 @@
 Revision history for Perl extension Crypt::MatrixSSL3.
 
+v3.9.4  2024-11-05 12:18:36 EET
+	- Update tests for Perl v5.41.x (thanks @richardleach)
+
 v3.9.3  2020-03-19 09:46:50 EET
-        - Fixed PS_PUBKEY_OPTIMIZE_FOR_FASTER_SPEED / PS_PUBKEY_OPTIMIZE_FOR_SMALLER_RAM contention
+	- Fixed PS_PUBKEY_OPTIMIZE_FOR_FASTER_SPEED / PS_PUBKEY_OPTIMIZE_FOR_SMALLER_RAM contention
 
 v3.9.2  2018-12-03 23:06:57 EET
 	- Update bundled ca-certificates.

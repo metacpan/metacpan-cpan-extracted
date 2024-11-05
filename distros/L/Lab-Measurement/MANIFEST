@@ -22,6 +22,7 @@ examples/Sweeps/manual-T-IV-freq.pl
 examples/Sweeps/manual.pl
 examples/Sweeps/pulsewidth-sweep.pl
 examples/Sweeps/voltage-sweep.pl
+lib/Lab/Measurement.pm
 lib/Lab/Measurement/Backends.pod
 lib/Lab/Measurement/Developer.pod
 lib/Lab/Measurement/Examples/Example1_Simple_IV.pod
@@ -64,6 +65,7 @@ lib/Lab/Moose/Instrument/Agilent33120A.pm
 lib/Lab/Moose/Instrument/Agilent33210A.pm
 lib/Lab/Moose/Instrument/Agilent34410A.pm
 lib/Lab/Moose/Instrument/Agilent34460A.pm
+lib/Lab/Moose/Instrument/AttoCube_AMC.pm
 lib/Lab/Moose/Instrument/Bluefors_Temp.pm
 lib/Lab/Moose/Instrument/Cache.pm
 lib/Lab/Moose/Instrument/Common.pm

@@ -16,6 +16,12 @@ BEGIN {
 use lib "$perlLibDirJavonet";
 use lib "$perlLibDirDeps";
 use aliased 'Javonet::Core::Interpreter::Interpreter' => 'Interpreter', qw(process);
+use aliased 'Javonet::Sdk::Core::RuntimeLogger' => 'RuntimeLogger', qw(print_runtime_info);
+
+
+BEGIN {
+    RuntimeLogger->print_runtime_info();
+}
 
 sub heart_beat {
     my ($self, $message_byte_array_ref) = @_;

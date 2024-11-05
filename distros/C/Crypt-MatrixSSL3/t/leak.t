@@ -260,7 +260,15 @@ sub alert {
 sub leaktest {
     my $test = shift;
     my %arg  = (init=>10, test=>100, max_mem_diff=>288, diag=>0, @_);
-    my $tmp = 'x' x 1000000; undef $tmp;
+
+    # The perl interpreter may constant-fold the string of 'x's and
+    # mark it suitable for Copy-on-Write (COW) sharing, meaning that 
+    # `my $tmp = ('x' x 1000000)` will not assign $tmp its own string
+    # buffer. (It shares the buffer of the underlying CONST OP.)
+    # Concatenation with `time` forces a full string copy, ensuring
+    # that $tmp gets a dedicated buffer.
+    my $tmp = ('x' x 1000000).time; undef $tmp;
+
     my $code = sub { no strict 'refs'; \&$test(); };
     $code->() for 1 .. $arg{init};
     my $mem = MEM_used();

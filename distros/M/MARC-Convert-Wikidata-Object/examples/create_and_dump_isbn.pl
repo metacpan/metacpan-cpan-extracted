@@ -18,12 +18,22 @@ p $obj;
 
 # Output:
 # MARC::Convert::Wikidata::Object::ISBN  {
-#     Parents       Mo::Object
-#     public methods (9) : BUILD, can (UNIVERSAL), DOES (UNIVERSAL), err (Error::Pure), check_isa (Mo::utils), check_required (Mo::utils), isa (UNIVERSAL), type, VERSION (UNIVERSAL)
-#     private methods (1) : __ANON__ (Mo::build)
+#     parents: Mo::Object
+#     public methods (8):
+#         BUILD, type
+#         Error::Pure:
+#             err
+#         List::Util:
+#             none
+#         Mo::utils:
+#             check_bool, check_isa, check_required
+#         Readonly:
+#             Readonly
+#     private methods (0)
 #     internals: {
-#         _isbn       Business::ISBN13,
-#         isbn        "978-80-00-05046-1",
-#         publisher   MARC::Convert::Wikidata::Object::Publisher
+#         _isbn        978-80-00-05046-1 (Business::ISBN13),
+#         collective   0,
+#         isbn         "978-80-00-05046-1" (dualvar: 978),
+#         publisher    MARC::Convert::Wikidata::Object::Publisher
 #     }
 # }

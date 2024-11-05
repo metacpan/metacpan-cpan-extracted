@@ -22,6 +22,11 @@ from javonet.core.handler.GetEnumNameHandler import GetEnumNameHandler
 from javonet.core.handler.GetEnumValueHandler import GetEnumValueHandler
 from javonet.core.handler.EnableNamespaceHandler import EnableNamespaceHandler
 from javonet.core.handler.EnableTypeHandler import EnableTypeHandler
+from javonet.core.handler.GetStaticMethodAsDelegateHandler import GetStaticMethodAsDelegateHandler
+from javonet.core.handler.GetInstanceMethodAsDelegateHandler import GetInstanceMethodAsDelegateHandler
+from javonet.core.handler.PassDelegateHandler import PassDelegateHandler
+from javonet.core.handler.InvokeDelegateHandler import InvokeDelegateHandler
+
 
 from javonet.core.handler.HandlerDictionary import handler_dict
 from javonet.core.referenceCache.ReferencesCache import ReferencesCache
@@ -56,6 +61,10 @@ class Handler(AbstractHandler):
         handler_dict[CommandType.GetEnumValue] = GetEnumValueHandler()
         handler_dict[CommandType.EnableNamespace] = EnableNamespaceHandler()
         handler_dict[CommandType.EnableType] = EnableTypeHandler()
+        handler_dict[CommandType.GetStaticMethodAsDelegate] = GetStaticMethodAsDelegateHandler()
+        handler_dict[CommandType.GetInstanceMethodAsDelegate] = GetInstanceMethodAsDelegateHandler()
+        handler_dict[CommandType.PassDelegate] = PassDelegateHandler()
+        handler_dict[CommandType.InvokeDelegate] = InvokeDelegateHandler()
 
     def handle_command(self, command):
         try:

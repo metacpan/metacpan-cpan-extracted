@@ -7,13 +7,16 @@ use warnings;
 use Carp;
 use Time::Local;
 
+use parent 'Weather::API::Base';
+use Weather::API::Base qw(:all);
+
 =head1 NAME
 
 Weather::Astro7Timer - Simple client for the 7Timer.info Weather Forecast service
 
 =cut
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 =head1 SYNOPSIS
 
@@ -73,7 +76,7 @@ Weather Forecast API.
 It is mostly known for its ASTRO product intended for astronomers and stargazers, as
 it provides an astronomical seeing and transparency forecast.
 
-Pease see the L<official API documentation|https://www.7timer.info/doc.php> and
+Please see the L<official API documentation|https://www.7timer.info/doc.php> and
 L<GitHub Wiki|https://github.com/Yeqzids/7timer-issues/wiki/Wiki> for details.
 
 The module was made to serve the apps L<Xasteria|https://astro.ecuadors.net/xasteria/> and
@@ -89,6 +92,7 @@ requires some extra functionality, feel free to contact the author about it.
         timeout => $timeout_sec?,
         agent   => $user_agent_string?,
         ua      => $lwp_ua?,
+        error   => $die_or_return?
     );
   
 Optional parameters:
@@ -101,7 +105,9 @@ Optional parameters:
 
 =item * C<agent> : Customize the user agent string.
 
-=item * C<ua> : Pass your own L<LWP::UserAgent> to customise further.
+=item * C<ua> : Pass your own L<LWP::UserAgent> to customise further (overrides C<agent>).
+
+=item * C<error> : Pass C<'die'> to die on error. Default is C<'return'>.
 
 =back
 
@@ -126,7 +132,7 @@ Optional parameters:
 Fetches a forecast report for the requested for the requested location.
 Returns a string containing the JSON or XML data, except in array context, in which case,
 as a convenience, it will use L<JSON> or L<XML::Simple> to decode it directly to a Perl hash
-(in the case of C<png> output, the hash will containg a single key C<data> with the png data).
+(in the case of C<png> output, the hash will containing a single key C<data> with the png data).
 For an explanation to the returned data, refer to the L<official API documentation|http://www.7timer.info/doc.php>.
 
 If the request is not successful, it will C<die> throwing the C<< HTTP::Response->status_line >>.
@@ -149,7 +155,7 @@ Required parameters:
 
 =item * C<civillight> : CIVIL Light simplified per-day forecast for next week.
 
-=item * C<meteo> : A detailed meteorogical forecast including relative humidity and wind profile from 950hPa to 200hPa.
+=item * C<meteo> : A detailed meteorological forecast including relative humidity and wind profile from 950hPa to 200hPa.
 
 =item * C<two> : A two week overview forecast (may be unmaintained).
 
@@ -161,7 +167,7 @@ Optional parameters (see the API documentation for further details):
 
 =over 4
 
-=item * C<lang> : Supports C<zh-CN> or C<zh-TW>, otherwise default is C<en>.
+=item * C<lang> : Default is C<en>, also supports C<zh-CN> or C<zh-TW>.
 
 =item * C<unit> : C<metric> (default) or C<british> units.
 
@@ -198,19 +204,8 @@ Returns the supported forecast products.
 =cut
 
 sub new {
-    my $class = shift;
-
-    my $self = {};
-    bless($self, $class);
-
-    my %args = @_;
-
-    $self->{ua}      = $args{ua};
-    $self->{scheme}  = $args{scheme} || 'https';
-    $self->{timeout} = $args{timeout} || 30;
-    $self->{agent}   = $args{agent} || "libwww-perl Weather::Astro7Timer/$VERSION";
-
-    return $self;
+    my ($class, %args) = @_;
+    return $class->SUPER::new(%args);
 }
 
 sub get {
@@ -219,15 +214,9 @@ sub get {
     $args{lang}   ||= 'en';
     $args{output} ||= 'json';
     $args{output} = 'internal' if $args{output} eq 'png';
+    $self->{output} = $args{output};
 
-    my $resp = $self->get_response(%args);
-
-    if ($resp->is_success) {
-        return _output($resp->decoded_content, wantarray ? $args{output} : '');
-    }
-    else {
-        die $resp->status_line;
-    }
+    return $self->_get_output($self->get_response(%args), wantarray);
 }
 
 sub get_response {
@@ -240,51 +229,19 @@ sub get_response {
     croak("product not supported")
         unless grep { /^$args{product}$/ } products();
 
-    croak("lat between -90 and 90 expected")
-        unless defined $args{lat} && abs($args{lat}) <= 90;
+    Weather::API::Base::_verify_lat_lon(\%args);
 
-    croak("lon between -180 and 180 expected")
-        unless defined $args{lon} && abs($args{lon}) <= 180;
-
-    my $url = $self->_weather_url(%args);
-
-    unless ($self->{ua}) {
-        require LWP::UserAgent;
-        $self->{ua} = LWP::UserAgent->new();
-    }
-
-    $self->{ua}->agent($self->{agent});    
-    $self->{ua}->timeout($self->{timeout});
-
-    return $self->{ua}->get($url);
+    return $self->_get_ua($self->_weather_url(%args));
 }
 
 sub _weather_url {
     my $self = shift;
     my %args = @_;
     my $prod = delete $args{product};
-    my $url =
-          $self->{scheme}
-        . "://www.7timer.info/bin/$prod.php?"
+    my $url  = "www.7timer.info/bin/$prod.php?"
         . join("&", map {"$_=$args{$_}"} keys %args);
 
     return $url;
-}
-
-sub _output {
-    my $str    = shift;
-    my $format = shift;
-
-    return $str unless $format;
-
-    if ($format eq 'json') {
-        require JSON;
-        return %{JSON::decode_json($str)};
-    } elsif ($format eq 'xml') {
-        require XML::Simple;
-        return %{XML::Simple::XMLin($str)};
-    }
-    return (data => $str);
 }
 
 sub products {
@@ -300,20 +257,6 @@ sub products {
 Returns a unix timestamp from the init date. For the subsequent entries of the
 timeseries you can add C<timepoint> * 3600 to the timestamp.
 
-=head2 C<ts_to_date>
-
-    my $datetime = Weather::Astro7Timer::ts_to_date($timestamp, $utc?);
-
-For convenience, C<ts_to_date> will convert a timestamp (e.g. returned by
-C<init_to_ts>) to a date/time format C<YYYY-MM-DD HH:mm:ss> in your local time zone,
-or C<YYYY-MM-DD HH:mm:ssZ> in UTC if the second argument is true. For example:
-
- my $datetime = Weather::Astro7Timer::ts_to_date(
-    Weather::Astro7Timer::init_to_ts($report{init}) +
-        $report{dataseries}->[0]->{timepoint} * 3600
- );
-
-
 =cut
 
 sub init_to_ts {
@@ -323,42 +266,44 @@ sub init_to_ts {
     return timegm(0,0,$4,$3,$2-1,$1) 
 }
 
-sub ts_to_date {
-    my $ts = shift;
-    my $gm = shift;
-    $gm = $gm ? 'Z' : '';
-    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) =
-        $gm ? gmtime($ts) : localtime($ts);
-    $mon++;
-    $year += 1900;
-    return sprintf "%04d-%02d-%02d %02d:%02d:%02d%s", $year, $mon, $mday,
-        $hour, $min, $sec, $gm;
-}
+=head1 HELPER FUNCTIONS FROM Weather::API::Base
+
+The parent class L<Weather::API::Base> contains some useful functions:
+
+  use Weather::API::Base qw(:all);
+
+  # Get time in YYYY-MM-DD HH:mm:ss format, local time zone
+  my $datetime = ts_to_date(time());
+
+  # Convert 30 degrees Celsius to Fahrenheit
+  my $result = convert_units('C', 'F', 30);
+
+See the doc for that module for more details.
 
 =head1 OTHER PERL WEATHER MODULES
 
 A quick listing of Perl modules for current weather and forecasts from various sources:
 
-=head2 OpenWeatherMap
+=head2 L<Weather::OWM>
 
 OpenWeatherMap uses various weather sources combined with their own ML and offers
 a couple of free endpoints (the v2.5 current weather and 5d/3h forecast) with generous
 request limits. Their newer One Call 3.0 API also offers some free usage (1000 calls/day)
 and the cost is per call above that. If you want access to history APIs, extended
 hourly forecasts etc, there are monthly subscriptions. L<Weather::OWM> is from the
-same author as this module and simplar in use.
+same author as this module and similar in use.
 
-=head2 Apple WeatherKit
+=head2 L<Weather::WeatherKit>
 
 An alternative source for multi-source forecasts is Apple's WeatherKit (based on
 the old Dark Sky weather API). It offers 500k calls/day for free, but requires a
 paid Apple developer account. You can use L<Weather::WeatherKit>, which is very
 similar to this module (same author).
 
-=head2 YR.no
+=head2 L<Weather::YR>
 
-Finally, the Norwegian Meteorological Institute offers the free YR.no service, which
-can be accessed via L<Weather::YR>, although I am not affiliated with that module.
+The Norwegian Meteorological Institute offers the free YR.no service (no registration
+needed), which can be accessed via L<Weather::YR>. I am not affiliated with that module.
 
 =head1 AUTHOR
 

@@ -1,3 +1,7 @@
+0.08 2024-11-04T21:20:17+01:00
+ - API change: Add 'cycles' parameter to Object.
+ - Regen examples.
+
 0.07 2024-10-30T22:17:14+01:00
  - API change: Add 'collective' parameter to ISBN.
  - API change: Add 'precision' parameter to PublicationDate.

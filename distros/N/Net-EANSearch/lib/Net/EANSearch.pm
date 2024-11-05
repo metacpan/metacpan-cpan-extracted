@@ -29,7 +29,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 our $ALL_LANGUAGES = 99;
 our $ENGLISH = 1;
@@ -53,6 +53,7 @@ our $BULGARIAN = 20;
 our $GREEK = 21;
 
 my $BASE_URI = 'https://api.ean-search.org/api?format=json&token=';
+my $MAX_API_TRIES = 3; # retry, eg. on 429 error
 
 sub new {
 	my $class = shift;
@@ -109,6 +110,18 @@ sub productSearch {
 	return @{ $json->{productlist} };
 }
 
+sub similarProductSearch {
+	my $self = shift;
+	my $kw = shift;
+	my $lang = shift || 1;
+	my $page = shift || 1;
+
+	my $json_str = $self->_apiCall($self->{base_uri} . "&op=similar-product-search&page=$page&language=$lang&name="
+		. URL::Encode::url_encode_utf8($kw));
+	my $json = decode_json($json_str);
+	return @{ $json->{productlist} };
+}
+
 sub categorySearch {
 	my $self = shift;
 	my $category = shift;
@@ -154,14 +167,23 @@ sub verifyChecksum {
 sub _apiCall {
 	my $self = shift;
 	my $url = shift;
+	my $tries = 0;
 
-	my $doc = $self->{ua}->request(HTTP::Request->new(GET => $url));
-	if (!defined($doc) || $doc->is_error()) {
-		print STDERR 'Network error: ' . (defined($doc) ? $doc->code : 'unknown') . "\n";
-		return undef;
-	} else {
-		return $doc->content;
+	while ($tries < $MAX_API_TRIES) {
+		my $doc = $self->{ua}->request(HTTP::Request->new(GET => $url));
+		$tries++;
+		if (!defined($doc) || $doc->is_error()) {
+			if ($doc->code == 429) { # auto-retry on 429 (too many requests)
+				sleep 1;
+				next;
+			}
+			print STDERR 'Network error: ' . (defined($doc) ? $doc->code : 'unknown') . "\n";
+			return undef;
+		} else {
+			return $doc->content;
+		}
 	}
+	return undef;
 }
 
 1;
@@ -215,7 +237,17 @@ If there are many results, you may need to page through the results to retrieve 
 
 =item productSearch($name [, $language, $page])
 
-Search the database by product name or keyword.
+Search the database by product name or keyword (exact search, all parts of the query must be found).
+If you get no results, you might want to try a similarProductSearch().
+
+Optionally, you can specify a preferred language for the results.
+
+If there are many results, you may need to page through the results to retrieve them all. Page numbers start at 1.
+
+=item similarProductSearch($name [, $language, $page])
+
+Search the database by product name or keyword (find similar products, not all parts of the query must match).
+You probably want to try an exact search (productSearch()) before you do a similarProductSearch().
 
 Optionally, you can specify a preferred language for the results.
 

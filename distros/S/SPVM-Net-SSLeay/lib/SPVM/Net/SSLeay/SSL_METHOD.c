@@ -13,10 +13,10 @@ int32_t SPVM__Net__SSLeay__SSL_METHOD__SSLv23_method(SPVM_ENV* env, SPVM_VALUE* 
   
   const SSL_METHOD* ssl_method = SSLv23_method();
   
-  void* obj_ssl_method = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::SSL_METHOD", (void*)ssl_method, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_self = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::SSL_METHOD", (void*)ssl_method, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  stack[0].oval = obj_ssl_method;
+  stack[0].oval = obj_self;
   
   return 0;
 }
@@ -27,10 +27,10 @@ int32_t SPVM__Net__SSLeay__SSL_METHOD__SSLv23_client_method(SPVM_ENV* env, SPVM_
   
   const SSL_METHOD* ssl_method = SSLv23_client_method();
   
-  void* obj_ssl_method = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::SSL_METHOD", (void*)ssl_method, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_self = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::SSL_METHOD", (void*)ssl_method, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  stack[0].oval = obj_ssl_method;
+  stack[0].oval = obj_self;
   
   return 0;
 }
@@ -41,10 +41,10 @@ int32_t SPVM__Net__SSLeay__SSL_METHOD__SSLv23_server_method(SPVM_ENV* env, SPVM_
   
   const SSL_METHOD* ssl_method = SSLv23_server_method();
   
-  void* obj_ssl_method = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::SSL_METHOD", (void*)ssl_method, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_self = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::SSL_METHOD", (void*)ssl_method, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  stack[0].oval = obj_ssl_method;
+  stack[0].oval = obj_self;
   
   return 0;
 }
@@ -58,10 +58,10 @@ int32_t SPVM__Net__SSLeay__SSL_METHOD__TLS_method(SPVM_ENV* env, SPVM_VALUE* sta
   
   const SSL_METHOD* ssl_method = TLS_method();
   
-  void* obj_ssl_method = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::SSL_METHOD", (void*)ssl_method, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_self = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::SSL_METHOD", (void*)ssl_method, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  stack[0].oval = obj_ssl_method;
+  stack[0].oval = obj_self;
   
   return 0;
 #endif
@@ -76,10 +76,10 @@ int32_t SPVM__Net__SSLeay__SSL_METHOD__TLS_client_method(SPVM_ENV* env, SPVM_VAL
   
   const SSL_METHOD* ssl_method = TLS_client_method();
   
-  void* obj_ssl_method = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::SSL_METHOD", (void*)ssl_method, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_self = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::SSL_METHOD", (void*)ssl_method, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  stack[0].oval = obj_ssl_method;
+  stack[0].oval = obj_self;
   
   return 0;
 #endif
@@ -94,10 +94,10 @@ int32_t SPVM__Net__SSLeay__SSL_METHOD__TLS_server_method(SPVM_ENV* env, SPVM_VAL
   
   const SSL_METHOD* ssl_method = TLS_server_method();
   
-  void* obj_ssl_method = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::SSL_METHOD", (void*)ssl_method, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_self = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::SSL_METHOD", (void*)ssl_method, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  stack[0].oval = obj_ssl_method;
+  stack[0].oval = obj_self;
   
   return 0;
 #endif

@@ -95,6 +95,16 @@ do {
 	}
 } while (@product_list == 10);
 
+$page = 0;
+do {
+	$page++;
+	@product_list = $eansearch->similarProductSearch('Apple iPhone 16 exotic keywords white', $Net::EANSearch::ENGLISH, $page);
+
+	foreach my $p (@product_list) {
+		print "EAN $p->{ean} is $p->{name}\n";
+	}
+} while (@product_list == 10);
+
 my @book_list = $eansearch->categorySearch(15, 'iphone');
 
 foreach my $p (@book_list) {

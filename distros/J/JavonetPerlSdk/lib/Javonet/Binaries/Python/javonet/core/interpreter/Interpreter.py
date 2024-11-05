@@ -7,7 +7,6 @@ from javonet.utils.connectionData.IConnectionData import IConnectionData
 
 handler = Handler()
 
-
 class Interpreter:
 
     def execute(self, command, connection_data: IConnectionData):

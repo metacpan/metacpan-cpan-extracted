@@ -1,3 +1,7 @@
+0.18 2024-11-04T21:23:56+01:00
+ - Add another edition number cleanup use case.
+ - Add processing of cycles.
+
 0.17 2024-11-02T18:32:52+01:00
  - Add another publication place cleanup use case.
  - Add another edition number cleanup use case.

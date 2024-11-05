@@ -14,7 +14,7 @@ Lab::Measurement::Roadmap - Some notes and speculations on future L::M developme
 
 =head1 VERSION
 
-version 3.910
+version 3.920
 
 =head1 3.800: legacy code deprecation
 

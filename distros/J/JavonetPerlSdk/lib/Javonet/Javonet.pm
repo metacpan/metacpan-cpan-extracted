@@ -8,6 +8,7 @@ use threads;
 use aliased 'Javonet::Sdk::Internal::RuntimeFactory' => 'RuntimeFactory';
 use aliased 'Javonet::Core::Transmitter::PerlTransmitter' => 'Transmitter', qw(activate_with_license_file activate_with_credentials activate_with_credentials_and_proxy);
 use aliased 'Javonet::Core::Exception::SdkExceptionHelper' => 'SdkExceptionHelper';
+use aliased 'Javonet::Sdk::Core::RuntimeLogger' => 'RuntimeLogger', qw(print_runtime_info);
 
 BEGIN {
     try {
@@ -15,6 +16,7 @@ BEGIN {
     } catch {
         SdkExceptionHelper->send_exception_to_app_insights($_,"JavonetStatic");
     };
+    RuntimeLogger->print_runtime_info();
 }
 
 sub activate {

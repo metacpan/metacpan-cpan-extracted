@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.8] - 2024-11-04
+
+### Improved
+
+- Remove the requirement for a Font Awesome kit number
+
 ## [0.0.7] - 2024-11-02
 
 ### Fixed

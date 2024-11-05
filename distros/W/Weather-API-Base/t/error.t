@@ -22,7 +22,7 @@ subtest '_deref' => sub {
 subtest 'convert_units' => sub {
     like(dies {convert_units()}, qr/Value not defined/, "Missing val");
     like(dies {convert_units('x', 'km', 1)}, qr/not recognized/, "Unknown units");
-    like(dies {convert_units('km', 'kph', 1)}, qr/Cannot convert/, "Incompatible units");
+    like(dies {convert_units('km', 'km/h', 1)}, qr/Cannot convert/, "Incompatible units");
 };
 
 subtest 'datetime_to_ts' => sub {

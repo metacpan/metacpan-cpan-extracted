@@ -1,5 +1,3 @@
-import traceback
-
 from javonet.core.handler.AbstractCommandHandler import *
 
 

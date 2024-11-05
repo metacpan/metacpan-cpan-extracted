@@ -6,33 +6,25 @@ class CommandSerializer {
     buffer = new Int8Array(2)
 
 
-    serialize(command, connectionData, runtimeVersion = 0) {
-        let deque = [command]
-        this.buffer[0] = command.runtimeName
+    serialize(root_command, connectionData, runtimeVersion = 0) {
+        this.buffer[0] = root_command.runtimeName
         this.buffer[1] = runtimeVersion
         this.#insertIntoBuffer(connectionData.serializeConnectionData())
-        this.#insertIntoBuffer(new Int8Array([Runtime.Nodejs, command.commandType]))
-        return this.#serializeRecursively(deque)
+        this.#insertIntoBuffer(new Int8Array([Runtime.Nodejs, root_command.commandType]))
+        this.#serializeRecursively(root_command)
+        return this.buffer
     }
 
-    #serializeRecursively = function(deque) {
-        if (deque.length === 0) return this.buffer;
-        let cmd = deque.pop()
-        deque.push(cmd.dropFirstPayloadArg())
-        if (cmd.payload.length > 0) {
-            if (cmd.payload[0] instanceof Command) {
-                let innerCommand = cmd.payload[0]
-                this.#insertIntoBuffer(TypeEncoder.serializeCommand(innerCommand))
-                deque.push(innerCommand)
+    #serializeRecursively = function(root_command) {
+        for (let cmd of root_command.payload) {
+            if (cmd instanceof Command) {
+                this.#insertIntoBuffer(TypeEncoder.serializeCommand(cmd))
+                this.#serializeRecursively(cmd)
             } else {
-                let result = TypeEncoder.encodePrimitive(cmd.payload[0])
+                let result = TypeEncoder.encodePrimitive(cmd)
                 this.#insertIntoBuffer(result)
             }
-            return this.#serializeRecursively(deque)
-        } else {
-            deque.pop()
         }
-        return this.#serializeRecursively(deque)
     }
 
     #insertIntoBuffer = function(arg) {

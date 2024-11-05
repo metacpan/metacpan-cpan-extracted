@@ -22,7 +22,7 @@ class TransmitterWrapper {
     }
 
     static setConfigSource(configSource) {
-        return library.setConfigSource(configSource)
+        //return library.setConfigSource(configSource)
     }
 }
 

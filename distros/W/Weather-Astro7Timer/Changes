@@ -1,5 +1,8 @@
 Revision history for Weather-Astro7Timer
 
+0.4     2024-11-04
+        Refactored to use Weather::API::Base.
+
 0.3     2024-10-24
         Helper functions.
 

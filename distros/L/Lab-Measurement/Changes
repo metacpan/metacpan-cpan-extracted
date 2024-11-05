@@ -4,6 +4,12 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.920 2024-11-05
+  * First rough version of AttoCube motion controller driver
+  * AMI_430 magnet supply: add check of attribute persistent_mode
+  * Add a dummy L::M module that errors out, for 3.920 => 3.990
+  * Minor documentation fixes
+
 3.910 2024-09-19
   * AMI430 magnet supply: Add persistent mode features
   * KeysightB2901A: Check source range in set_level

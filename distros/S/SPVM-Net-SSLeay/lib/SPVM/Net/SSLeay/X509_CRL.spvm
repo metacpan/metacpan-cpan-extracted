@@ -2,6 +2,19 @@
 # MIT License
 
 class Net::SSLeay::X509_CRL {
+  allow Net::SSLeay::PEM;
+  
+  use Fn;
+  
+  # Class Methods
+  private static method new_with_pointer : Net::SSLeay::X509_CRL ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::X509_CRL;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
   
   # Instance Methods
   native method DESTROY : void ();

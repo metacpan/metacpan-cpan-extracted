@@ -3,6 +3,8 @@
 
 class Net::SSLeay::ERR {
   
+  use Fn;
+  
   # Instance Methods
   native static method error_string_n : void ($e : long, $buf : mutable string, $len : int = -1);
   
@@ -10,7 +12,9 @@ class Net::SSLeay::ERR {
   static method error_string : string ($e : long) {
     my $buf = (mutable string)new_string_len 256;
     
-    &error_string_n($e, $buf, length $buf);
+    &error_string_n($e, $buf);
+    
+    Fn->shorten_null_char($buf);
     
     return $buf;
   }

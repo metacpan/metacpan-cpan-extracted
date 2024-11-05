@@ -1,5 +1,11 @@
 Changelog for Mojo-Leds
 
+1.18 2024-11-04T15:12:00
+- New upload because module seems to be deleted from CPAN. No changes from 1.17.
+
+1.17 2024-11-04T12:40:00
+- Minor bugs in build
+
 1.16 2024-11-04T11:20:00
 - Add support for custom format response in Mojo::Leds::Page::route
 

@@ -39,3 +39,7 @@ class CommandType(Enum):
     EnableNamespace = 34
     EnableType = 35
     CreateNull = 36
+    GetStaticMethodAsDelegate = 37
+    GetInstanceMethodAsDelegate = 38
+    PassDelegate = 39
+    InvokeDelegate = 40

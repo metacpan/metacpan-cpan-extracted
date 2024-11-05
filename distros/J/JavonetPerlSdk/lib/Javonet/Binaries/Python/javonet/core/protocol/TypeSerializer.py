@@ -5,7 +5,27 @@ from javonet.utils.StringEncodingMode import StringEncodingMode
 
 
 class TypeSerializer:
-    
+
+    @staticmethod
+    def serialize_primitive(payload_item):
+        if payload_item is None:
+            return TypeSerializer.serialize_none()
+        if isinstance(payload_item, bool):
+            return TypeSerializer.serialize_bool(payload_item)
+        elif isinstance(payload_item, int):
+            if payload_item in range(-2 ** 31, 2 ** 31):
+                return TypeSerializer.serialize_int(payload_item)
+            elif payload_item in range(-2 ** 63, 2 ** 63):
+                return TypeSerializer.serialize_longlong(payload_item)
+            else:
+                return TypeSerializer.serialize_ullong(payload_item)
+        elif isinstance(payload_item, float):
+            return TypeSerializer.serialize_double(payload_item)
+        elif isinstance(payload_item, str):
+            return TypeSerializer.serialize_string(payload_item)
+        else:
+            raise Exception("Python: Type serialization not supported for type: " + payload_item)
+
     @staticmethod
     def serialize_command(command):
         length = list(bytearray(struct.pack("<i", len(command.payload))))

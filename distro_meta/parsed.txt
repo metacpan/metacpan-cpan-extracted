@@ -95013,3 +95013,16 @@ C/CO/CORION/RecentInfo-Manager-0.03.tar.gz
 S/SO/SONGMU/Riji-v1.1.2.tar.gz
 K/KI/KIMOTO/SPVM-0.990028.tar.gz
 I/IN/INGY/YAMLScript-0.1.82.tar.gz
+D/DA/DAVECROSS/App-LinkSite-0.0.8.tar.gz
+P/PO/POWERMAN/Crypt-MatrixSSL3-v3.9.4.tar.gz
+J/JA/JAVONET/JavonetPerlSdk-v2.5.3.tar.gz
+A/AK/AKHUETTEL/Lab-Measurement-3.920.tar.gz
+S/SK/SKIM/MARC-Convert-Wikidata-0.18.tar.gz
+S/SK/SKIM/MARC-Convert-Wikidata-Object-0.08.tar.gz
+S/SI/SISYPHUS/Math-Ryu-1.07.tar.gz
+E/EB/EBRUNI/Mojo-Leds-1.18.tar.gz
+J/JA/JANW/Net-EANSearch-1.07.tar.gz
+L/LN/LNATION/Quaint-0.02.tar.gz
+K/KI/KIMOTO/SPVM-Net-SSLeay-0.006.tar.gz
+D/DK/DKECHAG/Weather-API-Base-0.2.tar.gz
+D/DK/DKECHAG/Weather-Astro7Timer-0.4.tar.gz

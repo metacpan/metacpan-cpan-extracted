@@ -1,5 +1,5 @@
 ---
-abstract: 'SPVM bindings for OpenSSL'
+abstract: 'OpenSSL Binding'
 author:
   - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
   SPVM::IO: '0.204003'
   SPVM::Mozilla::CA: '0.001'
 configure_requires:
-  SPVM: '0.990026'
+  SPVM: '0.990028'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -20,8 +20,8 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.990026'
+  SPVM: '0.990028'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Net-SSLeay.git
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

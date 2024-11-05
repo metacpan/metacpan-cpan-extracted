@@ -5,8 +5,28 @@ use Moose;
 use Encode;
 use lib 'lib';
 
+use Scalar::Util::Numeric qw(isint);
+use autobox::universal qw(type);
 use aliased 'Javonet::Sdk::Core::Type' => 'Type', qw(get_type);
 use aliased 'Javonet::Sdk::Core::StringEncodingMode' => 'StringEncodingMode', qw(get_string_encoding_mode);
+
+sub serialize_primitive {
+    my $self = $_[0];
+    my $payload_item = $_[1];
+    if(!defined $payload_item) {
+        return serializeUndef($self);
+    }
+
+    if(isint($payload_item)){
+        return serializeInt($self, $payload_item);
+    }
+    if(type($payload_item) eq "FLOAT"){
+        return serializeDouble($self, $payload_item);
+    }
+    else{
+        return serializeString($self, $payload_item);
+    }
+}
 
 sub serializeCommand {
     my $self = $_[0];

@@ -1,8 +1,12 @@
+1.07
+     - Fix reference counting of $Math::Ryu::pinf/ninf/nanv in fmtpy() XSub.
+     - Add more fmtpy_pp() tests.
 1.06
      - Wrap and export SvPOK (as ryu_SvPOK) and SvIOKp (as ryu_SvIOKp).
      - Optionally allow (via setting of $Math::Ryu::PERL_INFNAN) infs and nans to be
-       stringified to the same as perl provides. Previously they have been stringified
-       strictly as "inf", "-inf" and "nan" - which could differ from perl's presentation.
+       stringified by nv2s() to the same as perl provides. Previously they have been
+       stringified by nv2s() strictly as "inf", "-inf" and "nan" - which could differ
+       from perl's presentation. See "DISPLAYING INFS AND NANS" in the documentation.
 
 1.05
      - In 1.04, I failed to amend pany() and sany() to allow for the "PV_NV_BUG". This
@@ -18,7 +22,8 @@
      - Add new "print" functions pany() and sany(), and "sprintf" function spanyf().
      - Export ryu_SvIOK and and ryu_SvNOK - formerly known as the unexported
        functions _SvIOK and _SvNOK.
-     - Remove the "PV_NV_BUG" check as it is irrelevant.
+     - Remove the "PV_NV_BUG" check as it is irrelevant. (Subsequently re-instated in
+       version 1.04 because, as it turns out, it wasn't irrelevant.)
 
 1.02
      - Fix fmtpy_pp() to handle values like '6E15' correctly. (In 1.01, they appear

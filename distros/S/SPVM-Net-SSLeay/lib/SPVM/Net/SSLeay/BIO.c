@@ -13,10 +13,10 @@ int32_t SPVM__Net__SSLeay__BIO__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   BIO* bio = BIO_new(BIO_s_mem());
   
-  void* obj_bio = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::BIO", bio, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_self = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::BIO", bio, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  stack[0].oval = obj_bio;
+  stack[0].oval = obj_self;
   
   return 0;
 }

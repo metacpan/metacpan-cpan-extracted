@@ -1,5 +1,5 @@
 package Mojo::Leds::Rest::DBIx;
-$Mojo::Leds::Rest::DBIx::VERSION = '1.16';
+$Mojo::Leds::Rest::DBIx::VERSION = '1.18';
 use Mojo::Base 'Mojo::Leds::Rest';
 
 has pk       => 'id';
@@ -150,7 +150,7 @@ Mojo::Leds::Rest::DBIx - A RESTFul interface to Class::DBIx
 
 =head1 VERSION
 
-version 1.16
+version 1.18
 
 =head1 SYNOPSIS
 

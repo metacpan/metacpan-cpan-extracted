@@ -59,7 +59,6 @@ The `links.json` file defines what appears on your link site. It has three secti
 * **site_url:** The URL of your site. This is optional. Without it, the program will probably do the right thing
 * **desc:** A one-line description that appears on the site. You can use simple HTML in this
 * **ga4:** If you want to track visitors using Google Analytics, then put your site key here
-* **font_awesome_kit:** In order to use the nice Font Awesome social icons, you need a Font Awesome key. Put it here
 
 ### Socials
 

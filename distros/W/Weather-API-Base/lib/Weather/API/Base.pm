@@ -19,7 +19,7 @@ Weather::API::Base - Base/util module for Weather API clients
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 =head1 SYNOPSIS
 
@@ -154,13 +154,13 @@ Can convert from/to various units that are used in weather:
 
 =over 4
 
-=item * B<Wind speed:> kph, mph, m/s, Bft, knot
+=item * B<Wind speed:> km/h, mph, m/s, Bft, kt
 
 =item * B<Temp:> K, F, C
 
 =item * B<Rainfall & distance:> mm, in, m, km, mi
 
-=item * B<Pressure:> atm, mbar, mmHg, kPa
+=item * B<Pressure:> atm, mbar, mmHg, kPa, hPa
 
 =back
 
@@ -169,9 +169,9 @@ Use the above units as string parameters. Example:
   $result = convert_units('atm', 'mmHg', 1); # Will return 760 (mmHg per 1 atm)
 
 If you try to convert between non convertible units, the croak message will list
-the valid conversions from the 'from' units. For example C<convert_units('kph', 'mm', 10)>
-will croak with the speed units (kph, mph, m/s, Bft, knot) that are available to
-convert from kph.
+the valid conversions from the 'from' units. For example C<convert_units('km/h', 'mm', 10)>
+will croak with the speed units (km/h, mph, m/s, Bft, kt) that are available to
+convert from km/h.
 
 Note that the Beaufort scale (C<Bft>) is an empirical scale commonly used in whole
 numbers (converting to a range of +/- 0.5 Bft in other units), but the convert
@@ -327,23 +327,24 @@ sub _deref {
 }
 
 my %units = (
-    kph   => [1000 / 3600,     'm/s'],
-    mph   => [1609.344 / 3600, 'm/s'],
-    Bft   => [\&_beaufort,     'm/s'],
-    knot  => [0.514444,        'm/s'],
-    'm/s' => [1,               'm/s'],
-    in    => [0.0254,          'm'],
-    mm    => [0.001,           'm'],
-    mi    => [1609.344,        'm'],
-    m     => [1,               'm'],
-    km    => [1000,            'm'],
-    atm   => [1,               'atm'],
-    mbar  => [1/1013.25,       'atm'],
-    mmHg  => [1/760,           'atm'],
-    kPa   => [1/101.325,       'atm'],
-    K     => [\&_kelvin,       'C'],
-    F     => [\&_fahr,         'C'],
-    C     => [1,               'C'],
+    'km/h' => [1000 / 3600,     'm/s'],
+    mph    => [1609.344 / 3600, 'm/s'],
+    Bft    => [\&_beaufort,     'm/s'],
+    kt     => [0.514444,        'm/s'],
+    'm/s'  => [1,               'm/s'],
+    in     => [0.0254,          'm'],
+    mm     => [0.001,           'm'],
+    mi     => [1609.344,        'm'],
+    m      => [1,               'm'],
+    km     => [1000,            'm'],
+    atm    => [1,               'atm'],
+    mbar   => [1 / 1013.25,     'atm'],
+    mmHg   => [1 / 760,         'atm'],
+    hPa    => [1 / 1013.25,     'atm'],
+    kPa    => [1 / 101.325,     'atm'],
+    K      => [\&_kelvin,       'C'],
+    F      => [\&_fahr,         'C'],
+    C      => [1,               'C'],
 );
 
 sub _units {

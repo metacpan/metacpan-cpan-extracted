@@ -6,11 +6,11 @@ package SPVM::Net::SSLeay::ERR;
 
 =head1 Name
 
-SPVM::Net::SSLeay::ERR - SSL/TSL Errors
+SPVM::Net::SSLeay::ERR - OpenSSL Errors
 
 =head1 Description
 
-The Net::SSLeay::ERR class of L<SPVM> has methods to manipulate SSL/TLS errors.
+Net::SSLeay::ERR class in L<SPVM> has methods to manipulate OpenSSL Errors.
 
 =head1 Usage
 
@@ -20,11 +20,31 @@ The Net::SSLeay::ERR class of L<SPVM> has methods to manipulate SSL/TLS errors.
 
 =head2 error_string_n
 
-  static method error_string_n : void ($e : long, $buf : mutable string, $len : int = -1);
+C<static method error_string_n : void ($e : long, $buf : mutable string, $len : int = -1);>
+
+Calls L<error_string_n|https://docs.openssl.org/1.1.1/man3/ERR_error_string/> function.
+
+Exceptions:
+
+The buffer $buf must be defined. Otherwise an exception is thrown.
+
+The length $len must be less than or equal to the length of the buffer $buf. Otherwise an exception is thrown.
 
 =head2 error_string
 
-  static method error_string : string ($e : long);
+C<static method error_string : string ($e : long);>
+
+Same as L</"error_string_n> method, but $buf of the length 256 is created automatically.
+
+The returned string is cut just before C<\0>.
+
+=head1 See Also
+
+=over 2
+
+=item * L<Net::SSLeay|SPVM::Net::SSLeay>
+
+=back
 
 =head1 Copyright & License
 

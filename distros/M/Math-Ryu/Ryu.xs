@@ -118,6 +118,10 @@ int ryu_lln(pTHX_ SV * sv) {
   return looks_like_number(sv);
 }
 
+int ryu_refcnt(SV * sv) {
+  return SvREFCNT(sv);
+}
+
 int _compiler_has_uint128(void) {
 #ifdef COMPILER_HAS_UINT128_T
    return 1;
@@ -293,11 +297,11 @@ SV * fmtpy(pTHX_ SV * in) {
     if(s[0] == 'I') {
       if(is_neg) {
         s--;
-        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return get_sv("Math::Ryu::ninf", 0);
+        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::ninfstr", 0)), 0);
         return newSVpv("-inf", 0);
       }
       else {
-        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return get_sv("Math::Ryu::pinf", 0);
+        if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::pinfstr", 0)), 0);
         return newSVpv("inf", 0);
       }
     }
@@ -306,7 +310,7 @@ SV * fmtpy(pTHX_ SV * in) {
         s--;
         croak("rubbish input of '%s'", s);
       }
-      if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return get_sv("Math::Ryu::nanv", 0);
+      if(SvIV(get_sv("Math::Ryu::PERL_INFNAN", 0))) return newSVpv(SvPV_nolen(get_sv("Math::Ryu::nanvstr", 0)), 0);
       return newSVpv("nan", 0);
     }
     /* mantissa is single-digit */
@@ -438,11 +442,16 @@ int
 ryu_SvIOKp (sv)
 	SV *	sv
 
-int ryu_lln (sv)
+int
+ryu_lln (sv)
 	SV *	sv
 CODE:
   RETVAL = ryu_lln (aTHX_ sv);
 OUTPUT:  RETVAL
+
+int
+ryu_refcnt (sv)
+	SV *	sv
 
 int
 _compiler_has_uint128 ()

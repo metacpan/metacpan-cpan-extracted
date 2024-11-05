@@ -15,7 +15,7 @@ The main driver class for App::LinkSite.
 use Feature::Compat::Class;
 
 class App::LinkSite {
-  our $VERSION = '0.0.7';
+  our $VERSION = '0.0.8';
   use strict;
   use warnings;
   use feature qw[say signatures];
@@ -42,7 +42,6 @@ class App::LinkSite {
   field $src :reader :param = eval { dist_dir("App-LinkSite") } || "$Bin/../src";
   field $out :reader :param = 'docs';
   field $ga4 :reader :param = undef;
-  field $font_awesome_kit :reader :param = undef;
   field $site :reader :param = undef;
 
   field $tt;
@@ -52,7 +51,6 @@ class App::LinkSite {
     my $data = JSON->new->decode($json);
 
     $ga4 = $data->{ga4} // '';
-    $font_awesome_kit = $data->{font_awesome_kit} // '';
 
     $tt = Template->new({
       # Templates in the CPAN distro directory
@@ -61,7 +59,6 @@ class App::LinkSite {
       OUTPUT_PATH  => $out,
       VARIABLES    => {
         ga4              => $ga4,
-        font_awesome_kit => $font_awesome_kit,
       }
     });
 

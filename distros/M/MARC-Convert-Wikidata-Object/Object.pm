@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 has authors => (
 	default => [],
@@ -34,6 +34,11 @@ has compilers => (
 );
 
 has cover => (
+	is => 'ro',
+);
+
+has cycles => (
+	default => [],
 	is => 'ro',
 );
 
@@ -168,6 +173,10 @@ sub BUILD {
 		err "Book cover '".$self->{'cover'}."' doesn't exist.";
 	}
 
+	# Check cycles.
+	check_array_object($self, 'cycles',
+		'MARC::Convert::Wikidata::Object::Series', 'Book cycles');
+
 	# Check directors.
 	check_array_object($self, 'directors',
 		'MARC::Convert::Wikidata::Object::People', 'Director');
@@ -251,6 +260,7 @@ MARC::Convert::Wikidata::Object - Bibliographic Wikidata object defined by MARC 
  my $authors_of_introduction_ar = $obj->authors_of_introduction;
  my $compilers = $obj->compilers;
  my $cover = $obj->cover;
+ my $cycles_ar = $obj->cycles;
  my $directors_ar = $obj->directors;
  my $dml = $obj->dml;
  my $edition_number = $obj->edition_number;
@@ -322,6 +332,13 @@ Possible values:
  * paperback
 
 Default value is undef.
+
+=item * C<cycles>
+
+List of book cycles.
+Reference to array with MARC::Convert::Wikidata::Object::Series instances.
+
+Default value is [].
 
 =item * C<directors>
 
@@ -504,6 +521,14 @@ Get book cover.
 
 Returns string (hardback or paperback).
 
+=head2 C<cycles>
+
+ my $cycles_ar = $obj->cycles;
+
+Get reference to array with Serie item objects.
+
+Returns reference to array of MARC::Convert::Wikidata::Object::Series instances.
+
 =head2 C<directors>
 
  my $directors_ar = $obj->directors;
@@ -683,6 +708,7 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
                  Author of introduction isn't 'MARC::Convert::Wikidata::Object::People' object.
                  Book series isn't 'MARC::Convert::Wikidata::Object::Series' object.
                  Book cover '%s' doesn't exist.
+                 Book cycle isn't 'MARC::Convert::Wikidata::Object::Series' object.
                  Compiler isn't 'MARC::Convert::Wikidata::Object::People' object.
                  Director isn't 'MARC::Convert::Wikidata::Object::People' object.
                  Editor isn't 'MARC::Convert::Wikidata::Object::People' object.
@@ -693,6 +719,7 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
                  Parameter 'authors_of_afterword' must be a array.
                  Parameter 'authors_of_introduction' must be a array.
                  Parameter 'compilers' must be a array.
+                 Parameter 'cycles' must be a array.
                  Parameter 'directors' must be a array.
                  Parameter 'editors' must be a array.
                  Parameter 'end_time' must be a number.
@@ -838,6 +865,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

@@ -91,17 +91,18 @@ subtest 'datetime_to_ts' => sub {
 
 subtest 'convert_units' => sub {
     my @tests = (
-        ['mph','kph',10,16.09344],
+        ['mph','km/h',10,16.09344],
         ['m/s','m/s',10,10],
         ['Bft','m/s',10,26.44],
         ['m/s','Bft',10,5.23],
-        ['knot','kph',10,18.52],
+        ['kt','km/h',10,18.52],
         ['in','mm',10,254],
         ['mm','km',10,10/1000000],
-        ['knot','kph',10,18.52],
+        ['kt','km/h',10,18.52],
         ['mi','m',10,16093.44],
         ['mbar','mmHg',10,7.5],
         ['atm','kPa',10,1013.25],
+        ['kPa','hPa',10,100],
         ['K','C',10,-263.15],
         ['C','K',0,273.15],
         ['C','F',0,32],
@@ -117,7 +118,6 @@ subtest '_get_ua' => sub {
     my ($content, $request);
     my $mock = Test2::Mock->new(
         class    => 'LWP::UserAgent',
-        track    => 1,
         override => [
             get => sub {
                 my $req = $_[1];

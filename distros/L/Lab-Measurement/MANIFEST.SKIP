@@ -37,9 +37,6 @@ nytprof
 # coding documentation not for distribution
 \bdoc\b
 
-# drivers and modules that are not ready yet for release
-^lib/Lab/Moose/Instrument/AttoCube_AMC.pm
-
 # dont distribute the old examples
 ^examples/Old
 

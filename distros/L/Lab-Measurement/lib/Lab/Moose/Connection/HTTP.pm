@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::HTTP;
-$Lab::Moose::Connection::HTTP::VERSION = '3.910';
+$Lab::Moose::Connection::HTTP::VERSION = '3.920';
 #ABSTRACT: Connection with Http requests
 
 use v5.20;
@@ -93,7 +93,7 @@ Lab::Moose::Connection::HTTP - Connection with Http requests
 
 =head1 VERSION
 
-version 3.910
+version 3.920
 
 =head1 SYNOPSIS
 

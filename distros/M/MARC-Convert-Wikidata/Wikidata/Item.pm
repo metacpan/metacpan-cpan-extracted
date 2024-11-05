@@ -26,7 +26,7 @@ Readonly::Hash our %EXT_ID_MAPPING => (
 	'lccn' => 'P243',
 );
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 # Constructor.
 sub new {
@@ -37,6 +37,9 @@ sub new {
 
 	# Cover callback.
 	$self->{'callback_cover'} = undef;
+
+	# Cycles callback.
+	$self->{'callback_cycles'} = undef;
 
 	# Lang callback.
 	$self->{'callback_lang'} = undef;
@@ -718,7 +721,11 @@ sub wikidata_series {
 	} else {
 		# No warn flag for use case when we found series.
 		my $found = 0;
-		foreach my $series (@{$self->{'transform_object'}->series}) {
+		foreach my $series (
+				@{$self->{'transform_object'}->series},
+				@{$self->{'transform_object'}->cycles}
+			) {
+
 			my $series_qid = $self->{'callback_series'}->($series, $found);
 			if ($series_qid) {
 				push @series_qids, [

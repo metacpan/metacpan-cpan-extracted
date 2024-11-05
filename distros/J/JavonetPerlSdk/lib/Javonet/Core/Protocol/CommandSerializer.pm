@@ -7,12 +7,10 @@ use lib 'lib';
 use aliased 'Javonet::Sdk::Core::PerlCommand' => 'PerlCommand';
 use aliased 'Javonet::Sdk::Core::RuntimeLib' => 'RuntimeLib', qw(get_runtime);
 use aliased 'Javonet::Sdk::Core::Type' => 'Type', qw(get_type);
-use aliased 'Javonet::Core::Protocol::TypeSerializer' => 'TypeSerializer', qw(serializeInt serializeString serializeDouble serializeFloat serializeCommand);
+use aliased 'Javonet::Core::Protocol::TypeSerializer' => 'TypeSerializer', qw(serializePrimitive serializeCommand);
 use Javonet::Sdk::Internal::ConnectionType;
 
 use Thread::Queue;
-use Scalar::Util::Numeric qw(isint);
-use autobox::universal qw(type);
 
 my @byte_buffer = ();
 my $queue = Thread::Queue->new();
@@ -25,7 +23,8 @@ sub encode {
     insert_into_buffer(($root_command->{runtime}, $runtimeVersion));
     insert_into_buffer(serialize_tcp_address($connection_type, $tcp_address));
     insert_into_buffer(Javonet::Sdk::Core::RuntimeLib::get_runtime('Perl'), $root_command->{command_type});
-    return serialize_recursively();
+    serialize_recursively();
+    return @byte_buffer;
 }
 
 sub serialize_tcp_address {
@@ -44,27 +43,6 @@ sub serialize_tcp_address {
     }
 }
 
-sub insert_into_buffer {
-    my @arguments = @_;
-    @byte_buffer = (@byte_buffer, @arguments);
-}
-
-sub serialize_primitive {
-    my ($payload_item) = @_;
-    if(!defined $payload_item) {
-        return TypeSerializer->serializeUndef();
-    }
-
-    if(isint($payload_item)){
-        return TypeSerializer->serializeInt($payload_item);
-    }
-    if(type($payload_item) eq "FLOAT"){
-        return TypeSerializer->serializeDouble($payload_item);
-    }
-    else{
-        return TypeSerializer->serializeString($payload_item);
-    }
-}
 
 sub serialize_recursively{
     my $left = $queue->pending();
@@ -78,7 +56,7 @@ sub serialize_recursively{
     my $payload_len = @cur_payload;
     if ($payload_len > 0){
         if (!defined $cur_payload[0]){
-            insert_into_buffer(serialize_primitive(undef));
+            insert_into_buffer(TypeSerializer->serialize_primitive(undef));
         }
         else {
             if ($cur_payload[0]->isa("Javonet::Sdk::Core::PerlCommand")) {
@@ -87,7 +65,7 @@ sub serialize_recursively{
                 $queue->insert(0, $inner_command);
             }
             else {
-                my @result = serialize_primitive($cur_payload[0]);
+                my @result = TypeSerializer->serialize_primitive($cur_payload[0]);
                 insert_into_buffer(@result);
             }
         }
@@ -97,6 +75,11 @@ sub serialize_recursively{
         $queue->dequeue();
     }
     return serialize_recursively();
+}
+
+sub insert_into_buffer {
+    my @arguments = @_;
+    @byte_buffer = (@byte_buffer, @arguments);
 }
 
 no Moose;
