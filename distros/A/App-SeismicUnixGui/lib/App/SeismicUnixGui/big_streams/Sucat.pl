@@ -36,11 +36,12 @@ Square brackets show abbreviations of default directories.
 
  CASE 1A
 
- Use a list (use complete file names but exclude the directory paths) 
+ Use a list of complete file names (include suffixes if they have them
+ but exclude the directory paths)
  for concatenating iVelan "pick files" (Vrms,time pairs)
  into the correct format.
 
- A "list", which is found in the $DATA_SEISMIC_TXT directory contains, 
+ A "list.txt", which is found in the $DATA_SEISMIC_TXT directory contains, 
  e.g.,:
  ivpicks_sorted_par_L28Hz_Ibeam_geom4_cdp1
  ivpicks_sorted_par_L28Hz_Ibeam_geom4_cdp11
@@ -62,39 +63,41 @@ Square brackets show abbreviations of default directories.
  vnmo=59.4778,160.806,195.689,273.761
  tnmo=0.0316623,0.0759894,0.129815
  vnmo=101.006,130.906,263.794
-
+ 
+  (See ~sunix/shell/sucat.pm)
+ If "data_type" = "velan" then the concatenated output file
+ will automatically be reformatted for input into sunmo.
 
 CASE 1B
 
- Use a list (use complete file names but exclude the directory paths) 
- for concatenating iVelan "pick files" (x-coordinate,time pairs)
+ Use a list of complete file names (include suffixes if they have them
+ but exclude the directory paths),
+ for concatenating picked "mute files" (time, x-coordinate pairs)
  into the correct format.
 
- For example, a "list" [$DATA_SEISMIC_TXT] contains:
+ For example, a "list" called ""ute_list.txt"" [in $DATA_SEISMIC_TXT] contains:
 
- itop_mute_par_L28Hz_Ibeam_cmp_ep3
- itop_mute_par_L28Hz_Ibeam_cmp_ep5
+itop_mute_par_All_SH_geom3_ep3
+itop_mute_par_All_SH_geom3_ep4
 
  The starting input format in each  in "par" format:
- tnmo=0.0189974,0.113193,0.153562,0.231926
- vnmo=59.4778,160.806,195.689,273.761
+tmute=0.0122645,0.0122645,0.00947713,0.0133795,0.0462707,0.0819493,0.134352,0.20
+5152
+xmute=1.18683,0.58898,2.75617,4.21343,10.9766,19.8322,36.9455,60.1121
 
- tmute=0.0189974,0.113193,0.153562,0.231926
- xmute=5.4778,16.806,19.68,100.761
+tmute=0.0328725,0.0223064,0.0540049,0.105662,0.207214
+xmute=0.397959,4.11054,13.7934,28.7942,60.7526
 
- The final output format is:
+ For the final output format:
  Data_type is determined by parsing the file names and normally contains:
  "itop_mute", "ibot_mute" etc." '
     
- (See ~sunix/shell/sucat.pm)
- If "data_type" = "velan" then the concatenated output file
- will automatically be reformatted for input into sunmo.       
-
+ (See ~sunix/shell/sucat.pm)   
  If "data_type" = "itop_mute" or "ibot_mute" then the concatenated 
  output file will automatically be reformatted for input into
  "sumute". 
 
-GUI EXAMPLE:    
+    GUI EXAMPLE:    
     
  Note that a list can only be used when the values of the prior
  6 parameters are BLANK, i.e., be sure to

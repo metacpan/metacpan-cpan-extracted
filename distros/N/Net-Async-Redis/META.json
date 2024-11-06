@@ -110,51 +110,55 @@
    "provides" : {
       "Net::Async::Redis" : {
          "file" : "lib/Net/Async/Redis.pm",
-         "version" : "6.003"
+         "version" : "6.004"
       },
       "Net::Async::Redis::Cluster" : {
          "file" : "lib/Net/Async/Redis/Cluster.pm",
-         "version" : "6.003"
+         "version" : "6.004"
       },
       "Net::Async::Redis::Cluster::Multi" : {
          "file" : "lib/Net/Async/Redis/Cluster/Multi.pm",
-         "version" : "6.003"
+         "version" : "6.004"
       },
       "Net::Async::Redis::Cluster::Node" : {
          "file" : "lib/Net/Async/Redis/Cluster/Node.pm",
-         "version" : "6.003"
+         "version" : "6.004"
+      },
+      "Net::Async::Redis::Cluster::Replica" : {
+         "file" : "lib/Net/Async/Redis/Cluster/Replica.pm",
+         "version" : "6.004"
       },
       "Net::Async::Redis::Commands" : {
          "file" : "lib/Net/Async/Redis/Commands.pm",
-         "version" : "6.003"
+         "version" : "6.004"
       },
       "Net::Async::Redis::Multi" : {
          "file" : "lib/Net/Async/Redis/Multi.pm",
-         "version" : "6.003"
+         "version" : "6.004"
       },
       "Net::Async::Redis::Protocol" : {
          "file" : "lib/Net/Async/Redis/Protocol.pm",
-         "version" : "6.003"
+         "version" : "6.004"
       },
       "Net::Async::Redis::Server" : {
          "file" : "lib/Net/Async/Redis/Server.pm",
-         "version" : "6.003"
+         "version" : "6.004"
       },
       "Net::Async::Redis::Server::Connection" : {
          "file" : "lib/Net/Async/Redis/Server/Connection.pm",
-         "version" : "6.003"
+         "version" : "6.004"
       },
       "Net::Async::Redis::Server::Database" : {
          "file" : "lib/Net/Async/Redis/Server/Database.pm",
-         "version" : "6.003"
+         "version" : "6.004"
       },
       "Net::Async::Redis::Subscription" : {
          "file" : "lib/Net/Async/Redis/Subscription.pm",
-         "version" : "6.003"
+         "version" : "6.004"
       },
       "Net::Async::Redis::Subscription::Message" : {
          "file" : "lib/Net/Async/Redis/Subscription/Message.pm",
-         "version" : "6.003"
+         "version" : "6.004"
       }
    },
    "release_status" : "stable",
@@ -169,7 +173,7 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Redis"
       }
    },
-   "version" : "6.003",
+   "version" : "6.004",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Tom Molesworth <tom@audioboundary.com>",

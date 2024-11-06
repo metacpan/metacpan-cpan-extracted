@@ -11,6 +11,7 @@ package App::SeismicUnixGui::misc::wipe;
  DESCRIPTION: 
  Version:0.1 
  Package used for scrubbing gui
+ 
 =head2 USE
 
 =head3 NOTES 
@@ -32,7 +33,6 @@ my $get   = L_SU_global_constants->new();
 my $var   = $get->var();
 my $param = $get->param();
 
-
 # TODO mystery memory leak between check_buttons_settings_aref and values_w[$i]
 
 =head2 anonymous reference to common variable
@@ -43,17 +43,15 @@ length = max_index + 1 (see L_SU_global constants)
 =cut
 
 my $entries = {
-    _last                 => '',
-    _length				  => '',
-    _first_idx            => '',
-    _labels_w_aref        => '',
-    _values_w_aref        => '',
-    _check_buttons_w_aref => '',
-    # _check_buttons_settings_aref => '',
-    _max_index			  => $param->{_length},
+	_last                 => '',
+	_length               => '',
+	_first_idx            => '',
+	_labels_w_aref        => '',
+	_values_w_aref        => '',
+	_check_buttons_w_aref => '',
+	_max_length            => $param->{_length},
 
 };
-
 
 =head2 sub all_check_buttons 
 
@@ -73,67 +71,118 @@ my $entries = {
 
 sub all_check_buttons {
 
-    my ($self) = @_;
-    my ( $first_idx, $length, $i );
-    my (@check_buttons_w);
-    $first_idx = $entries->{_first_idx};
-    $length    = $entries->{_max_index};
+	my ($self) = @_;
+	my ( $first_idx, $length, $i );
+	my (@check_buttons_w);
+	$first_idx = $entries->{_first_idx};
+	$length    = $entries->{_max_length};
 
-    if ( $entries->{_check_buttons_w_aref} ) {
-#    	print("wipe, check_buttons, cleaning up to index:$length \n");
-        @check_buttons_w = @{ $entries->{_check_buttons_w_aref} };
+	if ( $entries->{_check_buttons_w_aref} ) {
 
-        for ( $i = $first_idx ; $i < $length ; $i++ ) {
+		#    	print("wipe, check_buttons, cleaning up to index:$length \n");
+		@check_buttons_w = @{ $entries->{_check_buttons_w_aref} };
 
-            $check_buttons_w[$i]->configure(
-                -background       => $var->{_my_white},
-                -activebackground => $var->{_my_white},
-                -variable         => \$var->{_off},
-            );
-        }
-    }
-    else {
-        # print("wipe, check_buttons, missing parameters \n");
-    }
+		for ( $i = $first_idx ; $i < $length ; $i++ ) {
+
+			$check_buttons_w[$i]->configure(
+				-background       => $var->{_my_white},
+				-activebackground => $var->{_my_white},
+				-variable         => \$var->{_off},
+			);
+		}
+	}
+	else {
+		# print("wipe, check_buttons, missing parameters \n");
+	}
 
 }
 
-
-
 =head2 sub neutral_range 
 
+for neutral color
 
 =cut 
 
 sub neutral_range {
-    my ( $self, $ref_hash ) = @_;
-    $entries->{_first_idx}            = $ref_hash->{_first_idx};  
-    $entries->{_length}               = $entries->{_max_index};
-    $entries->{_labels_w_aref}        = $ref_hash->{_labels_w_aref};
-    $entries->{_values_w_aref}        = $ref_hash->{_values_w_aref};
-    $entries->{_check_buttons_w_aref} = $ref_hash->{_check_buttons_w_aref};
-    # $temp							  = $ref_hash->{_check_buttons_settings_aref};
-    # $entries->{_check_buttons_settings_aref} = $ref_hash->{_check_buttons_settings_aref};
-	# print("wipe,neutral_range,length of previous selected sueprflow = $entries->{_length}\n");
-	# print("wipe,neutral_range,check_buttons_settings_aref=--@{$entries->{_check_buttons_settings_aref}}--\n");	
-	# @{$entries->{_check_buttons_settings_aref}}[0]='aaa';
+	my ( $self, $ref_hash ) = @_;
+	$entries->{_first_idx}            = $ref_hash->{_first_idx};
+	$entries->{_length}               = $entries->{_max_length};
+	$entries->{_labels_w_aref}        = $ref_hash->{_labels_w_aref};
+	$entries->{_values_w_aref}        = $ref_hash->{_values_w_aref};
+	$entries->{_check_buttons_w_aref} = $ref_hash->{_check_buttons_w_aref};
+
+# $temp							  = $ref_hash->{_check_buttons_settings_aref};
+# $entries->{_check_buttons_settings_aref} = $ref_hash->{_check_buttons_settings_aref};
+# print("wipe,neutral_range,length of previous selected sueprflow = $entries->{_length}\n");
+# print("wipe,neutral_range,check_buttons_settings_aref=--@{$entries->{_check_buttons_settings_aref}}--\n");
+# @{$entries->{_check_buttons_settings_aref}}[0]='aaa';
 }
 
 =head2 sub range 
 
+for colored flows
 
 =cut 
 
 sub range {
-    my ( $self, $ref_hash ) = @_;
-    
-    $entries->{_first_idx}            = $ref_hash->{_first_idx};
-    $entries->{_length}               = $ref_hash->{_length};
-    $entries->{_labels_w_aref}        = $ref_hash->{_labels_w_aref};
-    $entries->{_values_w_aref}        = $ref_hash->{_values_w_aref};
-    $entries->{_check_buttons_w_aref} = $ref_hash->{_check_buttons_w_aref};
+	my ( $self, $ref_hash ) = @_;
 
-	# print("wipe,range,length of previous selected sueprflow = $entries->{_length}\n");
+	if ( length $ref_hash ) {
+
+		$entries->{_first_idx}            = $ref_hash->{_first_idx};
+		$entries->{_length}               = $entries->{_max_length};
+		$entries->{_labels_w_aref}        = $ref_hash->{_labels_w_aref};
+		$entries->{_values_w_aref}        = $ref_hash->{_values_w_aref};
+		$entries->{_check_buttons_w_aref} = $ref_hash->{_check_buttons_w_aref};
+	}
+	else {
+		print("wipe,range, missing hash reference\n");
+	}
+
+	return ();
+
+}
+
+=head2 sub set_range 
+
+
+=cut 
+
+sub set_range {
+	my ( $self, $range ) = @_;
+
+	if ( length $range ) {
+
+		$entries->{_length} = $range;
+
+	}
+	else {
+		print("wipe,range,length to wipe is missing\n");
+	}
+
+}
+
+=head2 sub set_all 
+
+
+=cut 
+
+sub set_all {
+	my ( $self, $ref_hash ) = @_;
+
+	if ( length $ref_hash ) {
+
+		$entries->{_first_idx}            = $ref_hash->{_first_idx};
+		$entries->{_length}               = $entries->{_max_length};
+		$entries->{_labels_w_aref}        = $ref_hash->{_labels_w_aref};
+		$entries->{_values_w_aref}        = $ref_hash->{_values_w_aref};
+		$entries->{_check_buttons_w_aref} = $ref_hash->{_check_buttons_w_aref};
+	}
+	else {
+		print("wipe,range, missing hash reference\n");
+	}
+	return ();
+	
 }
 
 =head2 sub labels 
@@ -144,28 +193,28 @@ sub range {
 =cut 
 
 sub labels {
-    my ($self) = @_;
-    my ( $first_idx, $length, $i );
-    my (@labels_w);
+	my ($self) = @_;
+	my ( $first_idx, $length, $i );
+	my (@labels_w);
 
-    $first_idx = $entries->{_first_idx};
-    $length    = $entries->{_length};
+	$first_idx = $entries->{_first_idx};
+	$length    = $entries->{_length};
 
-    if ( $entries->{_labels_w_aref} ) {
+	if ( length $entries->{_labels_w_aref} ) {
 
-        @labels_w = @{ $entries->{_labels_w_aref} };
+		@labels_w = @{ $entries->{_labels_w_aref} };
 
-        for ( $i = $first_idx ; $i < $length ; $i++ ) {
+		for ( $i = $first_idx ; $i < $length ; $i++ ) {
 
-            $labels_w[$i]->configure( -text => '', );
-        }
+			$labels_w[$i]->configure( -text => '', );
+		}
 
-    }
-    else {
-        # print("wipe,values, missing entries->{_labels_w_aref}\n");
-    }
+	}
+	else {
+		# print("wipe,values, missing entries->{_labels_w_aref}\n");
+	}
 
-    return ();
+	return ();
 }
 
 =head2 sub values
@@ -178,7 +227,7 @@ sub labels {
    print("max final entry num $all\n\n");
     $LSU->{_ref_labels_w} = $create->labelsc(\@blank_choices,
 	\$parameter_names_frame);
-     print("wipe i $i\n");
+     
      
 	solve mystery memory leak
     $entries->{_check_buttons_settings_aref} = $temp;
@@ -191,29 +240,29 @@ sub labels {
 =cut 
 
 sub values {
-    my ($self) = @_;
-    my ( $first_idx, $length, $i );
-    my (@values_w);
-    $first_idx = $entries->{_first_idx};
-    $length    = $entries->{_length};
+	my ($self) = @_;
+	my ( $first_idx, $length, $i );
+	my (@values_w);
+	$first_idx = $entries->{_first_idx};
+	$length    = $entries->{_length};
 
-#    my $clear_text = '';
+	if ( length $entries->{_values_w_aref} ) {
 
-    if ( $entries->{_values_w_aref} ) {
+		@values_w = @{ $entries->{_values_w_aref} };
 
-        @values_w = @{ $entries->{_values_w_aref} };
-        
-        for ( $i = $first_idx ; $i < $length ; $i++ ) {
-        	
-            $values_w[$i]->delete(0,'end');
-  	        # print("wipe,values,length=$length}--\n");	          
-        }
-    }
-    else {
-    	# print("warning: wipe,values, missing entries->{_values_w_aref}\n");
-    	# print("wipe,values, first_idx: $first_idx, length: $length, _values_w_aref: $entries->{_values_w_aref} \n");
-    }
-    return ();
+		for ( $i = $first_idx ; $i < $length ; $i++ ) {
+
+			$values_w[$i]->delete( 0, 'end' );
+#			print("wipe,values,idx=$i,length=$length}--\n");
+		}
+	}
+	else {
+		print("warning: wipe,values, missing entries->{_values_w_aref}\n");
+		print(
+"wipe,values, first_idx: $first_idx, length: $length, _values_w_aref: $entries->{_values_w_aref} \n"
+		);
+	}
+	return ();
 }
 
 =head2 sub check_buttons 
@@ -234,28 +283,29 @@ sub values {
 
 sub check_buttons {
 
-    my ($self) = @_;
-    my ( $first_idx, $length, $i );
-    my (@check_buttons_w);
-    $first_idx = $entries->{_first_idx};
-    $length    = $entries->{_length};
+	my ($self) = @_;
+	my ( $first_idx, $length, $i );
+	my (@check_buttons_w);
+	$first_idx = $entries->{_first_idx};
+	$length    = $entries->{_length};
 
-    if ( $entries->{_check_buttons_w_aref} ) {
-    	#print("wipe, check_buttons, cleaning up to index:$length \n");
-        @check_buttons_w = @{ $entries->{_check_buttons_w_aref} };
+	if ( length $entries->{_check_buttons_w_aref} ) {
 
-        for ( $i = $first_idx ; $i < $length ; $i++ ) {
+		#print("wipe, check_buttons, cleaning up to index:$length \n");
+		@check_buttons_w = @{ $entries->{_check_buttons_w_aref} };
 
-            $check_buttons_w[$i]->configure(
-                -background       => $var->{_white},
-                -activebackground => $var->{_white},
-                -variable         => \$var->{_off},
-            );
-        }
-    }
-    else {
-        # print("wipe, check_buttons, missing parameters \n");
-    }
+		for ( $i = $first_idx ; $i < $length ; $i++ ) {
+
+			$check_buttons_w[$i]->configure(
+				-background       => $var->{_white},
+				-activebackground => $var->{_white},
+				-variable         => \$var->{_off},
+			);
+		}
+	}
+	else {
+		# print("wipe, check_buttons, missing parameters \n");
+	}
 
 }
 1;

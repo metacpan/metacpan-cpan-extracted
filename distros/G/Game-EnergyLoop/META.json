@@ -1,0 +1,46 @@
+{
+   "abstract" : "a simple energy system",
+   "author" : [
+      "Jeremy Mates <jmates@thrig.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Game-EnergyLoop",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "2.142060",
+            "Module::Build" : "0.4004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Game::EnergyLoop" : {
+         "file" : "lib/Game/EnergyLoop.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "url" : "https://thrig.me/src/Game-EnergyLoop.git"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

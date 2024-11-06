@@ -72,6 +72,7 @@ my $builder = $class->new(
         'Set::Scalar'           => '0',
         'Sub::Util'             => '0',
         'Term::Table'           => '0',
+        'Text::CSV_XS'          => '0',
         'Tiny::Prof'            => '0.03',
         'YAML::XS'              => '0',
     },

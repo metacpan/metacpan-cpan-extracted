@@ -1,3 +1,11 @@
+0.028   2024-11-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Allow setting nutrition value in table different than lab result
+          value.
+
+        - Bug fixes.
+
+
 0.027   2024-06-17  Released-By: PERLANCAR; Urgency: medium
 
         - Allow specifying other vitamins & minerals.

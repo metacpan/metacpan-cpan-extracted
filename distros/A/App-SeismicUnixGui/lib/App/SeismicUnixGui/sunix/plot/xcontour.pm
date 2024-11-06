@@ -1,15 +1,16 @@
- package xcontour;
-
-
-=head1 DOCUMENTATION
+package App::SeismicUnixGui::sunix::plot::xcontour;
 
 =head2 SYNOPSIS
 
-PERL PROGRAM NAME:  XCONTOUR - X CONTOUR plot of f(x1,x2) via vector plot call		
-AUTHOR: Juan Lorenzo (Perl module only)
-DATE:   
+PERL PROGRAM NAME: 
+
+AUTHOR:  
+
+DATE:
+
 DESCRIPTION:
-Version: 
+
+Version:
 
 =head2 USE
 
@@ -17,215 +18,391 @@ Version:
 
 =head4 Examples
 
-=head3 SEISMIC UNIX NOTES
+=head2 SYNOPSIS
 
+=head3 SEISMIC UNIX NOTES
  XCONTOUR - X CONTOUR plot of f(x1,x2) via vector plot call		
+
+
 
  xcontour n1= [optional parameters] <binaryfile [>psplotfile]		
 
+
+
  X Functionality:							
+
  Button 1	Zoom with rubberband box				
+
  Button 2	Show mouse (x1,x2) coordinates while pressed		
+
  q or Q key	Quit 							
+
  s key		Save current mouse (x1,x2) location to file		
+
  p or P key	Plot current window with pswigb	(only from disk files)	
 
+
+
  Required Parameters:							
+
  n1                     number of samples in 1st (fast) dimension	
 
+
+
  Optional Parameters:							
+
  d1=1.0                 sampling interval in 1st dimension		
+
  f1=0.0                 first sample in 1st dimension			
+
  x1=f1,f1+d1,...        array of sampled values in 1nd dimension	
+
  n2=all                 number of samples in 2nd (slow) dimension	
+
  d2=1.0                 sampling interval in 2nd dimension		
+
  f2=0.0                 first sample in 2nd dimension			
+
  x2=f2,f2+d2,...        array of sampled values in 2nd dimension	
+
  mpicks=/dev/tty        file to save mouse picks in			
+
  verbose=1              =1 for info printed on stderr (0 for no info)	
+
  nc=5                   number of contour values                       
+
  dc=(zmax-zmin)/nc      contour interval                               
+
  fc=min+dc              first contour                                  
+
  c=fc,fc+dc,...         array of contour values                        
+
  cwidth=1.0,...         array of contour line widths                   
+
  ccolor=none,...        array of contour colors; none means use cgray  
+
  cdash=0.0,...          array of dash spacings (0.0 for solid)         
+
  labelcf=1              first labeled contour (1,2,3,...)              
+
  labelcper=1            label every labelcper-th contour               
+
  nlabelc=nc             number of labeled contours (0 no contour label)
+
  nplaces=6              number of decimal places in contour labeling	
+
  xbox=50                x in pixels of upper left corner of window	
+
  ybox=50                y in pixels of upper left corner of window	
+
  wbox=550               width in pixels of window			
+
  hbox=700               height in pixels of window			
+
  x1beg=x1min            value at which axis 1 begins			
+
  x1end=x1max            value at which axis 1 ends			
+
  d1num=0.0              numbered tic interval on axis 1 (0.0 for automatic)
+
  f1num=x1min            first numbered tic on axis 1 (used if d1num not 0.0)
+
  n1tic=1                number of tics per numbered tic on axis 1	
+
  grid1=none             grid lines on axis 1 - none, dot, dash, or solid
+
  x2beg=x2min            value at which axis 2 begins			
+
  x2end=x2max            value at which axis 2 ends			
+
  d2num=0.0              numbered tic interval on axis 2 (0.0 for automatic)
+
  f2num=x2min            first numbered tic on axis 2 (used if d2num not 0.0)
+
  n2tic=1                number of tics per numbered tic on axis 2	
+
  grid2=none             grid lines on axis 2 - none, dot, dash, or solid
+
  label2=                label on axis 2				
+
  labelfont=Erg14        font name for axes labels			
+
  title=                 title of plot					
+
  titlefont=Rom22        font name for title				
+
  windowtitle=xwigb      title on window				
+
  labelcolor=blue        color for axes labels				
+
  titlecolor=red         color for title				
+
  gridcolor=blue         color for grid lines				
+
  labelccolor=black      color of contour labels                        ",   
+
  labelcfont=fixed       font name for contour labels                   
+
  style=seismic		 normal (axis 1 horizontal, axis 2 vertical) or	
+
 			 seismic (axis 1 vertical, axis 2 horizontal)	
 
 
+
+
+
  Notes:								
+
  For some reason the contour might slight differ from ones generated   
+
  by pscontour (propably due to the pixel nature of the plot            
+
  coordinates)                                                          
 
+
+
  The line width of unlabeled contours is designed as a quarter of that	
+
  of labeled contours. 							
+
+
+
 
 
  Author: Morten Wendell Pedersen, Aarhus University 
 
+
+
  All the coding is based on snippets taken from xwigb, ximage and pscontour
+
  All I have done is put the parts together and put in some bugs ;-)
+
+
 
  So credits should go to the authors of these packages... 
 
+
+
  Caveats and Notes:
+
  The code has been developed under Linux 1.3.20/Xfree 3.1.2E (X11 6.1)
+
  with gcc-2.7.0 But hopefully it should work on other platforms as well
 
+
+
  Since all the contours are drawn by Vector plot call's everytime the
+
  Window is exposed, the exposing can be darn slow 
+
  OOPS This should be history... Now I keep my window content with backing
+
  store so I won't have to redraw my window unless I really have to...
 
+
+
  Portability Question: I guess I should check if the display supports
+
  backingstore and redraw if it doesn't (see DoesBackingStore(3) )
+
  I have to be able to use CWBackingStore==Always (other values can be
+
  NonUseful and WhenMapped
 
+
+
  Since I put the contour labels everytime I draw one contour level the area 
+
  that contains the label will be crossed by the the next contour lines...
+
  (this bug also seems to be present in pscontour)
+
  To fix this I have to redraw all the labels after been through all
+
  the contour calls
+
  Right now I can't see a way to fix this without actually to through
+
  the entire label positioning again....Overkill I would say
 
+
+
  
+
  The relative short length of the contour segments will propably mask the
+
  cdash settings
+
  which means it is disposable (but I know how to draw dashed lines :)
+
  A way of fixing this could be to get all connected point and then use
+
  XDrawlines or XDrawSegments... just an idea...No idea if it'll work. 
 
+
+
  I think there is a bug in xContour since my plot coordinates increase
+
  North and west ward instead of south and eastward
 
+
+
    I need to check the Self Doc so if the right parameters are described
+
    (I have been through it a couple of times but....)
 
+
+
    All functions need a heavy cleanup for unused variables
+
    I suppose there is a couple of memory leaks due to missing free'ing of
+
  numerous pointers (especially fonts,GC's & colors could be a problem...
 
+
+
    I have to browse through the internal pscontour call... basically what
+
  I have done is just putting pscontour instead of pswigb... Instead of
+
  repositioning the input file  pointer (which doesnt work with pipes) one
+
  should consider the use of temporary file
+
    or write your zoombox to pscontour (...how one does that?)
 
+
+
   Wish List:
+
    The use of cgray's unused until now... I guess I'll need to allocate
+
  a gray Colormap  -> meaning that the code not will run at other display
+
  than 8 bit Pseudocolor :( (with the use of present version of the colormap
+
  library (code in $CWPROOT/src/xplot/lib ) )
 
+
+
   The format of contour label should be open for the user.. 
+
   
+
   It could be nice if one could choose to have a pixmap (like ximage )
+
  underlying  the contours... this should be defined either by the input
+
  data  or by a seperate file
+
   eg useful for viewing traveltime contours on top a plot of the velocity
+
  field
+
+
+
+=head2 User's notes (Juan Lorenzo)
+untested
+
+=cut
+
 
 =head2 CHANGES and their DATES
 
 =cut
- use Moose;
+
+use Moose;
 our $VERSION = '0.0.1';
+
+
+=head2 Import packages
+
+=cut
+
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 
-	my $get					= L_SU_global_constants->new();
-
-	my $var				= $get->var();
-	my $empty_string    	= $var->{_empty_string};
+use App::SeismicUnixGui::misc::SeismicUnix qw($go $in $off $on $out $ps $to $suffix_ascii $suffix_bin $suffix_ps $suffix_segy $suffix_su);
+use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 
 
-	my $xcontour		= {
-		_CWBackingStore					=> '',
-		_c					=> '',
-		_ccolor					=> '',
-		_cdash					=> '',
-		_cwidth					=> '',
-		_d1					=> '',
-		_d1num					=> '',
-		_d2					=> '',
-		_d2num					=> '',
-		_dc					=> '',
-		_f1					=> '',
-		_f1num					=> '',
-		_f2					=> '',
-		_f2num					=> '',
-		_fc					=> '',
-		_grid1					=> '',
-		_grid2					=> '',
-		_gridcolor					=> '',
-		_hbox					=> '',
-		_label2					=> '',
-		_labelccolor					=> '',
-		_labelcf					=> '',
-		_labelcfont					=> '',
-		_labelcolor					=> '',
-		_labelcper					=> '',
-		_labelfont					=> '',
-		_mpicks					=> '',
-		_n1					=> '',
-		_n1tic					=> '',
-		_n2					=> '',
-		_n2tic					=> '',
-		_nc					=> '',
-		_nlabelc					=> '',
-		_nplaces					=> '',
-		_style					=> '',
-		_title					=> '',
-		_titlecolor					=> '',
-		_titlefont					=> '',
-		_verbose					=> '',
-		_wbox					=> '',
-		_windowtitle					=> '',
-		_x1					=> '',
-		_x1beg					=> '',
-		_x1end					=> '',
-		_x2					=> '',
-		_x2beg					=> '',
-		_x2end					=> '',
-		_xbox					=> '',
-		_ybox					=> '',
-		_Step					=> '',
-		_note					=> '',
-    };
+=head2 instantiation of packages
 
+=cut
+
+my $get					= L_SU_global_constants->new();
+my $Project				= Project_config->new();
+my $DATA_SEISMIC_SU		= $Project->DATA_SEISMIC_SU();
+my $DATA_SEISMIC_BIN	= $Project->DATA_SEISMIC_BIN();
+my $DATA_SEISMIC_TXT	= $Project->DATA_SEISMIC_TXT();
+
+my $PS_SEISMIC      	= $Project->PS_SEISMIC();
+
+my $var				= $get->var();
+my $on				= $var->{_on};
+my $off				= $var->{_off};
+my $true			= $var->{_true};
+my $false			= $var->{_false};
+my $empty_string	= $var->{_empty_string};
+
+=head2 Encapsulated
+hash of private variables
+
+=cut
+
+my $xcontour			= {
+	_CWBackingStore					=> '',
+	_c					=> '',
+	_ccolor					=> '',
+	_cdash					=> '',
+	_cwidth					=> '',
+	_d1					=> '',
+	_d1num					=> '',
+	_d2					=> '',
+	_d2num					=> '',
+	_dc					=> '',
+	_f1					=> '',
+	_f1num					=> '',
+	_f2					=> '',
+	_f2num					=> '',
+	_fc					=> '',
+	_grid1					=> '',
+	_grid2					=> '',
+	_gridcolor					=> '',
+	_hbox					=> '',
+	_label2					=> '',
+	_labelccolor					=> '',
+	_labelcf					=> '',
+	_labelcfont					=> '',
+	_labelcolor					=> '',
+	_labelcper					=> '',
+	_labelfont					=> '',
+	_mpicks					=> '',
+	_n1					=> '',
+	_n1tic					=> '',
+	_n2					=> '',
+	_n2tic					=> '',
+	_nc					=> '',
+	_nlabelc					=> '',
+	_nplaces					=> '',
+	_style					=> '',
+	_title					=> '',
+	_titlecolor					=> '',
+	_titlefont					=> '',
+	_verbose					=> '',
+	_wbox					=> '',
+	_windowtitle					=> '',
+	_x1					=> '',
+	_x1beg					=> '',
+	_x1end					=> '',
+	_x2					=> '',
+	_x2beg					=> '',
+	_x2end					=> '',
+	_xbox					=> '',
+	_ybox					=> '',
+	_Step					=> '',
+	_note					=> '',
+
+};
 
 =head2 sub Step
 
@@ -255,6 +432,7 @@ by adding the program name
 	return ( $xcontour->{_note} );
 
  }
+
 
 
 =head2 sub clear
@@ -1305,10 +1483,10 @@ max index = number of input variables -1
  
 sub get_max_index {
  	  my ($self) = @_;
-    my $max_index = 36;
+	my $max_index = 47;
 
     return($max_index);
 }
  
  
-1; 
+1;

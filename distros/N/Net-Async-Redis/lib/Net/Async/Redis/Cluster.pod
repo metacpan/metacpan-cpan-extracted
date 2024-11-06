@@ -48,6 +48,8 @@ Note that this adds some overhead to lookups, so you may be better served
 by options such as the L<https://github.com/twitter/twemproxy|twemproxy>
 proxy routing dæmon, or a service mesh such as L<https://istio.io/|istio>.
 
+See L</configure> for additional cluster configuration parameters.
+
 =head1 METHODS
 
 =head2 bootstrap
@@ -114,6 +116,16 @@ returning the data as if this was a regular L<Net::Async::Redis>
 instance.
 
 =head1 METHODS - Internal
+
+=head2 configure
+
+Takes the same parameters as L<Net::Async::Redis/configure>, with the addition of:
+
+=over 4
+
+=item * C<use_read_replica> - direct read commands to replicas, instead of the primary nodes
+
+=back
 
 =head2 hash_slot_for_key
 

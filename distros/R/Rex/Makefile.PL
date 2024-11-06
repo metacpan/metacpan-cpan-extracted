@@ -64,12 +64,12 @@ my %WriteMakefileArgs = (
     "IO::File" => 0,
     "IO::Select" => 0,
     "IO::Socket" => 0,
-    "IO::String" => 0,
     "IPC::Open3" => 0,
     "JSON::MaybeXS" => 0,
     "LWP::UserAgent" => 0,
     "List::Util" => "1.45",
     "MIME::Base64" => 0,
+    "Module::Load::Conditional" => 0,
     "Net::OpenSSH::ShellQuoter" => 0,
     "POSIX" => 0,
     "Scalar::Util" => 0,
@@ -80,7 +80,7 @@ my %WriteMakefileArgs = (
     "Term::ReadKey" => 0,
     "Test::Builder::Module" => 0,
     "Text::Glob" => 0,
-    "Text::Wrap" => 0,
+    "Text::Wrap" => ">= 0, != 2023.0509",
     "Time::HiRes" => 0,
     "UNIVERSAL" => 0,
     "URI" => 0,
@@ -101,7 +101,6 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "File::Find" => 0,
     "File::Temp" => 0,
-    "Module::Load::Conditional" => 0,
     "String::Escape" => 0,
     "Sub::Override" => 0,
     "Test::Deep" => 0,
@@ -113,7 +112,7 @@ my %WriteMakefileArgs = (
     "autodie" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.14.3",
+  "VERSION" => "1.15.0",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/issue/*.t t/scm/*.t"
   }
@@ -144,7 +143,6 @@ my %FallbackPrereqs = (
   "IO::File" => 0,
   "IO::Select" => 0,
   "IO::Socket" => 0,
-  "IO::String" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
   "LWP::UserAgent" => 0,
@@ -169,7 +167,7 @@ my %FallbackPrereqs = (
   "Test::UseAllModules" => 0,
   "Test::Warnings" => 0,
   "Text::Glob" => 0,
-  "Text::Wrap" => 0,
+  "Text::Wrap" => ">= 0, != 2023.0509",
   "Time::HiRes" => 0,
   "UNIVERSAL" => 0,
   "URI" => 0,
@@ -200,6 +198,7 @@ requires('DBI')
 requires('XML::LibXML')
   if has_module('XML::LibXML')
     || prompt('install Support describing host groups in XML format? [y/N]', 'N') =~ /^y/i;
+
 requires('Expect')
   if has_module('Expect')
     || prompt('install Support rsync tasks? [y/N]', 'N') =~ /^y/i;
@@ -222,6 +221,10 @@ if ( $^O !~ /MSWin/i ) {
 if ( $^O =~ /MSWin/i ) {
 	$WriteMakefileArgs{PREREQ_PM}{'Net::SSH2'} = $FallbackPrereqs{'Net::SSH2'} = '0';
 	$WriteMakefileArgs{PREREQ_PM}{'Win32::Console::ANSI'} = $FallbackPrereqs{'Win32::Console::ANSI'} = '0';
+}
+
+if ( $^O eq 'darwin' ) {
+	$WriteMakefileArgs{PREREQ_PM}{'IO::Pty'} = $FallbackPrereqs{'IO::Pty'} = '!= 1.18';
 }
 
 WriteMakefile(%WriteMakefileArgs);

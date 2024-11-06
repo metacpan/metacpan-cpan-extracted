@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-17'; # DATE
+our $DATE = '2024-11-05'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionFacts'; # DIST
-our $VERSION = '0.027'; # VERSION
+our $VERSION = '0.028'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/NutritionFacts/bpom_show_nutrition_facts",
@@ -39,7 +39,7 @@ bpom-tampilkan-ing - Render BPOM-compliant nutrition fact table (ING - informasi
 
 =head1 VERSION
 
-This document describes version 0.027 of bpom-tampilkan-ing (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2024-06-17.
+This document describes version 0.028 of bpom-tampilkan-ing (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2024-11-05.
 
 =head1 SYNOPSIS
 
@@ -47,7 +47,7 @@ B<bpom-tampilkan-ing> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?
 
 B<bpom-tampilkan-ing> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<bpom-tampilkan-ing> [B<L<--biotin|/"--biotin=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--browser|/"--browser">>] [B<L<--ca|/"--ca=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--carbohydrate|/"--carbohydrate=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--cholesterol|/"--cholesterol=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--choline|/"--choline=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--color|/"--color=s">>=I<str>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--cr|/"--cr=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--cu|/"--cu=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--fat|/"--fat=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--fe|/"--fe=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--fluorine|/"--fluorine=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--folate|/"--folate=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--iodium|/"--iodium=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<-k|/"-k=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--mg|/"--mg=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--mn|/"--mn=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--name|/"--name=s">>=I<str>] [B<L<--no-env|/"--no-env">>] [B<L<--output-format|/"--output-format=s, -f">>=I<str>|B<L<-f|/"--output-format=s, -f">>=I<str>] [B<L<--package-size|/"--package-size=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--phosphorus|/"--phosphorus=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--protein|/"--protein=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--saturated-fat|/"--saturated-fat=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--se|/"--se=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--serving-size|/"--serving-size=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--sodium|/"--sodium=s*, --salt">>=I<L<ufloat|Sah::Schema::ufloat>>|B<L<--salt|/"--sodium=s*, --salt">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--sugar|/"--sugar=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--va|/"--va=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb12|/"--vb12=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb1|/"--vb1=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb2|/"--vb2=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb3|/"--vb3=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb5|/"--vb5=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb6|/"--vb6=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vc|/"--vc=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vd|/"--vd=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--ve|/"--ve=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vk|/"--vk=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--zn|/"--zn=s">>=I<L<ufloat|Sah::Schema::ufloat>>]
+B<bpom-tampilkan-ing> [B<L<--biotin-nufact-note|/"--biotin-nufact-note=s">>=I<str>] [B<L<--biotin-nufact|/"--biotin-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--biotin|/"--biotin=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--browser|/"--browser">>] [B<L<--ca-nufact-note|/"--ca-nufact-note=s">>=I<str>] [B<L<--ca-nufact|/"--ca-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--ca|/"--ca=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--carbohydrate-nufact-note|/"--carbohydrate-nufact-note=s">>=I<str>] [B<L<--carbohydrate-nufact|/"--carbohydrate-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--carbohydrate|/"--carbohydrate=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--cholesterol-nufact-note|/"--cholesterol-nufact-note=s">>=I<str>] [B<L<--cholesterol-nufact|/"--cholesterol-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--cholesterol|/"--cholesterol=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--choline-nufact-note|/"--choline-nufact-note=s">>=I<str>] [B<L<--choline-nufact|/"--choline-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--choline|/"--choline=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--color|/"--color=s">>=I<str>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--cr-nufact-note|/"--cr-nufact-note=s">>=I<str>] [B<L<--cr-nufact|/"--cr-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--cr|/"--cr=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--cu-nufact-note|/"--cu-nufact-note=s">>=I<str>] [B<L<--cu-nufact|/"--cu-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--cu|/"--cu=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--fat-nufact-note|/"--fat-nufact-note=s">>=I<str>] [B<L<--fat-nufact|/"--fat-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--fat|/"--fat=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--fe-nufact-note|/"--fe-nufact-note=s">>=I<str>] [B<L<--fe-nufact|/"--fe-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--fe|/"--fe=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--fluorine-nufact-note|/"--fluorine-nufact-note=s">>=I<str>] [B<L<--fluorine-nufact|/"--fluorine-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--fluorine|/"--fluorine=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--folate-nufact-note|/"--folate-nufact-note=s">>=I<str>] [B<L<--folate-nufact|/"--folate-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--folate|/"--folate=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--has-claims|/"--has-claims">>|B<L<--hasnt-claims|/"--has-claims">>] [B<L<--iodium-nufact-note|/"--iodium-nufact-note=s">>=I<str>] [B<L<--iodium-nufact|/"--iodium-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--iodium|/"--iodium=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--k-nufact-note|/"--k-nufact-note=s">>=I<str>] [B<L<--k-nufact|/"--k-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<-k|/"-k=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--mg-nufact-note|/"--mg-nufact-note=s">>=I<str>] [B<L<--mg-nufact|/"--mg-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--mg|/"--mg=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--mn-nufact-note|/"--mn-nufact-note=s">>=I<str>] [B<L<--mn-nufact|/"--mn-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--mn|/"--mn=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--name|/"--name=s">>=I<str>] [B<L<--no-env|/"--no-env">>] [B<L<--output-format|/"--output-format=s, -f">>=I<str>|B<L<-f|/"--output-format=s, -f">>=I<str>] [B<L<--package-size|/"--package-size=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--phosphorus-nufact-note|/"--phosphorus-nufact-note=s">>=I<str>] [B<L<--phosphorus-nufact|/"--phosphorus-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--phosphorus|/"--phosphorus=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--protein-nufact-note|/"--protein-nufact-note=s">>=I<str>] [B<L<--protein-nufact|/"--protein-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--protein|/"--protein=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--saturated-fat-nufact-note|/"--saturated-fat-nufact-note=s">>=I<str>] [B<L<--saturated-fat-nufact|/"--saturated-fat-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--saturated-fat|/"--saturated-fat=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--se-nufact-note|/"--se-nufact-note=s">>=I<str>] [B<L<--se-nufact|/"--se-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--se|/"--se=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--serving-size|/"--serving-size=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--sodium-nufact-note|/"--sodium-nufact-note=s">>=I<str>] [B<L<--sodium-nufact|/"--sodium-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--sodium|/"--sodium=s*, --salt">>=I<L<ufloat|Sah::Schema::ufloat>>|B<L<--salt|/"--sodium=s*, --salt">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--sugar-nufact-note|/"--sugar-nufact-note=s">>=I<str>] [B<L<--sugar-nufact|/"--sugar-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--sugar|/"--sugar=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--va-nufact-note|/"--va-nufact-note=s">>=I<str>] [B<L<--va-nufact|/"--va-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--va|/"--va=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb1-nufact-note|/"--vb1-nufact-note=s">>=I<str>] [B<L<--vb1-nufact|/"--vb1-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb12-nufact-note|/"--vb12-nufact-note=s">>=I<str>] [B<L<--vb12-nufact|/"--vb12-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb12|/"--vb12=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb1|/"--vb1=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb2-nufact-note|/"--vb2-nufact-note=s">>=I<str>] [B<L<--vb2-nufact|/"--vb2-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb2|/"--vb2=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb3-nufact-note|/"--vb3-nufact-note=s">>=I<str>] [B<L<--vb3-nufact|/"--vb3-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb3|/"--vb3=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb5-nufact-note|/"--vb5-nufact-note=s">>=I<str>] [B<L<--vb5-nufact|/"--vb5-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb5|/"--vb5=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb6-nufact-note|/"--vb6-nufact-note=s">>=I<str>] [B<L<--vb6-nufact|/"--vb6-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb6|/"--vb6=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vc-nufact-note|/"--vc-nufact-note=s">>=I<str>] [B<L<--vc-nufact|/"--vc-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vc|/"--vc=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vd-nufact-note|/"--vd-nufact-note=s">>=I<str>] [B<L<--vd-nufact|/"--vd-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vd|/"--vd=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--ve-nufact-note|/"--ve-nufact-note=s">>=I<str>] [B<L<--ve-nufact|/"--ve-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--ve|/"--ve=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vk-nufact-note|/"--vk-nufact-note=s">>=I<str>] [B<L<--vk-nufact|/"--vk-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vk|/"--vk=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--zn-nufact-note|/"--zn-nufact-note=s">>=I<str>] [B<L<--zn-nufact|/"--zn-nufact=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--zn|/"--zn=s">>=I<L<ufloat|Sah::Schema::ufloat>>]
 
 
 
@@ -61,57 +61,196 @@ C<*> marks required options.
 
 =over
 
+=item B<--biotin-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--biotin-nufact>=I<s>
+
+Biotin, in mcg/100g (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--biotin>=I<s>
 
 Biotin, in mcg/100g.
+
+=item B<--ca-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--ca-nufact>=I<s>
+
+Calcium, in mg/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--ca>=I<s>
 
 Calcium, in mg/100g.
 
+=item B<--carbohydrate-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--carbohydrate-nufact>=I<s>
+
+Total carbohydrate, in g/100g (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--carbohydrate>=I<s>*
 
 Total carbohydrate, in g/100g.
+
+=item B<--cholesterol-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--cholesterol-nufact>=I<s>
+
+Cholesterol, in mg/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--cholesterol>=I<s>
 
 Cholesterol, in mg/100g.
 
+=item B<--choline-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--choline-nufact>=I<s>
+
+Choline, in mg/100g (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--choline>=I<s>
 
 Choline, in mg/100g.
+
+=item B<--cr-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--cr-nufact>=I<s>
+
+Chromium, in mcg/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--cr>=I<s>
 
 Chromium, in mcg/100g.
 
+=item B<--cu-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--cu-nufact>=I<s>
+
+Copper, in mcg/100g (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--cu>=I<s>
 
 Copper, in mcg/100g.
+
+=item B<--fat-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--fat-nufact>=I<s>
+
+Total fat, in g/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--fat>=I<s>*
 
 Total fat, in g/100g.
 
+=item B<--fe-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--fe-nufact>=I<s>
+
+Iron, in mg/100g (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--fe>=I<s>
 
 Iron, in mg/100g.
+
+=item B<--fluorine-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--fluorine-nufact>=I<s>
+
+Fluorine, in mg/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--fluorine>=I<s>
 
 Fluorine, in mg/100g.
 
+=item B<--folate-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--folate-nufact>=I<s>
+
+Folate (vitamin B9), in mcg/100g (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--folate>=I<s>
 
 Folate (vitamin B9), in mcg/100g.
+
+=item B<--has-claims>
+
+Whether food is registered as having claims.
+
+=item B<--iodium-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--iodium-nufact>=I<s>
+
+Iodium, in mcg/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--iodium>=I<s>
 
 Iodium, in mcg/100g.
 
+=item B<--k-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--k-nufact>=I<s>
+
+Potassium, in mg/100g (value to be used in nutrition facts table instead the lab test result).
+
+=item B<--mg-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--mg-nufact>=I<s>
+
+Magnesium, in mg/100g (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--mg>=I<s>
 
 Magnesium, in mg/100g.
+
+=item B<--mn-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--mn-nufact>=I<s>
+
+Manganese, in mcg/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--mn>=I<s>
 
@@ -126,17 +265,53 @@ Manganese, in mcg/100g.
 
 Packaging size, in g.
 
+=item B<--phosphorus-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--phosphorus-nufact>=I<s>
+
+Phosphorus, in mg/100g (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--phosphorus>=I<s>
 
 Phosphorus, in mg/100g.
+
+=item B<--protein-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--protein-nufact>=I<s>
+
+Protein, in g/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--protein>=I<s>*
 
 Protein, in g/100g.
 
+=item B<--saturated-fat-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--saturated-fat-nufact>=I<s>
+
+Saturated fat, in g/100g (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--saturated-fat>=I<s>*
 
 Saturated fat, in g/100g.
+
+=item B<--se-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--se-nufact>=I<s>
+
+Selenium, in mcg/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--se>=I<s>
 
@@ -146,17 +321,62 @@ Selenium, in mcg/100g.
 
 Serving size, in g.
 
+=item B<--sodium-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--sodium-nufact>=I<s>
+
+Sodium, in mg/100g (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--sodium>=I<s>*, B<--salt>
 
 Sodium, in mg/100g.
+
+=item B<--sugar-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--sugar-nufact>=I<s>
+
+Total sugar, in g/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--sugar>=I<s>*
 
 Total sugar, in g/100g.
 
+=item B<--va-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--va-nufact>=I<s>
+
+Vitamin A, in mcg/100g (all-trans-)retinol (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--va>=I<s>
 
 Vitamin A, in mcg/100g (all-trans-)retinol.
+
+=item B<--vb1-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--vb1-nufact>=I<s>
+
+Vitamin B1, in mg/100g (value to be used in nutrition facts table instead the lab test result).
+
+=item B<--vb12-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--vb12-nufact>=I<s>
+
+Vitamin B12, in mcg/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--vb12>=I<s>
 
@@ -166,37 +386,118 @@ Vitamin B12, in mcg/100g.
 
 Vitamin B1, in mg/100g.
 
+=item B<--vb2-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--vb2-nufact>=I<s>
+
+Vitamin B2, in mg/100g (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--vb2>=I<s>
 
 Vitamin B2, in mg/100g.
+
+=item B<--vb3-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--vb3-nufact>=I<s>
+
+Vitamin B3, in mg/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--vb3>=I<s>
 
 Vitamin B3, in mg/100g.
 
+=item B<--vb5-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--vb5-nufact>=I<s>
+
+Vitamin B5 (pantothenic acid), in mg/100g (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--vb5>=I<s>
 
 Vitamin B5 (pantothenic acid), in mg/100g.
+
+=item B<--vb6-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--vb6-nufact>=I<s>
+
+Vitamin B6, in mg/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--vb6>=I<s>
 
 Vitamin B6, in mg/100g.
 
+=item B<--vc-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--vc-nufact>=I<s>
+
+Vitamin C, in mg/100g (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--vc>=I<s>
 
 Vitamin C, in mg/100g.
+
+=item B<--vd-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--vd-nufact>=I<s>
+
+Vitamin D, in mcg (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--vd>=I<s>
 
 Vitamin D, in mcg.
 
+=item B<--ve-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--ve-nufact>=I<s>
+
+Vitamin E, in mg alpha-TE (tocopherol-equivalent) (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--ve>=I<s>
 
 Vitamin E, in mg alpha-TE (tocopherol-equivalent).
 
+=item B<--vk-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--vk-nufact>=I<s>
+
+Vitamin K, in mcg (value to be used in nutrition facts table instead the lab test result).
+
 =item B<--vk>=I<s>
 
 Vitamin K, in mcg.
+
+=item B<--zn-nufact-note>=I<s>
+
+(No description)
+
+
+=item B<--zn-nufact>=I<s>
+
+Zinc, in mg/100g (value to be used in nutrition facts table instead the lab test result).
 
 =item B<--zn>=I<s>
 
@@ -476,47 +777,114 @@ which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-F
 List of available configuration parameters:
 
  biotin (see --biotin)
+ biotin_nufact (see --biotin-nufact)
+ biotin_nufact_note (see --biotin-nufact-note)
  browser (see --browser)
  ca (see --ca)
+ ca_nufact (see --ca-nufact)
+ ca_nufact_note (see --ca-nufact-note)
  carbohydrate (see --carbohydrate)
+ carbohydrate_nufact (see --carbohydrate-nufact)
+ carbohydrate_nufact_note (see --carbohydrate-nufact-note)
  cholesterol (see --cholesterol)
+ cholesterol_nufact (see --cholesterol-nufact)
+ cholesterol_nufact_note (see --cholesterol-nufact-note)
  choline (see --choline)
+ choline_nufact (see --choline-nufact)
+ choline_nufact_note (see --choline-nufact-note)
  color (see --color)
  cr (see --cr)
+ cr_nufact (see --cr-nufact)
+ cr_nufact_note (see --cr-nufact-note)
  cu (see --cu)
+ cu_nufact (see --cu-nufact)
+ cu_nufact_note (see --cu-nufact-note)
  fat (see --fat)
+ fat_nufact (see --fat-nufact)
+ fat_nufact_note (see --fat-nufact-note)
  fe (see --fe)
+ fe_nufact (see --fe-nufact)
+ fe_nufact_note (see --fe-nufact-note)
  fluorine (see --fluorine)
+ fluorine_nufact (see --fluorine-nufact)
+ fluorine_nufact_note (see --fluorine-nufact-note)
  folate (see --folate)
+ folate_nufact (see --folate-nufact)
+ folate_nufact_note (see --folate-nufact-note)
  format (see --format)
+ has_claims (see --has-claims)
  iodium (see --iodium)
+ iodium_nufact (see --iodium-nufact)
+ iodium_nufact_note (see --iodium-nufact-note)
  k (see -k)
+ k_nufact (see --k-nufact)
+ k_nufact_note (see --k-nufact-note)
  log_level (see --log-level)
  mg (see --mg)
+ mg_nufact (see --mg-nufact)
+ mg_nufact_note (see --mg-nufact-note)
  mn (see --mn)
+ mn_nufact (see --mn-nufact)
+ mn_nufact_note (see --mn-nufact-note)
  naked_res (see --naked-res)
  name (see --name)
  output_format (see --output-format)
  package_size (see --package-size)
  phosphorus (see --phosphorus)
+ phosphorus_nufact (see --phosphorus-nufact)
+ phosphorus_nufact_note (see --phosphorus-nufact-note)
  protein (see --protein)
+ protein_nufact (see --protein-nufact)
+ protein_nufact_note (see --protein-nufact-note)
  saturated_fat (see --saturated-fat)
+ saturated_fat_nufact (see --saturated-fat-nufact)
+ saturated_fat_nufact_note (see --saturated-fat-nufact-note)
  se (see --se)
+ se_nufact (see --se-nufact)
+ se_nufact_note (see --se-nufact-note)
  serving_size (see --serving-size)
  sodium (see --sodium)
+ sodium_nufact (see --sodium-nufact)
+ sodium_nufact_note (see --sodium-nufact-note)
  sugar (see --sugar)
+ sugar_nufact (see --sugar-nufact)
+ sugar_nufact_note (see --sugar-nufact-note)
  va (see --va)
+ va_nufact (see --va-nufact)
+ va_nufact_note (see --va-nufact-note)
  vb1 (see --vb1)
  vb12 (see --vb12)
+ vb12_nufact (see --vb12-nufact)
+ vb12_nufact_note (see --vb12-nufact-note)
+ vb1_nufact (see --vb1-nufact)
+ vb1_nufact_note (see --vb1-nufact-note)
  vb2 (see --vb2)
+ vb2_nufact (see --vb2-nufact)
+ vb2_nufact_note (see --vb2-nufact-note)
  vb3 (see --vb3)
+ vb3_nufact (see --vb3-nufact)
+ vb3_nufact_note (see --vb3-nufact-note)
  vb5 (see --vb5)
+ vb5_nufact (see --vb5-nufact)
+ vb5_nufact_note (see --vb5-nufact-note)
  vb6 (see --vb6)
+ vb6_nufact (see --vb6-nufact)
+ vb6_nufact_note (see --vb6-nufact-note)
  vc (see --vc)
+ vc_nufact (see --vc-nufact)
+ vc_nufact_note (see --vc-nufact-note)
  vd (see --vd)
+ vd_nufact (see --vd-nufact)
+ vd_nufact_note (see --vd-nufact-note)
  ve (see --ve)
+ ve_nufact (see --ve-nufact)
+ ve_nufact_note (see --ve-nufact-note)
  vk (see --vk)
+ vk_nufact (see --vk-nufact)
+ vk_nufact_note (see --vk-nufact-note)
  zn (see --zn)
+ zn_nufact (see --zn-nufact)
+ zn_nufact_note (see --zn-nufact-note)
 
 =head1 ENVIRONMENT
 
@@ -695,7 +1063,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

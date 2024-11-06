@@ -132,12 +132,17 @@ $developer_sunix_categories[17] = '';
 $developer_tools_categories[99] = 'big_streams';
 
 =head2 Define paths
+
   for programs with a colon format instead of forward slashed
 
 =cut
 
 my $specifications_path_w_colon = {
 
+	_BackupProject => $global_libs_w_colon->{_specs_big_streams} . '::'
+	  . $developer_tools_categories[99],
+	_RestoreProject => $global_libs_w_colon->{_specs_big_streams} . '::'
+	  . $developer_tools_categories[99],
 	_Sudipfilt => $global_libs_w_colon->{_specs_big_streams} . '::'
 	  . $developer_tools_categories[99],
 	_ProjectVariables => $global_libs_w_colon->{_specs_big_streams} . '::'
@@ -233,6 +238,8 @@ my $specifications_path_w_colon = {
 	  . $developer_sunix_categories[3],
 	_sufrac => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[3],
+	_sufwatrim => $global_libs_w_colon->{_specs} . '::'
+	  . $developer_sunix_categories[3],
 	_sufxdecon => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[3],
 	_sugroll => $global_libs_w_colon->{_specs} . '::'
@@ -291,7 +298,7 @@ my $specifications_path_w_colon = {
 	_sucliphead => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[4],
 	_sucountkey => $global_libs_w_colon->{_specs} . '::'
-	  . $developer_sunix_categories[4],
+	  . $developer_sunix_categories[4], 
 	_sudumptrace => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[4],
 	_suedit => $global_libs_w_colon->{_specs} . '::'
@@ -312,6 +319,8 @@ my $specifications_path_w_colon = {
 	  . $developer_sunix_categories[4],
 	_surange => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[4],
+	_suresstat => $global_libs_w_colon->{_specs} . '::'
+	  . $developer_sunix_categories[4],	  
 	_susehw => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[4],
 	_sushw => $global_libs_w_colon->{_specs} . '::'
@@ -346,9 +355,9 @@ my $specifications_path_w_colon = {
 	  . $developer_sunix_categories[6],
 	_sukdmig2d => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[6],
-	_suktmig2d => $global_libs_w_colon->{_specs} . '::'
-	  . $developer_sunix_categories[6],
 	_sukdmig3d => $global_libs_w_colon->{_specs} . '::'
+	  . $developer_sunix_categories[6],
+	_suktmig2d => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[6],
 	_sumigfd => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[6],
@@ -366,6 +375,8 @@ my $specifications_path_w_colon = {
 	  . $developer_sunix_categories[6],
 	_sumigpresp => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[6],
+	_sumigps => $global_libs_w_colon->{_specs} . '::'
+	  . $developer_sunix_categories[6],
 	_sumigpspi => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[6],
 	_sumigpsti => $global_libs_w_colon->{_specs} . '::'
@@ -381,7 +392,7 @@ my $specifications_path_w_colon = {
 	_sutifowler => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[6],
 
-	_catsu => $global_libs_w_colon->{_specs} . '::'
+	_cat_su => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[12],
 	_evince => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[12],
@@ -562,6 +573,8 @@ my $specifications_path_w_colon = {
 	  . $developer_sunix_categories[9],
 	_unisam => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[9],
+	_unisam2 => $global_libs_w_colon->{_specs} . '::'
+	  . $developer_sunix_categories[9],
 	_vel2stiff => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[9],
 
@@ -633,12 +646,16 @@ my $specifications_path_w_colon = {
 	  . $developer_sunix_categories[2],
 	_suxwigb => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[2],
+	_xcontour => $global_libs_w_colon->{_specs} . '::'
+	  . $developer_sunix_categories[2],	  
 	_xgraph => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[2],
 	_ximage => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[2],
 	_xmovie => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[2],
+	_xpicker => $global_libs_w_colon->{_specs} . '::'
+	  . $developer_sunix_categories[2],	  
 	_xwigb => $global_libs_w_colon->{_specs} . '::'
 	  . $developer_sunix_categories[2],
 
@@ -758,6 +775,10 @@ in standard linux format
 
 my $specifications_path_w_slash = {
 
+	_BackupProject => $global_libs_w_slash->{_specs_big_streams} . '/'
+	  . $developer_tools_categories[99],
+	_RestoreProject => $global_libs_w_slash->{_specs_big_streams} . '/'
+	  . $developer_tools_categories[99],
 	_Sudipfilt => $global_libs_w_slash->{_specs_big_streams} . '/'
 	  . $developer_tools_categories[99],
 	_ProjectVariables => $global_libs_w_slash->{_specs_big_streams} . '/'
@@ -853,6 +874,8 @@ my $specifications_path_w_slash = {
 	  . $developer_sunix_categories[3],
 	_sufrac => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[3],
+	_sufwatrim => $global_libs_w_slash->{_specs} . '/'
+	  . $developer_sunix_categories[3],	  
 	_sufxdecon => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[3],
 	_sugroll => $global_libs_w_slash->{_specs} . '/'
@@ -911,7 +934,7 @@ my $specifications_path_w_slash = {
 	_sucliphead => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[4],
 	_sucountkey => $global_libs_w_slash->{_specs} . '/'
-	  . $developer_sunix_categories[4],
+	  . $developer_sunix_categories[4],  
 	_sudumptrace => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[4],
 	_suedit => $global_libs_w_slash->{_specs} . '/'
@@ -932,6 +955,8 @@ my $specifications_path_w_slash = {
 	  . $developer_sunix_categories[4],
 	_surange => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[4],
+	_suresstat => $global_libs_w_slash->{_specs} . '/'
+	  . $developer_sunix_categories[4],	  
 	_susehw => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[4],
 	_sushw => $global_libs_w_slash->{_specs} . '/'
@@ -986,6 +1011,8 @@ my $specifications_path_w_slash = {
 	  . $developer_sunix_categories[6],
 	_sumigpresp => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[6],
+	_sumigps => $global_libs_w_slash->{_specs} . '/'
+	  . $developer_sunix_categories[6],	  
 	_sumigpspi => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[6],
 	_sumigpsti => $global_libs_w_slash->{_specs} . '/'
@@ -1001,7 +1028,7 @@ my $specifications_path_w_slash = {
 	_sutifowler => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[6],
 
-	_catsu => $global_libs_w_slash->{_specs} . '/'
+	_cat_su => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[12],
 	_evince => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[12],
@@ -1182,6 +1209,8 @@ my $specifications_path_w_slash = {
 	  . $developer_sunix_categories[9],
 	_unisam => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[9],
+	_unisam2 => $global_libs_w_slash->{_specs} . '/'
+	  . $developer_sunix_categories[9],	  
 	_vel2stiff => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[9],
 
@@ -1253,12 +1282,16 @@ my $specifications_path_w_slash = {
 	  . $developer_sunix_categories[2],
 	_suxwigb => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[2],
+	_xcontour => $global_libs_w_slash->{_specs} . '/'
+	  . $developer_sunix_categories[2],	  
 	_xgraph => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[2],
 	_ximage => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[2],
 	_xmovie => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[2],
+	_xpicker => $global_libs_w_slash->{_specs} . '/'
+	  . $developer_sunix_categories[2],	  
 	_xwigb => $global_libs_w_slash->{_specs} . '/'
 	  . $developer_sunix_categories[2],
 
@@ -1404,11 +1437,15 @@ sub get_pathNmodule_spec_w_slash_pm {
 	my ($self) = @_;
 
 	if ( length $L_SU_path->{_program_name} ) {
+		
+#		print ("L_SU_path,get_pathNmodule_spec_w_slash_pm, program name: $L_SU_path->{_program_name}\n");
 
 		my $key            = '_' . $L_SU_path->{_program_name};
 		my $module_spec_pm = $L_SU_path->{_program_name} . '_spec' . '.pm';
 		my $pathNmodule_spec_w_slash_pm =
-		  $specifications_path_w_slash->{$key} . '/' . $module_spec_pm;
+		$specifications_path_w_slash->{$key} . '/' . $module_spec_pm;
+#		print ("L_SU_path,get_pathNmodule_spec_w_slash_pm, $pathNmodule_spec_w_slash_pm\n");
+		  
 		return ($pathNmodule_spec_w_slash_pm);
 
 	}

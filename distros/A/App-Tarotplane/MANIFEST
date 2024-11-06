@@ -1,6 +1,5 @@
 bin/tarotplane
 Changes
-demo.gif
 lib/App/Tarotplane.pm
 lib/App/Tarotplane/Cards.pm
 lib/App/Tarotplane/UI.pm
@@ -14,5 +13,6 @@ t/00_load.t
 t/10_cards.t
 t/20_tarotplane-init.t
 t/data/escape.cards
+t/data/multiline.cards
 t/data/sort.cards
 t/data/whitespace.cards

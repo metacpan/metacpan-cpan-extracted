@@ -48,6 +48,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.00",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/1-1sam/tarotplane/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/1-1sam/tarotplane.git",
+         "web" : "https://codeberg.org/1-1sam/tarotplane"
+      }
+   },
+   "version" : "2.00",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

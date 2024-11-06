@@ -200,7 +200,7 @@ sub _get_DIR {
 =head2 subroutine _get_suffix
 	
   send PATH for suffix_type
-  suffix_type can be su txt sgy or su
+  suffix_type can be su, txt, sgy or su
   
 
 =cut
@@ -418,7 +418,7 @@ sub base_file_name_sref {
 
 		$data_in->{_base_file_name} = $$base_file_name_sref;
 
-		# print ("data_in, base_file_name $data_in->{_base_file_name}\n");
+#		print ("data_in, base_file_name $data_in->{_base_file_name}\n");
 
 	}
 	else {
@@ -471,7 +471,7 @@ sub get_inbound {
 		$suffix  = _get_suffix();
 		$inbound = $DIR . '/' . $file . $suffix;
 
-		# print ("data_in,get_inbound inbound: $inbound\n");
+		#print ("data_in,get_inbound inbound: $inbound\n");
 		return ($inbound);
 
 	}

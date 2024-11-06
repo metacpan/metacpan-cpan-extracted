@@ -14,6 +14,8 @@ my @files = (
     'lib/Net/Async/Redis/Cluster/Multi.pm',
     'lib/Net/Async/Redis/Cluster/Node.pm',
     'lib/Net/Async/Redis/Cluster/Node.pod',
+    'lib/Net/Async/Redis/Cluster/Replica.pm',
+    'lib/Net/Async/Redis/Cluster/Replica.pod',
     'lib/Net/Async/Redis/Commands.pm',
     'lib/Net/Async/Redis/Commands.pod',
     'lib/Net/Async/Redis/Multi.pm',

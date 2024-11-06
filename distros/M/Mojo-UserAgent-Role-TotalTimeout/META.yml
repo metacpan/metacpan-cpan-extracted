@@ -1,0 +1,41 @@
+---
+abstract: 'Role for Mojo::UserAgent that enables setting total timeout including redirects'
+author:
+  - 'Alexander Karelas <karjala@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-UserAgent-Role-TotalTimeout
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojo::Transaction::HTTP::Role::TotalTimeout:
+    file: lib/Mojo/Transaction/HTTP/Role/TotalTimeout.pm
+    version: v0.0.1
+  Mojo::UserAgent::Role::TotalTimeout:
+    file: lib/Mojo/UserAgent/Role/TotalTimeout.pm
+    version: v0.0.1
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://gitlab.com/karjala/mojo-useragent-role-total_timeout/issues
+  homepage: https://gitlab.com/karjala/mojo-useragent-role-total_timeout
+  repository: https://gitlab.com/karjala/mojo-useragent-role-total_timeout.git
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

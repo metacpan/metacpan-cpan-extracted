@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>907c88a7-d62b-4485-a2c5-6d68a7b7fe1f</MessageSerialNumber>
-  <MessageDate>Fri, 25 Oct 2024 04:43:52 BST</MessageDate>
+  <MessageSerialNumber>83213127-5e32-4c55-bc34-4a92a057a268</MessageSerialNumber>
+  <MessageDate>Tue, 5 Nov 2024 03:42:46 GMT</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -1722,6 +1722,40 @@
         </Rule>
         <Rule>
           <Range>9600000-9999999</Range>
+          <Length>5</Length>
+        </Rule>
+      </Rules>
+    </Group>
+    <Group>
+      <Prefix>978-635</Prefix>
+      <Agency>Estonia</Agency>
+      <Rules>
+        <Rule>
+          <Range>0000000-0299999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>0300000-2999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>3000000-3499999</Range>
+          <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>3500000-7749999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>7750000-7999999</Range>
+          <Length>4</Length>
+        </Rule>
+        <Rule>
+          <Range>8000000-9799999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>9800000-9999999</Range>
           <Length>5</Length>
         </Rule>
       </Rules>

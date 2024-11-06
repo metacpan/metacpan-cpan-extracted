@@ -1,6 +1,11 @@
+import importlib
+import inspect
+import os
+import sys
 from importlib import import_module
 
 from javonet.core.handler.AbstractCommandHandler import AbstractCommandHandler
+from javonet.core.handler.LoadLibraryHandler import LoadLibraryHandler
 from javonet.core.namespaceCache.NamespaceCache import NamespaceCache
 from javonet.core.typeCache.TypeCache import TypeCache
 
@@ -37,7 +42,10 @@ class GetTypeHandler(AbstractCommandHandler):
 
         except Exception as e:
             exc_type, exc_value = type(e), e
-            new_exc = exc_type(exc_value).with_traceback(e.__traceback__)
+            sys_path = "\n".join(sys.path)
+            available_types = "\n".join(self.get_all_available_types())
+            new_message = str(e) + "\nLoaded directories: " + sys_path  + "\nAvailable user types:\n" + available_types + "\n\n\n"
+            new_exc = exc_type(new_message).with_traceback(e.__traceback__)
             raise new_exc from None
 
     def _get_type_from_payload(self, command):
@@ -55,3 +63,21 @@ class GetTypeHandler(AbstractCommandHandler):
         class_name = payload[-1]
         loaded_module = import_module(module_name)
         return getattr(loaded_module, class_name)
+
+
+    def get_all_available_types(self):
+        available_types = list()
+        for directory in LoadLibraryHandler.loaded_directories:
+            for root, _, files in os.walk(directory):
+                for file in files:
+                    if file.endswith(".py") and file != "__init__.py":
+                        module_name = os.path.splitext(file)[0]
+                        module_path = os.path.relpath(os.path.join(root, module_name), directory)
+                        module_path = module_path.replace(os.sep, ".")
+                        try:
+                            module = importlib.import_module(module_path)
+                            for name, obj in inspect.getmembers(module, inspect.isclass):
+                                available_types.append(name)
+                        except Exception as e:
+                            print(f"Error importing {module_path}: {e}")
+        return available_types

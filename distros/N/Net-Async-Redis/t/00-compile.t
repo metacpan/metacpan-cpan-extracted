@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Net/Async/Redis.pm',
     'Net/Async/Redis/Cluster.pm',
     'Net/Async/Redis/Cluster/Multi.pm',
     'Net/Async/Redis/Cluster/Node.pm',
+    'Net/Async/Redis/Cluster/Replica.pm',
     'Net/Async/Redis/Commands.pm',
     'Net/Async/Redis/Multi.pm',
     'Net/Async/Redis/Protocol.pm',

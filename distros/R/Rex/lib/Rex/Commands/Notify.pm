@@ -24,7 +24,7 @@ package Rex::Commands::Notify;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.3'; # VERSION
+our $VERSION = '1.15.0'; # VERSION
 
 require Rex::Exporter;
 

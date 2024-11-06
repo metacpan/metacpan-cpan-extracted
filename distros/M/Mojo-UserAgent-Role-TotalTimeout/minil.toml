@@ -1,0 +1,5 @@
+name = "Mojo-UserAgent-Role-TotalTimeout"
+badges = ["github-actions/test.yml"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

@@ -134,23 +134,23 @@ sub out_1_col {
 
 }
 
-=head2 sub config_LSU 
-
-=cut
-
-sub config_LSU {
-
-    my ( $self, $array_ref ) = @_;
-
-    #my ($self,$array_ref) = @_;
-    #print ("@$array_ref\n");
-    #foreach (@$array_ref) {
-    #  print "$_\n";
-    ##}
-    print("$self writefiles,config_LSU\n");
-
-    return ();
-}
+#=head2 sub config_LSU 
+#
+#=cut
+#
+#sub config_LSU {
+#
+#    my ( $self, $array_ref ) = @_;
+#
+#    #my ($self,$array_ref) = @_;
+#    #print ("@$array_ref\n");
+#    #foreach (@$array_ref) {
+#    #  print "$_\n";
+#    ##}
+#    print("$self writefiles,config_LSU\n");
+#
+#    return ();
+#}
 
 sub format {
     my ( $variables, $format ) = @_;

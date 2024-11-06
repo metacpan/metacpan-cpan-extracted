@@ -365,6 +365,34 @@ sub clear {
 	$suop->{_note}         = '';
 }
 
+=head2 sub _get_file_names
+
+=cut
+
+sub _get_file_names {
+	my ($self) = @_;
+
+	if ( length $suop->{_inbound_list} ) {
+
+#		_set_inbound_list(); 
+
+		my $inbound_list = $suop->{_inbound_list};
+
+		my ( $file_names_ref, $num_files ) = $readfiles->cols_1p($inbound_list);
+		my $result_a = $file_names_ref;
+		my $result_b = $num_files;
+
+		#		print("_get_file_names, values=@$file_names_ref\n");
+		return ( $result_a, $result_b );
+
+	}
+	else {
+		print("_get_file_names, missing inbound\n");
+		return ();
+	}
+
+}
+
 =head2 sub _get_inbound
 
 =cut
@@ -395,27 +423,6 @@ sub _get_inbound {
 
 }
 
-#=head2 _get_check4inbound_list
-#
-#=cut
-#
-#sub _get_check4inbound_list {
-#	my ($self) = @_;
-#
-#	if (   length $suop->{_inbound_list} )
-#	{
-#		#NADA, $suop->{_inbound_list} = $suop->{_inbound_list};
-#		return($true);
-#	}
-#	else {
-#		print(
-#"suop, _get_check4inbound_list, improper type, missing list or key\n"
-#		);
-#		return ($false);
-#	}
-#
-#}
-
 =head2 sub _set_inbound_list
 
 =cut
@@ -433,34 +440,6 @@ sub _set_inbound_list {
 	}
 	else {
 		print("_set_inbound_list, missing list\n");
-		return ();
-	}
-
-}
-
-=head2 sub _get_file_names
-
-=cut
-
-sub _get_file_names {
-	my ($self) = @_;
-
-	if ( length $suop->{_inbound_list} ) {
-
-		_set_inbound_list();
-
-		my $inbound_list = $suop->{_inbound_list};
-
-		my ( $file_names_ref, $num_files ) = $readfiles->cols_1p($inbound_list);
-		my $result_a = $file_names_ref;
-		my $result_b = $num_files;
-
-		#		print("_get_file_names, values=@$file_names_ref\n");
-		return ( $result_a, $result_b );
-
-	}
-	else {
-		print("_get_file_names, missing inbound\n");
 		return ();
 	}
 
@@ -488,6 +467,26 @@ sub list {
 	}
 	return ();
 }
+
+#=head2 sub neg 
+#
+#
+#=cut
+#
+#sub neg {
+#
+#	my ( $self, $neg ) = @_;
+#	if ( $neg ne $empty_string ) {
+#
+#		$suop->{_neg}   = $neg;
+#		$suop->{_note} = $suop->{_note} . ' neg=' . $suop->{_neg};
+#		$suop->{_Step} = $suop->{_Step} . ' neg=' . $suop->{_neg};
+#
+#	}
+#	else {
+#		print("suop, neg, missing neg,\n");
+#	}
+#}
 
 =head2 sub nw 
 

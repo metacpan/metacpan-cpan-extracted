@@ -56,6 +56,11 @@ $sunix_category_number = 15
 selected changes are taken from files:
 program_name_changes.txt
 
+
+After running this script do the following:
+
+check the *spec file
+
 =cut
 
 use Moose;

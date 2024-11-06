@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.32
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.33
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,7 +45,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.32';
+our $VERSION = '1.33';
 
 =head1 SYNOPSIS
 
@@ -267,6 +267,67 @@ Benchmark and compare different pieces of code.
 =cut
 
 =head2 Format Conversions
+
+=head3 csv
+
+CSV parser.
+
+Syntax:
+
+    csv ( ARRAYREF_OF_ARRAYREFS )
+    csv ( ARRAYREF, [ARRAYREF] )
+    csv ( STRING )
+    csv ( )
+
+Convert Perl object to CSV string:
+
+    $ perl -Me -e 'say csv [ "A1", "B1", "C1" ], [ "A2", "B2", "C2" ]'
+    A1,B1,C1
+    A2,B2,C2
+
+Convert CSV string to Perl object:
+
+    # Single row:
+    perl -Me -e 'p csv "A1,B1,C1"'
+    [
+        [0] [
+                [0] "A1",
+                [1] "B1",
+                [2] "C1",
+            ],
+    ]
+
+    # Multiple rows at once:
+    $ perl -Me -e 'p csv "A1,B1,C1\nA2,B2,C2"'
+    [
+        [0] [
+                [0] "A1",
+                [1] "B1",
+                [2] "C1",
+            ],
+        [1] [
+                [0] "A2",
+                [1] "B2",
+                [2] "C2",
+            ],
+    ]
+
+    # Can use default variable:
+    $ perl -Me -e 'p csv for "A1,B1,C1", "A2,B2,C2"'
+    [
+        [0] [
+                [0] "A1",
+                [1] "B1",
+                [2] "C1",
+            ],
+    ]
+    [
+        [0] [
+                [0] "A2",
+                [1] "B2",
+                [2] "C2",
+            ],
+    ]
 
 =head3 j
 
@@ -858,12 +919,51 @@ sub import {
         #         Format Conversions
         ######################################
 
+        # CSV.
+        csv => sub {
+            if ( !$imported{$caller}{"Text::CSV_XS"}++ ) {
+                require Text::CSV_XS;
+
+                # Avoid rebuilding this object.
+                $e::_csv = Text::CSV_XS->new(
+                    {
+                        binary    => 1,
+                        auto_diag => 1,
+                    }
+                );
+            }
+
+            my @args = @_ ? @_ : ( $_ );
+            my ( $thing ) = @args;
+            return if !defined $thing;
+
+            # String to reference.
+            if ( !ref $thing ) {
+                open my $io, "<", \$thing;
+                return $e::_csv->getline_all( $io );
+            }
+
+            # Reference to string.
+            if ( ref( $thing ) ne "ARRAY" ) {
+                die "csv arguement is not an array reference!\n";
+            }
+
+            if ( ref( $thing->[0] ) ne "ARRAY" ) {
+                $thing = [@args];
+            }
+
+            join "\n",
+              map { $e::_csv->combine( @$_ ) && $e::_csv->string; } @$thing;
+
+        },
+
         # Json.
         j => sub {
             if ( !$imported{$caller}{"Mojo::JSON"}++ ) {
                 require Mojo::JSON;
             }
-            Mojo::JSON::j( @_ );
+            my @args = @_ ? @_ : ( $_ );
+            Mojo::JSON::j( @args );
         },
 
         # XML/HTML.
@@ -871,7 +971,8 @@ sub import {
             if ( !$imported{$caller}{"Mojo::DOM"}++ ) {
                 require Mojo::DOM;
             }
-            Mojo::DOM->new( @_ );
+            my @args = @_ ? @_ : ( $_ );
+            Mojo::DOM->new( @args );
         },
 
         # YAML.
@@ -879,7 +980,8 @@ sub import {
             if ( !$imported{$caller}{"YAML::XS"}++ ) {
                 require YAML::XS;
             }
-            my ( $thing ) = @_;
+            my @args = @_ ? @_ : ( $_ );
+            my ( $thing ) = @args;
             ref $thing
               ? YAML::XS::Dump( $thing )
               : YAML::XS::Load( $thing );

@@ -18,7 +18,7 @@ ok tests if modules compile well
 
 =cut
 
-use Test::Compile::Internal tests => 112;
+use Test::Compile::Internal tests => 122;
 
 my $test=Test::Compile::Internal->new();
 my $root='lib/App/SeismicUnixGui/misc/';

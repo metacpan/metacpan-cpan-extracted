@@ -193,10 +193,12 @@ V 0.0.2
 
 Normally, sumute can only apply one set muting coordinates to one gather
 at a time.
+
 In this manner you would use a 
 "par_file" e.g.,
 
 tmute=0.128544,0.245747
+
 xmute=73.2464,95.6714
 
 In this particular case, the mute pick coordinates
@@ -206,36 +208,41 @@ sumute sp_fldr4.su par=par_file key=tracr mode=0 |
 sugain agc=1 wagc=0.1 | suxwigb clip=1.5 &
 
 
-We have added some options to allow the user to mute a file
+Now, we have added some options to allow the user to mute a file
 that contains many gathers at one time. You will need to supply 
-a "multi-gather", mute-type parameter file.
-
-That is, sumute.pm can use a concatenated 
-collection of the contents of these individual parfiles.
-The name of this file is called the "multi-par-file.
+a "multi-gather", mute-type parameter file. That is, sumute.pm 
+can use a concatenated  collection of the contents of these individual 
+parfiles. The name of this file is called the "multi_gather_par_file"".
 
 Generate the "parfiles" (x,t values in SUnix "par" format) 
 using the iTopMute Tool. iTopMute saves the picked values 
 into individual "parfiles" named according to
 their corresponding gather.
 
+To create a multi-gather parameter file 
+this composite "parfile" can be concatenated from individual parfiles
+using the Tool: Sucat
+
 We now have added the following options
 to sumute:
 
 gather_type           = ep (shotpoint),cdp (cdp gathers),fldr(field data gathers)
+
 multi_gather_par_file = a concatenated file of the individual parfiles
-multi_gather_su_file  = the su file which was muted interactively to create each of the parfiles
-using the Tool: iTop_Mute 
+
+multi_gather_su_file  = the su file which was muted interactively to 
+create each of the parfiles, while using the Tool: iTop_Mute 
 
 A multi-parameter-file looks as follows:
+
 cdp=1,2
+
 tmute=0.141777,0.251418
 xmute=73,96
+
 tmute=0.131777,0.241418
 xmute=85,96
 
-To create a multi-gather parameter file 
-this composite "parfile"" can be concatenated using the Tool: Sucat
 
 Internally, sumute uses "susplit" to break a large multi-gather file into individual
 shotpoint gathers (ep), or cdp gathers or fldr (gathers) according to Segy
@@ -248,15 +255,27 @@ of tracr (x-co-ordinate)
 
 The parameter values in sumute are:
 gather_type=cdp
+
 header-word=tracr
+
 multi_gather_par_file=list
+
 multi_gather_su_file=sp_fldr4
 
+
 the file "list" is as follows:
+
 cdp=1
+
 tmute=0.141777,0.251418
+
 xmute=73,96
 
+
+Note, DO NOT include a separate
+"data_in" file in the flow. The "data_in" is not necessary
+because the new option in 
+sumute reads multi_gather_su_file automatically.
 
 =cut
 
@@ -264,11 +283,13 @@ xmute=73,96
 
 Nov. 2022, V 0.0.2
 June 2023, split files are read from DATA_SEISMIC_SU directory
+March, 2024, V 0.0.3
+		corrected error in removal of extra ".su" in output muted file name
 
 =cut
 
 use Moose;
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
 =head2 Import packages
 
@@ -638,7 +659,7 @@ Run flow in system independently of sumute
 		if ( $number_of_split_files ne $number_of_par_sets ) {
 
 			print(
-"\n sumute, Step,N.B.:    # of split files (= $number_of_split_files)\n"
+"\n sumute, Step, N.B.:   # of split files (= $number_of_split_files)\n"
 			);
 			print(
 " may not equal         # of par files   (= $number_of_par_sets) \n"
@@ -659,7 +680,8 @@ Run flow in system independently of sumute
 			# NADA
 		}
 
-=head2 get the temporary single-gather 
+=head2 get the temporary, single-gather 
+
 parameter files
 that match split data files
 
@@ -687,8 +709,9 @@ that match split data files
 				# print("2 sumute,Step,mo. matches = $length\n");
 
 =head2  error check
+
 get match to an 
-existing split files
+existing split file
 
 =cut
 
@@ -721,6 +744,7 @@ existing split files
 		}    # if split files exist
 
 =head2 First case
+
 i=0
 
 =cut
@@ -730,7 +754,7 @@ i=0
 		if ( $number_of_split_file_matches > 0 ) {
 
 			$muted_output[0] = $split_file_matches[0];
-			$muted_output[0] =~ s/.su//;
+			$muted_output[0] =~ s/\.su//;
 			$muted_output[0] =
 			  $DATA_SEISMIC_SU . '/' . $muted_output[0] . '_mute' . $suffix_su;
 
@@ -741,7 +765,7 @@ i=0
 			my $x_picks_w_commas    = $control->commify( \@x_picks );
 
 	 # print("2 sumute,Step,time_picks_aref2[0]=@time_picks\n");
-	 # print("sumute,Step,muted_output: $muted_output[0], case 0 \n");
+	 print("sumute,Step,muted_output: $muted_output[0], case 0 \n");
 	 # print("sumute,Step,split_file_match: $split_file_matches[0], case 0 \n");
 	 # print("1 sumute,Step,time_picks_aref2[0]=@{@{$time_picks_aref2}[0]}\n");
 	 # print("1 sumute,Step,x_picks_w_commas=$x_picks_w_commas\n");
@@ -771,7 +795,7 @@ i=0
 				$muted_output[$i] = $split_file_matches[$i];
 
 		   # print("2 sumute,Step,muted_output: $muted_output[$i] case i=$i\n");
-				$muted_output[$i] =~ s/.su//;
+				$muted_output[$i] =~ s/\.su//;
 				$muted_output[$i] =
 					$DATA_SEISMIC_SU . '/'
 				  . $muted_output[$i] . '_mute'
@@ -808,7 +832,7 @@ i=0
 			$muted_output[$last_case] = $split_file_matches[$last_case];
 
 # print("2 sumute,Step,muted_output: $muted_output[$last_case] case i=$last_case\n");
-			$muted_output[$last_case] =~ s/.su//;
+			$muted_output[$last_case] =~ s/\.su//;
 			$muted_output[$last_case] =
 				$DATA_SEISMIC_SU . '/'
 			  . $muted_output[$last_case] . '_mute'
@@ -837,12 +861,13 @@ i=0
 			# print("2 sumute,Step,result for everything\n$result\n");
 
 =head2  concatenate muted results
+
 create concatenated output file name
 
 =cut
 
 			my $string = $sumute->{_multi_gather_su_file};
-			$string =~ s/.su//;
+			$string =~ s/\.su//;
 			my $outbound_concatenated_mute_file =
 			  $DATA_SEISMIC_SU . '/' . $string . '_mute' . $suffix_su;
 

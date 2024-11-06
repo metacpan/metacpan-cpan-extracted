@@ -30,6 +30,7 @@
             "Set::Scalar" : "0",
             "Sub::Util" : "0",
             "Term::Table" : "0",
+            "Text::CSV_XS" : "0",
             "Tiny::Prof" : "0.03",
             "YAML::XS" : "0",
             "perl" : "5.016"
@@ -44,7 +45,7 @@
    "provides" : {
       "e" : {
          "file" : "lib/e.pm",
-         "version" : "1.32"
+         "version" : "1.33"
       }
    },
    "release_status" : "stable",
@@ -59,6 +60,6 @@
          "url" : "https://github.com/poti1/e"
       }
    },
-   "version" : "1.32",
+   "version" : "1.33",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -4,7 +4,7 @@
 
 =head2 SYNOPSIS 
 
- PERL PROGRAM NAME: L_SUV0.87.1.pl 
+ PERL PROGRAM NAME: L_SUV0.87.2.pl 
  AUTHOR: 	Juan Lorenzo
  DATE: 		June 22 2017 
 
@@ -56,7 +56,8 @@
  V0.80.00 September 19, 2022 ready for initial uploading to the CPAN
  
  V0.82.3 April 2023, ready for automatic installation and Earthscope summer program 
- V0.82.4,5 27 April 2023, Improved: "How to install environment variables"" 
+ V0.82.4,5 27 April 2023, Improved: "How to install environment variables"
+
  
 =cut
 
@@ -574,6 +575,7 @@ my $side_menu_bar_right =
 my @Help_option;
 $Help_option[0] = $help_menubutton_type->{_About};
 $Help_option[1] = $help_menubutton_type->{_InstallationGuide};
+$Help_option[2] = $help_menubutton_type->{_Tutorial};
 
 # Help is always enabled and from the start
 $main_href->{_install_menubutton} =
@@ -590,7 +592,13 @@ $main_href->{_install_menubutton} =
 	-command   => [ \&_L_SU, 'help_menubutton', \$Help_option[1] ],
 	-font      => $arial_16,
   );
-
+$main_href->{_install_menubutton} =
+  ( $main_href->{_help_menubutton} )->command(
+	-label     => @$alias_help_menubutton_label[2],
+	-underline => 0,
+	-command   => [ \&_L_SU, 'help_menubutton', \$Help_option[2] ],
+	-font      => $arial_16,
+  );
 =pod
     $args[0] = $superflow_names->{_ProjectVariables}; (OLD)
 	print("main, _Project: $args[0]\n");
@@ -2445,8 +2453,10 @@ in L_SU
 	possible values: 'Open', 'SaveAs'
 	possible values: 'Delete'	
 	
-	-help_menubutton with possible value:
+	-help_menubutton with possible values:
 	 About
+	 InstallationGuide
+	 Tutorial
 
 =cut
 

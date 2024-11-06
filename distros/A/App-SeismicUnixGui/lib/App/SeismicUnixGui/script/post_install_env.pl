@@ -45,10 +45,10 @@ use List::Util 'first';
 # important variables defined
 my $null = 'null';
 my $fifo ='tbd';
-my $starting_points          = '/home /';
+my $starting_points         = '/home /';
 my $script_file             = 'post_install_env.pl';
 my $script_path;
-my $paths2find               = "*/App/SeismicUnixGui/script";
+my $paths2find              = "*/App/SeismicUnixGui/script";
 my $SeismicUnixGui;
 my $default_answer          = 'y';
 my $hintA                   = 'perl';
@@ -160,7 +160,7 @@ if ( length $SCRIPT_PATH ) {
 	print(
 "\nThe system path to \"SeismicUnixGui_script\" appears to be:\n $SCRIPT_PATH\n");
 	print("Before running SeismicUnixGui, be sure to add the\n");
-	print("following 5 lines to the end of your \".bashrc\" file\n\n");
+	print("following 6 lines to the end of your \".bashrc\" file\n\n");
 	print("export SeismicUnixGui=$SeismicUnixGui\n");	
 	print("export PERL5LIB=\$PERL5LIB:\$SeismicUnixGui\n");
 	print("export SeismicUnixGui_script=\$SeismicUnixGui/script\n");	
@@ -170,7 +170,7 @@ if ( length $SCRIPT_PATH ) {
 
 	print(
 		"\nHowever, for a quick BUT temporary fix, you have another option:\n");
-	print("    Cut-and-paste the 5 instructions above, one at a time \n");
+	print("    Cut-and-paste the 6 instructions above, one at a time \n");
 	print("into your command line and execute them one at a time.\n"
 	);
 	print("\nIn case you are unsure, this last instruction also means: \n");

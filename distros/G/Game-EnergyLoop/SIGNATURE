@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 1ab250f39d063f93685296fb7d96f2b209709e805fd5d887fded62a057cf4852 Build.PL
+SHA256 6499714be0ace3f29fe1f5c80ca9436bf622c6bc6074db6c264f273c32e085d9 Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 43d586848fcaf71563244c59ba552cf08ac5e292b0d38f7e6f30219ae7638d3b MANIFEST
+SHA256 28905477d9ff1df0d56d671d201a3238777c37497031a6f2cc22d166a6beab07 META.json
+SHA256 ca004450dae5c9640e26a48230cca433d278c6aa334304b3192c6d2036911a82 META.yml
+SHA256 c42bc436989386d810e3a8bf9fe5c1cfabea920adaf564ae6d3ce5ee10592c2e README
+SHA256 d5c5da77349657800140ddafa768be238811dbde7486f346d304355d3bbcc974 eg/Makefile
+SHA256 34c543a82c6d75815e2676a999eec7b37027161a1c4b75fc41e78c5454a81119 eg/cpanfile
+SHA256 8c41337edd61088e162568923b2db56f4821b8d748073a3386b742b274f7b642 eg/rhythm.pl
+SHA256 fc748c930cbfe2a7c00c13f9f5250d003cdba78c57c91f8185976aae70fa5d39 eg/synopsis.pl
+SHA256 96307417230e078a93f5a32ac0b7647732859d917c3f97407bbc2176789fb0cc lib/Game/EnergyLoop.pm
+SHA256 ba1b2614dd99031ac6e94d4230d2c9dfcd98e43f1f3a3cd32e8cd1782a7a4140 t/00-load.t
+SHA256 e611dc0cc0f844db9fac43e0281453623a008f7e6a2eb252d9a65c7e66025945 t/10-update.t
+SHA256 e6d9462c550e9e4fb82ab19823c8c5421ca0ce0fa077c01b9fac03a11e0a87f9 t/pod-coverage.t
+SHA256 26e8eef165b3efeb88516cf0e98ea5ac2455f53e57eabc1259f9cfa6937a51a8 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iIYEARYDAC4WIQSoG2omBgOrWHlBAx4Ch4zzrMtsJAUCZypuWBAcam1hdGVzQHRo
+cmlnLm1lAAoJEAKHjPOsy2wk/OUA/iM+anLP4JA+Ray8IB9+7D34m8HfJX61km8k
+XewmJ6yQAP93rr2nVuSHx2NVu8agimflDuAfKSaQ1OsDysyL25cLCA==
+=WV47
+-----END PGP SIGNATURE-----

@@ -64,6 +64,74 @@ like run(
 #         Format Conversions
 ######################################
 
+# CSV - ref to string.
+is
+  csv( [ "A1", "B1", "C1" ] ),
+  qq(A1,B1,C1),
+  "csv - ref to csv string (single)";
+
+is
+  csv( [ [ "A1", "B1", "C1" ] ] ),
+  qq(A1,B1,C1),
+  "csv - ref to csv string (single, aoa)";
+
+is
+  csv( [ "A1", "B1", "C1" ], [ "A2", "B2", "C2" ] ),
+  qq(A1,B1,C1\nA2,B2,C2),
+  "csv - ref to csv string (multiple)";
+
+is
+  csv( [ [ "A1", "B1", "C1" ], [ "A2", "B2", "C2" ] ] ),
+  qq(A1,B1,C1\nA2,B2,C2),
+  "csv - ref to csv string (multiple, aoa)";
+
+is
+  csv( [ "A1", "B1", "C1" ], [ "A2", "B2", "C\n2" ] ),
+  qq(A1,B1,C1\nA2,B2,"C\n2"),
+  "csv - ref to csv string (newline)";
+
+is
+  csv( [ "A1", "B1", "C1" ], [ "A2", "B,2", "C2" ] ),
+  qq(A1,B1,C1\nA2,"B,2",C2),
+  "csv - ref to csv string (separator)";
+
+{
+    local $_ = [ "A1", "B1", "C1" ];
+    is
+      csv,
+      qq(A1,B1,C1),
+      "csv - ref to csv string (default var)";
+}
+
+# CSV - string to ref.
+is_deeply
+  csv( qq(A1,B1,C1) ),
+  [ [ "A1", "B1", "C1" ] ],
+  "csv - csv string to ref (single)";
+
+is_deeply
+  csv( qq(A1,B1,"C\n1") ),
+  [ [ "A1", "B1", "C\n1" ] ],
+  "csv - csv string to ref (single,newline)";
+
+is_deeply
+  csv( qq(A1,B1,"C,1") ),
+  [ [ "A1", "B1", "C,1" ] ],
+  "csv - csv string to ref (single,separator)";
+
+is_deeply
+  csv( qq(A1,B1,C1\nA2,B2,C2) ),
+  [ [ "A1", "B1", "C1" ], [ "A2", "B2", "C2" ] ],
+  "csv - csv string to ref (multiple)";
+
+{
+    local $_ = "A1,B1,C1";
+    is_deeply
+      csv,
+      [ [ "A1", "B1", "C1" ] ],
+      "csv - csv string to ref (default var)";
+}
+
 # Json.
 is
   j( { a => 1 } ),
@@ -257,17 +325,11 @@ is
 #            List Support
 ######################################
 
-is
-  max( 10, 20, 9, 15 ), 20,
-  "max - sanity check";
+is max( 10, 20, 9, 15 ), 20, "max - sanity check";
 
-is
-  min( 10, 20, 9, 15 ), 9,
-  "min - sanity check";
+is min( 10, 20, 9, 15 ), 9, "min - sanity check";
 
-is
-  sum( 1 .. 10 ), 55,
-  "sum - sanity check";
+is sum( 1 .. 10 ), 55, "sum - sanity check";
 
 is_deeply
   [ uniq 2, 4, 4, 6 ],

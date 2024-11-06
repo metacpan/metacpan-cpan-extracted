@@ -8,7 +8,7 @@ use v5.12.5;
 use warnings;
 use Rex::Interface::Shell::Csh;
 
-our $VERSION = '1.14.3'; # VERSION
+our $VERSION = '1.15.0'; # VERSION
 
 use base qw(Rex::Interface::Shell::Csh);
 

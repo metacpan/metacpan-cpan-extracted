@@ -132,7 +132,7 @@ sub _get_DATA_DIR_IN {
 	{
 
 		$L_SU_path->set_program_name($prog_name);
-
+          print("135 iFile \n");
 		my $pathNmodule_spec_w_slash_pm =
 		  $L_SU_path->get_pathNmodule_spec_w_slash_pm();
 		my $pathNmodule_spec_w_colon =
@@ -142,25 +142,6 @@ sub _get_DATA_DIR_IN {
 
 		# INSTANTIATE
 		my $package = $pathNmodule_spec_w_colon->new();
-
-		#		my $L_SU_global_constants = L_SU_global_constants->new();
-		#		my $module_spec_pm        = $prog_name . '_spec.pm';
-		#
-		#		$L_SU_global_constants->set_file_name($module_spec_pm);
-		#		my $slash_path4spec = $L_SU_global_constants->get_path4spec_file();
-		#		my $slash_pathNmodule_spec_pm =
-		#		  $slash_path4spec . '/' . $module_spec_pm;
-		#
-		#		$L_SU_global_constants->set_program_name($prog_name);
-		#		my $colon_pathNmodule_spec =
-		#		  $L_SU_global_constants->get_colon_pathNmodule_spec();
-		#
-##	 	print("1. iFile _get_suffix_aref, prog_name: $slash_pathNmodule_spec_pm\n");
-##	 	print("1.iFile, _get_suffix_aref, prog_name: $colon_pathNmodule_spec\n");
-		#		require $slash_pathNmodule_spec_pm;
-		#
-		#		# INSTANTIATE
-		#		my $package = $colon_pathNmodule_spec->new();
 
 		# collect specifications of input and output directories
 		# from a "program_spec".pm module
@@ -226,8 +207,10 @@ sub _get_DATA_DIR_IN {
 
 				}
 				elsif ( $prefix[$index] eq '$PL_SEISMIC/' ) {
-					
-					print("iFile, _get_DATA_DIR_IN for PL_SEISMIC; prefix[$index] =$prefix[$index]\n");
+
+					print(
+"iFile, _get_DATA_DIR_IN for PL_SEISMIC; prefix[$index] =$prefix[$index]\n"
+					);
 
 					$result = $PL_SEISMIC;
 
@@ -290,7 +273,6 @@ sub _get_DATA_DIR_OUT {
 	if ($prog_name) {
 
 		$L_SU_path->set_program_name($prog_name);
-
 		my $pathNmodule_spec_w_slash_pm =
 		  $L_SU_path->get_pathNmodule_spec_w_slash_pm();
 		my $pathNmodule_spec_w_colon =
@@ -301,35 +283,35 @@ sub _get_DATA_DIR_OUT {
 		# INSTANTIATE
 		my $package = $pathNmodule_spec_w_colon->new();
 
-  #		 use Module::Refresh; # reload updated module
-  #	    my $refresher = Module::Refresh->new;
-  #
-  #		my $manage_files_by2 = manage_files_by2->new();
-  #
-  #		$manage_files_by2->set_program_name($prog_name);
-  #		my $pathNmodule_pm   = $manage_files_by2->get_pathNmodule_pm();
-  #		my $pathNmodule_spec = $manage_files_by2->get_pathNmodule_spec();
-  #
-  #	 #	print("1. _get_suffix_aref, prog_name: $program_name$pathNmodule_pm \n");
-  #
-  #		require $pathNmodule_pm;
-  #
-  #		#$refresher->refresh_module("$module_spec_pm");
-  #
-  #		# INSTANTIATE
-  #		my $package = $pathNmodule_spec->new();
-
-		#		my $module_spec    = $prog_name . '_spec';
-		#		my $module_spec_pm = $module_spec . '.pm';
-		#
-		#		$L_SU_global_constants->set_file_name($module_spec_pm);
-		#		my $path           = $L_SU_global_constants->get_path4spec_file();
-		#		my $pathNmodule_pm = $path . '/' . $module_spec_pm;
-		#
-		#		require $pathNmodule_pm;
-		#
-		#		#		$refresher->refresh_module("$module_spec_pm");
-		#		my $package = $module_spec->new;
+#  #		 use Module::Refresh; # reload updated module
+#  #	    my $refresher = Module::Refresh->new;
+#  #
+#  #		my $manage_files_by2 = manage_files_by2->new();
+#  #
+#  #		$manage_files_by2->set_program_name($prog_name);
+#  #		my $pathNmodule_pm   = $manage_files_by2->get_pathNmodule_pm();
+#  #		my $pathNmodule_spec = $manage_files_by2->get_pathNmodule_spec();
+#  #
+#  #	 #	print("1. _get_suffix_aref, prog_name: $program_name$pathNmodule_pm \n");
+#  #
+#  #		require $pathNmodule_pm;
+#  #
+#  #		#$refresher->refresh_module("$module_spec_pm");
+#  #
+#  #		# INSTANTIATE
+#  #		my $package = $pathNmodule_spec->new();
+#
+#		#		my $module_spec    = $prog_name . '_spec';
+#		#		my $module_spec_pm = $module_spec . '.pm';
+#		#
+#		#		$L_SU_global_constants->set_file_name($module_spec_pm);
+#		#		my $path           = $L_SU_global_constants->get_path4spec_file();
+#		#		my $pathNmodule_pm = $path . '/' . $module_spec_pm;
+#		#
+#		#		require $pathNmodule_pm;
+#		#
+#		#		#		$refresher->refresh_module("$module_spec_pm");
+#		#		my $package = $module_spec->new;
 
 		# collect specifications of input and output directories
 		# fromt a program_spec.pm module
@@ -421,13 +403,15 @@ sub get_Data_path {
 	my $entry_label = $iFile->{_entry_button_label};
 	my $dialog_type = $iFile->{_dialog_type};
 
- #	print("iFile, get_Data_path, parameter label or name = $entry_label\n");
- #	print("iFile, Data_File,get_Data_path, base_file_name  = $base_file_name\n");
- #	print("iFile,get_Data_path,flow_type =$iFile->{_flow_type}\n");
+#	print("iFile, get_Data_path, parameter label or name = $entry_label\n");
+#	print(
+#		"iFile, Data_File,get_Data_path, base_file_name  = $base_file_name\n");
+#	print("iFile,get_Data_path,flow_type =$iFile->{_flow_type}\n");
 
 	my $Project                   = Project_config->new();
 	my $DATA_SEISMIC_BIN          = $Project->DATA_SEISMIC_BIN();
 	my $DATA_SEISMIC_SU           = $Project->DATA_SEISMIC_SU();
+	my $HOME                      = $Project->HOME();
 	my $PL_SEISMIC                = $Project->PL_SEISMIC();
 	my $DATA_SEISMIC_SEGB         = $Project->DATA_SEISMIC_SEGB();
 	my $DATA_SEISMIC_SEGD         = $Project->DATA_SEISMIC_SEGD();
@@ -589,20 +573,21 @@ sub get_Data_path {
 			}
 
 		}
-#		elsif ($entry_label eq 'file1'
-#			or $entry_label eq 'file2' )
-#		{
-#
-#		# FOR ANOTHER VERY SPECIFIC CASE
-#		# TODO remove?? becuase it is updated by prefix values inthe *_spec file?
-#		# CASE 1B.1 : suop2
-#		# first label/name   = 'file1'
-#		# second label/name  = 'file2'
-#			$iFile->{_path} = $DATA_SEISMIC_SU;
-#
-#			# print("CASE 1B.1 : iFile,get_path,path=$iFile->{_path}\n");
-#
-#		}
+
+	#		elsif ($entry_label eq 'file1'
+	#			or $entry_label eq 'file2' )
+	#		{
+	#
+	#		# FOR ANOTHER VERY SPECIFIC CASE
+	#		# TODO remove?? becuase it is updated by prefix values inthe *_spec file?
+	#		# CASE 1B.1 : suop2
+	#		# first label/name   = 'file1'
+	#		# second label/name  = 'file2'
+	#			$iFile->{_path} = $DATA_SEISMIC_SU;
+	#
+	#			# print("CASE 1B.1 : iFile,get_path,path=$iFile->{_path}\n");
+	#
+	#		}
 		elsif ( $entry_label ne $empty_string
 			and $iFile->{_dialog_type} eq
 			$file_dialog_type_h->{_Data_PL_SEISMIC} )
@@ -613,7 +598,7 @@ sub get_Data_path {
 			$iFile->{_path} = $Data_PL_SEISMIC;
 
 		}
-		elsif ( length $entry_label 
+		elsif ( length $entry_label
 			and $iFile->{_dialog_type} eq
 			$file_dialog_type_h->{_Data_SEISMIC_TXT} )
 		{
@@ -623,7 +608,7 @@ sub get_Data_path {
 			$iFile->{_path} = $Data_SEISMIC_TXT;
 
 		}
-		
+
 		elsif ( $entry_label ne $empty_string ) {
 
 			# CASE 1B.3
@@ -657,7 +642,7 @@ sub get_Data_path {
 	}
 	elsif ( $iFile->{_flow_type} eq $flow_type_href->{_pre_built_superflow} ) {
 
-		# CASES 2: for superflows
+		# CASE 2: for superflows
 
 		if ( $entry_label eq $base_file_name ) {
 
@@ -665,7 +650,7 @@ sub get_Data_path {
 			# first label/name = 'base_file_name
 			# and second label/name  = 'type',
 			# and second (index=1) entry value = 'su', 'segy' etc.
-			#			print("CASE 2A.1: iFile,get_Data_path, $DATA_SEISMIC_SU\n");
+#			print("iFile,CCASE 2A.1: iFile,get_Data_path, $DATA_SEISMIC_SU\n");
 			$iFile->{_path} = _get_DATA_DIR_IN();
 
 		}
@@ -674,34 +659,44 @@ sub get_Data_path {
 			$file_dialog_type_h->{_Data_PL_SEISMIC} )
 		{
 
-# case 2A.2
-#			print("case 2A.2 iFile,get_Data_path, dialog_type=$iFile->{_dialog_type} \n");
+			# case 2A.2
+#			print(
+#"iFile,Ccase 2A.2 iFile,get_Data_path, dialog_type=$iFile->{_dialog_type} \n"
+#			);
 			$iFile->{_path} = $Data_PL_SEISMIC;
 
-		} elsif ( $entry_label ne $empty_string
+		}
+		elsif ( $entry_label ne $empty_string
 			and $iFile->{_dialog_type} eq
-			$file_dialog_type_h->{_Data_SEISMIC_TXT} ) {
-				
-	      # CASE 2A.3 	
-			$iFile->{_path} = $Data_SEISMIC_TXT;	
-#		    print("case 2A.3 iFile,get_Data_path, dialog_type=$iFile->{_dialog_type} \n");		
-	}
-		elsif ( $entry_label eq $empty_string ) {
+			$file_dialog_type_h->{_Data_SEISMIC_TXT} )
+		{
 
-	   # CASE 2A.3
-	   #			print("iFile,get_Data_path, entry_label is empty \n");
-	   #			print("CASE 2A.3 File,get_Data_path, new PL_SEISMIC path chosen \n");
-			$iFile->{_path} = $PL_SEISMIC;
+			# CASE 2A.3
+			$iFile->{_path} = $Data_SEISMIC_TXT;
+#			print(
+#"iFile,Ccase 2A.3 iFile,get_Data_path, dialog_type=$iFile->{_dialog_type} \n"
+#			);
+		}
+		elsif ( $entry_label ne $empty_string
+			and $iFile->{_dialog_type} eq $file_dialog_type_h->{_Home} )
+		{
+
+			# CASE 2A.4
+#			print("iFile,CASE 2A.4 File, get_Data_path, Home path chosen \n");
+			$iFile->{_path} = $HOME;
 
 		}
 		else {
 
-			# CASE 2A.4
+			# CASE 2A.5
 			$iFile->{_path} = $default_path;
 
-#			print("iFile, get_Data_path, superflow entry label is unexpected \n");
-#			print("case 2A.4 iFile,get_Data_path, dialog_type=$iFile->{_dialog_type} \n");
-#			print("CASE 2A.4, iFile,get_path,path=$iFile->{_path}\n");
+	  #			print("iFile, get_Data_path, superflow entry label is unexpected \n");
+#			print(
+#"case 2A.5 iFile,get_Data_path, iFile->_path = $Data_SEISMIC_TXT\n"
+#			);
+
+			#			print("CASE 2A.5, iFile,get_path,path=$iFile->{_path}\n");
 		}
 
 	}
@@ -710,14 +705,14 @@ sub get_Data_path {
 		# CASE 3: all other cases
 		$iFile->{_path} = $default_path;
 
-		#		print("CASE 3: iFile,get_Data_path, unsuitable flow type \n");
+		print("CASE 3: iFile,get_Data_path, unsuitable flow type \n");
 
 		# print("CASE 3: iFile,get_path,path=$iFile->{_path}\n");
 	}
 
 	my $result = $iFile->{_path};
 
-	#	print("2. iFile,get_Data_path,result=$iFile->{_path}\n");
+#	print("2. iFile,get_Data_path,result=$iFile->{_path}\n");
 	return ($result);
 }
 
@@ -890,7 +885,7 @@ sub get_Path {
 	$iFile->{_path} = $Path;
 	$result = $iFile->{_path};
 
-	#	print("7. iFile,get_Path,path=$iFile->{_path}\n");
+	print("7. iFile,get_Path,path=$iFile->{_path}\n");
 	return ($result);
 }
 

@@ -484,10 +484,10 @@ The pick file can be saved
 
 =cut
 
-	print "$flow[1]\n";
+#	print "$flow[1]\n";
 	# $log->file($flow[1]);
 
-	print  "$flow[2]\n";
+#	print  "$flow[2]\n";
 	# $log->file($flow[2]);
 
 }    # end calcNdisplay subroutine

@@ -199,8 +199,8 @@ sub calc {
             print("iSave_picks,calc, $message\n");
         }
 
-        # CASE 2 - normal case
     }
+    # CASE 2 - normal case
     elsif ( not defined $iSave_picks->{_purpose}
         || $iSave_picks->{_purpose} eq $empty_string )
     {

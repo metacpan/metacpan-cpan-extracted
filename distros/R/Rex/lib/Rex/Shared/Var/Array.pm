@@ -9,7 +9,7 @@ use warnings;
 
 use Rex::Shared::Var::Common qw/__lock __store __retrieve/;
 
-our $VERSION = '1.14.3'; # VERSION
+our $VERSION = '1.15.0'; # VERSION
 
 sub TIEARRAY {
   my $self = { varname => $_[1], };
@@ -80,7 +80,7 @@ sub PUSH {
   __lock sub {
     my $ref = __retrieve;
 
-    if ( !ref( $ref->{ $self->{varname} }->{data} ) eq "ARRAY" ) {
+    if ( ref( $ref->{ $self->{varname} }->{data} ) ne "ARRAY" ) {
       $ref->{ $self->{varname} }->{data} = [];
     }
 
@@ -97,7 +97,7 @@ sub UNSHIFT {
   __lock sub {
     my $ref = __retrieve;
 
-    if ( !ref( $ref->{ $self->{varname} }->{data} ) eq "ARRAY" ) {
+    if ( ref( $ref->{ $self->{varname} }->{data} ) ne "ARRAY" ) {
       $ref->{ $self->{varname} }->{data} = [];
     }
 

@@ -1,10 +1,110 @@
 package App::Tarotplane::Cards;
+our $VERSION = '2.00';
 use 5.016;
 use strict;
 use warnings;
 
 use Carp;
 use List::Util qw(shuffle);
+
+use constant {
+	CARD_TERM => 0,
+	CARD_DEF  => 1,
+};
+
+sub _read_cardfile {
+
+	my $file = shift;
+
+	my @cards;
+
+	open my $fh, '<', $file or croak "Could not open $file: $!";
+
+	my $card = {};
+
+	my $cn = 1;
+
+	my $state = CARD_TERM;
+
+	my $l = '';
+	while (defined $l) {
+
+		$l = readline $fh;
+
+		if (not defined $l or $l eq "%\n") {
+
+			# Blank cards are okay
+			next if not defined $card->{Term};
+
+			croak "No definition for card #$cn in $file"
+				unless $state == CARD_DEF;
+
+			# Trim leading/trailing whitespace
+			$card->{Term}       =~ s/^\s+|\s+$//g;
+			$card->{Definition} =~ s/^\s+|\s+$//g;
+
+			# Truncate whitespace
+			$card->{Term}       =~ s/\s+/ /g;
+			$card->{Definition} =~ s/\s+/ /g;
+
+			## Now interpret some escape codes
+			# '\:' -> ':'
+			$card->{Term}       =~ s/\\:/:/g;
+			$card->{Definition} =~ s/\\:/:/g;
+
+			# '\n' -> line break
+			$card->{Term}       =~ s/\\n/\n/g;
+			$card->{Definition} =~ s/\\n/\n/g;
+
+			# No longer need '\\' substitution null byte
+			$card->{Term}       =~ s/\0//g;
+			$card->{Definition} =~ s/\0//g;
+
+			push @cards, $card;
+			$card = {};
+			$state = CARD_TERM;
+
+			$cn++;
+
+			next;
+
+		}
+
+		# Skip comments and blanks
+		my $first = substr $l, 0, 1;
+		next if $first eq '#' or $first eq "\n";
+
+		# Substitute '\\' now so that '\\:' does not count as an escaped colon.
+		# The null byte is added so that the subsequent substitutions do not
+		# try to replace any '\\' escaped backslash.
+		$l =~ s/\\\\/\\\0/g;
+
+		if ($state == CARD_TERM) {
+			# Does card contain non-escaped colon?
+			if ($l =~ /(^|[^\\]):/) {
+				my (undef,
+					$te,
+					$de
+				) = split(/(^.*[^\\]):/, $l, 2);
+				$card->{Term}       .= $te || '';
+				$card->{Definition} .= $de || '';
+				$state = CARD_DEF;
+			} else {
+				$card->{Term} .= $l;
+			}
+		} else {
+			$card->{Definition} .= $l;
+		}
+
+	}
+
+	close $fh;
+
+	croak "No cards found in $file" unless @cards;
+
+	return @cards;
+
+}
 
 sub new {
 
@@ -18,64 +118,10 @@ sub new {
 
 	foreach my $f (@files) {
 
-		my $lnum = 0;
-		my $origtotal = $self->{CardNum};
+		my @cards = _read_cardfile($f);
 
-		open my $fh, '<', $f or croak "Could not open $f: $!";
-
-		while (my $l = readline $fh) {
-
-			$lnum++;
-
-			# Skip comments and blanks
-			my $first = substr $l, 0, 1;
-			next if $first eq '#' or $first eq "\n";
-
-			chomp $l;
-
-			# Add null byte so that subsequent substitutions will not interfere
-			# with '\\' back slash.
-			$l =~ s/\\\\/\\\0/g;
-
-			# Line must contain non-escaped colon
-			if ($l !~ /[^\\]:/) {
-				close $fh;
-				croak "$f: Bad line at $lnum, does not contain delimiting colon";
-			}
-
-			my (undef, $term, $def) = split(/(^.*[^\\]):/, $l, 2);
-
-			## Now interpret escape codes
-			# '\:' -> ':'
-			$term =~ s/\\:/:/g;
-			$def  =~ s/\\:/:/g;
-
-			# '\n' -> line break
-			$term =~ s/\\n/\n/g;
-			$def  =~ s/\\n/\n/g;
-
-			# No longer need '\\' substitution null byte
-			$term =~ s/\0//g;
-			$def  =~ s/\0//g;
-
-			# Trim
-			$term =~ s/^\s+|\s+$//g;
-			$def  =~ s/^\s+|\s+$//g;
-
-			push @{$self->{Cards}}, {
-				'Term'       => $term,
-				'Definition' => $def,
-			};
-
-			$self->{CardNum}++;
-
-		}
-
-		close $fh;
-
-		if ($origtotal == $self->{CardNum}) {
-			croak "No cards found in $f";
-		}
+		push @{$self->{Cards}}, @cards;
+		$self->{CardNum} += scalar @cards;
 
 	}
 
@@ -179,7 +225,8 @@ files, consult the relevant documentation in the L<tarotplane> manual page.
 
 =head2 App::Tarotplane::Cards->new(@files)
 
-Reads cards from @files, and returns an App::Tarotplane::Cards object.
+Reads cards from @files, and returns an App::Tarotplane::Cards object. To read
+more about the card file format, consult the L<tarotplane> manual page.
 
 =head2 $deck->get($get)
 

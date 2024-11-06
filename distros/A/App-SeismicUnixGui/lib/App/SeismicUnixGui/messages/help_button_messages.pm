@@ -28,7 +28,7 @@ our $VERSION = '0.0.2';
 
 =head2 CHANGES and their DATE
 
- V 0.2.0 April 2023 Introduce viewing pdf files
+ V 0.2.0 April 2023 Introduce viewing of pdf files
 
 =cut 
 
@@ -122,7 +122,7 @@ sub get_pdf {
 		my $inbound_pdf =
 		  $path4SeismicUnixGui . '/doc/' . $help_button_messages->{_item};
 
-		#		print $inbound_pdf;
+		print $inbound_pdf;
 		system("evince $inbound_pdf &");
 
 	}
@@ -156,8 +156,17 @@ sub set_pdf {
 		if ( $item eq 'InstallationGuide' ) {
 
 			$help_button_messages->{_item} =
-			  'SeismicUnixGuiInstallationGuide0.87.1.pdf';
+			  'SeismicUnixGuiInstallationGuide0.87.2.pdf';
 
+		}
+		elsif ( $item eq 'Tutorial' ) {
+
+			$help_button_messages->{_item} =
+			  'SeismicUnixGuiTutorial0.87.2.pdf';
+			
+			
+		} else{
+			print("help_button_messages, set_pdf, unexpectedly here\n");
 		}
 
 	}

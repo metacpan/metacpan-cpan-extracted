@@ -7,7 +7,7 @@ package Rex::Cloud::Jiffybox;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.3'; # VERSION
+our $VERSION = '1.15.0'; # VERSION
 
 use Rex::Logger;
 
@@ -54,7 +54,7 @@ sub _do_request {
   my ($res);
 
   if ( $type eq "GET" ) {
-    $res = $ua->request( GET $url);
+    $res = $ua->request( GET $url );
   }
   elsif ( $type eq "POST" ) {
     $res = $ua->request( POST $url, \@params );

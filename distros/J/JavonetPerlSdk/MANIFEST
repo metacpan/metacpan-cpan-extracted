@@ -492,6 +492,7 @@ lib/Javonet/Binaries/Ruby/Linux/X64/utils/connection_type.rb
 lib/Javonet/Binaries/Ruby/Linux/X64/utils/exceptions/exception_serializer.rb
 lib/Javonet/Binaries/Ruby/Linux/X64/utils/exceptions/exception_thrower.rb
 lib/Javonet/Binaries/Ruby/Linux/X64/utils/exceptions/exception_type.rb
+lib/Javonet/Binaries/Ruby/Linux/X64/utils/runtime_logger.rb
 lib/Javonet/Binaries/Ruby/Linux/X64/utils/runtime_name.rb
 lib/Javonet/Binaries/Ruby/Linux/X64/utils/runtime_name_handler.rb
 lib/Javonet/Binaries/Ruby/Linux/X64/utils/string_encoding_mode.rb
@@ -541,6 +542,7 @@ lib/Javonet/Binaries/Ruby/MacOs/X64/utils/connection_type.rb
 lib/Javonet/Binaries/Ruby/MacOs/X64/utils/exceptions/exception_serializer.rb
 lib/Javonet/Binaries/Ruby/MacOs/X64/utils/exceptions/exception_thrower.rb
 lib/Javonet/Binaries/Ruby/MacOs/X64/utils/exceptions/exception_type.rb
+lib/Javonet/Binaries/Ruby/MacOs/X64/utils/runtime_logger.rb
 lib/Javonet/Binaries/Ruby/MacOs/X64/utils/runtime_name.rb
 lib/Javonet/Binaries/Ruby/MacOs/X64/utils/runtime_name_handler.rb
 lib/Javonet/Binaries/Ruby/MacOs/X64/utils/string_encoding_mode.rb
@@ -590,6 +592,7 @@ lib/Javonet/Binaries/Ruby/Windows/X64/utils/connection_type.rb
 lib/Javonet/Binaries/Ruby/Windows/X64/utils/exceptions/exception_serializer.rb
 lib/Javonet/Binaries/Ruby/Windows/X64/utils/exceptions/exception_thrower.rb
 lib/Javonet/Binaries/Ruby/Windows/X64/utils/exceptions/exception_type.rb
+lib/Javonet/Binaries/Ruby/Windows/X64/utils/runtime_logger.rb
 lib/Javonet/Binaries/Ruby/Windows/X64/utils/runtime_name.rb
 lib/Javonet/Binaries/Ruby/Windows/X64/utils/runtime_name_handler.rb
 lib/Javonet/Binaries/Ruby/Windows/X64/utils/string_encoding_mode.rb

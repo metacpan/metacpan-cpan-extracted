@@ -1,0 +1,24 @@
+---
+abstract: 'A Perl module for accessing the CheerLights API'
+author:
+  - 'Hans Scharler <nothans@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CheerLights-API
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON: '0'
+  LWP::UserAgent: '0'
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

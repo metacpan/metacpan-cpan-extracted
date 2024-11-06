@@ -142,13 +142,20 @@ sub _FileDialog {
 
 	my ($self) = @_;
 	my $my_title =
-	  _get_dialog_type();    # e.g., 'SaveAs' or 'Save', 'Open' or 'Delete'
-	my $FileDialog_path = _get_path();    # e.g., $PL or $DATA_SEISMIC_SU
-
+	 _get_dialog_type();    # e.g., 'SaveAs' or 'Save', 'Open' or 'Delete'
+	my $path_w_ticks = _get_path();    # $PL, $DATA_SEISMIC_SU or $HOME etc.
+	
+    # JFileDialog does not tolerate ending '/'
+    # JFileDialog does not tolerate path names enclosed with ticks
+    $control->set_infection($path_w_ticks);
+    my $path_no_ticks = $control->get_ticksBgone();
+    $control->set_path( $path_no_ticks);
+	my $FileDialog_path = $control->get_path_wo_last_slash();
+    
 	# Can be for a data or pl directory or for only a directory
 	# print("file_dialog,_FileDialog, path: $file_dialog->{_path}\n");
-	#	print("file_dialog,_FileDialog, path: $FileDialog_path\n");
-	#	print("file_dialog,_FileDialog, mytitle: $my_title\n");
+#	print("file_dialog,_FileDialog, path: $FileDialog_path\n");
+	# print("file_dialog,_FileDialog, mytitle: $my_title\n");
 
 	my $fileDialog_w = $file_dialog->{_mw}->JFileDialog(
 		-Title        => $my_title,
@@ -156,6 +163,7 @@ sub _FileDialog {
 		-History      => 12,
 		-HistDeleteOk => 1,
 		-HistUsePath  => 1,
+		-SelDir       => 2,  # dir or files will be selected
 		-SelHook      => \&_SelHook,
 		-HistFile     => "./.FileHistory.txt",
 		-PathFile     => "./.Bookmarks.txt",
@@ -165,10 +173,10 @@ sub _FileDialog {
 
 	);
 
-	# results from interactive file selection
-	# If cancel is selected, an undefined value for the file name is returned
+	# Results from interactive file selection
+	# If Cancel is selected, an undefined value for the file name is returned
 	$file_dialog->{_selected_file_name} = $fileDialog_w->Show();
-	$file_dialog->{_last_path_touched}  = $fileDialog_w->cget('-Path');
+	$file_dialog->{_last_path_touched}  = $fileDialog_w->cget('-Path');			
 
 =head2 sub _SelHook
 
@@ -183,11 +191,13 @@ confirm that a file was selected
 	sub _SelHook {
 
 		my ($pathNfile) = @_;
+		
 		my $result;
 
 		if ( defined $pathNfile ) {
 
 			$result = $true;
+#			print("file_dialog,SelHook, pathNfile =$pathNfile \n");
 			$file_dialog->{_is_file_selected} = $true;
 
 		}
@@ -196,6 +206,7 @@ confirm that a file was selected
 			$result = $false;
 		}
 
+#		print("file_dialog,SelHook, result=$result\n");
 		return ($result);
 	}
 
@@ -783,8 +794,6 @@ sub _get_flow_type {
 sub _pre_built_superflow_close_data_file {
 	my ($self) = @_;
 
-	#	my $iFile         = iFile;
-	#	my $control       = control->new;
 	my $param_widgets = param_widgets4pre_built_streams->new();
 
 	my @fields;
@@ -797,13 +806,13 @@ sub _pre_built_superflow_close_data_file {
 
 		@fields = split( /\//, $pathNfile );
 
-# print("file_dialog, _pre_built_superflow_close_data_file,fields are: @fields\n");
+#    print("file_dialog, _pre_built_superflow_close_data_file,fields are: @fields\n");
 		$file_dialog->{_is_selected_file_name} = $true;
 
 	}
 	else {
 		print(
-"file_dialog, _pre_built_superflow_close_data_file,Cancelled. No  name selected\n"
+"file_dialog, _pre_built_superflow_close_data_file, Cancelled. No  name selected\n"
 		);
 	}
 
@@ -903,8 +912,6 @@ sub _pre_built_superflow_close_data_file {
 sub _pre_built_superflow_close_path {
 	my ($self) = @_;
 
-	#	my $iFile         = iFile;
-	#	my $control       = control->new();
 	my $param_widgets = param_widgets4pre_built_streams->new();
 
 	my $topic             = $file_dialog->{_dialog_type};
@@ -997,13 +1004,11 @@ sub _pre_built_superflow_open_data_file {
 	my $param_widgets = param_widgets4pre_built_streams->new();
 	my $whereami      = whereami->new();
 
-	#	my $iFile         = iFile->new();
-
 	my $default_param_specs = $L_SU_global_constants->param();
 	my $first_idx           = $default_param_specs->{_first_entry_idx};
 	my $length              = $default_param_specs->{_length};
 
-	# e.g. Data_Pl_SEISMIC, Data_SEISMIC_TXT, Data, Path, Open, Delete etc.
+	# e.g., Data_Pl_SEISMIC, Data_SEISMIC_TXT, Data, Path, Open, Delete etc.
 	my $topic = _get_dialog_type();
 
 	$gui_history->set_hash_ref($file_dialog);
@@ -1075,8 +1080,8 @@ sub _pre_built_superflow_open_data_file {
 
 			$file_dialog->{_path} = $iFile->get_Data_path();
 
-# print("1.file_dialog,_pre-built_superflow_open_data_file, PATH:  $file_dialog->{_path} \n");
-# print(
+#print("1.file_dialog,_pre-built_superflow_open_data_file, PATH:  $file_dialog->{_path} \n");
+#print(
 # 	"1.file_dialog,_pre-built_superflow_open_data_file, _values_aref: @{$file_dialog->{_values_aref}}[0]\n"
 # );
 
@@ -1125,9 +1130,6 @@ sub _pre_built_superflow_open_path {
 
 	my $param_widgets = param_widgets4pre_built_streams->new();
 	my $whereami      = whereami->new();
-
-	#	my $iFile         = iFile->new();
-	#	my $control       = control->new();
 
 	my $default_param_specs = $L_SU_global_constants->param();
 	my $first_idx           = $default_param_specs->{_first_entry_idx};
@@ -1281,8 +1283,12 @@ sub _set_FileDialog2pre_built_superflow {
 			  \&_pre_built_superflow_open_data_file,
 			$file_dialog_type->{_Data_SEISMIC_TXT} =>
 			  \&_pre_built_superflow_open_data_file,
+			$file_dialog_type->{_Home} =>
+			  \&_pre_built_superflow_open_data_file,		  
 			$file_dialog_type->{_Data} => \&_pre_built_superflow_open_data_file,
+			
 			$file_dialog_type->{_Path} => \&_pre_built_superflow_open_path,
+			
 			$file_dialog_type->{_last_dir_in_path} =>
 			  \&_big_stream_last_dir_in_path,
 		};
@@ -1421,7 +1427,7 @@ sub _user_built_flow_Delete_perl_file {
 # make the file paths for the current file_dialog type (Save, SaveAs, Delete, Open, Data, etc.)
 		_set_file_path();
 
-		# collects the name of the data file to be opened
+		# collects the name of the data file to be deleted
 		_FileDialog();    # file dialog mega-widget
 
 		my $topic = $file_dialog->{_dialog_type};
@@ -1761,7 +1767,7 @@ sub _user_built_flow_close_data_file {
 sub _user_built_flow_close_path {
 	my ($self) = @_;
 
-	my $control  = control->new();
+#	my $control  = control->new();
 	my $whereami = whereami2->new();
 
 	my @fields;
@@ -2613,7 +2619,7 @@ sub FileDialog_director {
 
 	}
 	else {
-		print("file_dialog, FileDialog_director i smissing flow type\n");
+		print("file_dialog, FileDialog_director is missing flow type\n");
 	}
 	return ($empty_string);
 }

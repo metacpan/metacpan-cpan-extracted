@@ -7,7 +7,7 @@ package Rex::Helper::Run;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.3'; # VERSION
+our $VERSION = '1.15.0'; # VERSION
 
 require Exporter;
 use base qw(Exporter);

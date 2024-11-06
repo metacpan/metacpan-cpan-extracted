@@ -1,8 +1,12 @@
 # local pass for V0.87.1
-#L_SU_path.pm
-#L_SU_global_constants.pm
-#dirs.pm
+# All tested july 6. 2024
+# L_SU_path.pm
+# L_SU_global_constants.pm
+# dirs.pm
+# tbd.pl
+a2su.pm
 algebra_by.pm
+# archive
 array.pm
 big_streams_param.pm
 binding.pm
@@ -14,7 +18,9 @@ conditions4big_streams.pm
 conditions4flows.pm
 config_superflows.pm
 control.pm
+copyNclean_sgy_up.pl
 count.pm
+cps.pm
 decisions.pm
 developer.pm
 error.pm
@@ -37,7 +43,6 @@ manage_files_by2.pm
 manage_files_by.pm
 Math.pm
 message.pm
-misc_files.txt
 mkparfile.pm
 name.pm
 neutral_flow.pm
@@ -81,13 +86,16 @@ perl_use_pkg.pm
 PID.pm
 pink_flow.pm
 plot.pm
+pm_io.pm
 pod_declare.pm
 pod_flows.pm
 pod_log_flows.pm
 pod_prog_param_setup.pm
 pod_run_flows.pm
 premmod.pm
+program_name.pm
 project_selector.pm
+Project_Variables.pm
 readfiles.pm
 read_psunix.pm
 redisplay.pm

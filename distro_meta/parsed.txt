@@ -95026,3 +95026,17 @@ L/LN/LNATION/Quaint-0.02.tar.gz
 K/KI/KIMOTO/SPVM-Net-SSLeay-0.006.tar.gz
 D/DK/DKECHAG/Weather-API-Base-0.2.tar.gz
 D/DK/DKECHAG/Weather-Astro7Timer-0.4.tar.gz
+P/PE/PERLANCAR/App-BPOMUtils-NutritionFacts-0.028.tar.gz
+G/GL/GLLORE/App-SeismicUnixGui-0.87.2.tar.gz
+S/SA/SAMYOUNG/App-Tarotplane-2.00.tar.gz
+B/BR/BRIANDFOY/Business-ISBN-Data-20241105.001.tar.gz
+N/NO/NOTHANS/CheerLights-API-1.00.tar.gz
+N/NA/NALOBIN/Date-Holidays-RU-1.2025.0.tar.gz
+T/TI/TIMKA/e-1.33.tar.gz
+J/JM/JMATES/Game-EnergyLoop-0.01.tar.gz
+J/JA/JAVONET/JavonetPerlSdk-v2.5.4.tar.gz
+K/KA/KARJALA/Mojo-UserAgent-Role-TotalTimeout-v0.0.1.tar.gz
+T/TE/TEAM/Net-Async-Redis-6.004.tar.gz
+F/FE/FERKI/Rex-1.15.0.tar.gz
+S/SO/SONGMU/Riji-v1.1.3.tar.gz
+O/OA/OALDERS/URI-5.31.tar.gz

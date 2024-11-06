@@ -286,18 +286,9 @@ sub _get_program_config {
 	$sub_category_directory = $big_streams_param->{_sub_category_directory};
 	$program_sref           = $big_streams_param->{_program_sref};
 
-#	print("big_streams_param, get_program_config, path = $path\n");
-#	print(
-#"big_streams_param, get_program_config, sub_category_directory = $sub_category_directory\n"
-#	);
-#	print("big_streams_param, get_program_config, program_sref= $$program_sref\n");
-
-	if (   defined $path
-		&& $path ne $empty_string
-		&& defined $sub_category_directory
-		&& $sub_category_directory ne $empty_string
-		&& defined $$program_sref
-		&& $$program_sref ne $empty_string )
+	if (   length $path
+		&& length $sub_category_directory
+		&& length $$program_sref )
 	{
 
 		$program_config =
@@ -307,12 +298,16 @@ sub _get_program_config {
 		  . '.config';
 
 		$big_streams_param->{_program_config} = $program_config;
+#		print("big_streams_param, get_program_config, program_config= $program_config\n");
 		my $result = $program_config;
 		return ($result);
 
 	}
 	else {
 		print("big_streams_param, _set_program_config, missing value\n");
+		print("path = $path\n");
+	    print("sub_category_directory = $sub_category_directory\n");
+	    print("program_sref = $$program_sref\n");	    
 		return ();
 	}
 
@@ -400,11 +395,11 @@ sub get {
 
 	 # CASE for previously run
 	 # Tools except Project
-	 #				print(
-	 #"big_streams_param, get,CASE 1A: If progam_sref = a pre-built superflow\n"
-	 #				);
+#	 				print(
+#	 "big_streams_param, get,CASE 1A: If progam_sref = a pre-built superflow\n"
+#	 				);
 
-				# e.g., with tools like Sseg2su.config
+				# i.e., with tools like Sseg2su.config
 				# but not with Project.config
 
 				use Module::Refresh;    # reload updated module
@@ -469,6 +464,9 @@ sub get {
 #				print(
 #					"1C big_streams_param,get,using global lib: path is $path\n"
 #				);
+#								print(
+#					"1C big_streams_param,get,using global lib: sub_category=$sub_category_directory\n"
+#				);
 				_set_path($path);
 				_set_sub_category_directory($sub_category_directory);
 				$config_corrupt = $false;
@@ -501,11 +499,11 @@ sub get {
 		if ( $config_corrupt eq $false ) {
 
 			# CASE:3A use the local configuration file
-			#			print("CASE 3.A big_streams_param,get\n");
+			# print("CASE 3.A big_streams_param,get\n");
 			# share local variables with the package namespace
 			$program_config = _get_program_config();
 
-		#			print("big_streams_param, get,configuration file is NOT corrupt\n");
+#			print("big_streams_param, get,program_config=$program_config\n");
 
 			( $names_aref, $values_aref ) = $read->configs($program_config);
 			$big_streams_param->{_names_aref} = $names_aref;
@@ -563,9 +561,8 @@ sub get {
 				_set_sub_category_directory($sub_category_directory);
 				$program_config = _get_program_config();
 
-		   #				print("big_streams_param, get,configuration file is corrupt\n");
-		   #				print(
-		   #					"big_streams_param, get,program_config=$program_config\n");
+#		   print("big_streams_param, get, sub_category_directory=$sub_category_directory\n");
+#		   print("big_streams_param, get,program_config=$program_config\n");
 				( $names_aref, $values_aref ) = $read->configs($program_config);
 				$big_streams_param->{_names_aref} = $names_aref;
 				$length = scalar @$names_aref;

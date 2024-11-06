@@ -27,10 +27,28 @@ and definitions, then displays them in a TUI.
 
 =head2 Card Files
 
-A B<tarotplane> card file consists of lines that contain terms and their
-respective definitions seperated by a colon (:). Text preceding the colon is
-considered the term, text following the colon is considered the term's
-definition.
+A B<tarotplane> card file is a text file that contains cards. Each card must
+contain a term and definition, which are seperated by a colon (:). Terms
+precede the colon, definitions follow the colon Cards are.
+seperated from each other by a delimitting line, which is a line that only
+contains a percentage (%) sign. Any whitespace found in the terms and
+definitions will be truncated to a single space character. Leading and trailing
+whitespace for terms/definitions are trimmed. A detailed example card file can
+be found in the EXAMPLES section of this manual.
+
+Empty cards are ignored and will not throw an error. This means if you have a
+card file like this:
+
+  %
+  Term 1: Definiton 1
+  %
+  %
+  %
+  Term 2: Definition 2
+  %
+
+B<tarotplane> will only read two cards, and ignore the two empty cards between
+Term 1 and Term 2.
 
 Lines starting with a hash (#) are treated as comments and are ignored. Blank
 lines are also ignored.
@@ -126,15 +144,40 @@ Print version and copyright information, then exit.
 
 An example of a valid card file:
 
- # Comment
- # Term: Definition
- $: Dollar sign
- ^: Caret
- !: Exclamation point
+ # American authors
+ %
+ Thomas Pynchon:
+ Author of Gravity's Rainbow, V, and The Crying of Lot 49.
+ %
+ Joseph Heller:
+ Author of Catch-22.
+ %
+ John Steinbeck:
+ Author of East of Eden, Of Mice and Men, and Grapes of Wrath.
+ %
+ Cormac McCarthy:
+ Author of Blood-Meridian, No Country For Old Men, and The Road.
+ %
+ Herman Melville:
+ Author of Moby-Dick, Billy Budd the Sailor, and Bartleby the
+ Scrivener.
+ %
 
- # Note the backslashes
- \:): Smiley face
- >\:): Angry face
+ # Russian authors
+ %
+ Leo Tolstoy:
+ Author of War and Peace, Anna Karenina, and Death of Ivan Ilyich.
+ %
+ Fyodor Dostoevsky:
+ Author of Crime and Punishment, Notes from the Underground, and The
+ Brothers Karamazov.
+ %
+ Aleksander Solzhenitsyn:
+ Author fo One Day in the Life of Ivan Denisovich.
+ %
+ Vladimir Nabokov:
+ Author of Lolita and Pale Fire.
+ %
 
 =head1 AUTHOR
 

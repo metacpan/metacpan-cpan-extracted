@@ -321,9 +321,9 @@ $sudipfilter[2] = $sudipfilter->Step();
 
 $suxwigb->clear();
 $suxwigb->title( quotemeta($sufile_in) );
-$suxwigb->windowtitle( quotemeta('RAW') );
-$suxwigb->xlabel( quotemeta('# traces') );
-$suxwigb->ylabel( quotemeta('#samples') );
+$suxwigb->windowtitle( quotemeta('unfiltered data') );
+$suxwigb->xlabel( quotemeta('trace No.') );
+$suxwigb->ylabel( quotemeta('# samples') );
 $suxwigb->box_width( quotemeta(300) );
 $suxwigb->box_height( quotemeta(370) );
 $suxwigb->dt( quotemeta(1) );
@@ -352,9 +352,9 @@ $suxwigb[1] = $suxwigb->Step();
 
 $suxwigb->clear();
 $suxwigb->title( quotemeta($sufile_in) );
-$suxwigb->windowtitle( quotemeta('Dip-filtered') );
-$suxwigb->xlabel( quotemeta('No. traces') );
-$suxwigb->ylabel( quotemeta('No. samples') );
+$suxwigb->windowtitle( quotemeta('dip-filtered') );
+$suxwigb->xlabel( quotemeta('trace No.') );
+$suxwigb->ylabel( quotemeta('# samples') );
 $suxwigb->box_width( quotemeta(300) );
 $suxwigb->box_height( quotemeta(370) );
 $suxwigb->box_X0( quotemeta(370) );
@@ -373,7 +373,7 @@ $suxwigb[5] = $suxwigb->Step();
 =head2 DISPLAY DATA as IMAGE
 
   Set parameters
-  Top left image
+  Top-left image
 
 =cut
 
@@ -392,7 +392,7 @@ $suximage->x_tick_increment( quotemeta(0.2) );
 $suximage->first_distance_tick_num( quotemeta(-0.5) );
 $suximage->num_minor_ticks_betw_time_ticks( quotemeta(2) );
 $suximage->y_tick_increment( quotemeta(0.1) );
-$suximage->xlabel( quotemeta('Frequency Hz dt=1 Nf=0.5') );
+$suximage->xlabel( quotemeta('frequency (Hz) dt=1 Nf=0.5') );
 $suximage->ylabel( quotemeta('k 1/m dx=1 Nk=0.5') );
 $suximage->legend( quotemeta(1) );
 $suximage->hiclip( quotemeta(1000) );
@@ -407,14 +407,14 @@ $suximage[1] = $suximage->Step();
 =head2 DISPLAY DATA as IMAGE
 
   Set parameters
-  Top right image
+  Top-right image
 
 =cut
 
 $suximage->clear();
 $suximage->title( quotemeta($sufile_in) );
-$suximage->xlabel( quotemeta('No. traces') );
-$suximage->ylabel( quotemeta('Time s') );
+$suximage->xlabel( quotemeta('trace No.') );
+$suximage->ylabel( quotemeta('time s') );
 $suximage->box_width( quotemeta(300) );
 $suximage->box_height( quotemeta(370) );
 $suximage->box_X0( quotemeta(670) );
@@ -422,12 +422,13 @@ $suximage->box_Y0( quotemeta(0) );
 $suximage->hiclip( quotemeta(1) );
 $suximage->loclip( quotemeta(-1) );
 $suximage->tstart_s( quotemeta($suwind_1_tmin) );
-$suximage->first_distance_tick_num( quotemeta(-0.5) );
+#$suximage->first_distance_tick_num( quotemeta(1) );
 $suximage->tend_s( quotemeta($suwind_1_tmax) );
-$suximage->num_minor_ticks_betw_distance_ticks( quotemeta(1) );
-$suximage->x_tick_increment( quotemeta(5) );
-$suximage->num_minor_ticks_betw_time_ticks( quotemeta(2) );
+#$suximage->num_minor_ticks_betw_distance_ticks( quotemeta(1) );
+$suximage->x_tick_increment( quotemeta(10) );
+#$suximage->num_minor_ticks_betw_time_ticks( quotemeta(2) );
 $suximage->y_tick_increment( quotemeta(.1) );
+$suximage->windowtitle(quotemeta('unfiltered data'));
 $suximage->legend( quotemeta(1) );
 $suximage->style( quotemeta('seismic') );
 $suximage[2] = $suximage->Step();    #
@@ -435,7 +436,7 @@ $suximage[2] = $suximage->Step();    #
 =head2 DISPLAY DATA as IMAGE
 
   Set parameters
-  Bottom left image
+  Bottom-left image
 
 =cut
 
@@ -455,12 +456,12 @@ $suximage->num_minor_ticks_betw_distance_ticks( quotemeta(1) );
 $suximage->x_tick_increment( quotemeta(0.2) );
 $suximage->first_distance_tick_num( quotemeta(-0.5) );
 $suximage->y_tick_increment( quotemeta(0.1) );
-$suximage->ylabel( quotemeta('Frequency (Hz) dt=1 Nf=0.5') );
+$suximage->ylabel( quotemeta('frequency (Hz) dt=1 Nf=0.5') );
 $suximage->xlabel( quotemeta('k (1/m) dx=1 Nk=0.5') );
 $suximage->hiclip( quotemeta(1000) );
 $suximage->loclip( quotemeta(0) );
 $suximage->cmap( quotemeta('hsv2') );
-$suximage->windowtitle( quotemeta('Dip-filtered') );
+$suximage->windowtitle( quotemeta('dip-filtered') );
 $suximage[4] = $suximage->Step();
 
 =head2 DISPLAY DATA as IMAGE
@@ -472,8 +473,8 @@ $suximage[4] = $suximage->Step();
 
 $suximage->clear();
 $suximage->title( quotemeta($sufile_in) );
-$suximage->xlabel( quotemeta('No. traces') );
-$suximage->ylabel( quotemeta('Time (s)') );
+$suximage->xlabel( quotemeta('trace No.') );
+$suximage->ylabel( quotemeta('time (s)') );
 $suximage->box_width( quotemeta(300) );
 $suximage->box_height( quotemeta(370) );
 $suximage->box_X0( quotemeta(670) );
@@ -486,6 +487,7 @@ $suximage->num_minor_ticks_betw_time_ticks( quotemeta(2) );
 $suximage->y_tick_increment( quotemeta(.1) );
 $suximage->first_time_sample_value( quotemeta(0) );
 $suximage->absclip( quotemeta($BOTTOM_RIGHT_suximage_absclip) );
+$suximage->windowtitle( quotemeta('dip-filtered') );
 $suximage->legend( quotemeta(1) );
 $suximage[6] = $suximage->Step();
 
@@ -497,9 +499,9 @@ $suximage[6] = $suximage->Step();
   top left image
   top middle plot
   top right plot
-  bottom left image
-  bottom middle plot
-  bottom right image
+  bottom-left image
+  bottom-middle plot
+  bottom-right image
   output filtered data set
 
 =cut
@@ -527,7 +529,7 @@ if ( length $skip_suinterp and $skip_suinterp eq $yes ) {
 	);
 	$flow[3] = $run->modules( \@items );
 
-	# bottom left
+	# bottom-left
 	@items = (
 		$suwind[1],      $in, $inbound[1],  $to, $suwind[2],      $to,
 		$sugain[1],      $to, $sufilter[1], $to, $sudipfilter[1], $to,
@@ -535,7 +537,7 @@ if ( length $skip_suinterp and $skip_suinterp eq $yes ) {
 	);
 	$flow[4] = $run->modules( \@items );
 
-	# bottom middle
+	# bottom-middle
 	@items = (
 		$suwind[1],      $in, $inbound[1],  $to, $suwind[2],      $to,
 		$sugain[1],      $to, $sufilter[1], $to, $sudipfilter[1], $to,
@@ -543,7 +545,7 @@ if ( length $skip_suinterp and $skip_suinterp eq $yes ) {
 	);
 	$flow[5] = $run->modules( \@items );
 
-	# bottom right image fk filter
+	# bottom-right image fk filter
 	@items = (
 		$suwind[1],      $in,
 		$inbound[1],     $to,
@@ -606,7 +608,7 @@ if ( length $skip_suinterp and $skip_suinterp eq $yes ) {
 	);
 	$flow[3] = $run->modules( \@items );
 
-	# bottom left
+	# bottom-left
 	@items = (
 		$suwind[1],      $in,
 		$inbound[1],     $to,
@@ -621,7 +623,7 @@ if ( length $skip_suinterp and $skip_suinterp eq $yes ) {
 	);
 	$flow[4] = $run->modules( \@items );
 
-	# bottom middle
+	# bottom-middle
 	@items = (
 		$suwind[1],      $in,
 		$inbound[1],     $to,
@@ -636,7 +638,7 @@ if ( length $skip_suinterp and $skip_suinterp eq $yes ) {
 	);
 	$flow[5] = $run->modules( \@items );
 
-	# bottom right image fk filter
+	# bottom-right image fk filter
 	@items = (
 		$suwind[1],      $in,
 		$inbound[1],     $to,

@@ -62,6 +62,7 @@ my $yes = $var->{_yes};
 =cut
 
 my $control = {
+	_aref                       => '',
 	_file_name                  => '',
 	_file_name_sref             => '',
 	_first_name                 => '',
@@ -76,6 +77,32 @@ my $control = {
 	_suffix4oop                 => '',
 	_value                      => '',
 };
+
+
+=head2 sub clear
+
+Clear all memory
+
+=cut
+
+sub clear {
+	my $self = @_;
+	$control->{_aref}                         = '';                     
+	$control->{_file_name}                    = '';                 
+	$control->{_file_name_sref}               = '';             
+	$control->{_first_name}                   = '';                 
+	$control->{_first_name_string}            = '';        
+	$control->{_first_name_w_single_quotes}   = ''; 
+	$control->{_flow_index}                   = '';                 
+	$control->{_infected_string}              = '';            
+	$control->{_parameter_index4array}        = '';     
+	$control->{_prog_names_aref}              = '';            
+	$control->{_stringWcommas}                = '';              
+	$control->{_stringWback_slash}            = '';          
+	$control->{_suffix4oop}                   = '';                 
+	$control->{_value}                        = '';                     
+
+}
 
 =head2 sub _get_no_quotes
 
@@ -609,6 +636,29 @@ sub get_back_slashBgone {
 
 }
 
+=head2 sub get_base_file_name_aref
+
+
+=cut
+
+sub get_base_file_name_aref {
+	my ($self) = @_;
+
+	if ( length $control->{_base_file_name_aref} ) {
+
+		my $result = $control->{_base_file_name_aref};
+
+  # print("control,get_base_file_name_aref,$control->{_base_file_name_aref}\n");
+		return ($result);
+
+	}
+	else {
+		print("control,get_base_file_name, error: missing array reference\n");
+		return ();
+	}
+
+}
+
 =head2 sub get_commas2space
 
     Replace commas in strings
@@ -685,7 +735,6 @@ sub get_max_index {
 	if ( length $program_name ) {
 
 		$L_SU_path->set_program_name($program_name);
-
 		my $pathNmodule_spec_w_slash_pm =
 		  $L_SU_path->get_pathNmodule_spec_w_slash_pm();
 		my $pathNmodule_spec_w_colon =
@@ -831,18 +880,22 @@ sub get_path_wo_last_slash {
 
 	if ( length $control->{_path} ) {
 
-		my $path          = $control->{_path};
+		my $path           = $control->{_path};
+		
 		my $last_character = substr( $path, -1 );
-
+#        print ("old path=$path\n\n");
+       
 		if ( $last_character eq $forward_slash ) {
-			
+
 			$path =~ s/\/$//;
+#			print ("path new $path\n\n");
 		}
 		else {
-			# NADA print ("path unchanged $path\n\n");
+#			print ("path unchanged $path\n\n");
 		}
 
 		my $result = $path;
+
 #		print("control,get_path_wo_last_slash, : $result\n");
 		return ($result);
 
@@ -1103,7 +1156,7 @@ sub get_w_single_quotes {
 
 	my $first_name_string = $control->{_first_name_string};
 
-	# print("-1.control,w_single_quotes, value is: $first_name_string\n");
+#	print("-1.control,w_single_quotes, value is: $first_name_string\n");
 
 	if ($first_name_string) {
 
@@ -1156,9 +1209,42 @@ sub ors {
 	return ($label);
 }
 
+=head2 sub remove_su_suffix4aref
+
+=cut
+
+sub remove_su_suffix4aref {
+	my ($self) = @_;
+
+	if ( length $control->{_aref} ) {
+
+		my @name;
+		my @array  = @{ $control->{_aref} };
+		my $length = scalar @array;
+
+		for ( my $i = 0 ; $i < $length ; $i++ ) {
+
+			$name[$i] = $array[$i];
+#			print("control,remove_su_suffix, name=$name[$i]\n");
+			my $last_3_char = substr( $name[$i], -3 );
+
+			#			print("$last_3_char\n");
+			$name[$i] =~ s{\.[^.]+$}{};
+
+		# print("control,remove_su_suffix, missing aref; base_name= $name\n");
+		}
+
+		$control->{_base_file_name_aref} = \@name;
+	}
+	else {
+		print("control,remove_su_suffix, missing aref\n");
+
+	}
+}
+
 =head2 sub remove_su_suffix
 
-  For a  scalar reference  remove the .su extension
+  For a  scalar reference remove the .su extension
   For a scalar also remove the .su extension
   For an  array reference do nothig 
 	returns a non-empty string if EXPR is a reference, the empty string otherwise. 
@@ -1208,6 +1294,25 @@ sub remove_su_suffix4sref {
 #	    $first_name_string 	=~ s{\.[^.]+$}{};
 #	    $first_name_string   = "'".$first_name_string."'"; #for complex names, in addition to plain letters
 	}
+}
+
+=head2 set_aref
+
+=cut
+
+sub set_aref {
+	my ( $self, $aref ) = @_;
+
+	if ( length $aref ) {
+
+		$control->{_aref} = $aref;
+
+		#		print("control,set_aref, $control->{_aref}\n");
+	}
+	else {
+		print("control,set_aref, missing aref value\n");
+	}
+	return ();
 }
 
 =head2 sub set_back_slashBgome
@@ -1326,7 +1431,25 @@ sub set_first_name {
 	return ();
 }
 
+=head sub set_first_name_string
+
+=cut
+
+sub set_first_name_string {
+	my ( $self, $infected_string2B ) = @_;
+
+	# print("control,set_first_name_string, infected_string2B: $infected_string2B\n");
+
+	if ($infected_string2B) {
+		$control->{_first_name_string} = $infected_string2B;
+
+#		print("control,set_first_name_string, infected_string2B: $infected_string2B\n");
+	}
+	return ();
+}
+
 =head2 sub set_flow_program_name_sref
+
 Which program in the flow is active
 
 =cut
@@ -1409,6 +1532,7 @@ sub set_infection {
 	}
 	return ();
 }
+
 
 =head2 sub set_flow_prog_names_aref 
 
@@ -1513,56 +1637,68 @@ sub set_path {
 sub set_suffix {
 
 	my ($self) = @_;
-	my ( $first_name, $suffix, $file_name );
 
-	# print("control,file_name,is: $control->{_file_name}\n");
-	# split by the escaped period
-	$file_name = $control->{_file_name};
-	( $first_name, $suffix ) = split( /\./, $file_name );
-	$control->{_first_name} = $first_name;
+	#	my ( $first_name, $suffix, $file_name );
 
-	# print("control,first_name,is: $first_name\n");
-	# print("control,suffix,is: $suffix\n");
+	if ( length $control->{_file_name} ) {
 
-	if ( !($suffix) ) {
-		$suffix = '';
-	}
+		my $first_name;
+		my $suffix;
 
-	if ( $suffix eq '' ) {
+		# print("control,file_name,is: $control->{_file_name}\n");
+		# split by the escaped period
+		my $file_name = $control->{_file_name};
+		( $first_name, $suffix ) = split( /\./, $file_name );
+		$control->{_first_name} = $first_name;
 
-		# print("1. control,set_suffix,is: empty\n");
-		$control->{_suffix} = '';
+		# print("control,first_name,is: $first_name\n");
+		# print("control,suffix,is: $suffix\n");
 
-	}
-	elsif ( $suffix eq 'su' ) {
-		$control->{_suffix} = 'su';
+		if ( !($suffix) ) {
+			$suffix = '';
+		}
 
-		# print("control,set_suffix,is: $control->{_suffix}\n");
+		if ( $suffix eq '' ) {
 
-	}
-	elsif ( $suffix eq 'config' ) {
-		$control->{_suffix} = 'config';
+			# print("1. control,set_suffix,is: empty\n");
+			$control->{_suffix} = '';
 
-		# print("control,set_suffix,is: $control->{_suffix}\n");
+		}
+		elsif ( $suffix eq 'su' ) {
+			$control->{_suffix} = 'su';
 
-	}
-	elsif ( $suffix eq 'pl' ) {
-		$control->{_suffix} = 'pl';
+			# print("control,set_suffix,is: $control->{_suffix}\n");
 
-		# print("control,set_suffix,is: $control->{_suffix}\n");
+		}
+		elsif ( $suffix eq 'config' ) {
+			$control->{_suffix} = 'config';
 
-	}
-	elsif ( $suffix eq 'txt' ) {
-		$control->{_suffix} = 'txt';
+			# print("control,set_suffix,is: $control->{_suffix}\n");
 
-		# print("control,set_suffix,is: $control->{_suffix}\n");
+		}
+		elsif ( $suffix eq 'pl' ) {
+			$control->{_suffix} = 'pl';
 
+			# print("control,set_suffix,is: $control->{_suffix}\n");
+
+		}
+		elsif ( $suffix eq 'txt' ) {
+			$control->{_suffix} = 'txt';
+
+			# print("control,set_suffix,is: $control->{_suffix}\n");
+
+		}
+		else {
+			$control->{_suffix} = '';
+
+			# print("2. control,set_suffix, suffix:$suffix is empty\n");
+		}
 	}
 	else {
-		$control->{_suffix} = '';
-
-		# print("2. control,set_suffix, suffix:$suffix is empty\n");
+		print("control,set_suffix,file_name missing\n");
 	}
+
+	return ();
 }
 
 =head2 sub set_suffix4oop

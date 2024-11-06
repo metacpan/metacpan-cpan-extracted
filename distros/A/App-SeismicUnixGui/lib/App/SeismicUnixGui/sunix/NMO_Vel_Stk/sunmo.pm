@@ -28,7 +28,7 @@ AUTHOR: Juan Lorenzo (Perl module only)
  Optional Parameters:							     
  tnmo=0,...		NMO times corresponding to velocities in vnmo	     
  vnmo=1500,...		NMO velocities corresponding to times in tnmo	     
- cdp=			CDPs for which vnmo & tnmo arApp::SeismicUnixGui::sunix::NMO_Vel_Stk::e specified (see Notes) 
+ cdp=			CDPs for which vnmo & tnmo are specified (see Notes) 
  smute=1.5		samples with NMO stretch exceeding smute are zeroed  
  lmute=25		length (in samples) of linear ramp for stretch mute  
  sscale=1		=1 to divide output samples by NMO stretch factor    
@@ -39,11 +39,11 @@ AUTHOR: Juan Lorenzo (Perl module only)
  Notes:								     
  For constant-velocity NMO, specify only one vnmo=constant and omit tnmo.   
 
- NMO interpolation error is less than 1 0.000000or frequencies less than 600f   
- the Nyquist frequency.						     
+ NMO interpolation error is less than 1 percent for frequencies less than 
+ 60 percent of the Nyquist frequency.						     
 
  Exact inverse NMO is impossible, particularly for early times at large     
- offsets and for frequencies near Nyquist witApp::SeismicUnixGui::sunix::NMO_Vel_Stk::h large interpolation errors.  
+ offsets and for frequencies near Nyquist with large interpolation errors.  
 
  The "offset" header field must be set.				     
  Use suazimuth to set offset header field when sx,sy,gx,gy are all	     

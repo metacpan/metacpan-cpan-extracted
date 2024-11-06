@@ -14,7 +14,10 @@ PERL PROGRAM NAME: SuMessages
  DESCRIPTION: 
  Version: 1.1
  Version: 1.11 : June 12 2007 
-   Include messages for interactive bottom mute
+   Include messages for 
+   --interactive bottom mute
+   --interactive velocity analysis
+   -- TODO
  Messages to users in Seismic unix programs
 
 =head2 USE

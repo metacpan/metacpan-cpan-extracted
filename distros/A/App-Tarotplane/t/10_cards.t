@@ -9,7 +9,7 @@ use File::Spec;
 
 use App::Tarotplane::Cards;
 
-plan tests => 53;
+plan tests => 66;
 
 my $Sort_Test = File::Spec->catfile(qw(t data sort.cards));
 my $Sort_Num = 5;
@@ -78,6 +78,35 @@ my @Escape = (
 	},
 );
 
+my $Multiline_Test = File::Spec->catfile(qw(t data multiline.cards));
+my $Multiline_Num = 6;
+my @Multiline = (
+	{
+		Term => 'Term 1',
+		Def  => 'Definition 1',
+	},
+	{
+		Term => 'Term 2',
+		Def  => 'Definition 2',
+	},
+	{
+		Term => 'Term 3',
+		Def  => 'Definition 3',
+	},
+	{
+		Term => 'Term 4',
+		Def  => 'Definition 4',
+	},
+	{
+		Term => 'Term 5',
+		Def  => 'Definition 5',
+	},
+	{
+		Term => 'Term 6',
+		Def  => 'Definition 6',
+	},
+);
+
 # Will test general card reading and sorting.
 my $d1 = App::Tarotplane::Cards->new($Sort_Test);
 isa_ok($d1, 'App::Tarotplane::Cards', "new() return App::Tarotplane::Card object");
@@ -142,3 +171,15 @@ my $d4 = App::Tarotplane::Cards->new(
 
 is($d4->get('CardNum'), $Sort_Num + $Whitespace_Num + $Escape_Num,
 	"new() correctly read multiple files at once");
+
+# $d5 will test card files w/ multiline cards
+my $d5 = App::Tarotplane::Cards->new($Multiline_Test);
+
+is($d5->get('CardNum'), $Multiline_Num, "Correct number of cards read");
+
+foreach my $i (0 .. $Multiline_Num - 1) {
+	is($d5->card_side($i, 'Term'), $Multiline[$i]->{Term},
+		"Card #$i term is okay (w/ multiple lines)");
+	is($d5->card_side($i, 'Definition'), $Multiline[$i]->{Def},
+		"Card #$i term is okay (w/ multiple lines)");
+}

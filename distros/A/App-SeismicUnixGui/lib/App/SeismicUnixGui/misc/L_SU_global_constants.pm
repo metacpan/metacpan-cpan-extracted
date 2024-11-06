@@ -42,6 +42,13 @@ my $L_SU_global_constants = {
 =head2 Default Tk settings
 
  _first_entry_num is normally 1 _max_entry_num is defaulted to
+ 
+ The names seen in the gui do not have to be the same as
+ the internal program names.
+ 
+ For example 'fk' for the user of the gui
+ is the same as Sudipfilt
+ internally for the programmer.
 
 =cut
 
@@ -59,9 +66,19 @@ my $alias_superflow_names_h = {
 	Sseg2su           => 'Sseg2su',
 	Sucat             => 'Sucat',
 	immodpg           => 'immodpg',
+	ProjectBackup     => 'BackupProject',
+	ProjectRestore    => 'RestoreProject',	
 	temp              => 'temp',                # make last
 };
 
+=head2 Default Tk settings
+
+ The names seen in the gui do not have to be the same as
+ the internal program names.
+ For example 'fk' for the user is the same as Sudipfilt
+ internally for the programmer.
+
+=cut
 my $alias_superflow_spec_names_h = {
 	fk                => 'Sudipfilt',
 	ProjectVariables  => 'Project_Variables',
@@ -78,6 +95,10 @@ my $alias_superflow_spec_names_h = {
 	Sucat             => 'Sucat',
 	Sudipfilt         => 'Sudipfilt',
 	immodpg           => 'immodpg',
+	ProjectBackup     => 'BackupProject',
+	BackupProject     => 'BackupProject',
+	ProjectRestore    => 'RestoreProject',
+	RestoreProject    => 'RestoreProject',	
 	temp              => 'temp',                # make last
 };
 
@@ -93,8 +114,6 @@ my $number_from_color = {
 	_green => 2,
 	_blue  => 3,
 };
-
-#print("my constants, alias for fk: $alias_h->{fk}\n");
 
 my $superflow_names_h = {
 	_fk                => 'fk',
@@ -112,6 +131,10 @@ my $superflow_names_h = {
 	_Sseg2su           => 'Sseg2su',
 	_Sucat             => 'Sucat',
 	_immodpg           => 'immodpg',
+	_BackupProject     => 'BackupProject',
+	_ProjectBackup     => 'Project Backup',
+	_ProjectRestore    => 'Project Restore',
+	_RestoreProject    => 'RestoreProject',	
 	_temp              => 'temp',                # make last
 };
 
@@ -133,7 +156,43 @@ $superflow_names_gui[7]  = 'fk';
 $superflow_names_gui[8]  = 'Synseis';
 $superflow_names_gui[9]  = 'iPick';
 $superflow_names_gui[10] = 'immodpg';
-$superflow_names_gui[11] = 'temp';                # make last
+$superflow_names_gui[11] = 'Project Backup';
+$superflow_names_gui[12] = 'Project Restore';
+$superflow_names_gui[13] = 'temp';                # make last
+
+
+=head2
+
+ as shown in gui
+ allows reverse aliasing between gui
+ names and the internal program names
+ ??
+
+=cut
+
+my $superflow_names_gui_h ={
+	_Project            => 'Project',
+	_Sseg2su   			=> 'Sseg2su',
+	_Sucat     			=> 'Sucat',
+	_iSpectralAnalysis  => 'iSpectralAnalysis',
+	_iVelAnalysis       => 'iVelAnalysis',
+	_iTopMute        	=> 'iTopMute',
+	_iBottomMute  	    => 'iBottomMute',
+	_fk                 => 'fk',
+	_Synseis            => 'Synseis',
+	_iPick              => 'iPick',
+	_immodpg            => 'immodpg',
+	_ProjectBackup      => 'Project Backup',
+	_ProjectRestore     => 'Project Restore',	
+	_temp               => 'temp',                # make last
+
+};
+
+=head2
+
+ as shown in gui
+
+=cut
 
 my @superflow_names;
 $superflow_names[0]  = 'fk';
@@ -149,7 +208,16 @@ $superflow_names[9]  = 'Sseg2su';
 $superflow_names[10] = 'Sucat';
 $superflow_names[11] = 'iPick';
 $superflow_names[12] = 'immodpg';
-$superflow_names[13] = 'temp';                # make last
+$superflow_names[13] = 'Project Backup';
+$superflow_names[14] = 'Project Restore';
+$superflow_names[15] = 'temp';                # make last
+
+=head2
+
+ internal names for configuration files
+ missing _fk and _Sudipfilter TODO
+
+=cut
 
 my @alias_superflow_names;
 $alias_superflow_names[0]  = 'Sudipfilt';
@@ -165,7 +233,9 @@ $alias_superflow_names[9]  = 'Sseg2su';
 $alias_superflow_names[10] = 'Sucat';
 $alias_superflow_names[11] = 'iPick';
 $alias_superflow_names[12] = 'immodpg';
-$alias_superflow_names[13] = 'temp';                # make last
+$alias_superflow_names[13] = 'BackupProject';
+$alias_superflow_names[14] = 'RestoreProject';
+$alias_superflow_names[15] = 'temp';                # make last
 
 # to match each alias_superflow_names (above)
 # Tools subdirectories
@@ -184,6 +254,16 @@ $developer_Tools_categories[10] = 'big_streams';
 $developer_Tools_categories[11] = 'big_streams';
 $developer_Tools_categories[12] = 'big_streams';
 $developer_Tools_categories[13] = 'big_streams';
+$developer_Tools_categories[14] = 'big_streams';
+
+
+
+
+=head2
+
+internal names for programs
+
+=cut
 
 my @superflow_config_names;
 $superflow_config_names[0]  = 'Sudipfilt';
@@ -199,7 +279,16 @@ $superflow_config_names[9]  = 'Sseg2su';
 $superflow_config_names[10] = 'Sucat';
 $superflow_config_names[11] = 'iPick';
 $superflow_config_names[12] = 'immodpg';
-$superflow_config_names[13] = 'temp';                # make last
+$superflow_config_names[13] = 'BackupProject';
+$superflow_config_names[14] = 'RestoreProject';
+$superflow_config_names[15] = 'temp';                # make last
+
+
+=head2
+
+internal names for configuration files
+
+=cut
 
 my @alias_superflow_config_names;
 $alias_superflow_config_names[0]  = 'Sudipfilt';
@@ -215,7 +304,9 @@ $alias_superflow_config_names[9]  = 'Sseg2su';
 $alias_superflow_config_names[10] = 'Sucat';
 $alias_superflow_config_names[11] = 'iPick';
 $alias_superflow_config_names[12] = 'immodpg';
-$alias_superflow_config_names[13] = 'temp';                          # make last
+$alias_superflow_config_names[13] = 'BackupProject';
+$alias_superflow_config_names[14] = 'RestoreProject';
+$alias_superflow_config_names[15] = 'temp';                          # make last
 
 # for the visible buttons in the GUI only
 # e.g., Path and PL_SEISMIC are not visible to the user
@@ -232,10 +323,12 @@ my @file_dialog_type;
 my @alias_help_menubutton_label;
 $alias_help_menubutton_label[0] = 'About';
 $alias_help_menubutton_label[1] = 'InstallationGuide';
+$alias_help_menubutton_label[2] = 'Tutorial';
 
 my $alias_help_menubutton_label_h = { 
-		_About => 'About', 
-        _InstallationGuide => 'InstallationGuide', 
+		_About             => 'About', 
+        _InstallationGuide => 'InstallationGuide',
+        _Tutorial          => 'Tutorial',
 };
 
 # in spec files for when Data_PL_SEISMIC, may
@@ -251,6 +344,7 @@ $file_dialog_type[4] = 'SaveAs';
 $file_dialog_type[5] = 'last_dir_in_path';
 $file_dialog_type[5] = 'Delete';
 $file_dialog_type[6] = 'Data_SEISMIC_TXT';
+$file_dialog_type[7] = 'Home';
 
 my $file_dialog_type_h = {
 	_Data_PL_SEISMIC  => 'Data_PL_SEISMIC',
@@ -274,8 +368,9 @@ my $flow_type_h = {
 	_pre_built_superflow => 'pre_built_superflow',
 };
 
-my $help_menubutton_type_h = { _About => 'About', 
+my $help_menubutton_type_h = { _About             => 'About', 
 							   _InstallationGuide => 'InstallationGuide',
+							   _Tutorial          => 'Tutorial',
 };
 
 my $purpose = { _geopsy => 'geopsy', };
@@ -345,7 +440,7 @@ my $var = {
 	_l_suplot_width                => '500',
 	_l_suplot_height               => '300',
 	_log_file_txt                  => 'log.txt',
-	_main_window_geometry          => '1100x750+12+5',
+	_main_window_geometry          => '1100x750+100+100',
 	_medium_width                  => '100',
 	_message_box_geometry          => '400x250+400+400',
 	_min_clicks4save_button        => 45,     # B4:19; fixing leaky param_widget memory
@@ -375,7 +470,7 @@ my $var = {
 	_one_character                 => '1',
 	_one_pixel                     => '1',
 	_one_pixel_borderwidth         => '1',
-	_program_title                 => 'SeismicUnixGui V0.87.1',
+	_program_title                 => 'SeismicUnixGui V0.87.2',
 	_project_selector_title        => 'Project Selector',
 	_l_suplot_title                => 'L_suplot',
 	_project_selector_title        => 'Project Selector',
@@ -495,6 +590,7 @@ sub get_developer_sunix_category_h {
 		_sueipofi     => $developer_sunix_categories[3],
 		_sufilter     => $developer_sunix_categories[3],
 		_sufrac       => $developer_sunix_categories[3],
+		_sufwatrim    => $developer_sunix_categories[3],
 		_sufxdecon    => $developer_sunix_categories[3],
 		_sugroll      => $developer_sunix_categories[3],
 		_suk1k2filter => $developer_sunix_categories[3],
@@ -535,6 +631,7 @@ sub get_developer_sunix_category_h {
 		_supaste      => $developer_sunix_categories[4],
 		_surandhw     => $developer_sunix_categories[4],
 		_surange      => $developer_sunix_categories[4],
+		_suresstat    => $developer_sunix_categories[4],		
 		_susehw       => $developer_sunix_categories[4],
 		_sushw        => $developer_sunix_categories[4],
 		_sustatic     => $developer_sunix_categories[4],
@@ -563,6 +660,7 @@ sub get_developer_sunix_category_h {
 		_sumigpreffd  => $developer_sunix_categories[6],
 		_sumigprepspi => $developer_sunix_categories[6],
 		_sumigpresp   => $developer_sunix_categories[6],
+		_sumigps      => $developer_sunix_categories[6],
 		_sumigpspi    => $developer_sunix_categories[6],
 		_sumigpsti    => $developer_sunix_categories[6],
 		_sumigsplit   => $developer_sunix_categories[6],
@@ -571,7 +669,7 @@ sub get_developer_sunix_category_h {
 		_sustolt      => $developer_sunix_categories[6],
 		_sutifowler   => $developer_sunix_categories[6],
 
-		_catsu     => $developer_sunix_categories[12],
+		_cat_su     => $developer_sunix_categories[12],
 		_evince    => $developer_sunix_categories[12],
 		_sugetgthr => $developer_sunix_categories[12],
 		_suputgthr => $developer_sunix_categories[12],
@@ -663,6 +761,7 @@ sub get_developer_sunix_category_h {
 		_unif2      => $developer_sunix_categories[9],
 		_unif2aniso => $developer_sunix_categories[9],
 		_unisam     => $developer_sunix_categories[9],
+		_unisam2    => $developer_sunix_categories[9],
 		_vel2stiff  => $developer_sunix_categories[9],
 
 		_elaps           => $developer_sunix_categories[2],
@@ -699,9 +798,11 @@ sub get_developer_sunix_category_h {
 		_suxmovie        => $developer_sunix_categories[2],
 		_suxpicker       => $developer_sunix_categories[2],
 		_suxwigb         => $developer_sunix_categories[2],
+		_xcontour        => $developer_sunix_categories[2],		
 		_xgraph          => $developer_sunix_categories[2],
 		_ximage          => $developer_sunix_categories[2],
 		_xmovie          => $developer_sunix_categories[2],
+		_xpicker         => $developer_sunix_categories[2],		
 		_xwigb           => $developer_sunix_categories[2],
 
 		_suflip  => $developer_sunix_categories[11],
@@ -778,36 +879,39 @@ my @sunix_datum_programs =
   ( "sudatumk2dr", "sudatumk2ds", "sukdmdcr", "sukdmdcs", );
 
 my @sunix_filter_programs = (
-	"subfilt",  "succfilt",     "sucddecon",  "sudipfilt",
-	"sueipofi", "sufilter",     "sufrac",     "sufxdecon",
-	"sugroll",  "suk1k2filter", "sukfilter",  "sulfaf",
-	"sumedian", "supef",        "suphase",    "suphidecon",
-	"supofilt", "supolar",      "susmgauss2", "sutvband",
+	"subfilt", "succfilt", "sucddecon", "sudipfilt",
+	"sueipofi", "sufilter", "sufrac", 	"sufwatrim",
+	"sufxdecon",
+	"sugroll", "suk1k2filter", "sukfilter", "sulfaf",
+	"sumedian", "supef", "suphase", "suphidecon",
+	"supofilt", "supolar", "susmgauss2", "sutvband",
 );
 
 my @sunix_header_programs = (
-	"segyclean",   "segyhdrmod", "segyhdrs",    "setbhed",
-	"su3dchart",   "suabshw",    "suaddhead",   "suaddstatics",
-	"suahw",       "suascii",    "suazimuth",   "sucdpbin",
-	"suchart",     "suchw",      "sucliphead",  "sucountkey",
-	"sudumptrace", "suedit",     "sugethw",     "suhtmath",
-	"sukeycount",  "sulcthw",    "sulhead",     "supaste",
-	"surandhw",    "surange",    "susehw",      "sushw",
-	"sustatic",    "sustaticB",  "sustaticrrs", "sustrip",
-	"sutrcount",   "suutm",      "suxedit",     "swapbhed",
+	"segyclean", "segyhdrmod", "segyhdrs", "setbhed",
+	"su3dchart", "suabshw", "suaddhead", "suaddstatics",
+	"suahw", "suascii", "suazimuth", "sucdpbin",
+	"suchart", "suchw", "sucliphead", "sucountkey",
+	"sudumptrace", "suedit", "sugethw", "suhtmath",
+	"sukeycount", "sulcthw", "sulhead", "supaste",
+	"surandhw", "surange", "suresstat", "susehw",
+	"sushw",
+	"sustatic", "sustaticB", "sustaticrrs", "sustrip",
+	"sutrcount", "suutm", "suxedit", "swapbhed",
 );
 
 my @sunix_inversion_programs = ( "suinvco3d", "suinvvxzco", "suinvzco3d", );
 
 my @sunix_migration_programs = (
-	"sudatumfd",   "sugazmig",    "sukdmig2d",   "suktmig2d",
-	"sukdmig3d",   "sumigfd",     "sumigffd",    "sumiggbzo",
-	"sumiggbzoan", "sumigprefd",  "sumigpreffd", "sumigprepspi",
-	"sumigpresp",  "sumigpspi",   "sumigpsti",   "sumigsplit",
-	"sumigtk",     "sumigtopo2d", "sustolt",     "sutifowler",
+	"sudatumfd", "sugazmig", "sukdmig2d", "suktmig2d",
+	"sukdmig3d", "sumigfd", "sumigffd", "sumiggbzo",
+	"sumiggbzoan", "sumigprefd", "sumigpreffd", "sumigprepspi",
+	"sumigpresp", "sumigps", "sumigpspi", "sumigpsti",
+	"sumigsplit",
+	"sumigtk", "sumigtopo2d", "sustolt", "sutifowler",
 );
 
-my @sunix_shell_programs = ( "catsu", "evince", "sugetgthr", "suputgthr", );
+my @sunix_shell_programs = ( "cat_su", "evince", "sugetgthr", "suputgthr", );
 
 =pod
 
@@ -839,10 +943,11 @@ my @sunix_NMO_Vel_Stk_programs = (
 );
 
 my @sunix_par_programs = (
-	"a2b",        "a2i",       "b2a",      "bhedtopar",
-	"cshotplot",  "float2ibm", "ftnstrip", "ftnunstrip",
-	"makevel",    "mkparfile", "transp",   "unif2",
-	"unif2aniso", "unisam",    "vel2stiff",
+	"a2b", "a2i", "b2a", "bhedtopar",
+	"cshotplot", "float2ibm", "ftnstrip", "ftnunstrip",
+	"makevel", "mkparfile", "transp", "unif2",
+	"unif2aniso", "unisam", "unisam2","vel2stiff",
+
 );
 
 my @sunix_picks_programs = (
@@ -850,16 +955,16 @@ my @sunix_picks_programs = (
 );
 
 my @sunix_plot_programs = (
-	"elaps",           "lcmap",     "lprop",         "psbbox",
-	"pscontour",       "pscube",    "pscubecontour", "psepsi",
-	"psgraph",         "psimage",   "pslabel",       "psmanager",
-	"psmerge",         "psmovie",   "pswigb",        "pswigp",
-	"scmap",           "spsplot",   "supscontour",   "supscube",
-	"supscubecontour", "supsgraph", "supsimage",     "supsmax",
-	"supsmovie",       "supswigb",  "supswigp",      "suxcontour",
-	"suxgraph",        "suximage",  "suxmax",        "suxmovie",
-	"suxpicker",       "suxwigb",   "xgraph",        "ximage",
-	"xmovie",          "xwigb",
+    "elaps", "lcmap", "lprop", "psbbox",
+	"pscontour", "pscube", "pscubecontour", "psepsi",
+	"psgraph", "psimage", "pslabel", "psmanager",
+	"psmerge", "psmovie", "pswigb", "pswigp",
+	"scmap", "spsplot", "supscontour", "supscube",
+	"supscubecontour", "supsgraph", "supsimage", "supsmax",
+	"supsmovie", "supswigb", "supswigp", "suxcontour",
+	"suxgraph", "suximage", "suxmax", "suxmovie",
+	"suxpicker", "suxwigb", "xcontour","xgraph", 
+	"ximage", "xmovie", "xpicker", "xwigb",
 );
 
 my @sunix_shapeNcut_programs = (
@@ -1060,6 +1165,12 @@ sub developer_Tools_categories_aref {
 
 }
 
+#sub developer_Tools_categories_h {
+#
+#	return ( $developer_Tools_categories_h );
+#
+#}
+
 sub file_dialog_type_aref {
 
 	return ( \@file_dialog_type );
@@ -1080,86 +1191,6 @@ sub flow_type_href {
 	return ($flow_type_h);
 }
 
-#=head2 sub get_colon_pathNmodule
-#
-#=cut
-#
-#sub get_colon_pathNmodule {
-#
-#	my ($self) = @_;
-#
-#	if ( length $L_SU_global_constants->{_program_name} ) {
-#
-#		my $program_name = $L_SU_global_constants->{_program_name};
-#
-#		my $module_spec    = $program_name . '_spec';
-#		my $module_spec_pm = $program_name . '_spec.pm';
-#
-#		_set_file_name($module_spec_pm);
-#		my $path4spec = _get_path4spec_file();
-#
-#		my $path4SeismicUnixGui = _get_path4SeismicUnixGui;
-#
-#		#		my $pathNmodule_pm   = $path4spec . '/' . $module_spec_pm;
-#		my $pathNmodule_spec = $path4spec . '/' . $module_spec;
-#
-#		# carp"pathNmodule_pm = $pathNmodule_pm";
-#
-#		$pathNmodule_spec =~ s/$path4SeismicUnixGui//g;
-#		$pathNmodule_spec =~ s/\//::/g;
-#		my $new_pathNmodule_spec = 'App::SeismicUnixGui' . $pathNmodule_spec;
-#
-#		my $result = $new_pathNmodule_spec;
-#		return ($result);
-#
-#	}
-#	else {
-#		carp "missing program name";
-#		return ();
-#	}
-#
-#}
-#
-#=head2 sub get_colon_pathNmodule_spec
-#
-#=cut
-#
-#sub get_colon_pathNmodule_spec {
-#
-#	my ($self) = @_;
-#
-#	if ( length $L_SU_global_constants->{_program_name} ) {
-#
-#		my $program_name = $L_SU_global_constants->{_program_name};
-#
-#		my $module_spec    = $program_name . '_spec';
-#		my $module_spec_pm = $program_name . '_spec.pm';
-#
-#		_set_file_name($module_spec_pm);
-#		my $path4spec = _get_path4spec_file();
-#
-#		my $path4SeismicUnixGui = _get_path4SeismicUnixGui;
-#
-#		#		my $pathNmodule_pm   = $path4spec . '/' . $module_spec_pm;
-#		my $pathNmodule_spec = $path4spec . '/' . $module_spec;
-#
-#		# carp"pathNmodule_pm = $pathNmodule_pm";
-#
-#		$pathNmodule_spec =~ s/$path4SeismicUnixGui//g;
-#		$pathNmodule_spec =~ s/\//::/g;
-#		my $new_pathNmodule_spec = 'App::SeismicUnixGui' . $pathNmodule_spec;
-#
-#		my $result = $new_pathNmodule_spec;
-#		return ($result);
-#
-#	}
-#	else {
-#		carp "missing program name";
-#		return ();
-#	}
-#
-#}
-#
 sub get_path4SeismicUnixGui {
 	my ($self) = @_;
 	if ( length $path4SeismicUnixGui ) {
@@ -1239,802 +1270,6 @@ sub help_menubutton_type_href {
 
 	return ($help_menubutton_type_h);
 }
-#
-#=head2 sub get_pathNfile2search
-#
-#Useful directories to search
-#
-#=cut
-#
-#sub get_pathNfile2search {
-#
-#	my ($self) = @_;
-#
-#	if (    length $L_SU_global_constants->{_CHILD_DIR}
-#		and length $L_SU_global_constants->{_GRANDPARENT_DIR}
-#		and length $L_SU_global_constants->{_PARENT_DIR} )
-#	{
-#
-#		my $CHILD_DIR       = $L_SU_global_constants->{_CHILD_DIR};
-#		my $GRANDPARENT_DIR = $L_SU_global_constants->{_GRANDPARENT_DIR};
-#		my $PARENT_DIR      = $L_SU_global_constants->{_PARENT_DIR};
-#
-#=head2 Instantiate modules
-#
-#=cut
-#
-#		my $manage_dirs_by = manage_dirs_by->new();
-#
-#=head2 Define
-#
-# variables
-#
-#=cut
-#
-#		#		my @result_aref2;
-#		my @directory_contents;
-#		my @dimensions;
-#
-#=head2 Define
-#
-# directory search arrays
-#
-#=cut
-#
-#		my @PARENT_DIR = @{ $L_SU_global_constants->{_PARENT_DIR} };
-#		my @CHILD_DIR  = @{ $L_SU_global_constants->{_CHILD_DIR} };
-#
-#		my $parent_directory_number_of = scalar @PARENT_DIR;
-#		my $child_directory_number_of  = scalar @CHILD_DIR;
-#
-#		@dimensions =
-#		  ( $parent_directory_number_of, $child_directory_number_of );
-#
-#=head2 SU-related matters
-#
-#=cut
-#
-#		for (
-#			my $parent = 0 ;
-#			$parent < $parent_directory_number_of ;
-#			$parent++
-#		  )
-#		{
-#
-#			for (
-#				my $child = 0 ;
-#				$child < $child_directory_number_of ;
-#				$child++
-#			  )
-#			{
-#
-#				my $SEARCH_DIR =
-#					$GRANDPARENT_DIR . '/'
-#				  . $PARENT_DIR[$parent] . '/'
-#				  . $CHILD_DIR[$child];
-#
-#   #	  	  			print(
-#   #	  	  "L_SU_global_constants, get_pathNfile2search,SEARCH_DIR=$SEARCH_DIR\n"
-#   #	  	  			);
-#				$manage_dirs_by->set_directory($SEARCH_DIR);
-#				my $directory_list_aref = $manage_dirs_by->get_file_list_aref();
-#				my @directory_list      = @$directory_list_aref;
-#				my $files_number_of     = scalar @directory_list;
-#				my @pathNfile;
-#
-#				for ( my $i = 0 ; $i < $files_number_of ; $i++ ) {
-#
-#					$pathNfile[$i] = $SEARCH_DIR . '/' . $directory_list[$i];
-#
-#				}
-#
-#				$directory_contents[$parent][$child] = \@pathNfile;
-#
-##				print("L_SU_global_constants,get_pathNfile2search,dir contents:@{$directory_contents[$parent][$child]}\n");
-#
-#			}
-#		}
-#
-#		my $result_aref2 = \@directory_contents;
-#
-#		return ( $result_aref2, \@dimensions );
-#	}
-#	else {
-#		print("get_pathNfile2search, missing variable(s)\n");
-#		print("CHILD_DIR=$L_SU_global_constants->{_CHILD_DIR}\n");
-#		print("GRANDPARENT_DIR=$L_SU_global_constants->{_GRANDPARENT_DIR}\n");
-#		print("PARENT_DIR=$L_SU_global_constants->{_PARENT_DIR}\n");
-#	}
-#
-#}
-#
-#=head2 sub _get_convert_pathNfile2search
-#
-#Useful directories to search when
-#converting old perl files to new perl
-#files (> 0.7)
-#
-#=cut
-#
-#sub _get_convert_pathNfile2search {
-#
-#	my ($self) = @_;
-#
-#=head2 import modules
-#
-#=cut
-#
-#	use Carp;
-#
-#=head2 Instantiate modules
-#
-#=cut
-#
-#	my $manage_dirs_by = manage_dirs_by->new();
-#
-#=head2 Define
-#
-# variables
-#
-#=cut
-#
-#	my @result_aref2;
-#	my @directory_contents_convert;
-#	my @dimensions;
-#
-#=head2 Define
-#
-# directory search arrays
-#
-#=cut
-#
-#	my $GRANDPARENT_DIR = $path4SeismicUnixGui;
-#
-##	print ("L_SU_global_constants,_get_convert_pathNfile2search,SeismicUnixGui = $path4SeismicUnixGui\n");
-#
-#	my @PARENT_DIR_CONVERT = @{ $L_SU_global_constants->{_PARENT_DIR_CONVERT} };
-#	my @CHILD_DIR_CONVERT  = @{ $L_SU_global_constants->{_CHILD_DIR_CONVERT} };
-#
-#	#	print("L_SU_global_constants,PARENT_DIR_CONVERT=@PARENT_DIR_CONVERT\n");
-#	#	print("L_SU_global_constants,CHILD_DIR_CONVERT=@CHILD_DIR_CONVERT\n");
-#
-#	my $parent_directory_convert_number_of = scalar @PARENT_DIR_CONVERT;
-#	my $child_directory_convert_number_of  = scalar @CHILD_DIR_CONVERT;
-#
-#	@dimensions = (
-#		$parent_directory_convert_number_of,
-#		$child_directory_convert_number_of
-#	);
-#
-#	#	$parent_directory_convert_number_of = 2;
-#	#	$child_directory_convert_number_of  = 2;
-#
-##		print("L_SU_global_constants,parent_directory_convert_number_of=$parent_directory_convert_number_of\n");
-##	    print("L_SU_global_constants,child_directory_convert_number_of=$child_directory_convert_number_of\n");
-#
-#=head2 CONVERT-related matters first
-#
-#=cut
-#
-#	for (
-#		my $parent = 0 ;
-#		$parent < $parent_directory_convert_number_of ;
-#		$parent++
-#	  )
-#	{
-#
-#		for (
-#			my $child = 0 ;
-#			$child < $child_directory_convert_number_of ;
-#			$child++
-#		  )
-#		{
-#
-#			my $SEARCH_DIR =
-#				$GRANDPARENT_DIR . '/'
-#			  . $PARENT_DIR_CONVERT[$parent] . '/'
-#			  . $CHILD_DIR_CONVERT[$child];
-#
-#			$manage_dirs_by->set_directory($SEARCH_DIR);
-#			my $directory_list_aref = $manage_dirs_by->get_file_list_aref();
-#
-#			if ( length $directory_list_aref ) {
-#
-#				$directory_contents_convert[$parent][$child] =
-#				  $directory_list_aref;
-#
-##				  print("L_SU_global_constants,print search_dir = $SEARCH_DIR\n");
-##				  print("L_SU_global_constants,directory_list_aref=@{$directory_list_aref}\n");
-#
-#			}
-#			else {
-#	 #				print(
-#	 #"L_SU_global_constants, _get_convert_pathNfile2search,missing directory\n"
-#	 #				);
-#	 #				print("print search_dir = $SEARCH_DIR\n");
-#			}
-#
-#		}
-#
-#	}
-#
-##	my $parent_convert = 0;
-##	my $child_convert  = 0;
-##
-##	print(
-##"\nL_SU_global_constants, get_pathNfile2search, For convert directory paths: $PARENT_DIR_CONVERT[$parent_convert]::$CHILD_DIR_CONVERT[$child_convert]::\n"
-##	);
-##
-##	print("@{$directory_contents_convert[$parent_convert][$child_convert]}\n");
-#
-#	$result_aref2[0] = \@directory_contents_convert;
-#
-#	return ( \@result_aref2, \@dimensions );
-#
-#}
-#
-#=head2 sub _get_specs_pathNfile2search
-#
-#Useful directories to search
-#
-#=cut
-#
-#sub _get_specs_pathNfile2search {
-#
-#	my ($self) = @_;
-#
-#=head2 Instantiate modules
-#
-#=cut
-#
-#	my $manage_dirs_by = manage_dirs_by->new();
-#
-#=head2 Define
-#
-# variables
-#
-#=cut
-#
-#	my @result_aref2;
-#	my @directory_contents_specs;
-#	my @dimensions;
-#
-#=head2 Define
-#
-# directory search arrays
-#
-#=cut
-#
-#	my $GRANDPARENT_DIR = $path4SeismicUnixGui;
-#
-#	my @PARENT_DIR_SPECS = @{ $L_SU_global_constants->{_PARENT_DIR_SPECS} };
-#	my @CHILD_DIR_SPECS  = @{ $L_SU_global_constants->{_CHILD_DIR_SPECS} };
-#
-#	my $parent_directory_specs_number_of = scalar @PARENT_DIR_SPECS;
-#	my $child_directory_specs_number_of  = scalar @CHILD_DIR_SPECS;
-#
-#	@dimensions =
-#	  ( $parent_directory_specs_number_of, $child_directory_specs_number_of );
-#
-##	print(
-##		"L_SU_global_constants,$parent_directory_specs_number_of, $child_directory_specs_number_of\n"
-##	);
-#
-#=head2 SPECS-related matters
-#
-#=cut
-#
-#	for (
-#		my $parent = 0 ;
-#		$parent < $parent_directory_specs_number_of ;
-#		$parent++
-#	  )
-#	{
-#
-#		for (
-#			my $child = 0 ;
-#			$child < $child_directory_specs_number_of ;
-#			$child++
-#		  )
-#		{
-#
-#			my $SEARCH_DIR =
-#				$GRANDPARENT_DIR . '/'
-#			  . $PARENT_DIR_SPECS[$parent] . '/'
-#			  . $CHILD_DIR_SPECS[$child];
-#
-##  			print(
-##  "L_SU_global_constants, _get_specs_pathNfile2search,SEARCH_DIR=$SEARCH_DIR\n"
-##  			);
-#			$manage_dirs_by->set_directory($SEARCH_DIR);
-#			my $directory_list_aref = $manage_dirs_by->get_file_list_aref();
-#			my @directory_list      = @$directory_list_aref;
-#
-#			$directory_contents_specs[$parent][$child] = $directory_list_aref;
-#
-#			#			print("@{$directory_contents_specs[$parent][$child]}\n");
-#
-#		}
-#
-#	}
-#
-##	my $parent_specs = 1;
-##	my $child_specs  = 1;
-##	print(
-##"\nL_SU_global_constants, get_pathNfile2search, For specs directory paths: $PARENT_DIR_GUI[$parent_specs]::$CHILD_DIR_GUI[$child_gui]::\n"
-##	);
-##	print("@{$directory_contents_specs[$parent_specs][$child_specs]}\n");
-#
-#	$result_aref2[0] = \@directory_contents_specs;
-#
-#	return ( \@result_aref2, \@dimensions );
-#
-#}
-#
-#=head2 sub _get_tools_pathNfile2search
-#
-#Useful directories to search
-#
-#=cut
-#
-#sub _get_tools_pathNfile2search {
-#
-#	my ($self) = @_;
-#
-#=head2 Instantiate modules
-#
-#=cut
-#
-#	my $manage_dirs_by = manage_dirs_by->new();
-#
-#=head2 Define
-#
-# variables
-#
-#=cut
-#
-#	my @result_aref2;
-#	my @directory_contents_tools;
-#	my @dimensions;
-#
-#=head2 Define
-#
-# directory search arrays
-#
-#=cut
-#
-#	my $GRANDPARENT_DIR = $path4SeismicUnixGui;
-#
-#	#	my @PARENT_DIR_GUI = @{ $L_SU_global_constants->{_PARENT_DIR_GUI} };
-#	#	my @CHILD_DIR_GUI  = @{ $L_SU_global_constants->{_CHILD_DIR_GUI} };
-#	my @PARENT_DIR_TOOLS = @{ $L_SU_global_constants->{_PARENT_DIR_TOOLS} };
-#	my @CHILD_DIR_TOOLS  = @{ $L_SU_global_constants->{_CHILD_DIR_TOOLS} };
-#
-#	#	my @PARENT_DIR_SU  = @{ $L_SU_global_constants->{_PARENT_DIR_SU} };
-#	#	my @CHILD_DIR_SU   = @{ $L_SU_global_constants->{_CHILD_DIR_SU} };
-#	#	my @PARENT_DIR_GEN = @{ $L_SU_global_constants->{_PARENT_DIR_GEN} };
-#
-#	#	print("PARENT_DIR_GUI=@PARENT_DIR_GUI\n");
-#
-#	#	my $parent_directory_gui_number_of = scalar @PARENT_DIR_GUI;
-#	#	my $child_directory_gui_number_of  = scalar @CHILD_DIR_GUI;
-#	my $parent_directory_tools_number_of = scalar @PARENT_DIR_TOOLS;
-#	my $child_directory_tools_number_of  = scalar @CHILD_DIR_TOOLS;
-#
-#	#	my $parent_directory_su_number_of  = scalar @PARENT_DIR_SU;
-#	#	my $child_directory_su_number_of   = scalar @CHILD_DIR_SU;
-#	#	my $parent_directory_gen_number_of = scalar @PARENT_DIR_GEN;
-#
-#	@dimensions =
-#	  ( $parent_directory_tools_number_of, $child_directory_tools_number_of );
-#
-#	#	$parent_directory_su_number_of, $child_directory_su_number_of,
-#	#	  $parent_directory_gen_number_of $parent_directory_gui_number_of,
-#	#	  $child_directory_gui_number_of,
-#
-#=head2 TOOLS-related matters first
-#
-#=cut
-#
-#	for (
-#		my $parent = 0 ;
-#		$parent < $parent_directory_tools_number_of ;
-#		$parent++
-#	  )
-#	{
-#
-#		for (
-#			my $child = 0 ;
-#			$child < $child_directory_tools_number_of ;
-#			$child++
-#		  )
-#		{
-#
-#			my $SEARCH_DIR =
-#				$GRANDPARENT_DIR . '/'
-#			  . $PARENT_DIR_TOOLS[$parent] . '/'
-#			  . $CHILD_DIR_TOOLS[$child];
-#
-##  			print(
-##  "L_SU_global_constants, _get_tools_pathNfile2search,SEARCH_DIR=$SEARCH_DIR\n"
-##  			);
-#			$manage_dirs_by->set_directory($SEARCH_DIR);
-#			my $directory_list_aref = $manage_dirs_by->get_file_list_aref();
-#			my @directory_list      = @$directory_list_aref;
-#
-#			$directory_contents_tools[$parent][$child] = $directory_list_aref;
-#
-#			#			print("@{$directory_contents_TOOLS[$parent][$child]}\n");
-#
-#		}
-#
-#	}
-#
-##	my $parent_TOOLS = 1;
-##	my $child_TOOLS  = 1;
-##	print(
-##"\nL_SU_global_constants, get_tools_pathNfile2search, For TOOLS directory paths: $PARENT_DIR_TOOLS[$parent_TOOLS]::$CHILD_DIR_TOOLS[$child_tools]::\n"
-##	);
-##	print("@{$directory_contents_tools[$parent_tools][$child_tools]}\n");
-#
-#	$result_aref2[0] = \@directory_contents_tools;
-#
-#	return ( \@result_aref2, \@dimensions );
-#
-#}
-#
-#=head2 Find a path for
-#
-#a given perl file
-#generated by the convert
-#
-#=cut
-#
-#sub get_path4convert_file {
-#
-#	my (@self) = @_;
-#
-#	if ( length $L_SU_global_constants->{_file_name} ) {
-#
-#		my $file_name = $L_SU_global_constants->{_file_name};
-#		my $result;
-#
-#=head2 Collect parameters from local hash
-#
-#=cut
-#
-#		my $GRANDPARENT_DIR = $path4SeismicUnixGui;
-#		my @PARENT_DIR_CONVERT =
-#		  @{ $L_SU_global_constants->{_PARENT_DIR_CONVERT} };
-#		my @CHILD_DIR_CONVERT =
-#		  @{ $L_SU_global_constants->{_CHILD_DIR_CONVERT} };
-#
-#=head2 Collect relevant "convert"
-#
-# project paths and files
-#
-#=cut
-#
-#		my ( $result_aref3, $dimensions_aref ) =
-#		  _get_convert_pathNfile2search();
-#		my @result_aref2                       = @$result_aref3;
-#		my @directory_contents_convert         = @{ $result_aref2[0] };
-#		my @dimension                          = @$dimensions_aref;
-#		my $parent_directory_convert_number_of = $dimension[0];
-#		my $child_directory_convert_number_of  = $dimension[1];
-#
-## test
-##		my $parent_convert = 0;
-##		my $child_convert  = 0;
-##		print(
-##"\nL_SU_global_constants,get_path4convert_file, For convert directory paths: App::SeismicUnixGui::$PARENT_DIR_CONVERT[$parent_convert]::$CHILD_DIR_CONVERT[$child_convert]\n"
-##		);
-##		print(
-##			"_SU_global_constants,get_path4convert_file,@{$directory_contents_convert[$parent_convert][$child_convert]}\n"
-##		);
-#
-#=head2 Search all "convert"-relevant
-#
-#directories start with
-#convert derectory listing
-#
-#=cut
-#
-#		for (
-#			my $parent = 0 ;
-#			$parent < $parent_directory_convert_number_of ;
-#			$parent++
-#		  )
-#		{
-#
-#			for (
-#				my $child = 0 ;
-#				$child < $child_directory_convert_number_of ;
-#				$child++
-#			  )
-#			{
-#
-#				my $directory_list_aref =
-#				  $directory_contents_convert[$parent][$child];
-#
-#				if ( length $directory_list_aref ) {
-#
-#					my @directory_list        = @$directory_list_aref;
-#					my $length_directory_list = scalar @directory_list;
-#
-#	   #					print(
-#	   #"L_SU_global_contents,@{$directory_contents_convert[$parent][$child]}\n"
-#	   #					);
-#	   #					print("L_SU_global_contents,file_name=$file_name\n");
-#
-#					for ( my $i = 0 ; $i < $length_directory_list ; $i++ ) {
-#
-#	#						print("L_SU_global_constants, directory list=$directory_list[$i]\n");
-#						;
-#						if ( not $file_name eq $directory_list[$i] ) {
-#
-#							next;
-#
-#						}
-#						elsif ( $file_name eq $directory_list[$i] ) {
-#
-#	  #							print(
-#	  #"L_SU_global_constants,get_path4convert_file,found the file $file_name in
-#	  #	   					$PARENT_DIR_CONVERT[$parent]::$CHILD_DIR_CONVERT[$child]\n"
-#	  #							);
-#							$result =
-#								$path4SeismicUnixGui . '/'
-#							  . $PARENT_DIR_CONVERT[$parent] . '/'
-#							  . $CHILD_DIR_CONVERT[$child];
-#
-#							return ($result);
-#						}
-#						else {
-#							print("change_a_line, unexpected value\n");
-#							return ();
-#						}
-#					}
-#
-#				}
-#				else {
-##					print(
-##						"L_SU_global_constants, get_path4convert_file, missing directory; NADA\n"
-##					);
-#				}
-#
-#			}
-#		}
-#
-#	}
-#	else {
-#		print(
-#			"L_SU_global_constants,_get_path_4convert_file,file_name_missing\n"
-#		);
-#		return ();
-#	}
-#}
-#
-#=head2 sub get_path4spec_file
-#
-#Find a path for
-#
-#a given spec file
-#
-#=cut
-#
-#sub get_path4spec_file {
-#
-#	my (@self) = @_;
-#
-#	if ( length $L_SU_global_constants->{_file_name} ) {
-#
-#		my $file_name = $L_SU_global_constants->{_file_name};
-#		my $result;
-#
-#=head2 Collect parameters from local hash
-#
-#=cut
-#
-#		my $GRANDPARENT_DIR  = $path4SeismicUnixGui;
-#		my @PARENT_DIR_SPECS = @{ $L_SU_global_constants->{_PARENT_DIR_SPECS} };
-#		my @CHILD_DIR_SPECS  = @{ $L_SU_global_constants->{_CHILD_DIR_SPECS} };
-#
-#=head2 Collect relevant "spec"
-#
-# project paths and files
-#
-#=cut
-#
-#		my ( $result_aref3, $dimensions_aref ) = _get_specs_pathNfile2search();
-#		my @result_aref2                     = @$result_aref3;
-#		my @directory_contents_specs         = @{ $result_aref2[0] };
-#		my @dimension                        = @$dimensions_aref;
-#		my $parent_directory_specs_number_of = $dimension[0];
-#		my $child_directory_specs_number_of  = $dimension[1];
-#
-## test
-##		my $parent_specs = 1;
-##		my $child_specs  = 1;
-##		print(
-##"\nFor specs directory paths: $PARENT_DIR_SPECS[$parent_specs]::$CHILD_DIR_SPECS[$child_specs]::\n"
-##		);
-##		print("@{$directory_contents_specs[$parent_specs][$child_specs]}\n");
-#
-#=head2 Search all "spec"-relevant
-#
-#directories start with
-#gui drectory listing
-#
-#=cut
-#
-#		for (
-#			my $parent = 0 ;
-#			$parent < $parent_directory_specs_number_of ;
-#			$parent++
-#		  )
-#		{
-#
-#			for (
-#				my $child = 0 ;
-#				$child < $child_directory_specs_number_of ;
-#				$child++
-#			  )
-#			{
-#
-#				my $directory_list_aref =
-#				  $directory_contents_specs[$parent][$child];
-#				my @directory_list = @$directory_list_aref;
-#
-#				my $length_directory_list = scalar @directory_list;
-#
-#				#				print("@{$directory_contents_specs[$parent][$child]}\n");
-#				#				print("file_name=$file_name\n");
-#				for ( my $i = 0 ; $i < $length_directory_list ; $i++ ) {
-#
-#					if ( not $file_name eq $directory_list[$i] ) {
-#
-#						next;
-#
-#					}
-#					elsif ( $file_name eq $directory_list[$i] ) {
-#
-#		 #						print(
-#		 #"L_SU_global_constants,get_path4spec_file,found the file $file_name in
-#		 #				  			  $PARENT_DIR_SPECS[$parent]::$CHILD_DIR_SPECS[$child]\n"
-#		 #						);
-#						$result =
-#							$path4SeismicUnixGui . '/'
-#						  . $PARENT_DIR_SPECS[$parent] . '/'
-#						  . $CHILD_DIR_SPECS[$child];
-#
-#						return ($result);
-#					}
-#					else {
-#						print("change_a_line, unexpected value\n");
-#						return ();
-#					}
-#				}
-#
-#			}
-#		}
-#
-#	}
-#	else {
-#		print("L_SU_global_constants,_get_path4spec_file,file_name_missing\n");
-#		return ();
-#	}
-#}
-#
-#=head2 Find a path for
-#
-#a given tools file
-#You need to pre-determine
-#you have a "Tools" file
-#
-#=cut
-#
-#sub get_path4tools_file {
-#
-#	my (@self) = @_;
-#
-#	if ( length $L_SU_global_constants->{_file_name} ) {
-#
-#		my $file_name = $L_SU_global_constants->{_file_name};
-#		my $result;
-#
-#=head2 Collect parameters from local hash
-#
-#=cut
-#
-#		my $GRANDPARENT_DIR  = $path4SeismicUnixGui;
-#		my @PARENT_DIR_TOOLS = @{ $L_SU_global_constants->{_PARENT_DIR_TOOLS} };
-#		my @CHILD_DIR_TOOLS  = @{ $L_SU_global_constants->{_CHILD_DIR_TOOLS} };
-#
-#=head2 Collect relevant "tools"
-#
-# project paths and files
-#
-#=cut
-#
-#		my ( $result_aref3, $dimensions_aref ) = _get_tools_pathNfile2search();
-#		my @result_aref2                     = @$result_aref3;
-#		my @directory_contents_tools         = @{ $result_aref2[0] };
-#		my @dimension                        = @$dimensions_aref;
-#		my $parent_directory_tools_number_of = $dimension[0];
-#		my $child_directory_tools_number_of  = $dimension[1];
-#
-## test
-##		my $parent_tools = 1;
-##		my $child_tools  = 1;
-##		print(
-##"\nFor tools directory paths: $PARENT_DIR_TOOLS[$parent_tools]::$CHILD_DIR_TOOLS[$child_tools]::\n"
-##		);
-##		print("@{$directory_contents_tools[$parent_tools][$child_tools]}\n");
-#
-#=head2 Search all "spec"-relevant
-#
-#directories start with
-#gui drectory listing
-#
-#=cut
-#
-#		for (
-#			my $parent = 0 ;
-#			$parent < $parent_directory_tools_number_of ;
-#			$parent++
-#		  )
-#		{
-#
-#			for (
-#				my $child = 0 ;
-#				$child < $child_directory_tools_number_of ;
-#				$child++
-#			  )
-#			{
-#
-#				my $directory_list_aref =
-#				  $directory_contents_tools[$parent][$child];
-#				my @directory_list = @$directory_list_aref;
-#
-#				my $length_directory_list = scalar @directory_list;
-#
-#				#				print("@{$directory_contents_tools[$parent][$child]}\n");
-#				#				print("file_name=$file_name\n");
-#				for ( my $i = 0 ; $i < $length_directory_list ; $i++ ) {
-#
-#					if ( not $file_name eq $directory_list[$i] ) {
-#
-#						next;
-#
-#					}
-#					elsif ( $file_name eq $directory_list[$i] ) {
-#
-#		#						print(
-#		#"L_SU_global_constants,get_path4tools_file,found the file $file_name in
-#		#				  			  $PARENT_DIR_TOOLS[$parent]::$CHILD_DIR_TOOLS[$child]\n"
-#		#						);
-#						$result =
-#							$path4SeismicUnixGui . '/'
-#						  . $PARENT_DIR_TOOLS[$parent] . '/'
-#						  . $CHILD_DIR_TOOLS[$child];
-#
-#						return ($result);
-#					}
-#					else {
-#						print("change_a_line, unexpected value\n");
-#						return ();
-#					}
-#				}
-#
-#			}
-#		}
-#
-#	}
-#	else {
-#		print("L_SU_global_constants,_get_path4tools_file,file_name_missing\n");
-#		return ();
-#	}
-#}
 
 sub number_from_color_href {
 
@@ -2063,109 +1298,26 @@ sub set_file_name {
 	}
 
 }
-#
-#=head2 sub set_CHILD_DIR_type
-#
-#=cut
-#
-#sub set_CHILD_DIR_type {
-#
-#	my ( $self, $type ) = @_;
-#
-#	if ( length $type ) {
-#
-#		my $CHILD_DIR = '_CHILD_DIR_' . $type;
-#		$L_SU_global_constants->{_CHILD_DIR} =
-#		  $L_SU_global_constants->{$CHILD_DIR};
-#
-##		print("L_SU_global_constants,set_CHILD_DIR,set_CHILD_DIR_type = $L_SU_global_constants->{_CHILD_DIR}\n");
-#
-#	}
-#	else {
-#		print(
-#"L_SU_global_constants,set_CHILD_DIR_type, type=$type is missing variable"
-#		);
-#	}
-#
-#}
-#
-#=head2 sub set_GRANDPARENT_DIR
-#
-#=cut
-#
-#sub set_GRANDPARENT_DIR {
-#
-#	my ( $self, $GRANDPARENT_DIR ) = @_;
-#
-#	if ( length $GRANDPARENT_DIR ) {
-#
-#		$L_SU_global_constants->{_GRANDPARENT_DIR} = $GRANDPARENT_DIR;
-#
-##		print("L_SU_global_constants,set_GRANDPARENT_DIR,set_GRANDPARENT_DIR = $L_SU_global_constants->{_GRANDPARENT_DIR}\n");
-#
-#	}
-#	else {
-#		print("L_SU_global_constants,set_GRANDPARENT_DIR,missing variable");
-#	}
-#
-#}
-#
-#=head2 sub set_PARENT_DIR_type
-#
-#=cut
-#
-#sub set_PARENT_DIR_type {
-#
-#	my ( $self, $type ) = @_;
-#
-#	if ( length $type ) {
-#
-#		my $PARENT_DIR = '_PARENT_DIR_' . $type;
-#		$L_SU_global_constants->{_PARENT_DIR} =
-#		  $L_SU_global_constants->{$PARENT_DIR};
-#
-##		print("L_SU_global_constants,set_PARENT_DIR,set_PARENT_DIR_type = $L_SU_global_constants->{_PARENT_DIR}\n");
-#
-#	}
-#	else {
-#		print(
-#"L_SU_global_constants,set_PARENT_DIR_type, type=$type is missing variable"
-#		);
-#	}
-#
-#}
-#
-#=head2 sub set_program_name
-#
-#=cut
-#
-#sub set_program_name {
-#
-#	my ( $self, $program_name ) = @_;
-#
-#	if ( length $program_name ) {
-#
-#		$L_SU_global_constants->{_program_name} = $program_name;
-#
-#	}
-#	else {
-#		carp "missing program_name";
-#		print("L_SU_global_constants,set_program_name,missing program_name\n");
-#	}
-#
-#}
 
 sub superflow_config_names_aref {
+		my (@self) = @_;
 	return ( \@superflow_config_names );
 }
 
 sub superflow_names_aref {
+		my (@self) = @_;
 	return ( \@superflow_names );
 }
 
 sub superflow_names_gui_aref {
 	my (@self) = @_;
 	return ( \@superflow_names_gui );
+
+}
+
+sub superflow_names_gui_h {
+	my (@self) = @_;
+	return ( $superflow_names_gui_h );
 
 }
 

@@ -6,13 +6,11 @@ use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 use App::SeismicUnixGui::misc::SeismicUnix
   qw($bin $su $suffix_bin $suffix_su $suffix_txt $txt);
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
-use aliased 'App::SeismicUnixGui::sunix::shapeNcut::suflip';
 
-my $get     = L_SU_global_constants->new();
-my $Project = Project_config->new();
-my $suflip  = suflip->new();
+my $get     		 = L_SU_global_constants->new();
+my $Project 		 = Project_config->new();
 
-my $var = $get->var();
+my $var 			 = $get->var();
 
 my $empty_string     = $var->{_empty_string};
 my $true             = $var->{_true};
@@ -24,7 +22,7 @@ my $DATA_SEISMIC_BIN = $Project->DATA_SEISMIC_BIN();
 my $DATA_SEISMIC_SU  = $Project->DATA_SEISMIC_SU();     # output data directory
 my $DATA_SEISMIC_TXT = $Project->DATA_SEISMIC_TXT();    # output data directory
 my $PL_SEISMIC       = $Project->PL_SEISMIC();
-my $max_index        = 2;                               # Insert a number here
+my $max_index        = 3;                               # Insert a number here
 
 my $suflip_spec = {
 	_CONFIG                => $PL_SEISMIC,
@@ -40,7 +38,7 @@ my $suflip_spec = {
 	_has_infile            => $true,
 	_has_outpar            => $false,
 	_has_pipe_in           => $true,
-	_has_pipe_out          => $true,
+	_has_pipe_out          => $false,
 	_has_redirect_in       => $true,
 	_has_redirect_out      => $true,
 	_has_subin_in          => $false,
@@ -72,7 +70,7 @@ sub binding_index_aref {
 	# first binding index (0)
 	# connects to second item (1)
 	# in the parameter list
-	#	$index[0] = 1; # inbound item is  bound to _DATA_DIR_IN
+	$index[0] = 1; # inbound item is  bound to _DATA_DIR_IN
 	#	$index[1]	= 2; # inbound item is  bound to _DATA_DIR_IN
 	#	$index[2]	= 8; # outbound item is  bound to _DATA_DIR_OUT
 
@@ -93,12 +91,11 @@ sub file_dialog_type_aref {
 
 	my @type;
 
-	$type[0] = '';
+	my $index_aref = get_binding_index_aref();
+	my @index      = @$index_aref;
 
-	#		# bound index will look for data
-	#	$type[0]	=  $file_dialog_type->{_Data};
-	#	$type[1]	=  $file_dialog_type->{_Data};
-	#	$type[2]	=  $file_dialog_type->{_Data};
+	# bound index will look for data
+	$type[ $index[0] ] =  $file_dialog_type->{_Data};
 
 	$suflip_spec->{_file_dialog_type_aref} = \@type;
 	return ();
@@ -329,17 +326,11 @@ sub prefix_aref {
 
 	}
 
-	#	my $index_aref = get_binding_index_aref();
-	#	my @index       = @$index_aref;
-	#
-	#	# label 2 in GUI is input xx_file and needs a home directory
-	#	$prefix[ $index[0] ] = '$DATA_SEISMIC_BIN' . ''.'/'.'';
-	#
-	#	# label 3 in GUI is input yy_file and needs a home directory
-	#	$prefix[ $index[1] ] = '$DATA_SEISMIC_BIN' . ''.'/'.'';
-	#
-	#	# label 9 in GUI is input zz_file and needs a home directory
-	#	$prefix[ $index[2] ] = '$DATA_SEISMIC_SU' . ''.'/'.'';
+	my $index_aref = get_binding_index_aref();
+	my @index       = @$index_aref;
+	
+	# label 2 in GUI is input xx_file and needs a home directory
+	$prefix[ $index[0] ] = '$DATA_SEISMIC_TXT' . ".'/'.";
 
 	$suflip_spec->{_prefix_aref} = \@prefix;
 	return ();
@@ -365,17 +356,11 @@ sub suffix_aref {
 
 	}
 
-	#	my $index_aref = get_binding_index_aref();
-	#	my @index       = @$index_aref;
-	#
-	#	# label 2 in GUI is input xx_file and needs a home directory
-	#	$suffix[ $index[0] ] = ''.'' . '$suffix_bin';
-	#
-	#	# label 3 in GUI is input yy_file and needs a home directory
-	#	$suffix[ $index[1] ] = ''.'' . '$suffix_bin';
-	#
-	#	# label 9 in GUI is output zz_file and needs a home directory
-	#	$suffix[ $index[2] ] = ''.'' . '$suffix_su';
+	my $index_aref = get_binding_index_aref();
+	my @index       = @$index_aref;
+
+	# label 2 in GUI is input xx_file and needs a home directory
+	$suffix[ $index[0] ] = ''.'' . '$suffix_txt';
 
 	$suflip_spec->{_suffix_aref} = \@suffix;
 	return ();

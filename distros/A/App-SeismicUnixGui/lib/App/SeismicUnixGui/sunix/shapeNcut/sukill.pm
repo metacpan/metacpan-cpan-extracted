@@ -14,25 +14,15 @@ Version: 0.0.2   1.30.23
 
 =head2 USE
 
-Usage 1:
-To kill an array of trace numbers
-
-Example:
-       $sukill->tracl(\@array);
-       $sukill->Steps()
-
-Usage 2:
+Typical usage 1:
 To kill a single of trace number
 count=1 (default if omitted)
 
-Example:
+Internal code example      
        $sukill->min('2');
        $sukill->Step()
 
-If you read the file directly into sukill then also
-us sukill->file('name')
-
-Usage 3:
+Usage 2:
       $sukill->list(list_of_traces_to_kill)
       $sukill->su_base_file_name(file_in_seismic_unix_format)
 
@@ -103,7 +93,9 @@ Usage 3:
   "list" = a file name (in directory path: DATA_SEISMICS_TXT)
   
   su_base_file_name =   e.g., 1001, which by defaults lies
-  in directory path: DATA_SEISMIC_SU
+  in directory path: DATA_SEISMIC_SU.
+  A bare file name: '1001' will automatically be given an suffix
+  The file name on the disk will be '1001.su'
   
   Notes:
   If list is used then su_base_file_name and key MUST be used

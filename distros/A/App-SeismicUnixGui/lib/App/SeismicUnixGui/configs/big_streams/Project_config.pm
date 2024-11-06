@@ -40,7 +40,7 @@ use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 use aliased 'App::SeismicUnixGui::misc::dirs';
 use aliased 'App::SeismicUnixGui::misc::Project_Variables';
 
-my $read              = readfiles->new();
+my $readfiles         = readfiles->new();
 my $control           = control->new;
 my $dirs              = dirs->new();
 my $get               = L_SU_global_constants->new();
@@ -62,8 +62,7 @@ my $Project = {
 	_date                => '',
 	_geomaps_is_selected => '',
 	_geopsy_is_selected  => '',
-	_gmt_is_selected     => '',
-
+#	_gmt_is_selected     => '',
 	#	_gpr_is_selected              => '',
 	_grass__is_selected  => '',
 	_matlab_is_selected  => '',
@@ -74,7 +73,6 @@ my $Project = {
 	_component           => '',
 	_stage               => '',
 	_process             => '',
-	_PROJECT_HOME        => '',
 	_subUser             => '',
 	_DATA_GEOMAPS                 => '',
 	_DATA_GEOMAPS_BIN             => '',
@@ -153,6 +151,7 @@ my $Project = {
 	_PL_RESISTIVITY_SURFACE       => '',
 	_PL_WELL                      => '',
 	_PNG                          => '',
+	_PROJECT_HOME                 => '',
 	_RESISTIVITY_SURFACE          => '',
 	_R_GAMMA_WELL                 => '',
 	_R_RESISTIVITY_SURFACE        => '',
@@ -191,7 +190,7 @@ sub _get_home {
 
 }
 
-=head2 sub get_ACTIVE_PROJECT{
+=head2 sub _get_ACTIVE_PROJECT{
 
 upper case ACTIVE_PROJECT 
 PATH to the defatul Project.config
@@ -227,14 +226,14 @@ sub _basic_dirs {
 	if ( -e $prog_name_old . '.config' ) {
 
    # CASE 1 check local directory first LEGACY Project_Variables file
-   # print("1. Project_config,_basic_dirs,using local $prog_name_old.config\n");
+#   print("1. CASE 1 Project_config,_basic_dirs,using local $prog_name_old.config\n");
 
 		$prog_name = $prog_name_old;
 
-#		print("1a. Project_config,_basic_dirs,using local $prog_name_old.config \n");
+#		print("L 233 Project_config,_basic_dirs,using local $prog_name_old.config \n");
 		$prog_name_config = $prog_name_old . '.config';
 		my ( $ref_DIR_FUNCTION, $ref_DIR ) =
-		  $read->configs( ( $prog_name . '.config' ) );
+		  $readfiles->configs( ( $prog_name . '.config' ) );
 		$Project->{_ref_DIR} = $ref_DIR;
 
 	#		print(" 1. Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
@@ -242,20 +241,22 @@ sub _basic_dirs {
 		_change_basic_dirs();
 
 	}
-	elsif ( -e $prog_name_new . '.config' ) {
-
-		# CASE2 check local directory for Project.config
-
-		$prog_name =
-		  $prog_name_new;    # system uses $GLOBAL_CONFIG_LIB.'/'.$prog_name_new
-		$prog_name_config = $prog_name_new . '.config';    # i.e. Project.config
-
-	}
+#	elsif ( -e $prog_name_new . '.config' ) {
+#
+#		# CASE2 check local directory for Project.config
+#		# deprecated 10.27.24
+#		# lcoal directory should not exist
+#
+#		$prog_name =
+#		  $prog_name_new;    # system uses $GLOBAL_CONFIG_LIB.'/'.$prog_name_new
+#		$prog_name_config = $prog_name_new . '.config';    # i.e. Project.config
+#
+#	}
 	elsif ( -e $ACTIVE_PROJECT . '/' . $prog_name_new . '.config' ) {
 
 		# CASE 3 check user configuration directory for Project.config
 
-# print("2. Project_config,_basic_dirs,using local $prog_name_new.config\n");
+#print("CASE 3 Project_config,_basic_dirs,using local $prog_name_new.config\n");
 # print("3. Project_config,_basic_dirs,using local $ACTIVE_PROJECT/$prog_name_new.config\n");
 		$prog_name =
 		  $prog_name_new;    # system uses $GLOBAL_CONFIG_LIB.'/'.$prog_name_new
@@ -263,8 +264,10 @@ sub _basic_dirs {
 			$ACTIVE_PROJECT . '/'
 		  . $prog_name_new
 		  . '.config'
-		  ;    # i.e. /home/gom/.L_SU/configuration/active/Project.config
-		my ( $ref_DIR_FUNCTION, $ref_DIR ) = $read->configs(
+		  ;    
+		  
+#		print("L 267 Project_config,_basic_dirs, /home/gom/.L_SU/configuration/active/Project.config\n");
+		my ( $ref_DIR_FUNCTION, $ref_DIR ) = $readfiles->configs(
 			( $ACTIVE_PROJECT . '/' . $prog_name_new . '.config' ) );
 
 		# parameter widget values
@@ -288,12 +291,12 @@ sub _basic_dirs {
 		# copy a default Project configuration file from
 		# the GLOBAL_LIBS directory defined in
 		# L_SU_global_constants.pm
-		#		print("Project_config, _basic_dirs, no configuration files exist\n");
+#		print("CASE 4 roject_config, _basic_dirs, no configuration files exist\n");
 
 		use File::Copy;
 		my $ACTIVE_PROJECT = _get_ACTIVE_PROJECT();
 
-	 # print(" Project_config, _basic_dirs, ACTIVE_PROJECT: $ACTIVE_PROJECT\n");
+#	 print(" Project_config, _basic_dirs, ACTIVE_PROJECT: $ACTIVE_PROJECT\n");
 		my $PATH_N_file = $ACTIVE_PROJECT . '/Project.config';
 
 #		print("Project_config,PATH_N_file 	: $PATH_N_file\n");
@@ -306,18 +309,18 @@ sub _basic_dirs {
 #		print(
 #"Project_config, _basic_dirs, Project.config in ~user/.L_SU/configuration/active dir. created\n"
 #		);
-
 	}
+	
 
 # print("1. Project_config,_basic_dirs, prog_name_config: $prog_name_config \n");
 
-	if ( $prog_name ne '' ) {    # safe condition
-			# print("Project_config,_basic_dirs,reading $prog_name_config\n");
+	if ( length $prog_name) {    # safe condition
+#	    print("L 316 Project_config,_basic_dirs,reading $prog_name_config\n");
 		my ( $ref_DIR_FUNCTION, $ref_DIR ) =
-		  $read->configs( ($prog_name_config) );
+		  $readfiles->configs( ($prog_name_config) );
 		$Project->{_ref_DIR} = $ref_DIR;
 
-	# print("4. Project_config,_basic_dirs,ref_DIR: @{$Project->{_ref_DIR}}\n");
+#	print("4. Project_config,_basic_dirs,ref_DIR: @{$Project->{_ref_DIR}}\n");
 		$Project->{_ref_DIR_FUNCTION} = $ref_DIR_FUNCTION;
 		_change_basic_dirs();
 	}
@@ -327,7 +330,7 @@ sub _basic_dirs {
 			  # copy a default Project configuration file from
 			  # the GLOBAL_LIBS directory defined in
 			  # L_SU_global_constants.pm
-		 # print ("Project_config, _basic_dirs, no configuration files exist\n");
+#		 print ("Project_config, _basic_dirs, no configuration files exist\n");
 
 		use File::Copy;
 		my $ACTIVE_PROJECT = _get_ACTIVE_PROJECT();
@@ -381,47 +384,49 @@ sub basic_dirs {
 	my $prog_name_old    = 'Project_Variables';
 	my $prog_name_config = '';
 
-	# 1. check local directory first LEGACY Project_Variables file
+	# 1. check local directory first,  LEGACY Project_Variables file
 	if ( -e $prog_name_old . '.config' ) {
 
 		$prog_name = $prog_name_old;
 
-		#		print("Project_config,basic_dirs,using local $prog_name.config\n");
+#		print("L390 Project_config,basic_dirs,using local $prog_name.config\n");
 		$prog_name_config = $prog_name_old . '.config';
 
 		my ( $ref_DIR_FUNCTION, $ref_DIR ) =
-		  $read->configs( ( $prog_name . '.config' ) );
+		  $readfiles->configs( ( $prog_name . '.config' ) );
 		$Project->{_ref_DIR} = $ref_DIR;
 
-	#	 print(" 1. Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
+#	print(" 1. L 397 Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
 		$Project->{_ref_DIR_FUNCTION} = $ref_DIR_FUNCTION;
 		_change_basic_dirs();
 
 		# 2. then, check local directory for Project.config
 	}
-	elsif ( -e $prog_name_new . '.config' ) {
-
-		$prog_name = $prog_name_new;
-		my ( $ref_DIR_FUNCTION, $ref_DIR ) =
-		  $read->configs( ( $prog_name . '.config' ) );
-		$Project->{_ref_DIR} = $ref_DIR;
-#		print(
-#			" 3. Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
-		$Project->{_ref_DIR_FUNCTION} = $ref_DIR_FUNCTION;
-		_change_basic_dirs();
-
-		# in local user configuration directory
-	}
+# deprecated 10.27.24 no local Project.config file will be read
+#	elsif ( -e $prog_name_new . '.config' ) {
+#
+#		$prog_name = $prog_name_new;
+#		my ( $ref_DIR_FUNCTION, $ref_DIR ) =
+##				print(
+##		" L 408 Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
+#		  $readfiles->configs( ( $prog_name . '.config' ) );
+#		$Project->{_ref_DIR} = $ref_DIR;
+#
+#		$Project->{_ref_DIR_FUNCTION} = $ref_DIR_FUNCTION;
+#		_change_basic_dirs();
+#
+#		# in local user configuration directory
+#	}
 	elsif ( -e ( $ACTIVE_PROJECT . '/' . $prog_name_new . '.config' ) ) {
 
 		$prog_name = $prog_name_new;
 
-#        print("Project_config,basic_dirs,using $ACTIVE_PROJECT/$prog_name.config\n");
-		my ( $ref_DIR_FUNCTION, $ref_DIR ) = $read->configs(
+#        print("L 420 Project_config,basic_dirs,using $ACTIVE_PROJECT/$prog_name.config\n");
+		my ( $ref_DIR_FUNCTION, $ref_DIR ) = $readfiles->configs(
 			( $ACTIVE_PROJECT . '/' . $prog_name_new . '.config' ) );
 		$Project->{_ref_DIR} = $ref_DIR;
 
-#	 print(" L406 2.Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
+#	 print(" L424 2.Project_config,basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
 		$Project->{_ref_DIR_FUNCTION} = $ref_DIR_FUNCTION;
 		_change_basic_dirs();
 
@@ -454,7 +459,7 @@ sub _change_basic_dirs {
 
 	my $length = scalar @{ $Project->{_ref_DIR} };
 
-#print(" 5. Project_config,_change_basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
+#print(" L 458. Project_config,_change_basic_dirs,ref_DIR:@{$Project->{_ref_DIR}}\n");
 
 	for ( my $i = 0, my $j = 0 ; $i < $length ; $i++, $j = $j + 2 ) {
 
@@ -468,6 +473,7 @@ sub _change_basic_dirs {
 	$HOME         = $CFG[1];
 	$PROJECT_HOME = $CFG[3];
 	$site         = $CFG[5];
+#	print("L 472 Project_config,make_local_dirs,PROJECT_HOME=$PROJECT_HOME\n");
 
 	# use scalar ref
 	$spare_dir = $control->empty_directory( \$CFG[7] );
@@ -490,7 +496,7 @@ sub _change_basic_dirs {
 	$r_logic       = $control->set_str2logic( $CFG[29] );
 	$sqlite_logic  = $control->set_str2logic( $CFG[31] );
 
-# print("1. Project_config,_change_basic_dirs PROJECT_HOME=$Project->{_PROJECT_HOME}\n");
+#print("L495 Project_config,_change_basic_dirs PROJECT_HOME=$Project->{_PROJECT_HOME}\n");
 # print("1. Project_config,_change_basic_dirs spare_dir=----$spare_dir----\n");
 
 =head2
@@ -582,7 +588,7 @@ sub _system_dirs {
   # print(" Project_config, _system_dirs, Before PROJECT_HOME $PROJECT_HOME\n");
 	$PROJECT_HOME =~ s/\'//g;
 
-  #  print(" Project_config, _system_dirs, After PROJECT_HOME $PROJECT_HOME\n");
+#  print(" L 587 Project_config, _system_dirs, After PROJECT_HOME $PROJECT_HOME\n");
   # print(" Project_config, _system_dirs, Before subUser: $subUser \n");
 
 	if ( length $subUser ) {
@@ -1229,6 +1235,7 @@ sub system_dirs {
 	my $PROJECT_HOME = $Project->{_PROJECT_HOME};
 	my $subUser      = $Project->{_subUser};
 
+#    print("L1236 $PROJECT_HOME\n");
 	# META-DATA FILE STRUCTRUE
 	my $DATE_LINE_COMPONENT_STAGE_PROCESS =
 	  $date . '/' . $line . '/' . $component . '/' . $stage . '/' . $process;
@@ -2628,6 +2635,7 @@ sub make_local_dirs {
 	# Always create basic types
 	my $PROJECT_HOME = $Project->{_PROJECT_HOME};
 	
+#	print("Project_config,L2633,$PROJECT_HOME\n");
 	$manage_dirs_by->make_dir($PROJECT_HOME);
 
 	# BY data type
@@ -2915,6 +2923,7 @@ sub make_local_dirs {
 	return ();
 }
 
+
 =head2 sub get_max_index
 
 max index = number of input variables -1
@@ -2960,8 +2969,8 @@ sub update_configuration_files {
 		_values_aref        => '',
 		_check_buttons_aref => '',
 	};
-
-	my ( $names_aref, $values_aref ) = $read->configs($inbound);
+#	print("L 2965 Project_config, $inbound\n");
+	my ( $names_aref, $values_aref ) = $readfiles->configs($inbound);
 
 	$project->{_names_aref}  = $names_aref;
 	$project->{_values_aref} = $values_aref;

@@ -20,13 +20,28 @@ Build new files: ~/configs/"program_group_name"/"module".config
                  ~/misc/L_SU_global_constants.pm
 
 =head3 NOTES
+ramp
 
-Modify "module".config file after running this script
-and before running sudoc2pm_pt2.pl
+0. make sure that the documentation
+exists for the program in the 
+"Stripped"  directory
 
-Modify "nameNnumber.txt" witht he correct base
+Modify "nameNnumber.txt" with the correct base
 file name and number
 e.g. susynlv 7
+
+define program ONLY within a
+developer category in L_SU_global_constants.pm 
+L 234
+
+define program in two locations within
+L_SU_path for hash and the colon definitions
+
+After running this script
+and before running sudoc2pm_pt2.pl:
+modify "module".config file , as needed
+
+modify *_spec to include bindings to directories
 
 
 =head4 Examples:
@@ -147,7 +162,7 @@ my $package_name;
 
 for ( my $i = 0 ; $i < $list_length ; $i++ ) {
 
-#	print("sudoc2pm_pt1.pl,program_name, num=$i, program_name=$program_name[$i]\n");
+#    print("sudoc2pm_pt1.pl,program_name, num=$i, program_name=$program_name[$i]\n");
 
 	$package_name       = $program_name[$i];
 	$pm_file_out[0]     = $package_name . '.pm';

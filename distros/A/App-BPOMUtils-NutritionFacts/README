@@ -3,9 +3,9 @@ NAME
     facts
 
 VERSION
-    This document describes version 0.027 of App::BPOMUtils::NutritionFacts
+    This document describes version 0.028 of App::BPOMUtils::NutritionFacts
     (from Perl distribution App-BPOMUtils-NutritionFacts), released on
-    2024-06-17.
+    2024-11-05.
 
 SYNOPSIS
 DESCRIPTION
@@ -282,6 +282,15 @@ FUNCTIONS
 
         Biotin, in mcg/100g.
 
+    *   biotin_nufact => *ufloat*
+
+        Biotin, in mcg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   biotin_nufact_note => *str*
+
+        (No description)
+
     *   browser => *true*
 
         View output HTML in browser instead of returning it.
@@ -290,17 +299,53 @@ FUNCTIONS
 
         Calcium, in mg/100g.
 
+    *   ca_nufact => *ufloat*
+
+        Calcium, in mg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   ca_nufact_note => *str*
+
+        (No description)
+
     *   carbohydrate* => *ufloat*
 
         Total carbohydrate, in g/100g.
+
+    *   carbohydrate_nufact => *ufloat*
+
+        Total carbohydrate, in g/100g (value to be used in nutrition facts
+        table instead the lab test result).
+
+    *   carbohydrate_nufact_note => *str*
+
+        (No description)
 
     *   cholesterol => *ufloat*
 
         Cholesterol, in mg/100g.
 
+    *   cholesterol_nufact => *ufloat*
+
+        Cholesterol, in mg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   cholesterol_nufact_note => *str*
+
+        (No description)
+
     *   choline => *ufloat*
 
         Choline, in mg/100g.
+
+    *   choline_nufact => *ufloat*
+
+        Choline, in mg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   choline_nufact_note => *str*
+
+        (No description)
 
     *   color => *str* (default: "auto")
 
@@ -310,41 +355,135 @@ FUNCTIONS
 
         Chromium, in mcg/100g.
 
+    *   cr_nufact => *ufloat*
+
+        Chromium, in mcg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   cr_nufact_note => *str*
+
+        (No description)
+
     *   cu => *ufloat*
 
         Copper, in mcg/100g.
+
+    *   cu_nufact => *ufloat*
+
+        Copper, in mcg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   cu_nufact_note => *str*
+
+        (No description)
 
     *   fat* => *ufloat*
 
         Total fat, in g/100g.
 
+    *   fat_nufact => *ufloat*
+
+        Total fat, in g/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   fat_nufact_note => *str*
+
+        (No description)
+
     *   fe => *ufloat*
 
         Iron, in mg/100g.
+
+    *   fe_nufact => *ufloat*
+
+        Iron, in mg/100g (value to be used in nutrition facts table instead
+        the lab test result).
+
+    *   fe_nufact_note => *str*
+
+        (No description)
 
     *   fluorine => *ufloat*
 
         Fluorine, in mg/100g.
 
+    *   fluorine_nufact => *ufloat*
+
+        Fluorine, in mg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   fluorine_nufact_note => *str*
+
+        (No description)
+
     *   folate => *ufloat*
 
         Folate (vitamin B9), in mcg/100g.
+
+    *   folate_nufact => *ufloat*
+
+        Folate (vitamin B9), in mcg/100g (value to be used in nutrition
+        facts table instead the lab test result).
+
+    *   folate_nufact_note => *str*
+
+        (No description)
+
+    *   has_claims => *bool*
+
+        Whether food is registered as having claims.
 
     *   iodium => *ufloat*
 
         Iodium, in mcg/100g.
 
+    *   iodium_nufact => *ufloat*
+
+        Iodium, in mcg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   iodium_nufact_note => *str*
+
+        (No description)
+
     *   k => *ufloat*
 
         Potassium, in mg/100g.
+
+    *   k_nufact => *ufloat*
+
+        Potassium, in mg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   k_nufact_note => *str*
+
+        (No description)
 
     *   mg => *ufloat*
 
         Magnesium, in mg/100g.
 
+    *   mg_nufact => *ufloat*
+
+        Magnesium, in mg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   mg_nufact_note => *str*
+
+        (No description)
+
     *   mn => *ufloat*
 
         Manganese, in mcg/100g.
+
+    *   mn_nufact => *ufloat*
+
+        Manganese, in mcg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   mn_nufact_note => *str*
+
+        (No description)
 
     *   name => *str*
 
@@ -366,17 +505,53 @@ FUNCTIONS
 
         Phosphorus, in mg/100g.
 
+    *   phosphorus_nufact => *ufloat*
+
+        Phosphorus, in mg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   phosphorus_nufact_note => *str*
+
+        (No description)
+
     *   protein* => *ufloat*
 
         Protein, in g/100g.
+
+    *   protein_nufact => *ufloat*
+
+        Protein, in g/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   protein_nufact_note => *str*
+
+        (No description)
 
     *   saturated_fat* => *ufloat*
 
         Saturated fat, in g/100g.
 
+    *   saturated_fat_nufact => *ufloat*
+
+        Saturated fat, in g/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   saturated_fat_nufact_note => *str*
+
+        (No description)
+
     *   se => *ufloat*
 
         Selenium, in mcg/100g.
+
+    *   se_nufact => *ufloat*
+
+        Selenium, in mcg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   se_nufact_note => *str*
+
+        (No description)
 
     *   serving_size* => *ufloat*
 
@@ -386,13 +561,40 @@ FUNCTIONS
 
         Sodium, in mg/100g.
 
+    *   sodium_nufact => *ufloat*
+
+        Sodium, in mg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   sodium_nufact_note => *str*
+
+        (No description)
+
     *   sugar* => *ufloat*
 
         Total sugar, in g/100g.
 
+    *   sugar_nufact => *ufloat*
+
+        Total sugar, in g/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   sugar_nufact_note => *str*
+
+        (No description)
+
     *   va => *ufloat*
 
         Vitamin A, in mcg/100g (all-trans-)retinol.
+
+    *   va_nufact => *ufloat*
+
+        Vitamin A, in mcg/100g (all-trans-)retinol (value to be used in
+        nutrition facts table instead the lab test result).
+
+    *   va_nufact_note => *str*
+
+        (No description)
 
     *   vb1 => *ufloat*
 
@@ -402,41 +604,140 @@ FUNCTIONS
 
         Vitamin B12, in mcg/100g.
 
+    *   vb12_nufact => *ufloat*
+
+        Vitamin B12, in mcg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   vb12_nufact_note => *str*
+
+        (No description)
+
+    *   vb1_nufact => *ufloat*
+
+        Vitamin B1, in mg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   vb1_nufact_note => *str*
+
+        (No description)
+
     *   vb2 => *ufloat*
 
         Vitamin B2, in mg/100g.
+
+    *   vb2_nufact => *ufloat*
+
+        Vitamin B2, in mg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   vb2_nufact_note => *str*
+
+        (No description)
 
     *   vb3 => *ufloat*
 
         Vitamin B3, in mg/100g.
 
+    *   vb3_nufact => *ufloat*
+
+        Vitamin B3, in mg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   vb3_nufact_note => *str*
+
+        (No description)
+
     *   vb5 => *ufloat*
 
         Vitamin B5 (pantothenic acid), in mg/100g.
+
+    *   vb5_nufact => *ufloat*
+
+        Vitamin B5 (pantothenic acid), in mg/100g (value to be used in
+        nutrition facts table instead the lab test result).
+
+    *   vb5_nufact_note => *str*
+
+        (No description)
 
     *   vb6 => *ufloat*
 
         Vitamin B6, in mg/100g.
 
+    *   vb6_nufact => *ufloat*
+
+        Vitamin B6, in mg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   vb6_nufact_note => *str*
+
+        (No description)
+
     *   vc => *ufloat*
 
         Vitamin C, in mg/100g.
+
+    *   vc_nufact => *ufloat*
+
+        Vitamin C, in mg/100g (value to be used in nutrition facts table
+        instead the lab test result).
+
+    *   vc_nufact_note => *str*
+
+        (No description)
 
     *   vd => *ufloat*
 
         Vitamin D, in mcg.
 
+    *   vd_nufact => *ufloat*
+
+        Vitamin D, in mcg (value to be used in nutrition facts table instead
+        the lab test result).
+
+    *   vd_nufact_note => *str*
+
+        (No description)
+
     *   ve => *ufloat*
 
         Vitamin E, in mg alpha-TE (tocopherol-equivalent).
+
+    *   ve_nufact => *ufloat*
+
+        Vitamin E, in mg alpha-TE (tocopherol-equivalent) (value to be used
+        in nutrition facts table instead the lab test result).
+
+    *   ve_nufact_note => *str*
+
+        (No description)
 
     *   vk => *ufloat*
 
         Vitamin K, in mcg.
 
+    *   vk_nufact => *ufloat*
+
+        Vitamin K, in mcg (value to be used in nutrition facts table instead
+        the lab test result).
+
+    *   vk_nufact_note => *str*
+
+        (No description)
+
     *   zn => *ufloat*
 
         Zinc, in mg/100g.
+
+    *   zn_nufact => *ufloat*
+
+        Zinc, in mg/100g (value to be used in nutrition facts table instead
+        the lab test result).
+
+    *   zn_nufact_note => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -485,8 +786,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024, 2023, 2022 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

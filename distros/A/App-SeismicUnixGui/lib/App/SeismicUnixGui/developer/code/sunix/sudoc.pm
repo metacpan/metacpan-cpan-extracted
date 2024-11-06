@@ -183,8 +183,8 @@ sub parameters {
 		$key   = $unique_keys[$i];
 		$value = $old_hash{$key};
 
-		print
-		  "#=$i: unique and alphabetical key: $key, and its value: $value\n";
+#		print
+#		  "#=$i: unique and alphabetical key: $key, and its value: $value\n";
 
 		$export_names[$i]  = $unique_keys[$i];
 		$export_values[$i] = $value;

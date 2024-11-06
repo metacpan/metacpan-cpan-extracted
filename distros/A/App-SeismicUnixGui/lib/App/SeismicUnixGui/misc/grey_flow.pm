@@ -165,9 +165,10 @@ my $false      = $var->{_false};
 
 =cut
 
+my $default  = 0;
 my @save_last_param_widget_values;
 my $save_last_param_widget_value;
-my $save_last_param_widget_index;
+my $save_last_param_widget_index  = $default;
 my $memory_leak4save_button_fixed = $false;
 my $memory_leak4flow_select_fixed = $false;
 my $min_clicks4save_button        = $var->{_min_clicks4save_button};

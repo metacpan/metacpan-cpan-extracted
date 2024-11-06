@@ -881,6 +881,7 @@ sub get_label4entry_button_chosen {
 		if ( $widget eq @{ $param_widgets->{_values_w_aref} }[$choice] ) {
 			my $parameter_value_index = $choice;
 			my $parameter_name_index  = $choice;
+			
 			$label =
 			  @{ $param_widgets->{_labels_w_aref} }[$choice]->cget('-text');
 			my $value = @{ $param_widgets->{_values_w_aref} }[$choice]->get;
@@ -923,11 +924,9 @@ sub get_value4entry_button_chosen {
 			my $parameter_value_index = $choice;
 			my $parameter_name_index  = $choice;
 
-		  #$label = @{$param_widgets->{_labels_w_aref}}[$choice]->cget('-text');
 			$value = @{ $param_widgets->{_values_w_aref} }[$choice]->get();
 
-			#print("param_widgets,get_entry_button_chosen,label,=$label\n");
-			print("param_widgets,get_entry_button_chosen,value,=$value\n");
+#			print("param_widgets,get_entry_button_chosen,value,=$value\n");
 
 			#print("param_widgets,get_entry_button_chosen,index,=$choice\n");
 		}

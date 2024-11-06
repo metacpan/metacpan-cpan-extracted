@@ -53,12 +53,9 @@ my $L_SU_global_constants = L_SU_global_constants->new();
 
 local variables
 
-# print("param_widgets, default_param_specs,first entry num=$default_param_specs->{_first_entry_num}\n");
-# print("param_widgets_grey, default_param_specs,first entry num=$default_param_specs->{_first_entry_num}\n");
-
 =cut
 
-my $default_param_specs = $L_SU_global_constants->param();
+my $default_param       = $L_SU_global_constants->param();
 my $var                 = $L_SU_global_constants->var();
 my $on                  = $var->{_on};
 my $off                 = $var->{_off};
@@ -87,12 +84,6 @@ my $param_widgets       = $gui_history->get_defaults();
  all parameters and so we 
  forcibly check for changes always
  
- changes are only allowed for those sunix programs whose spec files
- have a max_index defined
- 
- currently changes in param_widgets package only works with regular flows 
- and not with pre-built superflows
-
 =cut
 
 sub _changes {
@@ -104,19 +95,23 @@ sub _changes {
 	# two cases possible
 	# in general L_SU
 	if ( $param_widgets->{_current_program_name} ) {
+		
+		# use the internal program name instead of the alias
+#		print(" param_widgets4pre_built_streams,_changes, program_name: $param_widgets->{_current_program_name}\n");
 		my $prog_name = $param_widgets->{_current_program_name};
 
-		# print(" param_widgets, changes, prog_name: $prog_name \n");
-		# print(" param_widgets, changes, index: $idx \n");
+		# print(" param_widgets4pre_built_streams, changes, prog_name: $prog_name \n");
+#		print(" 110 param_widgets4pre_built_streams, _changes, index: $idx \n");
+        
 
-		my $max_idx = $control->get_max_index($prog_name);
-		# print(" param_widgets,max_index, $max_idx \n");
+#		my $max_idx = $control->get_max_index($prog_name);
+		# print(" param_widgets4pre_built_streams,max_index, $max_idx \n");
 		if ( $idx >= 0 && $idx <= $control->get_max_index($prog_name) ) {    # cautious, index must be reasonable
 
 			local_set_entry_change_status($true);
 			my $changed_entry = $param_widgets->{_changed_entry};            # always
 
-			# print("param_widgets,changes,changed 1-yes 0 -no? $changed_entry\n");
+			# print("param_widgets4pre_built_streams,changes,changed 1-yes 0 -no? $changed_entry\n");
 			local_update_check_button_setting($idx);
 
 			# local_set_last_changed_entry_index($idx);
@@ -141,7 +136,7 @@ sub _changes {
 
 sub error_check {
 	my ($self) = @_;
-	print("param_widgets,error_check return is $true\n");
+	print("param_widgets4pre_built_streams,error_check return is $true\n");
 	return ($true);
 }
 
@@ -160,7 +155,7 @@ sub get_check_buttons_w_aref {
 
 	}
 	else {
-		print( "param_widgets, get_check_buttons_w_aref, missing check_buttons_w_aref \n" );
+		print( "param_widgets4pre_built_streams, get_check_buttons_w_aref, missing check_buttons_w_aref \n" );
 		return ();
 	}
 }
@@ -187,7 +182,7 @@ sub get_entry_change_status {
 	my @self   = @_;
 	my $status = $param_widgets->{_changed_entry};
 
-	# print("param_widgets, get_entry_change_status,changed_entry: $param_widgets->{_changed_entry}\n");
+	# print("param_widgets4pre_built_streams, get_entry_change_status,changed_entry: $param_widgets->{_changed_entry}\n");
 	return ($status);
 }
 
@@ -205,7 +200,7 @@ sub get_labels_w_aref {
 
 	}
 	else {
-		print("param_widgets,get_labels_w_aref, missing labels_w_aref \n");
+		print("param_widgets4pre_built_streams,get_labels_w_aref, missing labels_w_aref \n");
 		return ();
 	}
 }
@@ -219,7 +214,7 @@ sub get_length_check_buttons_on {
 	my ( $length, $count );
 	my $check_buttons_aref = _get_check_buttons_settings_aref();
 
-	# print("param_widgets,get_length_check_buttons_on, @$check_buttons_aref)\n");
+	# print("param_widgets4pre_built_streams,get_length_check_buttons_on, @$check_buttons_aref)\n");
 	my @button_settings = @$check_buttons_aref;
 	$length = scalar @button_settings;
 
@@ -244,7 +239,7 @@ sub get_index_check_buttons_on {
 	my ( $length, $count );
 	my $check_buttons_aref = _get_check_buttons_settings_aref();
 
-	# print("param_widgets,get_length_check_buttons_on, @$check_buttons_aref)\n");
+	# print("param_widgets4pre_built_streams,get_length_check_buttons_on, @$check_buttons_aref)\n");
 	my @button_settings = @$check_buttons_aref;
 	$length = scalar @button_settings;
 	my @saved_index_on;
@@ -277,7 +272,7 @@ sub get_values_w_aref {
 
 	}
 	else {
-		print("param_widgets,get_values_w_aref, missing values_w_aref \n");
+		print("param_widgets4pre_built_streams,get_values_w_aref, missing values_w_aref \n");
 		return ();
 	}
 }
@@ -326,7 +321,6 @@ clear the gui completely of 61 parameter values
 61 = current defaulted maximum number of variables in a list box
 
 #	my $safe = $param_widgets->{_length};
-	# print("param_widgets_neutral, gui_full_clear, temp save length $param_widgets_color_href->{_length} \n");
 	# _max_length_in_gui();
 	# print("param_widgets_neutral, gui_full_clear, length used for cleaning $param_widgets_color_href->{_length} \n");
 
@@ -344,13 +338,16 @@ sub gui_full_clear {
 	my ($self) = @_;
 	
 	my $wipe = wipe->new();
-	
-	$wipe->range($param_widgets);
+    my $max_length = $default_param->{_max_entry_num};
+#    print("param_widgets4pre_built_streams, gui_full_clear, max_length $max_length\n");
+    
+	$wipe->set_range($max_length);
+	$wipe->set_all($param_widgets);
 	$wipe->values();
 	$wipe->labels();
 	$wipe->all_check_buttons();
 #    print("param_widgets4pre_built_streams,gui_full_clear\n");
-;	return ();
+    return ();
 }
 
 
@@ -362,7 +359,7 @@ sub local_set_entry_change_status {
 	my ($ans) = @_;
 	$param_widgets->{_changed_entry} = $ans;
 
-	# print("param_widgets,local_set_entry_change_status,changed_entry,is: success \n");
+	# print("param_widgets4pre_built_streams,local_set_entry_change_status,changed_entry,is: success \n");
 
 	return ();
 }
@@ -393,40 +390,40 @@ sub local_update_check_button_setting {
 
 				$on_off[$idx] = $on;
 
-				# print("1.20 param_widgets,,local_update_check_button_setting index: $idx , value:$values[$idx] or '0' \n");
+				# print("1.20 param_widgets4pre_built_streams,,local_update_check_button_setting index: $idx , value:$values[$idx] or '0' \n");
 
 			}
 			elsif ( $values[$idx] eq '0.0' ) {
 
 				$on_off[$idx] = $on;
 
-				# print("1.21 param_widgets,local_update_check_button_setting, ndex: $idx , value:$values[$idx] or 0.0 \n");
+				# print("1.21 param_widgets4pre_built_streams,local_update_check_button_setting, ndex: $idx , value:$values[$idx] or 0.0 \n");
 
 			}
 			elsif ( $values[$idx] eq '0' ) {
 
 				$on_off[$idx] = $on;
 
-				# print("1.22 param_widgets,,local_update_check_button_setting index: $idx , value:$values[$idx] or '0' \n");
+				# print("1.22 param_widgets4pre_built_streams,,local_update_check_button_setting index: $idx , value:$values[$idx] or '0' \n");
 
 			}
 			elsif ( $values[$idx] eq '0.0' ) {
 
 				$on_off[$idx] = $on;
 
-				# print("1.23 param_widgets,local_update_check_button_setting, ndex: $idx , value:$values[$idx] or 0.0 \n");
+				# print("1.23 param_widgets4pre_built_streams,local_update_check_button_setting, ndex: $idx , value:$values[$idx] or 0.0 \n");
 
 			}
 			else {
 
-				# print("1.24 param_widgets,local_update_check_button_setting; empty value,  :index $idx value: $values[$idx]\n");
+				# print("1.24 param_widgets4pre_built_streams,local_update_check_button_setting; empty value,  :index $idx value: $values[$idx]\n");
 				$on_off[$idx] = $off;
 			}
 
 		}
 		else {
 
-			# print("param_widgets,local_update_check_button_setting; unexpected cases\n");
+			# print("param_widgets4pre_built_streams,local_update_check_button_setting; unexpected cases\n");
 			$on_off[$idx] = $off;
 		}
 
@@ -438,26 +435,26 @@ sub local_update_check_button_setting {
 
 			$on_off[$idx] = $on;
 
-			print("1.11.23 1 param_widgets,local_update_check_button_setting, index: $idx value: $values[$idx]\n");
+			print("1.11.23 1 param_widgets4pre_built_streams,local_update_check_button_setting, index: $idx value: $values[$idx]\n");
 
 		}
 		elsif ( $values[$idx] eq '0.0' ) {
 
 			$on_off[$idx] = $on;
 
-			# print("1.12 param_widgets,local_update_check_button_setting, ndex: $idx , value:$values[$idx] or 0.0 \n");
+			# print("1.12 param_widgets4pre_built_streams,local_update_check_button_setting, ndex: $idx , value:$values[$idx] or 0.0 \n");
 
 		}
 		elsif ( $values[$idx] eq "" ) {
 
 			$on_off[$idx] = $off;
 
-			# print("1.13 param_widgets,local_update_check_button_setting, \"\" \n");
+			# print("1.13 param_widgets4pre_built_streams,local_update_check_button_setting, \"\" \n");
 
 		}
 		elsif ( $values[$idx] eq '' ) {
 
-			# print("1.14 param_widgets,local_update_check_button_setting, \'\' \n");
+			# print("1.14 param_widgets4pre_built_streams,local_update_check_button_setting, \'\' \n");
 			$on_off[$idx] = $off;
 
 		}
@@ -465,29 +462,29 @@ sub local_update_check_button_setting {
 
 			$on_off[$idx] = $off;
 
-			# print("1. param_widgets,local_update_check_button_setting, \"\'nu\'\"  \n");
+			# print("1. param_widgets4pre_built_streams,local_update_check_button_setting, \"\'nu\'\"  \n");
 
 		}
 		elsif ( $values[$idx] eq $nu ) {
 			$on_off[$idx] = $off;
 
-			# print("1.15 param_widgets,local_update_check_button_setting, \$nu \n");
+			# print("1.15 param_widgets4pre_built_streams,local_update_check_button_setting, \$nu \n");
 
 		}
 		elsif ( $values[$idx] eq $no ) {
 			$on_off[$idx] = $off;
 
-			# print("2. param_widgets,local_update_check_button_setting, \$no \n");
+			# print("2. param_widgets4pre_built_streams,local_update_check_button_setting, \$no \n");
 
 		}
 		elsif ( $values[$idx] eq "'0'" ) {
 			$on_off[$idx] = $on;
 
-			# print("2.1 param_widgets,local_update_check_button_setting, \"\'0\'\" \n");
+			# print("2.1 param_widgets4pre_built_streams,local_update_check_button_setting, \"\'0\'\" \n");
 
 		}
 		else {
-			# print("3.1 param_widgets,local_update_check_button_setting, all else\n");
+			# print("3.1 param_widgets4pre_built_streams,local_update_check_button_setting, all else\n");
 			$on_off[$idx] = $on;
 		}
 
@@ -516,7 +513,7 @@ sub local_set_last_changed_entry_index {
 	my ($self) = @_;
 	$param_widgets->{_last_changed_entry_index} = $self;
 
-	# print("param_widgets,local_set_last_changed_entry_index:  $param_widgets->{_last_changed_entry_index} \n");
+	# print("param_widgets4pre_built_streams,local_set_last_changed_entry_index:  $param_widgets->{_last_changed_entry_index} \n");
 	return ();
 }
 
@@ -530,7 +527,7 @@ sub set_check_buttons {
 	if ($check_buttons_settings_aref) {
 		$param_widgets->{_check_buttons_settings_aref} = $check_buttons_settings_aref;
 
-		# print("param_widgets,set_check_buttons, settings are @{$param_widgets->{_check_buttons_settings_aref}}\n");
+		# print("param_widgets4pre_built_streams,set_check_buttons, settings are @{$param_widgets->{_check_buttons_settings_aref}}\n");
 	}
 	return ();
 }
@@ -581,7 +578,7 @@ sub get_check_buttons_settings_aref {
 	}
 	else {
 		my @check_buttons_aref = ();
-		# print("param_widgets,get_check_buttons_settings_aref is empty NADA\n");
+		# print("param_widgets4pre_built_streams,get_check_buttons_settings_aref is empty NADA\n");
 		return ( \@check_buttons_aref );
 	}
 
@@ -593,7 +590,7 @@ sub set_entry_button_chosen_index {
 	my ( $self, $index ) = @_;
 	$param_widgets->{_entry_button_chosen_index} = $index;
 
-	# print (" param_widgets,set_entry_button_chosen_index, #$index \n");
+	# print (" param_widgets4pre_built_streams,set_entry_button_chosen_index, #$index \n");
 
 }
 
@@ -606,7 +603,7 @@ sub _get_check_buttons_settings_aref {
 	my $check_buttons_settings_aref = \@{ $param_widgets->{_check_buttons_settings_aref} };
 	my $check_buttons_aref          = $check_buttons_settings_aref;
 
-	#print("param_widgets,get_check_buttons_settings_aref: @{$param_widgets->{_check_buttons_settings_aref}}\n");
+	#print("param_widgets4pre_built_streams,get_check_buttons_settings_aref: @{$param_widgets->{_check_buttons_settings_aref}}\n");
 	return ($check_buttons_aref);
 }
 
@@ -615,7 +612,7 @@ sub set_entry_button_chosen_widget {
 	my ( $self, $widget_h ) = @_;
 	$param_widgets->{_entry_button_chosen_widget} = $widget_h;
 
-	# print (" param_widgets,set_entry_button_chosen_widget, #$widget_h \n");
+	# print (" param_widgets4pre_built_streams,set_entry_button_chosen_widget, #$widget_h \n");
 
 }
 
@@ -645,7 +642,7 @@ sub get_entry_button_chosen_index {
 
 			$param_widgets->{_entry_button_chosen_index} = $choice;
 
-			# print (" param_widgets,get_entry_button_chosen_index, #$choice \n");
+			# print (" param_widgets4pre_built_streams,get_entry_button_chosen_index, #$choice \n");
 			$index = $choice;
 		}
 	}
@@ -712,12 +709,12 @@ sub get_value4entry_button_chosen {
 	my $first  = $param_widgets->{_first_idx};
 	my $length = $param_widgets->{_length};
 
-	# print("param_widgets,get_entry_button_chosen,first_index=$param_widgets->{_first_idx}\n");
-	# print("param_widgets,get_entry_button_chosen,length_=$param_widgets->{_length} \n");
+	# print("param_widgets4pre_built_streams,get_entry_button_chosen,first_index=$param_widgets->{_first_idx}\n");
+	# print("param_widgets4pre_built_streams,get_entry_button_chosen,length_=$param_widgets->{_length} \n");
 
 	my $widget = $param_widgets->{_entry_button_chosen_widget};
 
-	# print("param_widgets,get_entry_button_chosen,widget,=$widget\n");
+	# print("param_widgets4pre_built_streams,get_entry_button_chosen,widget,=$widget\n");
 
 	for ( my $choice = $first; $choice < $length; $choice++ ) {
 		if ( $widget eq @{ $param_widgets->{_values_w_aref} }[$choice] ) {
@@ -727,10 +724,10 @@ sub get_value4entry_button_chosen {
 			#$label = @{$param_widgets->{_labels_w_aref}}[$choice]->cget('-text');
 			$value = @{ $param_widgets->{_values_w_aref} }[$choice]->get();
 
-			#print("param_widgets,get_entry_button_chosen,label,=$label\n");
-			print("param_widgets,get_entry_button_chosen,value,=$value\n");
+			#print("param_widgets4pre_built_streams,get_entry_button_chosen,label,=$label\n");
+			print("param_widgets4pre_built_streams,get_entry_button_chosen,value,=$value\n");
 
-			#print("param_widgets,get_entry_button_chosen,index,=$choice\n");
+			#print("param_widgets4pre_built_streams,get_entry_button_chosen,index,=$choice\n");
 		}
 	}
 	return ($value);
@@ -749,12 +746,12 @@ sub get_values_aref {
 
 		my $values_aref = \@{ $param_widgets->{_values_aref} };
 
-		# print("param_widgets,get_values_aref,value[0]= @{$param_widgets->{_values_aref}}[0]\n");
+		# print("param_widgets4pre_built_streams,get_values_aref,value[0]= @{$param_widgets->{_values_aref}}[0]\n");
 		return ($values_aref);
 
 	}
 	else {
-		# print("param_widgets, get_values_aref,  missing values_aref\n");
+		# print("param_widgets4pre_built_streams, get_values_aref,  missing values_aref\n");
 	}
 
 }
@@ -770,7 +767,7 @@ sub get_labels_aref {
 	my ($self) = @_;
 	my $labels_aref = \@{ $param_widgets->{_labels_aref} };
 
-	# print("param_widgets,get_labels_aref: @{$param_widgets->{_labels_aref}}\n"); # all labels in array may not be there
+	# print("param_widgets4pre_built_streams,get_labels_aref: @{$param_widgets->{_labels_aref}}\n"); # all labels in array may not be there
 	return ( $param_widgets->{_labels_aref} );
 }
 
@@ -785,7 +782,7 @@ sub get_names_aref {
 	my ($self) = @_;
 	my $labels_aref = \@{ $param_widgets->{_labels_aref} };
 
-	# print("param_widgets,get_labels_aref: @{$param_widgets->{_labels_aref}}\n"); # all labels in array may not be there
+	# print("param_widgets4pre_built_streams,get_labels_aref: @{$param_widgets->{_labels_aref}}\n"); # all labels in array may not be there
 	return ( $param_widgets->{_labels_aref} );
 }
 
@@ -807,13 +804,13 @@ sub initialize_check_buttons {
 		$off[$i] = 'off';
 	}
 
-	$check_buttons->specs($default_param_specs);
+	$check_buttons->specs($default_param);
 	$check_buttons->frame( $param_widgets->{_check_buttons_frame_href} );
 	$check_buttons->make( \@off );
 
 	$param_widgets->{_check_buttons_w_aref} = $check_buttons->get_w_aref();
 
-	# print("param_widgets, initialize_check_buttons check_buttons_w_aref: $param_widgets->{_check_buttons_w_aref}\n");
+	# print("param_widgets4pre_built_streams, initialize_check_buttons check_buttons_w_aref: $param_widgets->{_check_buttons_w_aref}\n");
 
 }
 
@@ -832,14 +829,14 @@ sub initialize_labels {
 	$first  = $param_widgets->{_first_idx};
 	$length = $param_widgets->{_length};
 
-	# print("param_widgets,initialize_labels,first:$first\n");
-	# print("param_widgets,initialize_labels,length:$length\n");
+	# print("param_widgets4pre_built_streams,initialize_labels,first:$first\n");
+	# print("param_widgets4pre_built_streams,initialize_labels,length:$length\n");
 
 	for ( my $i = $first; $i < $length; $i++ ) {
 		$blank_labels[$i] = '';
 	}
 
-	$labels->specs($default_param_specs);
+	$labels->specs($default_param);
 	$labels->frame( $param_widgets->{_labels_frame_href} );
 	$labels->texts( \@blank_labels );
 
@@ -865,7 +862,7 @@ sub initialize_values {
 		$blank_values[$i] = '';
 	}
 
-	$values->specs($default_param_specs);
+	$values->specs($default_param);
 	$values->frame( $param_widgets->{_values_frame_href} );
 	$values->texts( \@blank_values );
 
@@ -873,12 +870,37 @@ sub initialize_values {
 
 }
 
+
+=head2 sub set_range 
+
+=cut 
+
+sub set_range {
+	my ( $self, $ref_hash ) = @_;
+
+    if ($ref_hash->{_is_superflow_select_button}
+		|| $ref_hash->{_is_superflow} )
+	{
+
+		$param_widgets->{_first_idx} = $ref_hash->{_superflow_first_idx};
+		$param_widgets->{_length}    = $ref_hash->{_superflow_length};
+
+#		print("4. param_widgets4pre_built_streams,set_range, (superflows) first idx:$param_widgets->{_first_idx}, and length:$param_widgets->{_length}\n");
+
+	}else {
+		print ("param_widgets4pre_built_streams,set_range, _missing ref_hash\n");
+	}
+
+	# print ("6. param_widgets4pre_built_streams,range, _values_w_aref:  $param_widgets->{_values_w_aref}\n");
+	return ();
+}
+
 =head2 sub range 
 
 	establish the first and last
     indices of the array
   	  	 foreach my $key (sort keys %$ref_hash) {
-  			print (" param_widgets,range, key is $key, value is $ref_hash->{$key}\n");
+  			print (" param_widgets4pre_built_streams,range, key is $key, value is $ref_hash->{$key}\n");
   		} 
 
 =cut 
@@ -894,7 +916,7 @@ sub range {
 		$param_widgets->{_first_idx} = $ref_hash->{_param_sunix_first_idx};
 		$param_widgets->{_length}    = $ref_hash->{_param_sunix_length};
 
-		# print("1.param_widgets,range,  (add2flow_button and add2flow)  first idx:$param_widgets->{_first_idx}, and length:$param_widgets->{_length}\n");
+		# print("1.param_widgets4pre_built_streams,range,  (add2flow_button and add2flow)  first idx:$param_widgets->{_first_idx}, and length:$param_widgets->{_length}\n");
 	}
 
 	# for sunix selections
@@ -903,7 +925,7 @@ sub range {
 		$param_widgets->{_first_idx} = $ref_hash->{_param_sunix_first_idx};
 		$param_widgets->{_length}    = $ref_hash->{_param_sunix_length};
 
-		# print("2. param_widgets,range, (sunix_listbox) first idx:$param_widgets->{_first_idx}, and length:$param_widgets->{_length}\n");
+		# print("2. param_widgets4pre_built_streams,range, (sunix_listbox) first idx:$param_widgets->{_first_idx}, and length:$param_widgets->{_length}\n");
 	}
 
 	# for user-built flows
@@ -918,7 +940,7 @@ sub range {
 		$param_widgets->{_first_idx} = $ref_hash->{_param_flow_first_idx};
 		$param_widgets->{_length}    = $ref_hash->{_param_flow_length};
 
-		# print("3. param_widgets,range, (user-built-flow)  first idx:$param_widgets->{_first_idx}, and length:$param_widgets->{_length}\n");
+		# print("3. param_widgets4pre_built_streams,range, (user-built-flow)  first idx:$param_widgets->{_first_idx}, and length:$param_widgets->{_length}\n");
 	}
 
 	# button for L_SU and no button for project selector
@@ -929,16 +951,16 @@ sub range {
 		$param_widgets->{_first_idx} = $ref_hash->{_superflow_first_idx};
 		$param_widgets->{_length}    = $ref_hash->{_superflow_length};
 
-		# print("4. param_widgets,range, (superflows) first idx:$param_widgets->{_first_idx}, and length:$param_widgets->{_length}\n");
+#		print("4. param_widgets4pre_built_,range, (superflows) first idx:$param_widgets->{_first_idx}, and length:$param_widgets->{_length}\n");
 
-		#		# case of now pre-existing color (not even neutral) and the perl flow is selected
+		# case of now pre-existing color (not even neutral) and the perl flow is selected
 		# this case actually does not need range because the following subroutines estimate
-		# the length fromt he scalar of the array and all correctly assume that the first index=0
+		# the length from the scalar of the array and all correctly assume that the first index=0
 		#		elsif ($ref_hash->{_is_user_built_flow} && $ref_hash->{_is_new_listbox_selection} )   {
 		#
 		#	 		$param_widgets->{_first_idx}		= $ref_hash->{_param_flow_first_idx};
 		#  			$param_widgets->{_length}			= $ref_hash->{_param_flow_length};
-		#	 		print("5. param_widgets,range, (user-built-flow)  first idx:$param_widgets->{_first_idx}, and length:$param_widgets->{_length}\n");
+		#	 		print("5. param_widgets4pre_built_streams,range, (user-built-flow)  first idx:$param_widgets->{_first_idx}, and length:$param_widgets->{_length}\n");
 		#
 		#		}
 
@@ -947,10 +969,10 @@ sub range {
 		# the length fromt he scalar of the array and all correctly assume that the first index=0
 	}
 	else {
-		#NADA print ("6. param_widgets,range, _missing ref_hash\n");
+		#NADA print ("6. param_widgets4pre_built_streams,range, _missing ref_hash\n");
 	}
 
-	# print ("6. param_widgets,range, _values_w_aref:  $param_widgets->{_values_w_aref}\n");
+	# print ("6. param_widgets4pre_built_streams,range, _values_w_aref:  $param_widgets->{_values_w_aref}\n");
 	return ();
 }
 
@@ -969,9 +991,9 @@ sub redisplay_check_buttons {
 
 	my $settings_aref = $param_widgets->{_check_buttons_settings_aref};
 
-	# print("1. param_widgets,redisplay_check_buttons,settings @{$settings_aref}[0]\n");
-	# print("2. param_widgets,redisplay_check_buttons,settings @{$param_widgets->{_check_buttons_settings_aref}}[0]\n");
-#	print("2. param_widgets,redisplay_check_buttons,length: $length\n");
+	# print("1. param_widgets4pre_built_streams,redisplay_check_buttons,settings @{$settings_aref}[0]\n");
+	# print("2. param_widgets4pre_built_streams,redisplay_check_buttons,settings @{$param_widgets->{_check_buttons_settings_aref}}[0]\n");
+#	print("2. param_widgets4pre_built_streams,redisplay_check_buttons,length: $length\n");
 
 	if ( $button_w_aref && $settings_aref ) {
 
@@ -988,7 +1010,7 @@ sub redisplay_check_buttons {
 		}
 	}
 	else {
-		print("param_widgets, redisplay_check_buttons missing parameters\n");
+		print("param_widgets4pre_built_streams, redisplay_check_buttons missing parameters\n");
 	}
 	return ();
 }
@@ -1015,13 +1037,13 @@ sub redisplay_labels {
 		
 		for ( $i = $first; $i < $length; $i++ ) {
 
-			# print("i:$i   param_widgets,redisplay_labels length:$length\n");
+			# print("i:$i   param_widgets4pre_built_streams,redisplay_labels length:$length\n");
 			# print(" text is @{$labels_aref}\n");
 			@$labels_w_aref[$i]->configure( -text => @$labels_aref[$i], );
 		}
 	}
 	else {
-		print( "param_widgets,redisplay labels, Warning parameters or labels_w_aref missing \n" );
+		print( "param_widgets4pre_built_streams,redisplay labels, Warning parameters or labels_w_aref missing \n" );
 	}
 	return ();
 }
@@ -1053,8 +1075,8 @@ sub redisplay_values {
 	my $length        = scalar @{ $param_widgets->{_values_aref} };
 
 	# my $length 			= $param_widgets->{_length};
-	# print("param_widgets, redisplay_values, length is $length\n");
-	# print("param_widgets, redisplay_values, first is $first\n");
+	# print("param_widgets4pre_built_streams, redisplay_values, length is $length\n");
+	# print("param_widgets4pre_built_streams, redisplay_values, first is $first\n");
 	
 	if ( length $values_w_aref && 
 		 length $values_aref ) {
@@ -1063,13 +1085,6 @@ sub redisplay_values {
 
 			my $control = control->new();
 			
-			#TODO: fully clear the gui first
-
-			# print("1. param_widgets,redisplay_values,chkbtn @{$param_widgets->{_check_buttons_settings_aref}}[$i]\n");
-
-			# print("param_widgets, redisplay_values, i is $i\n");
-			# print("1. param_widgets, redisplay_values, value is @{$values_aref}[$i]\n");
-
 			#  &_changes is invoked if
 			#  there is a new selection after an entry change
 			#  or even just if redisplay is selected
@@ -1082,7 +1097,7 @@ sub redisplay_values {
 			@{$values_aref}[$i] =
 				$control->get_no_quotes( @{$values_aref}[$i] );
 
-			# print("2. param_widgets, redisplay_values, value is @{$values_aref}[$i]\n");
+			# print("2. param_widgets4pre_built_streams, redisplay_values, value is @{$values_aref}[$i]\n");
 			@$values_w_aref[$i]->configure(
 				-textvariable    => \@{$values_aref}[$i],
 				-validate        => 'all',
@@ -1090,16 +1105,16 @@ sub redisplay_values {
 				-invalidcommand  => \&error_check,
 			);
 
-			# print("2. param_widgets,redisplay_values,chkbtn @{$param_widgets->{_check_buttons_settings_aref}}[$i]\n");
+			# print("2. param_widgets4pre_built_streams,redisplay_values,chkbtn @{$param_widgets->{_check_buttons_settings_aref}}[$i]\n");
 		}
 	}
 	else {
-		print("2. param_widgets,redisplay_values,missing parameters\n");
+		print("2. param_widgets4pre_built_streams,redisplay_values,missing parameters\n");
 	}
 
-	# print("param_widgets, redisplay_values, first item's value is  @{$values_aref}[$first]\n");
-	# print("param_widgets, redisplay_values, last item's values is  @{$values_aref}[($length-1)]\n");
-	# print("param_widgets, redisplay_values, last values are  @{$values_aref}\n");
+	# print("param_widgets4pre_built_streams, redisplay_values, first item's value is  @{$values_aref}[$first]\n");
+	# print("param_widgets4pre_built_streams, redisplay_values, last item's values is  @{$values_aref}[($length-1)]\n");
+	# print("param_widgets4pre_built_streams, redisplay_values, last values are  @{$values_aref}\n");
 
 	return ();
 }
@@ -1119,7 +1134,7 @@ sub set_current_program {
 	if ($prog_name_sref) {
 		$param_widgets->{_current_program_name} = $$prog_name_sref;
 
-		# print("param_widgets,set_current_program, program name: $param_widgets->{_current_program_name}\n");
+#		print("param_widgets4pre_built_streams,set_current_program, program name: $param_widgets->{_current_program_name}\n");
 	}
 }
 
@@ -1165,11 +1180,11 @@ sub set_length {
 
 		$param_widgets->{_length} = $length;
 
-		# print("param_widgets,set_length = $param_widgets->{_length}\n");
+		# print("param_widgets4pre_built_streams,set_length = $param_widgets->{_length}\n");
 
 	}
 	else {
-		# print("param_widgets,missing length NADA\n");
+		# print("param_widgets4pre_built_streams,missing length NADA\n");
 	}
 }
 
@@ -1185,11 +1200,11 @@ sub set_check_buttons_w_aref {
 
 		$param_widgets->{_check_buttons_w_aref} = $check_buttons_w_aref;
 
-		# print("param_widgets,set_check_buttons_w_aref, $check_buttons_w_aref \n");
+		# print("param_widgets4pre_built_streams,set_check_buttons_w_aref, $check_buttons_w_aref \n");
 
 	}
 	else {
-		print( "param_widgets, set_check_buttons_w_aref,missing check_buttons_w_aref \n" );
+		print( "param_widgets4pre_built_streams, set_check_buttons_w_aref,missing check_buttons_w_aref \n" );
 
 	}
 	return ();
@@ -1206,11 +1221,11 @@ sub set_labels_w_aref {
 
 		$param_widgets->{_labels_w_aref} = $labels_w_aref;
 
-		# print("param_widgets,set_labels_w_aref, $labels_w_aref \n");
+		# print("param_widgets4pre_built_streams,set_labels_w_aref, $labels_w_aref \n");
 
 	}
 	else {
-		print("param_widgets,set_labels_w_aref, missing labels_w_aref \n");
+		print("param_widgets4pre_built_streams,set_labels_w_aref, missing labels_w_aref \n");
 
 	}
 	return ();
@@ -1232,7 +1247,7 @@ sub set_values_frame {
 
 	}
 	else {
-		print("param_widgets, set_values_frame, missing  values_frame_href\n");
+		print("param_widgets4pre_built_streams, set_values_frame, missing  values_frame_href\n");
 	}
 
 	return ();
@@ -1249,11 +1264,11 @@ sub set_values_w_aref {
 
 		$param_widgets->{_values_w_aref} = $values_w_aref;
 
-		# print("param_widgets,set_values_w_aref,  $param_widgets->{_values_w_aref}\n");
+		# print("param_widgets4pre_built_streams,set_values_w_aref,  $param_widgets->{_values_w_aref}\n");
 
 	}
 	else {
-		print("param_widgets,set_values_w_aref, missing values_w_aref \n");
+		print("param_widgets4pre_built_streams,set_values_w_aref, missing values_w_aref \n");
 	}
 	return ();
 }
@@ -1273,12 +1288,12 @@ sub show_values {
 	$first    = $param_widgets->{_first_idx};
 	$length   = $param_widgets->{_length};
 
-	# print("param_widgets,show_values,first:$first\n");
-	# print("param_widgets,show_values,length:$length\n");
+	# print("param_widgets4pre_built_streams,show_values,first:$first\n");
+	# print("param_widgets4pre_built_streams,show_values,length:$length\n");
 
 	for ( my $i = $first; $i < $length; $i++ ) {
 
-		# print("param_widgets,show_values,values_w at $i $values_w[$i]\n");
+		# print("param_widgets4pre_built_streams,show_values,values_w at $i $values_w[$i]\n");
 		$values_w[$i]->pack(
 			-side   => 'top',
 			-anchor => 'w',
@@ -1309,7 +1324,7 @@ sub set_entry_change_status {
 	my ( $self, $status ) = @_;
 	$param_widgets->{_changed_entry} = $status;
 
-	# print("param_widgets, set_entry_change_status: to $status\n");
+	# print("param_widgets4pre_built_streams, set_entry_change_status: to $status\n");
 	return ();
 }
 
@@ -1342,13 +1357,13 @@ sub set_hash_ref {
 
 sub set_labels {
 	my ( $self, $labels_aref ) = @_;
- #       print("param_widgets,set_labels\n");
+ #       print("param_widgets4pre_built_streams,set_labels\n");
 	if ( defined $labels_aref ) {
 
 		$param_widgets->{_labels_aref} = $labels_aref;
 
 		# my $length = scalar @{ $param_widgets->{_labels_aref} };
-		# print("param_widgets,set_labels, length=$length\n");
+		# print("param_widgets4pre_built_streams,set_labels, length=$length\n");
 
 	}
 	else {
@@ -1369,11 +1384,11 @@ sub set_prog_name_sref {
 	if ($prog_name_sref) {
 		$param_widgets->{_prog_name_sref} = $prog_name_sref;
 
-		print("param_widgets,set_prog_name_sref, $$prog_name_sref\n");
+		print("param_widgets4pre_built_streams,set_prog_name_sref, $$prog_name_sref\n");
 
 	}
 	else {
-		print("param_widgets, set_prog_name_sref, missing prog name\n");
+		print("param_widgets4pre_built_streams, set_prog_name_sref, missing prog name\n");
 	}
 	return ();
 }
@@ -1395,10 +1410,10 @@ sub set_value4entry_button_chosen {
 	my $first  = $param_widgets->{_first_idx};
 	my $length = $param_widgets->{_length};
 
-	# print("param_widgets,set_entry_button_chosen,length_=$param_widgets->{_length} \n");
+	# print("param_widgets4pre_built_streams,set_entry_button_chosen,length_=$param_widgets->{_length} \n");
 
 	my $widget = $param_widgets->{_entry_button_chosen_widget};
-	print("param_widgets,set_entry_button_chosen,widget,=$widget\n");
+	print("param_widgets4pre_built_streams,set_entry_button_chosen,widget,=$widget\n");
 
 	# run through widgets until the match is made
 	for ( my $choice = $first; $choice < $length; $choice++ ) {
@@ -1406,8 +1421,8 @@ sub set_value4entry_button_chosen {
 
 			@{ $param_widgets->{_values_w_aref} }[$choice]->configure( -text => $value );
 
-			print( "param_widgets,set_entry_button_chosen,value= @{$param_widgets->{_values_w_aref}}[$choice]\n" );
-			print("param_widgets,set_entry_button_chosen,choice= $choice\n");
+			print( "param_widgets4pre_built_streams,set_entry_button_chosen,value= @{$param_widgets->{_values_w_aref}}[$choice]\n" );
+			print("param_widgets4pre_built_streams,set_entry_button_chosen,choice= $choice\n");
 
 		}
 	}
@@ -1427,11 +1442,11 @@ sub set_values {
 
 		$param_widgets->{_values_aref} = $values_aref;
 
-		# print("param_widgets,set_values,@{$param_widgets->{_values_aref}}\n");
+		# print("param_widgets4pre_built_streams,set_values,@{$param_widgets->{_values_aref}}\n");
 
 	}
 	else {
-		print("param_widgets,set_values, values_aref missing\n");
+		print("param_widgets4pre_built_streams,set_values, values_aref missing\n");
 	}
 
 	return ();
@@ -1475,8 +1490,8 @@ sub show_labels {
 	$first    = $param_widgets->{_first_idx};
 	$length   = $param_widgets->{_length};
 
-	# print("param_widgets,show_labels,first:$first\n");
-	# print("param_widgets,show_labels,length:$length\n");
+	# print("param_widgets4pre_built_streams,show_labels,first:$first\n");
+	# print("param_widgets4pre_built_streams,show_labels,length:$length\n");
 	for ( my $i = $first; $i < $length; $i++ ) {
 		$labels_w[$i]->pack(
 			-side   => 'top',

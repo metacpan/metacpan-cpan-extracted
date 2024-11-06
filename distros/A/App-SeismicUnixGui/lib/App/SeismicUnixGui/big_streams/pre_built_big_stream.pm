@@ -40,7 +40,7 @@ use aliased 'App::SeismicUnixGui::messages::message_director';
 use aliased 'App::SeismicUnixGui::misc::whereami';
 use aliased 'App::SeismicUnixGui::misc::param_widgets4pre_built_streams';
 use aliased 'App::SeismicUnixGui::misc::binding';
-use aliased 'App::SeismicUnixGui::misc::name';
+use aliased 'App::SeismicUnixGui::misc::program_name';  # instead of name
 use aliased 'App::SeismicUnixGui::misc::config_superflows';
 
 =head2 Instantiation
@@ -52,6 +52,7 @@ my $param_widgets 	          = param_widgets4pre_built_streams->new();
 my $whereami      			  = whereami->new();
 my $gui_history  			  = gui_history->new();
 my $pre_built_big_stream_href = $gui_history->get_defaults();
+my $program_name              = program_name->new();
 
 
 =head2
@@ -141,14 +142,23 @@ sub select {
     my ($self) = @_;
 
     my $binding            				= binding->new();
-    my $name               				= name->new();
+    my $program_name               		= program_name->new();
     my $pre_built_big_stream_messages 	= message_director->new();
     my $config_superflows  				= config_superflows->new();
     my $Project            				= 'Project';
 
     my $prog_name_sref = $pre_built_big_stream_href->{_prog_name_sref};
-
-    # print("1. pre_built_big_stream,select,prog=${$pre_built_big_stream_href->{_prog_name_sref}}\n");
+    
+    # for internal purposes, convert external names from the gui into internal name
+    # TODO needs its own function  
+    my $external_name = $$prog_name_sref;
+#    print("1. pre_built_big_stream,select,external prog_name=$external_name\n");
+    $program_name->set($external_name);
+    my $internal_name = $program_name->get();
+#    print("1. pre_built_big_stream,select,internal prog_name=$internal_name\n");
+    
+    $prog_name_sref    = \$internal_name; #scalar
+#    print("1. pre_built_big_stream,select,prog=${$pre_built_big_stream_href->{_prog_name_sref}}\n");
     my $message = $pre_built_big_stream_messages->null_button(0);
 
     # print("pre_built_big_stream,select,message_w:$pre_built_big_stream_href->{_message_w}\n");
@@ -227,10 +237,10 @@ sub select {
     my $here = $whereami->get4superflow_select_button();
     
     # widgets were initialized in a super class
-    # print("5. pre_built_big_stream,_is_superflow_select,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
-
+#    print("5. pre_built_big_stream,select,$pre_built_big_stream_href->{_is_superflow_select_button}\n");
+#    print("5. pre_built_big_stream,select,prog_name=${$prog_name_sref}\n");
     $param_widgets->gui_full_clear();
-    $param_widgets->range($pre_built_big_stream_href);
+    $param_widgets->range( $pre_built_big_stream_href);
     $param_widgets->set_labels( $pre_built_big_stream_href->{_names_aref} );
     $param_widgets->set_values( $pre_built_big_stream_href->{_values_aref} );
     $param_widgets->set_check_buttons( $pre_built_big_stream_href->{_check_buttons_settings_aref} );
@@ -255,9 +265,9 @@ sub select {
     # that links their GUI name to their program name
     # e.g., iVelAnalysis (GUI) is actually IVA.pm (shortened)
 
-    my $run_name = $name->get_alias_superflow_names($prog_name_sref);
-
-    # print("pre_built_big_stream,select,run_name: $run_name\n");
+     my $run_name = $internal_name;;
+    
+#    print("pre_built_big_stream,select,run_name: $run_name\n");
 
     $binding->set_prog_name_sref( \$run_name );
     $binding->set_values_w_aref( $param_widgets->get_values_w_aref );

@@ -5,18 +5,30 @@ use Moose;
 
 count
 
- PERL PROGRAM NAME: copyNclean_seg_up.pl
+ PERL PROGRAM NAME: copyNclean_sgy_up.pl
  AUTHOR: 	Juan Lorenzo
  DATE: 		Nov. 23 2023
 
  DESCRIPTION 
-     count occurrences of strings in a list
+     Count occurrences of strings in a list
+     Output a new file and filename in one
+     directory above current one, which is usually 
+     called "raw"
+     
+     Remove beginning zeros and renames
+     "sgy" extension to "segy" extension
+     
+     executable shell script exists:
+     copyNclean_segy_up
 
  BASED ON:
 
 =cut
 
 =head2 USE
+
+	From the command line:
+	      copyNclean_segy_up
 
 =head3 NOTES
 

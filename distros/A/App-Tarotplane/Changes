@@ -1,5 +1,26 @@
 Revision history for perl module App::Tarotplane
 
+2.00 Tue 5 Nov 2024
+  This update uses a new card file format which is incompatible with the
+  previous one. You are going to have to rewrite your card files to conform to
+  the new format.
+  Added:
+    - Repository info to META files.
+    - App::Tarotplane get() POD.
+  Fixes:
+    - Add missing $VERSIONs to modules.
+    - App::Tarotplane::UI POD typos.
+    - Removed irrelevant README info.
+    - App::Tarotplane::UI should now be able to recover the terminal if an error
+      occurs during init().
+  Changes:
+    - New card format is used. '%' lines are used as card delimits instead of
+      newlines.
+    - New card file example in manual.
+    - Error messages now report bad card number instead of line number.
+  Removed:
+    - demo.gif from distribution.
+
 1.00 Thu 31 Oct 2024
   This release features a lot of changes related to the project's structure, as
   this is intended to be the first release published on CPAN.

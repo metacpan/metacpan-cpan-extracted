@@ -20,7 +20,7 @@ my $flow_type        = $get->flow_type_href();
 my $PS_SEISMIC        = $Project->PS_SEISMIC();    # output data directory
 my $DATA_SEISMIC_SU   = $Project->DATA_SEISMIC_SU();    # output data directory
 my $PL_SEISMIC        = $Project->PL_SEISMIC();
-my $max_index         = 61;
+my $max_index         = 60;
 
 my $supswigb_spec = {
     _CONFIG	 			   => $PL_SEISMIC,

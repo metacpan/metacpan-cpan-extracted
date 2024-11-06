@@ -83,7 +83,7 @@ use Rex::Commands -no => [qw/auth/];
 use Rex::Commands::Fs;
 use Rex::Commands::Cloud;
 
-our $VERSION = '1.14.3'; # VERSION
+our $VERSION = '1.15.0'; # VERSION
 
 BEGIN {
   LWP::UserAgent->use;

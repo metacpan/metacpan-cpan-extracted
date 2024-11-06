@@ -46,6 +46,10 @@ Seismic unix program
 
 You will need to
 
+0. make sure that the documentation
+exists for the program in the 
+"Stripped"  directory
+
 1. populate the following file:
 ~/developer/code/sunix/nameNnumber.txt
 
@@ -59,24 +63,28 @@ module: sudocpm_nameNnumber.pm
 
  Program group names and numbers:
 
-$developer_sunix_categories[0]  = 'data';
-$developer_sunix_categories[1]  = 'datum';
-$developer_sunix_categories[2]  = 'plot';
-$developer_sunix_categories[3]  = 'filter';
-$developer_sunix_categories[4]  = 'header';
-$developer_sunix_categories[5]  = 'inversion';
-$developer_sunix_categories[6]  = 'migration';
-$developer_sunix_categories[7]  = 'model';
-$developer_sunix_categories[8]  = 'NMO_Vel_Stk';
-$developer_sunix_categories[9]  = 'par';
-$developer_sunix_categories[10] = 'picks';
-$developer_sunix_categories[11] = 'shapeNcut';
-$developer_sunix_categories[12] = 'shell';
-$developer_sunix_categories[13] = 'statsMath';
-$developer_sunix_categories[14] = 'transform';
-$developer_sunix_categories[15] = 'well';
-$developer_sunix_categories[16] = 'unix';
+$developer_sunix_categories[0]  = 'data'; 22
+$developer_sunix_categories[1]  = 'datum'; 4
+$developer_sunix_categories[2]  = 'plot'; 40
+$developer_sunix_categories[3]  = 'filter'; 21
+$developer_sunix_categories[4]  = 'header'; 37
+$developer_sunix_categories[5]  = 'inversion'; 3
+$developer_sunix_categories[6]  = 'migration'; 21
+$developer_sunix_categories[7]  = 'model'; 39
+$developer_sunix_categories[8]  = 'NMO_Vel_Stk'; 32
+$developer_sunix_categories[9]  = 'par'; 16
+$developer_sunix_categories[10] = 'picks'; NA
+$developer_sunix_categories[11] = 'shapeNcut'; 11
+$developer_sunix_categories[12] = 'shell'; 4 (of which 2 are My linux)
+$developer_sunix_categories[13] = 'statsMath'; 19
+$developer_sunix_categories[14] = 'transform'; 15
+$developer_sunix_categories[15] = 'well'; 6
+$developer_sunix_categories[16] = 'unix'; NA
 $developer_sunix_categories[17] = '';
+total modules: 290
+Total Tools; 13 2-linux, 1-C, 1 sioseis, 1 fortran
+
+
 
 2. Finally, before your run sudoc2pm.pt1.pl enter a line in
 L_SU_global_constants.pm e.g., 
@@ -109,7 +117,7 @@ See for example ~/developer/Stripped/migration/sukdmig3d_changes.txt
 The number points to the parameter label seen in the gui
 The data type abbreviation binds a clicking action to
 open the correct directory for that file type. For example,
-su will open $DATAS_SEISMIC_SU
+su will open $DATA_SEISMIC_SU
 
 2. Also check to see in
 ~/configs/
@@ -117,7 +125,7 @@ su will open $DATAS_SEISMIC_SU
 program_name.config
 
 e.g.,
-~/congigs/statsMath/suop.config
+~/configs/statsMath/suop.config
 
 
 =item

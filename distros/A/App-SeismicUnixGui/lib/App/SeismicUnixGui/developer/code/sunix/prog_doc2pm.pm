@@ -269,12 +269,11 @@ sub get_path_out4configs {
 
 	if ( $prog_doc2pm->{_group_directory} ne $empty_string ) {
 
-		# my $path 	= '/usr/local/pl/L_SU/configs';
 		my $dir = $prog_doc2pm->{_group_directory};
 
 		my $PATH_OUT = $global_libs->{_configs} . '/' . $dir;
 
-		# print("prog_doc2pm,get_path_out = $PATH_OUT\n");
+#		print("prog_doc2pm,get_path_out4configs = $PATH_OUT\n");
 		return ($PATH_OUT);
 
 	} else {

@@ -287,9 +287,9 @@ What program do you want?
 sub set_program {
 	my ( $self, $program_name, $group_number ) = @_;
 
-#	print(
-#"update, set_program , group_number category=$group_number, program_name=$program_name\n"
-#	);
+	print(
+"update, set_program , group_number category=$group_number, program_name=$program_name\n"
+	);
 
 	if (   length $program_name
 		&& length $group_number )
@@ -348,7 +348,7 @@ search lines
 		my ( $start_prefix_line,           $end_prefix_line );
 		my ( $start_suffix_line,           $end_suffix_line );
 
-		my $start_binding_index_line2find = '# first binding index \(index=0\)';
+		my $start_binding_index_line2find = '# e.g., first binding index \(index=0\)';
 		my $end_binding_index_line2find   = '= 8; # outbound item is  bound';
 		my $end_file_dialog_type_line2find =
 		  '#	\$type\[\$index\[2\]\]	=  \$file_dialog_type->\{_Data\};';
@@ -418,7 +418,7 @@ my $additional_suffix_change  	=
 
 		for ( my $i = 0 ; $i < $length_of_slurp ; $i++ ) {
 
-			#			print("update,All sunix documentation $slurp[$i]\n");
+#			print("update,All sunix documentation $slurp[$i]\n");
 
 			my $string = $slurp[$i];
 
@@ -540,9 +540,9 @@ sub set_spec_changes_base_file_name {
 
 		$update->{_spec_changes_base_file_name} = $spec_changes_base_file_name;
 
-#		print(
-#"update, set_spec_changes_base_file_name,spec_changes_base_file_name=$spec_changes_base_file_name\n"
-#		);
+		print(
+"update, set_spec_changes_base_file_name,spec_changes_base_file_name=$spec_changes_base_file_name\n"
+		);
 
 	}
 	else {
@@ -755,7 +755,7 @@ where "max_index" line" is found
 
 				if ( $string =~ /$spec_string_to_find/ ) {
 
-#					print("a spec success\n");
+					#					print("a spec success\n");
 
 					$slurp[$i] = $spec_replacement_string;
 
@@ -777,7 +777,7 @@ where "max_index" line" is found
 
 				for ( my $i = 0 ; $i < $length_of_slurp ; $i++ ) {
 
-					print ("$slurp[$i]\n");
+					print("$slurp[$i]\n");
 					print OUT $slurp[$i] . "\n";
 
 				}

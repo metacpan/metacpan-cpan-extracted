@@ -1,0 +1,53 @@
+ SEG2SEGY - read an SEG-Y tape
+ 			
+ Usage: seg2segy first-seg2file number-of-files [shot-number]
+
+ Required parameters:	
+  first-seg2file=
+  number-of-files=
+
+the result will be a file named
+
+first-seg2file.sgy
+
+segyread tape=first-seg2file.sgy verbose=1 endian=BYTE conv=0 |
+segyclean > data.su
+
+Note that this version of seg2segy does not convert from ieee to
+SEGY fortran, it only swaps bytes so that the endian is correct.
+
+BYTE=0   for little endian platforms
+BYTE=1   for big endian platforms
+
+Update: 7 Dec 2019:
+The seg2segy.c code has been modified to compile under 64 bit 
+and the tmpnam call has been replaced with mkstemp.
+
+To test the demo files type:
+
+to convert the first file only
+seg2segy 329.dat 1 
+
+The segyread program autodetects the endian so this should be all
+you need to type:
+segyread tape=329.sgy verbose=1 | segyclean > 329.su
+
+suxwigb < 329.su
+
+or
+
+suxwigb < 329.su perc=99
+
+will show 3 test traces with oscillatory signals.
+
+The other files are simply copies of the first file
+
+seg2segy 329.dat 4 
+
+segyread tape=329.sgy verbose=1 | segyclean > 329.su
+
+suxwigb < 329.su 
+
+The result will be the same 3 seismic traces repeated 4 times
+
+suxwigb < 329.su  perc=99

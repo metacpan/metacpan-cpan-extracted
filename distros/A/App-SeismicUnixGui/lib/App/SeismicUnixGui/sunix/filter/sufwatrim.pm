@@ -4,7 +4,7 @@ package App::SeismicUnixGui::sunix::filter::sufwatrim;
 
 PERL PROGRAM NAME: 
 
-AUTHOR: Juan Lorenzo (Perl module only)
+AUTHOR:  
 
 DATE:
 
@@ -279,7 +279,7 @@ max index = number of input variables -1
  
 sub get_max_index {
  	  my ($self) = @_;
-    my $max_index = 36;
+	my $max_index = 4;
 
     return($max_index);
 }

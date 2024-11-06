@@ -15,22 +15,19 @@ package App::SeismicUnixGui::big_streams::iPick;
 
 =head2 USE
 
-=head3 NOTES 
-
- "purpose" is now exclusively 'geopsy', in which case the processing
+ When "purpose" is 'geopsy', the processing
  is slightly different and
  the output directories and files have a unique format
  
  ep is an appropriated gather header. 
- If you do not want to have ep
- defined as a gather header variable, then the following is allowed:
- p=0
-ep max=0 a
-ep min=0  
+ If you do not want to have ep defined as a gather header 
+ variable, then the following is allowed:
+ ep =0
+ ep max=0
+ ep min=0  
+
+ ??JML TODO
  
-
-=head4
-
  Examples:
 
      base_file_name  	= 30Hz_All_geom_geom;
@@ -39,7 +36,7 @@ ep min=0
      first_gather   	= 1;
      gather_inc    		= 1;
      last_gather    	= 100;
-     freq    		    = 0,3,100,200;  or freq = (can be left empty without any values as well)
+     freq    		    = 0,3,100,200;       (Hz; can be left empty without any values as well)
      **gather_type    	= fldr;
      min_amplitude      = .0;
      max_amplitude      = .75;
@@ -53,10 +50,35 @@ ep min=0
       ** Define family of interactive user messages to use
           SP or CDP
 
-=head3 SEISMIC UNIX NOTES  
+=head2 Examples
 
-=head4 CHANGES and their DATES
+=head2 SEISMIC UNIX NOTES
 
+=head2 STEPS
+
+=head2 Perl NOTES 
+
+ We are using Moose
+ Moose already declares that you need debuggers turned on
+ so you don't need a line like the following:
+ use warnings;
+ 
+ For the iPick tool and in  order to prevent redefining subroutines
+ we implement new modulesB,C,D ...
+ 
+ Both of the following instantiate iPick_spec.pm
+ --iPick_config 
+ 			calls 
+ 		config_superflows 
+ 		    calls 
+ 		big_streams_param 
+ 			which requires and instantiates iPick_spec
+ --iPick.pm
+ 		uses and instantiates iPick_specB.pm
+ 		uses iShowNselect_picks
+ 		      which instantiates iPick_specC
+ 		uses iSelect_xt
+ 			  which instantiates iPick_specD		
 
 =cut
 

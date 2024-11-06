@@ -33,7 +33,7 @@ Modules
 use Moose;
 our $VERSION = '0.0.2';
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
-use namespace::autoclean;    # best-practices hygiene
+#use namespace::autoclean;    # best-practices hygiene
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 
 =head2 Instantiation

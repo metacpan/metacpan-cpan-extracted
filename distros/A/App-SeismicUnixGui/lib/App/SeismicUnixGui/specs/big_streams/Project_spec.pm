@@ -20,7 +20,6 @@ my $Project = Project_config->new();
 my $DATA_SEISMIC_SU = $Project->DATA_SEISMIC_SU();      # output data directory
 my $PL_SEISMIC      = $Project->PL_SEISMIC();
 
-#print("Project_spec,PL_SEISMIC=$PL_SEISMIC\n");
 my $max_index = $Project->get_max_index();
 
 my $Project_spec = {

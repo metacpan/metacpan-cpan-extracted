@@ -104,7 +104,7 @@ sub set_prog_name_sref {
 	if ($name_sref) {
 		$binding->{_prog_name_sref} = $name_sref;
 
-		# print("binding, set_prog_name_sref , $binding->{_prog_name_sref}\n");
+#		print("binding, set_prog_name_sref , ${$binding->{_prog_name_sref}}\n");
 
 	}
 	else {
@@ -176,9 +176,9 @@ sub set {
 	my ($self) = @_;
 
 	my $program_name = ${ $binding->{_prog_name_sref} };
-
+#	print("binding $program_name\n");
 	$L_SU_path->set_program_name($program_name);
-	
+
 	my $pathNmodule_spec_w_slash_pm  = $L_SU_path->get_pathNmodule_spec_w_slash_pm();
 	my $pathNmodule_spec_w_colon     = $L_SU_path->get_pathNmodule_spec_w_colon();
 

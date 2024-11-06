@@ -7,7 +7,7 @@ package Rex::Test::Base::has_service_running;
 use v5.12.5;
 use warnings;
 
-our $VERSION = '1.14.3'; # VERSION
+our $VERSION = '1.15.0'; # VERSION
 
 use Rex -base;
 use base qw(Rex::Test::Base);

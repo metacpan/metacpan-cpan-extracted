@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+eg/Makefile
+eg/cpanfile
+eg/rhythm.pl
+eg/synopsis.pl
+lib/Game/EnergyLoop.pm
+t/00-load.t
+t/10-update.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

@@ -42,7 +42,7 @@ my @inbound;
 my @outbound_bck;
 my @outbound;
 my ( @line2find, @replacement );
-my $max_num_files = 5;   # +1!
+my $max_num_files = 6;   # +1!
 
 my $up3dirs = '/../../..';
 my $up4dirs = '/../../../..';
@@ -53,8 +53,8 @@ and file
 =cut
 
 my $local       = getcwd();
-my $old_version = '0.87.0';
-my $new_version = '0.87.1';
+my $old_version = '0.87.1';
+my $new_version = '0.87.2';
 
 my $i = 0;
 $line2find[$i]   = ("L_SUV$old_version.pl");
@@ -94,6 +94,14 @@ $i = 4;
 $line2find[$i]     = "'SeismicUnixGuiInstallationGuide$old_version.pdf';";
 print("line2find   = $line2find[$i]\n");
 $replacement[$i] = "'SeismicUnixGuiInstallationGuide$new_version.pdf';";
+print("replacement = $replacement[$i]\n");
+$file[$i]         = 'help_button_messages.pm';
+$path2file[$i]    = $local . $up3dirs . '/messages';
+
+$i = 5;
+$line2find[$i]     = "'SeismicUnixGuiTutorial$old_version.pdf';";
+print("line2find   = $line2find[$i]\n");
+$replacement[$i] = "'SeismicUnixGuiTutorial$new_version.pdf';";
 print("replacement = $replacement[$i]\n");
 $file[$i]         = 'help_button_messages.pm';
 $path2file[$i]    = $local . $up3dirs . '/messages';
@@ -157,5 +165,6 @@ for ( my $count = 0 ; $count < $max_num_files; $count++ ) {
 
 }
 
-print("Do not forget to update the name of the SeismicUnixGuiInstallationGuide too\n
-	   As well, update the contents of the file if necessary");
+print("Do not forget to update the internal name of the SeismicUnixGuiInstallationGuide \n
+       and SeismicUnixTutorial too.\n
+	   As well, update other contents of the file as necessary");

@@ -278,7 +278,7 @@ use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
     _wbox                                      => '',
     _wigclip                                   => '',
     _wt                                        => '',
-    _windowtitle                               => '',
+#    _windowtitle                               => '',
     _x2beg                                     => '',
     _xstart_m                                  => '',
     _x2end                                     => '',
@@ -421,7 +421,7 @@ sub clear {
     $supswigp->{_wbox}                                      = '';
     $supswigp->{_wigclip}                                   = '';
     $supswigp->{_wt}                                        = '';
-    $supswigp->{_windowtitle}                               = '';
+#    $supswigp->{_windowtitle}                               = '';
     $supswigp->{_x2beg}                                     = '';
     $supswigp->{_xstart_m}                                  = '';
     $supswigp->{_x2end}                                     = '';
@@ -2220,27 +2220,27 @@ sub wigclip {
     }
 }
 
-=head2 sub windowtitle 
-
-
-=cut
-
-sub windowtitle {
-
-    my ( $self, $windowtitle ) = @_;
-    if ( $windowtitle ne $empty_string ) {
-
-        $supswigp->{_windowtitle} = $windowtitle;
-        $supswigp->{_note} =
-          $supswigp->{_note} . ' windowtitle=' . $supswigp->{_windowtitle};
-        $supswigp->{_Step} =
-          $supswigp->{_Step} . ' windowtitle=' . $supswigp->{_windowtitle};
-
-    }
-    else {
-        print("supswigp,missing windowtitle,\n");
-    }
-}
+#=head2 sub windowtitle 
+#
+#
+#=cut
+#
+#sub windowtitle {
+#
+#    my ( $self, $windowtitle ) = @_;
+#    if ( $windowtitle ne $empty_string ) {
+#
+#        $supswigp->{_windowtitle} = $windowtitle;
+#        $supswigp->{_note} =
+#          $supswigp->{_note} . ' windowtitle=' . $supswigp->{_windowtitle};
+#        $supswigp->{_Step} =
+#          $supswigp->{_Step} . ' windowtitle=' . $supswigp->{_windowtitle};
+#
+#    }
+#    else {
+#        print("supswigp,missing windowtitle,\n");
+#    }
+#}
 
 =head2 sub wt 
 
@@ -2824,7 +2824,7 @@ max index = number of input variables -1
 
 sub get_max_index {
     my ($self) = @_;
-    my $max_index = 53;
+    my $max_index = 52;
 
     return ($max_index);
 }

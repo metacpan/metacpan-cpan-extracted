@@ -1,5 +1,5 @@
 package App::Tarotplane;
-our $VERSION = '1.00';
+our $VERSION = '2.00';
 use 5.016;
 use strict;
 use warnings;
@@ -213,6 +213,32 @@ tarotplane.
 =head2 $tarotplane->run()
 
 Runs tarotplane.
+
+=head2 $tarotplane->get($get)
+
+Get member $get from $tarotplane. The following are valid gets:
+
+=over 4
+
+=item Files
+
+Array ref of supplied file arguments.
+
+=item Sort
+
+Sort method used, see %CARD_SORT below.
+
+=item OrderBy
+
+If ordering cards, what to order by. Can either be 'Term' or 'Definition'.
+
+=item First
+
+Which card side to display first. Can either be 'Term' or 'Definition'.
+
+=back
+
+get() primarily exists for testing purposes.
 
 =head1 Global Variables
 

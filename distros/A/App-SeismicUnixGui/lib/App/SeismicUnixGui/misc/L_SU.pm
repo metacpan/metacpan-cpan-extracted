@@ -998,25 +998,39 @@ sub help_menubutton {
 
 	my $help_menubutton_type = $get->help_menubutton_type_href();
 
-	if ( length $install_option_ref
-		and $$install_option_ref eq $help_menubutton_type->{_About} )
-	{
+	if ( length $install_option_ref ) {
 
-		my $item    = $alias_help_menubutton_label_h->{_About};
-		my $message = $message_director->help_button($item);
+		if ( $$install_option_ref eq $help_menubutton_type->{_About} )
+		{
 
-	}
-	elsif ( length $install_option_ref
-		and $$install_option_ref eq $help_menubutton_type->{_InstallationGuide}
-	  )
-	{
+			my $item    = $alias_help_menubutton_label_h->{_About};
+			my $message = $message_director->help_button($item);
 
-		my $item    = $alias_help_menubutton_label_h->{_InstallationGuide};
-		my $message = $message_director->help_button_pdf($item);
+		}
+		elsif ( $$install_option_ref eq
+			$help_menubutton_type->{_InstallationGuide} )
+		{
+
+			my $item    = $alias_help_menubutton_label_h->{_InstallationGuide};
+			my $message = $message_director->help_button_pdf($item);
+
+		}
+		elsif ( $$install_option_ref eq $help_menubutton_type->{_Tutorial} )
+		{
+
+			my $item    = $alias_help_menubutton_label_h->{_Tutorial};
+			my $message = $message_director->help_button_pdf($item);
+
+		}
+		else {
+			carp("L_SU, can not provide help\n");
+			print("Help button option = $$install_option_ref\n");
+		}
+
 	}
 	else {
-		carp("L_SU, can not provide help\n");
-		print("Help button option = $$install_option_ref\n");
+		carp("L_SU, help_menubutton\n");
+		print("missing value\n");
 	}
 
 	return ();
@@ -1105,7 +1119,7 @@ sub initialize_messages {
 sub pre_built_superflows {
 	my ( $self, $superflow_name_sref ) = @_;
 
-# print("2. L_SU,pre_built_superflows ,superflow_name_sref=$$superflow_name_sref\n");
+#print("2. L_SU,pre_built_superflows ,superflow_name_sref=$$superflow_name_sref\n");
 
 	if ($superflow_name_sref) {
 
@@ -1262,8 +1276,7 @@ sub set_run_button {
 
 					}
 					else {
-						print("L_SU,set_run_button, missing conditions\n")
-						  ;
+						print("L_SU,set_run_button, missing conditions\n");
 						my $message = $message_director->run_button(1);
 
 						# a blank message

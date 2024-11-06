@@ -72,10 +72,17 @@ my $readfiles = {
 =cut
 
 sub clear {
-	$readfiles->{_note}         = '';
-	$readfiles->{_ref_file}     = '';
-	$readfiles->{_program_name} = '';
-	$readfiles->{_Step}         = '';
+	$readfiles->{_note}                = '';
+	$readfiles->{_ref_file}            = '';
+	$readfiles->{_file_name}           = '';
+	$readfiles->{_parameter}           = '';
+	$readfiles->{_path}                = '';
+	$readfiles->{_program_name}        = '';
+	$readfiles->{_program_name_config} = '';
+	$readfiles->{_skip_lines}          = '';
+	$readfiles->{_program_name}        = '';
+	$readfiles->{_value}               = '';
+	$readfiles->{_Step}                = '';
 }
 
 =head2 sub cols_1 
@@ -178,7 +185,7 @@ sub cols_1p {
 	if ($ref_origin) {
 		$readfiles->{_ref_file} = $ref_origin;
 
-#	   print ("\n readfiles, cols_1, The input file is called $ref_origin\n");
+	#	   print ("\n readfiles, cols_1, The input file is called $ref_origin\n");
 		open( FILE, $readfiles->{_ref_file} )
 		  || print("Can't open file_name, $!\n");
 
@@ -225,7 +232,7 @@ sub cols_1p {
 sub cols_2p {
 
 	my ( $files, $ref_file ) = @_;
-	
+
 	$readfiles->{_ref_file} = $$ref_file if defined($ref_file);
 
 	#print '$$ref_file= '.$$ref_file."\n\n";
@@ -370,6 +377,7 @@ sub cols_2 {
 #	my $cfg;
 #	use Moose;
 our $VERSION = '0.0.1';
+
 #	# use Config::Simple;
 #	use name;
 #use App::SeismicUnixGui::misc::control '0.0.3';
@@ -686,17 +694,21 @@ sub cfg {
 sub configs {
 	my ( $self, $program ) = @_;
 
-	if ($program) {
+	my @parameter;
+	my @value;
+
+	if ( length $program ) {
 
 		my $control = control->new();
-		my ( @parameter, @value );
-		my ( $this,      $eq );
+		my ( $this, $eq );
 
 		$this = $program;
 
 #		print("readfiles,configs,this program is:$this\n");
-		my ( $i, $t, $t_whole, $x, $line, $max_index );
+		my ($t, $t_whole, $x, $line, $max_index );
 		
+		my $index=0;
+
 		open( my $IN, '<', $this )
 		  or die "readfiles,configs: Can't open parameter file: '$this' $!";
 
@@ -740,59 +752,37 @@ sub configs {
 
 =cut
 
-		$i = 0;
-		while ( $line = <$IN>) {
+		while ( $line = <$IN> ) {
 
-#			print("1. readfiles,configs:raw line $i is $line\n");
+#			print("1. readfiles,configs:raw line $index is $line\n");
 			chomp($line);
 
    # skip lines starting where first non-white character is
    # modify 'm' starts ^ and ends $ as pertaining to each line and not each file
-#   print("2. readfiles,configs:chomped line $i is $line\n");
+#      print("2. readfiles,configs:chomped line num is $line\n");
 			next if $line =~ /^\s*#/m;
 
-#	print("3.0 readfiles,configs:these lines have no starting '#' $i is $line\n");
+#	print("3.0 readfiles,configs:these lines have no starting '#' is $line\n");
 
 			# trim white spaces from both ends
 			$line =~ s/^\s+|\s+$//g;
 
-#	print("3-1. readfiles,configs white spaces removed from ends,line $i is $line\n");
+#	print("3-1. readfiles,configs white spaces removed from ends,line is $line\n");
 
 			# split line using =
 			( $t_whole, $x ) = split( /\s+=\s*/, $line );
 			$t = $t_whole;    # redundant in long run unless the
 							  # following changes
 
-	#		  #  Only first of a composite set of labels e.g. boundary_conditions|abs
-	#			if ( defined $t_whole
-	#				&& $t_whole ne $empty_string )
-	#			{
-	#				my @t_split = $t_whole =~ m/(\w+)/;
-	#				$t       	= $t_split[0];
-	#
-	#			}
-	#			else {
-	#				$t			= $t_whole;
-	#				# print(" readfiles,configs, unexpected empty label ,NADA\n");
-	#			}
-
-			# print("3-1a. readfiles,configs $t\t$x \n");
-
-			#			print("3-1b. readfiles,configs $t\t$x \n");
+#			print("3-1b. readfiles,configs $t\t$x \n");
 
 			$x = $control->get_no_quotes($x);
 
-			# print("3-1b. readfiles,configs $t\t$x \n");
+#			print("3-1b. readfiles,configs $t\t$x \n");
 
-# establish which program is active in the flow 7.10.21
-#		$color_flow_href->{_prog_names_aref} = $param_flow_color_pkg->get_flow_prog_names_aref();
-#   	    $control->set_flow_prog_names_aref($color_flow_href->{_prog_names_aref});
-#   	    $control->set_flow_prog_name_index($most_recent_flow_index_touched);
-# add single strings to the start and end if we do have a string
-# but do nothing if it is a number
 			$x = $control->get_string_or_number($x);
 
-			# print("3-1c. readfiles,configs $t\t$x \n");
+#			print("3-1c. readfiles,configs $t\t$x \n");
 
 			# only print out lines that are not empty
 			if ($t) {
@@ -805,19 +795,19 @@ sub configs {
 				# test for "bad" x values
 				if ( not defined $x ) {
 
-					# print( "readfiles,configs, x is undefined\n");
+#					print( "readfiles,configs, x is undefined\n");
 					# print("                    replace x=$x  with ''\n");
 					$x = '';
 
 				}
 				elsif ( $x eq "''" ) {
 
-			  # print( "readfiles,configs, x is --$x--i.e., an empty string\n");
+#			  print( "readfiles,configs, x is --$x--i.e., an empty string\n");
 			  # print("                    replace x=$x  with ''\n");
 				}
 				elsif ( $x =~ /^ *$/ ) {
 
-				   # print( "readfiles,configs, x contains 0 or more spaces\n");
+#				   print( "readfiles,configs, x contains 0 or more spaces\n");
 				   # print("                    replace x=$x  with ''\n");
 					$x = '';
 				}
@@ -827,23 +817,32 @@ sub configs {
 					# print("                    replace x=$x  with ''\n");
 				}
 
-				# assume ALL bad x value shave been caught , including x=0
+				# assume ALL bad x values have been caught , including x=0
 
-			  # print("5-1. readfiles,configs:parameter name, value : $t,$x\n");
-				$parameter[$i] = $t;
-				$value[$i]     = $x;
+#		        print("5-1. readfiles,configs:parameter name, value : $t,$x\n");
+				$parameter[$index] = $t;
+				$value[$index]     = $x;
 
-				# print("5-2. readfiles,configs: parameter,value :
-				# --$parameter[$i]--,--$value[$i]--\n");
-				$i++;
-			}
-		}
+#				print(
+#					"5-2. index=$index; readfiles,configs: parameter,value :
+#				 --$parameter[$index]--,--$value[$index]--\n"
+#				);
+			} # only non-empty lines
+			
+		$index++;	
+		} # end of while
+
+#		my $long = scalar @parameter;
+#		print("L 837 long = $long\n");
+# N.B. Read many times
 		close($IN);
 		$readfiles->{_parameter} = \@parameter;
 		$readfiles->{_value}     = \@value;
+
 		return ( \@parameter, \@value );
 
 	}    # end program
+
 }    # end sub
 
 =head2 sub get_cols_3 

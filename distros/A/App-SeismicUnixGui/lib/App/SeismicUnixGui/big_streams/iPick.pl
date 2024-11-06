@@ -16,13 +16,49 @@
 
 =head2 USE
 
+ When "purpose" is 'geopsy', the processing
+ is slightly different and
+ the output directories and files have a unique format
+ 
+ ep is an appropriated gather header. 
+ If you do not want to have ep defined as a gather header 
+ variable, then the following is allowed:
+ ep =0
+ ep max=0
+ ep min=0  
+ 
+ ??JML TODO
+
+
+ Examples:
+
+     base_file_name  	= 30Hz_All_geom_geom;
+     gather_header  	= fldr;   (single gather type for picking)
+     offset_type  		= tracl;  (or, e.g., offset but only affects the label *)
+     first_gather   	= 1;
+     gather_inc    		= 1;
+     last_gather    	= 100;
+     freq    		    = 0,3,100,200;       (Hz; can be left empty without any values as well)
+     **gather_type    	= fldr;
+     min_amplitude      = .0;
+     max_amplitude      = .75;
+     min_x1             = 15.873015           (Hz, for geopsy)
+     max_x1             = 999.999             (Hz, for geopsy)
+     purpose            = geopsy
+      
+      * if you want offset to be considered when plotting data
+      then modify the d2 and f2 values prior to picking.
+      
+      ** Define family of interactive user messages to use
+          SP or CDP
+
 =head2 Examples
 
 =head2 SEISMIC UNIX NOTES
 
 =head2 STEPS
 
-=head2 NOTES 
+=head2 Perl NOTES 
 
  We are using Moose
  Moose already declares that you need debuggers turned on
@@ -44,7 +80,7 @@
  		uses iShowNselect_picks
  		      which instantiates iPick_specC
  		uses iSelect_xt
- 			  which instantiates iPick_specD
+ 			  which instantiates iPick_specD		
 
 =cut
 

@@ -9,9 +9,9 @@ use Log::ger;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-17'; # DATE
+our $DATE = '2024-11-05'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionFacts'; # DIST
-our $VERSION = '0.027'; # VERSION
+our $VERSION = '0.028'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_show_nutrition_facts
@@ -46,6 +46,22 @@ my @output_formats = (qw/
                                            calculation_html calculation_text
 /);
 # horizontal_html_table horizontal_text_table formats not supported yet
+
+sub _add_real_and_nufact_args {
+    my %args = @_;
+    my %res;
+    for my $key (keys %args) {
+        $res{$key} = $args{$key};
+        $res{"${key}_nufact"} = {
+            summary => "$args{$key}{summary} (value to be used in nutrition facts table instead the lab test result)",
+            schema => $args{$key}{schema},
+        };
+        $res{"${key}_nufact_note"} = {
+            schema => "str*",
+        };
+    }
+    %res;
+}
 
 $SPEC{bpom_show_nutrition_facts} = {
     v => 1.1,
@@ -82,6 +98,7 @@ _
             tags => ['category:output'],
         },
 
+        _add_real_and_nufact_args(
         fat           => {summary => 'Total fat, in g/100g'           , schema => 'ufloat*', req=>1},
         saturated_fat => {summary => 'Saturated fat, in g/100g'       , schema => 'ufloat*', req=>1},
         cholesterol   => {summary => 'Cholesterol, in mg/100g'        , schema => 'ufloat*'},
@@ -115,9 +132,12 @@ _
         zn            => {summary => 'Zinc, in mg/100g', schema => 'ufloat*'},
         se            => {summary => 'Selenium, in mcg/100g', schema => 'ufloat*'},
         fluorine      => {summary => 'Fluorine, in mg/100g', schema => 'ufloat*'},
+        ),
 
         serving_size  => {summary => 'Serving size, in g'             , schema => 'ufloat*', req=>1},
         package_size  => {summary => 'Packaging size, in g'           , schema => 'ufloat*', req=>1},
+
+        has_claims    => {summary => 'Whether food is registered as having claims', schema=>'bool*'},
     },
 
     examples => [
@@ -737,20 +757,37 @@ sub bpom_show_nutrition_facts {
             };
 
             my $do_vm = sub {
-                my ($name_ind, $val0, $akg, $unit, $name_eng) = @_;
+                my ($sym, $name_ind, $akg, $unit, $name_eng) = @_;
+
+                my $val0 = $args{$sym};
+                my $val0_nufact = $args{"${sym}_nufact"};
+                my $nufact_note = $args{"${sym}_nufact_note"};
+
+                if (defined $val0_nufact) {
+                    if ($args{has_claims}) {
+                        if ($val0 < $val0_nufact) {
+                            die "$name_eng: In food with claims, value in lab test result ($val0) must be greater than or equal to value to be shown in nufacts";
+                        }
+                    } else {
+                        if ($val0 < $val0_nufact * 0.8) {
+                            die "$name_eng: In food without claims, value in lab test result ($val0) must at least be 80% of value to be shown in nufacts";
+                        }
+                    }
+                    $val0 = $val0_nufact;
+                }
 
                 $name_eng //= $name_ind;
                 my $val  = $val0*$args{$size_key}/100;
                 my $pct_dv = $val/$akg *100;
                 my $pct_dv_R = $code_round_vitamin_mineral_pct_dv->($pct_dv, $pct_dv);
                 if ($pct_dv_R < 2) {
-                    warn "$name_eng value is below 2% AKG, skipped showing in nutrition facts\n";
+                    die "$name_eng value is below 2% AKG, can't show in nutrition facts\n";
                     return;
                 }
-                $funcraw->{va_pct_dv_per_srv} = $pct_dv           if !$per_package_ing;
-                $funcraw->{va_pct_dv_per_srv_rounded} = $pct_dv_R if !$per_package_ing;
-                $funcraw->{va_pct_dv_per_pkg} = $pct_dv           if  $per_package_ing;
-                $funcraw->{va_pct_dv_per_pkg_rounded} = $pct_dv_R if  $per_package_ing;
+                $funcraw->{"${sym}_pct_dv_per_srv"} = $pct_dv           if !$per_package_ing;
+                $funcraw->{"${sym}_pct_dv_per_srv_rounded"} = $pct_dv_R if !$per_package_ing;
+                $funcraw->{"${sym}_pct_dv_per_pkg"} = $pct_dv           if  $per_package_ing;
+                $funcraw->{"${sym}_pct_dv_per_pkg_rounded"} = $pct_dv_R if  $per_package_ing;
                 if ($output_format eq 'raw_table') {
                     push @rows_vm, {
                         name_eng => $name_eng,
@@ -768,8 +805,8 @@ sub bpom_show_nutrition_facts {
                 } elsif ($output_format =~ /calculation/) {
                     push @rows_vm, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->("*$name_ind*")}];
                     push @rows_vm, [{align=>'right', text=>"$name_ind per 100 g"},
-                                     {align=>'left', $attr=>"= $args{va} $unit"}];
-                    push @rows_vm, [{align=>'right', text=>"Vitamin A total per ".($per_package_ing ? "kemasan $args{package_size} g" : "takaran saji $args{serving_size} g")},
+                                     {align=>'left', $attr=>"= $val0 $unit"}];
+                    push @rows_vm, [{align=>'right', text=>"$name_ind total per ".($per_package_ing ? "kemasan $args{package_size} g" : "takaran saji $args{serving_size} g")},
                                      {align=>'left', $attr=>"= $val0 $M $args{$size_key} / 100 = $val $unit"}];
                     push @rows_vm, ['', ''];
                     push @rows_vm, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->("*%AKG $name_ind*")}];
@@ -780,32 +817,32 @@ sub bpom_show_nutrition_facts {
                 }
             }; # do_vm
 
-            $do_vm->("Vitamin A", $args{va}, 600, "mcg (all-trans-)retinol") if $args{va};
-            $do_vm->("Vitamin D", $args{vd}, 15, "mcg") if $args{vd};
-            $do_vm->("Vitamin E", $args{ve}, 15, "mg alpha-TE (tocopherol-equivalent)") if $args{ve};
-            $do_vm->("Vitamin K", $args{vk}, 60, "mcg") if $args{vk};
-            $do_vm->("Vitamin B1", $args{vb1}, 1.4, "mg") if $args{vb1};
-            $do_vm->("Vitamin B2", $args{vb2}, 1.6, "mg") if $args{vb2};
-            $do_vm->("Vitamin B3", $args{vb3}, 15, "mg") if $args{vb3};
-            $do_vm->("Vitamin B5", $args{vb5}, 5, "mg") if $args{vb5};
-            $do_vm->("Vitamin B6", $args{vb6}, 1.3, "mg") if $args{vb6};
-            $do_vm->("Folat", $args{folate}, 400, "mcg", "Folate") if $args{folate};
-            $do_vm->("Vitamin B12", $args{vb12}, 2.4, "mcg") if $args{vb12};
-            $do_vm->("Biotin", $args{biotin}, 30, "mcg") if $args{biotin};
-            $do_vm->("Kolin", $args{choline}, 450, "mg", "Choline") if $args{choline};
-            $do_vm->("Vitamin C", $args{vc}, 90, "mg") if $args{vc};
-            $do_vm->("Kalsium", $args{ca}, 1100, "mg", "Calcium") if $args{ca};
-            $do_vm->("Fosfor", $args{phosphorus}, 700, "mg", "Phosphorus") if $args{phosphorus};
-            $do_vm->("Magnesium", $args{mg}, 350, "mg") if $args{mg};
-            $do_vm->("Kalium", $args{potassium}, 4700, "mg", "Potassium") if $args{potassium};
-            $do_vm->("Mangan", $args{mn}, 2000, "mcg", "Manganese") if $args{mn};
-            $do_vm->("Tembaga", $args{cu}, 800, "mcg", "Copper") if $args{cu};
-            $do_vm->("Kromium", $args{cr}, 26, "mcg", "Chromium") if $args{cr};
-            $do_vm->("Besi", $args{fe}, 22, "mg", "Iron") if $args{fe};
-            $do_vm->("Iodium", $args{iodium}, 90, "mcg", "Iodium") if $args{iodium};
-            $do_vm->("Seng", $args{zn}, 13, "mg", "Zinc") if $args{zn};
-            $do_vm->("Selenium", $args{se}, 30, "mcg") if $args{se};
-            $do_vm->("Fluor", $args{fluorine}, 2.5, "mg", "Fluorine") if $args{fluorine};
+            $do_vm->("va", "Vitamin A", 600, "mcg (all-trans-)retinol") if $args{va};
+            $do_vm->("vd", "Vitamin D", 15, "mcg") if $args{vd};
+            $do_vm->("ve", "Vitamin E", 15, "mg alpha-TE (tocopherol-equivalent)") if $args{ve};
+            $do_vm->("vk", "Vitamin K", 60, "mcg") if $args{vk};
+            $do_vm->("vb1", "Vitamin B1", 1.4, "mg") if $args{vb1};
+            $do_vm->("vb2", "Vitamin B2", 1.6, "mg") if $args{vb2};
+            $do_vm->("vb3", "Vitamin B3", 15, "mg") if $args{vb3};
+            $do_vm->("vb5", "Vitamin B5", 5, "mg") if $args{vb5};
+            $do_vm->("vb6", "Vitamin B6", 1.3, "mg") if $args{vb6};
+            $do_vm->("folate", "Folat", 400, "mcg", "Folate") if $args{folate};
+            $do_vm->("vb12", "Vitamin B12", 2.4, "mcg") if $args{vb12};
+            $do_vm->("biotin", "Biotin", 30, "mcg") if $args{biotin};
+            $do_vm->("choline", "Kolin", 450, "mg", "Choline") if $args{choline};
+            $do_vm->("vc", "Vitamin C", 90, "mg") if $args{vc};
+            $do_vm->("ca", "Kalsium", 1100, "mg", "Calcium") if $args{ca};
+            $do_vm->("phosphorus", "Fosfor", 700, "mg", "Phosphorus") if $args{phosphorus};
+            $do_vm->("mg", "Magnesium", 350, "mg") if $args{mg};
+            $do_vm->("potassium", "Kalium", 4700, "mg", "Potassium") if $args{potassium};
+            $do_vm->("mn", "Mangan", 2000, "mcg", "Manganese") if $args{mn};
+            $do_vm->("cu", "Tembaga", 800, "mcg", "Copper") if $args{cu};
+            $do_vm->("cr", "Kromium", 26, "mcg", "Chromium") if $args{cr};
+            $do_vm->("fe", "Besi", 22, "mg", "Iron") if $args{fe};
+            $do_vm->("iodium", "Iodium", 90, "mcg", "Iodium") if $args{iodium};
+            $do_vm->("zn", "Seng", 13, "mg", "Zinc") if $args{zn};
+            $do_vm->("se", "Selenium", 30, "mcg") if $args{se};
+            $do_vm->("fluorine", "Fluor", 2.5, "mg", "Fluorine") if $args{fluorine};
         } # VITAMIN_MINERAL
 
         my @rows_nn;
@@ -930,7 +967,7 @@ App::BPOMUtils::NutritionFacts - Utilities related to BPOM nutrition facts
 
 =head1 VERSION
 
-This document describes version 0.027 of App::BPOMUtils::NutritionFacts (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2024-06-17.
+This document describes version 0.028 of App::BPOMUtils::NutritionFacts (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2024-11-05.
 
 =head1 SYNOPSIS
 
@@ -1217,6 +1254,14 @@ Arguments ('*' denotes required arguments):
 
 Biotin, in mcgE<sol>100g.
 
+=item * B<biotin_nufact> => I<ufloat>
+
+Biotin, in mcgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<biotin_nufact_note> => I<str>
+
+(No description)
+
 =item * B<browser> => I<true>
 
 View output HTML in browser instead of returning it.
@@ -1225,17 +1270,49 @@ View output HTML in browser instead of returning it.
 
 Calcium, in mgE<sol>100g.
 
+=item * B<ca_nufact> => I<ufloat>
+
+Calcium, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<ca_nufact_note> => I<str>
+
+(No description)
+
 =item * B<carbohydrate>* => I<ufloat>
 
 Total carbohydrate, in gE<sol>100g.
+
+=item * B<carbohydrate_nufact> => I<ufloat>
+
+Total carbohydrate, in gE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<carbohydrate_nufact_note> => I<str>
+
+(No description)
 
 =item * B<cholesterol> => I<ufloat>
 
 Cholesterol, in mgE<sol>100g.
 
+=item * B<cholesterol_nufact> => I<ufloat>
+
+Cholesterol, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<cholesterol_nufact_note> => I<str>
+
+(No description)
+
 =item * B<choline> => I<ufloat>
 
 Choline, in mgE<sol>100g.
+
+=item * B<choline_nufact> => I<ufloat>
+
+Choline, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<choline_nufact_note> => I<str>
+
+(No description)
 
 =item * B<color> => I<str> (default: "auto")
 
@@ -1245,41 +1322,125 @@ Choline, in mgE<sol>100g.
 
 Chromium, in mcgE<sol>100g.
 
+=item * B<cr_nufact> => I<ufloat>
+
+Chromium, in mcgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<cr_nufact_note> => I<str>
+
+(No description)
+
 =item * B<cu> => I<ufloat>
 
 Copper, in mcgE<sol>100g.
+
+=item * B<cu_nufact> => I<ufloat>
+
+Copper, in mcgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<cu_nufact_note> => I<str>
+
+(No description)
 
 =item * B<fat>* => I<ufloat>
 
 Total fat, in gE<sol>100g.
 
+=item * B<fat_nufact> => I<ufloat>
+
+Total fat, in gE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<fat_nufact_note> => I<str>
+
+(No description)
+
 =item * B<fe> => I<ufloat>
 
 Iron, in mgE<sol>100g.
+
+=item * B<fe_nufact> => I<ufloat>
+
+Iron, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<fe_nufact_note> => I<str>
+
+(No description)
 
 =item * B<fluorine> => I<ufloat>
 
 Fluorine, in mgE<sol>100g.
 
+=item * B<fluorine_nufact> => I<ufloat>
+
+Fluorine, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<fluorine_nufact_note> => I<str>
+
+(No description)
+
 =item * B<folate> => I<ufloat>
 
 Folate (vitamin B9), in mcgE<sol>100g.
+
+=item * B<folate_nufact> => I<ufloat>
+
+Folate (vitamin B9), in mcgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<folate_nufact_note> => I<str>
+
+(No description)
+
+=item * B<has_claims> => I<bool>
+
+Whether food is registered as having claims.
 
 =item * B<iodium> => I<ufloat>
 
 Iodium, in mcgE<sol>100g.
 
+=item * B<iodium_nufact> => I<ufloat>
+
+Iodium, in mcgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<iodium_nufact_note> => I<str>
+
+(No description)
+
 =item * B<k> => I<ufloat>
 
 Potassium, in mgE<sol>100g.
+
+=item * B<k_nufact> => I<ufloat>
+
+Potassium, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<k_nufact_note> => I<str>
+
+(No description)
 
 =item * B<mg> => I<ufloat>
 
 Magnesium, in mgE<sol>100g.
 
+=item * B<mg_nufact> => I<ufloat>
+
+Magnesium, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<mg_nufact_note> => I<str>
+
+(No description)
+
 =item * B<mn> => I<ufloat>
 
 Manganese, in mcgE<sol>100g.
+
+=item * B<mn_nufact> => I<ufloat>
+
+Manganese, in mcgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<mn_nufact_note> => I<str>
+
+(No description)
 
 =item * B<name> => I<str>
 
@@ -1301,17 +1462,49 @@ Packaging size, in g.
 
 Phosphorus, in mgE<sol>100g.
 
+=item * B<phosphorus_nufact> => I<ufloat>
+
+Phosphorus, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<phosphorus_nufact_note> => I<str>
+
+(No description)
+
 =item * B<protein>* => I<ufloat>
 
 Protein, in gE<sol>100g.
+
+=item * B<protein_nufact> => I<ufloat>
+
+Protein, in gE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<protein_nufact_note> => I<str>
+
+(No description)
 
 =item * B<saturated_fat>* => I<ufloat>
 
 Saturated fat, in gE<sol>100g.
 
+=item * B<saturated_fat_nufact> => I<ufloat>
+
+Saturated fat, in gE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<saturated_fat_nufact_note> => I<str>
+
+(No description)
+
 =item * B<se> => I<ufloat>
 
 Selenium, in mcgE<sol>100g.
+
+=item * B<se_nufact> => I<ufloat>
+
+Selenium, in mcgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<se_nufact_note> => I<str>
+
+(No description)
 
 =item * B<serving_size>* => I<ufloat>
 
@@ -1321,13 +1514,37 @@ Serving size, in g.
 
 Sodium, in mgE<sol>100g.
 
+=item * B<sodium_nufact> => I<ufloat>
+
+Sodium, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<sodium_nufact_note> => I<str>
+
+(No description)
+
 =item * B<sugar>* => I<ufloat>
 
 Total sugar, in gE<sol>100g.
 
+=item * B<sugar_nufact> => I<ufloat>
+
+Total sugar, in gE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<sugar_nufact_note> => I<str>
+
+(No description)
+
 =item * B<va> => I<ufloat>
 
 Vitamin A, in mcgE<sol>100g (all-trans-)retinol.
+
+=item * B<va_nufact> => I<ufloat>
+
+Vitamin A, in mcgE<sol>100g (all-trans-)retinol (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<va_nufact_note> => I<str>
+
+(No description)
 
 =item * B<vb1> => I<ufloat>
 
@@ -1337,41 +1554,129 @@ Vitamin B1, in mgE<sol>100g.
 
 Vitamin B12, in mcgE<sol>100g.
 
+=item * B<vb12_nufact> => I<ufloat>
+
+Vitamin B12, in mcgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<vb12_nufact_note> => I<str>
+
+(No description)
+
+=item * B<vb1_nufact> => I<ufloat>
+
+Vitamin B1, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<vb1_nufact_note> => I<str>
+
+(No description)
+
 =item * B<vb2> => I<ufloat>
 
 Vitamin B2, in mgE<sol>100g.
+
+=item * B<vb2_nufact> => I<ufloat>
+
+Vitamin B2, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<vb2_nufact_note> => I<str>
+
+(No description)
 
 =item * B<vb3> => I<ufloat>
 
 Vitamin B3, in mgE<sol>100g.
 
+=item * B<vb3_nufact> => I<ufloat>
+
+Vitamin B3, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<vb3_nufact_note> => I<str>
+
+(No description)
+
 =item * B<vb5> => I<ufloat>
 
 Vitamin B5 (pantothenic acid), in mgE<sol>100g.
+
+=item * B<vb5_nufact> => I<ufloat>
+
+Vitamin B5 (pantothenic acid), in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<vb5_nufact_note> => I<str>
+
+(No description)
 
 =item * B<vb6> => I<ufloat>
 
 Vitamin B6, in mgE<sol>100g.
 
+=item * B<vb6_nufact> => I<ufloat>
+
+Vitamin B6, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<vb6_nufact_note> => I<str>
+
+(No description)
+
 =item * B<vc> => I<ufloat>
 
 Vitamin C, in mgE<sol>100g.
+
+=item * B<vc_nufact> => I<ufloat>
+
+Vitamin C, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<vc_nufact_note> => I<str>
+
+(No description)
 
 =item * B<vd> => I<ufloat>
 
 Vitamin D, in mcg.
 
+=item * B<vd_nufact> => I<ufloat>
+
+Vitamin D, in mcg (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<vd_nufact_note> => I<str>
+
+(No description)
+
 =item * B<ve> => I<ufloat>
 
 Vitamin E, in mg alpha-TE (tocopherol-equivalent).
+
+=item * B<ve_nufact> => I<ufloat>
+
+Vitamin E, in mg alpha-TE (tocopherol-equivalent) (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<ve_nufact_note> => I<str>
+
+(No description)
 
 =item * B<vk> => I<ufloat>
 
 Vitamin K, in mcg.
 
+=item * B<vk_nufact> => I<ufloat>
+
+Vitamin K, in mcg (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<vk_nufact_note> => I<str>
+
+(No description)
+
 =item * B<zn> => I<ufloat>
 
 Zinc, in mgE<sol>100g.
+
+=item * B<zn_nufact> => I<ufloat>
+
+Zinc, in mgE<sol>100g (value to be used in nutrition facts table instead the lab test result).
+
+=item * B<zn_nufact_note> => I<str>
+
+(No description)
 
 
 =back
@@ -1425,7 +1730,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

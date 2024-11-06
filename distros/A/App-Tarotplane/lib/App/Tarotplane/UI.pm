@@ -1,4 +1,5 @@
 package App::Tarotplane::UI;
+our $VERSION = '2.00';
 use 5.016;
 use strict;
 use warnings;
@@ -14,7 +15,7 @@ use Curses;
 
 # Tells whether Curses is running or not, so that multiple objects don't try to
 # run Curses.
-my $CURSED = 0;
+my $Cursed = 0;
 
 our %KEY_BINDINGS = (
 	Next  => [ 'l', KEY_RIGHT, ],
@@ -47,9 +48,11 @@ sub init {
 		InfoStr => '',
 	};
 
-	if ($CURSED) {
+	if ($Cursed) {
 		croak "Curses is already running";
 	}
+
+	bless $self, $class;
 
 	initscr();
 
@@ -63,9 +66,8 @@ sub init {
 	$self->{InfoWin} = newwin(1, $COLS, $LINES - 1, 0);
 	$self->{CardWin} = newwin($LINES - 3, $COLS - 2, 1, 1);
 
-	$CURSED = 1;
+	$Cursed = 1;
 
-	bless $self, $class;
 	return $self;
 
 }
@@ -198,7 +200,7 @@ sub end {
 		$self->{$win} = undef;
 	}
 
-	$CURSED = 0;
+	$Cursed = 0;
 
 }
 
@@ -219,6 +221,8 @@ DESTROY {
 App::Tarotplane::UI - tarotplane TUI
 
 =head1 SYNOPSIS
+
+  use App::Tarotplane::UI;
 
   $ui = App::Tarotplane::UI->init();
 
@@ -263,14 +267,14 @@ will be bold.
 
 update() needs to be called to push the drawing to the screen.
 
-If $str and/or $bold are not supplied, will use whatever was used on a previous
-call to draw_card().
+If $str and/or $bold are not supplied, draw_card() 
+will use whatever was used on a previous call to draw_card().
 
 =head2 $ui->draw_info([$str])
 
 Draws an info bar at the bottom of the screen containing $str.
 
-update() needs to be calleed to push the drawing to the screen.
+update() needs to be called to push the drawing to the screen.
 
 If $str is not supplied, uses the last string supplied by a previous
 draw_info() call.

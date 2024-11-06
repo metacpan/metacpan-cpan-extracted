@@ -6,10 +6,10 @@ use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 use App::SeismicUnixGui::misc::SeismicUnix qw($su $suffix_su);
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 
-my $get     = L_SU_global_constants->new();
-my $Project = Project_config->new();
+my $get     	     = L_SU_global_constants->new();
+my $Project 	     = Project_config->new();
 
-my $var = $get->var();
+my $var 		     = $get->var();
 
 my $empty_string     = $var->{_empty_string};
 my $true             = $var->{_true};
@@ -23,7 +23,7 @@ my $max_index        = 5;                               # Insert a number here
 
 
 my $suop2_spec =  {
-	_CONFIG	 				=> $PL_SEISMIC,
+	_CONFIG	 			   => $PL_SEISMIC,
 	_DATA_DIR_IN           => $DATA_SEISMIC_SU,
 	_DATA_DIR_OUT          => $DATA_SEISMIC_SU,
 	_binding_index_aref    => '',

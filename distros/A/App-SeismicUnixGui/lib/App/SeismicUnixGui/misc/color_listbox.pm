@@ -21,7 +21,7 @@ package App::SeismicUnixGui::misc::color_listbox;
 =cut 
 
 use Moose;
-use namespace::autoclean;    # best-practices hygiene
+#use namespace::autoclean;    # best-practices hygiene
 our $VERSION = '0.0.1';
 
 =head2 Import modules

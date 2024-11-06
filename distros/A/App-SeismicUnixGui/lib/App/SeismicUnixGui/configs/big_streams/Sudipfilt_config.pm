@@ -115,7 +115,7 @@ sub get_values {
     # Warning: set using a scalar reference
     $Sudipfilt->{_prog_name} = \@{$superflow_config_names}[0];
 
-#    print("Sudipfilt_config, get_values, prog_name : @{$superflow_config_names}[0]\n");
+    print("Sudipfilt_config, get_values, prog_name : @{$superflow_config_names}[0]\n");
 
     $config_superflows->set_program_name( $Sudipfilt->{_prog_name} );
 

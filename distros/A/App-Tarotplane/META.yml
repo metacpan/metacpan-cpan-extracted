@@ -26,5 +26,8 @@ requires:
   List::Util: '0'
   Text::Wrap: '0'
   perl: '5.016'
-version: '1.00'
+resources:
+  bugtracker: https://codeberg.org/1-1sam/tarotplane/issues
+  repository: https://codeberg.org/1-1sam/tarotplane.git
+version: '2.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

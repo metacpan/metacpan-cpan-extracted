@@ -24,9 +24,22 @@ my %WriteMakefileArgs = (
         'List::Util'   => '0',
         'Text::Wrap'   => '0',
 	},
-	EXE_FILES => [
+    EXE_FILES => [
         'bin/tarotplane',
-	],
+    ],
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                url => 'https://codeberg.org/1-1sam/tarotplane.git',
+                web => 'https://codeberg.org/1-1sam/tarotplane',
+                type => 'git',
+            },
+            bugtracker => {
+                web => 'https://codeberg.org/1-1sam/tarotplane/issues',
+            },
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'App-Tarotplane-*' },
 );
@@ -48,5 +61,7 @@ delete $WriteMakefileArgs{MIN_PERL_VERSION}
     unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
 delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
+delete $WriteMakefileArgs{META_MERGE}
+    unless eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);

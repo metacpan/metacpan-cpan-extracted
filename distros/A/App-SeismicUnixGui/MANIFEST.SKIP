@@ -1,25 +1,29 @@
-\.git$
-\.metadata
-\.project
-\.FileHistory.txt
-\.Makefile.PL.swp
-\chain.sh
-\tbd.pl
-\cpan-upload.sh
-
+\B.metadata
+\B.project
+\B.FileHistory.txt
+\B.Makefile.PL.swp
+\bchain.sh
+\bCHANGES
+\bMYMETA\.
+\btbd.pl
+\bcpan-upload.sh
+\btbd
 # Skip temporary, backup files,
 # and directories
-\.itemp_
-\.tbd
-\.num_samples
-\/archive
-\/tbd
-\/bck
-\/temp
-\.temp
-
+\barchive/
+\B.bashrc
+\B.itemp_
+\B.temp
+\B.tbd
+\B.num_samples
+\btbd/
+\bbck/
+\btemp/
+\bdocumentation_conversion/
 # Skip git-related files
-\.git
-
+\B.git$
+\B.git/
+\B.gitignore
 # Skip Makemaker generated and utility files.
-blib\/
+\bblib\/
+\bworking\simages/

@@ -78,6 +78,7 @@ our (@EXPORT_OK, @ISA); #Global variables
   $mute
   $temp 
   $fldr
+  $flip
   $ivpicks_sorted_par_
   $ms2s $us2s
   $offset 
@@ -230,6 +231,8 @@ our $out = ' > ';
 our $_cdp = '_cdp';
 
 our $_mute = '_mute';
+
+our $flip  = 'flip';
 
 our $pick  = 'pick';
 

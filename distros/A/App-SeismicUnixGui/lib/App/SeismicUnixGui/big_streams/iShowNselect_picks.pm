@@ -17,6 +17,8 @@ package App::SeismicUnixGui::big_streams::iShowNselect_picks;
 
 =cut
 
+		$iPick->{_min_amplitude} = $min_amplitude;
+
 =head2 
 
  needed packages
@@ -543,7 +545,7 @@ sub calcNdisplay {
 =cut
 
 	# for suxwigb
-	#	print  "$flow[1]\n";
+		print  "$flow[1]\n";
 	#$log->file($flow[1]);
 
 	#for suximage

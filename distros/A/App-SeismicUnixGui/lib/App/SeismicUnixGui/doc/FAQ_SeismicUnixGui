@@ -1112,7 +1112,7 @@ Q. How does Project Tool update the gui parameter values?
 			# collects the file name or folder and displays it				
 			_pre_built_superflow_close_path
 				
-				param_widgets
+				param_widgets4pre_built_streams
 					redisplay_values();
 
 	$L_SU_href = $file_dialog->get_hash_ref();
@@ -1807,7 +1807,7 @@ A:     from prefix definitions in _spec file
 		 1. open pre-existing user-built perl flow
 
  #########################################################################  	
-Q . How to build a new superflow new pre-built superflows from scratch?
+Q . How to build a new superflow/Tool/pre-built superflows/big_stream from scratch?
    	
    	e.g., interactive picking: iPick.pl
    	
@@ -1936,7 +1936,7 @@ Q . How to build a new superflow new pre-built superflows from scratch?
     } # end pick instructions
    		
   
- --------- add the followinglines to old_data
+ --------- add the following lines to old_data
   ~L79-80
     	$ipick_check_pickfile_ 
   		$false $true $suffix_su $suffix_su);
@@ -1976,7 +1976,7 @@ $itemp_num_points $itemp_picks_sorted_ $itemp_picks_sorted_par_ $ipicks_par_ $ip
  #########################################################################
  Another example: immodpg
  
- Q . How to build a new superflow new pre-built superflows from scratch?
+ Q . How to build a new superflow/Tool/pre-built superflows from scratch?
    	
    	e.g., interactive ray modeling of seismograms
    	
@@ -2021,7 +2021,7 @@ sub get {
 
 1;
 
-insdie L_SU/configs/big_streams/immodpg_config.pm (copied from iPicks_config.pm)
+inside L_SU/configs/big_streams/immodpg_config.pm (copied from iPicks_config.pm)
 
 Change the number#		    \@{$superflow_config_names}[#]; 12
 
@@ -2061,7 +2061,16 @@ and add an additional temp to the arrays and hashes
 for the next Tool that will be added
  
  
-Modify package misc/config_superflows:
+Modify package misc/config_superflows: in two places:
+     set_program_name  ( for the alias)
+    _set_program_name  ( also for the alias)
+
+Also update:
+   L_SU_path, 
+        $specifications_path_w_slash
+        $specifications_path_w_colon
+    
+   
   Lines 453:
           if ( $$program_name_sref eq $superflow_names->{_immodpg} ) {
 
@@ -2073,7 +2082,7 @@ Modify package misc/config_superflows:
  				       
      ( I have left a "temp" example you can replace);
  
-Modify the main program, i.e. immodpg.config.pm
+Modify the main program, i.e., immodpg.config.pm
  							    
  	so that it can import values from the configuration file
     by adding the following lines, as an example for immodpg:
@@ -2083,8 +2092,13 @@ Modify the main program, i.e. immodpg.config.pm
      
    	
  	Also create specs/immodpg_spec.pm for superflows
- 	Update the values in the $immodpg.pm has
- 	
+ 	Update the values in the $immodpg.pm
+ 
+ Also update config_superflows
+     -> save
+     
+     
+ Also update program_name definitions
  
  #########################################################################  
    Q. Inside each spec file, What does binding_index_aref ?
@@ -3024,4 +3038,55 @@ A.  Following on from the previous questions, if MB3 selected,
 		my $sub_ref = \&_FileDialog_button;
 		   $pre_built_big_stream->set_sub_ref($sub_ref);
 		   $pre_built_big_stream->select();
+		   
+		   
+   Q. What do the different names in superflows/Tools/pre-built flows/big streams mean?
+   
+   While using L_SU_global_constants.pm:
+   
+   CASE of    $alias_superflow_names_h,       (used by sub alias_superflow_names_h),
+          and $alias_superflow_spec_names_h   (used by sub alias_superflow_spec_names_h)
+	
+    The names seen in the gui do not have to be the same as
+    the internal program names.
+    For example 'fk' for the user of the gui
+    is the same as Sudipfilt
+    internally for the programmer.
+    
+    CASE of @superflow_names_gui,    (used by superflow_names_gui_aref),
+            @superflow_names         (used by sub superflow_names_aref),
+    
+      Are as seen differently in the GUI 
+      	e.g., fk
+    
+    CASE of @superflow_config_names   (used by sub superflow_config_names_aref),
+    
+      Are the internal names for configuration files, 
+       e.g., Sudipfilt_config
+       
+    unclear CASE ...
+         $superflow_names_h               (used by sub superflow_names_h)
+         because both fk and Sudipfilt are included her 
+         
+    Try to keep the use of only internal names within the program, and not the aliased version
+    
+    
+    #####################################################
+    TODO
+    Deprecation TODO: July 2024
+    replace $name with $program_name
+    and consoidate program name definitions into L_SU_global_constants or equivalent
+    Currently progam_name has definitions that are repeated in L_SU_global_constants
+    
+    Not working??
+    project_selector->_get_labels_from_gui
+    
+    But, this is working!
+    project_selector->_get_labels_from_gui
+    
+    
+    When creating the first project using SUG, two configuration
+    files appear in .L_SU/configuration/"Projectname", i.e. Project.config and "Projectname.config"
+    Can not understand ??
+     
            

@@ -1,5 +1,10 @@
 # These cards test tarotplane's escape sequences
+%
 \:): Happy \:D
+%
 \:-\\: Concerned\\Confused
+%
 Line\nbreak: Broken\nline
+%
 \\\n\\\\\:\:: All together!
+%

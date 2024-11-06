@@ -29,15 +29,13 @@ arguments. Please read the manual for more in-depth documentation on the usage
 of **tarotplane**.
 
 ### Card Files
-A **tarotplane** card file consists of lines that contain terms and their
-respective definitions seperated by a colon (:). Text preceding the colon is
-considered the term, text following the colon is considered the term's
-definition.
+A **tarotplane** card file is a text file that contains cards seperated by a
+delimitting line, which is a line the contains nothing but a percentage (%)
+sign. Each card must contain a term and a definition, seperated by a colon (:).
+Terms precede the colon, definitions follow the colon.
 
 Lines starting with a hash (#) are treated as comments and are ignored. Blank
 lines are also ignored.
-
-*example.cards* shows how one could format a card file.
 
 #### Escape Sequences
 An escape sequence is a pair of characters, a forward slash (\\) and some other

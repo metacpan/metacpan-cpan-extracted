@@ -84,7 +84,7 @@ my $NaN = $var->{_NaN};
 
 =head2 Create Main Window 
 
- Sstart event-driven loop
+ Start event-driven loop
  Interaction with user
  initialize values
  If picks are new, show

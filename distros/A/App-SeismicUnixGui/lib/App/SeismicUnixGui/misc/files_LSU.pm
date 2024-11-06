@@ -439,7 +439,7 @@ except Project.config, which uses sub write2
 sub check2write {
 	my (@self) = @_;
 
-	# print("files_LSU, check2write,start\n");
+#	print("files_LSU, check2write,start\n");
 
 	if ( not -e $files_LSU->{_outbound} ) {
 		
@@ -453,7 +453,7 @@ sub check2write {
 
 		copy( $from, $to );
 
-#		print("files_LSU check2write copy $from to $to \n");
+#		print("files_LSU check2write copying $from to $to \n");
 
 		# Now you can overwrite the file
 		_write();
@@ -461,8 +461,8 @@ sub check2write {
 	}
 	elsif ( -e $files_LSU->{_outbound} ) {
 
-		# CASE if file does already exist
-		# print("files_LSU, write_config OK: $files_LSU->{_outbound}\n");
+		# CASE if file doesalready exist
+#		print("files_LSU, write_config OK: $files_LSU->{_outbound}\n");
 #		print(
 #"files_LSU, write_config, configuration file exists and will be overwritten\n"
 #		);
@@ -478,6 +478,7 @@ sub check2write {
 }
 
 =head2 sub copy_default_config
+
 files_LSU,copy_default_config for 
 pre-built/superflows/Tools
 (except Project.config, uses sub write2)
@@ -580,23 +581,6 @@ sub outbound {
 
 			my $DATA_PATH_IN;
 
-		 # CASE 2 for superflows
-		 #			my $L_SU_global_constants = L_SU_global_constants->new();
-		 #			my $module_spec_pm        = $program_name . '_spec.pm';
-		 #
-		 #			$L_SU_global_constants->set_file_name($module_spec_pm);
-		 #			my $slash_path4spec = $L_SU_global_constants->get_path4spec_file();
-		 #			my $slash_pathNmodule_spec_pm =
-		 #			  $slash_path4spec . '/' . $module_spec_pm;
-		 #
-		 #			$L_SU_global_constants->set_program_name($program_name);
-		 #			my $colon_pathNmodule_spec =
-		 #			  $L_SU_global_constants->get_colon_pathNmodule_spec();
-		 #
-##	 	print("1. files_LSU,_get_suffix_aref, prog_name: $slash_pathNmodule_spec_pm\n");
-			#
-			#			require $slash_pathNmodule_spec_pm;
-
 			$L_SU_path->set_program_name($program_name);
 
 			my $pathNmodule_spec_w_slash_pm =
@@ -608,9 +592,6 @@ sub outbound {
 
 			# INSTANTIATE
 			my $package = $pathNmodule_spec_w_colon->new();
-			#
-			#			# INSTANTIATE
-			#			my $package = $colon_pathNmodule_spec->new();
 
 			# collect specifications of output directory
 			# from a program_spec.pm module
@@ -622,7 +603,7 @@ sub outbound {
 			$files_LSU->{_outbound} =
 			  $CONFIG . '/' . $files_LSU->{_program_name_config};
 
-	# print("Case 2 files_LSU, outbound, outbound: $files_LSU->{_outbound} \n");
+#	print("Case 2 files_LSU, outbound, outbound: $files_LSU->{_outbound} \n");
 
 		}
 		elsif ($files_LSU->{_is_pl}
@@ -694,9 +675,9 @@ sub outbound2 {
 				  $name->change_config($program_name);
 				$files_LSU->{_outbound2} =
 				  $PL_SEISMIC . '/' . $files_LSU->{_program_name_config};
-				print(
-"files_LSU, outbound2, outbound2 _is_config: $files_LSU->{_outbound2} \n"
-				);
+#				print(
+#"files_LSU, outbound2, outbound2 _is_config: $files_LSU->{_outbound2} \n"
+#				);
 			}
 			else {
 				print(
@@ -1330,7 +1311,7 @@ sub _write {
 
 			$format[$i] = @{$config_file_format_aref}[0];
 
-			# print("1. files_LSU,_write,$format[$i]\n");
+#			print("1. files_LSU,_write,$format[$i]\n");
 
 		}
 
@@ -1384,8 +1365,8 @@ sub write {
 	my @info        = @{ $files_LSU->{_info} };
 	my @CFG         = @{ $files_LSU->{_CFG} };
 
- #  print("files_LSU, write, length:$length,length_info:$length_info \n");
- #  print("files_LSU,write,files_LSU->{_outbound}: $files_LSU->{_outbound} \n");
+#	print("files_LSU, write, length:$length,length_info:$length_info \n");
+#	print("files_LSU,write,files_LSU->{_outbound}: $files_LSU->{_outbound} \n");
 
 	open( my $fh, '>', $files_LSU->{_outbound} )
 	  or die "Can't open parameter file:$!";

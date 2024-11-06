@@ -345,7 +345,7 @@ sub _set_data_type {
 
 		$sucat->{_data_type} = $data_type;
 
-		print("sucat, _set_data_type, data_type = $sucat->{_data_type}\n");
+#		print("sucat, _set_data_type, data_type = $sucat->{_data_type}\n");
 
 	}
 	else {
@@ -415,7 +415,7 @@ sub data_type {
 		_set_data_type($data_type);
 		my $gather_type = _get_gather_type();
 
-		print("sucat, data_type, data_type=---$data_type---\n\n");
+#		print("sucat, data_type, data_type=---$data_type---\n\n");
 
 		if (
 			$data_type ne $empty_string
