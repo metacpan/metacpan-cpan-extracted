@@ -5,7 +5,7 @@ use Test::More;
 use Compression::Util qw(:all);
 use List::Util        qw(shuffle);
 
-plan tests => 822;
+plan tests => 866;
 
 ##################################
 
@@ -77,6 +77,9 @@ foreach my $str (
     is(gzip_decompress(gzip_compress($str)),                     $str);
     is(gzip_decompress(gzip_compress($str, \&lzss_encode_fast)), $str);
 
+    is(zlib_decompress(zlib_compress($str)),                     $str);
+    is(zlib_decompress(zlib_compress($str, \&lzss_encode_fast)), $str);
+
     is(lzb_decompress(lzb_compress($str)),                     $str);
     is(lzb_decompress(lzb_compress($str, \&lzss_encode_fast)), $str);
 
@@ -99,6 +102,9 @@ foreach my $str (
 is(bzip2_decompress(bzip2_compress('')),                   '');
 is(gzip_decompress(gzip_compress('')),                     '');
 is(gzip_decompress(gzip_compress('', \&lzss_encode_fast)), '');
+
+is(zlib_decompress(zlib_compress('')),                     '');
+is(zlib_decompress(zlib_compress('', \&lzss_encode_fast)), '');
 
 is(lzb_decompress(lzb_compress('')),                      '');
 is(lzb_decompress(lzb_compress('', \&lzss_encode_fast)),  '');
@@ -171,6 +177,9 @@ is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic([])),  []);
     is(bzip2_decompress(bzip2_compress($str)),                   $str);
     is(gzip_decompress(gzip_compress($str)),                     $str);
     is(gzip_decompress(gzip_compress($str, \&lzss_encode_fast)), $str);
+
+    is(zlib_decompress(zlib_compress($str)),                     $str);
+    is(zlib_decompress(zlib_compress($str, \&lzss_encode_fast)), $str);
 
     is_deeply(mrl_decompress_symbolic(mrl_compress_symbolic(\@symbols)),                                       \@symbols);
     is_deeply(mrl_decompress_symbolic(mrl_compress_symbolic(\@symbols, \&create_ac_entry), \&decode_ac_entry), \@symbols);
@@ -397,13 +406,21 @@ is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic([])),  []);
 ###############################################
 
 {
-
     is(crc32("The quick brown fox jumps over the lazy dog"), 0x414fa339);
 
     my $p1 = crc32("The quick brown fox jumps");
     my $p2 = crc32(" over the lazy dog", $p1);
 
     is($p2, 0x414fa339);
+}
+
+{
+    is(adler32("The quick brown fox jumps over the lazy dog"), 0x5bdc0fda);
+
+    my $p1 = adler32("The quick brown fox jumps");
+    my $p2 = adler32(" over the lazy dog", $p1);
+
+    is($p2, 0x5bdc0fda);
 }
 
 {
@@ -466,6 +483,15 @@ is(gzip_decompress("\37\x8B\b\0\xE9\e\xC7f\0\3K\4\0C\xBE\xB7\xE8\1\0\0\0"),     
 is(gzip_decompress("\37\x8B\b\0\23\34\xC7f\0\3c\0\0\x8D\xEF\2\xD2\1\0\0\0"),        "\0");
 is(gzip_decompress("\37\x8B\b\0\0\0\0\0\2\3\xCB\xC8\4\0\xAC*\x93\xD8\2\0\0\0"),     "hi");
 is(gzip_decompress("\37\x8B\b\0\xCE\32\xC7f\0\3\xCB\xC8\4\0\xAC*\x93\xD8\2\0\0\0"), "hi");
+
+is(gzip_decompress(gzip_compress("hello") . gzip_compress("world")), "helloworld");
+is(zlib_decompress(zlib_compress("hello") . zlib_compress("world")), "helloworld");
+
+is(zlib_decompress("x\1\1\31\0\xE6\xFFTOBEORNOTTOBEORTOBEORNOT\na\xE5\aN"),         "TOBEORNOTTOBEORTOBEORNOT\n");
+is(zlib_decompress("x\1\13\xF1wr\xF5\17\xF2\xF3\17\t\x013 \$\x90\xCB\5\0a\xE5\aN"), "TOBEORNOTTOBEORTOBEORNOT\n");
+is(zlib_decompress("x\xDA\13\xF1wr\xF5\17\xF2\xF3\17\t\x013B`\\.\0a\xE5\aN"),       "TOBEORNOTTOBEORTOBEORNOT\n");
+is(zlib_decompress("x\x9C\13\xF1wr\xF5\17\xF2\xF3\17\t\x013B`\\.\0a\xE5\aN"),       "TOBEORNOTTOBEORTOBEORNOT\n");
+is(zlib_decompress(zlib_compress("TOBEORNOTTOBEORTOBEORNOT\n")),                    "TOBEORNOTTOBEORTOBEORNOT\n");
 
 is(gzip_decompress("\37\x8B\b\0\0\0\0\0\0\3\1\31\0\xE6\xFFTOBEORNOTTOBEORTOBEORNOT\nW\xF9\@\xF8\31\0\0\0"),                   "TOBEORNOTTOBEORTOBEORNOT\n");
 is(gzip_decompress("\37\x8B\b\0\0\0\0\0\0\3\13\xF1wr\xF5\17\xF2\xF3\17\x810\xE0\\.\0W\xF9\@\xF8\31\0\0\0"),                   "TOBEORNOTTOBEORTOBEORNOT\n");
@@ -569,3 +595,107 @@ is(
 }
 
 ###################################################
+
+# DEFLATE block type 0
+
+{
+    my $chunk        = "foobar hello world";
+    my $bt0_header   = deflate_create_block_type_0_header($chunk);
+    my $block_type_0 = pack('b*', '00') . pack('b*', $bt0_header) . $chunk;
+
+    open my $fh, '<:raw', \$block_type_0;
+    my ($buffer, $search_window) = ('', '');
+    my $decoded_chunk = deflate_extract_next_block($fh, \$buffer, \$search_window);
+
+    is($chunk,         $decoded_chunk);
+    is($search_window, $chunk);
+}
+
+# DEFLATE block type 0
+
+{
+    my $chunk        = "hello world 12";
+    my $bt0_header   = deflate_create_block_type_0_header($chunk);
+    my $block_type_0 = pack('b*', $bt0_header) . $chunk;
+
+    my ($buffer, $search_window) = ('', '');
+    open my $fh, '<:raw', \$block_type_0;
+    my $decoded_chunk = deflate_extract_block_type_0($fh, \$buffer, \$search_window);
+
+    is($chunk, $decoded_chunk);
+}
+
+# DEFLATE block type 1
+
+{
+    my $chunk = "foobar hello world";
+
+    my ($literals, $distances, $lengths) = lzss_encode($chunk, min_len => 4, max_len => 258, max_dist => 2**15 - 1);
+
+    my $bitstring    = deflate_create_block_type_1($literals, $distances, $lengths);
+    my $block_type_1 = pack('b*', $bitstring);
+    open my $fh, '<:raw', \$block_type_1;
+    my ($buffer, $search_window) = ('', '');
+    my $decoded_chunk = deflate_extract_next_block($fh, \$buffer, \$search_window);
+
+    is($chunk,         $decoded_chunk);
+    is($search_window, $chunk);
+}
+
+# DEFLATE block type 1
+
+{
+    my $chunk = "foobar hello world";
+
+    my ($literals, $distances, $lengths) = lzss_encode($chunk, min_len => 4, max_len => 258, max_dist => 2**15 - 1);
+
+    my $bitstring    = deflate_create_block_type_1($literals, $distances, $lengths);
+    my $block_type_1 = pack('b*', $bitstring);
+    open my $fh, '<:raw', \$block_type_1;
+
+    my ($buffer, $search_window) = ('', '');
+    my $block_type = bits2int_lsb($fh, 2, \$buffer);
+    is($block_type, 1);
+
+    my $decoded_chunk = deflate_extract_block_type_1($fh, \$buffer, \$search_window);
+
+    is($chunk,         $decoded_chunk);
+    is($search_window, $chunk);
+}
+
+# DEFLATE block type 2
+
+{
+    my $chunk = "foobar hello world";
+
+    my ($literals, $distances, $lengths) = lzss_encode($chunk, min_len => 4, max_len => 258, max_dist => 2**15 - 1);
+
+    my $bitstring    = deflate_create_block_type_2($literals, $distances, $lengths);
+    my $block_type_2 = pack('b*', $bitstring);
+    open my $fh, '<:raw', \$block_type_2;
+    my ($buffer, $search_window) = ('', '');
+    my $decoded_chunk = deflate_extract_next_block($fh, \$buffer, \$search_window);
+
+    is($chunk,         $decoded_chunk);
+    is($search_window, $chunk);
+}
+
+# DEFLATE block type 2
+
+{
+    my $chunk = "foobar hello world";
+
+    my ($literals, $distances, $lengths) = lzss_encode($chunk, min_len => 4, max_len => 258, max_dist => 2**15 - 1);
+
+    my $bitstring    = deflate_create_block_type_2($literals, $distances, $lengths);
+    my $block_type_2 = pack('b*', $bitstring);
+    open my $fh, '<:raw', \$block_type_2;
+
+    my ($buffer, $search_window) = ('', '');
+    my $block_type = bits2int_lsb($fh, 2, \$buffer);
+    is($block_type, 2);
+
+    my $decoded_chunk = deflate_extract_block_type_2($fh, \$buffer, \$search_window);
+    is($decoded_chunk, $chunk);
+    is($search_window, $chunk);
+}

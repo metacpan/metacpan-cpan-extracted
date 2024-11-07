@@ -95040,3 +95040,14 @@ T/TE/TEAM/Net-Async-Redis-6.004.tar.gz
 F/FE/FERKI/Rex-1.15.0.tar.gz
 S/SO/SONGMU/Riji-v1.1.3.tar.gz
 O/OA/OALDERS/URI-5.31.tar.gz
+B/BR/BRIANDFOY/Business-ISBN-Data-20241107.001.tar.gz
+T/TR/TRIZEN/Compression-Util-0.14.tar.gz
+L/LI/LION/Data-TagDB-v0.06.tar.gz
+N/NH/NHORNE/File-pfopen-0.03.tar.gz
+G/GW/GWS/Map-Tube-Glasgow-v0.71.0.tar.gz
+G/GW/GWS/Map-Tube-KoelnBonn-v0.91.0.tar.gz
+G/GW/GWS/Map-Tube-Lyon-v0.61.0.tar.gz
+M/MJ/MJOHNSON/Math-Symbolic-Custom-Collect-0.03.tar.gz
+D/DD/DDROWN/MFab-Plugins-Datadog-1.0.tar.gz
+J/JD/JDEGUEST/Nice-Try-v1.3.15.tar.gz
+K/KI/KIMOTO/SPVM-Net-SSLeay-0.008.tar.gz

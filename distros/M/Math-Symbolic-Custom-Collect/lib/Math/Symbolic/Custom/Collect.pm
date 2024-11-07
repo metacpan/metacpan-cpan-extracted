@@ -15,11 +15,11 @@ Math::Symbolic::Custom::Collect - Collect up Math::Symbolic expressions
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::Custom::Base;
@@ -90,6 +90,8 @@ The result is often a more concise expression. However, because it does not (yet
 sub to_collected {
     my ($t1) = @_;
 
+    return undef unless defined wantarray;
+
     # 1. recursion step. 
     # Fold constants, convert decimal to rational, combine fractions, expand brackets
     my $t2 = prepare($t1);
@@ -101,50 +103,53 @@ sub to_collected {
     }
    
     # 2. collect like terms
-    my $t3;
     if ( ($t2->term_type() == T_OPERATOR) && ($t2->type() == B_DIVISION) ) {
     
         my $numerator = $t2->op1();
         my $denominator = $t2->op2();
+        my ($n_hr, $d_hr);
         
         my ($c_n, $c_n_cth) = collect_like_terms($numerator);
         my ($c_d, $c_d_cth) = collect_like_terms($denominator);
 
         if ( defined($c_n_cth) && defined($c_d_cth) ) {
             # 3. attempt to cancel down
-            ($numerator, $denominator) = cancel_down($c_n, $c_n_cth, $c_d, $c_d_cth);
+            ($numerator, $n_hr, $denominator, $d_hr) = cancel_down($c_n, $c_n_cth, $c_d, $c_d_cth);
         }
-        elsif ( defined $c_n ) {
-            $numerator = $c_n;
-        }
-        elsif ( defined $c_d ) {
-            $denominator = $c_d;
+        else {
+            if ( defined $c_n ) {
+                $numerator = $c_n;
+                $n_hr = $c_n_cth;
+            }
+            if ( defined $c_d ) {
+                $denominator = $c_d;
+                $d_hr = $c_d_cth;
+            }
         }
         
         # check denominator
         if ( ($denominator->term_type() == T_CONSTANT) && ($denominator->value() == 1) ) {
-            $t3 = $numerator;
+            return wantarray ? ($numerator, $n_hr) : $numerator;
         }
         elsif ( ($denominator->term_type() == T_CONSTANT) && ($denominator->value() == 0) ) {
             # FIXME: divide by zero at this point?!
-            $t3 = $t2;
+            return $t2;
         }
         else {
-            $t3 = Math::Symbolic::Operator->new( '/', $numerator, $denominator );
+            my $t3 = Math::Symbolic::Operator->new( '/', $numerator, $denominator );
+            return wantarray ? ($t3, $n_hr, $d_hr) : $t3;
         }
     }
     else {
         my ($collected, $ct_href) = collect_like_terms($t2);
 
         if ( defined $collected ) {
-            $t3 = $collected;
+            return wantarray ? ($collected, $ct_href) : $collected;
         }
         else {
-            $t3 = $t2;
+            return $t2;
         }
     }
-
-    return $t3;
 }
 
 
@@ -157,10 +162,10 @@ sub cancel_down {
     my %d_ct = %{$d_cth};
 
     my %n_terms = %{ $n_ct{terms} };
-    my %n_funcs = %{ $n_ct{funcs} };
+    my %n_funcs = %{ $n_ct{trees} };
 
     my %d_terms = %{ $d_ct{terms} };
-    my %d_funcs = %{ $d_ct{funcs} };
+    my %d_funcs = %{ $d_ct{trees} };
 
     my $n_acc = $n_terms{constant_accumulator};
     my $d_acc = $d_terms{constant_accumulator};
@@ -206,7 +211,7 @@ sub cancel_down {
         }
     }
 
-    if ( ($n_acc == 0) && ($d_acc == 0) && (scalar(%d_terms)>1) ) {
+    if ( ($n_acc == 0) && ($d_acc == 0) ) {
 
         # try to cancel vars
         # see if there are any common variables we can cancel
@@ -217,7 +222,7 @@ sub cancel_down {
                 my @v1 = split(/,/, $key);
                 foreach my $v2 (@v1) {
                     my ($v, $c) = split(/:/, $v2);
-                    if ( !(exists($n_funcs{$v}) || exists($d_funcs{$v})) ) {
+                    if ( ($v =~ /^CONST/) or ($v =~ /^VAR/) ) {
                         $c_vars{$v}++;
                     }
                 }
@@ -228,7 +233,8 @@ sub cancel_down {
         my @all_terms;
         while ( my ($v, $c) = each %c_vars ) {
             if ( $c == (scalar(keys %n_terms)+scalar(keys %d_terms)) ) {
-                push @all_terms, $v;
+                push @all_terms, $v
+                    unless ($v =~ /^VAR/) && (scalar(%d_terms) == 1);   # don't get rid of all instances of a variable from the denominator
             }
         }
 
@@ -294,15 +300,18 @@ sub cancel_down {
     $n_terms{constant_accumulator} = $n_acc;
     $d_terms{constant_accumulator} = $d_acc;
 
+    my $n_hr = { terms => \%n_terms, trees => \%n_funcs };
+    my $d_hr = { terms => \%d_terms, trees => \%d_funcs };
+
     if ( $did_some_cancellation ) {
 
-        my $new_n = build_summation_tree( { terms => \%n_terms, funcs => \%n_funcs } );
-        my $new_d = build_summation_tree( { terms => \%d_terms, funcs => \%d_funcs } );
+        my $new_n = build_summation_tree( $n_hr );
+        my $new_d = build_summation_tree( $d_hr );
 
-        return ($new_n, $new_d);
+        return ($new_n, $n_hr, $new_d, $d_hr);
     }
 
-    return ($c_n, $c_d); 
+    return ($c_n, $n_cth, $c_d, $d_cth);
 }
 
 #### collect_like_terms
@@ -454,8 +463,8 @@ sub get_product_elements_collect {
         }
     }
     elsif ( ($tree->term_type() == T_OPERATOR) && ($tree->type() == B_PRODUCT) ) {
-        my $ok1 = get_product_elements($l, $tree->op1());
-        my $ok2 = get_product_elements($l, $tree->op2());
+        my $ok1 = get_product_elements_collect($l, $tree->op1()); #my $ok1 = get_product_elements($l, $tree->op1());    ## ~??
+        my $ok2 = get_product_elements_collect($l, $tree->op2()); #my $ok2 = get_product_elements($l, $tree->op2());
         return $ok1 & $ok2; 
     }
 
@@ -469,38 +478,63 @@ sub collect_terms {
 
     my $accumulator = 0;
     my %collected_terms;
-    my $func_prefix = '|-&-|=&&=|';        # FIXME: some random string for the hash which is unlikely to be an existing variable name. 
-    my $func_num = 1;
-    my %func_trees;
+    my $tree_num = 1;
+    my %trees;    
     foreach my $e (@elements) {
-        if ( $e->{type} eq 'constant' ) {
-            $accumulator += $e->{object}->value();
+        if ( ($e->{type} eq 'constant') ) {
+            if ( $e->{object}->special() eq '' ) {
+                $accumulator += $e->{object}->value();
+            }
+            else {               
+                my $name;
+                GET_CONST_NAME_1: foreach my $n (grep { /^CONST/ } keys %trees) {
+                    if ( $e->{object}->is_identical($trees{$n}) ) {
+                        $name = $n;
+                        last GET_CONST_NAME_1;
+                    }
+                }
+                if ( not defined $name ) {
+                    $name = 'CONST' . $tree_num;
+                    $trees{$name} = $e->{object};
+                    $tree_num++;
+                }
+                $collected_terms{terms}{$name . ":1"}++;                
+            }
         }
         elsif ( $e->{type} eq 'variable' ) {
-            my $key = $e->{object}->name() . ":1";
-            $collected_terms{terms}{$key}++;         
+            my $name;
+            GET_VAR_NAME_1: foreach my $n (grep { /^VAR/ } keys %trees) {
+                if ( $e->{object}->is_identical($trees{$n}) ) {
+                    $name = $n;
+                    last GET_VAR_NAME_1;
+                }
+            }
+            if ( not defined $name ) {
+                $name = 'VAR' . $tree_num;
+                $trees{$name} = $e->{object};
+                $tree_num++;
+            }
+            $collected_terms{terms}{$name . ":1"}++;     
         }
-        elsif ( $e->{type} eq 'function' ) {    
-            my $ft = $e->{object};
-            my $func_name;
-            GET_FUNC_NAME_1: foreach my $fn (keys %func_trees) {
-                if ( $ft->is_identical($func_trees{$fn}) ) {
-                    $func_name = $fn;
+        elsif ( $e->{type} eq 'function' ) {
+            my $name;
+            GET_FUNC_NAME_1: foreach my $n (grep { /^FUNC/ } keys %trees) {
+                if ( $e->{object}->is_identical($trees{$n}) ) {
+                    $name = $n;
                     last GET_FUNC_NAME_1;
                 }
             }
-            if ( !defined $func_name ) {
-                # no existing function definition, initialise
-                $func_name = $func_prefix . $func_num;
-                $func_trees{$func_name} = $ft;
-                $func_num++;
+            if ( not defined $name ) {
+                $name = 'FUNC' . $tree_num;
+                $trees{$name} = $e->{object};
+                $tree_num++;
             }
-            $collected_terms{terms}{$func_name . ":1"}++;
+            $collected_terms{terms}{$name . ":1"}++;     
         }
         elsif ( $e->{type} eq 'products' ) {
             my @list = @{$e->{list}};
             # if it's a list of constants, fold them into the accumulator
-            my @con_list = grep { $_->{type} eq 'constant' } @list;
+            my @con_list = grep { ($_->{type} eq 'constant') && ($_->{object}->special() eq '') } @list;
             if (scalar(@con_list) == scalar(@list)) {
                 my $c_n = 1;
                 $c_n *= $_->{object}->value() for @list;
@@ -510,27 +544,55 @@ sub collect_terms {
                 my $num_coeff = 1;
                 my %hist;
                 foreach my $l (@list) {
-                    if ($l->{type} eq 'constant') {
-                        $num_coeff *= $l->{object}->value();
+                    if ( ($l->{type} eq 'constant') ) {
+                        if ( $l->{object}->special() eq '' ) {
+                            $num_coeff *= $l->{object}->value();
+                        }
+                        else {               
+                            my $name;
+                            GET_CONST_NAME_2: foreach my $n (grep { /^CONST/ } keys %trees) {
+                                if ( $l->{object}->is_identical($trees{$n}) ) {
+                                    $name = $n;
+                                    last GET_CONST_NAME_2;
+                                }
+                            }
+                            if ( not defined $name ) {
+                                $name = 'CONST' . $tree_num;
+                                $trees{$name} = $l->{object};
+                                $tree_num++;
+                            }                            
+                            $hist{$name}++;
+                        }
                     }
                     elsif ($l->{type} eq 'variable') {
-                        $hist{$l->{object}->name()}++;
+                        my $name;
+                        GET_VAR_NAME_2: foreach my $n (grep { /^VAR/ } keys %trees) {
+                            if ( $l->{object}->is_identical($trees{$n}) ) {
+                                $name = $n;
+                                last GET_VAR_NAME_2;
+                            }
+                        }
+                        if ( not defined $name ) {
+                            $name = 'VAR' . $tree_num;
+                            $trees{$name} = $l->{object};
+                            $tree_num++;
+                        }
+                        $hist{$name}++;
                     }
-                    elsif ($l->{type} eq 'function') {                     
-                        my $ft = $l->{object};
-                        my $func_name;
-                        GET_FUNC_NAME_2: foreach my $fn (keys %func_trees) {
-                            if ( $ft->is_identical($func_trees{$fn}) ) {
-                                $func_name = $fn;
+                    elsif ($l->{type} eq 'function') {
+                        my $name;
+                        GET_FUNC_NAME_2: foreach my $n (grep { /^FUNC/ } keys %trees) {
+                            if ( $l->{object}->is_identical($trees{$n}) ) {
+                                $name = $n;
                                 last GET_FUNC_NAME_2;
                             }
                         }
-                        if ( !defined $func_name ) {
-                            $func_name = $func_prefix . $func_num;
-                            $func_trees{$func_name} = $ft;
-                            $func_num++;
-                        }                        
-                        $hist{$func_name}++;
+                        if ( not defined $name ) {
+                            $name = 'FUNC' . $tree_num;
+                            $trees{$name} = $l->{object};
+                            $tree_num++;
+                        }
+                        $hist{$name}++;
                     }
                     else {                    
                         return (undef, undef);
@@ -549,16 +611,31 @@ sub collect_terms {
     # put the accumulator into the data structure
     $collected_terms{terms}{constant_accumulator} = $accumulator;
     # and the functions 
-    $collected_terms{funcs} = \%func_trees;
+    $collected_terms{trees} = \%trees;
 
     return \%collected_terms;
 }
+
+sub get_term_name {
+    my ($tn, $thr) = @_;
+
+    if ( $tn =~ /^VAR/ ) {
+
+        my ($n,$p) = split(/:/, $tn);
+        if ( exists $thr->{$n} ) {
+            $tn = $thr->{$n}{name};
+        }
+    }
+
+    return $tn;
+}
+
 
 sub build_summation_tree {
     my ($ct) = @_;
     my %ct = %{$ct};
     my %collected_terms = %{$ct{terms}};
-    my %func_trees = %{$ct{funcs}};
+    my %trees = %{$ct{trees}};
 
     my $accumulator = $collected_terms{constant_accumulator};
     delete $collected_terms{constant_accumulator};
@@ -571,8 +648,11 @@ sub build_summation_tree {
     }
 
     # try to put the terms in a neat consistent order
-    my @sorted_terms =  sort { length($a) <=> length($b) || $a cmp $b || $collected_terms{$a} <=> $collected_terms{$b} } 
-                        keys %collected_terms;
+    my @sorted_terms =  sort {  length(get_term_name($a, \%trees)) <=> length(get_term_name($b, \%trees)) || 
+                                get_term_name($a, \%trees) cmp get_term_name($b, \%trees) || 
+                                $collected_terms{$a} <=> $collected_terms{$b} } 
+                                keys %collected_terms;
+
     my @negative = grep { $_ <= 0 } @coeffs;
     my $all_neg = 0;
     if ( scalar(@negative) == scalar(@sorted_terms) ) {
@@ -613,21 +693,22 @@ sub build_summation_tree {
             my ($var, $pow) = split(/:/, $v);            
             next VAR_LOOP if $pow == 0; #?? how would that get there?
 
-            if ( exists $func_trees{$var} ) {
+            if ( exists $trees{$var} ) {
                 if ( $pow == 1 ) {
-                    push @product_list, $func_trees{$var}->new();
+                    push @product_list, $trees{$var}->new();
                 }
                 else {
-                    push @product_list, Math::Symbolic::Operator->new('^', $func_trees{$var}->new(), Math::Symbolic::Constant->new($pow));
+                    push @product_list, Math::Symbolic::Operator->new('^', $trees{$var}->new(), Math::Symbolic::Constant->new($pow));
                 }
             }
             else {
-                if ( $pow == 1 ) {
-                    push @product_list, Math::Symbolic::Variable->new($var);
-                }
-                else {
-                    push @product_list, Math::Symbolic::Operator->new('^', Math::Symbolic::Variable->new($var), Math::Symbolic::Constant->new($pow));
-                }
+                 die "build_summation_tree: Found something without an associated Math::Symbolic object!: $var";
+#                if ( $pow == 1 ) {
+#                    push @product_list, Math::Symbolic::Variable->new($var);
+#                }
+#                else {
+#                    push @product_list, Math::Symbolic::Operator->new('^', Math::Symbolic::Variable->new($var), Math::Symbolic::Constant->new($pow));
+#                }
             }
         }
 
@@ -646,7 +727,7 @@ sub build_summation_tree {
     my $first = shift @to_sum;
     my $nt = $first->[1];
     if ( $first->[0] eq '-' ) {       
-        if ( $first->[1]->term_type() == T_CONSTANT ) {
+        if ( ($first->[1]->term_type() == T_CONSTANT) && ($first->[1]->special() eq '') ) {
             # folding -1 into constant
             $nt = Math::Symbolic::Constant->new(-1 * $first->[1]->value());
         }
@@ -695,12 +776,12 @@ sub prepare {
     elsif ( $t->term_type() == T_CONSTANT ) {
         # convert (non-integer decimal) constants into rational numbers where possible
         my $val = $t->value();
-        if ( $val eq int($val) ) {
+        if ( ($val eq int($val)) || length($t->special()) ) {
             $return_t = $t->new();
         }
         else {
             my (undef, $frac) = split(/\./, $val);
-            if ( defined($frac) && (length($frac)>=1) ) {
+            if ( defined($frac) && (length($frac)>=1) && (length($frac)<10) ) {
                 my $mult = 10**length($frac);
                 # this will (possibly) be cancelled down later 
                 $return_t = Math::Symbolic::Operator->new( '/', Math::Symbolic::Constant->new($val*$mult), Math::Symbolic::Constant->new($mult) )
@@ -722,7 +803,7 @@ sub prepare {
         #
         # here come the "hardly readable if-else blocks" Steffen warned of in Math::Symbolic::Custom::Transformation
         if ( $t->type() == B_SUM ) {
-            if ( ($op1->term_type() == T_CONSTANT) && ($op2->term_type() == T_CONSTANT) ) {
+            if ( ($op1->term_type() == T_CONSTANT) && ($op1->special() eq '') && ($op2->term_type() == T_CONSTANT) && ($op2->special() eq '') ) {
                 # Executing addition of two constants
                 $return_t = Math::Symbolic::Constant->new($op1->value() + $op2->value());
             }
@@ -776,7 +857,7 @@ sub prepare {
             }
         }
         elsif ( $t->type() == B_DIFFERENCE ) {
-            if ( ($op1->term_type() == T_CONSTANT) && ($op2->term_type() == T_CONSTANT) ) {
+            if ( ($op1->term_type() == T_CONSTANT) && ($op1->special() eq '') && ($op2->term_type() == T_CONSTANT) && ($op2->special() eq '') ) {
                 # Executing subtraction of two constants
                 $return_t = Math::Symbolic::Constant->new( $op1->value() - $op2->value() );
             }
@@ -845,25 +926,25 @@ sub prepare {
                 # Division by unity found, removing division
                 $return_t = $op1;
             }
-            elsif ( ($op1->term_type() == T_CONSTANT) && ($op2->term_type() == T_CONSTANT) &&
+            elsif ( ($op1->term_type() == T_CONSTANT) && ($op1->special() eq '') && ($op2->term_type() == T_CONSTANT) && ($op2->special() eq '') &&
                     (($op1->value()/$op2->value()) eq int($op1->value()/$op2->value())) ) {
                 # Denominator evenly divides into numerator, removing division
                 $return_t = Math::Symbolic::Constant->new($op1->value()/$op2->value())
             }
-            elsif ( ($op2->term_type() == T_CONSTANT) && ($op2->value() < 0) ) {
+            elsif ( ($op2->term_type() == T_CONSTANT) && ($op2->special() eq '') && ($op2->value() < 0) ) {
                 # Pulling negative out of denominator
                 my $numerator = Math::Symbolic::Operator->new( '*', Math::Symbolic::Constant->new(-1), $op1 );
                 $return_t = prepare(Math::Symbolic::Operator->new( '/', $numerator, Math::Symbolic::Constant->new(abs($op2->value())) ), $d);
             }    
             elsif ( ($op2->term_type() == T_OPERATOR) && ($op2->type() == B_PRODUCT) &&
-                    ($op2->op1()->term_type() == T_CONSTANT) && ($op2->op1()->value() < 0) ) {
+                    ($op2->op1()->term_type() == T_CONSTANT) && ($op2->op1()->special() eq '') && ($op2->op1()->value() < 0) ) {
                 # Pulling negative out of denominator
                 my $numerator = Math::Symbolic::Operator->new( '*', Math::Symbolic::Constant->new(-1), $op1 );
                 my $denominator = Math::Symbolic::Operator->new( '*', Math::Symbolic::Constant->new(abs($op2->op1()->value())), $op2->op2()->new() );
                 $return_t = prepare(Math::Symbolic::Operator->new( '/', $numerator, $denominator ), $d);
             }
             elsif ( ($op2->term_type() == T_OPERATOR) && ($op2->type() == B_PRODUCT) &&
-                    ($op2->op2()->term_type() == T_CONSTANT) && ($op2->op2()->value() < 0) ) {
+                    ($op2->op2()->term_type() == T_CONSTANT) && ($op2->op2()->special() eq '') && ($op2->op2()->value() < 0) ) {
                 # Pulling negative out of denominator
                 my $numerator = Math::Symbolic::Operator->new( '*', Math::Symbolic::Constant->new(-1), $op1->new() );
                 my $denominator = Math::Symbolic::Operator->new( '*', $op2->op1()->new(), Math::Symbolic::Constant->new(abs($op2->op2()->value())) );
@@ -904,7 +985,7 @@ sub prepare {
                 # Removing multiply by unity
                 $return_t = $op1;
             }
-            elsif ( ($op1->term_type() == T_CONSTANT) && ($op2->term_type() == T_CONSTANT) ) {
+            elsif ( ($op1->term_type() == T_CONSTANT) && ($op1->special() eq '') && ($op2->term_type() == T_CONSTANT) && ($op2->special() eq '') ) {
                 # Executing multiplication of two constants
                 $return_t = Math::Symbolic::Constant->new($op1->value() * $op2->value());
             }
@@ -1027,7 +1108,7 @@ sub prepare {
         my $op1 = prepare($t->op1(), $d);
     
         if ( $t->type() == U_MINUS ) {
-            if ( $op1->term_type() == T_CONSTANT ) {
+            if ( ($op1->term_type() == T_CONSTANT) && ($op1->special() eq '') ) {
                 # Removing negation of a constant by directly folding multiplication of -1 into that constant
                 $return_t = Math::Symbolic::Constant->new( -1*$op1->value() );
             }
@@ -1192,7 +1273,7 @@ sub create_product_tree {
     my $const = 1;
     my @v_e;
     foreach my $c (@{$elements}) {        
-        if ( $c->{type} eq 'constant' ) {
+        if ( ($c->{type} eq 'constant') && ($c->{object}->special() eq '') ) {
             $const *= $c->{object}->value();
         }
         else {

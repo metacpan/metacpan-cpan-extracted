@@ -2,7 +2,7 @@
 #
 # Author: Gisbert W. Selke, TapirSoft Selke & Selke GbR.
 #
-# Copyright (C) 2015 Gisbert W. Selke. All rights reserved.
+# Copyright (C) 2015, 2024 Gisbert W. Selke. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -10,16 +10,18 @@
 #
 
 package Map::Tube::Lyon;
+use 5.10.0;
+use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = version->declare('v0.61.0');
 
 =encoding utf8
 
 =head1 NAME
 
-Map::Tube::Lyon - Interface to the Lyon metro map
+Map::Tube::Lyon - Interface to the Lyon metro, funicular and tramway map
 
 =cut
 
@@ -42,8 +44,9 @@ with 'Map::Tube';
 
 =head1 DESCRIPTION
 
-This module allows to find the shortest route between any two given métro
-stations in Lyon. All interesting methods are provided by the role L<Map::Tube>.
+This module allows to find the shortest route between any two given
+stations in Lyon. Metro, funiculars and tramways are covered.
+All interesting methods are provided by the role L<Map::Tube>.
 
 =head1 METHODS
 

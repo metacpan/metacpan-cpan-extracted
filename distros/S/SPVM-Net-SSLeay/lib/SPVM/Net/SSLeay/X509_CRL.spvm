@@ -4,6 +4,8 @@
 class Net::SSLeay::X509_CRL {
   allow Net::SSLeay::PEM;
   
+  use Net::SSLeay::Error;
+  
   use Fn;
   
   # Class Methods

@@ -9,7 +9,7 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our $VERBOSE = 0;        # verbose mode
 
 our $LZ_MIN_LEN       = 4;          # minimum match length in LZ parsing
@@ -27,6 +27,7 @@ our %EXPORT_TAGS = (
         qw(
 
           crc32
+          adler32
 
           read_bit
           read_bit_lsb
@@ -185,6 +186,18 @@ our %EXPORT_TAGS = (
 
           lzw_compress
           lzw_decompress
+
+          zlib_compress
+          zlib_decompress
+
+          deflate_create_block_type_0_header
+          deflate_create_block_type_1
+          deflate_create_block_type_2
+
+          deflate_extract_next_block
+          deflate_extract_block_type_0
+          deflate_extract_block_type_1
+          deflate_extract_block_type_2
           )
     ]
 );
@@ -3146,6 +3159,21 @@ sub crc32($str, $crc = 0) {
     return (($crc & 0xffffffff) ^ 0xffffffff);
 }
 
+sub adler32($str, $adler = 1) {
+
+    # Reference:
+    #   https://datatracker.ietf.org/doc/html/rfc1950#section-9
+
+    my $s1 = $adler & 0xffff;
+    my $s2 = ($adler >> 16) & 0xffff;
+
+    foreach my $c (unpack('C*', $str)) {
+        $s1 = ($s1 + $c) % 65521;
+        $s2 = ($s2 + $s1) % 65521;
+    }
+    return (($s2 << 16) + $s1);
+}
+
 #############################
 # Bzip2 compression
 #############################
@@ -3560,7 +3588,7 @@ sub _create_cl_dictionary (@cl_symbols) {
     }
 }
 
-sub _create_block_type_2 ($literals, $distances, $lengths) {
+sub deflate_create_block_type_2 ($literals, $distances, $lengths) {
 
     state $deflate_tables = [make_deflate_tables()];
     my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS, $LENGTH_INDICES) = @$deflate_tables;
@@ -3668,7 +3696,7 @@ sub _create_block_type_2 ($literals, $distances, $lengths) {
     return $bitstring;
 }
 
-sub _create_block_type_1 ($literals, $distances, $lengths) {
+sub deflate_create_block_type_1 ($literals, $distances, $lengths) {
 
     state $deflate_tables = [make_deflate_tables()];
     my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS, $LENGTH_INDICES) = @$deflate_tables;
@@ -3730,7 +3758,7 @@ sub _create_block_type_1 ($literals, $distances, $lengths) {
     return $bitstring;
 }
 
-sub _create_block_type_0($chunk) {
+sub deflate_create_block_type_0_header($chunk) {
 
     my $chunk_len = length($chunk);
     my $len       = int2bits_lsb($chunk_len,             16);
@@ -3743,7 +3771,7 @@ sub gzip_compress ($in_fh, $lzss_encoding_sub = \&lzss_encode) {
 
     if (ref($in_fh) eq '') {
         open(my $fh2, '<:raw', \$in_fh) or confess "error: $!";
-        return __SUB__->($fh2);
+        return __SUB__->($fh2, $lzss_encoding_sub);
     }
 
     my $compressed = '';
@@ -3778,12 +3806,11 @@ sub gzip_compress ($in_fh, $lzss_encoding_sub = \&lzss_encode) {
 
         $crc32 = crc32($chunk, $crc32);
         $total_length += length($chunk);
+        $bitstring .= eof($in_fh) ? '1' : '0';
 
         my ($literals, $distances, $lengths) = $lzss_encoding_sub->($chunk);
 
-        $bitstring .= eof($in_fh) ? '1' : '0';
-
-        my $bt1_bitstring = _create_block_type_1($literals, $distances, $lengths);
+        my $bt1_bitstring = deflate_create_block_type_1($literals, $distances, $lengths);
 
         # When block type 1 is larger than the input, then we have random uncompressible data: use block type 0
         if ((length($bt1_bitstring) >> 3) > length($chunk) + 5) {
@@ -3792,15 +3819,15 @@ sub gzip_compress ($in_fh, $lzss_encoding_sub = \&lzss_encode) {
 
             $bitstring .= '00';
 
-            print $out_fh pack('b*', $bitstring);                     # pads to a byte
-            print $out_fh pack('b*', _create_block_type_0($chunk));
+            print $out_fh pack('b*', $bitstring);                                   # pads to a byte
+            print $out_fh pack('b*', deflate_create_block_type_0_header($chunk));
             print $out_fh $chunk;
 
             $bitstring = '';
             next;
         }
 
-        my $bt2_bitstring = _create_block_type_2($literals, $distances, $lengths);
+        my $bt2_bitstring = deflate_create_block_type_2($literals, $distances, $lengths);
 
         # When block type 2 is larger than block type 1, then we may have very small data
         if (length($bt2_bitstring) > length($bt1_bitstring)) {
@@ -3819,8 +3846,8 @@ sub gzip_compress ($in_fh, $lzss_encoding_sub = \&lzss_encode) {
         print $out_fh pack('b*', $bitstring);
     }
 
-    print $out_fh pack('b*', int2bits_lsb($crc32,        32));
-    print $out_fh pack('b*', int2bits_lsb($total_length, 32));
+    print $out_fh int2bytes_lsb($crc32,        4);
+    print $out_fh int2bytes_lsb($total_length, 4);
 
     return $compressed;
 }
@@ -3829,10 +3856,12 @@ sub gzip_compress ($in_fh, $lzss_encoding_sub = \&lzss_encode) {
 # GZIP DECOMPRESSOR
 ###################
 
-sub _extract_block_type_0 ($in_fh, $buffer) {
+sub deflate_extract_block_type_0 ($in_fh, $buffer, $search_window) {
 
-    my $len           = bits2int_lsb($in_fh, 16, $buffer);
-    my $nlen          = bits2int_lsb($in_fh, 16, $buffer);
+    $$buffer = '';
+
+    my $len           = bytes2int_lsb($in_fh, 2);
+    my $nlen          = bytes2int_lsb($in_fh, 2);
     my $expected_nlen = (~$len) & 0xffff;
 
     if ($expected_nlen != $nlen) {
@@ -3843,6 +3872,11 @@ sub _extract_block_type_0 ($in_fh, $buffer) {
     }
 
     read($in_fh, (my $chunk), $len) // confess "Read error: $!";
+    $$search_window .= $chunk;
+
+    $$search_window = substr($$search_window, -$Compression::Util::LZ_MAX_DIST)
+      if (length($$search_window) > 2 * $Compression::Util::LZ_MAX_DIST);
+
     return $chunk;
 }
 
@@ -3920,10 +3954,13 @@ sub _deflate_decode_huffman($in_fh, $buffer, $rev_dict, $dist_rev_dict, $search_
         confess "[!] Something went wrong: code `$code` is not empty!";
     }
 
+    $$search_window = substr($$search_window, -$Compression::Util::LZ_MAX_DIST)
+      if (length($$search_window) > 2 * $Compression::Util::LZ_MAX_DIST);
+
     return $data;
 }
 
-sub _extract_block_type_1 ($in_fh, $buffer, $search_window) {
+sub deflate_extract_block_type_1 ($in_fh, $buffer, $search_window) {
 
     state $rev_dict;
     state $dist_rev_dict;
@@ -3998,7 +4035,7 @@ sub _decode_CL_lengths($in_fh, $buffer, $CL_rev_dict, $size) {
     return @lengths;
 }
 
-sub _extract_block_type_2 ($in_fh, $buffer, $search_window) {
+sub deflate_extract_block_type_2 ($in_fh, $buffer, $search_window) {
 
     # (5 bits) HLIT = (number of LL code entries present) - 257
     my $HLIT = bits2int_lsb($in_fh, 5, $buffer) + 257;
@@ -4033,6 +4070,31 @@ sub _extract_block_type_2 ($in_fh, $buffer, $search_window) {
     _deflate_decode_huffman($in_fh, $buffer, $LL_rev_dict, $dist_rev_dict, $search_window);
 }
 
+sub deflate_extract_next_block ($in_fh, $buffer, $search_window) {
+
+    my $block_type = bits2int_lsb($in_fh, 2, $buffer);
+
+    my $chunk = '';
+
+    if ($block_type == 0) {
+        $VERBOSE && say STDERR "\n:: Extracting block of type 0";
+        $chunk = deflate_extract_block_type_0($in_fh, $buffer, $search_window);
+    }
+    elsif ($block_type == 1) {
+        $VERBOSE && say STDERR "\n:: Extracting block of type 1";
+        $chunk = deflate_extract_block_type_1($in_fh, $buffer, $search_window);
+    }
+    elsif ($block_type == 2) {
+        $VERBOSE && say STDERR "\n:: Extracting block of type 2";
+        $chunk = deflate_extract_block_type_2($in_fh, $buffer, $search_window);
+    }
+    else {
+        confess "[!] Unknown block of type: $block_type";
+    }
+
+    return $chunk;
+}
+
 sub gzip_decompress ($in_fh) {
 
     if (ref($in_fh) eq '') {
@@ -4051,7 +4113,7 @@ sub gzip_decompress ($in_fh) {
     my $MAGIC = (getc($in_fh) // confess "error") . (getc($in_fh) // confess "error");
 
     if ($MAGIC ne pack('C*', 0x1f, 0x8b)) {
-        confess "Not a valid Gzip container!";
+        confess "Not a valid GZIP container!";
     }
 
     my $CM     = getc($in_fh) // confess "error";                             # 0x08 = DEFLATE
@@ -4114,37 +4176,15 @@ sub gzip_decompress ($in_fh) {
     my $actual_length = 0;
     my $buffer        = '';
     my $search_window = '';
-    my $window_size   = $Compression::Util::LZ_MAX_DIST;
 
     while (1) {
 
-        my $is_last    = read_bit_lsb($in_fh, \$buffer);
-        my $block_type = bits2int_lsb($in_fh, 2, \$buffer);
-
-        my $chunk = '';
-
-        if ($block_type == 0) {
-            $VERBOSE && say STDERR "\n:: Extracting block of type 0";
-            $buffer = '';                                        # pad to a byte
-            $chunk  = _extract_block_type_0($in_fh, \$buffer);
-            $search_window .= $chunk;
-        }
-        elsif ($block_type == 1) {
-            $VERBOSE && say STDERR "\n:: Extracting block of type 1";
-            $chunk = _extract_block_type_1($in_fh, \$buffer, \$search_window);
-        }
-        elsif ($block_type == 2) {
-            $VERBOSE && say STDERR "\n:: Extracting block of type 2";
-            $chunk = _extract_block_type_2($in_fh, \$buffer, \$search_window);
-        }
-        else {
-            confess "[!] Unknown block of type: $block_type";
-        }
+        my $is_last = read_bit_lsb($in_fh, \$buffer);
+        my $chunk   = deflate_extract_next_block($in_fh, \$buffer, \$search_window);
 
         print $out_fh $chunk;
         $crc32 = crc32($chunk, $crc32);
         $actual_length += length($chunk);
-        $search_window = substr($search_window, -$window_size) if (length($search_window) > 2 * $window_size);
 
         last if $is_last;
     }
@@ -4182,6 +4222,163 @@ sub gzip_decompress ($in_fh) {
 }
 
 ###############################
+# ZLIB compressor
+###############################
+
+sub zlib_compress ($in_fh, $lzss_encoding_sub = \&lzss_encode) {
+
+    if (ref($in_fh) eq '') {
+        open(my $fh2, '<:raw', \$in_fh) or confess "error: $!";
+        return __SUB__->($fh2, $lzss_encoding_sub);
+    }
+
+    my $compressed = '';
+
+    open my $out_fh, '>:raw', \$compressed;
+
+    local $LZ_MIN_LEN  = 4 if ($LZ_MIN_LEN < 4);    # minimum match length in LZ parsing
+    local $LZ_MAX_LEN  = 258;                       # maximum match length in LZ parsing
+    local $LZ_MAX_DIST = (1 << 15) - 1;             # maximum allowed back-reference distance in LZ parsing
+
+    my $CMF = (7 << 4) | 8;
+    my $FLG = 2 << 6;
+
+    while (($CMF * 256 + $FLG) % 31 != 0) {
+        ++$FLG;
+    }
+
+    my $bitstring = '';
+    my $adler32   = 1;
+
+    print $out_fh chr($CMF);
+    print $out_fh chr($FLG);
+
+    if (eof($in_fh)) {    # empty file
+        $bitstring = '1' . '10' . '0000000';
+    }
+
+    state $CHUNK_SIZE = (1 << 15) - 1;
+
+    while (read($in_fh, (my $chunk), $CHUNK_SIZE)) {
+
+        $adler32 = adler32($chunk, $adler32);
+        $bitstring .= eof($in_fh) ? '1' : '0';
+
+        my ($literals, $distances, $lengths) = $lzss_encoding_sub->($chunk);
+
+        my $bt1_bitstring = deflate_create_block_type_1($literals, $distances, $lengths);
+
+        # When block type 1 is larger than the input, then we have random uncompressible data: use block type 0
+        if ((length($bt1_bitstring) >> 3) > length($chunk) + 5) {
+
+            $VERBOSE && say STDERR ":: Using block type: 0";
+
+            $bitstring .= '00';
+
+            print $out_fh pack('b*', $bitstring);                                   # pads to a byte
+            print $out_fh pack('b*', deflate_create_block_type_0_header($chunk));
+            print $out_fh $chunk;
+
+            $bitstring = '';
+            next;
+        }
+
+        my $bt2_bitstring = deflate_create_block_type_2($literals, $distances, $lengths);
+
+        # When block type 2 is larger than block type 1, then we may have very small data
+        if (length($bt2_bitstring) > length($bt1_bitstring)) {
+            $VERBOSE && say STDERR ":: Using block type: 1";
+            $bitstring .= $bt1_bitstring;
+        }
+        else {
+            $VERBOSE && say STDERR ":: Using block type: 2";
+            $bitstring .= $bt2_bitstring;
+        }
+
+        print $out_fh pack('b*', substr($bitstring, 0, length($bitstring) - (length($bitstring) % 8), ''));
+    }
+
+    if ($bitstring ne '') {
+        print $out_fh pack('b*', $bitstring);
+    }
+
+    print $out_fh int2bytes($adler32, 4);
+
+    return $compressed;
+}
+
+###############################
+# ZLIB decompressor
+###############################
+
+sub zlib_decompress($in_fh) {
+
+    if (ref($in_fh) eq '') {
+        open(my $fh2, '<:raw', \$in_fh) or confess "error: $!";
+        return __SUB__->($fh2);
+    }
+
+    my $decompressed = '';
+
+    open my $out_fh, '>:raw', \$decompressed;
+
+    local $LZ_MIN_LEN  = 4 if ($LZ_MIN_LEN < 4);    # minimum match length in LZ parsing
+    local $LZ_MAX_LEN  = 258;                       # maximum match length in LZ parsing
+    local $LZ_MAX_DIST = (1 << 15) - 1;             # maximum allowed back-reference distance in LZ parsin
+
+    my $adler32 = 1;
+
+    my $CMF = ord(getc($in_fh));
+    my $FLG = ord(getc($in_fh));
+
+    if (($CMF * 256 + $FLG) % 31 != 0) {
+        confess "Invalid header checksum!\n";
+    }
+
+    my $CINFO = $CMF >> 4;
+
+    if ($CINFO > 7) {
+        confess "Values of CINFO above 7 are not supported!\n";
+    }
+
+    my $method = $CMF & 0b1111;
+
+    if ($method != 8) {
+        confess "Only method 8 (DEFLATE) is supported!\n";
+    }
+
+    my $buffer        = '';
+    my $search_window = '';
+
+    while (1) {
+
+        my $is_last = read_bit_lsb($in_fh, \$buffer);
+        my $chunk   = deflate_extract_next_block($in_fh, \$buffer, \$search_window);
+
+        print $out_fh $chunk;
+        $adler32 = adler32($chunk, $adler32);
+
+        last if $is_last;
+    }
+
+    my $stored_adler32 = bytes2int($in_fh, 4);
+
+    if ($adler32 != $stored_adler32) {
+        confess "Adler32 checksum does not match: $adler32 (actual) != $stored_adler32 (stored)\n";
+    }
+
+    if (eof($in_fh)) {
+        $VERBOSE && print STDERR "\n:: Reached the end of the file.\n";
+    }
+    else {
+        $VERBOSE && print STDERR "\n:: There is something else in the container! Trying to recurse!\n\n";
+        return ($decompressed . __SUB__->($in_fh));
+    }
+
+    return $decompressed;
+}
+
+###############################
 # LZ4 compressor
 ###############################
 
@@ -4189,7 +4386,7 @@ sub lz4_compress($fh, $lzss_encoding_sub = \&lzss_encode) {
 
     if (ref($fh) eq '') {
         open(my $fh2, '<:raw', \$fh) or confess "error: $!";
-        return __SUB__->($fh2);
+        return __SUB__->($fh2, $lzss_encoding_sub);
     }
 
     my $compressed = '';
@@ -4485,7 +4682,8 @@ B<Compression::Util> is a function-based module, implementing various techniques
     * LZ77/LZSS (de)compression
     * LZW (de)compression
     * Bzip2 (de)compression
-    * Gzip (de)compression
+    * GZIP (de)compression
+    * ZLIB (de)compression
     * LZ4 (de)compression
 
 The provided techniques can be easily combined in various ways to create powerful compressors, such as the Bzip2 compressor, which is a pipeline of the following methods:
@@ -4625,8 +4823,11 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       bzip2_compress($string)              # Compress a given string using the Bzip2 format
       bzip2_decompress($fh)                # Inverse of the above method
 
-      gzip_compress($string)               # Compress a given string using the Gzip format
+      gzip_compress($string)               # Compress a given string using the GZIP format
       gzip_decompress($fh)                 # Inverse of the above method
+
+      zlib_compress($string)               # Compress a given string using the ZLIB format
+      zlib_decompress($fh)                 # Inverse of the above method
 
       lzss_compress($string)               # LZSS + DEFLATE-like encoding of lengths and distances
       lzss_decompress($fh)                 # Inverse of the above method
@@ -4997,14 +5198,29 @@ Valid Bzip2 decompressor, given a string or an input file-handle.
     my $string = gzip_compress($data);
     my $string = gzip_compress($data, \&lzss_encode_fast);  # using fast LZ-parsing
 
-Valid Gzip compressor, given a string or an input file-handle.
+Valid GZIP compressor (RFC 1952), given a string or an input file-handle.
 
 =head2 gzip_decompress
 
     my $data = gzip_decompress($string);
     my $data = gzip_decompress($fh);
 
-Valid Bzip2 decompressor, given a string or an input file-handle.
+Valid GZIP decompressor (RFC 1952), given a string or an input file-handle.
+
+=head2 zlib_compress
+
+    my $string = zlib_compress($fh);
+    my $string = zlib_compress($data);
+    my $string = zlib_compress($data, \&lzss_encode_fast);  # using fast LZ-parsing
+
+Valid ZLIB compressor (RFC 1950), given a string or an input file-handle.
+
+=head2 zlib_decompress
+
+    my $data = zlib_decompress($string);
+    my $data = zlib_decompress($fh);
+
+Valid ZLIB decompressor (RFC 1950), given a string or an input file-handle.
 
 =head2 mrl_compress / mrl_compress_symbolic
 
@@ -5349,7 +5565,14 @@ The function returns the decoded string.
     my $int32 = crc32($data);
     my $int32 = crc32($data, $prev_crc32);
 
-Compute the CRC32 of a given string.
+Compute the CRC32 checksum of a given string.
+
+=head2 adler32
+
+    my $int32 = adler32($data);
+    my $int32 = adler32($data, $prev_adler32);
+
+Compute the Adler32 checksum of a given string.
 
 =head2 read_bit
 
@@ -5643,6 +5866,79 @@ There is no need to call this function explicitly. Use C<deflate_encode()> inste
 
 Low-level function that returns the index inside the DEFLATE tables for a given value.
 
+=head2 deflate_create_block_type_0_header
+
+    my $bt0_header = deflate_create_block_type_0_header($chunk);
+
+Creates the header for a DEFLATE block of type 0 (uncompressed), as a bitstring, without including the block code number C<00>.
+
+The length of the C<$chunk> must not exceed C<2^16 - 1>.
+
+To create a DEFLATE block of type 0, including the content, use:
+
+    my $block_type_0 = pack('b*', '00') . pack('b*', $bt0_header) . $chunk;
+
+which can be recovered as:
+
+    open my $fh, '<:raw', \$block_type_0;
+    my ($buffer, $search_window) = ('', '');
+    my $chunk = deflate_extract_next_block($fh, \$buffer, \$search_window);
+
+=head2 deflate_create_block_type_1
+
+    my $bitstring = deflate_create_block_type_1($literals, $distances, $lengths);
+
+Creates a DEFLATE block of type 1 (fixed prefix-codes), as a bitstring, given the ARRAY-refs of literals, distances and lengths, returned by C<lzss_encode()>.
+
+This type of block uses fixed prefix-codes and is pretty fast.
+
+=head2 deflate_create_block_type_2
+
+    my $bitstring = deflate_create_block_type_1($literals, $distances, $lengths);
+
+Creates a DEFLATE block of type 2 (dynamic prefix-codes), as a bitstring, given the ARRAY-refs of literals, distances and lengths, returned by C<lzss_encode()>.
+
+This type of block uses dynamic prefix-codes (Huffman codes) and produces good compression ratio on most inputs.
+
+=head2 deflate_extract_block_type_0
+
+    my $data = deflate_extract_block_type_0($fh, \$buffer, \$search_window);
+
+Given an input filehandle, it extracts a DEFLATE block of type 0 (uncompressed).
+
+    my ($buffer, $search_window) = ('', '');
+    my $block_type = bits2int_lsb($fh, 2, \$buffer);
+    $block_type == 0 or die "Not a block of type 0";
+    my $decoded_chunk = deflate_extract_block_type_0($fh, \$buffer, \$search_window);
+
+=head2 deflate_extract_block_type_1
+
+    my $data = deflate_extract_block_type_1($fh, \$buffer, \$search_window);
+
+Given an input filehandle, a bitstring buffer and a search window, it extracts a DEFLATE block of type 1 (fixed prefix-codes).
+
+    my ($buffer, $search_window) = ('', '');
+    my $block_type = bits2int_lsb($fh, 2, \$buffer);
+    $block_type == 1 or die "Not a block of type 1";
+    my $decoded_chunk = deflate_extract_block_type_1($fh, \$buffer, \$search_window);
+
+=head2 deflate_extract_block_type_2
+
+    my $data = deflate_extract_block_type_2($fh, \$buffer, \$search_window);
+
+Given an input filehandle, a bitstring buffer and a search window, it extracts a DEFLATE block of type 2 (dynamic prefix-codes).
+
+    my ($buffer, $search_window) = ('', '');
+    my $block_type = bits2int_lsb($fh, 2, \$buffer);
+    $block_type == 2 or die "Not a block of type 2";
+    my $decoded_chunk = deflate_extract_block_type_2($fh, \$buffer, \$search_window);
+
+=head2 deflate_extract_next_block
+
+    my $data = deflate_extract_next_block($fh, \$buffer, \$search_window);
+
+Given an input filehandle, a bitstring buffer and a search window, it extracts the next DEFLATE block. The next two bits in the input file-handle (or in the bitstring buffer) must contain the block-type number.
+
 =head1 EXPORT
 
 Each function can be exported individually, as:
@@ -5719,6 +6015,9 @@ The functions can be combined in various ways, easily creating novel compression
 
 =item * GZIP file format specification
         L<https://datatracker.ietf.org/doc/html/rfc1952>
+
+=item * ZLIB Compressed Data Format Specification
+        L<https://datatracker.ietf.org/doc/html/rfc1950>
 
 =item * BZIP2 Format Specification, by Joe Tsai:
         L<https://github.com/dsnet/compress/blob/master/doc/bzip2-format.pdf>

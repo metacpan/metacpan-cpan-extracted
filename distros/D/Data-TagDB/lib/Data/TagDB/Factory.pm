@@ -20,7 +20,7 @@ use parent 'Data::TagDB::WeakBaseObject';
 use constant NS_DATE => 'fc43fbba-b959-4882-b4c8-90a288b7d416';
 use constant RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 
 
@@ -509,7 +509,7 @@ Data::TagDB::Factory - Work with Tag databases
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

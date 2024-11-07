@@ -1,5 +1,13 @@
 Revision history for Perl extension Map::Tube::Lyon.
 
+0.61.0 2024-11-05
+  - Adapted for use with Map::Tube 3.77
+  - Bumped Perl version to 5.10.0
+  - Use semantic versioning
+  - Added more tests
+  - Added metro stations, updated some names
+  - Added funiculars and tramways
+
 0.07 2015-03-10
   - fixed MANIFEST.SKIP and tests to cope with ExtUtils::MakeMaker 7.05+
     (thanks to Slaven's tireless research)

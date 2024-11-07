@@ -4,6 +4,8 @@
 class Net::SSLeay::X509_VERIFY_PARAM {
   allow Net::SSLeay::SSL_CTX;
   
+  use Net::SSLeay::Error;
+  
   use Fn;
   
   # Class Methods

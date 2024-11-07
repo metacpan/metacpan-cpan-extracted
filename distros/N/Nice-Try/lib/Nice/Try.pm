@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.3.13
+## Version v1.3.15
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2024/09/06
+## Modified 2024/11/07
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.3.13';
+    our $VERSION = 'v1.3.15';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -47,6 +47,8 @@ sub import
     $hash->{debug_code} = 0 if( !CORE::exists( $hash->{debug_code} ) );
     $hash->{debug_dump} = 0 if( !CORE::exists( $hash->{debug_dump} ) );
     $hash->{dont_want} = 0 if( !CORE::exists( $hash->{dont_want} ) );
+    # We use the $class to process the __DATA__ or __END__ token section
+    $hash->{class} = $class;
     # We check if we are running under tie and if so we cannot use Want features, 
     # because they would trigger a segmentation fault.
     $hash->{is_tied} = 0;
@@ -123,11 +125,17 @@ sub filter
         if( index( $code, 'try' ) != -1 )
         {
             $self->_message( 4, "Processing $line lines of code." ) if( $self->{debug} >= 4 );
+            $self->_message( 4, "Processing code:\n${code}" ) if( $self->{debug} >= 5 );
             my $doc = PPI::Document->new( \$code, readonly => 1 ) || die( "Unable to parse: ", PPI::Document->errstr, "\n$code\n" );
             # Remove pod
             # $doc->prune('PPI::Token::Pod');
             $self->_browse( $doc ) if( $self->{debug_dump} );
-            if( $doc = $self->_parse( $doc ) )
+            # It is easy for us to do a simple check as to whether there is potentially a __DATA__ or a __END__ token,
+            # so we avoid wasting resources and time checking it using PPI::Element::find()
+            if( $doc = $self->_parse( $doc,
+                {
+                    has_data => ( ( CORE::index( $code, '__DATA__' ) != -1 || CORE::index( $code, '__END__' ) != -1 ) ? 1 : 0 ),
+                }) )
             {
                 $_ = $doc->serialize;
                 # $doc->save( "./dev/debug-parsed.pl" );
@@ -161,6 +169,7 @@ sub filter
             $line++;
         }
     }
+#     $self->_message( 4, "Resulting code:\n${_}" ) if( $self->{debug} >= 5 );
     if( $self->{debug_file} )
     {
         if( open( my $fh, ">$self->{debug_file}" ) )
@@ -283,6 +292,7 @@ sub _parse
 {
     my $self = shift( @_ );
     my $elem = shift( @_ );
+    my $opts = shift( @_ );
     no warnings 'uninitialized';
     if( !Scalar::Util::blessed( $elem ) || !$elem->isa( 'PPI::Node' ) )
     {
@@ -1473,7 +1483,115 @@ EOT
         }
     }
     # End foreach catch found
+
+    # NOTE: Do we have a __DATA__ or __END__ token ?
+    if( $opts->{has_data} )
+    {
+        my $ref = $elem->find(sub
+        {
+            my( $top, $this ) = @_;
+            return( ( $this->class eq 'PPI::Statement::Data' || $this->class eq 'PPI::Statement::End' ) ? 1 : 0 );
+        });
+        warn( "Warning only: Failed to find any __DATA__ or __END__ token." ) if( !defined( $ref ) && warnings::enabled() );
+        my $class = $self->{class};
+        my $name = 'DATA';
+        $self->_message( 4, "Found ", scalar( @$ref ), " DATA tokens." );
+        # There must be only one: either __DATA__ or __END__, so we process it, and exit the loop.
+        foreach my $this ( @$ref )
+        {
+            $self->_message( 4, "DATA or END token found." );
+            $self->_browse( $this ) if( $self->{debug} >= 5 );
+            my $tokens = $this->find(sub
+            {
+                my( $top, $this ) = @_;
+                # PPI::Token::End
+                return( ( $this->class eq 'PPI::Token::Data' || $this->class eq 'PPI::Token::End' ) ? 1 : 0 );
+            });
+            next if( !$tokens || ( defined( $tokens ) && ref( $tokens ) && !scalar( @$tokens ) ) );
+            my $token = $tokens->[0];
+            my $token_name_ref = $this->find( 'PPI::Token::Separator' );
+            my $token_name;
+            if( $token_name_ref && ref( $token_name_ref ) eq 'ARRAY' && scalar( @$token_name_ref ) )
+            {
+                $token_name = $token_name_ref->[0]->content;
+            }
+            else
+            {
+                warn( "Could not find the __END__ or __DATA__ separator." ) if( warnings::enabled() );
+                last;
+            }
+            
+            # my $io = $token->handle;
+            my $raw_data_str = $token->content;
+            $self->_message( 5, "Found DATA to be:\n${raw_data_str}" );
+
+            # Create a new string that holds only non-POD data
+            my $filtered_data_str = '';
+
+            if( $raw_data_str =~ /\S+/ )
+            {
+                # Parse the data as a PPI document to filter POD content
+                $self->_message( 5, "Parsing the DATA, and check for POD to skip." );
+                # Force it to be __END__ so PPI can handle properly the POD data
+                # FYI, PPI only handles POD data when the token is __END__, and not when it is __DATA__
+                if( $token_name eq '__DATA__' )
+                {
+                    my $data_str = "__END__\n" . $raw_data_str;
+                    require PPI::Tokenizer;
+                    my $tokenizer = PPI::Tokenizer->new( \$data_str );
+                    my $tokens = $tokenizer->all_tokens;
+                    foreach my $token ( @$tokens )
+                    {
+                        $filtered_data_str .= "${token}" if( $token->class eq 'PPI::Token::End' );
+                    }
+                }
+                else
+                {
+                    $filtered_data_str = $raw_data_str;
+                }
+            }
+            
+            # Now $filtered_data_str holds only the non-POD data content
+            $self->_message( 5, "Creating BEGIN block to set DATA with value:\n${filtered_data_str}" );
+            
+            # Define the BEGIN block code with the filtered data
+            my $begin_block_code = <<"END_CODE";
+CHECK
+{
+    my \$nice_try_data_block_str = <<'END_OF_DATA';
+${filtered_data_str}
+END_OF_DATA
     
+    require Symbol;
+    my \$fh = Symbol::geniosym();
+    open( \$fh, '<:scalar', \\\$nice_try_data_block_str ) || die( \$! );
+    no strict 'refs';
+    no warnings 'redefine';
+    *{ __PACKAGE__ . '::DATA' } = \$fh;
+};
+
+END_CODE
+            $self->_message( 5, "BEGIN block is:\n${begin_block_code}" );
+            my $begin_block = PPI::Token->new( $begin_block_code ) || die( "Unable to create token" );
+            $self->_message( 5, "Inserting BEGIN element object '", overload::StrVal( $begin_block ), "', before '", overload::StrVal( $this ), "'" );
+            my $rv = $this->__insert_before( $begin_block );
+            if( !defined( $rv ) )
+            {
+                warn( "BEGIN block object (", overload::StrVal( $begin_block ), ") to be inserted before the DATA token is not a valid object." ) if( warnings::enabled() );
+                last;
+            }
+            elsif( !$rv )
+            {
+                warn( "Somehow, the BEGIN block object (", overload::StrVal( $begin_block ), ") could not be inserted before the DATA token." ) if( warnings::enabled() );
+                last;
+            }
+            # $self->_message( 5, "BEGIN block object (", overload::StrVal( $begin_block ), ") was successfully inserted." );
+            # We end here, because there can be only one __DATA__ or __END__ token
+            last;
+        }
+    }
+
+    # $self->_message( 5, "Code now is: $elem" );
     return( $elem );
 }
 
@@ -2162,7 +2280,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.3.13
+    v1.3.15
 
 =head1 DESCRIPTION
 
@@ -2549,6 +2667,8 @@ Also, the C<use feature 'try'> expression must be in the relevant block where yo
 
 It is probably a matter of time until this is fully implemented in perl as a regular non-experimental feature.
 
+As of perl C<v5.40.0>. the C<try-catch> block L<is now only partly experimental|https://perldoc.perl.org/5.40.0/perldelta#try/catch-feature-is-no-longer-experimental>, but you still need to load it with C<use feature 'try'>. However, at least no warning of it being experimental will be emitted. Still, L<no exception filtering by class though|https://perldoc.perl.org/5.40.0/perlsyn#Try-Catch-Exception-Handling>
+
 See more information about perl's featured implementation of try-catch in L<perlsyn|https://perldoc.perl.org/perlsyn#Try-Catch-Exception-Handling>
 
 So, L<Nice::Try> is quite unique and fills the missing features, and since it uses XS modules for a one-time filtering, it is quite fast.
@@ -2921,6 +3041,96 @@ This is particularly true when running within an Apache modperl handler which ha
 When there is an update to correct this bug from L<Want>, I will issue a new version.
 
 The use of L<Want> is also automatically disabled when running under a package that use overloading.
+
+=head1 __DATA__ and __END__ sections
+
+Due to a limitation to the way source filter works with L<Filter::Util::Call>, normally, it is not possible to make the data available after the C<__DATA__> or C<__END__> token accessible with the special glob C<DATA>, but with C<Nice::Try>, it is possible. Thus, the following would work as you would expect:
+
+    #!/usr/bin/env perl
+    use strict;
+    use warnings;
+    use Nice::Try;
+    
+    try
+    {
+        print "Poem by Pierre de Ronsard (1545)\n";
+        
+        print while( <DATA> );
+    }
+    catch($e)
+    {
+        print( "Oh no: $e\n" );
+    }
+    
+    __END__
+    Mignonne, allons voir si la rose
+    Qui ce matin avoit desclose
+    Sa robe de pourpre au Soleil,
+    A point perdu ceste vesprée
+    Les plis de sa robe pourprée,
+    Et son teint au vostre pareil.
+
+The same would work if the C<__DATA__> were used instead of C<__END__>
+
+And, if you mix POD, it will ignore it to only make available in the C<DATA> glob the non-POD data. For example:
+
+    #!/usr/bin/env perl
+    use strict;
+    use warnings;
+    use Nice::Try;
+    
+    try
+    {
+        print "Poem by Pierre de Ronsard (1545)\n";
+        
+        print while( <DATA> );
+    }
+    catch($e)
+    {
+        print( "Oh no: $e\n" );
+    }
+    
+    __END__
+    Mignonne, allons voir si la rose
+    Qui ce matin avoit desclose
+    Sa robe de pourpre au Soleil,
+    A point perdu ceste vesprée
+    Les plis de sa robe pourprée,
+    Et son teint au vostre pareil.
+    
+    =encoding utf-8
+    
+    =head1 NAME
+    
+    French::Poetry - Pierre de Ronsard, Ode à Cassandre
+    
+    =head1 DESCRIPTION
+    
+    This famous poem was made by Pierre de Ronsard after he met Cassandre Salviati, daughter of an Italian banker, at the court in 1545.
+    
+    This poem is the epitome of Epicureanism (Carpe diem).
+    
+    =cut
+    
+    Las ! voyez comme en peu d'espace,
+    Mignonne, elle a dessus la place,
+    Las ! las ! ses beautés laissé choir !
+    Ô vraiment marâtre Nature,
+    Puisqu'une telle fleur ne dure
+    Que du matin jusques au soir !
+    
+    Donc, si vous me croyez, mignonne,
+    Tandis que votre âge fleuronne
+    En sa plus verte nouveauté,
+    Cueillez, cueillez votre jeunesse :
+    Comme à cette fleur, la vieillesse
+    Fera ternir votre beauté.
+
+This would yield the entire poem of 3 paragraph, while skipping the POD in-between. Of course, the same would work with C<__DATA__>
+
+The C<DATA> is actually an C<IO::File> object generated with C<Symbol::geniosym()>
+
+See also L<perldata/"Special-Literals"> for more information.
 
 =head1 LIMITATIONS
 

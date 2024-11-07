@@ -1,3 +1,40 @@
+0.008 2024-11-07
+  [New Features]
+    * Add Net::SSLeay::Error class.
+    * Add Net::SSLeay::Error::Operation class.
+  [Exception Messages Improvement]
+    * Improve exception messages.
+  [Incompatible Changes]
+    * Use Net::SSLeay::Error for OpenSSL errors.
+  [Document Improvement]
+    * Add docs for Net::SSLeay class.
+    
+0.007 2024-11-07
+  [Document Improvement]
+    * Add docs for Net::SSLeay::X509 class.
+    * Add docs for Net::SSLeay::X509_CRL class.
+    * Add docs for Net::SSLeay::X509_VERIFY_PARAM class.
+    * Add docs for Net::SSLeay::X509_STORE_CTX class.
+    * Add docs for Net::SSLeay::X509_STORE class.
+    * Add docs for Net::SSLeay::SSL_CTX class.
+  [Incompatible Changes]
+    * Fix the return type of Net::SSLeay::SSL_CTX#set_verify method.
+      
+      [Before]
+      method set_verify : int ($mode : int);
+      
+      [After]
+      method set_verify : void ($mode : int);
+    
+    * Net::SSLeay::SSL_CTX does not throw system errors.
+    * Remove Net::SSLeay#error field.
+  [New Features]
+    * Add Net::SSLeay::ERR#get_error method.
+    * Add Net::SSLeay::ERR#peek_error method.
+    * Add Net::SSLeay::ERR#peek_last_error method.
+  [Changes]
+    * Use ERR_peak_last_error instead of ERR_get_error not to change SSL error queue.
+    
 0.006 2024-11-05
   [Requirement Changes]
     * Require SPVM 0.990028.

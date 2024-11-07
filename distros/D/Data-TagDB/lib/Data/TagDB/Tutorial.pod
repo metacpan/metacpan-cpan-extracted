@@ -18,7 +18,7 @@ Data::TagDB::Tutorial - Work with Tag databases
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 Overview
 

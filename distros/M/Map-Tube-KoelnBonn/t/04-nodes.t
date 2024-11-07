@@ -1,0 +1,57 @@
+#!perl
+
+use strict;
+use warnings FATAL => 'all';
+use Test::More tests => 23;
+use Map::Tube::KoelnBonn;
+
+my $map = new_ok( 'Map::Tube::KoelnBonn' );
+
+is( $map->name( ), 'Köln-Bonn U- and S-Bahn and Tramways', 'Name of map does not match' );
+
+eval { $map->get_node_by_name('XYZ'); };
+like($@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E/, 'Node XYZ should not exist' );
+
+{
+  my $ret = $map->get_node_by_name('Neumarkt');
+  isa_ok( $ret,      'Map::Tube::Node' );
+  is( $ret->id( ),   's017',     'Node id not correct for Neumarkt' );
+  is( $ret->name( ), 'Neumarkt', 'Node name not correct for Neumarkt' );
+  is( $ret->link( ), 's016,s018,s050,s051,s125', 'Links not correct for Neumarkt' );
+  is( join( ',', sort map { $_->name( ) } @{ $ret->line( ) } ),  '1,16,18,3,4,7,9', 'Lines not correct for Neumarkt' );
+}
+
+{
+  my $ret = $map->get_node_by_id('s017');
+  isa_ok( $ret,      'Map::Tube::Node' );
+  is( $ret->id( ),   's017',     'Node id not correct for s017' );
+  is( $ret->name( ), 'Neumarkt', 'Node name not correct for s017' );
+}
+
+{
+  my $stationref = $map->get_stations( );
+  isa_ok( $stationref, 'ARRAY' );
+  my @stations = @{ $stationref };
+  isa_ok( ref($stations[0]), 'Map::Tube::Node' );
+  is( scalar(@stations), 376, 'Number of stations incorrect for map' );
+  like( join( ',', sort map { $_->name( ) } @stations ),  qr(^Aachener.*Kanalstr\.$), 'Stations not correct for map' );
+}
+
+{
+  my $stationref = $map->get_stations(16);
+  isa_ok( $stationref, 'ARRAY' );
+  my @stations = @{ $stationref };
+  isa_ok( ref($stations[0]), 'Map::Tube::Node' );
+  is( scalar(@stations), 50, 'Number of stations incorrect for line 16' );
+  like( join( ',', sort map { $_->name( ) } @stations ),  qr(^Amsterdamer.*Wurzerstr\.$), 'Stations not correct for line 16' );
+}
+
+{
+  my $stationref = $map->get_next_stations( 'Neumarkt' );
+  isa_ok( $stationref, 'ARRAY' );
+  my @stations = @{ $stationref };
+  isa_ok( $stations[0], 'Map::Tube::Node' );
+  is( scalar(@stations), 5, 'Number of neighbouring stations incorrect for Neumarkt' );
+  like( join( ',', sort map { $_->name( ) } @stations ), qr(^Appellhofplatz.*Rudolfplatz$), 'Neighbouring stations not correct for Neumarkt' );
+}
+

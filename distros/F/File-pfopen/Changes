@@ -1,5 +1,12 @@
 Revision history for File-pfopen
 
+0.03	Wed Nov  6 08:17:35 EST 2024
+	Refactor
+	Use Test::DescribeMe to simplify tests
+	Use gtar to create a distribution on Macs
+	Added support for codecode.io and Coveralls
+	Added the mode option
+
 0.02	Fri Jun 16 15:20:57 EDT 2017
 	Make it a proper pfopen, not just find the file
 

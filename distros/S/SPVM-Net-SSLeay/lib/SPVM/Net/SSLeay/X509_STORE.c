@@ -20,7 +20,11 @@ int32_t SPVM__Net__SSLeay__X509_STORE__add_cert(SPVM_ENV* env, SPVM_VALUE* stack
   int32_t status = X509_STORE_add_cert(x509_store, x509);
   
   if (!(status == 1)) {
-    return env->die(env, stack, "X509_STORE_add_cert failed.", __func__, FILE_NAME, __LINE__);
+    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    env->die(env, stack, "[OpenSSL Error]X509_STORE_add_cert failed.", __func__, FILE_NAME, __LINE__);
+    return error_id;
   }
   
   void* obj_certs_list = env->get_field_object_by_name(env, stack, obj_self, "certs_list", &error_id, __func__, FILE_NAME, __LINE__);
@@ -48,7 +52,11 @@ int32_t SPVM__Net__SSLeay__X509_STORE__set_flags(SPVM_ENV* env, SPVM_VALUE* stac
   int32_t status = X509_STORE_set_flags(x509_store, flags);
   
   if (!(status == 1)) {
-    return env->die(env, stack, "X509_STORE_set_flags failed.", __func__, FILE_NAME, __LINE__);
+    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    env->die(env, stack, "[OpenSSL Error]X509_STORE_set_flags failed.", __func__, FILE_NAME, __LINE__);
+    return error_id;
   }
   
   return 0;
@@ -67,7 +75,11 @@ int32_t SPVM__Net__SSLeay__X509_STORE__add_crl(SPVM_ENV* env, SPVM_VALUE* stack)
   int32_t status = X509_STORE_add_crl(x509_store, x509_crl);
   
   if (!(status == 1)) {
-    return env->die(env, stack, "X509_STORE_add_crl failed.", __func__, FILE_NAME, __LINE__);
+    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    env->die(env, stack, "[OpenSSL Error]X509_STORE_add_crl failed.", __func__, FILE_NAME, __LINE__);
+    return error_id;
   }
   
   void* obj_crls_list = env->get_field_object_by_name(env, stack, obj_self, "crls_list", &error_id, __func__, FILE_NAME, __LINE__);

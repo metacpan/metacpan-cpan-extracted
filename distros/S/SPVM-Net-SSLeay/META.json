@@ -1,5 +1,5 @@
 {
-   "abstract" : "OpenSSL Binding",
+   "abstract" : "OpenSSL Binding and SSL data strcuture.",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
@@ -50,6 +50,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Net-SSLeay"
       }
    },
-   "version" : "0.006",
+   "version" : "0.008",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

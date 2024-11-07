@@ -1,12 +1,14 @@
 #!perl
+
 use strict;
+use warnings FATAL => 'all';
 use utf8;
 use Test::More 0.82;
 use XML::Simple;
 use Map::Tube::KoelnBonn;
 
 my $map = new_ok( 'Map::Tube::KoelnBonn' );
-my $xml = XMLin( $map->xml() , KeyAttr => [ ], KeepRoot => 1, );
+my $xml = XMLin( $map->xml( ) , KeyAttr => [ ], KeepRoot => 1, );
 
 my(%lines, %stations);
 
@@ -43,4 +45,4 @@ for my $id( keys %stations ) {
 # Every line should have at least one station:
 isnt( $lines{$_}, 0, "Line named $_ has no stations" ) for keys %lines;
 
-done_testing();
+done_testing( );

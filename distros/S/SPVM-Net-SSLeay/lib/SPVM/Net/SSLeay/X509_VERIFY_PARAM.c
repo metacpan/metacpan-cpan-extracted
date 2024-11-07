@@ -31,7 +31,7 @@ int32_t SPVM__Net__SSLeay__X509_VERIFY_PARAM__set1_host(SPVM_ENV* env, SPVM_VALU
   void* obj_name = stack[1].oval;
   
   if (!obj_name) {
-    return env->die(env, stack, "The $name must be defined.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The host name $name must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   int32_t namelen = stack[2].ival;
@@ -43,7 +43,7 @@ int32_t SPVM__Net__SSLeay__X509_VERIFY_PARAM__set1_host(SPVM_ENV* env, SPVM_VALU
   }
   
   if (!(namelen <= name_length)) {
-    return env->die(env, stack, "The $namelen must be greater than or equal to the length of the $name.", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The length $namelen must be greater than or equal to the length of the host name $name.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* name = env->get_chars(env, stack, obj_name);

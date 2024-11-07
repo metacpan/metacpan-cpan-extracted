@@ -38,3 +38,30 @@ int32_t SPVM__Net__SSLeay__ERR__error_string_n(SPVM_ENV* env, SPVM_VALUE* stack)
   
   return 0;
 }
+
+int32_t SPVM__Net__SSLeay__ERR__get_error(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int64_t error = ERR_get_error();
+  
+  stack[0].lval = error;
+  
+  return 0;
+}
+
+int32_t SPVM__Net__SSLeay__ERR__peek_error(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int64_t error = ERR_peek_error();
+  
+  stack[0].lval = error;
+  
+  return 0;
+}
+
+int32_t SPVM__Net__SSLeay__ERR__peek_last_error(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int64_t error = ERR_peek_last_error();
+  
+  stack[0].lval = error;
+  
+  return 0;
+}

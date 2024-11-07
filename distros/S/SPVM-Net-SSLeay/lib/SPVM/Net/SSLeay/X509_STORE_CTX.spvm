@@ -3,6 +3,8 @@
 
 class Net::SSLeay::X509_STORE_CTX {
   
+  use Net::SSLeay::Error;
+  
   # Instance Methods
   native method DESTROY : void ();
   

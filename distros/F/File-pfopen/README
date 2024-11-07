@@ -1,4 +1,4 @@
-File-pfopen Version 0.02
+File-pfopen Version 0.03
 
 INSTALLATION
 
@@ -24,15 +24,11 @@ You can also look for information at:
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/File-pfopen
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/File-pfopen
-
     Search CPAN
         http://search.cpan.org/dist/File-pfopen/
 
-
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010-2017 Nigel Horne
+Copyright (C) 2010-2024 Nigel Horne
 
 This program is released under the following licence: GPL

@@ -4,14 +4,25 @@ lib/File/pfopen.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 README.md
 t/00-load.t
-t/coverage.t
+t/comment-spelling.t
+t/critic.t
 t/dist.t
+t/eof.t
+t/eol.t
 t/manifest.t
+t/no404s.t
 t/pfopen.t
 t/pod-cm.t
+t/pod-coverage.t
+t/pod-links.t
+t/pod-snippets.t
+t/pod-spelling.t
+t/pod-synopsis.t
 t/pod.t
+t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

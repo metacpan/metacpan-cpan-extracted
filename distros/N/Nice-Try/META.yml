@@ -27,6 +27,7 @@ requires:
   PPI: '1.278'
   PPI::XS: '0.910'
   Scalar::Util: '1.50'
+  Symbol: '1.07'
   Want: '0.29'
   perl: '5.016000'
   strict: '0'
@@ -34,5 +35,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Nice-Try/issues
   repository: https://gitlab.com/jackdeguest/Nice-Try
-version: v1.3.13
+version: v1.3.15
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

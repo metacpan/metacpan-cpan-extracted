@@ -1,7 +1,12 @@
 Revision history for Perl module Nice::Try.
 
+v1.3.15 2024-11-07T06:28:30+0900
+    - Minor documentation correction
+
+v1.3.14 2024-11-06T15:37:56+0900
+    - Corrected issue of the __DATA__ or __END__ token section not being recognised. Thansk to Ron Savage for pointing that out.
+
 v1.3.13 2024-09-06T09:59:05+0900
-    - Improved handling of conditional return
     - Improved handling of conditional return
 
 v1.3.12 2024-09-02T13:39:19+0900

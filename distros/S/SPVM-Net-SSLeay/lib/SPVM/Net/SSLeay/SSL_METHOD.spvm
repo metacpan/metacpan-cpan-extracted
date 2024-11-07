@@ -3,6 +3,8 @@
 
 class Net::SSLeay::SSL_METHOD {
   
+  use Net::SSLeay::Error;
+  
   # Class Methods
   native static method SSLv23_method : Net::SSLeay::SSL_METHOD ();
   

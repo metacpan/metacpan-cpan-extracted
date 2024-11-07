@@ -32,17 +32,11 @@ The pointer value of the new L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO> object i
 
 =head1 Instance Methods
 
-=head2 DESTROY
-
-C<method DESTROY : void ();>
-
-Frees L<BIO|https://docs.openssl.org/1.0.2/man3/BIO_new> object using L<BIO_free|https://docs.openssl.org/1.0.2/man3/BIO_free> function if C<no_free> flag of the instance is not a true value.
-
 =head2 read
 
 C<method read : int ($data : mutable string, $dlen : int = -1);>
 
-Attempts to read $dlen bytes from C<BIO> and places the data in $data using L<BIO_read|https://docs.openssl.org/1.0.2/man3/BIO_read/> function and returns its return value.
+Attempts to read $dlen bytes from C<BIO> and places the data in $data by calling L<BIO_read|https://docs.openssl.org/1.0.2/man3/BIO_read/> function and returns its return value.
 
 If $dlen is lower than 0, it is set to the length of $data.
 
@@ -52,13 +46,13 @@ The $data must be defined. Otherwise an exception is thrown.
 
 The $dlen must be lower than or equal to the length of the $data. Otherwise an exception is thrown.
 
-If BIO_read failed, an exception is thrown.
+If BIO_read failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
 =head2 write
 
 C<method write : int ($data : string, $dlen : int = -1);>
 
-Attempts to write $dlen bytes from $data to C<BIO> using L<BIO_write|https://docs.openssl.org/1.0.2/man3/BIO_write/> function and returns its return value.
+Attempts to write $dlen bytes from $data to C<BIO> by calling L<BIO_write|https://docs.openssl.org/1.0.2/man3/BIO_write/> function and returns its return value.
 
 If $dlen is lower than 0, it is set to the length of $data.
 
@@ -68,7 +62,13 @@ The $data must be defined. Otherwise an exception is thrown.
 
 The $dlen must be lower than or equal to the length of the $data. Otherwise an exception is thrown.
 
-If BIO_write failed, an exception is thrown.
+If BIO_write failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
+=head2 DESTROY
+
+C<method DESTROY : void ();>
+
+Frees L<BIO|https://docs.openssl.org/1.0.2/man3/BIO_new> object by calling L<BIO_free|https://docs.openssl.org/1.0.2/man3/BIO_free> function if C<no_free> flag of the instance is not a true value.
 
 =head1 See Also
 

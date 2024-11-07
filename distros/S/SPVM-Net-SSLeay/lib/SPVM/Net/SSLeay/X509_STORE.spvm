@@ -4,6 +4,8 @@
 class Net::SSLeay::X509_STORE {
   allow Net::SSLeay::SSL_CTX;
   
+  use Net::SSLeay::Error;
+  
   use Net::SSLeay::X509;
   use Net::SSLeay::X509_CRL;
   use List;

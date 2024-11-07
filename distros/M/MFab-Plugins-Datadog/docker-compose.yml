@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  testcode:
+    container_name: testcode
+    build: .
+    ports:
+      - 4301:4301
+    volumes:
+      - ./testcode:/var/mfab/apps/testcode
+    environment:
+      - MOJO_INACTIVITY_TIMEOUT=600
+      - DD_TRACE_ENABLED=true
+      - DD_AGENT_HOST=localhost

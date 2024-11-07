@@ -2,6 +2,9 @@
 # MIT License
 
 class Net::SSLeay::Constant {
+  
+  use Net::SSLeay::Error;
+  
   native static method ASN1_STRFLGS_ESC_CTRL : int ();
 
   native static method ASN1_STRFLGS_ESC_MSB : int ();

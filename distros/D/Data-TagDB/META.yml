@@ -21,45 +21,51 @@ no_index:
 provides:
   Data::TagDB:
     file: lib/Data/TagDB.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::TagDB::Cache:
     file: lib/Data/TagDB/Cache.pm
-    version: v0.5.0
+    version: v0.6.0
+  Data::TagDB::Exporter:
+    file: lib/Data/TagDB/Exporter.pm
+    version: v0.6.0
   Data::TagDB::Factory:
     file: lib/Data/TagDB/Factory.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::TagDB::Iterator:
     file: lib/Data/TagDB/Iterator.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::TagDB::Link:
     file: lib/Data/TagDB/Link.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::TagDB::LinkIterator:
     file: lib/Data/TagDB/LinkIterator.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::TagDB::Metadata:
     file: lib/Data/TagDB/Metadata.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::TagDB::Migration:
     file: lib/Data/TagDB/Migration.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::TagDB::MultiIterator:
     file: lib/Data/TagDB/MultiIterator.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::TagDB::Relation:
     file: lib/Data/TagDB/Relation.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::TagDB::Tag:
     file: lib/Data/TagDB/Tag.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::TagDB::WeakBaseObject:
     file: lib/Data/TagDB/WeakBaseObject.pm
-    version: v0.5.0
+    version: v0.6.0
   Data::TagDB::WellKnown:
     file: lib/Data/TagDB/WellKnown.pm
-    version: v0.5.0
+    version: v0.6.0
 recommends:
   Data::Identifier: v0.2.0
+  File::Spec: '3.84'
+  File::ValueFile::Simple::Reader: v0.2.0
+  File::ValueFile::Simple::Writer: v0.2.0
 requires:
   Carp: '1.35'
   DBI: '1.643'
@@ -70,7 +76,7 @@ requires:
   perl: v5.16.0
 resources:
   repository: git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/Data-TagDB.git
-version: v0.05
+version: v0.06
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

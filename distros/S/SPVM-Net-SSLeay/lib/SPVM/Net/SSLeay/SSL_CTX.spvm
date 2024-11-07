@@ -2,6 +2,9 @@
 # MIT License
 
 class Net::SSLeay::SSL_CTX {
+  
+  use Net::SSLeay::Error;
+  
   use Net::SSLeay::SSL_METHOD;
   use Net::SSLeay::X509_STORE;
   use Net::SSLeay::X509_VERIFY_PARAM;
@@ -10,11 +13,9 @@ class Net::SSLeay::SSL_CTX {
   native static method new : Net::SSLeay::SSL_CTX ($method : Net::SSLeay::SSL_METHOD);
   
   # Instance Methods
-  native method DESTROY : void ();
-  
   native method set_mode : long ($mode : long);
   
-  native method set_verify : int ($mode : int);
+  native method set_verify : void ($mode : int);
   
   native method get0_param : Net::SSLeay::X509_VERIFY_PARAM ();
   
@@ -39,4 +40,7 @@ class Net::SSLeay::SSL_CTX {
   native method get_options : long ();
   
   native method clear_options : long ($options : long);
+  
+  native method DESTROY : void ();
+  
 }

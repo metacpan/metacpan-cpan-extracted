@@ -28,7 +28,7 @@ Exceptions:
 
 The BIO $bp must be defined. Otherwise an exception is thrown.
 
-If PEM_read_bio_X509 failed, an exception is thrown.
+If PEM_read_bio_X509 failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
 =head2 read_bio_X509_CRL
 
@@ -40,7 +40,7 @@ Exceptions:
 
 The BIO $bp must be defined. Otherwise an exception is thrown.
 
-If PEM_read_bio_X509_CRL failed, an exception is thrown.
+If PEM_read_bio_X509_CRL failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
 =head1 See Also
 

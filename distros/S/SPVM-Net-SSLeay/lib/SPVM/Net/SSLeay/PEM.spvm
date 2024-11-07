@@ -2,6 +2,9 @@
 # MIT License
 
 class Net::SSLeay::PEM {
+  
+  use Net::SSLeay::Error;
+  
   use Net::SSLeay::BIO;
   use Net::SSLeay::X509;
   use Net::SSLeay::X509_CRL;

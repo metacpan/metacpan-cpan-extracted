@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use Mojo::Base -strict;
+
+use Mojo::JSON qw(encode_json decode_json false true from_json to_json j);
+
+use File::Basename 'dirname';
+
+# Check if Mojolicious is installed;
+die <<EOF unless eval 'use Mojolicious::Commands; 1';
+It looks like you don't have the Mojolicious framework installed.
+Please visit http://mojolicio.us for detailed installation instructions.
+
+EOF
+
+# Application
+$ENV{MOJO_APP} ||= 'TestCode';
+
+# Start commands
+my $app;
+eval {
+    $app = Mojolicious::Commands->start_app($ENV{MOJO_APP});
+};
+
+if ($@)
+{
+    print("Error starting the $ENV{MOJO_APP} application: $@");
+}
+
+return $app;
+

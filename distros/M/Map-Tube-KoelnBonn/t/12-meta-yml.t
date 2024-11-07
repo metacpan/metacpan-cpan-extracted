@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
-use strict; use warnings;
+use strict;
+use warnings FATAL => 'all';
 use Map::Tube::KoelnBonn;
 use Test::More;
 plan skip_all => 'these tests are for authors only!' unless ( $ENV{AUTHOR_TESTING} ||  $ENV{RELEASE_TESTING} );
@@ -19,4 +20,4 @@ if ( $meta->{provides} ) {
   }
 }
 
-done_testing();
+done_testing( );

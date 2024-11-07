@@ -34,6 +34,10 @@ t/023_return.t
 t/024_signature.t
 t/025_sub_token.t
 t/026_inside_outside_return.t
+t/027_data_token.t
+t/028_end_token.t
+t/029_data_token_mixed.t
+t/030_end_token_mixed.t
 t/900_pod.t
 t/910_signature.t
 t/999_kwalitee.t

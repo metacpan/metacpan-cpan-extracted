@@ -10,6 +10,7 @@ class TestCase::Net::SSLeay {
   use StringBuffer;
   use Mozilla::CA;
   use Sys::Signal::Constant as SIGNAL;
+  use Net::SSLeay::Error;
   
   static method test : int () {
     
@@ -99,16 +100,6 @@ class TestCase::Net::SSLeay {
     }
     
     my $shutdown_ret = $ssl->shutdown;
-    
-    if ($shutdown_ret == 0) {
-      while (1) {
-        my $recv_buffer = (mutable string)new_string_len 100;
-        my $read_length = $ssl->read($recv_buffer);
-        if ($read_length <= 0) {
-          last;
-        }
-      }
-    }
     
     $socket->close;
     

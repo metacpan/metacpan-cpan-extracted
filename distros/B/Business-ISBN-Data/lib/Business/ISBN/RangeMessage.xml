@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>83213127-5e32-4c55-bc34-4a92a057a268</MessageSerialNumber>
-  <MessageDate>Tue, 5 Nov 2024 03:42:46 GMT</MessageDate>
+  <MessageSerialNumber>3afd4cf6-66a7-445b-a9f3-277a6af51f01</MessageSerialNumber>
+  <MessageDate>Thu, 7 Nov 2024 03:43:01 GMT</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -1305,19 +1305,11 @@
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>4600000-4799999</Range>
-          <Length>0</Length>
-        </Rule>
-        <Rule>
-          <Range>4800000-8499999</Range>
+          <Range>4600000-8749999</Range>
           <Length>4</Length>
         </Rule>
         <Rule>
-          <Range>8500000-8999999</Range>
-          <Length>0</Length>
-        </Rule>
-        <Rule>
-          <Range>9000000-9999999</Range>
+          <Range>8750000-9999999</Range>
           <Length>5</Length>
         </Rule>
       </Rules>
@@ -1722,40 +1714,6 @@
         </Rule>
         <Rule>
           <Range>9600000-9999999</Range>
-          <Length>5</Length>
-        </Rule>
-      </Rules>
-    </Group>
-    <Group>
-      <Prefix>978-635</Prefix>
-      <Agency>Estonia</Agency>
-      <Rules>
-        <Rule>
-          <Range>0000000-0299999</Range>
-          <Length>2</Length>
-        </Rule>
-        <Rule>
-          <Range>0300000-2999999</Range>
-          <Length>0</Length>
-        </Rule>
-        <Rule>
-          <Range>3000000-3499999</Range>
-          <Length>3</Length>
-        </Rule>
-        <Rule>
-          <Range>3500000-7749999</Range>
-          <Length>0</Length>
-        </Rule>
-        <Rule>
-          <Range>7750000-7999999</Range>
-          <Length>4</Length>
-        </Rule>
-        <Rule>
-          <Range>8000000-9799999</Range>
-          <Length>0</Length>
-        </Rule>
-        <Rule>
-          <Range>9800000-9999999</Range>
           <Length>5</Length>
         </Rule>
       </Rules>
@@ -4451,6 +4409,40 @@
       </Rules>
     </Group>
     <Group>
+      <Prefix>978-9908</Prefix>
+      <Agency>Estonia</Agency>
+      <Rules>
+        <Rule>
+          <Range>0000000-1999999</Range>
+          <Length>1</Length>
+        </Rule>
+        <Rule>
+          <Range>2000000-4999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>5000000-6999999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>7000000-8249999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>8250000-8999999</Range>
+          <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>9000000-9699999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>9700000-9999999</Range>
+          <Length>4</Length>
+        </Rule>
+      </Rules>
+    </Group>
+    <Group>
       <Prefix>978-9909</Prefix>
       <Agency>Tunisia</Agency>
       <Rules>
@@ -4797,27 +4789,23 @@
       <Agency>Morocco</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-2799999</Range>
+          <Range>0000000-2299999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>2800000-4299999</Range>
+          <Range>2300000-4299999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>4300000-4799999</Range>
-          <Length>0</Length>
-        </Rule>
-        <Rule>
-          <Range>4800000-7999999</Range>
+          <Range>4300000-7999999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>8000000-8749999</Range>
+          <Range>8000000-8549999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>8750000-9999999</Range>
+          <Range>8550000-9999999</Range>
           <Length>4</Length>
         </Rule>
       </Rules>
@@ -5263,7 +5251,15 @@
           <Length>1</Length>
         </Rule>
         <Rule>
-          <Range>4000000-7999999</Range>
+          <Range>4000000-4799999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>4800000-4999999</Range>
+          <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>5000000-7999999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>

@@ -1,20 +1,24 @@
 #!perl
+
 use strict;
+use warnings FATAL => 'all';
 use utf8;
 use Test::More 0.82;
 use XML::Simple;
 use Map::Tube::Glasgow;
 
 my $map = new_ok( 'Map::Tube::Glasgow' );
-my $xml = XMLin( $map->xml() , KeyAttr => [ ], KeepRoot => 1, );
+my $xml = XMLin( $map->xml( ) , KeyAttr => [ ], KeepRoot => 1, );
 
 my(%lines, %stations);
 
-my $line = $xml->{'tube'}->{'lines'}->{'line'};
-my $id   = $line->{'id'};
-my $name = $line->{'name'};
-ok( !exists( $lines{$name} ), "Line name $name, id $id defined more than once" );
-$lines{$name} = 0;
+{
+  my $line = $xml->{'tube'}->{'lines'}->{'line'};
+  my $id   = $line->{'id'};
+  my $name = $line->{'name'};
+  ok( !exists( $lines{$name} ), "Line name $name, id $id defined more than once" );
+  $lines{$name} = 0;
+}
 
 for my $station( @{ $xml->{'tube'}->{'stations'}->{'station'} } ) {
   my $id    = $station->{'id'};
@@ -42,4 +46,4 @@ for my $id( keys %stations ) {
 # Every line should have at least one station:
 isnt( $lines{$_}, 0, "Line named $_ has no stations" ) for keys %lines;
 
-done_testing();
+done_testing( );

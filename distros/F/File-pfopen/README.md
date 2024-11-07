@@ -2,22 +2,27 @@
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/File-pfopen/badge)](https://dependencyci.com/github/nigelhorne/File-pfopen)
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/File-pfopen/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/File-pfopen?branch=master)
+[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/7983554719636717/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/7983554719636717/heads/master/)
 
-# File::pfopen
+# NAME
 
-Try hard to find a file
+File::pfopen - Try hard to find a file
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
-# SYNOPSIS
+# SUBROUTINES/METHODS
 
 ## pfopen
 
+Look in a list of directories for a file with an optional list of suffixes.
+
     use File::pfopen 'pfopen';
-    ($fh, $filename) = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo', 'txt:bin'));
-    $fh = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo'));
+    ($fh, $filename) = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo', 'txt:bin');
+    $fh = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo', '<');
+
+If mode (argument 4) isn't given, the file is open read/write ('+<')
 
 # AUTHOR
 
@@ -25,13 +30,17 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
 
+Doesn't play well in taint mode.
+
+Using the colon separator can cause confusion on Windows.
+
+Would be better if the mode and suffixes options were the other way around, but it's too late to change that now.
+
 Please report any bugs or feature requests to `bug-file-pfopen at rt.cpan.org`,
 or through the web interface at
 [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-pfopen](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-pfopen).
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-# SEE ALSO
 
 # SUPPORT
 
@@ -41,25 +50,29 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
+- MetaCPAN
+
+    [https://metacpan.org/release/File-pfopen](https://metacpan.org/release/File-pfopen)
+
 - RT: CPAN's request tracker
 
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-pfopen](http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-pfopen)
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=File-pfopen](https://rt.cpan.org/NoAuth/Bugs.html?Dist=File-pfopen)
 
-- AnnoCPAN: Annotated CPAN documentation
+- CPANTS
 
-    [http://annocpan.org/dist/File-pfopen](http://annocpan.org/dist/File-pfopen)
+    [http://cpants.cpanauthors.org/dist/File-pfopen](http://cpants.cpanauthors.org/dist/File-pfopen)
 
-- CPAN Ratings
+- CPAN Testers' Matrix
 
-    [http://cpanratings.perl.org/d/File-pfopen](http://cpanratings.perl.org/d/File-pfopen)
+    [http://matrix.cpantesters.org/?dist=File-pfopen](http://matrix.cpantesters.org/?dist=File-pfopen)
 
-- Search CPAN
+- CPAN Testers Dependencies
 
-    [http://search.cpan.org/dist/File-pfopen/](http://search.cpan.org/dist/File-pfopen/)
+    [http://deps.cpantesters.org/?module=File::pfopen](http://deps.cpantesters.org/?module=File::pfopen)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017-2024 Nigel Horne.
 
 Usage is subject to licence terms.
 

@@ -1,0 +1,19 @@
+docker-compose.yml
+Dockerfile
+example/hypnotoad
+example/lib/TestCode.pm
+example/README.md
+example/run.sh
+example/shell
+example/web
+lib/MFab/Plugins/Datadog.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/datadog_id.t
+t/Mock/Mojo/UserAgent.pm
+t/Mock/Webserver.pm
+t/plugin.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

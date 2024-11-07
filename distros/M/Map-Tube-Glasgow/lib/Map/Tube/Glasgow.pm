@@ -2,17 +2,19 @@
 #
 # Author: Gisbert W. Selke, TapirSoft Selke & Selke GbR.
 #
-# Copyright (C) 2015 Gisbert W. Selke. All rights reserved.
+# Copyright (C) 2015, 2024 Gisbert W. Selke. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
 # Mail: gws@cpan.org
 #
 package Map::Tube::Glasgow;
+use 5.10.0;
+use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = version->declare('v0.71.0');
 
 =encoding utf8
 

@@ -2,11 +2,12 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.006";
+  version "0.008";
   
   use Net::SSLeay::Constant;
   use Net::SSLeay::SSL_CTX;
   use Net::SSLeay::ERR;
+  use Net::SSLeay::Error;
   
   INIT {
     &init();
@@ -17,8 +18,6 @@ class Net::SSLeay {
   
   has operation_error : ro int;
   
-  has error : ro long;
-  
   # Class Methods
   native static method new : Net::SSLeay ($ssl_ctx : Net::SSLeay::SSL_CTX);
   
@@ -28,9 +27,9 @@ class Net::SSLeay {
   native static method _print_version_text : void ();
   
   # Instance Methods
-  native method DESTROY : void ();
-  
   native method set_fd : int ($fd : int);
+  
+  native method set_tlsext_host_name : int ($name : string);
   
   native method connect : int ();
   
@@ -38,12 +37,12 @@ class Net::SSLeay {
   
   native method shutdown : int ();
   
-  native method set_tlsext_host_name : int ($name : string);
-  
   native method read : int ($buf : mutable string, $num : int = -1, $offset : int = 0);
   
   native method peek : int ($buf : mutable string, $num : int = -1, $offset : int = 0);
   
   native method write : int ($buf : string, $num : int = -1, $offset : int = 0);
+  
+  native method DESTROY : void ();
   
 }

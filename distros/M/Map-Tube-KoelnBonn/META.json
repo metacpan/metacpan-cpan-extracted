@@ -4,13 +4,13 @@
       "Gisbert W. Selke <gws@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0514, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Map-Tube-KoelnBonn",
    "no_index" : {
@@ -34,10 +34,10 @@
       "runtime" : {
          "requires" : {
             "File::Share" : "0",
-            "Map::Tube" : "2.87",
+            "Map::Tube" : "3.77",
             "Moo" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010000"
          }
       },
       "test" : {
@@ -50,7 +50,7 @@
    "provides" : {
       "Map::Tube::KoelnBonn" : {
          "file" : "lib/Map/Tube/KoelnBonn.pm",
-         "version" : "0.09"
+         "version" : "v0.91.0"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "mailto" : "bug-Map-Tube-KoelnBonn@rt.cpan.org"
       }
    },
-   "version" : "0.09"
+   "version" : "v0.91.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }
-

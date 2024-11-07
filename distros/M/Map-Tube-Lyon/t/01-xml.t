@@ -1,13 +1,14 @@
 #!perl
 
 use strict;
+use warnings FATAL => 'all';
 use utf8;
 use Test::More 0.82;
 use XML::Simple;
 use Map::Tube::Lyon;
 
 my $map = new_ok( 'Map::Tube::Lyon' );
-my $xml = XMLin( $map->xml() , KeyAttr => [ ], KeepRoot => 1, );
+my $xml = XMLin( $map->xml( ) , KeyAttr => [ ], KeepRoot => 1, );
 
 ok( exists $xml->{'tube'},               'There should be a <tube> tag at the top level' );
 ok( exists $xml->{'tube'}->{'name'},     'There should be one <name> tag directly under the top level' );
@@ -31,4 +32,4 @@ for my $line( @{ $xml->{'tube'}->{'lines'}->{'line'} } ) {
   like( $line->{'color'}, qr/^#[0-9A-F]{6}$/i, 'color attribute of <line> should be six-digit hex format HTML color spec' );
 }
 
-done_testing();
+done_testing( );

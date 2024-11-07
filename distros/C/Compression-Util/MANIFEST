@@ -94,6 +94,7 @@ t/mrl.t
 t/mrl_symbolic.t
 t/pod-coverage.t
 t/pod.t
+t/zlib.t
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh
 SIGNATURE    Added here by Module::Build

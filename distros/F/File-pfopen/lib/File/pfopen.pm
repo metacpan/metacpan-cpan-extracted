@@ -1,7 +1,7 @@
 package File::pfopen;
 
 # Author Nigel Horne: njh@bandsman.co.uk
-# Copyright (C) 2017 Nigel Horne
+# Copyright (C) 2017-2024 Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -24,73 +24,63 @@ File::pfopen - Try hard to find a file
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-=head1 SYNOPSIS
+=head1 SUBROUTINES/METHODS
 
 =head2 pfopen
 
+Look in a list of directories for a file with an optional list of suffixes.
+
     use File::pfopen 'pfopen';
-    ($fh, $filename) = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo', 'txt:bin'));
-    $fh = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo'));
+    ($fh, $filename) = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo', 'txt:bin');
+    $fh = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo', '<');
 
-=cut 
+If mode (argument 4) isn't given, the file is open read/write ('+<')
 
-sub pfopen {
-	my $path = shift;
-	my $prefix = shift;
-	my $suffixes = shift;
+=cut
 
+sub pfopen
+{
+	my ($path, $prefix, $suffixes, $mode) = @_;
+	my $candidate = defined($suffixes) ? "$prefix;$path;$suffixes" : "$prefix;$path";
 	our $savedpaths;
 
-	my $candidate;
-	if(defined($suffixes)) {
-		$candidate = "$prefix;$path;$suffixes";
-	} else {
-		$candidate = "$prefix;$path";
-	}
-	if($savedpaths->{$candidate}) {
+	$mode ||= '+<';	# defaults to opening RW
+
+	# Return cached filename if available
+	if(my $rc = $savedpaths->{$candidate}) {
 		# $self->_log({ message => "remembered $savedpaths->{$candidate}" });
-		my $rc = $savedpaths->{$candidate};
-		open(my $fh, '+<', $rc);
-		if(wantarray) {
-			return ($fh, $rc);
+		if(open(my $fh, $mode, $rc)) {
+			return wantarray ? ($fh, $rc) : $fh;
 		}
-		return $fh;
+		delete $savedpaths->{$candidate};	# Failed to open cached file
 	}
 
-	foreach my $dir(split(/:/, $path)) {
-		next unless(-d $dir);
-		if($suffixes) {
-			foreach my $suffix(split(/:/, $suffixes)) {
-				# $self->_log({ message => "check for file $dir/$prefix.$suffix" });
-				my $rc = File::Spec->catfile($dir, "$prefix.$suffix");
-				if(-r $rc) {
-					$savedpaths->{$candidate} = $rc;
-					open(my $fh, '+<', $rc);
-					if(wantarray) {
-						return ($fh, $rc);
-					}
-					return $fh;
-				}
-			}
-		} elsif(-r "$dir/$prefix") {
-			my $rc = File::Spec->catfile($dir, $prefix);
-			$savedpaths->{$candidate} = $rc;
+	foreach my $dir (split /:/, $path) {
+		next unless -d $dir;
+
+		foreach my $suffix (defined($suffixes) ? split(/:/, $suffixes) : undef) {
+			my $rc = File::Spec->catfile($dir, defined $suffix ? "$prefix.$suffix" : $prefix);
+			next unless -r $rc;
+
 			# $self->_log({ message => "using $rc" });
-			open(my $fh, '+<', $rc);
-			if(wantarray) {
-				return ($fh, $rc);
-			}
-			return $fh;
+
+			# FIXME: Doesn't play well in taint mode
+			open(my $fh, $mode, $rc) or next;
+
+			$savedpaths->{$candidate} = $rc;
+			return wantarray ? ($fh, $rc) : $fh;
 		}
 	}
-	return();
+
+	return;
 }
+
 
 =head1 AUTHOR
 
@@ -98,13 +88,17 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
+Doesn't play well in taint mode.
+
+Using the colon separator can cause confusion on Windows.
+
+Would be better if the mode and suffixes options were the other way around, but it's too late to change that now.
+
 Please report any bugs or feature requests to C<bug-file-pfopen at rt.cpan.org>,
 or through the web interface at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-pfopen>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-=head1 SEE ALSO
 
 =head1 SUPPORT
 
@@ -116,27 +110,31 @@ You can also look for information at:
 
 =over 4
 
+=item * MetaCPAN
+
+L<https://metacpan.org/release/File-pfopen>
+
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-pfopen>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=File-pfopen>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * CPANTS
 
-L<http://annocpan.org/dist/File-pfopen>
+L<http://cpants.cpanauthors.org/dist/File-pfopen>
 
-=item * CPAN Ratings
+=item * CPAN Testers' Matrix
 
-L<http://cpanratings.perl.org/d/File-pfopen>
+L<http://matrix.cpantesters.org/?dist=File-pfopen>
 
-=item * Search CPAN
+=item * CPAN Testers Dependencies
 
-L<http://search.cpan.org/dist/File-pfopen/>
+L<http://deps.cpantesters.org/?module=File::pfopen>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017-2024 Nigel Horne.
 
 Usage is subject to licence terms.
 

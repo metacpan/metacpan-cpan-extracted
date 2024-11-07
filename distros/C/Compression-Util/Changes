@@ -1,5 +1,22 @@
 Revision history for Compression-Util
 
+0.14    2024-11-06
+
+        [ADDITIONS]
+
+        - Added the `adler32()` checksum function.
+        - Added the `zlib_compress()` and `zlib_uncompress()` functions.
+        - Added the following low-level functions:
+
+            deflate_create_block_type_0_header
+            deflate_create_block_type_1
+            deflate_create_block_type_2
+
+            deflate_extract_next_block
+            deflate_extract_block_type_0
+            deflate_extract_block_type_1
+            deflate_extract_block_type_2
+
 0.13    2024-08-25
 
         [IMPROVEMENTS]

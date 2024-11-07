@@ -1,0 +1,6 @@
+v0.06  2024-11-06Z
+    - Added Data::TagDB::Exporter
+    - Added support in Data::TagDB::Migration to import files and directories
+    - Added support for Data::Identifier::Interface::Known in Data::TagDB::Migration
+    - Improved the speed of Data::TagDB::Migration by the use of transactions
+    - Added Data::TagDB::Tutorial::Conventions

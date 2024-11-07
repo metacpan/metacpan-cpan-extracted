@@ -24,7 +24,7 @@ use Data::TagDB::MultiIterator;
 use Data::TagDB::WellKnown;
 use Data::URIID::Colour;
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 
 
@@ -258,6 +258,13 @@ sub factory {
     my ($self) = @_;
     require Data::TagDB::Factory;
     return $self->{factory} //= Data::TagDB::Factory->_new(db => $self);
+}
+
+
+sub exporter {
+    my ($self, $target, %opts) = @_;
+    require Data::TagDB::Exporter;
+    return Data::TagDB::Exporter->_new(db => $self, target => $target, %opts);
 }
 
 
@@ -527,7 +534,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 
@@ -716,6 +723,25 @@ See also L<Data::TagDB::Migration>.
 
 Get a factory object used to create tags.
 See also L<Data::TagDB::Factory> for details.
+
+=head2 exporter
+
+    my Data::TagDB::Exporter $exporter = $db->exporter($target, %opts);
+
+Create a new exporter. C<$target> must be a open file handle (that supports seeking)
+or a filename.
+
+The following options (all optional) are defined:
+
+=over
+
+=item C<format>
+
+The format to use. This can be L<Data::TagDB::Tag>, a L<Data::Identfier>, or a raw ISE string.
+
+The default is I<tagpool-source-format> (C<e5da6a39-46d5-48a9-b174-5c26008e208e>).
+
+=back
 
 =head2 begin_work, commit, rollback
 

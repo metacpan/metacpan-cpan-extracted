@@ -1,0 +1,292 @@
+# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024 Philipp Schafft
+
+# licensed under Artistic License 2.0 (see LICENSE file)
+
+# ABSTRACT: Work with Tag databases
+# PODNAME: Data::TagDB::Tutorial::Conventions
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::TagDB::Tutorial::Conventions - Work with Tag databases
+
+=head1 VERSION
+
+version v0.06
+
+=head1 Overview
+
+This documentation outlines basic conventions that have been establish when working with universal tag data.
+Most of this document applies to the creation of tags.
+
+It must be noted that the conventions outlined in this documentation are one of many ways. However they are
+selected as they give a very good compatibility with other existing data structures, patterns, and conventions.
+
+=head2 Meaning of a tag
+
+Each tag forms an inseparably pair with exactly one subject.
+The represents exactly this B<one subject>.
+And each subject is represented by exactly B<one tag>.
+
+As tag and subject form this tight atomic bond they are often used synonymous.
+
+=head2 Abstract and specific
+
+A subject can be one of I<abstract>, a concept, or I<specific>, an instances of a concept or neither nor.
+
+An I<abstract> subject is always untouchable, a kind, or genre of things. Examples include the concept of books, or
+the concept of parentship. In software development they are often called I<types>.
+
+A I<specific> subject is an I<instance> of one or more I<abstract> subjects. Examples include
+any specific book one can I<touch>, or the specific relation between a specific parent and child.
+
+B<Note:>
+The concept of touchableness is to be understood figuratively here. For example "I<air>" (our atmosphere) is often considered untouchable,
+while the atmosphere is still I<specific> (touchable).
+
+=head3 Tag definition and merging
+
+Any two tags that represent the same subject are in fact the same tag. If they occur in software they can be (and should)
+be merged.
+
+However, which subject a tag belongs to is given by it's definition. Definitions by different parties
+(or even by the same party over time, e.g. different versions of a standard) will differ.
+In those cases tags must not be merged.
+
+This also implies that if for example a standard updates the definition of a tag it must create a new tag
+(most often denoted by a new identifier for the new tag).
+
+=head1 Tag identification
+
+=head2 Tag identifiers
+
+Each tag is identified by a set of zero or more identifiers.
+Identifiers can be of different I<types>. Each type has it's own specific properties.
+Each tag should have at least one globally unique identifier, often an UUID.
+
+See also L<Data::TagDB::Tutorial::WellKnown/also-shares-identifier>.
+
+=head3 ISE identifiers
+
+It is recommended that each tag should have an UUID, an OID, or an URI (in that order of preference) that identifies the tag.
+Those types have several properties that make them good identifiers:
+
+=over
+
+=item *
+
+Each of those types can be serialised using I<ISE> (Identifier String Encoding)
+
+=item *
+
+All UUIDs can be converted to both OIDs and URIs.
+
+=item *
+
+All OIDs can be converted to URIs.
+OIDs that have been UUIDs before can be converted back into their normal form as UUID.
+
+=item *
+
+URIs that have been UUIDs or OIDs can be converted back into their normal form as UUID, or OID.
+
+=item *
+
+All three types support globally unique identifiers.
+
+=item *
+
+Each of the types has it's own special properties complementing each other.
+
+=back
+
+B<Note:>
+URIs here are understood as identifiers for tags. This is not to be confused with
+URIs (most often URLs) used to locate specific documents (for I<fetching> them).
+It is generally expected that fetching any URI used as an identifier will result
+in error or a document being fetched that is different from the tag's subject.
+
+See also
+L<Data::TagDB::Tutorial::WellKnown/uuid>,
+L<Data::TagDB::Tutorial::WellKnown/oid>,
+L<Data::TagDB::Tutorial::WellKnown/uri>.
+
+=head2 Tag names
+
+Tag names are specific identifiers of the type I<tagname> (see L<Data::TagDB::Tutorial::WellKnown/tagname>).
+They provide a basic way to name a tag. However they are not to be confused with proper names, or document titles
+or technical designators. However they often mirror those.
+
+Tag names are B<not> unique in any way. Each tag can have zero or more tag names.
+
+The following guidelines should be followed for tag names:
+
+=over
+
+=item *
+
+Tag names are for reading by a person, not a computer.
+They should be useful to the user.
+Including any meaning for machines should be avoided. Other relations should be used for that.
+
+=item *
+
+If a subject has a proper name, that name should be included as tag name as-is.
+For examples Richard George Adams' tag should include the tag name C<Richard George Adams>.
+However if there are valid variations they should also be included.
+Such as C<Richard Adams> as his middle name is commonly not used in his publications.
+
+B<Note:>
+Tag names can contain any character. It is therefore possible to include non-latin scripts.
+Spaces are valid.
+
+B<Note:>
+If a proper name is commonly translated (such as city names) more languages might be included.
+See below.
+
+=item *
+
+If the subject does not have a proper name it is common to use the English (that is British)
+name. If the subject is specific to a social context (such as a city that is located within some nation)
+than it is common to include the name of the subject that is native to that context.
+
+It is possible to include names in more languages if needed.
+
+It is also possible to use I<context> in the link denoting the name to provide cultural, language, or other
+context for the name.
+
+=item *
+
+Subjects without a proper name and (often) I<abstract> subjects may sometimes require more than one word to
+build a useful tag name.
+While spaces are valid in tag names it is often harder to enter them in computer systems.
+For example lists of keywords are often separating individual keywords by space.
+In that case the use of dash (C<->) is native. Underscore (C<_>) or CamelCase or similar is dissuaded.
+
+=item *
+
+Tag names must not include any non-name part (such symbols of sex, membership of a social context or movement).
+there are other relations for this.
+
+=item *
+
+Tag names for relations that allow or encourage multiple values are commonly prefixed with C<also->.
+For example C<also-has-role> and C<also-shares-identifier>.
+
+Tag names for subjects that are super types of other subjects are commonly prefixed with C<proto->.
+Examples include C<proto-file> and C<proto-entity>.
+
+See also L<Data::TagDB::Tutorial::WellKnown> for more examples.
+
+=back
+
+=head1 Types and roles
+
+Each subject has zero or one type and zero or more roles. The type of a subject is one of it's roles.
+
+Each role defines a set of properties or operations that can be done with the subject.
+For example one might own an apple (I<specific>) that has the type of apples (I<abstract>) that has also
+the role of a fruit.
+
+In software development this is often implemented as types and inherence.
+See for example L<perlfunc/package>, L<UNIVERSAL/ise>, and L<UNIVERSAL/DOES> for Perl's implementation.
+
+B<Note:>
+It is often not clear when creating a tag what it's type actually is. In this case it is wise
+to not set the type at all but set those roles that it implements.
+
+B<Note:>
+While each subject has only one type, in a real world database a tag might have several C<has-type> relations.
+However this is only allowed if those types are actually in inherence. As the data might not be complete this
+might be hard to check.
+Therefore, it might be wide to allow multiple C<has-type> alike C<also-has-role> however print a warning.
+
+See also
+L<Data::TagDB::Tutorial::WellKnown/also-has-role>,
+L<Data::TagDB::Tutorial::WellKnown/has-type>.
+
+=head2 Type inherence
+
+To implement inherence in types the relations C<specialises> and C<generalises> are used.
+
+It is very common to have multi level type trees.
+For newly defined types it is also wise to specialise them from common well known types.
+This allows software that is not aware of them to perform basic operations
+(such as to correctly display them to the user).
+
+See also
+L<Data::TagDB::Tutorial::WellKnown/specialises>,
+L<Data::TagDB::Tutorial::WellKnown/generalises>.
+
+=head2 Common types
+
+The following types are very common. Many other complex types specialise them.
+
+See also
+L<Data::TagDB::Tutorial::WellKnown>.
+
+=head3 Types and roles
+
+Types and roles inherit from C<subject-type>.
+
+See also
+L<Data::TagDB::Tutorial::WellKnown/subject-type>.
+
+=head3 Entities, Persons, accounts
+
+All accounts (like e-mail, bank, or user accounts) should have roles including
+C<account> (C<b72508ba-7fb9-42ae-b4cf-b850b53a16c2>).
+Accounts are owned by one or more entities.
+They commonly include some amount of profile data
+(such as names and contact information) and may represent the entity they are owned by.
+
+In contrast an entity (natural or legal) should have roles including
+C<entity> (C<09ade47e-b049-436b-bf10-8357f4b6bc05>).
+Entities also include some amount of profile data. However this should be limited
+to such data that is directly linked to the entity and is valid indefinitely
+(e.g. names, cultural background, locations, and important events).
+An entity never contain any technical data such as login credentials.
+Such data is a clear sign that it is in fact an account.
+
+Legal entities are entities that are created by legal means. Most commonly
+companies. In order for them to be legal entities registration and legal
+documentation is needed.
+Such entities should include the role C<legal-entity> (C<f57f5e00-1d08-4731-b49b-c8316e23f06a>).
+If it is unclear if a group qualifies as a legal entity (e.g. people doing something together vs.
+a registered association) it is wise to only mark it as C<entity>.
+
+Natural entities are I<living beings>.
+Those include alive, dead, real, fictional, human and non-human beings.
+Such subjects should have the role
+C<natural-entity> AKA C<person> (C<f6249973-59a9-47e2-8314-f7cf9a5f77bf>) included in their list of roles.
+
+In addition to the C<natural-entity> the universal tag model includes the type
+C<body> (C<5501e545-f39a-4d62-9f65-792af6b0ccba>) used to record all what is related to the body of a person,
+such as birthday, locations, and species.
+And C<character> (C<a331f2c5-20e5-4aa2-b277-8e63fd03438d>) used to record anything about the character of a person,
+such as identity, world view, and interests.
+
+B<Note:>
+When in doubt it is wise to use the role
+C<proto-entity> (C<7be4d8c7-6a75-44cc-94f7-c87433307b26>).
+It is the super-role for all other entity and account roles and provides many common properties.
+
+=head1 AUTHOR
+
+Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2024 by Löwenfelsen UG (haftungsbeschränkt) <support@loewenfelsen.net>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

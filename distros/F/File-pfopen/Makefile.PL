@@ -2,6 +2,15 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
     NAME		=> 'File::pfopen',
     AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
@@ -13,15 +22,16 @@ WriteMakefile(
       : ()),
     PL_FILES	=> {},
     TEST_REQUIRES => {
+	'Test::DescribeMe' => 0,
 	'Test::Most' => 0,
 	'Test::TempDir::Tiny' => 0,
+	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
     },
     PREREQ_PM => {
 	'File::Spec' => 0,
 	'Exporter' => 0,
-    },
-    dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    }, dist => $dist,
     clean		=> { FILES => 'File-pfopen-*' },
     META_MERGE		=> {
     	'meta-spec' => { version => 2 },
