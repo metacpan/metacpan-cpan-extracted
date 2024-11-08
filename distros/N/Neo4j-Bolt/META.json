@@ -4,13 +4,13 @@
       "Mark A. Jensen (majensen -at- cpan -dot- org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Neo4j-Bolt",
    "no_index" : {
@@ -21,22 +21,38 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::Typemaps" : "3.24"
+         }
       },
       "configure" : {
          "requires" : {
             "Alien::OpenSSL" : "0",
             "ExtUtils::MakeMaker" : "7.12",
-            "Neo4j::Client" : "0.46",
+            "Neo4j::Client" : "0.54",
             "Try::Tiny" : "0"
          }
       },
+      "develop" : {
+         "recommends" : {
+            "Path::Tiny" : "0",
+            "Pod::Markdown" : "0"
+         },
+         "requires" : {
+            "Devel::PPPort" : "3.63",
+            "Inline::C" : "0"
+         }
+      },
       "runtime" : {
+         "recommends" : {
+            "Mozilla::CA" : "0"
+         },
          "requires" : {
             "Alien::OpenSSL" : "0",
+            "DateTime" : "0",
             "JSON::PP" : "0",
-            "Neo4j::Client" : "0.46",
-            "Neo4j::Types" : "1.00",
+            "Neo4j::Client" : "0.54",
+            "Neo4j::Types" : "2.00",
             "URI" : "0",
             "XSLoader" : "0.14",
             "perl" : "5.012"
@@ -44,7 +60,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::Exception" : "0"
+            "Test::Exception" : "0",
+            "Test::Neo4j::Types" : "0.06"
          }
       }
    },
@@ -54,13 +71,15 @@
          "web" : "https://github.com/majensen/perlbolt/issues"
       },
       "repository" : {
-         "url" : "https://github.com/majensen/perlbolt.git"
+         "type" : "git",
+         "url" : "https://github.com/majensen/perlbolt.git",
+         "web" : "https://github.com/majensen/perlbolt"
       }
    },
-   "version" : "0.4203",
+   "version" : "0.5000",
    "x_contributors" : [
       "Mark A. Jensen <majensen@cpan.org>",
       "Arne Johannessen <ajnn@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

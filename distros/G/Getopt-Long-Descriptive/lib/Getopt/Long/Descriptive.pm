@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Getopt::Long::Descriptive 0.114;
+package Getopt::Long::Descriptive 0.115;
 # ABSTRACT: Getopt::Long, but simpler and more powerful
 
 use v5.12;
@@ -361,7 +361,7 @@ sub _build_describe_options {
   my ($class) = @_;
 
   sub {
-    my $format = shift;
+    my $format = (ref $_[0] ? '%c %o' : shift(@_));
     my $arg    = (ref $_[-1] and ref $_[-1] eq 'HASH') ? pop @_ : {};
     my @opts;
 
@@ -734,7 +734,7 @@ Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
 
 =head1 VERSION
 
-version 0.114
+version 0.115
 
 =head1 SYNOPSIS
 

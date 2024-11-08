@@ -1,0 +1,6 @@
+Revision history for Perl extension Data::FastPack.
+
+0.01  Wed Jul 17 13:30:51 2024
+	- original version; created by h2xs 1.23 with options
+		-P -X --name Data::FastPack -b 5.24.0
+

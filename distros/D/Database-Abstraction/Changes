@@ -1,5 +1,11 @@
 Revision history for Database-Abstraction
 
+0.11	Thu Nov  7 10:44:24 EST 2024
+	Added id parameter
+	Slurp small XML files using XML::Simple
+	Fix uninitialised error when slurp_file doesn't exist
+	Use features of File::pfopen version 0.03
+
 0.10	Thu Sep 19 08:17:55 EDT 2024
 	Added t/init.t
 	The constructor now honours 'sep_char'

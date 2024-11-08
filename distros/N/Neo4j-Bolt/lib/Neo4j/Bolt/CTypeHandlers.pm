@@ -1,6 +1,6 @@
 package Neo4j::Bolt::CTypeHandlers;
 BEGIN {
-  our $VERSION = "0.4203";
+  our $VERSION = "0.5000";
   require XSLoader;
   XSLoader::load();
 }
@@ -9,6 +9,10 @@ use JSON::PP; # operator overloading for boolean values
 use Neo4j::Bolt::Node;
 use Neo4j::Bolt::Relationship;
 use Neo4j::Bolt::Path;
+use Neo4j::Bolt::Point;
+use Neo4j::Bolt::DateTime;
+use Neo4j::Bolt::Duration;
+use Neo4j::Bolt::Bytes;
 
 =head1 NAME
 
@@ -61,7 +65,7 @@ L<libneo4j-client API|http://neo4j-client.net/doc/latest/neo4j-client_8h.html>.
 
 =head1 LICENSE
 
-This software is Copyright (c) 2019-2021 by Mark A. Jensen.
+This software is Copyright (c) 2019-2024 by Mark A. Jensen.
 
 This is free software, licensed under:
 

@@ -2,7 +2,7 @@ package Neo4j::Bolt;
 use Cwd qw/realpath getcwd/;
 
 BEGIN {
-  our $VERSION = "0.4203";
+  our $VERSION = "0.5000";
   require Neo4j::Bolt::Cxn;
   require Neo4j::Bolt::Txn;
   require Neo4j::Bolt::ResultStream;
@@ -10,6 +10,12 @@ BEGIN {
   require XSLoader;
   XSLoader::load();
 
+  my @min_lib_version = (5,0,4);
+  if (my $lib_version = _check_neo4j_omni_version(@min_lib_version)) {
+    warnings::warnif( "misc", sprintf
+      "Neo4j::Client is outdated and should be upgraded (want libneo4j-omni %i.%i.%i, found %s)",
+      @min_lib_version, $lib_version );
+  }
 }
 our $DEFAULT_DB = "neo4j";
 
@@ -49,7 +55,7 @@ sub connect_tls {
 
 Neo4j::Bolt - query Neo4j using Bolt protocol
 
-=for markdown [![Build Status](https://travis-ci.org/majensen/perlbolt.svg?branch=master)](https://travis-ci.org/majensen/perlbolt)
+=for markdown [![Build Status](https://github.com/majensen/perlbolt/actions/workflows/tests.yaml/badge.svg)](https://github.com/majensen/perlbolt/actions/workflows/tests.yaml)
 
 =head1 SYNOPSIS
 
@@ -87,16 +93,19 @@ references. These represent Neo4j types according to the following:
  Neo4j type       Perl representation
  ----- ----       ---- --------------
  Null             undef
- Bool             JSON::PP::Boolean (acts like 0 or 1)
+ Bool             Perl core bool (v5.36+) or JSON::PP::Boolean
  Int              scalar
  Float            scalar
  String           scalar
- Bytes            scalar
+ Bytes            scalarref (Neo4j::Bolt::Bytes)
+ DateTime         hashref   (Neo4j::Bolt::DateTime)
+ Duration         hashref   (Neo4j::Bolt::Duration)
+ Point            hashref   (Neo4j::Bolt::Point)
  List             arrayref
  Map              hashref
- Node             hashref  (Neo4j::Bolt::Node)
- Relationship     hashref  (Neo4j::Bolt::Relationship)
- Path             arrayref (Neo4j::Bolt::Path)
+ Node             hashref   (Neo4j::Bolt::Node)
+ Relationship     hashref   (Neo4j::Bolt::Relationship)
+ Path             arrayref  (Neo4j::Bolt::Path)
 
 L<Nodes|Neo4j::Bolt::Node>, L<Relationships|Neo4j::Bolt::Relationship> and
 L<Paths|Neo4j::Bolt::Path> are represented in the following formats:
@@ -118,6 +127,26 @@ L<Paths|Neo4j::Bolt::Path> are represented in the following formats:
  bless [
    $node1, $reln12, $node2, $reln23, $node3, ...
  ], 'Neo4j::Bolt::Path'
+
+For further details, see the individual modules:
+
+=over 
+
+=item * L<Neo4j::Bolt::Bytes>
+
+=item * L<Neo4j::Bolt::DateTime>
+
+=item * L<Neo4j::Bolt::Duration>
+
+=item * L<Neo4j::Bolt::Node>
+
+=item * L<Neo4j::Bolt::Path>
+
+=item * L<Neo4j::Bolt::Point>
+
+=item * L<Neo4j::Bolt::Relationship>
+
+=back
 
 =head1 METHODS
 
@@ -159,7 +188,7 @@ Set to C<NONE> to turn off completely (the default).
 
 =head1 SEE ALSO
 
-L<Neo4j::Bolt::Cxn>, L<Neo4j::Bolt::ResultStream>.
+L<Neo4j::Bolt::Cxn>, L<Neo4j::Bolt::ResultStream>, L<Neo4j::Types>.
 
 =head1 AUTHOR
 
@@ -171,13 +200,13 @@ L<Neo4j::Bolt::Cxn>, L<Neo4j::Bolt::ResultStream>.
 
 =over
 
-=item Arne Johannessen (@johannessen)
+=item * Arne Johannessen (L<AJNN|https://metacpan.org/author/AJNN>)
 
 =back
 
 =head1 LICENSE
 
-This software is Copyright (c) 2019-2021 by Mark A. Jensen.
+This software is Copyright (c) 2019-2024 by Mark A. Jensen.
 
 This is free software, licensed under:
 

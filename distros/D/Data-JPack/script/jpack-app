@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::JPack;
+# Encode JS/CSS/image files into scripts to be loaded via jpack
+
+# Options
+# -c  combine files into a single file, instead of a 1:1 file to jpacked file 
+# -a  append files to current file listing (opposite to set)
+# -s  generate a new sub set (opposite to append) (default)
+# --html_container  the  html container file or the dir in which it will be stored.
+# --prefix prefix from the html container to the actual location of stored files
+
+# list dir contents
+
+
+
+use feature qw<say state >;
+
+use File::Basename qw<dirname>;
+use File::Path qw<make_path>;
+
+use Getopt::Long;
+
+sub usage {
+  require Pod::Usage;
+  Pod::Usage::pod2usage();
+}
+
+my %options=(
+  prefix=>"data/jpack",
+  compress=>1,
+  #write_size=>8*4096,
+  #read_size=>8*4096,
+  #message_limit=>1000000,   # 1M messages
+  #byte_limit=>1000000*24,    # size of 1M messages with double float payload
+  group=>"default"
+);
+
+GetOptions(\%options,
+  "prefix=s",
+	"html_container=s",
+  "flush",  # Flush the data and app
+  #"byte_limit=i",
+  #"message_limit=i",
+  #"read_size=i",
+  #"write_size=i",
+  "compress",
+  "group=s",
+	"help"
+);
+
+usage if $options{help};
+
+die "html_container must be specified" unless exists $options{html_container};
+
+
+
+if(delete $options{compress}){
+	$options{jpack_options}={jpack_compression=>"deflate"};
+}
+
+
+
+my $jpack=Data::JPack->new(prefix=>$options{prefix}, html_container=>$options{html_container}, );
+if($options{flush}){
+  $jpack->flush;
+}
+
+for(@ARGV){
+  $jpack->set_prefix($options{prefix});
+  my $name=$jpack->next_file_name;
+  my $data=do {open my $fh, "<", $_; local $/=undef; <$fh>};
+  my $encoded=$jpack->encode($data);
+  say $encoded;
+  my $dir=dirname $name;
+  make_path $dir;
+  open  my $of, ">", $name;
+  say STDERR $of;
+  print $of $encoded;
+
+}
+

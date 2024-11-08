@@ -26,6 +26,7 @@ my %schemas = (
 );
 
 my @warnings = (
+  [ draft6 => [ qw(id) ] ],
   [ draft7 => [ qw(id) ] ],
   [ 'draft2019-09' => [ qw(id definitions dependencies) ] ],
 );
@@ -37,7 +38,13 @@ foreach my $index (0 .. $#warnings) {
   my $js = JSON::Schema::Modern->new(specification_version => $spec_version);
   foreach my $keyword (@$removed_keywords) {
     cmp_result(
-      [ warnings { ok($js->evaluate(true, { $keyword => $schemas{$keyword} }), 'schema with "'.$keyword.'" still validates in '.$spec_version) } ],
+      [ warnings {
+          cmp_result(
+            $js->evaluate(true, { $keyword => $schemas{$keyword} })->TO_JSON,
+            { valid => true },
+            'schema with "'.$keyword.'" still validates in '.$spec_version,
+          )
+        } ],
       superbagof(re($strings{$keyword})),
       'warned for "'.$keyword.'" in '.$spec_version,
     );
@@ -51,7 +58,13 @@ foreach my $index (0 .. $#warnings) {
       warn @_ if $_[0] =~ /^no-longer-supported "$keyword" keyword present/;
     };
     cmp_result(
-      [ warnings { ok($js->evaluate(true, { $keyword => $schemas{$keyword} }), 'schema with "'.$keyword.'" validates in '.$spec_version) } ],
+      [ warnings {
+          cmp_result(
+            $js->evaluate(true, { $keyword => $schemas{$keyword} })->TO_JSON,
+            { valid => true },
+            'schema with "'.$keyword.'" validates in '.$spec_version,
+          )
+        } ],
       [],
       'did not warn for "'.$keyword.'" in '.$spec_version,
     );

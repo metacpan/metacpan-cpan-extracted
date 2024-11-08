@@ -19,11 +19,13 @@ use AnyEvent::UserAgent ();
 
 		ok exists($opts{headers});
 		is ref($opts{headers}), 'HASH';
-		ok keys(%{$opts{headers}}) == 2;
+		ok keys(%{$opts{headers}}) == 3;
 
 		ok exists($opts{headers}{'X-Foo'});
 		is $opts{headers}{'X-Foo'}, 'bar';
 		ok exists($opts{headers}{'User-Agent'});
+		ok exists($opts{headers}{'X-Multi'});
+		is $opts{headers}{'X-Multi'}, 'foo, bar';
 
 		$cb->('', {Status => 200});
 	};
@@ -32,7 +34,7 @@ use AnyEvent::UserAgent ();
 my $ua = AnyEvent::UserAgent->new;
 my $cv = AE::cv;
 
-$ua->get('http://example.com/', 'X-Foo' => 'bar', sub { $cv->send(); });
+$ua->get('http://example.com/', 'X-Foo' => 'bar', 'X-Multi' => 'foo', 'X-Multi' => 'bar', sub { $cv->send(); });
 $cv->recv();
 
 

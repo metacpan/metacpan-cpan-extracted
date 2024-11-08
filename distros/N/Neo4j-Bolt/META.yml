@@ -3,14 +3,16 @@ abstract: 'Neo4j server agent using Bolt protocol'
 author:
   - 'Mark A. Jensen (majensen -at- cpan -dot- org)'
 build_requires:
+  ExtUtils::Typemaps: '3.24'
   Test::Exception: '0'
+  Test::Neo4j::Types: '0.06'
 configure_requires:
   Alien::OpenSSL: '0'
   ExtUtils::MakeMaker: '7.12'
-  Neo4j::Client: '0.46'
+  Neo4j::Client: '0.54'
   Try::Tiny: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,18 +22,21 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Mozilla::CA: '0'
 requires:
   Alien::OpenSSL: '0'
+  DateTime: '0'
   JSON::PP: '0'
-  Neo4j::Client: '0.46'
-  Neo4j::Types: '1.00'
+  Neo4j::Client: '0.54'
+  Neo4j::Types: '2.00'
   URI: '0'
   XSLoader: '0.14'
   perl: '5.012'
 resources:
   bugtracker: https://github.com/majensen/perlbolt/issues
   repository: https://github.com/majensen/perlbolt.git
-version: '0.4203'
+version: '0.5000'
 x_contributors:
   - 'Mark A. Jensen <majensen@cpan.org>'
   - 'Arne Johannessen <ajnn@cpan.org>'

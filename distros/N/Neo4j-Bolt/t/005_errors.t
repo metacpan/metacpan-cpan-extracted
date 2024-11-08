@@ -40,7 +40,7 @@ unless ($cxn->connected) {
 }
 
 SKIP: {
-  skip "Couldn't connect to server", 1 unless $cxn->connected;
+  skip "Couldn't connect to server", 6+2 unless $cxn->connected;
   ok my $stream = $cxn->run_query(
     "MATCH (a) RETRUN labels a",
    ), 'label count query';
@@ -55,7 +55,8 @@ SKIP: {
   is $cxn->errnum, -12, "got error";
   
   $url->userinfo($neo_info->{user}.':blarf');
-  if ($neo_info->{pass}) {
+  SKIP: {
+    skip "no neo_info pass", 2 unless $neo_info->{pass};
     $cxn = Neo4j::Bolt->connect($url->as_string);
     ok (!$cxn->connected, "bad pass, not connected");
     like $cxn->errmsg, qr/password is invalid/, "got unauthorized";

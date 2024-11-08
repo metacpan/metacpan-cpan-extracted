@@ -1,33 +1,37 @@
 Revision history for perl module AnyEvent::UserAgent
 
+0.08    2024-11-08
+        - Support sending multiple values for a single header (#5, Mathias
+          Kende).
+
 0.07    2014-09-02
-        - Fixed cookie handling (thanks to Eric Johnson).
+        - Fix cookie handling (#4, Eric Johnson).
 
 0.06    2014-07-31
-        - Renamed timeout attribute to inactivity_timeout.
-        - Added request_timeout attribute (thanks to Alexander Onokhov).
-        - Added Client-Warning header on error, like in LWP::UserAgent.
+        - Renam timeout attribute to inactivity_timeout.
+        - Add request_timeout attribute (Alexander Onokhov).
+        - Add Client-Warning header on error, like in LWP::UserAgent.
 
 0.05    2014-06-21
-        - Fixed test failed for perl <= 5.12.
+        - Fix test failed for perl <= 5.12.
 
 0.04    2014-06-20
-        - Added support for redefine some options of the user agent for one
+        - Add support for redefine some options of the user agent for one
           request only.
-        - Added support for arguments of AnyEvent::HTTP::http_request method.
-        - Fixed changing of the request options during the redirects.
-        - Fixed processing of the request headers.
-        - Added more tests.
+        - Add support for arguments of AnyEvent::HTTP::http_request method.
+        - Fix changing of the request options during the redirects.
+        - Fix processing of the request headers.
+        - Add more tests.
 
 0.03    2014-04-12
-        - Fixed processing of an invalid URLs (reported by Andrey Khozov).
+        - Fix processing of an invalid URLs (#3, Andrey Khozov).
 
 0.02    2013-10-06
-        - Implemented Basic authorization support.
-        - Implemented redirects support.
-        - Fixed processing of the cookies in redirects.
-        - Added max_redirects attribute.
-        - Added more tests.
+        - Implement Basic authorization support.
+        - Implement redirects support.
+        - Fix processing of the cookies in redirects.
+        - Add max_redirects attribute.
+        - Add more tests.
 
 0.01    2013-08-16
         - Initial public release.

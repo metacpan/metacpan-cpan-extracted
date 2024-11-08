@@ -1,0 +1,6 @@
+Revision history for Perl extension Data::JPack.
+
+0.01  Fri Oct 22 12:05:23 2021
+	- original version; created by h2xs 1.23 with options
+		-PX -n Data::JPack
+

@@ -1,0 +1,53 @@
+{
+   "abstract" : "FastPack Record format, parsing and serialising module",
+   "author" : [
+      "Ruben Westerberg <drclaw@mac.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-FastPack",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cpanel::JSON::XS" : "0",
+            "Data::MessagePack" : "0",
+            "Export::These" : "0",
+            "File::ShareDir" : "0",
+            "constant::more" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/drclaw1394/perl-data-fastpack.git",
+         "web" : "https://github.com/drclaw1394/perl-data-fastpack"
+      }
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

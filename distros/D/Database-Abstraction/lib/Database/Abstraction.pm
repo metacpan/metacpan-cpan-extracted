@@ -25,7 +25,7 @@ Database::Abstraction - database abstraction layer
 #	new(database => 'redis://servername');
 # TODO:	Add a "key" property, defaulting to "entry", which would be the name of the key
 # TODO:	The maximum number to return should be tuneable (as a LIMIT)
-# TODO:	Investigate XML::Hash
+# FIXME:	t/xml.t fails in slurping mode
 
 use warnings;
 use strict;
@@ -34,7 +34,7 @@ use Data::Dumper;
 use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
 use File::Basename;
 use File::Spec;
-use File::pfopen 0.02;
+use File::pfopen 0.03;	# For $mode and list context
 use File::Temp;
 # use Error::Simple;	# A nice idea to use this but it doesn't play well with "use lib"
 use Carp;
@@ -44,11 +44,11 @@ use constant	DEFAULT_MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size 
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -69,24 +69,16 @@ For example, you can access the files in /var/db/foo.csv via this class:
 
 You can then access the data using:
 
-    my $foo = MyPackageName::Database::Foo->new(directory => '/var/db');
+    my $foo = MyPackageName::Database::Foo->new(directory => '/var/dat');
     print 'Customer name ', $foo->name(customer_id => 'plugh'), "\n";
     my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
     print Data::Dumper->new([$row])->Dump();
 
-If the table has a column called "entry",
+If the table has a key column,
 entries are keyed on that and sorts are based on it.
 To turn that off, pass 'no_entry' to the constructor, for legacy
 reasons it's enabled by default.
-
-    # Regular CSV: There is no entry column and the separators are commas
-    sub new
-    {
-	my $class = shift;
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
-
-	return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
-    }
+The key column's default name is 'entry', but it can be overridden by the 'id' parameter.
 
 CSV files that are not no_entry can have empty lines or comment lines starting with '#',
 to make them more readable.
@@ -109,6 +101,7 @@ Therefore when given with no arguments you can get the current default values:
 
 =cut
 
+# Subroutine to initialize with args
 sub init
 {
 	if(scalar(@_)) {
@@ -133,9 +126,18 @@ Arguments:
 cache => place to store results;
 cache_duration => how long to store results in the cache (default is 1 hour);
 directory => where the database file is held
-max_slurp_size => CSV/PSV files smaller than this are held in RAM (default is 16K)
+max_slurp_size => CSV/PSV/XML files smaller than this are held in RAM (default is 16K)
 
 If the arguments are not set, tries to take from class level defaults.
+
+    # Regular CSV: There is no entry column and the separators are commas
+    sub new
+    {
+	my $class = shift;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+
+	return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
+    }
 
 =cut
 
@@ -153,8 +155,11 @@ sub new {
 
 	if(!defined($class)) {
 		# Using Database::Abstraction->new(), not Database::Abstraction::new()
-		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		return;
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
 	} elsif($class eq __PACKAGE__) {
 		croak("$class: abstract class");
 	} elsif(ref($class)) {
@@ -176,9 +181,11 @@ sub new {
 		# no_entry => $args{'no_entry'} || 0,
 	# }, $class;
 
+
 	# Re-seen keys take precedence, so defaults come first
 	return bless {
 		no_entry => 0,
+		id => 'entry',
 		cache_duration => '1 hour',
 		max_slurp_size => DEFAULT_MAX_SLURP_SIZE,
 		%defaults,
@@ -247,7 +254,7 @@ sub _open {
 		$self->{'type'} = 'DBI';
 	} else {
 		my $fin;
-		($fin, $slurp_file) = File::pfopen::pfopen($dir, $table, 'csv.gz:db.gz');
+		($fin, $slurp_file) = File::pfopen::pfopen($dir, $table, 'csv.gz:db.gz', '<');
 		if(defined($slurp_file) && (-r $slurp_file)) {
 			require Gzip::Faster;
 			Gzip::Faster->import();
@@ -258,12 +265,12 @@ sub _open {
 			$slurp_file = $fin->filename();
 			$self->{'temp'} = $slurp_file;
 		} else {
-			($fin, $slurp_file) = File::pfopen::pfopen($dir, $table, 'psv');
+			($fin, $slurp_file) = File::pfopen::pfopen($dir, $table, 'psv', '<');
 			if(defined($fin)) {
 				# Pipe separated file
 				$args{'sep_char'} = '|';
 			} else {
-				($fin, $slurp_file) = File::pfopen::pfopen($dir, $table, 'csv:db');
+				($fin, $slurp_file) = File::pfopen::pfopen($dir, $table, 'csv:db', '<');
 			}
 		}
 		if(defined($slurp_file) && (-r $slurp_file)) {
@@ -368,11 +375,11 @@ sub _open {
 						$self->{'data'}[$i++] = $d;
 					}
 				} else {
-					# keyed on the "entry" column
+					# keyed on the $self->{'id'} (default: "entry") column
 					# Ignore blank lines or lines starting with # in the CSV file
-					@data = grep { $_->{'entry'} !~ /^\s*#/ } grep { defined($_->{'entry'}) } @data;
+					@data = grep { $_->{$self->{'id'}} !~ /^\s*#/ } grep { defined($_->{$self->{'id'}}) } @data;
 					foreach my $d(@data) {
-						$self->{'data'}->{$d->{'entry'}} = $d;
+						$self->{'data'}->{$d->{$self->{'id'}}} = $d;
 					}
 				}
 			}
@@ -380,12 +387,40 @@ sub _open {
 		} else {
 			$slurp_file = File::Spec->catfile($dir, "$table.xml");
 			if(-r $slurp_file) {
-				$dbh = DBI->connect('dbi:XMLSimple(RaiseError=>1):');
-				$dbh->{'RaiseError'} = 1;
-				if($self->{'logger'}) {
-					$self->{'logger'}->debug("read in $table from XML $slurp_file");
+				if((-s $slurp_file) <= $self->{'max_slurp_size'}) {
+					require XML::Simple;
+					XML::Simple->import();
+
+					my $xml = XMLin(File::Spec->catfile($dir, "$table.xml"));
+					my @keys = keys %{$xml};
+					my $key = $keys[0];
+					my @data;
+					if(ref($xml->{$key}) eq 'ARRAY') {
+						@data = @{$xml->{$key}};
+					} else {
+						@data = @{$xml};
+					}
+					$self->{'data'} = ();
+					if($self->{'no_entry'}) {
+						# Not keyed, will need to scan each entry
+						my $i = 0;
+						foreach my $d(@data) {
+							$self->{'data'}->{$i++} = $d;
+						}
+					} else {
+						# keyed on the $self->{'id'} (default: "entry") column
+						foreach my $d(@data) {
+							$self->{'data'}->{$d->{$self->{'id'}}} = $d;
+						}
+					}
+				} else {
+					$dbh = DBI->connect('dbi:XMLSimple(RaiseError=>1):');
+					$dbh->{'RaiseError'} = 1;
+					if($self->{'logger'}) {
+						$self->{'logger'}->debug("read in $table from XML $slurp_file");
+					}
+					$dbh->func($table, 'XML', $slurp_file, 'xmlsimple_import');
 				}
-				$dbh->func($table, 'XML', $slurp_file, 'xmlsimple_import');
 			} else {
 				# throw Error(-file => "$dir/$table");
 				croak("Can't find a $table database in $dir");
@@ -432,8 +467,10 @@ sub selectall_hash
 	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
 
+	$self->_open() if((!$self->{$table}) && (!$self->{'data'}));
+
 	if($self->{'data'}) {
-		if(scalar(keys %${params}) == 0) {
+		if(scalar(keys %{$params}) == 0) {
 			if($self->{'logger'}) {
 				$self->{'logger'}->trace("$table: selectall_hash fast track return");
 			}
@@ -447,8 +484,6 @@ sub selectall_hash
 
 	my $query;
 	my $done_where = 0;
-
-	$self->_open() if(!$self->{$table});
 
 	if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
 		$query = "SELECT * FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
@@ -490,7 +525,7 @@ sub selectall_hash
 		push @query_args, $arg;
 	}
 	if(!$self->{no_entry}) {
-		$query .= ' ORDER BY entry';
+		$query .= ' ORDER BY ' . $self->{'id'};
 	}
 	if(!wantarray) {
 		$query .= ' LIMIT 1';
@@ -583,7 +618,7 @@ sub fetchrow_hashref {
 	$self->_open() if(!$self->{$table});
 
 	if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
-		$query .= " WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
+		$query .= ' WHERE ' . $self->{'id'} . ' IS NOT NULL AND ' . $self->{'id'} . " NOT LIKE '#%'";
 		$done_where = 1;
 	}
 	my @query_args;
@@ -670,36 +705,49 @@ On CSV tables without no_entry, it may help to add
 "WHERE entry IS NOT NULL AND entry NOT LIKE '#%'"
 to the query.
 
+If the data have been slurped,
+this will still work by accessing that actual database.
+
 =cut
 
-sub execute {
+sub execute
+{
 	my $self = shift;
 	my $args = $self->_get_params('query', @_);
 
-	Carp::croak(__PACKAGE__, ': Usage: execute(query => $query)') unless(defined($args->{'query'}));
+	# Ensure the 'query' parameter is provided
+	Carp::croak(__PACKAGE__, ': Usage: execute(query => $query)') 
+		unless defined $args->{'query'};
 
+	# Get table name (remove package name prefix if present)
 	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
 
-	$self->_open() if(!$self->{$table});
+	# Open a connection if it's not already open
+	$self->_open() unless $self->{$table};
 
 	my $query = $args->{'query'};
-	if($query !~ / FROM /i) {
-		$query .= " FROM $table";
-	}
-	if($self->{'logger'}) {
-		$self->{'logger'}->debug("execute $query");
-	}
+
+	# Append "FROM <table>" if missing
+	$query .= " FROM $table" unless $query =~ /\sFROM\s/i;
+
+	# Log the query if a logger is available
+	$self->{'logger'}->debug("execute $query") if $self->{'logger'};
+
+	# Prepare and execute the query
 	my $sth = $self->{$table}->prepare($query);
-	# $sth->execute() || throw Error::Simple($query);
-	$sth->execute() || croak($query);
-	my @rc;
-	while(my $href = $sth->fetchrow_hashref()) {
-		return $href if(!wantarray);
-		push @rc, $href;
+	$sth->execute() or croak($query);  # Die with the query in case of error
+
+	# Fetch the results
+	my @results;
+	while (my $row = $sth->fetchrow_hashref()) {
+		# Return a single hashref if scalar context is expected
+		return $row unless wantarray;
+		push @results, $row;
 	}
 
-	return @rc;
+	# Return all rows as an array in list context
+	return @results;
 }
 
 =head2 updated
@@ -724,6 +772,8 @@ or only the first when called in scalar context
 If the database has a column called "entry" you can do a quick lookup with
 
     my $value = $foo->column('123');	# where "column" is the value you're after
+    my @entries = $foo->entry();
+    print 'There are ', scalar(@entries), " entries in the database\n";
 
 Set distinct or unique to 1 if you're after a unique list.
 
@@ -731,9 +781,7 @@ Set distinct or unique to 1 if you're after a unique list.
 
 sub AUTOLOAD {
 	our $AUTOLOAD;
-	my $column = $AUTOLOAD;
-
-	$column =~ s/.*:://;
+	my ($column) = $AUTOLOAD =~ /::(\w+)$/;
 
 	return if($column eq 'DESTROY');
 
@@ -749,7 +797,7 @@ sub AUTOLOAD {
 		%params = @_;
 	} elsif(scalar(@_) == 1) {
 		if($self->{'no_entry'}) {
-			Carp::croak(ref($self), "::($_[0]): entry is not a column");
+			Carp::croak(ref($self), "::($_[0]): ", $self->{'id'}, 'is not a column');
 		}
 		$params{'entry'} = shift;
 	}
@@ -766,7 +814,7 @@ sub AUTOLOAD {
 			return map { $_->{$column} } values %{$data};
 		}
 		if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
-			$query = "SELECT $column FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
+			$query = "SELECT $column FROM $table WHERE " . $self->{'id'} . "IS NOT NULL AND entry NOT LIKE '#%'";
 			$done_where = 1;
 		} else {
 			$query = "SELECT $column FROM $table";
@@ -839,7 +887,7 @@ sub AUTOLOAD {
 			return
 		}
 		if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
-			$query = "SELECT DISTINCT $column FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
+			$query = "SELECT DISTINCT $column FROM $table WHERE " . $self->{'id'} . "IS NOT NULL AND entry NOT LIKE '#%'";
 			$done_where = 1;
 		} else {
 			$query = "SELECT DISTINCT $column FROM $table";
@@ -913,30 +961,25 @@ sub DESTROY {
 #	when called _get_params('arg', @_);
 sub _get_params
 {
-	shift;
+	shift;  # Discard the first argument (typically $self)
 	my $default = shift;
 
-	if(ref($_[0]) eq 'HASH') {
-		# %rc = %{$_[0]};
-		return $_[0];
-	}
+	# Directly return hash reference if the first parameter is a hash reference
+	return $_[0] if ref $_[0] eq 'HASH';
 
 	my %rc;
+	my $num_args = scalar @_;
 
-	if((scalar(@_) % 2) == 0) {
+	# Populate %rc based on the number and type of arguments
+	if(($num_args == 1) && (defined $default)) {
+		# %rc = ($default => shift);
+		return { $default => shift };
+	} elsif($num_args == 1) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
+	} elsif($num_args == 0 && defined $default) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '($default => \$val)');
+	} elsif(($num_args % 2) == 0) {
 		%rc = @_;
-	} elsif(scalar(@_) == 1) {
-		if(defined($default)) {
-			$rc{$default} = shift;
-		} else {
-			my @c = caller(1);
-			my $func = $c[3];	# calling function name
-			Carp::croak('Usage: ', __PACKAGE__, "->$func()");
-		}
-	} elsif((scalar(@_) == 0) && defined($default)) {
-		my @c = caller(1);
-		my $func = $c[3];	# calling function name
-		Carp::croak('Usage: ', __PACKAGE__, "->$func($default => " . '$val)');
 	}
 
 	return \%rc;
@@ -953,6 +996,16 @@ I really ought to fix that.
 
 It would be nice for the key column to be called key, not entry,
 however key's a reserved word in SQL.
+
+The no_entry parameter should be no_id.
+
+XML slurping is hard,
+so if XML fails for you on a small file force non-slurping mode with
+
+    $foo = MyPackageName::Database::Foo->new({
+	directory => '/var/db',
+	# max_slurp_size => 1	# force to not use slurp and therefore to use SQL
+    });
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -96,9 +96,9 @@ of the response as Perl arrays (not arrayrefs).
 
 # LIMITATIONS
 
-The results of Cypher `EXPLAIN` or `PROFILE` queries are currently
-unsupported. If you need to access such results, consider using
-[Neo4j::Driver](https://metacpan.org/pod/Neo4j::Driver) or the interactive
+The results of Cypher `EXPLAIN` or `PROFILE` queries are
+currently unsupported. If you need to access such results,
+consider using [Neo4j::Driver](https://metacpan.org/pod/Neo4j::Driver) or the interactive
 [Neo4j Browser](https://neo4j.com/docs/browser-manual/current/)
 instead of this module.
 
@@ -114,7 +114,7 @@ instead of this module.
 
 # LICENSE
 
-This software is Copyright (c) 2019-2021 by Mark A. Jensen.
+This software is Copyright (c) 2019-2024 by Mark A. Jensen.
 
 This is free software, licensed under:
 

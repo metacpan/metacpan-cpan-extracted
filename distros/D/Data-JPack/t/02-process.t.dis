@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use feature ":all";
+use AnyEvent;
+use AnyEvent::AIO;
+use Promise::XS;
+
+use Data::Base64;
+
+#open my $outFile,">", "base64.test";
+say "#Creating  service";
+my $service=Data::Base64::new;
+Data::Base64::open $service, "base64.test";
+
+my $cv=AE::cv;
+my $data="HHHHHHH";
+say "#About to call write";
+Data::Base64::writeHeader($service,{})
+->then(sub {
+	Data::Base64::openProcess $service;
+	Data::Base64::writeToFromBuffer($service,\$data)
+})
+->then(sub {
+	say "Write finished. about to close";
+	Data::Base64::closeProcess($service);
+
+})
+->then(sub {
+	say "About to write footer";
+	Data::Base64::writeFooter($service, "FOOTER");
+})
+->then(sub {
+	say "sending cv";
+	$cv->send;
+});
+
+$cv->recv;
+

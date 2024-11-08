@@ -37,28 +37,29 @@ void new_rs_obj (rs_obj_t **rs_obj) {
   (*rs_obj)->fetched = 0;
   (*rs_obj)->failure_details = (struct neo4j_failure_details *) NULL;
   (*rs_obj)->stats = stats;
-  (*rs_obj)->eval_errcode = "";
-  (*rs_obj)->eval_errmsg = "";
+  (*rs_obj)->eval_errcode = savepvs("");
+  (*rs_obj)->eval_errmsg = savepvs("");
   (*rs_obj)->errnum = 0;
-  (*rs_obj)->strerror = "";
+  (*rs_obj)->strerror = 0;
   return;
 }
 
 void reset_errstate_rs_obj (rs_obj_t *rs_obj) {
+  Safefree(rs_obj->eval_errcode);
+  Safefree(rs_obj->eval_errmsg);
+  Safefree(rs_obj->strerror);
   rs_obj->succeed = -1;  
   rs_obj->fail = -1;  
   rs_obj->failure_details = (struct neo4j_failure_details *) NULL;
-  rs_obj->eval_errcode = "";
-  rs_obj->eval_errmsg = "";
+  rs_obj->eval_errcode = savepvs("");
+  rs_obj->eval_errmsg = savepvs("");
   rs_obj->errnum = 0;
-  rs_obj->strerror = "";
+  rs_obj->strerror = 0;
   return;
 }
 
 int update_errstate_rs_obj (rs_obj_t *rs_obj) {
-  const char *evalerr, *evalmsg;
-  char *climsg;
-  char *s, *t;
+  char climsg[BUFLEN];
   int fail;
   fail = neo4j_check_failure(rs_obj->res_stream);
   if (fail != 0) {
@@ -66,22 +67,21 @@ int update_errstate_rs_obj (rs_obj_t *rs_obj) {
     rs_obj->fail = 1;
     rs_obj->fetched = -1;
     rs_obj->errnum = fail;
-    Newx(climsg, BUFLEN, char);
-    rs_obj->strerror = neo4j_strerror(fail, climsg, BUFLEN);
+    Safefree(rs_obj->strerror);
+    rs_obj->strerror = savepv( neo4j_strerror(fail, climsg, sizeof(climsg)) );
     if (fail == NEO4J_STATEMENT_EVALUATION_FAILED) {
       rs_obj->failure_details = neo4j_failure_details(rs_obj->res_stream);
-      Newx(s, strlen(rs_obj->failure_details->code)+1,char);
-      rs_obj->eval_errcode = strncpy(s,rs_obj->failure_details->code, (size_t)
-				     strlen(rs_obj->failure_details->code));
-      Newx(t, strlen(rs_obj->failure_details->message)+1,char);
-      rs_obj->eval_errmsg = strncpy(t,rs_obj->failure_details->message,
-				    (size_t) strlen(rs_obj->failure_details->message));
+      Safefree(rs_obj->eval_errcode);
+      Safefree(rs_obj->eval_errmsg);
+      rs_obj->eval_errcode = savepv( rs_obj->failure_details->code );
+      rs_obj->eval_errmsg  = savepv( rs_obj->failure_details->message );
     }
   }
   else {
     rs_obj->succeed = 1;
     rs_obj->fail = 0;
-    rs_obj->strerror = "";
+    Safefree(rs_obj->strerror);
+    rs_obj->strerror = savepvs("");
   }
   return fail;
 }

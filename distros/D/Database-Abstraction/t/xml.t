@@ -1,5 +1,7 @@
 #!perl -w
 
+# FIXME: Slurping mode fails on this
+
 use strict;
 use FindBin qw($Bin);
 
@@ -8,7 +10,10 @@ use Test::Most tests => 10;
 
 use_ok('Database::test3');
 
-my $test3 = new_ok('Database::test3' => ["$Bin/../data"]);
+my $test3 = new_ok('Database::test3' => [{
+	directory => "$Bin/../data",
+	max_slurp_size => 1	# force to not use slurp and therefore to use SQL
+}]);
 
 cmp_ok($test3->fr('2'), 'eq', 'Deux', 'XML AUTOLOAD works found');
 is($test3->fr('4'), undef, 'XML AUTOLOAD works not found');

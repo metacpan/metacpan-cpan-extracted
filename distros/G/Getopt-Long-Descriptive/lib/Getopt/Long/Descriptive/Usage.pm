@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Getopt::Long::Descriptive::Usage 0.114;
+package Getopt::Long::Descriptive::Usage 0.115;
 # ABSTRACT: the usage description for GLD
 
 use List::Util qw(max);
@@ -280,7 +280,7 @@ Getopt::Long::Descriptive::Usage - the usage description for GLD
 
 =head1 VERSION
 
-version 0.114
+version 0.115
 
 =head1 SYNOPSIS
 

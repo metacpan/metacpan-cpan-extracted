@@ -3,6 +3,8 @@ data/test1.csv
 data/test2.psv
 data/test3.xml
 data/test4.csv
+data/test5.csv
+data/test6.xml
 lib/Database/Abstraction.pm
 LICENSE
 Makefile.PL
@@ -15,6 +17,7 @@ t/20-new.t
 t/chi.t
 t/comment-spelling.t
 t/csv.t
+t/csv_id.t
 t/eof.t
 t/eol.t
 t/error.t
@@ -23,6 +26,8 @@ t/lib/Database/test1.pm
 t/lib/Database/test2.pm
 t/lib/Database/test3.pm
 t/lib/Database/test4.pm
+t/lib/Database/test5.pm
+t/lib/Database/test6.pm
 t/lib/MyLogger.pm
 t/logger.t
 t/no_entry.t
@@ -39,5 +44,6 @@ t/two_databases.t
 t/vars.t
 t/version.t
 t/xml.t
+t/xml_record.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

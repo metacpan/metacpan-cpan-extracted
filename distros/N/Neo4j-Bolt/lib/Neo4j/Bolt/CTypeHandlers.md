@@ -45,7 +45,7 @@ data to Perl representations.
 
 # LICENSE
 
-This software is Copyright (c) 2019-2021 by Mark A. Jensen.
+This software is Copyright (c) 2019-2024 by Mark A. Jensen.
 
 This is free software, licensed under:
 

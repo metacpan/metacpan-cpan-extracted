@@ -1,0 +1,37 @@
+<records>
+  <record>
+    <ID>101</ID>
+    <Name>John Doe</Name>
+    <Age>28</Age>
+    <Email>john.doe@example.com</Email>
+    <Country>USA</Country>
+  </record>
+  <record>
+    <ID>102</ID>
+    <Name>Jane Smith</Name>
+    <Age>35</Age>
+    <Email>jane.smith@example.com</Email>
+    <Country>UK</Country>
+  </record>
+  <record>
+    <ID>103</ID>
+    <Name>Alice Johnson</Name>
+    <Age>22</Age>
+    <Email>alice.j@example.com</Email>
+    <Country>Canada</Country>
+  </record>
+  <record>
+    <ID>104</ID>
+    <Name>Bob Williams</Name>
+    <Age>40</Age>
+    <Email>bob.w@example.com</Email>
+    <Country>Australia</Country>
+  </record>
+  <record>
+    <ID>105</ID>
+    <Name>Emily Davis</Name>
+    <Age>30</Age>
+    <Email>emily.d@example.com</Email>
+    <Country>Germany</Country>
+  </record>
+</records>

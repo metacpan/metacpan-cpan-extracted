@@ -1,5 +1,5 @@
 #include "perlbolt.h"
-#include "ingyINLINE.h"
+#include "ppport.h"
 
 #define NVCLASS "Neo4j::Bolt::NeoValue"
 
@@ -36,6 +36,32 @@ SV* _as_perl (SV *obj) {
 int _map_size (SV *obj) {
   return neo4j_map_size( C_PTR_OF(obj, neovalue_t)->value );
 }
+
+SV* is_bool (SV *sv) {
+  SV *ref;
+  if (! SvOK(sv)) {
+    return &PL_sv_no;
+  }
+  SvGETMAGIC(sv);
+  if (SvROK(sv)) {
+    ref = SvRV(sv);
+    if (SvTYPE(ref) < SVt_PVAV) { // scalar ref
+      if (SvOBJECT(ref) && sv_isa(sv, "JSON::PP::Boolean")) {
+        return &PL_sv_yes;
+      }
+      if (SvIOK(ref) && SvIV(ref) >> 1 == 0) { // literal \1 or \0
+        return &PL_sv_yes;
+      }
+    }
+  }
+#if PERL_VERSION_GE(5,36,0)
+  else if (SvIsBOOL(sv)) {
+    return &PL_sv_yes;
+  }
+#endif
+  return &PL_sv_no;
+}
+
 void DESTROY(SV *obj) {
   neo4j_value_t *val = C_PTR_OF(obj, neo4j_value_t);
   return;
@@ -62,6 +88,10 @@ _as_perl (obj)
 
 int
 _map_size (obj)
+	SV *	obj
+
+SV *
+is_bool (obj)
 	SV *	obj
 
 void

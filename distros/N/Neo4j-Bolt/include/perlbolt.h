@@ -9,10 +9,15 @@
 #define NODE_CLASS "Neo4j::Bolt::Node"
 #define RELATIONSHIP_CLASS "Neo4j::Bolt::Relationship"
 #define PATH_CLASS "Neo4j::Bolt::Path"
+#define DATETIME_CLASS "Neo4j::Bolt::DateTime"
+#define DURATION_CLASS "Neo4j::Bolt::Duration"
+#define POINT_CLASS "Neo4j::Bolt::Point"
 #define BUFLEN 256
 
 #define C_PTR_OF(perl_obj,c_type) ((c_type *)SvIV(SvRV(perl_obj)))
 #define ignore_unused_result(func) if (func) { }
+#define value_to_blessed_sv(the_value,the_func,THE_CLASS) (sv_bless(newRV_noinc((SV*) the_func(the_value)),gv_stashpv(THE_CLASS,GV_ADD)))
+#define neo4j_type_svpv(the_value) newSVpv(neo4j_typestr(neo4j_type(the_value)),0)
 
 struct cxn_obj {
   neo4j_connection_t *connection;

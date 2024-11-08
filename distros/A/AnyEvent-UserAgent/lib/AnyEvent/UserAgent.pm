@@ -13,7 +13,7 @@ use HTTP::Response ();
 
 use namespace::clean;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 
 has agent              => (is => 'rw', default => sub { $AnyEvent::HTTP::USERAGENT . ' AnyEvent-UserAgent/' . $VERSION });
@@ -35,19 +35,18 @@ sub request {
 	});
 }
 
-sub get    { _make_request(GET    => @_) }
-sub head   { _make_request(HEAD   => @_) }
-sub put    { _make_request(PUT    => @_) }
-sub delete { _make_request(DELETE => @_) }
-sub post   { _make_request(POST   => @_) }
+sub get    { _do_request(\&HTTP::Request::Common::GET    => @_) }
+sub head   { _do_request(\&HTTP::Request::Common::HEAD   => @_) }
+sub put    { _do_request(\&HTTP::Request::Common::PUT    => @_) }
+sub delete { _do_request(\&HTTP::Request::Common::DELETE => @_) }
+sub post   { _do_request(\&HTTP::Request::Common::POST   => @_) }
 
-sub _make_request {
+sub _do_request {
 	my $cb   = pop();
 	my $meth = shift();
 	my $self = shift();
 
-	no strict 'refs';
-	$self->request(&{'HTTP::Request::Common::' . $meth}(@_), $cb);
+	$self->request($meth->(@_), $cb);
 }
 
 sub _request {
@@ -82,7 +81,7 @@ sub _request {
 	$grd = AnyEvent::HTTP::http_request(
 		$req->method,
 		$req->uri,
-		headers => {map { $_ => $hdrs->header($_) } $hdrs->header_field_names},
+		headers => {map { $_ => scalar($hdrs->header($_)) } $hdrs->header_field_names},
 		body    => $req->content,
 		recurse => 0,
 		timeout => $opts->{inactivity_timeout},
@@ -332,12 +331,16 @@ L<http://github.com/AdCampRu/anyevent-useragent/issues>
 
 Denis Ibaev C<dionys@cpan.org> for AdCamp.ru.
 
-=head1 CONTRIBUTORS
-
-Andrey Khozov C<avkhozov@cpan.org>.
-
 This module based on original L<AnyEvent::HTTP::Simple|http://github.com/punytan/AnyEvent-HTTP-Simple>
 module by punytan C<punytan@gmail.com>.
+
+=head1 CONTRIBUTORS
+
+Andrey Khozov C<avkhozov@cpan.org>
+
+Eric Johnson C<github@iijo.org>
+
+Mathias Kende C<mathias@cpan.org>
 
 =head1 LICENSE
 

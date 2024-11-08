@@ -15,7 +15,7 @@ void new_cxn_obj(cxn_obj_t **cxn_obj) {
   (*cxn_obj)->errnum = 0;
   int major_version = 0;
   int minor_version = 0;
-  (*cxn_obj)->strerror = "";
+  (*cxn_obj)->strerror = savepvs("");
 }		 
 
 int set_log_level( const char* classname, const char* lvl )
@@ -55,7 +55,7 @@ SV* connect_ ( const char* classname, const char* neo4j_url,
   SV *cxn;
   SV *cxn_ref;
   cxn_obj_t *cxn_obj;
-  char *climsg, *s;
+  char climsg[BUFLEN];
   neo4j_config_t *config;
   new_cxn_obj(&cxn_obj);
   neo4j_client_init();
@@ -82,8 +82,8 @@ SV* connect_ ( const char* classname, const char* neo4j_url,
   if (cxn_obj->connection == NULL) {
     cxn_obj->errnum = errno;
     cxn_obj->connected = false;
-    Newx(climsg, BUFLEN, char);
-    cxn_obj->strerror = neo4j_strerror(errno, climsg, BUFLEN-1);
+    Safefree(cxn_obj->strerror);
+    cxn_obj->strerror = savepv( neo4j_strerror(errno, climsg, sizeof(climsg)) );
   } else {
     if ( encrypt && ! neo4j_connection_is_secure(cxn_obj->connection) ) {
       warn("Bolt connection not secure!");
@@ -91,13 +91,19 @@ SV* connect_ ( const char* classname, const char* neo4j_url,
     cxn_obj->major_version = cxn_obj->connection->version;
     cxn_obj->minor_version = cxn_obj->connection->minor_version;
     cxn_obj->connected = true;
-    cxn_obj->strerror = "";
   }
   cxn = newSViv((IV) cxn_obj);
   cxn_ref = newRV_noinc(cxn);
   sv_bless(cxn_ref, gv_stashpv(CXNCLASS, GV_ADD));
   SvREADONLY_on(cxn);
   return cxn_ref;
+}
+
+static const char * _check_neo4j_omni_version (int major, int minor, int patch)
+{
+  int min_version = (major << 20) | (minor << 12) | (patch << 4);
+  return 0 < min_version && min_version <= NEO4J_VERSION_NUMBER
+    ? NULL : NEO4J_VERSION;
 }
 
 
@@ -121,4 +127,10 @@ int
 set_log_level (classname, lvl)
         const char* classname
         const char* lvl
-	
+
+const char *
+_check_neo4j_omni_version (major, minor, patch)
+        int major
+        int minor
+        int patch
+

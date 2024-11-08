@@ -1,16 +1,32 @@
 package Neo4j::Bolt::Path;
 # ABSTRACT: Representation of Neo4j Path
 
-$Neo4j::Bolt::Path::VERSION = '0.4203';
+$Neo4j::Bolt::Path::VERSION = '0.5000';
 
 use strict;
 use warnings;
 
 use parent 'Neo4j::Types::Path';
 
+sub elements {
+  my $self = shift;
+  return @$self;
+}
+
+sub nodes {
+  my $self = shift;
+  my $i = 0;
+  return grep { ++$i & 1 } @$self;
+}
+
+sub relationships {
+  my $self = shift;
+  my $i = 0;
+  return grep { $i++ & 1 } @$self;
+}
+
 sub as_simple {
-  my ($self) = @_;
-  
+  my $self = shift;
   return [ @$self ];
 }
 
@@ -45,7 +61,7 @@ a Cypher query that returns paths from a Neo4j database.
 Their nodes, relationships and metadata can be accessed
 as shown in the synopsis above.
 
-This package inherits from L<Neo4j::Types::Path>, which
+This class conforms to the L<Neo4j::Types::Path> API, which
 offers an object-oriented interface to the paths's
 elements and metadata. This is entirely optional to use.
 
@@ -54,7 +70,19 @@ L<Neo4j::Bolt::Path> instances will be created.
 
 =head1 METHODS
 
-This package inherits all methods from L<Neo4j::Types::Path>.
+This class provides the following methods defined by
+L<Neo4j::Types::Path>:
+
+=over
+
+=item * L<B<elements()>|Neo4j::Types::Path/"elements">
+
+=item * L<B<nodes()>|Neo4j::Types::Path/"nodes">
+
+=item * L<B<relationships()>|Neo4j::Types::Path/"relationships">
+
+=back
+
 The following additional method is provided:
 
 =over
@@ -81,7 +109,7 @@ L<Neo4j::Bolt>, L<Neo4j::Types::Path>
 
 =head1 LICENSE
 
-This software is Copyright (c) 2020-2021 by Arne Johannessen.
+This software is Copyright (c) 2020-2024 by Arne Johannessen.
 
 This is free software, licensed under:
 

@@ -4,7 +4,7 @@ Database::Abstraction - database abstraction layer
 
 # VERSION
 
-Version 0.10
+Version 0.11
 
 # SYNOPSIS
 
@@ -25,24 +25,16 @@ For example, you can access the files in /var/db/foo.csv via this class:
 
 You can then access the data using:
 
-    my $foo = MyPackageName::Database::Foo->new(directory => '/var/db');
+    my $foo = MyPackageName::Database::Foo->new(directory => '/var/dat');
     print 'Customer name ', $foo->name(customer_id => 'plugh'), "\n";
     my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
     print Data::Dumper->new([$row])->Dump();
 
-If the table has a column called "entry",
+If the table has a key column,
 entries are keyed on that and sorts are based on it.
 To turn that off, pass 'no\_entry' to the constructor, for legacy
 reasons it's enabled by default.
-
-    # Regular CSV: There is no entry column and the separators are commas
-    sub new
-    {
-        my $class = shift;
-        my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
-
-        return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
-    }
+The key column's default name is 'entry', but it can be overridden by the 'id' parameter.
 
 CSV files that are not no\_entry can have empty lines or comment lines starting with '#',
 to make them more readable.
@@ -72,9 +64,18 @@ Arguments:
 cache => place to store results;
 cache\_duration => how long to store results in the cache (default is 1 hour);
 directory => where the database file is held
-max\_slurp\_size => CSV/PSV files smaller than this are held in RAM (default is 16K)
+max\_slurp\_size => CSV/PSV/XML files smaller than this are held in RAM (default is 16K)
 
 If the arguments are not set, tries to take from class level defaults.
+
+    # Regular CSV: There is no entry column and the separators are commas
+    sub new
+    {
+        my $class = shift;
+        my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+
+        return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
+    }
 
 ## set\_logger
 
@@ -122,6 +123,8 @@ or only the first when called in scalar context
 If the database has a column called "entry" you can do a quick lookup with
 
     my $value = $foo->column('123');    # where "column" is the value you're after
+    my @entries = $foo->entry();
+    print 'There are ', scalar(@entries), " entries in the database\n";
 
 Set distinct or unique to 1 if you're after a unique list.
 
@@ -136,6 +139,16 @@ I really ought to fix that.
 
 It would be nice for the key column to be called key, not entry,
 however key's a reserved word in SQL.
+
+The no\_entry parameter should be no\_id.
+
+XML slurping is hard,
+so if XML fails for you on a small file force non-slurping mode with
+
+    $foo = MyPackageName::Database::Foo->new({
+        directory => '/var/db',
+        # max_slurp_size => 1   # force to not use slurp and therefore to use SQL
+    });
 
 # LICENSE AND COPYRIGHT
 

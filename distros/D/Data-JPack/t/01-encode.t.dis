@@ -1,0 +1,26 @@
+use strict;
+use warnings;
+use feature ":all";
+#use Test::More;
+
+
+
+
+use Data::JPack;
+
+#say jpack_encode_file "pako/dist/pako.js"; 
+
+my $jpack=Data::JPack->new;
+
+say $jpack->encode_header;
+local $/;
+open my $fh, "<", "test.dat";
+my $buffer="";
+my $read=0;
+my $offset=0;
+while($read=sysread $fh, $buffer, 4096){
+
+	say $jpack->encode_data($buffer);
+}
+say $jpack->encode_footer;
+

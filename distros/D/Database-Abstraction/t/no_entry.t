@@ -13,4 +13,4 @@ use_ok('Database::test4');
 
 my $test4 = new_ok('Database::test4' => [directory => "$Bin/../data"]);
 
-cmp_ok($test4->ordinal(cardinal => 'one'), 'eq', 'first', 'CSV AUTOLOAD works found');
+cmp_ok($test4->ordinal(cardinal => 'one'), 'eq', 'first', 'CSV AUTOLOAD works');

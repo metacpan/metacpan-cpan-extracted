@@ -11,14 +11,14 @@ void new_txn_obj( txn_obj_t **txn_obj) {
   Newx(*txn_obj,1,txn_obj_t);
   (*txn_obj)->tx = NULL;
   (*txn_obj)->errnum = 0;
-  (*txn_obj)->strerror = "";
+  (*txn_obj)->strerror = savepvs("");
   return;
 }
 
 // class method
 SV *begin_( const char* classname, SV *cxn_ref, int tx_timeout, const char *mode, const char *dbname) {
   txn_obj_t *txn_obj;
-  char *climsg;
+  char climsg[BUFLEN];
   new_txn_obj(&txn_obj);
   cxn_obj_t *cxn_obj = C_PTR_OF(cxn_ref, cxn_obj_t);
   neo4j_transaction_t *tx = neo4j_begin_tx(cxn_obj->connection, tx_timeout,
@@ -27,8 +27,8 @@ SV *begin_( const char* classname, SV *cxn_ref, int tx_timeout, const char *mode
   txn_obj->tx = tx;
   if (tx == NULL) {
     txn_obj->errnum = errno;
-    Newx(climsg, BUFLEN, char);
-    txn_obj->strerror = neo4j_strerror(errno,climsg,BUFLEN);
+    Safefree(txn_obj->strerror);
+    txn_obj->strerror = savepv( neo4j_strerror(errno, climsg, sizeof(climsg)) );
   }
   SV *txn = newSViv((IV) txn_obj);
   SV *txn_ref = newRV_noinc(txn);
@@ -107,6 +107,10 @@ const char *errmsg_(SV *txn_ref) {
 
 MODULE = Neo4j::Bolt::Txn  PACKAGE = Neo4j::Bolt::Txn  
 
+TYPEMAP: <<END
+txn_obj_t *    T_PTRREF
+END
+
 PROTOTYPES: DISABLE
 
 
@@ -140,4 +144,12 @@ errnum_ (txn_ref)
 const char *
 errmsg_ (txn_ref)
 	SV *	txn_ref
+
+void
+DESTROY (txn_obj)
+        txn_obj_t *    txn_obj
+    CODE:
+        neo4j_free_tx(txn_obj->tx);
+        Safefree(txn_obj->strerror);
+        Safefree(txn_obj);
 

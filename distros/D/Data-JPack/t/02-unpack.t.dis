@@ -1,0 +1,9 @@
+use strict;
+use warnings;
+use feature ":all";
+use Data::JPack qw<jpack_decode_file>;
+
+my $data=jpack_decode_file @ARGV;
+while($data){
+say unpack "H*", substr $data, 0, 16,"";
+}

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.594';
+our $VERSION = '0.595';
 
 use 5.020;
 use Moo;
@@ -203,10 +203,7 @@ sub _get_format_definition ($class, $schema, $state) {
     # draft2019-09+ hostname uses RFC1123
     elsif ($schema->{format} eq 'hostname' or $schema->{format} eq 'idn-hostname') {
       require Data::Validate::Domain;
-    }
-
-    if ($schema->{format} eq 'idn-hostname') {
-      require Net::IDN::Encode;
+      require Net::IDN::Encode if $schema->{format} eq 'idn-hostname';
     }
   }
   catch ($e) {
@@ -276,7 +273,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.594
+version 0.595
 
 =head1 DESCRIPTION
 

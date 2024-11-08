@@ -24,7 +24,8 @@ SV *run_query_( SV *cxn_ref, const char *cypher_query, SV *params_ref, int send,
   cxn_obj = C_PTR_OF(cxn_ref,cxn_obj_t);
   if (!cxn_obj->connected) {
     cxn_obj->errnum = ENOTCONN;
-    cxn_obj->strerror = "Not connected";
+    Safefree(cxn_obj->strerror);
+    cxn_obj->strerror = savepvs("Not connected");
     return &PL_sv_undef;
   }
   cxn = cxn_obj->connection;
@@ -76,14 +77,14 @@ const char *errmsg_(SV *cxn_ref) {
 void reset_ (SV *cxn_ref)
 {
   int rc;
-  char *climsg;
+  char climsg[BUFLEN];
   cxn_obj_t *cxn_obj;
   cxn_obj = C_PTR_OF(cxn_ref,cxn_obj_t);
   rc = neo4j_reset( cxn_obj->connection );
   if (rc < 0) {
     cxn_obj->errnum = errno;
-    Newx(climsg, BUFLEN, char);
-    cxn_obj->strerror = neo4j_strerror(errno, climsg, BUFLEN-1);
+    Safefree(cxn_obj->strerror);
+    cxn_obj->strerror = savepv( neo4j_strerror(errno, climsg, sizeof(climsg)) );
   }
   return;
 }
@@ -92,15 +93,12 @@ const char *server_id_(SV *cxn_ref) {
   return neo4j_server_id( C_PTR_OF(cxn_ref,cxn_obj_t)->connection );
 }
 
-const char *protocol_version_(SV *cxn_ref) {
+char *protocol_version_(SV *cxn_ref) {
     if (C_PTR_OF(cxn_ref,cxn_obj_t)->connected)
     {
 	uint32_t V = C_PTR_OF(cxn_ref,cxn_obj_t)->major_version;
 	uint32_t v = C_PTR_OF(cxn_ref,cxn_obj_t)->minor_version;
-	char *vstr;
-	Newx(vstr, 32, char);
-	snprintf(vstr, 32, "%d.%d",(int)V,(int)v);
-	return vstr;
+	return Perl_form(aTHX_ "%d.%d", (int)V, (int)v);
     }
     else {
 	return "";
@@ -109,7 +107,10 @@ const char *protocol_version_(SV *cxn_ref) {
 
 void DESTROY (SV *cxn_ref)
 {
-  neo4j_close( C_PTR_OF(cxn_ref,cxn_obj_t)->connection );
+  cxn_obj_t *cxn_obj = C_PTR_OF(cxn_ref,cxn_obj_t);
+  neo4j_close(cxn_obj->connection);
+  Safefree(cxn_obj->strerror);
+  Safefree(cxn_obj);
   return;
 }
 

@@ -4,7 +4,7 @@
       "Denis Ibaev <dionys@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -23,15 +23,12 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "AnyEvent" : "0",
-            "HTTP::Request::Common" : "0",
-            "Test::Deep" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -41,6 +38,14 @@
             "HTTP::Message" : "0",
             "Moo" : "0",
             "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "HTTP::Request::Common" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0"
          }
       }
    },
@@ -56,5 +61,6 @@
          "url" : "http://github.com/AdCampRu/anyevent-useragent"
       }
    },
-   "version" : "0.07"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

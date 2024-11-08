@@ -26,7 +26,7 @@ my $url = URI::bolt->new("bolt://".$neo_info->{host});
 if ($neo_info->{user}) {
   $url->userinfo($neo_info->{user}.':'.$neo_info->{pass});
 }
-diag $url->as_string;
+diag $url->as_string if $ENV{AUTHOR_TESTING};
 
 # ok(Neo4j::Bolt->set_log_level("TRACE"), "log level TRACE");
 ok my $cxn = Neo4j::Bolt->connect($url->as_string);

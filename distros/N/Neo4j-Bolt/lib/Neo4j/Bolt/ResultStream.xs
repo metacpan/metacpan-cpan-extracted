@@ -47,7 +47,7 @@ void fetch_next_ (SV *rs_ref) {
   for (i=0; i<n; i++) {
     value = neo4j_result_field(result, i);
     perl_value = neo4j_value_to_SV(value);
-    Inline_Stack_Push( perl_value );
+    Inline_Stack_Push( sv_2mortal(perl_value) );
   }
   Inline_Stack_Done;
   return;
@@ -146,17 +146,17 @@ void update_counts_ (SV *rs_ref) {
   }
   uc = C_PTR_OF(rs_ref,rs_obj_t)->stats->update_counts;
 
-  Inline_Stack_Push( newSViv( (const UV) uc->nodes_created ));
-  Inline_Stack_Push( newSViv( (const UV) uc->nodes_deleted ));
-  Inline_Stack_Push( newSViv( (const UV) uc->relationships_created ));
-  Inline_Stack_Push( newSViv( (const UV) uc->relationships_deleted ));
-  Inline_Stack_Push( newSViv( (const UV) uc->properties_set ));
-  Inline_Stack_Push( newSViv( (const UV) uc->labels_added ));
-  Inline_Stack_Push( newSViv( (const UV) uc->labels_removed ));
-  Inline_Stack_Push( newSViv( (const UV) uc->indexes_added ));
-  Inline_Stack_Push( newSViv( (const UV) uc->indexes_removed ));
-  Inline_Stack_Push( newSViv( (const UV) uc->constraints_added ));
-  Inline_Stack_Push( newSViv( (const UV) uc->constraints_removed ));
+  mXPUSHu( (const UV) uc->nodes_created );
+  mXPUSHu( (const UV) uc->nodes_deleted );
+  mXPUSHu( (const UV) uc->relationships_created );
+  mXPUSHu( (const UV) uc->relationships_deleted );
+  mXPUSHu( (const UV) uc->properties_set );
+  mXPUSHu( (const UV) uc->labels_added );
+  mXPUSHu( (const UV) uc->labels_removed );
+  mXPUSHu( (const UV) uc->indexes_added );
+  mXPUSHu( (const UV) uc->indexes_removed );
+  mXPUSHu( (const UV) uc->constraints_added );
+  mXPUSHu( (const UV) uc->constraints_removed );
   Inline_Stack_Done;
   return;
 }
@@ -165,6 +165,9 @@ void DESTROY (SV *rs_ref) {
   rs_obj_t *rs_obj;
   rs_obj = C_PTR_OF(rs_ref,rs_obj_t);
   neo4j_close_results(rs_obj->res_stream);
+  Safefree(rs_obj->eval_errcode);
+  Safefree(rs_obj->eval_errmsg);
+  Safefree(rs_obj->strerror);
   Safefree(rs_obj->stats->update_counts);
   Safefree(rs_obj->stats);
   Safefree(rs_obj);
