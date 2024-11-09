@@ -1,10 +1,16 @@
-$Id: Changes 1991 2024-09-18 13:21:14Z willem $                       -*-text-*-
+$Id: Changes 1995 2024-11-08 13:20:54Z willem $                       -*-text-*-
+
+
+**** 1.48 Nov 8, 2024
+
+	SVCB: Add tls-suppored-groups parameter.
+	Fix failures in 01-resolver.t dry tests.
 
 
 **** 1.47 Sep 18, 2024
 
 	Restore current domain name following $INCLUDE in zone file.
-	Update RFC and other document referneces.
+	Update RFC and other document references.
 
 Fix rt.cpan.org #155337
 	Issue with parallel run of TSIG tests

@@ -1,7 +1,7 @@
--- 
+--
 -- Created by SQL::Translator::Producer::SQLite
--- Created on Sat Mar 28 14:16:41 2020
--- 
+-- Created on Fri Nov  8 09:31:51 2024
+--
 
 BEGIN TRANSACTION;
 
@@ -85,7 +85,7 @@ CREATE INDEX "Bar_idx_foo_id" ON "Bar" ("foo_id");
 CREATE TABLE "Foo" (
   "id" INTEGER PRIMARY KEY NOT NULL,
   "bar_id" integer NOT NULL,
-  FOREIGN KEY ("bar_id") REFERENCES "Bar"("id") ON DELETE CASCADE
+  FOREIGN KEY ("bar_id") REFERENCES "Bar"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE INDEX "Foo_idx_bar_id" ON "Foo" ("bar_id");

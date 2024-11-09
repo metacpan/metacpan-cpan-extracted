@@ -214,4 +214,12 @@ cluster_test 'MULTI interspersed with regular Redis calls' => async sub ($redis)
     is(await $redis->get($k . 'count'), $target, 'count matches afterwards');
 };
 
+cluster_test 'Read from replica nodes' => async sub ($redis) {
+    await $redis->get('xyz');
+    await $redis->set('xyz', 1);
+    await $redis->get('xyz');
+    return;
+}, (
+    use_read_replica => 1,
+);
 done_testing;

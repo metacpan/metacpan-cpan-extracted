@@ -8,7 +8,7 @@ use Lemonldap::NG::Handler::Main;
 use Lemonldap::NG::Common::Util qw(getSameSite);
 use URI;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.21.0';
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -94,13 +94,14 @@ sub tests {
             foreach my $vh ( keys %{ $conf->{locationRules} } ) {
                 push @pb, $vh if ( $vh =~ /:/ );
             }
-            if (@pb) {
-                return ( 0,
-                        'Virtual hosts '
-                      . join( ', ', @pb )
-                      . " contain a port, this is not allowed" );
-            }
-            else { return 1; }
+            return @pb
+              ? (
+                0,
+                'Virtual hosts '
+                  . join( ', ', @pb )
+                  . ' contain a port, this is not allowed'
+              )
+              : 1;
         },
 
         # Force vhost to be lowercase
@@ -109,13 +110,27 @@ sub tests {
             foreach my $vh ( keys %{ $conf->{locationRules} } ) {
                 push @pb, $vh if ( $vh ne lc $vh );
             }
-            if (@pb) {
-                return ( 0,
-                        'Virtual hosts '
-                      . join( ', ', @pb )
-                      . " must be in lower case" );
+            return @pb
+              ? (
+                0,
+                'Virtual hosts ' . join( ', ', @pb ) . ' must be in lower case'
+              )
+              : 1;
+        },
+
+        vhostNotAnAlias => sub {
+            my ( @pb, $aliases );
+
+            $aliases = join ' ',
+              map { $conf->{vhostOptions}->{$_}->{vhostAliases} }
+              keys %{ $conf->{vhostOptions} };
+
+            foreach my $vh ( keys %{ $conf->{locationRules} } ) {
+                push @pb, $vh if $aliases =~ /\Q$vh\E/;
             }
-            else { return 1; }
+            return @pb
+              ? ( 0, 'Virtual hosts ' . join( ', ', @pb ) . ' match an alias' )
+              : 1;
         },
 
         # Check if "userDB" and "authentication" are consistent

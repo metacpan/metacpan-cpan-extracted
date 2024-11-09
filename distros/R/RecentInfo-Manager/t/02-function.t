@@ -3,7 +3,7 @@ use 5.020;
 use Test2::V0 -no_srand;
 use Time::HiRes 'sleep';
 use RecentInfo::Manager 'add_recent_file', 'remove_recent_file', 'recent_files';
-use experimental 'try', 'signatures';
+use experimental 'signatures';
 use stable 'postderef';
 
 use File::Temp 'tempfile';
@@ -57,7 +57,7 @@ if( $os eq 'Unix' ) {
     my @other = recent_files(undef, { app => 'foo', recent_path => $name });
     is \@other, [], "Recent files for another program are empty with appname initialized";
     sleep 0.1;
-    
+
     @other = recent_files({ app => 'bar' }, { recent_path => $name });
     is \@other, [], "Recent files for another program are empty with appname as parameter";
     sleep 0.1;

@@ -234,7 +234,7 @@ SKIP:
     is_deeply( \@tables, $expected, 'tables' );
 };
 my $vers = $cldr->cldr_version;
-is( $vers, '45.0', 'CLDR version' );
+is( $vers, '46.0', 'CLDR version' );
 
 my $tests =
 {
@@ -335,7 +335,7 @@ my $tests =
             {
                 locale      => 'en',
                 annotation  => '{',
-                defaults    => ["brace", "bracket", "curly brace", "curly bracket", "gullwing", "open curly bracket"],
+                defaults    => ["brace", "bracket", "curly", "gullwing", "open"],
                 tts         => 'open curly bracket',
             },
         },
@@ -1455,7 +1455,10 @@ my $tests =
                 language    => 'ryu',
                 scripts     => ["Kana"],
                 territories => ["JP"],
-                parent      => undef,
+                # This is highly doubtful, and is now part of an issue submitted to Unicode
+                # It should just be undef, as it was in version 45.0
+                # <https://unicode-org.atlassian.net/browse/CLDR-18095>
+                parent      => 'tut',
                 alt         => undef,
                 status      => 'regular',
             },
@@ -1969,9 +1972,9 @@ my $tests =
             {
                 territory           => 'FR',
                 parent              => 155,
-                gdp                 => 2856000000000,
+                gdp                 => 3764000000000,
                 literacy_percent    => 99,
-                population          => 67848200,
+                population          => 68374600,
                 languages           => ["fr","en","es","de","oc","it","pt","pcd","gsw","br","co","hnj","ca","nl","eu","frp","ia"],
                 contains            => undef,
                 currency            => 'EUR',

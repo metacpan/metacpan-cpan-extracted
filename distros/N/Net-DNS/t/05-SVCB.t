@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-SVCB.t 1990 2024-09-18 13:16:07Z willem $	-*-perl-*-
+# $Id: 05-SVCB.t 1993 2024-11-07 14:06:53Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -78,9 +78,11 @@ for my $corruption ( pack 'H*', '00004000010000000000070001000bad0001' ) {
 Net::DNS::RR->new( <<'END' )->print;
 example.com.	SVCB	16 foo.example.org.	( mandatory=alpn alpn=h2,h3-19
 			no-default-alpn port=1234 ipv4hint=192.0.2.1
-			ech=Li4u ipv6hint=2001:db8::1
+			ech=AEP+DQA/BAAgACCW2/dfOBZAtQU55/py/BlhdRdaauPAkrERAUwppoeSEgAEAAEAAQAQY2QxLnRlc3QuZGVmby5pZQAA
+			ipv6hint=2001:db8::1
 			dohpath=/dns-query{?dns}
 			ohttp
+			tls-supported-groups=29,23
 			)
 END
 

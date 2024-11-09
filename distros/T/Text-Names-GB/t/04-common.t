@@ -1,3 +1,6 @@
+use warnings;
+use strict;
+
 use Test::More;
 use Text::Names::GB qw/isCommonSurname isCommonFirstname guessGender firstnamePrevalence surnamePrevalence isLikelyMisparsed/;
 
@@ -13,7 +16,7 @@ ok(isCommonFirstname('Mary',0.5),'Firstname threshold test, positive');
 ok(isCommonFirstname('John',1),'Firstname threshold test, positive');
 ok(!isCommonFirstname('Mark',3),'Firstname threshold test, negative');
 ok(guessGender('David') eq 'M');
-ok(guessGender('lkjasdf') == undef);
+ok(!defined(guessGender('lkjasdf')));
 ok(guessGender('Mary') eq 'F');
 ok(guessGender('Arthur') eq 'M');
 ok(guessGender('William') eq 'M');
@@ -35,4 +38,4 @@ ok(isLikelyMisparsed('Bourget, David Dr'), 'Misparsed is likely misparsed');
 ok(isLikelyMisparsed('Gilbert Daniel R.'));
 ok(!isLikelyMisparsed('Smith, Daniel R.'));
 
-done_testing;
+done_testing();

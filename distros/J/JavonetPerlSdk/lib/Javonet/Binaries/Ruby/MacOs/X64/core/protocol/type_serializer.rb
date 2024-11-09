@@ -3,6 +3,29 @@ require_relative '../../utils/string_encoding_mode'
 
 class TypeSerializer
 
+  def self.serialize_primitive(payload_item)
+    if payload_item.nil?
+      return TypeSerializer.serialize_nil
+    elsif [true, false].include? payload_item
+      return TypeSerializer.serialize_bool(payload_item)
+    elsif payload_item.is_a? Integer
+      if (-2 ** 31..2 ** 31).include?(payload_item)
+        return TypeSerializer.serialize_int(payload_item)
+      elsif (-2 ** 63..2 ** 63).include?(payload_item)
+        return TypeSerializer.serialize_longlong(payload_item)
+      else
+        return TypeSerializer.serialize_ullong(payload_item)
+      end
+    elsif payload_item.is_a? String
+      return TypeSerializer.serialize_string(payload_item)
+    elsif payload_item.is_a? Float
+      return TypeSerializer.serialize_double(payload_item)
+    elsif payload_item.is_a?
+    else
+      raise Exception.new("Payload not supported in command serializer")
+    end
+  end
+
   def self.serialize_command(command)
     length = [command.payload.length].pack("i").bytes
     return [Type::COMMAND] + length + [command.runtime_name, command.command_type]

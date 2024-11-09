@@ -58,12 +58,9 @@ class TransmitterWrapper:
     def activate(license_key):
         activate = TransmitterWrapper.python_lib.Activate
         activate.restype = c_int
-        activate.argtypes = [c_char_p, c_char_p, c_char_p, c_char_p]
+        activate.argtypes = [c_char_p]
 
-        activation_result = activate(license_key.encode('ascii'),
-                                     "".encode('ascii'),
-                                     "".encode('ascii'),
-                                     "".encode('ascii'))
+        activation_result = activate(license_key.encode('ascii'))
 
         if activation_result < 0:
             get_native_error = TransmitterWrapper.python_lib.GetNativeError
@@ -82,7 +79,7 @@ class TransmitterWrapper:
         set_config_source.restype = c_int
         set_config_source.argtypes = [c_char_p]
 
-        set_config_result = set_config_source(sourcePath.encode('ascii'))
+        set_config_result = set_config_source(sourcePath.encode('utf-8'))
 
         if set_config_result < 0:
             get_native_error = TransmitterWrapper.python_lib.GetNativeError

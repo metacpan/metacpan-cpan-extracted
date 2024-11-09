@@ -1,7 +1,7 @@
--- 
+--
 -- Created by SQL::Translator::Producer::Oracle
--- Created on Sat Mar 28 14:16:41 2020
--- 
+-- Created on Fri Nov  8 09:31:51 2024
+--
 --
 -- Table: Bloaty
 --;
@@ -151,15 +151,15 @@ ALTER TABLE "Gnarly_Station" ADD CONSTRAINT "Gnarly_Station_gnarly_id_fk" FOREIG
 
 ALTER TABLE "Gnarly_Station" ADD CONSTRAINT "Gnarly_Station_station_id_fk" FOREIGN KEY ("station_id") REFERENCES "Station" ("id") ON DELETE CASCADE;
 
-CREATE INDEX "Bar_idx_foo_id" on "Bar" ("foo_id");
+CREATE INDEX "Bar_idx_foo_id" ON "Bar" ("foo_id");
 
-CREATE INDEX "Foo_idx_bar_id" on "Foo" ("bar_id");
+CREATE INDEX "Foo_idx_bar_id" ON "Foo" ("bar_id");
 
-CREATE INDEX "Foo_Bar_idx_bar_id" on "Foo_Bar" ("bar_id");
+CREATE INDEX "Foo_Bar_idx_bar_id" ON "Foo_Bar" ("bar_id");
 
-CREATE INDEX "Foo_Bar_idx_foo_id" on "Foo_Bar" ("foo_id");
+CREATE INDEX "Foo_Bar_idx_foo_id" ON "Foo_Bar" ("foo_id");
 
-CREATE INDEX "Gnarly_Station_idx_gnarly_id" on "Gnarly_Station" ("gnarly_id");
+CREATE INDEX "Gnarly_Station_idx_gnarly_id" ON "Gnarly_Station" ("gnarly_id");
 
-CREATE INDEX "Gnarly_Station_idx_station_id" on "Gnarly_Station" ("station_id");
+CREATE INDEX "Gnarly_Station_idx_station_id" ON "Gnarly_Station" ("station_id");
 

@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 1990 2024-09-18 13:16:07Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 1993 2024-11-07 14:06:53Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -19,18 +19,20 @@ use Net::DNS::DomainName;
 use Net::DNS::RR::A;
 use Net::DNS::RR::AAAA;
 use Net::DNS::Text;
+use MIME::Base64;
 
 
 my %keybyname = (
-	mandatory	  => 'key0',
-	alpn		  => 'key1',
-	'no-default-alpn' => 'key2',
-	port		  => 'key3',
-	ipv4hint	  => 'key4',
-	ech		  => 'key5',
-	ipv6hint	  => 'key6',
-	dohpath		  => 'key7',				# draft-schwartz-svcb-dns
-	ohttp		  => 'key8',				# draft-pauly-ohai-svcb-config
+	mandatory	       => 'key0',			# RFC9460(8)
+	alpn		       => 'key1',			# RFC9460(7.1)
+	'no-default-alpn'      => 'key2',			# RFC9460(7.1)
+	port		       => 'key3',			# RFC9460(7.2)
+	ipv4hint	       => 'key4',			# RFC9460(7.3)
+	ech		       => 'key5',			# RFC9460
+	ipv6hint	       => 'key6',			# RFC9460(7.3)
+	dohpath		       => 'key7',			# RFC9461
+	ohttp		       => 'key8',			# RFC9540(4)
+	'tls-supported-groups' => 'key9',
 	);
 
 
@@ -74,20 +76,16 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my $priority = $self->{SvcPriority};
-	my $target   = $self->{TargetName}->string;
-	my $params   = $self->{SvcParams} || [];
-	return ( $priority, $target ) unless $priority;
+	my @rdata = unpack 'H4', pack 'n', $self->{SvcPriority};
 
 	my $encode = $self->{TargetName}->encode();
 	my $length = 2 + length $encode;
 	my @target = grep {length} split /(\S{32})/, unpack 'H*', $encode;
-	my @rdata  = unpack 'H4', pack 'n', $priority;
-	push @rdata, "\t; $priority\n";
-	push @rdata, shift @target;
-	push @rdata, join '', "\t; ", substr( $target, 0, 40 ), "\n";
+	my $target = substr $self->{TargetName}->string, 0, 40;
+	push @rdata, join '', shift(@target), "\t; $target\n";
 	push @rdata, @target;
 
+	my $params = $self->{SvcParams} || [];
 	my @params = @$params;
 	while (@params) {
 		my $key = shift @params;
@@ -121,10 +119,17 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 		for ($svcparam) {
 			my @value;
 			if (/^key\d+=(.*)$/i) {
-				push @value, length($1) ? $1 : shift @argument;
-			} elsif (/^[^=]+=(.*)$/) {
 				local $_ = length($1) ? $1 : shift @argument;
 				s/^"([^"]*)"$/$1/;		# strip enclosing quotes
+				push @value, $_;
+			} elsif (/^[^=]+=(.*)$/) {
+				local $_ = length($1) ? $1 : shift @argument;
+				die <<"Amen" if /\\092[,\\]/;
+SVCB:	Please use standard RFC1035 escapes
+	RFC9460 double-escape nonsense not implemented
+Amen
+				s/^"([^"]*)"$/$1/;		# strip enclosing quotes
+				s/\\,/\\044/g;			# disguise (RFC1035) escaped comma
 				push @value, split /,/;
 			} else {
 				push @value, '' unless $keybyname{lc $_};    # empty | Boolean
@@ -200,7 +205,7 @@ sub alpn {				## alpn=h3,h2,...
 
 sub no_default_alpn {			## no-default-alpn	(Boolean)
 	my ( $self, @value ) = @_;				# uncoverable pod
-	return $self->key2( ( defined(wantarray) ? () : '' ), @value );
+	return $self->key2( defined(wantarray) ? () : _boolean(@value) );
 }
 
 sub port {				## port=1234
@@ -213,9 +218,9 @@ sub ipv4hint {				## ipv4hint=192.0.2.1,...
 	return $self->key4( _ipv4(@value) );
 }
 
-sub ech {				## Format not specified
+sub ech {				## ech=base64
 	my ( $self, @value ) = @_;
-	return $self->key5(@value);				# RESERVED
+	return $self->key5( map { _base64($_) } @value );
 }
 
 sub ipv6hint {				## ipv6hint=2001:DB8::1,...
@@ -228,19 +233,39 @@ sub dohpath {				## dohpath=/dns-query{?dns}
 	return $self->key7(@value);
 }
 
-sub ohttp {				## ohttp	(Boolean)
+sub ohttp {				## ohttp
 	my ( $self, @value ) = @_;				# uncoverable pod
-	return $self->key8( ( defined(wantarray) ? () : '' ), @value );
+	return $self->key8( defined(wantarray) ? () : _boolean(@value) );
+}
+
+sub tls_supported_groups {		## tls_supported_groups=29,23
+	my ( $self, @value ) = @_;				# uncoverable pod
+	return $self->key9( _integer16(@value) );
 }
 
 
 ########################################
 
 
-sub _presentation {			## render octet string(s) in presentation format
+sub _presentation {			## represent octet string(s) using local charset
 	my @arg = @_;
-	my $raw = scalar(@arg) ? join( '', @arg ) : return ();
+	my $raw = scalar(@arg) ? join( '', @arg ) : return ();	# concatenate arguments
 	return Net::DNS::Text->decode( \$raw, 0, length($raw) )->string;
+}
+
+sub _boolean {
+	my @arg = @_;
+	return ( '', @arg );
+}
+
+sub _string {
+	my @arg = @_;
+	return _presentation( map { Net::DNS::Text->new($_)->encode() } @arg );
+}
+
+sub _base64 {
+	my @arg = @_;
+	return _presentation( map { MIME::Base64::decode($_) } @arg );
 }
 
 sub _integer16 {
@@ -256,17 +281,6 @@ sub _ipv4 {
 sub _ipv6 {
 	my @arg = @_;
 	return _presentation( map { Net::DNS::RR::AAAA::address( {}, $_ ) } @arg );
-}
-
-sub _string {
-	my @arg = @_;
-	local $_ = join ',', @arg;				# reassemble argument string
-	s/\\,/\\044/g;						# disguise (RFC1035) escaped comma
-	die <<"QQ" if /\\092,|\\092\\092/;
-SVCB:	Please use standard RFC1035 escapes
-	RFC9460 double-escape nonsense not implemented
-QQ
-	return _presentation( map { Net::DNS::Text->new($_)->encode() } split /,/ );
 }
 
 

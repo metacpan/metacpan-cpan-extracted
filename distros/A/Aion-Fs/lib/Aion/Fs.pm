@@ -3,11 +3,12 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "0.0.7";
+our $VERSION = "0.0.8";
 
 use Exporter qw/import/;
 use File::Spec     qw//;
 use Scalar::Util   qw//;
+use List::Util     qw//;
 use Time::HiRes    qw//;
 
 our @EXPORT = our @EXPORT_OK = grep {
@@ -15,31 +16,432 @@ our @EXPORT = our @EXPORT_OK = grep {
 } keys %Aion::Fs::;
 
 
-use constant UNIX => $^O =~ /^(?:aix|bsdos|darwin|dynixptx|freebsd|haiku|linux|hpux|irix|next|openbsd|dec_osf|svr4|sco_sv|unicos|unicosmk|unicos|solaris|sunos)\z/;
+# Список ОС с различающимся синтаксисом файловых путей (должен быть в нижнем регистре)
+use constant {
+	UNIX    => 'unix',
+	AMIGAOS => 'amigaos',
+	CYGWIN  => 'cygwin',
+	MSYS    => 'msys',
+	MSYS2   => 'msys2',
+	MSWIN32 => 'mswin32',
+	DOS     => 'dos',
+	OS2     => 'os2',
+	SYMBIAN => 'symbian',
+	VMS     => 'vms',
+	VOS     => 'vos',
+	RISCOS  => 'riscos',
+	MACOS   => 'macos',
+	VMESA   => 'vmesa',
+};
 
-# Из пакета в файловый путь
-sub from_pkg(;$) {
-	my ($pkg) = @_ == 0? $_: @_;
-	$pkg =~ s!::!/!g;
-	"$pkg.pm"
+sub _fs();
+sub _match($$) {
+	my ($match, $fs) = @_;
+	my @res; my @remove;
+	my $trans = $fs->{before_split} // sub {$_[0]};
+	for my $key (@$match) {
+		next unless exists $_->{$key};
+		
+		push @remove, $key unless defined $_->{$key};
+		
+		my $regexp = ($key eq "path"? $fs->{regexp}: $fs->{group}{$key});
+		my $val = $trans->($_->{$key});
+		push @res, $val =~ $regexp
+			? %+
+			: die "`$key` is in the wrong format `$val`. Has been used regexp: $regexp";
+	}
+
+	my %res = @res;
+	delete @res{keys %{$fs->{remove}->{$_}}} for @remove;
+	
+	return %res, %$_;
 }
 
-# Из файлового пути в пакет
-sub to_pkg(;$) {
+sub _join(@) {
+	my ($match, @format) = @_;
+	my $fs = _fs;
+	my $trans = $fs->{before_split} // sub {$_[0]};
+	my %f = _match $match, $fs;
+	join "", List::Util::pairmap {
+		my @keys = ref $a? @$a: $a;
+		my $is = List::Util::first {defined $f{$_}} @keys;
+		defined $is? do {
+			my ($if, $format) = ref $b? @$b: (undef, $b);
+			
+			my @val = map $trans->($f{$_}), @keys;
+			defined $if && $val[0] eq $if? $if:
+				$format !~ /%s/? $format:
+					sprintf($format, @val)
+		}: () 
+	} @format
+}
+
+# Синтаксисы файловых путей в разных ОС
+my %FS;
+my @FS = (
+	{
+		name   => UNIX,
+		symdir => '/',
+		symext => '.',
+		regexp => qr!^
+			(
+				(?<dir> / ) | (?<dir> .* ) /
+			)?
+			(?<file>
+				(?<name> \.? [^/.]* )
+				( \. (?<ext> [^/]* ) )?
+			)
+		\z!xsn,
+		join => sub {
+			_join [qw/path file/],
+				dir    => ["/", "%s/"],
+				name   => "%s",
+				ext    => ".%s",
+		},
+	},
+	{
+		name   => AMIGAOS,
+		symdir => '/',
+		symext => '.',
+		regexp => qr!^
+			(?<dir>
+				( (?<volume> [^/:]+) : )?
+				(?<folder> .* ) /
+			)?
+			(?<file>
+				(?<name> \.? [^/.]* )
+				( \. (?<ext> [^/]* ) )?
+			)
+		\z!xsn,
+		join => sub {
+			_join [qw/path dir file/],
+				volume => "%s:",
+				folder => "%s/",
+				name   => "%s",
+				ext    => ".%s",
+		},
+	},
+	{
+		name   => CYGWIN,
+		symdir => '/',
+		symext => '.',
+		regexp => qr!^
+			(?<dir>
+				( /cygdrive/ (?<volume> [^/]+ ) /? )?
+				( (?<folder> .* ) / )?
+			)
+			(?<file>
+				(?<name> \.? [^/.]* )
+				( \. (?<ext> [^/]* ) )?
+			)
+		\z!xsn,
+		join => sub {
+			_join [qw/path dir file/],
+				volume => "/cygdrive/%s/",
+				folder => "%s/",
+				name   => "%s",
+				ext    => ".%s",
+		},
+	},
+	{
+		name   => [MSYS, MSYS2],
+		symdir => '/',
+		symext => '.',
+		regexp => qr!^
+			(?<dir>
+				( / (?<volume> [^/]+ )? /? )
+				( (?<folder> .* ) / )?
+			)?
+			(?<file>
+				(?<name> \.? [^/.]* )
+				( \. (?<ext> [^/]* ) )?
+			)
+		\z!xsn,
+		join => sub {
+			_join [qw/path dir file/],
+				volume => "/%s/",
+				folder => "%s/",
+				name   => "%s",
+				ext    => ".%s",
+		},
+	},
+	{
+		name   => [DOS, OS2, MSWIN32, SYMBIAN],
+		symdir => '\\',
+		symext => '.',
+		before_split => sub { $_[0] =~ s!/!\\!gr },
+		regexp => qr!^
+			(?<dir>
+				( (?<volume> [^\\:]+) : | \\\\ (?<server> [^\\]+ )? )?
+				( (?<folder> \\ ) | (?<folder> .* ) \\ )?
+			)
+			(?<file>
+				(?<name> \.? [^\\.]* )
+				( \. (?<ext> [^\\]* ) )?
+			)
+		\z!xsn,
+		join => sub {
+			_join [qw/path dir file/],
+				volume => "%s:",
+				server => "\\\\%s",
+				folder => ["\\", "%s\\"],
+				name   => "%s",
+				ext    => ".%s",
+		},
+	},
+	{
+		name   => VMS,
+		symdir => '.',
+		symext => '.',
+		regexp => qr!^
+			(?<dir>
+				( 
+					(?<node> [^:\[\]]* )
+					( \[" (?<accountname> [^\s:\[\]]+ ) \s+ (?<password> [^\s:\[\]]+ ) "\] )?
+				:: )?
+				(?<volume>
+						(?<disk> [^\$:\[\]]* )
+						( \$ (?<user> [^\$:\[\]]* ) )?
+					: )?
+				( \[ (?<folder> [^\[\]]* ) \] )?
+			)
+			(?<card>
+			    (?<file>
+					(?<name> \.? [^.;\[\]]*? )
+					( \. (?<ext> [^;\[\]]* ) )?
+				)
+				( ; (?<version> [^;\[\]]* ) )?
+			)
+		\z!xsn,
+		join => sub {
+			_join [qw/path dir volume file/],
+				node            => "%s",
+				[qw/accountname password/] => '["%s %s"]',
+				[qw/node accountname password/] => "::",
+				disk            => "%s",
+				user            => "\$%s",
+				[qw/disk user/] => ':',
+				folder          => "[%s]",
+				name            => "%s",
+				ext             => ".%s",
+				version         => ";%s",
+		},
+	},
+	{
+		name   => VOS,
+		symdir => '>',
+		symext => '.',
+		regexp => qr!^
+			(?<dir>
+				(?<volume>
+					% (?<sysname> [^>\#]* ) \# (?<module> [^>\#]* ) >
+				)?
+				( (?<folder> .* ) > )?
+			)
+			(?<file>
+				(?<name> \.? [^.]*? )
+				( \. (?<ext> .* ) )?
+			)
+		\z!xsn,
+		join => sub {
+			_join [qw/path dir volume file/],
+				[qw/sysname module/] => "%%%s#%s>",
+				folder => "%s>",
+				name   => "%s",
+				ext    => ".%s",
+		},
+	},
+	{
+		name   => RISCOS,
+		symdir => '.',
+		symext => '/',
+		regexp => qr!^
+			(?<dir>
+				(?<volume>
+					(
+						(?<fstype> [^\$\#:.]* )
+						( \# (?<option> [^\$\#:.]* ) )?
+					: )?
+					( : (?<disk> [^\$\#:.]* ) \. )?
+				)
+				( (?<folder> .* ) \. )?
+			)
+			(?<file>
+				(?<name> [^./]*? )
+				( / (?<ext> [^.]* ) )?
+			)
+		\z!xsn,
+		join => sub {
+			_join [qw/path dir volume file/],
+				fstype => "%s",
+				option => "#%s",
+				[qw/fstype option/] => ":",
+				disk   => ":%s.",
+				folder => "%s.",
+				name   => "%s",
+				ext    => "/%s",
+		},
+	},
+	{
+		name   => MACOS,
+		symdir => ':',
+		symext => '.',
+		regexp => qr!^
+			(?<dir>
+				( (?<volume> [^:]* ) : )?
+				( (?<folder>    .* ) : )?
+			)
+			(?<file>
+				(?<name> [^.:]*? )
+				( \. (?<ext> [^:]* ) )?
+			)
+		\z!xsn,
+		join => sub {
+			_join [qw/path dir file/],
+				volume => "%s:",
+				folder => "%s:",
+				name   => "%s",
+				ext    => ".%s",
+		},
+	},
+	{
+		name   => VMESA,
+		symdir => '/',
+		symext => '.',
+		regexp => qr!^
+			\s* (?<userid> \S+ )
+			\s+ (?<file>
+				    (?<name> \S+ )
+				\s+ (?<ext>  \S+ )
+			)
+			\s+ (?<volume> \S+ )
+			\s*
+		\z!xsn,
+		join => sub {
+			_join [qw/path/],
+				[qw/userid file ext volume/] => "%s %s %s %s",
+		},
+	},
+	
+);
+
+# Инициализация по имени
+%FS = map {
+	$_->{symdirquote} = quotemeta $_->{symdir};
+	$_->{symextquote} = quotemeta $_->{symext};
+	
+	my @S;
+	while($_->{regexp} =~ m{
+		\\ .
+		| (?<open> \( ( \?<(?<group> \w+ )> )? )
+		| (?<close> \) )
+	}gx) {
+		if($+{open}) {
+			my $group = $+{group};
+
+			if ($group && @S) {
+				my $curgroup;
+				for(my $i = $#S; $i>=0; --$i) { $curgroup = $S[$i][1], last if defined $S[$i][1] }
+				
+				$_->{remove}{$curgroup}{$group}++ if defined $curgroup;
+			}
+		
+			push @S, [length($`) + length $&, $group];
+		}
+		elsif($+{close}) {
+			my ($pos, $group, $g2) = @{pop @S};
+			
+			$S[$#S][2] //= $group if $_->{group}{$group} && @S;
+			
+			$group //= $g2;
+			$_->{group}{$group} = do {
+				my $x = substr $_->{regexp}, $pos, length($`) - $pos;
+				qr/()^$x\z/xsn
+			} if defined $group;
+		}
+	}
+	
+	my $x = $_;
+	ref $_->{name}? (map { ($_ => $x) } @{$_->{name}}): ($_->{name} => $_)
+} @FS;
+
+sub _fs() { $FS{lc $^O} // $FS{unix} }
+
+# Мы находимся в ОС семейства UNIX
+sub isUNIX() { _fs->{name} eq "unix" }
+
+# Разбивает директорию на составляющие
+sub splitdir(;$) {
+	my ($dir) = @_ == 0? $_: @_;
+	($dir) = @$dir if ref $dir;
+	my $fs = _fs;
+	$dir = $fs->{before_split}->($dir) if exists $fs->{before_split};
+	split $fs->{symdirquote}, $dir, -1
+}
+
+# Объединяет директорию из составляющих
+sub joindir(@) {
+	join _fs->{symdir}, @_
+}
+
+# Разбивает расширение (тип файла) на составляющие
+sub splitext(;$) {
+	my ($ext) = @_ == 0? $_: @_;
+	($ext) = @$ext if ref $ext;
+	split _fs->{symextquote}, $ext, -1
+}
+
+# Объединяет расширение (тип файла) из составляющих
+sub joinext(@) {
+	join _fs->{symext}, @_
+}
+
+
+# Выделяет в пути составляющие, а если получает хеш, то объединяет его в путь
+sub path(;$) {
 	my ($path) = @_ == 0? $_: @_;
-	$path =~ s!\.\w+$!!;
-	$path =~ s!/!::!g;
-	$path
+	
+	my $fs = _fs;
+	
+	if(ref $path eq "HASH") {
+		local $_ = $path;
+		return $fs->{join}->();
+	}
+	
+	($path) = @$path if ref $path;
+	
+	$path = $fs->{before_split}->($path) if exists $fs->{before_split};
+	
+	+{
+		$path =~ $fs->{regexp}? (map { $_ ne "ext" && $+{$_} eq ""? (): ($_ => $+{$_}) } keys %+): (error => 1),
+		path => $path,
+	}
 }
 
-# Подключает модуль, если он ещё не подключён, и возвращает его
-sub include(;$) {
-	my ($pkg) = @_ == 0? $_: @_;
-	return $pkg if $pkg->can("new") || $pkg->can("has");
-	my $path = from_pkg $pkg;
-	return $pkg if exists $INC{$path};
-	require $path;
-	$pkg
+# Переводит путь из формата одной ОС в другую
+sub transpath ($$;$) {
+	my ($path, $from, $to) = @_ == 2? ($_, @_): @_;
+	my (@dir, @folder, @ext);
+	{ local $^O = $from;
+		$path = path $path;
+
+		@dir = splitdir $path->{dir} if exists $path->{dir} && !exists $path->{folder};
+		@folder = splitdir $path->{folder} if exists $path->{folder};
+		@ext = splitext $path->{ext} if exists $path->{ext};
+	}
+
+	delete $path->{path};
+	delete $path->{dir} if exists $path->{folder};
+	delete $path->{file};
+	
+	{ local $^O = $to;
+		@dir = @folder, @folder = () if !_fs->{group}{folder};
+		
+		$path->{dir} = joindir @dir if scalar @dir;
+		$path->{folder} = joindir @folder if scalar @folder;
+		$path->{ext}    = joinext @ext if scalar @ext;
+		path $path;
+	}
 }
 
 # как mkdir -p
@@ -54,7 +456,7 @@ sub mkpath (;$) {
 	
 	local $!;
 	
-	if(UNIX) {
+	if(isUNIX) {
 		while($path =~ m!/!g) {
 			mkdir $`, $permission
 				or ($! != FILE_EXISTS? die "mkpath $`: $!": ())
@@ -62,16 +464,24 @@ sub mkpath (;$) {
 		}
 	}
 	else {
-		my ($volume, $dirs, $file) = File::Spec->splitpath($path);
+		my $part = path $path;
 		
-		my @dirs = File::Spec->splitdir($dirs);
+		return $path unless exists $part->{folder};
+		
+		my @dirs = splitdir $part->{folder};
 		
 		# Если волюм или первый dirs пуст - значит путь относительный
-		my $cat = $dirs[0] eq ""? $volume: undef;
-		for(my $i = 0; $i < @dirs; $i++) {
-			$cat = defined($cat)? File::Spec->catdir($cat, $dirs[$i]): $dirs[$i];
+		my $cat = $part->{volume};
+		for(my $i=0; $i<@dirs; $i++) {
 			
-			mkdir $cat, $permission or ($! != FILE_EXISTS? die "mkpath $cat: $!": ()) if $dirs[$i] ne '';
+			next if $dirs[$i] eq "";
+			
+			my $cat = path +{
+				$part->{volume}? (volume => $part->{volume}): (),
+				folder => joindir(@dirs[0..$i]),
+			};
+			
+			mkdir $cat, $permission or ($! != FILE_EXISTS? die "mkpath $cat: $!": ());
 		}
 	}
 	
@@ -141,67 +551,15 @@ sub sta(;$) {
 	
 	my %sta = (path => $path);
 	@sta{qw/dev ino mode nlink uid gid rdev size atime mtime ctime blksize blocks/} = Time::HiRes::stat $path or die "sta $path: $!";
+# 	@sta{qw/
+# 		 user_can_exec user_can_read   user_can_write
+# 		group_can_exec group_can_read group_can_write
+# 		other_can_exec other_can_read other_can_write
+# 	/} = (
+# 		
+# 	);
 	\%sta
 }
-
-# Выделяет в пути составляющие, а если получает хеш, то объединяет его в путь
-sub path(;$);
-sub path(;$) {
-	my ($path) = @_ == 0? $_: @_;
-	if(ref $path eq "HASH") {
-		my ($path, $volume, $dir, $file, $name, $ext) = @$path{qw/path volume dir file name ext/};
-		
-		if(defined $path) {
-			my $p = path $path;
-			$volume //= $p->{volume};
-			$dir    //= $p->{dir};
-			$file   //= $p->{file};
-			$name   //= $p->{name};
-			$ext    //= $p->{ext};
-		}
-
-		if(defined $file and (defined $name or defined $ext)) {
-			my ($n, $e) = $file =~ /\./? ($`, $'): $file;
-			$name //= $n;
-			$ext //= $e;
-		}
-		
-		$file = defined($ext)? "$name.$ext": $name;
-		
-		if(UNIX) {
-			return defined($dir)? join("", $dir, $dir =~ /\/\z/? (): "/", $file): $file;
-		}
-		
-		return File::Spec->catpath($volume, $dir, $file);
-	}
-	
-	($path) = @$path if ref $path;
-	
-	my $und = sub { $_[0] eq ""? undef: $_[0] };
-	
-	+{
-		path => $path,
-		UNIX? do {
-			my ($dir, $file, $name, $ext);
-			
-			if($path =~ m!/([^/]*)\z!) { $dir = length($`)? $`: "/"; $file = $1 } else { $file = $path }
-			
-			if($file =~ /\./) { ($name, $ext) = ($`, $') } else { $name = $file }
-			
-			(volume => undef, dir => $und->($dir), file => $und->($file), name => $und->($name), ext => $und->($ext))
-		}: do {
-			my ($volume, $dir, $file) = File::Spec->splitpath($path);
-			my ($name, $ext) = $file =~ /\./? ($`, $'): $file;
-			
-			my @dirs = File::Spec->splitdir($dir);
-			pop @dirs;
-			$dir = File::Spec->catdir(@dirs);
-
-			(volume => $und->($volume), dir => $und->($dir), file => $und->($file), name => $und->($name), ext => $und->($ext))
-		},
-	}
-}
-
 
 # Файловые фильтры
 sub _filters(@) {
@@ -260,7 +618,6 @@ sub find(;@) {
 				opendir my $dir, $path or do { local $_ = $path; $errorenter->(); next FILE };
 				my @file;
 				while(my $f = readdir $dir) {
-					#use DDP; p my $x=["hi!", $path, $f, File::Spec->join($path, $f)];
 					push @file, File::Spec->join($path, $f) if $f !~ /^\.{1,2}\z/;
 				}
 				push @$file, sort @file;
@@ -350,6 +707,31 @@ sub goto_editor($$) {
 	return;
 }
 
+# Из пакета в файловый путь
+sub from_pkg(;$) {
+	my ($pkg) = @_ == 0? $_: @_;
+	$pkg =~ s!::!/!g;
+	"$pkg.pm"
+}
+
+# Из файлового пути в пакет
+sub to_pkg(;$) {
+	my ($path) = @_ == 0? $_: @_;
+	$path =~ s!\.\w+$!!;
+	$path =~ s!/!::!g;
+	$path
+}
+
+# Подключает модуль, если он ещё не подключён, и возвращает его
+sub include(;$) {
+	my ($pkg) = @_ == 0? $_: @_;
+	return $pkg if $pkg->can("new") || $pkg->can("has");
+	my $path = from_pkg $pkg;
+	return $pkg if exists $INC{$path};
+	require $path;
+	$pkg
+}
+
 1;
 
 __END__
@@ -362,7 +744,7 @@ Aion::Fs - utilities for the file system: reading, writing, searching, replacing
 
 =head1 VERSION
 
-0.0.7
+0.0.8
 
 =head1 SYNOPSIS
 
@@ -433,21 +815,11 @@ C<cat> throws an exception if the I/O operation fails:
 
 	eval { cat "A" }; $@  # ~> cat A: No such file or directory
 
-B<Cm. Also:>
+--timeout
+13
 
-=over
-
-=item * <File::Slurp> - C<read_file('file.txt')>.
-
-=item * <File::Slurper> - C<read_text('file.txt')>, C<read_binary('file.txt')>.
-
-=item * <IO::All> - C<< io('file.txt') E<gt> $contents >>.
-
-=item * <IO::Util> - C<$contents = ${ slurp 'file.txt' }>.
-
-=item * <File::Util> - C<< File::Util-E<gt>new-E<gt>load_file(file =E<gt> 'file.txt') >>.
-
-=back
+--timeout
+13
 
 =head2 lay ($file?, $content)
 
@@ -466,21 +838,11 @@ Writes C<$content> to C<$file>.
 	
 	eval { lay "/", "↯" }; $@ # ~> lay /: Is a directory
 
-B<Cm. Also:>
+--timeout
+13
 
-=over
-
-=item * <File::Slurp> - C<write_file('file.txt', $contents)>.
-
-=item * <File::Slurper> - C<write_text('file.txt', $contents)>, C<write_binary('file.txt', $contents)>.
-
-=item * <IO::All> - C<< io('file.txt') E<lt> $contents >>.
-
-=item * <IO::Util> - C<slurp \$contents, 'file.txt'>.
-
-=item * <File::Util> - C<< File::Util-E<gt>new-E<gt>write_file(file =E<gt> 'file.txt', content =E<gt> $contents, bitmask =E<gt> 0644) >>.
-
-=back
+--timeout
+13
 
 =head2 find (;$path, @filters)
 
@@ -522,71 +884,11 @@ B<Attention!> If C<errorenter> is not specified, then all errors are B<ignored>!
 	my $count = 0;
 	find "ex", sub { find_stop if ++$count == 3; 1}  # -> 2
 
-B<Cm. Also:>
+--timeout
+13
 
-=over
-
-=item * <AudioFile::Find> - searches for audio files in the specified directory. Allows you to filter them by attributes: title, artist, genre, album and track.
-
-=item * <Directory::Iterator> - C<< $it = Directory::Iterator-E<gt>new($dir, %opts); push @paths, $_ while E<lt>$itE<gt> >>.
-
-=item * <IO::All> - C<< @paths = map { "$_" } grep { -f $_ && $_-E<gt>size E<gt> 10*1024 } io(".")-E<gt>all(0) >>.
-
-=item * <IO::All::Rule> - C<< $next = IO::All::Rule-E<gt>new-E<gt>file-E<gt>size("E<gt>10k")-E<gt>iter($dir1, $dir2); push @paths, "$f" while $f = $next-E<gt>() >>.
-
-=item * <File::Find> - C<find( sub { push @paths, $File::Find::name if /\.png/ }, $dir )>.
-
-=item * <File::Find::utf8> - like <File::Find>, only file paths are in I<utf8>.
-
-=item * <File::Find::Age> - sorts files by modification time (inherits <File::Find::Rule>): C<< File::Find::Age-E<gt>in($dir1, $dir2) >>.
-
-=item * <File::Find::Declare> — C<< @paths = File::Find::Declare-E<gt>new({ size =E<gt> 'E<gt>10K', perms =E<gt> 'wr-wr-wr-', modified =E<gt> 'E<lt>2010-01-30', recurse =E<gt> 1, dirs =E<gt> [$dir1] })-E<gt>find >>.
-
-=item * <File::Find::Iterator> - has an OOP interface with an iterator and the C<imap> and C<igrep> functions.
-
-=item * <File::Find::Match> - calls a handler for each matching filter. Similar to C<switch>.
-
-=item * <File::Find::Node> - traverses the file hierarchy in parallel by several processes: C<< tie @paths, IPC::Shareable, { key =E<gt> "GLUE STRING", create =E<gt> 1 }; File::Find::Node-E<gt>new(".")-E<gt>process(sub { my $f = shift; $f-E<gt>fork(5); tied(@paths)-E<gt>lock; push @paths, $ f-E<gt>path; tied(@paths)-E<gt>unlock })-E<gt>find; tied(@paths)-E<gt>remove >>.
-
-=item * <File::Find::Fast> - C<@paths = @{ find($dir) }>.
-
-=item * <File::Find::Object> - has an OOP interface with an iterator.
-
-=item * <File::Find::Parallel> - can compare two directories and return their union, intersection and quantitative intersection.
-
-=item * <File::Find::Random> - selects a file or directory at random from the file hierarchy.
-
-=item * <File::Find::Rex> - C<< @paths = File::Find::Rex-E<gt>new(recursive =E<gt> 1, ignore_hidden =E<gt> 1)-E<gt>query($dir, qr/^b/i) >>.
-
-=item * <File::Find::Rule> — C<< @files = File::Find::Rule-E<gt>any( File::Find::Rule-E<gt>file-E<gt>name('*.mp3', '*.ogg ')-E<gt>size('E<gt>2M'), File::Find::Rule-E<gt>empty )-E<gt>in($dir1, $dir2); >>. Has an iterator, procedural interface, and L<File::Find::Rule::ImageSize> and L<File::Find::Rule::MMagic> extensions: C<< @images = find(file =E<gt> magic =E<gt> 'image/*', '!image_x' =E<gt> 'E<gt>20', in =E<gt> '.') >>.
-
-=item * <File::Find::Wanted> - C<@paths = find_wanted( sub { -f && /\.png/ }, $dir )>.
-
-=item * <File::Hotfolder> - C<< watch( $dir, callback =E<gt> sub { push @paths, shift } )-E<gt>loop >>. Powered by C<AnyEvent>. Customizable. There is parallelization into several processes.
-
-=item * <File::Mirror> - also forms a parallel path for copying files: C<recursive { my ($src, $dst) = @_; push @paths, $src } '/path/A', '/path/B'>.
-
-=item * <File::Set> - C<< $fs = File::Set-E<gt>new; $fs-E<gt>add($dir); @paths = map { $_-E<gt>[0] } $fs-E<gt>get_path_list >>.
-
-=item * <File::Wildcard> — C<< $fw = File::Wildcard-E<gt>new(exclude =E<gt> qr/.svn/, case_insensitive =E<gt> 1, sort =E<gt> 1, path =E<gt> "src///*.cpp ", match =E<gt> qr(^src/(.*?)\.cpp$), derive =E<gt> ['src/$1.o','src/$1.hpp']); push @paths, $f while $f = $fw-E<gt>next >>.
-
-=item * <File::Wildcard::Find> - C<findbegin($dir); push @paths, $f while $f = findnext()> or C<findbegin($dir); @paths = findall()>.
-
-=item * <File::Util> - C<< File::Util-E<gt>new-E<gt>list_dir($dir, qw/ --pattern=\.txt$ --files-only --recurse /) >>.
-
-=item * <Path::Find> - C<@paths = path_find( $dir, "*.png" )>. For complex queries, use I<matchable>: C<< my $sub = matchable( sub { my( $entry, $directory, $fullname, $depth ) = @_; $depth E<lt>= 3 } >>.
-
-=item * <Path::Extended::Dir> - C<< @paths = Path::Extended::Dir-E<gt>new($dir)-E<gt>find('*.txt') >>.
-
-=item * <Path::Iterator::Rule> - C<< $i = Path::Iterator::Rule-E<gt>new-E<gt>file; @paths = $i-E<gt>clone-E<gt>size("E<gt>10k")-E<gt>all(@dirs); $i-E<gt>size("E<lt>10k")... >>.
-
-=item * <Path::Class::Each> - C<< dir($dir)-E<gt>each(sub { push @paths, "$_" }) >>.
-
-=item * <Path::Class::Iterator> - C<< $i = Path::Class::Iterator-E<gt>new(root =E<gt> $dir, depth =E<gt> 2); until ($i-E<gt>done) { push @paths, $i-E<gt>next-E<gt>stringify } >>.
-
-=item * <Path::Class::Rule> - C<< @paths = Path::Class::Rule-E<gt>new-E<gt>file-E<gt>size("E<gt>10k")-E<gt>all($dir) >>.
-
-=back
+--timeout
+13
 
 =head2 noenter (@filters)
 
@@ -610,17 +912,11 @@ Removes files and empty directories. Returns C<@paths>. If there is an I/O error
 	eval { erase "/" }; $@  # ~> erase dir /: Device or resource busy
 	eval { erase "/dev/null" }; $@  # ~> erase file /dev/null: Permission denied
 
-B<Cm. Also:>
+--timeout
+13
 
-=over
-
-=item * <unlink> + <rmdir>.
-
-=item * <File::Path> - C<remove_tree("dir")>.
-
-=item * <File::Path::Tiny> - C<File::Path::Tiny::rm($path)>. Does not throw exceptions.
-
-=back
+--timeout
+13
 
 =head2 replace (&sub, @files)
 
@@ -647,19 +943,11 @@ In the example below, the file "replace.ex" is read by the C<:utf8> layer and wr
 	replace { $b = ":utf8"; y/a/¡/ } [$_, ":raw"];
 	cat  # => ¡bc
 
-B<Cm. Also:>
+--timeout
+13
 
-=over
-
-=item * <File::Edit>.
-
-=item * <File::Edit::Portable>.
-
-=item * <File::Replace>.
-
-=item * <File::Replace::Inplace>.
-
-=back
+--timeout
+13
 
 =head2 mkpath (;$path)
 
@@ -685,7 +973,8 @@ Like B<mkdir -p>, but considers the last part of the path (after the last slash)
 	mkpath "A///./file";
 	-d "A"  # -> 1
 
-B<Cm. Also:>
+--timeout
+13
 
 =over
 
@@ -706,17 +995,11 @@ Throws an exception if the file does not exist or does not have permission:
 	
 	mtime ["/"]   # ~> ^\d+(\.\d+)?$
 
-B<Cm. Also:>
+--timeout
+13
 
-=over
-
-=item * C<-M> — C<-M "file.txt">, C<-M _> in days from the current time.
-
-=item * <stat> - C<(stat "file.txt")[9]> in seconds (unixtime).
-
-=item * <Time::HiRes> - C<(Time::HiRes::stat "file.txt")[9]> in seconds with fractional part.
-
-=back
+--timeout
+13
 
 =head2 sta (;$path)
 
@@ -729,10 +1012,11 @@ Throws an exception if the file does not exist or does not have permission:
 	local $_ = "nofile";
 	eval { sta }; $@  # ~> sta nofile: No such file or directory
 	
-	sta(["/"])->{ino} # ~> ^\d+$ 
+	sta(["/"])->{ino} # ~> ^\d+$
 	sta(".")->{atime} # ~> ^\d+(\.\d+)?$
 
-B<Cm. Also:>
+--timeout
+13
 
 =over
 
@@ -768,48 +1052,316 @@ B<Cm. Also:>
 
 Splits a file path into its components or assembles it from its components.
 
-=over
+--timeout
+13
 
-=item * If it receives a reference to an array, it treats its first element as a path.
-
-=item * If it receives a link to a hash, it collects a path from it. Unfamiliar keys are simply ignored. Also ignores volume on UNIX.
-
-=item * The file system is not accessed.
-
-=back
-
-	path "."       # --> {path => ".", volume => undef, dir => undef, file => ".", name => undef, ext => undef}
-	path ["/"]     # --> {path => "/", volume => undef, dir => "/", file => undef, name => undef, ext => undef}
-	local $_ = "";
-	path           # --> {path => "", volume => undef, dir => undef, file => undef, name => undef, ext => undef}
-	path "a/b/c.ext.ly"   # --> {path => "a/b/c.ext.ly", volume => undef, dir => "a/b", file => "c.ext.ly", name => "c", ext => "ext.ly"}
+	{
+	    local $^O = "freebsd";
 	
-	path +{dir  => "/", ext => "ext.ly"}    # => /.ext.ly
-	path +{file => "b.c", ext => "ly"}      # => b.ly
-	path +{path => "a/b/f.c", dir => "m"}   # => m/f.c
+	    path "."        # --> {path => ".", file => ".", name => "."}
+	    path ".bashrc"  # --> {path => ".bashrc", file => ".bashrc", name => ".bashrc"}
+	    path ".bash.rc"  # --> {path => ".bash.rc", file => ".bash.rc", name => ".bash", ext => "rc"}
+	    path ["/"]      # --> {path => "/", dir => "/"}
+	    local $_ = "";
+	    path            # --> {path => ""}
+	    path "a/b/c.ext.ly"   # --> {path => "a/b/c.ext.ly", dir => "a/b", file => "c.ext.ly", name => "c", ext => "ext.ly"}
 	
-	local $_ = +{path => "a/b/f.c", dir => undef, ext => undef};
-	path             # => a/b/f.c
-	path +{path => "a/b/f.c", volume => "/x", dir => "m/y", file => "f.y", name => "j", ext => "ext"} # => m/y/j.ext
-	path +{path => "a/b/f.c", volume => "/x", dir =>  "/y", file => "f.y", name => "j", ext => "ext"} # => /y/j.ext
+	    path +{dir  => "/", ext => "ext.ly"}    # => /.ext.ly
+	    path +{file => "b.c", ext => "ly"}      # => b.ly
+	    path +{path => "a/b/f.c", dir => "m"}   # => m/f.c
+	
+	    local $_ = +{path => "a/b/f.c", dir => undef, ext => undef};
+	    path # => f
+	    path +{path => "a/b/f.c", volume => "/x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"} # => m/y//j.ext
+	    path +{path => "a/b/f.c", volume => "/x", dir => "/y", file => "f.y", name => "j", ext => "ext"} # => /y/j.ext
+	}
+	
+	{
+	    local $^O = "MSWin32"; # also os2, symbian and dos
+	
+	    path "."        # --> {path => ".", file => ".", name => "."}
+	    path ".bashrc"  # --> {path => ".bashrc", file => ".bashrc", name => ".bashrc"}
+	    path "/"        # --> {path => "\\", dir => "\\", folder => "\\"}
+	    path "\\"       # --> {path => "\\", dir => "\\", folder => "\\"}
+	    path ""         # --> {path => ""}
+	    path "a\\b\\c.ext.ly"   # --> {path => "a\\b\\c.ext.ly", dir => "a\\b\\", folder => "a\\b", file => "c.ext.ly", name => "c", ext => "ext.ly"}
+	
+	    path +{dir  => "/", ext => "ext.ly"}    # => \\.ext.ly
+	    path +{dir  => "\\", ext => "ext.ly"}   # => \\.ext.ly
+	    path +{file => "b.c", ext => "ly"}      # => b.ly
+	    path +{path => "a/b/f.c", dir => "m/r/"}   # => m\\r\\f.c
+	
+	    path +{path => "a/b/f.c", dir => undef, ext => undef} # => f
+	    path +{path => "a/b/f.c", volume => "x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"} # \> x:m\y\j.ext
+	    path +{path => "x:/a/b/f.c", volume => undef, dir =>  "/y/", file => "f.y", name => "j", ext => "ext"} # \> \y\j.ext
+	}
+	
+	{
+	    local $^O = "amigaos";
+	
+	    my $path = {
+	        path   => "Work1:Documents/Letters/Letter1.txt",
+	        dir    => "Work1:Documents/Letters/",
+	        volume => "Work1",
+	        folder => "Documents/Letters",
+	        file   => "Letter1.txt",
+	        name   => "Letter1",
+	        ext    => "txt",
+	    };
+	
+	    path "Work1:Documents/Letters/Letter1.txt" # --> $path
+	
+	    path {volume => "Work", file => "Letter1.pm", ext => "txt"} # => Work:Letter1.txt
+	}
+	
+	{
+	    local $^O = "cygwin";
+	
+	    my $path = {
+	        path   => "/cygdrive/c/Documents/Letters/Letter1.txt",
+	        dir    => "/cygdrive/c/Documents/Letters/",
+	        volume => "c",
+	        folder => "Documents/Letters",
+	        file   => "Letter1.txt",
+	        name   => "Letter1",
+	        ext    => "txt",
+	    };
+	
+	    path "/cygdrive/c/Documents/Letters/Letter1.txt" # --> $path
+	
+	    path {volume => "c", file => "Letter1.pm", ext => "txt"} # => /cygdrive/c/Letter1.txt
+	}
+	
+	{
+	    local $^O = "dos";
+	
+	    my $path = {
+	        path   => 'c:\Documents\Letters\Letter1.txt',
+	        dir    => 'c:\Documents\Letters\\',
+	        volume => 'c',
+	        folder => '\Documents\Letters',
+	        file   => 'Letter1.txt',
+	        name   => 'Letter1',
+	        ext    => 'txt',
+	    };
+	
+	    path 'c:\Documents\Letters\Letter1.txt' # --> $path
+	
+	    path {volume => "c", file => "Letter1.pm", ext => "txt"} # \> c:Letter1.txt
+	    path {dir => 'r\t\\',  file => "Letter1",    ext => "txt"} # \> r\t\Letter1.txt
+	}
+	
+	{
+	    local $^O = "VMS";
+	
+	    my $path = {
+	        path   => "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION",
+	        dir    => "DISK:[DIRECTORY.SUBDIRECTORY]",
+	        volume => "DISK:",
+	        disk   => "DISK",
+	        folder => "DIRECTORY.SUBDIRECTORY",
+	        card   => "FILENAME.EXTENSION",
+	        file   => "FILENAME.EXTENSION",
+	        name   => "FILENAME",
+	        ext    => "EXTENSION",
+	    };
+	
+	    path "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION" # --> $path
+	
+	    $path = {
+	        path        => 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7',
+	        dir         => 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]',
+	        node        => "NODE",
+	        accountname => "account",
+	        password    => "password",
+	        volume      => 'DISK$USER:',
+	        disk        => 'DISK',
+	        user        => 'USER',
+	        folder      => "DIRECTORY.SUBDIRECTORY",
+	        card        => "FILENAME.EXTENSION;7",
+	        file        => "FILENAME.EXTENSION",
+	        name        => "FILENAME",
+	        ext         => "EXTENSION",
+	        version     => 7,
+	    };
+	
+	    path 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7' # --> $path
+	
+	    path {volume => "DISK:", file => "FILENAME.pm", ext => "EXTENSION"} # => DISK:FILENAME.EXTENSION
+	    path {user => "USER", folder => "DIRECTORY.SUBDIRECTORY", file => "FILENAME.pm", ext => "EXTENSION"} # \> $USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION
+	}
+	
+	{
+	    local $^O = "VOS";
+	
+	    my $path = {
+	        path    => "%sysname#module1>SubDir>File.txt",
+	        dir     => "%sysname#module1>SubDir>",
+	        volume  => "%sysname#module1>",
+	        sysname => "sysname",
+	        module  => "module1",
+	        folder  => "SubDir",
+	        file    => "File.txt",
+	        name    => "File",
+	        ext     => "txt",
+	    };
+	
+	    path $path->{path} # --> $path
+	
+	    path {volume => "%sysname#module1>", file => "File.pm", ext => "txt"} # => %sysname#module1>File.txt
+	    path {module => "module1", file => "File.pm"} # => %#module1>File.pm
+	    path {sysname => "sysname", file => "File.pm"} # => %sysname#>File.pm
+	    path {dir => "dir>subdir>", file => "File.pm", ext => "txt"} # => dir>subdir>File.txt
+	}
+	
+	{
+	    local $^O = "riscos";
+	
+	    my $path = {
+	        path   => 'Filesystem#Special_Field::DiskName.$.Directory.Directory.File/Ext/Ext',
+	        dir    => 'Filesystem#Special_Field::DiskName.$.Directory.Directory.',
+	        volume => 'Filesystem#Special_Field::DiskName.',
+	        fstype => "Filesystem",
+	        option => "Special_Field",
+	        disk   => "DiskName",
+	        folder => '$.Directory.Directory',
+	        file   => "File/Ext/Ext",
+	        name   => "File",
+	        ext    => "Ext/Ext",
+	    };
+	
+	    path $path->{path} # --> $path
+	
+	    $path = {
+	        path => '.$.Directory.Directory.',
+	        dir => '.$.Directory.Directory.',
+	        folder => '.$.Directory.Directory',
+	    };
+	
+	    path '.$.Directory.Directory.' # --> $path
+	
+	    path {volume => "ADFS::HardDisk.", file => "File"} # => ADFS::HardDisk.$.File
+	    path {folder => "x"}  # => x.
+	    path {dir    => "x."} # => x.
+	}
+	
+	{
+	    local $^O = "MacOS";
+	
+	    my $path = {
+	        path   => '::::mix:report.doc',
+	        dir    => "::::mix:",
+	        folder => ":::mix",
+	        file   => "report.doc",
+	        name   => "report",
+	        ext    => "doc",
+	    };
+	
+	    path $path->{path} # --> $path
+	    path $path         # => $path->{path}
+	
+	    path 'report' # --> {path => 'report', file => 'report', name => 'report'}
+	
+	    path {volume => "x", file => "f"} # => x:f
+	    path {folder => "x"} # => x:
+	}
+	
+	{
+	    local $^O = "vmesa";
+	
+	    my $path = {
+	        path   => ' USERID   FILE EXT   VOLUME ',
+	        userid => "USERID",
+	        file   => "FILE EXT",
+	        name   => "FILE",
+	        ext    => "EXT",
+	        volume => "VOLUME",
+	    };
+	
+	    path $path->{path} # --> $path
+	
+	    path {volume => "x", file => "f"} # -> ' f  x'
+	}
+	
 
-B<Cm. Also:>
+--timeout
+13
 
-=over
+--timeout
+13
 
-=item * <File::Spec> – C<< ($volume, $directories, $file) = File::Spec-E<gt>splitpath($path) >>.
+--timeout
+13
 
-=item * <File::Basename> – C<($name, $path, $suffix) = fileparse($fullname, @suffixlist)>.
+--timeout
+13
 
-=item * <Path::Class::File> – C<< file('foo', 'bar.txt')-E<gt>is_absolute >>.
+--timeout
+13
 
-=item * <Path::Extended::File> – C<< Path::Extended::File-E<gt>new('path/to/file')-E<gt>basename >>.
+--timeout
+13
 
-=item * <Parse::Path> – C<< Parse::Path-E<gt>new(path =E<gt> 'gophers[0].food.count', style =E<gt> 'DZIL')-E<gt>push("chunk") >>. Works with paths as with arrays (C<push>, C<pop>, C<shift>, C<splice>). It also overloads comparison operators. It has styles: C<DZIL>, C<File::Unix>, C<File::Win32>, C<PerlClass> and C<PerlClassUTF8>.
+=head2 transpath ($path?, $from, $to)
 
-=back
+--timeout
+13
 
-=head2 include (;$pkg)
+--timeout
+13
+
+--timeout
+13
+
+--timeout
+13
+
+	local $_ = ">x>y>z.doc.zip";
+	transpath "vos", "unix"       # \> /x/y/z.doc.zip
+	transpath "vos", "VMS"        # \> [.x.y]z.doc.zip
+	transpath $_, "vos", "RiscOS" # \> .x.y.z/doc/zip
+
+=head2 splitdir (;$dir)
+
+--timeout
+13
+
+	local $^O = "unix";
+	[ splitdir "/x/" ]    # --> ["", "x", ""]
+
+--timeout
+13
+
+--timeout
+13
+
+	local $^O = "unix";
+	joindir qw/x y z/    # => x/y/z
+	
+	path +{ dir => joindir qw/x y z/ } # => x/y/z/
+
+--timeout
+13
+
+--timeout
+13
+
+	local $^O = "unix";
+	[ splitext ".x." ]    # --> ["", "x", ""]
+
+--timeout
+13
+
+--timeout
+13
+
+	local $^O = "unix";
+	joinext qw/x y z/    # => x.y.z
+	
+	path +{ ext => joinext qw/x y z/ } # => .x.y.z
+
+--timeout
+13
 
 Connects C<$pkg> (if it has not already been connected via C<use> or C<require>) and returns it. Without a parameter, uses C<$_>.
 
@@ -880,7 +1432,7 @@ Converts a file mask to a regular expression. Without a parameter, uses C<$_>.
 
 Used in filters of the C<find> function.
 
-B<Cm. Also:>
+=head3 See also
 
 =over
 

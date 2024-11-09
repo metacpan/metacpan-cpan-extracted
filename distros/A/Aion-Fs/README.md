@@ -5,7 +5,7 @@ Aion::Fs - утилиты для файловой системы: чтение, 
 
 # VERSION
 
-0.0.7
+0.0.8
 
 # SYNOPSIS
 
@@ -79,13 +79,15 @@ length cat["unicode.txt", ":raw"]   # -> 3
 eval { cat "A" }; $@  # ~> cat A: No such file or directory
 ```
 
-**См. также:**
+### See also
 
+* <autodie> – `open $f, "r.txt"; $s = join "", <$f>; close $f`.
 * <File::Slurp> — `read_file('file.txt')`.
 * <File::Slurper> — `read_text('file.txt')`, `read_binary('file.txt')`.
+* <File::Util> — `File::Util->new->load_file(file => 'file.txt')`.
 * <IO::All> — `io('file.txt') > $contents`.
 * <IO::Util> — `$contents = ${ slurp 'file.txt' }`.
-* <File::Util> — `File::Util->new->load_file(file => 'file.txt')`.
+* <Mojo::File> – `path($file)->slurp`.
 
 ## lay ($file?, $content)
 
@@ -101,13 +103,15 @@ lay ["unicode.txt", ":raw"], "↯"  # => unicode.txt
 eval { lay "/", "↯" }; $@ # ~> lay /: Is a directory
 ```
 
-**См. также:**
+### See also
 
+* <autodie> – `open $f, ">r.txt"; print $f $contents; close $f`.
 * <File::Slurp> — `write_file('file.txt', $contents)`.
 * <File::Slurper> — `write_text('file.txt', $contents)`, `write_binary('file.txt', $contents)`.
 * <IO::All> — `io('file.txt') < $contents`.
 * <IO::Util> — `slurp \$contents, 'file.txt'`.
 * <File::Util> — `File::Util->new->write_file(file => 'file.txt', content => $contents, bitmask => 0644)`.
+* <Mojo::File> – `path($file)->spew($chars, 'UTF-8')`.
 
 ## find (;$path, @filters)
 
@@ -146,7 +150,7 @@ my $count = 0;
 find "ex", sub { find_stop if ++$count == 3; 1}  # -> 2
 ```
 
-**См. также:**
+### See also
 
 * <AudioFile::Find> — ищет аудиофайлы в указанной директории. Позволяет фильтровать их по атрибутам: названию, артисту, жанру, альбому и трэку.
 * <Directory::Iterator> — `$it = Directory::Iterator->new($dir, %opts); push @paths, $_ while <$it>`.
@@ -172,6 +176,7 @@ find "ex", sub { find_stop if ++$count == 3; 1}  # -> 2
 * <File::Wildcard> — `$fw = File::Wildcard->new(exclude => qr/.svn/, case_insensitive => 1, sort => 1, path => "src///*.cpp", match => qr(^src/(.*?)\.cpp$), derive => ['src/$1.o','src/$1.hpp']); push @paths, $f while $f = $fw->next`.
 * <File::Wildcard::Find> — `findbegin($dir); push @paths, $f while $f = findnext()` или  `findbegin($dir); @paths = findall()`.
 * <File::Util> — `File::Util->new->list_dir($dir, qw/ --pattern=\.txt$ --files-only --recurse /)`.
+* <Mojo::File> – `say for path($path)->list_tree({hidden => 1, dir => 1})->each`.
 * <Path::Find> — `@paths = path_find( $dir, "*.png" )`. Для сложных запросов использует _matchable_: `my $sub = matchable( sub { my( $entry, $directory, $fullname, $depth ) = @_; $depth <= 3 }`.
 * <Path::Extended::Dir> — `@paths = Path::Extended::Dir->new($dir)->find('*.txt')`.
 * <Path::Iterator::Rule> — `$i = Path::Iterator::Rule->new->file; @paths = $i->clone->size(">10k")->all(@dirs); $i->size("<10k")...`.
@@ -205,11 +210,12 @@ eval { erase "/" }; $@  # ~> erase dir /: Device or resource busy
 eval { erase "/dev/null" }; $@  # ~> erase file /dev/null: Permission denied
 ```
 
-**См. также:**
+### See also
 
-* <unlink> + <rmdir>.
+* `unlink` + `rmdir`.
 * <File::Path> — `remove_tree("dir")`.
 * <File::Path::Tiny> — `File::Path::Tiny::rm($path)`. Не выбрасывает исключений.
+* <Mojo::File> – `path($file)->remove`.
 
 ## replace (&sub, @files)
 
@@ -232,11 +238,11 @@ replace { $b = ":utf8"; y/a/¡/ } [$_, ":raw"];
 cat  # => ¡bc
 ```
 
-**См. также:**
+### See also
 
-* <File::Edit>.
-* <File::Edit::Portable>.
-* <File::Replace>.
+* <File::Edit> – `File::Edit->new($file)->replace('x', 'y')->save`.
+* <File::Edit::Portable> – `File::Edit::Portable->new->splice(file => $file, line => 10, contens => ["line1", "line2"])`.
+* <File::Replace> – `($infh,$outfh,$repl) = replace3($file); while (<$infh>) { print $outfh "X: $_" } $repl->finish`.
 * <File::Replace::Inplace>.
 
 ## mkpath (;$path)
@@ -258,7 +264,7 @@ mkpath "A///./file";
 -d "A"  # -> 1
 ```
 
-**См. также:**
+### See also
 
 * <File::Path> — `mkpath("dir1/dir2")`.
 * <File::Path::Tiny> — `File::Path::Tiny::mk($path)`. Не выбрасывает исключений.
@@ -276,11 +282,12 @@ eval { mtime }; $@  # ~> mtime nofile: No such file or directory
 mtime ["/"]   # ~> ^\d+(\.\d+)?$
 ```
 
-**См. также:**
+### See also
 
 * `-M` — `-M "file.txt"`, `-M _` в днях от текущего времени.
 * <stat> — `(stat "file.txt")[9]` в секундах (unixtime).
 * <Time::HiRes> — `(Time::HiRes::stat "file.txt")[9]` в секундах с дробной частью.
+* <Mojo::File> — `path($file)->stat->mtime`.
 
 ## sta (;$path)
 
@@ -294,11 +301,11 @@ mtime ["/"]   # ~> ^\d+(\.\d+)?$
 local $_ = "nofile";
 eval { sta }; $@  # ~> sta nofile: No such file or directory
 
-sta(["/"])->{ino} # ~> ^\d+$ 
+sta(["/"])->{ino} # ~> ^\d+$
 sta(".")->{atime} # ~> ^\d+(\.\d+)?$
 ```
 
-**См. также:**
+### See also
 
 * <Fcntl> – содержит константы для распознавания режима.
 * <BSD::stat> – дополнительно возвращает atime, ctime и mtime в наносекундах, флаги пользователя и номер генерации файла. Имеет ООП-интерфейс.
@@ -319,33 +326,321 @@ sta(".")->{atime} # ~> ^\d+(\.\d+)?$
 Разбивает файловый путь на составляющие или собирает его из составляющих.
 
 * Если получает ссылку на массив, то воспринимает его первый элемент как путь.
-* Если получает ссылку на хэш, то собирает из него путь. Незнакомые ключи просто игнорирует. Так же игнорирует volume в UNIX.
+* Если получает ссылку на хэш, то собирает из него путь. Незнакомые ключи просто игнорирует. Набор ключей для каждой ФС – разный.
+* ФС берётся из системной переменной `$^O`.
 * К файловой системе не обращается.
 
 ```perl
-path "."       # --> {path => ".", volume => undef, dir => undef, file => ".", name => undef, ext => undef}
-path ["/"]     # --> {path => "/", volume => undef, dir => "/", file => undef, name => undef, ext => undef}
-local $_ = "";
-path           # --> {path => "", volume => undef, dir => undef, file => undef, name => undef, ext => undef}
-path "a/b/c.ext.ly"   # --> {path => "a/b/c.ext.ly", volume => undef, dir => "a/b", file => "c.ext.ly", name => "c", ext => "ext.ly"}
+{
+    local $^O = "freebsd";
 
-path +{dir  => "/", ext => "ext.ly"}    # => /.ext.ly
-path +{file => "b.c", ext => "ly"}      # => b.ly
-path +{path => "a/b/f.c", dir => "m"}   # => m/f.c
+    path "."        # --> {path => ".", file => ".", name => "."}
+    path ".bashrc"  # --> {path => ".bashrc", file => ".bashrc", name => ".bashrc"}
+    path ".bash.rc"  # --> {path => ".bash.rc", file => ".bash.rc", name => ".bash", ext => "rc"}
+    path ["/"]      # --> {path => "/", dir => "/"}
+    local $_ = "";
+    path            # --> {path => ""}
+    path "a/b/c.ext.ly"   # --> {path => "a/b/c.ext.ly", dir => "a/b", file => "c.ext.ly", name => "c", ext => "ext.ly"}
 
-local $_ = +{path => "a/b/f.c", dir => undef, ext => undef};
-path             # => a/b/f.c
-path +{path => "a/b/f.c", volume => "/x", dir => "m/y", file => "f.y", name => "j", ext => "ext"} # => m/y/j.ext
-path +{path => "a/b/f.c", volume => "/x", dir =>  "/y", file => "f.y", name => "j", ext => "ext"} # => /y/j.ext
+    path +{dir  => "/", ext => "ext.ly"}    # => /.ext.ly
+    path +{file => "b.c", ext => "ly"}      # => b.ly
+    path +{path => "a/b/f.c", dir => "m"}   # => m/f.c
+
+    local $_ = +{path => "a/b/f.c", dir => undef, ext => undef};
+    path # => f
+    path +{path => "a/b/f.c", volume => "/x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"} # => m/y//j.ext
+    path +{path => "a/b/f.c", volume => "/x", dir => "/y", file => "f.y", name => "j", ext => "ext"} # => /y/j.ext
+}
+
+{
+    local $^O = "MSWin32"; # also os2, symbian and dos
+
+    path "."        # --> {path => ".", file => ".", name => "."}
+    path ".bashrc"  # --> {path => ".bashrc", file => ".bashrc", name => ".bashrc"}
+    path "/"        # --> {path => "\\", dir => "\\", folder => "\\"}
+    path "\\"       # --> {path => "\\", dir => "\\", folder => "\\"}
+    path ""         # --> {path => ""}
+    path "a\\b\\c.ext.ly"   # --> {path => "a\\b\\c.ext.ly", dir => "a\\b\\", folder => "a\\b", file => "c.ext.ly", name => "c", ext => "ext.ly"}
+
+    path +{dir  => "/", ext => "ext.ly"}    # => \\.ext.ly
+    path +{dir  => "\\", ext => "ext.ly"}   # => \\.ext.ly
+    path +{file => "b.c", ext => "ly"}      # => b.ly
+    path +{path => "a/b/f.c", dir => "m/r/"}   # => m\\r\\f.c
+
+    path +{path => "a/b/f.c", dir => undef, ext => undef} # => f
+    path +{path => "a/b/f.c", volume => "x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"} # \> x:m\y\j.ext
+    path +{path => "x:/a/b/f.c", volume => undef, dir =>  "/y/", file => "f.y", name => "j", ext => "ext"} # \> \y\j.ext
+}
+
+{
+    local $^O = "amigaos";
+
+    my $path = {
+        path   => "Work1:Documents/Letters/Letter1.txt",
+        dir    => "Work1:Documents/Letters/",
+        volume => "Work1",
+        folder => "Documents/Letters",
+        file   => "Letter1.txt",
+        name   => "Letter1",
+        ext    => "txt",
+    };
+
+    path "Work1:Documents/Letters/Letter1.txt" # --> $path
+
+    path {volume => "Work", file => "Letter1.pm", ext => "txt"} # => Work:Letter1.txt
+}
+
+{
+    local $^O = "cygwin";
+
+    my $path = {
+        path   => "/cygdrive/c/Documents/Letters/Letter1.txt",
+        dir    => "/cygdrive/c/Documents/Letters/",
+        volume => "c",
+        folder => "Documents/Letters",
+        file   => "Letter1.txt",
+        name   => "Letter1",
+        ext    => "txt",
+    };
+
+    path "/cygdrive/c/Documents/Letters/Letter1.txt" # --> $path
+
+    path {volume => "c", file => "Letter1.pm", ext => "txt"} # => /cygdrive/c/Letter1.txt
+}
+
+{
+    local $^O = "dos";
+
+    my $path = {
+        path   => 'c:\Documents\Letters\Letter1.txt',
+        dir    => 'c:\Documents\Letters\\',
+        volume => 'c',
+        folder => '\Documents\Letters',
+        file   => 'Letter1.txt',
+        name   => 'Letter1',
+        ext    => 'txt',
+    };
+
+    path 'c:\Documents\Letters\Letter1.txt' # --> $path
+
+    path {volume => "c", file => "Letter1.pm", ext => "txt"} # \> c:Letter1.txt
+    path {dir => 'r\t\\',  file => "Letter1",    ext => "txt"} # \> r\t\Letter1.txt
+}
+
+{
+    local $^O = "VMS";
+
+    my $path = {
+        path   => "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION",
+        dir    => "DISK:[DIRECTORY.SUBDIRECTORY]",
+        volume => "DISK:",
+        disk   => "DISK",
+        folder => "DIRECTORY.SUBDIRECTORY",
+        card   => "FILENAME.EXTENSION",
+        file   => "FILENAME.EXTENSION",
+        name   => "FILENAME",
+        ext    => "EXTENSION",
+    };
+
+    path "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION" # --> $path
+
+    $path = {
+        path        => 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7',
+        dir         => 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]',
+        node        => "NODE",
+        accountname => "account",
+        password    => "password",
+        volume      => 'DISK$USER:',
+        disk        => 'DISK',
+        user        => 'USER',
+        folder      => "DIRECTORY.SUBDIRECTORY",
+        card        => "FILENAME.EXTENSION;7",
+        file        => "FILENAME.EXTENSION",
+        name        => "FILENAME",
+        ext         => "EXTENSION",
+        version     => 7,
+    };
+
+    path 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7' # --> $path
+
+    path {volume => "DISK:", file => "FILENAME.pm", ext => "EXTENSION"} # => DISK:FILENAME.EXTENSION
+    path {user => "USER", folder => "DIRECTORY.SUBDIRECTORY", file => "FILENAME.pm", ext => "EXTENSION"} # \> $USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION
+}
+
+{
+    local $^O = "VOS";
+
+    my $path = {
+        path    => "%sysname#module1>SubDir>File.txt",
+        dir     => "%sysname#module1>SubDir>",
+        volume  => "%sysname#module1>",
+        sysname => "sysname",
+        module  => "module1",
+        folder  => "SubDir",
+        file    => "File.txt",
+        name    => "File",
+        ext     => "txt",
+    };
+
+    path $path->{path} # --> $path
+
+    path {volume => "%sysname#module1>", file => "File.pm", ext => "txt"} # => %sysname#module1>File.txt
+    path {module => "module1", file => "File.pm"} # => %#module1>File.pm
+    path {sysname => "sysname", file => "File.pm"} # => %sysname#>File.pm
+    path {dir => "dir>subdir>", file => "File.pm", ext => "txt"} # => dir>subdir>File.txt
+}
+
+{
+    local $^O = "riscos";
+
+    my $path = {
+        path   => 'Filesystem#Special_Field::DiskName.$.Directory.Directory.File/Ext/Ext',
+        dir    => 'Filesystem#Special_Field::DiskName.$.Directory.Directory.',
+        volume => 'Filesystem#Special_Field::DiskName.',
+        fstype => "Filesystem",
+        option => "Special_Field",
+        disk   => "DiskName",
+        folder => '$.Directory.Directory',
+        file   => "File/Ext/Ext",
+        name   => "File",
+        ext    => "Ext/Ext",
+    };
+
+    path $path->{path} # --> $path
+
+    $path = {
+        path => '.$.Directory.Directory.',
+        dir => '.$.Directory.Directory.',
+        folder => '.$.Directory.Directory',
+    };
+
+    path '.$.Directory.Directory.' # --> $path
+
+    path {volume => "ADFS::HardDisk.", file => "File"} # => ADFS::HardDisk.$.File
+    path {folder => "x"}  # => x.
+    path {dir    => "x."} # => x.
+}
+
+{
+    local $^O = "MacOS";
+
+    my $path = {
+        path   => '::::mix:report.doc',
+        dir    => "::::mix:",
+        folder => ":::mix",
+        file   => "report.doc",
+        name   => "report",
+        ext    => "doc",
+    };
+
+    path $path->{path} # --> $path
+    path $path         # => $path->{path}
+
+    path 'report' # --> {path => 'report', file => 'report', name => 'report'}
+
+    path {volume => "x", file => "f"} # => x:f
+    path {folder => "x"} # => x:
+}
+
+{
+    local $^O = "vmesa";
+
+    my $path = {
+        path   => ' USERID   FILE EXT   VOLUME ',
+        userid => "USERID",
+        file   => "FILE EXT",
+        name   => "FILE",
+        ext    => "EXT",
+        volume => "VOLUME",
+    };
+
+    path $path->{path} # --> $path
+
+    path {volume => "x", file => "f"} # -> ' f  x'
+}
+
 ```
 
-**См. также:**
+### See also
 
-* <File::Spec> – `($volume, $directories, $file) = File::Spec->splitpath($path)`.
+* https://en.wikipedia.org/wiki/Path_(computing)
+
+Модули для определения ОС, а значит и определения, какие в ОС файловые пути:
+
+* `$^O` – суперглобальная переменная с названием текущей ОС.
+* <Devel::CheckOS>, <Perl::OSType> – определяют ОС.
+* <Devel::AssertOS> – запрещает использовать модуль вне указанных ОС.
+* <System::Info> – информация об ОС, её версии, дистрибутиве, CPU и хосте.
+
+Выделяют части файловых путей:
+
+* <File::Spec> – `($volume, $directories, $file) = File::Spec->splitpath($path)`. Поддерживает только unix, win32, os/2, vms, cygwin и amigaos.
+* <File::Spec::Functions> – `($volume, $directories, $file) = splitpath($path)`.
+* <File::Spec::Mac> – входит в <File::Spec>, но не определяется им, поэтому приходится использовать отдельно. Для mac os по 9-ю версию.
 * <File::Basename> – `($name, $path, $suffix) = fileparse($fullname, @suffixlist)`.
 * <Path::Class::File> – `file('foo', 'bar.txt')->is_absolute`.
-* <Path::Extended::File> – `Path::Extended::File->new('path/to/file')->basename`.
+* <Path::Extended::File> – `Path::Extended::File->new($file)->basename`.
+* <Mojo::File> – `path($file)->extname`.
+* <Path::Util> – `$filename = basename($dir)`.
 * <Parse::Path> – `Parse::Path->new(path => 'gophers[0].food.count', style => 'DZIL')->push("chunk")`. Работает с путями как с массивами (`push`, `pop`, `shift`, `splice`). Так же перегружает операторы сравнения. У него есть стили: `DZIL`, `File::Unix`, `File::Win32`, `PerlClass` и `PerlClassUTF8`.
+
+## transpath ($path?, $from, $to)
+
+Переводит путь из формата одной ОС в другую.
+
+Если `$path` не указан, то используется `$_`.
+
+Перечень поддерживаемых ОС смотрите в примерах подпрограммы `path` чуть выше или так: `keys %Aion::Fs::FS`.
+
+Названия ОС – регистронезависимы.
+
+```perl
+local $_ = ">x>y>z.doc.zip";
+transpath "vos", "unix"       # \> /x/y/z.doc.zip
+transpath "vos", "VMS"        # \> [.x.y]z.doc.zip
+transpath $_, "vos", "RiscOS" # \> .x.y.z/doc/zip
+```
+
+
+## splitdir (;$dir)
+
+Разбивает директорию на составляющие. Директорию следует вначале получить из `path->{dir}`.
+
+```perl
+local $^O = "unix";
+[ splitdir "/x/" ]    # --> ["", "x", ""]
+```
+
+## joindir (;$dirparts)
+
+Объединяет директорию из составляющих. Затем полученную директорию следует включить в `path +{dir => $dir}`.
+
+```perl
+local $^O = "unix";
+joindir qw/x y z/    # => x/y/z
+
+path +{ dir => joindir qw/x y z/ } # => x/y/z/
+```
+
+## splitext (;$ext)
+
+Разбивает расширение на составляющие. Расширение следует вначале получить из `path->{ext}`.
+
+```perl
+local $^O = "unix";
+[ splitext ".x." ]    # --> ["", "x", ""]
+```
+
+## joinext (;$extparts)
+
+Объединяет расширение из составляющих. Затем полученное расширение следует включить в `path +{ext => $ext}`.
+
+```perl
+local $^O = "unix";
+joinext qw/x y z/    # => x.y.z
+
+path +{ ext => joinext qw/x y z/ } # => .x.y.z
+```
 
 ## include (;$pkg)
 
@@ -408,7 +703,7 @@ wildcard "?_??_**"  # \> (?^usn:^._[^/]_[^/]*?$)
 
 Используется в фильтрах функции `find`.
 
-**См. также:**
+### See also
 
 * <File::Wildcard>.
 * <String::Wildcard::Bash>.

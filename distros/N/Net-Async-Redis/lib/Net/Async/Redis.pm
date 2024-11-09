@@ -3,7 +3,7 @@ package Net::Async::Redis;
 
 use Full::Class qw(:v1), extends => qw(Net::Async::Redis::Commands);
 
-our $VERSION = '6.004';
+our $VERSION = '6.005';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -53,7 +53,7 @@ Current features include:
 
 =over 4
 
-=item * L<all commands|https://redis.io/commands> as of 7.4 (November 2024), see L<https://redis.io/commands> for the methods and parameters
+=item * L<all commands|https://redis.io/commands> as of 8.0-M02 (November 2024), see L<https://redis.io/commands> for the methods and parameters
 
 =item * L<pub/sub support|https://redis.io/topics/pubsub>, see L</METHODS - Subscriptions> including sharded pubsub
 
@@ -163,10 +163,6 @@ use Ryu::Async;
 use URI;
 use URI::redis;
 use Cache::LRU;
-use YAML::XS ();
-use Path::Tiny;
-use Dir::Self;
-use File::ShareDir ();
 
 use Metrics::Any qw($metrics), strict => 0;
 
@@ -254,17 +250,7 @@ our %SUBSCRIPTION_COMMANDS = (
     MESSAGE      => 1,
     PMESSAGE     => 1,
 );
-
-our %COMMAND_DEFINITION = do {
-    my $path = Path::Tiny::path(__DIR__)->parent(3)->child('share/commands.yaml');
-    $path = Path::Tiny::path(
-        File::ShareDir::dist_file(
-            'Net-Async-Redis',
-            'commands.yaml'
-        )
-    ) unless $path->exists;
-    YAML::XS::LoadFile("$path")->%*
-};
+our %COMMAND_DEFINITION = %Net::Async::Redis::Commands::COMMAND_DEFINITION;
 
 # Add support for secure Redis `rediss://...` URIs
 unless(URI::rediss->can('new')) {

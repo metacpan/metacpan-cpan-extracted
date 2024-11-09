@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Locale-Unicode-Data-v1.0.3/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Locale-Unicode-Data-v1.0.5/README.md)
 
 ## Author
 

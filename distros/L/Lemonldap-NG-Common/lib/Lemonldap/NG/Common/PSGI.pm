@@ -455,11 +455,12 @@ sub logAndRun {
         $self->userLogger->setRequestObj($req);
     }
 
-    $self->logger->info( "New request "
-          . ref($self) . " "
-          . $req->method . " "
-          . $req->request_uri );
-
+    if ( ref $self->logger ) {
+        $self->logger->info( "New request "
+              . ref($self) . " "
+              . $req->method . " "
+              . $req->request_uri );
+    }
     my $res = $sub->($req);
 
     # Clear the logging system before the next request

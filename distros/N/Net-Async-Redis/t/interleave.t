@@ -126,7 +126,7 @@ await fmap_void(async sub {
         fail("problem with $method - $e");
         await $redis->unlink($k);
     }
-}, foreach => [1..($ENV{AUTHOR_TESTING} ? 10000 : 100)], concurrent => 64);
+}, foreach => [1..($ENV{AUTHOR_TESTING} ? 1000 : 30)], concurrent => 64);
 
 done_testing;
 

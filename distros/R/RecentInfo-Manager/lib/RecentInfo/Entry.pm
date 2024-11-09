@@ -1,8 +1,8 @@
-package RecentInfo::Entry 0.03;
+package RecentInfo::Entry 0.04;
 use 5.020;
 use Moo 2;
 use XML::LibXML;
-use experimental 'signatures';
+use experimental 'signatures', 'postderef';
 use Carp 'croak';
 use URI;
 

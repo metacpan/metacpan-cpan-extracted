@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::Row::SelfResultSet;
-$DBIx::Class::Helper::Row::SelfResultSet::VERSION = '2.036000';
+$DBIx::Class::Helper::Row::SelfResultSet::VERSION = '2.037000';
 # ABSTRACT: Easily use ResultSet methods for the current row
 
 use strict;
@@ -11,7 +11,7 @@ sub self_rs {
    my ($self) = @_;
 
    my $rs = $self->result_source->resultset;
-   return $rs->search( $self->ident_condition( $rs->current_source_alias ) );
+   return $rs->search_rs( $self->ident_condition( $rs->current_source_alias ) );
 }
 
 1;
@@ -61,7 +61,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

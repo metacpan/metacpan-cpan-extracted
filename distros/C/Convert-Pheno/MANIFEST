@@ -78,7 +78,6 @@ t/redcap2bff/err/redcap_mapping_err2.yaml
 t/redcap2bff/err/redcap_mapping_err3.yaml
 t/redcap2bff/err/redcap_mapping_err4.yaml
 t/redcap2bff/err/redcap_mapping_err5.yaml
-t/redcap2bff/in/README
 t/redcap2bff/in/redcap_data.csv
 t/redcap2bff/in/redcap_dictionary.csv
 t/redcap2bff/in/redcap_mapping.yaml

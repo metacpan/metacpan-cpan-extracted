@@ -40,7 +40,7 @@
             "Locale::Unicode" : "v0.3.8",
             "Scalar::Util" : "0",
             "Want" : "0.17",
-            "perl" : "5.010000",
+            "perl" : "5.010001",
             "strict" : "0",
             "vars" : "0",
             "version" : "0",
@@ -69,6 +69,6 @@
          "web" : "https://gitlab.com/jackdeguest/Locale-Unicode-Data"
       }
    },
-   "version" : "v1.0.4",
+   "version" : "v1.1.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

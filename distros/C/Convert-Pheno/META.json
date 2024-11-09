@@ -81,7 +81,7 @@
          "web" : "https://github.com/CNAG-Biomedical-Informatics/convert-pheno"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

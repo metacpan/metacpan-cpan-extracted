@@ -131,7 +131,10 @@ t/TestAuditLogger.pm
 t/TestConfBackend.pm
 t/TestLogger.pm
 t/TestPsgi.pm
-tools/apache-session-mysql.sql
-tools/lmConfig.CDBI.mysql
-tools/lmConfig.RDBI.mysql
+tools/config.my.sql
+tools/config.pg.sql
+tools/notifications.my.sql
+tools/notifications.pg.sql
+tools/sessions.my.sql
+tools/sessions.pg.sql
 tools/sso.schema

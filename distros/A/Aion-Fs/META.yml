@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ no_index:
 provides:
   Aion::Fs:
     file: lib/Aion/Fs.pm
-    version: v0.0.7
+    version: v0.0.8
 requires:
   File::Spec: '0'
   Scalar::Util: '0'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/darviarush/perl-aion-fs/issues
   homepage: https://github.com/darviarush/perl-aion-fs
   repository: https://github.com/darviarush/perl-aion-fs.git
-version: 0.0.7
+version: 0.0.8
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'

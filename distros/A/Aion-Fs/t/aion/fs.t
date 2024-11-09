@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename q
 # 
 # # VERSION
 # 
-# 0.0.6
+# 0.0.7
 # 
 # # SYNOPSIS
 # 
@@ -79,13 +79,15 @@ lay "unicode.txt", "↯";
 ::like scalar do {eval { cat "A" }; $@}, qr!cat A: No such file or directory!, 'eval { cat "A" }; $@  # ~> cat A: No such file or directory';
 
 # 
-# **См. также:**
+# ### See also
 # 
+# * <autodie> – `open $f, "r.txt"; $s = join "", <$f>; close $f`.
 # * <File::Slurp> — `read_file('file.txt')`.
 # * <File::Slurper> — `read_text('file.txt')`, `read_binary('file.txt')`.
+# * <File::Util> — `File::Util->new->load_file(file => 'file.txt')`.
 # * <IO::All> — `io('file.txt') > $contents`.
 # * <IO::Util> — `$contents = ${ slurp 'file.txt' }`.
-# * <File::Util> — `File::Util->new->load_file(file => 'file.txt')`.
+# * <Mojo::File> – `path($file)->slurp`.
 # 
 # ## lay ($file?, $content)
 # 
@@ -101,13 +103,15 @@ done_testing; }; subtest 'lay ($file?, $content)' => sub {
 ::like scalar do {eval { lay "/", "↯" }; $@}, qr!lay /: Is a directory!, 'eval { lay "/", "↯" }; $@ # ~> lay /: Is a directory';
 
 # 
-# **См. также:**
+# ### See also
 # 
+# * <autodie> – `open $f, ">r.txt"; print $f $contents; close $f`.
 # * <File::Slurp> — `write_file('file.txt', $contents)`.
 # * <File::Slurper> — `write_text('file.txt', $contents)`, `write_binary('file.txt', $contents)`.
 # * <IO::All> — `io('file.txt') < $contents`.
 # * <IO::Util> — `slurp \$contents, 'file.txt'`.
 # * <File::Util> — `File::Util->new->write_file(file => 'file.txt', content => $contents, bitmask => 0644)`.
+# * <Mojo::File> – `path($file)->spew($chars, 'UTF-8')`.
 # 
 # ## find (;$path, @filters)
 # 
@@ -146,7 +150,7 @@ my $count = 0;
 ::is scalar do {find "ex", sub { find_stop if ++$count == 3; 1}}, scalar do{2}, 'find "ex", sub { find_stop if ++$count == 3; 1}  # -> 2';
 
 # 
-# **См. также:**
+# ### See also
 # 
 # * <AudioFile::Find> — ищет аудиофайлы в указанной директории. Позволяет фильтровать их по атрибутам: названию, артисту, жанру, альбому и трэку.
 # * <Directory::Iterator> — `$it = Directory::Iterator->new($dir, %opts); push @paths, $_ while <$it>`.
@@ -172,6 +176,7 @@ my $count = 0;
 # * <File::Wildcard> — `$fw = File::Wildcard->new(exclude => qr/.svn/, case_insensitive => 1, sort => 1, path => "src///*.cpp", match => qr(^src/(.*?)\.cpp$), derive => ['src/$1.o','src/$1.hpp']); push @paths, $f while $f = $fw->next`.
 # * <File::Wildcard::Find> — `findbegin($dir); push @paths, $f while $f = findnext()` или  `findbegin($dir); @paths = findall()`.
 # * <File::Util> — `File::Util->new->list_dir($dir, qw/ --pattern=\.txt$ --files-only --recurse /)`.
+# * <Mojo::File> – `say for path($path)->list_tree({hidden => 1, dir => 1})->each`.
 # * <Path::Find> — `@paths = path_find( $dir, "*.png" )`. Для сложных запросов использует _matchable_: `my $sub = matchable( sub { my( $entry, $directory, $fullname, $depth ) = @_; $depth <= 3 }`.
 # * <Path::Extended::Dir> — `@paths = Path::Extended::Dir->new($dir)->find('*.txt')`.
 # * <Path::Iterator::Rule> — `$i = Path::Iterator::Rule->new->file; @paths = $i->clone->size(">10k")->all(@dirs); $i->size("<10k")...`.
@@ -205,11 +210,12 @@ done_testing; }; subtest 'erase (@paths)' => sub {
 ::like scalar do {eval { erase "/dev/null" }; $@}, qr!erase file /dev/null: Permission denied!, 'eval { erase "/dev/null" }; $@  # ~> erase file /dev/null: Permission denied';
 
 # 
-# **См. также:**
+# ### See also
 # 
-# * <unlink> + <rmdir>.
+# * `unlink` + `rmdir`.
 # * <File::Path> — `remove_tree("dir")`.
 # * <File::Path::Tiny> — `File::Path::Tiny::rm($path)`. Не выбрасывает исключений.
+# * <Mojo::File> – `path($file)->remove`.
 # 
 # ## replace (&sub, @files)
 # 
@@ -232,11 +238,11 @@ replace { $b = ":utf8"; y/a/¡/ } [$_, ":raw"];
 ::is scalar do {cat}, "¡bc", 'cat  # => ¡bc';
 
 # 
-# **См. также:**
+# ### See also
 # 
-# * <File::Edit>.
-# * <File::Edit::Portable>.
-# * <File::Replace>.
+# * <File::Edit> – `File::Edit->new($file)->replace('x', 'y')->save`.
+# * <File::Edit::Portable> – `File::Edit::Portable->new->splice(file => $file, line => 10, contens => ["line1", "line2"])`.
+# * <File::Replace> – `($infh,$outfh,$repl) = replace3($file); while (<$infh>) { print $outfh "X: $_" } $repl->finish`.
 # * <File::Replace::Inplace>.
 # 
 # ## mkpath (;$path)
@@ -258,7 +264,7 @@ mkpath "A///./file";
 ::is scalar do {-d "A"}, scalar do{1}, '-d "A"  # -> 1';
 
 # 
-# **См. также:**
+# ### See also
 # 
 # * <File::Path> — `mkpath("dir1/dir2")`.
 # * <File::Path::Tiny> — `File::Path::Tiny::mk($path)`. Не выбрасывает исключений.
@@ -276,11 +282,12 @@ local $_ = "nofile";
 ::like scalar do {mtime ["/"]}, qr!^\d+(\.\d+)?$!, 'mtime ["/"]   # ~> ^\d+(\.\d+)?$';
 
 # 
-# **См. также:**
+# ### See also
 # 
 # * `-M` — `-M "file.txt"`, `-M _` в днях от текущего времени.
 # * <stat> — `(stat "file.txt")[9]` в секундах (unixtime).
 # * <Time::HiRes> — `(Time::HiRes::stat "file.txt")[9]` в секундах с дробной частью.
+# * <Mojo::File> — `path($file)->stat->mtime`.
 # 
 # ## sta (;$path)
 # 
@@ -298,7 +305,7 @@ local $_ = "nofile";
 ::like scalar do {sta(".")->{atime}}, qr!^\d+(\.\d+)?$!, 'sta(".")->{atime} # ~> ^\d+(\.\d+)?$';
 
 # 
-# **См. также:**
+# ### See also
 # 
 # * <Fcntl> – содержит константы для распознавания режима.
 # * <BSD::stat> – дополнительно возвращает atime, ctime и mtime в наносекундах, флаги пользователя и номер генерации файла. Имеет ООП-интерфейс.
@@ -319,33 +326,321 @@ local $_ = "nofile";
 # Разбивает файловый путь на составляющие или собирает его из составляющих.
 # 
 # * Если получает ссылку на массив, то воспринимает его первый элемент как путь.
-# * Если получает ссылку на хэш, то собирает из него путь. Незнакомые ключи просто игнорирует. Так же игнорирует volume в UNIX.
+# * Если получает ссылку на хэш, то собирает из него путь. Незнакомые ключи просто игнорирует. Набор ключей для каждой ФС – разный.
+# * ФС берётся из системной переменной `$^O`.
 # * К файловой системе не обращается.
 # 
 done_testing; }; subtest 'path (;$path)' => sub { 
-::is_deeply scalar do {path "."}, scalar do {{path => ".", volume => undef, dir => undef, file => ".", name => undef, ext => undef}}, 'path "."       # --> {path => ".", volume => undef, dir => undef, file => ".", name => undef, ext => undef}';
-::is_deeply scalar do {path ["/"]}, scalar do {{path => "/", volume => undef, dir => "/", file => undef, name => undef, ext => undef}}, 'path ["/"]     # --> {path => "/", volume => undef, dir => "/", file => undef, name => undef, ext => undef}';
-local $_ = "";
-::is_deeply scalar do {path}, scalar do {{path => "", volume => undef, dir => undef, file => undef, name => undef, ext => undef}}, 'path           # --> {path => "", volume => undef, dir => undef, file => undef, name => undef, ext => undef}';
-::is_deeply scalar do {path "a/b/c.ext.ly"}, scalar do {{path => "a/b/c.ext.ly", volume => undef, dir => "a/b", file => "c.ext.ly", name => "c", ext => "ext.ly"}}, 'path "a/b/c.ext.ly"   # --> {path => "a/b/c.ext.ly", volume => undef, dir => "a/b", file => "c.ext.ly", name => "c", ext => "ext.ly"}';
+{
+    local $^O = "freebsd";
 
-::is scalar do {path +{dir  => "/", ext => "ext.ly"}}, "/.ext.ly", 'path +{dir  => "/", ext => "ext.ly"}    # => /.ext.ly';
-::is scalar do {path +{file => "b.c", ext => "ly"}}, "b.ly", 'path +{file => "b.c", ext => "ly"}      # => b.ly';
-::is scalar do {path +{path => "a/b/f.c", dir => "m"}}, "m/f.c", 'path +{path => "a/b/f.c", dir => "m"}   # => m/f.c';
+::is_deeply scalar do {path "."}, scalar do {{path => ".", file => ".", name => "."}}, '    path "."        # --> {path => ".", file => ".", name => "."}';
+::is_deeply scalar do {path ".bashrc"}, scalar do {{path => ".bashrc", file => ".bashrc", name => ".bashrc"}}, '    path ".bashrc"  # --> {path => ".bashrc", file => ".bashrc", name => ".bashrc"}';
+::is_deeply scalar do {path ".bash.rc"}, scalar do {{path => ".bash.rc", file => ".bash.rc", name => ".bash", ext => "rc"}}, '    path ".bash.rc"  # --> {path => ".bash.rc", file => ".bash.rc", name => ".bash", ext => "rc"}';
+::is_deeply scalar do {path ["/"]}, scalar do {{path => "/", dir => "/"}}, '    path ["/"]      # --> {path => "/", dir => "/"}';
+    local $_ = "";
+::is_deeply scalar do {path}, scalar do {{path => ""}}, '    path            # --> {path => ""}';
+::is_deeply scalar do {path "a/b/c.ext.ly"}, scalar do {{path => "a/b/c.ext.ly", dir => "a/b", file => "c.ext.ly", name => "c", ext => "ext.ly"}}, '    path "a/b/c.ext.ly"   # --> {path => "a/b/c.ext.ly", dir => "a/b", file => "c.ext.ly", name => "c", ext => "ext.ly"}';
 
-local $_ = +{path => "a/b/f.c", dir => undef, ext => undef};
-::is scalar do {path}, "a/b/f.c", 'path             # => a/b/f.c';
-::is scalar do {path +{path => "a/b/f.c", volume => "/x", dir => "m/y", file => "f.y", name => "j", ext => "ext"}}, "m/y/j.ext", 'path +{path => "a/b/f.c", volume => "/x", dir => "m/y", file => "f.y", name => "j", ext => "ext"} # => m/y/j.ext';
-::is scalar do {path +{path => "a/b/f.c", volume => "/x", dir =>  "/y", file => "f.y", name => "j", ext => "ext"}}, "/y/j.ext", 'path +{path => "a/b/f.c", volume => "/x", dir =>  "/y", file => "f.y", name => "j", ext => "ext"} # => /y/j.ext';
+::is scalar do {path +{dir  => "/", ext => "ext.ly"}}, "/.ext.ly", '    path +{dir  => "/", ext => "ext.ly"}    # => /.ext.ly';
+::is scalar do {path +{file => "b.c", ext => "ly"}}, "b.ly", '    path +{file => "b.c", ext => "ly"}      # => b.ly';
+::is scalar do {path +{path => "a/b/f.c", dir => "m"}}, "m/f.c", '    path +{path => "a/b/f.c", dir => "m"}   # => m/f.c';
+
+    local $_ = +{path => "a/b/f.c", dir => undef, ext => undef};
+::is scalar do {path}, "f", '    path # => f';
+::is scalar do {path +{path => "a/b/f.c", volume => "/x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"}}, "m/y//j.ext", '    path +{path => "a/b/f.c", volume => "/x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"} # => m/y//j.ext';
+::is scalar do {path +{path => "a/b/f.c", volume => "/x", dir => "/y", file => "f.y", name => "j", ext => "ext"}}, "/y/j.ext", '    path +{path => "a/b/f.c", volume => "/x", dir => "/y", file => "f.y", name => "j", ext => "ext"} # => /y/j.ext';
+}
+
+{
+    local $^O = "MSWin32"; # also os2, symbian and dos
+
+::is_deeply scalar do {path "."}, scalar do {{path => ".", file => ".", name => "."}}, '    path "."        # --> {path => ".", file => ".", name => "."}';
+::is_deeply scalar do {path ".bashrc"}, scalar do {{path => ".bashrc", file => ".bashrc", name => ".bashrc"}}, '    path ".bashrc"  # --> {path => ".bashrc", file => ".bashrc", name => ".bashrc"}';
+::is_deeply scalar do {path "/"}, scalar do {{path => "\\", dir => "\\", folder => "\\"}}, '    path "/"        # --> {path => "\\", dir => "\\", folder => "\\"}';
+::is_deeply scalar do {path "\\"}, scalar do {{path => "\\", dir => "\\", folder => "\\"}}, '    path "\\"       # --> {path => "\\", dir => "\\", folder => "\\"}';
+::is_deeply scalar do {path ""}, scalar do {{path => ""}}, '    path ""         # --> {path => ""}';
+::is_deeply scalar do {path "a\\b\\c.ext.ly"}, scalar do {{path => "a\\b\\c.ext.ly", dir => "a\\b\\", folder => "a\\b", file => "c.ext.ly", name => "c", ext => "ext.ly"}}, '    path "a\\b\\c.ext.ly"   # --> {path => "a\\b\\c.ext.ly", dir => "a\\b\\", folder => "a\\b", file => "c.ext.ly", name => "c", ext => "ext.ly"}';
+
+::is scalar do {path +{dir  => "/", ext => "ext.ly"}}, "\\.ext.ly", '    path +{dir  => "/", ext => "ext.ly"}    # => \\.ext.ly';
+::is scalar do {path +{dir  => "\\", ext => "ext.ly"}}, "\\.ext.ly", '    path +{dir  => "\\", ext => "ext.ly"}   # => \\.ext.ly';
+::is scalar do {path +{file => "b.c", ext => "ly"}}, "b.ly", '    path +{file => "b.c", ext => "ly"}      # => b.ly';
+::is scalar do {path +{path => "a/b/f.c", dir => "m/r/"}}, "m\\r\\f.c", '    path +{path => "a/b/f.c", dir => "m/r/"}   # => m\\r\\f.c';
+
+::is scalar do {path +{path => "a/b/f.c", dir => undef, ext => undef}}, "f", '    path +{path => "a/b/f.c", dir => undef, ext => undef} # => f';
+::is scalar do {path +{path => "a/b/f.c", volume => "x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"}}, 'x:m\y\j.ext', '    path +{path => "a/b/f.c", volume => "x", dir => "m/y/", file => "f.y", name => "j", ext => "ext"} # \> x:m\y\j.ext';
+::is scalar do {path +{path => "x:/a/b/f.c", volume => undef, dir =>  "/y/", file => "f.y", name => "j", ext => "ext"}}, '\y\j.ext', '    path +{path => "x:/a/b/f.c", volume => undef, dir =>  "/y/", file => "f.y", name => "j", ext => "ext"} # \> \y\j.ext';
+}
+
+{
+    local $^O = "amigaos";
+
+    my $path = {
+        path   => "Work1:Documents/Letters/Letter1.txt",
+        dir    => "Work1:Documents/Letters/",
+        volume => "Work1",
+        folder => "Documents/Letters",
+        file   => "Letter1.txt",
+        name   => "Letter1",
+        ext    => "txt",
+    };
+
+::is_deeply scalar do {path "Work1:Documents/Letters/Letter1.txt"}, scalar do {$path}, '    path "Work1:Documents/Letters/Letter1.txt" # --> $path';
+
+::is scalar do {path {volume => "Work", file => "Letter1.pm", ext => "txt"}}, "Work:Letter1.txt", '    path {volume => "Work", file => "Letter1.pm", ext => "txt"} # => Work:Letter1.txt';
+}
+
+{
+    local $^O = "cygwin";
+
+    my $path = {
+        path   => "/cygdrive/c/Documents/Letters/Letter1.txt",
+        dir    => "/cygdrive/c/Documents/Letters/",
+        volume => "c",
+        folder => "Documents/Letters",
+        file   => "Letter1.txt",
+        name   => "Letter1",
+        ext    => "txt",
+    };
+
+::is_deeply scalar do {path "/cygdrive/c/Documents/Letters/Letter1.txt"}, scalar do {$path}, '    path "/cygdrive/c/Documents/Letters/Letter1.txt" # --> $path';
+
+::is scalar do {path {volume => "c", file => "Letter1.pm", ext => "txt"}}, "/cygdrive/c/Letter1.txt", '    path {volume => "c", file => "Letter1.pm", ext => "txt"} # => /cygdrive/c/Letter1.txt';
+}
+
+{
+    local $^O = "dos";
+
+    my $path = {
+        path   => 'c:\Documents\Letters\Letter1.txt',
+        dir    => 'c:\Documents\Letters\\',
+        volume => 'c',
+        folder => '\Documents\Letters',
+        file   => 'Letter1.txt',
+        name   => 'Letter1',
+        ext    => 'txt',
+    };
+
+::is_deeply scalar do {path 'c:\Documents\Letters\Letter1.txt'}, scalar do {$path}, '    path \'c:\Documents\Letters\Letter1.txt\' # --> $path';
+
+::is scalar do {path {volume => "c", file => "Letter1.pm", ext => "txt"}}, 'c:Letter1.txt', '    path {volume => "c", file => "Letter1.pm", ext => "txt"} # \> c:Letter1.txt';
+::is scalar do {path {dir => 'r\t\\',  file => "Letter1",    ext => "txt"}}, 'r\t\Letter1.txt', '    path {dir => \'r\t\\\',  file => "Letter1",    ext => "txt"} # \> r\t\Letter1.txt';
+}
+
+{
+    local $^O = "VMS";
+
+    my $path = {
+        path   => "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION",
+        dir    => "DISK:[DIRECTORY.SUBDIRECTORY]",
+        volume => "DISK:",
+        disk   => "DISK",
+        folder => "DIRECTORY.SUBDIRECTORY",
+        card   => "FILENAME.EXTENSION",
+        file   => "FILENAME.EXTENSION",
+        name   => "FILENAME",
+        ext    => "EXTENSION",
+    };
+
+::is_deeply scalar do {path "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION"}, scalar do {$path}, '    path "DISK:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION" # --> $path';
+
+    $path = {
+        path        => 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7',
+        dir         => 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]',
+        node        => "NODE",
+        accountname => "account",
+        password    => "password",
+        volume      => 'DISK$USER:',
+        disk        => 'DISK',
+        user        => 'USER',
+        folder      => "DIRECTORY.SUBDIRECTORY",
+        card        => "FILENAME.EXTENSION;7",
+        file        => "FILENAME.EXTENSION",
+        name        => "FILENAME",
+        ext         => "EXTENSION",
+        version     => 7,
+    };
+
+::is_deeply scalar do {path 'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7'}, scalar do {$path}, '    path \'NODE["account password"]::DISK$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION;7\' # --> $path';
+
+::is scalar do {path {volume => "DISK:", file => "FILENAME.pm", ext => "EXTENSION"}}, "DISK:FILENAME.EXTENSION", '    path {volume => "DISK:", file => "FILENAME.pm", ext => "EXTENSION"} # => DISK:FILENAME.EXTENSION';
+::is scalar do {path {user => "USER", folder => "DIRECTORY.SUBDIRECTORY", file => "FILENAME.pm", ext => "EXTENSION"}}, '$USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION', '    path {user => "USER", folder => "DIRECTORY.SUBDIRECTORY", file => "FILENAME.pm", ext => "EXTENSION"} # \> $USER:[DIRECTORY.SUBDIRECTORY]FILENAME.EXTENSION';
+}
+
+{
+    local $^O = "VOS";
+
+    my $path = {
+        path    => "%sysname#module1>SubDir>File.txt",
+        dir     => "%sysname#module1>SubDir>",
+        volume  => "%sysname#module1>",
+        sysname => "sysname",
+        module  => "module1",
+        folder  => "SubDir",
+        file    => "File.txt",
+        name    => "File",
+        ext     => "txt",
+    };
+
+::is_deeply scalar do {path $path->{path}}, scalar do {$path}, '    path $path->{path} # --> $path';
+
+::is scalar do {path {volume => "%sysname#module1>", file => "File.pm", ext => "txt"}}, "%sysname#module1>File.txt", '    path {volume => "%sysname#module1>", file => "File.pm", ext => "txt"} # => %sysname#module1>File.txt';
+::is scalar do {path {module => "module1", file => "File.pm"}}, "%#module1>File.pm", '    path {module => "module1", file => "File.pm"} # => %#module1>File.pm';
+::is scalar do {path {sysname => "sysname", file => "File.pm"}}, "%sysname#>File.pm", '    path {sysname => "sysname", file => "File.pm"} # => %sysname#>File.pm';
+::is scalar do {path {dir => "dir>subdir>", file => "File.pm", ext => "txt"}}, "dir>subdir>File.txt", '    path {dir => "dir>subdir>", file => "File.pm", ext => "txt"} # => dir>subdir>File.txt';
+}
+
+{
+    local $^O = "riscos";
+
+    my $path = {
+        path   => 'Filesystem#Special_Field::DiskName.$.Directory.Directory.File/Ext/Ext',
+        dir    => 'Filesystem#Special_Field::DiskName.$.Directory.Directory.',
+        volume => 'Filesystem#Special_Field::DiskName.',
+        fstype => "Filesystem",
+        option => "Special_Field",
+        disk   => "DiskName",
+        folder => '$.Directory.Directory',
+        file   => "File/Ext/Ext",
+        name   => "File",
+        ext    => "Ext/Ext",
+    };
+
+::is_deeply scalar do {path $path->{path}}, scalar do {$path}, '    path $path->{path} # --> $path';
+
+    $path = {
+        path => '.$.Directory.Directory.',
+        dir => '.$.Directory.Directory.',
+        folder => '.$.Directory.Directory',
+    };
+
+::is_deeply scalar do {path '.$.Directory.Directory.'}, scalar do {$path}, '    path \'.$.Directory.Directory.\' # --> $path';
+
+::is scalar do {path {volume => "ADFS::HardDisk.", file => "File"}}, "ADFS::HardDisk.$.File", '    path {volume => "ADFS::HardDisk.", file => "File"} # => ADFS::HardDisk.$.File';
+::is scalar do {path {folder => "x"}}, "x.", '    path {folder => "x"}  # => x.';
+::is scalar do {path {dir    => "x."}}, "x.", '    path {dir    => "x."} # => x.';
+}
+
+{
+    local $^O = "MacOS";
+
+    my $path = {
+        path   => '::::mix:report.doc',
+        dir    => "::::mix:",
+        folder => ":::mix",
+        file   => "report.doc",
+        name   => "report",
+        ext    => "doc",
+    };
+
+::is_deeply scalar do {path $path->{path}}, scalar do {$path}, '    path $path->{path} # --> $path';
+::is scalar do {path $path}, "$path->{path}", '    path $path         # => $path->{path}';
+
+::is_deeply scalar do {path 'report'}, scalar do {{path => 'report', file => 'report', name => 'report'}}, '    path \'report\' # --> {path => \'report\', file => \'report\', name => \'report\'}';
+
+::is scalar do {path {volume => "x", file => "f"}}, "x:f", '    path {volume => "x", file => "f"} # => x:f';
+::is scalar do {path {folder => "x"}}, "x:", '    path {folder => "x"} # => x:';
+}
+
+{
+    local $^O = "vmesa";
+
+    my $path = {
+        path   => ' USERID   FILE EXT   VOLUME ',
+        userid => "USERID",
+        file   => "FILE EXT",
+        name   => "FILE",
+        ext    => "EXT",
+        volume => "VOLUME",
+    };
+
+::is_deeply scalar do {path $path->{path}}, scalar do {$path}, '    path $path->{path} # --> $path';
+
+::is scalar do {path {volume => "x", file => "f"}}, scalar do{' f  x'}, '    path {volume => "x", file => "f"} # -> \' f  x\'';
+}
+
 
 # 
-# **См. также:**
+# ### See also
 # 
-# * <File::Spec> – `($volume, $directories, $file) = File::Spec->splitpath($path)`.
+# * https://en.wikipedia.org/wiki/Path_(computing)
+# 
+# Модули для определения ОС, а значит и определения, какие в ОС файловые пути:
+# 
+# * `$^O` – суперглобальная переменная с названием текущей ОС.
+# * <Devel::CheckOS>, <Perl::OSType> – определяют ОС.
+# * <Devel::AssertOS> – запрещает использовать модуль вне указанных ОС.
+# * <System::Info> – информация об ОС, её версии, дистрибутиве, CPU и хосте.
+# 
+# Выделяют части файловых путей:
+# 
+# * <File::Spec> – `($volume, $directories, $file) = File::Spec->splitpath($path)`. Поддерживает только unix, win32, os/2, vms, cygwin и amigaos.
+# * <File::Spec::Functions> – `($volume, $directories, $file) = splitpath($path)`.
+# * <File::Spec::Mac> – входит в <File::Spec>, но не определяется им, поэтому приходится использовать отдельно. Для mac os по 9-ю версию.
 # * <File::Basename> – `($name, $path, $suffix) = fileparse($fullname, @suffixlist)`.
 # * <Path::Class::File> – `file('foo', 'bar.txt')->is_absolute`.
-# * <Path::Extended::File> – `Path::Extended::File->new('path/to/file')->basename`.
+# * <Path::Extended::File> – `Path::Extended::File->new($file)->basename`.
+# * <Mojo::File> – `path($file)->extname`.
+# * <Path::Util> – `$filename = basename($dir)`.
 # * <Parse::Path> – `Parse::Path->new(path => 'gophers[0].food.count', style => 'DZIL')->push("chunk")`. Работает с путями как с массивами (`push`, `pop`, `shift`, `splice`). Так же перегружает операторы сравнения. У него есть стили: `DZIL`, `File::Unix`, `File::Win32`, `PerlClass` и `PerlClassUTF8`.
+# 
+# ## transpath ($path?, $from, $to)
+# 
+# Переводит путь из формата одной ОС в другую.
+# 
+# Если `$path` не указан, то используется `$_`.
+# 
+# Перечень поддерживаемых ОС смотрите в примерах подпрограммы `path` чуть выше или так: `keys %Aion::Fs::FS`.
+# 
+# Названия ОС – регистронезависимы.
+# 
+done_testing; }; subtest 'transpath ($path?, $from, $to)' => sub { 
+local $_ = ">x>y>z.doc.zip";
+::is scalar do {transpath "vos", "unix"}, '/x/y/z.doc.zip', 'transpath "vos", "unix"       # \> /x/y/z.doc.zip';
+::is scalar do {transpath "vos", "VMS"}, '[.x.y]z.doc.zip', 'transpath "vos", "VMS"        # \> [.x.y]z.doc.zip';
+::is scalar do {transpath $_, "vos", "RiscOS"}, '.x.y.z/doc/zip', 'transpath $_, "vos", "RiscOS" # \> .x.y.z/doc/zip';
+
+# 
+# 
+# ## splitdir (;$dir)
+# 
+# Разбивает директорию на составляющие. Директорию следует вначале получить из `path->{dir}`.
+# 
+done_testing; }; subtest 'splitdir (;$dir)' => sub { 
+local $^O = "unix";
+::is_deeply scalar do {[ splitdir "/x/" ]}, scalar do {["", "x", ""]}, '[ splitdir "/x/" ]    # --> ["", "x", ""]';
+
+# 
+# ## joindir (;$dirparts)
+# 
+# Объединяет директорию из составляющих. Затем полученную директорию следует включить в `path +{dir => $dir}`.
+# 
+done_testing; }; subtest 'joindir (;$dirparts)' => sub { 
+local $^O = "unix";
+::is scalar do {joindir qw/x y z/}, "x/y/z", 'joindir qw/x y z/    # => x/y/z';
+
+::is scalar do {path +{ dir => joindir qw/x y z/ }}, "x/y/z/", 'path +{ dir => joindir qw/x y z/ } # => x/y/z/';
+
+# 
+# ## splitext (;$ext)
+# 
+# Разбивает расширение на составляющие. Расширение следует вначале получить из `path->{ext}`.
+# 
+done_testing; }; subtest 'splitext (;$ext)' => sub { 
+local $^O = "unix";
+::is_deeply scalar do {[ splitext ".x." ]}, scalar do {["", "x", ""]}, '[ splitext ".x." ]    # --> ["", "x", ""]';
+
+# 
+# ## joinext (;$extparts)
+# 
+# Объединяет расширение из составляющих. Затем полученное расширение следует включить в `path +{ext => $ext}`.
+# 
+done_testing; }; subtest 'joinext (;$extparts)' => sub { 
+local $^O = "unix";
+::is scalar do {joinext qw/x y z/}, "x.y.z", 'joinext qw/x y z/    # => x.y.z';
+
+::is scalar do {path +{ ext => joinext qw/x y z/ }}, ".x.y.z", 'path +{ ext => joinext qw/x y z/ } # => .x.y.z';
+
 # 
 # ## include (;$pkg)
 # 
@@ -408,7 +703,7 @@ done_testing; }; subtest 'wildcard (;$wildcard)' => sub {
 # 
 # Используется в фильтрах функции `find`.
 # 
-# **См. также:**
+# ### See also
 # 
 # * <File::Wildcard>.
 # * <String::Wildcard::Bash>.

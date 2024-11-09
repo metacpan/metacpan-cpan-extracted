@@ -3,8 +3,9 @@ use 5.020;
 use Test2::V0 -no_srand;
 use XML::LibXML;
 use RecentInfo::Manager::XBEL;
-use experimental 'try', 'signatures';
+use experimental 'signatures';
 use stable 'postderef';
+use Try::Tiny;
 
 # Do some roundtrip tests
 
@@ -27,10 +28,11 @@ sub valid_xml( $xml, $msg ) {
     try {
         $xmlschema->validate( $doc );
         pass($msg);
-    } catch( $e ) {
+    } catch {
+        my $e = $_;
         diag $e;
         fail($msg);
-    }
+    };
 }
 
 for my $test (@tests) {

@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::Explain;
-$DBIx::Class::Helper::ResultSet::Explain::VERSION = '2.036000';
+$DBIx::Class::Helper::ResultSet::Explain::VERSION = '2.037000';
 # ABSTRACT: Get query plan for a ResultSet
 
 use strict;
@@ -116,8 +116,8 @@ to your entire schema.
      0,
      10,
      0,
-     "",
-     "00",
+     undef,
+     0,
      undef,
    ],
    [
@@ -127,7 +127,7 @@ to your entire schema.
      3,
      0,
      4,
-     "00",
+     0,
      undef,
    ],
    [
@@ -136,8 +136,8 @@ to your entire schema.
      0,
      9,
      0,
-     "",
-     "00",
+     undef,
+     0,
      undef,
    ],
    [
@@ -146,8 +146,8 @@ to your entire schema.
      0,
      1,
      0,
-     "",
-     "00",
+     undef,
+     0,
      undef,
    ],
    [
@@ -156,8 +156,8 @@ to your entire schema.
      0,
      1,
      2,
-     "",
-     "00",
+     undef,
+     0,
      undef,
    ],
    [
@@ -166,8 +166,8 @@ to your entire schema.
      0,
      2,
      3,
-     "",
-     "00",
+     undef,
+     0,
      undef,
    ],
    [
@@ -176,8 +176,8 @@ to your entire schema.
      0,
      3,
      4,
-     "",
-     "00",
+     undef,
+     0,
      undef,
    ],
    [
@@ -186,8 +186,8 @@ to your entire schema.
      1,
      4,
      0,
-     "",
-     "00",
+     undef,
+     0,
      undef,
    ],
    [
@@ -196,8 +196,8 @@ to your entire schema.
      0,
      3,
      0,
-     "",
-     "01",
+     undef,
+     1,
      undef,
    ],
    [
@@ -206,8 +206,8 @@ to your entire schema.
      0,
      0,
      0,
-     "",
-     "00",
+     undef,
+     0,
      undef,
    ],
    [
@@ -217,7 +217,7 @@ to your entire schema.
      0,
      17,
      0,
-     "01",
+     1,
      undef,
    ],
    [
@@ -226,8 +226,8 @@ to your entire schema.
      0,
      1,
      0,
-     "",
-     "00",
+     undef,
+     0,
      undef,
    ],
  ]
@@ -236,13 +236,13 @@ to your entire schema.
 
  [
    [
-     "Seq Scan on \"Gnarly\" me  (cost=0.00..16.20 rows=620 width=100) (actual time=0.002..0.002 rows=0 loops=1)",
+     "Seq Scan on \"Gnarly\" me  (cost=0.00..16.20 rows=620 width=100) (actual time=0.003..0.003 rows=0 loops=1)",
    ],
    [
-     "Planning time: 0.182 ms",
+     "Planning time: 0.102 ms",
    ],
    [
-     "Execution time: 0.037 ms",
+     "Execution time: 0.023 ms",
    ],
  ]
 
@@ -270,7 +270,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,7 +2,7 @@ package Net::Async::Redis::Cluster::Node;
 use Object::Pad;
 class Net::Async::Redis::Cluster::Node :isa(IO::Async::Notifier);
 
-our $VERSION = '6.004'; # VERSION
+our $VERSION = '6.005'; # VERSION
 
 use Net::Async::Redis::Cluster::Replica;
 use Scalar::Util qw(refaddr blessed);

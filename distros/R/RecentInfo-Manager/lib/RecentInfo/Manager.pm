@@ -1,6 +1,6 @@
-package RecentInfo::Manager 0.03;
+package RecentInfo::Manager 0.04;
 use 5.020;
-use experimental 'signatures';
+use experimental 'signatures', 'postderef';
 
 use Exporter 'import';
 use Module::Load;

@@ -1,7 +1,7 @@
 ##############################################################################
 #
 #  Data::Tools::Time perl module
-#  Copyright (c) 2013-2022 Vladi Belperchinov-Shabanski "Cade" 
+#  Copyright (c) 2013-2024 Vladi Belperchinov-Shabanski "Cade" 
 #        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
 #  http://cade.noxrun.com/  
 #
@@ -16,7 +16,7 @@ use Data::Tools;
 use Date::Calc qw(:all);
 use Time::JulianDay;
 
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -40,6 +40,8 @@ our @EXPORT = qw(
                 julian_date_from_ymd
                 julian_date_from_md
 
+                julian_date_goto_first_dow
+                julian_date_goto_last_dow
                 julian_date_goto_first_dom
                 julian_date_goto_last_dom
                 julian_date_goto_first_doy
@@ -52,10 +54,16 @@ our @EXPORT = qw(
                 julian_date_month_days
 
                 julian_date_to_iso
+                julian_date_from_iso
 
                 utime_from_julian_date
                 utime_from_ymdhms
                 utime_to_ymdhms
+                
+                utime_to_iso
+                utime_from_iso
+                utime_to_iso_ext
+                utime_from_iso_ext
                 
                 utime_split_to_jdt
                 utime_split_to_utt
@@ -69,12 +77,16 @@ our @EXPORT = qw(
                 utime_month_days
 
                 utime_goto_midnight
+                utime_goto_first_dow
+                utime_goto_last_dow
                 utime_goto_first_dom
                 utime_goto_last_dom
                 utime_goto_first_doy
                 utime_goto_last_doy
+
                 utime_get_dow
                 utime_get_moy
+                utime_get_woy
                 
                 );
 
@@ -352,6 +364,22 @@ sub julian_date_from_md
   return abs( $cd - $now ) < abs( $od - $now ) ? $cd : $od;
 }
 
+# return julian date, moved to the first day of its week (starting Mon=1 as in ISO8601)
+sub julian_date_goto_first_dow
+{
+  my $wd = shift; # original/work date
+  
+  return $wd - ( julian_date_get_dow( $wd ) - 1 );
+}
+
+# return julian date, moved to the last day of its week (ending Sun=7 as in ISO8601)
+sub julian_date_goto_last_dow
+{
+  my $wd = shift; # original/work date
+
+  return $wd + 7 - julian_date_get_dow( $wd );
+}
+
 # return julian date, moved to the first day of its month
 sub julian_date_goto_first_dom
 {
@@ -415,12 +443,15 @@ sub julian_date_get_year
   return $y;
 }
 
-# return day of the week, for julian date -- 0 Sun .. 6 Sat
+# return day of the week, for julian date -- 1 Mon .. 7 Sun
 sub julian_date_get_dow
 {
   my $d = shift; # original date
 
-  return day_of_week( $d );
+  my $dow = day_of_week( $d ); # this returns Sun=0 ... Sat=6, but...
+
+  return 7 if $dow == 0; # return Sun=7 as in ISO8601
+  return $dow;           # return Mon=1 as in ISO8601
 }
 
 # return month days count for given ( year, month ) (not strictly julian_ namespace)
@@ -459,9 +490,34 @@ sub utime_from_ymdhms
   return Mktime( @args[ 0 .. 5 ] );
 }
 
+# TODO: handle TZ
 sub utime_to_ymdhms
 {
   return Localtime( shift() );
+}
+
+# NOTE: returns date/time string without timezone
+
+# convert to basic format
+sub utime_to_iso
+{
+  return sprintf("%04d%02d%02dT%02d%02d%02d", utime_to_ymdhms( shift() ) );
+}
+
+# convert to extended format
+sub utime_to_iso_ext
+{
+  return sprintf("%04d-%02d-%02dT%02d:%02d:%02d", utime_to_ymdhms( shift() ) );
+}
+
+# converts basic iso format to utime
+sub utime_from_iso
+{
+}
+
+# converts extended iso format to utime
+sub utime_from_iso_ext
+{
 }
 
 # returns local julian day and time from unix time
@@ -537,6 +593,22 @@ sub utime_goto_midnight
   return ( utime_split_to_utt( shift() ) )[0];
 }
 
+# return unix time, moved to the midnight of the first day of its week (starting Mon=1 as in ISO8601)
+sub utime_goto_first_dow
+{
+  my $tt = shift;
+  
+  return utime_goto_midnight( $tt - ( utime_get_dow( $tt ) - 1 ) * 24 * 3600 );
+}
+
+# return unix time, moved to the midnight of the last day of its week (ending Sun=7 as in ISO8601)
+sub utime_goto_last_dow
+{
+  my $tt = shift;
+
+  return utime_goto_midnight( $tt + ( 7 - utime_get_dow( $tt ) ) * 24 * 3600 );
+}
+
 sub utime_goto_first_dom
 {
   my $tt = shift;
@@ -577,6 +649,14 @@ sub utime_get_moy
   my $tt = shift;
   my ( $year, $month, $day, $hour, $min, $sec ) = Localtime( $tt );
   return $month;
+}
+
+sub utime_get_woy
+{
+  my $tt = shift;
+  my ( $year, $month, $day, $hour, $min, $sec ) = Localtime( $tt );
+  my ( $week, $year ) = Week_of_Year( $year, $month, $day );
+  return wantarray ? ( $week, $year ) : $week;
 }
 
 ##############################################################################

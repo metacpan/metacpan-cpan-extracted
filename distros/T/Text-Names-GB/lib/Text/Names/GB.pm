@@ -73,11 +73,11 @@ Text::Names::GB - Perl extension for proper name parsing, normalization, recogni
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -98,36 +98,22 @@ that's probably true in most other countries as well.
 sub guessGender {
 	my $name = uc(shift);
 
-	if($name eq 'BERTIE') {
-		return 'M';
-	}
-	if($name eq 'BARRIE') {
-		return 'M';
-	}
-	if($name eq 'KAI') {
-		return 'M';
-	}
-	if($name eq 'REECE') {
-		return 'M';
-	}
-	if($name eq 'RITCHIE') {
-		return 'M';
-	}
-	if($name eq 'OLLIE') {
-		return 'M';
-	}
-	if($name eq 'BEATON') {
-		return 'M';
-	}
-	if($name eq 'CALLUM') {
-		return 'M';
-	}
-	if($name eq 'STACEY') {
-		return 'F';
-	}
-	if($name eq 'ZARA') {
-		return 'F';
-	}
+	my %gender_map = (
+		'BERTIE'  => 'M',
+		'BARRIE'  => 'M',
+		'KAI'     => 'M',
+		'REECE'   => 'M',
+		'RITCHIE' => 'M',
+		'OLLIE'   => 'M',
+		'BEATON'  => 'M',
+		'CALLUM'  => 'M',
+		'STACEY'  => 'F',
+		'ZARA'    => 'F'
+	);
+
+	return $gender_map{$name} if exists $gender_map{$name};
+
+	# Fallback to guessGender if the name is not in the map
 	# return $self->SUPER::guessGender($name);
 	return Text::Names::guessGender($name);
 }
@@ -158,14 +144,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Names-GB>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Text-Names-GB>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Text-Names-GB>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Text-Names-GB/>
@@ -174,7 +152,7 @@ L<http://search.cpan.org/dist/Text-Names-GB/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2019 Nigel Horne.
+Copyright 2017-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

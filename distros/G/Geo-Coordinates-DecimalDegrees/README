@@ -81,10 +81,10 @@ CAVEATS
     ahead.
 
 AUTHOR
-    Walt Mankowski, <waltman@cpan.org>
+    Walt Mankowski, <waltman@pobox.com>
 
 COPYRIGHT AND LICENSE
-    Copyright 2003-2011 by Walt Mankowski
+    Copyright 2003-2024 by Walt Mankowski
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

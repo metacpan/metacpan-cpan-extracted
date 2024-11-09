@@ -8,3 +8,7 @@ Revision history for Parse-Lnk
         Improved documentation.
 0.06    2021-05-02
         Added missing information in the ACKNOWLEDGEMENTS section of POD.
+0.08    2024-11-09
+        Changed the way bigint hex is loaded to avoid external conflicts.
+0.10    2024-11-09
+        Fixed previously broken distribution file.

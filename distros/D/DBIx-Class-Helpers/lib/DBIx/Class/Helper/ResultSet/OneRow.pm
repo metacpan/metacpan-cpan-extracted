@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::OneRow;
-$DBIx::Class::Helper::ResultSet::OneRow::VERSION = '2.036000';
+$DBIx::Class::Helper::ResultSet::OneRow::VERSION = '2.037000';
 # ABSTRACT: The first you always wanted
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'DBIx::Class::ResultSet';
 
-sub one_row { shift->search(undef, { rows => 1})->next }
+sub one_row { shift->search(shift, { rows => 1})->next }
 
 1;
 
@@ -60,16 +60,18 @@ default.
 
 =head1 METHODS
 
-=head2 one_row
+=head2 one_row($cond?)
 
 Limits the ResultSet to a single row, and then returns the matching result
 object. In case no rows match, C<undef> is returned as normal.
+
+The optional C<$cond> argument can be used like in C<search()>.
 
 =head1 THANKS
 
 Thanks to Aran Clary Deltac (BLUEFEET) for initially writing this module, and
 thanks to L<ZipRecruiter|https://www.ziprecruiter.com> for sponsoring that
-initial developmentl
+initial development.
 
 =head1 AUTHOR
 
@@ -77,7 +79,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

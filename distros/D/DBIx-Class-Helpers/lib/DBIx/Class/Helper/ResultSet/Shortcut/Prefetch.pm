@@ -1,11 +1,11 @@
 package DBIx::Class::Helper::ResultSet::Shortcut::Prefetch;
-$DBIx::Class::Helper::ResultSet::Shortcut::Prefetch::VERSION = '2.036000';
+$DBIx::Class::Helper::ResultSet::Shortcut::Prefetch::VERSION = '2.037000';
 use strict;
 use warnings;
 
 use parent 'DBIx::Class::ResultSet';
 
-sub prefetch { return shift->search(undef, { prefetch => shift }) }
+sub prefetch { return shift->search(undef, { prefetch => @_ > 1 ? \@_ : shift }) }
 
 1;
 
@@ -23,7 +23,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

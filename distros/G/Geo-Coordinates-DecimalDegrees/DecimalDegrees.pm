@@ -9,7 +9,7 @@ require Carp;
 
 @EXPORT = qw( decimal2dms decimal2dm dms2decimal dm2decimal );
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 use strict;
 use warnings;
@@ -154,14 +154,14 @@ right ahead.
 
 =head1 AUTHOR
 
-Walt Mankowski, E<lt>waltman@cpan.orgE<gt>
+Walt Mankowski, E<lt>waltman@pobox.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2003-2011 by Walt Mankowski
+Copyright 2003-2024 by Walt Mankowski
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =head1 THANKS
 

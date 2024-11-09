@@ -1,0 +1,12 @@
+Changes
+lib/Random/Simple.pm
+lib/Random/Simple.xs
+lib/Random/pcg.h
+lib/Random/xorshiro.h
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-general.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

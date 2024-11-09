@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v1.0.4
+## Version v1.1.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2024/10/03
+## Modified 2024/11/09
 ## All rights reserved
 ## 
 ## 
@@ -14,7 +14,7 @@
 package Locale::Unicode::Data;
 BEGIN
 {
-    use v5.10;
+    use v5.10.1;
     use strict;
     use warnings;
     use warnings::register;
@@ -39,7 +39,7 @@ BEGIN
     our $CLDR_VERSION = '45.0';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.0.4';
+    our $VERSION = 'v1.1.0';
 };
 
 sub INIT
@@ -550,9 +550,9 @@ sub date_fields_l10n { return( shift->_fetch_all({
 
 sub date_term { return( shift->_fetch_one({
     id          => 'get_date_term',
-    field       => 'display_name',
+    field       => 'term_type',
     table       => 'date_terms',
-    requires    => [qw( locale term_type term_length )],
+    requires    => [qw( locale term_length )],
 }, @_ ) ); }
 
 sub date_terms { return( shift->_fetch_all({
@@ -2869,6 +2869,7 @@ BEGIN
 };
 use strict;
 use warnings;
+use overloading;
 
 sub new
 {
@@ -3735,7 +3736,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.0.4
+    v1.1.0
 
 =head1 DESCRIPTION
 
@@ -5536,7 +5537,7 @@ An American standard
 
 =item * C<type>
 
-The mapping <type>
+The mapping C<type>
 
 =back
 
@@ -10043,6 +10044,8 @@ Returns all the week preferences information as an array reference of hash refer
 =head1 Format Patterns
 
 The following is taken directly from the L<Unicode LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#table-date-field-symbol-table> and placed here for your convenience.
+
+See also the L<ICU format patterns table|https://unicode-org.github.io/icu/userguide/format_parse/datetime/#date-field-symbol-table>.
 
 Examples:
 

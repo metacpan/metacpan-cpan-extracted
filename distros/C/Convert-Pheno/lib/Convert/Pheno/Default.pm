@@ -2,13 +2,13 @@ package Convert::Pheno::Default;
 
 use strict;
 use warnings;
-use Hash::Util 'lock_hash';
+use Hash::Util qw(lock_hash_recurse);
 use Exporter 'import';
 our @EXPORT_OK = qw(get_defaults);
 
 # Define your default values
 my %DEFAULT = (
-    ontology_term => { id => 'NCIT:NA0000', label => 'NA' },
+    ontology_term => { id => 'NCIT:C126101', label => 'Not Available' },
     date          => '1900-01-01',
     duration      => 'P999Y',
     duration_OMOP => 'P0Y',
@@ -28,8 +28,8 @@ $DEFAULT{quantity} = {
     referenceRange => $DEFAULT{referenceRange}
 };
 
-# Lock the hash to make it read-only
-lock_hash(%DEFAULT);
+# Lock the hash recursively to make it read-only
+lock_hash_recurse(%DEFAULT);
 
 # Function to get a reference to the locked default values
 sub get_defaults {

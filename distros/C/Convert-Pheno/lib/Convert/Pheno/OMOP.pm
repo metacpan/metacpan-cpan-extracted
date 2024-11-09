@@ -186,14 +186,16 @@ sub do_omop2bff {
             $disease->{_info}{$table}{OMOP_columns} = $field;
 
             #$disease->{severity} = undef;
-            $disease->{stage} = map2ohdsi(
+            $disease->{stage} = $field->{condition_status_concept_id}
+              ? map2ohdsi(
                 {
                     ohdsi_dict => $ohdsi_dict,
                     concept_id => $field->{condition_status_concept_id},
                     self       => $self
 
                 }
-            ) if defined $field->{condition_status_concept_id};
+              )
+              : $DEFAULT->{ontology_term};
 
             # NB: PROVISIONAL
             # Longitudinal data are not allowed yet in BFF/PXF
@@ -302,14 +304,16 @@ sub do_omop2bff {
                 }
             ) if defined $field->{observation_concept_id};
 
-            my $unit = map2ohdsi(
+            my $unit = $field->{unit_concept_id}
+              ? map2ohdsi(
                 {
                     ohdsi_dict => $ohdsi_dict,
                     concept_id => $field->{unit_concept_id},
                     self       => $self
 
                 }
-            );
+              )
+              : $DEFAULT->{ontology_term};
 
             $exposure->{unit} = $unit;
             $exposure->{value} =
@@ -428,7 +432,7 @@ sub do_omop2bff {
                 }
             };
 
-            #$intervention->{bodySite} = undef;
+            $intervention->{bodySite}        = $DEFAULT->{ontology_term};
             $intervention->{dateOfProcedure} = $field->{procedure_date};
 
             # _info (Autovivification)
@@ -507,63 +511,90 @@ sub do_omop2bff {
         for my $field ( @{ $participant->{$table} } ) {
 
             # FAKE VALUES FOR DEBUG
-            $field->{unit_concept_id}     = 18753   if DEVEL_MODE;
-            $field->{value_as_number}     = 20      if DEVEL_MODE;
-            $field->{operator_concept_id} = 4172756 if DEVEL_MODE;
-
-            # Only proceeding if we have actual values
-            next if $field->{value_as_number} eq '\\N';
+            $field->{unit_concept_id}             = 18753   if DEVEL_MODE;
+            $field->{value_as_number}             = 20      if DEVEL_MODE;
+            $field->{operator_concept_id}         = 4172756 if DEVEL_MODE;
+            $field->{measurement_type_concept_id} = 4024958 if DEVEL_MODE;
+            $field->{value_as_concept_id}         = 18753   if DEVEL_MODE;
 
             my $measure;
 
-            $measure->{assayCode} = map2ohdsi(
-                {
-                    ohdsi_dict => $ohdsi_dict,
-                    concept_id => $field->{measurement_concept_id},
-                    self       => $self
-                }
-            ) if defined $field->{measurement_concept_id};
+            if ( $field->{measurement_concept_id} ) {    # != 0
+                $measure->{assayCode} = map2ohdsi(
+                    {
+                        ohdsi_dict => $ohdsi_dict,
+                        concept_id => $field->{measurement_concept_id},
+                        self       => $self
+                    }
+                );
+            }
+
+            # Set default and move on
+            else {
+                $measure = set_default_measure();
+                next;
+            }
 
             $measure->{date} = $field->{measurement_date};
 
-            my $unit = map2ohdsi(
+            my $unit = $field->{unit_concept_id}
+              ? map2ohdsi(
                 {
                     ohdsi_dict => $ohdsi_dict,
                     concept_id => $field->{unit_concept_id},
                     self       => $self
 
                 }
-            );
 
-            # *** IMPORTANT ***
-            # We can get value_as_concept_id or as value_as_number
-            # NB: EUNOMIA always -- $field->{value_as_concept_id} = 0;
-            $field->{value_as_concept_id} = 18753 if DEVEL_MODE;
+                #) : $DEFAULT->{ontology_term};
 
-            $measure->{measurementValue} =
-              $field->{value_as_concept_id} ? map2ohdsi(
-                {
-                    ohdsi_dict => $ohdsi_dict,
-                    concept_id => $field->{value_as_concept_id},
-                    self       => $self
-                }
               )
               : {
-                quantity => {
-                    unit           => $unit,
-                    value          => $field->{value_as_number},
-                    referenceRange => $field->{operator_concept_id}
-                    ? map_operator_concept_id(
-                        {
-                            operator_concept_id =>
-                              $field->{operator_concept_id},
-                            value_as_number => $field->{value_as_number},
-                            unit            => $unit
-                        }
-                      )
-                    : undef
+                id    => "NCIT:C126101",
+                label => "Not Available"
+              },
+
+              # *** IMPORTANT ***
+              # We can get value_as_concept_id or as value_as_number
+              # NB: EUNOMIA always -- $field->{value_as_concept_id} = 0;
+
+              my $measurement_value;
+
+            if ( $field->{value_as_concept_id} ) {
+                $measurement_value = map2ohdsi(
+                    {
+                        ohdsi_dict => $ohdsi_dict,
+                        concept_id => $field->{value_as_concept_id},
+                        self       => $self
+                    }
+                );
+            }
+            else {
+                if ( $field->{value_as_number} eq '\\N' ) {
+                    $measurement_value = { quantity => $DEFAULT->{quantity} };
                 }
-              };
+                else {
+                    $measurement_value = {
+                        quantity => {
+                            unit           => $unit,
+                            value          => $field->{value_as_number},
+                            referenceRange => $field->{operator_concept_id}
+                            ? map_operator_concept_id(
+                                {
+                                    operator_concept_id =>
+                                      $field->{operator_concept_id},
+                                    value_as_number =>
+                                      $field->{value_as_number},
+                                    unit => $unit
+                                }
+                              )
+                            : undef
+                        }
+                    };
+                }
+            }
+
+            $measure->{measurementValue} = $measurement_value;
 
             # notes MUST be string
             # _info (Autovivification)
@@ -578,7 +609,20 @@ sub do_omop2bff {
                     )
                 }
             };
-            $measure->{procedure} = { procedureCode => $measure->{assayCode} };
+
+            # procedure
+            $measure->{procedure}{ageAtProcedure} =
+              $measure->{observationMoment};
+            $measure->{procedure}{bodySite}        = $DEFAULT->{ontology_term};
+            $measure->{procedure}{dateOfProcedure} = $field->{measurement_date};
+            $measure->{procedure}{procedureCode}   = map2ohdsi(
+                {
+                    ohdsi_dict => $ohdsi_dict,
+                    concept_id => $field->{measurement_type_concept_id},
+                    self       => $self
+
+                }
+            );
 
             # NB: PROVISIONAL
             # Longitudinal data are not allowed yet in BFF/PXF
@@ -876,4 +920,15 @@ sub avoid_seen_individuals {
       0
       ; # The individual does not match the expected keys and is treated as non-duplicate
 }
+
+sub set_default_measure {
+
+    return {
+        assayCode        => $DEFAULT->{ontology_term},
+        date             => $DEFAULT->{date},
+        measurementValue => $DEFAULT->{quantity},
+        procedure        => $DEFAULT->{ontology_term}
+    };
+}
+
 1;

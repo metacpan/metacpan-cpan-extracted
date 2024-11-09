@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 01-resolver.t 1980 2024-06-02 10:16:33Z willem $	-*-perl-*-
+# $Id: 01-resolver.t 1993 2024-11-07 14:06:53Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -7,12 +7,18 @@ use warnings;
 use Test::More tests => 38;
 use TestToolkit;
 
-use Net::DNS::Resolver;
-use Net::DNS::Resolver::Recurse;
-
-{					## off-line dry tests
+BEGIN {					## off-line dry tests
+	require Net::DNS::Resolver;
 
 	package Net::DNS::Resolver;
+	sub _create_tcp_socket {return}	## stub
+	sub _create_udp_socket {return}	## stub
+}
+
+BEGIN {					## off-line dry tests
+	require Net::DNS::Resolver::Recurse;
+
+	package Net::DNS::Resolver::Recurse;
 	sub _create_tcp_socket {return}	## stub
 	sub _create_udp_socket {return}	## stub
 }

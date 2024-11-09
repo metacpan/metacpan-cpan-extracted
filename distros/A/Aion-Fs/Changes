@@ -1,5 +1,9 @@
 Revision history for Perl extension Aion::Fs
 
+0.0.8 2024-11-08T16:27:58Z
+
+    - add subroutines "path" and "transpath" with more OS
+
 0.0.7 2024-09-17T22:22:33Z
 
     - add subroutines path and sta. sta while on ro

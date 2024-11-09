@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.21.0';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -594,6 +594,7 @@ sub logout_app_sso {
 sub aliasInit {
     my ( $class, $conf ) = @_;
 
+    delete $class->tsv->{vhostAlias};
     foreach my $vhost ( keys %{ $conf->{vhostOptions} || {} } ) {
         if ( my $aliases = $conf->{vhostOptions}->{$vhost}->{vhostAliases} ) {
             foreach ( split /\s+/, $aliases ) {

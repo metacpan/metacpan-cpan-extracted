@@ -1,4 +1,4 @@
-requires 'Full::Class', '>= 1.000';
+requires 'Full::Class', '>= 1.004';
 requires 'parent', 0;
 requires 'curry', 0;
 requires 'Path::Tiny', 0;

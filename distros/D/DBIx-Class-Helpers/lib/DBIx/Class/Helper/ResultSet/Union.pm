@@ -1,12 +1,12 @@
 package DBIx::Class::Helper::ResultSet::Union;
-$DBIx::Class::Helper::ResultSet::Union::VERSION = '2.036000';
+$DBIx::Class::Helper::ResultSet::Union::VERSION = '2.037000';
 use parent 'DBIx::Class::Helper::ResultSet::SetOperations';
 
 use Carp::Clan;
 carp 'This module is deprecated!  Please use the namespaced version instead!' if $VERSION >= 3;
 croak 'This module is deprecated!  Please use the namespaced version instead!' if $VERSION >= 4;
 
-# ABSTRACT: (DEPRECATED) Get rid of search context issues
+# ABSTRACT: (DEPRECATED) Do unions with DBIx::Class
 
 1;
 
@@ -16,7 +16,7 @@ __END__
 
 =head1 NAME
 
-DBIx::Class::Helper::ResultSet::Union - (DEPRECATED) Get rid of search context issues
+DBIx::Class::Helper::ResultSet::Union - (DEPRECATED) Do unions with DBIx::Class
 
 =head1 DESCRIPTION
 
@@ -31,7 +31,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

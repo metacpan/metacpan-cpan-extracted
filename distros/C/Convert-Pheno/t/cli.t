@@ -111,13 +111,14 @@ my $input = {
     }
 };
 
-#for my $method (qw/pxf2csv/) {
-for my $method ( sort keys %{$input} ) {
+for my $method (sort keys %{$input}) {
+
     $method = $method eq 'pxf2bff_yaml' ? 'pxf2bff' : $method;
 
     # Create Temporary file
     my ( undef, $tmp_file ) =
       tempfile( DIR => 't', SUFFIX => ".json", UNLINK => 1 );
+
     my $convert = Convert::Pheno->new(
         {
             in_file  => $input->{$method}{in_file},
@@ -138,6 +139,7 @@ for my $method ( sort keys %{$input} ) {
             method               => $method
         }
     );
+
   SKIP: {
 
         # Fails
@@ -176,7 +178,7 @@ qq{Files <$input->{$method}{out}> <$tmp_file> are supposedly identical yet compa
             $convert->$method;
         }
 
-        # Compare the files
+        # If the test fails compare the actual content
         if ( compare( $input->{$method}{out}, $tmp_file ) != 0 ) {
             my $expected_content = read_file( $input->{$method}{out} );
             my $actual_content   = read_file($tmp_file);
@@ -191,12 +193,18 @@ qq{Files <$input->{$method}{out}> <$tmp_file> are supposedly identical yet compa
             cmp_deeply( $actual_json, $expected_json,
                 "Check if actual output matches expected for $method" );
         }
+
+        # This is the one
         ok( compare( $input->{$method}{out}, $tmp_file ) == 0, $method );
-        unlink($tmp_file) if -f $tmp_file;
+
+        # Delete *.json.csv
+        unlink($tmp_file) if $tmp_file =~ m/\.json\.csv$/ && -e $tmp_file;
     }
+
 }
 
 sub read_file {
+
     my ($file) = @_;
     open my $fh, '<', $file or die "Could not open file '$file': $!";
     local $/;

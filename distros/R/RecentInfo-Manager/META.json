@@ -53,7 +53,8 @@
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "0"
+            "Test2::V0" : "0",
+            "Try::Tiny" : "0"
          }
       }
    },
@@ -71,7 +72,7 @@
          "web" : "https://github.com/Corion/RecentInfo-Manager"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

@@ -1,10 +1,10 @@
-# Log::Log4perl::Layout::RFC3164
+# NAME
 
-Layout in Syslog format
+Log::Log4perl::Layout::Syslog - Layout in Syslog format
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -39,13 +39,13 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 I can't work out how to get the ident given to
 Log::Dispatch::Syslog's constructor,
-so ident (facility in RFC3164 lingo) is always sent to 
+so ident (facility in RFC3164 lingo) is always sent to
 LOG\_USER.
 
 # SEE ALSO
 
-[Log::Log4perl](https://metacpan.org/pod/Log::Log4perl)
-[Log::Dispatch::Syslog](https://metacpan.org/pod/Log::Dispatch::Syslog)
+[Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl)
+[Log::Dispatch::Syslog](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3ASyslog)
 
 # SUPPORT
 
@@ -63,16 +63,12 @@ You can also look for information at:
 
     [http://annocpan.org/dist/Log-Log4perl-Layout-Syslog](http://annocpan.org/dist/Log-Log4perl-Layout-Syslog)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Log-Log4perl-Layout-Syslog](http://cpanratings.perl.org/d/Log-Log4perl-Layout-Syslog)
-
 - Search CPAN
 
     [http://search.cpan.org/dist/Log-Log4perl-Layout-Syslog/](http://search.cpan.org/dist/Log-Log4perl-Layout-Syslog/)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017-2014 Nigel Horne.
 
 This program is released under the following licence: GPL2

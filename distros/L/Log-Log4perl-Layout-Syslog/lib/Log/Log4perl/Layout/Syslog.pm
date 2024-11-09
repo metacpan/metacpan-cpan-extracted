@@ -4,6 +4,8 @@ use 5.006;
 use strict;
 use warnings;
 
+use Scalar::Util;
+
 =encoding utf8
 
 =head1 NAME
@@ -12,11 +14,11 @@ Log::Log4perl::Layout::Syslog - Layout in Syslog format
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -45,8 +47,21 @@ flutentd.
 
 sub new {
 	my $class = shift;
-	$class = ref ($class) || $class;
 
+	if(!defined($class)) {
+		# Using Log::Log4perl::Layout::Syslog->new(), not Log::Log4perl::Layout::Syslog::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
+		# return bless { %{$class}, %args }, ref($class);
+		return bless { %{$class} }, ref($class);
+	}
+
+	# Return the blessed object
 	return bless {
 		info_needed => {},
 		stack       => [],
@@ -100,10 +115,6 @@ L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Log4perl-Layout-Syslog>
 
 L<http://annocpan.org/dist/Log-Log4perl-Layout-Syslog>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Log-Log4perl-Layout-Syslog>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Log-Log4perl-Layout-Syslog/>
@@ -112,7 +123,7 @@ L<http://search.cpan.org/dist/Log-Log4perl-Layout-Syslog/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017-2014 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

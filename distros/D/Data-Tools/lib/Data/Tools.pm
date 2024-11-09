@@ -20,8 +20,9 @@ use Digest::SHA1;
 use MIME::Base64;
 use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
+use Fcntl qw( :flock );
 
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -54,6 +55,12 @@ our @EXPORT = qw(
               file_name
               file_name_ext
               file_ext
+              
+              file_lock
+              file_lock_nb
+              file_lock_ex
+              file_lock_ex_nb
+              file_unlock
 
               dir_path_make
               dir_path_ensure
@@ -417,6 +424,51 @@ sub file_ext
 {
   # return undef for dot-files ( .filename )
   return $_[0] =~ /[^\/]\.([^\.\/]+)$/ ? $1 : undef;
+}
+
+##############################################################################
+
+sub file_lock
+{
+  my $fnh = shift; # file name or file handle
+  my $nb  = shift; # non-blocking
+  my $ex  = shift; # true if exclusive lock
+  
+  my $fh;
+  if( ref $fnh )
+    {
+    # file handle
+    $fh = $fnh;
+    }
+  else  
+    {
+    # filename
+    open( $fh, ( -e $fnh ? ( $ex ? '+<' : '<' ) : ( $ex ? '+>' : '>' ) ), $fnh ) or return undef;
+    }
+
+  my $res = flock( $fh, ( $ex ? LOCK_EX : LOCK_SH ) | ( $nb ? LOCK_NB : 0 ) );
+  return $res ? $fh : undef;
+}
+
+sub file_lock_nb
+{
+  return file_lock( shift(), 1 );
+}
+
+sub file_lock_ex
+{
+  return file_lock( shift(), shift(), 1 );
+}
+
+sub file_lock_ex_nb
+{
+  return file_lock( shift(), 1, 1 );
+}
+
+# needs first arg to be file handle returned from any file_lock* function above
+sub file_unlock
+{
+  return flock( shift(), LOCK_UN );
 }
 
 ##############################################################################

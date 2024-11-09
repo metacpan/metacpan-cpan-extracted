@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::AutoRemoveColumns;
-$DBIx::Class::Helper::ResultSet::AutoRemoveColumns::VERSION = '2.036000';
+$DBIx::Class::Helper::ResultSet::AutoRemoveColumns::VERSION = '2.037000';
 # ABSTRACT: Automatically remove columns from a ResultSet
 
 use strict;
@@ -126,9 +126,11 @@ columns to remove you might override this method like this:
  sub _should_column_fetch {
     my ( $self, $column ) = @_;
 
-    my $info = $self->column_info($column);
+    my $info = $self->result_source->column_info($column);
 
-    return !defined $info->{remove_column} || $info->{remove_column};
+    return exists $info->{remove_column}
+        ? $info->{remove_column}
+        : 0;
  }
 
 =head2 fetchable_columns
@@ -141,7 +143,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

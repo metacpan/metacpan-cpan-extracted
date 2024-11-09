@@ -1,7 +1,7 @@
 ##############################################################################
 #
 #  Data::Tools::CSV perl module
-#  Copyright (c) 2013-2022 Vladi Belperchinov-Shabanski "Cade" 
+#  Copyright (c) 2013-2024 Vladi Belperchinov-Shabanski "Cade" 
 #        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
 #  http://cade.noxrun.com/  
 #
@@ -12,7 +12,7 @@ package Data::Tools::CSV;
 use strict;
 use Exporter;
 
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(

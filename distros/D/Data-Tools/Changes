@@ -1,5 +1,25 @@
 Revision history for Perl extension Data::Tools
 
+1.45 2024-11-08
+
+   - Data::Tools::Time adds new functions:
+                julian_date_goto_first_dow
+                julian_date_goto_last_dow
+                utime_goto_first_dow
+                utime_goto_last_dow
+                julian_date_to_iso
+                julian_date_from_iso
+                utime_to_iso
+                utime_from_iso
+                utime_to_iso_ext
+                utime_from_iso_ext
+                utime_get_woy
+    
+   - added file_lock_*() set of functions to handle advisory locking
+   - added functions for handling pid files: create and remove
+   - pid files creation may act as single process locking
+
+
 1.44 2024-06-08
 
    - added BCD conversion functions

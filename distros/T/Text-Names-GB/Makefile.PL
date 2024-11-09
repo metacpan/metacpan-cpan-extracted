@@ -4,17 +4,27 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
     NAME              => 'Text::Names::GB',
     VERSION_FROM      => 'lib/Text/Names/GB.pm', # finds $VERSION
     PL_FILES            => {},
     TEST_REQUIRES => {
-        'Test::More' => 0.96
-    },
-    PREREQ_PM         => {
+	'Test::Most' => 0,
+    }, PREREQ_PM         => {
         'Text::Capitalize' => 1.1,
+	'Test::DescribeMe' => 0,
         'Text::LevenshteinXS' => 0.03,
         'Text::Names' => 0.46,
+	'Test::Needs' => 0
     }, # e.g., Module::Name => 1.1
     LICENSE => 'perl_5',
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
@@ -28,8 +38,7 @@ WriteMakefile(
               },
           },
         )
-    ),
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    ), dist => $dist,
     clean               => { FILES => 'Text-Names-GB-* t/online.enabled' },
     META_MERGE		=> {
     	'meta-spec' => { version => 2 },

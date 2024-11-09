@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Dir::Self" => 0,
     "File::ShareDir" => 0,
     "File::ShareDir::Install" => 0,
-    "Full::Class" => "1.000",
+    "Full::Class" => "1.004",
     "Future" => "0.51",
     "Future::AsyncAwait" => "0.48",
     "Future::Queue" => "0.50",
@@ -65,7 +65,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Variable::Disposition" => "0.004"
   },
-  "VERSION" => "6.004",
+  "VERSION" => "6.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -81,7 +81,7 @@ my %FallbackPrereqs = (
   "File::ShareDir" => 0,
   "File::ShareDir::Install" => 0,
   "File::Spec" => 0,
-  "Full::Class" => "1.000",
+  "Full::Class" => "1.004",
   "Future" => "0.51",
   "Future::AsyncAwait" => "0.48",
   "Future::Queue" => "0.50",

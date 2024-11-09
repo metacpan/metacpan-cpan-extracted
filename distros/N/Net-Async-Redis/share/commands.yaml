@@ -1,4 +1,2007 @@
 ---
+FT.ADD:
+  acl_cat:
+    '@admin': 1
+    '@search': 1
+    '@write': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.ADD
+  step: 0
+  subcommands: []
+  tips: {}
+FT.AGGREGATE:
+  acl_cat:
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.AGGREGATE
+  step: 0
+  subcommands: []
+  tips: {}
+FT.ALIASADD:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.ALIASADD
+  step: 0
+  subcommands: []
+  tips: {}
+FT.ALIASDEL:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.ALIASDEL
+  step: 0
+  subcommands: []
+  tips: {}
+FT.ALIASUPDATE:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.ALIASUPDATE
+  step: 0
+  subcommands: []
+  tips: {}
+FT.ALTER:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.ALTER
+  step: 0
+  subcommands: []
+  tips: {}
+FT.CONFIG:
+  acl_cat:
+    '@admin': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.CONFIG
+  step: 0
+  subcommands: []
+  tips: {}
+FT.CREATE:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.CREATE
+  step: 0
+  subcommands: []
+  tips: {}
+FT.CURSOR:
+  acl_cat:
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.CURSOR
+  step: 0
+  subcommands: []
+  tips: {}
+FT.DEL:
+  acl_cat:
+    '@admin': 1
+    '@search': 1
+    '@write': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.DEL
+  step: 0
+  subcommands: []
+  tips: {}
+FT.DICTADD:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.DICTADD
+  step: 0
+  subcommands: []
+  tips: {}
+FT.DICTDEL:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.DICTDEL
+  step: 0
+  subcommands: []
+  tips: {}
+FT.DICTDUMP:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.DICTDUMP
+  step: 0
+  subcommands: []
+  tips: {}
+FT.DROP:
+  acl_cat:
+    '@admin': 1
+    '@search': 1
+    '@write': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.DROP
+  step: 0
+  subcommands: []
+  tips: {}
+FT.DROPINDEX:
+  acl_cat:
+    '@dangerous': 1
+    '@search': 1
+    '@slow': 1
+    '@write': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.DROPINDEX
+  step: 0
+  subcommands: []
+  tips: {}
+FT.EXPLAIN:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.EXPLAIN
+  step: 0
+  subcommands: []
+  tips: {}
+FT.EXPLAINCLI:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.EXPLAINCLI
+  step: 0
+  subcommands: []
+  tips: {}
+FT.GET:
+  acl_cat:
+    '@admin': 1
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.GET
+  step: 0
+  subcommands: []
+  tips: {}
+FT.INFO:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.INFO
+  step: 0
+  subcommands: []
+  tips: {}
+FT.MGET:
+  acl_cat:
+    '@admin': 1
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.MGET
+  step: 0
+  subcommands: []
+  tips: {}
+FT.PROFILE:
+  acl_cat:
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.PROFILE
+  step: 0
+  subcommands: []
+  tips: {}
+FT.SEARCH:
+  acl_cat:
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.SEARCH
+  step: 0
+  subcommands: []
+  tips: {}
+FT.SPELLCHECK:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.SPELLCHECK
+  step: 0
+  subcommands: []
+  tips: {}
+FT.SUGADD:
+  acl_cat:
+    '@search': 1
+    '@write': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.SUGADD
+  step: 0
+  subcommands: []
+  tips: {}
+FT.SUGDEL:
+  acl_cat:
+    '@search': 1
+    '@write': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.SUGDEL
+  step: 0
+  subcommands: []
+  tips: {}
+FT.SUGGET:
+  acl_cat:
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.SUGGET
+  step: 0
+  subcommands: []
+  tips: {}
+FT.SUGLEN:
+  acl_cat:
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.SUGLEN
+  step: 0
+  subcommands: []
+  tips: {}
+FT.SYNADD:
+  acl_cat:
+    '@admin': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    write: 1
+  key_spec: []
+  last_key: 0
+  name: FT.SYNADD
+  step: 0
+  subcommands: []
+  tips: {}
+FT.SYNDUMP:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.SYNDUMP
+  step: 0
+  subcommands: []
+  tips: {}
+FT.SYNFORCEUPDATE:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.SYNFORCEUPDATE
+  step: 0
+  subcommands: []
+  tips: {}
+FT.SYNUPDATE:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.SYNUPDATE
+  step: 0
+  subcommands: []
+  tips: {}
+FT.TAGVALS:
+  acl_cat:
+    '@admin': 1
+    '@dangerous': 1
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT.TAGVALS
+  step: 0
+  subcommands: []
+  tips: {}
+FT._ALIASADDIFNX:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT._ALIASADDIFNX
+  step: 0
+  subcommands: []
+  tips: {}
+FT._ALIASDELIFX:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT._ALIASDELIFX
+  step: 0
+  subcommands: []
+  tips: {}
+FT._ALTERIFNX:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT._ALTERIFNX
+  step: 0
+  subcommands: []
+  tips: {}
+FT._CREATEIFNX:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT._CREATEIFNX
+  step: 0
+  subcommands: []
+  tips: {}
+FT._DROPIFX:
+  acl_cat:
+    '@admin': 1
+    '@search': 1
+    '@write': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT._DROPIFX
+  step: 0
+  subcommands: []
+  tips: {}
+FT._DROPINDEXIFX:
+  acl_cat:
+    '@dangerous': 1
+    '@search': 1
+    '@slow': 1
+    '@write': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT._DROPINDEXIFX
+  step: 0
+  subcommands: []
+  tips: {}
+FT._LIST:
+  acl_cat:
+    '@admin': 1
+    '@search': 1
+    '@slow': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: FT._LIST
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.ADD:
+  acl_cat:
+    '@admin': 1
+    '@search': 1
+    '@write': 1
+  arity: -1
+  first_key: 2
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 2
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 2
+  name: _FT.ADD
+  step: 1
+  subcommands: []
+  tips: {}
+_FT.AGGREGATE:
+  acl_cat:
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.AGGREGATE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.ALIASADD:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.ALIASADD
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.ALIASDEL:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.ALIASDEL
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.ALIASUPDATE:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.ALIASUPDATE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.ALTER:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    write: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.ALTER
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.CONFIG:
+  acl_cat:
+    '@admin': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.CONFIG
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.CREATE:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.CREATE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.CURSOR:
+  acl_cat:
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.CURSOR
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG:
+  acl_cat:
+    '@admin': 1
+    '@dangerous': 1
+    '@search': 1
+    '@slow': 1
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG
+  step: 0
+  subcommands:
+  - - _FT.DEBUG|DOCIDTOID
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|DELETE_LOCAL_CURSORS
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|TTL_PAUSE
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|GC_CLEAN_NUMERIC
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|INVIDX_SUMMARY
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|DUMP_NUMIDXTREE
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|DUMP_TAGIDX
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|GC_WAIT_FOR_JOBS
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|GC_FORCEINVOKE
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|GC_FORCEBGINVOKE
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|GC_CONTINUE_SCHEDULE
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|DUMP_HNSW
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|HELP
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|GC_STOP_SCHEDULE
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|TTL_EXPIRE
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|GIT_SHA
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|DUMP_PREFIX_TRIE
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|DUMP_NUMIDX
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|IDTODOCID
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|DUMP_PHONETIC_HASH
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|SHARD_CONNECTION_STATES
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|NUMIDX_SUMMARY
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|TTL
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|DUMP_TERMS
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|PAUSE_TOPOLOGY_UPDATER
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|DUMP_GEOMIDX
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|DOCINFO
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|VECSIM_INFO
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|DUMP_SUFFIX_TRIE
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|INFO_TAGIDX
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|WORKERS
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|DUMP_INVIDX
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  - - _FT.DEBUG|RESUME_TOPOLOGY_UPDATER
+    - -2
+    - - readonly
+      - module
+    - 0
+    - 0
+    - 0
+    - []
+    - []
+    - []
+    - []
+  tips: {}
+_FT.DEBUG_DELETE_LOCAL_CURSORS:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|DELETE_LOCAL_CURSORS
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_DOCIDTOID:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|DOCIDTOID
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_DOCINFO:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|DOCINFO
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_DUMP_GEOMIDX:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|DUMP_GEOMIDX
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_DUMP_HNSW:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|DUMP_HNSW
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_DUMP_INVIDX:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|DUMP_INVIDX
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_DUMP_NUMIDX:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|DUMP_NUMIDX
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_DUMP_NUMIDXTREE:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|DUMP_NUMIDXTREE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_DUMP_PHONETIC_HASH:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|DUMP_PHONETIC_HASH
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_DUMP_PREFIX_TRIE:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|DUMP_PREFIX_TRIE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_DUMP_SUFFIX_TRIE:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|DUMP_SUFFIX_TRIE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_DUMP_TAGIDX:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|DUMP_TAGIDX
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_DUMP_TERMS:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|DUMP_TERMS
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_GC_CLEAN_NUMERIC:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|GC_CLEAN_NUMERIC
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_GC_CONTINUE_SCHEDULE:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|GC_CONTINUE_SCHEDULE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_GC_FORCEBGINVOKE:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|GC_FORCEBGINVOKE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_GC_FORCEINVOKE:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|GC_FORCEINVOKE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_GC_STOP_SCHEDULE:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|GC_STOP_SCHEDULE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_GC_WAIT_FOR_JOBS:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|GC_WAIT_FOR_JOBS
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_GIT_SHA:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|GIT_SHA
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_HELP:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|HELP
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_IDTODOCID:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|IDTODOCID
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_INFO_TAGIDX:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|INFO_TAGIDX
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_INVIDX_SUMMARY:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|INVIDX_SUMMARY
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_NUMIDX_SUMMARY:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|NUMIDX_SUMMARY
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_PAUSE_TOPOLOGY_UPDATER:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|PAUSE_TOPOLOGY_UPDATER
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_RESUME_TOPOLOGY_UPDATER:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|RESUME_TOPOLOGY_UPDATER
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_SHARD_CONNECTION_STATES:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|SHARD_CONNECTION_STATES
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_TTL:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|TTL
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_TTL_EXPIRE:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|TTL_EXPIRE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_TTL_PAUSE:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|TTL_PAUSE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_VECSIM_INFO:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|VECSIM_INFO
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEBUG_WORKERS:
+  acl_cat: {}
+  arity: -2
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DEBUG|WORKERS
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DEL:
+  acl_cat:
+    '@admin': 1
+    '@search': 1
+    '@write': 1
+  arity: -1
+  first_key: 2
+  flags:
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 2
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 2
+  name: _FT.DEL
+  step: 1
+  subcommands: []
+  tips: {}
+_FT.DICTADD:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DICTADD
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DICTDEL:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DICTDEL
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DROP:
+  acl_cat:
+    '@admin': 1
+    '@dangerous': 1
+    '@search': 1
+    '@slow': 1
+    '@write': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    write: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DROP
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.DROPINDEX:
+  acl_cat:
+    '@dangerous': 1
+    '@search': 1
+    '@slow': 1
+    '@write': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    write: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.DROPINDEX
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.GET:
+  acl_cat:
+    '@admin': 1
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 2
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 2
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 2
+  name: _FT.GET
+  step: 1
+  subcommands: []
+  tips: {}
+_FT.INFO:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.INFO
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.MGET:
+  acl_cat:
+    '@admin': 1
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.MGET
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.PROFILE:
+  acl_cat:
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.PROFILE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.SAFEADD:
+  acl_cat:
+    '@admin': 1
+    '@search': 1
+    '@write': 1
+  arity: -1
+  first_key: 2
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 2
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 2
+  name: _FT.SAFEADD
+  step: 1
+  subcommands: []
+  tips: {}
+_FT.SEARCH:
+  acl_cat:
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.SEARCH
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.SPELLCHECK:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.SPELLCHECK
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.SUGADD:
+  acl_cat:
+    '@search': 1
+    '@write': 1
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: _FT.SUGADD
+  step: 1
+  subcommands: []
+  tips: {}
+_FT.SUGDEL:
+  acl_cat:
+    '@search': 1
+    '@write': 1
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: _FT.SUGDEL
+  step: 1
+  subcommands: []
+  tips: {}
+_FT.SUGGET:
+  acl_cat:
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: _FT.SUGGET
+  step: 1
+  subcommands: []
+  tips: {}
+_FT.SUGLEN:
+  acl_cat:
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: _FT.SUGLEN
+  step: 1
+  subcommands: []
+  tips: {}
+_FT.SYNUPDATE:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    write: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.SYNUPDATE
+  step: 0
+  subcommands: []
+  tips: {}
+_FT.TAGVALS:
+  acl_cat:
+    '@admin': 1
+    '@dangerous': 1
+    '@read': 1
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT.TAGVALS
+  step: 0
+  subcommands: []
+  tips: {}
+_FT._ALIASADDIFNX:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT._ALIASADDIFNX
+  step: 0
+  subcommands: []
+  tips: {}
+_FT._ALIASDELIFX:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: _FT._ALIASDELIFX
+  step: 0
+  subcommands: []
+  tips: {}
+_FT._ALTERIFNX:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    write: 1
+  key_spec: []
+  last_key: 0
+  name: _FT._ALTERIFNX
+  step: 0
+  subcommands: []
+  tips: {}
+_FT._CREATEIFNX:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec: []
+  last_key: 0
+  name: _FT._CREATEIFNX
+  step: 0
+  subcommands: []
+  tips: {}
+_FT._DROPIFX:
+  acl_cat:
+    '@admin': 1
+    '@dangerous': 1
+    '@search': 1
+    '@slow': 1
+    '@write': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    write: 1
+  key_spec: []
+  last_key: 0
+  name: _FT._DROPIFX
+  step: 0
+  subcommands: []
+  tips: {}
+_FT._DROPINDEXIFX:
+  acl_cat:
+    '@dangerous': 1
+    '@search': 1
+    '@slow': 1
+    '@write': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    write: 1
+  key_spec: []
+  last_key: 0
+  name: _FT._DROPINDEXIFX
+  step: 0
+  subcommands: []
+  tips: {}
 acl:
   acl_cat:
     '@slow': 1
@@ -10,61 +2013,8 @@ acl:
   name: acl
   step: 0
   subcommands:
-  - - acl|load
+  - - acl|list
     - 2
-    - - admin
-      - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
-    - []
-    - []
-    - []
-  - - acl|genpass
-    - -2
-    - - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-    - []
-    - []
-    - []
-  - - acl|help
-    - 2
-    - - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-    - []
-    - []
-    - []
-  - - acl|dryrun
-    - -4
-    - - admin
-      - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
-    - []
-    - []
-    - []
-  - - acl|getuser
-    - 3
     - - admin
       - noscript
       - loading
@@ -90,8 +2040,8 @@ acl:
     - []
     - []
     - []
-  - - acl|log
-    - -2
+  - - acl|dryrun
+    - -4
     - - admin
       - noscript
       - loading
@@ -105,23 +2055,7 @@ acl:
     - []
     - []
     - []
-  - - acl|deluser
-    - -3
-    - - admin
-      - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
-    - - request_policy:all_nodes
-      - response_policy:all_succeeded
-    - []
-    - []
-  - - acl|list
+  - - acl|load
     - 2
     - - admin
       - noscript
@@ -167,10 +2101,48 @@ acl:
       - response_policy:all_succeeded
     - []
     - []
+  - - acl|genpass
+    - -2
+    - - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+    - []
+    - []
+    - []
+  - - acl|getuser
+    - 3
+    - - admin
+      - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
+    - []
+    - []
+    - []
   - - acl|cat
     - -2
     - - noscript
       - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+    - []
+    - []
+    - []
+  - - acl|help
+    - 2
+    - - loading
       - stale
     - 0
     - 0
@@ -193,6 +2165,37 @@ acl:
       - '@dangerous'
     - - request_policy:all_nodes
       - response_policy:all_succeeded
+    - []
+    - []
+  - - acl|deluser
+    - -3
+    - - admin
+      - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
+    - - request_policy:all_nodes
+      - response_policy:all_succeeded
+    - []
+    - []
+  - - acl|log
+    - -2
+    - - admin
+      - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
+    - []
     - []
     - []
   tips: {}
@@ -484,6 +2487,314 @@ auth:
   last_key: 0
   name: auth
   step: 0
+  subcommands: []
+  tips: {}
+bf.add:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: bf.add
+  step: 1
+  subcommands: []
+  tips: {}
+bf.card:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: bf.card
+  step: 1
+  subcommands: []
+  tips: {}
+bf.debug:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: bf.debug
+  step: 1
+  subcommands: []
+  tips: {}
+bf.exists:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: bf.exists
+  step: 1
+  subcommands: []
+  tips: {}
+bf.info:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: bf.info
+  step: 1
+  subcommands: []
+  tips: {}
+bf.insert:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: bf.insert
+  step: 1
+  subcommands: []
+  tips: {}
+bf.loadchunk:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: bf.loadchunk
+  step: 1
+  subcommands: []
+  tips: {}
+bf.madd:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: bf.madd
+  step: 1
+  subcommands: []
+  tips: {}
+bf.mexists:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: bf.mexists
+  step: 1
+  subcommands: []
+  tips: {}
+bf.reserve:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: bf.reserve
+  step: 1
+  subcommands: []
+  tips: {}
+bf.scandump:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: bf.scandump
+  step: 1
   subcommands: []
   tips: {}
 bgrewriteaof:
@@ -959,6 +3270,398 @@ bzpopmin:
   step: 1
   subcommands: []
   tips: {}
+cf.add:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.add
+  step: 1
+  subcommands: []
+  tips: {}
+cf.addnx:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.addnx
+  step: 1
+  subcommands: []
+  tips: {}
+cf.compact:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.compact
+  step: 1
+  subcommands: []
+  tips: {}
+cf.count:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.count
+  step: 1
+  subcommands: []
+  tips: {}
+cf.debug:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.debug
+  step: 1
+  subcommands: []
+  tips: {}
+cf.del:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.del
+  step: 1
+  subcommands: []
+  tips: {}
+cf.exists:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.exists
+  step: 1
+  subcommands: []
+  tips: {}
+cf.info:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.info
+  step: 1
+  subcommands: []
+  tips: {}
+cf.insert:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.insert
+  step: 1
+  subcommands: []
+  tips: {}
+cf.insertnx:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.insertnx
+  step: 1
+  subcommands: []
+  tips: {}
+cf.loadchunk:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.loadchunk
+  step: 1
+  subcommands: []
+  tips: {}
+cf.mexists:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.mexists
+  step: 1
+  subcommands: []
+  tips: {}
+cf.reserve:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.reserve
+  step: 1
+  subcommands: []
+  tips: {}
+cf.scandump:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    fast: 1
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cf.scandump
+  step: 1
+  subcommands: []
+  tips: {}
 client:
   acl_cat:
     '@slow': 1
@@ -970,6 +3673,144 @@ client:
   name: client
   step: 0
   subcommands:
+  - - client|tracking
+    - -3
+    - - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+      - '@connection'
+    - []
+    - []
+    - []
+  - - client|caching
+    - 3
+    - - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+      - '@connection'
+    - []
+    - []
+    - []
+  - - client|trackinginfo
+    - 2
+    - - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+      - '@connection'
+    - []
+    - []
+    - []
+  - - client|setinfo
+    - 4
+    - - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+      - '@connection'
+    - - request_policy:all_nodes
+      - response_policy:all_succeeded
+    - []
+    - []
+  - - client|no-touch
+    - 3
+    - - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+      - '@connection'
+    - []
+    - []
+    - []
+  - - client|id
+    - 2
+    - - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+      - '@connection'
+    - []
+    - []
+    - []
+  - - client|setname
+    - 3
+    - - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+      - '@connection'
+    - - request_policy:all_nodes
+      - response_policy:all_succeeded
+    - []
+    - []
+  - - client|list
+    - -2
+    - - admin
+      - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
+      - '@connection'
+    - - nondeterministic_output
+    - []
+    - []
+  - - client|pause
+    - -3
+    - - admin
+      - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
+      - '@connection'
+    - []
+    - []
+    - []
+  - - client|getredir
+    - 2
+    - - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+      - '@connection'
+    - []
+    - []
+    - []
   - - client|help
     - 2
     - - loading
@@ -978,6 +3819,38 @@ client:
     - 0
     - 0
     - - '@slow'
+      - '@connection'
+    - []
+    - []
+    - []
+  - - client|no-evict
+    - 3
+    - - admin
+      - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
+      - '@connection'
+    - []
+    - []
+    - []
+  - - client|kill
+    - -3
+    - - admin
+      - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
       - '@connection'
     - []
     - []
@@ -995,22 +3868,8 @@ client:
     - - nondeterministic_output
     - []
     - []
-  - - client|setinfo
-    - 4
-    - - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-      - '@connection'
-    - - request_policy:all_nodes
-      - response_policy:all_succeeded
-    - []
-    - []
-  - - client|reply
-    - 3
+  - - client|getname
+    - 2
     - - noscript
       - loading
       - stale
@@ -1022,20 +3881,7 @@ client:
     - []
     - []
     - []
-  - - client|tracking
-    - -3
-    - - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-      - '@connection'
-    - []
-    - []
-    - []
-  - - client|kill
+  - - client|unblock
     - -3
     - - admin
       - noscript
@@ -1067,151 +3913,8 @@ client:
     - []
     - []
     - []
-  - - client|pause
-    - -3
-    - - admin
-      - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
-      - '@connection'
-    - []
-    - []
-    - []
-  - - client|caching
+  - - client|reply
     - 3
-    - - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-      - '@connection'
-    - []
-    - []
-    - []
-  - - client|getname
-    - 2
-    - - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-      - '@connection'
-    - []
-    - []
-    - []
-  - - client|trackinginfo
-    - 2
-    - - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-      - '@connection'
-    - []
-    - []
-    - []
-  - - client|no-evict
-    - 3
-    - - admin
-      - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
-      - '@connection'
-    - []
-    - []
-    - []
-  - - client|setname
-    - 3
-    - - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-      - '@connection'
-    - - request_policy:all_nodes
-      - response_policy:all_succeeded
-    - []
-    - []
-  - - client|getredir
-    - 2
-    - - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-      - '@connection'
-    - []
-    - []
-    - []
-  - - client|no-touch
-    - 3
-    - - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-      - '@connection'
-    - []
-    - []
-    - []
-  - - client|list
-    - -2
-    - - admin
-      - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
-      - '@connection'
-    - - nondeterministic_output
-    - []
-    - []
-  - - client|unblock
-    - -3
-    - - admin
-      - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
-      - '@connection'
-    - []
-    - []
-    - []
-  - - client|id
-    - 2
     - - noscript
       - loading
       - stale
@@ -1546,40 +4249,7 @@ cluster:
   name: cluster
   step: 0
   subcommands:
-  - - cluster|slots
-    - 2
-    - - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-    - - nondeterministic_output
-    - []
-    - []
-  - - cluster|help
-    - 2
-    - - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-    - []
-    - []
-    - []
-  - - cluster|shards
-    - 2
-    - - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-    - - nondeterministic_output
-    - []
-    - []
-  - - cluster|addslotsrange
+  - - cluster|setslot
     - -4
     - - admin
       - stale
@@ -1607,18 +4277,8 @@ cluster:
     - []
     - []
     - []
-  - - cluster|info
-    - 2
-    - - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-    - - nondeterministic_output
-    - []
-    - []
-  - - cluster|replicate
-    - 3
+  - - cluster|failover
+    - -2
     - - admin
       - stale
       - no_async_loading
@@ -1645,9 +4305,10 @@ cluster:
     - - nondeterministic_output
     - []
     - []
-  - - cluster|myshardid
+  - - cluster|shards
     - 2
-    - - stale
+    - - loading
+      - stale
     - 0
     - 0
     - 0
@@ -1655,32 +4316,25 @@ cluster:
     - - nondeterministic_output
     - []
     - []
-  - - cluster|reset
-    - -2
-    - - admin
-      - noscript
+  - - cluster|keyslot
+    - 3
+    - - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+    - []
+    - []
+    - []
+  - - cluster|slots
+    - 2
+    - - loading
       - stale
     - 0
     - 0
     - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
-    - []
-    - []
-    - []
-  - - cluster|meet
-    - -4
-    - - admin
-      - stale
-      - no_async_loading
-    - 0
-    - 0
-    - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
-    - []
+    - - '@slow'
+    - - nondeterministic_output
     - []
     - []
   - - cluster|saveconfig
@@ -1697,40 +4351,6 @@ cluster:
     - []
     - []
     - []
-  - - cluster|delslotsrange
-    - -4
-    - - admin
-      - stale
-      - no_async_loading
-    - 0
-    - 0
-    - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
-    - []
-    - []
-    - []
-  - - cluster|links
-    - 2
-    - - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-    - - nondeterministic_output
-    - []
-    - []
-  - - cluster|getkeysinslot
-    - 4
-    - - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-    - - nondeterministic_output
-    - []
-    - []
   - - cluster|set-config-epoch
     - 3
     - - admin
@@ -1743,6 +4363,30 @@ cluster:
       - '@slow'
       - '@dangerous'
     - []
+    - []
+    - []
+  - - cluster|replicate
+    - 3
+    - - admin
+      - stale
+      - no_async_loading
+    - 0
+    - 0
+    - 0
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
+    - []
+    - []
+    - []
+  - - cluster|getkeysinslot
+    - 4
+    - - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+    - - nondeterministic_output
     - []
     - []
   - - cluster|replicas
@@ -1758,6 +4402,30 @@ cluster:
     - - nondeterministic_output
     - []
     - []
+  - - cluster|myshardid
+    - 2
+    - - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+    - - nondeterministic_output
+    - []
+    - []
+  - - cluster|addslotsrange
+    - -4
+    - - admin
+      - stale
+      - no_async_loading
+    - 0
+    - 0
+    - 0
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
+    - []
+    - []
+    - []
   - - cluster|slaves
     - 3
     - - admin
@@ -1771,34 +4439,11 @@ cluster:
     - - nondeterministic_output
     - []
     - []
-  - - cluster|count-failure-reports
-    - 3
+  - - cluster|reset
+    - -2
     - - admin
+      - noscript
       - stale
-    - 0
-    - 0
-    - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
-    - - nondeterministic_output
-    - []
-    - []
-  - - cluster|nodes
-    - 2
-    - - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-    - - nondeterministic_output
-    - []
-    - []
-  - - cluster|setslot
-    - -4
-    - - admin
-      - stale
-      - no_async_loading
     - 0
     - 0
     - 0
@@ -1822,6 +4467,17 @@ cluster:
     - []
     - []
     - []
+  - - cluster|help
+    - 2
+    - - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+    - []
+    - []
+    - []
   - - cluster|addslots
     - -3
     - - admin
@@ -1836,14 +4492,24 @@ cluster:
     - []
     - []
     - []
-  - - cluster|keyslot
-    - 3
+  - - cluster|info
+    - 2
     - - stale
     - 0
     - 0
     - 0
     - - '@slow'
+    - - nondeterministic_output
     - []
+    - []
+  - - cluster|links
+    - 2
+    - - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+    - - nondeterministic_output
     - []
     - []
   - - cluster|myid
@@ -1856,8 +4522,21 @@ cluster:
     - []
     - []
     - []
-  - - cluster|delslots
-    - -3
+  - - cluster|count-failure-reports
+    - 3
+    - - admin
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
+    - - nondeterministic_output
+    - []
+    - []
+  - - cluster|delslotsrange
+    - -4
     - - admin
       - stale
       - no_async_loading
@@ -1870,8 +4549,8 @@ cluster:
     - []
     - []
     - []
-  - - cluster|failover
-    - -2
+  - - cluster|delslots
+    - -3
     - - admin
       - stale
       - no_async_loading
@@ -1891,6 +4570,30 @@ cluster:
     - 0
     - 0
     - - '@slow'
+    - []
+    - []
+    - []
+  - - cluster|nodes
+    - 2
+    - - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+    - - nondeterministic_output
+    - []
+    - []
+  - - cluster|meet
+    - -4
+    - - admin
+      - stale
+      - no_async_loading
+    - 0
+    - 0
+    - 0
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
     - []
     - []
     - []
@@ -2338,6 +5041,172 @@ cluster_slots:
   subcommands: []
   tips:
     nondeterministic_output: 1
+cms.incrby:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cms.incrby
+  step: 1
+  subcommands: []
+  tips: {}
+cms.info:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cms.info
+  step: 1
+  subcommands: []
+  tips: {}
+cms.initbydim:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cms.initbydim
+  step: 1
+  subcommands: []
+  tips: {}
+cms.initbyprob:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cms.initbyprob
+  step: 1
+  subcommands: []
+  tips: {}
+cms.merge:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cms.merge
+  step: 1
+  subcommands: []
+  tips: {}
+cms.query:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: cms.query
+  step: 1
+  subcommands: []
+  tips: {}
 command:
   acl_cat:
     '@connection': 1
@@ -2352,8 +5221,8 @@ command:
   name: command
   step: 0
   subcommands:
-  - - command|docs
-    - -2
+  - - command|count
+    - 2
     - - loading
       - stale
     - 0
@@ -2361,7 +5230,7 @@ command:
     - 0
     - - '@slow'
       - '@connection'
-    - - nondeterministic_output_order
+    - []
     - []
     - []
   - - command|help
@@ -2374,18 +5243,6 @@ command:
     - - '@slow'
       - '@connection'
     - []
-    - []
-    - []
-  - - command|list
-    - -2
-    - - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-      - '@connection'
-    - - nondeterministic_output_order
     - []
     - []
   - - command|info
@@ -2424,8 +5281,8 @@ command:
     - []
     - []
     - []
-  - - command|count
-    - 2
+  - - command|list
+    - -2
     - - loading
       - stale
     - 0
@@ -2433,7 +5290,19 @@ command:
     - 0
     - - '@slow'
       - '@connection'
+    - - nondeterministic_output_order
     - []
+    - []
+  - - command|docs
+    - -2
+    - - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+      - '@connection'
+    - - nondeterministic_output_order
     - []
     - []
   tips:
@@ -2557,17 +5426,6 @@ config:
   name: config
   step: 0
   subcommands:
-  - - config|help
-    - 2
-    - - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-    - []
-    - []
-    - []
   - - config|rewrite
     - 2
     - - admin
@@ -2600,18 +5458,14 @@ config:
       - response_policy:all_succeeded
     - []
     - []
-  - - config|get
-    - -3
-    - - admin
-      - noscript
-      - loading
+  - - config|help
+    - 2
+    - - loading
       - stale
     - 0
     - 0
     - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
+    - - '@slow'
     - []
     - []
     - []
@@ -2629,6 +5483,21 @@ config:
       - '@dangerous'
     - - request_policy:all_nodes
       - response_policy:all_succeeded
+    - []
+    - []
+  - - config|get
+    - -3
+    - - admin
+      - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
+    - []
     - []
     - []
   tips: {}
@@ -3355,6 +6224,31 @@ function:
   name: function
   step: 0
   subcommands:
+  - - function|dump
+    - 2
+    - - noscript
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+      - '@scripting'
+    - []
+    - []
+    - []
+  - - function|delete
+    - 3
+    - - write
+      - noscript
+    - 0
+    - 0
+    - 0
+    - - '@write'
+      - '@slow'
+      - '@scripting'
+    - - request_policy:all_shards
+      - response_policy:all_succeeded
+    - []
+    - []
   - - function|help
     - 2
     - - loading
@@ -3367,20 +6261,10 @@ function:
     - []
     - []
     - []
-  - - function|list
-    - -2
-    - - noscript
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-      - '@scripting'
-    - - nondeterministic_output_order
-    - []
-    - []
-  - - function|delete
-    - 3
+  - - function|load
+    - -3
     - - write
+      - denyoom
       - noscript
     - 0
     - 0
@@ -3420,17 +6304,6 @@ function:
       - response_policy:all_succeeded
     - []
     - []
-  - - function|dump
-    - 2
-    - - noscript
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-      - '@scripting'
-    - []
-    - []
-    - []
   - - function|flush
     - -2
     - - write
@@ -3445,19 +6318,15 @@ function:
       - response_policy:all_succeeded
     - []
     - []
-  - - function|load
-    - -3
-    - - write
-      - denyoom
-      - noscript
+  - - function|list
+    - -2
+    - - noscript
     - 0
     - 0
     - 0
-    - - '@write'
-      - '@slow'
+    - - '@slow'
       - '@scripting'
-    - - request_policy:all_shards
-      - response_policy:all_succeeded
+    - - nondeterministic_output_order
     - []
     - []
   - - function|stats
@@ -4708,7 +7577,8 @@ hpttl:
   name: hpttl
   step: 1
   subcommands: []
-  tips: {}
+  tips:
+    nondeterministic_output: 1
 hrandfield:
   acl_cat:
     '@hash': 1
@@ -4883,7 +7753,8 @@ httl:
   name: httl
   step: 1
   subcommands: []
-  tips: {}
+  tips:
+    nondeterministic_output: 1
 hvals:
   acl_cat:
     '@hash': 1
@@ -5024,6 +7895,688 @@ info:
     nondeterministic_output: 1
     request_policy:all_shards: 1
     response_policy:special: 1
+json.arrappend:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.arrappend
+  step: 1
+  subcommands: []
+  tips: {}
+json.arrindex:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.arrindex
+  step: 1
+  subcommands: []
+  tips: {}
+json.arrinsert:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.arrinsert
+  step: 1
+  subcommands: []
+  tips: {}
+json.arrlen:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.arrlen
+  step: 1
+  subcommands: []
+  tips: {}
+json.arrpop:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.arrpop
+  step: 1
+  subcommands: []
+  tips: {}
+json.arrtrim:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.arrtrim
+  step: 1
+  subcommands: []
+  tips: {}
+json.clear:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.clear
+  step: 1
+  subcommands: []
+  tips: {}
+json.debug:
+  acl_cat: {}
+  arity: -1
+  first_key: 2
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 2
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 2
+  name: json.debug
+  step: 1
+  subcommands: []
+  tips: {}
+json.del:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.del
+  step: 1
+  subcommands: []
+  tips: {}
+json.forget:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.forget
+  step: 1
+  subcommands: []
+  tips: {}
+json.get:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.get
+  step: 1
+  subcommands: []
+  tips: {}
+json.merge:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.merge
+  step: 1
+  subcommands: []
+  tips: {}
+json.mget:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.mget
+  step: 1
+  subcommands: []
+  tips: {}
+json.mset:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 3
+        lastkey: -1
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: -1
+  name: json.mset
+  step: 3
+  subcommands: []
+  tips: {}
+json.numincrby:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.numincrby
+  step: 1
+  subcommands: []
+  tips: {}
+json.nummultby:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.nummultby
+  step: 1
+  subcommands: []
+  tips: {}
+json.numpowby:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.numpowby
+  step: 1
+  subcommands: []
+  tips: {}
+json.objkeys:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.objkeys
+  step: 1
+  subcommands: []
+  tips: {}
+json.objlen:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.objlen
+  step: 1
+  subcommands: []
+  tips: {}
+json.resp:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.resp
+  step: 1
+  subcommands: []
+  tips: {}
+json.set:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.set
+  step: 1
+  subcommands: []
+  tips: {}
+json.strappend:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.strappend
+  step: 1
+  subcommands: []
+  tips: {}
+json.strlen:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.strlen
+  step: 1
+  subcommands: []
+  tips: {}
+json.toggle:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.toggle
+  step: 1
+  subcommands: []
+  tips: {}
+json.type:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: json.type
+  step: 1
+  subcommands: []
+  tips: {}
 keys:
   acl_cat:
     '@dangerous': 1
@@ -5071,6 +8624,22 @@ latency:
   name: latency
   step: 0
   subcommands:
+  - - latency|reset
+    - -2
+    - - admin
+      - noscript
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
+    - - request_policy:all_nodes
+      - response_policy:agg_sum
+    - []
+    - []
   - - latency|graph
     - 3
     - - admin
@@ -5099,8 +8668,8 @@ latency:
     - []
     - []
     - []
-  - - latency|reset
-    - -2
+  - - latency|latest
+    - 2
     - - admin
       - noscript
       - loading
@@ -5111,8 +8680,9 @@ latency:
     - - '@admin'
       - '@slow'
       - '@dangerous'
-    - - request_policy:all_nodes
-      - response_policy:agg_sum
+    - - nondeterministic_output
+      - request_policy:all_nodes
+      - response_policy:special
     - []
     - []
   - - latency|history
@@ -5132,7 +8702,7 @@ latency:
       - response_policy:special
     - []
     - []
-  - - latency|latest
+  - - latency|doctor
     - 2
     - - admin
       - noscript
@@ -5151,23 +8721,6 @@ latency:
     - []
   - - latency|histogram
     - -2
-    - - admin
-      - noscript
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
-    - - nondeterministic_output
-      - request_policy:all_nodes
-      - response_policy:special
-    - []
-    - []
-  - - latency|doctor
-    - 2
     - - admin
       - noscript
       - loading
@@ -5777,7 +9330,42 @@ memory:
       - response_policy:all_succeeded
     - []
     - []
+  - - memory|help
+    - 2
+    - - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+    - []
+    - []
+    - []
   - - memory|doctor
+    - 2
+    - []
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+    - - nondeterministic_output
+      - request_policy:all_shards
+      - response_policy:special
+    - []
+    - []
+  - - memory|stats
+    - 2
+    - []
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+    - - nondeterministic_output
+      - request_policy:all_shards
+      - response_policy:special
+    - []
+    - []
+  - - memory|malloc-stats
     - 2
     - []
     - 0
@@ -5816,41 +9404,6 @@ memory:
             - 1
             - limit
             - 0
-    - []
-  - - memory|help
-    - 2
-    - - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-    - []
-    - []
-    - []
-  - - memory|malloc-stats
-    - 2
-    - []
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-    - - nondeterministic_output
-      - request_policy:all_shards
-      - response_policy:special
-    - []
-    - []
-  - - memory|stats
-    - 2
-    - []
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-    - - nondeterministic_output
-      - request_policy:all_shards
-      - response_policy:special
-    - []
     - []
   tips: {}
 memory_doctor:
@@ -6055,14 +9608,17 @@ module:
     - []
     - []
     - []
-  - - module|help
-    - 2
-    - - loading
-      - stale
+  - - module|load
+    - -3
+    - - admin
+      - noscript
+      - no_async_loading
     - 0
     - 0
     - 0
-    - - '@slow'
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
     - []
     - []
     - []
@@ -6079,17 +9635,14 @@ module:
     - - nondeterministic_output_order
     - []
     - []
-  - - module|load
-    - -3
-    - - admin
-      - noscript
-      - no_async_loading
+  - - module|help
+    - 2
+    - - loading
+      - stale
     - 0
     - 0
     - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
+    - - '@slow'
     - []
     - []
     - []
@@ -6327,17 +9880,34 @@ object:
   name: object
   step: 0
   subcommands:
-  - - object|help
+  - - object|idletime
+    - 3
+    - - readonly
     - 2
-    - - loading
-      - stale
-    - 0
-    - 0
-    - 0
+    - 2
+    - 1
     - - '@keyspace'
+      - '@read'
       - '@slow'
-    - []
-    - []
+    - - nondeterministic_output
+    - - - flags
+        - - RO
+        - begin_search
+        - - type
+          - index
+          - spec
+          - - index
+            - 2
+        - find_keys
+        - - type
+          - range
+          - spec
+          - - lastkey
+            - 0
+            - keystep
+            - 1
+            - limit
+            - 0
     - []
   - - object|freq
     - 3
@@ -6397,34 +9967,17 @@ object:
             - limit
             - 0
     - []
-  - - object|idletime
-    - 3
-    - - readonly
+  - - object|help
     - 2
-    - 2
-    - 1
+    - - loading
+      - stale
+    - 0
+    - 0
+    - 0
     - - '@keyspace'
-      - '@read'
       - '@slow'
-    - - nondeterministic_output
-    - - - flags
-        - - RO
-        - begin_search
-        - - type
-          - index
-          - spec
-          - - index
-            - 2
-        - find_keys
-        - - type
-          - range
-          - spec
-          - - lastkey
-            - 0
-            - keystep
-            - 1
-            - limit
-            - 0
+    - []
+    - []
     - []
   - - object|refcount
     - 3
@@ -6988,19 +10541,6 @@ pubsub:
   name: pubsub
   step: 0
   subcommands:
-  - - pubsub|numpat
-    - 2
-    - - pubsub
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@pubsub'
-      - '@slow'
-    - []
-    - []
-    - []
   - - pubsub|help
     - 2
     - - loading
@@ -7025,7 +10565,7 @@ pubsub:
     - []
     - []
     - []
-  - - pubsub|numsub
+  - - pubsub|shardnumsub
     - -2
     - - pubsub
       - loading
@@ -7051,7 +10591,20 @@ pubsub:
     - []
     - []
     - []
-  - - pubsub|shardnumsub
+  - - pubsub|numpat
+    - 2
+    - - pubsub
+      - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@pubsub'
+      - '@slow'
+    - []
+    - []
+    - []
+  - - pubsub|numsub
     - -2
     - - pubsub
       - loading
@@ -7715,29 +11268,6 @@ script:
     - []
     - []
     - []
-  - - script|debug
-    - 3
-    - - noscript
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-      - '@scripting'
-    - []
-    - []
-    - []
-  - - script|flush
-    - -2
-    - - noscript
-    - 0
-    - 0
-    - 0
-    - - '@slow'
-      - '@scripting'
-    - - request_policy:all_nodes
-      - response_policy:all_succeeded
-    - []
-    - []
   - - script|exists
     - -3
     - - noscript
@@ -7748,6 +11278,19 @@ script:
       - '@scripting'
     - - request_policy:all_shards
       - response_policy:agg_logical_and
+    - []
+    - []
+  - - script|load
+    - 3
+    - - noscript
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+      - '@scripting'
+    - - request_policy:all_nodes
+      - response_policy:all_succeeded
     - []
     - []
   - - script|kill
@@ -7763,10 +11306,20 @@ script:
       - response_policy:one_succeeded
     - []
     - []
-  - - script|load
+  - - script|debug
     - 3
     - - noscript
-      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+      - '@scripting'
+    - []
+    - []
+    - []
+  - - script|flush
+    - -2
+    - - noscript
     - 0
     - 0
     - 0
@@ -7941,6 +11494,53 @@ sdiffstore:
   last_key: -1
   name: sdiffstore
   step: 1
+  subcommands: []
+  tips: {}
+search.CLUSTERINFO:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    loading: 1
+    module: 1
+    noscript: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: search.CLUSTERINFO
+  step: 0
+  subcommands: []
+  tips: {}
+search.CLUSTERREFRESH:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    noscript: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: search.CLUSTERREFRESH
+  step: 0
+  subcommands: []
+  tips: {}
+search.CLUSTERSET:
+  acl_cat:
+    '@search': 1
+  arity: -1
+  first_key: 0
+  flags:
+    loading: 1
+    module: 1
+    noscript: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: search.CLUSTERSET
+  step: 0
   subcommands: []
   tips: {}
 select:
@@ -8286,15 +11886,20 @@ slowlog:
   name: slowlog
   step: 0
   subcommands:
-  - - slowlog|help
+  - - slowlog|len
     - 2
-    - - loading
+    - - admin
+      - loading
       - stale
     - 0
     - 0
     - 0
-    - - '@slow'
-    - []
+    - - '@admin'
+      - '@slow'
+      - '@dangerous'
+    - - request_policy:all_nodes
+      - response_policy:agg_sum
+      - nondeterministic_output
     - []
     - []
   - - slowlog|reset
@@ -8312,22 +11917,6 @@ slowlog:
       - response_policy:all_succeeded
     - []
     - []
-  - - slowlog|len
-    - 2
-    - - admin
-      - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@admin'
-      - '@slow'
-      - '@dangerous'
-    - - request_policy:all_nodes
-      - response_policy:agg_sum
-      - nondeterministic_output
-    - []
-    - []
   - - slowlog|get
     - -2
     - - admin
@@ -8341,6 +11930,17 @@ slowlog:
       - '@dangerous'
     - - request_policy:all_nodes
       - nondeterministic_output
+    - []
+    - []
+  - - slowlog|help
+    - 2
+    - - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@slow'
+    - []
     - []
     - []
   tips: {}
@@ -8999,6 +12599,388 @@ sync:
   step: 0
   subcommands: []
   tips: {}
+tdigest.add:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.add
+  step: 1
+  subcommands: []
+  tips: {}
+tdigest.byrank:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.byrank
+  step: 1
+  subcommands: []
+  tips: {}
+tdigest.byrevrank:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.byrevrank
+  step: 1
+  subcommands: []
+  tips: {}
+tdigest.cdf:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.cdf
+  step: 1
+  subcommands: []
+  tips: {}
+tdigest.create:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.create
+  step: 1
+  subcommands: []
+  tips: {}
+tdigest.info:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.info
+  step: 1
+  subcommands: []
+  tips: {}
+tdigest.max:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.max
+  step: 1
+  subcommands: []
+  tips: {}
+tdigest.merge:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.merge
+  step: 1
+  subcommands: []
+  tips: {}
+tdigest.min:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.min
+  step: 1
+  subcommands: []
+  tips: {}
+tdigest.quantile:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.quantile
+  step: 1
+  subcommands: []
+  tips: {}
+tdigest.rank:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.rank
+  step: 1
+  subcommands: []
+  tips: {}
+tdigest.reset:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.reset
+  step: 1
+  subcommands: []
+  tips: {}
+tdigest.revrank:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.revrank
+  step: 1
+  subcommands: []
+  tips: {}
+tdigest.trimmed_mean:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: tdigest.trimmed_mean
+  step: 1
+  subcommands: []
+  tips: {}
 time:
   acl_cat:
     '@fast': 1
@@ -9015,6 +12997,310 @@ time:
   subcommands: []
   tips:
     nondeterministic_output: 1
+timeseries.CLUSTERSET:
+  acl_cat: {}
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    noscript: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: timeseries.CLUSTERSET
+  step: 0
+  subcommands: []
+  tips: {}
+timeseries.CLUSTERSETFROMSHARD:
+  acl_cat: {}
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    noscript: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: timeseries.CLUSTERSETFROMSHARD
+  step: 0
+  subcommands: []
+  tips: {}
+timeseries.FORCESHARDSCONNECTION:
+  acl_cat: {}
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    noscript: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: timeseries.FORCESHARDSCONNECTION
+  step: 0
+  subcommands: []
+  tips: {}
+timeseries.HELLO:
+  acl_cat: {}
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    noscript: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: timeseries.HELLO
+  step: 0
+  subcommands: []
+  tips: {}
+timeseries.INFOCLUSTER:
+  acl_cat: {}
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    noscript: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: timeseries.INFOCLUSTER
+  step: 0
+  subcommands: []
+  tips: {}
+timeseries.INNERCOMMUNICATION:
+  acl_cat: {}
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    noscript: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: timeseries.INNERCOMMUNICATION
+  step: 0
+  subcommands: []
+  tips: {}
+timeseries.NETWORKTEST:
+  acl_cat: {}
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    noscript: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: timeseries.NETWORKTEST
+  step: 0
+  subcommands: []
+  tips: {}
+timeseries.REFRESHCLUSTER:
+  acl_cat: {}
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    noscript: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: timeseries.REFRESHCLUSTER
+  step: 0
+  subcommands: []
+  tips: {}
+topk.add:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: topk.add
+  step: 1
+  subcommands: []
+  tips: {}
+topk.count:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: topk.count
+  step: 1
+  subcommands: []
+  tips: {}
+topk.incrby:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: topk.incrby
+  step: 1
+  subcommands: []
+  tips: {}
+topk.info:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: topk.info
+  step: 1
+  subcommands: []
+  tips: {}
+topk.list:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: topk.list
+  step: 1
+  subcommands: []
+  tips: {}
+topk.query:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: topk.query
+  step: 1
+  subcommands: []
+  tips: {}
+topk.reserve:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: topk.reserve
+  step: 1
+  subcommands: []
+  tips: {}
 touch:
   acl_cat:
     '@fast': 1
@@ -9045,6 +13331,416 @@ touch:
   tips:
     request_policy:multi_shard: 1
     response_policy:agg_sum: 1
+ts.add:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: ts.add
+  step: 1
+  subcommands: []
+  tips: {}
+ts.alter:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: ts.alter
+  step: 1
+  subcommands: []
+  tips: {}
+ts.create:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: ts.create
+  step: 1
+  subcommands: []
+  tips: {}
+ts.createrule:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: ts.createrule
+  step: 1
+  subcommands: []
+  tips: {}
+ts.decrby:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: ts.decrby
+  step: 1
+  subcommands: []
+  tips: {}
+ts.del:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: ts.del
+  step: 1
+  subcommands: []
+  tips: {}
+ts.deleterule:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: ts.deleterule
+  step: 1
+  subcommands: []
+  tips: {}
+ts.get:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: ts.get
+  step: 1
+  subcommands: []
+  tips: {}
+ts.incrby:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: ts.incrby
+  step: 1
+  subcommands: []
+  tips: {}
+ts.info:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: ts.info
+  step: 1
+  subcommands: []
+  tips: {}
+ts.madd:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    denyoom: 1
+    module: 1
+    write: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 3
+        lastkey: -1
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: -1
+  name: ts.madd
+  step: 3
+  subcommands: []
+  tips: {}
+ts.mget:
+  acl_cat: {}
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: ts.mget
+  step: 0
+  subcommands: []
+  tips: {}
+ts.mrange:
+  acl_cat: {}
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: ts.mrange
+  step: 0
+  subcommands: []
+  tips: {}
+ts.mrevrange:
+  acl_cat: {}
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: ts.mrevrange
+  step: 0
+  subcommands: []
+  tips: {}
+ts.queryindex:
+  acl_cat: {}
+  arity: -1
+  first_key: 0
+  flags:
+    module: 1
+    readonly: 1
+  key_spec: []
+  last_key: 0
+  name: ts.queryindex
+  step: 0
+  subcommands: []
+  tips: {}
+ts.range:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: ts.range
+  step: 1
+  subcommands: []
+  tips: {}
+ts.revrange:
+  acl_cat: {}
+  arity: -1
+  first_key: 1
+  flags:
+    module: 1
+    readonly: 1
+  key_spec:
+  - begin_search:
+      spec:
+        index: 1
+      type: index
+    find_keys:
+      spec:
+        keystep: 1
+        lastkey: 0
+        limit: 0
+      type: range
+    flags:
+      RW: 1
+      access: 1
+      update: 1
+  last_key: 1
+  name: ts.revrange
+  step: 1
+  subcommands: []
+  tips: {}
 ttl:
   acl_cat:
     '@fast': 1
@@ -9394,6 +14090,66 @@ xgroup:
   name: xgroup
   step: 0
   subcommands:
+  - - xgroup|delconsumer
+    - 5
+    - - write
+    - 2
+    - 2
+    - 1
+    - - '@write'
+      - '@stream'
+      - '@slow'
+    - []
+    - - - flags
+        - - RW
+          - delete
+        - begin_search
+        - - type
+          - index
+          - spec
+          - - index
+            - 2
+        - find_keys
+        - - type
+          - range
+          - spec
+          - - lastkey
+            - 0
+            - keystep
+            - 1
+            - limit
+            - 0
+    - []
+  - - xgroup|destroy
+    - 4
+    - - write
+    - 2
+    - 2
+    - 1
+    - - '@write'
+      - '@stream'
+      - '@slow'
+    - []
+    - - - flags
+        - - RW
+          - delete
+        - begin_search
+        - - type
+          - index
+          - spec
+          - - index
+            - 2
+        - find_keys
+        - - type
+          - range
+          - spec
+          - - lastkey
+            - 0
+            - keystep
+            - 1
+            - limit
+            - 0
+    - []
   - - xgroup|help
     - 2
     - - loading
@@ -9405,6 +14161,36 @@ xgroup:
       - '@slow'
     - []
     - []
+    - []
+  - - xgroup|setid
+    - -5
+    - - write
+    - 2
+    - 2
+    - 1
+    - - '@write'
+      - '@stream'
+      - '@slow'
+    - []
+    - - - flags
+        - - RW
+          - update
+        - begin_search
+        - - type
+          - index
+          - spec
+          - - index
+            - 2
+        - find_keys
+        - - type
+          - range
+          - spec
+          - - lastkey
+            - 0
+            - keystep
+            - 1
+            - limit
+            - 0
     - []
   - - xgroup|create
     - -5
@@ -9451,96 +14237,6 @@ xgroup:
     - - - flags
         - - RW
           - insert
-        - begin_search
-        - - type
-          - index
-          - spec
-          - - index
-            - 2
-        - find_keys
-        - - type
-          - range
-          - spec
-          - - lastkey
-            - 0
-            - keystep
-            - 1
-            - limit
-            - 0
-    - []
-  - - xgroup|delconsumer
-    - 5
-    - - write
-    - 2
-    - 2
-    - 1
-    - - '@write'
-      - '@stream'
-      - '@slow'
-    - []
-    - - - flags
-        - - RW
-          - delete
-        - begin_search
-        - - type
-          - index
-          - spec
-          - - index
-            - 2
-        - find_keys
-        - - type
-          - range
-          - spec
-          - - lastkey
-            - 0
-            - keystep
-            - 1
-            - limit
-            - 0
-    - []
-  - - xgroup|setid
-    - -5
-    - - write
-    - 2
-    - 2
-    - 1
-    - - '@write'
-      - '@stream'
-      - '@slow'
-    - []
-    - - - flags
-        - - RW
-          - update
-        - begin_search
-        - - type
-          - index
-          - spec
-          - - index
-            - 2
-        - find_keys
-        - - type
-          - range
-          - spec
-          - - lastkey
-            - 0
-            - keystep
-            - 1
-            - limit
-            - 0
-    - []
-  - - xgroup|destroy
-    - 4
-    - - write
-    - 2
-    - 2
-    - 1
-    - - '@write'
-      - '@stream'
-      - '@slow'
-    - []
-    - - - flags
-        - - RW
-          - delete
         - begin_search
         - - type
           - index
@@ -9727,20 +14423,8 @@ xinfo:
   name: xinfo
   step: 0
   subcommands:
-  - - xinfo|help
-    - 2
-    - - loading
-      - stale
-    - 0
-    - 0
-    - 0
-    - - '@stream'
-      - '@slow'
-    - []
-    - []
-    - []
-  - - xinfo|groups
-    - 3
+  - - xinfo|consumers
+    - 4
     - - readonly
     - 2
     - 2
@@ -9748,7 +14432,7 @@ xinfo:
     - - '@read'
       - '@stream'
       - '@slow'
-    - []
+    - - nondeterministic_output
     - - - flags
         - - RO
           - access
@@ -9799,8 +14483,8 @@ xinfo:
             - limit
             - 0
     - []
-  - - xinfo|consumers
-    - 4
+  - - xinfo|groups
+    - 3
     - - readonly
     - 2
     - 2
@@ -9808,7 +14492,7 @@ xinfo:
     - - '@read'
       - '@stream'
       - '@slow'
-    - - nondeterministic_output
+    - []
     - - - flags
         - - RO
           - access
@@ -9828,6 +14512,18 @@ xinfo:
             - 1
             - limit
             - 0
+    - []
+  - - xinfo|help
+    - 2
+    - - loading
+      - stale
+    - 0
+    - 0
+    - 0
+    - - '@stream'
+      - '@slow'
+    - []
+    - []
     - []
   tips: {}
 xinfo_consumers:

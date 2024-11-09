@@ -2,7 +2,7 @@ package Net::Async::Redis::Cluster;
 
 use Full::Class qw(:v1), extends => qw(Net::Async::Redis::Commands);
 
-our $VERSION = '6.004'; # VERSION
+our $VERSION = '6.005'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
@@ -473,7 +473,11 @@ sub configure {
     for (@CONFIG_KEYS) {
         $self->{$_} = delete $args{$_} if exists $args{$_};
     }
-    $self->{read_from_replica} = delete $args{read_from_replica} if exists $args{read_from_replica};
+    if(exists $args{read_from_replica}) {
+        warn "`read_from_replica` parameter passed - please update your code to use `use_read_replica` instead!";
+        $self->{use_read_replica} = delete $args{read_from_replica};
+    }
+    $self->{use_read_replica} = delete $args{use_read_replica} if exists $args{use_read_replica};
     die 'invalid protocol requested: ' . $self->{protocol} if defined $self->{protocol} and not $self->{protocol} =~ /^resp[23]$/;
 
     die 'hashref support requires RESP3 (Redis version 6+)' if defined $self->{protocol} and $self->{protocol} eq 'resp2' and $self->{hashrefs};
@@ -683,7 +687,7 @@ sub execute_command {
 async sub find_node_and_execute_command ($self, @cmd) {
     my $node = await $self->find_node(@cmd);
     my $redis = await (
-           $self->{read_from_replica}
+           $self->{use_read_replica}
         && $node->replica_count
         && Net::Async::Redis->extract_spec_for_command(\@cmd)->{acl_cat}{'@read'}
         ? $node->replica_connection

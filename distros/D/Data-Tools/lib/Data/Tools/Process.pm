@@ -15,12 +15,15 @@ use Exporter;
 use POSIX;
 use Data::Tools;
 
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
                   fork_exec_cmd
                   daemonize
+                  
+                  pidfile_create
+                  pidfile_remove
                 );
 
 ##############################################################################
@@ -41,7 +44,7 @@ sub fork_exec_cmd
 # TODO:
 #       pidfile
 #       lock pidfile to ensure single process
-#       file names for stdout/err
+#       open file names for stdout/err
 #
 
 sub daemonize
@@ -78,6 +81,50 @@ sub daemonize
 
   return 1;
 }
+
+##############################################################################
+
+# pidfile_create( $pid_file_name, STALE_CHECK => 1 )
+#    STALE_CHECK is optional and will try to check if existing process is 
+#                running with the same pid file name
+#
+# returns:
+#    * undef for success 
+#    * negative for error
+#    * positive (non-zero) for existing running process pid
+# errors:
+#    * -1 cannot create pidfile or was created just before we try
+
+sub pidfile_create
+{
+  my $fname = shift;
+  my %opt   = @_;
+
+  hash_uc_ipl( \%opt );
+
+  my $opid = int( file_load( $fname ) );
+  unlink( $fname ) if ( $opid < 1 ) or ( $opt{ 'STALE_CHECK' } and ! kill( 0, $opid ) );
+
+  return $opid if -e $fname;
+
+  dir_path_ensure( file_path( $fname ) );
+  return -1 unless sysopen my $fh, $fname, O_CREAT | O_EXCL | O_RDWR, 0600;
+
+  print $fh $$;
+
+  close $fh;
+
+  return undef;
+}
+
+sub pidfile_remove
+{
+  my $fname = shift;
+  
+  unlink( $fname ) if $fname;
+  return undef;
+}
+
 
 ##############################################################################
 1;

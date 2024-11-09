@@ -1,4 +1,4 @@
-package RecentInfo::GroupEntry 0.03;
+package RecentInfo::GroupEntry 0.04;
 use 5.020;
 use Moo 2;
 use experimental 'signatures';

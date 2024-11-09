@@ -12,9 +12,8 @@ class TransmitterWrapper {
         return library.initializeTransmitter(binariesRootPath)
     }
 
-    static activate(licenseKey, proxyHost, proxyUserName, proxyUserPassword) {
-        this.initialize()
-        return library.activate(licenseKey, proxyHost, proxyUserName, proxyUserPassword)
+    static activate(licenseKey) {
+        return library.activate(licenseKey)
     }
 
     static sendCommand(messageArray) {
@@ -22,7 +21,7 @@ class TransmitterWrapper {
     }
 
     static setConfigSource(configSource) {
-        //return library.setConfigSource(configSource)
+        return library.setConfigSource(configSource)
     }
 }
 

@@ -30,4 +30,8 @@ class TcpConnectionData
   def get_port_bytes
     [@port & 0xFF, @port >> 8]
   end
+
+  def serialize_connection_data
+    [ConnectionType::TCP] + get_address_bytes + get_port_bytes
+  end
 end

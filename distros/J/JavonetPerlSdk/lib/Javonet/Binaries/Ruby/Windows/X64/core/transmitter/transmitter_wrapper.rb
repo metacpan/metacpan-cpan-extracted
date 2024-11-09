@@ -25,7 +25,7 @@ module TransmitterWrapper
 
   attach_function :SendCommand, [:pointer, :int], :int
   attach_function :ReadResponse, [:pointer, :int], :int
-  attach_function :Activate, [:pointer, :pointer, :pointer, :pointer], :int
+  attach_function :Activate, [:pointer], :int
   attach_function :GetNativeError, [], :string
   attach_function :SetConfigSource, [:pointer], :int
 end

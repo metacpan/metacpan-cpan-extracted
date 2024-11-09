@@ -5,7 +5,7 @@ use experimental 'signatures';
 # Central command dispatcher like C<git>
 # See https://git-scm.com/docs/git
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use Getopt::Long (qw(:config pass_through permute)); # stop at the first unknown option or first argument
 use File::Basename;
 

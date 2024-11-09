@@ -53,7 +53,7 @@ use Class::Load 'load_class';
 use Encode 2.21 'decode_utf8', 'encode_utf8';
 use Scalar::Util;
 
-our $VERSION = '5.90131';
+our $VERSION = '5.90132';
 $VERSION =~ tr/_//d;
 
 BEGIN { require 5.008003; }
@@ -345,7 +345,7 @@ settings override the application, with <MYAPP>_DEBUG having the highest
 priority.
 
 This sets the log level to 'debug' and enables full debug output on the
-error screen. If you only want the latter, see L<< $c->debug >>.
+error screen. If you only want the latter, see L<< /$c->debug >>.
 
 =head2 -Home
 
@@ -480,9 +480,9 @@ and access it from the stash.
 
 Keep in mind that the C<end> method used is that of the caller action. So a C<< $c->detach >> inside a forwarded action would run the C<end> method from the original action requested.
 
-If you call c<forward> with the name of a component class or instance, rather than an action name
+If you call C<forward> with the name of a component class or instance, rather than an action name
 or instance, we invoke the C<process> action on that class or instance, or whatever action you
-specific via the second argument $method.
+specify via the second argument C<$method>.
 
 =cut
 
@@ -4570,7 +4570,7 @@ headers.
 
 If you do not wish to use the proxy support at all, you may set:
 
-    MyApp->config(ignore_frontend_proxy => 0);
+    MyApp->config(ignore_frontend_proxy => 1);
 
 =head2 Note about psgi files
 

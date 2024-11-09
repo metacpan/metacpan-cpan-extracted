@@ -74,7 +74,7 @@ subtest 'MULTI while existing MULTI is active' => sub { (async sub {
     await $redis->hset($k, x => "y");
     await $redis->expire($k, 60);
     my %result;
-    my $target = $ENV{AUTHOR_TESTING} ? 2000 : 100;
+    my $target = $ENV{AUTHOR_TESTING} ? 1000 : 20;
     await fmap_void(async sub ($item) {
         await $redis->multi(sub ($tx) {
             $tx->hset($k, $item => '' . reverse $item);
@@ -99,7 +99,7 @@ subtest 'MULTI interspersed with regular Redis calls' => sub { (async sub {
     await $redis->hset($k, x => "y");
     await $redis->expire($k, 300);
     my %result;
-    my $target = $ENV{AUTHOR_TESTING} ? 2000 : 100;
+    my $target = $ENV{AUTHOR_TESTING} ? 1000 : 20;
     await $redis->unlink($k . '.count');
     await fmap_void(async sub ($item) {
         await $redis->multi(sub ($tx) {

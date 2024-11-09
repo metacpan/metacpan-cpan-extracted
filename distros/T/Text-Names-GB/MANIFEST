@@ -2,12 +2,21 @@ Changes
 lib/Text/Names/GB.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
+README
 README.md
 t/01-abbreviations.t
 t/02-samePerson.t
 t/03-parseNames.t
 t/04-common.t
 t/05-weakenings.t
+t/comment-spelling.t
+t/eof.t
+t/eol.t
+t/links.t
+t/no404s.t
+t/pod-spelling.t
 t/rt119031.t
+t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,50 @@
+# ♻️ Random::Simple
+
+Perl module to generate good random numbers in a user consumable way.
+
+## ❓ Why Random::Simple?
+
+To make generating random numbers as easy as possible _and_ in a manner that
+you can use in real code. Generate "good" random numbers without having to
+think about it.
+
+## 📦 Installation
+
+```bash
+cpanm Random::Simple
+```
+
+## 💻 Usage
+
+```perl
+use Random::Simple;
+
+my $integer = random_int($min, $max); # inclusive
+my $bytes   = random_bytes($count);
+```
+
+## 🧠 Methodology
+
+Perl's internal `rand()` function uses `drand48()` which is an older PRNG,
+and may have limitations. `Random::Simple` uses
+[PCG](https://www.pcg-random.org/download.html) which is: modern, simple,
+well vetted, and fast.
+
+`Random::Simple` is automatically seeded with high quality entropy directly
+from your OS. On Linux this is `/dev/urandom` and on Windows it uses
+CryptGenRandom. You will get statistically unique random numbers
+automatically.
+
+## 🔍 See also
+
+If you need finer grained control of your random numbers check out one
+of these alternatives:
+
+* [Math::Random::PCG32](https://metacpan.org/pod/Math::Random::PCG32)
+* [Math::Random::ISAAC](https://metacpan.org/pod/Math::Random::ISAAC)
+* [Math::Random::MT](https://metacpan.org/pod/Math::Random::MT)
+* [Math::Random::Secure](https://metacpan.org/pod/Math::Random::Secure)
+
+## 👴 Author
+
+Scott Baker - https://www.perturb.org/

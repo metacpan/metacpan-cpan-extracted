@@ -23,7 +23,7 @@ class Transmitter
   end
 
   def self.activate(license_key)
-    activation_result = TransmitterWrapper.Activate(license_key, "", "", "")
+    activation_result = TransmitterWrapper.Activate(license_key)
     if activation_result < 0
       error_message = get_native_error
       raise Exception.new "Javonet activation result: " + activation_result.to_s + ". Native error message: " + error_message

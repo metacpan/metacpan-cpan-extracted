@@ -1,3 +1,7 @@
+0.04 2024-11-08
+    * Don't require 5.43, swap out experimental try/catch with use of Try::Tiny
+    * Also declare postderef where we need it
+
 0.03 2024-11-03
     * Re-release to fix botched CPAN upload
 
