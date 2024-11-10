@@ -4,7 +4,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 # VERSION
 
-2024.10
+2024.11
 
 # DESCRIPTION
 
@@ -154,6 +154,18 @@ Here are the snippets that may accompany the photo project
         # Call the fizz_buzz subroutine with appropriate parameters
         print Dumper( \@result );
 
+## LEEJO (snippet from obs-studio/libobs/obs.c)
+
+        static void stop_audio(void)
+        {
+                struct obs_core_audio *audio = &obs->audio;
+
+                if (audio->audio) {
+                        audio_output_close(audio->audio);
+                        audio->audio = NULL;
+                }
+        }
+
 ## MIKESTOK (soundex "joke")
 
     sub Soundex
@@ -203,7 +215,7 @@ A full list of the workshops and conferences this project was shot at
 - Swiss Perl Workshop (2015, 2017, 2018, 2019)
 - The Perl Conference \[EU\] (2017, 2018)
 - The Perl Conference \[NA\] (2016, 2017)
-- The Perl Toolchain Sumit (2017)
+- The Perl Toolchain Summit (2017)
 - The Perl and Raku Conference \[NA\] (2023, 2024)
 - Yet Another Perl Conference \[EU\] (2015, 2016)
 

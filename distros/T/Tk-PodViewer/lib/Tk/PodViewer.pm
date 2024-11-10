@@ -3,7 +3,7 @@ package Tk::PodViewer;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.05';
 use base qw(Tk::Derived Tk::Frame);
 
 Construct Tk::Widget 'PodViewer';
@@ -133,7 +133,7 @@ sub Populate {
 
 =item B<clear>
 
-Deletes all content and resets all stacks except the.
+Deletes all content and resets all stacks except the history.
 
 =cut
 
@@ -148,7 +148,7 @@ sub clear {
 
 =item B<clearHistory>
 
-Resets the history stack.
+Resets the history stack. 
 
 =cut
 
@@ -509,13 +509,11 @@ sub load {
 			my @blob = ();
 			my $text = $token->text;
 			if (exists $self->{'nbspaces'}) {
-				my @words = split(/\s/, $text);
-				while (@words) {
-					my $w = shift @words;
-					if (@words) {
-						push @blob, $w, [@tags], '-', ['nbspace'] 
-					} else {
-						push @blob, $w, [@tags] 
+				while ($text ne '') {
+					if ($text =~ s/^([^\s]+)//) {
+						push @blob, $1, [@tags] 
+					} elsif ($text =~ s/^\s//) {
+						push @blob, '-', ['nbspace'] 
 					}
 				}
 			} else {

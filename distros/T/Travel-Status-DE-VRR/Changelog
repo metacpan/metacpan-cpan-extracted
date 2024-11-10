@@ -1,3 +1,9 @@
+Travel::Status::DE::VRR 3.03 - Sat Nov 09 2024
+
+    * efa-m: handle undefined platforms
+    * Trip->polyline: pass `fallback => 1` to return beeline between stops
+      if the backend did not provide a polyline.
+
 Travel::Status::DE::VRR 3.02 - Wed Oct 16 2024
 
     * Stop: Add ar_delay, dep_delay, delay, stop_id accessos

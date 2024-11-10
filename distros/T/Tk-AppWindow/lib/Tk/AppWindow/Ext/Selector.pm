@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Selector - Navigate opened documents and files
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.15";
+$VERSION="0.16";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -27,8 +27,6 @@ require Tk::DocumentTree;
 Adds a document list to your application.
 Creates a tool panel called navigator panel unless it already exists.
 
-Replaces L<Tk::AppWindow::Ext::Navigator> which is becoming obsolete.
-
 =head1 CONFIG VARIABLES
 
 =over 4
@@ -36,7 +34,7 @@ Replaces L<Tk::AppWindow::Ext::Navigator> which is becoming obsolete.
 =item B<-documentinterface>
 
 Default value 'MDI'. Sets the extension name for the
-multiple docoment interface that B<Navigator> communicates with.
+multiple docoment interface that B<Selector> communicates with.
 
 =item B<-treeiconsize>
 
@@ -62,11 +60,14 @@ sub new {
 		-treeiconsize => ['PASSIVE'],
 	);
 
-
 	my $sb = $self->extGet('SideBars');
 	$sb->nbAdd('navigator panel', $panel, 'left') unless $sb->nbExists('navigator panel');
+	if ($sb->canRotateText) {
+		$sb->nbTextSide('navigator panel', 'bottom');
+		$sb->nbTextRotate('navigator panel', 90);
+	}
 
-	$self->addPostConfig('CreateDocumentList', $self);
+	$self->addPostConfig('CreateSideBar', $self, $panel);
 	return $self;
 }
 
@@ -86,11 +87,10 @@ sub Add {
 	$t->entryAdd($name);
 }
 
-sub CreateDocumentList {
-	my $self = shift;
+sub CreateSideBar {
+	my ($self, $panel) = @_;
 	my $sb = $self->extGet('SideBars');
 	my $page = $sb->pageAdd('navigator panel', 'Documents', 'document-open', undef, 'Document list', 250);
-
 	my $dt = $page->DocumentTree(
 		-entryselect => ['SelectDocument', $self],
 		-diriconcall => ['GetDirIcon', $self],
@@ -217,7 +217,7 @@ Unknown. If you find any, please contact the author.
 
 =item L<Tk::AppWindow::BaseClasses::Extension>
 
-=item L<Tk::AppWindow::Ext::NavigatorPanel>
+=item L<Tk::AppWindow::Ext::SideBars>
 
 =back
 

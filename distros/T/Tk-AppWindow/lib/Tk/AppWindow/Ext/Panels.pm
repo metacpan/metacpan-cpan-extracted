@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Panels - manage the layout of your application
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.12";
+$VERSION="0.16";
 use Tk;
 require Tk::Adjuster;
 require Tk::Pane;
@@ -34,11 +34,16 @@ Each Frame can be in a shown or hidden state.
 
 =over 4
 
+=item B<-panelgeometry>
+
+Specifies the geometry manager used for the panel layout. Possible
+values are 'pack' and 'grid'. Default value 'pack'.
+
 =item B<-panellayout>
 
 Specify the structure of your layout. 
 
-The keys used below are all home to the pack geometry manager. Plus a
+The keys used below are all home to the geometry manager used. Plus a
 few more. These are:
 
 =over 4
@@ -116,16 +121,22 @@ sub new {
 	$self->addPreConfig(
 		-showadjusteratcreate => ['PASSIVE', undef, undef, 1],
 	);
+	my $args = $self->GetArgsRef;
+	my $panelgeometry = delete $args->{'-panelgeometry'};
+	$panelgeometry = 'pack' unless defined $panelgeometry;
 
-	$self->{PACKINFO} = {};
 	$self->{ADJUSTACTIVE} = {};
 	$self->{ADJUSTERS} = {};
+	$self->{ADJUSTGEO} = {};
 	$self->{ADJUSTINFO} = {};
+	$self->{GEOINFO} = {};
 	$self->{LAYOUT} = undef;
 	$self->{PANELS} = {};
+	$self->{PANELGEOMETRY} = $panelgeometry;
 	$self->{VISIBLE} = {};
 
 	$self->configInit(
+		-panelgeometry => ['PanelGeometry', $self, $panelgeometry], 
 		-panellayout => ['PanelLayOut', $self, [
 			CENTER => {
 				-in => 'MAIN',
@@ -197,20 +208,61 @@ sub adjusterActive {
 }
 
 sub adjusterAssign {
-	my ($self , $name, $panel, $adjuster) = @_;
+	my ($self , $name, $panel, $adjuster, $row, $col) = @_;
 	$self->{ADJUSTINFO}->{$name} = {
 		-widget => $panel,
 		-side => $adjuster,
 	};
+	my $geoinf = $self->{GEOINFO}->{$name};
+	if ($self->PanelGeometry eq 'grid') {
+		my $prow = $geoinf->{'-row'};
+		my $pcolumn = $geoinf->{'-column'};
+		my $sticky;
+		if ($adjuster eq 'left') {
+			$sticky = 'ns';
+		} elsif ($adjuster eq 'right') {
+			$sticky = 'ns';
+		} elsif ($adjuster eq 'top') {
+			$sticky = 'ew';
+		} elsif ($adjuster eq 'bottom') {
+			$sticky = 'ew';
+		}
+		unless (defined $row) {
+			if ($adjuster eq 'left') {
+				$row = $prow;
+			} elsif ($adjuster eq 'right') {
+				$row = $prow;
+			} elsif ($adjuster eq 'top') {
+				$row = $prow + 1
+			} elsif ($adjuster eq 'bottom') {
+				$row = $prow - 1
+			}
+		}
+		unless (defined $col) {
+			if ($adjuster eq 'left') {
+				$col = $pcolumn + 1;
+			} elsif ($adjuster eq 'right') {
+				$col = $pcolumn - 1;
+			} elsif ($adjuster eq 'top') {
+				$col = $pcolumn;
+			} elsif ($adjuster eq 'bottom') {
+				$col = $pcolumn;
+			}
+		}
+		$self->{ADJUSTGEO}->{$name} = {
+			-sticky => $sticky,
+			-row => $row,
+			-column => $col,
+		};
+	} else {
+		$self->{ADJUSTGEO}->{$name} = $geoinf;
+	}
 }
 
 sub adjusterClear {
 	my ($self, $panel) = @_;
 	my $adj = $self->{ADJUSTERS}->{$panel};
-	if (defined $adj) {
-		$adj->destroy;
-		delete $self->{ADJUSTERS}->{$panel};
-	}
+	$self->geoForget($adj) if defined $adj;
 }
 
 sub adjusterDefine {
@@ -221,14 +273,16 @@ sub adjusterDefine {
 
 sub adjusterSet {
 	my ($self , $panel) = @_;
-	my $packinfo = $self->{PACKINFO}->{$panel};
+	my $adjgeo = $self->{ADJUSTGEO}->{$panel};
 	my $adjustinfo = $self->{ADJUSTINFO}->{$panel};
 	if (defined $adjustinfo) {
-		unless (exists $self->{ADJUSTERS}->{$panel}) {
+		my $adj = $self->{ADJUSTERS}->{$panel};
+		unless (defined $adj) {
 			my $parent = $self->Subwidget($panel)->parent;
-			my $adj = $parent->Adjuster(%$adjustinfo)->pack(%$packinfo);
+			$adj = $parent->Adjuster(%$adjustinfo);
 			$self->{ADJUSTERS}->{$panel} = $adj;
 		}
+		$self->geoShow($adj, %$adjgeo);
 	}
 }
 
@@ -242,6 +296,37 @@ sub adjusterWidget {
 	my $adjustinfo = $self->{ADJUSTINFO}->{$panel};
 	$adjustinfo->{'-widget'} = $widget if defined $widget;
 	return $adjustinfo->{'-widget'};
+}
+
+sub geoForget {
+	my $self = shift;
+	my $widget = shift;
+	my $gm = $self->PanelGeometry;
+	$gm = $gm . 'Forget';
+	$widget->$gm;
+}
+
+sub geoShow {
+	my $self = shift;
+	my $widget = shift;
+	my $gm = $self->PanelGeometry;
+	my %options = @_;
+	my $weight = delete $options{'-weight'};
+	if (defined $weight) {
+		my $par = $widget->parent;
+		my $sticky = $options{'-sticky'};
+		if (defined $sticky) {
+			if (($sticky =~ /e/) and ($sticky =~ /w/)) {
+				my $col = $options{'-column'};
+				$par->gridColumnconfigure($col, '-weight', $weight);
+			}
+			if (($sticky =~ /n/) and ($sticky =~ /s/)) {
+				my $row = $options{'-row'};
+				$par->gridRowconfigure($row, '-weight', $weight);
+			}
+		}
+	}
+	$widget->$gm(%options);
 }
 
 sub layout { return $_[0]->{LAYOUT}}
@@ -303,6 +388,13 @@ sub panelDelete {
 	$self->menuRefresh;
 }
 
+sub PanelGeometry {
+	my $self = shift;
+	$self->{PANELGEOMETRY} = shift if @_;
+	return $self->{PANELGEOMETRY}
+}
+
+
 
 =item B<panelGet>I<($name)>
 
@@ -324,7 +416,7 @@ panelHide $panel and its adjuster if any.
 sub panelHide {
 	my ($self, $panel) = @_;
 	unless ($self->panelIsHidden($panel)) {
-		$self->Subwidget($panel)->packForget;
+		$self->geoForget($self->Subwidget($panel));
 		$self->adjusterClear($panel);
 	}
 }
@@ -345,6 +437,7 @@ sub PanelLayOut {
 	my ($self, $layout) = @_;
 	return unless defined $layout;
 	$self->{LAYOUT} = $layout;
+	my $panelgeometry = $self->configGet('-panelgeometry');
 	my @l = @$layout;
 	while (@l) {
 		my $name = shift @l;
@@ -382,18 +475,16 @@ sub PanelLayOut {
 		$paneloptions = [] unless defined $paneloptions;
 
 		my $adjuster = delete $options->{'-adjuster'};
+		my $adjrow = delete $options->{'-adjusterrow'};
+		my $adjcolumn = delete $options->{'-adjustercolumn'};
 
 		my $panel = $parent->Frame(@$paneloptions);
 		
 		$self->Advertise($name, $panel);
 		
-		$self->adjusterAssign($name, $panel, $adjuster) if defined $adjuster;
-		
-		if ($canhide) {
-			$self->{PACKINFO}->{$name} = $options;
-		} else {
-			$panel->pack(%$options);
-		}
+		$self->{GEOINFO}->{$name} = $options;
+		$self->adjusterAssign($name, $panel, $adjuster, $adjrow, $adjcolumn) if defined $adjuster;
+		$self->geoShow($panel, %$options) unless $canhide;
 	}
 }
 
@@ -424,8 +515,8 @@ sub panelShow {
 	my ($self, $name) = @_;
 	if ($self->panelIsHidden($name)) {
 		my $panel = $self->Subwidget($name);
-		my $packinfo = $self->{PACKINFO}->{$name};
-		$panel->pack(%$packinfo);
+		my $packinfo = $self->{GEOINFO}->{$name};
+		$self->geoShow($panel, %$packinfo);
 		$self->adjusterSet($name) if $self->adjusterActive($name);
 	}
 }

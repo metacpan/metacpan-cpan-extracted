@@ -11,6 +11,7 @@ snippets/LEEJO/transform.pl
 snippets/LEEJO/vec_pack.pl
 snippets/LEEJO/quine.pl
 snippets/LEEJO/genome.pl
+snippets/LEEJO/obs.c
 snippets/MIKESTOK/soundex.pl
 snippets/NERDVANA/delorean_options.pl
 snippets/SLU/MAZE.BAS

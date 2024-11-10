@@ -1,13 +1,52 @@
 package Random::Simple;
-BEGIN { our $VERSION = 0.02 }
+BEGIN { our $VERSION = 0.03 }
 
 #############################################################
 
 =encoding utf8
 
-=head1 NAME
+=head1 Random::Simple
 
 Random::Simple - Simple, usable, real world random numbers
+
+=head2 Why Random::Simple?
+
+To make generating random numbers as easy as possible and in a manner that
+you can use in real code. Generate "good" random numbers without having to
+think about it.
+
+=head2 Usage
+
+    use Random::Simple;
+
+    my $integer = random_int($min, $max); # inclusive
+    my $bytes   = random_bytes($count);
+
+=head2 See also
+
+=over
+
+=item *
+Math::Random::PCG32
+
+=item *
+Math::Random::ISAAC
+
+=item *
+Math::Random::MT
+
+=item *
+Math::Random::Secure
+
+=back
+
+=head2 More information
+
+https://github.com/scottchiefbaker/perl-Random-Simple
+
+=head2 Author
+
+Scott Baker - https://www.perturb.org/
 
 =cut
 
@@ -31,7 +70,7 @@ sub warmup {
 	my $iter = $_[0];
 
 	for (my $i = 0; $i < $iter; $i++) {
-		rand64();
+		_rand64();
 	}
 }
 
@@ -43,7 +82,7 @@ sub seed {
 		print "SEEDING MANUALLY\n";
 	}
 
-	pcg32_seed($seed1, $seed2);
+	_seed($seed1, $seed2);
 
 	$has_been_seeded = 1;
 }
@@ -73,7 +112,7 @@ sub seed_with_random {
 
 	#print("XXX: $seed1, $seed2\n");
 
-	pcg32_seed($seed1, $seed2);
+	_seed($seed1, $seed2);
 
 	$has_been_seeded = 1;
 
@@ -89,7 +128,7 @@ sub random_bytes {
 
 	my $ret = "";
 	for (my $i = 0; $i < $octets_needed; $i++) {
-		my $num = rand64();
+		my $num = _rand64();
 
 		$ret .= pack("Q", $num);
 	}
@@ -104,9 +143,11 @@ sub random_int {
 
 	if (!$has_been_seeded) { seed_with_random(); }
 
+	if ($max < $min) { die("Max can't be less than min"); }
+
 	# FIXME: This is modulus and biased... fix later
 	my $range  = $max - $min + 1; # +1 makes it inclusive of $min AND $max
-	my $num    = rand64();
+	my $num    = _rand64();
 	my $ret    = $num % $range;
 	# Add back the offset
 	$ret      += $min;

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use vars qw ($VERSION);
-$VERSION =  0.02;
+$VERSION =  0.05;
 
 my $fileopenimg = '/* XPM */
 static char * fileopen_xpm[] = {
@@ -353,7 +353,7 @@ $viewer = $app->PodViewerFull(%options,
 		}
 	}
 )->pack(-expand => 1, -fill => 'both');
-$viewer->Subwidget('txt')->bind('<Control-o>', \&dialogPop);
+$app->bind('<Control-o>', \&dialogPop);
 
 
 $app->geometry('800x600+150+150');

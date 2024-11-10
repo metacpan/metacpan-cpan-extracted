@@ -7,6 +7,13 @@
 
 #include "pcg.h"
 
+// Alernate PRNGs available
+//#include "xorshiro.h"
+//#include "xoroshiro128starstar.h"
+//
+// Other PRGNs just need three functions _seed(S1,S2), _rand32(),
+// and _rand64()
+
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 
@@ -19,10 +26,10 @@ PROTOTYPES: ENABLE
  # directives
 
 U32
-rand32()
+_rand32()
 
 UV
-rand64()
+_rand64()
 
 void
-pcg32_seed(UV seed1, UV seed2)
+_seed(UV seed1, UV seed2)

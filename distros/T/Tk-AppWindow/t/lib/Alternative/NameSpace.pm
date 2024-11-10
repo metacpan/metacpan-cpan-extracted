@@ -19,7 +19,7 @@ sub Populate {
 	$self->geometry('800x600+150+150');
 
 	my %opts = (
-		-extensions => [qw[Art Daemons ToolBar StatusBar MenuBar NavigatorPanel ToolPanel Settings Plugins]],
+		-extensions => [qw[Art Daemons ToolBar StatusBar MenuBar SideBars Selector Settings Plugins]],
 		-namespace => 'Alternative::NameSpace',
 
 	);

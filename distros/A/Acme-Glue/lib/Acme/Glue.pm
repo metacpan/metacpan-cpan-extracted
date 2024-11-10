@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-$Acme::Glue::VERSION = "2024.10";
+$Acme::Glue::VERSION = "2024.11";
 
 =encoding utf8
 
@@ -14,7 +14,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 =head1 VERSION
 
-2024.10
+2024.11
 
 =head1 DESCRIPTION
 
@@ -164,6 +164,18 @@ Here are the snippets that may accompany the photo project
 	# Call the fizz_buzz subroutine with appropriate parameters
 	print Dumper( \@result );
 
+=head2 LEEJO (snippet from obs-studio/libobs/obs.c)
+
+	static void stop_audio(void)
+	{
+		struct obs_core_audio *audio = &obs->audio;
+
+		if (audio->audio) {
+			audio_output_close(audio->audio);
+			audio->audio = NULL;
+		}
+	}
+
 =head2 MIKESTOK (soundex "joke")
 
     sub Soundex
@@ -226,7 +238,7 @@ A full list of the workshops and conferences this project was shot at
 
 =item The Perl Conference [NA] (2016, 2017)
 
-=item The Perl Toolchain Sumit (2017)
+=item The Perl Toolchain Summit (2017)
 
 =item The Perl and Raku Conference [NA] (2023, 2024)
 

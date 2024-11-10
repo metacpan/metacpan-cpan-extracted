@@ -112,7 +112,6 @@ lib/Travel/Status/DE/EFA/Stop.pm
 lib/Travel/Status/DE/EFA/Trip.pm
 lib/Travel/Status/DE/VRR.pm
 MANIFEST			This list of files
-META.json
 README.md
 scripts/check-efa-urls
 scripts/makedeb-docker
@@ -124,4 +123,5 @@ t/in/essen_alfred_ambiguous.json
 t/in/essen_bp.json
 xt/10-pod-coverage.t
 META.yml
+META.json
 SIGNATURE    Added here by Module::Build

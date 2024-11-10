@@ -15,10 +15,10 @@ This is for testing only. Yes, you read me, for TESTING. Didn't you hear me say?
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new(@_, 'NavigatorPanel');
+	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
-	my $tp = $self->extGet('NavigatorPanel');
-	my $page = $tp->addPage('Colors', 'fill-color', undef, 'Select and insert colors');
+	my $sb = $self->extGet('SideBars');
+	my $page = $sb->pageAdd('navigator panel', 'Colors', 'fill-color', undef, 'Select and insert colors');
 	$page->Label(-text => 'Colors')->pack(-expand => 1, -fill => 'both');
 	$self->{QUITTER} = 1;
 	$self->cmdHookBefore('plusser', $plsub);
@@ -58,7 +58,8 @@ sub Unload {
 	my $self = shift;
 	if ($self->{QUITTER}) {
 		$self->cmdUnhookBefore('plusser', $plsub);
-		$self->extGet('NavigatorPanel')->deletePage('Colors');
+		my $sb = $self->extGet('SideBars');
+		$sb->pageDelete('navigator panel', 'Colors');
 		return $self->SUPER::Unload
 	}
 	return 0

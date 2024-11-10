@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.15";
+$VERSION="0.16";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
@@ -214,7 +214,6 @@ sub Populate {
 		my $message = shift;
 		print STDERR "$message\n";
 	};
-	$self->bind('<Configure>', [$self, 'OnConfigure']);
 	$self->ConfigSpecs(
 		-initpaneldelay => ['PASSIVE', undef, undef, 500],
 		-linkcolor => ['PASSIVE', 'linkColor', 'LinkColor', '#3030DF'],
@@ -735,48 +734,49 @@ sub fileSeparator {
 	return '/'
 }
 
-sub geoAddCall {
-	my $self = shift;
-	my $panel = shift;
-	my $call = $self->CreateCallback(@_);
-	$self->{GEOCALLS}->{$panel} = $call if defined $call; 
-}
+#sub geoAddCall {
+#	my $self = shift;
+#	my $panel = shift;
+#	my $call = $self->CreateCallback(@_);
+#	$self->{GEOCALLS}->{$panel} = $call if defined $call; 
+#}
+#
+#sub geoBlock {
+#	my $self = shift;
+#	$self->{GEOBLOCK} = shift if @_;
+#	return $self->{GEOBLOCK};
+#}
+#
+#sub geoCalls {
+#	my $self = shift;
+#	return if $self->configMode;
+#	return if $self->geoBlock;
+#	my $exclusive = $self->geoExclusive;
+#	my $calls = $self->{GEOCALLS};
+#	if ($exclusive eq '') {
+## 		print "resize all\n";
+#		for (keys %$calls) { $calls->{$_}->execute };
+#	} else {
+## 		print "resize $exclusive\n";
+#		$calls->{$exclusive}->execute;
+#	}
+#	delete $self->{'cfid'};
+#}
+#
+#sub geoDeleteCall {
+#	my ($self, $panel) = @_;
+#	delete $self->{GEOCALLS}->{$panel};
+#}
+#
+#sub geoExclusive {
+#	my $self = shift;
+#	$self->{GEOEXCLUSIVE} = shift if @_;
+#	return $self->{GEOEXCLUSIVE};
+#}
+#
+#sub geoRemoveCall {
+#}
 
-sub geoBlock {
-	my $self = shift;
-	$self->{GEOBLOCK} = shift if @_;
-	return $self->{GEOBLOCK};
-}
-
-sub geoCalls {
-	my $self = shift;
-	return if $self->configMode;
-	return if $self->geoBlock;
-	my $exclusive = $self->geoExclusive;
-	my $calls = $self->{GEOCALLS};
-	if ($exclusive eq '') {
-# 		print "resize all\n";
-		for (keys %$calls) { $calls->{$_}->execute };
-	} else {
-# 		print "resize $exclusive\n";
-		$calls->{$exclusive}->execute;
-	}
-	delete $self->{'cfid'};
-}
-
-sub geoDeleteCall {
-	my ($self, $panel) = @_;
-	delete $self->{GEOCALLS}->{$panel};
-}
-
-sub geoExclusive {
-	my $self = shift;
-	$self->{GEOEXCLUSIVE} = shift if @_;
-	return $self->{GEOEXCLUSIVE};
-}
-
-sub geoRemoveCall {
-}
 sub GetArgsRef { return $_[0]->{ARGS} }
 
 =item B<getArt>I<($icon, $size)>
@@ -863,14 +863,6 @@ sub MenuItems {
 
 sub NameSpace {
 	return $_[0]->{NAMESPACE}
-}
-
-sub OnConfigure {
-	my $self = shift;
-	my $cfid = $self->{'cfid'};
-	$self->afterCancel($cfid) if defined $cfid;
-	my $id = $self->after(400, ['geoCalls', $self]);
-	$self->{'cfid'} = $id;
 }
 
 =item B<openURL>I<($file_or_web)>

@@ -215,7 +215,11 @@ start_connect:
     goto error_out2;
   }
 
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
   cert = SSL_get_peer_certificate(self->ssl);
+#else
+  cert = SSL_get1_peer_certificate(self->ssl);
+#endif
 
   if (self->verify_peer) {
     if (!cert) {
@@ -627,7 +631,7 @@ out:
 #endif
 }
 
-static int initialize_ssl_and_increment_connections() {
+static int initialize_ssl_and_increment_connections(void) {
   int status;
   CHECK_SUCCESS(pthread_mutex_lock(&openssl_init_mutex));
 

@@ -1,5 +1,13 @@
 Revision history for Perl extension Tk::AppWindow.
 
+0.16 Sat Nov 09 2024
+	- Removed extensions Navigator NavigatorPanel and ToolPanel, they are obsolete.
+	- Removed methods geo* from Tk::AppWindow and removed it's binding to <Configure>
+	- Extension Panels now can also operate in grid mode
+	- Added method text2image to extension Art. We can now rotate text.
+	- Side bars can now have vertical text labels.
+	- More button now has an icon
+
 0.15 Sat Oct 12 2024
 	- Added pause method to Tk::AppWindow
 	- Added extension Selector

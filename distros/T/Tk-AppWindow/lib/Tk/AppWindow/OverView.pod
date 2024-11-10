@@ -101,17 +101,9 @@ Multiple Document Interface
 
 Menus and stuff
 
-=item B<Navigator>
-
-Navigate your documents in a multiple document interface.
-
-=item B<NavigatorPanel>
-
-Panel used by Nnavigator
-
 =item B<Panels>
 
-Arrange your panels, like Toolbar, StatusBar, NavigatorPanel, ToolPanel and Work area.
+Arrange your panels, like Toolbar, StatusBar and Work area.
 
 =item B<Plugins>
 
@@ -132,14 +124,6 @@ Log messages and special events.
 =item B<ToolBar>
 
 What to say?
-
-=item B<ToolPanel>
-
-Panel like NavigatorPanel. By default on the right hand side.
-
-=item B<WebBrowser>
-
-Interface to your webbrowser.
 
 =back
 

@@ -64,6 +64,6 @@
          "web" : "https://github.com/haje61/Tk-AppWindow"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

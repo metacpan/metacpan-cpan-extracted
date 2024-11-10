@@ -23,7 +23,7 @@ cgi_this - export the current directory as if it were a cgi-bin
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -35,6 +35,9 @@ version 0.004
     
     ## Start the server on a specific port
     $ cgi_this --port 9001
+
+    ## Set HTTP server to listen for incoming connections on 192.168.0.1
+    $ cgi_this --host 192.168.0.1
     
     ## Announces the HTTP server via Bonjour with the specified name
     $ cgi_this --name "My CGI server"
@@ -43,15 +46,16 @@ version 0.004
     $ cgi_this --cgi-bin
     
     ## Show documentation about our options
-    $ http_this --help
+    $ cgi_this --help
     
     ## Show the entire man page
-    $ http_this --man
+    $ cgi_this --man
 
 =head1 DESCRIPTION
 
 Like L<http_this> and L<https_this>, but converts the directory to a C<cgi-bin>
-and runs every script in it as a CGI script.
+and runs every script in it as a CGI script. This is useful for testing old CGI 
+scripts when you don't have a web server installed.
 
 =head1 OPTIONS
 
@@ -61,7 +65,11 @@ The following options are available:
 
 =item --port PORT
 
-Start the HTTP server ona specific C<PORT>. Default is 3000.
+Start the HTTP server on a specific C<PORT>. Default is 3000.
+
+=item --host IP_ADDRESS
+
+Set HTTP server to listen for incoming connections on C<IP_ADDRESS>. Default is 127.0.0.1.
 
 =item --name NAME
 
@@ -85,6 +93,35 @@ Print information about the script usage and its options.
 Print the entire man page for the command.
 
 =back
+
+=head2 EXAMPLES
+
+The C<t/> directory of this distribution contains a few examples. Here is how to use them.
+
+    $ cgi_this t
+    Exporting 't', available at:
+    http://127.0.0.1:3000/
+
+    Found the following scripts:
+        http://127.0.0.1:3000/test-no-bin.cgi
+        http://127.0.0.1:3000/bin/test.pl    
+
+At this point you can visit the URLs in your browser and see the scripts in action. 
+
+If want some nostalgia, enable the C<--cgi-bin> option. It will stick a fake C</cgi-bin> in the URL.
+
+    $ cgi_this --cgi-bin t
+    Exporting 't', available at:
+    http://127.0.0.1:3000/
+
+    Found the following scripts:
+        http://127.0.0.1:3000/cgi-bin/test-no-bin.cgi
+        http://127.0.0.1:3000/cgi-bin/bin/test.pl
+
+=head2 SEE ALSO
+
+At the the Swiss Perl Workshop in 2018 Julien gave a talk about this and similar modules, 
+titled "Do stuff with _this". You can find a recording L<here|https://www.youtube.com/watch?v=b33MDXyl3Mw&t=26126>.
 
 =head1 AUTHOR
 

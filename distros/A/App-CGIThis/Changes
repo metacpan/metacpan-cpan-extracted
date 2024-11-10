@@ -1,4 +1,9 @@
+0.005     2024-11-09 22:36:28+00:00 Europe/London
+        - Improve documentation
+        - Add `--host' argument(#6)(Kueppo Tcheukam)
+
 0.004     2018-08-16 00:58:14+01:00 Europe/London
+        - Include .cgi files and remove duplicate slashes from output (Mohammad S Anwar)
 
 0.003     2017-10-13 18:15:26+02:00 Europe/Berlin
         - rerelease previous version because it was broken

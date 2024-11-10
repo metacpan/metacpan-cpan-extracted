@@ -1,5 +1,8 @@
 Revision history for Acme::Glue
 
+2024.11
+    - obs.c snippet, bordering on semantic satiation
+
 2024.10
     - a better video of the lightning talk
 

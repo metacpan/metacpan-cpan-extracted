@@ -1,5 +1,11 @@
 Revision history for Perl extension Tk::PodViewer.
 
+0.05  Sat Nov 09 2024
+	- fixed issue with consequtive non breakable spaces
+
+0.03  Thu Oct 10 2024
+	- pressing up and down arrow now immediately scrolls the text
+
 0.03  Fri Aug 23 2024
 	- corrected README.md
 	- fixed non breakable spaces tags

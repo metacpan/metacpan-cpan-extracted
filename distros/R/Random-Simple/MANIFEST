@@ -3,6 +3,7 @@ lib/Random/Simple.pm
 lib/Random/Simple.xs
 lib/Random/pcg.h
 lib/Random/xorshiro.h
+lib/Random/xoroshiro128starstar.h
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

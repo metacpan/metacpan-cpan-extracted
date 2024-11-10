@@ -18,6 +18,7 @@ createapp(
 	-appname => 'Selector',
 	-extensions => [qw[Art MenuBar ToolBar StatusBar MDI Selector]],
 	-configfolder => 't/settings',
+#	-icontheme => 'Oxygen',
 	-contentmanagerclass => 'TestTextManager',
 #	-icontheme => 'Bloom',
 );

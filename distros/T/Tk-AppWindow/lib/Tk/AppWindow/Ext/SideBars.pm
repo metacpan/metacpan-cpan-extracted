@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::SideBars - Basic functionality for side bars.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = "0.15";
+$VERSION = "0.16";
 use Tk;
 require Tk::YANoteBook;
 
@@ -45,7 +45,7 @@ sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);
 	$self->Require('Panels');
-	$self->{ICONSIZE} = 32;
+	$self->{ICONSIZE} = 22;
 	$self->{INITIALSIZES} = {};
 	$self->{LASTSIZE} = {};
 	$self->{PAGES} = {};
@@ -54,9 +54,10 @@ sub new {
 	$self->{UNSELECTCALLS} = {};
 	$self->{TABSIDES} = {};
 	$self->{TEXTSIDES} = {};
+	$self->{TEXTROTATES} = {};
 
 	$self->configInit(
-		'-sidebariconsize' => ['IconSize', $self, 32]
+		'-sidebariconsize' => ['IconSize', $self, 22]
 	);
 	return $self;
 }
@@ -65,7 +66,19 @@ sub new {
 
 =over 4
 
+=item B<canRotateText>
+
+Returns true if facilities for rotating text are in place.
+On linux this means the command 'fc-list' works.
+
 =cut
+
+sub canRotateText {
+	my $self = shift;
+	my $art = $self->extGet('Art');
+	return 0 unless defined $art;
+	return $art->canRotateText;
+}
 
 =item B<IconSize>I<(?$size?)>
 
@@ -97,6 +110,9 @@ sub nbAdd {
 		-unselecttabcall => ['TabUnselect', $self, $name],
 	)->pack(-expand => 1, -fill=> 'both', -padx => 2, -pady => 2);
 	$self->{TABSIDES}->{$name} = $tabside;
+	$self->after(200, sub { 
+		$nb->Subwidget('MoreButton')->configure(-image => $self->getArt('document-multiple', 16))
+	});
 	$self->Advertise($name . 'NB', $nb);
 	my $pn = $self->extGet('Panels');
 	$pn->adjusterWidget($panel, $nb);
@@ -115,7 +131,7 @@ sub nbDelete {
 	my ($self, $name) = @_;
 	my $pn = $self->extGet('Panels');
 	my $panel = $pn->panelGet($name);
-	$self->geoDeleteCall($panel);
+#	$self->geoDeleteCall($panel);
 	$pn->panelDelete($name);
 	delete $self->textsides->{$name};
 	$name = $name . 'NB';
@@ -211,7 +227,12 @@ sub nbOffset {
 	return (($tf->cget('-borderwidth') + $nb->cget('-borderwidth')) * 2) +1
 }
 
-=item B<nbTextSide>I($name, ?$side?)>
+=item B<nbTextSide>I($name, $side)>
+
+Specifies where the text should be shown relative to the image in the
+page tags of sidebar $name. Posible values are 'left', 'right', 'top', 'bottom'
+and 'none'. If you do not call this method for a notebook it will be treated as
+'none'.
 
 =cut
 
@@ -219,6 +240,20 @@ sub nbTextSide {
 	my ($self, $name, $side) = @_;
 	$self->textsides->{$name} = $side if defined $side;
 	return $self->textsides->{$name}
+}
+
+=item B<nbTextRotate>I($name, $degrees)>
+
+Specifies with how many degrees text on tags of sidebar $name
+should be rotated. If you do not call this method for a notebook
+it will be treated as 0 degrees.
+
+=cut
+
+sub nbTextRotate {
+	my ($self, $name, $rotate) = @_;
+	$self->textrotates->{$name} = $rotate if defined $rotate;
+	return $self->textrotates->{$name}
 }
 
 =item B<pageAdd>I<($notebook, $name, $image, $text, $statustext, $initialsize)>
@@ -299,17 +334,16 @@ sub pageImage {
 	my $img;
 	if (defined $art) {
 		my $image = $art->getIcon($icon, $self->IconSize);
-		return undef unless defined $image;
 		my $side = $self->textsides->{$nb};
-		if (defined $side) {
-			$img = $art->createCompound(
-				-textside => $side,
-				-image => $image,
-				-text => $text,
-			);
-		} else {
-			$img = $art->getIcon($icon, $self->IconSize);
-		}
+		$side = 'none' unless defined $side;
+		my $rotate = $self->textrotates->{$nb};
+
+		$img = $art->createCompound(
+			-textside => $side,
+			-image => $image,
+			-text => $text,
+			-textrotate => $rotate,
+		);
 	}
 	return $img;
 }
@@ -369,7 +403,7 @@ sub ReConfigure {
 sub TabSelect {
 	my ($self, $notebook, $tab) = @_;
 	return if $self->configMode;
-	$self->geoBlock(1);
+#	$self->geoBlock(1);
 	my $pn = $self->extGet('Panels');
 	$self->after(1, sub {
 		$self->nbMaximize($notebook, $tab);
@@ -379,7 +413,7 @@ sub TabSelect {
 		my $call = $self->{SELECTCALLS}->{$tab};
 		$call->execute if defined $call;
 	});
-	$self->after(200, ['geoBlock', $self, 0]);
+#	$self->after(200, ['geoBlock', $self, 0]);
 }
 
 sub TabUnselect {
@@ -389,14 +423,16 @@ sub TabUnselect {
 	my $p = $pn->panelAssign($notebook);
 	$pn->adjusterClear($p);
 	$pn->adjusterActive($p, 0);
-	$self->geoBlock(1);
+#	$self->geoBlock(1);
 	$self->nbMinimize($notebook, $tab);
 	my $call = $self->{UNSELECTCALLS}->{$tab};
 	$call->execute if defined $call;
-	$self->after(400, ['geoBlock', $self, 0]);
+#	$self->after(400, ['geoBlock', $self, 0]);
 }
 
 sub textsides { return $_[0]->{TEXTSIDES} }
+
+sub textrotates { return $_[0]->{TEXTROTATES} }
 
 =back
 

@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -237,7 +237,8 @@ sub format_route {
 				$output .= sprintf(
 					"    %5s      %s %s %35s %s\n",
 					$stop->arr->strftime('%H:%M'),
-					$delay, $occupancy, $stop->full_name, $stop->platform,
+					$delay, $occupancy, $stop->full_name,
+					$stop->platform // q{},
 				);
 			}
 			else {
@@ -248,7 +249,7 @@ sub format_route {
 					$delay,
 					$occupancy,
 					$stop->full_name,
-					$stop->platform,
+					$stop->platform // q{},
 				);
 			}
 		}
@@ -344,10 +345,12 @@ sub show_stopseq {
 	);
 	say q{};
 
-	my $delay_len = 0;
-	my $max_delay = max map { abs( $_->delay // 0 ) } $trip->route;
+	my $delay_len       = 0;
+	my $inner_delay_len = 0;
+	my $max_delay       = max map { abs( $_->delay // 0 ) } $trip->route;
 	if ($max_delay) {
-		$delay_len = length( sprintf( '%+d', $max_delay ) ) + 1;
+		$inner_delay_len = length($max_delay) + 1;
+		$delay_len       = length( sprintf( '(%+d)', $max_delay ) ) + 1;
 	}
 
 	for my $stop ( $trip->route ) {
@@ -357,7 +360,8 @@ sub show_stopseq {
 			: q{     },
 			$stop->dep ? $stop->dep->strftime('%H:%M')
 			: q{     },
-			$stop->delay ? sprintf( ' %+d', $stop->delay ) : q{},
+			$stop->delay ? sprintf( " (%+${inner_delay_len}d)", $stop->delay )
+			: q{},
 			$stop->full_name,
 			$stop->niveau,
 			$stop->platform
@@ -605,7 +609,7 @@ B<efa-m> [B<-s> I<service>] I<tripid>
 
 =head1 VERSION
 
-version 3.02
+version 3.03
 
 =head1 DESCRIPTION
 

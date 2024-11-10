@@ -95083,3 +95083,12 @@ C/CO/CORION/RecentInfo-Manager-0.04.tar.gz
 E/EH/EHUELS/Test-Dependencies-0.34.tar.gz
 N/NH/NHORNE/Text-Names-GB-0.04.tar.gz
 I/IN/INGY/YAMLScript-0.1.83.tar.gz
+L/LE/LEEJO/Acme-Glue-2024.11.tar.gz
+S/SI/SIMBABQUE/App-CGIThis-0.005.tar.gz
+P/PE/PERLANCAR/HashDataBundle-Display-Resolution-0.001.tar.gz
+M/MS/MSTEMLE/Net-AMQP-RabbitMQ-2.40014.tar.gz
+B/BA/BAKERSCOT/Random-Simple-0.03.tar.gz
+U/UT/UTASHIRO/Text-ANSI-Fold-2.24.tar.gz
+H/HA/HANJE/Tk-AppWindow-0.16.tar.gz
+H/HA/HANJE/Tk-PodViewer-0.05.tar.gz
+D/DE/DERF/Travel-Status-DE-VRR-3.03.tar.gz

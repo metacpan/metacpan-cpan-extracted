@@ -9,7 +9,7 @@ use Travel::Status::DE::EFA::Stop;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 
 Travel::Status::DE::EFA::Trip->mk_ro_accessors(
 	qw(operator product product_class name line number type id dest_name dest_id)
@@ -46,7 +46,12 @@ sub new {
 }
 
 sub polyline {
-	my ($self) = @_;
+	my ( $self, %opt ) = @_;
+
+	if ( $opt{fallback} and not @{ $self->{polyline} // [] } ) {
+		# TODO add $_->{id} as well?
+		return map { $_->{latlon} } $self->route;
+	}
 
 	return @{ $self->{polyline} // [] };
 }
@@ -143,7 +148,7 @@ trip
 
 =head1 VERSION
 
-version 3.02
+version 3.03
 
 =head1 DESCRIPTION
 

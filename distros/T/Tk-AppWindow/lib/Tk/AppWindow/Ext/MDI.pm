@@ -11,7 +11,7 @@ use warnings;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION="0.15";
+$VERSION="0.16";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -503,6 +503,7 @@ Creates a Tk::YANoteBook multiple document interface.
 sub CreateInterface {
 	my $self = shift;
 	$self->{INTERFACE} = $self->WorkSpace->YANoteBook(
+		-image => $self->getArt('document-multiple', 16),
 		-selecttabcall => ['cmdExecute', $self, 'doc_select'],
 		-closetabcall => ['cmdExecute', $self, 'doc_close'],
 	)->pack(-expand => 1, -fill => 'both');
@@ -1282,7 +1283,6 @@ sub monitorUpdate {
 sub navigator {
 	my $self = shift;
 	my $nav = $self->extGet('Selector');
-	$nav = $self->extGet('Navigator') unless defined $nav;
 	return $nav
 }
 

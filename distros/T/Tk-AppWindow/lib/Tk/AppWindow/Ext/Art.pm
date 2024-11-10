@@ -10,7 +10,7 @@ Tk::AppWindow::Ext::Art - Use icon libraries quick & easy
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.08";
+$VERSION="0.16";
 use Config;
 my $mswin = 0;
 $mswin = 1 if $Config{'osname'} eq 'MSWin32';
@@ -28,9 +28,12 @@ require Tk::Photo;
 use Tk::PNG;
 
 my $svgsupport = 0;
-
 eval 'use Image::LibRSVG';
 $svgsupport = 1 unless $@;
+
+my $t;
+eval '$t = `fc-list :family=xxxx:style=yyyy`';
+my $fc_list_supported = defined $t;
 
 =head1 SYNOPSIS
 
@@ -141,7 +144,7 @@ sub new {
 	);
 
 	$self->addPreConfig(
-		-compoundcolspace =>['PASSIVE', undef, undef, 5],
+		-compoundcolspace =>['PASSIVE', undef, undef, 3],
 		-iconsize => ['PASSIVE', 'iconSize', 'IconSize', 16],
 		-icontheme => ['PASSIVE', 'iconTheme', 'IconTheme', 'Oxygen'],
 	);
@@ -247,6 +250,19 @@ sub cacheName {
 	return "$file-$width-$height"
 }
 
+=item B<canRotateText>
+
+Returns true if facilities for rotating text are in place.
+On linux this means the command 'fc-list' works.
+
+=cut
+
+sub canRotateText {
+	my $self = shift;
+	return 1 if $mswin;
+	return $fc_list_supported;
+}
+
 =item B<createCompound>I<(%args)>
 
 Creates and returns a compound image.
@@ -254,7 +270,7 @@ Creates and returns a compound image.
 
 B<-image> Reference to a Tk::Image object.
 
-B<-orient> Either 'Horizontal' or 'Vertical'. Default is 'Horizontal'.
+B<-textrotate> An angle in degrees.
 
 B<-text> Text to be displayed.
 
@@ -267,59 +283,57 @@ sub createCompound {
 	my %args = (@_);
 	
 	my $side = delete $args{'-textside'};
-	my $orient = delete $args{'-orient'};
-	$orient = 'Horizontal' unless defined $orient;
 	my $text = delete $args{'-text'};
 	my $image = delete $args{'-image'};
+	my $rotate = delete $args{'-textrotate'};
+	my $textimage;
+	$textimage = $self->text2image($text, $rotate) if defined $rotate;
 	$side = 'right' unless defined $side;
 	my $compound = $self->Compound;
 	if ($side eq 'left') {
-		if ($orient eq 'Vertical') {
-			$self->CreateCompoundVertical($compound, $text);
+		if (defined $textimage) {
+			$compound->Image(-image => $textimage);
 		} else {
-			$compound->Text(-text => $text, -anchor => 'c');
+			$compound->Text(-text => $text, -anchor => 'c') if defined $text;
 		}
-		$compound->Space(-width => $self->configGet('-compoundcolspace'));
-		$compound->Image(-image => $image);
+		if (defined $image) {
+			$compound->Space(-width => $self->configGet('-compoundcolspace'));
+			$compound->Image(-image => $image);
+		}
 	} elsif ($side eq 'right') {
-		$compound->Image(-image => $image);
-		$compound->Space(-width => $self->configGet('-compoundcolspace'));
-		if ($orient eq 'Vertical') {
-			$self->CreateCompoundVertical($compound, $text);
-		} else {
+		$compound->Image(-image => $image) if defined $image;
+		if (defined $textimage) {
+			$compound->Space(-width => $self->configGet('-compoundcolspace'));
+			$compound->Image(-image => $textimage);
+		} elsif (defined $text) {
+			$compound->Space(-width => $self->configGet('-compoundcolspace'));
 			$compound->Text(-text => $text, -anchor => 'c');
 		}
 	} elsif ($side eq 'top') {
-		if ($orient eq 'Vertical') {
-			$self->CreateCompoundVertical($compound, $text);
+		if (defined $textimage) {
+			$compound->Image(-image => $textimage);
 		} else {
-			$compound->Text(-text => $text, -anchor => 'c');
+			$compound->Text(-text => $text, -anchor => 'c') if defined $text;
 		}
-		$compound->Line;
-		$compound->Image(-image => $image);
+		if (defined $image) {
+			$compound->Line(-pady => $self->configGet('-compoundcolspace'));
+			$compound->Image(-image => $image);
+		}
 	} elsif ($side eq 'bottom') {
-		$compound->Image(-image => $image);
-		$compound->Line;
-		if ($orient eq 'Vertical') {
-			$self->CreateCompoundVertical($compound, $text);
-		} else {
+		$compound->Image(-image => $image) if defined $image;
+		if (defined $textimage) {
+			$compound->Line(-pady => $self->configGet('-compoundcolspace'));
+			$compound->Image(-image => $textimage);
+		} elsif (defined $text) {
+			$compound->Line(-pady => $self->configGet('-compoundcolspace'));
 			$compound->Text(-text => $text, -anchor => 'c');
 		}
 	} elsif ($side eq 'none') {
-		$compound->Image(-image => $image);
+		$compound->Image(-image => $image) if defined $image;
 	} else {
 		warn "illegal value $side for -textside. Should be 'left', 'right' 'top', bottom' or 'none'"
 	}
 	return $compound;
-}
-
-sub CreateCompoundVertical {
-	my ($self, $compound, $text) = @_;
-	my @t = split(//, $text);
-	for (@t) {
-		$compound->Text(-text => $_, -anchor => 'c');
-		$compound->Line;
-	}
 }
 
 =item B<createEmptyImage>I<(?$width?, ?$height?)>
@@ -373,6 +387,37 @@ sub DoPostConfig {
 	my $size = $self->configGet('-iconsize');
 	$size = $self->getAlternateSize($size);
 	$self->configPut(-iconsize => $size);
+}
+
+sub fontFile {
+	my ($self, $font) = @_;
+	my $family = $self->fontActual($font, '-family');
+	$family =~ s/\s//g; #remove spaces
+	my $slant = $self->fontActual($font, '-slant');
+	my $weight = $self->fontActual($font, '-weight');
+	$slant = '' if $slant eq 'roman';
+	$weight = '' if $weight eq 'normal';
+	my $style = $weight . $slant;
+	if ($style eq '') {
+		for ('regular', 'normal', 'roman') {
+			my $f = $self->fontFind($family, $_);
+			if (defined $f) {
+				last
+				return $f
+			}
+		}
+	} else {
+		return $self->fontFind($family, $style);
+	}
+}
+
+sub fontFind {
+	my ($self, $family, $style) = @_;
+	my $res = `fc-list :family=$family:style=$style`;
+	if ($res =~ s/([^\:]*)\:.*\n//) {
+		return $1
+	}
+	return undef
 }
 
 =item B<getAlternateSize>I<($size>)>
@@ -503,6 +548,74 @@ sub loadImage {
 		warn "image file $file not found \n";
 	}
 	return undef
+}
+
+
+=item B<text2image>I<($text, ?$rotate?)>
+
+Returns a Tk::Photo class with $text as image. $rotate specifies
+how much the text must be rotated in degrees. On linux this only works
+if the command 'fc-list' is available.
+
+=cut
+
+sub text2image {
+	my ($self, $text, $rotate) = @_;
+	return undef unless $fc_list_supported;
+	my $l = $self->Label;
+	my $fnt = $l->cget('-font');
+	my $color = $l->cget('-foreground');
+	$color = '#000000' if $color eq 'SystemButtonText';
+	my $fontsize = abs($self->fontActual($fnt, '-size'));
+	my $width = $self->fontMeasure($fnt, $text) + 2;
+	my $height = $self->fontMetrics($fnt, '-linespace') + 2;
+	my $desc = $self->fontMetrics($fnt, '-descent');
+	my $ypos = $height - $desc - 1;
+	$l->destroy;
+	
+	my $img = Imager->new(xsize => $width, ysize => $height, channels => 4);
+	
+	$color = Imager::Color->new($color) or die "Color";
+
+	my $font;	
+	if ($mswin) {
+		my $fontdesc = $self->fontActual($fnt, '-family');
+		my $fontweight = $l->fontActual($fnt, '-weight');
+		$fontdesc = "$fontdesc bold" if $fontweight eq 'bold';
+		my $fontslant = $l->fontActual($fnt, '-slant');
+		$fontdesc = "$fontdesc italic" if $fontslant eq 'italic';
+		$font = Imager::Font->new(
+			face  => $fontdesc,
+			size  => $fontsize,
+		) or die Imager->errstr;
+	} else {
+		my $fontfile = $self->fontFile($fnt);
+		$font = Imager::Font->new(
+			file  => $fontfile,
+			size  => $fontsize,
+		) or die Imager->errstr;
+	}
+	
+	$img->string(
+		x => 1,
+		'y' => $ypos,
+		font => $font, 
+		string => $text, 
+		color => $color, 
+		aa => 1,
+	) or die "String";
+
+	if (defined $rotate) {
+		my $new = $img->rotate(degrees => $rotate);
+		$img = $new;
+	}
+	
+	my $data;
+	$img->write(data => \$data, type => 'png');
+	return $self->Photo(
+		-format => 'png',
+		-data => encode_base64($data)
+	)
 }
 
 =back

@@ -41,5 +41,5 @@ requires:
   Tk::YANoteBook: '0.09'
 resources:
   repository: git://github.com/haje61/Tk-AppWindow.git
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

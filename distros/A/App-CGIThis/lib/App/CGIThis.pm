@@ -16,7 +16,7 @@ sub new {
     my $class = shift;
     my $self = bless { port => 3000, root => '.' }, $class;
 
-    GetOptions( $self, "help", "man", "port=i", "name=s", "cgi-bin" ) || pod2usage(2);
+    GetOptions( $self, "help", "man", "port=i", "host=s", "name=s", "cgi-bin" ) || pod2usage(2);
     pod2usage(1) if $self->{help};
     pod2usage( -verbose => 2 ) if $self->{man};
 
@@ -36,6 +36,7 @@ sub run {
     my $runner = Plack::Runner->new;
     $runner->parse_options(
         '--port'         => $self->{port},
+        '--host'         => $self->{host},
         '--env'          => 'production',
         '--server_ready' => sub { $self->_server_ready(@_) },
     );
@@ -110,7 +111,7 @@ App::CGIThis - Export the current directory like a cgi-bin
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
