@@ -1,6 +1,6 @@
 package SPVM::Net::SSLeay;
 
-our $VERSION = "0.008";
+our $VERSION = "0.010";
 
 1;
 
@@ -34,11 +34,17 @@ See source codes of L<IO::Socket::SSL|https://metacpan.org/pod/SPVM::IO::Socket:
 
 =head1 Fields
 
+=head2 ssl_ctx
+
+C<has ssl_ctx : L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX>;>
+
+A L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX> object.
+
 =head2 operation_error
 
 C<has operation_error : ro int;>
 
-The place where the return value of L<SSL_get_error|https://docs.openssl.org/1.1.1/man3/SSL_get_error/>.
+The place where the return value of L<SSL_get_error|https://docs.openssl.org/1.1.1/man3/SSL_get_error/> function is stored.
 
 =head1 Class Methods
 
@@ -46,11 +52,25 @@ The place where the return value of L<SSL_get_error|https://docs.openssl.org/1.1
 
 C<static method new : Net::SSLeay ($ssl_ctx : L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX>);>
 
-Creates a new L<Net::SSLeay|SPVM::Net::SSLeay> object, creates a L<SSL|https://docs.openssl.org/master/man3/SSL_new/> object by calling L<SSL_new|https://docs.openssl.org/master/man3/SSL_new/> function given the L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX> object $ssl_ctx, sets the pointer value of the new L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX> object to the return value of L<SSL_new|https://docs.openssl.org/master/man3/SSL_new/> function, and returns the new L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX> object.
+Creates a new L<Net::SSLeay|SPVM::Net::SSLeay> object, creates a L<SSL|https://docs.openssl.org/master/man3/SSL_new/> object by calling native L<SSL_new|https://docs.openssl.org/master/man3/SSL_new/> function given the L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX> object $ssl_ctx, sets the pointer value of the new L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX> object to the return value of L<SSL_new|https://docs.openssl.org/master/man3/SSL_new/> function, and returns the new L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX> object.
+
+L</"ssl_ctx"> field is set to $ssl_ctx.
 
 Exceptions:
 
 If SSL_new failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
+=head2 library_init
+
+C<static method library_init : int ();>
+
+Calls native L<SSL_library_init|https://docs.openssl.org/master/man3/SSL_library_init> function, and returns its return value.
+
+=head2 load_error_strings
+
+C<static method load_error_strings : void ();>
+
+Calls native L<SSL_load_error_strings|https://docs.openssl.org/3.0/man3/ERR_load_crypto_strings/> function.
 
 =head1 Instance Methods
 
@@ -58,7 +78,7 @@ If SSL_new failed, an exception is thrown with C<eval_error_id> set to the basic
 
 C<method set_fd : int ($fd : int);>
 
-Sets the file descriptor $fd as the input/output facility for the TLS/SSL (encrypted) side by calling L<SSL_set_fd|https://docs.openssl.org/master/man3/SSL_set_fd/> function, and returns its return value.
+Calls native L<SSL_set_fd|https://docs.openssl.org/master/man3/SSL_set_fd/> function given $fd, and returns its return value.
 
 Exceptions:
 
@@ -68,7 +88,7 @@ If SSL_set_fd failed, an exception is thrown with C<eval_error_id> set to the ba
 
 C<method set_tlsext_host_name : int ($name : string);>
 
-Sets the server name indication ClientHello extension to contain the value name $name by calling L<SSL_set_tlsext_host_name|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_servername_callback> function.
+Calls native L<SSL_set_tlsext_host_name|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_servername_callback> function given the host name $name, and returns its return value.
 
 Exceptions:
 
@@ -80,7 +100,7 @@ If SSL_set_tlsext_host_name failed, an exception is thrown with C<eval_error_id>
 
 C<method connect : int ();>
 
-Initiates the TLS/SSL handshake with a server by calling L<SSL_connect|https://docs.openssl.org/1.0.2/man3/SSL_connect/> function, and returns its return value.
+Calls native L<SSL_connect|https://docs.openssl.org/1.0.2/man3/SSL_connect/> function, and returns its return value.
 
 Exceptions:
 
@@ -90,7 +110,7 @@ If SSL_connect failed, an exception is thrown with C<eval_error_id> set to the b
 
 C<method accept : int ();>
 
-Waits for a TLS/SSL client to initiate the TLS/SSL handshake by calling L<SSL_accept|https://docs.openssl.org/master/man3/SSL_accept/> function, and returns its return value.
+Calls native L<SSL_accept|https://docs.openssl.org/master/man3/SSL_accept/> function, and returns its return value.
 
 Exceptions:
 
@@ -100,7 +120,7 @@ If SSL_accept failed, an exception is thrown with C<eval_error_id> set to the ba
 
 C<method shutdown : int ();>
 
-Shuts down an active connection represented by an SSL object by calling L<SSL_shutdown|https://docs.openssl.org/master/man3/SSL_shutdown/> function, and returns its return value.
+Calls native L<SSL_shutdown|https://docs.openssl.org/master/man3/SSL_shutdown/> function, and returns its return value.
 
 Exceptions:
 
@@ -110,7 +130,7 @@ If SSL_shutdown failed, an exception is thrown with C<eval_error_id> set to the 
 
 C<method read : int ($buf : mutable string, $num : int = -1, $offset : int = 0);>
 
-Try to read $num bytes into the buffer $buf at the offset $offset by calling L<SSL_read|https://docs.openssl.org/1.1.1/man3/SSL_read/>, and returns its return value.
+Calls native L<SSL_read|https://docs.openssl.org/1.1.1/man3/SSL_read/> function given $buf at the offest $offset, $num, and returns its return value.
 
 Exceptions:
 
@@ -126,9 +146,7 @@ If SSL_read failed, an exception is thrown with C<eval_error_id> set to the basi
 
 C<method peek : int ($buf : mutable string, $num : int = -1, $offset : int = 0);>
 
-Identical to L</"read"> respectively except no bytes are actually removed from the underlying BIO during the read.
-
-This method calls L<SSL_peek|https://docs.openssl.org/1.1.1/man3/SSL_read> function.
+Calls native L<SSL_peek|https://docs.openssl.org/1.1.1/man3/SSL_peek/> function given $buf at the offset $offset, $num, and returns its return value.
 
 Exceptions:
 
@@ -144,7 +162,7 @@ If SSL_peek failed, an exception is thrown with C<eval_error_id> set to the basi
 
 C<method write : int ($buf : string, $num : int = -1, $offset : int = 0);>
 
-Writes $num bytes from the buffer $buf at the offset $offset into the specified ssl connection by calling L<SSL_write|https://docs.openssl.org/1.1.1/man3/SSL_write/> function, and returns its return value.
+Calls native L<SSL_write|https://docs.openssl.org/1.1.1/man3/SSL_write/> function, given $buf at the offset $offset, $num, and returns its return value.
 
 Exceptions:
 
@@ -156,11 +174,113 @@ The offset $offset + $num must be lower than or equal to the length of the buffe
 
 If SSL_write failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class and with L</"operation_error"> field set to the return vlaue of L<SSL_get_error|https://docs.openssl.org/1.1.1/man3/SSL_get_error/> function given the return value of L<SSL_write|https://docs.openssl.org/1.0.2/man3/SSL_write/> function.
 
+=head2 get_servername
+
+C<method get_servername : string ($type : int);>
+
+Calls native L<SSL_get_servername|https://docs.openssl.org/master/man3/SSL_CTX_set_tlsext_servername_callback> function given $type, and returns its return value.
+
+=head2 set_tlsext_status_type
+
+C<method set_tlsext_status_type : long  ($type : int);>
+
+Calls native L<SSL_set_tlsext_status_type|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_tlsext_status_cb> function given $type, and returns its return value.
+
+Exceptions:
+
+If SSL_set_tlsext_status_type failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
+=head2 alert_desc_string_long
+
+C<method alert_desc_string_long : string  ($type : int);>
+
+Calls native L<SSL_alert_desc_string_long|https://docs.openssl.org/1.1.1/man3/SSL_alert_type_string/> function given $type, and returns its return value.
+
+=head2 set_mode
+
+C<method set_mode : long ($mode : long);>
+
+Calls native L<SSL_set_mode|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_mode/> function given $mode, and returns its return value.
+
+=head2 clear_mode
+
+C<method clear_mode : long ($mode : long);>
+
+Calls native L<SSL_clear_mode|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_mode/> function given $mode, and returns its return value.
+
+=head2 get_mode
+
+C<method get_mode : long ();>
+
+Calls native L<get_mode|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_mode/> function, and returns its return value.
+
+=head2 version
+
+C<native method version : int ();>
+
+Calls native L<version|https://docs.openssl.org/master/man3/SSL_get_version> function, and returns its return value.
+
+=head2 session_reused
+
+C<native method session_reused : int ();>
+  
+Calls native L<SSL_session_reused|https://docs.openssl.org/1.1.1/man3/SSL_session_reused/> function, and returns its return value.
+
+=head2 get_cipher
+
+C<method get_cipher : string ();>
+
+Calls native L<SSL_get_cipher|https://docs.openssl.org/1.0.2/man3/SSL_get_current_cipher/> function, and returns its return value.
+
+=head2 get_peer_certificate
+
+C<method get_peer_certificate : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> ();>
+
+Calls native L<SSL_get_peer_certificate|https://docs.openssl.org/master/man3/SSL_get_peer_certificate> function.
+
+If the return value of the native function is NULL, returns undef.
+
+Otherwise, creates a new L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
+
+=head2 get_shutdown
+
+C<method get_shutdown : int ();>
+
+Calls native L<SSL_get_shutdown|https://docs.openssl.org/master/man3/SSL_set_shutdown/> function, and returns its return value.
+
+=head2 pending
+
+C<method pending : int ();>
+
+Calls native L<SSL_pending|https://docs.openssl.org/master/man3/SSL_pending/> function, and returns its return value.
+
+=head2 get1_session
+
+C<method get1_session : L<Net::SSLeay::SSL_SESSION|SPVM::Net::SSLeay::SSL_SESSION> ();>
+
+Calls native L<SSL_get1_session|https://docs.openssl.org/1.1.1/man3/SSL_get_session> function.
+
+If the return value of the native function is NULL, returns undef.
+
+Otherwise, creates a new L<Net::SSLeay::SSL_SESSION|SPVM::Net::SSLeay::SSL_SESSION> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
+
+=head2 set_session
+
+C<method set_session : int ($session : Net::SSLeay::SSL_SESSION);>
+
+Calls native L<SSL_set_session|https://docs.openssl.org/1.1.1/man3/SSL_set_session> function given the pointer value of $session, sets L</"ssl_session"> field to $ssl.
+
+If this method succeeds, C<no_free> flag of $session is set to 1.
+
+Exceptions:
+
+If SSL_set_session failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
 =head2 DESTROY
 
 C<method DESTROY : void ();>
 
-Frees L<SSL|https://docs.openssl.org/1.0.2/man3/SSL_free> object by calling L<SSL_free|https://docs.openssl.org/1.0.2/man3/SSL_free> function if C<no_free> flag of the instance is not a true value.
+Frees native L<SSL|https://docs.openssl.org/1.0.2/man3/SSL_free> object by calling native L<SSL_free|https://docs.openssl.org/1.0.2/man3/SSL_free> function if C<no_free> flag of the instance is not a true value.
 
 =head1 Modules
 

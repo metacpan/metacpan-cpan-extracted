@@ -1,4 +1,15 @@
 Revision history for Perl extension Geo::Leaflet.
 
+0.02 2024-11-09
+  - BREAKING CHANGE - Changed map object property from `properties` to `options` to match Leaflet documentation
+  - BREAKING CHANGE - Changed tileLayer to move maxZoom and attribution to options
+  - Refactored code
+  - Added polyline and rectangle capability
+  - Added tooltip capability
+  - Added marker icon capability
+  - Updated packages to pass JSON::XS to child objects for performance
+  - Updated HTML generation from CGI.pm to HTML::Tiny - Issue #1
+  - Added custom JSON encoding support for marker->icon value which is a variable name not a string.
+
 0.01 2024-11-08
   - original version; created by h2xs 1.23 with options

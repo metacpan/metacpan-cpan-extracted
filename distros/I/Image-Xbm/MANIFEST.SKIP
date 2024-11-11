@@ -66,4 +66,5 @@
 #!end included /usr/perl5.20.2p/lib/site_perl/5.20.2/ExtUtils/MANIFEST.SKIP
 
 ^\.travis\.yml$
+^appveyor\.yml$
 ^Image-Xbm-[0-9.]+\.tar\.gz$

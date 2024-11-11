@@ -1,14 +1,14 @@
 package Geo::Leaflet::polygon;
 use strict;
 use warnings;
-use base qw{Geo::Leaflet::Base};
+use base qw{Geo::Leaflet::Objects};
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
 
-Geo::Leaflet::polygon - Generates Leaflet web page
+Geo::Leaflet::polygon - Leaflet polygon object
 
 =head1 SYNOPSIS
 
@@ -16,12 +16,12 @@ Geo::Leaflet::polygon - Generates Leaflet web page
   my $map     = Geo::Leaflet->new;
   my $polygon = $map->polygon(
                               coordinates => [[$lat, $lon], ...]
-                              properties  => {},
+                              options     => {},
                              );
 
 =head1 DESCRIPTION
 
-The package is designed to be able to build a Leaflet map similar to what L<Geo::Google::StaticMaps::V2> used to be able to provide.
+This package constructs a Leaflet polygon object for use on a L<Geo::Leaflet> map.
 
 =head1 PROPERTIES
 
@@ -36,7 +36,7 @@ sub coordinates {
   return $self->{'coordinates'};
 }
 
-=head2 properties
+=head2 options
 
 =head2 popup
 

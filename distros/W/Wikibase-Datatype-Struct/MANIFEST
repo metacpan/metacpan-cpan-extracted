@@ -15,6 +15,7 @@ examples/obj2struct_statement.pl
 examples/obj2struct_value.pl
 examples/obj2struct_value_globe_coordinate.pl
 examples/obj2struct_value_item.pl
+examples/obj2struct_value_lexeme.pl
 examples/obj2struct_value_monolingual.pl
 examples/obj2struct_value_property.pl
 examples/obj2struct_value_quantity.pl
@@ -37,6 +38,7 @@ examples/struct2obj_statement.pl
 examples/struct2obj_value.pl
 examples/struct2obj_value_globe_coordinate.pl
 examples/struct2obj_value_item.pl
+examples/struct2obj_value_lexeme.pl
 examples/struct2obj_value_monolingual.pl
 examples/struct2obj_value_property.pl
 examples/struct2obj_value_quantity.pl
@@ -183,6 +185,8 @@ t/Wikibase-Datatype-Struct-Value/03-obj2struct.t
 t/Wikibase-Datatype-Struct-Value/04-struct2obj.t
 t/Wikibase-Datatype-Struct/01-use.t
 t/Wikibase-Datatype-Struct/02-version.t
+t/Wikibase-Datatype-Struct/03-obj2struct.t
+t/Wikibase-Datatype-Struct/04-struct2obj.t
 xt/Wikibase-Datatype-Struct-Form/01-pod_coverage.t
 xt/Wikibase-Datatype-Struct-Form/02-pod.t
 xt/Wikibase-Datatype-Struct-Item/01-pod_coverage.t

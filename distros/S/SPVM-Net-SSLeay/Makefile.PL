@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.990028');
+my %configure_and_runtime_requires = ('SPVM' => '0.990029');
 WriteMakefile(
   NAME => 'SPVM::Net::SSLeay',
   VERSION_FROM => 'lib/SPVM/Net/SSLeay.pm',
@@ -63,16 +63,24 @@ sub MY::postamble {
     
     local @INC = ('lib', @INC);
     
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::SSL_METHOD');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::SSL_CTX');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_VERIFY_PARAM');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::ERR');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_STORE');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::PEM');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::BIO');
-    
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::Constant');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::DH');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::EC_KEY');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::ERR');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::PEM');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::SSL_CTX');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::SSL_METHOD');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::SSL_SESSION');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::SSL_CIPHER');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_CRL');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_STORE');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_STORE_CTX');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_VERIFY_PARAM');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::OPENSSL');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::RAND');
   }
   
   return $make_rule;

@@ -1,3 +1,52 @@
+0.010 2024-11-11
+  [New Features]
+    * Add Net::SSLeay::BIO#new_file method.
+    * Add Net::SSLeay::DH class.
+    * Add Net::SSLeay::PEM#read_bio_DHparams method.
+    * Add Net::SSLeay#get_servername method.
+    * Add Net::SSLeay::SSL_CTX#set_alpn_protos method.
+    * Add Net::SSLeay::EC_KEY class.
+    * Add Net::SSLeay::SSL_CTX#set_tmp_ecdh method.
+    * Add Net::SSLeay::SSL_CTX#set1_groups_list method.
+    * Add Net::SSLeay::SSL_CTX#set1_curves_list method.
+    * Add Net::SSLeay#set_tlsext_status_type method.
+    * Add Net::SSLeay#alert_desc_string_long method.
+    * Add Net::SSLeay::EC_KEY#free method.
+    * Add Net::SSLeay::EC_KEY#new_by_curve_name method.
+    * Add Net::SSLeay#set_SSL_CTX method.
+    * Add Net::SSLeay#get_mode method.
+    * Add Net::SSLeay#set_mode method.
+    * Add Net::SSLeay#clear_mode method.
+    * Add Net::SSLeay#get_mode method.
+    * Add Net::SSLeay#set_mode method.
+    * Add Net::SSLeay#clear_mode method.
+    * Add Net::SSLeay#version method.
+    * Add Net::SSLeay::DH#DESTROY method.
+    * Add Net::SSLeay::SSL_SESSION class.
+    * Add Net::SSLeay::SSL_SESSION#DESTROY method.
+    * Add Net::SSLeay#session_reused method.
+    * Add Net::SSLeay::CIPHER class.
+    * Add Net::SSLeay#get_cipher method.
+    * Add Net::SSLeay#get_peer_certificate method.
+    * Add Net::SSLeay#library_init method.
+    * Add Net::SSLeay::OPENSSL class.
+    * Add Net::SSLeay::OPENSSL#add_ssl_algorithms method.
+    * Add Net::SSLeay::OPENSSL#add_all_algorithms method.
+    * Add Net::SSLeay#get_shutdown method.
+    * Add Net::SSLeay#pending method.
+    * Add Net::SSLeay#load_error_strings method.
+    * Add Net::SSLeay#get1_session method.
+    * Add Net::SSLeay#set_session method.
+    * Add Net::SSLeay::RAND class.
+    * Add Net::SSLeay::RAND#seed method.
+    * Add Net::SSLeay::RAND#poll method.
+    * Add Net::SSLeay::RAND#load_file method.
+    
+0.009 2024-11-08
+  [Requirement Changes]
+    * Require SPVM 0.990029.
+  [Exception Message Improvement]
+    * Add the detail of OpenSSL error to its exception message.
 0.008 2024-11-07
   [New Features]
     * Add Net::SSLeay::Error class.

@@ -20,13 +20,13 @@ Net::SSLeay::X509 class in L<SPVM> represents L<X509|https://docs.openssl.org/3.
 
 C<method DESTROY : void ();>
 
-Frees L<X509|https://docs.openssl.org/3.1/man3/X509_new/> object by calling L<X509_free|https://docs.openssl.org/3.1/man3/X509_free/> function if C<no_free> flag of the instance is not a true value.
+Frees native L<X509|https://docs.openssl.org/3.1/man3/X509_new/> object by calling native L<X509_free|https://docs.openssl.org/3.1/man3/X509_free/> function if C<no_free> flag of the instance is not a true value.
 
 =head1 FAQ
 
 =head2 How to create a new Net::SSLeay::X509 object?
 
-A way is reading PEM file by calling L<Net::SSLeay::PEM#read_bio_X509|SPVM::Net::SSLeay::PEM/"read_bio_X509"> method.
+A way is reading PEM file by calling native L<Net::SSLeay::PEM#read_bio_X509|SPVM::Net::SSLeay::PEM/"read_bio_X509"> method.
 
 =head1 See Also
 

@@ -150,7 +150,18 @@ assert_lib(
   LIBS => $opt->{libs},
 );
 
-print "Looks good.\n\n";
+if ($opt->{libs} =~ /mariadb/) {
+  print <<"MSG";
+
+The chosen MySQL client library appears to be MariaDB's. Compilation may fail.
+Consider DBD::MariaDB or installing Oracle's MySQL client library.
+
+
+MSG
+}
+else {
+  print "Looks good.\n\n";
+}
 
 sleep 1;
 
@@ -250,7 +261,7 @@ if (eval $ExtUtils::MakeMaker::VERSION >= 5.43) {
         'Damyan Ivanov <dmn@debian.org>',
         'Dan Book <grinnz@gmail.com>',
         'Daniël van Eeden <daniel.vaneeden@booking.com>',
-        'Dave Lambley <davel@isosceles.(none)>',
+        'Dave Lambley <dave@lambley.me.uk>',
         'David Farrell <davidnmfarrell@gmail.com>',
         'David Steinbrunner <dsteinbrunner@pobox.com>',
         'Giovanni Bechis <giovanni@bigio.snb.it>',
@@ -447,7 +458,7 @@ sub Configure {
                 }
 
                 if ($param eq 'version') {
-                  if ($str !~ /^[89]\./) {
+                  if ((split(/\./, $str, 2))[0] < 8) {
                     die "DBD::mysql requires MySQL 8.x or newer for building. Version reported by $command: $str";
                   }
                 }

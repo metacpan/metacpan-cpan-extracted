@@ -191,9 +191,10 @@ ok $result eq "my name is John not Jill", "Lexical and override access";
 
         ok $@, "Compile error set";
         if($@){
-          my $expected='4=>     \} \]\}Hello\!';
+          my $expected='4=>     } ]}Hello!';
           #say STDERR "RESULT: $@";
-          ok $@=~/$expected/s;
+          #say STDERR "Expected $expected";
+          ok $@=~/$expected/s, "Error as expected";
           #test for the correct line number
         }
 }

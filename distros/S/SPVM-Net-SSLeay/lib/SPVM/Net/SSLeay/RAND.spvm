@@ -1,0 +1,13 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::RAND {
+  
+  # Class Mehtods
+  native static method seed : void ($buf : string, $num : int);
+  
+  native static method poll : int ();
+  
+  native static method load_file : int ($filename : string, $max_bytes : long);
+  
+}

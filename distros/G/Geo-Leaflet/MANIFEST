@@ -5,11 +5,15 @@ README.md
 t/001_load.t
 t/002_html.t
 lib/Geo/Leaflet.pm
-lib/Geo/Leaflet/tileLayer.pm
 lib/Geo/Leaflet/Base.pm
+lib/Geo/Leaflet/Objects.pm
+lib/Geo/Leaflet/tileLayer.pm
 lib/Geo/Leaflet/marker.pm
-lib/Geo/Leaflet/circle.pm
+lib/Geo/Leaflet/polyline.pm
 lib/Geo/Leaflet/polygon.pm
+lib/Geo/Leaflet/rectangle.pm
+lib/Geo/Leaflet/circle.pm
+lib/Geo/Leaflet/icon.pm
 example/quick-start-example.pl
 perl-Geo-Leaflet.spec
 META.yml                                 Module YAML meta-data (added by MakeMaker)

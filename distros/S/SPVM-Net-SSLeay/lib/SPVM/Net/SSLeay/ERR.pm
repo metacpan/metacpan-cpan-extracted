@@ -22,7 +22,7 @@ Net::SSLeay::ERR class in L<SPVM> has methods to manipulate OpenSSL Errors.
 
 C<static method error_string_n : void ($e : long, $buf : mutable string, $len : int = -1);>
 
-Calls L<error_string_n|https://docs.openssl.org/1.1.1/man3/ERR_error_string/> function.
+Calls native L<error_string_n|https://docs.openssl.org/1.1.1/man3/ERR_error_string/> function.
 
 Exceptions:
 
@@ -42,19 +42,19 @@ The returned string is cut just before C<\0>.
 
 C<method get_error : long ();>
 
-Returns the earliest error code from the thread's error queue and removes the entry by calling L<ERR_get_error|https://docs.openssl.org/3.1/man3/ERR_get_error/#synopsis>.
+Returns the earliest error code from the thread's error queue and removes the entry by calling native L<ERR_get_error|https://docs.openssl.org/3.1/man3/ERR_get_error/#synopsis> function.
 
 =head2 peek_error
 
 C<method peek_error : long ();>
 
-Returns the earliest error code from the thread's error queue and removes the entry by calling L<ERR_peek_error|https://docs.openssl.org/3.1/man3/ERR_get_error/#synopsis>.
+Returns the earliest error code from the thread's error queue and removes the entry by calling native L<ERR_peek_error|https://docs.openssl.org/3.1/man3/ERR_get_error/#synopsis> function.
 
 =head2 peek_last_error
 
 C<method peek_last_error : long ();>
 
-Returns the earliest error code from the thread's error queue and removes the entry by calling L<ERR_peek_last_error|https://docs.openssl.org/3.1/man3/ERR_get_error/#synopsis>.
+Returns the earliest error code from the thread's error queue and removes the entry by calling native L<ERR_peek_last_error|https://docs.openssl.org/3.1/man3/ERR_get_error/#synopsis> function.
 
 =head1 See Also
 

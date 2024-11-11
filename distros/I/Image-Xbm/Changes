@@ -1,5 +1,8 @@
 Revision history for Image::Xbm.
 
+1.11	2024-11-10
+	- allow filehandles in new (GH PR #2)
+
 1.10	2016-02-23
 	- make sure macro/variable names are always sane
 	- more strict parsing of bits

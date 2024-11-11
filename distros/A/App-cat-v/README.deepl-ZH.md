@@ -31,7 +31,7 @@ cat-v \[ 选项 \] args ...
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -104,6 +104,7 @@ Version 1.00
     nl    \x{23CE}  ⏎  RETURN SYMBOL
     np    \x{2398}  ⎘  NEXT PAGE
     sp    \x{00B7}  ·  MIDDLE DOT
+    del   \x{232B}  ⌫  ERASE TO THE LEFT
 
 # OPTIONS
 
@@ -157,11 +158,11 @@ Version 1.00
 
     如果标志以 `+` 开头，则该字符将被添加到重复列表中。
 
-        cat -v --esc=+s
+        cat-v --esc=+s
 
     因此，上述命令的含义将与如下内容相同。
 
-        cat -v --esc=s --repeat +esc
+        cat-v --esc=s --repeat +esc
 
 - **--repeat**=_name_\[,_name_...\]
 

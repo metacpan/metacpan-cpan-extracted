@@ -2,12 +2,15 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.008";
+  version "0.010";
   
   use Net::SSLeay::Constant;
   use Net::SSLeay::SSL_CTX;
   use Net::SSLeay::ERR;
   use Net::SSLeay::Error;
+  use Net::SSLeay::SSL_CIPHER;
+  use Net::SSLeay::X509;
+  use Net::SSLeay::SSL_SESSION;
   
   INIT {
     &init();
@@ -16,10 +19,19 @@ class Net::SSLeay {
   # Fields
   has ssl_ctx : Net::SSLeay::SSL_CTX;
   
+  has ssl_session : Net::SSLeay::SSL_SESSION;
+  
   has operation_error : ro int;
   
   # Class Methods
   native static method new : Net::SSLeay ($ssl_ctx : Net::SSLeay::SSL_CTX);
+  
+  native static method alert_desc_string_long : string ($value : int);
+  
+  native static method load_error_strings : void ();
+  
+  # This native function is deprecated in OpenSSL 1.1.0, but Perl's IO::Socket::SSL used this method.
+  native static method library_init : int ();
   
   # Private or Internal Class Methods
   private native static method init : void ();
@@ -42,6 +54,35 @@ class Net::SSLeay {
   native method peek : int ($buf : mutable string, $num : int = -1, $offset : int = 0);
   
   native method write : int ($buf : string, $num : int = -1, $offset : int = 0);
+  
+  native method get_servername : string ($type : int);
+  
+  native method set_tlsext_status_type : long  ($type : int);
+  
+  native method set_mode : long ($mode : long);
+  
+  native method clear_mode : long ($mode : long);
+  
+  native method get_mode : long ();
+  
+  native method version : int ();
+  
+  native method session_reused : int ();
+  
+  native method get_cipher : string ();
+  
+  native method get_peer_certificate : Net::SSLeay::X509 ();
+  
+  native method get_shutdown : int ();
+  
+  native method pending : int ();
+  
+  native method get1_session :  Net::SSLeay::SSL_SESSION ();
+  
+  native method set_session : int ($session : Net::SSLeay::SSL_SESSION);
+  
+  # This native function is not documented in OpenSSL, but Perl's IO::Socket::SSL uses this method
+  native method set_SSL_CTX : Net::SSLeay::SSL_CTX ($ctx : Net::SSLeay::SSL_CTX);
   
   native method DESTROY : void ();
   

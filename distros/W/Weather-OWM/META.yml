@@ -8,7 +8,6 @@ build_requires:
   JSON: '0'
   Test2::Tools::Exception: '0'
   Test2::V0: '0'
-  XML::Simple: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -23,9 +22,9 @@ no_index:
     - t
     - inc
 requires:
-  LWP::UserAgent: '0'
+  Weather::API::Base: '0'
   perl: '5.008'
 resources:
   repository: git://github.com/dkechag/Weather-OWM.git
-version: '0.1'
+version: '0.2'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

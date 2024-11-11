@@ -5,6 +5,7 @@ examples/external.plex
 examples/header.plex
 examples/html.pl
 examples/html.plex
+examples/javascript.pl
 examples/parent.plex
 examples/recursive-2.plex
 examples/recursive-3.plex

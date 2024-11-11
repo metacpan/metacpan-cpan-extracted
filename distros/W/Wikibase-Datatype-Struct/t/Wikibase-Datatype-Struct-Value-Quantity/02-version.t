@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Wikibase::Datatype::Struct::Value::Quantity;
 
 # Test.
-is($Wikibase::Datatype::Struct::Value::Quantity::VERSION, 0.12, 'Version.');
+is($Wikibase::Datatype::Struct::Value::Quantity::VERSION, 0.13, 'Version.');

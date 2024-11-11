@@ -1,6 +1,6 @@
 package Mail::BIMI::Options;
 # ABSTRACT: Shared options
-our $VERSION = '3.20240402'; # VERSION
+our $VERSION = '3.20241111'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -71,7 +71,7 @@ Mail::BIMI::Options - Shared options
 
 =head1 VERSION
 
-version 3.20240402
+version 3.20241111
 
 =head1 DESCRIPTION
 

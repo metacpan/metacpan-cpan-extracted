@@ -1,5 +1,8 @@
 Revision history for Weather-OWM
 
+0.2     2024-11-11
+        Refactored to inherit from Weather::API::Base for easier maintenance.
+
 0.1     2024-10-07
         First general release with v2.5 & v3.0 API support.
 

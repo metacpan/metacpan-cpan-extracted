@@ -1,7 +1,7 @@
 package SPVM::Net::SSLeay::ConfigBuilder;
 
 # find_openssl_prefix function and ssleay_get_build_opts function are copied from Makefile.PL in Perl's Net::SSLeay.
-# Some parts are commented out with "=pod COMMENT OUT".
+# Some parts are commented out with "=begin comment".
 
 use utf8;
 use strict;
@@ -113,13 +113,15 @@ sub ssleay_get_build_opts {
 	}
     }
 
-=pod COMMENT OUT
+=begin comment
 
     print <<EOM;
 *** If there are build errors, test failures or run-time malfunctions,
     try to use the same compiler and options to compile your OpenSSL,
     Perl, and Net::SSLeay.
 EOM
+
+=end comment
 
 =cut
 
@@ -181,9 +183,11 @@ EOM
 
         if (($Config{cc} =~ /aCC/i) && $^O eq 'hpux') {
 
-=pod COMMENT OUT
+=begin comment
 
             print "*** Enabling HPUX aCC options (+e)\n";
+
+=end comment
 
 =cut
 
@@ -192,9 +196,11 @@ EOM
 
         if ( (($Config{ccname} || $Config{cc}) eq 'gcc') && ($Config{cccdlflags} =~ /-fpic/) ) {
 
-=pod
+=begin comment
 
             print "*** Enabling gcc -fPIC optimization\n";
+
+=end comment
 
 =cut
 
@@ -264,9 +270,9 @@ This class is a Perl module.
 
 =head1 Usage
 
-my $ssl_config_builder = SPVM::Net::SSLeay::ConfigBuilder->new;
-
-$ssl_config_builder->build_config($config);
+  my $ssl_config_builder = SPVM::Net::SSLeay::ConfigBuilder->new;
+  
+  $ssl_config_builder->build_config($config);
 
 =head1 Class Methods
 

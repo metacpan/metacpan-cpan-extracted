@@ -217,6 +217,7 @@ t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-GivenName-Douglas/02-versi
 t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-GivenName-Douglas/03-new.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-GivenName-Michal/01-use.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-GivenName-Michal/02-version.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-GivenName-Michal/03-new.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-GrammaticalGender-Masculine/01-use.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-GrammaticalGender-Masculine/02-version.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Snak-Wikidata-GrammaticalGender-Masculine/03-new.t
@@ -261,6 +262,7 @@ t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-GivenName-Douglas/02-
 t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-GivenName-Douglas/03-new.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-GivenName-Michal/01-use.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-GivenName-Michal/02-version.t
+t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-GivenName-Michal/03-new.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-GrammaticalGender-Masculine/01-use.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-GrammaticalGender-Masculine/02-version.t
 t/Test-Shared-Fixture-Wikibase-Datatype-Statement-Wikidata-GrammaticalGender-Masculine/03-new.t

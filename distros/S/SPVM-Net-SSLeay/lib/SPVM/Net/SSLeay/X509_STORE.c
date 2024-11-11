@@ -4,6 +4,7 @@
 #include "spvm_native.h"
 
 #include <openssl/x509_vfy.h>
+#include <openssl/err.h>
 
 static const char* FILE_NAME = "Net/SSLeay/X509_STORE.c";
 
@@ -20,10 +21,15 @@ int32_t SPVM__Net__SSLeay__X509_STORE__add_cert(SPVM_ENV* env, SPVM_VALUE* stack
   int32_t status = X509_STORE_add_cert(x509_store, x509);
   
   if (!(status == 1)) {
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
-    if (error_id) { return error_id; }
+    int64_t ssl_error = ERR_peek_last_error();
     
-    env->die(env, stack, "[OpenSSL Error]X509_STORE_add_cert failed.", __func__, FILE_NAME, __LINE__);
+    char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
+    ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
+    
+    env->die(env, stack, "[OpenSSL Error]X509_STORE_add_cert failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+    
+    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    
     return error_id;
   }
   
@@ -52,10 +58,15 @@ int32_t SPVM__Net__SSLeay__X509_STORE__set_flags(SPVM_ENV* env, SPVM_VALUE* stac
   int32_t status = X509_STORE_set_flags(x509_store, flags);
   
   if (!(status == 1)) {
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
-    if (error_id) { return error_id; }
+    int64_t ssl_error = ERR_peek_last_error();
     
-    env->die(env, stack, "[OpenSSL Error]X509_STORE_set_flags failed.", __func__, FILE_NAME, __LINE__);
+    char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
+    ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
+    
+    env->die(env, stack, "[OpenSSL Error]X509_STORE_set_flags failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+    
+    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    
     return error_id;
   }
   
@@ -75,10 +86,15 @@ int32_t SPVM__Net__SSLeay__X509_STORE__add_crl(SPVM_ENV* env, SPVM_VALUE* stack)
   int32_t status = X509_STORE_add_crl(x509_store, x509_crl);
   
   if (!(status == 1)) {
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
-    if (error_id) { return error_id; }
+    int64_t ssl_error = ERR_peek_last_error();
     
-    env->die(env, stack, "[OpenSSL Error]X509_STORE_add_crl failed.", __func__, FILE_NAME, __LINE__);
+    char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
+    ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
+    
+    env->die(env, stack, "[OpenSSL Error]X509_STORE_add_crl failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+    
+    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    
     return error_id;
   }
   

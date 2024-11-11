@@ -7,7 +7,7 @@
 use strict ;
 
 use File::Temp qw(tempfile);
-use Test::More tests => 15 ;
+use Test::More tests => 19 ;
 
 use Image::Xbm ;
 pass 'loaded module' ;
@@ -41,3 +41,19 @@ is $i->as_binstring, '11111100010111000100001001111100', 'loaded image from file
 is $i->get( -file ), $fp, '-file accessor' ;
 is $i->get( -width ), 5, '-width accessor' ;
 is $i->get( -height ), 6, '-height accessor' ;
+
+{
+    open my $fh, '<', "$fp" or die "Can't open previously created temporary file $fp: $!" ;
+    my $ixbm = Image::Xbm->new( -file => $fh ) ;
+    isa_ok $i, 'Image::Xbm' ;
+    is $i->as_binstring, '11111100010111000100001001111100', 'loaded image from filehandle' ;
+}
+
+{
+    open my $fh, '<', "$fp" or die "Can't open previously created temporary file $fp: $!" ;
+    my $xbm_string = do { local $/; <$fh> } ;
+    open my $scalar_fh, '<', \$xbm_string or die $! ;
+    my $ixbm = Image::Xbm->new( -file => $scalar_fh ) ;
+    isa_ok $i, 'Image::Xbm' ;
+    is $i->as_binstring, '11111100010111000100001001111100', 'loaded image from scalar filehandle' ;
+}

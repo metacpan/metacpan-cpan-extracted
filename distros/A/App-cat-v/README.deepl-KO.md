@@ -31,7 +31,7 @@ cat-v \[ 옵션 \] args ...
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -104,6 +104,7 @@ Version 1.00
     nl    \x{23CE}  ⏎  RETURN SYMBOL
     np    \x{2398}  ⎘  NEXT PAGE
     sp    \x{00B7}  ·  MIDDLE DOT
+    del   \x{232B}  ⌫  ERASE TO THE LEFT
 
 # OPTIONS
 
@@ -157,11 +158,11 @@ Version 1.00
 
     플래그가 `+`로 시작하면 해당 문자가 반복 목록에 추가됩니다.
 
-        cat -v --esc=+s
+        cat-v --esc=+s
 
     따라서 위의 명령은 다음과 같이 작성했을 때와 같은 의미를 갖습니다.
 
-        cat -v --esc=s --repeat +esc
+        cat-v --esc=s --repeat +esc
 
 - **--repeat**=_name_\[,_name_...\]
 

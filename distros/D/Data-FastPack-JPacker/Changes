@@ -1,0 +1,6 @@
+Revision history for Perl extension Data::FastPack::JPacker.
+
+0.01  Wed Aug 14 09:15:11 2024
+	- original version; created by h2xs 1.23 with options
+		--name Data::FastPack::JPacker -X -P -b5.24.0
+

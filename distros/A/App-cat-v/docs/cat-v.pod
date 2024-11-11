@@ -33,7 +33,7 @@ cat-v [ options ] args ...
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 DESCRIPTION
 
@@ -126,6 +126,7 @@ characters
     nl    \x{23CE}  ⏎  RETURN SYMBOL
     np    \x{2398}  ⎘  NEXT PAGE
     sp    \x{00B7}  ·  MIDDLE DOT
+    del   \x{232B}  ⌫  ERASE TO THE LEFT
 
 =head1 OPTIONS
 
@@ -193,12 +194,12 @@ Unicode character name.
 
 If flag begins with C<+>, that character is added to the repeat list.
 
-    cat -v --esc=+s
+    cat-v --esc=+s
 
 So the above command will have the same meaning as if you had written
 as following.
 
-    cat -v --esc=s --repeat +esc
+    cat-v --esc=s --repeat +esc
 
 =item B<--repeat>=I<name>[,I<name>...]
 

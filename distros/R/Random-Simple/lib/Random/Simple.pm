@@ -1,5 +1,10 @@
 package Random::Simple;
-BEGIN { our $VERSION = 0.03 }
+
+our $VERSION = 0.04;
+our $debug   = 0;
+
+use strict;
+use warnings;
 
 #############################################################
 
@@ -89,34 +94,53 @@ sub seed {
 
 # Randomly seed the PRNG and warmup
 sub seed_with_random {
-	my $seed1, $seed2;
+	my ($seed1, $seed2);
 
 	if (-r "/dev/urandom") {
 		open(my $FH, "<", "/dev/urandom");
-		my $ok = read($FH, $bytes, 16);
+		my $bytes;
+		my $ok = sysread($FH, $bytes, 16);
 
-		# Build 2x 64bit unsigned ints from the raw bytes
-		$seed1 = unpack("Q", substr($bytes, 0, 8));
-		$seed2 = unpack("Q", substr($bytes, 8, 8));
+		my ($high, $low);
+
+		#my $has_64bit = ($Config{uvsize} == 8);
+
+		# Build the first 64bit seed manually
+		# Cannot use Q because it doesn't exist on 32bit Perls
+		$high  = unpack("L", substr($bytes, 0, 4));
+		$low   = unpack("L", substr($bytes, 4, 4));
+		$seed1 = ($high << 32) | $low;
+
+		# Build the second 64bit seed
+		$high  = unpack("L", substr($bytes, 8, 4));
+		$low   = unpack("L", substr($bytes, 12, 4));
+		$seed2 = ($high << 32) | $low;
 
 		close $FH;
 	} else {
 		# FIXME: Use real entropy this is just a proof of concept
-		$seed1 = int(rand() * (2**64) -1);
-		$seed2 = int(rand() * (2**64) -1);
+		$seed1 = perl_rand64();
+		$seed2 = perl_rand64();
 	}
 
-	if ($DEBUG) {
-		print "SEEDING RANDOMLY\n";
+	if ($debug) {
+		print "SEEDING RANDOMLY: $seed1 / $seed2\n";
 	}
-
-	#print("XXX: $seed1, $seed2\n");
 
 	_seed($seed1, $seed2);
 
 	$has_been_seeded = 1;
 
 	warmup(32);
+}
+
+sub perl_rand64 {
+	my $high = rand(2**32 - 1);
+	my $low  = rand(2**32 - 1);
+
+	my $ret = ($high << 32 | $low);
+
+	return $ret;
 }
 
 sub random_bytes {
@@ -145,11 +169,8 @@ sub random_int {
 
 	if ($max < $min) { die("Max can't be less than min"); }
 
-	# FIXME: This is modulus and biased... fix later
-	my $range  = $max - $min + 1; # +1 makes it inclusive of $min AND $max
-	my $num    = _rand64();
-	my $ret    = $num % $range;
-	# Add back the offset
+	my $range = $max - $min + 1; # +1 makes it inclusive
+	my $ret   = _bounded_rand($range);
 	$ret      += $min;
 
 	return $ret;

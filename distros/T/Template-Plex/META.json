@@ -54,6 +54,6 @@
          "web" : "https://github.com/drclaw1394/perl-template-plex"
       }
    },
-   "version" : "v0.7.0",
+   "version" : "v0.7.1",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

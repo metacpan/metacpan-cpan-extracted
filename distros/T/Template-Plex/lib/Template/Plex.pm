@@ -3,7 +3,7 @@ package Template::Plex;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.7.0';
+our $VERSION = 'v0.7.1';
 use feature qw<say refaliasing>;
 no warnings "experimental";
 
@@ -33,6 +33,7 @@ sub new {
 	my $self=[];
 	$self->[plex_]=$plex;
 	$self->[cache_]={};
+  $self->[slots_]={};
 	bless $self, $package;
 }
 sub get_cache {
@@ -240,7 +241,7 @@ sub slot {
 	my $output="";
 	
 	$data//=$default_value;
-	if(defined($data) and $data->isa("Template::Plex")){
+	if(defined($data) and ref $data and $data->isa("Template::Plex")){
 		#render template
 		if($slot_name eq "default"){
 			DEBUG and Log::OK::TRACE and log_trace __PACKAGE__.": copy default slot";
@@ -261,14 +262,14 @@ sub slot {
 
 sub fill_slot {
 	my ($self)=shift;
-	my $parent=$self->[parent_];
+	my $parent=$self->[parent_]//$self;
 	unless($parent){
 		DEBUG and Log::OK::WARN and log_warn __PACKAGE__.": No parent setup for: ". $self->meta->{file};
 		return;
 	}
 
 	unless(@_){
-		#An unnamed fill spec implies the default slot
+		#An unnamed fill spec implies the default slot to which this template will be rendered
 		$parent->[slots_]{default}=$self;
 	}
 	else{
@@ -281,7 +282,8 @@ sub fill_slot {
 
 		my %fillers=@_;
 		for (keys %fillers){
-			$parent->[slots_]{$_}=$fillers{$_};
+      # Only fill the slot if it doesn't have a value
+      $parent->[slots_]{$_}=$fillers{$_};
 		}
 	}
 	"";
@@ -289,7 +291,7 @@ sub fill_slot {
 
 sub append_slot {
   my($self)=shift;
-  my $parent=$self->[parent_];
+	my $parent=$self->[parent_]//$self;
   unless($parent){
 
     DEBUG and Log::OK::WARN and log_warn __PACKAGE__.": No parent setup for ". $self->meta->{file};
@@ -305,7 +307,7 @@ sub append_slot {
 
 sub prepend_slot {
   my($self)=shift;
-  my $parent=$self->[parent_];
+  my $parent=$self->[parent_]//$self;
   unless($parent){
 
     DEBUG and Log::OK::WARN and log_warn __PACKAGE__.": No parent setup for ". $self->meta->{file};
@@ -321,6 +323,7 @@ sub prepend_slot {
 
 
 
+
 sub inherit {
 	my ($self, $path)=@_;
 	DEBUG and Log::OK::DEBUG and log_debug __PACKAGE__.": Inherit: $path";
@@ -328,7 +331,7 @@ sub inherit {
 
 	#Setup the parent. Cached  with path
 	my $p=$self->load($path, $self->args, $self->meta->%*);
-	$p->[slots_]={};
+  #$p->[slots_]={};
 
 	#Add this template to the default slot
 	$p->[slots_]{default}=$self;

@@ -3,7 +3,7 @@ package Image::Xbm ;    # Documented at the __END__
 use strict ;
 
 use vars qw( $VERSION @ISA ) ;
-$VERSION = '1.10' ;
+$VERSION = '1.11' ;
 
 use Image::Base ;
 
@@ -138,7 +138,9 @@ sub new { # Class and object method
     }
 
     my $file = $self->get( '-file' ) ;
-    $self->load if defined $file and -r $file and not $self->{'-bits'} ;
+    if (defined $file and not $self->{-bits}) {
+        $self->load if ref $file or -r $file;
+    }
 
     croak "new() `$file' not found or unreadable" 
     if defined $file and not defined $self->get( '-width' ) ;
@@ -770,6 +772,11 @@ Returns the image as a string of 0's and 1's, e.g.
     1111101110001110001001001000100000010000
 
 =head1 CHANGES
+
+2024/11/10
+
+Allow filehandles in new()
+
 
 2016/02/23 (Slaven Rezic)
 

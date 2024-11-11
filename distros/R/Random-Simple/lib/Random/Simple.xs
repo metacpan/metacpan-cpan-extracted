@@ -6,6 +6,7 @@
 #include <stdint.h>         // uint64_t
 
 #include "pcg.h"
+#include "rand-common.h"
 
 // Alernate PRNGs available
 //#include "xorshiro.h"
@@ -33,3 +34,6 @@ _rand64()
 
 void
 _seed(UV seed1, UV seed2)
+
+U32
+_bounded_rand(UV range)

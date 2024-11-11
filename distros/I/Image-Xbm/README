@@ -284,6 +284,11 @@ Returns the image as a string of 0's and 1's, e.g.
 
 =head1 CHANGES
 
+2024/11/10
+
+Allow filehandles in new()
+
+
 2016/02/23 (Slaven Rezic)
 
 Make sure macro/variable names are always sane.

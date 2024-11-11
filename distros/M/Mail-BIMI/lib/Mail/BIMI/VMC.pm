@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC;
 # ABSTRACT: Class to model a VMC
-our $VERSION = '3.20240402'; # VERSION
+our $VERSION = '3.20241111'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -185,7 +185,7 @@ sub is_valid_alt_name($self) {
   foreach my $alt_name ( @alt_names ) {
     $alt_name =~ s/^\s+//;
     $alt_name =~ s/\s+$//;
-    next if ! $alt_name =~ /^dns:/;
+    next unless $alt_name =~ /^dns:/;
     $alt_name =~ s/^dns://;
     return 1 if $alt_name eq $check_domain;
     return 1 if $alt_name eq $check_full_record;
@@ -338,7 +338,7 @@ Mail::BIMI::VMC - Class to model a VMC
 
 =head1 VERSION
 
-version 3.20240402
+version 3.20241111
 
 =head1 DESCRIPTION
 

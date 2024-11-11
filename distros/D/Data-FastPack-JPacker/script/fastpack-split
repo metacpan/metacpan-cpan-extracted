@@ -1,0 +1,182 @@
+#!/usr/bin/env perl
+#
+=pod
+
+=head1 TITLE
+
+  fastpack-split - split fastpack data files into message/bytes size limited output sequences suitable for JPack
+
+=head1 SYNOPSIS
+
+  fastpack-split  [options] fastpack_files ...
+  fastpack-split  --html_container path/to/index.html   [-o group] file1.fastpack file2.fastpack
+
+Options include:
+
+=over
+
+=item html_container
+
+A required option.  The path the html file which will act as the 'container'
+for this data. The containing dir of this file becomes the root dir of the data
+sctructures.
+
+This can be a directory, in which case it is used directly as the html root
+
+=item prefix
+
+The default output directory, relative to the html container root. Default is data/jpack
+
+=item compress
+
+Flag indicating if jpack output is to be compressed. Default is true
+
+=item message_limit
+
+The maximum number of messages allowed in an output file. Once reached, a new
+output file is created.
+
+=item byte_limit
+
+The maximum bytes allowed in an output file. Once reached,a new output file is
+created. Note the exact size of the file may be larger than this limit, due to
+unkown compression sizing
+
+=item read_size
+
+Maximum bytes to read from an in put file at a time. Allows for less memory
+usage. Default is 8*4096 bytes
+
+
+=item output group
+
+If a input has an output groups specified, this is used instead of the prefix.
+Output files are always numbered sequentiallly based of the existing files in
+the dir
+
+=head1 DESCRIPTION
+
+Takes a list of input files, expected to be in fastpack format. The files are
+read and each record is accounted. Once a limit of records or file size has be
+reache a new output file is created. Hence the splitting behaviour.  This can
+also be used to merge multiple fastpack files, as the split happend on output
+limits not input limits.
+
+=cut
+
+
+
+use strict;
+use warnings;
+
+use feature qw<say state >;
+
+our $VERSION="v0.1.0";
+
+use Getopt::Long;
+
+sub usage {
+  require Pod::Usage;
+  Pod::Usage::pod2usage();
+}
+
+my %options=(
+  prefix=>"data/jpack",
+  compress=>0,
+  write_size=>8*4096,
+  read_size=>8*4096,
+  message_limit=>1000000,   # 1M messages
+  byte_limit=>1000000*24,    # size of 1M messages with double float payload
+  group=>"default"
+);
+
+GetOptions(\%options,
+  "prefix=s",
+	"html_container=s",
+	"byte_limit=i",
+	"message_limit=i",
+	"read_size=i",
+	"write_size=i",
+	"compress",
+  "group=s",
+	"help"
+);
+
+usage if $options{help};
+
+die "html_container must be specified" unless exists $options{html_container};
+
+if(delete $options{compress}){
+	$options{jpack_options}={jpack_compression=>"deflate"};
+}
+
+
+say STDERR "fastpack-split version ".$VERSION;
+# Processing Output/group arguments.
+# An input can be directed to go to an output group.
+#
+my $output=$options{prefix};#"default";     # is a path
+my $inputs=[];  # is a list of paths
+my $item;
+my @set;
+
+# Process output switches (--o)
+my $first=1;
+while(@ARGV){
+  $item=shift;
+  if($item =~ /-{1,2}o/){
+    # This is a switch, treat next item as new output location
+    unless($first){
+      unless(@$inputs){
+        # If no inputs use standard input, if pipe
+        push @$inputs, "-";
+      }
+      # Push the group to the stack and allocate a new new group to process
+      push @set,[$output, $inputs];
+    }
+     # setup new set
+    $output=shift;
+    $inputs=[];
+    $first=0;
+    
+  }
+  else {
+    # Push to existing set
+    push @$inputs, $item;
+  }
+}
+
+# Push the last active/processed group to the stack
+#
+push @set,[$output, $inputs];
+
+# TODO: If no inputs perhaps stdin
+
+
+# Flatten array, so each input has an output
+die "Nothing to process" unless @set;
+my @pairs;
+for(@set){
+  my $out=$_->[0]//$options{prefix}; #use prefix as default, unless output group has been specified.
+  for my $in ($_->[1]->@*){
+    push @pairs, $in, $out;
+  }
+}
+
+# test for piped standard input
+#Now test if this is pipe, $file or other
+  #############################################
+  # say STDERR "Processing inputs from ARGV"; #
+  # @pairs=map {                              #
+  #               my $dst=s/\..+$//r;         #
+  #               ($_,$dst);                  #
+  #       }                                   #
+  #       @ARGV;                              #
+  #############################################
+use Data::Dumper;
+say Dumper \@pairs;
+
+# Create the Fastpack driver object and create the split/combined files
+require Data::FastPack::JPacker;	#Main modules which does the IO, splitting and encoding
+my $packer=Data::FastPack::JPacker->new(%options);
+$packer->pack_files(@pairs);

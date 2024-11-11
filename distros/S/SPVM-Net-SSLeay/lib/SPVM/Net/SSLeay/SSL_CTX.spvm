@@ -8,6 +8,7 @@ class Net::SSLeay::SSL_CTX {
   use Net::SSLeay::SSL_METHOD;
   use Net::SSLeay::X509_STORE;
   use Net::SSLeay::X509_VERIFY_PARAM;
+  use Net::SSLeay::EC_KEY;
   
   # Class Methods
   native static method new : Net::SSLeay::SSL_CTX ($method : Net::SSLeay::SSL_METHOD);
@@ -40,6 +41,14 @@ class Net::SSLeay::SSL_CTX {
   native method get_options : long ();
   
   native method clear_options : long ($options : long);
+  
+  native method set_alpn_protos : int ($protos : string, $protos_len : int = -1);
+  
+  native method set_tmp_ecdh : long ($ecdh : Net::SSLeay::EC_KEY);
+  
+  native method set1_groups_list : int ($list : string);
+  
+  native method set1_curves_list : int ($list : string);
   
   native method DESTROY : void ();
   

@@ -1,0 +1,11 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::OPENSSL {
+  
+  # Class Method
+  native static method add_ssl_algorithms : int ();
+  
+  native static method add_all_algorithms : void ();
+  
+}

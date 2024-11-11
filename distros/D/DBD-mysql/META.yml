@@ -34,7 +34,7 @@ resources:
   homepage: http://dbi.perl.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/DBD-mysql.git
-version: '5.009'
+version: '5.010'
 x_contributors:
   - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
@@ -53,7 +53,7 @@ x_contributors:
   - 'Damyan Ivanov <dmn@debian.org>'
   - 'Dan Book <grinnz@gmail.com>'
   - 'Daniël van Eeden <daniel.vaneeden@booking.com>'
-  - 'Dave Lambley <davel@isosceles.(none)>'
+  - 'Dave Lambley <dave@lambley.me.uk>'
   - 'David Farrell <davidnmfarrell@gmail.com>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
   - 'Giovanni Bechis <giovanni@bigio.snb.it>'

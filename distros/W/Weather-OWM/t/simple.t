@@ -44,27 +44,34 @@ subtest 'get_weather' => sub {
     <temperature value="298.48" unit="kelvin"/>
     </current>';
 
-    $request = \"https://api.openweathermap.org/data/2.5/weather?q=Zocca&appid=APIKEY&mode=xml";
-    my %re = $owm->get_weather(loc => "Zocca", mode => 'xml', units => 'standard');
+    if (eval "require XML::Simple;") {
+        $request =
+            \"https://api.openweathermap.org/data/2.5/weather?q=Zocca&appid=APIKEY&mode=xml";
+        my %re = $owm->get_weather(
+            loc   => "Zocca",
+            mode  => 'xml',
+            units => 'standard'
+        );
 
-    is(
-        \%re,
-        {
-            temperature => {
-                value => 298.48,
-                unit  => 'kelvin',
-            }
-        },
-        'Decoded XML content as expected'
-    );
+        is(
+            \%re,
+            {
+                temperature => {
+                    value => 298.48,
+                    unit  => 'kelvin',
+                }
+            },
+            'Decoded XML content as expected'
+        );
+    }
 
-    $request = \"https://api.openweathermap.org/data/2.5/forecast?units=metric&lon=-1.83&lat=51.18&appid=APIKEY";
+    $request = \"https://api.openweathermap.org/data/2.5/forecast?lang=&units=metric&lon=-1.83&lat=51.18&appid=APIKEY";
     $content = \'{"main":{"temp":29.48}}';
-    my $re = $owm->get_weather(lat => 51.18, lon => -1.83, product => 'forecast');
+    my $re = $owm->get_weather(lat => 51.18, lang => '', lon => -1.83, product => 'forecast');
     is($re, $$content, 'Content as expected');
 
     $request = \"https://pro.openweathermap.org/data/2.5/forecast/hourly?zip=10001&appid=APIKEY&lang=el&units=metric";
-    %re = $owm->get_weather(zip => 10001, lang => 'el', product => 'hourly');
+    my %re = $owm->get_weather(zip => 10001, lang => 'el', product => 'hourly');
     is(\%re, {main=>{temp=>29.48}}, 'Decoded JSON content as expected');
 
     $request = \"https://api.openweathermap.org/data/2.5/forecast/daily?city_id=1&appid=APIKEY&mode=html";

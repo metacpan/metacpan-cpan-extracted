@@ -1,3 +1,14 @@
+0.13 2024-11-10T17:20:57+01:00
+ - Add Value::Lexeme to Wikibase::Datatype::Struct doc.
+ - Add flag 'add' => '' to Form and Sense as information to create Form or
+   Sense.
+ - Add obj2struct() and struct2obj() for main objects to
+   Wikibase::Datatype::Struct.
+ - Fix id in Form::obj2struct().
+ - Fix id in Sense::obj2struct().
+ - Regen examples.
+ - Update copyright years.
+
 0.12 2023-10-27T23:15:03+02:00
  - Add Value::Lexeme.
  - Update Module::Install to 1.21 version.

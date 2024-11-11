@@ -1,28 +1,30 @@
 package Geo::Leaflet::tileLayer;
 use strict;
 use warnings;
-use base qw{Package::New};
+use base qw{Geo::Leaflet::Base};
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
 
-Geo::Leaflet::tileLayer - Generates a Leaflet tileLayer Object
+Geo::Leaflet::tileLayer - Leaflet tileLayer Object
 
 =head1 SYNOPSIS
 
   use Geo::Leaflet;
   my $map       = Geo::Leaflet->new;
   my $tileLayer = $map->tileLayer(
-                                  url         => 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                  maxZoom     => 19,
-                                  attribution => '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                                  url     => 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                  options => {
+                                    maxZoom     => 19,
+                                    attribution => '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                                  }
                                  );
 
 =head1 DESCRIPTION
 
-The package generates a Leaflet tileLayer Object
+This package constructs a Leaflet tileLayer object for use on a L<Geo::Leaflet> map.
 
 =head1 CONSTRUCTORS
 
@@ -41,9 +43,11 @@ Returns the default OpenStreetMaps.org tileLayer.
 sub osm {
   my $self = shift;
   return $self->new(
-                    url         => 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    maxZoom     => 19,
-                    attribution => '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                    url     => 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    options => {
+                      maxZoom     => 19,
+                      attribution => '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                    },
                     @_,
                    );
 }
@@ -55,34 +59,10 @@ sub osm {
 =cut
 
 sub url {
-  my $self        = shift;
+  my $self       = shift;
   $self->{'url'} = shift if @_;
   die("Error: url required") unless $self->{'url'};
   return $self->{'url'};
-}
-
-=head2 maxZoom
-
-=cut
-
-sub maxZoom {
-  my $self           = shift;
-  $self->{'maxZoom'} = shift if @_;
-  die("Error: maxZoom required") unless $self->{'maxZoom'};
-  die("Error: maxZoom must be integer") unless $self->{'maxZoom'} =~ m/\A[1-9][0-9]*\Z/;
-  return $self->{'maxZoom'};
-}
-
-=head2 attribution
-
-=cut
-
-sub attribution {
-  my $self               = shift;
-  $self->{'attribution'} = shift if @_;
-  $self->{'attribution'} = '' unless $self->{'attribution'};
-  die("Error: attribution cannot contain single quote") if $self->{'attribution'} =~ m/'/;
-  return $self->{'attribution'};
 }
 
 =head1 METHODS
@@ -93,11 +73,8 @@ sub attribution {
 
 sub stringify {
   my $self = shift;
-  return sprintf(q[const tiles = L.tileLayer('%s', {maxZoom: %d, attribution: '%s' }).addTo(map);], 
-                 $self->url,
-                 $self->maxZoom,
-                 $self->attribution,
-                );
+  #L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+  return $self->stringify_base($self->url);
 }
 
 =head1 SEE ALSO

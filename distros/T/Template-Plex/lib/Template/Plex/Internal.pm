@@ -8,12 +8,15 @@ use Template::Plex;
 use feature qw<state refaliasing>;
 no warnings "experimental";
 
-#use File::Spec::Functions qw<catfile>;
+use File::Spec::Functions qw<file_name_is_absolute>;
 
 use Export::These qw<block pl jmap>;
 
 my $Include=qr|\@\{\s*\[\s*include\s*\(\s*(.*?)\s*\)\s*\] \s* \}|x;
 my $Init=qr|\@\{\s*\[\s*init\s*\{(?:.*?)\}\s*\] \s* \}|smx;
+
+# Match any curly bracket not contained withing a @{[ ]} block
+#my $plain=qr/(?<! \@\{ \s* \[) (?:\{ \| \}) (?!\] \s* \})/smx;
 
 
 sub new;	#forward declare new;
@@ -78,6 +81,9 @@ $out.='
 		$self->_init(@_);
 	}
 
+	sub parent {
+		$self->parent(@_);
+	}
 	sub slot {
 		$self->slot(@_);
 	}
@@ -339,7 +345,8 @@ sub new{
       
 
       # only prepend root if relative path
-      unless($path=~m|^/|){
+      #unless($path=~m|^/|){
+      unless(file_name_is_absolute($path)){
         # Assume working dir if no root
         $path=join "/", $root, $path if $root;
       }

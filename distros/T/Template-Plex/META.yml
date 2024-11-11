@@ -27,5 +27,5 @@ requires:
   perl: '5.024000'
 resources:
   repository: git://github.com/drclaw1394/perl-template-plex.git
-version: v0.7.0
+version: v0.7.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

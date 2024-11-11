@@ -1,9 +1,52 @@
 NAME
     Wikibase::Datatype::Struct - Wikibase structure serialization.
 
+SYNOPSIS
+     use Wikibase::Datatype::Struct qw(obj2struct struct2obj);
+
+     my $struct_hr = obj2struct($obj, $base_uri);
+     my $obj = struct2obj($struct_hr);
+
 DESCRIPTION
     This conversion is between objects defined in Wikibase::Datatype and
     structures serialized via JSON to MediaWiki.
+
+  "obj2struct"
+     my $struct_hr = obj2struct($obj, $base_uri);
+
+    Convert main instances to structure. Supported instances are
+    Wikibase::Datatype::Item, Wikibase::Datatype::Lexeme,
+    Wikibase::Datatype::Mediainfo and Wikibase::Datatype::Property.
+    $base_uri is base URI of Wikibase system (e.g.
+    <http://test.wikidata.org/entity/>).
+
+    Returns reference to hash with structure.
+
+  "struct2obj"
+     my $obj = struct2obj($struct_hr);
+
+    Convert structure of item to object. Supported types are: 'item',
+    'lexeme', 'mediainfo' and 'property'.
+
+    Returns Wikibase::Datatype::Item, Wikibase::Datatype::Lexeme,
+    Wikibase::Datatype::Mediainfo or Wikibase::Datatype::Property instance.
+
+ERRORS
+     obj2struct():
+             Base URI is required.
+             Object doesn't exist.
+             Unsupported Wikibase::Datatype object.
+                     Reference: %s
+
+     struct2obj():
+             Structure doesn't supported. No type.
+             Unsupported '%s' type,
+
+DEPENDENCIES
+    Error::Pure, Exporter, Readonly, Wikibase::Datatype::Struct::Item,
+    Wikibase::Datatype::Struct::Lexeme,
+    Wikibase::Datatype::Struct::Mediainfo,
+    Wikibase::Datatype::Struct::Property.
 
 SEE ALSO
     Wikibase::Datatype::Struct::Form
@@ -54,6 +97,9 @@ SEE ALSO
     Wikibase::Datatype::Struct::Value::Item
         Wikibase item value structure serialization.
 
+    Wikibase::Datatype::Struct::Value::Lexeme
+        Wikibase lexeme value structure serialization.
+
     Wikibase::Datatype::Struct::Value::Monolingual
         Wikibase monolingual value structure serialization.
 
@@ -81,10 +127,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020-2023 Michal Josef Špaček
+    © 2020-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.12
+    0.13
 

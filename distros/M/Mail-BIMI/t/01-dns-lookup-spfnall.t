@@ -46,7 +46,7 @@ $bimi->selector( 'default' );
 my $result = $bimi->result;
 my $auth_results = $result->get_authentication_results;
 my $expected_result = 'bimi=pass header.d=dnslookupspfnall.com header.selector=default';
-is( $auth_results, $expected_result, 'Auth results correcct' );
+is( $auth_results, $expected_result, 'Auth results correct' );
 
 my $expected_headers = {
   'BIMI-Indicator' => 'PHN2ZyB2ZXJzaW9uPSIxLjIiIGJhc2VQcm9maWxlPSJ0aW55LXBzIiB4bWxucz0iaHR0cD

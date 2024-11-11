@@ -1,5 +1,5 @@
 ---
-abstract: 'Generates Leaflet web page'
+abstract: 'Generates a Leaflet JavaScript map web page'
 author:
   - 'Michael R. Davis'
 build_requires:
@@ -18,11 +18,11 @@ no_index:
     - t
     - inc
 requires:
-  CGI: '0'
+  HTML::Tiny: '0'
   JSON::XS: '0'
   Package::New: '0'
 resources:
   bugtracker: https://github.com/mrdvt92/perl-Geo-Leaflet/issues
   homepage: https://github.com/mrdvt92/perl-Geo-Leaflet
   repository: https://github.com/mrdvt92/perl-Geo-Leaflet.git
-version: '0.01'
+version: '0.02'

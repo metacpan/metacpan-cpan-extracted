@@ -13,7 +13,7 @@ use Wikibase::Datatype::Struct::Lexeme;
 use Wikibase::Datatype::Struct::Mediainfo;
 use Wikibase::Datatype::Struct::Property;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -62,10 +62,12 @@ sub create_item {
 
 	$self->_init;
 
+
+	my ($type, $data) = $self->_obj2json($item_obj);
 	my $res = $self->{'mediawiki_api'}->api({
 		'action' => 'wbeditentity',
-		'new' => 'item',
-		'data' => $self->_obj2json($item_obj),
+		'new' => $type,
+		'data' => $data,
 		defined $summary ? (
 			'summary' => $summary,
 		) : (),
@@ -157,20 +159,27 @@ sub _init {
 sub _obj2json {
 	my ($self, $item_obj) = @_;
 
+	my $type;
+	my $struct_hr;
 	if (! defined $item_obj) {
 		return '{}';
 	} else {
-		if (! $item_obj->isa('Wikibase::Datatype::Item')) {
-			err "Bad data. Must be 'Wikibase::Datatype::Item' object.";
+		if ($item_obj->isa('Wikibase::Datatype::Item')) {
+			$type = 'item';
+			$struct_hr = Wikibase::Datatype::Struct::Item::obj2struct($item_obj,
+				$self->{'_mediawiki_entity_uri'});
+		} elsif ($item_obj->isa('Wikibase::Datatype::Lexeme')) {
+			$type = 'lexeme';
+			$struct_hr = Wikibase::Datatype::Struct::Lexeme::obj2struct($item_obj,
+				$self->{'_mediawiki_entity_uri'});
+		} else {
+			err 'Bad data. Not supported object.';
 		}
 	}
 
-	my $struct_hr = Wikibase::Datatype::Struct::Item::obj2struct($item_obj,
-		$self->{'_mediawiki_entity_uri'});
-
 	my $json = decode_utf8(JSON::XS->new->utf8->encode($struct_hr));
 
-	return $json;
+	return ($type, $json);
 }
 
 sub _mediawiki_api_error {
@@ -291,7 +300,7 @@ Returns reference to hash.
                  Error details: %s
 
  create_item():
-         Bad data. Must be 'Wikibase::Datatype::Item' object.
+         Bad data. Not supported object.
 
 =head1 EXAMPLE1
 
@@ -602,6 +611,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

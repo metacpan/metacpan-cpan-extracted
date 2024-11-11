@@ -6,14 +6,20 @@ use Geo::Leaflet::tileLayer;
 use Geo::Leaflet::marker;
 use Geo::Leaflet::circle;
 use Geo::Leaflet::polygon;
-use CGI qw{link};
+use Geo::Leaflet::polyline;
+use Geo::Leaflet::rectangle;
+use Geo::Leaflet::icon;
+use JSON::XS qw{};
+use HTML::Tiny qw{};;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our $PACKAGE = __PACKAGE__;
+our @OBJECTS = ();
+our @ICONS   = ();
 
 =head1 NAME
 
-Geo::Leaflet - Generates Leaflet web page
+Geo::Leaflet - Generates a Leaflet JavaScript map web page
 
 =head1 SYNOPSIS
 
@@ -23,7 +29,7 @@ Geo::Leaflet - Generates Leaflet web page
 
 =head1 DESCRIPTION
 
-The package is designed to be able to build a Leaflet map similar to what L<Geo::Google::StaticMaps::V2> used to be able to provide.
+This package generates a L<Leaflet JavaScript|https://leafletjs.com/> map web page.
 
 =head1 CONSTRUCTORS
 
@@ -69,7 +75,7 @@ sub center {
   my $self           = shift;
   $self->{'center'}  = shift if @_;
   $self->{'center'}  = [38.2, -97.2] unless defined $self->{'center'};
-  my $error_template = "Error: $PACKAGE property center expected %s (e.g., [\$lat, \$lon])";
+  my $error_template = "Error: $PACKAGE center expected %s (e.g., [\$lat, \$lon])";
   die(sprintf($error_template, 'array reference')) unless ref($self->{'center'}) eq 'ARRAY';
   die(sprintf($error_template, 'two elements'   )) unless   @{$self->{'center'}} == 2;
   return $self->{'center'};
@@ -163,38 +169,62 @@ sub title {
   return $self->{'title'};
 }
 
-=head2 objects
-
-=cut
-
-sub objects {
-  my $self           = shift;
-  $self->{'objects'} = [] unless ref($self->{'objects'}) eq 'ARRAY';
-  return $self->{'objects'};
-}
-
-=head1 OBJECT CONSTRUCTORS
+=head1 TILE LAYER CONSTRUCTOR
 
 =head2 tileLayer
 
 Creates and returns a tileLayer object which is added to the map.
 
   $map->tileLayer(
-                  url         => 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  maxZoom     => 19,
-                  attribution => '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                  url     => 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  options => {
+                    maxZoom     => 19,
+                    attribution => '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                  },
                  );
 
   Default: OpenStreetMaps
+
+See: L<https://leafletjs.com/reference.html#tilelayer>
 
 =cut
 
 sub tileLayer {
   my $self             = shift;
-  $self->{'tileLayer'} = Geo::Leaflet::tileLayer->new(@_) if @_;
-  $self->{'tileLayer'} = Geo::Leaflet::tileLayer->osm(  ) unless defined $self->{'tileLayer'};
+  $self->{'tileLayer'} = Geo::Leaflet::tileLayer->new(@_, JSON=>$self->JSON) if @_;
+  $self->{'tileLayer'} = Geo::Leaflet::tileLayer->osm((), JSON=>$self->JSON) unless defined $self->{'tileLayer'};
   return $self->{'tileLayer'};
 }
+
+=head1 ICON CONSTRUCTOR
+
+=head2 icon
+
+  my $icon = $map->icon(
+                        name    => "my_icon", #must be a valid JavaScript variable name
+                        options => {
+                                    iconUrl      => "my-icon.png",
+                                    iconSize     => [38, 95],
+                                    iconAnchor   => [22, 94],
+                                    popupAnchor  => [-3, -76],
+                                    shadowUrl    => "my-icon-shadow.png",
+                                    shadowSize   => [68, 95],
+                                    shadowAnchor => [22, 94],
+                                   }
+                       );
+
+See: L<https://leafletjs.com/reference.html#icon>
+
+=cut
+
+sub icon {
+  my $self = shift;
+  my $icon = Geo::Leaflet::icon->new(@_, JSON=>$self->JSON);
+  push @ICONS, $icon;
+  return $icon;
+}
+
+=head1 MAP OBJECT CONSTRUCTORS
 
 =head2 marker
 
@@ -202,30 +232,33 @@ Adds a marker object to the map and returns a reference to the marker object.
 
   $map->marker(lat=>$lat, lon=>$lon);
 
+See: L<https://leafletjs.com/reference.html#marker>
+
 =cut
 
 sub marker {
-  my $self    = shift;
-  my $objects = $self->objects;
-  my $marker  = Geo::Leaflet::marker->new(@_);
-  push @{$objects}, $marker;
+  my $self   = shift;
+  my $marker = Geo::Leaflet::marker->new(@_, JSON=>$self->JSON);
+  push @OBJECTS, $marker;
   return $marker;
 }
 
-=head2 circle
+=head2 polyline
 
-Adds a circle object to the map and returns a reference to the circle object.
+Adds a polyline object to the map and returns a reference to the polyline object.
 
-  $map->circle(lat=>$lat, lon=>$lon, radius=>$radius, properties=>{});
+  my $latlngs = [[$lat, $lon], ...]
+  $map->polyline(coordinates=>$latlngs, options=>{});
+
+See: L<https://leafletjs.com/reference.html#polyline>
 
 =cut
 
-sub circle {
-  my $self    = shift;
-  my $objects = $self->objects;
-  my $circle  = Geo::Leaflet::circle->new(@_);
-  push @{$objects}, $circle;
-  return $circle;
+sub polyline {
+  my $self     = shift;
+  my $polyline = Geo::Leaflet::polyline->new(@_, JSON=>$self->JSON);
+  push @OBJECTS, $polyline;
+  return $polyline;
 }
 
 =head2 polygon
@@ -233,16 +266,55 @@ sub circle {
 Adds a polygon object to the map and returns a reference to the polygon object.
 
   my $latlngs = [[$lat, $lon], ...]
-  $map->polygon(coordinates=>$latlngs, properties=>{});
+  $map->polygon(coordinates=>$latlngs, options=>{});
+
+See: L<https://leafletjs.com/reference.html#polygon>
 
 =cut
 
 sub polygon {
   my $self    = shift;
-  my $objects = $self->objects;
-  my $polygon = Geo::Leaflet::polygon->new(@_);
-  push @{$objects}, $polygon;
+  my $polygon = Geo::Leaflet::polygon->new(@_, JSON=>$self->JSON);
+  push @OBJECTS, $polygon;
   return $polygon;
+}
+
+=head2 rectangle
+
+Adds a rectangle object to the map and returns a reference to the rectangle object.
+
+  $map->rectangle(llat       => $llat,
+                  llon       => $llon,
+                  ulat       => $ulat,
+                  ulon       => $ulon,
+                  options => {});
+
+See: L<https://leafletjs.com/reference.html#rectangle>
+
+=cut
+
+sub rectangle {
+  my $self      = shift;
+  my $rectangle = Geo::Leaflet::rectangle->new(@_, JSON=>$self->JSON);
+  push @OBJECTS, $rectangle;
+  return $rectangle;
+}
+
+=head2 circle
+
+Adds a circle object to the map and returns a reference to the circle object.
+
+  $map->circle(lat=>$lat, lon=>$lon, radius=>$radius, options=>{});
+
+See: L<https://leafletjs.com/reference.html#circle>
+
+=cut
+
+sub circle {
+  my $self    = shift;
+  my $circle  = Geo::Leaflet::circle->new(@_, JSON=>$self->JSON);
+  push @OBJECTS, $circle;
+  return $circle;
 }
 
 =head1 METHODS
@@ -253,19 +325,19 @@ sub polygon {
 
 sub html {
   my $self = shift;
-  my $html = $self->CGI;
-  return $html->html(
-           $html->head(
+  my $html = $self->HTML;
+  return $html->html([
+           $html->head([
              $html->title($self->title),
              $self->html_head_link,
              $self->html_head_script,
              $self->html_head_style,
-           ),
-           $html->body(
+           ]),
+           $html->body([
              $self->html_body_div,
              $self->html_body_script
-           ),
-         ), "\n";
+           ]),
+         ]);
 }
 
 =head2 html_head_link
@@ -274,7 +346,7 @@ sub html {
 
 sub html_head_link {
   my $self = shift;
-  my $html = $self->CGI;
+  my $html = $self->HTML;
   return $html->link({
                       rel         => 'stylesheet',
                       href        => 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
@@ -289,7 +361,7 @@ sub html_head_link {
 
 sub html_head_script {
   my $self = shift;
-  my $html = $self->CGI;
+  my $html = $self->HTML;
   return $html->script({
                         src         => 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
                         integrity   => 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=',
@@ -303,7 +375,7 @@ sub html_head_script {
 
 sub html_head_style {
   my $self       = shift;
-  my $html       = $self->CGI;
+  my $html       = $self->HTML;
   my $style_size = sprintf('width: %dpx; height: %dpx;', $self->width, $self->height);
   my $style_full = 'html, body { height: 100%; margin: 0; } '.
                    ".leaflet-container { $style_size max-width: 100%; max-height: 100%; }";
@@ -316,7 +388,7 @@ sub html_head_style {
 
 sub html_body_div {
   my $self       = shift;
-  my $html       = $self->CGI;
+  my $html       = $self->HTML;
   my $style_size = sprintf('width: %dpx; height: %dpx;', $self->width, $self->height);
   return $html->div({id => $self->id, style => $style_size});
 }
@@ -327,7 +399,7 @@ sub html_body_div {
 
 sub html_body_script {
   my $self = shift;
-  my $html = $self->CGI;
+  my $html = $self->HTML;
   return $html->script({}, $self->html_body_script_contents);
 }
 
@@ -337,7 +409,11 @@ sub html_body_script {
 
 sub html_body_script_map {
   my $self = shift;
-  return sprintf(q{const map = L.map('%s').setView([%f, %f], %u);}, $self->id, $self->center->[0], $self->center->[1], $self->zoom);
+  return sprintf(q{const map = L.map(%s).setView(%s, %s);},
+                 $self->JSON->encode($self->id),
+                 $self->JSON->encode($self->center),
+                 $self->JSON->encode($self->zoom),
+                );
 }
 
 =head2 html_body_script_contents
@@ -354,8 +430,12 @@ sub html_body_script_contents {
                   $self->tileLayer->stringify,
                   $empty,
                  );
+  foreach my $icon (@ICONS) {
+    my $name = $icon->name;
+    push @commands, "const $name = " . $icon->stringify;
+  }
   my $loop     = 0;
-  foreach my $object (@{$self->objects}) {
+  foreach my $object (@OBJECTS) {
     $loop++;
     push @commands, "const object$loop = " . $object->stringify;
   }
@@ -366,17 +446,29 @@ sub html_body_script_contents {
 
 =head1 OBJECT ACCESSORS
 
-=head2 CGI
+=head2 HTML
 
-Returns a L<CGI> object to generate HTML.
+Returns an L<HTML:Tiny> object to generate HTML.
 
 =cut
 
-sub CGI {
+sub HTML {
   my $self       = shift;
-  $self->{'CGI'} = shift if @_;
-  $self->{'CGI'} = CGI->new('') unless defined $self->{'CGI'};
-  return $self->{'CGI'};
+  $self->{'HTML'} = shift if @_;
+  $self->{'HTML'} = HTML::Tiny->new unless defined $self->{'HTML'};
+  return $self->{'HTML'};
+}
+
+=head2 JSON
+
+Returns a L<JSON::XS> object to generate JSON.
+
+=cut
+
+sub JSON {
+  my $self        = shift;
+  $self->{'JSON'} = JSON::XS->new->allow_nonref;
+  return $self->{'JSON'};
 }
 
 =head1 SEE ALSO

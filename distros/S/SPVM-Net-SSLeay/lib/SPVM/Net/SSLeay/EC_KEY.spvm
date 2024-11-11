@@ -1,0 +1,12 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::EC_KEY {
+  
+  # Class Methods
+  native method new_by_curve_name : Net::SSLeay::EC_KEY ($nid : int);
+  
+  # Instance Methods
+  native method DESTROY : void ();
+  
+}

@@ -1,6 +1,6 @@
 package App::cat::v;
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 use 5.024;
 use warnings;
@@ -60,7 +60,8 @@ my %control = (
     us   => [ 's', "\037", { s => "\x{241F}", } ], # ␟ SYMBOL FOR UNIT SEPARATOR
     sp   => [ 'm', "\040", { s => "\x{2420}",      # ␠ SYMBOL FOR SPACE
 			     m => "\x{00B7}", } ], # · MIDDLE DOT
-    del  => [ 's', "\177", { s => "\x{2421}", } ], # ␡ SYMBOL FOR DELETE
+    del  => [ 'm', "\177", { s => "\x{2421}",    , # ␡ SYMBOL FOR DELETE
+			     m => "\x{232B}", } ], # ⌫ ERASE TO THE LEFT
     nbsp => [ 's', "\240", { s => "\x{2423}", } ], # ␣ OPEN BOX
 );
 

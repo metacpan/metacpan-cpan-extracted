@@ -5,8 +5,9 @@ use strict;
 use warnings;
 
 use Carp;
-use LWP::UserAgent;
-use Time::Local;
+
+use parent 'Weather::API::Base';
+use Weather::API::Base qw(:all);
 
 =head1 NAME
 
@@ -14,12 +15,11 @@ Weather::OWM - Perl client for the OpenWeatherMap (OWM) API
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 =head1 SYNOPSIS
 
   use Weather::OWM;
-  use strict;
   use v5.10;
 
   my $owm = Weather::OWM->new(key => 'Your API key');
@@ -108,7 +108,7 @@ Current OWM API support:
 =back
 
 Please see L<the official OWM website|https://openweathermap.org/api> for extensive
-documentation. Note that even the free APIs require L<signing up|https://home.openweathermap.org/users/sign_up>
+documentation. Note that even the free APIs require L<registering|https://home.openweathermap.org/users/sign_up>
 for an API key.
 
 This module belongs to a family of weather modules (along with L<Weather::Astro7Timer>
@@ -609,46 +609,31 @@ unless you pass C<$small> in which case you get the URL to the 50x50 icon.
 
 Similar to L<icon_url> above, but downloads the png data (undef on error).
 
+=head1 HELPER FUNCTIONS FROM Weather::API::Base
 
-=head1 HELPER FUNCTIONS
+The parent class L<Weather::API::Base> contains some useful functions:
 
-=head2 C<ts_to_date>
+  use Weather::API::Base qw(:all);
 
-    my $datetime = Weather::OWM::ts_to_date($timestamp, $utc?);
+  # Get time in YYYY-MM-DD HH:mm:ss format, local time zone from a unix timestamp
+  my $datetime = ts_to_date(time());
 
-The OWM APIs usually return unix timestamps (key C<dt>). There are many ways to
-convert them to human readable dates, but for convenience you can use C<ts_to_date>,
-which will return the format C<YYYY-MM-DD HH:mm:ss> in your local time zone, or
-C<YYYY-MM-DD HH:mm:ssZ> in UTC if the second argument is true.
+  # Convert 30 degrees Celsius to Fahrenheit
+  my $result = convert_units('C', 'F', 30);
+
+See the doc for that module for more details.
 
 =cut
 
 my $geocache;
 
 sub new {
-    my $class = shift;
-
-    my $self = {};
-    bless($self, $class);
-
-    my %args = @_;
+    my ($class, %args) = @_;
 
     croak("key required ") unless $args{key};
 
-    my %defaults = (
-        scheme  => 'https',
-        timeout => 30,
-        agent   => "libwww-perl Weather::OWM/$VERSION",
-        lang    => "en",
-        units   => 'metric',
-        error   => 'return',
-    );
-    $args{agent} = $args{ua}->agent() if $args{ua};
-    $self->{$_} = $args{$_} || $defaults{$_} for keys %defaults;
-    $self->{$_} = $args{$_} for qw/key ua debug/;
-
-    croak("http or https scheme expected")
-        if $self->{scheme} ne 'http' && $self->{scheme} ne 'https';
+    my $self = $class->SUPER::new(lang => 'en', %args);
+    $self->{key} = $args{key};
 
     return $self;
 }
@@ -684,7 +669,7 @@ sub one_call_response {
 
     $self->_geocode(\%args);
 
-    _verify_lat_lon(\%args);
+    Weather::API::Base::_verify_lat_lon(\%args);
 
     if ($args{product}) { # Not forecast
         croak("date expected")
@@ -702,7 +687,7 @@ sub one_call_response {
             croak("date of at least 1979-01-02 expected")
                 unless $args{date} ge "1979-01-02";
         } elsif ($args{product} eq 'historical') {
-            $args{date} = _date_to_ts($args{date})
+            $args{date} = datetime_to_ts($args{date})
                 unless $args{date} =~ /^\d+$/;
 
             croak("dt / date of at least 1979-01-01 expected")
@@ -718,7 +703,7 @@ sub get_weather_response {
     my $self = shift;
     my %args = $self->_preprocess_params('weather', @_);
 
-    _verify_lat_lon(\%args)
+    Weather::API::Base::_verify_lat_lon(\%args)
         unless $args{q} || $args{zip} || $args{city_id};
 
     return $self->_get_ua($self->_weather_url(%args));
@@ -730,7 +715,7 @@ sub get_history_response {
 
     $args{product} ||= 'hourly';
 
-    _verify_lat_lon(\%args)
+    Weather::API::Base::_verify_lat_lon(\%args)
         unless $args{q} || $args{zip} || $args{city_id};
 
     my %req = (
@@ -751,7 +736,7 @@ sub get_history_response {
 
     foreach (qw/start end/) {
         next unless $args{$_};
-        $args{$_} = _date_to_ts($args{$_})
+        $args{$_} = datetime_to_ts($args{$_})
                 unless $args{$_} =~ /^\d+$/;
     }
 
@@ -763,7 +748,7 @@ sub geo_response {
     my %args = $self->_preprocess_params('geo', @_);
 
     if (defined $args{lat} && defined $args{lon}) {
-        _verify_lat_lon(\%args);
+        Weather::API::Base::_verify_lat_lon(\%args);
     } else {
         croak("either both lat & lon, or either of city or zip parameters expected")
             unless $args{city} || $args{zip};        
@@ -795,26 +780,6 @@ sub icon_data {
     return;
 }
 
-sub ts_to_date {
-    my $ts = shift;
-    my $gm = shift;
-    $gm = $gm ? 'Z' : '';
-    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) =
-        $gm ? gmtime($ts) : localtime($ts);
-    $mon++;
-    $year += 1900;
-    return sprintf "%04d-%02d-%02d %02d:%02d:%02d%s", $year, $mon, $mday,
-        $hour, $min, $sec, $gm;
-}
-
-sub _date_to_ts {
-    my $date = shift;
-    if ($date =~ /(\d{4})-(\d{2})-(\d{2})(?:.(\d{2}):(\d{2}):(\d{2})([Zz])?)?/) {
-        return $7 ? timegm($6,$5,$4,$3,$2-1,$1) : timelocal($6,$5,$4,$3,$2-1,$1);
-    }
-    croak("unrecognized date format (try 'YYYY-MM-DD' or 'YYYY-MM-DD HH:mm:ss')");
-}
-
 sub _preprocess_params {
     my $self = shift;
     my $api  = shift;
@@ -824,7 +789,7 @@ sub _preprocess_params {
     if ($api eq 'one_call' || $api eq 'weather') {
         $args{$_} //= $self->{$_} for qw/lang units/;
         delete $args{units} if $args{units} eq 'standard';
-        delete $args{lang}  if $args{lang} eq 'en';
+        delete $args{lang}  if $args{lang} && $args{lang} eq 'en';
     }
     $args{appid} = $self->{key};
 
@@ -836,7 +801,8 @@ sub _get {
     my $wantarray = shift;
     my $api       = shift;
     my %args      = @_;
-    my $error     = delete $args{error} || $self->{error};
+
+    $self->{output} = $args{mode} || 'json';
 
     my $resp =
           $api eq 'one_call' ? $self->one_call_response(%args)
@@ -844,25 +810,7 @@ sub _get {
         : $api eq 'history'  ? $self->get_history_response(%args)
         :                      $self->geo_response(%args);
 
-    if ($resp->is_success) {
-        return _output($resp->decoded_content, $wantarray ? ($args{mode} || 'json') : '');
-    } else {
-        if ($error eq 'die') {
-            die $resp->status_line;
-        } else {
-            return $wantarray ? (error => $resp) : "ERROR: ".$resp->status_line;
-        }
-    }
-}
-
-sub _verify_lat_lon {
-    my $args = shift;
-
-    croak("lat between -90 and 90 expected")
-        unless defined $args->{lat} && abs($args->{lat}) <= 90;
-
-    croak("lon between -180 and 180 expected")
-        unless defined $args->{lon} && abs($args->{lon}) <= 180;
+    return $self->_get_output($resp, $wantarray);
 }
 
 sub _geocode {
@@ -873,20 +821,6 @@ sub _geocode {
     my @location = $self->geo(city => $args->{city}, zip => $args->{zip}, limit => 1);
     croak("requested location not found") unless @location;
     $args->{$_} = $location[0]->{$_} for qw/lat lon/;
-}
-
-sub _get_ua {
-    my $self = shift;
-    my $url  = shift;
-    $url = $self->{scheme}.$url;
-
-    warn "$url\n" if $self->{debug};
-
-    $self->{ua} = LWP::UserAgent->new() unless $self->{ua};
-    $self->{ua}->agent($self->{agent});    
-    $self->{ua}->timeout($self->{timeout});
-
-    return $self->{ua}->get($url);
 }
 
 sub _weather_url {
@@ -905,7 +839,7 @@ sub _weather_url {
     croak('valid products: '.join(", ", keys %products))
         unless $products{$prod};
 
-    return "://$sub.openweathermap.org/data/2.5/$products{$prod}?" . _join_args(\%args);
+    return "$sub.openweathermap.org/data/2.5/$products{$prod}?" . _join_args(\%args);
 }
 
 sub _history_url {
@@ -926,7 +860,7 @@ sub _history_url {
     croak('valid products: '.join(", ", keys %products))
         unless $products{$prod};
 
-    return "://history.openweathermap.org/data/2.5/$products{$prod}?" . _join_args(\%args);
+    return "history.openweathermap.org/data/2.5/$products{$prod}?" . _join_args(\%args);
 }
 
 sub _onecall_url {
@@ -936,47 +870,23 @@ sub _onecall_url {
     $prod = '/timemachine' if $prod eq 'historical';
     $prod = '/day_summary' if $prod eq 'daily';
 
-    return "://api.openweathermap.org/data/3.0/onecall$prod?" . _join_args(\%args);
+    return "api.openweathermap.org/data/3.0/onecall$prod?" . _join_args(\%args);
 }
 
 sub _geo_url {
     my $self = shift;
     my %args = @_;
 
-    return "://api.openweathermap.org/geo/1.0/reverse?" . _join_args(\%args)
+    return "api.openweathermap.org/geo/1.0/reverse?" . _join_args(\%args)
         if defined $args{lat} && defined $args{lon};
 
     $args{q} = delete $args{city};
-    return "://api.openweathermap.org/geo/1.0/direct?" . _join_args(\%args);
+    return "api.openweathermap.org/geo/1.0/direct?" . _join_args(\%args);
 }
 
 sub _join_args {
     my $args = shift;
     return join "&", map {defined $args->{$_} ? "$_=$args->{$_}" : ()} keys %$args;
-}
-
-sub _output {
-    my $str    = shift;
-    my $format = shift;
-
-    return $str unless $format;
-
-    if ($format eq 'json') {
-        require JSON;
-        return _deref(JSON::decode_json($str));
-    } elsif ($format eq 'xml') {
-        require XML::Simple;
-        return _deref(XML::Simple::XMLin($str));
-    }
-    return (data => $str);
-}
-
-sub _deref {
-    my $ref = shift;
-    die "Could not decode response body" unless $ref;
-    return $ref unless ref($ref);
-    return %$ref if ref($ref) eq 'HASH';
-    return @$ref;
 }
 
 =head1 PERL WEATHER MODULES
@@ -996,9 +906,9 @@ Note that there is an older L<Weather::OpenWeatherMap> module, but it is no long
 maintained and only supports the old (v2.5) Weather API. I looked into updating it
 for my purposes, but it was more complex (returns objects, so a new object definition
 is required per API endpoint added etc) and with more dependencies (including L<Moo>),
-than what I wanted from such a module.
+than what I wanted for such a module.
 
-=head2 Apple WebKit
+=head2 Apple WeatherKit
 
 An alternative source for multi-source forecasts is Apple's WeatherKit (based on
 the old Dark Sky weather API). It offers 500k calls/day for free, but requires a

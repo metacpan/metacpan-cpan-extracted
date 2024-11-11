@@ -8,6 +8,8 @@ class Net::SSLeay::BIO {
   # Class Methods
   native static method new : Net::SSLeay::BIO ();
   
+  native static method new_file : Net::SSLeay::BIO ($filename : string, $mode : string);
+  
   # Instance Methods
   native method read : int ($data : mutable string, $dlen : int = -1);
   

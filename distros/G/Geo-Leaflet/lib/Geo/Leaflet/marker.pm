@@ -1,14 +1,14 @@
 package Geo::Leaflet::marker;
 use strict;
 use warnings;
-use base qw{Geo::Leaflet::Base};
+use base qw{Geo::Leaflet::Objects};
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
 
-Geo::Leaflet::marker - Generates Leaflet web page
+Geo::Leaflet::marker - Leaflet marker object
 
 =head1 SYNOPSIS
 
@@ -21,7 +21,7 @@ Geo::Leaflet::marker - Generates Leaflet web page
 
 =head1 DESCRIPTION
 
-The package is designed to be able to build a Leaflet map similar to what L<Geo::Google::StaticMaps::V2> used to be able to provide.
+This package constructs a Leaflet marker object for use on a L<Geo::Leaflet> map.
 
 =head1 PROPERTIES
 
@@ -47,7 +47,7 @@ sub lon {
   return $self->{'lon'};
 }
 
-=head2 properties
+=head2 options
 
 =head2 popup
 
@@ -58,9 +58,45 @@ sub lon {
 =cut
 
 sub stringify {
-  my $self = shift;
-  #const marker = L.marker([51.5, -0.09]).addTo(map);
-  return $self->stringify_base([$self->lat, $self->lon]);
+  my $self    = shift;
+  my $options = $self->options;
+  my $value   = shift;
+  #const object6 = L.marker([51.498,-0.09],
+  #                         {"icon":paddle_1})
+  #                .addTo(map).bindPopup("marker icon popup").bindTooltip("marker icon tooltip");
+  my $class   = 'marker';
+  my $addmap  = '.addTo(map)';
+  my $popup   = $self->popup   ? sprintf('.bindPopup(%s)',   $self->JSON->encode($self->popup))   : '';
+  my $tooltip = $self->tooltip ? sprintf('.bindTooltip(%s)', $self->JSON->encode($self->tooltip)) : '';
+  return sprintf(q{L.%s(%s, %s)%s%s%s;},
+                 $class,
+                 $self->JSON->encode([$self->lat, $self->lon]),
+                 $self->_hash_to_json($self->options),
+                 $addmap,
+                 $popup,
+                 $tooltip,
+                );
+}
+
+#head2 _hash_to_json
+#
+#Custom JSON encoder!  Unfortunately, no Perl encoders support function name encoding as needed here for "icon" keys
+#
+#cut
+
+sub _hash_to_json {
+  my $self   = shift;
+  my $hash   = shift;
+  my $string = ''; 
+  foreach my $key (keys %$hash) {
+    my $value = $hash->{$key};
+    if ($key eq "icon") {
+      $string = $string . join(':', $self->JSON->encode($key), $value); #function name encoding is not supported by any perl package!
+    } else {
+      $string = $string . join(':', $self->JSON->encode($key), $self->JSON->encode($value));
+    }
+  }
+  return "{$string}";
 }
 
 =head1 SEE ALSO

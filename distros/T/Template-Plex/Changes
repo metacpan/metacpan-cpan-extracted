@@ -1,4 +1,17 @@
 Revision history for Perl extension Template::Plex.
+v0.7.1 2024-04-23
+  [fixes]
+    -  { and } characters are now replaced with Perl escape equivalents \{ and
+       \} for better code generation support (ie C, Perl, Javascript etc that
+       use  {} as block delimieters)
+    -  Extra test for reference types in slot rendering
+    -  use file_name_is_absolute for path testing instead of regex
+
+    [new features]
+    - Add parent shortcut in templates
+    - If a template is not inherited, slot references are to the template, not
+      the parent
+
 v0.7.0 2024-01-10
   [improvements]
     - immediate load and render will use the supplied vars also as fields to

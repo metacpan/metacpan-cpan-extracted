@@ -15,9 +15,7 @@ subtest 'one_call' => sub {
     like(dies {$owm->one_call(product=>'forecast')}, qr/lat & lon/, "No coordinates");
     like(dies {$owm->one_call(lat=>50)}, qr/both lat & lon/, "Latitude wrong");
     like(dies {$owm->one_call(lat=>200,lon=>0)}, qr/lat between/, "Latitude wrong");
-    like(dies {Weather::OWM::_verify_lat_lon()}, qr/lat between/, "Latitude missing");
     like(dies {$owm->one_call(lon=>200,lat=>0)}, qr/lon between/, "Longitude wrong");
-    like(dies {Weather::OWM::_verify_lat_lon({lat=>50})}, qr/lon between/, "Longitude missing");
     like(dies {$owm->one_call(product=>'a')}, qr/product has to be/, "Wrong product");
     my $mock = Test2::Mock->new(
         class    => 'LWP::UserAgent',
@@ -34,6 +32,12 @@ subtest 'one_call' => sub {
     like(dies {$owm->one_call(product=>'historical',city=>'a', date=>"15-07-99")}, qr/date format/, "Invalid date format");
 };
 
+subtest 'get_geo' => sub {
+    my $owm = Weather::OWM->new(key=>'MYKEY');
+    like(dies {$owm->geo(lat=>0)}, qr/both lat & lon/, "geo croak");
+};
+
+
 subtest 'get_weather' => sub {
     my $owm = Weather::OWM->new(key=>'MYKEY');
     like(dies {$owm->get_weather(product=>'a',lat=>0,lon=>0)}, qr/valid prod/, "Invalid product");
@@ -47,7 +51,7 @@ subtest 'get_history' => sub {
 };
 
 subtest 'request errors' => sub {
-    my $owm = Weather::OWM->new(key=>'MYKEY', error=>'die');
+    my $owm  = Weather::OWM->new(key=>'MYKEY', error=>'die');
     my $mock = Test2::Mock->new(
         class => 'LWP::UserAgent',
         override => [

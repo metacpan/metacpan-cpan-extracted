@@ -1,29 +1,29 @@
 package Geo::Leaflet::circle;
 use strict;
 use warnings;
-use base qw{Geo::Leaflet::Base};
+use base qw{Geo::Leaflet::Objects};
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
 
-Geo::Leaflet::circle - Generates Leaflet web page
+Geo::Leaflet::circle - Leaflet circle object
 
 =head1 SYNOPSIS
 
   use Geo::Leaflet;
   my $map    = Geo::Leaflet->new;
   my $circle = $map->circle(
-                            lat        => $lat,
-                            lon        => $lon,
-                            radius     => $radius,
-                            properties => {},
+                            lat     => $lat,
+                            lon     => $lon,
+                            radius  => $radius,
+                            options => {},
                            );
 
 =head1 DESCRIPTION
 
-The package is designed to be able to build a Leaflet map similar to what L<Geo::Google::StaticMaps::V2> used to be able to provide.
+This package constructs a Leaflet circle object for use on a L<Geo::Leaflet> map.
 
 =head1 PROPERTIES
 
@@ -59,7 +59,7 @@ sub radius {
   return $self->{'radius'};
 }
 
-=head2 properties
+=head2 options
 
 =head1 METHODS
 
@@ -68,9 +68,9 @@ sub radius {
 =cut
 
 sub stringify {
-  my $self                = shift;
-  my $properties          = $self->properties;
-  $properties->{'radius'} = $self->radius if defined $self->radius; #radius is set in properties
+  my $self             = shift;
+  my $options          = $self->options;
+  $options->{'radius'} = $self->radius if defined $self->radius; #radius is set in options
   return $self->stringify_base([$self->lat, $self->lon]);
 }
 

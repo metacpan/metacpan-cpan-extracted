@@ -9,7 +9,7 @@ use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::
 use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SexOrGender::Male;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.33;
+our $VERSION = 0.34;
 
 sub new {
 	my $class = shift;
@@ -252,12 +252,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2023 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.33
+0.34
 
 =cut

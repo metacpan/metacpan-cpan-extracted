@@ -31,7 +31,7 @@ cat-v \[ オプション \] args ...
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -104,6 +104,7 @@ Version 1.00
     nl    \x{23CE}  ⏎  RETURN SYMBOL
     np    \x{2398}  ⎘  NEXT PAGE
     sp    \x{00B7}  ·  MIDDLE DOT
+    del   \x{232B}  ⌫  ERASE TO THE LEFT
 
 # OPTIONS
 
@@ -157,11 +158,11 @@ Version 1.00
 
     フラグが`+`で始まる場合、その文字はリピートリストに追加されます。
 
-        cat -v --esc=+s
+        cat-v --esc=+s
 
     つまり、上記のコマンドは、次のように書いたのと同じ意味になります。
 
-        cat -v --esc=s --repeat +esc
+        cat-v --esc=s --repeat +esc
 
 - **--repeat**=_name_\[,_name_...\]
 

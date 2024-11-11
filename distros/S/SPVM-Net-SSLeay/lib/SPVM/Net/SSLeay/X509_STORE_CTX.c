@@ -3,10 +3,11 @@
 
 #include "spvm_native.h"
 
-
+#include <openssl/ssl.h>
 
 static const char* FILE_NAME = "Net/SSLeay/X509_STORE_CTX.c";
 
+// Instance Methods
 int32_t SPVM__Net__SSLeay__X509_STORE_CTX__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;

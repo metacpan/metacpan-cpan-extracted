@@ -17,7 +17,7 @@ my %vars;
 my $template=Template::Plex->load("child.plex", \%vars, root=>"t", use_comments=>0);
 #$template->setup;
 my $result=$template->render;
-#print $result. "\n";
+print $result. "\n";
 my $expected='###START OF GRANDPARENT
 ###START OF PARENT
 ===HEADER===

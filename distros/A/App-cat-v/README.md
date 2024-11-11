@@ -32,7 +32,7 @@ cat-v \[ options \] args ...
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -119,6 +119,7 @@ characters
     nl    \x{23CE}  ⏎  RETURN SYMBOL
     np    \x{2398}  ⎘  NEXT PAGE
     sp    \x{00B7}  ·  MIDDLE DOT
+    del   \x{232B}  ⌫  ERASE TO THE LEFT
 
 # OPTIONS
 
@@ -184,12 +185,12 @@ characters
 
     If flag begins with `+`, that character is added to the repeat list.
 
-        cat -v --esc=+s
+        cat-v --esc=+s
 
     So the above command will have the same meaning as if you had written
     as following.
 
-        cat -v --esc=s --repeat +esc
+        cat-v --esc=s --repeat +esc
 
 - **--repeat**=_name_\[,_name_...\]
 

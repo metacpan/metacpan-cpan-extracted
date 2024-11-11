@@ -32,17 +32,22 @@
       },
       "runtime" : {
          "requires" : {
-            "LWP::UserAgent" : "0",
+            "Weather::API::Base" : "0",
             "perl" : "5.008"
+         },
+         "suggests" : {
+            "JSON" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "XML::Simple" : "0"
+         },
          "requires" : {
             "HTTP::Response" : "0",
             "JSON" : "0",
             "Test2::Tools::Exception" : "0",
-            "Test2::V0" : "0",
-            "XML::Simple" : "0"
+            "Test2::V0" : "0"
          }
       }
    },
@@ -54,6 +59,6 @@
          "web" : "https://github.com/dkechag/Weather-OWM"
       }
    },
-   "version" : "0.1",
+   "version" : "0.2",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

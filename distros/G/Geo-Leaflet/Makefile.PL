@@ -4,7 +4,7 @@ WriteMakefile(
     VERSION_FROM  => 'lib/Geo/Leaflet.pm',
     PREREQ_PM     => {
                       'Package::New' => 0,
-                      'CGI'          => 0,
+                      'HTML::Tiny'   => 0,
                       'JSON::XS'     => 0,
                      },
     ABSTRACT_FROM => 'lib/Geo/Leaflet.pm',
@@ -27,5 +27,4 @@ WriteMakefile(
       'version' => 2
     }
   }
-
 );
