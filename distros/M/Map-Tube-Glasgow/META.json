@@ -42,14 +42,15 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.82"
+            "Test::More" : "0.82",
+            "XML::Simple" : "0"
          }
       }
    },
    "provides" : {
       "Map::Tube::Glasgow" : {
          "file" : "lib/Map/Tube/Glasgow.pm",
-         "version" : "v0.71.0"
+         "version" : "v0.72.0"
       }
    },
    "release_status" : "stable",
@@ -58,6 +59,6 @@
          "mailto" : "bug-Map-Tube-Glasgow@rt.cpan.org"
       }
    },
-   "version" : "v0.71.0",
+   "version" : "v0.72.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

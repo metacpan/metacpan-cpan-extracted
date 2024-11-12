@@ -2,7 +2,7 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.010";
+  version "0.011";
   
   use Net::SSLeay::Constant;
   use Net::SSLeay::SSL_CTX;
@@ -80,6 +80,14 @@ class Net::SSLeay {
   native method get1_session :  Net::SSLeay::SSL_SESSION ();
   
   native method set_session : int ($session : Net::SSLeay::SSL_SESSION);
+  
+  native method get_certificate : Net::SSLeay::X509 ();
+  
+  native method get0_next_proto_negotiated : void ($data_ref : string[], $len_ref : int*);
+  
+  native method get0_alpn_selected : void ($data_ref : string[], $len_ref : int*);
+  
+  native method get_peer_cert_chain : Net::SSLeay::X509[] ();
   
   # This native function is not documented in OpenSSL, but Perl's IO::Socket::SSL uses this method
   native method set_SSL_CTX : Net::SSLeay::SSL_CTX ($ctx : Net::SSLeay::SSL_CTX);

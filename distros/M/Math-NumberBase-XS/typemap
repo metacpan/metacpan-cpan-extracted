@@ -1,0 +1,17 @@
+TYPEMAP
+AV *         T_AVREF
+HV *         T_HVREF
+
+INPUT
+T_AVREF
+    $var = (AV *)SvRV($arg);
+
+T_HVREF
+    $var = (HV *)SvRV($arg);
+
+OUTPUT
+T_AVREF
+    sv_setrv_noinc($arg, (SV*)$var);
+
+T_HVREF
+    sv_setrv_noinc($arg, (SV*)$var);

@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="copyright" content="App::financeta Authors">
+    <meta name="author" content="Vikas N Kumar <vikas@cpan.org>">
+    <meta name="description" content="App::financeta">
+    <link rel="icon" href="chart-line-solid.png" type="image/png">
+    <title>[% page.title %]</title>
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <style>
+    #chart-container {
+        min-width: 600px;
+        min-height: 400px;
+        height: [% chart.height %];
+        width: 95%;
+        margin: 20px;
+    };
+    </style>
+    </head>
+    <body>
+        <h1>[% page.title %]</h1>
+        <hr/>
+        <div id="chart-container">
+        </div>
+        <hr/>
+    <script type="text/javascript">
+        var yaxes = [];
+        [% FOREACH el IN chart.yaxes_index %]
+            [% SWITCH el %]
+            [% CASE 0 %]
+                yaxes.push({
+                    labels: { align: 'left' },
+                    height: "400px",
+                    resize: { enabled: true },
+                });
+            [% CASE 1 %]
+                yaxes.push({
+                    labels: { align: 'left' },
+                    top: "400px",
+                    height: "200px",
+                    opposite: true,
+                    offset: 0,
+                    resize: { enabled: true },
+                });
+            [% CASE 2 %]
+                yaxes.push({
+                    labels: { align: 'left' },
+                    top: "600px",
+                    height: "200px",
+                    opposite: true,
+                    offset: 0,
+                    resize: { enabled: true },
+                });
+            [% CASE 3 %]
+                yaxes.push({
+                    labels: { align: 'left' },
+                    top: "800px",
+                    height: "200px",
+                    opposite: true,
+                    offset: 0,
+                    resize: { enabled: true },
+                });
+            [% END %]
+        [% END %]
+        window.chart = new Highcharts.stockChart('chart-container', {
+            accessibility: { enabled: false },
+            yAxis: yaxes,
+            title: { text: "[% chart.title %]" },
+            series:[
+            [% FOREACH el IN chart.charts %]
+                {
+                    type: "[% el.type %]",
+                    name: "[% el.title %]",
+                    id: "[% el.id %]",
+                    data: [% el.data %],
+                    [% IF el.y_axis %]
+                    yAxis: [% el.y_axis %],
+                    [% END %]
+                    [% IF el.is_signal %]
+                    lineWidth: 0,
+                    showInLegend: true,
+                    marker: {
+                        enabled: true,
+                        fillColor: "[% el.marker_color %]",
+                        radius: 4,
+                        symbol: "[% el.marker_symbol %]",
+                    },
+                    [% END %]
+                },
+            [% END %]
+            ],
+            responsive: {
+                rules: [{
+                    condition: { maxWidth: 800 },
+                    chartOptions: {
+                        rangeSelector: {
+                            inputEnabled: false
+                        }
+                    }
+                }]
+            }
+        });
+    </script>
+    </body>
+</html>

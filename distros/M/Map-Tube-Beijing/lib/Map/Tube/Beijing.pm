@@ -12,10 +12,12 @@
 
 
 package Map::Tube::Beijing;
+use 5.10.0;
+use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = version->declare('v0.11.0');
 
 =encoding utf8
 
@@ -30,50 +32,46 @@ use XML::Simple;
 use Moo;
 use namespace::clean;
 
+my %nametypes = map { $_ => 1 } qw(alt); # The permissible alternative nametypes. In our case, just 'alt'
+
 has xml      => ( is  => 'ro', lazy => 1, default => sub { return dist_file('Map-Tube-Beijing', 'beijing-map.xml') } );
 has nametype => ( is  => 'ro', default => '',
-                  isa => sub { die "Illegal nametype '$_[0]'" unless $_[0] =~ /^(alt)?$/ },
+				  isa => sub { die __PACKAGE__ . ": ERROR: Invalid nametype for constructor: '$_[0]'" unless ( ( $_[0] eq '') || exists($nametypes{ $_[0] } ) ) },
                 );
 
 with 'Map::Tube';
 
-around BUILDARGS => sub {
-  my($orig, $class, @args) = @_;
-  my %args;
-  if ( ( @args == 1 ) && ( ref($args[0]) == 'HASH' ) ) {
-    %args = %{ $args[0] };
-  } else {
-    %args = @args;
-  }
-
-  if ( exists($args{nametype}) && ( $args{nametype} ne '' ) ) {
-    $args{xml} = XMLout( _xmlmod(
-                                  XMLin( dist_file('Map-Tube-Beijing', 'beijing-map.xml'),
-                                         KeyAttr => [ ], KeepRoot => 1,
-                                       ),
-                                  '_' . $args{nametype},
-                                ),
-                         XMLDecl => 1, KeepRoot => 1,
-                       );
-  }
-
-  return $class->$orig(%args);
-
+before _validate_map_structure => sub {
+  $_[1] = _relocate_alternatives( $_[1], '_' . $_[0]->{nametype} ) if ( exists( $_[0]->{nametype}) && ( $_[0]->{nametype} ne '' ) );
+  $_[1] = _remove_alternatives( $_[1] );
 };
 
-
-sub _xmlmod {
-  my ( $branch, $suffix ) = @_;
+sub _relocate_alternatives {
+  my( $branch, $suffix ) = @_;
   for my $key( keys %{ $branch } ) {
     if ( ref( $branch->{$key} ) eq 'HASH' ) {
-      $branch->{$key} = _xmlmod( $branch->{$key}, $suffix );
+	  $branch->{$key} = _relocate_alternatives( $branch->{$key}, $suffix );
     } elsif ( ( ref( $branch->{$key} ) eq '' ) && ( $key eq ( 'name' . $suffix ) ) ) {
       $branch->{'name'} = $branch->{ 'name' . $suffix };
-    } elsif ( ( ref( $branch->{$key} ) eq '' ) && ( $key eq ( 'line' . $suffix ) ) ) {
-      $branch->{'line'} = $branch->{ 'line' . $suffix };
     } elsif ( ref( $branch->{$key} ) eq 'ARRAY' ) {
-      $branch->{$key} = [ map { _xmlmod( $_, $suffix ) } @{ $branch->{$key} } ];
+	  $branch->{$key} = [ map { _relocate_alternatives( $_, $suffix ) } @{ $branch->{$key} } ];
     }
+  }
+  return $branch;
+}
+
+sub _remove_alternatives {
+  my($branch) = @_;
+  for my $key( keys %{ $branch } ) {
+    if ( ref( $branch->{$key} ) eq 'HASH' ) {
+	  $branch->{$key} = _remove_alternatives( $branch->{$key} );
+	} elsif ( ( ref( $branch->{$key} ) eq '' ) && ( $key eq 'name' ) ) {
+	  for my $suffix ( keys(%nametypes) ) {
+		delete $branch->{ $key . '_' . $suffix };
+	  }
+    } elsif ( ref( $branch->{$key} ) eq 'ARRAY' ) {
+	  $branch->{$key} = [ map { _remove_alternatives($_) } @{ $branch->{$key} } ];
+	}
   }
   return $branch;
 }
@@ -81,7 +79,7 @@ sub _xmlmod {
 =head1 SYNOPSIS
 
     use Map::Tube::Beijing;
-    my $tube = Map::Tube::Beijing->new();
+	my $tube = Map::Tube::Beijing->new( nametype => 'alt' );
 
     my $route = $tube->get_shortest_route('Yonghegong', 'Chongwenmen');
 
@@ -106,6 +104,32 @@ which is part of the distribution. Without argument, full Chinese characters
 (simplified) will be used. With the value C<'alt>' for C<nametype>, pinyin
 transliteration into Western characters will be used. Other values will throw
 an error.
+
+
+=head1 METHODS
+
+=head2 nametype( )
+
+This yields the nametype that was specified with the constructor call, or '' if none.
+
+
+=head1 MAP DATA FORMAT
+
+The data format for Map::Tube instances is described in the documentation for L<Map::Tube>.
+The Beijing map, however, comes either with station and line names in the original Chinese
+writing or in pinyin, i.e., in Latin alphabet letters that are a rough representation of
+the pronunciation. To this end, all tags that have a C<name> attribute containing the name
+in Chinese script also have a C<name_alt> attribute with the pinyin writing. When reading the
+map data and no C<nametype> is given, all the C<name_alt> attributes are deleted, so that
+the L<Map::Tube> software sees only a standard data structure. However, if C<nametype=alt>
+was specified when instantiating L<Map::Data::Beijing>, the C<name_alt> attributes will be
+copied into the C<name> atributes, and, again, the C<name_alt> attributes themselves are
+removed.
+
+This mechanism may also be employed also for other countries/regions where more than one language
+and/or writing system is used. E.g., for Swiss subway systems it is conceivable to have up to four
+different languages. C<name> might be used for the French name, C<name_d> for the German name,
+C<name_i> for Italian, and C<name_r> for Romansh.
 
 =head1 ERRORS
 

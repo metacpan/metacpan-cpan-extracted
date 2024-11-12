@@ -11,11 +11,11 @@ WriteMakefile (
     NAME => 'Parse::Gitignore',
     VERSION_FROM => $pm,
     ABSTRACT_FROM => $pod,
-    AUTHOR => 'Ben Bullock <bkb@cpan.org>',
+    AUTHOR => 'Ben Bullock <benkasminbullock@gmail.com>',
     LICENSE => 'perl',
     PREREQ_PM => {
-	'Path::Tiny' => '0.076',
 	'File::Slurper' => '0.010',
+	'File::Spec' => '3.40',
     },
     META_MERGE => {
 	'meta-spec' => {

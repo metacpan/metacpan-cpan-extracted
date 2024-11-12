@@ -1,5 +1,8 @@
 Tk::CodeText module changes log
 
+0.55 11 Nov 2024
+	Only clear highlighting of the section about to be highlighted in the highlightLoop method.
+
 0.54 04 Oct 2024
 	Removed -updatelines option from documentation.
 	Added -linespercycle option.

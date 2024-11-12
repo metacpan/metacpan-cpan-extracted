@@ -8,11 +8,21 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 ## [Unreleased]
 
+## [30.0.1] - 2024-11-12
+### Changed
+- [Ruby] Fixed up some style autofix cops ([#311](https://github.com/cucumber/gherkin/pull/311))
+- [Ruby] Internal rewrites to razor template variables and `TokenFormatterBuilder`) ([#311](https://github.com/cucumber/gherkin/pull/311))
+
+### Fixed
+- [Python] Release process didn't release to pypi correctly
+- [Python, JavaScript] Remove executable permissions from `.razor` files ([#310](https://github.com/cucumber/gherkin/pull/310))
+
 ## [30.0.0] - 2024-10-24
 ### Added
 - [PHP, Java, Ruby, JavaScript] update dependency messages up to v26
 - [Python] Added type annotations ([#283](https://github.com/cucumber/gherkin/pull/283))
 - [Python] Switch to pyproject.toml ([#290](https://github.com/cucumber/gherkin/pull/290))
+- [.NET] Added .NET 9 to test matrix
 
 ### Changed
 - [.NET] Drop unsupported frameworks. Now supported target frameworks are .NET 8, .NET Standard 2.0 ([#265](https://github.com/cucumber/gherkin/pull/265))
@@ -688,7 +698,8 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 ### Changed
 - First release
 
-[Unreleased]: https://github.com/cucumber/gherkin/compare/v30.0.0...HEAD
+[Unreleased]: https://github.com/cucumber/gherkin/compare/v30.0.1...HEAD
+[30.0.1]: https://github.com/cucumber/gherkin/compare/v30.0.0...v30.0.1
 [30.0.0]: https://github.com/cucumber/gherkin/compare/v29.0.0...v30.0.0
 [29.0.0]: https://github.com/cucumber/gherkin/compare/v28.0.0...v29.0.0
 [28.0.0]: https://github.com/cucumber/gherkin/compare/v27.0.0...v28.0.0

@@ -238,7 +238,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.11";
+$VERSION="0.12";
 use Tk;
 use App::Codit::CodeTextManager;
 
@@ -264,68 +264,70 @@ sub Populate {
 		-savegeometry => 1,
 		-updatesmenuitem => 1,
 
+		-panelgeometry => 'grid',
 		-panellayout => [
 			CENTER => {
+				-weight => 1,
 				-in => 'MAIN',
-				-side => 'top',
-				-fill => 'both',
-				-expand => 1,
+				-column => 0,
+				-row => 1,
+				-sticky => 'nsew',
 			},
 			SUBCENTER => {
 				-in => 'CENTER',
-				-side => 'left',
-				-fill => 'both',
-				-expand => 1,
+				-weight => 1,
+				-column => 2,
+				-row => 0,
+				-sticky => 'nsew',
 			},
 			WORK => {
+				-weight => 1,
 				-in => 'SUBCENTER',
-				-side => 'top',
-				-fill => 'both',
-				-expand => 1,
+				-weight => 1,
+				-column => 0,
+				-row => 0,
+				-sticky => 'nsew',
 			},
 			TOOL => {
 				-in => 'SUBCENTER',
-				-after => 'WORK',
-				-side => 'top',
-				-fill => 'x',
-#				-expand => 1,
+				-weight => 1,
+				-column => 0,
+				-row => 2,
+				-sticky => 'ew',
 				-canhide => 1,
-				-paneloptions => [-height => 150],
 				-adjuster => 'bottom',
 			},
 			TOP => {
+				-weight => 1,
 				-in => 'MAIN',
-				-side => 'top',
-				-before => 'CENTER',
-				-fill => 'x',
+				-column => 0,
+				-row => 0,
+				-sticky => 'ew',
 				-canhide => 1,
 			},
 			BOTTOM => {
 				-in => 'MAIN',
-				-after => 'CENTER',
-				-side => 'top',
-				-fill => 'x',
+				-column => 0,
+				-row => 2,
+				-sticky => 'ew',
 				-canhide => 1,
 			},
 			LEFT => {
 				-in => 'CENTER',
-				-before => 'SUBCENTER',
-				-side => 'left',
-				-fill => 'y',
+				-column => 0,
+				-row => 0,
+				-sticky => 'ns',
 				-canhide => 1,
-				-paneloptions => [-width => 150],
 				-adjuster => 'left',
 			},
 			RIGHT => {
 				-in => 'CENTER',
-				-after => 'SUBCENTER',
-				-side => 'left',
-				-fill => 'y',
+				-column => 4,
+				-row => 0,
+				-sticky => 'ns',
 				-canhide => 1,
-				-paneloptions => [-width => 150],
 				-adjuster => 'right',
 			},
-		
 		],
 
 		-aboutinfo => {
@@ -372,14 +374,6 @@ sub Populate {
 			'-highlight_themefile',
 		],
 
-		-contentautoindent => 1, 
-		-contentindent => 'tab',
-		-contenttabs => '8m',
-		-contentwrap => 'none',
-		-showfolds => 1,
-		-shownumbers => 1,
-		-showstatus => 1,
-
 		-useroptions => [
 			'*page' => 'Editing',
 			'*section' => 'Editor settings',
@@ -395,7 +389,7 @@ sub Populate {
 			-shownumbers => ['boolean', 'Line numbers'],
 			-showstatus => ['boolean', 'Doc status'],
 			'*end',
-
+	
 			'*page' => 'Colors',
 			'*section' => 'Editing',
 			-contentforeground => ['color', 'Foreground', -width => 8],
@@ -413,7 +407,7 @@ sub Populate {
 			'*section' => 'Bookmarks',
 			-contentbookmarkcolor => ['color', 'Background', -width => 8],
 			'*end',
-
+	
 			'*page' => 'GUI',
 			'*section' => 'Icon sizes',
 			-iconsize => ['spin', 'General', -width => 4],
@@ -438,6 +432,14 @@ sub Populate {
 			-tooltextposition => ['radio', 'Text position', -values => [qw[none left right top bottom]]],
 			'*end',
 		],
+		-contentautoindent => 1, 
+		-contentindent => 'tab',
+		-contenttabs => '8m',
+		-contentwrap => 'none',
+		-showfolds => 1,
+		-shownumbers => 1,
+		-showstatus => 1,
+
 	);
 	for (keys %opts) {
 		$args->{$_} = $opts{$_}
@@ -537,7 +539,7 @@ sub lockScan {
 				chomp $line;
 				$self->cmdExecute('doc_open', $line) if -e $line
 			}
-#			close LIN;
+			close LIN;
 			$self->lockReset;
 		}
 	}
@@ -670,6 +672,10 @@ sub ToolRightBookAdd {
 	my $sb = $self->sidebars;
 	$sb->nbAdd('tool panel right', 'RIGHT', 'right');
 #	$sb->nbTextSide('tool panel bottom', 'right');
+	if ($sb->canRotateText) {
+		$sb->nbTextSide('tool panel right', 'bottom');
+		$sb->nbTextRotate('tool panel right', 270);
+	}
 	$self->panels->panelShow('RIGHT')
 }
 

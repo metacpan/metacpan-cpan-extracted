@@ -7,6 +7,7 @@ use Valiant::Util 'debug';
 use namespace::autoclean -also => ['debug'];
 use DBIx::Class::Valiant::Util::Exception::TooManyRows;
 use Role::Tiny::With;
+use Scalar::Util ();
 
 with 'Valiant::Naming';
 
@@ -141,6 +142,94 @@ sub contains {
   return 0;
 }
 
+# This is a work in progress, this needs to really use code from ::Result
+# so that is working against an already loaded resultset, so that we properly
+# handle deletes and so forth.
+# $self, $data, { rollback_on_invalid=>0||1 }
+sub set_recursively {
+  my ($self, $data, $opts) = @_;
+  my $rollback_on_invalid = delete($opts->{rollback_on_invalid}) || 0;
+  my @results = ();
+
+  $self->result_source->schema->txn_begin if $rollback_on_invalid;
+
+  my $err = 0;
+  foreach my $row_data (@$data) {
+    if(ref($row_data) eq 'HASH') {
+      my $new_result = $self->new_result(+{});
+      $new_result->set_columns_recursively($row_data);
+      $new_result->insert_or_update;
+      $err ||= $new_result->errors->count ? 1:0;
+      push @results, $new_result;
+    } elsif (ref($row_data) && $row_data->isa('DBIx::Class::Row')) {
+      $row_data->insert_or_update;
+      $err ||= $row_data->errors->count ? 1:0;
+      push @results, $row_data;
+    } else {
+      die "Don't know how to handle row data of type @{[ ref($row_data) ]}";
+    }
+  }
+
+  $self->result_source->schema->txn_rollback if $rollback_on_invalid && $err;
+  $self->result_source->schema->txn_commit if $rollback_on_invalid && !$err;
+
+  $self->set_cache(\@results);
+  my @rs_with_errs = grep { $_->errors->count } @results;
+  return $self, @rs_with_errs;
+}
+
+# $self, ${ cached_only => 0||1, depth => $num, _seen => +{}, _current_depth => 0, allow_undef => 0||1 }
+sub _dump_resultset {
+    my ($resultset, $seen) = @_;
+    my $name = $resultset->result_source->name;
+    my @data;
+
+    $resultset->reset;
+    while (my $row = $resultset->next) {
+        my $data = _dump_row($row, $seen);
+        push @data, $data;
+    }
+    $resultset->reset;
+
+    return +{ $name => \@data};
+}
+
+# Recursive function to dump a row and its relationships
+sub _dump_row {
+  my ($row, $seen) = @_;
+  $seen ||= +{};
+
+  # Prevent infinite recursion in case of circular relationships
+  my $row_id = Scalar::Util::refaddr($row);
+  return if $seen->{$row_id}++;
+
+  my %data = $row->get_columns;
+  my %errors = ();
+  foreach my $attr (keys %data) {
+    my @errors = $row->errors->full_messages_for($attr);
+    $errors{$attr} = \@errors if @errors;
+  }
+  my @model_errors = $row->errors->model_messages;
+  $errors{"*"} = \@model_errors if @model_errors;
+
+  my @relationships = $row->result_source->relationships;
+  foreach my $rel_name (@relationships) {
+    next unless exists $row->{_relationship_data}{$rel_name};
+    my $related = $row->{_relationship_data}{$rel_name};
+    if (defined $related) {
+      if ($related->isa('DBIx::Class::ResultSet')) {
+        $data{$rel_name} = $related->_dump_resultset($seen);
+      } elsif ($related->isa('DBIx::Class::Row')) {
+        my @rel_errors = $row->errors->full_messages_for($rel_name);
+        $errors{$rel_name} = \@rel_errors if @rel_errors;
+        my $recursed = _dump_row($related, $seen);
+        next unless $recursed;
+        $data{$rel_name} = $recursed;
+      }
+    }
+  }
+  return +{ data => \%data, errors => \%errors };
+}
 1;
 
 =head1 NAME

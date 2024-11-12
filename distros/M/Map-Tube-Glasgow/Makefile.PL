@@ -1,6 +1,5 @@
 use strict;
-use warnings FATAL => 'all';
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;
 use File::ShareDir::Install;
 
 my $mod_name     =  'Map::Tube::Glasgow';
@@ -24,15 +23,18 @@ WriteMakefile(
                             'ExtUtils::MakeMaker'     => 6.64,
                             'File::ShareDir::Install' => 0,
                           },
-    TEST_REQUIRES      => { 'Test::More' => 0.82, },
+	TEST_REQUIRES	   => { 'Test::More'  => 0.82,
+							'XML::Simple' => 0,
+						  },
     PREREQ_PM          => {
                             'Moo'              => 0,
                             'namespace::clean' => 0,
                             'File::Share'      => 0,
-							'Map::Tube'        => '3.77',
+							'Map::Tube'        => 3.77,
                           },
+	( MM->can('signature_target') ? ( SIGN => 1 ) : ( ) ),
     dist               => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean              => { FILES => 'Map-Tube-Glasgow-*', },
+    clean              => { FILES    => $mod_distname . '-*', },
     META_MERGE         => {
                             'meta-spec' => { version => 2 },
                             dynamic_config => 0,
@@ -43,15 +45,7 @@ WriteMakefile(
                                                           },
                                            },
                             resources   => {
-                #                            repository => {
-                #                                            url  => 'https://...',
-                #                                            web  => 'https://...',
-                #                                            type => 'git',
-                #                                          },
-                                             bugtracker => {
-                                                             mailto => 'bug-' . $mod_distname . '@rt.cpan.org',
-               #                                              web    => 'https://...',
-                                                           },
+											 bugtracker => { mailto => 'bug-' . $mod_distname . '@rt.cpan.org', },
                                            },
                           },
 );

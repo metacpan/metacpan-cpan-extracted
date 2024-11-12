@@ -7,6 +7,17 @@ use Map::Tube::Glasgow;
 
 my $map = new_ok( 'Map::Tube::Glasgow' );
 
+# {
+#   Optional additional debug output, helps to identify mistakes in per-line station indexes
+#   (watch out for stations not showing up in the data -- they may have been unceremoniously dropped!)
+#   my $stationref = $map->get_stations( );
+#   my @stations = @{ $stationref };
+#   print STDERR "\n*******\n";
+#   print STDERR join("\n", sort map { $_->id( ) } @stations ), "\n";
+#   print STDERR "*** ", scalar(@stations), "\n";
+#   print STDERR "*******\n";
+# }
+
 is( $map->name( ), 'Glasgow tube', 'Name of map does not match' );
 
 eval { $map->get_node_by_name('XYZ'); };

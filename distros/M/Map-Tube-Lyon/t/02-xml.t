@@ -10,18 +10,20 @@ use Map::Tube::Lyon;
 my $map = new_ok( 'Map::Tube::Lyon' );
 my $xml = XMLin( $map->xml( ) , KeyAttr => [ ], KeepRoot => 1, );
 
-my(%lines, %stations);
+my( %line_ids, %line_names, %stations );
 
 for my $line( @{ $xml->{'tube'}->{'lines'}->{'line'} } ) {
   my $id   = $line->{'id'};
   my $name = $line->{'name'};
-  ok( !exists( $lines{$name} ), "Line name $name, id $id defined more than once" );
-  $lines{$name} = 0;
+  ok( !exists( $line_names{$name} ), "Line name $name (id $id) defined more than once" );
+  ok( !exists( $line_ids{$name}   ), "Line id $id (name $name) defined more than once" );
+  $line_ids{$id} = 0;
+  $line_names{$name} = 0;
 }
 
 for my $station( @{ $xml->{'tube'}->{'stations'}->{'station'} } ) {
   my $id    = $station->{'id'};
-  my @lines = split( /,/, $station->{'line'} );
+  my @lines = map { ( split(/:/) )[0] } split( /,/, $station->{'line'} );
   my @links = split( /,/, $station->{'link'} );
 
   isnt( scalar(@lines), 0, "Station id $id should have at least one line" );
@@ -32,9 +34,9 @@ for my $station( @{ $xml->{'tube'}->{'stations'}->{'station'} } ) {
   $stations{$id}->{lines}->{$_}++ for @lines;
   $stations{$id}->{links}->{$_}++ for @links;
 
-  ok( exists( $lines{$_} ), "Station id $id connected by undefined line named $_" ) for @lines;
+  ok( exists( $line_ids{$_} ), "Station id $id connected by undefined line named $_" ) for @lines;
 
-  $lines{$_}++ for @lines;
+  $line_ids{$_}++ for @lines;
 }
 
 # Links should be symmetric: (not necessarily, but in our tube!)
@@ -43,6 +45,6 @@ for my $id( keys %stations ) {
 }
 
 # Every line should have at least one station:
-isnt( $lines{$_}, 0, "Line named $_ has no stations" ) for keys %lines;
+isnt( $line_ids{$_}, 0, "Line with id $_ has no stations" ) for keys %line_ids;
 
 done_testing( );

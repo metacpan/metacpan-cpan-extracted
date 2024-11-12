@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.54';
+$VERSION = '0.55';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -326,6 +326,7 @@ sub Populate {
 	$self->{FOLDSVISIBLE} = 0;
 	$self->{KAMELON} = Tk::CodeText::Kamelon->new($self, @ko);
 	$self->{HIGHLIGHTINTERVAL} = 1;
+	$self->{LINESPERCYCLE} = 10;
 	$self->{LOOPACTIVE} = 0;
 	$self->{NOHIGHLIGHTING} = 1;
 	$self->{NUMBERSVISIBLE} = 0;
@@ -507,7 +508,7 @@ sub Populate {
 		-bookmarksize => [qw/PASSIVE bookmarkSize BookmarkSize/, 20],
 		-configdir => [qw/PASSIVE configdir ConfigDir/, ''],
 		-highlightinterval => [qw/METHOD highlightInterval HighlightInterval/, 1],
-		-linespercycle => ['PASSIVE', undef, undef, 1],
+		-linespercycle => ['METHOD', undef, undef, 10],
 		-minusimg => ['PASSIVE', undef, undef, $self->Bitmap(
 			-data => $minusimg,
 			-foreground => $fg,
@@ -1139,11 +1140,8 @@ sub highlightLine {
 	my $kam = $self->Kamelon;
 	$kam->LineNumber($num);
 	my $xt = $self->Subwidget('XText');
-	my $begin = "$num.0"; my $end = $xt->index("$num.0 lineend + 1c");
-#	#remove all existing tags in this line
-# 	foreach my $tn ($self->tags) {
-# 		$xt->tagRemove($tn, $begin, $end);
-# 	}	
+	my $begin = "$num.0"; 
+	my $end = $xt->index("$num.0 lineend + 1c");
 	my $cli = $self->ColorInf;
 	my $k = $cli->[$num - 1];
 	$kam->StateSet(@$k);
@@ -1172,7 +1170,9 @@ sub highlightLoop {
 	}
 	my $xt = $self->Subwidget('XText');
 	my $lpc = $self->cget('-linespercycle');
-	$lpc = 1 unless defined $lpc;
+#	$lpc = 10 unless defined $lpc;
+	my $colored = $self->Colored;
+	$self->highlightRemove($colored, $colored + $lpc);
 	for (1 .. $lpc) {
 		my $colored = $self->Colored;
 		if ($colored <= $xt->linenumber('end - 1c')) {
@@ -1193,7 +1193,7 @@ sub highlightPurge {
 	$line = 1 unless defined $line;
 
 	#purge highlightinfo
-	$self->highlightRemove($line);
+#	$self->highlightRemove($line);
 	$self->Colored($line);
 	my $cli = $self->ColorInf;
 	if (@$cli) { splice(@$cli, $line) };
@@ -1216,10 +1216,11 @@ sub highlightPurge {
 }
 
 sub highlightRemove {
-	my ($self, $begin) = @_;
+	my ($self, $begin, $end) = @_;
+	$end = $self->linenumber('end') unless defined $end;
 	$begin = 1 unless defined $begin;
 	for ($self->tags) {
-		$self->tagRemove($_, "$begin.0", 'end')
+		$self->tagRemove($_, "$begin.0", "$end.0 lineend" )
 	}
 }
 
@@ -1249,6 +1250,13 @@ sub Kamelon {
 Returns the line number of $index.
 
 =cut
+
+sub linespercycle {
+	my $self = shift;
+	$self->{LINESPERCYCLE} = shift if @_;
+	return $self->{LINESPERCYCLE}
+}
+
 
 =item B<lineVisible>I<($line)>
 
@@ -1753,24 +1761,3 @@ If you find any, please contact the author.
 1;
 
 __END__
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

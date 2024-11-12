@@ -1,0 +1,232 @@
+=head1 NAME
+
+Template::Plexsite - Templating for interlinked templates
+
+=head1 SYNOPSIS
+
+
+
+=head1 DESCRIPTION
+
+C<Template::Plexsite> is a template system designed to give flexibility in
+writing templates for repetitive and interlinked content like HTML and CSS.
+
+There is very little external configuration as each template has the power to
+add resources, import modules and define local helper code and variables.
+L<Template::Plex> is used in the back end to power this module, so all the
+features such as init blocks, inheritance, sub templates, etc are used and
+extended to implement the relational features.
+
+=head1 SO WHAT DOES IT DO?
+
+Specifically, L<Template::Plexsite> provides the boot strapping templates need
+to B<reference other templates by their original name and location>. The final
+destination of the templates do not need to be known.
+
+What that means if you have template A, which has a link to template B, and
+vice versa, both templates can reference each other without knowing the output
+location beforehand. 
+
+
+=head1 USAGE
+
+The C<plexsite> program will execute templates in a src dir and output them in
+the site (build) dir unless a specific file is requested.
+
+
+  plexsite
+
+
+The interlinking of resource files is specified in the template, so very little
+configuration is require.
+
+
+TODO MOTE USAGE DETAILS
+
+
+=head1 DIRECTIVES
+
+Directives are accessible via  and C<@{[init]}> block as per L<Template::Plex>.
+Some directives are extended to allow direct usage of a L<Template::Plexsite>
+templates
+
+=head2 inherit
+
+  @{[ init { inherit PATH } ]}
+
+This template inherits from the template at PATH. The path is expected to refer
+to another L<Template::Plexsite> template.
+
+
+=head2 res 
+
+  @{[ init { res PATH, OPTIONS } ]}
+
+Adds a resource at PATH (static file, template, plexsite template, etc) to the
+resource table. Path is relative to the source root, in source name space.
+Returns the path of the resource in the output namespace relative to this
+template (in output namespace)
+
+=head2 plt_res 
+
+  @{[ init { plt_res PATH, OPTIONS } ]}
+
+Adds a resource at PATH (static file, template, plexsite template, etc) to the
+resource table. Path is relative to the PLT DIRECTORY OF THIS TEMPLATE in
+source namespace. Returns the path of the resource in the output namespace
+relative to this template (in output namespace)
+
+
+=head2 existing_resource
+
+  @{[ init { existing_res PATH, OPTIONS } ]}
+
+Returns a path to the resource at PATH, which already exists in the output
+namespace. Instead of the resource being copied/executed during build, it is
+expected to already exist as a result of an external process.
+
+=head2 sys_path_src
+
+  @{[ init {
+    
+      sys_path_src PATH;
+
+    } ]}
+
+
+Returns the path suitable for system IO calls. PATH is relative to src. Return
+path is a path relative to current working dir or the process, or an absolute
+path
+
+=head2 sys_path_build
+
+  @{[ init {
+    
+      sys_path_build PATH;
+
+    } ]}
+
+
+Returns the path suitable for system IO calls. PATH is relative to build.
+Return path is a path relative to current working dir or the process, or an
+absolute path
+
+=head2 plt_path
+
+  @{[ init {
+    
+      plt_path PATH;
+
+    } ]}
+
+
+Returns the path suitable for system IO calls. PATH is relative to current plt
+directory, in input namespace Return path is a path relative to current working
+dir or the process, or an absolute path
+
+=head2 output
+
+  @{[ init { output location=>LOCATION, name=>NAME } ]}
+
+
+Sets the output directory (relative to the build root) of the template.
+
+If not used the relative path of the template is used as the relative path to
+the output
+
+
+=head2 locale
+
+  @{[ init { locale LOCALE } ]}
+ 
+
+Sets the locale or variant of the build. Ultimately becomes a prefix added to
+paths in the output
+
+=head2 lander
+
+  
+  @{[ init { lander location=>PATH, name=>NAME, type=>TYPE } ]}
+
+
+Creates a lander/redirect output a location PATH, with a name of NAME. If no
+name is given it is 'index.html' by default.
+
+Type can be C<refresh> or  C<symlink>. A refresh create a new file with HTTP
+meta tags to cause a client side redirect to the target page.  A symlink adds a
+soft link to the actual file
+
+
+=head1 ON DISK TEMPLATE STRUCTURE
+
+=head2 Index file
+
+Plexsite template is:
+
+=over 
+
+=item Directory with a B<.plt> extension.
+
+The name of the directory can be anything as long as it ends with .plt
+
+=item Must have an index file in the .plt directory
+
+The prefix of the index file must be 'index' and the suffix must either end in
+".plex" or have it as the second last extension ie index.plex.html
+index.html.plex index.some.other.plex.html index.some.other.html.plex
+  
+The first form is preferred. It gives text editors a chance to perform syntax
+syntax highlighting for known file types for example.
+
+When the PLT template is loaded, the first index file found in the PLT
+directory is loaded:
+
+
+=item They can have any number of sub directories and files
+
+A template can be a package of sorts containing images, style sheets, other plt
+templates and basic plex templates
+
+
+=back
+
+=head2 Locale/Variant 
+
+Each PLT template supports variants or locales. The specified locale is the
+name of a directory within the PLT directory,  which is checked for an index
+file (like above). If its found, it will loaded and ready for use if you choose
+to render it.  B<NOTE:> The name of the locale index file must be the same as
+the main one
+
+
+
+
+=head1 PRCOESSING OVERVIEW
+
+
+TODO....
+
+
+
+=head1 SEE ALSO
+
+
+L<Tempalte::Plex>
+
+=head1 REPOSITORY and BUG REPORTING
+
+Please report any bugs and feature requests on the repo page:
+L<GitHub|https://github.com/drclaw1394/perl-template-plexsite>
+
+=head1 AUTHOR
+
+Ruben Westerberg, E<lt>drclaw@mac.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Ruben Westerberg
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, or under the MIT license
+
+=cut

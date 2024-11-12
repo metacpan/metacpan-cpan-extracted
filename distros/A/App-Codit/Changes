@@ -1,6 +1,12 @@
 Revision history for Perl extension App::Codit.
 
-0.10 Sat Oct 12 2024
+0.12 Mon Nov 11 2024
+	- Left and right side bars have rotated labels
+	- Switched to gridded approach for panel layout
+	- Snippet name does not give error when dot used in name
+	- Columns in PerlSubs plugin are resizable and sortable
+
+0.11 Sat Oct 12 2024
 	- Using extension Selector instead of Navigator
 	- Added ToolNavigPageAdd and ToolNavigPageRemove methods to App::Codit
 	- Plugin PodViewer keeps the view intact after reload

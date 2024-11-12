@@ -7,6 +7,17 @@ use Map::Tube::Lyon;
 
 my $map = new_ok( 'Map::Tube::Lyon' );
 
+# {
+#   Optional additional debug output, helps to identify mistakes in per-line station indexes
+#   (watch out for stations not showing up in the data -- they may have been unceremoniously dropped!)
+#   my $stationref = $map->get_stations( );
+#   my @stations = @{ $stationref };
+#   print STDERR "\n*******\n";
+#   print STDERR join("\n", sort map { $_->id( ) } @stations ), "\n";
+#   print STDERR "*** ", scalar(@stations), "\n";
+#   print STDERR "*******\n";
+# }
+
 is( $map->name( ), 'Métro, funiculaires et tramways de Lyon', 'Name of map does not match' );
 
 eval { $map->get_node_by_name('XYZ'); };
@@ -33,7 +44,7 @@ like($@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E
   isa_ok( $stationref, 'ARRAY' );
   my @stations = @{ $stationref };
   isa_ok( ref($stations[0]), 'Map::Tube::Node' );
-  is( scalar(@stations), 135, 'Number of stations incorrect for map' );
+  is( scalar(@stations), 139, 'Number of stations incorrect for map' );
   like( join( ',', sort map { $_->name( ) } @stations ),  qr(^Alfred.*Viviani$), 'Stations not correct for map' );
 }
 

@@ -6,7 +6,7 @@ package SPVM::Net::SSLeay::X509_VERIFY_PARAM;
 
 =head1 Name
 
-SPVM::Net::SSLeay::X509_VERIFY_PARAM - X509_VERIFY_PARAM data structure in OpenSSL.
+SPVM::Net::SSLeay::X509_VERIFY_PARAM - X509_VERIFY_PARAM Data Structure in OpenSSL.
 
 =head1 Description
 
@@ -22,13 +22,13 @@ Net::SSLeay::X509_VERIFY_PARAM class in L<SPVM> represents L<X509_VERIFY_PARAM|h
 
 C<method set_hostflags : void ($flags : int);>
 
-Sets the host flags to $flags by calling native L<X509_VERIFY_PARAM_set_hostflags|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function.
+Calls native L<X509_VERIFY_PARAM_set_hostflags|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function given $flags.
 
 =head2 set1_host
 
 C<method set1_host : int ($name : string, $namelen : int = 0);>
 
-Sets the host name $name of the length $namelen by calling native L<X509_VERIFY_PARAM_set1_host|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function.
+Calls native L<X509_VERIFY_PARAM_set1_host|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function given $name, $namelen, and returns its return value.
 
 If $namelen is 0, it is set to the length of $name.
 
@@ -38,7 +38,17 @@ The host name $name must be defined. Otherwise an exception is thrown.
 
 The length $namelen must be greater than or equal to the length of the host name $name. Otherwise an exception is thrown.
 
-If X509_VERIFY_PARAM_set1_host failed, an exception is thrown.
+If X509_VERIFY_PARAM_set1_host failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
+=head2 set_flags
+
+C<method set_flags : void ($flags : long);>
+
+Calls native L<X509_VERIFY_PARAM_set_flags|https://docs.openssl.org/master/man3/X509_VERIFY_PARAM_set_flags> function given $flags, and returns its return value.
+
+Exceptions:
+
+If X509_VERIFY_PARAM_set_flags failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
 =head2 DESTROY
 
@@ -56,7 +66,7 @@ A way is using L<Net::SSLeay::SSL_CTX#get0_param|SPVM::Net::SSLeay::SSL_CTX/"get
 
 =over 2
 
-=item * L<Net::SSLeay::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX>
+=item * L<Net::SSLeay::SSLeay::X509|SPVM::Net::SSLeay::X509>
 
 =item * L<Net::SSLeay|SPVM::Net::SSLeay>
 

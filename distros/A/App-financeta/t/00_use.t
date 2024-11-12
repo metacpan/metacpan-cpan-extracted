@@ -4,11 +4,18 @@ use Test::More;
 
 use_ok('App::financeta::mo');
 use_ok('App::financeta::utils');
-foreach (qw(dumper log_filter get_icon_path)) {
+foreach (qw(dumper log_filter get_icon_path get_file_path)) {
     can_ok('App::financeta::utils', $_);
 }
 use_ok('App::financeta::language');
 
+foreach my $src (qw(data data::yahoo data::gemini)) {
+    my $module = "App::financeta::$src";
+    use_ok($module);
+    foreach (qw(ohlcv)) {
+        can_ok($module, $_);
+    }
+}
 use_ok('App::financeta::indicators');
 foreach (qw(calculate_pnl get_plot_args_buysell get_plot_args buysell
     execute_ohlcv get_params get_funcs get_groups 
@@ -16,13 +23,21 @@ foreach (qw(calculate_pnl get_plot_args_buysell get_plot_args buysell
     overlaps ma_name volatility momentum hilbert volume candlestick)) {
     can_ok('App::financeta::indicators', $_);
 }
-use_ok('App::financeta::editor');
+use_ok('App::financeta::gui::editor');
 foreach (qw(execute compile get_text update_editor close)) {
-    can_ok('App::financeta::editor', $_);
+    can_ok('App::financeta::gui::editor', $_);
 }
-use_ok('App::financeta::tradereport');
+use_ok('App::financeta::gui::tradereport');
 foreach (qw(save close update)) {
-    can_ok('App::financeta::tradereport', $_);
+    can_ok('App::financeta::gui::tradereport', $_);
+}
+use_ok('App::financeta::gui::security_wizard');
+foreach (qw(run)) {
+    can_ok('App::financeta::gui::security_wizard', $_);
+}
+use_ok('App::financeta::gui::progress_bar');
+foreach (qw(update close progress)) {
+    can_ok('App::financeta::gui::progress_bar', $_);
 }
 use_ok('App::financeta::gui');
 foreach (qw(run)) {

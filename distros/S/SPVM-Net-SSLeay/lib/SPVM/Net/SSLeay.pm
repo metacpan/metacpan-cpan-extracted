@@ -1,6 +1,6 @@
 package SPVM::Net::SSLeay;
 
-our $VERSION = "0.010";
+our $VERSION = "0.011";
 
 1;
 
@@ -15,6 +15,62 @@ Net::SSLeay class in L<SPVM> is a binding for OpenSSL. This class itself represe
 B<Warnings:>
 
 B<The tests haven't been written yet. The features may be changed without notice.> 
+
+=head1 Modules
+
+=over 2
+
+=item * L<Net::SSLeay|SPVM::Net::SSLeay>
+
+=item * L<Net::SSLeay::ASN1_OBJECT|SPVM::Net::SSLeay::ASN1_OBJECT>
+
+=item * L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO>
+
+=item * L<Net::SSLeay::Constant|SPVM::Net::SSLeay::Constant>
+
+=item * L<Net::SSLeay::DH|SPVM::Net::SSLeay::DH>
+
+=item * L<Net::SSLeay::EC_KEY|SPVM::Net::SSLeay::EC_KEY>
+
+=item * L<Net::SSLeay::ERR|SPVM::Net::SSLeay::ERR>
+
+=item * L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error>
+
+=item * L<Net::SSLeay::EVP|SPVM::Net::SSLeay::EVP>
+
+=item * L<Net::SSLeay::EVP_MD|SPVM::Net::SSLeay::EVP_MD>
+
+=item * L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY>
+
+=item * L<Net::SSLeay::OBJ|SPVM::Net::SSLeay::OBJ>
+
+=item * L<Net::SSLeay::OPENSSL|SPVM::Net::SSLeay::OPENSSL>
+
+=item * L<Net::SSLeay::PEM|SPVM::Net::SSLeay::PEM>
+
+=item * L<Net::SSLeay::RAND|SPVM::Net::SSLeay::RAND>
+
+=item * L<Net::SSLeay::SSL_CIPHER|SPVM::Net::SSLeay::SSL_CIPHER>
+
+=item * L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX>
+
+=item * L<Net::SSLeay::SSL_METHOD|SPVM::Net::SSLeay::SSL_METHOD>
+
+=item * L<Net::SSLeay::SSL_SESSION|SPVM::Net::SSLeay::SSL_SESSION>
+
+=item * L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>
+
+=item * L<Net::SSLeay::X509_CRL|SPVM::Net::SSLeay::X509_CRL>
+
+=item * L<Net::SSLeay::X509_NAME|SPVM::Net::SSLeay::X509_NAME>
+
+=item * L<Net::SSLeay::X509_STORE|SPVM::Net::SSLeay::X509_STORE>
+
+=item * L<Net::SSLeay::X509_STORE_CTX|SPVM::Net::SSLeay::X509_STORE_CTX>
+
+=item * L<Net::SSLeay::X509_VERIFY_PARAM|SPVM::Net::SSLeay::X509_VERIFY_PARAM>
+
+=back
 
 =head1 Usage
 
@@ -276,39 +332,45 @@ Exceptions:
 
 If SSL_set_session failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
+=head2 get_certificate
+
+C<method get_certificate : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> ();>
+
+Calls native L<SSL_get_certificate|https://docs.openssl.org/master/man3/SSL_get_certificate> function.
+
+If the return value of the native function is NULL, returns undef.
+
+Otherwise, creates a new L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
+
+C<no_free> flag of the new object is set to 1.
+
+=head2 get0_next_proto_negotiated
+
+C<method get0_next_proto_negotiated : void ($data_ref : string[], $len_ref : int*);>
+
+Calls native L<SSL_get0_next_proto_negotiated|https://docs.openssl.org/master/man3/SSL_get_certificate> function given $data_ref, $len_ref.
+
+=head2 get0_alpn_selected
+
+C<method get0_alpn_selected : void ($data_ref : string[], $len_ref : int*);>
+
+Calls native L<SSL_get0_alpn_selected|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb> function given $data_ref, $len_ref.
+
+=head2 get_peer_cert_chain
+
+C<method get_peer_cert_chain : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>[] ();>
+
+Calls native L<SSL_get_peer_cert_chain|https://docs.openssl.org/1.1.1/man3/SSL_get_peer_cert_chain> function.
+
+If its return value is NULL, returns undef.
+
+Ohterwise converts its return value to the array of L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>, and returns the array.
+
 =head2 DESTROY
 
 C<method DESTROY : void ();>
 
 Frees native L<SSL|https://docs.openssl.org/1.0.2/man3/SSL_free> object by calling native L<SSL_free|https://docs.openssl.org/1.0.2/man3/SSL_free> function if C<no_free> flag of the instance is not a true value.
-
-=head1 Modules
-
-=over 2
-
-=item * L<Net::SSLeay::Constant|SPVM::Net::SSLeay::Constant>
-
-=item * L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX>
-
-=item * L<Net::SSLeay::SSL_METHOD|SPVM::Net::SSLeay::SSL_METHOD>
-
-=item * L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>
-
-=item * L<Net::SSLeay::X509_VERIFY_PARAM|SPVM::Net::SSLeay::X509_VERIFY_PARAM>
-
-=item * L<Net::SSLeay::X509_CRL|SPVM::Net::SSLeay::X509_CRL>
-
-=item * L<Net::SSLeay::X509_STORE_CTX|SPVM::Net::SSLeay::X509_STORE_CTX>
-
-=item * L<Net::SSLeay::X509_STORE|SPVM::Net::SSLeay::X509_STORE>
-
-=item * L<Net::SSLeay::PEM|SPVM::Net::SSLeay::PEM>
-
-=item * L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO>
-
-=item * L<Net::SSLeay::ERR|SPVM::Net::SSLeay::ERR>
-
-=back
 
 =head2 Config Builder
 

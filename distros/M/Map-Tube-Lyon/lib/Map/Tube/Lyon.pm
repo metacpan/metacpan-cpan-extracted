@@ -15,7 +15,7 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.61.0');
+our $VERSION = version->declare('v0.62.0');
 
 =encoding utf8
 

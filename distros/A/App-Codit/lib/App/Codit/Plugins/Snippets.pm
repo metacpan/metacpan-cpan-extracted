@@ -9,7 +9,7 @@ App::Codit::Plugins::Snippets - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.10;
+$VERSION = 0.12;
 
 use Carp;
 
@@ -121,6 +121,17 @@ sub current {
 	return $self->{CURRENT}
 }
 
+sub itemName {
+	my ($self, $item) = @_;
+	$item =~ s/\./`/g;
+	return $item
+}
+
+sub itemText {
+	my ($self, $item) = @_;
+	return $self->_list->entrycget($item, '-text');
+}
+
 sub listSelect {
 	my ($self, $item) = @_;
 	croak "Item not defined" unless defined $item;
@@ -138,9 +149,9 @@ sub listRefresh {
 		croak "cannot open folder $folder";
 		return
 	}
+	$self->snippetSave;
 	my $l = $self->_list;
 	$l->deleteAll;
-	$self->snippetSave;
 	$self->current(undef);
 	$self->_text->clear;
 	while (my $i = readdir($dh)) {
@@ -151,11 +162,18 @@ sub listRefresh {
 	closedir($dh)
 }
 
+sub Quit {
+	my $self = shift;
+	$self->snippetSave;
+}
+
 sub snippetAdd {
 	my ($self, $item) = @_;
 	croak "Item not defined" unless defined $item;
 	my $l = $self->_list;
 	my @op = ();
+	my $text = $item;
+	$item = $self->itemName($item);
 	my @peers = $l->infoChildren('');
 	for (@peers) {
 		if ($item lt $_) {
@@ -163,7 +181,7 @@ sub snippetAdd {
 			last;
 		}
 	}
-	$l->add($item, -text => $item, @op);
+	$l->add($item, -text => $text, @op);
 }
 
 sub snippetClipboard {
@@ -183,7 +201,7 @@ sub snippetCopy {
 	my $new = $self->snippetDialog;
 	if (defined $new) {
 		$self->snippetAdd($new);
-		$self->listSelect($new);
+		$self->listSelect($self->itemName($new));
 		$self->_text->insert('end', $text);                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 	}
 }
@@ -211,6 +229,7 @@ sub snippetDelete {
 	my $list = $self->_list;
 	my ($sel) = $list->infoSelection;
 	return unless defined $sel;
+	$sel = $self->itemText($sel);
 	my $file = $self->snippetsFolder . "/$sel";
 	my $button = $self->popDialog(
 		'Deleting snippet', 
@@ -248,6 +267,7 @@ sub snippetLoad {
 	my ($self, $item) = @_;
 	$item = $self->current unless defined $item;
 	return unless defined $item;
+	$item = $self->itemText($item);
 	my $txt = $self->_text;
 	$txt->clear;
 	my $file = $self->snippetsFolder . "/$item";
@@ -265,6 +285,7 @@ sub snippetSave {
 	my ($self, $item) = @_;
 	$item = $self->current unless defined $item;
 	return unless defined $item;
+	$item = $self->itemText($item);
 	my $txt = $self->_text;
 	$txt->save($self->snippetsFolder . "/$item")
 }

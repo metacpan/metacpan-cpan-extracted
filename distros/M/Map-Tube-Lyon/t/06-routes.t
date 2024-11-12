@@ -2,7 +2,7 @@
 
 use strict;
 use warnings FATAL => 'all';
-use Test::More tests => 9;
+use Test::More tests => 11;
 use Map::Tube::Lyon;
 
 my $map = new_ok( 'Map::Tube::Lyon' );
@@ -20,11 +20,20 @@ eval { $map->get_shortest_route( 'Foch', 'XYZ' ); };
 like( $@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E/, 'Must specify two existing stations for get_shortest_route( )' );
 
 {
-  my $ret = $map->get_shortest_route( 'Foch', 'Flachet - Alain Gilles' );
+  my $ret = $map->get_shortest_route( 'Foch', 'Saxe-Gambetta' );
   isa_ok( $ret, 'Map::Tube::Route' );
   is( $ret,
-      'Foch (A), Masséna (A), Charpennes - Charles Hernu (A, B, T1), République - Villeurbanne (A), Gratte-Ciel (A), Flachet - Alain Gilles (A)',
-      'Foch - Flachet Alain Gilles'
+      'Foch (A), Hôtel de Ville - Louis Pradel (A, C), Cordeliers (A), Bellecour (A, D), Guillotière - Gabriel Péri (D, T1), Saxe-Gambetta (B, D)',
+      'Foch - Saxe-Gambetta'
+    );
+}
+
+{
+  my $ret = $map->get_shortest_route( 'Foch', 'Saxe-Gambetta' )->preferred( );
+  isa_ok( $ret, 'Map::Tube::Route' );
+  is( $ret,
+      'Foch (A), Hôtel de Ville - Louis Pradel (A), Cordeliers (A), Bellecour (A, D), Guillotière - Gabriel Péri (D), Saxe-Gambetta (D)',
+      'Foch - Saxe-Gambetta preferred route'
     );
 }
 

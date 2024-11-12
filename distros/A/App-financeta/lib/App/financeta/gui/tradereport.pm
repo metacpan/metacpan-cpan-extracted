@@ -1,9 +1,9 @@
-package App::financeta::tradereport;
+package App::financeta::gui::tradereport;
 use strict;
 use warnings;
 use 5.10.0;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 $VERSION = eval $VERSION;
 use App::financeta::mo;
 use App::financeta::utils qw(dumper log_filter);
@@ -200,9 +200,8 @@ sub save {
     $symbol =~ s/tab_//g;
     my $docdir = File::HomeDir->my_documents || File::HomeDir->my_home;
     my $ext = 'csv';
-    my $dlg = Prima::SaveDialog->new(
-        defaultExt => $ext,
-        fileName => "tradereport_$symbol",
+    my $dlg = Prima::Dialog::SaveDialog->new(
+        fileName => "tradereport_$symbol\.$ext",
         filter => [
             ['CSV files' => "*.$ext"],
             ['All files' => '*'],

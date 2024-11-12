@@ -1,3 +1,16 @@
+2.000.1  2024-11-12  Released-By: PERLANCAR; Urgency: low
+
+         - No functional changes.
+
+         [DOCUMENTATION]
+
+         - [doc] Describe the organization system.
+
+         - Move Examples under HowTo::.
+
+         - Add an example: Word wrapping.
+
+
 2.000.0  2021-12-19  Released-By: PERLANCAR; Urgency: medium
 
 	 - Mention Perinci::CmdLine::Plugin, minor tweaks.

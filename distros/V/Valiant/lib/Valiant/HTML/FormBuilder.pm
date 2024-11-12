@@ -298,35 +298,47 @@ sub errors_for {
     $content = $arg if (ref($arg)||'') eq 'CODE';
   }
   $options = $self->merge_theme_field_opts(errors_for=>$attribute, $options);
+  my $show_empty = exists($options->{show_empty}) ? delete($options->{show_empty}) : 0;
+  if($show_empty) {
+    $options->{always_array} = 1 unless exists($options->{always_array});
+  }
 
   return '' unless $self->model->can('errors');
 
   my @errors = $self->tag_errors_for_attribute($attribute);
+
   #my @errors = $self->model->errors->full_messages_for($attribute);
-  return '' unless scalar(@errors);
+  return '' if scalar(@errors) == 0 && !$show_empty;
   
   my $max_errors = exists($options->{max_errors}) ? delete($options->{max_errors}) : undef;
   @errors = @errors[0..($max_errors-1)] if($max_errors);
   $options = $self->process_options($attribute, $options);
-  $content = $self->_default_errors_for_content($options) unless defined($content);
+  $content = $self->_default_errors_for_content($attribute, $options) unless defined($content);
 
   my $response = $self->view->safe('');
-  $response = $content->(@errors) if @errors;
+  $response = $content->(@errors);# if @errors;
 
   return $response;
 }
 
 sub _default_errors_for_content {
-  my ($self, $options) = @_;
+  my ($self, $attribute, $options) = @_;
+  my $always_array = exists($options->{always_array}) ? delete($options->{always_array}) : 0;
+  my $id = $self->tag_id_for_attribute($attribute) . '_errors';
+
   return sub {
     my (@errors) = @_;
-
-    if( scalar(@errors) == 1 ) {
-       return $self->tag_helpers->content_tag('div', $errors[0], {%$options, data=>{error_param=>1}});
+    my $response = '';
+    if( !$always_array && (scalar(@errors) < 2) ) {
+       $response = $self->tag_helpers->content_tag('div', $errors[0], {%$options, id=>$id, data=>{error_param=>1}});
     } else {
-      my @li_content = map { $self->tag_helpers->content_tag('li', $_, {data=>{error_param=>1}}) } @errors;
-      return $self->tag_helpers->content_tag('ol', $self->view->safe_concat(@li_content), $options);
+      if($always_array) {
+        @errors = ('') unless @errors;
+      }
+      my @li_content = map { $self->tag_helpers->content_tag('li', $_, { data=>{error_param=>1}}) } @errors;
+      $response = $self->tag_helpers->content_tag('ol', $self->view->safe_concat(@li_content), {%$options, id=>$id, data=>{error_list=>1}});
     }
+    return $response;
   }
 }
 
@@ -594,8 +606,7 @@ sub legend_for {
 
   $attrs->{id} = "@{[ $self->tag_id_for_attribute($attribute) ]}_legend" unless exists($attrs->{id});
   $attrs = $self->merge_theme_field_opts('legend_for', $attribute, $attrs);
-
-  return $self->tag_helpers->legend_tag($attrs, $content);
+  return $self->tag_helpers->legend_tag($content, $attrs);
 }
 
 sub _legend_default_value {
@@ -631,8 +642,21 @@ sub fields_for {
   $options->{namespace} = $self->namespace if $self->has_namespace;
   $options->{parent_builder} = $self;
 
-  my $related_record = $self->tag_value_for_attribute($related_attribute);
-  my $name = "@{[ $self->name ]}.@{[ $related_attribute ]}";
+  my $related_record;
+  if(Scalar::Util::blessed($related_attribute)) {
+    $related_record = $related_attribute;
+    $related_attribute = $related_record->model_name->param_key;
+  } else {
+    $related_record = $self->tag_value_for_attribute($related_attribute);
+  }
+
+  my $builder_name = exists($options->{scope})
+    ? delete($options->{scope})
+    : $self->name;
+  my $attribute_name = exists($options->{as})
+    ? delete($options->{as})
+    : $related_attribute;
+  my $name = "${builder_name}.${attribute_name}";
 
   $related_record = $related_record->to_model if Scalar::Util::blessed($related_record) && $related_record->can('to_model');
 
@@ -1516,6 +1540,27 @@ template displaying errors in an ordered list (if more than one) or wrapped in a
 
 Don't display more than a certain number of errors
 
+=item show_empty
+
+Defaults to false.
+
+If true then display an empty container even if there are no errors.  By default we don't
+display anything if there are no errors.  If you enable this option then you can use the
+\&template to display a message like "No errors" or something similar.   Or you can use CSS
+to hide the container if there are no errors but need a container if you are also updating
+the container with AJAX.
+
+B<NOTE> If you set this to true then C<alway_array> is also set to true UNLESS you've specified
+a different value.
+
+=item always_array
+
+Defaults to false.
+
+If true then render the default content as if there was more than one error.  This is useful
+if you want to always render the default content as an ordered list even if there's only one
+error.
+
 =back
 
 Assume the attribute 'last_name' has the following two errors in the given examples: "first Name
@@ -1939,6 +1984,8 @@ $attribute.  Allows you to pass some additional HTML attributes to the legend ta
       my ($nested_fb, $new_model) = @_;
     });
 
+Where C<$attribute> is a string that refers to a nested object or collection of objects on the model
+OR its an object or collection of objects itself.
 
 Used to create sub form builders under the current one for nested models (either a collection of models
 or a single model.)  This sub form builder will be passed as the first argument to the enclosing subref
@@ -1993,6 +2040,14 @@ Override the ID namespace for th sub model.
 =item index
 
 Explicitly override the index of the sub model.
+
+=item scope
+
+Explicitly override the scope of the sub model.
+
+=item as
+
+Explicitly override the name of the sub model.
 
 =back
 

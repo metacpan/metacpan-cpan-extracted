@@ -40,7 +40,7 @@ requires 'Plack::Runner';
 requires 'Scalar::Util';
 requires 'Sub::Exporter';
 requires 'Term::Size::Any';
-requires 'Mojo::DOM'
+requires 'Mojo::DOM';
 requires 'MooseX::NonMoose', '0.26';
 requires 'MooseX::MarkAsMethods', '0.15';
 

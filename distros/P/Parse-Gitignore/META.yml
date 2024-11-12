@@ -1,13 +1,13 @@
 ---
 abstract: 'parse .gitignore files'
 author:
-  - 'Ben Bullock <bkb@cpan.org>'
+  - 'Ben Bullock <benkasminbullock@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,10 +19,10 @@ no_index:
     - inc
 requires:
   File::Slurper: '0.010'
-  Path::Tiny: '0.076'
+  File::Spec: '3.40'
   perl: '5.006001'
 resources:
   bugtracker: https://github.com/benkasminbullock/parse-gitignore/issues
   repository: git://github.com/benkasminbullock/parse-gitignore.git
-version: '0.04'
+version: '1.0'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

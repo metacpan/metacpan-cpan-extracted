@@ -10,7 +10,7 @@ use App::financeta;
 #parse arguments and set up options
 my %options = (verbose => 1);
 GetOptions(\%options,
-    qw(help version verbose=i debug quiet),
+    qw(help version verbose=i debug quiet plot_engine=s),
 ) or pod2usage(-verbose => 1, -noperldoc => 1, -exitval => 2);
 pod2usage(-verbose => 1, -noperldoc => 1, -exitval => 2) if $options{help};
 App::financeta->print_banner if $options{verbose};
@@ -35,7 +35,7 @@ a GUI for technical analysis of stocks.
 
 =head1 VERSION
 
-0.11
+0.15
 
 =head1 OPTIONS
 
@@ -48,6 +48,8 @@ B<--verbose=[0|1|2]>     Adjust verbosity. Default 1.
 B<--debug>               Set verbosity to 2. Run other debug settings.
 
 B<--quiet>               Set verbosity to 0.
+
+B<--plot_engine=[highcharts|gnuplot]> Plot engine to use: HighCharts or Gnuplot
 
 =head1 SEE ALSO
 

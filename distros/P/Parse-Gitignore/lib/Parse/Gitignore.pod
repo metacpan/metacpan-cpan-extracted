@@ -9,19 +9,33 @@ Parse::Gitignore - parse .gitignore files
 =head1 SYNOPSIS
 
     
+    use FindBin '$Bin';
+    use Parse::Gitignore;
+    chdir "$Bin/../" or die $!;
+    my $gitignore = Parse::Gitignore->new (".gitignore");
+    for my $file ('examples/synopsis.pl', 'MANIFEST') {
+        if ($gitignore->ignored ($file)) {
+            print "$file is ignored.\n";
+        }
+        else {
+            print "$file is not ignored.\n";
+        }
+    }
 
 
 produces output
 
-    
+    examples/synopsis.pl is not ignored.
+    MANIFEST is ignored.
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Parse-Gitignore-0.04/examples/synopsis.pl> in the distribution.)
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Parse-Gitignore-1.0/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Parse::Gitignore version 0.04
-corresponding to git commit L<eef29c685b26d8cd9b28ff74e5e2388e751fd23e|https://github.com/benkasminbullock/parse-gitignore/commit/eef29c685b26d8cd9b28ff74e5e2388e751fd23e> released on Mon Oct 9 14:00:13 2017 +0900.
+This documents Parse::Gitignore version 1.0
+corresponding to git commit L<66d95b057677120fce6309993e9f9324d2d665ab|https://github.com/benkasminbullock/parse-gitignore/commit/66d95b057677120fce6309993e9f9324d2d665ab> released on Tue Nov 12 06:23:43 2024 +0900.
 
 =head1 DESCRIPTION
 
@@ -32,6 +46,10 @@ Parse a .gitignore file and check whether a file matches it.
 =head2 new
 
     my $pg = Parse::Gitignore->new ('./.gitignore');
+
+To get messages on what it is doing, set C<verbose> to a true value:
+
+    my $pg = Parse::Gitignore->new ('./.gitignore', verbose => 1);
 
 =head2 ignored
 
@@ -45,8 +63,19 @@ Check whether a file matches a .gitignore.
 
     $pg->read_gitignore ('.gitignore');
 
-Read a F<.gitignore> file. You can read as many as you like and they
-are accumulated.
+Read a F<.gitignore> file. Because different directories in the same
+git repository may feature their own F<.gitignore> files, the
+information is accumulated in C<$pg> along with the specific directory
+of the gitignore file relative to the top directory of the repository,
+for example
+
+    $pg->read_gitignore ("$top/.gitignore");
+    $pg->read_gitignore ("$top/src/.gitignore");
+
+If the suggested F<.gitignore> does not actually exist, a warning is
+printed and processing continues. If the argument is a directory, the
+module assumes that you intended to read a file called F<.gitignore>
+in that directory.
 
 =head2 excludesfile
 
@@ -59,7 +88,27 @@ found.
 
 =over
 
-=item L<Path::Tiny>
+=item L<Carp>
+
+Used to report errors.
+
+=item L<File::Slurper/read_lines>
+
+Used to read the gitignore file.
+
+=item L<File::Spec>
+
+Used to disambiguate file path names.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<C<man gitignore>|https://git-scm.com/docs/gitignore>
+
+=item L<C<man git-check-ignore>|https://git-scm.com/docs/git-check-ignore>
 
 =back
 
@@ -68,15 +117,20 @@ found.
 I wrote this because I wanted to have a way to ignore generated files
 for a desktop file search application.
 
+Version 1.0 changes the way that subdirectories are dealt with. The
+older versions turned out to have a problem whereby files in
+subdirectories were not picked up correctly.
+
+
 
 =head1 AUTHOR
 
-Ben Bullock, <bkb@cpan.org>
+Ben Bullock, <benkasminbullock@gmail.com>
 
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2016-2017
+2016-2024
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

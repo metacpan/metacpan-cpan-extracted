@@ -1,6 +1,6 @@
 package Random::Simple;
 
-our $VERSION = 0.04;
+our $VERSION = '0.04';
 our $debug   = 0;
 
 use strict;
@@ -10,7 +10,7 @@ use warnings;
 
 =encoding utf8
 
-=head1 Random::Simple
+=head1 NAME
 
 Random::Simple - Simple, usable, real world random numbers
 
@@ -98,8 +98,7 @@ sub seed_with_random {
 
 	if (-r "/dev/urandom") {
 		open(my $FH, "<", "/dev/urandom");
-		my $bytes;
-		my $ok = sysread($FH, $bytes, 16);
+		my $ok = sysread($FH, my $bytes, 16);
 
 		my ($high, $low);
 
@@ -148,13 +147,13 @@ sub random_bytes {
 
 	if (!$has_been_seeded) { seed_with_random(); }
 
-	my $octets_needed = $num / 8;
+	my $octets_needed = $num / 4;
 
 	my $ret = "";
 	for (my $i = 0; $i < $octets_needed; $i++) {
-		my $num = _rand64();
+		my $num = _rand32();
 
-		$ret .= pack("Q", $num);
+		$ret .= pack("L", $num);
 	}
 
 	$ret = substr($ret, 0, $num);

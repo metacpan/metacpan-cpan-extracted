@@ -1,12 +1,12 @@
 use strict;
 use warnings;
-use Test::More tests => 29;
+use Test::More tests => 30;
 use Test::Tk;
 use Tk;
 
 BEGIN { use_ok('Tk::CodeText') };
 
-# $delay = 3000;
+#$delay = 3500;
 createapp;
 
 my $text;
@@ -82,7 +82,7 @@ if (defined $app) {
 }
 
 #testing accessors
-testaccessors($text, qw /Colored ColorInf FoldButtons FoldInf highlightinterval LoopActive NoHighlighting SaveFirstVisible SaveLastVisible/);
+testaccessors($text, qw /Colored ColorInf FoldButtons FoldInf highlightinterval linespercycle LoopActive NoHighlighting SaveFirstVisible SaveLastVisible/);
 
 push @tests, (
 	[ sub { return defined $text }, 1, 'CodeText widget created' ],

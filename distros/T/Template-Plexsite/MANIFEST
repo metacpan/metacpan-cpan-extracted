@@ -1,0 +1,14 @@
+lib/Template/Plexsite.pm
+lib/Template/Plexsite.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+script/build-menu.pl
+script/page.pl
+script/plexsite
+t/urltable.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

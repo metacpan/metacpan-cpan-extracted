@@ -28,33 +28,47 @@ no_index:
 provides:
   App::financeta:
     file: lib/App/financeta.pm
-    version: '0.13'
-  App::financeta::editor:
-    file: lib/App/financeta/editor.pm
-    version: '0.13'
+    version: '0.15'
+  App::financeta::data:
+    file: lib/App/financeta/data.pm
+    version: '0.15'
+  App::financeta::data::gemini:
+    file: lib/App/financeta/data/gemini.pm
+    version: '0.15'
+  App::financeta::data::yahoo:
+    file: lib/App/financeta/data/yahoo.pm
+    version: '0.15'
   App::financeta::gui:
     file: lib/App/financeta/gui.pm
-    version: '0.13'
+    version: '0.15'
+  App::financeta::gui::editor:
+    file: lib/App/financeta/gui/editor.pm
+    version: '0.15'
+  App::financeta::gui::progress_bar:
+    file: lib/App/financeta/gui/progress_bar.pm
+  App::financeta::gui::security_wizard:
+    file: lib/App/financeta/gui/security_wizard.pm
+  App::financeta::gui::tradereport:
+    file: lib/App/financeta/gui/tradereport.pm
+    version: '0.15'
   App::financeta::indicators:
     file: lib/App/financeta/indicators.pm
-    version: '0.13'
+    version: '0.15'
   App::financeta::language:
     file: lib/App/financeta/language.pm
+    version: '0.15'
   App::financeta::language::grammar:
     file: lib/App/financeta/language.pm
-    version: '0.13'
+    version: '0.15'
   App::financeta::language::receiver:
     file: lib/App/financeta/language.pm
-    version: '0.13'
+    version: '0.15'
   App::financeta::mo:
     file: lib/App/financeta/mo.pm
-    version: '0.13'
-  App::financeta::tradereport:
-    file: lib/App/financeta/tradereport.pm
-    version: '0.13'
+    version: '0.15'
   App::financeta::utils:
     file: lib/App/financeta/utils.pm
-    version: '0.13'
+    version: '0.15'
 requires:
   Browser::Open: '0.04'
   Capture::Tiny: '0.48'
@@ -69,6 +83,8 @@ requires:
   File::Spec: '3.78'
   Finance::QuoteHist: '1.32'
   Getopt::Long: '2.54'
+  JSON::XS: '4.03'
+  LWP::UserAgent: '6.52'
   Log::Any: '1.713'
   PDL: '2.081'
   PDL::Finance::TA: '0.010'
@@ -79,8 +95,9 @@ requires:
   Pegex: '0.75'
   Perl::Tidy: '0'
   Pod::Usage: '2.03'
-  Prima: '1.67001'
+  Prima: '1.68002'
   Scalar::Util: '1.63'
+  Template::Toolkit: '3.100'
   Try::Tiny: '0.31'
   YAML::Any: '1.30'
   perl: v5.10.0
@@ -88,5 +105,5 @@ resources:
   bugtracker: https://github.com/vikasnkumar/financeta/issues
   license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
   repository: https://github.com/vikasnkumar/financeta
-version: '0.13'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

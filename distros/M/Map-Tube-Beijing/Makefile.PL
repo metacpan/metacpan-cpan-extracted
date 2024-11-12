@@ -1,43 +1,52 @@
 use strict;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;
 use File::ShareDir::Install;
+
+my $mod_name	 =	'Map::Tube::Beijing';
+my $mod_file     =  'lib/' . $mod_name . '.pm';
+$mod_file        =~ s|::|/|g;
+my $mod_distname =  $mod_name;
+$mod_distname    =~ s|::|-|g;
+my $mod_version  = MM->parse_version($mod_file);
 
 install_share dist => 'share';
 
 WriteMakefile(
-    NAME               => 'Map::Tube::Beijing',
+	NAME			   => $mod_name,
     AUTHOR             => q{Gisbert W. Selke <gws@cpan.org>},
-    VERSION_FROM       => 'lib/Map/Tube/Beijing.pm',
-    ABSTRACT_FROM      => 'lib/Map/Tube/Beijing.pm',
+    VERSION_FROM       => $mod_file,
+    ABSTRACT_FROM      => $mod_file,
     LICENSE            => 'artistic_2',
     PL_FILES           => { },
-    MIN_PERL_VERSION   => 5.006,
+	MIN_PERL_VERSION   => 5.010,
     CONFIGURE_REQUIRES => {
-                           'ExtUtils::MakeMaker' => 6.64,
-                           'File::ShareDir::Install' => 0,
+							'ExtUtils::MakeMaker'     => 6.64,
+							'File::ShareDir::Install' => 0,
                           },
-    TEST_REQUIRES     => {
-                           'Test::More' => 0.82,
+	TEST_REQUIRES	   => {
+							'Test::More'  => 0.82,
+                            'XML::Simple' => 0,
                           },
     PREREQ_PM          => {
-                           'Moo'              => 0,
-                           'namespace::clean' => 0,
-                           'File::Share'      => 0,
-                           'Map::Tube'        => '2.85',
+							'Moo'              => 0,
+							'namespace::clean' => 0,
+							'File::Share'      => 0,
+							'Map::Tube'        => 3.77,
                           },
-    dist               => {
-                            COMPRESS => 'gzip -9f', SUFFIX => 'gz',
-                          },
-    clean              => {
-                            FILES => 'Map-Tube-Beijing-*',
-                          },
+	( MM->can('signature_target') ? ( SIGN => 1 ) : ( ) ),
+	dist			   => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean              => { FILES    => $mod_distname . '-*', },
     META_MERGE         => {
                             'meta-spec' => { version => 2 },
-                            'provides'  => {
-                                             'Map::Tube::Beijing' => {
-                                                                       file => 'lib/Map/Tube/Beijing.pm',
-                                                                       version => '0.01',
-                                                                     },
+                            dynamic_config => 0,
+                            provides    => {
+                                             $mod_name => {
+                                                            file    => $mod_file,
+                                                            version => $mod_version,
+                                                          },
+                                           },
+                            resources   => {
+											 bugtracker => { mailto => 'bug-' . $mod_distname . '@rt.cpan.org', },
                                            },
                           },
 );

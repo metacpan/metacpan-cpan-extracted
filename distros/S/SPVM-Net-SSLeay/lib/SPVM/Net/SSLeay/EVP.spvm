@@ -1,0 +1,11 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::EVP {
+  
+  use Net::SSLeay::EVP_MD;
+  
+  # Class Methods
+  native static method get_digestbyname : Net::SSLeay::EVP_MD ($name : string);
+  
+}

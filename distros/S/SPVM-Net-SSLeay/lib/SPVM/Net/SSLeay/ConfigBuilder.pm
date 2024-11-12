@@ -30,6 +30,7 @@ sub build_config {
   my ($self, $config) = @_;
   
   my $openssl_prefix = &find_openssl_prefix();
+  
   my $openss_build_opts = &ssleay_get_build_opts($openssl_prefix);
   
   my $cccdlflags = $openss_build_opts->{cccdlflags};

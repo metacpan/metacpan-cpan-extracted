@@ -5,11 +5,14 @@ use strict;
 use warnings;
 use Test::More;
 use Random::Simple;
+use Config;
 
 ########################################################
 # Testing random numbers is hard so we do basic sanity #
 # checking of the bounds                               #
 ########################################################
+
+my $has_64bit = ($Config{uvsize} == 8);
 
 my $min = 100;
 my $max = 200;
@@ -65,18 +68,20 @@ cmp_ok($avg_32, '<', 2**32, "rand32() generates the right size numbers");
 
 ###################################################################
 
-$i     = 0;
-$total = 0;
-while ($i < $count) {
-	my $num = Random::Simple::_rand64();
-	$total += $num;
-	$i++;
+if ($has_64bit) {
+	$i     = 0;
+	$total = 0;
+	while ($i < $count) {
+		my $num = Random::Simple::_rand64();
+		$total += $num;
+		$i++;
+	}
+
+	my $avg_64 = int($total / $count);
+	#print "64: $avg_64\n";
+
+	cmp_ok($avg_64, '>', 2**32, "rand64() generates the right size numbers");
+	cmp_ok($avg_64, '<', 2**64, "rand64() generates the right size numbers");
 }
-
-my $avg_64 = int($total / $count);
-#print "64: $avg_64\n";
-
-cmp_ok($avg_64, '>', 2**32, "rand64() generates the right size numbers");
-cmp_ok($avg_64, '<', 2**64, "rand64() generates the right size numbers");
 
 done_testing();

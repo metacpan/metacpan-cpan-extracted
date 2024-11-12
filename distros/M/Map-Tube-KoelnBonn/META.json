@@ -37,7 +37,7 @@
             "Map::Tube" : "3.77",
             "Moo" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.010000"
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -50,7 +50,7 @@
    "provides" : {
       "Map::Tube::KoelnBonn" : {
          "file" : "lib/Map/Tube/KoelnBonn.pm",
-         "version" : "v0.91.0"
+         "version" : "v0.92.0"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "mailto" : "bug-Map-Tube-KoelnBonn@rt.cpan.org"
       }
    },
-   "version" : "v0.91.0",
+   "version" : "v0.92.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

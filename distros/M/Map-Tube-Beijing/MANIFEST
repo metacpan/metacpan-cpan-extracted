@@ -8,16 +8,20 @@ share/beijing-map.xml
 t/00-load.t
 t/01-xml.t
 t/02-xml.t
+t/02-xml-alt.t
 t/03-map.t
-t/04-routes-chin.t
-t/05-routes-pinyin.t
+t/03-map-alt.t
+t/04-nodes-alt.t
+t/05-lines-alt.t
+t/06-routes-alt.t
 t/10-manifest.t
 t/11-meta-json.t
 t/12-meta-yml.t
 t/13-version.t
 t/14-signature.t
 t/20-pod.t
-t/21-changes.t
+t/21-pod-coverage.t
+t/22-changes.t
 SIGNATURE
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.10.0;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 $VERSION = eval $VERSION;
 use App::financeta::mo;
 use App::financeta::utils qw(dumper log_filter);
@@ -12,6 +12,7 @@ use PDL;
 use PDL::NiceSlice;
 use PDL::Finance::TA;
 use POSIX ();
+use JSON::XS qw(encode_json);
 
 $PDL::doubleformat = "%0.6lf";
 has debug => 0;
@@ -128,15 +129,52 @@ sub _plot_gnuplot_general {
     return wantarray ? @plotinfo : \@plotinfo;
 }
 
+sub _plot_highcharts_general {
+    my ($self, $xdata, $output, $scale) = @_;
+    my @plotinfo = ();
+    foreach my $o (@$output) {
+        ## this is an array
+        #[0] => legend title
+        #[1] => PDL data
+        #[2] => gnuplot args or undef
+        #[3] => variable name for execution rules
+        ## let's create a x-y pdl data
+        ## highcharts requires timestamp in milliseconds;
+        my $xypdl = pdl($xdata * 1000, (defined $scale) ? $o->[1] / $scale : $o->[1])->transpose->setbadtoval(0);
+        my $xyidx = $xypdl((1))->which;
+        my $xypdlclean = $xypdl->dice_axis(1, $xyidx);
+        $log->debug($o->[0], $xypdlclean);
+        push @plotinfo, {
+            title => $o->[0],
+            data => encode_json $xypdlclean->unpdl,
+            impulses => (ref $o->[2] eq 'HASH' and $o->[2]->{with} eq 'impulses') ? 1 : 0,
+            id => $o->[3],
+        };
+    }
+    return wantarray ? @plotinfo : \@plotinfo;
+}
+
 sub _plot_gnuplot_volume {
     my ($self, $xdata, $output) = @_;
     my @plotinfo = $self->_plot_gnuplot_general($xdata, $output, 1e6);
     return { volume => \@plotinfo };
 }
 
+sub _plot_highcharts_volume {
+    my ($self, $xdata, $output) = @_;
+    my @plotinfo = $self->_plot_highcharts_general($xdata, $output, 1e6);
+    return { volume => \@plotinfo };
+}
+
 sub _plot_gnuplot_additional {
     my ($self, $xdata, $output) = @_;
     my @plotinfo = $self->_plot_gnuplot_general($xdata, $output);
+    return { additional => \@plotinfo };
+}
+
+sub _plot_highcharts_additional {
+    my ($self, $xdata, $output) = @_;
+    my @plotinfo = $self->_plot_highcharts_general($xdata, $output);
     return { additional => \@plotinfo };
 }
 
@@ -171,6 +209,47 @@ sub _plot_gnuplot_compare {
         return { general => \@g, additional => \@a };
     } else {
         my @a = $self->_plot_gnuplot_general($xdata, $output);
+        return { additional => \@a };
+    }
+}
+
+sub _plot_highcharts_candlestick {
+    my ($self, $xdata, $output) = @_;
+    my @plotinfo = ();
+    foreach my $o (@$output) {
+        ## this is an array
+        #[0] => legend title
+        #[1] => PDL data
+        #[2] => gnuplot args or undef
+        #[3] => variable name for execution rules
+        ## let's create a x-y pdl data
+        ## highcharts requires timestamp in milliseconds;
+        my $xypdl = pdl($xdata * 1000, $o->[1])->transpose->setbadtoval(0);
+        my $xyidx = $xypdl((1))->which;
+        my $xypdlclean = $xypdl->dice_axis(1, $xyidx);
+        $log->debug($o->[0], $xypdlclean);
+        push @plotinfo, {
+            title => $o->[0],
+            data => encode_json $xypdlclean->unpdl,
+            impulses => 1,
+            id => $o->[3],
+        };
+    }
+    return { candle => \@plotinfo };
+}
+
+sub _plot_highcharts_compare {
+    my ($self, $xdata, $output) = @_;
+    if (scalar @$output >= 2) {
+        # we don't want to change the output variable itself
+        # otherwise the plots don't stay the same
+        my $o2 = [ @$output ]; # make a copy
+        my $o1 = pop @$o2;
+        my @g = $self->_plot_highcharts_general($xdata, [$o1]);
+        my @a = $self->_plot_highcharts_general($xdata, $o2);
+        return { general => \@g, additional => \@a };
+    } else {
+        my @a = $self->_plot_highcharts_general($xdata, $output);
         return { additional => \@a };
     }
 }
@@ -224,6 +303,7 @@ has overlaps => {
         },
         # use Gnuplot related stuff
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     dema => {
         name => 'Double Exponential Moving Average',
@@ -241,6 +321,7 @@ has overlaps => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     ema => {
         name => 'Exponential Moving Average',
@@ -258,6 +339,7 @@ has overlaps => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     kama => {
         name => 'Kaufman Adaptive Moving Average',
@@ -275,6 +357,7 @@ has overlaps => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     ma => {
         name => 'Moving Average',
@@ -307,6 +390,7 @@ has overlaps => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     mama => {
         name => 'MESA Adaptive Moving Average',
@@ -325,6 +409,7 @@ has overlaps => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     mavp => {
         name => 'Moving Average with Variable Period',
@@ -375,6 +460,7 @@ has overlaps => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     sar => {
         name => 'Parabolic Stop And Reverse (SAR)',
@@ -393,6 +479,7 @@ has overlaps => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     sarext => {
         name => 'Parabolic Stop And Reverse (SAR) - Extended',
@@ -421,6 +508,7 @@ has overlaps => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     sma => {
         name => 'Simple Moving Average',
@@ -438,6 +526,7 @@ has overlaps => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     t3 => {
         name => 'Triple Exponential Moving Average (T3)',
@@ -456,6 +545,7 @@ has overlaps => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     tema => {
         name => 'Triple Exponential Moving Average',
@@ -473,6 +563,7 @@ has overlaps => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     trima => {
         name => 'Triangular Moving Average',
@@ -490,6 +581,7 @@ has overlaps => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     wma => {
         name => 'Weighted Moving Average',
@@ -507,6 +599,7 @@ has overlaps => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     ### SKELETON
     #key => {
@@ -548,6 +641,7 @@ has volatility => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     natr => {
         name => 'Normalized Average True Range',
@@ -566,6 +660,7 @@ has volatility => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     trange => {
         name => 'True Range',
@@ -582,6 +677,7 @@ has volatility => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
 };
 
@@ -603,6 +699,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     adxr => {
         name => 'Average Directional Movement Index Rating (ADXR)',
@@ -621,6 +718,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     apo => {
         name => 'Absolute Price Oscillator (APO)',
@@ -655,6 +753,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     aroon => {
         name => 'Aroon',
@@ -674,6 +773,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     aroonosc => {
         name => 'Aroon Oscillator',
@@ -692,6 +792,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     bop => {
         name => 'Balance Of Power (BOP)',
@@ -708,6 +809,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     cci => {
         name => 'Commodity Channel Index (CCI)',
@@ -726,6 +828,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     cmo => {
         name => 'Chande Momentum Oscillator (CMO)',
@@ -743,6 +846,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     dx => {
         name => 'Directional Movement Index (DX)',
@@ -761,6 +865,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     macd => {
         name => 'Moving Average Convergence/Divergence (MACD)',
@@ -784,6 +889,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     macdext => {
         name => 'MACD with different Mov. Avg',
@@ -849,6 +955,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     macdfix => {
         name => 'MACD Fixed to 12/26',
@@ -868,6 +975,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     mfi => {
         name => 'Money Flow Index (MFI)',
@@ -886,6 +994,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     minus_di => {
         name => 'Minus Directional Indicator (-DI)',
@@ -904,6 +1013,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     minus_dm => {
         name => 'Minus Directional Movement (-DM)',
@@ -922,6 +1032,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     mom => {
         name => 'Momentum',
@@ -939,6 +1050,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     plus_di => {
         name => 'Plus Directional Indicator (+DI)',
@@ -957,6 +1069,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     plus_dm => {
         name => 'Plus Directional Movement (+DM)',
@@ -975,6 +1088,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     ppo => {
         name => 'Percentage Price Oscillator (PPO)',
@@ -1009,6 +1123,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     roc => {
         name => 'Rate of Change (ROC)',
@@ -1026,6 +1141,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     rocp => {
         name => 'Rate of Change Precentage (ROCP)',
@@ -1043,6 +1159,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     rocr => {
         name => 'Rate of Change Ratio (ROCR)',
@@ -1060,6 +1177,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     rocr100 => {
         name => 'Rate of Change Ratio x 100 (ROCR100)',
@@ -1077,6 +1195,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     rsi => {
         name => 'Relative Strength Index (RSI)',
@@ -1094,6 +1213,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     stoch => {
         name => 'Stochastic',
@@ -1144,6 +1264,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     stochf => {
         name => 'Stochastic Fast',
@@ -1179,6 +1300,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     stochrsi => {
         name => 'Stochastic Relative Strength Index (STOCHRSI)',
@@ -1216,6 +1338,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     trix => {
         name => 'ROC of Triple Smooth EMA (TRIX)',
@@ -1233,6 +1356,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     ultosc => {
         name => 'Ultimate Oscillator',
@@ -1255,6 +1379,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     willr => {
         name => q/Williams' %R/,
@@ -1273,6 +1398,7 @@ has momentum => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
 };
 
@@ -1291,6 +1417,7 @@ has hilbert => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     ht_dcperiod => {
         name => 'Hilbert Transform - Dominant Cycle Period',
@@ -1306,6 +1433,7 @@ has hilbert => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     ht_dcphase => {
         name => 'Hilbert Transform - Dominant Cycle Phase',
@@ -1321,6 +1449,7 @@ has hilbert => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     ht_phasor => {
         name => 'Hilbert Transform - In-Phase & Quadrature',
@@ -1337,6 +1466,7 @@ has hilbert => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     ht_sine => {
         name => 'Hilbert Transform - Sine Wave',
@@ -1353,6 +1483,7 @@ has hilbert => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     ht_trendmode => {
         name => 'Hilbert Transform - Market Mode (Trend vs Cycle)',
@@ -1368,6 +1499,7 @@ has hilbert => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
 };
 
@@ -1387,6 +1519,7 @@ has volume => {
             ];
         },
         gnuplot => \&_plot_gnuplot_volume,
+        highcharts => \&_plot_highcharts_volume,
     },
     adosc => {
         name => 'Chaikin Accumulation/Distribution Oscillator',
@@ -1407,6 +1540,7 @@ has volume => {
             ];
         },
         gnuplot => \&_plot_gnuplot_volume,
+        highcharts => \&_plot_highcharts_volume,
     },
     obv => {
         name => 'On Balance Volume (OBV)',
@@ -1423,6 +1557,7 @@ has volume => {
             ];
         },
         gnuplot => \&_plot_gnuplot_volume,
+        highcharts => \&_plot_highcharts_volume,
     },
 };
 
@@ -1449,6 +1584,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdl2crows, 'ta_cdl2crows', '2CROWS', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdl3blackcrows => {
         name => 'Three Black Crows',
@@ -1456,6 +1592,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdl3blackcrows, 'ta_cdl3blackcrows', '3BLACKCROWS', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdl3inside => {
         name => 'Three Inside Up/Down',
@@ -1463,6 +1600,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdl3inside, 'ta_cdl3inside', '3INSIDE', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdl3linestrike => {
         name => 'Three Line Strike',
@@ -1470,6 +1608,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdl3linestrike, 'ta_cdl3linestrike', '3LINESTRIKE', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdl3outside => {
         name => 'Three Outside Up/Down',
@@ -1477,6 +1616,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdl3outside, 'ta_cdl3outside', '3OUTSIDE', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdl3starsinsouth => {
         name => 'Three Stars In The South',
@@ -1484,6 +1624,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdl3starsinsouth, 'ta_cdl3starsinsouth', '3STARSSOUTH', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdl3whitesoldiers => {
         name => 'Three Advancing White Soldiers',
@@ -1491,6 +1632,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdl3whitesoldiers, 'ta_cdl3whitesoldiers', '3WHITESOLDIER', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlabandonedbaby => {
         name => 'Abandoned Baby',
@@ -1501,6 +1643,7 @@ has candlestick => {
         ],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlabandonedbaby, 'ta_cdlabandonedbaby', 'ABANDONBABY', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdladvanceblock => {
         name => 'Advance Block',
@@ -1508,6 +1651,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdladvanceblock, 'ta_cdladvanceblock', 'ADVANCEBLK', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlbelthold => {
         name => 'Belt Hold',
@@ -1515,6 +1659,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlbelthold, 'ta_cdlbelthold', 'BELTHOLD', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlbreakaway => {
         name => 'Break Away',
@@ -1522,6 +1667,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlbreakaway, 'ta_cdlbreakaway', 'BREAKAWAY', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlclosingmarubozu => {
         name => 'Closing Marubozu',
@@ -1529,6 +1675,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlclosingmarubozu, 'ta_cdlclosingmarubozu', 'CLOSEMARUBOZU', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlconcealbabyswall => {
         name => 'Concealing Baby Swallow',
@@ -1536,6 +1683,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlconcealbabyswall, 'ta_cdlconcealbabyswall', 'BABYSWALLOW', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlcounterattack => {
         name => 'Counter Attack',
@@ -1543,6 +1691,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlcounterattack, 'ta_cdlcounterattack', 'CTRATTACK', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdldarkcloudcover => {
         name => 'Dark Cloud Cover',
@@ -1553,6 +1702,7 @@ has candlestick => {
         ],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdldarkcloudcover, 'ta_cdldarkcloudcover', 'DARKCLOUD', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdldoji => {
         name => 'Doji',
@@ -1560,6 +1710,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdldoji, 'ta_cdldoji', 'DOJI', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdldojistar => {
         name => 'Doji Star',
@@ -1567,6 +1718,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdldojistar, 'ta_cdldojistar', 'DOJISTAR', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdldragonflydoji => {
         name => 'Dragonfly Doji',
@@ -1574,6 +1726,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdldragonflydoji, 'ta_cdldragonflydoji', 'DRGNFLYDOJI', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlengulfing => {
         name => 'Engulfing Pattern',
@@ -1581,6 +1734,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlengulfing, 'ta_cdlengulfing', 'ENGULFING', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdleveningdojistar => {
         name => 'Evening Doji Star',
@@ -1591,6 +1745,7 @@ has candlestick => {
         ],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdleveningdojistar, 'ta_cdleveningdojistar', 'EVEDOJISTAR', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdleveningstar => {
         name => 'Evening Star',
@@ -1601,6 +1756,7 @@ has candlestick => {
         ],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdleveningstar, 'ta_cdleveningstar', 'EVESTAR', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlgapsidesidewhite => {
         name => 'Up/Down Gap Side-by-Side White Lines',
@@ -1608,6 +1764,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlgapsidesidewhite, 'ta_cdlgapsidesidewhite', 'GAPSxSWHITE', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlgravestonedoji => {
         name => 'Gravestone Doji',
@@ -1615,6 +1772,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlgravestonedoji, 'ta_cdlgravestonedoji', 'GRVSTNDOJI', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlhammer => {
         name => 'Hammer',
@@ -1622,6 +1780,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlhammer, 'ta_cdlhammer', 'HAMMER', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlhangingman => {
         name => 'Hanging Man',
@@ -1629,6 +1788,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlhangingman, 'ta_cdlhangingman', 'HANGMAN', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlharami => {
         name => 'Harami Pattern',
@@ -1636,6 +1796,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlharami, 'ta_cdlharami', 'HARAMI', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlharamicross => {
         name => 'Harami Cross Pattern',
@@ -1643,6 +1804,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlharamicross, 'ta_cdlharamicross', 'HARAMI-X',@_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlhighwave => {
         name => 'High-Wave Candle',
@@ -1650,6 +1812,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlhighwave, 'ta_cdlhighwave', 'HIGHWAVE', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlhikkake => {
         name => 'Hikkake Pattern',
@@ -1657,6 +1820,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlhikkake, 'ta_cdlhikkake', 'HIKKAKE', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlhikkakemod => {
         name => 'Modified Hikkake Pattern',
@@ -1664,6 +1828,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlhikkakemod, 'ta_cdlhikkakemod', 'HIKKAKEMOD', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlhomingpigeon => {
         name => 'Homing Pigeon',
@@ -1671,13 +1836,15 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlhomingpigeon, 'ta_cdlhomingpigeon', 'HOMINGPIGEON', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlidentical3crows => {
         name => 'Identical Three Crows',
         params => [],
         input => [qw(open high low close)],
-        code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlidential3crows, 'ta_cdlidential3crows', 'ID3CROWS', @_); },
+        code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlidentical3crows, 'ta_cdlidentical3crows', 'ID3CROWS', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlinneck => {
         name => 'In-Neck Pattern',
@@ -1685,6 +1852,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlinneck, 'ta_cdlinneck', 'IN-NECK', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlinvertedhammer => {
         name => 'Inverted Hammer',
@@ -1692,6 +1860,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlinvertedhammer, 'ta_cdlinvertedhammer', 'INVHAMMER', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlkicking => {
         name => 'Kicking',
@@ -1699,6 +1868,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlkicking, 'ta_cdlkicking', 'KICKING', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlkickingbylength => {
         name => 'Kicking - Marubozu Length based',
@@ -1706,6 +1876,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlkickingbylength, 'ta_cdlkickingbylength', 'KICKLEN', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlladderbottom => {
         name => 'Ladder Bottom',
@@ -1713,6 +1884,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlladderbottom, 'ta_cdlladderbottom', 'LADDERBTM', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdllongleggeddoji => {
         name => 'Long Legged Doji',
@@ -1720,6 +1892,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdllongleggeddoji, 'ta_cdllongleggeddoji', 'LONGDOJI', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdllongline => {
         name => 'Long Line Candle',
@@ -1727,6 +1900,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdllongline, 'ta_cdllongline', 'LONGLINE', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlmarubozu => {
         name => 'Marubozu',
@@ -1734,6 +1908,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlmarubozu, 'ta_cdlmarubozu', 'MARUBOZU', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlmatchinglow => {
         name => 'Matching Low',
@@ -1741,6 +1916,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlmatchinglow, 'ta_cdlmatchinglow', 'MATCHLOW', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlmathold => {
         name => 'Mat Hold',
@@ -1751,6 +1927,7 @@ has candlestick => {
         ],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlmathold, 'ta_cdlmathold', 'MATHOLD', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlmorningdojistar => {
         name => 'Morning Doji Star',
@@ -1761,6 +1938,7 @@ has candlestick => {
         ],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlmorningdojistar, 'ta_cdlmorningdojistar', 'MORNDOJISTAR', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlmorningstar => {
         name => 'Morning Star',
@@ -1771,6 +1949,7 @@ has candlestick => {
         ],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlmorningstar, 'ta_cdlmorningstar', 'MORNINGSTAR', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlonneck => {
         name => 'On-Neck Pattern',
@@ -1778,6 +1957,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlonneck, 'ta_cdlonneck', 'ON-NECK', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlpiercing => {
         name => 'Piercing Pattern',
@@ -1785,6 +1965,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlpiercing, 'ta_cdlpiercing', 'PIERCING', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlrickshawman => {
         name => 'Rickshaw Man',
@@ -1792,6 +1973,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlrickshawman, 'ta_cdlrickshawman', 'RICKSHAW', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlrisefall3methods => {
         name => 'Rising/Falling Three Methods',
@@ -1799,6 +1981,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlrisefall3methods, 'ta_cdlrisefall3methods', 'RISEFALL3M', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlseparatinglines => {
         name => 'Separating Lines',
@@ -1806,6 +1989,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlseparatinglines, 'ta_cdlseparatinglines', 'SEPARATELINES', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlshootingstar => {
         name => 'Shooting Star',
@@ -1813,6 +1997,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlshootingstar, 'ta_cdlshootingstar', 'SHOOTINGSTAR', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlshortline => {
         name => 'Short Line Candle',
@@ -1820,6 +2005,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlshortline, 'ta_cdlshortline', 'SHORTLINE', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlspinningtop => {
         name => 'Spinning Top',
@@ -1827,6 +2013,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlspinningtop, 'ta_cdlspinningtop', 'SPINTOP', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlstalledpattern => {
         name => 'Stalled Pattern',
@@ -1834,6 +2021,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlstalledpattern, 'ta_cdlstalledpattern', 'STALLED', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlsticksandwich => {
         name => 'Stick Sandwich',
@@ -1841,6 +2029,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlsticksandwich, 'ta_cdlsticksandwich', 'SANDWICH', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdltakuri => {
         name => 'Takuri',
@@ -1848,6 +2037,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdltakuri, 'ta_cdltakuri', 'TAKURI', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdltasukigap => {
         name => 'Tasuki Gap',
@@ -1855,6 +2045,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdltasukigap, 'ta_cdltasukigap', 'TASUKI', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlthrusting => {
         name => 'Thrusting Pattern',
@@ -1862,6 +2053,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlthrusting, 'ta_cdlthrusting', 'THRUSTING', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdltristar => {
         name => 'Tristar Pattern',
@@ -1869,6 +2061,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdltristar, 'ta_cdltristar', 'TRISTAR', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlunique3river => {
         name => 'Unique Three River',
@@ -1876,6 +2069,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlunique3river, 'ta_cdlunique3river', 'U3RIVER', @_); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlupsidegap2crows => {
         name => 'Upside Gap Two Crows',
@@ -1883,6 +2077,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlupsidegap2crows, 'ta_cdlupsidegap2crows', 'UPSIDEGAP2CROWS'); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
     cdlxsidegap3methods => {
         name => 'Upside/Downside Gap Three Methods',
@@ -1890,6 +2085,7 @@ has candlestick => {
         input => [qw(open high low close)],
         code => sub { return shift->_execute_candlestick(\&PDL::ta_cdlxsidegap3methods, 'ta_cdlxsidegap3methods', 'XSIDEGAP3M'); },
         gnuplot => \&_plot_gnuplot_candlestick,
+        highcharts => \&_plot_highcharts_candlestick,
     },
 };
 
@@ -1918,6 +2114,7 @@ has statistic => {
             ];
         },
         gnuplot => \&_plot_gnuplot_compare,
+        highcharts => \&_plot_highcharts_compare,
     },
     correl => {
         name => q/Pearson's Correlation Coefficient/,
@@ -1943,6 +2140,7 @@ has statistic => {
             ];
         },
         gnuplot => \&_plot_gnuplot_compare,
+        highcharts => \&_plot_highcharts_compare,
     },
     linearreg => {
         name => 'Linear Regression',
@@ -1960,6 +2158,7 @@ has statistic => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     linearreg_angle => {
         name => 'Linear Regression Angle',
@@ -1977,6 +2176,7 @@ has statistic => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     linearreg_intercept => {
         name => 'Linear Regression Intercept',
@@ -1994,6 +2194,7 @@ has statistic => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     linearreg_slope => {
         name => 'Linear Regression Slope',
@@ -2011,6 +2212,7 @@ has statistic => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     linearreg_tsf => {
         name => 'Linear Regression - Forecast',
@@ -2028,6 +2230,7 @@ has statistic => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     stddev => {
         name => 'Standard Deviation',
@@ -2047,6 +2250,7 @@ has statistic => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
     var => {
         name => 'Variance',
@@ -2066,6 +2270,7 @@ has statistic => {
             ];
         },
         gnuplot => \&_plot_gnuplot_additional,
+        highcharts => \&_plot_highcharts_additional,
     },
 };
 
@@ -2086,6 +2291,7 @@ has price => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     midprice => {
         name => 'Mid-point Price over period',
@@ -2104,6 +2310,7 @@ has price => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     avgprice => {
         name => 'Average Price',
@@ -2120,6 +2327,7 @@ has price => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     medprice => {
         name => 'Median Price',
@@ -2136,6 +2344,7 @@ has price => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     typprice => {
         name => 'Typical Price',
@@ -2152,6 +2361,7 @@ has price => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
     wclprice => {
         name => 'Weighted Close Price',
@@ -2168,6 +2378,7 @@ has price => {
             ];
         },
         gnuplot => \&_plot_gnuplot_general,
+        highcharts => \&_plot_highcharts_general,
     },
 };
 
@@ -2282,7 +2493,7 @@ sub execute_ohlcv($$) {
             my $csv = $params->{$k};
             $csv =~ s/\s//g if length $csv;
             my @a = split /,/, $csv if length $csv;
-            push @args, PDL->new(@a) if @a;
+            push @args, pdl(@a) if @a;
             push @args, PDL::null unless @a;
         } elsif ($k =~ /CompareWith/i) {
             # dont eval it
@@ -2326,6 +2537,8 @@ sub get_plot_args($$$) {
 
 has buysell => {
     gnuplot => \&_plot_gnuplot_general,
+    ##NOT USED for HighCharts
+    highcharts => \&_plot_highcharts_general,
 };
 
 sub get_plot_args_buysell {

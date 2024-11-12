@@ -159,9 +159,9 @@ is $fb->label('first_name', +{class=>'foo'}, sub {
     $fb->input('first_name');
 }), '<label class="foo" for="person_first_name">First Name <input id="person_first_name" name="person.first_name" type="text" value="J"/></label>';
 
-is $fb->errors_for('first_name'), '<ol><li data-error-param="1">First Name is too short (minimum is 3 characters)</li><li data-error-param="1">First Name contains non alphabetic characters</li></ol>';
-is $fb->errors_for('first_name', {class=>'foo'}), '<ol class="foo"><li data-error-param="1">First Name is too short (minimum is 3 characters)</li><li data-error-param="1">First Name contains non alphabetic characters</li></ol>';
-is $fb->errors_for('first_name', {class=>'foo', max_errors=>1}), '<div class="foo" data-error-param="1">First Name is too short (minimum is 3 characters)</div>';
+is $fb->errors_for('first_name'), '<ol data-error-list="1" id="person_first_name_errors"><li data-error-param="1">First Name is too short (minimum is 3 characters)</li><li data-error-param="1">First Name contains non alphabetic characters</li></ol>';
+is $fb->errors_for('first_name', {class=>'foo'}), '<ol class="foo" data-error-list="1" id="person_first_name_errors"><li data-error-param="1">First Name is too short (minimum is 3 characters)</li><li data-error-param="1">First Name contains non alphabetic characters</li></ol>';
+is $fb->errors_for('first_name', {class=>'foo', max_errors=>1}), '<div class="foo" data-error-param="1" id="person_first_name_errors">First Name is too short (minimum is 3 characters)</div>';
 is $fb->errors_for('first_name', sub {
   my (@errors) = @_;
   join " | ", @errors;
@@ -243,7 +243,7 @@ is $fb->fields_for('profile', sub {
           $fb_profile->errors_for('address'),
           $fb_profile->input('zip');
 
-}), '<input id="person_profile_address" name="person.profile.address" type="text" value="ab"/><div data-error-param="1">Address is too short (minimum is 3 characters)</div><input id="person_profile_zip" name="person.profile.zip" type="text" value="78621"/>';
+}), '<input id="person_profile_address" name="person.profile.address" type="text" value="ab"/><div data-error-param="1" id="person_profile_address_errors">Address is too short (minimum is 3 characters)</div><input id="person_profile_zip" name="person.profile.zip" type="text" value="78621"/>';
 
 is $fb->fields_for('credit_cards', sub {
   my $view = shift;
@@ -255,7 +255,7 @@ is $fb->fields_for('credit_cards', sub {
   my $view = shift;
   my $fb_finally = shift;
   return  $fb_finally->button('add', +{value=>1}, 'Add a New Credit Card');
-}), '<input id="person_credit_cards_0_number" name="person.credit_cards[0].number" type="text" value="234234223444"/><input id="person_credit_cards_0_expiration" name="person.credit_cards[0].expiration" type="date" value="'.$person->credit_cards->[0]->expiration->ymd.'"/><input id="person_credit_cards_1_number" name="person.credit_cards[1].number" type="text" value="342342342322"/><input id="person_credit_cards_1_expiration" name="person.credit_cards[1].expiration" type="date" value="'.$person->credit_cards->[1]->expiration->ymd.'"/><input id="person_credit_cards_2_number" name="person.credit_cards[2].number" type="text" value="111112222233"/><input id="person_credit_cards_2_expiration" name="person.credit_cards[2].expiration" type="date" value="'.$person->credit_cards->[2]->expiration->ymd.'"/><div data-error-param="1">Expiration chosen date can&#39;t be earlier than '.DateTime->now->ymd.'</div><button id="person_credit_cards_3_add" name="person.credit_cards[3].add" type="submit" value="1">Add a New Credit Card</button>';
+}), '<input id="person_credit_cards_0_number" name="person.credit_cards[0].number" type="text" value="234234223444"/><input id="person_credit_cards_0_expiration" name="person.credit_cards[0].expiration" type="date" value="'.$person->credit_cards->[0]->expiration->ymd.'"/><input id="person_credit_cards_1_number" name="person.credit_cards[1].number" type="text" value="342342342322"/><input id="person_credit_cards_1_expiration" name="person.credit_cards[1].expiration" type="date" value="'.$person->credit_cards->[1]->expiration->ymd.'"/><input id="person_credit_cards_2_number" name="person.credit_cards[2].number" type="text" value="111112222233"/><input id="person_credit_cards_2_expiration" name="person.credit_cards[2].expiration" type="date" value="'.$person->credit_cards->[2]->expiration->ymd.'"/><div data-error-param="1" id="person_credit_cards_2_expiration_errors">Expiration chosen date can&#39;t be earlier than '.DateTime->now->ymd.'</div><button id="person_credit_cards_3_add" name="person.credit_cards[3].add" type="submit" value="1">Add a New Credit Card</button>';
 
 is $fb->select('state_id', [11,22,33], +{class=>'foo'} ), '<select class="foo" id="person_state_id" name="person.state_id"><option value="11">11</option><option value="22">22</option><option value="33">33</option></select>';
 

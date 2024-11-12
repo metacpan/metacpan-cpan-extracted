@@ -70,6 +70,7 @@ sub _to_model {
 sub _model_name_from_object_or_class {
   my ($self, $proto) = @_;
   my $model = $self->_to_model($proto);
+
   return $model->model_name if $model->can('model_name');
   return Valiant::Name->new(Valiant::Naming::prepare_model_name_args($model));
 }

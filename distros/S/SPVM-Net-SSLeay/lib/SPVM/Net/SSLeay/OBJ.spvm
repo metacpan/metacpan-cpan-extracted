@@ -1,0 +1,9 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::OBJ {
+  
+  # Class Methods
+  native static method txt2nid : int ($s : string);
+  
+}

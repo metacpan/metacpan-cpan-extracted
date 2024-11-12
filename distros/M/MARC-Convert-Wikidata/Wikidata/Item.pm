@@ -26,7 +26,7 @@ Readonly::Hash our %EXT_ID_MAPPING => (
 	'lccn' => 'P243',
 );
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 # Constructor.
 sub new {
@@ -383,11 +383,7 @@ sub wikidata_labels {
 	return (
 		'labels' => [
 			Wikibase::Datatype::Value::Monolingual->new(
-				'language' => 'cs',
-				'value' => $self->{'transform_object'}->full_name,
-			),
-			Wikibase::Datatype::Value::Monolingual->new(
-				'language' => 'en',
+				'language' => 'mul',
 				'value' => $self->{'transform_object'}->full_name,
 			),
 		],

@@ -1,8 +1,10 @@
 #!/usr/bin/perl
 
-use strict; use warnings;
+use strict;
+use warnings FATAL => 'all';
 use Map::Tube::Beijing;
 use Test::More;
+plan skip_all => 'these tests are for authors only!' unless ( $ENV{AUTHOR_TESTING} ||  $ENV{RELEASE_TESTING} );
 
 eval "use Test::CPAN::Meta::JSON";
 plan skip_all => "Test::CPAN::Meta::JSON required for testing MYMETA.json" if $@;
@@ -18,4 +20,4 @@ if($meta->{provides}) {
     }
 }
 
-done_testing();
+done_testing( );

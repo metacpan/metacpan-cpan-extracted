@@ -1,0 +1,32 @@
+Revision history for Genealogy::FindaGrave
+
+0.07	Mon Nov 11 07:59:23 EST 2024
+	Renamed from WWW::Scrape::FindaGrave
+	Updated for latest website
+	Support for GitHub Actions
+	Use Test::DescribeMe to simplify tests
+	Use Test::Needs
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+	Refactor get_next_entry
+
+0.06	Tue Aug 28 10:16:33 EDT 2018
+	Fix undefined variable usage
+	Started work on new website
+
+0.05	Tue Nov  7 15:00:00 EST 2017
+	Use the legacy website, the new one doesn't scrape well and doesn't have RESTful
+
+0.04	Mon 19 Jun 20:26:20 EDT 2017
+	Try to fix http://www.cpantesters.org/cpan/report/66aabd38-5457-11e7-8c7b-c7f2659b2034
+	Added ua option to new
+
+0.03	Tue May 23 10:33:01 EDT 2017
+	Added Travis and Coveralls integration
+	Don't try tests when not on-line
+	Added LWP::Protocol::https as a prerequisite
+
+0.02	Tue Jun 14 19:48:02 EDT 2016
+	Added a few more tests
+
+0.01	Tue Jun 14 19:26:29 EDT 2016
+        First draft

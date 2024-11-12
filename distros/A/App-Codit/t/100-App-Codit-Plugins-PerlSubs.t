@@ -4,15 +4,15 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 6;
+use Test::More tests => 9;
 use File::Spec;
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
 
 $quitdelay = 1000;
-$delay = 3000;
-$delay = 5000 if $mswin;
+my $ddelay = 3000;
+$ddelay = 5000 if $mswin;
 
 BEGIN { use_ok('App::Codit::Plugins::PerlSubs') };
 
@@ -24,9 +24,15 @@ createapp(
 );
 
 my $pext;
+my $subs;
 if (defined $app) {
+	pause($ddelay);
 	$pext = $app->extGet('Plugins');
+	$subs = $pext->plugGet('PerlSubs');
 }
+
+testaccessors($subs, 'Current', 'SortOn', 'SortOrder');
+
 push @tests, (
 	[ sub { 
 		return $pext->plugExists('PerlSubs') 

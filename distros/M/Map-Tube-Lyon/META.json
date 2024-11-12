@@ -1,5 +1,5 @@
 {
-   "abstract" : "Interface to the Lyon metro map",
+   "abstract" : "Interface to the Lyon metro, funicular and tramway map",
    "author" : [
       "Gisbert W. Selke <gws@cpan.org>"
    ],
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.82"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -39,12 +39,18 @@
             "namespace::clean" : "0",
             "perl" : "5.010"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.82",
+            "XML::Simple" : "0"
+         }
       }
    },
    "provides" : {
       "Map::Tube::Lyon" : {
          "file" : "lib/Map/Tube/Lyon.pm",
-         "version" : "v0.61.0"
+         "version" : "v0.62.0"
       }
    },
    "release_status" : "stable",
@@ -53,6 +59,6 @@
          "mailto" : "bug-Map-Tube-Lyon@rt.cpan.org"
       }
    },
-   "version" : "v0.61.0",
+   "version" : "v0.62.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Perinci/CmdLine.pm','lib/Perinci/CmdLine/Manual.pod','lib/Perinci/CmdLine/Manual/Examples.pod','lib/Perinci/CmdLine/Manual/Explanation/ArgumentValidation.pod','lib/Perinci/CmdLine/Manual/FAQ.pod','lib/Perinci/CmdLine/Manual/HowTo/Debugging.pod'];
+my $filenames = ['lib/Perinci/CmdLine.pm','lib/Perinci/CmdLine/Manual.pod','lib/Perinci/CmdLine/Manual/Explanation/ArgumentValidation.pod','lib/Perinci/CmdLine/Manual/FAQ.pod','lib/Perinci/CmdLine/Manual/HowTo/99Examples.pod','lib/Perinci/CmdLine/Manual/HowTo/Debugging.pod'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

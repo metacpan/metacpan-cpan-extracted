@@ -12,7 +12,7 @@
                  |___/                      
 
 
-This is the README for Parse::Gitignore version 0.04.
+This is the README for Parse::Gitignore version 1.0.
 
 Parse::Gitignore is a "module" for the Perl computer programming language,
 a library of computer code to install on a computer.  This document
@@ -39,12 +39,11 @@ Parse a .gitignore file and check whether a file matches it.
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?Parse::Gitignore
     * http://metacpan.org/release/Parse-Gitignore
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -65,11 +64,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Parse::Gitignore
 
-To install the module from the source file, Parse-Gitignore-0.04.tar.gz,
+To install the module from the source file, Parse-Gitignore-1.0.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Parse-Gitignore-0.04.tar.gz
-    cd Parse-Gitignore-0.04
+    tar xfz Parse-Gitignore-1.0.tar.gz
+    cd Parse-Gitignore-1.0
     perl Makefile.PL
     make
     make install
@@ -82,8 +81,8 @@ If you want to test the module before installing it, use "make test" after
 4. HELP
 
 To get help with the module, you can email the author, Ben Bullock, at
-<bkb@cpan.org>. If you think there is a problem in the module, you can
-report a bug at 
+<benkasminbullock@gmail.com>. If you think there is a problem in the
+module, you can report a bug at 
 
 <https://github.com/benkasminbullock/parse-gitignore/issues>,
 
@@ -94,6 +93,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Mon Oct  9 14:00:57 2017.
+This README was written on Tue Nov 12 06:24:05 2024.
 
 -----------------------------------------------------------------------------

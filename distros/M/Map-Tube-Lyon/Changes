@@ -1,5 +1,11 @@
 Revision history for Perl extension Map::Tube::Lyon.
 
+0.62.0 2024-11-11
+  - Augmented data with per-line station indexes
+  - Added RhoneExpress line
+  - Added test for preferred route
+  - Fixed test 02-xml.t
+
 0.61.0 2024-11-05
   - Adapted for use with Map::Tube 3.77
   - Bumped Perl version to 5.10.0

@@ -37,7 +37,7 @@ requires:
   Unicode::UTF8: 0
   Wikibase::Datatype: 0.03
   Wikibase::Datatype::Struct::Item: 0
-  Wikibase::Datatype::Struct::Lexeme: 0
+  Wikibase::Datatype::Struct::Lexeme: 0.13
   Wikibase::Datatype::Struct::Mediainfo: 0
   Wikibase::Datatype::Struct::Property: 0
   perl: 5.6.2
@@ -46,4 +46,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Wikibase-API
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-API
-version: '0.06'
+version: '0.07'

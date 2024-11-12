@@ -1,0 +1,177 @@
+NAME
+    Template::Plexsite - Templating for interlinked templates
+
+SYNOPSIS
+DESCRIPTION
+    "Template::Plexsite" is a template system designed to give flexibility
+    in writing templates for repetitive and interlinked content like HTML
+    and CSS.
+
+    There is very little external configuration as each template has the
+    power to add resources, import modules and define local helper code and
+    variables. Template::Plex is used in the back end to power this module,
+    so all the features such as init blocks, inheritance, sub templates, etc
+    are used and extended to implement the relational features.
+
+SO WHAT DOES IT DO?
+    Specifically, Template::Plexsite provides the boot strapping templates
+    need to reference other templates by their original name and location.
+    The final destination of the templates do not need to be known.
+
+    What that means if you have template A, which has a link to template B,
+    and vice versa, both templates can reference each other without knowing
+    the output location beforehand.
+
+USAGE
+    The "plexsite" program will execute templates in a src dir and output
+    them in the site (build) dir unless a specific file is requested.
+
+      plexsite
+
+    The interlinking of resource files is specified in the template, so very
+    little configuration is require.
+
+    TODO MOTE USAGE DETAILS
+
+DIRECTIVES
+    Directives are accessible via and "@{[init]}" block as per
+    Template::Plex. Some directives are extended to allow direct usage of a
+    Template::Plexsite templates
+
+  inherit
+      @{[ init { inherit PATH } ]}
+
+    This template inherits from the template at PATH. The path is expected
+    to refer to another Template::Plexsite template.
+
+  res
+      @{[ init { res PATH, OPTIONS } ]}
+
+    Adds a resource at PATH (static file, template, plexsite template, etc)
+    to the resource table. Path is relative to the source root, in source
+    name space. Returns the path of the resource in the output namespace
+    relative to this template (in output namespace)
+
+  plt_res
+      @{[ init { plt_res PATH, OPTIONS } ]}
+
+    Adds a resource at PATH (static file, template, plexsite template, etc)
+    to the resource table. Path is relative to the PLT DIRECTORY OF THIS
+    TEMPLATE in source namespace. Returns the path of the resource in the
+    output namespace relative to this template (in output namespace)
+
+  existing_resource
+      @{[ init { existing_res PATH, OPTIONS } ]}
+
+    Returns a path to the resource at PATH, which already exists in the
+    output namespace. Instead of the resource being copied/executed during
+    build, it is expected to already exist as a result of an external
+    process.
+
+  sys_path_src
+      @{[ init {
+    
+          sys_path_src PATH;
+
+        } ]}
+
+    Returns the path suitable for system IO calls. PATH is relative to src.
+    Return path is a path relative to current working dir or the process, or
+    an absolute path
+
+  sys_path_build
+      @{[ init {
+    
+          sys_path_build PATH;
+
+        } ]}
+
+    Returns the path suitable for system IO calls. PATH is relative to
+    build. Return path is a path relative to current working dir or the
+    process, or an absolute path
+
+  plt_path
+      @{[ init {
+    
+          plt_path PATH;
+
+        } ]}
+
+    Returns the path suitable for system IO calls. PATH is relative to
+    current plt directory, in input namespace Return path is a path relative
+    to current working dir or the process, or an absolute path
+
+  output
+      @{[ init { output location=>LOCATION, name=>NAME } ]}
+
+    Sets the output directory (relative to the build root) of the template.
+
+    If not used the relative path of the template is used as the relative
+    path to the output
+
+  locale
+      @{[ init { locale LOCALE } ]}
+
+    Sets the locale or variant of the build. Ultimately becomes a prefix
+    added to paths in the output
+
+  lander
+      @{[ init { lander location=>PATH, name=>NAME, type=>TYPE } ]}
+
+    Creates a lander/redirect output a location PATH, with a name of NAME.
+    If no name is given it is 'index.html' by default.
+
+    Type can be "refresh" or "symlink". A refresh create a new file with
+    HTTP meta tags to cause a client side redirect to the target page. A
+    symlink adds a soft link to the actual file
+
+ON DISK TEMPLATE STRUCTURE
+  Index file
+    Plexsite template is:
+
+    Directory with a .plt extension.
+        The name of the directory can be anything as long as it ends with
+        .plt
+
+    Must have an index file in the .plt directory
+        The prefix of the index file must be 'index' and the suffix must
+        either end in ".plex" or have it as the second last extension ie
+        index.plex.html index.html.plex index.some.other.plex.html
+        index.some.other.html.plex
+
+        The first form is preferred. It gives text editors a chance to
+        perform syntax syntax highlighting for known file types for example.
+
+        When the PLT template is loaded, the first index file found in the
+        PLT directory is loaded:
+
+    They can have any number of sub directories and files
+        A template can be a package of sorts containing images, style
+        sheets, other plt templates and basic plex templates
+
+  Locale/Variant
+    Each PLT template supports variants or locales. The specified locale is
+    the name of a directory within the PLT directory, which is checked for
+    an index file (like above). If its found, it will loaded and ready for
+    use if you choose to render it. NOTE: The name of the locale index file
+    must be the same as the main one
+
+PRCOESSING OVERVIEW
+    TODO....
+
+SEE ALSO
+    Tempalte::Plex
+
+REPOSITORY and BUG REPORTING
+    Please report any bugs and feature requests on the repo page: GitHub
+    <https://github.com/drclaw1394/perl-template-plexsite>
+
+AUTHOR
+    Ruben Westerberg, <drclaw@mac.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2024 by Ruben Westerberg
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, or under the MIT license
+

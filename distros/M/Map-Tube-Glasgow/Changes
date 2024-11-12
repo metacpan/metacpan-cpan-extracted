@@ -1,6 +1,10 @@
 Revision history for Perl extension Map::Tube::Glasgow.
 
-071.0 2024-11-05
+0.72.0 2024-11-11
+  - Augmented data with per-line station indexes
+  - Fixed test 02-xml.t
+
+0.71.0 2024-11-05
   - Adapted for use with Map::Tube 3.77
   - Bumped Perl version to 5.10.0
   - Use semantic versioning

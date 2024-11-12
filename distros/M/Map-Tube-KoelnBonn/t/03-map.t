@@ -10,3 +10,4 @@ plan skip_all => 'Test::Map::Tube required for this test' if $@;
 
 ok_map( Map::Tube::KoelnBonn->new( ) );
 
+done_testing( );

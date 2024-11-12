@@ -2,3 +2,6 @@
 *fruit
 # nice
 monkey*
+# Exclude everything in a bin/ directory
+bin/
+bigger

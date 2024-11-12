@@ -1,5 +1,10 @@
 Revision history for Perl extension Map::Tube::KoelnBonn.
 
+0.92.0 2024-11-11
+  - Augmented data with per-line station indexes
+  - Added test for preferred route
+  - Fixed test 02-xml.t
+
 0.91.0 2024-11-05
   - Adapted for use with Map::Tube 3.77
   - Bumped Perl version to 5.10.0

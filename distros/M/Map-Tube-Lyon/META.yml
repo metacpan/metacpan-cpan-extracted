@@ -1,9 +1,11 @@
 ---
-abstract: 'Interface to the Lyon metro map'
+abstract: 'Interface to the Lyon metro, funicular and tramway map'
 author:
   - 'Gisbert W. Selke <gws@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test::More: '0.82'
+  XML::Simple: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
@@ -21,7 +23,7 @@ no_index:
 provides:
   Map::Tube::Lyon:
     file: lib/Map/Tube/Lyon.pm
-    version: v0.61.0
+    version: v0.62.0
 requires:
   File::Share: '0'
   Map::Tube: '3.77'
@@ -29,5 +31,5 @@ requires:
   namespace::clean: '0'
   perl: '5.010'
 resources: {}
-version: v0.61.0
+version: v0.62.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

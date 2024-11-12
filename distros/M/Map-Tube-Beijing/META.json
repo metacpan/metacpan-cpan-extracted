@@ -3,14 +3,14 @@
    "author" : [
       "Gisbert W. Selke <gws@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Map-Tube-Beijing",
    "no_index" : {
@@ -34,24 +34,31 @@
       "runtime" : {
          "requires" : {
             "File::Share" : "0",
-            "Map::Tube" : "2.85",
+            "Map::Tube" : "3.77",
             "Moo" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.82"
+            "Test::More" : "0.82",
+            "XML::Simple" : "0"
          }
       }
    },
    "provides" : {
       "Map::Tube::Beijing" : {
          "file" : "lib/Map/Tube/Beijing.pm",
-         "version" : "0.01"
+         "version" : "v0.11.0"
       }
    },
    "release_status" : "stable",
-   "version" : "0.01"
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Map-Tube-Beijing@rt.cpan.org"
+      }
+   },
+   "version" : "v0.11.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

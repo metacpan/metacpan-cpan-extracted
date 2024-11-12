@@ -45,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.0201",
    "x_serialization_backend" : "JSON version 4.10"
 }

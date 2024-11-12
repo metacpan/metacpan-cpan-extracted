@@ -1,0 +1,24 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::X509_NAME {
+  
+  use Fn;
+  
+  # Class Methods
+  private static method new_with_pointer : Net::SSLeay::X509_NAME ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::X509_NAME;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  native method oneline : string ();
+  
+  native method get_text_by_NID : int ($nid : int, $buf : mutable string, $len : int = -1);
+  
+  native method DESTROY : void ();
+}

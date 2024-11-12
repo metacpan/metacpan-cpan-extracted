@@ -13,7 +13,7 @@ use Wikibase::Datatype::Struct::Lexeme;
 use Wikibase::Datatype::Struct::Mediainfo;
 use Wikibase::Datatype::Struct::Property;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -61,7 +61,6 @@ sub create_item {
 	my ($self, $item_obj, $summary) = @_;
 
 	$self->_init;
-
 
 	my ($type, $data) = $self->_obj2json($item_obj);
 	my $res = $self->{'mediawiki_api'}->api({
@@ -611,6 +610,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

@@ -224,6 +224,7 @@ t/dbic/nested.t
 t/dbic/nested2.t
 t/dbic/nested3.t
 t/dbic/new_result.t
+t/dbic/resultsets.t
 t/dbic/todo_tests.t
 t/dbic/update.t
 t/error.t

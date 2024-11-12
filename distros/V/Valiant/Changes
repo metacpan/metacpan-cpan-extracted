@@ -1,5 +1,12 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002006 2024 October 27
+          - Fixed issue where legend_for tag didn't respect custom attributes
+          - More control options over how errors are displayed in the formbuilder
+          - Updated Formbuilder 'fields_for' to allow you to pass an actual
+            object or collection of objects rather than just the name of the
+            attribute.
+
 0.002005 2024 October 1
           - Added support for a model to declare its form fields.
           - documentation improvements

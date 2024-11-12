@@ -7,6 +7,12 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/parse-gitignore.t
+t/subd.t
+t/subd/.gitignore
+t/subd/subsubd/.gitignore
+t/subd/subsubd/test2
+t/subd/test1
+t/test-files/bin/isotope
 t/test-files/monkeyshines
 t/test-files/nice
 t/test-files/starfruit

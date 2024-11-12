@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_edition_number
 	clean_title look_for_external_id);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -44,7 +44,9 @@ sub clean_cover {
 	$ret_cover =~ s/^$c$/paperback/ms;
 
 	# Collective.
-	$ret_cover =~ s/soubor/collective/ms;
+	$c = decode_utf8('svazků');
+	$ret_cover =~ s/soubor\s+\d+\s+$c/collective/ms;
+	$ret_cover =~ s/soubor\s*\d*/collective/ms;
 
 	if (none { $ret_cover eq $_ } (@COVERS, 'collective')) {
 		if ($DEBUG) {
@@ -810,6 +812,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.18
+0.19
 
 =cut

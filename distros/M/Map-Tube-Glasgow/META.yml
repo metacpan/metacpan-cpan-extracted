@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0.82'
+  XML::Simple: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
@@ -22,7 +23,7 @@ no_index:
 provides:
   Map::Tube::Glasgow:
     file: lib/Map/Tube/Glasgow.pm
-    version: v0.71.0
+    version: v0.72.0
 requires:
   File::Share: '0'
   Map::Tube: '3.77'
@@ -30,5 +31,5 @@ requires:
   namespace::clean: '0'
   perl: '5.010'
 resources: {}
-version: v0.71.0
+version: v0.72.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

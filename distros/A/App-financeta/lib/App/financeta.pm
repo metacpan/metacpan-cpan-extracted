@@ -7,7 +7,7 @@ use Log::Any '$log', filter => \&App::financeta::utils::log_filter;
 use Log::Any::Adapter 'Stderr';
 use App::financeta::gui;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 $VERSION = eval $VERSION;
 
 sub print_banner {
@@ -56,6 +56,7 @@ sub run {
         log_level => $log_level,
         debug => $opts{debug},
         brand => __PACKAGE__,
+        plot_engine => $opts{plot_engine} // 'gnuplot',
     );
     return $gui->run;
 }
@@ -78,7 +79,7 @@ as an application. It handles command line processing of C<financeta>.
 
 =head1 VERSION
 
-0.11
+0.15
 
 DESCRIPTION
 

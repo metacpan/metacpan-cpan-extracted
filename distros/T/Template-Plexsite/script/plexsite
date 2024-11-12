@@ -1,0 +1,314 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use feature qw<say>;
+use Log::ger;
+use Log::ger::Output "Screen";
+use Log::OK {
+	lvl=>"info",
+	opt=>"verbose",
+};
+
+use Log::ger::Util;
+Log::ger::Util::set_level Log::OK::LEVEL;
+
+use Data::Dumper;
+
+use Getopt::Long;
+use File::Spec::Functions qw<rel2abs abs2rel catfile>;
+use File::Path qw<make_path>;
+
+my $src="src";
+my $html_root="site";
+
+my $locale;#="en";	#Default locale is en
+my @libs;
+
+my $verbose;#dummy
+my $create;
+my $base_template;		#The path to the template 
+				#to inhert from if sub templates
+				#don't specifiy one
+my $title;
+my $location;
+my $help_flag;
+my $type="html";
+my %define;
+GetOptions(
+	"src=s"=>\$src,
+	"html_root=s"=>\$html_root,
+	"locale=s"=>\$locale,
+	"lib=s"=>\@libs,
+	"verbose"=>\$verbose,
+	"create"=>\$create,
+  "type"=>\$type,
+	"base=s"=>\$base_template,
+	"title=s"=>\$title,
+	"location=s"=>\$location,
+  "define=s"=>\%define,
+  help=>\$help_flag,
+
+
+) or die "Error in command arguments";
+
+
+if($help_flag){
+
+  eval "require Pod::Usage;
+  Pod::Usage::pod2usage {verbose=>1};
+  ";
+}
+
+die "No src specified" unless $src;
+
+
+if($create){
+	goto CREATE;
+}
+
+# Locale is basically a prefix from the html_root....
+#
+$locale||="app/en";
+die "No html_root specified" unless $html_root;
+
+use Template::Plexsite::URLTable;
+
+my $table=Template::Plexsite::URLTable->new(src=>$src, html_root=>$html_root, locale=>$locale);
+
+#say "Remainder : ", @ARGV;
+
+if(@ARGV){
+	#Any remaining arguments are explicit templates to add
+	#Paths are made relative to src
+	Log::OK::INFO and log_info "Adding arguments";
+	for my $path (@ARGV){
+		$path=abs2rel($path, $src);
+		#say "adding $path";
+		$table->add_resource($path);
+	}
+
+}
+else {
+	#Assumes all templates are under src
+	#Recursively process the entire directory structure.
+	Log::OK::INFO and log_info "Processing src directory";
+	my @paths;
+	push @paths , $src;
+	while(@paths){
+		my $path=pop @paths;
+		#say "processing $path";
+		if(-d $path){
+			my @new= < $path/*>;
+			push @paths, @new;
+
+			#If it is plt dir, add it as a resource
+			if($path =~/plt$/){
+				$path=~s|^$src/||;	#Strip source dir from prefix
+				$table->add_resource($path);
+			}
+		}
+	}
+}
+
+#add explicit libs
+Log::OK::INFO and log_info "Processing explicit libs directory";
+for my $lib (@libs){
+
+	$lib=abs2rel($lib, $src);
+	$table->add_resource($lib);
+}
+
+Log::OK::INFO and log_info "Rendering templates";
+$table->build;
+
+exit;
+
+
+
+
+
+
+
+
+
+
+
+CREATE:
+#Create a page entry with a path contained withing the src dir
+
+
+my $data;
+unless($data){
+	local $/=undef;
+	$data=<DATA>;
+}
+
+my ($content_base, $content_locale)=split /#----/ms,$data, 2;
+
+
+die "Input node path required" unless @ARGV;
+my $path=$ARGV[0];	#Assume first non switch is target
+# Chech the node contains the plt extension
+Log::OK::TRACE and log_trace "ARGV: ", join ", ", @ARGV;
+die  "Node must end in .plt" unless $path =~ /\.plt$/;
+
+#Make directories
+#--title		#Required
+#--location	#Opional- use normalized input path otherwise
+#--base		#Class to inhert from
+
+
+#Paths for index and local_index
+my $index_path=catfile $path, "index.plex.$type";
+
+#Command line tool is expecting arguments relative to process. However we want
+#all inputs relative to src directory. Make all paths absolute and them remove
+#src prefix
+#
+my $abs_src=rel2abs $src;
+my $input_path;
+($base_template, $input_path)=map {abs2rel $_, $abs_src } map {rel2abs($_)} ($base_template, $path);
+
+#Create any dirs needing to be created. Path is always a dir
+say "PATH: $path";
+make_path $path;
+
+
+
+unless($location){
+	$location=$input_path=~s/\.plt//gr;
+	#say "INPUT PATH IS $location";
+}
+
+die "Location required" unless $location;
+
+my @temps=($content_base, $content_locale);
+for(@temps){
+	s/LOCATION/$location/;
+	s/TITLE/$title/;
+	s/INHERIT/$base_template/;
+}
+
+
+#Test if files already exist
+
+my $ans="y";
+if(-e $index_path and $locale){
+	say "Node exists: $input_path";
+	#Only attempt to make node if id doesn't exist or  is explicitly asked for
+	goto MAKE_LOCALE;
+}
+$ans="y";
+say "Node creation: $input_path";
+if(-e $index_path){
+	say "$index_path already exists. Overwrite (Y/n)?";
+	$ans=<STDIN>;
+	chomp $ans;
+	$ans="y" if $ans eq "";
+}
+
+if($ans=~/y/i){
+	die "Could not open $index_path: $!" unless open my $fh_base, ">", $index_path;
+	print $fh_base $temps[0];
+}
+else {
+	say "Node creation: skipping";
+}
+
+
+MAKE_LOCALE:
+#Process locale
+if($locale){
+	say "Locale creation: $locale, for node $input_path";
+	my $locale_index_path=catfile $path, $locale, "index.plex.$type";
+	make_path catfile $path, $locale; #$locale_index_path if $locale_index_path;
+
+	$ans="y";
+	if( -e $locale_index_path){
+		say "$locale_index_path already exists. Overwrite (Y/n)?";
+		$ans=<STDIN>;
+		chomp $ans;
+		$ans="y" if $ans eq "";
+	}
+
+	if($ans=~/y/i){
+		$locale_index_path and die "Could not open $locale_index_path: $!" unless open my $fh_locale, ">", $locale_index_path;
+		$locale_index_path and print $fh_locale $temps[1];
+	}
+	else {
+		say "Locale creation: skipping";
+	}
+}
+
+exit;
+
+
+=head1 NAME
+
+plexsite - Linked Plex Template Rendering Tool
+
+=head1 SYNOPSIS
+
+
+	plexsite CMD OPTIONS --create --title "My title" src/pages/about.plt
+
+=over 
+
+=item Create a empty node:
+  
+	plexsite --create --title "My title" src/pages/about.plt
+
+
+=back
+
+
+Render linked templates from the src dir in current working directory
+
+	plexsite
+
+
+=head2 DESCRIPTION
+
+This is a site building application using  L<Template::Plexsite> inter-template
+system.
+
+
+In its simplest form, it  takes a directory of input (src by default),
+recursively finds all the plt templates, executes them, writing the results to
+the output directory (site by default).
+
+
+There is very little configuration, as each plt template provides almost
+everything needed to locate resources and the directory structure of the
+output.
+
+For details on the template system itself please refer to
+L<Template::Plexsite>.
+
+
+=cut
+
+
+__DATA__
+@{[
+	init {
+    # Data section is a skeleton node  which  is used as a mini template
+    # in generated new templates nodes
+		output	location=>"LOCATION", title=>"TITLE";
+    #inherit "INHERIT";
+
+    #navi  path=>"menu/path", label=>"label", href=>"url_or_frag";
+	}
+]}
+
+@{[locale->render]}
+#----
+@{[
+	init {
+		output	location=>"LOCATION", title=>"TITLE";
+    #inherit "INHERIT";
+
+	}
+]}
+
+

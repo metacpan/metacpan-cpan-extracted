@@ -2,7 +2,7 @@
 
 use strict;
 use warnings FATAL => 'all';
-use Test::More tests => 9;
+use Test::More tests => 11;
 use Map::Tube::KoelnBonn;
 
 my $map = new_ok( 'Map::Tube::KoelnBonn' );
@@ -20,12 +20,24 @@ eval { $map->get_shortest_route( 'Neumarkt', 'XYZ' ); };
 like( $@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E/, 'Must specify two existing stations for get_shortest_route( )' );
 
 {
-  my $ret = $map->get_shortest_route( 'Neumarkt', 'Ebertplatz' );
+  my $ret = $map->get_shortest_route( 'Neumarkt', 'Trimbornstr.' );
   isa_ok( $ret, 'Map::Tube::Route' );
   is( $ret,
       'Neumarkt (1, 16, 18, 3, 4, 7, 9), Appellhofplatz / Breite Str. (16, 18, 3, 4), ' .
-      'Dom / Hbf (16, 18, 5, street), Breslauer Platz / Hbf (16, 18, street), Ebertplatz (12, 15, 16, 18)',
-      'Neumarkt - Ebertplatz'
+      'Dom / Hbf (16, 18, 5, hbfkoeln), Köln Hbf (S11, S12, S13, S19, S6, hbfkoeln), ' .
+      'Köln Messe / Deutz (S11, S12, S13, S19, S6, bfdeutz), Trimbornstr. (S12, S13, S19)',
+      'Neumarkt - Trimbornstr.'
+    );
+}
+
+{
+  my $ret = $map->get_shortest_route( 'Neumarkt', 'Trimbornstr.' )->preferred( );
+  isa_ok( $ret, 'Map::Tube::Route' );
+  is( $ret,
+      'Neumarkt (16, 18, 3, 4), Appellhofplatz / Breite Str. (16, 18, 3, 4), ' .
+      'Dom / Hbf (16, 18, hbfkoeln), Köln Hbf (S11, S12, S13, S19, S6, hbfkoeln), ' .
+      'Köln Messe / Deutz (S11, S12, S13, S19, S6), Trimbornstr. (S12, S13, S19)',
+      'Neumarkt - Trimbornstr. preferred route'
     );
 }
 

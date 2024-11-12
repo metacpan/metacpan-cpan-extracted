@@ -1,0 +1,4 @@
+
+Print modules in POD
+
+  find lib | grep '\.spvm$' | perl -p -e 's/\.spvm$//' | sort | perl -p -e 's|lib/SPVM/||;s|/|::|g;s/\.spvm$//; chomp; $_ = "=item * L<$_|SPVM::$_>\n\n";'

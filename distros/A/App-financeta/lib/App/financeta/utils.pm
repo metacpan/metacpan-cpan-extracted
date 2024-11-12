@@ -10,10 +10,10 @@ use File::ShareDir 'dist_file';
 use File::Spec::Functions qw(rel2abs catfile);
 use Cwd qw(getcwd);
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 $VERSION = eval $VERSION;
 our @EXPORT_OK = (
-    qw(dumper log_filter get_icon_path)
+    qw(dumper log_filter get_icon_path get_file_path)
 );
 
 sub dumper {
@@ -38,20 +38,24 @@ sub log_filter {
 }
 
 sub get_icon_path {
-    my @args = @_;
-    my $icon_path;
-    my $filename = 'chart-line-solid.png';#'icon.gif';
+    return get_file_path('chart-line-solid.png', @_);
+}
+
+sub get_file_path {
+    my ($filename, @args) = @_;
+    return unless defined $filename;
+    my $file_path;
     my $distname = 'App-financeta';
     try {
-        $icon_path = dist_file($distname, $filename);
+        $file_path = dist_file($distname, $filename);
     } catch {
-        $log->warn("Failed to find icon. Error: $_");
-        $icon_path = undef;
+        $log->warn("Failed to find $filename. Error: $_");
+        $file_path = undef;
     };
-    unless ($icon_path) {
+    unless ($file_path) {
         my $dist_share_path = rel2abs(catfile(getcwd, 'share'));
         try {
-            $log->debug("icon backup dist-share path: $dist_share_path");
+            $log->debug("$filename backup dist-share path: $dist_share_path");
             ## find all packages and search for all of them
             if (@args) {
                 foreach (@args) {
@@ -59,17 +63,17 @@ sub get_icon_path {
                 }
             }
             $File::ShareDir::DIST_SHARE{$distname} = $dist_share_path;
-            $icon_path = dist_file($distname, $filename);
+            $file_path = dist_file($distname, $filename);
         } catch {
-            $log->warn("Failed to find icon in $dist_share_path. Error: $_");
-            $icon_path = undef;
+            $log->warn("Failed to find $filename in $dist_share_path. Error: $_");
+            $file_path = undef;
         };
     };
-    $log->debug("Icon path: $icon_path") if defined $icon_path;
-    if (defined $icon_path and -e $icon_path) {
-        return $icon_path;
+    $log->debug("$filename path: $file_path") if defined $file_path;
+    if (defined $file_path and -e $file_path) {
+        return $file_path;
     } else {
-        $log->warn("No icon found, using system icon");
+        $log->warn("No $filename found");
         return undef;
     }
 }
@@ -91,7 +95,7 @@ App::financeta::utils is an internal utility library for App::financeta.
 
 =head1 VERSION
 
-0.11
+0.15
 
 
 =head1 METHODS

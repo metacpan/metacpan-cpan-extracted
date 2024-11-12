@@ -36,6 +36,6 @@ like($@, qr/\QMap::Tube::get_line_by_name(): ERROR: Invalid Line Name [XYZ]\E/, 
   isa_ok( $ret,      'ARRAY' );
   my @lines = @{ $ret };
   isa_ok( $lines[0],  'Map::Tube::Line' );
-  is( scalar(@lines), 13, 'Number of lines incorrect' );
+  is( scalar(@lines), 14, 'Number of lines incorrect' );
 }
 

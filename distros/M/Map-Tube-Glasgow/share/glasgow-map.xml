@@ -4,20 +4,20 @@
     <line id="SPT" name="SPT" color="#68232E"/>
   </lines>
   <stations>
-    <station id="KB" name="Kelvinbridge"      line="SPT" link="SG,HH"/>
-    <station id="SG" name="St George's Cross" line="SPT" link="CC,KB"/>
-    <station id="CC" name="Cowcaddens"        line="SPT" link="BU,SG"/>
-    <station id="BU" name="Buchanan Street"   line="SPT" link="SE,CC"/>
-    <station id="SE" name="St Enoch"          line="SPT" link="BS,BU"/>
-    <station id="BS" name="Bridge Street"     line="SPT" link="WS,SE"/>
-    <station id="WS" name="West Street"       line="SPT" link="SR,BS"/>
-    <station id="SR" name="Shields Road"      line="SPT" link="KP,WS"/>
-    <station id="KP" name="Kinning Park"      line="SPT" link="CN,SR"/>
-    <station id="CN" name="Cessnock"          line="SPT" link="IB,KP"/>
-    <station id="IB" name="Ibrox"             line="SPT" link="GO,CN"/>
-    <station id="GO" name="Govan"             line="SPT" link="PA,IB"/>
-    <station id="PA" name="Partick"           line="SPT" link="KH,GO"/>
-    <station id="KH" name="Kelvinhall"        line="SPT" link="HH,PA"/>
-    <station id="HH" name="Hillhead"          line="SPT" link="KB,KH"/>
+    <station id="KB" name="Kelvinbridge"      line="SPT:1"  link="SG,HH"/>
+    <station id="SG" name="St George's Cross" line="SPT:2"  link="CC,KB"/>
+    <station id="CC" name="Cowcaddens"        line="SPT:3"  link="BU,SG"/>
+    <station id="BU" name="Buchanan Street"   line="SPT:4"  link="SE,CC"/>
+    <station id="SE" name="St Enoch"          line="SPT:5"  link="BS,BU"/>
+    <station id="BS" name="Bridge Street"     line="SPT:6"  link="WS,SE"/>
+    <station id="WS" name="West Street"       line="SPT:7"  link="SR,BS"/>
+    <station id="SR" name="Shields Road"      line="SPT:8"  link="KP,WS"/>
+    <station id="KP" name="Kinning Park"      line="SPT:9"  link="CN,SR"/>
+    <station id="CN" name="Cessnock"          line="SPT:10" link="IB,KP"/>
+    <station id="IB" name="Ibrox"             line="SPT:11" link="GO,CN"/>
+    <station id="GO" name="Govan"             line="SPT:12" link="PA,IB"/>
+    <station id="PA" name="Partick"           line="SPT:13" link="KH,GO"/>
+    <station id="KH" name="Kelvinhall"        line="SPT:14" link="HH,PA"/>
+    <station id="HH" name="Hillhead"          line="SPT:15" link="KB,KH"/>
   </stations>
 </tube>

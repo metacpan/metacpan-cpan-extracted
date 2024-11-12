@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use 5.10.0;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 $VERSION = eval $VERSION;
 use App::financeta::mo;
-use App::financeta::utils qw(dumper log_filter get_icon_path);
+use App::financeta::utils qw(dumper log_filter get_icon_path get_file_path);
 use Carp ();
 use Log::Any '$log', filter => \&App::financeta::utils::log_filter;
 use Try::Tiny;
@@ -31,16 +31,21 @@ use Prima qw(
 );
 use Prima::Utils ();
 use Capture::Tiny ();
-use Finance::QuoteHist;
 use PDL::Lite;
 use PDL::IO::Misc;
 use PDL::NiceSlice;
 use PDL::Graphics::Gnuplot;
+use App::financeta::gui::security_wizard;
+use App::financeta::gui::progress_bar;
+use App::financeta::gui::editor;
+use App::financeta::gui::tradereport;
 use App::financeta::indicators;
-use App::financeta::editor;
+use App::financeta::data;
 use Scalar::Util qw(blessed);
 use Browser::Open ();
 use YAML::Any ();
+use JSON::XS qw(encode_json);
+use Template;
 
 $PDL::doubleformat = "%0.6lf";
 $| = 1;
@@ -49,8 +54,11 @@ has timezone => 'America/New_York';
 has brand => __PACKAGE__;
 has main => (builder => '_build_main');
 has tmpdir => ( default => sub {
-    return $ENV{TEMP} || $ENV{TMP} if $^O =~ /Win32|Cygwin/i;
-    return $ENV{TMPDIR} || '/tmp';
+    my $dir = $ENV{TEMP} || $ENV{TMP} if $^O =~ /Win32|Cygwin/i;
+    $dir //= $ENV{TMPDIR} || File::Spec->tmpdir || '/tmp';
+    $dir = File::Spec->catdir($dir, $ENV{USER} || getlogin(), 'financeta');
+    File::Path::make_path($dir) unless -d $dir;
+    return $dir;
 });
 has datadir => ( default => sub {
     my $dir = $ENV{DATADIR} || File::Spec->catfile(File::HomeDir->my_home, '.financeta');
@@ -63,6 +71,9 @@ has indicator => (builder => '_build_indicator');
 has tab_was_closed => 0;
 has editors => {};
 has tradereports => {};
+has list_sources => ['yahoo', 'gemini'];
+has list_sources_pretty => ['Yahoo! Finance', 'Gemini Crypto Exchange'];
+has list_sources_urls => ['https://finance.yahoo.com', 'https://docs.gemini.com/rest-api/?python#symbols'];
 
 sub _build_indicator {
     my $self = shift;
@@ -74,7 +85,7 @@ sub _build_editor {
     my $self = shift;
     my $name = shift || '';
     $name =~ s/tab_//g if length $name;
-    return App::financeta::editor->new(debug => $self->debug,
+    return App::financeta::gui::editor->new(debug => $self->debug,
         parent => $self, brand => $self->brand . " Rules Editor for $name");
 }
 
@@ -82,7 +93,7 @@ sub _build_tradereport {
     my $self = shift;
     my $name = shift || '';
     $name =~ s/tab_//g if length $name;
-    return App::financeta::tradereport->new(debug => $self->debug,
+    return App::financeta::gui::tradereport->new(debug => $self->debug,
         parent => $self, brand => $self->brand . " Trade Report for $name");
 }
 
@@ -149,7 +160,7 @@ sub _menu_items {
                         return;
                     }
                     if ($gui->security_wizard($win)) {
-                        my $bar = $gui->progress_bar_create($win, 'Downloading...');
+                        my $bar = App::financeta::gui::progress_bar->new(owner => $win, title => 'Downloading...');
                         # download security data
                         my ($data, $symbol, $csv) = $gui->download_data($bar);
                         if (defined $data) {
@@ -163,7 +174,7 @@ sub _menu_items {
                             $gui->plot_data($win, $data, $symbol, $type);
                             $gui->enable_menu_options($win);
                         }
-                        $gui->progress_bar_close($bar);
+                        $bar->close if $bar;
                     }
                 },
                 $self,
@@ -481,303 +492,10 @@ sub run {
     run Prima;
 }
 
-sub progress_bar_create {
-    my ($self, $win, $text) = @_;
-    $text = $text || 'Loading...';
-    my $bar = Prima::Window->create(
-        name => 'progress_bar',
-        text => $text,
-        size => [160, 100],
-        origin => [0, 0],
-        widgetClass => wc::Dialog,
-        borderStyle => bs::Dialog,
-        borderIcons => 0,
-        centered => 1,
-        owner => $win,
-        visible => 1,
-        pointerType => cr::Wait,
-        onPaint => sub {
-            my ($w, $canvas) = @_;
-            $canvas->color(cl::Blue);
-            $canvas->bar(0, 0, $w->{-progress}, $w->height);
-            $canvas->color(cl::Back);
-            $canvas->bar($w->{-progress}, 0, $w->size);
-            $canvas->color(cl::Yellow);
-            $canvas->font(size => 16, style => fs::Bold);
-            $canvas->text_out($w->text, 0, 10);
-        },
-        syncPaint => 1,
-        onTop => 1,
-    );
-    $bar->{-progress} = 0;
-    $bar->repaint;
-    $win->pointerType(cr::Wait);
-    $win->repaint;
-    return $bar;
-}
-
-sub progress_bar_update {
-    my ($self, $bar) = @_;
-    if ($bar and defined $bar->{-progress}) {
-        $bar->{-progress} += 5;
-        $bar->repaint;
-    }
-}
-
-sub progress_bar_close {
-    my ($self, $bar) = @_;
-    if ($bar) {
-        $bar->owner->pointerType(cr::Default);
-        $bar->close;
-    }
-}
-
 sub security_wizard {
     my ($self, $win) = @_;
-    my $w = Prima::Dialog->new(
-        name => 'sec_wizard',
-        centered => 1,
-        origin => [200, 200],
-        size => [640, 480],
-        text => 'Security Wizard',
-        icon => $self->icon,
-        visible => 1,
-        taskListed => 0,
-        onExecute => sub {
-            my $dlg = shift;
-            my $sec = $self->current->{symbol} || '';
-            $dlg->input_symbol->text($sec);
-            $dlg->btn_ok->enabled(length($sec) ? 1 : 0);
-            $dlg->btn_cancel->enabled(1);
-            if ($self->current->{start_date}) {
-                my $dt = $self->current->{start_date};
-                $dlg->cal_start->date($dt->day, $dt->month - 1, $dt->year - 1900);
-            } else {
-                $dlg->cal_start->date_from_time(gmtime);
-                # reduce 1 year
-                my $yr = $dlg->cal_start->year;
-                $dlg->cal_start->year($yr - 1);
-            }
-            if ($self->current->{end_date}) {
-                my $dt = $self->current->{end_date};
-                $dlg->cal_end->date($dt->day, $dt->month - 1, $dt->year - 1900);
-            } else {
-                $dlg->cal_end->date_from_time(gmtime);
-            }
-            $dlg->chk_force_download->checked(0);
-            $self->current->{force_download} = 0;
-        },
-    );
-    $w->owner($win) if defined $win;
-    $w->insert(
-        Label => text => 'Enter Security Symbol',
-        name => 'label_symbol',
-        alignment => ta::Left,
-        autoHeight => 1,
-        origin => [ 20, 440],
-        autoWidth => 1,
-        font => { height => 14, style => fs::Bold },
-        hint => 'Stock symbols are available at Yahoo! Finance',
-    );
-    $w->insert(
-        InputLine => name => 'input_symbol',
-        alignment => ta::Left,
-        autoHeight => 1,
-        width => 100,
-        autoTab => 1,
-        maxLen => 10,
-        origin => [ 200, 440],
-        font => { height => 16 },
-        onChange => sub {
-            my $inp = shift;
-            my $owner = $inp->owner;
-            unless (length $inp->text) {
-                $owner->btn_ok->enabled(0);
-            } else {
-                $owner->btn_ok->enabled(1);
-            }
-        },
-    );
-    $w->insert(
-        Button => name => 'btn_help',
-        text => 'Symbol Search',
-        height => 20,
-        autoWidth => 1,
-        origin => [340, 440],
-        default => 0,
-        enabled => 1,
-        font => { height => 12, style => fs::Bold },
-        onClick => sub {
-            my $url = 'http://finance.yahoo.com';
-            my $ok = Browser::Open::open_browser($url, 1);
-            if (not defined $ok) {
-                message("Error finding a browser to open $url");
-            } elsif ($ok != 0) {
-                message("Error opening $url");
-            }
-        },
-    );
-    $w->insert(
-        Label => text => 'Select Start Date',
-        name => 'label_enddate',
-        alignment => ta::Center,
-        autoHeight => 1,
-        autoWidth => 1,
-        origin => [ 20, 410 ],
-        font => { height => 14, style => fs::Bold },
-    );
-    $w->insert(
-        Calendar => name => 'cal_start',
-        useLocale => 1,
-        size => [ 220, 200 ],
-        origin => [ 20, 200 ],
-        font => { height => 16 },
-        onChange => sub {
-            my $cal = shift;
-            $self->current->{start_date} = DateTime->new(
-                year => 1900 + $cal->year(),
-                month => 1 + $cal->month(),
-                day => $cal->day(),
-                time_zone => $self->timezone,
-            );
-        },
-    );
-    $w->insert(
-        Label => text => 'Select End Date',
-        name => 'label_enddate',
-        alignment => ta::Center,
-        autoHeight => 1,
-        autoWidth => 1,
-        origin => [ 260, 410 ],
-        font => { height => 14, style => fs::Bold },
-    );
-    $w->insert(
-        Calendar => name => 'cal_end',
-        useLocale => 1,
-        size => [ 220, 200 ],
-        origin => [ 260, 200 ],
-        font => { height => 16 },
-        onChange => sub {
-            my $cal = shift;
-            $self->current->{end_date} = DateTime->new(
-                year => 1900 + $cal->year(),
-                month => 1 + $cal->month(),
-                day => $cal->day(),
-                time_zone => $self->timezone,
-            );
-        },
-    );
-    $w->insert(
-        CheckBox => name => 'chk_force_download',
-        text => 'Force Download',
-        origin => [ 20, 170 ],
-        font => { height => 14, style => fs::Bold },
-        onCheck => sub {
-            my $chk = shift;
-            my $owner = $chk->owner;
-            if ($chk->checked) {
-                $self->current->{force_download} = 1;
-            } else {
-                $self->current->{force_download} = 0;
-            }
-        },
-    );
-    $w->insert(
-        Button => name => 'btn_csv',
-        text => 'Load from CSV',
-        autoHeight => 1,
-        autoWidth => 1,
-        origin => [ 20, 120 ],
-        default => 0,
-        enabled => 1,
-        font => { height => 16, style => fs::Bold },
-        onClick => sub {
-            my $btn = shift;
-            my $owner = $btn->owner;
-            $owner->hide;
-            my $dlg = Prima::Dialog::OpenDialog->new(
-                filter => [
-                    ['CSV files' => '*.csv'],
-                    ['All files' => '*'],
-                ],
-                filterIndex => 0,
-                fileMustExist => 1,
-                multiSelect => 0,
-                directory => $self->tmpdir,
-            );
-            my $csv = $dlg->fileName if $dlg->execute;
-            if (defined $csv and -e $csv) {
-                $log->info("You have selected $csv to load");
-                $owner->label_csv->text($csv);
-                $self->current->{csv} = $csv;
-            }
-            $owner->show;
-        },
-    );
-    $w->insert(
-        Label => text => '',
-        name => 'label_csv',
-        alignment => ta::Left,
-        autoHeight => 1,
-        autoWidth => 1,
-        origin => [ 20, 90 ],
-        font => { height => 13, style => fs::Bold },
-    );
-    $w->insert(
-        Button => name => 'btn_cancel',
-        text => 'Cancel',
-        autoHeight => 1,
-        autoWidth => 1,
-        origin => [ 20, 40 ],
-        modalResult => mb::Cancel,
-        default => 0,
-        enabled => 1,
-        font => { height => 16, style => fs::Bold },
-        onClick => sub {
-            delete $self->current->{symbol};
-            delete $self->current->{start_date};
-            delete $self->current->{end_date};
-            delete $self->current->{force_download};
-            delete $self->current->{csv};
-        },
-    );
-    $w->insert(
-        Button => name => 'btn_ok',
-        text => 'OK',
-        autoHeight => 1,
-        autoWidth => 1,
-        origin => [ 150, 40 ],
-        modalResult => mb::Ok,
-        default => 1,
-        enabled => 0,
-        font => { height => 16, style => fs::Bold },
-        onClick => sub {
-            my $btn = shift;
-            my $owner = $btn->owner;
-            $self->current->{symbol} = $owner->input_symbol->text;
-            unless (defined $self->current->{start_date}) {
-                my $cal = $owner->cal_start;
-                $self->current->{start_date} = DateTime->new(
-                    year => 1900 + $cal->year(),
-                    month => 1 + $cal->month(),
-                    day => $cal->day(),
-                    time_zone => $self->timezone,
-                );
-            }
-            unless (defined $self->current->{end_date}) {
-                my $cal = $owner->cal_end;
-                $self->current->{end_date} = DateTime->new(
-                    year => 1900 + $cal->year(),
-                    month => 1 + $cal->month(),
-                    day => $cal->day(),
-                    time_zone => $self->timezone,
-                );
-            }
-        },
-    );
-    my $res = $w->execute();
-    $w->end_modal;
-    return $res == mb::Ok;
+    my $wiz = App::financeta::gui::security_wizard->new(owner => $win, gui => $self);
+    return ($wiz->run() == mb::Ok) ? 1 : undef;
 }
 
 sub remove_indicator($) {
@@ -1008,7 +726,7 @@ sub run_and_display_indicator {
             if (exists $iref->{params} and exists $iref->{params}->{CompareWith}) {
                 # ok this is a security.
                 # we need to download the data for this and store it
-                my $bar = $self->progress_bar_create($win, 'Downloading...');
+                my $bar = App::financeta::gui::progress_bar->new(owner => $win, title => 'Downloading...');
                 my $current = $self->current;
                 $iref->{params}->{CompareWith} =~ s/\s//g;
                 $current->{symbol} = $iref->{params}->{CompareWith};
@@ -1024,7 +742,7 @@ sub run_and_display_indicator {
                     $current->{end_date} = $dt;
                 }
                 my ($data2, $symbol2, $csv2) = $self->download_data($bar, $current);
-                $self->progress_bar_close($bar);
+                $bar->close if $bar;
                 return unless (defined $data2 and defined $symbol2);
                 $log->debug("Successfully downloaded data for $symbol2");
                 $iref->{params}->{CompareWith} = $symbol2;
@@ -1437,8 +1155,10 @@ sub add_indicator_wizard {
 
 sub download_data {
     my ($self, $pbar, $current) = @_;
-    $self->progress_bar_update($pbar) if $pbar;
+    $pbar->update(5) if $pbar;
     $current = $self->current unless $current;
+    my $src_index = $current->{source_index} // 0;
+    my $src = @{$self->list_sources}[$src_index];
     my $start = $current->{start_date};
     my $end = $current->{end_date};
     my $symbol = $current->{symbol};
@@ -1449,52 +1169,29 @@ sub download_data {
         $csv = $current->{csv};
         $log->debug("Using $csv as it was chosen");
     }
-    $self->progress_bar_update($pbar) if $pbar;
+    $pbar->update(10) if $pbar;
     my $data;
     unlink $csv if $current->{force_download};
     unless (-e $csv) {
-        my $fq = Finance::QuoteHist->new(
-            symbols => [ $symbol ],
-            start_date => $start->mdy('/'),
-            end_date => $end->mdy('/'),
-            auto_proxy => 1,
-        );
-        $self->progress_bar_update($pbar) if $pbar;
-        open my $fh, '>', $csv or die "$!";
-        my @quotes = ();
-        foreach my $row ($fq->quotes) {
-            my ($sym, $date, $o, $h, $l, $c, $vol) = @$row;
-            my ($yy, $mm, $dd) = split /\//, $date;
-            my $epoch = DateTime->new(
-                year => $yy,
-                month => $mm,
-                day => $dd,
-                hour => 16, minute => 0, second => 0,
-                time_zone => $self->timezone,
-            )->epoch;
-            print $fh "$epoch,$o,$h,$l,$c,$vol\n";
-            push @quotes, pdl($epoch, $o, $h, $l, $c, $vol);
-        }
-        $self->progress_bar_update($pbar) if $pbar;
-        $fq->clear_cache;
-        close $fh;
-        unless (scalar @quotes) {
+        $pbar->update(25) if $pbar;
+        $data = App::financeta::data::ohlcv($src, $symbol, $start, $end, $csv);
+        $pbar->update(35) if $pbar;
+        unless (defined $data) {
             message_box('Error',
                 "Failed to download $symbol data. Check if '$symbol' is correct",
                 mb::Ok | mb::Error);
-            unlink $csv;
+            unlink $csv if -e $csv;
             return;
         }
-        $log->info("$csv has downloaded data for analysis");
-        $self->progress_bar_update($pbar) if $pbar;
-        $data = pdl(@quotes)->transpose;
-        $self->progress_bar_update($pbar) if $pbar;
+        wcols($data, $csv, { COLSEP => ',' });
+        $log->info("File $csv has downloaded data for analysis for symbol $symbol");
+        $pbar->update(75) if $pbar;
     } else {
         ## now read this back into a PDL using rcol
-        $self->progress_bar_update($pbar) if $pbar;
+        $pbar->update(35) if $pbar;
         $log->info("$csv already present. loading it...");
-        $data = PDL->rcols($csv, [], { COLSEP => ',', DEFTYPE => PDL::double});
-        $self->progress_bar_update($pbar) if $pbar;
+        $data = rcols($csv, [], { COLSEP => ',', DEFTYPE => PDL::double});
+        $pbar->update(75) if $pbar;
     }
     return ($data, $symbol, $csv);
 }
@@ -1505,7 +1202,6 @@ sub display_data {
     my @tabsize = $win->size();
     $symbol = $self->current->{symbol} unless defined $symbol;
     my @tabs = grep { $_->name =~ /data_tabs/ } $win->get_widgets();
-    $log->debug("Tabs: @tabs");
     unless (@tabs) {
         $win->insert('Prima::TabbedNotebook',
             name => 'data_tabs',
@@ -1603,7 +1299,7 @@ sub display_data {
     my $tz = $self->timezone;
     # reformat
     foreach my $arr (@$items) {
-        my $dt = DateTime->from_epoch(epoch => $arr->[0], time_zone => $tz)->ymd('-');
+        my $dt = DateTime->from_epoch(epoch => $arr->[0], time_zone => $tz)->datetime(' ');
         $arr->[0] = $dt;
         for (my $i = 1; $i < scalar @$arr; ++$i) {
             $arr->[$i] = '' if $arr->[$i] =~ /BAD/i;
@@ -1754,8 +1450,10 @@ sub save_current_tab {
             } else {
                 $mfile .= '.yml' unless $mfile =~ /\.yml$/; #windows is weird
             }
+            $name //= $tname // '';
             $log->info("Saving tab $name to $mfile");
         } else {
+            $name //= $tname // '';
             $log->warn("Saving the tab $name was canceled.");
             return;
         }
@@ -1808,7 +1506,7 @@ sub load_new_tab {
         force_download => 0,
     };
     $current->{csv} = $saved->{csv} if defined $saved->{csv};
-    my $bar = $self->progress_bar_create($win, 'Loading...');
+    my $bar = App::financeta::gui::progress_bar->new(owner => $win, title => 'Loading...');
     my ($data, $symbol, $csv) = $self->download_data($bar, $current);
     $log->debug("Loading the data into tab");
     $saved->{csv} = $csv if defined $csv;
@@ -1821,7 +1519,7 @@ sub load_new_tab {
     $self->enable_menu_options($win);
     $self->set_tab_info($win, $saved);
     $log->debug("Running the indicators and updating tab");
-    $self->progress_bar_close($bar);
+    $bar->close if $bar;
     if ($self->run_and_display_indicator($win, $data, $symbol,
             $saved->{indicators})) {
         # this is specially done
@@ -2244,6 +1942,9 @@ sub plot_data {
         $log->info("Using Gnuplot to do plotting");
         $log->info("PDL::Graphics::Gnuplot $PDL::Graphics::Gnuplot::VERSION is being used");
         return $self->plot_data_gnuplot(@_);
+    } elsif (lc($self->plot_engine) eq 'highcharts') {
+        $log->info("Using Highcharts to do plotting");
+        return $self->plot_data_highcharts(@_);
     }
     $log->warn($self->plot_engine . " is not supported yet.");
 }
@@ -2258,14 +1959,16 @@ sub plot_data_gnuplot {
     if ($^O =~ /Darwin/i) {
         Capture::Tiny::capture {
             my @terms = PDL::Graphics::Gnuplot::terminfo();
-            $term = 'aqua' if grep {/aqua/} @terms;
-            $term = 'wxt' if grep {/wxt/} @terms;
+            $term = 'aqua' if (grep {/aqua/} @terms) > 0;
+            $term = 'wxt' if (grep {/wxt/} @terms) > 0;
+            $term = 'qt' if (grep {/qt/} @terms) > 0;
         };
     } elsif ($^O =~ /Win32|Cygwin/i) {
         Capture::Tiny::capture {
             my @terms = PDL::Graphics::Gnuplot::terminfo();
-            $term = 'wxt' if (grep {/wxt/} @terms) > 0;
             $term = 'windows' if (grep {/windows/} @terms) > 0;
+            $term = 'wxt' if (grep {/wxt/} @terms) > 0;
+            $term = 'qt' if (grep {/qt/} @terms) > 0;
             # on Cygwin it may be x11
         };
     }
@@ -2757,9 +2460,339 @@ sub plot_data_gnuplot {
     $self->current->{plot_type} = $type if defined $type;
 }
 
+sub plot_data_highcharts {
+    my ($self, $win, $data, $symbol, $type, $indicators, $buysell) = @_;
+    return unless defined $data;
+    $symbol = $self->current->{symbol} unless defined $symbol;
+    $type = $self->current->{plot_type} unless defined $type;
+    ### for OHLC type
+    ## timestamp: data(,(0))
+    ## OHLC: data(, (1)), data(, (2)), data(,(3)), data(,(4))
+    ## Volume: data(, (5))
+    $log->debug("Symbol $symbol. Plot type $type");
+    ### we use Template toolkit to take a template, plug data in via variables
+    ### and auto-generate an HTML page that will then render graphics as needed
+    ### maybe all the data should be in the HTML form for easy generation
+    ### and the JS code has to be fixed and pre-written.
+    ### so the JS code uses variables that are defined in the HTML data that is printed by
+    ### the template
+    my $ttfile = get_file_path('chart.tt');
+    $log->info("Template file path: $ttfile");
+    my $html = File::Spec->catfile($self->tmpdir, lc "$symbol\_$type.html");
+    ## highcharts requires timestamp in milliseconds
+    ## transpose the data for JSON charting
+    my $chart_type_pretty;
+    my @charts = ();
+    $type //= 'OHLC';
+    my $next_y_axis = 0;
+    my $has_volume_chart = 0;
+    if ($type eq 'OHLC' or $type eq 'CANDLE') {
+        $chart_type_pretty = ($type eq 'CANDLE') ? 'Candlestick' : 'OHLC Price';
+        my $ppdl = encode_json pdl($data(,(0)) * 1000, $data(,(1)), $data(,(2)), $data(,(3)), $data(,(4)))->transpose->unpdl;
+        $log->debug($ppdl);
+        push @charts, {
+            title => $symbol,
+            data => $ppdl,
+            type => ($type eq 'CANDLE') ? 'candlestick' : 'ohlc',
+            id => lc "$symbol-$type",
+            y_axis => 0,
+        };
+        $next_y_axis = 1;
+    } elsif ($type eq 'OHLCV' or $type eq 'CANDLEV') {
+        $chart_type_pretty = ($type eq 'CANDLEV') ? 'Candlestick & Volume' : 'OHLC Price & Volume';
+        my $ppdl = encode_json pdl($data(,(0)) * 1000, $data(,(1)), $data(,(2)), $data(,(3)), $data(,(4)))->transpose->unpdl;
+        $log->debug($ppdl);
+        my $vpdl = encode_json pdl($data(,(0)) * 1000, $data(,(5)))->transpose->unpdl;
+        push @charts, {
+            title => $symbol,
+            data => $ppdl,
+            type => ($type eq 'CANDLEV') ? 'candlestick' : 'ohlc',
+            id => lc "$symbol-$type",
+            y_axis => 0,
+        };
+        push @charts, {
+            title => 'Volume',
+            data => $vpdl,
+            type => 'column',
+            id => lc "$symbol-volume",
+            y_axis => 1,
+        };
+        $has_volume_chart = 1;
+        $next_y_axis = 2;
+    } elsif ($type eq 'CLOSEV') {
+        $chart_type_pretty = "Close Price & Volume";
+        my $ppdl = encode_json pdl($data(,(0)) * 1000, $data(,(4)))->transpose->unpdl;
+        my $vpdl = encode_json pdl($data(,(0)) * 1000, $data(,(5)))->transpose->unpdl;
+        $log->debug($ppdl);
+        push @charts, {
+            title => $symbol,
+            data => $ppdl,
+            type => 'line',
+            id => lc "$symbol-$type",
+            y_axis => 0,
+        };
+        push @charts, {
+            title => 'Volume',
+            data => $vpdl,
+            type => 'column',
+            id => lc "$symbol-volume",
+            y_axis => 1,
+        };
+        $has_volume_chart = 1;
+        $next_y_axis = 2;
+    } else {
+        $chart_type_pretty = "Close Price";
+        my $ppdl = encode_json pdl($data(,(0)) * 1000, $data(,(4)))->transpose->unpdl;
+        $log->debug($ppdl);
+        push @charts, {
+            title => $symbol,
+            data => $ppdl,
+            type => 'line',
+            id => lc "$symbol-$type",
+            y_axis => 0,
+        };
+        $next_y_axis = 1;
+    }
+    ## add the indicators
+    if (defined $indicators and scalar @$indicators) {
+        $self->indicator->color_idx(0); # reset color index
+        # ok now create a list of indicators to plot
+        # we have to take the data and plot it into HighCharts structure
+        foreach (@$indicators) {
+            my $iref = $_->{indicator};
+            my $idata = $_->{data};
+            ## we  have custom HighCharts plotting data handlers
+            my $iplot = $self->indicator->get_plot_args($data(,(0)), $idata, $iref);
+            next unless $iplot;
+            if (ref $iplot eq 'ARRAY') {
+                foreach my $ph (@$iplot) {
+                    $ph->{id} = lc "$symbol-$ph->{id}";
+                    $ph->{y_axis} = 0;
+                    $ph->{type} = ($ph->{impulses}) ? 'column' : 'line';
+                    push @charts, $ph;
+                }
+            } elsif (ref $iplot eq 'HASH') {
+                my $iplot_gen = $iplot->{general};
+                if (ref $iplot_gen eq 'ARRAY') {
+                    foreach my $ph (@$iplot_gen) {
+                        $ph->{type} = ($ph->{impulses}) ? 'column' : 'line';
+                        $ph->{id} = lc "$symbol-$ph->{id}";
+                        $ph->{y_axis} = 0;
+                        push @charts, $ph;
+                    }
+                }
+                my $iplot_vol = $iplot->{volume};
+                if ($has_volume_chart and ref $iplot_vol eq 'ARRAY') {
+                    foreach my $ph (@$iplot_vol) {
+                        $ph->{type} = 'column';
+                        $ph->{id} = lc "$symbol-$ph->{id}";
+                        $ph->{y_axis} = 1;
+                        push @charts, $ph;
+                    }
+                }
+                my $iplot_addon = $iplot->{additional};
+                if (ref $iplot_addon eq 'ARRAY') {
+                    foreach my $ph (@$iplot_addon) {
+                        $ph->{type} = ($ph->{impulses}) ? 'column' : 'line';
+                        $ph->{id} = lc "$symbol-$ph->{id}";
+                        $ph->{y_axis} = $next_y_axis;
+                        push @charts, $ph;
+                    }
+                }
+                if ($type =~ /CANDLE/) {
+                    my $iplot_cdl = $iplot->{candle};
+                    $log->debug("Candle: " . dumper($iplot_cdl));
+                    foreach my $ph (@$iplot_cdl) {
+                        $ph->{type} = 'column';
+                        $ph->{id} = lc "$symbol-$ph->{id}";
+                        $ph->{y_axis} = 0;
+                        push @charts, $ph;
+                    }
+                }
+            } else {
+                $log->warn('Unable to handle plot arguments in ' . ref($iplot) . ' form!');
+            }
+        }
+    }
+    ## handle buys and sells
+    ##TODO: handle realtime P&L and draw an area plot
+    if (defined $buysell and ref $buysell eq 'HASH' and
+        defined $buysell->{buys} and defined $buysell->{sells}) {
+        my $buys = $buysell->{buys};
+        my $sells = $buysell->{sells};
+        if (ref $buys eq 'PDL' and ref $sells eq 'PDL') {
+            my $bpdl = pdl($data(,(0)) * 1000, $buys)->transpose;
+            my $bidx = $bpdl((1))->which;#check if !0 is true
+            my $bpdlclean = $bpdl->dice_axis(1, $bidx);
+            $log->debug($bpdlclean);
+            my $bpdljs = encode_json $bpdlclean->unpdl;
+            push @charts, {
+                title => "Buy Signals",
+                data => $bpdljs,
+                type => 'line',
+                id => lc "$symbol-buy-signals",
+                y_axis => 0,
+                is_signal => 1,
+                marker_symbol => 'triangle',
+                marker_color => 'green',
+            };
+            my $spdl = pdl($data(,(0)) * 1000, $sells)->transpose;
+            my $sidx = $spdl((1))->which;#check if !0 is true
+            my $spdlclean = $spdl->dice_axis(1, $sidx);
+            $log->debug($spdlclean);
+            my $spdljs = encode_json $spdlclean->unpdl;
+            push @charts, {
+                title => "Sell Signals",
+                data => $spdljs,
+                type => 'line',
+                id => lc "$symbol-sell-signals",
+                y_axis => 0,
+                is_signal => 1,
+                marker_symbol => 'triangle-down',
+                marker_color => 'red',
+            };
+        } else {
+            $log->warn("Unable to plot invalid buy-sell data");
+        }
+    }
+    my %y_axes_index = ();
+    foreach (@charts) {
+        $y_axes_index{$_->{y_axis}}++;
+    }
+    my $cheight = 400;
+    foreach (keys %y_axes_index) {
+        $cheight += 200;
+    }
+    my $ttconf = {
+        page => {
+            title => "$chart_type_pretty plot of $symbol",
+        },
+        chart => {
+            height => $cheight . "px",
+            yaxes_index => [sort keys(%y_axes_index)],
+            charts => \@charts,
+            title => $symbol,
+        },
+    };
+    my $tt = Template->new({ ABSOLUTE => 1 });
+    my $ret = $tt->process($ttfile, $ttconf, $html, { binmode => ':utf8' });
+    if ($ret) {
+        my $url = "file://$html";
+        my $ok = Browser::Open::open_browser($url, 1);
+        if (not defined $ok) {
+            message("Error finding a browser to open $url");
+            $log->warn("Error finding a default browser to open $url");
+        } elsif ($ok != 0) {
+            message("Error opening $url");
+            $log->warn("Error opening $url in default browser");
+        }
+    } else {
+        $log->error("Failed to generate $html from $ttfile: " . $tt->error() . "\n");
+        message("Failed to plot chart in a browser!");
+    }
+    # make the current plot type the type
+    $self->current->{plot_type} = $type if defined $type;
+}
+
 1;
+
 __END__
 ### COPYRIGHT: 2013-2023. Vikas N. Kumar. All Rights Reserved.
 ### AUTHOR: Vikas N Kumar <vikas@cpan.org>
 ### DATE: 3rd Jan 2014
 ### LICENSE: Refer LICENSE file
+
+=head1 NAME
+
+App::financeta::gui
+
+=head1 SYNOPSIS
+
+App::financeta::gui is a perl module allowing the user to perform technical
+analysis on financial data stored as PDLs. It is the basis of the graphics
+application L<App::financeta> which can be used by users to do financial stocks
+research with Technical Analysis.
+
+=head1 VERSION
+
+0.15
+
+=head1 METHODS
+
+=over
+
+=item B<new>
+
+Creates a new instance of C<App::financeta::gui>. Takes in various properties that
+the user might want to override. Check the B<PROPERTIES> section to view the
+different properties.
+
+=item B<run>
+
+This function starts the graphical user interface (GUI) and uses
+L<POE::Loop::Prima> and L<Prima> to do all its work. This is our current choice
+of the GUI framework but it need not be in the future.
+
+=back
+
+=head1 PROPERTIES
+
+=over
+
+=item B<debug>
+
+Turn on debug printing of comments on the terminal. Set it to 1 to enable and 0
+or undef to disable.
+
+=item B<timezone>
+
+Default is set to I<America/New_York>.
+
+=item B<brand>
+
+Default is set to L<App::financeta::gui>. Changing this will change the application
+name. Useful if the user wants to embed C<App::financeta::gui> in another
+application.
+
+=item B<icon>
+
+Picks up the file C<icon.gif> from distribution sharedir as the application icon
+but can be given as a C<Prima::Icon> object as well.
+
+=item B<tmpdir>
+
+The default on Windows is C<$ENV{TMP}> or C<$ENV{TEMP}> and on Unix based
+systems is C<$ENV{TMPDIR}> if it is set or C</tmp> if none are set.
+The CSV files that are downloaded and temporary data is stored here.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<PDL::Finance::TA>
+
+This module will be used to add technical analysis to the charts.
+
+=item L<App::financeta>
+
+This module just runs the application that calls C<App::financeta::gui>.
+
+=item L<financeta>
+
+The commandline script that calls C<App::financeta>.
+
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2013-2023. Vikas N Kumar <vikas@cpan.org>. All Rights Reserved.
+
+=head1 LICENSE
+
+This is free software. You can redistribute it or modify it under the terms of
+GNU General Public License version 3. Refer LICENSE file in the top level source directory for more
+information.
+
