@@ -1,5 +1,14 @@
 Revision history for Perl module Math::MPFR
 
+4.31
+  - Reduce the testing done in t/LongDouble.t to simply test the correctness of
+    Rmpfr_set_LD() and Rmpfr_get_LD().
+  - Add log_2(),log_10(), sind(), cosd(), tand() and tangent() functions.
+  - Optionally allow (via setting of $Math::MPFR::PERL_INFNAN) infs and nans to be
+    stringified by nv2a() to the same as perl provides. Previously they have been
+    stringified by nv2a() strictly as "Inf", "-Inf" and "Nan" - which could differ
+    from perl's presentation. See "DISPLAYING INFS AND NANS" in the documentation.
+
 4.29
   - Add new (in MPFR-4.3.0) function Rmpfr_compound and new test script t/compound.t.
   - In math_mpfr_include.h, re-specify MATH_MPFR_NV_MAX in hex, as 32-bit Windows

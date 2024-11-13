@@ -5,7 +5,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -57,7 +57,7 @@
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Portability::Files" : "0",
-            "Test::Spelling" : "0.12",
+            "Test::Spelling" : "0.17",
             "Test::Version" : "1",
             "perl" : "5.006"
          }
@@ -66,8 +66,7 @@
          "recommends" : {
             "HTTP::CookieJar" : "0.001",
             "IO::Socket::IP" : "0.32",
-            "IO::Socket::SSL" : "1.42",
-            "Mozilla::CA" : "20160104",
+            "IO::Socket::SSL" : "1.968",
             "Net::SSLeay" : "1.49"
          },
          "requires" : {
@@ -81,9 +80,6 @@
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
-         },
-         "suggests" : {
-            "IO::Socket::SSL" : "1.56"
          }
       },
       "test" : {
@@ -111,7 +107,7 @@
    "provides" : {
       "HTTP::Tiny" : {
          "file" : "lib/HTTP/Tiny.pm",
-         "version" : "0.088"
+         "version" : "0.090"
       }
    },
    "release_status" : "stable",
@@ -126,7 +122,7 @@
          "web" : "https://github.com/Perl-Toolchain-Gang/HTTP-Tiny"
       }
    },
-   "version" : "0.088",
+   "version" : "0.090",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Alan Gardner <gardner@pythian.com>",
@@ -139,7 +135,6 @@
       "Claes Jakobsson <claes@surfar.nu>",
       "Clinton Gormley <clint@traveljury.com>",
       "Craig A. Berry <craigberry@mac.com>",
-      "Craig Berry <cberry@cpan.org>",
       "David Golden <xdg@xdg.me>",
       "David Mitchell <davem@iabyn.com>",
       "Dean Pearce <pearce@pythian.com>",
@@ -175,8 +170,8 @@
       "Tony Cook <tony@develop-help.com>",
       "Xavier Guimard <yadd@debian.org>"
    ],
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

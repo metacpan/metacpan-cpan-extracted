@@ -1,11 +1,227 @@
 Revision History for Muster
 ===========================
 
-v0.62 2017-10-12
+v0.92 2024-11-13
 ----------------
 
-* 2017-10-12 07:43:15 +1100
-  removed dependency on NYTProf
+* 2024-11-13 03:11:23 +1100
+  tweaking the sqlreport hook
+* 2023-09-07 17:04:48 +1000
+  updated attrs for Img hook
+* 2023-08-31 12:00:55 +1000
+  Merge branch 'master' of github.com:rubykat/Muster
+* 2023-08-31 12:00:25 +1000
+  Slight changes due to changes in File::Sticker
+* 2023-05-23 02:06:19 +1000
+  adding MANIFEST.SKIP
+* 2021-11-09 10:09:52 +1100
+  there is something odd with rowids
+* 2021-08-31 04:24:43 +1000
+  bug fix
+* 2021-08-28 16:37:48 +1000
+  CSS3 based toggling for the win
+* 2021-08-28 13:13:37 +1000
+  tweak
+* 2021-08-28 12:59:43 +1000
+  tweak
+* 2021-08-28 12:56:46 +1000
+  putting things in head tag, working, yay
+* 2021-08-28 12:43:39 +1000
+  putting things in head tag, still not working
+* 2021-08-28 12:30:55 +1000
+  putting things in head tag
+* 2021-08-28 12:17:45 +1000
+  putting things in head tag
+* 2021-08-28 11:13:56 +1000
+  got rid of the who/where/what thing
+* 2021-08-28 11:03:15 +1000
+  separated out to different plugin
+* 2021-06-19 15:15:09 +1000
+  includepage alongside HeadFoot can do binary-file pages
+* 2021-06-19 11:55:41 +1000
+  limit is limit, pagination is pagination
+* 2021-06-19 02:14:14 +1000
+  Fix the previous fix
+* 2021-06-19 00:54:30 +1000
+  fix some render/redirect route stuff
+* 2021-06-18 17:00:46 +1000
+  more fixing relative links
+* 2021-06-18 16:37:01 +1000
+  no more pagelink
+* 2021-06-18 15:20:23 +1000
+  no more pagesrclink
+* 2021-06-18 15:15:30 +1000
+  more making links relative
+* 2021-06-18 13:39:30 +1000
+  trying to make links relative
+* 2021-06-18 13:28:34 +1000
+  trying to make links relative
+* 2021-06-18 11:04:57 +1000
+  new tests
+* 2021-06-18 10:47:06 +1000
+  added a test
+* 2021-06-18 10:39:43 +1000
+  print message on startup
+* 2021-06-18 10:33:17 +1000
+  version bump
+* 2021-06-18 10:33:09 +1000
+  display version on startup
+* 2021-06-18 10:32:44 +1000
+  removing route prefix
+* 2021-06-17 09:19:54 +1000
+  fixing some warnings
+* 2021-06-17 08:24:35 +1000
+  don't process if you don't need to
+* 2021-06-17 08:10:07 +1000
+  next pass on binary-file pages
+* 2021-06-16 21:20:29 +1000
+  that darned UTF-8 thing again
+* 2021-06-16 20:35:07 +1000
+  check for binary
+* 2021-06-16 20:26:43 +1000
+  setting default values per-extension
+* 2021-06-16 16:31:51 +1000
+  binary-file pages, next bit
+* 2021-06-16 16:27:50 +1000
+  binary-file pages, next bit
+* 2021-06-16 14:16:34 +1000
+  page_format now render_format
+* 2021-06-15 17:57:24 +1000
+  well that didn't work
+* 2021-06-15 17:51:09 +1000
+  first pass on sqlreport splitting
+* 2021-06-15 17:01:00 +1000
+  no more _src
+* 2021-06-15 16:59:08 +1000
+  no more _src
+* 2021-06-15 16:57:32 +1000
+  no more _src
+* 2021-06-15 16:10:45 +1000
+  attempting to fix image problem
+* 2021-06-15 16:03:18 +1000
+  dealing with source pages
+* 2021-06-15 15:51:35 +1000
+  dealing with source pages
+* 2021-06-15 15:49:00 +1000
+  dealing with source pages
+* 2021-06-15 15:39:26 +1000
+  attempting to fix image problem
+* 2021-06-15 15:29:15 +1000
+  attempting to fix image problem
+* 2021-06-15 15:11:49 +1000
+  attempting to fix image problem
+* 2021-06-15 14:59:23 +1000
+  attempting to fix image problem
+* 2021-06-15 14:54:56 +1000
+  attempting to fix image problem
+* 2021-06-15 14:47:12 +1000
+  attempting to fix image problem
+* 2021-06-15 14:46:59 +1000
+  attempting to fix image problem
+* 2021-06-15 13:33:50 +1000
+  fix date bug
+* 2021-06-15 13:25:40 +1000
+  tweak formatting
+* 2021-06-15 13:11:51 +1000
+  more derived fields stuff
+* 2021-06-15 12:42:46 +1000
+  more derived fields stuff
+* 2021-06-14 16:36:50 +1000
+  trying to make a datetime
+* 2021-06-14 16:23:28 +1000
+  trying to make a datetime
+* 2021-06-14 13:09:14 +1000
+  oops
+* 2021-06-14 13:02:30 +1000
+  more verbose failure msg
+* 2021-06-14 12:50:17 +1000
+  revamping pages, stage 2
+* 2021-06-14 12:07:38 +1000
+  revamping pages, stage 2
+* 2021-06-14 12:06:00 +1000
+  revamping pages, stage 2
+* 2021-06-14 10:27:51 +1000
+  tweak
+* 2021-06-14 09:31:22 +1000
+  tweak
+* 2021-06-14 08:49:43 +1000
+  more better checking
+* 2021-06-14 08:14:17 +1000
+  oops, db-name
+* 2021-06-14 08:08:40 +1000
+  is_page is now flipped to is_binary
+* 2021-06-14 00:43:37 +1000
+  words not wordcount
+* 2021-06-13 23:47:56 +1000
+  grandlocal head/foot
+* 2021-06-13 23:46:06 +1000
+  tweak
+* 2021-06-13 23:17:26 +1000
+  major change - grandparent_page is now primary
+* 2021-06-13 23:16:53 +1000
+  grandparent page
+* 2021-06-13 23:14:34 +1000
+  grandparent page
+* 2021-06-13 23:04:58 +1000
+  tweaking more things with page listing + including
+* 2021-06-13 22:25:08 +1000
+  improving pagespec
+* 2021-06-12 21:33:29 +1000
+  pmap formatting
+* 2021-06-12 20:20:18 +1000
+  add SIMPLE condition to template
+* 2021-06-11 17:28:42 +1000
+  added grandparent_page to derived fields
+* 2021-05-13 00:37:17 +1000
+  version bump
+* 2021-05-13 00:36:55 +1000
+  slightly more informative errors
+* 2021-04-02 13:40:47 +1100
+  docs
+* 2021-04-02 13:39:31 +1100
+  version bump
+* 2021-04-02 13:39:04 +1100
+  making image defaults a hidden field
+* 2021-04-02 12:11:15 +1100
+  even more efficient
+* 2021-04-01 14:32:02 +1100
+  tweak
+* 2021-04-01 14:28:07 +1100
+  Improved speed for flat-fields table generation.
+* 2019-11-19 12:48:42 +1100
+  dealing with undefined values
+* 2019-11-19 12:28:17 +1100
+  use Text::NeatTemplate to format FieldSubst
+* 2019-08-11 00:17:22 +1000
+  unwarranted assumptions fixed
+* 2019-08-10 17:10:11 +1000
+  trying to speed up multi-page updates
+* 2019-03-17 00:28:06 +1100
+  fixed bug with new ImageMagick version
+* 2019-03-17 00:26:18 +1100
+  trying to fix Img bug
+* 2019-01-16 14:08:55 +1100
+  version bump
+* 2019-01-16 14:08:31 +1100
+  formatting
+* 2018-05-25 02:25:37 +1000
+  version bump
+* 2018-05-25 02:24:46 +1000
+  make the repeat_ functions be separated by newlines
+* 2018-05-25 02:19:51 +1000
+  newline tweaking
+* 2018-01-27 16:10:19 +1100
+  YYP bug
+* 2017-10-31 13:22:05 +1100
+  removing dyncost
+* 2017-10-31 13:19:19 +1100
+  removing dyncost
+* 2017-10-31 13:19:02 +1100
+  removing dyncost
+* 2017-10-31 13:00:12 +1100
+  removed Costings hook
+* 2017-10-31 13:00:06 +1100
+  removed Costings hook
 
 ===================================
 End of changes in the last 365 days

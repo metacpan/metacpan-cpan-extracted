@@ -1,5 +1,5 @@
 package Muster::Hook::Shortcut;
-$Muster::Hook::Shortcut::VERSION = '0.62';
+$Muster::Hook::Shortcut::VERSION = '0.92';
 use Mojo::Base 'Muster::Hook::Directives';
 use Muster::LeafFile;
 use Muster::Hooks;
@@ -13,7 +13,7 @@ Muster::Hook::Shortcut - Muster shortcut directive
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 

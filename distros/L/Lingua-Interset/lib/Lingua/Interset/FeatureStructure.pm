@@ -4,7 +4,7 @@
 package Lingua::Interset::FeatureStructure;
 use strict;
 use warnings;
-our $VERSION = '3.015';
+our $VERSION = '3.016';
 
 use utf8;
 use open ':utf8';
@@ -2141,7 +2141,7 @@ sub is_adposition {my $self = shift; return $self->contains('pos', 'adp');}
 sub is_adverb {my $self = shift; return $self->contains('pos', 'adv');}
 
 #------------------------------------------------------------------------------
-sub is_affirmative {my $self = shift; return $self->contains('negativeness', 'pos');}
+sub is_affirmative {my $self = shift; return $self->contains('polarity', 'pos');}
 
 #------------------------------------------------------------------------------
 sub is_allative {my $self = shift; return $self->contains('case', 'all');}
@@ -2408,7 +2408,7 @@ sub is_narrative {my $self = shift; return $self->contains('tense', 'past') && $
 sub is_necessitative {my $self = shift; return $self->contains('mood', 'nec');}
 
 #------------------------------------------------------------------------------
-sub is_negative {my $self = shift; return $self->contains('negativeness', 'neg') || $self->prontype() eq 'neg';} # prontype: don't use contains() here, we don't want true on 'ind|tot|neg'
+sub is_negative {my $self = shift; return $self->contains('polarity', 'neg') || $self->prontype() eq 'neg';} # prontype: don't use contains() here, we don't want true on 'ind|tot|neg'
 
 #------------------------------------------------------------------------------
 sub is_nominative {my $self = shift; return $self->contains('case', 'nom');}
@@ -2988,7 +2988,7 @@ Lingua::Interset::FeatureStructure - Definition of morphosyntactic features and 
 
 =head1 VERSION
 
-version 3.015
+version 3.016
 
 =head1 SYNOPSIS
 

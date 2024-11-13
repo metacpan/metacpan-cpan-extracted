@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 require XSLoader;
-our $VERSION = '0.0201';
+our $VERSION = '0.0202';
 
 XSLoader::load('Math::NumberBase::XS', $VERSION);
 

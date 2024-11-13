@@ -4,8 +4,17 @@
 class Net::SSLeay::X509_STORE_CTX {
   
   use Net::SSLeay::Error;
+  use Net::SSLeay::X509;
   
   # Instance Methods
+  native method set_error : void ($s : int);
+  
+  native method get_error : int ();
+  
+  native method get_error_depth : int ();
+  
+  native method get_current_cert : Net::SSLeay::X509 ();
+  
   native method DESTROY : void ();
   
 }

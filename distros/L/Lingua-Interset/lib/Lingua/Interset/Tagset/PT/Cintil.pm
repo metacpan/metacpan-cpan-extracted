@@ -7,7 +7,7 @@
 package Lingua::Interset::Tagset::PT::Cintil;
 use strict;
 use warnings;
-our $VERSION = '3.015';
+our $VERSION = '3.016';
 
 use utf8;
 use open ':utf8';
@@ -693,7 +693,7 @@ Lingua::Interset::Tagset::PT::Cintil - Driver for the Portuguese tagset of the C
 
 =head1 VERSION
 
-version 3.015
+version 3.016
 
 =head1 SYNOPSIS
 

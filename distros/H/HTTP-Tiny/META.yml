@@ -22,7 +22,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,12 +39,11 @@ no_index:
 provides:
   HTTP::Tiny:
     file: lib/HTTP/Tiny.pm
-    version: '0.088'
+    version: '0.090'
 recommends:
   HTTP::CookieJar: '0.001'
   IO::Socket::IP: '0.32'
-  IO::Socket::SSL: '1.42'
-  Mozilla::CA: '20160104'
+  IO::Socket::SSL: '1.968'
   Net::SSLeay: '1.49'
 requires:
   Carp: '0'
@@ -61,7 +60,7 @@ resources:
   bugtracker: https://github.com/Perl-Toolchain-Gang/HTTP-Tiny/issues
   homepage: https://github.com/Perl-Toolchain-Gang/HTTP-Tiny
   repository: https://github.com/Perl-Toolchain-Gang/HTTP-Tiny.git
-version: '0.088'
+version: '0.090'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Alan Gardner <gardner@pythian.com>'
@@ -74,7 +73,6 @@ x_contributors:
   - 'Claes Jakobsson <claes@surfar.nu>'
   - 'Clinton Gormley <clint@traveljury.com>'
   - 'Craig A. Berry <craigberry@mac.com>'
-  - 'Craig Berry <cberry@cpan.org>'
   - 'David Golden <xdg@xdg.me>'
   - 'David Mitchell <davem@iabyn.com>'
   - 'Dean Pearce <pearce@pythian.com>'
@@ -109,6 +107,6 @@ x_contributors:
   - 'Tom Hukins <tom@eborcom.com>'
   - 'Tony Cook <tony@develop-help.com>'
   - 'Xavier Guimard <yadd@debian.org>'
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,5 +1,5 @@
 package Muster::Hooks;
-$Muster::Hooks::VERSION = '0.62';
+$Muster::Hooks::VERSION = '0.92';
 #ABSTRACT: Muster::Hooks - scanning and processing hooks
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::Hooks - scanning and processing hooks
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -39,9 +39,9 @@ Hooks are currently in scanning phase where pages are scanned for meta-data.
 
 Hooks are currently in build/assemble phase, where the pages are read and built.
 
-=item $PHASE_FORMAT
+=item $PHASE_FILTER
 
-Hooks are currently in format phase, where the page has already been converted to HTML, and needs post-processing.
+Hooks are currently in filter phase, where the page has already been converted to HTML, and needs post-processing.
 
 =back
 
@@ -92,6 +92,22 @@ sub init {
         }
     }
 
+    # Filters use register_filter instead
+    # This will be a no-op for most hooks.
+    $self->{filters} = {};
+    $self->{filterorder} = [];
+    foreach my $mod (@{$config->{hooks}})
+    {
+        if ($phooks{$mod})
+        {
+            $phooks{$mod}->register_filter($self,$config);
+        }
+        else
+        {
+            warn "Filter '$mod' does not exist";
+        }
+    }
+
     return $self;
 } # init
 
@@ -111,7 +127,7 @@ sub add_hook {
 
 Run the hooks over the given leaf.
 Leaf must already be created and reclassified.
-The "scanning" flag says whether we are scanning or assembling.
+The "phase" flag says what phase we are in (e.g. scanning)
     
     $leaf = $self->run_hooks(leaf=>$leaf,phase=>$phase);
 
@@ -130,6 +146,40 @@ sub run_hooks {
 
     return $leaf;
 } # run_hooks
+
+=head2 add_filter
+
+Add a post-processing filter.
+
+=cut
+sub add_filter {
+    my ($self, $name, $call) = @_;
+    $self->{filters}->{$name} = $call;
+    push @{$self->{filterorder}}, $name;
+    return $self;
+} # add_filter
+
+=head2 run_filters
+
+Run post-processing filters over already-rendered HTML.
+    
+    $html = $self->run_filters(html=>$html,phase=>$phase);
+
+=cut
+
+sub run_filters {
+    my $self = shift;
+    my %args = @_;
+
+    my $html = $args{html};
+
+    foreach my $hn (@{$self->{filterorder}})
+    {
+        $html = $self->{filters}->{$hn}(%args);
+    }
+
+    return $html;
+} # run_filters
 
 1; # End of Muster::Hooks
 __END__

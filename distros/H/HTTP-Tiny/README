@@ -2,7 +2,7 @@ NAME
     HTTP::Tiny - A small, simple, correct HTTP/1.1 client
 
 VERSION
-    version 0.088
+    version 0.090
 
 SYNOPSIS
         use HTTP::Tiny;
@@ -41,49 +41,49 @@ METHODS
     This constructor returns a new HTTP::Tiny object. Valid attributes
     include:
 
-    *   "agent" — A user-agent string (defaults to 'HTTP-Tiny/$VERSION'). If
-        "agent" — ends in a space character, the default user-agent string
+    *   "agent" â A user-agent string (defaults to 'HTTP-Tiny/$VERSION'). If
+        "agent" â ends in a space character, the default user-agent string
         is appended.
 
-    *   "cookie_jar" — An instance of HTTP::CookieJar — or equivalent class
+    *   "cookie_jar" â An instance of HTTP::CookieJar â or equivalent class
         that supports the "add" and "cookie_header" methods
 
-    *   "default_headers" — A hashref of default headers to apply to
+    *   "default_headers" â A hashref of default headers to apply to
         requests
 
-    *   "local_address" — The local IP address to bind to
+    *   "local_address" â The local IP address to bind to
 
-    *   "keep_alive" — Whether to reuse the last connection (if for the same
+    *   "keep_alive" â Whether to reuse the last connection (if for the same
         scheme, host and port) (defaults to 1)
 
-    *   "max_redirect" — Maximum number of redirects allowed (defaults to 5)
+    *   "max_redirect" â Maximum number of redirects allowed (defaults to 5)
 
-    *   "max_size" — Maximum response size in bytes (only when not using a
+    *   "max_size" â Maximum response size in bytes (only when not using a
         data callback). If defined, requests with responses larger than this
         will return a 599 status code.
 
-    *   "http_proxy" — URL of a proxy server to use for HTTP connections
-        (default is $ENV{http_proxy} — if set)
+    *   "http_proxy" â URL of a proxy server to use for HTTP connections
+        (default is $ENV{http_proxy} â if set)
 
-    *   "https_proxy" — URL of a proxy server to use for HTTPS connections
-        (default is $ENV{https_proxy} — if set)
+    *   "https_proxy" â URL of a proxy server to use for HTTPS connections
+        (default is $ENV{https_proxy} â if set)
 
-    *   "proxy" — URL of a generic proxy server for both HTTP and HTTPS
-        connections (default is $ENV{all_proxy} — if set)
+    *   "proxy" â URL of a generic proxy server for both HTTP and HTTPS
+        connections (default is $ENV{all_proxy} â if set)
 
-    *   "no_proxy" — List of domain suffixes that should not be proxied.
+    *   "no_proxy" â List of domain suffixes that should not be proxied.
         Must be a comma-separated string or an array reference. (default is
-        $ENV{no_proxy} —)
+        $ENV{no_proxy} â)
 
-    *   "timeout" — Request timeout in seconds (default is 60) If a socket
+    *   "timeout" â Request timeout in seconds (default is 60) If a socket
         open, read or write takes longer than the timeout, the request
         response status code will be 599.
 
-    *   "verify_SSL" — A boolean that indicates whether to validate the
-        TLS/SSL certificate of an "https" — connection (default is true).
+    *   "verify_SSL" â A boolean that indicates whether to validate the
+        TLS/SSL certificate of an "https" â connection (default is true).
         Changed from false to true in version 0.083.
 
-    *   "SSL_options" — A hashref of "SSL_*" — options to pass through to
+    *   "SSL_options" â A hashref of "SSL_*" â options to pass through to
         IO::Socket::SSL
 
     *   $ENV{PERL_HTTP_TINY_SSL_INSECURE_BY_DEFAULT} - Changes the default
@@ -107,7 +107,7 @@ METHODS
     persistent connections across multiple destinations, use multiple
     HTTP::Tiny objects.
 
-    See "SSL SUPPORT" for more on the "verify_SSL" and "SSL_options"
+    See "TLS/SSL SUPPORT" for more on the "verify_SSL" and "SSL_options"
     attributes.
 
   get|head|put|post|patch|delete
@@ -115,10 +115,10 @@ METHODS
         $response = $http->get($url, \%options);
         $response = $http->head($url);
 
-    These methods are shorthand for calling "request()" for the given
-    method. The URL must have unsafe characters escaped and international
-    domain names encoded. See "request()" for valid options and a
-    description of the response.
+    These methods are shorthand for calling request() for the given method.
+    The URL must have unsafe characters escaped and international domain
+    names encoded. See request() for valid options and a description of the
+    response.
 
     The "success" field of the response will be true if the status code is
     2XX.
@@ -131,14 +131,14 @@ METHODS
     a form data hash or array reference to the given URL with a
     "content-type" of "application/x-www-form-urlencoded". If data is
     provided as an array reference, the order is preserved; if provided as a
-    hash reference, the terms are sorted on key and value for consistency.
-    See documentation for the "www_form_urlencode" method for details on the
+    hash reference, the terms are sorted by key for consistency. See
+    documentation for the "www_form_urlencode" method for details on the
     encoding.
 
     The URL must have unsafe characters escaped and international domain
-    names encoded. See "request()" for valid options and a description of
-    the response. Any "content-type" header or content in the options
-    hashref will be ignored.
+    names encoded. See request() for valid options and a description of the
+    response. Any "content-type" header or content in the options hashref
+    will be ignored.
 
     The "success" field of the response will be true if the status code is
     2XX.
@@ -190,23 +190,23 @@ METHODS
 
     Valid options are:
 
-    *   "headers" — A hashref containing headers to include with the
+    *   "headers" â A hashref containing headers to include with the
         request. If the value for a header is an array reference, the header
         will be output multiple times with each value in the array. These
         headers over-write any default headers.
 
-    *   "content" — A scalar to include as the body of the request OR a code
+    *   "content" â A scalar to include as the body of the request OR a code
         reference that will be called iteratively to produce the body of the
         request
 
-    *   "trailer_callback" — A code reference that will be called if it
+    *   "trailer_callback" â A code reference that will be called if it
         exists to provide a hashref of trailing headers (only used with
         chunked transfer-encoding)
 
-    *   "data_callback" — A code reference that will be called for each
+    *   "data_callback" â A code reference that will be called for each
         chunks of the response body received.
 
-    *   "peer" — Override host resolution and force all connections to go
+    *   "peer" â Override host resolution and force all connections to go
         only to a specific peer address, regardless of the URL of the
         request. This will include any redirections! This options should be
         used with extreme caution (e.g. debugging or very special
@@ -240,22 +240,22 @@ METHODS
     The "request" method returns a hashref containing the response. The
     hashref will have the following keys:
 
-    *   "success" — Boolean indicating whether the operation returned a 2XX
+    *   "success" â Boolean indicating whether the operation returned a 2XX
         status code
 
-    *   "url" — URL that provided the response. This is the URL of the
+    *   "url" â URL that provided the response. This is the URL of the
         request unless there were redirections, in which case it is the last
         URL queried in a redirection chain
 
-    *   "status" — The HTTP status code of the response
+    *   "status" â The HTTP status code of the response
 
-    *   "reason" — The response phrase returned by the server
+    *   "reason" â The response phrase returned by the server
 
-    *   "content" — The body of the response. If the response does not have
+    *   "content" â The body of the response. If the response does not have
         any content or if a data callback is provided to consume the
         response body, this will be the empty string
 
-    *   "headers" — A hashref of header fields. All header field names will
+    *   "headers" â A hashref of header fields. All header field names will
         be normalized to be lower case. If a header is repeated, the value
         will be an arrayref; it will otherwise be a scalar string containing
         the value
@@ -315,8 +315,8 @@ TLS/SSL SUPPORT
     Direct "https" connections are supported only if IO::Socket::SSL 1.56 or
     greater and Net::SSLeay 1.49 or greater are installed. An error will
     occur if new enough versions of these modules are not installed or if
-    the TLS encryption fails. You can also use "HTTP::Tiny::can_ssl()"
-    utility function that returns boolean to see if the required modules are
+    the TLS encryption fails. You can also use HTTP::Tiny::can_ssl() utility
+    function that returns boolean to see if the required modules are
     installed.
 
     An "https" connection may be made via an "http" proxy that supports the
@@ -341,17 +341,17 @@ TLS/SSL SUPPORT
     CA, this will protect against machine-in-the-middle attacks
     <http://en.wikipedia.org/wiki/Machine-in-the-middle_attack>.
 
-    Certificate verification requires a file containing trusted CA
-    certificates.
+    Certificate verification requires a file or directory containing trusted
+    CA certificates.
 
-    If the environment variable "SSL_CERT_FILE" is present, HTTP::Tiny will
-    try to find a CA certificate file in that location.
+    IO::Socket::SSL::default_ca() is called to detect the default location
+    of your CA certificates. This also supports the environment variables
+    "SSL_CERT_FILE" and "SSL_CERT_DIR", and will fail over to Mozilla::CA if
+    no certs are found.
 
-    If the Mozilla::CA module is installed, HTTP::Tiny will use the CA file
-    included with it as a source of trusted CA's.
-
-    If that module is not available, then HTTP::Tiny will search several
-    system-specific default locations for a CA certificate file:
+    If IO::Socket::SSL::default_ca() is not able to find usable CA
+    certificates, HTTP::Tiny will search several well-known system-specific
+    default locations for a CA certificate file as a last resort:
 
     *   /etc/ssl/certs/ca-certificates.crt
 
@@ -374,7 +374,7 @@ TLS/SSL SUPPORT
 
     If you desire complete control over TLS/SSL connections, the
     "SSL_options" attribute lets you provide a hash reference that will be
-    passed through to "IO::Socket::SSL::start_SSL()", overriding any options
+    passed through to IO::Socket::SSL::start_SSL(), overriding any options
     set by HTTP::Tiny. For example, to provide your own trusted CA file:
 
         SSL_options => {
@@ -491,8 +491,6 @@ SEE ALSO
     *   LWP::UserAgent - If HTTP::Tiny isn't enough for you, this is the
         "standard" way to do things
 
-    *   Mozilla::CA - Required if you want to validate SSL certificates
-
     *   Net::SSLeay - Required for SSL support
 
 SUPPORT
@@ -535,8 +533,6 @@ CONTRIBUTORS
 
     *   Craig A. Berry <craigberry@mac.com>
 
-    *   Craig Berry <cberry@cpan.org>
-
     *   David Golden <xdg@xdg.me>
 
     *   David Mitchell <davem@iabyn.com>
@@ -577,9 +573,9 @@ CONTRIBUTORS
 
     *   Olaf Alders <olaf@wundersolutions.com>
 
-    *   Olivier Mengué <dolmen@cpan.org>
+    *   Olivier MenguÃ© <dolmen@cpan.org>
 
-    *   Petr Písař <ppisar@redhat.com>
+    *   Petr PÃ­saÅ <ppisar@redhat.com>
 
     *   sanjay-cpu <snjkmr32@gmail.com>
 
@@ -589,7 +585,7 @@ CONTRIBUTORS
 
     *   SkyMarshal <skymarshal1729@gmail.com>
 
-    *   Sören Kornetzki <soeren.kornetzki@delti.com>
+    *   SÃ¶ren Kornetzki <soeren.kornetzki@delti.com>
 
     *   Steve Grazzini <steve.grazzini@grantstreet.com>
 
@@ -606,7 +602,7 @@ CONTRIBUTORS
     *   Xavier Guimard <yadd@debian.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by Christian Hansen.
+    This software is copyright (c) 2024 by Christian Hansen.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,12 +1,12 @@
 package Muster::Hook::Img;
-$Muster::Hook::Img::VERSION = '0.62';
+$Muster::Hook::Img::VERSION = '0.92';
 =head1 NAME
 
 Muster::Hook::Img - Muster image and thumbnailing directive
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -49,7 +49,7 @@ sub register {
     {
         mkdir $self->{img_dir};
     }
-    $self->{img_url} = $conf->{route_prefix} . 'images/';
+    $self->{img_url} = 'images/';
 
     $hookmaster->add_hook('img' => sub {
             my %args = @_;
@@ -93,7 +93,7 @@ sub process {
     {
         if ($image eq 'defaults' and $phase eq $Muster::Hooks::PHASE_SCAN)
         {
-            $leaf->{meta}->{img_defaults} = Dump(@p);
+            $leaf->{meta}->{_img_defaults} = Dump(@p);
         }
         return "";
     }
@@ -102,10 +102,10 @@ sub process {
     # ---------------------------------------------------------
 
     # Image defaults
-    if (exists $leaf->{meta}->{img_defaults}
-            and defined $leaf->{meta}->{img_defaults})
+    if (exists $leaf->{meta}->{_img_defaults}
+            and defined $leaf->{meta}->{_img_defaults})
     {
-        my @d = Load($leaf->{meta}->{img_defaults});
+        my @d = Load($leaf->{meta}->{_img_defaults});
         my %d = @d;
         foreach my $key (keys %d)
         {
@@ -135,7 +135,7 @@ sub process {
     # arbitrary files named *.jpg, etc.
     my $magic;
     my $offset = 0;
-    open(my $in, '<', $img_info->{filename}) or croak sprintf(gettext("failed to read %s: %s"), $imgpage, $!);
+    open(my $in, '<', $img_info->{filename}) or croak sprintf("A. failed to read %s: %s", $imgpage, $!);
     binmode($in);
 
     if ($extension =~ m/^(jpeg|jpg)$/is)
@@ -165,7 +165,7 @@ sub process {
     if (defined $magic)
     {
         my $content;
-        read($in, $content, length $magic) or croak sprintf(("failed to read %s: %s"), $imgpage, $!);
+        read($in, $content, length $magic) or croak sprintf("B. failed to read %s: %s", $imgpage, $!);
         if ($magic ne $content) {
             croak sprintf(("\"%s\" does not seem to be a valid %s file"), $imgpage, $format);
         }
@@ -173,7 +173,7 @@ sub process {
     close($in);
 
     # give it a long flat name
-    my $thumb_base = $imgpage;
+    my $thumb_base = $img_info->{pagesrcname};
     $thumb_base =~ s!/!-!g;
     my $imglink;
     my ($dwidth, $dheight);
@@ -194,15 +194,15 @@ sub process {
         # only a width or only a height is specified.
         # When both are specified, aspect ratio will not be
         # preserved.
-        $imglink = $imgpage;
+        $imglink = $img_info->{pagesrcname};
         $dwidth = $w if length $w;
         $dheight = $h if length $h;
     }
     else
     {
         my $im = Image::Magick->new();
-        my $r = $im->Read("$format:". $img_info->{filename});
-        croak sprintf(("failed to read %s: %s"), $imgpage, $r) if $r;
+        my $r = $im->Read(filename=>$img_info->{filename});
+        croak sprintf(("C. failed to read %s: %s"), $imgpage, $r) if $r;
 
         if (! defined $im->Get("width") || ! defined $im->Get("height"))
         {
@@ -251,7 +251,7 @@ sub process {
             {
                 $im = Image::Magick->new;
                 $r = $im->Read($outfile);
-                croak sprintf("failed to read %s: %s", $outfile, $r) if $r;
+                croak sprintf("D. failed to read %s: %s", $outfile, $r) if $r;
             }
             else
             {
@@ -270,13 +270,16 @@ sub process {
         }
         else
         {
-            $imglink = $imgpage;
+            $imglink = $img_info->{pagesrcname};
         }
 
         if (! defined($dwidth) || ! defined($dheight))
         {
             croak sprintf("failed to determine size of image %s", $imgpage)
         }
+
+        # link needs to be relative to this page
+        $imglink = File::Spec->abs2rel($imglink, $leaf->pagename);
     }
 
     if (! exists $params{class})
@@ -285,7 +288,7 @@ sub process {
     }
 
     my $attrs='';
-    foreach my $attr (qw{alt title class id hspace vspace})
+    foreach my $attr (qw{alt title class id style})
     {
         if (exists $params{$attr})
         {
@@ -303,7 +306,7 @@ sub process {
     my $link;
     if (! defined $params{link})
     {
-        $link = $img_info->{pagelink};
+        $link = File::Spec->abs2rel($img_info->{pagesrcname}, $leaf->{pagename});
     }
     elsif ($params{link} =~ /^\w+:\/\//)
     {

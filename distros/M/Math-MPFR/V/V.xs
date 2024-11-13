@@ -15,75 +15,57 @@
 #include "../math_mpfr_include.h"
 
 SV * ___GNU_MP_VERSION(pTHX) {
-     return newSVuv(__GNU_MP_VERSION);
+  return newSVuv(__GNU_MP_VERSION);
 }
 
 SV * ___GNU_MP_VERSION_MINOR(pTHX) {
-     return newSVuv(__GNU_MP_VERSION_MINOR);
+  return newSVuv(__GNU_MP_VERSION_MINOR);
 }
 
 SV * ___GNU_MP_VERSION_PATCHLEVEL(pTHX) {
-     return newSVuv(__GNU_MP_VERSION_PATCHLEVEL);
+  return newSVuv(__GNU_MP_VERSION_PATCHLEVEL);
 }
 
 SV * ___GMP_CC(pTHX) {
 #ifdef __GMP_CC
-     char * ret = __GMP_CC;
-     return newSVpv(ret, 0);
+  char * ret = __GMP_CC;
+  return newSVpv(ret, 0);
 #else
-     return &PL_sv_undef;
+  return &PL_sv_undef;
 #endif
 }
 
 SV * ___GMP_CFLAGS(pTHX) {
 #ifdef __GMP_CFLAGS
-     char * ret = __GMP_CFLAGS;
-     return newSVpv(ret, 0);
+  char * ret = __GMP_CFLAGS;
+  return newSVpv(ret, 0);
 #else
-     return &PL_sv_undef;
+  return &PL_sv_undef;
 #endif
 }
-
-/*
-Removed - don't want library functions in this module
-
-SV * gmp_v(pTHX) {
-#if __GNU_MP_VERSION >= 4
-     return newSVpv(gmp_version, 0);
-#else
-     warn("From Math::MPFR::V::gmp_v function: 'gmp_version' is not implemented - returning '0'");
-     return newSVpv("0", 0);
-#endif
-}
-*/
 
 SV * _MPFR_VERSION(pTHX) {
-     return newSVuv(MPFR_VERSION);
+  return newSVuv(MPFR_VERSION);
 }
 
 SV * _MPFR_VERSION_MAJOR(pTHX) {
-     return newSVuv(MPFR_VERSION_MAJOR);
+  return newSVuv(MPFR_VERSION_MAJOR);
 }
 
 SV * _MPFR_VERSION_MINOR(pTHX) {
-     return newSVuv(MPFR_VERSION_MINOR);
+  return newSVuv(MPFR_VERSION_MINOR);
 }
 
 SV * _MPFR_VERSION_PATCHLEVEL(pTHX) {
-     return newSVuv(MPFR_VERSION_PATCHLEVEL);
+  return newSVuv(MPFR_VERSION_PATCHLEVEL);
 }
 
 SV * _MPFR_VERSION_STRING(pTHX) {
-     return newSVpv(MPFR_VERSION_STRING, 0);
+  return newSVpv(MPFR_VERSION_STRING, 0);
 }
 
-/*
-Removed - don't want library functions in this module
 
-SV * Rmpfr_get_version(pTHX) {
-     return newSVpv(mpfr_get_version(), 0);
-}
-*/
+
 
 
 MODULE = Math::MPFR::V  PACKAGE = Math::MPFR::V

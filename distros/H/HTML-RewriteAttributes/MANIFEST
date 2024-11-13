@@ -27,4 +27,3 @@ t/020-inline-css.t
 t/021-import.t
 t/022-import-off.t
 t/023-import-comment.t
-SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -45,85 +45,82 @@
 #endif
 
 SV * Rmpfr_randinit_default(pTHX) {
-     gmp_randstate_t * state;
-     SV * obj_ref, * obj;
+  gmp_randstate_t * state;
+  SV * obj_ref, * obj;
 
-     Newx(state, 1, gmp_randstate_t);
-     if(state == NULL) croak("Failed to allocate memory in Rmpfr_randinit_default function");
-     obj_ref = newSV(0);
-     obj = newSVrv(obj_ref, "Math::MPFR::Random");
-     gmp_randinit_default(*state);
+  Newx(state, 1, gmp_randstate_t);
+  if(state == NULL) croak("Failed to allocate memory in Rmpfr_randinit_default function");
+  obj_ref = newSV(0);
+  obj = newSVrv(obj_ref, "Math::MPFR::Random");
+  gmp_randinit_default(*state);
 
-     sv_setiv(obj, INT2PTR(IV,state));
-     SvREADONLY_on(obj);
-     return obj_ref;
+  sv_setiv(obj, INT2PTR(IV,state));
+  SvREADONLY_on(obj);
+  return obj_ref;
 }
 
 SV * Rmpfr_randinit_mt(pTHX) {
-     gmp_randstate_t * rand_obj;
-     SV * obj_ref, * obj;
+  gmp_randstate_t * rand_obj;
+  SV * obj_ref, * obj;
 
-     Newx(rand_obj, 1, gmp_randstate_t);
-     if(rand_obj == NULL) croak("Failed to allocate memory in Math::MPFR::Random::Rmpfr_randinit_mt function");
-     obj_ref = newSV(0);
-     obj = newSVrv(obj_ref, "Math::MPFR::Random");
-     gmp_randinit_mt(*rand_obj);
+  Newx(rand_obj, 1, gmp_randstate_t);
+  if(rand_obj == NULL) croak("Failed to allocate memory in Math::MPFR::Random::Rmpfr_randinit_mt function");
+  obj_ref = newSV(0);
+  obj = newSVrv(obj_ref, "Math::MPFR::Random");
+  gmp_randinit_mt(*rand_obj);
 
-     sv_setiv(obj, INT2PTR(IV, rand_obj));
-     SvREADONLY_on(obj);
-     return obj_ref;
+  sv_setiv(obj, INT2PTR(IV, rand_obj));
+  SvREADONLY_on(obj);
+  return obj_ref;
 }
 
 SV * Rmpfr_randinit_lc_2exp(pTHX_ SV * a, SV * c, SV * m2exp ) {
-     gmp_randstate_t * state;
-     mpz_t aa;
-     SV * obj_ref, * obj;
+  gmp_randstate_t * state;
+  mpz_t aa;
+  SV * obj_ref, * obj;
 
-     Newx(state, 1, gmp_randstate_t);
-     if(state == NULL) croak("Failed to allocate memory in Rmpfr_randinit_lc_2exp function");
-     obj_ref = newSV(0);
-     obj = newSVrv(obj_ref, "Math::MPFR::Random");
-     if(sv_isobject(a)) {
-       const char* h = HvNAME(SvSTASH(SvRV(a)));
+  Newx(state, 1, gmp_randstate_t);
+  if(state == NULL) croak("Failed to allocate memory in Rmpfr_randinit_lc_2exp function");
+  obj_ref = newSV(0);
+  obj = newSVrv(obj_ref, "Math::MPFR::Random");
+  if(sv_isobject(a)) {
+    const char* h = HvNAME(SvSTASH(SvRV(a)));
 
-       if(strEQ(h, "Math::GMP") ||
-          strEQ(h, "GMP::Mpz")  ||
-          strEQ(h, "Math::GMPz"))
-            gmp_randinit_lc_2exp(*state, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (unsigned long)SvUV(c), (unsigned long)SvUV(m2exp));
-       else croak("First arg to Rmpfr_randinit_lc_2exp is of invalid type");
-     }
+    if(strEQ(h, "Math::GMP") || strEQ(h, "GMP::Mpz") || strEQ(h, "Math::GMPz"))
+      gmp_randinit_lc_2exp(*state, *(INT2PTR(mpz_t *, SvIVX(SvRV(a)))), (unsigned long)SvUV(c), (unsigned long)SvUV(m2exp));
+    else croak("First arg to Rmpfr_randinit_lc_2exp is of invalid type");
+  }
+  else {
+    if(!mpz_init_set_str(aa, SvPV_nolen(a), 0)) {
+      gmp_randinit_lc_2exp(*state, aa, (unsigned long)SvUV(c), (unsigned long)SvUV(m2exp));
+      mpz_clear(aa);
+    }
+    else croak("Seedstring supplied to Rmpfr_randinit_lc_2exp is not a valid number");
+  }
 
-     else {
-       if(!mpz_init_set_str(aa, SvPV_nolen(a), 0)) {
-         gmp_randinit_lc_2exp(*state, aa, (unsigned long)SvUV(c), (unsigned long)SvUV(m2exp));
-         mpz_clear(aa);
-       }
-       else croak("Seedstring supplied to Rmpfr_randinit_lc_2exp is not a valid number");
-     }
-
-     sv_setiv(obj, INT2PTR(IV,state));
-     SvREADONLY_on(obj);
-     return obj_ref;
+  sv_setiv(obj, INT2PTR(IV,state));
+  SvREADONLY_on(obj);
+  return obj_ref;
 }
 
 SV * Rmpfr_randinit_lc_2exp_size(pTHX_ SV * size) {
-     gmp_randstate_t * state;
-     SV * obj_ref, * obj;
+  gmp_randstate_t * state;
+  SV * obj_ref, * obj;
 
-     if(SvUV(size) > 128) croak("The argument supplied to Rmpfr_randinit_lc_2exp_size function is too large - ie greater than 128");
+  if(SvUV(size) > 128) croak("The argument supplied to Rmpfr_randinit_lc_2exp_size function is too large - ie greater than 128");
 
-     Newx(state, 1, gmp_randstate_t);
-     if(state == NULL) croak("Failed to allocate memory in Rmpfr_randinit_lc_2exp_size function");
-     obj_ref = newSV(0);
-     obj = newSVrv(obj_ref, "Math::MPFR::Random");
+  Newx(state, 1, gmp_randstate_t);
+  if(state == NULL) croak("Failed to allocate memory in Rmpfr_randinit_lc_2exp_size function");
+  obj_ref = newSV(0);
+  obj = newSVrv(obj_ref, "Math::MPFR::Random");
 
-     if(gmp_randinit_lc_2exp_size(*state, (unsigned long)SvUV(size))) {
-       sv_setiv(obj, INT2PTR(IV,state));
-       SvREADONLY_on(obj);
-       return obj_ref;
-       }
+  if(gmp_randinit_lc_2exp_size(*state, (unsigned long)SvUV(size))) {
+    sv_setiv(obj, INT2PTR(IV,state));
+    SvREADONLY_on(obj);
+    return obj_ref;
+  }
 
-     croak("Rmpfr_randinit_lc_2exp_size function failed");
+  croak("Rmpfr_randinit_lc_2exp_size function failed");
 }
 
 /* Provide a duplicate of Math::MPFR::_MPFR_VERSION. *
@@ -132,9 +129,9 @@ SV * Rmpfr_randinit_lc_2exp_size(pTHX_ SV * size) {
 
 SV * _MPFR_VERSION(pTHX) {
 #if defined(MPFR_VERSION)
-     return newSVuv(MPFR_VERSION);
+  return newSVuv(MPFR_VERSION);
 #else
-     return &PL_sv_undef;
+  return &PL_sv_undef;
 #endif
 }
 
@@ -144,15 +141,15 @@ SV * _MPFR_VERSION(pTHX) {
 
 int _has_pv_nv_bug(void) {
 #if defined(MPFR_PV_NV_BUG)
-     return 1;
+  return 1;
 #else
-     return 0;
+  return 0;
 #endif
 }
 
 void DESTROY(gmp_randstate_t * p) {
-     gmp_randclear(*p);
-     Safefree(p);
+  gmp_randclear(*p);
+  Safefree(p);
 }
 
 int _is_NOK_and_POK(SV * in) {

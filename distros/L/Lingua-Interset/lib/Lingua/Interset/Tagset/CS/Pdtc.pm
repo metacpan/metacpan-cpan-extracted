@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::CS::Pdtc;
 use strict;
 use warnings;
-our $VERSION = '3.015';
+our $VERSION = '3.016';
 
 use utf8;
 use open ':utf8';
@@ -196,16 +196,18 @@ sub _create_atoms
             # indefinite numeral "nejeden" = lit. "not one" = "more than one"
             # examples: nejeden
             # indefinite or demonstrative adjectival ordinal numeral
-            # examples: několikátý, mnohý, tolikátý
+            # examples: několikátý, mnohý, tolikátý, (kolikátý)
+            ###!!! DZ: It seems that in PDT-C, 'Cw' would newly also cover interrogative/relative "kolikátý" (tagged "Cz" in the old PDT tagset),
+            ###!!! but the word does not occur in PDT. Nevertheless, Morphodita (https://lindat.mff.cuni.cz/services/morphodita/) tags it this way.
             'Cw' => ['pos' => 'adj', 'numtype' => 'ord', 'prontype' => 'ind|dem'],
             # cardinal numeral, fraction denominator
             # examples: polovina třetina čtvrtina setina tisícina
             # These words behave morphologically and syntactically as feminine nouns of the paradigm "žena".
             # (Note that the fraction words "půl" and "čtvrt" are not tagged "Cy".)
             'Cy' => ['pos' => 'num', 'numtype' => 'frac'],
-            # interrogative or relative ordinal numeral
-            # examples: kolikátý
-            'Cz' => ['pos' => 'adj', 'numtype' => 'ord', 'prontype' => 'int|rel'],
+            # cardinal numerals that can also behave like nouns (typically large numbers, but also "zero" or "quarter")
+            # examples: bilión, čtvrt, desetitisíc, miliarda, milión, nula, půlmiliarda, stamilión, statisíc, sto, tisíc, trilión
+            'Cz' => ['pos' => 'num', 'numtype' => 'card', 'nountype' => 'com'],
             # adjectival postfixal segment of a hyphenated compound
             # examples: ti (in "755-ti")
             'Sl' => ['pos' => 'adj', 'other' => 'postfix', 'numtype' => 'card', 'numform' => 'word'],
@@ -642,9 +644,15 @@ sub encode
                 # jeden, jedna, jedno, dva, dvě, tři, čtyři
                 $tag = 'Cl-XX----------';
             }
+            # Cardinal numerals whose behavior is close to nouns have their own tag.
+            elsif($fs->contains('nountype', 'com'))
+            {
+                # nula, čtvrt, sto, tisíc, milión
+                $tag = 'CzXXX----------';
+            }
             else
             {
-                # pět, deset, patnáct, devadesát, sto
+                # pět, deset, patnáct, dvaadvacet, devadesát
                 $tag = 'CnXXX----------';
             }
         }
@@ -1652,12 +1660,14 @@ CzFP1----------
 CzFP2----------
 CzFP3----------
 CzFP4----------
+CzFP5----------
 CzFP6----------
 CzFP7----------
 CzFS1----------
 CzFS2----------
 CzFS3----------
 CzFS4----------
+CzFS5----------
 CzFS6----------
 CzFS7----------
 CzFXX----------
@@ -1666,12 +1676,14 @@ CzIP1----------
 CzIP2----------
 CzIP3----------
 CzIP4----------
+CzIP5----------
 CzIP6----------
 CzIP7----------
 CzIS1----------
 CzIS2----------
 CzIS3----------
 CzIS4----------
+CzIS5----------
 CzIS6----------
 CzIS7----------
 CzIXX----------
@@ -1680,12 +1692,15 @@ CzNP1----------
 CzNP2----------
 CzNP3----------
 CzNP4----------
+CzNP5----------
 CzNP6----------
 CzNP7----------
 CzNS1----------
 CzNS2----------
 CzNS4----------
+CzNS5----------
 CzNS6----------
+CzNS7----------
 CzNXX----------
 CzNXX---------2
 C}-------------
@@ -2525,7 +2540,7 @@ Lingua::Interset::Tagset::CS::Pdtc - Driver for the tagset of the Prague Depende
 
 =head1 VERSION
 
-version 3.015
+version 3.016
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env perl
 package HTML::RewriteAttributes::Resources;
 use strict;
 use warnings;
@@ -39,9 +38,10 @@ sub _should_rewrite {
 
 sub _invoke_callback {
     my $self = shift;
-    my ($tag, $attr, $value) = @_;
+    my ($tag, $attr, $value, $attrs, $attr_list) = @_;
 
-    return $self->{rewrite_callback}->($value, tag => $tag, attr => $attr, rewriter => $self);
+    return $self->{rewrite_callback}
+        ->( $value, tag => $tag, attr => $attr, rewriter => $self, attrs => $attrs, attr_list => $attr_list );
 }
 
 sub _start_tag {
@@ -203,11 +203,11 @@ L<HTML::RewriteAttributes>, L<HTML::Parser>, L<Email::MIME::CreateHTML>
 
 =head1 AUTHOR
 
-Shawn M Moore, C<< <sartak@bestpractical.com> >>
+Best Practical Solutions, LLC <modules@bestpractical.com>
 
 =head1 LICENSE
 
-Copyright 2008-2010 Best Practical Solutions, LLC.
+Copyright 2008-2024 Best Practical Solutions, LLC.
 HTML::RewriteAttributes::Resources is distributed under the same terms as Perl itself.
 
 =cut

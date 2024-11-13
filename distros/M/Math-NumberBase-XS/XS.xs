@@ -2,6 +2,10 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef sv_setrv
+#define sv_setrv(sv, rv) sv_rvweaken(sv); SvRV_set((sv), (rv)); SvROK_on(sv)
+#endif
+
 typedef struct {
     int base;
     AV *symbols;
@@ -181,32 +185,28 @@ CODE:
     AV *symbols = data->symbols;
 
     STRLEN result_len = 0;
-    STRLEN buffer_size = 64; /* Initial buffer size */
+    STRLEN buffer_size = 64;
     char *buffer = (char *)malloc(buffer_size);
 
     if (!buffer) {
         croak("Memory allocation failed");
     }
 
-    /* Null-terminate the buffer */
-    buffer[0] = '\0';
+    buffer[0] = '\0'; // Ensure buffer starts null-terminated
 
     while (in_decimal > 0) {
-        /* Get the current symbol index */
         int index = in_decimal % base;
+        in_decimal /= base;
 
-        /* Fetch the symbol from the symbols array */
         SV **symbol_sv = av_fetch(symbols, index, 0);
         if (!symbol_sv || !SvOK(*symbol_sv)) {
             free(buffer);
             croak("Invalid symbol for index %d", index);
         }
 
-        /* Get the symbol as a string */
         STRLEN symbol_len;
         const char *symbol = SvPV(*symbol_sv, symbol_len);
 
-        /* Expand the buffer if necessary */
         while (result_len + symbol_len + 1 >= buffer_size) {
             buffer_size *= 2;
             buffer = (char *)realloc(buffer, buffer_size);
@@ -215,42 +215,11 @@ CODE:
             }
         }
 
-        /* Shift the existing content to make room for the new symbol */
-        memmove(buffer + symbol_len, buffer, result_len + 1); /* Include the null terminator */
-        memcpy(buffer, symbol, symbol_len);                  /* Copy the new symbol */
-        result_len += symbol_len;
-
-        /* Update the number */
-        in_decimal /= base;
-    }
-
-    /* If the number is zero, add the first symbol */
-    if (result_len == 0) {
-        SV **symbol_sv = av_fetch(symbols, 0, 0);
-        if (!symbol_sv || !SvOK(*symbol_sv)) {
-            free(buffer);
-            croak("Invalid symbol for index 0");
-        }
-
-        STRLEN symbol_len;
-        const char *symbol = SvPV(*symbol_sv, symbol_len);
-
-        /* Expand the buffer if necessary */
-        while (symbol_len + 1 >= buffer_size) {
-            buffer_size = symbol_len + 1;
-            buffer = (char *)realloc(buffer, buffer_size);
-            if (!buffer) {
-                croak("Memory allocation failed");
-            }
-        }
-
+        memmove(buffer + symbol_len, buffer, result_len + 1);
         memcpy(buffer, symbol, symbol_len);
-        buffer[symbol_len] = '\0'; /* Null-terminate explicitly */
+        result_len += symbol_len;
     }
 
     RETVAL = buffer;
-
-    /* Free the buffer in XS automatically */
-    Safefree(buffer);
 OUTPUT:
     RETVAL

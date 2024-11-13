@@ -5,23 +5,16 @@ use warnings;
 
 use Test::More 0.96;
 use IO::Socket::INET;
-BEGIN {
-    eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION(1.56); 1 };
-    plan skip_all => 'IO::Socket::SSL 1.56 required for SSL tests' if $@;
-    # $IO::Socket::SSL::DEBUG = 3;
 
-    eval { require Net::SSLeay; Net::SSLeay->VERSION(1.49); 1};
-    plan skip_all => 'Net::SSLeay 1.49 required for SSL tests' if $@;
-
-    eval { require Mozilla::CA; 1 };
-    plan skip_all => 'Mozilla::CA required for SSL tests' if $@;
-}
 use HTTP::Tiny;
-
-delete $ENV{PERL_HTTP_TINY_SSL_INSECURE_BY_DEFAULT};
 
 plan skip_all => 'Only run for $ENV{AUTOMATED_TESTING}'
   unless $ENV{AUTOMATED_TESTING};
+
+plan skip_all => "Only run if HTTP::Tiny->can_ssl()"
+  unless HTTP::Tiny->can_ssl();
+
+delete $ENV{PERL_HTTP_TINY_SSL_INSECURE_BY_DEFAULT};
 
 use IPC::Cmd qw/can_run/;
 
@@ -46,7 +39,7 @@ test_ssl('https://github.com/' => {
 test_ssl('https://wrong.host.badssl.com/' => {
     host => 'wrong.host.badssl.com',
     pass => { SSL_options => { SSL_verifycn_scheme => 'none', SSL_verifycn_name => 'wrong.host.badssl.com', SSL_verify_mode => 0x00 } },
-    fail => { SSL_options => { SSL_verifycn_scheme => 'http', SSL_verifycn_name => 'wrong.host.badssl.com', SSL_verify_mode => 0x01, SSL_ca_file => Mozilla::CA::SSL_ca_file() } },
+    fail => { SSL_options => { SSL_verifycn_scheme => 'http', SSL_verifycn_name => 'wrong.host.badssl.com', SSL_verify_mode => 0x01 } },
     default_verify_should_return => !!0,
 });
 

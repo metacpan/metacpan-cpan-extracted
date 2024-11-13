@@ -7,7 +7,7 @@
 package Lingua::Interset::Tagset::EN::Penn;
 use strict;
 use warnings;
-our $VERSION = '3.015';
+our $VERSION = '3.016';
 
 use utf8;
 use open ':utf8';
@@ -306,7 +306,7 @@ Lingua::Interset::Tagset::EN::Penn - Driver for the tagset of the Penn Treebank.
 
 =head1 VERSION
 
-version 3.015
+version 3.016
 
 =head1 SYNOPSIS
 

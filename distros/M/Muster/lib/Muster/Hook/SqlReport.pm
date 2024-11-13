@@ -1,12 +1,12 @@
 package Muster::Hook::SqlReport;
-$Muster::Hook::SqlReport::VERSION = '0.62';
+$Muster::Hook::SqlReport::VERSION = '0.92';
 =head1 NAME
 
 Muster::Hook::SqlReport - Muster SQL-report directive
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -108,14 +108,18 @@ sub process {
     # If there is only one report on the page, then it doesn't.
  
     # Check for pagination and query
+    # Note that limit either means LIMIT, or records-per-page
+    # depending on whether pagination is true.
     my $c = $args{controller}; # build-phase has a controller
     my $n = 1;
+    my $pagination = (exists $params{pagination} ? $params{pagination} : 0);
     my $limit = (exists $params{limit} ? $params{limit} : 0);
     my $n_id = (exists $params{report_id}
         ? "n_".$params{report_id} : "n");
 
     # pagination happens when the limit is not zero
-    if ($limit)
+    # and pagination is true
+    if ($limit and $pagination)
     {
         $n = $c->param($n_id) || 1;
     }
@@ -132,11 +136,11 @@ sub process {
 
     # if there is query_form enabled:
     # - print a query form
-    my $form = '';
+    my $prefix = '';
     if (exists $params{query_form} and $params{query_form})
     {
         my $this_url = $c->req->url->to_string;
-        $form =<<EOT;
+        $prefix =<<EOT;
 <div>
 <form action="$this_url">
 <strong>WHERE:</strong> $w
@@ -147,8 +151,17 @@ sub process {
 </div>
 EOT
     }
+    elsif (exists $params{show_query} and $params{show_query})
+    {
+        $prefix =<<EOT;
+<div>
+<strong>WHERE:</strong>
+<pre>$w</pre>
+</div>
+EOT
+    }
 
-    my $result = $self->{databases}->{$params{database}}->do_report(%params,page=>$n,limit=>$limit,q=>$q);
+    my $result = $self->{databases}->{$params{database}}->do_report(%params,pagination=>$pagination,page=>$n,limit=>$limit,q=>$q);
 
     if ($params{ltemplate}
         and $result)
@@ -157,7 +170,7 @@ EOT
         $out2 =~ s/CONTENTS/$result/g;
         $result = $out2;
     }
-    return $form . $result;
+    return $prefix . $result;
 } # preprocess
 
 sub DESTROY {
@@ -181,7 +194,7 @@ sub DESTROY {
 1;
 # =================================================================
 package SQLite::Work::Muster;
-$SQLite::Work::Muster::VERSION = '0.62';
+$SQLite::Work::Muster::VERSION = '0.92';
 use SQLite::Work;
 use Text::NeatTemplate;
 use POSIX;
@@ -226,7 +239,7 @@ sub print_select {
     my $template = $self->get_template($self->{report_template});
     $self->{report_template} = $template;
 
-    my $num_pages = ($args{limit} ? ceil($args{total} / $args{limit}) : 1);
+    my $num_pages = ($args{limit} and $args{pagination} ? ceil($args{total} / $args{limit}) : 1);
     # generate the HTML table
     my $count = 0;
     my $res_tab = '';
@@ -241,7 +254,7 @@ sub print_select {
     my $buttons = $self->make_pagination(%args);
     my $main_title = ($args{title} ? $args{title}
 	: "$table $args{command} result");
-    my $title = ($args{limit} ? "$main_title ($page)"
+    my $title = ($args{limit} and $args{pagination} ? "$main_title ($page)"
 	: $main_title);
     # fix up random apersands
     if ($title =~ / & /)
@@ -266,7 +279,7 @@ sub print_select {
         push @result, "<p>$summary</p>\n";
     }
     push @result, $res_tab;
-    if ($args{limit} and $args{report_style} eq 'full')
+    if ($args{limit} and $args{pagination} and $args{report_style} eq 'full')
     {
 	push @result, "<p>Page $page of $num_pages.</p>\n"
     }
@@ -340,6 +353,7 @@ sub do_report {
     my %args = (
 	command=>'Select',
 	limit=>0,
+        pagination=>0,
 	page=>1,
 	headers=>'',
 	groups=>'',
@@ -374,7 +388,7 @@ sub do_report {
 	? @{$args{show}}
 	: ($args{show}
 	    ? split(' ', $args{show})
-	    : $self->get_colnames($table)));
+	    : $self->get_colnames($table,do_rowid=>0)));
 
     my $total = $self->get_total_matching(%args);
     if ($total == 0)
@@ -425,7 +439,9 @@ EOT
 =head2 make_pagination
 
 Make the buttons for the pagination.
-Pagination happens only when there's a limit not equal to zero.
+
+Pagination happens only when pagination is true and there's a limit
+not equal to zero.
 
 =cut
 sub make_pagination {
@@ -433,10 +449,11 @@ sub make_pagination {
     my %args = @_;
     my $page = $args{page};
     my $limit = $args{limit};
+    my $pagination = $args{pagination};
     my $total = $args{total};
     my $q = $args{q};
 
-    if (!$limit)
+    if (!$limit or !$pagination)
     {
         return "";
     }

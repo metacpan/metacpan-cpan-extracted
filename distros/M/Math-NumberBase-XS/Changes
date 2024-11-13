@@ -1,6 +1,8 @@
 Revision history for Math-NumberBase-XS
 
-0.02    Date/time
+0.02    2024-11-10
         First version, released on an unsuspecting world.
-0.0201  Date/time
+0.0201  2024-11-11
         Added missing files to MANIFEST.
+0.0202  2024-11-12
+        Made changes to XS code after seeing failing tests on Linux.

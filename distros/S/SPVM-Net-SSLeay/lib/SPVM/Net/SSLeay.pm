@@ -1,6 +1,6 @@
 package SPVM::Net::SSLeay;
 
-our $VERSION = "0.011";
+our $VERSION = "0.012";
 
 1;
 
@@ -127,6 +127,22 @@ Calls native L<SSL_library_init|https://docs.openssl.org/master/man3/SSL_library
 C<static method load_error_strings : void ();>
 
 Calls native L<SSL_load_error_strings|https://docs.openssl.org/3.0/man3/ERR_load_crypto_strings/> function.
+
+=head2 load_client_CA_file
+
+C<static method load_client_CA_file : L<Net::SSLeay::X509_NAME|SPVM::Net::SSLeay::X509_NAME>[] ($file : string);>
+
+Calls native L<SSL_load_client_CA_file|https://docs.openssl.org/3.0/man3/SSL_load_client_CA_file/> function,.
+
+If its return value is NULL, returns undef.
+
+Ohterwise, converts its return value to the array of L<Net::SSLeay::X509_NAME|SPVM::Net::SSLeay::X509_NAME>, and returns the array.
+
+Exceptions:
+
+The file $file must be defined. Otherwise an exception is thrown.
+
+If load_client_CA_file failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
 =head1 Instance Methods
 
@@ -364,7 +380,15 @@ Calls native L<SSL_get_peer_cert_chain|https://docs.openssl.org/1.1.1/man3/SSL_g
 
 If its return value is NULL, returns undef.
 
-Ohterwise converts its return value to the array of L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>, and returns the array.
+Ohterwise, converts its return value to the array of L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>, and returns the array.
+
+method get_SSL_CTX : Net::SSLeay::SSL_CTX ();
+
+=head2 get_SSL_CTX
+
+C<method get_SSL_CTX : Net::SSLeay::SSL_CTX ();>
+
+Returns the value of L</"ssl_ctx"> field.
 
 =head2 DESTROY
 

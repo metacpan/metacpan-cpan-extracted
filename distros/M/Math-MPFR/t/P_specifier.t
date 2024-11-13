@@ -46,7 +46,7 @@ $ok = '';
 unless($ENV{SISYPHUS_SKIP}) {
   # Because of the way I (sisyphus) build this module with MS
   # Visual Studio, XSubs that take a filehandle as an argument
-  # do not work. It therefore suits my purposes to be able to
+  # may not work. It therefore suits my purposes to be able to
   # avoid calling (and testing) those particular XSubs
 
   my $o = open($fh, '>', $file);

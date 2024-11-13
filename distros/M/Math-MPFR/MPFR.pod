@@ -880,8 +880,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     a Math::Float128 object using the rounding mode $rnd.
 
    $double = Rmpfr_get_d1($op);
-    Convert $op to a double, using the default MPFR rounding mode
-    (see function 'mpfr_set_default_rounding_mode').
+    Convert $op to a double, using the default MPFR rounding mode.
+    THIS FUNCTION IS DEPRECATED.
+    Instead, do:
+    $double = Rmpfr_get_d($op, Rmpfr_get_default_prec());
 
    $si = Rmpfr_get_z_exp($z, $op);  # $z is a mpz object
    $si = Rmpfr_get_z_2exp($z, $op); # $z is a mpz object
@@ -1043,6 +1045,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     (See https://sympa.inria.fr/sympa/arc/mpfr/2016-12/msg00032.html)
 
     Set $rop to $op ** (-1 / $ui) rounded in the direction $rnd.
+    This function sets its $rop to the reciprocal of the $rop that
+    is set by Rmpfr_rootn_ui (below) for identical arguments.
 
     May not correctly handle overflow or underflow.
 
@@ -1266,6 +1270,13 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    SPECIAL
 
+   $rop = log_2 ($op);
+   $rop = log_10($op);
+    Return log2 of $op (resp. log10 of $op), set to default
+    precision and using default rounding mode.
+    These are the functions that log2 and log10 overloading would
+    call if log2 and log10 overloading was available.
+
    $inex = Rmpfr_log($rop, $op, $rnd);
    $inex = Rmpfr_log_ui($rop, $ui, $rnd); # mpfr-4.0.0 & later only
    $inex = Rmpfr_log2($rop, $op, $rnd);
@@ -1279,6 +1290,20 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $inex = Rmpfr_exp10($rop, $op, $rnd);
     Set rop to the exponential of op, to 2 power of op or to
     10 power of op, respectively, rounded in the direction rnd.
+
+   $rop = sind($op); # Value of $op is in degrees (not radians)
+   $rop = cosd($op); # Value of $op is in degrees (not radians)
+
+    Return (respectively) sin() and cos() of $op, where the
+    value of $op is expressed in degrees. The return value is
+    calculated using default precision and default rounding mode.
+    These are essentially the same as the overloaded sin and
+    cos functions except that the given argument is in degrees.
+
+   $rop = tand($op);    # $op is in degrees (not radians)
+   $rop = tangent($op); # $op is in radians
+    Return tan($op) calculated with default precision and
+    default rounding mode.
 
    $inex = Rmpfr_sin($rop $op, $rnd);
    $inex = Rmpfr_cos($rop, $op, $rnd);
@@ -1308,7 +1333,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     that the function is even.  For 'Rmpfr_sinu', when $op multiplied by
     2 and divided by $ui is an integer, the result is zero with the same
     sign as $op, following IEEE 754-2019 (sinPi), so that the function
-    is odd.  Similarly, the function 'Rmpfr_tanu' follows IEEE 754-2019
+    is odd.  Similarly, the function 'Rmpfr_tanu' follows IEEE 754-2019Rmp
     (tanPi).
 
    $inex = Rmpfr_acosu($rop, $op, $ui, $rnd); # mpfr-4.2.0 and later only
@@ -1700,6 +1725,19 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     MPFR_PREC_MAX.
     Return 0 if the export/import was successful.
 
+   ########################
+
+   DISPLAYING INFS AND NANS
+
+   Generally, these will be displayed as 'Inf', '-Inf' and 'NaN'.
+   However, if you set $Math::MPFR::PERL_INFNAN to a TRUE value,
+   then nvtoa($num) and numtoa($num) (which are documented below
+   in 'MISCELLANEOUS') will display them in the same way that perl
+   itself displays them.
+   Note that nvtoa() and numtoa() expect a plain numeric perl
+   scalar as their argument - not a Math::MPFR object.
+   $Math::MPFR::PERL_INFNAN has the initial (default) value of 0.
+
    ##########
 
    EXCEPTIONS
@@ -1963,8 +2001,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     For inf, nan, and zero, we do only the initial test and return 15 if
     that test has passed, or 0 if that test has failed. (The other 3
     tests don't really apply.)
-
-
 
    $str = numtoa($sv);
     As for nvtoa() but prints out UVs and IVs in integer format.
@@ -2515,7 +2551,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     Again, each of those operations returns a Math::MPFR object
     containing the result of the operation.
-    Each operation is conducted using current default rounding mode.
+    Each operation is conducted using default Math::MPFR rounding
+    mode and default Math::MPFR precision.
+    The precision of the returned Math::MPFR object will therefore
+    differ from the precision of $M unless the precision of $M is
+     the default.
 
     NOTE: In overloading a ** (power) operation that involves a
     Math::GMPq object, it is necessary to convert the Math::GMPq
@@ -2523,7 +2563,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Math::MPFR object). This conversion is done using current default
     precision and current default rounding mode.
 
-    The following is still NOT ALLOWED, and will cause a fatal error:
+    The following is allowed for Math::GMPq objects (if
+    $Math::GMPq::VERSION >= 0.54 && $Math::GMPq::RETYPE == 1) and
+    for Math::GMPz (if $Math::GMPz::VERSION >= 0.57 &&
+    $Math::GMPz::RETYPE == 1), but not for Math::GMPf :
 
      $G += $M;
      $G -= $M;
@@ -2531,12 +2574,14 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      $G /= $M;
      $G **= $M;
 
-    In those situations where the overload subroutine operates on 2
-    perl variables, then obviously one of those perl variables is
-    a Math::MPFR object. To determine the value of the other variable
-    the subroutine works through the following steps (in order),
-    using the first value it finds, or croaking if it gets
-    to step 6:
+    When this usage is permitted, the result of the operation is
+    returned as a Math::MPFR object, calculated using Math::MPFR
+    default precision and Math::MPFR default rounding mode.
+
+    To determine the type and value of the second argument received
+    by the overloading subroutine, it works through the following
+    steps (in order), using the first value it finds, or croaking if
+    it gets to step 6:
 
     1. If the variable is a UV then that value is used. The variable
        is considered to be a UV if the IOK and IsUV flags are set.
@@ -2600,6 +2645,18 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    FORMATTED OUTPUT
 
+   NOTE: Bear in mind that, if the variable to be formatted by
+         Rmpfr_printf/Rmpfr_fprintf/Rmpfr_sprintf/Rmpfr_snprintf
+         is a normal perl string or numeric scalar (ie PV or IV or
+         NV) then the formatting will actually be done by the
+         underlying C functionality.
+         For example, if perl's nvtype is 'long double' then doing:
+         Rmpfr_printf("%a", $nv);
+         will output rubbish. Instead, you would need to:
+         Rmpfr_printf("%La", $nv).
+         (But then ... why would you invoke Rmpfr_printf to do
+         something of which perl's printf function is capable ?)
+
    NOTE: When using the 'P' (precision) type specifier, instead of
          providing $prec to the 'P' specifier, it's now advisable
          to provide prec_cast($prec). The 'P' specifier expects an
@@ -2629,12 +2686,17 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     This function (unlike the MPFR counterpart) is limited to taking
     2 or 3 arguments - the format string, optionally a rounding argument,
     and the variable to be formatted.
-    That is, you can currently printf only one variable at a time.
+    That is, you can currently Rmpfr_printf only one variable at a time.
     If there's no variable to be formatted, just add a '0' as the final
     argument. ie this will work fine:
      Rmpfr_printf("hello world\n", 0);
     NOTE: The rounding argument $rnd can be provided *only* if $var is a
           Math::MPFR object. To do otherwise is a fatal error.
+          A better way (IMO) to specify the rounding arg is to include it
+          in the formatting spec. For example, instead of doing:
+            Rmpfr_printf("%.17R*g\n", MPFR_RNDU, $op);
+            do:
+            Rmpfr_printf("%.17RUg\n", $op);
     See the mpfr documentation for details re the formatting options:
     http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
 
@@ -2643,12 +2705,14 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     This function (unlike the MPFR counterpart) is limited to taking
     3 or 4 arguments - the filehandle, the format string, optionally a
     rounding argument, and the variable to be formatted. That is, you
-    can printf only one variable at a time.
+    can Rmpfr_fprintf only one variable at a time.
     If there's no variable to be formatted, just add a '0' as the final
     argument. ie this will work fine:
      Rmpfr_fprintf($fh, "hello world\n", 0);
     NOTE: The rounding argument $rnd can be provided *only* if $var is a
           Math::MPFR object. To do otherwise is a fatal error.
+          As for Rmpfr_printf (above), the rounding argument can be given
+          in the formatting spec, rather than as a separate argument.
     See the mpfr documentation for details re the formatting options:
     http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
 
@@ -2666,6 +2730,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      Rmpfr_sprintf($buffer, "hello world", 0, $buflen);
     NOTE: The rounding argument $rnd can be provided *only* if $var is a
           Math::MPFR object. To do otherwise is a fatal error.
+          As for Rmpfr_printf (above), the rounding argument can be given
+          in the formatting spec, rather than as a separate argument.
     See the mpfr documentation for details re the formatting options:
     http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
 
@@ -2683,6 +2749,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      Rmpfr_snprintf($buffer, 12, "hello world", 0, $buflen);
     NOTE: The rounding argument $rnd can be provided *only* if $var is a
           Math::MPFR object. To do otherwise is a fatal error.
+          As for Rmpfr_printf (above), the rounding argument can be given
+          in the formatting spec, rather than as a separate argument.
     See the mpfr documentation for further details:
     http://www.mpfr.org/mpfr-current/mpfr.html#Formatted-Output-Functions
 
@@ -2725,7 +2793,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
      and be assured of retrieving the original base 10 representation when
      we convert the base 2 representations back to base 10.
      Sure ... not all 16-digit values require 55 bits, but there are some
-     that do ... and there are none that require more than  55 bits.
+     that do ... and there are none that require more than 55 bits.
 
      Example 2:
      $min_prec = mpfr_min_inter_prec(2, 53, 10);

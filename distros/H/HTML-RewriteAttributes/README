@@ -2,6 +2,11 @@ NAME
     HTML::RewriteAttributes - concise attribute rewriting
 
 SYNOPSIS
+    Locate a tag in a provided block of HTML and delete, add, or rewrite the
+    attributes associated with that tag. The updated HTML is returned.
+
+    Delete an attribute by returning undef.
+
         $html = HTML::RewriteAttributes->rewrite($html, sub {
             my ($tag, $attr, $value) = @_;
 
@@ -12,8 +17,21 @@ SYNOPSIS
             return $value;
         });
 
+    Add an attribute by appending it to the $attr_list arrayref and adding
+    the value to the $attrs hashref. For example, you could add
+    "loading="lazy"" to all "img" tags.
 
-        # writing some HTML email I see..
+        $html = HTML::RewriteAttributes->rewrite($html, sub {
+            my ( $tag, $attr, $value, $attrs, $attr_list ) = @_;
+            return $value unless $tag eq 'img' && !$attrs->{loading};
+            $attrs->{loading} = 'lazy';
+            push @$attr_list, 'loading';
+            return $value;
+        });
+
+    Modify an existing attribute by returning the new value. The example
+    below would be a "src" attribute for an "img" in an email.
+
         $html = HTML::RewriteAttributes::Resources->rewrite($html, sub {
             my $uri = shift;
             my $content = render_template($uri);
@@ -22,11 +40,16 @@ SYNOPSIS
             return "cid:$cid";
         });
 
+    Passing a URL, HTML::RewriteAttributes::Links can update resources like
+    "href"s or "img"s to include the base URL, changing "<img
+    src="/bar.gif">" to "<img src="https://search.cpan.org/bar.gif">". See
+    also HTML::ResolveLink.
 
-        # up for some HTML::ResolveLink?
-        $html = HTML::RewriteAttributes::Links->rewrite($html, "http://search.cpan.org");
+        $html = HTML::RewriteAttributes::Links->rewrite($html, "https://search.cpan.org");
 
-        # or perhaps HTML::LinkExtor?
+        # Passing a subroutine reference, L<HTML::RewriteAttributes::Links> can
+        # extract all links, similar to L<HTML::LinkExtor>.
+
         HTML::RewriteAttributes::Links->rewrite($html, sub {
             my ($tag, $attr, $value) = @_;
             push @links, $value;
@@ -41,7 +64,10 @@ DESCRIPTION
     rest for you.
 
     This module is designed to be subclassable to make handling special
-    cases eaiser. See the source for methods you can override.
+    cases easier. See the source for methods you can override.
+
+    See the SYNOPSIS above and included tests in the "t" directory for more
+    examples.
 
 METHODS
   "new"
@@ -53,10 +79,20 @@ METHODS
     callback, the callback is invoked potentially many times, and you get
     back some similar HTML.
 
-    The callback receives as arguments the tag name, the attribute name, and
-    the attribute value (though subclasses may override this --
-    HTML::RewriteAttributes::Resources does). Return "undef" to remove the
-    attribute, or any other value to set the value of the attribute.
+    As "rewrite" parses the HTML block, it calls the provided callback,
+    passing as arguments the current tag name, the attribute name, and the
+    attribute value (though subclasses may override this --
+    HTML::RewriteAttributes::Resources does). The callback can then use the
+    arguments to determine if you want to change the current tag or
+    attribute, or skip it by returning the current value unchanged. If you
+    find the tag and attribute you want to change, return "undef" to remove
+    the attribute, or any other value to set the value of the attribute.
+
+    The callback also is passed a hashref $attrs which has keys for
+    attributes and values with the current values. Finally $attr_list is
+    passed as an arrayref contain all attributes for the current tag. To add
+    a new attribute, add the attribute name to the $attr_list arrayref, and
+    add the new value to $attrs.
 
 SEE ALSO
     HTML::Parser, HTML::ResolveLink, Email::MIME::CreateHTML,
@@ -67,10 +103,10 @@ THANKS
     HTML::ResolveLink.
 
 AUTHOR
-    Shawn M Moore, "<sartak@bestpractical.com>"
+    Best Practical Solutions, LLC <modules@bestpractical.com>
 
 LICENSE
-    Copyright 2008-2010 Best Practical Solutions, LLC.
+    Copyright 2008-2024 Best Practical Solutions, LLC.
     HTML::RewriteAttributes is distributed under the same terms as Perl
     itself.
 

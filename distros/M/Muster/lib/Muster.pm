@@ -1,5 +1,5 @@
 package Muster;
-$Muster::VERSION = '0.62';
+$Muster::VERSION = '0.92';
 # ABSTRACT: web application for content management
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster - web application for content management
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 SYNOPSIS
 
@@ -53,6 +53,7 @@ sub startup {
     {
         $conf_file = $ENV{MUSTER_CONFIG};
     }
+    print STDERR "Muster::VERSION=$Muster::VERSION CONFIG: $conf_file\n";
     my $mojo_config = $self->plugin('Config' => { file => $conf_file });
 
     # -------------------------------------------
@@ -147,10 +148,6 @@ sub startup {
         my $c  = shift;
         $self->{assemble}->serve_meta($c);
     };
-    my $do_source = sub {
-        my $c  = shift;
-        $self->{assemble}->serve_source($c);
-    };
     my $do_debug = sub {
         my $c  = shift;
 
@@ -164,7 +161,6 @@ sub startup {
     $r->get('/_debug' => $do_debug);
     $r->get('/_debug/*cpath' => $do_debug);
     $r->get('/_meta/*cpath' => $do_meta);
-    $r->get('/_src/*cpath' => $do_source);
     # anything else should be a page or file
     $r->get('/*cpath' => $do_page);
 }
@@ -202,6 +198,7 @@ __DATA__
 % layout 'foil';
 % content_for 'head_extra' => begin
 <link rel="stylesheet" href="<%= url_for('/css') %>/muster.css" type="text/css" />
+<%== $head_append %>
 % end
 % content_for 'verso' => begin
 <%== muster_sidebar %>
@@ -221,6 +218,7 @@ __DATA__
 % layout 'foil';
 % content_for 'head_extra' => begin
 <link rel="stylesheet" href="<%= url_for('/css') %>/muster.css" type="text/css" />
+<%== $head_append %>
 % end
 % content_for 'verso' => begin
 <%== muster_sidebar %>

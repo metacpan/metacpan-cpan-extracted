@@ -1,5 +1,5 @@
 package Muster::Command::init;
-$Muster::Command::init::VERSION = '0.62';
+$Muster::Command::init::VERSION = '0.92';
 #ABSTRACT: Muster::Command::init - generate initial boilerplate app
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::Command::init - generate initial boilerplate app
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 

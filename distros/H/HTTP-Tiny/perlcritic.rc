@@ -1,5 +1,7 @@
 severity = 5
 verbose = 8
+profile-strictness = fatal
+theme = core
 
 [Variables::ProhibitPunctuationVars]
 allow = $@ $!
@@ -23,4 +25,3 @@ variables = $DB::single
 
 # Turn this on
 [Lax::ProhibitStringyEval::ExceptForRequire]
-

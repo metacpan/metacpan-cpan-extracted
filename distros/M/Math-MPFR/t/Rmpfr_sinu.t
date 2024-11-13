@@ -90,8 +90,11 @@ if(MPFR_VERSION() >= 262656) {
   cmp_ok($inex, '==', 0, 'result was exact');
 
   SKIP: {
-    skip 'USE_QUADMATH builds miscalculate sqrt(0.5) by 1ULP',
-         2 if ($Config{nvtype} eq '__float128');
+    skip 'This USE_QUADMATH build miscalculates sqrt(0.5) by 1ULP',
+         2 if ($Config{nvtype} eq '__float128'
+                  &&
+               sprintf("%.36g", sqrt(2.0)) ne '1.41421356237309504880168872420969798'
+              );
     $inex = Rmpfr_sinpi($rop1, Math::MPFR->new(0.25), MPFR_RNDN);
     cmp_ok($rop1, '==', sqrt(Math::MPFR->new(0.5)), 'sinpi(0.25) == sqrt(0.5)');
     cmp_ok($inex, '!=', 0, 'result was inexact');
@@ -118,8 +121,11 @@ if(MPFR_VERSION() >= 262656) {
   cmp_ok($inex, '==', 0, 'result was exact');
 
   SKIP: {
-    skip 'USE_QUADMATH builds miscalculate sqrt(0.5) by 1ULP',
-         2 if ($Config{nvtype} eq '__float128');
+    skip 'This USE_QUADMATH build miscalculates sqrt(0.5) by 1ULP',
+         2 if ($Config{nvtype} eq '__float128'
+                  &&
+               sprintf("%.36g", sqrt(2.0)) ne '1.41421356237309504880168872420969798'
+              );
     $inex = Rmpfr_cospi($rop1, Math::MPFR->new(0.25), MPFR_RNDN);
     cmp_ok($rop1, '==', sqrt(Math::MPFR->new(0.5)), 'cospi(0.25) == sqrt(0.5)');
     cmp_ok($inex, '!=', 0, 'result was inexact');
@@ -152,6 +158,13 @@ if(MPFR_VERSION() >= 262656) {
   $inex = Rmpfr_tanpi($rop1, Math::MPFR->new(-0.25), MPFR_RNDN);
   cmp_ok($rop1, '==', -1, 'tanpi(-0.25) is -1');
   cmp_ok($inex, '==', 0, 'result was exact');
+
+  Rmpfr_sinpi($rop1, Math::MPFR->new(0.25),    MPFR_RNDN);
+  Rmpfr_sinu ($rop2, Math::MPFR->new(45), 360, MPFR_RNDN);
+  cmp_ok($rop1, '==', $rop2, "Rmpfr_sinu and Rmpfr_sinpi agree");
+
+  Rmpfr_rec_sqrt($rop1, Math::MPFR->new(2), MPFR_RNDN);
+  cmp_ok($rop1, '==', $rop2, "Rmpfr_rec_sqrt(2) == Rmpfr_sinu(2)");
 
 ##
   my($s, $c) = (0, 0);

@@ -23,5 +23,5 @@ requires:
   Test::More: '0'
   Test::NoWarnings: '0.084'
   perl: '5.006'
-version: '0.0201'
+version: '0.0202'
 x_serialization_backend: YAML::XS version 0.89

@@ -40,13 +40,18 @@ for(@in) {
 }
 
 ##############################################################################
-# First check that mpfrtoa(Math::MPFR::object) eq nvtoa(NV) whenever:        #
+# Check that mpfrtoa(Math::MPFR::object) eq nvtoa(NV) eq Math::Ryu::nv2s(NV) #
+# whenever:                                                                  #
 # a) the value of the Math::MPFR object and the NV are identical             #
 # &&                                                                         #
 # b) the precision of the Math::MPFR object matches the precision of the NV. #
-#                                                                            #
-# (Math::MPFR precision has already been set such that b) is satisfied.)     #
+# Math::MPFR precision has already been set such that b) is satisfied.       #
+# The Math::Ryu::nv2s() check is dependent upon Math::Ryu being available.   #
 ##############################################################################
+
+my $have_ryu = 0;
+eval{require Math::Ryu;};
+$have_ryu = 1 if(!$@ && $Math::Ryu::VERSION >= 1.05);
 
 for(1 .. 100) {
   if($Math::MPFR::NV_properties{bits} == 2098) {
@@ -74,6 +79,11 @@ for(1 .. 100) {
   cmp_ok($s1, 'eq', $s2, "mpfrtoa() and nvtoa() agree for $s");
   ok(nvtoa_test($s1, $f ) == 15, "$s");
   ok(nvtoa_test($s2, $nv) == 15, "$s");
+
+  if($have_ryu) {
+    my $s3 = Math::Ryu::nv2s($nv);
+    cmp_ok($s1, 'eq', $s3, "mpfrtoa() and Math::Ryu agree for $s");
+  }
 }
 
 ###########################################################################

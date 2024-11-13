@@ -1,5 +1,5 @@
 package Muster::LeafFile::txt;
-$Muster::LeafFile::txt::VERSION = '0.62';
+$Muster::LeafFile::txt::VERSION = '0.92';
 #ABSTRACT: Muster::LeafFile::txt - a plain text file in a Muster content tree
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::LeafFile::txt - a plain text file in a Muster content tree
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -22,15 +22,15 @@ use Carp;
 use Mojo::Util      'decode';
 use YAML::Any;
 
-=head2 is_this_a_page
+=head2 is_this_a_binary
 
-Test if this type of file creates a page or is just a file.
+Test if this type of file which just contains binary data.
 
 =cut
-sub is_this_a_page {
+sub is_this_a_binary {
     my $self = shift;
 
-    return 1;
+    return undef;
 }
 
 =head2 build_html
@@ -44,8 +44,8 @@ sub build_html {
 
     my $content = $self->cooked();
     # if the output is going to be text, don't process it
-    if (defined $self->meta->{page_format}
-            and $self->meta->{page_format} eq 'txt')
+    if (defined $self->meta->{render_format}
+            and $self->meta->{render_format} eq 'txt')
     {
         return $content;
     }

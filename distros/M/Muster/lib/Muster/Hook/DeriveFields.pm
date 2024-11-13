@@ -1,12 +1,12 @@
 package Muster::Hook::DeriveFields;
-$Muster::Hook::DeriveFields::VERSION = '0.62';
+$Muster::Hook::DeriveFields::VERSION = '0.92';
 =head1 NAME
 
 Muster::Hook::DeriveFields - Muster hook for field derivation
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -23,6 +23,8 @@ use Mojo::Base 'Muster::Hook';
 use Muster::Hooks;
 use Muster::LeafFile;
 use Lingua::EN::Inflexion;
+use DateTime;
+use POSIX qw(strftime);
 use YAML::Any;
 use Carp;
 
@@ -79,7 +81,7 @@ sub process {
 
     # split the page-name on '-'
     # useful for project-types
-    my @bits = split('-', $leaf->name);
+    my @bits = split('-', $leaf->bald_name);
     for (my $i=0; $i < scalar @bits; $i++)
     {
         my $p1 = sprintf('p%d', $i + 1); # page-bits start from 1 not 0
@@ -97,77 +99,118 @@ sub process {
     }
 
     # the first Alpha of the name; good for headers in reports
-    $meta->{name_a} = uc(substr($leaf->name, 0, 1));
+    $meta->{name_a} = uc(substr($leaf->bald_name, 0, 1));
+
+    # name-spaced
+    my $namespaced = $leaf->bald_name;
+    $namespaced =~ s#_# #g;
+    $namespaced =~ s#-# #g;
+    $namespaced =~ s/([-\w]+)/\u\L$1/g;
+    $meta->{namespaced} = $namespaced;
 
     # plural and singular 
     # assuming that the page-name is a noun...
-    my $noun = noun($leaf->name);
+    my $noun = noun($leaf->bald_name);
     if ($noun->is_plural())
     {
         $meta->{singular} = $noun->singular();
-        $meta->{plural} = $leaf->name;
+        $meta->{plural} = $leaf->bald_name;
     }
     elsif ($noun->is_singular())
     {
-        $meta->{singular} = $leaf->name;
+        $meta->{singular} = $leaf->bald_name;
         $meta->{plural} = $noun->plural();
     }
     else # neither
     {
-        $meta->{singular} = $leaf->name;
-        $meta->{plural} = $leaf->name;
+        $meta->{singular} = $leaf->bald_name;
+        $meta->{plural} = $leaf->bald_name;
     }
 
-    # Classify the prose length for those pages that have wordcounts. Of course,
-    # this assumes that all of the words are in one page, which for long
-    # stories won't be the case. Hmmm.
-    if ($meta->{wordcount})
+    # ============================================
+    # DATE stuff
+    # ============================================
+
+    # Some date adjustments.
+    # Files may have creation-date information in them;
+    # use that for the "date" of the page
+    if (exists $meta->{timestamp}
+            and defined $meta->{timestamp}
+            and $meta->{timestamp} != $meta->{mtime})
     {
-        my $len = '';
-        if ($meta->{wordcount} == 100)
+        $meta->{date} = strftime('%Y-%m-%d %H:%M', localtime($meta->{timestamp}));
+    }
+    elsif (exists $meta->{creation_date}
+            and defined $meta->{creation_date}
+            and $meta->{creation_date} =~ /^\d\d\d\d-\d\d-\d\d/)
+    {
+        $meta->{date} = $meta->{creation_date};
+    }
+    elsif (exists $meta->{date_added}
+            and defined $meta->{date_added}
+            and $meta->{date_added} =~ /^\d\d\d\d-\d\d-\d\d/)
+    {
+        $meta->{date} = $meta->{creation_date};
+    }
+    elsif (exists $meta->{fetch_date}
+            and defined $meta->{fetch_date}
+            and $meta->{fetch_date} =~ /^\d\d\d\d-\d\d-\d\d/)
+    {
+        $meta->{date} = $meta->{fetch_date};
+    }
+
+    # Derived date-related info using DateTime
+    # Look for existing fields which end with _date
+    foreach my $field (keys %{$meta})
+    {
+        if (($field =~ /_date$/ 
+                    or $field =~ /^date_/
+                    or $field eq 'date')
+                and defined $meta->{$field}
+                and $meta->{$field} =~ /^(\d\d\d\d)-(\d\d)-(\d\d)/)
         {
-            $len = 'Drabble';
-        } elsif ($meta->{wordcount} == 200)
-        {
-            $len = 'Double-Drabble';
-        } elsif ($meta->{wordcount} >= 75000)
-        {
-            $len = 'Long-Novel';
-        } elsif ($meta->{wordcount} >= 50000)
-        {
-            $len = 'Novel';
-        } elsif ($meta->{wordcount} >= 25000)
-        {
-            $len = 'Novella';
-        } elsif ($meta->{wordcount} >= 7500)
-        {
-            $len = 'Novelette';
-        } elsif ($meta->{wordcount} >= 2000)
-        {
-            $len = 'Short-Story';
-        } elsif ($meta->{wordcount} > 500)
-        {
-            $len = 'Short-Short';
-        } elsif ($meta->{wordcount} <= 500)
-        {
-            $len = 'Flash';
-        }
-        if ($meta->{tags})
-        {
-            if (ref $meta->{tags} eq 'ARRAY')
+            my $year = $1;
+            my $month = $2;
+            my $day = $3;
+            my $hour = 0;
+            my $min = 0;
+            # The date MAY have time info in it too
+            if ($meta->{$field} =~ /^\d\d\d\d-\d\d-\d\d (\d+):(\d\d)/)
             {
-                push @{$meta->{tags}}, $len;
+                $hour = $1;
+                $min = $2;
             }
-            else
-            {
-                $meta->{tags} .= "|$len";
-            }
-        }
-        else
-        {
-            $meta->{tags} = $len;
+            my $dt = DateTime->new(year=>$year,month=>$month,day=>$day,
+                hour=>$hour,minute=>$min);
+            my $new_fn = $field;
+            $new_fn =~ s/date/datetime/;
+            $meta->{$new_fn} = $dt->epoch();
+            $new_fn = $field; $new_fn =~ s/date/date_year/;
+            $meta->{$new_fn} = $dt->year();
+            $new_fn = $field; $new_fn =~ s/date/date_month/;
+            $meta->{$new_fn} = $dt->month();
+            $new_fn = $field; $new_fn =~ s/date/date_monthname/;
+            $meta->{$new_fn} = $dt->month_name();
         }
     }
+
+    # -----------------------------------------
+    # Default field-values
+    # set on a per-extension basis.
+    # These are set in the config for this hook.
+    # They will not clobber existing values.
+    # -----------------------------------------
+    if (defined $self->{config}->{ext}->{$meta->{extension}})
+    {
+        foreach my $field (keys %{$self->{config}->{ext}->{$meta->{extension}}})
+        {
+            if (!defined $meta->{$field})
+            {
+                $meta->{$field} = $self->{config}->{ext}->{$meta->{extension}}->{$field};
+            }
+        }
+    }
+
     $leaf->{meta} = $meta;
 
     return $leaf;

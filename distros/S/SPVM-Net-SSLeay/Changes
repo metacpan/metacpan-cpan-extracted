@@ -1,3 +1,30 @@
+0.012 2024-11-13
+  [New Features]
+    * Add Net::SSLeay::X509_STORE_CTX#set_error method.
+    * Add Net::SSLeay::X509_STORE_CTX#get_error method.
+    * Add Net::SSLeay::X509_STORE_CTX#get_error_depth method.
+    * Add Net::SSLeay::X509_STORE_CTX#get_current_cert method.
+    * Add Net::SSLeay::SSL_CTX#set_session_cache_mode method.
+    * Add Net::SSLeay::SSL_CTX#set_ecdh_auto method.
+    * Add Net::SSLeay::SSL_CTX#set_tmp_dh method.
+    * Add Net::SSLeay::SSL_CTX#set_post_handshake_auth method.
+    * Add Net::SSLeay::SSL_CTX#use_PrivateKey method.
+    * Add Net::SSLeay::SSL_CTX#set_session_id_context method.
+    * Add Net::SSLeay::SSL_CTX#set_min_proto_version method.
+    * Add Net::SSLeay::SSL_CTX#get_ext_d2i  method.
+    * Add Net::SSLeay::DER class.
+    * Add Net::SSLeay::OCSP class.
+    * Add Net::SSLeay::OCSP_REQUEST class.
+    * Add Net::SSLeay::OCSP_RESPONSE class.
+    * Add Net::SSLeay::DER#d2i_OCSP_REQUEST method.
+    * Add Net::SSLeay::DER#d2i_OCSP_RESPONSE method.
+    * Add Net::SSLeay::DER#i2d_OCSP_REQUEST method.
+    * Add Net::SSLeay#load_client_CA_file method.
+    * Add Net::SSLeay::SSL_CTX#set_client_CA_list method.
+    * Add Net::SSLeay::SSL_CTX#add_client_CA method.
+    * Add Net::SSLeay#get_SSL_CTX  method.
+    * Add Net::SSLeay::SSL_CTX#add_extra_chain_cert method.
+    
 0.011 2024-11-12
   [New Features]
     * Add Net::SSLeay::X509_NAME class.

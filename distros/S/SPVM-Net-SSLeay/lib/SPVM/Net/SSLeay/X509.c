@@ -170,6 +170,31 @@ int32_t SPVM__Net__SSLeay__X509__pubkey_digest(SPVM_ENV* env, SPVM_VALUE* stack)
   return 0;
 }
 
+int32_t SPVM__Net__SSLeay__X509__get_ext_d2i(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  int32_t nid = stack[1].ival;
+  
+  int32_t* crit_ref = stack[2].iref;
+  
+  int32_t* idx_ref = stack[3].iref;
+  
+  X509* x509 = env->get_pointer(env, stack, obj_self);
+  
+  int crit_tmp = 0;
+  int idx_tmp = 0;
+  X509_get_ext_d2i(x509, nid, &crit_tmp, &idx_tmp);
+  
+  *crit_ref = crit_tmp;
+  
+  *idx_ref = idx_tmp;
+  
+  return 0;
+}
+
 int32_t SPVM__Net__SSLeay__X509__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;

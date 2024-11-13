@@ -1,5 +1,5 @@
 package Muster::LeafFile::EXIF;
-$Muster::LeafFile::EXIF::VERSION = '0.62';
+$Muster::LeafFile::EXIF::VERSION = '0.92';
 #ABSTRACT: Muster::LeafFile::EXIF - an EXIF-containing file in a Muster content tree
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::LeafFile::EXIF - an EXIF-containing file in a Muster content tree
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -20,12 +20,12 @@ use Mojo::Base 'Muster::LeafFile';
 
 use Carp;
 use Image::ExifTool qw(:Public);
+use Text::Markdown::Discount 'markdown';
 
-# this is not a page
-sub is_this_a_page {
+sub is_this_a_binary {
     my $self = shift;
 
-    return undef;
+    return 1;
 }
 
 sub build_meta {
@@ -48,7 +48,7 @@ sub build_meta {
     # There are multiple fields which could be used as a file "description".
     # Check through them until you find a non-empty one.
     my $description = '';
-    foreach my $field (qw(Description Caption-Abstract Comment ImageDescription UserComment))
+    foreach my $field (qw(Caption-Abstract Comment ImageDescription UserComment Description))
     {
         if (exists $info->{$field} and $info->{$field} and !$description)
         {
@@ -103,9 +103,13 @@ sub build_meta {
         if (exists $info->{$field} and $info->{$field} and !$date)
         {
             $date = $info->{$field};
+            # often the formatting can be different
+            # Change YYYY:MM:DD to YYYY-MM-DD
+            $date =~ s/^(\d+):(\d+):(\d+)/$1-$2-$3/;
         }
     }
     $meta->{date} = $date if $date;
+    $meta->{creation_date} = $date if $date;
 
     # Use a consistent naming for tag fields.
     # Combine the tag-like fields together.
@@ -130,12 +134,10 @@ sub build_meta {
     # There are SOOOOOO many fields in EXIF data, just remember a subset of them
     foreach my $field (qw(
 FileSize
-Flash
 ImageHeight
 ImageSize
 ImageWidth
 Megapixels
-PageCount
 Location
 Title
 ))
@@ -149,16 +151,68 @@ Title
     return $meta;
 }
 
+=head2 build_raw
+
+The raw content of the page.
+For binary files, the "page" content is empty;
+if you want to show the actual binary file,
+do a source-file request.
+
+=cut
 sub build_raw {
     my $self = shift;
 
     return "";
 }
 
+=head2 build_html
+
+Create the HTML for this binary-file page.
+
+=cut
 sub build_html {
     my $self = shift;
-
-    return "";
+    
+    my $content = $self->cooked();
+    # if the output is going to be text, don't process it
+    if (defined $self->meta->{render_format}
+            and $self->meta->{render_format} eq 'txt')
+    {
+        return $content;
+    }
+    elsif (defined $content
+            and $content
+            and defined $self->meta->{html_from})
+    {
+        # This probably needs to be done more generically
+        # by using modules' own methods,
+        # but this will do for now.
+        if ($self->meta->{html_from} eq 'html')
+        {
+            # HTML doesn't need processing
+            return $content;
+        }
+        elsif ($self->meta->{html_from} eq 'txt')
+        {
+    return <<EOT;
+<pre>
+$content
+</pre>
+EOT
+        }
+        elsif ($self->meta->{html_from} eq 'mdwn')
+        {
+            return markdown($content);
+        }
+        else # Don't know what this is, don't process
+        {
+            return $content;
+        }
+    }
+    else
+    {
+        return $content;
+    }
 }
 
 1;

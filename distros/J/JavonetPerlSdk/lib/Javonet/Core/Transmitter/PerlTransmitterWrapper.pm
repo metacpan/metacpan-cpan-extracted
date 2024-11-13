@@ -50,7 +50,7 @@ sub initialize {
         $ffi->lib("$current_dir/$perl_native_lib");
         $send_command_native = $ffi->function('SendCommand' => [ 'uchar[]', 'int' ] => 'int');
         $read_response_native = $ffi->function('ReadResponse' => [ 'uchar[]', 'int' ] => 'int');
-        $activate_native = $ffi->function('Activate' => ['string', 'string', 'string', 'string' ] => 'int');
+        $activate_native = $ffi->function('Activate' => ['string'] => 'int');
         $get_native_error_native = $ffi->function('GetNativeError' => [] => 'string');
         $set_config_source_native = $ffi->function('SetConfigSource' => ['string'] => 'int');
     }
@@ -77,9 +77,9 @@ sub send_command {
 }
 
 sub activate {
-    my ($self, $licenseKey, $proxyHost, $proxyUserName, $proxyPassword) = @_;
+    my ($self, $licenseKey) = @_;
     initialize();
-    my $activation_result = $activate_native->($licenseKey, $proxyHost, $proxyUserName, $proxyPassword);
+    my $activation_result = $activate_native->($licenseKey);
     if ($activation_result < 0) {
         my $error_message = $get_native_error_native->();
         die "Javonet activation result: $activation_result. Native error message: $error_message";

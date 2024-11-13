@@ -260,7 +260,7 @@ else {
 
 my $nv = 1.3;
 my $s  = "$nv"; # $nv should be POK && NOK if MPFR_PV_NV_BUG is 1
-                # Else (ie MPFR_NV_BUG is 0) $nv should be NOK only.
+                # Else (ie MPFR_PV_NV_BUG is 0) $nv should be NOK only.
 
 $z = Math::MPFR->new($nv);
 

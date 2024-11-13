@@ -1,12 +1,12 @@
 package Muster::Hook::Counter;
-$Muster::Hook::Counter::VERSION = '0.62';
+$Muster::Hook::Counter::VERSION = '0.92';
 =head1 NAME
 
 Muster::Hook::Counter - Muster counter directives.
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,6 @@ use Muster::LeafFile;
 use Muster::Hooks;
 use Muster::Hook::Links;
 use File::Basename qw(basename);
-use HTML::LinkList;
 use YAML::Any;
 
 use Carp 'croak';

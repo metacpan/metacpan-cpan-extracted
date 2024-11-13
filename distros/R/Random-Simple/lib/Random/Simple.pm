@@ -1,6 +1,6 @@
 package Random::Simple;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 our $debug   = 0;
 
 use strict;
@@ -12,11 +12,11 @@ use warnings;
 
 =head1 NAME
 
-Random::Simple - Simple, usable, real world random numbers
+Random::Simple - Generate good random numbers in a user consumable way.
 
 =head2 Why Random::Simple?
 
-To make generating random numbers as easy as possible and in a manner that
+To make generating random numbers as easy as possible I<and> in a manner that
 you can use in real code. Generate "good" random numbers without having to
 think about it.
 
@@ -26,6 +26,17 @@ think about it.
 
     my $integer = random_int($min, $max); # inclusive
     my $bytes   = random_bytes($count);
+
+=head2 Methodology
+
+Perl's internal C<rand()> function uses C<drand48()> which is an older PRNG,
+and may have limitations. `Random::Simple` uses PCG which is: modern, simple,
+well vetted, and fast.
+
+C<Random::Simple> is automatically seeded with high quality entropy directly
+from your OS. On Linux this is C</dev/urandom> and on Windows it uses
+CryptGenRandom. You will get statistically unique random numbers
+automatically.
 
 =head2 See also
 

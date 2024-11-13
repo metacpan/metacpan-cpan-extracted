@@ -1,5 +1,5 @@
 {
-   "abstract" : "Simple, usable, real world random numbers",
+   "abstract" : "Generate good random numbers in a user consumable way.",
    "author" : [
       "Scott Baker <bakerscot@cpan.org>"
    ],
@@ -49,6 +49,6 @@
          "web" : "https://github.com/scottchiefbaker/perl-Random-Simple"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

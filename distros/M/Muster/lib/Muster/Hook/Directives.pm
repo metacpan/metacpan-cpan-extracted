@@ -1,12 +1,12 @@
 package Muster::Hook::Directives;
-$Muster::Hook::Directives::VERSION = '0.62';
+$Muster::Hook::Directives::VERSION = '0.92';
 =head1 NAME
 
 Muster::Hook::Directives - Muster base class for preprocessor directives
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 SYNOPSIS
 
@@ -57,11 +57,6 @@ sub do_directives {
     my $directive = $args{directive};
     my $call = $args{call};
 
-    # do nothing if this is not a page
-    if (!$leaf->is_page)
-    {
-        return $leaf;
-    }
     my $page = $leaf->pagename;
     my $content = $leaf->cooked;
 
@@ -110,8 +105,10 @@ sub do_directives {
                 {
                     $val=$2;
                     $val=~s/\r\n/\n/mg;
-                    $val=~s/^\n+//g;
-                    $val=~s/\n+$//g;
+                    $val=~s/^\n+//g; # remove starting newlines
+                    $val=~s/\n+$//g; # remove trailing newlines
+                    # to compensate for the newline removal, enable substitution of \n as a newline
+                    $val=~s/\\n/\n/g;
                 }
                 elsif (defined $3)
                 {

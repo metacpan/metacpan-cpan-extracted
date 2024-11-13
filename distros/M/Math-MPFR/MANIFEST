@@ -58,6 +58,7 @@ t/float128_subnormal.t
 t/get_IV.t
 t/get_NV.t
 t/grandom.t
+t/infnan_str.t
 t/integer_string.t
 t/inits.t
 t/lngamma_bug.t
@@ -88,6 +89,7 @@ t/overload_cross_class.t
 t/overload_float128.t
 t/overload_shift.t
 t/overload_switch.t
+t/overloadex.t
 t/P_specifier.t
 t/pod.t
 t/printf.t
@@ -111,6 +113,8 @@ t/set_NV.t
 t/set_str.t
 t/sign.t
 t/sizes.t
+t/snprintf.t
+t/sprintf.t
 t/subnormal_doubles.t
 t/sum.t
 t/test1.t

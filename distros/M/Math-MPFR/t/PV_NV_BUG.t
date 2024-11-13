@@ -15,6 +15,7 @@ warn " The string 'nan' apparently numifies to zero\n"
 
 # Check that both the perl environment and the XS
 # environment agree on whether the problem is present.
+
 cmp_ok(MPFR_PV_NV_BUG, '==', Math::MPFR::_has_pv_nv_bug(),
        "Perl environment and XS environment agree");       # Test 1
 

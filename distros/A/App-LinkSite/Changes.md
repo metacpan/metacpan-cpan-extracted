@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.0.10] - 2024-11-12
+
+### Fixed
+
+- A stupid typo
+
+## [0.0.9] - 2024-11-12
+
+### Fixed
+
+- Added meta description to output page
+
 ## [0.0.8] - 2024-11-04
 
 ### Improved

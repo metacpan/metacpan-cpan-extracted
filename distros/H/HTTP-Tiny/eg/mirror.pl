@@ -6,7 +6,7 @@ use warnings;
 use HTTP::Tiny;
 
 my $url  = shift(@ARGV) || 'http://example.com';
-my $file = shift(@ARGV) || 'example.output'; 
+my $file = shift(@ARGV) || 'example.output';
 
 my $response = HTTP::Tiny->new->mirror($url, $file);
 

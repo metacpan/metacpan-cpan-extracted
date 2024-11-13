@@ -104,6 +104,7 @@ MPFR_RNDA MPFR_RNDD MPFR_RNDF MPFR_RNDN MPFR_RNDU MPFR_RNDZ MPFR_PV_NV_BUG
 MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
 RMPFR_PREC_MAX RMPFR_PREC_MIN RMPFR_VERSION_NUM
 
+log_2 log_10 sind cosd tand tangent
 Rmpfr_abs Rmpfr_acos Rmpfr_acosh Rmpfr_acospi Rmpfr_acosu
 Rmpfr_add Rmpfr_add_d Rmpfr_add_q Rmpfr_add_si Rmpfr_add_ui Rmpfr_add_z
 Rmpfr_agm Rmpfr_ai
@@ -192,7 +193,7 @@ prec_cast q_add_fr q_cmp_fr q_div_fr q_mul_fr q_sub_fr rndna
 
     @Math::MPFR::EXPORT_OK = (@tags, 'bytes');
 
-    our $VERSION = '4.29';
+    our $VERSION = '4.31';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -213,6 +214,15 @@ $Math::MPFR::doubletoa_fallback = 0; # If FALLBACK_NOTIFY is defined, this scala
                                      # incremented whenever the grisu3 algorithm (used by doubletoa) fails
                                      # to produce correct result, and thus falls back to its designated
                                      # fallback routine. (See the doubletoa documentation for details.)
+
+$Math::MPFR::PERL_INFNAN = 0;
+
+my $pinf = 1e5000;      # +infinity
+my $ninf = -$pinf;      # -infinity
+my $nanv = $pinf/$pinf; # not a number
+$Math::MPFR::pinfstr = "$pinf"; # perl's string representation of +infinity
+$Math::MPFR::ninfstr = "$ninf"; # perl's string representation of -infinity
+$Math::MPFR::nanvstr = "$nanv"; # perl's string representation of a nan
 
 %Math::MPFR::NV_properties = _get_NV_properties();
 

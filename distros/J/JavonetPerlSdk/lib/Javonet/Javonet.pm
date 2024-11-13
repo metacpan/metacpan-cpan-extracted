@@ -8,45 +8,20 @@ use threads;
 use aliased 'Javonet::Sdk::Internal::RuntimeFactory' => 'RuntimeFactory';
 use aliased 'Javonet::Core::Transmitter::PerlTransmitter' => 'Transmitter', qw(activate_with_license_file activate_with_credentials activate_with_credentials_and_proxy);
 use aliased 'Javonet::Core::Exception::SdkExceptionHelper' => 'SdkExceptionHelper';
-use aliased 'Javonet::Sdk::Core::RuntimeLogger' => 'RuntimeLogger', qw(print_runtime_info);
+use aliased 'Javonet::Sdk::Core::RuntimeLogger' => 'RuntimeLogger', qw(get_runtime_info);
 
 BEGIN {
-    try {
-        Transmitter->activate_with_license_file();
-    } catch {
-        SdkExceptionHelper->send_exception_to_app_insights($_,"JavonetStatic");
-    };
-    RuntimeLogger->print_runtime_info();
+    SdkExceptionHelper->send_exception_to_app_insights("SdkMessage","Javonet Sdk initialized");
 }
 
 sub activate {
-    if(@_ == 1) {
-        try {
-            return Transmitter->activate_with_license_file();
-        } catch {
-            Javonet::Core::Exception::SdkExceptionHelper->send_exception_to_app_insights($_,"licenseFile");
-            die($_);
-        };
-    }
-    if(@_ == 2) {
-        my($self, $licenseKey) = @_;
-        try {
-            return Transmitter->activate_with_credentials($licenseKey);
-        } catch {
-            Javonet::Core::Exception::SdkExceptionHelper->send_exception_to_app_insights($_,$licenseKey);
-            die($_);
-        };
-    } elsif (@_ > 2) {
-        my($self, $licenseKey, $proxyHost, $proxyUserName, $proxyPassword) = @_;
-        $proxyUserName //="";
-        $proxyPassword //="";
-        try {
-            return Transmitter->activate_with_credentials_and_proxy($licenseKey, $proxyHost, $proxyUserName, $proxyPassword);
-        } catch {
-            Javonet::Core::Exception::SdkExceptionHelper->send_exception_to_app_insights($_,$licenseKey);
-            die($_);
-        };
-    }
+    my($self, $licenseKey) = @_;
+    try {
+        return Transmitter->activate($licenseKey);
+    } catch {
+        Javonet::Core::Exception::SdkExceptionHelper->send_exception_to_app_insights($_,"licenseFile");
+        die($_);
+    };
 }
 
 sub in_memory {
@@ -68,6 +43,10 @@ sub with_config {
         SdkExceptionHelper->send_exception_to_app_insights($_,"withConfig");
         die $_;
     };
+}
+
+sub get_runtime_info() {
+    RuntimeLogger->get_runtime_info();
 }
 
 1;

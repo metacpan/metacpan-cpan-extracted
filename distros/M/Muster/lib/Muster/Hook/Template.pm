@@ -1,12 +1,12 @@
 package Muster::Hook::Template;
-$Muster::Hook::Template::VERSION = '0.62';
+$Muster::Hook::Template::VERSION = '0.92';
 =head1 NAME
 
 Muster::Hook::Template - Muster template directive.
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -86,11 +86,25 @@ sub process {
         return "";
     }
 
-    # fill in the template with the leaf's data
-    my $result = $self->{neat}->fill_in(
-        data_hash=>$leaf->{meta},
-        template=>$params{template},
-    );
+    # Check simple IF condition
+    my $go_ahead = 1;
+    if (exists $params{if} and $params{if})
+    {
+        $go_ahead = (exists $leaf->{meta}->{$params{if}}
+                and defined $leaf->{meta}->{$params{if}}
+                and $leaf->{meta}->{$params{if}}
+        );
+    }
+
+    my $result = '';
+    if ($go_ahead)
+    {
+        # fill in the template with the leaf's data
+        $result = $self->{neat}->fill_in(
+            data_hash=>$leaf->{meta},
+            template=>$params{template},
+        );
+    }
 
     return $result;
 } # process
@@ -152,11 +166,11 @@ sub _format_hash {
     {
         if ($level == 0)
         {
-            $out .= "<br/><b>$key:</b> ";
+            $out .= "<div class=yhash><b>$key:</b> ";
         }
         else
         {
-            $out .= '<br/>' . '&nbsp;&nbsp;' x $level . $key . ': ';
+            $out .= sprintf('<span class=lev%d>',$level) . '&nbsp;&nbsp;' x $level . $key . ': ';
         }
 
         my $v = $hash->{$key};
@@ -171,6 +185,14 @@ sub _format_hash {
         elsif (ref $v eq 'ARRAY')
         {
             $out .= _format_array($v,$level + 1);
+        }
+        if ($level == 0)
+        {
+            $out .= "</div>\n";
+        }
+        else
+        {
+            $out .= "</span>\n";
         }
     }
     return $out;
@@ -223,7 +245,7 @@ sub repeat_n {
         push @out, $line;
         $a++;
     }
-    return join("", @out);
+    return join("\n", @out);
 } # repeat_n
 
 =head2 repeat_for
@@ -256,7 +278,7 @@ sub repeat_for {
         $a++;
         $i++;
     }
-    return join("", @out);
+    return join("\n", @out);
 } # repeat_for
 
 =head2 math

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 # RewriteAttributes {{{
 my $html = << "END";
@@ -117,3 +117,35 @@ is($html, << "END", "rewrote the html correctly");
 END
 # }}}
 
+diag 'Add an attribute';
+$html = << "END";
+<html>
+    <body background="baroque.jpg">
+        <a href="http://en.wikipedia.org/wiki/COBOL">COBOL</a><br />
+        <a href="http://en.wikipedia.org/wiki/FORTRAN">FORTRAN</a><br />
+
+        <img src="http://example.com/img/COBOL.bmp" title="COBOL rocks" />
+        <img src="http://example.com/img/FORTRAN.bmp" title="FORTRAN rocks" />
+    </body>
+</html>
+END
+
+$html = HTML::RewriteAttributes->rewrite($html, sub {
+    my ( $tag, $attr, $value, $attrs, $attr_list ) = @_;
+    return $value unless $tag eq 'img' && !$attrs->{loading};
+    $attrs->{loading} = 'lazy';
+    push @$attr_list, 'loading';
+    return $value;
+});
+
+is($html, << "END", "rewrote the html correctly");
+<html>
+    <body background="baroque.jpg">
+        <a href="http://en.wikipedia.org/wiki/COBOL">COBOL</a><br />
+        <a href="http://en.wikipedia.org/wiki/FORTRAN">FORTRAN</a><br />
+
+        <img loading="lazy" src="http://example.com/img/COBOL.bmp" title="COBOL rocks" />
+        <img loading="lazy" src="http://example.com/img/FORTRAN.bmp" title="FORTRAN rocks" />
+    </body>
+</html>
+END

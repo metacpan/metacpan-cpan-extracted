@@ -1,5 +1,5 @@
 package Muster::Hook::Meta;
-$Muster::Hook::Meta::VERSION = '0.62';
+$Muster::Hook::Meta::VERSION = '0.92';
 use Mojo::Base 'Muster::Hook::Directives';
 use Muster::LeafFile;
 use Muster::Hooks;
@@ -12,7 +12,7 @@ Muster::Hook::Meta - Muster meta directive
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 

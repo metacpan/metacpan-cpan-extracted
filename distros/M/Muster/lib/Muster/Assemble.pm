@@ -1,5 +1,5 @@
 package Muster::Assemble;
-$Muster::Assemble::VERSION = '0.62';
+$Muster::Assemble::VERSION = '0.92';
 #ABSTRACT: Muster::Assemble - page rendering
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::Assemble - page rendering
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 SYNOPSIS
 
@@ -24,7 +24,7 @@ use Carp;
 use Muster::MetaDb;
 use Muster::LeafFile;
 use Muster::Hooks;
-use File::Slurper 'read_binary';
+use File::LibMagic;
 use YAML::Any;
 use Module::Pluggable search_path => ['Muster::Hook'], instantiate => 'new';
 
@@ -48,6 +48,8 @@ sub init {
     $self->{hookmaster} = Muster::Hooks->new();
     $self->{hookmaster}->init($app->config);
 
+    $self->{file_magic} = File::LibMagic->new();
+
     return $self;
 } # init
 
@@ -63,16 +65,24 @@ sub serve_page {
 
     $self->init($c);
 
-    # If this is a page, there ought to be a trailing slash in the cpath.
-    # If there isn't, either this isn't canonical, or it isn't a page.
+    # If a page is requested, there ought to be a trailing slash in the cpath.
+    # If there isn't, either this isn't canonical, or it isn't a page request.
     # However, pagenames don't have a trailing slash.
     # Yes, this is confusing.
+    # So why do we care if a URL is canonical? Because if it isn't canonical,
+    # it messes up relative page links. Ugh.
     my $pagename = $c->param('cpath') // 'index';
     my $has_trailing_slash = 0;
+    my $is_source_file_request = 0;
     if ($pagename =~ m!/$!)
     {
         $has_trailing_slash = 1;
         $pagename =~ s!/$!!;
+    }
+    elsif ($pagename =~ m!(.*)\.\w+$!) # source-file or file requests have .ext suffixes
+    {
+        $pagename = $1;
+        $is_source_file_request = 1;
     }
 
     # now we need to find if this page exists, and what type it is
@@ -82,29 +92,39 @@ sub serve_page {
         $c->reply->not_found;
         return;
     }
-    if (!$info->{is_page}) # a non-page
+
+    if ($is_source_file_request)
     {
-        return $self->_serve_file($c, $info->{filename});
+        return $self->_serve_file(controller=>$c, meta=>$info);
     }
     elsif (!$has_trailing_slash and $pagename ne 'index') # non-canonical
     {
-        return $c->redirect_to("/${pagename}/");
+        my $redir = "/${pagename}/";
+        return $c->redirect_to($redir);
     }
+
+    # Make sure that "head_append" is defined
+    $c->stash('head_append' => "");
 
     my $leaf = $self->_create_and_process_leaf(controller=>$c,meta=>$info);
 
     my $html = $leaf->html();
     unless (defined $html)
     {
+        say STDERR "404: html not rendered for '$pagename'";
         $c->reply->not_found;
         return;
     }
+    my $filtered_html = $self->{hookmaster}->run_filters(
+        html=>$html,
+        controller=>$c,
+        phase=>$Muster::Hooks::PHASE_FILTER);
 
     $c->stash('title' => $leaf->title);
     $c->stash('pagename' => $pagename);
-    $c->stash('content' => $html);
+    $c->stash('content' => $filtered_html);
     $c->render(template => 'page',
-        format => ($info->{page_format} ? $info->{page_format} : 'html'));
+        format => ($info->{render_format} ? $info->{render_format} : 'html'));
 } # serve_page
 
 =head2 serve_meta
@@ -137,90 +157,33 @@ sub serve_meta {
     $c->render(template => 'page');
 }
 
-=head2 serve_source
-
-Serve the source-content for a page (for debugging purposes)
-Only works for page-files. (We don't want to be sending a binary file!)
-
-=cut
-sub serve_source {
-    my $self = shift;
-    my $c = shift;
-    my $app = $c->app;
-
-    $self->init($c);
-
-    # If this is a page, there ought to be a trailing slash in the cpath.
-    # If there isn't, either this isn't canonical, or it isn't a page.
-    # However, pagenames don't have a trailing slash.
-    # Yes, this is confusing.
-    my $pagename = $c->param('cpath') // 'index';
-    my $has_trailing_slash = 0;
-    if ($pagename =~ m!/$!)
-    {
-        $has_trailing_slash = 1;
-        $pagename =~ s!/$!!;
-    }
-
-    # now we need to find if this page exists, and what type it is
-    my $info = $self->{metadb}->page_or_file_info($pagename);
-    unless (defined $info and defined $info->{filename} and -f -r $info->{filename})
-    {
-        $c->reply->not_found;
-        return;
-    }
-    if (!$info->{is_page}) # a non-page
-    {
-        $c->reply->not_found;
-        return;
-    }
-
-    my $leaf = $self->_create_and_process_leaf(controller=>$c,meta=>$info);
-
-    my $content = $leaf->raw();
-    unless (defined $content)
-    {
-        $c->reply->not_found;
-        return;
-    }
-
-    $c->stash('title' => $leaf->title);
-    $c->stash('pagename' => $pagename);
-    $c->stash('content' => "<pre>$content</pre>");
-    $c->render(template => 'page');
-} # serve_source
-
 =head1 Helper Functions
 
 =head2 _serve_file
 
 Serve a file rather than a page.
     
-    $self->_serve_file($filename);
+    $self->_serve_file(controller=>$c, meta=>$meta);
 
 =cut
 
 sub _serve_file {
     my $self = shift;
-    my $c = shift;
-    my $filename = shift;
+    my %args = @_;
+    my $c = $args{controller};
+    my $meta = $args{meta};
 
+    my $filename = $meta->{filename};
     if (!-f $filename)
     {
         # not found
         return;
     }
-    # extenstion is format (exclude the dot)
-    my $ext = '';
-    if ($filename =~ /\.(\w+)$/)
-    {
-        $ext = $1;
-    }
-    # read the image
-    my $bytes = read_binary($filename);
+    # Figure out the correct mime-type to give
+    my $file_info = $self->{file_magic}->info_from_filename($filename);
+    $c->res->headers->content_type($file_info->{mime_type});
+    $c->reply->file($filename);
 
-    # now display the logo
-    $c->render(data => $bytes, format => $ext);
 } # _serve_file
 
 =head2 _create_and_process_leaf
@@ -240,12 +203,15 @@ sub _create_and_process_leaf {
 
     my $leaf = Muster::LeafFile->new(
         pagename=>$meta->{pagename},
+        pagesrcname=>$meta->{pagesrcname},
         parent_page=>$meta->{parent_page},
+        grandparent_page=>$meta->{grandparent_page},
         filename=>$meta->{filename},
         filetype=>$meta->{filetype},
-        is_page=>$meta->{is_page},
+        is_binary=>$meta->{is_binary},
         extension=>$meta->{extension},
-        name=>$meta->{name},
+        bald_name=>$meta->{bald_name},
+        hairy_name=>$meta->{hairy_name},
         title=>$meta->{title},
         date=>$meta->{date},
         meta=>$meta,

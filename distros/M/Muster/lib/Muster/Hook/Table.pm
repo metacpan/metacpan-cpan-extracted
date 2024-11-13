@@ -1,5 +1,5 @@
 package Muster::Hook::Table;
-$Muster::Hook::Table::VERSION = '0.62';
+$Muster::Hook::Table::VERSION = '0.92';
 use Mojo::Base 'Muster::Hook::Directives';
 use Muster::LeafFile;
 use Muster::Hooks;
@@ -13,7 +13,7 @@ Muster::Hook::Table - Muster table directive.
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -72,7 +72,6 @@ sub process {
         header => 'row',
         @p
     );
-    my $pagename = $leaf->pagename;
 
     # code from IkiWiki
     if (lc $params{format} eq 'auto')

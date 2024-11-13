@@ -3,9 +3,17 @@
 # However, there can be an issue with the SvNOK flag on old perls,
 # so we avoid anything older than perl-5.12.
 
+BEGIN {
+  if($] < 5.012 ) {
+    print "1..1\n";
+    print "ok 1\n";
+    warn "Skipping tests because perl-$] is buggy\n";
+    exit 0;
+  }
+};
+
 use strict;
 use warnings;
-use 5.012;
 use Math::MPFR qw(:mpfr);
 
 use Test::More;

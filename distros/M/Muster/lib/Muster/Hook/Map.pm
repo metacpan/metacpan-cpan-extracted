@@ -1,12 +1,12 @@
 package Muster::Hook::Map;
-$Muster::Hook::Map::VERSION = '0.62';
+$Muster::Hook::Map::VERSION = '0.92';
 =head1 NAME
 
 Muster::Hook::Map - Muster map and pmap directive.
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -20,6 +20,7 @@ use Muster::LeafFile;
 use Muster::Hooks;
 use Muster::Hook::Links;
 use File::Basename qw(basename);
+use File::Spec;
 use HTML::LinkList;
 use YAML::Any;
 
@@ -126,7 +127,7 @@ sub process {
     }
     elsif (exists $params{where})
     {
-        my $pages = $self->{metadb}->query("SELECT page FROM pagefiles WHERE " . $params{where});
+        my $pages = $self->{metadb}->query("SELECT page FROM flatfields WHERE " . $params{where});
         @matching_pages = @{$pages} if $pages;
     }
     if (!scalar @matching_pages)
@@ -141,9 +142,12 @@ sub process {
         my @urls = ();
         foreach my $pn (@matching_pages)
         {
-            my $pi = $self->{metadb}->page_or_file_info($pn);
             $labels{$pn} = basename($pn);
-            push @urls, $pi->{pagelink};
+            # top-level index page is treated differently
+            my $relpage = ($leaf->pagename eq 'index'
+                ? $pn
+                : File::Spec->abs2rel($pn, $leaf->pagename));
+            push @urls, $relpage;
         }
         $result = HTML::LinkList::link_list(
             urls=>\@urls,
@@ -176,7 +180,9 @@ sub process {
             {
                 $max_depth = $pd;
             }
-            my $urlto = $page_info->{pagelink};
+            my $urlto = ($leaf->pagename eq 'index'
+                ? $page
+                : File::Spec->abs2rel($page, $leaf->pagename));
             push @link_list, $urlto;
 
             if (defined $show)
@@ -234,7 +240,11 @@ sub process {
             ? $tree
             : ($map_type eq 'nav'
                 ? "<nav>$tree</nav>\n"
-                : "<div class='map'>$tree</div>\n"));
+                : ($params{class}
+                    ? "<div class='$params{class}'>$tree</div>\n"
+                    : "<div class='map'>$tree</div>\n")
+            )
+        );
     } # else pmap
 
     if ($params{prepend})

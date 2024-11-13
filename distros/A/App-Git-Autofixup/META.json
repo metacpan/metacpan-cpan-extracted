@@ -4,13 +4,13 @@
       "Jordan Torbiak"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-Git-Autofixup",
    "no_index" : {
@@ -65,5 +65,6 @@
          "web" : "https://github.com/torbiak/git-autofixup"
       }
    },
-   "version" : 0.004006
+   "version" : 0.004007,
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

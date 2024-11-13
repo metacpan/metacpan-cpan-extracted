@@ -1,9 +1,10 @@
 package Muster::Hook::GraphViz;
-$Muster::Hook::GraphViz::VERSION = '0.62';
+$Muster::Hook::GraphViz::VERSION = '0.92';
 use Mojo::Base 'Muster::Hook::Directives';
 use Muster::LeafFile;
 use Muster::Hooks;
 use Digest::SHA;
+use File::Spec;
 
 use Carp 'croak';
 
@@ -13,7 +14,7 @@ Muster::Hook::GraphViz - Muster graph directive using GraphViz.
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -43,7 +44,7 @@ sub register {
     {
         mkdir $self->{graphs_dir};
     }
-    $self->{img_url} = $conf->{route_prefix} . 'graphs/';
+    $self->{img_url} = 'graphs/';
 
     my $callback = sub {
         my %args = @_;
@@ -112,7 +113,7 @@ sub process {
         print $fh $src;
         close $fh;
     }
-    my $imglink = $self->{img_url} . $dest;
+    my $imglink = File::Spec->abs2rel($self->{img_url} . $dest, $leaf->pagename);
 
     return <<EOT;
 <img src="$imglink" alt="$sha"/>

@@ -1,5 +1,5 @@
 package Muster::PagesHelper;
-$Muster::PagesHelper::VERSION = '0.62';
+$Muster::PagesHelper::VERSION = '0.92';
 #ABSTRACT: Muster::PagesHelper - helping with pages
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::PagesHelper - helping with pages
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 SYNOPSIS
 
@@ -26,6 +26,7 @@ use common::sense;
 use Text::NeatTemplate;
 use YAML::Any;
 use File::Basename 'basename';
+use File::Spec;
 use Mojo::URL;
 use HTML::LinkList;
 
@@ -135,18 +136,21 @@ sub _rightbar {
 
     my $pagename = $c->param('cpath');
     $pagename =~ s!/$!!; # remove trailing slash
+    my $info = $self->{metadb}->page_or_file_info($pagename);
+    $pagename = $info->{pagename};
 
-    my $src_dest_url = $c->url_for("/_src/$pagename/");
-    my $src_dest_label = 'Source';
+    # The source-file relative to the "page" is reached by going up
+    # because the page URL is foo/bar/page/
+    # and the page source URL is foo/bar/page.ext
+    # so the relative URL is foo/bar/page/../page.ext
+    my $src_file_url = '../' . $info->{hairy_name};
+    my $src_file_label = $info->{hairy_name};
+
     my $current_url = $c->req->url->to_abs;
-    if ($current_url =~ /_src/) # we're already looking at Source
-    {
-        $src_dest_url =~ s/_src\///;
-        $src_dest_label = "Dest";
-    }
     my $meta_dest_url = $c->url_for("/_meta/$pagename/");
     my $meta_dest_label = 'Meta';
-    if ($current_url =~ /_meta/) # we're already looking at Meta
+    if (defined $current_url
+            and $current_url =~ /_meta/) # we're already looking at Meta
     {
         $meta_dest_url =~ s/_meta\///;
         $meta_dest_label = "Page";
@@ -155,8 +159,8 @@ sub _rightbar {
     my $atts = $self->_make_page_attachments_list($c);
     my $out=<<EOT;
 <p class="total">$total pages</p>
-<p class="srcdest"><a href="$src_dest_url">$src_dest_label</a></p>
-<p class="metadest"><a href="$meta_dest_url">$meta_dest_label</a></p>
+<p class="srcfile"><a href="$src_file_url">$src_file_label</a></p>
+<p class="metadest"><a href="$meta_dest_url">$meta_dest_url</a></p>
 $atts
 EOT
         return $out;
@@ -184,7 +188,7 @@ sub _total_pages {
 
 =head2 _make_page_attachments_list
 
-Make a list of related pages to this page.
+Make a list of related files to this page.
 
 =cut
 
@@ -201,12 +205,23 @@ sub _make_page_attachments_list {
     {
         my @att = ();
         my %labels = ();
+        # If this is not a binary-file page
         # just link to the basenames, since this should be relative
-        foreach my $att (@{$info->{attachments}})
+        # But with a binary-file page, the "attachment" is the binary-file itself.
+        if ($info->{is_binary})
         {
-            my $bn = basename($att);
-            push @att, $bn;
-            $labels{$bn} = $bn;
+            my $src_link = '../'.$info->{hairy_name};
+            push @att, $src_link;
+            $labels{$src_link} = $info->{hairy_name};
+        }
+        else
+        {
+            foreach my $att (@{$info->{attachments}})
+            {
+                my $bn = basename($att);
+                push @att, $bn;
+                $labels{$bn} = $bn;
+            }
         }
         $att_list = HTML::LinkList::link_list(
             urls=>\@att,
@@ -231,15 +246,27 @@ sub _make_page_related_list {
     my $pagename = $c->param('cpath') || 'index';
     $pagename =~ s!/$!!; # remove trailing slash
     my $info = $self->{metadb}->page_or_file_info($pagename);
-    my $current_url = $info->{pagelink};
 
     # get the links to the pages
-    my @paths = $self->{metadb}->allpagelinks();
-
+    my @pages = $self->{metadb}->non_hidden_pagelist();
+    # need to add slashes to ends of paths
+    my @paths = ();
+    foreach my $pn (@pages)
+    {
+        if ($pn !~ m{/$})
+        {
+            $pn = "/${pn}/";
+        }
+        push @paths, $pn;
+    }
     my $link_list = HTML::LinkList::nav_tree(
-        current_url=>$current_url,
+        current_url=>"/${pagename}/",
         paths=>\@paths,
     );
+    # figure out how get to the top page from this page
+    my $rel_str = File::Spec->abs2rel('/', '/'.$info->{pagename});
+    # alter the links to be relative to this page
+    $link_list =~ s!href="!href="${rel_str}!g;
 
     return $link_list;
 } # _make_page_related_list
@@ -254,9 +281,9 @@ sub _pagelist {
     my $self  = shift;
     my $c  = shift;
 
-    my $location = $c->url_for('pagelist');
+    my $location = $c->url_for('pagelist') // "";
     # get the links to the pages
-    my @paths = $self->{metadb}->allpagelinks();
+    my @paths = $self->{metadb}->non_hidden_pagelist();
 
     my $link_list = HTML::LinkList::full_tree(
         current_url=>$location,

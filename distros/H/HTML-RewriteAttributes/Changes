@@ -1,5 +1,12 @@
 Revision history for HTML-RewriteAttributes
 
+0.06    Fri Nov  12 2024
+        Pass more args to callback to support adding attributes.
+        Improve documentation for other features.
+        Add dot ('.') to Makefile.PL to find Module::Install in newer perls. Reported by Kent Fredric, RT 121446.
+        Remove unneeded shebang line in lib files. Reported by Laurent Baillet, RT 126906.
+        Fix spelling error in docs. Reported by x.guimard, RT 126964.
+
 0.05    Mon Oct 22 2012
         Resources: Preserve the media attribute when inlining CSS
         Resources: Avoid uninitialized warnings by checking the attributes we expect

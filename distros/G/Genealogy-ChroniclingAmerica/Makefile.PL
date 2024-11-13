@@ -8,17 +8,19 @@ use IO::Socket::INET;
 
 my $online_tests;
 
-if($ENV{RELEASE_TESTING}) {
+if($ENV{'AUTHOR_TESTING'}) {
 	$online_tests = are_online();
-} elsif($ENV{NO_NETWORK_TESTING}) {
-	$online_tests = 0;
 } else {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
 
 	if(!defined($online_tests)) {
 		$online_tests = are_online();
 	}
+	if(!$online_tests) {
+		print "On-line tests have been disabled\n";
+	}
 }
+
 
 if($online_tests) {
 	open(my $enabled, '>', 't/online.enabled') || die "Can't touch t/online.enabled $!";
@@ -27,6 +29,15 @@ if($online_tests) {
 	unlink('t/online.enabled');
 	print STDERR "NA: Genealogy::ChroniclingAmerica needs a permanent connexion to the Internet\n";
 	exit(0);
+}
+
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
 }
 
 WriteMakefile(
@@ -40,28 +51,36 @@ WriteMakefile(
       : ()),
     PL_FILES	=> {},
     TEST_REQUIRES => {
+	'Test::DescribeMe' => 0,
 	'Test::Most' => 0,
+	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
+	'Test::RequiresInternet' => 0,
 	'Test::URI' => 0,
 	# 'Test::Kwalitee' => 0,
-    },
-    PREREQ_PM => {
-    	'Carp' => 0,
-    	'JSON' => 0,
+    }, PREREQ_PM => {
+	'Carp' => 0,
+	'JSON::MaybeXS' => 0,
 	'LWP::Protocol::https' => 0,
 	'LWP::UserAgent' => 0,
-    	'URI' => 0,
-    },
-    dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	'Scalar::Util' => 0,
+	'URI' => 0
+    }, dist => $dist,
     clean		=> { FILES => 'Genealogy-ChroniclingAmerica-*' },
     META_MERGE		=> {
-    	'meta-spec' => { version => 2 },
-    	resources => {
-    		repository => {
+	'meta-spec' => { version => 2 },
+	resources => {
+		repository => {
+			repository => 'https://github.com/nigelhorne/Genealogy-ChroniclingAmerica',
 			type => 'git',
 			url => 'git://github.com/nigelhorne/Genealogy-ChroniclingAmerica.git',
 			web => 'https://github.com/nigelhorne/Genealogy-ChroniclingAmerica',
-    		},
+		}, bugtracker => {
+			mailto => 'bug-Genealogy-ChroniclingAmerica@rt.cpan.org',
+			url => 'https://github.com/nigelhorne/Genealogy-ChroniclingAmerica/issues',
+			# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-ChroniclingAmerica',
+			web => 'https://github.com/nigelhorne/Genealogy-ChroniclingAmerica/issues'
+		}, homepage => 'https://chroniclingamerica.loc.gov',
 	},
     },
     MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
@@ -69,18 +88,17 @@ WriteMakefile(
 
 sub are_online
 {
-	my $host = 'chroniclingamerica.loc.gov:80';
+	my $host = 'chroniclingamerica.loc.gov:443';
 
-	if($ENV{'http_proxy'} && ($ENV{'http_proxy'} =~ /^.+\/\/(\w+:\d+)$/)) {
+	if($ENV{'https_proxy'} && ($ENV{'https_proxy'} =~ /^.+\/\/(\w+:\d+)$/)) {
 		$host = $1;
-	} elsif($ENV{'HTTP_PROXY'} && ($ENV{'HTTP_PROXY'} =~ /^.+\/\/(\w+:\d+)$/)) {
+	} elsif($ENV{'HTTPS_PROXY'} && ($ENV{'HTTPS_PROXY'} =~ /^.+\/\/(\w+:\d+)$/)) {
 		$host = $1;
 	}
-	my $s = IO::Socket::INET->new(
+	if(my $s = IO::Socket::INET->new(
 		PeerAddr => $host,
 		Timeout => 5
-	);
-	if($s) {
+	)) {
 		if($ENV{'AUTOMATED_TESTING'}) {
 			close($s);
 			return 1;

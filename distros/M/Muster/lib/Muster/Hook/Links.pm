@@ -1,12 +1,12 @@
 package Muster::Hook::Links;
-$Muster::Hook::Links::VERSION = '0.62';
+$Muster::Hook::Links::VERSION = '0.92';
 =head1 NAME
 
 Muster::Hook::Links - Muster hook for links
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 SYNOPSIS
 
@@ -91,30 +91,28 @@ sub process {
     my $leaf = $args{leaf};
     my $phase = $args{phase};
 
-    if (!$leaf->is_page)
-    {
-        return $leaf;
-    }
-
     my $content = $leaf->cooked();
     my $page = $leaf->pagename;
 
     if ($phase eq $Muster::Hooks::PHASE_SCAN)
     {
-        my %links = ();
+        if (!$leaf->is_binary)
+        {
+            my %links = ();
 
-        while ($content =~ /(?<!\\)$Link_Regexp/g)
-        {
-            my $link = $2;
-            my $anchor = $3;
-            if (! $self->is_externallink($page, $link, $anchor)) {
-                $links{$link}++;
+            while ($content =~ /(?<!\\)$Link_Regexp/g)
+            {
+                my $link = $2;
+                my $anchor = $3;
+                if (! $self->is_externallink($page, $link, $anchor)) {
+                    $links{$link}++;
+                }
             }
-        }
-        my @links = sort keys %links;
-        if (scalar @links)
-        {
-            $leaf->{meta}->{links} = \@links;
+            my @links = sort keys %links;
+            if (scalar @links)
+            {
+                $leaf->{meta}->{links} = \@links;
+            }
         }
     }
     else
@@ -244,17 +242,19 @@ sub htmllink {
         $linktext=basename($link);
     }
 
-    return "<span class=\"selflink\">$linktext</span>"
-    if length $bestlink && $page eq $bestlink &&
-    ! defined $opts{anchor};
+    if (length $bestlink
+        && $page eq $bestlink
+        && ! defined $opts{anchor})
+    {
+        return "<span class=\"selflink\">$linktext</span>";
+    }
 
     if (!$page_exists or !$bestlink)
     {
         return "<a class=\"createlink\" href=\"$link\">$linktext ?</a>";
     }
     
-    $bestlink=File::Spec->abs2rel($bestlink, $page);
-    $bestlink=$bl_info->{pagelink};
+    $bestlink=File::Spec->abs2rel($bestlink, $page) if $page ne 'index';
 
     if (defined $opts{anchor}) {
         $bestlink.="#".$opts{anchor};

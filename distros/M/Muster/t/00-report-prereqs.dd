@@ -1,12 +1,12 @@
 do { my $x = {
        'build' => {
                     'requires' => {
-                                    'Module::Build' => '0.28'
+                                    'Module::Build' => '0.3601'
                                   }
                   },
        'configure' => {
                         'requires' => {
-                                        'Module::Build' => '0.28'
+                                        'Module::Build' => '0.3601'
                                       }
                       },
        'develop' => {
@@ -24,10 +24,13 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Const::Fast' => '0',
                                       'DBI' => '0',
+                                      'DateTime' => '0',
                                       'Digest::SHA' => '0',
                                       'Encode' => '0',
                                       'File::Basename' => '0',
                                       'File::Find' => '0',
+                                      'File::LibMagic' => '0',
+                                      'File::MimeInfo::Magic' => '0',
                                       'File::ShareDir' => '0',
                                       'File::Slurper' => '0',
                                       'File::Spec' => '0',
@@ -66,8 +69,8 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Test::Mojo' => '0',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.006',
                                    'strict' => '0',
                                    'warnings' => '0'

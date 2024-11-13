@@ -3,8 +3,10 @@ package Genealogy::ChroniclingAmerica;
 # https://chroniclingamerica.loc.gov/search/pages/results/?state=Indiana&andtext=james=serjeant&date1=1894&date2=1896&format=json
 use warnings;
 use strict;
+
 use LWP::UserAgent;
-use JSON;
+use JSON::MaybeXS;
+use Scalar::Util;
 use URI;
 use Carp;
 
@@ -14,11 +16,11 @@ Genealogy::ChroniclingAmerica - Find URLs for a given person on the Library of C
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -56,11 +58,11 @@ as L<LWP::UserAgent::Throttled>.
 =cut
 
 sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
+	my $class = shift;
 
 	return unless(defined($class));
 
+	# Handle hash or hashref arguments
 	my %args;
 	if(ref($_[0]) eq 'HASH') {
 		%args = %{$_[0]};
@@ -68,6 +70,18 @@ sub new {
 		Carp::croak('Usage: ', __PACKAGE__, '->new(%args)');
 	} elsif(@_ % 2 == 0) {
 		%args = @_;
+	}
+
+	if(!defined($class)) {
+		# Using Genealogy::ChroniclingAmerica->new(), not Genealogy::ChroniclingAmerica::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
+		return bless { %{$class}, %args }, ref($class);
 	}
 
 	unless($args{'firstname'}) {
@@ -83,13 +97,18 @@ sub new {
 		return;
 	}
 
-	Carp::croak('State needs to be the full name') if(length($args{'state'}) == 2);
+	if(length($args{'state'}) == 2) {
+		Carp::croak('State needs to be the full name');
+		return;
+	}
 
 	my $ua = $args{'ua'} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
-	$ua->env_proxy(1) unless(delete $args{'ua'});
+	$ua->env_proxy(1) unless($args{'ua'});
 
-	my $rc = { ua => $ua };
-	$rc->{'host'} = $args{'host'} || 'chroniclingamerica.loc.gov';
+	my $rc = {
+		ua => $ua,
+		host => $args{'host'} || 'chroniclingamerica.loc.gov'
+	};
 
 	my %query_parameters = ( 'format' => 'json', 'state' => ucfirst(lc($args{'state'})) );
 	if($query_parameters{'state'} eq 'District of columbia') {
@@ -129,7 +148,7 @@ sub new {
 		die $resp->status_line();
 	}
 
-	$rc->{'json'} = JSON->new();
+	$rc->{'json'} = JSON::MaybeXS->new();
 	my $data = $rc->{'json'}->decode($resp->content());
 
 	# ::diag(Data::Dumper->new([$data])->Dump());
@@ -159,19 +178,17 @@ sub get_next_entry
 {
 	my $self = shift;
 
-	return if($self->{'matches'} == 0);
+	# Exit if no matches or index out of bounds
+	return if($self->{'matches'} == 0) || ($self->{'index'} >= $self->{'matches'});
 
-	if($self->{'index'} >= $self->{'matches'}) {
-		return;
-	}
-
-	my $entry = @{$self->{'items'}}[$self->{'index'}];
-	$self->{'index'}++;
+	# Retrieve the next entry and increment index
+	my $entry = $self->{'items'}->[$self->{'index'}++];
 
 	if(!defined($entry->{'url'})) {
 		return $self->get_next_entry();
 	}
 
+	# Clean up OCR text
 	my $text = $entry->{'ocr_eng'};
 
 	if(!defined($text)) {
@@ -185,8 +202,10 @@ sub get_next_entry
 
 	# ::diag(Data::Dumper->new([$entry])->Dump());
 
+	# Make the API request
 	my $resp = $self->{'ua'}->get($entry->{'url'});
 
+	# Handle error responses
 	if($resp->is_error()) {
 		# print 'got: ', $resp->content(), "\n";
 		Carp::carp("get_next_entry: API returned error on $entry->{url}: ", $resp->status_line());
@@ -197,6 +216,7 @@ sub get_next_entry
 		die $resp->status_line();
 	}
 
+	# Decode JSON response and return PDF data
 	return $self->{'json'}->decode($resp->content())->{'pdf'};
 }
 
@@ -234,10 +254,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Genealogy-ChroniclingAmerica>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Genealogy-ChroniclingAmerica>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Genealogy-ChroniclingAmerica>
@@ -246,7 +262,7 @@ L<https://metacpan.org/release/Genealogy-ChroniclingAmerica>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018,2019 Nigel Horne.
+Copyright 2018-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

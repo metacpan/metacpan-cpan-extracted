@@ -1,5 +1,5 @@
 package Muster::Hook;
-$Muster::Hook::VERSION = '0.62';
+$Muster::Hook::VERSION = '0.92';
 use Mojo::Base -base;
 use Muster::LeafFile;
 
@@ -13,7 +13,7 @@ Muster::Hook - Muster hook base class
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 SYNOPSIS
 
@@ -61,6 +61,19 @@ sub register {
 
     return $self;
 } # register
+
+=head2 register_filter
+
+Initialize, and register HTML-filters.
+
+=cut
+sub register_filter {
+    my $self = shift;
+    my $hookmaster = shift;
+    my $conf = shift;
+
+    return $self;
+} # register_filter
 
 =head2 process
 

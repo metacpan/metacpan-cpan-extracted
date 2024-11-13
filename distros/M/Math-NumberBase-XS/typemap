@@ -1,6 +1,8 @@
 TYPEMAP
 AV *         T_AVREF
 HV *         T_HVREF
+T_STDIO      T_PTR
+T_OBJECT     T_PTR
 
 INPUT
 T_AVREF
@@ -11,7 +13,9 @@ T_HVREF
 
 OUTPUT
 T_AVREF
-    sv_setrv_noinc($arg, (SV*)$var);
+    SvREFCNT_inc((SV *)$var);
+    sv_setrv($arg, (SV*)$var);
 
 T_HVREF
-    sv_setrv_noinc($arg, (SV*)$var);
+    SvREFCNT_inc((SV *)$var);
+    sv_setrv($arg, (SV*)$var);

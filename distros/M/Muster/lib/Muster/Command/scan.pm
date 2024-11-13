@@ -1,5 +1,5 @@
 package Muster::Command::scan;
-$Muster::Command::scan::VERSION = '0.62';
+$Muster::Command::scan::VERSION = '0.92';
 #ABSTRACT: Muster::Command::scan - scan pages for metadata
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::Command::scan - scan pages for metadata
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 

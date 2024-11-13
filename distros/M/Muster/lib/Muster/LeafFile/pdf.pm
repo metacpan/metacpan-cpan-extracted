@@ -1,5 +1,5 @@
 package Muster::LeafFile::pdf;
-$Muster::LeafFile::pdf::VERSION = '0.62';
+$Muster::LeafFile::pdf::VERSION = '0.92';
 #ABSTRACT: Muster::LeafFile::pdf - a PDF file in a Muster content tree
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::LeafFile::pdf - a PDF file in a Muster content tree
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 DESCRIPTION
 
@@ -20,11 +20,10 @@ use Mojo::Base 'Muster::LeafFile::EXIF';
 
 use Carp;
 
-# this is not a page
-sub is_this_a_page {
+sub is_this_a_binary {
     my $self = shift;
 
-    return undef;
+    return 1;
 }
 
 1;

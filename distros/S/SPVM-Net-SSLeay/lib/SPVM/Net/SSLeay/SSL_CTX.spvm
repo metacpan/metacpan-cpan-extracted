@@ -7,11 +7,24 @@ class Net::SSLeay::SSL_CTX {
   
   use Net::SSLeay::SSL_METHOD;
   use Net::SSLeay::X509_STORE;
+  use Net::SSLeay::X509_NAME;
   use Net::SSLeay::X509_VERIFY_PARAM;
   use Net::SSLeay::EC_KEY;
+  use Net::SSLeay::DH;
+  use Net::SSLeay::EVP_PKEY;
+  use List;
+  
+  # Fields
+  has pkeys_list : List of Net::SSLeay::EVP_PKEY;
   
   # Class Methods
   native static method new : Net::SSLeay::SSL_CTX ($method : Net::SSLeay::SSL_METHOD);
+  
+  protected method init : void ($options : object[] = undef) {
+    
+    my $pkeys_list = List->new(new Net::SSLeay::EVP_PKEY[0]);
+    $self->{pkeys_list} = $pkeys_list;
+  }
   
   # Instance Methods
   native method set_mode : long ($mode : long);
@@ -49,6 +62,26 @@ class Net::SSLeay::SSL_CTX {
   native method set1_groups_list : int ($list : string);
   
   native method set1_curves_list : int ($list : string);
+  
+  native method set_session_cache_mode : long ($mode : long);
+  
+  native method set_ecdh_auto : long ($state : int);
+  
+  native method set_tmp_dh : long ($dh : Net::SSLeay::DH);
+  
+  native method set_post_handshake_auth : void ($val : int);
+  
+  native method use_PrivateKey : int ($pkey : Net::SSLeay::EVP_PKEY);
+  
+  native method set_session_id_context : int ($sid_ctx : string, $sid_ctx_len : int = -1);
+  
+  native method set_min_proto_version : int ($version : int);
+  
+  native method set_client_CA_list : void ($list : Net::SSLeay::X509_NAME[]);
+  
+  native method add_client_CA : int ($cacert : Net::SSLeay::X509);
+  
+  native method add_extra_chain_cert : long ($x509 : Net::SSLeay::X509);
   
   native method DESTROY : void ();
   

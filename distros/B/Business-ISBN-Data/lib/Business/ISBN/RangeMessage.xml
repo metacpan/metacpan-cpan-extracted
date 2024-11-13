@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>3afd4cf6-66a7-445b-a9f3-277a6af51f01</MessageSerialNumber>
-  <MessageDate>Thu, 7 Nov 2024 03:43:01 GMT</MessageDate>
+  <MessageSerialNumber>89e476fb-71ef-4a23-9d61-1b6b89dab0dc</MessageSerialNumber>
+  <MessageDate>Tue, 12 Nov 2024 03:41:57 GMT</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -8249,11 +8249,11 @@
       <Agency>Benin</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-1999999</Range>
+          <Range>0000000-2999999</Range>
           <Length>1</Length>
         </Rule>
         <Rule>
-          <Range>2000000-4999999</Range>
+          <Range>3000000-4999999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>

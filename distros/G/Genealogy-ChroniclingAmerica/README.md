@@ -4,7 +4,7 @@ Genealogy::ChroniclingAmerica - Find URLs for a given person on the Library of C
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -75,16 +75,12 @@ You can also look for information at:
 
     [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Genealogy-ChroniclingAmerica](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Genealogy-ChroniclingAmerica)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Genealogy-ChroniclingAmerica](http://cpanratings.perl.org/d/Genealogy-ChroniclingAmerica)
-
 - Search CPAN
 
     [https://metacpan.org/release/Genealogy-ChroniclingAmerica](https://metacpan.org/release/Genealogy-ChroniclingAmerica)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2018,2019 Nigel Horne.
+Copyright 2018-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

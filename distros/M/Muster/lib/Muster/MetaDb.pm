@@ -1,5 +1,5 @@
 package Muster::MetaDb;
-$Muster::MetaDb::VERSION = '0.62';
+$Muster::MetaDb::VERSION = '0.92';
 #ABSTRACT: Muster::MetaDb - keeping meta-data about pages
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::MetaDb - keeping meta-data about pages
 
 =head1 VERSION
 
-version 0.62
+version 0.92
 
 =head1 SYNOPSIS
 
@@ -40,11 +40,11 @@ Set the defaults for the object if they are not defined already.
 sub init {
     my $self = shift;
 
-    $self->{primary_fields} = [qw(title name date filetype is_page pagelink extension filename parent_page)];
+    $self->{primary_fields} = [qw(title bald_name hairy_name date filetype is_binary pagesrcname extension filename parent_page grandparent_page)];
     if (!defined $self->{metadb_db})
     {
         # give a default name
-        $self->{metadb_db} = 'muster.sqlite';
+        $self->{metadb_db} = 'muster.db3';
     }
     if (!defined $self->{route_prefix})
     {
@@ -76,6 +76,27 @@ sub update_one_page {
     $self->_add_page_data($pagename, %args);
 
 } # update_one_page
+
+=head2 update_some_pages
+
+Update the meta information for more than one page
+
+    $self->update_some_pages($page=>{...},$page2=>{}...);
+
+=cut
+
+sub update_some_pages {
+    my $self = shift;
+    my %args = @_;
+
+    if (!$self->_connect())
+    {
+        return undef;
+    }
+
+    $self->_update_some_entries(%args);
+
+} # update_some_pages
 
 =head2 update_all_pages
 
@@ -137,7 +158,7 @@ sub update_derived_tables {
         return undef;
     }
 
-    $self->_generate_derived_tables();
+    $self->_generate_derived_tables(%args);
 
 } # update_derived_tables
 
@@ -227,7 +248,22 @@ sub pagespec_translate {
         }
         elsif ($word =~ /^(\w+)\((.*)\)$/)
         {
-            # can't deal with functions, skip it
+            my $func = $1;
+            my $func_args_str = $2;
+
+            # field_item(column value)
+            if ($func eq 'field_item')
+            {
+                my @func_args = split(' ', $func_args_str);
+                $sql .= sprintf(" %s = '%s' ",
+                    $func_args[0], $func_args[1]);
+            }
+            # where(condition)
+            elsif ($func eq 'where' and $func_args_str)
+            {
+                # put parens around it just in case
+                $sql.=' ( '.$func_args_str.' ) ';
+            }
         }
         else
         {
@@ -241,6 +277,8 @@ sub pagespec_translate {
 =head2 query_pagespec
 
 Do a query using an IkiWiki-style pagespec.
+Always EXCLUDE pages starting with _ because they
+are special hidden pages.
 
     my $results = $self->query($spec);
 
@@ -255,14 +293,14 @@ sub query_pagespec {
         return undef;
     }
     my $where = $self->pagespec_translate($spec);
-    my $query = "SELECT page FROM pagefiles WHERE ($where);";
+    my $query = "SELECT page FROM flatfields WHERE bald_name NOT GLOB '_*' AND ($where);";
 
     return $self->_do_one_col_query($query);
 } # query_pagespec
 
 =head2 pagelist
 
-Query the database, return a list of pages
+Query the database, return a list of all pages
 
 =cut
 
@@ -278,14 +316,14 @@ sub pagelist {
     return $self->_get_all_pagenames();
 } # pagelist
 
-=head2 allpagelinks
+=head2 non_hidden_pagelist
 
-Query the database, return a list of all pages' pagelinks.
-This does not include _Header or _Footer pages.
+Query the database, return a list of all pages
+NOT including _Header or _Footer pages.
 
 =cut
 
-sub allpagelinks {
+sub non_hidden_pagelist {
     my $self = shift;
     my %args = @_;
 
@@ -294,9 +332,9 @@ sub allpagelinks {
         return undef;
     }
 
-    my $pagelinks = $self->_do_one_col_query("SELECT pagelink FROM pagefiles WHERE is_page IS NOT NULL AND NAME NOT GLOB '_*' ORDER BY page;");
-    return @{$pagelinks};
-} # allpagelinks
+    my $pages = $self->_do_one_col_query("SELECT page FROM pagefiles WHERE is_binary IS NULL AND bald_name NOT GLOB '_*' ORDER BY page;");
+    return @{$pages};
+} # non_hidden_pagelist
 
 =head2 total_pages
 
@@ -376,6 +414,10 @@ sub bestlink {
         $cwd="";
     }
     $link=~s/\/$//;
+
+    # If the given link ends with .ext suffix
+    # the related page will be the thing without the suffix
+    $link =~ s/\.\w+$//;
 
     do {
         my $l=$cwd;
@@ -474,7 +516,7 @@ sub _prepare {
         $sth = $self->{dbh}->prepare($q);
         if (!$sth)
         {
-            croak "FAILED to prepare '$q' $DBI::errstr";
+            confess "FAILED to prepare '$q' $DBI::errstr";
         }
         $self->{prepared}->{$q} = $sth;
     }
@@ -485,7 +527,7 @@ sub _prepare {
 
 Create the initial tables in the database:
 
-pagefiles: (page, title, name, filetype, is_page, filename, parent_page)
+pagefiles: (page, title, name, filetype, is_binary, filename, parent_page...)
 links: (page, links_to)
 deepfields: (page, field, value)
 
@@ -528,15 +570,193 @@ sub _create_tables {
 
 =head2 _generate_derived_tables
 
-Create and populate the flatfields table using the data from the deepfields table.
-Expects the deepfields table to be up to date, so this needs to be called
-at the end of the scanning pass.
+The flatfields table may or may not need to be re-defined, depending on
+whether there are new or deleted non-hidden fields since the last time
+the flatfields table was updated. If the column definitions are unchanged,
+one does not need to re-define the flatfields table, just update its contents.
 
     $self->_generate_derived_tables();
 
 =cut
 
 sub _generate_derived_tables {
+    my $self = shift;
+    my %args = @_;
+
+    return unless $self->{dbh};
+
+    my $dbh = $self->{dbh};
+
+    # ---------------------------------------------------
+    # TABLE: flatfields
+    # ---------------------------------------------------
+    
+    # Figure out if we need to re-define the table.
+    my $redefine_table = 0;
+    
+    # The non-hidden fieldnames should be in alphabetical
+    # order; the column-names will be "page", followed
+    # by fieldnames in alphabetical order.
+    # Therefore, prepending "page" to the fieldnames
+    # should make them match, if the flatfields table
+    # does not need to be re-defined.
+    my @fieldnames = $self->_get_all_nonhidden_fieldnames();
+    unshift @fieldnames, 'page';
+    my @col_names = $self->_column_names('flatfields');
+
+    # Check if these arrays are the same length
+    if (scalar @fieldnames != scalar @col_names)
+    {
+        $redefine_table = 1;
+    }
+    else # check if the contents match
+    {
+        for (my $i=0;
+            (!$redefine_table and $i < scalar @fieldnames);
+            $i++)
+        {
+            if ($fieldnames[$i] ne $col_names[$i])
+            {
+                $redefine_table = 1;
+            }
+        }
+    }
+    if ($redefine_table)
+    {
+        $self->_generate_new_derived_tables();
+    }
+    else
+    {
+        $self->_update_derived_tables(%args);
+    }
+
+    return 1;
+} # _generate_derived_tables
+
+=head2 _update_derived_tables
+
+If the flatfields table definition hasn't been changed, it needs
+to be updated using the data from the deepfields table.
+Expects the deepfields table to be up to date, so this needs to be called
+at the end of the scanning pass.
+If the "pages" argument exists, just update those pages rather than
+all the pages.
+
+    $self->_update_derived_tables(pages=>{%the_pages});
+
+=cut
+
+sub _update_derived_tables {
+    my $self = shift;
+    my %args = @_;
+
+    return unless $self->{dbh};
+
+    my $dbh = $self->{dbh};
+
+    # ---------------------------------------------------
+    # TABLE: flatfields
+    # ---------------------------------------------------
+    print STDERR "Updating flatfields table\n";
+    
+    # We need to insert/update values for existing pages,
+    # and delete values for non-existing pages.
+    
+    # Prepare the insert-or-replace query
+    my @fieldnames = $self->_get_all_nonhidden_fieldnames();
+    my $placeholders = join ", ", ('?') x @fieldnames;
+    my $iq = 'INSERT OR REPLACE INTO flatfields (page, '
+    . join(", ", @fieldnames) . ') VALUES (?, ' . $placeholders . ');';
+    my $isth = $self->_prepare($iq);
+    if (!$isth)
+    {
+        croak __PACKAGE__ . " failed to prepare '$iq' : $DBI::errstr";
+    }
+
+    my $ret;
+    my $transaction_on = 0;
+    my $num_trans = 0;
+    my @pagefiles = (defined $args{pages}
+        ? sort keys %{$args{pages}}
+        : $self->_get_all_pagefiles());
+    foreach my $page (@pagefiles)
+    {
+        if (!$transaction_on)
+        {
+            my $ret = $dbh->do("BEGIN TRANSACTION;");
+            if (!$ret)
+            {
+                croak __PACKAGE__ . " failed 'BEGIN TRANSACTION' : $DBI::errstr";
+            }
+            $transaction_on = 1;
+            $num_trans = 0;
+        }
+        my $meta = $self->_get_fields_for_page($page);
+
+        my @values = ();
+        foreach my $fn (@fieldnames)
+        {
+            my $val = $meta->{$fn};
+            if (!defined $val)
+            {
+                push @values, undef;
+            }
+            elsif (ref $val)
+            {
+                $val = join("|", @{$val});
+                push @values, $val;
+            }
+            else
+            {
+                push @values, $val;
+            }
+        }
+        # we now have values to insert
+        $ret = $isth->execute($page, @values);
+        if (!$ret)
+        {
+            croak __PACKAGE__ . " failed '$iq' (" . join(',', ($page, @values)) . "): $DBI::errstr";
+        }
+        # do the commits in bursts
+        $num_trans++;
+        if ($transaction_on and $num_trans > 100)
+        {
+            $self->_commit();
+            $transaction_on = 0;
+            $num_trans = 0;
+        }
+
+    } # for each page
+
+    # Now, delete rows that don't have matching pages
+    my $dq = 'DELETE FROM flatfields WHERE page NOT IN (SELECT page FROM pagefiles);';
+    $ret = $dbh->do($dq);
+    if (!$ret)
+    {
+        croak "FAILED to execute '$dq' $DBI::errstr";
+    }
+    
+    if ($transaction_on)
+    {
+        $self->_commit();
+    }
+
+    print STDERR "Updated flatfields table\n";
+    return 1;
+} # _update_derived_tables
+
+=head2 _generate_new_derived_tables
+
+If the definition of the flatfields table has changed, it needs to be recreated.
+Create and populate the flatfields table using the data from the deepfields table.
+Expects the deepfields table to be up to date, so this needs to be called
+at the end of the scanning pass.
+
+    $self->_generate_new_derived_tables();
+
+=cut
+
+sub _generate_new_derived_tables {
     my $self = shift;
 
     return unless $self->{dbh};
@@ -546,7 +766,7 @@ sub _generate_derived_tables {
     # ---------------------------------------------------
     # TABLE: flatfields
     # ---------------------------------------------------
-    print STDERR "Generating flatfields table\n";
+    print STDERR "Generating new flatfields table\n";
     
     # Drop the table, as it is going to be re-defined.
     my $q = "DROP TABLE IF EXISTS flatfields;";
@@ -556,6 +776,7 @@ sub _generate_derived_tables {
         croak __PACKAGE__ . " failed '$q' : $DBI::errstr";
     }
     my @fieldnames = $self->_get_all_nonhidden_fieldnames();
+    say STDERR "FIELDS: ", join(', ', @fieldnames);
 
     # need to define some fields as numeric
     my @field_defs = ();
@@ -647,7 +868,7 @@ sub _generate_derived_tables {
 
     print STDERR "Generated flatfields table\n";
     return 1;
-} # _generate_derived_tables
+} # _generate_new_derived_tables
 
 =head2 _drop_main_tables
 
@@ -676,6 +897,54 @@ sub _drop_main_tables {
 
     return 1;
 } # _drop_main_tables
+
+=head2 _update_some_entries
+
+Update some pages, adding new ones and updating existing ones.
+This does NOT delete pages.
+
+    $self->_update_some_entries($page=>{...},$page2=>{}...);
+
+=cut
+sub _update_some_entries {
+    my $self = shift;
+    my %pages = @_;
+
+    my $dbh = $self->{dbh};
+
+    # update/add pages
+    my $transaction_on = 0;
+    my $num_trans = 0;
+    foreach my $pn (sort keys %pages)
+    {
+        print STDERR "UPDATING $pn\n";
+        if (!$transaction_on)
+        {
+            my $ret = $dbh->do("BEGIN TRANSACTION;");
+            if (!$ret)
+            {
+                croak __PACKAGE__ . " failed 'BEGIN TRANSACTION' : $DBI::errstr";
+            }
+            $transaction_on = 1;
+            $num_trans = 0;
+        }
+        $self->_add_page_data($pn, %{$pages{$pn}});
+        # do the commits in bursts
+        $num_trans++;
+        if ($transaction_on and $num_trans > 100)
+        {
+            $self->_commit();
+            $transaction_on = 0;
+            $num_trans = 0;
+        }
+    }
+    if ($transaction_on)
+    {
+        $self->_commit();
+    }
+
+    print STDERR "UPDATING DONE\n";
+} # _update_some_entries
 
 =head2 _update_all_entries
 
@@ -781,7 +1050,7 @@ sub _get_all_pagenames {
     my $self = shift;
 
     my $dbh = $self->{dbh};
-    my $pages = $self->_do_one_col_query("SELECT page FROM pagefiles WHERE is_page IS NOT NULL ORDER BY page;");
+    my $pages = $self->_do_one_col_query("SELECT page FROM pagefiles WHERE is_binary IS NULL ORDER BY page;");
 
     return @{$pages};
 } # _get_all_pagenames
@@ -857,7 +1126,7 @@ sub _get_children_for_page {
 
     return unless $self->{dbh};
     my $dbh = $self->{dbh};
-    my $children = $self->_do_one_col_query("SELECT page FROM pagefiles WHERE parent_page = '$pagename' AND is_page IS NOT NULL;");
+    my $children = $self->_do_one_col_query("SELECT page FROM pagefiles WHERE parent_page = '$pagename' AND is_binary IS NULL;");
 
     return $children;
 } # _get_children_for_page
@@ -876,7 +1145,7 @@ sub _get_attachments_for_page {
 
     return unless $self->{dbh};
     my $dbh = $self->{dbh};
-    my $attachments = $self->_do_one_col_query("SELECT page FROM pagefiles WHERE parent_page = '$pagename' AND is_page IS NULL;");
+    my $attachments = $self->_do_one_col_query("SELECT pagesrcname FROM pagefiles WHERE parent_page = '$pagename' AND is_binary IS NOT NULL;");
 
     return $attachments;
 } # _get_attachments_for_page
@@ -934,8 +1203,8 @@ sub _get_page_meta {
         return undef;
     }
     # Note that there are three different kinds of files we have data on:
-    # files: just the basic info in the pagefiles table
-    # files-with-filetypes: which have additional meta-data (for example, image file meta-data)
+    # binary files: just the basic info in the pagefiles table
+    # binary-files-with-filetypes: which have additional meta-data (for example, image file meta-data)
     # pages: which have additional meta-data, and also children, attachments, and links
     if ($meta->{filetype})
     {
@@ -952,13 +1221,18 @@ sub _get_page_meta {
             }
         }
 
-        # non-pages don't have links, children, or attachments
-        if ($meta->{is_page})
+        # binary file pages don't have links or children
+        # and only one attachment: itself
+        if ($meta->{is_binary})
+        {
+            $meta->{attachments} = [$meta->{pagesrcname}];
+        }
+        else # non-binary pages have children, links and attachments
         {
             # get multi-valued fields from other tables
             $meta->{children} = $self->_get_children_for_page($pagename);
-            $meta->{attachments} = $self->_get_attachments_for_page($pagename);
             $meta->{links} = $self->_get_links_for_page($pagename);
+            $meta->{attachments} = $self->_get_attachments_for_page($pagename);
         }
     }
 
@@ -1003,6 +1277,46 @@ sub _do_one_col_query {
     }
     return \@results;
 } # _do_one_col_query
+
+=head2 _column_names
+
+Get the column names of the given table.
+
+my @col_names = $self->_column_names($table);
+
+=cut
+
+sub _column_names {
+    my $self = shift;
+    my $tbl_name = shift;
+
+    # The PRAGMA table_info returns ALL the information
+    # about the given table, as a table with columns:
+    # cid|name|type|notnull|dflt_value|pk
+    # We are interested in the second column, "name".
+    my $q = "PRAGMA table_info($tbl_name);";
+    my $dbh = $self->{dbh};
+
+    my $sth = $self->_prepare($q);
+    if (!$sth)
+    {
+        croak "FAILED to prepare '$q' $DBI::errstr";
+    }
+    my $ret = $sth->execute();
+    if (!$ret)
+    {
+        croak "FAILED to execute '$q' $DBI::errstr";
+    }
+    my @results = ();
+    my @row;
+    while (@row = $sth->fetchrow_array)
+    {
+        # The "name" is the second column.
+        # Second column starting from 0 is 1
+        push @results, $row[1];
+    }
+    return @results;
+} # _column_names
 
 =head2 _total_pagefiles
 
@@ -1051,7 +1365,7 @@ sub _total_pages {
 
     my $dbh = $self->{dbh};
 
-    my $q = "SELECT COUNT(*) FROM pagefiles WHERE is_page IS NOT NULL;";
+    my $q = "SELECT COUNT(*) FROM pagefiles WHERE is_binary IS NULL;";
 
     my $sth = $self->_prepare($q);
     if (!$sth)
@@ -1119,39 +1433,6 @@ sub _find_pagename {
     return $realpage;
 } # _find_pagename
 
-=head2 _pagelink
-
-The page as if it were a html link.
-This does things like add a route-prefix or trailing slash if it is needed.
-
-It's okay to hardcode the route-prefix into the database, because it isn't
-as if one is going to be mounting the same config multiple times with different
-route-prefixes. If you have a different config, you're going to need a
-different database.
-
-=cut
-sub _pagelink {
-    my $self = shift;
-    my $link = shift;
-    my $info = shift;
-
-    if (!defined $info)
-    {
-        return $link;
-    }
-    # if this is an absolute link, needs a prefix in front of it
-    if ($link eq $info->{pagename})
-    {
-        $link = $self->{route_prefix} . $link;
-    }
-    # if this is a page, it needs a slash added to it
-    if ($info->{is_page})
-    {
-        $link .= '/';
-    }
-    return $link;
-} # _pagelink
-
 =head2 _add_page_data
 
 Add metadata to db for one page.
@@ -1167,14 +1448,6 @@ sub _add_page_data {
     return unless $self->{dbh};
     my $dbh = $self->{dbh};
 
-    # ------------------------------------------------
-    # Derive derivable data
-    # ------------------------------------------------
-    if (!$meta{pagelink})
-    {
-        $meta{pagelink} = $self->_pagelink($meta{pagename}, \%meta);
-    }
-    
     # ------------------------------------------------
     # TABLE: pagefiles
     # ------------------------------------------------

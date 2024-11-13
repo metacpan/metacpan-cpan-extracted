@@ -2,7 +2,7 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.011";
+  version "0.012";
   
   use Net::SSLeay::Constant;
   use Net::SSLeay::SSL_CTX;
@@ -10,6 +10,7 @@ class Net::SSLeay {
   use Net::SSLeay::Error;
   use Net::SSLeay::SSL_CIPHER;
   use Net::SSLeay::X509;
+  use Net::SSLeay::X509_NAME;
   use Net::SSLeay::SSL_SESSION;
   
   INIT {
@@ -29,6 +30,8 @@ class Net::SSLeay {
   native static method alert_desc_string_long : string ($value : int);
   
   native static method load_error_strings : void ();
+  
+  native static method load_client_CA_file : Net::SSLeay::X509_NAME[] ($file : string);
   
   # This native function is deprecated in OpenSSL 1.1.0, but Perl's IO::Socket::SSL used this method.
   native static method library_init : int ();
@@ -89,7 +92,10 @@ class Net::SSLeay {
   
   native method get_peer_cert_chain : Net::SSLeay::X509[] ();
   
-  # This native function is not documented in OpenSSL, but Perl's IO::Socket::SSL uses this method
+  method get_SSL_CTX : Net::SSLeay::SSL_CTX () {
+    return $self->{ssl_ctx};
+  }
+  
   native method set_SSL_CTX : Net::SSLeay::SSL_CTX ($ctx : Net::SSLeay::SSL_CTX);
   
   native method DESTROY : void ();
