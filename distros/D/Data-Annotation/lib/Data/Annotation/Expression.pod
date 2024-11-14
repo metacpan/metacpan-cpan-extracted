@@ -1,0 +1,221 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Annotation::Expression
+
+
+=head1 SYNOPSIS
+
+   use Data::Annotation::Expression qw< evaluator_factory >;
+
+   my $evaluator = evaluator_factory(\%definition, \%parse_context);
+   my $retval = $evaluator->($data);
+
+=head1 DESCRIPTION
+
+This module exports L</evaluator_factory>, a factory function that
+produces sub references based on an expression definition and additional
+context.  These sub references can later be used to evaluate the
+expression based on additional data that is provided as input.
+
+=head2 Example
+
+To make an example, suppose that we have the following I<target>
+function (from a behavioural point of view, at least):
+
+   my $expression = sub ($data) {
+      return ($data->{foo} eq 'bar')
+         && ($data->{baz}  ne $data->{galook});
+   }
+
+It's a boolean expression that makes use of some parts taken from
+C<$data> (keys C<foo>, C<baz>, and C<baz>) as well as a constant (string
+C<bar>), also leveraging boolean operators like C<&&> and comparison
+operators like C<eq> and C<ne>.
+
+The first step is to represent the expression as data, e.g. in
+YAML it would be:
+
+   and:
+      - eq: [ '.foo', '=bar' ]
+      - ne: [ '.baz', '.galook' ]
+
+In this module's conventions, strings starting with a dot represent
+access to the input data (like C<< .foo >>), while strings starting with
+an equal sign represent verbatim data (like C<< =baz >>). When we have
+this expression parsed as a Perl data structure, we can generate our
+equivalent function:
+
+   my $equivalent_expression = evaluator_factory($definition);
+
+=head2 Definition format(s)
+
+This section will use YAML format to represent data structure, although
+this module does only accept Perl data structures (i.e. parsing of YAML
+or any other representation format is supposed to be performed
+elsewhere).
+
+A definition is a hierarchical data structure composed of I<nodes>, that
+are hash references, with some specific fields that indicate what the
+node does. Some of these nodes represent functions/operators that take
+parameters, in the form of array references.
+
+In its most verbose form, the representation is very I<explicit>, like
+this that represents C<< $input->{foo} eq 'bar' >>:
+
+   type: sub
+   name: eq
+   args:
+      - type: context
+        path: run.foo
+      - type: data
+        value: bar
+
+There are three node C<type>s:
+
+=over
+
+=item *
+
+C<sub>: indicate a sub or an operator. This will be looked around based
+on its C<name> and invoked with the provided C<args>, after they have
+been evaluated. It is also possible to set a C<package> where the
+C<name> function will be searched, otherwise the L</Parse context> will
+be used.
+
+=item *
+
+C<data>: indicate verbatim data, provided as C<value>. This can itself
+be some complicated data structure, but it will be used as-is.
+
+=item *
+
+C<context>: indicate data that has to be taken from the available
+context, using a I<path> that is evaluated using
+L<Data::Annotation::Traverse> functions. The top-most key in the path
+can be C<run>, meaning whatever is passed to the evaluation function at
+runtime, as well as C<parse>, meaning the L</Parse context>, as well as
+C<definition>, which means the expression definition itself. Most of the
+times you will probably want to use C<run>, possibly C<parse> (to keep
+some less-dynamic data like configurations), almost never C<definition>
+(it's there mostly for debugging reasons).
+
+=back
+
+The fully explicit form above is the I<normal> form. As it is quite
+verbose, it's possible to use shortcuts as we already saw in the
+example. First of all, plain strings can serve as expressions, like
+this:
+
+   &sub_name     -->    { type: sub, name: sub_name, args: [] }
+   =foo_bar      -->    { type: data, value: foo_bar }
+   run.place     -->    { type: context, path: run.place }
+   .place        -->    { type: context, path: run.place }
+
+Then, we can have hash-references that contain a single key/value pair
+(like in the first examples). Keys C<data>, C<sub>, and C<context> do
+I<the right thing> much like the string versions above; other keys
+always lead to C<sub> nodes, where it's possible to also specify the
+C<package> by setting the value to a I<fully qualified> Perl function
+(i.e. including the package with the usual C<::> notation).
+
+=head2 Parse context
+
+When calling L</evalutor_function> it's possible to pass an optional
+second parameter with a hash reference of options. These are used to set
+the behaviour of parsing, as well as some runtime behaviour (e.g. where
+to find functions or retrieving values from the "context").
+
+The normalization process described in the previous section can be
+completely overridden by passing option C<definition-normalizer>, which
+is a sub reference with the following signature:
+
+   sub normalizer ($parse_ctx, $definition)  --> $normalized_definition
+
+You can find the default one in the L<Data::Annotation::Expression> code
+(function C<default_definition_normalizer>), which does what explained
+before.
+
+The parse context can be used at runtime to retrieve values using a
+C<context> node type. In this case, the path must start with string
+C<parse>.
+
+The parse context is also used in C<sub> node types. In particular, key
+C<locator-relative-prefixes> is (if present) an array reference holding
+a list of package prefixes that will be tried to find each function. As
+an example, suppose that it is set like this:
+
+   locator-relative-prefixes:
+      - Foo::Bar
+      - Baz::Galook
+
+The following applies:
+
+   { type: sub, name: blorg }
+      candidates: package Foo::Bar           function blorg
+                  package Baz::Galook        function blorg
+
+   { type: sub, name: blorg, package: Barf }
+      candidates: package Foo::Bar::Barf     function blorg
+                  package Baz::Galook::Barf  function blorg
+
+   { type: sub, name: blorg, package: '/Barf' }
+      candidates: package Barf               function blorg
+
+=head2 Builtin functions
+
+This module comes with a set of wrappers around Perl most common
+operators which are used as I<default> built-ins available in
+expressions. These are contained in
+L<Data::Annotation::Expression::Builtin> and this module is injected by
+default inside L</Parse context> option C<locator-relative-prefixes>.
+
+It is possible to avoid the injection of these built-ins by passing a
+true value to L</Parse context> option C<no-builtin> when calling the
+factory function.
+
+=head1 INTERFACE
+
+=head2 B<< evaluator_factory >>
+
+   my $sub1 = evaluator_factory(\%definition); # OR
+   my $sub2 = evaluator_factory(\%definition, \%parse_context);
+
+Generate an evaluator function based on a C<%definition> and optional
+C<%parse_context>. See L</DESCRIPTION> for everything.
+
+
+=begin private
+
+=over
+
+=item default_definition_normalizer
+
+=item generate_function
+
+=item generate_function_context
+
+=item generate_function_data
+
+=item generate_function_sub
+
+=item require_module
+
+=item resolve_function
+
+=back
+
+=end private
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for Data::Annotation.
+
+
+=cut

@@ -1244,6 +1244,21 @@ void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
   av_push(meta->adjustcvs, (SV *)cv);
 }
 
+void ObjectPad_mop_class_add_APPLY(pTHX_ ClassMeta *meta, CV *cv)
+{
+  if(meta->type != METATYPE_ROLE)
+    croak("Can only add a new APPLY block to a role");
+  if(!meta->begun)
+    croak("Cannot add a new APPLY block to a role that is not yet begun");
+  if(meta->sealed)
+    croak("Cannot add an APPLY block to an already-sealed role");
+
+  if(!meta->role.applycvs)
+    meta->role.applycvs = newAV();
+
+  av_push(meta->role.applycvs, (SV *)cv);
+}
+
 void ObjectPad_mop_class_add_required_method(pTHX_ ClassMeta *meta, SV *methodname)
 {
   if(meta->type != METATYPE_ROLE)
@@ -1549,7 +1564,35 @@ static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
 
   classmeta->next_fieldix += rolemeta->next_fieldix;
 
-  /* TODO: Run an APPLY block if the role has one */
+  if(rolemeta->role.applycvs) {
+    /* TODO: if APPLY blocks exist they should *replace* the built-in behaviour */
+    dSP;
+
+    AV *applycvs = rolemeta->role.applycvs;
+
+    SV *classmop = sv_newmortal();
+    sv_setref_uv(classmop, "Object::Pad::MOP::Class", PTR2UV(classmeta));
+
+    int i;
+    for(i = 0; i < av_count(applycvs); i++) {
+      CV *applycv = (CV *)AvARRAY(applycvs)[i];
+
+      ENTER;
+      SAVETMPS;
+      SPAGAIN;
+
+      EXTEND(SP, 1);
+      PUSHMARK(SP);
+      PUSHs(sv_mortalcopy(classmop));
+      PUTBACK;
+
+      assert(applycv);
+      call_sv((SV *)applycv, G_VOID);
+
+      FREETMPS;
+      LEAVE;
+    }
+  }
 }
 
 static void S_apply_roles(pTHX_ ClassMeta *dstmeta, ClassMeta *srcmeta)

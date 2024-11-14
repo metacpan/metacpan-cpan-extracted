@@ -1,5 +1,5 @@
 package Crypt::Bear::X509::Certificate;
-$Crypt::Bear::X509::Certificate::VERSION = '0.001';
+$Crypt::Bear::X509::Certificate::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Crypt::Bear::X509::Certificate - A X509 certificate in BearSSL
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

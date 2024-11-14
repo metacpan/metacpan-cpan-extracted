@@ -1,0 +1,166 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Annotation::Expression::Builtin
+
+
+=head1 SYNOPSIS
+
+   use Data::Annotation::Expression::Builtin;
+
+
+=head1 DESCRIPTION
+
+This module is not supposed to be used alone. It provides default
+built-ins for L<Data::Annotation::Expression>:
+
+=over
+
+=item *
+
+numeric comparison operators (same as Perl)
+
+=item *
+
+string comparison operators (same as Perl)
+
+=item *
+
+boolean operators C<and>, C<or>, C<not>, and C<xor>. Note that both
+C<and> and C<or> always evaluate all their operands, mostly because the
+evaluation happens I<before> the functions are called.
+
+=item *
+
+regular expression functions:
+
+=over
+
+=item *
+
+C<match>/C<< =~ >>
+
+=item *
+
+C<unmatch>/C<< !~ >>
+
+=back
+
+=item *
+
+set operations, applied to lists (array references) that are anyway
+cleaned up of duplicates:
+
+=over
+
+=item *
+
+C<union>/C<U>/C<⋃>
+
+=item *
+
+C<intersection>/C<⋂>
+
+=item *
+
+C<less> (binary, the second set is subtracted from the first)
+
+=item *
+
+C<symmetric_difference>
+
+=item *
+
+C<is_superset_of>/C<⊇>
+
+=item *
+
+C<is_subset_of>/C<⊆>
+
+=item *
+
+C<is_element_of>/C<∈>
+
+=item *
+
+C<contains>/C<∋>
+
+=item *
+
+C<sets_are_same>
+
+=item *
+
+C<set_size>
+
+=item *
+
+C<set_is_empty>
+
+=back
+
+=item *
+
+miscellaneous:
+
+=over
+
+=item *
+
+C<array> makes sure that I<something> is an array, turning C<undef> into
+an empty array and a lonely scalar into array with that scalar inside.
+
+=item *
+
+C<trim> removes blank chars from the beginning and end of a string.
+
+=back
+
+=back
+
+=begin private
+
+=over
+
+=item factory
+
+=item match
+
+=item set_contains
+
+=item set_intersection
+
+=item set_is_element_of
+
+=item set_is_subset_of
+
+=item set_is_superset_of
+
+=item set_less
+
+=item set_sorted_result
+
+=item set_symmetric_difference
+
+=item set_union
+
+=item sets_are_same
+
+=item unmatch
+
+=back
+
+=end private
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for Data::Annotation.
+
+
+=cut

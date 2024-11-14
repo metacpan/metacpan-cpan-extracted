@@ -460,7 +460,7 @@ static const map pem_flags = {
 
 typedef struct {
 #ifdef MULTIPLICITY
-	pTHX;
+	tTHX aTHX;
 #endif
 	br_pem_decoder_context decoder;
 	SV* callback;
@@ -480,7 +480,6 @@ static int pem_decoder_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* params) {
 
 #ifdef MULTIPLICITY
 	self->aTHX = aTHX;
-#endif
 	self->callback = sv_dup_inc(decoder->callback, params);
 	if (decoder->buffer)
 		self->buffer = sv_dup_inc(decoder->buffer, params);
@@ -488,6 +487,7 @@ static int pem_decoder_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* params) {
 		self->name = sv_dup_inc(decoder->name, params);
 	if (decoder->decoder.dest_ctx)
 		self->decoder.dest_ctx = self;
+#endif
 
 	return 0;
 }
@@ -554,7 +554,7 @@ typedef unsigned key_kind_type;
 
 struct decoder_helper {
 #ifdef MULTIPLICITY
-	pTHX;
+	tTHX aTHX;
 #endif
 	SV* value;
 };

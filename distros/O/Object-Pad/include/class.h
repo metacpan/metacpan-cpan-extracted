@@ -74,6 +74,7 @@ struct ClassMeta {
     struct {
       AV *superroles;      /* each elem is a raw pointer directly to a ClassMeta whose type == METATYPE_ROLE */
       HV *applied_classes; /* keyed by class name each elem is a raw pointer directly to a RoleEmbedding */
+      AV *applycvs;        /* the APPLY {} phaser blocks; each elem is a CV* directly */
     } role;
   };
 };

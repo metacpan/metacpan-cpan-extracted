@@ -1,5 +1,5 @@
 package JSON::Lines;
-use 5.006; use strict; use warnings; our $VERSION = '1.00';
+use 5.006; use strict; use warnings; our $VERSION = '1.01';
 use JSON; use base 'Import::Export';
 
 our ($JSON, $LINES, %EX);
@@ -27,7 +27,7 @@ sub jsonl {
 sub new {
 	my ($pkg, %args) = (shift, scalar @_ == 1 ? %{$_[0]} : @_);
 	my $self = bless { headers => [] }, $pkg;
-	exists $args{$_} && $JSON->$_($args{$_}) for qw/json pretty canonical/;
+	exists $args{$_} && $JSON->$_($args{$_}) for qw/pretty canonical/;
 	$self->{$_} = $args{$_} for qw/parse_headers error_cb success_cb/;
 	$self;
 }
@@ -41,12 +41,12 @@ sub encode {
 		my $json = eval { $JSON->encode($_) };
 		if ($@) {
 			if ($self->{error_cb}) {
-				$self->{error_cb}->($@, $_);
+				$self->{error_cb}->('encode', $@, $_);
 			} else {
 				die $@;
 			}
 		} else {
-			$self->{success_cb}->($json, $_) if $self->{success_cb};
+			$self->{success_cb}->('encode', $json, $_) if $self->{success_cb};
 			$stream .= $json . ($json =~ m/\n$/ ? "" : "\n");
 		}
 	}
@@ -118,12 +118,12 @@ sub _decode_line {
 	my $struct = eval { $JSON->decode($line) };
 	if ($@) {
 		if ($self->{error_cb}) {
-			return $self->{error_cb}->($@, $line);
+			return $self->{error_cb}->('decode', $@, $line);
 		} else {
 			die $@;
 		}
 	}
-	return $self->{success_cb}->($struct, $line) if $self->{success_cb};
+	return $self->{success_cb}->('decode', $struct, $line) if $self->{success_cb};
 	return $struct;
 }
 
@@ -182,7 +182,7 @@ JSON::Lines - Parse JSONLines with perl.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -275,9 +275,9 @@ L<https://jsonlines.org/>
 
 =head2 jsonl
 
-	my $string = jsonl( parse_headers => 1, encode => 1, data => $aoh );
+	my $string = jsonl( success_cb => sub { ... }, error_cb => sub { ... }, encode => 1, data => $aoh );
 
-	my $aoa = jsonl( decode => 1, data => $string )
+	my $aoa = jsonl( parse_headers => 1, decode => 1, data => $string )
 
 =head1 SUBROUTINES/METHODS
 
@@ -285,7 +285,33 @@ L<https://jsonlines.org/>
 
 Instantiate a new JSON::Lines object.
 
-	my $jsonl = JSON::Lines->new
+	my $jsonl = JSON::Lines->new(
+		success_cb => sub { if ($_[0] eq 'encode') { ... } },
+		error_cb => sub { if ($_[0] eq 'decode') { ... } },
+		canonical => 1,
+		pretty => 1,
+		parse_headers => 1
+	);
+
+=head3 success_cb
+
+Callback called on successfull encode or decode of an item.
+
+=head3 error_cb
+
+Callback called on unsucessfull encode or decode of an item.
+
+=head3 canonical
+
+Print in canonical order.
+
+=head3 pretty
+
+Pretty print.
+
+=head3 parse_headers
+
+Parse the first line of the stream as headers.
 
 =head2 encode
 
@@ -339,7 +365,7 @@ Decode a json lines file, 'n' lines at a time.
 
 Clear the current JSON::Lines stream.
 
-	$jsonl->clear_string;
+	$jsonl->clear_stream;
 
 =head1 AUTHOR
 

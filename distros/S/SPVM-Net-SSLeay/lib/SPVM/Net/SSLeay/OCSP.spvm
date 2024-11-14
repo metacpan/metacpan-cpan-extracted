@@ -3,4 +3,25 @@
 
 class Net::SSLeay::OCSP {
   
+  use Net::SSLeay::OCSP_REQUEST;
+  use Net::SSLeay::OCSP_RESPONSE;
+  use Net::SSLeay::OCSP_BASICRESP;
+  use Net::SSLeay::X509_STORE;
+  use Net::SSLeay::X509;
+  use Net::SSLeay::ASN1_GENERALIZEDTIME;
+  
+  native static method response_status_str : string ($code : long);
+  
+  native static method response_status : int ($resp : Net::SSLeay::OCSP_RESPONSE);
+  
+  native static method basic_verify : int ($bs : Net::SSLeay::OCSP_BASICRESP, $certs : Net::SSLeay::X509[], $st : Net::SSLeay::X509_STORE, $flags : long);
+  
+  native static method basic_add1_cert : int ($resp : Net::SSLeay::OCSP_BASICRESP, $cert : Net::SSLeay::X509);
+  
+  native static method check_nonce : int ($req : Net::SSLeay::OCSP_REQUEST, $resp : Net::SSLeay::OCSP_BASICRESP);
+  
+  native static method check_validity : int ($thisupd : Net::SSLeay::ASN1_GENERALIZEDTIME, $nextupd : Net::SSLeay::ASN1_GENERALIZEDTIME, $sec : long, $maxsec : long);
+  
+  native static method resp_count : int ($bs : Net::SSLeay::OCSP_BASICRESP);
+  
 }

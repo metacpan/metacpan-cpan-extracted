@@ -1,8 +1,6 @@
 #!/usr/bin/perl
-use 5.006;
 use strict;
-use warnings FATAL => 'all';
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;
 
 my $mod_name     =  'Map::Tube::Plugin::FuzzyFind';
 my $mod_file     =  'lib/' . $mod_name . '.pm';
@@ -17,21 +15,22 @@ WriteMakefile(
     VERSION_FROM       => $mod_file,
     ABSTRACT_FROM      => $mod_file,
     LICENSE            => 'artistic_2',
-    PL_FILES           => {},
-    MIN_PERL_VERSION   => 5.006,
+	PL_FILES		   => { },
+	MIN_PERL_VERSION   => 5.010,
     CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => 6.64, },
     TEST_REQUIRES      => {
                             'Test::More'        => 0.82,
-                            'Map::Tube::London' => 0.71,
-                            'Map::Tube'         => 2.92,
+							'Map::Tube::London' => 1.39,
+							'Map::Tube'         => 3.77,
                           },
     PREREQ_PM          => {
-                            'Map::Tube'         => 2.85,
+							'Map::Tube'         => 3.77,
                             'Moo::Role'         => 0,
                             'Moo'               => 0,
                             'namespace::clean'  => 0,
                             'Try::Tiny'         => 0,
                           },
+	( MM->can('signature_target') ? ( SIGN => 1 ) : ( ) ),
     dist               => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean              => { FILES    => $mod_distname . '-*', },
     META_MERGE         => {
@@ -47,23 +46,22 @@ WriteMakefile(
                                              runtime => {
                                                           suggests => {
                                                                         'Text::Soundex'     => 3,
-                                                                        'Text::Unidecode'   => 0,
+																		'Text::Phonetic::Phonix' => 0,
+																		'Text::Phonetic::Phonem' => 0,
+																		'Text::Phonetic::DaitchMokotoff' => 0,
+																		'Text::Phonetic::Koeln' => 0,
                                                                         'Text::Metaphone'   => 20081017,
-                                                                        'Text::Levenshtein' => 0.12,
+																		'Text::DoubleMetaphone' => 0,
+																		'Text::Levenshtein::XS' => 0.503,
+																		'Text::Levenshtein::Damerau::XS' => 3.2,
+																		'Text::JaroWinkler' => 0,
                                                                         'String::Trigram'   => 0.12,
+																		'Text::Unidecode'   => 0,        # not needed by ourselves but by Text::Soundex, which does not declare this fact
                                                                       },
                                                         },
                                            },
                             resources   => {
-                #                             repository => {
-                #                                             url  => 'https://...',
-                #                                             web  => 'https://...',
-                #                                             type => 'git',
-                #                                           },
-                                             bugtracker => {
-                                                             mailto => 'bug-' . $mod_distname . '@rt.cpan.org',
-                                                             web    => 'https://rt.cpan.org/Dist/Display.html?Name=' . $mod_distname,
-                                                           },
+											 bugtracker => { mailto => 'bug-' . $mod_distname . '@rt.cpan.org', },
                                            },
                           },
 );

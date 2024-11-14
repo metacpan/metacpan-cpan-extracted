@@ -1,0 +1,42 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Annotation::Util
+
+
+=head1 SYNOPSIS
+
+   use Data::Annotation::Util qw< o overlay >;
+
+   my $ov = o(\%data);  # same as overlay(\%data);
+
+=head1 DESCRIPTION
+
+Utility functions.
+
+
+=head1 INTERFACE
+
+=head2 C<< o >>
+
+Same as L</overlay>.
+
+=head2 C<< overlay >>
+
+   my $o = overlay(\%data_structure);
+
+Instantiate a L<Data::Annotation::Overlay> taking the provided
+C<%data_structure> for the underlay. It's also possible to pass additional
+parameters that will be passed on to the constructor.
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<Data::Annotation>.
+
+=cut

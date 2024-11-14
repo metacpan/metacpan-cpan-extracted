@@ -1,5 +1,5 @@
-#!perl -T
-use 5.006;
+#!perl
+use 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Test::More 0.82;
@@ -12,8 +12,8 @@ BEGIN {
 
 diag( "Testing Map::Tube::Plugin::FuzzyFind $Map::Tube::Plugin::FuzzyFind::VERSION, Perl $], $^X" );
 
-my $tube = Map::Tube::London->new();
+my $tube = new_ok( 'Map::Tube::London' );
 can_ok( $tube, 'fuzzy_find' );
 
-plan tests => 2;
+plan tests => 3;
 

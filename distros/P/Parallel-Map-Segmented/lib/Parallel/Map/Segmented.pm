@@ -1,5 +1,5 @@
 package Parallel::Map::Segmented;
-$Parallel::Map::Segmented::VERSION = '0.4.0';
+$Parallel::Map::Segmented::VERSION = '0.4.1';
 use strict;
 use warnings;
 use autodie;
@@ -52,7 +52,7 @@ segments of items.
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 SYNOPSIS
 
@@ -310,7 +310,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/parallel-map-segmented/issues>
+L<https://github.com/shlomif/perl-Parallel-ForkManager-Segmented/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

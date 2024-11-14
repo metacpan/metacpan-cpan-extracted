@@ -9,7 +9,7 @@ use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Leader;
 use MARC::Leader::Print;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -36,8 +36,9 @@ sub run {
 		'f' => undef,
 		'h' => 0,
 	};
-	if (! getopts('adf:h', $self->{'_opts'}) || (! $self->{'_opts'}->{'f'}
-		&& @ARGV < 1) || $self->{'_opts'}->{'h'}) {
+	if (! getopts('adf:h', $self->{'_opts'})
+		|| (! $self->{'_opts'}->{'f'} && @ARGV < 1)
+		|| $self->{'_opts'}->{'h'}) {
 
 		print STDERR "Usage: $0 [-a] [-d] [-f marc_xml_file] [-h] [--version] [leader_string]\n";
 		print STDERR "\t-a\t\t\tPrint with ANSI colors (or use NO_COLOR/COLOR env variables).\n";
@@ -380,6 +381,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

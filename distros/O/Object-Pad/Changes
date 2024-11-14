@@ -1,5 +1,9 @@
 Revision history for Object-Pad
 
+0.815   2024-11-13
+        [CHANGES]
+         * Initial experiment at adding `APPLY` phaser blocks to roles
+
 0.814   2024-09-20
         [CHANGES]
          * Depend on `XS::Parse::Sublike` v0.25 because of RT155630 bugfix

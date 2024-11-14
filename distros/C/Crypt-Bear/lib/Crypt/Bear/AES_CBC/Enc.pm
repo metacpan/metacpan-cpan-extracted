@@ -1,5 +1,5 @@
 package Crypt::Bear::AES_CBC::Enc;
-$Crypt::Bear::AES_CBC::Enc::VERSION = '0.001';
+$Crypt::Bear::AES_CBC::Enc::VERSION = '0.002';
 use Crypt::Bear;
 
 1;
@@ -18,7 +18,7 @@ Crypt::Bear::AES_CBC::Enc - AES-CBC encoder class in BearSSL
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

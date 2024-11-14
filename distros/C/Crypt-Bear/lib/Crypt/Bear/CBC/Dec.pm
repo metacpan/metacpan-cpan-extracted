@@ -1,5 +1,5 @@
 package Crypt::Bear::CBC::Dec;
-$Crypt::Bear::CBC::Dec::VERSION = '0.001';
+$Crypt::Bear::CBC::Dec::VERSION = '0.002';
 use Crypt::Bear;
 
 1;
@@ -18,7 +18,7 @@ Crypt::Bear::CBC::Dec - CBC decoder baseclass BearSSL
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

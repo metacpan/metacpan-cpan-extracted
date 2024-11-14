@@ -1,4 +1,8 @@
 package Test::Fixture::DBIC::Schema;
+# git description: 568db46
+
+our $AUTHORITY = 'cpan:SCHWIGON';
+# ABSTRACT: fixture data loader for DBIx::Class::Schema
 use strict;
 use warnings;
 our $VERSION = '0.04';
@@ -80,15 +84,16 @@ sub _insert {
 }
 
 1;
+
 __END__
 
-=encoding utf8
+=pod
 
-=for stopwords Fushihara Kan
+=encoding UTF-8
 
 =head1 NAME
 
-Test::Fixture::DBIC::Schema - load fixture data to storage.
+Test::Fixture::DBIC::Schema - fixture data loader for DBIx::Class::Schema
 
 =head1 SYNOPSIS
 
@@ -118,6 +123,12 @@ Test::Fixture::DBIC::Schema - load fixture data to storage.
 =head1 DESCRIPTION
 
 Test::Fixture::DBIC::Schema is fixture data loader for DBIx::Class::Schema.
+
+=for stopwords Fushihara Kan
+
+=head1 NAME
+
+Test::Fixture::DBIC::Schema - load fixture data to storage.
 
 =head1 METHODS
 
@@ -153,5 +164,16 @@ L<DBIx::Class>, L<Kwalify>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Steffen Schwigon <ss5@renormalist.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Steffen Schwigon.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

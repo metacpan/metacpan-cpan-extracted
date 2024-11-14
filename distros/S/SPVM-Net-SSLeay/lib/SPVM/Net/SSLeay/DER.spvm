@@ -5,12 +5,19 @@ class Net::SSLeay::DER {
   
   use Net::SSLeay::OCSP_REQUEST;
   use Net::SSLeay::OCSP_RESPONSE;
+  use Net::SSLeay::OCSP_CERTID;
   
   # Class Methods
   native static method d2i_OCSP_REQUEST : Net::SSLeay::OCSP_REQUEST ($a_ref : Net::SSLeay::OCSP_REQUEST[], $ppin_ref : string[], $length : long);
   
+  native static method i2d_OCSP_REQUEST : int ($a : Net::SSLeay::OCSP_REQUEST, $ppout_ref : string[]);
+  
   native static method d2i_OCSP_RESPONSE : Net::SSLeay::OCSP_RESPONSE ($a_ref : Net::SSLeay::OCSP_RESPONSE[], $ppin_ref : string[], $length : long);
   
-  native static method i2d_OCSP_REQUEST : int ($a : Net::SSLeay::OCSP_REQUEST, $ppout_ref : string[]);
+  native static method i2d_OCSP_RESPONSE : int ($a : Net::SSLeay::OCSP_RESPONSE, $ppout_ref : string[]);
+  
+  native static method d2i_OCSP_CERTID : Net::SSLeay::OCSP_CERTID ($a_ref : Net::SSLeay::OCSP_CERTID[], $ppin_ref : string[], $length : long);
+  
+  native static method i2d_OCSP_CERTID : int ($a : Net::SSLeay::OCSP_CERTID, $ppout_ref : string[]);
   
 }

@@ -16,31 +16,15 @@ Net::SSLeay::DER class in L<SPVM> represents a name space for L<d2i_ and i2d_ pr
 
   use Net::SSLeay::DER;
 
-=head1 Class Methods
+=head1 Template Methods
 
-=head2 d2i_OCSP_REQUEST
+The following methods are virtual template methods that does not exist. C<TYPE> represents a real type of OpenSSL.
 
-C<static method d2i_OCSP_REQUEST : L<Net::SSLeay::OCSP_REQUEST|SPVM::Net::SSLeay::OCSP_REQUEST> ($a_ref : L<Net::SSLeay::OCSP_REQUEST|SPVM::Net::SSLeay::OCSP_REQUEST>[], $ppin_ref : string[], $length : long);>
+=head2 d2i_TYPE
 
-Calls native L<d2i_OCSP_REQUEST|https://docs.openssl.org/master/man3/d2i_X509> function given $a_ref, $ppin_ref, $length, and creates a new L<Net::SSLeay::OCSP_REQUEST|SPVM::Net::SSLeay::OCSP_REQUEST> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
+C<static method d2i_TYPE : C<Net::SSLeay::TYPE> ($a_ref : C<Net::SSLeay::TYPE>[], $ppin_ref : string[], $length : long);>
 
-Exceptions:
-
-$a_ref must be undef(Currently reuse feature is not available). Otherwise an exception is thrown.
-
-$ppin_ref must be defined. Otherwise an exception is thrown. Otherwise an exception is thrown.
-
-The length of $ppin_ref must be 1. Otherwise an exception is thrown. Otherwise an exception is thrown.
-
-$ppin_ref at index 0 must be defined. Otherwise an exception is thrown. Otherwise an exception is thrown.
-
-If d2i_OCSP_REQUEST failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
-
-=head2 d2i_OCSP_RESPONSE
-
-C<static method d2i_OCSP_RESPONSE : L<Net::SSLeay::OCSP_RESPONSE|SPVM::Net::SSLeay::OCSP_RESPONSE> ($a_ref : L<Net::SSLeay::OCSP_RESPONSE|SPVM::Net::SSLeay::OCSP_RESPONSE>[], $ppin_ref : string[], $length : long);>
-
-Calls native L<d2i_OCSP_RESPONSE|https://docs.openssl.org/master/man3/d2i_X509> function given $a_ref, $ppin_ref, $length, and creates a new L<Net::SSLeay::OCSP_RESPONSE|SPVM::Net::SSLeay::OCSP_RESPONSE> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
+Calls native L<d2i_TYPE|https://docs.openssl.org/master/man3/d2i_X509> function given $a_ref, $ppin_ref, $length, and creates a new C<Net::SSLeay::TYPE> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
 
 Exceptions:
 
@@ -52,13 +36,13 @@ The length of $ppin_ref must be 1. Otherwise an exception is thrown. Otherwise a
 
 $ppin_ref at index 0 must be defined. Otherwise an exception is thrown. Otherwise an exception is thrown.
 
-If d2i_OCSP_RESPONSE failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+If d2i_TYPE failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
-=head2 i2d_OCSP_REQUEST
+=head2 i2d_TYPE
 
-C<static method i2d_OCSP_REQUEST : int ($a : L<Net::SSLeay::OCSP_REQUEST|SPVM::Net::SSLeay::OCSP_REQUEST>, $ppout_ref : string[]);>
+C<static method i2d_TYPE : int ($a : C<Net::SSLeay::TYPE>, $ppout_ref : string[]);>
 
-Calls native L<i2d_OCSP_REQUEST|https://docs.openssl.org/master/man3/d2i_X509> function given $a_ref, $ppin_ref, $length, and returns its return value.
+Calls native L<i2d_TYPE|https://docs.openssl.org/master/man3/d2i_X509> function given $a_ref, $ppin_ref, $length, and returns its return value.
 
 Exceptions:
 
@@ -68,7 +52,46 @@ $ppout_ref must be defined. Otherwise an exception is thrown. Otherwise an excep
 
 The length of $ppout_ref must be 1. Otherwise an exception is thrown. Otherwise an exception is thrown.
 
-If i2d_OCSP_REQUEST failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+If i2d_TYPE failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
+=head1 Class Methods
+
+=head2 d2i_OCSP_REQUEST
+=head2 d2i_OCSP_REQUEST
+
+C<static method d2i_OCSP_REQUEST : Net::SSLeay::OCSP_REQUEST ($a_ref : Net::SSLeay::OCSP_REQUEST[], $ppin_ref : string[], $length : long);>
+
+See L</"d2i_TYPE"> template method.
+
+=head2 i2d_OCSP_REQUEST
+
+C<static method i2d_OCSP_REQUEST : int ($a : Net::SSLeay::OCSP_REQUEST, $ppout_ref : string[]);>
+
+See L</"i2d_TYPE"> template method.
+
+=head2 d2i_OCSP_RESPONSE
+
+C<static method d2i_OCSP_RESPONSE : Net::SSLeay::OCSP_RESPONSE ($a_ref : Net::SSLeay::OCSP_RESPONSE[], $ppin_ref : string[], $length : long);>
+
+See L</"d2i_TYPE"> template method.
+
+=head2 i2d_OCSP_RESPONSE
+
+C<static method i2d_OCSP_RESPONSE : int ($a : Net::SSLeay::OCSP_RESPONSE, $ppout_ref : string[]);>
+
+See L</"i2d_TYPE"> template method.
+
+=head2 d2i_OCSP_CERTID
+
+C<static method d2i_OCSP_CERTID : Net::SSLeay::OCSP_CERTID ($a_ref : Net::SSLeay::OCSP_CERTID[], $ppin_ref : string[], $length : long);>
+
+See L</"d2i_TYPE"> template method.
+
+=head2 i2d_OCSP_CERTID
+
+C<static method i2d_OCSP_CERTID : int ($a : Net::SSLeay::OCSP_CERTID, $ppout_ref : string[]);>
+
+See L</"i2d_TYPE"> template method.
 
 =head1 See Also
 

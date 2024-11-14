@@ -1,0 +1,281 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Annotation - Analyze data iptables-like
+
+
+=head1 VERSION
+
+This document describes Data::Annotation version 0.002.
+
+=begin html
+
+<a href="https://travis-ci.org/polettix/Data-Annotation">
+<img alt="Build Status" src="https://travis-ci.org/polettix/Data-Annotation.svg?branch=master">
+</a>
+<a href="https://www.perl.org/">
+<img alt="Perl Version" src="https://img.shields.io/badge/perl-5.24+-brightgreen.svg">
+</a>
+<a href="https://badge.fury.io/pl/Data-Annotation">
+<img alt="Current CPAN version" src="https://badge.fury.io/pl/Data-Annotation.svg">
+</a>
+<a href="http://cpants.cpanauthors.org/dist/Data-Annotation">
+<img alt="Kwalitee" src="http://cpants.cpanauthors.org/dist/Data-Annotation.png">
+</a>
+<a href="http://www.cpantesters.org/distro/O/Data-Annotation.html?distmat=1">
+<img alt="CPAN Testers" src="https://img.shields.io/badge/cpan-testers-blue.svg">
+</a>
+<a href="http://matrix.cpantesters.org/?dist=Data-Annotation">
+<img alt="CPAN Testers Matrix" src="https://img.shields.io/badge/matrix-@testers-blue.svg">
+</a>
+
+=end html
+
+=head1 SYNOPSIS
+
+   use Data::Annotation;
+
+   my %definition = (...);
+   my $da = Data::Annotation->new(\%definition);
+
+   my %data = (...);
+   my $annotation = $da->evaluate(\%data);
+
+
+=head1 DESCRIPTION
+
+Generic framework for defining iptables-like chains of rules, apply them
+on data and get back an overall I<annotation> about it. This annotation
+can be whatever, e.g. strings C<accept> and C<reject> (following the
+spirit of iptables) or more complicated stuff like data structures
+describing whatever has been analyzed.
+
+The definition is a hash with the following high-level structure:
+
+   my %da_def = (
+      chains:     => \%hash_of_chains,
+      default     => 'some annotation',
+      description => 'string...',
+      'condition-parse-context' => \%hash_of_configurations,
+   );
+
+This high level is much like a table in iptables, containing a number of
+I<chains> below. C<default> represents the default annotation if none of
+the chains provides any result back, much like the C<POLICY> in a table
+in iptables. The C<parse_context> provides some more kick for generating
+a function but it's totally optional, much like the C<description>.
+
+A I<chain> has the following structure:
+
+   my %chain = (
+      rules       => \@rules,
+      description => 'string...',
+      'condition-parse-context' => \%hash_of_configurations,
+   );
+
+A chain is a sequence of I<rules>, which will be analyzed in order, much
+like what happens in iptables.
+
+A I<rule> has the following structure:
+
+   my %rule = (
+      condition => <expression/expression-definition/plain-scalar>,
+      return    => <call/goto/whatever else>
+      description => 'string...',
+      'condition-parse-context' => \%hash_of_configurations,
+   );
+
+When a rule is evaluated, the I<condition> is checked first. It can be a
+plain scalar, in which case it's considered a boolean value, or a hash
+definition, which will be inflated via L<Data::Annotation::Expression>,
+or a sub reference that accepts a I<runtime context> that most of the
+time will be a hash reference of sort.
+
+If the I<condition> gives a true value, the C<return> value is provided
+back as the result of the rule I<and>. This result can be I<almost>
+anything:
+
+=over
+
+=item *
+
+if it's a hash reference, it should only contain one single key/value
+pair, with allowed keys:
+
+=over
+
+=item *
+
+C<call>: call another chain (name from value) from the beginning like it
+were a single rule. If the called chain does not provide a result,
+continue processing the current chain from the following rule.
+
+=item *
+
+C<goto>: stop processing the current chain and move on to the start of
+another chain (name provided as value).
+
+=item *
+
+C<result>: value is the result for the whole annotation (i.e. it will
+exit the rule, the chain and the annotation evaluations).
+
+=back
+
+=item *
+
+anything else is taken at face value and used as the C<result> above.
+
+=back
+
+A result can be anything, even a hash reference (provided it's wrapped
+into another hash reference with key C<result>). In the most basic case,
+it will be a bunch of labels, e.g. C<accept> or C<reject>, but it can
+also be something more sophisticated like a list of characteristics or a
+whole complex data structure.
+
+Full definition example:
+
+  description: some policy of sort
+  default: reject
+  default-chain: foo
+  chains:
+    foo:
+      description: an example chain
+      rules:
+        - return: accept
+          condition:
+            eq: [ '.from', '=foobar@example.com' ]
+    bar:
+      rules:
+        - return: accept
+          condition:
+            '=~': [ '.to', '=(?mxs:\A barbaz)' ]
+
+=head1 INTERFACE
+
+=head2 Constructor
+
+=head3 B<< new >>
+
+   my $da1 = Data::Annotation->new(%definition); # OR
+   my $da2 = Data::Annotation->new(\%definition);
+
+Constructor. See L</DESCRIPTION> for the format of the definition.
+
+
+=head2 Accessors
+
+=head3 B<< chains >>
+
+   my $href = $da->chains;
+
+A hash reference of chains, indexed by name. This name is the same that
+can be used by rules in results like C<< {name => ...} >> and
+C<< { goto => ... } >>.
+
+=head3 B<< default_chain >>
+
+   my $chain_name = $da->default_chain;
+
+The default chain to use if an L</evaluate> call is done on a chain that
+is not known.
+
+=head3 B<< default_retval >>
+
+   my $retval = $da->default_retval;
+
+The default result (annotation) value returned when none of the rules
+that are checked as part of a call to L</evaluate> provides anything
+meaningful back.
+
+Initialized by key C<default> in the constructor.
+
+=head3 B<< description >>
+
+   my $text = $da->description;
+
+An optional description for the Data::Annotation definition. It will be
+useful for you in a couple of months, after you forgot everything about
+it.
+
+=head3 B<< parse_context >>
+
+   my $ctx = $da->parse_context;
+
+Whatever was passed as argument C<condition-parse-context>, which can
+help set the stage for condition parsing. This should not be generally
+needed, but still. See L<Data::Annotation::Expression> for more details.
+
+
+=head2 Methods
+
+=head3 B<< chains_list >>
+
+Get the sorted list of chains (as strings).
+
+=head3 B<< evaluate >>
+
+   my $result = $da->evaluate($chain_name, $data);
+
+Evaluate the annotation for some C<$data>, starting at chain named
+C<$chain_name>.
+
+=head3 B<< has_chain_for >>
+
+   my $bool = $da->has_chain_for($chain_name);
+
+Check if there is a chain definition whose name is C<< $chain_name >>o
+
+=head3 B<< inflate_chains >>
+
+   $da->inflate_chains;
+
+Make sure all input chain definitions are I<inflated>, i.e. turned into
+L</Data::Annotation::Chain> objects. This makes sure the definitions
+parse correctly.
+
+=head3 B<< overlay_cloak >>
+
+   my $overlay = $da->overlay_cloak($data, %opts);
+
+Shorthand to the constructor for L</Data::Annotation::Overlay>, passing
+C<$data> as the C<under> option and then the rest of C<%opts>:
+
+=head1 BUGS AND LIMITATIONS
+
+Minimul perl version 5.24.
+
+Report bugs through Codeberg (patches welcome) at
+L<https://codeberg.org/polettix/Data-Annotation>.
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2024 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Just to be clear: apache-2.0
+
+
+=cut

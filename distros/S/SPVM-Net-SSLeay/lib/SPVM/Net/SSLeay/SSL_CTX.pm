@@ -314,7 +314,7 @@ If add_extra_chain_cert failed, an exception is thrown with C<eval_error_id> set
 
 C<method DESTROY : void ();>
 
-Frees native L<SSL_CTX|https://docs.openssl.org/3.1/man3/SSL_CTX_new/> object by calling native L<SSL_CTX_free|https://docs.openssl.org/3.1/man3/SSL_CTX_free/> function if C<no_free> flag of the instance is not a true value.
+Calls native L<SSL_CTX_free|https://docs.openssl.org/3.1/man3/SSL_CTX_free/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
 
 =head1 See Also
 

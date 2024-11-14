@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More tests => 30;
 use Parallel::Map::Segmented ();
-use Path::Tiny qw/ path /;
+use Path::Tiny               qw/ path /;
 
 {
     my $NUM    = 30;

@@ -4,13 +4,13 @@
       "Gisbert W. Selke <gws@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0514, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Map-Tube-Plugin-FuzzyFind",
    "no_index" : {
@@ -32,25 +32,32 @@
       },
       "runtime" : {
          "requires" : {
-            "Map::Tube" : "2.85",
+            "Map::Tube" : "3.77",
             "Moo" : "0",
             "Moo::Role" : "0",
             "Try::Tiny" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          },
          "suggests" : {
             "String::Trigram" : "0.12",
-            "Text::Levenshtein" : "0.12",
+            "Text::DoubleMetaphone" : "0",
+            "Text::JaroWinkler" : "0",
+            "Text::Levenshtein::Damerau::XS" : "3.2",
+            "Text::Levenshtein::XS" : "0.503",
             "Text::Metaphone" : "20081017",
+            "Text::Phonetic::DaitchMokotoff" : "0",
+            "Text::Phonetic::Koeln" : "0",
+            "Text::Phonetic::Phonem" : "0",
+            "Text::Phonetic::Phonix" : "0",
             "Text::Soundex" : "3",
             "Text::Unidecode" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Map::Tube" : "2.92",
-            "Map::Tube::London" : "0.71",
+            "Map::Tube" : "3.77",
+            "Map::Tube::London" : "1.39",
             "Test::More" : "0.82"
          }
       }
@@ -58,16 +65,15 @@
    "provides" : {
       "Map::Tube::Plugin::FuzzyFind" : {
          "file" : "lib/Map/Tube/Plugin/FuzzyFind.pm",
-         "version" : "0.08"
+         "version" : "v0.81.0"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Map-Tube-Plugin-FuzzyFind@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Map-Tube-Plugin-FuzzyFind"
+         "mailto" : "bug-Map-Tube-Plugin-FuzzyFind@rt.cpan.org"
       }
    },
-   "version" : "0.08"
+   "version" : "v0.81.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }
-

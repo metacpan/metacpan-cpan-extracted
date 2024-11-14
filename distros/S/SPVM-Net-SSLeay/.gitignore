@@ -13,3 +13,4 @@ core
 *.tmp
 *.o
 *.bs
+tmp/*

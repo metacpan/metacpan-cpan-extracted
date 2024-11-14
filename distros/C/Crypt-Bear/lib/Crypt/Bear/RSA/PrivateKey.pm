@@ -1,5 +1,5 @@
 package Crypt::Bear::RSA::PrivateKey;
-$Crypt::Bear::RSA::PrivateKey::VERSION = '0.001';
+$Crypt::Bear::RSA::PrivateKey::VERSION = '0.002';
 use Crypt::Bear;
 
 1;
@@ -18,7 +18,7 @@ Crypt::Bear::RSA::PrivateKey - An RSA private key in BearSSL
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

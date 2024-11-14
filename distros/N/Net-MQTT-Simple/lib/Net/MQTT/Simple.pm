@@ -5,7 +5,7 @@ use warnings;
 
 use IO::Socket::IP;
 
-our $VERSION = '1.29';
+our $VERSION = '1.31';
 
 # Please note that these are not documented and are subject to change:
 our $KEEPALIVE_INTERVAL = 60;
@@ -56,8 +56,9 @@ sub import {
     $global = $class->new($server);
 
     no strict 'refs';
-    *{ (caller)[0] . "::publish" } = \&publish;
-    *{ (caller)[0] . "::retain"  } = \&retain;
+    *{ (caller)[0] . "::publish" }  = \&publish;
+    *{ (caller)[0] . "::retain"  }  = \&retain;
+    *{ (caller)[0] . "::mqtt_get" } = \&get;
 }
 
 sub new {
@@ -72,9 +73,9 @@ sub new {
     # Add port for bare IPv4 address or bracketed IPv6 address
     $server .= ":$port" if $server !~ /:/ or $server =~ /^\[.*\]$/;
 
-	# Create a random ID for the instance of the object
-	my $random_id = join "", map chr 65 + int rand 26, 1 .. 10;
-	
+    # Create a random ID for the instance of the object
+    my $random_id = join "", map chr 65 + int rand 26, 1 .. 10;
+
     return bless {
         server       => $server,
         last_connect => 0,
@@ -148,6 +149,7 @@ sub _connect {
     # Reset state
     $self->{last_connect} = time;
     $self->{buffer} = "";
+    $self->{subscribed} = {};
     delete $self->{ping};
 
     # Connect
@@ -156,8 +158,12 @@ sub _connect {
         PeerAddr => $self->{server},
         %{ $self->{sockopts} }
     );
-    $self->{socket} = $socket_class->new( %socket_options )
-        or warn "$0: connect: " . $self->_socket_error . "\n";
+    $self->{socket} = $socket_class->new( %socket_options );
+
+    if (not $self->{socket}) {
+        warn "$0: connect: " . $self->_socket_error . "\n";
+        return;
+    }
 
     # Say hello
     local $self->{skip_connect} = 1;  # avoid infinite recursion :-)
@@ -184,7 +190,6 @@ sub _send {
     my ($self, $data) = @_;
 
     $self->_connect unless exists $self->{skip_connect};
-    delete $self->{skip_connect};
 
     my $socket = $self->{socket} or return;
 
@@ -224,12 +229,13 @@ sub _send_connect {
 }
 
 sub _send_subscribe {
-    my ($self, @topics) = @_;
+    my ($self) = @_;
 
-    if (not @topics) {
-        @topics = keys %{ $self->{sub} } or return;
-    }
-    return if not @topics;
+    my @topics = grep {
+        not exists $self->{actually_subscribed}->{$_}
+    } keys %{ $self->{subscriptions} };
+
+    @topics or return;
 
     utf8::encode($_) for @topics;
 
@@ -238,6 +244,8 @@ sub _send_subscribe {
     $self->_send("\x82" . _prepend_variable_length("\0\x01" .
         pack("(n/a* x)*", @topics)  # x = QoS 0
     ));
+
+    @{ $self->{actually_subscribed} }{ @topics } = ();
 }
 
 sub _send_unsubscribe {
@@ -251,6 +259,8 @@ sub _send_unsubscribe {
     $self->_send("\xa2" . _prepend_variable_length("\0\x01" .
         pack("(n/a*)*", @topics)
     ));
+
+    delete @{ $self->{actually_subscribed} }{ @topics };
 }
 
 sub _parse {
@@ -377,7 +387,7 @@ sub subscribe {
     my ($self, @kv) = @_;
 
     while (my ($topic, $callback) = splice @kv, 0, 2) {
-        $self->{sub}->{ $topic } = 1;
+        $self->{subscriptions}->{ $topic } = undef;
         push @{ $self->{callbacks} }, {
             topic => $topic,
             regex => filter_as_regex($topic),
@@ -398,7 +408,7 @@ sub unsubscribe {
       @$cb = grep {$_->{topic} ne $topic} @$cb;
     }
 
-    delete @{ $self->{sub} }{ @topics };
+    delete @{ $self->{subscriptions} }{ @topics };
 }
 
 sub tick {
@@ -432,6 +442,59 @@ sub tick {
     }
 
     return !! $self->{socket};
+}
+
+sub once {
+    my ($self, $subscribe_topic, $callback) = @_;
+
+    $self->subscribe($subscribe_topic, sub {
+        my ($received_topic, $message, $retain) = @_;
+
+        $callback->($received_topic, $message, $retain);
+        $self->unsubscribe($subscribe_topic);
+    });
+}
+
+sub get {
+    my $method = UNIVERSAL::isa($_[0], __PACKAGE__);
+    @_ >= ($method ? 2 : 1)
+        or _croak "Wrong number of arguments for " . ($method ? "get" : "mqtt_get");
+
+    my $self = ($method ? shift : $global);
+    my ($topics, $timeout) = @_;
+
+    $timeout ||= 1;
+
+    my $got_ref = ref $topics;
+    $topics = [ $topics ] if not $got_ref;
+
+    my @messages;
+    my %waiting;
+    @waiting{ @$topics } = ();
+
+    for my $i (0 .. $#$topics) {
+        # Close over $topic in case the callback gets a different one
+        # (e.g. due to wildcards)
+        my $topic = $topics->[$i];
+
+        $self->once($topic, sub {
+            my (undef, $message, undef) = @_;
+
+            $messages[$i] = $message;
+            delete $waiting{$topic};
+        });
+    }
+
+    my $stop = time() + $timeout;
+
+    while (time() <= $stop) {
+        $self->tick(.05);
+        last if not %waiting;
+    }
+
+    return @messages  if $got_ref and wantarray;
+    return \@messages if $got_ref;
+    return $messages[0];
 }
 
 sub disconnect {
@@ -473,6 +536,9 @@ Net::MQTT::Simple - Minimal MQTT version 3 interface
     publish "topic/here" => "Message here";
     retain  "topic/here" => "Retained message here";
 
+    my $value = mqtt_get "topic/here";
+    my @values = mqtt_get [ "topic/one", "topic/two" ];
+
 
     # Object oriented (supports subscribing to topics)
 
@@ -480,8 +546,16 @@ Net::MQTT::Simple - Minimal MQTT version 3 interface
 
     my $mqtt = Net::MQTT::Simple->new("mosquitto.example.org");
 
+    my $value = $mqtt->get("topic/here");
+    my @values = $mqtt->get([ "topic/one", "topic/two" ]);
+
     $mqtt->publish("topic/here" => "Message here");
     $mqtt->retain( "topic/here" => "Message here");
+
+    $mqtt->subscribe("topic/here" => sub {
+        my ($topic, $message) = @_;
+        ...
+    });
 
     $mqtt->run(
         "sensors/+/temperature" => sub {
@@ -520,7 +594,8 @@ for subscriptions, only for publishing.
 
 Instead of requesting symbols to be imported, provide the MQTT server on the
 C<use Net::MQTT::Simple> line. A non-standard port can be specified with a
-colon. The functions C<publish> and C<retain> will be exported.
+colon. The functions C<publish>, C<retain>, and C<mqtt_get> will be exported,
+that will call the methods C<publish>, C<retain>, and C<get>.
 
 =head2 Object oriented interface
 
@@ -595,6 +670,9 @@ messages about events that occur (like that a button was pressed).
 
 =head1 SUBSCRIPTIONS
 
+Note that any one topic should be used with C<subscribe>, C<once>, or C<get>,
+but not multiple methods simultaneously.
+
 =head2 subscribe(topic, handler[, topic, handler, ...])
 
 Subscribes to the given topic(s) and registers the callbacks. Note that only
@@ -606,6 +684,25 @@ patterns overlap.
 Unsubscribes from the given topic(s) and unregisters the corresponding
 callbacks. The given topics must exactly match topics that were previously
 used with the C<subscribe> method.
+
+=head2 once(topic, handler)
+
+Subscribes to a topic, and unsubscribes from that topic after the first message
+that matches the topic has been received and the handler has been called.
+
+=head2 get(topics[, timeout])
+
+Returns the first message received for one or more topics. Specifically useful
+when combined with retained messages.
+
+When given a single topic (string), returns the single message.
+
+When given multiple topics (reference to an array of strings), returns a
+reference to an array of messages in scalar context, or the messages themselves
+in list context.
+
+The timeout is expressed in whole seconds and defaults to 1. The actual time
+waited may be up to 1 second longer than specified.
 
 =head2 run(...)
 
@@ -664,10 +761,6 @@ as "fire and forget".
 Since QoS is not supported, no retransmissions are done, and no message will
 indicate that it has already been sent before.
 
-=item Authentication
-
-No username and password are sent to the server.
-
 =item Large data
 
 Because everything is handled in memory and there's no way to indicate to the
@@ -723,8 +816,8 @@ C<utf8::encode($message);>.
 This software may be redistributed under the terms of the GPL, LGPL, modified
 BSD, or Artistic license, or any of the other OSI approved licenses listed at
 http://www.opensource.org/licenses/alphabetical. Distribution is allowed under
-all of these these licenses, or any smaller subset of multiple or just one of
-these licenses.
+all of these licenses, or any smaller subset of multiple or just one of these
+licenses.
 
 When using a packaged version, please refer to the package metadata to see
 under which license terms it was distributed. Alternatively, a distributor may

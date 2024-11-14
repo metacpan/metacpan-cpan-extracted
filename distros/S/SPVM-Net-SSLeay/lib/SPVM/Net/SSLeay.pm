@@ -1,6 +1,6 @@
 package SPVM::Net::SSLeay;
 
-our $VERSION = "0.012";
+our $VERSION = "0.013";
 
 1;
 

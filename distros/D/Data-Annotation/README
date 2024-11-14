@@ -1,0 +1,226 @@
+NAME
+
+    Data::Annotation - Analyze data iptables-like
+
+VERSION
+
+    This document describes Data::Annotation version 0.002.
+
+SYNOPSIS
+
+       use Data::Annotation;
+    
+       my %definition = (...);
+       my $da = Data::Annotation->new(\%definition);
+    
+       my %data = (...);
+       my $annotation = $da->evaluate(\%data);
+
+DESCRIPTION
+
+    Generic framework for defining iptables-like chains of rules, apply
+    them on data and get back an overall annotation about it. This
+    annotation can be whatever, e.g. strings accept and reject (following
+    the spirit of iptables) or more complicated stuff like data structures
+    describing whatever has been analyzed.
+
+    The definition is a hash with the following high-level structure:
+
+       my %da_def = (
+          chains:     => \%hash_of_chains,
+          default     => 'some annotation',
+          description => 'string...',
+          'condition-parse-context' => \%hash_of_configurations,
+       );
+
+    This high level is much like a table in iptables, containing a number
+    of chains below. default represents the default annotation if none of
+    the chains provides any result back, much like the POLICY in a table in
+    iptables. The parse_context provides some more kick for generating a
+    function but it's totally optional, much like the description.
+
+    A chain has the following structure:
+
+       my %chain = (
+          rules       => \@rules,
+          description => 'string...',
+          'condition-parse-context' => \%hash_of_configurations,
+       );
+
+    A chain is a sequence of rules, which will be analyzed in order, much
+    like what happens in iptables.
+
+    A rule has the following structure:
+
+       my %rule = (
+          condition => <expression/expression-definition/plain-scalar>,
+          return    => <call/goto/whatever else>
+          description => 'string...',
+          'condition-parse-context' => \%hash_of_configurations,
+       );
+
+    When a rule is evaluated, the condition is checked first. It can be a
+    plain scalar, in which case it's considered a boolean value, or a hash
+    definition, which will be inflated via Data::Annotation::Expression, or
+    a sub reference that accepts a runtime context that most of the time
+    will be a hash reference of sort.
+
+    If the condition gives a true value, the return value is provided back
+    as the result of the rule and. This result can be almost anything:
+
+      * if it's a hash reference, it should only contain one single
+      key/value pair, with allowed keys:
+
+	* call: call another chain (name from value) from the beginning
+	like it were a single rule. If the called chain does not provide a
+	result, continue processing the current chain from the following
+	rule.
+
+	* goto: stop processing the current chain and move on to the start
+	of another chain (name provided as value).
+
+	* result: value is the result for the whole annotation (i.e. it
+	will exit the rule, the chain and the annotation evaluations).
+
+      * anything else is taken at face value and used as the result above.
+
+    A result can be anything, even a hash reference (provided it's wrapped
+    into another hash reference with key result). In the most basic case,
+    it will be a bunch of labels, e.g. accept or reject, but it can also be
+    something more sophisticated like a list of characteristics or a whole
+    complex data structure.
+
+    Full definition example:
+
+      description: some policy of sort
+      default: reject
+      default-chain: foo
+      chains:
+        foo:
+          description: an example chain
+          rules:
+            - return: accept
+              condition:
+                eq: [ '.from', '=foobar@example.com' ]
+        bar:
+          rules:
+            - return: accept
+              condition:
+                '=~': [ '.to', '=(?mxs:\A barbaz)' ]
+
+INTERFACE
+
+ Constructor
+
+  new
+
+       my $da1 = Data::Annotation->new(%definition); # OR
+       my $da2 = Data::Annotation->new(\%definition);
+
+    Constructor. See "DESCRIPTION" for the format of the definition.
+
+ Accessors
+
+  chains
+
+       my $href = $da->chains;
+
+    A hash reference of chains, indexed by name. This name is the same that
+    can be used by rules in results like {name => ...} and { goto => ... }.
+
+  default_chain
+
+       my $chain_name = $da->default_chain;
+
+    The default chain to use if an "evaluate" call is done on a chain that
+    is not known.
+
+  default_retval
+
+       my $retval = $da->default_retval;
+
+    The default result (annotation) value returned when none of the rules
+    that are checked as part of a call to "evaluate" provides anything
+    meaningful back.
+
+    Initialized by key default in the constructor.
+
+  description
+
+       my $text = $da->description;
+
+    An optional description for the Data::Annotation definition. It will be
+    useful for you in a couple of months, after you forgot everything about
+    it.
+
+  parse_context
+
+       my $ctx = $da->parse_context;
+
+    Whatever was passed as argument condition-parse-context, which can help
+    set the stage for condition parsing. This should not be generally
+    needed, but still. See Data::Annotation::Expression for more details.
+
+ Methods
+
+  chains_list
+
+    Get the sorted list of chains (as strings).
+
+  evaluate
+
+       my $result = $da->evaluate($chain_name, $data);
+
+    Evaluate the annotation for some $data, starting at chain named
+    $chain_name.
+
+  has_chain_for
+
+       my $bool = $da->has_chain_for($chain_name);
+
+    Check if there is a chain definition whose name is $chain_nameo
+
+  inflate_chains
+
+       $da->inflate_chains;
+
+    Make sure all input chain definitions are inflated, i.e. turned into
+    "Data::Annotation::Chain" objects. This makes sure the definitions
+    parse correctly.
+
+  overlay_cloak
+
+       my $overlay = $da->overlay_cloak($data, %opts);
+
+    Shorthand to the constructor for "Data::Annotation::Overlay", passing
+    $data as the under option and then the rest of %opts:
+
+BUGS AND LIMITATIONS
+
+    Minimul perl version 5.24.
+
+    Report bugs through Codeberg (patches welcome) at
+    https://codeberg.org/polettix/Data-Annotation.
+
+AUTHOR
+
+    Flavio Poletti <flavio@polettix.it>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2024 by Flavio Poletti <flavio@polettix.it>
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+    implied. See the License for the specific language governing
+    permissions and limitations under the License.
+
+    Just to be clear: apache-2.0
+

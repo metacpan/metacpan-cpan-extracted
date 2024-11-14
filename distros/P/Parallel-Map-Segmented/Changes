@@ -1,5 +1,10 @@
 Revision history for Parallel-Map-Segmented
 
+0.4.1       2024-11-14
+    - Point the bugtracker link to GitHub.
+        - Thanks to SREZIC on
+        https://rt.cpan.org/Ticket/Display.html?id=156509
+
 0.4.0       2020-09-30
     - Use serial_run() from Parallel::ForkManager::Segmented::Base v0.4.0.
 

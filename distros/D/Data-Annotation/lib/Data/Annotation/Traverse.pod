@@ -1,0 +1,149 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Annotation::Traverse
+
+
+=head1 SYNOPSIS
+
+   use Data::Annotation::Traverse qw< :all >;
+
+   my $crumbs_aref = crumble('foo.bar."baz and galook".whatever');
+   # returns [ 'foo', 'bar', 'baz and galook', 'whatever' ];
+
+   my $key1 = kpath('foo.bar."baz and galook".whatever'); # OR
+   my $key2 = kpath($crumbs_aref);
+
+   my $result = traverse_plain($node, $crumbs, %opts);
+
+   my $is_missing_boolean = means_missing($result);
+
+
+=head1 DESCRIPTION
+
+Functions to ease handling the traversing of a data structure, meant to
+be used by L<Data::Annotation> and its siblings. The traversal mechanism
+is a rip-off of what happens in L<Template::Perlish>, with
+simplifications (hence the C<_plain> suffix in the main function name);
+the division of an input path string into steps is basically the same
+(without partial matches, though).
+
+=head1 INTERFACE
+
+=head2 C<< crumble >>
+
+   my $crumbs = crumble($string);
+
+Parse a string into an array reference containing the different steps
+(a.k.a. I<crumbs>) for looking into hierarchical data structures, like
+L</traverse_plain> does.
+
+Returns a reference to an array with the crumbs, in order. Returns undef
+if the provided $path cannot be broken down.
+
+The input string is assumed to represent a path with steps separated by
+dots. As each step might itself contain a dot, the function supports
+quoting mechanisms much like Perl does. In particular:
+
+=over
+
+=item *
+
+B<< single quotes >> are paired and can contain any character inside,
+except a single quote. Use double quotes if you need to put single
+quotes. The quotes themselves are stripped away before figuring out what
+the key is;
+
+=item *
+
+B<< double quotes >> are paired and can contain any character inside,
+with some care. If you need to put double quotes inside, you have to
+escape with a backslash. Also, if you want to insert a literal
+backslash, you have to prepend it with another backslash. In general,
+every time you put a backslash, the following character is taken as-is
+and the escaping backslash is tossed away. So the following:
+
+"\'\a\ \v\e\r\y\ \s\t\r\a\n\g\e\ \k\e\y\'"
+
+is interpreted as:
+
+'a very strange key'
+
+(including the single quotes). No, there is no specific handling for
+other characters that are normally escaped, i.e. C<\n> means C<n>, not a
+newline (C<crumble> has no problem dealing with a literal newline
+though).
+
+=item *
+
+B<< the rest >> must be alphanumeric only.
+
+=back
+
+Note that this function does B<NOT> support parsing paths that have been
+passed through L</kpath>. Although it would be easy to do, there seems
+to be no need to do so.
+
+=head2 C<< kpath >>
+
+   my $key = kpath($crumbs_or_string);
+
+Turn some crumbs or a string that can be turned into crumbs (via
+L</crumble>) and generate a standard key that can be used for indexing.
+After making sure that we have crumbs, each step is percent-encoded
+(where needed) before joining all items all back together.
+
+The resulting string is generally B<NOT> suitable for being used in
+L</crumble> as it does B<NOT> yield the same path through the data
+structure when either dots or percent characters are present.
+
+=head2 C<< means_missing >>
+
+   my $bool = means_missing($some_result_from_traverse_plain);
+
+Test if the value returned from L</traverse_plain> indicates that the
+output is actually empty. This allows claling the traverse function in
+scalar context and still be allowed to distinguish between C<undef> and
+a missing value.
+
+=head2 B<< traverse_plain >>
+
+   my $result = traverse_plain($node, $crumbs, %opts);
+
+Traverse an input hiearchical data starting at C<$node>, following the
+C<$crumbs> and some C<%opts>.
+
+Options can be:
+
+=over
+
+=item *
+
+C<method_over_key>: if there are both a method and a key in a hash/array with
+the provided name, give precedence to the method.
+
+=item *
+
+C<strict_blessed>: when hitting blessed nodes, only look for methods and not
+for hash keys.
+
+=item *
+
+C<traverse_methods>: when hitting blessed nodes, consider using methods with
+the provided name.
+
+=back
+
+
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<Data::Annotation>.
+
+=cut

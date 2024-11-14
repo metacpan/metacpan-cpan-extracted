@@ -1,5 +1,5 @@
 package Crypt::Bear::SSL::Client;
-$Crypt::Bear::SSL::Client::VERSION = '0.001';
+$Crypt::Bear::SSL::Client::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::Bear::SSL::Client - A sans-io SSL Client in BearSSL
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,7 @@ version 0.001
      sysread $socket, my $buffer, 1024;
      $buffer .= $client->push_received($buffer);
 
-	 die "Failed to connect" if $client->is_closed;
+     die "Failed to connect" if $client->is_closed;
  }
 
  # now we're connected

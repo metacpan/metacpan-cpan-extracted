@@ -1,24 +1,24 @@
-#!perl -T
-use 5.006;
+#!perl
+use 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Test::More 0.82;
 
-eval 'use Map::Tube::London';
-plan skip_all => 'Map::Tube::London required for this test' if $@;
+eval 'use Map::Tube::London 1.39';
+plan skip_all => 'Map::Tube::London (>= 1.39) required for this test' if $@;
 
-plan tests => 18;
+plan tests => 19;
 
-sub a2n { return [ map { $_->name() } @{ $_[0] } ]; }
+sub a2n { return [ map { $_->name( ) } @{ $_[0] } ]; }
 
-my $tube = Map::Tube::London->new();
+my $tube = new_ok( 'Map::Tube::London' );
 my $ret;
 
 $ret = $tube->fuzzy_find( '[kx]erloo', objects => 'lines', method => 're' );
 is( $ret, 'Bakerloo', 'Finding regex [kx]erloo' );
 
 $ret = $tube->fuzzy_find( '[tx]erloo', objects => 'lines', method => 're' );
-is( $ret, 'Waterloo & City', 'Finding regex [tx]erloo' );
+is( $ret, 'Waterloo and City', 'Finding regex [tx]erloo' );
 
 $ret = $tube->fuzzy_find( '[ktx]erloo', objects => 'lines', method => 're' );
 is( $ret, 'Bakerloo', 'Finding regex [ktx]erloo' );
@@ -27,30 +27,30 @@ $ret = [ $tube->fuzzy_find( '[kx]erloo',  objects => 'lines', method => 're' ) ]
 is_deeply($ret, [ 'Bakerloo' ], 'Finding regex [kx]erloo');
 
 $ret = [ $tube->fuzzy_find( '[tx]erloo',  objects => 'lines', method => 're' ) ];
-is_deeply($ret, [ 'Waterloo & City' ], 'Finding regex [tx]erloo');
+is_deeply($ret, [ 'Waterloo and City' ], 'Finding regex [tx]erloo');
 
 $ret = [ $tube->fuzzy_find( '[ktx]erloo', objects => 'lines', method => 're' ) ];
-is_deeply($ret, [ 'Bakerloo',  'Waterloo & City'  ], 'Finding regex [ktx]erloo');
+is_deeply($ret, [ 'Bakerloo',  'Waterloo and City'  ], 'Finding regex [ktx]erloo');
 
 $ret = $tube->fuzzy_find( '[kx]er',       objects => 'stations', method => 're' );
 ok($ret, 'Finding regex [kx]er');
 is($ret->name(), 'Baker Street', 'Finding regex [kx]er');
 
-$ret = $tube->fuzzy_find( '[tx]er',       objects => 'stations', method => 're' );
-ok($ret, 'Finding regex [tx]er');
-is($ret->name(), 'Bayswater', 'Finding regex [tx]er');
+$ret = $tube->fuzzy_find( '[ax]ter',       objects => 'stations', method => 're' );
+ok($ret, 'Finding regex [ax]ter');
+is($ret->name(), 'Bayswater', 'Finding regex [ax]ter');
 
-$ret = $tube->fuzzy_find( '[ktx]er',      objects => 'stations', method => 're' );
-ok($ret, 'Finding regex [ktx]er');
-is($ret->name(), 'Baker Street', 'Finding regex [ktx]er');
+$ret = $tube->fuzzy_find( '[atx]ker',      objects => 'stations', method => 're' );
+ok($ret, 'Finding regex [atx]ker');
+is($ret->name(), 'Baker Street', 'Finding regex [atx]ter');
 
 $ret = [ $tube->fuzzy_find( '[kx]er',       objects => 'stations', method => 're' ) ];
 ok($ret, 'Finding regex [kx]er');
 is_deeply( a2n($ret), [ 'Baker Street' ], 'Finding regex [kx]er');
 
-$ret = [ $tube->fuzzy_find( '[tx]ers',      objects => 'stations', method => 're' ) ];
-ok($ret, 'Finding regex [tx]ers');
-is_deeply( a2n($ret), [ 'Cockfosters', 'Seven Sisters' ], 'Finding regex [tx]ers');
+$ret = [ $tube->fuzzy_find( '[sx]ters',      objects => 'stations', method => 're' ) ];
+ok($ret, 'Finding regex [sx]ters');
+is_deeply( a2n($ret), [ 'Cockfosters', 'Seven Sisters' ], 'Finding regex [sx]ters');
 
 $ret = [ $tube->fuzzy_find( 'a[ktx]er',     objects => 'stations', method => 're' ) ];
 ok($ret, 'Finding regex a[ktx]er');

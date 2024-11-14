@@ -219,6 +219,9 @@ void ObjectPad_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv);
 #define mop_class_add_ADJUST(class, cv)  ObjectPad_mop_class_add_ADJUST(aTHX_ class, cv)
 void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv);
 
+#define mop_class_add_APPLY(class, cv)  ObjectPad_mop_class_add_APPLY(aTHX_ class, cv)
+void ObjectPad_mop_class_add_APPLY(pTHX_ ClassMeta *meta, CV *cv);
+
 #define mop_class_add_required_method(class, methodname)  ObjectPad_mop_class_add_required_method(aTHX_ class, methodname)
 void ObjectPad_mop_class_add_required_method(pTHX_ ClassMeta *meta, SV *methodname);
 

@@ -1,3 +1,24 @@
+0.013 2024-11-14
+  [New Features]
+    * Add Net::SSLeay::OCSP#response_status_str method.
+    * Add Net::SSLeay::OCSP#response_status method.
+    * Add Net::SSLeay::ASN1_TIME class.
+    * Add Net::SSLeay::ASN1_GENERALIZEDTIME class.
+    * Add Net::SSLeay::ASN1_INTEGER class.
+    * Add Net::SSLeay::ASN1_ENUMERATED class.
+    * Add Net::SSLeay::OCSP_BASICRESP class.
+    * Add Net::SSLeay::OCSP_CERTID class.
+    * Add Net::SSLeay::DER::d2i_OCSP_CERTID method.
+    * Add Net::SSLeay::DER::i2d_OCSP_CERTID method.
+    * Add Net::SSLeay::OCSP#basic_verify method.
+    * Add Net::SSLeay::OCSP#basic_add1_cert method.
+    * Add Net::SSLeay::OCSP#check_nonce method.
+    * Add Net::SSLeay::OCSP_BASICRESP#DESTROY method.
+    * Add Net::SSLeay::OCSP_CERTID#DESTROY method.
+    * Add Net::SSLeay::OCSP#check_validity method.
+    * Add Net::SSLeay::OCSP_SINGLERESP class.
+    * Add Net::SSLeay::ASN1_GENERALIZEDTIME#DESTROY method.
+    * Add Net::SSLeay::OCSP#resp_count method.
 0.012 2024-11-13
   [New Features]
     * Add Net::SSLeay::X509_STORE_CTX#set_error method.

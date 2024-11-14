@@ -1,0 +1,82 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Annotation::Chain
+
+
+=head1 SYNOPSIS
+
+   use Data::Annotation::Chain;
+
+
+=head1 DESCRIPTION
+
+Representation of a chain, meant to be used by L<Data::Annotation>.
+
+=head1 INTERFACE
+
+=head2 Constructor
+
+=head3 B<< new >>
+
+   my $chain = Data::Annotation::Chain->(%opts);
+
+Make a new instance for a chain.
+
+Input parameter C<rules> is supposed to be an array reference whose
+content will be overwritte in time with L<Data::Annotation::Rule>
+instances, unless elements are already blessed.
+
+=head2 Accessors
+
+=head3 B<< default_retval >>
+
+   my $retval = $chain->default_retval;
+
+The default result (annotation) value returned when none of the rules
+that are checked as part of a call to L</evaluate> provides anything
+meaningful back.
+
+Initialized by key C<default> in the constructor.
+
+=head3 B<< description >>
+
+   my $text = $chain->description;
+
+An optional description for the chain definition. It will be useful for
+you in a couple of months, after you forgot everything about it.
+
+=head3 B<< parse_context >>
+
+   my $ctx = $chain->parse_context;
+
+Whatever was passed as argument C<condition-parse-context>, which can
+help set the stage for condition parsing. This should not be generally
+needed, but still. See L<Data::Annotation::Expression> for more details.
+
+=head3 B<< rules >>
+
+   my $aref = $chain->rules;
+
+Get the list of rules configured for the chain. Thi
+
+=head2 Methods
+
+=head2 B<< evaluate >>
+
+   my $result = $chain->evaluate($state, $overlay);
+
+Evaluate the annotation for data wrapped in some C<$overlay>, leveraging
+state in C<$state>.
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<Data::Annotation>.
+
+=cut

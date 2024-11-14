@@ -1,5 +1,17 @@
 Revision history for Map::Tube::Plugin::FuzzyFind
 
+0.81.0 2024-11-13
+  - Adapted for use with Map::Tube 3.77 and Map::Tube::London 1.39
+  - Bumped Perl version to 5.10.0
+  - Use semantic versioning
+  - Added algorithms Phonix, Phonem, Koeln Phonetics, DoubleMetaphone,
+    Levenshtein-Damerau, Daitch-Mokotoff, Jaro-Winkler
+  - BREAKING CHANGE: By default, limit Metaphone encoding to 4 characters
+    (as per the original Metaphone definition). Use new argument maxcodelen
+    with an explicit value or 0 for unlimited (which was used up to v0.08).
+  - BREAKING CHANGE: Specifying an unknown method will croak (instead of silently
+    using exact matching).
+
 0.08 2015-03-25
   - Upgraded test 07 to work properly with Map::Tube 2.93
 

@@ -1,0 +1,152 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Annotation::Overlay
+
+
+=head1 SYNOPSIS
+
+   use Data::Annotation::Overlay;
+
+   my %data = (...);
+   my $overlay = Data::Annotation::Overlay->new(under => \%data);
+
+
+=head1 DESCRIPTION
+
+Wrapper around a data structure, useful to record "changes" to the data
+structure without making actual modifications to it. Loosely inspired by
+the I<overalay> file systems.
+
+=head1 INTERFACE
+
+=head2 Constructor
+
+   my $rule = Data::Annotation::Overlay->(%opts);
+
+Make a new instance for an overlay. Accepted options are all
+L</Accessors>.
+
+Input parameter C<under> is the only required key, representing the data
+structure that the overlay wraps around.
+
+All I<paths> used in this module must be compatible with
+L</Data::Annotation::Traverse::crumble> and will be normalized with
+L</Data::Annotation::Traverse::kpath>.
+
+=head2 Accessors
+
+=head3 B<< cache_existing >>
+
+All values retrieved with L</get> will be cached for quicker access
+later on. Set by default. Disable if there are intermediate function
+calls that need to be executed at every access.
+
+=head3 B<< method_over_key >>
+
+Prefer the method call over key access when there is an intermediate
+blessed object while traversing.
+
+=head3 B<< over >>
+
+Reference to the I<overlay> data structure (a hash reference).
+
+=head3 B<< strict_blessed >>
+
+Only consider method calls on blessed objects while traversing. False by
+default.
+
+=head3 B<< traverse_methods >>
+
+Consider using methods when traversing an object. True by default.
+
+=head3 B<< under >>
+
+Reference to the I<underlay> data structure. Required.
+
+=head3 B<< value_if_missing >>
+
+Value to return if the path of a traversal in L</get> or
+L</get_external> leads to nothing. By default, an empty list (in list
+context) or C<undef> will be returned.
+
+=head3 B<< value_if_undef >>
+
+Value to return if the path of a traversal in L</get> or
+L</get_external> leads to an undefined value. By default C<undef> is
+returned.
+
+
+=head2 Methods
+
+=head3 B<< delete >>
+
+   $ov->delete($path);
+
+Mark C<$path> as deleted.
+
+=head3 B<< get >>
+
+   my $value = $ov->get($path);
+
+Look for the value associated to C<$path>. This first looks into
+L</over>, then into L</under>.
+
+=head3 B<< get_external >>
+
+   my $value = $ov->get_external($path, $data);
+
+Shorthand to apply the same traversing algorithm (with the same options)
+in traversing C<$data> with C<$path>. In particular, it also uses
+L</return_value_for> to cope with missing/undefined elements.
+
+=head3 B<< merged >>
+
+   my $thin_ov = $stacked_ov->merged;
+
+Generate a new overlay from a stack of multiple wrapped overlays. The
+L</under> of this new overlay is the same as the one for the bottom
+overlay of the whole stack, as well as traversal options; L</over> is
+generated anew and independent of what's in the stacked overlay;
+L</value_if_missing> and L</value_if_undef> are taken from the top
+overlay, and L<cache_existing> is taken from any layer.
+
+All in all, it aims at being a close representation of the behaviour as
+seen from the top layer of the C<$stacked_ov>.
+
+=head3 B<< return_value_for >>
+
+   my $value = $ov->return_value_for($retval);
+
+Adapt the return value according to the configuration.
+
+A C<$retval> meaning "missing" (according to
+L</Data::Annotation::Traverse::means_missing>) is turned into what is
+set for L</value_if_missing>, if the accessor is set, or to just return
+I<nothing> (which will be turned into C<undef> in scalar context).
+
+An undefined C<$retval> will be turned into whatever is set for
+C<value_if_undef> or simply C<undef> if that is not set.
+
+=head3 B<< set >>
+
+   $ov->set($path, $value);
+
+Set the C<$value> for the specific C<$path>.
+
+=head3 B<< traversal_options >>
+
+   my %opts = $ov->traversal_options;
+
+Get all options for traversing the data structure (i.e.
+L</traverse_methods>, L</strict_blessed>, and L</method_over_key>) as a
+hash reference suitable to pass to
+L</Data::Annotation::Traverse::traverse_plain>.
+
+=cut

@@ -1,5 +1,5 @@
 package Crypt::Bear::GCM;
-$Crypt::Bear::GCM::VERSION = '0.001';
+$Crypt::Bear::GCM::VERSION = '0.002';
 use Crypt::Bear;
 
 1;
@@ -18,7 +18,7 @@ Crypt::Bear::GCM - GCM implementation for BearSSL
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

@@ -87,6 +87,8 @@ DESCRIPTION
     
        use Object::Pad ':experimental(inherit_field)';
     
+       use Object::Pad ':experimental(apply_phaser)';
+    
        use Object::Pad ':experimental(:all)';  # all of the above
 
     Since version 0.64.
@@ -450,6 +452,8 @@ KEYWORDS
     
        inherit Classname LIST...;
        inherit Classname VER LIST...;
+
+    Since version 0.807.
 
     Declares a superclass that this class extends. At most one superclass
     is supported. If present, this declaration must come before any methods
@@ -1086,6 +1090,30 @@ KEYWORDS
     wishes to consume. Once all the ADJUST blocks have run, any remaining
     keys in the hash will be considered errors, subject to the
     ":strict(params)" check.
+
+ APPLY
+
+    Experimental. Since version 0.815.
+
+       APPLY ( $class_mop ) {        # on perl 5.26 onwards
+          ...
+       }
+    
+       APPLY {
+          my $class_mop = shift;
+          ...
+       }
+
+    Only valid within a role definition. Declares a block of code that will
+    be run at compile-time whenever the role is applied to a class. Each
+    time it is applied to a new class, the code will be invoked. It
+    receives as an argument a Object::Pad::MOP::Class instance representing
+    the class to which the role is currently being applied.
+
+    The eventual intent is that the presence of any of these phaser blocks
+    will replace the current implicit behaviour of applying a role, though
+    currently they run in addition to it. This is part of an ongoing
+    experiment whose details will change over time.
 
  __CLASS__
 

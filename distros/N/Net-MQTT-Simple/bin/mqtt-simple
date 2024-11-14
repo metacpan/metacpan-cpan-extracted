@@ -150,7 +150,7 @@ such :-)
 
 =over 25
 
-=item -h --host
+=item -h --host I<address>[:I<port>]
 
 MQTT server to connect to, required.
 

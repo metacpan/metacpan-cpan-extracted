@@ -1,5 +1,5 @@
 package Crypt::Bear::PEM;
-$Crypt::Bear::PEM::VERSION = '0.001';
+$Crypt::Bear::PEM::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ Crypt::Bear::PEM - A decoder for PEM
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

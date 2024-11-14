@@ -95142,3 +95142,13 @@ R/RU/RUBYKAT/Muster-0.92.tar.gz
 B/BA/BAKERSCOT/Random-Simple-0.05.tar.gz
 K/KI/KIMOTO/SPVM-Net-SSLeay-0.012.tar.gz
 H/HM/HMBRAND/Text-CSV_XS-1.57.tgz
+S/SK/SKIM/App-MARC-Leader-0.06.tar.gz
+L/LE/LEONT/Crypt-Bear-0.002.tar.gz
+P/PO/POLETTIX/Data-Annotation-0.002.tar.gz
+L/LN/LNATION/JSON-Lines-1.01.tar.gz
+G/GW/GWS/Map-Tube-Plugin-FuzzyFind-v0.81.0.tar.gz
+J/JU/JUERD/Net-MQTT-Simple-1.31.tar.gz
+P/PE/PEVANS/Object-Pad-0.815.tar.gz
+S/SH/SHLOMIF/Parallel-Map-Segmented-0.4.1.tar.gz
+K/KI/KIMOTO/SPVM-Net-SSLeay-0.013.tar.gz
+S/SC/SCHWIGON/Test-Fixture-DBIC-Schema-0.051.tar.gz

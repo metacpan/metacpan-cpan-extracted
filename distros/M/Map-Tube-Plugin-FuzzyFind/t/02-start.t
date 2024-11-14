@@ -1,24 +1,24 @@
-#!perl -T
-use 5.006;
+#!perl
+use 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Test::More 0.82;
 
-eval 'use Map::Tube::London';
-plan skip_all => 'Map::Tube::London required for this test' if $@;
+eval 'use Map::Tube::London 1.39';
+plan skip_all => 'Map::Tube::London (>= 1.39) required for this test' if $@;
 
-plan tests => 19;
+plan tests => 20;
 
-sub a2n { return [ map { $_->name() } @{ $_[0] } ]; }
+sub a2n { return [ map { $_->name( ) } @{ $_[0] } ]; }
 
-my $tube = Map::Tube::London->new();
+my $tube = new_ok( 'Map::Tube::London' );
 my $ret;
 
 $ret = $tube->fuzzy_find( 'Bakerloo', objects => 'lines', method => 'start' );
 is( $ret, 'Bakerloo', 'Finding Bakerloo at start' );
 
 $ret = $tube->fuzzy_find( 'Waterloo', objects => 'lines', method => 'start' );
-is( $ret, 'Waterloo & City', 'Finding Waterloo at start' );
+is( $ret, 'Waterloo and City', 'Finding Waterloo at start' );
 
 $ret = $tube->fuzzy_find( 'kerloo', objects => 'lines', method => 'start' );
 is( $ret, undef, 'Finding kerloo at start should fail' );
@@ -27,7 +27,7 @@ $ret = [ $tube->fuzzy_find( 'Bakerloo',   objects => 'lines', method => 'start' 
 is_deeply($ret, [ 'Bakerloo' ], 'Finding Bakerloo at start');
 
 $ret = [ $tube->fuzzy_find( 'Waterloo',   objects => 'lines', method => 'start' ) ];
-is_deeply($ret, [ 'Waterloo & City' ], 'Finding Waterloo at start');
+is_deeply($ret, [ 'Waterloo and City' ], 'Finding Waterloo at start');
 
 $ret = [ $tube->fuzzy_find( 'kerloo',     objects => 'lines', method => 'start' ) ];
 is_deeply($ret, [ ], 'Finding kerloo at start should fail');

@@ -1,0 +1,150 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Annotation::Rule
+
+
+=head1 SYNOPSIS
+
+   use Data::Annotation::Rule;
+
+
+=head1 DESCRIPTION
+
+Representation of a rule, meant to be used by L<Data::Annotation>.
+
+=head1 INTERFACE
+
+=head2 Constructor
+
+   my $rule = Data::Annotation::Rule->(%opts);
+
+Make a new instance for a rule.
+
+Input parameter C<condition> is supposed to be compatible with
+L<Data::Annotation::Expression>, either by being an instance itself or
+by being suitable to create a new instance.
+
+=head2 Accessors
+
+=head3 B<< condition >>
+
+   my $condition = $rule->condition;
+
+The condition that is checked to see if the rule applies or not. It must
+be compatible with L<Data::Annotation::Expression> and will be used as a
+boolean expression.
+
+=head3 B<< description >>
+
+   my $text = $rule->description;
+
+An optional description for the rule definition. It will be useful for
+you in a couple of months, after you forgot everything about it.
+
+=head3 B<< name >>
+
+   my $text = $rule->name;
+
+An explicit name for the rule, useful for debugging (it is printed when
+a rule matches and debug or trace is enabled).
+
+=head3 B<< parse_context >>
+
+   my $ctx = $rule->parse_context;
+
+Whatever was passed as argument C<condition-parse-context>, which can
+help set the stage for condition parsing. This should not be generally
+needed, but still. See L<Data::Annotation::Expression> for more details.
+
+=head3 B<< record >>
+
+   my $defs = $rule->record;
+
+A data structure to drive changes in the C<$overlay> passed to
+L</evaluate> in case the condition applies. This allows recording some
+data that can be later used by other chains/rules during following
+evaluations.
+
+Accepts a hash reference with the following keys:
+
+=over
+
+=item *
+
+C<delete>: an array reference of I<paths> suitable for
+L</Data::Annotation::Traverse::traverse_plain>, these paths will be
+marked as deleted in the overlay.
+
+=item *
+
+C<set>: a hash reference of I<paths>/values to be set in the overlay.
+
+=back
+
+All paths are supposed to be relative to an initial key C<run>, which is
+mapped onto the C<$overlay> in L</execute>.
+
+As an example, let's consider the following chains definitions:
+
+   # ...
+   EHLO:
+     default: reject
+     rules:
+       - condition:
+           and:
+             - eq: [ '.peer_ip', '=127.0.0.1' ]
+             - eq: [ '.peer_identity', '=localhost.localdomain' ]
+         record:
+           set:
+             '.caller': localhost
+         return: accept
+
+   DATA:
+     default: reject
+     rules:
+       - name: localhost/size
+         condition:
+           and:
+             - eq: [ '.caller', '=localhost' ]
+             - '<': [ '.mail_min_size', '=250' ]
+         return: accept
+   # ...
+
+When the C<EHLO> chain is called and the first (and only) rule is
+matched, then a new parameter at position C<run.caller> is set to the
+literal value C<localhost>. This can then be used at a later call to
+rule C<DATA>, allowing to avoid repeating all the tests and adding
+readability to the whole condition.
+
+=head3 B<< retval >>
+
+   my $retval = $rule->retval;
+
+The result (annotation) value returned by L</evaluate> when the
+condition of the rule applies.
+
+Initialized by key C<return> in the constructor.
+
+
+=head2 Methods
+
+=head3 B<< evaluate >>
+
+   my $result = $rule->evaluate($overlay);
+
+Evaluate the annotation for data wrapped in some C<$overlay>.
+
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for Data::Annotation.
+
+
+=cut

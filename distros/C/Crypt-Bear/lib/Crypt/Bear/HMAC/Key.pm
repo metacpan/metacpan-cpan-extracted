@@ -1,5 +1,5 @@
 package Crypt::Bear::HMAC::Key;
-$Crypt::Bear::HMAC::Key::VERSION = '0.001';
+$Crypt::Bear::HMAC::Key::VERSION = '0.002';
 use Crypt::Bear;
 
 1;
@@ -18,7 +18,7 @@ Crypt::Bear::HMAC::Key - A key for HMAC computation.
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

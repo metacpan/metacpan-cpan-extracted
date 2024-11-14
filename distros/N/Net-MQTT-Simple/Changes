@@ -3,6 +3,17 @@ Revision history for Perl extension Net::MQTT::Simple.
 Incompatible changes are marked with "!!". Incompatibility with and changes in
 "undocumented features" are not always specifically mentioned here.
 
+1.31  2024-11-13 23:37
+        - Fix: in one-shot, unsubscribe from same topic string
+
+1.30  2024-11-13 23:06
+        - New: single-shot handlers
+        - Fix: Don't do deep recursion on connection errors
+        - Fix: Don't subscribe to already-subscribed topics
+        - License fix: typo (repeated word)
+        - Doc fix: removed outdated part about not supporting logins
+        - Doc fix: document argument for --host
+
 1.29  2023-10-13 13:37
         - Clarify license terms.
 

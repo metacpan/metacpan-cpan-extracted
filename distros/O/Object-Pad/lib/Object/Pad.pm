@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.814;
+package Object::Pad 0.815;
 
 use v5.18;
 use warnings;
@@ -116,6 +116,8 @@ module to only silence the module's warnings selectively:
    use Object::Pad ':experimental(composed_adjust)';
 
    use Object::Pad ':experimental(inherit_field)';
+
+   use Object::Pad ':experimental(apply_phaser)';
 
    use Object::Pad ':experimental(:all)';  # all of the above
 
@@ -470,6 +472,8 @@ the role.
 
    inherit Classname LIST...;
    inherit Classname VER LIST...;
+
+I<Since version 0.807.>
 
 Declares a superclass that this class extends. At most one superclass is
 supported. If present, this declaration must come before any methods or fields
@@ -1086,6 +1090,30 @@ The code in the block should C<delete> from this hash any parameters it wishes
 to consume. Once all the C<ADJUST> blocks have run, any remaining keys in the
 hash will be considered errors, subject to the L</:strict(params)> check.
 
+=head2 APPLY
+
+I<Experimental. Since version 0.815.>
+
+   APPLY ( $class_mop ) {        # on perl 5.26 onwards
+      ...
+   }
+
+   APPLY {
+      my $class_mop = shift;
+      ...
+   }
+
+Only valid within a C<role> definition. Declares a block of code that will be
+run at compile-time whenever the role is applied to a class. Each time it is
+applied to a new class, the code will be invoked. It receives as an argument
+a L<Object::Pad::MOP::Class> instance representing the class to which the role
+is currently being applied.
+
+The eventual intent is that the presence of any of these phaser blocks will
+I<replace> the current implicit behaviour of applying a role, though currently
+they run in addition to it. This is part of an ongoing experiment whose
+details will change over time.
+
 =head2 __CLASS__
 
    my $classname = __CLASS__;
@@ -1451,7 +1479,7 @@ sub import_into
    my $class = shift;
    my $caller = shift;
 
-   $class->_import_experimental( \@_, qw( init_expr mop custom_field_attr adjust_params composed_adjust inherit_field ) );
+   $class->_import_experimental( \@_, qw( init_expr mop custom_field_attr adjust_params composed_adjust inherit_field apply_phaser ) );
 
    $class->_import_configuration( \@_ );
 
@@ -1459,10 +1487,10 @@ sub import_into
 
    # Default imports
    unless( %syms ) {
-      $syms{$_}++ for qw( class role inherit apply method field has requires BUILD ADJUST );
+      $syms{$_}++ for qw( class role inherit apply method field has requires BUILD ADJUST APPLY );
    }
 
-   delete $syms{$_} and $^H{"Object::Pad/$_"}++ for qw( class role inherit apply method field has requires BUILD ADJUST );
+   delete $syms{$_} and $^H{"Object::Pad/$_"}++ for qw( class role inherit apply method field has requires BUILD ADJUST APPLY );
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }

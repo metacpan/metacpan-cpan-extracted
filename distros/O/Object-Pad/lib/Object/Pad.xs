@@ -893,12 +893,14 @@ enum PhaserType {
   PHASER_BUILD,
   PHASER_ADJUST,
   PHASER_ADJUSTPARAMS,
+  PHASER_APPLY,
 };
 
 static const char *phasertypename[] = {
   [PHASER_BUILD]        = "BUILD",
   [PHASER_ADJUST]       = "ADJUST",
   [PHASER_ADJUSTPARAMS] = "ADJUST",
+  [PHASER_APPLY]        = "APPLY",
 };
 
 static bool parse_method_permit(pTHX_ void *hookdata)
@@ -916,6 +918,7 @@ static bool parse_method_permit(pTHX_ void *hookdata)
 static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   enum PhaserType type = PTR2UV(hookdata);
+  HV *hints = GvHV(PL_hintgv);
 
   /* XS::Parse::Sublike doesn't support lexical `method $foo`, but we can hack
    * it up here
@@ -939,6 +942,7 @@ static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, v
     case PHASER_NONE:
     case PHASER_BUILD:
     case PHASER_ADJUST:
+    case PHASER_APPLY:
       break;
 
     case PHASER_ADJUSTPARAMS:
@@ -968,7 +972,16 @@ static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, v
   };
 
   hv_stores(ctx->moddata, "Object::Pad/compmethodmeta", newSVuv(PTR2UV(compmethodmeta)));
-  hv_stores(GvHV(PL_hintgv), "Object::Pad/__CLASS__", newSVsv(&PL_sv_yes));
+  hv_stores(hints, "Object::Pad/__CLASS__", newSVsv(&PL_sv_yes));
+}
+
+static void parse_classphaser_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
+{
+  ClassMeta *meta = compclassmeta;
+
+  mop_class_begin(meta);
+
+  ctx->actions &= ~XS_PARSE_SUBLIKE_ACTION_CVf_ANON;
 }
 
 static bool parse_method_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val, void *hookdata)
@@ -1033,6 +1046,15 @@ static void parse_method_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx
 
     parse_adjust_params(compclassmeta, params);
   }
+}
+
+static void parse_classphaser_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
+{
+  /* phasers always permit signatures */
+#ifdef HAVE_PARSE_SUBSIGNATURE
+  import_pragma("feature", "signatures");
+  import_pragma("-warnings", "experimental::signatures");
+#endif
 }
 
 #define walk_optree_warn_for_defargs(o)  S_walk_optree_warn_for_defargs(aTHX_ o)
@@ -1139,6 +1161,14 @@ redo:
     ctx->actions &= ~XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL;
 }
 
+static void parse_classphaser_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
+{
+  /* We need to remove the name now to stop newATTRSUB() from creating this
+   * as a named symbol table entry
+   */
+  ctx->actions &= ~XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL;
+}
+
 static void parse_method_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   enum PhaserType type = PTR2UV(hookdata);
@@ -1180,6 +1210,9 @@ static void parse_method_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, voi
     case PHASER_ADJUSTPARAMS:
       mop_class_add_ADJUST(compclassmeta, ctx->cv); /* steal CV */
       break;
+
+    case PHASER_APPLY:
+      croak("ARHG unreachable wrong post_newcv for type=%d", type);
   }
 
   SV **varnamep;
@@ -1202,6 +1235,25 @@ static void parse_method_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, voi
 
   SvREFCNT_dec(compmethodmeta->name);
   Safefree(compmethodmeta);
+}
+
+static void parse_classphaser_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
+{
+  enum PhaserType type = PTR2UV(hookdata);
+
+  switch(type) {
+    case PHASER_APPLY:
+      mop_class_add_APPLY(compclassmeta, ctx->cv); /* steal CV */
+      break;
+
+    case PHASER_NONE:
+    case PHASER_BUILD:
+    case PHASER_ADJUST:
+    case PHASER_ADJUSTPARAMS:
+      croak("ARHG unreachable wrong post_newcv for type=%d", type);
+  }
+
+  ctx->actions &= ~(XS_PARSE_SUBLIKE_ACTION_REFGEN_ANONCODE|XS_PARSE_SUBLIKE_ACTION_RET_EXPR);
 }
 
 static struct XSParseSublikeHooks parse_method_hooks = {
@@ -1229,14 +1281,28 @@ static struct XSParseSublikeHooks parse_phaser_hooks = {
   .post_newcv      = parse_method_post_newcv,
 };
 
+static struct XSParseSublikeHooks parse_classphaser_hooks = {
+  /* hooks for phasers that apply to entire classes but not instances */
+  .flags           = XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS,
+  .skip_parts      = XS_PARSE_SUBLIKE_PART_NAME,
+  /* no permit */
+  .pre_subparse    = parse_classphaser_pre_subparse,
+  .post_blockstart = parse_classphaser_post_blockstart,
+  .pre_blockend    = parse_classphaser_pre_blockend,
+  .post_newcv      = parse_classphaser_post_newcv,
+};
+
 static int parse_phaser(pTHX_ OP **out, void *hookdata)
 {
+  enum PhaserType type = PTR2UV(hookdata);
+  HV *hints = GvHV(PL_hintgv);
+
   if(!have_compclassmeta)
     croak("Cannot '%s' outside of 'class'", phasertypename[PTR2UV(hookdata)]);
 
   lex_read_space(0);
 
-  if(PTR2UV(hookdata) == PHASER_ADJUST && compclassmeta->composed_adjust) {
+  if(type == PHASER_ADJUST && compclassmeta->composed_adjust) {
     ClassMeta *classmeta = compclassmeta;
 
     ENTER;
@@ -1310,7 +1376,21 @@ static int parse_phaser(pTHX_ OP **out, void *hookdata)
     return KEYWORD_PLUGIN_STMT;
   }
 
-  return xs_parse_sublike(&parse_phaser_hooks, hookdata, out);
+  switch(type) {
+    case PHASER_NONE:
+    case PHASER_BUILD:
+    case PHASER_ADJUST:
+    case PHASER_ADJUSTPARAMS:
+      return xs_parse_sublike(&parse_phaser_hooks, hookdata, out);
+
+    case PHASER_APPLY:
+      if(!hv_fetchs(hints, "Object::Pad/experimental(apply_phaser)", 0))
+        Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+          "APPLY phaser blocks are experimental and may be changed or removed without notice");
+      return xs_parse_sublike(&parse_classphaser_hooks, hookdata, out);
+  }
+
+  croak("ARGH unreachable: unhandled phaser type %d", type);
 }
 
 static const struct XSParseKeywordHooks kwhooks_BUILD = {
@@ -1320,6 +1400,11 @@ static const struct XSParseKeywordHooks kwhooks_BUILD = {
 
 static const struct XSParseKeywordHooks kwhooks_ADJUST = {
   .permit_hintkey = "Object::Pad/ADJUST",
+  .parse = &parse_phaser,
+};
+
+static const struct XSParseKeywordHooks kwhooks_APPLY = {
+  .permit_hintkey = "Object::Pad/APPLY",
   .parse = &parse_phaser,
 };
 
@@ -1522,10 +1607,11 @@ static void dump_classmeta(pTHX_ DMDContext *ctx, ClassMeta *classmeta)
 
     case METATYPE_ROLE:
       DMD_DUMP_STRUCT(ctx, "Object::Pad/ClassMeta.role", classmeta, sizeof(ClassMeta),
-        N_COMMON_FIELDS+2, ((const DMDNamedField []){
+        N_COMMON_FIELDS+3, ((const DMDNamedField []){
           COMMON_FIELDS,
           {"the superroles AV",           DMD_FIELD_PTR, .ptr = classmeta->role.superroles},
           {"the role applied classes HV", DMD_FIELD_PTR, .ptr = classmeta->role.applied_classes},
+          {"the role APPLY blocks AV",    DMD_FIELD_PTR, .ptr = classmeta->role.applycvs},
         })
       );
       break;
@@ -1993,6 +2079,7 @@ BOOT:
   register_xs_parse_keyword("BUILD",        &kwhooks_BUILD, (void *)PHASER_BUILD);
   register_xs_parse_keyword("ADJUST",       &kwhooks_ADJUST, (void *)PHASER_ADJUST);
   register_xs_parse_keyword("ADJUSTPARAMS", &kwhooks_ADJUST, (void *)PHASER_ADJUSTPARAMS);
+  register_xs_parse_keyword("APPLY",        &kwhooks_APPLY, (void *)PHASER_APPLY);
 
   register_xs_parse_keyword("__CLASS__", &kwhooks_uuCLASS, NULL);
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More tests => 1;
 use Parallel::Map::Segmented ();
-use Path::Tiny qw/ path /;
+use Path::Tiny               qw/ path /;
 
 {
     my $temp_d = Path::Tiny->tempdir;

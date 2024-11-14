@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::FieldAttr 0.814;
+package Object::Pad::MOP::FieldAttr 0.815;
 
 use v5.18;
 use warnings;
