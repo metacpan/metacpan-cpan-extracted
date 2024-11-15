@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Geo::Leaflet;
 
-my $map = Geo::Leaflet->new(center=>[51.505, -0.09], zoom=>13);
+my $map = Geo::Leaflet->new(center=>[51.505, -0.09], zoom=>13, width=>'100%', height=>'100%');
 
 $map->marker(  lat         => 51.5,
                lon         => -0.09,

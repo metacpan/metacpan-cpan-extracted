@@ -3,7 +3,7 @@
 #
 package PDL::CCS::Utils;
 
-our @EXPORT_OK = qw(nnz nnza ccs_encode_pointers ccs_decode_pointer ccs_pointerlen ccs_xindex1d ccs_xindex2d ccs_dump_which );
+our @EXPORT_OK = qw(nnz nnza ccs_encode_pointers ccs_decode_pointer ccs_xindex1d ccs_xindex2d ccs_dump_which );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '1.23.23';
+   our $VERSION = '1.23.25';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Utils $VERSION;
@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-
 #line 13 "ccsutils.pd"
+
 
 #use PDL::CCS::Config;
 use strict;
@@ -44,6 +44,11 @@ PDL::CCS::Utils - Low-level utilities for compressed storage sparse PDLs
 =cut
 #line 46 "Utils.pm"
 
+
+
+
+
+
 =head1 FUNCTIONS
 
 =cut
@@ -51,18 +56,28 @@ PDL::CCS::Utils - Low-level utilities for compressed storage sparse PDLs
 
 
 
-
 #line 51 "ccsutils.pd"
 
 *ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices
+#line 63 "Utils.pm"
+
+
 
 #line 69 "ccsutils.pd"
+
+
 =pod
 
 =head1 Non-missing Value Counts
 
 =cut
-#line 66 "Utils.pm"
+#line 75 "Utils.pm"
+
+
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
+
+
 
 =head2 nnz
 
@@ -79,20 +94,26 @@ For k>1 dimensional PDLs, projects via number of nonzero elements
 to N-1 dimensions by computing the number of nonzero elements
 along the the 1st dimension.
 
+
 =for bad
 
 nnz does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
+
 =cut
+#line 106 "Utils.pm"
 
 
 
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *nnz = \&PDL::nnz;
+#line 113 "Utils.pm"
 
 
 
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -107,30 +128,40 @@ For 1d PDLs, should be equivalent to:
 
  $nnz = nelem(which(!$a->approx(0,$eps)));
 
+
 =for bad
 
 nnza does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
+
 =cut
+#line 140 "Utils.pm"
 
 
 
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *nnza = \&PDL::nnza;
-
-
+#line 147 "Utils.pm"
 
 
 
 #line 171 "ccsutils.pd"
+
 
 =pod
 
 =head1 Encoding Utilities
 
 =cut
-#line 134 "Utils.pm"
+#line 159 "Utils.pm"
+
+
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
+
+
 
 =head2 ccs_encode_pointers
 
@@ -154,15 +185,20 @@ guaranteed to be stably sorted along dimension $N():
  or
   $ixix->at($i)             < $ixix->at($j)               ##-- ... stable
 
+
+
 =for bad
 
 ccs_encode_pointers does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
+
 =cut
+#line 198 "Utils.pm"
 
 
 
+#line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
  sub PDL::ccs_encode_pointers {
@@ -174,23 +210,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    &PDL::_ccs_encode_pointers_int($ix,$N,$ptr,$ixix);
    return ($ptr,$ixix);
  }
+#line 214 "Utils.pm"
 
 
+
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_encode_pointers = \&PDL::ccs_encode_pointers;
-
-
+#line 221 "Utils.pm"
 
 
 
 #line 248 "ccsutils.pd"
+
 
 =pod
 
 =head1 Decoding Utilities
 
 =cut
-#line 194 "Utils.pm"
+#line 233 "Utils.pm"
+
+
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
+
+
 
 =head2 ccs_decode_pointer
 
@@ -205,15 +250,20 @@ If unspecified, $proj() defaults to:
 
  sequence($ptr->dim(0))
 
+
+
 =for bad
 
 ccs_decode_pointer does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
+
 =cut
+#line 263 "Utils.pm"
 
 
 
+#line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
  sub PDL::ccs_decode_pointer {
@@ -234,65 +284,39 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    &PDL::_ccs_decode_pointer_int($ptr,$proj,$projix,$nzix);
    return ($projix,$nzix);
  }
+#line 288 "Utils.pm"
 
 
+
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_decode_pointer = \&PDL::ccs_decode_pointer;
+#line 295 "Utils.pm"
 
 
 
+#line 313 "ccsutils.pd"
 
-
-
-=head2 ccs_pointerlen
-
-=for sig
-
-  Signature: (ptr(Nplus1); [o]ptrlen(N))
-
-Get number of non-missing values for each axis value from a CCS-encoded
-offset pointer vector $ptr().
-
-=for bad
-
-ccs_pointerlen does not process bad values.
-It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
-
-=cut
-
-
-
-
-
-sub PDL::ccs_pointerlen {
-  my ($ptr,$len) = @_;
-  $len = zeroes($ptr->type, $ptr->nelem-1) if (!defined($len));
-  &PDL::_ccs_pointerlen_int($ptr,$len);
-  return $len;
-}
-
-
-
-*ccs_pointerlen = \&PDL::ccs_pointerlen;
-
-
-
-
-
-#line 348 "ccsutils.pd"
 
 =pod
 
 =head1 Indexing Utilities
 
 =cut
-#line 290 "Utils.pm"
+#line 307 "Utils.pm"
+
+
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
+
+
 
 =head2 ccs_xindex1d
 
 =for sig
 
   Signature: (which(Ndims,Nnz); a(Na); [o]nzia(NnzA); [o]nnza())
+
 
 Compute indices $nzai() along dimension C<NNz> of $which() whose initial values $which(0,$nzai)
 match some element of $a().  Appropriate for indexing a sparse encoded PDL
@@ -304,15 +328,20 @@ In list context, returns a list ($nzai,$nnza), where $nnza() is the number of in
 and $nzai are those C<Nnz> indices.  In scalar context, trims the output vector $nzai() to $nnza()
 elements.
 
+
+
 =for bad
 
 ccs_xindex1d does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
+
 =cut
+#line 341 "Utils.pm"
 
 
 
+#line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
  sub PDL::ccs_xindex1d {
@@ -327,13 +356,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    return ($nzia,$nnza) if (wantarray);
    return $nzia->reshape($nnza->sclr);
  }
+#line 360 "Utils.pm"
 
 
+
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_xindex1d = \&PDL::ccs_xindex1d;
+#line 367 "Utils.pm"
 
 
 
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -342,6 +376,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (which(Ndims,Nnz); a(Na); b(Nb); [o]ab(Nab); [o]nab())
+
 
 Compute indices along dimension C<NNz> of $which() corresponding to any combination
 of values in the Cartesian product of $a() and $b().  Appropriate for indexing a
@@ -353,15 +388,20 @@ In list context, returns a list ($ab,$nab), where $nab() is the number of indice
 and $ab are those C<Nnz> indices.  In scalar context, trims the output vector $ab() to $nab()
 elements.
 
+
+
 =for bad
 
 ccs_xindex2d does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
+
 =cut
+#line 401 "Utils.pm"
 
 
 
+#line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
  sub PDL::ccs_xindex2d {
@@ -379,23 +419,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    return ($ab,$nab) if (wantarray);
    return $ab->reshape($nab->sclr);
  }
+#line 423 "Utils.pm"
 
 
+
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_xindex2d = \&PDL::ccs_xindex2d;
+#line 430 "Utils.pm"
 
 
 
+#line 478 "ccsutils.pd"
 
-
-#line 513 "ccsutils.pd"
 
 =pod
 
 =head1 Debugging Utilities
 
 =cut
-#line 399 "Utils.pm"
+#line 442 "Utils.pm"
+
+
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
+
+
 
 =head2 ccs_dump_which
 
@@ -403,20 +452,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
   Signature: (indx which(Ndims,Nnz); SV *HANDLE; char *fmt; char *fsep; char *rsep)
 
+
 Print a text dump of an index PDL to the filehandle C<HANDLE>, which default to C<STDUT>.
 C<$fmt> is a printf() format to use for output, which defaults to "%d".
 C<$fsep> and C<$rsep> are field-and record separators, which default to
 a single space and C<$/>, respectively.
+
+
 
 =for bad
 
 ccs_dump_which does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
+
 =cut
+#line 471 "Utils.pm"
 
 
 
+#line 950 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
  sub PDL::ccs_dump_which {
@@ -427,16 +482,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
    $fh = \*STDOUT if (!defined($fh));
    &PDL::_ccs_dump_which_int($which,$fh,$fmt,$fsep,$rsep);
  }
+#line 486 "Utils.pm"
 
 
+
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_dump_which = \&PDL::ccs_dump_which;
+#line 493 "Utils.pm"
 
 
 
+#line 548 "ccsutils.pd"
 
-
-#line 583 "ccsutils.pd"
 
 ##---------------------------------------------------------------------
 =pod
@@ -458,6 +516,7 @@ Probably many.
 
 =cut
 
+
 ##---------------------------------------------------------------------
 =pod
 
@@ -478,7 +537,12 @@ as Perl itself.
 perl(1), PDL(3perl)
 
 =cut
-#line 482 "Utils.pm"
+#line 541 "Utils.pm"
+
+
+
+
+
 
 # Exit with OK status
 

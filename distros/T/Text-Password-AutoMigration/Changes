@@ -1,5 +1,8 @@
 Revision history for Perl extension Text-Password-AutoMigration
 
+0.43 2024-11-14T15:28:17Z
+  - forbided white spaces at the end of raw passwords
+
 0.42 2024-10-17T00:28:41Z
  - added rondom tests for every sub-module
  - fixed a bug around the test for MD5

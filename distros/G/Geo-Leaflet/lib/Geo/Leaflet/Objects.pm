@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw{Geo::Leaflet::Base};
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME

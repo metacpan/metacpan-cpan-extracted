@@ -13,9 +13,13 @@ Neo4j::Driver::Net - Explains the design of the networking modules
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 OVERVIEW
+
+I<This document will be removed from the CPAN distribution with the
+next major update. It will continue to be available
+L<on GitHub|https://github.com/johannessen/neo4j-driver-perl/blob/0.51/lib/Neo4j/Driver/Net.pod>.>
 
 Each L<Neo4j::Driver::Session> has exactly one network controller
 instance that is used by the session and all of its transactions
@@ -126,7 +130,7 @@ of the driver and the Neo4j server
 Bolt, on the other hand, currently only supports a single open
 transaction per connection. While a Bolt connection can be viewed
 as a simple state machine in the backend Bolt library (see
-L<Bolt Protocol Server State Spec|https://7687.org/bolt/bolt-protocol-server-state-specification-4.html#appendix---bolt-message-state-transitions>),
+L<Bolt Protocol Server State Spec|https://neo4j.com/docs/bolt/current/appendix/version-4/>),
 L<Neo4j::Bolt> currently doesn't allow users to directly observe
 state changes, so it is currently somewhat difficult to determine
 the Bolt connection state. This driver infers it based
@@ -134,7 +138,7 @@ on the behaviour of L<Neo4j::Bolt>.
 
 =head1 COMPATIBILITY
 
-L<Neo4j::Driver> S<version 0.50> is compatible with
+L<Neo4j::Driver> S<version 0.51> is compatible with
 S<L<Neo4j::Bolt> 0.01> or later.
 Note that some L<Neo4j::Bolt> and L<Neo4j::Client> versions are
 broken, or simply incompatible with each other. Recommended pairs
@@ -144,17 +148,17 @@ of known-good module versions are as follows:
    |       +-- Neo4j::Client
    |       |     +-- max recommended Neo4j server
    |       |     |
-  0.5000  0.53  5.x  (neither is on CPAN yet - install from source)
+  0.5000  0.54  5.x
   0.4203  0.46  4.4
   0.20    0.17  3.4
   0.12     -    3.4  (system libneo4j-client)
 
-When using HTTP, S<L<Neo4j::Driver> 0.50> supports determining the
+When using HTTP, S<L<Neo4j::Driver> 0.51> supports determining the
 version of any Neo4j server via L<Neo4j::Driver::Session/"server">.
 This even works on S<Neo4j 1.x>, but running statements on
 S<Neo4j 1.x> will fail, because it lacks the transactional API.
 
-S<L<Neo4j::Driver> 0.50> is compatible with Neo4j S<versions 2.x>,
+S<L<Neo4j::Driver> 0.51> is compatible with Neo4j S<versions 2.x>,
 3.x, S<4.x, and 5.x>. It supports HTTP responses in the
 L<formats|https://neo4j.com/docs/http-api/4.4/actions/result-format/>
 JSON and Jolt (strict and sparse, line-delimited and sequenced).
@@ -279,7 +283,7 @@ see L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS">.
 =head2 Custom HTTP networking modules
 
 L<Neo4j::Driver> includes a default HTTP network adapter.
-The included adapter may change in future. As of S<version 0.50>,
+The included adapter may change in future. As of S<version 0.51>,
 the default adapter uses L<LWP> directly. Versions earlier
 S<than 0.21> used L<REST::Client>.
 

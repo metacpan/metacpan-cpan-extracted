@@ -20,9 +20,10 @@ use File::Information::Inode;
 use File::Information::Filesystem;
 use File::Information::Tagpool;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; 1;};
+my $HAVE_UNIX_MKNOD     = eval {require Unix::Mknod; 1;};
 
 
 my %_new_subobjects = (
@@ -317,17 +318,73 @@ sub _load_filesystems {
                     next unless S_ISBLK($stat[2]);
 
                     $found{$stat[6]} //= {};
-                    $found{$stat[6]}{''} = \@stat;
-                    $found{$stat[6]}{$dir_path} //= [];
-                    push(@{$found{$stat[6]}{$dir_path}}, $entry);
+                    $found{$stat[6]}{stat} = \@stat;
+                    $found{$stat[6]}{paths} //= {};
+                    $found{$stat[6]}{paths}{$dir_path} //= [];
+                    push(@{$found{$stat[6]}{paths}{$dir_path}}, $entry);
+                }
+            }
+        }
+
+        if ($^O eq 'MSWin32') {
+            foreach my $dos_device ('A'..'Z') {
+                my $dos_path = $dos_device.':\\';
+                my @stat = stat($dos_path);
+
+                next unless scalar @stat;
+
+                $found{$stat[0]} //= {};
+                $found{$stat[0]}{dirstat} = \@stat;
+                $found{$stat[0]}{dos_device} = $dos_device;
+                $found{$stat[0]}{dos_path} = $dos_path;
+                $found{$stat[0]}{paths} //= {};
+            }
+        }
+
+        if ($HAVE_UNIX_MKNOD && $^O eq 'linux') {
+            if (open(my $mountinfo, '<', '/proc/self/mountinfo')) {
+                while (defined(my $line = <$mountinfo>)) {
+                    my ($mount_id, $parent_id, $major, $minor, $root, $mountpoint, $mount_options, $options, $fs_type, $source, $super_options) =
+                        $line =~ m#^(\S+)\s+(\S+)\s+([0-9]+):([0-9]+)\s+(/\S*)\s+(/\S*)\s+(\S+)\s+((?:\S+:\S+\s+)*)-\s+(\S+)\s+(/\S+|none|\S+)\s+(\S+)$#;
+                    my $dev;
+                    my $entry;
+
+                    next unless defined $mount_id;
+
+                    s/\\([0-9]{3})/chr(oct($1))/ge foreach $mount_id, $parent_id, $major, $minor, $root, $mountpoint, $mount_options, $options, $fs_type, $source, $super_options;
+
+                    $dev = Unix::Mknod::makedev($major, $minor);
+
+                    $entry = $found{$dev} //= {};
+                    $entry->{paths} //= {};
+
+                    if (!defined($entry->{stat}) && $source =~ m#^/#) {
+                        my @stat = eval {stat($source)};
+                        $entry->{stat} = \@stat if scalar @stat;
+                    }
+
+                    if (!defined($entry->{dirstat}) && $mountpoint =~ m#^/#) {
+                        my @stat = eval {stat($mountpoint)};
+                        $entry->{dirstat} = \@stat if scalar @stat;
+                    }
+
+                    $entry->{mountpoint}                //= $mountpoint if $mountpoint =~ m#^/#;
+                    $entry->{fs_type}                   //= $fs_type;
+                    $entry->{linux_mount_options}       //= $mount_options;
+                    $entry->{linux_superblock_options}  //= $super_options;
+
+                    if ($source =~ m#^/#) {
+                        my ($volume, $directories, $file) = File::Spec->splitpath($source);
+                        my $dir = File::Spec->catdir($volume, $directories);
+                        $entry->{paths}{$dir} //= [];
+                        push(@{$entry->{paths}{$dir}}, $file);
+                    }
                 }
             }
         }
 
         foreach my $key (keys %found) {
-            my $entry = $found{$key};
-            my $stat = delete $entry->{''};
-            $filesystems{$key} = File::Information::Filesystem->_new(instance => $self, stat => $stat, paths => $entry);
+            $filesystems{$key} = File::Information::Filesystem->_new(instance => $self, %{$found{$key}});
         }
         $self->{dev_found} = \%found;
         $self->{filesystems} = \%filesystems;
@@ -354,7 +411,7 @@ File::Information - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -362,13 +419,41 @@ version v0.03
 
     my File::Information $instance = File::Information->new(%config);
 
+    my File::Information::Base $obj = $instance->for_link($path)
+    my File::Information::Base $obj = $instance->for_handle($handle);
+
+    my $title                       = $obj->get('title');
+    my $digest                      = $obj->digest('sha-3-512');
+
+    my $result                      = $obj->verify;
+    my $passed                      = $result->has_passed;
+
+This module provides support to read/write properties of inodes (files) and links
+in a portable and compact way.
+
+This module will collect data from a number of sources such as the file system
+(ANSI, POSIX, and operating specific interfaces),
+C<.comments/>, tagpool, tag databases, and other.
+
+The provided example program C<file-information-dump> dumps all information this module
+can read for a given file. It is also meant as an example on how to interact with the API.
+
+In addition this module also provides a way to verify a file for corruption.
+See L<File::Information::Base/verify> for that.
+
+A noteable difference of this module to other similar modules is the use of lifecycles.
+See L</lifecycles> for more information on that.
+
+B<Note:>
+Future versions of this module will depend on L<Data::Identifier>.
+
 =head1 METHODS
 
 =head2 new
 
-    my File::Information $instance = File::Information->new(%config);
+    my File::Information $instance  = File::Information->new(%config);
 
-Creates a new instance that can be used to do lookups later on.
+Creates a new instance that can be used to perform lookups later on.
 
 The following options (all optional) are supported:
 

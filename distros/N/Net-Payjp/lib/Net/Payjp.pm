@@ -24,6 +24,7 @@ use Net::Payjp::Statement;
 use Net::Payjp::Balance;
 use Net::Payjp::Term;
 use Net::Payjp::Object;
+use Net::Payjp::ThreeDSecureRequest;
 
 # ABSTRACT: API client for pay.jp
 
@@ -67,7 +68,7 @@ This is required. You get this from your Payjp Account settings.
 
 =cut
 
-our $VERSION = '0.3.1';
+our $VERSION = '0.4.0';
 our $API_BASE = 'https://api.pay.jp';
 our $INITIAL_DELAY_SEC = 2;
 our $MAX_DELAY_SEC = 32;
@@ -446,6 +447,15 @@ L<https://pay.jp/docs/api/#トークン情報を取得>
 
 $payjp->token->retrieve('tok_eff34b780cbebd61e87f09ecc9c6');
 
+=head2 tds_finish
+
+Finish 3D-Secure flow of token
+
+L<https://pay.jp/docs/api/#%E3%83%88%E3%83%BC%E3%82%AF%E3%83%B3%E3%81%AB%E5%AF%BE%E3%81%99%E3%82%8B3d%E3%82%BB%E3%82%AD%E3%83%A5%E3%82%A2%E3%83%95%E3%83%AD%E3%83%BC%E3%82%92%E5%AE%8C%E4%BA%86%E3%81%99%E3%82%8B>
+
+ $payjp->id('tok_xxxxxx');
+ $payjp->token->tds_finish();
+
 =cut
 
 sub token{
@@ -487,6 +497,41 @@ L<https://pay.jp/docs/api/#入金の内訳を取得>
 sub transfer{
   my $self = shift;
   return Net::Payjp::Transfer->new(%$self);
+}
+
+=head1 ThreeDSecureRequest Methods
+
+=head2 create
+
+Create a three_d_secure_request
+
+L<https://pay.jp/docs/api/#3d%E3%82%BB%E3%82%AD%E3%83%A5%E3%82%A2%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%82%92%E4%BD%9C%E6%88%90>
+
+ $payjp->three_d_secure_request->create(
+   "resource_id" => "car_xxxx",
+ );
+
+=head2 retrieve
+
+Retrieve a three_d_secure_request
+
+L<https://pay.jp/docs/api/#3d%E3%82%BB%E3%82%AD%E3%83%A5%E3%82%A2%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E6%83%85%E5%A0%B1%E3%82%92%E5%8F%96%E5%BE%97>
+
+ $payjp->three_d_secure_request->retrieve('tdsr_xxxx');
+
+=head2 all
+
+Returns the three_d_secure_request list
+
+L<https://pay.jp/docs/api/#3d%E3%82%BB%E3%82%AD%E3%83%A5%E3%82%A2%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%83%AA%E3%82%B9%E3%83%88%E3%82%92%E5%8F%96%E5%BE%97>
+
+$res = $payjp->three_d_secure_request->all(limit => 2, offset => 1);
+
+=cut
+
+sub three_d_secure_request{
+  my $self = shift;
+  return Net::Payjp::ThreeDSecureRequest->new(%$self);
 }
 
 =head1 Event Methods

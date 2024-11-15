@@ -20,7 +20,7 @@ use File::Basename ();
 
 use File::Information::Inode;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my $HAVE_XML_SIMPLE = eval {require XML::Simple; 1;};
 my $HAVE_URI_FILE = eval {require URI::file; 1;};
@@ -62,7 +62,7 @@ sub inode {
             $mode |= O_NOFOLLOW;
         }
 
-        sysopen($fh, $self->{path}, O_RDONLY|$mode) or croak $!;
+        sysopen($fh, $self->{path}, O_RDONLY|$mode) or opendir($fh, $self->{path}) or die $!;
         $self->{inode} = File::Information::Inode->_new(
             (map {$_ => $self->{$_}} qw(instance path)),
             handle => $fh,
@@ -87,85 +87,89 @@ sub tagpool {
 
 sub _load_dotcomments {
     my ($self, $key) = @_;
-    my $info = $self->{properties}{$key};
-    my $pv = ($self->{properties_values} //= {})->{current} //= {};
-    my ($volume, $directories, $file) = File::Spec->splitpath($self->{path});
-    my $comments_file = File::Spec->catfile($volume, $directories, '.comments', $file.'.xml');
-    my $xml;
+    unless ($self->{_loaded_dotcomments}) {
+        my $info = $self->{properties}{$key};
+        my $pv = ($self->{properties_values} //= {})->{current} //= {};
+        my ($volume, $directories, $file) = File::Spec->splitpath($self->{path});
+        my $comments_file = File::Spec->catfile($volume, $directories, '.comments', $file.'.xml');
+        my $xml;
 
-    return unless -f $comments_file;
+        $self->{_loaded_dotcomments} = 1;
 
-    croak 'Not supported, requires XML::Simple' unless $HAVE_XML_SIMPLE;
+        return unless -f $comments_file;
 
-    eval {
-        my $magic;
-        my $fh;
+        croak 'Not supported, requires XML::Simple' unless $HAVE_XML_SIMPLE;
 
-        open($fh, '<', $comments_file) or die $!;
-        binmode($fh);
+        eval {
+            my $magic;
+            my $fh;
 
-        read($fh, $magic, 2);
-        seek($fh, 0, SEEK_SET);
+            open($fh, '<', $comments_file) or die $!;
+            binmode($fh);
 
-        if ($magic eq "\x1f\x8b") {
-            binmode($fh, ':gzip');
-        }
+            read($fh, $magic, 2);
+            seek($fh, 0, SEEK_SET);
 
-        $xml = XML::Simple::XMLin($fh);
-    };
+            if ($magic eq "\x1f\x8b") {
+                binmode($fh, ':gzip');
+            }
 
-    croak 'No valid .comments/ XML at: '.$comments_file unless defined $xml;
+            $xml = XML::Simple::XMLin($fh);
+        };
 
-    foreach my $key (qw(version note place caption keywords)) {
-        my $value = $xml->{$key} // $xml->{ucfirst $key};
+        croak 'No valid .comments/ XML at: '.$comments_file unless defined $xml;
 
-        if (defined($value) && !ref($value) && length($value)) {
-            $pv->{'dotcomments_'.$key} = {raw => $value};
-        }
-    }
+        foreach my $key (qw(version note place caption keywords)) {
+            my $value = $xml->{$key} // $xml->{ucfirst $key};
 
-    {
-        my $value = $xml->{time} // $xml->{Time};
-        if (defined($value)) {
-            if ($xml->{version} eq '2.0') {
-                if (!ref($value) && $value =~ /^[0-9][1-9]+$/ && int($value)) {
-                    $pv->{dotcomments_time_v2_0} = {raw => int($value)};
-                }
-            } elsif ($xml->{version} eq '3.0') {
-                if (ref($value) && defined($value->{value}) && !ref($value->{value}) && $value->{value} =~ /^[0-9]{4}:[0-9]{2}:[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/) {
-                    $pv->{dotcomments_time_v3_0} = {raw => $value->{value}};
-                }
+            if (defined($value) && !ref($value) && length($value)) {
+                $pv->{'dotcomments_'.$key} = {raw => $value};
             }
         }
-    }
 
-    {
-        my $value = $xml->{rating} // $xml->{Rating};
-        if (defined($value) && ref($value) && defined($value->{value}) && !ref($value->{value}) && $value->{value} =~ /^[1-5]$/) {
-            $pv->{dotcomments_rating} = {raw => int($value->{value})};
-        }
-    }
-
-    {
-        my $value = $xml->{categories} // $xml->{Categories};
-        my @list;
-
-        if (defined($value) && ref($value) && defined($value->{category}) && ref($value->{category})) {
-            $value = $value->{category};
-            if (ref($value)) {
-                foreach my $entry (@{$value}) {
-                    if (ref($entry) && defined($entry->{value}) && length($entry->{value})) {
-                        push(@list, $entry->{value});
+        {
+            my $value = $xml->{time} // $xml->{Time};
+            if (defined($value)) {
+                if ($xml->{version} eq '2.0') {
+                    if (!ref($value) && $value =~ /^[0-9][1-9]+$/ && int($value)) {
+                        $pv->{dotcomments_time_v2_0} = {raw => int($value)};
+                    }
+                } elsif ($xml->{version} eq '3.0') {
+                    if (ref($value) && defined($value->{value}) && !ref($value->{value}) && $value->{value} =~ /^[0-9]{4}:[0-9]{2}:[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$/) {
+                        $pv->{dotcomments_time_v3_0} = {raw => $value->{value}};
                     }
                 }
             }
         }
 
-        if (defined($pv->{dotcomments_keywords}) && defined($pv->{dotcomments_keywords}{raw})) {
-            push(@list, grep {length} split(/\s*,\s*/, $pv->{dotcomments_keywords}{raw}));
+        {
+            my $value = $xml->{rating} // $xml->{Rating};
+            if (defined($value) && ref($value) && defined($value->{value}) && !ref($value->{value}) && $value->{value} =~ /^[1-5]$/) {
+                $pv->{dotcomments_rating} = {raw => int($value->{value})};
+            }
         }
 
-        $pv->{dotcomments_categories}{raw} = \@list;
+        {
+            my $value = $xml->{categories} // $xml->{Categories};
+            my @list;
+
+            if (defined($value) && ref($value) && defined($value->{category}) && ref($value->{category})) {
+                $value = $value->{category};
+                if (ref($value)) {
+                    foreach my $entry (@{$value}) {
+                        if (ref($entry) && defined($entry->{value}) && length($entry->{value})) {
+                            push(@list, $entry->{value});
+                        }
+                    }
+                }
+            }
+
+            if (defined($pv->{dotcomments_keywords}) && defined($pv->{dotcomments_keywords}{raw})) {
+                push(@list, grep {length} split(/\s*,\s*/, $pv->{dotcomments_keywords}{raw}));
+            }
+
+            $pv->{dotcomments_categories}{raw} = \@list;
+        }
     }
 }
 
@@ -184,19 +188,25 @@ sub _load_basename {
 
 sub _load_thumbnail {
     my ($self) = @_;
-    my $instance = $self->instance;
-    my $pv = ($self->{properties_values} //= {})->{current} //= {};
-    my $uri = URI::file->new_abs($self->{path});
-    my $digest = Digest->new('MD5')->add($uri)->hexdigest;
-    my $mtime = $self->inode->get('st_mtime');
+    unless ($self->{_loaded_thumbnail}) {
+        my $instance = $self->instance;
+        my $pv = ($self->{properties_values} //= {})->{current} //= {};
+        my $uri = URI::file->new_abs($self->{path});
+        my $digest = Digest->new('MD5')->add($uri)->hexdigest;
+        my $mtime = $self->inode->get('st_mtime', default => undef);
 
-    foreach my $size (qw(normal large x-large xx-large)) {
-        my $file = $instance->_path(XDG_CACHE_HOME => file => thumbnails => $size => $digest.'.png');
-        my @stat = stat($file);
-        if (scalar(@stat)) {
-            if ($mtime < $stat[9]) {
-                $pv->{link_thumbnail} = {raw => $file};
-                return;
+        $self->{_loaded_thumbnail} = 1;
+
+        return unless defined $mtime;
+
+        foreach my $size (qw(normal large x-large xx-large)) {
+            my $file = $instance->_path(XDG_CACHE_HOME => file => thumbnails => $size => $digest.'.png');
+            my @stat = stat($file);
+            if (scalar(@stat)) {
+                if ($mtime < $stat[9]) {
+                    $pv->{link_thumbnail} = {raw => $file};
+                    return;
+                }
             }
         }
     }
@@ -216,7 +226,7 @@ File::Information::Link - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

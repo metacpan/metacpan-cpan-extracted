@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result;
 # ABSTRACT: Result of running a Cypher statement (a stream of records)
-$Neo4j::Driver::Result::VERSION = '0.50';
+$Neo4j::Driver::Result::VERSION = '0.51';
 
 use parent 'Neo4j::Driver::StatementResult';
 
@@ -225,7 +225,7 @@ Neo4j::Driver::Result - Result of running a Cypher statement (a stream of record
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 
@@ -402,10 +402,10 @@ way.
 L<Neo4j::Driver::B<ResultSummary>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
-L<Result (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/neo4j/driver/Result.html>,
-L<Result (Python)|https://neo4j.com/docs/api/python-driver/5.2/api.html#result>,
-L<Result (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.2/class/lib6/result.js~Result.html>,
-L<IResult (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/f1ac31ec-c6dd-798b-b5d6-3ca0794d7502.htm>
+L<Result (Java)|https://neo4j.com/docs/api/java-driver/5.26/org.neo4j.driver/org/neo4j/driver/Result.html>,
+L<Result (Python)|https://neo4j.com/docs/api/python-driver/5.26/api.html#result>,
+L<Result (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.26/class/lib6/result.js~Result.html>,
+L<IResult (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.13/html/f1ac31ec-c6dd-798b-b5d6-3ca0794d7502.htm>
 
 =back
 

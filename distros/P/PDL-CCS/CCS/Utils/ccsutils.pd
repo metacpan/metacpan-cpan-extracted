@@ -5,7 +5,7 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.23.23'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.23.25'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##------------------------------------------------------
@@ -306,41 +306,6 @@ If unspecified, $proj() defaults to:
 
 EOD
 );
-
-##--------------------------------------------------------------
-## _ccs_pointerlen : optimized pointer-length
-pp_def('ccs_pointerlen',
-       Pars => "ptr(Nplus1); [o]ptrlen(N);",
-       GenericTypes=>$PDL::CCS::Config::ccsConfig{INT_TYPE_CHRS},
-
-       Code =>
-q{
-   $GENERIC(ptr) *pptr = $P(ptr);
-   loop (N) %{
-     $ptrlen() = *(pptr+1) - *pptr;
-     ++pptr;
-   %}
-},
-
-       PMCode =>
-q{
-sub PDL::ccs_pointerlen {
-  my ($ptr,$len) = @_;
-  $len = zeroes($ptr->type, $ptr->nelem-1) if (!defined($len));
-  &PDL::_ccs_pointerlen_int($ptr,$len);
-  return $len;
-}
-},
-
-       Doc => <<'EOD'
-
-Get number of non-missing values for each axis value from a CCS-encoded
-offset pointer vector $ptr().
-
-EOD
-      ); ##-- /ccs_pointerlen
-
-
 
 ##======================================================================
 ## Indexing

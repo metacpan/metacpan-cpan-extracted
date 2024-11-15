@@ -9,11 +9,30 @@ use Scalar::Util qw(blessed looks_like_number);
 use File::Information;
 
 # Check which types we, only request data for installed modules.
-my @as_types = qw(mediatype raw);
+my @as_types = qw(bool mediatype raw);
 unshift(@as_types, 'DateTime')          if eval { require DateTime;         1 };
 unshift(@as_types, 'Data::Identifier')  if eval { require Data::Identifier; 1 };
 
-my $instance = File::Information->new;
+my $instance;
+{
+    my %settings;
+    while (scalar(@ARGV) && $ARGV[0] =~ /^--./) {
+        my $opt = shift(@ARGV);
+
+        if ($opt eq '--database' && scalar(@ARGV)) {
+            my $dsn = shift(@ARGV);
+            require Data::TagDB;
+            $settings{db} = Data::TagDB->new($dsn);
+            unshift(@as_types, 'Data::TagDB::Tag');
+        } else {
+            die 'Invalid option: '.$opt;
+        }
+    }
+
+    $instance = File::Information->new(%settings);
+}
+
+shift(@ARGV) if scalar(@ARGV) && $ARGV[0] eq '--';
 
 foreach my $filename (@ARGV) {
     my $link = $instance->for_link(path => $filename, symlinks => 'follow');
@@ -33,6 +52,7 @@ sub dump_base {
     my @hashes;
     my @properties;
     my $max_len = 0;
+    my %verify_a_b;
 
     return unless defined $base;
     $instance   = $base->instance;
@@ -75,8 +95,11 @@ sub dump_base {
     foreach my $key (@properties) {
         foreach my $lifecycle ($instance->lifecycles) {
             my $value;
+            my $type;
+
             foreach my $as (@as_types) {
                 $value = $base->get($key, lifecycle => $lifecycle, default => undef, as => $as);
+                $type = $as;
                 last if defined $value;
             }
             next unless defined $value;
@@ -88,7 +111,15 @@ sub dump_base {
                     if (defined(my $displayname = $id->displayname(no_defaults => 1, default => undef))) {
                         $value .= sprintf(' (%s)', $displayname);
                     }
+                } elsif ($value->isa('Data::TagDB::Tag')) {
+                    my $tag = $value;
+                    $value = sprintf('Tag <%s>', $tag->ise);
+                    if (defined(my $displayname = $tag->displayname(no_defaults => 1, default => undef))) {
+                        $value .= sprintf(' (%s)', $displayname);
+                    }
                 }
+            } elsif ($type eq 'bool') {
+                $value = $value ? 'true' : 'false';
             } elsif (looks_like_number($value)) {
                 # no-op
             } else {
@@ -108,6 +139,23 @@ sub dump_base {
             my $value = $base->digest($algo, lifecycle => $lifecycle, default => undef);
             next unless defined $value;
             printf("  %7s :: %-*s = %s\n", $lifecycle, $max_len, $key, $value);
+        }
+    }
+
+    foreach my $lifecycle_from ($instance->lifecycles) {
+        foreach my $lifecycle_to ($instance->lifecycles) {
+            my $verify_key = join('::', sort ($lifecycle_from, $lifecycle_to));
+
+            next if $verify_a_b{$verify_key};
+            $verify_a_b{$verify_key} = 1;
+
+            if ($lifecycle_from ne $lifecycle_to) {
+                my $result = $base->verify(lifecycle_from => $lifecycle_from, lifecycle_to => $lifecycle_to);
+                unless ($result->has_no_data) {
+                    my $displaykey = sprintf('%7s :: verify', $lifecycle_to);
+                    printf("  %7s :: %-*s = %s\n", $lifecycle_from, $max_len, $displaykey, $result->status);
+                }
+            }
         }
     }
 }

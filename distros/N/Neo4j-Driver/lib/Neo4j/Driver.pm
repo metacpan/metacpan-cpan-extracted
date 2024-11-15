@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.50';
+$Neo4j::Driver::VERSION = '0.51';
 
 use Carp qw(croak);
 
@@ -250,7 +250,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 
@@ -261,7 +261,7 @@ version 0.50
  $driver->basic_auth( $user, $password );
  $session = $driver->session;
  
- $query = <<~ END;
+ $query = <<~END;
    MATCH (someone :Person)-[:KNOWS]->(friend)
    WHERE someone.name = \$name
    RETURN friend.name
@@ -284,9 +284,9 @@ This extends the uniformity across languages, which is a
 stated goal of the Neo4j Driver API, to Perl.
 
 This driver targets the Neo4j community edition,
-version 2.x, 3.x, 4.x, and 5.x. The Neo4j enterprise edition
-and AuraDB are only supported as far as practical,
-but patches will be accepted.
+version 2.x, 3.x, 4.x, and 5.x. Other Neo4j editions are
+only supported as far as practical, but patches targeting
+them are welcome.
 
 Two different network protocols exist for connecting to Neo4j.
 By default, Neo4j servers offer both, but this can be changed
@@ -300,8 +300,8 @@ L<"Configure connectors" in the Neo4j Operations Manual|https://neo4j.com/docs/o
 Bolt is a Neo4j proprietary, binary protocol, available with
 S<Neo4j 3.0> and newer. Bolt communication may be encrypted or
 unencrypted. Because Bolt is faster than HTTP, it is generally
-the recommended protocol. However, Perl support for it may be
-lagging after major updates to Neo4j.
+the recommended protocol. However, Perl support for it tends
+to lag behind after major updates to Neo4j.
 
 This driver supports Bolt, but doesn't bundle the necessary XS
 packages. You will need to install L<Neo4j::Bolt> separately
@@ -327,9 +327,9 @@ install L<LWP::Protocol::https> separately to enable HTTPS.
 The protocol is automatically chosen based on the URI scheme.
 See L<Neo4j::Driver::Config/"uri"> for details.
 
-This driver will soon
-move to S<version 1.00,> removing L<deprecated
-functionality|Neo4j::Driver::Deprecations>.
+Version 0.x of Neo4j::Driver is targeting Perl v5.10 and later.
+See L<Neo4j::Driver::Deprecations> for features set to be removed
+with the next major update.
 
 =head1 METHODS
 
@@ -413,26 +413,9 @@ in F<neo4j.conf>.
 The C<database> option is silently ignored when used with Neo4j
 S<versions 2> S<and 3>, which only support a single database.
 
-=head1 ENVIRONMENT
-
-This software requires at least Perl 5.10, though you should consider
-using Perl 5.26 or newer if you can.
-
-=head1 DIAGNOSTICS
-
-Neo4j::Driver triggers an "error" event as soon as an error
-condition is discovered. If unhandled, this event will cause
-the driver to die with an error string.
-See L<Neo4j::Driver::Transaction/"ERROR HANDLING"> for
-further information.
-
-Warnings are given when deprecated or ambiguous method calls are used.
-These warnings may be disabled if desired.
-
- no warnings 'deprecated';
- no warnings 'ambiguous';
-
 =head1 SEE ALSO
+
+Interacting with a Neo4j database:
 
 =over
 
@@ -440,17 +423,35 @@ These warnings may be disabled if desired.
 
 =item * L<Neo4j::Driver::Types>
 
-=item * Official API documentation:
-L<Neo4j Driver API Specification|https://github.com/neo4j/docs-bolt/blob/main/modules/ROOT/pages/driver-api/index.adoc>,
-L<Neo4j Drivers Manual|https://neo4j.com/docs/java-manual/5/>,
-L<Neo4j HTTP API Docs|https://neo4j.com/docs/http-api/5/>
+=back
 
-=item * Other modules for working with Neo4j:
-L<DBD::Neo4p>,
-L<Neo4j::Bolt>,
-L<Neo4j::Cypher::Abstract>,
-L<REST::Cypher>,
-L<REST::Neo4p>
+Official API documentation:
+
+=over
+
+=item * L<Neo4j Driver API Specification|https://github.com/neo4j/docs-bolt/blob/main/modules/ROOT/pages/driver-api/index.adoc>
+
+=item * L<Neo4j Drivers Manual|https://neo4j.com/docs/java-manual/5/>
+
+=item * L<Neo4j HTTP API Docs|https://neo4j.com/docs/http-api/5/>
+
+=back
+
+Other Perl modules for working with Neo4j:
+
+=over
+
+=item * L<DBD::Neo4p> E<ndash> a L<DBI>-compliant wrapper for REST::Neo4p
+
+=item * L<Neo4j::Bolt> E<ndash> XS bindings for libneo4j-omni, a S<C library> for Bolt
+
+=item * L<Neo4j::Cypher::Abstract> E<ndash> generate Cypher query statements
+
+=item * L<Neo4j::Types::Generic> E<ndash> create values for Bolt query parameters
+
+=item * L<REST::Cypher> E<ndash> access the REST interface in old Neo4j versions
+
+=item * L<REST::Neo4p> E<ndash> object mappings for Neo4j nodes and relationships
 
 =back
 

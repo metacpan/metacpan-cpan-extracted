@@ -20,7 +20,7 @@ use Scalar::Util qw(weaken);
 
 use File::Information::Lock;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; require File::ValueFile::Simple::Writer; 1;};
 my $HAVE_UUID_TINY = eval {require UUID::Tiny; 1;};
@@ -309,7 +309,6 @@ sub _catdir {
 
 sub _tempfile {
     my ($self, $task, $instance) = @_;
-    my $hostname = 'localhost';
 
     $task ||= 'UNKNOWN';
     $instance ||= int($self);;
@@ -370,7 +369,7 @@ File::Information::Tagpool - generic module for extracting information from file
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

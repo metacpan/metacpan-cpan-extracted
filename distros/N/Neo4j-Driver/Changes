@@ -1,5 +1,10 @@
 Revision history for Neo4j::Driver
 
+0.51  2024-11-14
+
+ - Update documentation for the release of Neo4j::Bolt 0.5000.
+ - Minor documentation fixes and clarifications.
+
 0.50  2024-10-28
 
  - Various documentation improvements:

@@ -1,3 +1,8 @@
+1.1.6 2024-11-11
+
+- Allow client (re-)initialization with explicit initial_last_request_id
+  or calling init($initial_last_request_id) to be followed in queue for next request
+
 1.1.5 2024-07-16
 
 - Require Data::Radius v1.2.8

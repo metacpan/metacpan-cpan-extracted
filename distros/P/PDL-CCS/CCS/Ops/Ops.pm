@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '1.23.23';
+   our $VERSION = '1.23.25';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Ops $VERSION;
@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-
 #line 13 "ccsops.pd"
+
 
 #use PDL::CCS::Version;
 use strict;
@@ -44,6 +44,11 @@ PDL::CCS::Ops - Low-level binary operations for compressed storage sparse PDLs
 =cut
 #line 46 "Ops.pm"
 
+
+
+
+
+
 =head1 FUNCTIONS
 
 =cut
@@ -51,11 +56,16 @@ PDL::CCS::Ops - Low-level binary operations for compressed storage sparse PDLs
 
 
 
-
 #line 51 "ccsops.pd"
 
 *ccs_indx = \&PDL::indx; ##-- typecasting for CCS indices
-#line 59 "Ops.pm"
+#line 63 "Ops.pm"
+
+
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
+
+
 
 =head2 ccs_binop_align_block_mia
 
@@ -65,6 +75,7 @@ PDL::CCS::Ops - Low-level binary operations for compressed storage sparse PDLs
     indx ixa(Ndims,NnzA); indx ixb(Ndims,NnzB); indx    istate(State);
     indx [o]nzai(NnzC);   indx [o]nzbi(NnzC);   indx [o]ostate(State);
     )
+
 
 Partially aligns a pair of lexicographically sorted index-vector lists C<$ixa()> and C<$ixb()>,
 e.g. for block-wise incremental computation of binary operations over sparse index-encoded PDLs,
@@ -114,23 +125,28 @@ This ought to be the case for all operations if missing values are C<BAD> (see L
 but might cause unexpected results if e.g. missing values are zero and the operation
 in question is addition.
 
+
+
 =for bad
 
 ccs_binop_align_block_mia does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
+
 =cut
+#line 138 "Ops.pm"
 
 
 
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *ccs_binop_align_block_mia = \&PDL::ccs_binop_align_block_mia;
-
-
+#line 145 "Ops.pm"
 
 
 
 #line 220 "ccsops.pd"
+
 
 ##---------------------------------------------------------------------
 =pod
@@ -152,6 +168,7 @@ No support for (pseudo)-threading.
 
 =cut
 
+
 ##---------------------------------------------------------------------
 =pod
 
@@ -172,7 +189,12 @@ as Perl itself.
 perl(1), PDL(3perl)
 
 =cut
-#line 176 "Ops.pm"
+#line 193 "Ops.pm"
+
+
+
+
+
 
 # Exit with OK status
 

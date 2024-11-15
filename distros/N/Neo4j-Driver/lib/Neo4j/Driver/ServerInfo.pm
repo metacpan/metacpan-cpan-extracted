@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ServerInfo;
 # ABSTRACT: Provides Neo4j server address and version
-$Neo4j::Driver::ServerInfo::VERSION = '0.50';
+$Neo4j::Driver::ServerInfo::VERSION = '0.51';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Session);
@@ -76,7 +76,7 @@ Neo4j::Driver::ServerInfo - Provides Neo4j server address and version
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 
@@ -146,9 +146,9 @@ This method may be deprecated and removed in future.
 L<Neo4j::Driver::B<ResultSummary>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
-L<ServerInfo (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/neo4j/driver/summary/ServerInfo.html>,
-L<IServerInfo (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/24780fbc-1b81-92a8-97f6-a484475e18dc.htm>,
-L<ServerInfo (Python)|https://neo4j.com/docs/api/python-driver/5.2/api.html#serverinfo>
+L<ServerInfo (Java)|https://neo4j.com/docs/api/java-driver/5.26/org.neo4j.driver/org/neo4j/driver/summary/ServerInfo.html>,
+L<IServerInfo (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.26/api/Neo4j.Driver.IServerInfo.html>,
+L<ServerInfo (Python)|https://neo4j.com/docs/api/python-driver/5.26/api.html#serverinfo>
 
 =back
 

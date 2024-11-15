@@ -13,7 +13,7 @@ Neo4j::Driver::Deprecations - Explains features that have been deprecated, but n
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 OVERVIEW
 
@@ -25,9 +25,7 @@ briefly explains the reason for their deprecation, and suggests
 alternatives where possible.
 
 The intention is that most deprecated features will be removed with
-the next major update to L<Neo4j::Driver>. There is no schedule for
-the release of that update S<(version 1.00),> but there is a decent
-chance that it will happen in the year 2022.
+the next major update to L<Neo4j::Driver>, likely in December 2024.
 
 =head1 Neo4j::Driver
 
@@ -610,7 +608,7 @@ Originally added in 0.01 as an experimental feature.>
 
  @records = $session->run('...');
 
-See L</"Call-run()-in-list-context1">
+See L<"Call run() in list context" for Transaction|/"Call-run()-in-list-context1">
 below for details.
 
 =head2 close()
@@ -823,6 +821,21 @@ as C<< $path->path >>, which are needlessly difficult to comprehend.
 Use L<C<elements()>|Neo4j::Types::Path/"elements"> instead.
 
  $array = [ $path->elements ];
+
+=head1 Neo4j::Driver::Type::Temporal
+
+I<Deprecated in version 0.42 and to be removed in 1.00.
+Originally added in 0.13 as an experimental feature.>
+
+ if ( $value->isa('Neo4j::Driver::Type::Temporal') )
+   { ... }
+
+When implementing Neo4j temporal types, C<Temporal> was split into
+C<DateTime> and C<Duration>. The documentation of C<Temporal> had
+always warned that temporal values were not yet implemented, and
+that the module name may change eventually.
+
+Use L<Neo4j::Types::DateTime> and L<Neo4j::Types::Duration> instead.
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@ use warnings;
 use base qw{Package::New};
 use JSON::XS;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME

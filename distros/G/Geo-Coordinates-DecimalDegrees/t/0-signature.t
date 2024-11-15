@@ -1,6 +1,4 @@
 # Copied from the pod for Module::Signature
-#
-# $Id$
 
 use strict;
 use Test::More;

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultSummary;
 # ABSTRACT: Details about the result of running a statement
-$Neo4j::Driver::ResultSummary::VERSION = '0.50';
+$Neo4j::Driver::ResultSummary::VERSION = '0.51';
 
 use Carp qw(croak);
 
@@ -90,7 +90,7 @@ Neo4j::Driver::ResultSummary - Details about the result of running a statement
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 
@@ -181,9 +181,9 @@ The statement and parameters this summary is for.
 L<Neo4j::Driver::B<SummaryCounters>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
-L<ResultSummary (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html>,
-L<ResultSummary (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.2/class/lib6/result-summary.js~ResultSummary.html>,
-L<IResultSummary (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/17958e2b-d923-ab62-bb96-697556493c2e.htm>
+L<ResultSummary (Java)|https://neo4j.com/docs/api/java-driver/5.26/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html>,
+L<ResultSummary (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.26/class/lib6/result-summary.js~ResultSummary.html>,
+L<IResultSummary (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.26/api/Neo4j.Driver.IResultSummary.html>
 
 =back
 

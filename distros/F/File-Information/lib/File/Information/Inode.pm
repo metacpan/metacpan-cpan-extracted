@@ -17,12 +17,24 @@ use Carp;
 use File::Spec;
 use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S_IWGRP S_IWOTH SEEK_SET);
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
 my $HAVE_UUID_TINY          = eval {require UUID::Tiny; 1;};
 my $HAVE_FILE_VALUEFILE     = eval {require File::ValueFile::Simple::Reader; 1;};
 my $HAVE_DATA_IDENTIFIER    = eval {require Data::Identifier; 1;};
+my $HAVE_CONFIG_INI_READER  = eval {require Config::INI::Reader; 1;};
+
+my %_ntfs_attributes = (
+    FILE_ATTRIBUTE_READONLY             => 0x0001,
+    FILE_ATTRIBUTE_HIDDEN               => 0x0002,
+    FILE_ATTRIBUTE_SYSTEM               => 0x0004,
+    FILE_ATTRIBUTE_ARCHIVE              => 0x0020,
+    FILE_ATTRIBUTE_TEMPORARY            => 0x0100,
+    FILE_ATTRIBUTE_COMPRESSED           => 0x0800,
+    FILE_ATTRIBUTE_OFFLINE              => 0x1000,
+    FILE_ATTRIBUTE_NOT_CONTENT_INDEXED  => 0x2000,
+);
 
 my %_tagpool_directory_setting_tagmap; # define here, but only load (below) if we $HAVE_FILE_VALUEFILE
 
@@ -47,11 +59,21 @@ my %_wk_tagged_as_tags = (
     'cb9c2c8a-b6bd-4733-80a4-5bd65af6b957' => {for => 'finalmode'},
 );
 
+my %_URLZONE = (
+    # tag-ise             66294283-0a5d-4e78-a4b0-91df2c82068d # URLZONE-namespace
+    0 => {ise => 'd0e96897-b82f-5696-aa8e-8c29a16ab613', displayname => 'URLZONE_LOCAL_MACHINE'},
+    1 => {ise => 'cb576748-97f3-5fd7-80db-3682a94c67aa', displayname => 'URLZONE_INTRANET'},
+    2 => {ise => '445acf47-7049-5af1-8ed9-fecb54a8c517', displayname => 'URLZONE_TRUSTED'},
+    3 => {ise => 'a80b2f16-0db7-5536-a3ee-be8d85d123bd', displayname => 'URLZONE_INTERNET'},
+    4 => {ise => '73ef6c11-cdef-5547-be38-aa2cede0d4ea', displayname => 'URLZONE_UNTRUSTED'},
+);
+
 my %_properties = (
     (map {$_ => {loader => \&_load_stat}}qw(st_dev st_ino st_mode st_nlink st_uid st_gid st_rdev st_size st_blksize st_blocks st_atime st_mtime st_ctime stat_readonly stat_cachehash)),
     magic_mediatype         => {loader => \&_load_magic, rawtype => 'mediatype'},
     magic_valuefile_version => {loader => \&_load_magic, rawtype => 'uuid'},
     magic_valuefile_format  => {loader => \&_load_magic, rawtype => 'ise'},
+    db_inode_tag            => {loader => \&_load_db,    rawtype => 'Data::TagDB::Tag'},
 );
 
 $_properties{$_}{rawtype} = 'unixts' foreach qw(st_atime st_mtime st_ctime);
@@ -69,7 +91,9 @@ if ($HAVE_XATTR) {
     $_properties{'xattr_utag_final_'.($_ =~ tr/.-/__/r)} = {loader => \&_load_xattr, lifecycle => 'final', xattr_key => 'utag.final.'.$_} foreach qw(file.size file.encoding file.hash);
     $_properties{'xattr_utag_final_file_encoding'}{parts} = [qw(ise mediatype)];
     $_properties{'xattr_utag_final_file_hash'}{parsing} = 'utag';
-    $_properties{'xattr_utag_final_file_hash_size'} = {loader => \&_load_xattr, lifecycle => 'final', xattr_key => 'utag.final.hash'};
+    $_properties{'xattr_utag_final_file_hash_size'} = {loader => \&_load_redirect, redirect => 'xattr_utag_final_file_hash'};
+
+    $_properties{'ntfs_'.lc($_)} = {loader => \&_load_ntfs_xattr, ntfs_attribute => $_, rawtype => 'bool'} foreach keys %_ntfs_attributes;
 }
 
 if ($HAVE_UUID_TINY) {
@@ -205,6 +229,13 @@ if ($HAVE_DATA_IDENTIFIER) {
         Data::Identifier->new(ise => $key, %{$value})->register;
     }
 
+    foreach my $value (values %_URLZONE) {
+        Data::Identifier->new(ise => $value->{ise}, displayname => $value->{displayname})->register;
+    }
+}
+
+if ($HAVE_CONFIG_INI_READER) {
+    $_properties{'zonetransfer_'.lc($_)} = {loader => \&_load_zonetransfer, zonetransfer_key => $_} foreach qw(HostIpAddress ZoneId ReferrerUrl HostUrl);
 }
 
 {
@@ -228,7 +259,7 @@ if ($HAVE_DATA_IDENTIFIER) {
                     foreach my $key (keys %_S_IS_to_tagpool_ise) {
                         my $func = __PACKAGE__->can($key);
                         if (defined $func) {
-                            if ($func->($mode)) {
+                            if (eval {$func->($mode)}) {
                                 $ise = $_S_IS_to_tagpool_ise{$key};
                                 last;
                             }
@@ -324,7 +355,7 @@ sub _tagpool_paths {
 
         return unless scalar @{$instance->_tagpool_path};
 
-        @stat = stat($self->{handle});
+        @stat = eval {stat($self->{handle})};
         return $self->{_tagpool_paths} = {} unless scalar(@stat) && S_ISREG($stat[2]);
 
         # Try the cache first:
@@ -415,23 +446,25 @@ sub _load_stat {
     my ($self, undef, %opts) = @_;
     if ($opts{lifecycle} eq 'current' && !$self->{_loaded_stat}) {
         my $pv = ($self->{properties_values} //= {})->{current} //= {};
-        my @values = stat($self->{handle});
+        my @values = eval {stat($self->{handle})};
         my @keys = qw(st_dev st_ino st_mode st_nlink st_uid st_gid st_rdev st_size st_atime st_mtime st_ctime st_blksize st_blocks);
 
-        for (my $i = 0; $i < scalar(@keys); $i++) {
-            my $value = $values[$i];
-            my $key = $keys[$i];
+        if (scalar @values) {
+            for (my $i = 0; $i < scalar(@keys); $i++) {
+                my $value = $values[$i];
+                my $key = $keys[$i];
 
-            next if $key eq ':skip';
-            next if $value eq '';
-            next if $value == 0 && ($key eq 'st_ino' || $key eq 'st_rdev' || $key eq 'st_blksize');
-            next if $value < 0;
+                next if $key eq ':skip';
+                next if $value eq '';
+                next if $value == 0 && ($key eq 'st_ino' || $key eq 'st_rdev' || $key eq 'st_blksize');
+                next if $value < 0;
 
-            $pv->{$key} = {raw => $values[$i]};
+                $pv->{$key} = {raw => $values[$i]};
+            }
+
+            $pv->{stat_readonly} = {raw => !($values[2] & (S_IWUSR|S_IWGRP|S_IWOTH))};
+            $pv->{stat_cachehash} = {raw => $values[1].'@'.$values[0]} if $values[1] > 0 && $values[0] ne '';
         }
-
-        $pv->{stat_readonly} = {raw => !($values[2] & (S_IWUSR|S_IWGRP|S_IWOTH))};
-        $pv->{stat_cachehash} = {raw => $values[1].'@'.$values[0]} if $values[1] > 0 && $values[0] ne '';
 
         $self->{_loaded_stat} = 1;
     }
@@ -448,6 +481,10 @@ sub _load_xattr {
     return unless ($opts{lifecycle} // 'current') eq $lifecycle;
 
     croak 'Not supported, requires File::ExtAttr' unless $HAVE_XATTR;
+
+    $self->{_loaded_xattr} //= {};
+    return if $self->{_loaded_xattr}{$key};
+    $self->{_loaded_xattr}{$key} = 1;
 
     $fh = File::Information::Inode::_DUMMY_FOR_XATTR->new($self->{handle});
     $value = eval {File::ExtAttr::getfattr($fh, $info->{xattr_key})};
@@ -526,7 +563,7 @@ sub _load_tagpool_directory {
     return if $self->{_loaded_tagpool_directory};
     $self->{_loaded_tagpool_directory} = 1;
 
-    {
+    eval {
         my @stat = stat($self->{handle});
 
         if (scalar(@stat) && S_ISDIR($stat[2])) {
@@ -536,7 +573,7 @@ sub _load_tagpool_directory {
             $c->{tagpool_directory_inode} = {raw => $stat[1]};
             $c->{tagpool_directory_mtime} = {raw => $stat[9]};
         }
-    }
+    };
 
     return unless defined $self->{path};
     return unless $HAVE_FILE_VALUEFILE;
@@ -611,7 +648,7 @@ sub _load_tagpool_file {
 
     return unless scalar @{$instance->_tagpool_path};
 
-    @stat = stat($self->{handle});
+    @stat = eval {stat($self->{handle})};
     return unless scalar(@stat) && S_ISREG($stat[2]);
 
     {
@@ -776,6 +813,107 @@ sub _load_magic {
     $pv->{magic_mediatype} = {raw => $media_type} if defined $media_type;
 }
 
+sub _load_db {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+
+    return if $self->{_loaded_db};
+    $self->{_loaded_db} = 1;
+
+    if (defined(my $db = eval { $self->instance->db })) {
+        eval {
+            my $inode = $self->get('st_ino', as => 'raw');
+            my $fs    = $self->filesystem->get('ise', as => 'Data::TagDB::Tag');
+            my $inode_number = $db->tag_by_id(uuid => 'd2526d8b-25fa-4584-806b-67277c01c0db');
+            my $also_on_filesystem = $db->tag_by_id(uuid => 'cd5bfb11-620b-4cce-92bd-85b7d010f070');
+            my $wk = $db->wk;
+            my $metadata = $db->metadata(relation => $wk->also_shares_identifier, type => $inode_number, data_raw => $inode);
+            my $res;
+
+            #warn sprintf('inode=%s, inode_number=%s, fs=%s', $inode, $inode_number, $fs);
+            $metadata->foreach(sub {
+                    my ($entry) = @_;
+                    my $fs_relation = $db->relation(tag => $entry->tag, relation => $also_on_filesystem, related => $fs)->one;
+                    $res = $entry->tag;
+                    #warn $fs_relation;
+                });
+
+            $pv->{db_inode_tag} = {raw => $res} if defined $res;
+        };
+    }
+}
+
+sub _load_redirect {
+    my ($self, $key, %opts) = @_;
+    my $info = $self->{properties}{$key};
+
+    $self->get($info->{redirect}, lifecycle => $opts{lifecycle}, default => undef, as => 'raw');
+}
+
+sub _load_zonetransfer {
+    my ($self, $key, %opts) = @_;
+    my $info = $self->{properties}{$key};
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+    my $raw;
+    my $parsed;
+
+    return if $self->{_loaded_zonetransfer};
+    $self->{_loaded_zonetransfer} = 1;
+
+    if ($HAVE_XATTR) {
+        my $fh = File::Information::Inode::_DUMMY_FOR_XATTR->new($self->{handle});
+        $raw = eval {File::ExtAttr::getfattr($fh, 'Zone.Identifier')};
+    }
+
+    if (!defined($raw) && $^O eq 'MSWin32' && defined($self->{path})) {
+        if (open(my $ads, '<', sprintf('%s:Zone.Identifier', $self->{path}))) {
+            local $/ = undef;
+            $raw = <$ads>;
+            close($ads);
+        }
+    }
+
+    return unless defined $raw;
+
+    $parsed = Config::INI::Reader->read_string($raw);
+
+    if (defined(my $ZoneTransfer = $parsed->{ZoneTransfer})) {
+        foreach my $key (qw(HostIpAddress ZoneId ReferrerUrl HostUrl)) {
+            my $value = $ZoneTransfer->{$key};
+
+            next unless defined($value) && length($value);
+
+            $pv->{'zonetransfer_'.lc($key)} = {raw => $value};
+
+            if ($key eq 'ZoneId' && defined(my $zone = $_URLZONE{$value})) {
+                $pv->{'zonetransfer_'.lc($key)}{ise} //= $zone->{ise};
+            }
+        }
+    }
+}
+
+sub _load_ntfs_xattr {
+    my ($self, $key, %opts) = @_;
+    my $info = $self->{properties}{$key};
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+    my $attrb;
+
+    return if $self->{_loaded_ntfs_xattr};
+    $self->{_loaded_ntfs_xattr} = 1;
+
+    if ($HAVE_XATTR) {
+        my $fh = File::Information::Inode::_DUMMY_FOR_XATTR->new($self->{handle});
+        my $raw = eval {File::ExtAttr::getfattr($fh, 'ntfs_attrib_be', {namespace => 'system'})};
+        $attrb = unpack('N', $raw) if defined $raw;
+    }
+
+    if (defined $attrb) {
+        foreach my $key (keys %_ntfs_attributes) {
+            $pv->{'ntfs_'.lc($key)} = {raw => ($attrb & $_ntfs_attributes{$key})};
+        }
+    }
+}
+
 1;
 
 __END__
@@ -790,7 +928,7 @@ File::Information::Inode - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

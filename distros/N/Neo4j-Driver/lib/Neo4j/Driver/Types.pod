@@ -13,7 +13,7 @@ Neo4j::Driver::Types - Type mapping from Neo4j to Perl and vice versa
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 MAPPING
 
@@ -164,19 +164,19 @@ you might consider caching the hash ref locally.
 
 For connecting to a Neo4j server using the Bolt protocol, this
 driver will by default use L<Neo4j::Bolt>. The following bugs
-and limitations related to types are known for the latest
-released version of L<Neo4j::Bolt> (0.4203 at time of this writing):
+and limitations related to types are known for Bolt:
 
 =over
-
-=item *
-Neo4j 5 element IDs are not yet supported
-(L<perlbolt#50|https://github.com/majensen/perlbolt/issues/50>).
 
 =item *
 Query parameters containing an empty list or empty map will
 be converted to a Cypher C<null> value
 (L<perlbolt#19|https://github.com/majensen/perlbolt/issues/19>).
+
+=item *
+Neo4j C<ZONED DATETIME> values defined by time zone name rather
+than just by offset are not supported
+(L<libneo4j-omni#5|https://github.com/majensen/libneo4j-omni/issues/5>).
 
 =item *
 With L<Neo4j::Bolt> version 0.01, the value of node or
@@ -186,18 +186,10 @@ correctly. Note that support for all L<Neo4j::Bolt> versions
 earlier than 0.4201 will be phased out entirely soon.
 
 =item *
-L<builtin::true|builtin/"true"> and
-L<builtin::false|builtin/"false"> are not yet
-supported in query parameters. Use C<\1> and C<\0>
-or L<JSON::PP::Boolean> instead.
-
-=item *
-Byte arrays are not yet supported as query parameters.
-Byte arrays are coded as unblessed strings in Bolt results.
-
-=item *
-Temporal and spatial values are not yet supported
-(L<perlbolt#36|https://github.com/majensen/perlbolt/issues/36>).
+The use of L<builtin::true|builtin/"true">,
+L<builtin::false|builtin/"false">, byte arrays, spatial values,
+and temporal values requires a recent enough L<Neo4j::Bolt>
+version (S<0.5000 or later>).
 
 =back
 

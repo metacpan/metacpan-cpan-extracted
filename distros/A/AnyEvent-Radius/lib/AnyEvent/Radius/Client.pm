@@ -22,8 +22,11 @@ use constant {
     READ_TIMEOUT_SEC => 5,
     WRITE_TIMEOUT_SEC => 5,
     RADIUS_PORT => 1812,
-    MAX_QUEUE => 255,
+    MAX_REQUEST_ID => 0xFF,
 };
+
+# deprecated?
+use constant MAX_QUEUE => MAX_REQUEST_ID() + 1;
 
 # new 'NAS'
 # args:
@@ -34,6 +37,7 @@ use constant {
 #   read_timeout
 #   write_timeout
 #   bind_ip
+#   initial_last_request_id - random by default
 #- callbacks:
 #    on_read
 #    on_read_raw
@@ -159,7 +163,7 @@ sub new {
 
     $obj->handler( AnyEvent::Handle::UDP->new(%udp_handle_args) );
 
-    $obj->init();
+    $obj->init($h{initial_last_request_id});
 
     return $obj;
 }
@@ -180,8 +184,6 @@ sub clear_send_cache {
 
 sub _send_packet {
     my ($self, $packet) = @_;
-
-    $self->queue_cnt($self->queue_cnt() + 1);
 
     # +1
     $self->queue_cv()->begin;
@@ -210,8 +212,8 @@ sub wait {
 
 # reset vars - need to be called after wait() or on_ready()
 sub init {
-    my $self = shift;
-
+    my ($self, $initial_last_request_id) = @_;
+    $initial_last_request_id //= int rand (MAX_REQUEST_ID + 1);
     $self->read_cv(AnyEvent->condvar);
     $self->write_cv(AnyEvent->condvar);
     $self->queue_cv(AnyEvent->condvar);
@@ -219,7 +221,7 @@ sub init {
     $self->reply_cnt(0);
     $self->queue_cnt(0);
     $self->send_cache({});
-    $self->last_request_id( int rand(0x100) );
+    $self->last_request_id( $initial_last_request_id & MAX_REQUEST_ID() );
 }
 
 # close open socket, object is unusable after it was called
@@ -277,15 +279,17 @@ sub load_dictionary {
     return $dict;
 }
 
-sub new_request_id {
+sub next_request_id {
     my $self = shift;
+    return undef if $self->queue_cnt() > MAX_REQUEST_ID();
     my $last_request_id = $self->last_request_id();
-    my $new_request_id = ($last_request_id + 1) & 0xFF;
+    my $new_request_id = ($last_request_id + 1) & MAX_REQUEST_ID();
     my $send_cache = $self->send_cache();
     while (exists $send_cache->{$new_request_id}) {
-        $new_request_id = ($new_request_id + 1) & 0xFF;
+        $new_request_id = ($new_request_id + 1) & MAX_REQUEST_ID();
         return undef if $new_request_id == $last_request_id; # send cache full ??
     }
+    $self->last_request_id($new_request_id);
     return $new_request_id;
 }
 
@@ -299,13 +303,10 @@ sub new_request_id {
 sub send_packet {
     my ($self, $type, $av_list, $cb) = @_;
 
-    if ($self->queue_cnt >= MAX_QUEUE) {
-        # queue overflow
-        return undef;
+    my $request_id = $self->next_request_id();
+    if ( !defined $request_id ) {
+        return;
     }
-
-    my $request_id = $self->new_request_id();
-    return undef if !defined $request_id;
 
     $type = $RADIUS_PACKET_TYPES{$type} if exists $RADIUS_PACKET_TYPES{$type};
 
@@ -315,8 +316,6 @@ sub send_packet {
                         request_id => $request_id,
                     );
 
-    $self->last_request_id( $req_id );
-
     # required to verify reply
     $self->send_cache()->{ $req_id } = {
         authenticator => $auth,
@@ -324,6 +323,7 @@ sub send_packet {
         callback => $cb,
         time_cached => AE::now(),
     };
+    $self->queue_cnt($self->queue_cnt() + 1);
 
     $self->_send_packet($packet);
 
@@ -415,6 +415,8 @@ and then wait for responses.
 
 =item write_timeout - network I/O timeouts (default is 5 second)
 
+=item initial_last_request_id - explicit radius id initialization, the next request will use it+1
+
 =item Callbacks:
 
 =over
@@ -473,7 +475,12 @@ Alias methods to send RADIUS request of required type by L<send_packet()>
 
 =item wait()
 
-Blocks until all requests are received or read timeout reached
+Blocks until all requests are received or read timeout reached,
+new requests can't be sent afterwards until next call to C<init>
+
+=item init( $initial_last_request_id )
+
+Re-initilize the queue with optional last used request id
 
 =item on_ready ( $cond_var )
 

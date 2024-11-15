@@ -21,26 +21,36 @@ no_index:
 provides:
   File::Information:
     file: lib/File/Information.pm
-    version: v0.3.0
+    version: v0.4.0
   File::Information::Base:
     file: lib/File/Information/Base.pm
-    version: v0.3.0
+    version: v0.4.0
   File::Information::Filesystem:
     file: lib/File/Information/Filesystem.pm
-    version: v0.3.0
+    version: v0.4.0
   File::Information::Inode:
     file: lib/File/Information/Inode.pm
-    version: v0.3.0
+    version: v0.4.0
   File::Information::Link:
     file: lib/File/Information/Link.pm
-    version: v0.3.0
+    version: v0.4.0
   File::Information::Lock:
     file: lib/File/Information/Lock.pm
-    version: v0.3.0
+    version: v0.4.0
   File::Information::Tagpool:
     file: lib/File/Information/Tagpool.pm
-    version: v0.3.0
+    version: v0.4.0
+  File::Information::VerifyBase:
+    file: lib/File/Information/VerifyBase.pm
+    version: v0.4.0
+  File::Information::VerifyResult:
+    file: lib/File/Information/VerifyResult.pm
+    version: v0.4.0
+  File::Information::VerifyTestResult:
+    file: lib/File/Information/VerifyTestResult.pm
+    version: v0.4.0
 recommends:
+  Config::INI: '0.029'
   Data::Identifier: v0.2.0
   DateTime: '1.54'
   Digest: 1.17_01
@@ -50,6 +60,7 @@ recommends:
   MIME::Base64: '3.15'
   URI::file: '4.21'
   UUID::Tiny: '1.04'
+  Unix::Mknod: '0.04'
   XML::Simple: '2.25'
 requires:
   Carp: '1.35'
@@ -58,7 +69,7 @@ requires:
   perl: v5.16.0
 resources:
   repository: git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/File-Information.git
-version: v0.03
+version: v0.04
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

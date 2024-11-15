@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Driver::Plugin;
 # ABSTRACT: Plug-in interface for Neo4j::Driver
-$Neo4j::Driver::Plugin::VERSION = '0.50';
+$Neo4j::Driver::Plugin::VERSION = '0.51';
 
 1;
 
@@ -20,7 +20,7 @@ Neo4j::Driver::Plugin - Plug-in interface for Neo4j::Driver
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNPOSIS
 
@@ -290,7 +290,7 @@ into the Neo4j::Driver:: namespace.
 
 =head2 Network adapter API for Bolt
 
-At this time (2022), there is only one known implementation of the
+At this time (2024), there is only one known implementation of the
 Bolt protocol for Perl: L<Neo4j::Bolt>, created by Mark A. Jensen.
 
 For this reason, an abstraction API for Bolt network adapters has

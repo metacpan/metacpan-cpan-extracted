@@ -32,5 +32,5 @@ resources:
   bugtracker: http://github.com/AdCampRu/anyevent-useragent/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/AdCampRu/anyevent-useragent
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -15,13 +15,13 @@ my @ccs_binops = qw(
   and2 or2 xor shiftleft shiftright
 );
 
-our $VERSION = '1.23.23'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.25'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
    ##
    ##-- Decoding
-   qw(ccs_decode ccs_pointerlen),
+   qw(ccs_decode), #ccs_pointerlen
    ##
    ##-- Vector Operations (compat)
    qw(ccs_binop_vector_mia),
@@ -30,6 +30,7 @@ our @EXPORT_OK =
    ##-- qsort
    qw(ccs_qsort),
   );
+
 our %EXPORT_TAGS =
   (
    Func => [@EXPORT_OK],               ##-- respect PDL conventions (hopefully)
@@ -63,28 +64,9 @@ PDL::CCS::Functions - Useful perl-level functions for PDL::CCS
 
 =cut
 
-##---------------------------------------------------------------
-## Decoding: utils
-=pod
-
-=head2 ccs_pointerlen
-
-=for sig
-
-  Signature: (indx ptr(N+1); indx [o]len(N))
-
-Get number of non-missing values for each axis value from a CCS-encoded
-offset pointer vector $ptr().
-
-=cut
-
-;#-- emacs
-
-*ccs_pointerlen = \&PDL::ccs_pointerlen; 
-
-##-- now a PDL::PP function in PDL::CCS::Utils
-*PDL::ccs_pointerlen_perl = \&ccs_pointerlen_perl;
-sub ccs_pointerlen_perl :lvalue {
+##-- DEPRECATED STEALTH METHOD: formerly a PDL::PP function in PDL::CCS::Utils
+#*PDL::ccs_pointerlen = \&ccs_pointerlen;
+sub ccs_pointerlen :lvalue {
   my ($ptr,$len) = @_;
   if (!defined($len)) {
     $len = $ptr->slice("1:-1") - $ptr->slice("0:-2");
@@ -94,6 +76,7 @@ sub ccs_pointerlen_perl :lvalue {
   }
   return $len;
 }
+
 
 ##---------------------------------------------------------------
 ## Decoding: generic

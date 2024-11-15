@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.50';
+$Neo4j::Driver::Session::VERSION = '0.51';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -207,7 +207,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 
@@ -375,9 +375,9 @@ L<Neo4j::Driver::B<ServerInfo>>,
 L<Neo4j::Driver::B<Result>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
-L<Session (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/neo4j/driver/Session.html>,
-L<Session (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.2/class/lib6/session.js~Session.html>,
-L<ISession (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/6bcf5d8c-98e7-b521-03e7-210cd6155850.htm>
+L<Session (Java)|https://neo4j.com/docs/api/java-driver/5.26/org.neo4j.driver/org/neo4j/driver/Session.html>,
+L<Session (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.26/class/lib6/session.js~Session.html>,
+L<ISession (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.13/html/6bcf5d8c-98e7-b521-03e7-210cd6155850.htm>
 
 =back
 

@@ -3,16 +3,16 @@ use warnings;
 
 use Test::More tests => 12;
 
-use_ok 'Text::Password::CoreCrypt';                                                          # 1
-my $pwd = new_ok('Text::Password::CoreCrypt');                                               # 2
-like $pwd->nonce(),  qr/^\S[!-~\s]{7}$/, "succeed to make nonce with length 8 automatically";    # 3
-like $pwd->nonce(4), qr/^\S[!-~\s]{3}$/, "succeed to make nonce with length 4";                  # 4
+use_ok 'Text::Password::CoreCrypt';                                                             # 1
+my $pwd = new_ok('Text::Password::CoreCrypt');                                                  # 2
+like $pwd->nonce(),  qr/^\S[!-~\s]{7}$/, "succeed to make nonce with length 8 automatically";   # 3
+like $pwd->nonce(4), qr/^\S[!-~\s]{3}$/, "succeed to make nonce with length 4";                 # 4
 
 eval { $pwd->nonce(3) };
-like $@, qr/^Unvalid length for nonce was set/, "fail to make nonce with enough length";     # 5
+like $@, qr/^Unvalid length for nonce was set/, "fail to make nonce with enough length";    # 5
 
 eval { $pwd->nonce('wrong') };
-like $@, qr/^Unvalid length for nonce was set/, "fail to make nonce without setting digit";    # 6
+like $@, qr/^Unvalid length for nonce was set/, "fail to make nonce without setting digit"; # 6
 
 SKIP: {
     skip "CORE::crypt is not available", 3 unless $pwd->can('CORE::crypt');
@@ -20,37 +20,38 @@ SKIP: {
     like $pwd->encrypt($raw), qr/^[!-~]{13}$/, "succeed to encrypt from raw password";    # 7
     is $pwd->verify( $pwd->nonce, $hash ), '', "fail to verify with wrong password";      # 8
 
-    subtest "generate with CORE::crypt" => sub {                                          # 9
+    subtest "generate with CORE::crypt" => sub {                                                # 9
         plan tests => 6;
         my ( $raw, $hash ) = $pwd->generate;
-        like $raw,  qr/^\S[ -~]{7}$/, "succeed to generate raw passwd";                          # 9.1
-        like $raw,  qr/^\S[^0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`]{7}$/, "is readable";    # 9.2
-        like $hash, qr/^\S[!-~]{12}$/, "succeed to generate hash with CORE::crypt";              # 9.3
-        is $pwd->verify( $raw,        $hash ), 1,  "succeed to verify";                        # 9.4
-        is $pwd->verify( $pwd->nonce, $hash ), '', "fail to verify with random strings";       # 9.5
-        is $pwd->verify( '',          $hash ), '', "fail to verify with empty string";         # 9.6
+        like $raw,  qr/^\S[ -~]{7}$/, "succeed to generate raw passwd";                         # 9.1
+        like $raw,  qr/^\S[^0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`]{7}$/, "is readable";   # 9.2
+        like $hash, qr/^\S[!-~]{12}$/, "succeed to generate hash with CORE::crypt";             # 9.3
+        is $pwd->verify( $raw,        $hash ), 1,  "succeed to verify";                         # 9.4
+        is $pwd->verify( $pwd->nonce, $hash ), '', "fail to verify with random strings";        # 9.5
+        is $pwd->verify( '',          $hash ), '', "fail to verify with empty string";          # 9.6
     };
 }
 
-subtest "generate unreadable strings" => sub {    #10
+subtest "generate unreadable strings" => sub {                          #10
     plan tests => 3;
     $pwd->readability(0);
     my ( $raw, $hash ) = $pwd->generate;
     like $raw,  qr/^\S[ -~]{7}$/,  "succeed to generate raw passwd";    #10.1
     like $hash, qr/^\S[ -~]{12}$/, "succeed to generate hash";          #10.2
-    is $pwd->verify( $raw, $hash ), 1, "succeed to verify";           #10.3
+    is $pwd->verify( $raw, $hash ), 1, "succeed to verify";             #10.3
 };
 
 my ( $raw, $hash ) = eval { $pwd->generate(3) };
 like $@, qr/^Text::Password::CoreCrypt::generate requires at least 4 length/,
-    "fail to make too short password";                                #11
+    "fail to make too short password";                                  # 11
 
-subtest "rondom tests" => sub {                                                         # 12
-    plan tests => 1000;
+subtest "rondom tests" => sub {                                         # 12
+    plan tests => 1500;
     for (1..500){
         ( $raw, $hash ) = $pwd->generate;
-        like $hash, qr/^\S[ -~]{12}$/, "succeed to generate hash";          # 12.1
-        is $pwd->verify( $raw,        $hash ), 1,  "succeed to verify";     # 12.2
+        like $raw, qr/\S$/, "succeed to generate secure raw passwd";    # 12.1
+        like $hash, qr/^\S[ -~]{12}$/, "succeed to generate hash";      # 12.2
+        is $pwd->verify( $raw, $hash ), 1,  "succeed to verify";        # 12.3
     }
 };
 

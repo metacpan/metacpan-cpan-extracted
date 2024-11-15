@@ -8,12 +8,14 @@ use Data::Dumper;
 
 plan tests => 3;
 
-use_ok qw{ Module::ScanDeps::Static };
+use_ok qw( Module::ScanDeps::Static );
+
 my $data_start_pos = tell DATA;
 
+########################################################################
 subtest 'use' => sub {
-  my $scanner
-    = Module::ScanDeps::Static->new( { handle => *DATA, add_version => 1 } );
+########################################################################
+  my $scanner = Module::ScanDeps::Static->new( { handle => *DATA, add_version => 1 } );
 
   my @dependencies = $scanner->parse;
   my $require      = $scanner->get_require;
@@ -21,20 +23,25 @@ subtest 'use' => sub {
   ok( scalar @dependencies > 0, 'found dependencies' );
   isa_ok( $require, 'HASH', 'require is a HASH' );
 
-  my $module_names = join '', @dependencies;
+  my $module_names = join q{}, @dependencies;
 
-  is( $module_names,    'Buz::BazCarpFoo::Bar', 'sorted dependencies' );
-  is( $dependencies[2], 'Foo::Bar',             'Foo::Bar' );
+  is( $module_names, 'Buz::BazCarpFoo::Bar', 'sorted dependencies' );
+
+  is( $dependencies[2], 'Foo::Bar', 'Foo::Bar' );
 
   ok( exists $require->{'Foo::Bar'}, 'version for Foo::Bar in hash' );
-  is( $require->{'Foo::Bar'}, q{}, 'version is empty string' );
+
+  is( $require->{'Foo::Bar'}, q{}, 'version is empty string' )
+    or diag( Dumper( [ require => $require ] ) );
 
   is( $require->{'Buz::Baz'}, q{1.0}, 'version of Buz::Baz is 1.0' )
     or diag( Dumper \@dependencies );
 
 };
 
+########################################################################
 subtest 'require' => sub {
+########################################################################
   seek DATA, $data_start_pos, 0;
 
   my $scanner = Module::ScanDeps::Static->new( { handle => *DATA } );
@@ -45,7 +52,7 @@ subtest 'require' => sub {
   ok( @dependencies, 'found 3 dependencies' )
     or diag( Dumper \@dependencies );
 
-  ok( grep {/Carp/} @dependencies, 'found require Carp' )
+  ok( grep {/Carp/xsm} @dependencies, 'found require Carp' )
     or diag( Dumper \@dependencies );
 
   ok( defined $require->{'Carp'}, 'version defined' );

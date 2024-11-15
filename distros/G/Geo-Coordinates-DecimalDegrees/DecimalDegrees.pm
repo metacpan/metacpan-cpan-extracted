@@ -1,5 +1,3 @@
-# $Id$
-
 package Geo::Coordinates::DecimalDegrees;
 
 require Exporter;
@@ -7,9 +5,10 @@ require Carp;
 
 @ISA = qw(Exporter);
 
-@EXPORT = qw( decimal2dms decimal2dm dms2decimal dm2decimal );
+@EXPORT = qw( decimal2dms decimal2dm dms2decimal dm2decimal
+              dec2dms     dec2dm     dms2dec     dm2dec);
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 use strict;
 use warnings;
@@ -57,6 +56,11 @@ sub dm2decimal {
     return dms2decimal($degrees, $minutes, 0);
 }
 
+*dec2dms = \&decimal2dms;
+*dec2dm = \&decimal2dm;
+*dms2dec = \&dms2decimal;
+*dm2dec = \&dm2decimal;
+
 1;
 
 =head1 NAME
@@ -67,9 +71,16 @@ Geo::Coordinates::DecimalDegrees - convert between degrees/minutes/seconds and d
 
   use Geo::Coordinates::DecimalDegrees;
   ($degrees, $minutes, $seconds, $sign) = decimal2dms($decimal_degrees);
+  ($degrees, $minutes, $seconds, $sign) = dec2dms($decimal_degrees);
+
   ($degrees, $minutes, $sign) = decimal2dm($decimal_degrees);
+  ($degrees, $minutes, $sign) = dec2dm($decimal_degrees);
+
   $decimal_degrees = dms2decimal($degrees, $minutes, $seconds);
+  $decimal_degrees = dms2dec($degrees, $minutes, $seconds);
+
   $decimal_degrees = dm2decimal($degrees, $minutes);
+  $decimal_degrees = dm2dec($degrees, $minutes);
 
 =head1 DESCRIPTION
 
@@ -108,6 +119,10 @@ $decimal_degrees is positive, 0, or negative:
 
   ($degrees, $minutes, $seconds, $sign) = decimal2dms($decimal_degrees);
 
+=item dec2dms($decimal_degrees)
+
+An alias for decimal2dms().
+
 =item decimal2dm($decimal_degrees)
 
 Converts a floating point number of degrees to the equivalent number
@@ -126,6 +141,10 @@ $decimal_degrees is positive, 0, or negative:
 
   ($degrees, $minutes, $sign) = decimal2dm($decimal_degrees);
 
+=item dec2dm($decimal_degrees)
+
+An alias for decimal2dm().
+
 =item dms2decimal($degrees, $minutes, $seconds)
 
 Converts degrees, minutes, and seconds to the equivalent number of
@@ -135,6 +154,10 @@ decimal degrees:
 
 If $degrees is negative, then $decimal_degrees will also be negative.
 
+=item dms2dec($degrees, $minutes, $seconds)
+
+An alias for dms2decimal().
+
 =item dm2decimal($degrees, $minutes)
 
 Converts degrees and minutes to the equivalent number of
@@ -143,6 +166,10 @@ decimal degrees:
   $decimal_degrees = dm2decimal($degrees, $minutes);
 
 If $degrees is negative, then $decimal_degrees will also be negative.
+
+=item dm2dec($degrees, $minutes)
+
+An alias for dm2decimal().
 
 =back
 

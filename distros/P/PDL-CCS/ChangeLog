@@ -1,3 +1,11 @@
+v1.23.25 Thu, 14 Nov 2024 16:29:14 +0100
+	+ fix embarrassing typo in ChangeLog
+
+v1.23.24 Thu, 14 Nov 2024 16:06:52 +0100
+	+ PR #13 if want $PDL::VERSION, load PDL
+	+ PR #12 ccs_pointerlen removal
+	  - keep pure-perl PDL::CCS::Functions::ccs_pointerlen for paranoia reasons
+
 v1.23.23 Wed, 15 May 2024 21:51:55 +0200 mohawk2
 	+ PR #8: no strict "refs" instead of string-eval
 	+ PR #9: switch from $PP() to $P()

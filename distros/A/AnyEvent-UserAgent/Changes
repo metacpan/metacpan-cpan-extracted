@@ -1,5 +1,10 @@
 Revision history for perl module AnyEvent::UserAgent
 
+0.09    2024-11-15
+        - Add more class options that can be passed to all requests (#6, Mathias
+          Kende).
+        - Support sending HTTP PATCH and OPTIONS requests (#6, Mathias Kende).
+
 0.08    2024-11-08
         - Support sending multiple values for a single header (#5, Mathias
           Kende).
@@ -8,7 +13,7 @@ Revision history for perl module AnyEvent::UserAgent
         - Fix cookie handling (#4, Eric Johnson).
 
 0.06    2014-07-31
-        - Renam timeout attribute to inactivity_timeout.
+        - Rename timeout attribute to inactivity_timeout.
         - Add request_timeout attribute (Alexander Onokhov).
         - Add Client-Warning header on error, like in LWP::UserAgent.
 

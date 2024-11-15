@@ -8,6 +8,14 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 ## [Unreleased]
 
+## [30.0.3] - 2024-11-14
+### Fixed
+- [Python] Release process (still) didn't release to pypi correctly
+
+## [30.0.2] - 2024-11-14
+### Fixed
+- [Python] Release process (again) didn't release to pypi correctly
+
 ## [30.0.1] - 2024-11-12
 ### Changed
 - [Ruby] Fixed up some style autofix cops ([#311](https://github.com/cucumber/gherkin/pull/311))
@@ -698,7 +706,9 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 ### Changed
 - First release
 
-[Unreleased]: https://github.com/cucumber/gherkin/compare/v30.0.1...HEAD
+[Unreleased]: https://github.com/cucumber/gherkin/compare/v30.0.3...HEAD
+[30.0.3]: https://github.com/cucumber/gherkin/compare/v30.0.2...v30.0.3
+[30.0.2]: https://github.com/cucumber/gherkin/compare/v30.0.1...v30.0.2
 [30.0.1]: https://github.com/cucumber/gherkin/compare/v30.0.0...v30.0.1
 [30.0.0]: https://github.com/cucumber/gherkin/compare/v29.0.0...v30.0.0
 [29.0.0]: https://github.com/cucumber/gherkin/compare/v28.0.0...v29.0.0

@@ -1,6 +1,6 @@
 Name:           perl-Geo-Leaflet
-Version:        0.02
-Release:        1%{?dist}
+Version:        0.03
+Release:        2%{?dist}
 Summary:        Generates a Leaflet JavaScript map web page
 License:        MIT
 Group:          Development/Libraries

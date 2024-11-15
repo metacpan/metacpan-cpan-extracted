@@ -1,5 +1,5 @@
 package Gherkin::Generated::Languages;
-$Gherkin::Generated::Languages::VERSION = '30.0.1';
+$Gherkin::Generated::Languages::VERSION = '30.0.3';
 use strict;
 use warnings;
 use utf8;

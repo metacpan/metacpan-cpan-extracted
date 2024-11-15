@@ -1,5 +1,10 @@
 Revision history for Perl extension Geo::Leaflet.
 
+0.03 2024-11-14
+  - BREAKING CHANGE - Changed map width and height from integer pixel to string percent or pixel
+  - Change default height and width to 100%
+  - Updated example script to 100% width and height
+
 0.02 2024-11-09
   - BREAKING CHANGE - Changed map object property from `properties` to `options` to match Leaflet documentation
   - BREAKING CHANGE - Changed tileLayer to move maxZoom and attribution to options
@@ -8,7 +13,7 @@ Revision history for Perl extension Geo::Leaflet.
   - Added tooltip capability
   - Added marker icon capability
   - Updated packages to pass JSON::XS to child objects for performance
-  - Updated HTML generation from CGI.pm to HTML::Tiny - Issue #1
+  - Updated HTML generation from CGI.pm to HTML::Tiny - Resolves #1
   - Added custom JSON encoding support for marker->icon value which is a variable name not a string.
 
 0.01 2024-11-08

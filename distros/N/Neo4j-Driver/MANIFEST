@@ -28,7 +28,6 @@ lib/Neo4j/Driver/ServerInfo.pm
 lib/Neo4j/Driver/Session.pm
 lib/Neo4j/Driver/StatementResult.pm
 lib/Neo4j/Driver/SummaryCounters.pm
-lib/Neo4j/Driver/TODO.pod
 lib/Neo4j/Driver/Transaction.pm
 lib/Neo4j/Driver/Type/Bytes.pm
 lib/Neo4j/Driver/Type/DateTime.pm

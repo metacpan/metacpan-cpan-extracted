@@ -3,33 +3,43 @@ package Module::ScanDeps::Static;
 use strict;
 use warnings;
 
-our $VERSION = '1.003';
+our $VERSION = '1.005';
 
 use 5.010;
 
 use Carp;
 use Data::Dumper;
-use English qw{ -no_match_vars };
+use English qw( -no_match_vars );
 use ExtUtils::MM;
 use Getopt::Long;
-use JSON::PP;
+use JSON;
 use Module::CoreList;
 use Pod::Usage;
-use Pod::Find qw{ pod_where };
+use Pod::Find qw( pod_where );
 use Readonly;
 use IO::Scalar;
-use List::Util qw{ max };
+use List::Util qw( max none );
 use version;
 
-use parent qw{ Class::Accessor::Fast };
+use parent qw( Class::Accessor::Fast );
+
+our @OPTIONS = qw(
+  add_version
+  core
+  handle
+  include_require
+  json
+  min_core_version
+  path
+  perlreq
+  raw
+  require
+  separator
+  text
+);
 
 __PACKAGE__->follow_best_practice;
-__PACKAGE__->mk_accessors(
-  qw{
-    json raw text handle include_require core
-    add_version perlreq require path separator min_core_version
-  }
-);
+__PACKAGE__->mk_accessors(@OPTIONS);
 
 # booleans
 Readonly my $TRUE  => 1;
@@ -76,10 +86,16 @@ sub new {
   }
 
   # defaults
-  $options{'core'}             //= $TRUE;
-  $options{'include_require'}  //= $FALSE;
-  $options{'add_version'}      //= $TRUE;
-  $options{'min_core_version'} //= $DEFAULT_MIN_CORE_VERSION;
+  $options{core}             //= $TRUE;
+  $options{include_require}  //= $FALSE;
+  $options{add_version}      //= $TRUE;
+  $options{min_core_version} //= $DEFAULT_MIN_CORE_VERSION;
+
+  # check for unknown options
+  foreach my $o ( keys %options ) {
+    die "unknown option $o\n"
+      if none { $_ eq $o } @OPTIONS;
+  }
 
   my $self = $class->SUPER::new( \%options );
 
@@ -160,12 +176,11 @@ sub is_core {
     # consider a module core if its first release was less than some
     # version of Perl. This is done because CPAN testers don't seem to
     # test modules against Perls that are older than 5.8.9 - however,
-    # some modules like JSON::PP did not appear until > 5.10
+    # some modules like JSON::PP did not appear until after 5.10
 
     # print {*STDERR} "$module: $first_release_version $min_core_version\n";
 
-    $core = version->parse($first_release_version)
-      <= version->parse($min_core_version) ? 1 : 0;
+    $core = version->parse($first_release_version) <= version->parse($min_core_version) ? 1 : 0;
 
   }
 
@@ -175,7 +190,7 @@ sub is_core {
 }
 
 ########################################################################
-sub parse_line { ## no critic (Subroutines::ProhibitExcessComplexity)
+sub parse_line {  ## no critic (Subroutines::ProhibitExcessComplexity)
 ########################################################################
   my ( $self, $line ) = @_;
 
@@ -337,7 +352,7 @@ sub parse_line { ## no critic (Subroutines::ProhibitExcessComplexity)
       return $line if $whitespace ne $EMPTY && $statement eq 'require';
     }
     elsif ( $statement eq 'require' ) {
-      return $line if $line =~ /\$/xsm; # eval?
+      return $line if $line =~ /\$/xsm;  # eval?
     }
 
     # if there is some interpolation of variables just skip this
@@ -372,17 +387,17 @@ sub parse_line { ## no critic (Subroutines::ProhibitExcessComplexity)
     $module =~ s/qw.*\z//xsm;
     $module =~ s/[(].*\z//xsm;
 
-    # if the module ends with .pm, strip it to leave only basename.
-    $module =~ s/[.]pm\z//xsm;
-
     # some perl programmers write 'require URI/URL;' when
     # they mean 'require URI::URL;'
+    if ( $module !~ /[.]pl$/xsm ) {
+      # if the module ends with .pm, strip it to leave only basename.
+      $module =~ s/[.]pm\z//xsm;
 
-    $module =~ s/\//::/xsm;
+      $module =~ s/\//::/xsgm;
+    }
 
     # trim off trailing parentheses if any.  Sometimes people pass
     # the module an empty list.
-
     $module =~ s/[(]\s*[)]$//xsm;
 
     if ( $module =~ /\Av?([\d._]+)\z/xsm ) {
@@ -459,7 +474,7 @@ sub parse {
   if ( my $file = $self->get_path ) {
     chomp $file;
 
-    open my $fh, '<', $file ## no critic (InputOutput::RequireBriefOpen)
+    open my $fh, '<', $file  ## no critic (InputOutput::RequireBriefOpen)
       or croak "could not open file '$file' for reading: $OS_ERROR";
 
     $self->set_handle($fh);
@@ -469,7 +484,7 @@ sub parse {
     $self->set_handle( IO::Scalar->new($script) );
   }
   elsif ( !$self->get_handle ) {
-    open my $fh, '<&STDIN'  ## no critic (InputOutput::RequireBriefOpen)
+    open my $fh, '<&STDIN'   ## no critic (InputOutput::RequireBriefOpen)
       or croak 'could not open STDIN';
 
     $self->set_handle($fh);
@@ -596,7 +611,7 @@ sub format_json {
       };
   }
 
-  my $json = JSON::PP->new->pretty;
+  my $json = JSON->new->pretty;
 
   return wantarray ? @requirements : $json->encode( \@requirements );
 }
@@ -606,10 +621,12 @@ sub get_dependencies {
 ########################################################################
   my ( $self, %options ) = @_;
 
-  if ( $options{json} || $self->get_json ) {
+  my $format = $options{format} // $EMPTY;
+
+  if ( ( $options{format} && $options{format} eq 'json' ) || $self->get_json ) {
     return scalar $self->format_json;
   }
-  elsif ( $options{text} || $self->get_text || $self->get_raw ) {
+  elsif ( ( $options{format} && $options{format} eq 'text' ) || $self->get_text || $self->get_raw ) {
     return $self->format_text;
   }
   else {
@@ -643,6 +660,7 @@ sub format_text {
     }
     else {
       $name = "'$name'";
+      $separator //= $SPACE;
     }
 
     push @output, sprintf $format, $name, $separator, $version // $EMPTY;
@@ -706,12 +724,9 @@ sub main {
   );
 
   GetOptions(
-    \%options,              'json|j',
-    'text|t',               'core!',
-    'min-core-version|m=s', 'add-version|a!',
-    'include-require|i!',   'help|h',
-    'separator|s=s',        'version|v',
-    'raw|r',
+    \%options,              'json|j',         'text|t',             'core!',
+    'min-core-version|m=s', 'add-version|a!', 'include-require|i!', 'help|h',
+    'separator|s=s',        'version|v',      'raw|r',
   );
 
   # print {*STDERR} Dumper( \%options );
@@ -761,7 +776,7 @@ Module::ScanDeps::Static - a cleanup of rpmbuild's perl.req
 
 =head1 SYNOPSIS
 
- my $scanner = Module::ScanDeps::Static->new({ file => 'myfile.pl' });
+ my $scanner = Module::ScanDeps::Static->new({ path => 'myfile.pl' });
  $scanner->parse;
  print $scanner->format_text;
 
@@ -955,7 +970,7 @@ default: B<false>
 =item min_core_version
 
 The minimum version of Perl which will be used to decide if a module
-is include in Perl core.
+is included in Perl core.
 
 default: 5.8.9
 
@@ -1051,7 +1066,7 @@ contain the keys "name" and "version" for each dependency.
 
 =head1 VERSION
 
-1.002
+1.005
 
 =head1 AUTHOR
 

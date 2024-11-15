@@ -1,0 +1,33 @@
+v0.04  XXX
+    - Improved documentation
+    - Added Note that Data::Identifier will become a hard dependency soon
+    - Added initial support to interact with a database and Data::TagDB::Tag
+    - Fix: Use final hashes as size provider
+    - Added support to verify a file (to detect modification or corruption)
+    - Improved performance by caching negative results
+    - Added workarounds for limitations of Windows and Perl on Windows
+    - Added support for DOS device names and DOS paths on Windows
+    - Added support for Windows ZoneTransfer data (both on Windows and UNIX/Linux)
+    - Added new aggregated properties inodeise, contentise, and fetchurl
+    - Added support to read mountinfo on Linux
+    - Added support to read DOS attributes from NTFS on UNIX/Linux
+    - Improved formatting of file-information-dump
+    - Improved tests
+
+v0.03  2024-10-25Z
+    - Improved documentation
+    - Added properties content_sha_1_160_sha_3_512_uuid, xattr_utag_final_file_hash, and xattr_utag_final_file_hash_size
+    - Added support for xattr utag.final.file.hash
+    - Added support for "v0m" style hashes
+    - Fixed loading of aggregated values
+    - Added support to read version and format of ValueFiles in magic detection code
+
+v0.02  2024-10-13Z
+    - Improved documentation
+    - Added basic tagpool support
+    - Fixed reference counting
+    - Added support to add files to tagpools
+    - Added properties stat_cachehash, content_sha_3_512_uuid
+
+v0.01  2024-10-11Z
+    - Initial release

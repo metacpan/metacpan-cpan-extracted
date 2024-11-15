@@ -12,7 +12,7 @@ use Geo::Leaflet::icon;
 use JSON::XS qw{};
 use HTML::Tiny qw{};;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our $PACKAGE = __PACKAGE__;
 our @OBJECTS = ();
 our @ICONS   = ();
@@ -118,37 +118,39 @@ sub setView {
 
 =head2 width
 
-Sets and returns the pixel width of the map.
+Sets and returns the percent or pixel width of the map.
 
-  $map->width(600);
+  $map->width('600px');
+  $map->width('100%');
   my $width = $map->width;
 
-Default: 600
+Default: 100%
 
 =cut
 
 sub width {
   my $self         = shift;
   $self->{'width'} = shift if @_;
-  $self->{'width'} = 600 unless defined $self->{'width'};
+  $self->{'width'} = '100%' unless defined $self->{'width'};
   return $self->{'width'};
 }
 
 =head2 height
 
-Sets and returns the pixel height of the map.
+Sets and returns the percent or pixel height of the map.
 
-  $map->height(600);
+  $map->height('400px');
+  $map->height('100%');
   my $height = $map->height;
 
-Default: 400
+Default: 100%
 
 =cut
 
 sub height {
   my $self          = shift;
   $self->{'height'} = shift if @_;
-  $self->{'height'} = 400 unless defined $self->{'height'};
+  $self->{'height'} = '100%' unless defined $self->{'height'};
   return $self->{'height'};
 }
 
@@ -376,7 +378,7 @@ sub html_head_script {
 sub html_head_style {
   my $self       = shift;
   my $html       = $self->HTML;
-  my $style_size = sprintf('width: %dpx; height: %dpx;', $self->width, $self->height);
+  my $style_size = sprintf('width: %s; height: %s;', $self->width, $self->height);
   my $style_full = 'html, body { height: 100%; margin: 0; } '.
                    ".leaflet-container { $style_size max-width: 100%; max-height: 100%; }";
   return $html->style({}, $style_full);
@@ -389,7 +391,7 @@ sub html_head_style {
 sub html_body_div {
   my $self       = shift;
   my $html       = $self->HTML;
-  my $style_size = sprintf('width: %dpx; height: %dpx;', $self->width, $self->height);
+  my $style_size = sprintf('width: %s; height: %s;', $self->width, $self->height);
   return $html->div({id => $self->id, style => $style_size});
 }
 

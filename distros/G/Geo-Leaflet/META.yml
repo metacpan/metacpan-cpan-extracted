@@ -25,4 +25,4 @@ resources:
   bugtracker: https://github.com/mrdvt92/perl-Geo-Leaflet/issues
   homepage: https://github.com/mrdvt92/perl-Geo-Leaflet
   repository: https://github.com/mrdvt92/perl-Geo-Leaflet.git
-version: '0.02'
+version: '0.03'

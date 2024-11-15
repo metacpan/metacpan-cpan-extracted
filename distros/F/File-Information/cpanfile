@@ -5,6 +5,7 @@ requires "Carp" => "1.35";
 requires "File::Spec" => "3.84";
 requires "Sys::Hostname" => "1.20";
 requires "perl" => "v5.16.0";
+recommends "Config::INI" => "0.029";
 recommends "Data::Identifier" => "v0.2.0";
 recommends "DateTime" => "1.54";
 recommends "Digest" => "1.17_01";
@@ -14,6 +15,7 @@ recommends "File::ValueFile::Simple::Reader" => "v0.1.0";
 recommends "MIME::Base64" => "3.15";
 recommends "URI::file" => "4.21";
 recommends "UUID::Tiny" => "1.04";
+recommends "Unix::Mknod" => "0.04";
 recommends "XML::Simple" => "2.25";
 
 on 'test' => sub {

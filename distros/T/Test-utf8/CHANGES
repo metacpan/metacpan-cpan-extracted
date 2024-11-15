@@ -1,3 +1,9 @@
+1.03   2024-11-14
+     - Fix tests to adapt to Perl now removing
+       apostrophe as package separator [RT#154915]
+     - upgraded distro files like packaged Module::Install version
+       and META.yml, to avoid other looming Perl deprecation issues
+
 1.02 Fix for 5.26 not including '.' in INC, which was breaking the
      Module::Install stuff (thanks to preaction)
 

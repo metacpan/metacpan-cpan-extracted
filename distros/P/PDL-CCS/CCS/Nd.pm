@@ -6,7 +6,7 @@ package PDL::CCS::Nd;
 use PDL::Lite qw();
 use PDL::VectorValued;
 use PDL::CCS::Config qw(ccs_indx);
-use PDL::CCS::Functions qw(ccs_decode ccs_pointerlen ccs_qsort);
+use PDL::CCS::Functions qw(ccs_decode ccs_qsort);
 use PDL::CCS::Utils     qw(ccs_encode_pointers ccs_decode_pointer);
 use PDL::CCS::Ufunc;
 use PDL::CCS::Ops;
@@ -19,7 +19,7 @@ BEGIN {
   *can = \&UNIVERSAL::can;
 }
 
-our $VERSION = '1.23.23'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.25'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = qw();
 our %EXPORT_TAGS =
   (

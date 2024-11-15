@@ -1,0 +1,4 @@
+postamble ::
+install::
+	create-modulino.pl -m Module::ScanDeps::FindRequires \
+           -a find-requires -d $(DESTDIR) -b $(INSTALLSITESCRIPT)

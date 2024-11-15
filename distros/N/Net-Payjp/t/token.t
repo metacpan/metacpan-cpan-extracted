@@ -5,12 +5,12 @@ use warnings;
 
 use Test::Mock::LWP;
 use Net::Payjp;
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 my $payjp = Net::Payjp->new(api_key => 'api_key');
 
 isa_ok($payjp->token, 'Net::Payjp::Token');
-can_ok($payjp->token, qw(retrieve create));
+can_ok($payjp->token, qw(retrieve create tds_finish));
 ok(!$payjp->token->can('all'));
 ok(!$payjp->token->can('save'));
 ok(!$payjp->token->can('delete'));
@@ -36,3 +36,8 @@ is($token->id, 'res1');
 $token->retrieve;
 is($Mock_req->{new_args}[1], 'GET');
 is($Mock_req->{new_args}[2], 'https://api.pay.jp/v1/tokens/res1');
+
+#tds_finish
+$token->tds_finish;
+is($Mock_req->{new_args}[1], 'POST');
+is($Mock_req->{new_args}[2], 'https://api.pay.jp/v1/tokens/res1/tds_finish');

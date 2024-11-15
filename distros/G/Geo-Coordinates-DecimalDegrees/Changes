@@ -1,5 +1,13 @@
 Revision history for Perl extension Geo::Coordinates::DecimalDegrees.
 
+0.11  Thu 14 Nov 2024 09:26:56 PM EST
+        Added aliases so you can now abbreviate "decimal" by "dec"
+
+0.10  Fri 08 Nov 2024 07:52:09 PM EST
+        Updated copyright to 2024
+
+        Changed my email address back to pobox.com
+
 0.09  Tue 04 Oct 2011 10:26:05 PM EDT
         Fixed typos in synopsis
 

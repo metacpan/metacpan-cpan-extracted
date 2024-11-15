@@ -23,7 +23,7 @@ sub cprompt {
   return $cconfig{$key} = ($answer eq '' ? $default : $answer);
 }
 
-require PDL::Core;
+require PDL;
 
 $cconfig{INDX_CTYPE} = "PDL_Indx";
 $cconfig{INDX_SIG}   = "indx";

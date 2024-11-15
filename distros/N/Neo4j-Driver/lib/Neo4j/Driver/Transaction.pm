@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.50';
+$Neo4j::Driver::Transaction::VERSION = '0.51';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -296,7 +296,7 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.50
+version 0.51
 
 =head1 SYNOPSIS
 
@@ -481,12 +481,10 @@ a defined state, you can roll back a failed transaction manually:
 =item * L<Neo4j::Driver::Types>
 
 =item * Equivalent documentation for the official Neo4j drivers:
-L<Transaction (Java)|https://neo4j.com/docs/api/java-driver/5.2/org.neo4j.driver/org/neo4j/driver/Transaction.html>,
-L<Transaction (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.2/class/lib6/transaction.js~Transaction.html>,
-L<ITransaction (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.2/html/b64c7dfe-87e9-8b85-5a02-8ff03800b67b.htm>,
-L<Sessions & Transactions (Python)|https://neo4j.com/docs/api/python-driver/5.2/api.html#transaction>
-
-=item * Neo4j L<Transactional Cypher HTTP API|https://neo4j.com/docs/http-api/5/actions/>
+L<Transaction (Java)|https://neo4j.com/docs/api/java-driver/5.26/org.neo4j.driver/org/neo4j/driver/Transaction.html>,
+L<Transaction (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.26/class/lib6/transaction.js~Transaction.html>,
+L<ITransaction (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.13/html/b64c7dfe-87e9-8b85-5a02-8ff03800b67b.htm>,
+L<Sessions & Transactions (Python)|https://neo4j.com/docs/api/python-driver/5.26/api.html#transaction>
 
 =back
 

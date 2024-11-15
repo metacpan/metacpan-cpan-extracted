@@ -22,7 +22,7 @@ use constant { # Taken from Data::Identifier
     WK_FINAL    => 'f418cdb9-64a7-4f15-9a18-63f7755c5b47',
 };
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 our %_digest_name_converter = ( # stolen from Data::URIID::Result
     fc('md5')   => 'md-5-128',
@@ -98,12 +98,14 @@ my %_ise_keys = map {$_ => 1} qw(ise uuid oid uri);
 my %_data_identifier_keys = map {$_ => 1} keys %_ise_keys;
 
 my %_properties = (
-    uuid        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag uuid(xattr_utag_ise) :self dev_disk_by_uuid tagpool_pool_uuid)], rawtype => 'uuid'},
-    oid         => {loader => \&_load_aggregate, sources => [qw(::Inode oid(xattr_utag_ise))], rawtype => 'oid'},
-    uri         => {loader => \&_load_aggregate, sources => [qw(::Inode uri(xattr_utag_ise))], rawtype => 'uri'},
+    uuid        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag uuid(xattr_utag_ise) uuid(db_inode_tag) :self dev_disk_by_uuid tagpool_pool_uuid)], rawtype => 'uuid'},
+    oid         => {loader => \&_load_aggregate, sources => [qw(::Inode oid(xattr_utag_ise) oid(db_inode_tag))], rawtype => 'oid'},
+    uri         => {loader => \&_load_aggregate, sources => [qw(::Inode uri(xattr_utag_ise) uri(db_inode_tag))], rawtype => 'uri'},
     ise         => {loader => \&_load_aggregate, sources => [qw(:self uuid oid uri ::Inode xattr_utag_ise)], rawtype => 'ise'},
+    inodeise    => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag xattr_utag_ise db_inode_tag)], rawtype => 'ise'},
+    contentise  => {loader => \&_load_aggregate, sources => [qw(::Inode content_sha_1_160_sha_3_512_uuid content_sha_3_512_uuid)], rawtype => 'ise'},
 
-    size        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_size xattr_utag_final_file_size st_size)]},
+    size        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_size xattr_utag_final_file_size xattr_utag_final_file_hash_size st_size)]},
     title       => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_title        tagpool_directory_title         xattr_dublincore_title dotcomments_caption)]},
     comment     => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_comment      tagpool_directory_comment       xattr_xdg_comment      dotcomments_note)]},
     description => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_description  tagpool_directory_description   xattr_dublincore_description)]},
@@ -114,6 +116,8 @@ my %_properties = (
     thumbnail   => {loader => \&_load_aggregate, sources => [qw(::Link link_thumbnail ::Inode tagpool_file_thumbnail)], rawtype => 'filename'},
     finalmode   => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_finalmode xattr_utag_final_mode)], rawtype => 'ise'},
     readonly    => {loader => \&_load_readonly, rawtype => 'bool'},
+
+    fetchurl    => {loader => \&_load_aggregate, sources => [qw(:self tagpool_file_original_url xattr_xdg_origin_url zonetransfer_hosturl)]},
 
     # TODO: displaycolour icontext charset (hash) (mediatype / encoding)
 );
@@ -179,6 +183,8 @@ sub get {
         } elsif ($rawtype eq 'filename' && ($as eq 'IO::Handle' || $as eq 'IO::File')) {
             require IO::File;
             $res = IO::File->new($raw, 'r');
+        } elsif (exists($_ise_re{$rawtype}) && $as eq 'Data::TagDB::Tag' && $self->instance->db) {
+            $res = eval {$self->instance->db->tag_by_id($rawtype => $raw)};
         }
 
         $v->{$as} = $res if defined($res) && $as !~ /^IO::/; # Cache unless it is a file handle.
@@ -203,12 +209,17 @@ sub get {
         $v->{ise} = $_mediatypes{$v->{raw} // ''};
     }
     if (!defined($res) && !defined($v->{ise})) {
-        foreach my $source_type (qw(Data::Identifier Data::URIID::Result Data::URIID::Colour)) {
+        foreach my $source_type (qw(Data::Identifier Data::URIID::Result Data::URIID::Colour Data::TagDB::Tag)) {
             if (defined(my $obj = $v->{$source_type})) {
+                last if defined($v->{ise} = eval {$obj->ise});
+            }
+            if (defined($info->{rawtype}) && $info->{rawtype} eq $source_type && defined(my $obj = $v->{raw})) {
                 last if defined($v->{ise} = eval {$obj->ise});
             }
         }
     }
+
+    delete $v->{ise} unless defined $v->{ise}; # TODO: Figure out where it is set to undef
 
     # Try: Check if we have an ISE and can convert that to what we want.
     if (!defined($res) && defined(my $ise = $v->{ise})) {
@@ -217,6 +228,12 @@ sub get {
             $res = Data::Identifier->new(ise => $ise);
         } elsif ($as eq 'Data::URIID::Result') {
             $res = $self->instance->extractor->lookup(ise => $ise);
+        } elsif ($as eq 'Data::TagDB::Tag' && $self->instance->db) {
+            foreach my $type (keys %_ise_re) {
+                if ($ise =~ $_ise_re{$type}) {
+                    $res = eval {$self->instance->db->tag_by_id($type => $ise)} and last;
+                }
+            }
         } elsif (defined(my $re = $_ise_re{$as})) {
             $res = $ise if $ise =~ $re;
         } elsif ($as eq 'sid') {
@@ -353,6 +370,15 @@ sub digest {
 }
 
 
+
+#@returns File::Information::VerifyBase
+sub verify {
+    my ($self, %opts) = @_;
+    require File::Information::VerifyResult;
+    return File::Information::VerifyResult->_new(base => $self, instance => $self->instance, %opts{'lifecycle_from', 'lifecycle_to'});
+}
+
+
 sub uuid            { return $_[0]->get('uuid',             @_[1..$#_]); }
 sub oid             { return $_[0]->get('oid',              @_[1..$#_]); }
 sub uri             { return $_[0]->get('uri',              @_[1..$#_]); }
@@ -364,6 +390,7 @@ sub description     { return $_[0]->get('description',      @_[1..$#_]); }
 
 
 
+#@returns File::Information
 sub instance {
     my ($self) = @_;
     return $self->{instance};
@@ -412,8 +439,16 @@ sub _load_aggregate {
         } elsif (!defined $current) {
             next;
         } elsif ($source =~ /^([a-z]+)\((.+)\)$/) {
-            my $re = $_ise_re{$1} // croak 'BUG';
+            my $func = $1;
+            my $re = $_ise_re{$func} // croak 'BUG';
             my $value = $current->get($2, %opts, default => undef, as => 'raw');
+
+            if (defined($value) && eval {$value->isa('Data::TagDB::Tag')}) {
+                if (defined(my $c = $value->can($func))) {
+                    $value = $value->$c(no_defaults => 1, default => undef);
+                }
+            }
+
             $pv->{$key} = {raw => $value} if defined($value) && !ref($value) && $value =~ $re;
         } else {
             #warn sprintf('%s <- %s %s %s', $key, $current, $source, $opts{lifecycle});
@@ -436,10 +471,19 @@ sub _load_readonly {
 
     if (defined $inode) {
         $v ||= $inode->get('stat_readonly', %opts, default => undef, as => 'raw');
+        $v ||= $inode->get('ntfs_file_attribute_readonly', %opts, default => undef, as => 'raw');
     }
 
     $v ||= $self->get('writemode', %opts, default => '', as => 'uuid') eq WK_WM_NONE;
     $v ||= $self->get('finalmode', %opts, default => '', as => 'uuid') eq WK_FINAL;
+
+    # Mount options:
+    unless ($v) {
+        foreach my $option (qw(linux_mount_options linux_superblock_options)) {
+            my $value = $self->get($option, %opts, default => undef, as => 'raw') // next;
+            $v ||= $value =~ /^ro(?:,.+)?$/ || $value =~ /,ro$/;
+        }
+    }
 
     $pv->{$key} = {raw => $v};
 }
@@ -458,7 +502,7 @@ File::Information::Base - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -491,6 +535,7 @@ The following packages are supported (they need to be installed):
 L<Data::Identifier>,
 L<DateTime>,
 L<Data::URIID::Result>,
+L<Data::TagDB::Tag>,
 L<IO::Handle>,
 L<File::Information::Link>.
 
@@ -514,6 +559,10 @@ The following keys for B<aggregated values> are supported:
 
 A comment on the document (if any).
 
+=item C<contentise>
+
+An ISE of the document that refers to it's content (so all bit-perfect copies share this ISE).
+
 =item C<description>
 
 A description of the document (if any).
@@ -522,11 +571,19 @@ A description of the document (if any).
 
 A string that is suitable for display and likely meaningful to users.
 
+=item C<fetchurl>
+
+An URL the file can be fetched from. This is very often a HTTPS URL. But it may be any valid URL.
+
 =item C<finalmode>
 
 The final mode of the document. Normally this is unset,
 auto-final (meaning the document should become final once successfully verifies it's final state),
 or final (it reached it's final state).
+
+=item C<inodeise>
+
+An ISE for the inode. All hardlinks share this ISE but (bit-perfect) copies do not.
 
 =item C<ise>
 
@@ -625,6 +682,42 @@ from C<die>-ing when no value is available to returning C<undef>.
 
 The lifecycle to get the value for. The default is C<current>
 See also L<File::Information/lifecycles>.
+
+=back
+
+=head2 verify
+
+    my File::Information::VerifyBase $result = $obj->verify;
+    # same as:
+    my File::Information::VerifyBase $result = $obj->verify(lifecycle_from => 'current', lifecycle_to => 'final');
+
+    my $passed = $result->has_passed;
+
+Performs a verify of the object using the given lifecycles. The verify operation checks if the given object
+in the state of C<lifecycle_from> (by default C<'current'>) is the same as in the state of C<lifecycle_to>
+(by default C<'final'>).
+
+The resulting object contains information on the result of the verify. The most common operation is to call
+L<File::Information::VerifyBase/has_passed> on the result.
+
+B<Note:>
+This operation may read the file and calculate digests. This may take significant time.
+
+See also
+L</digest>,
+L<File::Information/lifecycles>.
+
+The following options (all optional) are supported:
+
+=over
+
+=item C<lifecycle_from>
+
+The lifecycle to verify.
+
+=item C<lifecycle_to>
+
+The lifecycle to verify against/to compare to.
 
 =back
 

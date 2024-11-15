@@ -1,8 +1,8 @@
-# $Id$
-
 use strict;
 use Test::Number::Delta tests => 57;
 use Geo::Coordinates::DecimalDegrees;
+
+# Test all the methods under a variety of conditions
 
 delta_ok( dms2decimal( 0,  0,  0),   0);
 delta_ok( dms2decimal( 1,  0,  0),   1);

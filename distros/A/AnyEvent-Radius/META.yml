@@ -24,5 +24,5 @@ requires:
   Class::Accessor::Fast: '0'
   Data::Radius: v1.2.8
   perl: '5.010000'
-version: v1.1.5
+version: v1.1.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

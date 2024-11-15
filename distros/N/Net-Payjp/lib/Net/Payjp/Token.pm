@@ -20,4 +20,10 @@ sub retrieve{
     $self->_request(method => 'GET', url => $self->_instance_url);
 }
 
+sub tds_finish{
+    my $self = shift;
+
+    $self->_request(method => 'POST', url => $self->_instance_url.'/tds_finish');
+}
+
 1;

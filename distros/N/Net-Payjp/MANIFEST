@@ -15,6 +15,7 @@ lib/Net/Payjp/Subscription.pm
 lib/Net/Payjp/Tenant.pm
 lib/Net/Payjp/TenantTransfer.pm
 lib/Net/Payjp/Term.pm
+lib/Net/Payjp/ThreeDSecureRequest.pm
 lib/Net/Payjp/Token.pm
 lib/Net/Payjp/Transfer.pm
 LICENSE
@@ -33,6 +34,7 @@ t/subscription.t
 t/tenant.t
 t/tenant_transfer.t
 t/term.t
+t/three_d_secure_request.t
 t/token.t
 t/transfer.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

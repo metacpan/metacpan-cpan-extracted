@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::Bolt;
 # ABSTRACT: Network controller for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.50';
+$Neo4j::Driver::Net::Bolt::VERSION = '0.51';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -87,7 +87,7 @@ sub new {
 #   |       +-- Neo4j::Client
 #   |       |     +-- max recommended Neo4j server
 #   |       |     |
-#  0.5000  0.53  5.x  (neither is on CPAN yet - install from source)
+#  0.5000  0.54  5.x
 #  0.4203  0.46  4.4
 #  0.20    0.17  3.4
 #  0.12     -    3.4  (system libneo4j-client)

@@ -13,7 +13,7 @@ use HTTP::Response ();
 
 use namespace::clean;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 
 has agent              => (is => 'rw', default => sub { $AnyEvent::HTTP::USERAGENT . ' AnyEvent-UserAgent/' . $VERSION });
@@ -25,6 +25,15 @@ has max_redirects      => (is => 'rw', default => sub { 5 });
 has inactivity_timeout => (is => 'rw', default => sub { 20 });
 
 has request_timeout    => (is => 'rw', default => sub { 0 });
+
+my @OPTIONS = qw(
+	proxy tls_ctx session timeout on_prepare tcp_connect on_header on_body
+	want_body_handle persistent keepalive handle_params
+);
+
+for my $o (@OPTIONS) {
+	has $o => (is => 'rw', default => undef);
+}
 
 sub request {
 	my $cb = pop();
@@ -40,6 +49,8 @@ sub head   { _do_request(\&HTTP::Request::Common::HEAD   => @_) }
 sub put    { _do_request(\&HTTP::Request::Common::PUT    => @_) }
 sub delete { _do_request(\&HTTP::Request::Common::DELETE => @_) }
 sub post   { _do_request(\&HTTP::Request::Common::POST   => @_) }
+sub patch   { _do_request(\&HTTP::Request::Common::PATCH   => @_) }
+sub options   { _do_request(\&HTTP::Request::Common::OPTIONS   => @_) }
 
 sub _do_request {
 	my $cb   = pop();
@@ -66,7 +77,7 @@ sub _request {
 		$self->cookie_jar->add_cookie_header($req);
 	}
 
-	for (qw(max_redirects inactivity_timeout request_timeout)) {
+	for (qw(max_redirects inactivity_timeout request_timeout), @OPTIONS) {
 		$opts->{$_} = $self->$_() unless exists($opts->{$_});
 	}
 
@@ -85,9 +96,7 @@ sub _request {
 		body    => $req->content,
 		recurse => 0,
 		timeout => $opts->{inactivity_timeout},
-		(map { $_ => $opts->{$_} } grep { exists($opts->{$_}) }
-			qw(proxy tls_ctx session timeout on_prepare tcp_connect on_header
-			   on_body want_body_handle persistent keepalive handle_params)),
+		(map { $_ => $opts->{$_} } grep { defined($opts->{$_}) } @OPTIONS),
 		sub {
 			undef($grd);
 			undef($tmr);
@@ -247,6 +256,14 @@ a response. The request will be canceled when that time expires. Default timeout
 value is C<0>. Setting the value to C<0> will allow the user agent to wait
 indefinitely. The timeout will reset for every followed redirect.
 
+=head2 Other attributes
+
+The following attributes are supported and they are all passed as options to the
+L<C<AnyEvent::HTTP::http_request>|AnyEvent::HTTP/METHODS> calls made by this
+module: C<proxy>, C<tls_ctx>, C<session>, C<timeout>, C<on_prepare>,
+C<tcp_connect>, C<on_header>, C<on_body>, C<want_body_handle>, C<persistent>,
+C<keepalive>, C<handle_params>.
+
 =head1 METHODS
 
 =head2 new
@@ -307,6 +324,26 @@ function. See L<C<get()>|/get>.
 This method is a wrapper for the L<C<request()>|/request> method and the
 L<C<HTTP::Request::Common::POST()>|HTTP::Request::Common/POST $url> function.
 The last argument must be a callback.
+
+=head2 patch
+
+This method is a wrapper for the L<C<request()>|/request> method and the
+L<C<HTTP::Request::Common::PATCH()>|HTTP::Request::Common/PATCH $url> function.
+The last argument must be a callback.
+
+=head2 options
+
+This method is a wrapper for the L<C<request()>|/request> method and the
+L<C<HTTP::Request::Common::OPTIONS()>|HTTP::Request::Common/OPTIONS $url>
+function. The last argument must be a callback.
+
+=head1 LIMITATIONS
+
+Because of the handling of redirections done by this module as well as
+L<AnyEvent::HTTP>, if you are connecting to a web server that does not implement
+persistent connections (which is common for test servers) then you should pass a
+C<persistent => 0> option to the C<AnyEvent::UserAgent> constructor otherwise
+some requests might fail.
 
 =head1 SEE ALSO
 

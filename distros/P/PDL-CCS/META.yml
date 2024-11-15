@@ -12,7 +12,7 @@ configure_requires:
   PDL: '2.082'
   PDL::VectorValued: v1.0.4
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,5 +28,5 @@ requires:
   PDL::VectorValued: v1.0.4
 resources:
   repository: git://github.com/moocow-the-bovine/PDL-CCS.git
-version: v1.23.23
+version: v1.23.25
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

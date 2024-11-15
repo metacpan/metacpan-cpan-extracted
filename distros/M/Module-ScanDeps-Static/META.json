@@ -4,7 +4,7 @@
       "BIGFOOT <bigfoot@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,12 +34,11 @@
       },
       "runtime" : {
          "requires" : {
+            "CLI::Simple" : "v0.0.4",
             "Class::Accessor::Fast" : "0.51",
             "IO::Scalar" : "2.111",
-            "JSON::PP" : "2.97001",
-            "Pod::Find" : "0",
-            "Readonly" : "2.05",
-            "version" : "0"
+            "JSON" : "4.10",
+            "Readonly" : "2.05"
          }
       },
       "test" : {
@@ -49,12 +48,16 @@
       }
    },
    "provides" : {
+      "Module::ScanDeps::FindRequires" : {
+         "file" : "lib/Module/ScanDeps/FindRequires.pm",
+         "version" : "1.005"
+      },
       "Module::ScanDeps::Static" : {
          "file" : "lib/Module/ScanDeps/Static.pm",
-         "version" : "1.003"
+         "version" : "1.005"
       }
    },
    "release_status" : "stable",
-   "version" : "1.003",
-   "x_serialization_backend" : "JSON::PP version 4.10"
+   "version" : "1.005",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

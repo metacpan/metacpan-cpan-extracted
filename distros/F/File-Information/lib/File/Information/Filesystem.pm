@@ -15,13 +15,22 @@ use parent 'File::Information::Base';
 
 use Carp;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
+
+my @_copy_properties = (
+    qw(dos_device dos_path),
+    qw(mountpoint fs_type),
+    qw(linux_mount_options linux_superblock_options),
+);
 
 my %_properties = (
     dev_disk_by_uuid        => {rawtype => 'uuid'},
     dev_disk_by_label       => {},
     dev_name                => {},
     dev_mapper_name         => {},
+    (map {$_ => {}}
+        @_copy_properties,
+    ),
 );
 
 my %_known_paths = (
@@ -36,7 +45,7 @@ sub _new {
     my $self = $pkg->SUPER::_new(%opts, properties => \%_properties);
     my $pv = ($self->{properties_values} //= {})->{current} //= {};
 
-    croak 'No stat is given' unless defined $self->{stat};
+    croak 'No stat or dirstat is given' unless defined($self->{stat}) || defined($self->{dirstat});
     croak 'No paths is given' unless defined $self->{paths};
 
     foreach my $key (keys %{$self->{paths}}) {
@@ -53,6 +62,13 @@ sub _new {
             } elsif ($known eq 'mapper') {
                 $pv->{dev_mapper_name} //= {raw => $value};
             }
+        }
+    }
+
+    # Simple keys:
+    foreach my $key (@_copy_properties) {
+        if (defined $self->{$key}) {
+            $pv->{$key} = {raw => $self->{$key}};
         }
     }
 
@@ -79,7 +95,7 @@ File::Information::Filesystem - generic module for extracting information from f
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

@@ -12,7 +12,7 @@ Geo::Leaflet - Generates a Leaflet JavaScript map web page
 
 ## DESCRIPTION
 
-This package builds a [Leaflet JavaScript](https://leafletjs.com/) map web page.
+This package generates a [Leaflet JavaScript](https://leafletjs.com/) map web page.
 
 ## CONSTRUCTORS
 
@@ -60,21 +60,23 @@ Sets the center and zoom of the map and returns the map object (i.e., matches le
 
 ### width
 
-Sets and returns the pixel width of the map.
+Sets and returns the percent or pixel width of the map.
 
-    $map->width(600);
+    $map->width('600px');
+    $map->width('100%');
     my $width = $map->width;
 
-Default: 600
+Default: 100%
 
 ### height
 
-Sets and returns the pixel height of the map.
+Sets and returns the percent or pixel height of the map.
 
-    $map->height(600);
+    $map->height('400px');
+    $map->height('100%');
     my $height = $map->height;
 
-Default: 400
+Default: 100%
 
 ## HTML PROPERTIES
 
