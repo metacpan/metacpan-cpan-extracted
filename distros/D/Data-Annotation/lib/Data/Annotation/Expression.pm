@@ -3,7 +3,7 @@ use v5.24;
 use utf8;
 use warnings;
 use experimental qw< signatures >;
-{ our $VERSION = '0.002' }
+{ our $VERSION = '0.004' }
 
 use Data::Annotation::Traverse qw< crumble traverse_plain >;
 use Exporter qw< import >;
@@ -17,7 +17,7 @@ sub evaluator_factory ($definition, $parse_ctx = {}) {
    # a true value for key 'no-builtin'.
    if (! $parse_ctx{'no-builtin'}) {
       my @prefixes = ($parse_ctx{'locator-relative-prefixes'} // [])->@*;
-      unshift @prefixes, qw< Data::Annotation::Expression::Builtin >;
+      push @prefixes, qw< Data::Annotation::Expression::Builtin >;
       $parse_ctx{'locator-relative-prefixes'} = \@prefixes;
    }
 

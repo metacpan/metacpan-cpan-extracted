@@ -11,7 +11,7 @@ my %bn_cont = (
         'type'  => '_invalid',
     },
     ',' => {
-        'split' => [],
+        'split' => [ '', '' ],
         'type'  => '_invalid',
     },
     ',abc,def' => {

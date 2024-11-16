@@ -2,7 +2,7 @@
 package Tapper::Reports::DPath::TT;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Mix DPath into Template-Toolkit templates
-$Tapper::Reports::DPath::TT::VERSION = '5.0.4';
+$Tapper::Reports::DPath::TT::VERSION = '5.0.5';
 use 5.010;
         use Moose;
         use Template;
@@ -20,6 +20,8 @@ use 5.010;
         use JSON;
         use YAML::XS;
         use Data::Structure::Util 'unbless';
+        use Moose::Exporter;
+        Moose::Exporter->setup_import_methods(as_is => [ 'render' ] );
 
         has debug           => ( is => 'rw');
         has puresqlabstract => ( is => 'rw', default => 0);
@@ -158,7 +160,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

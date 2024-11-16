@@ -1,5 +1,11 @@
 Revision history for Tapper-CLI
 
+5.0.8     2024-11-15
+        - [BACKWARDS INCOMPATIBLE CHANGE] host-feature-delete - fix option duplicate:
+          no short option -v for --value, only for --verbose
+        - replace given/when with if/else for newer Perl versions
+        - tapper resource-list - Add option --json for JSON output [tu-maurice]
+
 5.0.7     2020-12-09
         - cmdline usability [tu-maurice]
 

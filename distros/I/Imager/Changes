@@ -1,5 +1,18 @@
 Imager release history.  Older releases can be found in Changes.old
 
+Imager 1.025 - 16 Nov 2024
+============
+
+ - trim: fix a buffer overflow due to a mis-sized buffer
+   https://github.com/tonycoz/imager/issues/534
+
+ - JPEG: fix an invalid sscanf() return value check detected by CodeQL
+
+ - FT2: separately #include t1tables.h, since ftmm.h no longer
+   includes it from freetype 2.13.3
+   https://github.com/tonycoz/imager/pull/533
+   https://bugs.debian.org/1081821
+
 Imager 1.024 - 6 Apr 2024
 ============
 

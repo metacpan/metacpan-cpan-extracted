@@ -1,25 +1,21 @@
 package Tapper::TestSuite::Netperf;
-# git description: v4.1.0-2-gaabc828
+# git description: v4.1.1-1-g93ea217
 
-BEGIN {
-  $Tapper::TestSuite::Netperf::AUTHORITY = 'cpan:TAPPER';
-}
-{
-  $Tapper::TestSuite::Netperf::VERSION = '4.1.1';
-}
+our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Network performance measurements
-
+$Tapper::TestSuite::Netperf::VERSION = '5.0.0';
+use 5.022;
 use Moose;
 
 with 'MooseX::Log::Log4perl';
 
 1; # End of Tapper::TestSuite::Netperf
 
-
+__END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -45,14 +41,10 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 
   The (two-clause) FreeBSD License
 
 =cut
-
-
-__END__
-

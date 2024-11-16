@@ -9,13 +9,13 @@ use Hash::MultiValue;
 use Plack::Request;
 use Plack::Response;
 
-field $env	       :reader;
-field $app	:param :reader;
-field $route	:param :reader = {};
+field $env             :reader;
+field $app      :param :reader;
+field $route    :param :reader = {};
 
-field $request	:reader;
-field $response	:reader;
-field $params	:reader;
+field $request  :reader;
+field $response :reader;
+field $params   :reader;
 
 field $req_encoding;
 
@@ -60,12 +60,12 @@ method print_env
 
     my $max = 0;
     for (map { length } keys %$env) {
-	$max = $_ if $_ > $max;
+        $max = $_ if $_ > $max;
     }
     $response->body(
-	map {
-	    sprintf "%*s => %s\n", -$max, $_, $env->{$_}
-	} sort keys %$env
+        map {
+            sprintf "%*s => %s\n", -$max, $_, $env->{$_}
+        } sort keys %$env
     );
     $response->finalize;
 }
@@ -85,7 +85,7 @@ method _get_request_parameters
     $req_encoding = $app->config->{request_encoding} // 'UTF-8';
 
     my @parameters = map {
-	$self->_decode($_)
+        $self->_decode($_)
     } $request->parameters->flatten;
 
     $params = Hash::MultiValue->new(@parameters);
@@ -94,23 +94,23 @@ method _get_request_parameters
 method _decode ($data)
 {
     if (ref $data eq ref {}) {
-	my %encoded;
-	for my ($k, $v) (%$data) {
-	    $encoded{ $self->_decode($k) } = $self->_decode($v);
-	}
-	return \%encoded;
+        my %encoded;
+        for my ($k, $v) (%$data) {
+            $encoded{ $self->_decode($k) } = $self->_decode($v);
+        }
+        return \%encoded;
     }
 
     if (ref $data eq ref []) {
-	my @encoded;
-	for my $v (@$data) {
-	    push @encoded, $self->_decode($v);
-	}
-	return \@encoded;
+        my @encoded;
+        for my $v (@$data) {
+            push @encoded, $self->_decode($v);
+        }
+        return \@encoded;
     }
 
     if (defined $data) {
-	return decode($req_encoding, $data);
+        return decode($req_encoding, $data);
     }
 
     undef;
@@ -120,7 +120,7 @@ __END__
 
 =head1 NAME
 
-Minima::Controller -- Base class for controllers used with Minima
+Minima::Controller - Base class for controllers used with Minima
 
 =head1 SYNOPSIS
 
@@ -237,14 +237,14 @@ Internal L<Plack::Response>
 =item C<params>
 
 Decoded GET and POST parameters merged in a L<Hash::MultiValue>. See
-L</Configuration> to set the desired encoding.
+L<"Configuration"|/CONFIGURATION> to set the desired encoding.
 
 =back
 
 =head1 SEE ALSO
 
-L<Minima>, L<Minima::App>, L<Minima::Router>, L<Plack::Request>,
-L<Plack::Response>, L<perlclass>.
+L<Minima>, L<Minima::App>, L<Minima::Router>, L<Minima::View>,
+L<Plack::Request>, L<Plack::Response>, L<perlclass>.
 
 =head1 AUTHOR
 

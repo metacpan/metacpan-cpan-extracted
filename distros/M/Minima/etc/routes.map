@@ -1,4 +1,4 @@
 # Routes
-GET	/		Minima::Controller	hello
-GET	/env		Minima::Controller	print_env
-@	not_found	Minima::Controller	not_found
+GET     /               Minima::Controller      hello
+GET     /env            Minima::Controller      print_env
+@       not_found       Minima::Controller      not_found

@@ -34,7 +34,7 @@ Testruns:
   [% r.testrun_id() %] [% r.status() %]
 [% END -%]
 |;
-$expected = q|
+my $expected = q|
 Testruns:
   1002 running
   1001 finished

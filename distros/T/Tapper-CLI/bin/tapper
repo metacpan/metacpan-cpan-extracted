@@ -27,6 +27,7 @@ sub setup {
         Tapper::CLI::Precondition
         Tapper::CLI::Queue
         Tapper::CLI::Scenario
+        Tapper::CLI::Resource
     /) {
         Module::Load::load( $s_module );
         if ( my $fh_setup = $s_module->can('setup') ) {
@@ -56,7 +57,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc.
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

@@ -10,3 +10,7 @@ Revision history for Apache2-AuthCASpbh
 
 	* Pass a copy of the cas attributes data structure to consumers so
 	  they can't change the master session values
+
+0.30	2024/11/15
+
+	* Minor fixes, see git log for details

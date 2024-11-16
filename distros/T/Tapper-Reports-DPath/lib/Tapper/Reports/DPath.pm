@@ -1,10 +1,10 @@
 ## no critic (RequireUseStrict)
 package Tapper::Reports::DPath;
-# git description: v5.0.3-2-g27f36fd
+# git description: v5.0.4-3-g41ece2e
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Extended DPath functionality for Tapper reports
-$Tapper::Reports::DPath::VERSION = '5.0.4';
+$Tapper::Reports::DPath::VERSION = '5.0.5';
 use 5.010;
         use Moose;
 
@@ -722,7 +722,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

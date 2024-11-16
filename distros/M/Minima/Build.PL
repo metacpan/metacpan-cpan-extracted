@@ -5,26 +5,26 @@ my $build = Module::Build->new(
     module_name => 'Minima',
     share_dir => 'share',
     requires => {
-	perl => '5.40.0',
-	'File::Share' => '0.27',
-	'Hash::MultiValue', '0.16',
-	'Path::Tiny' => '0.142',
-	'Plack' => '1.0050',
-	'Router::Simple' => '0.17',
-	'Template' => '3.100',
+        perl => '5.40.0',
+        'File::Share' => '0.27',
+        'Hash::MultiValue', '0.16',
+        'Path::Tiny' => '0.142',
+        'Plack' => '1.0050',
+        'Router::Simple' => '0.17',
+        'Template' => '3.100',
     },
     configure_requires => {
-	'Module::Build' => '0.42',
+        'Module::Build' => '0.42',
     },
     test_requires => {
-	'Data::Dumper' => '2.1',
-	'HTTP::Request::Common' => '6.0',
+        'Data::Dumper' => '2.1',
+        'HTTP::Request::Common' => '6.0',
     },
     meta_merge => {
-	resources => {
-	    repository => 'https://github.com/tessarin/Minima',
-	    bugtracker => 'https://github.com/tessarin/Minima/issues',
-	},
+        resources => {
+            repository => 'https://github.com/tessarin/Minima',
+            bugtracker => 'https://github.com/tessarin/Minima/issues',
+        },
     },
     license => 'mit',
 );

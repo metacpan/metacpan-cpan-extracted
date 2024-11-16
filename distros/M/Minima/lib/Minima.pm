@@ -1,5 +1,5 @@
 use v5.40;
-package Minima v0.2.0;
+package Minima v0.3.0;
 1;
 
 __END__
@@ -69,8 +69,9 @@ A typical web application using Minima operates as follows:
 =item 1.
 
 L<Minima::Setup> is loaded. It will read a configuration file (if any,
-see L<Minima::Setup/Config File>) and provides a C<init> subroutine
-that is passed to Plack as the entry point for receiving requests.
+see L<"Config File in Minima::Setup"|Minima::Setup/"CONFIG FILE">) and
+provides a C<init> subroutine that is passed to Plack as the entry point
+for receiving requests.
 
 =item 2.
 

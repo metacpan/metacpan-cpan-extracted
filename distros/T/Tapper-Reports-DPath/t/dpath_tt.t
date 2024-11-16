@@ -34,7 +34,7 @@ $template = q{
 [% SET bar = 'hello affe zomtec' -%]
 foo [% bar %] baz
 };
-$expected = q{
+my $expected = q{
 foo hello affe zomtec baz
 };
 is($tt->render(template => $template), $expected, "tt template with variables 1");

@@ -59,17 +59,17 @@ like(
     my $real_stdout = select $fake_stdout;
 
     Minima::Project::create(
-	$dir->child('AnotherNewDirectory'),
-	{ verbose => 1 },
+        $dir->child('AnotherNewDirectory'),
+        { verbose => 1 },
     );
 
     select $real_stdout;
     close $fake_stdout;
 
     like(
-	$output,
-	qr/mkdir|spew/,
-	'outputs text in verbose mode'
+        $output,
+        qr/mkdir|spew/,
+        'outputs text in verbose mode'
     );
 }
 

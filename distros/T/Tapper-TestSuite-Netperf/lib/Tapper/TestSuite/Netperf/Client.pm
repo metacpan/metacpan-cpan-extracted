@@ -1,13 +1,8 @@
 package Tapper::TestSuite::Netperf::Client;
-BEGIN {
-  $Tapper::TestSuite::Netperf::Client::AUTHORITY = 'cpan:TAPPER';
-}
-{
-  $Tapper::TestSuite::Netperf::Client::VERSION = '4.1.1';
-}
+our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Network performance measurements - Client
-
-        use Moose;
+$Tapper::TestSuite::Netperf::Client::VERSION = '5.0.0';
+use Moose;
         extends 'Tapper::TestSuite::Netperf';
         use IO::Socket::INET;
         use YAML;
@@ -166,11 +161,11 @@ BEGIN {
 
 1;
 
-
+__END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -244,14 +239,10 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 
   The (two-clause) FreeBSD License
 
 =cut
-
-
-__END__
-

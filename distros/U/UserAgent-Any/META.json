@@ -1,0 +1,104 @@
+{
+   "abstract" : "Wrapper above any UserAgent library, supporting sync and async calls.",
+   "author" : [
+      "Mathias Kende <mathias@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "useragent",
+      "www",
+      "lwp",
+      "async",
+      "rpc",
+      "http"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "UserAgent-Any",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "local",
+         "vendor",
+         "t"
+      ],
+      "namespace" : [
+         "UserAgent::Any::Impl",
+         "UserAgent::Any::Response::Impl"
+      ],
+      "package" : [
+         "UserAgent::Any::Impl",
+         "UserAgent::Any::Response::Impl"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "perl" : "v5.36.0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Devel::Cover" : "0"
+         },
+         "suggests" : {
+            "CPAN::Uploader" : "0",
+            "Dist::Setup" : "0",
+            "PAR::Packer" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "Readonly" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.036"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Common::Index::Mux::Ordered" : "0",
+            "Test::Pod" : "1.22"
+         },
+         "requires" : {
+            "AnyEvent" : "0",
+            "Promise::XS" : "0",
+            "Readonly" : "0",
+            "Test2::V0" : "0",
+            "Test::CPANfile" : "0",
+            "Test::HTTP::MockServer" : "0",
+            "Test::More" : "0"
+         },
+         "suggests" : {
+            "IPC::Run3" : "0",
+            "Perl::Tidy" : "20220613",
+            "Test2::Tools::PerlCritic" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mkende/perl_user_agent_any/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mkende/perl_user_agent_any"
+      }
+   },
+   "version" : 0.01,
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

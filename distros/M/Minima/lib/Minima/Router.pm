@@ -19,32 +19,40 @@ method read_file ($file)
 {
     $file = path($file);
     croak "Routes file `$file` does not exist.\n"
-	unless -e $file->absolute;
+        unless -e $file->absolute;
 
     # Parse routes
     for ($file->lines_utf8) {
-	# Skip blank or comment lines
-	next if /^\s*#|^\s*$/;
+        # Skip blank or comment lines
+        next if /^\s*#|^\s*$/;
 
-	# Extract data
-	my ($method, $pattern, $controller, $action) = split;
+        # Extract data
+        my ($method, $pattern, $controller, $action) = split;
 
-	# Fix controller prefix
-	$controller =~ s/^:+/Controller::/;
+        # Fix controller prefix
+        $controller =~ s/^:+/Controller::/;
 
-	# Build destination and options
-	my %dest = ( controller => $controller, action => $action );
-	my %opt;
-	$opt{method} = $method unless $method eq '*';
+        # Build destination and options
+        my %dest = ( controller => $controller, action => $action );
+        my %opt;
+        if ($method eq '*') {
+            # Do nothing -- don't add a constraint
+        } elsif ($method eq 'GET') {
+            $opt{method} = [ qw/ GET HEAD / ];
+        } elsif ($method eq '_GET') {
+            $opt{method} = 'GET';
+        } else {
+            $opt{method} = $method;
+        }
 
-	# Test the nature of the route
-	if ($method eq '@') {
-	    # Special
-	    $special{$pattern} = \%dest;
-	} else {
-	    # Regular
-	    $router->connect($pattern, \%dest, \%opt);
-	}
+        # Test the nature of the route
+        if ($method eq '@') {
+            # Special
+            $special{$pattern} = \%dest;
+        } else {
+            # Regular
+            $router->connect($pattern, \%dest, \%opt);
+        }
     }
 }
 
@@ -60,14 +68,15 @@ method error_route
 
 method clear_routes
 {
-    $router = Router::Simple->new;
+    $router  = Router::Simple->new;
+    %special = ( );
 }
 
 __END__
 
 =head1 NAME
 
-Minima::Router -- Define and match URIs to controllers and methods
+Minima::Router - Define and match URIs to controllers and methods
 
 =head1 SYNOPSIS
 
@@ -131,6 +140,9 @@ The name of the HTTP method to which this route applies (GET, POST,
 etc.). This value may also be set to C<*>, in which case any method is
 permitted for this route. If set to C<@>, the route represents a special
 directive determined in conjunction with the next column.
+
+B<Note>: C<GET> matches both GET and HEAD requests. To match GET
+exclusively, use C<_GET> instead.
 
 =item B<Route Name>
 
@@ -240,7 +252,8 @@ Removes all registered routes.
 
 =head1 SEE ALSO
 
-L<Minima>, L<Router::Simple>, L<Plack>, L<perlclass>.
+L<Minima>, L<Minima::Controller>, L<Router::Simple>, L<Plack>,
+L<perlclass>.
 
 =head1 AUTHOR
 

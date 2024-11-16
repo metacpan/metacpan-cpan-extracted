@@ -8,10 +8,10 @@ use Module::Want ();
 
 $Locale::Maketext::Utils::Phrase::VERSION = '0.1';
 
-my $closing_bn = qr/(?<!\~)\]/;
-my $opening_bn = qr/(?<!\~)\[/;
-my $bn_delimit = qr/(?<!\~)\,/;
-my $bn_var_arg = qr/(?<!\~)\_(?:0|\-?[1-9]+[0-9]*|\*)/;
+our $closing_bn = qr/(?<!\~)\]/;
+our $opening_bn = qr/(?<!\~)\[/;
+our $bn_delimit = qr/(?<!\~)\,/;
+our $bn_var_arg = qr/(?<!\~)\_(?:0|\-?[1-9]+[0-9]*|\*)/;
 
 sub get_bn_var_regexp {
     return qr/(?<!\~)\_(?:0|\-?[1-9]+[0-9]*|\*)/;
@@ -132,7 +132,7 @@ sub struct_is_entirely_bracket_notation {
 sub _split_bn_cont {
     my ( $cont, $limit ) = @_;
     $limit = abs( int( $limit || 0 ) );
-    return $limit ? split( $bn_delimit, $cont, $limit ) : split( $bn_delimit, $cont );
+    return $limit ? split( $bn_delimit, $cont, $limit ) : split( $bn_delimit, $cont, -1 );
 }
 
 my %meth = (

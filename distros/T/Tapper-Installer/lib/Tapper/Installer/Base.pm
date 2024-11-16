@@ -1,6 +1,6 @@
 package Tapper::Installer::Base;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Installer::Base::VERSION = '5.0.1';
+$Tapper::Installer::Base::VERSION = '5.0.2';
 use Moose;
 
 use common::sense;
@@ -218,15 +218,14 @@ sub system_install
         $self->mcp_inform("end-install");
         $self->log->info("Finished installation of test machine");
 
-        given ($state){
-                when ("standard"){
+                if ($state eq "standard"){
                         return 0 if $config->{installer_stop};
                         system("sync");
                         system("sync");
                         system("sync");
                         system("reboot");
                 }
-                when ('simnow'){
+                elsif ($state eq 'simnow'){
                         #FIXME: don't use hardcoded path
                         my $simnow_config = $self->cfg->{files}{simnow_config};
                         $retval = qx(/opt/tapper/perl/perls/current/bin/perl /opt/tapper/perl/perls/current/bin/tapper-simnow-start --config=$simnow_config);
@@ -238,7 +237,6 @@ sub system_install
                         }
 
                 }
-        }
         return 0;
 }
 
@@ -333,7 +331,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Advanced Micro Devices, Inc.
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

@@ -3,7 +3,7 @@ package Apache2::AuthCASpbh::UserAgent;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.30';
 
 use parent qw(LWP::UserAgent);
 
@@ -299,7 +299,7 @@ https://github.com/pbhenson/Apache2-AuthCASpbh
 
 =head1 AUTHOR
 
-Copyright (c) 2018, Paul B. Henson <henson@acm.org>
+Copyright (c) 2018-2024, Paul B. Henson <henson@acm.org>
 
 This file is part of AuthCASpbh.
 

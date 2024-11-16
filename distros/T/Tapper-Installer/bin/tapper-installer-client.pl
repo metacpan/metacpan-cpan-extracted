@@ -6,13 +6,16 @@ use warnings;
 use strict;
 use Log::Log4perl;
 use Tapper::Installer::Base;
+use Tapper::Config;
 
 BEGIN {
-        Log::Log4perl::init('/etc/log4perl.cfg');
+        Tapper::Config::_switch_context; # reload config
+        my $l4p_cfg = Tapper::Config->subconfig->{files}{log4perl_cfg};
+        Log::Log4perl::init($l4p_cfg);
 }
 
 
-my $client = new Tapper::Installer::Base;
+my $client = Tapper::Installer::Base->new();
 $client->system_install("");
 
 __END__
@@ -54,7 +57,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Advanced Micro Devices, Inc.
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

@@ -17,11 +17,12 @@ sub normalize_maketext_string {
         $filter->add_warning('Entire phrase is bracket notation, is there a better way in this case?');
     }
 
-    my $idx          = -1;
-    my $has_bare     = 0;
-    my $has_hardurl  = 0;
-    my $last_idx     = @{$struct} - 1;
-    my $bn_var_rexep = Locale::Maketext::Utils::Phrase::get_bn_var_regexp();
+    my $idx           = -1;
+    my $has_bare      = 0;
+    my $has_hardurl   = 0;
+    my $has_empty_arg = 0;
+    my $last_idx      = @{$struct} - 1;
+    my $bn_var_rexep  = Locale::Maketext::Utils::Phrase::get_bn_var_regexp();
 
     for my $piece ( @{$struct} ) {
         $idx++;
@@ -65,10 +66,35 @@ sub normalize_maketext_string {
                 $has_hardurl++;
             }
         }
+
+        if ( $piece->{'type'} eq 'complex' ) {
+            my @arg_list        = @{ $piece->{'list'} };
+            my $new_bn          = $bn;
+            my $empty_arg_count = 0;
+            for my $frag ( @arg_list[ 1 .. $#arg_list ] ) {
+                if ( $frag eq '' ) {
+                    $new_bn =~ s{
+                        ($Locale::Maketext::Utils::Phrase::bn_delimit)
+                        (
+                            $Locale::Maketext::Utils::Phrase::bn_delimit
+                            |
+                            $Locale::Maketext::Utils::Phrase::closing_bn
+                        )
+                    }{$1EMPTY STRING$2}x;
+
+                    $empty_arg_count++;
+                }
+            }
+            if ( $empty_arg_count > 0 ) {
+                ${$string_sr} =~ s/\Q$bn\E/$new_bn/;
+                $has_empty_arg++;
+            }
+        }
     }
 
     $filter->add_warning('Hard coded URLs can be a maintenance nightmare, why not pass the URL in so the phrase does not change if the URL does') if $has_hardurl;
     $filter->add_warning('Bare variable can lead to ambiguous output')                                                                            if $has_bare;
+    $filter->add_warning('Empty strings as arguments in bracket notation should be avoided')                                                      if $has_empty_arg;
 
     return $filter->return_value;
 }

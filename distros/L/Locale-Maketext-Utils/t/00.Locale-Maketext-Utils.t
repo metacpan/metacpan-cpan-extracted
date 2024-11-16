@@ -344,11 +344,11 @@ my $dt_obj = DateTime->new( 'year' => 1978 );    # DateTime already brought in b
 ok( $en->maketext( '[datetime,_1]', $dt_obj ) =~ m{^January 1, (?:19)?78$}i, '1st arg object' );
 like( $en->maketext( '[datetime,_1,_2]', { 'year' => 1977 }, '' ), qr{^January 1, (?:19)?77$}i, '1st arg hashref' );
 is( $en->maketext( '[datetime,_1,_2]', { 'year' => 1977 }, 'yyyy' ), '1977', '2nd arg string' );
-like( $en->maketext( '[datetime,_1,_2]', { 'year' => 1977 }, sub { $_[0]->{'locale'}->datetime_format_long } ), qr{^January 1, (?:19)?77.*12:00:00 AM .*$}i, '2nd arg coderef' );
-like( $en->maketext( '[datetime,_1,_2]', { 'year' => 1978, 'month' => 11, 'day' => 13 }, sub { $_[0]->{'locale'}->datetime_format_long } ), qr{^November 13, (?:19)?78.*12:00:00 AM .*$}i, '[datetime] English' );
+like( $en->maketext( '[datetime,_1,_2]', { 'year' => 1977 }, sub { $_[0]->{'locale'}->datetime_format_long } ), qr{^January 1, (?:19)?77.*12:00:00\sAM\s.*$}i, '2nd arg coderef' );
+like( $en->maketext( '[datetime,_1,_2]', { 'year' => 1978, 'month' => 11, 'day' => 13 }, sub { $_[0]->{'locale'}->datetime_format_long } ), qr{^November 13, (?:19)?78.*12:00:00\sAM\s.*$}i, '[datetime] English' );
 like( $fr->maketext( '[datetime,_1,_2]', { 'year' => 1999, 'month' => 7,  'day' => 17 }, sub { $_[0]->{'locale'}->datetime_format_long } ), qr{^17 juillet (?:19)?99.*00:00:00 .*$}i,      '[datetime] French' );
 
-like( $en->maketext( '[datetime,_1,datetime_format_short]', { 'year' => 1977 } ), qr{1/1/77.*12:00 AM}, '2nd arg DateTime::Locale method name' );
+like( $en->maketext( '[datetime,_1,datetime_format_short]', { 'year' => 1977 } ), qr{1/1/77.*12:00\sAM}, '2nd arg DateTime::Locale method name' );
 
 # is( $en->maketext('[datetime,_1,_2]', {'year'=>1977}, 'invalid' ), 'invalid', '2nd arg DateTime::Locale method name invalid');
 

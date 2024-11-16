@@ -1,5 +1,5 @@
 package File::Strfile;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use 5.016;
 use strict;
 use warnings;
@@ -159,7 +159,7 @@ sub read_strfile {
 		$self->{LongLen},
 		$self->{ShortLen},
 		$self->{Flags},
-		my $delim,
+		$self->{Delimit},
 		# We're ignoring 3 padding bytes
 	) = unpack "N N N N N a", $buf;
 
@@ -302,15 +302,15 @@ sub write_strfile {
 	my $file = shift // "$self->{SrcFile}.dat";
 
 	open my $fh, '>', $file or croak "Failed to open $file for writing: $!";
+	binmode $fh;
 
-	my $hdr = pack "N N N N N c c c c", (
+	my $hdr = pack "N N N N N c x x x", (
 		$self->{Version},
 		$self->{StrNum},
 		$self->{LongLen},
 		$self->{ShortLen},
 		$self->{Flags},
 		ord $self->{Delimit},
-		0, 0, 0,
 	);
 
 	print { $fh } $hdr;
@@ -327,6 +327,8 @@ sub write_strfile {
 		print { $fh } $off;
 
 	}
+
+	close $fh;
 
 }
 

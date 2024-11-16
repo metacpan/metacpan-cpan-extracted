@@ -1,6 +1,6 @@
 package Tapper::Installer::Precondition::PRC;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Installer::Precondition::PRC::VERSION = '5.0.1';
+$Tapper::Installer::Precondition::PRC::VERSION = '5.0.2';
 use strict;
 use warnings;
 
@@ -341,7 +341,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Advanced Micro Devices, Inc.
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

@@ -1,3 +1,6 @@
+0.004  2024-11-16 10:56:55 CET
+   - put builtins at the end to allow for overriding
+
 0.002  2024-11-14 08:01:35 CET
    - Same code as previous release, official one to make it appear in CPAN
    - Updated dist.ini

@@ -1,0 +1,53 @@
+---
+abstract: 'Wrapper above any UserAgent library, supporting sync and async calls.'
+author:
+  - 'Mathias Kende <mathias@cpan.org>'
+build_requires:
+  AnyEvent: '0'
+  ExtUtils::MakeMaker: '0'
+  Promise::XS: '0'
+  Readonly: '0'
+  Test2::V0: '0'
+  Test::CPANfile: '0'
+  Test::HTTP::MockServer: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  perl: v5.36.0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - useragent
+  - www
+  - lwp
+  - async
+  - rpc
+  - http
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: UserAgent-Any
+no_index:
+  directory:
+    - t
+    - inc
+    - local
+    - vendor
+    - t
+  namespace:
+    - UserAgent::Any::Impl
+    - UserAgent::Any::Response::Impl
+  package:
+    - UserAgent::Any::Impl
+    - UserAgent::Any::Response::Impl
+requires:
+  Moo: '0'
+  Readonly: '0'
+  namespace::clean: '0'
+  perl: '5.036'
+resources:
+  bugtracker: https://github.com/mkende/perl_user_agent_any/issues
+  repository: https://github.com/mkende/perl_user_agent_any
+version: 0.01
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

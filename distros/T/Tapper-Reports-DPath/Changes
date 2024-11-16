@@ -1,5 +1,9 @@
 Revision history for Tapper-Reports-DPath
 
+5.0.5     2024-11-15
+        - fix sloppy strictness in code
+        - required dependencies++
+
 5.0.4     2020-01-23
         - multiline paths are trimmed from leading+trailing whitespace
 

@@ -22,7 +22,7 @@ use LWP::UserAgent qw ();
 use Storable qw();
 use XML::Simple qw();
 
-our $VERSION = '0.20';
+our $VERSION = '0.30';
 
 sub handler {
 	my ($r) = shift;
@@ -61,7 +61,7 @@ sub handler {
 		my $session = open_session($session_db, $cookies{$cookie_name}->value());
 
 		if (ref($session)) {
-			if ($session->{expiration} > $now) {
+			if (defined($session->{expiration}) && $session->{expiration} > $now) {
 				$_log->l($debug_level, 'valid cookie for ' . $session->{user} .
 					 ' expires ' . $session->{expiration});
 				$r->user($session->{user});
@@ -92,8 +92,8 @@ sub handler {
 				return Apache2::Const::OK;
 			}
 			else {
-				$_log->l($debug_level, 'cookie for ' . $session->{user} .
-					 ' expired ' . $session->{expiration});
+				$_log->l($debug_level, 'cookie for ' . ($session->{user} // '<missing>') .
+					 ' expired ' . ($session->{expiration} // '<missing>'));
 
 				eval { tied(%{$session})->delete; };
 				if ($@) {
@@ -188,7 +188,7 @@ sub handler {
 
 					if (!_allowed_proxy($_log, $debug_level, $cas_proxy,
 							    $proxy_allow, $proxy_allow_re)) {
-			    			$_log->l($debug_level, 'proxy chain (' .
+						$_log->l('notice', 'proxy chain (' .
 								       join(' ', @{$cas_proxy}) .
 								       ') not permitted');
 						return Apache2::Const::FORBIDDEN;
@@ -199,7 +199,7 @@ sub handler {
 					$r->pnotes(cas_proxy => $cas_proxy);
 				}
 				elsif (cfg_value($dir_cfg, 'ProxyRequired')) {
-			    		$_log->l($debug_level, 'proxy chain not found in response');
+					$_log->l('notice', 'proxy chain not found in response');
 					return Apache2::Const::FORBIDDEN;
 				}
 			}
@@ -393,11 +393,14 @@ sub cleanup {
 				if (ref($session)) {
 					eval { tied(%{$session})->delete; };
 					if ($@) {
-			    			$_log->l('warn', "session delete failed for $_ - $@");
+						$_log->l('warn', "cleanup session delete failed for $_ - $@");
 					}
 				}
+				elsif ($session !~ /Object does not exist in the data store/) {
+					$_log->l('warn', "cleanup session tie failed for $_ - $session");
+				}
 				else {
-			    		$_log->l('warn', "session tie failed for $_ - $session");
+					$_log->l('debug', "cleanup session tie $_ not found");
 				}
 			}
 		}
@@ -488,7 +491,7 @@ https://github.com/pbhenson/Apache2-AuthCASpbh
 
 =head1 AUTHOR
 
-Copyright (c) 2018, Paul B. Henson <henson@acm.org>
+Copyright (c) 2018-2024, Paul B. Henson <henson@acm.org>
 
 This file is part of AuthCASpbh.
 

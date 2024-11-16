@@ -17,25 +17,25 @@ sub import
     my $default_config = './etc/config.pl';
 
     if ($file) {
-	my $file_abs = path($file)->absolute;
+        my $file_abs = path($file)->absolute;
 
-	croak "Config file `$file` does not exist.\n"
-	    unless -e $file_abs;
+        croak "Config file `$file` does not exist.\n"
+            unless -e $file_abs;
 
-	$config = do $file_abs;
-	croak "Failed to parse config file `$file`: $@\n" if $@;
+        $config = do $file_abs;
+        croak "Failed to parse config file `$file`: $@\n" if $@;
 
     } elsif (-e $default_config) {
-	$config = do $default_config;
-	croak "Failed to parse default config file `$default_config`: "
-	    . "$@\n" if $@;
+        $config = do $default_config;
+        croak "Failed to parse default config file `$default_config`: "
+            . "$@\n" if $@;
     }
     croak "Config is not a hash reference.\n"
-	unless ref $config eq ref {};
+        unless ref $config eq ref {};
 
     # initialize app
     $app = Minima::App->new(
-	configuration => $config,
+        configuration => $config,
     );
 }
 
@@ -54,7 +54,7 @@ __END__
 
 =head1 NAME
 
-Minima::Setup -- Setup a Minima web application
+Minima::Setup - Setup a Minima web application
 
 =head1 SYNOPSIS
 

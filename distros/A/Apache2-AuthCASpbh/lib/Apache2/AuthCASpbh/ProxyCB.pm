@@ -8,7 +8,7 @@ use Apache2::AuthCASpbh::Log qw();
 use Apache2::Const -compile => qw(HTTP_INTERNAL_SERVER_ERROR HTTP_OK);
 use CGI qw ();
 
-our $VERSION = '0.20';
+our $VERSION = '0.30';
 
 sub handler {
 	my ($r) = shift;
@@ -87,7 +87,7 @@ https://github.com/pbhenson/Apache2-AuthCASpbh
 
 =head1 AUTHOR
 
-Copyright (c) 2018, Paul B. Henson <henson@acm.org>
+Copyright (c) 2018-2024, Paul B. Henson <henson@acm.org>
 
 This file is part of AuthCASpbh.
 

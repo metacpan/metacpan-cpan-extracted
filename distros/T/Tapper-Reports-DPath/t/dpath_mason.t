@@ -37,7 +37,7 @@ $template = q{
 % my $bar = 'hello affe zomtec';
 foo <% $bar %> baz
 };
-$expected = q{
+my $expected = q{
 foo hello affe zomtec baz
 };
 is($mason->render(template => $template), $expected, "mason template with variables 1");

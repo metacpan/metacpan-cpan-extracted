@@ -1,24 +1,37 @@
+v0.3.0  2024-11-11
+
+        [Changes]
+        - Minima::Router now supports matching HEAD requests to GET
+          routes.
+        - Minima::App can automatically remove the response body for
+          HEAD requests.
+        - Add support to a default data hash in Minima::View::HTML.
+
+        [Fixes]
+        - Version option not working in bin/minima.
+        - Minima::Router's clear_routes would not remove special routes.
+
 v0.2.0  2024-10-18
 
-	[Changes]
-	- New default template file extension.
-	- Add configuration option to change the template file
-	  extension.
+        [Changes]
+        - New default template file extension.
+        - Add configuration option to change the template file
+          extension.
 
-	[Fixes]
-	- Broken documentation links.
+        [Fixes]
+        - Broken documentation links.
 
 v0.1.1  2024-10-05
 
-	[Changes]
-	- Improve test coverage.
-	- Add Hash::MultiValue as a direct requirement.
+        [Changes]
+        - Improve test coverage.
+        - Add Hash::MultiValue as a direct requirement.
 
-	[Fixes]
-	- Update customization manual, which mentioned a parameter that
-	  does not exist anymore.
-	- Add missing key in documentation of configuration defaults for
-	  Minima::View::HTML.
+        [Fixes]
+        - Update customization manual, which mentioned a parameter that
+          does not exist anymore.
+        - Add missing key in documentation of configuration defaults for
+          Minima::View::HTML.
 
-v0.1.0	2024-09-30
-	First experimental version.
+v0.1.0  2024-09-30
+        First experimental version.

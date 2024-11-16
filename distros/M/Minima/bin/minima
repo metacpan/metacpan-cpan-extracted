@@ -5,7 +5,7 @@ use Getopt::Long qw/ :config bundling pass_through /;
 use Pod::Usage;
 
 use IO::Socket::INET;
-use Minima::App;
+use Minima;
 use Minima::Project;
 
 my $help;
@@ -21,7 +21,7 @@ Getopt::Long::Configure('no_pass_through');
 
 # Preliminary
 pod2usage(-exitval => 0, -verbose => 2) if $help;
-say 'Minima v', $Minima::App::VERSION and exit if $version;
+say 'Minima ', Minima->VERSION and exit if $version;
 
 # Commands
 $command = shift @ARGV // 'nop';
@@ -29,30 +29,30 @@ $command = shift @ARGV // 'nop';
 if ($command eq 'new') {
     my %config;
     GetOptions(
-	\%config,
-	'static|s!',
-	'verbose!',
+        \%config,
+        'static|s!',
+        'verbose!',
     );
     Minima::Project::create(shift @ARGV, \%config);
 } elsif ($command eq 'run') {
     # Attempt to find a free port
     my $port = 5000;
     while (++$port < 2**16) {
-	my $sock = IO::Socket::INET->new(
-	    PeerAddr => '127.0.0.1',
-	    PeerPort => $port,
-	    Proto => 'tcp',
-	    Timeout => 5,
-	);
-	last unless defined $sock;
+        my $sock = IO::Socket::INET->new(
+            PeerAddr => '127.0.0.1',
+            PeerPort => $port,
+            Proto => 'tcp',
+            Timeout => 5,
+        );
+        last unless defined $sock;
     }
 
     my @plackup = qw(
-	plackup
-	app.psgi
-	--reload
-	--access-log /dev/null
-	--listen
+        plackup
+        app.psgi
+        --reload
+        --access-log /dev/null
+        --listen
     );
     push @plackup, "localhost:$port";
     push @plackup, @ARGV;
@@ -62,8 +62,8 @@ if ($command eq 'new') {
 } else {
     # No valid command passed
     pod2usage(
-	-verbose => 99,
-	-sections => 'SYNOPSIS|GLOBAL OPTIONS',
+        -verbose => 99,
+        -sections => 'SYNOPSIS|GLOBAL OPTIONS',
     );
 }
 

@@ -3,7 +3,7 @@ package Locale::Maketext::Utils;
 # these work fine, but are not used in production
 # use strict;
 # use warnings;
-$Locale::Maketext::Utils::VERSION = '0.42';
+$Locale::Maketext::Utils::VERSION = '0.43';
 
 use Locale::Maketext 1.21 ();
 use Locales 0.26          ();

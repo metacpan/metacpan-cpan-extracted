@@ -1,5 +1,13 @@
 Revision history for perl module File::Strfile
 
+0.03 Fri 15 Nov 2024
+  Fixes:
+    - Delimit characters are correctly read from strfiles.
+    - Output file handle for write_strfile() is closed upon completion.
+    - write_strfile() now writes files in binary mode.
+    - LICENSE file now contains perl license rather than the Artistic License
+      2.0.
+
 0.02 Sun 3 Nov 2024
   Added:
     - Repository info in META files.

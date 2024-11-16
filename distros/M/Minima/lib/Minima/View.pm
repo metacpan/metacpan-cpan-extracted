@@ -15,7 +15,7 @@ __END__
 
 =head1 NAME
 
-Minima::View -- Base class for views used with Minima
+Minima::View - Base class for views used with Minima
 
 =head1 DESCRIPTION
 

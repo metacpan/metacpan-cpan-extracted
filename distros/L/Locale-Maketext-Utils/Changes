@@ -1,5 +1,12 @@
 Revision history for Perl extension Locale::Maketext::Utils.
 
+0.43  Fri Nov 15 01:16:42 2024
+    - rt144987: Update test regexps to account for non-ascii regular space in
+       tests that failed after CLDR updates in DateTime::Locale 1.37
+    - GH PR 7 (thanks sloanebernstein!)
+       Warn when complex BN receives empty string as arg
+       phrase2struct() should keep empty string args
+
 0.42  Fri Apr 15 09:40:53 2016
     - numf() return 0 on undef from CLDR
     - add i_ tags to get_asset (since they can't be had from the Locales obj)
@@ -67,29 +74,29 @@ Revision history for Perl extension Locale::Maketext::Utils.
     - Make Ellipsis filter a warning
     - rt 81243: expand medial ellipsis check to handle being at the beginning or end of a parenthesized chunk of text
     - rt 81243 (sort of): allow punctuation after trailing ellipsis
-    
+
 0.35  Thu Aug  9 15:30:52 2012
     - rt 78871 - rename normalizing object constructors
     - rt 78748 - ellipsis typo
     - rt 78603 - handle undef value to normalize()
     - rt 78073 - POD typo
     - rt 78870 - rename lexicon lookup method for less ambiguity
-    
+
 0.34  Mon Jun 25 20:12:28 2012
     - rt 78036: silence uninit warnings during normalize()
     - rt 78032: minor output,url tweaks
     - rt 77669: typo
-    - rt 77923: translation normalization, cPanel legacy normalization (including the translation variation) 
+    - rt 77923: translation normalization, cPanel legacy normalization (including the translation variation)
 
 0.33  Fri Jun  1 11:12:31 2012
     - Add 0.32 output()s to 'meth' type in Phrase.pm
-    
+
 0.32  Thu May 31 17:32:19 2012
     - rt 77527: add Test::Warn as a dependency
     - Added output() amp, lt, gt, apos, quot, shy
     - Added L::M::U::MarkPhrase::translatable()
         - Updated rt 77538 to look for that
-        
+
 0.31  Thu Apr 26 15:57:43 2012
     - rt 76607: POD typo
     - rt 76778: Support format_for() in datetime()
@@ -123,10 +130,10 @@ Revision history for Perl extension Locale::Maketext::Utils.
     - Add cPanel normalization "recipe": Locale::Maketext::Utils::Phrase::cPanel
     - fix POD in …::Norm::Markup …::Norm::EndPunc
     - rt 76146: add filter for escapes
-    
+
 0.25  Thu Mar 22 12:39:55 2012
     - adjust output,url regex in 'Consider' filter to capture the first arg instead of all args for the example
-    
+
 0.24  Thu Mar 22 09:29:55 2012
     - rt 75979: Do not use /p so that it will work on perls older than 5.10
     - rt 75919: POD normalize_maketext_string() spiff ups
@@ -159,12 +166,12 @@ Revision history for Perl extension Locale::Maketext::Utils.
     - add &shy; for chr(173) in html context so its visible
     - Initial Locale::Maketext::Utils::Phrase::Norm and company
     - Put conceptual L::M::U::Phrase::Core in tarball–not tested, may change drastically or go away completely
-    - added "arbitrary attributes" to appropriate output methods: 
-        e.g. key,value,pairs,that,add,clarity,to,phrase[,_N] 
+    - added "arbitrary attributes" to appropriate output methods:
+        e.g. key,value,pairs,that,add,clarity,to,phrase[,_N]
             - where _N is a hashref of key/value pairs important to the caller but essentially irrelevant to the meaning
     - rt 74127: Change a test to use like() to (hopefully) pass on the oddball machine and if not have more useful output
     - rt 74125: POD typo
-    - rt 74126: removed note-to-self left in Changelog for 0.20 
+    - rt 74126: removed note-to-self left in Changelog for 0.20
     - rt 74603: Pass max decimal length to quant() used in format_bytes()
     - rt 74604: Add max decimal length to format_bytes
     - rt 74337: handle '' arg, fix datetime() POD, added current_year()
@@ -202,17 +209,17 @@ Revision history for Perl extension Locale::Maketext::Utils.
         - output_acronym()
         - output_sup()
         - output_sub()
-        - get_locales_obj(), 
+        - get_locales_obj(),
         - makethis()
         - makethis_base()
         - output_nbsp()
         - asis(), output_asis()
-       
+
         - set_context(), set_context_html(), set_context_ansi(), set_context_plain()
         - context_is(), context_is_html(), context_is_ansi(), context_is_plain()
         - get_context()
         - maketext_html_context(), maketext_ansi_context(), maketext_plain_context()
-        
+
         - list_and(), list_or(), quant(), numerate(), numf()  - rt 69270
 
 0.19  Mon May 24 23:11:15  2010
@@ -232,7 +239,7 @@ Revision history for Perl extension Locale::Maketext::Utils.
     - move all no()s outside of loops
     - add support for use_external_lex_cache (see Locale::Maketext's https://rt.cpan.org/Ticket/Display.html?id=46738 )
     - change test's BAILOUT to SKIP to avoid false failures
-    
+
 0.15  Wed Jun  3 16:01:29 2009
     - Dropped need for Locale::Maketext::Pseudo
     - removed env_ functions (use Locale::Maketext::Pseudo explicitly if you want them)
@@ -247,7 +254,7 @@ Revision history for Perl extension Locale::Maketext::Utils.
     - fixed scoping of a test that caused issues in later tests on some systems
     - added notes in POD about Locales::Language 0.03
     - Address eval {} setting $! spuriously-for-our-purposes
-    
+
 0.13  Sat May 16 20:21:57 2009
     - drop 'use version'
     - 'use base' to @ISA
@@ -260,7 +267,7 @@ Revision history for Perl extension Locale::Maketext::Utils.
         boolean()
         output() - (part of the todo 'possibly some formatters (would need to associate an output object of some kind though...)')
     - added utility methods:
-        get_language_class()        
+        get_language_class()
         add_lexicon_override_hash() - "Tie::Hash::ReadonlyStack compat Lexicon only" (part of the todo 'Specific support of lexicon management w/ non-hash based lexicons')
         add_lexcion_fallback_hash() - "Tie::Hash::ReadonlyStack compat Lexicon only" (part of the todo 'Specific support of lexicon management w/ non-hash based lexicons')
         del_lexicon_hash()          - "Tie::Hash::ReadonlyStack compat Lexicon only" (part of the todo 'Specific support of lexicon management w/ non-hash based lexicons')
@@ -281,11 +288,11 @@ Revision history for Perl extension Locale::Maketext::Utils.
 
 0.0.10  Thu Jul 23 10:33:47 2008
     - fix makefile entry
-    
+
 0.0.9  Tue Oct 16 22:47:04 2007
 	- make test case insensitiive in case that ever changes
 	- more sensible -DateTime format (why have SQL datetime when we want language!)
-	
+
 0.0.8  Sat Oct 13 14:13:37 2007
     - Minor POD fixup
     - '-DateTime' key to all %Lexicons's
@@ -294,10 +301,10 @@ Revision history for Perl extension Locale::Maketext::Utils.
 	- added env_* functions
     - changed get() and say() '||' logic to ternaries
 	- added $ENV{'maketext_obj'} support
-	
+
 0.0.6  Wed Nov  8 23:08:18 2006
 	- Added say(), get(), and AUTOLOAD(). Made $Onesided hashes retain the value of keys whose value is not ''
-	
+
 0.0.5  Wed Sep 14 11:33:57 2006
     - re bundled without Mac's ._ files in the tarball
 
@@ -308,10 +315,10 @@ Revision history for Perl extension Locale::Maketext::Utils.
 0.0.3 Fri Jul  7 16:04:40 2006
 	- Fixed up POD
 	- added [loadable_]lang_names_hashref()
-	
+
 0.0.2  Wed Jul  5 22:29:50 2006
 	- added $Encoding support
-	
+
 0.0.1  Tue Jul  4 18:14:34 2006
 	- original version; created by h2xs 1.23 with options
 		-AXc -n Locale::Maketext::Utils

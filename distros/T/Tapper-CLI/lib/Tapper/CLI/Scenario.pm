@@ -1,6 +1,6 @@
 package Tapper::CLI::Scenario;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::CLI::Scenario::VERSION = '5.0.7';
+$Tapper::CLI::Scenario::VERSION = '5.0.8';
 
 use 5.010;
 use warnings;
@@ -150,7 +150,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc.
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

@@ -9,7 +9,7 @@ field $view;
 
 ADJUST {
     $view = Minima::View::HTML->new(
-	app => $self->app,
+        app => $self->app,
     );
 
     $self->response->content_type('text/html; charset=utf-8');

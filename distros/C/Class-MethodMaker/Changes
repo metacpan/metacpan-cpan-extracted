@@ -1,5 +1,8 @@
 Revision History for Class::MethodMaker (versions 2)
 
+2.25	Nov 15 2024
+        - deterministic hash key order, needed for reproducible builds (GH#6, Bernhard M. Wiedemann)
+
 2.24	Mar 31 2015
         - fix missing OUTPUT section - RT#103113 (Zefram)
 

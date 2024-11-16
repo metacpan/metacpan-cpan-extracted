@@ -357,7 +357,7 @@ sub encode {
 
 # -------------------------------------
 
-sub option_names { grep $_ ne 'DEFAULT', keys %{OPTEXT()} }
+sub option_names { grep $_ ne 'DEFAULT', sort keys %{OPTEXT()} }
 
 sub optcode {
   my $class = shift;

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+cip exec cpanm -n https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Archive-Libarchive-Peek-0.05.tar.gz

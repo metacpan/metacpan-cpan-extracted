@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -30,6 +30,7 @@ my @files = (
     'lib/Tapper/Installer/Precondition/Rawimage.pm',
     'lib/Tapper/Installer/Precondition/Repository.pm',
     'lib/Tapper/Installer/Precondition/Simnow.pm',
+    't/00-compile.t',
     't/00-load.t',
     't/author-eol.t',
     't/author-pod-syntax.t',

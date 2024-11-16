@@ -1,6 +1,6 @@
 package Tapper::CLI::HostFeature;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::CLI::HostFeature::VERSION = '5.0.7';
+$Tapper::CLI::HostFeature::VERSION = '5.0.8';
 use 5.010;
 
 use warnings;
@@ -16,7 +16,7 @@ sub ar_get_host_feature_parameters {
         [ 'entry|e=s'   , 'host feature entry',                 ],
         (
             $s_cmd ne 'host-feature-delete'
-                ? ( [ 'value|v=s'   , 'host feature value',         ] )
+                ? ( [ 'value=s'   , 'host feature value',         ] )
                 : ( [ 'force|f'     , 'really delete host feature', ] )
         ),
         [ 'verbose|v'   , 'some more informational output',     ],
@@ -307,7 +307,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc.
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

@@ -37,7 +37,7 @@ https://github.com/pbhenson/Apache2-AuthCASpbh
 
 =head1 AUTHOR
 
-Copyright (c) 2018, Paul B. Henson <henson@acm.org>
+Copyright (c) 2018-2024, Paul B. Henson <henson@acm.org>
 
 This file is part of AuthCASpbh.
 

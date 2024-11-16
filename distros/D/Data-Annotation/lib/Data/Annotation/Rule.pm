@@ -4,7 +4,7 @@ use utf8;
 use Moo;
 use warnings;
 use experimental qw< signatures >;
-{ our $VERSION = '0.002' }
+{ our $VERSION = '0.004' }
 
 use Data::Annotation::Expression qw< evaluator_factory >;
 use namespace::clean;

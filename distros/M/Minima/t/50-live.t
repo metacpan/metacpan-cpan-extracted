@@ -6,8 +6,16 @@ use Minima::Setup;
 
 my $test = Minima::Setup::test;
 
+# Basic responses
 my $res = $test->request(GET '/');
 is( $res->content, "hello, world\n", 'hello, world\n' );
+
+$res = $test->request(HEAD '/');
+is( length($res->content), 0, 'returns empty body for HEAD /' );
+
+$Minima::Setup::app->set_config({ automatic_head => 0 });
+$res = $test->request(HEAD '/');
+ok( length($res->content), 'respects config for auto HEAD' );
 
 # Move to the complex example in eg/
 {

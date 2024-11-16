@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [27.0.2] - 2024-11-15
+### Fixed
+- [Elixir] Fix release process
+
 ## [27.0.1] - 2024-11-15
 ### Fixed
+- 
 - [Elixir] Restored test and release process
 
 ## [27.0.0] - 2024-10-26
@@ -558,7 +563,8 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v27.0.1...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v27.0.2...HEAD
+[27.0.2]: https://github.com/cucumber/messages/compare/v27.0.1...v27.0.2
 [27.0.1]: https://github.com/cucumber/messages/compare/v27.0.0...v27.0.1
 [27.0.0]: https://github.com/cucumber/messages/compare/v26.0.1...v27.0.0
 [26.0.1]: https://github.com/cucumber/messages/compare/v26.0.0...v26.0.1
