@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.417  2024-11-17
+        - Confirm update/delete without where clause.
+
 2.416  2024-10-28
         - Term::Choose minimum version 1.767.
 

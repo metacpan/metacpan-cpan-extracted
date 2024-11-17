@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.221';
+our $VERSION = '1.222';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -1793,6 +1793,11 @@ Nimm das Wurzelverzeichnis $path nicht in die Pfadliste mit auf.
 
 Folge Symbolic Links.
 
+=item -followSkip => $val (Default: 2)
+
+Definiert, was geschehen soll, wenn einem Symbolischen Link
+ein zweites Mal gefolgt wird. Siehe Doku.
+
 =item -leavesOnly => $bool (Default: 0)
 
 Liefere nur Pfade, die kein Anfang eines anderen Pfads sind.
@@ -1876,6 +1881,7 @@ sub find {
     my $exclude = undef;
     my $excludeRoot = 0;
     my $follow = 1;
+    my $followSkip = 2;
     my $leavesOnly = 0;
     my $olderThan = 0;
     my $outHandle = \*STDOUT;
@@ -1894,6 +1900,7 @@ sub find {
             -exclude => \$exclude,
             -excludeRoot => \$excludeRoot,
             -follow => \$follow,
+            -followSkip => \$followSkip,
             -leavesOnly => \$leavesOnly,
             -olderThan => \$olderThan,
             -outHandle => \$outHandle,
@@ -1992,7 +1999,11 @@ sub find {
             push @paths,$File::Find::name;
         }
     };
-    File::Find::find({wanted=>$sub,follow=>$follow},$dir);
+    File::Find::find({
+            wanted=>$sub,
+            follow=>$follow,
+            follow_skip=>$followSkip,
+        },$dir);
 
     if ($leavesOnly) {
         my @arr;
@@ -4225,7 +4236,7 @@ sub uid {
 
 =head1 VERSION
 
-1.221
+1.222
 
 =head1 AUTHOR
 

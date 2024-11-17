@@ -6,36 +6,36 @@ use Moo;
 
 use namespace::clean;
 
-with 'UserAgent::Any::Response';
+with 'UserAgent::Any::Response::Impl';
 
 our $VERSION = 0.01;
 
-sub status_code ($this) {
-  return $this->{res}->code;
+sub status_code ($self) {
+  return $self->{res}->code;
 }
 
-sub status_text ($this) {
-  return $this->{res}->message;
+sub status_text ($self) {
+  return $self->{res}->message;
 }
 
-sub success ($this) {
-  return $this->{res}->is_success;
+sub success ($self) {
+  return $self->{res}->is_success;
 }
 
-sub content ($this) {
-  return $this->{res}->decoded_content;
+sub content ($self) {
+  return $self->{res}->decoded_content;
 }
 
-sub raw_content ($this) {
-  return $this->{res}->content;
+sub raw_content ($self) {
+  return $self->{res}->content;
 }
 
-sub headers ($this) {
-  return $this->{res}->flatten();
+sub headers ($self) {
+  return $self->{res}->flatten();
 }
 
-sub header ($this, $header) {
-  return $this->{res}->header($header);
+sub header ($self, $header) {
+  return $self->{res}->header($header);
 }
 
 1;

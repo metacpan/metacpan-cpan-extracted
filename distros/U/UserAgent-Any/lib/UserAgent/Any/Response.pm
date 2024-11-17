@@ -3,39 +3,45 @@ package UserAgent::Any::Response;
 use 5.036;
 
 use Carp;
+use Moo;
 use Scalar::Util 'blessed';
 
 use namespace::clean;
 
 our $VERSION = 0.01;
 
-sub new ($class, $res) {
-  croak 'Passed Response object must be a blessed reference' unless blessed($res);
-  if ($res isa HTTP::Response) {
-    require UserAgent::Any::Response::Impl::HttpResponse;
-    return UserAgent::Any::Response::Impl::HttpResponse->new(res => $res);
-  } elsif ($res isa Mojo::Message::Response) {
-    require UserAgent::Any::Response::Impl::MojoMessageResponse;
-    return UserAgent::Any::Response::Impl::MojoMessageResponse->new(res => $res);
-  } elsif ($res isa HTTP::Promise::Response) {
-    require UserAgent::Any::Response::Impl::HttpPromiseResponse;
-    return UserAgent::Any::Response::Impl::HttpPromiseResponse->new(res => $res);
-  } elsif ($res->DOES('UserAgent::Any::Response')) {
-    return $res;
-  } else {
-    croak 'Unknown Response type "'.ref($res).'"';
-  }
-}
+around BUILDARGS => sub {
+  my ($orig, $class, @args) = @_;
 
-# Do not define methods after this line, otherwise they are part of the role.
-use Moo::Role;
+  return {res => $args[0]}
+      if @args == 1 && (ref($args[0]) ne 'HASH' || !blessed($args[0]));
 
-has res => (
+  return $class->$orig(@args);
+};
+
+has _impl => (
+  init_arg => 'res',
   is => 'ro',
   required => 1,
+  handles => 'UserAgent::Any::Response::Impl',
+  coerce => sub ($res) {
+    croak 'Passed Response object must be a blessed reference' unless blessed($res);
+    if ($res isa HTTP::Response) {
+      require UserAgent::Any::Response::Impl::HttpResponse;
+      return UserAgent::Any::Response::Impl::HttpResponse->new(res => $res);
+    } elsif ($res isa Mojo::Message::Response) {
+      require UserAgent::Any::Response::Impl::MojoMessageResponse;
+      return UserAgent::Any::Response::Impl::MojoMessageResponse->new(res => $res);
+    } elsif ($res isa HTTP::Promise::Response) {
+      require UserAgent::Any::Response::Impl::HttpPromiseResponse;
+      return UserAgent::Any::Response::Impl::HttpPromiseResponse->new(res => $res);
+    } elsif ($res->DOES('UserAgent::Any::Response')) {
+      return $res;
+    } else {
+      croak 'Unknown Response type "'.ref($res).'"';
+    }
+  }
 );
-
-requires qw(status_code status_text success content raw_content headers header);
 
 1;
 

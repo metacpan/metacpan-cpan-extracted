@@ -145,7 +145,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.221';
+our $VERSION = '1.222';
 
 use Quiq::Path;
 use Quiq::LockedCounter;
@@ -406,6 +406,41 @@ sub backUrlObj {
 
 # -----------------------------------------------------------------------------
 
+=head3 backWithParameters() - URL der Rückkehrseite mit zusätzlichen Parametern
+
+=head4 Synopsis
+
+  $url = $nav->backWithParameters(@keyVal);
+
+=head4 Returns
+
+(String) URL-String
+
+=head4 Description
+
+Liefere den URL der Rückkehrseite mit den zusätzlichen Parametern @keyVal.
+
+=head4 Example
+
+  my $backUrl = $nav->backWithParameters(
+      navMsg => 'FEHLER: Keine Datei hochgeladen',
+  );
+  $self->redirect_to($backUrl);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub backWithParameters {
+    my $self = shift;
+
+    my $backUrlObj = $self->backUrlObj->setQuery(@_);
+
+    return $backUrlObj->url;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 prevUrl() - URL der Vorgängerseite
 
 =head4 Synopsis
@@ -480,9 +515,45 @@ sub prevUrlObj {
 
 # -----------------------------------------------------------------------------
 
+=head3 prevWithParameters() - URL der Vorgängerseite mit zusätzlichen Parametern
+
+=head4 Synopsis
+
+  $url = $nav->prevWithParameters(@keyVal);
+
+=head4 Returns
+
+(String) URL-String
+
+=head4 Description
+
+Liefere den URL der Vorgängerseite mit den zusätzlichen
+Parametern @keyVal.
+
+=head4 Example
+
+  my $prevUrl = $nav->prevWithParameters(
+      navMsg => 'FEHLER: Datum ist Pflichtfeld',
+  );
+  $self->redirect_to($prevUrl);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub prevWithParameters {
+    my $self = shift;
+
+    my $backUrlObj = $self->backUrlObj->setQuery(@_);
+
+    return $backUrlObj->url;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.221
+1.222
 
 =head1 AUTHOR
 

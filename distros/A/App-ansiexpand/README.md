@@ -16,10 +16,11 @@ ansiunexpand \[ option \] file ...
        --tabspace=char          tab space character
        --tabstyle=style         tab style
        --ambiguous=wide|narrow  width of Unicode ambiguous character
+    -z --zap                    read whole contents at once
 
 # VERSION
 
-Version 1.05
+Version 1.06
 
 # DESCRIPTION
 
@@ -77,6 +78,11 @@ implementation detail.
 - **--ambiguous**=`wide`|`narrow`
 
     Set the width of Unicode ambiguous characters.  Default is `narrow`.
+
+- **-z**, **--zap**
+
+    Instead of processing one line at a time, read all data contained in
+    the file at once and processed together.
 
 # INCOMPATIBILITY
 

@@ -38,7 +38,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.221';
+our $VERSION = '1.222';
 
 # -----------------------------------------------------------------------------
 
@@ -134,7 +134,7 @@ sub next {
 
 =head1 VERSION
 
-1.221
+1.222
 
 =head1 AUTHOR
 

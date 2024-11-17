@@ -6,41 +6,41 @@ use Moo;
 
 use namespace::clean;
 
-with 'UserAgent::Any::Response';
+with 'UserAgent::Any::Response::Impl';
 
 our $VERSION = 0.01;
 
-sub status_code ($this) {
-  return $this->{res}->code;
+sub status_code ($self) {
+  return $self->{res}->code;
 }
 
-sub status_text ($this) {
-  return $this->{res}->message;
+sub status_text ($self) {
+  return $self->{res}->message;
 }
 
-sub success ($this) {
-  return $this->{res}->is_success;
+sub success ($self) {
+  return $self->{res}->is_success;
 }
 
-sub content ($this) {
-  return $this->{res}->text;
+sub content ($self) {
+  return $self->{res}->text;
 }
 
-sub raw_content ($this) {
-  return $this->{res}->body;
+sub raw_content ($self) {
+  return $self->{res}->body;
 }
 
-sub headers ($this) {
+sub headers ($self) {
   my @all_headers;
-  for my $k (@{$this->{res}->headers->names}) {
-    push @all_headers, map { ($k, $_) } $this->header($k);
+  for my $k (@{$self->{res}->headers->names}) {
+    push @all_headers, map { ($k, $_) } $self->header($k);
   }
   return @all_headers;
 }
 
-sub header ($this, $header) {
-  return @{$this->{res}->headers->every_header($header)} if wantarray;
-  return $this->{res}->headers->header($header);
+sub header ($self, $header) {
+  return @{$self->{res}->headers->every_header($header)} if wantarray;
+  return $self->{res}->headers->header($header);
 }
 
 1;

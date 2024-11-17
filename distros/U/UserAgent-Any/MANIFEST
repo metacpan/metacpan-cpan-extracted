@@ -3,10 +3,12 @@ cpanfile
 lib/UserAgent/Any.pm
 lib/UserAgent/Any/Impl.pm
 lib/UserAgent/Any/Impl/AnyEventUserAgent.pm
+lib/UserAgent/Any/Impl/Helper.pm
 lib/UserAgent/Any/Impl/HttpPromise.pm
 lib/UserAgent/Any/Impl/LwpUserAgent.pm
 lib/UserAgent/Any/Impl/MojoUserAgent.pm
 lib/UserAgent/Any/Response.pm
+lib/UserAgent/Any/Response/Impl.pm
 lib/UserAgent/Any/Response/Impl/HttpPromiseResponse.pm
 lib/UserAgent/Any/Response/Impl/HttpResponse.pm
 lib/UserAgent/Any/Response/Impl/MojoMessageResponse.pm

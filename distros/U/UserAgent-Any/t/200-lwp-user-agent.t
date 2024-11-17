@@ -20,12 +20,6 @@ sub get_ua {
   return UserAgent::Any->new($underlying_ua);
 }
 
-{
-  my $ua = get_ua();
-  isa_ok($ua, ['UserAgent::Any::Impl', 'UserAgent::Any::Impl::LwpUserAgent']);
-  DOES_ok($ua, 'UserAgent::Any');
-}
-
 TestSuite::run(\&get_ua);
 
 done_testing;

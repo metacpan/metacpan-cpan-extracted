@@ -165,8 +165,6 @@ my @death_tests = ([
 );
 
 sub run ($get_ua, $start_loop = undef, $stop_loop = undef) {
-  _start_server();
-
   my @runner = (
     ['sync', '', sub ($req, $proc) { $proc->($req) }],
     [
@@ -192,6 +190,9 @@ sub run ($get_ua, $start_loop = undef, $stop_loop = undef) {
   );
 
   my $ua = $get_ua->();
+  isa_ok($ua, 'UserAgent::Any');
+
+  _start_server();
 
   for my $run (@runner) {
     my ($run_name, $suffix, $handler) = @{$run};

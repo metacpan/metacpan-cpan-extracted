@@ -3,7 +3,7 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "0.0.8";
+our $VERSION = "0.1.0";
 
 use Exporter qw/import/;
 use File::Spec     qw//;
@@ -744,7 +744,7 @@ Aion::Fs - utilities for the file system: reading, writing, searching, replacing
 
 =head1 VERSION
 
-0.0.8
+0.1.0
 
 =head1 SYNOPSIS
 
@@ -801,7 +801,7 @@ The C<IO::All> supermodule is not a competitor to C<Aion::Fs>, because uses an O
 
 =head2 cat ($file)
 
-Reads the file. If no parameter is specified, use C<$_>.
+Reads the file. If no parameter is specified, uses C<$_>.
 
 	cat "/etc/passwd"  # ~> root
 
@@ -815,11 +815,25 @@ C<cat> throws an exception if the I/O operation fails:
 
 	eval { cat "A" }; $@  # ~> cat A: No such file or directory
 
---timeout
-13
+=head3 See also
 
---timeout
-13
+=over
+
+=item * <autodie> – C<< open $f, "r.txt"; $s = join "", E<lt>$fE<gt>; close $f >>.
+
+=item * <File::Slurp> - C<read_file('file.txt')>.
+
+=item * <File::Slurper> - C<read_text('file.txt')>, C<read_binary('file.txt')>.
+
+=item * <File::Util> - C<< File::Util-E<gt>new-E<gt>load_file(file =E<gt> 'file.txt') >>.
+
+=item * <IO::All> - C<< io('file.txt') E<gt> $contents >>.
+
+=item * <IO::Util> - C<$contents = ${ slurp 'file.txt' }>.
+
+=item * <Mojo::File> – C<< path($file)-E<gt>slurp >>.
+
+=back
 
 =head2 lay ($file?, $content)
 
@@ -838,11 +852,25 @@ Writes C<$content> to C<$file>.
 	
 	eval { lay "/", "↯" }; $@ # ~> lay /: Is a directory
 
---timeout
-13
+=head3 See also
 
---timeout
-13
+=over
+
+=item * <autodie> – C<< open $f, "E<gt>r.txt"; print $f $contents; close $f >>.
+
+=item * <File::Slurp> - C<write_file('file.txt', $contents)>.
+
+=item * <File::Slurper> - C<write_text('file.txt', $contents)>, C<write_binary('file.txt', $contents)>.
+
+=item * <IO::All> - C<< io('file.txt') E<lt> $contents >>.
+
+=item * <IO::Util> - C<slurp \$contents, 'file.txt'>.
+
+=item * <File::Util> - C<< File::Util-E<gt>new-E<gt>write_file(file =E<gt> 'file.txt', content =E<gt> $contents, bitmask =E<gt> 0644) >>.
+
+=item * <Mojo::File> – C<< path($file)-E<gt>spew($chars, 'UTF-8') >>.
+
+=back
 
 =head2 find (;$path, @filters)
 
@@ -884,11 +912,73 @@ B<Attention!> If C<errorenter> is not specified, then all errors are B<ignored>!
 	my $count = 0;
 	find "ex", sub { find_stop if ++$count == 3; 1}  # -> 2
 
---timeout
-13
+=head3 See also
 
---timeout
-13
+=over
+
+=item * <AudioFile::Find> - searches for audio files in the specified directory. Allows you to filter them by attributes: title, artist, genre, album and track.
+
+=item * <Directory::Iterator> - C<< $it = Directory::Iterator-E<gt>new($dir, %opts); push @paths, $_ while E<lt>$itE<gt> >>.
+
+=item * <IO::All> - C<< @paths = map { "$_" } grep { -f $_ && $_-E<gt>size E<gt> 10*1024 } io(".")-E<gt>all(0) >>.
+
+=item * <IO::All::Rule> - C<< $next = IO::All::Rule-E<gt>new-E<gt>file-E<gt>size("E<gt>10k")-E<gt>iter($dir1, $dir2); push @paths, "$f" while $f = $next-E<gt>() >>.
+
+=item * <File::Find> - C<find( sub { push @paths, $File::Find::name if /\.png/ }, $dir )>.
+
+=item * <File::Find::utf8> - like <File::Find>, only file paths are in I<utf8>.
+
+=item * <File::Find::Age> - sorts files by modification time (inherits <File::Find::Rule>): C<< File::Find::Age-E<gt>in($dir1, $dir2) >>.
+
+=item * <File::Find::Declare> — C<< @paths = File::Find::Declare-E<gt>new({ size =E<gt> 'E<gt>10K', perms =E<gt> 'wr-wr-wr-', modified =E<gt> 'E<lt>2010-01-30', recurse =E<gt> 1, dirs =E<gt> [$dir1] })-E<gt>find >>.
+
+=item * <File::Find::Iterator> - has an OOP interface with an iterator and the C<imap> and C<igrep> functions.
+
+=item * <File::Find::Match> - calls a handler for each matching filter. Similar to C<switch>.
+
+=item * <File::Find::Node> - traverses the file hierarchy in parallel by several processes: C<< tie @paths, IPC::Shareable, { key =E<gt> "GLUE STRING", create =E<gt> 1 }; File::Find::Node-E<gt>new(".")-E<gt>process(sub { my $f = shift; $f-E<gt>fork(5); tied(@paths)-E<gt>lock; push @paths, $ f-E<gt>path; tied(@paths)-E<gt>unlock })-E<gt>find; tied(@paths)-E<gt>remove >>.
+
+=item * <File::Find::Fast> - C<@paths = @{ find($dir) }>.
+
+=item * <File::Find::Object> - has an OOP interface with an iterator.
+
+=item * <File::Find::Parallel> - can compare two directories and return their union, intersection and quantitative intersection.
+
+=item * <File::Find::Random> - selects a file or directory at random from the file hierarchy.
+
+=item * <File::Find::Rex> - C<< @paths = File::Find::Rex-E<gt>new(recursive =E<gt> 1, ignore_hidden =E<gt> 1)-E<gt>query($dir, qr/^b/i) >>.
+
+=item * <File::Find::Rule> — C<< @files = File::Find::Rule-E<gt>any( File::Find::Rule-E<gt>file-E<gt>name('*.mp3', '*.ogg ')-E<gt>size('E<gt>2M'), File::Find::Rule-E<gt>empty )-E<gt>in($dir1, $dir2); >>. Has an iterator, procedural interface, and L<File::Find::Rule::ImageSize> and L<File::Find::Rule::MMagic> extensions: C<< @images = find(file =E<gt> magic =E<gt> 'image/*', '!image_x' =E<gt> 'E<gt>20', in =E<gt> '.') >>.
+
+=item * <File::Find::Wanted> - C<@paths = find_wanted( sub { -f && /\.png/ }, $dir )>.
+
+=item * <File::Hotfolder> - C<< watch( $dir, callback =E<gt> sub { push @paths, shift } )-E<gt>loop >>. Powered by C<AnyEvent>. Customizable. There is parallelization into several processes.
+
+=item * <File::Mirror> - also forms a parallel path for copying files: C<recursive { my ($src, $dst) = @_; push @paths, $src } '/path/A', '/path/B'>.
+
+=item * <File::Set> - C<< $fs = File::Set-E<gt>new; $fs-E<gt>add($dir); @paths = map { $_-E<gt>[0] } $fs-E<gt>get_path_list >>.
+
+=item * <File::Wildcard> — C<< $fw = File::Wildcard-E<gt>new(exclude =E<gt> qr/.svn/, case_insensitive =E<gt> 1, sort =E<gt> 1, path =E<gt> "src///*.cpp ", match =E<gt> qr(^src/(.*?)\.cpp$), derive =E<gt> ['src/$1.o','src/$1.hpp']); push @paths, $f while $f = $fw-E<gt>next >>.
+
+=item * <File::Wildcard::Find> - C<findbegin($dir); push @paths, $f while $f = findnext()> or C<findbegin($dir); @paths = findall()>.
+
+=item * <File::Util> - C<< File::Util-E<gt>new-E<gt>list_dir($dir, qw/ --pattern=\.txt$ --files-only --recurse /) >>.
+
+=item * <Mojo::File> – C<< say for path($path)-E<gt>list_tree({hidden =E<gt> 1, dir =E<gt> 1})-E<gt>each >>.
+
+=item * <Path::Find> - C<@paths = path_find( $dir, "*.png" )>. For complex queries, use I<matchable>: C<< my $sub = matchable( sub { my( $entry, $directory, $fullname, $depth ) = @_; $depth E<lt>= 3 } >>.
+
+=item * <Path::Extended::Dir> - C<< @paths = Path::Extended::Dir-E<gt>new($dir)-E<gt>find('*.txt') >>.
+
+=item * <Path::Iterator::Rule> - C<< $i = Path::Iterator::Rule-E<gt>new-E<gt>file; @paths = $i-E<gt>clone-E<gt>size("E<gt>10k")-E<gt>all(@dirs); $i-E<gt>size("E<lt>10k")... >>.
+
+=item * <Path::Class::Each> - C<< dir($dir)-E<gt>each(sub { push @paths, "$_" }) >>.
+
+=item * <Path::Class::Iterator> - C<< $i = Path::Class::Iterator-E<gt>new(root =E<gt> $dir, depth =E<gt> 2); until ($i-E<gt>done) { push @paths, $i-E<gt>next-E<gt>stringify } >>.
+
+=item * <Path::Class::Rule> - C<< @paths = Path::Class::Rule-E<gt>new-E<gt>file-E<gt>size("E<gt>10k")-E<gt>all($dir) >>.
+
+=back
 
 =head2 noenter (@filters)
 
@@ -907,16 +997,24 @@ Stops C<find> being called in one of its filters, C<errorenter> or C<noenter>.
 
 =head2 erase (@paths)
 
-Removes files and empty directories. Returns C<@paths>. If there is an I/O error, it throws an exception.
+Removes files and empty directories. Returns C<@paths>. Throws an exception if there is an I/O error.
 
 	eval { erase "/" }; $@  # ~> erase dir /: Device or resource busy
 	eval { erase "/dev/null" }; $@  # ~> erase file /dev/null: Permission denied
 
---timeout
-13
+=head3 See also
 
---timeout
-13
+=over
+
+=item * C<unlink> + C<rmdir>.
+
+=item * <File::Path> - C<remove_tree("dir")>.
+
+=item * <File::Path::Tiny> - C<File::Path::Tiny::rm($path)>. Does not throw exceptions.
+
+=item * <Mojo::File> – C<< path($file)-E<gt>remove >>.
+
+=back
 
 =head2 replace (&sub, @files)
 
@@ -932,7 +1030,7 @@ C<&sub> is called for each file in C<@files>. It transmits:
 
 =item * C<$a> — path to the file.
 
-=item * C<$b> — the layer by which the file was read and by which it will be written.
+=item * C<$b> — the layer with which the file was read and with which it will be written.
 
 =back
 
@@ -943,11 +1041,19 @@ In the example below, the file "replace.ex" is read by the C<:utf8> layer and wr
 	replace { $b = ":utf8"; y/a/¡/ } [$_, ":raw"];
 	cat  # => ¡bc
 
---timeout
-13
+=head3 See also
 
---timeout
-13
+=over
+
+=item * <File::Edit> – C<< File::Edit-E<gt>new($file)-E<gt>replace('x', 'y')-E<gt>save >>.
+
+=item * <File::Edit::Portable> – C<< File::Edit::Portable-E<gt>new-E<gt>splice(file =E<gt> $file, line =E<gt> 10, contens =E<gt> ["line1", "line2"]) >>.
+
+=item * <File::Replace> – C<< ($infh,$outfh,$repl) = replace3($file); while (E<lt>$infhE<gt>) { print $outfh "X: $_" } $repl-E<gt>finish >>.
+
+=item * <File::Replace::Inplace>.
+
+=back
 
 =head2 mkpath (;$path)
 
@@ -973,8 +1079,7 @@ Like B<mkdir -p>, but considers the last part of the path (after the last slash)
 	mkpath "A///./file";
 	-d "A"  # -> 1
 
---timeout
-13
+=head3 See also
 
 =over
 
@@ -995,11 +1100,19 @@ Throws an exception if the file does not exist or does not have permission:
 	
 	mtime ["/"]   # ~> ^\d+(\.\d+)?$
 
---timeout
-13
+=head3 See also
 
---timeout
-13
+=over
+
+=item * C<-M> — C<-M "file.txt">, C<-M _> in days from the current time.
+
+=item * <stat> - C<(stat "file.txt")[9]> in seconds (unixtime).
+
+=item * <Time::HiRes> - C<(Time::HiRes::stat "file.txt")[9]> in seconds with fractional part.
+
+=item * <Mojo::File> - C<< path($file)-E<gt>stat-E<gt>mtime >>.
+
+=back
 
 =head2 sta (;$path)
 
@@ -1015,8 +1128,7 @@ Throws an exception if the file does not exist or does not have permission:
 	sta(["/"])->{ino} # ~> ^\d+$
 	sta(".")->{atime} # ~> ^\d+(\.\d+)?$
 
---timeout
-13
+=head3 See also
 
 =over
 
@@ -1052,8 +1164,17 @@ Throws an exception if the file does not exist or does not have permission:
 
 Splits a file path into its components or assembles it from its components.
 
---timeout
-13
+=over
+
+=item * If it receives a reference to an array, it treats its first element as a path.
+
+=item * If it receives a link to a hash, it collects a path from it. Unfamiliar keys are simply ignored. The set of keys for each FS is different.
+
+=item * FS is taken from the system variable C<$^O>.
+
+=item * The file system is not accessed.
+
+=back
 
 	{
 	    local $^O = "freebsd";
@@ -1284,37 +1405,61 @@ Splits a file path into its components or assembles it from its components.
 	}
 	
 
---timeout
-13
+=head3 See also
 
---timeout
-13
+=over
 
---timeout
-13
+=item * https://en.wikipedia.org/wiki/Path_(computing)
 
---timeout
-13
+=back
 
---timeout
-13
+Modules for determining the OS, and therefore determining what file paths are in the OS:
 
---timeout
-13
+=over
+
+=item * C<$^O> – superglobal variable with the name of the current OS.
+
+=item * <Devel::CheckOS>, <Perl::OSType> – define the OS.
+
+=item * <Devel::AssertOS> – prohibits the use of the module outside the specified OS.
+
+=item * <System::Info> – information about the OS, its version, distribution, CPU and host.
+
+=back
+
+Parts of file paths are distinguished:
+
+=over
+
+=item * <File::Spec> – C<< ($volume, $directories, $file) = File::Spec-E<gt>splitpath($path) >>. Only supports unix, win32, os/2, vms, cygwin and amigaos.
+
+=item * <File::Spec::Functions> – C<($volume, $directories, $file) = splitpath($path)>.
+
+=item * <File::Spec::Mac> - included in <File::Spec>, but not defined by it, so it must be used separately. For mac os version 9.
+
+=item * <File::Basename> – C<($name, $path, $suffix) = fileparse($fullname, @suffixlist)>.
+
+=item * <Path::Class::File> – C<< file('foo', 'bar.txt')-E<gt>is_absolute >>.
+
+=item * <Path::Extended::File> – C<< Path::Extended::File-E<gt>new($file)-E<gt>basename >>.
+
+=item * <Mojo::File> – C<< path($file)-E<gt>extname >>.
+
+=item * <Path::Util> – C<$filename = basename($dir)>.
+
+=item * <Parse::Path> – C<< Parse::Path-E<gt>new(path =E<gt> 'gophers[0].food.count', style =E<gt> 'DZIL')-E<gt>push("chunk") >>. Works with paths as arrays (C<push>, C<pop>, C<shift>, C<splice>). It also overloads comparison operators. It has styles: C<DZIL>, C<File::Unix>, C<File::Win32>, C<PerlClass> and C<PerlClassUTF8>.
+
+=back
 
 =head2 transpath ($path?, $from, $to)
 
---timeout
-13
+Converts a path from one OS format to another.
 
---timeout
-13
+If C<$path> is not specified, C<$_> is used.
 
---timeout
-13
+For a list of supported operating systems, see the examples of the C<path> subroutine just above or like this: C<keys %Aion::Fs::FS>.
 
---timeout
-13
+OS names are case insensitive.
 
 	local $_ = ">x>y>z.doc.zip";
 	transpath "vos", "unix"       # \> /x/y/z.doc.zip
@@ -1323,45 +1468,37 @@ Splits a file path into its components or assembles it from its components.
 
 =head2 splitdir (;$dir)
 
---timeout
-13
+Splits a directory into components. The directory should first be obtained from C<< path-E<gt>{dir} >>.
 
 	local $^O = "unix";
 	[ splitdir "/x/" ]    # --> ["", "x", ""]
 
---timeout
-13
+=head2 joindir (;$dirparts)
 
---timeout
-13
+Combines a directory from its components. The resulting directory should then be included in C<< path +{dir =E<gt> $dir} >>.
 
 	local $^O = "unix";
 	joindir qw/x y z/    # => x/y/z
 	
 	path +{ dir => joindir qw/x y z/ } # => x/y/z/
 
---timeout
-13
+=head2 splitext (;$ext)
 
---timeout
-13
+Breaks the extension into its components. The extension should first be obtained from C<< path-E<gt>{ext} >>.
 
 	local $^O = "unix";
 	[ splitext ".x." ]    # --> ["", "x", ""]
 
---timeout
-13
+=head2 joinext (;$extparts)
 
---timeout
-13
+Combines an extension from its components. The resulting extension should then be included in C<< path +{ext =E<gt> $ext} >>.
 
 	local $^O = "unix";
 	joinext qw/x y z/    # => x.y.z
 	
 	path +{ ext => joinext qw/x y z/ } # => .x.y.z
 
---timeout
-13
+=head2 include (;$pkg)
 
 Connects C<$pkg> (if it has not already been connected via C<use> or C<require>) and returns it. Without a parameter, uses C<$_>.
 

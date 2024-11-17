@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 BEGIN {
     if ($0 =~ /unexpand$/) {
@@ -35,10 +35,11 @@ ansiunexpand [ option ] file ...
        --tabspace=char          tab space character
        --tabstyle=style         tab style
        --ambiguous=wide|narrow  width of Unicode ambiguous character
+    -z --zap                    read whole contents at once
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 DESCRIPTION
 
@@ -101,6 +102,11 @@ defined in L<Text::ANSI::Fold> library.
 =item B<--ambiguous>=C<wide>|C<narrow>
 
 Set the width of Unicode ambiguous characters.  Default is C<narrow>.
+
+=item B<-z>, B<--zap>
+
+Instead of processing one line at a time, read all data contained in
+the file at once and processed together.
 
 =back
 

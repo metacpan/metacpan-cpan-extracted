@@ -46,7 +46,7 @@ sub table_write_access {
     if ( ! @stmt_types ) {
         return;
     }
-    my $old_idx = 0;
+    my $old_idx_type = 0;
 
     STMT_TYPE: while ( 1 ) {
         my $prompt = 'Choose SQL type:';
@@ -55,17 +55,17 @@ sub table_write_access {
         # Choose
         my $idx = $tc->choose(
             $menu,
-            { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $old_idx }
+            { %{$sf->{i}{lyt_v}}, prompt => $prompt, index => 1, default => $old_idx_type }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $old_idx = 0;
+            if ( $old_idx_type == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $old_idx_type = 0;
                 next STMT_TYPE;
             }
-            $old_idx = $idx;
+            $old_idx_type = $idx;
         }
         my $stmt_type = $menu->[$idx];
         $stmt_type =~ s/^-\ //;
@@ -87,7 +87,7 @@ sub table_write_access {
             set    => '- SET',
             where  => '- WHERE',
         );
-        my $old_idx = 0;
+        my $old_idx_cust = 0;
 
         CUSTOMIZE: while ( 1 ) {
             my $menu = [ undef, @cu{@{$sub_stmts->{$stmt_type}}} ];
@@ -95,18 +95,18 @@ sub table_write_access {
             # Choose
             my $idx = $tc->choose(
                 $menu,
-                { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Customize:', index => 1, default => $old_idx }
+                { %{$sf->{i}{lyt_v}}, info => $info, prompt => 'Customize:', index => 1, default => $old_idx_cust }
             );
             $ax->print_sql_info( $info );
             if ( ! defined $idx || ! defined $menu->[$idx] ) {
                 next STMT_TYPE;
             }
             if ( $sf->{o}{G}{menu_memory} ) {
-                if ( $old_idx == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                    $old_idx = 0;
+                if ( $old_idx_cust == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                    $old_idx_cust = 0;
                     next CUSTOMIZE;
                 }
-                $old_idx = $idx;
+                $old_idx_cust = $idx;
             }
             my $custom = $menu->[$idx];
             if ( $custom eq $cu{'set'} ) {
@@ -116,6 +116,23 @@ sub table_write_access {
                 $sb->where( $sql );
             }
             elsif ( $custom eq $cu{'commit'} ) {
+                if ( $stmt_type =~/^(Delete|Update)\z/i && ! length $sql->{where_stmt} ) {
+                    my ( $no, $yes ) = ( 'No', 'Yes' );
+                    my $prompt = uc( $stmt_type ) . ' without WHERE clause?';
+                    my $menu = [ undef, $no, $yes ];
+                    # Choose
+                    my $choice = $tc->choose(
+                        $menu,
+                        { %{$sf->{i}{lyt_h}}, info => $info, prompt => $prompt }
+                    );
+                    if ( ! defined $choice ) {
+                        next STMT_TYPE;
+                    }
+                    elsif ( $choice eq $no ) {
+                        $old_idx_cust = 0;
+                        next CUSTOMIZE;
+                    }
+                }
                 $cs->commit_sql( $sql );
                 next STMT_TYPE;
             }

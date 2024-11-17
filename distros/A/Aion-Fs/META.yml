@@ -33,7 +33,7 @@ no_index:
 provides:
   Aion::Fs:
     file: lib/Aion/Fs.pm
-    version: v0.0.8
+    version: v0.1.0
 requires:
   File::Spec: '0'
   Scalar::Util: '0'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/darviarush/perl-aion-fs/issues
   homepage: https://github.com/darviarush/perl-aion-fs
   repository: https://github.com/darviarush/perl-aion-fs.git
-version: 0.0.8
+version: 0.1.0
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'

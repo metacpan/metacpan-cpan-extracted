@@ -4,39 +4,13 @@ use 5.036;
 
 use Carp;
 use Exporter 'import';
+use Moo;
 use Scalar::Util 'blessed';
 
 use namespace::clean -except => ['import'];
 
-our $VERSION = 0.01;
+our $VERSION = 0.03;
 our @EXPORT_OK = ('wrap_method');
-
-# The class hierarchy here is somehow inside out. When you call
-# UserAgent::Any->new, the constructor in fact delegates to one of the
-# implementations class which are (ISA) UserAgent::Any::Impl and which have
-# (DOES) the UserAgent::Any role. This makes deriving from this class be a
-# little difficult. Instead you should in general use composition or delegation.
-
-sub new ($class, $ua) {
-  croak 'Passed User Agent object must be a blessed reference' unless blessed($ua);
-  if ($ua isa LWP::UserAgent) {
-    require UserAgent::Any::Impl::LwpUserAgent;
-    return UserAgent::Any::Impl::LwpUserAgent->new(ua => $ua);
-  } elsif ($ua isa AnyEvent::UserAgent) {
-    require UserAgent::Any::Impl::AnyEventUserAgent;
-    return UserAgent::Any::Impl::AnyEventUserAgent->new(ua => $ua);
-  } elsif ($ua isa Mojo::UserAgent) {
-    require UserAgent::Any::Impl::MojoUserAgent;
-    return UserAgent::Any::Impl::MojoUserAgent->new(ua => $ua);
-  } elsif ($ua isa HTTP::Promise) {
-    require UserAgent::Any::Impl::HttpPromise;
-    return UserAgent::Any::Impl::HttpPromise->new(ua => $ua);
-  } elsif ($ua->DOES('UserAgent::Any')) {
-    return $ua;
-  } else {
-    croak 'Unknown User Agent type "'.ref($ua).'"';
-  }
-}
 
 sub _wrap_response {
   return undef unless @_;  ## no critic (ProhibitExplicitReturnUndef)
@@ -50,47 +24,74 @@ sub wrap_method {  ## no critic (RequireArgUnpacking)
   my ($method, $code, $cb) = @_;
   my $dest_pkg = caller(0);
   no strict 'refs';  ## no critic (ProhibitNoStrict)
-  my $get_obj = defined $member ? sub ($this) { $this->$member() } : sub ($this) { $this };
+  my $get_obj = defined $member ? sub ($self) { $self->$member() } : sub ($self) { $self };
   if (defined $cb) {
-    *{"${dest_pkg}::${name}"} = sub ($this, @args) {
-      $cb->($this, _wrap_response($get_obj->($this)->$method($code->($this, @args))), @args);
+    *{"${dest_pkg}::${name}"} = sub ($self, @args) {
+      $cb->($self, _wrap_response($get_obj->($self)->$method($code->($self, @args))), @args);
     };
     my $method_cb = "${method}_cb";
-    *{"${dest_pkg}::${name}_cb"} = sub ($this, @args) {
+    *{"${dest_pkg}::${name}_cb"} = sub ($self, @args) {
       return sub ($final_cb) {
-        $get_obj->($this)->$method_cb($code->($this, @args))
-            ->(sub { $final_cb->($cb->($this, &_wrap_response, @args)) });
+        $get_obj->($self)->$method_cb($code->($self, @args))
+            ->(sub { $final_cb->($cb->($self, &_wrap_response, @args)) });
       }
     };
     my $method_p = "${method}_p";
-    *{"${dest_pkg}::${name}_p"} = sub ($this, @args) {
-      $get_obj->($this)->$method_p($code->($this, @args))
-          ->then(sub { $cb->($this, &_wrap_response, @args) });
+    *{"${dest_pkg}::${name}_p"} = sub ($self, @args) {
+      $get_obj->($self)->$method_p($code->($self, @args))
+          ->then(sub { $cb->($self, &_wrap_response, @args) });
     };
   } else {
     *{"${dest_pkg}::${name}"} =
-        sub ($this, @args) { $get_obj->($this)->$method($code->($this, @args)) };
+        sub ($self, @args) { $get_obj->($self)->$method($code->($self, @args)) };
     my $method_cb = "${method}_cb";
     *{"${dest_pkg}::${name}_cb"} =
-        sub ($this, @args) { $get_obj->($this)->$method_cb($code->($this, @args)) };
+        sub ($self, @args) { $get_obj->($self)->$method_cb($code->($self, @args)) };
     my $method_p = "${method}_p";
     *{"${dest_pkg}::${name}_p"} =
-        sub ($this, @args) { $get_obj->($this)->$method_p($code->($this, @args)) };
+        sub ($self, @args) { $get_obj->($self)->$method_p($code->($self, @args)) };
   }
   return;
 }
 
-# Do not define methods after this line, otherwise they are part of the role.
-use Moo::Role;
+# We expect a single argument to this class, so we take it without the need to
+# pass it in a hash. See:
+# https://metacpan.org/pod/Moo#BUILDARGS
+around BUILDARGS => sub {
+  my ($orig, $class, @args) = @_;
 
-has ua => (
+  return {ua => $args[0]}
+      if @args == 1 && (ref($args[0]) ne 'HASH' || !blessed($args[0]));
+
+  return $class->$orig(@args);
+};
+
+has _impl => (
+  init_arg => 'ua',
   is => 'ro',
   required => 1,
+  handles => 'UserAgent::Any::Impl',
+  coerce => sub ($ua) {
+    croak 'Passed User Agent object must be a blessed reference' unless blessed($ua);
+    if ($ua isa LWP::UserAgent) {
+      require UserAgent::Any::Impl::LwpUserAgent;
+      return UserAgent::Any::Impl::LwpUserAgent->new(ua => $ua);
+    } elsif ($ua isa AnyEvent::UserAgent) {
+      require UserAgent::Any::Impl::AnyEventUserAgent;
+      return UserAgent::Any::Impl::AnyEventUserAgent->new(ua => $ua);
+    } elsif ($ua isa Mojo::UserAgent) {
+      require UserAgent::Any::Impl::MojoUserAgent;
+      return UserAgent::Any::Impl::MojoUserAgent->new(ua => $ua);
+    } elsif ($ua isa HTTP::Promise) {
+      require UserAgent::Any::Impl::HttpPromise;
+      return UserAgent::Any::Impl::HttpPromise->new(ua => $ua);
+    } elsif ($ua->DOES('UserAgent::Any')) {
+      return $ua;
+    } else {
+      croak 'Unknown User Agent type "'.ref($ua).'"';
+    }
+  }
 );
-
-my @methods = qw(get post delete);
-
-requires map { ($_, $_.'_cb', $_.'_p') } @methods;
 
 1;
 
@@ -131,7 +132,8 @@ contribute new features if needed.
 =head3 L<LWP::UserAgent>
 
 When using an L<LWP::UserAgent>, a C<UserAgent::Any> object only implements the
-synchronous calls (without the C<_cb> or C<_p> suffixes).
+synchronous calls (without the C<_cb> or C<_p> suffixes) and the asynchronous
+ones will throw exceptions when called.
 
 =head3 L<Mojo::UserAgent>
 
@@ -176,8 +178,21 @@ The wrapped object must be an instance of a
 L<supported user agent|/Supported user agents>. Feel free to ask for or
 contribute new implementations.
 
-Note that C<UserAgent::Any> is a L<Moo::Role> and not a class. As such you can
-compose it or delegate to it, but you can’t extend it directly.
+=head2 Synchronous and asynchronous supports
+
+When supported by the underlying user agent, all the C<UserAgent::Any> methods
+exist in 3 versions. The synchronous version, without a suffix, and two
+asynchronous versions, one taking a callback executed when the call is done and
+one returning a promise that is fulfilled with the result of the call
+
+Note that, as documented above in L<supported user agent|Supported user agents>,
+the asynchronous methods will throw an exception if the object is built with a
+user agent that does not support asynchronous calls.
+
+See the documentation of the L<C<get()> method|/get> for more explanation on the
+asynchronous support. And see the documentation of the
+L<C<wrap_method()> function|/wrap_method> to learn how you can easily expose
+sets of methods with the same sync/async semantics in your own library.
 
 =head2 User agent methods
 
@@ -189,10 +204,32 @@ compose it or delegate to it, but you can’t extend it directly.
 
   my $promise = $ua->get_p($url, %params);
 
-Note that while the examples above are using C<%params>, the parameters are
-actually treated as a list as the same key can appear multiple times to send the
-same header multiple time. But that list must be an even-sized list of
-alternating key-value pairs.
+Execute an HTTP call with the C<GET> verb to the given url and with the
+specified parameters, passed as request headers.
+
+Note that, while the examples above are using C<%params>, the arguments are
+actually treated as a list and the same key can appear multiple times to send
+the same header multiple times. So, that list of arguments must still be an
+even-sized list of alternating key-value pairs.
+
+Like all the user agent methods below, the synchronous C<get()> returns a
+L<UserAgent::Any::Response> object, the asynchronous-with-callback C<get_cb()>
+returns a code-reference expecting a callback that will be called with an
+L<UserAgent::Any::Response> object, and the promise based C<get_p()> will return
+a promise, whose type depends on the type of user agent used, and that will be
+fulfilled with a L<UserAgent::Any::Response> object once the request returns.
+
+Note that the two steps call to C<get_cb()> is just syntactic sugar and the
+actual GET call is done after the callback is passed. Nothing will happen if the
+code reference returned by C<get_cb()> is not called.
+
+If an error happens (like an invalid argument) these methods will throw an
+exception synchronously in the initial call. It is unlikely (but possible) that
+the methods fail during the processing of the request in which case the error
+handling depends on the underlying user agent asynchronous model. With the
+callback based methods you can generally not catch the errors while the promise
+based one can allow it (in general through a C<catch()> method or a second
+argument to the C<then()> method).
 
 =head3 post
 
@@ -202,10 +239,10 @@ alternating key-value pairs.
 
   my $promise = $ua->post_p($url, %params, $content);
 
-This is similar to the C<get> method except that the call uses the C<POST> HTTP
-verb. in addition to the C<$url> and C<%params> (which is still actually a
-C<@params>), this method can take an optional C<$content> scalar that will be
-sent as the body of the request.
+This is similar to the C<get> method, except that the call uses the C<POST> HTTP
+verb. Also, in addition to the C<$url> and C<%params> (which is still actually a
+C<@params>) arguments, this method can take an optional C<$content> scalar that
+will be sent as the body of the request.
 
 =head3 delete
 
@@ -237,7 +274,7 @@ Same as the C<post> method, but uses the C<PATCH> HTTP verb for the request.
 
 Same as the C<post> method, but uses the C<PUT> HTTP verb for the request.
 
-=head3 HEAD
+=head3 head
 
   my $res = $ua->head($url, %params);
 
@@ -249,28 +286,34 @@ Same as the C<get> method, but uses the C<HEAD> HTTP verb for the request. Note
 that it means that in general the user agent will ignore the content returned by
 the server (except for the headers), even if some content is returned.
 
-=head2 Using UserAgent::Any in client APIs
+=head2 Using UserAgent::Any in client libraries
+
+This section describes how to write higher level client libraries, on top of
+C<UserAgent::Any>, while retaining its benefit (support for any user agents and
+multiple asynchronous models).
 
 =head3 wrap_method
+
+The C<wrap_method()> function (which is the only one that can be exported by
+this module) is there to help implement API client library using
+C<UserAgent::Any> and expose methods handling callback and promise without
+having to implement them all.
 
 =head4 Calling a class method
 
   wrap_method($name => $delegate, sub ($self, ...) { ... }, sub ($self, $res, ...));
 
-This method (which is the only one that can be exported by this module) is there
-to help implement API client library using C<UserAgent::Any> and expose methods
-handling callback and promise without having to implement them all.
+The call above will generate in your class a set of methods named C<$name>,
+C<$name_cb>, and C<$name_p>. These methods will each execute the first sub that
+was passed to C<wrap_method()> and then pass the results to the method named
+with C<$delegate> and a suffix matching that of the function called. The result
+of that call if passed to the second sub, if it was provided, in the right async
+context (in a callback or a C<then> method of a promise).
 
-The call above will generate in your class a set of method named with C<$name>
-and the (optional) suffix C<_cb> and C<_p>, that will call the methods named
-with C<$delegate> and the same suffix on the same object, passing it the result
-of the first code reference and passing the result of that call to the second
-code reference.
-
-For example, if you have a class that can handle methods C<foo>, C<foo_cb>, and
-C<foo_p> with the same semantics as the user agent methods above (this will
-typically be the methods for C<UserAgent::Any> itself) and you want to expose a
-method C<bar> that depends on C<foo> you can write:
+For example, if you have a class that can I<already> handle methods C<foo>,
+C<foo_cb>, and C<foo_p> with the same semantics as the user agent methods above
+(this will typically be the methods for C<UserAgent::Any> itself) and you want
+to expose a method C<bar> that depends on C<foo> you can write:
 
   wrap_method('bar' => 'foo', sub ($self, @args) { make_args_for_foo($@args) });
 
@@ -308,15 +351,8 @@ by the call to C<&method>.
 
 =head3 Example
 
-Here is a minimal example on how to create a client library for a hypothetical
-service exposing a C<create> call using the C<POST> method.
-
-Note in particular that, to bring the C<post> method from C<UserAgent::Any> in
-C<MyPackage>, we are using L<Moo> delegation to the C<UserAgent::Any>
-package, which is an L<Moo::Role> with the user agent methods.
-
-Another class extending C<MyPackage> would not need this trick and could
-directly derive from C<MyPackage> without issues.
+Here is are two minimal example on how to create a client library for a
+hypothetical service exposing a C<create> call using the C<POST> method.
 
   package MyPackage;
 
@@ -327,19 +363,14 @@ directly derive from C<MyPackage> without issues.
 
   use namespace::clean;
 
-  has ua => (
-    is => 'ro',
-    handles => 'UserAgent::Any',
-    coerce => sub { UserAgent::Any->new($_[0]) },
-    required => 1,
-  );
+  extends 'UserAgent::Any';
 
   wrap_method(create_document => 'post', sub ($self, %opts) {
     return ('https://example.com/create/'.$opts{document_id}, $opts{content});
   });
 
 Or, if you don’t want to re-expose the C<UserAgent::Any> method in your class
-directly (possibly because you want to re-use the same name), you can do:
+directly (possibly because you want to re-use the same names), you can do:
 
   package MyPackage;
 

@@ -28,7 +28,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.221';
+our $VERSION = '1.222';
 
 use Quiq::Url;
 use Quiq::Hash::Ordered;
@@ -131,7 +131,7 @@ sub queryString {
 
 =head4 Synopsis
 
-  $urlObj->setQuery(@keyVal);
+  $urlObj = $urlObj->setQuery(@keyVal);
 
 =head4 Arguments
 
@@ -142,6 +142,10 @@ sub queryString {
 Liste von Schlüssel-Wert-Paaren
 
 =back
+
+=head4 Returns
+
+(Object) Das URl-Objekt (für Methodenverkettung)
 
 =head4 Description
 
@@ -184,7 +188,7 @@ sub setQuery {
         push @$arr,$type eq 'ARRAY'? @$val: $val;
     }
 
-    return;
+    return $self;
 }
 
 # -----------------------------------------------------------------------------
@@ -240,7 +244,7 @@ sub url {
 
 =head1 VERSION
 
-1.221
+1.222
 
 =head1 AUTHOR
 

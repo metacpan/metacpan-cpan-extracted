@@ -1,5 +1,9 @@
 Revision history for Perl extension Aion::Fs
 
+0.1.0 2024-11-16T12:11:03Z
+
+    - change translate from ru to en
+
 0.0.8 2024-11-08T16:27:58Z
 
     - add subroutines "path" and "transpath" with more OS

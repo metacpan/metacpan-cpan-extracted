@@ -16,7 +16,7 @@ use Test::More;
 use Path::Tiny;
 
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings' => ':fail_on_warning'; # hooks into done_testing unless overridden
-use Test::JSON::Schema::Acceptance 1.014;
+use Test::JSON::Schema::Acceptance 1.026;
 use JSON::Schema::Tiny;
 
 BEGIN {
@@ -36,7 +36,6 @@ sub acceptance_tests (%options) {
     $ENV{TEST_DIR} ? (test_dir => $ENV{TEST_DIR})
       : $ENV{TEST_PREFIXDIR} ? (test_dir => path($ENV{TEST_PREFIXDIR}, 'tests', $options{acceptance}{specification})) : (),
   );
-  $accepter->_json_decoder->allow_bignum; # TODO: switch to public accessor with TJSA 1.015
 
   my $js = JSON::Schema::Tiny->new($options{evaluator}->%*);
   my $js_short_circuit = $ENV{NO_SHORT_CIRCUIT} || JSON::Schema::Tiny->new($options{evaluator}->%*, short_circuit => 1);

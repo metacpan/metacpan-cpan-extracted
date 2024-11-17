@@ -41,12 +41,6 @@ sub get_ua {
   return UserAgent::Any->new($underlying_ua);
 }
 
-{
-  my $ua = get_ua();
-  isa_ok($ua, ['UserAgent::Any::Impl', 'UserAgent::Any::Impl::HttpPromise']);
-  DOES_ok($ua, 'UserAgent::Any');
-}
-
 my $done : shared = 0;
 TestSuite::run(\&get_ua, sub { 1 until $done; $done = 0 }, sub { $done = 1 });
 

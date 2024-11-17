@@ -1,5 +1,13 @@
 Revision history for JSON-Schema-Tiny
 
+0.026     2024-11-16 22:05:15Z
+          - some performance optimizations for schema traversal and evaluation
+          - is_equal() utility function, and the const and enum keywords, now
+            provide more detailed error diagnostics
+          - numeric type checking is relaxed, now allowing for dualvars
+            arising from the simple case of using a number in string context
+            or a string in numeric context (only a problem in perls <5.36)
+
 0.025     2024-06-11 20:17:39Z
           - update test results and exemptions for TJSA 1.025
 

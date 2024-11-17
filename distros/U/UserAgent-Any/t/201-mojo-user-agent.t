@@ -20,12 +20,6 @@ sub get_ua {
   return UserAgent::Any->new($underlying_ua);
 }
 
-{
-  my $ua = get_ua();
-  isa_ok($ua, ['UserAgent::Any::Impl', 'UserAgent::Any::Impl::MojoUserAgent']);
-  DOES_ok($ua, 'UserAgent::Any');
-}
-
 TestSuite::run(\&get_ua, sub { Mojo::IOLoop->start }, sub { Mojo::IOLoop->stop });
 
 done_testing;

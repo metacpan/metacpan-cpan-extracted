@@ -89,7 +89,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Tiny",
-      "dist_version" => "0.025",
+      "dist_version" => "0.026",
       "license" => "perl",
       "module_name" => "JSON::Schema::Tiny",
       "recursive_test_files" => 1,
@@ -109,12 +109,15 @@ EOW
         "Scalar::Util" => 0,
         "Storable" => 0,
         "autovivification" => 0,
+        "builtin::compat" => 0,
+        "constant" => 0,
         "experimental" => "0.026",
         "if" => 0,
         "namespace::clean" => 0,
         "perl" => "5.020",
         "stable" => "0.031",
-        "strictures" => 2
+        "strictures" => 2,
+        "warnings" => 0
       },
       "test_requires" => {
         "Data::Dumper" => 0,
@@ -125,16 +128,14 @@ EOW
         "Path::Tiny" => 0,
         "Test::Deep" => 0,
         "Test::Fatal" => 0,
-        "Test::JSON::Schema::Acceptance" => "1.014",
+        "Test::JSON::Schema::Acceptance" => "1.026",
         "Test::More" => "0.96",
         "Test::Warnings" => 0,
-        "constant" => 0,
         "lib" => 0,
         "open" => 0,
         "perl" => "5.020",
         "strict" => 0,
-        "utf8" => 0,
-        "warnings" => 0
+        "utf8" => 0
       }
     );
 
@@ -148,16 +149,14 @@ EOW
       "Path::Tiny" => 0,
       "Test::Deep" => 0,
       "Test::Fatal" => 0,
-      "Test::JSON::Schema::Acceptance" => "1.014",
+      "Test::JSON::Schema::Acceptance" => "1.026",
       "Test::More" => "0.96",
       "Test::Warnings" => 0,
-      "constant" => 0,
       "lib" => 0,
       "open" => 0,
       "perl" => "5.020",
       "strict" => 0,
-      "utf8" => 0,
-      "warnings" => 0
+      "utf8" => 0
     );
 
 

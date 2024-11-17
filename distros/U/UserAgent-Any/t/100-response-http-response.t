@@ -17,8 +17,7 @@ my $raw_response = HTTP::Response->new(200, 'success', \@raw_headers, $raw_conte
 
 my $r = CLASS()->new($raw_response);
 
-isa_ok($r, 'UserAgent::Any::Response::Impl::HttpResponse');
-DOES_ok($r, 'UserAgent::Any::Response');
+isa_ok($r, 'UserAgent::Any::Response');
 
 is($r->res, exact_ref($raw_response), 'res');
 is($r->status_code, 200, 'status_code');

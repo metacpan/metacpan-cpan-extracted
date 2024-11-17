@@ -1,11 +1,11 @@
 # vim: set ft=perl ts=8 sts=2 sw=2 tw=100 et :
 use strictures 2;
-package JSON::Schema::Tiny; # git description: v0.024-3-g81fed08
+package JSON::Schema::Tiny; # git description: v0.025-18-gd5b9b7f
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use 5.020;  # for unicode_strings, signatures, postderef features
 use stable 0.031 'postderef';
@@ -25,7 +25,8 @@ use Mojo::JSON ();  # for JSON_XS, MOJO_NO_JSON_XS environment variables
 use Feature::Compat::Try;
 use JSON::PP ();
 use List::Util 1.33 qw(any none);
-use Scalar::Util qw(blessed looks_like_number);
+use Scalar::Util 'looks_like_number';
+use builtin::compat qw(blessed created_as_number created_as_string);
 use if "$]" >= 5.022, POSIX => 'isinf';
 use Math::BigFloat;
 use namespace::clean;
@@ -143,6 +144,12 @@ sub _eval_subschema ($data, $schema, $state) {
   abort($state, 'EXCEPTION: maximum evaluation depth exceeded')
     if $state->{depth}++ > $MAX_TRAVERSAL_DEPTH;
 
+  my $schema_type = get_type($schema);
+  return $schema || E($state, 'subschema is false') if $schema_type eq 'boolean';
+  abort($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
+
+  return 1 if not keys %$schema;
+
   # find all schema locations in effect at this data path + canonical_uri combination
   # if any of them are absolute prefix of this schema location, we are in a loop.
   my $canonical_uri = canonical_uri($state);
@@ -154,12 +161,6 @@ sub _eval_subschema ($data, $schema, $state) {
         keys $state->{seen}{$state->{data_path}}{$canonical_uri}->%*;
     $state->{seen}{$state->{data_path}}{$canonical_uri}{$schema_location}++;
   }
-
-  my $schema_type = get_type($schema);
-  return $schema || E($state, 'subschema is false') if $schema_type eq 'boolean';
-  abort($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
-
-  return 1 if not keys %$schema;
 
   my $valid = 1;
   my $spec_version = $state->{spec_version}//'';
@@ -173,14 +174,15 @@ sub _eval_subschema ($data, $schema, $state) {
     '$ref',
     !$spec_version || $spec_version eq 'draft2019-09' ? '$recursiveRef' : (),
     !$spec_version || $spec_version eq 'draft2020-12' ? '$dynamicRef' : (),
-    !$spec_version || $spec_version ne 'draft7' ? qw($vocabulary $comment) : (),
+    !$spec_version || $spec_version ne 'draft7' ? '$vocabulary' : (),
+    '$comment',
     !$spec_version || $spec_version eq 'draft7' ? 'definitions' : (),
     !$spec_version || $spec_version ne 'draft7' ? '$defs' : (),
     # APPLICATOR KEYWORDS
     qw(allOf anyOf oneOf not if),
     !$spec_version || $spec_version ne 'draft7' ? 'dependentSchemas' : (),
     !$spec_version || $spec_version eq 'draft7' ? 'dependencies' : (),
-    !$spec_version || $spec_version !~ qr/^draft(7|2019-09)$/ ? 'prefixItems' : (),
+    !$spec_version || $spec_version !~ qr/^draft(?:7|2019-09)$/ ? 'prefixItems' : (),
     'items',
     !$spec_version || $spec_version =~ qr/^draft(?:7|2019-09)$/ ? 'additionalItems' : (),
     qw(contains properties patternProperties additionalProperties propertyNames),
@@ -261,7 +263,7 @@ sub _eval_keyword_ref ($data, $schema, $state) {
 
   my $uri = Mojo::URL->new($schema->{$state->{keyword}})->to_abs($state->{initial_schema_uri});
   abort($state, '%ss to anchors are not supported', $state->{keyword})
-    if ($uri->fragment//'') !~ m{^(/(?:[^~]|~[01])*|)$};
+    if ($uri->fragment//'') !~ m{^(?:/(?:[^~]|~[01])*)?$};
 
   # the base of the $ref uri must be the same as the base of the root schema
   # unfortunately this means that many uses of $ref won't work, because we don't
@@ -286,7 +288,7 @@ sub _eval_keyword_recursiveRef ($data, $schema, $state) {
 
   my $uri = Mojo::URL->new($schema->{'$recursiveRef'})->to_abs($state->{initial_schema_uri});
   abort($state, '$recursiveRefs to anchors are not supported')
-    if ($uri->fragment//'') !~ m{^(/(?:[^~]|~[01])*|)$};
+    if ($uri->fragment//'') !~ m{^(?:/(?:[^~]|~[01])*)?$};
 
   # the base of the $recursiveRef uri must be the same as the base of the root schema.
   # unfortunately this means that nearly all usecases of $recursiveRef won't work, because we don't
@@ -385,9 +387,11 @@ sub _eval_keyword_dynamicAnchor ($data, $schema, $state) {
 sub _eval_keyword_vocabulary ($data, $schema, $state) {
   assert_keyword_type($state, $schema, 'object');
 
-  foreach my $property (sort keys $schema->{'$vocabulary'}->%*) {
-    assert_keyword_type({ %$state, _schema_path_suffix => $property }, $schema, 'boolean');
-    assert_uri($state, undef, $property);
+  foreach my $uri (sort keys $schema->{'$vocabulary'}->%*) {
+    abort({ %$state, _schema_path_suffix => $uri }, '$vocabulary value at "%s" is not a boolean', $uri)
+      if not is_type('boolean', $schema->{'$vocabulary'}{$uri});
+
+    assert_uri($state, undef, $uri);
   }
 
   abort($state, '$vocabulary can only appear at the schema resource root')
@@ -451,13 +455,12 @@ sub _eval_keyword_enum ($data, $schema, $state) {
 
   return E($state, 'value does not match'
     .(!(grep $_->{path}, @s) ? ''
-      : ' (differences start '.join(', ', map 'from item #'.$_.' at "'.$s[$_]->{path}.'"', 0..$#s).')'));
+      : ' ('.join('; ', map "from enum $_ at '$s[$_]->{path}': $s[$_]->{error}", 0..$#s).')'));
 }
 
 sub _eval_keyword_const ($data, $schema, $state) {
   return 1 if is_equal($data, $schema->{const}, my $s = {});
-  return E($state, 'value does not match'
-    .($s->{path} ? ' (differences start at "'.$s->{path}.'")' : ''));
+  return E($state, 'value does not match'.($s->{path} ? " (at '$s->{path}': $s->{error})" : ''));
 }
 
 sub _eval_keyword_multipleOf ($data, $schema, $state) {
@@ -788,34 +791,6 @@ sub _eval_keyword_dependencies ($data, $schema, $state) {
   return E($state, 'not all dependencies are satisfied');
 }
 
-# drafts 4, 6, 7, 2019-09:
-# prefixItems: ignored
-# items - array-based  - start at 0; set $state->{_last_items_index} to last evaluated (not successfully).
-# items - schema-based - start at 0; set $state->{_last_items_index} to last data item.
-#                        booleans NOT accepted in draft4.
-# additionalItems - schema-based. consume $state->{_last_items_index} as starting point.
-#                                 booleans accepted in all versions.
-
-# draft2020-12:
-# prefixItems - array-based - start at 0; set $state->{_last_items_index} to last evaluated (not successfully).
-# items - array-based: error
-# items - schema-based - consume $state->{_last_items_index} as starting point.
-# additionalItems - ignored
-
-# no $SPECIFICATION_VERSION specified:
-# prefixItems - array-based - set $state->{_last_items_index} to last evaluated (not successfully).
-# items - array-based  -  starting index is always 0
-#                             set $state->{_last_items_index} to last evaluated (not successfully).
-# items - schema-based -  consume $state->{_last_items_index} as starting point
-#                             set $state->{_last_items_index} to last data item.
-#                                  booleans accepted.
-# additionalItems - schema-based. consume $state->{_last_items_index} as starting point.
-#                                 booleans accepted.
-
-# prefixItems + items(array-based): items will generate an error
-# prefixItems + additionalItems: additionalItems will be ignored
-# items(schema-based) + additionalItems: additionalItems does nothing.
-
 sub _eval_keyword_prefixItems ($data, $schema, $state) {
   return if not assert_array_schemas($schema, $state);
   goto \&_eval_keyword__items_array_schemas;
@@ -1050,6 +1025,11 @@ sub _eval_keyword_unevaluatedProperties ($data, $schema, $state) {
 
 # UTILITIES
 
+# supports the six core types, plus integer (which is also a number)
+# we do NOT check $STRINGY_NUMBERS here -- you must do that in the caller
+# note that sometimes a value may return true for more than one type, e.g. integer+number,
+# or number+string, depending on its internal flags.
+# copied from JSON::Schema::Modern::Utilities::is_type
 sub is_type ($type, $value) {
   if ($type eq 'null') {
     return !(defined $value);
@@ -1068,18 +1048,30 @@ sub is_type ($type, $value) {
     return 0 if not defined $value;
     my $flags = B::svref_2object(\$value)->FLAGS;
 
+    # dualvars with the same string and (stringified) numeric value could be either a string or a
+    # number, and before 5.36 we can't tell the difference, so we will answer yes for both.
+    # in 5.36+, stringified numbers still get a PV but don't have POK set, whereas
+    # numified strings do have POK set, so we can tell which one came first.
+
     if ($type eq 'string') {
-      return !is_ref($value) && $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
+      # like created_as_string, but rejects dualvars with stringwise-unequal string and numeric parts
+      return !is_ref($value)
+        && $flags & B::SVf_POK
+        && (!($flags & (B::SVf_IOK | B::SVf_NOK))
+          || do { no warnings 'numeric'; 0+$value eq $value });
     }
 
     if ($type eq 'number') {
-      return is_bignum($value)
-        || !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
+      # floats in json will always be parsed into Math::BigFloat, when allow_bignum is enabled
+      return is_bignum($value) || created_as_number($value);
     }
 
     if ($type eq 'integer') {
+      # note: values that are larger than $Config{ivsize} will be represented as an NV, not IV,
+      # therefore they will fail this check
       return is_bignum($value) && $value->is_int
-        || !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK)) && int($value) == $value;
+        # if dualvar, PV and stringified NV/IV must be identical
+        || created_as_number($value) && int($value) == $value;
     }
   }
 
@@ -1090,28 +1082,55 @@ sub is_type ($type, $value) {
   return ref($value) eq $type;
 }
 
+# returns one of the six core types, plus integer
+# we do NOT check $STRINGY_NUMBERS here -- you must do that in the caller
+# copied from JSON::Schema::Modern::Utilities::get_type
 sub get_type ($value) {
-  return 'null' if not defined $value;
   return 'object' if is_plain_hashref($value);
-  return 'array' if is_plain_arrayref($value);
   return 'boolean' if is_bool($value);
+  return 'null' if not defined $value;
+  return 'array' if is_plain_arrayref($value);
 
-  return is_bignum($value) ? ($value->is_int ? 'integer' : 'number')
-      : (blessed($value) ? '' : 'reference to ').ref($value)
-    if is_ref($value);
+  # floats in json will always be parsed into Math::BigFloat, when allow_bignum is enabled
+  if (is_ref($value)) {
+    my $ref = ref($value);
+    return $ref eq 'Math::BigInt' ? 'integer'
+      : $ref eq 'Math::BigFloat' ? ($value->is_int ? 'integer' : 'number')
+      : (defined blessed($value) ? '' : 'reference to ').$ref;
+  }
 
   my $flags = B::svref_2object(\$value)->FLAGS;
-  return 'string' if $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
-  return int($value) == $value ? 'integer' : 'number'
-    if !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
 
-  croak sprintf('ambiguous type for %s',
-    (Mojo::JSON::JSON_XS ? 'Cpanel::JSON::XS' : 'JSON::PP')->new->allow_nonref(1)->canonical(1)->utf8(0)->encode($value));
+  # dualvars with the same string and (stringified) numeric value could be either a string or a
+  # number, and before 5.36 we can't tell the difference, so we choose number because it has been
+  # evaluated as a number already.
+  # in 5.36+, stringified numbers still get a PV but don't have POK set, whereas
+  # numified strings do have POK set, so we can tell which one came first.
+
+  # like created_as_string, but rejects dualvars with stringwise-unequal string and numeric parts
+  return 'string'
+    if $flags & B::SVf_POK
+      && (!($flags & (B::SVf_IOK | B::SVf_NOK))
+        || do { no warnings 'numeric'; 0+$value eq $value });
+
+  # note: values that are larger than $Config{ivsize} will be represented as an NV, not IV,
+  # therefore they will fail this check
+  return int($value) == $value ? 'integer' : 'number' if created_as_number($value);
+
+  # this might be a scalar with POK|IOK or POK|NOK set
+  return 'ambiguous type';
 }
 
 # lifted from JSON::MaybeXS
+# note: unlike builtin::compat on older perls, we do not accept
+# dualvar(0,"") or dualvar(1,"1") because JSON::PP and Cpanel::JSON::XS
+# do not encode these as booleans.
+use constant HAVE_BUILTIN => $] ge '5.036';
+use if HAVE_BUILTIN, experimental => 'builtin';
 sub is_bool ($value) {
-  Scalar::Util::blessed($value)
+  HAVE_BUILTIN and builtin::is_bool($value)
+  or
+  !!blessed($value)
     and ($value->isa('JSON::PP::Boolean')
       or $value->isa('Cpanel::JSON::XS::Boolean')
       or $value->isa('JSON::XS::Boolean'));
@@ -1123,11 +1142,19 @@ sub is_bignum ($value) {
 
 # compares two arbitrary data payloads for equality, as per
 # https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.2
-# if provided with a state hashref, any differences are recorded within
+# $state hashref supports the following fields/configs:
+# - path: location of the first difference
+# - error: description of the difference
+# - $SCALARREF_BOOLEANS: treats \0 and \1 as boolean values
+# - $STRINGY_NUMBERS: strings will be typed as numbers if looks_like_number() is true
+# copied from JSON::Schema::Modern::Utilities::is_equal
 sub is_equal ($x, $y, $state = {}) {
   $state->{path} //= '';
 
   my @types = map get_type($_), $x, $y;
+
+  $state->{error} = 'ambiguous type encountered', return 0
+    if grep $types[$_] eq 'ambiguous type', 0..1;
 
   if ($SCALARREF_BOOLEANS) {
     ($x, $types[0]) = (0+!!$$x, 'boolean') if $types[0] eq 'reference to SCALAR';
@@ -1137,43 +1164,58 @@ sub is_equal ($x, $y, $state = {}) {
   if ($STRINGY_NUMBERS) {
     ($x, $types[0]) = (0+$x, int(0+$x) == $x ? 'integer' : 'number')
       if $types[0] eq 'string' and looks_like_number($x);
+
     ($y, $types[1]) = (0+$y, int(0+$y) == $y ? 'integer' : 'number')
       if $types[1] eq 'string' and looks_like_number($y);
   }
 
-  return 0 if $types[0] ne $types[1];
+  $state->{error} = "wrong type: $types[0] vs $types[1]", return 0 if $types[0] ne $types[1];
   return 1 if $types[0] eq 'null';
-  return $x eq $y if $types[0] eq 'string';
-  return $x == $y if grep $types[0] eq $_, qw(boolean number integer);
+  ($x eq $y and return 1), $state->{error} = 'strings not equal', return 0
+    if $types[0] eq 'string';
+  ($x == $y and return 1), $state->{error} = "$types[0]s not equal", return 0
+    if grep $types[0] eq $_, qw(boolean number integer);
 
   my $path = $state->{path};
   if ($types[0] eq 'object') {
-    return 0 if keys %$x != keys %$y;
-    return 0 if not is_equal([ sort keys %$x ], [ sort keys %$y ]);
+    $state->{error} = 'property count differs: '.keys(%$x).' vs '.keys(%$y), return 0
+      if keys %$x != keys %$y;
+
+    if (not is_equal(my $arr_x = [ sort keys %$x ], my $arr_y = [ sort keys %$y ], my $s={})) {
+      my $pos = substr($s->{path}, 1);
+      $state->{error} = 'property names differ starting at position '.$pos.' ("'.$arr_x->[$pos].'" vs "'.$arr_y->[$pos].'")';
+      return 0;
+    }
+
     foreach my $property (sort keys %$x) {
       $state->{path} = jsonp($path, $property);
       return 0 if not is_equal($x->{$property}, $y->{$property}, $state);
     }
+
     return 1;
   }
 
   if ($types[0] eq 'array') {
-    return 0 if @$x != @$y;
-    foreach my $idx (0..$x->$#*) {
+    $state->{error} = 'element count differs: '.@$x.' vs '.@$y, return 0 if @$x != @$y;
+    foreach my $idx (0 .. $x->$#*) {
       $state->{path} = $path.'/'.$idx;
       return 0 if not is_equal($x->[$idx], $y->[$idx], $state);
     }
     return 1;
   }
 
-  return 0; # should never get here
+  $state->{error} = 'uh oh', return 0; # should never get here
 }
 
 # checks array elements for uniqueness. short-circuits on first pair of matching elements
 # if second arrayref is provided, it is populated with the indices of identical items
+# supports the following configs:
+# - $SCALARREF_BOOLEANS: treats \0 and \1 as boolean values
+# - $STRINGY_NUMBERS: strings will be typed as numbers if looks_like_number() is true
+# copied from JSON::Schema::Modern::Utilities::is_elements_unique
 sub is_elements_unique ($array, $equal_indices = undef) {
-  foreach my $idx0 (0..$array->$#*-1) {
-    foreach my $idx1 ($idx0+1..$array->$#*) {
+  foreach my $idx0 (0 .. $array->$#*-1) {
+    foreach my $idx1 ($idx0+1 .. $array->$#*) {
       if (is_equal($array->[$idx0], $array->[$idx1])) {
         push @$equal_indices, $idx0, $idx1 if defined $equal_indices;
         return 0;
@@ -1184,26 +1226,35 @@ sub is_elements_unique ($array, $equal_indices = undef) {
 }
 
 # shorthand for creating and appending json pointers
+# the first argument is a json pointer; remaining arguments are path segments to be encoded and
+# appended
+# copied from JSON::Schema::Modern::Utilities::jsonp
 sub jsonp {
-  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, map +(is_plain_arrayref($_) ? @$_ : $_), grep defined, @_);
+  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, grep defined, @_);
 }
 
 # shorthand for finding the canonical uri of the present schema location
+# copied from JSON::Schema::Modern::Utilities::canonical_uri
 sub canonical_uri ($state, @extra_path) {
-  splice(@extra_path, -1, 1, $extra_path[-1]->@*) if @extra_path and is_plain_arrayref($extra_path[-1]);
+  return $state->{initial_schema_uri} if not @extra_path and not length($state->{schema_path});
   my $uri = $state->{initial_schema_uri}->clone;
-  $uri->fragment(($uri->fragment//'').jsonp($state->{schema_path}, @extra_path));
-  $uri->fragment(undef) if not length($uri->fragment);
+  my $fragment = ($uri->fragment//'').(@extra_path ? jsonp($state->{schema_path}, @extra_path) : $state->{schema_path});
+  undef $fragment if not length($fragment);
+  $uri->fragment($fragment);
   $uri;
 }
 
 # shorthand for creating error objects
+# based on JSON::Schema::Modern::Utilities::E
 sub E ($state, $error_string, @args) {
   # sometimes the keyword shouldn't be at the very end of the schema path
-  my $uri = canonical_uri($state, $state->{keyword}, $state->{_schema_path_suffix});
+  my $sps = delete $state->{_schema_path_suffix};
+  my @schema_path_suffix = defined $sps && is_plain_arrayref($sps) ? $sps->@* : $sps//();
+
+  my $uri = canonical_uri($state, $state->{keyword}, @schema_path_suffix);
 
   my $keyword_location = $state->{traversed_schema_path}
-    .jsonp($state->{schema_path}, $state->{keyword}, delete $state->{_schema_path_suffix});
+    .jsonp($state->{schema_path}, $state->{keyword}, @schema_path_suffix);
 
   undef $uri if $uri eq '' and $keyword_location eq ''
     or ($uri->fragment//'') eq $keyword_location and $uri->clone->fragment(undef) eq '';
@@ -1228,12 +1279,7 @@ sub abort ($state, $error_string, @args) {
 
 # one common usecase of abort()
 sub assert_keyword_type ($state, $schema, $type) {
-  my $value = $schema->{$state->{keyword}};
-  $value = is_plain_hashref($value) ? $value->{$state->{_schema_path_suffix}}
-      : is_plain_arrayref($value) ? $value->[$state->{_schema_path_suffix}]
-      : die 'unknown type'
-    if exists $state->{_schema_path_suffix};
-  return 1 if is_type($type, $value);
+  return 1 if is_type($type, $schema->{$state->{keyword}});
   abort($state, '%s value is not a%s %s', $state->{keyword}, ($type =~ /^[aeiou]/ ? 'n' : ''), $type);
 }
 
@@ -1246,6 +1292,7 @@ sub assert_pattern ($state, $pattern) {
   return 1;
 }
 
+# based on JSON::Schema::Modern::Utilities::assert_uri_reference
 sub assert_uri_reference ($state, $schema) {
   my $ref = $schema->{$state->{keyword}};
 
@@ -1261,6 +1308,7 @@ sub assert_uri_reference ($state, $schema) {
   return 1;
 }
 
+# based on JSON::Schema::Modern::Utilities::assert_uri
 sub assert_uri ($state, $schema, $override = undef) {
   my $string = $override // $schema->{$state->{keyword}};
   my $uri = Mojo::URL->new($string);
@@ -1291,6 +1339,7 @@ sub assert_array_schemas ($schema, $state) {
   return 1;
 }
 
+# copied from JSON::Schema::Modern::Utilities::sprintf_num
 sub sprintf_num ($value) {
   # use original value as stored in the NV, without losing precision
   is_bignum($value) ? $value->bstr : sprintf('%s', $value);
@@ -1312,7 +1361,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 

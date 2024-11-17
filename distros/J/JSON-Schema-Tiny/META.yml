@@ -11,16 +11,14 @@ build_requires:
   Path::Tiny: '0'
   Test::Deep: '0'
   Test::Fatal: '0'
-  Test::JSON::Schema::Acceptance: '1.014'
+  Test::JSON::Schema::Acceptance: '1.026'
   Test::More: '0.96'
   Test::Warnings: '0'
-  constant: '0'
   lib: '0'
   open: '0'
   perl: '5.020'
   strict: '0'
   utf8: '0'
-  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build::Tiny: '0.034'
@@ -47,7 +45,7 @@ no_index:
 provides:
   JSON::Schema::Tiny:
     file: lib/JSON/Schema/Tiny.pm
-    version: '0.025'
+    version: '0.026'
 requires:
   B: '0'
   Carp: '0'
@@ -64,20 +62,23 @@ requires:
   Scalar::Util: '0'
   Storable: '0'
   autovivification: '0'
+  builtin::compat: '0'
+  constant: '0'
   experimental: '0.026'
   if: '0'
   namespace::clean: '0'
   perl: '5.020'
   stable: '0.031'
   strictures: '2'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Tiny/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Tiny
   repository: https://github.com/karenetheridge/JSON-Schema-Tiny.git
-version: '0.025'
+version: '0.026'
 x_Dist_Zilla:
   perl:
-    version: '5.040000'
+    version: '5.041005'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -123,7 +124,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::ETHER/Git::GatherDir'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::ETHER/MetaYAML'
@@ -223,8 +224,9 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Test::CPAN::Changes:
           changelog: Changes
+          filename: xt/release/cpan-changes.t
       name: '@Author::ETHER/Test::CPAN::Changes'
-      version: '0.012'
+      version: '0.013'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@Author::ETHER/Test::ChangesHasContent'
@@ -235,7 +237,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::MinimumVersion:
           max_target_perl: '5.020'
       name: '@Author::ETHER/Test::MinimumVersion'
-      version: '2.000010'
+      version: '2.000011'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::ETHER/PodSyntaxTests'
@@ -259,7 +261,7 @@ x_Dist_Zilla:
             - irc
           wordlist: Pod::Wordlist
       name: '@Author::ETHER/Test::PodSpelling'
-      version: '2.007005'
+      version: '2.007006'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee
       config:
@@ -282,7 +284,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::Portability:
           options: ''
       name: '@Author::ETHER/Test::Portability'
-      version: '2.001001'
+      version: '2.001003'
     -
       class: Dist::Zilla::Plugin::Test::CleanNamespaces
       config:
@@ -590,7 +592,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20240609'
+          Module::CoreList: '5.20241020'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -618,7 +620,7 @@ x_Dist_Zilla:
           git_version: 2.45.2
           repo_root: .
       name: '@Author::ETHER/initial check'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
@@ -660,7 +662,7 @@ x_Dist_Zilla:
           git_version: 2.45.2
           repo_root: .
       name: '@Author::ETHER/after tests'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::CheckIssues
       name: '@Author::ETHER/CheckIssues'
@@ -746,7 +748,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/release snapshot'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -754,7 +756,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.025
+          tag: v0.026
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -763,7 +765,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/Git::Tag'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -800,7 +802,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/post-release commit'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -820,7 +822,7 @@ x_Dist_Zilla:
           git_version: 2.45.2
           repo_root: .
       name: '@Author::ETHER/Git::Push'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
@@ -938,7 +940,7 @@ x_Dist_Zilla:
 x_authority: cpan:ETHER
 x_contributors:
   - 'Matt S Trout <mst@shadowcat.co.uk>'
-x_generated_by_perl: v5.40.0
+x_generated_by_perl: v5.41.5
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

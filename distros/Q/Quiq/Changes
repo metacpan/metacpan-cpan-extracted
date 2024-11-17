@@ -1,3 +1,17 @@
+1.222 2024-11-16
+================
+
+[Quiq::Path]
+* find(): Option -followSkip hinzugefügt
+
+[Quiq::UrlObj]
+* setQuery(): Objekt als Returnwert hinzugefügt
+
+[Quiq::Web::Navigation]
+* backWithParameters(): Methode hinzugefügt
+* prevWithParameters(): Methode hinzugefügt
+
+
 1.221 2024-10-26
 ================
 

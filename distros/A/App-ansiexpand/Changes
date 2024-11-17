@@ -1,5 +1,10 @@
 Revision history for Perl extension App-ansiexpand
 
+1.06 2024-11-16T14:26:03Z
+
+    - introduce -z (--zap) option
+    - improve EOL handling with Text::ANSI::Tabs@1.06 
+
 1.05 2024-03-23T14:29:35Z
 
     - single space is not converted to tab by -u option by default
