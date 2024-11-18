@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-MailTools>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/MailTools/>
-    and <https://metacpan.org/release/MailTools>
+  * Indexed from CPAN: <https://metacpan.org/release/MailTools>
 
 MailTools is one of the oldest modules on CPAN.  It started off in 1995,
 the year Perl 5.0 got released!  That's just in the beginning of the

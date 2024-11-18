@@ -1,0 +1,103 @@
+=head1 NAME
+
+Template::Plexsize::URLTable - Manage relative resources
+
+=head2 SYNOPSIS
+
+
+=head2 DESCRIPTION
+
+An class implementing a table facilitating building of relative link paths,
+between resources, suitable for local file system access or in a web browser
+
+The links between resources are specified in the input file namespace. That
+means the user does not need to know the output relationship between the files
+beforehand.
+
+The output relationship is specified in the the template files processed.
+
+
+The table maps an input path to an output location, based on the context of the table
+
+
+=head2 USAGE
+
+A L<Template::Plexsite::URLTable> is create with a standard constructor. It
+takes named arguments which describe the details of where source material is
+located (src), the output root directory (html_root) and the locale to be used
+in link generation.
+
+
+With this information resources which are added to the table 
+
+=head2 add_resource
+
+	$table->add_resource($path,%options);
+
+Adds a resource specified by C<$path>. If it is simple scalar, it is treated as
+a path to a resource. If the path is a directory, the contents of the directory are recursively processed.
+
+If the path is non template file, an entry is created to add to the table. This entry 
+Returns the path to the input file
+
+The entry options attributes include:
+	output - The output path in the output namesapce. 
+	input - Path of the input filename
+
+
+If the path is that of plt directory the table entry includes an attribute of
+C<template>. This contains configuration information for building heirachial
+document structures.
+	menu
+	nab
+	output
+	locale
+	res
+	table - A refernece to this URLTable
+	slots
+	parent
+	plt -  Path  to template file (input name space)
+	html_root - path to html_root output
+	template 	- the loaded and prepared template
+
+The templates is loaded and prepared for rendering
+
+
+=head2 lookup
+
+	$table->lookup($path)
+
+Uses a path of a resource in input namespace, and returns the relative path to
+the same resource in the output name space
+
+
+=head2 path_from_to 
+
+	$table->path_from_to($src, $dest);
+
+Returns a relative path from a  resource located at C<$src> to a resource
+located at C<$dest>. The returned path is in the output name spac
+
+=head2 build
+
+	$table->build;
+
+Builds the table, renders templates and copies resources
+
+
+=head2 Internal methods
+
+=head3 _render_templates
+
+Takes all keys of the table (input paths), and for any which are plt templates,
+it renderes them by calling the C<build> method on the C<Template::Plexsite>
+class and writing the result to the output file 
+
+=head3 _static_files
+
+Takes all keys from the table (input paths), and for non templates, copies or otherwise processes the intput file to the output location. This is only done of the modification date of the input files is newer then the output files.
+
+
+=head3 _site_map
+
+Currently does nothing?

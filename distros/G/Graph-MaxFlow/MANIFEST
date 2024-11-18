@@ -3,9 +3,12 @@ MaxFlow.pm
 INSTALL
 Makefile.PL
 MANIFEST
+MYMETA.json
+MYMETA.yml
 README
 SIGNATURE
 t/0-signature.t
 t/1.t
 t/pod.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

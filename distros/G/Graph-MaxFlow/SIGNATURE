@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.66.
+signed via the Module::Signature module, version 0.89.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,22 +12,24 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 a1c300f90be195c78ccaa73e742ec879c2fa2cdf Changes
-SHA1 415e185cf2aff00f855763aae84945501fd7c0d5 INSTALL
-SHA1 af446e764ac6e5aca25d748e06191383ecf1759b MANIFEST
-SHA1 61bf7413c54d9d82124842ffaa7d53d4990d1387 META.yml
-SHA1 5d10ef73e77474689a0a69f7e667c73b53c5706c Makefile.PL
-SHA1 55b883a804d2e4ebccc0aea5a364a4b7e59bc713 MaxFlow.pm
-SHA1 ddfa823cefce7f90642f7105d0223800c983a682 README
-SHA1 c3f2c4a2d94a1d5bd0fb22e02181e6be8f6e8c53 t/0-signature.t
-SHA1 e866a4d7a2ee7f503838ad7ff88cfeedc600e9c5 t/1.t
-SHA1 a725c1c4c451f4d4c337434f94ffe1b36e9a7ef0 t/pod.t
+SHA256 33a50b3ee4eb17a5ab69874fc87db9122e7ef2f54871e95cfd2405b99c89958a Changes
+SHA256 5a3d299eb68649ea17f1c5428d1d54384afc48341f6d777916b4ff3f42c1353c INSTALL
+SHA256 e93d2f299c670939dd285996f4a78baedf20ba859e9c53bd45edbd60c71d4586 MANIFEST
+SHA256 22661b21e36efffa86dcd951d4a1182fd0311909c1a7bdcaf6b9c3746483981e META.json
+SHA256 dd4ff5f3b7e22cda9099787154dddaf0cfe5c12e9649af1f968c2b5545dd2368 META.yml
+SHA256 1ef45a073ce5e4750c03772ba7b7b132b3ca693443676e4bab60e2d85a6c662c MYMETA.json
+SHA256 9decf7750fbe7d8ec86733b47bfa3c7858a72a570a664d09ad96bf77f072e669 MYMETA.yml
+SHA256 8fb95f4b9291dae5bf1ecffa4dc97106f107120276889c04301cbc690789efae Makefile.PL
+SHA256 850f1d93e64654915660e694d52d55598ddac3a2309dd95785f50fd330ae2dbe MaxFlow.pm
+SHA256 6ae1432eecf11c3b5ffc1e35420f9f3ae3c8b9d3866e1063fab1349d7fe42a21 README
+SHA256 26e8499689ce9acd7e17dc676fb1578a8e4a66febad8e4cda589590debdeb61c t/0-signature.t
+SHA256 94c0420bfdba355289966166e85f3eb9a8e4fb13c8b1697a6516b87f453d597e t/1.t
+SHA256 5a58727ea8c40250858a79a98e73f7b37209bb87f09de62a35af09c41a0b317e t/pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
 
-iD8DBQFNDsBPXfGeK2entYQRAhCeAJ4j3LyQqB9FkrzGxOHVEGHsehPsowCfdFPh
-SPb8pwxe7jVdyg3WE8ERtfo=
-=+KF2
+iF0EAREDAB0WIQR31NgdxH1o+p6eanxd8Z4rZ6e1hAUCZzqdHwAKCRBd8Z4rZ6e1
+hI9IAKC76UTO1x1MSr0g7afghB1iqNnYAgCgyGGeZ3iiVJZJ6RvNeN5LshvJ4cI=
+=l//n
 -----END PGP SIGNATURE-----

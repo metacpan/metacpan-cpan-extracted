@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename q
 # 
 # # VERSION
 # 
-# 0.0.8
+# 0.1.0
 # 
 # # SYNOPSIS
 # 
@@ -81,13 +81,13 @@ lay "unicode.txt", "↯";
 # 
 # ### See also
 # 
-# * <autodie> – `open $f, "r.txt"; $s = join "", <$f>; close $f`.
-# * <File::Slurp> — `read_file('file.txt')`.
-# * <File::Slurper> — `read_text('file.txt')`, `read_binary('file.txt')`.
-# * <File::Util> — `File::Util->new->load_file(file => 'file.txt')`.
-# * <IO::All> — `io('file.txt') > $contents`.
-# * <IO::Util> — `$contents = ${ slurp 'file.txt' }`.
-# * <Mojo::File> – `path($file)->slurp`.
+# * [autodie](https://metacpan.org/pod/autodie) – `open $f, "r.txt"; $s = join "", <$f>; close $f`.
+# * <https://metacpan.org/pod/File::Slurp> — `read_file('file.txt')`.
+# * <https://metacpan.org/pod/File::Slurper> — `read_text('file.txt')`, `read_binary('file.txt')`.
+# * [File::Util](https://metacpan.org/pod/File::Util) — `File::Util->new->load_file(file => 'file.txt')`.
+# * [IO::All](https://metacpan.org/pod/IO::All) — `io('file.txt') > $contents`.
+# * [IO::Util](https://metacpan.org/pod/IO::Util) — `$contents = ${ slurp 'file.txt' }`.
+# * [Mojo::File](https://metacpan.org/pod/Mojo::File) – `path($file)->slurp`.
 # 
 # ## lay ($file?, $content)
 # 
@@ -105,13 +105,13 @@ done_testing; }; subtest 'lay ($file?, $content)' => sub {
 # 
 # ### See also
 # 
-# * <autodie> – `open $f, ">r.txt"; print $f $contents; close $f`.
-# * <File::Slurp> — `write_file('file.txt', $contents)`.
-# * <File::Slurper> — `write_text('file.txt', $contents)`, `write_binary('file.txt', $contents)`.
-# * <IO::All> — `io('file.txt') < $contents`.
-# * <IO::Util> — `slurp \$contents, 'file.txt'`.
-# * <File::Util> — `File::Util->new->write_file(file => 'file.txt', content => $contents, bitmask => 0644)`.
-# * <Mojo::File> – `path($file)->spew($chars, 'UTF-8')`.
+# * [autodie](https://metacpan.org/pod/autodie) – `open $f, ">r.txt"; print $f $contents; close $f`.
+# * [File::Slurp](https://metacpan.org/pod/File::Slurp) — `write_file('file.txt', $contents)`.
+# * [File::Slurper](https://metacpan.org/pod/File::Slurper) — `write_text('file.txt', $contents)`, `write_binary('file.txt', $contents)`.
+# * [IO::All](https://metacpan.org/pod/IO::All) — `io('file.txt') < $contents`.
+# * [IO::Util](https://metacpan.org/pod/IO::Util) — `slurp \$contents, 'file.txt'`.
+# * [File::Util](https://metacpan.org/pod/File::Util) — `File::Util->new->write_file(file => 'file.txt', content => $contents, bitmask => 0644)`.
+# * [Mojo::File](https://metacpan.org/pod/Mojo::File) – `path($file)->spew($chars, 'UTF-8')`.
 # 
 # ## find (;$path, @filters)
 # 
@@ -152,37 +152,37 @@ my $count = 0;
 # 
 # ### See also
 # 
-# * <AudioFile::Find> — ищет аудиофайлы в указанной директории. Позволяет фильтровать их по атрибутам: названию, артисту, жанру, альбому и трэку.
-# * <Directory::Iterator> — `$it = Directory::Iterator->new($dir, %opts); push @paths, $_ while <$it>`.
-# * <IO::All> — `@paths = map { "$_" } grep { -f $_ && $_->size > 10*1024 } io(".")->all(0)`.
-# * <IO::All::Rule> — `$next = IO::All::Rule->new->file->size(">10k")->iter($dir1, $dir2); push @paths, "$f" while $f = $next->()`.
-# * <File::Find> — `find( sub { push @paths, $File::Find::name if /\.png/ }, $dir )`.
-# * <File::Find::utf8> — как <File::Find>, только пути файлов в _utf8_.
-# * <File::Find::Age> — сортирует файлы по времени модификации (наследует <File::Find::Rule>): `File::Find::Age->in($dir1, $dir2)`.
-# * <File::Find::Declare> — `@paths = File::Find::Declare->new({ size => '>10K', perms => 'wr-wr-wr-', modified => '<2010-01-30', recurse => 1, dirs => [$dir1] })->find`.
-# * <File::Find::Iterator> — имеет ООП интерфейс с итератором и функции `imap` и `igrep`.
-# * <File::Find::Match> — вызывает обработчик на каждый подошедший фильтр. Похож на `switch`.
-# * <File::Find::Node> — обходит иерархию файлов параллельно несколькими процессами: `tie @paths, IPC::Shareable, { key => "GLUE STRING", create => 1 }; File::Find::Node->new(".")->process(sub { my $f = shift; $f->fork(5); tied(@paths)->lock; push @paths, $f->path; tied(@paths)->unlock })->find; tied(@paths)->remove`.
-# * <File::Find::Fast> — `@paths = @{ find($dir) }`.
-# * <File::Find::Object> — имеет ООП интерфейс с итератором.
-# * <File::Find::Parallel> — умеет сравнивать два каталога и возвращать их объединение, пересечение и количественное пересечение.
-# * <File::Find::Random> — выбирает файл или директорию наугад из иерархии файлов.
-# * <File::Find::Rex> — `@paths = File::Find::Rex->new(recursive => 1, ignore_hidden => 1)->query($dir, qr/^b/i)`.
-# * <File::Find::Rule> — `@files = File::Find::Rule->any( File::Find::Rule->file->name('*.mp3', '*.ogg')->size('>2M'), File::Find::Rule->empty )->in($dir1, $dir2);`. Имеет итератор, процедурный интерфейс и расширения [::ImageSize](File::Find::Rule::ImageSize) и [::MMagic](File::Find::Rule::MMagic): `@images = find(file => magic => 'image/*', '!image_x' => '>20', in => '.')`.
-# * <File::Find::Wanted> — `@paths = find_wanted( sub { -f && /\.png/ }, $dir )`.
-# * <File::Hotfolder> — `watch( $dir, callback => sub { push @paths, shift } )->loop`. Работает на `AnyEvent`. Настраиваемый. Есть распараллеливание на несколько процессов.
-# * <File::Mirror> — формирует так же параллельный путь для копирования файлов: `recursive { my ($src, $dst) = @_; push @paths, $src } '/path/A', '/path/B'`.
-# * <File::Set> — `$fs = File::Set->new; $fs->add($dir); @paths = map { $_->[0] } $fs->get_path_list`.
-# * <File::Wildcard> — `$fw = File::Wildcard->new(exclude => qr/.svn/, case_insensitive => 1, sort => 1, path => "src///*.cpp", match => qr(^src/(.*?)\.cpp$), derive => ['src/$1.o','src/$1.hpp']); push @paths, $f while $f = $fw->next`.
-# * <File::Wildcard::Find> — `findbegin($dir); push @paths, $f while $f = findnext()` или  `findbegin($dir); @paths = findall()`.
-# * <File::Util> — `File::Util->new->list_dir($dir, qw/ --pattern=\.txt$ --files-only --recurse /)`.
-# * <Mojo::File> – `say for path($path)->list_tree({hidden => 1, dir => 1})->each`.
-# * <Path::Find> — `@paths = path_find( $dir, "*.png" )`. Для сложных запросов использует _matchable_: `my $sub = matchable( sub { my( $entry, $directory, $fullname, $depth ) = @_; $depth <= 3 }`.
-# * <Path::Extended::Dir> — `@paths = Path::Extended::Dir->new($dir)->find('*.txt')`.
-# * <Path::Iterator::Rule> — `$i = Path::Iterator::Rule->new->file; @paths = $i->clone->size(">10k")->all(@dirs); $i->size("<10k")...`.
-# * <Path::Class::Each> — `dir($dir)->each(sub { push @paths, "$_" })`.
-# * <Path::Class::Iterator> — `$i = Path::Class::Iterator->new(root => $dir, depth => 2); until ($i->done) { push @paths, $i->next->stringify }`.
-# * <Path::Class::Rule> — `@paths = Path::Class::Rule->new->file->size(">10k")->all($dir)`.
+# * [AudioFile::Find](https://metacpan.org/pod/AudioFile::Find) — ищет аудиофайлы в указанной директории. Позволяет фильтровать их по атрибутам: названию, артисту, жанру, альбому и трэку.
+# * [Directory::Iterator](https://metacpan.org/pod/Directory::Iterator) — `$it = Directory::Iterator->new($dir, %opts); push @paths, $_ while <$it>`.
+# * [IO::All](https://metacpan.org/pod/IO::All) — `@paths = map { "$_" } grep { -f $_ && $_->size > 10*1024 } io(".")->all(0)`.
+# * [IO::All::Rule](https://metacpan.org/pod/IO::All::Rule) — `$next = IO::All::Rule->new->file->size(">10k")->iter($dir1, $dir2); push @paths, "$f" while $f = $next->()`.
+# * [File::Find](https://metacpan.org/pod/File::Find) — `find( sub { push @paths, $File::Find::name if /\.png/ }, $dir )`.
+# * [File::Find::utf8](https://metacpan.org/pod/File::Find::utf8) — как [File::Find](https://metacpan.org/pod/File::Find), только пути файлов в _utf8_.
+# * [File::Find::Age](https://metacpan.org/pod/File::Find::Age) — сортирует файлы по времени модификации (наследует [File::Find::Rule](https://metacpan.org/pod/File::Find::Rule)): `File::Find::Age->in($dir1, $dir2)`.
+# * [File::Find::Declare](https://metacpan.org/pod/File::Find::Declare) — `@paths = File::Find::Declare->new({ size => '>10K', perms => 'wr-wr-wr-', modified => '<2010-01-30', recurse => 1, dirs => [$dir1] })->find`.
+# * [File::Find::Iterator](https://metacpan.org/pod/File::Find::Iterator) — имеет ООП интерфейс с итератором и функции `imap` и `igrep`.
+# * [File::Find::Match](https://metacpan.org/pod/File::Find::Match) — вызывает обработчик на каждый подошедший фильтр. Похож на `switch`.
+# * [File::Find::Node](https://metacpan.org/pod/File::Find::Node) — обходит иерархию файлов параллельно несколькими процессами: `tie @paths, IPC::Shareable, { key => "GLUE STRING", create => 1 }; File::Find::Node->new(".")->process(sub { my $f = shift; $f->fork(5); tied(@paths)->lock; push @paths, $f->path; tied(@paths)->unlock })->find; tied(@paths)->remove`.
+# * [File::Find::Fast](https://metacpan.org/pod/File::Find::Fast) — `@paths = @{ find($dir) }`.
+# * [File::Find::Object](https://metacpan.org/pod/File::Find::Object) — имеет ООП интерфейс с итератором.
+# * [File::Find::Parallel](https://metacpan.org/pod/File::Find::Parallel) — умеет сравнивать два каталога и возвращать их объединение, пересечение и количественное пересечение.
+# * [File::Find::Random](https://metacpan.org/pod/File::Find::Random) — выбирает файл или директорию наугад из иерархии файлов.
+# * [File::Find::Rex](https://metacpan.org/pod/File::Find::Rex) — `@paths = File::Find::Rex->new(recursive => 1, ignore_hidden => 1)->query($dir, qr/^b/i)`.
+# * [File::Find::Rule](https://metacpan.org/pod/File::Find::Rule) — `@files = File::Find::Rule->any( File::Find::Rule->file->name('*.mp3', '*.ogg')->size('>2M'), File::Find::Rule->empty )->in($dir1, $dir2);`. Имеет итератор, процедурный интерфейс и расширения [::ImageSize](File::Find::Rule::ImageSize) и [::MMagic](File::Find::Rule::MMagic): `@images = find(file => magic => 'image/*', '!image_x' => '>20', in => '.')`.
+# * [File::Find::Wanted](https://metacpan.org/pod/File::Find::Wanted) — `@paths = find_wanted( sub { -f && /\.png/ }, $dir )`.
+# * [File::Hotfolder](https://metacpan.org/pod/File::Hotfolder) — `watch( $dir, callback => sub { push @paths, shift } )->loop`. Работает на `AnyEvent`. Настраиваемый. Есть распараллеливание на несколько процессов.
+# * [File::Mirror](https://metacpan.org/pod/File::Mirror) — формирует так же параллельный путь для копирования файлов: `recursive { my ($src, $dst) = @_; push @paths, $src } '/path/A', '/path/B'`.
+# * [File::Set](https://metacpan.org/pod/File::Set) — `$fs = File::Set->new; $fs->add($dir); @paths = map { $_->[0] } $fs->get_path_list`.
+# * [File::Wildcard](https://metacpan.org/pod/File::Wildcard) — `$fw = File::Wildcard->new(exclude => qr/.svn/, case_insensitive => 1, sort => 1, path => "src///*.cpp", match => qr(^src/(.*?)\.cpp$), derive => ['src/$1.o','src/$1.hpp']); push @paths, $f while $f = $fw->next`.
+# * [File::Wildcard::Find](https://metacpan.org/pod/File::Wildcard::Find) — `findbegin($dir); push @paths, $f while $f = findnext()` или  `findbegin($dir); @paths = findall()`.
+# * [File::Util](https://metacpan.org/pod/File::Util) — `File::Util->new->list_dir($dir, qw/ --pattern=\.txt$ --files-only --recurse /)`.
+# * [Mojo::File](https://metacpan.org/pod/Mojo::File) – `say for path($path)->list_tree({hidden => 1, dir => 1})->each`.
+# * [Path::Find](https://metacpan.org/pod/Path::Find) — `@paths = path_find( $dir, "*.png" )`. Для сложных запросов использует _matchable_: `my $sub = matchable( sub { my( $entry, $directory, $fullname, $depth ) = @_; $depth <= 3 }`.
+# * [Path::Extended::Dir](https://metacpan.org/pod/Path::Extended::Dir) — `@paths = Path::Extended::Dir->new($dir)->find('*.txt')`.
+# * [Path::Iterator::Rule](https://metacpan.org/pod/Path::Iterator::Rule) — `$i = Path::Iterator::Rule->new->file; @paths = $i->clone->size(">10k")->all(@dirs); $i->size("<10k")...`.
+# * [Path::Class::Each](https://metacpan.org/pod/Path::Class::Each) — `dir($dir)->each(sub { push @paths, "$_" })`.
+# * [Path::Class::Iterator](https://metacpan.org/pod/Path::Class::Iterator) — `$i = Path::Class::Iterator->new(root => $dir, depth => 2); until ($i->done) { push @paths, $i->next->stringify }`.
+# * [Path::Class::Rule](https://metacpan.org/pod/Path::Class::Rule) — `@paths = Path::Class::Rule->new->file->size(">10k")->all($dir)`.
 # 
 # ## noenter (@filters)
 # 
@@ -213,9 +213,9 @@ done_testing; }; subtest 'erase (@paths)' => sub {
 # ### See also
 # 
 # * `unlink` + `rmdir`.
-# * <File::Path> — `remove_tree("dir")`.
-# * <File::Path::Tiny> — `File::Path::Tiny::rm($path)`. Не выбрасывает исключений.
-# * <Mojo::File> – `path($file)->remove`.
+# * [File::Path](https://metacpan.org/pod/File::Path) — `remove_tree("dir")`.
+# * [File::Path::Tiny](https://metacpan.org/pod/File::Path::Tiny) — `File::Path::Tiny::rm($path)`. Не выбрасывает исключений.
+# * [Mojo::File](https://metacpan.org/pod/Mojo::File) – `path($file)->remove`.
 # 
 # ## replace (&sub, @files)
 # 
@@ -240,10 +240,10 @@ replace { $b = ":utf8"; y/a/¡/ } [$_, ":raw"];
 # 
 # ### See also
 # 
-# * <File::Edit> – `File::Edit->new($file)->replace('x', 'y')->save`.
-# * <File::Edit::Portable> – `File::Edit::Portable->new->splice(file => $file, line => 10, contens => ["line1", "line2"])`.
-# * <File::Replace> – `($infh,$outfh,$repl) = replace3($file); while (<$infh>) { print $outfh "X: $_" } $repl->finish`.
-# * <File::Replace::Inplace>.
+# * [File::Edit](https://metacpan.org/pod/File::Edit) – `File::Edit->new($file)->replace('x', 'y')->save`.
+# * [File::Edit::Portable](https://metacpan.org/pod/File::Edit::Portable) – `File::Edit::Portable->new->splice(file => $file, line => 10, contens => ["line1", "line2"])`.
+# * [File::Replace](https://metacpan.org/pod/File::Replace) – `($infh,$outfh,$repl) = replace3($file); while (<$infh>) { print $outfh "X: $_" } $repl->finish`.
+# * [File::Replace::Inplace](https://metacpan.org/pod/File::Replace::Inplace).
 # 
 # ## mkpath (;$path)
 # 
@@ -266,8 +266,8 @@ mkpath "A///./file";
 # 
 # ### See also
 # 
-# * <File::Path> — `mkpath("dir1/dir2")`.
-# * <File::Path::Tiny> — `File::Path::Tiny::mk($path)`. Не выбрасывает исключений.
+# * [File::Path](https://metacpan.org/pod/File::Path) — `mkpath("dir1/dir2")`.
+# * [File::Path::Tiny](https://metacpan.org/pod/File::Path::Tiny) — `File::Path::Tiny::mk($path)`. Не выбрасывает исключений.
 # 
 # ## mtime (;$path)
 # 
@@ -285,9 +285,9 @@ local $_ = "nofile";
 # ### See also
 # 
 # * `-M` — `-M "file.txt"`, `-M _` в днях от текущего времени.
-# * <stat> — `(stat "file.txt")[9]` в секундах (unixtime).
-# * <Time::HiRes> — `(Time::HiRes::stat "file.txt")[9]` в секундах с дробной частью.
-# * <Mojo::File> — `path($file)->stat->mtime`.
+# * [stat](https://metacpan.org/pod/stat) — `(stat "file.txt")[9]` в секундах (unixtime).
+# * [Time::HiRes](https://metacpan.org/pod/Time::HiRes) — `(Time::HiRes::stat "file.txt")[9]` в секундах с дробной частью.
+# * [Mojo::File](https://metacpan.org/pod/Mojo::File) — `path($file)->stat->mtime`.
 # 
 # ## sta (;$path)
 # 
@@ -307,19 +307,19 @@ local $_ = "nofile";
 # 
 # ### See also
 # 
-# * <Fcntl> – содержит константы для распознавания режима.
-# * <BSD::stat> – дополнительно возвращает atime, ctime и mtime в наносекундах, флаги пользователя и номер генерации файла. Имеет ООП-интерфейс.
-# * <File::chmod> – `chmod("o=,g-w","file1","file2")`, `@newmodes = getchmod("+x","file1","file2")`.
-# * <File::stat> – предоставляет ООП-интерфейс к stat.
-# * <File::Stat::Bits> – аналогичен <Fcntl>.
-# * <File::stat::Extra> – расширяет <File::stat> методами для получения информации о режиме, а так же перезагружает **-X**, **<=>**, **cmp** и **~~** операторы и стрингифицируется.
-# * <File::Stat::Ls> – возвращает режим в формате утилиты ls.
-# * <File::Stat::Moose> – ООП интерфейс на Moose.
-# * <File::Stat::OO> – предоставляет ООП-интерфейс к stat. Может возвращать atime, ctime и mtime сразу в `DateTime`.
-# * <File::Stat::Trigger> – следилка за изменением атрибутов файла.
-# * <Linux::stat> – парсит /proc/stat и возвращает доп-информацию. Однако в других ОС не работает.
-# * <Stat::lsMode> – возвращает режим в формате утилиты ls.
-# * <VMS::Stat> – возвращает списки VMS ACL.
+# * [Fcntl](https://metacpan.org/pod/Fcntl) – содержит константы для распознавания режима.
+# * [BSD::stat](https://metacpan.org/pod/BSD::stat) – дополнительно возвращает atime, ctime и mtime в наносекундах, флаги пользователя и номер генерации файла. Имеет ООП-интерфейс.
+# * [File::chmod](https://metacpan.org/pod/File::chmod) – `chmod("o=,g-w","file1","file2")`, `@newmodes = getchmod("+x","file1","file2")`.
+# * [File::stat](https://metacpan.org/pod/File::stat) – предоставляет ООП-интерфейс к stat.
+# * [File::Stat::Bits](https://metacpan.org/pod/File::Stat::Bits) – аналогичен [Fcntl](https://metacpan.org/pod/Fcntl).
+# * [File::stat::Extra](https://metacpan.org/pod/File::stat::Extra) – расширяет [File::stat](https://metacpan.org/pod/File::stat) методами для получения информации о режиме, а так же перезагружает **-X**, **<=>**, **cmp** и **~~** операторы и стрингифицируется.
+# * [File::Stat::Ls](https://metacpan.org/pod/File::Stat::Ls) – возвращает режим в формате утилиты ls.
+# * [File::Stat::Moose](https://metacpan.org/pod/File::Stat::Moose) – ООП интерфейс на Moose.
+# * [File::Stat::OO](https://metacpan.org/pod/File::Stat::OO) – предоставляет ООП-интерфейс к stat. Может возвращать atime, ctime и mtime сразу в `DateTime`.
+# * [File::Stat::Trigger](https://metacpan.org/pod/File::Stat::Trigger) – следилка за изменением атрибутов файла.
+# * [Linux::stat](https://metacpan.org/pod/Linux::stat) – парсит /proc/stat и возвращает доп-информацию. Однако в других ОС не работает.
+# * [Stat::lsMode](https://metacpan.org/pod/Stat::lsMode) – возвращает режим в формате утилиты ls.
+# * [VMS::Stat](https://metacpan.org/pod/VMS::Stat) – возвращает списки VMS ACL.
 # 
 # ## path (;$path)
 # 
@@ -568,21 +568,21 @@ done_testing; }; subtest 'path (;$path)' => sub {
 # Модули для определения ОС, а значит и определения, какие в ОС файловые пути:
 # 
 # * `$^O` – суперглобальная переменная с названием текущей ОС.
-# * <Devel::CheckOS>, <Perl::OSType> – определяют ОС.
-# * <Devel::AssertOS> – запрещает использовать модуль вне указанных ОС.
-# * <System::Info> – информация об ОС, её версии, дистрибутиве, CPU и хосте.
+# * [Devel::CheckOS](https://metacpan.org/pod/Devel::CheckOS), [Perl::OSType](https://metacpan.org/pod/Perl::OSType) – определяют ОС.
+# * [Devel::AssertOS](https://metacpan.org/pod/Devel::AssertOS) – запрещает использовать модуль вне указанных ОС.
+# * [System::Info](https://metacpan.org/pod/System::Info) – информация об ОС, её версии, дистрибутиве, CPU и хосте.
 # 
 # Выделяют части файловых путей:
 # 
-# * <File::Spec> – `($volume, $directories, $file) = File::Spec->splitpath($path)`. Поддерживает только unix, win32, os/2, vms, cygwin и amigaos.
-# * <File::Spec::Functions> – `($volume, $directories, $file) = splitpath($path)`.
-# * <File::Spec::Mac> – входит в <File::Spec>, но не определяется им, поэтому приходится использовать отдельно. Для mac os по 9-ю версию.
-# * <File::Basename> – `($name, $path, $suffix) = fileparse($fullname, @suffixlist)`.
-# * <Path::Class::File> – `file('foo', 'bar.txt')->is_absolute`.
-# * <Path::Extended::File> – `Path::Extended::File->new($file)->basename`.
-# * <Mojo::File> – `path($file)->extname`.
-# * <Path::Util> – `$filename = basename($dir)`.
-# * <Parse::Path> – `Parse::Path->new(path => 'gophers[0].food.count', style => 'DZIL')->push("chunk")`. Работает с путями как с массивами (`push`, `pop`, `shift`, `splice`). Так же перегружает операторы сравнения. У него есть стили: `DZIL`, `File::Unix`, `File::Win32`, `PerlClass` и `PerlClassUTF8`.
+# * [File::Spec](https://metacpan.org/pod/File::Spec) – `($volume, $directories, $file) = File::Spec->splitpath($path)`. Поддерживает только unix, win32, os/2, vms, cygwin и amigaos.
+# * [File::Spec::Functions](https://metacpan.org/pod/File::Spec::Functions) – `($volume, $directories, $file) = splitpath($path)`.
+# * [File::Spec::Mac](https://metacpan.org/pod/File::Spec::Mac) – входит в [File::Spec](https://metacpan.org/pod/File::Spec), но не определяется им, поэтому приходится использовать отдельно. Для mac os по 9-ю версию.
+# * [File::Basename](https://metacpan.org/pod/File::Basename) – `($name, $path, $suffix) = fileparse($fullname, @suffixlist)`.
+# * [Path::Class::File](https://metacpan.org/pod/Path::Class::File) – `file('foo', 'bar.txt')->is_absolute`.
+# * [Path::Extended::File](https://metacpan.org/pod/Path::Extended::File) – `Path::Extended::File->new($file)->basename`.
+# * [Mojo::File](https://metacpan.org/pod/Mojo::File) – `path($file)->extname`.
+# * [Path::Util](https://metacpan.org/pod/Path::Util) – `$filename = basename($dir)`.
+# * [Parse::Path](https://metacpan.org/pod/Parse::Path) – `Parse::Path->new(path => 'gophers[0].food.count', style => 'DZIL')->push("chunk")`. Работает с путями как с массивами (`push`, `pop`, `shift`, `splice`). Так же перегружает операторы сравнения. У него есть стили: `DZIL`, `File::Unix`, `File::Win32`, `PerlClass` и `PerlClassUTF8`.
 # 
 # ## transpath ($path?, $from, $to)
 # 
@@ -705,9 +705,9 @@ done_testing; }; subtest 'wildcard (;$wildcard)' => sub {
 # 
 # ### See also
 # 
-# * <File::Wildcard>.
-# * <String::Wildcard::Bash>.
-# * <Text::Glob> — `glob_to_regex("*.{pm,pl}")`.
+# * [File::Wildcard](https://metacpan.org/pod/File::Wildcard).
+# * [String::Wildcard::Bash](https://metacpan.org/pod/String::Wildcard::Bash).
+# * [Text::Glob](https://metacpan.org/pod/Text::Glob) — `glob_to_regex("*.{pm,pl}")`.
 # 
 # ## goto_editor ($path, $line)
 # 

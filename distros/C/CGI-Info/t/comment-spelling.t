@@ -24,6 +24,7 @@ getpairs
 INET
 NetBSD
 NUL
+param
 paramref
 params
 realpath

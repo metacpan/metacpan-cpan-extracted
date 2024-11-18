@@ -28,14 +28,10 @@ PROTOTYPES: ENABLE
  # XS comments begin with " #" to avoid them being interpreted as pre-processor
  # directives
 
-U32
-_rand32()
+U32 _rand32()
 
-UV
-_rand64()
+UV _rand64()
 
-void
-_seed(UV seed1, UV seed2)
+void _seed(UV seed1, UV seed2)
 
-U32
-_bounded_rand(UV range)
+U32 _bounded_rand(UV range)

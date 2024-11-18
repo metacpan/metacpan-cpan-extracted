@@ -28,7 +28,7 @@
    "provides" : {
       "Devel::PatchPerl::Plugin::Darwin" : {
          "file" : "lib/Devel/PatchPerl/Plugin/Darwin.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.2"
       }
    },
    "release_status" : "stable",
@@ -37,6 +37,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "v0.1.1",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v0.1.2",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

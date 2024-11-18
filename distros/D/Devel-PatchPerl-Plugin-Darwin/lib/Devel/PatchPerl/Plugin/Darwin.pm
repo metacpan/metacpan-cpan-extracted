@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 
 my @patch = (
     {
@@ -62,6 +62,10 @@ my @patch = (
     {
 	perl => [ qr/^5\.25\.]d+/, qr/^5\.26\.[0-3]$/, qr/^5\.27\.\d+/, qr/^5\.28\.[0-3]$/ ],
 	subs => [ [ \&_patch_darwin_libperl_test5250 ] ],
+    },
+    {
+	perl => [ qr/^5\.30\.\d+/, qr/^5\.32\.\d+/, qr/^5\.33\.0/ ],
+	subs => [ [ \&_patch_darwin_libperl_test5300 ] ],
     },
 );
 
@@ -639,7 +643,17 @@ sub _patch_darwin_libperl_test5250 {
     my $patch = <<'END';
 --- t/porting/libperl.t
 +++ t/porting/libperl.t
-@@ -574,7 +574,7 @@ if (defined $nm_err_tmp) {
+@@ -241,7 +241,8 @@ sub nm_parse_gnu {
+ sub nm_parse_darwin {
+     my $symbols = shift;
+     my $line = $_;
+-    if (m{^(?:.+)?libperl\.a\((\w+\.o)\):$}) {
++    if (m{^(?:.+)?libperl\.a\((\w+\.o)\):$} ||
++        m{^(\w+\.o):$}) {
+         # object file name
+         $symbols->{obj}{$1}++;
+         $symbols->{o} = $1;
+@@ -574,7 +575,7 @@ if (defined $nm_err_tmp) {
          while (<$nm_err_fh>) {
              # OS X has weird error where nm warns about
              # "no name list" but then outputs fine.
@@ -648,6 +662,24 @@ sub _patch_darwin_libperl_test5250 {
                  print "# $^O ignoring $nm output: $_";
                  next;
              }
+END
+    Devel::PatchPerl::_patch($patch);
+}
+
+sub _patch_darwin_libperl_test5300 {
+    my $patch = <<'END';
+--- t/porting/libperl.t
++++ t/porting/libperl.t
+@@ -241,7 +241,8 @@ sub nm_parse_gnu {
+ sub nm_parse_darwin {
+     my $symbols = shift;
+     my $line = $_;
+-    if (m{^(?:.+)?libperl\.a\((\w+\.o)\):$}) {
++    if (m{^(?:.+)?libperl\.a\((\w+\.o)\):$} ||
++        m{^(\w+\.o):$}) {
+         # object file name
+         $symbols->{obj}{$1}++;
+         $symbols->{o} = $1;
 END
     Devel::PatchPerl::_patch($patch);
 }

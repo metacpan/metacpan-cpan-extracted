@@ -1,0 +1,32 @@
+---
+abstract: 'the CPAN Security Advisory data as a Perl data structure, mostly for CPAN::Audit'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Data::Rx: '0'
+  Mojo::Util: '0'
+  Test::More: '1'
+  YAML::XS: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPANSA-DB
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  perl: '5.020'
+resources:
+  bugtracker: hhttps://github.com/briandfoy/cpan-security-advisory/issues
+  homepage: hhttps://github.com/briandfoy/cpan-security-advisory
+  repository: hhttps://github.com/briandfoy/cpan-security-advisory
+version: '20241117.003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

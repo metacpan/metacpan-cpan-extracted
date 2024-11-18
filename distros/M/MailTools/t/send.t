@@ -45,3 +45,5 @@ printf "ok %d\n",$i++;
 $msg->delete('X-Test') or print "not ";
 printf "ok %d\n",$i++;
 
+#my $fh = $msg->open('testfile');  # produces 'mailer.testfile'
+#$fh->close;

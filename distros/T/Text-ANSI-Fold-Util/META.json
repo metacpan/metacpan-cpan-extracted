@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -43,8 +43,8 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.45",
-            "Text::ANSI::Fold" : "2.1301",
-            "Text::ANSI::Tabs" : "0.06",
+            "Text::ANSI::Fold" : "2.26",
+            "Text::ANSI::Tabs" : "1.06",
             "perl" : "v5.14.0"
          }
       },
@@ -57,26 +57,26 @@
    "provides" : {
       "Text::ANSI::Fold::Util" : {
          "file" : "lib/Text/ANSI/Fold/Util.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/kaz-utashiro/Text-ANSI-Fold-Util/issues"
+         "web" : "https://github.com/tecolicom/Text-ANSI-Fold-Util/issues"
       },
-      "homepage" : "https://github.com/kaz-utashiro/Text-ANSI-Fold-Util",
+      "homepage" : "https://github.com/tecolicom/Text-ANSI-Fold-Util",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/kaz-utashiro/Text-ANSI-Fold-Util.git",
-         "web" : "https://github.com/kaz-utashiro/Text-ANSI-Fold-Util"
+         "url" : "https://github.com/tecolicom/Text-ANSI-Fold-Util.git",
+         "web" : "https://github.com/tecolicom/Text-ANSI-Fold-Util"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

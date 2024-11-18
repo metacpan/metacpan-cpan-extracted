@@ -1,7 +1,8 @@
-old
+\.tar\.gz$
+\bold\/
 t\/t\/.*
-site\/
-src
+\bsite\/
+\bsrc
 #!start included /Users/drclaw/perl5/perlbrew/perls/perl-5.36.3/lib/5.36.3/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b

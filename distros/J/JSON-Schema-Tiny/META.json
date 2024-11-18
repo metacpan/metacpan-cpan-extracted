@@ -82,7 +82,7 @@
             "Scalar::Util" : "0",
             "Storable" : "0",
             "autovivification" : "0",
-            "builtin::compat" : "0",
+            "builtin::compat" : "0.003003",
             "constant" : "0",
             "experimental" : "0.026",
             "if" : "0",
@@ -200,7 +200,7 @@
    "provides" : {
       "JSON::Schema::Tiny" : {
          "file" : "lib/JSON/Schema/Tiny.pm",
-         "version" : "0.026"
+         "version" : "0.027"
       }
    },
    "release_status" : "stable",
@@ -215,7 +215,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Tiny"
       }
    },
-   "version" : "0.026",
+   "version" : "0.027",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.041005"
@@ -1110,7 +1110,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.026",
+                  "tag" : "v0.027",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

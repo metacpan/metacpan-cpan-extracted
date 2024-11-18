@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-Tiny
 
+0.027     2024-11-17 16:51:42Z
+          - bump builtin::compat prereq for compatibility issues
+
 0.026     2024-11-16 22:05:15Z
           - some performance optimizations for schema traversal and evaluation
           - is_equal() utility function, and the const and enum keywords, now

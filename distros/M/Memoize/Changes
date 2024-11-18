@@ -1,5 +1,8 @@
 Release history for Memoize
 
+1.17  Sun 17 Nov 2024
+  * Documentation fixes
+
 1.16  Sun 29 Jan 2023
   * Protection against @_ mutation by the normalizer (reported by Mithun Bhattacharya).
     This was a backcompat breakage in 1.10

@@ -31,13 +31,13 @@ name: Env-Dot
 provides:
   Env::Dot:
     file: lib/Env/Dot.pm
-    version: '0.017'
+    version: '0.018'
   Env::Dot::Functions:
     file: lib/Env/Dot/Functions.pm
-    version: '0.017'
+    version: '0.018'
   Env::Dot::ScriptFunctions:
     file: lib/Env/Dot/ScriptFunctions.pm
-    version: '0.017'
+    version: '0.018'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -56,7 +56,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Env-Dot
   homepage: https://metacpan.org/release/Env-Dot
   repository: git://github.com/mikkoi/env-dot.git
-version: '0.017'
+version: '0.018'
 x_contributors:
   - 'David Kaufman <david@gigawatt.org>'
   - 'Twata <twata_1@yahoo.co.jp>'

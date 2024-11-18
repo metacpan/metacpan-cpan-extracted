@@ -2,7 +2,7 @@
 # vim: ts=4 sts=4 sw=4:
 use strict;
 package CPAN;
-$CPAN::VERSION = '2.37';
+$CPAN::VERSION = '2.38';
 $CPAN::VERSION =~ s/_//;
 
 # we need to run chdir all over and we would get at wrong libraries
@@ -2086,6 +2086,17 @@ overridden in a user specific file: CPAN/MyConfig.pm. Such a file is
 best placed in C<$HOME/.cpan/CPAN/MyConfig.pm>, because C<$HOME/.cpan> is
 added to the search path of the CPAN module before the use() or
 require() statements. The mkmyconfig command writes this file for you.
+
+If you want to keep your own CPAN/MyConfig.pm somewhere else, you
+should load it before loading CPAN.pm, e.g.:
+
+  perl -I/tmp/somewhere -MCPAN::MyConfig -MCPAN -eshell
+
+  --or--
+
+ perl -I/tmp/somewhere -MCPAN::MyConfig -S cpan
+
+Once you are in the shell you can change your configuration as follows.
 
 The C<o conf> command has various bells and whistles:
 

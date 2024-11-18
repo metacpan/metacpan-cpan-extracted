@@ -1,5 +1,12 @@
 Revision history for OpenAPI-Client-OpenAI
 
+0.12    2024-11-18
+        - Added examples/get-embeddings.pl to the MANIFEST
+
+0.11    2024-11-18
+		- Update to the latest OpenAPI spec
+		- Add example of fetching embeddings from the API
+
 0.10    2024-10-05
         - Update MANIFEST to include missing example files
 

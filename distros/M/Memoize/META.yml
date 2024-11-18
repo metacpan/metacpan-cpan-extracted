@@ -22,7 +22,7 @@ resources:
   bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Memoize
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ap/Memoize.git
-version: '1.16'
+version: '1.17'
 x_copyright:
   holder: 'Mark Jason Dominus'
   year: 2012

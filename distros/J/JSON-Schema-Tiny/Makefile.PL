@@ -98,7 +98,7 @@ my %WriteMakefileArgs = (
     "Scalar::Util" => 0,
     "Storable" => 0,
     "autovivification" => 0,
-    "builtin::compat" => 0,
+    "builtin::compat" => "0.003003",
     "constant" => 0,
     "experimental" => "0.026",
     "if" => 0,
@@ -124,7 +124,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.026",
+  "VERSION" => "0.027",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -156,7 +156,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.96",
   "Test::Warnings" => 0,
   "autovivification" => 0,
-  "builtin::compat" => 0,
+  "builtin::compat" => "0.003003",
   "constant" => 0,
   "experimental" => "0.026",
   "if" => 0,

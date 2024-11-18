@@ -1,5 +1,5 @@
 ---
-abstract: 'utilities for the file system: reading, writing, searching, replacing files, etc.'
+abstract: 'утилиты для файловой системы: чтение, запись, поиск, замена файлов и т.д.'
 author:
   - 'Yaroslav O. Kosmina L<mailto:dart@cpan.org>'
 build_requires:
@@ -33,19 +33,28 @@ no_index:
 provides:
   Aion::Fs:
     file: lib/Aion/Fs.pm
-    version: v0.1.0
+    version: v0.1.2
 requires:
+  Exporter: '0'
+  File::Glob: '0'
   File::Spec: '0'
+  File::Spec::Unix: '0'
+  List::Util: '0'
   Scalar::Util: '0'
   Time::HiRes: '0'
   common::sense: '0'
   config: '1.3'
+  constant: '0'
+  diagnostics: '0'
+  feature: '0'
   perl: v5.22.0
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/darviarush/perl-aion-fs/issues
   homepage: https://github.com/darviarush/perl-aion-fs
   repository: https://github.com/darviarush/perl-aion-fs.git
-version: 0.1.0
+version: 0.1.2
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'

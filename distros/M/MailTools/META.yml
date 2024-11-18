@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,11 +22,11 @@ requires:
   Date::Parse: '0'
   IO::Handle: '0'
   Net::Domain: '1.05'
-  Net::SMTP: '1.03'
+  Net::SMTP: '1.28'
   Test::More: '0'
 resources:
   homepage: http://perl.overmeer.net/CPAN/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-MailTools.git
-version: '2.21'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+version: '2.22'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

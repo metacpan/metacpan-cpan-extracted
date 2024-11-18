@@ -67,7 +67,7 @@ HOSTNAMES: {
 	$ENV{'SERVER_PORT'} = 443;
 
 	$i = new_ok('CGI::Info');
-	ok($i->cgi_host_url() eq 'https://www.bandsman.co.uk');
+	cmp_ok($i->cgi_host_url(), 'eq', 'https://www.bandsman.co.uk', 'Check cgi_host_url');
 	ok($i->host_name() eq 'www.bandsman.co.uk');
 	# Check calling twice return path
 	ok($i->cgi_host_url() eq 'https://www.bandsman.co.uk');

@@ -4,10 +4,22 @@ use strict;
 use warnings;
 use v5.16;
 
+use Random::Simple;
+use Getopt::Long;
+
+my $debug = 0;
+
+GetOptions(
+	'debug' => \$debug,
+);
+
+$Random::Simple::debug = $debug;
+
 ###############################################################################
 ###############################################################################
 
-use Random::Simple;
+my $ver = $Random::Simple::VERSION;
+printf("Using %s %s\n\n", color('yellow', 'Random::Simple'), color('white', "v" .$ver));
 
 my $x   = Random::Simple::random_bytes(14);
 my $len = length($x);
@@ -16,19 +28,44 @@ print "Got $len random bytes: 0x$str\n\n";
 
 my $min = -20;
 my $max = 10;
-my $num = Random::Simple::random_int($min, $max);
-print "Random number between $min and $max = $num\n\n";
-
+my @nums;
 for (1 .. 9) {
-	my $x = Random::Simple::_rand32();
-	print "32 #$_: $x\n";
+	my $num = Random::Simple::random_int($min, $max);
+	push(@nums, $num);
+}
+
+my $num_str = join(", ", @nums);
+print "Random numbers (inclusive) between $min and $max = $num_str\n\n";
+
+for (1 .. 5) {
+	my $x = Random::Simple::random_float();
+	print "Float #$_: $x\n";
 }
 
 print "\n";
 
-for (1 .. 9) {
+for (1 .. 5) {
+	my $x = Random::Simple::_rand32();
+	my $per = sprintf("%0.1f%%", ($x / (2**32 - 1) * 100));
+
+	if ($debug) {
+		print "32bit #$_: $x ($per)\n";
+	} else {
+		print "32bit #$_: $x\n";
+	}
+}
+
+print "\n";
+
+for (1 .. 5) {
 	my $x = Random::Simple::_rand64();
-	print "64 #$_: $x\n";
+	my $per = sprintf("%0.1f%%", ($x / (2**64 - 1) * 100));
+
+	if ($debug) {
+		print "64bit #$_: $x ($per)\n";
+	} else {
+		print "64bit #$_: $x\n";
+	}
 }
 
 ###############################################################################

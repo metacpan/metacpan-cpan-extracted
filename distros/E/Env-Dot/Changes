@@ -1,5 +1,10 @@
 Revision history for Env-Dot
 
+0.018     2024-11-17 22:07:21+01:00 Europe/Stockholm
+            * Use Dzil plugin Git::Commit to commit instead of Run::AfterRelease.
+            * Reorder AfterRelease activity in dist.ini.
+            * Remove Modules::RequireVersionVar from excluded Perl::Critic tests.
+
 0.017     2024-11-03 21:50:44+01:00 Europe/Stockholm
             * Remove fatpacker instruction from README.
             * Remove whitespace.

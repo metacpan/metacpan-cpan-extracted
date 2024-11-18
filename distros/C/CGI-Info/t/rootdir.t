@@ -67,7 +67,8 @@ ROOTDIR: {
 	ok(-r $dir);
 	ok(-d $dir);
 
-	$ENV{'DOCUMENT_ROOT'} = File::Spec->catdir(File::Spec->tmpdir());
+	delete $ENV{'DOCUMENT_ROOT'};
+	$ENV{'C_DOCUMENT_ROOT'} = File::Spec->catdir(File::Spec->tmpdir());
 	$dir = $i->root_dir();
 	ok($dir eq File::Spec->catdir(File::Spec->tmpdir()));
 	ok(-r $dir);

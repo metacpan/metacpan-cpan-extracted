@@ -2,11 +2,12 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 64;
+
 use File::Spec;
 use Cwd;
 use Test::NoWarnings;
 use Tie::Filehandle::Preempt::Stdin;
+use Test::Most tests => 64;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -77,7 +78,7 @@ PATHS: {
 	delete $ENV{'SCRIPT_FILENAME'};
 
 	$i = new_ok('CGI::Info');
-	ok($i->script_name() eq 'bar.pl');
+	cmp_ok($i->script_name() ,'eq', 'bar.pl', 'script_name returns script name');
 	if($^O eq 'MSWin32') {
 		TODO: {
 			local $TODO = 'Absolute path test needs to be done on Windows';

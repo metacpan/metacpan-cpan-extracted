@@ -49,4 +49,4 @@ top       = 1000
 # Allow the use of Policies that are marked as "unsafe" by the author. Zero or One
 allow-unsafe = 0
 
-exclude = Modules::RequireVersionVar Documentation CodeLayout::RequireTidyCode
+exclude = Documentation CodeLayout::RequireTidyCode

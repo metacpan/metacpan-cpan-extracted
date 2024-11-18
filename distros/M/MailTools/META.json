@@ -4,7 +4,7 @@
       "Mark Overmeer <markov@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,7 @@
             "Date::Parse" : "0",
             "IO::Handle" : "0",
             "Net::Domain" : "1.05",
-            "Net::SMTP" : "1.03",
+            "Net::SMTP" : "1.28",
             "Test::More" : "0"
          }
       }
@@ -53,6 +53,6 @@
          "web" : "https://github.com/markov2/perl5-MailTools"
       }
    },
-   "version" : "2.21",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "2.22",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

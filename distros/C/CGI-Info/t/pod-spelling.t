@@ -14,26 +14,7 @@ all_pod_files_spelling_ok();
 
 __END__
 AnnoCPAN
-CGI
 CPAN
 CPANTS
-FCGI
 GPL
-Init
-ISPs
-logdir
 MetaCPAN
-POSTing
-RT
-cgi
-documentroot
-http
-https
-params
-param
-stdin
-tmpdir
-Tmpdir
-www
-xml
-iPad

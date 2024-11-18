@@ -14,6 +14,7 @@ t/10-compile.t
 t/20-new.t
 t/allow.t
 t/apoc.t
+t/as_string.t
 t/bin.t
 t/boiler.t
 t/carp.t

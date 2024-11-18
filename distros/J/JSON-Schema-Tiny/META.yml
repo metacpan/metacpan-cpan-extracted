@@ -45,7 +45,7 @@ no_index:
 provides:
   JSON::Schema::Tiny:
     file: lib/JSON/Schema/Tiny.pm
-    version: '0.026'
+    version: '0.027'
 requires:
   B: '0'
   Carp: '0'
@@ -62,7 +62,7 @@ requires:
   Scalar::Util: '0'
   Storable: '0'
   autovivification: '0'
-  builtin::compat: '0'
+  builtin::compat: '0.003003'
   constant: '0'
   experimental: '0.026'
   if: '0'
@@ -75,7 +75,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Tiny/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Tiny
   repository: https://github.com/karenetheridge/JSON-Schema-Tiny.git
-version: '0.026'
+version: '0.027'
 x_Dist_Zilla:
   perl:
     version: '5.041005'
@@ -756,7 +756,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.026
+          tag: v0.027
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

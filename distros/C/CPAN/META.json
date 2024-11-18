@@ -93,6 +93,6 @@
          "url" : "https://github.com/andk/cpanpm"
       }
    },
-   "version" : "2.37",
+   "version" : "2.38",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -10,6 +10,7 @@ examples/describe-image.pl
 examples/README.md
 examples/transcribe-audio.pl
 examples/translate.pl
+examples/get-embeddings.pl
 lib/OpenAPI/Client/OpenAI.pm
 lib/OpenAPI/Client/OpenAI/Methods.pod
 lib/OpenAPI/Client/OpenAI/Schema.pod

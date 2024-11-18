@@ -12,3 +12,7 @@ Revision history for Perl extension Graph::MaxFlow.
         Require Graph.pm version 0.50 or later
         Switched from svn to git, so removed $Id$ tags
         No changes to the core algorithm
+
+0.04  Sun 17 Nov 2024 08:36:10 PM EST
+        Changed email address from @cpan.org to @pobox.com
+        Updated copyright to 2024

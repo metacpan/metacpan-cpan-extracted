@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 179;
+use Test::Most tests => 189;
 use Test::NoWarnings;
 use File::Spec;
 use lib 't/lib';
@@ -80,6 +80,14 @@ PARAMS: {
 	cmp_ok($i->foo(), 'eq', 'bar', 'Test AUTOLOAD');
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
 
+	$ENV{'QUERY_STRING'} = 'page=submit&country=Singapore&county=';
+	$i = new_ok('CGI::Info');
+	%p = %{$i->params()};
+	diag(Data::Dumper->new([\%p])->Dump()) if($ENV{'TEST_VERBOSE'});
+	cmp_ok(scalar(keys %p), '==', 2, 'Ignored county=');
+	cmp_ok($p{'page'}, 'eq', 'submit', 'Parsed page=submit');
+	cmp_ok($p{'country'}, 'eq', 'Singapore', 'Parsed country=Singapore');
+
 	# Catch XSS attempts
 	$ENV{'QUERY_STRING'} = 'foo=bar&fred=<script>alert(123)</script>';
 	$i = new_ok('CGI::Info');
@@ -96,6 +104,7 @@ PARAMS: {
 	$i = new_ok('CGI::Info');
 	ok(!defined($i->params()));
 	ok($i->as_string() eq '');
+	cmp_ok($i->status(), '==', 403, 'SQL Injection generates 403 code');
 
 	# Seen in vwf.log
 	$ENV{'QUERY_STRING'} = 'entry=-4346" OR 1749\=1749 AND "dgiO"\="dgiO;page=people';
@@ -103,6 +112,7 @@ PARAMS: {
 	ok(!defined($i->params()));
 	ok(!defined($i->entry()));
 	ok($i->as_string() eq '');
+	cmp_ok($i->status(), '==', 403, 'SQL Injection generates 403 code');
 
 	$ENV{'QUERY_STRING'} = '<script>alert(123)</script>=wilma';
 	$i = new_ok('CGI::Info');
@@ -487,4 +497,26 @@ EOF
 	};
 
 	ok($@ =~ /Reset is a class method/);
+
+	$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
+	$ENV{'REQUEST_METHOD'} = 'GET';
+	$ENV{'QUERY_STRING'} = 'country=/etc/passwd&page=by_location';
+	delete $ENV{'CONTENT_TYPE'};
+	delete $ENV{'CONTENT_LENGTH'};
+	$i = new_ok('CGI::Info');
+
+	my $allow = {
+		'entry' => undef,
+		'country' => qr/^[A-Z\s]+$/i,	# Must start with a letter
+		'county' => qr/^[A-Z\s]+$/i,
+		'string' => undef,
+		'page' => 'by_location',
+		'lang' => qr/^[A-Z][A-Z]/i,
+	};
+
+	my %params = %{$i->params({ allow => $allow })};
+
+	cmp_ok($params{'page'}, 'eq', 'by_location', 'allow lets through legal parameters');
+	is($params{'country'}, undef, 'allow blocks illegal parameters');
+	cmp_ok($i->status(), '==', 422, 'HTTP Unprocessable Content');
 }

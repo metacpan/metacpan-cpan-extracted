@@ -7,7 +7,7 @@ use Carp 'carp';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(max_flow);
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 use strict;
 use warnings;
@@ -178,11 +178,11 @@ indicate the flow along each edge.
 
 =head1 AUTHOR
 
-Walt Mankowski, E<lt>waltman@cpan.orgE<gt>
+Walt Mankowski, E<lt>waltman@pobox.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2010 by Walt Mankowski
+Copyright 2024 by Walt Mankowski
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

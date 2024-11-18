@@ -1,14 +1,14 @@
 package App::ProcUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-21'; # DATE
-our $DIST = 'App-ProcUtils'; # DIST
-our $VERSION = '0.038'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-11-15'; # DATE
+our $DIST = 'App-ProcUtils'; # DIST
+our $VERSION = '0.039'; # VERSION
 
 our %SPEC;
 
@@ -39,7 +39,7 @@ our %args_filtering = (
     uids => {
         'x.name.is_plural' => 1,
         'x.name.singular' => 'uid',
-        schema => ['array*', of=>'unix::local_uid*'],
+        schema => ['array*', of=>'unix::uid::exists*'],
         tags => ['category:filtering'],
     },
     logic => {
@@ -53,13 +53,13 @@ our %args_filtering = (
     },
     code => {
         schema => 'code*',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 Code is given <pm:Proc::ProcessTable::Process> object, which is a hashref
 containing items like `pid`, `uid`, etc. It should return true to mean that a
 process matches.
 
-_
+MARKDOWN
         tags => ['category:filtering'],
     },
 );
@@ -330,7 +330,7 @@ App::ProcUtils - Command line utilities related to processes
 
 =head1 VERSION
 
-This document describes version 0.038 of App::ProcUtils (from Perl distribution App-ProcUtils), released on 2020-07-21.
+This document describes version 0.039 of App::ProcUtils (from Perl distribution App-ProcUtils), released on 2024-11-15.
 
 =head1 SYNOPSIS
 
@@ -357,7 +357,7 @@ This distribution provides the following command-line utilities:
 
 Usage:
 
- exists(%args) -> [status, msg, payload, meta]
+ exists(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check if processes that match criteria exists.
 
@@ -369,7 +369,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cmdline_match> => I<re>
 
+(No description)
+
 =item * B<cmdline_not_match> => I<re>
+
+(No description)
 
 =item * B<code> => I<code>
 
@@ -379,27 +383,39 @@ process matches.
 
 =item * B<exec_match> => I<re>
 
+(No description)
+
 =item * B<exec_not_match> => I<re>
+
+(No description)
 
 =item * B<logic> => I<str> (default: "AND")
 
+(No description)
+
 =item * B<pids> => I<array[unix::pid]>
+
+(No description)
 
 =item * B<quiet> => I<true>
 
-=item * B<uids> => I<array[unix::local_uid]>
+(No description)
+
+=item * B<uids> => I<array[unix::uid::exists]>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -409,7 +425,7 @@ Return value:  (any)
 
 Usage:
 
- kill(%args) -> [status, msg, payload, meta]
+ kill(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Kill processes that match criteria.
 
@@ -424,7 +440,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cmdline_match> => I<re>
 
+(No description)
+
 =item * B<cmdline_not_match> => I<re>
+
+(No description)
 
 =item * B<code> => I<code>
 
@@ -434,15 +454,27 @@ process matches.
 
 =item * B<exec_match> => I<re>
 
+(No description)
+
 =item * B<exec_not_match> => I<re>
+
+(No description)
 
 =item * B<logic> => I<str> (default: "AND")
 
+(No description)
+
 =item * B<pids> => I<array[unix::pid]>
+
+(No description)
 
 =item * B<signal> => I<unix::signal> (default: "TERM")
 
-=item * B<uids> => I<array[unix::local_uid]>
+(No description)
+
+=item * B<uids> => I<array[unix::uid::exists]>
+
+(No description)
 
 
 =back
@@ -459,12 +491,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -474,7 +506,7 @@ Return value:  (any)
 
 Usage:
 
- list(%args) -> [status, msg, payload, meta]
+ list(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List processes that match criteria.
 
@@ -486,7 +518,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cmdline_match> => I<re>
 
+(No description)
+
 =item * B<cmdline_not_match> => I<re>
+
+(No description)
 
 =item * B<code> => I<code>
 
@@ -500,25 +536,35 @@ Return detailed records instead of just PIDs.
 
 =item * B<exec_match> => I<re>
 
+(No description)
+
 =item * B<exec_not_match> => I<re>
+
+(No description)
 
 =item * B<logic> => I<str> (default: "AND")
 
+(No description)
+
 =item * B<pids> => I<array[unix::pid]>
 
-=item * B<uids> => I<array[unix::local_uid]>
+(No description)
+
+=item * B<uids> => I<array[unix::uid::exists]>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -528,7 +574,7 @@ Return value:  (any)
 
 Usage:
 
- list_parents() -> [status, msg, payload, meta]
+ list_parents() -> [$status_code, $reason, $payload, \%result_meta]
 
 List all the parents of the current process.
 
@@ -538,12 +584,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -553,7 +599,7 @@ Return value:  (any)
 
 Usage:
 
- table() -> [status, msg, payload, meta]
+ table() -> [$status_code, $reason, $payload, \%result_meta]
 
 Run Proc::ProcessTable and display the result.
 
@@ -563,12 +609,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -580,14 +626,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ProcUt
 
 Source repository is at L<https://github.com/perlancar/perl-App-ProcUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProcUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Proc::Find> is a similar module; App::ProcUtils provides the CLI scripts as
@@ -597,11 +635,37 @@ well as function interface.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProcUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -52,6 +52,14 @@ $_ = "\e[31m111\e[m222\e[31m333\e[m";
 my $s = Text::ANSI::Fold::Util::substr($_, 2, 5);
 is($s, "\e[31m1\e[m222\e[31m3\e[m", "color: good break");
 
+$_ = "\e[31m111222\e[m";
+
+my $s = Text::ANSI::Fold::Util::substr($_, 3, 6);
+is($s, "\e[31m222\e[m", "color: no-padding");
+
+Text::ANSI::Fold->configure(padding => 1);
+my $s = Text::ANSI::Fold::Util::substr($_, 3, 6);
+is($s, "\e[31m222\e[m   ", "color: padding");
 
 done_testing;
 

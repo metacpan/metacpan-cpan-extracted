@@ -13,7 +13,7 @@ no warnings "experimental";
 #use Template::Plex::Internal;
 use parent "Template::Plex";
 
-our $VERSION="v0.1.0";
+our $VERSION="v0.1.1";
 use File::Basename qw<dirname basename>;
 use File::Spec::Functions qw<catfile catdir abs2rel>;
 use File::Path qw<mkpath>;

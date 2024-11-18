@@ -1,5 +1,14 @@
 Revision history for CGI-Info
 
+0.85	Sun Nov 17 09:49:52 EST 2024
+	Send back HTTP code 422 when argument fails "allow"
+	Added come comments and small optimisations
+	new(): Use Scalar::Util to verify it's an object
+	Refactor AUTOLOAD
+	Avoid re-importing modules
+	Refactor status() and cookie() and add more tests
+	Added t/as_string.t
+
 0.84	Fri Oct 18 08:21:05 EDT 2024
 	Intercept SQL Injection
 		entry=-4346" OR 1749\=1749 AND "dgiO"\="dgiO;page=people

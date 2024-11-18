@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold-Util
 
+1.02 2024-11-17T13:08:04Z
+
+    - Share common object of Text::ANSI::Fold
+
 1.01 2022-08-05T23:04:21Z
 
     - Deprecate expand() and release 1.01.

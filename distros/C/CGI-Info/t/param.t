@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 31;
+use Test::Most tests => 33;
 use Test::NoWarnings;
 use lib 't/lib';
 use MyLogger;
@@ -65,4 +65,41 @@ PARAM: {
 	ok($i->param('foo', logger => MyLogger->new()) eq 'bar');
 	ok($i->param('fred') eq 'wilma');
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
+
+	subtest 'Test GET' => sub {
+		# Preserve the current %ENV, so changes are local to this subtest
+		local %ENV = %ENV;
+
+		my $info = CGI::Info->new();
+
+		$ENV{'REQUEST_METHOD'} = 'GET';
+		$ENV{'QUERY_STRING'} = 'name=John&age=30';
+
+		is($info->param('name'), 'John', 'name parameter is correct');
+		is($info->name(), 'John', 'name parameter is correct with AUTOLOAD')
+	};
+
+	subtest 'Test POST' => sub {
+		# Preserve the current %ENV, so changes are local to this subtest
+		local %ENV = %ENV;
+
+		CGI::Info->reset();	# Force stdin re-read
+
+		my $info = CGI::Info->new();
+		my $data = 'name=Jane&age=25';
+
+		$ENV{'CONTENT_LENGTH'} = length($data);
+		$ENV{'REQUEST_METHOD'} = 'POST';
+		$ENV{'CONTENT_TYPE'} = 'application/x-www-form-urlencoded';
+
+		# Simulate the input stream using an in-memory filehandle
+		open(my $fh, '<', \$data);
+		local *STDIN = $fh;	# Redirect STDIN to read from our in-memory filehandle
+		binmode($fh);
+
+		is($info->param('name'), 'Jane', 'name parameter is correct');
+		is($info->name(), 'Jane', 'name parameter is correct with AUTOLOAD');
+
+		close $fh
+	}
 }

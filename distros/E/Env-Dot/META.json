@@ -84,15 +84,15 @@
    "provides" : {
       "Env::Dot" : {
          "file" : "lib/Env/Dot.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "Env::Dot::Functions" : {
          "file" : "lib/Env/Dot/Functions.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "Env::Dot::ScriptFunctions" : {
          "file" : "lib/Env/Dot/ScriptFunctions.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       }
    },
    "release_status" : "stable",
@@ -108,7 +108,7 @@
          "web" : "https://github.com/mikkoi/env-dot"
       }
    },
-   "version" : "0.017",
+   "version" : "0.018",
    "x_contributors" : [
       "David Kaufman <david@gigawatt.org>",
       "Twata <twata_1@yahoo.co.jp>"
