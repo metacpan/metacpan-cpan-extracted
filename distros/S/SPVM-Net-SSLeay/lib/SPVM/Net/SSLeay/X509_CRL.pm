@@ -20,7 +20,7 @@ Net::SSLeay::X509_CRL class in L<SPVM> represents L<X509_CRL|https://docs.openss
 
 C<method DESTROY : void ();>
 
-Frees native L<X509_CRL|https://docs.openssl.org/3.1/man3/X509_CRL_new/> object by calling native L<X509_CRL_free|https://docs.openssl.org/3.1/man3/X509_CRL_free/> function if C<no_free> flag of the instance is not a true value.
+Calls native L<X509_CRL_free|https://docs.openssl.org/3.1/man3/X509_CRL_free/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
 
 =head1 FAQ
 

@@ -1,7 +1,7 @@
 # Copyright (c) 2024 Yuki Kimoto
 # MIT License
 
-class Net::SSLeay::X509_NAME {
+class Net::SSLeay::X509_NAME : pointer {
   
   use Fn;
   

@@ -32,7 +32,7 @@ If SSL_SESSION_up_ref failed, an exception is thrown with C<eval_error_id> set t
 
 C<method DESTROY : void ();>
 
-Frees native L<SSL_SESSION|https://docs.openssl.org/1.1.1/man3/SSL_SESSION_free/> object by calling native L<SSL_SESSION_free|https://docs.openssl.org/1.1.1/man3/SSL_SESSION_free/> function if C<no_free> flag of the instance is not a true value.
+Calls native L<SSL_SESSION_free|https://docs.openssl.org/1.1.1/man3/SSL_SESSION_free/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
 
 =head1 See Also
 

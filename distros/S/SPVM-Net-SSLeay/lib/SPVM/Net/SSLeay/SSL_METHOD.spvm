@@ -1,7 +1,7 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Net::SSLeay::SSL_METHOD {
+class Net::SSLeay::SSL_METHOD : pointer {
   
   use Net::SSLeay::Error;
   

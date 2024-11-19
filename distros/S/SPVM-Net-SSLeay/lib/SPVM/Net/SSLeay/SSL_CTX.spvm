@@ -1,7 +1,7 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Net::SSLeay::SSL_CTX {
+class Net::SSLeay::SSL_CTX : pointer {
   
   use Net::SSLeay::Error;
   
@@ -13,6 +13,23 @@ class Net::SSLeay::SSL_CTX {
   use Net::SSLeay::DH;
   use Net::SSLeay::EVP_PKEY;
   use List;
+  
+  use Net::SSLeay::Callback::TlsextServername;
+  use Net::SSLeay::Callback::TlsextStatus;
+  use Net::SSLeay::Callback::PemPasswd;
+  use Net::SSLeay::Callback::PskClient;
+  use Sync::Mutex;
+  
+  # Class Variables
+  our $PSK_CLIENT_CBS : Hash of Net::SSLeay::Callback::PskClient;
+  
+  our $MUTEX : Sync::Mutex;
+  
+  INIT {
+    $PSK_CLIENT_CBS = Hash->new;
+    
+    $MUTEX = Sync::Mutex->new;
+  }
   
   # Fields
   has pkeys_list : List of Net::SSLeay::EVP_PKEY;
@@ -82,6 +99,45 @@ class Net::SSLeay::SSL_CTX {
   native method add_client_CA : int ($cacert : Net::SSLeay::X509);
   
   native method add_extra_chain_cert : long ($x509 : Net::SSLeay::X509);
+  
+  native method set_tlsext_servername_callback : long ($cb : Net::SSLeay::Callback::TlsextServername, $arg : object = undef);
+  
+  native method set_tlsext_status_cb : long ($cb : Net::SSLeay::Callback::TlsextStatus, $arg : object = undef);
+  
+  native method set_default_passwd_cb : void ($cb : Net::SSLeay::Callback::PemPasswd, $arg : object = undef);
+  
+  native method set_psk_client_callback : void ($cb : Net::SSLeay::Callback::PskClient);
+  
+  private method get_psk_client_cb : Net::SSLeay::Callback::PskClient ($key : string) {
+    
+    $MUTEX->reader_lock;
+    
+    my $psk_clinent_cb = (Net::SSLeay::Callback::PskClient)$PSK_CLIENT_CBS->get($key);
+    
+    $MUTEX->reader_unlock;
+    
+    return $psk_clinent_cb;
+  }
+  
+  private method set_psk_client_cb : void ($key : string, $psk_clinent_cb : Net::SSLeay::Callback::PskClient) {
+    
+    $MUTEX->lock;
+    
+    $PSK_CLIENT_CBS->set($key, $psk_clinent_cb);
+    
+    $MUTEX->unlock;
+    
+  }
+  
+  private method delete_psk_client_cb : void ($key : string) {
+    
+    $MUTEX->lock;
+    
+    $PSK_CLIENT_CBS->delete($key);
+    
+    $MUTEX->unlock;
+    
+  }
   
   native method DESTROY : void ();
   

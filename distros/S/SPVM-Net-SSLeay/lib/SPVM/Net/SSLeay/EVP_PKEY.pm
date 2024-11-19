@@ -22,7 +22,7 @@ Net::SSLeay::EVP_PKEY class in L<SPVM> represents L<EVP_PKEY|https://docs.openss
 
 C<method DESTROY : void ();>
 
-Frees native L<EVP_PKEY|https://docs.openssl.org/3.0/man3/EVP_PKEY_new/> object by calling native L<EVP_PKEY_free|https://docs.openssl.org/3.0/man3/EVP_PKEY_new/> function if C<no_free> flag of the instance is not a true value.
+Calls native L<EVP_PKEY_free|https://docs.openssl.org/3.0/man3/EVP_PKEY_new/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
 
 =head1 See Also
 

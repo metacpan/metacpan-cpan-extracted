@@ -1,7 +1,7 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Net::SSLeay::X509_VERIFY_PARAM {
+class Net::SSLeay::X509_VERIFY_PARAM : pointer {
   allow Net::SSLeay::SSL_CTX;
   
   use Net::SSLeay::Error;

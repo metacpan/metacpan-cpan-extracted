@@ -8,6 +8,8 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
+#include <openssl/x509v3.h>
+
 static const char* FILE_NAME = "Net/SSLeay/X509.c";
 
 int32_t SPVM__Net__SSLeay__X509__get_issuer_name(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -195,7 +197,7 @@ int32_t SPVM__Net__SSLeay__X509__get_ext_d2i(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Net__SSLeay__X509__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Net__SSLeay__X509__dup(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
@@ -203,8 +205,56 @@ int32_t SPVM__Net__SSLeay__X509__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   X509* x509 = env->get_pointer(env, stack, obj_self);
   
+  X509* x509_dup = X509_dup(x509);
+  
+  assert(x509_dup);
+  
+  void* obj_address_x509_dup = env->new_pointer_object_by_name(env, stack, "Address", x509_dup, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  stack[0].oval = obj_address_x509_dup;
+  env->call_class_method_by_name(env, stack, "Net::SSLeay::X509", "new_with_pointer", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  void* obj_x509_dup = stack[0].oval;
+  
+  stack[0].oval = obj_x509_dup;
+  
+  return 0;
+}
+
+
+int32_t SPVM__Net__SSLeay__X509__check_issued(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  void* obj_subject = stack[1].oval;
+  
+  X509* x509 = env->get_pointer(env, stack, obj_self);
+  
+  if (!obj_subject) {
+    return env->die(env, stack, "The X509 object $subject must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  X509* subject = env->get_pointer(env, stack, obj_subject);
+  
+  int32_t status = X509_check_issued(x509, subject);
+  
+  stack[0].ival = status;
+  
+  return 0;
+}
+
+int32_t SPVM__Net__SSLeay__X509__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  X509* pointer = env->get_pointer(env, stack, obj_self);
+  
   if (!env->no_free(env, stack, obj_self)) {
-    X509_free(x509);
+    X509_free(pointer);
   }
   
   return 0;

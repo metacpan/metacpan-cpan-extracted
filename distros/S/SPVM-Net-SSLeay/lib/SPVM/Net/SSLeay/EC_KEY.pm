@@ -20,7 +20,7 @@ Net::SSLeay::EC_KEY class in L<SPVM> represents L<EC_KEY|https://docs.openssl.or
 
 =head2 new_by_curve_name
 
-C<method new_by_curve_name : Net::SSLeay::EC_KEY ($nid : int);>
+C<static method new_by_curve_name : Net::SSLeay::EC_KEY ($nid : int);>
 
 Calls native L<EC_KEY_new_by_curve_name|https://docs.openssl.org/1.1.1/man3/EC_KEY_new/> function given $nid, creates a new L<Net::SSLeay::EC_KEY|SPVM::Net::SSLeay::EC_KEY> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
 
@@ -34,7 +34,7 @@ If EC_KEY_new failed, an exception is thrown with C<eval_error_id> set to the ba
 
 C<method DESTROY : void ();>
 
-Frees native L<EC_KEY|https://docs.openssl.org/master/man3/EC_KEY_new/> object by calling native L<EC_KEY_free|https://docs.openssl.org/master/man3/EC_KEY_new/> function if C<no_free> flag of the instance is not a true value.
+Calls native L<EC_KEY_free|https://docs.openssl.org/master/man3/EC_KEY_new/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
 
 =head1 See Also
 

@@ -22,7 +22,7 @@ Net::SSLeay::OCSP_BASICRESP class in L<SPVM> represents L<OCSP_BASICRESP|https:/
 
 C<method DESTROY : void ();>
 
-Frees native L<OCSP_BASICRESP|https://docs.openssl.org/1.1.1/man3/X509_dup> object by calling native L<OCSP_BASICRESP_free|https://docs.openssl.org/1.1.1/man3/X509_dup> function if C<no_free> flag of the instance is not a true value.
+Calls native L<OCSP_BASICRESP_free|https://docs.openssl.org/1.1.1/man3/X509_dup> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
 
 =head1 See Also
 

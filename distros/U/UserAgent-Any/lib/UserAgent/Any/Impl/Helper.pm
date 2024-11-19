@@ -14,7 +14,9 @@ Readonly our %EXPORT_TAGS => ('all' => \@EXPORT_OK);
 Readonly our $VERSION => 0.01;
 
 Readonly our @METHODS => qw(delete get head patch post put);
-Readonly our %METHODS_WITH_DATA => map { $_ => 1 } qw(patch post put);
+Readonly our @METHODS_WITH_DATA => qw(patch post put);
+Readonly our %METHODS_WITH_DATA => map { $_ => 1 } @METHODS_WITH_DATA;
+Readonly our @METHODS_WITHOUT_DATA => grep { !$METHODS_WITH_DATA{$_} } @METHODS;
 
 sub get_call_args {  ## no critic (RequireArgUnpacking)
   my ($self, $method, $url) = (shift, shift, shift);

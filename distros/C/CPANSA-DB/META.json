@@ -1,7 +1,7 @@
 {
    "abstract" : "the CPAN Security Advisory data as a Perl data structure, mostly for CPAN::Audit",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
@@ -38,7 +38,6 @@
       "test" : {
          "requires" : {
             "Data::Rx" : "0",
-            "Mojo::Util" : "0",
             "Test::More" : "1",
             "YAML::XS" : "0"
          }
@@ -47,15 +46,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "hhttps://github.com/briandfoy/cpan-security-advisory/issues"
+         "web" : "https://github.com/briandfoy/cpan-security-advisory/issues"
       },
-      "homepage" : "hhttps://github.com/briandfoy/cpan-security-advisory",
+      "homepage" : "https://github.com/briandfoy/cpan-security-advisory",
       "repository" : {
          "type" : "git",
-         "url" : "hhttps://github.com/briandfoy/cpan-security-advisory",
-         "web" : "hhttps://github.com/briandfoy/cpan-security-advisory"
+         "url" : "https://github.com/briandfoy/cpan-security-advisory",
+         "web" : "https://github.com/briandfoy/cpan-security-advisory"
       }
    },
-   "version" : "20241117.003",
+   "version" : "20241118.002",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

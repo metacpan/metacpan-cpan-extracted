@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:DERIV';    # AUTHORITY
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 use feature qw(state);
 use parent  qw(Log::Any::Adapter::Coderef);
@@ -664,6 +664,7 @@ sub mask_sensitive {
         qr/\b(?:token|key|oauth[ _-]?token)\s*[:=]\s*([^\s]+)/i,    #Token or API key , = : value
         qr/(?:a1|r1|ct1)-[a-z0-9]{29}/i,                            #OAuth, Refresh, and CTrader token patterns
         qr/\b[a-z0-9]{15}\b/i,                                      #API Token
+        qr/xoxb-\d+-\d+-[a-z0-9]{24,}/i,                            #Slack Token
     );
 
     try {

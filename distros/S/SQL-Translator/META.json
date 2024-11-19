@@ -4,7 +4,7 @@
       "Ken Youens-Clark <kclark@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -102,7 +102,7 @@
       "x_IRC" : "irc://irc.perl.org/#sql-translator",
       "x_Ratings" : "http://cpanratings.perl.org/d/SQL-Translator"
    },
-   "version" : "1.65",
+   "version" : "1.66",
    "x_authority" : "cpan:JROBINSON",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

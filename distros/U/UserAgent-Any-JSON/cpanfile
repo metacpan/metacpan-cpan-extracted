@@ -34,6 +34,7 @@ on 'develop' => sub {
 requires 'JSON';
 requires 'Moo';
 requires 'UserAgent::Any';
+requires 'UserAgent::Any::Wrapper';
 requires 'namespace::clean';
 
 recommends 'JSON::XS';

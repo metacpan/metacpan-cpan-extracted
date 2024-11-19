@@ -973,10 +973,10 @@ int32_t SPVM__Net__SSLeay__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* pointer = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    SSL_free(ssl);
+    SSL_free(pointer);
   }
   
   return 0;

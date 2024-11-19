@@ -74,7 +74,7 @@ If X509_STORE_add_crl failed, an exception is thrown with C<eval_error_id> set t
 
 C<method DESTROY : void ();>
 
-Frees native L<X509_STORE|https://docs.openssl.org/3.1/man3/X509_STORE_new/> object by calling native L<X509_STORE_free|https://docs.openssl.org/3.1/man3/X509_STORE_free/> function if C<no_free> flag of the instance is not a true value.
+Calls native L<X509_STORE_free|https://docs.openssl.org/3.1/man3/X509_STORE_free/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
 
 =head1 FAQ
 

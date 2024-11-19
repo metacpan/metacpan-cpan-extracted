@@ -1,5 +1,11 @@
 Revision history for Perl distribution UserAgent-Any
 
+0.04 - 2024-11-18
+
+ - Improvement to the source distribution on GitHub.
+ - Move the wrap_method function to a separate package.
+ - Add the wrap_all_methods family of function.
+
 0.03 - 2024-11-16
 
  - Also simplify the Response object class hierarchy.

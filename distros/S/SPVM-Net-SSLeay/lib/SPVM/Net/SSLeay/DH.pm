@@ -26,7 +26,7 @@ Net::SSLeay::DH class in L<SPVM> represents L<DH|https://docs.openssl.org/3.0/ma
 
 C<method DESTROY : void ();>
 
-Frees native L<DH|https://docs.openssl.org/3.0/man3/DH_new/> object by calling native L<DH_free|https://docs.openssl.org/3.0/man3/DH_new/> function if C<no_free> flag of the instance is not a true value.
+Calls native L<DH_free|https://docs.openssl.org/3.0/man3/DH_new/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
 
 =head1 See Also
 

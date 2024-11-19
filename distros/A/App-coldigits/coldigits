@@ -1,0 +1,147 @@
+#!/usr/bin/perl 
+use 5.014 ; use warnings ; 
+use Time::HiRes qw [ gettimeofday tv_interval ] ;
+my ${ dt_start } = [ gettimeofday ] ; 
+use Encode qw[ decode_utf8 encode_utf8 ] ; 
+use Getopt::Std ; getopts '=0:R:i:u:y:' , \my %o  ; 
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ; 
+use autodie qw [ open ] ;
+use List::Util qw[ max ] ; 
+use Scalar::Util qw [ dualvar ]  ; 
+
+* d3 = exists $o{','} && $o{','} eq 0 ? sub{$_[0]} : sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
+my $time0 = time ; 
+my $help = 0  ; # オンラインヘルプの文面の表示をしたか否か。
+my $readLines  ; # 読み取った行数
+#my $diffChars = 0 ; # 出力の行数
+my $sec = $o{'@'} // 15 ; # 何秒おきにアラームを発生させるか
+
+our @y_ranges ; # = () ; 
+& y_init () ; 
+
+$o{0} //= '-' ; # 行列状の出力で 値が 0 の場合に出力する文字
+$o{q} //= "'" ; # 文字を囲む文字
+my $isep = $o{i} // "\t" ;  # 入力の区切り文字
+
+* R0proc = exists $o{R} && $o{R} eq 0 ? sub {} : sub { s/\r$// } ; 
+* decode = exists $o{u} && $o{u} eq 0 ? * decode_utf8 : sub ( $ ) { $_[0] } ; 
+#binmode STDOUT, ":utf8" ; # unless exists $o{u} && $o{u} eq 0 ;
+
+my @cn =  & colnames if $o{'='} ;  # Column Names の頭文字
+
+my @cd  ; # $c[列番]{桁数} により、0始まり何番の列に、何桁のものが、何件あったかを示す。
+my %dl  ; # $dl{ 桁数} > 0 により、その桁数のものが存在したことを示す。digit length のつもり。
+
+
+my @fm1 ; # $fm1[col] で col番列の桁数の最大値を記録。dualvar であり、その時の最大値の時の、該当文字列も格納。
+my @fm2 ; # %fm1 とよく似ているが、最後の例を取り出す。 dualvar であることは同じ。
+my @fm1C ; # その対応する文字列の出現回数を格納する。
+my @fm2C ; 
+
+
+while( <> ) { 
+  chomp ; & R0proc ; 
+  my @F = split /$isep/ , decode( $_ ) , -1 ; 
+  for ( 0 .. $#F ) { 
+    my $len = length $F[$_] ; 
+    next unless & y_filter ($len) ; # 桁数が範囲外なら読まない
+    $cd [ $_ ] { $len } ++ ; 
+    $dl { $len } ++  ;
+
+    my %f1 ; #  $f1{ $char } でその行にその文字が何回出現したかを格納。
+    do{ $fm1C [ $_ ] = 0 ; $fm1[$_] = dualvar $len,$F[$_] } if ($fm1[$_]//0) < $len ;  # ここでの $_ は列番号である。
+    do{ $fm1C [ $_ ] ++ } if ($fm1[$_]//0) == $len && $fm1[$_] eq $F[$_] ; # dualvar の文字列の方の比較になっている
+    do{ $fm2C[$_]=0; $fm2[$_]=dualvar $len,$F[$_] } if ($fm2[$_]//0)<$len && $fm1[$_]ne$F[$_] &&  $fm1[$_] == $len ; #($fm1[$_]//0) <= $len && 
+    $fm2C[$_] ++ if defined $fm2[$_] && $fm2[$_] eq $F[$_] ; # dualvar の文字列の方の比較になっている    
+  }
+} 
+
+# 出力; 
+my @dl = sort { $a <=> $b } keys %dl ;
+say join "\t" , map { UNDERLINE $_ } 'col' , @dl ,qw[eg1(freq) eg2(freq)];  
+for my $col ( 0 .. $#cd ) {
+  my @out ; 
+  push @out , $cn [ $col ] // YELLOW $col + 1 ; 
+  push @out , $cd[ $col ] { $dl[$_] } // $o{0} for 0 .. $#dl ; 
+  push @out , $fm1[ $col ] . '' . FAINT "($fm1C[$col])" ;
+  push @out , $fm2[ $col ] . '' . FAINT "($fm2C[$col])" if exists $fm2[ $col ] ; 
+  #push @out , $cd [ $col ] for 0 .. $#dl ;
+  say join "\t" , @out ; 
+}
+
+$SIG{INT} = sub { exit } ;
+$SIG{ALRM} = sub { 
+  my $n = $.  =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr ; # 3桁ごとに区切る。
+  say STDERR GREEN "$n lines read ($Script). " , scalar localtime ; 
+  alarm $sec 
+} ; 
+alarm $sec ;
+
+### ヘッダから列名を取得する。 -= が指定された場合のみ
+sub colnames ( ) {  
+  $_ = <> ; 
+  #$rl ++ if defined $_ ; 
+  $_ //= '' ; 
+  & R0proc ; # <-- R0procで行末の\r対策。
+  chomp $_ ; 
+  decode ($_) ; 
+  my @F = split /$isep/, decode ($_) , -1 ; 
+} 
+
+##
+sub y_init ( ) { 
+  my @ranges = split /,/o , $o{y} // '' , -1 ; 
+  grep { $_ = $_ . ".." . $_ unless m/\.\./ }  @ranges ; # = split /,/ , $o{y} // '' , -1 ; 
+  do { m/^(\d*)\.\.(\d*)/ ; push @y_ranges , [ $1||1 , $2||'Inf' ] } for @ranges ; 
+}
+sub y_filter ( $ ) { 
+  do { return not 0 if $_->[0] <= $_[0] && $_[0] <= $_->[1] } for @y_ranges ; 
+  return @y_ranges ? not 1 : not 0 ; # 指定が無かった場合はとにかく真を返す。
+}
+
+END {
+  exit if $help ;
+  my $procsec = sprintf "%.5f", tv_interval ${ dt_start } ; #time - $time0 ; # このプログラムの処理にかかった秒数。比較する2個の時刻は秒単位なので、±1秒未満の誤差は発生する。
+  $readLines //= $. ; # Ctrl+Cの連打で必要となる処理。
+  return if ($o{2}//'') eq 0 ; 
+  my $linenumeral = $readLines > 1 ? 'lines' : 'line' ; 
+  print STDERR BOLD FAINT ITALIC & d3 ( $readLines ) . " $linenumeral read" ; 
+  #print STDERR BOLD FAINT ITALIC $o{'='} ? " after $o{q}$head$o{q}. " : ". " ; 
+  #my $charnumeral = $diffChars > 1 ? 'characters' : 'character' ; 
+  #print STDERR BOLD FAINT ITALIC & d3 ( $diffChars ) . " different $charnumeral in input are shown. " ; 
+  my $s = tv_interval $dt_start , [ gettimeofday ] ; 
+  say STDERR BOLD FAINT ITALIC " -- $Script ; " . $procsec . " sec. in process" ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+=encoding utf8
+
+=head1 $0 
+
+TSV形式ファイルにおいて、各列に何桁の文字列が何件含まれていたかを一覧表示する。
+出力の右側は、具体的な文字列の例を表す。その頻度は薄い文字で括弧内に表す。
+その具体例の1番目は、最長の文字列であるが、オプションの-yで指定された場合、その範囲の長さに限定される。
+2番目の例は、1番目とは異なるものを探す。できるだけ長い文字列を採用するようにアルゴリズムの設計は試みたが、そうなるとも限らない。
+
+オプション : 
+
+ -=     : 入力の1行目を、変数名の並びと見なすか。見なした場合、出力の1列目に、列番号の代わりに列名が並ぶ。
+ -0 str : 頻度が0の場合に与える文字列
+ -i str : 入力の区切り文字。未指定なら \t すなわちタブ文字。csvなら -i , のように与える。
+ -u 0   : UTF-8 と通常見なすが、そうせず、バイナリのまま処理をする。
+ -R 0   : 改行がWindows形式すなわち \r\n であっても、\nしか改行文字と見なさない。(何かこの特殊な用途を想定して実装した。)
+
+=cut

@@ -1,0 +1,34 @@
+
+INSTALL memo for "App::coldigits" : 
+
+   cpanm App::coldigits
+
+
+
+## INSTALL
+
+cpanm App::coldigits
+
+
+## UNINSTALL 
+
+cpanm -U App::coldigits
+
+
+
+■ コマンド coldigits を使えるようにする方法 : 
+
+   インストール:     cpanm    App::coldigits
+アンインストール:   cpanm –U App::coldigits
+
+cpanmが使えない場合は、cpan でも良いが、インストールしたモジュールの
+アンインストールが難しくなるであろう。
+
+上記は  Perlのモジュールのインストールでよく用いられる方法である。
+
+■ cpanmやcpanによる一般的なインストールの方法は下記で網羅的に説明をしている。
+
+1. https://metacpan.org/release/TULAMILI/Table-Hack-0.12/source/Table-Hack.pdf
+2. https://www.ite.or.jp/wp/wp-content/uploads/opendata/tool201807.pdf
+
+上記2個のURLにある同じPDF形式ファイルは、2018年に下野寿之が書いたものである。   

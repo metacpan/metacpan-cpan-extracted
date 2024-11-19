@@ -1,6 +1,6 @@
 package SPVM::Net::SSLeay;
 
-our $VERSION = "0.013";
+our $VERSION = "0.014";
 
 1;
 
@@ -150,7 +150,7 @@ If load_client_CA_file failed, an exception is thrown with C<eval_error_id> set 
 
 C<method set_fd : int ($fd : int);>
 
-Calls native L<SSL_set_fd|https://docs.openssl.org/master/man3/SSL_set_fd/> function given $fd, and returns its return value.
+Calls native L<SSL_set_fd|https://docs.openssl.org/master/man3/SSL_set_fd/> function given the pointer value of the instance, $fd, and returns its return value.
 
 Exceptions:
 
@@ -202,7 +202,7 @@ If SSL_shutdown failed, an exception is thrown with C<eval_error_id> set to the 
 
 C<method read : int ($buf : mutable string, $num : int = -1, $offset : int = 0);>
 
-Calls native L<SSL_read|https://docs.openssl.org/1.1.1/man3/SSL_read/> function given $buf at the offest $offset, $num, and returns its return value.
+Calls native L<SSL_read|https://docs.openssl.org/1.1.1/man3/SSL_read/> function given the pointer value of the instance, $buf at the offest $offset, $num, and returns its return value.
 
 Exceptions:
 
@@ -218,7 +218,7 @@ If SSL_read failed, an exception is thrown with C<eval_error_id> set to the basi
 
 C<method peek : int ($buf : mutable string, $num : int = -1, $offset : int = 0);>
 
-Calls native L<SSL_peek|https://docs.openssl.org/1.1.1/man3/SSL_peek/> function given $buf at the offset $offset, $num, and returns its return value.
+Calls native L<SSL_peek|https://docs.openssl.org/1.1.1/man3/SSL_peek/> function given the pointer value of the instance, $buf at the offset $offset, $num, and returns its return value.
 
 Exceptions:
 
@@ -234,7 +234,7 @@ If SSL_peek failed, an exception is thrown with C<eval_error_id> set to the basi
 
 C<method write : int ($buf : string, $num : int = -1, $offset : int = 0);>
 
-Calls native L<SSL_write|https://docs.openssl.org/1.1.1/man3/SSL_write/> function, given $buf at the offset $offset, $num, and returns its return value.
+Calls native L<SSL_write|https://docs.openssl.org/1.1.1/man3/SSL_write/> function, given the pointer value of the instance, $buf at the offset $offset, $num, and returns its return value.
 
 Exceptions:
 
@@ -250,13 +250,13 @@ If SSL_write failed, an exception is thrown with C<eval_error_id> set to the bas
 
 C<method get_servername : string ($type : int);>
 
-Calls native L<SSL_get_servername|https://docs.openssl.org/master/man3/SSL_CTX_set_tlsext_servername_callback> function given $type, and returns its return value.
+Calls native L<SSL_get_servername|https://docs.openssl.org/master/man3/SSL_CTX_set_tlsext_servername_callback> function given the pointer value of the instance, $type, and returns its return value.
 
 =head2 set_tlsext_status_type
 
 C<method set_tlsext_status_type : long  ($type : int);>
 
-Calls native L<SSL_set_tlsext_status_type|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_tlsext_status_cb> function given $type, and returns its return value.
+Calls native L<SSL_set_tlsext_status_type|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_tlsext_status_cb> function given the pointer value of the instance, $type, and returns its return value.
 
 Exceptions:
 
@@ -266,19 +266,19 @@ If SSL_set_tlsext_status_type failed, an exception is thrown with C<eval_error_i
 
 C<method alert_desc_string_long : string  ($type : int);>
 
-Calls native L<SSL_alert_desc_string_long|https://docs.openssl.org/1.1.1/man3/SSL_alert_type_string/> function given $type, and returns its return value.
+Calls native L<SSL_alert_desc_string_long|https://docs.openssl.org/1.1.1/man3/SSL_alert_type_string/> function given the pointer value of the instance, $type, and returns its return value.
 
 =head2 set_mode
 
 C<method set_mode : long ($mode : long);>
 
-Calls native L<SSL_set_mode|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_mode/> function given $mode, and returns its return value.
+Calls native L<SSL_set_mode|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_mode/> function given the pointer value of the instance, $mode, and returns its return value.
 
 =head2 clear_mode
 
 C<method clear_mode : long ($mode : long);>
 
-Calls native L<SSL_clear_mode|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_mode/> function given $mode, and returns its return value.
+Calls native L<SSL_clear_mode|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_mode/> function given the pointer value of the instance, $mode, and returns its return value.
 
 =head2 get_mode
 
@@ -364,13 +364,13 @@ C<no_free> flag of the new object is set to 1.
 
 C<method get0_next_proto_negotiated : void ($data_ref : string[], $len_ref : int*);>
 
-Calls native L<SSL_get0_next_proto_negotiated|https://docs.openssl.org/master/man3/SSL_get_certificate> function given $data_ref, $len_ref.
+Calls native L<SSL_get0_next_proto_negotiated|https://docs.openssl.org/master/man3/SSL_get_certificate> function given the pointer value of the instance, $data_ref, $len_ref.
 
 =head2 get0_alpn_selected
 
 C<method get0_alpn_selected : void ($data_ref : string[], $len_ref : int*);>
 
-Calls native L<SSL_get0_alpn_selected|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb> function given $data_ref, $len_ref.
+Calls native L<SSL_get0_alpn_selected|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb> function given the pointer value of the instance, $data_ref, $len_ref.
 
 =head2 get_peer_cert_chain
 

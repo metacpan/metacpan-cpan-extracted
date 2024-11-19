@@ -15,6 +15,10 @@ use Test2::V0;
 
 my $mock;
 
+if ($^O eq 'MSWin32') {
+  skip_all('Test::HTTP::MockServer does not seem to work under Windows');
+}
+
 sub _start_server {
   $mock = Test::HTTP::MockServer->new();
   $mock->bind_mock_server();

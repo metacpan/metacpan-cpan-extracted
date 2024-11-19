@@ -38,6 +38,14 @@ lib/SPVM/Net/SSLeay/BIO.c
 lib/SPVM/Net/SSLeay/BIO.config
 lib/SPVM/Net/SSLeay/BIO.pm
 lib/SPVM/Net/SSLeay/BIO.spvm
+lib/SPVM/Net/SSLeay/Callback/PemPasswd.pm
+lib/SPVM/Net/SSLeay/Callback/PemPasswd.spvm
+lib/SPVM/Net/SSLeay/Callback/PskClient.pm
+lib/SPVM/Net/SSLeay/Callback/PskClient.spvm
+lib/SPVM/Net/SSLeay/Callback/TlsextServername.pm
+lib/SPVM/Net/SSLeay/Callback/TlsextServername.spvm
+lib/SPVM/Net/SSLeay/Callback/TlsextStatus.pm
+lib/SPVM/Net/SSLeay/Callback/TlsextStatus.spvm
 lib/SPVM/Net/SSLeay/ConfigBuilder.pm
 lib/SPVM/Net/SSLeay/Constant.c
 lib/SPVM/Net/SSLeay/Constant.config
@@ -89,6 +97,10 @@ lib/SPVM/Net/SSLeay/OCSP_CERTID.c
 lib/SPVM/Net/SSLeay/OCSP_CERTID.config
 lib/SPVM/Net/SSLeay/OCSP_CERTID.pm
 lib/SPVM/Net/SSLeay/OCSP_CERTID.spvm
+lib/SPVM/Net/SSLeay/OCSP_ONEREQ.c
+lib/SPVM/Net/SSLeay/OCSP_ONEREQ.config
+lib/SPVM/Net/SSLeay/OCSP_ONEREQ.pm
+lib/SPVM/Net/SSLeay/OCSP_ONEREQ.spvm
 lib/SPVM/Net/SSLeay/OCSP_REQUEST.c
 lib/SPVM/Net/SSLeay/OCSP_REQUEST.config
 lib/SPVM/Net/SSLeay/OCSP_REQUEST.pm

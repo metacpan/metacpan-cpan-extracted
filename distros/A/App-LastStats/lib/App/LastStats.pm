@@ -14,7 +14,7 @@ class App::LastStats {
   use Getopt::Long;
   use JSON;
 
-  our $VERSION = '0.0.8';
+  our $VERSION = '0.0.9';
 
   field $username   :param = 'davorg';
   field $period     :param = '7day';
@@ -77,7 +77,7 @@ class App::LastStats {
       name     => $_->{name},
       count    => $_->{playcount},
     } } @artists;
-    say JSON->new->canonical(1)->encode(\@data);
+    say JSON->new->canonical(1)->pretty(1)->encode(\@data);
   }
 
   method render_html {

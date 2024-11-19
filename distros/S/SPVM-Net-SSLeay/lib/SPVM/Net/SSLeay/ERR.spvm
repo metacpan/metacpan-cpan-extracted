@@ -1,15 +1,16 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Net::SSLeay::ERR {
+class Net::SSLeay::ERR : pointer {
   
   use Net::SSLeay::Error;
   
   use Fn;
   
-  # Instance Methods
+  # Class Methods
   native static method error_string_n : void ($e : long, $buf : mutable string, $len : int = -1);
   
+  # Instance Methods
   static method error_string : string ($e : long) {
     my $buf = (mutable string)new_string_len 256;
     

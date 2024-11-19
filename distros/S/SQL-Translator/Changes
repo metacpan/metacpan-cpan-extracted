@@ -1,5 +1,9 @@
 Changes for SQL::Translator
 
+1.66 - 2024-11-18
+
+  FIXES
+  * fix precedence problem issue with newest perl (thanks @mauke)
 
 1.65 - 2024-01-15
   FIXES

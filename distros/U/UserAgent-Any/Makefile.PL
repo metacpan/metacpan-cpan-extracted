@@ -64,6 +64,7 @@ sub MY::postamble {
 
   push @postamble, <<"MAKE_FRAGMENT" if supported_platform();
 ALL_PM := \$(shell find lib -name "*.pm")
+TEST_PM := \$(shell find t -name "*.pm")
 ALL_EXE :=
 
 .PHONY: distupload cover critic rawcritic tidy spelling alltest clean clean_coverdb pod2html exe
@@ -83,7 +84,7 @@ rawcritic:
 \tperlcritic lib 
 
 tidy:
-\tperltidy -b -bext='/' \$(ALL_PM) \$(ALL_EXE)
+\tperltidy -b -bext='/' \$(ALL_PM) \$(TEST_PM) \$(ALL_EXE)
 
 spelling: export EXTENDED_TESTING = 1
 spelling:
@@ -135,16 +136,3 @@ MAKE_FRAGMENT
 # add to the generated Makefile.
 
 # End of the template. You can add custom content below this line.
-
-sub postamble {
-  return <<"MAKE_FRAGMENT" if supported_platform();
-
-TEST_PM := \$(shell find t -name "*.pm")
-
-tidy: tidy_test
-
-tidy_test:
-\tperltidy -b -bext='/' \$(TEST_PM)
-
-MAKE_FRAGMENT
-}

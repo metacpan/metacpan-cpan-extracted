@@ -104,10 +104,10 @@ int32_t SPVM__Net__SSLeay__X509_VERIFY_PARAM__DESTROY(SPVM_ENV* env, SPVM_VALUE*
   
   void* obj_self = stack[0].oval;
   
-  X509_VERIFY_PARAM* x509_verify_param = env->get_pointer(env, stack, obj_self);
+  X509_VERIFY_PARAM* pointer = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    X509_VERIFY_PARAM_free(x509_verify_param);
+    X509_VERIFY_PARAM_free(pointer);
   }
   
   return 0;

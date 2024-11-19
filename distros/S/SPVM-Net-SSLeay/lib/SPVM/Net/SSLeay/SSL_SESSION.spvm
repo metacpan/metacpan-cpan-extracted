@@ -1,7 +1,7 @@
 # Copyright (c) 2024 Yuki Kimoto
 # MIT License
 
-class Net::SSLeay::SSL_SESSION {
+class Net::SSLeay::SSL_SESSION : pointer {
   
   # Instance Methods
   native method DESTROY : void ();

@@ -1,7 +1,9 @@
 
 Revision history for Log-Any-Adapter-DERIV
-0.008     2024-03-20 08:41:56+00:00 UTC
+0.009     2024-11-18 11:50:10+00:00 UTC
+    - Added slack bot token pattern for masking
 
+0.008     2024-05-20 00:00:00+00:00 UTC
     - fixing of one sensitive regex pattern for log message masking
 
 0.007     2024-03-15 07:29:29+00:00 UTC

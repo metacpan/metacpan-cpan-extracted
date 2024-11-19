@@ -40,7 +40,7 @@ use File::Spec::Functions qw(catfile);
 my $module    = __PACKAGE__;
 ( my $dist = $module ) =~ s/::/-/g;
 
-my $github    = 'hhttps://github.com/briandfoy/cpan-security-advisory';
+my $github    = 'https://github.com/briandfoy/cpan-security-advisory';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
@@ -50,7 +50,7 @@ my %WriteMakefile = (
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
 	'LICENSE'       => 'artistic_2',
-	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
+	'AUTHOR'        => 'brian d foy <briandfoy@pobox.com>',
 
 	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker'   => '6.64',
@@ -64,7 +64,6 @@ my %WriteMakefile = (
 	# cpanfile exists
 	'TEST_REQUIRES' => {
 		'Data::Rx'   => '0',
-		'Mojo::Util' => '0',
 		'Test::More' => '1',
 		'YAML::XS'   => '0',
 		},

@@ -1,5 +1,3 @@
-package Amazon::Sites;
-
 =head1 NAME
 
 Amazon::Sites - A class to represent Amazon sites
@@ -36,22 +34,22 @@ use Feature::Compat::Class;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.1.7';
+our $VERSION = '0.1.9';
 
-class Amazon::Sites {
+class Amazon::Sites;
 
-  use Amazon::Site ();
+use Amazon::Site ();
 
-  field $include :param = [];
-  field $exclude :param = [];
-  field $assoc_codes :param = {};
-  field %sites = _init_sites($assoc_codes, $include, $exclude);
+field $include :param = [];
+field $exclude :param = [];
+field $assoc_codes :param = {};
+field %sites = _init_sites($assoc_codes, $include, $exclude);
 
-  ADJUST {
-    if (@$include and @$exclude) {
-      die "You can't specify both include and exclude";
-    }
+ADJUST {
+  if (@$include and @$exclude) {
+    die "You can't specify both include and exclude";
   }
+}
 
 =head1 METHODS
 
@@ -83,7 +81,7 @@ L<Amazon::Site> objects.
 
 =cut
 
-  method sites_hash { return %sites }
+method sites_hash { return %sites }
 
 =head2 site($code)
 
@@ -91,7 +89,7 @@ Given a two-letter country code, returns the corresponding L<Amazon::Site> objec
 
 =cut
 
-  method site ($code) { return $sites{$code} }
+method site ($code) { return $sites{$code} }
 
 =head2 sites
 
@@ -99,37 +97,37 @@ Returns a list of L<Amazon::Site> objects, sorted by the sort order.
 
 =cut
 
-  method sites {
-    my @sites = sort {
-      $a->sort <=> $b->sort;
-    } values %sites;
+method sites {
+  my @sites = sort {
+    $a->sort <=> $b->sort;
+  } values %sites;
 
-    return @sites;
+  return @sites;
+}
+
+sub _init_sites($assoc_codes, $include, $exclude) {
+  my %sites;
+  my @cols = qw[code country tldn currency sort];
+
+  my $where = tell DATA;
+
+  while (<DATA>) {
+    chomp;
+    my %site;
+    @site{@cols} = split /\t/;
+
+    next if @$include and not grep { $site{code} eq $_ } @$include;
+    next if @$exclude and grep { $site{code} eq $_ } @$exclude;
+
+    $site{assoc_code} = $assoc_codes->{$site{code}} if $assoc_codes->{$site{code}};
+
+    $sites{$site{code}} = Amazon::Site->new(%site);
   }
 
-  sub _init_sites($assoc_codes, $include, $exclude) {
-    my %sites;
-    my @cols = qw[code country tldn currency sort];
+  seek DATA, $where, 0;
 
-    my $where = tell DATA;
-
-    while (<DATA>) {
-      chomp;
-      my %site;
-      @site{@cols} = split /\t/;
-
-      next if @$include and not grep { $site{code} eq $_ } @$include;
-      next if @$exclude and grep { $site{code} eq $_ } @$exclude;
-
-      $site{assoc_code} = $assoc_codes->{$site{code}} if $assoc_codes->{$site{code}};
-
-      $sites{$site{code}} = Amazon::Site->new(%site);
-    }
-
-    seek DATA, $where, 0;
-
-    return %sites;
-  }
+  return %sites;
+}
 
 =head2 codes
 
@@ -137,9 +135,9 @@ Returns a list of the two-letter country codes, sorted by the sort order.
 
 =cut
 
-  method codes {
-    return sort keys %sites;
-  }
+method codes {
+  return sort keys %sites;
+}
 
 =head2 asin_urls
 
@@ -148,14 +146,13 @@ codes and the values are the corresponding ASIN URLs.
 
 =cut
 
-  method asin_urls ($asin) {
-    my %urls;
-    for my $site ($self->sites) {
-      $urls{$site->code} = $site->asin_url($asin);
-    }
-
-    return %urls;
+method asin_urls ($asin) {
+  my %urls;
+  for my $site ($self->sites) {
+    $urls{$site->code} = $site->asin_url($asin);
   }
+
+  return %urls;
 }
 
 1;

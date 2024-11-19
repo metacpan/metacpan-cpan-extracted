@@ -1,7 +1,7 @@
 # Copyright (c) 2024 Yuki Kimoto
 # MIT License
 
-class Net::SSLeay::X509_CRL {
+class Net::SSLeay::X509_CRL : pointer {
   allow Net::SSLeay::PEM;
   
   use Net::SSLeay::Error;

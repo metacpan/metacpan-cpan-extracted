@@ -1,3 +1,30 @@
+0.014 2024-11-19
+  [New Features]
+    * Add Net::SSLeay::OCSP#single_get0_status method.
+    * Add Net::SSLeay::OCSP#resp_find method.
+    * Add Net::SSLeay::OCSP_SINGLERESP#DESTROY method.
+    * Add Net::SSLeay::OCSP#resp_get0 method.
+    * Add Net::SSLeay::OCSP#response_get1_basic method.
+    * Add Net::SSLeay::X509_STORE_CTX#get1_issuer method.
+    * Add Net::SSLeay::X509_STORE_CTX#Init method.
+    * Add Net::SSLeay::X509#dup method.
+    * Add Net::SSLeay::OCSP#cert_to_id method.
+    * Add Net::SSLeay::X509#check_issued method.
+    * Add Net::SSLeay::OCSP_ONEREQ class.
+    * Add Net::SSLeay::OCSP_ONEREQ#DESTROY method.
+    * Add Net::SSLeay::OCSP#request_add0_id method.
+    * Add Net::SSLeay::OCSP#request_add1_nonce method.
+    * Add Net::SSLeay::OCSP_REQUEST#new method.
+    * Add Net::SSLeay::Net::SSLeay::Callback::TlsextServername interface.
+    * Add Net::SSLeay::SSL_CTX#set_tlsext_servername_callback method.
+    * Add Net::SSLeay::SSL_CTX#set_tlsext_status_cb method.
+    * Add Net::SSLeay::SSL_CTX#set_default_passwd_cb method.
+    * Add Net::SSLeay::Callback::PskClient class.
+    * Add Net::SSLeay::Callback::TlsextStatus class.
+    * Add Net::SSLeay::Callback::TlsextServername class.
+    * Add Net::SSLeay::Callback::PemPasswd class.
+    * Add Net::SSLeay::SSL_CTX#set_psk_client_callback method.
+    
 0.013 2024-11-14
   [New Features]
     * Add Net::SSLeay::OCSP#response_status_str method.

@@ -1,7 +1,7 @@
 # Copyright (c) 2024 Yuki Kimoto
 # MIT License
 
-class Net::SSLeay::DH {
+class Net::SSLeay::DH : pointer {
   
   # Instance Methods
   native method DESTROY : void ();

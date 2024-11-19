@@ -5,12 +5,12 @@ use 5.036;
 use Carp;
 use JSON;
 use Moo;
-use UserAgent::Any 'wrap_method';
 use UserAgent::Any::JSON::Response;
+use UserAgent::Any::Wrapper 'wrap_get_like_methods', 'wrap_post_like_methods';
 
 use namespace::clean;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 extends 'UserAgent::Any';
 
@@ -38,15 +38,8 @@ sub _process_response ($self, $res, @) {
   return UserAgent::Any::JSON::Response->new($res);
 }
 
-# GET style methods
-wrap_method(get => 'UserAgent::Any::get', \&_generate_get_request, \&_process_response);
-wrap_method(delete => 'UserAgent::Any::delete', \&_generate_get_request, \&_process_response);
-wrap_method(head => 'UserAgent::Any::head', \&_generate_get_request, \&_process_response);
-
-# POST style methods
-wrap_method(post => 'UserAgent::Any::post', \&_generate_post_request, \&_process_response);
-wrap_method(patch => 'UserAgent::Any::patch', \&_generate_post_request, \&_process_response);
-wrap_method(put => 'UserAgent::Any::put', \&_generate_post_request, \&_process_response);
+wrap_get_like_methods('UserAgent::Any', \&_generate_get_request, \&_process_response);
+wrap_post_like_methods('UserAgent::Any', \&_generate_post_request, \&_process_response);
 
 1;
 

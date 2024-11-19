@@ -117,10 +117,10 @@ int32_t SPVM__Net__SSLeay__X509_STORE__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack)
   
   void* obj_self = stack[0].oval;
   
-  X509_STORE* x509_store = env->get_pointer(env, stack, obj_self);
+  X509_STORE* pointer = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    X509_STORE_free(x509_store);
+    X509_STORE_free(pointer);
   }
   
   return 0;

@@ -1,6 +1,6 @@
 # Copyright (c) 2024 Yuki Kimoto
 # MIT License
 
-class Net::SSLeay::SSL_CIPHER {
+class Net::SSLeay::SSL_CIPHER : pointer {
   
 }

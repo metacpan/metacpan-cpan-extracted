@@ -99,6 +99,6 @@
          "web" : "https://github.com/mkende/perl_user_agent_any"
       }
    },
-   "version" : 0.03,
+   "version" : 0.04,
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

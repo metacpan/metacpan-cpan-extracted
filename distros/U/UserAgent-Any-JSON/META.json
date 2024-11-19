@@ -59,6 +59,7 @@
             "JSON" : "0",
             "Moo" : "0",
             "UserAgent::Any" : "0",
+            "UserAgent::Any::Wrapper" : "0",
             "namespace::clean" : "0",
             "perl" : "5.036"
          }
@@ -92,6 +93,6 @@
          "web" : "https://github.com/mkende/perl_user_agent_any_json"
       }
    },
-   "version" : 0.01,
+   "version" : 0.02,
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

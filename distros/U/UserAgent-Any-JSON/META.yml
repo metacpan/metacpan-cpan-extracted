@@ -38,10 +38,11 @@ requires:
   JSON: '0'
   Moo: '0'
   UserAgent::Any: '0'
+  UserAgent::Any::Wrapper: '0'
   namespace::clean: '0'
   perl: '5.036'
 resources:
   bugtracker: https://github.com/mkende/perl_user_agent_any_json/issues
   repository: https://github.com/mkende/perl_user_agent_any_json
-version: 0.01
+version: 0.02
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

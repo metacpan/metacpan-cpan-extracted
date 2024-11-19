@@ -1,5 +1,9 @@
 Revision history for Perl distribution UserAgent-Any-JSON
 
+0.02 - 2024-11-18
+
+ - Update to using the UserAgent::Any::Wrapper module.
+
 0.01 - 2024-11-16
 
  - Initial release.

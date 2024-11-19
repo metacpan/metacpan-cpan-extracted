@@ -44,7 +44,7 @@ If BIO_new_file failed, an exception is thrown with C<eval_error_id> set to the 
 
 C<method read : int ($data : mutable string, $dlen : int = -1);>
 
-Calls native L<BIO_read|https://docs.openssl.org/1.0.2/man3/BIO_read/> function given $data and $dlen, and returns its return value.
+Calls native L<BIO_read|https://docs.openssl.org/1.0.2/man3/BIO_read/> function given the pointer value of the instance, $data and $dlen, and returns its return value.
 
 If $dlen is lower than 0, it is set to the length of $data.
 
@@ -60,7 +60,7 @@ If BIO_read failed, an exception is thrown with C<eval_error_id> set to the basi
 
 C<method write : int ($data : string, $dlen : int = -1);>
 
-Calls native L<BIO_write|https://docs.openssl.org/1.0.2/man3/BIO_write/> function given $data and $dlen, and returns its return value.
+Calls native L<BIO_write|https://docs.openssl.org/1.0.2/man3/BIO_write/> function given the pointer value of the instance, $data and $dlen, and returns its return value.
 
 If $dlen is lower than 0, it is set to the length of $data.
 
@@ -76,7 +76,7 @@ If BIO_write failed, an exception is thrown with C<eval_error_id> set to the bas
 
 C<method DESTROY : void ();>
 
-Frees native L<BIO|https://docs.openssl.org/1.0.2/man3/BIO_new> object by calling native L<BIO_free|https://docs.openssl.org/1.0.2/man3/BIO_free> function if C<no_free> flag of the instance is not a true value.
+Calls native L<BIO_free|https://docs.openssl.org/1.0.2/man3/BIO_free> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
 
 =head1 See Also
 

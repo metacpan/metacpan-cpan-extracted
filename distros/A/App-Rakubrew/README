@@ -6,11 +6,21 @@ DESCRIPTION
 
     See rakubrew.org <https://rakubrew.org/>.
 
+CPAN INSTALLATION
+    If you want to install Rakubrew via CPAN there are a few things to watch
+    out for. Rakubrew installs an executable "rakubrew". To be able to run
+    executables installed via CPAN it's necessary for the respective "bin/"
+    folder to be in your "PATH" and "lib/" folder to be in your "PERL5LIB".
+    Usually this should be taken care for by your distribution or Perl
+    environment manager. If that's not the case, then putting something like
+    the following in your "~/.bashrc" will help. You'll need to adapt the
+    paths depending on where your Perl modules are installed to.
+
 AUTHOR
     Patrick Böker "<patrickb@cpan.org>" Tadeusz Sośnierz "<tadzik@cpan.org>"
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2020 by Patrick Böker.
+    This software is Copyright (c) 2024 by Patrick Böker.
 
     This is free software, licensed under:
 

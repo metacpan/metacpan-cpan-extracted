@@ -2,7 +2,7 @@ package App::Rakubrew;
 use strict;
 use warnings;
 use 5.010;
-our $VERSION = '39';
+our $VERSION = '40';
 
 use Encode::Locale qw(env);
 if (-t) {
@@ -323,8 +323,15 @@ EOL
         say "panda is discontinued; please use zef (rakubrew build-zef) instead";
 
     } elsif ($arg eq 'exec') {
-        my $prog_name = shift @args;
-        $self->do_exec($prog_name, \@args);
+        my $param = shift @args;
+        if ($param eq '--with') {
+            my $version = shift @args;
+            my $prog_name = shift @args;
+            $self->do_exec_with_version($version, $prog_name, \@args);
+        }
+        else {
+            $self->do_exec($param, \@args);
+        }
 
     } elsif ($arg eq 'which') {
         if (!@args) {
@@ -576,10 +583,10 @@ sub de_par_environment {
     delete $ENV{PAR_TEMP};
 }
 
-sub do_exec {
-    my ($self, $program, $args) = @_;
+sub do_exec_with_version {
+    my ($self, $version, $program, $args) = @_;
 
-    my $target = which($program, get_version());
+    my $target = which($program, $version);
 
     # Undo PAR env modifications.
     # Only need to do this on MacOS, as only there
@@ -593,6 +600,11 @@ sub do_exec {
     # Run.
     exec { $target } ($target, @$args);
     die "Executing $target failed with: $!";
+}
+
+sub do_exec {
+    my ($self, $program, $args) = @_;
+    $self->do_exec_with_version(get_version(), $program, $args);
 }
 
 1;
@@ -613,6 +625,28 @@ A tool to manage multiple Rakudo installations.
 
 See L<rakubrew.org|https://rakubrew.org/>.
 
+=head1 CPAN INSTALLATION
+
+If you want to install Rakubrew via CPAN there are a few things to watch out
+for. Rakubrew installs an executable C<rakubrew>. To be able to run executables
+installed via CPAN it's necessary for the respective C<bin/> folder to be in
+your C<PATH> and C<lib/> folder to be in your C<PERL5LIB>.
+Usually this should be taken care for by your distribution or Perl environment
+manager. If that's not the case, then putting something like the following in
+your C<~/.bashrc> will help. You'll need to adapt the paths depending on where
+your Perl modules are installed to.
+
+=begin shell
+
+export PATH="$HOME/perl5/bin/:$PATH"
+if [ -d $HOME/perl5/lib/perl5 ]; then
+	PERL5LIB=${PERL5LIB:+$PERL5LIB:}$HOME/perl5/lib/perl5
+	MANPATH=${MANPATH:+$MANPATH:}$HOME/perl5/man
+	export MANPATH PERL5LIB
+fi
+
+=end shell
+
 =head1 AUTHOR
 
 Patrick Böker C<< <patrickb@cpan.org> >>
@@ -620,7 +654,7 @@ Tadeusz Sośnierz C<< <tadzik@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Patrick Böker.
+This software is Copyright (c) 2024 by Patrick Böker.
 
 This is free software, licensed under:
 

@@ -3,56 +3,13 @@ package UserAgent::Any;
 use 5.036;
 
 use Carp;
-use Exporter 'import';
 use Moo;
 use Scalar::Util 'blessed';
 
-use namespace::clean -except => ['import'];
+use namespace::clean;
 
-our $VERSION = 0.03;
-our @EXPORT_OK = ('wrap_method');
-
-sub _wrap_response {
-  return undef unless @_;  ## no critic (ProhibitExplicitReturnUndef)
-  return @_ if @_ == 1;
-  return \@_;
-}
-
-sub wrap_method {  ## no critic (RequireArgUnpacking)
-  my $name = shift;
-  my $member = shift if ref($_[0]) eq 'CODE';  ## no critic (ProhibitConditionalDeclarations)
-  my ($method, $code, $cb) = @_;
-  my $dest_pkg = caller(0);
-  no strict 'refs';  ## no critic (ProhibitNoStrict)
-  my $get_obj = defined $member ? sub ($self) { $self->$member() } : sub ($self) { $self };
-  if (defined $cb) {
-    *{"${dest_pkg}::${name}"} = sub ($self, @args) {
-      $cb->($self, _wrap_response($get_obj->($self)->$method($code->($self, @args))), @args);
-    };
-    my $method_cb = "${method}_cb";
-    *{"${dest_pkg}::${name}_cb"} = sub ($self, @args) {
-      return sub ($final_cb) {
-        $get_obj->($self)->$method_cb($code->($self, @args))
-            ->(sub { $final_cb->($cb->($self, &_wrap_response, @args)) });
-      }
-    };
-    my $method_p = "${method}_p";
-    *{"${dest_pkg}::${name}_p"} = sub ($self, @args) {
-      $get_obj->($self)->$method_p($code->($self, @args))
-          ->then(sub { $cb->($self, &_wrap_response, @args) });
-    };
-  } else {
-    *{"${dest_pkg}::${name}"} =
-        sub ($self, @args) { $get_obj->($self)->$method($code->($self, @args)) };
-    my $method_cb = "${method}_cb";
-    *{"${dest_pkg}::${name}_cb"} =
-        sub ($self, @args) { $get_obj->($self)->$method_cb($code->($self, @args)) };
-    my $method_p = "${method}_p";
-    *{"${dest_pkg}::${name}_p"} =
-        sub ($self, @args) { $get_obj->($self)->$method_p($code->($self, @args)) };
-  }
-  return;
-}
+our $VERSION = 0.04;
+our @CARP_NOT = 'UserAgent::Any::Wrapper';
 
 # We expect a single argument to this class, so we take it without the need to
 # pass it in a hash. See:
@@ -190,9 +147,9 @@ the asynchronous methods will throw an exception if the object is built with a
 user agent that does not support asynchronous calls.
 
 See the documentation of the L<C<get()> method|/get> for more explanation on the
-asynchronous support. And see the documentation of the
-L<C<wrap_method()> function|/wrap_method> to learn how you can easily expose
-sets of methods with the same sync/async semantics in your own library.
+asynchronous support. And see the documentation of L<UserAgent::Any::Wrapper> to
+learn how you can easily expose sets of methods with the same sync/async
+semantics in your own library.
 
 =head2 User agent methods
 
@@ -286,111 +243,6 @@ Same as the C<get> method, but uses the C<HEAD> HTTP verb for the request. Note
 that it means that in general the user agent will ignore the content returned by
 the server (except for the headers), even if some content is returned.
 
-=head2 Using UserAgent::Any in client libraries
-
-This section describes how to write higher level client libraries, on top of
-C<UserAgent::Any>, while retaining its benefit (support for any user agents and
-multiple asynchronous models).
-
-=head3 wrap_method
-
-The C<wrap_method()> function (which is the only one that can be exported by
-this module) is there to help implement API client library using
-C<UserAgent::Any> and expose methods handling callback and promise without
-having to implement them all.
-
-=head4 Calling a class method
-
-  wrap_method($name => $delegate, sub ($self, ...) { ... }, sub ($self, $res, ...));
-
-The call above will generate in your class a set of methods named C<$name>,
-C<$name_cb>, and C<$name_p>. These methods will each execute the first sub that
-was passed to C<wrap_method()> and then pass the results to the method named
-with C<$delegate> and a suffix matching that of the function called. The result
-of that call if passed to the second sub, if it was provided, in the right async
-context (in a callback or a C<then> method of a promise).
-
-For example, if you have a class that can I<already> handle methods C<foo>,
-C<foo_cb>, and C<foo_p> with the same semantics as the user agent methods above
-(this will typically be the methods for C<UserAgent::Any> itself) and you want
-to expose a method C<bar> that depends on C<foo> you can write:
-
-  wrap_method('bar' => 'foo', sub ($self, @args) { make_args_for_foo($@args) });
-
-And this will expose in your package a set of C<bar>, C<bar_cb>, and C<bar_p>
-methods with the same semantics that will use the provided method reference to
-build the arguments to C<foo>. For the synchronous case, the method from the
-example above will be equivalent to:
-
-  sub bar ($self, @args) { $self->foo($self, make_args_for_foo(@args))}
-
-You can optionally pass a second callback that will be called with the response
-from the wrapped method:
-
-  wrap_method($name => $delegate, $cb, sub ($self, $res, ...));
-
-The second callback will be called with the current object, the response from
-the wrapped method and the arguments that were passed to the wrappers (the same
-that were already passed to the first callback). The wrapped method will be
-called in list context. If it returns exactly 1 result, then that result is
-passed as-is to the second callback; if it returns 0 result, then the callback
-will receive C<undef>; otherwise the callback will receive an array reference
-with the result of the call.
-
-If you don’t pass a second callback, then the callback, promise or method will
-return the default result from the invoked method, without any transformation.
-
-=head4 Calling a method of a class member
-
-  wrap_method($name => \&method, $delegate, $cb1[, $cb2]);
-
-Alternatively to the above, C<wrap_method> can be used to wrap a method of a
-class member. Instead of calling the method named C<$delegate> in your class,
-the call above will call the method named C<$delegate> on the reference returned
-by the call to C<&method>.
-
-=head3 Example
-
-Here is are two minimal example on how to create a client library for a
-hypothetical service exposing a C<create> call using the C<POST> method.
-
-  package MyPackage;
-
-  use 5.036;
-
-  use Moo;
-  use UserAgent::Any 'wrap_method';
-
-  use namespace::clean;
-
-  extends 'UserAgent::Any';
-
-  wrap_method(create_document => 'post', sub ($self, %opts) {
-    return ('https://example.com/create/'.$opts{document_id}, $opts{content});
-  });
-
-Or, if you don’t want to re-expose the C<UserAgent::Any> method in your class
-directly (possibly because you want to re-use the same names), you can do:
-
-  package MyPackage;
-
-  use 5.036;
-
-  use Moo;
-  use UserAgent::Any 'wrap_method';
-
-  use namespace::clean;
-
-  has ua => (
-    is => 'ro',
-    coerce => sub { UserAgent::Any->new($_[0]) },
-    required => 1,
-  );
-
-  wrap_method(create_document => \&ua => 'post', sub ($self, %opts) {
-    return ('https://example.com/create/'.$opts{document_id}, $opts{content});
-  });
-
 =head1 BUGS AND LIMITATIONS
 
 =over 4
@@ -439,6 +291,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 =over 4
+
+=item *
+
+L<UserAgent::Any::Wrapper>
+
+=item *
+
+L<UserAgent::Any::Response>
 
 =item *
 

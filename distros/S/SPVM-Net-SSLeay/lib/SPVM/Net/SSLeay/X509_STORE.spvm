@@ -1,7 +1,7 @@
 # Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
-class Net::SSLeay::X509_STORE {
+class Net::SSLeay::X509_STORE : pointer {
   allow Net::SSLeay::SSL_CTX;
   
   use Net::SSLeay::Error;

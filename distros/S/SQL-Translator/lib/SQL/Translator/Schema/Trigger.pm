@@ -35,7 +35,7 @@ use Sub::Quote             qw(quote_sub);
 
 extends 'SQL::Translator::Schema::Object';
 
-our $VERSION = '1.65';
+our $VERSION = '1.66';
 
 =head2 new
 
@@ -356,7 +356,7 @@ around equals => sub {
     return $self->error('Names not equal');
   }
 
-  if (!$self->perform_action_when eq $other->perform_action_when) {
+  if ($self->perform_action_when ne $other->perform_action_when) {
     return $self->error('perform_action_when differs');
   }
 

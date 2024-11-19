@@ -3,7 +3,7 @@ package Perlsac::rwsac ;
 use strict ;
 use warnings ;
 
-our $VERSION = 0.03 ;
+our $VERSION = 0.05 ;
 
 our @map ;
 $map[0] = "delta" ;
@@ -140,6 +140,57 @@ $map[130] = "knetwk" ;
 $map[131] = "kdatrd" ;
 $map[132] = "kinst" ;
 
+sub init {
+	my ($b,$npts,$delta)=@_ ;
+	my %h ;
+	my $n = -1 ;
+	my $hname ;
+	for (1..70){
+		$n++ ;
+		$hname = $map[$n] ;
+		#print $f pack("f",$h{$hname}) ;
+		$h{$hname} = -12345.0 ;
+	}
+	for (1..40){
+		$n++ ;
+		$hname = $map[$n] ;
+		#print $f pack("i",$h{$hname}) ;
+		$h{$hname} = -12345 ;
+	}
+	for (1..1){
+		$n++ ;
+		$hname = $map[$n] ;
+		#print $f pack("a8",$h{$hname}) ;
+		$h{$hname} = "-12345  " ;
+	}
+	for (1..1){
+		$n++ ;
+		$hname = $map[$n] ;
+		#print $f pack("a16",$h{$hname}) ;
+		$h{$hname} = "-12345          " ;
+	}
+	for (1..21){
+		$n++ ;
+		$hname = $map[$n] ;
+		#print $f pack("a8",$h{$hname}) ;
+		$h{$hname} = "-12345  " ;
+	}
+	#required
+	$h{npts} = $npts ;
+	$h{nvhdr} = 6 ; #does not work when it is 7. Not sure about the reason.
+	$h{b} = $b ;
+	$h{e} = $b+$delta*$npts ;
+	$h{iftype} = 1 ;
+	$h{leven} = 1 ;
+	$h{delta} = $delta ;
+	for(my $i=0; $i<$npts; $i++){
+		$h{d}[$i] = 0.0 ;
+	}
+	$h{depmax} = 0.0 ;
+	$h{depmin} = 0.0 ;
+	return %h ;
+}
+
 sub rsac {
 	my ($fname)=@_ ;
 	my $b ;
@@ -174,12 +225,22 @@ sub rsac {
 	$h{d} = [@d1] ;
 	$h{d2} = [@d2] ;
 	$h{d3} = [@d3] ;
-	my @t ;
-	for (my $n=0; $n<=$h{npts}; $n++){
-		$t[$n] = $h{b}+$n*$h{delta} ;
-	}
-	$h{t} = [@t] ;
+	#my @t ;
+	#for (my $n=0; $n<=$h{npts}; $n++){
+	#	$t[$n] = $h{b}+$n*$h{delta} ;
+	#}
+	#$h{t} = [@t] ;
+	$h{t} = &calt($h{b},$h{npts},$h{delta}) ;
 	return %h ;
+}
+
+sub calt {
+	my ($b,$npts,$delta)=@_ ;
+	my @t ;
+	for (my $n=0; $n<$npts; $n++){
+		$t[$n] = $b+$n*$delta ;
+	}
+	return @t ;
 }
 
 sub wsac {
@@ -253,46 +314,71 @@ MIT
 
 Using C<cpan>:
 
-    $ cpan install Perlsac::rwsac
+    cpan install Perlsac::rwsac
 
 Manual install:
 
-    $ perl Makefile.PL
-    $ make
-    $ make install
+    perl Makefile.PL
+    make
+    make install
 
-=head1 TUTORIAL
+=head1 TUTORIALS
 
-Printing out time and data.
+1. Printing out time and data.
 
-    $ #!/usr/bin/env perl
-    $ 
-    $ use strict ;
-    $ use warnings ;
-    $ use Perlsac::rwsac ;
-    $ 
-    $ my %h = Perlsac::rwsac::rsac("example.sac") ;
-    $ 
-    $ for (my $n=0; $n<$h{npts}; $n++){
-    $     print "$h{t}[$n] $h{d}[$n]\n" ;
-    $ }
-    $ 
+    #!/usr/bin/env perl
+    
+    use strict ;
+    use warnings ;
+    use Perlsac::rwsac ;
+    
+    my %h = Perlsac::rwsac::rsac("example.sac") ;
+    
+    for (my $n=0; $n<$h{npts}; $n++){
+        print "$h{t}[$n] $h{d}[$n]\n" ;
+    }
+    
 
-Dividing data by 'depmax' in headers and writing a new sac file.
+2. Dividing data by 'depmax' in headers and writing a new sac file.
 
-    $ #!/usr/bin/env perl
-    $ 
-    $ use strict ;
-    $ use warnings ;
-    $ use Perlsac::rwsac ;
-    $ 
-    $ my %h = Perlsac::rwsac::rsac("example.sac") ;
-    $ 
-    $ for (my $n=0; $n<$h{npts}; $n++){
-    $     $h{d}[$n] /= $h{depmax} ;
-    $ }
-    $ 
-    $ &Perlsac::rwsac::wsac("example.sac.div",%h) ;
+    #!/usr/bin/env perl
+    
+    use strict ;
+    use warnings ;
+    use Perlsac::rwsac ;
+    
+    my %h = Perlsac::rwsac::rsac("example.sac") ;
+    
+    for (my $n=0; $n<$h{npts}; $n++){
+        $h{d}[$n] /= $h{depmax} ;
+    }
+    
+    &Perlsac::rwsac::wsac("example.sac.div",%h) ;
+
+3. Making a synthetic triangle-shaped waveform.
+
+    #!/usr/bin/env perl
+    
+    use strict ;
+    use warnings ;
+    use Perlsac::rwsac ;
+
+    my $b = 0.0 ;
+    my $npts = 20 ;
+    my $delta = 0.1 ;
+
+    my %h = Perlsac::rwsac::init($b, $npts, $delta) ; #b, npts, delta
+    #$h{d} are zero-padded.
+
+    my @ys = (
+      0,0,0,0,0,
+      1,2,3,4,5,
+      4,3,2,1,0,
+      0,0,0,0,0) ;
+
+    $h{d} = [@ys] ;
+   
+    &Perlsac::rwsac::wsac('triangle.sac',%h) ;
 
 =cut
 

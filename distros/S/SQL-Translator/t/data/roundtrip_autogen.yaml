@@ -337,4 +337,4 @@ translator:
   producer_type: SQL::Translator::Producer::YAML
   show_warnings: 0
   trace: 0
-  version: 1.65
+  version: 1.66

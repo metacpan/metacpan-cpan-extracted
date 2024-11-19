@@ -21,5 +21,5 @@ requires:
   perl: '5.032000'
   strict: '0'
   warnings: '0'
-version: 0.03
+version: 0.05
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

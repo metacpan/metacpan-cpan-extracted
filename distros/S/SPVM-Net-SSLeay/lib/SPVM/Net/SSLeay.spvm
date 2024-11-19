@@ -2,7 +2,7 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.013";
+  version "0.014";
   
   use Net::SSLeay::Constant;
   use Net::SSLeay::SSL_CTX;
@@ -12,6 +12,7 @@ class Net::SSLeay {
   use Net::SSLeay::X509;
   use Net::SSLeay::X509_NAME;
   use Net::SSLeay::SSL_SESSION;
+  use Net::SSLeay::OCSP_ONEREQ;
   
   INIT {
     &init();
@@ -26,6 +27,15 @@ class Net::SSLeay {
   
   # Class Methods
   native static method new : Net::SSLeay ($ssl_ctx : Net::SSLeay::SSL_CTX);
+  
+  private static method new_with_pointer : Net::SSLeay ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
   
   native static method alert_desc_string_long : string ($value : int);
   

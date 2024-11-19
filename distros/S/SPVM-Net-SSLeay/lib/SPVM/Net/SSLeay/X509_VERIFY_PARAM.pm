@@ -22,13 +22,13 @@ Net::SSLeay::X509_VERIFY_PARAM class in L<SPVM> represents L<X509_VERIFY_PARAM|h
 
 C<method set_hostflags : void ($flags : int);>
 
-Calls native L<X509_VERIFY_PARAM_set_hostflags|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function given $flags.
+Calls native L<X509_VERIFY_PARAM_set_hostflags|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function given the pointer value of the instance, $flags.
 
 =head2 set1_host
 
 C<method set1_host : int ($name : string, $namelen : int = 0);>
 
-Calls native L<X509_VERIFY_PARAM_set1_host|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function given $name, $namelen, and returns its return value.
+Calls native L<X509_VERIFY_PARAM_set1_host|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function given the pointer value of the instance, $name, $namelen, and returns its return value.
 
 If $namelen is 0, it is set to the length of $name.
 
@@ -44,7 +44,7 @@ If X509_VERIFY_PARAM_set1_host failed, an exception is thrown with C<eval_error_
 
 C<method set_flags : void ($flags : long);>
 
-Calls native L<X509_VERIFY_PARAM_set_flags|https://docs.openssl.org/master/man3/X509_VERIFY_PARAM_set_flags> function given $flags, and returns its return value.
+Calls native L<X509_VERIFY_PARAM_set_flags|https://docs.openssl.org/master/man3/X509_VERIFY_PARAM_set_flags> function given the pointer value of the instance, $flags, and returns its return value.
 
 Exceptions:
 
@@ -54,7 +54,7 @@ If X509_VERIFY_PARAM_set_flags failed, an exception is thrown with C<eval_error_
 
 C<method DESTROY : void ();>
 
-Frees native L<X509_VERIFY_PARAM|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> object by calling native L<X509_VERIFY_PARAM_free|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function if C<no_free> flag of the instance is not a true value.
+Calls native L<X509_VERIFY_PARAM_free|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
 
 =head1 FAQ
 

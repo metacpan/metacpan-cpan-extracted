@@ -1,6 +1,6 @@
 # Copyright (c) 2024 Yuki Kimoto
 # MIT License
 
-class Net::SSLeay::EVP_MD {
+class Net::SSLeay::EVP_MD : pointer {
   
 }

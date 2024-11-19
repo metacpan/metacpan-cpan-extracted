@@ -28,52 +28,52 @@ no_index:
 provides:
   App::Rakubrew:
     file: lib/App/Rakubrew.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Build:
     file: lib/App/Rakubrew/Build.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Config:
     file: lib/App/Rakubrew/Config.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Download:
     file: lib/App/Rakubrew/Download.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Shell:
     file: lib/App/Rakubrew/Shell.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Shell::Bash:
     file: lib/App/Rakubrew/Shell/Bash.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Shell::Cmd:
     file: lib/App/Rakubrew/Shell/Cmd.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Shell::Fish:
     file: lib/App/Rakubrew/Shell/Fish.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Shell::PowerShell:
     file: lib/App/Rakubrew/Shell/PowerShell.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Shell::Sh:
     file: lib/App/Rakubrew/Shell/Sh.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Shell::Tcsh:
     file: lib/App/Rakubrew/Shell/Tcsh.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Shell::Zsh:
     file: lib/App/Rakubrew/Shell/Zsh.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Tools:
     file: lib/App/Rakubrew/Tools.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Update:
     file: lib/App/Rakubrew/Update.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::Variables:
     file: lib/App/Rakubrew/Variables.pm
-    version: '39'
+    version: '40'
   App::Rakubrew::VersionHandling:
     file: lib/App/Rakubrew/VersionHandling.pm
-    version: '39'
+    version: '40'
 requires:
   Encode::Locale: '== 1.05'
   File::Copy::Recursive: '== 0.45'
@@ -87,7 +87,7 @@ resources:
   bugtracker: https://github.com/Raku/App-Rakubrew/issues
   homepage: https://rakubrew.org/
   repository: https://github.com/Raku/App-Rakubrew.git
-version: '39'
+version: '40'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

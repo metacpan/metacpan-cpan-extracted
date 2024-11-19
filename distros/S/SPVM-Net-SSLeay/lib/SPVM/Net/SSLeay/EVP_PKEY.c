@@ -14,10 +14,10 @@ int32_t SPVM__Net__SSLeay__EVP_PKEY__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  EVP_PKEY* evp_pkey = env->get_pointer(env, stack, obj_self);
+  EVP_PKEY* pointer = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    EVP_PKEY_free(evp_pkey);
+    EVP_PKEY_free(pointer);
   }
   
   return 0;
