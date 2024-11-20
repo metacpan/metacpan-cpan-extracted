@@ -102,12 +102,12 @@ if ($pid==0) {
 
 # TAP report 0 is hw report
 is($tap_reports[1], "1..1
-# Tapper-reportgroup-testrun: 4
-# Tapper-suite-name: Topic-Software
-# Tapper-suite-version: $Tapper::MCP::VERSION
-# Tapper-machine-name: bullock
-# Tapper-section: MCP overview
-# Tapper-reportgroup-primary: 1
+# Test-reportgroup-testrun: 4
+# Test-suite-name: Topic-Software
+# Test-suite-version: $Tapper::MCP::VERSION
+# Test-machine-name: bullock
+# Test-section: MCP overview
+# Test-reportgroup-primary: 1
 not ok 1 - Testrun cancelled during state 'installing': killed by admin
 # killed by admin
 ", 'Report for quit during installation');
@@ -138,12 +138,12 @@ if ($pid==0) {
 
 # TAP report 0 is hw report
 is($tap_reports[1], "1..2
-# Tapper-reportgroup-testrun: 4
-# Tapper-suite-name: Topic-Software
-# Tapper-suite-version: $Tapper::MCP::VERSION
-# Tapper-machine-name: bullock
-# Tapper-section: MCP overview
-# Tapper-reportgroup-primary: 1
+# Test-reportgroup-testrun: 4
+# Test-suite-name: Topic-Software
+# Test-suite-version: $Tapper::MCP::VERSION
+# Test-machine-name: bullock
+# Test-section: MCP overview
+# Test-reportgroup-primary: 1
 ok 1 - Installation finished
 not ok 2 - Testrun cancelled during state 'reboot_test': killed by admin
 # killed by admin

@@ -1,0 +1,31 @@
+########## no feature 'multidimensional'
+no feature 'multidimensional';
+---
+use v5.XX;
+no feature 'multidimensional';
+--- v5.36
+use v5.XX;
+########## feature multidimensional
+use feature 'multidimensional';
+---
+use v5.XX;
+--- v5.36
+use v5.XX;
+use feature 'multidimensional';
+########## no multidimensional
+no multidimensional;
+---
+use v5.XX;
+no multidimensional;
+--- v5.34
+use v5.XX;
+no feature 'multidimensional';
+--- v5.36
+use v5.XX;
+########## use multidimensional
+use multidimensional;
+---
+use v5.XX;
+--- v5.36
+use v5.XX;
+use feature 'multidimensional';

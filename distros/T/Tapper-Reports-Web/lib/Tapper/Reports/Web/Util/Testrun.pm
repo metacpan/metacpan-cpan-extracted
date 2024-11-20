@@ -1,10 +1,8 @@
 package Tapper::Reports::Web::Util::Testrun;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Util::Testrun::VERSION = '5.0.15';
+$Tapper::Reports::Web::Util::Testrun::VERSION = '5.0.17';
 use Moose;
 use Tapper::Model 'model';
-
-use common::sense;
 
 extends 'Tapper::Reports::Web::Util';
 
@@ -47,6 +45,10 @@ sub prepare_testrunlist
                         $status   = $testrun->testrun_scheduling->status;
                 }
 
+                my @resources = $testrun->claimed_resources;
+
+                my @dependencies = $testrun->depending_testruns;
+
                 my $tr = {
                           testrun_id            => $testrun->id,
                           success_ratio         => $testrun_report ? $testrun_report->success_ratio : 0,
@@ -58,6 +60,8 @@ sub prepare_testrunlist
                           created_at            => $testrun->created_at,
                           updated_at            => $updated_at || $testrun->updated_at,
                           owner                 => $testrun->owner->login || 'unknown user' ,
+                          resources             => \@resources,
+                          dependencies          => \@dependencies,
                          };
                 push @testruns, $tr;
         }
@@ -112,7 +116,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

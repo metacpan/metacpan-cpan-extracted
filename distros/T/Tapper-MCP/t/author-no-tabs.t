@@ -46,6 +46,7 @@ my @files = (
     'lib/Tapper/MCP/State/Details.pm',
     'lib/Tapper/MCP/State/Plugin/Dummy.pm',
     'lib/Tapper/MCP/State/Plugin/OSRC.pm',
+    't/00-compile.t',
     't/00-load.t',
     't/01-instance.t',
     't/author-eol.t',

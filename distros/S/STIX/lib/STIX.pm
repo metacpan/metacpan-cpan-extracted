@@ -165,7 +165,7 @@ my @COMMON = (qw[
     marking_definition
 ]);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 $VERSION =~ tr/_//d;    ## no critic
 
 our %EXPORT_TAGS = (
@@ -334,10 +334,6 @@ Import all STIX objects
 =item :common
 
 Import all common objects
-
-=item :objects
-
-Import all STIX objects
 
 =item :sco
 

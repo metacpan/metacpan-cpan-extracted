@@ -1,6 +1,6 @@
 package Tapper::Reports::Web::Controller::Tapper::ContinuousTestruns;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Controller::Tapper::ContinuousTestruns::VERSION = '5.0.15';
+$Tapper::Reports::Web::Controller::Tapper::ContinuousTestruns::VERSION = '5.0.17';
 # ABSTRACT: Tapper - List and edit continuous tests
 
 use strict;
@@ -213,6 +213,13 @@ sub edit_page : Private {
                 } $or_testrun->testrun_precondition
             ],
         };
+
+        my $trr = $or_testrun->testrun_requested_resource->first;
+
+        if (defined($trr)) {
+            my $res = $trr->alternatives->first->resource if defined $trr;
+            $or_c->stash->{continuous_testrun}->{resource} = $res->name;
+        }
     }
 
     return 1;
@@ -237,6 +244,8 @@ sub save : Local {
                 'testrun_scheduling.status'     => ['prepare','schedule'],
             };
 
+            my $or_target_testrun;
+
             if ( $or_c->req->params->{command} eq 'edit' ) {
 
                 $i_testrun_id            = $or_c->req->params->{testrun_id};
@@ -254,17 +263,15 @@ sub save : Local {
                     die "topic name already exists $i_testrun_id\n";
                 }
 
-                # update topic
-                $or_schema
+                $or_target_testrun = $or_schema
                     ->resultset('Testrun')
-                    ->search({
-                        -not    => { topic_name => $or_c->req->params->{topic}, },
-                        id      => $i_testrun_id,
-                    })
-                    ->update({
-                        topic_name => $or_c->req->params->{topic},
-                    })
-                ;
+                    ->find($i_testrun_id);
+
+                # update topic
+                if ( $or_target_testrun->topic_name ne $or_c->req->params->{topic} ) {
+                    $or_target_testrun->topic_name($or_c->req->params->{topic});
+                    $or_target_testrun->update;
+                }
 
                 # update queue
                 $or_schema
@@ -294,6 +301,15 @@ sub save : Local {
                     ->delete_all()
                 ;
 
+                my @resource_requests = $or_schema
+                    ->resultset('TestrunRequestedResource')
+                    ->search({ testrun_id => $i_testrun_id })
+                    ->all();
+
+                foreach my $req (@resource_requests) {
+                    $req->alternatives->delete_all();
+                    $req->delete();
+                }
             }
             elsif ( $or_c->req->params->{command} eq 'clone' ) {
 
@@ -327,6 +343,7 @@ sub save : Local {
                     })
                     ->insert()
                 ;
+                $or_target_testrun = $or_new_testrun;
 
                 # add a new testrun scheduling entry
                 my $or_testrun_scheduling = $or_schema
@@ -405,17 +422,30 @@ sub save : Local {
             }
 
             # insert testrun requested hosts
-            for my $i_host ( @{toarrayref( $or_c->req->params->{host} )} ) {
+            for my $s_host ( @{toarrayref( $or_c->req->params->{host} )} ) {
+                my $or_host = $or_schema->resultset('Host')->search({ name => $s_host })->first;
+
+                die "Host with name '$s_host' does not exist"
+                  unless defined $or_host;
+
                 $or_schema
                     ->resultset('TestrunRequestedHost')
                     ->new({
-                        host_id     => $i_host,
+                        host_id     => $or_host->id,
                         testrun_id  => $i_testrun_id,
                     })
                     ->insert()
                 ;
             }
 
+            # insert resource
+            my $resname = $or_c->req->params->{resource};
+            $resname =~ s/^\s+|\s+$//g if defined $resname;
+            if (defined $resname && $resname ne "") {
+              if (!$or_target_testrun->add_requested_resource_by_name($or_c->req->params->{resource})) {
+                die "Resource with name ".$or_c->req->params->{resource}." does not exist.";
+              }
+            }
         });
     }
     catch {
@@ -492,7 +522,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

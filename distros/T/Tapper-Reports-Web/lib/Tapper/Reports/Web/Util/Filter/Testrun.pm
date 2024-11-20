@@ -1,6 +1,6 @@
 package Tapper::Reports::Web::Util::Filter::Testrun;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Util::Filter::Testrun::VERSION = '5.0.15';
+$Tapper::Reports::Web::Util::Filter::Testrun::VERSION = '5.0.17';
 
 
 
@@ -24,6 +24,7 @@ sub BUILD {
                         {
                                 host    => \&host,
                                 owner   => \&owner,
+                                resource => \&resource,
                                 state   => sub { hr_set_filter_default( @_, 'state' );      },
                                 success => sub { hr_set_filter_default( @_, 'success' );    },
                                 topic   => sub { hr_set_filter_default( @_, 'topic' );      },
@@ -64,6 +65,23 @@ sub owner
         }
 
         push @{$filter_condition->{owner} ||= []}, $owner_result->id;
+
+        return $filter_condition;
+}
+
+
+sub resource
+{
+        my ($self, $filter_condition, $resource) = @_;
+
+        my $resource_result = model('TestrunDB')->resultset('Resource')->search({name => $resource})->first;
+
+        if (not $resource_result) {
+                $filter_condition->{error} = "No resource with name '$resource' found";
+                return $filter_condition;
+        }
+
+        push @{$filter_condition->{resource} ||= []}, $resource_result->id;
 
         return $filter_condition;
 }
@@ -112,6 +130,14 @@ Add owner filters to early filters.
 
 @return hash ref - updated filters
 
+=head2 resource
+
+Add resource filters to early filters.
+@param hash ref - current version of filters
+@param string   - resource name
+
+@return hash ref - updated filters
+
 =head1 NAME
 
 Tapper::Reports::Web::Util::Filter::Testrun - Filter utilities for testrun listing
@@ -132,7 +158,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

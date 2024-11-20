@@ -1,6 +1,6 @@
 package Tapper::Reports::Web::Controller::Tapper;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Controller::Tapper::VERSION = '5.0.15';
+$Tapper::Reports::Web::Controller::Tapper::VERSION = '5.0.17';
 use strict;
 use warnings;
 use 5.010;
@@ -89,7 +89,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

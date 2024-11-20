@@ -1,6 +1,6 @@
 package Tapper::Installer::Precondition::Exec;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Installer::Precondition::Exec::VERSION = '5.0.2';
+$Tapper::Installer::Precondition::Exec::VERSION = '5.0.3';
 use 5.010;
 use strict;
 use warnings;

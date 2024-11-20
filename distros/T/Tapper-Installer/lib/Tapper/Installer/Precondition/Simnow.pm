@@ -1,8 +1,7 @@
 package Tapper::Installer::Precondition::Simnow;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Installer::Precondition::Simnow::VERSION = '5.0.2';
+$Tapper::Installer::Precondition::Simnow::VERSION = '5.0.3';
 use Moose;
-use common::sense;
 
 use Tapper::Installer::Precondition::PRC;
 use YAML;

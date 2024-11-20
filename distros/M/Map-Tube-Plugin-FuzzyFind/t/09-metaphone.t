@@ -6,6 +6,8 @@ use Test::More 0.82;
 
 eval 'use Map::Tube::London 1.39';
 plan skip_all => 'Map::Tube::London (>= 1.39) required for this test' if $@;
+eval 'use Text::Metaphone';
+plan skip_all => 'Text::Metaphone required for this test'      if $@;
 
 # Would like to skip tests if Text::Metaphone is not installed.
 # Ordinarily, this would be done like so:

@@ -1,0 +1,8 @@
+########## no strict
+$one = 1;
+---
+use v5.XX;
+$one = 1;
+--- v5.12
+use v5.10;
+$one = 1;

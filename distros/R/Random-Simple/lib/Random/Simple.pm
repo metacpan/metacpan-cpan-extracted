@@ -1,6 +1,6 @@
 package Random::Simple;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our $debug   = 0;
 
 use strict;
@@ -159,11 +159,11 @@ think about it.
 
 =head2 Usage
 
-    use Random::Simple;
+	use Random::Simple;
 
-    my $integer = random_int($min, $max); # inclusive
-    my $float   = random_float();         # 0 - 1 inclusive
-    my $bytes   = random_bytes($count);   # string of X bytes
+	my $integer = random_int($min, $max); # inclusive
+	my $float   = random_float();         # 0 - 1 inclusive
+	my $bytes   = random_bytes($count);   # string of X bytes
 
 	my $die_roll       = random_int(1, 6);
 	my $random_percent = random_float() * 100;

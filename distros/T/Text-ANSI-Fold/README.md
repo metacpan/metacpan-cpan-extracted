@@ -5,7 +5,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 # VERSION
 
-Version 2.2104
+Version 2.2701
 
 # SYNOPSIS
 
@@ -30,7 +30,7 @@ Version 2.2104
         linebreak => LINEBREAK_ALL,
         runin     => 4,
         runout    => 4,
-        );
+    );
 
 # DESCRIPTION
 
@@ -49,6 +49,8 @@ the linebreak mode to enable it.
 Since the overhead of ANSI escape sequence handling is not significant
 when the data does not include them, this module can be used for
 normal text processing with small penalty.
+
+## **ansi\_fold**
 
 Use exported **ansi\_fold** function to fold original text, with number
 of visual columns you want to cut off the text.
@@ -70,6 +72,8 @@ This function returns at least one character in any situation.  If you
 provide Asian wide string and just one column as width, it trims off
 the first wide character even if it does not fit to given width.
 
+## **configure**
+
 Default parameter can be set by **configure** class method:
 
     Text::ANSI::Fold->configure(width => 80, padding => 1);
@@ -89,49 +93,74 @@ Some other easy-to-use interfaces are provided by sister module
 # OBJECT INTERFACE
 
 You can create an object to hold parameters, which is effective during
-object life time.  For example, 
+object life time.
 
-    my $f = Text::ANSI::Fold->new(
+## **new**
+
+Use `new` method to make a fold object.
+
+    my $obj = Text::ANSI::Fold->new(
         width => 80,
         boundary => 'word',
-        );
+    );
 
-makes an object folding on word boundaries with 80 columns width.
-Then you can use this without parameters.
+This makes an object folding on word boundaries with 80 columns width.
 
-    $f->fold($text);
+## **fold**
+
+Then you can call `fold` method without parameters because the object
+keeps necessary information.
+
+    $obj->fold($text);
+
+## **configure**
 
 Use **configure** method to update parameters:
 
-    $f->configure(padding => 1);
+    $obj->configure(padding => 1);
 
 Additional parameter can be specified on each call, and they precede
 saved value.
 
-    $f->fold($text, width => 40);
+    $obj->fold($text, width => 40);
 
 # STRING OBJECT INTERFACE
 
+You can use a fold object to hold string inside, and take out folded
+strings from it.  Use `text` method to store data in the object, and
+`retrieve` or `chops` method to take out folded string from it.
+
+## **text**
+
 A fold object can hold string inside by **text** method.
 
-    $f->text("text");
+    $obj->text("text");
 
-And folded string can be taken by **retrieve** method.  It returns
+Method **text** has an lvalue attribute, so it can be assigned to, as
+well as can be a subject of mutating operator such as `s///`.
+
+    $obj->text = "text";
+
+## **retrieve**
+
+Folded string can be taken out by `retrieve` method.  It returns
 empty string if nothing remained.
 
-    while ((my $folded = $f->retrieve) ne '') {
+    while ((my $folded = $obj->retrieve) ne '') {
         print $folded;
         print "\n" if $folded !~ /\n\z/;
     }
 
-Method **chops** returns chopped string list.  Because the **text**
+## **chops**
+
+Method `chops` returns chopped string list.  Because the `text`
 method returns the object itself when called with a parameter, you can
-use **text** and **chops** in series:
+use `text` and `chops` in series:
 
-    print join "\n", $f->text($string)->chops;
+    print join "\n", $obj->text($string)->chops;
 
-Actually, text can be set by **new** or **configure** method through
-**text** parameter.  Next program just works.
+Actually, text can be set by c&lt;new> or `configure` method through
+`text` parameter.  Next program just works.
 
     use Text::ANSI::Fold;
     while (<>) {
@@ -139,7 +168,9 @@ Actually, text can be set by **new** or **configure** method through
             Text::ANSI::Fold->new(width => 40, text => $_)->chops;
     }
 
-When using **chops** method, **width** parameter can take array
+## **chops** with multiple width
+
+When using `chops` method, `width` parameter can take array
 reference, and chops text into given width list.
 
     my $fold = Text::ANSI::Fold->new;
@@ -147,10 +178,17 @@ reference, and chops text into given width list.
     # return ("1", "22", "333") and keep "4444"
 
 If the width value is 0, it returns empty string.  Negative width
-value takes all the rest of stored string.
+value takes all the rest of stored string.  In the following code, the
+fourth width (3) is ignored because the -2 immediately preceding it
+consumes all remaining strings.
 
-Method **text** has an lvalue attribute, so it can be assigned to, as
-well as can be a subject of mutating operator such as `s///`.
+    my $fold = Text::ANSI::Fold->new;
+    my @list = $fold->text("1223334444")->chops(width => [ 1, 0, -2, 3 ]);
+    # return ("1", "", "223334444")
+
+The padding operation is performed only on the last non-empty element,
+and no elements corresponding to subsequent items are returned.  Also,
+of course, padding is not performed for negative widths.
 
 # OPTIONS
 
@@ -161,9 +199,9 @@ function as well as **new** and **configure** method.
 
     Text::ANSI::Fold->configure(boundary => 'word');
 
-    my $f = Text::ANSI::Fold->new(boundary => 'word');
+    my $obj = Text::ANSI::Fold->new(boundary => 'word');
 
-    $f->configure(boundary => 'word');
+    $obj->configure(boundary => 'word');
 
 - **width** => _n_ | _\[ n, m, ... \]_
 
@@ -213,6 +251,10 @@ function as well as **new** and **configure** method.
     If the value is reference to subroutine, its result is used as a
     prefix string.
 
+    The **fold** function does not complain if the result of adding a
+    prefix string is longer than the original text.  The caller must be
+    very careful because of the possibility of an infinite loop.
+
 - **ambiguous** => `narrow` or `wide`
 
     Tells how to treat Unicode East Asian ambiguous characters.  Default
@@ -253,6 +295,18 @@ function as well as **new** and **configure** method.
     Option **runin** and **runout** is used to set maximum width of moving
     characters.  Default values are both 2.
 
+- **crackwide** => _bool_
+- **lefthalf** => _char_
+- **righthalf** => _char_
+
+    It is sometimes necessary to split a string at the middle of a wide
+    character.  In such cases, the string is usually split before that
+    point.  If this parameter is true, that wide character is split into
+    left-half and right-half character.
+
+    The parameters `lefthalf` and `righthalf` specify the respective
+    characters. Their default value is both `NON-BREAK SPACE`.
+
 - **expand** => _bool_
 - **tabstop** => _n_
 - **tabhead** => _char_
@@ -276,16 +330,18 @@ function as well as **new** and **configure** method.
 
     Currently these names are available.
 
-        symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}",
-                    "\N{SYMBOL FOR SPACE}" ],
-        shade  => [ "\N{MEDIUM SHADE}",
-                    "\N{LIGHT SHADE}" ],
-        block  => [ "\N{LOWER ONE QUARTER BLOCK}",
-                    "\N{LOWER ONE EIGHTH BLOCK}" ],
-        bar    => [ "\N{BOX DRAWINGS HEAVY RIGHT}",
-                    "\N{BOX DRAWINGS LIGHT HORIZONTAL}" ],
-        dash   => [ "\N{BOX DRAWINGS HEAVY RIGHT}",
-                    "\N{BOX DRAWINGS LIGHT DOUBLE DASH HORIZONTAL}" ],
+        symbol   => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}",
+                      "\N{SYMBOL FOR SPACE}" ],
+        shade    => [ "\N{MEDIUM SHADE}",
+                      "\N{LIGHT SHADE}" ],
+        block    => [ "\N{LOWER ONE QUARTER BLOCK}",
+                      "\N{LOWER ONE EIGHTH BLOCK}" ],
+        needle   => [ "\N{BOX DRAWINGS HEAVY RIGHT}",
+                      "\N{BOX DRAWINGS LIGHT HORIZONTAL}" ],
+        dash     => [ "\N{BOX DRAWINGS HEAVY RIGHT}",
+                      "\N{BOX DRAWINGS LIGHT DOUBLE DASH HORIZONTAL}" ],
+        triangle => [ "\N{BLACK RIGHT-POINTING SMALL TRIANGLE}",
+                      "\N{WHITE RIGHT-POINTING SMALL TRIANGLE}" ],
 
     Below are styles providing same character for both tabhead and
     tabspace.
@@ -293,6 +349,7 @@ function as well as **new** and **configure** method.
         dot          => '.',
         space        => ' ',
         emspace      => "\N{EM SPACE}",
+        blank        => "\N{OPEN BOX}",
         middle-dot   => "\N{MIDDLE DOT}",
         arrow        => "\N{RIGHTWARDS ARROW}",
         double-arrow => "\N{RIGHTWARDS DOUBLE ARROW}",
@@ -325,12 +382,48 @@ text with Japanese prohibited character handling.
         linebreak => LINEBREAK_ALL,
         runin     => 4,
         runout    => 4,
-        );
+    );
     
     $, = "\n";
     while (<>) {
         print $fold->text($_)->chops;
     }
+
+# CONTROL CHARACTERS
+
+Text::ANSI::Fold handles the following line break related codes
+specially:
+
+    Newline (\n)
+    Form feed (\f)
+    Carriage return (\r)
+    Null (\0)
+    Line separator (U+2028)
+    Paragraph separator (U+2029)
+
+These characters are handled as follows:
+
+- NEWLINE (`\n`), CRNL (`\r\n`)
+- NULL (`\0`)
+- LINE SEPARATOR (`U+2028`)
+- PARAGRAPH SEPARATOR (`U+2029`)
+
+    If any of these characters are found, the folding process terminates
+    immediately and the portion up to that character is returned as folded
+    text.  These character itself is included at the end of the folded
+    text.
+
+- CARRIAGE RETURN (`\r`)
+
+    When a carriage return is found, it is added to the folded text and
+    the fold width is reset.
+
+- FORM FEED (`\f`)
+
+    If a form feed character is found in the middle of a string,
+    processing stops and the string up to the point immediately before is
+    returned.  If it is found at the beginning of a string, it is added to
+    the folded text and processing continues.
 
 # SEE ALSO
 
@@ -391,7 +484,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright ©︎ 2018-2023 Kazumasa Utashiro.
+Copyright ©︎ 2018-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

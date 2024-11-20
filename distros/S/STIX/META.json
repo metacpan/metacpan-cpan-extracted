@@ -59,7 +59,7 @@
          "web" : "https://github.com/giterlizzi/perl-STIX"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_purl" : "pkg:cpan/GDT/STIX",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

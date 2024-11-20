@@ -3,11 +3,12 @@ package AppBase::Grep;
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-25'; # DATE
+our $DATE = '2024-11-20'; # DATE
 our $DIST = 'AppBase-Grep'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our %SPEC;
 
@@ -170,10 +171,20 @@ string or regexp patterns.
 
 Will be called for each line of text with these arguments:
 
-    ($line, \%args)
+    ($line, \%args, $ansi_highlight_seqe)
 
 where `$line` is the line of text and `%args` are the arguments given to the
 `grep()` function.
+
+Should return either: 1) a simple scalar boolean value reflecting whether the
+line matches, true when it does and false otherwise; 2) an arrayref containing
+this information:
+
+    [
+      $is_match,            # bool, required
+      $highlighted_line,    # str , optional
+      $number_of_matches,   # bool, optional
+    ]
 
 MARKDOWN
         },
@@ -233,9 +244,9 @@ sub grep {
     $logic = 'and' if $args{all};
 
     my $num_matches = 0;
-    my ($line, $label, $linum, $chomp);
+    my ($line, $label, $linum, $chomp, $highlighted_line);
 
-    my $ansi_highlight = ColorThemeUtil::ANSI::item_color_to_ansi($ct_obj->get_item_color('highlight'));
+    my $ansi_highlight_seq = ColorThemeUtil::ANSI::item_color_to_ansi($ct_obj->get_item_color('highlight'));
     my $code_print = sub {
         if (defined $label && length $label) {
             if ($use_color) {
@@ -254,8 +265,12 @@ sub grep {
         }
 
         if ($use_color) {
-            $line =~ s/($re_highlight)/$ansi_highlight$1\e[0m/g;
-            print $line;
+            if (defined $highlighted_line) {
+                print $highlighted_line;
+            } else {
+                $line =~ s/($re_highlight)/$ansi_highlight_seq$1\e[0m/g;
+                print $line;
+            }
         } else {
             print $line;
         }
@@ -291,7 +306,15 @@ sub grep {
 
         my $is_line_match;
         if ($args{_filter_code}) {
-            $is_line_match = $args{_filter_code}->($line, \%args);
+            my $res = $args{_filter_code}->($line, \%args, $ansi_highlight_seq);
+            #log_trace "Result from _filter_code: %s", $res;
+            my $ref = ref $res;
+            if (!$ref) {
+                $is_line_match = $res;
+            } else {
+                die "BUG: _filter_code must return an arrayref" unless $ref eq 'ARRAY';
+                ($is_line_match, $highlighted_line, undef) = @$res; # num_of_matches still unused
+            }
         } elsif ($logic eq 'or') {
             $is_line_match = 0;
             for my $re (@re_patterns) {
@@ -361,7 +384,7 @@ AppBase::Grep - A base for grep-like CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.013 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2024-01-25.
+This document describes version 0.014 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2024-11-20.
 
 =head1 FUNCTIONS
 
@@ -528,7 +551,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

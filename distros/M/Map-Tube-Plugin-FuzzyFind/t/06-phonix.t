@@ -6,6 +6,8 @@ use Test::More 0.82;
 
 eval 'use Map::Tube::London 1.39';
 plan skip_all => 'Map::Tube::London (>= 1.39) required for this test' if $@;
+eval 'use Text::Phonetic::Phonix';
+plan skip_all => 'Text::Phonetic::Phonix required for this test'      if $@;
 
 plan tests => 14;
 
@@ -14,7 +16,8 @@ sub a2n { return [ map { $_->name( ) } @{ $_[0] } ]; }
 my $tube = new_ok( 'Map::Tube::London' );
 my $ret;
 
-print STDERR "\n   *** Expect many messages saying 'Negative repeat count does nothing at ...' -- ignore these, please! *** \n";
+diag( "*** Expect many messages saying 'Negative repeat count does nothing at ...' -- ignore these, please! *** \n",
+      "*** (They are coming from Text::Phonetic::Phonix. They are ugly but functionally harmless.)           ***" );
 
 $ret = $tube->fuzzy_find( 'Bakerloo', objects => 'lines', method => 'phonix' );
 is( $ret, 'Bakerloo', 'Finding line Bakerloo based on Phonix' );

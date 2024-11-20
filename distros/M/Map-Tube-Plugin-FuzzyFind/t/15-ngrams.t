@@ -6,7 +6,6 @@ use Test::More 0.82;
 
 eval 'use Map::Tube::London';
 plan skip_all => 'Map::Tube::London required for this test' if $@;
-
 eval 'use String::Trigram';
 plan skip_all => 'String::Trigram required for this test' if $@;
 

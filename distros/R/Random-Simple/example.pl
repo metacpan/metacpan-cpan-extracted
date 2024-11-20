@@ -84,7 +84,7 @@ sub color {
 	my ($str, $txt) = @_;
 
 	# If we're NOT connected to a an interactive terminal don't do color
-	if (-t STDOUT == 0) { return ''; }
+	if (-t STDOUT == 0) { return $txt; }
 
 	# No string sent in, so we just reset
 	if (!length($str) || $str eq 'reset') { return "\e[0m"; }

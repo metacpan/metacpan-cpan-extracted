@@ -1,6 +1,6 @@
 package Tapper::Installer::Precondition::PRC;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Installer::Precondition::PRC::VERSION = '5.0.2';
+$Tapper::Installer::Precondition::PRC::VERSION = '5.0.3';
 use strict;
 use warnings;
 

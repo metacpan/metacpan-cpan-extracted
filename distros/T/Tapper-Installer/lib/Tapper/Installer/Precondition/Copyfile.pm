@@ -1,6 +1,6 @@
 package Tapper::Installer::Precondition::Copyfile;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Installer::Precondition::Copyfile::VERSION = '5.0.2';
+$Tapper::Installer::Precondition::Copyfile::VERSION = '5.0.3';
 use strict;
 use warnings;
 

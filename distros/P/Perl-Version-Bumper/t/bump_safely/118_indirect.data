@@ -1,0 +1,15 @@
+########## indirect
+{ package Foo }
+my $o = new Foo;
+---
+use v5.XX;
+{ package Foo }
+my $o = new Foo;
+--- v5.36
+use v5.34;
+{ package Foo }
+my $o = new Foo;
+########## no feature 'indirect' DIE
+{ package Foo }
+no feature 'indirect';
+my $o = new Foo;

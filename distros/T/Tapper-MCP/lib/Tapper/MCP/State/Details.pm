@@ -1,10 +1,9 @@
 package Tapper::MCP::State::Details;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::MCP::State::Details::VERSION = '5.0.8';
+$Tapper::MCP::State::Details::VERSION = '5.0.9';
 use 5.010;
 use strict;
 use warnings;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 use Moose;
 use List::Util qw/max min/;
@@ -236,14 +235,13 @@ sub is_all_prcs_finished
 
 sub prc_next_timeout
 {
-        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
         my ($self, $num) = @_;
         my $prc = $self->state_details->{prcs}->[$num];
         my $default_timeout = 60 + 60; # (time between SIGTERM and SIGKILL in PRC) + (grace period for sending the message)
         my $next_timeout = $default_timeout;
-        given ($prc->{current_state}){
-                when('preload') { $next_timeout = $prc->{timeout_boot_span}}
-                when('boot')    {
+        my $state = $prc->{current_state};
+                if ($state eq 'preload') { $next_timeout = $prc->{timeout_boot_span}}
+                if ($state eq 'boot')    {
                         if (ref $prc->{timeout_testprograms_span} eq 'ARRAY' and
                             @{$prc->{timeout_testprograms_span}}) {
                                 $next_timeout = $prc->{timeout_testprograms_span}->[0];
@@ -251,7 +249,7 @@ sub prc_next_timeout
                                 $next_timeout = $default_timeout;
                         }
                 }
-                when('test') {
+                if ($state eq 'test') {
                         my $testprogram_number = $prc->{number_current_test};
                         ++$testprogram_number;
                         if (ref $prc->{timeout_testprograms_span} eq 'ARRAY' and
@@ -263,15 +261,14 @@ sub prc_next_timeout
                                 $next_timeout = $default_timeout;
                         }
                 }
-                when('lasttest') {
+                if ($state eq 'lasttest') {
                         my $result = { error => 1,
                                        msg   => "prc_next_timeout called in state testfin. This is a bug. Please report it!"};
                         $self->prc_results($num, $result);
                 }
-                when('finished') {
+                if ($state eq 'finished') {
                         return;
                 }
-        }
 
         $self->state_details->{prcs}->[$num]->{timeout_current_date} = time() + $next_timeout;
         $self->db_update;
@@ -500,7 +497,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

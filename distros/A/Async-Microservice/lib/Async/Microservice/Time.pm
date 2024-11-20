@@ -8,7 +8,9 @@ use Moose;
 
 with qw(Async::Microservice);
 
-our $VERSION = 0.01;
+our $VERSION = '0.03';
+
+has '+jsonp' => (default => '_cb');
 
 use DateTime;
 use Time::HiRes qw(time);
@@ -35,14 +37,15 @@ sub get_routes {
             },
         },
         'datetime/:time_zone_part1/:time_zone_part2' => {
-            defaults    => { GET       => 'GET_datetime_capture', },
+            defaults    => {GET => 'GET_datetime_capture',},
             validations => {
                 time_zone_part1 => qr{^\w+$},
                 time_zone_part2 => qr{^\w+$},
             },
         },
-        'epoch' => {defaults => {GET => 'GET_epoch'}},
-        'sleep' => {defaults => {GET => 'GET_sleep'}},
+        'datetime/span/:s_date' => {defaults => {GET => 'GET_datetime_span'}},
+        'epoch'                 => {defaults => {GET => 'GET_epoch'}},
+        'sleep'                 => {defaults => {GET => 'GET_sleep'}},
     );
 }
 
@@ -127,6 +130,66 @@ async sub GET_sleep {
             duration => ( $stop_time - $start_time ),
         }
     ];
+}
+
+async sub GET_datetime_span {
+    my ( $self, $this_req ) = @_;
+
+    my $now = DateTime->now(time_zone => 'UTC')->truncate(to => 'day');
+    my $s_date_dt;
+
+    my $s_date = $this_req->params->{s_date} // '';
+    if ($s_date =~ m/^([0-9]{4})-?([0-9]{2})-?([0-9]{2})$/) {
+        $s_date_dt = eval {DateTime->new(time_zone => 'UTC', day => $3, month => $2, year => $1)};
+    } elsif ($s_date eq 'now') {
+        $s_date_dt = $now->clone;
+    }
+    unless ($s_date_dt) {
+        return [
+            405,
+            [],
+            {   err_status => 405,
+                err_msg    => 'invalid date format ' . $s_date . ', use YYYYMMDD or "now"',
+            }
+        ];
+    }
+    my $r_age = int($this_req->params->{r_age} // 65);
+    unless ($r_age || ($r_age < 1) || ($r_age > 200)) {
+        return [
+            405,
+            [],
+            {   err_status => 405,
+                err_msg    => 'invalid age',
+            }
+        ];
+    }
+    my $m_income = int($this_req->params->{m_income} // 0);
+
+    my $r_age_dt       = $s_date_dt->clone->add(years => $r_age);
+    $r_age_dt = $now->clone
+        if $r_age_dt < $now;
+
+    my $counter_dt     = $r_age_dt->subtract_datetime($now);
+    my $days_counter   = $r_age_dt->delta_days($now)->in_units('days');
+    my $week_counter   = int($days_counter/7);
+    my $months_counter = $counter_dt->in_units('months');
+    my $years_counter  = $counter_dt->in_units('years');
+    my $date_from_str  = $s_date_dt->strftime('%Y-%m-%d');
+    my $date_to_str    = $r_age_dt->strftime('%Y-%m-%d');
+
+    return {
+        msg => sprintf(
+            '%d weeks left until date span age of %d (date from %s to %s)',
+            $week_counter, $r_age, $date_from_str, $date_to_str,
+        ),
+        days      => $days_counter,
+        weeks     => $week_counter,
+        months    => $months_counter,
+        years     => $years_counter,
+        date_from => $date_from_str,
+        date_to   => $date_to_str,
+        ($m_income ? (income => $months_counter * $m_income) : ()),
+    };
 }
 
 sub _datetime_as_data {

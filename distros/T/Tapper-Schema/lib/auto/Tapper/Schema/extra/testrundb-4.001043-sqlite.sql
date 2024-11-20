@@ -1,7 +1,7 @@
--- 
+--
 -- Created by SQL::Translator::Producer::SQLite
 -- Created on Thu Mar 10 12:06:40 2016
--- 
+--
 
 BEGIN TRANSACTION;
 
@@ -1100,5 +1100,77 @@ DROP VIEW IF EXISTS view_testrun_overview;
 
 CREATE VIEW view_testrun_overview AS
     select   vtor.primary_report_id  as vtor_primary_report_id        , vtor.rgt_testrun_id     as vtor_rgt_testrun_id        , vtor.rgts_success_ratio as vtor_rgts_success_ratio        , report.id               as report_id        , report.machine_name     as report_machine_name        , report.created_at       as report_created_at        , report.suite_id         as report_suite_id        , suite.name              as report_suite_name from view_testrun_overview_reports vtor,      report report,      suite suite where CAST(vtor.primary_report_id as UNSIGNED INTEGER)=report.id and       report.suite_id=suite.id;
+
+--
+-- Table: resource
+--
+
+DROP TABLE IF EXISTS resource;
+
+CREATE TABLE resource (
+  id INTEGER PRIMARY KEY NOT NULL,
+  name VARCHAR(255) DEFAULT '',
+  comment VARCHAR(255) DEFAULT '',
+  active TINYINT NOT NULL DEFAULT 0,
+  used_by_scheduling_id INT(11),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME,
+  FOREIGN KEY (used_by_scheduling_id) REFERENCES testrun_scheduling(id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+--
+-- Table: testrun_requested_resource
+--
+
+DROP TABLE IF EXISTS testrun_requested_resource;
+DROP INDEX IF EXISTS testrun_requested_resource_idx_selected_resource_id;
+DROP INDEX IF EXISTS testrun_requested_resource_idx_testrun_id;
+
+CREATE TABLE testrun_requested_resource (
+  id INTEGER PRIMARY KEY NOT NULL,
+  testrun_id INT(11) NOT NULL,
+  selected_resource_id INT(11),
+  FOREIGN KEY (selected_resource_id) REFERENCES resource(id) ON DELETE SET NULL,
+  FOREIGN KEY (testrun_id) REFERENCES testrun(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+CREATE INDEX testrun_requested_resource_idx_selected_resource_id ON testrun_requested_resource (selected_resource_id);
+CREATE INDEX testrun_requested_resource_idx_testrun_id ON testrun_requested_resource (testrun_id);
+
+--
+-- Table: testrun_requested_resource_alternative
+--
+
+DROP TABLE IF EXISTS testrun_requested_resource_alternative;
+DROP INDEX IF EXISTS testrun_requested_resource_alternative_idx_request_id;
+DROP INDEX IF EXISTS testrun_requested_resource_alternative_idx_resource_id;
+
+CREATE TABLE testrun_requested_resource_alternative (
+  id INTEGER PRIMARY KEY NOT NULL,
+  request_id INT(11) NOT NULL,
+  resource_id INT(11) NOT NULL,
+  FOREIGN KEY (request_id) REFERENCES testrun_requested_resource(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (resource_id) REFERENCES resource(id) ON DELETE CASCADE
+);
+CREATE INDEX testrun_requested_resource_alternative_idx_request_id ON testrun_requested_resource_alternative (request_id);
+CREATE INDEX testrun_requested_resource_alternative_idx_resource_id ON testrun_requested_resource_alternative (resource_id);
+
+
+--
+-- Table: testrun_requested_resource_alternative
+--
+
+DROP TABLE IF EXISTS testrun_dependency;
+DROP INDEX IF EXISTS testrun_dependency_dependee_testrun_id;
+DROP INDEX IF EXISTS testrun_dependency_depender_testrun_id;
+
+CREATE TABLE testrun_dependency (
+  dependee_testrun_id INT(11) NOT NULL,
+  depender_testrun_id INT(11) NOT NULL,
+  PRIMARY KEY (dependee_testrun_id, depender_testrun_id),
+  FOREIGN KEY (dependee_testrun_id) REFERENCES testrun(id) ON DELETE CASCADE,
+  FOREIGN KEY (depender_testrun_id) REFERENCES testrun(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+CREATE INDEX testrun_dependency_idx_dependee_testrun_id ON testrun_dependency (dependee_testrun_id);
+CREATE INDEX testrun_dependency_idx_depender_testrun_id ON testrun_dependency (depender_testrun_id);
 
 COMMIT;

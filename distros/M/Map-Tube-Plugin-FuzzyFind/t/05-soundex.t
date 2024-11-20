@@ -4,7 +4,9 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More 0.82;
 
-for my $m ( qw(Map::Tube::London Text::Soundex Text::Unidecode) ) {
+eval 'use Map::Tube::London 1.39';
+plan skip_all => 'Map::Tube::London (>= 1.39) required for this test' if $@;
+for my $m ( qw(Text::Soundex Text::Unidecode) ) {
   eval "use $m";
   plan skip_all => "$m required for this test" if $@;
 }

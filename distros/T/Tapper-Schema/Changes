@@ -1,5 +1,9 @@
 Revision history for Tapper-Schema
 
+5.0.12    2024-11-19
+        - TAP::DOM with option 'noempty_tap'
+        - throw common::sense out the air lock
+
 5.0.11    2019-11-04
         - re-upload to correct PAUSE user
 

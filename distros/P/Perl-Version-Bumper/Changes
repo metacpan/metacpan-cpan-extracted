@@ -1,0 +1,14 @@
+Revision history for Perl-Version-Bumper
+
+0.157 2024-11-20 BOOK
+    - First release, based on software originally developed at Booking.com.
+    - This version contains over 100 extra commits on top of the
+      Booking.com code. They add a lot of unit tests, store the feature
+      data in static table (instead of recomputing it using the running
+      perl), which makes it possible to bump code to any Perl version
+      using any version of the perl binary. (In other words, it's possible
+      to bump v5.14 code to v5.20 using `perl5.12`.)
+    - This version number is basically the number of commits that lead
+      to this first release (if CVS could do it, there's no reason I
+      can't do it either). I want to get to 1.000 soon, and need to stop
+      perfecting this before doing the initial release. 😅

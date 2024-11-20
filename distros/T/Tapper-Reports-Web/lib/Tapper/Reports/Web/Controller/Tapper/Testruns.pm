@@ -1,6 +1,6 @@
 package Tapper::Reports::Web::Controller::Tapper::Testruns;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Controller::Tapper::Testruns::VERSION = '5.0.15';
+$Tapper::Reports::Web::Controller::Tapper::Testruns::VERSION = '5.0.17';
 use parent 'Tapper::Reports::Web::Controller::Base';
 use Cwd;
 use Data::DPath 'dpath';
@@ -19,7 +19,6 @@ use Tapper::Model 'model';
 use Tapper::Reports::Web::Util::Testrun;
 use Tapper::Reports::Web::Util::Filter::Testrun;
 
-use common::sense;
 ## no critic (RequireUseStrict)
 
 
@@ -383,6 +382,14 @@ sub get_hostnames
 }
 
 
+sub get_resources
+{
+        my ($self) = @_;
+        my @all_resources = model("TestrunDB")->resultset('Resource')->all;
+        return \@all_resources;
+}
+
+
 
 sub parse_macro_precondition :Private
 {
@@ -630,6 +637,7 @@ sub prepare_testrunlists : Private {
             state               => $hr_filter_condition->{state},
             success             => $hr_filter_condition->{success},
             owner               => $hr_filter_condition->{owner},
+            resource            => $hr_filter_condition->{resource},
         };
 
         require DateTime;
@@ -680,11 +688,19 @@ sub prepare_testrunlists : Private {
             $or_c->stash->{head_overview}   = 'Testruns';
         }
 
-        $or_c->stash->{testruns} = $or_c->model('TestrunDB')->fetch_raw_sql({
+        my $ar_testruns = $or_c->model('TestrunDB')->fetch_raw_sql({
                 query_name  => 'testruns::web_list',
                 fetch_type  => '@%',
                 query_vals  => $hr_query_vals,
         });
+
+        foreach my $testrun (@$ar_testruns) {
+                my @res_requests = $or_c->model('TestrunDB')->resultset('TestrunRequestedResource')
+                  ->search({ testrun_id => $testrun->{testrun_id}, selected_resource_id => { '!=', undef } },{ prefetch => 'selected_resource' });
+                $testrun->{resources} = [ map { $_->selected_resource } @res_requests ];
+        }
+
+        $or_c->stash->{testruns} = $ar_testruns;
 
         return 1;
 
@@ -797,6 +813,12 @@ The array contains array that contain the hostname twice (i.e. (['host',
 
 @return success - ref to array of [ hostname, hostname ]
 
+=head2 get_resources
+
+Get an array of a all resources.
+
+@return success - array ref of resource db objects
+
 =head2 parse_macro_precondition
 
 Parse the given file as macro precondition and return a has ref
@@ -858,7 +880,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

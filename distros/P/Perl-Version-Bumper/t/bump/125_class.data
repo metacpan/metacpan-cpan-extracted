@@ -1,0 +1,10 @@
+########## use feature 'class'
+use feature 'class';
+---
+use v5.XX;
+use feature 'class';
+########## use feature 'class'
+no feature 'class';
+---
+use v5.XX;
+no feature 'class';

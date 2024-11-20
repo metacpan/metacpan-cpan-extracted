@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -60,6 +60,7 @@ my @files = (
     'lib/Tapper/Reports/Web/Util/Testrun.pm',
     'lib/Tapper/Reports/Web/View/JSON.pm',
     'lib/Tapper/Reports/Web/View/Mason.pm',
+    't/00-compile.t',
     't/00-use.t',
     't/01app.t',
     't/02pod.t',

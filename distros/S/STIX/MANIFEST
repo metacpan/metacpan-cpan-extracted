@@ -182,6 +182,7 @@ t/examples/indicator-for-c2-ip-address.json
 t/examples/indicator-to-campaign-relationship.json
 t/examples/indicators-for-C2-with-COA.json
 t/examples/infrastructure.json
+t/examples/interop-objectmarking-test.json
 t/examples/malicious-email-indicator-with-attachment.json
 t/examples/README.md
 t/examples/threat-reports/apt1.json

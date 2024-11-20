@@ -1,5 +1,8 @@
 Revision history for Tapper-Base
 
+5.0.1     2024-11-19
+        - throw common::sense out the air lock
+
 5.0.0     2015-12-18
         - use dzil pluginbundle TAPPER
         - [FIX] add Perl boilerplate

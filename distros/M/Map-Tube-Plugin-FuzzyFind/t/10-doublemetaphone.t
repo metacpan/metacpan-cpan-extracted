@@ -6,6 +6,8 @@ use Test::More 0.82;
 
 eval 'use Map::Tube::London 1.39';
 plan skip_all => 'Map::Tube::London (>= 1.39) required for this test' if $@;
+eval 'use Text::DoubleMetaphone';
+plan skip_all => 'Text::DoubleMetaphone required for this test'      if $@;
 
 plan tests => 16;
 

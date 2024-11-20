@@ -2,7 +2,7 @@ package Bio::MUST::Apps::TwoScalp::Profile2Profile;
 # ABSTRACT: internal class for two-scalp tool
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Apps::TwoScalp::Profile2Profile::VERSION = '0.231010';
+$Bio::MUST::Apps::TwoScalp::Profile2Profile::VERSION = '0.243240';
 use Moose;
 use namespace::autoclean;
 
@@ -105,7 +105,7 @@ Bio::MUST::Apps::TwoScalp::Profile2Profile - internal class for two-scalp tool
 
 =head1 VERSION
 
-version 0.231010
+version 0.243240
 
 =head1 SYNOPSIS
 

@@ -60,6 +60,7 @@ my @files = (
     'lib/Tapper/Reports/Web/Util/Testrun.pm',
     'lib/Tapper/Reports/Web/View/JSON.pm',
     'lib/Tapper/Reports/Web/View/Mason.pm',
+    't/00-compile.t',
     't/00-use.t',
     't/01app.t',
     't/02pod.t',

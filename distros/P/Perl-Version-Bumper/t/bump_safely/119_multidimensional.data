@@ -1,0 +1,17 @@
+########## multidimensional
+use strict;
+my %foo;
+$foo{ 0, 1 } = 2;    # %foo = ( '0\0341' => 2 )
+---
+use v5.XX;
+use strict;
+my %foo;
+$foo{ 0, 1 } = 2;    # %foo = ( '0\0341' => 2 )
+--- v5.12
+use v5.XX;
+my %foo;
+$foo{ 0, 1 } = 2;    # %foo = ( '0\0341' => 2 )
+--- v5.36
+use v5.34;
+my %foo;
+$foo{ 0, 1 } = 2;    # %foo = ( '0\0341' => 2 )

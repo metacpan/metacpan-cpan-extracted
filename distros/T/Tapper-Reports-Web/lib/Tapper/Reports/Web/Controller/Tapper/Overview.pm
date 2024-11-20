@@ -1,11 +1,10 @@
 package Tapper::Reports::Web::Controller::Tapper::Overview;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Controller::Tapper::Overview::VERSION = '5.0.15';
+$Tapper::Reports::Web::Controller::Tapper::Overview::VERSION = '5.0.17';
 use parent 'Tapper::Reports::Web::Controller::Base';
 use DateTime;
 use Tapper::Reports::Web::Util::Filter::Overview;
 
-use common::sense;
 ## no critic (RequireUseStrict)
 
 sub auto :Private
@@ -56,10 +55,9 @@ sub index :Path  :Args()
           defined($filter_condition->{early}) and
             ref($filter_condition->{early}) eq 'HASH' ;
 
-        given ($type) {
-                when('suite') {$self->suite($c, $filter_condition)};
-                when('host')  {$self->host($c, $filter_condition)};
-        }
+                if    ($type eq 'suite') {$self->suite($c, $filter_condition)}
+                elsif ($type eq 'host')  {$self->host($c, $filter_condition)}
+                elsif ($type eq 'resource') {$self->resource($c, $filter_condition)}
 }
 
 sub suite
@@ -93,7 +91,17 @@ sub host
         $c->stash->{title} = "Tapper report hosts";
 }
 
+sub resource
+{
+        my ( $self, $c, $filter_condition ) = @_;
 
+        my $resources = $c->model('TestrunDB')->resultset('Resource')->search($filter_condition->{early}, { columns => [ qw/name/ ] });
+
+        while ( my $resource = $resources->next ) {
+                $c->stash->{overviews}{$resource->name} = '/tapper/testruns/resource/'.$resource->name;
+        }
+        $c->stash->{title} = "Tapper resources";
+}
 
 sub prepare_navi : Private
 {
@@ -191,7 +199,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

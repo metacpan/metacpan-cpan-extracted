@@ -1,6 +1,6 @@
 package Tapper::MCP::Daemon;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::MCP::Daemon::VERSION = '5.0.8';
+$Tapper::MCP::Daemon::VERSION = '5.0.9';
 use 5.010;
 
 use strict;
@@ -67,7 +67,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

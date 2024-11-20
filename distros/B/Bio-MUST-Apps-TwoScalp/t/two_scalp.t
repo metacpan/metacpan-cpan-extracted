@@ -44,7 +44,7 @@ EOT
 
     my $infile1 = file('test', 'seq_out1_mafft.fasta');
     my $infile2 = file('test', 'seq_out2_mafft.fasta');
-    
+
     my $align = $class->new( file1 => $infile1, file2 => $infile2 );
 
     my @got_seqs_maf = $align->all_seqs;
@@ -60,7 +60,7 @@ EOT
     my $exp_ali_clustal = $ali->load($exp_clustal);
     my @exp_seqs = $exp_ali_clustal->all_seqs;
     my @exp_seq_ids = $exp_ali_clustal->all_seq_ids;
-    
+
     is_deeply \@got_seqs_maf, \@exp_seqs_maf,
         "profiles correctly aligned with mafft";
     is_deeply \@got_seq_ids_maf, \@exp_seq_ids_maf,
@@ -76,17 +76,17 @@ EOT
 
     my $infile1 = file('test', 'seq_in2.fasta');
     my $infile2 = file('test', 'seq_out1_mafft.fasta');
-    
+
     my $align = $class->new( file1 => $infile1, file2 => $infile2 );
-    
+
     my @got_seqs_maf = $align->all_seqs;
     my @got_seq_ids_maf = $align->all_seq_ids;
-    
+
     my $exp_mafft = file('test', 'seq_profile_out.fasta');
     my $exp_ali_mafft = $ali->load($exp_mafft);
     my @exp_seqs_maf = $exp_ali_mafft->all_seqs;
     my @exp_seq_ids_maf = $exp_ali_mafft->all_seq_ids;
-    
+
     is_deeply \@got_seqs_maf, \@exp_seqs_maf,
         "sequences correctly aligned on profile with mafft";
     is_deeply \@got_seq_ids_maf, \@exp_seq_ids_maf,
@@ -98,17 +98,17 @@ EOT
     my $class = 'Bio::MUST::Apps::TwoScalp::AlignAll';
 
     my $infile1 = file('test', 'seq_in1.fasta');
-    
+
     my $align = $class->new( file => $infile1 );
-    
+
     my @got_seqs_maf = $align->all_seqs;
     my @got_seq_ids_maf = $align->all_seq_ids;
-    
+
     my $exp_mafft = file('test', 'seq_out1_gap_mafft.fasta');
     my $exp_ali_mafft = $ali->load($exp_mafft);
     my @exp_seqs_maf = $exp_ali_mafft->all_seqs;
     my @exp_seq_ids_maf = $exp_ali_mafft->all_seq_ids;
-    
+
     is_deeply \@got_seqs_maf, \@exp_seqs_maf,
         "sequences correctly aligned from scratch with mafft";
     is_deeply \@got_seq_ids_maf, \@exp_seq_ids_maf,

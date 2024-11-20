@@ -1,6 +1,6 @@
 package Tapper::Reports::Web::Model::TestrunDB;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Model::TestrunDB::VERSION = '5.0.15';
+$Tapper::Reports::Web::Model::TestrunDB::VERSION = '5.0.17';
 use strict;
 use warnings;
 
@@ -65,7 +65,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

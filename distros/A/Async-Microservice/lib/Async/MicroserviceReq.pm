@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use 5.010;
 
+our $VERSION = '0.03';
+
 use Moose;
 use namespace::autoclean;
 use URI;
@@ -40,6 +42,11 @@ has 'want_json' => (
     required => 1,
     lazy     => 1,
     builder  => '_build_want_json'
+);
+has 'jsonp' => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1,
 );
 
 sub _build_base_url {
@@ -80,12 +87,9 @@ sub text_plain {
 
 sub respond {
     my ($self, $status, $headers, $payload) = @_;
-    my %headers_as_hash = map {defined($_) ? lc($_) : $_} @$headers;
 
-    unless ($headers_as_hash{'content-type'}) {
-        my $content_type = ($self->want_json ? 'application/json' : 'text/plain');
-        push(@$headers, ('Content-Type' => $content_type));
-    }
+    my %headers_as_hash = map {defined($_) ? lc($_) : $_} @$headers;
+    my $content_type;
 
     if ($self->want_json                      # json wanted via accept headerts
         && !ref($payload)                     # payload not a reference
@@ -107,13 +111,36 @@ sub respond {
     # encode any reference as json
     if (ref($payload)) {
         try {
-            $payload = $json->encode($payload);
+            if (my $jsonp = $self->jsonp) {
+                if (my $js_func = $self->params->{$jsonp}) {
+                    if ($js_func !~ m/^[a-zA-Z_\$][0-9a-zA-Z_\$\.]*$/) {
+                        $status  = 405;
+                        $payload = {
+                            'error' => {
+                                err_status => $status,
+                                err_msg    => 'unsupported call-back function name',
+                            }
+                        };
+                    }
+                    else {
+                        $payload      = sprintf('%s(%s);', $js_func, $json->encode($payload));
+                        $content_type = 'application/javascript';
+                    }
+                }
+            }
+            if (ref($payload)) {
+                $payload      = $json->encode($payload);
+                $content_type = 'application/json';
+            }
         }
         catch {
-            $payload =
-                $json->encode(CRS::Exception::Internal->as_data('failed to serialize json: ' . $_));
+            $payload = $json->encode('failed to serialize json: ' . $_);
         };
     }
+
+    push(@$headers, ('Content-Type' => ($content_type || 'text/plain')))
+        unless ($headers_as_hash{'content-type'});
+
     return $self->plack_respond->([$status, [@no_cache_headers, @$headers], [$payload]]);
 }
 

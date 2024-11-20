@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v10.3.0
+#                   and LibVirt version v10.9.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::StoragePool v0.0.11;
+package Sys::Async::Virt::StoragePool v0.0.12;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.11;
+use Protocol::Sys::Virt::Remote::XDR v0.0.12;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -174,7 +174,7 @@ Sys::Async::Virt::StoragePool - Client side proxy to remote LibVirt storage pool
 
 =head1 VERSION
 
-v0.0.11
+v0.0.12
 
 =head1 SYNOPSIS
 

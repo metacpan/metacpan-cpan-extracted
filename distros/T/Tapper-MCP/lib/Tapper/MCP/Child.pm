@@ -1,11 +1,10 @@
 package Tapper::MCP::Child;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Control one specific testrun on MCP side
-$Tapper::MCP::Child::VERSION = '5.0.8';
+$Tapper::MCP::Child::VERSION = '5.0.9';
 use 5.010;
 use strict;
 use warnings;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 use Class::Load 'load_class';
 use Hash::Merge::Simple qw/merge/;
@@ -85,12 +84,17 @@ sub generate_configs
         my $hostname = $self->testrun->testrun_scheduling->host->name;
         my $config_file_name = "$hostname-install-".$self->testrun->id;
 
+        my @res_reqs = $self->testrun->testrun_requested_resource;
+        my @resources = map { defined $_->selected_resource ? $_->selected_resource->name : 'unknown' } @res_reqs;
+
         $retval = $mcpconfig->write_config($config, $config_file_name);
         return $retval if $retval;
 
         if ($config->{autoinstall} or $mcpconfig->mcp_info->skip_install) {
                 my $common_config = $mcpconfig->get_common_config();
                 $common_config->{hostname} = $hostname; # allows guest systems to know their host system name
+                # allows guest system to know the resources that have been selected
+                $common_config->{resources} = \@resources;
 
                 my $testconfigs = $mcpconfig->get_test_config();
                 return $testconfigs if not ref $testconfigs eq 'ARRAY';
@@ -154,19 +158,18 @@ sub handle_error
 
 sub start_testrun
 {
-        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
         my ($self, $config, $revive) = @_;
 
         my $net    = Tapper::MCP::Net->new();
         $net->cfg->{testrun_id} = $self->testrun->id;
         my $hostname = $self->testrun->testrun_scheduling->host->name;
-        given(lc($self->mcp_info->test_type)){
-                when('simnow'){
+        my $lc_type = lc($self->mcp_info->test_type);
+                if($lc_type eq 'simnow'){
                         $self->log->debug("Starting Simnow on $hostname");
                         my $simnow_retval = $net->start_simnow($hostname);
                         return $self->handle_error("Starting simnow", $simnow_retval) if $simnow_retval;
                 }
-                when('ssh') {
+                elsif($lc_type eq 'ssh') {
                         $self->log->debug("Starting SSH testrun on $hostname");
                         my $ssh_retval;
                         if ($config->{client_package}) {
@@ -181,7 +184,7 @@ sub start_testrun
                                 return ("Starting Tapper on testmachine with SSH failed: $ssh_retval");
                         }
                 }
-                when('local') {
+                elsif($lc_type eq 'local') {
                         $self->log->debug("Starting LOCAL testrun on $hostname");
                         my $local_retval;
                         my $tr_id = $self->testrun->id;
@@ -194,7 +197,7 @@ sub start_testrun
                                 return ("Starting Tapper locally failed: $local_retval");
                         }
                 }
-                when('minion') {
+                elsif($lc_type eq 'minion') {
                         $self->log->debug("Starting MINION testrun on $hostname");
                         my $local_retval;
                         my $tr_id = $self->testrun->id;
@@ -208,7 +211,7 @@ sub start_testrun
                         }
                         $self->log->debug("Returned from start_minion.");
                 }
-                default {
+                else {
                         $self->log->debug("Write grub file for $hostname");
                         my $grub_retval = $net->write_grub_file($hostname, $config->{installer_grub});
                         return $self->handle_error("Writing grub file", $grub_retval) if $grub_retval;
@@ -227,7 +230,6 @@ sub start_testrun
                                 $self->tap_report_away($report);
                         }
                 }
-        }
 
         return 0;
 }
@@ -529,7 +531,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

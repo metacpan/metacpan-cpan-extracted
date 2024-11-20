@@ -15,6 +15,21 @@ Module::ScanDeps uses the standard perl module install process:
     make test
     make install
 
+* Source Repository
+
+You can check out the most recent revision from Module::ScanDeps' GitHub repository:
+
+    https://github.com/rschupp/Module-ScanDeps
+
+* Contact
+
+You can write to the mailing list at <par@perl.org> (no subscription
+required).  Archives of the mailing list are available at
+<http://www.nntp.perl.org/group/perl.par>
+or <https://www.mail-archive.com/par@perl.org/>.
+
+Please submit bug reports to <https://github.com/rschupp/Module-ScanDeps/issues>.
+
 * Copyright
 
 Copyright 2002-2008 by Audrey Tang <autrijus@autrijus.org>;

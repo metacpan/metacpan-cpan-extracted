@@ -9,7 +9,7 @@ use Text::ANSI::Fold qw(:constants);
 my $fold = Text::ANSI::Fold->new;
 
 sub color {
-    my $code = { r => 31 , b => 34 }->{+shift};
+    my $code = { r => 31 , g => 32 , b => 34 }->{+shift};
     my @result;
     while (my($color, $plain) = splice @_, 0, 2) {
 	push @result, "\e[${code}m" . $color . "\e[m";
@@ -131,6 +131,22 @@ sub right { (fold @_)[1] }
     is(left($_, width => 6),  r("〇一" =~ /./g), "linebreak_runall+: 6");
     is(left($_, width => 8),  r("〇一（二）" =~ /./g), "linebreak_runall+: 8");
     is(left($_, width => 10), r("〇一（二）" =~ /./g), "linebreak_runall+: 10");
+}
+
+{
+    $_ = r("赤").g("緑").b("青");
+    is( left($_, width => 1), r("赤"),         "multicolor: 1");
+    is(right($_, width => 3), g("緑").b("青"), "multicolor: 1 (right)");
+    is( left($_, width => 2), r("赤"),         "multicolor: 2");
+    is(right($_, width => 3), g("緑").b("青"), "multicolor: 2 (right)");
+  {
+    local $TODO = 'extra ANSI sequence';
+    is( left($_, width => 3), r("赤"),         "multicolor: 3");
+  }
+    is( left($_, width => 3), r("赤").g(""),   "multicolor: 3 (current)");
+    is(right($_, width => 3), g("緑").b("青"), "multicolor: 3 (right)");
+    is( left($_, width => 4), r("赤").g("緑"), "multicolor: 4");
+    is(right($_, width => 4), b("青"), "multicolor: 4");
 }
 
 done_testing;

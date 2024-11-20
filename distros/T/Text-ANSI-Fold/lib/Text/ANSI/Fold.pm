@@ -4,10 +4,15 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "2.2104";
+our $VERSION = "2.2701";
 
 use Data::Dumper;
-$Data::Dumper::Sortkeys = 1;
+{
+    no warnings 'redefine';
+    *Data::Dumper::qquote = sub { qq["${\(shift)}"] };
+    $Data::Dumper::Useperl = 1;
+    $Data::Dumper::Sortkeys = 1;
+}
 use Carp;
 use List::Util qw(pairmap pairgrep);
 use Scalar::Util qw(looks_like_number);
@@ -120,20 +125,23 @@ our %TABSTYLE = (
     pairmap {
 	( $a =~ s/_/-/gr => ref $b ? $b : [ $b, $b ] );
     }
-    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}",			    # ␉
-		"\N{SYMBOL FOR SPACE}" ],				    # ␠
-    shade  => [ "\N{MEDIUM SHADE}",					    # ▒
-		"\N{LIGHT SHADE}" ],					    # ░
-    block  => [ "\N{LOWER ONE QUARTER BLOCK}",				    # ▂
-		"\N{LOWER ONE EIGHTH BLOCK}" ],				    # ▁
-    bar    => [ "\N{BOX DRAWINGS HEAVY RIGHT}",				    # ╺
-		"\N{BOX DRAWINGS LIGHT HORIZONTAL}" ],			    # ─
-    dash   => [ "\N{BOX DRAWINGS HEAVY RIGHT}",				    # ╺
-		"\N{BOX DRAWINGS LIGHT DOUBLE DASH HORIZONTAL}" ],	    # ╌
+    symbol   => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}",		    # ␉
+		  "\N{SYMBOL FOR SPACE}" ],				    # ␠
+    shade    => [ "\N{MEDIUM SHADE}",					    # ▒
+		  "\N{LIGHT SHADE}" ],					    # ░
+    block    => [ "\N{LOWER ONE QUARTER BLOCK}",			    # ▂
+		  "\N{LOWER ONE EIGHTH BLOCK}" ],			    # ▁
+    needle   => [ "\N{BOX DRAWINGS HEAVY RIGHT}",			    # ╺
+		  "\N{BOX DRAWINGS LIGHT HORIZONTAL}" ],		    # ─
+    dash     => [ "\N{BOX DRAWINGS HEAVY RIGHT}",			    # ╺
+		  "\N{BOX DRAWINGS LIGHT DOUBLE DASH HORIZONTAL}" ],	    # ╌
+    triangle => [ "\N{BLACK RIGHT-POINTING SMALL TRIANGLE}",		    # ▸
+		  "\N{WHITE RIGHT-POINTING SMALL TRIANGLE}" ],		    # ▹
 
     dot          => '.',
     space        => ' ',
     emspace      => "\N{EM SPACE}",					    #  
+    blank        => "\N{OPEN BOX}",					    # ␣
     middle_dot   => "\N{MIDDLE DOT}",					    # ·
     arrow        => "\N{RIGHTWARDS ARROW}",				    # →
     double_arrow => "\N{RIGHTWARDS DOUBLE ARROW}",			    # ⇒
@@ -149,6 +157,13 @@ our %TABSTYLE = (
     cuneiform    => "\N{CUNEIFORM SIGN TAB}",				    # 𒋰
 
     );
+
+for my $alias (
+    [ bar => 'needle'],
+    [ pin => 'needle']
+) {
+    $TABSTYLE{$alias->[0]} = $TABSTYLE{$alias->[1]};
+}
 
 my @default = (
     text      => '',
@@ -167,6 +182,9 @@ my @default = (
     tabhead   => ' ',
     tabspace  => ' ',
     discard   => {},
+    crackwide => 0,
+    lefthalf  => "\N{NO-BREAK SPACE}",
+    righthalf => "\N{NO-BREAK SPACE}",
     );
 
 sub new {
@@ -257,6 +275,14 @@ sub pop_reset {
 
 use constant MAX_INT => ~0 >> 1;
 
+sub IsEOL {
+    <<"END";
+0000\t0000
+000A\t000D
+2028\t2029
+END
+}
+
 sub fold {
     my $obj = shift;
     local $_ = shift // '';
@@ -269,7 +295,8 @@ sub fold {
     my $width = $opt->{width};
     looks_like_number $width and $width == int($width)
 	or croak "$width: invalid width";
-    $width = MAX_INT if $width < 0;
+    $opt->{padding} = 0 if $width <= 0;
+    $width = MAX_INT    if $width <  0;
     ($width -= $opt->{margin}) > 0 or croak "margin too big";
 
     my $word_char_re =
@@ -282,19 +309,28 @@ sub fold {
     my $eol = '';
     my $room = $width;
     @bg_stack = @color_stack = @reset = ();
-    my $yield_re = $opt->{expand} ? qr/[^\e\n\f\r\t]/ : qr/[^\e\n\f\r]/;
+    my $unremarkable_re =
+	$opt->{expand} ? qr/[^\p{IsEOL}\e\t]/
+		       : qr/[^\p{IsEOL}\e]/;
 
   FOLD:
     while (length) {
 
-	# newline
-	if (s/\A(\r*\n)//) {
+	# newline, null, vt
+	# U+2028: Line Separator
+	# U+2029: Paragraph Separator
+	if (s/\A(\r*\n|[\0\x0b\N{U+2028}\N{U+2029}])//) {
 	    $eol = $1;
 	    last;
 	}
-	# formfeed / carriage return
-	if (s/\A([\f\r]+)//) {
-	    last if length == 0;
+	# form feed
+	if (m/\A(\f+)/p) {
+	    last if length $folded;
+	    ($folded, $_) = ($1, ${^POSTMATCH});
+	    next;
+	}
+	# carriage return
+	if (s/\A(\r+)//) {
 	    $folded .= $1;
 	    $room = $width;
 	    next;
@@ -318,7 +354,9 @@ sub fold {
 	}
 
 	last if $room < 1;
-	last if $room != $width and &_startWideSpacing and $room < 2;
+	if ($room < 2 and !$opt->{crackwide}) {
+	    last if $room != $width and &_startWideSpacing;
+	}
 
 	if (@reset) {
 	    $folded .= pop_reset();
@@ -340,25 +378,20 @@ sub fold {
 
 	# backspace
 	my $bs = 0;
-	while (s/\A(?:\X\cH+)++(?<c>\X|\z)//p) {
+	while (m/\A(?:\X\cH+)++(?<c>\X|\z)/p) {
 	    my $w = vwidth($+{c});
-	    if ($w > $room) {
-		if ($folded eq '') {
-		    $folded .= ${^MATCH};
-		    $room -= $w;
-		} else {
-		    $_ = ${^MATCH} . $_;
-		}
-		last FOLD;
-	    }
+	    last FOLD if $w > $room and $room != $width;
 	    $folded .= ${^MATCH};
+	    $_ = ${^POSTMATCH};
 	    $room -= $w;
 	    $bs++;
-	    last if $room < 1;
+	    last FOLD if $room < 0;
+	    last      if $room < 1;
 	}
 	next if $bs;
 
-	if (s/\A(\e+|(?:${yield_re}(?!\cH))+)//) {
+	# consume unremarkable characters
+	if (s/\A(\e+|(?:${unremarkable_re}(?!\cH))+)//) {
 	    my $s = $1;
 	    if ((my $w = vwidth($s)) <= $room) {
 		$folded .= $s;
@@ -366,7 +399,19 @@ sub fold {
 		next;
 	    }
 	    my($a, $b, $w) = simple_fold($s, $room);
-	    if ($w > $room and $room < $width) {
+	    if ($opt->{crackwide}) {
+		if ($w == $room - 1 && $b =~ /\A\p{IsWideSpacing}/p) {
+		    $a .= $opt->{lefthalf};
+		    $b  = $opt->{righthalf} . ${^POSTMATCH};
+		    $w++;
+		}
+		elsif ($w > $room) {
+		    $a = $opt->{lefthalf};
+		    $b = $opt->{righthalf} . $b;
+		    $w--;
+		}
+	    }
+	    if ($w > $room && $room != $width) {
 		$_ = $s . $_;
 		last;
 	    }
@@ -454,6 +499,7 @@ sub fold {
     if ($opt->{padding} and $room > 0) {
 	my $padding = $opt->{padchar} x $room;
 	if (@bg_stack) {
+	    $padding .= $opt->{padchar} x $opt->{runin} if $opt->do_runin;
 	    $padding = join '', @bg_stack, $padding, SGR_RESET;
 	}
 	$folded .= $padding;
@@ -554,7 +600,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 =head1 VERSION
 
-Version 2.2104
+Version 2.2701
 
 =head1 SYNOPSIS
 
@@ -579,7 +625,7 @@ Version 2.2104
         linebreak => LINEBREAK_ALL,
         runin     => 4,
         runout    => 4,
-        );
+    );
 
 =head1 DESCRIPTION
 
@@ -598,6 +644,8 @@ the linebreak mode to enable it.
 Since the overhead of ANSI escape sequence handling is not significant
 when the data does not include them, this module can be used for
 normal text processing with small penalty.
+
+=head2 B<ansi_fold>
 
 Use exported B<ansi_fold> function to fold original text, with number
 of visual columns you want to cut off the text.
@@ -619,6 +667,8 @@ This function returns at least one character in any situation.  If you
 provide Asian wide string and just one column as width, it trims off
 the first wide character even if it does not fit to given width.
 
+=head2 B<configure>
+
 Default parameter can be set by B<configure> class method:
 
     Text::ANSI::Fold->configure(width => 80, padding => 1);
@@ -638,49 +688,74 @@ L<Text::ANSI::Fold::Util>.
 =head1 OBJECT INTERFACE
 
 You can create an object to hold parameters, which is effective during
-object life time.  For example, 
+object life time.
 
-    my $f = Text::ANSI::Fold->new(
+=head2 B<new>
+
+Use C<new> method to make a fold object.
+
+    my $obj = Text::ANSI::Fold->new(
         width => 80,
         boundary => 'word',
-        );
+    );
 
-makes an object folding on word boundaries with 80 columns width.
-Then you can use this without parameters.
+This makes an object folding on word boundaries with 80 columns width.
 
-    $f->fold($text);
+=head2 B<fold>
+
+Then you can call C<fold> method without parameters because the object
+keeps necessary information.
+
+    $obj->fold($text);
+
+=head2 B<configure>
 
 Use B<configure> method to update parameters:
 
-    $f->configure(padding => 1);
+    $obj->configure(padding => 1);
 
 Additional parameter can be specified on each call, and they precede
 saved value.
 
-    $f->fold($text, width => 40);
+    $obj->fold($text, width => 40);
 
 =head1 STRING OBJECT INTERFACE
 
+You can use a fold object to hold string inside, and take out folded
+strings from it.  Use C<text> method to store data in the object, and
+C<retrieve> or C<chops> method to take out folded string from it.
+
+=head2 B<text>
+
 A fold object can hold string inside by B<text> method.
 
-    $f->text("text");
+    $obj->text("text");
 
-And folded string can be taken by B<retrieve> method.  It returns
+Method B<text> has an lvalue attribute, so it can be assigned to, as
+well as can be a subject of mutating operator such as C<s///>.
+
+    $obj->text = "text";
+
+=head2 B<retrieve>
+
+Folded string can be taken out by C<retrieve> method.  It returns
 empty string if nothing remained.
 
-    while ((my $folded = $f->retrieve) ne '') {
+    while ((my $folded = $obj->retrieve) ne '') {
         print $folded;
         print "\n" if $folded !~ /\n\z/;
     }
 
-Method B<chops> returns chopped string list.  Because the B<text>
+=head2 B<chops>
+
+Method C<chops> returns chopped string list.  Because the C<text>
 method returns the object itself when called with a parameter, you can
-use B<text> and B<chops> in series:
+use C<text> and C<chops> in series:
 
-    print join "\n", $f->text($string)->chops;
+    print join "\n", $obj->text($string)->chops;
 
-Actually, text can be set by B<new> or B<configure> method through
-B<text> parameter.  Next program just works.
+Actually, text can be set by c<new> or C<configure> method through
+C<text> parameter.  Next program just works.
 
     use Text::ANSI::Fold;
     while (<>) {
@@ -688,7 +763,9 @@ B<text> parameter.  Next program just works.
             Text::ANSI::Fold->new(width => 40, text => $_)->chops;
     }
 
-When using B<chops> method, B<width> parameter can take array
+=head2 B<chops> with multiple width
+
+When using C<chops> method, C<width> parameter can take array
 reference, and chops text into given width list.
 
     my $fold = Text::ANSI::Fold->new;
@@ -696,10 +773,17 @@ reference, and chops text into given width list.
     # return ("1", "22", "333") and keep "4444"
 
 If the width value is 0, it returns empty string.  Negative width
-value takes all the rest of stored string.
+value takes all the rest of stored string.  In the following code, the
+fourth width (3) is ignored because the -2 immediately preceding it
+consumes all remaining strings.
 
-Method B<text> has an lvalue attribute, so it can be assigned to, as
-well as can be a subject of mutating operator such as C<s///>.
+    my $fold = Text::ANSI::Fold->new;
+    my @list = $fold->text("1223334444")->chops(width => [ 1, 0, -2, 3 ]);
+    # return ("1", "", "223334444")
+
+The padding operation is performed only on the last non-empty element,
+and no elements corresponding to subsequent items are returned.  Also,
+of course, padding is not performed for negative widths.
 
 =head1 OPTIONS
 
@@ -710,9 +794,9 @@ function as well as B<new> and B<configure> method.
 
     Text::ANSI::Fold->configure(boundary => 'word');
 
-    my $f = Text::ANSI::Fold->new(boundary => 'word');
+    my $obj = Text::ANSI::Fold->new(boundary => 'word');
 
-    $f->configure(boundary => 'word');
+    $obj->configure(boundary => 'word');
 
 =over 7
 
@@ -764,6 +848,10 @@ B<chops> interface.
 If the value is reference to subroutine, its result is used as a
 prefix string.
 
+The B<fold> function does not complain if the result of adding a
+prefix string is longer than the original text.  The caller must be
+very careful because of the possibility of an infinite loop.
+
 =item B<ambiguous> => C<narrow> or C<wide>
 
 Tells how to treat Unicode East Asian ambiguous characters.  Default
@@ -806,6 +894,20 @@ Import-tag C<:constants> can be used to access these constants.
 Option B<runin> and B<runout> is used to set maximum width of moving
 characters.  Default values are both 2.
 
+=item B<crackwide> => I<bool>
+
+=item B<lefthalf> => I<char>
+
+=item B<righthalf> => I<char>
+
+It is sometimes necessary to split a string at the middle of a wide
+character.  In such cases, the string is usually split before that
+point.  If this parameter is true, that wide character is split into
+left-half and right-half character.
+
+The parameters C<lefthalf> and C<righthalf> specify the respective
+characters. Their default value is both C<NON-BREAK SPACE>.
+
 =item B<expand> => I<bool>
 
 =item B<tabstop> => I<n>
@@ -832,16 +934,18 @@ C<symbols>'s tabhead and C<space>'s tabspace.
 
 Currently these names are available.
 
-    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}",
-                "\N{SYMBOL FOR SPACE}" ],
-    shade  => [ "\N{MEDIUM SHADE}",
-                "\N{LIGHT SHADE}" ],
-    block  => [ "\N{LOWER ONE QUARTER BLOCK}",
-                "\N{LOWER ONE EIGHTH BLOCK}" ],
-    bar    => [ "\N{BOX DRAWINGS HEAVY RIGHT}",
-                "\N{BOX DRAWINGS LIGHT HORIZONTAL}" ],
-    dash   => [ "\N{BOX DRAWINGS HEAVY RIGHT}",
-                "\N{BOX DRAWINGS LIGHT DOUBLE DASH HORIZONTAL}" ],
+    symbol   => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}",
+                  "\N{SYMBOL FOR SPACE}" ],
+    shade    => [ "\N{MEDIUM SHADE}",
+                  "\N{LIGHT SHADE}" ],
+    block    => [ "\N{LOWER ONE QUARTER BLOCK}",
+                  "\N{LOWER ONE EIGHTH BLOCK}" ],
+    needle   => [ "\N{BOX DRAWINGS HEAVY RIGHT}",
+                  "\N{BOX DRAWINGS LIGHT HORIZONTAL}" ],
+    dash     => [ "\N{BOX DRAWINGS HEAVY RIGHT}",
+                  "\N{BOX DRAWINGS LIGHT DOUBLE DASH HORIZONTAL}" ],
+    triangle => [ "\N{BLACK RIGHT-POINTING SMALL TRIANGLE}",
+		  "\N{WHITE RIGHT-POINTING SMALL TRIANGLE}" ],
 
 Below are styles providing same character for both tabhead and
 tabspace.
@@ -849,6 +953,7 @@ tabspace.
     dot          => '.',
     space        => ' ',
     emspace      => "\N{EM SPACE}",
+    blank        => "\N{OPEN BOX}",
     middle-dot   => "\N{MIDDLE DOT}",
     arrow        => "\N{RIGHTWARDS ARROW}",
     double-arrow => "\N{RIGHTWARDS DOUBLE ARROW}",
@@ -883,12 +988,55 @@ text with Japanese prohibited character handling.
         linebreak => LINEBREAK_ALL,
         runin     => 4,
         runout    => 4,
-        );
+    );
     
     $, = "\n";
     while (<>) {
         print $fold->text($_)->chops;
     }
+
+=head1 CONTROL CHARACTERS
+
+Text::ANSI::Fold handles the following line break related codes
+specially:
+
+    Newline (\n)
+    Form feed (\f)
+    Carriage return (\r)
+    Null (\0)
+    Line separator (U+2028)
+    Paragraph separator (U+2029)
+
+These characters are handled as follows:
+
+=over 4
+
+=item NEWLINE (C<\n>), CRNL (C<\r\n>)
+
+=item NULL (C<\0>)
+
+=item LINE SEPARATOR (C<U+2028>)
+
+=item PARAGRAPH SEPARATOR (C<U+2029>)
+
+If any of these characters are found, the folding process terminates
+immediately and the portion up to that character is returned as folded
+text.  These character itself is included at the end of the folded
+text.
+
+=item CARRIAGE RETURN (C<\r>)
+
+When a carriage return is found, it is added to the folded text and
+the fold width is reset.
+
+=item FORM FEED (C<\f>)
+
+If a form feed character is found in the middle of a string,
+processing stops and the string up to the point immediately before is
+returned.  If it is found at the beginning of a string, it is added to
+the folded text and processing continues.
+
+=back
 
 =head1 SEE ALSO
 
@@ -954,7 +1102,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright ©︎ 2018-2023 Kazumasa Utashiro.
+Copyright ©︎ 2018-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

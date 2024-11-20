@@ -4,6 +4,9 @@ author:
   - 'AMD OSRC Tapper Team <tapper@amd64.org>'
   - 'Tapper Team <tapper-ops@amazon.com>'
 build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Scalar::Util: '0'
   Test::Deep: '0'
   Test::Fixture::DBIC::Schema: '0'
@@ -12,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -48,7 +51,6 @@ requires:
   Variable::Magic: '0'
   YAML::Syck: '0'
   YAML::XS: '0'
-  common::sense: '0'
   namespace::clean: '0'
   parent: '0'
   perl: '5.010'
@@ -58,10 +60,10 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Tapper-Schema
   homepage: http://metacpan.org/release/Tapper-Schema
   repository: git://github.com/tapper/Tapper-Schema.git
-version: 5.0.11
+version: 5.0.12
 x_Dist_Zilla:
   perl:
-    version: '5.022000'
+    version: '5.041003'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -75,74 +77,92 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@TAPPER/GatherDir'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@TAPPER/PruneCruft'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@TAPPER/ManifestSkip'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@TAPPER/MetaYAML'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@TAPPER/Readme'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@TAPPER/ExtraTests'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@TAPPER/ExecDir'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@TAPPER/ShareDir'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@TAPPER/MakeMaker'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@TAPPER/Manifest'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@TAPPER/TestRelease'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@TAPPER/ConfirmRelease'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@TAPPER/UploadToCPAN'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@TAPPER/MetaConfig'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@TAPPER/MetaJSON'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@TAPPER/PkgVersion'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@TAPPER/PodSyntaxTests'
-      version: '6.012'
+      version: '6.032'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: 0
+          fail_on_warning: author
+          fake_home: 0
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: test
+          script_finder:
+            - ':PerlExecFiles'
+          skips: []
+          switch: []
+      name: '@TAPPER/Test::Compile'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
@@ -157,7 +177,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@TAPPER/MetaResources'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@TAPPER/Authority'
@@ -168,12 +188,12 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::EOL:
           filename: xt/author/eol.t
           finder:
-            - ':InstallModules'
             - ':ExecFiles'
+            - ':InstallModules'
             - ':TestFiles'
-          trailing_whitespace: '0'
+          trailing_whitespace: 0
       name: '@TAPPER/Test::EOL'
-      version: '0.18'
+      version: '0.19'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -182,94 +202,94 @@ x_Dist_Zilla:
             - '@TAPPER'
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Name
               name: '@TAPPER/Name'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Region
               name: '@TAPPER/prelude'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Collect
               name: TYPES
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@TAPPER/Leftovers'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Region
               name: '@TAPPER/postlude'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Authors
               name: '@TAPPER/Authors'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Section::Legal
               name: '@TAPPER/Legal'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@TAPPER/List'
-              version: '4.012'
+              version: '4.020'
             -
               class: Pod::Weaver::Plugin::Encoding
               name: '@TAPPER/Encoding'
               version: '0.03'
       name: '@TAPPER/PodWeaver'
-      version: '4.006'
+      version: '4.010'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@TAPPER/AutoPrereqs'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Git::Describe
       name: '@TAPPER/Git::Describe'
-      version: '0.006'
+      version: '0.008'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@TAPPER/CheckChangesHasContent'
-      version: '0.008'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@TAPPER/NextRelease'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -278,9 +298,10 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.1
           repo_root: .
       name: '@TAPPER/Git::NextVersion'
-      version: '2.036'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -293,15 +314,17 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.1
           repo_root: .
       name: '@TAPPER/@Git/Check'
-      version: '2.036'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -309,11 +332,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@TAPPER/@Git/Commit'
-      version: '2.036'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -321,15 +345,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v5.0.11
-          tag_format: v%v
-          tag_message: v%v
+          tag: v5.0.12
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@TAPPER/@Git/Tag'
-      version: '2.036'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -338,9 +363,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.25.1
           repo_root: .
       name: '@TAPPER/@Git/Push'
-      version: '2.036'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -348,52 +374,57 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.012'
+      version: '6.032'
+    -
+      class: Dist::Zilla::Plugin::Encoding
+      name: Encoding
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.012'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.012'
+      version: '6.032'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
-    version: '6.012'
+      is_trial: 0
+    version: '6.032'
 x_authority: cpan:TAPPER
-x_generated_by_perl: v5.22.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.41.3
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: BSD-2-Clause-FreeBSD

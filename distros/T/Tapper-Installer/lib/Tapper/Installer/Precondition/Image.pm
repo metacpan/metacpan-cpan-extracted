@@ -1,6 +1,6 @@
 package Tapper::Installer::Precondition::Image;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Installer::Precondition::Image::VERSION = '5.0.2';
+$Tapper::Installer::Precondition::Image::VERSION = '5.0.3';
 use strict;
 use warnings;
 

@@ -1,9 +1,9 @@
 package Tapper::Schema;
-# git description: v5.0.10-1-g82bd276
+# git description: v5.0.11-5-ga76178f
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Database schemas for Tapper
-$Tapper::Schema::VERSION = '5.0.11';
+$Tapper::Schema::VERSION = '5.0.12';
 use warnings;
 use strict;
 
@@ -35,7 +35,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

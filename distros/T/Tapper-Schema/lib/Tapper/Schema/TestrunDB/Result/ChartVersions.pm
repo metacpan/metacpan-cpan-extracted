@@ -1,6 +1,6 @@
 package Tapper::Schema::TestrunDB::Result::ChartVersions;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Schema::TestrunDB::Result::ChartVersions::VERSION = '5.0.11';
+$Tapper::Schema::TestrunDB::Result::ChartVersions::VERSION = '5.0.12';
 # ABSTRACT: Tapper - Keep Charts for Tapper-Reports-Web-GUI
 
 use strict;
@@ -167,7 +167,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

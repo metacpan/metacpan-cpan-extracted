@@ -1,0 +1,142 @@
+basic tests
+########## empty
+########## just comments
+# is this a Perl program?
+---
+# is this a Perl program?
+use v5.XX;
+########## this is the end
+__END__
+---
+use v5.XX;
+__END__
+########## keep possibly meaningful comments
+use v5.10; ## no critic
+---
+use v5.XX;
+## no critic
+########## no version
+...;
+{ use strict; ... }
+---
+use v5.XX;
+...;
+{ use strict; ... }
+########## recent version
+use v5.28;
+--- v5.28
+use v5.XX;
+########## numeric version
+use 5.028;
+---
+use 5.028;
+--- v5.28
+use v5.XX;
+########## move version to the top
+...;
+use v5.10;
+no strict 'refs';
+---
+use v5.XX;
+...;
+no strict 'refs';
+########## reorder no strict
+...;
+no strict 'refs';
+use v5.10;
+---
+use v5.XX;
+...;
+no strict 'refs';
+########## move version after package
+use v5.10;
+package Foo;
+---
+package Foo;
+use v5.XX;
+########## version remain after package
+package Foo;
+use v5.10;
+---
+package Foo;
+use v5.XX;
+########## move to the top if package is not first
+use utf8;
+package Bar;
+use strict;
+---
+use v5.XX;
+use utf8;
+package Bar;
+use strict;
+--- v5.12
+use v5.XX;
+use utf8;
+package Bar;
+########## move version after comments
+#!/usr/bin/env perl
+...;
+use v5.10;
+---
+#!/usr/bin/env perl
+use v5.XX;
+...;
+########## a version with comments
+#!/usr/bin/env perl
+...;
+    use v5.10  ; # some comment about use version
+# more stuff
+...;
+---
+#!/usr/bin/env perl
+use v5.XX;
+...;
+# some comment about use version
+# more stuff
+...;
+########## use version inside a block
+{
+    use v5.10;
+    no warnings;
+}
+---
+use v5.XX;
+{
+    no warnings;
+}
+########## use version inside a BEGIN block
+BEGIN {
+    use v5.10;
+    no warnings;
+}
+---
+use v5.XX;
+BEGIN {
+    no warnings;
+}
+########## use version followed by stuff
+use Foo;
+use 5.010; use strict; use warnings; # comment
+---
+use v5.XX;
+use Foo;
+use strict; use warnings; # comment
+--- v5.12
+use v5.XX;
+use Foo;
+use warnings; # comment
+--- v5.36
+use v5.XX;
+use Foo;
+# comment
+########## no warning before v line
+no warnings 'once';
+use v5.10;
+---
+use v5.XX;
+no warnings 'once';
+########## no warning before v5.36 line
+no warnings 'once';
+use v5.36;
+--- v5.36 use v5.36 re-enables all warnings
+use v5.XX;

@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use Test::More;
 use Random::Simple;
-use List::Util qw(any);
 use Config;
 
 ########################################################
@@ -42,8 +41,8 @@ for (my $i = 0; $i < 50000; $i++) {
 }
 
 # Check if ANY of the items are the mim/max
-my $has_min = int(any { $_ == $min } @nums);
-my $has_max = int(any { $_ == $max } @nums);
+my $has_min = int(grep { $_ == $min } @nums);
+my $has_max = int(grep { $_ == $max } @nums);
 
 # Make sure we contain the lower and upper bounds (inclusive)
 ok($has_min, "random_int() contains lower bound") or diag("$min not in sample");
@@ -58,9 +57,12 @@ ok($has_max, "random_int() contains upper bound") or diag("$max not in sample");
 cmp_ok(get_avg_randX(32), '>', 2**30, "rand32() generates the right size numbers");
 cmp_ok(get_avg_randX(32), '<', 2**32, "rand32() generates the right size numbers");
 
-# Average should be about 2**63
-cmp_ok(get_avg_randX(64), '>', 2**62, "rand64() generates the right size numbers");
-cmp_ok(get_avg_randX(64), '<', 2**64, "rand64() generates the right size numbers");
+# Only do the 64bit tests on platforms that support it
+if ($has_64bit) {
+	# Average should be about 2**63
+	cmp_ok(get_avg_randX(64), '>', 2**62, "rand64() generates the right size numbers");
+	cmp_ok(get_avg_randX(64), '<', 2**64, "rand64() generates the right size numbers");
+}
 
 ###################################################################
 

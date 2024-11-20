@@ -14,9 +14,6 @@ use Log::Any::Adapter::Stdout;
 use Scalar::Util qw( blessed );
 use Sys::Async::Virt;
 
-use Carp::Always;
-use Data::Dumper;
-
 my $url;
 my $domain;
 my $target_state_name;

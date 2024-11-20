@@ -1,0 +1,7 @@
+########## feature switch
+use feature 'switch';
+---
+use v5.XX;
+--- v5.36
+use v5.XX;
+use feature 'switch';

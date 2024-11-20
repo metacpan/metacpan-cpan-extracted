@@ -1,9 +1,8 @@
 package Tapper::Reports::Web::Controller::Tapper::Testplan::Id;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Controller::Tapper::Testplan::Id::VERSION = '5.0.15';
+$Tapper::Reports::Web::Controller::Tapper::Testplan::Id::VERSION = '5.0.17';
 use parent 'Tapper::Reports::Web::Controller::Base';
 
-use common::sense;
 ## no critic (RequireUseStrict)
 use Tapper::Model 'model';
 use Tapper::Reports::Web::Util::Testrun;
@@ -57,10 +56,8 @@ sub gen_testplan_overview
         my @testplan_elements;
 
         foreach my $plan (@plans) {
-                given ($plan->{type})
-                {
-                        when(['multitest', 'testrun'])  { push @testplan_elements, $self->parse_testrun($plan) }
-                }
+                my $type = $plan->{type};
+                        if ($type =~ /^(multitest|testrun)$/)  { push @testplan_elements, $self->parse_testrun($plan) }
         }
         return \@testplan_elements;
 }
@@ -181,7 +178,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

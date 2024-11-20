@@ -1,12 +1,10 @@
 package Tapper::Base;
-# git description: v4.1.4-43-g3d8dee0
+# git description: v5.0.0-1-g5b9d217
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Common functions for all Tapper classes
-$Tapper::Base::VERSION = '5.0.0';
+$Tapper::Base::VERSION = '5.0.1';
 use Moose;
-
-use common::sense;
 
 use 5.010;
 
@@ -106,7 +104,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

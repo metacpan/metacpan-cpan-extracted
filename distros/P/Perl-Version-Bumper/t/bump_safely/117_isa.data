@@ -1,0 +1,23 @@
+########## use feature 'isa' DIE < v5.32
+use feature 'isa';
+---
+use v5.XX;
+use feature 'isa';
+--- v5.36
+use v5.XX;
+########## no feature 'isa' DIE < v5.32
+no feature 'isa';
+---
+use v5.XX;
+no feature 'isa';
+########## isa DIE
+my $o = bless {}, 'SomeClass';
+say $o isa 'SomeClass';
+########## isa DIE < v5.36
+use v5.36;
+my $o = bless {}, 'SomeClass';
+say $o isa 'SomeClass';
+--- v5.36
+use v5.XX;
+my $o = bless {}, 'SomeClass';
+say $o isa 'SomeClass';

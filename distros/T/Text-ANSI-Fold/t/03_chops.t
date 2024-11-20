@@ -61,6 +61,16 @@ is_deeply(chops($fold),
 	  [ ],
 	  "chops (empty)");
 
+$fold->configure(text => "12233344", width => [ 1..5 ], padding => 1);
+is_deeply(chops($fold),
+	  [ "1", "22", "333", "44  ", ],
+	  "array (padding)");
+
+$fold->configure(text => "12233344", width => [ 1, 2, 3, -1 ], padding => 1);
+is_deeply(chops($fold),
+	  [ "1", "22", "333", "44", ],
+	  "array (padding + -1)");
+
 $fold->configure(text => "", width => 10, padding => 1);
 is_deeply(chops($fold),
 	  [ " " x 10 ],

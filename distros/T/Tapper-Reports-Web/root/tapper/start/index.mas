@@ -20,6 +20,9 @@
                 <tr>
                   <td>&bull;&nbsp;<a href="/tapper/overview/host">Hosts</a></td><td>List of all hosts.</td>
                 </tr>
+                <tr>
+                  <td>&bull;&nbsp;<a href="/tapper/overview/resource">Resources</a></td><td>List of all resources.</td>
+                </tr>
         </table>
 
 <p>

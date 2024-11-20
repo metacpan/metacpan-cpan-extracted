@@ -1,9 +1,7 @@
 package Tapper::Installer::Base;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Installer::Base::VERSION = '5.0.2';
+$Tapper::Installer::Base::VERSION = '5.0.3';
 use Moose;
-
-use common::sense;
 
 use Tapper::Remote::Config;
 use Tapper::Installer::Precondition::Copyfile;

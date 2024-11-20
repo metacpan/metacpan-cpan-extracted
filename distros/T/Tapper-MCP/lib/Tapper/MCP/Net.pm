@@ -1,6 +1,6 @@
 package Tapper::MCP::Net;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::MCP::Net::VERSION = '5.0.8';
+$Tapper::MCP::Net::VERSION = '5.0.9';
 use strict;
 use warnings;
 use English '-no_match_vars';
@@ -385,7 +385,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

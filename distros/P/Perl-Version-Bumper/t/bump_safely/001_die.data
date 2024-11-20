@@ -1,0 +1,4 @@
+########## does not compile DIE!
+BEGIN { die }
+########## non existent feature DIE!
+use feature 'foobar';

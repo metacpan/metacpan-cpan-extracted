@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -46,6 +46,7 @@ my @files = (
     'lib/Tapper/MCP/State/Details.pm',
     'lib/Tapper/MCP/State/Plugin/Dummy.pm',
     'lib/Tapper/MCP/State/Plugin/OSRC.pm',
+    't/00-compile.t',
     't/00-load.t',
     't/01-instance.t',
     't/author-eol.t',

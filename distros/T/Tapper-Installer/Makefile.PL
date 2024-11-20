@@ -44,7 +44,6 @@ my %WriteMakefileArgs = (
     "Tapper::Remote::Net" => 0,
     "URI::Escape" => 0,
     "YAML" => 0,
-    "common::sense" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -59,7 +58,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "subs" => 0
   },
-  "VERSION" => "5.0.2",
+  "VERSION" => "5.0.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -94,7 +93,6 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "URI::Escape" => 0,
   "YAML" => 0,
-  "common::sense" => 0,
   "strict" => 0,
   "subs" => 0,
   "warnings" => 0

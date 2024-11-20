@@ -1,12 +1,10 @@
 package Tapper::Reports::Web::Util::Report;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Util::Report::VERSION = '5.0.15';
+$Tapper::Reports::Web::Util::Report::VERSION = '5.0.17';
 use Moose;
 use Tapper::Model 'model';
 
 extends 'Tapper::Reports::Web::Util';
-
-use common::sense;
 
 sub prepare_simple_reportlist {
 
@@ -152,7 +150,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

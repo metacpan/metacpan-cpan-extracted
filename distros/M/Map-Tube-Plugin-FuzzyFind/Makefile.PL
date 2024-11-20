@@ -45,18 +45,18 @@ WriteMakefile(
                             prereqs     => {
                                              runtime => {
                                                           suggests => {
-                                                                        'Text::Soundex'     => 3,
-																		'Text::Phonetic::Phonix' => 0,
-																		'Text::Phonetic::Phonem' => 0,
+																		'Text::Soundex'                  => 3,
+																		'Text::Phonetic::Phonix'         => 0,
+																		'Text::Phonetic::Phonem'         => 0,
 																		'Text::Phonetic::DaitchMokotoff' => 0,
-																		'Text::Phonetic::Koeln' => 0,
-                                                                        'Text::Metaphone'   => 20081017,
-																		'Text::DoubleMetaphone' => 0,
-																		'Text::Levenshtein::XS' => 0.503,
+																		'Text::Phonetic::Koeln'          => 0,
+																		'Text::Metaphone'                => 20081017,
+																		'Text::DoubleMetaphone'          => 0,
+																		'Text::Levenshtein::XS'          => 0.503,
 																		'Text::Levenshtein::Damerau::XS' => 3.2,
-																		'Text::JaroWinkler' => 0,
-                                                                        'String::Trigram'   => 0.12,
-																		'Text::Unidecode'   => 0,        # not needed by ourselves but by Text::Soundex, which does not declare this fact
+																		'Text::JaroWinkler'              => 0,
+																		'String::Trigram'                => 0.12,
+																		'Text::Unidecode'                => 0,  # not needed by ourselves but by Text::Soundex, which does not declare this fact
                                                                       },
                                                         },
                                            },

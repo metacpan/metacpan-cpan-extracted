@@ -1,6 +1,6 @@
 package Tapper::Installer::Precondition::Kernelbuild;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Installer::Precondition::Kernelbuild::VERSION = '5.0.2';
+$Tapper::Installer::Precondition::Kernelbuild::VERSION = '5.0.3';
 
 use Moose;
 use IO::Handle; # needed to set pipe nonblocking

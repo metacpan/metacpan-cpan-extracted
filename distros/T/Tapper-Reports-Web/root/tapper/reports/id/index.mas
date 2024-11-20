@@ -2,8 +2,10 @@
     $report
     $failures => {}
     $overview
+    $external_attachments => []
     %reportlist_rga => {}
     %reportlist_rgt => {}
+    $resources => []
 </%args>
 <link rel="stylesheet" type="text/css" title="Red" href="/tapper/static/css/tap_formatter_html.css" />
 <script type="text/javascript" src="/tapper/static/js/tap_formatter_html_jquery-1.2.3.pack.js"></script>
@@ -37,6 +39,11 @@
                         	(<% $report->machine_description %>)
 %                       }
                 </li>
+%       if ($resources) {
+%          foreach my $resource (@$resources) {
+		<li class="meta">Resource: '<% $resource->name %>'</li>
+%          }
+%       }
 	</ul>
 
     <!-- ************************************************************ -->
@@ -74,6 +81,24 @@
 
     <!-- ************************************************************ -->
 
+%        if (@$external_attachments) {
+        <h4>External Attachments</h4>
+        <table class="reportfile" style="margin-bottom:5em">
+%               my @sorted_attachments = sort { $a->{filename} cmp $b->{filename} } @$external_attachments;
+%               foreach my $att (@sorted_attachments) {
+          <tr>
+            <td align="left"><a href="<% $att->{view_url} %>"><% $att->{filename} %></a></td>
+            <td>
+              view
+              <a href="<% $att->{view_url} %>?filter=ansi2txt">ansi2txt</a>&nbsp;|
+              <a href="<% $att->{view_url} %>?filter=ascii">ascii only</a>&nbsp;|
+              <a href="<% $att->{info_url} %>">info</a>&nbsp;|
+              <% $att->{size} %> Bytes
+            </td>
+          </tr>
+%               }
+          </table>
+%        }
 % }
 
 %# Local Variables:

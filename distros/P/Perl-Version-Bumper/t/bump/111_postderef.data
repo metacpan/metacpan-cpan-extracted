@@ -1,0 +1,7 @@
+########## feature postderef
+use feature 'postderef';
+---
+use v5.XX;
+use feature 'postderef';
+--- v5.24
+use v5.XX;

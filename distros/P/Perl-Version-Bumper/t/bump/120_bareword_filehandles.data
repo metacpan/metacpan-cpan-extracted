@@ -1,0 +1,31 @@
+######### no feature 'bareword_filehandles'
+no feature 'bareword_filehandles';
+---
+use v5.XX;
+no feature 'bareword_filehandles';
+--- v5.38
+use v5.XX;
+########## feature bareword_filehandles
+use feature 'bareword_filehandles';
+---
+use v5.XX;
+--- v5.38
+use v5.XX;
+use feature 'bareword_filehandles';
+########## no bareword::filehandles
+no bareword::filehandles;
+---
+use v5.XX;
+no bareword::filehandles;
+--- v5.34
+use v5.XX;
+no feature 'bareword_filehandles';
+--- v5.38
+use v5.XX;
+########## use bareword::filehandles
+use bareword::filehandles;
+---
+use v5.XX;
+--- v5.38
+use v5.XX;
+use feature 'bareword_filehandles';

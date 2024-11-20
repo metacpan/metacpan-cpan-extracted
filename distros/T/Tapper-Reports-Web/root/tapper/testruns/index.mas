@@ -71,6 +71,7 @@
                      <th>Updated At (GMT)</th>
                      <th>Topic</th>
                      <th>Machine</th>
+                     <th>Resources</th>
                      <th>State</th>
                      <th>Success</th>
                      <th>Ratio</th>
@@ -99,7 +100,7 @@
 %                       }
 %                   }
 
-                    <tr>
+                    <tr style="vertical-align:top;">
                         <td>
                             <div class="plus idlist"></div>
                             <a title="Click to show details" href="/tapper/testruns/id/<% $hr_testrun->{testrun_id} %>">tr<% $hr_testrun->{testrun_id} %></a>
@@ -117,6 +118,18 @@
                                 <a title="Click to show testruns on '<% $hr_testrun->{machine_name} %>'" key="host">
                                     <% $hr_testrun->{machine_name} %>
                                 </a>
+%                           }
+                        </td>
+                        <td>
+%                           if ( $hr_testrun->{resources} ) {
+%                               foreach my $res (@{$hr_testrun->{resources}}) {
+                                    <div>
+                                    <div class="plus resource"></div>
+                                    <a title="Click to show testruns with '<% $res->name %>'" key="resource">
+                                         <% $res->name %>
+                                    </a>
+                                    </div>
+%                               }
 %                           }
                         </td>
                         <td>

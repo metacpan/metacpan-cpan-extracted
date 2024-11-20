@@ -48,9 +48,9 @@ DESCRIPTION
 
     Now you are able to lauch the http service with:
 
-        plackup -Ilib --port 8089 --server Twiggy bin/async-microservice-YOUNAME.psgi
+        plackup -Ilib --port 8089 --server Twiggy bin/async-microservice-YOURNAME.psgi
 
-    In your broser you can read the OpenAPI documentation:
+    In your browser you can read the OpenAPI documentation:
     http://0.0.0.0:8089/v1/ and also use editor to extend it:
     http://0.0.0.0:8089/v1/edit
 

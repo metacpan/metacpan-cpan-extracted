@@ -1,3 +1,9 @@
+0.243240  2024-11-19 13:26:12+01:00 Europe/Brussels
+    - Additions
+       - binaries: refined MAFFT usage (--addfragments and --addlong options)
+    - Fixes
+       - lib: fixed XML parsing bug in Seq2Seq (due to change in BLAST database format?)
+
 0.231010  2023-04-11 11:33:36+02:00 Europe/Brussels
     - Fixes
        - binaries: fixed bug preventing the alignment of multiple files at once

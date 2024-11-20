@@ -20,6 +20,7 @@ t/17-private_methods.t
 t/18-findbin.t
 t/19-autosplit.t
 t/2-static_functional_interface_fake.t
+t/20-_parse_libs.t
 t/3-static_oo_interface_real.t
 t/4-static_functional_interface_options_fake.t
 t/5-pluggable_fake.t

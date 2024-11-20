@@ -55,7 +55,6 @@
             "Tapper::Remote::Net" : "0",
             "URI::Escape" : "0",
             "YAML" : "0",
-            "common::sense" : "0",
             "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
@@ -91,7 +90,7 @@
          "web" : "http://github.com/tapper/Tapper-Installer"
       }
    },
-   "version" : "5.0.2",
+   "version" : "5.0.3",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.041003"
@@ -442,7 +441,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v5.0.2",
+                  "tag" : "v5.0.3",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

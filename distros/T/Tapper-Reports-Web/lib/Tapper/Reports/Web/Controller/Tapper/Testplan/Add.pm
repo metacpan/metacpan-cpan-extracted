@@ -1,9 +1,8 @@
 package Tapper::Reports::Web::Controller::Tapper::Testplan::Add;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Controller::Tapper::Testplan::Add::VERSION = '5.0.15';
+$Tapper::Reports::Web::Controller::Tapper::Testplan::Add::VERSION = '5.0.17';
 use parent 'Tapper::Reports::Web::Controller::Base';
 
-use common::sense;
 ## no critic (RequireUseStrict)
 
 
@@ -67,7 +66,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

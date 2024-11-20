@@ -1,6 +1,6 @@
 package Tapper::Reports::Web::Controller::Tapper::Testruns::Id;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Controller::Tapper::Testruns::Id::VERSION = '5.0.15';
+$Tapper::Reports::Web::Controller::Tapper::Testruns::Id::VERSION = '5.0.17';
 use 5.010;
 
 use strict;
@@ -69,6 +69,16 @@ sub index :Path :Args(1)
             join => [ 'reportgrouptestrun', ]
            }
            );
+
+        my @resource_requests = $c->model('TestrunDB')
+          ->resultset('TestrunRequestedResource')
+          ->search({ testrun_id => $testrun_id, selected_resource_id => { '!=', undef } },
+                 { 'prefetch' => 'selected_resource' })
+          ->all();
+
+        $c->stash->{resources} = [ map { $_->selected_resource } @resource_requests ];
+
+        $c->stash->{dependencies} = [ $c->stash->{testrun}->depending_testruns->all ];
 }
 
 sub prepare_navi : Private
@@ -184,7 +194,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

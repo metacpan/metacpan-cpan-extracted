@@ -1,0 +1,4 @@
+########## feature state
+use feature 'state';
+---
+use v5.XX;

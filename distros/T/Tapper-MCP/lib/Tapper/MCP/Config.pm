@@ -1,9 +1,8 @@
 package Tapper::MCP::Config;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::MCP::Config::VERSION = '5.0.8';
+$Tapper::MCP::Config::VERSION = '5.0.9';
 use strict;
 use warnings;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 use 5.010;
 use Data::DPath 'dpath';
@@ -115,16 +114,14 @@ sub handle_guest_tests
 
 sub parse_virt_host
 {
-        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
         my ($self, $config, $virt) = @_;
-        given (lc($virt->{host}->{root}->{precondition_type})) {
-                when ('image') {
+        my $lc_type = lc($virt->{host}->{root}->{precondition_type});
+                if ($lc_type eq 'image') {
                         $config = $self->parse_image_precondition($config, $virt->{host}->{root});
                 }
-                when ('autoinstall') {
+                elsif ($lc_type eq 'autoinstall') {
                         $config = $self->parse_autoinstall($config, $virt->{host}->{root});
                 }
-        }
 
         # additional preconditions for virt host
         if ($virt->{host}->{preconditions}) {
@@ -164,10 +161,8 @@ sub parse_virt_preconditions
 
                 # if we have a qcow image, we need a raw image to copy PRC stuff to
                 no warnings 'uninitialized';
-                no if $] >= 5.017011, warnings => 'experimental::smartmatch';
-                given($guest->{root}{mounttype})
-                {
-                        when ('raw') {
+                my $mtype = $guest->{root}{mounttype};
+                        if ($mtype eq 'raw') {
                                 my $raw_image = {
                                                  precondition_type => 'rawimage',
                                                  name              => basename($guest->{mountfile}),
@@ -175,7 +170,7 @@ sub parse_virt_preconditions
                                                 };
                                 push @{$config->{preconditions}}, $raw_image;
                         }
-                        when ('windows') {
+                        elsif ($mtype eq 'windows') {
                                 my $raw_image = {
                                                  precondition_type => 'copyfile',
                                                  name              => $self->cfg->{files}{windows_test_image},
@@ -184,7 +179,6 @@ sub parse_virt_preconditions
                                                 };
                                 push @{$config->{preconditions}}, $raw_image;
                         }
-                }
                 use warnings;
 
                 push @{$config->{preconditions}}, $guest->{root} if $guest->{root}->{precondition_type};
@@ -454,11 +448,10 @@ sub produce_preconds_in_arrayref
 
 sub produce_virt_precondition
 {
-        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
         my ($self, $config, $precondition) = @_;
         local $Data::DPath::USE_SAFE; # path not from user, Safe.pm deactivated for debug and speed
-        my $producers = $precondition ~~ dpath '//*[key eq "precondition_type" and lc(value) eq "produce"]/../..';
-        foreach my $producer (@$producers) {
+        my @producers = dpath('//*[key eq "precondition_type" and lc(value) eq "produce"]/../..')->match($precondition);
+        foreach my $producer (@producers) {
                 if (ref $producer eq 'ARRAY') {
                         my $error = $self->produce_preconds_in_arrayref($config, $producer);
                         return $error if $error;
@@ -484,18 +477,17 @@ sub produce_virt_precondition
 
 sub parse_precondition
 {
-        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
         my ($self, $config, $precondition_result) = @_;
         my $precondition = $precondition_result->precondition_as_hash;
 
-        given(lc($precondition->{precondition_type})){
-                when('produce') {
+        my $type = lc($precondition->{precondition_type});
+                if ($type eq 'produce') {
                         $config = $self->parse_produce_precondition($config, $precondition_result);
                 }
-                when('image' ) {
+                elsif ($type eq 'image' ) {
                         $config = $self->parse_image_precondition($config, $precondition);
                 }
-                when( 'virt' ) {
+                elsif ($type eq 'virt' ) {
                         $precondition = $self->produce_virt_precondition($config, $precondition);
                         return $precondition unless ref $precondition eq 'HASH';
 
@@ -505,40 +497,39 @@ sub parse_precondition
 
                         $config       = $self->parse_virt_preconditions($config, $precondition);
                 }
-                when( 'grub') {
+                elsif ($type eq 'grub') {
                         $config = $self->parse_grub($config, $precondition);
                 }
-                when( 'installer_stop') {
+                elsif ($type eq 'installer_stop') {
                         $config->{installer_stop} = 1;
                 }
-                when( 'testrun_stop') {
+                elsif ($type eq 'testrun_stop') {
                         $config->{testrun_stop} = 1;
                 }
-                when( 'reboot') {
+                elsif ($type eq 'reboot') {
                         $config = $self->parse_reboot($config, $precondition);
                 }
-                when( 'autoinstall') {
+                elsif ($type eq 'autoinstall') {
                         $config = $self->parse_autoinstall($config, $precondition);
                 }
-                when( 'testprogram') {
+                elsif ($type eq 'testprogram') {
                         $config = $self->parse_testprogram($config, $precondition);
                 }
-                when( 'testprogram_list') {
+                elsif ($type eq 'testprogram_list') {
                         $config = $self->parse_testprogram_list($config, $precondition);
                 }
-                when( 'simnow' ) {
+                elsif ($type eq 'simnow' ) {
                         $config=$self->parse_simnow_preconditions($config, $precondition);
                 }
-                when( 'hint' ) {
+                elsif ($type eq 'hint' ) {
                         $config=$self->parse_hint_preconditions($config, $precondition);
                 }
-                when( 'cobbler' ) {
+                elsif ($type eq 'cobbler' ) {
                         $config=$self->parse_cobbler_preconditions($config, $precondition);
                 }
-                default {
+                else {
                         push @{$config->{preconditions}}, $precondition;
                 }
-        }
 
 
         return $config;
@@ -1048,7 +1039,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

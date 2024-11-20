@@ -2,7 +2,7 @@
 package Tapper::MCP::Master;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Wait for new testruns and start a new child when needed
-$Tapper::MCP::Master::VERSION = '5.0.8';
+$Tapper::MCP::Master::VERSION = '5.0.9';
 use 5.010;
         use Moose;
         use parent "Tapper::MCP";
@@ -339,7 +339,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

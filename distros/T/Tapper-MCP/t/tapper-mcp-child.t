@@ -102,12 +102,12 @@ $mock_child->mock('tap_report_away', sub { my (undef, $new_tap_report) = @_; pus
 
 $retval =  $child->runtest_handling();
 is($tap_reports[1], "1..1
-# Tapper-reportgroup-testrun: 4
-# Tapper-suite-name: Topic-Software
-# Tapper-suite-version: $Tapper::MCP::VERSION
-# Tapper-machine-name: bullock
-# Tapper-section: MCP overview
-# Tapper-reportgroup-primary: 1
+# Test-reportgroup-testrun: 4
+# Test-suite-name: Topic-Software
+# Test-suite-version: $Tapper::MCP::VERSION
+# Test-machine-name: bullock
+# Test-section: MCP overview
+# Test-reportgroup-primary: 1
 not ok 1 - timeout hit while waiting for installation
 ", 'Detect timeout during installer booting');
 
@@ -116,12 +116,12 @@ $child      = Tapper::MCP::Child->new(113);
 $retval =  $child->runtest_handling();
 like($tap_reports[0],
           qr'1..1
-# Tapper-reportgroup-testrun: 113
-# Tapper-suite-name: Topic-Software
-# Tapper-suite-version: \d+[.\d]+
-# Tapper-machine-name: No hostname set
-# Tapper-section: MCP overview
-# Tapper-reportgroup-primary: 1
+# Test-reportgroup-testrun: 113
+# Test-suite-name: Topic-Software
+# Test-suite-version: \d+[.\d]+
+# Test-machine-name: No hostname set
+# Test-section: MCP overview
+# Test-reportgroup-primary: 1
 not ok 1 - Generating configs
 # No architecture set for guest #1
 ', 'Reporting error in gen_config as TAP');

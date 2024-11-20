@@ -1,6 +1,6 @@
 package Tapper::MCP::Net::TAP;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::MCP::Net::TAP::VERSION = '5.0.8';
+$Tapper::MCP::Net::TAP::VERSION = '5.0.9';
 use 5.010;
 use strict;
 use warnings;
@@ -16,15 +16,17 @@ sub prc_headerlines {
         my $hostname = $self->associated_hostname;
 
         my $testrun_id = $self->testrun->id;
+        my $testplan_id = $self->cfg->{testplan}{id} // '';
         my $suitename =  ($prc_number > 0) ? "Guest-Overview-$prc_number" : "PRC0-Overview";
 
         my $headerlines = [
-                           "# Tapper-reportgroup-testrun: $testrun_id",
-                           "# Tapper-suite-name: $suitename",
-                           "# Tapper-suite-version: $Tapper::MCP::VERSION",
-                           "# Tapper-machine-name: $hostname",
-                           "# Tapper-section: prc-state-details",
-                           "# Tapper-reportgroup-primary: 0",
+                           "# Test-reportgroup-testrun: $testrun_id",
+                           ( $testplan_id ? "# Test-testplan-id: $testplan_id" : ()),
+                           "# Test-suite-name: $suitename",
+                           "# Test-suite-version: $Tapper::MCP::VERSION",
+                           "# Test-machine-name: $hostname",
+                           "# Test-section: prc-state-details",
+                           "# Test-reportgroup-primary: 0",
                           ];
         return $headerlines;
 }
@@ -86,14 +88,16 @@ sub mcp_headerlines {
         $topic =~ s/\s+/-/g;
         my $hostname = $self->associated_hostname();
         my $testrun_id = $self->testrun->id;
+        my $testplan_id = $self->cfg->{testplan}{id} // '';
 
         my $headerlines = [
-                           "# Tapper-reportgroup-testrun: $testrun_id",
-                           "# Tapper-suite-name: Topic-$topic",
-                           "# Tapper-suite-version: $Tapper::MCP::VERSION",
-                           "# Tapper-machine-name: $hostname",
-                           "# Tapper-section: MCP overview",
-                           "# Tapper-reportgroup-primary: 1",
+                           "# Test-reportgroup-testrun: $testrun_id",
+                           ( $testplan_id ? "# Test-testplan-id: $testplan_id" : ()),
+                           "# Test-suite-name: Topic-$topic",
+                           "# Test-suite-version: $Tapper::MCP::VERSION",
+                           "# Test-machine-name: $hostname",
+                           "# Test-section: MCP overview",
+                           "# Test-reportgroup-primary: 1",
                           ];
         return $headerlines;
 }
@@ -251,7 +255,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

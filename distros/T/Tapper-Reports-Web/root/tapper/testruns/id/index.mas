@@ -4,6 +4,8 @@ $testrun
 $overview
 $hostname
 $time
+$resources => []
+$dependencies => []
 %reportlist_rgt => {}
 $precondition_string => ''
 </%args>
@@ -29,6 +31,16 @@ $precondition_string => ''
 	<ul class="post_info">
 		<li class="date"><% $time || '' %></li>
 		<li class="meta">Host: '<% $hostname || '' %>'</li>
+%       if ($resources) {
+%          foreach my $resource (@$resources) {
+		<li class="meta">Resource: '<% $resource->name %>'</li>
+%          }
+%       }
+%       if ($dependencies) {
+%          foreach my $dependency (@$dependencies) {
+        <li class="meta">Depends on <a href="/tapper/testruns/id/<% $dependency->id %>">tr<% $dependency->id %></a></li>
+%          }
+%       }
 	</ul>
 
     <!-- ************************************************************ -->

@@ -1,0 +1,7 @@
+########## use feature 'defer'
+use feature 'defer';
+no warnings 'experimental::defer';
+---
+use v5.XX;
+use feature 'defer';
+no warnings 'experimental::defer';

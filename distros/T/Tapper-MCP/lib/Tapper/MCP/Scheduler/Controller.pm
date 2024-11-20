@@ -2,7 +2,7 @@
 package Tapper::MCP::Scheduler::Controller;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Main class of the scheduler
-$Tapper::MCP::Scheduler::Controller::VERSION = '5.0.8';
+$Tapper::MCP::Scheduler::Controller::VERSION = '5.0.9';
 use 5.010;
 use Moose;
 use base "Tapper::Base";
@@ -48,6 +48,16 @@ sub free_hosts_with_features
         return \@hosts_with_features;
 }
 
+sub available_resources
+{
+        my $resources = model('TestrunDB')->resultset("Resource")->search(
+                {active => 1, used_by_scheduling_id => undef});
+        my @_available_resources;
+        while (my $resource = $resources->next) {
+                push @_available_resources, $resource;
+        }
+        return \@_available_resources;
+}
 
 
 sub official_queuelist
@@ -105,6 +115,7 @@ sub get_next_job {
                 my $free_hosts = $self->free_hosts_with_features();
                 return if not ($free_hosts and @$free_hosts);
 
+                my $available_resources = $self->available_resources();
 
                 my $queues = $self->official_queuelist();
 
@@ -112,7 +123,7 @@ sub get_next_job {
 
                 # reset the list of associated jobs with this queue on every get_next_job
                 my $prioqueue = PrioQueue->new();
-                $job = $prioqueue->get_first_fitting($free_hosts);
+                $job = $prioqueue->get_first_fitting($free_hosts, $available_resources);
 
 
         QUEUE:
@@ -120,7 +131,7 @@ sub get_next_job {
 
                         my $queue = $self->algorithm->lookup_next_queue($queues);
                         return () unless $queue;
-                        if ($job = $queue->get_first_fitting($free_hosts)) {
+                        if ($job = $queue->get_first_fitting($free_hosts, $available_resources)) {
                                 if ($job->auto_rerun) {
                                         $job->testrun->rerun;
                                 }
@@ -224,7 +235,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

@@ -6,10 +6,8 @@ use Test::More 0.82;
 
 eval 'use Map::Tube 3.77';
 plan skip_all => 'Map::Tube (>= 3.77) required for this test' if $@;
-
 eval 'use Map::Tube::London 1.39';
 plan skip_all => 'Map::Tube::London (>= 1.39) required for this test' if $@;
-
 eval 'use Text::JaroWinkler';
 plan skip_all => 'Text::JaroWinkler required for this test' if $@;
 

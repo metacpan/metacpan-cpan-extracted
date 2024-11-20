@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v10.3.0
+#                   and LibVirt version v10.9.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -15,12 +15,12 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Domain v0.0.11;
+package Sys::Async::Virt::Domain v0.0.12;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.11;
+use Protocol::Sys::Virt::Remote::XDR v0.0.12;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -181,6 +181,7 @@ use constant {
     MIGRATE_PARAM_GRAPHICS_URI                => "graphics_uri",
     MIGRATE_PARAM_LISTEN_ADDRESS              => "listen_address",
     MIGRATE_PARAM_MIGRATE_DISKS               => "migrate_disks",
+    MIGRATE_PARAM_MIGRATE_DISKS_DETECT_ZEROES => "migrate_disks_detect_zeroes",
     MIGRATE_PARAM_DISKS_PORT                  => "disks_port",
     MIGRATE_PARAM_DISKS_URI                   => "disks_uri",
     MIGRATE_PARAM_COMPRESSION                 => "compression",
@@ -563,6 +564,7 @@ use constant {
     JOB_ERRMSG                                => "errmsg",
     JOB_DISK_TEMP_USED                        => "disk_temp_used",
     JOB_DISK_TEMP_TOTAL                       => "disk_temp_total",
+    JOB_VFIO_DATA_TRANSFERRED                 => "vfio_data_transferred",
     EVENT_WATCHDOG_NONE                       => 0,
     EVENT_IO_ERROR_NONE                       => 0,
     EVENT_GRAPHICS_CONNECT                    => 0,
@@ -650,6 +652,7 @@ use constant {
     LAUNCH_SECURITY_SEV_API_MINOR             => "sev-api-minor",
     LAUNCH_SECURITY_SEV_BUILD_ID              => "sev-build-id",
     LAUNCH_SECURITY_SEV_POLICY                => "sev-policy",
+    LAUNCH_SECURITY_SEV_SNP_POLICY            => "sev-snp-policy",
     LAUNCH_SECURITY_SEV_SECRET_HEADER         => "sev-secret-header",
     LAUNCH_SECURITY_SEV_SECRET                => "sev-secret",
     LAUNCH_SECURITY_SEV_SECRET_SET_ADDRESS    => "sev-secret-set-address",
@@ -1584,7 +1587,7 @@ Sys::Async::Virt::Domain - Client side proxy to remote LibVirt domain
 
 =head1 VERSION
 
-v0.0.11
+v0.0.12
 
 =head1 SYNOPSIS
 
@@ -3013,6 +3016,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 
 =item MIGRATE_PARAM_MIGRATE_DISKS
 
+=item MIGRATE_PARAM_MIGRATE_DISKS_DETECT_ZEROES
+
 =item MIGRATE_PARAM_DISKS_PORT
 
 =item MIGRATE_PARAM_DISKS_URI
@@ -3777,6 +3782,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 
 =item JOB_DISK_TEMP_TOTAL
 
+=item JOB_VFIO_DATA_TRANSFERRED
+
 =item EVENT_WATCHDOG_NONE
 
 =item EVENT_IO_ERROR_NONE
@@ -3950,6 +3957,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 =item LAUNCH_SECURITY_SEV_BUILD_ID
 
 =item LAUNCH_SECURITY_SEV_POLICY
+
+=item LAUNCH_SECURITY_SEV_SNP_POLICY
 
 =item LAUNCH_SECURITY_SEV_SECRET_HEADER
 

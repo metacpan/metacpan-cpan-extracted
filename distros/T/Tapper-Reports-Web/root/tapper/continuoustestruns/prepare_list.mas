@@ -36,6 +36,7 @@
              <th>Topic</th>
              <th>Queue</th>
              <th>Requested Hosts</th>
+             <th>Requested Resource</th>
              <th>Owner</th>
              <th colspan="4">Actions</th>
         </tr>
@@ -51,6 +52,13 @@
             <td><a class="ctlink" title="Show testruns with this name" href="/tapper/testruns/topic/<% $hr_testrun->{topic_name} %>"><% $hr_testrun->{topic_name} %></a></td>
             <td><% $hr_testrun->{queue_name} %></td>
             <td><a class="ctlink" title="Show hosts with this name" href="/tapper/testruns/host/<% $hr_testrun->{hosts} %>"><% join '<br />', split /,/, $hr_testrun->{hosts} | n %></a></td>
+            <td>
+%             if (defined $hr_testrun->{resource}) {
+              <a class="ctlink" title="Show tesetruns with this resource" href="/tapper/testruns/host/<% $hr_testrun->{resource} %>"><% $hr_testrun->{resource} %></a>
+%             } else {
+              -
+%             }
+            </td>
             <td><% $hr_testrun->{owner} %></td>
             <td>
 %               if ( $hr_testrun->{status} eq 'prepare' ) {

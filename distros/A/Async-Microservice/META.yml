@@ -6,11 +6,12 @@ build_requires:
   Path::Class: '0'
   Pod::Simple::Text: '0'
   Test::Most: '0'
+  Test::Time: '0'
   Test::WWW::Mechanize: '0'
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 keywords:
   - async
   - asynchronous
@@ -26,14 +27,15 @@ name: Async-Microservice
 provides:
   Async::Microservice:
     file: lib/Async/Microservice.pm
-    version: '0.02'
+    version: '0.03'
   Async::Microservice::HelloWorld:
     file: lib/Async/Microservice/HelloWorld.pm
   Async::Microservice::Time:
     file: lib/Async/Microservice/Time.pm
-    version: '0.01'
+    version: '0.03'
   Async::MicroserviceReq:
     file: lib/Async/MicroserviceReq.pm
+    version: '0.03'
 requires:
   AnyEvent: '0'
   AnyEvent::Future: '0'
@@ -41,6 +43,7 @@ requires:
   DateTime: '0'
   Future::AsyncAwait: '0'
   JSON::XS: '0'
+  Log::Any: '0'
   Moose: '0'
   MooseX::Types::Path::Class: '0'
   Path::Class: '0'
@@ -54,8 +57,8 @@ requires:
   namespace::autoclean: '0'
   perl: '5.01'
 resources:
-  bugtracker: https://github.com/meon/Async-Microservice/issues
+  bugtracker: https://github.com/jozef/Async-Microservice/issues
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/meon/Async-Microservice.git
-version: '0.02'
+  repository: https://github.com/jozef/Async-Microservice.git
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

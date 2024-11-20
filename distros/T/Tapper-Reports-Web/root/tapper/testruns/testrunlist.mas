@@ -21,7 +21,7 @@
 % if ($testrun->{created_at}) { $testrun->{created_at}->set_formatter($formatter)}
 % if ($testrun->{started_at}) { $testrun->{started_at}->set_formatter($formatter)}
 
-                <tr>
+                <tr style="vertical-align: top">
                         <td class="reportid">
                               <b>
                                 <a title="Click to show details" href="/tapper/testruns/id/<% $testrun->{testrun_id} %>">tr<% $testrun->{testrun_id} %></a>
@@ -40,6 +40,23 @@
                             <img src="/tapper/static/images/plus.png" size="16"></a>
                             <a title="Click to show testruns on '<% $testrun->{machine_name} %>'"
                             href="/tapper/testruns/host/<% $testrun->{machine_name} %>"><% $testrun->{machine_name} %></a>
+                        </td>
+                        <td>
+%                         foreach my $resource (@{$testrun->{resources}}) {
+                          <span style="display:block">
+                            <a title="Click to show testruns with '<% $resource->name %>'"
+                            href="/tapper/testruns/resource/<% $resource->name %>"><% $resource->name %></a>
+                          </span>
+%                         }
+                        </td>
+                        <td>
+%                         if (@{$testrun->{dependencies}} > 0) {
+%                           foreach my $dependency (@{$testrun->{dependencies}}) {
+                            <a href="/tapper/testruns/id/<% $dependency->id %>">tr<% $dependency->id %></a>
+%                           }
+%                         } else {
+                            &ndash;
+%                         }
                         </td>
                         <td>
                             <a title="Add <% $testrun->{status} %> to filter" href="/<% $c->req->path %>/status/<% $testrun->{status} %>">
@@ -79,6 +96,8 @@
                          <th>DateTime (GMT)</th>
                          <th>Topic</th>
                          <th>Machine</th>
+                         <th>Resource</th>
+                         <th>Dependencies</th>
                          <th>state</th>
                          <th>Ratio</th>
                          <th>Owner</th>

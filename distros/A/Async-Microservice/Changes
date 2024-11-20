@@ -1,8 +1,13 @@
+0.03    2024-11-19
+    - add logging of internal server error
+    - allow for jsonp style callback
+
 0.02    2021-07-23
     - supports different return values from request handling methods
       Future, Array-Ref and Scalar
       so request handling methods can be async (Future::AsyncAwait)
     - add support for capture args
+    - fix dist issues (thanks to Slaven Rezic)
 
 0.01  2020-10-14
     - initial version

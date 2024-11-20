@@ -1,9 +1,9 @@
 package Tapper::MCP;
-# git description: v5.0.7-3-g27a6f59
+# git description: v5.0.8-5-g13081f8
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Central master control program of Tapper automation
-$Tapper::MCP::VERSION = '5.0.8';
+$Tapper::MCP::VERSION = '5.0.9';
 use warnings;
 use strict;
 
@@ -46,7 +46,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

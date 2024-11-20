@@ -42,6 +42,7 @@ my $builder = $mb_subclass->new(
     configure_requires => {'Module::Build' => '0.36',},
     build_requires     => {
         'Test::Most'           => 0,
+        'Test::Time'           => 0,
         'Path::Class'          => 0,
         'Pod::Simple::Text'    => 0,
         'Test::WWW::Mechanize' => 0,
@@ -65,6 +66,7 @@ my $builder = $mb_subclass->new(
         'namespace::autoclean'       => 0,
         'AnyEvent::Future'           => 0,
         'Future::AsyncAwait'         => 0,
+        'Log::Any'                   => 0,
     },
     script_files   => [qw(
         bin/async-microservice-time.psgi
@@ -73,8 +75,8 @@ my $builder = $mb_subclass->new(
     create_readme  => 1,
     meta_merge     => {
         resources => {
-            repository => 'https://github.com/meon/Async-Microservice.git',
-            bugtracker => 'https://github.com/meon/Async-Microservice/issues',
+            repository => 'https://github.com/jozef/Async-Microservice.git',
+            bugtracker => 'https://github.com/jozef/Async-Microservice/issues',
         },
         keywords => [qw/ async asynchronous micro service http plack /],
     },

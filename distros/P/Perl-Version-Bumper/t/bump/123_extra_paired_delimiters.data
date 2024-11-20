@@ -1,0 +1,10 @@
+########## use feature 'extra_paired_delimiters'
+use feature 'extra_paired_delimiters';
+---
+use v5.XX;
+use feature 'extra_paired_delimiters';
+########## no feature 'extra_paired_delimiters'
+no feature 'extra_paired_delimiters';
+---
+use v5.XX;
+no feature 'extra_paired_delimiters';

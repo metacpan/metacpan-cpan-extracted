@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Plugin::FuzzyFind
 
+0.81.1 2024-11-20
+  - Relaxed overy zealous tests.
+
 0.81.0 2024-11-13
   - Adapted for use with Map::Tube 3.77 and Map::Tube::London 1.39
   - Bumped Perl version to 5.10.0

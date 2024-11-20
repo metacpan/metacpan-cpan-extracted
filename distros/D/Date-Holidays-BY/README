@@ -1,8 +1,6 @@
 Date-Holidays-BY
 
-Determine Belarus official holidays and business days
-
-Source https://ru.wikipedia.org/wiki/Праздники_Белоруссии
+Determine public holidays and business days in Belarus
 
 
 INSTALLATION
@@ -34,7 +32,7 @@ Install Carton ( https://metacpan.org/pod/Carton  ), then dependencies:
 	perl dev/dev.pl
 Do something with code and test:
 	carton exec dzil test
-	(don't forget to change: release and year in dist.ini, stict dates and copyright year in .pm, Changes)
+	(don't forget to change dist.ini: release and year, .pm: copyright year, Changes)
 	carton exec dzil build
 	(git commit/push)
 	carton exec dzil release (sets the tag verstion in git)
@@ -56,7 +54,7 @@ You can also look for information at:
 
 COPYRIGHT AND LICENCE
 
-Copyright © 2017-2023 Vladimir Varlamov <bes.internal@gmail.com>
+Copyright © 2017-2024 Vladimir Varlamov <bes.internal@gmail.com>
 This module is adapted copy of Date-Holidays-RU:
 Copyright © 2014 Alexander Nalobin <alexander@nalobin.ru>
 

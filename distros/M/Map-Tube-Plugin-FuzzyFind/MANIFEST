@@ -13,7 +13,7 @@ t/03-in.t
 t/04-re.t
 t/05-soundex.t
 t/06-phonix.t
-t/07-daitch-motokoff.t
+t/07-daitch-mokotoff.t
 t/08-koeln.t
 t/09-metaphone.t
 t/10-doublemetaphone.t

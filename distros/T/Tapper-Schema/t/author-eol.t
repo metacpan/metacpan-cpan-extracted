@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -70,6 +70,7 @@ my @files = (
     'lib/Tapper/Schema/TestrunDB/Result/ReportgroupArbitrary.pm',
     'lib/Tapper/Schema/TestrunDB/Result/ReportgroupTestrun.pm',
     'lib/Tapper/Schema/TestrunDB/Result/ReportgroupTestrunStats.pm',
+    'lib/Tapper/Schema/TestrunDB/Result/Resource.pm',
     'lib/Tapper/Schema/TestrunDB/Result/Scenario.pm',
     'lib/Tapper/Schema/TestrunDB/Result/ScenarioElement.pm',
     'lib/Tapper/Schema/TestrunDB/Result/State.pm',
@@ -77,9 +78,12 @@ my @files = (
     'lib/Tapper/Schema/TestrunDB/Result/Tap.pm',
     'lib/Tapper/Schema/TestrunDB/Result/TestplanInstance.pm',
     'lib/Tapper/Schema/TestrunDB/Result/Testrun.pm',
+    'lib/Tapper/Schema/TestrunDB/Result/TestrunDependency.pm',
     'lib/Tapper/Schema/TestrunDB/Result/TestrunPrecondition.pm',
     'lib/Tapper/Schema/TestrunDB/Result/TestrunRequestedFeature.pm',
     'lib/Tapper/Schema/TestrunDB/Result/TestrunRequestedHost.pm',
+    'lib/Tapper/Schema/TestrunDB/Result/TestrunRequestedResource.pm',
+    'lib/Tapper/Schema/TestrunDB/Result/TestrunRequestedResourceAlternative.pm',
     'lib/Tapper/Schema/TestrunDB/Result/TestrunScheduling.pm',
     'lib/Tapper/Schema/TestrunDB/Result/Topic.pm',
     'lib/Tapper/Schema/TestrunDB/Result/View010TestrunOverviewReports.pm',
@@ -90,6 +94,7 @@ my @files = (
     'lib/Tapper/Schema/TestrunDB/ResultSet/ReportgroupTestrun.pm',
     'lib/Tapper/Schema/TestrunDB/ResultSet/Testrun.pm',
     'lib/Tapper/Schema/TestrunDB/ResultSet/TestrunScheduling.pm',
+    't/00-compile.t',
     't/00-load.t',
     't/author-eol.t',
     't/author-no-tabs.t',

@@ -1,6 +1,6 @@
 package Tapper::RawSQL::TestrunDB::testruns;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::RawSQL::TestrunDB::testruns::VERSION = '5.0.11';
+$Tapper::RawSQL::TestrunDB::testruns::VERSION = '5.0.12';
 use strict;
 use warnings;
 
@@ -51,6 +51,18 @@ sub web_list {
             }
         }
     }
+
+    if ( defined $hr_vals->{resource} ) {
+        my $inner_condition;
+        if ( ref $hr_vals->{resource} eq 'ARRAY' && @{$hr_vals->{resource}} != 1 ) {
+            $inner_condition = 'trr.selected_resource_id IN ($resource$)';
+        } else {
+            $inner_condition = 'trr.selected_resource_id = $resource$';
+        }
+
+        push @a_where, "EXISTS(SELECT trr.id FROM testrun_requested_resource trr WHERE trr.testrun_id = t.id AND $inner_condition)";
+    }
+
 
     return {
         Pg => q#
@@ -270,7 +282,10 @@ sub continuous_list {
                 t.topic_name,
                 q.name                                          AS queue_name,
                 STRING_AGG( h.name, ',' )                       AS hosts,
-                NULLIF( o.name, o.login )                       AS owner
+                NULLIF( o.name, o.login )                       AS owner,
+                (SELECT res.name FROM resource res INNER JOIN testrun_requested_resource_alternative trra ON ( res.id = trra.resource_id )
+                                                   INNER JOIN testrun_requested_resource trr ON ( trra.request_id = trr.id )
+                        WHERE trr.testrun_id = t.id LIMIT 1)    AS resource
             FROM
                 testrun t
                 JOIN testrun_scheduling ts
@@ -304,7 +319,11 @@ sub continuous_list {
                 t.topic_name,
                 q.name                                          AS queue_name,
                 GROUP_CONCAT( h.name )                          AS hosts,
-                IFNULL( o.name, o.login )                       AS owner
+                IFNULL( o.name, o.login )                       AS owner,
+                (SELECT res.name FROM resource res
+                  INNER JOIN testrun_requested_resource_alternative trra ON ( res.id = trra.resource_id )
+                  INNER JOIN testrun_requested_resource trr ON ( trra.request_id = trr.id )
+                  WHERE trr.testrun_id = t.id LIMIT 1)          AS resource
             FROM
                 testrun t
                 JOIN testrun_scheduling ts
@@ -338,7 +357,10 @@ sub continuous_list {
                 t.topic_name,
                 q.name                                          AS queue_name,
                 GROUP_CONCAT( h.name ORDER BY h.name )          AS hosts,
-                IFNULL( o.name, o.login )                       AS owner
+                IFNULL( o.name, o.login )                       AS owner,
+                (SELECT res.name FROM resource res INNER JOIN testrun_requested_resource_alternative trra ON ( res.id = trra.resource_id )
+                                                   INNER JOIN testrun_requested_resource trr ON ( trra.request_id = trr.id )
+                        WHERE trr.testrun_id = t.id LIMIT 1)    AS resource
             FROM
                 testrundb.testrun t
                 JOIN testrundb.testrun_scheduling ts
@@ -395,7 +417,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

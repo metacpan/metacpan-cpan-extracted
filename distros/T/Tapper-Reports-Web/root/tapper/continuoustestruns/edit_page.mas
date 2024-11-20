@@ -33,7 +33,8 @@
         width: 827px;
     }
 
-    input.intopic {
+    input.intopic,
+    input.acresource {
         width: 820px;
     }
     input.achost,
@@ -83,9 +84,14 @@
 %                   else {
                         <img src="/tapper/static/images/plus.png" class="addhost" />
 %                   }
-                    <input type="hidden" name="host" value="<% $ar_host->[0] %>" />
-                    <input type="text" class="achost" value="<% $ar_host->[1] %>" />
+                    <input type="text" class="achost" name="host" value="<% $ar_host->[1] %>" />
 %               }
+            </td>
+        </tr>
+        <tr>
+            <td>Requested Resource:</td>
+            <td>
+                <input type="text" class="acresource" name="resource" id="resource" value="<% $c->stash->{continuous_testrun}{resource} %>" />
             </td>
         </tr>
         <tr>
@@ -116,33 +122,25 @@
 <script type="text/javascript">
 
     var available_hosts = [<% q#{# . join( q#},{#, map { '"label":"' . $_->name . '","value":"' . $_->name . '","id":' . $_->id } $c->model('TestrunDB')->resultset('Host')->search({ is_deleted => 0 }) ) . q#}# | n %>];
+    var available_resources = ["<% join( '","', map { $_->name } $c->model('TestrunDB')->resultset('Resource')->all()) | n %>"];
 
     $(document).ready(function(){
 
-        var acoptions = {
+        $('input.achost').autocomplete({
             source: available_hosts,
-            change: function (event, ui) {
-                if(! ui.item ){
-                    $(event.target).val('');
-                }
-                else {
-                    $(event.target).prevAll('input[type="hidden"]:first').val(ui.item.id);
-                }
-            },
-            focus: function (event, ui) {
-                return false;
-            }
-        };
+        });
 
-        $('input.achost').autocomplete(acoptions);
+        $('input#resource').autocomplete({
+            source: available_resources,
+        });
+
         $('#tb_testruns_idx').click(function( e ){
             var $target = $(e.target);
             if ( $target.is('img') ) {
                 if ( $target.hasClass('addhost') ) {
                     $target.parent().append(
                           '<img src="/tapper/static/images/minus.png" class="delhost" /> '
-                        + '<input type="hidden" name="host" value="" />'
-                        + '<input type="text" class="achost" value="" />'
+                        + '<input type="text" class="achost" name="host" value="" />'
                     ).find('input:last').autocomplete(acoptions);
                 }
                 else if ( $target.hasClass('addprec') ) {
@@ -163,6 +161,7 @@
                 $('#tb_testruns_idx input:text, #tb_testruns_idx textarea')
                     .removeClass('redborder')
                     .not('.prcshort')
+                    .not('#resource')
                     .filter(function(){ return (/^\s*$/).test( $(this).val() ) })
                     .addClass('redborder')
                     .first()

@@ -23,7 +23,7 @@ no_index:
 provides:
   Map::Tube::Plugin::FuzzyFind:
     file: lib/Map/Tube/Plugin/FuzzyFind.pm
-    version: v0.81.0
+    version: v0.81.1
 requires:
   Map::Tube: '3.77'
   Moo: '0'
@@ -32,5 +32,5 @@ requires:
   namespace::clean: '0'
   perl: '5.010'
 resources: {}
-version: v0.81.0
+version: v0.81.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

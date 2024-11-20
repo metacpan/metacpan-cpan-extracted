@@ -1,5 +1,8 @@
 Revision history for Tapper-Installer
 
+5.0.3     2024-11-19
+        - throw common::sense out the air lock
+
 5.0.2     2024-11-15
         - replace given/when with if/else for newer Perl versions
         - replace hardcoded log4perl cfg file with Tapper::Config entry

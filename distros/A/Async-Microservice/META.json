@@ -4,7 +4,7 @@
       "Jozef Kutej <jkutej@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "async",
       "asynchronous",
@@ -27,6 +27,7 @@
             "Path::Class" : "0",
             "Pod::Simple::Text" : "0",
             "Test::Most" : "0",
+            "Test::Time" : "0",
             "Test::WWW::Mechanize" : "0"
          }
       },
@@ -43,6 +44,7 @@
             "DateTime" : "0",
             "Future::AsyncAwait" : "0",
             "JSON::XS" : "0",
+            "Log::Any" : "0",
             "Moose" : "0",
             "MooseX::Types::Path::Class" : "0",
             "Path::Class" : "0",
@@ -61,31 +63,32 @@
    "provides" : {
       "Async::Microservice" : {
          "file" : "lib/Async/Microservice.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Async::Microservice::HelloWorld" : {
          "file" : "lib/Async/Microservice/HelloWorld.pm"
       },
       "Async::Microservice::Time" : {
          "file" : "lib/Async/Microservice/Time.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       },
       "Async::MicroserviceReq" : {
-         "file" : "lib/Async/MicroserviceReq.pm"
+         "file" : "lib/Async/MicroserviceReq.pm",
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/meon/Async-Microservice/issues"
+         "web" : "https://github.com/jozef/Async-Microservice/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/meon/Async-Microservice.git"
+         "url" : "https://github.com/jozef/Async-Microservice.git"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

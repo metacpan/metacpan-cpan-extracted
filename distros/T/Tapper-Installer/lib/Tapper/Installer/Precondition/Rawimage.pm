@@ -1,6 +1,6 @@
 package Tapper::Installer::Precondition::Rawimage;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Installer::Precondition::Rawimage::VERSION = '5.0.2';
+$Tapper::Installer::Precondition::Rawimage::VERSION = '5.0.3';
 use strict;
 use warnings;
 

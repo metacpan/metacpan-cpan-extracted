@@ -1,6 +1,6 @@
 package Tapper::Reports::Web::Controller::Tapper::Reports::Id;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Controller::Tapper::Reports::Id::VERSION = '5.0.15';
+$Tapper::Reports::Web::Controller::Tapper::Reports::Id::VERSION = '5.0.17';
 use 5.010;
 use strict;
 use warnings;
@@ -10,6 +10,7 @@ use File::Basename;
 use File::stat;
 use parent 'Tapper::Reports::Web::Controller::Base';
 use YAML;
+use JSON::API;
 
 use Data::Dumper;
 use Data::DPath 'dpath';
@@ -69,6 +70,38 @@ sub generate_metareport_link
         return %metareport;
 }
 
+
+sub get_ostore_attachments {
+
+  my ($self, $report_id) = @_;
+
+  my $endpoint = Tapper::Config->subconfig->{ostore}{endpoint};
+
+  return [] unless defined $endpoint;
+
+  $endpoint =~ s,/$,,;
+
+  my $api = JSON::API->new($endpoint);
+
+  my $result = $api->get('/search.json', {
+    "q:report" => $report_id,
+  });
+
+  return [] unless defined($result) && ref($result) eq "HASH" && defined($result->{success}) && $result->{success} && defined($result->{objects});
+
+  my @attachments;
+  foreach my $obj (@{$result->{objects}}) {
+    push @attachments, {
+      filename => $obj->{meta}->{filename},
+      view_url => $endpoint . $obj->{urls}->{view},
+      info_url => $endpoint . $obj->{urls}->{meta_html},
+      size => $obj->{size},
+    };
+  }
+
+  return \@attachments;
+}
+
 # get array of not_ok sub tests
 
 sub get_report_failures
@@ -104,6 +137,8 @@ sub index :Path :Args(1)
         my $machine_name = $c->stash->{report}->machine_name;
         $c->stash->{title} = "Report $report_id: $suite_name @ $machine_name";
 
+        $c->stash->{external_attachments} = $self->get_ostore_attachments($report_id);
+
         my $util_report = Tapper::Reports::Web::Util::Report->new();
 
         if (my $rga = $c->stash->{report}->reportgrouparbitrary) {
@@ -136,6 +171,14 @@ sub index :Path :Args(1)
         }
 
         if (my $rgt = $c->stash->{report}->reportgrouptestrun) {
+
+                my @resource_requests = $c->model('TestrunDB')->resultset('TestrunRequestedResource')->search(
+                        { testrun_id => $rgt->testrun_id, 'selected_resource_id' => { '!=', undef } },
+                        { prefetch => 'selected_resource' }
+                      )->all();
+                my @resources = map { $_->selected_resource } @resource_requests;
+                $c->stash->{resources} = \@resources;
+
                 #my $rgt_reports = $c->model('TestrunDB')->resultset('ReportgroupTestrun')->search ({ testrun_id => $rgt->testrun_id });
                 my $rgt_reports = $c->model('TestrunDB')->resultset('Report')->search
                     (
@@ -202,6 +245,16 @@ Generate config for showing metareport image associated to given report.
 @return success - hash containing (url, img, alt, headline)
 @return error   - empty list
 
+=head2 get_ostore_attachments
+
+Query OStore for attachments if configured.
+
+@param scalar - report id
+
+@return success - Arrayref of Hashrefs with filename and url key filled with the corresponding information
+@return ostore not configured - empty arrayref
+@return error - empty arrayref
+
 =head1 AUTHORS
 
 =over 4
@@ -218,7 +271,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

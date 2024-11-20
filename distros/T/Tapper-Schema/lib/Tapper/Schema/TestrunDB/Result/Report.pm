@@ -1,6 +1,6 @@
 package Tapper::Schema::TestrunDB::Result::Report;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Schema::TestrunDB::Result::Report::VERSION = '5.0.11';
+$Tapper::Schema::TestrunDB::Result::Report::VERSION = '5.0.12';
 # ABSTRACT: Tapper - containing reports
 
 use 5.010;
@@ -160,6 +160,7 @@ sub get_cached_tapdom
                                 $rawtap    = $TAPVERSION."\n".$rawtap unless $rawtap =~ /^TAP Version/msi;
                                 #say STDERR length($rawtap);
                                 my $tapdom = new TAP::DOM ( tap    => $rawtap,
+                                                            noempty_tap => 1,
                                                             ignore => [qw( raw as_string )],
                                                             ignorelines => qr/^\#\# /,        # mostly used in oprofile
                                                           );
@@ -230,7 +231,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

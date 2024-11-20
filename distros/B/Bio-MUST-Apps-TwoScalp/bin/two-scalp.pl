@@ -43,8 +43,10 @@ use aliased 'Bio::MUST::Apps::TwoScalp::Profile2Profile';
 
 const my $DEF_FAM => ':default';
 
-# set up mafft options
+# set up mafft options (and pseudo-options --fragments and --long)
 my %opt;
+$opt{ '--fragments' }  = ()            if $ARGV_fragments;
+$opt{ '--long' }       = ()            if $ARGV_long;
 $opt{ '--keeplength' } = ()            if $ARGV_keep_length;
 $opt{ '--thread'     } = $ARGV_threads if $ARGV_threads > 1;
 if ($ARGV_linsi) {
@@ -249,7 +251,7 @@ sub align_on_profile {
     %reduced_opt = %opt;
 
     if ($type eq 'prof') {
-        delete $reduced_opt{ '--keeplength' };
+        delete @reduced_opt{ qw( --fragments --long --keeplength ) };
         $new_profile = Profile2Profile->new( file1   => $toalign_file,
                                              file2   => $profile_file,
                                              options => \%reduced_opt  );
@@ -352,7 +354,7 @@ two-scalp.pl - Align or re-align sequences using various strategies
 
 =head1 VERSION
 
-version 0.231010
+version 0.243240
 
 =head1 USAGE
 
@@ -396,6 +398,20 @@ family) are also present, these are degapped and aligned on the profile
 obtained after aligning the specified families.
 
 =for Euclid: family.type: string
+
+=item --fragments
+
+Run MAFFT with the C<--addfragments> option [default: no]. This option should
+be specified when the sequences to align are (much) shorter than the sequences
+that are already aligned. See
+L<https://mafft.cbrc.jp/alignment/server/add.html> for details.
+
+=item --long
+
+Run MAFFT with the C<--addlong> option [default: no]. This option should be
+specified when the sequences to align are (much) longer than the sequences
+that are already aligned. See
+L<https://mafft.cbrc.jp/alignment/server/add.html> for details.
 
 =item --keep-length
 

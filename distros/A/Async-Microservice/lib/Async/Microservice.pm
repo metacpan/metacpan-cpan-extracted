@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Moose::Role;
 requires qw(get_routes service_name);
@@ -17,11 +17,17 @@ use MooseX::Types::Path::Class;
 use Path::Router;
 use FindBin qw($Bin);
 use Async::MicroserviceReq;
+use Log::Any qw($log);
 
 has 'api_version' => (
     is      => 'ro',
     isa     => 'Int',
     default => 1,
+);
+has 'jsonp' => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => '',
 );
 has 'static_dir' => (
     is       => 'ro',
@@ -73,6 +79,7 @@ sub plack_handler {
         path       => $plack_req->path_info,
         params     => $plack_req->parameters,
         static_dir => $self->static_dir,
+        jsonp      => $self->jsonp,
     );
 
     # set process name and last requested path for debug/troubleshooting
@@ -140,6 +147,7 @@ sub plack_handler {
                             $resp->on_fail(sub {
                                 my ($err_msg) = @_;
                                 $err_msg ||= 'unknown';
+                                $log->errorf('exception while calling "%s": %s', $plack_req->path_info, $err_msg);
                                 $this_req->respond(
                                     503, [], 'internal server error calling '.$func.': ' . $err_msg
                                 );
@@ -237,9 +245,9 @@ C<service_name>.
 
 Now you are able to lauch the http service with:
 
-    plackup -Ilib --port 8089 --server Twiggy bin/async-microservice-YOUNAME.psgi
+    plackup -Ilib --port 8089 --server Twiggy bin/async-microservice-YOURNAME.psgi
 
-In your broser you can read the OpenAPI documentation: L<http://0.0.0.0:8089/v1/>
+In your browser you can read the OpenAPI documentation: L<http://0.0.0.0:8089/v1/>
 and also use editor to extend it: L<http://0.0.0.0:8089/v1/edit>
 
 =head1 SEE ALSO

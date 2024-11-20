@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   version: '1'
   title: 'Perl Async::Microservice::Time'
-  description: 'demo time service for Async::Microservice'
+  description: 'demo time service for Async::Microservice, supports jsonp with _cb parameter'
   termsOfService: "http://toterms/"
   contact:
     name: Jozef
@@ -82,6 +82,44 @@ paths:
             'application/json':
               schema:
                   $ref: '#/components/schemas/Detailed-DateTime'
+        405:
+          $ref: '#/components/responses/Input-Processing-Error'
+        500:
+          $ref: '#/components/responses/Internal-Server-Error'
+  '/datetime/span/{s_date}':
+    get:
+      description: 'Returns time span between now and start date + years period in different units'
+      parameters:
+        - name: s_date
+          in: path
+          description: start date in format YYYYMMDD or "now"
+          required: true
+          schema:
+            type: string
+            example: 20010924
+        - name: r_age
+          in: query
+          description: date span in years
+          required: false
+          schema:
+            type: number
+            default: 65
+            minimum: 1
+            maximum: 200
+        - name: m_income
+          in: query
+          description: monthly increase to sum-up
+          required: false
+          schema:
+            type: number
+            minimum: 1
+      responses:
+        200:
+          description: 'weeks left'
+          content:
+            'application/json':
+              schema:
+                  $ref: '#/components/schemas/Detailed-Weeks-Left'
         405:
           $ref: '#/components/responses/Input-Processing-Error'
         500:
@@ -221,6 +259,17 @@ components:
           type: integer
           description: "seconds since 1970-01-01T00:00:00"
           example: 1586355387
+    'Detailed-Weeks-Left':
+      type: object
+      properties:
+        msg:
+          type: string
+          description: 'text message'
+          example: 'you have 105 weeks left'
+        weeks:
+          type: number
+          description: 'number of weeks left'
+          example: 105
     'Error-Response':
       description: 'Error object definition'
       type: object

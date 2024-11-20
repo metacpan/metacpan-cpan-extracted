@@ -1,0 +1,7 @@
+########## feature array_base
+use feature 'array_base';
+---
+use v5.XX;
+--- v5.16
+use v5.XX;
+use feature 'array_base';

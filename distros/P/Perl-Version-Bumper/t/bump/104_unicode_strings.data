@@ -1,0 +1,7 @@
+########## feature unicode_strings
+use feature 'unicode_strings';
+---
+use v5.XX;
+use feature 'unicode_strings';
+--- v5.12
+use v5.XX;

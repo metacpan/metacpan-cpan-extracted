@@ -1,10 +1,9 @@
 package Tapper::MCP::State;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::MCP::State::VERSION = '5.0.8';
+$Tapper::MCP::State::VERSION = '5.0.9';
 use 5.010;
 use strict;
 use warnings;
-no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 use Moose;
 use List::Util qw/max min reduce/;
@@ -142,21 +141,19 @@ sub compare_given_state
 
 sub get_current_timeout_span
 {
-        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
         my ($self) = @_;
         my $new_timeout_date;
         my $keep_alive_timeout_date = $self->state_details->keep_alive_timeout_date;
-        given ($self->state_details->current_state){
-                when(['invalid', 'finished', 'started']){ $new_timeout_date = time + 60;}
-                when(['reboot_install', 'installing']){$new_timeout_date = $self->state_details->installer_timeout_current_date }
-                when('reboot_test'){ $new_timeout_date = $self->state_details->prc_timeout_current_date(0)}
-                when('testing'){
+        my $state = $self->state_details->current_state;
+        if($state =~ m{^(invalid|finished|started)$}){ $new_timeout_date = time + 60;}
+                elsif($state =~ m{^(reboot_install|installing)$}){$new_timeout_date = $self->state_details->installer_timeout_current_date }
+                elsif($state eq 'reboot_test'){ $new_timeout_date = $self->state_details->prc_timeout_current_date(0)}
+                elsif($state eq 'testing'){
                         $new_timeout_date = $self->state_details->prc_timeout_current_date(0);
                         for (my $prc_num = 1; $prc_num < $self->state_details->prc_count; $prc_num++) {
                                 $new_timeout_date = mindef($new_timeout_date, $self->state_details->prc_timeout_current_date($prc_num));
                         }
                 }
-        }
 
 
         return (mindef($new_timeout_date, $keep_alive_timeout_date)  - time);
@@ -176,17 +173,15 @@ sub state_init
 
 sub update_installer_timeout
 {
-        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
         my ($self) = @_;
         my $now = time();
         my $installer_timeout_date = $self->state_details->installer_timeout_current_date;
         if ( $installer_timeout_date <= $now) {
                 my $msg = 'timeout hit ';
-                given ($self->state_details->current_state){
-                        when ('started')        { $msg .= 'during preparation. Timeout was probably too low.'};
-                        when ('reboot_install') { $msg .= 'while waiting for installer booting'};
-                        when ('installing')     { $msg .= 'while waiting for installation'};
-                }
+                my $state = $self->state_details->current_state;
+                        if    ($state eq 'started')        { $msg .= 'during preparation. Timeout was probably too low.'}
+                        elsif ($state eq 'reboot_install') { $msg .= 'while waiting for installer booting'}
+                        elsif ($state eq 'installing')     { $msg .= 'while waiting for installation'}
                 $self->state_details->results({error => 1, msg => $msg});
                 $self->state_details->current_state('finished');
                 return (1, undef);
@@ -197,28 +192,26 @@ sub update_installer_timeout
 
 sub update_prc_timeout
 {
-        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
         my ($self, $prc_number) = @_;
         my $now = time();
         if ($self->state_details->prc_timeout_current_date($prc_number) < $now) {
                 my $result = { error => 1,
                                msg   => "Timeout in PRC $prc_number "};
-                given($self->state_details->prc_state($prc_number)){
-                        when ('boot'){
+                my $state = $self->state_details->prc_state($prc_number);
+                        if ($state eq 'boot'){
                                 $result->{msg} .= 'during boot';
                                 $self->state_details->prc_state($prc_number, 'finished');
                                 return;
                         }
-                        when ('test'){
+                        elsif ($state eq 'test'){
                                 $result->{msg} .= 'while waiting for testprogram ';
                                 $result->{msg} .= $self->state_details->prc_current_test_number($prc_number);
                         }
-                        when ('lasttest'){
+                        elsif ($state eq 'lasttest'){
                                 $result->{msg} .= 'while waiting for message "all tests finished"';
                                 $self->state_details->prc_state($prc_number, 'finished')
                         }
-                        default { return }
-                }
+                        else { return }
                 $self->state_details->results($result);
                 $self->state_details->prc_results($prc_number, $result);
                 return $self->state_details->prc_next_timeout($prc_number);
@@ -229,11 +222,10 @@ sub update_prc_timeout
 
 sub update_test_timeout
 {
-        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
         my ($self) = @_;
         my $now = time();
 
-        if ($self->state_details->current_state ~~ 'reboot_test') {
+        if ($self->state_details->current_state eq 'reboot_test') {
                 my $prc0_timeout_date = $self->state_details->prc_timeout_current_date(0);
                 if ( $prc0_timeout_date <= $now) {
                         my $msg = 'Timeout while booting testmachine';
@@ -250,9 +242,9 @@ sub update_test_timeout
         # we need the PRC number, thus not foreach
  PRC:
         for (my $prc_num = 0; $prc_num < $self->state_details->prc_count; $prc_num++) {
-                given($self->state_details->prc_state($prc_num)){
-                        when ( ['finished', 'preload'] ) { break}
-                        when ('boot') {
+                my $state = $self->state_details->prc_state($prc_num);
+                        if ($state =~ m{^(finished|preload)$}) { next PRC; }
+                        elsif ($state eq 'boot') {
                                 if ($self->state_details->prc_timeout_current_date($prc_num) <= $now){
                                         my $msg = "Timeout while booting PRC$prc_num";
                                         $self->state_details->results({error => 1, msg => $msg});
@@ -264,11 +256,9 @@ sub update_test_timeout
                                                                $self->state_details->prc_timeout_current_date($prc_num) - time());
                                 }
                         }
-                        when ( ['test', 'lasttest'] ) {
+                        elsif ($state =~ m{^(test|lasttest)$}) {
                                 $new_timeout_span = mindef($new_timeout_span, $self->update_prc_timeout($prc_num));
                         }
-
-                }
         }
 
         if ($self->state_details->is_all_prcs_finished()) {
@@ -303,25 +293,23 @@ sub update_keep_alive_timeout
 
 
 sub update_timeouts {
-        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
         my ($self) = @_;
         my ( $error, $timeout_span );
 
-        given($self->state_details->current_state){
-                when ( ['started', 'reboot_install', 'installing'] ) {
+        my $state = $self->state_details->current_state;
+                if ($state =~ m{^(started|reboot_install|installing)$}) {
                         ( $error, $timeout_span) =  $self->update_installer_timeout() }
-                when ( ['reboot_test','testing'] ) {
+                elsif ($state =~ m{^(reboot_test|testing)$}) {
                         ( $error, $timeout_span) =  $self->update_test_timeout() }
-                when ('finished')               {
+                elsif ($state eq 'finished')               {
                         return( 1, undef) } # no timeout handling when finished
-                default {
+                else {
                         my $msg = 'Invalid state ';
                         $msg   .= $self->state_details->current_state;
                         $msg   .= ' during update_timeouts';
                         $self->state_details->results({error => 1, msg => $msg});
                         return( 1, undef);
                 }
-        }
 
         my ( $alive_error, $alive_timeout_span ) = $self->update_keep_alive_timeout();
         return ($1, undef) if $error or $alive_error;
@@ -567,7 +555,6 @@ sub msg_keep_alive
 
 sub next_state
 {
-        no if $] >= 5.017011, warnings => 'experimental::smartmatch';
         my ($self, $msg) = @_;
         my ($error, $timeout_span);
 
@@ -579,23 +566,22 @@ sub next_state
         # FIXME! return values of all msg_* functions is ignored. This is ok, but why do they generate a return value then?
         #
         #######################################################################################################################
-        given ($msg->{state}) {
-                when ('quit')              { ($error, $timeout_span) = $self->msg_quit($msg)           };
-                when ('takeoff')           { ($error, $timeout_span) = $self->msg_takeoff($msg)           };
-                when ('start-install')     { ($error, $timeout_span) = $self->msg_start_install($msg)     };
-                when ('end-install')       { ($error, $timeout_span) = $self->msg_end_install($msg)       };
-                when ('error-install')     { ($error, $timeout_span) = $self->msg_error_install($msg)     };
-                when ('warn-install')      { ($error, $timeout_span) = $self->msg_warn_install($msg)     };
-                when ('start-guest')       { ($error, $timeout_span) = $self->msg_start_guest($msg)       };
-                when ('error-guest')       { ($error, $timeout_span) = $self->msg_error_guest($msg)       };
-                when ('start-testing')     { ($error, $timeout_span) = $self->msg_start_testing($msg)     };
-                when ('end-testing')       { ($error, $timeout_span) = $self->msg_end_testing($msg)       };
-                when ('error-testprogram') { ($error, $timeout_span) = $self->msg_error_testprogram($msg) };
-                when ('end-testprogram')   { ($error, $timeout_span) = $self->msg_end_testprogram($msg)   };
-                when ('reboot')            { ($error, $timeout_span) = $self->msg_reboot($msg)            };
-                when ('keep-alive')        { ($error, $timeout_span) = $self->msg_keep_alive($msg)        };
+        my $state = $msg->{state};
+                if    ($state eq 'quit')              { ($error, $timeout_span) = $self->msg_quit($msg)           }
+                elsif ($state eq 'takeoff')           { ($error, $timeout_span) = $self->msg_takeoff($msg)           }
+                elsif ($state eq 'start-install')     { ($error, $timeout_span) = $self->msg_start_install($msg)     }
+                elsif ($state eq 'end-install')       { ($error, $timeout_span) = $self->msg_end_install($msg)       }
+                elsif ($state eq 'error-install')     { ($error, $timeout_span) = $self->msg_error_install($msg)     }
+                elsif ($state eq 'warn-install')      { ($error, $timeout_span) = $self->msg_warn_install($msg)     }
+                elsif ($state eq 'start-guest')       { ($error, $timeout_span) = $self->msg_start_guest($msg)       }
+                elsif ($state eq 'error-guest')       { ($error, $timeout_span) = $self->msg_error_guest($msg)       }
+                elsif ($state eq 'start-testing')     { ($error, $timeout_span) = $self->msg_start_testing($msg)     }
+                elsif ($state eq 'end-testing')       { ($error, $timeout_span) = $self->msg_end_testing($msg)       }
+                elsif ($state eq 'error-testprogram') { ($error, $timeout_span) = $self->msg_error_testprogram($msg) }
+                elsif ($state eq 'end-testprogram')   { ($error, $timeout_span) = $self->msg_end_testprogram($msg)   }
+                elsif ($state eq 'reboot')            { ($error, $timeout_span) = $self->msg_reboot($msg)            }
+                elsif ($state eq 'keep-alive')        { ($error, $timeout_span) = $self->msg_keep_alive($msg)        }
                                 # (TODO) add default
-        }
 
         # every message resets the keep-alive timeout
         if (defined($self->state_details->keep_alive_timeout_span)) {
@@ -910,7 +896,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

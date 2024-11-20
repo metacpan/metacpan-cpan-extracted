@@ -2,7 +2,7 @@
 package Tapper::MCP::Scheduler::Algorithm::WFQ;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Scheduling algorithm "Weighted Fair Queueing"
-$Tapper::MCP::Scheduler::Algorithm::WFQ::VERSION = '5.0.8';
+$Tapper::MCP::Scheduler::Algorithm::WFQ::VERSION = '5.0.9';
 use Moose::Role;
         use 5.010;
 
@@ -110,7 +110,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

@@ -1,9 +1,9 @@
 package Tapper::Installer;
-# git description: v5.0.1-3-gd548dc1
+# git description: v5.0.2-1-gb2e7a2e
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Install everything needed for a test
-$Tapper::Installer::VERSION = '5.0.2';
+$Tapper::Installer::VERSION = '5.0.3';
 use strict;
 use warnings;
 

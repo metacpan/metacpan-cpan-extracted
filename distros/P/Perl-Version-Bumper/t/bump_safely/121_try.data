@@ -1,0 +1,14 @@
+########## use feature 'try' DIE<v5.34
+use feature 'try';
+no warnings 'experimental::try';
+---
+use v5.XX;
+use feature 'try';
+no warnings 'experimental::try';
+--- v5.40
+use v5.XX;
+########## no feature 'try' DIE<v5.34
+no feature 'try';
+---
+use v5.XX;
+no feature 'try';

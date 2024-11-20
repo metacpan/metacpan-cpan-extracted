@@ -1,0 +1,13 @@
+########## 5.8.5
+use v5.8.5;
+use strict;
+use warnings;
+---
+use v5.XX;
+use strict;
+use warnings;
+--- v5.12
+use v5.XX;
+use warnings;
+--- v5.36
+use v5.XX;

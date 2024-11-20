@@ -1,10 +1,10 @@
 {
-   "abstract" : "Determine Belorussian official holidays and business days.",
+   "abstract" : "Determine public holidays and business days in Belarus.",
    "author" : [
       "Vladimir Varlamov <bes.internal@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -59,9 +59,9 @@
          "web" : "https://github.com/bes-internal/Date-Holidays-BY"
       }
    },
-   "version" : "1.2024.0",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "version" : "2.2025.1",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

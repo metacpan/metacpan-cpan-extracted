@@ -6,10 +6,15 @@ use Test::More 0.82;
 
 eval 'use Map::Tube::London 1.39';
 plan skip_all => 'Map::Tube::London (>= 1.39) required for this test' if $@;
+eval 'use Text::Phonetic::DaitchMokotoff';
+plan skip_all => 'Text::Phonetic::DaitchMokotoff required for this test'      if $@;
 
 plan tests => 15;
 
 sub a2n { return [ map { $_->name( ) } @{ $_[0] } ]; }
+
+diag( "*** Expect many messages saying 'Negative repeat count does nothing at ...' -- ignore these, please! *** \n",
+      "*** (They are coming from Text::Phonetic::DaitchMokotoff. They are ugly but functionally harmless.)  ***" );
 
 my $tube = new_ok( 'Map::Tube::London' );
 my $ret;

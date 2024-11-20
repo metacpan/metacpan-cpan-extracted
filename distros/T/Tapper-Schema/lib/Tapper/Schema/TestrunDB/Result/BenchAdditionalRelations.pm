@@ -1,6 +1,6 @@
 package Tapper::Schema::TestrunDB::Result::BenchAdditionalRelations;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Schema::TestrunDB::Result::BenchAdditionalRelations::VERSION = '5.0.11';
+$Tapper::Schema::TestrunDB::Result::BenchAdditionalRelations::VERSION = '5.0.12';
 # ABSTRACT: Tapper - add additional values to benchmarks
 
 use strict;
@@ -87,7 +87,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

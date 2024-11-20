@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::TwoScalp::Seq2Seq;
 # ABSTRACT: internal class for two-scalp tool
-$Bio::MUST::Apps::TwoScalp::Seq2Seq::VERSION = '0.231010';
+$Bio::MUST::Apps::TwoScalp::Seq2Seq::VERSION = '0.243240';
 use Moose;
 use namespace::autoclean;
 
@@ -126,7 +126,8 @@ sub _align_seqs {
             # fetch template full_id
             my $template_id = SeqId->new(
                 full_id => $blastdb->long_id_for( $template->def )
-            );
+                        // $blastdb->long_id_for( $template->id  )
+            );          # workaround to accommodate change in BLAST XML report
 
             ###### [S2S] template: $template_id->full_id
             ###### [S2S] coverage: $coverage
@@ -268,7 +269,7 @@ Bio::MUST::Apps::TwoScalp::Seq2Seq - internal class for two-scalp tool
 
 =head1 VERSION
 
-version 0.231010
+version 0.243240
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@
 package Tapper::MCP::Scheduler::PrioQueue;
 our $AUTHORITY = 'cpan:TAPPER';
  # ABSTRACT: Object for test queue abstraction
-$Tapper::MCP::Scheduler::PrioQueue::VERSION = '5.0.8';
+$Tapper::MCP::Scheduler::PrioQueue::VERSION = '5.0.9';
 use 5.010;
 use Moose;
 
@@ -56,20 +56,29 @@ sub add {
 }
 
 sub get_first_fitting {
-        my ($self, $free_hosts) = @_;
+        my ($self, $free_hosts, $available_resources) = @_;
 
         foreach my $job (@{$self->testrunschedulings}) {
-                if (my $host = $job->fits($free_hosts)) {
-                        my $db_job = model('TestrunDB')->resultset('TestrunScheduling')->find($job->{id});
-                        $db_job->host_id ($host->id);
-                        $db_job->update;
-                        if ($db_job->testrun->scenario_element) {
-                                $db_job->testrun->scenario_element->is_fitted(1);
-                                $db_job->testrun->scenario_element->update();
-                        }
+                my $host = $job->fits($free_hosts);
+                next unless $host;
 
-                        return $db_job;
+                # Check for unfinished dependencies
+                next unless $job->dependencies_finished;
+
+                # Reserves resources, must run if $resources_available is 1
+                my ($resources_available,$acquireable_resources) =
+                  $job->claim_resources($available_resources);
+                next unless $resources_available;
+
+                my $db_job = model('TestrunDB')->resultset('TestrunScheduling')->find($job->{id});
+                $db_job->host_id ($host->id);
+                $db_job->update;
+                if ($db_job->testrun->scenario_element) {
+                        $db_job->testrun->scenario_element->is_fitted(1);
+                        $db_job->testrun->scenario_element->update();
                 }
+
+                return $db_job;
         }
         return;
 }
@@ -124,7 +133,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 
