@@ -1,0 +1,11 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::Callback::TlsextTicketKey : interface_t {
+  use Net::SSLeay;
+  use Net::SSLeay::EVP_CIPHER_CTX;
+  use Net::SSLeay::HMAC_CTX;
+  
+  required method : int ($ssl : Net::SSLeay, $key_name : mutable string, $iv : mutable string, $ctx : Net::SSLeay::EVP_CIPHER_CTX, $hctx : Net::SSLeay::HMAC_CTX, $enc : int);
+  
+}

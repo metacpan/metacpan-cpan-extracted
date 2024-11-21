@@ -2,7 +2,7 @@
 
 Customizing you usage of Minima is quite straightforward once you
 understand how it works and a few PSGI concepts. If you haven't yet,
-check L<"How it works in Minima"|Minima/"HOW IT WORKS">.
+check L<"How it works" in Minima|Minima/"HOW IT WORKS">.
 
 =head1 Setup
 
@@ -59,8 +59,8 @@ response and you're good to go.
 =head1 Templating System
 
 If you want to customize how L<Template Toolkit|Template> is used in
-L<Minima::View::HTML>, check L<"Configuration in
-Minima::View::HTML"|Minima::View::HTML/CONFIGURATION>.
+L<Minima::View::HTML>, check L<"Configuration" in
+Minima::View::HTML|Minima::View::HTML/CONFIGURATION>.
 
 If you don't want to use Template Toolkit at all, just skip
 L<Minima::View::HTML>. Your controller logic is solely responsible

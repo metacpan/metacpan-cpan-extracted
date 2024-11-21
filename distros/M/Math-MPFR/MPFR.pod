@@ -1333,7 +1333,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     that the function is even.  For 'Rmpfr_sinu', when $op multiplied by
     2 and divided by $ui is an integer, the result is zero with the same
     sign as $op, following IEEE 754-2019 (sinPi), so that the function
-    is odd.  Similarly, the function 'Rmpfr_tanu' follows IEEE 754-2019Rmp
+    is odd.  Similarly, the function 'Rmpfr_tanu' follows IEEE 754-2019
     (tanPi).
 
    $inex = Rmpfr_acosu($rop, $op, $ui, $rnd); # mpfr-4.2.0 and later only

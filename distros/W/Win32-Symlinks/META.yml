@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '7.12'
   XSLoader: '0'
 dynamic_config: 1
-generated_by: ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010
+generated_by: ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,5 +30,5 @@ requires:
   File::Spec: '0'
   Parse::Lnk: '0.04'
   perl: '5.016'
-version: '0.10'
-x_serialization_backend: YAML::XS version 0.82
+version: '0.12'
+x_serialization_backend: YAML::XS version 0.89

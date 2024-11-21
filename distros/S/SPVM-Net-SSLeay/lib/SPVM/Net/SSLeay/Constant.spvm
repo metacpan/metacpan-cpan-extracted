@@ -1215,4 +1215,46 @@ class Net::SSLeay::Constant {
 
   native static method XN_FLAG_SPC_EQ : int ();
 
+  native static method OPENSSL_INIT_NO_LOAD_SSL_STRINGS : int ();
+
+  native static method OPENSSL_INIT_LOAD_SSL_STRINGS : int ();
+
+  native static method OPENSSL_INIT_NO_LOAD_CRYPTO_STRINGS : int ();
+
+  native static method OPENSSL_INIT_LOAD_CRYPTO_STRINGS : int ();
+
+  native static method OPENSSL_INIT_ADD_ALL_CIPHERS : int ();
+
+  native static method OPENSSL_INIT_ADD_ALL_DIGESTS : int ();
+
+  native static method OPENSSL_INIT_NO_ADD_ALL_CIPHERS : int ();
+
+  native static method OPENSSL_INIT_NO_ADD_ALL_DIGESTS : int ();
+
+  native static method OPENSSL_INIT_LOAD_CONFIG : int ();
+
+  native static method OPENSSL_INIT_NO_LOAD_CONFIG : int ();
+
+  native static method OPENSSL_INIT_ASYNC : int ();
+
+  native static method OPENSSL_INIT_ENGINE_RDRAND : int ();
+
+  native static method OPENSSL_INIT_ENGINE_DYNAMIC : int ();
+
+  native static method OPENSSL_INIT_ENGINE_OPENSSL : int ();
+
+  native static method OPENSSL_INIT_ENGINE_CRYPTODEV : int ();
+
+  native static method OPENSSL_INIT_ENGINE_CAPI : int ();
+
+  native static method OPENSSL_INIT_ENGINE_PADLOCK : int ();
+
+  native static method OPENSSL_INIT_ENGINE_AFALG : int ();
+
+  native static method OPENSSL_INIT_ENGINE_ALL_BUILTIN : int ();
+
+  native static method OPENSSL_INIT_ATFORK : int ();
+
+  native static method OPENSSL_INIT_NO_ATEXIT : int ();
+
 }

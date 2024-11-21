@@ -1,7 +1,7 @@
 use v5.40;
 use experimental 'class';
 
-class Minima::View::HTML;
+class Minima::View::HTML :isa(Minima::View);
 
 use Carp;
 use Path::Tiny;
@@ -83,6 +83,11 @@ method add_pre_body       ($p) { push @{$content{pre_body}}, $p }
 method add_script         ($s) { push @{$content{scripts}}, $s }
 method add_class          ($c) { push @{$content{classes}}, $c }
 
+method prepare_response ($response)
+{
+    $response->content_type('text/html; charset=utf-8');
+}
+
 method render ($data = {})
 {
     croak "No template set." unless $template;
@@ -153,7 +158,7 @@ Minima::View::HTML - Render HTML views
 
     use Minima::View::HTML;
 
-    my $view = Minima::HTML::View->new(app => $app);
+    my $view = Minima::View::HTML->new(app => $app);
 
     $view->set_directory('templates'); # where templates resite
     $view->set_template('home');
@@ -298,6 +303,63 @@ automatically to template file names if none is provided.
 
 Constructs a new object. Requires a L<Minima::App> reference.
 
+=head2 add_class
+
+    method add_class ($class)
+
+Adds the passed class name to the list of C<E<lt>mainE<gt>> classes.
+
+=head2 add_header_css
+
+    method add_header_css ($css)
+
+Adds the passed CSS file name to the header CSS list.
+
+=head2 add_header_script
+
+    method add_header_script ($script)
+
+Adds the passed script to the header script list.
+
+=head2 add_include_path
+
+    method add_include_path ($directory)
+
+Adds the passed directory as a include path in conjunction with the main
+directory (set by L<C<set_directory>|/set_directory>). This method can
+be called multiple times to add multiple paths.
+
+=head2 add_post
+
+    method add_post ($post)
+
+Adds the passed template name to the post-template list.
+
+=head2 add_pre
+
+    method add_pre ($pre)
+
+Adds the passed template name to the pre-template list.
+
+=head2 add_pre_body
+
+    method add_pre_body ($pre)
+
+Adds the passed template name to the pre-body template list.
+
+=head2 add_script
+
+    method add_script ($script)
+
+Adds the passed script name to the list of scripts embedded in the body.
+
+=head2 prepare_response
+
+    method prepare_response ($response)
+
+Sets the appropriate I<Content-Type> header on the provided
+L<Plack::Response> object.
+
 =head2 render
 
     method render ($data = {})
@@ -309,11 +371,12 @@ To configure L<Template Toolkit|Template>, visit the
 L<"Configuration"/CONFIGURATION> section. See also
 L<C<set_default_data>|/set_default_data>.
 
-=head2 set_title
+=head2 set_block_indexing
 
-    method set_title ($title, $description = undef)
+    method set_block_indexing ($bool = 1)
 
-Sets the title and description (optional).
+Sets a boolean scalar to indicate if robots should be blocked from
+indexing the page. Defaults to true.
 
 =head2 set_compound_title
 
@@ -329,22 +392,6 @@ description.
 If no primaty title is already set, calling this method produces the
 same effect as L<C<set_title>|/set_title>.
 
-=head2 set_directory
-
-    method set_directory ($directory)
-
-Sets the main directory where templates reside. If this method is not
-called, the default F<templates> directory will be used.
-
-=head2 set_template
-
-    method set_template ($title)
-
-Sets the template name to be used. If no extension is present, the
-extension set by the L<C<template_ext>|/template_ext> configuration key
-(F<ht> by default) will be added. The template file name must not
-contain a dot (C<.>), except for the one used in the extension.
-
 =head2 set_default_data
 
     method set_default_data ($data)
@@ -352,20 +399,12 @@ contain a dot (C<.>), except for the one used in the extension.
 Sets a default data hash that will be used in rendering pages. The hash
 provided in L<C<render>|/render> is merged with this default data hash.
 
-=head2 add_include_path
+=head2 set_directory
 
-    method add_include_path ($directory)
+    method set_directory ($directory)
 
-Adds the passed directory as a include path in conjunction with the main
-directory (set by L<C<set_directory>|/set_directory>). This method can
-be called multiple times to add multiple paths.
-
-=head2 set_block_indexing
-
-    method set_block_indexing ($bool = 1)
-
-Sets a boolean scalar to indicate if robots should be blocked from
-indexing the page. Defaults to true.
+Sets the main directory where templates reside. If this method is not
+called, the default F<templates> directory will be used.
 
 =head2 set_name_as_class
 
@@ -376,51 +415,24 @@ added to the C<E<lt>mainE<gt>> CSS class list. This is particularly
 useful to target a page on a CSS file by simply using C<.main.template>.
 Defaults to true.
 
-=head2 add_header_script
+=head2 set_template
 
-    method add_header_script ($script)
+    method set_template ($title)
 
-Adds the passed script to the header script list.
+Sets the template name to be used. If no extension is present, the
+extension set by the L<C<template_ext>|/template_ext> configuration key
+(F<ht> by default) will be added. The template file name must not
+contain a dot (C<.>), except for the one used in the extension.
 
-=head2 add_header_css
+=head2 set_title
 
-    method add_header_css ($css)
+    method set_title ($title, $description = undef)
 
-Adds the passed CSS file name to the header CSS list.
-
-=head2 add_pre
-
-    method add_pre ($pre)
-
-Adds the passed template name to the pre-template list.
-
-=head2 add_post
-
-    method add_post ($post)
-
-Adds the passed template name to the post-template list.
-
-=head2 add_pre_body
-
-    method add_pre_body ($pre)
-
-Adds the passed template name to the pre-body template list.
-
-=head2 add_script
-
-    method add_script ($script)
-
-Adds the passed script name to the list of scripts embedded in the body.
-
-=head2 add_class
-
-    method add_class ($class)
-
-Adds the passed class name to the list of C<E<lt>mainE<gt>> classes.
+Sets the title and description (optional).
 
 =head1 SEE ALSO
 
-L<Minima>, L<Minima::Controller>, L<perlclass>.
+L<Minima>, L<Minima::Controller>, L<Minima::View>, L<perlclass>.
 
 =head1 AUTHOR
 

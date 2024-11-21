@@ -8,7 +8,7 @@
 
 static const char* FILE_NAME = "Net/SSLeay/OPENSSL.c";
 
-int32_t SPVM__Net__SSLeay__OPENSSL_add_ssl_algorithms(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Net__SSLeay__OPENSSL__add_ssl_algorithms(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
@@ -19,11 +19,39 @@ int32_t SPVM__Net__SSLeay__OPENSSL_add_ssl_algorithms(SPVM_ENV* env, SPVM_VALUE*
   return 0;
 }
 
-int32_t SPVM__Net__SSLeay__OPENSSL_add_all_algorithms(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Net__SSLeay__OPENSSL__add_all_algorithms(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
   OpenSSL_add_all_algorithms();
+  
+  return 0;
+}
+
+int32_t SPVM__Net__SSLeay__OPENSSL__init_ssl(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  int64_t opts = stack[0].lval;
+  
+  void* obj_settings = stack[1].oval;
+  
+  OPENSSL_INIT_SETTINGS* settings = NULL;
+  if (obj_settings) {
+    settings = env->get_pointer(env, stack, obj_settings);
+  }
+  
+  int32_t status = OPENSSL_init_ssl(opts, settings);
+  
+  if (!(status == 1)) {
+    env->die(env, stack, "[OpenSSL Error]OPENSSL_init_ssl failed.", __func__, FILE_NAME, __LINE__);
+    
+    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    
+    return error_id;
+  }
+  
+  stack[0].ival = status;
   
   return 0;
 }

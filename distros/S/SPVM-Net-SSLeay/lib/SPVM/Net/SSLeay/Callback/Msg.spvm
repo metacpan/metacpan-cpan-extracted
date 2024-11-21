@@ -1,0 +1,9 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::Callback::Msg : interface_t {
+  use Net::SSLeay;
+  
+  # Interface Methods
+  required method : void ($write_p : int, $version : int, $content_type : int, $buf : string, $len : int, $ssl : Net::SSLeay, $arg : object);
+}

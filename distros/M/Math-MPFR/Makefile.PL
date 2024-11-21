@@ -25,9 +25,10 @@ my ($d64_message, $d128_message, $float128_message);
 # The following tests don't work with perls built using MS Visual Studio.
 # We skip them all, as they are not particularly important ... some are
 # even irrelevant.
-# The assumptions (possibly bad) are that, if you're running MS Visual Studio,
-# then you have gmp and mpfr libraries that are compatible with that
-# toolchain, && that those libraries will be found when needed.
+# In skipping these tests we assumpe (perhaps incorrectly) that, if you're
+# running MS Visual Studio, then you have gmp and mpfr libraries that are
+# compatible with that toolchain, && that those libraries will be found
+# when needed.
 $skip_msvc = 1 if ($Config{'make'} eq 'nmake' && $Config{'cc'} eq 'cl');
 
 unless($skip_msvc) {

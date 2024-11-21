@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use utf8;
 use DateTime;
@@ -170,7 +170,9 @@ sub parse_mot_options {
 				my @mots = @{ $desc->{productbits} };
 				for my $mot ( @{ $desc->{productbits} } ) {
 					if ( ref($mot) eq 'ARRAY' ) {
-						printf( "%-10s %s\n", @{$mot} );
+						if ( $mot->[0] ne '_' ) {
+							printf( "%-10s %s\n", @{$mot} );
+						}
 					}
 					else {
 						say $mot;
@@ -273,7 +275,12 @@ sub format_delay {
 
 sub show_message {
 	my ($msg) = @_;
-	if ( $verbosity >= ( $min_verbosity{ $msg->type } // 0 ) ) {
+	if (
+		$msg->text
+		and ( not $msg->type
+			or $verbosity >= ( $min_verbosity{ $msg->type } // 0 ) )
+	  )
+	{
 		if ( $msg->short ) {
 			printf( "| %s\n", $msg->short );
 		}
@@ -284,11 +291,21 @@ sub show_message {
 }
 
 if ( my $err = $hafas->errstr ) {
-	say STDERR "Request error: ${err}";
-	if ( $hafas->errcode
-		and ( $hafas->errcode eq 'H730' or $hafas->errcode eq 'LOCATION' ) )
-	{
-		show_similar_stops();
+	say STDERR "Backend error: ${err}";
+	if ( $hafas->errcode ) {
+		if ( $hafas->errcode eq 'H730' or $hafas->errcode eq 'LOCATION' ) {
+			show_similar_stops();
+		}
+		elsif ( $hafas->errcode eq 'H890' ) {
+			say q{};
+			say 'HAFAS was unable to find suitable connections.';
+			say
+'Maybe your mode of transport (-m) or change (-c / -C) filters are too restrictive?';
+		}
+		elsif ( $hafas->errcode eq 'H9380' ) {
+			say q{};
+			say 'Arrival / departure / intermediate stops must not overlap.';
+		}
 	}
 	exit 2;
 }
@@ -451,9 +468,13 @@ for my $res ( $hafas->connections ) {
 			printf("\n???\n");
 		}
 		for my $msg ( $sec->messages ) {
-			if ( $msg->code eq 'text.connection.section.arrival.date.deviation'
-				or $msg->code eq
-				'text.connection.section.departure.date.deviation' )
+			if (
+				$msg->code
+				and ( $msg->code eq
+					'text.connection.section.arrival.date.deviation'
+					or $msg->code eq
+					'text.connection.section.departure.date.deviation' )
+			  )
 			{
 				next;
 			}
@@ -477,7 +498,7 @@ B<hafas> [B<-d> I<date>] [B<-t> I<time>] [B<-m> I<motlist>]
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 DESCRIPTION
 

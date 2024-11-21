@@ -1,0 +1,10 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::Callback::NewSession : interface_t {
+  use Net::SSLeay;
+  use Net::SSLeay::SSL_SESSION;
+  
+  required method : int ($ssl : Net::SSLeay, $session : Net::SSLeay::SSL_SESSION);
+  
+}

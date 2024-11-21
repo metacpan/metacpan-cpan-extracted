@@ -18,23 +18,6 @@ int32_t SPVM__Net__SSLeay___print_version_text(SPVM_ENV* env, SPVM_VALUE* stack)
   return 0;
 }
 
-int32_t SPVM__Net__SSLeay__init(SPVM_ENV* env, SPVM_VALUE* stack) {
-
-#if !(defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x10100000)
-  // SSL_library_init is deprecated in OpenSSL 1.1+.
-  SSL_library_init();
-  
-  // SSL_load_error_strings is deprecated OpenSSL in 1.1+.
-  SSL_load_error_strings();
-  
-  // OpenSSL_add_all_algorithms is deprecated in OpenSSL 1.1+.
-  OpenSSL_add_all_algorithms();
-  
-#endif
-  
-  return 0;
-}
-
 // Class Methods
 int32_t SPVM__Net__SSLeay__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
@@ -66,17 +49,6 @@ int32_t SPVM__Net__SSLeay__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   if (error_id) { return error_id; }
   
   stack[0].oval = obj_self;
-  
-  return 0;
-}
-
-int32_t SPVM__Net__SSLeay__library_init(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  int32_t status = SSL_library_init();
-  
-  stack[0].ival = status;
   
   return 0;
 }
@@ -963,6 +935,98 @@ int32_t SPVM__Net__SSLeay__get_peer_cert_chain(SPVM_ENV* env, SPVM_VALUE* stack)
   }
   
   stack[0].oval = obj_x509s;
+  
+  return 0;
+}
+
+static void print_exception_to_stderr(SPVM_ENV* env, SPVM_VALUE* stack) {
+  void* obj_exception = env->get_exception(env, stack);
+  const char* exception = env->get_chars(env, stack, obj_exception);
+  
+  fprintf(env->api->runtime->get_spvm_stderr(env->runtime), "[An exception is converted to a warning]\n");
+  
+  env->print_stderr(env, stack, obj_exception);
+  
+  fprintf(env->api->runtime->get_spvm_stderr(env->runtime), "\n");
+}
+
+static void SPVM__Net__SSLeay__my_msg_cb(int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_ENV* env = (SPVM_ENV*)((void**)arg)[0];
+  
+  SPVM_VALUE* stack = (SPVM_VALUE*)((void**)arg)[1];
+  
+  void* obj_cb = ((void**)arg)[2];
+  
+  void* obj_arg = ((void**)arg)[3];
+  
+  void* obj_buf = env->new_string(env, stack, buf, len);
+  
+  void* obj_address_ssl = env->new_pointer_object_by_name(env, stack, "Address", ssl, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    print_exception_to_stderr(env, stack);
+    
+    goto END_OF_FUNC;
+  }
+  stack[0].oval = obj_address_ssl;
+  env->call_class_method_by_name(env, stack, "Net::SSLeay", "new_with_pointer", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    print_exception_to_stderr(env, stack);
+    
+    goto END_OF_FUNC;
+  }
+  void* obj_ssl = stack[0].oval;
+  env->set_no_free(env, stack, obj_ssl, 1);
+  
+  stack[0].oval = obj_cb;
+  stack[1].ival = write_p;
+  stack[2].ival = version;
+  stack[3].ival = content_type;
+  stack[4].oval = obj_buf;
+  stack[5].ival = len;
+  stack[6].oval = obj_ssl;
+  stack[7].oval = obj_arg;
+  env->call_instance_method_by_name(env, stack, "", 7, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    print_exception_to_stderr(env, stack);
+    
+    goto END_OF_FUNC;
+  }
+  int32_t ret = stack[0].ival;
+  
+  END_OF_FUNC:
+  
+  return;
+}
+
+int32_t SPVM__Net__SSLeay__set_msg_callback(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  void* obj_cb = stack[1].oval;
+  
+  void* obj_arg = stack[2].oval;
+  
+  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  
+  void (*native_cb)(int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg) = NULL;
+  
+  if (obj_cb) {
+    native_cb = &SPVM__Net__SSLeay__my_msg_cb;
+    
+    void* native_args[4] = {0};
+    native_args[0] = env;
+    native_args[1] = stack;
+    native_args[2] = obj_cb;
+    native_args[3] = obj_arg;
+    SSL_set_msg_callback_arg(ssl, native_args);
+  }
+  
+  SSL_set_msg_callback(ssl, native_cb);
   
   return 0;
 }

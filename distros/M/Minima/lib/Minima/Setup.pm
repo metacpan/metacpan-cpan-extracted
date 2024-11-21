@@ -13,7 +13,11 @@ our $app;
 sub import
 {
     shift; # discard package name
-    my $file = shift if @_;
+    prepare(@_);
+}
+
+sub prepare ($file = undef)
+{
     my $default_config = './etc/config.pl';
 
     if ($file) {
@@ -50,6 +54,8 @@ sub test
     Plack::Test->create(\&init);
 }
 
+1;
+
 __END__
 
 =head1 NAME
@@ -65,15 +71,19 @@ Minima::Setup - Setup a Minima web application
 =head1 DESCRIPTION
 
 This package is dedicated to the initial setup of a web application
-using L<Minima>. It provides the L<C<init>|/init> subroutine which runs
-the app and can be passed (as a reference) as the starting subroutine of
-a PSGI application.
+using L<Minima>. It provides the main L<C<init>|/init> subroutine which
+runs the app and can be passed (as a reference) as the starting
+subroutine of a PSGI application. Additionally, it includes
+L<C<prepare>|/prepare>, responsible for loading the configuration file
+and preparing the main objects.
 
 =head1 CONFIG FILE
 
-A single argument may be optionally passed when C<use>-ing this module,
-representing the configuration file. Minima::Setup will attempt to read
-this file and use it to initialize L<Minima::App>.
+An optional argument may be optionally passed when C<use>-ing this
+module, representing the configuration file. This argument is forwarded
+to L<C<prepare>|/prepare> which can also be called directly.
+Minima::Setup will attempt to read the file and use it to initialize
+L<Minima::App>.
 
 By default, the configuration file is assumed to be F<etc/config.pl>. If
 this file exists and no other location is provided, it will be used. If
@@ -90,12 +100,20 @@ Receives the Plack environment and runs the L<Minima::App> object. A
 reference to this subroutine can be passed as the starting point of the
 PSGI application.
 
+=head2 prepare
+
+    sub prepare ($file = undef)
+
+Reads the provided configuration file, or the default one (see L<"Config
+File"|/"CONFIG FILE">) and initializes the internal L<Minima::App>
+object.
+
 =head2 test
 
     sub test ()
 
-Creates and returns L<Plack::Test> object with the current Minima::App.
-See L<Minima::Manual::Testing> for more on testing.
+Creates and returns a L<Plack::Test> object with the current
+Minima::App. See L<Minima::Manual::Testing> for more on testing.
 
 =head1 TESTING
 

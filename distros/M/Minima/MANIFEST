@@ -19,6 +19,8 @@ lib/Minima/Router.pm
 lib/Minima/Setup.pm
 lib/Minima/View.pm
 lib/Minima/View/HTML.pm
+lib/Minima/View/JSON.pm
+lib/Minima/View/PlainText.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -44,5 +46,8 @@ t/20-app.t
 t/30-controller.t
 t/40-view.t
 t/41-view-html.t
+t/42-view-json.t
+t/43-view-plaintext.t
 t/50-live.t
+t/51-stream.t
 t/90-project.t

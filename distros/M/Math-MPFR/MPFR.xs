@@ -6884,7 +6884,7 @@ SV * _bytes_fr(pTHX_ mpfr_t * str, unsigned long bits) {
 #endif
 
   if(mpfr_get_prec(*str) != (mpfr_prec_t)bits)
-    croak("Precision of 1st arg supplied to _bytes_fr != 2nd arg (%d)", bits );
+    croak("Precision of 1st arg supplied to _bytes_fr != 2nd arg (%d)", (int)bits );
 
   if(bits == 53) {
     msd = mpfr_get_d(*str, GMP_RNDN);
@@ -6955,7 +6955,7 @@ SV * _bytes_fr(pTHX_ mpfr_t * str, unsigned long bits) {
     sv_setpvn(sv, (char *) &ld, 16);
     return sv;
   }
-  croak("Invalid value (%u) provided as 2nd argument to internal _bytes_fr XSub", bits);
+  croak("Invalid value (%u) provided as 2nd argument to internal _bytes_fr XSub", (int)bits);
 }
 
 SV * _dd_bytes(pTHX_ SV * str) {

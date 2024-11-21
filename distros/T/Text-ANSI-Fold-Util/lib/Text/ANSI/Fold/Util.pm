@@ -1,5 +1,5 @@
 package Text::ANSI::Fold::Util;
-our $VERSION = "1.02";
+our $VERSION = "1.04";
 
 use v5.14;
 use utf8;
@@ -32,7 +32,7 @@ Text::ANSI::Fold::Util - Text::ANSI::Fold utilities (width, substr)
 
 =head1 VERSION
 
-Version 1.02
+Version 1.04
 
 =head1 DESCRIPTION
 
@@ -46,7 +46,7 @@ unexportable functions without them.
 
 Unless otherwise noted, these functions are executed in the same
 context as C<ansi_fold> exported by C<Text::ANSI::Fold> module. That
-is, the parameters set by C<Text::ANSI::Fold->configure> are
+is, the parameters set by C<< Text::ANSI::Fold->configure >> are
 effective.
 
 =over 7
@@ -76,13 +76,23 @@ sub width {
 
 Returns substring just like Perl's B<substr> function, but string
 position is calculated by the visible width on the screen instead of
-number of characters.
+number of characters.  If there is no corresponding substring, undef
+is returned always.
 
-If an optional I<replacement> parameter is given, replace the substring
-by the replacement and return the entire string.
+If the C<padding> option is specified, then if there is a
+corresponding substring, it is padded to the specified width and
+returned.
 
-It does not cut the text in the middle of multi-byte character, of
-course.  Its behavior depends on the implementation of lower module.
+It does not cut the text in the middle of multi-byte character.  If
+you want to split the text in the middle of a wide character, specify
+the C<crackwide> option.
+
+    Text::ANSI::Fold->configure(crackwide => 1);
+
+If an optional I<replacement> parameter is given, replace the
+substring by the replacement and return the entire string.  If 0 is
+specified for the width, there may be no error even if the
+corresponding substring does not exist.
 
 =cut
 
@@ -94,12 +104,15 @@ sub substr {
     if ($offset < 0) {
 	$offset = max(0, $offset + ansi_width($text));
     }
-    state $fold = Text::ANSI::Fold->configure();
-    my @s = $fold
-	->configure(text => $text, width => [ $offset, $length // -1, -1 ])
-	->chops;
+    my @s = (state $fold = Text::ANSI::Fold->configure)
+	->text($text)
+	->chops(width => [ $offset, $length // -1, -1 ]);
     if (defined $replacement) {
-	$s[0] . $replacement . ($s[2] // '');
+	if (defined $s[1]) {
+	    $s[0] . $replacement . ($s[2] // '');
+	} else {
+	    undef;
+	}
     } else {
 	$s[1];
     }

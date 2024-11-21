@@ -31,15 +31,15 @@ unless ($mklink_works) {
     plan skip_all => "mklink is not available on this system, cannot test symlink";
 }
 
-plan tests => $l_operator_works ? 25 : 20;
+plan tests => $l_operator_works ? 30 : 25;
 
 
 
-my $folder1 = 'testfolder_'.int time;
-my $folder2 = 'testfolder_link_'.int time;
-my $file1 = 'testfile1_'.int time;
-my $file2 = 'testfile_link_'.int time;
-my $invalid_path = 'invalid_path_'.int time;
+my $folder1 = 'testfolder_'.time;
+my $folder2 = 'testfolder_link_'.time;
+my $file1 = 'testfile1_'.time;
+my $file2 = 'testfile_link_'.time;
+my $invalid_path = 'invalid_path_'.time;
 my $content1 = 'Hello world! '.scalar localtime;
 sleep 1;
 my $content2 = 'Hello world! '.scalar localtime;
@@ -132,6 +132,32 @@ is -d $folder1, 1, "Folder $folder1 was not removed by unlink";
 # 25
 rmdir $folder1;
 isnt -d $folder1, 1, "Folder $folder1 is gone";
+
+{
+    open my $out3, '>', $file1 or die "Cannot create file $file1: $!";
+    print $out3 $content1;
+    close $out3;
+
+    open my $out4, '>', $file2 or die "Cannot write to $file2: $!";
+    print $out4 $content2;
+    close $out4;
+}
+
+# 26
+is -f $file1, 1, "File $file1 exists";
+# 27
+is -f $file2, 1, "File $file2 exists";
+
+# Testing unlink to verify it accepts a list of files instead of just one
+my $retval = unlink $file1, $file2;
+# 28
+is $retval, 2, "Retval for unlink looks correct";
+# 29
+isnt -f $file1, 1, "File $file1 is gone";
+# 30
+isnt -f $file2, 1, "File $file2 is gone";
+
+
 
 sub slurp {
 	my $path = shift;

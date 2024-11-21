@@ -2,6 +2,7 @@ use warnings;
 use strict;
 use Math::BigInt;
 use Math::MPFR qw(:mpfr);
+use Config;
 
 # Because of the way I (sisyphus) build this module with MS
 # Visual Studio, XSubs that take a filehandle argument might
@@ -9,8 +10,10 @@ use Math::MPFR qw(:mpfr);
 # able to avoid calling (and testing) those XSubs.
 # Hence the references to $ENV{SISYPHUS_SKIP} in this script.
 
+my $tests = 7;
+$tests = 5 if ($ENV{SISYPHUS_SKIP} || $Config{nvtype} eq '__float128');
 
-print "1..5\n";
+print "1..$tests\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -283,3 +286,61 @@ else {
   warn "5: \$ok: $ok\n";
   print "not ok 5\n";
 }
+
+# The following are mainly aimed at checking WIN32_FMT_BUG workaround:
+
+unless($ENV{SISYPHUS_SKIP}) {
+  if($Config{nvsize} == 8) {
+    my $ret = Rmpfr_fprintf(\*STDOUT, "For testing %%a formatting: %a\n", sqrt(2.0));
+    #print "RET: $ret\n";
+    if($ret == 48) {print "ok 6\n"}
+    else {
+      warn "Expected 48 but got $ret\n";
+      print "not ok 6\n";
+    }
+
+    $ret = Rmpfr_fprintf(\*STDOUT, "For testing %%A formatting: %A\n", sqrt(2.0));
+    if($ret == 48) {print "ok 7\n"}
+    else {
+      warn "Expected 48 but got $ret\n";
+      print "not ok 7\n";
+    }
+  }
+  elsif($Config{nvtype} ne '__float128') {
+    if(length(sqrt(2.0)) < 25) { # 80-bit extended precision long double
+      my $ret = Rmpfr_fprintf(\*STDOUT, "For testing %%La formatting: %La\n", sqrt(2.0));
+      #print "RET: $ret\n";
+      if($ret == 51 || $ret == 52) {print "ok 6\n"}
+      else {
+        warn "Expected 51 or 52 but got $ret\n";
+        print "not ok 6\n";
+      }
+
+      $ret = Rmpfr_fprintf(\*STDOUT, "For testing %%LA formatting: %LA\n", sqrt(2.0));
+      if($ret == 51 || $ret == 52) {print "ok 7\n"}
+      else {
+        warn "Expected 51 or 52 but got $ret\n";
+        print "not ok 7\n";
+      }
+    }
+    else { # IEEE 754 long double
+      my $ret = Rmpfr_fprintf(\*STDOUT, "For testing %%La formatting: %La\n", sqrt(2.0));
+      #print "RET: $ret\n";
+      if($ret == 64) {print "ok 6\n"}
+      else {
+        warn "Expected 64 but got $ret\n";
+        print "not ok 6\n";
+      }
+
+      $ret = Rmpfr_fprintf(\*STDOUT, "For testing %%LA formatting: %LA\n", sqrt(2.0));
+      if($ret == 64) {print "ok 7\n"}
+      else {
+        warn "Expected 64 but got $ret\n";
+        print "not ok 7\n";
+      }
+    }
+  }
+}
+
+__END__
+

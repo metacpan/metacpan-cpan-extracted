@@ -34,6 +34,7 @@
          "requires" : {
             "Carp" : "0",
             "DateTime" : "0",
+            "DateTime::Format::Flexible" : "0",
             "perl" : "5.006002"
          }
       },
@@ -41,6 +42,7 @@
          "requires" : {
             "Class::Simple" : "0",
             "Test::Deep" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
@@ -66,6 +68,6 @@
          "web" : "https://github.com/nigelhorne/DateTime-Format-Text"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

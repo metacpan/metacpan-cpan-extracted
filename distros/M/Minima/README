@@ -7,8 +7,8 @@ SYNOPSIS
 
     app.psgi
 
-        use Minima::Setup;
-        \&Minima::Setup::init;
+        use Minima;
+        Minima::init;
 
     For a "hello, world":
 
@@ -80,6 +80,30 @@ HOW IT WORKS
     5.  The controller handles the necessary logic, calling models (if
         required) and using views (if desired) to produce content.
         Content is then assigned to the response and finalized.
+
+
+GETTING STARTED
+
+    To begin a project, the Minima package provides a subroutine
+    (described below) to help you get started with the process mentioned
+    above.
+
+    You can also interact directly with Minima::Setup for full control
+    over the setup process.
+
+  init
+
+    sub init ($config = undef)
+
+    A convenience subroutine that calls Minima::Setup::prepare to
+    prepare the main app object and returns a reference to
+    Minima::Setup::init.
+
+    The optional argument allows you to specify the location of the
+    configuration file.
+
+    For a detailed explanation of behavior and options, refer to the
+    documentation for Minima::Setup.
 
 
 EXAMPLE

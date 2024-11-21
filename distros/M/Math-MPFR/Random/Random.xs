@@ -157,6 +157,15 @@ int _is_NOK_and_POK(SV * in) {
   return 0;
 }
 
+int _buggy(void) {
+#if defined(WIN32_FMT_BUG)
+  return 1;
+#else
+  return 0;
+#endif
+
+}
+
 MODULE = Math::MPFR::Random  PACKAGE = Math::MPFR::Random
 
 PROTOTYPES: DISABLE
@@ -206,4 +215,8 @@ _has_pv_nv_bug ()
 int
 _is_NOK_and_POK (in)
 	SV *	in
+
+int
+_buggy ()
+
 

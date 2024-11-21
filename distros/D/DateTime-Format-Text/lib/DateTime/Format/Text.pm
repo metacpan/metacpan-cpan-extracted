@@ -11,11 +11,11 @@ DateTime::Format::Text - Find a Date in Text
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our @month_names = (
 	'january',
@@ -74,8 +74,7 @@ Takes no arguments
 =cut
 
 sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
+	my $class = shift;
 
 	if(!defined($class)) {
 		# Using DateTime::Format::Text::new(), not DateTime::Format::Text->new()
@@ -206,6 +205,7 @@ sub parse {
 		}
 
 		# !wantarray
+
 		my $day;
 		my $month;
 		my $year;
@@ -256,8 +256,20 @@ sub parse {
 				$day = $2;
 			} elsif($string =~ /\s1st\s/i) {
 				$day = 1;
+			} elsif($string =~ /^1st\s/i) {
+				$day = 1;
 			} elsif($string =~ /\s2nd\s/i) {
 				$day = 2;
+			} elsif($string =~ /^2nd\s/i) {
+				$day = 3;
+			} elsif($string =~ /\s3rd\s/i) {
+				$day = 2;
+			} elsif($string =~ /^3rd\s/i) {
+				$day = 3;
+			} elsif($string =~ /\s(\d{1,2})th\s/i) {
+				$day = $1 if($1 <= 31);
+			} elsif($string =~ /^(\d{1,2})th\s/i) {
+				$day = $1 if($1 <= 31);
 			}
 		}
 
@@ -275,10 +287,17 @@ sub parse {
 				# This code should be unreachable
 				Carp::croak(__PACKAGE__, ": unknown month $month");
 				return;
-			} else {
-				return DateTime->new(day => $day, month => $month, year => $year);
 			}
+			return DateTime->new(day => $day, month => $month, year => $year);
 		}
+		# Last ditch if all else fails
+		eval {
+			require DateTime::Format::Flexible;
+
+			my $rc = DateTime::Format::Flexible->parse_datetime($string);
+
+			return $rc if(defined($rc));
+		};
 	} else {
 		Carp::croak('Usage: ', __PACKAGE__, '::parse(string => $string)');
 	}

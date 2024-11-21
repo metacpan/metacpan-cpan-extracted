@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20241020';
+our $VERSION = '5.20241120';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -429,6 +429,7 @@ sub changes_between {
     5.041003 => '2024-08-29',
     5.041004 => '2024-09-20',
     5.041005 => '2024-10-20',
+    5.041006 => '2024-11-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -22421,6 +22422,61 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.041006 => {
+        delta_from => 5.041005,
+        changed => {
+            'B::Deparse'            => '1.80',
+            'B::Op_private'         => '5.041006',
+            'CPAN'                  => '2.38',
+            'Config'                => '5.041006',
+            'DB'                    => '1.09',
+            'ExtUtils::ParseXS'     => '3.56',
+            'ExtUtils::ParseXS::Constants'=> '3.56',
+            'ExtUtils::ParseXS::CountLines'=> '3.56',
+            'ExtUtils::ParseXS::Eval'=> '3.56',
+            'ExtUtils::ParseXS::Node'=> '3.56',
+            'ExtUtils::ParseXS::Utilities'=> '3.56',
+            'ExtUtils::Typemaps'    => '3.56',
+            'ExtUtils::Typemaps::Cmd'=> '3.56',
+            'ExtUtils::Typemaps::InputMap'=> '3.56',
+            'ExtUtils::Typemaps::OutputMap'=> '3.56',
+            'ExtUtils::Typemaps::Type'=> '3.56',
+            'HTTP::Tiny'            => '0.090',
+            'IPC::Open2'            => '1.08',
+            'IPC::Open3'            => '1.24',
+            'List::Util'            => '1.68_01',
+            'List::Util::XS'        => '1.68_01',
+            'Math::Complex'         => '1.63',
+            'Math::Trig'            => '1.63',
+            'Memoize'               => '1.17',
+            'Memoize::AnyDBM_File'  => '1.17',
+            'Memoize::Expire'       => '1.17',
+            'Memoize::NDBM_File'    => '1.17',
+            'Memoize::SDBM_File'    => '1.17',
+            'Memoize::Storable'     => '1.17',
+            'Module::CoreList'      => '5.20241120',
+            'Module::CoreList::Utils'=> '5.20241120',
+            'NDBM_File'             => '1.18',
+            'ODBM_File'             => '1.19',
+            'POSIX'                 => '2.23',
+            'Scalar::Util'          => '1.68_01',
+            'Sub::Util'             => '1.68_01',
+            'Term::Table'           => '0.023',
+            'Term::Table::Cell'     => '0.023',
+            'Term::Table::CellStack'=> '0.023',
+            'Term::Table::HashBase' => '0.023',
+            'Term::Table::LineBreak'=> '0.023',
+            'Term::Table::Spacer'   => '0.023',
+            'Term::Table::Util'     => '0.023',
+            'builtin'               => '0.016',
+            'feature'               => '1.92',
+            'fields'                => '2.26',
+            'parent'                => '0.242_001',
+            'warnings'              => '1.71',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -23971,6 +24027,13 @@ sub is_core
     },
     5.041005 => {
         delta_from => 5.041004,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.041006 => {
+        delta_from => 5.041005,
         changed => {
         },
         removed => {

@@ -9,6 +9,8 @@ use 5.014;
 use parent 'Exporter';
 our @EXPORT = qw(handle_day_change);
 
+our $VERSION = '0.09';
+
 sub handle_day_change {
 	my (%opt)       = @_;
 	my $datestr     = $opt{date};
@@ -53,7 +55,7 @@ None.
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 METHODS
 

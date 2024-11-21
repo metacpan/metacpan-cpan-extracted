@@ -3650,6 +3650,132 @@ C<static method XN_FLAG_SPC_EQ : int ();>
 
 Gets the value of C<XN_FLAG_SPC_EQ>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
+=head2 OPENSSL_INIT_NO_LOAD_SSL_STRINGS
+
+  static method OPENSSL_INIT_NO_LOAD_SSL_STRINGS : int ();
+
+Gets the value of C<OPENSSL_INIT_NO_LOAD_SSL_STRINGS>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_LOAD_SSL_STRINGS
+
+  static method OPENSSL_INIT_LOAD_SSL_STRINGS : int ();
+
+Gets the value of C<OPENSSL_INIT_LOAD_SSL_STRINGS>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_NO_LOAD_CRYPTO_STRINGS
+
+  static method OPENSSL_INIT_NO_LOAD_CRYPTO_STRINGS : int ();
+
+Gets the value of C<OPENSSL_INIT_NO_LOAD_CRYPTO_STRINGS>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_LOAD_CRYPTO_STRINGS
+
+  static method OPENSSL_INIT_LOAD_CRYPTO_STRINGS : int ();
+
+Gets the value of C<OPENSSL_INIT_LOAD_CRYPTO_STRINGS>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_ADD_ALL_CIPHERS
+
+  static method OPENSSL_INIT_ADD_ALL_CIPHERS : int ();
+
+Gets the value of C<OPENSSL_INIT_ADD_ALL_CIPHERS>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_ADD_ALL_DIGESTS
+
+  static method OPENSSL_INIT_ADD_ALL_DIGESTS : int ();
+
+Gets the value of C<OPENSSL_INIT_ADD_ALL_DIGESTS>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_NO_ADD_ALL_CIPHERS
+
+  static method OPENSSL_INIT_NO_ADD_ALL_CIPHERS : int ();
+
+Gets the value of C<OPENSSL_INIT_NO_ADD_ALL_CIPHERS>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_NO_ADD_ALL_DIGESTS
+
+  static method OPENSSL_INIT_NO_ADD_ALL_DIGESTS : int ();
+
+Gets the value of C<OPENSSL_INIT_NO_ADD_ALL_DIGESTS>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_LOAD_CONFIG
+
+  static method OPENSSL_INIT_LOAD_CONFIG : int ();
+
+Gets the value of C<OPENSSL_INIT_LOAD_CONFIG>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_NO_LOAD_CONFIG
+
+  static method OPENSSL_INIT_NO_LOAD_CONFIG : int ();
+
+Gets the value of C<OPENSSL_INIT_NO_LOAD_CONFIG>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_ASYNC
+
+  static method OPENSSL_INIT_ASYNC : int ();
+
+Gets the value of C<OPENSSL_INIT_ASYNC>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_ENGINE_RDRAND
+
+  static method OPENSSL_INIT_ENGINE_RDRAND : int ();
+
+Gets the value of C<OPENSSL_INIT_ENGINE_RDRAND>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_ENGINE_DYNAMIC
+
+  static method OPENSSL_INIT_ENGINE_DYNAMIC : int ();
+
+Gets the value of C<OPENSSL_INIT_ENGINE_DYNAMIC>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_ENGINE_OPENSSL
+
+  static method OPENSSL_INIT_ENGINE_OPENSSL : int ();
+
+Gets the value of C<OPENSSL_INIT_ENGINE_OPENSSL>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_ENGINE_CRYPTODEV
+
+  static method OPENSSL_INIT_ENGINE_CRYPTODEV : int ();
+
+Gets the value of C<OPENSSL_INIT_ENGINE_CRYPTODEV>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_ENGINE_CAPI
+
+  static method OPENSSL_INIT_ENGINE_CAPI : int ();
+
+Gets the value of C<OPENSSL_INIT_ENGINE_CAPI>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_ENGINE_PADLOCK
+
+  static method OPENSSL_INIT_ENGINE_PADLOCK : int ();
+
+Gets the value of C<OPENSSL_INIT_ENGINE_PADLOCK>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_ENGINE_AFALG
+
+  static method OPENSSL_INIT_ENGINE_AFALG : int ();
+
+Gets the value of C<OPENSSL_INIT_ENGINE_AFALG>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_ENGINE_ALL_BUILTIN
+
+  static method OPENSSL_INIT_ENGINE_ALL_BUILTIN : int ();
+
+Gets the value of C<OPENSSL_INIT_ENGINE_ALL_BUILTIN>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_ATFORK
+
+  static method OPENSSL_INIT_ATFORK : int ();
+
+Gets the value of C<OPENSSL_INIT_ATFORK>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_INIT_NO_ATEXIT
+
+  static method OPENSSL_INIT_NO_ATEXIT : int ();
+
+Gets the value of C<OPENSSL_INIT_NO_ATEXIT>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
 =head1 See Also
 
 =over 2

@@ -210,13 +210,19 @@ match hash.
 
 Constructs a new object. No arguments required.
 
-=head2 read_file
+=head2 clear_routes
 
-    method read_file ($file)
+    method clear_routes ()
 
-Parses the routes file given as an argument and registers the routes.
-This method can be called multiple times on the same instance to process
-more than one file.
+Removes all registered routes.
+
+=head2 error_route
+
+    method error_route ()
+
+Returns the controller-action pair registered with the
+L<C<server_error>|/server_error> directive. If nothing was registered,
+returns C<undef>.
 
 =head2 match
 
@@ -236,19 +242,13 @@ returns C<undef>.
 Note that this does not call the controller. It's up to the user to do
 that in order to perform the intended action.
 
-=head2 error_route
+=head2 read_file
 
-    method error_route ()
+    method read_file ($file)
 
-Returns the controller-action pair registered with the
-L<C<server_error>|/server_error> directive. If nothing was registered,
-returns C<undef>.
-
-=head2 clear_routes
-
-    method clear_routes ()
-
-Removes all registered routes.
+Parses the routes file given as an argument and registers the routes.
+This method can be called multiple times on the same instance to process
+more than one file.
 
 =head1 SEE ALSO
 

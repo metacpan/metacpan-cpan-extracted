@@ -3,9 +3,13 @@
 
 class Net::SSLeay::OPENSSL {
   
+  use Net::SSLeay::OPENSSL_INIT_SETTINGS;
+  
   # Class Method
   native static method add_ssl_algorithms : int ();
   
   native static method add_all_algorithms : void ();
+  
+  native static method init_ssl : int ($opts : long, $settings : Net::SSLeay::OPENSSL_INIT_SETTINGS);
   
 }

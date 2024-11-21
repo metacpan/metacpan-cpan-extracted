@@ -3,7 +3,6 @@ abstract: 'Efficient web framework built with modern core classes'
 author:
   - 'Cesar Tessarin, <cesar@tessarin.com.br>.'
 build_requires:
-  Data::Dumper: '2.1'
   HTTP::Request::Common: '6.0'
 configure_requires:
   Module::Build: '0.42'
@@ -17,7 +16,7 @@ name: Minima
 provides:
   Minima:
     file: lib/Minima.pm
-    version: v0.3.0
+    version: v0.4.0
   Minima::App:
     file: lib/Minima/App.pm
   Minima::Controller:
@@ -30,9 +29,8 @@ provides:
     file: lib/Minima/Setup.pm
   Minima::View:
     file: lib/Minima/View.pm
-  Minima::View::HTML:
-    file: lib/Minima/View/HTML.pm
 requires:
+  Data::Dumper: '2.1'
   File::Share: '0.27'
   File::ShareDir: '1.00'
   Hash::MultiValue: '0.16'
@@ -45,5 +43,5 @@ resources:
   bugtracker: https://github.com/tessarin/Minima/issues
   license: http://www.opensource.org/licenses/mit-license.php
   repository: https://github.com/tessarin/Minima
-version: v0.3.0
+version: v0.4.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

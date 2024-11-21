@@ -19,7 +19,7 @@ use Travel::Status::DE::HAFAS;
 use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # {{{ Endpoint Definition
 
@@ -237,13 +237,23 @@ sub mot_mask {
 	if ( my @mots = @{ $self->{exclusive_mots} // [] } ) {
 		$mot_mask = 0;
 		for my $mot (@mots) {
-			$mot_mask |= 1 << $mot_pos{$mot};
+			if ( exists $mot_pos{$mot} ) {
+				$mot_mask |= 1 << $mot_pos{$mot};
+			}
+			elsif ( $mot =~ m{ ^ \d+ $ }x ) {
+				$mot_mask |= 1 << $mot;
+			}
 		}
 	}
 
 	if ( my @mots = @{ $self->{excluded_mots} // [] } ) {
 		for my $mot (@mots) {
-			$mot_mask &= ~( 1 << $mot_pos{$mot} );
+			if ( exists $mot_pos{$mot} ) {
+				$mot_mask &= ~( 1 << $mot_pos{$mot} );
+			}
+			elsif ( $mot =~ m{ ^ \d+ $ }x ) {
+				$mot_mask &= ~( 1 << $mot );
+			}
 		}
 	}
 
@@ -425,7 +435,15 @@ sub add_message {
 	}
 
 	for my $message ( @{ $self->{messages} } ) {
-		if ( $code eq $message->{code} and $text eq $message->{text} ) {
+		if (
+			(
+				not( not defined $code or not defined $message->{code} )
+				or $code eq $message->{code}
+			)
+			and ( not( not defined $text or not defined $message->{text} )
+				or $text eq $message->{text} )
+		  )
+		{
 			$message->{ref_count}++;
 			return $message;
 		}
@@ -535,7 +553,7 @@ Travel::Routing::DE::HAFAS - Interface to HAFAS itinerary services
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 DESCRIPTION
 

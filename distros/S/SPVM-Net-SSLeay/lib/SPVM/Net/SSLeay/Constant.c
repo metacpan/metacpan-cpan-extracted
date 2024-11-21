@@ -7280,5 +7280,254 @@ int32_t SPVM__Net__SSLeay__Constant__XN_FLAG_SPC_EQ(SPVM_ENV* env, SPVM_VALUE* s
   
 }
 
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_NO_LOAD_SSL_STRINGS(SPVM_ENV* env, SPVM_VALUE* stack) {
 
+#ifdef OPENSSL_INIT_NO_LOAD_SSL_STRINGS
+  stack[0].ival = OPENSSL_INIT_NO_LOAD_SSL_STRINGS;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_NO_LOAD_SSL_STRINGS is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
 
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_LOAD_SSL_STRINGS(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_LOAD_SSL_STRINGS
+  stack[0].ival = OPENSSL_INIT_LOAD_SSL_STRINGS;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_LOAD_SSL_STRINGS is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_NO_LOAD_CRYPTO_STRINGS(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_NO_LOAD_CRYPTO_STRINGS
+  stack[0].ival = OPENSSL_INIT_NO_LOAD_CRYPTO_STRINGS;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_NO_LOAD_CRYPTO_STRINGS is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_LOAD_CRYPTO_STRINGS(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_LOAD_CRYPTO_STRINGS
+  stack[0].ival = OPENSSL_INIT_LOAD_CRYPTO_STRINGS;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_LOAD_CRYPTO_STRINGS is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_ADD_ALL_CIPHERS(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_ADD_ALL_CIPHERS
+  stack[0].ival = OPENSSL_INIT_ADD_ALL_CIPHERS;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_ADD_ALL_CIPHERS is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_ADD_ALL_DIGESTS(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_ADD_ALL_DIGESTS
+  stack[0].ival = OPENSSL_INIT_ADD_ALL_DIGESTS;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_ADD_ALL_DIGESTS is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_NO_ADD_ALL_CIPHERS(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_NO_ADD_ALL_CIPHERS
+  stack[0].ival = OPENSSL_INIT_NO_ADD_ALL_CIPHERS;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_NO_ADD_ALL_CIPHERS is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_NO_ADD_ALL_DIGESTS(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_NO_ADD_ALL_DIGESTS
+  stack[0].ival = OPENSSL_INIT_NO_ADD_ALL_DIGESTS;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_NO_ADD_ALL_DIGESTS is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_LOAD_CONFIG(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_LOAD_CONFIG
+  stack[0].ival = OPENSSL_INIT_LOAD_CONFIG;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_LOAD_CONFIG is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_NO_LOAD_CONFIG(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_NO_LOAD_CONFIG
+  stack[0].ival = OPENSSL_INIT_NO_LOAD_CONFIG;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_NO_LOAD_CONFIG is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_ASYNC(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_ASYNC
+  stack[0].ival = OPENSSL_INIT_ASYNC;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_ASYNC is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_ENGINE_RDRAND(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_ENGINE_RDRAND
+  stack[0].ival = OPENSSL_INIT_ENGINE_RDRAND;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_ENGINE_RDRAND is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_ENGINE_DYNAMIC(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_ENGINE_DYNAMIC
+  stack[0].ival = OPENSSL_INIT_ENGINE_DYNAMIC;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_ENGINE_DYNAMIC is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_ENGINE_OPENSSL(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_ENGINE_OPENSSL
+  stack[0].ival = OPENSSL_INIT_ENGINE_OPENSSL;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_ENGINE_OPENSSL is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_ENGINE_CRYPTODEV(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_ENGINE_CRYPTODEV
+  stack[0].ival = OPENSSL_INIT_ENGINE_CRYPTODEV;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_ENGINE_CRYPTODEV is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_ENGINE_CAPI(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_ENGINE_CAPI
+  stack[0].ival = OPENSSL_INIT_ENGINE_CAPI;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_ENGINE_CAPI is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_ENGINE_PADLOCK(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_ENGINE_PADLOCK
+  stack[0].ival = OPENSSL_INIT_ENGINE_PADLOCK;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_ENGINE_PADLOCK is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_ENGINE_AFALG(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_ENGINE_AFALG
+  stack[0].ival = OPENSSL_INIT_ENGINE_AFALG;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_ENGINE_AFALG is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_ENGINE_ALL_BUILTIN(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_ENGINE_ALL_BUILTIN
+  stack[0].ival = OPENSSL_INIT_ENGINE_ALL_BUILTIN;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_ENGINE_ALL_BUILTIN is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_ATFORK(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_ATFORK
+  stack[0].ival = OPENSSL_INIT_ATFORK;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_ATFORK is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_NO_ATEXIT(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_INIT_NO_ATEXIT
+  stack[0].ival = OPENSSL_INIT_NO_ATEXIT;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_INIT_NO_ATEXIT is not defined on this system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}

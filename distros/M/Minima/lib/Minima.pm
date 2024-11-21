@@ -1,5 +1,15 @@
 use v5.40;
-package Minima v0.3.0;
+
+package Minima v0.4.0;
+
+use Minima::Setup;
+
+sub init ($config = undef)
+{
+    Minima::Setup::prepare($config);
+    \&Minima::Setup::init;
+}
+
 1;
 
 __END__
@@ -12,8 +22,8 @@ Minima - Efficient web framework built with modern core classes
 
 F<app.psgi>
 
-    use Minima::Setup;
-    \&Minima::Setup::init;
+    use Minima;
+    Minima::init;
 
 For a "hello, world":
 
@@ -69,7 +79,7 @@ A typical web application using Minima operates as follows:
 =item 1.
 
 L<Minima::Setup> is loaded. It will read a configuration file (if any,
-see L<"Config File in Minima::Setup"|Minima::Setup/"CONFIG FILE">) and
+see L<"Config File" in Minima::Setup|Minima::Setup/"CONFIG FILE">) and
 provides a C<init> subroutine that is passed to Plack as the entry point
 for receiving requests.
 
@@ -80,12 +90,12 @@ configuration.
 
 =item 3.
 
-Minima::App passes a routes file (where all application routes are
+L<Minima::App> passes a routes file (where all application routes are
 defined) to L<Minima::Router> to be read and parsed.
 
 =item 4.
 
-The request URL is matched to a route. Minima::App then calls the
+The request URL is matched to a route. L<Minima::App> then calls the
 appropriate controller and method, setting them up and passing along the
 relevant information such as request and route data.
 
@@ -96,6 +106,29 @@ and using views (if desired) to produce content. Content is then
 assigned to the response and finalized.
 
 =back
+
+=head1 GETTING STARTED
+
+To begin a project, the Minima package provides a subroutine  (described
+below) to help you get started with the process mentioned above.
+
+You can also interact directly with L<Minima::Setup> for full control
+over the setup process.
+
+=head2 init
+
+    sub init ($config = undef)
+
+A convenience subroutine that calls
+L<C<Minima::Setup::prepare>|Minima::Setup/prepare> to prepare the  main
+app object and returns a reference to
+L<C<Minima::Setup::init>|Minima::Setup/init>.
+
+The optional argument allows you to specify the location of the
+configuration file.
+
+For a detailed explanation of behavior and options, refer to the
+documentation for L<Minima::Setup>.
 
 =head1 EXAMPLE
 

@@ -1,3 +1,19 @@
+v0.4.0  2024-11-20
+
+        [Changes]
+        - Added a view for generating JSON responses.
+        - Added a view for generating plain text responses.
+        - Views can now modify Plack::Responses to configure them as
+          needed.
+        - Introduced a dedicated setup subroutine, enabling delayed
+          initialization rather than compile-time setup.
+        - The main package now includes a default starting point,
+          reducing the amount of required setup code.
+
+        [Fixes]
+        - HTML view is now a descendant of the base view class.
+        - Corrected typos in the documentation.
+
 v0.3.0  2024-11-11
 
         [Changes]

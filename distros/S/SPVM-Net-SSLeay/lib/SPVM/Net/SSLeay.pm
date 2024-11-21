@@ -1,6 +1,6 @@
 package SPVM::Net::SSLeay;
 
-our $VERSION = "0.014";
+our $VERSION = "0.016";
 
 1;
 
@@ -115,12 +115,6 @@ L</"ssl_ctx"> field is set to $ssl_ctx.
 Exceptions:
 
 If SSL_new failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
-
-=head2 library_init
-
-C<static method library_init : int ();>
-
-Calls native L<SSL_library_init|https://docs.openssl.org/master/man3/SSL_library_init> function, and returns its return value.
 
 =head2 load_error_strings
 
@@ -389,6 +383,12 @@ method get_SSL_CTX : Net::SSLeay::SSL_CTX ();
 C<method get_SSL_CTX : Net::SSLeay::SSL_CTX ();>
 
 Returns the value of L</"ssl_ctx"> field.
+
+=head2 set_msg_callback
+
+C<method set_msg_callback : void ($cb : L<Net::SSLeay::Callback::Msg|SPVM::Net::SSLeay::Callback::Msg>, $arg : object = undef);>
+
+Calls native L<SSL_set_msg_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_msg_callback> function given $cb, $arg, and returns its return value.
 
 =head2 DESTROY
 

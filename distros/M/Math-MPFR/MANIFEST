@@ -19,6 +19,7 @@ try_flt128.in
 Prec/Prec.xs
 Prec/Prec.pm
 Prec/Makefile.PL
+Random/checkinc.in
 Random/Random.xs
 Random/Random.pm
 Random/Makefile.PL

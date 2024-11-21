@@ -57,18 +57,19 @@
    "provides" : {
       "Travel::Routing::DE::HAFAS" : {
          "file" : "lib/Travel/Routing/DE/HAFAS.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Travel::Routing::DE::HAFAS::Connection" : {
          "file" : "lib/Travel/Routing/DE/HAFAS/Connection.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Travel::Routing::DE::HAFAS::Connection::Section" : {
          "file" : "lib/Travel/Routing/DE/HAFAS/Connection/Section.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Travel::Routing::DE::HAFAS::Utils" : {
-         "file" : "lib/Travel/Routing/DE/HAFAS/Utils.pm"
+         "file" : "lib/Travel/Routing/DE/HAFAS/Utils.pm",
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -80,6 +81,6 @@
          "url" : "https://github.com/derf/Travel-Routing-DE-HAFAS"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

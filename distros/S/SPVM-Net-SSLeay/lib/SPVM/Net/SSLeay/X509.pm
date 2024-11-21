@@ -66,12 +66,6 @@ The length of output buffer $md must be greater than or equal to EVP_MAX_MD_SIZE
 
 If X509_pubkey_digest failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
-=head2 get_ext_d2i
-
-C<method get_ext_d2i : void ($nid : int, $crit_ref : int*, $idx_ref : int*);>
-
-Calls native L<X509_get_ext_d2i|https://docs.openssl.org/master/man3/X509_pubkey_digest> function given the pointer value of the instance, $nid, $crit_ref, $idx_ref.
-
 =head2 dup
 
 C<method dup : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> ();>

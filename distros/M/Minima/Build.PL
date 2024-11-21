@@ -6,6 +6,7 @@ my $build = Module::Build->new(
     share_dir => 'share',
     requires => {
         perl => '5.40.0',
+        'Data::Dumper' => '2.1',
         'File::Share' => '0.27',
         'Hash::MultiValue', '0.16',
         'Path::Tiny' => '0.142',
@@ -17,7 +18,6 @@ my $build = Module::Build->new(
         'Module::Build' => '0.42',
     },
     test_requires => {
-        'Data::Dumper' => '2.1',
         'HTTP::Request::Common' => '6.0',
     },
     meta_merge => {

@@ -1,5 +1,13 @@
 Revision history for Perl extension Text-ANSI-Fold-Util
 
+1.04 2024-11-21T08:09:15Z
+
+    - substr with replacement fails for unmatched substring
+
+1.03 2024-11-21T02:46:41Z
+
+    - use Text::ANSI::Fold@2.2701 (support "crackwide")
+
 1.02 2024-11-17T13:08:04Z
 
     - Share common object of Text::ANSI::Fold

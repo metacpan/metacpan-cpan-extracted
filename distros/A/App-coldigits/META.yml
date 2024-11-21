@@ -20,5 +20,5 @@ no_index:
 resources:
   bugtracker: https://github.com/tulamili/App-coldigits/issues
   repository: https://github.com/tulamili/App-coldigits.git
-version: '0.011'
+version: '0.012'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

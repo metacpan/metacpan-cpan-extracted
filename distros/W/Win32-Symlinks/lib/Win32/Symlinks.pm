@@ -12,123 +12,128 @@ Win32::Symlinks - A maintained, working implementation of Perl symlink built in 
 
 =head1 VERSION
 
-Version 0.10
+Version 0.12
 
 =cut
 
 sub _mklink_works {
-	my $cmd = ($ENV{COMSPEC} =~ /^(.*?)$/) ? $1 : 'cmd.exe'; # Untaint
-	my $r = `"$cmd" /c mklink /? 2>&1`;
-    if ($r =~ m[/D]i and $r =~ m[/H]i and $r =~ m[/J]i) {
-		return 1;
-	}
-	return 0;
+  my $cmd = ($ENV{COMSPEC} =~ /^(.*?)$/) ? $1 : 'cmd.exe'; # Untaint
+  my $r = `"$cmd" /c mklink /? 2>&1`;
+  if ($r =~ m[/D]i and $r =~ m[/H]i and $r =~ m[/J]i) {
+    return 1;
+  }
+    return 0;
 }
 
 BEGIN {
-	our $VERSION = '0.10';
-	if ($^O eq 'MSWin32') {
-		require Parse::Lnk;
-		require File::Spec;
-		require File::Basename;
-        my $mklink_works = _mklink_works();
-		
-        if ($] >= 5.016) {
-            require XSLoader;
-            XSLoader::load();
-            _override_link_test();
+  our $VERSION = '0.12';
+  if ($^O eq 'MSWin32') {
+    require Parse::Lnk;
+    require File::Spec;
+    require File::Basename;
+    my $mklink_works = _mklink_works();
+    
+    if ($] >= 5.016) {
+      require XSLoader;
+      XSLoader::load();
+      _override_link_test();
+    } else {
+      unless ($ENV{WIN32_SYMLINKS_SUPRESS_VERSION_WARNING}) {
+        print STDERR "Warning: ".__PACKAGE__." can't override the -l operator on Perl versions older than 5.016. You are running $].\n";
+        print STDERR "You can supress this warning by setting the environment variable WIN32_SYMLINKS_SUPRESS_VERSION_WARNING to a true value.\n";
+      }
+    }
+    
+    unless ($mklink_works) {
+      unless ($ENV{WIN32_SYMLINKS_SUPRESS_VERSION_WARNING}) {
+        print STDERR "Warning: ".__PACKAGE__." cannot override the function 'symlink' because mklink doesn't seem to be available in this system.\n";
+        print STDERR "You can supress this warning by setting the environment variable WIN32_SYMLINKS_SUPRESS_VERSION_WARNING to a true value.\n";
+      }
+    }
+    
+    *CORE::GLOBAL::readlink = sub ($) {
+      my $path = shift;
+      undef $Win32::Symlinks::Type;
+      $path = File::Spec->catdir(File::Spec->splitdir($path));
+      if ($path =~ /\.lnk$/i) {
+        my $target = Parse::Lnk->from($path);
+        if ($target) {
+          $Win32::Symlinks::Type = 'SHORTCUT';
+          return $target;
+        }
+      }
+      my $cmd = $ENV{COMSPEC} || 'cmd.exe';
+      my $directory = File::Basename::dirname($path);
+      my $item = File::Basename::basename($path);
+      my @r = `"$cmd" /c dir /A:l "$directory" 2>&1`;
+      for my $i (@r) {
+        if ($i =~ m[<(JUNCTION|SYMLINK|SYMLINKD)>\s+(.*?)\s+\Q[\E([^\]]+)\Q]\E]) {
+          my ($type, $name, $target) = ($1, $2, $3);
+          for my $i ($type, $name, $target) {
+            $i =~ s[(^\s+|\s+$)][]g;
+          }
+          if ($name eq $item) {
+            $Win32::Symlinks::Type = $type;
+            return $target;
+          }
+        }
+      }
+      return;
+    };
+    
+    if ($mklink_works) {
+      *CORE::GLOBAL::symlink = sub ($$) {
+        my ($old, $new) = (shift, shift);
+        return unless defined $old;
+        return unless defined $new;
+        $old = File::Spec->catdir(File::Spec->splitdir($old));
+        $new = File::Spec->catdir(File::Spec->splitdir($new));
+        my $r;
+        if (-d $old) {
+          $r = `mklink /d "$new" "$old" 2>&1`;
         } else {
-            unless ($ENV{WIN32_SYMLINKS_SUPRESS_VERSION_WARNING}) {
-                print STDERR "Warning: ".__PACKAGE__." can't override the -l operator on Perl versions older than 5.016. You are running $].\n";
-                print STDERR "You can supress this warning by setting the environment variable WIN32_SYMLINKS_SUPRESS_VERSION_WARNING to a true value.\n";
-            }
+          $r = `mklink "$new" "$old" 2>&1`;
         }
-        
-        unless ($mklink_works) {
-            unless ($ENV{WIN32_SYMLINKS_SUPRESS_VERSION_WARNING}) {
-                print STDERR "Warning: ".__PACKAGE__." cannot override the function 'symlink' because mklink doesn't seem to be available in this system.\n";
-                print STDERR "You can supress this warning by setting the environment variable WIN32_SYMLINKS_SUPRESS_VERSION_WARNING to a true value.\n";
-            }
+        return 1 if $r =~ /\Q<<===>>\E/;
+        return 0;
+      };
+    }
+    
+    *CORE::GLOBAL::unlink = sub (@) {
+      my $retval = 0;
+      my @args = @_;
+      for my $path (@args) {
+        next unless defined $path;
+        $path = File::Spec->catdir(File::Spec->splitdir($path));
+        my $cmd = $ENV{COMSPEC} || 'cmd.exe';
+        if (_test_d($path) and l($path)) {
+          my $r = `"$cmd" /c rmdir "$path" 2>&1`;
+          $retval += $r ? 0 : 1;
+        } elsif (l($path)) {
+          my $r = `"$cmd" /c del /Q "$path" 2>&1`;
+          $retval += $r ? 0 : 1;
+        } else {
+          $retval += CORE::unlink($path);
         }
-		
-		*CORE::GLOBAL::readlink = sub ($) {
-			my $path = shift;
-			undef $Win32::Symlinks::Type;
-			$path = File::Spec->catdir(File::Spec->splitdir($path));
-			if ($path =~ /\.lnk$/i) {
-				my $target = Parse::Lnk->from($path);
-				if ($target) {
-					$Win32::Symlinks::Type = 'SHORTCUT';
-					return $target;
-				}
-			}
-			my $cmd = $ENV{COMSPEC} || 'cmd.exe';
-			my $directory = File::Basename::dirname($path);
-			my $item = File::Basename::basename($path);
-			my @r = `"$cmd" /c dir /A:l "$directory" 2>&1`;
-			for my $i (@r) {
-				if ($i =~ m[<(JUNCTION|SYMLINK|SYMLINKD)>\s+(.*?)\s+\Q[\E([^\]]+)\Q]\E]) {
-					my ($type, $name, $target) = ($1, $2, $3);
-					for my $i ($type, $name, $target) {
-						$i =~ s[(^\s+|\s+$)][]g;
-					}
-					if ($name eq $item) {
-						$Win32::Symlinks::Type = $type;
-						return $target;
-					}
-				}
-			}
-			return;
-		};
-		
-		if ($mklink_works) {
-            *CORE::GLOBAL::symlink = sub ($$) {
-                my ($old, $new) = (shift, shift);
-                return unless defined $old;
-                return unless defined $new;
-                $old = File::Spec->catdir(File::Spec->splitdir($old));
-                $new = File::Spec->catdir(File::Spec->splitdir($new));
-                my $r;
-                if (-d $old) {
-                    $r = `mklink /d "$new" "$old" 2>&1`;
-                } else {
-                    $r = `mklink "$new" "$old" 2>&1`;
-                }
-                return 1 if $r =~ /\Q<<===>>\E/;
-                return 0;
-            };
-        }
-		
-		*CORE::GLOBAL::unlink = sub ($) {
-			my $path = shift;
-			return unless defined $path;
-			$path = File::Spec->catdir(File::Spec->splitdir($path));
-			my $cmd = $ENV{COMSPEC} || 'cmd.exe';
-			if (_test_d($path) and l($path)) {
-				my $r = `"$cmd" /c rmdir "$path" 2>&1`;
-				return $r ? 0 : 1;
-			} elsif (l($path)) {
-				my $r = `"$cmd" /c del /Q "$path" 2>&1`;
-				return $r ? 0 : 1;
-			}
-			return CORE::unlink($path);
-		};
-	}
+      }
+      $retval;
+    };
+  }
 }
 
 sub l ($) {
-	return 1 if defined readlink($_[0]);
-	return 0;
+  return 1 if defined readlink($_[0]);
+  return 0;
 }
 
 # We need this because some versions of Perl (seen in 5.18) return true for -f dir_symlink
 # and false for -d dir_symlink. This breaks the unlink override.
 sub _test_d {
-	my $path = shift;
-	my $cmd = $ENV{COMSPEC} || 'cmd.exe';
-	my $r = `"$cmd" /c cd "$path" 2>&1`;
-	$r =~ s/(^\s+|\s+$)//g;
-	return $r ? 0 : 1;
+  my $path = shift;
+  my $cmd = $ENV{COMSPEC} || 'cmd.exe';
+  my $r = `"$cmd" /c cd "$path" 2>&1`;
+  $r =~ s/(^\s+|\s+$)//g;
+  return $r ? 0 : 1;
 }
 
 
@@ -152,13 +157,13 @@ code, you'll ensure these functions don't break when being executed in a Windows
 
 Perhaps a little code snippet.
 
-    use Win32::Symlinks;
+  use Win32::Symlinks;
 
-    # That's it. Now symlink, readlink, unlink and -l will work correctly when
-    # executed under Windows.
+  # That's it. Now symlink, readlink, unlink and -l will work correctly when
+  # executed under Windows.
+  
+  # Also, you don't need to call it everywhere. Calling it once is enough.
     
-    # Also, you don't need to call it everywhere. Calling it once is enough.
-	
     
 
 =head1 EXPORT
@@ -203,7 +208,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Win32::Symlinks
+  perldoc Win32::Symlinks
 
 
 You can also look for information at:

@@ -2,7 +2,7 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.014";
+  version "0.016";
   
   use Net::SSLeay::Constant;
   use Net::SSLeay::SSL_CTX;
@@ -13,10 +13,11 @@ class Net::SSLeay {
   use Net::SSLeay::X509_NAME;
   use Net::SSLeay::SSL_SESSION;
   use Net::SSLeay::OCSP_ONEREQ;
-  
-  INIT {
-    &init();
-  }
+  use Net::SSLeay::Callback::Msg;
+  use Net::SSLeay::Util;
+  use Net::SSLeay::OPENSSL;
+  use Net::SSLeay::OPENSSL_INIT_SETTINGS;
+  use Net::SSLeay::Util::X509;
   
   # Fields
   has ssl_ctx : Net::SSLeay::SSL_CTX;
@@ -42,12 +43,6 @@ class Net::SSLeay {
   native static method load_error_strings : void ();
   
   native static method load_client_CA_file : Net::SSLeay::X509_NAME[] ($file : string);
-  
-  # This native function is deprecated in OpenSSL 1.1.0, but Perl's IO::Socket::SSL used this method.
-  native static method library_init : int ();
-  
-  # Private or Internal Class Methods
-  private native static method init : void ();
   
   native static method _print_version_text : void ();
   
@@ -107,6 +102,8 @@ class Net::SSLeay {
   }
   
   native method set_SSL_CTX : Net::SSLeay::SSL_CTX ($ctx : Net::SSLeay::SSL_CTX);
+  
+  native method set_msg_callback : void ($cb : Net::SSLeay::Callback::Msg, $arg : object = undef);
   
   native method DESTROY : void ();
   

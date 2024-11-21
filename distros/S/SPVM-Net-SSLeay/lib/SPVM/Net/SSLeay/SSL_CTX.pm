@@ -344,6 +344,48 @@ C<method set_psk_client_callback : void ($cb : L<Net::SSLeay::Callback::PskClien
 
 Calls native L<SSL_CTX_set_psk_client_callback|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_psk_client_callback> function given $cb.
 
+=head2 set_psk_server_callback
+
+C<method set_psk_server_callback : void ($cb : L<Net::SSLeay::Callback::PskServer|SPVM::Net::SSLeay::Callback::PskServer>);>
+
+Calls native L<SSL_CTX_set_psk_server_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_use_psk_identity_hint> function given $cb.
+
+=head2 set_tlsext_ticket_key_cb
+
+C<method set_tlsext_ticket_key_cb : void ($cb : L<Net::SSLeay::Callback::TlsextTicketKey|SPVM::Net::SSLeay::Callback::TlsextTicketKey>);>
+
+Calls native L<SSL_CTX_set_tlsext_ticket_key_cb|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_tlsext_ticket_key_cb> function given $cb.
+
+=head2 set_alpn_select_cb_with_protocols
+
+C<method set_alpn_select_cb_with_protocols : void ($protocols : string[]);>
+
+Calls native L<SSL_CTX_set_alpn_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb> function defined to select $protocols.
+
+=head2 set_next_proto_select_cb_with_protocols
+
+C<method set_next_proto_select_cb_with_protocols : void ($protocols : string[]);>
+
+Calls native L<SSL_CTX_set_next_proto_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_next_proto_select_cb> function defined to select $protocols.
+
+=head2 set_next_protos_advertised_cb_with_protocols
+
+C<method set_next_protos_advertised_cb : void ($protocols : string[]);>
+
+Calls native L<SSL_CTX_set_next_protos_advertised_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb> function defined to select $protocols.
+
+=head2 sess_set_new_cb
+
+C<method sess_set_new_cb : void ($cb : L<Net::SSLeay::Callback::NewSession|SPVM::Net::SSLeay::Callback::NewSession>)>
+
+Calls native L<SSL_CTX_sess_set_new_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_set_get_cb> function given $cb.
+
+=head2 sess_set_remove_cb
+
+C<method sess_set_remove_cb : void ($cb : L<Net::SSLeay::Callback::RemoveSession|SPVM::Net::SSLeay::Callback::RemoveSession>)>
+
+Calls native L<SSL_CTX_sess_set_remove_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_set_get_cb/> function given $cb.
+
 =head2 DESTROY
 
 C<method DESTROY : void ();>

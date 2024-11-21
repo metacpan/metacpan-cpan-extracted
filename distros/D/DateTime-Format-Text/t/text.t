@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Class::Simple;
-use Test::Most tests => 91;
+use Test::Most tests => 99;
 use Test::Deep;
 use Test::NoWarnings;
 
@@ -87,3 +87,41 @@ TEXT: {
 		cmp_deeply($dft->parse_datetime($test), methods('day' => num(1), 'month' => num(3), 'year' => num(2015)), $test);
 	};
 }
+
+# Final set of test cases
+
+# Instantiate the module
+my $parser = DateTime::Format::Text->new();
+
+my @test_cases = (
+	{
+		input  => 'Today is 25th December 2024',
+		output => DateTime->new(day => 25, month => 12, year => 2024),
+	}, {
+		input  => 'Event on 1 Jan 2023',
+		output => DateTime->new(day => 1, month => 1, year => 2023),
+	}, {
+		input  => 'Meeting scheduled for 12/05/2022',
+		output => DateTime->new(day => 12, month => 5, year => 2022),
+	}, {
+		input  => '29th February 2020 was in a leap year',
+		output => DateTime->new(day => 29, month => 2, year => 2020),
+	}, {
+		input  => 'leap year test: 29th February 2020',
+		output => DateTime->new(day => 29, month => 2, year => 2020),
+	}, {
+		input  => '29th February 2020',
+		output => DateTime->new(day => 29, month => 2, year => 2020),
+	}, {
+		input  => 'December 2023',
+		output => DateTime->new(day => 1, month => 12, year => 2023),
+	}
+);
+
+# Run tests
+foreach my $test (@test_cases) {
+	my $parsed_date = $parser->parse($test->{input});
+	is_deeply($parsed_date, $test->{output}, "Parsed: $test->{input}");
+}
+
+ok(!defined($parser->parse('abc')));

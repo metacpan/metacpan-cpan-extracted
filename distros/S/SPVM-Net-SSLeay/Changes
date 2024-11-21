@@ -1,3 +1,62 @@
+0.016 2024-11-21
+  [New Features]
+    * Add Net::SSLeay::Util class.
+    * Add Net::SSLeay::Util::OCSP class.
+    * Add Net::SSLeay::Util::X509 class.
+    * Add Net::SSLeay::Util::PKCS12 class.
+    * Add Net::SSLeay::Util#dump_peer_certificate method.
+    * Add Net::SSLeay::Constant#OPENSSL_INIT_LOAD_SSL_STRINGS method.
+    * Add Net::SSLeay::Constant#OPENSSL_INIT_NO_LOAD_SSL_STRINGS method.
+    * Add the following methods to Net::SSLeay::Constant.
+      OPENSSL_INIT_NO_LOAD_SSL_STRINGS
+      OPENSSL_INIT_LOAD_SSL_STRINGS
+      OPENSSL_INIT_NO_LOAD_CRYPTO_STRINGS
+      OPENSSL_INIT_LOAD_CRYPTO_STRINGS
+      OPENSSL_INIT_ADD_ALL_CIPHERS
+      OPENSSL_INIT_ADD_ALL_DIGESTS
+      OPENSSL_INIT_NO_ADD_ALL_CIPHERS
+      OPENSSL_INIT_NO_ADD_ALL_DIGESTS
+      OPENSSL_INIT_LOAD_CONFIG
+      OPENSSL_INIT_NO_LOAD_CONFIG
+      OPENSSL_INIT_ASYNC
+      OPENSSL_INIT_ENGINE_RDRAND
+      OPENSSL_INIT_ENGINE_DYNAMIC
+      OPENSSL_INIT_ENGINE_OPENSSL
+      OPENSSL_INIT_ENGINE_CRYPTODEV
+      OPENSSL_INIT_ENGINE_CAPI
+      OPENSSL_INIT_ENGINE_PADLOCK
+      OPENSSL_INIT_ENGINE_AFALG
+      OPENSSL_INIT_ENGINE_ALL_BUILTIN
+      OPENSSL_INIT_ATFORK
+      OPENSSL_INIT_NO_ATEXIT
+    * Add Net::SSLeay::OPENSSL_INIT_SETTINGS class.
+    * Add Net::SSLeay::OPENSSL#init_ssl method.
+    * Add Net::SSLeay::PKCS12 class.
+    * Add  Net::SSLeay::Util::X509#get_ocsp_uri method.
+    * Add  Net::SSLeay::EVP#sha1 method.
+  [Incompatible Changes]
+    * Remove the logic of OpenSSL initializetion because this is automatically executed after OpenSSL 1.1.0.
+    * Remove Net::SSLeay#library_init method.
+    * Remove Net::SSLeay::X509#get_ext_d2i method.
+0.015 2024-11-20
+  [New Features]
+    * Add Net::SSLeay::SSL_CTX#set_psk_server_callback method.
+    * Add Net::SSLeay::EVP_CIPHER_CTX class.
+    * Add Net::SSLeay::HMAC_CTX class.
+    * Add Net::SSLeay::Callback::TlsextTicketKey class.
+    * Add Net::SSLeay::SSL_CTX#set_tlsext_ticket_key_cb method.
+    * Add Net::SSLeay::Callback::AlpnSelect class.
+    * Add Net::SSLeay::SSL_CTX#set_alpn_select_cb_with_protocols method.
+    * Add Net::SSLeay::SSL_CTX#set_next_proto_select_cb_with_protocols method.
+    * Add Net::SSLeay::SSL_CTX#set_next_protos_advertised_cb_with_protocols method.
+    * Add Net::SSLeay::Callback::NewSession class.
+    * Add Net::SSLeay::Callback::RemoveSession class.
+    * Add Net::SSLeay::SSL_CTX#sess_set_new_cb method.
+    * Add Net::SSLeay::SSL_CTX#sess_set_remove_cb method.
+    * Add Net::SSLeay::Callback::NextProtoSelect class.
+    * Add Net::SSLeay::Callback::Net::SSLeay::Callback::NextProtosAdvertised class.
+    * Add Net::SSLeay::Callback::Msg class.
+    * Add Net::SSLeay#set_msg_callback method.
 0.014 2024-11-19
   [New Features]
     * Add Net::SSLeay::OCSP#single_get0_status method.

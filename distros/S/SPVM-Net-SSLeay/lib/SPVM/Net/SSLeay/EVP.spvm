@@ -8,4 +8,6 @@ class Net::SSLeay::EVP : pointer {
   # Class Methods
   native static method get_digestbyname : Net::SSLeay::EVP_MD ($name : string);
   
+  native static method sha1 : Net::SSLeay::EVP_MD ();
+  
 }

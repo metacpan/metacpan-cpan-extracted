@@ -215,7 +215,7 @@ the app.
 =item C<automatic_head>
 
 Automatically remove the response body for HEAD requests. Defaults to
-true. See also: L<"Routes File in Minima::Router"|Minima::Router/"ROUTES
+true. See also: L<"Routes File" in Minima::Router|Minima::Router/"ROUTES
 FILE">.
 
 =item C<routes>
@@ -293,7 +293,8 @@ Returns or sets the environment hash.
 
 =head1 SEE ALSO
 
-L<Minima>, L<Minima::Setup>, L<Minima::Router>, L<perlclass>.
+L<Minima>, L<Minima::Setup>, L<Minima::Router>, L<Minima::Controller>,
+L<perlclass>.
 
 =head1 AUTHOR
 

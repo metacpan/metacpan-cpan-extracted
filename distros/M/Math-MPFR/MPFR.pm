@@ -4,7 +4,8 @@
     use POSIX;
     use Config;
     use Math::MPFR::Prec;
-    use Math::MPFR::Random; # Needs to be loaded before Math::MPFR
+    use Math::MPFR::Random; # Needs to be loaded before Math::MPFR as
+                            # it contains relevant configuration info.
 
     use constant  GMP_RNDN              => 0;
     use constant  GMP_RNDZ              => 1;
@@ -40,6 +41,10 @@
     use constant MPFR_3_1_6_OR_LATER    => Math::MPFR::Random::_MPFR_VERSION() >  196869 ? 1 : 0;
     use constant MPFR_4_0_2_OR_LATER    => Math::MPFR::Random::_MPFR_VERSION() >= 262146 ? 1 : 0;
     use constant MPFR_PV_NV_BUG         => Math::MPFR::Random::_has_pv_nv_bug();
+
+    # https://github.com/StrawberryPerl/Perl-Dist-Strawberry/issues/226
+    use constant WIN32_FMT_BUG          => Math::MPFR::Random::_buggy();
+
     use constant NV_IS_DOUBLEDOUBLE     => 1 + (2 ** -200) > 1 ? 1 : 0;
 
     # Inspired by https://github.com/Perl/perl5/issues/19550, which affects only perl-5.35.10:
@@ -100,7 +105,7 @@ MPFR_DBL_DIG MPFR_FLT128_DIG MPFR_LDBL_DIG
 MPFR_FLAGS_ALL MPFR_FLAGS_DIVBY0 MPFR_FLAGS_ERANGE MPFR_FLAGS_INEXACT MPFR_FLAGS_NAN
 MPFR_FLAGS_OVERFLOW MPFR_FLAGS_UNDERFLOW
 MPFR_FREE_LOCAL_CACHE MPFR_FREE_GLOBAL_CACHE
-MPFR_RNDA MPFR_RNDD MPFR_RNDF MPFR_RNDN MPFR_RNDU MPFR_RNDZ MPFR_PV_NV_BUG
+MPFR_RNDA MPFR_RNDD MPFR_RNDF MPFR_RNDN MPFR_RNDU MPFR_RNDZ MPFR_PV_NV_BUG WIN32_FMT_BUG
 MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
 RMPFR_PREC_MAX RMPFR_PREC_MIN RMPFR_VERSION_NUM
 
@@ -193,7 +198,7 @@ prec_cast q_add_fr q_cmp_fr q_div_fr q_mul_fr q_sub_fr rndna
 
     @Math::MPFR::EXPORT_OK = (@tags, 'bytes');
 
-    our $VERSION = '4.31';
+    our $VERSION = '4.32';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -457,7 +462,19 @@ sub Rmpfr_printf {
       else {die "The second (of 3) arguments given to Rmpfr_printf() is not a valid rounding argument"}
     }
     else {die "Rmpfr_printf must take 2 or 3 arguments: format string, [rounding,], and variable" if @_ != 2;
-    wrap_mpfr_printf(@_)}
+      if(WIN32_FMT_BUG) {
+        my $revised = _rewrite_fmt_arg($_[0]);
+        if($revised) {
+          wrap_mpfr_printf($revised, _to_mpfr_object($_[1]));
+        }
+        else {
+          wrap_mpfr_printf(@_);
+        }
+      }
+      else {
+        wrap_mpfr_printf(@_);
+      }
+    }
 }
 
 sub Rmpfr_fprintf {
@@ -466,19 +483,43 @@ sub Rmpfr_fprintf {
       else {die "The third (of 4) arguments given to Rmpfr_fprintf() is not a valid rounding argument"}
     }
     else {die "Rmpfr_fprintf must take 3 or 4 arguments: filehandle, format string, [rounding,], and variable" if @_ != 3;
-    wrap_mpfr_fprintf(@_)}
+
+      if(WIN32_FMT_BUG) {
+        my $revised = _rewrite_fmt_arg($_[1]);
+        if($revised) {
+          wrap_mpfr_fprintf($_[0], $revised, _to_mpfr_object($_[2]));
+        }
+        else {
+          wrap_mpfr_fprintf(@_);
+        }
+      }
+      else {
+        wrap_mpfr_fprintf(@_);
+      }
+    }
 }
 
 sub Rmpfr_sprintf {
     my $len;
     if(@_ == 5){
-      if(_itsa($_[2]) == 2) {
+      if(_itsa($_[2]) == 2) { # IV
         $len = wrap_mpfr_sprintf_rnd(@_);
         return $len;
       }
       else {die "The third (of 5) arguments given to Rmpfr_sprintf() is not a valid rounding argument"}
     }
-    die "Rmpfr_sprintf must take 4 or 5 arguments: buffer, format string, [rounding,], variable and buffer size" if @_ != 4;
+    die "Rmpfr_sprintf must take 4 or 5 arguments: buffer, format string, [rounding,] variable and buffer size" if @_ != 4;
+
+    # If we've got to here then @_ should comprise of only 4 arguments.
+
+    if(WIN32_FMT_BUG) {
+      my $revised = _rewrite_fmt_arg($_[1]);
+      if($revised) {
+        $len = wrap_mpfr_sprintf($_[0], $revised, _to_mpfr_object($_[2]), $_[3]);
+        return $len;
+      }
+    }
+
     $len = wrap_mpfr_sprintf(@_);
     return $len;
 }
@@ -486,13 +527,24 @@ sub Rmpfr_sprintf {
 sub Rmpfr_snprintf {
     my $len;
     if(@_ == 6){
-      if(_itsa($_[3]) == 2) {
+      if(_itsa($_[3]) == 2) {  # IV
         $len = wrap_mpfr_snprintf_rnd(@_);
         return $len;
       }
       else {die "The fourth (of 6) arguments given to Rmpfr_snprintf() is not a valid rounding argument"}
     }
     die "Rmpfr_snprintf must take 5 or 6 arguments: buffer, bytes written, format string, [rounding,], variable and buffer size" if @_ != 5;
+
+    # If we've got to here then @_ should comprise of only 5 arguments.
+
+    if(WIN32_FMT_BUG) {
+      my $revised = _rewrite_fmt_arg($_[2]);
+      if($revised) {
+        $len = wrap_mpfr_snprintf($_[0], $_[1], $revised, _to_mpfr_object($_[3]), $_[4]);
+        return $len;
+      }
+    }
+
     $len = wrap_mpfr_snprintf(@_);
     return $len;
 }
@@ -1162,7 +1214,6 @@ sub _get_exp {
 *Rmpfr_randinit_lc_2exp      = \&Math::MPFR::Random::Rmpfr_randinit_lc_2exp;
 *Rmpfr_randinit_lc_2exp_size = \&Math::MPFR::Random::Rmpfr_randinit_lc_2exp_size;
 
-
 sub nvtoa {
   # Special handling required for DoubleDouble
   # Unable to get the _nvtoa XSub to work flawlessly with DoubleDoubles,
@@ -1453,8 +1504,40 @@ sub _decrement {
 
   my $ret = $r[1] ? $r[0] . 'e' . $r[1]
                   : $r[0];
-
   return $ret;
+}
+
+sub _rewrite_fmt_arg { # Called only if the constant WIN32_FMT_BUG is 1
+  my $arg = shift;
+  # First check for a match of (eg) "%La" or "%A"
+  # at the beginning of $arg.
+  if($arg =~ /^%L?[a,A]/) {
+    # Should not be multiple matches.
+    $arg =~ s/^%L?/%R/;
+    return $arg;
+  }
+
+  # Need to match (eg) "%La" or "%A", but also to NOT match (eg) "%%La" or "%%A".
+  if($arg =~ /[^%]%L?[a,A]/) {
+    # Should not be multiple matches.
+    my $and_init = $&;
+    my $temp = $&;
+    my $start = substr($temp, 0, 1, '');
+    $temp =~ s/^%L?/%R/;
+    $start .= $temp;
+    $arg =~ s/$and_init/$start/;
+    return $arg;
+  }
+  return ''; # Nothing to modify - no action necessary.
+}
+
+sub _to_mpfr_object { # Called only if the constant WIN32_FMT_BUG is 1
+                      # && _rewrite_fmt_arg returned a non-empty string.
+  my $prec = Rmpfr_get_default_prec();
+  Rmpfr_set_default_prec($Math::MPFR::NV_properties{bits});
+  my $arg = Math::MPFR->new($_[0]);
+  Rmpfr_set_default_prec($prec);
+  return $arg;
 }
 
 1;

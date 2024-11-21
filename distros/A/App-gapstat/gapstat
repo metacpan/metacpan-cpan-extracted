@@ -1,0 +1,170 @@
+#!/usr/bin/perl 
+use 5.014 ; use warnings ; 
+use Time::HiRes qw [ gettimeofday tv_interval ] ;
+my ${ dt_start } = [ gettimeofday ] ; 
+use Encode qw[ decode_utf8 encode_utf8 ] ; 
+use Getopt::Std ; getopts '@:=G:L:R:u:' , \my %o  ; 
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ; 
+use List::Util qw[ min max uniq ] ; 
+use Scalar::Util qw [ dualvar ]  ;  # dualvar は num, string の順である。
+use utf8 ; 
+
+* d3 = exists $o{','} && $o{','} eq 0 ? sub{$_[0]} : sub { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ;
+$/ = $o{R} ? "\r\n" : "\n" ;  # 入力の改行文字に関して。Windows形式なら -R 1 が指定されることになる。
+* decode = ($o{u}//'') ne 0 ? * decode_utf8 : sub ( $ ) { $_[0] } ; 
+binmode STDOUT , "utf8" unless ($o{u}//'') eq 0 ;
+$o{'@'} //= 15 ; # 何秒おきにアラームを発生させるか
+my $help = 0  ; # オンラインヘルプの文面の表示をしたか否か。
+my $readLines  ; # 読み取った行数
+
+$SIG{INT} = sub { exit } ;
+$SIG{ALRM} = sub { 
+  my $n = $.  =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr ; # 3桁ごとに区切る。
+  say STDERR GREEN "$. lines read ($Script). " , scalar localtime ; 
+  alarm $o{'@'} ;
+} ; 
+alarm $o{'@'} ;
+
+my %gd ; # Gap Distribution 間隙の広さについての分布。 $gd{ gap } で 間の広さが gap であるものの、頻度を格納。
+my %gw1 ; # w = Where ; それが発生した場所の最初
+my %gw2 ; # w = Where ; それが最後に発生した場所(行番号)。$gw2{gap} は gapの大きさの間隙が最後に生じた両端の場所と値を示す。
+my %g22 ; # $g2w{gap}により、大きさgapの間隙が生じた最後の場所の(始まりでなく)終わりについて、[w,v] で示す。
+
+
+# 以下の lc は、 longest chain . 
+our %lc ; #  @{ $lc{Gap} } により、dualvar n,"w:s"。何個(n)続いた、何行目(w)の文字列(s)。各Gapでnは出来るだけ大きく(長く)する。
+our %lc0 ; # @lc を算出するための、一時的な格納場所
+my $head = <> if $o{'='} ; 
+my $v1 ; # 1行目の値を格納する。
+my $prev ; # 直前の行について [ $. , $str ] を格納。 (ただし、[ , ] は dualvar である。
+while( <> ) { 
+  my $neof = 1 ; # 毎行読み取り終わった場合の、最後の処理が終わったら 1 になる。
+  $_ = decode ($_) ;
+  s/\s//g ; # chomp もしなくて良くなっている。
+  y/０-９/0-9/ unless ($o{u}//'') eq 0 ;  
+  my $gap = undef ; # 直前の行の内容数値との差分を格納する。
+  $v1 //= $_ ; # 1行目の値を格納する。
+  if ( defined $prev ) { 
+    $gap = $_ - ($prev.'') ;
+    $gd { $gap } ++ ; 
+    $gw1 { $gap } //= dualvar $prev , sprintf "%s ~ %s:%s" , $prev . '' , $. , $_ ; # <-- 数段階トリッキー。
+    $gw2 { $gap } =   dualvar $prev , sprintf "%s ~ %s:%s" , $prev . '' , $. , $_ ;
+    # next if ($o{L}//'') eq 0 ;
+    #$g22 { $gap } =   dualvar $. , $_  ;  # この変数は、2番目の出力表のための計算に使う。
+  }
+  next if ($o{L}//'') eq 0 ;
+  my $str = $_ ; 
+
+  sub d2 ($) { 
+    my $m = min grep { $_ > $_[0] } keys %g22 ;  
+    defined $m ? dualvar $.-$g22{$m} , sprintf "%g:%s",$g22{$m},$g22{$m} : dualvar -1+$., "1:$v1" ;
+  } 
+
+  #if ( ! defined $gap ) { $lc0 {Inf} = dualvar 1 , "$.:$str" ; $gd {Inf} = 0 ; next }  # $. の部分は 1 でも良いかも。 <-- - 
+  next if ! defined $gap ; 
+  if ( $gd { $gap } == 1 ) { # もしも、そのギャップの値での記録が 1 個つまり初めてだった時
+    #my $max = max grep { abs $gap >= $_ } map { abs $_ } keys %gd ; # max 関数の対象が空であれば、返り値は undef となる。
+    #$lc0 { abs $gap } = defined $max ? $lc0 { $max } : $lc0{Inf} ; # if defined $max ; 
+    $lc0 { abs $gap } //= & d2 ( abs $gap ) ; 
+    #print RED $gap ;
+  }
+
+  ULOOP : 
+  for ( uniq map { abs $_ } keys %gd ) {
+    if ( $_ < abs $gap && defined $lc0 { $_ } || $neof == 0 && defined $lc0 { $_ } )  {
+      sub se($$){ dualvar $_[0] , sprintf "%s ~ %s:%s" , $_[0].'', $_[1]+0, $_[1].'' } # 関数 start end のつもり。次でしか使わないので、ここに書いた。
+      my $put = se $lc0{$_}, $prev ; # $lc0{gap}で[連続長,最初の場所:最初の値] 。$prevは[$.,$_]。つまり、返り値は、[連続長,初所:初値 ~ 終所:終値]。
+      if ( !defined $lc{$_} || $lc{$_}[0] < $put ) {  @{ $lc{$_} } = ($put)  } # $lc{$_}が存在しないか、その中身が新しい連続長より短いなら、lc0で上書き。
+      #if ( !defined $lc{$_} || $lc{$_}[0] < $put ) {  push @{ $lc{$_} } , ($put)  } 
+      #elsif ( $lc{$_}[0] == $put )  { push @{ $lc{$_} } , $put } # $lc{$_}の中身について、連続長が $lc0{$_} に等しいなら、追加する。
+      elsif ( $lc{$_}[0] >= $put )  { push @{ $lc{$_} } , $put } 
+      undef $lc0 { $_ }  ; 
+    }elsif ( $_ >= abs $gap ) {
+      #$lc0 { $_ } = defined $lc0 { $_ } ? dualvar 1 + $lc0 { $_ } , $lc0 { $_ } : & d2 ($gap)  ;
+      $lc0{$_} = defined $lc0{$_} ? dualvar 1+$lc0{$_} , $lc0{$_} : dualvar 2,  ($prev+0).":".$prev ; #"$.:$str" ;  # 0 ,
+    }
+  }
+  $g22 { $gap } = dualvar $. , $_  ;  # この変数は、2番目の出力表のための計算に使う。
+  #$g22 { $gap } = dualvar $prev , $prev ; 
+  $prev = dualvar $. , $_  and $neof = 0 or goto ULOOP if eof && $neof ; # and or xor は、やり過ぎかもか。
+  
+} continue {
+  $prev = dualvar $. , $_ ; #
+}   
+& gap1output unless ($o{G}//'') eq 0 ; 
+exit 0 if ($o{L}//'') eq 0 ; 
+
+
+sub f ($) { my $t = sprintf "%.12f" , $_[0] ; $t =~ s/\.?0*$//r } # 12桁にして、末尾からの0を削る
+
+# 出力2. longest length と max gap #### 
+say join "\t", map { UNDERLINE $_ }  "|gap|<=" , "maxlen" , "line:content (length)" ; 
+for ( grep { $_ != "Inf" } sort { $a <=> $b } uniq map { abs $_ } keys %gd  ) { 
+  my @chains = defined $lc{$_} ? @{ $lc {$_} } : () ; # それだけの $_ つまり max abs gap を持つものの、リストを取り出す。
+  #my $Length = defined $chains[0] ? $chains [0] +0 : "NA" ; # 本当は(バグってなければ)、どの要素を取ってきても良い。その数値部分(dualvar) を取り出す。それは最長長さ。
+  my $Length = max map { $_ + 0 } @chains ;
+  say join "\t" , f $_ , $Length, map{ sprintf "%s (%g)", $_ , $_ } @chains ; # join の中では、テキストコンテクスト。
+}
+
+sub gap1output () { # 出力1. Gapsの出力 
+  say join "\t", map { UNDERLINE $_ } 'gap', 'freq' , 'first' , 'last (line:content by "start ~ end")' ; 
+  for ( grep { $_ != "Inf" } sort { $a <=> $b } keys %gd ) {
+    say join "\t" , f $_ , $gd { $_ }, & ww ( $gw1{$_} , $gw2{$_} ) ; 
+  }
+}
+# 関数 where から where 
+sub ww ( $$ ) { 
+  my ($n1,$n2,$w1,$w2) = ( $_[0].'' , $_[1].'' , $_[0]+0, $_[1]+0 ) ;
+  return $w1 == $w2 ? "$w1:$n1" : "$w1:$n1\t$w2:$n2" ; 
+}
+
+END {
+  exit if $help ;
+  my $procsec = sprintf "%.5f", tv_interval ${ dt_start } ; #time - $time0 ; # このプログラムの処理にかかった秒数。比較する2個の時刻は秒単位なので、±1秒未満の誤差は発生する。
+  $readLines //= $. ; # Ctrl+Cの連打で必要となる処理。
+  return if ($o{2}//'') eq 0 ; 
+  my $linenumeral = $readLines > 1 ? 'lines' : 'line' ; 
+  print STDERR BOLD FAINT ITALIC d3 ( $readLines ) . " $linenumeral read" ; 
+  my $s = tv_interval $dt_start , [ gettimeofday ] ; 
+  say STDERR BOLD FAINT ITALIC " -- $Script ; " . $procsec . " seconds in process" ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+=encoding utf8
+
+=head1 $0 
+
+改行区切りで数値を読み取る。主な使い方は、連番でない場所を見つける。
+ * 最も大きな空き(整数の抜けている箇所)を見つける。
+ * 最も長い連続した(i.e.空きのない) 数の連続を見つける。
+ 2個の出力表が出力される。
+  (1) 1番目の出力表は、全ての行が直前の行と、どれだけの数値の違いδがあったかについての、頻度と、そのようになった例(最初と最後の出現)を表す。
+  (2) 2番目の出力表は、そのδについて、いろいろな閾値θに対して、δ≦θとなったものが、何行連続して出現したかを、できるだけ長く連続した例を示す(実装として不完全)。
+
+オプション : 
+ -=     : 1行目を読み飛ばす。
+ -G 0   : ギャップ(間隙)の統計表を出力しない。(2番目の表示を見やすくするため)
+ -L 0   ; 2番目の出力表(許容ギャップごとに数列の最大長とその例を示す)を出力しない。このことで計算量が節約出来る。
+ -R 1   : 改行文字が Windows 形式 すなわち \r\n に対応。
+ -u 0   : utf8と見なさない。全角の０から９までを数値と見なすことをしない(実験的であり今後の開発のために残す)。
+ -@ N   : N秒おきにどこまで読み取ったかを、標準エラー出力に出力する。
+ --help : このオンラインヘルプの文面を表示する。
+
+開発メモ : 
+  * 2番目の表の値の出し方に少し不具合はある。ある新しいδの値の出現が遅いほど、同じ値をθとした場合に、連続した具体例が前半にあった場合に見落としてしまう。
+  * 単純な数値以外でも、eやfを使った科学的表記や、日付や時刻にも対応したい(変換関数をオプションで受け付けるようにしたい)。
+
+=cut

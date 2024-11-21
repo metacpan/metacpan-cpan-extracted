@@ -1,3 +1,7 @@
+Travel::Routing::DE::HAFAS 0.09 - Wed Nov 20 2024
+
+    * Improve handling of backend messages and errors
+
 Travel::Routing::DE::HAFAS 0.08 - Tue Jun 11 2024
 
     * Adjust walking connection segment handling for DB HAFAS update on

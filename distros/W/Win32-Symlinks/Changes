@@ -13,3 +13,5 @@ Revision history for Win32-Symlinks
         Updated test files to run without Perlmazing
 0.10    2021-05-01
         Upagraded from Win32::Shortcut to Parse::Lnk (cross platform)
+0.12    2024-11-21
+        Fixed a bug related to unlink (it was accepting only one argument)

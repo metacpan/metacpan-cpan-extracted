@@ -2,7 +2,9 @@ use v5.40;
 use Test2::V0;
 use HTTP::Request::Common;
 
+use Minima;
 use Minima::Setup;
+use Plack::Test;
 
 my $test = Minima::Setup::test;
 
@@ -20,7 +22,7 @@ ok( length($res->content), 'respects config for auto HEAD' );
 # Move to the complex example in eg/
 {
     chdir 'eg';
-    $Minima::Setup::app->_read_config; # refresh config in new dir
+    $test = Plack::Test->create(Minima::init);
 
     local @INC = ( 'lib', @INC );
     local %ENV = %ENV;

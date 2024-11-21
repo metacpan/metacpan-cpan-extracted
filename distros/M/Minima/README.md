@@ -4,8 +4,8 @@ Efficient web framework build with modern core classes.
 
 _app.psgi_
 
-    use Minima::Setup;
-    \&Minima::Setup::init;
+    use Minima;
+    Minima::init;
 
 For a `hello, world`:
 

@@ -1,0 +1,28 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::Util {
+  
+  use Net::SSLeay;
+  
+  static method dump_peer_certificate : string ($ssl : Net::SSLeay) {
+    
+    unless ($ssl) {
+      die "The SSL object \$ssl must be defined.";
+    }
+    
+    my $cert = $ssl->get_peer_certificate;
+    
+    unless ($cert) {
+      die "No cert is defined.";
+    }
+    
+    my $subject_name = $cert->get_subject_name->oneline;
+    
+    my $issuer_name = $cert->get_issuer_name->oneline;
+    
+    my $dump = "Subject Name: $subject_name\nIssuer  Name: $issuer_name\n";
+    
+    return $dump;
+  }
+}

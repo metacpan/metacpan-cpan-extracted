@@ -6,6 +6,7 @@ build_requires:
   Class::Simple: '0'
   ExtUtils::MakeMaker: '0'
   Test::Deep: '0'
+  Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
@@ -32,9 +33,10 @@ no_index:
 requires:
   Carp: '0'
   DateTime: '0'
+  DateTime::Format::Flexible: '0'
   perl: '5.006002'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Text
   repository: git://github.com/nigelhorne/DateTime-Format-Text.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,8 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::Callback::NextProtoSelect : interface_t {
+  use Net::SSLeay;
+  
+  required method : int ($ssl : Net::SSLeay, $out : string[], $outlen_ref : int*, $in : string, $inlen : int, $arg : object);
+}

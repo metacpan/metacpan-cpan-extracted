@@ -11,6 +11,12 @@ method render
     "hello, world\n";
 }
 
+method prepare_response ($response)
+{
+    carp "Base view prepare_response` called.";
+    undef;
+}
+
 __END__
 
 =head1 NAME
@@ -22,17 +28,47 @@ Minima::View - Base class for views used with Minima
 This class serves as a base for views used with L<Minima>. It is not
 intended to be used directly but rather to be subclassed.
 
-It currently implements a single method: C<render>, which should not be
-called on this base class. (Perhaps, with roles in Perl core in the
-future, this class might become unnecessary.)
+It currently implements two methods: L<C<render>|/render> and
+L<C<prepare_response>|/prepare_response>, which should not be called on
+this base class. (Perhaps, with roles in Perl core in the future, this
+class might become unnecessary.)
 
-For HTML views, see L<Minima::View::HTML>.
+=head2 Subclasses
+
+These views are built into Minima by default:
+
+=over 4
+
+=item L<Minima::View::HTML>
+
+For rendering HTML content, includes utility methods.
+
+=item L<Minima::View::JSON>
+
+For creating JSON responses.
+
+=item L<Minima::View::PlainText>
+
+For plain text output.
+
+=back
+
+For HTML views, see L<Minima::View::HTML>. For JSON, see
+L<Minima::View::JSON>.
 
 =head1 METHODS
 
 =head2 new
 
 Constructs a new object. No arguments required.
+
+=head2 prepare_response
+
+    method prepare_response ($response)
+
+Prepares the provided L<Plack::Response> object for finalizing.
+Subclasses may use this method to set the I<Content-Type> header, for
+example.
 
 =head2 render
 

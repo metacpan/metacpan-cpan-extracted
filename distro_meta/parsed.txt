@@ -95255,3 +95255,15 @@ T/TA/TAPPER/Tapper-MCP-5.0.9.tar.gz
 T/TA/TAPPER/Tapper-Schema-5.0.12.tar.gz
 T/TA/TAPPER/Tapper-Reports-Web-5.0.17.tar.gz
 U/UT/UTASHIRO/Text-ANSI-Fold-2.2701.tar.gz
+T/TU/TULAMILI/App-gapstat-0.010.tar.gz
+T/TU/TULAMILI/App-coldigits-0.012.tar.gz
+P/PM/PMB/Sentry-SDK-1.3.9.tar.gz
+B/BI/BINGOS/CPAN-Perl-Releases-5.20241120.tar.gz
+N/NH/NHORNE/DateTime-Format-Text-0.09.tar.gz
+S/SI/SISYPHUS/Math-MPFR-4.32.tar.gz
+T/TE/TESSARIN/Minima-v0.4.0.tar.gz
+B/BI/BINGOS/Module-CoreList-5.20241120.tar.gz
+K/KI/KIMOTO/SPVM-Net-SSLeay-0.016.tar.gz
+U/UT/UTASHIRO/Text-ANSI-Fold-Util-1.04.tar.gz
+D/DE/DERF/Travel-Routing-DE-HAFAS-0.09.tar.gz
+Z/ZA/ZARABOZO/Win32-Symlinks-0.12.tar.gz

@@ -1,24 +1,24 @@
-package App::coldigits ;  
-our $VERSION = '0.011' ; 
-our $DATE = '2024-03-16T23:27+09:00' ; 
+package App::zerogap ;  
+our $VERSION = '0.012' ; 
+our $DATE = '2024-11-21T18:35+09:00' ; 
 
 =encoding utf8
 
 =head1 NAME
 
-App::coldigits - TSVファイルの各列が何桁のものが何件あったかを、行列状に示す。
+App::zerogap - TSVファイルの各列が何桁のものが何件あったかを、行列状に示す。
 
 =head1 SYNOPSIS
 
-This module provides a Unix-like command `F<coldigits>'. 
+This module provides a Unix-like command `F<zerogap>'. 
 
 =head1 DESCRIPTION
 
 =head1 SEE ALSO
 
-coldigits --help
-man coldigits
-perldoc coldigits
+zerogap --help
+man zerogap
+perldoc zerogap
 
 =cut
 

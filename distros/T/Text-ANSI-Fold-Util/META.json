@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.45",
-            "Text::ANSI::Fold" : "2.26",
+            "Text::ANSI::Fold" : "2.2701",
             "Text::ANSI::Tabs" : "1.06",
             "perl" : "v5.14.0"
          }
@@ -57,7 +57,7 @@
    "provides" : {
       "Text::ANSI::Fold::Util" : {
          "file" : "lib/Text/ANSI/Fold/Util.pm",
-         "version" : "1.02"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/tecolicom/Text-ANSI-Fold-Util"
       }
    },
-   "version" : "1.02",
+   "version" : "1.04",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
