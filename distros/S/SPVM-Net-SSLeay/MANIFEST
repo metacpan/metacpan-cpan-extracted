@@ -142,6 +142,10 @@ lib/SPVM/Net/SSLeay/OPENSSL.c
 lib/SPVM/Net/SSLeay/OPENSSL.config
 lib/SPVM/Net/SSLeay/OPENSSL.pm
 lib/SPVM/Net/SSLeay/OPENSSL.spvm
+lib/SPVM/Net/SSLeay/OPENSSL_INIT.c
+lib/SPVM/Net/SSLeay/OPENSSL_INIT.config
+lib/SPVM/Net/SSLeay/OPENSSL_INIT.pm
+lib/SPVM/Net/SSLeay/OPENSSL_INIT.spvm
 lib/SPVM/Net/SSLeay/OPENSSL_INIT_SETTINGS.c
 lib/SPVM/Net/SSLeay/OPENSSL_INIT_SETTINGS.config
 lib/SPVM/Net/SSLeay/OPENSSL_INIT_SETTINGS.pm
@@ -174,16 +178,6 @@ lib/SPVM/Net/SSLeay/SSL_SESSION.c
 lib/SPVM/Net/SSLeay/SSL_SESSION.config
 lib/SPVM/Net/SSLeay/SSL_SESSION.pm
 lib/SPVM/Net/SSLeay/SSL_SESSION.spvm
-lib/SPVM/Net/SSLeay/Util.pm
-lib/SPVM/Net/SSLeay/Util.spvm
-lib/SPVM/Net/SSLeay/Util/OCSP.pm
-lib/SPVM/Net/SSLeay/Util/OCSP.spvm
-lib/SPVM/Net/SSLeay/Util/PKCS12.pm
-lib/SPVM/Net/SSLeay/Util/PKCS12.spvm
-lib/SPVM/Net/SSLeay/Util/X509.c
-lib/SPVM/Net/SSLeay/Util/X509.config
-lib/SPVM/Net/SSLeay/Util/X509.pm
-lib/SPVM/Net/SSLeay/Util/X509.spvm
 lib/SPVM/Net/SSLeay/X509.c
 lib/SPVM/Net/SSLeay/X509.config
 lib/SPVM/Net/SSLeay/X509.pm

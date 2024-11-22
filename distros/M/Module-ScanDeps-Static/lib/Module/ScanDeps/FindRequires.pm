@@ -11,7 +11,7 @@ use English qw(-no_match_vars);
 use File::Find;
 use File::Temp qw(tempfile);
 use File::Basename qw(fileparse);
-use List::Util qw(any none);
+use List::Util qw(any none uniq);
 use JSON;
 use Module::ScanDeps::Static;
 use Scalar::Util qw(reftype);
@@ -28,7 +28,7 @@ Readonly::Scalar our $FAILURE => 1;
 
 Readonly::Scalar our $MIN_PERL_VERSION => '5.10.1';
 
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 
 use parent qw(CLI::Simple);
 
@@ -66,7 +66,7 @@ sub find_requires {
 
     my $scanner = Module::ScanDeps::Static->new(
       { core             => $include_core,
-        include_require  => $TRUE,
+        include_require  => $self->get_include_require,
         path             => $f,
         min_core_version => $min_perl_version,
       }
@@ -242,7 +242,7 @@ sub get_file_listing {
             if @exclude_paths && any { $File::Find::dir =~ /^$_/xsm } @exclude_paths;
 
           return
-            if /^[.]/xsm || !/[.]p(:?m|l)$/xsm;
+            if /^[.]/xsm || !/[.]p(?:[ml])$/xsm;
 
           die 'done'
             if !$self->get_recurse && $path ne $File::Find::dir;
@@ -367,7 +367,30 @@ sub list_requires {
 
   my $requires = $self->find_requires( files => $self->list_files( format => $EMPTY ) );
 
+  $requires = $self->filter_provided($requires);
+
   return $self->_format( $requires, format => $format );
+}
+
+########################################################################
+sub filter_provided {
+########################################################################
+  my ( $self, $requires ) = @_;
+
+  my @provided = grep { $_ !~ /[.]pl$/xsm } @{ $self->get_file_listing( path => $self->get_path ) };
+
+  my @packages = uniq $self->get_package_list( files => \@provided );
+
+  my %modules = map { $_->{name} => 1 } @{$requires};
+
+  foreach (@packages) {
+    next
+      if !$modules{$_};
+
+    delete $modules{$_};
+  }
+
+  return [ grep { $modules{ $_->{name} } } @{$requires} ];
 }
 
 ########################################################################
@@ -675,13 +698,14 @@ sub main {
     progress-bar|P!
     recurse|R!
     requires|r=s
+    include-require|i!
     update|u
     versions|v
   );
 
   my $cli = Module::ScanDeps::FindRequires->new(
     option_specs    => \@option_specs,
-    default_options => { path => getcwd },
+    default_options => { path => getcwd, 'include-require' => $TRUE },
     extra_options   => [qw(files packages requires_map filter_list)],
     commands        => {
       'create-cpanfile' => \&create_cpanfile,

@@ -1,0 +1,24 @@
+bin/stouch
+Changes
+examples/pl.template
+examples/raku.template
+lib/App/Stouch.pm
+lib/App/Stouch/Template.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/01_init.t
+t/10_stouch.t
+t/data/ideality/t.c
+t/data/ideality/t.dir/1.txt
+t/data/ideality/t.dir/2/3.txt
+t/data/ideality/t.dir/6.txt
+t/data/ideality/t.pl
+t/data/templates/c.template
+t/data/templates/dir.template/1.txt
+t/data/templates/dir.template/2/3.txt
+t/data/templates/dir.template/6.txt
+t/data/templates/pl.template

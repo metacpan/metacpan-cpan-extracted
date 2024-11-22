@@ -13,13 +13,13 @@ Neo4j::Driver::Net - Explains the design of the networking modules
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 OVERVIEW
 
 I<This document will be removed from the CPAN distribution with the
 next major update. It will continue to be available
-L<on GitHub|https://github.com/johannessen/neo4j-driver-perl/blob/0.51/lib/Neo4j/Driver/Net.pod>.>
+L<on GitHub|https://github.com/johannessen/neo4j-driver-perl/blob/0.52/lib/Neo4j/Driver/Net.pod>.>
 
 Each L<Neo4j::Driver::Session> has exactly one network controller
 instance that is used by the session and all of its transactions
@@ -102,8 +102,8 @@ bless result data records as L<Neo4j::Driver::Record> objects.
 Result handlers are also responsible that all values returned
 from Neo4j are provided to users in the format that is documented
 for L<Neo4j::Driver::Record/"get">. For backwards compatibility,
-a lot of the internal data structures currently match the format
-of Neo4j JSON responses.
+a lot of the internal data structures currently (0.52) match the
+format of Neo4j JSON responses.
 
 The first HTTP connection to a Neo4j server is always made to the
 L<Discovery API|https://neo4j.com/docs/http-api/4.2/discovery/>,
@@ -138,7 +138,7 @@ on the behaviour of L<Neo4j::Bolt>.
 
 =head1 COMPATIBILITY
 
-L<Neo4j::Driver> S<version 0.51> is compatible with
+L<Neo4j::Driver> S<version 0.52> is compatible with
 S<L<Neo4j::Bolt> 0.01> or later.
 Note that some L<Neo4j::Bolt> and L<Neo4j::Client> versions are
 broken, or simply incompatible with each other. Recommended pairs
@@ -153,12 +153,12 @@ of known-good module versions are as follows:
   0.20    0.17  3.4
   0.12     -    3.4  (system libneo4j-client)
 
-When using HTTP, S<L<Neo4j::Driver> 0.51> supports determining the
+When using HTTP, S<L<Neo4j::Driver> 0.52> supports determining the
 version of any Neo4j server via L<Neo4j::Driver::Session/"server">.
 This even works on S<Neo4j 1.x>, but running statements on
 S<Neo4j 1.x> will fail, because it lacks the transactional API.
 
-S<L<Neo4j::Driver> 0.51> is compatible with Neo4j S<versions 2.x>,
+S<L<Neo4j::Driver> 0.52> is compatible with Neo4j S<versions 2.x>,
 3.x, S<4.x, and 5.x>. It supports HTTP responses in the
 L<formats|https://neo4j.com/docs/http-api/4.4/actions/result-format/>
 JSON and Jolt (strict and sparse, line-delimited and sequenced).
@@ -283,7 +283,7 @@ see L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS">.
 =head2 Custom HTTP networking modules
 
 L<Neo4j::Driver> includes a default HTTP network adapter.
-The included adapter may change in future. As of S<version 0.51>,
+The included adapter may change in future. As of S<version 0.52>,
 the default adapter uses L<LWP> directly. Versions earlier
 S<than 0.21> used L<REST::Client>.
 

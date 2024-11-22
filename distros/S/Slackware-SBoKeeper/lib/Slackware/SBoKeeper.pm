@@ -1,6 +1,6 @@
 package Slackware::SBoKeeper;
 use 5.016;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 use strict;
 use warnings;
 
@@ -216,7 +216,10 @@ sub missing {
 
 	foreach my $p ($self->packages('all')) {
 
-		my @pmissing = grep { !$self->has($_) } $self->real_immediate_dependencies($p);
+		my @pmissing =
+			grep { !$self->has($_) }
+			$self->real_immediate_dependencies($p);
+
 		push @{$missing{$p}}, @pmissing if @pmissing;
 
 	}
@@ -237,7 +240,9 @@ sub extradeps {
 
 		my %realdeps = map { $_ => 1 } $self->real_immediate_dependencies($p);
 
-		my @pextra = grep { !defined $realdeps{$_} } $self->immediate_dependencies($p);
+		my @pextra =
+			grep { !defined $realdeps{$_} }
+			$self->immediate_dependencies($p);
 
 		push @{$extra{$p}}, @pextra if @pextra;
 
@@ -260,17 +265,17 @@ sub is_necessary {
 		return 1;
 	}
 
-	my @manuals = grep { $self->is_manual($_) } $self->packages();
-
-	return (any { $self->is_dependency($pkg, $_) } @manuals) ? 1 : 0;
+	# Check if $pkg is a dependency of any manually installed package
+	return (any { $self->is_dependency($pkg, $_) } $self->packages('manual'))
+		? 1 : 0;
 
 }
 
 sub is_dependency {
 
 	my $self = shift;
-	my $dep =  shift;
-	my $of =   shift;
+	my $dep  = shift;
+	my $of   = shift;
 
 	foreach my $p (@{$self->{_data}->{$of}->{Deps}}) {
 

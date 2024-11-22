@@ -1,0 +1,28 @@
+Changes
+charts/bar.png
+INSTALL.md
+lib/Chart/ECharts.pm
+lib/Chart/ECharts/Bar.pm
+lib/Chart/ECharts/Base.pm
+lib/Chart/ECharts/Candlestick.pm
+lib/Chart/ECharts/Donut.pm
+lib/Chart/ECharts/Gauge.pm
+lib/Chart/ECharts/Line.pm
+lib/Chart/ECharts/Parallel.pm
+lib/Chart/ECharts/Pie.pm
+lib/Chart/ECharts/Radar.pm
+lib/Chart/ECharts/Scatter.pm
+lib/Chart/ECharts/StackedBar.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+share/package.json
+share/render.cjs
+t/00-load.t
+t/kwalitee.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -13,7 +13,7 @@ Neo4j::Driver::Deprecations - Explains features that have been deprecated, but n
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 OVERVIEW
 
@@ -24,7 +24,7 @@ that are deprecated, but still working for completeness' sake,
 briefly explains the reason for their deprecation, and suggests
 alternatives where possible.
 
-The intention is that most deprecated features will be removed with
+The intention is that all deprecated features will be removed with
 the next major update to L<Neo4j::Driver>, likely in December 2024.
 
 =head1 Neo4j::Driver
@@ -621,6 +621,31 @@ Originally added in 0.02 as an experimental feature.>
 All resources opened by the Perl driver are closed automatically once
 they are no longer required. Explicit calls to C<close()> are neither
 required nor useful.
+
+=head2 Concurrent transactions in default HTTP sessions
+
+I<Deprecated in version 0.39 and to be removed in 1.00.
+Originally added in 0.01 as an experimental feature.>
+
+ $session = Neo4j::Driver->new({
+   concurrent_tx => 0,  # or unset
+   uri => 'http://...',
+ })->session;
+ $tx1 = $session->begin_transaction;
+ $tx2 = $session->begin_transaction;  # error
+ $tx3 = $session->run(...);           # error
+
+The driver allows concurrent transactions on HTTP, but only when the
+C<concurrent_tx> config option is enabled. This config option was
+added in S<version 0.30>, along with a warning that concurrent
+transactions I<without> setting C<concurrent_tx> might become fatal.
+In S<version 0.39>, the default value for C<concurrent_tx> changed
+to C<0> and the warning was updated to say that it I<will> become
+fatal.
+
+Making concurrent transactions without C<< concurrent_tx => 1 >>
+fatal will force users to be explicit about their intentions.
+This should improve interoperability between HTTP and Bolt.
 
 =head1 Neo4j::Driver::StatementResult
 

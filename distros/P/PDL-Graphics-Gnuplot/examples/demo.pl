@@ -37,7 +37,6 @@ sub prompt {
 
 $w=gpwin(x11);
 
-
 $w->plot($x**2);
 prompt("A simple parabola");
 
@@ -85,6 +84,14 @@ $w->plot(cbmin => -600, cbmax => 600, title=>"Variable pointsize",
 	 $x, $x/2, (10-abs($x))/2);
 prompt("Variable pointsize");
 
+## filled curve
+$w->plot(
+    { with => 'filledcurves', fc => 'red', below => 'y=0' },
+    -$x, (-$x)**3,
+    { with => 'filledcurves', fillcolor => 'green', above => 'y=0' },
+    $x, ($x)**3
+);
+prompt("Area curve with filled colors");
 
 ################################
 # some 3d stuff

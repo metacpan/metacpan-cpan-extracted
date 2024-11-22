@@ -1,5 +1,8 @@
 Revision history for Net-IP-XS
 
+0.23    22 November 2024
+        - Fix trailing zero issue (causes problems on M2 hardware).
+
 0.22    24 January 2023
         - Fix uninitialised buffer problem (Github #4).
 

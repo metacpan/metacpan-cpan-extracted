@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,10 +24,10 @@ requires:
   File::Path: '0'
   File::Spec: '0'
   Getopt::Long: '0'
-  List::Util: '1.33'
+  List::Util: '1.45'
   perl: '5.016'
 resources:
   bugtracker: https://codeberg.org/1-1sam/sbokeeper/issues
   repository: https://codeberg.org/1-1sam/sbokeeper.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

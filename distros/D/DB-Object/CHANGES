@@ -1,5 +1,8 @@
 Revision history for Perl module DB::Object
 
+v1.4.4 2024-11-22T16:36:08+0900
+    - Updated the private method _convert_datetime2object in DB::Object::Postgres to set the right default format
+
 v1.4.3 2024-09-06T17:33:04+0900
     - Correcting unit test
 

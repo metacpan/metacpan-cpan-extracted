@@ -3,4 +3,7 @@
 
 class Net::SSLeay::ASN1_TIME : pointer {
   
+  # Instance Methods
+  native method DESTROY : void ();
+  
 }

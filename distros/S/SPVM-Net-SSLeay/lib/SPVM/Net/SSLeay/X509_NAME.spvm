@@ -21,4 +21,5 @@ class Net::SSLeay::X509_NAME : pointer {
   native method get_text_by_NID : int ($nid : int, $buf : mutable string, $len : int = -1);
   
   native method DESTROY : void ();
+  
 }

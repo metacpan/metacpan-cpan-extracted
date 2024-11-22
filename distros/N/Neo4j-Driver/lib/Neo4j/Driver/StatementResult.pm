@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Driver::StatementResult;
 # ABSTRACT: DEPRECATED (renamed to Neo4j::Driver::Result)
-$Neo4j::Driver::StatementResult::VERSION = '0.51';
+$Neo4j::Driver::StatementResult::VERSION = '0.52';
 
 1;
 

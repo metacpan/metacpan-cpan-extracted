@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Driver::Type::Temporal;
 # ABSTRACT: DEPRECATED (use DateTime / Duration instead)
-$Neo4j::Driver::Type::Temporal::VERSION = '0.51';
+$Neo4j::Driver::Type::Temporal::VERSION = '0.52';
 
 1;
 

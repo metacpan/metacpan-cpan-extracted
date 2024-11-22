@@ -1,3 +1,6 @@
+2.032 2024-11-21
+- add filledcurves with above/below threshold and fillcolor (#105) - thanks @vikasnkumar
+
 2.031 2024-10-28
 - add default SIG{TERM,INT,QUIT,HUP} handler to close more gracefully
 - handle glx etc warnings from Gnuplot (https://github.com/PDLPorters/PDL-Graphics-Simple/issues/10) - thanks @eserte for report

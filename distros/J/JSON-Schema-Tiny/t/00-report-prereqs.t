@@ -72,6 +72,7 @@ my @include = qw(
   Cpanel::JSON::XS
   JSON::XS
   Mojolicious
+  builtin
 );
 
 my @exclude = qw(

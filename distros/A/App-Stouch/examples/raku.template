@@ -1,0 +1,10 @@
+#!/usr/bin/env raku
+
+my $SCRIPT = "{{script_name}}";
+my $VER    = "{{script_ver}}";
+
+multi sub MAIN() {
+
+	say "$SCRIPT - $VER";
+
+}

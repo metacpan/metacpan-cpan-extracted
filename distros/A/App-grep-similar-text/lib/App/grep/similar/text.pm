@@ -11,9 +11,9 @@ use Perinci::Sub::Util qw(gen_modified_sub);
 use Text::Levenshtein::XS;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-18'; # DATE
+our $DATE = '2024-11-20'; # DATE
 our $DIST = 'App-grep-similar-text'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -76,6 +76,7 @@ MARKDOWN
         ];
 
         $meta->{links} = [
+            {url => 'prog:grep-sounds-like'},
         ];
     },
     output_code => sub {
@@ -143,7 +144,7 @@ App::grep::similar::text - Print lines similar to the specified text
 
 =head1 VERSION
 
-This document describes version 0.001 of App::grep::similar::text (from Perl distribution App-grep-similar-text), released on 2024-01-18.
+This document describes version 0.002 of App::grep::similar::text (from Perl distribution App-grep-similar-text), released on 2024-11-20.
 
 =head1 FUNCTIONS
 
@@ -172,11 +173,19 @@ Specify when to show color (never, always, or autoE<sol>when interactive).
 
 =item * B<count> => I<true>
 
-Supress normal output, return a count of matching lines.
+Supress normal output; instead return a count of matching lines.
 
 =item * B<files> => I<array[filename]>
 
 (No description)
+
+=item * B<files_with_matches> => I<true>
+
+Supress normal output; instead return filenames with matching lines; scanning for each file will stop on the first match.
+
+=item * B<files_without_match> => I<true>
+
+Supress normal output; instead return filenames without matching lines.
 
 =item * B<ignore_case> => I<bool>
 

@@ -1,5 +1,5 @@
 package Slackware::SBoKeeper::DataFile;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 use 5.016;
 use strict;
 use warnings;

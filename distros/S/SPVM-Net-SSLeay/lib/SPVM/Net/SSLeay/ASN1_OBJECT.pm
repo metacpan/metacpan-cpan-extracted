@@ -16,6 +16,14 @@ Net::SSLeay::ASN1_OBJECT class in L<SPVM> represents L<ASN1_OBJECT|https://docs.
 
   use Net::SSLeay::ASN1_OBJECT;
 
+=head1 Instance Methods
+
+=head2 DESTROY
+
+C<method DESTROY : void ();>
+
+Calls native L<ASN1_OBJECT_free|https://docs.openssl.org/3.1/man3/ASN1_OBJECT_new/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+
 =head1 See Also
 
 =over 2

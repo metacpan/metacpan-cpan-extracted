@@ -16,6 +16,14 @@ Net::SSLeay::ASN1_TIME class in L<SPVM> represents L<ASN1_TIME|https://docs.open
 
   use Net::SSLeay::ASN1_TIME;
 
+=head1 Instance Methods
+
+=head2 DESTROY
+
+C<method DESTROY : void ();>
+
+Calls native L<ASN1_TIME_free|https://pub.sortix.org/sortix/release/nightly/man/man3/ASN1_TIME_free.3.html> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+
 =head1 See Also
 
 =over 2

@@ -38,7 +38,7 @@ int32_t SPVM__${class_name_c}__$constant_name(SPVM_ENV* env, SPVM_VALUE* stack) 
   stack[0].ival = $constant_name;
   return 0;
 #else
-  env->die(env, stack, "$constant_name is not defined on this system", __func__, FILE_NAME, __LINE__);
+  env->die(env, stack, "$constant_name is not defined on the system", __func__, FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
 #endif
   
@@ -52,9 +52,9 @@ EOS
     my $output = <<"EOS";
 =head2 $constant_name
 
-  static method $constant_name : int ();
+C<static method $constant_name : int ();>
 
-Gets the value of C<$constant_name>. If this constant value is not defined on this system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+Returns the value of C<$constant_name>. If this constant is not defined on the system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
 EOS
     

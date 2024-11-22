@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/grep/similar/text.pm','script/grep-similar-text'];
+my $filenames = ['lib/App/grep/similar/text.pm','script/grep-similar-text','script/grep-similar-to'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -9,6 +9,7 @@ my $build = Module::Build->new(
         'Data::Dumper' => '2.1',
         'File::Share' => '0.27',
         'Hash::MultiValue', '0.16',
+        'JSON' => '4.10',
         'Path::Tiny' => '0.142',
         'Plack' => '1.0050',
         'Router::Simple' => '0.17',

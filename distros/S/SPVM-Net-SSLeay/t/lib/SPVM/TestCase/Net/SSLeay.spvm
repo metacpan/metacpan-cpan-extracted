@@ -14,7 +14,9 @@ class TestCase::Net::SSLeay {
   
   static method test : int () {
     
-    Net::SSLeay->_print_version_text;
+    my $version = SSL->OPENSSL_VERSION_TEXT;
+    
+    warn "[Test Output]OpenSSL version:$version";
     
     # Socket
     my $host = "www.google.com";

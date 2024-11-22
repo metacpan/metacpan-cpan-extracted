@@ -48,8 +48,8 @@ B<Note:> Minima::View::JSON encodes data as UTF-8.
 
     method new (app)
 
-Creates a new instance of the class. Expects a L<Minima::App> reference
-as the C<app> parameter.
+Creates a new instance of the class. Expects a L<Minima::App> object as
+the C<app> parameter.
 
 =head2 prepare_response
 

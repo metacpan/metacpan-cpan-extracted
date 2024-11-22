@@ -2,8 +2,8 @@ NAME
     App::grep::similar::text - Print lines similar to the specified text
 
 VERSION
-    This document describes version 0.001 of App::grep::similar::text (from
-    Perl distribution App-grep-similar-text), released on 2024-01-18.
+    This document describes version 0.002 of App::grep::similar::text (from
+    Perl distribution App-grep-similar-text), released on 2024-11-20.
 
 FUNCTIONS
   grep_similar_text
@@ -28,11 +28,21 @@ FUNCTIONS
 
     *   count => *true*
 
-        Supress normal output, return a count of matching lines.
+        Supress normal output; instead return a count of matching lines.
 
     *   files => *array[filename]*
 
         (No description)
+
+    *   files_with_matches => *true*
+
+        Supress normal output; instead return filenames with matching lines;
+        scanning for each file will stop on the first match.
+
+    *   files_without_match => *true*
+
+        Supress normal output; instead return filenames without matching
+        lines.
 
     *   ignore_case => *bool*
 

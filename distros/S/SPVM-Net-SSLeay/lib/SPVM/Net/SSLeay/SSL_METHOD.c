@@ -50,10 +50,6 @@ int32_t SPVM__Net__SSLeay__SSL_METHOD__SSLv23_server_method(SPVM_ENV* env, SPVM_
 }
 
 int32_t SPVM__Net__SSLeay__SSL_METHOD__TLS_method(SPVM_ENV* env, SPVM_VALUE* stack) {
-#if !(OPENSSL_VERSION_NUMBER >= 0x10100000)
-  env->die(env, stack, "The TLS_method method in the Net::SSLeay::SSL_METHOD class is not supported in this system(!(OPENSSL_VERSION_NUMBER >= 0x10100000))", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
-#else
   int32_t error_id = 0;
   
   const SSL_METHOD* ssl_method = TLS_method();
@@ -64,14 +60,9 @@ int32_t SPVM__Net__SSLeay__SSL_METHOD__TLS_method(SPVM_ENV* env, SPVM_VALUE* sta
   stack[0].oval = obj_self;
   
   return 0;
-#endif
 }
 
 int32_t SPVM__Net__SSLeay__SSL_METHOD__TLS_client_method(SPVM_ENV* env, SPVM_VALUE* stack) {
-#if !(OPENSSL_VERSION_NUMBER >= 0x10100000)
-  env->die(env, stack, "The TLS_client_method method in the Net::SSLeay::SSL_METHOD class is not supported in this system(!(OPENSSL_VERSION_NUMBER >= 0x10100000))", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
-#else
   int32_t error_id = 0;
   
   const SSL_METHOD* ssl_method = TLS_client_method();
@@ -82,14 +73,9 @@ int32_t SPVM__Net__SSLeay__SSL_METHOD__TLS_client_method(SPVM_ENV* env, SPVM_VAL
   stack[0].oval = obj_self;
   
   return 0;
-#endif
 }
 
 int32_t SPVM__Net__SSLeay__SSL_METHOD__TLS_server_method(SPVM_ENV* env, SPVM_VALUE* stack) {
-#if !(OPENSSL_VERSION_NUMBER >= 0x10100000)
-  env->die(env, stack, "The TLS_server_method method in the Net::SSLeay::SSL_METHOD class is not supported in this system(!(OPENSSL_VERSION_NUMBER >= 0x10100000))", __func__, FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
-#else
   int32_t error_id = 0;
   
   const SSL_METHOD* ssl_method = TLS_server_method();
@@ -100,5 +86,6 @@ int32_t SPVM__Net__SSLeay__SSL_METHOD__TLS_server_method(SPVM_ENV* env, SPVM_VAL
   stack[0].oval = obj_self;
   
   return 0;
-#endif
 }
+
+// SSL_CIPHER is always constant data structure.

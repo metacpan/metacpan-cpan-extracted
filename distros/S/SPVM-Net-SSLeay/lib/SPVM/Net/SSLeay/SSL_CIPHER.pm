@@ -16,10 +16,6 @@ Net::SSLeay::SSL_CIPHER class in L<SPVM> represents L<SSL_CIPHER|https://docs.op
 
   use Net::SSLeay::SSL_CIPHER;
 
-=head1 Instance Methods
-
-
-
 =head1 See Also
 
 =over 2

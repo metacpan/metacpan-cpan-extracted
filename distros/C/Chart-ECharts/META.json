@@ -1,0 +1,63 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Giuseppe Di Terlizzi <gdt@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Chart-ECharts",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.13"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.114",
+            "JSON::PP" : "0",
+            "List::Util" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON::PP" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/giterlizzi/perl-Chart-ECharts/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/giterlizzi/perl-Chart-ECharts",
+         "web" : "https://github.com/giterlizzi/perl-Chart-ECharts"
+      }
+   },
+   "version" : "1.00",
+   "x_purl" : "pkg:cpan/GDT/Chart-ECharts",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

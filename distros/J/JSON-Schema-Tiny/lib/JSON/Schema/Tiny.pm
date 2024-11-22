@@ -1,11 +1,11 @@
 # vim: set ft=perl ts=8 sts=2 sw=2 tw=100 et :
 use strictures 2;
-package JSON::Schema::Tiny; # git description: v0.026-2-g484895e
+package JSON::Schema::Tiny; # git description: v0.027-4-gd0b3682
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 
 use 5.020;  # for unicode_strings, signatures, postderef features
 use stable 0.031 'postderef';
@@ -1122,10 +1122,10 @@ sub get_type ($value) {
 }
 
 # lifted from JSON::MaybeXS
-# note: unlike builtin::compat on older perls, we do not accept
+# note: unlike builtin::compat::is_bool on older perls, we do not accept
 # dualvar(0,"") or dualvar(1,"1") because JSON::PP and Cpanel::JSON::XS
 # do not encode these as booleans.
-use constant HAVE_BUILTIN => $] ge '5.036';
+use constant HAVE_BUILTIN => "$]" >= 5.035010;
 use if HAVE_BUILTIN, experimental => 'builtin';
 sub is_bool ($value) {
   HAVE_BUILTIN and builtin::is_bool($value)
@@ -1361,7 +1361,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 

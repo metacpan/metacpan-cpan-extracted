@@ -16,6 +16,14 @@ Net::SSLeay::ASN1_INTEGER class in L<SPVM> represents L<ASN1_INTEGER|https://doc
 
   use Net::SSLeay::ASN1_INTEGER;
 
+=head1 Instance Methods
+
+=head2 DESTROY
+
+C<method DESTROY : void ();>
+
+Calls native L<ASN1_INTEGER_free|https://github.com/google/boringssl/blob/master/include/openssl/asn1.h> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+
 =head1 See Also
 
 =over 2

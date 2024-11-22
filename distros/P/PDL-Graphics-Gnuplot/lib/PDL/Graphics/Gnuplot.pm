@@ -1709,6 +1709,31 @@ C<linespoints>).
 Selects a fractional size for point glyphs, relative to the default size
 on your terminal, for plots that render points as small glyphs.
 
+=item fillcolor (abbrev 'fc')
+
+Fills an area plot like C<filledcurves> with a color.
+It has the same format as C<linecolor>. This will fill the whole plot with
+the same color. To fill above a threshold or below a threshold, you need to
+use C<above> and C<below> options.
+
+An example to plot data in a single function call is below:
+
+    plot({ with => 'filledcurves', fillcolor => 'green', above => 'y=0' },
+        x, y,
+        { with => 'filledcurves', fillcolor => 'red', below => 'y=0' },
+        x, y);
+
+
+=item below
+
+This is used for C<filledcurves> to set a C<fillcolor> below a threshold.
+You can set the value like "y=0" if you want to color below the Y-axis value of 0.
+
+=item above
+
+This is used for C<filledcurves> to set a C<fillcolor> above a threshold.
+You can set the value like "y=0" if you want to color above the Y-axis value of 0.
+
 =item fillstyle (abbrev 'fs')
 
 Specify the way that filled regions should be colored, in plots that
@@ -2060,7 +2085,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.031';
+our $VERSION = '2.032';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -3479,7 +3504,7 @@ EOF
     # The search over @$with will disappear with the deprecated compound-with form;
     # the real one is the second line that scans through curve options.
     my $ExtraColumns = grep /(palette|variable)/, @$with;
-    for my $k (qw/linecolor textcolor fillstyle pointsize linewidth/ ) {
+    for my $k (qw/linecolor textcolor fillstyle pointsize linewidth fillcolor/ ) {
       my $v = $chunk{options}{$k};
       next unless defined($v);
       my $s = ref $v eq 'ARRAY' ? join(" ",@$v) : $v;
@@ -5234,6 +5259,15 @@ our $cOptionsTable = {
     'linewidth'=> ['s', 'css',  undef, 12],
     'linecolor'=> ['l', 'ccolor',  undef, 13],
     'textcolor'=> ['l', 'ccolor',  undef, 14],
+    'below' => [ 'l', sub {
+        return "$_[0] $_[1][0]" if (defined $_[1] and defined $_[1][0]);
+        return "";
+    }, undef, 9.2],
+    'above' => [ 'l', sub {
+        return "$_[0] $_[1][0]" if (defined $_[1] and defined $_[1][0]);
+        return "";
+    }, undef, 9.3],
+    'fillcolor'=> ['l', 'ccolor', ['above', 'below'], 14.5],
     'pointtype'=> ['s', 'cs',  undef, 15],
     'pointsize'=> ['s', 'css',  undef, 16],
     'fillstyle'=> ['l', 'cl',  undef, 17],
@@ -5266,7 +5300,8 @@ our $cOptionsAbbrevs = _gen_abbrev_list(keys %$cOptionsTable);
 	lc => ["linecolor"],
 	pt => ["pointtype"],
 	ps => ["pointsize"],
-	fs => ["fillstyle"]
+	fs => ["fillstyle"],
+	fc => ["fillcolor"],
     };
     for my $k(%$officialAbbrevs){
 	$cOptionsAbbrevs->{$k} = $officialAbbrevs->{$k};

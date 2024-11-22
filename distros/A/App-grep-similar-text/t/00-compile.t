@@ -6,14 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/grep/similar/text.pm'
 );
 
 my @scripts = (
-    'script/grep-similar-text'
+    'script/grep-similar-text',
+    'script/grep-similar-to'
 );
 
 # no fake home requested

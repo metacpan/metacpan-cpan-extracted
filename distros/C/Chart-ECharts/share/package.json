@@ -1,0 +1,13 @@
+{
+    "name": "perl-Chart-ECharts",
+    "type": "commonjs",
+    "version": "1.0.0",
+    "description": "Render chart image from Chart::ECharts Perl module",
+    "main": "render.cjs",
+    "license": "Artistic-2.0",
+    "author": "Giuseppe Di Terlizzi <gdt@cpan.org>",
+    "dependencies": {
+        "canvas": "^2.11",
+        "echarts": "^5.4"
+    }
+}

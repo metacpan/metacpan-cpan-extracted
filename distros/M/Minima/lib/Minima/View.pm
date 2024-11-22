@@ -60,6 +60,8 @@ L<Minima::View::JSON>.
 
 =head2 new
 
+    method new ()
+
 Constructs a new object. No arguments required.
 
 =head2 prepare_response

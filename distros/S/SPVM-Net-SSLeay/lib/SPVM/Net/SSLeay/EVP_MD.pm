@@ -16,6 +16,18 @@ Net::SSLeay::EVP_MD class in L<SPVM> represents L<EVP_MD|https://docs.openssl.or
 
   use Net::SSLeay::EVP_MD;
 
+=head1 Instance Methods
+
+=head2 DESTROY
+
+C<method DESTROY : void ();>
+
+Calls native L<EVP_MD_free|https://docs.openssl.org/master/man3/EVP_DigestInit/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+
+Requirement:
+
+OpenSSL 3.0
+
 =head1 See Also
 
 =over 2

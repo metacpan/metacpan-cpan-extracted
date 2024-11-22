@@ -19,7 +19,7 @@ int32_t SPVM__Net__SSLeay__ASN1_GENERALIZEDTIME__DESTROY(SPVM_ENV* env, SPVM_VAL
   ASN1_GENERALIZEDTIME* pointer = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    ASN1_STRING_free(pointer);
+    ASN1_GENERALIZEDTIME_free(pointer);
   }
   
   return 0;

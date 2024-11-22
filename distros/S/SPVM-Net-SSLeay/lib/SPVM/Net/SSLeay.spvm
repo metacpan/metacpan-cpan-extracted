@@ -2,7 +2,7 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.016";
+  version "0.017";
   
   use Net::SSLeay::Constant;
   use Net::SSLeay::SSL_CTX;
@@ -14,10 +14,8 @@ class Net::SSLeay {
   use Net::SSLeay::SSL_SESSION;
   use Net::SSLeay::OCSP_ONEREQ;
   use Net::SSLeay::Callback::Msg;
-  use Net::SSLeay::Util;
   use Net::SSLeay::OPENSSL;
   use Net::SSLeay::OPENSSL_INIT_SETTINGS;
-  use Net::SSLeay::Util::X509;
   
   # Fields
   has ssl_ctx : Net::SSLeay::SSL_CTX;
@@ -43,8 +41,6 @@ class Net::SSLeay {
   native static method load_error_strings : void ();
   
   native static method load_client_CA_file : Net::SSLeay::X509_NAME[] ($file : string);
-  
-  native static method _print_version_text : void ();
   
   # Instance Methods
   native method set_fd : int ($fd : int);
@@ -104,6 +100,23 @@ class Net::SSLeay {
   native method set_SSL_CTX : Net::SSLeay::SSL_CTX ($ctx : Net::SSLeay::SSL_CTX);
   
   native method set_msg_callback : void ($cb : Net::SSLeay::Callback::Msg, $arg : object = undef);
+  
+  method P_dump_peer_certificate : string () {
+    
+    my $cert = $self->get_peer_certificate;
+    
+    unless ($cert) {
+      die "No cert is defined.";
+    }
+    
+    my $subject_name = $cert->get_subject_name->oneline;
+    
+    my $issuer_name = $cert->get_issuer_name->oneline;
+    
+    my $dump = "Subject Name: $subject_name\nIssuer  Name: $issuer_name\n";
+    
+    return $dump;
+  }
   
   native method DESTROY : void ();
   

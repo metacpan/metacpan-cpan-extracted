@@ -1340,6 +1340,7 @@ NI_ip_range_to_prefix_ipv4(unsigned long begin, unsigned long end,
 {
     unsigned long current;
     unsigned long mask;
+    unsigned long tempmask;
 
     unsigned long zeroes;
     int iplen;
@@ -1360,10 +1361,14 @@ NI_ip_range_to_prefix_ipv4(unsigned long begin, unsigned long end,
         /* Calculate the number of zeroes that exist on the right of
          * 'begin', and create a mask for that number of bits. */
         zeroes = NI_trailing_zeroes(begin);
+        if (zeroes > 32) {
+            zeroes = 32;
+        }
         mask = 0;
 
         for (i = 0; i < (int) zeroes; i++) {
-            mask |= (1 << i);
+            tempmask = 1 << i;
+            mask |= tempmask;
         }
 
         /* Find the largest range (from 'begin' to 'current') that

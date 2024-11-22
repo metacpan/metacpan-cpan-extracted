@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v1.2.1
+## Version v1.2.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/09/04
+## Modified 2024/11/22
 ## All rights reserved
 ## 
 ## 
@@ -464,7 +464,7 @@ BEGIN
         },
     };
     our $PLACEHOLDER_REGEXP = qr/(?:\?|\$(?<index>\d+))/;
-    our $VERSION = 'v1.2.1';
+    our $VERSION = 'v1.2.2';
 };
 
 use strict;
@@ -1634,17 +1634,24 @@ sub _convert_datetime2object
         my $str = shift( @_ ) || return;
         if( $str =~ /^(?<year>\d{4})-(?<month>\d{1,2})-(?<day>\d{1,2})(?:[[:blank:]]+(?<hour>\d{1,2})\:(?<minute>\d{1,2})\:(?<second>\d{1,2}))?/ )
         {
+            my $pat = ['%Y-%m-%d'];
             my $hash =
             {
-            year => $+{year},
-            month => $+{month},
-            day => $+{day},
+                year => $+{year},
+                month => $+{month},
+                day => $+{day},
             };
             for( qw( hour minute second ) )
             {
-                $hash->{ $_ } = int( $+{ $_ } ) if( defined( $+{ $_ } ) );
+                $hash->{ $_ } = int( $+{ $_ } ) if( defined( $+{ $_ } ) && length( $+{ $_ } ) );
             }
             $hash->{time_zone} = $tz->name;
+            if( $hash->{hour} ||
+                $hash->{minute} ||
+                $hash->{second} )
+            {
+                push( @$pat, '%H:%M:%S' );
+            }
 
             # try-catch
             local $@;
@@ -1652,7 +1659,7 @@ sub _convert_datetime2object
             {
                 my $dt = DateTime->new( %$hash );
                 my $fmt = DateTime::Format::Strptime->new(
-                    pattern => '%Y-%m-%d %H:%M:%S',
+                    pattern => join( ' ', @$pat ),
                     locale => 'en_GB',
                     time_zone => $tz->name,
                 );
@@ -1673,7 +1680,10 @@ sub _convert_datetime2object
     };
     for( my $i = 0; $i < scalar( @$names ); $i++ )
     {
-        if( $types->[$i] eq PG_DATE || $types->[$i] eq PG_TIMESTAMP || $types->[$i] eq 'date' || $types->[$i] eq 'timestamp' )
+        if( $types->[$i] eq PG_DATE || 
+            $types->[$i] eq PG_TIMESTAMP || 
+            $types->[$i] eq 'date' || 
+            $types->[$i] eq 'timestamp' )
         {
             if( $mode eq 'ARRAY' )
             {
@@ -1932,7 +1942,7 @@ DB::Object::Postgres - SQL API
     
 =head1 VERSION
 
-    v1.2.1
+    v1.2.2
 
 =head1 DESCRIPTION
 

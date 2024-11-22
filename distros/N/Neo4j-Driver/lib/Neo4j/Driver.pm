@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.51';
+$Neo4j::Driver::VERSION = '0.52';
 
 use Carp qw(croak);
 
@@ -250,7 +250,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -327,9 +327,12 @@ install L<LWP::Protocol::https> separately to enable HTTPS.
 The protocol is automatically chosen based on the URI scheme.
 See L<Neo4j::Driver::Config/"uri"> for details.
 
-Version 0.x of Neo4j::Driver is targeting Perl v5.10 and later.
+B<This is the last release in the 0.x branch of Neo4j::Driver.>
+
 See L<Neo4j::Driver::Deprecations> for features set to be removed
 with the next major update.
+Version 0.x of Neo4j::Driver has been targeting S<Perl v5.10>
+and later.
 
 =head1 METHODS
 

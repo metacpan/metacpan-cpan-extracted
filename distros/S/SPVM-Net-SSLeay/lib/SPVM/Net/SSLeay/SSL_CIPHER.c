@@ -3,13 +3,9 @@
 
 #include "spvm_native.h"
 
-
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 static const char* FILE_NAME = "Net/SSLeay/SSL_CIPHER.c";
 
-int32_t SPVM__Net__SSLeay__SSL_CIPHER__foo(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  return 0;
-}
-
-
+// SSL_CIPHER is always constant data structure.

@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
         'File::Path'     => '0',
         'File::Spec'     => '0',
         'Getopt::Long'   => '0',
-        'List::Util'     => '1.33' # For any
+        'List::Util'     => '1.45' # For uniq
     },
     EXE_FILES => [
         'bin/sbokeeper',

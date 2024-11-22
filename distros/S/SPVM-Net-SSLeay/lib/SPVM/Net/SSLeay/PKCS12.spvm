@@ -3,4 +3,7 @@
 
 class Net::SSLeay::PKCS12 {
   
+  # Instance Methods
+  native method DESTROY : void ();
+
 }

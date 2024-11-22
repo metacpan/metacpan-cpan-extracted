@@ -1,3 +1,9 @@
+v0.4.1  2024-11-21
+
+        [Fixes]
+        - Missing required module in cpanfile.
+        - Bad documentation links.
+
 v0.4.0  2024-11-20
 
         [Changes]

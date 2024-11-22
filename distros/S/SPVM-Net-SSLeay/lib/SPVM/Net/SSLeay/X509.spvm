@@ -33,6 +33,8 @@ class Net::SSLeay::X509 : pointer {
   
   native method check_issued : int ($subject : Net::SSLeay::X509);
   
+  native static method P_get_ocsp_uri : string ();
+  
   native method DESTROY : void ();
   
 }

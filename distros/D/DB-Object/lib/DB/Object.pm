@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v1.4.3
+## Version v1.4.4
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/09/06
+## Modified 2024/11/22
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     use POSIX ();
     use Want;
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.4.3';
+    our $VERSION = 'v1.4.4';
 };
 
 use strict;
@@ -2768,7 +2768,7 @@ Because the L<fields objects|DB::Object::Fields::Field> are overloaded, instead 
 
 =head1 VERSION
 
-    v1.4.3
+    v1.4.4
 
 =head1 DESCRIPTION
 
@@ -2941,9 +2941,13 @@ See L<DB::Object::Tables/alias>
 
 Sets/gets the boolean value for whether to allow unsafe bulk delete. This means query without any C<where> clause.
 
+Default is false.
+
 =head2 allow_bulk_update
 
 Sets/gets the boolean value for whether to allow unsafe bulk update. This means query without any C<where> clause.
+
+Default is false.
 
 =head2 AND
 
@@ -2959,9 +2963,13 @@ See L<DB::Object::Statement/as_string>
 
 Sets or gets the boolean value. If true, then this api will automatically transcode datetime value into their equivalent L<DateTime> object.
 
+Default is false.
+
 =head2 auto_decode_json
 
 Sets or gets the boolean value. If true, then this api will automatically transcode json data into perl hash reference.
+
+Default is true.
 
 =head2 avoid
 

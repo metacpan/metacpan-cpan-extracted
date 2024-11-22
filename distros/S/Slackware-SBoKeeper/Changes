@@ -1,5 +1,10 @@
 Revision history for sbokeeper.
 
+1.01 (11/21/2024):
+  Fixes:
+    * LICENSE file now contains perl license rather than Artistic License 2.0.
+    * Require List::Util 1.45, as that is the version that introduced uniq().
+
 1.00 (10/31/2024):
   Added:
     * $VERSION to Slackware::SBoKeeper::DataFile.

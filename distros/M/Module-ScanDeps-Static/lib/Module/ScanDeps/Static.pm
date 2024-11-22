@@ -3,7 +3,7 @@ package Module::ScanDeps::Static;
 use strict;
 use warnings;
 
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 
 use 5.010;
 
@@ -723,13 +723,20 @@ sub main {
     'min-core-version' => '5.8.9',
   );
 
-  GetOptions(
-    \%options,              'json|j',         'text|t',             'core!',
-    'min-core-version|m=s', 'add-version|a!', 'include-require|i!', 'help|h',
-    'separator|s=s',        'version|v',      'raw|r',
+  my @option_specs = qw(
+    json|j
+    text|t
+    core!
+    min-core-version|m=s
+    add-version|a!
+    include-require|i!
+    help|h
+    separator|s=s
+    version|v
+    raw|r
   );
 
-  # print {*STDERR} Dumper( \%options );
+  GetOptions( \%options, @option_specs );
 
   if ( $options{'version'} ) {
     pod2usage(
@@ -1066,7 +1073,7 @@ contain the keys "name" and "version" for each dependency.
 
 =head1 VERSION
 
-1.005
+1.006
 
 =head1 AUTHOR
 

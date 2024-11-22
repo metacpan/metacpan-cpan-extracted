@@ -20,6 +20,17 @@
 
 static const char* FILE_NAME = "Net/SSLeay/Constant.c";
 
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_VERSION_TEXT(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  char *version = OPENSSL_VERSION_TEXT;
+  
+  void* obj_version = env->new_string_nolen(env, stack, version);
+  
+  stack[0].oval = obj_version;
+  
+  return 0;
+}
+
 int32_t SPVM__Net__SSLeay__Constant__ASN1_STRFLGS_ESC_CTRL(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 #ifdef ASN1_STRFLGS_ESC_CTRL

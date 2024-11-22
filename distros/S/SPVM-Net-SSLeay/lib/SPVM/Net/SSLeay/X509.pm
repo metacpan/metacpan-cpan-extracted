@@ -82,6 +82,14 @@ Exceptions:
 
 The X509 object $subject must be defined. Otherwise an exception is thrown.
 
+=head2 P_get_ocsp_uri
+
+C<static method P_get_ocsp_uri : string ();>
+
+Returns OCSP URI in the certificate $cert.
+
+If not found, returns undef.
+
 =head2 DESTROY
 
 C<method DESTROY : void ();>

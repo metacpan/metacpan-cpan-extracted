@@ -3,4 +3,7 @@
 
 class Net::SSLeay::EVP_MD : pointer {
   
+  # Instance Methods
+  native method DESTROY : void ();
+  
 }

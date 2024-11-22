@@ -1,3 +1,35 @@
+0.017 2024-11-22
+  [New Features]
+    * Add Net::SSLeay::Constant#OPENSSL_VERSION_TEXT method.
+    * Add Net::SSLeay::ASN1_ENUMERATED#DESTROY method.
+    * Add Net::SSLeay::ASN1_INTEGER#DESTROY method.
+    * Add Net::SSLeay::ASN1_OBJECT#DESTROY method.
+    * Add Net::SSLeay::ASN1_TIME#DESTROY method.
+    * Add Net::SSLeay::EVP_MD#DESTROY method.
+    * Add Net::SSLeay::OPENSSL_INIT class.
+    * Add the following methods to Net::SSLeay::OPENSSL_INIT class.
+      static method new : Net::SSLeay::OPENSSL_INIT_SETTINGS ();
+      
+      static method set_config_filename : int ($init : Net::SSLeay::OPENSSL_INIT_SETTINGS, $filename : string);
+      
+      static method set_config_file_flags : int ($init : Net::SSLeay::OPENSSL_INIT_SETTINGS, $flags : long);
+      
+      static method set_config_appname : int ($init : Net::SSLeay::OPENSSL_INIT_SETTINGS, $name : string);
+    * Add Net::SSLeay::PKCS12#DESTROY method.
+
+  [Incompatible Changes]
+    * Move Net::SSLeay::Util::X509#get_ocsp_uri method to Net::SSLeay::X509#P_get_ocsp_uri method.
+    * Move Net::SSLeay::Util#dump_peer_certificate method to Net::SSLeay#P_dump_peer_certificate method.
+    * Remove the following classes.
+        Net::SSLeay::Util
+        Net::SSLeay::Util::OCSP
+        Net::SSLeay::Util::PKCS12
+        Net::SSLeay::Util::X509
+  [Document Improvement]
+    * Add the links to all classes.
+  [Requirement Changes]
+    * Require OpenSSL 1.1.1.
+    
 0.016 2024-11-21
   [New Features]
     * Add Net::SSLeay::Util class.

@@ -3,4 +3,21 @@
 
 class Net::SSLeay::OPENSSL_INIT_SETTINGS {
   
+  allow Net::SSLeay::OPENSSL_INIT;
+  
+  use Fn;
+  
+  # Class Methods
+  private static method new_with_pointer : Net::SSLeay::OPENSSL_INIT_SETTINGS ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::OPENSSL_INIT_SETTINGS;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  native method DESTROY : void ();
+  
 }

@@ -16,6 +16,14 @@ Net::SSLeay::OPENSSL_INIT_SETTINGS class in L<SPVM> represents L<OPENSSL_INIT_SE
 
   use Net::SSLeay::OPENSSL_INIT_SETTINGS;
 
+=head1 Instance Methods
+
+=head2 DESTROY
+
+C<method DESTROY : void ();>
+
+Calls native L<OPENSSL_INIT_free|https://docs.openssl.org/1.1.1/man3/OPENSSL_init_crypto> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+
 =head1 See Also
 
 =over 2

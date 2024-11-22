@@ -1,0 +1,14 @@
+#include <stdio.h>
+
+#define PRGNAM "{{prgnam}}"
+#define PRGVER "{{prgver}}"
+#define PRGBIN "{{prgbin}}"
+
+int
+main(int argc, char** argv) {
+
+	printf("{{prgnam}} {{prgver}}");
+
+	return 0;
+
+}

@@ -1,0 +1,63 @@
+{
+   "abstract" : "Simple template file creator",
+   "author" : [
+      "Samuel Young <samyoung12788@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-Stouch",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/1-1sam/stouch/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/1-1sam/stouch.git",
+         "web" : "https://codeberg.org/1-1sam/stouch"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

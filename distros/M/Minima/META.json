@@ -25,6 +25,7 @@
             "File::Share" : "0.27",
             "File::ShareDir" : "1.00",
             "Hash::MultiValue" : "0.16",
+            "JSON" : "4.10",
             "Path::Tiny" : "0.142",
             "Plack" : "1.0050",
             "Router::Simple" : "0.17",
@@ -41,7 +42,7 @@
    "provides" : {
       "Minima" : {
          "file" : "lib/Minima.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.1"
       },
       "Minima::App" : {
          "file" : "lib/Minima/App.pm"
@@ -74,6 +75,6 @@
          "url" : "https://github.com/tessarin/Minima"
       }
    },
-   "version" : "v0.4.0",
+   "version" : "v0.4.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

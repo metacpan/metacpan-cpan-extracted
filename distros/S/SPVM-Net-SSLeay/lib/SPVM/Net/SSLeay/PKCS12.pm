@@ -16,6 +16,14 @@ Net::SSLeay::PKCS12 class in L<SPVM> represents PKCS12 data structure in OpenSSL
 
   use Net::SSLeay::PKCS12;
 
+=head1 Instance Methods
+
+=head2 DESTROY
+
+C<method DESTROY : void ();>
+
+Calls native L<PKCS12_free|https://docs.openssl.org/master/man3/X509_dup/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+
 =head1 See Also
 
 =over 2

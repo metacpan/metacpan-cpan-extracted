@@ -1,0 +1,123 @@
+#!/usr/bin/perl
+use 5.016;
+use strict;
+use warnings;
+
+use App::Stouch;
+
+my $stouch = App::Stouch->init();
+
+$stouch->run();
+
+=head1 NAME
+
+stouch - Simple template file creator
+
+=head1 SYNOPSIS
+
+  stouch [options] file ...
+
+=head1 DESCRIPTION
+
+B<stouch> (B<s>tock B<touch>) is a simple program that can create files based
+on pre-existing template files.
+
+By default, B<stouch> determines the template to used based on each file's
+suffix. 
+
+=head2 Templates
+
+A B<stouch> template is a file/directory that B<stouch> uses to generate
+new files. A B<stouch> template must be located in a template directory, with
+a filename like F<I<suffix>.template>. I<suffix> is the suffix of the file
+type that the template is templating for. If you don't want to name a template
+after the file type's suffix, you can name it something else and then just
+refer to it using the B<-T> option.
+
+B<stouch> templates also support basic text substitution via the B<-p> option.
+Text substitution is accomplished via substitution targets. A substitution
+target is a string consisting of alphanumeric characters or underscores
+contained in double curly braces.
+
+  {{this}} <-- example of a valid substitution target
+
+If C<"this =E<gt> Hello!"> is supplied to the C<-p> option, the line will be
+transformed into this:
+
+  Hello! <-- example of a valid substitution target
+
+If a substitution target is not given any text to be replaced by via the C<-p>
+option, the target will be unmodified and appear as-is in the generated file.
+
+B<stouch> templates are not just limitted to plain files, they can also be used
+for directories. When a directory template is used, B<stouch> will re-create the
+template's directory tree and perform any specified text substitutions on the
+files in the template directory.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-T> I<template>
+
+Instead of determining the template to use from the outputted file's suffix,
+use I<template> instead. I<template> must be the name of the template with
+the I<.template> suffix removed. When using this option with multiple output
+files, each file will use the template specified by C<-T>.
+
+=item B<-t> I<dir>
+
+Specify the template directory to use. Defaults to the value of the
+C<STOUCH_TEMPLATES> environment variable. B<stouch> requires one of them to be
+specified.
+
+=item B<-p> I<param>
+
+Specify what text substitutions to make on templated files. I<param> is a
+comma-seperated list of key-value pairs, the substitution target being the key
+and the text to substitute with being the value. Key-value pairs are seperated
+by a fat arrow (=E<gt>).
+
+  -p "targ1 => Replaces targ1, targ2 => Replaces targ2, targ3 => etc..."
+
+=item B<-q>
+
+Quiet mode. Silence informative messages from being printed.
+
+=item B<-h>
+
+Print B<stouch> help message and exit.
+
+=item B<-v>
+
+Print B<stouch> version/copyright info and exit.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item B<STOUCH_TEMPLATES>
+
+Path to B<stouch> template directory. Must be set if the C<-t> option is not
+used.
+
+=back
+
+=head1 AUTHORS
+
+Written by Samuel Young, L<samyoung12788@gmail.com>.
+
+=head1 COPYRIGHT
+
+Copyright 2024, Samuel Young
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+=head1 SEE ALSO
+
+L<touch(1)>
+
+=cut
