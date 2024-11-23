@@ -34,7 +34,8 @@
          "requires" : {
             "SPVM" : "0.990023",
             "SPVM::IO" : "0.229",
-            "SPVM::Net::SSLeay" : "0.001"
+            "SPVM::Mozilla::CA" : "0.002",
+            "SPVM::Net::SSLeay" : "0.017"
          }
       },
       "test" : {
@@ -49,6 +50,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-IO-Socket-SSL"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

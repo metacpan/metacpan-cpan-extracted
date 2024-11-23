@@ -1,0 +1,8 @@
+name = "Result-Simple"
+badges = ["github-actions/test.yml", "coveralls", "metacpan"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+markdown_maker = "Pod::Markdown::Github"
+
+[release]
+branch='main'

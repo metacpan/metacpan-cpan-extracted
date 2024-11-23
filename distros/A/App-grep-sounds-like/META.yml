@@ -19,7 +19,7 @@ name: App-grep-sounds-like
 provides:
   App::grep::sounds::like:
     file: lib/App/grep/sounds/like.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   AppBase::Grep: '0.014'
   Complete::Module: '0.263'
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-grep-sounds-like
   homepage: https://metacpan.org/release/App-grep-sounds-like
   repository: git://github.com/perlancar/perl-App-grep-sounds-like.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

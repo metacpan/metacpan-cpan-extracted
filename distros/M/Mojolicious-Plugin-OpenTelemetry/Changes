@@ -1,5 +1,11 @@
 Revision history for Mojolicious-Plugin-OpenTelemetry
 
+0.004     2024-11-22 13:22:54+00:00 Europe/London
+
+    * Fixed an issue that would cause the code to hang with
+      nested routes. This is a partial fix, in that the code
+      in the parent route is not currently instrumented.
+
 0.003     2024-05-09 17:59:53+01:00 Europe/London
 
     * Spans are no longer automatically marked as OK by this

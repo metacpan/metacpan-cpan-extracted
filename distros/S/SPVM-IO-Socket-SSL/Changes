@@ -1,3 +1,24 @@
+0.002 2024-111-23
+  [New Features]
+    * Add SSL_version option to IO::Socket::SSL#init method.
+    * Add SSL_cipher_list option IO::Socket::SSL#init method.
+    * Add SSL_ciphersuites option IO::Socket::SSL#init method.
+    * Add SSL_crl_file option to IO::Socket::SSL#init method.
+    * Add SSL_passwd_cb option to IO::Socket::SSL#init method.
+    * Add SSL_server option to IO::Socket::SSL#init method.
+    * Add SSL_npn_protocols option to IO::Socket::SSL#init method.
+    * Add SSL_alpn_protocols option to IO::Socket::SSL#init method.
+    * Add SSL_ticket_keycb option to IO::Socket::SSL#init method.
+    
+  [Requirement Changes]
+    * Require SPVM::Net::SSLeay 0.017.
+  [Internal Changes]
+    * set_tlsext_host_name is called only in a client.
+  [Changes]
+    * Call set_options method given SSL->SSL_OP_ALL | SSL->SSL_OP_SINGLE_DH_USE | SSL->SSL_OP_SINGLE_ECDH_USE.
+  [Bug Fix]
+    * Fix a bug that SSL_hostname option does not work well.
+    
 0.001 2024-10-22
   [Changes]
     * First release.

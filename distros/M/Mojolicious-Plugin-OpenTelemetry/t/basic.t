@@ -72,6 +72,17 @@ get '/error' => sub ( $c, @ ) {
     die 'oops';
 };
 
+# FIXME: The parent code is NOT instrumented
+under sub ($c, @) { 'A parent route' };
+get '/nested' => sub ( $c, @ ) {
+    $c->render( text => 'OK' );
+};
+
+under '/top';
+get '/bottom' => sub ( $c, @ ) {
+    $c->render( text => 'OK' );
+};
+
 my $tst = Test2::MojoX->new;
 
 subtest 'Static URL' => sub {
@@ -236,6 +247,31 @@ subtest 'Response codes' => sub {
         set_attribute    => [ 'http.response.status_code', 400 ],
         end              => [],
     ];
+};
+
+describe 'Nested route' => sub {
+    my $path;
+
+    case 'With sub'    => sub { $path = '/nested'     };
+    case 'With string' => sub { $path = '/top/bottom' };
+
+    it 'Works' => { flat => 1 } => sub {
+        $tst->get_ok($path);
+
+        like $span->{otel}, {
+            attributes => {
+                'http.request.method'      => 'GET',
+                'http.route'               => $path,
+                'url.path'                 => $path,
+            },
+            name => "GET $path",
+        };
+
+        span_calls [
+            set_attribute => [ 'http.response.status_code', 200 ],
+            end           => [],
+        ];
+    };
 };
 
 describe 'Host / port parsing' => sub {

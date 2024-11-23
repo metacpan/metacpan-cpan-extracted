@@ -3,7 +3,7 @@ package My::Test::Encode::workflow;
 use Moo::Role;
 
 has output => (
-    is      => 'ro',
+    is       => 'ro',
     required => 1,
 );
 

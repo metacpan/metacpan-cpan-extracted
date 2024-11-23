@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::OpenTelemetry;
 # ABSTRACT: An OpenTelemetry integration for Mojolicious
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
@@ -14,7 +14,7 @@ sub register ( $, $app, $config, @ ) {
     $config->{tracer}{name} //= otel_config('SERVICE_NAME') // $app->moniker;
 
     $app->hook( around_action  => sub ( $next, $c, $action, $last, @ ) {
-        return unless $last;
+        return $next->() unless $last;
 
         my $tracer = otel_tracer_provider->tracer( %{ $config->{tracer} } );
 

@@ -8,7 +8,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.044, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.047, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,8 +21,12 @@ provides:
     file: lib/Raylib/Color.pm
   Raylib::FFI:
     file: lib/Raylib/FFI.pm
-    version: '0.01'
+    version: '0.02'
   Raylib::FFI::AudioStream:
+    file: lib/Raylib/FFI.pm
+  Raylib::FFI::AutomationEvent:
+    file: lib/Raylib/FFI.pm
+  Raylib::FFI::AutomationEventList:
     file: lib/Raylib/FFI.pm
   Raylib::FFI::BoneInfo:
     file: lib/Raylib/FFI.pm
@@ -33,6 +37,8 @@ provides:
   Raylib::FFI::Camera3D:
     file: lib/Raylib/FFI.pm
   Raylib::FFI::Color:
+    file: lib/Raylib/FFI.pm
+  Raylib::FFI::FilePathList:
     file: lib/Raylib/FFI.pm
   Raylib::FFI::Font:
     file: lib/Raylib/FFI.pm
@@ -95,14 +101,15 @@ provides:
   Raylib::Texture:
     file: lib/Raylib/Texture.pm
 requires:
-  Alien::raylib: '0'
+  Alien::raylib5: '0'
   Convert::Color: '0'
   FFI::C: '0'
   FFI::CheckLib: '0'
-  FFI::Platypus: '0'
+  FFI::Platypus: '2.08'
   File::Share: '0'
   Module::Build::Tiny: '0'
   builtin::Backport: '0'
-version: '0.01'
+  perl: v5.38.0
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

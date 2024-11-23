@@ -6,13 +6,21 @@ use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Data::Record::Serialize::Error { errors => [qw( internal  )] }, -all;
 
 use Moo::Role;
 
 use namespace::clean;
+
+## no critic ( Subroutines::ProhibitBuiltinHomonyms )
+## no critic(BuiltinFunctions::ProhibitComplexMappings)
+## no critic( NamingConventions::ProhibitAmbiguousNames )
+
+sub say;
+sub print;
+sub encode;
 
 ( *say, *print, *encode ) = map {
     my $stub = $_;
@@ -48,7 +56,7 @@ Data::Record::Serialize::Role::EncodeAndSink - Both an Encode and Sink. handle u
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 INTERNALS
 

@@ -1,0 +1,32 @@
+use alienfile;
+use version;
+
+plugin 'PkgConfig' => 'raylib';
+
+share {
+    plugin Download => (
+        url => 'https://github.com/raysan5/raylib/archive/refs/tags/5.5.tar.gz'
+    );
+
+    plugin Extract => 'tar.gz';
+    plugin 'Build::CMake';
+
+    my @CMAKE_ARGS = (
+        '-DWITH_PIC=ON', '-DBUILD_SHARED_LIBS=ON',
+        '-DBUILD_EXAMPLES=OFF', '-DBUILD_GAMES=OFF',
+    );
+
+    $^O eq 'darwin' && do { chomp(my $r = `uname -r`); version->parse($r) < v18.0.0 }
+        and push @CMAKE_ARGS, '-DMACOS_FATLIB=ON';
+
+    build [
+      [ '%{cmake}', @{ meta->prop->{plugin_build_cmake}->{args} },
+          '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON',
+          '-DCMAKE_INSTALL_LIBDIR:PATH=lib',
+          @CMAKE_ARGS, '.'],
+        [qw(%{cmake} --build .)],
+        [qw(%{cmake} --build . --target install)],
+    ];
+
+    plugin 'Gather::IsolateDynamic' => ();
+};

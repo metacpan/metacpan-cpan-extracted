@@ -177,7 +177,7 @@ FUNCTIONS
     Check if application should close (KEY_ESCAPE pressed or windows close
     icon clicked).
 
- IsWindowReady() : bool
+ IsWindowValid() : bool
 
     Check if window has been initialized successfully.
 
@@ -274,6 +274,10 @@ FUNCTIONS
 
     Set window opacity [0.0f..1.0f]
 
+ SetWindowFocused()
+
+    Set window focused
+
  GetScreenWidth() : int
 
     Get current screen width.
@@ -341,6 +345,10 @@ FUNCTIONS
  GetClipboardText() : string
 
     Get clipboard text content.
+
+ GetClipboardImage() : Raylib::FFI::Image
+
+    Get clipboard image content.
 
  EnableEventWaiting()
 
@@ -459,9 +467,9 @@ FUNCTIONS
 
     Load shader from code strings and bind default locations.
 
- IsShaderReady( $shader ) : bool
+ IsShaderValid( $shader ) : bool
 
-    Check if a shader is ready.
+    Check if a shader is valid.
 
  GetShaderLocation( $shader, $uniformName ) : int
 
@@ -1082,7 +1090,7 @@ FUNCTIONS
     Load image from screen buffer and (screenshot) NOTE: This function
     requires GPU access
 
- IsImageReady( $image ) : bool
+ IsImageValid( $image ) : bool
 
     Check if an image is ready
 
@@ -1356,15 +1364,15 @@ FUNCTIONS
     Load texture for rendering (framebuffer) NOTE: This function requires
     GPU access
 
- IsTextureReady( $texture ) : bool
+ IsTextureValid( $texture ) : bool
 
-    Check if a texture is ready
+    Check if a texture is valid
 
  UnloadTexture( $texture )
 
     Unload texture from GPU memory (VRAM)
 
- IsRenderTextureReady( $renderTexture ) : bool
+ IsReanderTextureValid( $renderTexture ) : bool
 
     Check if a render texture is ready
 
@@ -1498,9 +1506,9 @@ FUNCTIONS
 
     Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
 
- IsFontReady( $font ) : bool
+ IsFontValid( $font ) : bool
 
-    Check if a font is ready
+    Check if a font is valid.
 
  LoadFontData( $fileData, $dataSize, $fontSize, $fontChars, $glyphCount,
  $type ) : Raylib::FFI::GlyphInfo
@@ -1698,7 +1706,7 @@ FUNCTIONS
 
     Load model from generated mesh (default material)
 
- IsModelReady( $model ) : bool
+ IsModelValid( $model ) : bool
 
     Check if an model is ready
 
@@ -1822,7 +1830,7 @@ FUNCTIONS
     Load default material (Supports: Diffuse Maps, Specular Maps, Normal
     Maps)
 
- IsMaterialReady( $material ) : bool
+ IsMaterialValid( $material ) : bool
 
     Check if a material is ready
 
@@ -1901,7 +1909,7 @@ FUNCTIONS
 
     Close the audio device and context
 
- IsAudioDeviceReady() : bool
+ IsAudioDeviceValid() : bool
 
     Check if audio device has been initialized successfully
 
@@ -1934,7 +1942,7 @@ FUNCTIONS
     Create a new sound that shares the same sound data as another existing
     sound
 
- IsSoundReady( $sound ) : bool
+ IsSoundValid( $sound ) : bool
 
     Check if a sound is ready
 
@@ -2015,7 +2023,7 @@ FUNCTIONS
 
     Load music stream from data
 
- IsMusicReady( $music ) : bool
+ IsMusicValid( $music ) : bool
 
     Check if music stream is ready
 
@@ -2076,9 +2084,9 @@ FUNCTIONS
 
     Load audio stream (to stream raw audio pcm data)
 
- IsAudioStreamReady( $audioStream ) : bool
+ IsAudioStreamValid( $audioStream ) : bool
 
-    Check if an audio stream is ready
+    Check if an audio stream is valid
 
  UnloadAudioStream( $audioStream )
 
@@ -2171,15 +2179,15 @@ POD ERRORS
     Hey! The above document had some coding errors, which are explained
     below:
 
-    Around line 2685:
+    Around line 2732:
 
       Unknown directive: =head
 
-    Around line 2689:
+    Around line 2736:
 
       Unknown directive: =head
 
-    Around line 2693:
+    Around line 2740:
 
       Unknown directive: =head
 

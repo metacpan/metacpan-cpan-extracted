@@ -37,7 +37,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 
 # Constructor.
 sub new {
@@ -174,7 +174,8 @@ sub _cycles {
 	my @cycle_787 = $self->{'marc_record'}->field('787');
 	my @cycles;
 	foreach my $cycle_787 (@cycle_787) {
-		if ($cycle_787->subfield('i') =~ m/^Z cyklu:/ms) {
+		my $marc_787i = $cycle_787->subfield('i');
+		if (defined $marc_787i && $marc_787i =~ m/^Z cyklu:/ms) {
 			my $cycle_name = $cycle_787->subfield('t');
 			my $cycle_ordinal = $cycle_787->subfield('g');
 

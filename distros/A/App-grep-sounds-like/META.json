@@ -69,7 +69,7 @@
    "provides" : {
       "App::grep::sounds::like" : {
          "file" : "lib/App/grep/sounds/like.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/perlancar/perl-App-grep-sounds-like"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

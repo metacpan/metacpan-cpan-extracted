@@ -205,6 +205,22 @@ exposed without leaking too much internal information.
 Any exceptions caught by this integration will be re-thrown to be handled
 downstream.
 
+=head1 LIMITATIONS
+
+=over
+
+=item *
+
+Routes generated with L<under|Mojolicious::Guides::Tutorial/Under> are B<NOT>
+currently instrumented. The code in the generated route will in effect run
+before the span is created, when no valid span is present in the context
+(unless one has been added by you).
+
+That said, the final routes that execute (ie. the ones that are I<under> the
+generated one) will correctly execute in a context with a span.
+
+=back
+
 =head1 SEE ALSO
 
 =over

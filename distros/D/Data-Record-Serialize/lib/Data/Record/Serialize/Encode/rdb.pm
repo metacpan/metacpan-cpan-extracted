@@ -5,7 +5,7 @@ package Data::Record::Serialize::Encode::rdb;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use namespace::clean;
 
@@ -64,7 +64,7 @@ Data::Record::Serialize::Encode::rdb - encoded a record as /rdb
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 

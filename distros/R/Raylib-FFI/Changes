@@ -1,5 +1,12 @@
 Revision history for Raylib-FFI
 
-0.001     2024-06-26
-          First release
+0.02     2024-11-20  Added support for raylib 5.5
+          - Updated validation function names from "Ready" to "Valid" to match
+            raylib 5.5
+          - Added new window management functions (ToggleBorderlessWindowed,
+            SetWindowIcons, SetWindowFocused, GetWindowScaleDPI)
+          - Added new clipboard function (GetClipboardImage)
+          - Added event waiting functions (EnableEventWaiting, DisableEventWaiting)
 
+0.01     2024-06-26
+          First release

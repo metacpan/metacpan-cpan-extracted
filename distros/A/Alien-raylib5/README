@@ -1,0 +1,56 @@
+NAME
+
+    Alien::raylib5 - Alien distribution for raylib video game engine,
+    version 5 and above
+
+ABSTRACT
+
+    Alien distribution for Raylib version 5.5
+
+VERSION
+
+    version 0.01
+
+USAGE
+
+    Use Raylib::FFI, which wraps this, instead. Otherwise, just use it like
+    any other Alien distro. Currently wraps raylib 5.5.
+
+System requirements
+
+    Should build out of the box on macOS and Windows. On an Ubuntu Linux a
+    few additonal packages are required:
+
+        sudo apt-get install -y libasound2-dev \
+            libxcursor-dev libxinerama-dev mesa-common-dev \
+            libx11-dev libxrandr-dev libxi-dev \
+            libgl1-mesa-dev libglu1-mesa-dev
+
+    If you also think these should be packaged as Alien modules, shoot me a
+    pull request.
+
+GIT REPOSITORY
+
+    http://github.com/perigrin/Alien-raylib5
+
+SEE ALSO
+
+    http://github.com/athreef/Alien-raylib
+
+    Raylib Homepage <http://www.raylib.com>
+
+    Raylib::FFI Graphics::Raylib Graphics::Raylib::XS
+
+AUTHOR
+
+    Chris Prather <chris at prather.org>, http://chris.prather.org
+
+    based on the work of Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

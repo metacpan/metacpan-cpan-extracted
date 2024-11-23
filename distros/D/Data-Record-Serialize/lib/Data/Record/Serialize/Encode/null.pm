@@ -5,7 +5,7 @@ package Data::Record::Serialize::Encode::null;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use namespace::clean;
 
@@ -17,6 +17,9 @@ use namespace::clean;
 
 
 
+
+## no critic ( Subroutines::ProhibitBuiltinHomonyms )
+## no critic( NamingConventions::ProhibitAmbiguousNames )
 
 sub encode { }
 sub send   { }
@@ -51,7 +54,7 @@ Data::Record::Serialize::Encode::null - infinite bitbucket
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 

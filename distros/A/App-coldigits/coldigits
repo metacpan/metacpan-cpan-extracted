@@ -3,7 +3,7 @@ use 5.014 ; use warnings ;
 use Time::HiRes qw [ gettimeofday tv_interval ] ;
 my ${ dt_start } = [ gettimeofday ] ; 
 use Encode qw[ decode_utf8 encode_utf8 ] ; 
-use Getopt::Std ; getopts '=0:R:e:i:u:y:' , \my %o  ; 
+use Getopt::Std ; getopts '=0:M:R:e:i:u:y:' , \my %o  ; 
 use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
 use FindBin qw[ $Script ] ; 
 use autodie qw [ open ] ;
@@ -15,8 +15,17 @@ my $time0 = time ;
 my $help = 0  ; # オンラインヘルプの文面の表示をしたか否か。
 my $readLines  ; # 読み取った行数
 my $sec = $o{'@'} // 15 ; # 何秒おきにアラームを発生させるか
-our @y_ranges ; # = () ; 
+$o{y} //= "2.." if $o{M} ; 
+our @y_ranges ; 
 & y_init () ; 
+
+$SIG{INT} = sub { exit } ;
+$SIG{ALRM} = sub { 
+  my $n = $.  =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr ; # 3桁ごとに区切る。
+  say STDERR GREEN "$n lines read ($Script). " , scalar localtime ; 
+  alarm $sec 
+} ; 
+alarm $sec ;
 
 * R0proc = exists $o{R} && $o{R} eq 0 ? sub {} : sub { s/\r$// } ; 
 * decode = ($o{u}//'') ne 0 ? * decode_utf8 : sub ( $ ) { $_[0] } ; 
@@ -26,51 +35,80 @@ $o{e} = decode ( $o{e} ) if exists $o{e} ;
 * len = ! exists $o{e} ? sub ( $ ) { length $_[0]  } : sub ($) { my @c = $_[0] =~ m/$o{e}/g ; scalar @c } ;
 
 my @cn =  & colnames if $o{'='} ;  # Column Names の頭文字
-my @cd  ; # $c[列番]{桁数} により、0始まり何番の列に、何桁のものが、何件あったかを示す。
-my %dl  ; # $dl{ 桁数} > 0 により、その桁数のものが存在したことを示す。digit length のつもり。
-my @fm1 ; # $fm1[col] で col番列の桁数の最大値を記録。dualvar であり、その時の最大値の時の、該当文字列も格納。
-my @fm2 ; # %fm1 とよく似ているが、最後の例を取り出す。 dualvar であることは同じ。
-my @fm1C ; # その対応する文字列の出現回数を格納する。
-my @fm2C ; 
+my @Cij  ; # $Cij[列番]{桁数} により、0始まり何番の列に、何桁のものが、何件あったかを示す。
+my %Cj  ; # $Cj{ 桁数} > 0 により、その桁数のものが存在したことを示す。digit length のつもり。
+my @Cj  ; # 出力の時に使う。 sort { $a <=> $b } keys %Cj ;
+my @E1  ; # $E1[$i] = [入力$i列目(出力$i行目)の最も右のjの値(位置) , 入力での出現値 , その位置と出現値の頻度 ] 。
+my @E2  ; # [位置, 出現値, 頻度]  ; $E2[$j] で $E1[$j] に準じるものになる。 形式は同様。
+
+goto M if exists $o{M} ; 
 
 while( <> ) { 
   chomp ; & R0proc ; 
-  my @F = split /$isep/ , decode( $_ ) , -1 ; 
+  my @F = split /$isep/o , decode( $_ ) , -1 ; 
   for ( 0 .. $#F ) { 
-    $cd [ $_ ] { '' }  //= '' ; # 入力の列に対応する出力の行で、何も出力するものが無かった場合でも、全部を表示するためのトリック。
-    my $len = & len ( $F[$_] ) ; 
-    next unless & y_filter ($len) ; # 桁数が範囲外なら読まない
-    $cd [ $_ ] { $len } ++ ; 
-    $dl { $len } ++  ;
-
-    my %f1 ; #  $f1{ $char } でその行にその文字が何回出現したかを格納。
-    do{ $fm1C [ $_ ] = 0 ; $fm1[$_] = dualvar $len,$F[$_] } if ($fm1[$_]//0) < $len ;  # ここでの $_ は列番号である。
-    do{ $fm1C [ $_ ] ++ } if ($fm1[$_]//0) == $len && $fm1[$_] eq $F[$_] ; # dualvar の文字列の方の比較になっている
-    do{ $fm2C[$_]=0; $fm2[$_]=dualvar $len,$F[$_] } if ($fm2[$_]//0)<$len && $fm1[$_]ne$F[$_] &&  $fm1[$_] == $len ; #($fm1[$_]//0) <= $len && 
-    $fm2C[$_] ++ if defined $fm2[$_] && $fm2[$_] eq $F[$_] ; # dualvar の文字列の方の比較になっている    
+    my $j = len ( $F[$_] ) ; 
+    next unless & y_filter ( $j ) ; # 桁数が範囲外なら読まない
+    $Cij [ $_ ] { $j } ++ ; 
+    $Cj { $j } ++  ;
+    $E1[$_] = [ $j , $F[$_] , 0 ] if ( $E1[$_]->[0] // "-Inf" ) < $j ;  # ここでの $_ は列番号である。
+    $E1[$_]->[2] ++ if $E1[$_]->[0] == $j && $E1[$_]->[1] eq $F[$_] ; 
+    $E2[$_] = [ $j , $F[$_] , 0 ] if ( $E2[$_]->[0] // "-Inf" ) < $j && $F[$_] ne $E1[$_]->[1] ; # && $E1[$_]->[0] == $j ;  
+    $E2[$_]->[2] ++ if exists $E2[$_]->[1] && $E2[$_]->[1] eq $F[$_] ;     
   }
 } 
 
 # 出力; 
 binmode STDOUT, "utf8" if ($o{u}//'') ne 0 ; 
-my @dl = sort { $a <=> $b } keys %dl ;
-say join "\t" , map { UNDERLINE $_ } 'col' , @dl ,qw[e.g.1(freq) e.g.2(freq)];  
-for my $col ( 0 .. $#cd ) {
+@Cj = sort { $a <=> $b } keys %Cj ;
+say join "\t" , map { UNDERLINE $_ } YELLOW ('col') , @Cj , map { "eg.$_". FAINT "(freq)" } 1..2 ;  
+for my $i ( 0 .. $#Cij ) {
   my @out ; 
-  push @out , $cn [ $col ] // YELLOW $col + 1 ; 
-  push @out , $cd[ $col ] { $dl[$_] } // $o{0} for 0 .. $#dl ; 
-  push @out , $fm1[ $col ] . '' . FAINT "($fm1C[$col])" if exists $fm1[ $col ] ;
-  push @out , $fm2[ $col ] . '' . FAINT "($fm2C[$col])" if exists $fm2[ $col ] ; 
+  push @out , YELLOW $cn [ $i ] // YELLOW $i + 1 ; 
+  push @out , $Cij[ $i ] { $Cj[$_] } // $o{0} for 0 .. $#Cj ; 
+  push @out , ITALIC $E1[$i]->[1] . '' . FAINT "($E1[$i]->[2])" if exists $E1[$i]->[2] ;
+  push @out , ITALIC $E2[$i]->[1] . '' . FAINT "($E2[$i]->[2])" if exists $E2[$i]->[2] ;
   say join "\t" , @out ; 
 }
 
-$SIG{INT} = sub { exit } ;
-$SIG{ALRM} = sub { 
-  my $n = $.  =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr ; # 3桁ごとに区切る。
-  say STDERR GREEN "$n lines read ($Script). " , scalar localtime ; 
-  alarm $sec 
-} ; 
-alarm $sec ;
+exit 0 ;
+
+M : # オプション -M が指定された時。
+
+while( <> ) { 
+  chomp ; & R0proc ; 
+  my @F = split /$isep/o , decode( $_ ) , -1 ; 
+  for ( 0 .. $#F ) {
+    my %chd ; for ( split // , $F[$_] , 0 ) { $chd{$_} ++ } ; # 文字の頻度表を作る。 CHaracter Distribution
+    my @jset = map { [ $_ , $chd{$_} ] } grep { & y_filter ( $chd{$_} ) } keys %chd ;  # 2回以上現れた文字のみを対象にする。#$chd{$_} >= 2
+    ####next unless & y_filter ( $j ) ; # 桁数が範囲外なら読まない
+    for my $j ( @jset ) {
+      next unless & y_filter ( $j->[1] ) ;  
+      $Cij [ $_ ] { $j->[1] } { $j->[0] } ++ ; 
+      $Cj { $j->[1] } ++  ;
+      $E1[$_] = [ $j->[1] , $F[$_] , 0 ] if ( $E1[$_]->[0] // "-Inf" ) < $j->[1] ;  # # [位置, 出現値, 頻度]  ; ここでの $_ は列番号である。
+      $E1[$_]->[2] ++ if $E1[$_]->[0] == $j->[1] && $E1[$_]->[1] eq $F[$_] ; 
+      $E2[$_] = [ $j->[1] , $F[$_] , 0 ] if ( $E2[$_]->[0] // "-Inf" ) < $j->[1] && $F[$_] ne $E1[$_]->[1] ; # && $E1[$_]->[0] == $j ;  
+      $E2[$_]->[2] ++ if exists $E2[$_]->[1] && $E2[$_]->[1] eq $F[$_] ;     
+    }
+  }
+} 
+
+# 出力; 
+my $m = defined $o{M} ? $o{M} : 15 ; # -Mオプションに寄り、出力の各セルに、何文字を超えたら、省略記法にするかについて。
+binmode STDOUT, "utf8" if ($o{u}//'') ne 0 ; 
+@Cj = sort { $a <=> $b } keys %Cj ;
+say join "\t" , map { UNDERLINE $_ } YELLOW ('col') , @Cj , map { "eg.$_". FAINT "(freq)" } 1..2 ;  
+for my $i ( 0 .. $#Cij ) {
+  my @out ; 
+  push @out , YELLOW $cn [ $i ] // YELLOW $i + 1 ; 
+  push @out , do { my @t = sort keys %{ $Cij[$i]{$Cj[$_]} } ; @t > $m ? "$t[0]..$t[-1](".@t.")" : join '', @t }  for 0 .. $#Cj ; 
+  push @out , ITALIC $E1[$i]->[1] . '' . FAINT "($E1[$i]->[2])" if exists $E1[$i]->[2] ;
+  push @out , ITALIC $E2[$i]->[1] . '' . FAINT "($E2[$i]->[2])" if exists $E2[$i]->[2] ;
+  say join "\t" , @out ; 
+}
+
+exit 0 ; 
 
 ### ヘッダから列名を取得する。 -= が指定された場合のみ
 sub colnames ( ) {  
@@ -100,9 +138,6 @@ END {
   return if ($o{2}//'') eq 0 ; 
   my $linenumeral = $readLines > 1 ? 'lines' : 'line' ; 
   print STDERR BOLD FAINT ITALIC & d3 ( $readLines ) . " $linenumeral read" ; 
-  #print STDERR BOLD FAINT ITALIC $o{'='} ? " after $o{q}$head$o{q}. " : ". " ; 
-  #my $charnumeral = $diffChars > 1 ? 'characters' : 'character' ; 
-  #print STDERR BOLD FAINT ITALIC & d3 ( $diffChars ) . " different $charnumeral in input are shown. " ; 
   my $s = tv_interval $dt_start , [ gettimeofday ] ; 
   say STDERR BOLD FAINT ITALIC " -- $Script ; " . $procsec . " sec. in process" ;
 }
@@ -127,8 +162,13 @@ sub HELP_MESSAGE {
 
 TSV形式ファイルにおいて、各列に何桁の文字列が何件含まれていたかを一覧表示する。
 出力の右側は、具体的な文字列の例を表す。その頻度は薄い文字で括弧内に表す。
-その具体例の1番目は、最長の文字列であるが、オプションの-yで指定された場合、その範囲の長さに限定される。
 2番目の例は、1番目とは異なるものを探す。できるだけ長い文字列を採用するようにアルゴリズムの設計は試みたが、そうなるとも限らない。
+
+使用例 : 
+  $0 -e '　'     # 各カラム(列)において、全角空白の文字が何回持つものが、何行出現したかを、行列状に出力。
+  $0 -e '[0-9]' # 各カラム(列)において、0から9までの10通りの文字が何回あらわれたものが何行出現したかを、行列状に出力。
+  $0 -M # 同じセルに同じ文字が何度も使われている様子を確認する。数値のみが想定されるカラムで、ピリオドが2個出現した文字列が存在しないかのチェックに使える。
+  $0 -y 1..5    # 出力表の各列の表頭を1,2,3,4,5に制限する。このことで横幅が短くなり、また例の表示で、6以上に対応するものの出力が抑制されて、見やすくなる場合がある。
 
 オプション : 
 
@@ -137,7 +177,10 @@ TSV形式ファイルにおいて、各列に何桁の文字列が何件含ま�
  -e RGX : 各セルの文字列長を測る代わりに、正規表現RGXをいくつ持っていたかを測るようにする。 -e '1' や -e '[0-9]$' や -e '大' を指定可能。
  -i str : 入力の区切り文字。未指定なら \t すなわちタブ文字。csvなら -i , のように与える。
  -u 0   : UTF-8 と通常見なすが、そうせず、バイナリのまま処理をする。
+ -y ... : 出力表の表頭に現れる数値を限定する。..や,を使う。例、 2..5 または 1,2,10 など。
  -R 0   : 改行がWindows形式すなわち \r\n であっても、\nしか改行文字と見なさない。(何かこの特殊な用途を想定して実装した。)
+
+ -M     : 同じセルに2回以上現れた文字を、何回出現したものが、どんな文字があったかを、出力表の形で、出力する。 ..で範囲表示。()内の数は該当する異なる文字の数。
 
  --help : このオンラインのヘルプ画面を出力する。 perldoc $0 や man $0 でも可能であろう。
 
@@ -145,6 +188,5 @@ TSV形式ファイルにおいて、各列に何桁の文字列が何件含ま�
   * 半角数値およびピリオドとプラスマイナスさらに半角空白の頻度表の機能を実装したい。
   * 平均と分散を算出する機能を入れたい(不偏分散の平方根とするか否か)
   * 先頭文字または末尾の文字についても一覧にしたい。
-
-
+  * -Mのオプションのサブオプションとして、連続して同じ文字が現れる様子も考察可能としたい。
 =cut

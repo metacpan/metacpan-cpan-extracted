@@ -1,0 +1,40 @@
+---
+abstract: 'A dead simple perl-ish Result like F#, Rust, Go, etc.'
+author:
+  - 'kobaken <kentafly88@gmail.com>'
+build_requires:
+  Test2::V0: '0.000135'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Result-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Result::Simple:
+    file: lib/Result/Simple.pm
+    version: '0.01'
+requires:
+  Scope::Upper: '0'
+  Sub::Util: '0'
+  perl: v5.40.0
+resources:
+  bugtracker: https://github.com/kfly8/Result-Simple/issues
+  homepage: https://github.com/kfly8/Result-Simple
+  repository: https://github.com/kfly8/Result-Simple.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

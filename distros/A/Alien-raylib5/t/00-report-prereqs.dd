@@ -1,0 +1,48 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Alien::Build' => '0.32',
+                                    'Alien::Build::MM' => '0.32',
+                                    'ExtUtils::MakeMaker' => '6.52'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Alien::Build' => '0.32',
+                                        'Alien::Build::MM' => '0.32',
+                                        'Alien::Build::Plugin::Build::CMake' => '0.99',
+                                        'ExtUtils::MakeMaker' => '6.52'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'perl' => '5.008'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '6.52',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

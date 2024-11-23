@@ -13,7 +13,7 @@ use Text::Levenshtein::XS;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-11-20'; # DATE
 our $DIST = 'App-grep-sounds-like'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -75,6 +75,9 @@ MARKDOWN
         ];
 
         $meta->{links} = [
+            {
+                url => 'prog:grep-similar-to',
+            },
         ];
     },
     output_code => sub {
@@ -152,7 +155,7 @@ App::grep::sounds::like - Print lines with words that sound like to the specifie
 
 =head1 VERSION
 
-This document describes version 0.001 of App::grep::sounds::like (from Perl distribution App-grep-sounds-like), released on 2024-11-20.
+This document describes version 0.002 of App::grep::sounds::like (from Perl distribution App-grep-sounds-like), released on 2024-11-20.
 
 =head1 FUNCTIONS
 

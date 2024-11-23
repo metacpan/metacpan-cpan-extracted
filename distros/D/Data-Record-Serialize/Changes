@@ -1,3 +1,10 @@
+1.07      2024-11-22 12:08:00-05:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * new "array" encoder, which outputs the transformed data as a
+      Perl arrayref.
+
 1.06      2024-01-10 12:23:54-05:00 America/New_York
 
   [BUGFIX]

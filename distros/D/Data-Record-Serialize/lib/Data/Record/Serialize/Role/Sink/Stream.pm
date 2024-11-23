@@ -8,11 +8,14 @@ use Moo::Role;
 
 use Data::Record::Serialize::Error { errors => [ '::create', '::parameter', '::internal' ] }, -all;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use IO::File;
 
 use namespace::clean;
+
+## no critic( NamingConventions::ProhibitAmbiguousNames )
+## no critic( Subroutines::ProhibitBuiltinHomonyms )
 
 
 
@@ -184,7 +187,7 @@ Data::Record::Serialize::Role::Sink::Stream - output encoded data to a stream.
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 

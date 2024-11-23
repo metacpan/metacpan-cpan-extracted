@@ -1,4 +1,4 @@
-use 5.38.2;
+use 5.38.0;
 use experimental 'class';
 
 use Raylib::Text;

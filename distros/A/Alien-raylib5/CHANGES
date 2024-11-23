@@ -1,0 +1,9 @@
+Revision history for Alien::raylib5
+
+0.02 2024-11-23
+
+    - Fix the distribution tarball
+
+0.01 2024-11-23
+
+    - Shamelessly Stolen from Alien::raylib

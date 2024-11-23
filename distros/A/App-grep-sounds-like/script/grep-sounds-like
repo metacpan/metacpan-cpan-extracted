@@ -13,7 +13,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-11-20'; # DATE
 our $DIST = 'App-grep-sounds-like'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/grep/sounds/like/grep_sounds_like",
@@ -42,7 +42,7 @@ grep-sounds-like - Print lines with words that sound like to the specified word
 
 =head1 VERSION
 
-This document describes version 0.001 of grep-sounds-like (from Perl distribution App-grep-sounds-like), released on 2024-11-20.
+This document describes version 0.002 of grep-sounds-like (from Perl distribution App-grep-sounds-like), released on 2024-11-20.
 
 =head1 SYNOPSIS
 
@@ -324,6 +324,10 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-grep-s
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-grep-sounds-like>.
+
+=head1 SEE ALSO
+
+L<grep-similar-to>.
 
 =head1 AUTHOR
 

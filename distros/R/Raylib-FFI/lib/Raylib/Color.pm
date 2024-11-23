@@ -1,12 +1,12 @@
-use 5.38.2;
+use 5.38.0;
 use builtin 'export_lexically';
+use Raylib::FFI ();
 
 package Raylib::Color {
-    use constant Color => 'Raylib::FFI::Color';
-    use Convert::Color;
+    use Convert::Color ();
 
     sub rgba ( $r, $g, $b, $a = 255 ) {
-        return Color->new( r => $r, g => $g, b => $b, a => $a );
+        return Raylib::FFI::Color->new( r => $r, g => $g, b => $b, a => $a );
     }
 
     sub new ( $, $color, $a = 255 ) {

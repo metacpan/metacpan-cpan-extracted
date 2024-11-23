@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_edition_number
 	clean_title look_for_external_id);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -134,6 +134,7 @@ sub clean_edition_number {
 	my $v1 = decode_utf8('Vydání');
 	my $v2 = decode_utf8('vydání');
 	$ret_edition_number =~ s/\s*(Vyd\.|vyd\.|$v1|$v2|Vydanie|vyd|published)//gx;
+	$ret_edition_number =~ s/English edition//ms;
 
 	$ret_edition_number =~ s/\s*rozmn\.//ms;
 	my $re = decode_utf8('souborné');
@@ -180,6 +181,8 @@ sub clean_edition_number {
 	$ret_edition_number =~ s/\s*$re//ms;
 	$ret_edition_number =~ s/\s*zcela//ms;
 	$re = decode_utf8('v této');
+	$ret_edition_number =~ s/\s*$re//ms;
+	$re = decode_utf8('V této');
 	$ret_edition_number =~ s/\s*$re//ms;
 	$re = decode_utf8('podobě');
 	$ret_edition_number =~ s/\s*$re//ms;
@@ -812,6 +815,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

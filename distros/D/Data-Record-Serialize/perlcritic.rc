@@ -5,7 +5,6 @@ exclude = Freenode
 
 [-BuiltinFunctions::RequireBlockGrep]
 [-BuiltinFunctions::RequireBlockMap]
-[-BuiltinFunctions::ProhibitComplexMappings]
 [-CodeLayout::ProhibitParensWithBuiltins]
 [-ControlStructures::ProhibitPostfixControls]
 [-ControlStructures::ProhibitUnlessBlocks]
@@ -14,14 +13,14 @@ exclude = Freenode
 [-Documentation::RequirePodSections]
 [-ErrorHandling::RequireCarping]
 [-InputOutput::RequireBriefOpen]
+
 [-Modules::ProhibitExcessMainComplexity]
+
 [-NamingConventions::Capitalization]
-[-NamingConventions::ProhibitAmbiguousNames]
 [-References::ProhibitDoubleSigils]
 [-RegularExpressions::RequireDotMatchAnything]
 [-RegularExpressions::RequireExtendedFormatting]
 [-RegularExpressions::RequireLineBoundaryMatching]
-[-Subroutines::ProhibitBuiltinHomonyms]
 [-Subroutines::ProhibitExplicitReturnUndef]
 [-Subroutines::ProhibitSubroutinePrototypes]
 [-Subroutines::ProhibitUnusedPrivateSubroutines]

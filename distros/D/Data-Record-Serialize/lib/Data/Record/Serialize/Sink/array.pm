@@ -7,11 +7,14 @@ use Moo::Role;
 
 use Data::Record::Serialize::Error { errors => ['::create'] }, -all;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use IO::File;
 
 use namespace::clean;
+
+## no critic( Subroutines::ProhibitBuiltinHomonyms )
+## no critic( NamingConventions::ProhibitAmbiguousNames )
 
 
 
@@ -37,7 +40,9 @@ has output => (
 
 
 sub print { push @{ shift->{output} }, @_ }
+sub say;
 *say = \&print;
+
 sub close { }
 
 with 'Data::Record::Serialize::Role::Sink';
@@ -66,7 +71,7 @@ Data::Record::Serialize::Sink::array - append encoded data to an array.
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 

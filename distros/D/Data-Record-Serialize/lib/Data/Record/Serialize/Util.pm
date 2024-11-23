@@ -5,7 +5,7 @@ package Data::Record::Serialize::Util;
 use v5.12;
 use strict;
 use warnings;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use parent 'Exporter::Tiny';
 
@@ -33,6 +33,7 @@ BEGIN {
 use enum @TYPE_CATEGORY_NAMES;
 use constant \%TYPES;
 
+## no critic(BuiltinFunctions::ProhibitComplexMappings)
 our @TYPE_CATEGORIES = map {
     ;                    # add a ; to help 5.10
     no strict 'refs';    ## no critic(ProhibitNoStrict)
@@ -100,7 +101,7 @@ Data::Record::Serialize::Util - Useful things
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 INTERNALS
 

@@ -5,7 +5,7 @@ package Data::Record::Serialize::Role::Default;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Hash::Util qw[ hv_store ];
 use Ref::Util  qw[ is_coderef ];
@@ -33,6 +33,8 @@ use namespace::clean;
 
 
 
+
+## no critic( Subroutines::ProhibitBuiltinHomonyms )
 
 # provide default if not already defined
 sub send {
@@ -175,7 +177,7 @@ Data::Record::Serialize::Role::Default - Default methods for Data::Record::Seria
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 DESCRIPTION
 

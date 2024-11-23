@@ -1,9 +1,9 @@
-use 5.40.0;
+use 5.38.0;
 use experimental 'try';
 
 package Raylib::FFI;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use FFI::CheckLib      qw( find_lib_or_die );
 use FFI::Platypus 2.08 ();
@@ -12,7 +12,7 @@ use builtin 'export_lexically';
 
 my $ffi = FFI::Platypus->new(
     api => 2,
-    lib => find_lib_or_die( lib => 'raylib', alien => 'Alien::raylib' ),
+    lib => find_lib_or_die( lib => 'raylib', alien => 'Alien::raylib5' ),
 );
 
 package Raylib::FFI::Vector2D {
@@ -47,7 +47,7 @@ package Raylib::FFI::Vector4D {
     );
 }
 $ffi->type( 'record(Raylib::FFI::Vector4D)' => 'Vector4D' );
-$ffi->type( 'record(Raylib::FFI::Vector4D)' => 'Qaternion' );
+$ffi->type( 'record(Raylib::FFI::Vector4D)' => 'Quaternion' );
 
 package Raylib::FFI::Matrix {
     use FFI::Platypus::Record qw( record_layout_1 );
@@ -431,6 +431,37 @@ package Raylib::FFI::VrStereoConfig {
 }
 $ffi->type( 'record(Raylib::FFI::VrStereoConfig)' => 'VrStereoConfig' );
 
+package Raylib::FFI::FilePathList {
+    use FFI::Platypus::Record qw( record_layout_1 );
+    record_layout_1(
+        $ffi,
+        opaque => 'paths',    # cast to char**
+        int    => 'count',    # number of strings
+    );
+}
+$ffi->type( 'record(Raylib::FFI::FilePathList)' => 'FilePathList' );
+
+package Raylib::FFI::AutomationEvent {
+    use FFI::Platypus::Record qw( record_layout_1 );
+    record_layout_1(
+        $ffi,
+        int    => 'type',
+        opaque => 'payload',
+    );
+}
+$ffi->type( 'record(Raylib::FFI::AutomationEvent)' => 'AutomationEvent' );
+
+package Raylib::FFI::AutomationEventList {
+    use FFI::Platypus::Record qw( record_layout_1 );
+    record_layout_1(
+        $ffi,
+        opaque => 'events',    # cast to AutomationEvent*
+        int    => 'count',     # number of events
+    );
+}
+$ffi->type(
+    'record(Raylib::FFI::AutomationEventList)' => 'AutomationEventList' );
+
 my %functions = (
 
     # Window-related functions
@@ -444,7 +475,6 @@ my %functions = (
     IsWindowMaximized        => [ []                   => 'bool' ],
     IsWindowFocused          => [ []                   => 'bool' ],
     IsWindowResized          => [ []                   => 'bool' ],
-    IsWindowHidden           => [ []                   => 'bool' ],
     IsWindowState            => [ ['int']              => 'bool' ],
     SetWindowState           => [ ['int']              => 'void' ],
     ClearWindowState         => [ ['int']              => 'void' ],
@@ -462,26 +492,29 @@ my %functions = (
     SetWindowMaxSize         => [ [qw(int int)]        => 'void' ],
     SetWindowSize            => [ [qw(int int)]        => 'void' ],
     SetWindowOpacity         => [ ['float']            => 'void' ],
-    SetWindowFocused         => [ ['int']              => 'void' ],
-    GetScreenWidth           => [ []                   => 'int' ],
-    GetScreenHeight          => [ []                   => 'int' ],
-    GetRenderWidth           => [ []                   => 'int' ],
-    GetRenderHeight          => [ []                   => 'int' ],
-    GetMonitorCount          => [ []                   => 'int' ],
-    GetCurrentMonitor        => [ []                   => 'int' ],
-    GetMonitorPosition       => [ ['int']              => 'Vector2D' ],
-    GetMonitorWidth          => [ ['int']              => 'int' ],
-    GetMonitorHeight         => [ ['int']              => 'int' ],
-    GetMonitorPhysicalWidth  => [ ['int']              => 'int' ],
-    GetMonitorPhysicalHeight => [ ['int']              => 'int' ],
-    GetMonitorRefreshRate    => [ ['int']              => 'int' ],
-    GetWindowPosition        => [ []                   => 'Vector2D' ],
-    GetWindowScaleDPI        => [ []                   => 'Vector2D' ],
-    GetMonitorName           => [ ['int']              => 'string' ],
-    SetClipboardText         => [ ['string']           => 'void' ],
-    GetClipboardText         => [ []                   => 'string' ],
-    EnableEventWaiting       => [ []                   => 'void' ],
-    DisableEventWaiting      => [ []                   => 'void' ],
+    SetWindowFocused         => [ []                   => 'void' ],
+
+# GetWindowHandle         => [ []                   => 'void' ], # not at all sure how to handle this yet
+    GetScreenWidth           => [ []         => 'int' ],
+    GetScreenHeight          => [ []         => 'int' ],
+    GetRenderWidth           => [ []         => 'int' ],
+    GetRenderHeight          => [ []         => 'int' ],
+    GetMonitorCount          => [ []         => 'int' ],
+    GetCurrentMonitor        => [ []         => 'int' ],
+    GetMonitorPosition       => [ ['int']    => 'Vector2D' ],
+    GetMonitorWidth          => [ ['int']    => 'int' ],
+    GetMonitorHeight         => [ ['int']    => 'int' ],
+    GetMonitorPhysicalWidth  => [ ['int']    => 'int' ],
+    GetMonitorPhysicalHeight => [ ['int']    => 'int' ],
+    GetMonitorRefreshRate    => [ ['int']    => 'int' ],
+    GetWindowPosition        => [ []         => 'Vector2D' ],
+    GetWindowScaleDPI        => [ []         => 'Vector2D' ],
+    GetMonitorName           => [ ['int']    => 'string' ],
+    SetClipboardText         => [ ['string'] => 'void' ],
+    GetClipboardText         => [ []         => 'string' ],
+    GetClipboardImage        => [ []         => 'Image' ],
+    EnableEventWaiting       => [ []         => 'void' ],
+    DisableEventWaiting      => [ []         => 'void' ],
 
     # Cursor-related functions
     ShowCursor       => [ [] => 'void' ],
@@ -492,14 +525,13 @@ my %functions = (
     IsCursorOnScreen => [ [] => 'bool' ],
 
     # Drawing-related functions
-    ClearBackground => [ ['Color']    => 'void' ],
-    BeginDrawing    => [ []           => 'void' ],
-    EndDrawing      => [ []           => 'void' ],
-    BeginMode2D     => [ ['Camera2D'] => 'void' ],
-    EndMode2D       => [ []           => 'void' ],
-    BeginMode3D     => [ ['Camera3D'] => 'void' ],
-    EndMode3D       => [ []           => 'void' ],
-
+    ClearBackground   => [ ['Color']             => 'void' ],
+    BeginDrawing      => [ []                    => 'void' ],
+    EndDrawing        => [ []                    => 'void' ],
+    BeginMode2D       => [ ['Camera2D']          => 'void' ],
+    EndMode2D         => [ []                    => 'void' ],
+    BeginMode3D       => [ ['Camera3D']          => 'void' ],
+    EndMode3D         => [ []                    => 'void' ],
     BeginTextureMode  => [ ['RenderTexture2D']   => 'void' ],
     EndTextureMode    => [ []                    => 'void' ],
     BeginShaderMode   => [ ['Shader']            => 'void' ],
@@ -512,13 +544,13 @@ my %functions = (
     EndVrStereoMode   => [ []                    => 'void' ],
 
     # VR stereo config functions for VR simulator
-    LoadVrStereoConfig   => [ ['VrStereoConfig'] => 'void' ],
+    LoadVrStereoConfig   => [ ['VrDeviceInfo']   => 'VrStereoConfig' ],
     UnloadVrStereoConfig => [ ['VrStereoConfig'] => 'void' ],
 
     # Shader management functions
     LoadShader              => [ [ 'string', 'string' ] => 'Shader' ],
     LoadShaderFromMemory    => [ [ 'string', 'string' ] => 'Shader' ],
-    IsShaderReady           => [ ['Shader']             => 'bool' ],
+    IsShaderValid           => [ ['Shader']             => 'bool' ],
     GetShaderLocation       => [ [ 'Shader', 'string' ] => 'int' ],
     GetShaderLocationAttrib => [ [ 'Shader', 'string' ] => 'int' ],
     SetShaderValue        => [ [ 'Shader', 'int', 'opaque', 'int' ] => 'void' ],
@@ -528,23 +560,32 @@ my %functions = (
     UnloadShader          => [ ['Shader']                           => 'void' ],
 
     # Screen-space-related functions
-    GetMouseRay        => [ [ 'Vector2D', 'Camera3D' ]          => 'Ray' ],
-    GetWorldToScreenEx => [ [ 'Vector3D', 'Camera3D', 'float' ] => 'Vector2D' ],
+    GetMouseRay         => [ [ 'Vector2D', 'Camera3D' ] => 'Ray' ], # DEPRECATED
+    GetScreenToWorldRay => [ [ 'Vector2D', 'Camera3D' ] => 'Ray' ],
+    GetScreenToWorldRayEx =>
+      [ [ 'Vector2D', 'Camera3D', 'int', 'int' ] => 'Ray' ],
+    GetWorldToScreen   => [ [ 'Vector3D', 'Camera3D' ] => 'Vector2D' ],
+    GetWorldToScreenEx =>
+      [ [ 'Vector3D', 'Camera3D', 'int', 'int' ] => 'Vector2D' ],
+    GetWorldToScreen2D => [ [ 'Vector2D', 'Camera2D' ]          => 'Vector2D' ],
     GetScreenToWorld2D => [ [ 'Vector2D', 'Camera2D' ]          => 'Vector2D' ],
+    GetWorldToScreenEx => [ [ 'Vector3D', 'Camera3D', 'float' ] => 'Vector2D' ],
     GetCameraMatrix    => [ ['Camera3D']                        => 'Matrix' ],
     GetCameraMatrix2D  => [ ['Camera2D']                        => 'Matrix' ],
 
     # Timing related functions
     SetTargetFPS => [ ['int'] => 'void' ],
-    GetFPS       => [ []      => 'int' ],
     GetFrameTime => [ []      => 'double' ],
     GetTime      => [ []      => 'double' ],
+    GetFPS       => [ []      => 'int' ],
 
     # Custom frame control functions
     SwapScreenBuffer => [ []         => 'void' ],
     PollInputEvents  => [ []         => 'void' ],
     WaitTime         => [ ['double'] => 'void' ],
 
+    # random values
+    #
     # Misc. functions
     TakeScreenshot   => [ [qw(string)] => 'void' ],
     SetConfigFlags   => [ [qw(int)]    => 'void' ],
@@ -703,7 +744,7 @@ my %functions = (
     LoadImageFromMemory  => [ [ 'string', 'string' ] => 'Image' ],
     LoadImageFromTexture => [ ['Texture2D']          => 'Image' ],
     LoadImageFromScreen  => [ []                     => 'Image' ],
-    IsImageReady         => [ ['Image']              => 'bool' ],
+    IsImageValid         => [ ['Image']              => 'bool' ],
     UnloadImage          => [ ['Image']              => 'void' ],
     ExportImage          => [ [ 'Image', 'string' ]  => 'void' ],
 
@@ -790,12 +831,10 @@ my %functions = (
     LoadTexture          => [ ['string']         => 'Texture' ],
     LoadTextureFromImage => [ ['Image']          => 'Texture2D' ],
     LoadTextureCubemap   => [ [ 'Image', 'int' ] => 'TextureCubemap' ],
-
-    LoadRenderTexture => [ [ 'int', 'int' ] => 'RenderTexture2D' ],
-    IsTextureReady    => [ ['Texture']      => 'bool' ],
-    UnloadTexture     => [ ['Texture2D']    => 'void' ],
-
-    IsRenderTextureReady => [ ['RenderTexture2D']                   => 'bool' ],
+    LoadRenderTexture    => [ [ 'int', 'int' ] => 'RenderTexture2D' ],
+    IsTextureValid       => [ ['Texture']      => 'bool' ],
+    UnloadTexture        => [ ['Texture2D']    => 'void' ],
+    IsRenderTextureValid => [ ['RenderTexture2D']                   => 'bool' ],
     UnloadRenderTexture  => [ ['RenderTexture2D']                   => 'void' ],
     UpdateTexture        => [ [ 'Texture2D', 'Image' ]              => 'void' ],
     UpdateTextureRec     => [ [ 'Texture2D', 'Rectangle', 'Image' ] => 'void' ],
@@ -844,7 +883,7 @@ my %functions = (
     LoadFontEx         => [ [ 'string', 'int', 'string' ]           => 'Font' ],
     LoadFontFromImage  => [ [ 'Image', 'float' ]                    => 'Font' ],
     LoadFontFromMemory => [ [ 'string', 'string', 'int', 'string' ] => 'Font' ],
-    IsFontReady        => [ ['Font']                                => 'bool' ],
+    IsFontValid        => [ ['Font']                                => 'bool' ],
     LoadFontData       =>
       [ [ 'Font', 'string', 'int', 'int', 'float' ] => 'GlyphInfo' ],
     GenImageFontAtlas =>
@@ -910,7 +949,7 @@ my %functions = (
     # model management functions
     LoadModel           => [ ['string'] => 'Model' ],
     LoadModelFromMesh   => [ ['Mesh']   => 'Model' ],
-    IsModelReady        => [ ['Model']  => 'bool' ],
+    IsModelValid        => [ ['Model']  => 'bool' ],
     UnloadModel         => [ ['Model']  => 'void' ],
     GetModelBoundingBox => [ ['Model']  => 'BoundingBox' ],
 
@@ -959,7 +998,7 @@ my %functions = (
     # Material loading/unloading
     LoadMaterials       => [ [ 'string', 'int' ]                => 'Material' ],
     LoadMaterialDefault => [ []                                 => 'Material' ],
-    IsMaterialReady     => [ ['Material']                       => 'bool' ],
+    IsMaterialValid     => [ ['Material']                       => 'bool' ],
     UnloadMaterial      => [ ['Material']                       => 'void' ],
     SetMaterialTexture  => [ [ 'Material', 'int', 'Texture2D' ] => 'void' ],
     SetModelMeshMaterial => [ [ 'Model', 'int', 'Material' ] => 'void' ],
@@ -991,19 +1030,19 @@ my %functions = (
     # audio device management
     InitAudioDevice    => [ []        => 'void' ],
     CloseAudioDevice   => [ []        => 'void' ],
-    IsAudioDeviceReady => [ []        => 'bool' ],
+    IsAudioDeviceValid => [ []        => 'bool' ],
     SetMasterVolume    => [ ['float'] => 'void' ],
     GetMasterVolume    => [ []        => 'float' ],
 
     # wave/sound loading/unloading
     LoadWave           => [ ['string']                 => 'Wave' ],
     LoadWaveFromMemory => [ [ 'string', 'int', 'int' ] => 'Wave' ],
-    IsWaveReady        => [ ['Wave']                   => 'bool' ],
+    IsWaveValid        => [ ['Wave']                   => 'bool' ],
 
     LoadSound         => [ ['string']           => 'Sound' ],
     LoadSoundFromWave => [ ['Wave']             => 'Sound' ],
     LoadSoundAlias    => [ ['Sound']            => 'Sound' ],
-    IsSoundReady      => [ ['Sound']            => 'bool' ],
+    IsSoundValid      => [ ['Sound']            => 'bool' ],
     UpdateSound       => [ [ 'Sound', 'float' ] => 'void' ],
     UnloadWave        => [ ['Wave']             => 'void' ],
     UnloadSound       => [ ['Sound']            => 'void' ],
@@ -1027,7 +1066,7 @@ my %functions = (
     # Music management functions
     LoadMusicStream           => [ ['string']                 => 'Music' ],
     LoadMusicStreamFromMemory => [ [ 'string', 'int', 'int' ] => 'Music' ],
-    IsMusicReady              => [ ['Music']                  => 'bool' ],
+    IsMusicValid              => [ ['Music']                  => 'bool' ],
     UnloadMusicStream         => [ ['Music']                  => 'void' ],
     PlayMusicStream           => [ ['Music']                  => 'void' ],
     IsMusicStreamPlaying      => [ ['Music']                  => 'bool' ],
@@ -1044,7 +1083,7 @@ my %functions = (
 
     # AudioStream management functions
     LoadAudioStream        => [ [ 'int', 'int', 'int' ] => 'AudioStream' ],
-    IsAudioStreamReady     => [ ['AudioStream']         => 'bool' ],
+    IsAudioStreamValid     => [ ['AudioStream']         => 'bool' ],
     UnloadAudioStream      => [ ['AudioStream']         => 'void' ],
     UpdateAudioStream      => [ [ 'AudioStream', 'float', 'float' ] => 'void' ],
     IsAudioStreamProcessed => [ ['AudioStream']                     => 'bool' ],
@@ -1258,7 +1297,7 @@ Close window and unload OpenGL context.
 
 Check if application should close (KEY_ESCAPE pressed or windows close icon clicked).
 
-=head2 IsWindowReady() : bool
+=head2 IsWindowValid() : bool
 
 Check if window has been initialized successfully.
 
@@ -1354,6 +1393,10 @@ Set window dimensions.
 
 Set window opacity [0.0f..1.0f]
 
+=head2 SetWindowFocused() 
+
+Set window focused
+
 =head2 GetScreenWidth() : int
 
 Get current screen width.
@@ -1421,6 +1464,10 @@ Set clipboard text content.
 =head2 GetClipboardText() : string
 
 Get clipboard text content.
+
+=head2 GetClipboardImage() : Raylib::FFI::Image
+
+Get clipboard image content.
 
 =head2 EnableEventWaiting()
 
@@ -1538,9 +1585,9 @@ Load shader from files and bind default locations.
 
 Load shader from code strings and bind default locations.
 
-=head2 IsShaderReady( $shader ) : bool
+=head2 IsShaderValid( $shader ) : bool
 
-Check if a shader is ready.
+Check if a shader is valid.
 
 =head2 GetShaderLocation( $shader, $uniformName ) : int
 
@@ -2141,7 +2188,7 @@ NOTE: This function requires GPU access
 Load image from screen buffer and (screenshot)
 NOTE: This function requires GPU access
 
-=head2 IsImageReady( $image ) : bool
+=head2 IsImageValid( $image ) : bool
 
 Check if an image is ready
 
@@ -2409,15 +2456,15 @@ NOTE: This function requires GPU access
 Load texture for rendering (framebuffer)
 NOTE: This function requires GPU access
 
-=head2 IsTextureReady( $texture ) : bool
+=head2 IsTextureValid( $texture ) : bool
 
-Check if a texture is ready
+Check if a texture is valid
 
 =head2 UnloadTexture( $texture )
 
 Unload texture from GPU memory (VRAM)
 
-=head2 IsRenderTextureReady( $renderTexture ) : bool
+=head2 IsReanderTextureValid( $renderTexture ) : bool
 
 Check if a render texture is ready
 
@@ -2547,9 +2594,9 @@ Load font from Image (XNA style)
 
 Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
 
-=head2 IsFontReady( $font ) : bool
+=head2 IsFontValid( $font ) : bool
 
-Check if a font is ready
+Check if a font is valid.
 
 =head2 LoadFontData( $fileData, $dataSize, $fontSize, $fontChars, $glyphCount, $type ) : Raylib::FFI::GlyphInfo
 
@@ -2738,7 +2785,7 @@ Load model from files (meshes and materials)
 
 Load model from generated mesh (default material)
 
-=head2 IsModelReady( $model ) : bool
+=head2 IsModelValid( $model ) : bool
 
 Check if an model is ready
 
@@ -2858,7 +2905,7 @@ Load materials from model file
 
 Load default material (Supports: Diffuse Maps, Specular Maps, Normal Maps)
 
-=head2 IsMaterialReady( $material ) : bool
+=head2 IsMaterialValid( $material ) : bool
 
 Check if a material is ready
 
@@ -2934,7 +2981,7 @@ Initialize audio device and context
 
 Close the audio device and context
 
-=head2 IsAudioDeviceReady() : bool
+=head2 IsAudioDeviceValid() : bool
 
 Check if audio device has been initialized successfully
 
@@ -2966,7 +3013,7 @@ Load sound from wave data
 
 Create a new sound that shares the same sound data as another existing sound
 
-=head2 IsSoundReady( $sound ) : bool
+=head2 IsSoundValid( $sound ) : bool
 
 Check if a sound is ready
 
@@ -3046,7 +3093,7 @@ Load music stream from file
 
 Load music stream from data
 
-=head2 IsMusicReady( $music ) : bool
+=head2 IsMusicValid( $music ) : bool
 
 Check if music stream is ready
 
@@ -3106,9 +3153,9 @@ Get current music time played (in seconds)
 
 Load audio stream (to stream raw audio pcm data)
 
-=head2 IsAudioStreamReady( $audioStream ) : bool
+=head2 IsAudioStreamValid( $audioStream ) : bool
 
-Check if an audio stream is ready
+Check if an audio stream is valid
 
 =head2 UnloadAudioStream( $audioStream )
 

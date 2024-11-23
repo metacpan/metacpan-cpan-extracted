@@ -6,7 +6,7 @@
       "Ahmad Fatoum C<< <athreef@cpan.org> >>, L<http://a3f.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.044",
+   "generated_by" : "App::ModuleBuildTiny version 0.047",
    "license" : [
       "perl_5"
    ],
@@ -23,19 +23,20 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.044"
+            "App::ModuleBuildTiny" : "0.047"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::raylib" : "0",
+            "Alien::raylib5" : "0",
             "Convert::Color" : "0",
             "FFI::C" : "0",
             "FFI::CheckLib" : "0",
-            "FFI::Platypus" : "0",
+            "FFI::Platypus" : "2.08",
             "File::Share" : "0",
             "Module::Build::Tiny" : "0",
-            "builtin::Backport" : "0"
+            "builtin::Backport" : "0",
+            "perl" : "v5.38.0"
          }
       }
    },
@@ -48,9 +49,15 @@
       },
       "Raylib::FFI" : {
          "file" : "lib/Raylib/FFI.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Raylib::FFI::AudioStream" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::AutomationEvent" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::AutomationEventList" : {
          "file" : "lib/Raylib/FFI.pm"
       },
       "Raylib::FFI::BoneInfo" : {
@@ -66,6 +73,9 @@
          "file" : "lib/Raylib/FFI.pm"
       },
       "Raylib::FFI::Color" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::FilePathList" : {
          "file" : "lib/Raylib/FFI.pm"
       },
       "Raylib::FFI::Font" : {
@@ -160,7 +170,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

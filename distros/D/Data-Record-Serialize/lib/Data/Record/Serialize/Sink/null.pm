@@ -7,7 +7,7 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 
 
@@ -15,6 +15,9 @@ our $VERSION = '1.06';
 
 
 
+
+## no critic( Subroutines::ProhibitBuiltinHomonyms )
+## no critic( NamingConventions::ProhibitAmbiguousNames )
 
 sub print { }
 sub say   { }
@@ -47,7 +50,7 @@ Data::Record::Serialize::Sink::null - send output to nowhere.
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 
