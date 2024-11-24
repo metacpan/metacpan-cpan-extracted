@@ -18,9 +18,8 @@ All information available is extracted.
 =cut
 
 use strict;
-use vars qw/$VERSION/;
 
-$VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub process_file {
     my($info, $fh) = @_;

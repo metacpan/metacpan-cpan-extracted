@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.595';
+our $VERSION = '0.596';
 
 use 5.020;
 use Moo;
@@ -273,7 +273,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.595
+version 0.596
 
 =head1 DESCRIPTION
 

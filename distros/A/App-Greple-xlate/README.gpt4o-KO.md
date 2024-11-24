@@ -10,7 +10,7 @@ App::Greple::xlate - greple을 위한 번역 지원 모듈
 
 # VERSION
 
-Version 0.4101
+Version 0.9901
 
 # DESCRIPTION
 
@@ -259,7 +259,7 @@ Perl의 pod 스타일로 작성된 문서에서 일반 텍스트 블록을 번�
 
 # COMMAND LINE INTERFACE
 
-배포에 포함된 `xlate` 명령을 사용하여 명령줄에서 이 모듈을 쉽게 사용할 수 있습니다. 사용법은 `xlate` 도움말 정보를 참조하세요.  
+이 모듈은 배포에 포함된 `xlate` 명령어를 사용하여 명령 줄에서 쉽게 사용할 수 있습니다. 사용법은 `xlate` 매뉴얼 페이지를 참조하세요.
 
 `xlate` 명령은 Docker 환경과 함께 작동하므로, 손에 설치된 것이 없어도 Docker가 사용 가능하면 사용할 수 있습니다. `-D` 또는 `-C` 옵션을 사용하세요.  
 
@@ -279,29 +279,41 @@ Docker와 메이크 옵션을 결합하여 Docker 환경에서 메이크를 실�
         -a   use API
         -c   just check translation area
         -r   refresh cache
+        -u   force update cache
         -s   silent mode
-        -e # translation engine (default "deepl")
+        -e # translation engine (*deepl, gpt3, gpt4, gpt4o)
         -p # pattern to determine translation area
         -x # file containing mask patterns
         -w # wrap line by # width
-        -o # output format (default "xtxt", or "cm", "ifdef")
+        -o # output format (*xtxt, cm, ifdef, space, space+, colon)
         -f # from lang (ignored)
         -t # to lang (required, no default)
         -m # max length per API call
         -l # show library files (XLATE.mk, xlate.el)
-        --   terminate option parsing
+        --   end of option
+        N.B. default is marked as *
+
     Make options
         -M   run make
         -n   dry-run
+
     Docker options
+        -D * run xlate on the container with the same parameters
+        -C * execute following command on the container, or run shell
+        -S * start the live container
+        -A * attach to the live container
+        N.B. -D/-C/-A terminates option handling
+
         -G   mount git top-level directory
-        -B   run in non-interactive (batch) mode
+        -H   mount home directory
+        -V # specify mount directory
+        -U   do not mount
         -R   mount read-only
-        -E * specify environment variable to be inherited
-        -I * docker image name or version (default: tecolicom/xlate:version)
-        -D * run xlate on the container with the rest parameters
-        -C * run following command on the container, or run shell
-    
+        -L   do not remove and keep live container
+        -K   kill and remove live container
+        -E # specify environment variable to be inherited
+        -I # docker image or version (default: tecolicom/xlate:version)
+
     Control Files:
         *.LANG    translation languates
         *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)

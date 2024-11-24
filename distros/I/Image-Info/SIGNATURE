@@ -15,20 +15,21 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA256
 
 SHA1 c82d6187bf83f92dcd4a4ba9ab8341c3edcc094a .gitignore
-SHA1 5bf370331b91d40e827be45d6e9efc2b81482a88 CHANGES
+SHA1 aadca4d4a78d088f262074a0505f7d9c2e9bff8c CHANGES
 SHA1 d6cf6ad48410d9163a0a33f512562164e31f0251 CREDITS
-SHA1 109caae03241de014eec0f5965b053b426c4fe99 MANIFEST
-SHA1 7508fd127843a69e30ba4f58f4b4e769f20d49e2 MANIFEST.SKIP
-SHA1 bbcb42a15f1fc43c707e0325ef8daeb85f0c3e7c META.json
-SHA1 87c6cf1fd15214421255ce7ad17732caaa830d4a META.yml
-SHA1 fd14642d591e132078fc91a8e54a4a4fed927f46 Makefile.PL
+SHA1 fb2a2d2c2f2b06da4750df79a6cb798e5d035252 MANIFEST
+SHA1 80229cc14a46fecd4b9343f3858e3b4e7edbdb4d MANIFEST.SKIP
+SHA1 6dba8181ccdc7c47e085ea9c60ce5f493ebd1be2 META.json
+SHA1 d2ada8c97efd129463257d791ba4da9b4e7c2510 META.yml
+SHA1 6218d3a0c04b97a2c4d520abbed5552bf19cddd5 Makefile.PL
 SHA1 9fa69197cc57e50669cedae9df4fde38c093c0ab README
 SHA1 36ea8eabe5ac80acc416411aae77b60e1480de1b TODO
-SHA1 a5f893711cdf86ca36889a34178d9ce8f847d6a7 dev/Info.pm.tmpl
+SHA1 27b00163ab6e9bff7c8ec3ac2f144f9eee7371da dev/Info.pm.tmpl
 SHA1 c11e7408bd16d35b2116ee47eaac4f08266be902 dev/build.pl
 SHA1 38b386e67725abff64ea00abb8e92c46f38e2f59 exifdump
 SHA1 fdf710d6580548b5fe62be0fd9151bc196537c17 img/anim.webp
 SHA1 0e2ed058a8e6b748c639b08064f6782c4f51d643 img/bad-exif-1.jpg
+SHA1 d89a0bb014a5dacdda5c2201786ef6e982b9575a img/bad-thumbnail.jpg
 SHA1 c11f86df48ca57d0364c9afd1449683ebf1979f4 img/be.tif
 SHA1 951a303482fb78bc02c65e8310854a7be975bfca img/cynic_hang.jpg
 SHA1 49a6dcd04263d15377be6e7ced44f4e3ce01437c img/gps.jpg
@@ -46,6 +47,7 @@ SHA1 feaec718770ec0de7fc1010827425eca5b268fb8 img/test-gimp.xbm
 SHA1 1c06aac0845d63d93dc09ca3ab7a03a6b309a68a img/test-lossless.webp
 SHA1 1f561889c44c24dae57de74f65401ca7bc089a87 img/test-multi0xff.jpg
 SHA1 44e527641f2af0aadfb1dcc9a7f301f258d8f77d img/test-notrailer.gif
+SHA1 ccec6ef30cc38e9ef1c402ebb469868f6b5cd533 img/test-rt133006.jpg
 SHA1 75da6beb9439bc07a0cd8537ce21689d560452da img/test-unknowncode.gif
 SHA1 dea5d3a37b9f934bc3b028f0467690a5cf4fe9b6 img/test.avif
 SHA1 5d3db653df616830a6a135d862e30e355464a43a img/test.gif
@@ -69,41 +71,44 @@ SHA1 e403a1722e5d26002d8afbf29bd497c60f8ee05f img/upside-down.bmp
 SHA1 5023229b3010b9e9ec663ce10e29bd3cbe5486c8 img/xxe.svg
 SHA1 684ef627299906409c258ed2a66990a26dd13794 img/ztxt.png
 SHA1 376cc1bd8424b1123f0073df81ce5433be4df58e imgdump
-SHA1 9e668ca8d7f8778315883dc8f9cb751cbfcae51e lib/Bundle/Image/Info/Everything.pm
-SHA1 222dd2400f89771096842e1a5b4264534aee5935 lib/Bundle/Image/Info/PNG.pm
-SHA1 e6fe98aa5a30dbd290668cffa515aebaf14828fa lib/Bundle/Image/Info/SVG.pm
-SHA1 fa3a601365ec108901e991a8148b62c2bf3dd62b lib/Bundle/Image/Info/XBM.pm
-SHA1 7ae5950ba4474e8099068ca6122e67cadce60842 lib/Bundle/Image/Info/XPM.pm
-SHA1 83171cc1b691717d85ce58de61ef8c12b03d4002 lib/Image/Info.pm
+SHA1 400ea639b5657b1999af806a433dc30ffabcdb8e lib/Bundle/Image/Info/Everything.pm
+SHA1 4184b6ad2406c6c83399d60ccfd1072711f669ce lib/Bundle/Image/Info/PNG.pm
+SHA1 be006abd33ee9eef9ac7ecd605b4b48a31a840aa lib/Bundle/Image/Info/SVG.pm
+SHA1 dff3bae01bddfa00b794ff44d72e02b848451b01 lib/Bundle/Image/Info/XBM.pm
+SHA1 76adbd3a6617be6dab358f963750ce77e313eb85 lib/Bundle/Image/Info/XPM.pm
+SHA1 b60b0843622ba879e778083cf2478d46186930f8 lib/Image/Info.pm
 SHA1 3da8a571a7d25f226153b177b51affe122a86a75 lib/Image/Info/AVIF.pm
 SHA1 6991a957bacde9d3b873184d90d910d083f5f403 lib/Image/Info/BMP.pm
 SHA1 0996bffe073126dceb72c04dc5b3002c78c24d56 lib/Image/Info/GIF.pm
 SHA1 fb628cb66c566ab66a1b7953a1bb29cfde1c79c7 lib/Image/Info/ICO.pm
-SHA1 b48eec84212c2665922f5dbf23e6083b1a818bfb lib/Image/Info/JPEG.pm
-SHA1 9aaff0bcddae56a1da3bc7dd04e5086760e5fe4c lib/Image/Info/PNG.pm
-SHA1 1b69276ab386d1795469773d6af70ff510c15feb lib/Image/Info/PPM.pm
-SHA1 badd075bff5f88975bcbff1eb2d4cdf84fe5a2ca lib/Image/Info/SVG.pm
-SHA1 c8aa83ad22ff1684a40bae3f37fccc358842b1d1 lib/Image/Info/SVG/XMLLibXMLReader.pm
+SHA1 ed5db398e34ad07bc3e970f72e9c844cda817155 lib/Image/Info/JPEG.pm
+SHA1 01f88457cf645da5361fbad70978e57671ed0687 lib/Image/Info/PNG.pm
+SHA1 ca659641f22dd393f7ddac5d4b4fb8519fad585b lib/Image/Info/PPM.pm
+SHA1 6da9d97354e4af5a1dfbf9af0e0759abb80af3cb lib/Image/Info/SVG.pm
+SHA1 9e69038d9f715829e85ff55f12664cd716061002 lib/Image/Info/SVG/XMLLibXMLReader.pm
 SHA1 c1fe64b6ad5faeeab7d690cd44fd0feaf56952ee lib/Image/Info/SVG/XMLSimple.pm
 SHA1 04be3e8792943ab9b61dcdc89e1f31b70dc60996 lib/Image/Info/TIFF.pm
-SHA1 ed6fde11752d6450756c815b2dca25f9ad1740d9 lib/Image/Info/WBMP.pm
-SHA1 d4a5013ec81db219edd32f273d1be370b5cda9fd lib/Image/Info/WEBP.pm
+SHA1 688871d95fa542d0aeeb96ef638e9b5e1fe5039b lib/Image/Info/WBMP.pm
+SHA1 0a3fefc03df5659b6062d79aae7b80a7b1a5b3ca lib/Image/Info/WEBP.pm
 SHA1 5c896ca4cc89715527f4207bae3c1e3c7a26286a lib/Image/Info/XBM.pm
 SHA1 4a5050fdcef00704e7d1fa2ae8751aa34a866f63 lib/Image/Info/XPM.pm
-SHA1 5e1853b08e6d86cd6be55bb7eea71cd8bd6e7aac lib/Image/TIFF.pm
+SHA1 b48bdfbf6ba2eba12320f5545da989046d130cbb lib/Image/TIFF.pm
 SHA1 34e6def40374dc924ea7ef58c5aa04e04a783295 t/00_basics.t
 SHA1 812aeed71b81ef55082573c4e65c7d2118395952 t/avif.t
-SHA1 38883a0d98f01e4e749168369848f3ab5b5c7660 t/bad_exif.t
+SHA1 8df559e6d189c39661212fbba4c08cc9211edf31 t/bad_exif.t
 SHA1 aaf002b3e5103e15dad27d59bbf2ce7d84caf79e t/bmp.t
-SHA1 7cddff7d8bccd9b2e303554d31ad6f8891b7705b t/exif.t
+SHA1 e55d0a4714934de6674d2b10ed96837389b8ce28 t/exif.t
 SHA1 86a7363e633fe7635f623f8a31cadebde585d0b3 t/fuji_s1000fd_substr_outside_of_string.t
 SHA1 919ad6c0fc44c3458cfd6cce90c665cecf83c287 t/ico.t
+SHA1 54938e8a147494d993ebc5ab470911a872d4443d t/jpg_bad_thumbnail.t
 SHA1 ba1cf7c01b0de6f449a90815bf7db5a3b1645e3d t/jpg_corruptchunk.t
 SHA1 3443c36fd2dbc7f58599cf175e0793c5e8601ea9 t/jpg_hang.t
 SHA1 026bdd691c1971289451e147b8ecf1c99463e74d t/jpg_ignore_thumbnail.t
+SHA1 7ad47176a9273998527606e117a933104130e03c t/jpg_nowarnings.t
 SHA1 79380e179b840468bef4ab231f1bc7ac93081ed2 t/png.t
 SHA1 cc217a37ee14356bb57e4ea32c1eda94d1a2d8c9 t/pod.t
 SHA1 ddac1596c132f80e81355cc048def2733163a9aa t/pod_cov.t
+SHA1 71c8a0761dd026120c879a7070dd1961154fab58 t/ppm_error.t
 SHA1 710bb49a5428b9b0301ec451f8d869b58937b746 t/string.t
 SHA1 456f4ac4ad5fc7eda6b08fca55db2bceb5b4e83a t/svg.t
 SHA1 1e8a42e9b7d911936853446ef907f8f74072d08f t/tiff.t
@@ -120,12 +125,12 @@ SHA1 6ef907e37bb4840f96f8d5b16b47991806f21f31 xt/strict.t
 SHA1 776c2c96e3155a622221cb1c4989579a652452d7 xt/synopsis.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhTWpz/sWDCQpAXAK3UaSYGV8Tz8FAmTL4DsACgkQ3UaSYGV8
-Tz8XdQf+KD6a94/oUsjC0biU5qQyRbdiAwPtjKKxz4bP60is3CzsdeZukfoqg0FU
-U5sB9vs58oEKZiU4nXFRDtkgny4wvnZihjHrDunTjE3DMkMddjenffL+FpOwkbnT
-48enjtKuTE9+2Ne4nBoja/Xp7nBzyeimhbj8eRuxKLbMwlhta30lBS0yCbbGB7PQ
-jurTx4juUUpPb1Aow3sgJzugIbuFcLrnASOEgCVcTYFZnRaucFCwYzPzVRrWXg6h
-YGYgncRLWUVusr8uzr5/kgfetqoC/G7hkrD7lkWZ0XtqLkfp5BAlVQ7ctaBjNb7a
-X9V0DyjBBLtaoNfA12Li8DZOswtl6w==
-=foeR
+iQEzBAEBCAAdFiEEhTWpz/sWDCQpAXAK3UaSYGV8Tz8FAmdC+GIACgkQ3UaSYGV8
+Tz8a9wgAmZk5ttLtUJMcsLgX7900l5L6qWMbvL03YEOH6yB5/9gyO8yIGpq/W16P
+PkwSYqKqnRS7w7KukpPA8N2ha6YmaF+vxEi6K9GmAZCf5Ce9vsN8xNWPF6+yYw4y
+VLOpAgfdw5GKohghAhy9GJxTC7pcVt94gQ0nJ0OlWmpHVKJAxxEDYYaLUPlGbXT7
+3/yrqzXFMBK2smG0Q2l4xxrBVJgKfYQUL3dnjoXcARq2CAJtrF5GjIaCupOHyQdg
+YGfV3NwPRKv9AxIeNI1YirsLoE1gTsYpUOpOGygXMKGJpK/z4rbgbNVFYNZ3PsXd
+qs+G1eYWP9h7Jb5rqui1mQLqtaTlww==
+=BXQt
 -----END PGP SIGNATURE-----

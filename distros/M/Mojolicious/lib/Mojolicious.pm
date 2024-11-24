@@ -57,7 +57,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Waffle';
-our $VERSION  = '9.38';
+our $VERSION  = '9.39';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -513,6 +513,9 @@ rotating passphrases, just add new ones to the front and remove old ones from th
 Signed cookie based session manager, defaults to a L<Mojolicious::Sessions> object. You can usually leave this alone,
 see L<Mojolicious::Controller/"session"> for more information about working with session data.
 
+  # Enable encrypted sessions
+  $app->sessions->encrypted(1);
+
   # Change name of cookie used for all sessions
   $app->sessions->cookie_name('mysession');
 
@@ -870,6 +873,8 @@ Alex Efros
 Alex Salimon
 
 Alexander Karelas
+
+Alexander Kuehne
 
 Alexey Likhatskiy
 

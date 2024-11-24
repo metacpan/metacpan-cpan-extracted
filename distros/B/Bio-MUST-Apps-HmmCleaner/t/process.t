@@ -17,6 +17,8 @@ use Bio::FastParsers::Hmmer;
 
 use Bio::MUST::Apps::HmmCleaner;
 
+say 'Note: tests designed for: HMMER 3.3.2 (Nov 2020); http://hmmer.org/';
+
 my $class = 'Bio::MUST::Apps::HmmCleaner::Process';
 
 # Creation of the 3 elements needed to build a process
@@ -49,8 +51,9 @@ my $process = $class->new(
     'model' => $hmmer,
 );
 
-my $expected_scoreseq = '                                                       gs+g+g++g+g     sggdparpglsqqqrasqrkaqvr+lprakkleklgvfsackane+ckcngwknp+pptaprmdlqqpaa+lse crsc+h+ladhvshlenvse+einrllgmvvdvenlfmsvhkeedtdtkqvyfylfkllrkcilqm++pvvegslgsppfekpnieqgvlnfvqykfshl+p+erqtm+elskmfllclnywkletp+qfrqrsq++dva+ykvnytrwlcychvpqscdslpryett+vfgrsllrsiftvtrrqllekfrvekdklvpekrtlilthfpkflsmleeeiyg nspiwe++ftmp+segtql++rpa vs+++vps+p+fs++++ggs+ss+s+ds g+ep+pgekr lpe+ltledakr+rvmgdipmelvnevmltitdpaamlgpetsllsanaardetarleerrgiiefhvignsl++k+n+++l+wlvglqnvfshqlprmpkeyi+rlvfdpkhktlalikdgrviggicfrmfptqgfteivfcavtsneqvkgygthlmnhlkeyhikhnilyfltyadeyaigyfkkqgfskdikvpksrylgyikdyegatlmecelnpripytelshiikkqkeiikklierkqaqirkvypglscfkegvrqip+es+pgiretgwkplgkekgkelkdpdqly+tlknllaqikshpsawpfmepvkkseapdyyevirfpidlktmterl++ryyvt+klf+adlqrvi+ncreynpp+seyc+ca++lekffyfklke+glidk';
+my $expected_scoreseq = '                                                          g+g++g+g     +ggdparpglsqqqrasqrkaqvr+lprakkleklgvfsackane+ckcngwknp+pptaprmdlqqpaa+lse crsc+h+ladhvshlenvse+einrllgmvvdvenlfmsvhkeedtdtkqvyfylfkllrkcilqm++pvvegslgsppfekpnieqgvlnfvqykfshl+p+erqtm+elskmfllclnywkletp+qfrqrsq +dva+ykvnytrwlcychvpqscdslpryett+vfgr+llrsiftvtrrqllekfrvekdkl+pekrtlilthfpkflsmleeeiyg nspiwe++ftmp+segtql++rpa vs+++vps+p+f+++++ggs+s++++ds g+ep+pgekr lpe+ltledakr+rvmgdipmelvnevmltitdpaamlgpetsllsanaardetarleerrgiiefhvignsl++k+n+++l+wlvglqnvfshqlprmpkeyi+rlvfdpkhktlalikdgrviggicfrmfptqgfteivfcavtsneqvkgygthlmnhlkeyhikhnil+fltyadeyaigyfkkqgfskdikvpksrylgyikdyegatlmecelnpripytelshiikkqkeiikklierkqaqirkvypglscfkegvrqip+es+pgiretgwkp+gkekgkelkdpdqly+tlknllaqikshpsawpfmepvkk+eapdyyevirfpidlktm+erl++ryyvt+klf+adlqrv++ncreynpp+seyc+ca++lekffyfk+ke+glidk';
 
-ok($expected_scoreseq eq $process->score, 'scoreseq processed properly');
+cmp_ok $process->score, 'eq', $expected_scoreseq,
+    'scoreseq processed properly';
 
 done_testing;

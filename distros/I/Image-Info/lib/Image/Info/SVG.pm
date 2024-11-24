@@ -11,8 +11,8 @@
 package Image::Info::SVG;
 
 use strict;
-use vars qw($VERSION @PREFER_MODULE $USING_MODULE);
-$VERSION = '2.04';
+our (@PREFER_MODULE, $USING_MODULE);
+our $VERSION = '2.05';
 
 @PREFER_MODULE = qw(Image::Info::SVG::XMLLibXMLReader
 		    Image::Info::SVG::XMLSimple

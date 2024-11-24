@@ -1,9 +1,10 @@
 # App::hopen::Gen - base class for hopen generators
 package App::hopen::Gen;
-use Data::Hopen qw(:default $QUIET);
+use Data::Hopen qw(:default *QUIET);
+use strict; use warnings;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000015'; # TRIAL
 
 use parent 'Data::Hopen::Visitor';
 use Class::Tiny qw(proj_dir dest_dir), {
@@ -14,7 +15,9 @@ use Class::Tiny qw(proj_dir dest_dir), {
     _assetop_by_asset => sub { +{} },   # Indexed by refaddr($asset)
 };
 
+use App::hopen::Asset;
 use App::hopen::BuildSystemGlobals;
+use App::hopen::Util::String qw(eval_here);
 use Data::Hopen::G::DAG;
 use Data::Hopen::Util::Data qw(forward_opts);
 use File::pushd qw(pushd);
@@ -25,16 +28,21 @@ use Scalar::Util qw(refaddr);
 
 =head1 NAME
 
-Data::Hopen::Gen - Base class for hopen generators
+App::hopen::Gen - Base class for hopen generators
 
 =head1 SYNOPSIS
 
 The code that generates blueprints for specific build systems
-lives under C<Data::Hopen::Gen>.  L<Data::Hopen::Phase::Gen> calls modules
-under C<Data::Hopen::Gen> to create the blueprints.  Those modules must
+lives under C<App::hopen::Gen>.  L<App::hopen> calls modules
+under C<App::hopen::Gen> to create the blueprints.  Those modules must
 implement the interface defined here.
 
 =head1 ATTRIBUTES
+
+=head2 architecture
+
+The architecture.  The use of this is defined by the specific
+generator or toolset.
 
 =head2 proj_dir
 
@@ -53,7 +61,7 @@ the L<App::Hopen::Asset>s to be created when a build is run.
 
 =head1 FUNCTIONS
 
-A generator (C<Data::Hopen::Gen> subclass) is a Visitor plus some.
+A generator (C<App::hopen::Gen> subclass) is a Visitor plus some.
 
 B<Note>:
 The generator does not have access to L<Data::Hopen::G::Link> instances.
@@ -95,9 +103,15 @@ sub asset {
         return $existing_op;
     }
 
-    # Create a new op
+    # Need to create an op.  First, load its class.
     my $class = $self->_assetop_class;
-    eval "require $class";
+
+    eval_here <<EOT;
+require $class;
+EOT
+    die "$@" if $@;
+
+    # Create a new op
     my $op = $class->new(name => 'Op:<<' . $args{asset}->target . '>>',
                             forward_opts(\%args, qw(asset how)));
     $self->_assetop_by_asset->{refaddr($args{asset})} = $op;
@@ -113,6 +127,9 @@ been added using L</asset>.  Usage:
     $Generator->connect([-from=>]$from, [-to=>$to]);
 
 TODO add missing assets automatically?
+
+TODO rename the asset-graph public interface so it's more clear that it's
+the asset graph and not the command graph.
 
 =cut
 
@@ -134,6 +151,14 @@ sub connect {
     croak "No To node for asset " . refaddr($args{to}) unless $nodes{to};
     $self->_assets->connect($nodes{from}, $nodes{to});
 } #connect()
+
+=head2 asset_default_goal
+
+Read-only accessor for the default goal of the asset graph
+
+=cut
+
+sub asset_default_goal () { shift->_assets->default_goal }
 
 =head2 run_build
 
@@ -170,6 +195,8 @@ sub BUILD {
 
     # Create the asset graph
     $self->_assets(hnew DAG => 'asset graph');
+    $self->_assets->goal('__R_asset_default_goal');
+        # Create and set default goal
 } #BUILD()
 
 =head1 FUNCTIONS TO BE IMPLEMENTED BY SUBCLASSES
@@ -188,10 +215,10 @@ sub _assetop_class { ... }
 (Required) Returns the package stem of the default toolset for this generator.
 
 When a hopen file invokes C<use language "Foo">, hopen will load
-C<< Data::Hopen::T::<stem>::Foo >>, where C<< <stem> >> is the return
-value of this function.
+C<< App::hopen::T::<stem>::Foo >>.  C<< <stem> >> is the return
+value of this function unless the user has specified a different toolset.
 
-As a sanity check, hopen will first try to load C<< Data::Hopen::T::<stem> >>,
+As a sanity check, hopen will first try to load C<< App::hopen::T::<stem> >>,
 so make sure that is a valid package.
 
 =cut
@@ -204,7 +231,13 @@ sub default_toolset { ... }
 Do whatever the generator wants to do to finish up.  By default, no-op.
 Is provided the L<Data::Hopen::G::DAG> instance as a parameter.  Usage:
 
-    $generator->finalize(-phase=>$Phase, -graph=>$dag)
+    $generator->finalize(-phase=>$Phase, -graph=>$Build,
+                        -data=>$data)
+
+C<$dag> is the command graph, and C<$data> is the output from the
+command graph.
+
+C<finalize> is always called with named parameters.
 
 =cut
 
@@ -223,16 +256,47 @@ sub _run_build {
 
 =head2 visit_goal
 
-(Optional)
-Do whatever the generator wants to do with a L<Data::Hopen::G::Goal>.
-For example, the generator may change the goal's C<outputs>.
-By default, no-op.  Usage:
+Add a target corresponding to the name of the goal.  Usage:
 
-    $generator->visit_goal($goal);
+    $Generator->visit_goal($node, $node_inputs);
+
+This happens while the command graph is being run.
+
+This can be overriden by a generator that wants to handle
+L<Data::Hopen::G::Goal> nodes differently.
+For example, the generator may want to change the goal's C<outputs>.
 
 =cut
 
-sub visit_goal { }
+sub visit_goal {
+    my ($self, %args) = getparameters('self', [qw(goal node_inputs)], @_);
+
+    # --- Add the goal to the asset graph ---
+
+    #my $asset_goal = $self->_assets->goal($args{goal}->name);
+    my $phony_asset = App::hopen::Asset->new(
+        target => $args{goal}->name,
+        made_by => $self,
+    );
+    my $phony_node = $self->asset(-asset => $phony_asset, -how => '');
+        # \p how defined but falsy => it's a goal
+    $self->connect($phony_node, $self->asset_default_goal);
+
+    # Pull the inputs.  TODO refactor out the code in common with
+    # AhG::Cmd::input_assets().
+    my $hrSourceFiles =
+        $args{node_inputs}->find(-name => 'made',
+                                    -set => '*', -levels => 'local') // {};
+    die 'No input files to goal ' . $args{goal}->name
+        unless scalar keys %$hrSourceFiles;
+
+    my $lrSourceFiles = $hrSourceFiles->{(keys %$hrSourceFiles)[0]};
+    hlog { 'found inputs to goal', $args{goal}->name, Dumper($lrSourceFiles) } 2;
+
+    # TODO? verify that all the assets are actually in the graph first?
+    $self->connect($_, $phony_node) foreach @$lrSourceFiles;
+
+} #visit_goal()
 
 =head2 visit_node
 

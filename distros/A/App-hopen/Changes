@@ -1,20 +1,41 @@
 Revision history for App-hopen
 
+0.000015 2024-11-24T00:08:21Z
+
+    - Non-TRIAL release
+
+0.000014 2024-09-28T15:12:46Z (TRIAL RELEASE)
+
+    - Manage this dist using Minilla
+
+0.000013    2022-11-12 (TRIAL RELEASE)
+    - Add MSBuild generator stub.
+    - Require Data::Hopen v0.0.19.  Fixes #9 (thanks to eserte for reporting!).
+    - Major internal changes.
+
+0.000012    2019-06-06 (TRIAL RELEASE)
+    - Added Microsoft cl.exe toolset
+
+0.000011    2019-06-04 (TRIAL RELEASE)
+    - Added Ninja generator
+    - Added examples in the `eg/` directory
+    - Updated documentation
+
 0.000010    2019-05-26
-    First non-trial release.
-    Major internal changes.  Finished removing Data-Hopen leftovers.
+    - First non-trial release.
+    - Major internal changes.  Finished removing Data-Hopen leftovers.
 
 0.000009    2019-02-24 (TRIAL RELEASE)
-    Split former Build-Hopen into App-hopen and Data-Hopen
+    - Split former Build-Hopen into App-hopen and Data-Hopen
 
 0.000008    2019-02-09 (TRIAL RELEASE)
-    Tweak File::Glob usage to support Perl 5.14
+    - Tweak File::Glob usage to support Perl 5.14
 
 0.000007    2019-02-08 (TRIAL RELEASE)
-    First version that can generate a Makefile
+    - First version that can generate a Makefile
 
 0.000006    2019-02-06 (TRIAL RELEASE)
-    Substantially expanded
+    - Substantially expanded
 
 0.000003    2018-01-02 (TRIAL RELEASE)
-    First full trial release
+    - First full trial release

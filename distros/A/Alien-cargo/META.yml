@@ -1,0 +1,33 @@
+---
+abstract: 'Find or download the cargo command (build system and package manager for Rust)'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::V0: '0.000121'
+  perl: '5.008004'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-cargo
+requires:
+  Alien::Base: '0'
+  Alien::Rust: '0'
+  Capture::Tiny: '0'
+  File::Which: '0'
+  perl: '5.008004'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/PerlAlien/Alien-cargo/issues
+  homepage: https://metacpan.org/pod/Alien::cargo
+  repository: git://github.com/PerlAlien/Alien-cargo.git
+version: '0.02'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: transferCleaner.pl
 # ABSTRACT: transfer amino acid LSSs on corresponding nucleotide alignment
+# CONTRIBUTOR: Denis BAURAIN <denis.baurain@uliege.be>
 
 use Modern::Perl;
 use Getopt::Euclid;
@@ -33,14 +34,14 @@ my $corg;
 my @spans;
 while (my $line = <$fh>) {
     chomp $line;
-    unless (substr($line,0,1) =~ m/\s/) {
+    unless (substr($line,0,1) =~ m/\s/xms) {
         if (defined $corg && @spans > 0) {
             $log{$corg} = [@spans];
             @spans = ();
         }
         $corg = $line;
     } else {
-        $line =~ s/\s+//g;
+        $line =~ s/\s+//xmsg;
         my ($s,$e) = split "-", $line;
         push @spans, [$s,$e];
     }
@@ -71,15 +72,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 transferCleaner.pl - transfer amino acid LSSs on corresponding nucleotide alignment
 
 =head1 VERSION
 
-version 0.180750
+version 0.243280
 
 =head1 USAGE
 
@@ -112,7 +111,7 @@ Log file
 Replacement character for removed residues
 
 =for Euclid: delchar.type: string
-	delchar.default: ' '
+    delchar.default: ' '
 
 =item -costs <c1> <c2> <c3> <c4>
 
@@ -124,9 +123,9 @@ Predefine value are also available with --large and --specificity options but
 user defined costs will be prioritary if present.
 
 =for Euclid: c1.type: number < 0
-	c2.type: number < 0
-	c3.type: number > 0
-	c4.type: number > 0
+    c2.type: number < 0
+    c3.type: number > 0
+    c4.type: number > 0
 
 =item --changeID
 
@@ -145,7 +144,7 @@ global = all sequences (same profile for each sequence)
 First case is more sensitive but need more ressource (hence more time)
 
 =for Euclid: profile.type: /local|global/
-    profile.type.error: <profile> must be either "local" or "global"                             
+    profile.type.error: <profile> must be either "local" or "global"
     profile.default: 'global'
 
 =item --large
@@ -191,6 +190,12 @@ Print the usual program information
 =head1 AUTHOR
 
 Arnaud Di Franco <arnaud.difranco@gmail.fr>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Denis BAURAIN
+
+Denis BAURAIN <denis.baurain@uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

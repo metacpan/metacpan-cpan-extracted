@@ -9,6 +9,7 @@ App-hopen-.*
 TODO
 \brunhopen$
 \.stackdump$
+\.mailmap$
 
 # Backup files
 \.swp$
@@ -17,8 +18,10 @@ TODO
 
 # Things we generate
 \bbuilt[\\/]
+\bhtml[\\/]
 \.o(bj)?$
 \.exe$
+\btags$
 
 #modified included
 # Avoid version control files.

@@ -1,3 +1,4 @@
+# vim: set ft=perl ts=8 sts=2 sw=2 tw=100 et :
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
@@ -19,8 +20,8 @@ use constant KEYWORDS => {
   # draft4 -> http://json-schema.org/draft-04/schema#
   'draft4' => {
     Core => [qw(
-      id
       $schema
+      id
       $ref
       definitions
     )],
@@ -66,8 +67,8 @@ use constant KEYWORDS => {
   # draft6 -> http://json-schema.org/draft-06/schema#
   'draft6' => {
     Core => [qw(
-      $id
       $schema
+      $id
       $ref
       definitions
     )],
@@ -117,8 +118,8 @@ use constant KEYWORDS => {
   # draft7 -> http://json-schema.org/draft-07/schema#
   'draft7' => {
     Core => [qw(
-      $id
       $schema
+      $id
       $ref
       definitions
       $comment
@@ -178,8 +179,8 @@ use constant KEYWORDS => {
   # draft2019-09 -> https://json-schema.org/draft/2019-09/schema
   'draft2019-09' => {
     Core => [qw(
-      $id
       $schema
+      $id
       $anchor
       $recursiveAnchor
       $ref
@@ -252,8 +253,8 @@ use constant KEYWORDS => {
   # draft2020-12 -> https://json-schema.org/draft/2020-12/schema
   'draft2020-12' => {
     Core => [qw(
-      $id
       $schema
+      $id
       $anchor
       $dynamicAnchor
       $ref

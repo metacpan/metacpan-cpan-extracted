@@ -1,6 +1,6 @@
 #!perl
 use 5.014;
-use strict;
+use strict; use warnings;
 use warnings;
 use Test::More;
 

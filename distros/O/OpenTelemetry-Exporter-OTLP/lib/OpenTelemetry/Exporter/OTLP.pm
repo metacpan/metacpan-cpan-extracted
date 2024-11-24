@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::Exporter::OTLP;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
     use Feature::Compat::Try;
@@ -73,7 +73,7 @@ class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
     field $endpoint;
     field $compression;
     field $encoder;
-    field $max_retries = 5;
+    field $retries = 5;
 
     ADJUSTPARAMS ($params) {
         $endpoint = delete $params->{endpoint}
@@ -88,6 +88,8 @@ class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
         $compression = delete $params->{compression}
             // config(<EXPORTER_OTLP_{TRACES_,}COMPRESSION>)
             // $COMPRESSION;
+
+        $retries = delete $params->{retries};
 
         my $timeout = delete $params->{timeout}
             // config(<EXPORTER_OTLP_{TRACES_,}TIMEOUT>)
@@ -177,10 +179,10 @@ class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
         );
     }
 
-    method $maybe_backoff ( $count, $reason, $after = 0 ) {
-        $metrics->inc_counter( failure => [ reason => $reason ] );
+    method $maybe_backoff ( $attempts, $after = undef ) {
+        $after //= 0; # Breaks tests in Perls under 5.38 if in signature
 
-        return if $count > $max_retries;
+        return if $attempts > $retries;
 
         my $sleep;
         try {
@@ -191,7 +193,7 @@ class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
             die $e unless $e =~ /^Error parsing time/;
             $sleep = $after if $after > 0;
         }
-        $sleep //= int rand 2 ** $count;
+        $sleep //= int rand 2 ** $attempts;
 
         sleep $sleep + rand;
 
@@ -226,8 +228,8 @@ class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
             );
         }
 
-        my $start = timeout_timestamp;
-        my $retries = 0;
+        my $start    = timeout_timestamp;
+        my $attempts = 0;
         while (1) {
             my $remaining = maybe_timeout $timeout, $start;
             return TRACE_EXPORT_TIMEOUT if $timeout && !$remaining;
@@ -281,7 +283,9 @@ class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
                         }
                     };
 
-                    redo if $self->$maybe_backoff( ++$retries, $reason );
+                    $metrics->inc_counter( failure => [ reason => $reason ] );
+
+                    redo if $self->$maybe_backoff( ++$attempts );
                 }
                 case( m/^(?: 4 | 5 ) \d{2} $/ax ) {
                     my $code = $res->{status};
@@ -317,7 +321,7 @@ class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
                             || $code == 502
                             || $code == 503
                             || $code == 504
-                        ) && $self->$maybe_backoff( ++$retries, $code, $after );
+                        ) && $self->$maybe_backoff( ++$attempts, $after );
                 }
             }
 

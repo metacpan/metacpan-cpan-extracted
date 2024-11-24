@@ -1,19 +1,18 @@
 Homo sapiens@ENSP00000225916
-	1-86
+	1-87
 Homo sapiens@ENSP00000456712
-	1-86
+	1-87
 L oxodonta_africana@ENSLAFP00000006713_that is really long with strange stuff
-	12-86
+	12-87
 Canis familiaris@ENSCAFP00000023075
-	1-86
+	1-87
 Mus musculus@ENSMUSP00000098017
-	1-63
+	1-66
 	499-529
 Monodelphis domestica@ENSMODP00000018493
-	64-87
 	621-692
 Macropus eugenii@ENSMEUP00000005117
-	1-87
+	1-86
 	647-692
 Ornithorhynchus anatinus@ENSOANP00000015773
 	336-349
@@ -21,7 +20,7 @@ Ornithorhynchus anatinus@ENSOANP00000015773
 Xenopus tropicalis@ENSXETP00000004923
 	1-89
 Meleagris gallopavo@ENSMGAP00000006789
-	452-528
+	451-528
 Gallus gallus@ENSGALP00000005317
 	270-305
 	596-616
@@ -33,9 +32,11 @@ Anolis carolinensis@ENSACAP00000017686
 Protopterus annectens@comp246593_c0_seq1
 Protopterus annectens@comp301579_c0_seq1
 	43-89
+	438-495
 	577-732
 Latimeria chalumnae@ENSLACP00000012334
 	13-87
+	451-473
 	693-729
 	779-818
 Danio rerio@ENSDARP00000011795
@@ -55,9 +56,9 @@ Loxodonta africana@ENSLAFP00000005288
 Dasypus novemcinctus@ENSDNOP00000011162
 	233-265
 	326-390
-	412-451
+	412-450
 	587-646
-	856-892
+	856-891
 Monodelphis domestica@ENSMODP00000032522
 Macropus eugenii@ENSMEUP00000013271
 	390-433

@@ -9,13 +9,12 @@
 package Image::Info::WBMP;
 
 use strict;
-use vars qw($VERSION @EXPORT_OK);
-$VERSION = '0.01';
+our $VERSION = '0.02';
 
 require Exporter;
 *import = \&Exporter::import;
 
-@EXPORT_OK = qw(wbmp_image_info);
+our @EXPORT_OK = qw(wbmp_image_info);
 
 sub process_file {
     my($info, $fh) = @_;

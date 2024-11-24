@@ -1,9 +1,10 @@
 # App::hopen::G::Cmd - base class for hopen(1) command-graph nodes
 package App::hopen::G::Cmd;
+use strict; use warnings;
 use Data::Hopen::Base;
 use Quote::Code;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000015'; # TRIAL
 
 use parent 'Data::Hopen::G::Op';
 use Class::Tiny {
@@ -17,7 +18,7 @@ use Data::Hopen qw(getparameters);
 
 =head1 NAME
 
-App::hopen::G::Cmd - base class for hopen(1) operation-graph nodes
+App::hopen::G::Cmd - base class for hopen(1) command-graph nodes
 
 =head1 SYNOPSIS
 
@@ -29,7 +30,7 @@ L<App::hopen>.  See L<App::hopen::Conventions>.
 =head2 made
 
 An arrayref of the outputs from this function, which are L<App::hopen::Asset>
-instances.  (TODO enforce this requirement.)
+instances.
 
 =cut
 
@@ -94,8 +95,8 @@ sub input_assets {
     my $hrSourceFiles =
         $self->scope->find(-name => 'made', -set => '*', -levels => 'local') // {};
 
-    if(scalar keys %$hrSourceFiles) {
-        $lrSourceFiles = %$hrSourceFiles{(keys %$hrSourceFiles)[0]};
+    if(keys %$hrSourceFiles) {
+        $lrSourceFiles = $hrSourceFiles->{(keys %$hrSourceFiles)[0]};
     } else {
         $lrSourceFiles = [];
     }

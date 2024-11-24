@@ -42,6 +42,6 @@
          "web" : "https://github.com/tulamili/App-coldigits"
       }
    },
-   "version" : "0.014",
+   "version" : "0.016",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

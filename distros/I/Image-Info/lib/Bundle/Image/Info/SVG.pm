@@ -3,8 +3,7 @@
 package Bundle::Image::Info::SVG;
 
 use strict;
-use vars qw($VERSION);
-$VERSION = '0.02';
+our $VERSION = '0.03';
 
 1;
 

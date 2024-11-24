@@ -1,24 +1,20 @@
 # App::hopen::T::Gnu::C::CompileCmd - compile C source using the GNU toolset
-# TODO RESUME HERE - put .o files in the dest dir
 package App::hopen::T::Gnu::C::CompileCmd;
 use Data::Hopen;
+use strict; use warnings;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000015'; # TRIAL
 
-use parent 'App::hopen::G::Cmd';
+use parent 'App::hopen::G::OutputPerFileCmd';
 use Class::Tiny qw(compiler);
 
+use App::hopen::Asset;
 use App::hopen::BuildSystemGlobals;   # For $DestDir.
     # TODO make the dirs available to nodes through the context.
 use App::hopen::Util::BasedPath;
-use Config;
 use Data::Hopen qw(getparameters);
-use Data::Hopen::G::GraphBuilder;
-#use Data::Hopen::Util::Data qw(forward_opts);
 use Data::Hopen::Util::Filename;
-use Deep::Hash::Utils qw(deepvalue);
-use File::Which ();
 use Path::Class;
 
 my $_FN = Data::Hopen::Util::Filename->new;     # for brevity
@@ -53,41 +49,39 @@ The compiler to use.  TODO is this a full path or just a name?
 
 # }}}1
 
-=head2 _run
+=head2 _process_input
 
-Create the compile command line.
+Create the compile command line for a given asset.
 
 =cut
 
-sub _run {
-    my ($self, %args) = getparameters('self', [qw(phase visitor ; *)], @_);
+sub _process_input {
+    my ($self, %args) = getparameters('self', [qw(asset visitor ; *)], @_);
+    my $src = $args{asset};
 
-    # Currently we only do things at gen time.
-    return $self->passthrough(-nocontext=>1) if $args{phase} ne 'Gen';
+    die "Cannot compile non-file $src" unless $src->isdisk;
 
-    # Pull the inputs
-    my $lrSourceFiles = $self->input_assets;
-    hlog { 'found source files', Dumper($lrSourceFiles) } 2;
+    my $to = based_path(path => file($_FN->obj($src->target->path)),
+                        base => $DestDir);
+    my $how = $self->compiler . " -c #first -o #out";
+    my $obj = App::hopen::Asset->new(
+        target => $to,
+        made_by => $self,
+    );
 
-    my @objFiles;
-    foreach my $src (@$lrSourceFiles) {
-        die "Cannot compile non-file $src" unless $src->isdisk;
+    return [$obj, $how];
+} #_process_input()
 
-        my $to = based_path(path => file($_FN->obj($src->target->path)),
-                            base => $DestDir);
-        my $how = $self->compiler . " -c #first -o #out";
-        my $obj = App::hopen::Asset->new(
-            target => $to,
-            made_by => $self,
-        );
-        push @objFiles, $obj;
+=head2 _should_act
 
-        $args{visitor}->asset($obj, -how => $how);
-        $args{visitor}->connect($src, $obj);
-    }
-    $self->make(\@objFiles);
-    return {};
-} #_run()
+Returns truthy if L</_process_input> should be called.
+
+=cut
+
+sub _should_act {
+    my ($self, %args) = getparameters('self', [qw(visitor ; *)], @_);
+    return ($Phase eq 'Gen');
+} #_should_act()
 
 1;
 __END__

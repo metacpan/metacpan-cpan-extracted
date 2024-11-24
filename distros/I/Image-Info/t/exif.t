@@ -7,7 +7,7 @@ use strict;
 
 BEGIN
    {
-   plan tests => 7;
+   plan tests => 9;
    chdir 't' if -d 't';
    use lib '../lib';
    use_ok ("Image::Info") or die($@);
@@ -30,5 +30,8 @@ is ($i->{'Olympus-CameraID'}, 'OLYMPUS DIGITAL CAMERA', 'Olympus-CameraID');
 
 isnt ($i->{UserComment}, "ASCII", 'UserComment');
 like ($i->{UserComment}, qr/^\s+\z/, 'UserComment');
+
+isa_ok ($i->{ExposureBiasValue}, 'Image::TIFF::Rational');
+is ("$i->{ExposureBiasValue}", "0/10", 'ExposureBiasValue');
 
 is (dim($i), '320x240', 'dim()');

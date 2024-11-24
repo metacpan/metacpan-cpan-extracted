@@ -347,6 +347,7 @@ t/mojolicious/renderer.t
 t/mojolicious/restful_lite_app.t
 t/mojolicious/routes.t
 t/mojolicious/secret.txt
+t/mojolicious/session_lite_app.t
 t/mojolicious/signatures_lite_app.t
 t/mojolicious/single_file_test_app.conf
 t/mojolicious/static_lite_app.t

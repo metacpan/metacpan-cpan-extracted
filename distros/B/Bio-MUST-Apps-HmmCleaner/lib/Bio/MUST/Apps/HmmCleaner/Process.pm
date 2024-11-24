@@ -1,6 +1,7 @@
 package Bio::MUST::Apps::HmmCleaner::Process;
 # ABSTRACT: Process class for HmmCleaner
-$Bio::MUST::Apps::HmmCleaner::Process::VERSION = '0.180750';
+# CONTRIBUTOR: Denis BAURAIN <denis.baurain@uliege.be>
+$Bio::MUST::Apps::HmmCleaner::Process::VERSION = '0.243280';
 use Moose;
 use namespace::autoclean;
 
@@ -69,15 +70,17 @@ has 'debug_mode' => (
 
 # BUILDER
 
+## no critic (ProhibitUnusedPrivateSubroutines)
+
 # do the hmmsearch and recover the standard parser for current process
 sub _build_parser {
     my $self = shift;
 
     my $hmmer = $self->model;
-    
+
     # we work without gap
     # Hmmsearch output file and parser
-    
+
     my $target = Bio::MUST::Core::Ali::Temporary->new(
             seqs => [$self->nogap_seq],
             args => {
@@ -108,13 +111,13 @@ sub _build_scoreseq {
 
     my $seqfullid = $self->seq->full_id;
     my $seqlength = $self->nogap_seq->seq_len;
-    
+
     my $concat_scoreseq;
     if ( defined $target ) {
         ### [PROCESS] Actual target name : $target->name
         my @domains_info = $target->all_domains;
         #### [PROCESS] Nb of domains : scalar(@domains_info)
-        
+
         # check for ovelapping domains
         for(my $i=0; $i<@domains_info; $i++){
             for(my $j=$i+1; $j<@domains_info; $j++){
@@ -125,11 +128,11 @@ sub _build_scoreseq {
                 }
             }
         }
-        
+
         ### Concatening all domains on 1 line...
         $concat_scoreseq = ( @domains_info == 0 ) ? '' : " " x ($domains_info[0]->ali_start - 1);
         # Condition if no domain found
-        
+
         if ( @domains_info > 0) {
             for (my $i=0; $i<@domains_info; $i++) {
                 ###### [PROCESS] currentscore length   : length($concat_scoreseq)
@@ -138,7 +141,7 @@ sub _build_scoreseq {
                 ###### [PROCESS] Seq       : $domains_info[$i]->seq
                 ###### [PROCESS] Score seq : $domains_info[$i]->scoreseq
                 ###### [PROCESS] degap seq : $domains_info[$i]->get_degap_scoreseq
-                
+
                 # substr of score to remove beginning that could correspond to overlap
                 my $add = substr( $domains_info[$i]->get_degap_scoreseq, ( length($concat_scoreseq) - $domains_info[$i]->ali_start + 1 ) );
                 ###### [PROCESS] Added score : $add
@@ -157,7 +160,7 @@ sub _build_scoreseq {
             carp 'WARNING : No domains found for '.$seqfullid.' in '.$self->ali->file."\n";
             # TODO <-> Remove this futur empty seq
         }
-        
+
         $concat_scoreseq .= " " x ($seqlength - length($concat_scoreseq));
         #### [PROCESS] Final concatenated scoreseq : $concat_scoreseq
     } else {
@@ -170,9 +173,11 @@ sub _build_scoreseq {
     return $concat_scoreseq;
 }
 
+## use critic
+
 # Given two segment a-b and c-d, give the common part size
 # assume a<b and c<d
-# This sub is coming from the original script 
+# This sub is coming from the original script
 sub _overlap {
     my ($a, $b, $c, $d) = @_;
     my $ret = 0;
@@ -209,19 +214,23 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 Bio::MUST::Apps::HmmCleaner::Process - Process class for HmmCleaner
 
 =head1 VERSION
 
-version 0.180750
+version 0.243280
 
 =head1 AUTHOR
 
 Arnaud Di Franco <arnaud.difranco@gmail.fr>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Denis BAURAIN
+
+Denis BAURAIN <denis.baurain@uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

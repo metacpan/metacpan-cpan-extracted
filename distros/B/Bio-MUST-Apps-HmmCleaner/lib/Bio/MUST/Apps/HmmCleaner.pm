@@ -1,6 +1,7 @@
 package Bio::MUST::Apps::HmmCleaner;
 # ABSTRACT: Main class for HmmCleaner
-$Bio::MUST::Apps::HmmCleaner::VERSION = '0.180750';
+# CONTRIBUTOR: Denis BAURAIN <denis.baurain@uliege.be>
+$Bio::MUST::Apps::HmmCleaner::VERSION = '0.243280';
 use Moose;
 use namespace::autoclean;
 
@@ -80,7 +81,7 @@ has 'costs' => (
     handles        => {
         _get_cost => 'get',
     }
-    
+
 );
 
 has '_cleaners' => (
@@ -127,20 +128,22 @@ has 'debug_mode' => (
 sub BUILD {
     ##### [HMMCLEANER] BUILD...
     my $self = shift;
-    
+
     my $costs = $self->costs;
     carp "Your costs must be increasing" if ( ($$costs[0] > $$costs[1]) || ($$costs[1] > 0) || ($$costs[2] < 0) || ($$costs[2] > $$costs[3]) );
-    
+
     carp 'Your MSA file is not aligned' unless ($self->ali->is_aligned);
-    
+
     $self->_cleaners;
-    
+
     ##### End of BUILD...
     return;
 }
 
 
 # BUILDER
+
+## no critic (ProhibitUnusedPrivateSubroutines)
 
 # delayed costs creation
 sub _build_cost {
@@ -149,19 +152,19 @@ sub _build_cost {
 
 sub _build_outfile {
     my $self = shift;
-    
+
     my $infile = $self->ali->filename;
-    
+
     (my $outfile = $infile) =~ s/\.[^\.]+$//x;
     $outfile .= '_hmm';
-    
+
     return $outfile;
 }
 
 # produce the cleaned sequences
 sub _build_cleaners {
     #### [HMMCLEANER] building cleaners...
-    
+
     my $self = shift;
 
     my $ali = $self->ali;
@@ -186,7 +189,7 @@ sub _build_cleaners {
             gapify      => ($self->consider_X) ? 'X' : '*', # if consider_X changing MISS Char to X ...
             clean       => 1,
     };
-    
+
     # Creation of global profile
     my $hmmer;
     unless ($self->perseq_profile) {
@@ -197,7 +200,7 @@ sub _build_cleaners {
             args        => $alitemp_args,
         );
     }
-    
+
     SEQ:
     for my $seq ($ali->all_seqs) {
         ##### [HMMCLEANER] actual sequence : $seq->foreign_id
@@ -205,13 +208,13 @@ sub _build_cleaners {
         # Creation of perseq profile
         if ($self->perseq_profile) {
             ### Perseq profile ...
-            my $lookup = $self->ali_model->new_lookup;
+            my $lookup = $self->ali_model->new_lookup;  ## no critic (ProhibitReusedNames)
             my @new = map { $_->full_id } grep { $_->full_id ne $seq->full_id } $self->ali_model->all_seqs;
             my $list = IdList->new( ids => \@new);
 
             # ali without current seq
             my $shorted_ali = $list->reordered_ali($self->ali_model, $lookup);
-            
+
             $hmmer = Bio::MUST::Drivers::Hmmer::Model::Temporary->new(
                 seqs        => [ $shorted_ali->all_seqs ],
                 model_args  => $model_args,
@@ -220,7 +223,7 @@ sub _build_cleaners {
         }
 
         ##### [HMMCLEANER] HMM driver : $hmmer->model->filename
-        
+
         # Creation of process
         my $process = Process->new(
             'ali'           => $self->ali,
@@ -242,12 +245,12 @@ sub _build_cleaners {
             'delchar'       => $self->delchar,
             'is_protein'    => $self->ali->is_protein,
         );
-        
+
         push @cleaners, $cleaner;
 
         $hmmer->model->remove if ($self->perseq_profile && !$self->debug_mode); # if debug
     }
-    
+
     ##### [HMMCLEANER] end of building cleaners...
 
     $hmmer->model->remove unless ($self->debug_mode); # if debug
@@ -255,16 +258,18 @@ sub _build_cleaners {
     return \@cleaners;
 }
 
+## use critic
+
 # PRIVATE SUB
 
 sub _get_default_cost {
     ###### [HMMCLEANER] building cost...
     my $self = shift;
-    
+
     # need condition to enable non defaults values
     # if set, builder is not activated so ok
     my $costs = [ -0.15, -0.08, 0.15, 0.45 ];
-    
+
     ###### [HMMCLEANER] end of build cost...
     return $costs;
 }
@@ -292,28 +297,28 @@ sub get_result_ali {
         for my $seq (@$seqs) {
             $seq->_set_full_id($seq->full_id.'_hmmcleaned');
         };
-        
+
         return Ali->new( seqs => $seqs );
     }
 }
 
 sub store_results {
     my $self = shift;
-    
+
     my $ali  = $self->get_result_ali;
     if ($self->outfile_type) {
         $ali->store($self->outfile.'.ali');
     } else {
         $ali->store_fasta($self->outfile.'.fasta');
     }
-    
+
     return;
 }
 
 # output file with alignment of degap seq, score and result
 sub store_score {
     my $self = shift;
-    
+
     my $outscore = file($self->outfile.'.score');
     my $score_fh = $outscore->openw;
 
@@ -330,7 +335,7 @@ sub store_score {
 # Writing log at the same time, listings of cleaned blocks foreach seq
 sub store_log {
     my $self = shift;
-    
+
     my $outlog = file($self->outfile.'.log');
     my $log_fh = $outlog->openw;
 
@@ -345,12 +350,12 @@ sub store_log {
             $erased += $$shifts_withgaps[$i+1] - $$shifts_withgaps[$i];
             say {$log_fh} "\t".( 1+$$shifts_withgaps[$i] )."-".( $$shifts_withgaps[$i+1] );
         }
-        
+
         ##### Number of removed positions : $erased
 
         say $self->ali->file."\t".$seq->full_id."\t".$erased;
     }
-    
+
     return;
 }
 
@@ -361,15 +366,15 @@ sub get_log_simu {
     my %log;
     for my $cleaner ($self->all_cleaners) {
         my $seq = $cleaner->seq;
-        
+
         my $shifts = $cleaner->nogap_shifts;
         for(my $i = 0; $i < $#$shifts; $i+=2){
-            
+
             push @{$log{$self->ali->file}->{$seq->full_id}}, [(1+$$shifts[$i] ), ( $$shifts[$i+1] )];
         }
-        
+
     }
-    
+
     return \%log;
 }
 
@@ -380,15 +385,15 @@ sub get_log_simualign {
     my %log;
     for my $cleaner ($self->all_cleaners) {
         my $seq = $cleaner->seq;
-        
+
         my $shifts_withgaps = $cleaner->shifts;
         for(my $i = 0; $i < $#$shifts_withgaps; $i+=2){
-            
+
             push @{$log{$self->ali->file}->{$seq->full_id}}, [(1+$$shifts_withgaps[$i] ), ( $$shifts_withgaps[$i+1] )];
         }
-        
+
     }
-    
+
     return \%log;
 }
 
@@ -400,7 +405,7 @@ sub get_matrix_seqmask {
         my $seqid = $cleaner->seq->full_id;
         $matrix{$seqid} = $cleaner->get_seqmask;
     }
-    
+
     return \%matrix;
 }
 
@@ -434,19 +439,23 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 Bio::MUST::Apps::HmmCleaner - Main class for HmmCleaner
 
 =head1 VERSION
 
-version 0.180750
+version 0.243280
 
 =head1 AUTHOR
 
 Arnaud Di Franco <arnaud.difranco@gmail.fr>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Denis BAURAIN
+
+Denis BAURAIN <denis.baurain@uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

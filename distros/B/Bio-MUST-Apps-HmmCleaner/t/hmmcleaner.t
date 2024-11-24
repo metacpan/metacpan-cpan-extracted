@@ -12,6 +12,8 @@ use Path::Class qw(file);
 
 use Bio::MUST::Apps::HmmCleaner;
 
+say 'Note: tests designed for: HMMER 3.3.2 (Nov 2020); http://hmmer.org/';
+
 my $class = 'Bio::MUST::Apps::HmmCleaner';
 
 #~ check_test('GNTPAN12210.ali', 'GNTPAN12210_hmm10_global', { 'perseq' => 0, 'X' => 0});
@@ -32,43 +34,43 @@ sub check_cleaner {
 
     # read configuration file
     my $actual_args = {
-		ali             => file('test',$file),
+        ali             => file('test',$file),
         ali_model       => file('test',$file),
-		consider_X      => $$args{'X'},
-		perseq_profile  => $$args{'perseq'},
+        consider_X      => $$args{'X'},
+        perseq_profile  => $$args{'perseq'},
         outfile_type    => 1, # working in Ali format
-	};
-    
+    };
+
     $$actual_args{changeID} = $$args{changeID} if exists $$args{changeID};
     $$actual_args{delchar} = $$args{delchar} if exists $$args{delchar};
     $$actual_args{costs} = $$args{costs} if exists $$args{costs};
 
-	### Creating object for file : $file
-	my $cleaner = $class->new($actual_args);
-	$cleaner->_set_outfile('test/testfile');
-	$cleaner->store_all;
+    ### Creating object for file : $file
+    my $cleaner = $class->new($actual_args);
+    $cleaner->_set_outfile('test/testfile');
+    $cleaner->store_all;
 
     my @goners = (
         file('test', 'testfile.ali'),
         file('test', 'testfile.log'),
         file('test', 'testfile.score'),
     );
-    
+
     compare_ok(
-        file('test', "$expected_outfile.ali"),
         $goners[0],
+        file('test', "$expected_outfile.ali"),
             "wrote expected Ali for: $expected_outfile"
     );
 
     compare_ok(
-        file('test', "$expected_outfile.log"),
         $goners[1],
+        file('test', "$expected_outfile.log"),
             "wrote expected log for: $expected_outfile"
     );
 
     compare_ok(
-        file('test', "$expected_outfile.score"),
         $goners[2],
+        file('test', "$expected_outfile.score"),
             "wrote expected score for: $expected_outfile"
     );
 

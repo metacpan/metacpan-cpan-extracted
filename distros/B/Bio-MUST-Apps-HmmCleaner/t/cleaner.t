@@ -12,6 +12,8 @@ use Path::Class qw(file);
 
 use Bio::MUST::Apps::HmmCleaner;
 
+say 'Note: tests designed for: HMMER 3.3.2 (Nov 2020); http://hmmer.org/';
+
 my $class = 'Bio::MUST::Apps::HmmCleaner::Cleaner';
 
 # Needed elements for cleaner objetc

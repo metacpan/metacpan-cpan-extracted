@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::Exporter::OTLP::Logs;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 class OpenTelemetry::Exporter::OTLP::Logs :isa(OpenTelemetry::Exporter::OTLP) {
     use OpenTelemetry::Common 'config';

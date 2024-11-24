@@ -7,9 +7,8 @@ package Image::TIFF;
 # modify it under the same terms as Perl v5.8.8 itself.
 
 use strict;
-use vars qw($VERSION);
 
-$VERSION = '1.11';
+our $VERSION = '1.12';
 
 my @types = (
   [ "BYTE",      "C1", 1],
@@ -19,7 +18,6 @@ my @types = (
   [ "RATIONAL",  "N2", 8],
   [ "SBYTE",     "c1", 1],
   [ "UNDEFINED", "a1", 1],
-  [ "BINARY",    "a1", 1],  # treat binary data as UNDEFINED	
   [ "SSHORT",    "n1", 2],
   [ "SLONG",     "N1", 4],
   [ "SRATIONAL", "N2", 8],

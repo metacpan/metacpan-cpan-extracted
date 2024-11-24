@@ -1,9 +1,10 @@
 # App::hopen::T::Gnu::C::LinkCmd - link object files using the GNU toolset
 package App::hopen::T::Gnu::C::LinkCmd;
 use Data::Hopen;
+use strict; use warnings;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000015'; # TRIAL
 
 use parent 'App::hopen::G::Cmd';
 use Class::Tiny qw(dest linker);
@@ -11,23 +12,15 @@ use Class::Tiny qw(dest linker);
 use App::hopen::BuildSystemGlobals;   # For $DestDir.
     # TODO make the dirs available to nodes through the context.
 use App::hopen::Util::BasedPath;
-use Config;
 use Data::Hopen qw(getparameters);
-use Data::Hopen::G::GraphBuilder;
-#use Data::Hopen::Util::Data qw(forward_opts);
 use Data::Hopen::Util::Filename;
-use Deep::Hash::Utils qw(deepvalue);
-use File::Which ();
 use Path::Class;
-
-my $FN = Data::Hopen::Util::Filename->new;     # for brevity
-our $_CC;   # Cached compiler name
 
 # Docs {{{1
 
 =head1 NAME
 
-# App::hopen::T::Gnu::C::LinkCmd - link object files using the GNU toolset
+App::hopen::T::Gnu::C::LinkCmd - link object files using the GNU toolset
 
 =head1 SYNOPSIS
 
@@ -66,10 +59,10 @@ Create the link command line.
 =cut
 
 sub _run {
-    my ($self, %args) = getparameters('self', [qw(phase visitor ; *)], @_);
+    my ($self, %args) = getparameters('self', [qw(visitor ; *)], @_);
 
     # Currently we only do things at gen time.
-    return $self->passthrough(-nocontext=>1) if $args{phase} ne 'Gen';
+    return $self->passthrough(-nocontext=>1) if $Phase ne 'Gen';
 
     # Pull the inputs
     my $lrObjFiles = $self->input_assets;

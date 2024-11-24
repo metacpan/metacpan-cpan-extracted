@@ -5,13 +5,12 @@ author:
 build_requires:
   Test::Files: '0'
   Test::Most: '0'
-  autodie: '0'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,6 +40,10 @@ requires:
   Template: '0'
   Test::Most: '0'
   aliased: '0'
+  autodie: '0'
   namespace::autoclean: '0'
   perl: '5.010'
-version: '0.180750'
+version: '0.243280'
+x_generated_by_perl: v5.26.3
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

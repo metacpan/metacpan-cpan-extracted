@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: BSD-3-Clause
+name = "App-hopen"
+badges = ["appveyor"]
+authority="cpan:CXW"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+tag_format = "v%v"
+license = "lgpl_2_1"

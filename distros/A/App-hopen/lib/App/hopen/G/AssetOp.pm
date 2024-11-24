@@ -1,12 +1,17 @@
 # App::hopen::G::AssetOp - parent class for operations used by a
 # generator to build an asset
 package App::hopen::G::AssetOp;
+use strict; use warnings;
 use Data::Hopen::Base;
 use Quote::Code;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000015'; # TRIAL
 
 use parent 'App::hopen::G::Cmd';
+    # TODO why is this not directly a child of Data::Hopen::G::Op?
+    # It uses input_assets, but could that be refactored out to a parent
+    # of which this and AhG::Cmd were siblings?
+
 # we use Class::Tiny below
 
 use Class::Tiny::ConstrainedAccessor

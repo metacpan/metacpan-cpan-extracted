@@ -35,7 +35,7 @@ my $node = $builder->node;
 
 # Run the DAG
 $builder->default_goal;
-my $dag_out = $dag->run(-phase=>'foo', -visitor => FakeGenerator->new);
+my $dag_out = $dag->run(-visitor => FakeGenerator->new);
 
 # Check the results
 ok($node->outputs, 'Node has outputs');

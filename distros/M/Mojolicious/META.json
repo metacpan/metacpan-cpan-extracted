@@ -4,7 +4,7 @@
       "Sebastian Riedel <sri@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -64,6 +64,6 @@
          "web" : "https://web.libera.chat/#mojo"
       }
    },
-   "version" : "9.38",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "9.39",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

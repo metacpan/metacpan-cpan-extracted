@@ -1,6 +1,19 @@
 Revision history for OpenTelemetry-Exporter-OTLP
 
+0.018     2024-11-24 01:17:14+00:00 Europe/London
+
+    * Add missing change log entry for previous release
+    * Fixed an issue that would result in duplicate counts of the
+      'otel_exporter_otlp_failure' counter in some cases.
+    * Fixed a bug that would sometimes result in an attempt to sleep
+      for a negative number of seconds.
+    * Add a 'retries' contructor parameter to control the maximum
+      number of retries for failed export requests
+    * Document retry behaviour for export method
+
 0.017     2024-07-18 09:30:57+01:00 Europe/London
+
+    No changes from prior release
 
 0.016001  2024-06-28 22:39:20+01:00 Europe/London (TRIAL RELEASE)
 

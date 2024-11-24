@@ -1,5 +1,37 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.9901 2024-11-23T13:19:05Z
+
+    - update "xlate" command options
+      * rename -Q -> -K
+      * rename -K -> -L
+      * create -S
+
+0.99 2024-11-22T15:36:57Z
+
+    - rename xlate options: -L -> -A | -X -> -Q
+
+0.45 2024-11-22T02:14:44Z
+
+    - introduce -L and -K/-X option in xlate script
+    - install "yq" in docker
+
+0.44 2024-11-01T08:14:59Z
+
+    - run docker with --tty option when stdin is terminal
+    - -H option set HOME to the mount point
+
+0.43 2024-10-31T09:51:34Z
+
+    - install "llm" in Docker image
+    - inherit "-u" option to MAKE environment
+    - introduce "xlate -H" option to mount the home directory
+
+0.42 2024-10-24T15:44:24Z
+
+    - introduce "xlate -U" option
+    - add AI generated manual for "xlate"
+
 0.4101 2024-10-10T08:17:43Z
 
     - duplication in unmasking process can happen

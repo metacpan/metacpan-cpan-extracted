@@ -10,7 +10,7 @@
 # ABSTRACT: Edit the configuration of an application with fuse
 
 package App::Cme::Command::fusefs ;
-$App::Cme::Command::fusefs::VERSION = '1.040';
+$App::Cme::Command::fusefs::VERSION = '1.041';
 use strict;
 use warnings;
 use 5.10.1;
@@ -110,7 +110,7 @@ App::Cme::Command::fusefs - Edit the configuration of an application with fuse
 
 =head1 VERSION
 
-version 1.040
+version 1.041
 
 =head1 SYNOPSIS
 

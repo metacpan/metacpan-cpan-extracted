@@ -1,0 +1,54 @@
+NAME
+
+    Alien::cargo - Find or download the cargo command (build system and
+    package manager for Rust)
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+     use Alien::cargo;
+     use Env qw( @PATH );
+     
+     unshift @PATH, Alien::cargo->bind_dir;
+
+DESCRIPTION
+
+    This Alien provides the Rust Cargo <https://doc.rust-lang.org/cargo/>
+    command.
+
+METHODS
+
+ bin_dir
+
+     my @dir = Alien::cargo->bin_dir;
+
+    Provides the list of directories (if any) that are needed to add to the
+    PATH in order to run cargo.
+
+ version
+
+     my $version = Alien::cargo->version;
+
+    Returns the version of cargo.
+
+ install_type
+
+     my $install_type = Alien::cargo->install_type;
+     my $bool = Alien::cargo->install_type($install_type);
+
+    Returns the install type.
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2024 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

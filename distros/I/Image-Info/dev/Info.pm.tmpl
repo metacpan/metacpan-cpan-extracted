@@ -16,14 +16,13 @@ package Image::Info;
 # Currently maintained by Slaven Rezic - (c) 2008 - 2023.
 
 use strict;
-use vars qw($VERSION @EXPORT_OK);
 
-$VERSION = '1.44';
+our $VERSION = '1.45';
 
 require Exporter;
 *import = \&Exporter::import;
 
-@EXPORT_OK = qw(image_info dim html_dim image_type determine_file_format);
+our @EXPORT_OK = qw(image_info dim html_dim image_type determine_file_format);
 
 # already required and failed sub-modules are remembered here
 my %mod_failure;

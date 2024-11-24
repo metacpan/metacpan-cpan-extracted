@@ -1,5 +1,6 @@
 # App::hopen::HopenFileKit - set up a hopen file
 package App::hopen::HopenFileKit;
+use strict; use warnings;
 use Data::Hopen::Base;
 
 use Import::Into;
@@ -15,7 +16,7 @@ use App::hopen::Phases ();
 use Data::Hopen qw(:default loadfrom);
 
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000015'; # TRIAL
 
 use parent 'Exporter';  # Exporter-exported symbols {{{1
 our (@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
@@ -34,14 +35,14 @@ BEGIN {
 
 =head1 NAME
 
-Data::Hopen::HopenFileKit - Kit to be used by a hopen file
+App::hopen::HopenFileKit - Kit to be used by a hopen file
 
 =head1 SYNOPSIS
 
 This is a special-purpose test kit used for interpreting hopen files.
-See L<Data::Hopen::App/_run_phase>.  Usage:
+See L<App::hopen/_run_phase>.  Usage:
 
-    use Data::Hopen::HopenFileKit "<filename>"[, other args]
+    use App::hopen::HopenFileKit "<filename>"[, other args]
 
 C<< <filename> >> is the name you want to use for the package using
 this module, and will be loaded into constant C<$FILENAME> in that
@@ -91,6 +92,8 @@ C<import()> routine for the fake "language" package
         # Use only the last ::-separated component if :: are present.
         $dest_package = ($src_package =~ m/::([^:]+)$/) ? $1 : $src_package;
         Package::Alias->import::into($target, $dest_package => $src_package);
+            # TODO add to Package::Alias the ability to pass parameters
+            # to the package being loaded.
 
         $_loaded_languages{$language} = true;
     } #foreach requested language
@@ -98,7 +101,7 @@ C<import()> routine for the fake "language" package
 
 sub _create_language { # {{{1
 
-=head2
+=head2 _create_language
 
 Create a package "language" so that the calling package can invoke it.
 
@@ -146,8 +149,10 @@ Set up the calling package.  See L</SYNOPSIS> for usage.
     # Initialize data in the caller
     {
         no strict 'refs';
-        *{ $target . '::FILENAME' } = eval("\\\"$target_friendly_name\"");
-            # Need `eval` to make it read-only - even \"$target..." isn't RO
+        *{ $target . '::FILENAME' } = eval("\\\"\Q$target_friendly_name\E\"");
+            # Need `eval` to make it read-only - even \"$target..." isn't RO.
+            # \Q and \E since, on Windows, $friendly_name is likely to
+            # include backslashes.
     }
 
     # Create packages at the top level

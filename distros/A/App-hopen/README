@@ -1,8 +1,11 @@
 NAME
-    App::hopen - hopen build system command-line interface
+    App::hopen - Graph-driven cross-platform build system
 
-    (Note: most features are not yet implemented ;) .  However it will
-    generate a Makefile for a basic "Hello, World" program at this point!)
+CURRENT STATUS
+    Most features are not yet implemented ;) .  However it will generate a
+    "Makefile" or "build.ninja" file for a C "Hello, World" program at this
+    point!  It can generate command lines for gcc(1) or for Microsoft's
+    "cl.exe".
 
     hopen is a cross-platform software build generator.  It makes files you
     can pass to Make, Ninja, Visual Studio, or other build tools, to compile
@@ -12,7 +15,7 @@ NAME
         build scripts (specifically, Perl 5.14+)
 
     *   No hidden magic!  All your data is visible and accessible in a build
-        graph.
+        graph (whence "graph-driven").
 
     *   Context-sensitivity.  Your users can tweak their own builds for their
         own platforms without affecting your project.
@@ -22,19 +25,48 @@ NAME
     Why Perl?  Because (1) you probably already have it installed, and (2) it
     is the original write-once, run-everywhere language!
 
-USAGE
+  Example
+    Create a file ".hopen.pl" in your source tree.  Then:
+
+        $ hopen
+        From ``.'' into ``built''
+        Running Check phase
+
+    Now "built/MY.hopen.pl" has been created, and loaded with information
+    about your configuration.  You can edit that file if you want to change
+    what will happen next.
+
+        $ hopen
+        From ``.'' into ``built''
+        Running Gen phase
+
+    Now "built/Makefile" has been created.
+
+        $ hopen --build
+        Building in foo/built
+
+    And your software is ready to go!  "make" has been run in "built/", with
+    output left in "built/".
+
+    See App::hopen::Conventions for information on writing ".hopen.pl" files.
+
+SYNOPSIS
         hopen [options] [--] [destination dir [project dir]]
 
     If no project directory is specified, the current directory is used.
 
     If no destination directory is specified, "<project dir>/built" is used.
 
-    See App::hopen::Conventions for more details.
+    See App::hopen and App::hopen::Conventions for more details.
 
 OPTIONS
     -a "architecture"
         Specify the architecture.  This is an arbitrary string interpreted by
         the generator or toolset.
+
+    --build
+        Run the generator to process the blueprint files.  Cannot be used with
+        "--fresh".
 
     -e "Perl code"
         Add the "Perl code" as if it were a hopen file.  "-e" files are
@@ -43,19 +75,21 @@ OPTIONS
 
     --fresh
         Start a fresh build --- ignore any "MY.hopen.pl" file that may exist
-        in the destination directory.
+        in the destination directory.  Cannot be used with "--build".
 
     --from "project dir"
         Specify the project directory.  Overrides a project directory given as
         a positional argument.
 
-    -g "generator"
+    -g "generator" (or -G)
         Specify the generator.  The given "generator" should be either a full
-        package name or the part after "App::hopen::Gen::".
+        package name or the part after "App::hopen::Gen::".  Also accepts "-G"
+        to ease the transition from cmake.
 
-    -t "toolset"
+    -t "toolset" (or -T)
         Specify the toolset.  The given "toolset" should be either a full
-        package name or the part after "App::hopen::T::".
+        package name or the part after "App::hopen::T::".  Also accepts "-T"
+        to ease the transition from cmake.
 
     --to "destination dir"
         Specify the destination directory.  Overrides a destination directory
@@ -87,7 +121,7 @@ SUPPORT
 
         perldoc App::hopen                      For command-line options
         perldoc App::hopen::Conventions         For terminology and workflow
-        perldoc Data::Hopen                     For internals
+        perldoc Data::Hopen                     For the underlying engine
 
     You can also look for information at:
 
@@ -98,6 +132,10 @@ SUPPORT
     *   MetaCPAN
 
         <https://metacpan.org/pod/App::hopen>
+
+    *   This distribution
+
+        See the "eg/" directory distributed with this software for examples.
 
 LICENSE AND COPYRIGHT
     Copyright (c) 2018--2019 Christopher White.  All rights reserved.

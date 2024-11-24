@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.595';
+our $VERSION = '0.596';
 
 use 5.020;
 use strictures 2;
@@ -18,11 +18,10 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use B;
 use Carp 'croak';
 use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
-use builtin::compat 'blessed';
+use builtin::compat qw(blessed created_as_number created_as_string);
 use Scalar::Util 'looks_like_number';
 use Storable 'dclone';
 use Feature::Compat::Try;
-use builtin::compat qw(created_as_number created_as_string);
 use namespace::clean;
 
 use Exporter 'import';
@@ -168,10 +167,10 @@ sub get_type ($value, $config = {}) {
 }
 
 # lifted from JSON::MaybeXS
-# note: unlike builtin::compat on older perls, we do not accept
+# note: unlike builtin::compat::is_bool on older perls, we do not accept
 # dualvar(0,"") or dualvar(1,"1") because JSON::PP and Cpanel::JSON::XS
 # do not encode these as booleans.
-use constant HAVE_BUILTIN => $] ge '5.036';
+use constant HAVE_BUILTIN => "$]" >= 5.035010;
 use if HAVE_BUILTIN, experimental => 'builtin';
 sub is_bool ($value) {
   HAVE_BUILTIN and builtin::is_bool($value)
@@ -475,7 +474,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.595
+version 0.596
 
 =head1 SYNOPSIS
 

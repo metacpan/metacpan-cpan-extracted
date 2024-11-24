@@ -1,5 +1,5 @@
 #!perl
-# t/200-apputil-basic.t - basic tests of Data::Hopen::AppUtil
+# t/200-apputil-basic.t - basic tests of App::hopen::AppUtil
 use rlib 'lib';
 use HopenTest;
 use Test::Deep;

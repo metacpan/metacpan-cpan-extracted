@@ -1,4 +1,15 @@
 
+9.39  2024-11-23
+  - Added EXPERIMENTAL support for encrypted session cookies.
+    This feature is much more secure than signed cookies and can be enabled by installing CryptX and setting the
+    encrypted attribute.
+      $app->sessions->encrypted(1);
+  - Added EXPERIMENTAL encrypted attribute to Mojolicious::Sessions.
+  - Added EXPERIMENTAL encrypted_cookie and every_encrypted_cookie methods to Mojolicious::Controller.
+  - Added EXPERIMENTAL decrypt_cookie, encrypt_cookie and generate_secret functions to Mojo::Util.
+  - Fixed a bug in Mojo::Message::Request where message size limits were not always correctly applied.
+    (Alexander Kuehne)
+
 9.38  2024-08-17
   - Added support for new core booleans in Perl 5.36+ to Mojo::JSON. (haarg)
   - Deprecated support for "'" package separators that have been deprecated in Perl. (Grinnz)
@@ -14,7 +25,7 @@
   - Added EXPERIMENTAL support for persistent cookies in Netscape format.
   - Added EXPERIMENTAL file attribute to Mojo::UserAgent::CookieJar.
   - Added EXPERIMENTAL load, save and to_string methods to Mojo::UserAgent::CookieJar.
-  - Fixed error reporting when loading applicartions with syntax errors. (haarg)
+  - Fixed error reporting when loading applications with syntax errors. (haarg)
   - Fixed absolute URL support in url_for_file and url_for_asset methods. (rawleyfowler)
 
 9.34  2023-09-11

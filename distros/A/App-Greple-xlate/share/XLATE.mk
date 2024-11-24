@@ -4,6 +4,7 @@
 # XLATE_DEBUG:  Enable debug output
 # XLATE_MAXLEN: Set maximum length for API call
 # XLATE_USEAPI: Use API
+# XLATE_UPDATE: Force update cache
 #
 
 #
@@ -84,7 +85,8 @@ $(eval $(call FOREACH,DEFINE_RULE))
 XLATE = xlate \
 	$(if $(XLATE_DEBUG),-d) \
 	$(if $(XLATE_MAXLEN),-m$(XLATE_MAXLEN)) \
-	$(if $(XLATE_USEAPI),-a)
+	$(if $(XLATE_USEAPI),-a) \
+	$(if $(XLATE_UPDATE),-u)
 
 .PHONY: clean
 clean:

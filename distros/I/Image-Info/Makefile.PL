@@ -35,8 +35,7 @@ predist:
 	\$(MAKE) distclean
 	\$(PERL) Makefile.PL
 	git status
-	\$(NOECHO) \$(ECHO) "*** Consider also calling cpan_check_versions and"
-	\$(NOECHO) \$(ECHO) "*** cpan_check_unauthorized (on an older version)"
+	\$(NOECHO) \$(ECHO) "*** Consider also calling cpan_check_versions"
 
 postdist:
 	\$(NOECHO) \$(ECHO) "*** Run the following commands:"

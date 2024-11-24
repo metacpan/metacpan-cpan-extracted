@@ -31,5 +31,5 @@ requires:
   perl: '5.006'
 resources:
   repository: git://github.com/eserte/image-info.git
-version: '1.44'
+version: '1.45'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

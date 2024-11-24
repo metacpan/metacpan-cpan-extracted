@@ -1,38 +1,32 @@
 # App::hopen::Gen::Make - generator for a generic make(1).
 package App::hopen::Gen::Make;
+use strict; use warnings;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000015'; # TRIAL
 
 use parent 'App::hopen::Gen';
-use Class::Tiny qw(targets);
+use Class::Tiny;
 
 use App::hopen::BuildSystemGlobals;
 use App::hopen::Phases qw(is_last_phase);
-use Data::Hopen qw(:default getparameters $QUIET);
+use Data::Hopen qw(:default getparameters *QUIET);
 use Data::Hopen::Scope::Hash;
 use Data::Hopen::Util::Data qw(forward_opts);
 use File::Which;
-use Hash::Ordered;
+use Quote::Code;
 
 use App::hopen::Gen::Make::AssetGraphNode;     # for $OUTPUT
-use App::hopen::Gen::Make::AssetGraphVisitor;
 
 # Docs {{{1
 
 =head1 NAME
 
-Data::Hopen::Gen::Make - hopen generator for simple Makefiles
+App::hopen::Gen::Make - hopen generator for simple Makefiles
 
 =head1 SYNOPSIS
 
 This generator makes a Makefile that does its best to run on cmd.exe or sh(1).
-
-=head1 ATTRIBUTES
-
-=head2 targets
-
-A L<Hash::Ordered> of the targets, in the order encountered.
 
 =head1 FUNCTIONS
 
@@ -40,62 +34,20 @@ A L<Hash::Ordered> of the targets, in the order encountered.
 
 # }}}1
 
-=head2 visit_goal
-
-Add a target corresponding to the name of the goal.  Usage:
-
-    $Generator->visit_goal($node, $node_inputs);
-
-This happens while the command graph is being run.
-
-=cut
-
-sub visit_goal {
-    my ($self, %args) = getparameters('self', [qw(goal node_inputs)], @_);
-    $self->targets->set($args{goal}->name, $args{goal});
-
-    # --- Add the goal to the asset graph ---
-
-    my $asset_goal = $self->_assets->goal($args{goal}->name);
-
-    # Pull the inputs.  TODO refactor out the code in common with
-    # AhG::Cmd::input_assets().
-    my $hrSourceFiles =
-        $args{node_inputs}->find(-name => 'made',
-                                    -set => '*', -levels => 'local') // {};
-    die 'No input files to goal ' . $args{goal}->name
-        unless scalar keys %$hrSourceFiles;
-
-    my $lrSourceFiles = %$hrSourceFiles{(keys %$hrSourceFiles)[0]};
-    hlog { 'found inputs to goal', $args{goal}->name, Dumper($lrSourceFiles) } 2;
-
-    # TODO? verify that all the assets are actually in the graph first?
-    $self->connect($_, $asset_goal) foreach @$lrSourceFiles;
-
-} #visit_goal()
-
-#=head2 visit_node
-#
-# TODO Build the list of work to do each time we visit a node, rather
-# than requiring the generator to build the work[] array.
-#
-#=cut
-#
-#sub visit_node {
-#    my $self = shift or croak 'Need an instance';
-#    ...
-#} #visit_node()
-
 =head2 finalize
 
-Write out the Makefile.
+Write out the Makefile.  Usage:
+
+    $Generator->finalize($dag);     # $data parameter unused
+
+C<$dag> is the build graph.
 
 =cut
 
 sub finalize {
-    my ($self, %args) = getparameters('self', [qw(phase dag data)], @_);
-    hlog { Finalizing => __PACKAGE__ , '- phase', $args{phase} };
-    return unless is_last_phase $args{phase};
+    my ($self, %args) = getparameters('self', [qw(dag; data)], @_);
+    hlog { Finalizing => __PACKAGE__ , '- phase', $Phase };
+    return unless is_last_phase $Phase;
 
     hlog { __PACKAGE__, 'Asset graph', '' . $self->_assets->_graph } 3;
 
@@ -107,21 +59,17 @@ sub finalize {
 # From ``@{[$self->proj_dir->absolute]}'' into ``@{[$self->dest_dir->absolute]}''
 
 .PHONY: first__goal__
-
 EOT
 
     # Make sure the first goal is 'all' regardless of order.
-    print $fh 'first__goal__: ', $args{dag}->default_goal->name, "\n";
+    say $fh qc'first__goal__: {$args{dag}->default_goal->name}\n';
 
     my $context = Data::Hopen::Scope::Hash->new;
     $context->put(App::hopen::Gen::Make::AssetGraphNode::OUTPUT, $fh);
 
     # Write the Makefile.  TODO flip the order.
 
-    $self->_assets->run(-context => $context,
-        -visitor => App::hopen::Gen::Make::AssetGraphVisitor->new,
-        forward_opts(\%args, {'-'=>1}, qw(phase))
-    );
+    $self->_assets->run(-context => $context);
 
     close $fh;
 } #finalize()
@@ -129,7 +77,7 @@ EOT
 =head2 default_toolset
 
 Returns the package name of the default toolset for this generator,
-which is C<Gnu> (i.e., L<Data::Hopen::T::Gnu>).
+which is C<Gnu> (i.e., L<App::hopen::T::Gnu>).
 
 =cut
 
@@ -146,7 +94,7 @@ sub _assetop_class { 'App::hopen::Gen::Make::AssetGraphNode' }
 
 =head2 _run_build
 
-Implementation of L</run_build>.
+Implementation of L<App::hopen::Gen/run_build>.
 
 =cut
 
@@ -157,55 +105,12 @@ sub _run_build {
     foreach my $candidate (qw[make gmake mingw32-make dmake]) {
         my $path = File::Which::which($candidate);
         next unless defined $path;
-        # TODO cd into dest dir
         hlog { Running => $path };
         system $path, ();
         return;
     }
     warn "Could not find a 'make' program to run";
 } #_run_build()
-
-=head1 INTERNALS
-
-=head2 _expand
-
-Produce the command line or lines associated with a work item.  Used by
-L</finalize>.
-
-=cut
-
-sub _expand {
-    my $item = shift or croak 'Need a work item';
-    hlog { __PACKAGE__ . '::_expand()', Dumper($item) } 2;
-    my $retval = $item->{how} or return '';    # no `how` => no output; not an error
-    $retval = $retval->[0] if ref $retval eq 'ARRAY';
-
-    my $first = $item->{from}->[0];
-    $first = $first->orig->relative($DestDir)
-        if $first->DOES('App::hopen::Util::BasedPath');
-
-    my $out = $item->{to}->[0];
-    $out = $out->orig->relative($DestDir)
-        if $out->DOES('App::hopen::Util::BasedPath');
-
-    $retval =~ s{#first\b}{$first // ''}ge;          # first input
-    $retval =~ s{#all\b}{join(' ', @{$item->{from}})}ge;   # all inputs
-    $retval =~ s{#out\b}{$out // ''}ge;
-
-    return $retval;
-} #_expand()
-
-=head2 BUILD
-
-Constructor
-
-=cut
-
-sub BUILD {
-    my ($self, $hrArgs) = @_;
-    $self->targets(Hash::Ordered->new());
-} #BUILD()
-
 
 1;
 __END__

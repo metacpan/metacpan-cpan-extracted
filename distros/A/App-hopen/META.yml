@@ -1,7 +1,7 @@
 ---
-abstract: 'hopen build system command-line interface'
+abstract: 'Graph-driven cross-platform build system'
 author:
-  - 'Christopher White <cxwembedded@gmail.com>'
+  - 'Christopher White, C<cxwembedded at gmail.com>'
 build_requires:
   Carp: '0'
   Exporter: '0'
@@ -12,18 +12,15 @@ build_requires:
   Pod::Text: '0'
   Scalar::Util: '0'
   Test::Deep: '0.084'
+  Test::Directory: '0.02'
   Test::Exception: '0'
   Test::More: '0'
   Test::Warn: '0.35'
   rlib: '0'
 configure_requires:
-  Config: '0'
-  ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
-  strict: '0'
-  warnings: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.999, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,80 +29,113 @@ name: App-hopen
 no_index:
   directory:
     - t
+    - xt
     - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
 provides:
   App::hopen:
     file: lib/App/hopen.pm
-    version: '0.000010'
+    version: '0.000015'
   App::hopen::AppUtil:
     file: lib/App/hopen/AppUtil.pm
-    version: '0.000010'
+    version: '0.000015'
   App::hopen::Asset:
     file: lib/App/hopen/Asset.pm
-    version: '0.000010'
+    version: '0.000015'
   App::hopen::BuildSystemGlobals:
     file: lib/App/hopen/BuildSystemGlobals.pm
-    version: '0.000010'
+    version: '0.000015'
   App::hopen::G::AssetOp:
     file: lib/App/hopen/G/AssetOp.pm
-    version: '0.000010'
+    version: '0.000015'
   App::hopen::G::Cmd:
     file: lib/App/hopen/G/Cmd.pm
-    version: '0.000010'
+    version: '0.000015'
   App::hopen::G::FilesCmd:
     file: lib/App/hopen/G/FilesCmd.pm
-    version: '0.000010'
+    version: '0.000015'
+  App::hopen::G::OutputPerFileCmd:
+    file: lib/App/hopen/G/OutputPerFileCmd.pm
+    version: '0.000015'
   App::hopen::Gen:
     file: lib/App/hopen/Gen.pm
-    version: '0.000010'
+    version: '0.000015'
+  App::hopen::Gen::MSBuild:
+    file: lib/App/hopen/Gen/MSBuild.pm
+    version: '0.000015'
+  App::hopen::Gen::MSBuild::AssetGraphNode:
+    file: lib/App/hopen/Gen/MSBuild/AssetGraphNode.pm
+    version: '0.000015'
   App::hopen::Gen::Make:
     file: lib/App/hopen/Gen/Make.pm
-    version: '0.000010'
+    version: '0.000015'
   App::hopen::Gen::Make::AssetGraphNode:
     file: lib/App/hopen/Gen/Make/AssetGraphNode.pm
-    version: '0.000010'
-  App::hopen::Gen::Make::AssetGraphVisitor:
-    file: lib/App/hopen/Gen/Make/AssetGraphVisitor.pm
-    version: '0.000010'
+    version: '0.000015'
+  App::hopen::Gen::Ninja:
+    file: lib/App/hopen/Gen/Ninja.pm
+    version: '0.000015'
+  App::hopen::Gen::Ninja::AssetGraphNode:
+    file: lib/App/hopen/Gen/Ninja/AssetGraphNode.pm
+    version: '0.000015'
   App::hopen::H:
     file: lib/App/hopen/H.pm
-    version: '0.000010'
+    version: '0.000015'
   App::hopen::HopenFileKit:
     file: lib/App/hopen/HopenFileKit.pm
-    version: '0.000010'
-  App::hopen::Phase::Check:
-    file: lib/App/hopen/Phase/Check.pm
-    version: '0.000010'
-  App::hopen::Phase::Gen:
-    file: lib/App/hopen/Phase/Gen.pm
-    version: '0.000010'
+    version: '0.000015'
+  App::hopen::MYhopen:
+    file: lib/App/hopen/MYhopen.pm
+    version: '0.000015'
   App::hopen::Phases:
     file: lib/App/hopen/Phases.pm
-    version: '0.000010'
+    version: '0.000015'
   App::hopen::T::Gnu:
     file: lib/App/hopen/T/Gnu.pm
-    version: '0.000010'
+    version: '0.000015'
   App::hopen::T::Gnu::C:
     file: lib/App/hopen/T/Gnu/C.pm
-    version: '0.000010'
+    version: '0.000015'
   App::hopen::T::Gnu::C::CompileCmd:
     file: lib/App/hopen/T/Gnu/C/CompileCmd.pm
-    version: '0.000010'
+    version: '0.000015'
   App::hopen::T::Gnu::C::LinkCmd:
     file: lib/App/hopen/T/Gnu/C/LinkCmd.pm
-    version: '0.000010'
+    version: '0.000015'
+  App::hopen::T::MSCL:
+    file: lib/App/hopen/T/MSCL.pm
+    version: '0.000015'
+  App::hopen::T::MSCL::C:
+    file: lib/App/hopen/T/MSCL/C.pm
+    version: '0.000015'
+  App::hopen::T::MSCL::C::CompileCmd:
+    file: lib/App/hopen/T/MSCL/C/CompileCmd.pm
+    version: '0.000015'
+  App::hopen::T::MSCL::C::LinkCmd:
+    file: lib/App/hopen/T/MSCL/C/LinkCmd.pm
+    version: '0.000015'
+  App::hopen::T::VSXML:
+    file: lib/App/hopen/T/VSXML.pm
+    version: '0.000015'
   App::hopen::TEMPLATE:
     file: lib/App/hopen/TEMPLATE.pm
-    version: '0.000010'
-  App::hopen::Tool:
-    file: lib/App/hopen/Tool.pm
-    version: '0.000010'
+    version: '0.000013'
+  App::hopen::Util:
+    file: lib/App/hopen/Util.pm
+    version: '0.000015'
   App::hopen::Util::BasedPath:
     file: lib/App/hopen/Util/BasedPath.pm
-    version: '0.000010'
-  Data::Hopen::Toolchain:
-    file: lib/App/hopen/Toolchain.pm
-    version: '0.000010'
+    version: '0.000015'
+  App::hopen::Util::String:
+    file: lib/App/hopen/Util/String.pm
+    version: '0.000015'
+  App::hopen::Util::XML::FromPerl:
+    file: lib/App/hopen/Util/XML/FromPerl.pm
+    version: '0.000015'
 requires:
   Carp: '0'
   Class::Method::Modifiers: '2.10'
@@ -113,8 +143,8 @@ requires:
   Class::Tiny::ConstrainedAccessor: '0.000010'
   Config: '0'
   Cwd: '0'
-  Data::Dumper: '0'
-  Data::Hopen: '0.000013'
+  Data::Dumper: '2.154'
+  Data::Hopen: '0.000021'
   Deep::Hash::Utils: '0.03'
   Exporter: '0'
   File::Glob: '0'
@@ -127,7 +157,6 @@ requires:
   Getopt::Long: '2.5'
   Graph: '0.9704'
   Hash::Merge: '0.299'
-  Hash::Ordered: '0.011'
   Import::Into: '0'
   List::MoreUtils: '0.428'
   Package::Alias: '0.12'
@@ -137,7 +166,10 @@ requires:
   Scalar::Util: '0'
   Set::Scalar: '1.27'
   String::Print: '0.92'
+  Syntax::Construct: '0.07'
   Type::Tiny: '1.004004'
+  XML::FromPerl: '0'
+  XML::LibXML: '1.60'
   constant: '0'
   feature: '0'
   overload: '0'
@@ -147,6 +179,11 @@ requires:
   warnings: '0'
 resources:
   bugtracker: https://github.com/hopenbuild/App-hopen/issues
-  repository: https://github.com/hopenbuild/App-hopen.git
-version: '0.000010'
+  homepage: https://github.com/hopenbuild/App-hopen
+  repository: git://github.com/hopenbuild/App-hopen.git
+version: '0.000015'
+x_authority: cpan:CXW
+x_contributors:
+  - 'Christopher White <cxw@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

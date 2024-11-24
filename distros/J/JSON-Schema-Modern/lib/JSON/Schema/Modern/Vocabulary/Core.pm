@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.595';
+our $VERSION = '0.596';
 
 use 5.020;
 use Moo;
@@ -31,8 +31,8 @@ sub evaluation_order ($class) { 0 }
 
 sub keywords ($class, $spec_version) {
   return (
-    $spec_version eq 'draft4' ? 'id' : '$id',
     '$schema',
+    $spec_version eq 'draft4' ? 'id' : '$id',
     $spec_version !~ /^draft[467]$/ ? '$anchor' : (),
     $spec_version eq 'draft2019-09' ? '$recursiveAnchor' : (),
     $spec_version !~ /^draft(?:[467]|2019-09)$/ ? '$dynamicAnchor' : (),
@@ -77,6 +77,10 @@ sub _traverse_keyword_id ($class, $schema, $state) {
   # we don't set or update document_path because it is identical to traversed_schema_path
   $state->{schema_path} = '';
 
+  # Note that even though '$id' is considered ahead of '$schema' in the keyword list, we have
+  # already parsed the '$schema' keyword (before we even started looping through all vocabularies)
+  # and therefore this data (specification_version and vocabularies) is known to be correct.
+
   push $state->{identifiers}->@*,
     $state->{initial_schema_uri} => {
       path => $state->{traversed_schema_path},
@@ -97,6 +101,7 @@ sub _eval_keyword_id ($class, $data, $schema, $state) {
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
   $state->{document_path} = $state->{document_path}.$state->{schema_path};
   $state->{schema_path} = '';
+  # these will already be set if there is an adjacent $schema keyword
   $state->{spec_version} = $schema_info->{specification_version};
   $state->{vocabularies} = $schema_info->{vocabularies};
 
@@ -107,14 +112,61 @@ sub _eval_keyword_id ($class, $data, $schema, $state) {
 }
 
 sub _traverse_keyword_schema ($class, $schema, $state) {
-  # This is now safe to check, as by now we will have processed any adjacent '$id' keyword.
+  return if not assert_keyword_type($state, $schema, 'string') or not assert_uri($state, $schema);
+
+  my ($spec_version, $vocabularies);
+
+  if (my $metaschema_info = $state->{evaluator}->_get_metaschema_vocabulary_classes($schema->{'$schema'})) {
+    ($spec_version, $vocabularies) = @$metaschema_info;
+  }
+  else {
+    my $schema_info = $state->{evaluator}->_fetch_from_uri($schema->{'$schema'});
+    return E($state, 'EXCEPTION: unable to find resource %s', $schema->{'$schema'}) if not $schema_info;
+    # this cannot happen unless there are other entity types in the index
+    return E($state, 'EXCEPTION: bad reference to $schema %s: not a schema', $schema_info->{canonical_uri})
+      if $schema_info->{document}->get_entity_at_location($schema_info->{document_path}) ne 'schema';
+
+    if (not is_plain_hashref($schema_info->{schema})) {
+      ()= E($state, 'metaschemas must be objects');
+    }
+    else {
+      ($spec_version, $vocabularies) = $state->{evaluator}->_fetch_vocabulary_data({ %$state,
+          keyword => '$vocabulary', initial_schema_uri => Mojo::URL->new($schema->{'$schema'}),
+          traversed_schema_path => jsonp($state->{schema_path}, '$schema') },
+        $schema_info);
+    }
+  }
+
+  return E($state, '"%s" is not a valid metaschema', $schema->{'$schema'})
+    if not $vocabularies or not @$vocabularies;
+
   # "A JSON Schema resource is a schema which is canonically identified by an absolute URI."
   # "A resource's root schema is its top-level schema object."
   # note: we need not be at the document root, but simply adjacent to an $id (or be the at the
   # document root)
   return E($state, '$schema can only appear at the schema resource root')
-    if length($state->{schema_path});
+    if not exists $schema->{$spec_version eq 'draft4' ? 'id' : '$id'}
+      and length($state->{schema_path});
 
+  # This is a bit of a chicken-and-egg situation. If we start off at draft2020-12, then all
+  # keywords are valid, so we inspect and process the $schema keyword; this switches us to draft7
+  # but now only the $ref keyword is respected and everything else should be ignored, so the
+  # $schema keyword never happened, so now we're back to draft2020-12 again, and...?!
+  # The only winning move is not to play.
+  return E($state, '$schema and $ref cannot be used together in older drafts')
+    if exists $schema->{'$ref'} and $spec_version =~ /^draft[467]$/;
+
+  $state->{evaluator}->_set_metaschema_vocabulary_classes($schema->{'$schema'}, [ $spec_version, $vocabularies ]);
+  $state->@{qw(spec_version vocabularies)} = ($spec_version, $vocabularies);
+  return 1;
+}
+
+sub _eval_keyword_schema ($class, $data, $schema, $state) {
+  # we can't always rely on metaschema information being set in $state (if we recursed into this
+  # subschema from a parent, where the data is not already set via $ref), and we need to do it now
+  # so the evaluator knows whether to look for an 'id' or an '$id' keyword next (which sets up the
+  # remaining data in $state).
+  $state->@{qw(spec_version vocabularies)} = $state->{evaluator}->_get_metaschema_vocabulary_classes($schema->{'$schema'})->@*;
   return 1;
 }
 
@@ -290,7 +342,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.595
+version 0.596
 
 =head1 DESCRIPTION
 

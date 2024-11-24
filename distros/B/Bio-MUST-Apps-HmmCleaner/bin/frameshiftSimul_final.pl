@@ -1,8 +1,11 @@
 #!/usr/bin/env perl
 # PODNAME: frameshiftSimul_final.pl
 # ABSTRACT: Simulation for HmmCleaner
+# CONTRIBUTOR: Denis BAURAIN <denis.baurain@uliege.be>
 
 use Modern::Perl;
+use autodie;
+
 use Carp;
 use Path::Class;
 use File::Basename;
@@ -56,10 +59,10 @@ my $out_fp_global = $simul_file_fp_global->openw;
     #~ qw(File #Replicate #Frameshift Frameshift_size Threshold #Seq Ali_width #AA TruePositive TrueNegative FalsePositive FalseNegative MeanWithAllFrameshift)
 #~ );
 #~ say {$out_frameshift_global} '#'.join "\t",(
-    #~ 
+    #~
 #~ );
 #~ say {$out_fp_global} '#'.join "\t",(
-    #~ 
+    #~
 #~ );
 
 
@@ -72,7 +75,7 @@ for my $f ( @ARGV_infiles ) {
     my $file = file($f);
     my $basename = basename($file->stringify, qw(.fasta .fa .ali .fna .faa) );
     my $ali = Ali->load($file);
-        
+
     my @aa_base_seqs;
     for my $s ($ali->all_seqs) {
         push @aa_base_seqs, $code->translate($s,'+1');
@@ -82,7 +85,7 @@ for my $f ( @ARGV_infiles ) {
     $aa_base_ali->store($aa_base_ali->file);
 
     my $gapnseq = get_gapnseq($aa_base_ali);
-    
+
     ### aligned ref file is : $aa_base_ali->file->stringify
 
     ### Gblocks...
@@ -102,14 +105,14 @@ for my $f ( @ARGV_infiles ) {
     undef $gblocks_medium_neg;
     undef $gblocks_strict_neg;
     ###### mask gblocks loose : join ' ', $gblocks_loose->all_states
-    
+
     ### BMGE...
     my $bmge_loose = SeqMask->bmge_mask($aa_base_ali, 'loose');
     ###### mask bmge loose    : join ' ', $bmge_loose->all_states
     my $bmge_medium = SeqMask->bmge_mask($aa_base_ali, 'medium');
     my $bmge_strict = SeqMask->bmge_mask($aa_base_ali, 'strict');
     ### Done...
-    
+
     my $nseq = $aa_base_ali->count_seqs;
     #### $nseq
     my $width = $aa_base_ali->width;
@@ -123,24 +126,24 @@ for my $f ( @ARGV_infiles ) {
     my $rate_file = run_paml($aa_base_ali);
     my $rates = extract_rates($rate_file);
     ####### $rates : join ' ', @$rates
-    
+
     # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     #~ my @frameshift_size = (30,99,150,300);
     #~ my @frameshift_n    = (1,5,10,$nseq);
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    
+
     # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     ## INITIATING SIMULATION
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     #~ my $sf = (shuffle(@frameshift_size))[0];
     #~ my $nf = (shuffle(@frameshift_n))[0];
-    
+
     ### $nf
     ### $sf
 
     INITIATION:
     my $min_start = 0;
-    
+
     if ($ARGV_rep) {
 
 
@@ -152,13 +155,15 @@ for my $f ( @ARGV_infiles ) {
         my $gblocks_strict_mean = sum0(($gblocks_strict->all_states))/$aa_base_ali->width;
         my $gaps_mean = sum0(@$frequencies)/$aa_base_ali->width;
         my $rates_mean = sum0(@$rates)/$aa_base_ali->width;
-        
+
         REPLICATE:
         for my $nrep (1..$ARGV_rep) {
 
+            ## no critic (ProhibitReusedNames)
             my $nf = defined($nf) ? $nf : (shuffle((1..5)))[0];
             my $sf = defined($sf) ? $sf : ((shuffle((10..100)))[0]);
-            
+            ## use critic
+
             my $simul_info = {
                 nf          => $nf,
                 sf          => $sf,
@@ -166,17 +171,17 @@ for my $f ( @ARGV_infiles ) {
 
             # Random pick of subset sequences
             my $subset = defined( $ARGV_subset ) ? $ARGV_subset : scalar($ali->all_seqs);
-            
-            my $ali = Ali->load($file);
+
+            my $ali = Ali->load($file);     ## no critic (ProhibitReusedNames)
             my $lookup = $ali->new_lookup;
             my @new = (map { $_->full_id } shuffle($ali->all_seqs))[0..$subset-1];
             my $list = IdList->new( ids => \@new);
             $ali = $list->reordered_ali($ali, $lookup);
             #### List of picked seq : @new
-            
+
             ### Replicate number : $nrep
             $ali->degap_seqs;
-            
+
             my @pick;
             goto TRAD unless ($nf);
             if ($nf < $nseq) {
@@ -184,22 +189,22 @@ for my $f ( @ARGV_infiles ) {
                     #~ push @pick, int(rand($nseq-1));
                 #~ }
                 @pick = (shuffle($ali->all_seqs))[0..($nf-1)];
-                
+
             } else {
                 #~ @pick = (0..$nseq-1);
                 @pick = $ali->all_seqs;
             }
-        
+
             # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             ## RANDOMLY MODIFYING SEQ
             # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            
+
             for my $p (@pick) {
                 my $seq = $p->clone->degap;
                 my $codons = $seq->codons;
-    
+
                 ### SeqId : $seq->full_id
-                
+
                 my $n_codons = scalar(@$codons);
                 #### $n_codons
                 # !!!!!! Watch out this; should not be able to start the frameshift too early in seq
@@ -214,7 +219,7 @@ for my $f ( @ARGV_infiles ) {
                 my $frame_codons = $seq->codons($newframe);
                 my @part = @$frame_codons[@range_new];
                 ###### @part
-    
+
                 # >>>>>>>>>>>>>>>>>>>>>>
                 ## If inserting STOP
                 # <<<<<<<<<<<<<<<<<<<<<<
@@ -239,27 +244,27 @@ for my $f ( @ARGV_infiles ) {
                     $p->_set_seq(join('',@$codons[0..$start+$haltat]));
                     $end = $start+$haltat;
                 } else {
-                    ### not halt at 
+                    ### not halt at
                     #~ $ali->get_seq($i)->_set_seq(join('',@$codons));
                     $p->_set_seq(join('',@$codons));
                     $end = $start+scalar(@part)-1;
                 }
-    
+
                 FRAMESHIFT:
                 ##### BASE    : $seq->seq
                 ##### NEW     : $p->seq
 
-                warn 'New seq is not the same size. Not an issue if frameshift at end of seq' if ($seq->seq_len != $p->seq_len);
+                carp 'New seq is not the same size. Not an issue if frameshift at end of seq' if ($seq->seq_len != $p->seq_len);
                 ##### AA_BASE : $code->translate( $seq, '+1')->seq
                 ##### AA_NEW  : $code->translate( $p, '+1')->seq
-    
+
                 # Should I consider the supposed frameshift position or the actual one due to STOP codon
                 my ($s,$e) = get_real_position($aa_base_ali, $seq->full_id, [$start,$end]);
                 #~ my ($s,$e) = get_real_position($aa_base_ali, $i, [$start,$end);
-    
+
                 #### old start and end : ($start,$end)
                 #### new start and end : ($s,$e)
-    
+
                 # TODO: mask out of blocks so shorter than alignment
                 # It means that it can recover undef value for the sum0 -> warning
                 # but not changing the Mean value
@@ -273,7 +278,7 @@ for my $f ( @ARGV_infiles ) {
                 my $rates_fmean = sum0(@$rates[$s..$e])/(($e+1-$s));
                 my $gc_fmean = get_gc_mean($seq->edit_seq($start*3,$sf*3));
                 #### $gc_fmean
-        
+
                 push @{$simul_info->{frameshifts}}, {
                     id=>$seq->full_id, span => [$start+1,$end+1], type => $newframe, stop => ($haltat>=0)?1:0,
                     gaps_mean => $gaps_fmean, rates_mean => $rates_fmean, gc_mean => $gc_fmean,
@@ -283,7 +288,7 @@ for my $f ( @ARGV_infiles ) {
                 #~ say {$out} join "\t", ($f, $seq->full_id, (($start+1).'-'.($start+$sf)) );
             }
             #~ next;
-            
+
             # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             ## TRADUCTION
             # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -302,8 +307,8 @@ for my $f ( @ARGV_infiles ) {
                 push @aa_gapped_seqs, $code->translate($s->clone,'+1');
             }
             my $aa_gapped_ali = Ali->new( seqs => \@aa_gapped_seqs );
-            
-            
+
+
             #~ my $simufile = $basename.'-exonAA.fasta';
             #~ my $simuNucfile = $basename.'-exonNUC.fasta';
             #~ my $simualignedfile = $basename.'-exonAA_aligned.fasta';
@@ -312,33 +317,33 @@ for my $f ( @ARGV_infiles ) {
             my $simualignedfile = change_suffix($file, '-exonAA_aligned.fasta');
             $ali->store_fasta($simuNucfile);
             $aa_degap_ali->store_fasta($simufile);
-            
+
             my $cmd = "mafft --localpair --quiet --maxiterate 1000 --reorder --anysymbol --thread 2 $simufile > $simualignedfile";
-            
+
             # try to robustly execute hmmsearch
             my $ret_code = system( [ 0..127 ], $cmd);
             if ($ret_code != 0) {
                 carp 'Warning: cannot execute mafft command';
                 return;
             }
-            
+
             my $ali_simu = Ali->load($simualignedfile);
-    
+
             #~ my $ali_simu = align_ali($aa_ali);
-            
+
             $simul_info->{width} = $ali_simu->width;
             $simul_info->{width_gapped} = $aa_gapped_ali->width;
             $simul_info->{nseq} = $ali_simu->count_seqs;
-    
+
             # RECOVERING alignement information test
-            
+
             $ali_simu->degap_seqs;
             my $count_aa;
             for my $seq ($ali_simu->all_seqs) {
                 $count_aa += $seq->seq_len;
             }
             $simul_info->{count_aa} = $count_aa;
-        
+
             # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             ## CLEANER
             # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -349,10 +354,10 @@ for my $f ( @ARGV_infiles ) {
             my $c2 = $ARGV_cost2 // -0.08;
             my $c3 = $ARGV_cost3 // 0.15;
             my $c4 = $ARGV_cost4 // 0.45;
-            
+
             my $thresh = $t;
             my $costs = [$c1, $c2, $c3, $c4];
-            
+
             my $args_global = {
                 ali             => $simualignedfile,
                 ali_model       => $simualignedfile,
@@ -368,33 +373,33 @@ for my $f ( @ARGV_infiles ) {
             my $cleaner_global = HmmCleaner->new($args_global);
 
             # For parameter testing
-            
+
             #~ my @t_list = (1);
             #~ my @c1_list = (-0.05,-0.075,-0.1,-0.125,-0.15,-0.175,-0.2,-0.225,-0.25);
             #~ my @c2_list = (-0.02,-0.03,-0.04,-0.05,-0.06,-0.07,-0.08);
             #~ my @c3_list = (0.05,0.075,0.1,0.125,0.15,0.175,0.2,0.225,0.25);
             #~ my @c4_list = (0.4,0.45,0.5,0.55,0.6);
 
-            
+
 
             #~ for my $t (@t_list) {
                 #~ for my $c1 (@c1_list) {
                     #~ for my $c2 (@c2_list) {
                         #~ for my $c3 (@c3_list) {
                             #~ for my $c4 (@c4_list) {
-#~ 
+#~
                                 #~ #### Threshold : $t
                                 #~ #### Cost1  ' ': $c1
                                 #~ #### Cost2  '+': $c2
                                 #~ #### Cost3  'a': $c3
                                 #~ #### Cost4  'A': $c4
-                                #~ 
+                                #~
                                 #~ $cleaner_global->update_cleaners($t, [$c1, $c2, $c3, $c4] );
-            
+
             my $log_global = $cleaner_global->get_log_simu;
 
             unless (defined $log_global) {
-                ## Could not work anymore without the eval but bug was found 
+                ## Could not work anymore without the eval but bug was found
                 carp 'Warning: HmmCleaner global failed; Current file '.$f.' replicate '.$nrep.' will be missing';
                 next REPLICATE;
             }
@@ -405,19 +410,19 @@ for my $f ( @ARGV_infiles ) {
                     ##### nogap_shifts : $clean->nogap_shifts
                 }
             }
-            
+
             ### Cleaning tmpfile...
 
-            unless ($ARGV_verbosity>5) {
+            if ($ARGV_verbosity <= 5) {
                 my $dir = dir();
                 my @tmpfiles = grep {substr($_->stringify,0,9) eq "./tmpfile"} $dir->children;
                 $_->remove for (@tmpfiles);
             }
-            
+
             # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             ## COMPARE
             # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            
+
             COMPARE:
 
             ##### Simulation information : $simul_info
@@ -464,7 +469,7 @@ for my $f ( @ARGV_infiles ) {
                     );
                 }
             }
-            
+
         }
     } else {
         # In case of preflight run without replicate
@@ -496,40 +501,40 @@ sub size_overlap {
 
 # Given two segment a-b and c-d, give the common part size
 # assume a<b and c<d
-# This sub is coming from the original script 
+# This sub is coming from the original script
 sub _overlap {
     #~ ### In _overlap...
-	my ($a, $b, $c, $d) = @_;
-	my $ret = 0;
-	if( ($c <= $b) and ($b <= $d) ){
-		$ret = $b-$c+1;
-	}
-	if( ($c <= $a) and ($a <= $d) ){
-		if($ret == 0){
-			$ret = $d-$a+1;
-		}
-		else{
-			$ret-=$a-$c;
-		}
-	}	
-	if( ($a < $c) and ($d < $b) ){
-		$ret = $d-$c+1;
-	}
-	return $ret;
+    my ($a, $b, $c, $d) = @_;
+    my $ret = 0;
+    if( ($c <= $b) and ($b <= $d) ){
+        $ret = $b-$c+1;
+    }
+    if( ($c <= $a) and ($a <= $d) ){
+        if($ret == 0){
+            $ret = $d-$a+1;
+        }
+        else{
+            $ret-=$a-$c;
+        }
+    }
+    if( ($a < $c) and ($d < $b) ){
+        $ret = $d-$c+1;
+    }
+    return $ret;
 }
 
 sub gap_frequencies {
     my $ali = shift;
-    
+
     my @frequencies;
     for my $pos_idx (0..$ali->width-1) {
         my @col = map { $_->state_at($pos_idx) } $ali->all_seqs;
 
         my $freq = (grep{ $_ =~ $GAP }@col)/scalar(@col);
-        
+
         push @frequencies, $freq;
     }
-    
+
     return \@frequencies;
 }
 
@@ -541,9 +546,9 @@ sub align_ali {
     $ali->store_fasta($tmpfilename);
 
     my $outfile_name = $ali->file;
-    
+
     my $cmd = "mafft --localpair --quiet --maxiterate 1000 --reorder --anysymbol --thread 2 $tmpfilename > $outfile_name";
-        
+
     # try to robustly execute hmmsearch
     my $ret_code = system( [ 0, 127 ], $cmd);
     if ($ret_code == 127) {
@@ -574,13 +579,13 @@ sub get_stat_file {
 
     my %results_file;
     my @results_frameshifts;
-    
+
     my $vp          = 0;
     my $simu_aa     = 0;
     my $clean_aa    = 0;
 
     ##### Number of frameshift in simul_info : scalar( @{ $simul_info->{frameshifts} } )
-    
+
     for (my $j=0; $j<@{ $simul_info->{frameshifts} }; $j++) {
 
         my $frameshift = $simul_info->{frameshifts}->[$j];
@@ -592,7 +597,7 @@ sub get_stat_file {
 
         # True positive calc
         my $actual_vp = (defined $cleaner_spans) ? size_overlap($simu_span, $cleaner_spans) : 0 ;
-        
+
         $frameshift->{vp} = $actual_vp;
         $frameshift->{sf} = $simul_info->{sf};
         $vp += $actual_vp;
@@ -610,7 +615,7 @@ sub get_stat_file {
 
         push @results_frameshifts, $frameshift;
     }
-    
+
     # True positive
     $results_file{vp} = $vp;
     #### $vp
@@ -618,12 +623,12 @@ sub get_stat_file {
     # False negative
     #### $simu_aa
     $results_file{fn} = $simu_aa-$vp;
-    
-    die 'VP is wrong, larger than simu_aa' if ($vp > $simu_aa);
-    
+
+    croak 'VP is wrong, larger than simu_aa' if ($vp > $simu_aa);
+
     ### False positive...
     my @frameshifts = @{$simul_info->{frameshifts}};
-    
+
     my @fp;
     my %all_cleaners_span = %{ $log->{$simualignedfile} };
     for my $org (keys %all_cleaners_span) {
@@ -641,11 +646,11 @@ sub get_stat_file {
                         start   => $s,
                         end     => $e,
                     };
-                    
+
                 } else {
                     ### overlapping with : $gf[0]->{span}
                 }
-                
+
             }
         } else {
             for my $span ( @{ $all_cleaners_span{$org} } ) {
@@ -662,7 +667,7 @@ sub get_stat_file {
     }
     #### $clean_aa
     $results_file{fp} = $clean_aa-$vp;
-    
+
     # True Negative
     $results_file{vn} = $simul_info->{count_aa}-( $results_file{vp} + $results_file{fp} + $results_file{fn} );
 
@@ -671,20 +676,20 @@ sub get_stat_file {
 
 
 #~ sub get_stat_falsepositive {
-#~ 
+#~
     #~ my $simul_info  = shift;
     #~ my $log         = shift;
     #~ my $simualignedfile = shift;
-#~ 
+#~
     #~ my @frameshifts = @{$simul_info->{frameshifts}};
-    #~ 
+    #~
     #~ for my $org ( sort keys %{$log->{$simualignedfile}} ) {
-#~ 
+#~
         #~ grep { $_->{id} eq $org } @frameshifts;
-        #~ 
-        #~ 
+        #~
+        #~
     #~ }
-    #~ 
+    #~
     #~ return (\%results_file,\@results_frameshifts);
 #~ }
 
@@ -707,54 +712,54 @@ sub get_gapnseq {
 
 sub get_part_length {
     my $str = shift;
-    
+
     ## Looking for gaps in full sequence...
-	my @gaps_n_seqs;
-	my $push = 0;
-	foreach my $tab ( split /$GAP/, $str ) {
-		if( length($tab) == 0){
-			$push++;
-		}else{
-			push(@gaps_n_seqs, $push); # gap_length
-			push(@gaps_n_seqs, length($tab)); # seq_length
-			$push = 1;
-		}
-	}
+    my @gaps_n_seqs;
+    my $push = 0;
+    foreach my $tab ( split /$GAP/xms, $str ) {
+        if( length($tab) == 0){
+            $push++;
+        }else{
+            push(@gaps_n_seqs, $push); # gap_length
+            push(@gaps_n_seqs, length($tab)); # seq_length
+            $push = 1;
+        }
+    }
 
     return \@gaps_n_seqs;
 }
 
-# Push gap from aa alignment onto nucleotide 
+# Push gap from aa alignment onto nucleotide
 sub apply_gapnseq {
 
     my $ali     = shift;
     my $gapnseq = shift;
-    
+
     my @gap_nuc;
     for my $seq ($ali->all_seqs) {
         my $id = $seq->full_id;
         #~ ### $id
-    
+
         my $codons = $seq->codons;
-    
+
         my @new;
         my @gaps_n_seqs = @{ $$gapnseq{$id} };
-    
+
         my $last_start = 0;
         for (my $i=0; $i < @gaps_n_seqs; $i+=2) {
-    
+
             my $gap_number = $gaps_n_seqs[$i];
             if ($gap_number) {
                 push(@new, '***' ) for 1..$gap_number;
             }
             my $codons_number = $gaps_n_seqs[$i+1];
             push @new, @$codons[$last_start..($last_start+$codons_number-1)];
-    
+
             $last_start += $codons_number;
-    
+
             #~ ### Seq at the moment: join '', @new
         }
-    
+
         push @gap_nuc, Seq->new( seq => join( '', @new), seq_id => $id );
     }
 
@@ -780,7 +785,7 @@ sub run_paml {
         $ali->shorten_ids($idm);
         my $idmfile = change_suffix($ali->file, '.idm');
         $idm->store($idmfile);
-        
+
         my $phyfile = substr(change_suffix($ali->file, '.p80'),2);
         my $treefile = file(change_suffix($ali->file, '.tre'));
         unless ( -e $treefile) {
@@ -792,7 +797,7 @@ sub run_paml {
         }
         my $pamlfile = store_paml($ali);
         $ali->restore_ids($idm);
-        
+
             # fill-in template
         my $vars = {
             seqfile => $pamlfile->stringify,
@@ -819,23 +824,23 @@ getSE = 0 * 0: don't want them, 1: want S.E.s of estimates
 RateAncestor = 1 * (0,1,2): rates (alpha>0) or ancestral states (1 or 2)
 Small_Diff = .5e-6
 cleandata = 0 * remove sites with ambiguity data (1:yes, 0:no)?
-method = 1 * 0: simultaneous; 1: one branch at a time 
+method = 1 * 0: simultaneous; 1: one branch at a time
 EOT
-    
+
         my $tt = Template->new;
         $tt->process(\$tt_str, $vars, "codeml.ctl");
-            
+
         my $cmd = "codeml codeml.ctl";
-            
+
         # try to robustly execute codeml
         my $ret_code = system( [ 0, 127 ], $cmd);
         if ($ret_code == 127) {
             carp 'Warning: cannot execute codeml command';
             return;
         }
-    
+
         $rates_file = file('rates')->move_to($rates_file->stringify);
-    
+
         return $rates_file;
     }
 }
@@ -846,7 +851,7 @@ sub run_raxml {
     ### RAxML...
     #~ my $cmd = "raxml -m PROTGAMMALGF -p 12345 -s $file -n tree";
     my $cmd = "raxml-thread -m PROTGAMMALGF -p 12345 -s $file -n ".$file." -T 16";
-    
+
     # try to robustly execute raxml
     my $ret_code = system( [ 0, 127 ], $cmd);
     if ($ret_code == 127) {
@@ -856,13 +861,14 @@ sub run_raxml {
 
     my $treefile = 'RAxML_bestTree.'.$file;
     my $lines = file($treefile)->slurp(iomode => '<:encoding(UTF-8)');
-    $lines =~ s/Node\d+//g;
+    $lines =~ s/Node\d+//xmsg;
     #~ my $result = system("perl -i.bak -nle 's/Node\d+//g; print;' $treefile");
     my $filename = change_suffix($file, '.tre');
     my $pamltree = file($filename);
     $pamltree->spew($lines);
 
     return $pamltree if -e $pamltree->stringify;
+    return;
 }
 
 sub store_paml {
@@ -903,8 +909,10 @@ sub store_paml {
 
 sub extract_rates {
     my $file = shift;
-    my @lines = grep {$_ =~ m/^\s+\d+/} $file->slurp( chomp => 1);
-    my @rates = map { my @F = split /\s+/, $_; $F[4]; } @lines;
+    my @lines = grep {$_ =~ m/^\s+\d+/xms} $file->slurp( chomp => 1);
+    ## no critic (BuiltinFunctions::ProhibitComplexMappings)
+    my @rates = map { my @F = split /\s+/xms, $_; $F[4]; } @lines;
+    ## use critic
 
     return \@rates;
 }
@@ -921,7 +929,7 @@ sub get_real_position {
 
     my $count_gap_s = grep { $_ =~ $GAP } @fromstart;
     #### $count_gap_s
-    
+
     if ($count_gap_s) {
         my $nc = grep { $_ =~ $GAP } @residues[0..$$span[0]+$count_gap_s];
         while ( $nc != $count_gap_s ) {
@@ -945,7 +953,7 @@ sub get_real_position {
     }
 
     my $end = ($$span[1]+$count_gap_s+$count_gap_e > $#residues) ? $#residues : $$span[1]+$count_gap_s+$count_gap_e ;
-    
+
     return ($start , $end);
 }
 
@@ -956,15 +964,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 frameshiftSimul_final.pl - Simulation for HmmCleaner
 
 =head1 VERSION
 
-version 0.180750
+version 0.243280
 
 =head1 USAGE
 
@@ -1084,6 +1090,12 @@ Print the usual program information
 =head1 AUTHOR
 
 Arnaud Di Franco <arnaud.difranco@gmail.fr>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Denis BAURAIN
+
+Denis BAURAIN <denis.baurain@uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

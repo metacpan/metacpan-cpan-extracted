@@ -1,6 +1,7 @@
 package Bio::MUST::Apps::HmmCleaner::Cleaner;
 # ABSTRACT: Cleaner class for HmmCleaner
-$Bio::MUST::Apps::HmmCleaner::Cleaner::VERSION = '0.180750';
+# CONTRIBUTOR: Denis BAURAIN <denis.baurain@uliege.be>
+$Bio::MUST::Apps::HmmCleaner::Cleaner::VERSION = '0.243280';
 use Moose;
 use namespace::autoclean;
 
@@ -75,7 +76,7 @@ has 'costs' => (
     handles        => {
         _get_cost => 'get',
     }
-    
+
 );
 
 has 'consider_X' => (
@@ -93,6 +94,8 @@ has 'is_protein' => (
 
 # BUILDER
 
+## no critic (ProhibitUnusedPrivateSubroutines)
+
 sub _build_nogap_seq {
     my $self = shift;
     my $seq = $self->seq;
@@ -108,6 +111,8 @@ sub _build_nogap_shifts {
 sub _build_shifts {
     return shift->_get_shifts;
 }
+
+## use critic
 
 
 # METHOD
@@ -128,13 +133,13 @@ sub update {
 
 sub get_nogap_result {
     my $self = shift;
-    
+
     #~ my $nogap_result = _erasezone($self, $self->nogap_seq->seq, $self->nogap_mask);
     #~ #### $nogap_result
     #~ return Seq->new( seq_id => $self->nogap_seq->full_id, seq => $nogap_result );
 
     return $self->_apply_mask($self->nogap_seq, $self->get_nogap_seqmask);
-    
+
 }
 
 sub get_result {
@@ -143,7 +148,7 @@ sub get_result {
     #~ my $result = _erasezone( $self, $self->seq->seq, $self->mask );
     #~ #### $result
     #~ return Seq->new( seq_id => $self->seq->full_id, seq => $result );
-    
+
     return $self->_apply_mask($self->seq, $self->get_seqmask);
 }
 
@@ -153,7 +158,7 @@ sub _get_nogap_shifts {
     my $self = shift;
 
     my $concat_scoreseq = $self->score;
-    
+
     # this function return a list of shifts between good and bad positions, ArrayRef
     ##### [CLEANER] Finding shifts...
     my $shifts = _findingShifts($self, $concat_scoreseq);
@@ -166,11 +171,11 @@ sub _get_nogap_shifts {
 sub _get_shifts {
     my $self = shift;
     my $shifts = $self->nogap_shifts;
-    
+
     ##### [CLEANER] Looking for gaps in full sequence...
     my @gaps_n_seqs;
     my $push = 0;
-    
+
     my $regex = ($self->consider_X)
               ? $GAP
               : ( ($self->is_protein) ? $GAPPROTMISS : $GAPDNAMISS );
@@ -184,12 +189,12 @@ sub _get_shifts {
             $push = 1;
         }
     }
-    
+
     ###### [CLEANER] @gaps_n_seqs
 
     # Updating frameshift position by taking gaps into account
     my $shifts_withgaps = _pushingShifts( $shifts, \@gaps_n_seqs );
-    
+
     ##### [CLEANER] shifts after _pushingShifts: $shifts_withgaps
 
     return $shifts_withgaps;
@@ -205,7 +210,7 @@ sub _shifts2mask {
     for (my $i=1; $i<@$shifts-1; $i+=2) {
         push @blocks, [$$shifts[$i]+1,$$shifts[$i+1]];
     }
-    
+
     my $mask = SeqMask->empty_mask($max);
     $mask->mark_block( @{$_} ) for @blocks;
 
@@ -215,29 +220,29 @@ sub _shifts2mask {
 # slide the shifts to match the fullseq with gap
 sub _pushingShifts {
     my ($refshifts, $reftabs) = @_;
-    
+
     my @shifts = @$refshifts;
     my @tabs = @$reftabs;
-    
+
     my $index = 0;
     my $push = 0;
     my $level = 0;
-    
+
     # iterate throught length of gaps' block and length of seqs' block
     while(scalar(@tabs) != 0) {
-        
+
             $push += shift(@tabs); # a total number of gap cross at the moment
             $level += shift(@tabs); # a total number of residue cross at the moment
-            
+
             # add current crossed number of gap when the number of residue pass the shift position
             while( $shifts[$index] < $level ) {
                 $shifts[$index] += $push;
                 $index++;
             }
-            
+
     }
-    $shifts[$#shifts] += $push;
-    
+    $shifts[-1] += $push;
+
     return \@shifts;
 }
 
@@ -245,20 +250,20 @@ sub _pushingShifts {
 #~ sub _pushingBlocks {
     #~ use Smart::Comments;
     #~ my ($refblocks, $reftabs) = @_;
-    #~ 
+    #~
     #~ my @flat_blocks = map {@$_} @$refblocks;
     #~ my @tabs = @$reftabs;
-    #~ 
+    #~
     #~ my $index = 0;
     #~ my $push = 0;
     #~ my $level = 0;
-    #~ 
+    #~
     #~ # iterate throught length of gaps' block and length of seqs' block
     #~ while(scalar(@tabs) != 0) {
-        #~ 
+        #~
             #~ $push += shift(@tabs); # a total number of gap cross at the moment
             #~ $level += shift(@tabs); # a total number of residue cross at the moment
-#~ 
+#~
             #~ next if ($index == $#flat_blocks);
             #~ # add current crossed number of gap when the number of residue pass the shift position
             #~ while( $flat_blocks[$index] < $level ) {
@@ -272,7 +277,7 @@ sub _pushingShifts {
     #~ $flat_blocks[$#flat_blocks] += $push;
     #~ ### End value level : $level
     #~ ### End value push  : $push
-#~ 
+#~
     #~ push my @blocks, pairmap { [ $a , $b ] } @flat_blocks;
     #~ return \@blocks;
 #~ }
@@ -281,15 +286,15 @@ sub _pushingShifts {
 # use shifts informations to replace blocks in sequence by $delchar
 #~ sub _erasezone {
     #~ my ($self, $seq, $shifts) = @_;
-    #~ 
+    #~
     #~ my $result = '';
     #~ my @s = @$shifts;
     #~ my $a1 = 0;
-    #~ 
+    #~
     #~ while(scalar(@s) != 0) {
             #~ my $a2 = shift(@s);
             #~ $result .= substr($seq, $a1, $a2-$a1);
-            #~ 
+            #~
             #~ if ( scalar(@s) != 0 ) {
                 #~ $a1 = shift(@s);
             #~ } else {
@@ -331,17 +336,17 @@ sub get_seqmask {
 # Base of algorithm, decide if there are frameshift in seq based on domains score
 sub _findingShifts {
     my ($self, $score) = @_;
-    
+
     my $threshold = $self->threshold;
     my $val = $threshold;
     my $previous_pos = -1;
     my $shift = $previous_pos;
     my $hasShift = 0;
-    
+
     my @shifts;
     for(my $pos=0; $pos != length($score); $pos++){
         my $c = substr($score, $pos, 1);
-        
+
         # Updating val
         if($c eq " "){
             $val += $self->_get_cost(0); # default -0.15
@@ -359,8 +364,8 @@ sub _findingShifts {
             carp "Found unknowed character in Hmmer output : -$c-";
             exit;
         }
-        
-        
+
+
         # Putting mininal value back into window
         if($val < 0){
             $val = 0;
@@ -368,7 +373,7 @@ sub _findingShifts {
         if($val>$threshold){
             $val = $threshold;
         }
-        
+
         # Deciding if shift or not
         if($hasShift==0){
             if($val==0){
@@ -400,7 +405,7 @@ sub _findingShifts {
                 }
             }
         }
-        
+
     }
     push(@shifts, length($score));
     #foreach (@shifts) {print "$_ ";}print "\n";
@@ -410,17 +415,17 @@ sub _findingShifts {
 # Base of algorithm, decide if there are frameshift in seq based on domains score
 #~ sub _findingBlocks {
     #~ my ($self, $score) = @_;
-    #~ 
+    #~
     #~ my $threshold = $self->threshold;
     #~ my $val = $threshold;
     #~ my $startok = 0;
     #~ my $endok   = 0;
     #~ my $isok    = 1;
-    #~ 
+    #~
     #~ my @blocks;
     #~ for(my $pos=1; $pos <= length($score); $pos++){
         #~ my $c = substr($score, $pos-1, 1);
-        #~ 
+        #~
         #~ # Updating val
         #~ if($c eq " "){
             #~ $val += $self->_get_cost(0); # default -3
@@ -438,12 +443,12 @@ sub _findingShifts {
             #~ carp "Found unknowed character in Hmmer output : -$c-";
             #~ exit;
         #~ }
-        #~ 
-        #~ 
+        #~
+        #~
         #~ # Putting minimal value back into window
         #~ $val = 0 if ($val<0);
         #~ $val = $threshold if ($val>$threshold);
-        #~ 
+        #~
         #~ # Deciding if shift or not
         #~ if($isok){
             #~ if ($val==0) {
@@ -484,19 +489,23 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 Bio::MUST::Apps::HmmCleaner::Cleaner - Cleaner class for HmmCleaner
 
 =head1 VERSION
 
-version 0.180750
+version 0.243280
 
 =head1 AUTHOR
 
 Arnaud Di Franco <arnaud.difranco@gmail.fr>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Denis BAURAIN
+
+Denis BAURAIN <denis.baurain@uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

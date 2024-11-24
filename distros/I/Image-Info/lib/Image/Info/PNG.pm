@@ -18,9 +18,8 @@ key.
 =cut
 
 use strict;
-use vars qw/$VERSION/;
 
-$VERSION = 1.03;
+our $VERSION = 1.04;
 
 # Test for Compress::Zlib (for reading zTXt chunks)
 my $have_zlib = 0;

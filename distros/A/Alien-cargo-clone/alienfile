@@ -1,0 +1,16 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+  command => 'cargo-clone',
+  args    => [ '-h' ],
+);
+
+share {
+  requires 'Alien::cargo';
+  start_url './patch/dummy.txt';
+  plugin 'Download';
+  extract [ 'touch cargo-clone-extract' ];
+  build [
+    [ 'cargo', 'install', 'cargo-clone', '--root', '%{.install.prefix}' ],
+  ];
+};

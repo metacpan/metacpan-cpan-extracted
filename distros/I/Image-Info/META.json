@@ -54,6 +54,6 @@
          "url" : "git://github.com/eserte/image-info.git"
       }
    },
-   "version" : "1.44",
+   "version" : "1.45",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

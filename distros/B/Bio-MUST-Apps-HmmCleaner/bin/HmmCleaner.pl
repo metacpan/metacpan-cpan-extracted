@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: HmmCleaner.pl
 # ABSTRACT: Removing low similarity segments from your MSA
+# CONTRIBUTOR: Denis BAURAIN <denis.baurain@uliege.be>
 
 use Modern::Perl;
 use Getopt::Euclid;
@@ -38,25 +39,25 @@ $costs = [$ARGV{'-costs'}{'c1'}, $ARGV{'-costs'}{'c2'}, $ARGV{'-costs'}{'c3'}, $
 #### $costs
 
 for my $file ( @{$ARGV{'<infiles>'}} ) {
-	my $args = {
-		ali             => $file,
-		ali_model       => $file,
-		threshold       => 1,
-		changeID        => $ARGV{'--changeID'},
-		#~ delchar         => $ARGV{'-delchar'},
-		costs           => $costs,
-		consider_X      => ($ARGV{'--noX'}) ? 0 : 1,
-		perseq_profile  => ($ARGV{'-profile'} eq 'leave-one-out') ? 1 : 0,
+    my $args = {
+        ali             => $file,
+        ali_model       => $file,
+        threshold       => 1,
+        changeID        => $ARGV{'--changeID'},
+        #~ delchar         => $ARGV{'-delchar'},
+        costs           => $costs,
+        consider_X      => ($ARGV{'--noX'}) ? 0 : 1,
+        perseq_profile  => ($ARGV{'-profile'} eq 'leave-one-out') ? 1 : 0,
         outfile_type    => ($ARGV{'--ali'}) ? 1 : 0,
         debug_mode      => ($ARGV{'-v'}>5) ? 1 : 0,
         symfrac         => $ARGV{'-symfrac'},
-	};
+    };
 
-	### Creating object for file : $file
-	my $cleaner = HmmCleaner->new($args);
-    
-	($ARGV{'--log_only'}) ? $cleaner->store_log : $cleaner->store_all;
-    
+    ### Creating object for file : $file
+    my $cleaner = HmmCleaner->new($args);
+
+    ($ARGV{'--log_only'}) ? $cleaner->store_log : $cleaner->store_all;
+
 }
 
 ### End of script...
@@ -65,15 +66,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 HmmCleaner.pl - Removing low similarity segments from your MSA
 
 =head1 VERSION
 
-version 0.180750
+version 0.243280
 
 =head1 USAGE
 
@@ -106,9 +105,9 @@ Predefine value are also available with --large and --specificity options but
 user defined costs will be prioritary if present.
 
 =for Euclid: c1.type: number < 0
-	c2.type: number < 0
-	c3.type: number > 0
-	c4.type: number > 0
+    c2.type: number < 0
+    c3.type: number > 0
+    c4.type: number > 0
 
 =item --changeID
 
@@ -182,6 +181,12 @@ Print the usual program information
 =head1 AUTHOR
 
 Arnaud Di Franco <arnaud.difranco@gmail.fr>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Denis BAURAIN
+
+Denis BAURAIN <denis.baurain@uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

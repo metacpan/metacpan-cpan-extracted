@@ -1,14 +1,10 @@
 # App::hopen::T::Gnu::C - support GNU toolset, C language
-# TODO RESUME HERE - put .o files in the dest dir
 package App::hopen::T::Gnu::C;
 use Data::Hopen;
+use strict; use warnings;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000010';
-
-use parent 'Exporter';
-
-use Class::Tiny qw(op files _cc);
+our $VERSION = '0.000015'; # TRIAL
 
 use App::hopen::BuildSystemGlobals;   # For $DestDir.
     # TODO make the dirs available to nodes through the context.
@@ -22,7 +18,6 @@ use Data::Hopen qw(getparameters);
 use Data::Hopen::G::GraphBuilder;
 use Data::Hopen::Util::Data qw(forward_opts);
 use Data::Hopen::Util::Filename;
-#use Deep::Hash::Utils qw(deepvalue);
 use File::Which ();
 use Path::Class;
 
@@ -69,8 +64,11 @@ compilation options or object-file names).  Usage:
 
 =cut
 
+sub _find_compiler; # forward
+
 sub compile {
     my ($builder, %args) = getparameters('self', [qw(; name)], @_);
+    _find_compiler unless $_CC;
     my $node = App::hopen::T::Gnu::C::CompileCmd->new(
         compiler => $_CC,
         forward_opts(\%args, 'name')
@@ -98,6 +96,7 @@ using the compiler?
 
 sub link {
     my ($builder, %args) = getparameters('self', [qw(exe; name)], @_);
+    _find_compiler unless $_CC;
 
     my $dest = based_path(path => file($FN->exe($args{exe})), base => $DestDir);
 
@@ -140,7 +139,7 @@ sub _find_compiler {
     croak "Could not find a C compiler" unless $_CC;
 } #_find_compiler()
 
-BEGIN { _find_compiler; }
+BEGIN { _find_compiler if eval '$App::hopen::RUNNING'; }
 
 1;
 __END__

@@ -1,0 +1,74 @@
+#!perl
+# Copyright (c) 2018--2019 cxw42.  All rights reserved.  See LICENSE file.
+# To run this manually from the source tree, do
+#     perl -Ilib bin/hopen
+use strict; use warnings;
+use App::hopen;
+exit(App::hopen::Main(\@ARGV));
+__END__
+
+=head1 NAME
+
+hopen - CLI for the App::hopen build system
+
+=head1 SYNOPSIS
+
+See L<App::hopen>.  Basic usage:
+
+    hopen [options] [destination directory] [project directory]
+
+The default C<destination directory> is C<built/>.
+The default C<project directory> is C<.>.
+
+=head1 AUTHOR
+
+Christopher White, C<cxwembedded at gmail.com>
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc App::hopen                      For command-line options
+    perldoc App::hopen::Conventions         For terminology and workflow
+    perldoc Data::Hopen                     For internals
+
+You can also look for information at:
+
+=over 4
+
+=item * GitHub: The project's main repository and issue tracker
+
+L<https://github.com/hopenbuild/App-hopen>
+
+=item * MetaCPAN
+
+L<https://metacpan.org/pod/App::hopen>
+
+=item * This distribution
+
+See the C<eg/> directory distributed with this software for examples.
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2018--2019 Christopher White.  All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this program; if not, write to the Free
+Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+
+=cut
+
+# vi: set ts=4 sts=4 sw=4 et ai ft=perl: #

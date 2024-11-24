@@ -1,10 +1,10 @@
 {
-   "abstract" : "hopen build system command-line interface",
+   "abstract" : "Graph-driven cross-platform build system",
    "author" : [
-      "Christopher White <cxwembedded@gmail.com>"
+      "Christopher White, C<cxwembedded at gmail.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.999",
    "license" : [
       "lgpl_2_1"
    ],
@@ -16,7 +16,13 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
       ]
    },
    "prereqs" : {
@@ -30,17 +36,22 @@
       },
       "configure" : {
          "requires" : {
-            "Config" : "0",
-            "ExtUtils::MakeMaker" : "0",
-            "File::Spec" : "0",
-            "strict" : "0",
-            "warnings" : "0"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
             "App::RewriteVersion" : "0",
-            "Module::Metadata" : "1.000016"
+            "CPAN::Meta" : "0",
+            "File::Slurp" : "9999.26",
+            "Module::CPANfile" : "0.9020",
+            "Module::Metadata" : "1.000016",
+            "Test::CPAN::Meta" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
@@ -51,8 +62,8 @@
             "Class::Tiny::ConstrainedAccessor" : "0.000010",
             "Config" : "0",
             "Cwd" : "0",
-            "Data::Dumper" : "0",
-            "Data::Hopen" : "0.000013",
+            "Data::Dumper" : "2.154",
+            "Data::Hopen" : "0.000021",
             "Deep::Hash::Utils" : "0.03",
             "Exporter" : "0",
             "File::Glob" : "0",
@@ -65,7 +76,6 @@
             "Getopt::Long" : "2.5",
             "Graph" : "0.9704",
             "Hash::Merge" : "0.299",
-            "Hash::Ordered" : "0.011",
             "Import::Into" : "0",
             "List::MoreUtils" : "0.428",
             "Package::Alias" : "0.12",
@@ -75,7 +85,10 @@
             "Scalar::Util" : "0",
             "Set::Scalar" : "1.27",
             "String::Print" : "0.92",
+            "Syntax::Construct" : "0.07",
             "Type::Tiny" : "1.004004",
+            "XML::FromPerl" : "0",
+            "XML::LibXML" : "1.60",
             "constant" : "0",
             "feature" : "0",
             "overload" : "0",
@@ -92,6 +105,7 @@
             "Import::Into" : "0",
             "Scalar::Util" : "0",
             "Test::Deep" : "0.084",
+            "Test::Directory" : "0.02",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Warn" : "0.35",
@@ -102,99 +116,135 @@
    "provides" : {
       "App::hopen" : {
          "file" : "lib/App/hopen.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
       "App::hopen::AppUtil" : {
          "file" : "lib/App/hopen/AppUtil.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
       "App::hopen::Asset" : {
          "file" : "lib/App/hopen/Asset.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
       "App::hopen::BuildSystemGlobals" : {
          "file" : "lib/App/hopen/BuildSystemGlobals.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
       "App::hopen::G::AssetOp" : {
          "file" : "lib/App/hopen/G/AssetOp.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
       "App::hopen::G::Cmd" : {
          "file" : "lib/App/hopen/G/Cmd.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
       "App::hopen::G::FilesCmd" : {
          "file" : "lib/App/hopen/G/FilesCmd.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
+      },
+      "App::hopen::G::OutputPerFileCmd" : {
+         "file" : "lib/App/hopen/G/OutputPerFileCmd.pm",
+         "version" : "0.000015"
       },
       "App::hopen::Gen" : {
          "file" : "lib/App/hopen/Gen.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
+      },
+      "App::hopen::Gen::MSBuild" : {
+         "file" : "lib/App/hopen/Gen/MSBuild.pm",
+         "version" : "0.000015"
+      },
+      "App::hopen::Gen::MSBuild::AssetGraphNode" : {
+         "file" : "lib/App/hopen/Gen/MSBuild/AssetGraphNode.pm",
+         "version" : "0.000015"
       },
       "App::hopen::Gen::Make" : {
          "file" : "lib/App/hopen/Gen/Make.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
       "App::hopen::Gen::Make::AssetGraphNode" : {
          "file" : "lib/App/hopen/Gen/Make/AssetGraphNode.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
-      "App::hopen::Gen::Make::AssetGraphVisitor" : {
-         "file" : "lib/App/hopen/Gen/Make/AssetGraphVisitor.pm",
-         "version" : "0.000010"
+      "App::hopen::Gen::Ninja" : {
+         "file" : "lib/App/hopen/Gen/Ninja.pm",
+         "version" : "0.000015"
+      },
+      "App::hopen::Gen::Ninja::AssetGraphNode" : {
+         "file" : "lib/App/hopen/Gen/Ninja/AssetGraphNode.pm",
+         "version" : "0.000015"
       },
       "App::hopen::H" : {
          "file" : "lib/App/hopen/H.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
       "App::hopen::HopenFileKit" : {
          "file" : "lib/App/hopen/HopenFileKit.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
-      "App::hopen::Phase::Check" : {
-         "file" : "lib/App/hopen/Phase/Check.pm",
-         "version" : "0.000010"
-      },
-      "App::hopen::Phase::Gen" : {
-         "file" : "lib/App/hopen/Phase/Gen.pm",
-         "version" : "0.000010"
+      "App::hopen::MYhopen" : {
+         "file" : "lib/App/hopen/MYhopen.pm",
+         "version" : "0.000015"
       },
       "App::hopen::Phases" : {
          "file" : "lib/App/hopen/Phases.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
       "App::hopen::T::Gnu" : {
          "file" : "lib/App/hopen/T/Gnu.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
       "App::hopen::T::Gnu::C" : {
          "file" : "lib/App/hopen/T/Gnu/C.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
       "App::hopen::T::Gnu::C::CompileCmd" : {
          "file" : "lib/App/hopen/T/Gnu/C/CompileCmd.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
       "App::hopen::T::Gnu::C::LinkCmd" : {
          "file" : "lib/App/hopen/T/Gnu/C/LinkCmd.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
+      },
+      "App::hopen::T::MSCL" : {
+         "file" : "lib/App/hopen/T/MSCL.pm",
+         "version" : "0.000015"
+      },
+      "App::hopen::T::MSCL::C" : {
+         "file" : "lib/App/hopen/T/MSCL/C.pm",
+         "version" : "0.000015"
+      },
+      "App::hopen::T::MSCL::C::CompileCmd" : {
+         "file" : "lib/App/hopen/T/MSCL/C/CompileCmd.pm",
+         "version" : "0.000015"
+      },
+      "App::hopen::T::MSCL::C::LinkCmd" : {
+         "file" : "lib/App/hopen/T/MSCL/C/LinkCmd.pm",
+         "version" : "0.000015"
+      },
+      "App::hopen::T::VSXML" : {
+         "file" : "lib/App/hopen/T/VSXML.pm",
+         "version" : "0.000015"
       },
       "App::hopen::TEMPLATE" : {
          "file" : "lib/App/hopen/TEMPLATE.pm",
-         "version" : "0.000010"
+         "version" : "0.000013"
       },
-      "App::hopen::Tool" : {
-         "file" : "lib/App/hopen/Tool.pm",
-         "version" : "0.000010"
+      "App::hopen::Util" : {
+         "file" : "lib/App/hopen/Util.pm",
+         "version" : "0.000015"
       },
       "App::hopen::Util::BasedPath" : {
          "file" : "lib/App/hopen/Util/BasedPath.pm",
-         "version" : "0.000010"
+         "version" : "0.000015"
       },
-      "Data::Hopen::Toolchain" : {
-         "file" : "lib/App/hopen/Toolchain.pm",
-         "version" : "0.000010"
+      "App::hopen::Util::String" : {
+         "file" : "lib/App/hopen/Util/String.pm",
+         "version" : "0.000015"
+      },
+      "App::hopen::Util::XML::FromPerl" : {
+         "file" : "lib/App/hopen/Util/XML/FromPerl.pm",
+         "version" : "0.000015"
       }
    },
    "release_status" : "stable",
@@ -202,12 +252,17 @@
       "bugtracker" : {
          "web" : "https://github.com/hopenbuild/App-hopen/issues"
       },
+      "homepage" : "https://github.com/hopenbuild/App-hopen",
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/hopenbuild/App-hopen.git",
+         "url" : "git://github.com/hopenbuild/App-hopen.git",
          "web" : "https://github.com/hopenbuild/App-hopen"
       }
    },
-   "version" : "0.000010",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.000015",
+   "x_authority" : "cpan:CXW",
+   "x_contributors" : [
+      "Christopher White <cxw@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
 }

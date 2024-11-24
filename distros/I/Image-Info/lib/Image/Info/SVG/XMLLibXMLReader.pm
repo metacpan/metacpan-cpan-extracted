@@ -15,8 +15,7 @@
 package Image::Info::SVG::XMLLibXMLReader;
 
 use strict;
-use vars qw($VERSION);
-$VERSION = '1.05';
+our $VERSION = '1.06';
 
 use XML::LibXML::Reader;
 

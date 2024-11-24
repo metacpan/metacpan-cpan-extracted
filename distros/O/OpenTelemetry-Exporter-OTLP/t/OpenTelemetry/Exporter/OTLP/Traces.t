@@ -2,10 +2,12 @@
 
 use Log::Any::Adapter 'Stderr';
 use Test2::V0 -target => 'OpenTelemetry::Exporter::OTLP::Traces';
+use Test2::Tools::OpenTelemetry;
+use Test2::Tools::Spec;
 
 use experimental 'signatures';
 
-use HTTP::Tiny;
+use OpenTelemetry 'otel_error_handler';
 use OpenTelemetry::Constants
     'HEX_INVALID_SPAN_ID',
     'INVALID_SPAN_ID',
@@ -15,11 +17,10 @@ use OpenTelemetry::Constants
 use OpenTelemetry::Trace::SpanContext;
 use OpenTelemetry::Trace::Span::Status;
 
-my $http_mock = mock 'HTTP::Tiny' => override => [
-    request => sub { +{ success => 1, status => 200 } },
-];
+use HTTP::Tiny;
+use Syntax::Keyword::Dynamically;
 
-my $mock = mock 'OpenTelemetry::SDK::Trace::Span::Readable' => add => [
+my $span_mock = mock 'OpenTelemetry::SDK::Trace::Span::Readable' => add => [
     attributes         => sub { {} },
     dropped_attributes => 0,
     dropped_events     => 0,
@@ -60,11 +61,55 @@ my $mock = mock 'OpenTelemetry::SDK::Trace::Span::Readable' => add => [
     },
 ];
 
-is CLASS->new->export([
-    OpenTelemetry::SDK::Trace::Span::Readable->new,
-    OpenTelemetry::SDK::Trace::Span::Readable->new,
-    OpenTelemetry::SDK::Trace::Span::Readable->new,
-    OpenTelemetry::SDK::Trace::Span::Readable->new,
-]), TRACE_EXPORT_SUCCESS;
+subtest Export => sub {
+    my $http_mock = mock 'HTTP::Tiny' => override => [
+        request => sub { +{ success => 1, status => 200 } },
+    ];
+
+    is CLASS->new->export([
+        OpenTelemetry::SDK::Trace::Span::Readable->new,
+        OpenTelemetry::SDK::Trace::Span::Readable->new,
+        OpenTelemetry::SDK::Trace::Span::Readable->new,
+        OpenTelemetry::SDK::Trace::Span::Readable->new,
+    ]), TRACE_EXPORT_SUCCESS;
+};
+
+describe Retries => sub {
+    my $retries;
+
+    case 'No retries' => sub { $retries = 0 };
+    case 'One retry'  => sub { $retries = 1 };
+
+    tests Retries => { flat => 1 } => sub {
+        my $exporter = CLASS->new( retries => $retries );
+
+        my $content;
+        $content = OTel::Google::RPC::Status->new_and_check({
+            code    => 999,
+            message => 'Test failure',
+        })->encode if eval { require OpenTelemetry::Proto; 1 };
+
+        my $http_mock = mock 'HTTP::Tiny' => override => [
+            request => sub {
+                +{
+                    success => 0,
+                    status  => 429,
+                    content => $content,
+                };
+            },
+        ];
+
+        dynamically otel_error_handler = sub {};
+
+        is metrics {
+            $exporter->export([
+                OpenTelemetry::SDK::Trace::Span::Readable->new,
+            ]);
+        } => bag {
+            item match qr/otel_exporter_otlp_failure reason:429 = @{[ $retries + 1 ]}/;
+            etc;
+        };
+    };
+};
 
 done_testing;

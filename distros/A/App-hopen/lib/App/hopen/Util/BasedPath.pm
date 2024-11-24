@@ -1,8 +1,9 @@
 # App::hopen::Util::BasedPath - A path relative to a specified base
 package App::hopen::Util::BasedPath;
+use strict; use warnings;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000015'; # TRIAL
 
 use Exporter qw(import);
 our @EXPORT; BEGIN { @EXPORT = qw(based_path); }

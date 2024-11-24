@@ -35,7 +35,7 @@ The generator's job is to arrange for coordinating work that needs to be done.
 
 =item Toolset
 
-A collection of operations (L<App::hopen::G::Op> subclasses) that know
+A collection of commands (L<App::hopen::G::Cmd> subclasses) that know
 how to process specific types of files.  Toolsets are responsible for
 defining the work that the generator will coordinate.
 
@@ -236,3 +236,86 @@ implement is determined by the generator.
 The generator runs the asset graph to output the blueprint files.
 
 =back
+
+=head1 SCRAPS
+
+Ignore these --- I may come back to them in the future.
+
+=head2 Tool
+
+App::hopen::Tool - Base class for packages that know how to process files
+
+A tool knows how to generate a command or other text that will cause
+a build system to perform a particular action on a file belonging to a
+particular language.
+
+A tool is an L<App::hopen::G::Cmd>, so may interact with the current generator
+(L<App::hopen::BuildSystemGlobals/$Generator>).  Moreover, the generator will
+get a chance to visit the op after it is processed.
+
+Maybe TODO:
+
+    - Each Generator must specify a list of Content-Types (media types)
+        it can consume.  Each Tool must specify a specific content-type
+        it produces.  Mismatches are an error unless overriden on the
+        hopen command line.
+
+=head2 Toolchain
+
+TODO?
+
+    - permit loading any number of tools/toolchains
+    - The Generator specifies a default list of tools rather than a
+        single default toolchain.
+    - add G::ToolOp to invoke tools.  A ToolOp will take a language
+        and an opcode and invoke a corresponding Tool.  E.g., a GNU C
+        Tool will generate command-line options for gcc-style command lines.
+    - Only one Tool may be loaded for each (language, opcode) pair.
+        Otherwise the build would be ambiguous.
+    - In Conventions, define the formats for languages and opcodes.
+
+Maybe TODO:
+
+    - Each Generator must specify a list of Content-Types (media types)
+        it can consume.  Each Tool must specify a specific content-type
+        it produces.  Mismatches are an error unless overriden on the
+        hopen command line.
+
+=head2 Phases
+
+App::hopen::Phase - Namespace for hopen phases.
+
+The specific phases in hopen live under C<App::hopen::Phase>.  The
+current phases are:
+
+=over
+
+=item L<App::hopen::Phase::Probe>
+
+Read a foundations file and one or more context files; output a capability
+file and an options file.  The user may edit the options file.
+
+=item L<App::hopen::Phase::Gen>
+
+Read the capability, option, and context files, plus a recipes file identifying
+the build graph.  Output one or more blueprint files.
+
+=item B<Build>
+
+Not part of hopen --- run the blueprint files through make(1), ninja(1), or
+another build tool.
+
+If the dependencies change as the result of a build, the Gen phase is re-run.
+However, the Probe phase does not have to be re-run.
+
+=back
+
+=head3 PHILOSOPHY
+
+Hopen is a single-pass build system.  You do not have to re-run to converge
+on a final set of blueprint files.
+
+Hopen is context-aware.  You can change the build of a repo without having
+to touch files in that repo.
+
+=cut

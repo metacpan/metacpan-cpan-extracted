@@ -1,9 +1,10 @@
 # App::hopen::BuildSystemGlobals - global data for build-system use cases.
 package App::hopen::BuildSystemGlobals;
 use Data::Hopen;
+use strict; use warnings;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000015'; # TRIAL
 
 use parent 'Exporter';
 our @EXPORT;
@@ -17,14 +18,14 @@ App::hopen::BuildSystemGlobals - global data for hopen build-system use cases
 =head1 SYNOPSIS
 
 This module exports variables used when employing hopen(1) as a build system.
-They are in a separate module so that it's easy to tell which parts of
-L<Data::Hopen> I<don't> need them.
+They are in a separate module so that it's easy to tell in which parts of
+L<App::hopen> I<don't> need them.
 
 =head1 VARIABLES
 
 =head2 $Generator
 
-The current L<Data::Hopen::Gen> instance.
+The current L<App::hopen::Gen> instance.
 
 =head2 $Toolset
 

@@ -1,9 +1,10 @@
 # App::hopen::Phases - definitions of phases
 package App::hopen::Phases;
 use Data::Hopen;
+use strict; use warnings;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000015'; # TRIAL
 
 use parent 'Exporter';
 our (@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
@@ -29,7 +30,7 @@ use List::MoreUtils qw(first_index);
 
 =head1 NAME
 
-Data::Hopen::Phases - Definitions and routines for hopen phases
+App::hopen::Phases - Definitions and routines for hopen phases
 
 =head1 SYNOPSIS
 
@@ -41,7 +42,7 @@ character of a phase may not be a digit.  This is so they can be used as
 identifiers if necessary.
 
 This package also defines a special export tag, C<:hopenfile>, for use when
-running hopen files.  The wrapper code in L<Data::Hopen::App> uses this
+running hopen files.  The wrapper code in L<App::hopen> uses this
 tag.  Hopen files themselves do not need to use this tag.
 
 The names C<first>, C<start>, C<last>, and C<end> are reserved.
@@ -150,7 +151,7 @@ Take a given action only in a specified phase.  Usage examples:
         # Call the given sub and return its return value.
 
 This is designed for use within a hopen file.
-See L<Data::Hopen::App/_run_phase> for the execution environment C<on()> is
+See L<App::hopen/_run_phase> for the execution environment C<on()> is
 designed to run in.
 
 When run as part of a hopen file, C<on()> will skip the rest of the file if it

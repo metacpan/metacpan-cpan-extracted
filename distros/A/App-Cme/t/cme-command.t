@@ -183,6 +183,13 @@ my @script_tests = (
         stderr => $expect_namefoobar,
     },
     {
+        label => __LINE__.": modification with a script and args",
+        script => [ "# Format: YAML", "---", "app: popcon", 'load: |-', '  ! MY_HOSTID=\$name$name'],
+        args => [qw!--arg name=foobar!],
+        test => qr/"\$namefoobar"/,
+        stderr => $expect_namefoobar,
+    },
+    {
         label => "line ".__LINE__.": modification with a script and a default value",
         script => [ "app:  popcon", "default: name foobar", 'load ! MY_HOSTID=\$name$name'],
         test => qr/"\$namefoobar"/,

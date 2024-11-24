@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.040';
+$App::Cme::Command::run::VERSION = '1.041';
 use strict;
 use warnings;
 use v5.20;
@@ -281,6 +281,8 @@ sub parse_script ($script, $content, $user_args) {
             next if ref $data->{$key} eq 'ARRAY';
             $data->{$key} = [ $data->{$key} ]
         }
+        $data->{default} //= {};
+        $data->{commit_msg} = delete $data->{commit};
         if ($data->{default} and ref $data->{default} ne 'HASH') {
             die "default spec must be a hash ref, not a ", ref $data->{default} // 'scalar', "\n";
         }
@@ -291,6 +293,12 @@ sub parse_script ($script, $content, $user_args) {
     my $data = parse_script_lines ($script, $lines);
     $data = process_script_vars ($user_args, $data);
     return $data;
+}
+
+sub commit ($self, $root, $msg) {
+    $msg =~ s/\{\{(.*?)\}\}/$root->grab_value($1)/e;
+
+    system(qw/git commit -a -m/, $msg);
 }
 
 sub execute {
@@ -389,14 +397,14 @@ sub execute {
 
     # commit if needed
     if ($commit_msg and not $opt->{no_commit}) {
-        system(qw/git commit -a -m/, $commit_msg);
+        $self->commit($root, $commit_msg);
     }
 
     return;
 }
 
 package App::Cme::Run::Var; ## no critic (Modules::ProhibitMultiplePackages)
-$App::Cme::Run::Var::VERSION = '1.040';
+$App::Cme::Run::Var::VERSION = '1.041';
 require Tie::Hash;
 
 ## no critic (ClassHierarchies::ProhibitExplicitISA)
@@ -424,7 +432,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.040
+version 1.041
 
 =head1 SYNOPSIS
 
@@ -594,6 +602,19 @@ Specify that the change must be committed with the passed commit
 message. When this option is used, C<cme> raises an error if used on a
 non-clean workspace. This option works only with L<git>.
 
+Strings like C<{{ load path }}> are substituted with a value extracted
+from configuration tree with the specified load path. See
+L<Config::Model::Loader> for a valid load path.
+
+For example, this specification:
+
+    load: source Standards-Version="4.7.0"
+    commit: declare compliance with policy {{source Standards-Version}}
+
+yields this commit message:
+
+    declare compliance with policy 4.7.0
+
 =back
 
 All instructions can use variables like C<$stuff> whose value can be
@@ -658,7 +679,10 @@ For example:
 =head1 Syntax of YAML format
 
 This format is intented for people not wanting to user the text format
-above. It supoorts the same parameters as the text format.
+above. It supports the same parameters as the text format.
+
+When using "!" and "$" characters in a string, using YAML block scalar
+is probably easier.
 
 For instance:
 
@@ -667,8 +691,10 @@ For instance:
  app: popcon
  default:
    defname: foobar
- var: "$var{name} = $args{defname}"
- load: "! MY_HOSTID=$name"
+ var: |-
+   $var{name} = $args{defname}
+ load: |-
+   ! MY_HOSTID=$name
 
 =head1 Syntax of Perl format
 

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.594-5-g3db5521e
+package JSON::Schema::Modern; # git description: v0.595-15-g6dbb4ebf
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.595';
+our $VERSION = '0.596';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -535,34 +535,25 @@ sub _traverse_subschema ($self, $schema, $state) {
   my $valid = 1;
   my %unknown_keywords = map +($_ => undef), keys %$schema;
 
-  # First, we must determine the dialect to use. This is given to us in metaschema_uri
-  # and can also be indicated with the '$schema' keyword. We need to do this now, before iterating
-  # over vocabulary classes and keywords, because these can change depending on the dialect.
-  if (exists $schema->{'$schema'}) {
-    return if not $self->_parse_keyword_schema($state, $schema->{'$schema'});
-
-    # This is a bit of a chicken-and-egg situation. If we start off at draft2020-12, then all
-    # keywords are valid, so we inspect and process the $schema keyword; this switches us to draft7
-    # but now only the $ref keyword is respected and everything else should be ignored, so the
-    # $schema keyword never happened, so now we're back to draft2020-12 again, and...?!
-    # The only winning move is not to play.
-    return E($state, '$schema and $ref cannot be used together in older drafts')
-      if exists $schema->{'$ref'} and $state->{spec_version} =~ /^draft[467]$/;
-  }
-
+  # we use an index rather than iterating through the lists directly because the lists of
+  # vocabularies and keywords can change after we have started. However, only the Core vocabulary
+  # and $schema keyword can make this change, and they both come first, therefore a simple index
+  # into the list is sufficient.
   ALL_KEYWORDS:
-  foreach my $vocabulary ($state->{vocabularies}->@*) {
-    # [ [ $keyword => $subref ], [ ... ] ]
-    my $keyword_list = do {
-      use autovivification qw(fetch store);
-      $vocabulary_cache->{$state->{spec_version}}{$vocabulary}{traverse} //= [
-        map [ $_ => $vocabulary->can('_traverse_keyword_'.($_ =~ s/^\$//r)) ],
-          $vocabulary->keywords($state->{spec_version})
-      ];
-    };
+  for (my $vocab_index = 0; $vocab_index < $state->{vocabularies}->@*; $vocab_index++) {
+    my $vocabulary = $state->{vocabularies}[$vocab_index];
+    my $keyword_list;
 
-    foreach my $keyword_tuple ($keyword_list->@*) {
-      my ($keyword, $sub) = $keyword_tuple->@*;
+    for (my $keyword_index = 0;
+        $keyword_index < ($keyword_list //= do {
+          use autovivification qw(fetch store);
+          $vocabulary_cache->{$state->{spec_version}}{$vocabulary}{traverse} //= [
+            map [ $_ => $vocabulary->can('_traverse_keyword_'.($_ =~ s/^\$//r)) ],
+              $vocabulary->keywords($state->{spec_version})
+          ];
+        })->@*;
+        $keyword_index++) {
+      my ($keyword, $sub) = $keyword_list->[$keyword_index]->@*;
       next if not exists $schema->{$keyword};
 
       # keywords adjacent to $ref are not evaluated before draft2019-09
@@ -571,11 +562,16 @@ sub _traverse_subschema ($self, $schema, $state) {
       delete $unknown_keywords{$keyword};
       $state->{keyword} = $keyword;
 
+      my $old_spec_version = $state->{spec_version};
+
       if (not $sub->($vocabulary, $schema, $state)) {
         die 'traverse result is false but there are no errors (keyword: '.$keyword.')' if not $state->{errors}->@*;
         $valid = 0;
         next;
       }
+
+      # a keyword changed the keyword list for this vocabulary; re-fetch the list before continuing
+      undef $keyword_list if $state->{spec_version} ne $old_spec_version;
 
       if (my $callback = $state->{callbacks}{$keyword}) {
         if (not $callback->($schema, $state)) {
@@ -661,19 +657,26 @@ sub _eval_subschema ($self, $data, $schema, $state) {
   $state->{short_circuit} = ($state->{short_circuit} || delete($state->{short_circuit_suggested}))
     && !exists($schema->{unevaluatedItems}) && !exists($schema->{unevaluatedProperties});
 
-  ALL_KEYWORDS:
-  foreach my $vocabulary ($state->{vocabularies}->@*) {
-    # [ [ $keyword => $subref|undef ], [ ... ] ]
-    my $keyword_list = do {
-      use autovivification qw(fetch store);
-      $vocabulary_cache->{$state->{spec_version}}{$vocabulary}{evaluate} //= [
-        map [ $_ => $vocabulary->can('_eval_keyword_'.($_ =~ s/^\$//r)) ],
-          $vocabulary->keywords($state->{spec_version})
-      ];
-    };
+  # we use an index rather than iterating through the lists directly because the lists of
+  # vocabularies and keywords can change after we have started. However, only the Core vocabulary
+  # and $schema keyword can make this change, and they both come first, therefore a simple index
+  # into the list is sufficient.
 
-    foreach my $keyword_tuple ($keyword_list->@*) {
-      my ($keyword, $sub) = $keyword_tuple->@*;
+  ALL_KEYWORDS:
+  for (my $vocab_index = 0; $vocab_index < $state->{vocabularies}->@*; $vocab_index++) {
+    my $vocabulary = $state->{vocabularies}[$vocab_index];
+    my $keyword_list;
+
+    for (my $keyword_index = 0;
+        $keyword_index < ($keyword_list //= do {
+          use autovivification qw(fetch store);
+          $vocabulary_cache->{$state->{spec_version}}{$vocabulary}{evaluate} //= [
+            map [ $_ => $vocabulary->can('_eval_keyword_'.($_ =~ s/^\$//r)) ],
+              $vocabulary->keywords($state->{spec_version})
+          ];
+        })->@*;
+        $keyword_index++) {
+      my ($keyword, $sub) = $keyword_list->[$keyword_index]->@*;
       next if not exists $schema->{$keyword};
 
       # keywords adjacent to $ref are not evaluated before draft2019-09
@@ -683,6 +686,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
       $state->{keyword} = $keyword;
 
       if ($sub) {
+        my $old_spec_version = $state->{spec_version};
         my $error_count = $state->{errors}->@*;
 
         if (not $sub->($vocabulary, $data, $schema, $state)) {
@@ -693,6 +697,9 @@ sub _eval_subschema ($self, $data, $schema, $state) {
           last ALL_KEYWORDS if $state->{short_circuit};
           next;
         }
+
+        # a keyword changed the keyword list for this vocabulary; re-fetch the list before continuing
+        undef $keyword_list if $state->{spec_version} ne $old_spec_version;
       }
 
       if (my $callback = ($state->{callbacks}//{})->{$keyword}) {
@@ -906,45 +913,6 @@ sub _get_metaschema_info ($self, $metaschema_uri, $for_canonical_uri) {
   return ($state->{spec_version}, $state->{vocabularies});
 }
 
-# we can't do this work in the context of looping over vocabularies and keywords, because this
-# keyword changes which vocabularies and keywords we're going to use. Additionally we may need to
-# fetch and parse the referenced schema to discover what vocabularies it defines.
-sub _parse_keyword_schema ($self, $state, $metaschema_uri) {
-  $state->{keyword} = '$schema';
-
-  return E($state, '$schema value is not a string') if not is_type('string', $metaschema_uri);
-  return if not assert_uri($state, { '$schema' => $metaschema_uri });
-
-  my ($spec_version, $vocabularies);
-
-  if (my $metaschema_info = $self->_get_metaschema_vocabulary_classes($metaschema_uri)) {
-    ($spec_version, $vocabularies) = @$metaschema_info;
-  }
-  else {
-    my $schema_info = $self->_fetch_from_uri($metaschema_uri);
-    return E($state, 'EXCEPTION: unable to find resource %s', $metaschema_uri) if not $schema_info;
-    # this cannot happen unless there are other entity types in the index
-    return E($state, 'EXCEPTION: bad reference to $schema %s: not a schema', $schema_info->{canonical_uri})
-      if $schema_info->{document}->get_entity_at_location($schema_info->{document_path}) ne 'schema';
-
-    if (not is_plain_hashref($schema_info->{schema})) {
-      ()= E($state, 'metaschemas must be objects');
-    }
-    else {
-      ($spec_version, $vocabularies) = $self->_fetch_vocabulary_data({ %$state,
-          keyword => '$vocabulary', initial_schema_uri => Mojo::URL->new($metaschema_uri),
-          traversed_schema_path => jsonp($state->{schema_path}, '$schema'),
-        }, $schema_info);
-    }
-  }
-
-  return E($state, '"%s" is not a valid metaschema', $metaschema_uri)
-    if not $vocabularies or not @$vocabularies;
-
-  $state->@{qw(spec_version vocabularies)} = ($spec_version, $vocabularies);
-  return 1;
-}
-
 # translate vocabulary URIs into classes, caching the results (if any)
 sub _fetch_vocabulary_data ($self, $state, $schema_info) {
   if (not exists $schema_info->{schema}{'$vocabulary'}) {
@@ -985,9 +953,6 @@ sub _fetch_vocabulary_data ($self, $state, $schema_info) {
 
   $valid = E($state, 'the first vocabulary (by evaluation_order) must be Core')
     if ($vocabulary_classes[0]//'') ne 'JSON::Schema::Modern::Vocabulary::Core';
-
-  $self->_set_metaschema_vocabulary_classes($schema_info->{canonical_uri},
-    [ $schema_info->{specification_version}, \@vocabulary_classes ]) if $valid;
 
   return ($schema_info->{specification_version}, $valid ? \@vocabulary_classes : []);
 }
@@ -1238,7 +1203,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.595
+version 0.596
 
 =head1 SYNOPSIS
 
@@ -1289,7 +1254,7 @@ L<C<draft7> or C<7>|https://json-schema.org/specification-links.html#draft-7>, c
 
 =item *
 
-L<C<draft6> or C<4>|https://json-schema.org/specification-links.html#draft-6>, corresponding to metaschema C<http://json-schema.org/draft-06/schema#>
+L<C<draft6> or C<6>|https://json-schema.org/specification-links.html#draft-6>, corresponding to metaschema C<http://json-schema.org/draft-06/schema#>
 
 =item *
 
@@ -2020,7 +1985,7 @@ UNTRUSTED SOURCES.>
 
 (In particular, see vulnerability
 L<perl5363delta/CVE-2023-47038-Write-past-buffer-end-via-illegal-user-defined-Unicode-property>,
-which is closed in Perl releases 5.34.3, 5.36.3 and 5.38.1.)
+which was fixed in Perl releases 5.34.3, 5.36.3 and 5.38.1.)
 
 =head1 SEE ALSO
 

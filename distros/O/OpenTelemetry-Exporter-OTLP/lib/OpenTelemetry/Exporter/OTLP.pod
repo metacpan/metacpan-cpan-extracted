@@ -168,6 +168,12 @@ L<JSON::MaybeXS>.
 If the value is set to a value other than the ones laid out above,
 construction will throw an L<OpenTelemetry::X::Unsupported> exception.
 
+=item retries
+
+Determines the maximum number of retries to do for failed export requests.
+If no value is set, this defaults to 5 for a maximum number of 6 attempts.
+Set to 0 for no retries.
+
 =item timeout
 
 The maximum number of seconds to wait before disconnecting. Note that
@@ -184,6 +190,24 @@ if that variable is not set.
 If none of these values is set, this will default to 10.
 
 =back
+
+=head2 export
+
+See L<OpenTelemetry::Exporter/export> for general details about this method.
+
+The export request will be sent with L<HTTP::Tiny>. As per
+L<the specification|https://opentelemetry.io/docs/specs/otlp/#failures-1>,
+requests that failed with a 429 Too Many Requests, 502 Bad Gateway, 503 Service
+Unavailable, or 504 Gateway Timeout status code will be retried up to as many
+times as the value of the C<retries> parameter to the constructor. Requests
+that resulted in HTTP::Tiny's 599 internal exception error will be retried
+if they represent one of the errors covered in the L</METRICS> section below.
+
+All other requests will result in a
+L<EXPORT_RESULT_FAILURE|OpenTelemetry::Constants/EXPORT_RESULT_FAILURE>.
+
+As per the specification, retries will wait an exponential backoff period with
+jitter.
 
 =head1 METRICS
 
