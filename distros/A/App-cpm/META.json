@@ -20,6 +20,16 @@
             "perl" : "5.008001"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "Archive::Zip" : "1.68",
+            "CPAN::Mirror::Tiny" : "0.20",
+            "Capture::Tiny" : "0",
+            "Path::Tiny" : "0",
+            "Test::More" : "0.98"
+         }
+      },
       "runtime" : {
          "recommends" : {
             "Carton" : "0"
@@ -54,7 +64,7 @@
    "provides" : {
       "App::cpm" : {
          "file" : "lib/App/cpm.pm",
-         "version" : "0.997019"
+         "version" : "0.997020"
       },
       "App::cpm::CLI" : {
          "file" : "lib/App/cpm/CLI.pm"
@@ -150,7 +160,7 @@
          "web" : "https://github.com/skaji/cpm"
       }
    },
-   "version" : "0.997019",
+   "version" : "0.997020",
    "x_contributors" : [
       "Andrew Rodland <andrew@cleverdomain.org>",
       "Dave Rolsky <autarch@urth.org>",

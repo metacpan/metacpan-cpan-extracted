@@ -1,5 +1,11 @@
 Revision history for Perl module DB::Object
 
+v1.4.6 2024-11-24T16:31:24+0900
+    - Improved where clause to handle JSON->> fields
+
+v1.4.5 2024-11-23T09:45:34+0900
+    - Clear error after statement execution
+
 v1.4.4 2024-11-22T16:36:08+0900
     - Updated the private method _convert_datetime2object in DB::Object::Postgres to set the right default format
 

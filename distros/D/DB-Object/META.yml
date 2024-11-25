@@ -45,5 +45,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/DB-Object/issues
   repository: https://gitlab.com/jackdeguest/DB-Object
-version: v1.4.4
+version: v1.4.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

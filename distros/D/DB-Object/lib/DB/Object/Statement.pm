@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.6.1
+## Version v0.6.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/09/04
+## Modified 2024/11/23
 ## All rights reserved
 ## 
 ## 
@@ -26,7 +26,7 @@ BEGIN
     use Class::Struct qw( struct );
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v0.6.1';
+    our $VERSION = 'v0.6.2';
 };
 
 use strict;
@@ -288,7 +288,7 @@ sub execute
             push( @binded, @$binded_values ) if( scalar( @$binded_values ) );
         }
     }
-    
+
     @binded = @_ if( !@binded && @_ );
     @binded = () if( !@binded );
     if( $q && $q->is_upsert )
@@ -299,7 +299,7 @@ sub execute
             CORE::push( @binded, @binded );
         }
     }
-    
+
     if( scalar( @_ ) )
     {
         my $temp = {};
@@ -340,16 +340,16 @@ sub execute
             }
         }
     }
-    
+
     if( $q && scalar( @binded ) != scalar( @binded_types ) )
     {
         # Flag we use a bit below
         $bind_mismatch++;
-        warn( sprintf( "Warning: total %d bound values does not match the total %d bound types ('%s')! Check the code for query $self->{sth}->{Statement}...\n", scalar( @binded ), scalar( @binded_types ), CORE::join( "','", @binded_types ) ) );
+        warn( sprintf( "Warning: total %d bound values does not match the total %d bound types ('%s')! Check the code for query $self->{sth}->{Statement}\n", scalar( @binded ), scalar( @binded_types ), CORE::join( "','", @binded_types ) ) );
         # Cancel it, because it will create problems
         @binded_types = ();
     }
-    
+
     # If there are any array object of some sort provided, make sure they are transformed into a regular array so DBD::Ph can then transform it into a Postgres array.
     for( my $i = 0; $i < scalar( @binded ); $i++ )
     {
@@ -413,7 +413,7 @@ sub execute
         {
             $binded[$i] = $binded[$i]->iso8601;
         }
-        
+
         # The value is an array object, but not a simple array, so we need to convert it
         # or else the driver will not understand nor accept it.
         if( $self->_is_array( $binded[$i] ) && 
@@ -516,9 +516,12 @@ sub execute
     {
         return( $self->error( "Error while trying to execute query $self->{sth}->{Statement}: ", $self->{sth}->errstr ) );
     }
+    # Clear any error, since this query statement may be re-used
+    $self->clear_error;
+
     # User wants an object for chaining like:
     # $sth->exec( 'some value' )->fetchrow;
-    elsif( want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         return( $self );
     }
@@ -676,12 +679,6 @@ sub fetchrow_hashref
         $self->execute() || return( $self->pass_error );
     }
     my $ref = $sth->fetchrow_hashref;
-    if( !$dbo->auto_decode_json && !$dbo->auto_convert_datetime_to_object )
-    {
-        return( $ref );
-    }
-    # Convert json to hash for the relevant fields
-    # return( $self->_convert_json2hash( $ref ) );
     $ref = $self->_convert_json2hash({ statement => $sth, data => $ref }) if( $dbo->auto_decode_json );
     $ref = $self->_convert_datetime2object({ statement => $sth, data => $ref }) if( $dbo->auto_convert_datetime_to_object );
     return( $ref );
@@ -1237,7 +1234,7 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.6.1
+v0.6.2
 
 =head1 DESCRIPTION
 

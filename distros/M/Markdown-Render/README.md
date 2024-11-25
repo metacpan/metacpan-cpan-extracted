@@ -18,7 +18,7 @@
 * [Rendering](#rendering)
 * [Credits](#credits)
 
-__Updated 2023-08-14__ by Rob Lauer <rlauer6@comcast.net>
+__Updated 2024-11-24__ by Rob Lauer <rlauer6@comcast.net>
 
 # README
 
@@ -114,6 +114,7 @@ Options
 -R, --raw      return raw HTML from engine
 -t, --title    string to use for a custom title, default: "Table of Contents"
 -v, --version  version
+-N, --nocss    no css
 
 Tips
 ----

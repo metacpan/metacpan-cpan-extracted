@@ -1,6 +1,6 @@
 package SPVM::Net::SSLeay;
 
-our $VERSION = "0.017";
+our $VERSION = "0.018";
 
 1;
 
@@ -142,7 +142,7 @@ OpenSSL 1.1.1
   use Net::SSLeay::Net::SSLeay::SSL_METHOD;
   use Net::SSLeay::Net::SSLeay::SSL_CTX;
   
-  my $ssl_method = Net::SSLeay::SSL_METHOD->SSLv23_client_method;
+  my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
   
   my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
   

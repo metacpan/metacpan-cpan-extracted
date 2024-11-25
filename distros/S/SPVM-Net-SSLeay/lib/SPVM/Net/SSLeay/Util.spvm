@@ -1,0 +1,9 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::Util {
+  
+  # Class Methods
+  native static method convert_to_wire_format : byte[] ($protocols : string[]);
+  
+}

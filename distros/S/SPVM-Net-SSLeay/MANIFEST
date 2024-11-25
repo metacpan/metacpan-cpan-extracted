@@ -178,6 +178,10 @@ lib/SPVM/Net/SSLeay/SSL_SESSION.c
 lib/SPVM/Net/SSLeay/SSL_SESSION.config
 lib/SPVM/Net/SSLeay/SSL_SESSION.pm
 lib/SPVM/Net/SSLeay/SSL_SESSION.spvm
+lib/SPVM/Net/SSLeay/Util.c
+lib/SPVM/Net/SSLeay/Util.config
+lib/SPVM/Net/SSLeay/Util.pm
+lib/SPVM/Net/SSLeay/Util.spvm
 lib/SPVM/Net/SSLeay/X509.c
 lib/SPVM/Net/SSLeay/X509.config
 lib/SPVM/Net/SSLeay/X509.pm
@@ -209,5 +213,7 @@ MANIFEST.SKIP
 README.md
 t/basic.t
 t/lib/SPVM/TestCase/Net/SSLeay.spvm
+t/lib/SPVM/TestCase/Net/SSLeay/SSL_CTX.spvm
+t/lib/SPVM/TestCase/Net/SSLeay/Util.spvm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

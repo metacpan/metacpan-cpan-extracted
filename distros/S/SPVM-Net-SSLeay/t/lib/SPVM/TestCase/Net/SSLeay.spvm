@@ -23,7 +23,7 @@ class TestCase::Net::SSLeay {
     my $port = 443;
     my $socket = IO::Socket::IP->new({PeerAddr => $host, PeerPort => $port});
     
-    my $ssl_method = Net::SSLeay::SSL_METHOD->SSLv23_client_method;
+    my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
     
     my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
     

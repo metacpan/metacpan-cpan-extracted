@@ -58,15 +58,16 @@ my %WriteMakefileArgs = (
     "lib/Alien/cargo/clone.pm" => "\$(INST_LIB)/Alien/cargo/clone.pm"
   },
   "PREREQ_PM" => {
-    "Alien::Base" => "0.038",
-    "parent"      => 0
+    "Alien::Base"  => "0.038",
+    "Alien::cargo" => "0.03",
+    "parent"       => 0
   },
   "TEST_REQUIRES" => {
     "Path::Tiny"  => 0,
     "Test2::V0"   => "0.000121",
     "Test::Alien" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -76,6 +77,7 @@ my %FallbackPrereqs = (
   "Alien::Base"         => "0.038",
   "Alien::Build"        => "0.32",
   "Alien::Build::MM"    => "0.32",
+  "Alien::cargo"        => "0.03",
   "ExtUtils::MakeMaker" => "6.52",
   "Path::Tiny"          => 0,
   "Test2::V0"           => "0.000121",

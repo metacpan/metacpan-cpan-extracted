@@ -1,27 +1,31 @@
 [![Actions Status](https://github.com/kfly8/kura/actions/workflows/test.yml/badge.svg)](https://github.com/kfly8/kura/actions) [![Coverage Status](https://img.shields.io/coveralls/kfly8/kura/main.svg?style=flat)](https://coveralls.io/r/kfly8/kura?branch=main) [![MetaCPAN Release](https://badge.fury.io/pl/kura.svg)](https://metacpan.org/release/kura)
 # NAME
 
-kura - Store constraints for Data::Checks, Type::Tiny, Moose and more.
+kura - Store constraints for Data::Checks, Type::Tiny, Moose, and more.
 
 # SYNOPSIS
 
 ```perl
 package MyFoo {
+    use Exporter 'import';
     use Data::Checks qw(StrEq);
     use kura Foo => StrEq('foo');
 }
 
 package MyBar {
+    use Exporter 'import';
     use Types::Standard -types;
     use kura Bar => Str & sub { $_[0] eq 'bar' };
 }
 
 package MyBaz {
+    use Exporter 'import';
     use Moose::Util::TypeConstraints;
     use kura Baz => subtype as 'Str' => where { $_[0] eq 'baz' };
 }
 
 package MyQux {
+    use Exporter 'import';
     use kura Qux => sub { $_[0] eq 'qux' };
 }
 
@@ -38,7 +42,7 @@ ok !Qux->check('foo') && !Qux->check('bar') && !Qux->check('baz') &&  Qux->check
 
 # DESCRIPTION
 
-Kura - means "Traditional Japanese storehouse" - stores constraints, such as [Data::Checks](https://metacpan.org/pod/Data%3A%3AChecks), [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny), [Moose::Meta::TypeConstraint](https://metacpan.org/pod/Moose%3A%3AMeta%3A%3ATypeConstraint), [Mouse::Meta::TypeConstraint](https://metacpan.org/pod/Mouse%3A%3AMeta%3A%3ATypeConstraint), [Specio](https://metacpan.org/pod/Specio) and more. It can even be used with [Moo](https://metacpan.org/pod/Moo) when combined with [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny) constraints.
+Kura - means "Traditional Japanese storehouse" - stores constraints, such as [Data::Checks](https://metacpan.org/pod/Data%3A%3AChecks), [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny), [Moose::Meta::TypeConstraint](https://metacpan.org/pod/Moose%3A%3AMeta%3A%3ATypeConstraint), [Mouse::Meta::TypeConstraint](https://metacpan.org/pod/Mouse%3A%3AMeta%3A%3ATypeConstraint), [Specio](https://metacpan.org/pod/Specio), and more. It can even be used with [Moo](https://metacpan.org/pod/Moo) when combined with [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny) constraints.
 
 ```
 Data::Checks -----------------> +--------+
@@ -66,13 +70,13 @@ This constraint must be a any object that has a `check` method or a code referen
 The following is an example of a constraint declaration:
 
 ```perl
-# use Type::Tiny
+use Exporter 'import';
 use Types::Standard -types;
 
 use kura Name  => Str & sub { qr/^[A-Z][a-z]+$/ };
 use kura Level => Int & sub { $_[0] >= 1 && $_[0] <= 100 };
 
-use kura Charactor => Dict[
+use kura Character => Dict[
     name  => Name,
     level => Level,
 ];
@@ -92,71 +96,37 @@ use kura Parent => Dict[ name => Child ];
 
 If constraints are declared in the wrong order, you might encounter errors like “Bareword not allowed.” Ensure that all dependencies are declared beforehand to prevent such issues.
 
-## Using a constraint
+## Export a constraint
 
-You can use the declared constraint as follows:
+You can export the declared constraints by your favorite Exporter package such as [Exporter](https://metacpan.org/pod/Exporter), [Exporter::Tiny](https://metacpan.org/pod/Exporter%3A%3ATiny), and more.
+Internally, Kura automatically adds the declared constraint to `@EXPORT_OK`, so you just put `use Exporter 'import';` in your package:
 
 ```perl
 package MyFoo {
+    use Exporter 'import';
+
     use Data::Checks qw(StrEq);
     use kura Foo => StrEq('foo');
 }
 
 use MyFoo qw(Foo);
 Foo->check('foo'); # true
+Foo->check('bar'); # false
 ```
 
-Internally, Kura inherits [Exporter](https://metacpan.org/pod/Exporter) and automatically adds the declared constraint to `@EXPORT_OK`:
-
-```
-MyFoo->isa('Exporter'); # true
-@MyFoo::EXPORT_OK; # ('Foo')
-```
-
-So, you can add other functions to `@EXPORT_OK`:
+If you forget to put `use Exporter 'import';`, you get an error like this:
 
 ```perl
- package MyFoo {
-     our @EXPORT_OK;
-     push @EXPORT_OK => qw(hello);
-
-     use kura Foo => sub { $_[0] eq 'foo' };
-
-     sub hello { 'Hello, World!' }
-}
-
-use MyFoo qw(Foo hello);
-hello(); # 'Hello, World!'
-```
-
-# Customizing
-
-## `$EXPORTER_CLASS`
-
-`$EXPORTER_CLASS` is a package name of the Exporter class, default is [Exporter](https://metacpan.org/pod/Exporter).
-You can change this class by setting `$kura::EXPORTER_CLASS`.
-
-```perl
-package mykura {
-    use kura ();
-
-    sub import {
-        my $pkg = shift;
-        my $caller = caller;
-
-        local $kura::EXPORTER_CLASS = 'Exporter::Tiny';
-        kura->import_into($caller, @_);
-    }
-}
-
 package MyFoo {
-    use mykura Foo => sub { $_[0] eq 'foo' };
+    # use Exporter 'import'; # Forgot to load Exporter!!
+    use Data::Checks qw(StrEq);
+    use kura Foo => StrEq('foo');
 }
 
-# Exporter::Tiny accepts the `-as` option
-use MyFoo Foo => { -as => 'CheckerFoo' };
-
-CheckerFoo->check('foo'); # true
+use MyFoo qw(Foo);
+# => ERROR!
+Attempt to call undefined import method with arguments ("Foo" ...) via package "MyFoo"
+(Perhaps you forgot to load the package?)
 ```
 
 # LICENSE

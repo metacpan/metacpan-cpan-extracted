@@ -1,3 +1,4 @@
+
 // Copyright (c) 2023 Yuki Kimoto
 // MIT License
 
@@ -443,7 +444,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_alpn_protos(SPVM_ENV* env, SPVM_VALUE* s
     return env->die(env, stack, "The protocols $protos must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
-  const char* protos = env->get_chars(env, stack, obj_protos);
+  const char* protos = (const char*)env->get_elems_byte(env, stack, obj_protos);
   
   int32_t protos_len = stack[2].ival;
   
@@ -923,6 +924,8 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_tlsext_servername_callback(SSL *ssl, i
   
   int32_t error_id = 0;
   
+  int32_t ret_status = SSL_TLSEXT_ERR_NOACK;
+  
   SPVM_ENV* env = (SPVM_ENV*)((void**)arg)[0];
   
   SPVM_VALUE* stack = (SPVM_VALUE*)((void**)arg)[1];
@@ -955,7 +958,7 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_tlsext_servername_callback(SSL *ssl, i
   stack[3].oval = obj_arg;
   
   env->call_instance_method_by_name(env, stack, "", 4, &error_id, __func__, FILE_NAME, __LINE__);
-  int32_t ret = stack[0].ival;
+  ret_status = stack[0].ival;
   
   *al = al_tmp;
   
@@ -967,7 +970,7 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_tlsext_servername_callback(SSL *ssl, i
   
   END_OF_FUNC:
   
-  return ret;
+  return ret_status;
 }
 
 int32_t SPVM__Net__SSLeay__SSL_CTX__set_tlsext_servername_callback(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -1008,6 +1011,8 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_tlsext_status_cb(SSL *ssl, void *arg) 
   
   int32_t error_id = 0;
   
+  int32_t ret_status = SSL_TLSEXT_ERR_NOACK;
+  
   SPVM_ENV* env = (SPVM_ENV*)((void**)arg)[0];
   
   SPVM_VALUE* stack = (SPVM_VALUE*)((void**)arg)[1];
@@ -1043,11 +1048,11 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_tlsext_status_cb(SSL *ssl, void *arg) 
     
     goto END_OF_FUNC;
   }
-  int32_t ret = stack[0].ival;
+  ret_status = stack[0].ival;
   
   END_OF_FUNC:
   
-  return ret;
+  return ret_status;
 }
 
 int32_t SPVM__Net__SSLeay__SSL_CTX__set_tlsext_status_cb(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -1099,6 +1104,8 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_default_passwd_cb(char *buf, int size,
   
   int32_t error_id = 0;
   
+  int32_t ret_buf_length = 0;
+  
   SPVM_ENV* env = (SPVM_ENV*)((void**)arg)[0];
   
   SPVM_VALUE* stack = (SPVM_VALUE*)((void**)arg)[1];
@@ -1121,13 +1128,13 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_default_passwd_cb(char *buf, int size,
     
     goto END_OF_FUNC;
   }
-  int32_t ret = stack[0].ival;
+  ret_buf_length = stack[0].ival;
   
   memcpy(buf, env->get_chars(env, stack, obj_buf), size);
   
   END_OF_FUNC:
   
-  return ret;
+  return ret_buf_length;
 }
 
 int32_t SPVM__Net__SSLeay__SSL_CTX__set_default_passwd_cb(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -1163,6 +1170,8 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_default_passwd_cb(SPVM_ENV* env, SPVM_VA
 static unsigned int SPVM__Net__SSLeay__SSL_CTX__my_psk_client_cb(SSL *ssl, const char *hint, char *identity, unsigned int max_identity_len, unsigned char *psk, unsigned int max_psk_len) {
   
   int32_t error_id = 0;
+  
+  int32_t ret_status = 0;
   
   SPVM_ENV* env = thread_env;
   
@@ -1232,7 +1241,7 @@ static unsigned int SPVM__Net__SSLeay__SSL_CTX__my_psk_client_cb(SSL *ssl, const
     
     goto END_OF_FUNC;
   }
-  int32_t ret = stack[0].ival;
+  ret_status = stack[0].ival;
   
   memcpy(identity, env->get_chars(env, stack, obj_identity), max_identity_len);
   
@@ -1242,7 +1251,7 @@ static unsigned int SPVM__Net__SSLeay__SSL_CTX__my_psk_client_cb(SSL *ssl, const
   
   env->free_stack(env, stack);
   
-  return ret;
+  return ret_status;
 }
 
 int32_t SPVM__Net__SSLeay__SSL_CTX__set_psk_client_callback(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -1277,6 +1286,8 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_psk_client_callback(SPVM_ENV* env, SPVM_
 static unsigned int SPVM__Net__SSLeay__SSL_CTX__my_psk_server_cb(SSL *ssl, const char *identity, unsigned char *psk, unsigned int max_psk_len) {
   
   int32_t error_id = 0;
+  
+  int32_t ret_status = 0;
   
   SPVM_ENV* env = thread_env;
   
@@ -1337,7 +1348,7 @@ static unsigned int SPVM__Net__SSLeay__SSL_CTX__my_psk_server_cb(SSL *ssl, const
     
     goto END_OF_FUNC;
   }
-  int32_t ret = stack[0].ival;
+  ret_status = stack[0].ival;
   
   memcpy(psk, env->get_chars(env, stack, obj_psk), max_psk_len);
   
@@ -1345,7 +1356,7 @@ static unsigned int SPVM__Net__SSLeay__SSL_CTX__my_psk_server_cb(SSL *ssl, const
   
   env->free_stack(env, stack);
   
-  return ret;
+  return ret_status;
 }
 
 int32_t SPVM__Net__SSLeay__SSL_CTX__set_psk_server_callback(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -1380,6 +1391,8 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_psk_server_callback(SPVM_ENV* env, SPVM_
 static unsigned int SPVM__Net__SSLeay__SSL_CTX__my_tlsext_ticket_key_cb(SSL *ssl, unsigned char* key_name, unsigned char* iv, EVP_CIPHER_CTX *ctx, HMAC_CTX *hctx, int enc) {
   
   int32_t error_id = 0;
+  
+  int32_t ret_status = -1;
   
   SPVM_ENV* env = thread_env;
   
@@ -1483,7 +1496,7 @@ static unsigned int SPVM__Net__SSLeay__SSL_CTX__my_tlsext_ticket_key_cb(SSL *ssl
     goto END_OF_FUNC;
   }
   
-  int32_t ret = stack[0].ival;
+  ret_status = stack[0].ival;
   
   memcpy(key_name, env->get_chars(env, stack, obj_key_name), 16);
   memcpy(iv, env->get_chars(env, stack, obj_iv), EVP_MAX_IV_LENGTH);
@@ -1492,7 +1505,7 @@ static unsigned int SPVM__Net__SSLeay__SSL_CTX__my_tlsext_ticket_key_cb(SSL *ssl
   
   env->free_stack(env, stack);
   
-  return ret;
+  return ret_status;
 }
 
 int32_t SPVM__Net__SSLeay__SSL_CTX__set_tlsext_ticket_key_cb(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -1524,44 +1537,11 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_tlsext_ticket_key_cb(SPVM_ENV* env, SPVM
   return 0;
 }
 
-static int convert_to_wire_format(SPVM_ENV* env, SPVM_VALUE* stack, void* obj_protocols, unsigned char *out_wire_format) {
-  
-  assert(obj_protocols);
-  
-  int32_t out_wire_format_length = 0;
-  int32_t protocols_length = env->length(env, stack, obj_protocols);
-  for(int32_t i = 0; i <= protocols_length; i++) {
-    
-    void* obj_protocol = env->get_elem_string(env, stack, obj_protocols, i);
-    
-    if (obj_protocol) {
-      const char *protocol = env->get_chars(env, stack, obj_protocol);
-      
-      int32_t protocol_length = env->length(env, stack, obj_protocol);
-      
-      if (protocol_length > 0) {
-        size_t len = protocol_length;
-        if (!(len <= 255)) {
-          // Error
-          break;
-        }
-        
-        if (out_wire_format) {
-          out_wire_format[out_wire_format_length] = (unsigned char)protocol_length;
-          strncpy((char*)out_wire_format + 1 + out_wire_format_length, protocol, protocol_length);
-        }
-        
-        out_wire_format_length += 1 + protocol_length;
-      }
-    }
-  }
-  
-  return out_wire_format_length;
-}
-
 static int SPVM__Net__SSLeay__SSL_CTX__my_alpn_select_cb_for_protocols (SSL *ssl, const unsigned char **out, unsigned char *outlen, const unsigned char *in, unsigned int inlen, void *arg) {
   
   int32_t error_id = 0;
+  
+  int32_t ret_status = SSL_TLSEXT_ERR_NOACK;
   
   SPVM_ENV* env = (SPVM_ENV*)((void**)arg)[0];
   
@@ -1575,15 +1555,27 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_alpn_select_cb_for_protocols (SSL *ssl
   
   void* obj_in = env->new_string(env, stack, in, inlen);
   
-  int32_t protocols_wire_format_length = convert_to_wire_format(env, stack, obj_protocols, NULL);
-  void* obj_protocols_wire_format = env->new_string(env, stack, NULL, protocols_wire_format_length);
+  stack[0].oval = obj_protocols;
+  env->call_class_method_by_name(env, stack, "Net::SSLeay::Util", "convert_to_wire_format", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    print_exception_to_stderr(env, stack);
+    
+    goto END_OF_FUNC;
+  }
+  void* obj_protocols_wire_format = stack[0].oval;
+  
+  int32_t protocols_wire_format_length = env->length(env, stack, obj_protocols_wire_format);
   const char* protocols_wire_format = env->get_chars(env, stack, obj_protocols_wire_format);
   
   int32_t status_select_next_proto = SSL_select_next_proto((unsigned char **)out, outlen, in, inlen, protocols_wire_format, protocols_wire_format_length);
   
-  int32_t status = status_select_next_proto == OPENSSL_NPN_NEGOTIATED ? SSL_TLSEXT_ERR_OK : SSL_TLSEXT_ERR_NOACK;
+  if (status_select_next_proto == OPENSSL_NPN_NEGOTIATED) {
+    ret_status = SSL_TLSEXT_ERR_OK;
+  }
   
-  return status;
+  END_OF_FUNC:
+  
+  return ret_status;
 }
 
 int32_t SPVM__Net__SSLeay__SSL_CTX__set_alpn_select_cb_with_protocols(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -1616,6 +1608,8 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_next_proto_select_cb_for_protocols (SS
   
   int32_t error_id = 0;
   
+  int32_t ret_status = SSL_TLSEXT_ERR_NOACK;
+  
   SPVM_ENV* env = (SPVM_ENV*)((void**)arg)[0];
   
   SPVM_VALUE* stack = (SPVM_VALUE*)((void**)arg)[1];
@@ -1628,15 +1622,27 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_next_proto_select_cb_for_protocols (SS
   
   void* obj_in = env->new_string(env, stack, in, inlen);
   
-  int32_t protocols_wire_format_length = convert_to_wire_format(env, stack, obj_protocols, NULL);
-  void* obj_protocols_wire_format = env->new_string(env, stack, NULL, protocols_wire_format_length);
+  stack[0].oval = obj_protocols;
+  env->call_class_method_by_name(env, stack, "Net::SSLeay::Util", "convert_to_wire_format", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    print_exception_to_stderr(env, stack);
+    
+    goto END_OF_FUNC;
+  }
+  void* obj_protocols_wire_format = stack[0].oval;
+  
   const char* protocols_wire_format = env->get_chars(env, stack, obj_protocols_wire_format);
   
-  int32_t status_select_next_proto = SSL_select_next_proto((unsigned char **)out, outlen, in, inlen, protocols_wire_format, protocols_wire_format_length);
+  int32_t protocols_wire_format_length = env->length(env, stack, obj_protocols_wire_format);
+  int32_t ret_status_select_next_proto = SSL_select_next_proto((unsigned char **)out, outlen, in, inlen, protocols_wire_format, protocols_wire_format_length);
   
-  int32_t status = status_select_next_proto == OPENSSL_NPN_NEGOTIATED ? SSL_TLSEXT_ERR_OK : SSL_TLSEXT_ERR_NOACK;
+  if (ret_status_select_next_proto == OPENSSL_NPN_NEGOTIATED) {
+    ret_status = SSL_TLSEXT_ERR_OK;
+  }
   
-  return status;
+  END_OF_FUNC:
+  
+  return ret_status;
 }
 
 int32_t SPVM__Net__SSLeay__SSL_CTX__set_next_proto_select_cb_with_protocols(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -1669,6 +1675,8 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_next_protos_advertised_cb_for_protocol
   
   int32_t error_id = 0;
   
+  int32_t ret_status = SSL_TLSEXT_ERR_NOACK;
+  
   SPVM_ENV* env = (SPVM_ENV*)((void**)arg)[0];
   
   SPVM_VALUE* stack = (SPVM_VALUE*)((void**)arg)[1];
@@ -1679,8 +1687,15 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_next_protos_advertised_cb_for_protocol
   
   assert(obj_protocols);
   
-  int32_t protocols_wire_format_length = convert_to_wire_format(env, stack, obj_protocols, NULL);
-  void* obj_protocols_wire_format = env->new_string(env, stack, NULL, protocols_wire_format_length);
+  stack[0].oval = obj_protocols;
+  env->call_class_method_by_name(env, stack, "Net::SSLeay::Util", "convert_to_wire_format", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    print_exception_to_stderr(env, stack);
+    
+    goto END_OF_FUNC;
+  }
+  void* obj_protocols_wire_format = stack[0].oval;
+  
   const char* protocols_wire_format = env->get_chars(env, stack, obj_protocols_wire_format);
   
   *out = protocols_wire_format;
@@ -1689,19 +1704,18 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_next_protos_advertised_cb_for_protocol
   stack[1].oval = obj_protocols_wire_format;
   env->call_instance_method_by_name(env, stack, "push", 2, &error_id, __func__, FILE_NAME, __LINE__);
   
-  int32_t status = SSL_TLSEXT_ERR_NOACK;
   if (error_id) {
     print_exception_to_stderr(env, stack);
     
     goto END_OF_FUNC;
   }
   else {
-    status = SSL_TLSEXT_ERR_OK;
+    ret_status = SSL_TLSEXT_ERR_OK;
   }
   
   END_OF_FUNC:
   
-  return status;
+  return ret_status;
 }
 
 int32_t SPVM__Net__SSLeay__SSL_CTX__set_next_protos_advertised_cb_with_protocols(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -1723,7 +1737,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_next_protos_advertised_cb_with_protocols
   void* obj_cb_output_strings_list = env->get_field_object_by_name(env, stack, obj_self, "cb_output_strings_list", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  void* native_args[3] = {0};
+  void* native_args[4] = {0};
   native_args[0] = env;
   native_args[1] = stack;
   native_args[2] = obj_protocols;
@@ -1737,6 +1751,8 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_next_protos_advertised_cb_with_protocols
 static int SPVM__Net__SSLeay__SSL_CTX__my_session_new_cb(SSL* ssl, SSL_SESSION* session) {
   
   int32_t error_id = 0;
+  
+  int32_t ret_status = 0;
   
   SPVM_ENV* env = thread_env;
   
@@ -1815,13 +1831,13 @@ static int SPVM__Net__SSLeay__SSL_CTX__my_session_new_cb(SSL* ssl, SSL_SESSION* 
     
     goto END_OF_FUNC;
   }
-  int32_t ret = stack[0].ival;
+  ret_status = stack[0].ival;
   
   END_OF_FUNC:
   
   env->free_stack(env, stack);
   
-  return ret;
+  return ret_status;
 }
 
 int32_t SPVM__Net__SSLeay__SSL_CTX__sess_set_new_cb(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -2016,4 +2032,3 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   return 0;
 }
-

@@ -1,0 +1,53 @@
+# Describing complex x0:Document
+#     {urn:iso:std:iso:20022:tech:xsd:camt.050.001.07}Document
+#
+# Produced by XML::Compile::Translate::Template version undef
+#          on Mon Nov 25 09:42:45 2024
+#
+# BE WARNED: in most cases, the example below cannot be used without
+# interpretation.  The comments will guide you.
+#
+# xmlns:x0        urn:iso:std:iso:20022:tech:xsd:camt.050.001.07
+# xmlns:xs        http://www.w3.org/2001/XMLSchema
+
+# is a x0:Document
+{ # sequence of LqdtyCdtTrf
+
+  # is a x0:LiquidityCreditTransferV07
+  LqdtyCdtTrf =>
+  { # sequence of MsgHdr, LqdtyCdtTrf, SplmtryData
+
+    # is a x0:MessageHeader1
+    MsgHdr =>
+    { # sequence of MsgId, CreDtTm
+
+      # is a xs:string
+      # length <= 35
+      # length >= 1
+      MsgId => "example",
+
+      # is a xs:dateTime
+      # is optional
+      CreDtTm => "2006-10-06T00:23:02Z", },
+
+    # is a x0:LiquidityCreditTransfer4
+    # probably a recursive complex
+    LqdtyCdtTrf => {},
+
+    # is a x0:SupplementaryData1
+    # occurs any number of times
+    SplmtryData =>
+    [ { # sequence of PlcAndNm, Envlp
+
+        # is a xs:string
+        # is optional
+        # length <= 350
+        # length >= 1
+        PlcAndNm => "example",
+
+        # is a x0:SupplementaryDataEnvelope1
+        Envlp =>
+        { # sequence of ANY
+
+          # any element in any namespace
+          ANY => "Anything", }, }, ], }, }

@@ -1,7 +1,10 @@
 Changes
 lib/Tk/FileBrowser.pm
 lib/Tk/FileBrowser/Header.pm
+lib/Tk/FileBrowser/Images.pm
 lib/Tk/FileBrowser/Item.pm
+lib/Tk/FileManager.pm
+lib/Tk/FilePicker.pm
 LICENSE
 Makefile.PL
 MANIFEST
@@ -19,6 +22,7 @@ t/testfolder/folder2/File2.txt
 t/Tk-FileBrowser-Header.t
 t/Tk-FileBrowser-Item.t
 t/Tk-FileBrowser.t
-
+t/Tk-FileManager.t
+t/Tk-FilePicker.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

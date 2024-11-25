@@ -1,5 +1,11 @@
 Revision history for Perl distribution UserAgent-Any
 
+0.05 - 2024-11-24
+
+ - Decode UTF-8 encoded JSON content (or any other charset) which is not done
+   by default in many user agents.
+ - Add a fake implementation to help test libraries depending on this one.
+
 0.04 - 2024-11-18
 
  - Improvement to the source distribution on GitHub.

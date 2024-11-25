@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query.pm
-## Version v0.7.1
+## Version v0.7.2
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/09/04
+## Modified 2024/11/24
 ## All rights reserved
 ## 
 ## 
@@ -24,7 +24,7 @@ BEGIN
     use DB::Object::Query::Element;
     use Want;
     our $DEBUG = 0;
-    our $VERSION = 'v0.7.1';
+    our $VERSION = 'v0.7.2';
 };
 
 use strict;
@@ -509,6 +509,7 @@ sub format_update
         my( $field, $value ) = splice( @$info, 0, 2 );
         $self->messagec( 4, "Processing field {green}${field}{/}" );
         # Do not update a field that does not belong in this table
+        $self->messagec( 4, "Field {green}${field}{/} does not exist in table." ) if( !exists( $fields_ref->{ $field } ) );
         next if( !exists( $fields_ref->{ $field } ) );
         # DB::Object::Fields::Field object
         my $fo = $fields_ref->{ $field };
@@ -2298,8 +2299,29 @@ sub _where_having
                         $self->messagec( 5, "[process_where_condition] Value is a scalar reference, using it as is -> {green}", $$value, "{/}" );
                         push( @list, $self->new_clause({
                             value => $i_am_negative ? "$field != $$value" : "$field = $$value",
-                            type => 'where' })
+                            type => 'where'
+                            })
                         );
+                    }
+                    elsif( ref( $value ) eq 'HASH' )
+                    {
+                        foreach my $json_key ( keys( %$value ) )
+                        {
+                            my $json_value = $value->{ $json_key };
+                            # Assuming default "=" operator for now
+                            my $clause = $self->new_clause(
+                                value   => "${field}->>'${json_key}' = '${json_value}'",
+                                generic => "${field}->>'${json_key}' = ?",
+                                type    => 'where',
+                            );
+                            # Bind the value if it is not a DB::Object reference
+#                             if( !$self->_is_object( $json_value ) )
+#                             {
+#                                 $clause->push({ value => $json_value });
+#                             }
+                            $clause->push({ value => $json_value });
+                            push( @list, $clause );
+                        }
                     }
                     # If this is a sub-select - i.e.
                     # SELECT article, dealer, price
@@ -2500,7 +2522,7 @@ DB::Object::Query - Query Object
 
 =head1 VERSION
 
-    v0.7.1
+    v0.7.2
 
 =head1 DESCRIPTION
 

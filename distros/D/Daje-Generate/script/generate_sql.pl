@@ -25,17 +25,22 @@ option 'configpath' => (
 sub generate_sql($self) {
 
     my $config;
+    my $config_path;
     try  {
-        my $config_path = $self->get_configpath();
+        $config_path = $self->get_configpath();
+    } catch($e) {
+        die "Could not get config path '$e'";
+    };
+
+    try {
         my $sql_generator = Daje::GenerateSQL->new(
             config_path => $config_path
         )->process();
-
-    } catch($e) {
-        die "Could not open config file '$e'";
+    } catch ($e) {
+        die "Could not generate SQL '$e";
     };
 
-    return $config;
+    return;
 }
 
 main->new_with_options->generate_sql();

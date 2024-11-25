@@ -1,0 +1,92 @@
+# Describing complex x0:Document
+#     {urn:iso:std:iso:20022:tech:xsd:camt.016.001.04}Document
+#
+# Produced by XML::Compile::Translate::Template version undef
+#          on Mon Nov 25 09:42:44 2024
+#
+# BE WARNED: in most cases, the example below cannot be used without
+# interpretation.  The comments will guide you.
+#
+# xmlns:x0        urn:iso:std:iso:20022:tech:xsd:camt.016.001.04
+# xmlns:xs        http://www.w3.org/2001/XMLSchema
+
+# is a x0:Document
+{ # sequence of GetCcyXchgRate
+
+  # is a x0:GetCurrencyExchangeRateV04
+  GetCcyXchgRate =>
+  { # sequence of MsgHdr, CcyQryDef, SplmtryData
+
+    # is a x0:MessageHeader1
+    MsgHdr =>
+    { # sequence of MsgId, CreDtTm
+
+      # is a xs:string
+      # length <= 35
+      # length >= 1
+      MsgId => "example",
+
+      # is a xs:dateTime
+      # is optional
+      CreDtTm => "2006-10-06T00:23:02Z", },
+
+    # is a x0:CurrencyQueryDefinition3
+    # is optional
+    CcyQryDef =>
+    { # sequence of QryTp, CcyCrit
+
+      # is a xs:string
+      # is optional
+      # Enum: ALLL CHNG DELD MODF
+      QryTp => "ALLL",
+
+      # is a x0:CurrencyCriteriaDefinition1Choice
+      # is optional
+      CcyCrit =>
+      { # choice of QryNm, NewCrit
+
+        # is a xs:string
+        # length <= 35
+        # length >= 1
+        QryNm => "example",
+
+        # is a x0:CurrencyExchangeCriteria2
+        NewCrit =>
+        { # sequence of NewQryNm, SchCrit
+
+          # is a xs:string
+          # is optional
+          # length <= 35
+          # length >= 1
+          NewQryNm => "example",
+
+          # is a x0:CurrencyExchangeSearchCriteria1
+          # occurs 1 <= # <= unbounded times
+          SchCrit =>
+          [ { # sequence of SrcCcy, TrgtCcy
+
+              # is a xs:string
+              # Pattern: [A-Z]{3,3}
+              SrcCcy => "example",
+
+              # is a xs:string
+              # Pattern: [A-Z]{3,3}
+              TrgtCcy => "example", }, ], }, }, },
+
+    # is a x0:SupplementaryData1
+    # occurs any number of times
+    SplmtryData =>
+    [ { # sequence of PlcAndNm, Envlp
+
+        # is a xs:string
+        # is optional
+        # length <= 350
+        # length >= 1
+        PlcAndNm => "example",
+
+        # is a x0:SupplementaryDataEnvelope1
+        Envlp =>
+        { # sequence of ANY
+
+          # any element in any namespace
+          ANY => "Anything", }, }, ], }, }

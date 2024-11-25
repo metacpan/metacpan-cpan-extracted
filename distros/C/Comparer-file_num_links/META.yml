@@ -19,7 +19,7 @@ name: Comparer-file_num_links
 provides:
   Comparer::file_num_links:
     file: lib/Comparer/file_num_links.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   perl: '5.010001'
   strict: '0'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Comparer-file_num_links
   homepage: https://metacpan.org/release/Comparer-file_num_links
   repository: git://github.com/perlancar/perl-Comparer-file_num_links.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

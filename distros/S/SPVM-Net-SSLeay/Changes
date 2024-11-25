@@ -1,3 +1,17 @@
+0.018 2024-11-25
+  [New Features]
+    * Add Net::SSLeay::Util class.
+    * Add Net::SSLeay::SSL_CTX#set_alpn_protos_with_protocols method.
+  [Incompatible Changes]
+    * Changed the argument of Net::SSLeay::SSL_CTX#set_alpn_protos method.
+      [Before]
+      method set_alpn_protos : int ($protos : string, $protos_len : int = -1)
+      [After]
+      method set_alpn_protos : int ($protos : byte[], $protos_len : int = -1)
+  [Bug Fix]
+    * Fix a bug of Net::SSLeay::SSL_CTX#set_next_protos_advertised_cb_with_protocols.
+  [Test Improvement]
+    * Add some tests.
 0.017 2024-11-22
   [New Features]
     * Add Net::SSLeay::Constant#OPENSSL_VERSION_TEXT method.

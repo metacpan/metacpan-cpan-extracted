@@ -1,6 +1,9 @@
 Changes
 cpanfile
 lib/UserAgent/Any.pm
+lib/UserAgent/Any/Fake.pm
+lib/UserAgent/Any/Fake/Request.pm
+lib/UserAgent/Any/Fake/Response.pm
 lib/UserAgent/Any/Impl.pm
 lib/UserAgent/Any/Impl/AnyEventUserAgent.pm
 lib/UserAgent/Any/Impl/Helper.pm
@@ -28,6 +31,7 @@ t/202-any-event-user-agent.t
 t/203-http-promise.t
 t/204-user-agent-any.t
 t/300-wrap-method.t
+t/400-fake.t
 t/lib/TestSuite.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

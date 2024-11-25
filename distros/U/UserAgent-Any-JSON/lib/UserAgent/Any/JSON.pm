@@ -3,16 +3,21 @@ package UserAgent::Any::JSON;
 use 5.036;
 
 use Carp;
-use JSON;
 use Moo;
 use UserAgent::Any::JSON::Response;
 use UserAgent::Any::Wrapper 'wrap_get_like_methods', 'wrap_post_like_methods';
 
 use namespace::clean;
 
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 extends 'UserAgent::Any';
+
+has _converter => (
+  init_arg => 'json',
+  is => 'ro',
+  default => sub { require JSON; JSON->new },
+);
 
 # This is not specific to GET and can actually handle any verb that does not
 # take a request body.
@@ -31,11 +36,11 @@ sub _generate_post_request ($self, $url, @args) {
     'Accept' => 'application/json',
     'Content-Type' => 'application/json',
     @args,
-    defined $body ? (to_json($body)) : ());
+    defined $body ? ($self->_converter->encode($body)) : ());
 }
 
 sub _process_response ($self, $res, @) {
-  return UserAgent::Any::JSON::Response->new($res);
+  return UserAgent::Any::JSON::Response->new(res => $res, converter => $self->_converter);
 }
 
 wrap_get_like_methods('UserAgent::Any', \&_generate_get_request, \&_process_response);
@@ -76,6 +81,16 @@ Builds a new C<UserAgent::Any::JSON> object wrapping the given underlying user
 agent.
 The wrapped object must be an instance of a
 L<supported user agent|UserAgent::Any/Supported user agents>.
+
+Alternatively, you can pass named arguments to the constructor, mainly to
+specify the JSON encoder and decoder to use:
+
+  my $json_client = UserAgent::Any::JSON->new(ua => $underlying_ua,
+                                              json => $json_converter);
+
+The given C<$json_converter> must be an object with an C<encode()> and a
+C<decode()> method, acting like the equivalent methods in the L<JSON> class.
+The default is just a C<< JSON->new >> object.
 
 =head2 User agent methods
 

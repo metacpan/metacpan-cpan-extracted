@@ -3,22 +3,28 @@ package UserAgent::Any::JSON::Response;
 use 5.036;
 
 use Carp;
-use JSON;
 use Moo;
 use Scalar::Util 'blessed';
 
 use namespace::clean;
 
-our $VERSION = 0.01;
+our $VERSION = 0.03;
 
 extends 'UserAgent::Any::Response';
 
-has data => (
+has _converter => (
+  init_arg => 'converter',
+  is => 'ro',
+  lazy => 1,
+  default => sub { require JSON; JSON->new },
+);
+
+has json => (
   is => 'ro',
   lazy => 1,
   # TODO: here we should maybe check the Content-Type header of the response
   # (for application/json) before proceeding.
-  default => sub ($self) { return from_json($self->content) },
+  default => sub ($self) { return $self->_converter->decode($self->content) },
 );
 
 1;
@@ -36,7 +42,7 @@ UserAgent::Any::JSON::Response – Response object for L<UserAgent::Any::JSON>
 =head1 SYNOPSIS
 
   my $response = $json_client->get($url);
-  print Dumper($response->data) if $response->success;
+  print Dumper($response->json) if $response->success;
 
 =head1 DESCRIPTION
 
@@ -59,9 +65,9 @@ encoded data.
 A C<UserAgent::Any::JSON::Response> object exposes all the methods of a
 L<UserAgent::Any::Response> object and add the following:
 
-=head3 data
+=head3 json
 
-  my $obj = $res->data;
+  my $obj = $res->json;
 
 Returns a Perl datastructure corresponding to the decoded JSON content of the
 request.

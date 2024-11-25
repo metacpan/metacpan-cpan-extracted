@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+
+# Run with:   $0 <$xml-file>
+# Example:  examples/show examples/dutch-sepa/camt.053.001.02.xml
+
+use warnings;
+use strict;
+
+use lib 'lib';
+use Business::CAMT  ();
+
+use Log::Report; # mode => 'DEBUG';
+
+use Data::Dumper;
+$Data::Dumper::Indent    = 1;
+$Data::Dumper::Quotekeys = 0;
+$Data::Dumper::Sortkeys  = 1;
+
+@ARGV==1
+	or error "Usage: $0 <xml>";
+
+my $xml  = $ARGV[0];
+-r $xml or fault "XML file cannot be used";
+
+my $camt = Business::CAMT->new(
+#	big_numbers   => 1,
+#	match_schema  => 'NEWEST',
+	long_tagnames => 1,
+);
+
+my $data = $camt->read($xml);
+print Dumper $data;

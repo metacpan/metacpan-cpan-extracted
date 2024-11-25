@@ -1,0 +1,16 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+  command => 'cargo-capi',
+  args    => [ '-h' ],
+);
+
+share {
+  requires 'Alien::cargo';
+  start_url './patch/dummy.txt';
+  plugin 'Download';
+  extract [ 'touch cargo-capi-extract' ];
+  build [
+    [ 'cargo', 'install', 'cargo-c', '--root', '%{.install.prefix}' ],
+  ];
+};

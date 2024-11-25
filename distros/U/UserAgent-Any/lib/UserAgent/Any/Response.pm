@@ -93,7 +93,7 @@ Returns the 3 digit numerical status code of the HTTP Response.
 
 Returns the response status message attribute explaining the response code.
 
-=head3 content
+=head3 success
 
   my $bool = $res->success;
 
@@ -105,7 +105,8 @@ status code is in the C<200 .. 299> range).
   my $bytes = $res->content;
 
 Returns the decoded response content according to the C<Content-Encoding>
-header. For textual content this is turned into a Perl unicode string.
+header and, for text content (as per the C<Content-Type> header) attempt to
+decode the text into a Perl unicode string.
 
 Note that this is often called C<decoded_content> in other response objects.
 But, as this is what you should always use, we settled here on the simpler name.

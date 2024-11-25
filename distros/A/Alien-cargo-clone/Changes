@@ -1,5 +1,9 @@
 Revision history for Alien-cargo-clone
 
+0.02      2024-11-24 09:12:52 -0700
+  - Fix bug where `cargo` might not be in PATH if Alien::cargo
+    is a `share` install. (gh#2)
+
 0.01      2024-11-23 19:32:38 -0700
   - initial version
 

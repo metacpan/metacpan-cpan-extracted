@@ -3,7 +3,7 @@ BEGIN {
   my %missing = map {
     eval qq{ require $_ };
     $@ ? ($_=>1) : ()
-  } qw( Env base strict warnings );
+  } qw( Env strict warnings );
   if(%missing)
   {
     print "Your Perl is missing core modules: @{[ sort keys %missing ]}\n";
@@ -51,7 +51,6 @@ my %WriteMakefileArgs = (
     "lib/Alien/cargo.pm" => "\$(INST_LIB)/Alien/cargo.pm"
   },
   "PREREQ_PM" => {
-    "Alien::Base"   => 0,
     "Alien::Rust"   => 0,
     "Capture::Tiny" => 0,
     "File::Which"   => 0
@@ -59,14 +58,13 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000121"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Alien::Base"   => 0,
   "Alien::Rust"   => 0,
   "Capture::Tiny" => 0,
   "File::Which"   => 0,

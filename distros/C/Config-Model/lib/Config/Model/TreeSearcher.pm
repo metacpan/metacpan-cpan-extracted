@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::TreeSearcher 2.154;
+package Config::Model::TreeSearcher 2.155;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -126,7 +126,7 @@ sub search {
     my @loc;
     my $store_sub = sub {
         my $p = shift;
-        return if @loc and $loc[$#loc] eq $p;
+        return if @loc and $loc[-1] eq $p;
         $logger->trace("TreeSearcher: storing location '$p'");
         push @loc, $p;
     };
@@ -153,7 +153,7 @@ Config::Model::TreeSearcher - Search tree for match in value, description...
 
 =head1 VERSION
 
-version 2.154
+version 2.155
 
 =head1 SYNOPSIS
 

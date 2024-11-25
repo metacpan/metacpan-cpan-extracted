@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Loader 2.154;
+package Config::Model::Loader 2.155;
 
 use Carp;
 use strict;
@@ -925,6 +925,8 @@ my %load_value_dispatch = (
     '.=' => \&_append_value,
     '=~' => \&_apply_regexp_on_value,
     '=.file' => \&_store_file_in_value,
+    '=.set_to_std_value' => \&_set_to_standard_value,
+    '=.set_to_standard_value' => \&_set_to_standard_value,
     '=.json' => \&_store_json_vector_in_value,
     '=.yaml' => \&_store_yaml_vector_in_value,
     '=.env' => sub { $_[1]->store( value => $ENV{$_[2]}, check => $_[3] ); return 'ok'; },
@@ -977,6 +979,12 @@ sub _apply_regexp_on_value {
             $value, $element, $orig
         );
     }
+}
+
+sub _set_to_standard_value {
+    my ( $self, $element, $value, $check, $instructions, $cmd ) = @_;
+    # check value is done by store
+    $element->store($element->_fetch_std_no_check);
 }
 
 sub _store_file_in_value {
@@ -1102,7 +1110,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.154
+version 2.155
 
 =head1 SYNOPSIS
 
@@ -1430,6 +1438,12 @@ Undef element C<xxx>
 =item xxx.=zzz
 
 Appends C<zzz> value to current value (valid for C<leaf> elements).
+
+=item xxx=.set_to_standard_value()
+
+Set to standard value. Standard value is like a suggested value which
+requires an action from user to be set. C<set_to_std_value> is
+also accepted.
 
 =item xxx=.file(yyy)
 

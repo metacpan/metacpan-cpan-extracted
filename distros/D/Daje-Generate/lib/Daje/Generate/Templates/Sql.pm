@@ -7,7 +7,7 @@ __DATA__
 
 @@ file
 
-.. Auto generated file <<date>>
+-- Auto generated file <<date>>
 -- This file might be recreated so any manual changes might be overwritten
 
 <<sections>>
@@ -33,7 +33,7 @@ create table if not exists <<tablename>>
     <<fields>>
     CONSTRAINT <<tablename>>_pkey PRIMARY KEY (<<tablename>>_pkey)
     <<foregin_keys>>
-):
+);
 
 <<indexes>>
 <<sql>>
@@ -45,7 +45,7 @@ REFERENCES <<referenced_table>> (<<referenced_table>>_pkey) MATCH SIMPLE
                       ON UPDATE NO ACTION
                       ON DELETE NO ACTION
             DEFERRABLE
-);
+
 
 @@ index
 
@@ -59,6 +59,9 @@ INSERT INTO <<tablename>> (<<fields>>) VALUES (<<values>>);
 
 
 __END__
+
+
+
 
 
 

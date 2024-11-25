@@ -1,0 +1,220 @@
+=encoding utf8
+
+=head1 NAME
+
+Business::CAMT - ISO20022 Cash Management (CAMT) messages
+
+=head1 SYNOPSIS
+
+  my $camt = Business::CAMT->new;
+  my $data = $camt->read($file|$xml);
+
+=head1 DESCRIPTION
+
+Use this module to manage CAMT messages, which are ISO20022 standard
+"Cash Management" messages as produced in banking.  For instance,
+CAMT.053 is produced by banks and consumed by accountancies, showing
+transactions in bank-accounts.  See F<https://www.iso20022.org>.
+
+At the moment, this module can be used to read the XML files.  It is
+intended to also support constructing them.  However, B<I need a sponsor>
+to make that happen.  Contact the author for support.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Business::CAMT-E<gt>B<new>(%options)
+
+Create a new CAMT processing object.
+
+Reuse this object to avoid recompilation of the message reader.
+
+ -Option       --Default
+  big_numbers    false
+  long_tagnames  false
+  match_schema   'NEWER'
+
+=over 2
+
+=item big_numbers => BOOLEAN
+
+Set to a true value when your accounts run into the billions.  This will
+enable Math::BigFloat to be used, which is slower and memory hungry.
+
+=item long_tagnames => BOOLEAN
+
+The schemas are derived from an UML specifications which uses clear and
+readible long names for relations and attributes.  But, someone with a
+poor sense of optimization removed most of the vowels from these tags
+while translating the UML into an XSD.  When set to C<true>, this option
+will give you the nice long names in Perl.
+
+=item match_schema => $rule
+
+Sets the default $rule how to handle messages which have namespaces
+which do not match the schemas contained in the module release.
+
+See L<matchSchema()|Business::CAMT/"Read"> for the available $rule values.  See the L<DETAILS>
+section about the namespace versioning horrors.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=head1 DETAILS
+
+=head2 Implementation issues
+
+=head3 XML namespaces
+
+The idea behind XML namespaces to include schema versioning is
+fundamentally flawed.  The CAMT files form no exception in broken XML
+concept.  Of course, schema versions are backwards compatible, so why
+not design your versioning with that in mind?
+
+This module bends the namespace use to hide these design mistakes into
+flexible code.  Without full knowledge about existing and future versions
+of the schemas, there is a powerfull configuration setting with L<matchSchema()|Business::CAMT/"Read">.
+Please consider to contribute discovered issues to this module.
+
+=head3 Tag abbreviations
+
+XML is very verbose anyway, so it really does not help to abbreviate tags leaving
+some vowels out.  This makes it harder to read messages and code.  It increases
+the chance on stupid typos in the code.
+
+=head3 No common types
+
+Each schema is separate, although their type definitions are overlapping.  It is
+not guaranteed that equal types will stay that way over time.  This may cause
+instable code.  Probably, issues will not emerge because the schema files are
+generated from a central UML model.
+
+=head3 Missed chances on XML
+
+The messages are designed with an UML tool, which means: limited to the features
+of that tool and hindering the view on the quality of the schema.  This leads to
+structures like:
+
+  <Bal>
+    <Tp>
+      <CdOrPrtry>
+         <Cd>OPBD</Cd>
+      </CdOrPrtry>
+    </Tp>
+    <Amt Ccy="SEK">500000</Amt>
+    <CdtDbtInd>CRDT</CdtDbtInd>
+    <Dt>
+      <Dt>2010-10-15</Dt>
+    </Dt>
+  </Bal>
+
+In Perl, this leads to (C<long_tagnames> on)
+
+  Balance => {
+    Type => {
+      CodeOrProperty => {
+        Code => 'OPBD',
+      }
+    },
+    Amount => {
+      _ => '500000',
+      Currency => 'SEK',
+    },
+    CreditDebitInd => 'CRDT',
+    Date => {
+      Date => '2010-10-15',
+    },
+  }
+
+The XML schema, when B<designed> as XML schema, could have looked like
+
+  <Credit Code="OPDB">
+    <Amount Currency="SEK">500000</Amount>
+    <Date>2010-10-15</Date>
+  </Credit>
+
+Also: use of substitutionGroups would have made messages so much
+clearer and easier.
+
+=head1 Read
+
+=over 4
+
+=item $obj-E<gt>B<fullname2tagTable>()
+
+Translates long and understandable names into (silly) abbreviated tags.
+
+=item $obj-E<gt>B<knownVersions>( [$set] )
+
+Returns a sorted LIST with all schema versions which are included in this
+distribution.  When the $set is specified (like C<053.001>), then only
+those are reported.
+
+=item $obj-E<gt>B<matchSchema>($set, $version, %options)
+
+Find the available schema version for the $set (like '053.001') to interpret
+a message with $version (like '02').
+
+ -Option--Default
+  rule    new(match_schema)
+
+=over 2
+
+=item rule => 'EXACT'|'NEWER'|'NEWEST'|'ANY'|CODE
+
+When C<EXACT>, only the precise version is acceptable.  C<NEWER> will
+fall back to the closest newer version.  When no exact match, C<NEWEST>
+returns the highest available version, but must be newer.  Most generous
+is C<ANY>, which falls back to the newest available version even when
+it is older than the message version.
+
+You may also pass a CODE reference, which is called with the $set, the requested
+schema, and a sorted ARRAY of available versions.  It must return one of the
+available versions or C<undef> (no compatible version).
+
+=back
+
+=item $obj-E<gt>B<read>($file|$xml, %options)
+
+Pass a $file name, an $xml document or an $xml node.  Returned is
+a HASH blessed in class 'Business::CAMT::CAMT<nr>', for instance
+C<Business::CAMT::CAMT053>.
+
+ -Option      --Default
+  match_schema  new(match_schema)
+
+=over 2
+
+=item match_schema => $rule
+
+=back
+
+=item $obj-E<gt>B<schemaReader>($set, $version, $ns)
+
+=item $obj-E<gt>B<tag2fullnameTable>()
+
+Returns a table which translates the (silly) abbreviations used in the
+XML tags into readable names.  Good names make it easier to understand
+the handling code and is less error-prone.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Business-CAMT distribution version 0.10,
+built on November 25, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

@@ -1,0 +1,447 @@
+# Describing complex x0:Document
+#     {urn:iso:std:iso:20022:tech:xsd:camt.046.001.08}Document
+#
+# Produced by XML::Compile::Translate::Template version undef
+#          on Mon Nov 25 09:42:45 2024
+#
+# BE WARNED: in most cases, the example below cannot be used without
+# interpretation.  The comments will guide you.
+#
+# xmlns:x0        urn:iso:std:iso:20022:tech:xsd:camt.046.001.08
+# xmlns:xs        http://www.w3.org/2001/XMLSchema
+
+# is a x0:Document
+{ # sequence of GetRsvatn
+
+  # is a x0:GetReservationV08
+  GetRsvatn =>
+  { # sequence of MsgHdr, RsvatnQryDef, SplmtryData
+
+    # is a x0:MessageHeader9
+    MsgHdr =>
+    { # sequence of MsgId, CreDtTm, ReqTp
+
+      # is a xs:string
+      # length <= 35
+      # length >= 1
+      MsgId => "example",
+
+      # is a xs:dateTime
+      # is optional
+      CreDtTm => "2006-10-06T00:23:02Z",
+
+      # is a x0:RequestType4Choice
+      # is optional
+      ReqTp =>
+      { # choice of PmtCtrl, Enqry, Prtry
+
+        # is a xs:string
+        # length <= 4
+        # length >= 1
+        PmtCtrl => "example",
+
+        # is a xs:string
+        # length <= 4
+        # length >= 1
+        Enqry => "example",
+
+        # is a x0:GenericIdentification1
+        Prtry =>
+        { # sequence of Id, SchmeNm, Issr
+
+          # is a xs:string
+          # length <= 35
+          # length >= 1
+          Id => "example",
+
+          # is a xs:string
+          # is optional
+          # length <= 35
+          # length >= 1
+          SchmeNm => "example",
+
+          # is a xs:string
+          # is optional
+          # length <= 35
+          # length >= 1
+          Issr => "example", }, }, },
+
+    # is a x0:ReservationQuery6
+    # is optional
+    RsvatnQryDef =>
+    { # sequence of QryTp, RsvatnCrit
+
+      # is a xs:string
+      # is optional
+      # Enum: ALLL CHNG DELD MODF
+      QryTp => "ALLL",
+
+      # is a x0:ReservationCriteria6Choice
+      # is optional
+      RsvatnCrit =>
+      { # choice of QryNm, NewCrit
+
+        # is a xs:string
+        # length <= 35
+        # length >= 1
+        QryNm => "example",
+
+        # is a x0:ReservationCriteria7
+        NewCrit =>
+        { # sequence of NewQryNm, SchCrit, RtrCrit
+
+          # is a xs:string
+          # is optional
+          # length <= 35
+          # length >= 1
+          NewQryNm => "example",
+
+          # is a x0:ReservationSearchCriteria6
+          # occurs any number of times
+          SchCrit =>
+          [ { # sequence of DtTm, SysId, DfltRsvatnTp, CurRsvatnTp,
+              #   AcctOwnr, AcctId
+
+              # is a x0:DateTimeSearch2Choice
+              # is optional
+              DtTm =>
+              { # choice of FrDtTm, ToDtTm, FrToDtTm, EQDtTm, NEQDtTm
+
+                # is a xs:dateTime
+                FrDtTm => "2006-10-06T00:23:02Z",
+
+                # is a xs:dateTime
+                ToDtTm => "2006-10-06T00:23:02Z",
+
+                # is a x0:DateTimePeriod1
+                FrToDtTm =>
+                { # sequence of FrDtTm, ToDtTm
+
+                  # is a xs:dateTime
+                  FrDtTm => "2006-10-06T00:23:02Z",
+
+                  # is a xs:dateTime
+                  ToDtTm => "2006-10-06T00:23:02Z", },
+
+                # is a xs:dateTime
+                EQDtTm => "2006-10-06T00:23:02Z",
+
+                # is a xs:dateTime
+                NEQDtTm => "2006-10-06T00:23:02Z", },
+
+              # is a x0:SystemIdentification2Choice
+              # is optional
+              SysId =>
+              { # choice of MktInfrstrctrId, Ctry
+
+                # is a x0:MarketInfrastructureIdentification1Choice
+                MktInfrstrctrId =>
+                { # choice of Cd, Prtry
+
+                  # is a xs:string
+                  # length <= 3
+                  # length >= 1
+                  Cd => "example",
+
+                  # is a xs:string
+                  # length <= 35
+                  # length >= 1
+                  Prtry => "example", },
+
+                # is a xs:string
+                # Pattern: [A-Z]{2,2}
+                Ctry => "example", },
+
+              # is a x0:ReservationType2Choice
+              # occurs any number of times
+              DfltRsvatnTp =>
+              [ { # choice of Cd, Prtry
+
+                  # is a xs:string
+                  # length <= 4
+                  # length >= 1
+                  Cd => "example",
+
+                  # is a xs:string
+                  # length <= 35
+                  # length >= 1
+                  Prtry => "example", }, ],
+
+              # is a x0:ReservationType2Choice
+              # complex structure shown above
+              # occurs any number of times
+              CurRsvatnTp => [{},],
+
+              # is a x0:BranchAndFinancialInstitutionIdentification8
+              # is optional
+              AcctOwnr =>
+              { # sequence of FinInstnId, BrnchId
+
+                # is a x0:FinancialInstitutionIdentification23
+                FinInstnId =>
+                { # sequence of BICFI, ClrSysMmbId, LEI, Nm, PstlAdr, Othr
+
+                  # is a xs:string
+                  # is optional
+                  # Pattern:
+                  #    [A-Z0-9]{4,4}[A-Z]{2,2}[A-Z0-9]{2,2}([A-Z0-9]{3,3}){0,1}
+                  BICFI => "example",
+
+                  # is a x0:ClearingSystemMemberIdentification2
+                  # is optional
+                  ClrSysMmbId =>
+                  { # sequence of ClrSysId, MmbId
+
+                    # is a x0:ClearingSystemIdentification2Choice
+                    # is optional
+                    ClrSysId =>
+                    { # choice of Cd, Prtry
+
+                      # is a xs:string
+                      # length <= 5
+                      # length >= 1
+                      Cd => "example",
+
+                      # is a xs:string
+                      # length <= 35
+                      # length >= 1
+                      Prtry => "example", },
+
+                    # is a xs:string
+                    # length <= 35
+                    # length >= 1
+                    MmbId => "example", },
+
+                  # is a xs:string
+                  # is optional
+                  # Pattern: [A-Z0-9]{18,18}[0-9]{2,2}
+                  LEI => "example",
+
+                  # is a xs:string
+                  # is optional
+                  # length <= 140
+                  # length >= 1
+                  Nm => "example",
+
+                  # is a x0:PostalAddress27
+                  # is optional
+                  PstlAdr =>
+                  { # sequence of AdrTp, CareOf, Dept, SubDept, StrtNm, BldgNb,
+                    #   BldgNm, Flr, UnitNb, PstBx, Room, PstCd, TwnNm, TwnLctnNm,
+                    #   DstrctNm, CtrySubDvsn, Ctry, AdrLine
+
+                    # is a x0:AddressType3Choice
+                    # is optional
+                    AdrTp =>
+                    { # choice of Cd, Prtry
+
+                      # is a xs:string
+                      # Enum: ADDR BIZZ DLVY HOME MLTO PBOX
+                      Cd => "ADDR",
+
+                      # is a x0:GenericIdentification30
+                      # complex structure shown above
+                      Prtry => {}, },
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 140
+                    # length >= 1
+                    CareOf => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 70
+                    # length >= 1
+                    Dept => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 70
+                    # length >= 1
+                    SubDept => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 140
+                    # length >= 1
+                    StrtNm => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 16
+                    # length >= 1
+                    BldgNb => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 140
+                    # length >= 1
+                    BldgNm => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 70
+                    # length >= 1
+                    Flr => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 16
+                    # length >= 1
+                    UnitNb => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 16
+                    # length >= 1
+                    PstBx => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 70
+                    # length >= 1
+                    Room => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 16
+                    # length >= 1
+                    PstCd => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 140
+                    # length >= 1
+                    TwnNm => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 140
+                    # length >= 1
+                    TwnLctnNm => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 140
+                    # length >= 1
+                    DstrctNm => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 35
+                    # length >= 1
+                    CtrySubDvsn => "example",
+
+                    # is a xs:string
+                    # is optional
+                    # Pattern: [A-Z]{2,2}
+                    Ctry => "example",
+
+                    # is a xs:string
+                    # occurs 0 <= # <= 7 times
+                    # length <= 70
+                    # length >= 1
+                    AdrLine => [ "example", ], },
+
+                  # is a x0:GenericFinancialIdentification1
+                  # is optional
+                  Othr =>
+                  { # sequence of Id, SchmeNm, Issr
+
+                    # is a xs:string
+                    # length <= 35
+                    # length >= 1
+                    Id => "example",
+
+                    # is a x0:FinancialIdentificationSchemeName1Choice
+                    # is optional
+                    SchmeNm =>
+                    { # choice of Cd, Prtry
+
+                      # is a xs:string
+                      # length <= 4
+                      # length >= 1
+                      Cd => "example",
+
+                      # is a xs:string
+                      # length <= 35
+                      # length >= 1
+                      Prtry => "example", },
+
+                    # is a xs:string
+                    # is optional
+                    # length <= 35
+                    # length >= 1
+                    Issr => "example", }, },
+
+                # is a x0:BranchData5
+                # is optional
+                BrnchId =>
+                { # sequence of Id, LEI, Nm, PstlAdr
+
+                  # is a xs:string
+                  # is optional
+                  # length <= 35
+                  # length >= 1
+                  Id => "example",
+
+                  # is a xs:string
+                  # is optional
+                  # Pattern: [A-Z0-9]{18,18}[0-9]{2,2}
+                  LEI => "example",
+
+                  # is a xs:string
+                  # is optional
+                  # length <= 140
+                  # length >= 1
+                  Nm => "example",
+
+                  # is a x0:PostalAddress27
+                  # complex structure shown above
+                  # is optional
+                  PstlAdr => [{},], }, },
+
+              # is a x0:AccountIdentification4Choice
+              # is optional
+              AcctId =>
+              { # choice of IBAN, Othr
+
+                # is a xs:string
+                # Pattern: [A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}
+                IBAN => "example",
+
+                # is a x0:GenericAccountIdentification1
+                # complex structure shown above
+                Othr => {}, }, }, ],
+
+          # is a x0:ReservationReturnCriteria1
+          # is optional
+          RtrCrit =>
+          { # sequence of StartDtTmInd, StsInd
+
+            # is a xs:boolean
+            # is optional
+            StartDtTmInd => "true",
+
+            # is a xs:boolean
+            # is optional
+            StsInd => "true", }, }, }, },
+
+    # is a x0:SupplementaryData1
+    # occurs any number of times
+    SplmtryData =>
+    [ { # sequence of PlcAndNm, Envlp
+
+        # is a xs:string
+        # is optional
+        # length <= 350
+        # length >= 1
+        PlcAndNm => "example",
+
+        # is a x0:SupplementaryDataEnvelope1
+        Envlp =>
+        { # sequence of ANY
+
+          # any element in any namespace
+          ANY => "Anything", }, }, ], }, }

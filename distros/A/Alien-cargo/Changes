@@ -1,5 +1,8 @@
 Revision history for Alien-cargo
 
+0.03      2024-11-24 06:25:23 -0700
+  - Fix bug where Alien::Base was set as base class (gh#3)
+
 0.02      2024-11-23 20:13:51 -0700
   - Added documentaton forgotten in the first release (gh#2)
 

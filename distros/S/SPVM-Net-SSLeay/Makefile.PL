@@ -104,6 +104,7 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_STORE');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_STORE_CTX');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_VERIFY_PARAM');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::Util');
     
   }
   

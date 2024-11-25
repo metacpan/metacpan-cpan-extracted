@@ -2465,7 +2465,11 @@ Provided with a data and some data type, and this will possibly put surrounding 
 
 =head2 release
 
+    $dbh->release( 'mysavepoint' );
+
 Calls L<DBD::pg_release> passing it through whatever arguments were provided.
+
+See also L<savepoint|/savepoint> and L<rollback_to|/rollback_to>
 
 =head2 replace
 
@@ -2481,11 +2485,23 @@ Will roll back any changes made to the database since the last transaction point
 
 =head2 rollback_to
 
+    $dbh->rollback_to( 'mysavepoint' );
+
+To be used inside a transaction. This will rollback any change up to the specified savepoint.
+
 Will call L<DBD::Pg/pg_rollback_to> and passing it through whatever arguments were provided.
+
+See also L<release|/release> and L<savepoint|/savepoint>
 
 =head2 savepoint
 
+    $dbh->savepoint( 'mysavepoint' );
+
+To be used inside a transaction. This creates a savepoint, which you can L<rollback to|/rollback_to> or L<release/release>
+
 Will call L<DBD::Pg/pg_savepoint> and passing it through whatever arguments were provided.
+
+See also L<rollback_to|/rollback_to> and L<release|/release>
 
 =head2 schema
 

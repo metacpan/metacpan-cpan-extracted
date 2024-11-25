@@ -3,7 +3,6 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my $pm = 'FileBrowser';
-my $ld = '$(INST_LIBDIR)';
 
 WriteMakefile(
 	NAME => "Tk::$pm",
@@ -12,9 +11,10 @@ WriteMakefile(
 		'File::Spec' => 0,
 		'File::Spec::Link' => '0.073',
 		'Test::Tk' => '3.02',
-		'Tk' => '800.024',
+		'Tk' => '804.032',
 		'Tk::ITree' => '0.03',
 		'Tk::ListEntry' => '0.02',
+		'Tk::YADialog' => '0.04',
 	},
 	ABSTRACT_FROM => "lib/Tk/$pm.pm",
 	VERSION_FROM => "lib/Tk/$pm.pm",
@@ -28,6 +28,9 @@ WriteMakefile(
 				url  => "git://github.com/haje61/Tk-$pm.git",
 				web  => "https://github.com/haje61/Tk-$pm",
 			},
+         bugtracker => {
+            web  => "https://github.com/haje61/Tk-$pm/issues",
+         },
 		}}) : ()
 	),
 );

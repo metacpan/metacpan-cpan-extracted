@@ -4,14 +4,14 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 0.02
 
 SYNOPSIS
 
      use Alien::cargo::clone;
      use Env qw( @PATH );
      
-     push @PATH, Alien::cargo::clone->bin_dir;
+     unshift @PATH, Alien::cargo::clone->bin_dir;
      system 'cargo', 'clone', 'foo-bar';
 
 DESCRIPTION
@@ -27,6 +27,14 @@ METHODS
 
     Returns the list of directories (if any) that need to be added to the
     PATH to use cargo clone.
+
+SEE ALSO
+
+    Alien::Rust
+
+    Alien::cargo
+
+    FFI::Build::File::Cargo
 
 AUTHOR
 

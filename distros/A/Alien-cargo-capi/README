@@ -1,0 +1,51 @@
+NAME
+
+    Alien::cargo::capi - Find or build the cargo capi command
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+     use Alien::cargo::capi;
+     use Env qw( @PATH );
+    
+     unshift @PATH, Alien::cargo::capi->bin_dir;
+     system 'cargo', 'capi', 'build';
+
+DESCRIPTION
+
+    This Alien provides the cargo capi <https://crates.io/crates/cargo-c>
+    command.
+
+METHODS
+
+ bin_dir
+
+     my @dir = Alien::cargo::capi->bin_dir;
+
+    Returns the list of directories (if any) that need to be added to the
+    PATH to use cargo cpi.
+
+SEE ALSO
+
+    Alien::Rust
+
+    Alien::cargo
+
+    Alien::cargo::clone
+
+    FFI::Build::File::Cargo
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2024 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

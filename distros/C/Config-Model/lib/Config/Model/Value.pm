@@ -7,13 +7,12 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.154;
+package Config::Model::Value 2.155;
 
 use v5.20;
 
 use strict;
 use warnings;
-use feature "switch";
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -40,7 +39,7 @@ with "Config::Model::Role::HelpAsText";
 with "Config::Model::Role::ComputeFunction";
 
 use feature qw/postderef signatures/;
-no warnings qw/experimental::postderef experimental::smartmatch experimental::signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 my $logger        = get_logger("Tree::Element::Value");
 my $user_logger   = get_logger("User");
@@ -2001,7 +2000,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.154
+version 2.155
 
 =head1 SYNOPSIS
 

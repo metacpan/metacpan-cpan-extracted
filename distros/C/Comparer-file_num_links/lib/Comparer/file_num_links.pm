@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-11-10'; # DATE
 our $DIST = 'Comparer-file_num_links'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub meta {
     return +{
@@ -50,7 +50,7 @@ Comparer::file_num_links - Compare file's number of (hard) links
 
 =head1 VERSION
 
-This document describes version 0.001 of Comparer::file_num_links (from Perl distribution Comparer-file_num_links), released on 2024-11-10.
+This document describes version 0.002 of Comparer::file_num_links (from Perl distribution Comparer-file_num_links), released on 2024-11-10.
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,7 @@ Source repository is at L<https://github.com/perlancar/perl-Comparer-file_num_li
 
 =head1 SEE ALSO
 
-L<Sorter::file_num_links>
+L<Sorter::file_by_num_links>
 
 L<SortKey::Num::file_num_links>
 

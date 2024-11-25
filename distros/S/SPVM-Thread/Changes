@@ -1,4 +1,11 @@
-0.01 2022-11-19
+0.002 2024-11-25
+  [Changes]
+    * Add version string to Thread class.
+    
+  [Makefile.PL Bug Fix]
+    * Fix a bug that Thread::ThisThread class and Thread::ID class are not compiled to DLL.
+    
+0.001 2022-11-19
   [Changes]
     * First release.
   

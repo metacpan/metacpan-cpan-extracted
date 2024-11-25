@@ -1,0 +1,201 @@
+# Describing complex x0:Document
+#     {urn:iso:std:iso:20022:tech:xsd:camt.023.001.07}Document
+#
+# Produced by XML::Compile::Translate::Template version undef
+#          on Mon Nov 25 09:42:44 2024
+#
+# BE WARNED: in most cases, the example below cannot be used without
+# interpretation.  The comments will guide you.
+#
+# xmlns:x0        urn:iso:std:iso:20022:tech:xsd:camt.023.001.07
+# xmlns:xs        http://www.w3.org/2001/XMLSchema
+
+# is a x0:Document
+{ # sequence of BckpPmt
+
+  # is a x0:BackupPaymentV07
+  BckpPmt =>
+  { # sequence of MsgHdr, OrgnlMsgId, InstrInf, TrfdAmt, Cdtr,
+    #   CdtrAgt, DbtrAgt, SplmtryData
+
+    # is a x0:MessageHeader1
+    MsgHdr =>
+    { # sequence of MsgId, CreDtTm
+
+      # is a xs:string
+      # length <= 35
+      # length >= 1
+      MsgId => "example",
+
+      # is a xs:dateTime
+      # is optional
+      CreDtTm => "2006-10-06T00:23:02Z", },
+
+    # is a x0:MessageHeader1
+    # complex structure shown above
+    # is optional
+    OrgnlMsgId => [{},],
+
+    # is a x0:PaymentInstruction13
+    # is optional
+    InstrInf =>
+    { # sequence of ReqdExctnDtTm, PmtTp
+
+      # is a xs:dateTime
+      # is optional
+      ReqdExctnDtTm => "2006-10-06T00:23:02Z",
+
+      # is a x0:PaymentType4Choice
+      # is optional
+      PmtTp =>
+      { # choice of Cd, Prtry
+
+        # is a xs:string
+        # Enum: BAL BCK CBH CBP CBS CLS CTR DPG DPH DPN DPP DPS
+        #    EXP LIQ LMT LOA LOR MGL OND STF TCH TCP TCS TRP
+        Cd => "CBS",
+
+        # is a xs:string
+        # length <= 35
+        # length >= 1
+        Prtry => "example", }, },
+
+    # is a x0:Amount2Choice
+    TrfdAmt =>
+    { # choice of AmtWthtCcy, AmtWthCcy
+
+      # is a xs:decimal
+      # faction digits is 5
+      # value >= 0
+      # total digits is 18
+      AmtWthtCcy => 3.1415,
+
+      # is a x0:ActiveCurrencyAndAmount
+      # AmtWthCcy is simple value with attributes
+      AmtWthCcy =>
+      { # is a xs:string
+        # attribute Ccy is required
+        # Pattern: [A-Z]{3,3}
+        Ccy => "example",
+
+        # is a xs:decimal
+        # string content of the container
+        _ => 3.1415, }, },
+
+    # is a x0:SystemMember3
+    Cdtr =>
+    { # sequence of SysId, MmbId
+
+      # is a x0:SystemIdentification2Choice
+      # is optional
+      SysId =>
+      { # choice of MktInfrstrctrId, Ctry
+
+        # is a x0:MarketInfrastructureIdentification1Choice
+        MktInfrstrctrId =>
+        { # choice of Cd, Prtry
+
+          # is a xs:string
+          # length <= 3
+          # length >= 1
+          Cd => "example",
+
+          # is a xs:string
+          # length <= 35
+          # length >= 1
+          Prtry => "example", },
+
+        # is a xs:string
+        # Pattern: [A-Z]{2,2}
+        Ctry => "example", },
+
+      # is a x0:MemberIdentification3Choice
+      MmbId =>
+      { # choice of BICFI, ClrSysMmbId, Othr
+
+        # is a xs:string
+        # Pattern:
+        #    [A-Z0-9]{4,4}[A-Z]{2,2}[A-Z0-9]{2,2}([A-Z0-9]{3,3}){0,1}
+        BICFI => "example",
+
+        # is a x0:ClearingSystemMemberIdentification2
+        ClrSysMmbId =>
+        { # sequence of ClrSysId, MmbId
+
+          # is a x0:ClearingSystemIdentification2Choice
+          # is optional
+          ClrSysId =>
+          { # choice of Cd, Prtry
+
+            # is a xs:string
+            # length <= 5
+            # length >= 1
+            Cd => "example",
+
+            # is a xs:string
+            # length <= 35
+            # length >= 1
+            Prtry => "example", },
+
+          # is a xs:string
+          # length <= 35
+          # length >= 1
+          MmbId => "example", },
+
+        # is a x0:GenericFinancialIdentification1
+        Othr =>
+        { # sequence of Id, SchmeNm, Issr
+
+          # is a xs:string
+          # length <= 35
+          # length >= 1
+          Id => "example",
+
+          # is a x0:FinancialIdentificationSchemeName1Choice
+          # is optional
+          SchmeNm =>
+          { # choice of Cd, Prtry
+
+            # is a xs:string
+            # length <= 4
+            # length >= 1
+            Cd => "example",
+
+            # is a xs:string
+            # length <= 35
+            # length >= 1
+            Prtry => "example", },
+
+          # is a xs:string
+          # is optional
+          # length <= 35
+          # length >= 1
+          Issr => "example", }, }, },
+
+    # is a x0:SystemMember3
+    # complex structure shown above
+    # is optional
+    CdtrAgt => [{},],
+
+    # is a x0:SystemMember3
+    # complex structure shown above
+    # is optional
+    DbtrAgt => [{},],
+
+    # is a x0:SupplementaryData1
+    # occurs any number of times
+    SplmtryData =>
+    [ { # sequence of PlcAndNm, Envlp
+
+        # is a xs:string
+        # is optional
+        # length <= 350
+        # length >= 1
+        PlcAndNm => "example",
+
+        # is a x0:SupplementaryDataEnvelope1
+        Envlp =>
+        { # sequence of ANY
+
+          # any element in any namespace
+          ANY => "Anything", }, }, ], }, }

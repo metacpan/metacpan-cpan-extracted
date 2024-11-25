@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 21;
+use Test::More tests => 22;
 use Test::Tk;
 use Tk;
 
@@ -10,7 +10,8 @@ my $mswin = $Config{'osname'} eq 'MSWin32';
 
 BEGIN {
 	use_ok('Tk::FileBrowser::Header');
-	use_ok('Tk::FileBrowser')
+	use_ok('Tk::FileBrowser::Images');
+	use_ok('Tk::FileBrowser');
 };
 
 #$delay = 1000;
@@ -40,13 +41,6 @@ for (@folders) {
 
 ########################################################
 #Helper routines
-
-sub pause {
-	my $delay = shift;
-	my $flag = 0;
-	$app->after($delay, sub { $flag = 1 });
-	$app->waitVariable(\$flag);
-}
 
 sub shown {
 	my $path = shift;

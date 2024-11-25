@@ -62,6 +62,8 @@ sub MY::postamble {
     require SPVM::Builder::Util::API;
     
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Thread');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Thread::ThisThread');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Thread::ID');
   }
   
   return $make_rule;

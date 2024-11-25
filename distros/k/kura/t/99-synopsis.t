@@ -4,21 +4,25 @@ use Test2::Require::Module 'Data::Checks', '0.09';
 use Test2::Require::Module 'Moose', '2.2207';
 
 package MyFoo {
+    use Exporter 'import';
     use Data::Checks qw(StrEq);
     use kura Foo => StrEq('foo');
 }
 
 package MyBar {
+    use Exporter 'import';
     use Types::Standard -types;
     use kura Bar => Str & sub { $_[0] eq 'bar' };
 }
 
 package MyBaz {
+    use Exporter 'import';
     use Moose::Util::TypeConstraints;
     use kura Baz => subtype as 'Str' => where { $_[0] eq 'baz' };
 }
 
 package MyQux {
+    use Exporter 'import';
     use kura Qux => sub { $_[0] eq 'qux' };
 }
 

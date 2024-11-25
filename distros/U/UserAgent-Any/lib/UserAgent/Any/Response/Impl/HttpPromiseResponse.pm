@@ -2,6 +2,7 @@ package UserAgent::Any::Response::Impl::HttpPromiseResponse;
 
 use 5.036;
 
+use Encode 'decode';
 use Moo;
 
 use namespace::clean;
@@ -22,8 +23,18 @@ sub success ($self) {
   return $self->{res}->is_success;
 }
 
+has _content => (
+  is => 'ro',
+  lazy => 1,
+  default => sub ($self) {
+    my $fc = $self->_forced_charset;
+    return decode($fc, $self->raw_content) if defined $fc;
+    return $self->{res}->decoded_content;
+  },
+);
+
 sub content ($self) {
-  return $self->{res}->decoded_content;
+  return $self->_content;
 }
 
 sub raw_content ($self) {

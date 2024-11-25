@@ -1,0 +1,21 @@
+class TestCase::Net::SSLeay::Util {
+  
+  use Net::SSLeay::Util;
+  use Array;
+  
+  static method convert_to_wire_format : int () {
+    
+    {
+      my $protocols = ["spdy/1", "http/1.1"];
+      
+      my $ret = Net::SSLeay::Util->convert_to_wire_format($protocols);
+      
+      unless (Array->equals($ret, [(byte)6, 's', 'p', 'd', 'y', '/', '1', 8, 'h', 't', 't', 'p', '/', '1', '.', '1'])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+}

@@ -1,5 +1,16 @@
 Revision history for Perl distribution UserAgent-Any-JSON
 
+0.04 - 2024-11-24
+
+ - Don’t load JSON when a custom JSON object is passed. This allows to downgrade
+   the dependency on JSON to `recommends` instead of `require`.
+
+0.03 - 2024-11-24
+
+ - Allow to pass a specific JSON converter in the constructor.
+ - Rename the JSON accessor to json (instead of data) for forward compatibility
+   with other decoders (e.g. xml).
+
 0.02 - 2024-11-18
 
  - Update to using the UserAgent::Any::Wrapper module.

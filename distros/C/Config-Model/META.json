@@ -115,8 +115,8 @@
          "web" : "http://github.com/dod38fr/config-model"
       }
    },
-   "version" : "2.154",
-   "x_generated_by_perl" : "v5.38.2",
+   "version" : "2.155",
+   "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "LGPL-2.1"
 }

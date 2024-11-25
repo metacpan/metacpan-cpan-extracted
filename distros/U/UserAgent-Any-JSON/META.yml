@@ -5,10 +5,12 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   HTTP::Response: '0'
+  JSON::PP: '0'
   Readonly: '0'
   Test2::V0: '0'
   Test::CPANfile: '0'
   Test::More: '0'
+  UserAgent::Any::Fake: '0'
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
   perl: v5.36.0
@@ -33,9 +35,9 @@ no_index:
     - vendor
     - t
 recommends:
+  JSON: '0'
   JSON::XS: '0'
 requires:
-  JSON: '0'
   Moo: '0'
   UserAgent::Any: '0'
   UserAgent::Any::Wrapper: '0'
@@ -44,5 +46,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/perl_user_agent_any_json/issues
   repository: https://github.com/mkende/perl_user_agent_any_json
-version: 0.02
+version: 0.04
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

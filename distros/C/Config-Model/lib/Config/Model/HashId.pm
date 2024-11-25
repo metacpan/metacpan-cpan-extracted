@@ -7,15 +7,18 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::HashId 2.154;
+package Config::Model::HashId 2.155;
 
 use Mouse;
-use 5.10.1;
+use 5.20.0;
 
 use Config::Model::Exception;
 use Carp;
 
 use Mouse::Util::TypeConstraints;
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
+
 
 subtype 'HaskKeyArray' => as 'ArrayRef' ;
 coerce 'HaskKeyArray' => from 'Str' => via { [$_] } ;
@@ -48,8 +51,7 @@ has [qw/default_keys auto_create_keys/] => (
 );
 has [qw/ordered write_empty_value/] => ( is => 'ro', isa => 'Bool', default => 0 );
 
-sub BUILD {
-    my $self = shift;
+sub BUILD ($self,$) {
 
     # foreach my $wrong (qw/migrate_values_from/) {
     # Config::Model::Exception::Model->throw (
@@ -68,10 +70,8 @@ sub BUILD {
     return $self;
 }
 
-sub set_properties {
-    my $self = shift;
-
-    $self->SUPER::set_properties(@_);
+sub set_properties ($self, @args) {
+    $self->SUPER::set_properties(@args);
 
     my $idx_type = $self->{index_type};
 
@@ -96,11 +96,10 @@ sub set_properties {
         $logger->trace( "set_properties: ", $self->name, " deleting id $k" );
         delete $data->{$k};
     }
+    return;
 }
 
-sub _migrate {
-    my $self = shift;
-
+sub _migrate ($self) {
     return if $self->{migration_done};
 
     # migration must be done *after* initial load to make sure that all data
@@ -128,17 +127,14 @@ sub _migrate {
             $self->fetch_with_id($item)->load_data($data);
         }
     }
-
+    return;
 }
 
-sub get_type {
-    my $self = shift;
+sub get_type ($self) {
     return 'hash';
 }
 
-sub get_info {
-    my $self = shift;
-
+sub get_info ($self) {
     my @items = (
         'type: ' . $self->get_type . ( $self->ordered ? '(ordered)' : '' ),
         'index: ' . $self->index_type,
@@ -160,35 +156,30 @@ sub get_info {
 }
 
 # important: return the actual size (not taking into account auto-created stuff)
-sub fetch_size {
-    my $self = shift;
+sub fetch_size ($self) {
     return scalar keys %{ $self->{data} };
 }
 
-sub _fetch_all_indexes {
-    my $self = shift;
+sub _fetch_all_indexes ($self) {
     return $self->{ordered}
         ? @{ $self->{list} }
         : sort keys %{ $self->{data} };
 }
 
 # fetch without any check
-sub _fetch_with_id {
-    my ( $self, $key ) = @_;
+sub _fetch_with_id ($self, $key) {
     return $self->{data}{$key};
 }
 
 # store without any check
-sub _store {
-    my ( $self, $key, $value ) = @_;
+sub _store ($self, $key, $value) {
     push @{ $self->{list} }, $key
         unless exists $self->{data}{$key};
     $self->notify_change(note => "added entry $key") if $self->write_empty_value;
     return $self->{data}{$key} = $value;
 }
 
-sub _exists {
-    my ( $self, $key ) = @_;
+sub _exists ($self, $key) {
     return exists $self->{data}{$key};
 }
 
@@ -198,20 +189,20 @@ sub _defined {
 }
 
 #internal
-sub auto_create_elements {
-    my $self = shift;
-
+sub auto_create_elements ($self) {
     my $auto_p = $self->auto_create_keys;
     return unless defined $auto_p;
 
     # create empty slots
-    map { $self->_store( $_, undef ) unless exists $self->{data}{$_}; }
-        ( ref $auto_p ? @$auto_p : ($auto_p) );
+    foreach my $slot ( ref $auto_p ? @$auto_p : ($auto_p) ) {
+        $self->_store( $slot, undef ) unless exists $self->{data}{$slot};
+    }
+
+    return;
 }
 
 # internal
-sub create_default {
-    my $self = shift;
+sub create_default ($self) {
     my @temp = keys %{ $self->{data} };
 
     return if @temp;
@@ -220,30 +211,28 @@ sub create_default {
     my $def = $self->get_default_keys;
     map { $self->_store( $_, undef ) } @$def;
     $self->create_default_with_init;
+    return;
 }
 
-sub _delete {
-    my ( $self, $key ) = @_;
-
+sub _delete ( $self, $key ) {
     # remove key in ordered list
     @{ $self->{list} } = grep { $_ ne $key } @{ $self->{list} };
 
     return delete $self->{data}{$key};
 }
 
-sub remove {
-    my $self = shift;
-    $self->delete(@_);
+sub remove ($self, @args) {
+    return $self->delete(@args);
 }
 
-sub _clear {
-    my ($self) = @_;
+sub _clear ($self) {
     $self->{list} = [];
     $self->{data} = {};
+    return;
 }
 
-sub sort {
-    my $self = shift;
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub sort ($self) {
     if ($self->ordered) {
         $self->_sort;
     }
@@ -253,11 +242,10 @@ sub sort {
             message => "cannot call sort on non ordered hash"
         );
     }
+    return;
 }
 
-sub insort {
-    my ($self, $id) = @_;
-
+sub insort ($self, $id) {
     if ($self->ordered) {
         my $elt = $self->fetch_with_id($id);
         $self->_sort;
@@ -269,12 +257,11 @@ sub insort {
             message => "cannot call insort on non ordered hash"
         );
     }
+    return;
 }
 
 # hash only method
-sub firstkey {
-    my $self = shift;
-
+sub firstkey ($self) {
     $self->warp
         if ( $self->{warp} and @{ $self->{warp_info}{computed_master} } );
 
@@ -287,9 +274,7 @@ sub firstkey {
 }
 
 # hash only method
-sub nextkey {
-    my $self = shift;
-
+sub nextkey ($self) {
     $self->warp
         if ( $self->{warp} and @{ $self->{warp_info}{computed_master} } );
 
@@ -303,11 +288,8 @@ sub nextkey {
     return;
 }
 
-sub swap {
-    my $self = shift;
-    my ( $key1, $key2 ) = @_;
-
-    foreach my $k (@_) {
+sub swap ($self, $key1, $key2 ) {
+    foreach my $k ($key1, $key2) {
         Config::Model::Exception::User->throw(
             object  => $self,
             message => "swap: unknow key $k"
@@ -325,12 +307,10 @@ sub swap {
     }
 
     $self->notify_change( note => "swap ordered hash keys '$key1' and '$key2'" );
+    return;
 }
 
-sub move {
-    my $self = shift;
-    my ( $from, $to, %args ) = @_;
-
+sub move ($self, $from, $to, %args) {
     $logger->trace("moving item from $from to $to");
 
     Config::Model::Exception::User->throw(
@@ -381,16 +361,14 @@ sub move {
     return $ok;
 }
 
-sub move_after {
-    my $self = shift;
-    my ( $key_to_move, $ref_key ) = @_;
-
+sub move_after ($self, $key_to_move, $ref_key = undef) {
     if ( not $self->ordered ) {
         $logger->warn("called move_after on unordered hash");
         return;
     }
 
-    foreach my $k (@_) {
+    foreach my $k ($key_to_move, $ref_key) {
+        next unless defined $k;
         Config::Model::Exception::User->throw(
             object  => $self,
             message => "swap: unknow key $k"
@@ -420,12 +398,10 @@ sub move_after {
 
     $self->notify_change( note => $msg );
 
+    return;
 }
 
-sub move_up {
-    my $self = shift;
-    my ($key) = @_;
-
+sub move_up ($self, $key) {
     if ( not $self->ordered ) {
         $logger->warn("called move_up on unordered hash");
         return;
@@ -450,12 +426,10 @@ sub move_up {
 
     # notify_change is placed in the loop so the notification
     # is not sent if the user tries to move up idx 0
+    return;
 }
 
-sub move_down {
-    my $self = shift;
-    my ($key) = @_;
-
+sub move_down ($self, $key) {
     if ( not $self->ordered ) {
         $logger->warn("called move_down on unordered hash");
         return;
@@ -480,11 +454,10 @@ sub move_down {
 
     # notify_change is placed in the loop so the notification
     # is not sent if the user tries to move past last idx
+    return;
 }
 
-sub _load_data_from_hash {
-    my $self = shift;
-    my %args = @_;
+sub _load_data_from_hash ($self, %args) {
     my $data = $args{data};
     my %backup = %$data ;
 
@@ -529,23 +502,25 @@ sub _load_data_from_hash {
     $logger->info(
         "HashId load_data (" . $self->location .
             ") will load idx @load_keys from hash ref $from"
-        );
+    );
+    my $res = 0;
     foreach my $elt (@load_keys) {
         my $obj = $self->fetch_with_id($elt);
-        $obj->load_data( %args, data => $data->{$elt} ) if defined $data->{$elt};
+        $res += $obj->load_data( %args, data => $data->{$elt} ) if defined $data->{$elt};
     }
+    return !!$res;
 }
 
-sub load_data {
-    my $self  = shift;
-    my %args  = @_ > 1 ? @_ : ( data => shift );
+sub load_data ($self, @args) {
+    my %args = @args > 1 ? @args : ( data => $args[0] );
     my $data  = delete $args{data};
     my $check = $self->_check_check( $args{check} );
 
     if ( ref($data) eq 'HASH' ) {
-        $self->_load_data_from_hash(data => $data, %args);
+        return $self->_load_data_from_hash(data => $data, %args);
     }
     elsif ( ref($data) eq 'ARRAY' ) {
+        my $res = 0;
         $logger->info(
             "HashId load_data (" . $self->location . ") will load idx 0..$#$data from array ref" );
         $self->notify_change( note => "Converted ordered data to non ordered", really => 1) unless $self->ordered;
@@ -553,8 +528,9 @@ sub load_data {
         while ( $idx < @$data ) {
             my $elt = $data->[ $idx++ ];
             my $obj = $self->fetch_with_id($elt);
-            $obj->load_data( %args, data => $data->[ $idx++ ] );
+            $res += $obj->load_data( %args, data => $data->[ $idx++ ] );
         }
+        return !!$res;
     }
     elsif ( defined $data ) {
 
@@ -566,6 +542,7 @@ sub load_data {
             wrong_data => $data,
         );
     }
+    return;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -586,7 +563,7 @@ Config::Model::HashId - Handle hash element for configuration model
 
 =head1 VERSION
 
-version 2.154
+version 2.155
 
 =head1 SYNOPSIS
 
@@ -702,6 +679,8 @@ important:
   { __skip_order => 1, b => 'bar', a => 'foo'}
 
 load_data can also be called with a single ref parameter.
+
+Return 1 of some data was loaded.
 
 =head2 get_info
 

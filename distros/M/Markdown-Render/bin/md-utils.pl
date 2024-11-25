@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -67,6 +67,7 @@ Options
 -R, --raw      return raw HTML from engine
 -t, --title    string to use for a custom title, default: "Table of Contents"
 -v, --version  version
+-N, --nocss    do not add any CSS link
 
 Tips
 ----
@@ -116,6 +117,7 @@ my @options_spec = qw(
   infile=s
   mode=s
   no-title
+  nocss|N
   outfile=s
   raw|R
   render|r

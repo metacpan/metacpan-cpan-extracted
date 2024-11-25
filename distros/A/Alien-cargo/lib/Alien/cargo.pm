@@ -6,10 +6,9 @@ use 5.008004;
 use File::Which qw( which );
 use Capture::Tiny qw( capture );
 use Env qw( @PATH $RUSTUP_HOME );
-use base qw( Alien::Base );
 
 # ABSTRACT: Find or download the cargo command (build system and package manager for Rust)
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 our %config;
@@ -64,7 +63,7 @@ Alien::cargo - Find or download the cargo command (build system and package mana
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -98,6 +97,18 @@ Returns the version of C<cargo>.
  my $bool = Alien::cargo->install_type($install_type);
 
 Returns the install type.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Alien::Rust>
+
+=item L<Alien::cargo::clone>
+
+=item L<FFI::Build::File::Cargo>>
+
+=back
 
 =head1 AUTHOR
 

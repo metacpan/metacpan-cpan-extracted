@@ -30,6 +30,7 @@ class Net::SSLeay::SSL_CTX : pointer {
   use Net::SSLeay::Callback::AlpnSelect; 
   use Net::SSLeay::Callback::NextProtoSelect;
   use Net::SSLeay::Callback::NextProtosAdvertised;
+  use Net::SSLeay::Util;
   
   use Sync::Mutex;
   use StringList;
@@ -107,7 +108,16 @@ class Net::SSLeay::SSL_CTX : pointer {
   
   native method clear_options : long ($options : long);
   
-  native method set_alpn_protos : int ($protos : string, $protos_len : int = -1);
+  native method set_alpn_protos : int ($protos : byte[], $protos_len : int = -1);
+  
+  method set_alpn_protos_with_protocols : int ($protocols : string[]) {
+    
+    my $protos = Net::SSLeay::Util->convert_to_wire_format($protocols);
+    
+    my $ret = $self->set_alpn_protos($protos);
+    
+    return $ret;
+  }
   
   native method set_tmp_ecdh : long ($ecdh : Net::SSLeay::EC_KEY);
   

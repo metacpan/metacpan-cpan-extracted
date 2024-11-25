@@ -36,20 +36,24 @@
             "File::Spec" : "0",
             "File::Spec::Link" : "0.073",
             "Test::Tk" : "3.02",
-            "Tk" : "800.024",
+            "Tk" : "804.032",
             "Tk::ITree" : "0.03",
-            "Tk::ListEntry" : "0.02"
+            "Tk::ListEntry" : "0.02",
+            "Tk::YADialog" : "0.04"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haje61/Tk-FileBrowser/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/haje61/Tk-FileBrowser.git",
          "web" : "https://github.com/haje61/Tk-FileBrowser"
       }
    },
-   "version" : 0.04,
+   "version" : 0.05,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

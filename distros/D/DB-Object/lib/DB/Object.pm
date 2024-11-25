@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v1.4.4
+## Version v1.4.6
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/11/22
+## Modified 2024/11/24
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     use POSIX ();
     use Want;
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.4.4';
+    our $VERSION = 'v1.4.6';
 };
 
 use strict;
@@ -2766,9 +2766,19 @@ Because the L<fields objects|DB::Object::Fields::Field> are overloaded, instead 
     $tbl->where( $tbl->fo->some_field == '?', $tbl->fo->other_field == '?' );
     my $sth = $tbl->select || die( $tbl->error );
 
+Accessing a property in a C<JSON> or C<JSONB> field:
+
+    my $tbl = $dbh->some_table;
+    $tbl->where( metadata => { is_system => 'true' } );
+    my $sth = $tbl->select;
+    say $sth->as_string;
+    # SELECT * FROM some_table WHERE metadata->>is_system = 'true';
+
+In future release, other operators than C<=> will be implemented for C<JSON> and C<JSONB> fields.
+
 =head1 VERSION
 
-    v1.4.4
+    v1.4.6
 
 =head1 DESCRIPTION
 

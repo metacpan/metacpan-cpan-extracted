@@ -1,5 +1,5 @@
 {
-   "abstract" : "Store constraints for Data::Checks, Type::Tiny, Moose and more.",
+   "abstract" : "Store constraints for Data::Checks, Type::Tiny, Moose, and more.",
    "author" : [
       "kobaken <kentafly88@gmail.com>"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "kura" : {
          "file" : "lib/kura.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/kfly8/kura"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:KFLY",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1

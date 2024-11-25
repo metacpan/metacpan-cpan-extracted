@@ -9,7 +9,7 @@ Tk::FileBrowser - Multi column file system explorer
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.04;
+$VERSION = 0.05;
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'FileBrowser';
@@ -26,9 +26,12 @@ use File::Spec::Link;
 use Tie::Watch;
 use Tk;
 require Tk::FileBrowser::Header;
+use Tk::FileBrowser::Images;
 use Tk::FileBrowser::Item;
 require Tk::ITree;
 require Tk::ListEntry;
+require Tk::YADialog;
+require Tk::Message;
 
 my $file_icon = Tk->findINC('file.xpm');
 my $dir_icon = Tk->findINC('folder.xpm');
@@ -41,26 +44,7 @@ my %timedata = (
 	Modified => 'mtime',
 );
 
-my $link_pixmap = '/* XPM */
-static char * link_xpm[] = {
-"12 12 4 1",
-" 	c None",
-".	c #000000",
-"+	c #FFFFFF",
-"@	c #1C94D1",
-" ........   ",
-" .++++++.   ",
-" .+++@++... ",
-" .+++@@+++. ",
-" .+++@@@++. ",
-" .+++@@@@+. ",
-" .+++@@@@@. ",
-" .+++@@@@+. ",
-" .+++@@@++. ",
-" .+++@@+++. ",
-" .+++@++++. ",
-" .......... "};
-';
+
 
 =head1 SYNOPSIS
 
@@ -124,6 +108,10 @@ which marks every entry that is geater than 2048 with an 'X', and sorts on size.
    -fill => 'both',
  );
 
+=item Switch B<-createfolderbutton>
+
+Default value 0. If set a button is displayed on top right allowing the user to create a new folder.
+
 =item Switch B<-dateformat>
 
 Defaultvalue: "%Y-%m-%d %H:%M". Specifies how time stamps should be represented.
@@ -154,10 +142,6 @@ The value of this filter will change when you use the filter bar.
 
 If you change the value you have to call B<refresh> to see your changes.
 
-=item Switch: B<-filterfolders>
-
-Default value 1. Specifies if folders are filtered.
-
 =item Switch: B<-headermenu>
 
 Specifies a list of menuitems for the context menu of the header. By default
@@ -187,6 +171,18 @@ Specifies if filters are applied to folders during load. Default value 0.
 
 If you change the value you have to call B<reload> to see your changes.
 
+=item Switch B<-msgimage>
+
+Image displayed in message pop ups. By default set to the Tk info pixmap.
+
+=item Switch B<-newfolderimage>
+
+Image for the create folder button. By default set to the Tk info pixmap.
+
+=item Switch B<-postloadcall>
+
+Callback called after a call to B<load>
+
 =item Switch: B<-refreshfilter>
 
 Filter applied during refresh. Default value ''.
@@ -203,6 +199,18 @@ If you change the value you have to call B<refresh> to see your changes.
 =item Switch: B<-reloadimage>
 
 Image for the reload button.
+
+=item Switch: B<-showfiles>
+
+Default value 1;
+
+If you change the value you have to call B<reload> to see your changes.
+
+=item Switch: B<-showfolders>
+
+Default value 1;
+
+If you change the value you have to call B<reload> to see your changes.
 
 =item Switch: B<-showhidden>
 
@@ -221,6 +229,10 @@ If you change the value you have to call B<refresh> to see your changes.
 Can be 'ascending' or 'descending'. Default value 'ascending'.
 
 If you change the value you have to call B<refresh> to see your changes.
+
+=item Switch: B<-warnimage>
+
+Image displayed in warning dialogs. By default set to the 'warning' Pixmap of Tk.
 
 =back
 
@@ -253,6 +265,10 @@ Class Tk::Entry.
 =item B<CTRL+F>
 
 Shows the filter bar.
+
+=item B<F5>
+
+Reload.
 
 =back
 
@@ -336,13 +352,20 @@ sub Populate {
 	my $entry = $lframe->ListEntry(
 		-command => ['EditSelect', $self],
 		-textvariable => \$basetxt,
-	)->pack(@pack, -expand => 1, -fill => 'both');
+	)->pack(@pack, -expand => 1, -fill => 'x');
 	$self->Advertise('Entry', $entry);
 
 	my $reload = $lframe->Button(
 		-text => 'Reload',
 		-command => ['reload', $self],
 	)->pack(@pack);
+	
+	my $createfolderbutton = $lframe->Button(
+		-text => 'New folder',
+		-command => ['createFolder', $self],
+	);
+	$self->Advertise('CreateDirButton', $createfolderbutton);
+
 
 	###################################################################
 	#setting up the tree widget
@@ -367,11 +390,12 @@ sub Populate {
 
 	$self->Advertise('Tree' => $tree);
 	$tree->bind('<Control-f>', [$self, 'filterShow']);
+	$tree->bind('<F5>', [$self, 'reload']);
 	$tree->bind('<Escape>', [$self, 'filterHide']);
 	$tree->bind('<Button-3>' => [$self, 'lmPost', Ev('X'), Ev('Y')]);
 
 	###################################################################
-	#setting op tree headers
+	#setting up tree headers
 	my $column = 0;
 	for (@columns) {
 		my $n = $column;
@@ -415,7 +439,7 @@ sub Populate {
 		-textvariable => \$filter,
 	)->pack(@pack, -expand => 1, -fill => 'x');
 	$self->Advertise('FilterEntry', $fentry);
-	$fentry->bind('<Escape>', [$self, 'filterHide']);
+	$fentry->bind('<Control-f>', [$self, 'filterHide']);
 
 	my $case = 0;
 	$self->Advertise('Case', \$case);
@@ -515,37 +539,53 @@ sub Populate {
 
 
 	###################################################################
-	#setting up ConfigSpect
+	#setting up ConfigSpecs
 
 	$self->ConfigSpecs(
 		-background => ['SELF', 'DESCENDANTS'],
 		-bginterval => ['PASSIVE', undef, undef, 10],
 		-casedependantsort => ['PASSIVE', undef, undef, 0],
 		-columns => ['PASSIVE', undef, undef, \@columns],
+		-createfolderbutton => ['METHOD', undef, undef, 0],
 		-dateformat => ['PASSIVE', undef, undef, "%Y-%m-%d %H:%M"],
 		-directoriesfirst => ['PASSIVE', undef, undef, 1],
 		-diriconcall => ['CALLBACK', undef, undef, ['DefaultDirIcon', $self]],
+#		-errorimage => ['PASSIVE', undef, undef, $self->Getimage('error')],
 		-fileiconcall => ['CALLBACK', undef, undef, ['DefaultFileIcon', $self]],
 		-filtercase => ['PASSIVE', undef, undef, 0],
 		-headermenu => ['PASSIVE', undef, undef, \@headermenu],
-		-invokefile => ['CALLBACK', undef, undef, sub {}],
+		-invokefile => ['CALLBACK', undef, undef, ['openFile', $self]],
 		-linkiconcall => ['CALLBACK', undef, undef, ['DefaultLinkIcon', $self]],
 		-listmenu => ['PASSIVE', undef, undef, \@listmenu],
 		-loadfilter => ['PASSIVE', undef, undef, ''],
 		-loadfilterfolders => ['PASSIVE', undef, undef, 0],
+		-msgimage => ['PASSIVE', undef, undef, $self->Getimage('info')],
+		-newfolderimage => [{-image => $createfolderbutton}, undef, undef, $self->Pixmap(-data => $newfolder_pixmap)],
+		-postloadcall => ['CALLBACK', undef, undef, sub {}],
+#		-questionimage => ['PASSIVE', undef, undef, $self->Getimage('question')],
 		-refreshfilter => ['PASSIVE', undef, undef, ''],
 		-refreshfilterfolders => ['PASSIVE', undef, undef, 0],
-		-reloadimage => [{-image => $reload}],
+		-reloadimage => [{-image => $reload}, undef, undef, $self->Pixmap(-data => $reload_pixmap)],
 		-separator => ['METHOD'],
+		-showfiles => ['PASSIVE', undef, undef, 1],
+		-showfolders => ['PASSIVE', undef, undef, 1],
 		-showhidden => ['PASSIVE', undef, undef, 0],
 		-sorton => ['METHOD', undef, undef, $sorton],
 		-sortorder => ['METHOD', undef, undef, $sortorder],
+		-warnimage => ['PASSIVE', undef, undef, $self->Getimage('warning')],
 		DEFAULT => [ $tree ],
 	);
 	$self->Delegates(
-		DEFAULT => $tree
+		collect => $self,
+		filterHide => $self,
+		filterShow => $self,
+		folder => $self,
+		GetFullName => $self,
+		load => $self,
+		refresh => $self,
+		reload => $self,
+		DEFAULT => $tree,
 	);
-	return $self;
 }
 
 sub Add {
@@ -634,6 +674,10 @@ sub bgCycle {
 			} else {
 				$fullname = "$folder$sep$item";`																																	`																																																																																																																	
 			}
+
+			next if ((-d $fullname) and (not $self->cget('-showfolders')));
+			next if ((-f $fullname) and (not $self->cget('-showfiles')));
+
 			if (-d $fullname) {
 				if ($self->cget('-loadfilterfolders')) {
 					next unless $self->filter($self->cget('-loadfilter'), $item);
@@ -760,6 +804,20 @@ sub branchOpen {
 	$data->isOpen(1);
 }
 
+=item B<collect>
+
+Returns a list of all selected files and folders.
+
+=cut
+
+sub collect {
+	my $self = shift;
+	my @sel = $self->infoSelection;
+	my @ret = ();
+	for (@sel) { push @ret, $self->GetFullName($_) }
+	return @ret
+}
+
 sub ColName {
 	my ($self, $num) = @_;
 	return $self->{COLNUMS}->{$num}
@@ -768,6 +826,58 @@ sub ColName {
 sub ColNum {
 	my ($self, $name) = @_;
 	return $self->{COLNAMES}->{$name}
+}
+
+sub createFolder {
+	my $self = shift;
+	my @padding = (-padx => 10, -pady => 10);
+	my $q = $self->YADialog(
+		-title => 'New folder',
+		-buttons => [qw(Ok Cancel)],
+	);
+	$q->Label(-image => $self->cget('-msgimage'))->pack(-side => 'left', @padding);
+	my $f = $q->Frame->pack(-side => 'left', @padding);
+	$f->Label(
+		-anchor => 'w',
+		-text => 'Folder name:',
+	)->pack(-fill => 'x', -padx => 2, -pady => 2);
+	my $e = $f->Entry->pack(-fill => 'x', -padx => 2, -pady => 2);
+	$e->focus;
+	$e->bind('<Return>', sub { 
+		$q->Pressed('Ok');
+	});
+	my $result;
+	my $answer = $q->Show(-popover => $self);
+	$result = $e->get if $answer eq 'Ok';
+	$q->destroy;
+	if (defined $result) {
+		my $folder = $self->GetFullName($result);
+		if (mkdir $folder) {
+			$self->reload
+		} else {
+			my $e = $self->YAMessage(
+				-title => 'Error',
+				-text => "Creating Folder '$result' failed.",
+				-image => $self->cget('-warnimage'),
+			);
+			$e->show(-popover => $self->toplevel);
+			$e->destroy;
+		}
+	}
+}
+
+sub createfolderbutton {
+	my $self = shift;
+	my $b = $self->Subwidget('CreateDirButton');
+	if (@_) {
+		my $pack = shift;
+		if ($pack) {
+			$b->pack(-side => 'left', -padx => 2, -pady => 2) #unless $b->ismapped
+		} else {
+			$b->packForget #if $b->ismapped
+		}
+	}
+	return $b->ismapped
 }
 
 sub DefaultDirIcon {
@@ -999,7 +1109,7 @@ sub lmPost {
 		);
 		$menu->bind('<Leave>', [$self, 'lmUnpost']);
 		$self->{'l_menu'} = $menu;
-		$menu->post($x, $y);
+		$menu->post($x - 2, $y - 2);
 	}
 }
 
@@ -1066,6 +1176,7 @@ sub load {
 	###################################################################
 	#transfer focus to tree widget
 	$self->Subwidget('Tree')->focus if $focus;
+	$self->Callback('-postloadcall');
 }
 
 sub noRefresh {
@@ -1080,6 +1191,21 @@ sub NumberOfColumns {
 	my @size = keys %$names;
 	my $num = @size;
 	return $num
+}
+
+=item B<openFile>I<($file)>
+
+Opens I<$file> in the default application of your desktop.
+
+=cut
+
+sub openFile {
+	my ($self, $url) = @_;
+	if ($mswin) {
+		system("\"$url\"");
+	} else {
+		system("xdg-open \"$url\"");
+	}
 }
 
 sub OrderTest {

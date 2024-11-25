@@ -35,11 +35,13 @@
             "Config::Tiny" : "2.30",
             "Digest::SHA" : "6.04",
             "Mojo::File" : "0",
-            "Mojo::JSON" : "0"
+            "Mojo::JSON" : "0",
+            "String::CamelCase" : "0",
+            "Syntax::Operator::Matches" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

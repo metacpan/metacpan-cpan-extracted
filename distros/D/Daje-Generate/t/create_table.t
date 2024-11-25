@@ -5,7 +5,7 @@ use Test::More;
 use Test::Mojo;
 use Daje::Generate::Test::TestData;
 use Daje::Generate::Tools::Datasections;
-use Daje::Generate::Sql::Table;
+use Daje::Generate::Sql::SqlManager;
 
 use Mojo::Loader qw {data_section};
 use Mojo::JSON qw {from_json};
@@ -96,7 +96,7 @@ sub create_table {
     );
     $template->load_data_sections();
 
-    my $table = Daje::Generate::Sql::Table->new(
+    my $table = Daje::Generate::Sql::SqlManager->new(
         json     => $json,
         template => $template,
     );

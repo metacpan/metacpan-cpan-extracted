@@ -3,7 +3,7 @@ use v5.40;
 
 use Test::More;
 use Daje::Generate::Test::TestData;
-use Daje::Generate::Sql::Table;
+use Daje::Generate::Sql::SqlManager;
 use Daje::Generate::Templates::Sql;
 use Mojo::Log;
 
@@ -79,7 +79,7 @@ sub generate_table_sql()  {
     );
     $template->load_data_sections();
 
-    my $table = Daje::Generate::Sql::Table->new(
+    my $table = Daje::Generate::Sql::SqlManager->new(
         json     => $json,
         template => $template,
     );

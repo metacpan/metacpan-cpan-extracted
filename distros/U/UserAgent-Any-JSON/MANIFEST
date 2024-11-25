@@ -10,5 +10,6 @@ t/001-cpanfile.t
 t/001-podsyntax.t
 t/100-request.t
 t/101-response.t
+t/200-custom-json.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

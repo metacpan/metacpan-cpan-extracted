@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model 2.154;
+package Config::Model 2.155;
 
 use 5.20.0;
 use strict ;
@@ -1903,7 +1903,7 @@ Config::Model - a framework to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.154
+version 2.155
 
 =head1 SYNOPSIS
 
@@ -2672,7 +2672,7 @@ returns C<( 'Foo::Bar' , 'Foo::Bar2' )>.
 =head2 augment_config_class (name => '...', class_data )
 
 Enhance the feature of a configuration class. This method uses the same parameters
-as L<create_config_class>. See
+as L</create_config_class>. See
 L<Config::Model::Manual::ModelCreationAdvanced/"Model Plugin">
 for more details on creating model plugins.
 

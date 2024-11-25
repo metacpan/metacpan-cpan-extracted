@@ -1,0 +1,87 @@
+#!/usr/bin/env perl
+# Create all templates in the examples/templates directory
+
+use warnings;
+use strict;
+use feature 'say';
+
+use Log::Report;
+use File::Slurper  qw(read_lines write_text);
+
+use lib 'lib';
+use Business::CAMT ();
+
+use Data::Dumper;
+$Data::Dumper::Indent    = 1; 
+$Data::Dumper::Quotekeys = 0; 
+$Data::Dumper::Sortkeys  = 1; 
+
+my $xsddir  = 'lib/Business/CAMT/xsd';
+my $tagdir  = 'lib/Business/CAMT/tags';
+my $templs  = 'templates';
+my $urnbase = 'urn:iso:std:iso:20022:tech:xsd';
+
+my $camt    = Business::CAMT->new;
+my $schemas = $Business::CAMT::schemas;
+
+-d $templs or mkdir $templs or fault $templs;
+
+my %abbrevs;
+
+#
+## Create templates with abbreviations
+#
+
+say "Creating templates with abbreviated tags.";
+
+foreach my $version ($camt->knownVersions)
+{	$schemas->importDefinitions("$xsddir/$version.xsd");
+	my $ns   = "$urnbase:$version";
+
+	my $dump = $schemas->template(PERL => "{$ns}Document");
+
+	my $fn   = "$templs/$version.dd";
+	open my $fh, '>:encoding(UTF-8)', $fn or fault $fn;
+	$fh->print($dump);
+
+	$abbrevs{$_}++ for $dump =~ /^\s*(\w+)\s+\=\>/gm;
+}
+
+delete $abbrevs{$_} for qw/_ ANY/;
+
+#
+## Detect missing abbreviations
+#
+
+say "Detected unique tags: " . keys %abbrevs;
+
+my %umltags = reverse map split(/\,/, $_, 2),
+	read_lines "$tagdir/abbreviations.csv";
+
+#warn Dumper \%umltags;
+
+say "UML list of abbreviations: " . keys %umltags;
+
+my %index;
+foreach my $abbrev (keys %abbrevs)
+{	if(my $long = $umltags{$abbrev})
+	{	$index{$abbrev} = $long;
+	}
+}
+
+say "Used UML abbreviations: " . keys %index;
+say "Unused UML abbreviations: " , (keys %umltags) - (keys %index);
+
+my %current = map split(/,/, $_, 2), read_lines "$tagdir/index.csv";
+
+say "Please remove tag: $_"
+	for grep !$abbrevs{$_}, sort keys %current;
+
+say "UML defines $_ as $index{$_}, overruled as $current{$_}"
+	for grep $current{$_} && $index{$_} && $current{$_} ne $index{$_}, sort keys %current;
+
+$current{$_} ||= $umltags{$_} || '' for keys %abbrevs;
+say "Missing long names: " . (grep $current{$_} eq '', keys %current);
+
+write_text "$tagdir/index.csv", join '', map "$_,$current{$_}\n", sort keys %current;
+exit 0

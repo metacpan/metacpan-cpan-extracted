@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.03
 
 SYNOPSIS
 
@@ -40,6 +40,14 @@ METHODS
      my $bool = Alien::cargo->install_type($install_type);
 
     Returns the install type.
+
+SEE ALSO
+
+    Alien::Rust
+
+    Alien::cargo::clone
+
+    FFI::Build::File::Cargo>
 
 AUTHOR
 

@@ -1,0 +1,252 @@
+# Describing complex x0:Document
+#     {urn:iso:std:iso:20022:tech:xsd:camt.062.001.03}Document
+#
+# Produced by XML::Compile::Translate::Template version undef
+#          on Mon Nov 25 09:42:46 2024
+#
+# BE WARNED: in most cases, the example below cannot be used without
+# interpretation.  The comments will guide you.
+#
+# xmlns:x0        urn:iso:std:iso:20022:tech:xsd:camt.062.001.03
+# xmlns:xs        http://www.w3.org/2001/XMLSchema
+
+# is a x0:Document
+{ # sequence of PayInSchdl
+
+  # is a x0:PayInScheduleV03
+  PayInSchdl =>
+  { # sequence of PtyId, RptData, PayInSchdlLngBal, PayInSchdlItm,
+    #   PayInFctrs, SplmtryData
+
+    # is a x0:PartyIdentification73Choice
+    PtyId =>
+    { # choice of NmAndAdr, AnyBIC, PtyId
+
+      # is a x0:NameAndAddress8
+      NmAndAdr =>
+      { # sequence of Nm, Adr, AltrntvIdr
+
+        # is a xs:string
+        # length <= 350
+        # length >= 1
+        Nm => "example",
+
+        # is a x0:PostalAddress1
+        # is optional
+        Adr =>
+        { # sequence of AdrTp, AdrLine, StrtNm, BldgNb, PstCd, TwnNm,
+          #   CtrySubDvsn, Ctry
+
+          # is a xs:string
+          # is optional
+          # Enum: ADDR BIZZ DLVY HOME MLTO PBOX
+          AdrTp => "ADDR",
+
+          # is a xs:string
+          # occurs 0 <= # <= 5 times
+          # length <= 70
+          # length >= 1
+          AdrLine => [ "example", ],
+
+          # is a xs:string
+          # is optional
+          # length <= 70
+          # length >= 1
+          StrtNm => "example",
+
+          # is a xs:string
+          # is optional
+          # length <= 16
+          # length >= 1
+          BldgNb => "example",
+
+          # is a xs:string
+          # is optional
+          # length <= 16
+          # length >= 1
+          PstCd => "example",
+
+          # is a xs:string
+          # is optional
+          # length <= 35
+          # length >= 1
+          TwnNm => "example",
+
+          # is a xs:string
+          # is optional
+          # length <= 35
+          # length >= 1
+          CtrySubDvsn => "example",
+
+          # is a xs:string
+          # Pattern: [A-Z]{2,2}
+          Ctry => "example", },
+
+        # is a xs:string
+        # occurs 0 <= # <= 10 times
+        # length <= 35
+        # length >= 1
+        AltrntvIdr => [ "example", ], },
+
+      # is a x0:PartyIdentification44
+      AnyBIC =>
+      { # sequence of AnyBIC, AltrntvIdr
+
+        # is a xs:string
+        # Pattern:
+        #    [A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}
+        AnyBIC => "example",
+
+        # is a xs:string
+        # occurs 0 <= # <= 10 times
+        # length <= 35
+        # length >= 1
+        AltrntvIdr => [ "example", ], },
+
+      # is a x0:PartyIdentification59
+      # probably a recursive complex
+      PtyId => {}, },
+
+    # is a x0:ReportData4
+    RptData =>
+    { # sequence of MsgId, ValDt, DtAndTmStmp, Tp, SchdlTp, SttlmSsnIdr
+
+      # is a xs:string
+      # length <= 35
+      # length >= 1
+      MsgId => "example",
+
+      # is a xs:date
+      ValDt => "2006-10-06",
+
+      # is a xs:dateTime
+      DtAndTmStmp => "2006-10-06T00:23:02Z",
+
+      # is a xs:string
+      # Enum: OFFI REQU TRIA
+      Tp => "TRIA",
+
+      # is a xs:string
+      # Pattern: [a-zA-Z0-9]{4}
+      SchdlTp => "example",
+
+      # is a xs:string
+      # is optional
+      # Pattern: [a-zA-Z0-9]{4}
+      SttlmSsnIdr => "example", },
+
+    # is a x0:BalanceStatus2
+    # occurs any number of times
+    PayInSchdlLngBal =>
+    [ { # sequence of Bal
+
+        # is a x0:ActiveCurrencyAndAmount
+        # Bal is simple value with attributes
+        Bal =>
+        { # is a xs:string
+          # attribute Ccy is required
+          # Pattern: [A-Z]{3,3}
+          Ccy => "example",
+
+          # is a xs:decimal
+          # string content of the container
+          _ => 3.1415, }, }, ],
+
+    # is a x0:PayInScheduleItems1
+    # occurs any number of times
+    PayInSchdlItm =>
+    [ { # sequence of Amt, Ddln
+
+        # is a x0:ActiveCurrencyAndAmount
+        # Amt is simple value with attributes
+        Amt =>
+        { # is a xs:string
+          # attribute Ccy is required
+          # Pattern: [A-Z]{3,3}
+          Ccy => "example",
+
+          # is a xs:decimal
+          # string content of the container
+          _ => 3.1415, },
+
+        # is a xs:dateTime
+        Ddln => "2006-10-06T00:23:02Z", }, ],
+
+    # is a x0:PayInFactors1
+    # is optional
+    PayInFctrs =>
+    { # sequence of AggtShrtPosLmt, CcyFctrs
+
+      # is a x0:ActiveCurrencyAndAmount
+      # AggtShrtPosLmt is simple value with attributes
+      AggtShrtPosLmt =>
+      { # is a xs:string
+        # attribute Ccy is required
+        # Pattern: [A-Z]{3,3}
+        Ccy => "example",
+
+        # is a xs:decimal
+        # string content of the container
+        _ => 3.1415, },
+
+      # is a x0:CurrencyFactors1
+      # occurs 1 <= # <= unbounded times
+      CcyFctrs =>
+      [ { # sequence of Ccy, ShrtPosLmt, MinPayInAmt, VoltlyMrgn, Rate
+
+          # is a xs:string
+          # Pattern: [A-Z]{3,3}
+          Ccy => "example",
+
+          # is a xs:decimal
+          # faction digits is 5
+          # value >= 0
+          # total digits is 18
+          ShrtPosLmt => 3.1415,
+
+          # is a xs:decimal
+          # faction digits is 5
+          # value >= 0
+          # total digits is 18
+          MinPayInAmt => 3.1415,
+
+          # is a xs:decimal
+          # faction digits is 10
+          # total digits is 11
+          VoltlyMrgn => 3.1415,
+
+          # is a x0:AgreedRate2
+          # is optional
+          Rate =>
+          { # sequence of XchgRate, UnitCcy, QtdCcy
+
+            # is a xs:decimal
+            # faction digits is 10
+            # total digits is 11
+            XchgRate => 3.1415,
+
+            # is a xs:string
+            # Pattern: [A-Z]{3,3}
+            UnitCcy => "example",
+
+            # is a xs:string
+            # Pattern: [A-Z]{3,3}
+            QtdCcy => "example", }, }, ], },
+
+    # is a x0:SupplementaryData1
+    # occurs any number of times
+    SplmtryData =>
+    [ { # sequence of PlcAndNm, Envlp
+
+        # is a xs:string
+        # is optional
+        # length <= 350
+        # length >= 1
+        PlcAndNm => "example",
+
+        # is a x0:SupplementaryDataEnvelope1
+        Envlp =>
+        { # sequence of ANY
+
+          # any element in any namespace
+          ANY => "Anything", }, }, ], }, }

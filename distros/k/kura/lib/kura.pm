@@ -2,7 +2,7 @@ package kura;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use Carp ();
 use Sub::Util ();
@@ -12,10 +12,6 @@ my %FORBIDDEN_NAME = map { $_ => 1 } qw{
     BEGIN CHECK DESTROY END INIT UNITCHECK
     AUTOLOAD STDIN STDOUT STDERR ARGV ARGVOUT ENV INC SIG
 };
-
-# This is a default Exporter class.
-# You can change this class by setting $kura::EXPORTER_CLASS.
-our $EXPORTER_CLASS = 'Exporter';
 
 # This is a default constraint code to object.
 # You can change this code by setting $kura::CALLABLE_TO_OBJECT.
@@ -52,7 +48,7 @@ sub import_into {
     $err = _install_constraint($name, $constraint, $caller);
     Carp::croak $err if $err;
 
-    $err = _setup_exporter($caller);
+    $err = _setup_inc($caller);
     Carp::croak $err if $err;
 }
 
@@ -112,17 +108,12 @@ sub _install_constraint {
     return;
 }
 
-sub _setup_exporter {
+sub _setup_inc {
     my ($caller) = @_;
 
-    my $exporter_class = $EXPORTER_CLASS;
-
-    unless ($caller->isa($exporter_class)) {
-        no strict "refs";
-        push @{ "$caller\::ISA" }, $exporter_class;
-        ( my $file = $caller ) =~ s{::}{/}g;
-        $INC{"$file.pm"} ||= __FILE__;
-    }
+    # Hack to make the caller package already loaded. Useful for multi-packages in a single file.
+    ( my $file = $caller ) =~ s{::}{/}g;
+    $INC{"$file.pm"} ||= __FILE__;
 
     return;
 }
@@ -134,26 +125,30 @@ __END__
 
 =head1 NAME
 
-kura - Store constraints for Data::Checks, Type::Tiny, Moose and more.
+kura - Store constraints for Data::Checks, Type::Tiny, Moose, and more.
 
 =head1 SYNOPSIS
 
     package MyFoo {
+        use Exporter 'import';
         use Data::Checks qw(StrEq);
         use kura Foo => StrEq('foo');
     }
 
     package MyBar {
+        use Exporter 'import';
         use Types::Standard -types;
         use kura Bar => Str & sub { $_[0] eq 'bar' };
     }
 
     package MyBaz {
+        use Exporter 'import';
         use Moose::Util::TypeConstraints;
         use kura Baz => subtype as 'Str' => where { $_[0] eq 'baz' };
     }
 
     package MyQux {
+        use Exporter 'import';
         use kura Qux => sub { $_[0] eq 'qux' };
     }
 
@@ -169,7 +164,7 @@ kura - Store constraints for Data::Checks, Type::Tiny, Moose and more.
 
 =head1 DESCRIPTION
 
-Kura - means "Traditional Japanese storehouse" - stores constraints, such as L<Data::Checks>, L<Type::Tiny>, L<Moose::Meta::TypeConstraint>, L<Mouse::Meta::TypeConstraint>, L<Specio> and more. It can even be used with L<Moo> when combined with L<Type::Tiny> constraints.
+Kura - means "Traditional Japanese storehouse" - stores constraints, such as L<Data::Checks>, L<Type::Tiny>, L<Moose::Meta::TypeConstraint>, L<Mouse::Meta::TypeConstraint>, L<Specio>, and more. It can even be used with L<Moo> when combined with L<Type::Tiny> constraints.
 
     Data::Checks -----------------> +--------+
                                     |        |
@@ -192,13 +187,13 @@ It's easy to use to store constraints in a package:
 This constraint must be a any object that has a C<check> method or a code reference that returns true or false.
 The following is an example of a constraint declaration:
 
-    # use Type::Tiny
+    use Exporter 'import';
     use Types::Standard -types;
 
     use kura Name  => Str & sub { qr/^[A-Z][a-z]+$/ };
     use kura Level => Int & sub { $_[0] >= 1 && $_[0] <= 100 };
 
-    use kura Charactor => Dict[
+    use kura Character => Dict[
         name  => Name,
         level => Level,
     ];
@@ -215,64 +210,34 @@ When declaring constraints, it is important to define child constraints before t
 
 If constraints are declared in the wrong order, you might encounter errors like “Bareword not allowed.” Ensure that all dependencies are declared beforehand to prevent such issues.
 
-=head2 Using a constraint
+=head2 Export a constraint
 
-You can use the declared constraint as follows:
+You can export the declared constraints by your favorite Exporter package such as L<Exporter>, L<Exporter::Tiny>, and more.
+Internally, Kura automatically adds the declared constraint to C<@EXPORT_OK>, so you just put C<use Exporter 'import';> in your package:
 
     package MyFoo {
+        use Exporter 'import';
+
         use Data::Checks qw(StrEq);
         use kura Foo => StrEq('foo');
     }
 
     use MyFoo qw(Foo);
     Foo->check('foo'); # true
+    Foo->check('bar'); # false
 
-Internally, Kura inherits L<Exporter> and automatically adds the declared constraint to C<@EXPORT_OK>:
-
-    MyFoo->isa('Exporter'); # true
-    @MyFoo::EXPORT_OK; # ('Foo')
-
-So, you can add other functions to C<@EXPORT_OK>:
+If you forget to put C<use Exporter 'import';>, you get an error like this:
 
     package MyFoo {
-        our @EXPORT_OK;
-        push @EXPORT_OK => qw(hello);
-
-        use kura Foo => sub { $_[0] eq 'foo' };
-
-        sub hello { 'Hello, World!' }
-   }
-
-   use MyFoo qw(Foo hello);
-   hello(); # 'Hello, World!'
-
-=head1 Customizing
-
-=head2 C<$EXPORTER_CLASS>
-
-C<$EXPORTER_CLASS> is a package name of the Exporter class, default is L<Exporter>.
-You can change this class by setting C<$kura::EXPORTER_CLASS>.
-
-    package mykura {
-        use kura ();
-
-        sub import {
-            my $pkg = shift;
-            my $caller = caller;
-
-            local $kura::EXPORTER_CLASS = 'Exporter::Tiny';
-            kura->import_into($caller, @_);
-        }
+        # use Exporter 'import'; # Forgot to load Exporter!!
+        use Data::Checks qw(StrEq);
+        use kura Foo => StrEq('foo');
     }
 
-    package MyFoo {
-        use mykura Foo => sub { $_[0] eq 'foo' };
-    }
-
-    # Exporter::Tiny accepts the `-as` option
-    use MyFoo Foo => { -as => 'CheckerFoo' };
-
-    CheckerFoo->check('foo'); # true
+    use MyFoo qw(Foo);
+    # => ERROR!
+    Attempt to call undefined import method with arguments ("Foo" ...) via package "MyFoo"
+    (Perhaps you forgot to load the package?)
 
 =head1 LICENSE
 

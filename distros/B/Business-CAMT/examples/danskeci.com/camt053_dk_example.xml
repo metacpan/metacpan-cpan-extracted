@@ -1,0 +1,637 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02 camt.053.001.02.xsd">
+		<!-- Danske Bank CAMT053 example file for Denmark -->
+	  <!-- Balances in the file does not match the transactions booked -->
+		<!-- Payment types included: 4 credits and 2 debits -->
+	<BkToCstmrStmt>
+		<GrpHdr>
+			<MsgId>XXX24Y4XXX1Y000000001</MsgId>
+			<CreDtTm>2023-04-20T23:24:31</CreDtTm>
+		</GrpHdr>
+		<Stmt>
+			<Id>XXX24Y4XXX1Y000000001</Id>
+			<ElctrncSeqNb>1</ElctrncSeqNb>
+			<LglSeqNb>1</LglSeqNb>
+			<CreDtTm>2023-04-20T23:24:31</CreDtTm>
+			<FrToDt>
+				<FrDtTm>2023-04-20T00:00:00</FrDtTm>
+				<ToDtTm>2023-04-20T23:59:59</ToDtTm>
+			</FrToDt>
+			<Acct>
+				<Id>
+					<IBAN>DK8030000001234567</IBAN>
+				</Id>
+				<Ccy>DKK</Ccy>
+				<!-- Account name -->
+				<Nm>Danske Corporate</Nm>
+				<Ownr>
+					<!-- Account owners name and address -->
+					<Nm>Account owner</Nm>
+					<PstlAdr>
+						<StrtNm>Streetname</StrtNm>
+						<BldgNb>20</BldgNb>
+						<PstCd>1234</PstCd>
+						<TwnNm>Townname</TwnNm>
+						<Ctry>DK</Ctry>
+					</PstlAdr>
+					<Id>
+						<OrgId>
+							<Othr>
+								<!-- Account owners customer number -->
+								<Id>0012345678</Id>
+								<SchmeNm>
+									<Cd>CUST</Cd>
+								</SchmeNm>
+							</Othr>
+						</OrgId>
+					</Id>
+				</Ownr>
+				<Svcr>
+					<FinInstnId>
+						<BIC>DABADKKK</BIC>
+					</FinInstnId>
+				</Svcr>
+			</Acct>
+			<Bal>
+				<Tp>
+					<CdOrPrtry>
+						<Cd>OPBD</Cd>
+					</CdOrPrtry>
+				</Tp>
+				<Amt Ccy="DKK">12345.67</Amt>
+				<CdtDbtInd>DBIT</CdtDbtInd>
+				<Dt>
+					<Dt>2023-04-20</Dt>
+				</Dt>
+			</Bal>
+			<Bal>
+				<Tp>
+					<CdOrPrtry>
+						<Cd>CLBD</Cd>
+					</CdOrPrtry>
+				</Tp>
+				<Amt Ccy="DKK">23456.78</Amt>
+				<CdtDbtInd>DBIT</CdtDbtInd>
+				<Dt>
+					<Dt>2023-04-20</Dt>
+				</Dt>
+			</Bal>
+			<Bal>
+				<Tp>
+					<CdOrPrtry>
+						<Cd>OPAV</Cd>
+					</CdOrPrtry>
+				</Tp>
+				<Amt Ccy="DKK">12345.67</Amt>
+				<CdtDbtInd>DBIT</CdtDbtInd>
+				<Dt>
+					<Dt>2023-04-20</Dt>
+				</Dt>
+			</Bal>
+			<Bal>
+				<Tp>
+					<CdOrPrtry>
+						<Cd>CLAV</Cd>
+					</CdOrPrtry>
+				</Tp>
+				<Amt Ccy="DKK">23456.78</Amt>
+				<CdtDbtInd>DBIT</CdtDbtInd>
+				<Dt>
+					<Dt>2023-04-20</Dt>
+				</Dt>
+			</Bal>
+			<Bal>
+				<Tp>
+					<CdOrPrtry>
+						<Cd>PRCD</Cd>
+					</CdOrPrtry>
+				</Tp>
+				<Amt Ccy="DKK">12345.67</Amt>
+				<CdtDbtInd>DBIT</CdtDbtInd>
+				<Dt>
+					<Dt>2023-04-19</Dt>
+				</Dt>
+			</Bal>
+			<TxsSummry>
+				<TtlNtries>
+					<NbOfNtries>6</NbOfNtries>
+					<TtlNetNtryAmt>343174.12</TtlNetNtryAmt>
+					<CdtDbtInd>DBIT</CdtDbtInd>
+				</TtlNtries>
+				<TtlCdtNtries>
+					<NbOfNtries>4</NbOfNtries>
+					<Sum>3163.89</Sum>
+				</TtlCdtNtries>
+				<TtlDbtNtries>
+					<NbOfNtries>2</NbOfNtries>
+					<Sum>346338.01</Sum>
+				</TtlDbtNtries>
+			</TxsSummry>
+			
+			<!-- Incoming foreign payment example -->
+			<Ntry>
+				<NtryRef>1</NtryRef>
+				<Amt Ccy="DKK">591.15</Amt>
+				<CdtDbtInd>CRDT</CdtDbtInd>
+				<Sts>BOOK</Sts>
+				<BookgDt>
+					<Dt>2023-04-20</Dt>
+				</BookgDt>
+				<ValDt>
+					<Dt>2023-04-20</Dt>
+				</ValDt>
+				<!-- Account servicing institutions reference for the entry -->
+				<AcctSvcrRef>012X123456789012</AcctSvcrRef>
+				<BkTxCd>
+					<Domn>
+						<Cd>PMNT</Cd>
+						<Fmly>
+							<Cd>RCDT</Cd>
+							<SubFmlyCd>XBCT</SubFmlyCd>
+						</Fmly>
+					</Domn>
+					<Prtry>
+						<!-- Text on account owners account statement -->
+						<Cd>BETAL. 3825-0123456789</Cd>
+						<Issr>DBA</Issr>
+					</Prtry>
+				</BkTxCd>
+				<AddtlInfInd>
+					<!-- Danske Bank reference -->
+					<MsgNmId>O1XXXXXXX67X1X</MsgNmId>
+				</AddtlInfInd>
+				<NtryDtls>
+					<TxDtls>
+						<Refs>
+							<!-- Contains the EndToEndId from the SEPA transaction or if transaction is created via ISO 20022 XML pain001 Customer Credit Transfer in Danske Bank. In other cases the value is blank -->
+							<EndToEndId>NOTPROVIDED</EndToEndId>
+							<!-- Contains the Danske Bank reference number for the payment -->
+							<TxId>3825-0123456789</TxId>
+						</Refs>
+						<AmtDtls>
+							<!-- Amount and currency as instructed on the payment initiation -->
+							<InstdAmt>
+								<Amt Ccy="DKK">591.15</Amt>
+							</InstdAmt>
+							<!-- Amount and currency booked on the account -->
+							<TxAmt>
+								<Amt Ccy="DKK">591.15</Amt>
+							</TxAmt>
+              <!-- This value can be used by the bank for additional amount reporting on community or bank specific purposes -->						
+							<PrtryAmt>
+								<Tp>IBS</Tp>
+								<Amt Ccy="DKK">591.15</Amt>
+							</PrtryAmt>
+						</AmtDtls>
+						<RltdPties>
+							<Dbtr>
+								<!-- Debtors name and address -->
+								<Nm>Debtor</Nm>
+								<PstlAdr>
+									<Ctry>SE</Ctry>
+									<AdrLine>First addressline</AdrLine>
+								</PstlAdr>
+							</Dbtr>
+							<DbtrAcct>
+								<Id>
+									<IBAN>SE5180000810512345678901</IBAN>
+								</Id>
+							</DbtrAcct>
+							<Cdtr>
+								<!-- Beneficiary name and address -->
+								<Nm>Creditor</Nm>
+								<PstlAdr>
+									<AdrLine>First address line</AdrLine>
+								</PstlAdr>
+							</Cdtr>
+						</RltdPties>
+						<RltdAgts>
+							<DbtrAgt>
+								<!-- Debtors bank information -->
+								<FinInstnId>
+									<BIC>SWEDSESS</BIC>
+									<Nm>SWEDBANK AB (PUBL)</Nm>
+									<PstlAdr>
+										<AdrLine>First address line</AdrLine>
+										<AdrLine>Second address line</AdrLine>
+										<AdrLine>Third address line</AdrLine>
+									</PstlAdr>
+								</FinInstnId>
+							</DbtrAgt>
+						</RltdAgts>
+						<!-- Message to beneficiary -->
+						<RmtInf>
+							<Ustrd>Unstructured remittance information</Ustrd>
+						</RmtInf>
+						<RltdDts>
+							<AccptncDtTm>2023-04-18T01:01:01</AccptncDtTm>
+						</RltdDts>
+						<AddtlTxInf>Beregnede gebyrer: DKK 38,00 Gebyr konto: 1234567890</AddtlTxInf>
+					</TxDtls>
+				</NtryDtls>
+			</Ntry>
+			
+			<!-- Incoming FIK payment example -->
+			<Ntry>
+				<NtryRef>2</NtryRef>
+				<Amt Ccy="DKK">1101.88</Amt>
+				<CdtDbtInd>CRDT</CdtDbtInd>
+				<Sts>BOOK</Sts>
+				<BookgDt>
+					<Dt>2023-04-20</Dt>
+				</BookgDt>
+				<ValDt>
+					<Dt>2023-04-20</Dt>
+				</ValDt>
+				<!-- Account servicing institutions reference for the entry -->
+				<AcctSvcrRef>FISAM.POST</AcctSvcrRef>
+				<BkTxCd>
+					<Domn>
+						<Cd>PMNT</Cd>
+						<Fmly>
+							<Cd>RCDT</Cd>
+							<SubFmlyCd>VCOM</SubFmlyCd>
+						</Fmly>
+					</Domn>
+					<Prtry>
+						<!-- Text on account owners account statement -->
+						<Cd>DIV.INDB.KORT 87654321 / 71</Cd>
+						<Issr>DBA</Issr>
+					</Prtry>
+				</BkTxCd>
+				<NtryDtls>
+					<Btch>
+						<!-- Number of transactions in the bulked payment -->
+						<NbOfTxs>2</NbOfTxs>
+					</Btch>
+					<TxDtls>
+						<Refs>
+							<!-- Contains the EndToEndId from the SEPA transaction or if transaction is created via ISO 20022 XML pain001 Customer Credit Transfer in Danske Bank. In other cases the value is blank -->
+							<EndToEndId>NOTPROVIDED</EndToEndId>
+						</Refs>
+						<AmtDtls>
+							<TxAmt>
+								<Amt Ccy="DKK">528.94</Amt>
+							</TxAmt>
+						</AmtDtls>
+						<BkTxCd>
+							<Prtry>
+								<Cd>71/0000123456789012345</Cd>
+							</Prtry>
+						</BkTxCd>
+						<RltdPties>
+							<CdtrAcct>
+								<Id>
+									<Othr>
+										<!-- FIK Creditor number -->
+										<Id>87654321</Id>
+									</Othr>
+								</Id>
+							</CdtrAcct>
+						</RltdPties>
+						<!-- Message to beneficiary -->
+						<RmtInf>
+							<Strd>
+								<CdtrRefInf>
+									<Tp>
+										<CdOrPrtry>
+											<Cd>SCOR</Cd>
+										</CdOrPrtry>
+									</Tp>
+									<!-- FIK reference number -->
+									<Ref>71/0000123456789012345</Ref>
+								</CdtrRefInf>
+							</Strd>
+						</RmtInf>
+						<RltdDts>
+							<AccptncDtTm>2023-04-19T01:01:01</AccptncDtTm>
+						</RltdDts>
+					</TxDtls>
+					<TxDtls>
+						<Refs>
+							<!-- Contains the EndToEndId from the SEPA transaction or if transaction is created via ISO 20022 XML pain001 Customer Credit Transfer in Danske Bank. In other cases the value is blank -->
+							<EndToEndId>NOTPROVIDED</EndToEndId>
+						</Refs>
+						<AmtDtls>
+							<TxAmt>
+								<Amt Ccy="DKK">572.94</Amt>
+							</TxAmt>
+						</AmtDtls>
+						<BkTxCd>
+							<Prtry>
+								<Cd>71/0000543210987654321</Cd>
+							</Prtry>
+						</BkTxCd>
+						<RltdPties>
+							<CdtrAcct>
+								<Id>
+									<Othr>
+										<!-- FIK Creditor number -->
+										<Id>87654321</Id>
+									</Othr>
+								</Id>
+							</CdtrAcct>
+						</RltdPties>
+						<!-- Message to beneficiary -->
+						<RmtInf>
+							<Strd>
+								<CdtrRefInf>
+									<Tp>
+										<CdOrPrtry>
+											<Cd>SCOR</Cd>
+										</CdOrPrtry>
+									</Tp>
+									<!-- FIK reference number -->
+									<Ref>71/0000543210987654321</Ref>
+								</CdtrRefInf>
+							</Strd>
+						</RmtInf>
+						<RltdDts>
+							<AccptncDtTm>2023-04-19T01:01:01</AccptncDtTm>
+						</RltdDts>
+					</TxDtls>
+				</NtryDtls>
+			</Ntry>
+
+      <!-- Incoming domestic payment example -->
+			<Ntry>
+				<NtryRef>3</NtryRef>
+				<Amt Ccy="DKK">150.86</Amt>
+				<CdtDbtInd>CRDT</CdtDbtInd>
+				<Sts>BOOK</Sts>
+				<BookgDt>
+					<Dt>2023-04-20</Dt>
+				</BookgDt>
+				<ValDt>
+					<Dt>2023-04-20</Dt>
+				</ValDt>
+				<!-- Account servicing institutions reference for the entry -->
+				<AcctSvcrRef>1234569988</AcctSvcrRef>
+				<BkTxCd>
+					<Domn>
+						<Cd>PMNT</Cd>
+						<Fmly>
+							<Cd>RCDT</Cd>
+							<SubFmlyCd>DMCT</SubFmlyCd>
+						</Fmly>
+					</Domn>
+					<Prtry>
+						<!-- Text on account owners account statement -->
+						<Cd>81223344</Cd>
+						<Issr>DBA</Issr>
+					</Prtry>
+				</BkTxCd>
+				<AddtlInfInd>
+					<!-- Danske Bank reference -->
+					<MsgNmId>XXXXXXYYYYOO1X</MsgNmId>
+				</AddtlInfInd>
+				<NtryDtls>
+					<TxDtls>
+						<Refs>
+							<!-- Contains the EndToEndId from the SEPA transaction or if transaction is created via ISO 20022 XML pain001 Customer Credit Transfer in Danske Bank. In other cases the value is blank -->
+							<EndToEndId>NOTPROVIDED</EndToEndId>
+						</Refs>
+						<AmtDtls>
+							<TxAmt>
+								<Amt Ccy="DKK">150.86</Amt>
+							</TxAmt>
+						</AmtDtls>
+						<RltdPties>
+							<Dbtr>
+								<!-- Debtors name and address -->
+								<Nm>Debtor</Nm>
+								<PstlAdr>
+									<AdrLine>First address line</AdrLine>
+									<AdrLine>Second address line</AdrLine>
+								</PstlAdr>
+							</Dbtr>
+							<DbtrAcct>
+								<!-- Debtors account number - present if available -->
+								<Id>
+									<Othr>
+										<Id>3100 1234567890</Id>
+									</Othr>
+								</Id>
+							</DbtrAcct>
+						</RltdPties>
+						<!-- Message to beneficiary -->
+						<RmtInf>
+							<Ustrd>Invoice number 11223344</Ustrd>
+							<Ustrd>Invoice number 11223345</Ustrd>
+							<Ustrd>Invoice number 11223346</Ustrd>
+						</RmtInf>
+						<RltdDts>
+							<AccptncDtTm>2023-04-20T01:01:01</AccptncDtTm>
+						</RltdDts>
+					</TxDtls>
+				</NtryDtls>
+			</Ntry>
+			
+			<!-- Outgoing foreign payment example -->
+			<Ntry>
+				<NtryRef>4</NtryRef>
+				<Amt Ccy="DKK">344278.01</Amt>
+				<CdtDbtInd>DBIT</CdtDbtInd>
+				<Sts>BOOK</Sts>
+				<BookgDt>
+					<Dt>2023-04-19</Dt>
+				</BookgDt>
+				<ValDt>
+					<Dt>2023-04-19</Dt>
+				</ValDt>
+				<!-- Account servicing institutions reference for the entry -->
+				<AcctSvcrRef>1712345678</AcctSvcrRef>
+				<BkTxCd>
+					<Domn>
+						<Cd>PMNT</Cd>
+						<Fmly>
+							<Cd>ICDT</Cd>
+							<SubFmlyCd>XBCT</SubFmlyCd>
+						</Fmly>
+					</Domn>
+					<Prtry>
+						<!-- Text on account owners account statement -->
+						<Cd>DBT.XXXX YYX 1-1234567890</Cd>
+						<Issr>DBA</Issr>
+					</Prtry>
+				</BkTxCd>
+				<AddtlInfInd>
+					<!-- Danske Bank reference -->
+					<MsgNmId>XXXXX5XX8XX1X</MsgNmId>
+				</AddtlInfInd>
+				<NtryDtls>
+					<TxDtls>
+						<Refs>
+							<!-- Contains the Information id from the SEPA transaction or if transaction is created via ISO 20022 XML pain001 Customer Credit Transfer in Danske Bank. In other cases the value is blank -->
+							<PmtInfId>Payment Information ID</PmtInfId>
+							<!-- Contains the Instruction id from the SEPA transaction or if transaction is created via ISO 20022 XML pain001 Customer Credit Transfer in Danske Bank. In other cases the value is blank -->
+							<InstrId>Instruction Id</InstrId>
+							<!-- Contains the EndToEndId from the SEPA transaction or if transaction is created via ISO 20022 XML pain001 Customer Credit Transfer in Danske Bank. In other cases the value is blank -->
+							<EndToEndId>EndToEndId</EndToEndId>
+							<!-- Contains the Danske Bank reference number for the payment -->
+							<TxId>3001-123456789012</TxId>
+						</Refs>
+						<AmtDtls>
+							<!-- Amount and currency as instructed on the payment initiation -->
+							<InstdAmt>
+								<Amt Ccy="EUR">46064.52</Amt>
+							</InstdAmt>
+							<!-- Amount and currency booked on the account, including fees -->
+							<TxAmt>
+								<Amt Ccy="DKK">344278.01</Amt>
+								<CcyXchg>
+									<!-- Original amount currency of the currency exchange made -->
+									<SrcCcy>EUR</SrcCcy>
+									<!-- Resulting currency of the currency exchange made. Reported if available -->
+									<TrgtCcy>DKK</TrgtCcy>
+									<!-- Define in which direction the exchange rate is calculated. Reported if available -->
+									<UnitCcy>EUR</UnitCcy>
+									<XchgRate>7.4738000</XchgRate>
+								</CcyXchg>
+							</TxAmt>
+						</AmtDtls>
+						<RltdPties>
+							<Cdtr>
+								<!-- Beneficiary name and address -->
+								<Nm>Creditor</Nm>
+								<PstlAdr>
+									<Ctry>NL</Ctry>
+									<AdrLine>First addressline</AdrLine>
+									<AdrLine>Second addressline</AdrLine>
+								</PstlAdr>
+							</Cdtr>
+							<!-- Beneficiary account number -->
+							<CdtrAcct>
+								<Id>
+									<IBAN>NL11ABNA1234567890</IBAN>
+								</Id>
+							</CdtrAcct>
+						</RltdPties>
+						<!-- Beneficiary bank information -->
+						<RltdAgts>
+							<CdtrAgt>
+								<FinInstnId>
+									<BIC>ABNANL2A</BIC>
+								</FinInstnId>
+							</CdtrAgt>
+						</RltdAgts>
+						<!-- Message to beneficiary -->
+						<RmtInf>
+							<Ustrd>Unstructured remittance information</Ustrd>
+						</RmtInf>
+						<RltdDts>
+							<AccptncDtTm>2023-04-19T01:01:01</AccptncDtTm>
+						</RltdDts>
+						<AddtlTxInf>Vores gebyr: DKK 1,00</AddtlTxInf>
+					</TxDtls>
+				</NtryDtls>
+			</Ntry>
+			
+			<!-- Incoming card transaction(DKSSL) -->
+			<Ntry>
+				<NtryRef>5</NtryRef>
+				<Amt Ccy="DKK">1320.00</Amt>
+				<CdtDbtInd>CRDT</CdtDbtInd>
+				<Sts>BOOK</Sts>
+				<BookgDt>
+					<Dt>2023-04-20</Dt>
+				</BookgDt>
+				<ValDt>
+					<Dt>2023-04-20</Dt>
+				</ValDt>
+				<!-- Account servicing institutions reference for the entry -->
+				<AcctSvcrRef>0000000000</AcctSvcrRef>
+				<BkTxCd>
+					<Domn>
+						<Cd>PMNT</Cd>
+						<Fmly>
+							<Cd>MCRD</Cd>
+							<SubFmlyCd>POSP</SubFmlyCd>
+						</Fmly>
+					</Domn>
+					<Prtry>
+						<!-- Text on account owners account statement -->
+						<Cd>DKSSL 1234 1234567ZZ1XXXXX09Y</Cd>
+						<Issr>DBA</Issr>
+					</Prtry>
+				</BkTxCd>
+				<NtryDtls>
+					<TxDtls>
+						<Refs>
+							<!-- Contains the EndToEndId from the SEPA transaction or if transaction is created via ISO 20022 XML pain001 Customer Credit Transfer in Danske Bank. In other cases the value is blank -->
+							<EndToEndId>NOTPROVIDED</EndToEndId>
+						</Refs>
+						<AmtDtls>
+							<TxAmt>
+								<Amt Ccy="DKK">1320.00</Amt>
+							</TxAmt>
+						</AmtDtls>
+						<RltdDts>
+							<AccptncDtTm>2023-04-20T01:01:01</AccptncDtTm>
+						</RltdDts>
+					</TxDtls>
+				</NtryDtls>
+			</Ntry>		
+			
+			<!-- Outgoing domestic FIK payment -->
+			<Ntry>
+				<NtryRef>6</NtryRef>
+				<Amt Ccy="DKK">2060.00</Amt>
+				<CdtDbtInd>DBIT</CdtDbtInd>
+				<Sts>BOOK</Sts>
+				<BookgDt>
+					<Dt>2023-05-09</Dt>
+				</BookgDt>
+				<ValDt>
+					<Dt>2023-05-09</Dt>
+				</ValDt>
+				<!-- Account servicing institutions reference for the entry -->
+				<AcctSvcrRef>2112345678</AcctSvcrRef>
+				<BkTxCd>
+					<Domn>
+						<Cd>PMNT</Cd>
+						<Fmly>
+							<Cd>ICDT</Cd>
+							<SubFmlyCd>DMCT</SubFmlyCd>
+						</Fmly>
+					</Domn>
+					<Prtry>
+						<!-- Text on account owners account statement -->
+						<Cd>TELESERVICE 1722334455</Cd>
+						<Issr>DBA</Issr>
+					</Prtry>
+				</BkTxCd>
+				<AddtlInfInd>
+					<!-- Danske Bank reference -->
+					<MsgNmId>UVDPMCV1BLZU1B</MsgNmId>
+				</AddtlInfInd>
+				<NtryDtls>
+					<TxDtls>
+						<Refs>
+							<!-- Contains the EndToEndId from the SEPA transaction or if transaction is created via ISO 20022 XML pain001 Customer Credit Transfer in Danske Bank. In other cases the value is blank -->
+							<EndToEndId>NOTPROVIDED</EndToEndId>
+						</Refs>
+						<AmtDtls>
+							<TxAmt>
+								<Amt Ccy="DKK">2060.00</Amt>
+							</TxAmt>
+						</AmtDtls>
+						<RltdPties>
+							<!-- Beneficiary FIK creditor number -->
+							<CdtrAcct>
+								<Id>
+									<Othr>
+										<Id>82123456</Id>
+									</Othr>
+								</Id>
+							</CdtrAcct>
+						</RltdPties>
+						<RltdDts>
+							<AccptncDtTm>2023-05-09T01:01:01</AccptncDtTm>
+						</RltdDts>
+					</TxDtls>
+				</NtryDtls>
+			</Ntry>
+		</Stmt>
+	</BkToCstmrStmt>
+</Document>
