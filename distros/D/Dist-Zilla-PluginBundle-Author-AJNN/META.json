@@ -4,7 +4,7 @@
       "Arne Johannessen <ajnn@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unrestricted"
    ],
@@ -71,23 +71,23 @@
    "provides" : {
       "Dist::Zilla::PluginBundle::Author::AJNN" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/AJNN.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Dist::Zilla::PluginBundle::Author::AJNN::Readme" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/AJNN/Readme.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Pod::Weaver::PluginBundle::Author::AJNN" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/AJNN.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Pod::Weaver::PluginBundle::Author::AJNN::Author" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/AJNN/Author.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Pod::Weaver::PluginBundle::Author::AJNN::License" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/AJNN/License.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -101,9 +101,9 @@
          "web" : "https://github.com/johannessen/dzil-pluginbundle"
       }
    },
-   "version" : "0.07",
-   "x_generated_by_perl" : "v5.39.9",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "version" : "0.08",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "CC0-1.0"
 }
 

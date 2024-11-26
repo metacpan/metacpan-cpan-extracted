@@ -11,7 +11,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.85
+Version 0.86
 
 # SYNOPSIS
 
@@ -121,7 +121,7 @@ There is a good chance that this will be domain\_name() prepended with either
 ## domain\_name
 
 Domain\_name is the name of the controlling domain for this website.
-Usually it will be similar to host\_name, but will lack the http:// prefix.
+Usually it will be similar to host\_name, but will lack the http:// or www prefixes.
 
 ## cgi\_host\_url
 
@@ -396,6 +396,10 @@ it will replace the "get\_cookie" method in the future.
 Sets or returns the status of the object,
 200 for OK,
 otherwise an HTTP error code
+
+## warnings
+
+Returns the warnings that the object has generated
 
 ## set\_logger
 

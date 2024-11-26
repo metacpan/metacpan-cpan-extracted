@@ -259,6 +259,7 @@ for my $opt_dep (sort keys %min_version) {
 
 WriteMakefile(
     'NAME'	=> 'PGPLOT',
+    MIN_PERL_VERSION => '5.010001',
     'CONFIGURE_REQUIRES' => { 'ExtUtils::F77' => 1.13, 'Devel::CheckLib' => '1.14' },
     'TEST_REQUIRES' => { 'Test::More' => '0.88' },
     PREREQ_PM => { @prereq },

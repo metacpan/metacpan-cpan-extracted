@@ -13,11 +13,11 @@ use MARC::Convert::Wikidata::Object::ISBN;
 use MARC::Convert::Wikidata::Object::Kramerius;
 use MARC::Convert::Wikidata::Object::People;
 use MARC::Convert::Wikidata::Object::Publisher;
-use MARC::Convert::Wikidata::Object::Series 0.04;
+use MARC::Convert::Wikidata::Object::Series 0.09;
 use MARC::Convert::Wikidata::Utils qw(clean_cover clean_date clean_edition_number
-	clean_number_of_pages clean_oclc clean_publication_date clean_publisher_name
-	clean_publisher_place clean_series_name clean_series_ordinal clean_subtitle
-	clean_title);
+	clean_issn clean_number_of_pages clean_oclc clean_publication_date
+	clean_publisher_name clean_publisher_place clean_series_name clean_series_ordinal
+	clean_subtitle clean_title);
 use Readonly;
 use Scalar::Util qw(blessed);
 use URI;
@@ -37,7 +37,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.20;
+our $VERSION = 0.21;
 
 # Constructor.
 sub new {
@@ -538,10 +538,15 @@ sub _series {
 		$series_name = clean_series_name($series_name);
 		my $series_ordinal = $series_490->subfield('v');
 		$series_ordinal = clean_series_ordinal($series_ordinal);
+		my $issn = $series_490->subfield('x');
+		$issn = clean_issn($issn);
 
 		# XXX Over all publishers.
 		foreach my $publisher ($self->_publishers) {
 			push @series, MARC::Convert::Wikidata::Object::Series->new(
+				defined $issn ? (
+					'issn' => $issn,
+				) : (),
 				'name' => $series_name,
 				defined $publisher ? (
 					'publisher' => $publisher,

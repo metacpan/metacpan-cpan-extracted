@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-AJNN
 
+0.08  2024-11-25
+
+ - Configure PkgVersion with use_package (except when targeting v5.10)
+ - Fix the time zone used for the git tag
+
 0.07  2024-04-15
 
  - Add git contributors to meta and pod

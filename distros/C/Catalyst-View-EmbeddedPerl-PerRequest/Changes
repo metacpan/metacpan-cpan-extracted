@@ -1,5 +1,13 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest
 
+0.001012  25 November 2024
+          - Set a default template if none is provided
+          - new helpers to make setting and getting script and
+            style blocks easier and more consistent.
+          - new helper 'each' to make display oriented loops easier
+          - A bunch of other small new helpers to make it easier to
+            add attributes to tags
+
 0.001011  27 October 2024
           - update dependencies to take advantage of downstream fixes
           - fixed issue with 'export=1' on attributes breaking when there

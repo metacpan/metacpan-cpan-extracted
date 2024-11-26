@@ -16,6 +16,7 @@ isa_ok($obj, 'MARC::Convert::Wikidata::Object::Series');
 
 # Test.
 $obj = MARC::Convert::Wikidata::Object::Series->new(
+	'issn' => '0585-5675',
 	'name' => 'book series',
 	'publisher' => MARC::Convert::Wikidata::Object::Publisher->new(
 		'name' => 'Publisher',

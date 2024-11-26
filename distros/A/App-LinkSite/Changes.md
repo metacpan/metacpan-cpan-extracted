@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.11] - 2024-11-25
+
+### Fixed
+
+- Fixed invalid JSON-LD
+
 ## [0.0.10] - 2024-11-12
 
 ### Fixed

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.46;
+package XS::Parse::Keyword 0.47;
 
 use v5.14;
 use warnings;
@@ -31,6 +31,8 @@ changes or at least a rebuild of any module that depends on it.
 =cut
 
 =head1 XS FUNCTIONS
+
+=for highlighter language=c
 
 =head2 boot_xs_parse_keyword
 
@@ -172,7 +174,7 @@ specification given by the I<pieces> or I<piece1> field. The result of that
 parsing step is placed into the I<args> or I<arg0> parameter to the invoked
 function, using a C<struct> type consisting of the following fields:
 
-   typedef struct
+   typedef struct {
       union {
          OP *op;
          CV *cv;
@@ -452,8 +454,12 @@ Each attribute is expected to be an identifier name, followed by an optional
 value wrapped in parentheses. Whitespace is B<NOT> permitted between the name
 and value, as per standard Perl parsing rules.
 
+=for highlighter language=perl
+
    :attrname
    :attrname(value)
+
+=for highlighter language=c
 
 The I<i> field indicates how many attributes were found. That number of
 additional arguments are then passed, each containing two SVs in the
@@ -525,10 +531,10 @@ operator.
 Various versions of the macro are provided, each using a different selection
 filter to choose certain available infix operators:
 
-   XPK_INFIX_RELATION         # any relational operator
-   XPK_INFIX_EQUALITY         # an equality operator like `==` or `eq`
-   XPK_INFIX_MATCH_NOSMART    # any sort of "match"-like operator, except smartmatch
-   XPK_INFIX_MATCH_SMART      # XPK_INFIX_MATCH_NOSMART plus smartmatch
+   XPK_INFIX_RELATION         // any relational operator
+   XPK_INFIX_EQUALITY         // an equality operator like `==` or `eq`
+   XPK_INFIX_MATCH_NOSMART    // any sort of "match"-like operator, except smartmatch
+   XPK_INFIX_MATCH_SMART      // XPK_INFIX_MATCH_NOSMART plus smartmatch
 
 =head2 XPK_LITERAL
 

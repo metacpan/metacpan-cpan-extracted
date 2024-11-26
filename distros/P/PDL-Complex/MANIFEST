@@ -1,0 +1,8 @@
+Changes
+complex.pd
+Makefile.PL
+MANIFEST			This list of files
+t/complex.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/Complex.pm                 mod=PDL::Complex pd=complex.pd (added by pdlpp_mkgen)

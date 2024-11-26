@@ -1,7 +1,8 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1000.021 : Allow completely-redundant alias definitions; Added btw* test cases.
 1000.020 : Fix bug with BOM+empty files.
-1000.019 : Fix leading-zero corruption bug which came back in 1000.018
+1000.019 : Fix leading-zero .csv corruption bug which came back in 1000.018
            Fix BOM-related test issues on Windows.
 1000.018 : Support reading csv files with a BOM
 1000.016 : Avoid warnings about !$foo ne $bar with perl v5.41.5

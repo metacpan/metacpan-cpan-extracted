@@ -4,35 +4,40 @@
       "Kazuhiro Osawa <yappo {@} shibuya {dot} pl>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "String-Diff",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "eg",
+         "examples",
          "inc",
          "share",
-         "eg",
-         "examples"
+         "t",
+         "xt"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
             "Module::Build::Tiny" : "0.034"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
-            "Test::Pod" : "1.41"
+            "Dist::Milla" : "v1.0.22",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0"
          }
       },
       "runtime" : {
@@ -43,6 +48,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Base" : "0",
             "Test::More" : "0.88",
             "YAML" : "0"
          }
@@ -51,20 +57,28 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/yappo/p5-String-Diff/issues"
+         "web" : "https://github.com/renormalist/p5-String-Diff/issues"
       },
-      "homepage" : "https://github.com/yappo/p5-String-Diff",
+      "homepage" : "https://github.com/renormalist/p5-String-Diff",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/yappo/p5-String-Diff.git",
-         "web" : "https://github.com/yappo/p5-String-Diff"
+         "url" : "https://github.com/renormalist/p5-String-Diff.git",
+         "web" : "https://github.com/renormalist/p5-String-Diff"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_contributors" : [
+      "Jose Luis Martinez <jlmartinez@capside.com>",
       "Kazuhiro Osawa <yappo@shibuya.pl>",
+      "Kenichi Ishigaki <ishigaki@cpan.org>",
       "Nikolay Martynov <mar.kolya@gmail.com>",
+      "Petr \u0160abata <contyk@redhat.com>",
+      "Steffen Schwigon <ss5@renormalist.net>",
       "yappo <yappo@d0d07461-0603-4401-acd4-de1884942a52>"
-   ]
+   ],
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_static_install" : 0
 }
 

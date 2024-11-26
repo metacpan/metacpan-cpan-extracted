@@ -2,7 +2,7 @@
 # MIT License
 
 class IO::Socket::SSL extends IO::Socket::IP {
-  version "0.002";
+  version "0.003";
   
   use IO::Socket::INET;
   use Net::SSLeay;
@@ -15,12 +15,19 @@ class IO::Socket::SSL extends IO::Socket::IP {
   use StringBuffer;
   use Mozilla::CA;
   use Go;
+  use Net::SSLeay::X509;
+  use Net::SSLeay::EVP;
+  use Fn;
+  
+  has ref_x509s_list : List of Net::SSLeay::X509;
   
   has ssl : Net::SSLeay;
   
   has SSL_version : string;
   
   has SSL_verify_mode : int;
+  
+  has SSL_verify_mode_specified : int;
   
   has SSL_hostname : string;
   
@@ -43,6 +50,10 @@ class IO::Socket::SSL extends IO::Socket::IP {
   has SSL_alpn_protocols : string[];
   
   has SSL_ticket_keycb : Net::SSLeay::Callback::TlsextTicketKey;
+  
+  has SSL_startHandshake : int;
+  
+  has SSL_honor_cipher_order : int;
   
   # Class Methods
   static method new : IO::Socket::SSL ($options : object[] = undef) {
@@ -74,6 +85,8 @@ class IO::Socket::SSL extends IO::Socket::IP {
         "SSL_npn_protocols",
         "SSL_alpn_protocols",
         "SSL_ticket_keycb",
+        "SSL_startHandshake",
+        "SSL_honor_cipher_order",
       ],
     );
     
@@ -81,6 +94,8 @@ class IO::Socket::SSL extends IO::Socket::IP {
   }
   
   protected method init : void ($options : object[] = undef) {
+    
+    $self->{ref_x509s_list} = List->new(new Net::SSLeay::X509[0]);
     
     my $options_h = Hash->new($options);
     
@@ -90,9 +105,15 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     $self->{SSL_version} = $SSL_version;
     
-    my $SSL_verify_mode = $options_h->get_or_default_int("SSL_verify_mode", SSL->SSL_VERIFY_PEER);
-    
-    $self->{SSL_verify_mode} = $SSL_verify_mode;
+    if ($options_h->exists("SSL_verify_mode")) {
+      $self->{SSL_verify_mode_specified} = 1;
+      
+      my $SSL_verify_mode = $options_h->get_int("SSL_verify_mode");
+      $self->{SSL_verify_mode} = $SSL_verify_mode;
+    }
+    else {
+      $self->{SSL_verify_mode} = SSL->SSL_VERIFY_NONE;
+    }
     
     my $SSL_hostname = $options_h->get_or_default_string("SSL_hostname", undef);
     
@@ -135,6 +156,12 @@ class IO::Socket::SSL extends IO::Socket::IP {
     my $SSL_ticket_keycb = (Net::SSLeay::Callback::TlsextTicketKey)$options_h->get_or_default("SSL_ticket_keycb", undef);
     $self->{SSL_ticket_keycb} = $SSL_ticket_keycb;
     
+    my $SSL_startHandshake = $options_h->get_or_default_int("SSL_startHandshake", 1);
+    $self->{SSL_startHandshake} = $SSL_startHandshake;
+    
+    my $SSL_honor_cipher_order = $options_h->get_or_default_int("SSL_honor_cipher_order", 0);
+    $self->{SSL_honor_cipher_order} = $SSL_honor_cipher_order;
+    
   }
   
   protected method configure : void () {
@@ -146,7 +173,12 @@ class IO::Socket::SSL extends IO::Socket::IP {
     # Client
     my $peer_address = $self->{PeerAddr};
     if ($peer_address) {
-      $self->connect_SSL;
+      
+      my $SSL_startHandshake = $self->{SSL_startHandshake};
+      
+      if ($SSL_startHandshake) {
+        $self->connect_SSL;
+      }
     }
   }
   
@@ -234,6 +266,11 @@ class IO::Socket::SSL extends IO::Socket::IP {
     }
     
     my $SSL_verify_mode = $self->{SSL_verify_mode};
+    unless ($self->{SSL_verify_mode_specified}) {
+      unless ($SSL_server) {
+        $self->{SSL_verify_mode} = SSL->SSL_VERIFY_PEER;
+      }
+    }
     
     $ssl_ctx->set_verify($SSL_verify_mode);
     
@@ -322,6 +359,11 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     $verify_param->set1_host($peer_addr);
     
+    my $SSL_honor_cipher_order = $self->{SSL_honor_cipher_order};
+    if ($SSL_honor_cipher_order) {
+      $ssl_options |= SSL->SSL_OP_CIPHER_SERVER_PREFERENCE;
+    }
+    
     $ssl_ctx->set_options($ssl_options);
     
     my $ssl = Net::SSLeay->new($ssl_ctx);
@@ -337,7 +379,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
     $self->{ssl} = $ssl;
   }
   
-  protected method connect_SSL : void () {
+  method connect_SSL : void () {
     
     my $ssl = $self->{ssl};
     
@@ -365,7 +407,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
     }
   }
   
-  private method accept_SSL : void () {
+  method accept_SSL : void () {
     
     my $ssl = $self->{ssl};
     
@@ -396,7 +438,11 @@ class IO::Socket::SSL extends IO::Socket::IP {
   method accept : IO::Socket::SSL ($peer_ref : Sys::Socket::Sockaddr[] = undef) {
     my $client = (IO::Socket::SSL)$self->SUPER::accept($peer_ref);
     
-    $self->accept_SSL;
+    my $SSL_startHandshake = $self->{SSL_startHandshake};
+    
+    if ($SSL_startHandshake) {
+      $self->accept_SSL;
+    }
     
     return $client;
   }
@@ -474,22 +520,224 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
   }
   
-  method stat : Sys::IO::Stat () { die "stat method is not allowed in IO::Scoekt::SSL."; }
+  method stat : Sys::IO::Stat () {
+    die "This method is not allowed in IO::Scoekt::SSL.";
+  }
   
   method send : int ($buffer : string, $flags : int = 0, $length : int = -1, $offset : int = 0) {
-    die "send method is not allowed in IO::Scoekt::SSL. Use write method instead.";
+    die "This method is not allowed in IO::Scoekt::SSL.";
   }
   
   method sendto : int ($buffer : string, $flags : int, $to : Sys::Socket::Sockaddr, $length : int = -1, $offset : int = 0) {
-    die "sendto method is not allowed in IO::Scoekt::SSL. Use write method instead.";
+    die "This method is not allowed in IO::Scoekt::SSL.";
   }
   
   method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0, $offset : int = 0) {
-    die "recv method is not allowed in IO::Scoekt::SSL. Use read method instead.";
+    die "This method is not allowed in IO::Scoekt::SSL.";
   }
   
   method recvfrom : int ($buffer : mutable string, $length : int, $flags : int, $from_ref : Sys::Socket::Sockaddr[], $offset : int = 0) {
-    die "recvfrom method is not allowed in IO::Scoekt::SSL. Use read method instead.";
+    die "This method is not allowed in IO::Scoekt::SSL.";
   }
+  
+  method dump_peer_certificate : string () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $dump = $ssl->P_dump_peer_certificate;
+    
+    return $dump;
+  }
+  
+  method next_proto_negotiated : string () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $protocol_ref = [(string)undef];
+    my $protocol_length = 0;
+    
+    $ssl->get0_next_proto_negotiated($protocol_ref, \$protocol_length);
+    
+    my $protocol = (mutable string)$protocol_ref->[0];
+    
+    Fn->shorten($protocol, $protocol_length);
+    
+    return $protocol;
+  }
+  
+  method alpn_selected : string () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $protocol_ref = [(string)undef];
+    my $protocol_length = 0;
+    
+    $ssl->get0_alpn_selected($protocol_ref, \$protocol_length);
+    
+    my $protocol = (mutable string)$protocol_ref->[0];
+    
+    Fn->shorten($protocol, $protocol_length);
+    
+    return $protocol;
+  }
+  
+  method get_session_reused : int () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $reused = $ssl->session_reused;
+    
+    return $reused;
+  }
+  
+  method get_sslversion : string () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $version = $self->get_sslversion_int;
+    
+    my $version_string = (string)undef;
+    if ($version == 0x0304) {
+      $version_string = "TLSv1_3";
+    }
+    elsif ($version == 0x0303) {
+      $version_string = "TLSv1_2";
+    }
+    elsif ($version == 0x0302) {
+      $version_string = "TLSv1_1";
+    }
+    elsif ($version == 0x0301) {
+      $version_string = "TLSv1";
+    }
+    elsif ($version == 0x0300) {
+      $version_string = "SSLv3";
+    }
+    elsif ($version == 0x0002) {
+      $version_string = "SSLv2";
+    }
+    elsif ($version == 0xfeff) {
+      $version_string = "DTLS1";
+    }
+    else {
+      die "The version number is unknown.";
+    }
+    
+    return $version_string;
+  }
+  
+  method get_sslversion_int : int () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $version = $ssl->version;
+    
+    return $version;
+  }
+  
+  method get_cipher : string ()  {
+    
+    my $ssl = $self->{ssl};
+    
+    my $cipher = $ssl->get_cipher;
+    
+    return $cipher;
+  }  
+  
+  method get_servername : string ()  {
+    
+    my $ssl = $self->{ssl};
+    
+    my $servername = $ssl->get_servername(0); # SSL->TLSEXT_NAMETYPE_host_name
+    
+    return $servername;
+  }  
+  
+  method peer_certificate : Net::SSLeay::X509 () {
+    
+    my $ssl = $self->{ssl};
+    
+    # TODO: use SSL_get1_peer_certificate
+    my $cert = $ssl->get_peer_certificate;
+    $self->{ref_x509s_list}->push($cert);
+    
+    return $cert;
+  }
+  
+  method peer_certificates : Net::SSLeay::X509[] () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $x509_peer = $self->peer_certificate;
+    
+    my $x509s = (Net::SSLeay::X509[])undef;
+    if ($x509_peer) {
+      my $x509s_original = $ssl->get_peer_cert_chain;
+      
+      if ($self->{SSL_server}) {
+        $x509s = (Net::SSLeay::X509[])Array->merge_object([$x509_peer], $x509s_original);
+      }
+      else {
+        $x509s = $x509s_original;
+      }
+    }
+    else {
+      $x509s = new Net::SSLeay::X509[0];
+    }
+    
+    return $x509s;
+  }
+  
+  method sock_certificate : Net::SSLeay::X509 () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $cert = $ssl->get_certificate;
+    
+    return $cert;
+  }
+  
+  method get_fingerprint_bin : string ($algo : string = undef, $cert : Net::SSLeay::X509 = undef, $key_only : int = 0) {
+    
+    unless ($cert) {
+      $cert = $self->peer_certificate;
+    }
+    
+    unless ($algo) {
+      $algo = "sha256";
+    }
+    
+    my $algo_evp = Net::SSLeay::EVP->get_digestbyname($algo);
+    
+    # TODO: use EVP_MAX_MD_SIZE
+    my $fingerprint_bin = (mutable string)new_string_len 64;
+    my $fingerprint_bin_length = 0;
+    if ($key_only) {
+      $fingerprint_bin = $cert->pubkey_digest($algo_evp, $fingerprint_bin, \$fingerprint_bin_length);
+    }
+    else {
+      $fingerprint_bin = $cert->digest($algo_evp, $fingerprint_bin, \$fingerprint_bin_length);
+    }
+    
+    Fn->shorten($fingerprint_bin, $fingerprint_bin_length);
+    
+    return $fingerprint_bin;
+  }
+  
+  method get_fingerprint : string ($algo : string = undef, $cert : Net::SSLeay::X509 = undef, $key_only : int = 0) {
+    
+    my $fingerprint_bin = $self->get_fingerprint_bin($algo, $cert, $key_only);
+    
+    my $fingerprint = "$algo$";
+    
+    if ($key_only) {
+      $fingerprint .= "pub$";
+    }
+    
+    my $fingerprint_ref = (string[])Fn->unpack("H*", $fingerprint);
+    
+    $fingerprint .= $fingerprint_ref->[0];
+    
+    return $fingerprint;
+  }
+  
 }
-

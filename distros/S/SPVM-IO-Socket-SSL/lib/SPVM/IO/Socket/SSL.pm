@@ -1,6 +1,6 @@
 package SPVM::IO::Socket::SSL;
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 
 1;
 
@@ -90,7 +90,15 @@ C<has SSL_alpn_protocols : string[];>
 =head2 SSL_ticket_keycb
 
 C<has SSL_ticket_keycb : L<Net::SSLeay::Callback::TlsextTicketKey|SPVM::Net::SSLeay::Callback::TlsextTicketKey>;>
-  
+
+=head2 SSL_startHandshake
+
+C<has SSL_startHandshake : int;>
+
+=head2 SSL_honor_cipher_order
+
+C<has SSL_honor_cipher_order : int;>
+
 =head1 Class Methods
 
 =head2 new
@@ -121,19 +129,23 @@ Options:
 
 =item * SSL_ciphersuites : string
 
-=item * SSL_check_crl : int
+=item * SSL_check_crl : Int
 
 =item * SSL_crl_file : string
 
 =item * SSL_passwd_cb : L<Net::SSLeay::Callback::PemPasswd|SPVM::Net::SSLeay::Callback::PemPasswd>
 
-=item * SSL_server : int
+=item * SSL_server : Int
 
 =item * SSL_npn_protocols : string[]
 
 =item * SSL_alpn_protocols : string[]
 
 =item * SSL_ticket_keycb : L<Net::SSLeay::Callback::TlsextTicketKey|SPVM::Net::SSLeay::Callback::TlsextTicketKey>
+
+=item * SSL_startHandshake : Int = 1
+
+=item * SSL_honor_cipher_order : Int = 0;
 
 =back
 
@@ -147,11 +159,11 @@ C<protected method configure_SSL : void ();>
 
 =head2 connect_SSL
 
-C<protected method connect_SSL : void ();>
+C<method connect_SSL : void ();>
 
 =head2 accept_SSL
 
-C<private method accept_SSL : void ();>
+C<method accept_SSL : void ();>
 
 =head2 accept
 
@@ -171,23 +183,159 @@ C<method close : void ();>
 
 =head2 stat
 
-C<method stat : Sys::IO::Stat ();> die "stat method is not allowed in IO::Scoekt::SSL."; }
+C<method stat : L<Sys::IO::Stat|SPVM::Sys::IO::Stat> ();
+
+This method is not allowed in IO::Scoekt::SSL.
+
+Exceptions:
+
+An exception is thrown.
 
 =head2 send
 
 C<method send : int ($buffer : string, $flags : int = 0, $length : int = -1, $offset : int = 0);>
 
+This method is not allowed in IO::Scoekt::SSL.
+
+Exceptions:
+
+An exception is thrown.
+
 =head2 sendto
 
 C<method sendto : int ($buffer : string, $flags : int, $to : Sys::Socket::Sockaddr, $length : int = -1, $offset : int = 0);>
+
+This method is not allowed in IO::Scoekt::SSL.
+
+Exceptions:
+
+An exception is thrown.
 
 =head2 recv
 
 C<method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0, $offset : int = 0);>
 
+This method is not allowed in IO::Scoekt::SSL.
+
+Exceptions:
+
+An exception is thrown.
+
 =head2 recvfrom
 
 C<method recvfrom : int ($buffer : mutable string, $length : int, $flags : int, $from_ref : Sys::Socket::Sockaddr[], $offset : int = 0);>
+
+This method is not allowed in IO::Scoekt::SSL.
+
+Exceptions:
+
+An exception is thrown.
+
+=head2 dump_peer_certificate
+
+C<method dump_peer_certificate : string ();>
+
+Calls L<Net::SSLeay#P_dump_peer_certificate|SPVM::Net::SSLeay/"P_dump_peer_certificate"> method given the value of L</"ssl"> field, and returns its return value.
+
+Exceptions:
+
+Exceptions thrown by L<Net::SSLeay#P_dump_peer_certificate|SPVM::Net::SSLeay/"P_dump_peer_certificate"> method could be thrown.
+
+=head2 next_proto_negotiated
+
+C<method next_proto_negotiated : string ();>
+
+Calls L<Net::SSLeay#get0_next_proto_negotiated|SPVM::Net::SSLeay/"get0_next_proto_negotiated"> method given appropriate arguments, converts the value of output argument to a string of appropriate length, and retunrs it.
+
+=head2 alpn_selected
+
+C<method alpn_selected : string ();>
+
+Calls L<Net::SSLeay#get0_alpn_selected|SPVM::Net::SSLeay/"get0_alpn_selected"> method given appropriate arguments, converts the value of output argument to a string of appropriate length, and retunrs it.
+
+=head2 get_session_reused
+
+C<method get_session_reused : int ();>
+
+Calls L<Net::SSLeay#session_reused|SPVM::Net::SSLeay/"session_reused"> method given the value of L</"ssl"> field, and returns its return value.
+
+Exceptions:
+
+Exceptions thrown by L<Net::SSLeay#session_reused|SPVM::Net::SSLeay/"session_reused"> method could be thrown.
+
+=head2 get_sslversion
+
+C<method get_sslversion : string ();>
+
+Returns the same output of Perl's L<IO::Socket::SSL|/"get_sslversion"> method.
+
+Exceptions:
+
+If the version number is unknown, an exception is thrown.
+
+=head2 get_sslversion_int
+
+C<method get_sslversion_int : int ();>
+
+Calls L<Net::SSLeay#version|SPVM::Net::SSLeay/"version"> method given the value of L</"ssl"> field, and returns its return value.
+
+=head2 get_cipher
+
+C<method get_cipher : string ();>
+
+Calls L<Net::SSLeay#get_cipher|SPVM::Net::SSLeay/"get_cipher"> method given the value of L</"ssl"> field, and returns its return value.
+
+Exceptions:
+
+Exceptions thrown by L<Net::SSLeay#get_cipher|SPVM::Net::SSLeay/"get_cipher"> method could be thrown.
+
+=head2 get_servername
+
+C<method get_servername : string ();>
+
+Calls L<Net::SSLeay#get_servername|SPVM::Net::SSLeay/"get_servername"> method given the value of L</"ssl"> field, the value of C<TLSEXT_NAMETYPE_host_name>, and returns its return value.
+
+Exceptions:
+
+Exceptions thrown by L<Net::SSLeay#get_servername|SPVM::Net::SSLeay/"get_servername"> method could be thrown.
+
+=head2 peer_certificate
+
+C<method peer_certificate : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> ();>
+
+Calls L<Net::SSLeay#get1_peer_certificate|SPVM::Net::SSLeay/"get1_peer_certificate"> method given the value of L</"ssl"> field, and returns its return value.
+
+Exceptions:
+
+Exceptions thrown by L<Net::SSLeay#get1_peer_certificate|SPVM::Net::SSLeay/"get1_peer_certificate"> method could be thrown.
+
+=head2 peer_certificates
+
+C<method peer_certificates : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>[];>
+
+Returns the same output of Perl's L<IO::Socket::SSL|/"peer_certificates"> method.
+
+=head2 sock_certificate
+
+C<method sock_certificate : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> ();>
+
+Calls L<Net::SSLeay#get_certificate|SPVM::Net::SSLeay/"get_certificate"> method given the value of L</"ssl"> field, and returns its return value.
+
+Exceptions:
+
+Exceptions thrown by L<Net::SSLeay#get_certificate|SPVM::Net::SSLeay/"get_certificate"> method could be thrown.
+
+=head2 get_fingerprint_bin
+
+C<method get_fingerprint_bin : string ($algo : string = undef, $cert : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> = undef, $key_only : int = 0);>
+
+Returns the same output of Perl's L<IO::Socket::SSL|/"get_fingerprint_bin"> method.
+
+=head2 get_fingerprint
+
+C<method get_fingerprint : string ($algo : string = undef, $cert : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> = undef, $key_only : int = 0);>
+
+Returns the same output of Perl's L<IO::Socket::SSL|/"get_fingerprint"> method.
 
 =head1 Repository
 

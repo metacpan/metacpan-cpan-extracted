@@ -1,4 +1,26 @@
-0.002 2024-111-23
+0.003 2024-11-25
+  [New Features]
+    * Add IO::Socket::SSL#dump_peer_certificate method.
+    * Add IO::Socket::SSL#next_proto_negotiated method.
+    * Add IO::Socket::SSL#alpn_selected method.
+    * Add IO::Socket::SSL#get_session_reused method.
+    * Add IO::Socket::SSL#get_sslversion method.
+    * Add IO::Socket::SSL#get_sslversion_int method.
+    * Add IO::Socket::SSL#get_cipher method.
+    * Add IO::Socket::SSL#get_servername method.
+    * Add SSL_startHandshake option to IO::Socket::SSL#init method.
+    * Add SSL_honor_cipher_order option to IO::Socket::SSL#init method.
+    * Add IO::Socket::SSL#peer_certificate method.
+    * Add IO::Socket::SSL#peer_certificates method.
+    * Add IO::Socket::SSL#sock_certificate method.
+    * Add IO::Socket::SSL#get_fingerprint_bin method.
+    * Add IO::Socket::SSL#get_fingerprint method.
+  [Changes]
+    * IO::Socket::SSL#connect_SSL becomes a public method.
+    * IO::Socket::SSL#accept_SSL becomes a public method.
+    * If a socket is for a server, SSL_verify_mode is set to SSL_VERIFY_NONE.
+    
+0.002 2024-11-23
   [New Features]
     * Add SSL_version option to IO::Socket::SSL#init method.
     * Add SSL_cipher_list option IO::Socket::SSL#init method.

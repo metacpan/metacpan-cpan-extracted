@@ -1,0 +1,18 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+eg/Makefile
+eg/cpanfile
+eg/rainmidi3000.pl
+eg/synopsis.pl
+lib/Algorithm/Gutter.pm
+lib/Algorithm/Gutter/Cell.pod
+t/00-load.t
+t/10-gutter.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

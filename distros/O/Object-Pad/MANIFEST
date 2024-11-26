@@ -26,6 +26,7 @@ lib/Object/mop-method.xsi
 lib/Object/Pad.pm
 lib/Object/Pad.xs
 lib/Object/Pad/ExtensionBuilder.pm
+lib/Object/Pad/Guide/MigratingFromClassicalPerl.pod
 lib/Object/Pad/MetaFunctions.pm
 lib/Object/Pad/MOP/Class.pm
 lib/Object/Pad/MOP/Field.pm

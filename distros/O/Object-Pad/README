@@ -51,33 +51,59 @@ DESCRIPTION
     This module provides a simple syntax for creating object classes, which
     uses private variables that look like lexicals as object member fields.
 
-    While most of this module has evolved into a stable state in practice,
-    parts remain experimental because the design is still evolving, and
-    many features and ideas have yet to implemented. I don't yet guarantee
-    I won't have to change existing details in order to continue its
-    development. Feel free to try it out in experimental or newly-developed
-    code, but don't complain if a later version is incompatible with your
-    current code and you'll have to change it.
+ Relation to use feature 'class'
 
-    That all said, please do get in contact if you find the module overall
-    useful. The more feedback you provide in terms of what features you are
-    using, what you find works, and what doesn't, will help the ongoing
-    development and hopefully eventual stability of the design. See the
-    "FEEDBACK" section.
+    Since its original creation, this module has evolved to become the
+    test-bed for refining the design of what a good class-based object
+    system would look like for Perl. While useful in its own right, it also
+    acts as a preview of what Perl's use feature 'class' syntax will likely
+    become. Being a CPAN module, this can be iterated much faster than core
+    Perl, which only gets one major release per year. Getting the design
+    right in this module first therefore helps to reduce the amount of
+    development time needed in core Perl.
+
+    Where features overlap, both this module and the class feature added to
+    recent Perl versions should largely agree on syntax and semantics. This
+    module will likely always be ahead of core Perl in terms of exact
+    abilties because it is acting as a test-bed for these new ideas.
+    However, where both implementations support the same idea, they should
+    in general use the same syntax and semantics to provide it.
+
+    If you are interested in using this object system in new code in a way
+    that will be forward-compatible with the feature added directly in
+    newer Perl versions, while also supporting versions of Perl before this
+    feature was added, you may wish to use instead the module
+    Feature::Compat::Class. That module enables the core Perl feature on
+    the latest version of Perl, or uses Object::Pad to fill in the missing
+    syntax and features on older Perl versions.
 
  Experimental Features
 
     Since version 0.63.
 
-    Some of the features of this module are currently marked as
-    experimental. They will provoke warnings in the experimental category,
-    unless silenced.
+    While most of this module has evolved into a stable state,
+    recently-added parts remain experimental because the design is still
+    evolving, and many features and ideas have yet to implemented. Of these
+    experimental features, feel free to try them out in newly-developed
+    code, but don't complain if a later version is incompatible with your
+    current code and you'll have to change it. Once individual features are
+    stable and no longer declared experimental, they should have the same
+    stability guarantees as any other long-term supported CPAN module, or
+    core Perl itself.
 
-    You can silence this with no warnings 'experimental' but then that will
-    silence every experimental warning, which may hide others
-    unintentionally. For a more fine-grained approach you can instead use
-    the import line for this module to only silence the module's warnings
-    selectively:
+    That all said, please do get in contact if you find the module overall
+    useful. The more feedback you provide in terms of what features you are
+    using, what you find works, and what doesn't, will help the ongoing
+    development and hopefully eventual stability of the design - both
+    within this CPAN module and as the wider experiment to provide it as a
+    core Perl feature. See the "FEEDBACK" section.
+
+    Features of this module that are currently marked as experimental
+    provoke warnings in the experimental category, unless silenced. You can
+    silence this with no warnings 'experimental' but then that will silence
+    every experimental warning, which may hide others unintentionally. For
+    a more fine-grained approach you can instead use the import line for
+    this module to only silence the module's warnings selectively:
 
        use Object::Pad ':experimental(mop)';
     

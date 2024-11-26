@@ -4,12 +4,10 @@ use v5.18;
 use warnings;
 
 use Test2::V0;
-BEGIN {
-   eval { require Devel::MAT; Devel::MAT->VERSION( '0.49' ) } or
-      plan skip_all => "No Devel::MAT version 0.49";
 
-   require Devel::MAT::Dumper;
-}
+# requires Devel::MAT >= 0.53 in case Devel::MAT::Dumper writes a file in
+# format version 0.6
+use Test2::Require::Module 'Devel::MAT' => '0.53';
 
 use Object::Pad 0.800;
 
@@ -19,6 +17,8 @@ class AClass
 }
 
 my $obj = AClass->new( afield => 123 );
+
+require Devel::MAT::Dumper;
 
 ( my $file = __FILE__ ) =~ s/\.t$/.pmat/;
 Devel::MAT::Dumper::dump( $file );

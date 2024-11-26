@@ -1,4 +1,4 @@
-Dist::Zilla::PluginBundle::Author::AJNN 0.07
+Dist::Zilla::PluginBundle::Author::AJNN 0.08
 
 This is the configuration I use for Dist::Zilla.
 
@@ -17,7 +17,7 @@ For example:
 If you already have downloaded the distribution, you can alternatively
 point your tool directly at the archive file or the directory:
 
-  cpanm Dist-Zilla-PluginBundle-Author-AJNN-0.07.tar.gz
+  cpanm Dist-Zilla-PluginBundle-Author-AJNN-0.08.tar.gz
 
 You can also install the module manually by following these steps:
 

@@ -1,0 +1,56 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Marc Lehmann <pcg@goof.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PDL-Complex",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.14",
+            "PDL::Core::Dev" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "2.095",
+            "perl" : "5.016"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PDLPorters/PDL-Complex/issues"
+      },
+      "homepage" : "http://pdl.perl.org/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/PDL-Complex.git",
+         "web" : "https://github.com/PDLPorters/PDL-Complex"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pdl"
+   },
+   "version" : "2.010",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

@@ -15,7 +15,7 @@ A class to model a link site (part of App::LinkSite).
 use Feature::Compat::Class;
 
 class App::LinkSite::Site {
-  our $VERSION = '0.0.10';
+  our $VERSION = '0.0.11';
   use strict;
   use warnings;
   no if $] >= 5.038, 'warnings', 'experimental::class';
@@ -43,10 +43,15 @@ Returns a JSON/LD fragment for this web site.
   method json_ld {
     my $json = {
       '@context' => 'https://schema.org',
-      '@type' => 'Person',
-      name => $self->name,
-      image => $self->image,
-      sameAs => [ map { $_->mk_social_link } $self->socials->@* ],
+      '@type' => 'WebPage',
+      name => "Links page for $name ($handle)",
+      mainEntity => {
+        '@context' => 'https://schema.org',
+        '@type' => 'Person',
+        name => $self->name,
+        image => $self->image,
+        sameAs => [ map { $_->mk_social_link } $self->socials->@* ],
+      },
       relatedLink => [ map { $_->link } $self->links->@* ],
     };
 

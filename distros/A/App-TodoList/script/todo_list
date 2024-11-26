@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib "lib";
+
+use Getopt::Long;
+use App::TodoList;
+
+my $todo = App::TodoList->new();
+
+sub show_help {
+    print <<"END_HELP";
+Usage: $0 [options]
+
+Options:
+  --add <task>              Add a new task
+  --list                    List all tasks
+  --complete <task_number>  Mark a task as completed
+  --delete <task_number>    Delete a task
+  --help                    Show this help message
+
+Examples:
+  $0 --add "Buy groceries"
+  $0 --list
+  $0 --complete 1
+  $0 --delete 2
+END_HELP
+    exit;
+}
+
+my ($add_task, $list_tasks, $complete_task, $delete_task, $help);
+
+GetOptions(
+    'add=s'      => \$add_task,
+    'list'       => \$list_tasks,
+    'complete=i' => \$complete_task,
+    'delete=i'   => \$delete_task,
+    'help'       => \$help,
+) or die "Invalid options passed. Use --help for usage information.\n";
+
+if ($help) {
+    show_help();
+} elsif ($add_task) {
+    $todo->add_task($add_task);
+    print "Task added: $add_task\n";
+} elsif ($list_tasks) {
+    my @tasks = $todo->list_tasks();
+    if (@tasks) {
+        my $index = 1;
+        for my $task (@tasks) {
+            my $status = $task->{completed} ? '[X]' : '[ ]';
+            print "$index. $status $task->{task}\n";
+            $index++;
+        }
+    } else {
+        print "No tasks found.\n";
+    }
+} elsif (defined $complete_task) {
+    if ($todo->complete_task($complete_task)) {
+        print "Task $complete_task marked as completed.\n";
+    } else {
+        print "Error: Invalid task number.\n";
+    }
+} elsif (defined $delete_task) {
+    if ($todo->delete_task($delete_task)) {
+        print "Task $delete_task deleted.\n";
+    } else {
+        print "Error: Invalid task number.\n";
+    }
+} else {
+    print "No valid options provided. Use --help for usage information.\n";
+    exit 1;
+}

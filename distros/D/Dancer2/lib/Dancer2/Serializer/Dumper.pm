@@ -1,7 +1,7 @@
 # ABSTRACT: Serializer for handling Dumper data
 
 package Dancer2::Serializer::Dumper;
-$Dancer2::Serializer::Dumper::VERSION = '1.1.1';
+$Dancer2::Serializer::Dumper::VERSION = '1.1.2';
 use Moo;
 use Carp 'croak';
 use Data::Dumper;
@@ -50,7 +50,7 @@ Dancer2::Serializer::Dumper - Serializer for handling Dumper data
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 DESCRIPTION
 

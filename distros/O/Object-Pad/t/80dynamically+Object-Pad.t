@@ -5,19 +5,11 @@ use warnings;
 
 use Test2::V0;
 
-BEGIN {
-   plan skip_all => "Syntax::Keyword::Dynamically is not available"
-      unless eval { require Syntax::Keyword::Dynamically };
-   plan skip_all => "Object::Pad >= 0.800 is not available"
-      unless eval { require Object::Pad;
-                    Object::Pad->VERSION( '0.800' ) };
+use Test2::Require::Module 'Object::Pad' => '0.800';
+use Test2::Require::Module 'Syntax::Keyword::Dynamically';
 
-   Syntax::Keyword::Dynamically->import;
-   Object::Pad->import;
-
-   diag( "Syntax::Keyword::Dynamically $Syntax::Keyword::Dynamically::VERSION, " .
-         "Object::Pad $Object::Pad::VERSION" );
-}
+use Object::Pad;
+use Syntax::Keyword::Dynamically;
 
 class Datum {
    field $value = 1;

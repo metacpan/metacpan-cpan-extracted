@@ -29,7 +29,7 @@ new: perl
 --- data1
 -
  - ['-', 'perl']
--
+- []
 --- data2
 old: perl
 new: 

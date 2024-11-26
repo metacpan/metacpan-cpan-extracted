@@ -1,5 +1,14 @@
 Revision history for Perl extension String::Diff
 
+0.08  2024-11-25 15:16:09 CET
+        - fixed two tests that had been broken with YAML >= 1.21 (GH#7) (Kenichi Ishigaki)
+        - Add Test::Base to cpanfile (GH#5) (Jose Luis Martinez)
+        - Add develop dependencies to cpanfile (Jose Luis Martinez)
+        - Fix failing POD test (Petr Šabata)
+        - Kudos to Jose Luis Martinez for collecting all the issues
+          from different sources into one concise branch ready for a
+          new CPAN release
+
 0.07  2015-08-23 17:58:40 JST
         - Correctly escape hunks in the end of the merged string pull-req #2 (mar-kolya ++)
         - Add copyright in a pod RT #48063 (frequency++)

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 189;
+use Test::Most tests => 192;
 use Test::NoWarnings;
 use File::Spec;
 use lib 't/lib';
@@ -498,11 +498,33 @@ EOF
 
 	ok($@ =~ /Reset is a class method/);
 
-	$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
-	$ENV{'REQUEST_METHOD'} = 'GET';
-	$ENV{'QUERY_STRING'} = 'country=/etc/passwd&page=by_location';
 	delete $ENV{'CONTENT_TYPE'};
 	delete $ENV{'CONTENT_LENGTH'};
+	$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
+	$ENV{'REQUEST_METHOD'} = 'GET';
+
+	# Test that a message about SQL injection is logged
+	{
+		local $ENV{'QUERY_STRING'} = 'nan=lost&redir=-8717%22%20OR%208224%3D6013--%20ETLn';
+		local $ENV{'REMOTE_ADDR'} = '127.0.0.1';
+		my $mess = 'mess is undefined';
+
+		{
+			package MockLogger;
+
+			sub new { bless { }, shift }
+			sub trace { }
+			sub warn { shift; $mess = join(' ' , @_) }
+		}
+
+		my $info = new_ok('CGI::Info');
+		my $params = $info->params(logger => MockLogger->new());
+		like($mess, qr/SQL injection attempt blocked/, 'Correct message when blocking SQL injection');
+
+		cmp_ok($info->status(), '==', 403, 'SQL injection causes HTTP code 403');
+	}
+
+	$ENV{'QUERY_STRING'} = 'country=/etc/passwd&page=by_location';
 	$i = new_ok('CGI::Info');
 
 	my $allow = {
@@ -511,7 +533,7 @@ EOF
 		'county' => qr/^[A-Z\s]+$/i,
 		'string' => undef,
 		'page' => 'by_location',
-		'lang' => qr/^[A-Z][A-Z]/i,
+		'lang' => qr/^[A-Z]{2}/i,
 	};
 
 	my %params = %{$i->params({ allow => $allow })};

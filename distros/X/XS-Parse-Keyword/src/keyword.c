@@ -886,7 +886,7 @@ static int parse(pTHX_ OP **op, struct Registration *reg)
   else if(reg->apiver < 2) {
     /* version 1 ->build1 used to take a struct directly, not a pointer thereto */
     int (*v1_build1)(pTHX_ OP **out, XSParseKeywordPiece_v1 arg0, void *hookdata) =
-      (int (*)())hooks->build1;
+      (int (*)(pTHX_ OP **, XSParseKeywordPiece_v1, void *))hooks->build1;
     XSParseKeywordPiece_v1 arg0_v1;
     Copy(args + 0, &arg0_v1, 1, XSParseKeywordPiece_v1);
     ret = (*v1_build1)(aTHX_ op, arg0_v1, reg->hookdata);

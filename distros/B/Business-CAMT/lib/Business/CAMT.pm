@@ -8,7 +8,7 @@
 # https://www.betaalvereniging.nl/wp-content/uploads/IG-Bank-to-Customer-Statement-CAMT-053-v1-1.pdf
 
 package Business::CAMT;{
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 }
 
 
@@ -23,6 +23,7 @@ use XML::LibXML         ();
 use XML::Compile::Cache ();
 use Scalar::Util        qw(blessed);
 use List::Util          qw(first);
+use XML::Compile::Util  qw(pack_type);
 
 use Business::CAMT::Message ();
 
@@ -30,11 +31,11 @@ my $urnbase = 'urn:iso:std:iso:20022:tech:xsd';
 my $moddir  = Path::Class::File->new(__FILE__)->dir;
 my $xsddir  = $moddir->subdir('CAMT', 'xsd');
 my $tagdir  = $moddir->subdir('CAMT', 'tags');
+sub _rootElement($) { pack_type $_[1], 'Document' }  # $ns parameter
 
 # The XSD filename is like camt.052.001.12.xsd.  camt.052.001.* is expected
 # to be incompatible tiwh camt.052.002.*, but *.12.xsd can parse *.11.xsd
 my (%xsd_files, $tagtable);
-our $schemas;  # public for template generator
 
 
 sub new {
@@ -53,12 +54,14 @@ sub init($) {
 	$self->{BC_rule} = delete $args->{match_schema}  || 'NEWER';
 	$self->{BC_big}  = delete $args->{big_numbers}   || 0;
 	$self->{BC_long} = delete $args->{long_tagnames} || 0;
+	$self->{RC_schemas} = XML::Compile::Cache->new;
 
-	$schemas = XML::Compile::Cache->new;
     $self;
 }
 
 #-------------------------
+
+sub schemas() { $_[0]->{RC_schemas} }
 
 #-------------------------
 
@@ -85,25 +88,89 @@ sub read($%)
 	}
 
 	my $reader = $self->schemaReader($set, $xsd_version, $ns);
-	my $data   = $reader->($xml);
 
-	$data ? Business::CAMT::Message->fromData($set, $data) : undef;
+	Business::CAMT::Message->fromData(
+		set     => $set,
+		version => $xsd_version,
+		data    => $reader->($xml),
+		camt    => $self,
+	);
 }
 
+
+sub create($$$)
+{	my ($self, $set, $version, $data) = @_;
+	Business::CAMT::Message->create(
+		set     => $set,
+		version => $version,
+		data    => $data,
+		camt    => $self,
+	);
+}
+
+
+sub write($$%)
+{	my ($self, $fn, $msg, %args) = @_;
+
+	my $set      = $msg->set;
+	my $versions = $xsd_files{$set}
+		or error __x"Message set '{set}' is unsupported.", set => $set;
+
+	my @versions = sort { $a <=> $b } keys %$versions;
+	my $version  = $msg->version;
+	grep $version eq $_, @versions
+		or error __x"Schema version {version} is not available, pick from {versions}.",
+			version => $version, versions => \@versions;
+
+	my $ns     = "$urnbase:camt.$set.$version";
+	my $writer = $self->schemaWriter($set, $version, $ns);
+
+	my $doc    = XML::LibXML::Document->new('1.0', 'UTF-8');
+	my $xml    = $writer->($doc, $msg);
+	$doc->setDocumentElement($xml);
+	$doc->toFile($fn, 1);
+	$xml;
+}
+
+#-------------------------
+
+sub _loadXsd($$)
+{	my ($self, $set, $version) = @_;
+	my $file = $xsd_files{$set}{$version};
+	$self->{BC_loaded}{$file}++ or $self->schemas->importDefinitions($file);
+}
 
 my %msg_readers;
 sub schemaReader($$$)
 {	my ($self, $set, $version, $ns) = @_;
-	return $msg_readers{$ns} if $msg_readers{$ns};
+	my $r = $self->{BC_r} ||= {};
+	return $r->{$ns} if $r->{$ns};
 
-	$schemas->importDefinitions($xsd_files{$set}{$version});
+	$self->_loadXsd($set, $version);
 
-	$msg_readers{$ns} = $schemas->compile(
-		READER        => "{$ns}Document",
+	$r->{$ns} = $self->schemas->compile(
+		READER        => $self->_rootElement($ns),
 		sloppy_floats => !$self->{BC_big},
 		key_rewrite   => $self->{BC_long} ? $self->tag2fullnameTable : undef,
 	);
 }
+
+
+sub schemaWriter($$$)
+{	my ($self, $set, $version, $ns) = @_;
+	my $w = $self->{BC_w} ||= {};
+	return $w->{$ns} if $w->{$ns};
+
+	$self->_loadXsd($set, $version);
+	$w->{$ns} = $self->schemas->compile(
+		WRITER        => $self->_rootElement($ns),
+		sloppy_floats => !$self->{BC_big},
+		key_rewrite   => $self->{BC_long} ? $self->tag2fullnameTable : undef,
+		ignore_unused_tags => qr/^_attrs$/,
+		prefixes      => { $ns => '' },
+	);
+}
+
 
 
 # called with ($set, $version, \@available_versions)

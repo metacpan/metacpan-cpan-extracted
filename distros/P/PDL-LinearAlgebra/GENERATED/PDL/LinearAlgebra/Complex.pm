@@ -1,9 +1,9 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from complex.pd! Don't modify!
 #
 package PDL::LinearAlgebra::Complex;
 
-our @EXPORT_OK = qw(__Ccgtsv __Ncgtsv cgtsv __Ccgesvd __Ncgesvd cgesvd __Ccgesdd __Ncgesdd cgesdd __Ccggsvd __Ncggsvd cggsvd __Ccgeev __Ncgeev cgeev __Ccgeevx __Ncgeevx cgeevx __Ccggev __Ncggev cggev __Ccggevx __Ncggevx cggevx __Ccgees __Ncgees cgees __Ccgeesx __Ncgeesx cgeesx __Ccgges __Ncgges cgges __Ccggesx __Ncggesx cggesx __Ccheev __Ncheev cheev __Ccheevd __Ncheevd cheevd __Ccheevx __Ncheevx cheevx __Ccheevr __Ncheevr cheevr __Cchegv __Nchegv chegv __Cchegvd __Nchegvd chegvd __Cchegvx __Nchegvx chegvx __Ccgesv __Ncgesv cgesv __Ccgesvx __Ncgesvx cgesvx __Ccsysv __Ncsysv csysv __Ccsysvx __Ncsysvx csysvx __Cchesv __Nchesv chesv __Cchesvx __Nchesvx chesvx __Ccposv __Ncposv cposv __Ccposvx __Ncposvx cposvx __Ccgels __Ncgels cgels __Ccgelsy __Ncgelsy cgelsy __Ccgelss __Ncgelss cgelss __Ccgelsd __Ncgelsd cgelsd __Ccgglse __Ncgglse cgglse __Ccggglm __Ncggglm cggglm __Ccgetrf __Ncgetrf cgetrf __Ccgetf2 __Ncgetf2 cgetf2 __Ccsytrf __Ncsytrf csytrf __Ccsytf2 __Ncsytf2 csytf2 __Ccchetrf __Ncchetrf cchetrf __Cchetf2 __Nchetf2 chetf2 __Ccpotrf __Ncpotrf cpotrf __Ccpotf2 __Ncpotf2 cpotf2 __Ccgetri __Ncgetri cgetri __Ccsytri __Ncsytri csytri __Cchetri __Nchetri chetri __Ccpotri __Ncpotri cpotri __Cctrtri __Nctrtri ctrtri __Cctrti2 __Nctrti2 ctrti2 __Ccgetrs __Ncgetrs cgetrs __Ccsytrs __Ncsytrs csytrs __Cchetrs __Nchetrs chetrs __Ccpotrs __Ncpotrs cpotrs __Cctrtrs __Nctrtrs ctrtrs __Cclatrs __Nclatrs clatrs __Ccgecon __Ncgecon cgecon __Ccsycon __Ncsycon csycon __Cchecon __Nchecon checon __Ccpocon __Ncpocon cpocon __Cctrcon __Nctrcon ctrcon __Ccgeqp3 __Ncgeqp3 cgeqp3 __Ccgeqrf __Ncgeqrf cgeqrf __Ccungqr __Ncungqr cungqr __Ccunmqr __Ncunmqr cunmqr __Ccgelqf __Ncgelqf cgelqf __Ccunglq __Ncunglq cunglq __Ccunmlq __Ncunmlq cunmlq __Ccgeqlf __Ncgeqlf cgeqlf __Ccungql __Ncungql cungql __Ccunmql __Ncunmql cunmql __Ccgerqf __Ncgerqf cgerqf __Ccungrq __Ncungrq cungrq __Ccunmrq __Ncunmrq cunmrq __Cctzrzf __Nctzrzf ctzrzf __Ccunmrz __Ncunmrz cunmrz __Ccgehrd __Ncgehrd cgehrd __Ccunghr __Ncunghr cunghr __Cchseqr __Nchseqr chseqr __Cctrevc __Nctrevc ctrevc __Cctgevc __Nctgevc ctgevc __Ccgebal __Ncgebal cgebal __Cclange __Nclange clange __Cclansy __Nclansy clansy __Cclantr __Nclantr clantr __Ccgemm __Ncgemm cgemm __Ccmmult __Ncmmult cmmult __Cccrossprod __Nccrossprod ccrossprod __Ccsyrk __Ncsyrk csyrk __Ccdot __Ncdot cdot __Ccdotc __Ncdotc cdotc __Ccaxpy __Ncaxpy caxpy __Ccnrm2 __Ncnrm2 cnrm2 __Ccasum __Ncasum casum __Ccscal __Ncscal cscal __Ccsscal __Ncsscal csscal __Ccrotg __Ncrotg crotg __Cclacpy __Nclacpy clacpy __Cclaswp __Nclaswp claswp __Cccharpol __Nccharpol ccharpol );
+our @EXPORT_OK = qw(__Ncgtsv cgtsv __Ncgesvd cgesvd __Ncgesdd cgesdd __Ncggsvd cggsvd __Ncgeev cgeev __Ncgeevx cgeevx __Ncggev cggev __Ncggevx cggevx __Ncgees cgees __Ncgeesx cgeesx __Ncgges cgges __Ncggesx cggesx __Ncheev cheev __Ncheevd cheevd __Ncheevx cheevx __Ncheevr cheevr __Nchegv chegv __Nchegvd chegvd __Nchegvx chegvx __Ncgesv cgesv __Ncgesvx cgesvx __Ncsysv csysv __Ncsysvx csysvx __Nchesv chesv __Nchesvx chesvx __Ncposv cposv __Ncposvx cposvx __Ncgels cgels __Ncgelsy cgelsy __Ncgelss cgelss __Ncgelsd cgelsd __Ncgglse cgglse __Ncggglm cggglm __Ncgetrf cgetrf __Ncgetf2 cgetf2 __Ncsytrf csytrf __Ncsytf2 csytf2 __Ncchetrf cchetrf __Nchetf2 chetf2 __Ncpotrf cpotrf __Ncpotf2 cpotf2 __Ncgetri cgetri __Ncsytri csytri __Nchetri chetri __Ncpotri cpotri __Nctrtri ctrtri __Nctrti2 ctrti2 __Ncgetrs cgetrs __Ncsytrs csytrs __Nchetrs chetrs __Ncpotrs cpotrs __Nctrtrs ctrtrs __Nclatrs clatrs __Ncgecon cgecon __Ncsycon csycon __Nchecon checon __Ncpocon cpocon __Nctrcon ctrcon __Ncgeqp3 cgeqp3 __Ncgeqrf cgeqrf __Ncungqr cungqr __Ncunmqr cunmqr __Ncgelqf cgelqf __Ncunglq cunglq __Ncunmlq cunmlq __Ncgeqlf cgeqlf __Ncungql cungql __Ncunmql cunmql __Ncgerqf cgerqf __Ncungrq cungrq __Ncunmrq cunmrq __Nctzrzf ctzrzf __Ncunmrz cunmrz __Ncgehrd cgehrd __Ncunghr cunghr __Nchseqr chseqr __Nctrevc ctrevc __Nctgevc ctgevc __Ncgebal cgebal __Nclange clange __Nclansy clansy __Nclantr clantr __Ncgemm cgemm __Ncmmult cmmult __Nccrossprod ccrossprod __Ncsyrk csyrk __Ncdot cdot __Ncdotc cdotc __Ncaxpy caxpy __Ncnrm2 cnrm2 __Ncasum casum __Ncscal cscal __Ncsscal csscal __Ncrotg crotg __Nclacpy clacpy __Nclaswp claswp __Nccharpol ccharpol );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -26,22 +26,6 @@ use DynaLoader;
 
 use strict;
 use PDL::LinearAlgebra::Real;
-
-{ 
-  package # hide from CPAN
-    PDL::Complex;
-	my $warningFlag;
-	BEGIN{
-		$warningFlag = $^W;
-		$^W = 0;
-	}
-	use overload (
-		'x'     =>  sub {UNIVERSAL::isa($_[1],'PDL::Complex') ? PDL::cmmult($_[0], $_[1]) :
-						PDL::cmmult($_[0], PDL::Complex::r2C($_[1]));
-				},
-	);
-	BEGIN{ $^W = $warningFlag ; }
-}
 
 =encoding utf8
 
@@ -67,12 +51,7 @@ This module provides an interface to parts of the lapack library (complex number
 These routines accept either float or double ndarrays.
 
 =cut
-#line 71 "Complex.pm"
-
-*__Ccgtsv = \&PDL::__Ccgtsv;
-
-
-
+#line 55 "Complex.pm"
 
 *__Ncgtsv = \&PDL::__Ncgtsv;
 
@@ -80,7 +59,7 @@ These routines accept either float or double ndarrays.
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgtsv
 
@@ -143,19 +122,10 @@ its second element.
 =cut
 
 sub PDL::cgtsv {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgtsv if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgtsv;
 }
 *cgtsv = \&PDL::cgtsv;
-#line 154 "Complex.pm"
-
-*__Ccgesvd = \&PDL::__Ccgesvd;
-
-
-
+#line 129 "Complex.pm"
 
 *__Ncgesvd = \&PDL::__Ncgesvd;
 
@@ -163,7 +133,7 @@ sub PDL::cgtsv {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgesvd
 
@@ -182,19 +152,10 @@ The SVD is written
 =cut
 
 sub PDL::cgesvd {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgesvd if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgesvd;
 }
 *cgesvd = \&PDL::cgesvd;
-#line 193 "Complex.pm"
-
-*__Ccgesdd = \&PDL::__Ccgesdd;
-
-
-
+#line 159 "Complex.pm"
 
 *__Ncgesdd = \&PDL::__Ncgesdd;
 
@@ -202,7 +163,7 @@ sub PDL::cgesvd {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgesdd
 
@@ -221,19 +182,10 @@ The SVD is written
 =cut
 
 sub PDL::cgesdd {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgesdd if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgesdd;
 }
 *cgesdd = \&PDL::cgesdd;
-#line 232 "Complex.pm"
-
-*__Ccggsvd = \&PDL::__Ccggsvd;
-
-
-
+#line 189 "Complex.pm"
 
 *__Ncggsvd = \&PDL::__Ncggsvd;
 
@@ -241,7 +193,7 @@ sub PDL::cgesdd {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cggsvd
 
@@ -256,19 +208,10 @@ Complex version of L<PDL::LinearAlgebra::Real/ggsvd>
 =cut
 
 sub PDL::cggsvd {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccggsvd if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncggsvd;
 }
 *cggsvd = \&PDL::cggsvd;
-#line 267 "Complex.pm"
-
-*__Ccgeev = \&PDL::__Ccgeev;
-
-
-
+#line 215 "Complex.pm"
 
 *__Ncgeev = \&PDL::__Ncgeev;
 
@@ -276,7 +219,7 @@ sub PDL::cggsvd {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgeev
 
@@ -291,19 +234,10 @@ Complex version of L<PDL::LinearAlgebra::Real/geev>
 =cut
 
 sub PDL::cgeev {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgeev if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgeev;
 }
 *cgeev = \&PDL::cgeev;
-#line 302 "Complex.pm"
-
-*__Ccgeevx = \&PDL::__Ccgeevx;
-
-
-
+#line 241 "Complex.pm"
 
 *__Ncgeevx = \&PDL::__Ncgeevx;
 
@@ -311,7 +245,7 @@ sub PDL::cgeev {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgeevx
 
@@ -326,19 +260,10 @@ Complex version of L<PDL::LinearAlgebra::Real/geevx>
 =cut
 
 sub PDL::cgeevx {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgeevx if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgeevx;
 }
 *cgeevx = \&PDL::cgeevx;
-#line 337 "Complex.pm"
-
-*__Ccggev = \&PDL::__Ccggev;
-
-
-
+#line 267 "Complex.pm"
 
 *__Ncggev = \&PDL::__Ncggev;
 
@@ -346,7 +271,7 @@ sub PDL::cgeevx {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cggev
 
@@ -361,19 +286,10 @@ Complex version of L<PDL::LinearAlgebra::Real/ggev>
 =cut
 
 sub PDL::cggev {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccggev if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncggev;
 }
 *cggev = \&PDL::cggev;
-#line 372 "Complex.pm"
-
-*__Ccggevx = \&PDL::__Ccggevx;
-
-
-
+#line 293 "Complex.pm"
 
 *__Ncggevx = \&PDL::__Ncggevx;
 
@@ -381,7 +297,7 @@ sub PDL::cggev {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cggevx
 
@@ -396,19 +312,10 @@ Complex version of L<PDL::LinearAlgebra::Real/ggevx>
 =cut
 
 sub PDL::cggevx {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccggevx if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncggevx;
 }
 *cggevx = \&PDL::cggevx;
-#line 407 "Complex.pm"
-
-*__Ccgees = \&PDL::__Ccgees;
-
-
-
+#line 319 "Complex.pm"
 
 *__Ncgees = \&PDL::__Ncgees;
 
@@ -416,7 +323,7 @@ sub PDL::cggevx {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgees
 
@@ -433,30 +340,20 @@ Complex version of L<PDL::LinearAlgebra::Real/gees>
             to the top left of the Schur form.
             If sort = 0, select_func is not referenced.
             An complex eigenvalue w is selected if
-            select_func(PDL::Complex(w)) is true;
+            select_func(complex(w)) is true;
             Note that a selected complex eigenvalue may no longer
-            satisfy select_func(PDL::Complex(w)) = 1 after ordering, since
+            satisfy select_func(complex(w)) = 1 after ordering, since
             ordering may change the value of complex eigenvalues
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+2.
-	
 
 =cut
 
 sub PDL::cgees {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgees if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgees;
 }
 *cgees = \&PDL::cgees;
-#line 455 "Complex.pm"
-
-*__Ccgeesx = \&PDL::__Ccgeesx;
-
-
-
+#line 357 "Complex.pm"
 
 *__Ncgeesx = \&PDL::__Ncgeesx;
 
@@ -464,7 +361,7 @@ sub PDL::cgees {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgeesx
 
@@ -481,9 +378,9 @@ Complex version of L<PDL::LinearAlgebra::Real/geesx>
             to the top left of the Schur form.
             If sort = 0, select_func is not referenced.
             An complex eigenvalue w is selected if
-            select_func(PDL::Complex(w)) is true; 
+            select_func(complex(w)) is true;
             Note that a selected complex eigenvalue may no longer
-            satisfy select_func(PDL::Complex(w)) = 1 after ordering, since
+            satisfy select_func(complex(w)) = 1 after ordering, since
             ordering may change the value of complex eigenvalues
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+2.
@@ -491,19 +388,10 @@ Complex version of L<PDL::LinearAlgebra::Real/geesx>
 =cut
 
 sub PDL::cgeesx {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgeesx if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgeesx;
 }
 *cgeesx = \&PDL::cgeesx;
-#line 502 "Complex.pm"
-
-*__Ccgges = \&PDL::__Ccgges;
-
-
-
+#line 395 "Complex.pm"
 
 *__Ncgges = \&PDL::__Ncgges;
 
@@ -511,7 +399,7 @@ sub PDL::cgeesx {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgges
 
@@ -528,9 +416,9 @@ Complex version of L<PDL::LinearAlgebra::Real/ggees>
             to the top left of the Schur form.
             If sort = 0, select_func is not referenced.
             An eigenvalue w = w/beta is selected if
-            select_func(PDL::Complex(w), PDL::Complex(beta)) is true; 
+            select_func(complex(w), complex(beta)) is true;
             Note that a selected complex eigenvalue may no longer
-            satisfy select_func(PDL::Complex(w),PDL::Complex(beta)) = 1 after ordering, since
+            satisfy select_func(complex(w),complex(beta)) = 1 after ordering, since
             ordering may change the value of complex eigenvalues
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+2.
@@ -538,19 +426,10 @@ Complex version of L<PDL::LinearAlgebra::Real/ggees>
 =cut
 
 sub PDL::cgges {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgges if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgges;
 }
 *cgges = \&PDL::cgges;
-#line 549 "Complex.pm"
-
-*__Ccggesx = \&PDL::__Ccggesx;
-
-
-
+#line 433 "Complex.pm"
 
 *__Ncggesx = \&PDL::__Ncggesx;
 
@@ -558,7 +437,7 @@ sub PDL::cgges {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cggesx
 
@@ -575,9 +454,9 @@ Complex version of L<PDL::LinearAlgebra::Real/ggeesx>
             to the top left of the Schur form.
             If sort = 0, select_func is not referenced.
             An eigenvalue w = w/beta is selected if
-            select_func(PDL::Complex(w), PDL::Complex(beta)) is true; 
+            select_func(complex(w), complex(beta)) is true;
             Note that a selected complex eigenvalue may no longer
-            satisfy select_func(PDL::Complex(w),PDL::Complex(beta)) = 1 after ordering, since
+            satisfy select_func(complex(w),complex(beta)) = 1 after ordering, since
             ordering may change the value of complex eigenvalues
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+3.
@@ -585,19 +464,10 @@ Complex version of L<PDL::LinearAlgebra::Real/ggeesx>
 =cut
 
 sub PDL::cggesx {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccggesx if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncggesx;
 }
 *cggesx = \&PDL::cggesx;
-#line 596 "Complex.pm"
-
-*__Ccheev = \&PDL::__Ccheev;
-
-
-
+#line 471 "Complex.pm"
 
 *__Ncheev = \&PDL::__Ncheev;
 
@@ -605,7 +475,7 @@ sub PDL::cggesx {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cheev
 
@@ -620,19 +490,10 @@ Complex version of L<PDL::LinearAlgebra::Real/syev> for Hermitian matrix
 =cut
 
 sub PDL::cheev {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccheev if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncheev;
 }
 *cheev = \&PDL::cheev;
-#line 631 "Complex.pm"
-
-*__Ccheevd = \&PDL::__Ccheevd;
-
-
-
+#line 497 "Complex.pm"
 
 *__Ncheevd = \&PDL::__Ncheevd;
 
@@ -640,7 +501,7 @@ sub PDL::cheev {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cheevd
 
@@ -655,19 +516,10 @@ Complex version of L<PDL::LinearAlgebra::Real/syevd> for Hermitian matrix
 =cut
 
 sub PDL::cheevd {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccheevd if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncheevd;
 }
 *cheevd = \&PDL::cheevd;
-#line 666 "Complex.pm"
-
-*__Ccheevx = \&PDL::__Ccheevx;
-
-
-
+#line 523 "Complex.pm"
 
 *__Ncheevx = \&PDL::__Ncheevx;
 
@@ -675,7 +527,7 @@ sub PDL::cheevd {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cheevx
 
@@ -690,19 +542,10 @@ Complex version of L<PDL::LinearAlgebra::Real/syevx> for Hermitian matrix
 =cut
 
 sub PDL::cheevx {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccheevx if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncheevx;
 }
 *cheevx = \&PDL::cheevx;
-#line 701 "Complex.pm"
-
-*__Ccheevr = \&PDL::__Ccheevr;
-
-
-
+#line 549 "Complex.pm"
 
 *__Ncheevr = \&PDL::__Ncheevr;
 
@@ -710,7 +553,7 @@ sub PDL::cheevx {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cheevr
 
@@ -725,19 +568,10 @@ Complex version of L<PDL::LinearAlgebra::Real/syevr> for Hermitian matrix
 =cut
 
 sub PDL::cheevr {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccheevr if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncheevr;
 }
 *cheevr = \&PDL::cheevr;
-#line 736 "Complex.pm"
-
-*__Cchegv = \&PDL::__Cchegv;
-
-
-
+#line 575 "Complex.pm"
 
 *__Nchegv = \&PDL::__Nchegv;
 
@@ -745,7 +579,7 @@ sub PDL::cheevr {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 chegv
 
@@ -760,19 +594,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sygv> for Hermitian matrix
 =cut
 
 sub PDL::chegv {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cchegv if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nchegv;
 }
 *chegv = \&PDL::chegv;
-#line 771 "Complex.pm"
-
-*__Cchegvd = \&PDL::__Cchegvd;
-
-
-
+#line 601 "Complex.pm"
 
 *__Nchegvd = \&PDL::__Nchegvd;
 
@@ -780,7 +605,7 @@ sub PDL::chegv {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 chegvd
 
@@ -795,19 +620,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sygvd> for Hermitian matrix
 =cut
 
 sub PDL::chegvd {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cchegvd if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nchegvd;
 }
 *chegvd = \&PDL::chegvd;
-#line 806 "Complex.pm"
-
-*__Cchegvx = \&PDL::__Cchegvx;
-
-
-
+#line 627 "Complex.pm"
 
 *__Nchegvx = \&PDL::__Nchegvx;
 
@@ -815,7 +631,7 @@ sub PDL::chegvd {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 chegvx
 
@@ -834,19 +650,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sygvx> for Hermitian matrix
 =cut
 
 sub PDL::chegvx {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cchegvx if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nchegvx;
 }
 *chegvx = \&PDL::chegvx;
-#line 845 "Complex.pm"
-
-*__Ccgesv = \&PDL::__Ccgesv;
-
-
-
+#line 657 "Complex.pm"
 
 *__Ncgesv = \&PDL::__Ncgesv;
 
@@ -854,7 +661,7 @@ sub PDL::chegvx {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgesv
 
@@ -869,19 +676,10 @@ Complex version of L<PDL::LinearAlgebra::Real/gesv>
 =cut
 
 sub PDL::cgesv {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgesv if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgesv;
 }
 *cgesv = \&PDL::cgesv;
-#line 880 "Complex.pm"
-
-*__Ccgesvx = \&PDL::__Ccgesvx;
-
-
-
+#line 683 "Complex.pm"
 
 *__Ncgesvx = \&PDL::__Ncgesvx;
 
@@ -889,7 +687,7 @@ sub PDL::cgesv {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgesvx
 
@@ -902,26 +700,17 @@ sub PDL::cgesv {
 Complex version of L<PDL::LinearAlgebra::Real/gesvx>.
 
     trans:  Specifies the form of the system of equations:
-            = 0:  A * X = B     (No transpose)   
+            = 0:  A * X = B     (No transpose)
             = 1:  A' * X = B  (Transpose)
-            = 2:  A**H * X = B  (Conjugate transpose)  
+            = 2:  A**H * X = B  (Conjugate transpose)
 
 =cut
 
 sub PDL::cgesvx {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgesvx if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgesvx;
 }
 *cgesvx = \&PDL::cgesvx;
-#line 920 "Complex.pm"
-
-*__Ccsysv = \&PDL::__Ccsysv;
-
-
-
+#line 714 "Complex.pm"
 
 *__Ncsysv = \&PDL::__Ncsysv;
 
@@ -929,7 +718,7 @@ sub PDL::cgesvx {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 csysv
 
@@ -944,19 +733,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sysv>
 =cut
 
 sub PDL::csysv {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccsysv if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncsysv;
 }
 *csysv = \&PDL::csysv;
-#line 955 "Complex.pm"
-
-*__Ccsysvx = \&PDL::__Ccsysvx;
-
-
-
+#line 740 "Complex.pm"
 
 *__Ncsysvx = \&PDL::__Ncsysvx;
 
@@ -964,7 +744,7 @@ sub PDL::csysv {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 csysvx
 
@@ -979,19 +759,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sysvx>
 =cut
 
 sub PDL::csysvx {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccsysvx if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncsysvx;
 }
 *csysvx = \&PDL::csysvx;
-#line 990 "Complex.pm"
-
-*__Cchesv = \&PDL::__Cchesv;
-
-
-
+#line 766 "Complex.pm"
 
 *__Nchesv = \&PDL::__Nchesv;
 
@@ -999,7 +770,7 @@ sub PDL::csysvx {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 chesv
 
@@ -1014,19 +785,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sysv> for Hermitian matrix
 =cut
 
 sub PDL::chesv {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cchesv if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nchesv;
 }
 *chesv = \&PDL::chesv;
-#line 1025 "Complex.pm"
-
-*__Cchesvx = \&PDL::__Cchesvx;
-
-
-
+#line 792 "Complex.pm"
 
 *__Nchesvx = \&PDL::__Nchesvx;
 
@@ -1034,7 +796,7 @@ sub PDL::chesv {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 chesvx
 
@@ -1049,19 +811,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sysvx> for Hermitian matrix
 =cut
 
 sub PDL::chesvx {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cchesvx if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nchesvx;
 }
 *chesvx = \&PDL::chesvx;
-#line 1060 "Complex.pm"
-
-*__Ccposv = \&PDL::__Ccposv;
-
-
-
+#line 818 "Complex.pm"
 
 *__Ncposv = \&PDL::__Ncposv;
 
@@ -1069,7 +822,7 @@ sub PDL::chesvx {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cposv
 
@@ -1084,19 +837,10 @@ Complex version of L<PDL::LinearAlgebra::Real/posv> for Hermitian positive defin
 =cut
 
 sub PDL::cposv {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccposv if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncposv;
 }
 *cposv = \&PDL::cposv;
-#line 1095 "Complex.pm"
-
-*__Ccposvx = \&PDL::__Ccposvx;
-
-
-
+#line 844 "Complex.pm"
 
 *__Ncposvx = \&PDL::__Ncposvx;
 
@@ -1104,7 +848,7 @@ sub PDL::cposv {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cposvx
 
@@ -1119,19 +863,10 @@ Complex version of L<PDL::LinearAlgebra::Real/posvx> for Hermitian positive defi
 =cut
 
 sub PDL::cposvx {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccposvx if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncposvx;
 }
 *cposvx = \&PDL::cposvx;
-#line 1130 "Complex.pm"
-
-*__Ccgels = \&PDL::__Ccgels;
-
-
-
+#line 870 "Complex.pm"
 
 *__Ncgels = \&PDL::__Ncgels;
 
@@ -1139,7 +874,7 @@ sub PDL::cposvx {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgels
 
@@ -1149,7 +884,7 @@ sub PDL::cposvx {
 
 =for ref
 
-Solves overdetermined or underdetermined complex linear systems   
+Solves overdetermined or underdetermined complex linear systems
 involving an M-by-N matrix A, or its conjugate-transpose.
 Complex version of L<PDL::LinearAlgebra::Real/gels>.
 
@@ -1159,19 +894,10 @@ Complex version of L<PDL::LinearAlgebra::Real/gels>.
 =cut
 
 sub PDL::cgels {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgels if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgels;
 }
 *cgels = \&PDL::cgels;
-#line 1170 "Complex.pm"
-
-*__Ccgelsy = \&PDL::__Ccgelsy;
-
-
-
+#line 901 "Complex.pm"
 
 *__Ncgelsy = \&PDL::__Ncgelsy;
 
@@ -1179,7 +905,7 @@ sub PDL::cgels {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgelsy
 
@@ -1194,19 +920,10 @@ Complex version of L<PDL::LinearAlgebra::Real/gelsy>
 =cut
 
 sub PDL::cgelsy {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgelsy if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgelsy;
 }
 *cgelsy = \&PDL::cgelsy;
-#line 1205 "Complex.pm"
-
-*__Ccgelss = \&PDL::__Ccgelss;
-
-
-
+#line 927 "Complex.pm"
 
 *__Ncgelss = \&PDL::__Ncgelss;
 
@@ -1214,7 +931,7 @@ sub PDL::cgelsy {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgelss
 
@@ -1229,19 +946,10 @@ Complex version of L<PDL::LinearAlgebra::Real/gelss>
 =cut
 
 sub PDL::cgelss {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgelss if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgelss;
 }
 *cgelss = \&PDL::cgelss;
-#line 1240 "Complex.pm"
-
-*__Ccgelsd = \&PDL::__Ccgelsd;
-
-
-
+#line 953 "Complex.pm"
 
 *__Ncgelsd = \&PDL::__Ncgelsd;
 
@@ -1249,7 +957,7 @@ sub PDL::cgelss {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgelsd
 
@@ -1264,19 +972,10 @@ Complex version of L<PDL::LinearAlgebra::Real/gelsd>
 =cut
 
 sub PDL::cgelsd {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgelsd if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgelsd;
 }
 *cgelsd = \&PDL::cgelsd;
-#line 1275 "Complex.pm"
-
-*__Ccgglse = \&PDL::__Ccgglse;
-
-
-
+#line 979 "Complex.pm"
 
 *__Ncgglse = \&PDL::__Ncgglse;
 
@@ -1284,7 +983,7 @@ sub PDL::cgelsd {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgglse
 
@@ -1299,19 +998,10 @@ Complex version of L<PDL::LinearAlgebra::Real/gglse>
 =cut
 
 sub PDL::cgglse {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgglse if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgglse;
 }
 *cgglse = \&PDL::cgglse;
-#line 1310 "Complex.pm"
-
-*__Ccggglm = \&PDL::__Ccggglm;
-
-
-
+#line 1005 "Complex.pm"
 
 *__Ncggglm = \&PDL::__Ncggglm;
 
@@ -1319,7 +1009,7 @@ sub PDL::cgglse {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cggglm
 
@@ -1334,19 +1024,10 @@ Complex version of L<PDL::LinearAlgebra::Real/ggglm>
 =cut
 
 sub PDL::cggglm {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccggglm if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncggglm;
 }
 *cggglm = \&PDL::cggglm;
-#line 1345 "Complex.pm"
-
-*__Ccgetrf = \&PDL::__Ccgetrf;
-
-
-
+#line 1031 "Complex.pm"
 
 *__Ncgetrf = \&PDL::__Ncgetrf;
 
@@ -1354,7 +1035,7 @@ sub PDL::cggglm {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgetrf
 
@@ -1369,19 +1050,10 @@ Complex version of L<PDL::LinearAlgebra::Real/getrf>
 =cut
 
 sub PDL::cgetrf {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgetrf if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgetrf;
 }
 *cgetrf = \&PDL::cgetrf;
-#line 1380 "Complex.pm"
-
-*__Ccgetf2 = \&PDL::__Ccgetf2;
-
-
-
+#line 1057 "Complex.pm"
 
 *__Ncgetf2 = \&PDL::__Ncgetf2;
 
@@ -1389,7 +1061,7 @@ sub PDL::cgetrf {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgetf2
 
@@ -1404,19 +1076,10 @@ Complex version of L<PDL::LinearAlgebra::Real/getf2>
 =cut
 
 sub PDL::cgetf2 {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgetf2 if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgetf2;
 }
 *cgetf2 = \&PDL::cgetf2;
-#line 1415 "Complex.pm"
-
-*__Ccsytrf = \&PDL::__Ccsytrf;
-
-
-
+#line 1083 "Complex.pm"
 
 *__Ncsytrf = \&PDL::__Ncsytrf;
 
@@ -1424,7 +1087,7 @@ sub PDL::cgetf2 {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 csytrf
 
@@ -1439,19 +1102,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sytrf>
 =cut
 
 sub PDL::csytrf {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccsytrf if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncsytrf;
 }
 *csytrf = \&PDL::csytrf;
-#line 1450 "Complex.pm"
-
-*__Ccsytf2 = \&PDL::__Ccsytf2;
-
-
-
+#line 1109 "Complex.pm"
 
 *__Ncsytf2 = \&PDL::__Ncsytf2;
 
@@ -1459,7 +1113,7 @@ sub PDL::csytrf {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 csytf2
 
@@ -1474,19 +1128,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sytf2>
 =cut
 
 sub PDL::csytf2 {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccsytf2 if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncsytf2;
 }
 *csytf2 = \&PDL::csytf2;
-#line 1485 "Complex.pm"
-
-*__Ccchetrf = \&PDL::__Ccchetrf;
-
-
-
+#line 1135 "Complex.pm"
 
 *__Ncchetrf = \&PDL::__Ncchetrf;
 
@@ -1494,7 +1139,7 @@ sub PDL::csytf2 {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cchetrf
 
@@ -1509,19 +1154,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sytrf> for Hermitian matrix
 =cut
 
 sub PDL::cchetrf {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccchetrf if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncchetrf;
 }
 *cchetrf = \&PDL::cchetrf;
-#line 1520 "Complex.pm"
-
-*__Cchetf2 = \&PDL::__Cchetf2;
-
-
-
+#line 1161 "Complex.pm"
 
 *__Nchetf2 = \&PDL::__Nchetf2;
 
@@ -1529,7 +1165,7 @@ sub PDL::cchetrf {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 chetf2
 
@@ -1544,19 +1180,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sytf2> for Hermitian matrix
 =cut
 
 sub PDL::chetf2 {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cchetf2 if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nchetf2;
 }
 *chetf2 = \&PDL::chetf2;
-#line 1555 "Complex.pm"
-
-*__Ccpotrf = \&PDL::__Ccpotrf;
-
-
-
+#line 1187 "Complex.pm"
 
 *__Ncpotrf = \&PDL::__Ncpotrf;
 
@@ -1564,7 +1191,7 @@ sub PDL::chetf2 {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cpotrf
 
@@ -1579,19 +1206,10 @@ Complex version of L<PDL::LinearAlgebra::Real/potrf> for Hermitian positive defi
 =cut
 
 sub PDL::cpotrf {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccpotrf if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncpotrf;
 }
 *cpotrf = \&PDL::cpotrf;
-#line 1590 "Complex.pm"
-
-*__Ccpotf2 = \&PDL::__Ccpotf2;
-
-
-
+#line 1213 "Complex.pm"
 
 *__Ncpotf2 = \&PDL::__Ncpotf2;
 
@@ -1599,7 +1217,7 @@ sub PDL::cpotrf {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cpotf2
 
@@ -1614,19 +1232,10 @@ Complex version of L<PDL::LinearAlgebra::Real/potf2> for Hermitian positive defi
 =cut
 
 sub PDL::cpotf2 {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccpotf2 if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncpotf2;
 }
 *cpotf2 = \&PDL::cpotf2;
-#line 1625 "Complex.pm"
-
-*__Ccgetri = \&PDL::__Ccgetri;
-
-
-
+#line 1239 "Complex.pm"
 
 *__Ncgetri = \&PDL::__Ncgetri;
 
@@ -1634,7 +1243,7 @@ sub PDL::cpotf2 {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgetri
 
@@ -1649,19 +1258,10 @@ Complex version of L<PDL::LinearAlgebra::Real/getri>
 =cut
 
 sub PDL::cgetri {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgetri if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgetri;
 }
 *cgetri = \&PDL::cgetri;
-#line 1660 "Complex.pm"
-
-*__Ccsytri = \&PDL::__Ccsytri;
-
-
-
+#line 1265 "Complex.pm"
 
 *__Ncsytri = \&PDL::__Ncsytri;
 
@@ -1669,7 +1269,7 @@ sub PDL::cgetri {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 csytri
 
@@ -1684,19 +1284,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sytri>
 =cut
 
 sub PDL::csytri {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccsytri if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncsytri;
 }
 *csytri = \&PDL::csytri;
-#line 1695 "Complex.pm"
-
-*__Cchetri = \&PDL::__Cchetri;
-
-
-
+#line 1291 "Complex.pm"
 
 *__Nchetri = \&PDL::__Nchetri;
 
@@ -1704,7 +1295,7 @@ sub PDL::csytri {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 chetri
 
@@ -1719,19 +1310,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sytri> for Hermitian matrix
 =cut
 
 sub PDL::chetri {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cchetri if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nchetri;
 }
 *chetri = \&PDL::chetri;
-#line 1730 "Complex.pm"
-
-*__Ccpotri = \&PDL::__Ccpotri;
-
-
-
+#line 1317 "Complex.pm"
 
 *__Ncpotri = \&PDL::__Ncpotri;
 
@@ -1739,7 +1321,7 @@ sub PDL::chetri {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cpotri
 
@@ -1754,19 +1336,10 @@ Complex version of L<PDL::LinearAlgebra::Real/potri>
 =cut
 
 sub PDL::cpotri {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccpotri if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncpotri;
 }
 *cpotri = \&PDL::cpotri;
-#line 1765 "Complex.pm"
-
-*__Cctrtri = \&PDL::__Cctrtri;
-
-
-
+#line 1343 "Complex.pm"
 
 *__Nctrtri = \&PDL::__Nctrtri;
 
@@ -1774,7 +1347,7 @@ sub PDL::cpotri {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 ctrtri
 
@@ -1789,19 +1362,10 @@ Complex version of L<PDL::LinearAlgebra::Real/trtri>
 =cut
 
 sub PDL::ctrtri {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cctrtri if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nctrtri;
 }
 *ctrtri = \&PDL::ctrtri;
-#line 1800 "Complex.pm"
-
-*__Cctrti2 = \&PDL::__Cctrti2;
-
-
-
+#line 1369 "Complex.pm"
 
 *__Nctrti2 = \&PDL::__Nctrti2;
 
@@ -1809,7 +1373,7 @@ sub PDL::ctrtri {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 ctrti2
 
@@ -1824,19 +1388,10 @@ Complex version of L<PDL::LinearAlgebra::Real/trti2>
 =cut
 
 sub PDL::ctrti2 {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cctrti2 if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nctrti2;
 }
 *ctrti2 = \&PDL::ctrti2;
-#line 1835 "Complex.pm"
-
-*__Ccgetrs = \&PDL::__Ccgetrs;
-
-
-
+#line 1395 "Complex.pm"
 
 *__Ncgetrs = \&PDL::__Ncgetrs;
 
@@ -1844,7 +1399,7 @@ sub PDL::ctrti2 {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgetrs
 
@@ -1856,8 +1411,8 @@ sub PDL::ctrti2 {
 
 Complex version of L<PDL::LinearAlgebra::Real/getrs>
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 	trans:   = 0:  No transpose;
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
@@ -1865,19 +1420,10 @@ Complex version of L<PDL::LinearAlgebra::Real/getrs>
 =cut
 
 sub PDL::cgetrs {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgetrs if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgetrs;
 }
 *cgetrs = \&PDL::cgetrs;
-#line 1876 "Complex.pm"
-
-*__Ccsytrs = \&PDL::__Ccsytrs;
-
-
-
+#line 1427 "Complex.pm"
 
 *__Ncsytrs = \&PDL::__Ncsytrs;
 
@@ -1885,7 +1431,7 @@ sub PDL::cgetrs {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 csytrs
 
@@ -1900,19 +1446,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sytrs>
 =cut
 
 sub PDL::csytrs {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccsytrs if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncsytrs;
 }
 *csytrs = \&PDL::csytrs;
-#line 1911 "Complex.pm"
-
-*__Cchetrs = \&PDL::__Cchetrs;
-
-
-
+#line 1453 "Complex.pm"
 
 *__Nchetrs = \&PDL::__Nchetrs;
 
@@ -1920,7 +1457,7 @@ sub PDL::csytrs {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 chetrs
 
@@ -1935,19 +1472,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sytrs> for Hermitian matrix
 =cut
 
 sub PDL::chetrs {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cchetrs if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nchetrs;
 }
 *chetrs = \&PDL::chetrs;
-#line 1946 "Complex.pm"
-
-*__Ccpotrs = \&PDL::__Ccpotrs;
-
-
-
+#line 1479 "Complex.pm"
 
 *__Ncpotrs = \&PDL::__Ncpotrs;
 
@@ -1955,7 +1483,7 @@ sub PDL::chetrs {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cpotrs
 
@@ -1970,19 +1498,10 @@ Complex version of L<PDL::LinearAlgebra::Real/potrs> for Hermitian positive defi
 =cut
 
 sub PDL::cpotrs {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccpotrs if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncpotrs;
 }
 *cpotrs = \&PDL::cpotrs;
-#line 1981 "Complex.pm"
-
-*__Cctrtrs = \&PDL::__Cctrtrs;
-
-
-
+#line 1505 "Complex.pm"
 
 *__Nctrtrs = \&PDL::__Nctrtrs;
 
@@ -1990,7 +1509,7 @@ sub PDL::cpotrs {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 ctrtrs
 
@@ -2002,8 +1521,8 @@ sub PDL::cpotrs {
 
 Complex version of L<PDL::LinearAlgebra::Real/trtrs>
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 	trans:   = 0:  No transpose;
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
@@ -2011,19 +1530,10 @@ Complex version of L<PDL::LinearAlgebra::Real/trtrs>
 =cut
 
 sub PDL::ctrtrs {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cctrtrs if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nctrtrs;
 }
 *ctrtrs = \&PDL::ctrtrs;
-#line 2022 "Complex.pm"
-
-*__Cclatrs = \&PDL::__Cclatrs;
-
-
-
+#line 1537 "Complex.pm"
 
 *__Nclatrs = \&PDL::__Nclatrs;
 
@@ -2031,7 +1541,7 @@ sub PDL::ctrtrs {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 clatrs
 
@@ -2043,8 +1553,8 @@ sub PDL::ctrtrs {
 
 Complex version of L<PDL::LinearAlgebra::Real/latrs>
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 	trans:   = 0:  No transpose;
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
@@ -2052,19 +1562,10 @@ Complex version of L<PDL::LinearAlgebra::Real/latrs>
 =cut
 
 sub PDL::clatrs {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cclatrs if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nclatrs;
 }
 *clatrs = \&PDL::clatrs;
-#line 2063 "Complex.pm"
-
-*__Ccgecon = \&PDL::__Ccgecon;
-
-
-
+#line 1569 "Complex.pm"
 
 *__Ncgecon = \&PDL::__Ncgecon;
 
@@ -2072,7 +1573,7 @@ sub PDL::clatrs {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgecon
 
@@ -2087,19 +1588,10 @@ Complex version of L<PDL::LinearAlgebra::Real/gecon>
 =cut
 
 sub PDL::cgecon {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgecon if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgecon;
 }
 *cgecon = \&PDL::cgecon;
-#line 2098 "Complex.pm"
-
-*__Ccsycon = \&PDL::__Ccsycon;
-
-
-
+#line 1595 "Complex.pm"
 
 *__Ncsycon = \&PDL::__Ncsycon;
 
@@ -2107,7 +1599,7 @@ sub PDL::cgecon {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 csycon
 
@@ -2122,19 +1614,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sycon>
 =cut
 
 sub PDL::csycon {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccsycon if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncsycon;
 }
 *csycon = \&PDL::csycon;
-#line 2133 "Complex.pm"
-
-*__Cchecon = \&PDL::__Cchecon;
-
-
-
+#line 1621 "Complex.pm"
 
 *__Nchecon = \&PDL::__Nchecon;
 
@@ -2142,7 +1625,7 @@ sub PDL::csycon {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 checon
 
@@ -2157,19 +1640,10 @@ Complex version of L<PDL::LinearAlgebra::Real/sycon> for Hermitian matrix
 =cut
 
 sub PDL::checon {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cchecon if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nchecon;
 }
 *checon = \&PDL::checon;
-#line 2168 "Complex.pm"
-
-*__Ccpocon = \&PDL::__Ccpocon;
-
-
-
+#line 1647 "Complex.pm"
 
 *__Ncpocon = \&PDL::__Ncpocon;
 
@@ -2177,7 +1651,7 @@ sub PDL::checon {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cpocon
 
@@ -2192,19 +1666,10 @@ Complex version of L<PDL::LinearAlgebra::Real/pocon> for Hermitian positive defi
 =cut
 
 sub PDL::cpocon {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccpocon if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncpocon;
 }
 *cpocon = \&PDL::cpocon;
-#line 2203 "Complex.pm"
-
-*__Cctrcon = \&PDL::__Cctrcon;
-
-
-
+#line 1673 "Complex.pm"
 
 *__Nctrcon = \&PDL::__Nctrcon;
 
@@ -2212,7 +1677,7 @@ sub PDL::cpocon {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 ctrcon
 
@@ -2227,19 +1692,10 @@ Complex version of L<PDL::LinearAlgebra::Real/trcon>
 =cut
 
 sub PDL::ctrcon {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cctrcon if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nctrcon;
 }
 *ctrcon = \&PDL::ctrcon;
-#line 2238 "Complex.pm"
-
-*__Ccgeqp3 = \&PDL::__Ccgeqp3;
-
-
-
+#line 1699 "Complex.pm"
 
 *__Ncgeqp3 = \&PDL::__Ncgeqp3;
 
@@ -2247,7 +1703,7 @@ sub PDL::ctrcon {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgeqp3
 
@@ -2262,19 +1718,10 @@ Complex version of L<PDL::LinearAlgebra::Real/geqp3>
 =cut
 
 sub PDL::cgeqp3 {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgeqp3 if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgeqp3;
 }
 *cgeqp3 = \&PDL::cgeqp3;
-#line 2273 "Complex.pm"
-
-*__Ccgeqrf = \&PDL::__Ccgeqrf;
-
-
-
+#line 1725 "Complex.pm"
 
 *__Ncgeqrf = \&PDL::__Ncgeqrf;
 
@@ -2282,7 +1729,7 @@ sub PDL::cgeqp3 {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgeqrf
 
@@ -2297,19 +1744,10 @@ Complex version of L<PDL::LinearAlgebra::Real/geqrf>
 =cut
 
 sub PDL::cgeqrf {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgeqrf if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgeqrf;
 }
 *cgeqrf = \&PDL::cgeqrf;
-#line 2308 "Complex.pm"
-
-*__Ccungqr = \&PDL::__Ccungqr;
-
-
-
+#line 1751 "Complex.pm"
 
 *__Ncungqr = \&PDL::__Ncungqr;
 
@@ -2317,7 +1755,7 @@ sub PDL::cgeqrf {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cungqr
 
@@ -2332,19 +1770,10 @@ Complex version of L<PDL::LinearAlgebra::Real/orgqr>
 =cut
 
 sub PDL::cungqr {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccungqr if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncungqr;
 }
 *cungqr = \&PDL::cungqr;
-#line 2343 "Complex.pm"
-
-*__Ccunmqr = \&PDL::__Ccunmqr;
-
-
-
+#line 1777 "Complex.pm"
 
 *__Ncunmqr = \&PDL::__Ncunmqr;
 
@@ -2352,7 +1781,7 @@ sub PDL::cungqr {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cunmqr
 
@@ -2367,19 +1796,10 @@ Complex version of L<PDL::LinearAlgebra::Real/ormqr>. Here trans = 1 means conju
 =cut
 
 sub PDL::cunmqr {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccunmqr if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncunmqr;
 }
 *cunmqr = \&PDL::cunmqr;
-#line 2378 "Complex.pm"
-
-*__Ccgelqf = \&PDL::__Ccgelqf;
-
-
-
+#line 1803 "Complex.pm"
 
 *__Ncgelqf = \&PDL::__Ncgelqf;
 
@@ -2387,7 +1807,7 @@ sub PDL::cunmqr {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgelqf
 
@@ -2402,19 +1822,10 @@ Complex version of L<PDL::LinearAlgebra::Real/gelqf>
 =cut
 
 sub PDL::cgelqf {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgelqf if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgelqf;
 }
 *cgelqf = \&PDL::cgelqf;
-#line 2413 "Complex.pm"
-
-*__Ccunglq = \&PDL::__Ccunglq;
-
-
-
+#line 1829 "Complex.pm"
 
 *__Ncunglq = \&PDL::__Ncunglq;
 
@@ -2422,7 +1833,7 @@ sub PDL::cgelqf {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cunglq
 
@@ -2437,19 +1848,10 @@ Complex version of L<PDL::LinearAlgebra::Real/orglq>
 =cut
 
 sub PDL::cunglq {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccunglq if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncunglq;
 }
 *cunglq = \&PDL::cunglq;
-#line 2448 "Complex.pm"
-
-*__Ccunmlq = \&PDL::__Ccunmlq;
-
-
-
+#line 1855 "Complex.pm"
 
 *__Ncunmlq = \&PDL::__Ncunmlq;
 
@@ -2457,7 +1859,7 @@ sub PDL::cunglq {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cunmlq
 
@@ -2472,19 +1874,10 @@ Complex version of L<PDL::LinearAlgebra::Real/ormlq>. Here trans = 1 means conju
 =cut
 
 sub PDL::cunmlq {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccunmlq if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncunmlq;
 }
 *cunmlq = \&PDL::cunmlq;
-#line 2483 "Complex.pm"
-
-*__Ccgeqlf = \&PDL::__Ccgeqlf;
-
-
-
+#line 1881 "Complex.pm"
 
 *__Ncgeqlf = \&PDL::__Ncgeqlf;
 
@@ -2492,7 +1885,7 @@ sub PDL::cunmlq {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgeqlf
 
@@ -2507,19 +1900,10 @@ Complex version of L<PDL::LinearAlgebra::Real/geqlf>
 =cut
 
 sub PDL::cgeqlf {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgeqlf if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgeqlf;
 }
 *cgeqlf = \&PDL::cgeqlf;
-#line 2518 "Complex.pm"
-
-*__Ccungql = \&PDL::__Ccungql;
-
-
-
+#line 1907 "Complex.pm"
 
 *__Ncungql = \&PDL::__Ncungql;
 
@@ -2527,7 +1911,7 @@ sub PDL::cgeqlf {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cungql
 
@@ -2541,19 +1925,10 @@ Complex version of L<PDL::LinearAlgebra::Real/orgql>.
 =cut
 
 sub PDL::cungql {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccungql if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncungql;
 }
 *cungql = \&PDL::cungql;
-#line 2552 "Complex.pm"
-
-*__Ccunmql = \&PDL::__Ccunmql;
-
-
-
+#line 1932 "Complex.pm"
 
 *__Ncunmql = \&PDL::__Ncunmql;
 
@@ -2561,7 +1936,7 @@ sub PDL::cungql {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cunmql
 
@@ -2576,19 +1951,10 @@ Complex version of L<PDL::LinearAlgebra::Real/ormql>. Here trans = 1 means conju
 =cut
 
 sub PDL::cunmql {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccunmql if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncunmql;
 }
 *cunmql = \&PDL::cunmql;
-#line 2587 "Complex.pm"
-
-*__Ccgerqf = \&PDL::__Ccgerqf;
-
-
-
+#line 1958 "Complex.pm"
 
 *__Ncgerqf = \&PDL::__Ncgerqf;
 
@@ -2596,7 +1962,7 @@ sub PDL::cunmql {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgerqf
 
@@ -2611,19 +1977,10 @@ Complex version of L<PDL::LinearAlgebra::Real/gerqf>
 =cut
 
 sub PDL::cgerqf {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgerqf if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgerqf;
 }
 *cgerqf = \&PDL::cgerqf;
-#line 2622 "Complex.pm"
-
-*__Ccungrq = \&PDL::__Ccungrq;
-
-
-
+#line 1984 "Complex.pm"
 
 *__Ncungrq = \&PDL::__Ncungrq;
 
@@ -2631,7 +1988,7 @@ sub PDL::cgerqf {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cungrq
 
@@ -2646,19 +2003,10 @@ Complex version of L<PDL::LinearAlgebra::Real/orgrq>.
 =cut
 
 sub PDL::cungrq {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccungrq if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncungrq;
 }
 *cungrq = \&PDL::cungrq;
-#line 2657 "Complex.pm"
-
-*__Ccunmrq = \&PDL::__Ccunmrq;
-
-
-
+#line 2010 "Complex.pm"
 
 *__Ncunmrq = \&PDL::__Ncunmrq;
 
@@ -2666,7 +2014,7 @@ sub PDL::cungrq {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cunmrq
 
@@ -2681,19 +2029,10 @@ Complex version of L<PDL::LinearAlgebra::Real/ormrq>. Here trans = 1 means conju
 =cut
 
 sub PDL::cunmrq {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccunmrq if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncunmrq;
 }
 *cunmrq = \&PDL::cunmrq;
-#line 2692 "Complex.pm"
-
-*__Cctzrzf = \&PDL::__Cctzrzf;
-
-
-
+#line 2036 "Complex.pm"
 
 *__Nctzrzf = \&PDL::__Nctzrzf;
 
@@ -2701,7 +2040,7 @@ sub PDL::cunmrq {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 ctzrzf
 
@@ -2716,19 +2055,10 @@ Complex version of L<PDL::LinearAlgebra::Real/tzrzf>
 =cut
 
 sub PDL::ctzrzf {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cctzrzf if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nctzrzf;
 }
 *ctzrzf = \&PDL::ctzrzf;
-#line 2727 "Complex.pm"
-
-*__Ccunmrz = \&PDL::__Ccunmrz;
-
-
-
+#line 2062 "Complex.pm"
 
 *__Ncunmrz = \&PDL::__Ncunmrz;
 
@@ -2736,7 +2066,7 @@ sub PDL::ctzrzf {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cunmrz
 
@@ -2751,19 +2081,10 @@ Complex version of L<PDL::LinearAlgebra::Real/ormrz>. Here trans = 1 means conju
 =cut
 
 sub PDL::cunmrz {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccunmrz if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncunmrz;
 }
 *cunmrz = \&PDL::cunmrz;
-#line 2762 "Complex.pm"
-
-*__Ccgehrd = \&PDL::__Ccgehrd;
-
-
-
+#line 2088 "Complex.pm"
 
 *__Ncgehrd = \&PDL::__Ncgehrd;
 
@@ -2771,7 +2092,7 @@ sub PDL::cunmrz {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgehrd
 
@@ -2786,19 +2107,10 @@ Complex version of L<PDL::LinearAlgebra::Real/gehrd>
 =cut
 
 sub PDL::cgehrd {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgehrd if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgehrd;
 }
 *cgehrd = \&PDL::cgehrd;
-#line 2797 "Complex.pm"
-
-*__Ccunghr = \&PDL::__Ccunghr;
-
-
-
+#line 2114 "Complex.pm"
 
 *__Ncunghr = \&PDL::__Ncunghr;
 
@@ -2806,7 +2118,7 @@ sub PDL::cgehrd {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cunghr
 
@@ -2821,19 +2133,10 @@ Complex version of L<PDL::LinearAlgebra::Real/orghr>
 =cut
 
 sub PDL::cunghr {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccunghr if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncunghr;
 }
 *cunghr = \&PDL::cunghr;
-#line 2832 "Complex.pm"
-
-*__Cchseqr = \&PDL::__Cchseqr;
-
-
-
+#line 2140 "Complex.pm"
 
 *__Nchseqr = \&PDL::__Nchseqr;
 
@@ -2841,7 +2144,7 @@ sub PDL::cunghr {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 chseqr
 
@@ -2856,19 +2159,10 @@ Complex version of L<PDL::LinearAlgebra::Real/hseqr>
 =cut
 
 sub PDL::chseqr {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cchseqr if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nchseqr;
 }
 *chseqr = \&PDL::chseqr;
-#line 2867 "Complex.pm"
-
-*__Cctrevc = \&PDL::__Cctrevc;
-
-
-
+#line 2166 "Complex.pm"
 
 *__Nctrevc = \&PDL::__Nctrevc;
 
@@ -2876,7 +2170,7 @@ sub PDL::chseqr {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 ctrevc
 
@@ -2891,19 +2185,10 @@ Complex version of L<PDL::LinearAlgebra::Real/trevc>
 =cut
 
 sub PDL::ctrevc {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cctrevc if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nctrevc;
 }
 *ctrevc = \&PDL::ctrevc;
-#line 2902 "Complex.pm"
-
-*__Cctgevc = \&PDL::__Cctgevc;
-
-
-
+#line 2192 "Complex.pm"
 
 *__Nctgevc = \&PDL::__Nctgevc;
 
@@ -2911,7 +2196,7 @@ sub PDL::ctrevc {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 ctgevc
 
@@ -2926,19 +2211,10 @@ Complex version of L<PDL::LinearAlgebra::Real/tgevc>
 =cut
 
 sub PDL::ctgevc {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cctgevc if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nctgevc;
 }
 *ctgevc = \&PDL::ctgevc;
-#line 2937 "Complex.pm"
-
-*__Ccgebal = \&PDL::__Ccgebal;
-
-
-
+#line 2218 "Complex.pm"
 
 *__Ncgebal = \&PDL::__Ncgebal;
 
@@ -2946,7 +2222,7 @@ sub PDL::ctgevc {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgebal
 
@@ -2961,19 +2237,10 @@ Complex version of L<PDL::LinearAlgebra::Real/gebal>
 =cut
 
 sub PDL::cgebal {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgebal if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgebal;
 }
 *cgebal = \&PDL::cgebal;
-#line 2972 "Complex.pm"
-
-*__Cclange = \&PDL::__Cclange;
-
-
-
+#line 2244 "Complex.pm"
 
 *__Nclange = \&PDL::__Nclange;
 
@@ -2981,7 +2248,7 @@ sub PDL::cgebal {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 clange
 
@@ -2996,19 +2263,10 @@ Complex version of L<PDL::LinearAlgebra::Real/lange>
 =cut
 
 sub PDL::clange {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cclange if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nclange;
 }
 *clange = \&PDL::clange;
-#line 3007 "Complex.pm"
-
-*__Cclansy = \&PDL::__Cclansy;
-
-
-
+#line 2270 "Complex.pm"
 
 *__Nclansy = \&PDL::__Nclansy;
 
@@ -3016,7 +2274,7 @@ sub PDL::clange {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 clansy
 
@@ -3031,19 +2289,10 @@ Complex version of L<PDL::LinearAlgebra::Real/lansy>
 =cut
 
 sub PDL::clansy {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cclansy if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nclansy;
 }
 *clansy = \&PDL::clansy;
-#line 3042 "Complex.pm"
-
-*__Cclantr = \&PDL::__Cclantr;
-
-
-
+#line 2296 "Complex.pm"
 
 *__Nclantr = \&PDL::__Nclantr;
 
@@ -3051,7 +2300,7 @@ sub PDL::clansy {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 clantr
 
@@ -3066,19 +2315,10 @@ Complex version of L<PDL::LinearAlgebra::Real/lantr>
 =cut
 
 sub PDL::clantr {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cclantr if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nclantr;
 }
 *clantr = \&PDL::clantr;
-#line 3077 "Complex.pm"
-
-*__Ccgemm = \&PDL::__Ccgemm;
-
-
-
+#line 2322 "Complex.pm"
 
 *__Ncgemm = \&PDL::__Ncgemm;
 
@@ -3086,7 +2326,7 @@ sub PDL::clantr {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgemm
 
@@ -3098,8 +2338,8 @@ sub PDL::clantr {
 
 Complex version of L<PDL::LinearAlgebra::Real/gemm>.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 	transa:  = 0:  No transpose;
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
@@ -3111,19 +2351,10 @@ Complex version of L<PDL::LinearAlgebra::Real/gemm>.
 =cut
 
 sub PDL::cgemm {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgemm if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgemm;
 }
 *cgemm = \&PDL::cgemm;
-#line 3122 "Complex.pm"
-
-*__Ccmmult = \&PDL::__Ccmmult;
-
-
-
+#line 2358 "Complex.pm"
 
 *__Ncmmult = \&PDL::__Ncmmult;
 
@@ -3131,7 +2362,7 @@ sub PDL::cgemm {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cmmult
 
@@ -3146,19 +2377,10 @@ Complex version of L<PDL::LinearAlgebra::Real/mmult>
 =cut
 
 sub PDL::cmmult {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccmmult if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncmmult;
 }
 *cmmult = \&PDL::cmmult;
-#line 3157 "Complex.pm"
-
-*__Cccrossprod = \&PDL::__Cccrossprod;
-
-
-
+#line 2384 "Complex.pm"
 
 *__Nccrossprod = \&PDL::__Nccrossprod;
 
@@ -3166,7 +2388,7 @@ sub PDL::cmmult {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 ccrossprod
 
@@ -3181,19 +2403,10 @@ Complex version of L<PDL::LinearAlgebra::Real/crossprod>
 =cut
 
 sub PDL::ccrossprod {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cccrossprod if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nccrossprod;
 }
 *ccrossprod = \&PDL::ccrossprod;
-#line 3192 "Complex.pm"
-
-*__Ccsyrk = \&PDL::__Ccsyrk;
-
-
-
+#line 2410 "Complex.pm"
 
 *__Ncsyrk = \&PDL::__Ncsyrk;
 
@@ -3201,7 +2414,7 @@ sub PDL::ccrossprod {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 csyrk
 
@@ -3216,19 +2429,10 @@ Complex version of L<PDL::LinearAlgebra::Real/syrk>
 =cut
 
 sub PDL::csyrk {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccsyrk if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncsyrk;
 }
 *csyrk = \&PDL::csyrk;
-#line 3227 "Complex.pm"
-
-*__Ccdot = \&PDL::__Ccdot;
-
-
-
+#line 2436 "Complex.pm"
 
 *__Ncdot = \&PDL::__Ncdot;
 
@@ -3236,7 +2440,7 @@ sub PDL::csyrk {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cdot
 
@@ -3251,19 +2455,10 @@ Complex version of L<PDL::LinearAlgebra::Real/dot>
 =cut
 
 sub PDL::cdot {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccdot if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncdot;
 }
 *cdot = \&PDL::cdot;
-#line 3262 "Complex.pm"
-
-*__Ccdotc = \&PDL::__Ccdotc;
-
-
-
+#line 2462 "Complex.pm"
 
 *__Ncdotc = \&PDL::__Ncdotc;
 
@@ -3271,7 +2466,7 @@ sub PDL::cdot {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cdotc
 
@@ -3281,25 +2476,16 @@ sub PDL::cdot {
 
 =for ref
 
-Forms the dot product of two vectors, conjugating the first   
+Forms the dot product of two vectors, conjugating the first
 vector.
 
 =cut
 
 sub PDL::cdotc {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccdotc if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncdotc;
 }
 *cdotc = \&PDL::cdotc;
-#line 3298 "Complex.pm"
-
-*__Ccaxpy = \&PDL::__Ccaxpy;
-
-
-
+#line 2489 "Complex.pm"
 
 *__Ncaxpy = \&PDL::__Ncaxpy;
 
@@ -3307,7 +2493,7 @@ sub PDL::cdotc {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 caxpy
 
@@ -3322,19 +2508,10 @@ Complex version of L<PDL::LinearAlgebra::Real/axpy>
 =cut
 
 sub PDL::caxpy {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccaxpy if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncaxpy;
 }
 *caxpy = \&PDL::caxpy;
-#line 3333 "Complex.pm"
-
-*__Ccnrm2 = \&PDL::__Ccnrm2;
-
-
-
+#line 2515 "Complex.pm"
 
 *__Ncnrm2 = \&PDL::__Ncnrm2;
 
@@ -3342,7 +2519,7 @@ sub PDL::caxpy {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cnrm2
 
@@ -3357,19 +2534,10 @@ Complex version of L<PDL::LinearAlgebra::Real/nrm2>
 =cut
 
 sub PDL::cnrm2 {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccnrm2 if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncnrm2;
 }
 *cnrm2 = \&PDL::cnrm2;
-#line 3368 "Complex.pm"
-
-*__Ccasum = \&PDL::__Ccasum;
-
-
-
+#line 2541 "Complex.pm"
 
 *__Ncasum = \&PDL::__Ncasum;
 
@@ -3377,7 +2545,7 @@ sub PDL::cnrm2 {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 casum
 
@@ -3392,19 +2560,10 @@ Complex version of L<PDL::LinearAlgebra::Real/asum>
 =cut
 
 sub PDL::casum {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccasum if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncasum;
 }
 *casum = \&PDL::casum;
-#line 3403 "Complex.pm"
-
-*__Ccscal = \&PDL::__Ccscal;
-
-
-
+#line 2567 "Complex.pm"
 
 *__Ncscal = \&PDL::__Ncscal;
 
@@ -3412,7 +2571,7 @@ sub PDL::casum {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cscal
 
@@ -3427,19 +2586,10 @@ Complex version of L<PDL::LinearAlgebra::Real/scal>
 =cut
 
 sub PDL::cscal {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccscal if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncscal;
 }
 *cscal = \&PDL::cscal;
-#line 3438 "Complex.pm"
-
-*__Ccsscal = \&PDL::__Ccsscal;
-
-
-
+#line 2593 "Complex.pm"
 
 *__Ncsscal = \&PDL::__Ncsscal;
 
@@ -3447,7 +2597,7 @@ sub PDL::cscal {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 csscal
 
@@ -3462,19 +2612,10 @@ Scales a complex vector by a real constant.
 =cut
 
 sub PDL::csscal {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccsscal if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncsscal;
 }
 *csscal = \&PDL::csscal;
-#line 3473 "Complex.pm"
-
-*__Ccrotg = \&PDL::__Ccrotg;
-
-
-
+#line 2619 "Complex.pm"
 
 *__Ncrotg = \&PDL::__Ncrotg;
 
@@ -3482,7 +2623,7 @@ sub PDL::csscal {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 crotg
 
@@ -3497,19 +2638,10 @@ Complex version of L<PDL::LinearAlgebra::Real/rotg>
 =cut
 
 sub PDL::crotg {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccrotg if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncrotg;
 }
 *crotg = \&PDL::crotg;
-#line 3508 "Complex.pm"
-
-*__Cclacpy = \&PDL::__Cclacpy;
-
-
-
+#line 2645 "Complex.pm"
 
 *__Nclacpy = \&PDL::__Nclacpy;
 
@@ -3517,7 +2649,7 @@ sub PDL::crotg {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 clacpy
 
@@ -3532,19 +2664,10 @@ Complex version of L<PDL::LinearAlgebra::Real/lacpy>
 =cut
 
 sub PDL::clacpy {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cclacpy if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nclacpy;
 }
 *clacpy = \&PDL::clacpy;
-#line 3543 "Complex.pm"
-
-*__Cclaswp = \&PDL::__Cclaswp;
-
-
-
+#line 2671 "Complex.pm"
 
 *__Nclaswp = \&PDL::__Nclaswp;
 
@@ -3552,7 +2675,7 @@ sub PDL::clacpy {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 claswp
 
@@ -3567,19 +2690,10 @@ Complex version of L<PDL::LinearAlgebra::Real/laswp>
 =cut
 
 sub PDL::claswp {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cclaswp if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nclaswp;
 }
 *claswp = \&PDL::claswp;
-#line 3578 "Complex.pm"
-
-*__Cccharpol = \&PDL::__Cccharpol;
-
-
-
+#line 2697 "Complex.pm"
 
 *__Nccharpol = \&PDL::__Nccharpol;
 
@@ -3587,7 +2701,7 @@ sub PDL::claswp {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 ccharpol
 
@@ -3602,15 +2716,11 @@ Complex version of L<PDL::LinearAlgebra::Real/charpol>
 =cut
 
 sub PDL::ccharpol {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cccharpol if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nccharpol;
 }
 *ccharpol = \&PDL::ccharpol;
 
-#line 4961 "complex.pd"
+#line 4945 "complex.pd"
 
 =head1 AUTHOR
 
@@ -3621,7 +2731,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 3625 "Complex.pm"
+#line 2735 "Complex.pm"
 
 # Exit with OK status
 

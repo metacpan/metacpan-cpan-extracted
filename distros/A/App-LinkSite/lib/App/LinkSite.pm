@@ -1,6 +1,6 @@
 =head1 NAME
 
-App::LinkSite
+App::LinkSite - Create a website listing all of your links
 
 =head1 SYNOPIS
 
@@ -15,7 +15,7 @@ The main driver class for App::LinkSite.
 use Feature::Compat::Class;
 
 class App::LinkSite {
-  our $VERSION = '0.0.10';
+  our $VERSION = '0.0.11';
   use strict;
   use warnings;
   use feature qw[say signatures];

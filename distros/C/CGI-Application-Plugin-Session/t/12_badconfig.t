@@ -29,7 +29,7 @@ $SIG{'__WARN__'} = sub { $warning = join ' ', @_ };
 my $app2 = TestAppBadConfig->new();
 $app2->session_config(
     CGI_SESSION_OPTIONS => [
-        "driver:File", '1111', { Directory => 't/' }, { name => 'foobar' }
+        "driver:File", '1111', {}, { name => 'foobar' }
     ],
     COOKIE_PARAMS => { -name => 'monkeybeard' }
 );

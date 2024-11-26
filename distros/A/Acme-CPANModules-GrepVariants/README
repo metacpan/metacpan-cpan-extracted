@@ -3,9 +3,9 @@ NAME
     available on CPAN
 
 VERSION
-    This document describes version 0.012 of Acme::CPANModules::GrepVariants
+    This document describes version 0.013 of Acme::CPANModules::GrepVariants
     (from Perl distribution Acme-CPANModules-GrepVariants), released on
-    2024-01-18.
+    2024-11-20.
 
 DESCRIPTION
     This list catalogs various grep-like tools.
@@ -92,9 +92,14 @@ DESCRIPTION
     With wcgrep (from App::wcgrep) you can search using wildcard pattern
     instead of regex, which is admittedly more limited than regex.
 
-    grep-similar-text (from App::grep::similar::text lets you specify a text
+    grep-similar-to (from App::grep::similar::text lets you specify a text
     and it will only show lines from input that are similar to the provided
     text.
+
+    grep-sounds-like (from App::grep::sounds::like lets you specify a word
+    and it will only show lines from input that have words that sound like
+    the provided word. You can choose from one of several phonetic
+    algorithms like Metaphone (the default), Soundex, etc.
 
     4a. Variants: alternate source: repository (version control system)
     content and history
@@ -170,7 +175,7 @@ DESCRIPTION
 
 ACME::CPANMODULES ENTRIES
     PerlPowerTools
-        Author: BDFOY <https://metacpan.org/author/BDFOY>
+        Author: BRIANDFOY <https://metacpan.org/author/BRIANDFOY>
 
     ack
     App::Gre
@@ -195,6 +200,9 @@ ACME::CPANMODULES ENTRIES
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
     App::grep::similar::text
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    App::grep::sounds::like
     App::pmgrep
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
@@ -310,8 +318,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024, 2023, 2021, 2020 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

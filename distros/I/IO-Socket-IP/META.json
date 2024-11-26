@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -28,14 +28,14 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "IO::Socket::IP" : {
          "file" : "lib/IO/Socket/IP.pm",
-         "version" : "0.42"
+         "version" : "0.43"
       }
    },
    "release_status" : "stable",
@@ -44,6 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.42",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.43",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

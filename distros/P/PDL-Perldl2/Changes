@@ -1,0 +1,5 @@
+2.002 2024-11-26
+- upload with "PDL::Perldl2" in a .pm
+
+2.001 2024-11-26
+- split out from PDL 2.095

@@ -15,7 +15,7 @@ A class to model a social link on a link site (part of App::LinkSite).
 use Feature::Compat::Class;
 
 class App::LinkSite::Social {
-  our $VERSION = '0.0.10';
+  our $VERSION = '0.0.11';
   use strict;
   use warnings;
   use feature qw[say signatures];

@@ -85,6 +85,24 @@ ccc1
 
 }
 
+{
+  ok my $res = request GET '/attributes';
+  ok my $data = $res->content;
+  is $data, '<tag
+  foo="1"
+  style="font: big"
+  class="aaa"
+  checked
+  selected
+  disabled
+  readonly
+  required
+  href="http://example.comvvv"
+  src="http://example.comvvv"
+>
+<tag foo="1" class="aaa bbb" data-aaa="foo" data-bbb="bar">';
+}
+
 done_testing;
 
 __END__

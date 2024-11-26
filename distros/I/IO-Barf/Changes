@@ -1,3 +1,8 @@
+0.11 2024-11-26T11:06:18+01:00
+ - Rename example files to better name.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.10 2021-01-26T21:46:25+01:00
  - Fix bugtracker.
  - Rewrite doc to use =head2 in SUBROUTINES section.

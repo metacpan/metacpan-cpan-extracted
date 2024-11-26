@@ -6,7 +6,6 @@ sub pp_defc {
   my $decl = delete $hash{_decl};
   $decl =~ s/\$GENERIC\(\)\s*\*/void */g; # dodge float vs float complex ptr problem
   $hash{Code} = "$decl\n$hash{Code}";
-  pp_def("__Cc$function", %hash);
   my %hash2 = %hash;
   $hash2{Pars} = join ';', map s/\(2(?:,|(?=\)))/(/ ? "complex $_" : $_, split /;/, $hash2{Pars};
   if ($hash2{RedoDimsCode}) {
@@ -32,10 +31,6 @@ $doc
 =cut
 
 sub PDL::c$function {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref(\$_) eq 'PDL::Complex', \@_) and
-    (grep UNIVERSAL::isa(\$_, 'PDL') && !\$_->type->real, \@_);
-  goto &PDL::__Cc$function if grep ref(\$_) eq 'PDL::Complex', \@_;
   goto &PDL::__Nc$function;
 }
 *c$function = \\&PDL::c$function;

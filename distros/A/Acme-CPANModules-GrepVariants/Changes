@@ -1,3 +1,10 @@
+0.013   2024-11-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Add entry: grep-sounds-like.
+
+        - Rename entry: grep-similar-text -> grep-similar-to.
+
+
 0.012   2024-01-18  Released-By: PERLANCAR; Urgency: medium
 
         - Add entry: App::grep::similar::text.

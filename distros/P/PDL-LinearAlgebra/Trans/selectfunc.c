@@ -15,19 +15,16 @@ void dfunc_wrapper(void *p, integer n, SV* dfunc)
 {
    dSP ;
    PDL_Indx odims[] = {0};
-   PDL_Indx pc_dims[] = {2,n};
    PDL_Indx nat_dims[] = {n};
-   SV *pcv = perl_get_sv("PDL::Complex::VERSION", 0);
-   char use_native = !pcv || !SvOK(pcv);
-   PDL_Indx *dims = use_native ? nat_dims : pc_dims;
-   PDL_Indx ndims = use_native ? 1 : 2;
-   int type_add = use_native ? PDL_CF - PDL_F : 0;
+   PDL_Indx *dims = nat_dims;
+   PDL_Indx ndims = 1;
+   int type_add = PDL_CF - PDL_F;
    pdl *pdl = PDL->pdlnew();
    PDL->setdims(pdl, dims, ndims);
    pdl->datatype = PDL_D + type_add;
    pdl->data = p;
    pdl->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
-   HV *bless_stash = gv_stashpv(use_native ? "PDL" : "PDL::Complex", 0);
+   HV *bless_stash = gv_stashpv("PDL", 0);
    ENTER ;   SAVETMPS ;   PUSHMARK(sp) ;
    SV *pdl1 = sv_newmortal();
    PDL->SetSV_PDL(pdl1, pdl);

@@ -1,0 +1,103 @@
+=encoding utf8
+
+=head1 NAME
+
+Business::CAMT::Message - base class for messages
+
+=head1 SYNOPSIS
+
+  my $camt = Business::CAMT->new(...);
+
+  my $msg  = $camt->read(...);
+  my $msg  = $camt->create(...);
+
+  $msg->write('file.xml');
+  print $msg->toString;
+
+=head1 DESCRIPTION
+
+This module is the base class for objects which are able to interpret
+the CAMT messages.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Business::CAMT::Message-E<gt>B<fromData>(%options)
+
+This method accepts the same %options as N<new()>.  All options
+passed in are passed to that constructor.
+
+=item Business::CAMT::Message-E<gt>B<new>(%options)
+
+The data (probably read from a file) is wrapped into this class.  When
+C<data> is undef, then C<undef> will be returned.
+
+ -Option --Default
+  camt     <required>
+  data     <required>
+  set      <required>
+  version  <required>
+
+=over 2
+
+=item camt => L<Business::CAMT|Business::CAMT> object
+
+=item data => HASH
+
+=item set => STRING
+
+=item version => STRING
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<camt>()
+
+=item $obj-E<gt>B<set>()
+
+=item $obj-E<gt>B<version>()
+
+=back
+
+=head2 Other
+
+=over 4
+
+=item $obj-E<gt>B<toString>()
+
+Convert the HASH into a string, using Data::Dumper.  This is
+usefull, because you do not want to include the hidden object
+attributes in your output.
+
+=item $obj-E<gt>B<write>($file, %options)
+
+All %options are passed to L<Business::CAMT::write()|Business::CAMT/"Read and Write messages">.
+
+example: for write
+
+   $msg->write($file);
+   $camt->write($file, $msg);   # same
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Business-CAMT distribution version 0.11,
+built on November 26, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+
+=head1 LICENSE
+
+Copyrights 2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

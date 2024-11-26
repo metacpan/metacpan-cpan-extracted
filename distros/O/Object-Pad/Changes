@@ -1,5 +1,17 @@
 Revision history for Object-Pad
 
+0.816   2024-11-25
+        [CHANGES]
+         * Rewrote module introduction documentation, emphasising the relating
+           to core perl 'class' feature and `Feature::Compat::Class`
+         * Added a documentation file, giving a guide to migrating from
+           classical Perl to `Object::Pad`
+
+        [BUGFIXES]
+         * Fix for t/82devel-mat-dumper-helper.t should require `Devel::MAT`
+           v0.53 or later, in case DMD writes a file in format version 0.6
+           (RT157189)
+
 0.815   2024-11-13
         [CHANGES]
          * Initial experiment at adding `APPLY` phaser blocks to roles

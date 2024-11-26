@@ -8,8 +8,9 @@ use t_TestCommon # Test2::V0 etc.
 package Inner;
 our @ISA = ('Outer');
 use Data::Dumper::Interp;
-use Spreadsheet::Edit::Log qw/fmt_call log_call
-                              nearest_call abbrev_call_fn_ln_subname/;
+use Spreadsheet::Edit::Log
+  qw/fmt_call log_call nearest_call abbrev_call_fn_ln_subname/,
+  ':btw=$lno/$fname/$pkg/$package' ;
 
 sub new { my $class=shift; bless {color => $_[0]}, $class }
 sub get { my $self=shift; $self->{color} }
@@ -40,15 +41,28 @@ our %SpreadsheetEdit_Log_Options = (
   },
 );
 
+sub doeval {
+  my ($self, $str) = @_;
+  my $result = eval $str;
+  return defined($result) ? "normal:$result" : "exc:$@";
+}
+sub xxxtest {
+  my $result = "";
+  return defined($result) ? "normal:$result" : "exc:$@";
+}
+
 package Outer;
 sub new { my $class = shift; bless {inner=>Inner->new(@_)}, $class }
 sub get              { my $self=shift; $self->{inner}->get(@_) }
 sub meth_noretval    { my $self=shift; $self->{inner}->_pvt_noretval(@_); }
 sub meth_1retval     { my $self=shift; $self->{inner}->_pvt_1retval(@_); }
 sub meth_multiretval { my $self=shift; $self->{inner}->_pvt_multiretval(@_); }
+sub doeval           { my $self=shift; $self->{inner}->doeval(@_) }
+sub xxxtest           { my $self=shift; $self->{inner}->xxxtest(@_) }
 
 package main;
 use Spreadsheet::Edit::Log qw/nearest_call abbrev_call_fn_ln_subname/;
+my $myFILE_basename = basename(__FILE__);
 
 my $obj = Outer->new("red");
 my $obj2 = Outer->new("blue");
@@ -86,7 +100,10 @@ sub interm {
 sub foo {
   &interm;
 }
-checklog { &interm } '"main" '.__LINE__.' "main::interm" abbrev=("'.basename(__FILE__).'",'.__LINE__.',"interm")',"nerest_call() / abbrev_call_fn_ln_subname","NOHEAD";
+checklog { &interm }
+  '"main" '.(__LINE__-1)." \"main::interm\" abbrev=(\"$myFILE_basename\",".(__LINE__-1).',"interm")',
+  "nerest_call() / abbrev_call_fn_ln_subname",
+  "NOHEAD";
 
 #### Test log_call using our custom fmt_object callback ####
 
@@ -110,6 +127,46 @@ my $obj_xx = Outer->new("purple");
 checklog { $obj_xx->meth_noretval; } qr/<\d{3,}:[\da-fA-F]{3,}>\.meth_noretval/;
 checklog { $obj_xx->meth_noretval; } qr/\.meth_noretval/;
 checklog { $obj2->meth_1retval; } qr/<\d{3,}:[\da-fA-F]{3,}>\.meth_1retval\(\) ==> 42/;
+
+#### Test btw and friends ####
+{ my $obj = Outer->new("btw"); # equivalent to btwN 0,...
+  my $explno = (__LINE__)+1;
+  checklog { $obj->doeval('btw "FOO"') }  qr{
+              # pfx is lno/fname/pkg/package
+              1/\(eval\ \d+\)/Inner/Inner:\ FOO
+           }sx, "btw test", "NOHEAD" ;
+}
+{ my $obj = Outer->new("btwN3");
+  my $explno = (__LINE__)+1;
+  checklog { $obj->doeval('btwN 3,"FOO"') }  qr{
+              # something like 141/90_Log.t/main/main««: FOO
+              ${explno}/$myFILE_basename/main/main[^\r\n\/]*:\ FOO
+           }sx, "btwN 3,...", "NOHEAD" ;
+}
+{ my $obj = Outer->new("btwNslash2");
+  my $explno = (__LINE__)+1;
+  checklog { $obj->doeval('btwN \2, "FOO"') }  qr{
+              1/\(eval\ \d+\)/Inner/Inner
+              .*? \d+/$myFILE_basename/Inner/Inner:\ FOO
+           }sx,
+           "btwN \\2,...",
+           "NOHEAD"
+            ;
+}
+{ my $obj = Outer->new("btwbt");
+  my $explno = (__LINE__)+1;
+  checklog { $obj->doeval('btwbt "FOO"') }  qr{
+              # pfx is lno/fname/pkg/package
+              1/\(eval\ \d+\)/Inner/Inner .*? \d+/$myFILE_basename/Inner/Inner
+              .*? \d+/$myFILE_basename/Outer/Outer
+              .*? \d+/$myFILE_basename/main/main
+              .* # Capture::Tiny stuff
+                $explno/$myFILE_basename/main/main:\ FOO
+           }sx,
+           "btwbt test",
+           "NOHEAD"
+            ;
+}
 
 done_testing();
 exit 0;

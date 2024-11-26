@@ -4,9 +4,9 @@ use strict;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-18'; # DATE
+our $DATE = '2024-11-20'; # DATE
 our $DIST = 'Acme-CPANModules-GrepVariants'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 my $description = <<'_';
 This list catalogs various grep-like tools.
@@ -93,10 +93,14 @@ module instead.
 With <prog:wcgrep> (from <pm:App::wcgrep>) you can search using wildcard pattern
 instead of regex, which is admittedly more limited than regex.
 
-<prog:grep-similar-text> (from <pm:App::grep::similar::text> lets you specify a
+<prog:grep-similar-to> (from <pm:App::grep::similar::text> lets you specify a
 text and it will only show lines from input that are similar to the provided
 text.
 
+<prog:grep-sounds-like> (from <pm:App::grep::sounds::like> lets you specify a
+word and it will only show lines from input that have words that sound like the
+provided word. You can choose from one of several phonetic algorithms like
+Metaphone (the default), Soundex, etc.
 
 **4a. Variants: alternate source: repository (version control system) content and history**
 
@@ -200,7 +204,7 @@ Acme::CPANModules::GrepVariants - List of grep-like CLI utilities available on C
 
 =head1 VERSION
 
-This document describes version 0.012 of Acme::CPANModules::GrepVariants (from Perl distribution Acme-CPANModules-GrepVariants), released on 2024-01-18.
+This document describes version 0.013 of Acme::CPANModules::GrepVariants (from Perl distribution Acme-CPANModules-GrepVariants), released on 2024-11-20.
 
 =head1 DESCRIPTION
 
@@ -285,9 +289,14 @@ module instead.
 With L<wcgrep> (from L<App::wcgrep>) you can search using wildcard pattern
 instead of regex, which is admittedly more limited than regex.
 
-L<grep-similar-text> (from L<App::grep::similar::text> lets you specify a
+L<grep-similar-to> (from L<App::grep::similar::text> lets you specify a
 text and it will only show lines from input that are similar to the provided
 text.
+
+L<grep-sounds-like> (from L<App::grep::sounds::like> lets you specify a
+word and it will only show lines from input that have words that sound like the
+provided word. You can choose from one of several phonetic algorithms like
+Metaphone (the default), Soundex, etc.
 
 B<4a. Variants: alternate source: repository (version control system) content and history>
 
@@ -365,7 +374,7 @@ L<dategrep> (from L<App::dategrep>) prints lines matching a date range.
 
 =item L<PerlPowerTools>
 
-Author: L<BDFOY|https://metacpan.org/author/BDFOY>
+Author: L<BRIANDFOY|https://metacpan.org/author/BRIANDFOY>
 
 =item L<ack>
 
@@ -398,6 +407,10 @@ Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =item L<App::grep::similar::text>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<App::grep::sounds::like>
 
 =item L<App::pmgrep>
 
@@ -540,7 +553,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

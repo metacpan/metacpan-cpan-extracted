@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>02093nam a2200445 i 4500</leader>
+  <controlfield tag="001">nkc20233565872</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20240111121350.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">231107s2023    xr a   g      000 f cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb003565872</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">978-80-253-6569-4</subfield>
+    <subfield code="q">(vázáno)</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)1420606799</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABG001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">cze</subfield>
+    <subfield code="h">eng</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">821.111(73)-3</subfield>
+    <subfield code="x">Americká próza</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">25</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">821.111(73)-31</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(0:82-312.9)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Paolini, Christopher,</subfield>
+    <subfield code="d">1983-</subfield>
+    <subfield code="7">xx0025816</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="240" ind1="1" ind2="0">
+    <subfield code="a">Eragon.</subfield>
+    <subfield code="l">Česky</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Eragon /</subfield>
+    <subfield code="c">Christopher Paolini ; z anglického originálu Eragon ... přeložila Olga Machútová</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">1. vydání</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">V Praze :</subfield>
+    <subfield code="b">Fragment,</subfield>
+    <subfield code="c">2023</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">364 stran :</subfield>
+    <subfield code="b">ilustrace (převážně barevné) ;</subfield>
+    <subfield code="c">29 cm</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">text</subfield>
+    <subfield code="b">txt</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">bez média</subfield>
+    <subfield code="b">n</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">svazek</subfield>
+    <subfield code="b">nc</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Podnázev v tiráži: (ilustrované vydání)</subfield>
+  </datafield>
+  <datafield tag="520" ind1="2" ind2=" ">
+    <subfield code="a">Ilustrované vydání fantasy románu amerického autora. Úvodní díl o dobrodružné cestě malého chlapce a dračího mláděte.</subfield>
+    <subfield code="b">Nechte se okouzlit osudem chudého farmářského chlapce, který se spolu s dračicí Safirou vydává na nebezpečnou cestu královstvím pod krutovládou zlého krále. Dokáže Eragon naplnit své předurčení a převzít břímě legendárních Dračích jezdců? Osud celé země možná leží v jeho rukou. Díky barevným velkoformátovým ilustracím vám tento legendární příběh doslova ožije před očima. Nakladatelská anotace. Kráceno.</subfield>
+  </datafield>
+  <datafield tag="546" ind1=" " ind2=" ">
+    <subfield code="a">Český text</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">americké romány</subfield>
+    <subfield code="7">fd131796</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">fantasy romány</subfield>
+    <subfield code="7">fd184199</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">American fiction</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">fantasy novels</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Staníčková, Olga</subfield>
+    <subfield code="7">xx0031599</subfield>
+    <subfield code="4">trl</subfield>
+  </datafield>
+  <datafield tag="787" ind1="0" ind2="8">
+    <subfield code="i">Z cyklu:</subfield>
+    <subfield code="t">Odkaz Dračích jezdců (ilustrované vydání)</subfield>
+    <subfield code="g">1</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="b">9788025365694</subfield>
+    <subfield code="f">1. vydání</subfield>
+    <subfield code="o">20240103</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="928" ind1="9" ind2=" ">
+    <subfield code="a">Albatros Media - Fragment</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">003565872</subfield>
+  </datafield>
+</record>
+
+</collection>

@@ -13,7 +13,7 @@ sub cgiapp_init {
 
     $self->session_config(
         {   CGI_SESSION_OPTIONS =>
-                [ "driver:File", $self->query, { Directory => 't/' },
+                [ "driver:File", $self->query, {},
             { name => 'foobar' }
             ],
             SEND_COOKIE    => 1,

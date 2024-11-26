@@ -11,6 +11,7 @@ SYNOPSIS
      my $authors_of_introduction_ar = $obj->authors_of_introduction;
      my $compilers = $obj->compilers;
      my $cover = $obj->cover;
+     my $cycles_ar = $obj->cycles;
      my $directors_ar = $obj->directors;
      my $dml = $obj->dml;
      my $edition_number = $obj->edition_number;
@@ -75,6 +76,13 @@ METHODS
             Book cover. Possible values: * hardback * paperback
 
             Default value is undef.
+
+    *       "cycles"
+
+            List of book cycles. Reference to array with
+            MARC::Convert::Wikidata::Object::Series instances.
+
+            Default value is [].
 
     *       "directors"
 
@@ -254,6 +262,14 @@ METHODS
 
     Returns string (hardback or paperback).
 
+  "cycles"
+     my $cycles_ar = $obj->cycles;
+
+    Get reference to array with Serie item objects.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::Series
+    instances.
+
   "directors"
      my $directors_ar = $obj->directors;
 
@@ -421,6 +437,7 @@ ERRORS
                      Author of introduction isn't 'MARC::Convert::Wikidata::Object::People' object.
                      Book series isn't 'MARC::Convert::Wikidata::Object::Series' object.
                      Book cover '%s' doesn't exist.
+                     Book cycle isn't 'MARC::Convert::Wikidata::Object::Series' object.
                      Compiler isn't 'MARC::Convert::Wikidata::Object::People' object.
                      Director isn't 'MARC::Convert::Wikidata::Object::People' object.
                      Editor isn't 'MARC::Convert::Wikidata::Object::People' object.
@@ -431,6 +448,7 @@ ERRORS
                      Parameter 'authors_of_afterword' must be a array.
                      Parameter 'authors_of_introduction' must be a array.
                      Parameter 'compilers' must be a array.
+                     Parameter 'cycles' must be a array.
                      Parameter 'directors' must be a array.
                      Parameter 'editors' must be a array.
                      Parameter 'end_time' must be a number.
@@ -558,5 +576,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

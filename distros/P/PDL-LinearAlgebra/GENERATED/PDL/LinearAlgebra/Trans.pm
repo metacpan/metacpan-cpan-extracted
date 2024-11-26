@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from trans.pd! Don't modify!
 #
 package PDL::LinearAlgebra::Trans;
 
@@ -10,7 +10,7 @@ our @EXPORT_OK = qw( mexp mexpts mlog msqrt mpow
 			macosh masinh matanh masech macsch macoth
 			sec asec sech asech 
 			cot acot acoth coth mfun
-			csc acsc csch acsch toreal pi geexp __Ccgeexp __Ncgeexp cgeexp __Cctrsqrt __Nctrsqrt ctrsqrt __Cctrfun __Nctrfun ctrfun );
+			csc acsc csch acsch toreal pi geexp __Ncgeexp cgeexp __Nctrsqrt ctrsqrt __Nctrfun ctrfun );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -130,18 +130,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-*__Ccgeexp = \&PDL::__Ccgeexp;
-
-
-
-
 *__Ncgeexp = \&PDL::__Ncgeexp;
 
 
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 cgeexp
 
@@ -159,19 +154,10 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 =cut
 
 sub PDL::cgeexp {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Ccgeexp if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Ncgeexp;
 }
 *cgeexp = \&PDL::cgeexp;
-#line 170 "Trans.pm"
-
-*__Cctrsqrt = \&PDL::__Cctrsqrt;
-
-
-
+#line 161 "Trans.pm"
 
 *__Nctrsqrt = \&PDL::__Nctrsqrt;
 
@@ -179,7 +165,7 @@ sub PDL::cgeexp {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 ctrsqrt
 
@@ -198,19 +184,10 @@ If uplo is true, A is lower triangular.
 =cut
 
 sub PDL::ctrsqrt {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cctrsqrt if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nctrsqrt;
 }
 *ctrsqrt = \&PDL::ctrsqrt;
-#line 209 "Trans.pm"
-
-*__Cctrfun = \&PDL::__Cctrfun;
-
-
-
+#line 191 "Trans.pm"
 
 *__Nctrfun = \&PDL::__Nctrfun;
 
@@ -218,7 +195,7 @@ sub PDL::ctrsqrt {
 
 
 
-#line 23 "../pp_defc.pl"
+#line 22 "../pp_defc.pl"
 
 =head2 ctrfun
 
@@ -234,10 +211,6 @@ If uplo is true, A is lower triangular.
 =cut
 
 sub PDL::ctrfun {
-  barf "Cannot mix PDL::Complex and native-complex" if
-    (grep ref($_) eq 'PDL::Complex', @_) and
-    (grep UNIVERSAL::isa($_, 'PDL') && !$_->type->real, @_);
-  goto &PDL::__Cctrfun if grep ref($_) eq 'PDL::Complex', @_;
   goto &PDL::__Nctrfun;
 }
 *ctrfun = \&PDL::ctrfun;
@@ -476,7 +449,7 @@ Return matrix cosine of a square matrix.
 =cut
 
 sub _i {
-  defined $PDL::Complex::VERSION ? PDL::Complex::i() : i();
+  i();
 }
 
 *mcos = \&PDL::mcos;
@@ -1184,7 +1157,6 @@ sub PDL::mfun {
 		my ($e, $v) = $m->meigen(0,1);
 		my ($inv, $info) = $v->minv;
 		unless ($info){
-			$method = 'PDL::Complex::'.$method unless ref($method);
 			eval {$v = ($v * $e->$method) x $v->minv;};
 			if ($@){
 				warn "mfun: Error $@\n";
@@ -1204,7 +1176,6 @@ sub PDL::mfun {
 			warn "mfun: Can't compute Schur form\n";
 			return;		
 		}
-		$method = 'PDL::Complex::'.$method unless ref($method);
 		($t, $info) = $t->ctrfun(0,$method);
 		if($info){
 			warn "mfun: Can't compute $method\n";
@@ -1229,7 +1200,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 1233 "Trans.pm"
+#line 1204 "Trans.pm"
 
 # Exit with OK status
 

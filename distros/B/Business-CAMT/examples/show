@@ -11,15 +11,10 @@ use Business::CAMT  ();
 
 use Log::Report; # mode => 'DEBUG';
 
-use Data::Dumper;
-$Data::Dumper::Indent    = 1;
-$Data::Dumper::Quotekeys = 0;
-$Data::Dumper::Sortkeys  = 1;
+@ARGV >= 1
+	or error "Usage: $0 \$infile [\$outfile]";
 
-@ARGV==1
-	or error "Usage: $0 <xml>";
-
-my $xml  = $ARGV[0];
+my ($xml, $outfile) = @ARGV;
 -r $xml or fault "XML file cannot be used";
 
 my $camt = Business::CAMT->new(
@@ -29,4 +24,15 @@ my $camt = Business::CAMT->new(
 );
 
 my $data = $camt->read($xml);
-print Dumper $data;
+
+print "** The content of the message.  Compare this with template to learn.\n";
+print $data->toString;
+
+print "** The data is a ". (ref $data) . " object.\n";
+
+if($outfile)
+{	print "** Writing the same data to file $outfile\n";
+	$data->write($outfile);
+}
+
+exit 0;

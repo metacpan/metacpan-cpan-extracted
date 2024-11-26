@@ -24,5 +24,5 @@ requires:
   SPVM::Net::SSLeay: '0.017'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-IO-Socket-SSL.git
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

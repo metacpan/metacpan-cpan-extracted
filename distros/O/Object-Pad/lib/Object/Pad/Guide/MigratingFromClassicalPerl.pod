@@ -1,0 +1,442 @@
+=head1 TITLE
+
+Migrating from Classical Perl to L<Object::Pad>
+
+=head1 INTRODUCTION
+
+L<Object::Pad> provides a convenient and modern syntax for writing code in a
+class-based object oriented style. It is likely you already have much code
+already written using Perl's original style, of manual calls to C<bless>,
+storing instance data directly in hash keys, and so on. This guide aims to
+provide a sequence of steps to help rewrite this kind of code into using
+C<Object::Pad> instead.
+
+As well as being useful on its own, this can often serve as the first step
+towards a further onwards migration to L<Feature::Compat::Class>, and
+eventually the native class syntax provided by recent version of Perl itself
+as L<the 'class' feature|feature/"The 'class' feature">. See also
+L<perlclass>.
+
+=head1 SCENARIO 1 - A SIMPLE CLASS
+
+=for highlighter language=perl
+
+Lets suppose we have a simple module that provides some sort of object class
+based on a blessed hash reference. Before we start, the module file begins
+
+   use v5.36;
+    
+   package My::Example::Class v1.23;
+
+   sub new
+   {
+      my $class = shift;
+      my %params = @_;
+
+      return bless {
+         x => $params{x} // 0,
+         y => $params{y} // 0,
+      }, $class;
+   }
+
+   ...
+
+Over the following steps we will look at a sequence of small changes that can
+be made to this file, to turn it into using C<Object::Pad> in a good style.
+These steps are self-contained, in that each can be made one at a time, while
+the code remains fully operational with its intended behaviour, in-between.
+Each of these changes is also entirely internal within the source file that
+implements this class. The externally-visible API to this class that other
+code will see remains entirely unmodified.
+
+As a result of this, you do not have to migrate everything all at once. You
+can start by altering just a few files, or making just the first few changes
+to some files, and the system or application as a whole will remain running
+just as it did before. This allows you to gradually rewrite in stages, without
+needing to perform one big distruptive change.
+
+=head2 Step 1 - Basics
+
+The first thing to do is to add the C<use Object::Pad> line at the start. This
+gives us several new keywords - most notably the C<class> keyword which we'll
+use for declaring the class itself. Don't worry about imports polluting the
+C<main::> namespace - the C<Object::Pad> module only has lexical effects, so
+the scope of its additions is limited to this file alone.
+
+We'll give a module version number to this C<use> statement. This is
+important, because we want to ensure we have a sufficiently recent version of
+the module for our current set of features. 
+
+Now our file can begin
+
+   use v5.36;
+   use Object::Pad v0.800;
+
+   package My::Example::Class v1.23;
+
+   sub new
+   {
+      ...
+   }
+
+Next up, we need to declare our class by using the C<class> keyword. This can
+be used in place of the C<package> keyword. As we are in the process of
+migrating some existing code, we need to temporarily tell C<Object::Pad> to do
+something odd with the object instances.
+
+Normally for a newly-written class, it will pick its own internal
+representation type for instances, that is largely opaque to outside
+interaction. This internal type may be some kind of array reference on older
+Perl versions, but on versions of Perl new enough to support the C<class>
+feature it actually uses the same opaque representation type that core Perl
+classes will use.
+
+Until we have finished our migration process for this class, we need to ensure
+it uses a blessed hash reference so that existing code we've yet to rewrite
+continues to work correctly. Much of this code will presume that object
+instances are hash references and will attempt to use individually named keys
+within these references to store their data. For this to keep working, we need
+to supply the C<:repr> attribute, and ask to specifically use blessed hash
+references.
+
+   use v5.36;
+   use Object::Pad v0.800;
+
+   class My::Example::Class v1.23 :repr(HASH);
+
+   sub new
+   {
+      ...
+   }
+
+=head2 Step 2 - Constructor
+
+We could at this point try running the code already, although in practice we
+haven't really changed anything yet. If we did we'd get one warning already:
+
+=for highlighter
+
+    Subroutine new redefined at ...
+
+=for highlighter language=perl
+
+This warning comes because C<Object::Pad> has already provided a constructor
+method, named C<new>, so our code doesn't have to. The next thing we need to
+do, then, is to get rid of our current C<new> method and move the code
+elsewhere.
+
+Looking in more detail at our original code, we can take a look at the C<new>
+method. This takes a hash of incoming parameters, and extracts a couple of
+values to use as instance fields, along with defaulting values in case they
+are missing. This includes the C<bless> expression itself.
+
+   sub new
+   {
+      my $class = shift;
+      my %params = @_;
+
+      return bless {
+         x => $params{x} // 0,
+         y => $params{y} // 0,
+      }, $class;
+   }
+
+We can replace this constructor with a C<BUILD> phaser. This is a named block,
+much like C<BEGIN> or similar in core Perl, which provides some code that runs
+at a particular time. The code in this block runs as part of the constructor
+that C<Object::Pad> provided for us.
+
+Much like with the C<:repr> attribute we added earlier, this block is more of
+a temporary tool to aid the process of migrating existing code. It wouldn't be
+used in a newly-written native class - there are better things to use there.
+But for now, it is required because it gives us a way to handle the incoming
+arguments to the constructor and set up the initial values of those fields.
+
+Within the scope of the C<BUILD> phaser, a lexical variable called C<$self> is
+implicitly visible; its value will be a reference to the object being
+constructed. This will be a common theme later on - you don't need to
+specifically handle this as an argument; it is done automatically. When the
+C<BUILD> phaser runs, it receives as any extra arguments into its C<@_> array
+all of the additional values that the caller passed to the constructor. So we
+can inspect them there in the same way.
+
+We can now replace the entire C<sub new> with the following C<BUILD> phaser
+
+   BUILD
+   {
+      my %params = @_;
+
+      $self->{x} = $params{x} // 0;
+      $self->{y} = $params{y} // 0;
+   }
+
+Since we're on a version of Perl that is newer than C<v5.26>, we can use
+subroutine signature syntax to further tidy this block up. Like subroutines
+(and as we'll see later on, methods), these C<BUILD> phasers can be annotated
+with a signature, to automatically unpack the arguments passed in. We can
+write this even shorter.
+
+   BUILD ( %params )
+   {
+      $self->{x} = $params{x} // 0;
+      $self->{y} = $params{y} // 0;
+   }
+
+=head2 Step 3 - Method
+
+Now lets turn our focus to the other methods in the file. Most likely there
+were some existing methods designed as field accessors, and perhaps other
+behaviour that actually performs some real work. For the sake of providing
+some interesting variety of styles to migrate from, lets look at a few
+different ways the existing code might have been written.
+
+   sub x { return shift->{x}; }
+   sub set_x { $_[0]->{x} = $_[1]; }
+
+   sub y ( $self )
+   {
+      return $self->{y};
+   }
+
+   sub set_y ( $self, $new_y )
+   {
+      $self->{y} = $new_y;
+   }
+
+   sub reset
+   {
+      my $self = shift;
+      $self->{x} = $self->{y} = 0;
+   }
+
+In each of these cases, we can use another of C<Object::Pad>'s new keywords,
+C<method>. A C<method> declaration is similar to a C<sub>, except that it
+automatically handles the implicit C<$self> argument at the beginning of the
+argument list. In each method body, we already have such a variable in scope
+without needing to have explicitly created it ourselves.
+
+   method x { return $self->{x}; }
+   method set_x { $self->{x} = $_[0]; }
+
+   method y
+   {
+      return $self->{y};
+   }
+
+   method set_y ( $new_y )
+   {
+      $self->{y} = $new_y;
+   }
+
+   method reset
+   {
+      $self->{x} = $self->{y} = 0;
+   }
+
+In particular with the C<set_x> method, note that since the implicit C<$self>
+has been shifted out of the arguments array, the new value for the field now
+appears at C<$_[0]>, not C<$_[1]> as it had done prior.
+
+Like we did earlier with the C<BUILD> phaser, we can additionally make
+consistent use of subroutine signatures while we're here, to have some neater
+handling of the other arguments passed in to these method. While we're at it
+it's always good practice to mark an empty signature C<()> on any methods
+we're not expecting to pass additional arguments into, so that at runtime it
+will complain if someone accidentally does.
+
+   method x ()             { return $self->{x}; }
+   method set_x ( $new_x ) { $self->{x} = $new_x; }
+
+   method y ()             { return $self->{y}; }
+   method set_y ( $new_y ) { $self->{y} = $new_y; }
+
+   method reset ()
+   {
+      $self->{x} = $self->{y} = 0;
+   }
+
+=head2 Step 4 - Fields
+
+One of the key benefits of using C<Object::Pad> over plain classical Perl
+style is that all of the fields that store data within each instance are
+accessible using syntax that makes them look like lexical variables, rather
+than hash-key access via C<$self>. All of our changes so far have been leading
+up to the ability to do exactly this. So lets do that now.
+
+So far in all of our code, we have only used fields C<< $self->{x} >> and
+C<< $self->{y} >>. We can now declare those two using the C<field> keyword, and
+replace all of the occurances in existing code with those names.
+
+   field $x;
+   field $y;
+
+   BUILD ( %params )
+   {
+      $x = $params{x} // 0;
+      $y = $params{y} // 0;
+   }
+
+   method x ()             { return $x; }
+   method set_x ( $new_x ) { $x = $new_x; }
+
+   method y ()             { return $y; }
+   method set_y ( $new_y ) { $y = $new_y; }
+
+   method reset ()
+   {
+      $x = $y = 0;
+   }
+
+At this point it may be that there is now no longer any code left which tries
+to access C<$self> as if it was a hash reference. All of the basic field
+access in these methods has been updated to use the real C<field> variables.
+If we're sure we have no other code left in this file, and no other code
+elsewhere that, for example, tries to make any subclasses of this class, then
+it will be safe to remove the C<:repr(HASH)> attribute on the C<class> line.
+
+   use v5.36;
+   use Object::Pad v0.800;
+
+   class My::Example::Class v1.23;
+
+If not, there is no great trouble in it remaining there for a while longer,
+until a wider and more complete migration of the entire codebase has been
+completed. They can be tidied up at the end.
+
+=head2 Step 5 - Convenience Accessors
+
+At this point, you may notice a common pattern with the accessor methods we
+defined. We have two reader methods that simply return the current value of
+the fields, and two writer methods that simply set a new value.
+
+As this is such a common pattern, C<Object::Pad> provides some attributes you
+can annotate onto a C<field> declaration to have it build these methods for
+you. These attributes are called C<:reader> and C<:writer>.
+
+   field $x :reader :writer;
+   field $y :reader :writer;
+
+The C<:reader> attribute will create a reader method identical to the ones
+we manually created in the previous example. By default each method will be
+named as per the field it is attached to. 
+
+Likewise, the C<:writer> attribute will create a writer method identical to
+the ones we created as well. Its naming convention is that it will prepend
+C<set_> to the name of the field, so once again its default behaviour already
+matches the names of the accessors we wish to be created.
+
+With these in place we can entirely delete our manually-written C<x>,
+C<set_x>, C<y> and C<set_y> methods.
+
+=head2 Step 6 - Parameters and Field Defaults
+
+Recall earlier that we created the C<BUILD> block as a temporary migration
+tool to help handle constructor parameters. Now that we have real C<field>
+declarations it is time to fix that up into a more appropriate way of working.
+
+As was the case with the C<:reader> and C<:writer> attributes on a field,
+there is another attribute called C<:param> that can be applied which requests
+some implicit behaviour by C<Object::Pad> itself, to assign the value of a
+field from a named parameter passed to the constructor.
+
+   field $x :reader :writer :param;
+   field $y :reader :writer :param;
+
+As it stands, these create named parameters to the class constructor that act
+much like signature parameters without defaulting expressions - in that, they
+are mandatory. An error is raised at runtime if a caller does not provide a
+corresponding value for one.
+
+   My::Example::Class->new( x => 100 )
+
+Z<>
+
+=for highlighter
+
+   Required parameter 'y' is missing for My::Example::Class constructor at ...
+
+=for highlighter language=perl
+
+In order to match the behaviour of the original C<sub new> and later the
+C<BUILD> phaser we temporarily added, we should provide a default value for
+these fields that will be applied if the caller did not pass in a more
+specific one. Since the original behaviour applied the value C<0> using the
+C<//> operator, we can preserve this same behaviour by using the C<//=>
+assignment operator. This applies the default if the named parameter was
+absent, or given as the value C<undef>.
+
+   field $x :reader :writer :param //= 0;
+   field $y :reader :writer :param //= 0;
+
+As these defaulting operators entirely provide the behaviour we wrote manually
+in the C<BUILD> phaser, we can delete that too.
+
+=head2 The End Result
+
+Now we have finished these steps, we have fully converted our original class
+that was written using classical Perl with manual C<bless> expressions into
+using all of the conveniences and features of the object system provided by
+C<Object::Pad>. Many of the behaviours that had been explicitly provided in
+manually-written code are now implied by standard features of the object
+system. This makes them easier to comprehend at a quick glance. There is no
+custom code to have to read and understand, instead the mere presence of the
+standard keywords and attributes.
+
+Having started with the customly-written code at the beginning, we are now
+left with far fewer lines. The entire behaviour is now captured by this:
+
+   use v5.36;
+   use Object::Pad v0.800;
+
+   class My::Example::Class v1.23;
+
+   field $x :reader :writer :param //= 0;
+   field $y :reader :writer :param //= 0;
+
+   method reset ()
+   {
+      $x = $y = 0;
+   }
+
+=head2 Addendum - Conventions on Field Names
+
+Since these field variables are lexically scoped at the entire file level, in
+larger code examples it can sometimes be hard to remember that they even are
+field variables, confusing them with signature parameters or lexicals within
+individual methods and smaller bodies of code. With the previous style of
+using blessed hash references, the C<< $self->{...} >> pattern gives an
+obvious visual clue, but that kind of clue is lacking here.
+
+It is a common style choice in larger classes to give field variables names
+all beginning with a single underscore character, to distinguish them. This
+naming style makes it a little easier to see at a glance when looking at code
+that may be far away from the field declarations, that these variables even
+are fields.
+
+   field $_x;
+   field $_y;
+
+   BUILD ( %params )
+   {
+      $_x = $params{x} // 0;
+      $_y = $params{y} // 0;
+   }
+
+   method reset ()
+   {
+      $_x = $_y = 0;
+   }
+
+   ...
+
+Since C<Object::Pad> knows about the naming convention of beginning each field
+variable with a leading underscore it will ignore that for the purposes of
+things like handling constructor arguments for C<:param>, or generating
+accessor methods for C<:reader> and C<:writer>. Thus the methods are still
+named C<x> and C<y> as we would like.
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

@@ -18,27 +18,27 @@ $Data::Dumper::Sortkeys  = 1;
 
 my $xsddir  = 'lib/Business/CAMT/xsd';
 my $tagdir  = 'lib/Business/CAMT/tags';
-my $templs  = 'templates';
 my $urnbase = 'urn:iso:std:iso:20022:tech:xsd';
 
-my $camt    = Business::CAMT->new;
-my $schemas = $Business::CAMT::schemas;
-
+my $templs  = 'templates';
 -d $templs or mkdir $templs or fault $templs;
 
-my %abbrevs;
+my $templs2  = 'templates-long';
+-d $templs2 or mkdir $templs2 or fault $templs2;
 
 #
 ## Create templates with abbreviations
 #
 
 say "Creating templates with abbreviated tags.";
+my $camt    = Business::CAMT->new;
+my %abbrevs;
 
 foreach my $version ($camt->knownVersions)
-{	$schemas->importDefinitions("$xsddir/$version.xsd");
+{	$camt->schemas->importDefinitions("$xsddir/$version.xsd");
 	my $ns   = "$urnbase:$version";
 
-	my $dump = $schemas->template(PERL => "{$ns}Document");
+	my $dump = $camt->schemas->template(PERL => "{$ns}Document");
 
 	my $fn   = "$templs/$version.dd";
 	open my $fh, '>:encoding(UTF-8)', $fn or fault $fn;
@@ -84,4 +84,25 @@ $current{$_} ||= $umltags{$_} || '' for keys %abbrevs;
 say "Missing long names: " . (grep $current{$_} eq '', keys %current);
 
 write_text "$tagdir/index.csv", join '', map "$_,$current{$_}\n", sort keys %current;
+
+#
+## Create templates with long names
+#
+
+say "Creating templates with full size tags.";
+my $camt2    = Business::CAMT->new(long_tagnames => 1);
+
+foreach my $version ($camt2->knownVersions)
+{	$camt2->schemas->importDefinitions("$xsddir/$version.xsd");
+ 	my $ns   = "$urnbase:$version";
+	my $fn   = "$templs2/$version.dd";
+	open my $fh, '>:encoding(UTF-8)', $fn or fault $fn;
+
+	$fh->print($camt2->schemas->template(PERL => "{$ns}Document",
+        key_rewrite   => $camt2->tag2fullnameTable,
+	));
+
+	$fh->close;
+}
+
 exit 0

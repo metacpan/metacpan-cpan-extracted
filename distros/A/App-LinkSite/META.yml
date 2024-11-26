@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'Create a website listing all of your links'
 author:
   - 'Dave Cross <dave@perlhacks.com>'
 build_requires:
@@ -29,5 +29,5 @@ requires:
 resources:
   bugtracker: https://github.com/davorg-cpan/app-linksite/issues
   repository: git://github.com/davorg-cpan/app-linksite.git
-version: v0.0.10
+version: v0.0.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

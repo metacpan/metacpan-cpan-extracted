@@ -1,9 +1,9 @@
 use 5.026;
 use warnings;
 
-package Pod::Weaver::PluginBundle::Author::AJNN;
+package Pod::Weaver::PluginBundle::Author::AJNN 0.08;
 # ABSTRACT: AJNN Pod::Weaver configuration
-$Pod::Weaver::PluginBundle::Author::AJNN::VERSION = '0.07';
+
 
 use Pod::Weaver 4.009;
 use Pod::Weaver::Config::Assembler;
@@ -49,7 +49,7 @@ Pod::Weaver::PluginBundle::Author::AJNN - AJNN Pod::Weaver configuration
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

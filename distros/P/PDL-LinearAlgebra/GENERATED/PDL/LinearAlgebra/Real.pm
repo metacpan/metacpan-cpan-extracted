@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from real.pd! Don't modify!
 #
 package PDL::LinearAlgebra::Real;
 
@@ -8048,11 +8048,7 @@ sub PDL::cplx_eigen {
   my ($eigre, $eigim, $eigvec, $fortran, @outs) = @_;
   my ($outval, $outvec) = @outs ? @outs : (null, null);
   PDL::_cplx_eigen_int($eigre, $eigim, $eigvec, $fortran, $outval, $outvec);
-  if (defined $PDL::Complex::VERSION) {
-    $_ = bless($_, 'PDL::Complex') for $outval, $outvec;
-  } else {
-    $_ = $_->slice('(0)')->czip($_->slice('(1)')) for $outval, $outvec;
-  }
+  $_ = $_->slice('(0)')->czip($_->slice('(1)')) for $outval, $outvec;
   ($outval, $outvec);
 }
 
@@ -8093,7 +8089,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 10599 "real.pd"
+#line 10595 "real.pd"
 
 =head1 AUTHOR
 
@@ -8104,7 +8100,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 8108 "Real.pm"
+#line 8104 "Real.pm"
 
 # Exit with OK status
 

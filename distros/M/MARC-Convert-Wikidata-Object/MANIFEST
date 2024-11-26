@@ -86,9 +86,10 @@ t/MARC-Convert-Wikidata-Object-Publisher/06-place.t
 t/MARC-Convert-Wikidata-Object-Series/01-use.t
 t/MARC-Convert-Wikidata-Object-Series/02-version.t
 t/MARC-Convert-Wikidata-Object-Series/03-new.t
-t/MARC-Convert-Wikidata-Object-Series/04-name.t
-t/MARC-Convert-Wikidata-Object-Series/05-publisher.t
-t/MARC-Convert-Wikidata-Object-Series/06-series_ordinal.t
+t/MARC-Convert-Wikidata-Object-Series/04-issn.t
+t/MARC-Convert-Wikidata-Object-Series/05-name.t
+t/MARC-Convert-Wikidata-Object-Series/06-publisher.t
+t/MARC-Convert-Wikidata-Object-Series/07-series_ordinal.t
 t/MARC-Convert-Wikidata-Object/01-use.t
 t/MARC-Convert-Wikidata-Object/02-version.t
 t/MARC-Convert-Wikidata-Object/03-new.t

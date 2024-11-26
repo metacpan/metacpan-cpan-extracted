@@ -16,7 +16,7 @@ can also use.
   * An image to use in the OpenGraph tags
 * Create a file called `links.json`. You can either [copy mine](https://github.com/davorg-cpan/app-linksite/blob/main/example/links.json) and hack it about until it works, or read the details about the contents of the file below
 * Run `linksite`
-* Take the output (which will have been written to the `docs` subdirectory and put it somewhere that's accessible over the internet
+* Take the output (which will have been written to the `docs` subdirectory) and put it somewhere that's accessible over the internet
 
 ### The Github way
 

@@ -10509,11 +10509,7 @@ sub PDL::cplx_eigen {
   my ($eigre, $eigim, $eigvec, $fortran, @outs) = @_;
   my ($outval, $outvec) = @outs ? @outs : (null, null);
   PDL::_cplx_eigen_int($eigre, $eigim, $eigvec, $fortran, $outval, $outvec);
-  if (defined $PDL::Complex::VERSION) {
-    $_ = bless($_, 'PDL::Complex') for $outval, $outvec;
-  } else {
-    $_ = $_->slice('(0)')->czip($_->slice('(1)')) for $outval, $outvec;
-  }
+  $_ = $_->slice('(0)')->czip($_->slice('(1)')) for $outval, $outvec;
   ($outval, $outvec);
 }
 EOF

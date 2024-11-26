@@ -742,8 +742,7 @@ TOKEN PARSING METHODS
        $int = $parser->token_int;
 
     Expects to find an integer in decimal, octal or hexadecimal notation,
-    and consumes it. Negative integers, preceeded by -, are also
-    recognised.
+    and consumes it. Negative integers, preceded by -, are also recognised.
 
  token_float
 

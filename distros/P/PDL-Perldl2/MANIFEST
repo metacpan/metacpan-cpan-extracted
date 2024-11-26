@@ -1,0 +1,18 @@
+Changes
+logo3d.pdl
+Makefile.PL
+MANIFEST			This list of files
+pdl2
+Plugin/CleanErrors.pm
+Plugin/Makefile.PL
+Plugin/NiceSlice.pm
+Plugin/PDLCommands.pm
+Plugin/PrintControl.pm
+Profile/Makefile.PL
+Profile/Perldl2.pm
+README
+Script.pm
+tctrl-c.pl
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

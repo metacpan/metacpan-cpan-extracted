@@ -3,12 +3,13 @@ abstract: 'Simple diff to String'
 author:
   - 'Kazuhiro Osawa <yappo {@} shibuya {dot} pl>'
 build_requires:
+  Test::Base: '0'
   Test::More: '0.88'
   YAML: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,21 +17,29 @@ meta-spec:
 name: String-Diff
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
   Algorithm::Diff: '0'
   perl: '5.008005'
 resources:
-  bugtracker: https://github.com/yappo/p5-String-Diff/issues
-  homepage: https://github.com/yappo/p5-String-Diff
-  repository: https://github.com/yappo/p5-String-Diff.git
-version: '0.07'
+  bugtracker: https://github.com/renormalist/p5-String-Diff/issues
+  homepage: https://github.com/renormalist/p5-String-Diff
+  repository: https://github.com/renormalist/p5-String-Diff.git
+version: '0.08'
 x_contributors:
+  - 'Jose Luis Martinez <jlmartinez@capside.com>'
   - 'Kazuhiro Osawa <yappo@shibuya.pl>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
   - 'Nikolay Martynov <mar.kolya@gmail.com>'
+  - 'Petr Šabata <contyk@redhat.com>'
+  - 'Steffen Schwigon <ss5@renormalist.net>'
   - 'yappo <yappo@d0d07461-0603-4401-acd4-de1884942a52>'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 0

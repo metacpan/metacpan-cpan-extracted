@@ -1,9 +1,9 @@
 use 5.026;
 use warnings;
 
-package Dist::Zilla::PluginBundle::Author::AJNN;
+package Dist::Zilla::PluginBundle::Author::AJNN 0.08;
 # ABSTRACT: Dist::Zilla configuration the way AJNN does it
-$Dist::Zilla::PluginBundle::Author::AJNN::VERSION = '0.07';
+
 
 use Dist::Zilla;
 use Moose;
@@ -16,6 +16,7 @@ use Pod::Weaver::PluginBundle::Author::AJNN;
 
 use List::Util 1.33 'none';
 use Path::Tiny;
+use version 0.77;
 
 
 my @mvp_multivalue_args;
@@ -103,6 +104,8 @@ sub configure {
 		[ 'PruneAliases' ],
 	);
 	
+	my %use_package = eval { version->parse($self->max_target_perl) ge v5.12 }
+		? ( use_package => 1 ) : ();
 	$self->add_plugins(
 		[ 'CPANFile' ],
 		[ 'MetaJSON' ],
@@ -112,6 +115,7 @@ sub configure {
 		[ 'PkgVersion' => {
 			die_on_existing_version => 1,
 			die_on_line_insertion => 1,
+			%use_package,
 		}],
 		[ 'GithubMeta' => {
 			issues => 1,
@@ -130,6 +134,7 @@ sub configure {
 		[ 'Git::Tag' => {
 			tag_format => '%V',
 			tag_message => '%V%t  %{yyyy-MM-dd}d%n%c',
+			time_zone => 'UTC',
 		}],
 	);
 	
@@ -201,7 +206,7 @@ Dist::Zilla::PluginBundle::Author::AJNN - Dist::Zilla configuration the way AJNN
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -256,6 +261,7 @@ This plugin bundle is nearly equivalent to the following C<dist.ini> config:
  [PkgVersion]
  die_on_existing_version = 1
  die_on_line_insertion = 1
+ use_package = 1
  [GithubMeta]
  issues = 1
  homepage = ''
@@ -269,6 +275,7 @@ This plugin bundle is nearly equivalent to the following C<dist.ini> config:
  [Git::Tag]
  tag_format = '%V'
  tag_message = '%V%t  %{yyyy-MM-dd}d%n%c'
+ time_zone = UTC
  
  [MakeMaker]
  [@Author::AJNN::Readme]

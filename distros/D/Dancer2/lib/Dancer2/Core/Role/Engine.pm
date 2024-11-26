@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::Engine;
 # ABSTRACT: Role for engines
-$Dancer2::Core::Role::Engine::VERSION = '1.1.1';
+$Dancer2::Core::Role::Engine::VERSION = '1.1.2';
 use Moo::Role;
 use Dancer2::Core::Types;
 
@@ -42,7 +42,7 @@ Dancer2::Core::Role::Engine - Role for engines
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 DESCRIPTION
 

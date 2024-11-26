@@ -1,19 +1,19 @@
 NAME
-    CGI::Application::Plugin::Session - Plugin that adds session support to
+
+    CGI::Application::Plugin::Session - Add CGI::Session support to
     CGI::Application
 
-VERSION
-    version 1.05
-
 SYNOPSIS
-     use CGI::Application::Plugin::Session;
 
+     use CGI::Application::Plugin::Session;
+    
      my $language = $self->session->param('language');
 
 DESCRIPTION
+
     CGI::Application::Plugin::Session seamlessly adds session support to
-    your CGI::Application modules by providing a CGI::Session object that is
-    accessible from anywhere in the application.
+    your CGI::Application modules by providing a CGI::Session object that
+    is accessible from anywhere in the application.
 
     Lazy loading is used to prevent expensive file system or database calls
     from being made if the session is not needed during this request. In
@@ -22,35 +22,34 @@ DESCRIPTION
     returning the same Session object for the duration of the request.
 
     This module aims to be as simple and non obtrusive as possible. By not
-    requiring any changes to the inheritance tree of your modules, it can be
-    easily added to existing applications. Think of it as a plugin module
-    that adds a couple of new methods directly into the CGI::Application
-    namespace simply by loading the module.
-
-NAME
-    CGI::Application::Plugin::Session - Add CGI::Session support to
-    CGI::Application
+    requiring any changes to the inheritance tree of your modules, it can
+    be easily added to existing applications. Think of it as a plugin
+    module that adds a couple of new methods directly into the
+    CGI::Application namespace simply by loading the module.
 
 METHODS
-  session
+
+ session
+
     This method will return the current CGI::Session object. The
-    CGI::Session object is created on the first call to this method, and any
-    subsequent calls will return the same object. This effectively creates a
-    singleton session object for the duration of the request. CGI::Session
-    will look for a cookie or param containing the session ID, and create a
-    new session if none is found. If "session_config" has not been called
-    before the first call to "session", then it will choose some sane
-    defaults to create the session object.
+    CGI::Session object is created on the first call to this method, and
+    any subsequent calls will return the same object. This effectively
+    creates a singleton session object for the duration of the request.
+    CGI::Session will look for a cookie or param containing the session ID,
+    and create a new session if none is found. If session_config has not
+    been called before the first call to session, then it will choose some
+    sane defaults to create the session object.
 
       # retrieve the session object
       my $session = $self->session;
-
+    
       - or -
-
+    
       # use the session object directly
       my $language = $self->session->param('language');
 
-  session_config
+ session_config
+
     This method can be used to customize the functionality of the
     CGI::Application::Plugin::Session module. Calling this method does not
     mean that a new session object will be immediately created. The session
@@ -58,7 +57,7 @@ METHODS
     'lazy loading' can prevent expensive file system or database calls from
     being made if the session is not needed during this request.
 
-    The recommended place to call "session_config" is in the "cgiapp_init"
+    The recommended place to call session_config is in the cgiapp_init
     stage of CGI::Application. If this method is called after the session
     object has already been accessed, then it will die with an error
     message.
@@ -69,51 +68,54 @@ METHODS
     The following parameters are accepted:
 
     CGI_SESSION_OPTIONS
-        This allows you to customize how the CGI::Session object is created
-        by providing a list of options that will be passed to the
-        CGI::Session constructor. Please see the documentation for
-        CGI::Session for the exact syntax of the parameters.
+
+      This allows you to customize how the CGI::Session object is created
+      by providing a list of options that will be passed to the
+      CGI::Session constructor. Please see the documentation for
+      CGI::Session for the exact syntax of the parameters.
 
     DEFAULT_EXPIRY
-        CGI::Session Allows you to set an expiry time for the session. You
-        can set the DEFAULT_EXPIRY option to have a default expiry time set
-        for all newly created sessions. It takes the same format as the
-        $session->expiry method of CGI::Session takes. Note that it is only
-        set for new session, not when a session is reloaded from the store.
+
+      CGI::Session Allows you to set an expiry time for the session. You
+      can set the DEFAULT_EXPIRY option to have a default expiry time set
+      for all newly created sessions. It takes the same format as the
+      $session->expiry method of CGI::Session takes. Note that it is only
+      set for new session, not when a session is reloaded from the store.
 
     COOKIE_PARAMS
-        This allows you to customize the options that are used when creating
-        the session cookie. For example you could provide an expiry time for
-        the cookie by passing -expiry => '+24h'. The -name and -value
-        parameters for the cookie will be added automatically unless you
-        specifically override them by providing -name and/or -value
-        parameters. See the CGI::Cookie docs for the exact syntax of the
-        parameters.
 
-        NOTE: You can do the following to get both the cookie name and the
-        internal name of the CGI::Session object to be changed:
+      This allows you to customize the options that are used when creating
+      the session cookie. For example you could provide an expiry time for
+      the cookie by passing -expiry => '+24h'. The -name and -value
+      parameters for the cookie will be added automatically unless you
+      specifically override them by providing -name and/or -value
+      parameters. See the CGI::Cookie docs for the exact syntax of the
+      parameters.
 
-          $self->session_config(
-            CGI_SESSION_OPTIONS => [
-              $driver,
-              $self->query,
-              \%driver_options,
-              { name => 'new_cookie_name' } # change cookie and session name
-            ]
-          );
+      NOTE: You can do the following to get both the cookie name and the
+      internal name of the CGI::Session object to be changed:
 
-        Also, if '-name' parameter and 'name' of session don't match a
-        warning will be emitted.
+        $self->session_config(
+          CGI_SESSION_OPTIONS => [
+            $driver,
+            $self->query,
+            \%driver_options,
+            { name => 'new_cookie_name' } # change cookie and session name
+          ]
+        );
+
+      Also, if '-name' parameter and 'name' of session don't match a
+      warning will be emitted.
 
     SEND_COOKIE
-        If set to a true value, the module will automatically add a cookie
-        header to the outgoing headers if a new session is created (Since
-        the session module is lazy loaded, this will only happen if you make
-        a call to $self->session at some point to create the session
-        object). This option defaults to true. If it is set to false, then
-        no session cookies will be sent, which may be useful if you prefer
-        URL based sessions (it is up to you to pass the session ID in this
-        case).
+
+      If set to a true value, the module will automatically add a cookie
+      header to the outgoing headers if a new session is created (Since the
+      session module is lazy loaded, this will only happen if you make a
+      call to $self->session at some point to create the session object).
+      This option defaults to true. If it is set to false, then no session
+      cookies will be sent, which may be useful if you prefer URL based
+      sessions (it is up to you to pass the session ID in this case).
 
     The following example shows what options are set by default (ie this is
     what you would get if you do not call session_config).
@@ -139,7 +141,8 @@ METHODS
                                      },
      );
 
-  session_cookie
+ session_cookie
+
     This method will add a cookie to the outgoing headers containing the
     session ID that was assigned by the CGI::Session module.
 
@@ -152,27 +155,30 @@ METHODS
     the lazy loading benefits of the plugin where a session is only
     created/loaded when it is required.
 
-    It could be useful if you want to force the cookie header to be sent out
-    even if the session is not used on this request, or if you want to
+    It could be useful if you want to force the cookie header to be sent
+    out even if the session is not used on this request, or if you want to
     manage the headers yourself by turning SEND_COOKIE to false.
 
       # Force the cookie header to be sent including some
       # custom cookie parameters
       $self->session_cookie(-secure => 1, -expires => '+1w');
 
-  session_loaded
-    This method will let you know if the session object has been loaded yet.
-    In other words, it lets you know if $self->session has been called.
+ session_loaded
+
+    This method will let you know if the session object has been loaded
+    yet. In other words, it lets you know if $self->session has been
+    called.
 
       sub cgiapp_postrun {
         my $self = shift;
         $self->session->flush if $self->session_loaded;;
       }
 
-  session_recreate
-    This method will delete the existing session, and create a brand new one
-    for you with a new session ID. It copies over all existing parameters
-    into the new session.
+ session_recreate
+
+    This method will delete the existing session, and create a brand new
+    one for you with a new session ID. It copies over all existing
+    parameters into the new session.
 
     This can be useful to protect against some login attacks when storing
     authentication tokens in the session. Very briefly, an attacker loads a
@@ -190,7 +196,8 @@ METHODS
         }
       }
 
-  session_delete
+ session_delete
+
     This method will perform a more comprehensive clean-up of the session,
     calling both the CGI::Session delete() method, but also deleting the
     cookie from the client, if you are using cookies.
@@ -202,12 +209,13 @@ METHODS
       }
 
 EXAMPLE
+
     In a CGI::Application module:
 
       # configure the session once during the init stage
       sub cgiapp_init {
         my $self = shift;
-
+    
         # Configure the session
         $self->session_config(
            CGI_SESSION_OPTIONS => [ "driver:PostgreSQL;serializer:Storable", $self->query, {Handle=>$self->dbh} ],
@@ -218,60 +226,55 @@ EXAMPLE
                                   },
            SEND_COOKIE         => 1,
         );
-
+    
       }
-
+    
       sub cgiapp_prerun {
         my $self = shift;
-
+    
         # Redirect to login, if necessary
         unless ( $self->session->param('~logged-in') ) {
           $self->prerun_mode('login');
         }
       }
-
+    
       sub my_runmode {
         my $self = shift;
-
+    
         # Load the template
         my $template = $self->load_tmpl('my_runmode.tmpl');
-
+    
         # Add all the session parameters to the template
         $template->param($self->session->param_hashref());
-
+    
         # return the template output
         return $template->output;
       }
 
 TODO
-    *   I am considering adding support for other session modules in the
-        future, like Apache::Session and possibly others if there is a
-        demand.
 
-    *   Possibly add some tests to make sure cookies are accepted by the
-        client.
+      * I am considering adding support for other session modules in the
+      future, like Apache::Session and possibly others if there is a
+      demand.
 
-    *   Allow a callback to be executed right after a session has been
-        created
+      * Possibly add some tests to make sure cookies are accepted by the
+      client.
+
+      * Allow a callback to be executed right after a session has been
+      created
 
 SEE ALSO
+
     CGI::Application, CGI::Session, perl(1)
 
 AUTHOR
+
     Cees Hek <ceeshek@gmail.com>
 
 LICENSE
+
     Copyright (C) 2004, 2005 Cees Hek <ceeshek@gmail.com>
 
-    This library is free software. You can modify and or distribute it under
-    the same terms as Perl itself.
-
-AUTHOR
-    Cees Hek <ceeshek@gmail.com>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2013 by Cees Hek.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+    This library is free software. You can modify and or distribute it
+    under the same terms as Perl itself.
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package Parser::MGC 0.22;
+package Parser::MGC 0.23;
 
 use v5.14;
 use warnings;
@@ -1365,7 +1365,7 @@ sub _token_generic
    $int = $parser->token_int;
 
 Expects to find an integer in decimal, octal or hexadecimal notation, and
-consumes it. Negative integers, preceeded by C<->, are also recognised.
+consumes it. Negative integers, preceded by C<->, are also recognised.
 
 =cut
 

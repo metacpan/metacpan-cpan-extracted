@@ -1,3 +1,10 @@
+0.21 2024-11-25T23:55:13+01:00
+ - Add clean_issn() helper subroutine.
+ - Add detection of ISSN in series.
+ - Add edition number cleanup use case.
+ - Add series name cleanup use case.
+ - Add test for cycle.
+
 0.20 2024-11-22T19:41:33+01:00
  - Add edition number cleanup use case.
  - Fix 787i field existing.

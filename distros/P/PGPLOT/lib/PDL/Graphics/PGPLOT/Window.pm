@@ -595,7 +595,7 @@ rabbits in O'Fib-o-nachy's farm (alternatively they can of course be
 monitoring processes or do something entirely different). Odd wants the
 user to be able to monitor both the birth rates and accumulated number
 of rabbits and the spatial distribution of the births. Since these are
-logically different they chooses to have two windows open:
+logically different they choose to have two windows open:
 
   $rate_win = PDL::Graphics::PGPLOT::Window->new(Device => '/xw',
               Aspect => 1, WindowWidth => 5, NXPanel => 2);

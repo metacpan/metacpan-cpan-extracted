@@ -1,4 +1,4 @@
-package Parser::MGC::Examples::EvaluateExpression 0.22;
+package Parser::MGC::Examples::EvaluateExpression 0.23;
 
 =head1 NAME
 

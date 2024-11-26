@@ -1,5 +1,11 @@
 Revision history for IO-Socket-IP
 
+0.43    2024-11-25
+        [CHANGES]
+         * Swapped unit tests from `Test::More` to `Test2::V0`
+         * Fixed some documentation typoes
+           (thanks Igor Sobrado Delgado) (RT157201)
+
 0.42    2023-07-25
         [CHANGES]
          * Put error string in `$IO::Socket::errstr` as done by

@@ -1,28 +1,13 @@
-package MooseX::Attribute::Catalyst::View::EmbeddedPerl::ExportedAttribute;
-  
-use Moose::Role;
- 
-has 'exported_to_template' => (is=>'ro');
- 
-around '_process_options' => sub {
-  my ($orig, $self, $name, $options) = (@_);
-  if(delete($options->{export})) {
-    $options->{exported_to_template} = 1;
-  } else {
-    $options->{exported_to_template} = 0;
-  }
-  return $self->$orig($name, $options);
-};
-
-package Moose::Meta::Attribute::Custom::Trait::Catalyst::View::EmbeddedPerl::ExportedAttribute;
-sub register_implementation { 'MooseX::Attribute::Catalyst::View::EmbeddedPerl::ExportedAttribute' }
-
 package Catalyst::View::EmbeddedPerl::PerRequest;
 
 use Moose;
 use String::CamelCase;
 use Template::EmbeddedPerl;
 use Moose::Util::MetaRole;
+use Scalar::Util;
+use Catalyst::View::EmbeddedPerl::PerRequest::EachInfo;
+use Catalyst::View::EmbeddedPerl::PerRequest::TagUtils;
+use MooseX::Attribute::Catalyst::View::EmbeddedPerl::ExportedAttribute;
 
 Moose::Util::MetaRole::apply_metaroles(
   for => __PACKAGE__,
@@ -33,7 +18,7 @@ Moose::Util::MetaRole::apply_metaroles(
 
 extends 'Catalyst::View::BasePerRequest';
 
-our $VERSION = 0.001011;
+our $VERSION = 0.001012;
 eval $VERSION;
 
 # Args that get passed cleanly to Template::EmbeddedPerl
@@ -51,6 +36,11 @@ has _temple => (is=>'ro', required=>1, handles=>\@proxy_methods); # The underlyi
 has _doc => (is=>'ro', required=>1); # The underlying parsed template object
 has _parent_views => (is=>'ro', required=>1); # All parent classes that inherit from Catalyst::View::EmbeddedPerl::PerRequest
 has _exported_attributes => (is=>'ro', required=>1); # All attributes that are exported to the template
+has _tag_utils => (is=>'ro', lazy_build=>1); # Tag utility object
+
+sub _build__tag_utils {
+  return Catalyst::View::EmbeddedPerl::PerRequest::TagUtils->new(shift);
+}
 
 sub modify_init_args {
   my ($class, $app, $merged_args) = @_;
@@ -147,25 +137,34 @@ sub find_template {
   # Ok so first check __DATA__ for the template
   my $data_fh = do { no warnings 'once'; no strict 'refs'; *{"${class}::DATA"}{IO} };
   if (defined $data_fh) {
-    return $cached_templates{$class} if exists $cached_templates{$class};
+    return @{$cached_templates{$class}} if exists $cached_templates{$class};
     my $data = do { local $/; <$data_fh> };
     close($data_fh);
     if($data) {
       my $package_file = $class;
       $package_file =~ s/::/\//g;
       my $path = $INC{"${package_file}.pm"};
-      $cached_templates{$class} = $data;
+      $cached_templates{$class} = [$data, "${path}/DATA"];
       return ($data, "${path}/DATA");
     }
   }
 
   # ...and if its not there look for a file based on the class name
-  return $class->template_from_filesystem($app, $template_extension);
+  my ($template, $path) = $class->template_from_filesystem($app, $template_extension);
+  return ($template, $path) if $template;
+  return ($class->_default_template, 'default');
+}
+
+sub _default_template {
+  my ($class) = @_;
+  return $class->default_template if $class->can('default_template'); 
+  return '<%= $content %>';
 }
 
 sub template_from_filesystem {
   my ($class, $app, $template_extension) = @_;
   my $template_path = $class->get_path_to_template($app, $template_extension);
+  return unless -e $template_path;
   open(my $fh, '<', $template_path)
     || die "can't open '$template_path': $@";
   local $/; my $slurped = $fh->getline;
@@ -217,6 +216,158 @@ sub build_helpers {
   return %helpers;
 }
 
+sub push_style {
+  my ($self, @args) = @_;
+  my $cb = pop @args;
+  my $name = shift @args; # optional
+
+  if($name) {
+    return if $self->ctx->stash->{view_blocks}{'css'}{$name};
+    $self->ctx->stash->{view_blocks}{'css'}{$name} = 1;
+  }
+
+  if(exists $self->ctx->stash->{view_blocks}{'css'}) {
+    $self->content_append('css', $cb);
+  } else {
+    $self->content_for('css', $cb);
+  }
+  return;
+}
+
+sub get_styles {
+  my $self = shift;
+  my $css = $self->content('css');
+  return '' unless $css;
+  return $self->raw("<style>\n$css\n</style>");
+}
+
+sub push_script {
+  my ($self, @args) = @_;
+  my $cb = pop @args;
+  my $name = shift @args; # optional
+
+  if($name) {
+    return if $self->ctx->stash->{view_blocks}{'js'}{$name};
+    $self->ctx->stash->{view_blocks}{'js'}{$name} = 1;
+  }
+
+  if(exists $self->ctx->stash->{view_blocks}{'js'}) {
+    $self->content_append('js', $cb);
+  } else {
+    $self->content_for('js', $cb);
+  }
+  return;
+}
+
+sub get_scripts {
+  my $self = shift;
+  my $js = $self->content('js');
+  return '' unless $js;
+  return $self->raw("<script>\n$js\n</script>");
+}
+
+sub over {
+  my ($self, @args) = @_;
+  my $cb = pop @args; # The callback block is always the last argument
+
+  my $iterator;
+  my $length;
+  if(scalar(@args) == 1) {
+    my $arg = $args[0];
+    if(ref($arg) eq 'ARRAY') {  # []
+      $length = scalar(@$arg);
+      $iterator = sub { return shift @{$arg} };
+    } elsif(ref($arg) eq 'CODE') {  # \&cb->()
+      $iterator = $arg;
+    } elsif(Scalar::Util::blessed($arg) && $arg->can('next')) {  # $obj->next
+      $iterator = sub { return $arg->next };
+      $length = $arg->length if $arg->can('length');
+      $length = $arg->count if $arg->can('count');
+    } elsif((ref(\$arg)||'') eq 'SCALAR') { # A single value, could be undef even
+      $iterator = sub { return $arg };
+      $length = 1;
+    } else {
+      die "Invalid argument to each";
+    }
+  } else {
+    $iterator = sub { return shift @args }; # each(#arry, sub { ... })
+    $length = scalar(@args);
+  }
+
+
+  my $content = $self->raw('');
+  my $current_count = 1;
+  while(my $item = $iterator->()) {
+    my $inf = Catalyst::View::EmbeddedPerl::PerRequest::EachInfo->new($current_count, $length);
+    $content = $self->safe_concat($content,$cb->($item, $inf));
+    $current_count++;
+  }
+  return $content;
+}
+
+sub attr {
+  my ($self, $attribute, $value) = @_;
+  return $self->_tag_utils->_tag_options($attribute => $value);
+}
+
+sub style {
+  my ($self, $style) = @_;
+  return $self->attr('style', $style);
+}
+
+sub class {
+  my ($self, $class) = @_;
+  return $self->attr('class', $class);
+}
+
+sub checked {
+  my ($self, $checked) = @_;
+  return $self->attr('checked', 'checked') if $checked;
+  return '';
+}
+
+sub selected {
+  my ($self, $selected) = @_;
+  return $self->attr('selected', 'selected') if $selected;
+  return '';
+}
+
+sub disabled {
+  my ($self, $disabled) = @_;
+  return $self->attr('disabled', 'disabled') if $disabled;
+  return '';
+}
+
+sub readonly {
+  my ($self, $readonly) = @_;
+  return $self->attr('readonly', 'readonly') if $readonly;
+  return '';
+}
+
+sub required {
+  my ($self, $required) = @_;
+  return $self->attr('required', 'required') if $required;
+  return '';
+}
+
+sub href {
+  my ($self, @href_parts) = @_;
+  my $href = $self->safe_concat(@href_parts);
+  return $self->attr('href', $href);
+}
+
+sub src {
+  my ($self, @src_parts) = @_;
+  my $src = $self->safe_concat(@src_parts);
+  return $self->attr('src', $src);
+}
+
+sub data {
+  my ($self, $data) = @_;
+  return $self->attr('data', $data);
+}
+
+
 sub default_helpers {
   my $class = shift;
   return (
@@ -227,6 +378,22 @@ sub default_helpers {
     content_prepend => sub { my ($self, $c, @args) = @_; return $self->content_prepend(@args); },
     content_replace => sub { my ($self, $c, @args) = @_; return $self->content_replace(@args); },
     content_around => sub { my ($self, $c, @args) = @_; return $self->content_around(@args); },
+    push_style => sub { my ($self, $c, @args) = @_; return $self->push_style(@args); },
+    get_styles => sub { my ($self, $c, @args) = @_; return $self->get_styles(@args); },
+    push_script => sub { my ($self, $c, @args) = @_; return $self->push_script(@args); },
+    get_scripts => sub { my ($self, $c, @args) = @_; return $self->get_scripts(@args); },
+    over => sub { my ($self, $c, @args) = @_; return $self->over(@args); },
+    attr => sub { my ($self, $c, @args) = @_; return $self->attr(@args); },
+    style => sub { my ($self, $c, @args) = @_; return $self->style(@args); },
+    class => sub { my ($self, $c, @args) = @_; return $self->class(@args); },
+    checked => sub { my ($self, $c, @args) = @_; return $self->checked(@args); },
+    selected => sub { my ($self, $c, @args) = @_; return $self->selected(@args); },
+    disabled => sub { my ($self, $c, @args) = @_; return $self->disabled(@args); },
+    readonly => sub { my ($self, $c, @args) = @_; return $self->readonly(@args); },
+    required => sub { my ($self, $c, @args) = @_; return $self->required(@args); },
+    href => sub { my ($self, $c, @args) = @_; return $self->href(@args); },
+    src => sub { my ($self, $c, @args) = @_; return $self->src(@args); },
+    data => sub { my ($self, $c, @args) = @_; return $self->data(@args); },
   );
 }
 
@@ -707,33 +874,340 @@ my choice is to have helpers for things that are in my base view which are share
 all views and then call $self for things that are specific to the view.  This makes it
 easier for people to debug and understand the code IMHO.  
 
-=over 4
+=head2 view
 
-=item * C<view($view_name, @args)>
+  view($view_name, @args)
 
-Renders another view and returns its content. Useful for including the output of one
+Renders another view and returns its content. Useful for including the output of one view inside another.
 
-=item * C<content($name, $content)>
+=head2 content
+
+  content($name, $content)
 
 Captures a block of content for later use.
 
-=item * C<content_for($name, $content)>
+=head2 content_for
+
+  content_for($name, $content)
 
 Captures a block of content for later use, appending to any existing content.
 
-=item * C<content_append($name, $content)>
+=head2 content_append
+
+  content_append($name, $content)
 
 Appends content to a previously captured block.
 
-=item * C<content_prepend($name, $content)>
+=head2 content_prepend
+
+  content_prepend($name, $content)
 
 Prepends content to a previously captured block.
 
-=item * C<content_replace($name, $content)>
+=head2 content_replace
+
+  content_replace($name, $content)
 
 Replaces a previously captured block with new content.
 
+=head2 get_styles
+
+  get_styles()
+
+Returns all the styles that have been pushed to the 'css' block.
+
+=head3 Example
+
+    $self->push_style(sub {
+      p { color: red; }
+    });
+
+    my $styles = $self->get_styles;
+
+Or in a template:
+
+    <%= get_styles() %>
+
+    %= push_style(sub {
+      p { color: red; }
+    %})
+
+Produces output like:
+
+    <style>
+      p { color: red; }
+    </style>
+
+=head2 push_style
+
+  push_style($content)
+  push_style($name, $content)
+
+Pushes content to the 'css' block.  If a name is provided, the content will only be
+pushed if it has not already been pushed with that name.  Useful for ensuring that
+styles are only included once in the output.
+
+=head2 get_scripts
+
+  get_scripts()
+
+Returns all the scripts that have been pushed to the 'js' block.
+
+=head3 Example
+
+    $self->push_script(sub {
+      alert('hello');
+    });
+
+    my $scripts = $self->get_scripts;
+
+Or in a template:
+
+    <%= get_scripts() %>
+
+    %= push_script(sub {
+      alert('hello');
+    %})
+
+Produces output like:
+
+    <script>
+      alert('hello');
+    </script>
+
+=head2 push_script
+
+  push_script($content)
+  push_script($name, $content)
+
+Pushes content to the 'js' block.  If a name is provided, the content will only be
+pushed if it has not already been pushed with that name.  Useful for ensuring that
+scripts are only included once in the output.
+
+=head2 attr
+
+  attr($attribute, $value)
+
+Returns an HTML attribute string.  Example usage:
+
+  <a href="<%= attr('href', $url) %>">Link</a>
+
+=head2 style
+
+  style($style)
+
+Returns a C<style> attribute string.  Example usage:
+
+  <div <%= style('color: red;') %>>Content</div>
+
+=head2 class
+
+  class($class)
+
+Returns a C<class> attribute string.  Example usage:
+
+  <div <%= class('important') %>>Content</div>
+
+=head2 checked 
+  
+    checked($checked)
+
+Returns a C<checked> attribute string.  Example usage:
+  
+    <input type="checkbox" <%= checked($checked) %> />
+
+=head2 selected
+
+    selected($selected)
+
+Returns a C<selected> attribute string.  Example usage:
+
+    <select>
+      <option value="1" <%= selected($selected) %>>One</option>
+      <option value="2" <%= selected($selected) %>>Two</option>
+    </select>
+
+=head2 disabled
+
+    disabled($disabled)
+
+Returns a C<disabled> attribute string.  Example usage:
+
+    <input type="text" <%= disabled($disabled) %> />
+
+=head2 readonly
+
+    readonly($readonly)
+
+Returns a C<readonly> attribute string.  Example usage:
+
+    <input type="text" <%= readonly($readonly) %> />
+
+=head2 required
+
+    required($required)
+
+Returns a C<required> attribute string.  Example usage:
+
+    <input type="text" <%= required($required) %> />
+
+=head2 href
+
+    href(@href_parts)
+
+Returns an C<href> attribute string.  Example usage:
+
+
+    <a <%= href('/path/to/page') %>>Link</a>
+
+=head2 src
+  
+      src(@src_parts)
+
+Returns a C<src> attribute string.  Example usage:
+
+    <img <%= src('/path/to/image.jpg') %> />
+
+=head2 data
+
+    data($data)
+
+Returns a C<data> attribute string.  Example usage: 
+  
+      <div <%= data({'id', '123'}) %>>Content</div> 
+
+=head2 over
+
+  my $result = $self->over($iterable, sub {
+      my ($item, $info) = @_;
+      return "<p>Item: $item, Index: " . $info->current . "</p>";
+  });
+
+In a template:
+
+  <%= over($iterable, sub($item, $info) {
+      <p>Item: <%= $item %>, Index: <%= $info->current %></p>
+  }) %>
+
+(Remember in the template calling helpers via C<$self> is your option)
+
+Executes a callback for each item in an iterable, providing metadata about the iteration 
+through a L<Catalyst::View::EmbeddedPerl::PerRequest::EachInfo> object.
+
+Although you can use standard Perl looping constructs in your templates, the C<over>
+helper provides the addional metadata about the iteration that can be useful in some
+situations related to display logic, such as changing the CSS based on even/odd rows
+or tracking the item number.
+
+=head3 Arguments
+
+=over
+
+=item * C<$iterable> - An iterable source. This can be:
+
+=over
+
+=item * An array reference (e.g., C<[1, 2, 3]>).
+
+=item * A coderef that returns the next value when called (e.g., C<sub { ... }>).
+
+=item * An object with a C<next> method and optionally C<length> or C<count> methods.
+
+=item * A scalar value or single item.
+
 =back
+
+=item * C<$cb> - A callback subroutine. The callback will be called for each item in the iterable and receives the following arguments:
+
+=over
+
+=item * C<$item> - The current item in the iterable.
+
+=item * C<$info> - An instance of L<Catalyst::View::EmbeddedPerl::PerRequest::EachInfo> containing metadata about the current iteration.
+
+=back
+
+=back
+
+=head3 Returns
+
+A concatenated string of the results returned by the callback for each item.
+
+=head3 Examples
+
+=head4 Iterating over an array reference
+
+  my $array = [qw(foo bar baz)];
+  my $result = $self->over($array, sub {
+      my ($item, $info) = @_;
+      return "<p>Item: $item, Index: " . $info->current . "</p>";
+  });
+
+  # Output:
+  # <p>Item: foo, Index: 0</p>
+  # <p>Item: bar, Index: 1</p>
+  # <p>Item: baz, Index: 2</p>
+
+=head4 Using a coderef as an iterator
+
+  my $iterator = sub {
+      state $count = 0;
+      return $count < 5 ? ++$count : undef;
+  };
+
+  my $result = $self->over($iterator, sub {
+      my ($item, $info) = @_;
+      return "<p>Item: $item, Is Even: " . $info->is_even . "</p>";
+  });
+
+  # Output:
+  # <p>Item: 1, Is Even: 0</p>
+  # <p>Item: 2, Is Even: 1</p>
+  # <p>Item: 3, Is Even: 0</p>
+  # <p>Item: 4, Is Even: 1</p>
+  # <p>Item: 5, Is Even: 0</p>
+
+=head4 Iterating over an object with C<next> and C<length>
+
+  package MyIterator;
+  use Moo;
+
+  has items => (is => 'rw', default => sub { [1, 2, 3] });
+  sub next { shift @{ shift->items } }
+  sub length { scalar @{ shift->items } }
+
+  my $obj = MyIterator->new(items => [qw(alpha beta gamma)]);
+  my $result = $self->over($obj, sub {
+      my ($item, $info) = @_;
+      return "<p>Item: $item, Total: " . $info->total . "</p>";
+  });
+
+  # Output:
+  # <p>Item: alpha, Total: 3</p>
+  # <p>Item: beta, Total: 3</p>
+  # <p>Item: gamma, Total: 3</p>
+
+=head4 Passing a scalar value
+
+  my $result = $self->over("single value", sub {
+      my ($item, $info) = @_;
+      return "<p>Item: $item, Is First: " . $info->is_first . "</p>";
+  });
+
+  # Output:
+  # <p>Item: single value, Is First: 1</p>
+
+=head4 Iterating over multiple arguments
+
+  my $result = $self->over(qw(apple banana cherry), sub {
+      my ($item, $info) = @_;
+      return "<p>Item: $item, Is Last: " . $info->is_last . "</p>";
+  });
+
+  # Output:
+  # <p>Item: apple, Is Last: 0</p>
+  # <p>Item: banana, Is Last: 0</p>
+  # <p>Item: cherry, Is Last: 1</p>
 
 =head1 TEMPLATE LOCATIONS
 
@@ -750,6 +1224,19 @@ If your view module has a C<__DATA__> section, the template will be read from th
 If not found in C<__DATA__>, the template file is looked up in the file system, 
 following the view's class name path.  The file will be a 'snake case' version of
 the view module name with a '.epl' extension.
+
+=item 3. default_template method
+
+If no template is found, the C<default_template> method is called to get a default
+template.  This method should return a string containing the template.
+
+The default template is:
+
+  <%= $content %>
+
+Which is handy for when you are making a base view that others will inherit from.
+But you can override this method in your view module to provide a different default.
+
 
 =back
 

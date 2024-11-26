@@ -27,6 +27,13 @@ static char strbuff[256];
 static char strbuff2[256];
 #define SIZEOF(X) sizeof(strbuff)
 
+static IV pgplot_debugging=0;
+
+#define DEBUG_PRINT(c) do { \
+    if (pgplot_debugging < 1) break; \
+    fprintf(stderr, "PGPLOT::" #c "\n"); \
+  } while (0)
+
 void MAIN__ () {
    /* Cheat to define MAIN__ symbol */
    croak("This should never happen");
@@ -56,6 +63,15 @@ PGPLOT_function_handle myPGPLOT_handle;
 
 MODULE = PGPLOT     PACKAGE = PGPLOT
 
+IV
+set_debugging(i)
+  IV i;
+CODE:
+  RETVAL = pgplot_debugging;
+  pgplot_debugging = i;
+OUTPUT:
+  RETVAL
+
 void
 pgarro(x1,y1,x2,y2)
   float	x1
@@ -63,6 +79,7 @@ pgarro(x1,y1,x2,y2)
   float	x2
   float	y2
   CODE:
+    DEBUG_PRINT(pgarro);
     cpgarro(x1,y1,x2,y2);
 
 
@@ -70,6 +87,7 @@ void
 pgask(flag)
   Logical	flag
   CODE:
+    DEBUG_PRINT(pgask);
     cpgask(flag);
 
 void
@@ -89,6 +107,7 @@ pgaxis(opt,x1,y1,x2,y2,v1,v2,step,nsub,dmajl,dmajr,fmin,disp,orient)
   float	disp
   float	orient
   CODE:
+    DEBUG_PRINT(pgaxis);
     cpgaxis(opt,x1,y1,x2,y2,v1,v2,step,nsub,dmajl,dmajr,fmin,disp,orient);
 
 
@@ -103,6 +122,7 @@ pgband(mode,posn,xref,yref,x,y,ch)
   float	y = NO_INIT
   char	ch = NO_INIT
   CODE:
+    DEBUG_PRINT(pgband);
     RETVAL = cpgband(mode,posn,xref,yref,&x,&y,&ch);
   OUTPUT:
   x
@@ -114,6 +134,7 @@ pgband(mode,posn,xref,yref,x,y,ch)
 void
 pgbbuf()
   CODE:
+    DEBUG_PRINT(pgbbuf);
     cpgbbuf();
 
 
@@ -124,6 +145,7 @@ pgbeg(unit,file,nxsub,nysub)
   int	nxsub
   int	nysub
   CODE:
+    DEBUG_PRINT(pgbeg);
     RETVAL = cpgbeg(unit,file,nxsub,nysub);
   OUTPUT:
   RETVAL
@@ -136,6 +158,7 @@ pgbegin(unit,file,nxsub,nysub)
   int	nxsub
   int	nysub
   CODE:
+    DEBUG_PRINT(pgbegin);
     RETVAL = cpgbeg(unit,file,nxsub,nysub);
   OUTPUT:
   RETVAL
@@ -148,6 +171,7 @@ pgbin(nbin,x,data,center)
   float *	data
   Logical	center
   CODE:
+    DEBUG_PRINT(pgbin);
     cpgbin(nbin,x,data,center);
 
 
@@ -160,6 +184,7 @@ pgbox(xopt,xtick,nxsub,yopt,ytick,nysub)
   float	ytick
   int	nysub
   CODE:
+    DEBUG_PRINT(pgbox);
     cpgbox(xopt,xtick,nxsub,yopt,ytick,nysub);
 
 
@@ -169,12 +194,14 @@ pgcirc(xcent,ycent,radius)
   float	ycent
   float	radius
   CODE:
+    DEBUG_PRINT(pgcirc);
     cpgcirc(xcent,ycent,radius);
 
 
 void
 pgclos()
   CODE:
+    DEBUG_PRINT(pgclos);
     cpgclos();
 
 void
@@ -191,6 +218,7 @@ pgconb(a,idim,jdim,i1,i2,j1,j2,c,nc,tr,blank)
   float *	tr
   float	blank
   CODE:
+    DEBUG_PRINT(pgconb);
     cpgconb(a,idim,jdim,i1,i2,j1,j2,c,nc,tr,blank);
 
 
@@ -207,6 +235,7 @@ pgconf(a,idim,jdim,i1,i2,j1,j2,c1,c2,tr)
   float	c2
   float *	tr
   CODE:
+    DEBUG_PRINT(pgconf);
     cpgconf(a,idim,jdim,i1,i2,j1,j2,c1,c2,tr);
 
 void
@@ -224,6 +253,7 @@ pgconl(a,idim,jdim,i1,i2,j1,j2,c,tr,label,intval,minint)
   int	intval
   int	minint
   CODE:
+    DEBUG_PRINT(pgconl);
     cpgconl(a,idim,jdim,i1,i2,j1,j2,c,tr,label,intval,minint);
 
 
@@ -240,6 +270,7 @@ pgcons(a,idim,jdim,i1,i2,j1,j2,c,nc,tr)
   int	nc
   float *	tr
   CODE:
+    DEBUG_PRINT(pgcons);
     cpgcons(a,idim,jdim,i1,i2,j1,j2,c,nc,tr);
 
 
@@ -256,6 +287,7 @@ pgcont(a,idim,jdim,i1,i2,j1,j2,c,nc,tr)
   int	nc
   float *	tr
   CODE:
+    DEBUG_PRINT(pgcont);
     cpgcont(a,idim,jdim,i1,i2,j1,j2,c,nc,tr);
 
 
@@ -272,6 +304,7 @@ pgconx(a,idim,jdim,i1,i2,j1,j2,c,nc,plot)
   int	nc
   SV*	plot
   CODE:
+    DEBUG_PRINT(pgconx);
     pgfunname[0] = plot;
     cpgconx(a,idim,jdim,i1,i2,j1,j2,c,nc,pgfunplot);
 
@@ -286,6 +319,7 @@ pgctab(l,r,g,b,nc,contra,bright)
   float	contra
   float	bright
   CODE:
+    DEBUG_PRINT(pgctab);
     cpgctab(l,r,g,b,nc,contra,bright);
 
 
@@ -295,6 +329,7 @@ pgcurs(x,y,ch)
   float	y = NO_INIT
   char	ch = NO_INIT
   CODE:
+    DEBUG_PRINT(pgcurs);
     RETVAL = cpgcurs(&x,&y,&ch);
   OUTPUT:
   x
@@ -309,6 +344,7 @@ pgcurse(x,y,ch)
   float	y = NO_INIT
   char	ch = NO_INIT
   CODE:
+    DEBUG_PRINT(pgcurse);
     RETVAL = cpgcurs(&x,&y,&ch);
   OUTPUT:
   x
@@ -322,18 +358,21 @@ pgdraw(x,y)
   float	x
   float	y
   CODE:
+    DEBUG_PRINT(pgdraw);
     cpgdraw(x,y);
 
 
 void
 pgebuf()
   CODE:
+    DEBUG_PRINT(pgebuf);
     cpgebuf();
 
 
 void
 pgend()
   CODE:
+    DEBUG_PRINT(pgend);
     cpgend();
 
 
@@ -346,12 +385,14 @@ pgenv(xmin,xmax,ymin,ymax,just,axis)
   int	just
   int	axis
   CODE:
+    DEBUG_PRINT(pgenv);
     cpgenv(xmin,xmax,ymin,ymax,just,axis);
 
 
 void
 pgeras()
   CODE:
+    DEBUG_PRINT(pgeras);
     cpgeras();
 
 void
@@ -363,6 +404,7 @@ pgerrb(dir,n,x,y,e,t)
   float *	e
   float	t
   CODE:
+    DEBUG_PRINT(pgerrb);
     cpgerrb(dir,n,x,y,e,t);
 
 void
@@ -373,6 +415,7 @@ pgerr1(dir,x,y,e,t)
   float	e
   float	t
   CODE:
+    DEBUG_PRINT(pgerr1);
     cpgerr1(dir,x,y,e,t);
 
 
@@ -384,6 +427,7 @@ pgerrx(n,x1,x2,y,t)
   float *	y
   float	t
   CODE:
+    DEBUG_PRINT(pgerrx);
     cpgerrx(n,x1,x2,y,t);
 
 
@@ -395,12 +439,14 @@ pgerry(n,x,y1,y2,t)
   float *	y2
   float	t
   CODE:
+    DEBUG_PRINT(pgerry);
     cpgerry(n,x,y1,y2,t);
 
 
 void
 pgetxt()
   CODE:
+    DEBUG_PRINT(pgetxt);
     cpgetxt();
 
 
@@ -413,6 +459,7 @@ pgfunt(fx,fy,n,tmin,tmax,pgflag)
   float	tmax
   int	pgflag
   CODE:
+    DEBUG_PRINT(pgfunt);
     pgfunname[0] = fx;
     pgfunname[1] = fy;
     cpgfunt(pgfun1,pgfun2,n,tmin,tmax,pgflag);
@@ -426,6 +473,7 @@ pgfunx(fy,n,xmin,xmax,pgflag)
   float	xmax
   int	pgflag
   CODE:
+    DEBUG_PRINT(pgfunx);
     pgfunname[0] = fy;
     cpgfunx(pgfun1,n,xmin,xmax,pgflag);
 
@@ -438,6 +486,7 @@ pgfuny(fx,n,ymin,ymax,pgflag)
   float	ymax
   int	pgflag
   CODE:
+    DEBUG_PRINT(pgfuny);
     pgfunname[0] = fx;
     cpgfuny(pgfun1,n,ymin,ymax,pgflag);
 
@@ -455,6 +504,7 @@ pggray(a,idim,jdim,i1,i2,j1,j2,fg,bg,tr)
   float	bg
   float *	tr
   CODE:
+    DEBUG_PRINT(pggray);
     cpggray(a,idim,jdim,i1,i2,j1,j2,fg,bg,tr);
 
 
@@ -473,6 +523,7 @@ pghi2d(data,nxv,nyv,ix1,ix2,iy1,iy2,x,ioff,bias,center,ylims)
   Logical	center
   float *	ylims
   CODE:
+    DEBUG_PRINT(pghi2d);
     cpghi2d(data,nxv,nyv,ix1,ix2,iy1,iy2,x,ioff,bias,center,ylims);
 
 
@@ -485,12 +536,14 @@ pghist(n,data,datmin,datmax,nbin,pgflag)
   int	nbin
   int	pgflag
   CODE:
+    DEBUG_PRINT(pghist);
     cpghist(n,data,datmin,datmax,nbin,pgflag);
 
 
 void
 pgiden()
   CODE:
+    DEBUG_PRINT(pgiden);
     cpgiden();
 
 
@@ -507,6 +560,7 @@ pgimag(a,idim,jdim,i1,i2,j1,j2,a1,a2,tr)
   float	a2
   float *	tr
   CODE:
+    DEBUG_PRINT(pgimag);
     cpgimag(a,idim,jdim,i1,i2,j1,j2,a1,a2,tr);
 
 
@@ -516,6 +570,7 @@ pglab(xlbl,ylbl,toplbl)
   char *	ylbl
   char *	toplbl
   CODE:
+    DEBUG_PRINT(pglab);
     cpglab(xlbl,ylbl,toplbl);
 
 
@@ -525,6 +580,7 @@ pglabel(xlbl,ylbl,toplbl)
   char *	ylbl
   char *	toplbl
   CODE:
+    DEBUG_PRINT(pglabel);
     cpglab(xlbl,ylbl,toplbl);
 
 
@@ -535,6 +591,7 @@ pglcur(maxpt,npt,x,y)
   float *	x = NO_INIT
   float *	y = NO_INIT
   CODE:
+    DEBUG_PRINT(pglcur);
     coerce1D( (SV*)ST(2), maxpt );  /* Make sure arrays are big enough */
     coerce1D( (SV*)ST(3), maxpt );
     x = (float *) pack1D( (SV*)ST(2), 'f' );  /* Pack arrays */
@@ -549,6 +606,7 @@ pglcur(maxpt,npt,x,y)
 void
 pgldev()
   CODE:
+    DEBUG_PRINT(pgldev);
     cpgldev();
 
 
@@ -559,6 +617,7 @@ pglen(units,string,xl,yl)
   float	xl = NO_INIT
   float	yl = NO_INIT
   CODE:
+    DEBUG_PRINT(pglen);
     cpglen(units,string,&xl,&yl);
   OUTPUT:
   xl
@@ -571,6 +630,7 @@ pgline(n,xpts,ypts)
   float *	xpts
   float *	ypts
   CODE:
+    DEBUG_PRINT(pgline);
     cpgline(n,xpts,ypts);
 
 
@@ -579,6 +639,7 @@ pgmove(x,y)
   float	x
   float	y
   CODE:
+    DEBUG_PRINT(pgmove);
     cpgmove(x,y);
 
 
@@ -590,6 +651,7 @@ pgmtxt(side,disp,coord,fjust,text)
   float	fjust
   char *	text
   CODE:
+    DEBUG_PRINT(pgmtxt);
     cpgmtxt(side,disp,coord,fjust,text);
 
 
@@ -601,6 +663,7 @@ pgmtext(side,disp,coord,fjust,text)
   float	fjust
   char *	text
   CODE:
+    DEBUG_PRINT(pgmtext);
     cpgmtxt(side,disp,coord,fjust,text);
 
 
@@ -612,6 +675,7 @@ pgncur(maxpt,npt,x,y,symbol)
   float *	y = NO_INIT
   int	symbol
   CODE:
+    DEBUG_PRINT(pgncur);
     coerce1D( (SV*)ST(2), maxpt );  /* Make sure arrays are big enough */
     coerce1D( (SV*)ST(3), maxpt );
     x = (float *) pack1D( (SV*)ST(2), 'f' );  /* Pack arrays */
@@ -631,6 +695,7 @@ pgncurse(maxpt,npt,x,y,symbol)
   float *	y = NO_INIT
   int	symbol
   CODE:
+    DEBUG_PRINT(pgncurse);
     coerce1D( (SV*)ST(2), maxpt );  /* Make sure arrays are big enough */
     coerce1D( (SV*)ST(3), maxpt );
     x = (float *) pack1D( (SV*)ST(2), 'f' );  /* Pack arrays */
@@ -650,6 +715,7 @@ pgnumb(mm,pp,form,string,nc)
   char *	string = NO_INIT
   int	nc = NO_INIT
   CODE:
+    DEBUG_PRINT(pgnumb);
     string = strbuff;
            nc     = SIZEOF(string);
     cpgnumb(mm,pp,form,string,&nc);
@@ -666,6 +732,7 @@ pgolin(maxpt,npt,x,y,symbol)
   float *	y = NO_INIT
   int	symbol
   CODE:
+    DEBUG_PRINT(pgolin);
     coerce1D( (SV*)ST(2), maxpt );  /* Make sure arrays are big enough */
     coerce1D( (SV*)ST(3), maxpt );
     x = (float *) pack1D( (SV*)ST(2), 'f' );  /* Pack arrays */
@@ -681,6 +748,7 @@ int
 pgopen(device)
   char *	device
   CODE:
+    DEBUG_PRINT(pgopen);
     RETVAL = cpgopen(device);
   OUTPUT:
   RETVAL
@@ -688,12 +756,14 @@ pgopen(device)
 void
 pgpage()
   CODE:
+    DEBUG_PRINT(pgpage);
     cpgpage();
 
 
 void
 pgadvance()
   CODE:
+    DEBUG_PRINT(pgadvance);
     cpgpage();
 
 
@@ -702,6 +772,7 @@ pgpanl(ix,iy)
   int	ix
   int	iy
   CODE:
+    DEBUG_PRINT(pgpanl);
     cpgpanl(ix,iy);
 
 
@@ -710,6 +781,7 @@ pgpap(width,aspect)
   float	width
   float	aspect
   CODE:
+    DEBUG_PRINT(pgpap);
     cpgpap(width,aspect);
 
 
@@ -718,6 +790,7 @@ pgpaper(width,aspect)
   float	width
   float	aspect
   CODE:
+    DEBUG_PRINT(pgpaper);
     cpgpap(width,aspect);
 
 
@@ -735,6 +808,7 @@ pgpixl(ia,idim,jdim,i1,i2,j1,j2,x1,x2,y1,y2)
   float	y1
   float	y2
   CODE:
+    DEBUG_PRINT(pgpixl);
     cpgpixl(ia,idim,jdim,i1,i2,j1,j2,x1,x2,y1,y2);
 
 
@@ -746,6 +820,7 @@ pgpnts(n,x,y,symbol,ns)
   int *	symbol
   int	ns
   CODE:
+    DEBUG_PRINT(pgpnts);
     cpgpnts(n,x,y,symbol,ns);
 
 void
@@ -754,6 +829,7 @@ pgpoly(n,xpts,ypts)
   float *	xpts
   float *	ypts
   CODE:
+    DEBUG_PRINT(pgpoly);
     cpgpoly(n,xpts,ypts);
 
 
@@ -764,6 +840,7 @@ pgpt(n,xpts,ypts,symbol)
   float *	ypts
   int	symbol
   CODE:
+    DEBUG_PRINT(pgpt);
     cpgpt(n,xpts,ypts,symbol);
 
 void
@@ -772,6 +849,7 @@ pgpt1(xpt,ypt,symbol)
   float	ypt
   int	symbol
   CODE:
+    DEBUG_PRINT(pgpt1);
     cpgpt1(xpt,ypt,symbol);
 
 void
@@ -781,6 +859,7 @@ pgpoint(n,xpts,ypts,symbol)
   float *	ypts
   int	symbol
   CODE:
+    DEBUG_PRINT(pgpoint);
     cpgpt(n,xpts,ypts,symbol);
 
 
@@ -792,6 +871,7 @@ pgptxt(x,y,angle,fjust,text)
   float	fjust
   char *	text
   CODE:
+    DEBUG_PRINT(pgptxt);
     cpgptxt(x,y,angle,fjust,text);
 
 
@@ -803,6 +883,7 @@ pgptext(x,y,angle,fjust,text)
   float	fjust
   char *	text
   CODE:
+    DEBUG_PRINT(pgptext);
     cpgptxt(x,y,angle,fjust,text);
 
 
@@ -812,6 +893,7 @@ pgqah(fs,angle,vent)
   float	angle = NO_INIT
   float	vent = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqah);
     cpgqah(&fs,&angle,&vent);
   OUTPUT:
   fs
@@ -823,6 +905,7 @@ void
 pgqcf(font)
   int	font = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqcf);
     cpgqcf(&font);
   OUTPUT:
   font
@@ -832,6 +915,7 @@ void
 pgqch(size)
   float	size = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqch);
     cpgqch(&size);
   OUTPUT:
   size
@@ -841,6 +925,7 @@ void
 pgqci(ci)
   int	ci = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqci);
     cpgqci(&ci);
   OUTPUT:
   ci
@@ -851,6 +936,7 @@ pgqcir(icilo,icihi)
   int	icilo = NO_INIT
   int	icihi = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqcir);
     cpgqcir(&icilo,&icihi);
   OUTPUT:
   icilo
@@ -861,6 +947,7 @@ void
 pgqclp(state)
   int	state = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqclp);
     cpgqclp(&state);
   OUTPUT:
   state
@@ -870,6 +957,7 @@ pgqcol(ci1,ci2)
   int	ci1 = NO_INIT
   int	ci2 = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqcol);
     cpgqcol(&ci1,&ci2);
   OUTPUT:
   ci1
@@ -882,6 +970,7 @@ pgqcr(ci,cr,cg,cb)
   float	cg = NO_INIT
   float	cb = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqcr);
     cpgqcr(ci,&cr,&cg,&cb);
   OUTPUT:
   cr
@@ -895,6 +984,7 @@ pgqcs(units,xch,ych)
   float	xch = NO_INIT
   float	ych = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqcs);
     cpgqcs(units,&xch,&ych);
   OUTPUT:
   xch
@@ -909,6 +999,7 @@ pgqdt(n,type,tlen,descr,dlen,inter)
   int	dlen = NO_INIT
   int	inter = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqdt);
     type = strbuff;
     tlen = SIZEOF(type);
     descr = strbuff2;
@@ -925,6 +1016,7 @@ void
 pgqfs(fs)
   int	fs = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqfs);
     cpgqfs(&fs);
   OUTPUT:
   fs
@@ -936,6 +1028,7 @@ pgqhs(angle,sepn,phase)
   float	sepn = NO_INIT
   float	phase = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqhs);
     cpgqhs(&angle,&sepn,&phase);
   OUTPUT:
   angle
@@ -946,6 +1039,7 @@ void
 pgqid(id)
   int	id = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqid);
     cpgqid(&id);
   OUTPUT:
   id
@@ -956,6 +1050,7 @@ pgqinf(item,value,length)
   char *	value = NO_INIT
   int	length = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqinf);
     value = strbuff;
     length = SIZEOF(value);
     cpgqinf(item,value,&length);
@@ -968,6 +1063,7 @@ void
 pgqitf(itf)
   int	itf = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqitf);
     cpgqitf(&itf);
   OUTPUT:
   itf
@@ -977,6 +1073,7 @@ void
 pgqls(ls)
   int	ls = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqls);
     cpgqls(&ls);
   OUTPUT:
   ls
@@ -986,6 +1083,7 @@ void
 pgqlw(lw)
   int	lw = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqlw);
     cpgqlw(&lw);
   OUTPUT:
   lw
@@ -994,6 +1092,7 @@ void
 pgqndt(n)
   int	n = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqndt);
     cpgqndt(&n);
   OUTPUT:
   n
@@ -1003,6 +1102,7 @@ pgqpos(x,y)
   float	x = NO_INIT
   float	y = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqpos);
     cpgqpos(&x,&y);
   OUTPUT:
   x
@@ -1013,6 +1113,7 @@ void
 pgqtbg(tbci)
   int	tbci = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqtbg);
     cpgqtbg(&tbci);
   OUTPUT:
   tbci
@@ -1028,6 +1129,7 @@ pgqtxt(x,y,angle,fjust,text,xbox,ybox)
   float *	xbox = NO_INIT
   float *	ybox = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqtxt);
     xbox = get_mortalspace(4,'f');
     ybox = get_mortalspace(4,'f');
     cpgqtxt(x,y,angle,fjust,text,xbox,ybox);
@@ -1042,6 +1144,7 @@ pgqvp(units,x1,x2,y1,y2)
   float	y1 = NO_INIT
   float	y2 = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqvp);
     cpgqvp(units,&x1,&x2,&y1,&y2);
   OUTPUT:
   x1
@@ -1058,6 +1161,7 @@ pgqvsz(units,x1,x2,y1,y2)
   float	y1 = NO_INIT
   float	y2 = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqvsz);
     cpgqvsz(units,&x1,&x2,&y1,&y2);
   OUTPUT:
   x1
@@ -1073,6 +1177,7 @@ pgqwin(x1,x2,y1,y2)
   float	y1 = NO_INIT
   float	y2 = NO_INIT
   CODE:
+    DEBUG_PRINT(pgqwin);
     cpgqwin(&x1,&x2,&y1,&y2);
   OUTPUT:
   x1
@@ -1088,6 +1193,7 @@ pgrect(x1,x2,y1,y2)
   float	y1
   float	y2
   CODE:
+    DEBUG_PRINT(pgrect);
     cpgrect(x1,x2,y1,y2);
 
 
@@ -1096,6 +1202,7 @@ pgrnd(x,nsub)
   float	x
   int	nsub = NO_INIT
   CODE:
+    DEBUG_PRINT(pgrnd);
     RETVAL = cpgrnd(x,&nsub);
   OUTPUT:
   nsub
@@ -1109,6 +1216,7 @@ pgrnge(x1,x2,xlo,xhi)
   float	xlo = NO_INIT
   float	xhi = NO_INIT
   CODE:
+    DEBUG_PRINT(pgrnge);
     cpgrnge(x1,x2,&xlo,&xhi);
   OUTPUT:
   xlo
@@ -1121,18 +1229,21 @@ pgsah(fs,angle,vent)
   float	angle
   float	vent
   CODE:
+    DEBUG_PRINT(pgsah);
     cpgsah(fs,angle,vent);
 
 
 void
 pgsave()
   CODE:
+    DEBUG_PRINT(pgsave);
     cpgsave();
 
 
 void
 pgunsa()
   CODE:
+    DEBUG_PRINT(pgunsa);
     cpgunsa();
 
 
@@ -1140,6 +1251,7 @@ void
 pgscf(font)
   int	font
   CODE:
+    DEBUG_PRINT(pgscf);
     cpgscf(font);
 
 
@@ -1147,6 +1259,7 @@ void
 pgsch(size)
   float	size
   CODE:
+    DEBUG_PRINT(pgsch);
     cpgsch(size);
 
 
@@ -1154,6 +1267,7 @@ void
 pgsci(ci)
   int	ci
   CODE:
+    DEBUG_PRINT(pgsci);
     cpgsci(ci);
 
 
@@ -1162,12 +1276,14 @@ pgscir(icilo,icihi)
   int	icilo
   int	icihi
   CODE:
+    DEBUG_PRINT(pgscir);
     cpgscir(icilo,icihi);
 
 void
 pgsclp(state)
   int	state
   CODE:
+    DEBUG_PRINT(pgsclp);
     cpgsclp(state);
 
 void
@@ -1177,6 +1293,7 @@ pgscr(ci,cr,cg,cb)
   float	cg
   float	cb
   CODE:
+    DEBUG_PRINT(pgscr);
     cpgscr(ci,cr,cg,cb);
 
 void
@@ -1184,6 +1301,7 @@ pgscrl(dx,dy)
   float	dx
   float	dy
   CODE:
+    DEBUG_PRINT(pgscrl);
     cpgscrl(dx,dy);
 
 void
@@ -1192,6 +1310,7 @@ pgscrn(ci,name,ier)
   char *	name
   int	ier = NO_INIT
   CODE:
+    DEBUG_PRINT(pgscrn);
     cpgscrn(ci,name,&ier);
   OUTPUT:
   ier
@@ -1201,6 +1320,7 @@ void
 pgsfs(fs)
   int	fs
   CODE:
+    DEBUG_PRINT(pgsfs);
     cpgsfs(fs);
 
 
@@ -1211,6 +1331,7 @@ pgshls(ci,ch,cl,cs)
   float	cl
   float	cs
   CODE:
+    DEBUG_PRINT(pgshls);
     cpgshls(ci,ch,cl,cs);
 
 
@@ -1220,6 +1341,7 @@ pgshs(angle,sepn,phase)
   float	sepn
   float	phase
   CODE:
+    DEBUG_PRINT(pgshs);
     cpgshs(angle,sepn,phase);
 
 
@@ -1227,18 +1349,21 @@ void
 pgsitf(itf)
   int	itf
   CODE:
+    DEBUG_PRINT(pgsitf);
     cpgsitf(itf);
 
 void
 pgslct(id)
   int	id
   CODE:
+    DEBUG_PRINT(pgslct);
     cpgslct(id);
 
 void
 pgsls(ls)
   int	ls
   CODE:
+    DEBUG_PRINT(pgsls);
     cpgsls(ls);
 
 
@@ -1246,6 +1371,7 @@ void
 pgslw(lw)
   int	lw
   CODE:
+    DEBUG_PRINT(pgslw);
     cpgslw(lw);
 
 
@@ -1253,6 +1379,7 @@ void
 pgstbg(tbci)
   int	tbci
   CODE:
+    DEBUG_PRINT(pgstbg);
     cpgstbg(tbci);
 
 
@@ -1261,6 +1388,7 @@ pgsubp(nxsub,nysub)
   int	nxsub
   int	nysub
   CODE:
+    DEBUG_PRINT(pgsubp);
     cpgsubp(nxsub,nysub);
 
 
@@ -1271,6 +1399,7 @@ pgsvp(xleft,xright,ybot,ytop)
   float	ybot
   float	ytop
   CODE:
+    DEBUG_PRINT(pgsvp);
     cpgsvp(xleft,xright,ybot,ytop);
 
 
@@ -1281,6 +1410,7 @@ pgvport(xleft,xright,ybot,ytop)
   float	ybot
   float	ytop
   CODE:
+    DEBUG_PRINT(pgvport);
     cpgsvp(xleft,xright,ybot,ytop);
 
 
@@ -1291,6 +1421,7 @@ pgswin(x1,x2,y1,y2)
   float	y1
   float	y2
   CODE:
+    DEBUG_PRINT(pgswin);
     cpgswin(x1,x2,y1,y2);
 
 
@@ -1301,6 +1432,7 @@ pgwindow(x1,x2,y1,y2)
   float	y1
   float	y2
   CODE:
+    DEBUG_PRINT(pgwindow);
     cpgswin(x1,x2,y1,y2);
 
 
@@ -1313,6 +1445,7 @@ pgtbox(xopt,xtick,nxsub,yopt,ytick,nysub)
   float	ytick
   int	nysub
   CODE:
+    DEBUG_PRINT(pgtbox);
     cpgtbox(xopt,xtick,nxsub,yopt,ytick,nysub);
 
 void
@@ -1328,6 +1461,7 @@ pgtick(x1,y1,x2,y2,v,tikl,tikr,disp,orient,str)
   float	orient
   char *	str
   CODE:
+    DEBUG_PRINT(pgtick);
     cpgtick(x1,y1,x2,y2,v,tikl,tikr,disp,orient,str);
 
 void
@@ -1336,12 +1470,14 @@ pgtext(x,y,text)
   float	y
   char *	text
   CODE:
+    DEBUG_PRINT(pgtext);
     cpgtext(x,y,text);
 
 
 void
 pgupdt()
   CODE:
+    DEBUG_PRINT(pgupdt);
     cpgupdt();
 
 
@@ -1360,6 +1496,7 @@ pgvect(a,b,idim,jdim,i1,i2,j1,j2,c,nc,tr,blank)
   float *	tr
   float	blank
   CODE:
+    DEBUG_PRINT(pgvect);
     cpgvect(a,b,idim,jdim,i1,i2,j1,j2,c,nc,tr,blank);
 
 
@@ -1370,6 +1507,7 @@ pgvsiz(xleft,xright,ybot,ytop)
   float	ybot
   float	ytop
   CODE:
+    DEBUG_PRINT(pgvsiz);
     cpgvsiz(xleft,xright,ybot,ytop);
 
 
@@ -1380,18 +1518,21 @@ pgvsize(xleft,xright,ybot,ytop)
   float	ybot
   float	ytop
   CODE:
+    DEBUG_PRINT(pgvsize);
     cpgvsiz(xleft,xright,ybot,ytop);
 
 
 void
 pgvstd()
   CODE:
+    DEBUG_PRINT(pgvstd);
     cpgvstd();
 
 
 void
 pgvstand()
   CODE:
+    DEBUG_PRINT(pgvstand);
     cpgvstd();
 
 
@@ -1404,6 +1545,7 @@ pgwedg(side,disp,width,fg,bg,label)
   float	bg
   char *	label
   CODE:
+    DEBUG_PRINT(pgwedg);
     cpgwedg(side,disp,width,fg,bg,label);
 
 
@@ -1414,6 +1556,7 @@ pgwnad(x1,x2,y1,y2)
   float	y1
   float	y2
   CODE:
+    DEBUG_PRINT(pgwnad);
     cpgwnad(x1,x2,y1,y2);
 
 
@@ -1424,6 +1567,7 @@ pggapline(n,msgval,xpts,ypts)
   float_packed	xpts
   float_packed	ypts
   CODE:
+    DEBUG_PRINT(pggapline);
     { int i;
       int start = 0;
       while (xpts[start] == msgval) start++;  /* make sure we have a good starting point */
@@ -1450,6 +1594,7 @@ pgcolorpnts(n,x,y,z,sym)
   float_packed	z
   int   sym
   CODE:
+    DEBUG_PRINT(pgcolorpnts);
     {
       /* find range of color pallette */
       int icilo, icihi, i, cirange, ci;
@@ -1497,4 +1642,4 @@ BOOT:
        by other modules
    */
 
-   sv_setiv(perl_get_sv("PGPLOT::HANDLE",TRUE|GV_ADDMULTI), (IV) (void*) &myPGPLOT_handle);
+   sv_setiv(get_sv("PGPLOT::HANDLE",TRUE|GV_ADDMULTI), (IV) (void*) &myPGPLOT_handle);

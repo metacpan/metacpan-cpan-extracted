@@ -1,0 +1,20 @@
+Algorithm::Gutter - cellular automata to simulate rain in a gutter
+
+This module can be installed using cpanm.
+
+    cpanm Algorithm::Gutter
+
+Run perldoc(1) on Algorithm::Gutter for documentation.
+
+
+To author a new release,
+
+    export MODULE_SIGNATURE_AUTHOR=...
+    perl Build.PL
+    RELEASE_TESTING=1 ./Build test
+    ./Build disttest
+    git tag -u ... -s v...
+    ./Build dist
+    cpan-upload ...
+    git push ...
+    ./Build realclean

@@ -1,0 +1,55 @@
+{
+   "abstract" : "cellular automata to simulate rain in a gutter",
+   "author" : [
+      "Jeremy Mates <jmates@thrig.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Algorithm-Gutter",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "2.142060",
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Object::Pad" : "0.66",
+            "perl" : "v5.26.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Algorithm::Gutter" : {
+         "file" : "lib/Algorithm/Gutter.pm",
+         "version" : "0.01"
+      },
+      "Algorithm::Gutter::Cell" : {
+         "file" : "lib/Algorithm/Gutter.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "url" : "https://thrig.me/src/Algorithm-Gutter.git"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

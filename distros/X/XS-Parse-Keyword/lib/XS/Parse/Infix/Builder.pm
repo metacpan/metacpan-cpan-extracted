@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix::Builder 0.46;
+package XS::Parse::Infix::Builder 0.47;
 
 use v5.14;
 use warnings;
@@ -13,6 +13,8 @@ use warnings;
 C<XS::Parse::Infix::Builder> - build-time support for C<XS::Parse::Infix>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
 In F<Build.PL>:
 

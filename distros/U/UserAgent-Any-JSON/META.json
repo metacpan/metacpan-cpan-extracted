@@ -71,6 +71,7 @@
          },
          "requires" : {
             "HTTP::Response" : "0",
+            "JSON" : "0",
             "JSON::PP" : "0",
             "Readonly" : "0",
             "Test2::V0" : "0",
@@ -95,6 +96,6 @@
          "web" : "https://github.com/mkende/perl_user_agent_any_json"
       }
    },
-   "version" : 0.04,
+   "version" : 0.05,
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -155,7 +155,7 @@ PIECES AND PIECE TYPES
     parsing step is placed into the args or arg0 parameter to the invoked
     function, using a struct type consisting of the following fields:
 
-       typedef struct
+       typedef struct {
           union {
              OP *op;
              CV *cv;
@@ -509,10 +509,10 @@ PIECES AND PIECE TYPES
     Various versions of the macro are provided, each using a different
     selection filter to choose certain available infix operators:
 
-       XPK_INFIX_RELATION         # any relational operator
-       XPK_INFIX_EQUALITY         # an equality operator like `==` or `eq`
-       XPK_INFIX_MATCH_NOSMART    # any sort of "match"-like operator, except smartmatch
-       XPK_INFIX_MATCH_SMART      # XPK_INFIX_MATCH_NOSMART plus smartmatch
+       XPK_INFIX_RELATION         // any relational operator
+       XPK_INFIX_EQUALITY         // an equality operator like `==` or `eq`
+       XPK_INFIX_MATCH_NOSMART    // any sort of "match"-like operator, except smartmatch
+       XPK_INFIX_MATCH_SMART      // XPK_INFIX_MATCH_NOSMART plus smartmatch
 
  XPK_LITERAL
 

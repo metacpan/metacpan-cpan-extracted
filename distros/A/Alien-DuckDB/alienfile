@@ -1,0 +1,75 @@
+use alienfile;
+use Path::Tiny qw( path );
+use Config;
+
+# DuckDB's latest version
+my $version = '1.1.3';
+
+# Determine platform-specific settings
+my $os = $^O;
+my $arch = $Config{archname} =~ /aarch64|arm64/ ? 'aarch64' : 'amd64';
+
+# Map OS to DuckDB's naming convention
+my $os_name = 
+    $os eq 'darwin'  ? 'osx' :
+    $os eq 'MSWin32' ? 'windows' :
+    'linux';
+
+# Special case for macOS which uses universal binaries
+my $pkg_name = $os eq 'darwin' 
+    ? "libduckdb-osx-universal.zip"
+    : "libduckdb-$os_name-$arch.zip";
+
+probe sub {
+    my($build) = @_;
+    
+    # Check for libduckdb in common system paths
+    my @paths = qw( /usr/lib /usr/local/lib );
+    foreach my $path (@paths) {
+        if (-f "$path/libduckdb.so" || -f "$path/libduckdb.dylib" || -f "$path/duckdb.dll") {
+            return 'system';
+        }
+    }
+    return;
+};
+
+share {
+    # Download the binary
+    start_url "https://github.com/duckdb/duckdb/releases/download/v${version}/${pkg_name}";
+    plugin Download => (
+        version => qr/([0-9\.]+)/,
+    );
+
+    # Extract the binary
+    plugin Extract => 'zip';
+
+    # No build required for pre-built binaries
+    build sub {
+        my($build) = @_;
+        my $prefix = $build->install_prop->{prefix};
+        
+        # Create necessary directories
+        path($prefix, 'lib')->mkpath;
+        path($prefix, 'include')->mkpath;
+        
+        # Move library files to the right place
+        if($os eq 'MSWin32') {
+            path('duckdb.dll')->copy(path($prefix, 'lib', 'duckdb.dll'));
+        } elsif($os eq 'darwin') {
+            path('libduckdb.dylib')->copy(path($prefix, 'lib', 'libduckdb.dylib'));
+        } else {
+            path('libduckdb.so')->copy(path($prefix, 'lib', 'libduckdb.so'));
+        }
+        
+        # Move header files
+        for my $header (path('.')->children(qr/\.h$/)) {
+            $header->copy(path($prefix, 'include', $header->basename));
+        }
+    };
+
+    # Gather installed files
+    gather sub {
+        my($build) = @_;
+        $build->runtime_prop->{$_} = 1 for qw( shared_library );
+    };
+};

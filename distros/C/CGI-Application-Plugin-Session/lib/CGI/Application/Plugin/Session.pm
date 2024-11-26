@@ -1,8 +1,5 @@
 package CGI::Application::Plugin::Session;
-{
-  $CGI::Application::Plugin::Session::VERSION = '1.05';
-}
-
+$CGI::Application::Plugin::Session::VERSION = '1.06';
 use CGI::Session ();
 use File::Spec ();
 use CGI::Application 3.21;
@@ -288,7 +285,7 @@ CGI::Application::Plugin::Session - Plugin that adds session support to CGI::App
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -573,7 +570,7 @@ Cees Hek <ceeshek@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Cees Hek.
+This software is copyright (c) 2024 by Cees Hek.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -11,14 +11,20 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.020'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-10-16'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.021'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-11-25'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
+use Scalar::Util qw/reftype refaddr blessed weaken openhandle/;
+use List::Util qw/first any all/;
+use File::Basename qw/dirname basename/;
+use Data::Dumper::Interp qw/dvis vis visq avis hvis visnew addrvis u/;
 
 use Exporter 5.57 ();
 our @EXPORT = qw/fmt_call log_call fmt_methcall log_methcall
                  nearest_call abbrev_call_fn_ln_subname/;
+
+our @EXPORT_OK = qw/btw btwN btwbt oops set_logdest/;
 
 my %backup_defaults = (
   logdest         => \*STDERR,
@@ -34,69 +40,6 @@ sub set_logdest(*) {
 }
 
 my $default_pfx = '$lno';
-
-sub _btwTN($$@) {
-  local ($@, $_); # dont clobber caller's variables
-  my ($pfxexpr, $N, @strings) = @_;
-  local $_ = join("", @strings);
-  $pfxexpr = $default_pfx if $pfxexpr eq "__DEFAULT__";
-  s/\n\z//s;
-  my @levels;
-  my $sep = ",";
-  if (ref($N) eq "") {
-    @levels = ($N);
-  }
-  elsif (ref($N) eq 'SCALAR' && defined($$N) && $$N >= 1) {
-    #@levels = reverse 0..($$N-1); # mini-traceback
-    @levels = 0..($$N-1); # mini-traceback
-    #$sep = "<";
-    #$sep = " ← ";
-    #$sep = " ⇽ ";
-    #$sep = " « "; # « exists in both Unicode and latin1
-    $sep = " ⇐ ";
-  }
-  elsif (ref($N) eq 'ARRAY' && !grep{! defined} @$N) {
-    @levels = @$N
-  }
-  else {
-    confess "Invalid N arg to btwN: $N"
-  }
-  my $pfx = "";
-  foreach my $n (@levels) {
-    my ($package, $path, $lno) = caller($n);
-    next unless defined $lno;
-    (my $fname = $path) =~ s/.*[\\\/]//;
-    $fname =~ s/\.pm$//;
-    my $pkg = ($package =~ s/.*:://r);
-    my $pkg_space = $package eq "main" ? "" : "$pkg ";
-    my $s = eval qq< qq<${pfxexpr}> >;
-    croak "ERROR IN btw prefix '$pfxexpr': $@" if $@;
-    $pfx .= $sep if $pfx;
-    $pfx .= $s;
-  }
-  if (ref($N) eq "") {
-    foreach (2..$N) { $pfx .= "«" }
-  }
-  my $fh = $backup_defaults{logdest};
-  print $fh "${pfx}: $_\n";
-}
-
-sub _genbtw_funcs($$) {
-  my ($pkg, $pfxexpr) = @_;
-  no strict 'refs';
-  my $btwN  = eval{ sub($@) { unshift @_,$pfxexpr; goto &_btwTN } } // die $@;
-  my $btw   = eval{ sub(@)  { unshift @_,0 ; goto &{"${pkg}::btwN"} } } // die $@;
-  my $btwbt = eval{ sub(@)  { unshift @_,\99 ; goto &{"${pkg}::btwN"} } } // die $@;
-  *{"${pkg}::btwN"} = \&$btwN;
-  *{"${pkg}::btw"}  = \&$btw;
-  *{"${pkg}::btwbt"}  = \&$btwbt;
-}
-BEGIN {
-  # Generate the functions used when imported the usual way.
-  # The special prefix "__DEFAULT__" shows just $lno if btw() has only
-  # been imported into a single package, otherwise it is more fully qualified.
-  _genbtw_funcs(__PACKAGE__,'__DEFAULT__');
-}
 
 sub import {
   my $class = shift;
@@ -125,14 +68,70 @@ sub import {
   }
   @_ = ($class, @remaining_args);
   goto &Exporter::import
+}#import
+
+
+sub _btwTN($$@) {
+  my ($pfxexpr, $N, @strings) = @_;
+  local $@;
+  local $_ = join("", @strings);
+  $pfxexpr = $default_pfx if $pfxexpr eq "__DEFAULT__";
+  s/\n\z//s;
+  my @levels;
+  my $sep = ",";
+  if (ref($N) eq "") {
+    @levels = ($N);
+  }
+  elsif (ref($N) eq 'SCALAR' && defined($$N) && $$N >= 1) {
+    @levels = 0..($$N-1); # mini-traceback
+    #$sep = "<";
+    #$sep = " ← ";
+    #$sep = " ⇽ ";
+    #$sep = " « "; # « exists in both Unicode and latin1
+    $sep = " ⇐ ";
+  }
+  elsif (ref($N) eq 'ARRAY' && all{defined} @$N) {
+    @levels = @$N
+  }
+  else {
+    confess "Invalid N arg to btwN: $N"
+  }
+  my $pfx = "";
+  foreach my $n (@levels) {
+    my ($package, $path, $lno) = caller($n);
+    next unless defined $lno;
+    (my $fname = $path) =~ s/.*[\\\/]//;
+    $fname =~ s/\.pm$//;
+    my $pkg = ($package =~ s/.*:://r);
+    my $pkg_space = $package eq "main" ? "" : "$pkg ";
+    my $s = eval qq< qq<${pfxexpr}> >;
+    croak "ERROR IN btw prefix '$pfxexpr': $@" if $@;
+    $pfx .= $sep if $pfx;
+    $pfx .= $s;
+  }
+  if (ref($N) eq "") {
+    foreach (2..$N) { $pfx .= "«" }
+  }
+  my $fh = $backup_defaults{logdest};
+  print $fh "${pfx}: $_\n";
+}#_btwTN
+
+sub _genbtw_funcs($$) {
+  my ($pkg, $pfxexpr) = @_;
+  no strict 'refs';
+  my $btwN  = eval{ sub($@) { unshift @_,$pfxexpr; goto &_btwTN } } // die $@;
+  my $btw   = eval{ sub(@)  { unshift @_,0 ; goto &{"${pkg}::btwN"} } } // die $@;
+  my $btwbt = eval{ sub(@)  { unshift @_,\99 ; goto &{"${pkg}::btwN"} } } // die $@;
+  *{"${pkg}::btwN"} = \&$btwN;
+  *{"${pkg}::btw"}  = \&$btw;
+  *{"${pkg}::btwbt"}  = \&$btwbt;
 }
-
-our @EXPORT_OK = qw/btw btwN btwbt oops set_logdest/;
-
-
-use Scalar::Util qw/reftype refaddr blessed weaken openhandle/;
-use List::Util qw/first any all/;
-use File::Basename qw/dirname basename/;
+BEGIN {
+  # Generate the functions used when imported the usual way.
+  # The special prefix "__DEFAULT__" shows just $lno if btw() has only
+  # been imported into a single package, otherwise it is more fully qualified.
+  _genbtw_funcs(__PACKAGE__,'__DEFAULT__');
+}
 
 sub oops(@) {
   my $pkg = caller;
@@ -150,8 +149,6 @@ sub oops(@) {
   STDERR->flush if openhandle(*STDERR);
   goto &Carp::confess;
 }
-
-use Data::Dumper::Interp qw/dvis vis visq avis hvis visnew addrvis u/;
 
 # Return ref to hash of effective options (READ-ONLY).
 # If the first argument is a hashref it is shifted off and
@@ -227,9 +224,9 @@ sub _fmt_list($) {
 #   0       1        2       3
 #   package filename linenum subname ...
 #
-use constant _CALLER_OVERRIDE_CHECK_OK =>
-     (defined(&Carp::CALLER_OVERRIDE_CHECK_OK)
-      && &Carp::CALLER_OVERRIDE_CHECK_OK);
+##use constant _CALLER_OVERRIDE_CHECK_OK =>
+##     (defined(&Carp::CALLER_OVERRIDE_CHECK_OK)
+##      && &Carp::CALLER_OVERRIDE_CHECK_OK);
 
 sub _nearest_call($$) {
   my ($state, $opts) = @_;

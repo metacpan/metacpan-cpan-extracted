@@ -16,9 +16,13 @@ Use this module to manage CAMT messages, which are ISO20022 standard
 CAMT.053 is produced by banks and consumed by accountancies, showing
 transactions in bank-accounts.  See F<https://www.iso20022.org>.
 
-At the moment, this module can be used to read the XML files.  It is
-intended to also support constructing them.  However, B<I need a sponsor>
-to make that happen.  Contact the author for support.
+At the moment, this module can be used to read and write the XML message
+files.  It is intended to also support interpreting and construction
+abstraction.  However, B<I need a sponsor> to make that happen.
+Contact the author for support.  Please.
+
+I would also like to include a CAMT.053 to MT-940 converter, v.v.
+Please hire me.
 
 =head1 METHODS
 
@@ -57,7 +61,7 @@ will give you the nice long names in Perl.
 Sets the default $rule how to handle messages which have namespaces
 which do not match the schemas contained in the module release.
 
-See L<matchSchema()|Business::CAMT/"Read"> for the available $rule values.  See the L<DETAILS>
+See L<matchSchema()|Business::CAMT/"Helper methods"> for the available $rule values.  See the L<DETAILS>
 section about the namespace versioning horrors.
 
 =back
@@ -66,7 +70,129 @@ section about the namespace versioning horrors.
 
 =head2 Accessors
 
+=over 4
+
+=item $obj-E<gt>B<schemas>()
+
+=back
+
+=head2 Read and Write messages
+
+=over 4
+
+=item $obj-E<gt>B<create>($set, $version, $data)
+
+=item $obj-E<gt>B<read>($file|$xml, %options)
+
+Pass a $file name, an $xml document or an $xml node.  Returned is
+a HASH blessed in class 'Business::CAMT::CAMT<nr>', for instance
+C<Business::CAMT::CAMT053>.
+
+ -Option      --Default
+  match_schema  new(match_schema)
+
+=over 2
+
+=item match_schema => $rule
+
+=back
+
+=item $obj-E<gt>B<write>($file, $message, %options)
+
+example: writing a message
+
+  my $message = $camt->create('053.001', '02', $data);
+  $camt->write('out.xml', $message);
+
+=back
+
+=head2 Helper methods
+
+You would rarely (or never) need to use these methods in your programs: they support
+the reader and writer function.
+
+=over 4
+
+=item $obj-E<gt>B<fullname2tagTable>()
+
+Translates long and understandable names into (silly) abbreviated tags.
+
+=item $obj-E<gt>B<knownVersions>( [$set] )
+
+Returns a sorted LIST with all schema versions which are included in this
+distribution.  When the $set is specified (like C<053.001>), then only
+those are reported.
+
+=item $obj-E<gt>B<matchSchema>($set, $version, %options)
+
+Find the available schema version for the $set (like '053.001') to interpret
+a message with $version (like '02').
+
+ -Option--Default
+  rule    new(match_schema)
+
+=over 2
+
+=item rule => 'EXACT'|'NEWER'|'NEWEST'|'ANY'|CODE
+
+When C<EXACT>, only the precise version is acceptable.  C<NEWER> will
+fall back to the closest newer version.  When no exact match, C<NEWEST>
+returns the highest available version, but must be newer.  Most generous
+is C<ANY>, which falls back to the newest available version even when
+it is older than the message version.
+
+You may also pass a CODE reference, which is called with the $set, the requested
+schema, and a sorted ARRAY of available versions.  It must return one of the
+available versions or C<undef> (no compatible version).
+
+=back
+
+=item $obj-E<gt>B<schemaReader>($set, $version, $ns)
+
+Produces a CODE which can be called with an XML message, to get it transformed
+into a Perl data-structure.  In this case, the $set and $version have to be
+known already; method L<read()|Business::CAMT/"Read and Write messages"> figures that out by itself.
+
+=item $obj-E<gt>B<schemaWriter>($set, $version, $ns)
+
+=item $obj-E<gt>B<tag2fullnameTable>()
+
+Returns a table which translates the (silly) abbreviations used in the
+XML tags into readable names.  Good names make it easier to understand
+the handling code and is less error-prone.
+
+=back
+
 =head1 DETAILS
+
+In this chapter, you find some background information and implementation tips.
+
+=head2 Examples
+
+The release contains a C<examples/> directory.  In that directory, you with find
+a C<show> script and some xml files.  Run the script with a file, to see what
+this module has to offer.  For example:
+
+  cd Business-CAMT-0.01/
+  examples/show examples/danskeci.com/camt053_dk_example.xml /tmp/a.xml
+
+The script (this module) auto-detects the CAMT type which is found in the XML
+message.  Play with the script to see how changes affect the output.
+
+=head2 Templates
+
+In our GitHub repository, you find a C<templates/> directory which
+contains a structural dump of each of the Perl data structure which is
+produced (for L<read()|Business::CAMT/"Read and Write messages">) or consumed (for C<write>, to be implemented)
+by this module.
+
+Be sure you understand anonymous HASHes and ARRAYs in Perl well, when you
+start playing.  Do not forget that code gets more readible when you use
+practical reference variables.
+
+On GitHub, you will also find a C<templates-long/> directory full of
+examples.  This demonstrates what option L<new(long_tagnames)|Business::CAMT/"Constructors"> does: it
+will make the Perl datastructures readible.
 
 =head2 Implementation issues
 
@@ -79,7 +205,7 @@ not design your versioning with that in mind?
 
 This module bends the namespace use to hide these design mistakes into
 flexible code.  Without full knowledge about existing and future versions
-of the schemas, there is a powerfull configuration setting with L<matchSchema()|Business::CAMT/"Read">.
+of the schemas, there is a powerfull configuration setting with L<matchSchema()|Business::CAMT/"Helper methods">.
 Please consider to contribute discovered issues to this module.
 
 =head3 Tag abbreviations
@@ -142,73 +268,12 @@ The XML schema, when B<designed> as XML schema, could have looked like
 Also: use of substitutionGroups would have made messages so much
 clearer and easier.
 
-=head1 Read
-
-=over 4
-
-=item $obj-E<gt>B<fullname2tagTable>()
-
-Translates long and understandable names into (silly) abbreviated tags.
-
-=item $obj-E<gt>B<knownVersions>( [$set] )
-
-Returns a sorted LIST with all schema versions which are included in this
-distribution.  When the $set is specified (like C<053.001>), then only
-those are reported.
-
-=item $obj-E<gt>B<matchSchema>($set, $version, %options)
-
-Find the available schema version for the $set (like '053.001') to interpret
-a message with $version (like '02').
-
- -Option--Default
-  rule    new(match_schema)
-
-=over 2
-
-=item rule => 'EXACT'|'NEWER'|'NEWEST'|'ANY'|CODE
-
-When C<EXACT>, only the precise version is acceptable.  C<NEWER> will
-fall back to the closest newer version.  When no exact match, C<NEWEST>
-returns the highest available version, but must be newer.  Most generous
-is C<ANY>, which falls back to the newest available version even when
-it is older than the message version.
-
-You may also pass a CODE reference, which is called with the $set, the requested
-schema, and a sorted ARRAY of available versions.  It must return one of the
-available versions or C<undef> (no compatible version).
-
-=back
-
-=item $obj-E<gt>B<read>($file|$xml, %options)
-
-Pass a $file name, an $xml document or an $xml node.  Returned is
-a HASH blessed in class 'Business::CAMT::CAMT<nr>', for instance
-C<Business::CAMT::CAMT053>.
-
- -Option      --Default
-  match_schema  new(match_schema)
-
-=over 2
-
-=item match_schema => $rule
-
-=back
-
-=item $obj-E<gt>B<schemaReader>($set, $version, $ns)
-
-=item $obj-E<gt>B<tag2fullnameTable>()
-
-Returns a table which translates the (silly) abbreviations used in the
-XML tags into readable names.  Good names make it easier to understand
-the handling code and is less error-prone.
-
-=back
+=encoding utf-8
 
 =head1 SEE ALSO
 
-This module is part of Business-CAMT distribution version 0.10,
-built on November 25, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Business-CAMT distribution version 0.11,
+built on November 26, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

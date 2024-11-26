@@ -27,11 +27,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.85
+Version 0.86
 
 =cut
 
-our $VERSION = '0.85';
+our $VERSION = '0.86';
 
 =head1 SYNOPSIS
 
@@ -325,23 +325,19 @@ sub _find_site_details
 =head2 domain_name
 
 Domain_name is the name of the controlling domain for this website.
-Usually it will be similar to host_name, but will lack the http:// prefix.
+Usually it will be similar to host_name, but will lack the http:// or www prefixes.
 
 =cut
 
 sub domain_name {
 	my $self = shift;
 
-	if($self->{domain}) {
-		return $self->{domain};
-	}
+	return $self->{domain} if $self->{domain};
+
 	$self->_find_site_details();
 
-	if($self->{site}) {
-		$self->{domain} = $self->{site};
-		if($self->{domain} =~ /^www\.(.+)/) {
-			$self->{domain} = $1;
-		}
+	if(my $site = $self->{site}) {
+		$self->{domain} = ($site =~ /^www\.(.+)/) ? $1 : $site;
 	}
 
 	return $self->{domain};
@@ -862,6 +858,8 @@ sub _warn {
 		return;
 	}
 	# return if($self eq __PACKAGE__);  # Called from class method
+
+	push @{$self->{'warnings'}}, { warning => $warning };
 
 	if($self->{syslog}) {
 		require Sys::Syslog;
@@ -1735,6 +1733,19 @@ sub status
 
 	# Return current status or 200 by default
 	return $self->{status} || 200;
+}
+
+=head2 warnings
+
+Returns the warnings that the object has generated
+
+=cut
+
+sub warnings
+{
+	my $self = shift;
+
+	return $self->{'warnings'};
 }
 
 =head2 set_logger

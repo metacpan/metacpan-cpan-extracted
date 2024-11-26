@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Create a website listing all of your links",
    "author" : [
       "Dave Cross <dave@perlhacks.com>"
    ],
@@ -54,6 +54,6 @@
          "web" : "https://github.com/davorg-cpan/app-linksite"
       }
    },
-   "version" : "v0.0.10",
+   "version" : "v0.0.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

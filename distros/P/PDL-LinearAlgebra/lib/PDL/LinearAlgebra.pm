@@ -19,7 +19,7 @@ use constant {
 
 use strict;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 $VERSION = eval $VERSION;
 
 @PDL::LinearAlgebra::ISA = qw/PDL::Exporter/;
@@ -34,14 +34,6 @@ $VERSION = eval $VERSION;
 
 my $_laerror = BARF;
 
-{
-package # hide from CPAN indexer
-  PDL::Complex;
-
-our $floatformat  = "%4.4g";    # Default print format for long numbers
-our $doubleformat = "%6.6g";
-our @ISA = @ISA ? @ISA : 'PDL'; # so still operates when no PDL::Complex
-}
 ########################################################################
 
 =encoding utf8
@@ -141,8 +133,6 @@ Supports threading.
 
 sub PDL::dims_internal {0}
 sub PDL::dims_internal_values {()}
-sub PDL::Complex::dims_internal {1}
-sub PDL::Complex::dims_internal_values {(2)}
 sub PDL::_similar {
   my @di_vals = $_[0]->dims_internal_values;
   my ($m, @vdims) = @_;
@@ -150,22 +140,17 @@ sub PDL::_similar {
 }
 sub PDL::_similar_null { ref($_[0])->null }
 sub _complex_null {
-  (defined &PDL::Complex::new_from_specification ? 'PDL::Complex' : 'PDL')->null
+  PDL->null
 }
 sub _ecplx {
   my ($re, $im) = @_;
   $re = PDL->topdl($re);
-  return $re if UNIVERSAL::isa($re,'PDL::Complex') or !$re->type->real;
+  return $re if !$re->type->real;
   Carp::confess("Usage: _ecplx(re,im) or (complex)") if !defined $im;
   $im = PDL->topdl($im);
-  return $re->czip($im) if !defined &PDL::Complex::new_from_specification;
-  my $ret =  PDL::Complex->new_from_specification($re->type, 2, $re->dims);
-  $ret->slice('(0),') .= $re;
-  $ret->slice('(1),') .= $im;
-  return $ret;
+  $re->czip($im);
 }
 sub PDL::_is_complex { !$_[0]->type->real }
-sub PDL::Complex::_is_complex {1}
 sub PDL::_norm {
 	my ($m, $real, $trans) = @_;
 	# If trans == true => transpose output matrix
@@ -284,7 +269,6 @@ sub PDL::issym {
 	my ($m, $tol, $conj) = @_;
 	$tol //= ($m->type >= double) ? 1e-8 : 1e-5;
 	$m = $m - $m->t($conj);
-	$m = $m->clump(2) if $m->isa('PDL::Complex');
 	my ($min,$max) = PDL::Ufunc::minmaximum($m);
 	$min = $min->minimum;
 	$max = $max->maximum;
@@ -341,7 +325,7 @@ sub PDL::diag {
 		$z = $a->slice("$slice_prefix$diag:, :-@{[$diag+1]}")->diagonal(@diag_args);
 	}
 	else{$z = $a->diagonal(@diag_args);}
-	$a->isa('PDL::Complex') ? $z->complex : $z;
+	$z;
 }
 use attributes 'PDL', \&PDL::diag, 'lvalue';
 
@@ -428,12 +412,6 @@ sub PDL::_call_method {
   my ($m, $method, @args) = @_;
   $method = [$method, "c$method"] if !ref $method;
   $method = $method->[!$m->type->real ? 1 : 0];
-  $m->$method(@args);
-}
-sub PDL::Complex::_call_method {
-  my ($m, $method, @args) = @_;
-  $method = [$method, "c$method"] if !ref $method;
-  $method = $method->[1];
   $m->$method(@args);
 }
 *mcrossprod = \&PDL::mcrossprod;
@@ -548,7 +526,6 @@ sub PDL::mdet {
 	my $m_orig = my $m = shift->copy;
 	$m->_call_method('getrf', my $ipiv = null, my $info = null);
 	$m = $m->diagonal($di,$di+1);
-	$m = $m->complex if $m_orig->isa('PDL::Complex');
 	$m = $m->prodover;
 	$m = $m * ((PDL::Ufunc::sumover(sequence($ipiv->dim(0))->plus(1,0) != $ipiv)%2)*(-2)+1);
 	$info = which($info != 0);
@@ -957,13 +934,12 @@ sub PDL::mlu {
 	my $l = $m->mtri(1);
 	my $slice_prefix = ',' x $di;
 	my $smallerm1 = ($dims[$di] < $dims[$di+1] ? $dims[$di] : $dims[$di+1]) - 1;
-	my $one = $m->isa('PDL::Complex') ? PDL::Complex::r2C(1) : 1;
 	if ($dims[$di+1] > $dims[$di]) {
 		$u = $u->slice("$slice_prefix,:$smallerm1")->sever;
-		$l->slice("$slice_prefix :$smallerm1, :$smallerm1")->diagonal($di,$di+1) .= $one;
+		$l->slice("$slice_prefix :$smallerm1, :$smallerm1")->diagonal($di,$di+1) .= 1;
 	} else {
 		$l = $l->slice("$slice_prefix:$smallerm1")->sever if $dims[$di+1] < $dims[$di];
-		$l->diagonal($di,$di+1) .= $one;
+		$l->diagonal($di,$di+1) .= 1;
 	}
 	$l, $u, $ipiv, $info;
 }

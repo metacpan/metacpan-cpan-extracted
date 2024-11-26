@@ -339,24 +339,6 @@ XS_INTERNAL(xsub_mop_class_seal)
   mop_class_seal(meta);
 }
 
-#define is_valid_ident_utf8(s)  S_is_valid_ident_utf8(aTHX_ s)
-static bool S_is_valid_ident_utf8(pTHX_ const U8 *s)
-{
-  const U8 *e = s + strlen((char *)s);
-
-  if(!isIDFIRST_utf8_safe(s, e))
-    return false;
-
-  s += UTF8SKIP(s);
-  while(*s) {
-    if(!isIDCONT_utf8_safe(s, e))
-      return false;
-    s += UTF8SKIP(s);
-  }
-
-  return true;
-}
-
 static void inplace_trim_whitespace(SV *sv)
 {
   if(!SvPOK(sv) || !SvCUR(sv))

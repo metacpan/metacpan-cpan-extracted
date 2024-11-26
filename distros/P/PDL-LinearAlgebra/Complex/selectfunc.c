@@ -15,7 +15,7 @@ extern Core *PDL;
    ENTER;   SAVETMPS;   PUSHMARK(sp); \
     SV *svpdl = sv_newmortal(); \
     PDL->SetSV_PDL(svpdl, pdlvar); \
-    svpdl = sv_bless(svpdl, bless_stash); /* bless in PDL::Complex  */ \
+    svpdl = sv_bless(svpdl, bless_stash); \
     XPUSHs(svpdl); \
    PUTBACK;
 
@@ -37,13 +37,10 @@ int xerbla_(char *sub, int *info) { return 0; }
   { \
     dSP; \
     PDL_Indx odims[] = {0}; \
-    PDL_Indx pc_dims[] = {2}; \
-    SV *pcv = perl_get_sv("PDL::Complex::VERSION", 0); \
-    char use_native = !pcv || !SvOK(pcv); \
-    PDL_Indx *dims = use_native ? NULL : pc_dims; \
-    PDL_Indx ndims = use_native ? 0    : sizeof(pc_dims)/sizeof(pc_dims[0]); \
-    int type_add = use_native ? PDL_CF - PDL_F : 0; \
-    HV *bless_stash = gv_stashpv(use_native ? "PDL" : "PDL::Complex", 0); \
+    PDL_Indx *dims = NULL; \
+    PDL_Indx ndims = 0; \
+    int type_add = PDL_CF - PDL_F; \
+    HV *bless_stash = gv_stashpv("PDL", 0); \
     init \
     int count = perl_call_sv(letter ## select_func, G_SCALAR); \
     SPAGAIN; \

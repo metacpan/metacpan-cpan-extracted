@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword::Builder 0.46;
+package XS::Parse::Keyword::Builder 0.47;
 
 use v5.14;
 use warnings;
@@ -13,6 +13,8 @@ use warnings;
 C<XS::Parse::Keyword::Builder> - build-time support for C<XS::Parse::Keyword>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
 In F<Build.PL>:
 

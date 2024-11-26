@@ -19,7 +19,7 @@ my $t1_output = $t1_obj->run();
 like($t1_output, qr/\(3600\)/, 'expiry set correctly');
 like($t1_output, qr/Set-Cookie: CGISESSID=[a-zA-Z0-9]+/, 'session cookie set');
 like($t1_output, qr/expires=\w{3}, /, 'session cookie expiry set');
-my ($year) = $t1_output =~ /\d+\-\w{3}\-(\d+) /s;
+my ($year) = $t1_output =~ /\d+[ \-]\w{3}[ \-](\d+) /s;
 
 my ($id1) = $t1_output =~ /CGISESSID=([a-zA-Z0-9]+)/s;
 ok($id1, 'found session id');
@@ -38,7 +38,7 @@ $t1_output = $t1_obj->run();
 like($t1_output, qr/\(3600\)/, 'expiry set correctly');
 like($t1_output, qr/Set-Cookie: CGISESSID=[a-zA-Z0-9]+/, 'session cookie set');
 like($t1_output, qr/expires=\w{3}, /, 'session cookie expiry set');
-my ($year2) = $t1_output =~ /\d+\-\w{3}\-(\d+) /s;
+my ($year2) = $t1_output =~ /\d+[ \-]\w{3}[ \-](\d+) /s;
 
 # This test will fail during the last hour of the year, but I can't be bother to
 # test for that :)
@@ -62,7 +62,7 @@ $t1_output = $t1_obj->run();
 like($t1_output, qr/\(\-31536000\)/, 'expiry set correctly');
 like($t1_output, qr/Set-Cookie: CGISESSID=[a-zA-Z0-9]+/, 'session cookie set');
 like($t1_output, qr/expires=\w{3}, /, 'session cookie expiry set');
-($year2) = $t1_output =~ /\d+\-\w{3}\-(\d+) /s;
+($year2) = $t1_output =~ /\d+[ \-]\w{3}[ \-](\d+) /s;
 
 # This test will fail during the last hour of the year, but I can't be bother to
 # test for that :)

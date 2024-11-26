@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01390nam a2200385 a 4500</leader>
+  <controlfield tag="001">np9409794</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20090319121354.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">940623s1994    xr            000   cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000080974</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">80-200-0489-0</subfield>
+    <subfield code="q">(brož.)</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)35029473</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+  </datafield>
+  <datafield tag="041" ind1="0" ind2=" ">
+    <subfield code="a">cze</subfield>
+    <subfield code="b">eng</subfield>
+    <subfield code="b">ger</subfield>
+    <subfield code="b">rus</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">82.085</subfield>
+    <subfield code="2">undef</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">801.5</subfield>
+    <subfield code="2">undef</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Müllerová, Olga,</subfield>
+    <subfield code="d">1942-</subfield>
+    <subfield code="7">jn20000620242</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Mluvený text a jeho syntaktická výstavba /</subfield>
+    <subfield code="c">Olga Müllerová</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">Vyd. 1.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Academia,</subfield>
+    <subfield code="c">1994</subfield>
+    <subfield code="e">(Brno :</subfield>
+    <subfield code="f">Tisk)</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">145 s. ;</subfield>
+    <subfield code="c">24 cm</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Studie a práce lingvistické,</subfield>
+    <subfield code="x">0585-5675 ;</subfield>
+    <subfield code="v">sv. 27</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Na obálce chybně uvedeno č. edice 17</subfield>
+  </datafield>
+  <datafield tag="504" ind1=" " ind2=" ">
+    <subfield code="a">Obsahuje bibliografii a bibliografické odkazy</subfield>
+  </datafield>
+  <datafield tag="546" ind1=" " ind2=" ">
+    <subfield code="a">Anglické, německé a ruské resumé</subfield>
+  </datafield>
+  <datafield tag="550" ind1=" " ind2=" ">
+    <subfield code="a">Vydavatel: Akademie věd České republiky</subfield>
+  </datafield>
+  <datafield tag="653" ind1="0" ind2=" ">
+    <subfield code="a">mluvený projev</subfield>
+    <subfield code="a">větná skladba</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">studie</subfield>
+    <subfield code="7">fd133597</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="710" ind1="2" ind2=" ">
+    <subfield code="a">Akademie věd České republiky</subfield>
+    <subfield code="7">kn20010709016</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Studie a práce lingvistické</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="u">http://krameriusndk.nkp.cz/search/handle/uuid:c33800b0-8769-11e3-bd09-005056827e51</subfield>
+    <subfield code="y">Digitalizovaný dokument</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">projev mluvený nepřipravený - skladba větná - studie</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000080974</subfield>
+  </datafield>
+</record>
+
+</collection>

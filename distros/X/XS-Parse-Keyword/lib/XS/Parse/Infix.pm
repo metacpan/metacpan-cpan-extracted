@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix 0.46;
+package XS::Parse::Infix 0.47;
 
 use v5.14;
 use warnings;
@@ -59,6 +59,8 @@ all of the existing CPAN modules have been updated to the new model.
 =cut
 
 =head1 CONSTANTS
+
+=for highlighter language=perl
 
 =head2 HAVE_PL_INFIX_PLUGIN
 
@@ -165,6 +167,8 @@ sub apply_infix
 
 =head1 XS FUNCTIONS
 
+=for highlighter language=c
+
 =head2 boot_xs_parse_infix
 
   void boot_xs_parse_infix(double ver);
@@ -270,7 +274,11 @@ I<Since version 0.40.>
 If set, the operator supports n-way list-associative syntax; written in the
 form
 
+=for highlighter
+
    OPERAND op OPERAND op OPERAND op ...
+
+=for highlighter language=c
 
 In this case, the custom operator will be a LISTOP rather than a BINOP, and
 every operand of the entire chain will be stored as a child op of it. The op
@@ -398,6 +406,8 @@ C<parse> stage had stored additional results into the C<SV *> variable these
 will be lost here.
 
 =head2 The Wrapper Function
+
+=for highlighter language=perl
 
 Additionally, if the C<wrapper_func_name> field is set to a string, this gives
 the (fully-qualified) name for a function to be generated as part of

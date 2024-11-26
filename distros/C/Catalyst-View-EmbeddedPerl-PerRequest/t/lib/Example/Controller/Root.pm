@@ -41,5 +41,10 @@ sub inherit :Local  {
   return $c->view('Inherit', aaa=>1)->http_ok;
 } 
 
+sub attributes :Local  {
+  my ($self, $c) = @_;
+  return $c->view('Attributes', aaa=>1)->http_ok;
+} 
+
 __PACKAGE__->meta->make_immutable;
 __PACKAGE__->config(namespace => '');

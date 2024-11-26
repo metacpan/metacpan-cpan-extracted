@@ -14,7 +14,7 @@ use warnings;
 
 my $t1_obj = TestAppOptions->new();
 $t1_obj->session_config(
-    CGI_SESSION_OPTIONS => [ "driver:File", $t1_obj->query, {Directory=>'t/'} ],
+    CGI_SESSION_OPTIONS => [ "driver:File", $t1_obj->query ],
     SEND_COOKIE         => 1,
     DEFAULT_EXPIRY      => '+1y',
     COOKIE_PARAMS       => { -domain => 'example.com' },
@@ -29,7 +29,7 @@ my $session = $t1_obj->session;
 my $session_id = $session->id;
 eval {
     $t1_obj->session_config(
-        CGI_SESSION_OPTIONS => [ "driver:File", $t1_obj->query, {Directory=>'t/'} ],
+        CGI_SESSION_OPTIONS => [ "driver:File", $t1_obj->query ],
         SEND_COOKIE         => 1,
         DEFAULT_EXPIRY      => '+1y',
         COOKIE_PARAMS       => { -domain => 'example.com' },

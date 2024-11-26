@@ -39,7 +39,7 @@ void PGCONX(float *a, int *idim, int *jdim, int *i1, int *i2, int *j1, int *j2,
 CPGPLOT prototypes missing in PGPLOT 5 - these handle passed
 functions. Mechanism used below only works with standard UNIX
 C/F77 passing. I have yet to find a system where this doesn't
-work but pacthes are welcome.
+work but patches are welcome.
 
 */
 

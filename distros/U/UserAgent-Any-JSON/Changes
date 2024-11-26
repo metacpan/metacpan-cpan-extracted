@@ -1,5 +1,9 @@
 Revision history for Perl distribution UserAgent-Any-JSON
 
+0.05 - 2024-11-25
+
+ - Add back JSON as a required test dependency.
+
 0.04 - 2024-11-24
 
  - Don’t load JSON when a custom JSON object is passed. This allows to downgrade

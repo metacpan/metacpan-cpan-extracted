@@ -2,6 +2,7 @@ requires 'Template::EmbeddedPerl', '0.001009';
 requires 'Catalyst', '5.90090';
 requires 'Moose';
 requires 'String::CamelCase';
+requires 'Scalar::Util';
 requires 'Catalyst::View::BasePerRequest', '0.012';
 
 on test => sub {

@@ -1035,7 +1035,7 @@ Return matrix cosine of a square matrix.
 =cut
 
 sub _i {
-  defined $PDL::Complex::VERSION ? PDL::Complex::i() : i();
+  i();
 }
 
 *mcos = \&PDL::mcos;
@@ -1743,7 +1743,6 @@ sub PDL::mfun {
 		my ($e, $v) = $m->meigen(0,1);
 		my ($inv, $info) = $v->minv;
 		unless ($info){
-			$method = 'PDL::Complex::'.$method unless ref($method);
 			eval {$v = ($v * $e->$method) x $v->minv;};
 			if ($@){
 				warn "mfun: Error $@\n";
@@ -1763,7 +1762,6 @@ sub PDL::mfun {
 			warn "mfun: Can't compute Schur form\n";
 			return;		
 		}
-		$method = 'PDL::Complex::'.$method unless ref($method);
 		($t, $info) = $t->ctrfun(0,$method);
 		if($info){
 			warn "mfun: Can't compute $method\n";

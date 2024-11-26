@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.020'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-10-16'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.021'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-11-25'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -1459,8 +1459,9 @@ sub _preprocess($$) {
     if ($opts->{outpath} && $opts->{outpath} =~ /\.([^.]+)$/) {
       $opts->{cvt_to} = $1;
     }
-    croak "'cvt_to' was not specified and can not be intuited from 'outpath'"
-      ,dvis('\n### $opts')  ###TEMP
+    croak "outpath ",qsh($opts->{outpath}),
+          " has no suffix and 'cvt_to' was not specified",
+          ,dvis('\n### $opts')  ###TEMP
       unless $opts->{cvt_to};
   }
   unless ($opts->{cvt_from}) {

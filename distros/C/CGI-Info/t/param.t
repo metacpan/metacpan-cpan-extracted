@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 33;
+use Test::Most tests => 40;
 use Test::NoWarnings;
 use lib 't/lib';
 use MyLogger;
@@ -12,6 +12,48 @@ BEGIN {
 }
 
 PARAM: {
+	# Initial sanity tests
+	{
+		# Preserve the current %ENV, so changes are local to this subtest
+		local %ENV = %ENV;
+
+		$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
+		$ENV{'REQUEST_METHOD'} = 'GET';
+		$ENV{'QUERY_STRING'} = 'foo=bar&baz=qux';
+		my $mess = 'mess is undefined';
+
+		{
+			package MockLogger;
+
+			sub new { bless { }, shift }
+			sub trace { }
+			sub debug { }
+			sub warn { shift; $mess = join(' ' , @_) }
+		}
+
+		my $obj = CGI::Info->new(
+			allow => { foo => undef, baz => undef },
+			logger => MockLogger->new()
+		);
+
+		is_deeply($obj->param, { foo => 'bar', baz => 'qux' }, 'No arguments returns all params');
+
+		is($obj->param('foo'), 'bar', 'Fetching allowed parameter "foo"');
+
+		is($obj->param('baz'), 'qux', 'Fetching allowed parameter "baz"');
+
+		is($obj->param('invalid'), undef, 'Fetching disallowed parameter "invalid" returns undef');
+		like(
+			$obj->warnings()->[0]->{'warning'},
+			qr/param: invalid isn't in the allow list/,
+			'Warning generated for disallowed parameter'
+		 );
+
+		delete $ENV{'QUERY_STRING'};
+		$obj = CGI::Info->new();
+		is($obj->param('foo'), undef, 'No params set, fetching "foo" returns undef');
+	};
+	
 	$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
 	$ENV{'REQUEST_METHOD'} = 'GET';
 	$ENV{'QUERY_STRING'} = 'foo=bar';
@@ -66,6 +108,18 @@ PARAM: {
 	ok($i->param('fred') eq 'wilma');
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
 
+	subtest 'SQL injection is blocked' => sub {
+		# Preserve the current %ENV, so changes are local to this subtest
+		local %ENV = %ENV;
+
+		$ENV{'REQUEST_METHOD'} = 'GET';
+		$ENV{'QUERY_STRING'} = 'nan=lost&redir=-8717%22%20OR%208224%3D6013--%20ETLn';
+
+		my $info = new_ok('CGI::Info');
+		ok(!defined($info->param('nan')));
+		ok(!defined($info->param('redir')));
+	};
+
 	subtest 'Test GET' => sub {
 		# Preserve the current %ENV, so changes are local to this subtest
 		local %ENV = %ENV;
@@ -101,5 +155,6 @@ PARAM: {
 		is($info->name(), 'Jane', 'name parameter is correct with AUTOLOAD');
 
 		close $fh
-	}
+	};
+
 }

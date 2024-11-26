@@ -10,8 +10,12 @@ README.mkdn
 cpanfile
 dist.ini
 lib/Catalyst/View/EmbeddedPerl/PerRequest.pm
+lib/Catalyst/View/EmbeddedPerl/PerRequest/EachInfo.pm
+lib/Catalyst/View/EmbeddedPerl/PerRequest/TagUtils.pm
+lib/MooseX/Attribute/Catalyst/View/EmbeddedPerl/ExportedAttribute.pm
 t/lib/Example.pm
 t/lib/Example/Controller/Root.pm
+t/lib/Example/View/Attributes.pm
 t/lib/Example/View/Base.pm
 t/lib/Example/View/Captures.pm
 t/lib/Example/View/Empty.pm

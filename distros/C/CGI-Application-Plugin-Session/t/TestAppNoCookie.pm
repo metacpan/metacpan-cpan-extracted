@@ -10,7 +10,7 @@ sub cgiapp_init {
   my $self = shift;
 
   $self->session_config(
-                        CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory=>'t/'} ],
+                        CGI_SESSION_OPTIONS => [ "driver:File", $self->query ],
                         SEND_COOKIE         => 0,
   );
 }

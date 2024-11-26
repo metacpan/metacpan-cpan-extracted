@@ -1,0 +1,8 @@
+browse.c
+browser.pd
+Changes
+Makefile.PL
+MANIFEST			This list of files
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/IO/Browser.pm              mod=PDL::IO::Browser pd=browser.pd (added by pdlpp_mkgen)

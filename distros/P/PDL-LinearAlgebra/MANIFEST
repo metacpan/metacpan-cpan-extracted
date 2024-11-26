@@ -17,7 +17,6 @@ t/1.t
 t/cgtsv.t
 t/common.pl
 t/gtsv.t
-t/legacy.t
 Trans/Makefile.PL
 Trans/selectfunc.c
 Trans/trans.pd

@@ -80,22 +80,6 @@ pp_addpm({At=>'Top'},<<'EOD');
 use strict;
 use PDL::LinearAlgebra::Real;
 
-{ 
-  package # hide from CPAN
-    PDL::Complex;
-	my $warningFlag;
-	BEGIN{
-		$warningFlag = $^W;
-		$^W = 0;
-	}
-	use overload (
-		'x'     =>  sub {UNIVERSAL::isa($_[1],'PDL::Complex') ? PDL::cmmult($_[0], $_[1]) :
-						PDL::cmmult($_[0], PDL::Complex::r2C($_[1]));
-				},
-	);
-	BEGIN{ $^W = $warningFlag ; }
-}
-
 =encoding utf8
 
 =head1 NAME
@@ -325,7 +309,7 @@ EOF
 				rwork = ($GENERIC() *)malloc( 7 * lwork  *  sizeof($GENERIC()));
 				break;
 
-		}		
+		}
 		lwork = -1;
 		FORTRAN($TFD(c,z)gesdd)(
 		&tra,
@@ -383,9 +367,9 @@ The SVD is written
 pp_defc("ggsvd",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)ggsvd3)(char *jobu, char *jobv, char *jobq, integer *m,
-		integer *n, integer *p, integer *k, integer *l, $GENERIC() *a, 
-		integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *alpha, 
-		$GENERIC() *beta, $GENERIC() *u, integer *ldu, $GENERIC() *v, integer 
+		integer *n, integer *p, integer *k, integer *l, $GENERIC() *a,
+		integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *alpha,
+		$GENERIC() *beta, $GENERIC() *u, integer *ldu, $GENERIC() *v, integer
 		*ldv, $GENERIC() *q, integer *ldq, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *iwork,
 		integer *info);
 EOF
@@ -398,7 +382,7 @@ EOF
 	',
 	Code => generate_code '
 		char pjobu = \'N\';
-		char pjobv = \'N\';		
+		char pjobv = \'N\';
 		char pjobq = \'N\';
 		$GENERIC() *work, twork[2];
 		integer lwork = -1;
@@ -439,7 +423,7 @@ EOF
 
 		lwork = (integer) twork[0];
 		work = ($GENERIC() *)malloc(2*(lwork * sizeof($GENERIC())));
-		
+
 		FORTRAN($TFD(c,z)ggsvd3)(
 		&pjobu,
 		&pjobv,
@@ -870,7 +854,7 @@ EOF
 		&lwork,
 		$P(rwork),
 		$P(bwork),
-		$P(info));             
+		$P(info));
 
 		lwork = (integer )tmp_work[0];
 
@@ -903,13 +887,13 @@ Complex version of L<PDL::LinearAlgebra::Real/gees>
             to the top left of the Schur form.
             If sort = 0, select_func is not referenced.
             An complex eigenvalue w is selected if
-            select_func(PDL::Complex(w)) is true;
+            select_func(complex(w)) is true;
             Note that a selected complex eigenvalue may no longer
-            satisfy select_func(PDL::Complex(w)) = 1 after ordering, since
+            satisfy select_func(complex(w)) = 1 after ordering, since
             ordering may change the value of complex eigenvalues
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+2.
-	
+
 
 ');
 
@@ -1009,9 +993,9 @@ Complex version of L<PDL::LinearAlgebra::Real/geesx>
             to the top left of the Schur form.
             If sort = 0, select_func is not referenced.
             An complex eigenvalue w is selected if
-            select_func(PDL::Complex(w)) is true; 
+            select_func(complex(w)) is true;
             Note that a selected complex eigenvalue may no longer
-            satisfy select_func(PDL::Complex(w)) = 1 after ordering, since
+            satisfy select_func(complex(w)) = 1 after ordering, since
             ordering may change the value of complex eigenvalues
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+2.
@@ -1114,9 +1098,9 @@ Complex version of L<PDL::LinearAlgebra::Real/ggees>
             to the top left of the Schur form.
             If sort = 0, select_func is not referenced.
             An eigenvalue w = w/beta is selected if
-            select_func(PDL::Complex(w), PDL::Complex(beta)) is true; 
+            select_func(complex(w), complex(beta)) is true;
             Note that a selected complex eigenvalue may no longer
-            satisfy select_func(PDL::Complex(w),PDL::Complex(beta)) = 1 after ordering, since
+            satisfy select_func(complex(w),complex(beta)) = 1 after ordering, since
             ordering may change the value of complex eigenvalues
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+2.
@@ -1232,9 +1216,9 @@ Complex version of L<PDL::LinearAlgebra::Real/ggeesx>
             to the top left of the Schur form.
             If sort = 0, select_func is not referenced.
             An eigenvalue w = w/beta is selected if
-            select_func(PDL::Complex(w), PDL::Complex(beta)) is true; 
+            select_func(complex(w), complex(beta)) is true;
             Note that a selected complex eigenvalue may no longer
-            satisfy select_func(PDL::Complex(w),PDL::Complex(beta)) = 1 after ordering, since
+            satisfy select_func(complex(w),complex(beta)) = 1 after ordering, since
             ordering may change the value of complex eigenvalues
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+3.
@@ -1670,8 +1654,8 @@ EOF
 		$P(w),
 		&tmp_work[0],
 		&lwork,
-		&tmp_rwork,	
-		&lrwork,	
+		&tmp_rwork,
+		&lrwork,
 		&tmp_iwork,
 		&liwork,
 		$P(info));
@@ -1924,9 +1908,9 @@ Doc => '
 Complex version of L<PDL::LinearAlgebra::Real/gesvx>.
 
     trans:  Specifies the form of the system of equations:
-            = 0:  A * X = B     (No transpose)   
+            = 0:  A * X = B     (No transpose)
             = 1:  A\' * X = B  (Transpose)
-            = 2:  A**H * X = B  (Conjugate transpose)  
+            = 2:  A**H * X = B  (Conjugate transpose)
 ');
 
 pp_defc("sysv",
@@ -2321,7 +2305,7 @@ EOF
 Doc=>'
 =for ref
 
-Solves overdetermined or underdetermined complex linear systems   
+Solves overdetermined or underdetermined complex linear systems
 involving an M-by-N matrix A, or its conjugate-transpose.
 Complex version of L<PDL::LinearAlgebra::Real/gels>.
 
@@ -2981,8 +2965,8 @@ EOF
 
 Complex version of L<PDL::LinearAlgebra::Real/getrs>
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 	trans:   = 0:  No transpose;
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
@@ -3112,15 +3096,15 @@ EOF
 		$P(B),
 		&(integer){$SIZE(n)},
 		$P(info));
-', 
+',
 	Doc=>'
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/trtrs>
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 	trans:   = 0:  No transpose;
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
@@ -3131,7 +3115,7 @@ Complex version of L<PDL::LinearAlgebra::Real/trtrs>
 pp_defc("latrs",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)latrs)(char *uplo, char *trans, char *diag, char *
-		normin, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *x, 
+		normin, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *x,
 		$GENERIC() *scale, $GENERIC() *cnorm, integer *info);
 EOF
        HandleBad => 0,
@@ -3172,8 +3156,8 @@ EOF
 
 Complex version of L<PDL::LinearAlgebra::Real/latrs>
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 	trans:   = 0:  No transpose;
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
@@ -3397,7 +3381,7 @@ EOF
 pp_defc("ungqr",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)ungqr)(integer *m, integer *n, integer *k, $GENERIC() *
-		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, 
+		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork,
 		integer *info);
 EOF
        HandleBad => 0,
@@ -3540,7 +3524,7 @@ EOF
 pp_defc("unglq",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)unglq)(integer *m, integer *n, integer *k, $GENERIC() *
-		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, 
+		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork,
 		integer *info);
 EOF
        HandleBad => 0,
@@ -3682,7 +3666,7 @@ EOF
 pp_defc("ungql",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)ungql)(integer *m, integer *n, integer *k, $GENERIC() *
-		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, 
+		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork,
 		integer *info);
 EOF
        HandleBad => 0,
@@ -3822,7 +3806,7 @@ EOF
 pp_defc("ungrq",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)ungrq)(integer *m, integer *n, integer *k, $GENERIC() *
-		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, 
+		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork,
 		integer *info);
 EOF
        HandleBad => 0,
@@ -4025,7 +4009,7 @@ Complex version of L<PDL::LinearAlgebra::Real/ormrz>. Here trans = 1 means conju
 pp_defc("gehrd",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)gehrd)(integer *n, integer *ilo, integer *ihi,
-		$GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *work, 
+		$GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *work,
 		integer *lwork, integer *info);
 EOF
        HandleBad => 0,
@@ -4064,7 +4048,7 @@ EOF
 pp_defc("unghr",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)unghr)(integer *n, integer *ilo, integer *ihi,
-		$GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *work, 
+		$GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *work,
 		integer *lwork, integer *info);
 EOF
        HandleBad => 0,
@@ -4110,7 +4094,7 @@ pp_defc("hseqr",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)hseqr)(char *job, char *compz, integer *n, integer *ilo,
 		integer *ihi, $GENERIC() *h__, integer *ldh, $GENERIC() *w,
-		$GENERIC() *z__, integer *ldz, $GENERIC() *work, 
+		$GENERIC() *z__, integer *ldz, $GENERIC() *work,
 		integer *lwork, integer *info);
 EOF
        HandleBad => 0,
@@ -4172,7 +4156,7 @@ pp_defc("trevc",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)trevc)(char *side, char *howmny, logical *select,
 		integer *n, $GENERIC() *t, integer *ldt, $GENERIC() *vl, integer *
-		ldvl, $GENERIC() *vr, integer *ldvr, integer *mm, integer *m, 
+		ldvl, $GENERIC() *vr, integer *ldvr, integer *mm, integer *m,
 		$GENERIC() *work, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
@@ -4214,7 +4198,7 @@ EOF
 		$P(VR),
 		&(integer){$SIZE(p)},
 		&mm,
-		$P(m), 
+		$P(m),
 		$P(work) + $SIZE(n),
 		$P(work),
 		$P(info));
@@ -4224,7 +4208,7 @@ pp_defc("tgevc",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)tgevc)(char *side, char *howmny, logical *select,
 		integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb,
-		$GENERIC() *vl, integer *ldvl, $GENERIC() *vr, integer *ldvr, 
+		$GENERIC() *vl, integer *ldvl, $GENERIC() *vr, integer *ldvr,
 		integer *mm, integer *m, $GENERIC() *work, $GENERIC() *rwork, integer *info);
 EOF
        HandleBad => 0,
@@ -4266,7 +4250,7 @@ EOF
 		$P(VR),
 		&(integer){$SIZE(p)},
 		&mm,
-		$P(m), 
+		$P(m),
 		$P(work)+2*$SIZE(n),
 		$P(work),
 		$P(info));
@@ -4455,8 +4439,8 @@ EOF
 
 Complex version of L<PDL::LinearAlgebra::Real/gemm>.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 	transa:  = 0:  No transpose;
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
@@ -4517,8 +4501,8 @@ Doc=>'
 
 Complex version of L<PDL::LinearAlgebra::Real/rmgemm>.
 
-    Arguments   
-    =========   
+    Arguments
+    =========
 	transa:  = 0:  No transpose;
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
@@ -4736,7 +4720,7 @@ EOF
 Doc=>'
 =for ref
 
-Forms the dot product of two vectors, conjugating the first   
+Forms the dot product of two vectors, conjugating the first
 vector.
 ');
 
@@ -4835,7 +4819,7 @@ EOF
 		$P(a),
 		$P(b),
 		$P(c),
-		$P(s)		
+		$P(s)
 		);
 ');
 
@@ -4906,8 +4890,8 @@ EOF
 	Code => '
 	int i,j,k;
 	$GENERIC() tr[2], b[2];
-	//$GENERIC() *tmp;	
-	char ptrans = \'N\';	
+	//$GENERIC() *tmp;
+	char ptrans = \'N\';
 	$GENERIC() alpha[2] = {1,0};
 	$GENERIC() beta[2] = {0,0};
 	loop(n0,n1) %{

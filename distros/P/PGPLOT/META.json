@@ -40,7 +40,9 @@
          "recommends" : {
             "PDL" : "2.089"
          },
-         "requires" : {}
+         "requires" : {
+            "perl" : "5.010001"
+         }
       },
       "test" : {
          "requires" : {
@@ -59,7 +61,7 @@
          "web" : "https://github.com/PDLPorters/perl5-PGPLOT"
       }
    },
-   "version" : "2.33",
+   "version" : "2.34",
    "x_IRC" : "irc://irc.perl.org/#pdl",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

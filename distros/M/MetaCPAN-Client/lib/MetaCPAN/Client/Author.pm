@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Author;
 # ABSTRACT: An Author data object
-$MetaCPAN::Client::Author::VERSION = '2.032000';
+$MetaCPAN::Client::Author::VERSION = '2.033000';
 use Moo;
 use Ref::Util qw< is_arrayref >;
 
@@ -93,7 +93,7 @@ MetaCPAN::Client::Author - An Author data object
 
 =head1 VERSION
 
-version 2.032000
+version 2.033000
 
 =head1 SYNOPSIS
 
@@ -211,10 +211,6 @@ currently known keys are:
 =item * cpan_directory
 
 The author's CPAN directory.
-
-=item * backpan_directory
-
-The author's BackCPAN directory.
 
 =item * cpantesters_reports
 

@@ -1,0 +1,90 @@
+=head1 NAME
+
+Algorithm::Gutter::Cell - cellular automata to simulate rain in a gutter
+
+=head1 DESCRIPTION
+
+This module provides cells that can populate a L<Algorithm::Gutter>
+gutter array reference, or the caller could instead provide their own
+object that conforms to the same interface as this module.
+
+Cells may contain some amount of fluid, may have a hole in them that
+drains some amount of the fluid at some threshold, and the hole may or
+may not be enabled. An update code reference must be supplied that will
+trigger when fluid drains from the cell.
+
+=head1 FIELDS
+
+Note that mutator methods must be written as C<<$cell->enabled = 1>> and
+not C<<$cell->enabled(1)>>.
+
+=over 4
+
+=item B<amount>
+
+Mutator for the amount of fluid present in the cell, by default C<0>.
+
+=item B<context>
+
+Mutator for a user-supplied scalar that can contain additional state for
+the cell.
+
+=item B<enabled>
+
+Mutator for whether the cell's hole is enabled, or not. Cells are not
+enabled by default.
+
+=item B<threshold>
+
+Mutator for the threshold at which the cell drains, by default a very
+large integer. Cells with actual holes in them should probably set the
+threshold to a much smaller non-negative integer value. And one may also
+want to sometimes B<enable> the cell so that it can drain.
+
+=item B<update>
+
+Mandatory code reference that will be called when the B<drain> method in
+L<Algorithm::Gutter> calculates that this cell's fluid drains. The
+reference is called with the cell object, cell index in the gutter list,
+how much fluid drained, and an optional I<stash> provided by the caller.
+
+The caller is responsible for the return value, which will be
+accumulated by the parent B<drain> method and returned to the caller as
+a list. For example, the B<update> code could return MIDI events, the
+amount of fluid drained, both, neither, or other values as need be.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item B<new> [ I<fields ...> ]
+
+Constructor.
+
+=item B<set_update> I<code-reference>
+
+Writer method for the B<update> field.
+
+=back
+
+=head1 BUGS
+
+These probably should be called errors, not bugs.
+
+=head1 SEE ALSO
+
+L<Object::Pad>
+
+=head1 AUTHOR
+
+Jeremy Mates
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Jeremy Mates
+
+This module is distributed under the (Revised) BSD License.
+
+=cut

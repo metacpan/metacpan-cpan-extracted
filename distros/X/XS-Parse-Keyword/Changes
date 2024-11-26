@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Keyword
 
+0.47    2024-11-25
+        [BUGFIXES]
+         * Don't upset gcc 15, by ensuring that function pointer casts fully
+           specify argument types (RT157196)
+
 0.46    2024-09-03
         [CHANGES]
          * Added `XPK_PREFIXED_TERMEXPR_ENTERLEAVE`

@@ -69,6 +69,7 @@ lib/PDL/Graphics/LUT/tables/standard.fits
 lib/PDL/Graphics/PGPLOT.pm
 lib/PDL/Graphics/PGPLOT/Window.pm
 lib/PDL/Graphics/PGPLOTOptions.pm
+lib/PDL/Graphics/State.pm
 lib/PGPLOT.pm
 LICENSE
 Makefile.PL

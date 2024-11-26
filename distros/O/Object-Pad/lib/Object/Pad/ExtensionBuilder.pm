@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::ExtensionBuilder 0.815;
+package Object::Pad::ExtensionBuilder 0.816;
 
 use v5.18;
 use warnings;

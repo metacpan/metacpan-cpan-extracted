@@ -1,5 +1,10 @@
 Revision history for Parser-MGC
 
+0.23    2024-11-25
+        [CHANGES]
+         * Formatting, style, and typo fixes in Tutorial.pod
+           (thanks Étienne Mollier) (RT157369, RT157370)
+
 0.22    2024-10-11
         [CHANGES]
          * Added `->warn` and `->warn_from`

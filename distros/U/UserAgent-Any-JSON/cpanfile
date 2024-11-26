@@ -41,6 +41,7 @@ recommends 'JSON::XS';
 
 on 'test' => sub {
   requires 'HTTP::Response';
+  requires 'JSON';
   requires 'JSON::PP';
   requires 'UserAgent::Any::Fake';
 };

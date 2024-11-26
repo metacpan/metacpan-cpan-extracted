@@ -9,7 +9,7 @@ use UserAgent::Any::Wrapper 'wrap_get_like_methods', 'wrap_post_like_methods';
 
 use namespace::clean;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 extends 'UserAgent::Any';
 

@@ -27,6 +27,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'conflicts' => {
+                                       'Module::Pluggable' => '== 6.2',
                                        'Role::Tiny' => '== 2.000007',
                                        'YAML' => '== 1.16'
                                      },
@@ -41,7 +42,6 @@ do { my $x = {
                                         'MooX::TypeTiny' => '0',
                                         'Pod::Simple::Search' => '0',
                                         'Pod::Simple::SimpleTree' => '0',
-                                        'Scope::Upper' => '0',
                                         'Type::Tiny::XS' => '0',
                                         'URL::Encode::XS' => '0',
                                         'Unicode::UTF8' => '0',
@@ -73,6 +73,7 @@ do { my $x = {
                                       'JSON::MaybeXS' => '0',
                                       'List::Util' => '1.29',
                                       'MIME::Base64' => '3.13',
+                                      'Module::Pluggable' => '0',
                                       'Module::Runtime' => '0',
                                       'Moo' => '2.000000',
                                       'Moo::Role' => '0',

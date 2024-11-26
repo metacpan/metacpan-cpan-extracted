@@ -16,6 +16,7 @@ diag "Using device '$dev' - set env var PGPLOT_DEV to change";
 
 $ENV{PGPLOT_XW_WIDTH}=0.3;
 
+#PGPLOT::set_debugging(1);
 PGPLOT::pgbegin(0,$dev,1,1);  # Open plot device
 
 PGPLOT::pgscf(2);             # Set character font

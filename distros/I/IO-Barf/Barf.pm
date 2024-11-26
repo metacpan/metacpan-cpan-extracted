@@ -11,7 +11,7 @@ use Scalar::Util qw(blessed);
 # Constants.
 Readonly::Array our @EXPORT => qw(barf);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 # Barf content to file.
 sub barf {
@@ -80,6 +80,8 @@ Returns undef.
 
 =head1 EXAMPLE1
 
+=for comment filename=barf_content_to_temp_file.pl
+
  use strict;
  use warnings;
 
@@ -107,6 +109,8 @@ Returns undef.
 
 =head1 EXAMPLE2
 
+=for comment filename=barf_content_to_stdout.pl
+
  use strict;
  use warnings;
 
@@ -123,6 +127,8 @@ Returns undef.
  # bar
 
 =head1 EXAMPLE3
+
+=for comment filename=barf_benchmark1.pl
 
  use strict;
  use warnings;
@@ -178,6 +184,8 @@ Returns undef.
  # IO::Barf    35321/s       1000%        815%        437%         63%          --
 
 =head1 EXAMPLE4
+
+=for comment filename=barf_benchmark2.pl
 
  use strict;
  use warnings;
@@ -263,12 +271,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2009-2021 Michal Josef Špaček
+© 2009-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

@@ -24,7 +24,7 @@ DESCRIPTION
     sockets, intended as a replacement for IO::Socket::INET. Most
     constructor arguments and methods are provided in a backward-compatible
     way. For a list of known differences, see the IO::Socket::INET
-    INCOMPATIBILITES section below.
+    INCOMPATIBILITIES section below.
 
     It uses the getaddrinfo(3) function to convert hostnames and service
     names or port numbers into sets of possible addresses to connect to or
@@ -207,7 +207,7 @@ CONSTRUCTORS
     MultiHomed
 
       This IO::Socket::INET-style argument is ignored, except if it is
-      defined but false. See the IO::Socket::INET INCOMPATIBILITES section
+      defined but false. See the IO::Socket::INET INCOMPATIBILITIES section
       below.
 
       However, the behaviour it enables is always performed by
@@ -243,7 +243,7 @@ CONSTRUCTORS
 
     If neither Family nor any hosts or addresses are passed, nor any
     *AddrInfo, then the constructor has no information on which to decide a
-    socket family to create. In this case, it performs a getaddinfo call
+    socket family to create. In this case, it performs a getaddrinfo call
     with the AI_ADDRCONFIG flag, no host name, and a service name of "0",
     and uses the family of the first returned result.
 
@@ -268,7 +268,7 @@ METHODS
 
  sockhost_service
 
-       ( $host, $service ) = $sock->sockhost_service( $numeric )
+       ( $host, $service ) = $sock->sockhost_service( $numeric );
 
     Returns the hostname and service name of the local address (that is,
     the socket address given by the sockname method).
@@ -283,38 +283,38 @@ METHODS
 
  sockhost
 
-       $addr = $sock->sockhost
+       $addr = $sock->sockhost;
 
     Return the numeric form of the local address as a textual
     representation
 
  sockport
 
-       $port = $sock->sockport
+       $port = $sock->sockport;
 
     Return the numeric form of the local port number
 
  sockhostname
 
-       $host = $sock->sockhostname
+       $host = $sock->sockhostname;
 
     Return the resolved name of the local address
 
  sockservice
 
-       $service = $sock->sockservice
+       $service = $sock->sockservice;
 
     Return the resolved name of the local port number
 
  sockaddr
 
-       $addr = $sock->sockaddr
+       $addr = $sock->sockaddr;
 
     Return the local address as a binary octet string
 
  peerhost_service
 
-       ( $host, $service ) = $sock->peerhost_service( $numeric )
+       ( $host, $service ) = $sock->peerhost_service( $numeric );
 
     Returns the hostname and service name of the peer address (that is, the
     socket address given by the peername method), similar to the
@@ -327,37 +327,37 @@ METHODS
 
  peerhost
 
-       $addr = $sock->peerhost
+       $addr = $sock->peerhost;
 
     Return the numeric form of the peer address as a textual representation
 
  peerport
 
-       $port = $sock->peerport
+       $port = $sock->peerport;
 
     Return the numeric form of the peer port number
 
  peerhostname
 
-       $host = $sock->peerhostname
+       $host = $sock->peerhostname;
 
     Return the resolved name of the peer address
 
  peerservice
 
-       $service = $sock->peerservice
+       $service = $sock->peerservice;
 
     Return the resolved name of the peer port number
 
  peeraddr
 
-       $addr = $peer->peeraddr
+       $addr = $peer->peeraddr;
 
     Return the peer address as a binary octet string
 
  as_inet
 
-       $inet = $sock->as_inet
+       $inet = $sock->as_inet;
 
     Returns a new IO::Socket::INET instance wrapping the same filehandle.
     This may be useful in cases where it is required, for
@@ -409,7 +409,7 @@ NON-BLOCKING
        use IO::Socket::IP;
        use Errno qw( EINPROGRESS EWOULDBLOCK );
     
-       my @peeraddrinfo = ... # Caller must obtain the getaddinfo result here
+       my @peeraddrinfo = ... # Caller must obtain the getaddrinfo result here
     
        my $socket = IO::Socket::IP->new(
           PeerAddrInfo => \@peeraddrinfo,
@@ -479,16 +479,16 @@ PeerHost AND LocalHost PARSING
     description if it could be parsed, or the given address and undef if it
     was not recognised.
 
-       IO::Socket::IP->split_addr( "hostname:http" )
+       IO::Socket::IP->split_addr( "hostname:http" );
                                     # ( "hostname",  "http" )
     
-       IO::Socket::IP->split_addr( "192.0.2.1:80" )
+       IO::Socket::IP->split_addr( "192.0.2.1:80" );
                                     # ( "192.0.2.1", "80"   )
     
-       IO::Socket::IP->split_addr( "[2001:db8::1]:80" )
+       IO::Socket::IP->split_addr( "[2001:db8::1]:80" );
                                     # ( "2001:db8::1", "80" )
     
-       IO::Socket::IP->split_addr( "something.else" )
+       IO::Socket::IP->split_addr( "something.else" );
                                     # ( "something.else", undef )
 
  join_addr
@@ -505,7 +505,7 @@ PeerHost AND LocalHost PARSING
 
        say "Connected to ", IO::Socket::IP->join_addr( $sock->peerhost_service );
 
-IO::Socket::INET INCOMPATIBILITES
+IO::Socket::INET INCOMPATIBILITIES
 
       * The behaviour enabled by MultiHomed is in fact implemented by
       IO::Socket::IP as it is required to correctly support searching for a

@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 use utf8;
-use 5.014;
+use 5.020;
 
 use ExtUtils::MakeMaker;
 
@@ -13,15 +13,18 @@ my $git_url = 'https://github.com/markov2/perl5-Business-CAMT';
 WriteMakefile
   (
     NAME             => 'Business-CAMT',
-    VERSION          => '0.10',
+    VERSION          => '0.11',
     AUTHOR           => 'Mark Overmeer <markov@cpan.org>',
     PREREQ_PM        => {
+		'Data::Dumper'   => 0,
+		'List::Util'     => 0,
         'Log::Report'    => 1.32,
+		'Path::Class'    => 0,
         'Scalar::Util'   => 0,
         'Test::More'     => 0,
-        'XML::LibXML'    => 2.0207,
         'XML::Compile'   => 1.64,
         'XML::Compile::Cache' => 1.06,
+        'XML::LibXML'    => 2.0207,
     },
     test             => {TESTS         => 't/*.t'},
     clean            => {FILES         => '*.bak'},

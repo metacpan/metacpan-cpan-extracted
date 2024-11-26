@@ -10,7 +10,7 @@ sub cgiapp_init {
   my $self = shift;
 
   my $sid = $self->query->cookie('CGISESSID');
-  $self->session_config(CGI_SESSION_OPTIONS => [ "driver:File", $sid, {Directory=>'t/'} ]);
+  $self->session_config(CGI_SESSION_OPTIONS => [ "driver:File", $sid ]);
 }
 
 sub setup {

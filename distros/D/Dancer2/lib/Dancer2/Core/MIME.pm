@@ -1,7 +1,7 @@
 # ABSTRACT: Class to ease manipulation of MIME types
 
 package Dancer2::Core::MIME;
-$Dancer2::Core::MIME::VERSION = '1.1.1';
+$Dancer2::Core::MIME::VERSION = '1.1.2';
 use Moo;
 
 use Plack::MIME;
@@ -91,7 +91,7 @@ Dancer2::Core::MIME - Class to ease manipulation of MIME types
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 SYNOPSIS
 
