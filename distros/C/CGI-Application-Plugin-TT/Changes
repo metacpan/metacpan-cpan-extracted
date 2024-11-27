@@ -1,5 +1,8 @@
 Revision history for Perl extension CGI::Application::Plugin::TT.
 
+1.06      2024-11-26 11:07:32-06:00 America/Chicago
+    - Fix minor documentation typos (Wes Malone, RT#60921)
+
 1.05  Fri Jun  4 14:25:49 EST 2010
 
     - fix dev popup support by html encoding the data sent

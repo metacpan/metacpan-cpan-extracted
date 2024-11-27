@@ -28,7 +28,7 @@ use constant {
     FEATURE_HYBRID               => '5a1895b8-61f1-4ce1-a44f-1a239b7d9de7',
 };
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my %table_defs = (
     tag      => 'CREATE TABLE IF NOT EXISTS tag (id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT);',
@@ -392,7 +392,8 @@ sub _ingest_file {
                     $command eq 'tag-generator-hint' ||
                     $command eq 'tag-suggests' ||
                     $command eq 'tag-implies' ||
-                    $command eq 'tag-oid') {
+                    $command eq 'tag-oid' ||
+                    $command eq 'tag-description-image-uri') {
                     croak 'Known but unsupported command on import: '.$command unless $opts{skip_unsupported};
                 } else {
                     croak 'Unknown command: '.$command unless $opts{skip_unknown};
@@ -438,7 +439,7 @@ Data::TagDB::Migration - Work with Tag databases
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

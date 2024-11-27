@@ -18,7 +18,7 @@ Data::TagDB::Tutorial::Conventions - Work with Tag databases
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 Overview
 
@@ -276,6 +276,119 @@ B<Note:>
 When in doubt it is wise to use the role
 C<proto-entity> (C<7be4d8c7-6a75-44cc-94f7-c87433307b26>).
 It is the super-role for all other entity and account roles and provides many common properties.
+
+=head3 Files
+
+There are four different things people commonly refer to as files:
+I<hardlinks>, I<inodes>, I<bit exact copies>, and I<creative works>.
+
+We'll conver each in their own section. Here is a basic overview to find out
+what section is the correct one:
+
+=over
+
+=item I<Hardlinks>
+
+If you consider two files the same if they have the same filename
+(that is on the same machine and the B<full> path matches) even if the content,
+timestamps, and file attributes change you most likely mean I<hardlinks>.
+
+=item I<Inodes>
+
+If you consider two files the same if refer to the same physical storage (the same blocks on the disk),
+indepdenent on the filename (and path), and permit for the content, timestamps, and file attributes to
+change but consider each copy (that does not share blocks and therefore can change indepndently) distict
+(this also implies that any copy on a different disk is a distinct) you likely mean I<inodes>.
+
+=item I<Bit exact copies>
+
+If you consider any copy that has exactly (bit-wise) the same content, independent on it's storage the same
+then you most likely mean I<bit exact copies> (sometimes also called I<states>).
+
+This also implies that if two files have the same hash or checksum they are likely the same, but if they have
+different hashes or checksums they are always distinct.
+
+=item I<Creative works>
+
+If you consider all copies the same that have the same human readable content, independent on storage location
+and file format, encoding, or any other property you likely mean a I<creative work>.
+
+B<Note:>
+While creative works are one of the fundamental types they are strictly speaking not files by the definition of
+a file. Therefore they are covered in their own section under L</Creative works>.
+
+=back
+
+=head4 Hardlinks
+
+Hardlinks are very volatile as they often change over time. Therefore it is hard to include them in a non-volatile
+data model. It is best to consider if the data one wants to store is better bound to another propery than the filename
+(alone).
+
+If hardlinks are however used, they have the type/role C<hardlink> (C<61fba55f-1ba3-460d-85a7-9262557f41c9>.
+It also seems wise to include the basename (that is the filename without drive and directory) as a
+L<tagname|Data::TagDB::Tutorial::WellKnown/tagname>.
+A C<also-on-filesystem> (C<cd5bfb11-620b-4cce-92bd-85b7d010f070>) relation also seems to be helpful to locate the device.
+A L<also-list-contains-also|Data::TagDB::Tutorial::WellKnown/also-list-contains-also> may be used
+on the directory the link is part of.
+
+=head4 Inodes
+
+Inodes are a fundamental filesystem object. Flat files, directories, symlinks, and other data is stored
+as an inode on the filesystem. Hardlinks give names to inodes. There can be any number (even zero) of hardlinks
+to an inode.
+An inode is known by it's inode-number to the filesystem. For any point time knowing the filesystem a file is on
+and it's inode number uniquely identifies the file. However once a file is deleted the inode number may be reused
+by the filesystem.
+
+Therefore for software that depends on the use of inode numbers as keys they must ensure the inode is not deleted.
+At runtime this can be achieved by keeping an handle to the file open. Between runtimes this is harder.
+If the inode can be set to immutable that is often the best option. However that may require support by the system
+and corresponding rights.
+Having a shadow hardlink or setting the file to read only may or may not provide similar semantics depending on the
+usecase, operating system, and filesystem.
+
+The type/role to be used with inodes is C<inode> (C<59a5691a-6a19-4051-bc26-8db82c019df3>.
+They should include a relation C<also-on-filesystem> (C<cd5bfb11-620b-4cce-92bd-85b7d010f070>), and
+C<inode-number> (C<d2526d8b-25fa-4584-806b-67277c01c0db>).
+
+It is recommended that they include C<final-*> relations, such as
+L<final-file-hash|Data::TagDB::Tutorial::WellKnown/final-file-hash>, or
+C<has-final-state> (C<54d30193-2000-4d8a-8c28-3fa5af4cad6b>).
+
+Any intermediate state may be recorded using C<also-has-state> (C<4c426c3c-900e-4350-8443-e2149869fbc9>).
+
+=head4 Bit exact copies
+
+Bit exact copies are the way to look at files that will not change, or files that will transit between well defined states.
+This is the case for example for documents that need to be archived, static assets, files under version or revision control
+(such as files in git), disk images, most types of publications and many more.
+It is one of the preferred ways to look at files. However it is often combined with one of the other types.
+For example one might expect a never changing document under a given filename (I<hardlink> plus I<bit exact copy>).
+
+Tags for bit exact copies include the role L<proto-file|Data::TagDB::Tutorial::WellKnown/proto-file>. They are also often
+used as the I<related> (target) of a I<has-final-state> or I<also-has-state> relation. In that case they are also known
+as a I<state> the file can be in.
+
+Such tags commonly also contain a number of C<final-*> relations.
+Very common are
+L<final-file-hash|Data::TagDB::Tutorial::WellKnown/final-file-hash>,
+L<final-file-size|Data::TagDB::Tutorial::WellKnown/final-file-size>, and
+L<final-file-encoding|Data::TagDB::Tutorial::WellKnown/final-file-encoding>.
+
+=head3 Creative works
+
+A creative work is any work that was created by an author.
+Common types include texts, pictures, songs, videos, theatre plays, and curated collections.
+
+Each of those types has it's very own set of roles and relations that are specific to the type.
+However all of them should have the role C<creative-work> (C<84402088-2d3b-49c2-af16-f7715b54f051>).
+
+Common relations for all/most kinds of work include
+C<also-has-artist> (C<94a4ce85-dda0-433e-8b57-949a20606d7f>),
+C<also-has-topic>  (C<38314410-0eeb-442f-8215-fcded3d35738>),
+C<also-has-title>  (C<f7fd59e6-6727-4128-a0a7-cbc702dc09b8>), and
+C<also-depicts>    (C<a6ff7196-bc1a-4bee-9ee4-de99767cf236>).
 
 =head1 AUTHOR
 

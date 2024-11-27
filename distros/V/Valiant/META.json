@@ -30,9 +30,10 @@
       "runtime" : {
          "requires" : {
             "Carp" : "1.50",
-            "Catalyst::Runtime" : "5.90131",
+            "Catalyst::Runtime" : "5.90132",
             "Catalyst::View::BasePerRequest" : "0.010",
             "Class::Method::Modifiers" : "2.15",
+            "Cpanel::JSON::XS" : "4.38",
             "DBIx::Class" : "0.082843",
             "DBIx::Class::Candy" : "0.005003",
             "Data::Dumper" : "2.183",
@@ -44,7 +45,6 @@
             "File::Spec" : "0",
             "FreezeThaw" : "0.5001",
             "HTML::Escape" : "1.11",
-            "JSON::MaybeXS" : "1.004005",
             "Lingua::EN::Inflexion" : "0.002008",
             "Module::Runtime" : "0.016",
             "Moo" : "2.005005",
@@ -65,7 +65,7 @@
       },
       "test" : {
          "requires" : {
-            "Catalyst::Runtime" : "5.90131",
+            "Catalyst::Runtime" : "5.90132",
             "DBIx::Class" : "0.082843",
             "DBIx::Class::Candy" : "0.005003",
             "DateTime" : "1.65",
@@ -94,7 +94,7 @@
          "web" : "https://github.com/jjn1056/Valiant"
       }
    },
-   "version" : "0.002006",
+   "version" : "0.002007",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

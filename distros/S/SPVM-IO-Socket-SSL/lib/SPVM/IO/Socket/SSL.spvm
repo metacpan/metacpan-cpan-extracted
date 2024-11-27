@@ -2,7 +2,7 @@
 # MIT License
 
 class IO::Socket::SSL extends IO::Socket::IP {
-  version "0.003";
+  version "0.004";
   
   use IO::Socket::INET;
   use Net::SSLeay;
@@ -13,7 +13,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
   use Net::SSLeay::BIO;
   use Net::SSLeay::PEM;
   use StringBuffer;
-  use Mozilla::CA;
   use Go;
   use Net::SSLeay::X509;
   use Net::SSLeay::EVP;
@@ -21,7 +20,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
   
   has ref_x509s_list : List of Net::SSLeay::X509;
   
-  has ssl : Net::SSLeay;
+  has ssl : ro Net::SSLeay;
   
   has SSL_version : string;
   
@@ -39,21 +38,17 @@ class IO::Socket::SSL extends IO::Socket::IP {
   
   has SSL_crl_file : string;
   
-  has SSL_passwd_cb : Net::SSLeay::Callback::PemPasswd;
-  
   has SSL_server : int;
   
   has SSL_server_specified : int;
   
-  has SSL_npn_protocols : string[];
-  
   has SSL_alpn_protocols : string[];
-  
-  has SSL_ticket_keycb : Net::SSLeay::Callback::TlsextTicketKey;
   
   has SSL_startHandshake : int;
   
   has SSL_honor_cipher_order : int;
+  
+  has SSL_honor_cipher_order_specified : int;
   
   # Class Methods
   static method new : IO::Socket::SSL ($options : object[] = undef) {
@@ -80,11 +75,8 @@ class IO::Socket::SSL extends IO::Socket::IP {
         "SSL_ciphersuites",
         "SSL_check_crl",
         "SSL_crl_file",
-        "SSL_passwd_cb",
         "SSL_server",
-        "SSL_npn_protocols",
         "SSL_alpn_protocols",
-        "SSL_ticket_keycb",
         "SSL_startHandshake",
         "SSL_honor_cipher_order",
       ],
@@ -111,9 +103,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
       my $SSL_verify_mode = $options_h->get_int("SSL_verify_mode");
       $self->{SSL_verify_mode} = $SSL_verify_mode;
     }
-    else {
-      $self->{SSL_verify_mode} = SSL->SSL_VERIFY_NONE;
-    }
     
     my $SSL_hostname = $options_h->get_or_default_string("SSL_hostname", undef);
     
@@ -135,10 +124,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     $self->{SSL_crl_file} = $SSL_crl_file;
     
-    my $SSL_passwd_cb = (Net::SSLeay::Callback::PemPasswd)$options_h->get_or_default("SSL_passwd_cb", undef);
-    
-    $self->{SSL_passwd_cb} = $SSL_passwd_cb;
-    
     my $SSL_server = $options_h->get_or_default_int("SSL_server", 0);
     
     if ($SSL_server) {
@@ -147,21 +132,17 @@ class IO::Socket::SSL extends IO::Socket::IP {
       $self->{SSL_server} = $SSL_server;
     }
     
-    my $SSL_npn_protocols = (string[])$options_h->get_or_default("SSL_npn_protocols", undef);
-    $self->{SSL_npn_protocols} = $SSL_npn_protocols;
-    
     my $SSL_alpn_protocols = (string[])$options_h->get_or_default("SSL_alpn_protocols", undef);
     $self->{SSL_alpn_protocols} = $SSL_alpn_protocols;
-    
-    my $SSL_ticket_keycb = (Net::SSLeay::Callback::TlsextTicketKey)$options_h->get_or_default("SSL_ticket_keycb", undef);
-    $self->{SSL_ticket_keycb} = $SSL_ticket_keycb;
     
     my $SSL_startHandshake = $options_h->get_or_default_int("SSL_startHandshake", 1);
     $self->{SSL_startHandshake} = $SSL_startHandshake;
     
-    my $SSL_honor_cipher_order = $options_h->get_or_default_int("SSL_honor_cipher_order", 0);
-    $self->{SSL_honor_cipher_order} = $SSL_honor_cipher_order;
-    
+    if ($options_h->exists("SSL_honor_cipher_order")) {
+      $self->{SSL_honor_cipher_order_specified} = 1;
+      my $SSL_honor_cipher_order = $options_h->get_int("SSL_honor_cipher_order");
+      $self->{SSL_honor_cipher_order} = $SSL_honor_cipher_order;
+    }
   }
   
   protected method configure : void () {
@@ -265,16 +246,19 @@ class IO::Socket::SSL extends IO::Socket::IP {
       $ssl_ctx->set_ciphersuites($SSL_ciphersuites);
     }
     
-    my $SSL_verify_mode = $self->{SSL_verify_mode};
-    unless ($self->{SSL_verify_mode_specified}) {
-      unless ($SSL_server) {
-        $self->{SSL_verify_mode} = SSL->SSL_VERIFY_PEER;
+    my $SSL_verify_mode = -1;
+    if ($self->{SSL_verify_mode_specified}) {
+      $SSL_verify_mode = $self->{SSL_verify_mode};
+    }
+    else {
+      if ($SSL_server) {
+        $SSL_verify_mode = SSL->SSL_VERIFY_NONE;
+      }
+      else {
+        $SSL_verify_mode = SSL->SSL_VERIFY_PEER;
       }
     }
-    
     $ssl_ctx->set_verify($SSL_verify_mode);
-    
-    my $ca = Mozilla::CA->SSL_ca;
     
     my $SSL_hostname = $self->{SSL_hostname};
     
@@ -292,16 +276,26 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     $ssl_ctx->set_default_verify_paths;
     
-    my $bio = Net::SSLeay::BIO->new;
-    
-    $bio->write($ca);
-    
-    my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
-    
     my $x509_store = $ssl_ctx->get_cert_store;
     
-    $x509_store->add_cert($x509);
-    
+=begin comment
+
+    {
+      my $ca = Mozilla::CA->SSL_ca;
+      
+      my $bio = Net::SSLeay::BIO->new;
+      
+      $bio->write($ca);
+      
+      my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
+      
+      $x509_store->add_cert($x509);
+    }
+
+=end comment
+
+=cut
+
     my $SSL_check_crl = $self->{SSL_check_crl};
     
     my $SSL_crl_file = $self->{SSL_crl_file};
@@ -322,21 +316,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     $x509_store->set_flags($x509_store_flags);
     
-    my $SSL_passwd_cb = (Net::SSLeay::Callback::PemPasswd)$self->{SSL_passwd_cb};
-    if ($SSL_passwd_cb) {
-      $ssl_ctx->set_default_passwd_cb($SSL_passwd_cb);
-    }
-    
-    my $SSL_npn_protocols = $self->{SSL_npn_protocols};
-    if ($SSL_npn_protocols) {
-      if ($SSL_server) {
-        $ssl_ctx->set_next_protos_advertised_cb_with_protocols($SSL_npn_protocols);
-      }
-      else {
-        $ssl_ctx->set_next_proto_select_cb_with_protocols($SSL_npn_protocols);
-      }
-    }
-    
     my $SSL_alpn_protocols = $self->{SSL_alpn_protocols};
     if ($SSL_alpn_protocols) {
       if ($SSL_server) {
@@ -348,21 +327,24 @@ class IO::Socket::SSL extends IO::Socket::IP {
       }
     }
     
-    my $SSL_ticket_keycb = $self->{SSL_ticket_keycb};
-    if ($SSL_ticket_keycb) {
-      $ssl_ctx->set_tlsext_ticket_key_cb($SSL_ticket_keycb);
-    }
-    
     my $verify_param = $ssl_ctx->get0_param;
     
     $verify_param->set_hostflags(SSL->X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
     
     $verify_param->set1_host($peer_addr);
     
-    my $SSL_honor_cipher_order = $self->{SSL_honor_cipher_order};
-    if ($SSL_honor_cipher_order) {
-      $ssl_options |= SSL->SSL_OP_CIPHER_SERVER_PREFERENCE;
+    my $SSL_honor_cipher_order = 0;
+    if ($self->{SSL_honor_cipher_order_specified}) {
+      $SSL_honor_cipher_order = $self->{SSL_honor_cipher_order};
     }
+    else {
+      if ($self->{SSL_server}) {
+        $SSL_honor_cipher_order = 1;
+      }
+    }
+    # if ($SSL_honor_cipher_order) {
+      $ssl_options |= SSL->SSL_OP_CIPHER_SERVER_PREFERENCE;
+    # }
     
     $ssl_ctx->set_options($ssl_options);
     
@@ -579,15 +561,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
     Fn->shorten($protocol, $protocol_length);
     
     return $protocol;
-  }
-  
-  method get_session_reused : int () {
-    
-    my $ssl = $self->{ssl};
-    
-    my $reused = $ssl->session_reused;
-    
-    return $reused;
   }
   
   method get_sslversion : string () {

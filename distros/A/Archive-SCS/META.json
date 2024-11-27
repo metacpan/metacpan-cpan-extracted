@@ -55,39 +55,39 @@
    "provides" : {
       "Archive::SCS" : {
          "file" : "lib/Archive/SCS.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Archive::SCS::CityHash" : {
          "file" : "lib/Archive/SCS/CityHash.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Archive::SCS::DirIndex" : {
          "file" : "lib/Archive/SCS/DirIndex.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Archive::SCS::GameDir" : {
          "file" : "lib/Archive/SCS/GameDir.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Archive::SCS::HashFS" : {
          "file" : "lib/Archive/SCS/HashFS.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Archive::SCS::HashFS2" : {
          "file" : "lib/Archive/SCS/HashFS2.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Archive::SCS::InMemory" : {
          "file" : "lib/Archive/SCS/InMemory.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Archive::SCS::Mountable" : {
          "file" : "lib/Archive/SCS/Mountable.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Archive::SCS::TObj" : {
          "file" : "lib/Archive/SCS/TObj.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -102,6 +102,6 @@
          "web" : "https://github.com/nautofon/Archive-SCS"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

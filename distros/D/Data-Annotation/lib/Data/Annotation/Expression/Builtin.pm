@@ -3,7 +3,7 @@ use v5.24;
 use utf8;
 use warnings;
 use experimental qw< signatures >;
-{ our $VERSION = '0.004' }
+{ our $VERSION = '0.006' }
 
 sub factory ($parse_ctx, $name) {
    state $immediate_for = {

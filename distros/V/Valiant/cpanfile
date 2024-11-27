@@ -1,5 +1,5 @@
 requires 'Carp', '1.50';
-requires 'Catalyst::Runtime', '5.90131';
+requires 'Catalyst::Runtime', '5.90132';
 requires 'Catalyst::View::BasePerRequest', '0.010';
 requires 'Class::Method::Modifiers', '2.15';
 requires 'Data::Dumper', '2.183';
@@ -13,7 +13,7 @@ requires 'Devel::StackTrace', '2.05';
 requires 'File::Spec', '3.88';
 requires 'FreezeThaw', '0.5001';
 requires 'HTML::Escape', '1.11';
-requires 'JSON::MaybeXS', '1.004005';
+requires 'Cpanel::JSON::XS', '4.38';
 requires 'Lingua::EN::Inflexion', '0.002008';
 requires 'Module::Runtime', '0.016';
 requires 'Moo', '2.005005';

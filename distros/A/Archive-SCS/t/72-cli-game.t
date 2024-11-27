@@ -34,7 +34,7 @@ like scs_archive(qw[ --version --game ats ]),
 like scs_archive(qw[ --version -g ets2 ]),
   qr/$ETS2 $game_version_re/, 'ets2 version abbr';
 
-like scs_archive('--version', -g => $ATS),
+like scs_archive('-V', -g => $ATS),
   qr/$ATS $game_version_re/, 'full name';
 
 # --game file system path

@@ -7,6 +7,7 @@
 .github/workflows/windows-latest.yml
 .gitignore
 Changes
+DEVELOPMENT.md
 lib/SPVM/IO/Socket/SSL.pm
 lib/SPVM/IO/Socket/SSL.spvm
 LICENSE

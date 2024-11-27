@@ -2,7 +2,7 @@ use v5.28;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::TObj 1.04;
+class Archive::SCS::TObj 1.05;
 
 field $meta  :param;
 field $data  :param;

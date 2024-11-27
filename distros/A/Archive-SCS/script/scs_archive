@@ -23,7 +23,7 @@ GetOptions \%opts, qw(
   output|o=s
   recursive|r
   verbose|v
-  version
+  version|V
 );
 $opts{help} and pod2usage -verbose => 2;
 pod2usage unless
@@ -218,7 +218,7 @@ Write all file paths in mounted archives to standard output.
 Write the hash of all orphans in
 mounted archives to standard output.
 
-=item --version
+=item --version, -V
 
 Display version information.
 

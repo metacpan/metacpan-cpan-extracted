@@ -62,3 +62,5 @@
 
 ^\.travis\.yml$
 ^Map-Tube-Beijing-.*.tar.gz$
+
+scan-beijing-wikipedia.pl

@@ -26,26 +26,65 @@ use Test::Most;
   );
 }
 
-ok my $task = Local::Task->new(
-  priority => '21',
-  due_date => '2000-01-01',
-  description => 'Bills',
-);
+{
+  ok my $task = Local::Task->new(
+    priority => '21',
+    due_date => '2000-01-01',
+    description => 'Bills',
+  );
 
-$task->validate;
-ok my $today = DateTime->now->strftime($Valiant::Validator::Date::_pattern);
+  $task->validate;
+  ok my $today = DateTime->now->strftime($Valiant::Validator::Date::_pattern);
 
-is_deeply +{ $task->errors->to_hash },{
-  description => [
-    "is too short (minimum is 10 characters)",
-  ],
-  due_date => [
-    "chosen date can't be earlier than $today",
-  ],
-  priority => [
-    "must be less than or equal to 10",
-  ],
-}; 
+  is_deeply +{ $task->errors->to_hash },{
+    description => [
+      "is too short (minimum is 10 characters)",
+    ],
+    due_date => [
+      "chosen date can't be earlier than $today",
+    ],
+    priority => [
+      "must be less than or equal to 10",
+    ],
+  }; 
+}
+
+{
+  ok my $task = Local::Task->new(
+    priority => '21',
+    due_date => '2000-01-01',
+    description => 'Bills',
+  );
+
+  {
+    $task->validate_only('due_date');
+    ok my $today = DateTime->now->strftime($Valiant::Validator::Date::_pattern);
+    is_deeply +{ $task->errors->to_hash },{
+      due_date => [
+        "chosen date can't be earlier than $today",
+      ], 
+    }; 
+  }
+  {
+    $task->validate_only('description');
+    is_deeply +{ $task->errors->to_hash },{
+      description => [
+        "is too short (minimum is 10 characters)",
+     ],
+    }; 
+  }
+  {
+    $task->validate_only(['description', 'priority']);
+    is_deeply +{ $task->errors->to_hash },{
+      description => [
+        "is too short (minimum is 10 characters)",
+      ],
+      priority => [
+        "must be less than or equal to 10",
+      ],
+    }; 
+  }
+}
 
 done_testing;
 

@@ -2,7 +2,7 @@ package Result::Simple;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use Exporter 'import';
 
@@ -202,17 +202,21 @@ This module does not wrap a return value in an object. Just return a tuple like 
 
 =head3 Ok
 
-    Ok($data)
-    # => ($data, undef)
-
 Return a tuple of a given value and undef. When the function succeeds, it should return this.
+
+    sub add($a, $b) {
+        Ok($a + $b); # => ($a + $b, undef)
+    }
 
 =head3 Err
 
-    Err($err)
-    # => (undef, $err)
-
 Return a tuple of undef and a given error. When the function fails, it should return this.
+
+    sub div($a, $b) {
+        return Err('Division by zero') if $b == 0; # => (undef, 'Division by zero')
+        Ok($a / $b);
+    }
+
 Note that the error value must be a truthy value, otherwise it will throw an exception.
 
 =head2 ATTRIBUTES
@@ -274,7 +278,7 @@ This option is useful for development and testing mode, and it recommended to se
 
 =head1 NOTE
 
-=head2 What happens when you forget to call C<Ok> or C<Err>?
+=head2 Avoiding Ambiguity in Result Handling
 
 Forgetting to call C<Ok> or C<Err> function is a common mistake. Consider the following example:
 

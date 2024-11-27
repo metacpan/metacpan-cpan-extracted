@@ -22,9 +22,10 @@ use Data::TagDB::Metadata;
 use Data::TagDB::LinkIterator;
 use Data::TagDB::MultiIterator;
 use Data::TagDB::WellKnown;
+use Data::TagDB::Cloudlet;
 use Data::URIID::Colour;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 
 
@@ -270,17 +271,61 @@ sub exporter {
 
 sub begin_work {
     my ($self, @args) = @_;
+    croak 'Transaction already in process' if $self->{transaction_refc} || defined($self->{transaction_type});
+    $self->{transaction_refc} = 1;
     return $self->dbh->begin_work(@args);
 }
 
 sub commit {
     my ($self, @args) = @_;
+    croak 'No transaction in process' unless $self->{transaction_refc};
+    $self->{transaction_refc}--;
+    return if $self->{transaction_refc};
     return $self->dbh->commit(@args);
 }
 
 sub rollback {
     my ($self, @args) = @_;
+    croak 'No transaction in process' unless $self->{transaction_refc};
+    $self->{transaction_refc}--;
+    return if $self->{transaction_refc};
     return $self->dbh->rollback(@args);
+}
+
+
+sub in_transaction {
+    my ($self, $type, $code) = @_;
+    my $error;
+
+    croak 'Bad transaction type' unless $type eq 'ro' || $type eq 'rw';
+    croak 'Transaction already in process' if $self->{transaction_refc};
+
+    unless (defined($self->{transaction_type})) {
+        $self->{transaction_type} = $type;
+        $self->{transaction_open} = 0;
+        $self->dbh->begin_work;
+    }
+
+    if ($self->{transaction_type} eq $type || $self->{transaction_type} eq 'rw') {
+        # no-op
+    } elsif ($self->{transaction_type} eq 'ro' && $type eq 'rw') {
+        $self->{transaction_type} = $type;
+    } else {
+        $error = 'Transaction type missmatch';
+    }
+
+    unless (defined $error) {
+        $self->{transaction_open}++;
+        eval { $code->() };
+        $self->{transaction_open}--;
+    }
+
+    unless ($self->{transaction_open}) {
+        delete $self->{transaction_type};
+        $self->dbh->commit;
+    }
+
+    croak $error if defined $error;
 }
 
 # ---- Virtual methods ----
@@ -497,6 +542,47 @@ sub _link_iterator {
     return Data::TagDB::LinkIterator->new(%args, db => $self, query => $query, package => $opts{package});
 }
 
+sub _load_cloudlet {
+    my ($self, %opts) = @_;
+    my $direct = $opts{direct};
+    my $indirect = $opts{indirect};
+
+    $direct   = [$direct]   unless ref($direct) eq 'ARRAY';
+    $indirect = [$indirect] unless ref($indirect) eq 'ARRAY' || !defined($indirect);
+
+    return Data::TagDB::Cloudlet->new(db => $self, root => []) unless scalar(@{$direct});
+
+    if (defined($indirect) && !scalar(@{$indirect})) {
+        $indirect = undef;
+    }
+
+    if (defined $opts{indirect}) {
+        my $query = 'WITH RECURSIVE X(related,root) AS (SELECT related,true FROM relation WHERE tag = ? AND relation IN ('.join(',', map{'?'} @{$direct}).') UNION SELECT relation.related,false FROM relation, X WHERE relation.relation IN ('.join(',', map{'?'} @{$indirect}).') AND relation.tag = X.related) SELECT related,root FROM X';
+        my @bind = ($opts{tag}->dbid, map {$_->dbid} @{$direct}, @{$indirect});
+        my $sth = $self->dbh->prepare($query);
+        my @root;
+        my @entry;
+
+        $sth->execute(@bind);
+        while (my $row = $sth->fetchrow_arrayref) {
+            my $ent = $self->tag_by_dbid($row->[0]);
+            if ($row->[1]) {
+                push(@root, $ent);
+            } else {
+                push(@entry, $ent);
+            }
+        }
+        $sth->finish;
+        return Data::TagDB::Cloudlet->new(db => $self, root => \@root, entry => \@entry);
+    } else {
+        return Data::TagDB::Cloudlet->new(db => $self, root => [
+                $self->relation(tag => $opts{tag}, relation => $opts{direct})->collect('related')
+            ]);
+    }
+
+    # WITH RECURSIVE X(related,root) AS (SELECT related,true FROM relation WHERE tag = 597 AND relation IN (7, 201) UNION SELECT relation.related,false FROM relation, X WHERE relation.relation = 140 AND relation.tag = X.related) SELECT *,(SELECT data FROM metadata WHERE tag = X.related AND relation = 1 AND type = 5 LIMIT 1) FROM X
+}
+
 # ---- AUTOLOAD ----
 
 sub AUTOLOAD {
@@ -534,7 +620,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -576,11 +662,32 @@ Returns a new object that can be used for lookups.
 Either an already connected L<DBI> handle can be passed or
 data source that is then passed to L<DBI/connect> internally.
 
+If a open handle is passed, the same restrictions apply as for L</dbh>.
+
 =head2 dbh
 
     my $dbh = $db->dbh;
 
 Returns the current L<DBI> connection.
+
+This connection can be used to call any transaction independent method on the handle.
+It can for example be used to call L<DBI/ping> to keep the connection alive.
+
+If methods are called that depend on the state of the transaction logic
+(such as performing an SELECT or UPDATE) the state of the transaction B<must> be managed via
+this module. See </begin_work>.
+
+The same holds true for any open handle passed to L</new>. When passed the handle must
+not be in any active transaction and must not be used outside this module to change the transaction
+state of the handle.
+
+It is also wise to avoid interacting with the tables managed by this module. This may result in the
+internal states being in a wrong state. It is however generally safe (but for the restrictions given above)
+to interact with tables outside of the use of this module.
+
+As table names that are in use by this module depend on the version of the schema that is currently active
+(and may change in future) it is most wise to have any custom tables in a seperate namespace of some kind
+(the exact ways to do this may depend on the type of database used).
 
 =head2 disconnect
 
@@ -731,6 +838,8 @@ See also L<Data::TagDB::Factory> for details.
 Create a new exporter. C<$target> must be a open file handle (that supports seeking)
 or a filename.
 
+See also L<Data::TagDB::Exporter>.
+
 The following options (all optional) are defined:
 
 =over
@@ -745,18 +854,69 @@ The default is I<tagpool-source-format> (C<e5da6a39-46d5-48a9-b174-5c26008e208e>
 
 =head2 begin_work, commit, rollback
 
-    my $rc = $db->begin_work;
+    $db->begin_work;
     # ...
-    my $rc = $db->commit;
+    $db->commit;
     # or:
-    my $rc = $db->rollback;
+    $db->rollback;
 
 Those methods are provided as proxy to L<DBI>'s.
 The correct use of transactions can improve the speed (both for reading and writing)
 significantly. Specifically tag databases are subject to many improvements of correct transaction
 mangement.
 
+B<Note:>
+For each call to C<begin_work> there must be a matching call to C<commit> or C<rollback>.
+This is important as this API will keep track of transactions internally.
+
+B<Note:>
+A call to C<begin_work> may or may not fail if another transaction is already in process.
+This may depend on the type of database used.
+
+B<Note:>
+The return value of those methods is undefined. On error they will C<die>.
+
+B<Note:>
+These methods are mutually exclusive with the use of L</in_transaction> at this time.
+However, the use of L</in_transaction> is recommended.
+
 For details see also: L<DBI/begin_work>, L<DBI/commit>, L<DBI/rollback>.
+
+=head2 in_transaction
+
+    $db->in_transaction(ro => sub { ....});
+    # or:
+    $db->in_transaction(rw => sub { ....});
+
+Runs a block of code (a subref) inside a transaction.
+
+The passed block is run in a transaction. The transaction is commited after the code finishes.
+
+The type of the transaction can be C<ro> (read only) or C<rw> (read-write).
+The module may optimise based on this information.
+If a write operation is performed in a transaction that is marked C<ro> the behaviour is unspecified.
+
+In contrast to L</begin_work> and L</commit> calls to this method can be stacked freely.
+For example the following is valid:
+
+    $db->in_transaction(ro => sub {
+        # do some read...
+        $db->in_transaction(rw => sub {
+            # do some write...
+        });
+        # do more reading, writing is invalid here
+    });
+
+B<Note:>
+If the code C<die>s the error is ignored. The transaction is still commited.
+If the code wants to perform rollback in case it fails this function might not be the one to use.
+
+B<Note:>
+Data written might only be visible to other handles of the same database once I<all>
+transactions have been finished.
+
+B<Note:>
+This method is mutually exclusive with the use of L</begin_work> at this time.
 
 =head2 tag_by_hint
 

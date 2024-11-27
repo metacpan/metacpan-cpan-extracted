@@ -10,6 +10,7 @@ cpanfile
 dist.ini
 lib/Data/TagDB.pm
 lib/Data/TagDB/Cache.pm
+lib/Data/TagDB/Cloudlet.pm
 lib/Data/TagDB/Exporter.pm
 lib/Data/TagDB/Factory.pm
 lib/Data/TagDB/Iterator.pm

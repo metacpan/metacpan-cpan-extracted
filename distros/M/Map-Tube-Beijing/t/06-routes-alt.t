@@ -22,8 +22,8 @@ like( $@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\
     my $ret = $map->get_shortest_route('Yonghegong Lama Temple', 'Beijing Zoo');
     isa_ok( $ret, 'Map::Tube::Route' );
     is( $ret,
-        'Yonghegong Lama Temple (Line 2, Line 5), Andingmen (Line 2), Guloudajie (Line 2, Line 8), Jishuitan (Line 2), ' .
-        'Xizhimen (Daxing Line, Line 13, Line 2, Line 4), Beijing Zoo (Daxing Line, Line 4)',
+        'Yonghegong Lama Temple (Line 2, Line 5), Andingmen (Line 2), Gulou Dajie (Line 2, Line 8), Jishuitan (Line 19, Line 2), ' .
+        'Ping\'anli (Line 19, Line 4, Line 6), Xinjiekou (Line 4), Xizhimen (Line 13, Line 2, Line 4), Beijing Zoo (Line 4)',
         'Yonghegong Lama Temple - Beijing Zoo'
       );
 }
@@ -32,20 +32,20 @@ like( $@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\
     my $ret = $map->get_shortest_route('Yonghegong Lama Temple', 'Beijing Zoo')->preferred( );
     isa_ok( $ret, 'Map::Tube::Route' );
     is( $ret,
-        'Yonghegong Lama Temple (Line 2), Andingmen (Line 2), Guloudajie (Line 2), Jishuitan (Line 2), ' .
-        'Xizhimen (Daxing Line, Line 2, Line 4), Beijing Zoo (Daxing Line, Line 4)',
+        'Yonghegong Lama Temple (Line 2), Andingmen (Line 2), Gulou Dajie (Line 2), Jishuitan (Line 19, Line 2), ' .
+        'Ping\'anli (Line 19, Line 4), Xinjiekou (Line 4), Xizhimen (Line 4), Beijing Zoo (Line 4)',
         'Yonghegong Lama Temple - Beijing Zoo preferred route'
       );
 }
 
 {
-    my $ret = $map->get_shortest_route('yonghegong lama temple', 'JINTAIXIZHAO');
+    my $ret = $map->get_shortest_route('yonghegong lama temple', 'JINTAI XIZHAO');
     isa_ok( $ret, 'Map::Tube::Route' );
     is( $ret,
-        'Yonghegong Lama Temple (Line 2, Line 5), Dongzhimen (Airport Express, Line 13, Line 2), '.
+        'Yonghegong Lama Temple (Line 2, Line 5), Dongzhimen (Capital Airport Express, Line 13, Line 2), '.
         'Dongsi Shitiao (Line 2), Chaoyangmen (Line 2, Line 6), Dongdaqiao (Line 6), ' .
-        'Hujialou (Line 10, Line 6), Jintaixizhao (Line 10)',
-        'yonghegong lama temple - JINTAIXIZAHO case-insensitive'
+        'Hujialou (Line 10, Line 6), Jintai Xizhao (Line 10)',
+        'yonghegong lama temple - JINTAI XIZAHO case-insensitive'
       );
 }
 

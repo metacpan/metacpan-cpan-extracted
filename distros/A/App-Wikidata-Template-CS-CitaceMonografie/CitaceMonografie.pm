@@ -11,9 +11,9 @@ use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 use Wikibase::API;
 use Wikibase::Datatype::Query;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
-Readonly::Scalar our $LANGUAGE => 'cs';
+Readonly::Array our @LANGUAGES => ('mul', 'cs', 'en');
 
 # Constructor.
 sub new {
@@ -246,7 +246,10 @@ sub _get_citace_params {
 	}
 
 	# Number of pages.
-	$ret_hr->{decode_utf8('počet stran')} = $self->{'_q'}->query($item, 'P1104');
+	my $number_of_pages = $self->{'_q'}->query($item, 'P1104');
+	if (defined $number_of_pages) {
+		$ret_hr->{decode_utf8('počet stran')} = $number_of_pages;
+	}
 
 	# Edition number.
 	my $edition_number = $self->{'_q'}->query($item, 'P393');
@@ -266,13 +269,18 @@ sub _get_citace_params {
 sub _get_page_label {
 	my ($self, $page_id, $lang) = @_;
 
-	$lang //= $LANGUAGE;
 	my $item = $self->{'_api'}->get_item($page_id);
-	my $label = $self->{'_q'}->query($item, 'label:'.$lang);
-	if (defined $label) {
-		return $label;
+	my @languages = @LANGUAGES;
+	if (defined $lang) {
+		unshift @languages, $lang;
 	}
-	err "No '$lang' description for '$page_id'.";
+	foreach my $l (@languages) {
+		my $label = $self->{'_q'}->query($item, 'label:'.$l);
+		if (defined $label) {
+			return $label;
+		}
+	}
+	err "No language (".(join ', ', @languages).") description for '$page_id'.";
 }
 
 1;
@@ -371,6 +379,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

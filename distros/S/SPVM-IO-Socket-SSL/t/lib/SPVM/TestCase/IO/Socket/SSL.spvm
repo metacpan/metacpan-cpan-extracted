@@ -46,6 +46,16 @@ class TestCase::IO::Socket::SSL {
       my $port = 443;
       my $socket = IO::Socket::SSL->new({PeerAddr => $host, PeerPort => $port, SSL_startHandshake => 0});
       
+      my $ssl = $socket->ssl;
+      
+      unless ($ssl) {
+        return 0;
+      }
+      
+      unless ($ssl is_type Net::SSLeay) {
+        return 0;
+      }
+      
       $socket->connect_SSL;
       
       my $write_buffer = "GET / HTTP/1.0\r\nHost: $host\r\n\r\n";

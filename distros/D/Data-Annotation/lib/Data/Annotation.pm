@@ -2,7 +2,7 @@ package Data::Annotation;
 use v5.24;
 use Moo;
 use experimental qw< signatures >;
-{ our $VERSION = '0.004' }
+{ our $VERSION = '0.006' }
 
 use Ouch qw< :trytiny_var >;
 use Try::Catch;

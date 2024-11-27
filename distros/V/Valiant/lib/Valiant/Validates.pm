@@ -110,8 +110,8 @@ sub read_attribute_for_validation {
 }
 
 sub _validates_coderef {
-  my ($self, $coderef, %options) = @_;
-  $self->validations([$coderef, \%options]);
+  my ($self, $coderef, $attributes, %options) = @_;
+  $self->validations([$coderef, \%options, $attributes]);
   return $self;
 }
 
@@ -247,7 +247,7 @@ sub validates {
     push @validators, $new_validator;
   }
   my $coderef = sub { $_->validate(@_) foreach @validators };
-  $self->_validates_coderef($coderef, %global_options); 
+  $self->_validates_coderef($coderef, $attributes, %global_options); 
 }
 
 sub _normalize_validator_package {
@@ -350,6 +350,36 @@ sub validate {
   $self->validated(1);
   delete $self->{_inprocess};
   return $self;
+}
+
+sub validate_only {
+  my ($self, $attribute, %args) = @_;
+  my @attributes = ref($attribute) ? @$attribute : ($attribute);
+
+  my $existing_context = $args{context} ? $args{context} : [];
+  my @existing_context = ref($existing_context) ? @$existing_context : ($existing_context);
+  push @existing_context, @{$self->_context} if $self->has_context;
+
+  $args{context} = \@existing_context if @existing_context;
+
+  return $self if $self->skip_validation;
+  return $self if $self->{_inprocess};
+  $self->{_inprocess} =1;
+
+  $self->clear_validated if $self->validated;
+
+  foreach my $validation ($self->validations) {
+    next unless $validation->[2]; 
+    my @attrs_for_validation = @{$validation->[2]};
+    foreach my $attr (@attrs_for_validation) {
+      next unless grep { $_ eq $attr } @attributes;
+      $validation->[0]($self, +{%{$validation->[1]}, %args});
+    }
+  }
+
+  $self->validated(1);
+  delete $self->{_inprocess};
+  return $self; 
 }
 
 sub _run_validations {
@@ -507,6 +537,18 @@ value of this method is not defined in the API.  Example:
 
 Currently the only arguments with defined meaning is C<context>, which is used to defined a validation
 context.  All other arguments will be passed down to the C<$opts> hashref.
+
+=head2 validate_only
+
+    $obj->vadate_only('name', context=>'create');
+    $obj->validate_only(['name', 'age'], context=>'update');
+
+Similar to C<validate> but will run only those validations that are associated with the named 
+attribute(s).  Access either a single string or arrayref of strings.  Please keep in mind that
+fields or custom validations can add errors to other fields so you may still need to check all
+fields for errors after running this method in order to get a full picture of the object validation
+state. However this method can be of use if you are doing AJAX per field form validation, for
+example.
 
 =head2 valid
 

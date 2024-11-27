@@ -1,0 +1,45 @@
+---
+expected:
+  SDATA:
+    health_status: healthy
+    image: docker.io/plexinc/pms-docker:latest
+    m: +0.050887542 container health_status c12740d991d21bbea2989adffbbecf471eb28bd2d416587eff9c4b94e43fdb92
+    name: plex
+    org.opencontainers.image.created: 2024-09-11T16:25:53.185Z
+    org.opencontainers.image.description: The Plex Media Server
+    org.opencontainers.image.licenses: NOASSERTION
+    org.opencontainers.image.ref.name: ubuntu
+    org.opencontainers.image.revision: c8e17655441744e88dd3b45f96f824052fda79a3
+    org.opencontainers.image.source: https://github.com/plexinc/pms-docker
+    org.opencontainers.image.title: Plex Media Server
+    org.opencontainers.image.url: https://github.com/plexinc/plex-media-server
+    org.opencontainers.image.vendor: 'Plex, GmbH'
+    org.opencontainers.image.version: 1.41.0.8992-8463ad060
+    puppet_resource_flags: eyJuZXR3b3JrIj0+Imhvc3QiLCAidm9sdW1lIj0+WyJwbGV4bWVkaWE6L21lZGlhIiwgInBsZXh0cmFuc2NvZGU6L3RyYW5zY29kZSIsICIvaG9tZS9jb250YWluZXJzL3BsZXg6L2NvbmZpZyIsICIvbWVkaWEvbW92aWVzOi9tZWRpYS9tb3ZpZXMiLCAiL21lZGlhL211c2ljOi9tZWRpYS9tdXNpYyIsICIvbWVkaWEvdHY6L21lZGlhL3R2Il0sICJkZXZpY2UiPT5bIi9kZXYvZHJpOi9kZXYvZHJpIl19
+  content: '2024-09-15 00:00:05.516700379 -0700 PDT m=+0.050887542 container health_status c12740d991d21bbea2989adffbbecf471eb28bd2d416587eff9c4b94e43fdb92 (image=docker.io/plexinc/pms-docker:latest, name=plex, health_status=healthy, org.opencontainers.image.created=2024-09-11T16:25:53.185Z, org.opencontainers.image.ref.name=ubuntu, org.opencontainers.image.revision=c8e17655441744e88dd3b45f96f824052fda79a3, org.opencontainers.image.title=Plex Media Server, org.opencontainers.image.vendor=Plex, GmbH, org.opencontainers.image.licenses=NOASSERTION, org.opencontainers.image.url=https://github.com/plexinc/plex-media-server, org.opencontainers.image.version=1.41.0.8992-8463ad060, org.opencontainers.image.description="The Plex Media Server", puppet_resource_flags=eyJuZXR3b3JrIj0+Imhvc3QiLCAidm9sdW1lIj0+WyJwbGV4bWVkaWE6L21lZGlhIiwgInBsZXh0cmFuc2NvZGU6L3RyYW5zY29kZSIsICIvaG9tZS9jb250YWluZXJzL3BsZXg6L2NvbmZpZyIsICIvbWVkaWEvbW92aWVzOi9tZWRpYS9tb3ZpZXMiLCAiL21lZGlhL211c2ljOi9tZWRpYS9tdXNpYyIsICIvbWVkaWEvdHY6L21lZGlhL3R2Il0sICJkZXZpY2UiPT5bIi9kZXYvZHJpOi9kZXYvZHJpIl19, org.opencontainers.image.source=https://github.com/plexinc/pms-docker)'
+  date: 2018-09-15
+  date_raw: Sep 15 00:00:05
+  datetime_obj: ~
+  datetime_raw: Sep 15 00:00:05
+  datetime_str: 2018-09-15T00:00:05Z
+  domain: ~
+  epoch: 1536969605
+  facility: ~
+  facility_int: ~
+  host: alma9
+  host_raw: alma9
+  message: 'podman[1286826]: 2024-09-15 00:00:05.516700379 -0700 PDT m=+0.050887542 container health_status c12740d991d21bbea2989adffbbecf471eb28bd2d416587eff9c4b94e43fdb92 (image=docker.io/plexinc/pms-docker:latest, name=plex, health_status=healthy, org.opencontainers.image.created=2024-09-11T16:25:53.185Z, org.opencontainers.image.ref.name=ubuntu, org.opencontainers.image.revision=c8e17655441744e88dd3b45f96f824052fda79a3, org.opencontainers.image.title=Plex Media Server, org.opencontainers.image.vendor=Plex, GmbH, org.opencontainers.image.licenses=NOASSERTION, org.opencontainers.image.url=https://github.com/plexinc/plex-media-server, org.opencontainers.image.version=1.41.0.8992-8463ad060, org.opencontainers.image.description="The Plex Media Server", puppet_resource_flags=eyJuZXR3b3JrIj0+Imhvc3QiLCAidm9sdW1lIj0+WyJwbGV4bWVkaWE6L21lZGlhIiwgInBsZXh0cmFuc2NvZGU6L3RyYW5zY29kZSIsICIvaG9tZS9jb250YWluZXJzL3BsZXg6L2NvbmZpZyIsICIvbWVkaWEvbW92aWVzOi9tZWRpYS9tb3ZpZXMiLCAiL21lZGlhL211c2ljOi9tZWRpYS9tdXNpYyIsICIvbWVkaWEvdHY6L21lZGlhL3R2Il0sICJkZXZpY2UiPT5bIi9kZXYvZHJpOi9kZXYvZHJpIl19, org.opencontainers.image.source=https://github.com/plexinc/pms-docker)'
+  message_raw: 'Sep 15 00:00:05 alma9 podman[1286826]: 2024-09-15 00:00:05.516700379 -0700 PDT m=+0.050887542 container health_status c12740d991d21bbea2989adffbbecf471eb28bd2d416587eff9c4b94e43fdb92 (image=docker.io/plexinc/pms-docker:latest, name=plex, health_status=healthy, org.opencontainers.image.created=2024-09-11T16:25:53.185Z, org.opencontainers.image.ref.name=ubuntu, org.opencontainers.image.revision=c8e17655441744e88dd3b45f96f824052fda79a3, org.opencontainers.image.title=Plex Media Server, org.opencontainers.image.vendor=Plex, GmbH, org.opencontainers.image.licenses=NOASSERTION, org.opencontainers.image.url=https://github.com/plexinc/plex-media-server, org.opencontainers.image.version=1.41.0.8992-8463ad060, org.opencontainers.image.description="The Plex Media Server", puppet_resource_flags=eyJuZXR3b3JrIj0+Imhvc3QiLCAidm9sdW1lIj0+WyJwbGV4bWVkaWE6L21lZGlhIiwgInBsZXh0cmFuc2NvZGU6L3RyYW5zY29kZSIsICIvaG9tZS9jb250YWluZXJzL3BsZXg6L2NvbmZpZyIsICIvbWVkaWEvbW92aWVzOi9tZWRpYS9tb3ZpZXMiLCAiL21lZGlhL211c2ljOi9tZWRpYS9tdXNpYyIsICIvbWVkaWEvdHY6L21lZGlhL3R2Il0sICJkZXZpY2UiPT5bIi9kZXYvZHJpOi9kZXYvZHJpIl19, org.opencontainers.image.source=https://github.com/plexinc/pms-docker)'
+  offset: Z
+  preamble: ~
+  priority: ~
+  priority_int: ~
+  program_name: podman
+  program_pid: 1286826
+  program_raw: 'podman[1286826]'
+  program_sub: ~
+  time: 00:00:05
+name: Podman health status messages
+options:
+  AutoDetectKeyValues: 1
+string: 'Sep 15 00:00:05 alma9 podman[1286826]: 2024-09-15 00:00:05.516700379 -0700 PDT m=+0.050887542 container health_status c12740d991d21bbea2989adffbbecf471eb28bd2d416587eff9c4b94e43fdb92 (image=docker.io/plexinc/pms-docker:latest, name=plex, health_status=healthy, org.opencontainers.image.created=2024-09-11T16:25:53.185Z, org.opencontainers.image.ref.name=ubuntu, org.opencontainers.image.revision=c8e17655441744e88dd3b45f96f824052fda79a3, org.opencontainers.image.title=Plex Media Server, org.opencontainers.image.vendor=Plex, GmbH, org.opencontainers.image.licenses=NOASSERTION, org.opencontainers.image.url=https://github.com/plexinc/plex-media-server, org.opencontainers.image.version=1.41.0.8992-8463ad060, org.opencontainers.image.description="The Plex Media Server", puppet_resource_flags=eyJuZXR3b3JrIj0+Imhvc3QiLCAidm9sdW1lIj0+WyJwbGV4bWVkaWE6L21lZGlhIiwgInBsZXh0cmFuc2NvZGU6L3RyYW5zY29kZSIsICIvaG9tZS9jb250YWluZXJzL3BsZXg6L2NvbmZpZyIsICIvbWVkaWEvbW92aWVzOi9tZWRpYS9tb3ZpZXMiLCAiL21lZGlhL211c2ljOi9tZWRpYS9tdXNpYyIsICIvbWVkaWEvdHY6L21lZGlhL3R2Il0sICJkZXZpY2UiPT5bIi9kZXYvZHJpOi9kZXYvZHJpIl19, org.opencontainers.image.source=https://github.com/plexinc/pms-docker)'

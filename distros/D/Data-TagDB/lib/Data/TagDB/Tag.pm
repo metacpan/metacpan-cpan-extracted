@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use URI;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my $HAVE_DATA_IDENTIFIER = eval {require Data::Identifier; 1;};
 
@@ -329,6 +329,33 @@ sub description {
     }
 }
 
+
+sub cloudlet {
+    my ($self, $which) = @_;
+    my $wk = $self->db->wk;
+    my %opts = (
+        tag => $self,
+        indirect => [
+            $wk->specialises,
+        ],
+    );
+
+    if ($which eq 'roles') {
+        $opts{direct} = [
+            $wk->has_type,
+            $wk->also_has_role,
+        ];
+    } elsif ($which eq 'flags') {
+        $opts{direct} = [
+            $wk->flagged_as,
+        ];
+    } else {
+        croak 'Unknown cloudlet';
+    }
+
+    return $self->db->_load_cloudlet(%opts);
+}
+
 # ---- Private helpers ----
 
 sub _new {
@@ -471,7 +498,7 @@ Data::TagDB::Tag - Work with Tag databases
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -576,6 +603,16 @@ B<Note:> Future versions of this method will C<die> if no value can be found.
 
 The following universal options are supported: L</default>.
 The following universal options are ignored (without warning or error): L</no_defaults>.
+
+=head2 cloudlet
+
+    my Data::TagDB::Cloudlet $cl = $tag->cloudlet($which);
+
+B<Experimental:>
+Gets the given cloudlet.
+
+B<Note:>
+This method is experimental. It may change prototype, and behaviour or may be removed in future versions without warning.
 
 =head1 AUTHOR
 

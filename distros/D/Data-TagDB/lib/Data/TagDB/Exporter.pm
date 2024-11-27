@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 use parent 'Data::TagDB::WeakBaseObject';
 
@@ -132,7 +132,7 @@ Data::TagDB::Exporter - Work with Tag databases
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -154,7 +154,7 @@ See also L<Data::TagDB/exporter>.
 
 =head2 db
 
-    my Data::TagDB $db = $factory->db;
+    my Data::TagDB $db = $exporter->db;
 
 Returns the current L<Data::TagDB> object.
 

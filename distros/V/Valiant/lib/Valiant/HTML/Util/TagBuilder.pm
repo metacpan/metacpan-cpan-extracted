@@ -4,7 +4,7 @@ use Moo;
 use Sub::Util;
 use Carp;
 use Scalar::Util;
-use JSON::MaybeXS ('encode_json');
+use Cpanel::JSON::XS ('encode_json');
 use overload 
   bool => sub {1}, 
   '""' => sub { shift->to_string },

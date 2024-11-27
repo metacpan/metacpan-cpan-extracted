@@ -71,21 +71,25 @@ This module does not wrap a return value in an object. Just return a tuple like 
 
 ### Ok
 
-```perl
-Ok($data)
-# => ($data, undef)
-```
-
 Return a tuple of a given value and undef. When the function succeeds, it should return this.
+
+```perl
+sub add($a, $b) {
+    Ok($a + $b); # => ($a + $b, undef)
+}
+```
 
 ### Err
 
+Return a tuple of undef and a given error. When the function fails, it should return this.
+
 ```perl
-Err($err)
-# => (undef, $err)
+sub div($a, $b) {
+    return Err('Division by zero') if $b == 0; # => (undef, 'Division by zero')
+    Ok($a / $b);
+}
 ```
 
-Return a tuple of undef and a given error. When the function fails, it should return this.
 Note that the error value must be a truthy value, otherwise it will throw an exception.
 
 ## ATTRIBUTES
@@ -153,7 +157,7 @@ This option is useful for development and testing mode, and it recommended to se
 
 # NOTE
 
-## What happens when you forget to call `Ok` or `Err`?
+## Avoiding Ambiguity in Result Handling
 
 Forgetting to call `Ok` or `Err` function is a common mistake. Consider the following example:
 

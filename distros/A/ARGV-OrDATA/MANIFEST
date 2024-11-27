@@ -8,10 +8,13 @@ t/01-file.t
 t/02-stdin.t
 t/03-package.t
 t/04-unimport.t
+t/05-is_funcs.t
 t/input.txt
 t/My.pm
 t/pipe.pl
 t/script.pl
+t/is_using.pl
+t/is_using_package.pl
 xt/changes.t
 xt/manifest.t
 xt/pod-coverage.t

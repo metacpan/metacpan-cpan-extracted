@@ -2,7 +2,7 @@ package Data::Annotation::Chain;
 use v5.24;
 use Moo;
 use experimental qw< signatures >;
-{ our $VERSION = '0.004' }
+{ our $VERSION = '0.006' }
 
 use Scalar::Util qw< blessed >;
 use Data::Annotation::Rule;

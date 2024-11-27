@@ -2,7 +2,6 @@
 
 Aspose.Cells Cloud for Perl enables you to handle various aspects of Excel files, including cell data, styles, formulas, charts, pivot tables, data validation, comments, drawing objects, images, hyperlinks, and so on. Additionally, it supports operations such as splitting, merging, repairing, and converting to other compatible file formats.
 
-
 # Perl module for Aspose.Cells Cloud
 
 Enhance your Perl applications with the [Aspose.Cells Cloud](https://products.aspose.cloud/cells/perl) , enabling seamless integration with [Excel, ODS, CSV, Json and other spreadsheet document formats](https://docs.aspose.cloud/cells/supported-file-formats/). With its powerful APIs, developers can effortlessly read, convert, create, edit, and manipulate the contents of Excel documents without the need for any office software installed on the machine
@@ -20,11 +19,11 @@ Enhance your Perl applications with the [Aspose.Cells Cloud](https://products.as
 - Import/Export: Facilitates importing data from various sources into spreadsheets and exporting spreadsheet data to other formats.
 - Security Management: Offers a range of security features like data encryption, access control, and permission management to safeguard the security and integrity of spreadsheet data.
 
-## Feature & Enhancements in Version 24.10
+## Feature & Enhancements in Version 24.11
 
 Full list of issues covering all changes in this release:
 
-- Add the new feature about removing characters on TextProcessingController.
+- Add convert text feature on TextProcessingController.
 
 ## Support file format
 
@@ -115,6 +114,10 @@ $instance->put_convert_workbook(request=> $request);
 
 # Release history version
 
+## Enhancements in Version 24.10
+
+- Add the new feature about removing characters on TextProcessingController.
+
 ## Enhancements in Version 24.9
 
 - Add word case function for TextProcessingController.
@@ -126,7 +129,7 @@ $instance->put_convert_workbook(request=> $request);
 
 ## Enhancements in Version 24.7
 
-- Add a new feature about adding text content. 
+- Add a new feature about adding text content.
 - Add get access token by client id and client secret.
 
 ## Enhancements in Version 24.6

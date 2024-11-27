@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "24.10"
+         "version" : "24.11"
       },    
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -1024,6 +1024,9 @@
       },
       "AsposeCellsCloud::Object::BaseOperateOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/BaseOperateOptions.pm"
+      },
+      "AsposeCellsCloud::Object::ConvertTextOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/ConvertTextOptions.pm"
       },
       "AsposeCellsCloud::Object::RemoveCharactersByCharacter" : {
          "file" : "lib/AsposeCellsCloud/Object/RemoveCharactersByCharacter.pm"
@@ -2096,6 +2099,9 @@
       "AsposeCellsCloud::Request::PostRemoveCharactersRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostRemoveCharactersRequest.pm"
       },
+      "AsposeCellsCloud::Request::PostConvertTextRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostConvertTextRequest.pm"
+      },
       "AsposeCellsCloud::Request::GetWorkbookDefaultStyleRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetWorkbookDefaultStyleRequest.pm"
       },
@@ -2353,6 +2359,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "24.10",
+   "version" : "24.11",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

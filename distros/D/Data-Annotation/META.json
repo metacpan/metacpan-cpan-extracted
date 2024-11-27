@@ -42,7 +42,7 @@
          "requires" : {
             "Log::Any" : "0",
             "Moo" : "0",
-            "Ouch" : "0",
+            "Ouch" : "0.0500",
             "Path::Tiny" : "0.084",
             "Template::Perlish" : "0",
             "Try::Catch" : "0",
@@ -68,7 +68,7 @@
          "web" : "https://codeberg.org/polettix/Data-Annotation/"
       }
    },
-   "version" : "0.004",
+   "version" : "0.006",
    "x_contributors" : [
       "Flavio Poletti <flavio@polettix.it>"
    ],

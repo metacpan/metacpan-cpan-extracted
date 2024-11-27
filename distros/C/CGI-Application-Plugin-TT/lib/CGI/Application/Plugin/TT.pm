@@ -1,4 +1,6 @@
 package CGI::Application::Plugin::TT;
+$CGI::Application::Plugin::TT::VERSION = '1.06';
+# ABSTRACT: Plugin that adds Template Toolkit support to CGI::Application
 
 use Template 2.0;
 use CGI::Application 4.0;
@@ -8,8 +10,6 @@ use Scalar::Util ();
 
 use strict;
 use vars qw($VERSION @EXPORT);
-
-$VERSION = '1.05';
 
 require Exporter;
 
@@ -46,7 +46,7 @@ sub import {
 ##############################################
 #
 # Get a Template Toolkit object.  The same object
-# will be returned everytime this method is called
+# will be returned every time this method is called
 # during a request cycle.
 #
 sub tt_obj {
@@ -130,8 +130,8 @@ sub tt_config {
           carp "tt_config error: parameter TEMPLATE_PRECOMPILE_DIR must be a SCALAR or an ARRAY ref"
             unless( !defined($type) or $type eq 'ARRAY' );
 
-          # now look at each file and 
-          my @dirs = ($type && $type eq 'ARRAY') ? @{$props->{TEMPLATE_PRECOMPILE_DIR}} 
+          # now look at each file and
+          my @dirs = ($type && $type eq 'ARRAY') ? @{$props->{TEMPLATE_PRECOMPILE_DIR}}
             : ($props->{TEMPLATE_PRECOMPILE_DIR});
           delete $props->{TEMPLATE_PRECOMPILE_DIR};
           my $tt = $self->tt_obj;
@@ -148,7 +148,7 @@ sub tt_config {
           }
           require File::Find;
           File::Find::find(
-            sub { 
+            sub {
                 my $file = $File::Find::name;
                 return unless $filetester->($file);
                 if( !-d $file ) {
@@ -157,9 +157,9 @@ sub tt_config {
             },
             map { File::Spec->rel2abs($_) } @dirs,
           );
-    
+
       }
-      
+
       # If there are still entries left in $props then they are invalid
       carp "Invalid option(s) (".join(', ', keys %$props).") passed to tt_config" if %$props;
     }
@@ -173,7 +173,7 @@ sub tt_config {
 ###
 ##############################################
 #
-# Set some parameters that will be added to 
+# Set some parameters that will be added to
 # any template object we process in this
 # request cycle.
 #
@@ -347,7 +347,7 @@ sub tt_include_path {
 ##############################################
 #
 # Auto-generate the filename of a template based on
-# the current module, and the name of the 
+# the current module, and the name of the
 # function that called us.
 #
 sub tt_template_name {
@@ -366,7 +366,7 @@ sub tt_template_name {
 ##############################################
 #
 # Generate the filename of a template based on
-# the current module, and the name of the 
+# the current module, and the name of the
 # function that called us.
 #
 # example:
@@ -474,12 +474,20 @@ sub _tt_add_devpopup_info {
 
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-CGI::Application::Plugin::TT - Add Template Toolkit support to CGI::Application
+CGI::Application::Plugin::TT - Plugin that adds Template Toolkit support to CGI::Application
 
+=head1 VERSION
+
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -527,13 +535,12 @@ The return value will be a scalar reference to the output of the template.
 
     return $self->tt_process( 'Browser/myrunmode.tmpl', { foo => 'bar' } );
   }
- 
+
   sub myrunmode2 {
     my $self = shift;
 
     return $self->tt_process( { foo => 'bar' } ); # will process template 'My/App/Browser/myrunmode2.tmpl'
   }
- 
 
 =head2 tt_config
 
@@ -555,7 +562,6 @@ method).
     };
     __PACKAGE__->tt_config( TEMPLATE_OPTIONS => $TEMPLATE_OPTIONS );
 
-
 The following parameters are accepted:
 
 =over 4
@@ -570,7 +576,7 @@ for the L<Template> module for the exact syntax of the parameters, or see below 
 
 This allows you to provide your own method for auto-generating the template filename.  It requires
 a reference to a function that will be passed the $self object as it's only parameter.  This function
-will be called everytime $self->tt_process is called without providing the filename of the template
+will be called every time $self->tt_process is called without providing the filename of the template
 to process.  This can standardize the way templates are organized and structured by making the
 template filenames follow a predefined pattern.
 
@@ -582,7 +588,7 @@ module name, and the runmode.
 
 This options allows you to specify a directory (or an array of directories) to
 search when this module is loaded and then compile all files found into memory.
-This provides a speed boost in persistant environments (mod_perl, fast-cgi) and
+This provides a speed boost in persistent environments (mod_perl, fast-cgi) and
 can improve memory usage in environments that use shared memory (mod_perl).
 
 =item TEMPLATE_PRECOMPILE_FILETEST
@@ -616,7 +622,7 @@ $file = shift; ... } ).
 =head2 tt_obj
 
 This method will return the underlying Template Toolkit object that is used
-behind the scenes.  It is usually not necesary to use this object directly,
+behind the scenes.  It is usually not necessary to use this object directly,
 as you can process templates and configure the Template object through
 the tt_process and tt_config methods.  Every call to this method will
 return the same object during a single request.
@@ -630,9 +636,9 @@ in the processing of every call to tt_process.  It is important to note that
 the parameters defined using tt_params will be passed to every template that is
 processed during a given request cycle.  Usually only one template is processed
 per request, but it is entirely possible to call tt_process multiple times with
-different templates.  Everytime tt_process is called, the hashref of parameters
+different templates.  Every time tt_process is called, the hashref of parameters
 passed to tt_process will be merged with the parameters set using the tt_params
-method.  Parameters passed through tt_process will have precidence in case of
+method.  Parameters passed through tt_process will have precedence in case of
 duplicate parameters.
 
 This can be useful to add global values to your templates, for example passing
@@ -648,7 +654,6 @@ the user's name automatically if they are logged in.
 
 This method will clear all the currently stored parameters that have been set with
 tt_params.
-
 
 =head2 tt_pre_process
 
@@ -689,7 +694,6 @@ It will be passed a scalar reference to the processed template.
 
 If you are using CGI::Application 4.0 or greater, you can also register this as a callback (See
 tt_pre_process for an example of how to use it).
-
 
 =head2 tt_template_name
 
@@ -733,11 +737,10 @@ you if you do not pass a template name, so the above can be reduced to this:
  }
 
 Since the path is generated based on the name of the module, you could place all of your templates
-in the same directory as your perl modules, and then pass @INC as your INCLUDE_PATH parameter.
+in the same directory as your Perl modules, and then pass @INC as your INCLUDE_PATH parameter.
 Whether that is actually a good idea is left up to the reader.
 
  $self->tt_include_path(\@INC);
-
 
 =head2 tt_include_path
 
@@ -778,12 +781,11 @@ plugin, which gives easy access to the very powerful prototype.js JavaScript lib
   <a href="#" onclick="javascript:[% c.prototype.visual_effect( 'Appear', 'extra_info' ) %] return false;">Extra Info</a>
   <div style="display: none" id="extra_info">Here is some more extra info</div>
 
-With this extra flexibility comes some responsibilty as well.  It could lead down a
+With this extra flexibility comes some responsibility as well.  It could lead down a
 dangerous path if you start making alterations to your object from within the template.
 For example you could call c.header_add to add new outgoing headers, but that is something
 that should be left in your code, not in your template.  Try to limit yourself to
 pulling in information into your templates (like the session example above does).
-
 
 =head1 EXAMPLE
 
@@ -793,11 +795,11 @@ In a CGI::Application module:
 
   use CGI::Application::Plugin::TT;
   use base qw(CGI::Application);
-  
+
   # configure the template object once during the init stage
   sub cgiapp_init {
     my $self = shift;
- 
+
     # Configure the template
     $self->tt_config(
               TEMPLATE_OPTIONS => {
@@ -809,10 +811,10 @@ In a CGI::Application module:
               },
     );
   }
- 
+
   sub cgiapp_prerun {
     my $self = shift;
- 
+
     # Add the username to all templates if the user is logged in
     $self->tt_params(username => $ENV{REMOTE_USER}) if $ENV{REMOTE_USER};
   }
@@ -831,7 +833,7 @@ In a CGI::Application module:
   sub tt_post_process {
     my $self    = shift;
     my $htmlref = shift;
- 
+
     # clean up the resulting HTML
     require HTML::Clean;
     my $h = HTML::Clean->new($htmlref);
@@ -840,43 +842,42 @@ In a CGI::Application module:
     $$htmlref = $$newref;
     return;
   }
- 
- 
+
+
   sub my_runmode {
     my $self = shift;
- 
+
     my %params = (
             foo => 'bar',
     );
- 
+
     # return the template output
     return $self->tt_process('my_runmode.tmpl', \%params);
   }
 
   sub my_otherrunmode {
     my $self = shift;
- 
+
     my %params = (
             foo => 'bar',
     );
- 
+
     # Since we don't provide the name of the template to tt_process, it
     # will be auto-generated by a call to $self->tt_template_name,
     # which will result in a filename of 'Example/my_otherrunmode.tmpl'.
     return $self->tt_process(\%params);
   }
 
-
 =head1 SINGLETON SUPPORT
 
 Creating a Template Toolkit object can be an expensive operation if it needs to be done for every
 request.  This startup cost increases dramatically as the number of templates you use
 increases.  The reason for this is that when TT loads and parses a template, it
-generates actual perlcode to do the rendering of that template.  This means that the rendering of
+generates actual Perl code to do the rendering of that template.  This means that the rendering of
 the template is extremely fast, but the initial parsing of the templates can be inefficient.  Even
-by using the builting caching mechanism that TT provides only writes the generated perl code to
+by using the built-in caching mechanism that TT provides only writes the generated Perl code to
 the filesystem.  The next time a TT object is created, it will need to load these templates from disk,
-and eval the sourcecode that they contain.
+and eval the source code that they contain.
 
 So to improve the efficiency of Template Toolkit, we should keep the object (and hence all the compiled
 templates) in memory across multiple requests.  This means you only get hit with the startup cost
@@ -894,11 +895,10 @@ configurations for different CGI::Application modules if you require it.  If you
 CGI::Application applications to share the same Template Toolkit object, just create a Base class that
 calls tt_config to configure the plugin, and have all of your applications inherit from this Base class.
 
-
 =head1 SINGLETON EXAMPLE
 
   package My::App;
-  
+
   use base qw(CGI::Application);
   use CGI::Application::Plugin::TT;
   My::App->tt_config(
@@ -906,17 +906,17 @@ calls tt_config to configure the plugin, and have all of your applications inher
                         POST_CHOMP   => 1,
               },
   );
- 
+
   sub cgiapp_prerun {
     my $self = shift;
- 
+
     # Set the INCLUDE_PATH (will change the INCLUDE_PATH for
     # all subsequent requests as well, until tt_include_path is called
     # again)
     my $basedir = '/path/to/template/files/',
     $self->tt_include_path( [$basedir.$ENV{SERVER_NAME}, $basedir.'default'] );
   }
- 
+
   sub my_runmode {
     my $self = shift;
 
@@ -935,12 +935,6 @@ calls tt_config to configure the plugin, and have all of your applications inher
     return $self->tt_process({ param2 => 'value2' });
   }
 
-
-=head1 AUTHOR
-
-Cees Hek <ceeshek@gmail.com>
-
-
 =head1 BUGS
 
 Please report any bugs or feature requests to
@@ -948,23 +942,23 @@ C<bug-cgi-application-plugin-tt@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
 be notified of progress on your bug as I make changes.
 
-
 =head1 CONTRIBUTING
 
 Patches, questions and feedback are welcome.
-
 
 =head1 SEE ALSO
 
 L<CGI::Application>, L<Template>, perl(1)
 
+=head1 AUTHOR
 
-=head1 LICENSE
+Cees Hek <cees@crtconsulting.ca>
 
-Copyright (C) 2005 Cees Hek, All Rights Reserved.
+=head1 COPYRIGHT AND LICENSE
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This software is copyright (c) 2024 by Cees Hek.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

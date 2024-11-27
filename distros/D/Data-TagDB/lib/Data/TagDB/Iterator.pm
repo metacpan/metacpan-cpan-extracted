@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 
 
@@ -65,6 +65,23 @@ sub one {
 }
 
 
+sub none {
+    my ($self) = @_;
+    my $ent = $self->next;
+
+    $self->finish;
+
+    croak 'Iterator non-empty' if defined $ent;
+}
+
+
+sub map {
+    my ($self, $apply, %opts) = @_;
+
+    return Data::TagDB::Iterator::_Mapped->new($self, $apply);
+}
+
+
 sub collect {
     my ($self, $apply, %opts) = @_;
     my @ret;
@@ -98,6 +115,36 @@ sub collect {
     return @ret;
 }
 
+package Data::TagDB::Iterator::_Mapped {
+    use parent -norequire, 'Data::TagDB::Iterator';
+
+    sub new {
+        my ($pkg, $parent, $apply) = @_;
+
+        unless (ref $apply) {
+            my $funcname = $apply;
+            $apply = sub { $_[0]->can($funcname)->(@_) };
+        }
+
+        return $pkg->SUPER::new(db => $parent->db, parent => $parent, apply => $apply);
+    }
+
+    sub next {
+        my ($self, @args) = @_;
+        my $ent = $self->{parent}->next(@args);
+        my $apply = $self->{apply};
+
+        return undef unless defined $ent;
+
+        return $ent->$apply();
+    }
+
+    sub finish {
+        my ($self, @args) = @_;
+        return $self->{parent}->finish(@args);
+    }
+};
+
 1;
 
 __END__
@@ -112,7 +159,7 @@ Data::TagDB::Iterator - Work with Tag databases
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -167,6 +214,23 @@ Automatically finishes the iterator.
 Returns one entry from the iterator and finishes.
 This is most useful when you expect there to be exactly one entry.
 This function dies if no entry is returned. So It is guaranteed that this function returns non-C<undef>.
+
+=head2 none
+
+    $iter->none;
+
+This method dies if there is an entry left in the iterator.
+This finishes the iterator.
+This is most useful to assert that something is not present.
+
+=head2 map
+
+    my Data::TagDB::Iterator $mapped = $iter->map('method');
+    # or:
+    my Data::TagDB::Iterator $mapped = $iter->map(sub { ... });
+
+Returns a new iterator that contains the entries mapped by a filter.
+If the filter is a simple string it is as a method name to be called on the object.
 
 =head2 collect
 

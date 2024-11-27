@@ -2,7 +2,7 @@ requires 'namespace::clean';
 requires 'perl', '5.024000';
 requires 'Log::Any';
 requires 'Moo';
-requires 'Ouch';
+requires 'Ouch', '0.0500';
 requires 'Path::Tiny';
 requires 'Template::Perlish';
 requires 'Try::Catch';

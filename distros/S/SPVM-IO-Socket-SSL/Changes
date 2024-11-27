@@ -1,4 +1,14 @@
-0.003 2024-11-25
+0.004 2024-11-25
+  [New Features]
+    * Add IO::Socket::SSL#ssl method.
+  [Changes]
+    * SSL_honor_cipher_order is set to 1 if a socket is server and this option is not specified.
+  [Incompatible Changes]
+    * Remove SSL_passwd_cb option from IO::Socket::SSL#init method.
+    * Remove IO::Socket::SSL#get_session_reused method.
+    * Remove SSL_ticket_keycb option.
+    * Remove SSL_npn_protocols option.
+0.003 2024-11-27
   [New Features]
     * Add IO::Socket::SSL#dump_peer_certificate method.
     * Add IO::Socket::SSL#next_proto_negotiated method.
@@ -19,7 +29,6 @@
     * IO::Socket::SSL#connect_SSL becomes a public method.
     * IO::Socket::SSL#accept_SSL becomes a public method.
     * If a socket is for a server, SSL_verify_mode is set to SSL_VERIFY_NONE.
-    
 0.002 2024-11-23
   [New Features]
     * Add SSL_version option to IO::Socket::SSL#init method.

@@ -1,6 +1,6 @@
 package SPVM::IO::Socket::SSL;
 
-our $VERSION = "0.003";
+our $VERSION = "0.004";
 
 1;
 
@@ -37,7 +37,9 @@ L<IO::Socket::IP|SPVM::IO::Socket::IP>
 
 =head2 ssl
 
-C<has ssl : L<Net::SSLeay|SPVM::Net::SSLeay>;>
+C<has ssl : ro L<Net::SSLeay|SPVM::Net::SSLeay>;>
+
+A L<Net::SSLeay|SPVM::Net::SSLeay> object.
 
 =head2 SSL_version
 
@@ -67,10 +69,6 @@ C<has SSL_check_crl : int;>
 
 C<has SSL_crl_file : string;>
 
-=head2 SSL_passwd_cb
-
-C<has SSL_passwd_cb : L<Net::SSLeay::Callback::PemPasswd|SPVM::Net::SSLeay::Callback::PemPasswd>;>
-
 =head2 SSL_server
 
 C<has SSL_server : int;>
@@ -79,17 +77,9 @@ C<has SSL_server : int;>
 
 C<has SSL_server_specified : int;>
 
-=head2 SSL_npn_protocols
-
-C<has SSL_npn_protocols : string[];>
-
 =head2 SSL_alpn_protocols
 
 C<has SSL_alpn_protocols : string[];>
-
-=head2 SSL_ticket_keycb
-
-C<has SSL_ticket_keycb : L<Net::SSLeay::Callback::TlsextTicketKey|SPVM::Net::SSLeay::Callback::TlsextTicketKey>;>
 
 =head2 SSL_startHandshake
 
@@ -133,15 +123,9 @@ Options:
 
 =item * SSL_crl_file : string
 
-=item * SSL_passwd_cb : L<Net::SSLeay::Callback::PemPasswd|SPVM::Net::SSLeay::Callback::PemPasswd>
-
 =item * SSL_server : Int
 
-=item * SSL_npn_protocols : string[]
-
 =item * SSL_alpn_protocols : string[]
-
-=item * SSL_ticket_keycb : L<Net::SSLeay::Callback::TlsextTicketKey|SPVM::Net::SSLeay::Callback::TlsextTicketKey>
 
 =item * SSL_startHandshake : Int = 1
 
@@ -253,16 +237,6 @@ C<method alpn_selected : string ();>
 
 Calls L<Net::SSLeay#get0_alpn_selected|SPVM::Net::SSLeay/"get0_alpn_selected"> method given appropriate arguments, converts the value of output argument to a string of appropriate length, and retunrs it.
 
-=head2 get_session_reused
-
-C<method get_session_reused : int ();>
-
-Calls L<Net::SSLeay#session_reused|SPVM::Net::SSLeay/"session_reused"> method given the value of L</"ssl"> field, and returns its return value.
-
-Exceptions:
-
-Exceptions thrown by L<Net::SSLeay#session_reused|SPVM::Net::SSLeay/"session_reused"> method could be thrown.
-
 =head2 get_sslversion
 
 C<method get_sslversion : string ();>
@@ -337,6 +311,24 @@ C<method get_fingerprint : string ($algo : string = undef, $cert : L<Net::SSLeay
 
 Returns the same output of Perl's L<IO::Socket::SSL|/"get_fingerprint"> method.
 
+=head1 FAQ
+
+=head2 How to create a Net::SSLeay::X509 object for SSL_ca option from the return value of Mozilla::CA#SSL_ca method.
+  
+  use Mozilla::CA;
+  use Net::SSLeay::BIO;
+  use Net::SSLeay::PEM;
+  
+  my $ca = Mozilla::CA->SSL_ca;
+  
+  my $bio = Net::SSLeay::BIO->new;
+  
+  $bio->write($ca);
+  
+  my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
+  
+  my $SSL_ca = $x509;
+  
 =head1 Repository
 
 L<SPVM::IO::Socket::SSL - Github|https://github.com/yuki-kimoto/SPVM-IO-Socket-SSL>

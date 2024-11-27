@@ -1,5 +1,12 @@
 Revision history for perl distribution Archive-SCS
 
+1.05 - 2024-11-26
+
+  - Change the search order for the install dir to search paths provided as
+    environment variable first rather than last
+
+  - Add -V option to scs_archive (alias for --version)
+
 1.04 - 2024-06-20
 
   - Harden scs_archive tool against path traversal (CWE-22)

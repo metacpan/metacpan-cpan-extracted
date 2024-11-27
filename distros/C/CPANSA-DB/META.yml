@@ -3,7 +3,6 @@ abstract: 'the CPAN Security Advisory data as a Perl data structure, mostly for 
 author:
   - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
-  Data::Rx: '0'
   Test::More: '1'
   YAML::XS: '0'
 configure_requires:
@@ -27,5 +26,5 @@ resources:
   bugtracker: https://github.com/briandfoy/cpan-security-advisory/issues
   homepage: https://github.com/briandfoy/cpan-security-advisory
   repository: https://github.com/briandfoy/cpan-security-advisory
-version: '20241125.001'
+version: '20241126.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

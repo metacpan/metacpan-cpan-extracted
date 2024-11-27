@@ -26,17 +26,17 @@ like($@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E
 {
   my $ret = $map->get_node_by_name('Guoyuan');
   isa_ok( $ret,      'Map::Tube::Node' );
-  is( $ret->id( ),   'BT09', 'Node id not correct for Guoyuan' );
+  is( $ret->id( ),   's_guoyuan', 'Node id not correct for Guoyuan' );
   is( $ret->name( ), 'Guoyuan', 'Node name not correct for Guoyuan' );
-  is( $ret->link( ), 'BT08,BT10', 'Links not correct for Guoyuan' );
-  is( join( ',', sort map { $_->name( ) } @{ $ret->line( ) } ),  'Batong Line', 'Line(s) not correct for Guoyuan' );
+  is( $ret->link( ), 's_jiukeshu,s_tongzhoubeiyuan', 'Links not correct for Guoyuan' );
+  is( join( ',', sort map { $_->name( ) } @{ $ret->line( ) } ),  'Line 1 and Batong Line', 'Line(s) not correct for Guoyuan' );
 }
 
 {
-  my $ret = $map->get_node_by_id('BT09');
+  my $ret = $map->get_node_by_id('s_guoyuan');
   isa_ok( $ret,      'Map::Tube::Node' );
-  is( $ret->id( ),   'BT09',    'Node id not correct for BT09' );
-  is( $ret->name( ), 'Guoyuan', 'Node name not correct for BT09' );
+  is( $ret->id( ),   's_guoyuan', 'Node id not correct for s_guoyuan' );
+  is( $ret->name( ), 'Guoyuan',   'Node name not correct for s_guoyuan' );
 }
 
 {
@@ -44,25 +44,25 @@ like($@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E
   isa_ok( $stationref, 'ARRAY' );
   my @stations = @{ $stationref };
   isa_ok( ref($stations[0]), 'Map::Tube::Node' );
-  is( scalar(@stations), 290, 'Number of stations incorrect for map' );
-  like( join( ',', sort map { $_->name( ) } @stations ),  qr(^Agricultural.*Zhuxinzhuang$), 'Stations not correct for map' );
+  is( scalar(@stations), 398, 'Number of stations incorrect for map' );
+  like( join( ',', sort map { $_->name( ) } @stations ),  qr(^Agricultural.*Zuojiazhuang$), 'Stations not correct for map' );
 }
 
 {
-  my $stationref = $map->get_stations('Batong Line');
+  my $stationref = $map->get_stations('Line 1 and Batong Line');
   isa_ok( $stationref, 'ARRAY' );
   my @stations = @{ $stationref };
   isa_ok( ref($stations[0]), 'Map::Tube::Node' );
-  is( scalar(@stations), 13, 'Number of stations incorrect for line Batong Line' );
-  like( join( ',', sort map { $_->name( ) } @stations ),  qr(^Baliqiao.*Tuqiao$), 'Stations not correct for line Batong Line -- station indexes still have to be added' );
+  is( scalar(@stations), 36, 'Number of stations incorrect for Line 1 and Batong Line' );
+  like( join( ',', sort map { $_->name( ) } @stations ),  qr(^Babaoshan.*Yuquan Lu$), 'Stations not correct for Line 1 and Batong Line' );
 }
 
 {
-  my $stationref = $map->get_next_stations( 'Dawanglu' );
+  my $stationref = $map->get_next_stations( 'Dawang Lu' );
   isa_ok( $stationref, 'ARRAY' );
   my @stations = @{ $stationref };
   isa_ok( $stations[0], 'Map::Tube::Node' );
-  is( scalar(@stations), 4, 'Number of neighbouring stations incorrect for Dawanglu' );
-  like( join( ',', sort map { $_->name( ) } @stations ), qr(^Guomao.*Sihui$), 'Neighbouring stations not correct for Dawanglu -- station indexes still have to be added' );
+  is( scalar(@stations), 4, 'Number of neighbouring stations incorrect for Dawang Lu' );
+  is( join( ',', sort map { $_->name( ) } @stations ), 'Guomao,Jintai Lu,Jiulongshan,Sihui', 'Neighbouring stations not correct for Dawang Lu' );
 }
 

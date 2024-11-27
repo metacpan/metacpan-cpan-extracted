@@ -1,9 +1,48 @@
 ==================================================
-Changes from 2022-06-21 00:00:00 +0000 to present.
+Changes from 2022-11-27 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 5.3 at 2024-06-20 21:10:30 +0000
+version 5.4 at 2024-11-26 20:01:04 +0000
+----------------------------------------
+
+  Change: 5af3b79a294614272c84c4caff77ad247bd87a33
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-11-26 11:59:13 +0000
+
+    Prepping 5.4 Release
+
+    * Add a test for the IETF syslog-proto23 bug * Bump version 
+
+  Change: 6d2e44764f8d7d03d8beaae7434c66dbbb077b8a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-11-26 11:40:43 +0000
+
+    Bugfix: IETF-syslog-proto23
+
+    This addresses an issue parsing IETF Syslog Protocol 23 formatted messages.
+    It adds a positive look-ahead to check if the preamble "version" number is
+    followed by a space. This differentiates the start of an RFC-3339 date
+    string from that of a version string. I.E. it assumes, there is a space
+    between the version number and date string. 
+
+  Change: 204b56834f5e0181bb68b03f719b7e301c5a38b4
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-11-26 11:40:43 +0000
+
+    ci: -m Updates for the benchmark tool 
+
+  Change: 268f5a6e413b477b0b7cc374623361cbf9e5b8f2
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-09-18 17:09:34 +0000
+
+    Parse podman health status messages smarter
+
+    * Updates the K/V Regexp to stop if it detects a `[` or `(` * Adds a test
+    for the Podman health status output 
+
+----------------------------------------
+version 5.3 at 2024-06-20 21:09:27 +0000
 ----------------------------------------
 
   Change: 403cddd9b4b685f8cc53817fb7d4695c20e2a354
@@ -162,66 +201,6 @@ version 5.1 at 2024-05-24 18:17:59 +0000
 
     Attempt to enable GitHub Actions to run the test suite. 
 
-----------------------------------------
-version 5.0 at 2022-11-14 04:46:30 +0000
-----------------------------------------
-
-  Change: 6ca871f422f19a4374187a3a78e0066db774fd47
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-11-13 20:46:30 +0000
-
-    Updates for the 5.0 Release
-
-    Breaking Changes ================
-
-    * Shipping with `RFC5424StructuredData` enabled and set to true.
-
-    The biggest effect this could have on users, is the `content` field is now
-    stripped of the components of RFC structured data.
-
-    Given:
-
-    ``` <163>Jul 26 15:50:14 ether janus foobar[4291]: [lvl=2] [foo x=1] some
-    content [bar x=2] ```
-
-    The old behavior with the defaults would produce the following:
-
-    ``` content => '[lvl=2] [foo x=1] some content [bar x=2]', ```
-
-    As of 5.x, this is changed and will now produce:
-
-    ``` content => 'some content', SDATA => {
-
-    bar => {
-
-    x => 2,
-
-    },
-
-    foo => {,
-
-    x => 1,
-
-    },
-
-    lvl => 2, }, ```
-
-    The intent is this change makes the module even more useful as it defaults
-    to parsing structured data correctly according to the RFC. To restore the
-    prior functionality, you can disable this feature.
-
-    ``` $Parse::Syslog::Line::RFC5424StructuredData = 0; ```
-
-    Improvements ============
-
-    * Make `JSON::MaybeXS` a requirement, recommend `Cpanel::JSON::XS` * Remove
-    all `use JSON` from the code * Split up the k/v regex using `/x` so it's
-    more maintainable * Add support for simplistic RFC structured data, ala,
-    `[group k=v]` * Add tests for the RFC structured data parsing * Add
-    `RFC5424StructuredDataStrict` and tests for strict parsing * Squelch
-    warnings in tests and benchmarks * Document environment variables that
-    interact with `Parse::Syslog::Line` 
-
 =================================================
-Plus 37 releases after 2022-06-21 00:00:00 +0000.
+Plus 39 releases after 2022-11-27 00:00:00 +0000.
 =================================================

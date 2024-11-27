@@ -1,5 +1,8 @@
 Revision history for WebService-GarminConnect
 
+1.1.2   2024-11-26
+        - Change User-Agent header to keep up with Garmin
+
 1.1.1   2023-10-19
         - Cache the Garmin API access token (thanks noduck!)
         - Add a CONTRIBUTORS file

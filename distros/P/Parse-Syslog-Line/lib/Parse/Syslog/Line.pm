@@ -17,7 +17,7 @@ use Module::Loaded qw( is_loaded );
 use POSIX          qw( strftime tzset );
 use Ref::Util      qw( is_arrayref );
 
-our $VERSION = '5.3';
+our $VERSION = '5.4';
 
 # Default for Handling Parsing
 our $DateParsing     = 1;
@@ -121,8 +121,8 @@ our %EXPORT_TAGS = (
 # Regex to Extract Data
 const my %RE => (
     IPv4            => qr/(?>(?:[0-9]{1,3}\.){3}[0-9]{1,3})/,
-    preamble        => qr/^\<(\d+)\>(\d{0,2})\s*/,
-    year            => qr/^(\d{4}) /,
+    preamble        => qr/^\<(\d+)\>(\d{0,2}(?=\s))?\s*/,
+    year            => qr/^(\d{4})\s/,
     date            => qr/(?<date>[A-Za-z]{3}\s+[0-9]+\s+[0-9]{1,2}(?:\:[0-9]{2}){1,2})/,
     date_long => qr/
             (?:[0-9]{4}\s+)?                # Year: Because, Cisco
@@ -143,7 +143,7 @@ const my %RE => (
             (?:[Zz]|[+\-][0-9]{2}\:[0-9]{2}) # UTC Offset +DD:MM or 'Z' indicating UTC-0
     )/x,
     host            => qr/\s*(?<host>[^:\s]+)\s+/,
-    cisco_hates_you => qr/\s*[0-9]*:\s+/,
+    cisco_detection => qr/\s*[0-9]*:\s+/,
     program_raw     => qr/\s*([^\[][^:]+)(?<program_sep>:|\s-)\s+/,
     program_name    => qr/(.[^\[\(\ ]*)(.*)/,
     program_sub     => qr/(?>\(([^\)]+)\))/,
@@ -163,7 +163,7 @@ const my %RE => (
             )                                   # RETURN: Value, could be one word, or several
             (?=                                 # Zero width positive look-ahead
                 (?:                             # Clustering, non-grouping group one of:
-                    \s*[,;]                     #   Space, comma, or semicolon
+                    \s*[,;(\[]                  #   Space, comma, semicolon, open bracket or paren
                     |$                          #   End of string
                     |\s+[a-zA-Z\.0-9\-_]+=      #   A word, followed by an equal sign
                 )
@@ -344,8 +344,8 @@ sub parse_syslog_line {
     }
 
     # Find weird cisco dates
-    if( $raw_string =~ s/^$RE{cisco_hates_you}//o ) {
-        # Yes, Cisco adds a second timestamp to it's messages, because it hates you.
+    if( $raw_string =~ s/^$RE{cisco_detection}//o ) {
+        # Yes, Cisco adds a second timestamp to it's messages, because ...
         if( $raw_string =~ s/^$RE{date_long}//o ) {
             # Cisco encodes the status of NTP in the second datestamp, so let's pass it back
             if ( my $ntp = $1 ) {
@@ -594,7 +594,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 =head1 VERSION
 
-version 5.3
+version 5.4
 
 =head1 SYNOPSIS
 

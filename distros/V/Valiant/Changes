@@ -1,5 +1,11 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002007 2024 November 26
+          - attempted fix for issue with changes to boolean module that broke the tests
+          - new 'validate_only' method that lets you run validations only for a specific
+            attribute or arrayref of attributes.  Useful for AJAX stuff form field updates
+            or when you want very fine tuned or custom control over validation.
+
 0.002006 2024 October 27
           - Fixed issue where legend_for tag didn't respect custom attributes
           - More control options over how errors are displayed in the formbuilder

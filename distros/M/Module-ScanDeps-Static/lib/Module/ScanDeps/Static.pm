@@ -3,7 +3,7 @@ package Module::ScanDeps::Static;
 use strict;
 use warnings;
 
-our $VERSION = '1.006';
+require Module::ScanDeps::VERSION;
 
 use 5.010;
 
@@ -57,7 +57,7 @@ Readonly my $NEWLINE      => qq{\n};
 Readonly my $SLASH        => q{/};
 Readonly my $SPACE        => q{ };
 
-Readonly my $DEFAULT_MIN_CORE_VERSION => '5.8.9';
+Readonly my $DEFAULT_MIN_CORE_VERSION => $PERL_VERSION;
 
 our $HAVE_VERSION = eval {
   require version;
@@ -157,6 +157,17 @@ sub get_module_version {
 }
 
 ########################################################################
+sub min_core_version {
+########################################################################
+  my ($self) = @_;
+
+  my $min_core_version = $self->get_min_core_version;
+  $min_core_version = $min_core_version =~ /^v/xsm ? $min_core_version : "v$min_core_version";
+
+  return version->parse($min_core_version)->numify;
+}
+
+########################################################################
 sub is_core {
 ########################################################################
   my ( $self, $module_w_version ) = @_;
@@ -170,21 +181,22 @@ sub is_core {
   if (@ms) {
     my $first_release = Module::CoreList->first_release($module);
 
-    my $first_release_version = version->parse($first_release);
-    my $min_core_version      = $self->get_min_core_version;
+    my $removed_version = Module::CoreList->removed_from($module);
+
+    my $min_core_version = $self->min_core_version();
 
     # consider a module core if its first release was less than some
     # version of Perl. This is done because CPAN testers don't seem to
     # test modules against Perls that are older than 5.8.9 - however,
     # some modules like JSON::PP did not appear until after 5.10
 
-    # print {*STDERR} "$module: $first_release_version $min_core_version\n";
-
-    $core = version->parse($first_release_version) <= version->parse($min_core_version) ? 1 : 0;
-
+    if ($removed_version) {
+      $core = $removed_version > $min_core_version;
+    }
+    elsif ($first_release) {
+      $core = $first_release <= $min_core_version;
+    }
   }
-
-  # print {*STDERR} "$module: [$core]\n";
 
   return $core;
 }
@@ -724,16 +736,16 @@ sub main {
   );
 
   my @option_specs = qw(
-    json|j
-    text|t
-    core!
-    min-core-version|m=s
     add-version|a!
-    include-require|i!
+    core!
     help|h
-    separator|s=s
-    version|v
+    include-require|i!
+    json|j
+    min-core-version|m=s
     raw|r
+    separator|s=s
+    text|t
+    version|v
   );
 
   GetOptions( \%options, @option_specs );
@@ -749,10 +761,9 @@ sub main {
 
   if ( $options{'help'} ) {
     pod2usage(
-      -exitval  => 1,
-      -input    => pod_where( { -inc => 1 }, __PACKAGE__ ),
-      -sections => 'USAGE|VERSION',
-      -verbose  => 99,
+      -exitval => 1,
+      -input   => pod_where( { -inc => 1 }, __PACKAGE__ ),
+      -verbose => 1,
     );
   }
 
@@ -783,13 +794,17 @@ Module::ScanDeps::Static - a cleanup of rpmbuild's perl.req
 
 =head1 SYNOPSIS
 
+ scandeps-static.pl [options] Module
+
+If "Module" is not provided, the script will read from STDIN.
+
  my $scanner = Module::ScanDeps::Static->new({ path => 'myfile.pl' });
  $scanner->parse;
  print $scanner->format_text;
 
 =head1 DESCRIPTION
 
-This module is a mashup (and cleanup) of the `/usr/lib/rpm/perl.req`
+This module is a mashup (and cleanup) of the F</usr/lib/rpm/perl.req>
 file found in the rpm build tools library (see L</LICENSE>) below.
 
 Successful identification of the required Perl modules for a module or
@@ -805,18 +820,25 @@ Perl script or module.  It's not perfect and the regular expressions
 could use some polishing, but it works on a broad enough set of
 situations as to be useful.
 
-I<NOTE: Only direct dependencies are returned by this module. If you
-want a recursive search for dependencies, use C<scandeps.pl>>
+I<Only direct dependencies are returned by this module. If you
+want a recursive search for dependencies, use C<find-requires.pl>
+included in this distribution.>
 
-I<!!EXPERIMENTAL!!>
+=head1 OPTIONS
 
-I<The methods and output of this module are subject to revision!>
-
-=head1 USAGE
-
- scandeps-static.pl [options] Module
-
-If "Module" is not provided, the script will read from STDIN.
+ --add-version, -a        add version numbers to output
+ --no-add-version         don't add version numbers to output
+ --core                   include core modules (default)
+ --no-core                don't include core modules
+ --help, -h               help
+ --include-require, -i    include 'require'd modules
+ --no-include-require     don't include required modules
+ --json, -j               output JSON formatted list
+ --min-core-version, -m   minimum version of perl to consider core
+ --raw, -r                raw output
+ --separator, -s          separator for output (default: =>)
+ --text, -t               output as text (default)
+ --version, -v            verion
 
 =head2 Examples
 
@@ -824,7 +846,10 @@ If "Module" is not provided, the script will read from STDIN.
 
  scandeps-static.pl --json $(which scandeps-static.pl)
 
-=head2 Options
+I<Use the C<find-requires> script included in this distribution to
+recurse directories and create dependency files like C<cpanfile>>.
+
+=head1 OPTION DETAILS
 
 =over 5
 
@@ -870,7 +895,7 @@ identify the dependencies for your script B<AND> you know you will be
 using a specific version of Perl, then set the C<min-core-version> to
 that version of Perl.
 
-default: 5.8.9
+default: $PERL_VERSION
 
 =item --separator, -s
 
@@ -889,6 +914,7 @@ default: B<--text>
 
 Output the list with no quotes separated by a single whitespace
 character.
+
 
 =back
 
@@ -916,7 +942,7 @@ Use the C<--include-require> to expand the definition of a dependency
 to any module or Perl script that is the argument of the C<require>
 statement.
 
-=item * Allow detection of the C<parent>, C<base> statemens use of curly braces.
+=item * Allow detection of the C<parent>, C<base> statements use of curly braces.
 
 The regular expression and algorithm in C<parse> has been enhanced to
 detect the use of curly braces in C<use> or C<parent> declarations.
@@ -925,7 +951,8 @@ detect the use of curly braces in C<use> or C<parent> declarations.
 
 Use the C<--no-core> option to ignore core modules.
 
-=item * Add the current version of installed module if version not explicitly specified.
+=item * Add the current version of an installed module if the version
+is not explicitly specified.
 
 =back
 
@@ -1010,7 +1037,8 @@ After calling the C<parse()> method, call this method to retrieve a
 hash containing the dependencies and (potentially) their version
 numbers.
 
- $scanner->parse
+ $scanner->parse;
+ my $requires = $scanner->get_require;
 
 =head2 parse
 
@@ -1034,7 +1062,7 @@ numbers.
 
 =back
 
-Scans the specified input and returns a list Perl modulde dependencies.
+Scans the specified input and returns a list of Perl module dependencies.
 
 Use the C<get_dependencies> method to retrieve the dependencies as a
 formatted string or as a list of dependency objects. Use the
@@ -1064,7 +1092,7 @@ As JSON:
 
  print $scanner->get_dependencies( format => 'text' )
 
- Module::Name >= version
+ Module::Name => version
  ...
 
 In scalar context in the absence of an argument returns a JSON
@@ -1073,23 +1101,23 @@ contain the keys "name" and "version" for each dependency.
 
 =head1 VERSION
 
-1.006
+1.007
 
 =head1 AUTHOR
 
-This module is largely a lift and drop of Ken Este's `perl.req` script
+This module is largely a lift and drop of Ken Este's C<perl.req> script
 lifted from rpm build tools.
 
 Ken Estes Mail.com kestes@staff.mail.com
 
-The method `parse` is a cleaned up version of `process_file` from the
+The method C<parse> is a cleaned up version of C<process_file> from the
 same script.
 
 Rob Lauer - <bigfoot@cpan.org>
 
 =head1 LICENSE
 
-This statement was lifted right from C<perl.req>...
+This statement was lifted directly from C<perl.req>...
 
 =over 10
 

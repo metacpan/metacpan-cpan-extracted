@@ -1,5 +1,8 @@
 Revision history for Perl extension Result-Simple
 
+0.03 2024-11-27T01:18:40Z
+    - Improve docs #1
+
 0.02 2024-11-23T12:18:24Z
     - Fix perl runtime version
 

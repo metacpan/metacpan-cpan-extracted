@@ -1,0 +1,28 @@
+---
+abstract: 'Simple password manager for adding, listing, editing, deleting, and copying passwords to the clipboard'
+author:
+  - 'Luiz Felipe de Castro Vilas Boas <luizfelipecastrovb@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-PasswordManager
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::PBKDF2: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  JSON: '0'
+resources:
+  repository: https://gitlab.com/olooeez/app-passmanager
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

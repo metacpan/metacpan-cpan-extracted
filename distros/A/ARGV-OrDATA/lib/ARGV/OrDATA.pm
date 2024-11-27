@@ -10,11 +10,11 @@ ARGV::OrDATA - Let the diamond operator read from DATA if there's no ARGV
 
 =head1 VERSION
 
-Version 0.004
+Version 0.005
 
 =cut
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 sub import {
     my ($package) = $_[1] || caller;
@@ -34,6 +34,22 @@ sub unimport {
     }
     undef *ORIG;
 }
+
+
+sub is_using_argv {
+    ! is_using_data()
+}
+
+
+sub is_using_data {
+    my ($package) = caller;
+    $package = caller 1 if 'ARGV::OrDATA' eq $package;
+    return do {
+        no strict 'refs';
+        *ARGV eq *{$package . '::DATA' }
+    }
+}
+
 
 =head1 SYNOPSIS
 
@@ -59,6 +75,8 @@ the caller's:
     use ARGV::OrDATA 'My::Module';
 
     while (<>) {  # This reads from My/Module.pm's DATA section.
+        print;
+    }
 
 To restore the old behaviour, you can call the C<unimport> method.
 
@@ -86,7 +104,20 @@ into a file.
 
 =head1 EXPORT
 
-Nothing.
+Nothing. There are 2 subroutines you can call via their fully qualified names,
+though:
+
+=over 4
+
+=item ARGV::OrDATA::is_using_argv()
+
+Returns 0 when ARGV reads from DATA, 0 otherwise.
+
+=item ARGV::OrDATA::is_using_data()
+
+Returns 1 when ARGV reads from DATA, 1 otherwise.
+
+=back
 
 =head1 AUTHOR
 

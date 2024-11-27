@@ -2,7 +2,7 @@ use v5.32;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::GameDir 1.04;
+class Archive::SCS::GameDir 1.05;
 
 use builtin 'trim';
 use stable 0.031 'isa';
@@ -27,15 +27,17 @@ our @LOAD_ORDER = qw(
 );
 
 our @LIBRARY_PATHS = (
-  '~/.steam/steam',
-  '~/.local/share/Steam',
-  '~/.var/app/com.valvesoftware.Steam/.steam/steam',
-  '~/Library/Application Support/Steam',
+  (split /:/, $ENV{STEAM_LIBRARY} // ''),
   eval {
     require Archive::SCS::GameDir::Steam;
     @Archive::SCS::GameDir::Steam::library_paths
   },
-  (split /:/, $ENV{STEAM_LIBRARY} // ''),
+  '~/.steam/steam',
+  '~/.local/share/Steam',
+  '~/.var/app/com.valvesoftware.Steam/.steam/steam',
+  '~/.var/app/com.valvesoftware.Steam/.local/share/Steam',
+  '~/Library/Application Support/Steam',
+  '~/Library/Application Support/SteamApps',
 );
 
 our %GAMES = (
@@ -173,10 +175,10 @@ Archive::SCS::GameDir - Find the game dir and mount its archives
 
 Finds the game install directory inside your home directory.
 
-A number of default locations for the Steam library will be
-searched first. If your Steam library is in a non-standard
+Several default locations for the Steam library will be
+searched. If your Steam library is in a non-standard
 location, there are four different ways in which you can
-supply additional paths to search:
+supply additional paths to search first:
 
 =over
 
@@ -193,12 +195,12 @@ C<@Archive::SCS::GameDir::LIBRARY_PATHS> global variable.
 
 =item *
 
-Install a custom C<Archive::SCS::GameDir::Steam> module that
-sets the global variable C<@library_paths>.
+Set the C<STEAM_LIBRARY> environment variable.
 
 =item *
 
-Set the C<STEAM_LIBRARY> environment variable.
+Install a custom C<Archive::SCS::GameDir::Steam> module that
+sets the global variable C<@library_paths>.
 
 =back
 

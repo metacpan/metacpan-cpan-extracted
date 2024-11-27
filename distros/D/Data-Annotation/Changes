@@ -1,3 +1,6 @@
+0.006  2024-11-27 00:50:56 CET
+   - set minimum version of Ouch to 0.0500, for supporting :trytiny_var
+
 0.004  2024-11-16 10:56:55 CET
    - put builtins at the end to allow for overriding
 

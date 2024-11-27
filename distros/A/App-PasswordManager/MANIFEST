@@ -1,0 +1,15 @@
+.perlcriticrc
+.perltidyrc
+lib/App/PasswordManager.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+script/password_manager
+t/01_basic.t
+t/01_load.t
+t/02_functionality.t
+t/03_pod_syntax.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,6 +1,10 @@
 Revision history for Perl extension Map::Tube::Beijing.
 
-0.11.0 2014-11-10
+0.12.0 2024-11-26
+  - Augmented data with per-line station indexes
+  - Updated lines and stations, adding many
+
+0.11.0 2024-11-10
   - Fixed test 02-xml.t
   - Minor fixes to tests
   - Original code and data were a mess; less messy now.

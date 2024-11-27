@@ -1,3 +1,10 @@
+v0.07  2024-11-27Z
+    - Improved iterator interface
+    - Improved importer
+    - Added Data::TagDB::Cloudlet
+    - Added more discussion of transactions
+    - Improved Data::TagDB::Tutorial::Conventions
+
 v0.06  2024-11-06Z
     - Added Data::TagDB::Exporter
     - Added support in Data::TagDB::Migration to import files and directories

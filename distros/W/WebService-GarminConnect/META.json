@@ -4,7 +4,7 @@
       "Joel Loudermilk <joel@loudermilk.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -61,13 +61,13 @@
          "web" : "https://github.com/jlouder/garmin-connect-perl"
       }
    },
-   "version" : "1.1.1",
+   "version" : "1.1.2",
    "x_contributors" : [
       "Neil Bowers <neil@bowers.com>",
       "Raf D <noduck@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

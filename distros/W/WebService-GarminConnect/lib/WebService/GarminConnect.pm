@@ -12,7 +12,7 @@ use WWW::OAuth;
 use WWW::OAuth::Util qw( form_urldecode );
 #use LWP::ConsoleLogger::Everywhere ();
 
-our $VERSION = '1.1.1'; # VERSION
+our $VERSION = '1.1.2'; # VERSION
 
 =head1 NAME
 
@@ -20,7 +20,7 @@ WebService::GarminConnect - Access data from Garmin Connect
 
 =head1 VERSION
 
-version 1.1.1
+version 1.1.2
 
 =head1 SYNOPSIS
 
@@ -91,8 +91,7 @@ sub _login {
   # Bail out if we're already logged in.
   return if defined $self->{is_logged_in};
 
-  my $ua = LWP::UserAgent->new(agent => 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) ' .
-                                        'AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148');
+  my $ua = LWP::UserAgent->new(agent => 'GCM-iOS-5.7.2.1');
   $ua->cookie_jar( {} );
   push @{ $ua->requests_redirectable }, 'POST';
 

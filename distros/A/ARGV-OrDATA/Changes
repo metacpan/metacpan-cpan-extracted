@@ -1,5 +1,8 @@
 Revision history for ARGV-OrDATA
 
+0.005   2024-11-27
+        New subroutines: is_using_data and is_using_argv.
+
 0.004   2019-01-05
         Use IO::Pty if available instead of skipping tests.
 

@@ -1,2 +1,6 @@
+0.02 2024-11-26T15:50:21+01:00
+ - Fix fetching of number of pages.
+ - Rewrite queries to accept 'mul' language.
+
 0.01 2023-10-27T20:20:31+02:00
  - First version.

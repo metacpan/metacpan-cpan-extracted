@@ -23,10 +23,13 @@ no_index:
 provides:
   Module::ScanDeps::FindRequires:
     file: lib/Module/ScanDeps/FindRequires.pm
-    version: '1.006'
+    version: '0'
   Module::ScanDeps::Static:
     file: lib/Module/ScanDeps/Static.pm
-    version: '1.006'
+    version: '0'
+  Module::ScanDeps::VERSION:
+    file: lib/Module/ScanDeps/VERSION.pm
+    version: v1.7.0
 requires:
   CLI::Simple: v0.0.4
   Class::Accessor::Fast: '0.51'
@@ -35,5 +38,6 @@ requires:
   Pod::Find: '0'
   Readonly: '2.05'
   perl: '5.010'
-version: '1.006'
+resources: {}
+version: v1.7.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

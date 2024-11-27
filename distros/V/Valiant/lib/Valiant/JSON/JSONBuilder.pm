@@ -4,7 +4,7 @@ use Moo;
 use Carp;
 use Scalar::Util 'blessed';
 use Module::Runtime 'use_module';
-use JSON::MaybeXS ();
+use Cpanel::JSON::XS ();
 use Valiant::HTML::Util::Collection;
 use Valiant::Naming;
 
@@ -48,7 +48,7 @@ has 'json' => (
   lazy => 1,
   default => sub {
     my %args = %{ shift->json_args };
-    return JSON::MaybeXS->new(%args, utf8=>1, pretty=>1);
+    return Cpanel::JSON::XS->new(%args, utf8=>1, pretty=>1);
   },
   handles => {
     encode_json => 'encode',
@@ -63,8 +63,8 @@ sub reset {
   return $self;
 }
 
-sub json_true { JSON::MaybeXS::true() } 
-sub json_false { JSON::MaybeXS::false() }
+sub json_true { Cpanel::JSON::XS::true() } 
+sub json_false { Cpanel::JSON::XS::false() }
 
 sub render_json {
   my ($self) = @_;

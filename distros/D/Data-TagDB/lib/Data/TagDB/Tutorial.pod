@@ -18,7 +18,7 @@ Data::TagDB::Tutorial - Work with Tag databases
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 Overview
 
@@ -37,7 +37,9 @@ I<Specific> tags represent instances of those. For example the planet Earth, the
 
 Tags itself do not hold any data. All data is stored in I<links>.
 
-See also L<Data::TagDB::Tutorial::WellKnown>.
+See also
+L<Data::TagDB::Tutorial::Conventions>,
+L<Data::TagDB::Tutorial::WellKnown>.
 
 =head2 Links
 

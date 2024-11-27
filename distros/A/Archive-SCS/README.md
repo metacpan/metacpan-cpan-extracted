@@ -52,9 +52,7 @@ for example using [Perlbrew](https://perlbrew.pl/) like this:
 ```sh
 \curl -L https://install.perlbrew.pl | bash
 perlbrew install-cpanm
-
-perlbrew install --64int latest
-perlbrew switch latest
+perlbrew install --64int --switch stable
 ```
 
 You'll also need C and C++ compilers. On a Mac, they're included

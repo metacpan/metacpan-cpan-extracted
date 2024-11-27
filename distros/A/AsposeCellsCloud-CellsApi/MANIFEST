@@ -318,6 +318,7 @@ docs/PivotTable.md
 docs/PivotTables.md
 docs/AddTextOptions.md
 docs/BaseOperateOptions.md
+docs/ConvertTextOptions.md
 docs/RemoveCharactersByCharacter.md
 docs/RemoveCharactersByPosition.md
 docs/RemoveCharactersOptions.md
@@ -675,6 +676,7 @@ docs/PostAddTextContentRequest.md
 docs/PostTrimContentRequest.md
 docs/PostUpdateWordCaseRequest.md
 docs/PostRemoveCharactersRequest.md
+docs/PostConvertTextRequest.md
 docs/GetWorkbookDefaultStyleRequest.md
 docs/GetWorkbookTextItemsRequest.md
 docs/GetWorkbookNamesRequest.md
@@ -1081,6 +1083,7 @@ lib/AsposeCellsCloud/Object/PivotTable.pm
 lib/AsposeCellsCloud/Object/PivotTables.pm
 lib/AsposeCellsCloud/Object/AddTextOptions.pm
 lib/AsposeCellsCloud/Object/BaseOperateOptions.pm
+lib/AsposeCellsCloud/Object/ConvertTextOptions.pm
 lib/AsposeCellsCloud/Object/RemoveCharactersByCharacter.pm
 lib/AsposeCellsCloud/Object/RemoveCharactersByPosition.pm
 lib/AsposeCellsCloud/Object/RemoveCharactersOptions.pm
@@ -1438,6 +1441,7 @@ lib/AsposeCellsCloud/Request/PostAddTextContentRequest.pm
 lib/AsposeCellsCloud/Request/PostTrimContentRequest.pm
 lib/AsposeCellsCloud/Request/PostUpdateWordCaseRequest.pm
 lib/AsposeCellsCloud/Request/PostRemoveCharactersRequest.pm
+lib/AsposeCellsCloud/Request/PostConvertTextRequest.pm
 lib/AsposeCellsCloud/Request/GetWorkbookDefaultStyleRequest.pm
 lib/AsposeCellsCloud/Request/GetWorkbookTextItemsRequest.pm
 lib/AsposeCellsCloud/Request/GetWorkbookNamesRequest.pm
