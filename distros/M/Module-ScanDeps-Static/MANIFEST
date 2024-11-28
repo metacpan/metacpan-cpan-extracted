@@ -1,7 +1,7 @@
 bin/scandeps-static.pl
 lib/Module/ScanDeps/FindRequires.pm
 lib/Module/ScanDeps/Static.pm
-lib/Module/ScanDeps/VERSION.pm
+lib/Module/ScanDeps/Static/VERSION.pm
 Makefile.PL
 MANIFEST			This list of files
 postamble

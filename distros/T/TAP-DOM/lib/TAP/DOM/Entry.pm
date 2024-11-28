@@ -1,7 +1,7 @@
 package TAP::DOM::Entry;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Accessors for TAP::DOM line entries
-$TAP::DOM::Entry::VERSION = '0.99';
+$TAP::DOM::Entry::VERSION = '1.000';
 use 5.006;
 use strict;
 use warnings;

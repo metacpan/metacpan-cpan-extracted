@@ -59,7 +59,7 @@ B<Return value>
 sub get_my_info {
     my $self = shift;
 
-    return $self->client()->get("/hr/v2/users/me");
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_specific
@@ -82,7 +82,7 @@ sub get_specific {
     my $self = shift;
     my $user_ref = shift;
 
-    return $self->client()->get("/hr/v2/users/" . $user_ref);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

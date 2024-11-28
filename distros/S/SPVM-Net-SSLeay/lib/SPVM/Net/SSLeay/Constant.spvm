@@ -1259,4 +1259,8 @@ class Net::SSLeay::Constant {
 
   native static method OPENSSL_INIT_NO_ATEXIT : int ();
 
+  native static method TLSEXT_NAMETYPE_host_name : int ();
+
+  native static method EVP_MAX_MD_SIZE : int ();
+
 }

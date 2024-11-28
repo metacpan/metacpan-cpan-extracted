@@ -9,24 +9,19 @@ use Carp;
 use Const::Fast;
 use English qw(-no_match_vars);
 use Exporter;
-use HTTP::Date     qw( str2time );
 use JSON::MaybeXS  qw( decode_json );
 # RECOMMEND PREREQ: Cpanel::JSON::XS
 use Module::Load   qw( load );
 use Module::Loaded qw( is_loaded );
 use POSIX          qw( strftime tzset );
 use Ref::Util      qw( is_arrayref );
+use Time::Moment;
 
-our $VERSION = '5.4';
+our $VERSION = '6.0';
 
 # Default for Handling Parsing
 our $DateParsing     = 1;
-our $DateTimeCreate  = 0;
 our $EpochCreate     = 1;
-our $NormalizeToUTC  = 0;
-our $OutputTimeZone  = 0;
-our $IgnoreTimeZones = 0;
-our $HiResFmt        = '%0.6f';
 
 our $ExtractProgram      = 1;
 our $AutoDetectJSON      = 0;
@@ -35,10 +30,17 @@ our $PruneRaw            = 0;
 our $PruneEmpty          = 0;
 our @PruneFields         = ();
 our $FmtDate;
+our $TimeMomentFormatString = "%FT%T%f%z";
 
 # RFC-5424 Parsing
 our $RFC5424StructuredData       = 1;
 our $RFC5424StructuredDataStrict = 0;
+
+# DEPRECATED Settings
+our $DateTimeCreate;
+our $HiResFmt;
+our $OutputTimeZone;
+our $NormalizeToUTC;
 
 
 my %INT_PRIORITY = (
@@ -122,10 +124,23 @@ our %EXPORT_TAGS = (
 const my %RE => (
     IPv4            => qr/(?>(?:[0-9]{1,3}\.){3}[0-9]{1,3})/,
     preamble        => qr/^\<(\d+)\>(\d{0,2}(?=\s))?\s*/,
-    year            => qr/^(\d{4})\s/,
-    date            => qr/(?<date>[A-Za-z]{3}\s+[0-9]+\s+[0-9]{1,2}(?:\:[0-9]{2}){1,2})/,
+    date            => qr/
+            (?:(?<year>\d{4})\s)?             # Option Year: YYYY
+            (?<date>                          # Whole String
+                (?<month>[A-Za-z]{3})         # Month: Mmm
+                \s+
+                (?<day>[0-9]+)                # Day: DD
+                \s+
+                (?<hour>[0-9]{1,2})
+                    :(?<minute>[0-9]{2})
+                    :(?<second>[0-9]{2})
+                (?:\.                         # Time: .DDD millisecond or .DDDDDD microsecond resolution
+                    (?<highprecision>(?:[0-9]{3}){1,2})
+                )?
+            )
+    /x,
     date_long => qr/
-            (?:[0-9]{4}\s+)?                # Year: Because, Cisco
+            (?:[0-9]{4}\s+)?           # Year: Because, Cisco
             ([.*])?                         # Cisco adds a * for no ntp, and a . for configured but out of sync
             [a-zA-Z]{3}\s+[0-9]+            # Date: Jan  1
             (?:\s+[0-9]{4})?                # Year: Because, Cisco
@@ -135,12 +150,29 @@ const my %RE => (
             (?:\s+[A-Z]{3,4})?              # Timezone, ZZZ or ZZZZ
             (?:\:?)                         # Cisco adds a : after the second timestamp
     /x,
-    date_iso8601    => qr/(?<date_iso8601>
-            [0-9]{4}(?:\-[0-9]{2}){2}        # Date YYYY-MM-DD
-            (?:\s|T)                         # Date Separator T or ' '
-            [0-9]{2}(?:\:[0-9]{2}){1,2}      # Time HH:MM:SS
-            (?:\.(?:[0-9]{3}){1,2})?         # Time: .DDD millisecond or .DDDDDD microsecond resolution
-            (?:[Zz]|[+\-][0-9]{2}\:[0-9]{2}) # UTC Offset +DD:MM or 'Z' indicating UTC-0
+    date_iso8601 => qr/(
+            [0-9]{4}-[0-9]{2}-[0-9]{2}      # Date: YYYY-MM-DD
+            (?:\s|T)                        # Separato: T or ' '
+            [0-9]{2}:[0-9]{2}:[0-9]{2}      # Time: HH:MM:SS
+            \S*                             # Grab the rest since this looks like a date
+    )/x,
+    date_iso8601_capture => qr/(?<date>
+            (?<year>[0-9]{4})                # Date: YYYY-MM-DD
+               -(?<month>[0-9]{2})
+               -(?<day>[0-9]{2})
+            (?:\s|T)                         # Separato: T or ' '
+            (?<hour>[0-9]{2})                # Time: HH:MM:SS
+               :(?<minute>[0-9]{2})
+               :(?<second>[0-9]{2})
+            (?:\.                            # Time: .DDD millisecond or .DDDDDD microsecond resolution
+                (?<highprecision>(?:[0-9]{3}){1,2})
+            )?
+            (?<offset>[Zz]|                  # UTC Offset +DD:MM or 'Z' indicating UTC-0
+                (?<offset_sign>[+\-])
+                (?<offset_hours>[0-9]{2})
+                \:
+                (?<offset_minutes>[0-9]{2})
+            )
     )/x,
     host            => qr/\s*(?<host>[^:\s]+)\s+/,
     cisco_detection => qr/\s*[0-9]*:\s+/,
@@ -202,10 +234,17 @@ const my %RE => (
     quotedstring => qr/"(?:[^"\\]++|\\.)*+"/,
 );
 
+# For Date Translations
+my @MoY = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+my %MoY;
+@MoY{@MoY} = 0..11;
+
+
 
 my %_empty_msg = map { $_ => undef } qw(
     preamble priority priority_int facility facility_int
-    datetime_raw date_raw date time datetime_str datetime_obj epoch
+    datetime_raw date time epoch tz
+    datetime_local datetime_str datetime_utc
     host_raw host domain
     program_raw program_name program_pid program_sub
 );
@@ -245,77 +284,93 @@ sub parse_syslog_line {
 
     #
     # Handle Date/Time
-    my $year;
-    if( $raw_string =~ s/^$RE{year}//o ) {
-        $year = $1;
-    }
+    my %date = ();
     if( $raw_string =~ s/^$RE{date}//o) {
-        $msg{datetime_raw} = $1;
-        $msg{datetime_raw} .= " $year"
-            if $year;
+        $msg{datetime_raw} = $+{date};
+        $msg{datetime_raw} .= " $+{year}"
+            if $+{year};
+        # Copy into the date hash
+        %date = %+;
+        $date{month_abbr} = 1;
     }
     elsif( $raw_string =~ s/^$RE{date_iso8601}//o) {
         $msg{datetime_raw} = $1;
     }
-    if( exists $msg{datetime_raw} && length $msg{datetime_raw} ) {
-        $msg{date_raw} = $msg{datetime_raw};
 
+    # Handle Date Parsing
+    if( exists $msg{datetime_raw} && length $msg{datetime_raw} ) {
         if ( $DateParsing ) {
             # if User wants to fight with dates themselves, let them :)
             if( $FmtDate && ref $FmtDate eq 'CODE' ) {
                 @msg{qw(date time epoch datetime_str)} = $FmtDate->($msg{datetime_raw});
             }
-            else {
-                # Parse the Epoch
-                $msg{epoch} = HTTP::Date::str2time($msg{datetime_raw});
-
-                # Format accordingly, keep highest resolution we can
-                my $diff  = ($msg{epoch} - int($msg{epoch}));
-                my $hires = '';
-                if( $diff ) {
-                    $msg{epoch} = sprintf $HiResFmt, $msg{epoch};
-                    $hires      = substr(sprintf($HiResFmt,$diff),1);
+            elsif ( $msg{datetime_raw} ) {
+                my $tm;
+                if ( %date ) {
+                    delete $date{date};
+                    if ( delete $date{month_abbr} ) {
+                        $date{month} = $MoY{$date{month}} + 1;
+                    }
+                    if ( my $offset = delete $date{offset} ) {
+                        if ( $offset eq 'Z' ) {
+                            $date{offset} = 0;
+                        }
+                        else {
+                            my $sign = delete $date{offset_sign};
+                            my $hours = delete $date{offset_hours};
+                            my $minutes = delete $date{offset_minutes};
+                            $date{offset} = ($sign eq '-' ? -1 : 1)
+                                            * (( $hours * 60 ) + $minutes);
+                        }
+                    }
+                    else {
+                        $date{offset} = Time::Moment->now()->offset;
+                    }
+                    if( my $hp = delete $date{highprecision} ) {
+                        my $len = length($hp);
+                        my $v   = $len <= 3 ? $hp * 1_000_000
+                                : $len <= 6 ? $hp * 1_000
+                                : $len <= 9 ? $hp
+                                : 0;
+                        $date{nanosecond} = $v if $v
+                    }
+                    my $has_year = length $date{year};
+                    if ( !$has_year ) {
+                        $date{year} = 1900 + (localtime)[5];
+                    }
+                    $tm = eval { Time::Moment->new(%date) };
+                    if ( $tm ) {
+                        # Check that the timestamp isn't more than 1 day in the future
+                        $tm = Time::Moment->new(%date, year => $date{year} - 1)
+                            if !$has_year && $tm->epoch > (time + 86400);
+                    }
                 }
-                my $tm_fmt = '%FT%T' . $hires . ( $OutputTimeZone ? ($SYSLOG_TIMEZONE eq 'UTC' ? 'Z' : '%z') : '' );
+                else {
+                    $tm = eval { Time::Moment->from_string($msg{datetime_raw}, lenient => 1) };
+                }
+                my $ltm = Time::Moment->now();
+                $tm ||= $ltm;
 
-                # Set the Date Strings
-                $msg{datetime_str} = $NormalizeToUTC ? strftime($tm_fmt, gmtime $msg{epoch})
-                                                     : strftime($tm_fmt, localtime $msg{epoch});
+                # HiRes Epoch
+                $msg{epoch} = $tm->strftime("%s%f");
+                # ISO8601 Timestamps
+                $msg{datetime_utc}   = $tm->with_offset_same_instant(0)->strftime($TimeMomentFormatString) =~ s/\+00:?00$/Z/r;
+                $msg{datetime_local} = $tm->with_offset_same_instant($ltm->offset)->strftime($TimeMomentFormatString) =~ s/\+00:?00$/Z/r;
+                $msg{datetime_str}   = $tm->strftime($TimeMomentFormatString) =~ s/\+00:?00$/Z/r;
+                $msg{tz}             = $tm->strftime('%z') =~ s/\+00:?00/Z/r;
+            }
+
+            if ( $msg{datetime_str} ) {
                 # Split this up into parts
                 my @parts    = split /[ T]/, $msg{datetime_str};
                 $msg{date}   = $parts[0];
                 $msg{time}   = (split /[+\-Z]/, $parts[1])[0];
-                $msg{offset} = $NormalizeToUTC ? 'Z'
-                             : $parts[1] =~ /([Z+\-].*)/ ? $1
-                             : $SYSLOG_TIMEZONE;
 
                 # Debugging for my sanity
                 printf("TZ=%s Parsed: %s to [%s] %s D:%s T:%s O:%s\n",
                     $SYSLOG_TIMEZONE,
-                    @msg{qw(datetime_raw epoch datetime_str date time offset)},
+                    @msg{qw(datetime_raw epoch datetime_str date time tz)},
                 ) if $ENV{PARSE_SYSLOG_LINE_DEBUG};
-            }
-            # Use Module::Load to runtime load the DateTime libraries *if* necessary
-            if( $DateTimeCreate ) {
-                unless( $DateTimeTried && is_loaded('DateTime') ) {
-                    warn "DateTime seriously degrades performance, please start using 'epoch' and/or 'datetime_str' instead."
-                        unless $DisableWarnings;
-                    eval {
-                        load DateTime;
-                        1;
-                    } or do {
-                        my $err = $@;
-                        warn "DateTime unavailable, disabling it: $err"
-                            unless $DisableWarnings;
-                        $DateTimeCreate = 0;
-                    };
-                    $DateTimeTried++;
-                }
-                eval {
-                    my %args = (epoch => $msg{epoch});
-                    $args{time_zone} = $SYSLOG_TIMEZONE if $SYSLOG_TIMEZONE;
-                    $msg{datetime_obj} = DateTime->from_epoch(%args);
-                } if $DateTimeCreate;
             }
         }
     }
@@ -562,8 +617,6 @@ sub set_syslog_timezone {
     if( defined $tz_name && length $tz_name ) {
         $ENV{TZ} = $SYSLOG_TIMEZONE = $tz_name;
         tzset();
-        # Output Timezones
-        $OutputTimeZone = 1;
     }
 
     return $SYSLOG_TIMEZONE;
@@ -576,7 +629,6 @@ sub get_syslog_timezone {
 # If you have a syslog which logs dates in UTC, then processing will be much, much faster
 sub use_utc_syslog {
     set_syslog_timezone('UTC');
-    $NormalizeToUTC     = 1;
     return;
 }
 
@@ -594,7 +646,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 =head1 VERSION
 
-version 5.4
+version 6.0
 
 =head1 SYNOPSIS
 
@@ -604,8 +656,8 @@ parsed out.
 
     use Parse::Syslog::Line qw(parse_syslog_line);
 
-    $Parse::Syslog::Line::DateTimeCreate = 1;
     $Parse::Syslog::Line::AutoDetectJSON = 1;
+    $Parse::Syslog::Line::AutoDetectKeyValues = 1;
 
     my $href = parse_syslog_line( $msg );
     #
@@ -618,10 +670,10 @@ parsed out.
     #       date            => 'YYYY-MM-DD',
     #       time            => 'HH::MM:SS',
     #       epoch           => 1361095933,
-    #       datetime_str    => ISO 8601 datetime, $NormalizeToUTC = 1 then UTC, else local
-    #       datetime_obj    => undef,       # If $DateTimeCreate = 1, else undef
+    #       datetime_local  => ISO 8601 datetime, in local timezone (potentially buggy)
+    #       datetime_str    => ISO 8601 datetime, in message timezone
+    #       datetime_utc    => ISO 8601 datetime, in UTC
     #       datetime_raw    => 'Feb 17 11:12:13'
-    #       date_raw        => 'Feb 17 11:12:13'
     #       host_raw        => 'hostname',  # Hostname as it appeared in the message
     #       host            => 'hostname',  # Hostname without domain
     #       domain          => 'blah.com',  # if provided
@@ -682,33 +734,15 @@ Usage:
 
   $Parse::Syslog::Line::DateParsing = 0;
 
-=head2 DateTimeCreate
+=head2 TimeMomentFormatString
 
-If this variable is set to 1 (the default), a DateTime object will be returned in the
-$m->{datetime_obj} field.  Otherwise, this will be skipped.
-
-NOTE: DateTime timezone calculation is fairly slow. Unless you really need to
-take timezones into account, you're better off using other modes (below).
-
-Usage:
-
-  $Parse::Syslog::Line::DateTimeCreate = 0;
+This defaults to C<"%FT%T%f%z">. See L<Time::Moment/"EXAMPLE FORMAT STRINGS"> for syntax and usage.
 
 =head2 EpochCreate
 
 If this variable is set to 1, the default, the number of seconds from UNIX
 epoch will be returned in the $m->{epoch} field.  Setting this to false will
 only delete the epoch before returning the hash reference.
-
-=head2 NormalizeToUTC
-
-When set, the datetime_str will be ISO8601 UTC.
-
-=head2 OutputTimeZones
-
-Default is false, but is enabled if you call set_syslog_timezone() or
-use_utc_syslog().  If enabled, this will append the timezone offset to the
-datetime_str.
 
 =head2 FmtDate
 
@@ -730,12 +764,6 @@ in your wanted format.
     };
 
 B<NOTE>: No further date processing will be done, you're on your own here.
-
-=head2 HiResFmt
-
-Default is C<%0.6f>, or microsecond resolution.  This variable only comes into
-play when the syslog date string contains a high resolution timestamp.  It
-defaults to using microsecond resolution.
 
 =head2 AutoDetectJSON
 
@@ -819,7 +847,7 @@ This should be an array of fields you'd like to be removed from the hash referen
 
 Usage:
 
-  @Parse::Syslog::Line::PruneFields = qw(date_raw facility_int priority_int);
+  @Parse::Syslog::Line::PruneFields = qw(facility_int priority_int);
 
 =head1 FUNCTIONS
 
@@ -831,25 +859,238 @@ B<NOTE>: Date/time parsing is hard.  This module has been optimized to balance
 common sense and processing speed. Care is taken to ensure that any data input
 into the system isn't lost, but with the varieties of vendor and admin crafted
 date formats, we don't always get it right.  Feel free to override date
-processing using by setting the $FmtDate variable or completely disable it with
-$DateParsing set to 0.
+processing using by setting the C<$FmtDate> variable or completely disable it with
+C<$DateParsing> set to 0.
 
-=head2 set_syslog_timezone($timezone_name)
+=head3 Dates and Version 6+
 
-Sets a timezone $timezone_name for parsed messages. This timezone will be used
-to calculate offset from UTC if a timezone designation is not present in the
-message being parsed.  This timezone will also serve as the source timezone for
-the datetime_str field.
+As of version C<6.0> and later, the date parsing is handled by L<Time::Moment>.
+Ideally, I would use L<Date> for performance reasons, but it requires some
+heavy XS toolkits to build which don't work on my MacBookPro out of the box.
+This made the decision to use C<Time::Moment> kinda automatic. If you are
+B<seriously> concerned with performance, enough to figure out how to package
+and run L<Date> successfully, you can use the C<$FmtDate> parameter to inject
+your own date processing logic.
 
-=head2 get_syslog_timezone
+C<Time::Moment>'s API and known limitations informed updates to the API and output of dates
+in this module. It is drastic enough a shift to warrant a major version bump.
+
+L<Time::Moment/"The Effect of Daylight Saving Time"> explains that to properly
+convert times during DST transitions, things get messy. This caused issues in testing
+and warrants words of caution here, B<ALWAYS> use C<datetime_utc> or C<epoch>
+fields for datetime portability.
+
+The changes to the API and fields returned are as follows:
+
+=over 2
+
+=item B<API Changes>
+
+=over 2
+
+=item C<DateTimeCreate> is B<deprecated>
+
+L<DateTime> is slow and memory heavy. I never should've added support for it in
+this module.  This release removes it. If you need L<DateTime> objects, you'll
+need to build it yourself.
+
+=item C<HiResFmt> is B<deprecated>, use C<TimeMomentFormatString>
+
+=item C<NormalizeToUTC> is B<deprecated>, every log now returns C<datetime_utc>
+
+=item C<OutputTimeZone> is B<deprecated>, use C<TimeMomentFormatString>
+
+=back
+
+=item B<Field Changes>
+
+=over 2
+
+=item C<date_raw>
+
+B<Removed> from the fields returned, use C<datetime_raw>.
+
+=item C<datetime_obj>
+
+B<Removed> from the fields returned as we dropped support for L<DateTime>.
+
+=item C<datetime_utc>
+
+Present in every document, use this for portability.
+
+=item C<datetime_str>
+
+Now represents the parsed datetime as from the log without modifying the timezone.
+
+=item C<datetime_local>
+
+Attempts to represent the datetime in the timezone local to the program. This
+is prone to errors around DST, I don't advise using this, but it's
+provided as footgun for future generations.
+
+=item C<offset> renamed to C<tz>
+
+=back
+
+=back
+
+=head3 Fields Returned
+
+=over 2
+
+=item B<preamble>
+
+Syslog preamble without the brackets, i.e., C<13>.
+
+=item B<priority>
+
+String representation of the priority, i.e., C<"warn">
+
+=item B<priority_int>
+
+Integer representation of the priority, i.e., C<1>
+
+=item B<facility>
+
+String representation of the facility, i.e., C<"daemon">
+
+=item B<priority_int>
+
+Integer representation of the facility, i.e., C<1>
+
+=item B<datetime_raw>
+
+The datetime string from the log as it was discovered
+
+=item B<epoch>
+
+Numeric representation of the UNIX time as parsed by the C<datetime_str>. This
+is the most portable format for computers and I recommend using it, and only it
+for passing onto to computer systems.
+
+=item B<datetime_utc>
+
+UTC representation of the C<datetime_raw> in ISO8601 format (via
+C<TimeMomentFormatString>). If you must use a string format, this is the one
+you should pass to other computers.
+
+=item B<datetime_str>
+
+ISO8601 representation of the C<datetime_raw> (via C<TimeMomentFormatString>),
+without manipulating timezones.
+
+=item B<datetime_local>
+
+ISO8601 representation of the C<datetime_raw> (via C<TimeMomentFormatString>)
+attempting to manipulate into the timezone of the local computer or the
+timezone set by C<set_syslog_timezone()>.
+
+B<NOTE:> This does not handle DST well as the logic for that requires
+L<DateTime::TimeZone> when using L<Time::Moment>. Adding C<DateTime> back into
+this module will kill performance, so I accept the inaccuracy here as you
+should never use this.
+
+It is provided for those living in Arizona to mock the rest of us for our
+stupid DST sins.
+
+=item B<date>
+
+The date portion of C<datetime_str>
+
+=item B<time>
+
+The time portion of C<datetime_str>
+
+=item B<tz>
+
+The timezone offset of C<datetime_str>
+
+=item B<host_raw>
+
+The source host of the log as parsed, i.e., C<"host.example.com">
+
+=item B<host>
+
+Host portion of the C<host_raw>, i.e., C<"host">
+
+=item B<domain>
+
+Domain portion of the C<host_raw>, i.e., C<"example.com">
+
+=item B<origin>
+
+If relayed, contains the origin of the message, i.e., "host.example.com"
+
+=item B<origin_date>
+
+If relayed, contains the origin timestamp, this is unparsed.
+
+=item B<program_raw>
+
+The program, appname, or syslogtag in full, save the final colon, i.e.,
+C<sshd(pam_unix)[35454]>.
+
+=item B<program_name>
+
+Program name parsed from C<program_raw>, i.e., C<sshd>.
+
+=item B<program_pid>
+
+The PID as parsed from the C<program_raw>, i.e., C<35454>.
+
+=item B<program_sub>
+
+The program context as parsed from C<program_raw>, i.e., C<pam_unix>.
+
+=item B<content>
+
+Everything after the syslog tag, except when using C<AutoDetectJSON> or
+C<AutoDetectKeyValues>. When detecting structured data, successfully parsed chunks
+of the message are removed from the string.
+
+As an example, if the message is:
+
+    2015-09-30T06:26:06.779373-05:00 my-host my-script.pl: updating data {"lunchTime":1443612366.442}
+
+By default, C<content> will be:
+
+    updating data {"lunchTime":1443612366.442}
+
+However, if C<AutoDetectJSON> is set, then C<content> will be:
+
+    updating data
+
+And the JSON will be decoded into the C<SDATA> field.
+
+=item B<SDATA>
+
+The structured data from the log message. This include RFC5424 Structured Data as well
+as anything extracted by C<AutoDetectJSON> and/or C<AutoDetectKeyValues>.
+
+=item B<message>
+
+Everything from the syslogtag onward, i.e., C<"program_raw content">
+
+=item B<message_raw>
+
+The entire message passed into the function.
+
+=back
+
+=head2 C<set_syslog_timezone($timezone_name)>
+
+Sets a timezone C<$timezone_name> for parsed messages. This timezone will be
+used to calculate offset from UTC if a timezone designation is not present in
+the message being parsed.  This timezone will also serve as the source timezone
+for the C<datetime_local> field.
+
+=head2 C<get_syslog_timezone()>
 
 Returns the name of the timezone currently set by set_syslog_timezone.
 
-=head2 use_utc_syslog
+=head2 C<use_utc_syslog()>
 
-A convenient function which sets the syslog timezone to UTC and sets the config
-variables accordingly.  Automatically sets $NormaizeToUTC and datetime_str will
-be set to the UTC equivalent.
+A convenient function which sets the syslog timezone to UTC.
 
 =head2 parse_syslog_lines
 

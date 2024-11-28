@@ -2,7 +2,7 @@ package Web::Components;
 
 use 5.010001;
 use strictures;
-use version; our $VERSION = qv( sprintf '0.10.%d', q$Rev: 1 $ =~ /\d+/gmx );
+use version; our $VERSION = qv( sprintf '0.12.%d', q$Rev: 5 $ =~ /\d+/gmx );
 
 1;
 
@@ -29,12 +29,8 @@ Web::Components - MVC pattern for Web::Simple
 
    package Component::Server;
 
-   use Class::Usul;
-   use Moo;
-
-   has '_usul' => is => 'lazy', builder => sub {
-      Class::Usul->new( config => { appclass => __PACKAGE__  } ) },
-      handles  => [ 'config', 'debug', 'l10n', 'lock', 'log' ];
+   use Plack::Builder;
+   use Web::Simple;
 
    with 'Web::Components::Loader';
 

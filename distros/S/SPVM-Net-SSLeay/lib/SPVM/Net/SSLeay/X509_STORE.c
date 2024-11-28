@@ -13,12 +13,12 @@ int32_t SPVM__Net__SSLeay__X509_STORE__add_cert(SPVM_ENV* env, SPVM_VALUE* stack
   int32_t error_id = 0;
   
   void* obj_self = stack[0].oval;
-  X509_STORE* x509_store = env->get_pointer(env, stack, obj_self);
+  X509_STORE* self = env->get_pointer(env, stack, obj_self);
   
   void* obj_x509 = stack[1].oval;
   X509* x509 = env->get_pointer(env, stack, obj_x509);
   
-  int32_t status = X509_STORE_add_cert(x509_store, x509);
+  int32_t status = X509_STORE_add_cert(self, x509);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -51,11 +51,11 @@ int32_t SPVM__Net__SSLeay__X509_STORE__set_flags(SPVM_ENV* env, SPVM_VALUE* stac
   int32_t error_id = 0;
   
   void* obj_self = stack[0].oval;
-  X509_STORE* x509_store = env->get_pointer(env, stack, obj_self);
+  X509_STORE* self = env->get_pointer(env, stack, obj_self);
   
   int64_t flags = stack[1].lval;
   
-  int32_t status = X509_STORE_set_flags(x509_store, flags);
+  int32_t status = X509_STORE_set_flags(self, flags);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -78,12 +78,12 @@ int32_t SPVM__Net__SSLeay__X509_STORE__add_crl(SPVM_ENV* env, SPVM_VALUE* stack)
   int32_t error_id = 0;
   
   void* obj_self = stack[0].oval;
-  X509_STORE* x509_store = env->get_pointer(env, stack, obj_self);
+  X509_STORE* self = env->get_pointer(env, stack, obj_self);
   
   void* obj_x509_crl = stack[1].oval;
   X509_CRL* x509_crl = env->get_pointer(env, stack, obj_x509_crl);
   
-  int32_t status = X509_STORE_add_crl(x509_store, x509_crl);
+  int32_t status = X509_STORE_add_crl(self, x509_crl);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -117,10 +117,10 @@ int32_t SPVM__Net__SSLeay__X509_STORE__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack)
   
   void* obj_self = stack[0].oval;
   
-  X509_STORE* pointer = env->get_pointer(env, stack, obj_self);
+  X509_STORE* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    X509_STORE_free(pointer);
+    X509_STORE_free(self);
   }
   
   return 0;

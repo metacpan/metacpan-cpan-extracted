@@ -2,10 +2,10 @@
 expected:
   content: 'Interface BRI0:1, changed state to down'
   date: 2018-01-01
-  date_raw: Jan 1 14:58:58
-  datetime_obj: ~
+  datetime_local: 2018-01-01T14:58:58Z
   datetime_raw: Jan 1 14:58:58
   datetime_str: 2018-01-01T14:58:58Z
+  datetime_utc: 2018-01-01T14:58:58Z
   domain: tld
   epoch: 1514818738
   facility: local7
@@ -15,7 +15,6 @@ expected:
   message: '%LINK-3-UPDOWN: Interface BRI0:1, changed state to down'
   message_raw: '<187>Jan 1 14:58:58 fqdn.tld 6951: .Jan 1 14:58:57: %LINK-3-UPDOWN: Interface BRI0:1, changed state to down'
   ntp: out of sync
-  offset: Z
   preamble: 187
   priority: err
   priority_int: 3
@@ -24,5 +23,6 @@ expected:
   program_raw: '%LINK-3-UPDOWN'
   program_sub: ~
   time: 14:58:58
+  tz: Z
 name: Cisco NTP No Sync
 string: '<187>Jan 1 14:58:58 fqdn.tld 6951: .Jan 1 14:58:57: %LINK-3-UPDOWN: Interface BRI0:1, changed state to down'

@@ -1,3 +1,43 @@
+Wed Nov 27 17:15:26 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.60.2]:
+	* Markdown/Render.pm
+	- bump version
+	* md-utils.pl: usage tweak
+	* cpan/Makefile
+	- fabricate target tarball w/version
+
+Wed Nov 27 17:02:25 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.60.1]:
+	* Markdown/Render.pm
+	- bump version
+	- organize accessors
+	(_fix_header): remove special characters
+	(create_toc): likewise
+	* md-utils.pl
+	- use environment perl
+	* README.md: generated
+
+Fri Apr 26 11:28:27 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.5 - nocss]:
+	* README.md: generated
+	* md-utils.pl: add nocss option
+	* Markdown/Render.pm
+	(new): don't set css if nocss option
+	* .gitignore
+	* t/00-markdown.t
+
+Mon Aug 14 16:47:55 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.4 - Markdown::Render::Discount]:
+	* README.md.in: mention Text::Markdown::Discount
+	* cpan/Makefile
+	- create bin directory if it doesn't exist
+	- make lib/Markdown/Render.pm dependent on .. version
+	* Markdown/Render.pm: use Text::Markdown::Discount
+
 Wed May 31 02:25:00 2023  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.03 - CPAN distribution]:

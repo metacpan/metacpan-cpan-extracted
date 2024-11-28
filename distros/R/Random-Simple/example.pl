@@ -44,6 +44,15 @@ for (1 .. 5) {
 
 print "\n";
 
+########################################################################
+# Undocumented and has potential to change: _rand32() and _rand64()
+#
+# Note: these functions do *NOT* auto seed, so if you call this as your
+# first function call in Random::Simple you will get zero-filled
+# results, which is not going to be what you want. All other function
+# calls will auto seed if they're the first called function
+########################################################################
+
 for (1 .. 5) {
 	my $x = Random::Simple::_rand32();
 	my $per = sprintf("%0.1f%%", ($x / (2**32 - 1) * 100));

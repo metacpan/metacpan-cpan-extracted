@@ -5,7 +5,7 @@
 #   Note: Check also Monarch Initiative:
 #   https://github.com/monarch-initiative/PhenoImp
 #
-#   Last Modified: Feb/26/2024
+#   Last Modified: Nov/08/2024
 #
 #   $VERSION taken from Pheno::Ranker
 #
@@ -112,7 +112,7 @@ use Path::Tiny;
 use List::Util 1.50 qw(head shuffle);
 use JSON::XS;
 use Data::Fake qw(Core Company Dates Names);
-use FindBin qw($Bin);
+use FindBin    qw($Bin);
 use lib $Bin;
 use Ontologies
   qw($hpo_array $omim_array $rxnorm_array $ncit_procedures_array $ncit_exposures_array $ethnicity_array);
@@ -330,8 +330,9 @@ sub exposures {
 
     my ( $format, $ontologies_array, $n, $max ) = @_;
     my $default_duration = 'P999Y';
-    my $default_ontology = { id => 'NCIT:NA0000', label => 'NA' };
-    my $params           = {
+    my $default_ontology_term =
+      { id => 'NCIT:C126101', label => 'Not Available' };
+    my $params = {
         type          => $format eq 'bff' ? 'exposureCode'  : 'term',
         onset         => $format eq 'bff' ? 'ageAtExposure' : 'onset',
         entry_creator => \&common_entry_creator
@@ -341,7 +342,7 @@ sub exposures {
     # Add 'duration' 'and 'unit' to pass bff-validator
     foreach my $entry (@$entries) {
         $entry->{duration} = $default_duration;
-        $entry->{unit}     = $default_ontology;
+        $entry->{unit}     = $default_ontology_term;
     }
     return $entries;
 }

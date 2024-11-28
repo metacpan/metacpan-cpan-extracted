@@ -2,10 +2,10 @@
 expected:
   content: 'Denied ICMP type=5, code=1 from 1.2.3.4 on interface inside'
   date: 2018-01-01
-  date_raw: Jan 1 18:39:00
-  datetime_obj: ~
+  datetime_local: 2018-01-01T18:39:00Z
   datetime_raw: Jan 1 18:39:00
   datetime_str: 2018-01-01T18:39:00Z
+  datetime_utc: 2018-01-01T18:39:00Z
   domain: ~
   epoch: 1514831940
   facility: local4
@@ -14,7 +14,6 @@ expected:
   host_raw: hostname
   message: '%ASA-3-313001: Denied ICMP type=5, code=1 from 1.2.3.4 on interface inside'
   message_raw: '<161>Jan 1 18:39:00 hostname : %ASA-3-313001: Denied ICMP type=5, code=1 from 1.2.3.4 on interface inside'
-  offset: Z
   preamble: 161
   priority: alert
   priority_int: 1
@@ -23,5 +22,6 @@ expected:
   program_raw: '%ASA-3-313001'
   program_sub: ~
   time: 18:39:00
+  tz: Z
 name: Cisco ASA Alt
 string: '<161>Jan 1 18:39:00 hostname : %ASA-3-313001: Denied ICMP type=5, code=1 from 1.2.3.4 on interface inside'

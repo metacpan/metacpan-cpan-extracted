@@ -71,7 +71,7 @@ sub invite {
     my $job_key = shift;
     my %params = @_;
 
-    return $self->client()->post("/hr/v1/jobs/" . $job_key . "/candidates", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

@@ -23,7 +23,7 @@ no_index:
 provides:
   Map::Tube::Beijing:
     file: lib/Map/Tube/Beijing.pm
-    version: v0.12.0
+    version: v0.12.1
 requires:
   File::Share: '0'
   Map::Tube: '3.77'
@@ -31,5 +31,5 @@ requires:
   namespace::clean: '0'
   perl: '5.010'
 resources: {}
-version: v0.12.0
+version: v0.12.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

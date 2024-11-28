@@ -79,7 +79,7 @@ all_plugins_in_prereqs($tzil,
 );
 
 SKIP:
-foreach my $plugin ('Dist::Zilla::Plugin::MakeMaker::Fallback', 'Dist::Zilla::Plugin::ModuleBuildTiny::Fallback') {
+foreach my $plugin ('Dist::Zilla::Plugin::ModuleBuildTiny') {
     skip "need recent $plugin to test default_jobs option", 1 if not $plugin->can('default_jobs');
     my $obj = first { find_meta($_)->name eq $plugin } @{$tzil->plugins};
     is(
@@ -105,7 +105,6 @@ my $build_dir = path($tzil->tempdir)->child('build');
 
 my @expected_files = qw(
     Build.PL
-    Makefile.PL
     dist.ini
     INSTALL
     lib/DZT/Sample.pm
@@ -165,8 +164,7 @@ is(
             prereqs => superhashof({
                 $PREREQ_PHASE_DEFAULT => superhashof({
                     $PREREQ_RELATIONSHIP_DEFAULT => superhashof({
-                        'Dist::Zilla::Plugin::ModuleBuildTiny::Fallback' => '0.018',
-                        'Dist::Zilla::Plugin::MakeMaker::Fallback' => '0.029',
+                        'Dist::Zilla::Plugin::ModuleBuildTiny' => '0.012',
                         'Dist::Zilla::PluginBundle::Author::ETHER' => '0.002',
                     }),
                 }),
@@ -191,7 +189,7 @@ is(
                             name => '@Author::ETHER/' . $_,
                             version => "Dist::Zilla::Plugin::$_"->VERSION,
                         },
-                        qw(MakeMaker::Fallback ModuleBuildTiny::Fallback RunExtraTests) ),
+                        qw(ModuleBuildTiny RunExtraTests) ),
                     subhashof({
                         class => 'Dist::Zilla::Plugin::Run::AfterRelease',
                         # this may or may not be included, depending on the plugin version

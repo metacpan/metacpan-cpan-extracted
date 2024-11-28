@@ -59,7 +59,7 @@ B<Return value>
 sub get_categories_v2 {
     my $self = shift;
 
-    return $self->client()->get("/profiles/v2/metadata/categories");
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_skills
@@ -75,7 +75,7 @@ B<Return value>
 sub get_skills {
     my $self = shift;
 
-    return $self->client()->get("/profiles/v1/metadata/skills");
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_skills_v2
@@ -91,7 +91,7 @@ B<Return value>
 sub get_skills_v2 {
     my $self = shift;
 
-    return $self->client()->get("/profiles/v2/metadata/skills");
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_specialties
@@ -107,7 +107,7 @@ B<Return value>
 sub get_specialties {
     my $self = shift;
 
-    return $self->client()->get("/profiles/v1/metadata/specialties");
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_regions
@@ -123,7 +123,7 @@ B<Return value>
 sub get_regions {
     my $self = shift;
 
-    return $self->client()->get("/profiles/v1/metadata/regions");
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_tests
@@ -139,7 +139,7 @@ B<Return value>
 sub get_tests {
     my $self = shift;
 
-    return $self->client()->get("/profiles/v1/metadata/tests");
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_reasons
@@ -162,7 +162,7 @@ sub get_reasons {
     my $self = shift;
     my %params = @_;
 
-    return $self->client()->get("/profiles/v1/metadata/reasons", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

@@ -1,6 +1,6 @@
 package Random::Simple;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our $debug   = 0;
 
 use strict;
@@ -15,7 +15,7 @@ require XSLoader;
 XSLoader::load();
 
 use Exporter 'import';
-our @EXPORT = qw(random_int random_bytes random_float);
+our @EXPORT = qw(random_int random_bytes random_float rand);
 
 #############################################################
 
@@ -70,19 +70,56 @@ sub os_random_bytes {
 	return $ret;
 }
 
+# Split a string into an array of smaller length strings
+sub str_split {
+    my ($string, $chunk_size) = @_;
+	my $num_chunks = length($string) / $chunk_size;
+
+    my @ret = ();
+	for (my $i = 0; $i < $num_chunks; $i++) {
+		my $str = substr($string, $i * $chunk_size, $chunk_size);
+		push(@ret, $str);
+	}
+
+	return @ret;
+}
+
+sub bin2hex {
+	my $bytes = shift();
+	my $ret   = (unpack("h* ", $bytes));
+
+	return $ret;
+}
+
 # Randomly seed the PRNG and warmup
 sub seed_with_os_random {
 	my ($high, $low, $seed1, $seed2);
 
+	my $bytes = os_random_bytes(16);
+	my @parts = str_split($bytes, 4);
+
+	if (length($bytes) != 16) {
+		die("Did not get enough entropy bytes from OS\n");
+	}
+
+	if ($debug) {
+		print "Seed parts: ";
+		foreach my $x (@parts) {
+			my $str = bin2hex($x);
+			print "0x$str ";
+		}
+		print "\n";
+	}
+
 	# Build the first 64bit seed manually
 	# Cannot use Q because it doesn't exist on 32bit Perls
-	$high  = unpack("L", os_random_bytes(4));
-	$low   = unpack("L", os_random_bytes(4));
+	$high  = unpack("L", $parts[0]);
+	$low   = unpack("L", $parts[1]);
 	$seed1 = ($high << 32) | $low;
 
 	# Build the second 64bit seed
-	$high  = unpack("L", os_random_bytes(4));
-	$low   = unpack("L", os_random_bytes(4));
+	$high  = unpack("L", $parts[2]);
+	$low   = unpack("L", $parts[3]);
 	$seed2 = ($high << 32) | $low;
 
 	if ($debug) {
@@ -143,6 +180,15 @@ sub random_float {
 	return $ret;
 }
 
+# Our rand() overrides CORE::rand()
+# This prototype is required so we can emulate CORE::rand(@array)
+sub rand(;$) {
+	my $mult = shift() || 1;
+	my $num  = random_float() * $mult;
+
+	return $num;
+}
+
 #############################################################
 
 =encoding utf8
@@ -157,25 +203,40 @@ To make generating random numbers as easy as possible I<and> in a manner that
 you can use in real code. Generate "good" random numbers without having to
 think about it.
 
+=head2 Functions
+
+=head4 random_int($min, $max)
+
+returns a non-biased integer between C<$min> and C<$max> (inclusive). Range must be no larger than 2**32 - 2.
+
+=head4 random_float()
+
+returns a random floating point value between 0 and 1 (inclusive).
+
+=head4 random_bytes($number)
+
+returns a string of random bytes with length of C<$number>.
+
 =head2 Usage
 
-	use Random::Simple;
+    use Random::Simple;
 
-	my $integer = random_int($min, $max); # inclusive
-	my $float   = random_float();         # 0 - 1 inclusive
-	my $bytes   = random_bytes($count);   # string of X bytes
+    my $coin_flip      = random_int(1, 2);
+    my $die_roll       = random_int(1, 6);
+    my $random_percent = random_float() * 100;
+    my $buffer         = random_bytes(8);
 
-	my $die_roll       = random_int(1, 6);
-	my $random_percent = random_float() * 100;
-	my $buffer         = random_bytes(8);
+    my @arr        = ('red', 'green', 'blue');
+    my $rand_item  = $arr[random_int(0, @arr - 1)]; # Random array item
 
 =head2 Methodology
 
-Perl's internal C<rand()> function uses C<drand48()> which is an older PRNG,
-and may have limitations. `Random::Simple` uses PCG which is: modern, simple,
-well vetted, and fast.
+Perl's internal C<rand()> function uses C<drand48> which is an older
+pseudorandom number generator and may have limitations. C<Random::Simple> uses
+PCG which is: modern, simple, well vetted, and fast. Using C<Random::Simple>
+will upgrade/override the C<rand()> function to use a better PRNG.
 
-C<Random::Simple> is automatically seeded with high quality entropy directly
+C<Random::Simple> is automatically seeded with entropy directly
 from your OS. On Linux this is C</dev/urandom> and on Windows it uses
 CryptGenRandom. You will get statistically unique random numbers
 automatically.

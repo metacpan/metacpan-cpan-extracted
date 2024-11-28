@@ -66,7 +66,7 @@ sub get_list {
     my $self = shift;
     my %params = @_;
 
-    return $self->client()->get("/hr/v2/jobs", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_specific
@@ -89,7 +89,7 @@ sub get_specific {
     my $self = shift;
     my $key = shift;
 
-    return $self->client()->get("/hr/v2/jobs/" . $key);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item post_job
@@ -112,7 +112,7 @@ sub post_job {
     my $self = shift;
     my %params = @_;
 
-    return $self->client()->post("/hr/v2/jobs", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item edit_job
@@ -140,7 +140,7 @@ sub edit_job {
     my $key = shift;
     my %params = @_;
 
-    return $self->client()->put("/hr/v2/jobs/" . $key, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item delete_job
@@ -168,7 +168,7 @@ sub delete_job {
     my $key = shift;
     my %params = @_;
 
-    return $self->client()->delete("/hr/v2/jobs/" . $key, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

@@ -2,7 +2,7 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.018";
+  version "0.019";
   
   use Net::SSLeay::Constant;
   use Net::SSLeay::SSL_CTX;
@@ -89,7 +89,39 @@ class Net::SSLeay {
   
   native method get0_next_proto_negotiated : void ($data_ref : string[], $len_ref : int*);
   
+  method get0_next_proto_negotiated_return_string : string () {
+    
+    my $data_ref = new string[1];
+    my $len = 0;
+    
+    $self->get0_next_proto_negotiated($data_ref, \$len);
+    
+    my $protocol = (string)undef;
+    if ($data_ref) {
+      $protocol = $data_ref->[0];
+      Fn->shorten((mutable string)$protocol, $len);
+    }
+    
+    return $protocol;
+  }
+  
   native method get0_alpn_selected : void ($data_ref : string[], $len_ref : int*);
+  
+  method get0_alpn_selected_return_string : string () {
+    
+    my $data_ref = new string[1];
+    my $len = 0;
+    
+    $self->get0_alpn_selected($data_ref, \$len);
+    
+    my $protocol = (string)undef;
+    if ($data_ref) {
+      $protocol = $data_ref->[0];
+      Fn->shorten((mutable string)$protocol, $len);
+    }
+    
+    return $protocol;
+  }
   
   native method get_peer_cert_chain : Net::SSLeay::X509[] ();
   
@@ -102,6 +134,13 @@ class Net::SSLeay {
   native method set_msg_callback : void ($cb : Net::SSLeay::Callback::Msg, $arg : object = undef);
   
   method P_dump_peer_certificate : string () {
+    
+    warn "P_dump_peer_certificate is deprecated.";
+    
+    return $self->dump_peer_certificate;
+  }
+  
+  method dump_peer_certificate : string () {
     
     my $cert = $self->get_peer_certificate;
     
@@ -117,6 +156,8 @@ class Net::SSLeay {
     
     return $dump;
   }
+  
+  native method get_tlsext_status_type : long ();
   
   native method DESTROY : void ();
   

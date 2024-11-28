@@ -1,0 +1,49 @@
+
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Mail::Colander::AnnotationBuiltins
+
+
+=head1 SYNOPSIS
+
+   use Mail::Colander::AnnotationBuiltins;
+
+=head1 DESCRIPTION
+
+Built-ins suitable for L<Data::Annotation::Expression>, specific for
+L<Mail::Colander>.
+
+=head1 INTERFACE
+
+=head2 Functions
+
+=head3 B<< factory >>
+
+Factory function, leveraged by L<Data::Annotation::Expression>.
+
+=head3 B<< subnet_matcher >>
+
+Imported and re-published from L<Net::Subnet>, with no changes.
+
+=head3 B<< set_contains >>
+
+Override the default built-in to also support matching CIDR via
+L</subnet_matcher>.
+
+=head3 B<< set_is_element_of >>
+
+Override the default built-in to also support matching CIDR via
+L</subnet_matcher>.
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for Mail::Colander.
+
+
+=cut

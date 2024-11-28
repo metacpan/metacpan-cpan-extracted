@@ -1,7 +1,7 @@
 package TAP::DOM::Config;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Accessors for TAP::DOM specific parse config
-$TAP::DOM::Config::VERSION = '0.99';
+$TAP::DOM::Config::VERSION = '1.000';
 use 5.006;
 use strict;
 use warnings;

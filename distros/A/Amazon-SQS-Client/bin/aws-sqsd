@@ -1,0 +1,133 @@
+#!/bin/bash
+# -*- mode:sh; -*-
+
+# chkconfig: 2345 99 1
+# description: Example AWS SQS Perl queue handler
+# processname: aws-sqsd
+# pidfile: /var/run/QueueDaemon.pl.pid
+
+. /etc/rc.d/init.d/functions
+
+prog=aws-sqsd
+
+########################################################################
+function find_queue_daemon {
+########################################################################
+
+    DAEMON=$(command -v QueueDaemon.pl)
+    DAEMON=${DAEMON:-/usr/local/bin/QueueDaemon.pl}
+
+    if ! test -e "$DAEMON"; then
+        eval $(perl -MConfig -MData::Dumper -e 'print Config::config_re(qr/installsitebin/);');
+        DAEMON="$installsitebin/QueueDaemon.pl"
+    fi
+    
+    if ! test -e "$DAEMON"; then
+        echo "could not find QueueDaemon.pl\n";
+        exit 1;
+    fi
+}
+
+########################################################################
+function find_config {
+########################################################################
+    CONFIG=${CONFIG:-/usr/local/share/sqs/aws-sqs.ini};
+
+    if ! test -e "$CONFIG"; then
+        CONFIG_DIR=$(perl -MFile::ShareDir=dist_dir -e 'print dist_dir("Amazon-SQS-Client");')
+        CONFIG="$CONFIG_DIR/sqs/aws-sqs.ini"
+    fi
+
+    if ! test -e "$CONFIG"; then
+        echo "could not find $CONFIG file\n"
+        exit 1;
+    fi
+}
+
+start() {
+
+    echo -n $"Starting $prog: "
+
+    $DAEMON --config=$CONFIG
+
+    sleep 1;
+
+    if test -s ${pidfile}; then
+	success;
+    else
+	failure;
+    fi
+    
+    echo
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+
+    if test -s ${pidfile}; then 
+	killproc -p ${pidfile};
+    else
+	failure;
+    fi
+
+    echo
+}
+
+restart() {
+    stop;
+    start;
+}
+
+graceful() {
+    echo -n $"Restarting $prog: "
+
+    if test -s ${pidfile}; then
+	pid=$(cat $pidfile);
+
+	kill -s SIGHUP $pid 2>/dev/null;
+
+	sleep 1;
+
+	if ps -p ${pid} | grep -q ${pid}; then
+	    success;
+	else
+            failure;
+	fi
+    else
+        failure
+    fi
+
+    echo
+}
+
+find_queue_daemon;
+
+find_config;
+
+pidfile=/var/run/QueueDaemon.pl.pid
+
+case "$1" in 
+    start)
+	start
+	;;
+
+    stop)
+	stop
+	;;
+
+    restart)
+	restart
+	;;
+
+    graceful)
+	graceful
+	;;
+
+    status)
+	status -p ${pidfile}
+	RETVAL=$?
+	;;
+
+    *)
+	echo $"Usage: $prog {start|stop|restart}"
+esac

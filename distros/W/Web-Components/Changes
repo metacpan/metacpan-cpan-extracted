@@ -1,5 +1,33 @@
 Revision history for Web::Components
 
+          - More prereq fixes
+          - Curated dependencies
+          - Fixed prereqs
+          - Updated MANIFEST
+
+0.12.1    2024-11-27 20:55:34
+          - Bump version for release
+          - Fix tests. Import exceptions from Web::ComposableRequest
+          - Added some POD
+          - Better exception detection
+          - Adds fqdn to Util. Better rv in Model.error
+          - Adds Model Navigation and ConfigLoader
+          - Better error handling
+          - Can set http headers in a redirect
+          - Can set message log level
+          - Adds context to log calls
+          - Adds should_log_messages to config
+          - ReverseMap builds a lazy attribute
+          - ReverseMap calls dispatch_request and the subs to parse the map
+          - Better regexs in ReverseMap
+          - Adds ReverseMap role. Can do uri_for_action
+          - Models hash now passed to context constructor
+          - Render exception sets level 2
+
+0.11.1    2023-02-16 23:29:31
+          - Breaks back compat. Uses a context object not a request one
+          - Made loaders use of session object more robust
+
 0.10.1    2017-06-01 23:02:25
           - Makes factory_args a public attribute
 

@@ -58,9 +58,9 @@
          "file" : "lib/Module/ScanDeps/Static.pm",
          "version" : "0"
       },
-      "Module::ScanDeps::VERSION" : {
-         "file" : "lib/Module/ScanDeps/VERSION.pm",
-         "version" : "v1.7.0"
+      "Module::ScanDeps::Static::VERSION" : {
+         "file" : "lib/Module/ScanDeps/Static/VERSION.pm",
+         "version" : "v1.7.1"
       }
    },
    "release_status" : "stable",
@@ -70,6 +70,6 @@
          "type" : "git"
       }
    },
-   "version" : "v1.7.0",
+   "version" : "v1.7.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

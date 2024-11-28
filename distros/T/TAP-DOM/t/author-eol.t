@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -25,12 +25,12 @@ my @files = (
     't/00-load.t',
     't/author-eol.t',
     't/author-no-tabs.t',
+    't/author-pod-coverage.t',
     't/author-pod-syntax.t',
     't/dom2tap.t',
     't/empty_tap.tap',
     't/empty_tap_archive.tgz',
     't/no_tap_lines.tap',
-    't/release-pod-coverage.t',
     't/some_tap.dom',
     't/some_tap.txt',
     't/some_tap2.txt',

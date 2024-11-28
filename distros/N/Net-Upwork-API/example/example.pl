@@ -15,7 +15,6 @@
 use lib "./lib"; # UPDATE IF NEEDED
 use Data::Dumper;
 use Net::Upwork::API;
-use Net::Upwork::API::Routers::Auth;
 use Net::Upwork::API::Routers::Graphql;
 
 $config = Net::Upwork::API::Config->new(
@@ -55,11 +54,6 @@ if (!$api->has_access_token()) {
     # in case it's expired, i.e. expires_at < time(). Make sure you replace the
     # old token accordingly in your security storage.
 }
-
-$auth = Net::Upwork::API::Routers::Auth->new($api);
-$data = $auth->get_user_info();
-
-print Dumper $data;
 
 my $query = <<'EOF';
 query {

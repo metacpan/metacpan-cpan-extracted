@@ -1,7 +1,7 @@
 package TAP::DOM::Summary;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Accessors for TAP::DOM summary part
-$TAP::DOM::Summary::VERSION = '0.99';
+$TAP::DOM::Summary::VERSION = '1.000';
 use 5.006;
 use strict;
 use warnings;

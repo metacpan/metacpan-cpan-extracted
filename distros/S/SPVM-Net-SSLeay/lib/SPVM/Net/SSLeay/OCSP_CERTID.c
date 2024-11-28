@@ -16,10 +16,10 @@ int32_t SPVM__Net__SSLeay__OCSP_CERTID__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack
   
   void* obj_self = stack[0].oval;
   
-  OCSP_CERTID* pointer = env->get_pointer(env, stack, obj_self);
+  OCSP_CERTID* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    OCSP_CERTID_free(pointer);
+    OCSP_CERTID_free(self);
   }
   
   return 0;

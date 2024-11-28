@@ -1,42 +1,10 @@
 package Web::Components::Role;
 
-use namespace::autoclean;
-
-use Web::Components::Util             qw( deref );
 use Web::ComposableRequest::Constants qw( TRUE );
 use Unexpected::Types                 qw( HashRef NonEmptySimpleStr
                                           NonNumericSimpleStr Object );
+use Web::Components::Util             qw( deref );
 use Moo::Role;
-
-has 'components'  => is => 'ro',   isa => HashRef, default => sub { {} },
-   weak_ref       => TRUE;
-
-has 'config'      => is => 'ro',   isa => Object | HashRef, required => TRUE;
-
-has 'encoding'    => is => 'lazy', isa => NonEmptySimpleStr,
-   builder        => sub { deref $_[ 0 ]->config, 'encoding' };
-
-has 'log'         => is => 'ro',   isa => Object, required => TRUE;
-
-has 'moniker'     => is => 'ro',   isa => NonNumericSimpleStr, required => TRUE;
-
-around 'BUILDARGS' => sub {
-   my ($orig, $self, @args) = @_; my $attr = $orig->( $self, @args ); my $app;
-
-   (exists $attr->{application} and $app = $attr->{application})
-      or return $attr;
-
-   $app->can( 'config' ) and $attr->{config} //= $app->config;
-   $app->can( 'log'    ) and $attr->{log   } //= $app->log;
-
-   return $attr;
-};
-
-1;
-
-__END__
-
-=pod
 
 =encoding utf-8
 
@@ -66,19 +34,42 @@ A hash reference of component object references. This is not fully populated
 until all of the components have been loaded. It can be used by components to
 discover other dependant components
 
+=cut
+
+has 'components' =>
+   is       => 'ro',
+   isa      => HashRef,
+   default  => sub { {} },
+   weak_ref => TRUE;
+
 =item C<config>
 
 A required object or hash reference
+
+=cut
+
+has 'config' => is => 'ro', isa => Object | HashRef, required => TRUE;
 
 =item C<encoding>
 
 A non empty simple string that defaults to the value of the configuration
 attribute of the same name. Used to set input and output decoding / encoding
 
+=cut
+
+has 'encoding' =>
+   is      => 'lazy',
+   isa     => NonEmptySimpleStr,
+   default => sub { deref $_[0]->config, 'encoding', 'UTF-8' };
+
 =item C<log>
 
 A required object reference of type C<Logger>. The log object should support
 the C<log> call as well as the usual log level calls
+
+=cut
+
+has 'log' => is => 'ro', isa => Object, required => TRUE;
 
 =item C<moniker>
 
@@ -86,14 +77,45 @@ A required non numeric simple string. This is the component name. It is used
 to uniquely identify a component in the component collections held by the role
 L<Web::Components::Loader>
 
+=cut
+
+has 'moniker' => is => 'ro', isa => NonNumericSimpleStr, required => TRUE;
+
 =back
 
 =head1 Subroutines/Methods
 
-=head2 C<BUILDARGS>
+=over 3
+
+=item C<BUILDARGS>
 
 If supplied with an object reference called C<application> the C<config> and
 C<log> attribute values will be set from it if they are otherwise undefined
+
+=cut
+
+around 'BUILDARGS' => sub {
+   my ($orig, $self, @args) = @_;
+
+   my $attr = $orig->($self, @args);
+
+   return $attr unless exists $attr->{application};
+
+   my $app = $attr->{application};
+
+   $attr->{config} //= $app->config if $app->can('config');
+   $attr->{log} //= $app->log if $app->can('log');
+
+   return $attr;
+};
+
+use namespace::autoclean;
+
+1;
+
+__END__
+
+=back
 
 =head1 Diagnostics
 

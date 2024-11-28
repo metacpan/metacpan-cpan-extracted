@@ -16,7 +16,7 @@ sub main {
 		if (-d $_[0]) {
 			$path = $_[0];
 		} else {
-			$recursive = $_[0] ? 1 : 0;
+			croak "The provided path is not a directory or cannot be read";
 		}
 	} elsif (@_ == 2) {
 		if (defined($_[0]) and -d $_[0]) {

@@ -13,10 +13,11 @@ my $git_url = 'https://github.com/markov2/perl5-Business-CAMT';
 WriteMakefile
   (
     NAME             => 'Business-CAMT',
-    VERSION          => '0.11',
+    VERSION          => '0.12',
     AUTHOR           => 'Mark Overmeer <markov@cpan.org>',
     PREREQ_PM        => {
 		'Data::Dumper'   => 0,
+		'JSON'           => 0,
 		'List::Util'     => 0,
         'Log::Report'    => 1.32,
 		'Path::Class'    => 0,

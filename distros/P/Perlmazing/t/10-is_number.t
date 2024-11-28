@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 12;
-use Perlmazing;
+use Perlmazing qw(is_number);
 
 my @cases = (
 	[undef, 0, 'undef'],

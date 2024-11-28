@@ -66,7 +66,7 @@ sub get_specific {
     my $self = shift;
     my $key = shift;
 
-    return $self->client()->get("/profiles/v1/jobs/" . $key);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

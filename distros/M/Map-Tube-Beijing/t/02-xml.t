@@ -2,41 +2,50 @@
 use strict;
 use utf8;
 use Test::More 0.82;
-use XML::Simple;
+use XML::Twig;
 use Map::Tube::Beijing;
 
 my $map = Map::Tube::Beijing->new( );
-
 isa_ok( $map, 'Map::Tube::Beijing', "Map::Tube object without nametype" );
-my $xml = XMLin( $map->xml( ) , KeyAttr => [ ], KeepRoot => 1, );
 
-my( %line_ids, %line_names, %stations );
+my $xml = XML::Twig->new( );
+$xml->parsefile( $map->xml( ) );
+my $root = $xml->root( );
 
-for my $line( @{ $xml->{'tube'}->{'lines'}->{'line'} } ) {
-  my $id = $line->{'id'};
-  my $name = $line->{ 'name_alt'};
-  ok( !exists( $line_names{$name} ), "Line name $name (id $id) defined more than once" );
-  ok( !exists( $line_ids{$name}   ), "Line id $id (name $name) defined more than once" );
+my( %line_ids, %line_names, %stations, %station_names );
+
+my $line = $root->first_child('lines')->first_child('line');
+while ($line) {
+  my $id = $line->att('id');
+  my $name = $line->att('name');
+  ok( !exists( $line_names{$name} ), "Line name (for id $id) defined more than once" );
+  ok( !exists( $line_ids{$id}     ), "Line id $id defined more than once" );
   $line_ids{$id} = 0;
   $line_names{$name} = 0;
+  $line = $line->next_sibling( );
 }
 
-for my $station( @{ $xml->{'tube'}->{'stations'}->{'station'} } ) {
-  my $id    = $station->{'id'};
-  my @lines = map { ( split(/:/) )[0] } split( /,/, $station->{'line'} );
-  my @links = split( /,/, $station->{'link'} );
+my $station = $root->first_child('stations')->first_child('station');
+while($station) {
+  my $id    = $station->att('id');
+  my $name  = $station->att('name');
+  my @lines = map { ( split(/:/) )[0] } split( /,/, $station->att('line') );
+  my @links = split( /,/, $station->att('link') );
 
   isnt( scalar(@lines), 0, "Station id $id should have at least one line" );
   isnt( scalar(@links), 0, "Station id $id should have at least one link" );
 
-  ok( !exists( $stations{$id} ), "Station id $id defined more than once" );
+  ok( !exists( $station_names{$name} ), "Station name (for id $id) defined more than once" );
+  ok( !exists( $stations{$id} ),        "Station id $id defined more than once" );
 
+  $station_names{$name} = 0;
   $stations{$id}->{lines}->{$_}++ for @lines;
   $stations{$id}->{links}->{$_}++ for @links;
 
   ok( exists( $line_ids{$_} ), "Station id $id connected by undefined line named $_" ) for @lines;
 
   $line_ids{$_}++ for @lines;
+  $station = $station->next_sibling( );
 }
 
 # Links should be symmetric: (not necessarily, but in our tube!)

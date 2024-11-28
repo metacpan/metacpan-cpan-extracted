@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 27 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 28 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Games/Solitaire/Verify.pm',
@@ -25,6 +25,7 @@ my @module_files = (
     'Games/Solitaire/Verify/Golf.pm',
     'Games/Solitaire/Verify/HorneAutomovePrune.pm',
     'Games/Solitaire/Verify/KlondikeTalon.pm',
+    'Games/Solitaire/Verify/LinesIter.pm',
     'Games/Solitaire/Verify/Move.pm',
     'Games/Solitaire/Verify/Solution.pm',
     'Games/Solitaire/Verify/Solution/Base.pm',

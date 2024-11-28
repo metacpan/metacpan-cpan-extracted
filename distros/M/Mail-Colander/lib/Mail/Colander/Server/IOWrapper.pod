@@ -1,0 +1,108 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Mail::Colander::Server::IOWrapper
+
+
+=head1 SYNOPSIS
+
+   use Mail::Colander::Server::IOWrapper;
+
+=head1 DESCRIPTION
+
+Wrapper for bridging the I/O between L<Mojolicious> and
+L<Net::Server::Mail::ESMTP>. This module is not meant to be used directly.
+
+=head1 INTERFACE
+
+=head2 Constructor
+
+=head3 B<< new >>
+
+   my $wrapper = Mail::Colander::Server::IOWrapper->new(stream => $stream);
+
+Create an instance. C<$stream> is a required L<Mojo::IOLoop::Stream>
+object.
+
+=head2 Accessors
+
+=head3 B<< inr >>
+
+   my $ref_to_scalar = $wrapper->inr;
+
+Reference to the input buffer. Data that arrives via L</read_input> is
+mostly sent along, except for some few bytes that might be kept until
+something "complete" is available for parsing, much in the spirit of
+L</Net::Server::Mail::process>.
+
+=head3 B<< ofh >>
+
+   my $filehandle = $wrapper->ofh;
+
+A filehandle that can be used by L<Net::Server::Mail::ESMTP> for sending
+responses. Puts data in an internal buffer (see L</outr>) for later
+forwarding.
+
+There is a dirty trick that blesses this filehandle into L<IO::Handle>,
+to make L<Net::Server::Mail::ESMTP> happy. It does not make I<me> happy
+though.
+
+=head3 B<< outr >>
+
+   my $ref_to_scalar = $wrapper->outr;
+
+Reference to the output buffer. Data printed to L</ofh> ends up here and
+are eventually sent along to the stream via L</write_output>.
+
+=head3 B<< size >>
+
+   my $size = $wrapper->size;
+   $wrapper->size(1000);
+
+Track the size of the data transferred so far.
+
+=head3 B<< stream >>
+
+   my $stream = $wrapper->stream;
+
+Get the L<Mojo::IOLoop::Stream> object that handles the actual data
+trasnfer with the peer.
+
+=head2 Methods
+
+=head3 B<< read_input >>
+
+   my $some_bytes = $wrapper->read_input($input_bytes);
+
+Returns data much like what L</Net::Server::Mail::process> does.
+
+=head3 B<< reset >>
+
+   $wrapper->reset;
+
+Clear buffers and reset the output filehandle.
+
+=head3 B<< reset_size >>
+
+   $wrapper->reset_size;
+
+Set L</size> back to C<0>.
+
+=head3 B<< write_output >>
+
+   $wrapper->write_output;
+
+Flush the output buffer towards the L</stream>.
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for Mail::Colander.
+
+
+=cut

@@ -6,7 +6,7 @@
 # same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
 
 package Business::CAMT::Message;{
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 }
 
 
@@ -15,6 +15,7 @@ use warnings;
 
 use Log::Report 'business-camt';
 use Scalar::Util  qw/weaken/;
+use JSON          ();
 
 
 sub new
@@ -69,7 +70,7 @@ sub write(%)
 }
 
 
-sub toString()
+sub toPerl()
 {	my $self = shift;
 	my $attrs = delete $self->{_attrs};
 
@@ -79,6 +80,21 @@ sub toString()
 
 	$self->{_attrs} = $attrs;
 	$text;
+}
+
+
+sub toJSON(%)
+{	my ($self, %args) = @_;
+	my %data  = %$self;        # Shallow copy to remove blessing
+	delete $data{_attrs};      # remove object attributes
+
+	my $json     = JSON->new;
+	my $settings = $args{settings} || {};
+	my %settings = (pretty => 1, canonical => 1, %$settings);
+	while(my ($method, $value) = each %settings)
+	{	$json->$method($value);
+	}
+	$json->encode(\%data);     # returns bytes
 }
 
 1;

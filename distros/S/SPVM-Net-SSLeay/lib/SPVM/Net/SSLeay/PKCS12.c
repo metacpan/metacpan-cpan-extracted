@@ -15,10 +15,10 @@ int32_t SPVM__Net__SSLeay__PKCS12__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  PKCS12* pointer = env->get_pointer(env, stack, obj_self);
+  PKCS12* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    PKCS12_free(pointer);
+    PKCS12_free(self);
   }
   
   return 0;

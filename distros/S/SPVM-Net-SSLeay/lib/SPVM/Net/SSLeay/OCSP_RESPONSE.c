@@ -16,10 +16,10 @@ int32_t SPVM__Net__SSLeay__OCSP_RESPONSE__DESTROY(SPVM_ENV* env, SPVM_VALUE* sta
   
   void* obj_self = stack[0].oval;
   
-  OCSP_RESPONSE* pointer = env->get_pointer(env, stack, obj_self);
+  OCSP_RESPONSE* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    OCSP_RESPONSE_free(pointer);
+    OCSP_RESPONSE_free(self);
   }
   
   return 0;

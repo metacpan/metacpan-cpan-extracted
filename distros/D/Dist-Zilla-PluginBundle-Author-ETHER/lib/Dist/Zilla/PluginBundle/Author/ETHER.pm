@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.162-4-gf26f164
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.163-9-g9f23ff1
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.163';
+our $VERSION = '0.164';
 
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -43,7 +43,7 @@ has installer => (
     default => sub {
         my $self = shift;
 
-        return [ 'MakeMaker::Fallback', 'ModuleBuildTiny::Fallback' ]
+        return [ 'ModuleBuildTiny' ]
             if not exists $self->payload->{installer};
 
         # remove 'none' from installer list
@@ -335,6 +335,9 @@ sub configure {
             . ': recommend instead using server = github and GithubMeta.remote = '
             . $self->server . ' with a read-only mirror', 'yellow'), "\n"
         if $self->server ne 'github' and $self->server ne 'none';
+
+    warn '[@Author::ETHER] ', colored('defunct .travis.yml file detected in repository', 'yellow'), "\n"
+        if -f '.travis.yml';
 
     # method modifier will also apply default configs, compile plugin prereqs
     $self->add_plugins(
@@ -665,7 +668,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.163
+version 0.164
 
 =head1 SYNOPSIS
 
@@ -723,7 +726,7 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     [Manifest]
     [License]
     :version = 5.038
-    filename = LICENCE  ; for distributions where I have authority
+    filename = LICENCE  ; for distributions where I have authority, or any other owner who speaks the King's English
 
     [CPANFile] ; iff cpanfile = 1
 
@@ -1093,10 +1096,8 @@ See also L<[Test::PodSpelling]|Dist::Zilla::Plugin::Test::PodSpelling/stopwords>
 Available since version 0.007.
 
 The installer back-end(s) to use (can be specified more than once); defaults
-to L<C<ModuleBuildTiny::Fallback>|Dist::Zilla::Plugin::ModuleBuildTiny::Fallback>
-and L<C<MakeMaker::Fallback>|Dist::Zilla::Plugin::MakeMaker::Fallback>
-(which generates a F<Build.PL> for normal use with no-configure-requires
-protection, and F<Makefile.PL> as a fallback, containing an upgrade warning).
+to L<C<ModuleBuildTiny>|Dist::Zilla::Plugin::ModuleBuildTiny>
+(which generates a F<Build.PL>).
 For toolchain-grade modules, you should only use F<Makefile.PL>-generating installers.
 
 You can select other backends (by plugin name, without the C<[]>), with the

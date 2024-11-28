@@ -38,51 +38,58 @@ set_syslog_timezone('UTC');
 # this avoids HTTP::Date weirdnes with dates "in the future"
 Test::MockTime::set_fixed_time("2018-12-01T00:00:00Z");
 
-my %Options = ();
-if ( $opt->options ) {
-    %Options = %{ $opt->options };
-    foreach my $k ( sort keys %Options ) {
-        no strict 'refs';
-        verbose({color=>'yellow'}, "Setting Parse::Syslog::Line::$k = $Options{$k}");
-        ${"Parse::Syslog::Line::$k"} = $Options{$k};
-    }
-}
-
 if( $opt->regenerate ) {
+    die "Can't use --options with --regenerate!" if $opt->options;
     $dataDir->visit(sub {
         my ($p) = @_;
         # Only read YAML Data
         return unless $p->is_file and $p->stringify =~ /\.yaml/;
         # Reading is fatal if it fails, that's cool
         my $contents = YAML::LoadFile( $p->stringify );
-        # Generate the Test Case
-        generate_test_data( $contents );
+        # Generate the Test Case in a child to isolate test options
+        if ( my $pid = fork() ) {
+            while( wait() != -1 ) {}
+        }
+        else {
+            generate_test_data( $contents, id => $p->basename('.yaml') );
+            exit 0;
+        }
     });
 }
 else {
     output({color=>'magenta'}, "Please enter log entries newline delimited:");
     while(my $msg = <<>>) {
         chomp($msg);
-        generate_test_data({ string => $msg });
+        generate_test_data({ string => $msg }, options => $opt->options);
     }
 }
 
 sub generate_test_data {
-    my ($entry) = @_;
+    my ($entry,%args) = @_;
 
     die "Missing 'string' element in the test case"
         unless $entry->{string};
 
-    my $id_str = $entry->{string};
-    $id_str   .= YAML::Dump( \%Options ) if $opt->options;
-    my $id = md5_hex($id_str);
+    # Handle options
+    $entry->{options}  = $args{options} if $args{options};
+    if ( $entry->{options} ) {
+        foreach my $k ( keys %{ $entry->{options} } ) {
+            no strict 'refs';
+            ${"Parse::Syslog::Line::$k"} = $entry->{options}{$k};
+        }
+    }
 
-    $entry->{options}  = \%Options if $opt->options;
+    # Generate the data
     $entry->{expected} = parse_syslog_line($entry->{string});
+
+    # Generate a Test ID
+    my $id_str = $entry->{string};
+    $id_str .= YAML::Dump( $entry->{options} ) if $entry->{options};
+    my $id = $args{id} || md5_hex($id_str);
 
     output({clear => 1, color=>'cyan'}, $entry->{string});
     output({indent => 1}, split /\r?\n/, YAML::Dump($entry->{expected}));
-    next unless $opt->noconfirm or confirm("Does this look correct?");
+    return unless $opt->noconfirm or confirm("Does this look correct?");
     $entry->{name} ||= prompt("What name would you give this test? ", default => $id);
 
     my $file = $dataDir->child("${id}.yaml");

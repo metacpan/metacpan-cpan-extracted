@@ -3,7 +3,7 @@ use lib '../lib';
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More tests => 4;
 use Perlmazing qw(slurp md5);
 
 my $content = slurp $0;
@@ -22,3 +22,10 @@ close $in;
 
 is $md5_binary, md5($data_binary), 'binary content matches';
 is $md5, md5($data), 'content matches';
+
+my @lines = slurp $0;
+
+is join('', @lines), $content, 'slurp in list context has the same content';
+
+# ALWAYS leave the following line as the last line in this test file:
+is scalar(@lines), __LINE__, 'slurp in list context has the correct number of lines';

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,36 +12,40 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 9bcc5facd84c92eed9b6bb40d76ed44b76949bd4 Build.PL
-SHA1 4d7ed4cb67d114a69172f5281f0e6ff4d0ad5a89 Changes
-SHA1 c9287a0cfea1301a8e275e14df35a74d0b85e71c LICENSE
-SHA1 54cab5f2759ef514b06479fabd170ef277bc6781 MANIFEST
-SHA1 807828ada34ce3a1931fb6c3984670dab61f725e META.json
-SHA1 bfc3874539c317a2ccb97ed308e46e3d64f0369a META.yml
-SHA1 0553db4b5debe8d90141e4f52f46994d3382164d README
-SHA1 415595662645069b0c54f27985eaaa34b325a772 lib/Web/Components.pm
-SHA1 39ece30460136e6a828c83fb92631dbe3d5c1a92 lib/Web/Components/Loader.pm
-SHA1 af38fc33fb0d44d32aa4d0a1b20e4b9febf626d2 lib/Web/Components/Role.pm
-SHA1 79a084c2bd4fe39542ffb81d281dc53e0b4bd366 lib/Web/Components/Util.pm
-SHA1 08420d6e6e3e1c1fe2baec981edebf34fbfc86ac t/00report-metadata.dd
-SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
-SHA1 f6d57d8f933efb33cc057c265798688e69971860 t/02pod.t
-SHA1 378c0b8a1bf6d248e0025321be971f3d360c983b t/03podcoverage.t
-SHA1 ec69eb3d114489b222043cf3726cb4ef26b3bf51 t/05kwalitee.t
-SHA1 230ce4beccce2b8d03267940e81fcd403d2f6860 t/06yaml.t
-SHA1 1be42347ca117d1b4928eb5030363b6d6982af65 t/07podspelling.t
-SHA1 497e14f3c72cf8693c5b309eadc34f2cc5df59ec t/10test_script.t
-SHA1 5ca3d33e602461489c4795ecea1c3adc200530c3 t/boilerplate.pm
+SHA256 47b2f15b0de14b5c6d92d10154865473b1008ed048358e06ee781290b5622137 Build.PL
+SHA256 1771c6c048cf123a1b1fb826db0dcdcf583c074da28cc4559e09a1c6fab43f99 Changes
+SHA256 bc069c0fa5be6674db779f9fe4ae705d42cf9421f98de42a7c7fd0f8d335c349 LICENSE
+SHA256 6d91f65bbc5630f84a559d7611e30e19f436d71304da947f00ed07e7a6dc0cbe MANIFEST
+SHA256 c43a8f669e75e19e4d07518faa2ef41eba0d156c12667c1e94fb6119fc743e73 META.json
+SHA256 55cb9509f15bb7a51a64d28b080788c09dbeb7e2b0fa8197d60085074162bf71 META.yml
+SHA256 62be7255817a8beb6b02e607c1005d2a1e0964253e9e47a032bf4cec4daab833 README
+SHA256 567faa0855a8647ce5e84cabd05a6c0e8a00e48a7e5c7388cad045a8ff5078ef lib/Web/Components.pm
+SHA256 43538a81de34e4bef768e7b5db293803c06e175e7600b96210f910d138d8402f lib/Web/Components/Loader.pm
+SHA256 5a84085db2100b91677eac6cdee2eaa43db884d9a593905cea5f3b3b4e786d29 lib/Web/Components/Model.pm
+SHA256 619e8bef76692046d11826590c84f9399fcb1aba35a8c81a95de5ca402df1e9b lib/Web/Components/Navigation.pm
+SHA256 9469f647f07b22bcc5ef691e0429dd873fe1cb41b3c32619dce4616c8322b595 lib/Web/Components/ReverseMap.pm
+SHA256 593f26e9ca1fedc00f9c5c41fc54fa9a9eff2c4c0da3d12745f3e9912ebd38c7 lib/Web/Components/Role.pm
+SHA256 3d293ad80491c48af9400a3fbc02f6463e05f8e39290875f7a08df82b1b20e17 lib/Web/Components/Role/ConfigLoader.pm
+SHA256 d5f361f1d22d1311e97d614788cf046bed7f79986ee7fbb01cbd8346356ffc62 lib/Web/Components/Util.pm
+SHA256 f66d6abd5414cab5ded4a5c2fedd29a209ade03ea4b92e7862404de2fca2b85b t/00report-metadata.dd
+SHA256 e6c8740b7fefd59af11bf46337bb3b397914a588f54be22edc1637f7ac3a1e26 t/00report-metadata.t
+SHA256 4cf9886fc3c5d418e12e68a87dc3f4de06d2e583593ae3d138f373823be2c0ca t/02pod.t
+SHA256 8b6db1080c7c92098a38700dd6d42fc79927dbea633be8b448c314e7bb774ef2 t/03podcoverage.t
+SHA256 60fe2c6a04e81dacf35cd04d2f82156777ce577c623c6d68e0082a227519ca64 t/05kwalitee.t
+SHA256 aa521e6b4e0c6294227abb6d8c35506d4c06899e1970f0b83de9ad3d801bcf32 t/06yaml.t
+SHA256 464a32abf756623fb798202296e53292fc6da600b3953cf20e3059d155048256 t/07podspelling.t
+SHA256 a1b68c67ec06505877db8999b6468670e3bc0d908cee021244de4a6028032509 t/10test_script.t
+SHA256 34abc0cc9796cb42d9f4b8ed1f39cb9f811eb7b36be8aacc158071204fd2bbe9 t/boilerplate.pm
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQEcBAEBAgAGBQJZMI7zAAoJEK492j4Im1BpAjMH/2wqPK1FtaFyStfutiCvnFch
-bEf1l8u0JzDItvn0szQMSQBUyCl/91jsX5NMfJA71tME8wcAgcdypXyoIGXpzGIy
-F0HivuCtnKcMLJY14Od4sTwPYsnksdBv81pokusZOSoKrscuHhpkiYsI1fKnCwum
-XV7gcUtpo1u8PfrsTeghVGsezm8eJBOuUTXPm3KXXRgzHvcr+5+4fP8FqZexV2Gc
-X2HTTHuaZW3cGa1tdW6pHBM378FpjtanA7PlXiyYuHjFZZCJFaSI2SuT3VKBes5G
-eGWGNSRCdBkT2g3syvpwwNno/i+hmZBL0+RQRr+Xvx37itc75BKQNNY6Z9eY2ps=
-=algj
+iQEzBAEBAwAdFiEEQrnB1jVVTgrv7RYCrj3aPgibUGkFAmdHqYsACgkQrj3aPgib
+UGmXugf/WQ0vWR1icYw9Rg7R2fMbnkJTjDF/N9GkCD9eFKYD2B/rYgttC7KJituP
+Yo/qk4A1Nu8YrFVdnWqUf036lUtSiTmGtTiL9GJfV3aVUJySB6SBTVQaLj1+AN6S
+Z4BHsQgRKK/XNvGRvPyv7vqNcNAQejtlXKrnYzsvk4jHr/18ZgM6qvLABh/8RCAz
+tH9Io4k/jK0w4aKIFkBchs4uqottWS09e6ulnGlgwKKF0Wo++KJEL7CeQrRKbKak
+3BH40+92htcbK7n71CAoLffbIq80zNwPbvja3SheLF39MGCfLnMDvka0Quv0eSIE
+sKC3RT1QZhLmotHkHzCyESY7Dj+9bg==
+=GTB+
 -----END PGP SIGNATURE-----

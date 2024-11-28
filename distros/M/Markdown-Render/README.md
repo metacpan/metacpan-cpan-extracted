@@ -9,16 +9,16 @@
 * [Usage](#usage)
 * [Tips & Tricks](#tips--tricks)
   * [&#64;DATE(format)&#64;](#dateformat)
-  * [&#64;GIT_EMAIL&#64;](#git_email)
-  * [&#64;GIT_USER&#64;](#git_user)
+  * [&#64;GIT_EMAIL&#64;](#gitemail)
+  * [&#64;GIT_USER&#64;](#gituser)
   * [&#64;TOC&#64;](#toc)
-  * [&#64;TOC_BACK(optional text)&#64;](#toc_backoptional-text)
+  * [&#64;TOC_BACK(optional text)&#64;](#tocbackoptional-text)
   * [Custom TOC Title](#custom-toc-title)
   * [Prevent heading from being included in table of contents](#prevent-heading-from-being-included-in-table-of-contents)
 * [Rendering](#rendering)
 * [Credits](#credits)
 
-__Updated 2024-11-24__ by Rob Lauer <rlauer6@comcast.net>
+__Updated 2024-11-27__ by Rob Lauer <rlauer6@comcast.net>
 
 # README
 

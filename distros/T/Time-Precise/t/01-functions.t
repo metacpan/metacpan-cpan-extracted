@@ -1,7 +1,8 @@
-use lib 'lib';
+use lib '../lib';
+use lib '../blib';
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests => 24;
 
 BEGIN {
 	use_ok 'Time::Precise';
@@ -62,3 +63,11 @@ SKIP: {
 	my $ac_time = scalar gmtime '-1444222866.7336199';
 	is $ac_time =~ /^Thu Mar 27 10:58:5\d\.7336199 1924$/, 1, 'gmtime can go way back (negative seconds)';
 }
+
+my $lc_ts = localtime_ts($time);
+my $gm_ts = gmtime_ts($time);
+my $lt_ts_str = '1975-09-03 08:33:12.0067514';
+my $gm_ts_str = '1975-09-03 13:33:12.0067514';
+
+is $lc_ts, $lt_ts_str, "localtime_ts is $lt_ts_str";
+is $gm_ts, $gm_ts_str, "localtime_ts is $gm_ts_str";

@@ -9,7 +9,7 @@ BEGIN { use_ok('Map::Tube::Beijing') || print "Bail out!\n"; }
 diag( "Testing Map::Tube::Beijing $Map::Tube::Beijing::VERSION, Perl $], $^X" );
 
 my $map = Map::Tube::Beijing->new( );
-isa_ok( $map, 'Map::Tube::Beijing', 'Map::Tube::Beijing object for Chinese script' );
+isa_ok( $map, 'Map::Tube::Beijing', 'Map::Tube::Beijing object for simplified Chinese script' );
 
 $map = Map::Tube::Beijing->new( nametype => 'alt' );
 isa_ok( $map, 'Map::Tube::Beijing', 'Map::Tube::Beijing object for pinyin' );

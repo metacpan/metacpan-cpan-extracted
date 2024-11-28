@@ -25,6 +25,7 @@ my @files = (
     'lib/Games/Solitaire/Verify/Golf.pm',
     'lib/Games/Solitaire/Verify/HorneAutomovePrune.pm',
     'lib/Games/Solitaire/Verify/KlondikeTalon.pm',
+    'lib/Games/Solitaire/Verify/LinesIter.pm',
     'lib/Games/Solitaire/Verify/Move.pm',
     'lib/Games/Solitaire/Verify/Solution.pm',
     'lib/Games/Solitaire/Verify/Solution/Base.pm',

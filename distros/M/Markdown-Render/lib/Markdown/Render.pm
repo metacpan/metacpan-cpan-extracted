@@ -12,7 +12,7 @@ use JSON;
 use LWP::UserAgent;
 use List::Util qw(none);
 
-our $VERSION = '1.60.1';
+our $VERSION = '1.60.2';
 
 use parent qw(Class::Accessor::Fast);
 

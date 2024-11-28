@@ -20,7 +20,7 @@ name: Net-Upwork-API
 provides:
   Net::Upwork::API:
     file: lib/Net/Upwork/API.pm
-    version: v2.2.1
+    version: v2.3.0
   Net::Upwork::API::Client:
     file: lib/Net/Upwork/API/Client.pm
   Net::Upwork::API::Config:
@@ -97,5 +97,5 @@ resources:
   bugtracker: https://github.com/upwork/perl-upwork-oauth2/issues
   homepage: http://developers.upwork.com
   repository: https://github.com/upwork/perl-upwork-oauth2.git
-version: v2.2.1
+version: v2.3.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

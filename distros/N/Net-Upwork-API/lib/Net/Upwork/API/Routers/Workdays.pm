@@ -81,7 +81,7 @@ sub get_by_company {
     my $till_date = shift;
     my %params = @_;
 
-    return $self->client()->get("/team/v3/workdays/companies/" . $company . "/" . $from_date . "," . $till_date, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_by_contract
@@ -119,7 +119,7 @@ sub get_by_contract {
     my $till_date = shift;
     my %params = @_;
 
-    return $self->client()->get("/team/v3/workdays/contracts/" . $contract . "/" . $from_date . "," . $till_date, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

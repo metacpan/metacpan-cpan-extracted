@@ -66,7 +66,7 @@ sub get_list {
     my $self = shift;
     my %params = @_;
 
-    return $self->client()->get("/hr/v4/clients/applications", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_specific
@@ -94,7 +94,7 @@ sub get_specific {
     my $reference = shift;
     my %params = @_;
 
-    return $self->client()->get("/hr/v4/clients/applications/" . $reference, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

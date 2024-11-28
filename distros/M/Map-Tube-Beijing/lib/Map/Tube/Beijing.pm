@@ -3,13 +3,12 @@
 #
 # Author: Gisbert W. Selke, TapirSoft Selke & Selke GbR.
 #
-# Copyright (C) 2015 Gisbert W. Selke. All rights reserved.
+# Copyright (C) 2015/2024 Gisbert W. Selke. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
 # Mail: gws@cpan.org
 #
-
 
 package Map::Tube::Beijing;
 use 5.10.0;
@@ -17,7 +16,7 @@ use version 0.77 ( );
 use strict;
 use warnings;
 
-our $VERSION = version->declare('v0.12.0');
+our $VERSION = version->declare('v0.12.1');
 
 =encoding utf8
 
@@ -28,7 +27,6 @@ Map::Tube::Beijing - Interface to the Beijing tube map
 =cut
 
 use File::Share ':all';
-use XML::Simple;
 use Moo;
 use namespace::clean;
 
@@ -81,7 +79,7 @@ sub _remove_alternatives {
     use Map::Tube::Beijing;
 	my $tube = Map::Tube::Beijing->new( nametype => 'alt' );
 
-    my $route = $tube->get_shortest_route('Yonghegong', 'Chongwenmen');
+	my $route = $tube->get_shortest_route('Yonghegong Lama Temple', 'Chongwenmen')->preferred( );
 
     print "Route: $route\n";
 
@@ -142,7 +140,7 @@ Gisbert W. Selke, TapirSoft Selke & Selke GbR.
 
 =head1 COPYRIGHT AND LICENCE
 
-The data for the XML file were mainly taken from the appropriate Wikipedia
+The data for the XML file were mainly taken from the appropriate English-language Wikipedia
 pages. They are CC BY-SA 2.0.
 The module itself is free software; you may redistribute and/or modify it under
 the same terms as Perl itself.

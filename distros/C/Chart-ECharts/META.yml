@@ -28,6 +28,6 @@ requires:
 resources:
   bugtracker: https://github.com/giterlizzi/perl-Chart-ECharts/issues
   repository: git://github.com/giterlizzi/perl-Chart-ECharts
-version: '1.00'
+version: '1.01'
 x_purl: pkg:cpan/GDT/Chart-ECharts
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -15,10 +15,10 @@ int32_t SPVM__Net__SSLeay__SSL_SESSION__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack
   
   void* obj_self = stack[0].oval;
   
-  SSL_SESSION* pointer = env->get_pointer(env, stack, obj_self);
+  SSL_SESSION* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    SSL_SESSION_free(pointer);
+    SSL_SESSION_free(self);
   }
   
   return 0;

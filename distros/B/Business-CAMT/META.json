@@ -35,6 +35,7 @@
       "runtime" : {
          "requires" : {
             "Data::Dumper" : "0",
+            "JSON" : "0",
             "List::Util" : "0",
             "Log::Report" : "1.32",
             "Path::Class" : "0",
@@ -62,6 +63,6 @@
          "web" : "https://github.com/markov2/perl5-Business-CAMT"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

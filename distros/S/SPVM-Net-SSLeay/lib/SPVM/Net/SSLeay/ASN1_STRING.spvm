@@ -1,0 +1,25 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::ASN1_STRING : pointer {
+  
+  use Fn;
+  
+  # Class Methods
+  private static method new_with_pointer : Net::SSLeay::ASN1_STRING ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::ASN1_STRING;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  native method length : int ();
+  
+  native method get0_data : string ();
+  
+  native method DESTROY : void ();
+  
+}

@@ -68,7 +68,7 @@ like(
 
 like(
      $module,
-    qr/^our \$VERSION = '0.001';\n\nuse 5\.016;$/m,
+    qr/^our \$VERSION = '0.001';\n\nuse 5\.020;\nuse strictures 2;/m,
     'initial module $VERSION is calculated correctly',
 );
 

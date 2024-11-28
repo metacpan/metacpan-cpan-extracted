@@ -34,7 +34,7 @@ sub version {
 sub usage {
 ########################################################################
   print <<'END_OF_USAGE';
-usage: md-utils options [markdown-file]
+usage: md-utils.pl options [markdown-file]
 
 Utility to add a table of contents and other goodies to your GitHub
 flavored markdown.
@@ -48,9 +48,9 @@ flavored markdown.
 
 Examples:
 ---------
- md-utils README.md.in > README.md
+ md-utils.pl README.md.in > README.md
 
- md-utils -r README.md.in
+ md-utils.pl -r README.md.in
 
 Options
 -------

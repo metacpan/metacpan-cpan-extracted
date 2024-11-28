@@ -8,7 +8,7 @@
 # https://www.betaalvereniging.nl/wp-content/uploads/IG-Bank-to-Customer-Statement-CAMT-053-v1-1.pdf
 
 package Business::CAMT;{
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 }
 
 

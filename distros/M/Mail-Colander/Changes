@@ -1,0 +1,6 @@
+0.004  2024-11-28 07:47:48 CET
+   - Rename to Mail::Colander, apparently Mail::Sieve is already taken
+
+0.002  2024-11-16 11:11:23 CET
+   - Initial release - still have to think how to properly code tests
+     but still

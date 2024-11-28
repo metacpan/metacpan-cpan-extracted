@@ -45,10 +45,10 @@ int32_t SPVM__Net__SSLeay__EC_KEY__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  EC_KEY* pointer = env->get_pointer(env, stack, obj_self);
+  EC_KEY* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    EC_KEY_free(pointer);
+    EC_KEY_free(self);
   }
   
   return 0;

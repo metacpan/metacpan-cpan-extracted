@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Golf;
-$Games::Solitaire::Verify::Golf::VERSION = '0.2600';
+$Games::Solitaire::Verify::Golf::VERSION = '0.2601';
 use strict;
 use warnings;
 use 5.014;
@@ -12,6 +12,7 @@ use List::Util qw/ sum /;
 use Games::Solitaire::Verify::Card      ();
 use Games::Solitaire::Verify::Column    ();
 use Games::Solitaire::Verify::Freecells ();
+use Games::Solitaire::Verify::LinesIter ();
 
 use parent 'Games::Solitaire::Verify::Base';
 
@@ -33,6 +34,13 @@ my $MAX_RANK  = 13;
 my $NUM_SUITS = 4;
 my $CARD_RE   = qr/[A23456789TJQK][HCDS]/;
 
+my %_VARIANTS = (
+    all_in_a_row => 1,
+    binary_star  => 1,
+    black_hole   => 1,
+    golf         => 1,
+);
+
 sub _is_binary_star
 {
     my $self = shift;
@@ -47,19 +55,43 @@ sub _is_golf
     return $self->_variant eq 'golf';
 }
 
+sub _read_foundation_line
+{
+    my ( $self, $foundation_str ) = @_;
+    my $num_foundations = $self->_num_foundations();
+
+    if ( my ($card_s) = $foundation_str =~
+        m#\AFoundations:((?: $CARD_RE){$num_foundations})\z# )
+    {
+        $card_s =~ s/\A //ms
+            or Carp::confess("_set_found_line: no leading space");
+        my @c = split( / /, $card_s );
+        if ( @c != $num_foundations )
+        {
+            Carp::confess( "num_foundations is "
+                    . scalar(@c)
+                    . " rather than $num_foundations" );
+        }
+        for my $i ( keys @c )
+        {
+            my $s = $c[$i];
+            $self->_set_found( $i,
+                Games::Solitaire::Verify::Card->new( { string => $s } ) );
+        }
+    }
+    else
+    {
+        Carp::confess("Foundations str is '$foundation_str'");
+    }
+    return;
+}
+
 sub _init
 {
     my ( $self, $args ) = @_;
 
     my $variant = $self->_variant( $args->{variant} );
-    if (
-        not exists {
-            all_in_a_row => 1,
-            binary_star  => 1,
-            black_hole   => 1,
-            golf         => 1,
-        }->{$variant}
-        )
+    if ( not exists $_VARIANTS{$variant} )
     {
         Carp::confess("Unknown variant '$variant'!");
     }
@@ -75,35 +107,7 @@ sub _init
     );
     my $board_string = $args->{board_string};
 
-    my @lines = split( /\n/, $board_string );
-
-    my $_set_found_line = sub {
-        my $foundation_str = shift;
-        if ( my ($card_s) = $foundation_str =~
-            m#\AFoundations:((?: $CARD_RE){$num_foundations})\z# )
-        {
-            $card_s =~ s/\A //ms
-                or Carp::confess("_set_found_line: no leading space");
-            my @c = split( / /, $card_s );
-            if ( @c != $num_foundations )
-            {
-                Carp::confess( "num_foundations is "
-                        . scalar(@c)
-                        . " rather than $num_foundations" );
-            }
-            for my $i ( keys @c )
-            {
-                my $s = $c[$i];
-                $self->_set_found( $i,
-                    Games::Solitaire::Verify::Card->new( { string => $s } ) );
-            }
-        }
-        else
-        {
-            Carp::confess("Foundations str is '$foundation_str'");
-        }
-        return;
-    };
+    my @lines          = split( /\n/, $board_string );
     my $foundation_str = shift(@lines);
     if ( $self->_variant eq 'golf' )
     {
@@ -120,8 +124,7 @@ sub _init
         );
 
         $foundation_str = shift(@lines);
-        $_set_found_line->($foundation_str);
-
+        $self->_read_foundation_line($foundation_str);
     }
     else
     {
@@ -135,7 +138,7 @@ sub _init
         }
         else
         {
-            $_set_found_line->($foundation_str);
+            $self->_read_foundation_line($foundation_str);
         }
     }
 
@@ -165,74 +168,12 @@ sub _set_found
     return;
 }
 
-package Games::Solitaire::Verify::Golf::_LinesIter;
-$Games::Solitaire::Verify::Golf::_LinesIter::VERSION = '0.2600';
-sub new
-{
-    my $class = shift;
-
-    my $self = bless {}, $class;
-
-    $self->_init(@_);
-
-    return $self;
-}
-
-sub _init
-{
-    my ( $self, $args ) = @_;
-
-    $self->{_get}      = $args->{_get};
-    $self->{_line_num} = 0;
-
-    return;
-}
-
-sub _get_line
-{
-    my ( $self, ) = @_;
-
-    my $ret = $self->{_get}->();
-    return ( $ret, ++$self->{_line_num} );
-}
-
-sub _assert_empty_line
-{
-    my ( $self, ) = @_;
-
-    my ( $s, $line_idx ) = $self->_get_line;
-
-    if ( $s ne '' )
-    {
-        Carp::confess("Line '$line_idx' is not empty, but '$s'");
-    }
-
-    return;
-}
-
-sub _compare_line
-{
-    my ( $self, $wanted_line, $title, ) = @_;
-
-    my ( $line, $line_idx ) = $self->_get_line;
-    if ( $line ne $wanted_line )
-    {
-        Carp::confess(
-            "$title string is '$line' vs. '$wanted_line' at line no. $line_idx"
-        );
-    }
-
-    return;
-}
-
-package Games::Solitaire::Verify::Golf;
-
 sub process_solution
 {
     my ( $self, $next_line_iter ) = @_;
     my $columns     = $self->_columns;
     my $NUM_COLUMNS = @$columns;
-    my $it          = Games::Solitaire::Verify::Golf::_LinesIter->new(
+    my $it          = Games::Solitaire::Verify::LinesIter->new(
         { _get => $next_line_iter, } );
     my $remaining_cards = sum( map { $_->len } @$columns );
 
@@ -447,7 +388,7 @@ of black-hole-solve (or a similar solver)
 
 =head1 VERSION
 
-version 0.2600
+version 0.2601
 
 =head1 SYNOPSIS
 

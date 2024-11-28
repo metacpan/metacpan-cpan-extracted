@@ -29,10 +29,11 @@ This module accepts all of the standard parameters that can be passed
 to any Template provider module. See L<Template::Provider> for the full
 list.
 
-This module accepts two extra parameters, C<EXTENSIONS>, which defines the
-file extensions that is used to identify files that require conversion, and
+This module accepts three extra parameters, C<EXTENSIONS>, which defines the
+file extensions that is used to identify files that require conversion,
 C<OUTPUT_FORMAT> which defines the the format that template will be converted
-into.
+into and C<STRIP_FRONT_MATTER> which will remove Jekyll-style front matter
+from the file content before returning it.
 
 C<EXTENSIONS> is a hash reference. The default is to only handle Markdown
 files (which are identified by the extension .md). You can get a full list
@@ -61,6 +62,27 @@ allowed putput values by running
 
 at a command line.
 
+C<STRIP_FRONT_MATTER> is a flag that is either true or false. The default
+value is false. If it is true then this module will remove any Jekyll-style
+front matter from the file contents before returning them.
+
+Jekyll-style front matter is a format used by Jekyll and other, similar,
+static site builders. It is a fragmant of YAML that is inserted at the top
+of the file between two lines that consist only of three dashes, like this:
+
+    ---
+    title: Title of the page
+    author: Joe Author
+    tags:
+      - list
+      - of
+      -tags
+    ---
+
+The current implementation doesn't check that the front matter is actually
+YAML. It simply removes everything from the first line of dashes to the
+second.
+
 =head1 Template::Provider::Markdown::Pandoc
 
 This module is a successor to Template::Provider::Markdown::Pandoc. This
@@ -81,7 +103,7 @@ extends 'Template::Provider';
 
 use Pandoc ();
 
-our $VERSION = '0.0.5';
+our $VERSION = '0.1.0';
 
 has pandoc => (
   isa => 'Pandoc',
@@ -131,6 +153,8 @@ before _init  => sub {
 
   $self->{OUTPUT_FORMAT} =
     $opts->{OUTPUT_FORMAT} // $self->default_output_format;
+
+  $self->{STRIP_FRONT_MATTER} = $opts->{STRIP_FRONT_MATTER} // 0;
 };
 
 around _template_content => sub {
@@ -139,6 +163,10 @@ around _template_content => sub {
   my ($path) = @_;
 
   my ($data, $error, $mod_date) = $self->$orig(@_);
+
+  if ($self->{STRIP_FRONT_MATTER}) {
+    $data =~ s/\A---\n.+?\n---\n//;
+  }
 
   my $done = 0;
 

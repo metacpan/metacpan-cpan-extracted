@@ -12,3 +12,5 @@ Revision history for Time-Precise
         Fixed incorrect META.yml reported in RT 112413
 1.0010  2016-02-26
         Added croak to cases where Perl is < 5.012 and negative seconds are used for functions related to localtime.
+1.0012  2024-11-27
+        Added functions localtime_ts and gmtime_ts to get a timestamp SQL style.

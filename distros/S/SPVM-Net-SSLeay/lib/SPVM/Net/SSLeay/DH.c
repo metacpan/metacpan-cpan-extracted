@@ -15,10 +15,10 @@ int32_t SPVM__Net__SSLeay__DH__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  DH* pointer = env->get_pointer(env, stack, obj_self);
+  DH* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    DH_free(pointer);
+    DH_free(self);
   }
   
   return 0;

@@ -16,10 +16,10 @@ int32_t SPVM__Net__SSLeay__ASN1_ENUMERATED__DESTROY(SPVM_ENV* env, SPVM_VALUE* s
   
   void* obj_self = stack[0].oval;
   
-  ASN1_ENUMERATED* pointer = env->get_pointer(env, stack, obj_self);
+  ASN1_ENUMERATED* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    ASN1_ENUMERATED_free(pointer);
+    ASN1_ENUMERATED_free(self);
   }
   
   return 0;

@@ -1,4 +1,4 @@
-# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2024 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,9 +6,9 @@
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Mail::Message::Field;
-use vars '$VERSION';
-$VERSION = '3.015';
+package Mail::Message::Field;{
+our $VERSION = '3.016';
+}
 
 use base 'Mail::Reporter';
 
@@ -209,22 +209,18 @@ sub content() { shift->unfoldedBody }  # Compatibility
 
 sub attribute($;$)
 {   my ($self, $attr) = (shift, shift);
-    my $body  = $self->unfoldedBody;
 
-    unless(@_)
-    {   # only get a value
-        if($body =~ m/\b$attr\s*\=\s*
-                      ( "( (?> [^\\"]+|\\. )* )"
-                      | ([^";\s]*)
-                      )/xi)
-        {   (my $val = $+) =~ s/\\(.)/$1/g;
-            return $val;
-        }
-        return undef;
-    }
+	# Although each attribute can appear only once, some (intentionally)
+	# broken messages do repeat them.  See github issue 20.  Apple Mail and
+	# Outlook will take the last of the repeated in such case, so we do that
+	# as well.
+	my %attrs = $self->attributes;
+	@_ or return $attrs{$attr};
 
     # set the value
     my $value = shift;
+    my $body  = $self->unfoldedBody;
+
     unless(defined $value)  # remove attribute
     {   for($body)
         {      s/\b$attr\s*=\s*"(?>[^\\"]|\\.)*"//i

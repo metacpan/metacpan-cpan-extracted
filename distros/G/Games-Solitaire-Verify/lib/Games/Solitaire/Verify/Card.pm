@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Card;
-$Games::Solitaire::Verify::Card::VERSION = '0.2600';
+$Games::Solitaire::Verify::Card::VERSION = '0.2601';
 use warnings;
 use strict;
 
@@ -54,8 +54,9 @@ my @card_nums = (
             't'     => "T",
             'non_t' => "10",
         },
-        ,
-        "J", "Q", "K"
+
+        "J", "Q",
+        "K"
     )
 );
 
@@ -272,7 +273,7 @@ Solitaire card.
 
 =head1 VERSION
 
-version 0.2600
+version 0.2601
 
 =head1 SYNOPSIS
 

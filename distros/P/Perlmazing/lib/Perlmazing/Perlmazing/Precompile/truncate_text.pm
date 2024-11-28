@@ -1,4 +1,4 @@
-use Perlmazing;
+use Perlmazing qw(is_number);
 
 sub main ($$) {
 	my ($str, $size) = @_;

@@ -48,21 +48,40 @@ Revision history for Perlmazing
 1.2816  2021-04-18
 	Updated Makefile.PL to require Submodules 1.0015, which resolves issues with this update.
 2.0002  2023-03-16
-    Very important change: Perlmazing no longer exports everything by default. Only 'pl', 'dumped', 'define' are default now.
-        Also, all functions that match a CORE function name, are also automatically imported.
-        You now need to explicitly import the symbols you want, or import the tag ':all'. For 'pl', 'dumped' and 'define',
-        if you don't want them imported, you either need to "use Perlmazing ()" to avoid any imports, or explicitly say "!symbol".
-    Updated list of dependencies that were causing installation problems in some platforms.
-    Important change: Perlmazing previously would enable all the latest features of the Perl version it was running on. That
-    was a terrible idea from the start. It now has a version limit, that can be changed, set by default to 5.028.
-    Important change: rmdir was previously using File::Path::remove_tree, but we are now using our own implementation, since
-    File::Path is deleting the contents of symlinked directories, at least on Win32. This implementation correctly removes
-    symlinks on any OS instead of parsing its contents to delete them.
-    Added stat function. Works the same as CORE::stat, except it will give you an object you can call methods on when assigned
-        to a scalar.
-    Fixed some issues in the POD, related to links containing ->, which wasn't properly escaped.
-2.0004
-    Small changes in POD and stat t file.
-2.0006
-    Missing update in this file.
-    Missing update in MANIFEST for stat.pm
+  Very important change: Perlmazing no longer exports everything by default. Only 'pl', 'dumped', 'define' are default now.
+    Also, all functions that match a CORE function name, are also automatically imported.
+    You now need to explicitly import the symbols you want, or import the tag ':all'. For 'pl', 'dumped' and 'define',
+    if you don't want them imported, you either need to "use Perlmazing ()" to avoid any imports, or explicitly say "!symbol".
+  Updated list of dependencies that were causing installation problems in some platforms.
+  Important change: Perlmazing previously would enable all the latest features of the Perl version it was running on. That
+  was a terrible idea from the start. It now has a version limit, that can be changed, set by default to 5.028.
+  Important change: rmdir was previously using File::Path::remove_tree, but we are now using our own implementation, since
+  File::Path is deleting the contents of symlinked directories, at least on Win32. This implementation correctly removes
+  symlinks on any OS instead of parsing its contents to delete them.
+  Added stat function. Works the same as CORE::stat, except it will give you an object you can call methods on when assigned
+    to a scalar.
+  Fixed some issues in the POD, related to links containing ->, which wasn't properly escaped.
+2.0004  2023-05-28
+  Small changes in POD and stat t file.
+2.0006  2023-05-28
+  Missing update in this file.
+  Missing update in MANIFEST for stat.pm
+2.0008  2024-11-27
+  Removed unecessary dependencies from Makefile.PL
+  Fixed bug in function dir, it was assuming non existing directories as '.'.
+  Added new export tags.
+  Fixed several bugs related to Perlmazing::Engine::Exporter. It should now behave properly in all cases.
+  Fixed all the cases where Perlmazing's function files were not properly importing the symbols they need to run.
+  Fixed test cases that started to fail once the previous fixes were in place.
+  Fixed some errors/mispellings in the documentation.
+  Added windows_path and unix_path functions.
+  Fixed wrong sorting for "numeric" (upper/lower-case was taking precedence in a wrong way)
+  Added the unbless function from Data::Structure::Util
+  Improved the slurp function to do-what-you-mean in list context.
+2.0010  2024-11-28
+  Fixed an error in POD.
+2.0012  2024-11-28
+  Improved documentation.
+  Fixed a test for rmdir for a very small set of cases where testers seem to have permission issues when creating a symlink on Win32.
+2.0014  2024-11-28
+  Added localtime_ts and gmtime_ts functions.

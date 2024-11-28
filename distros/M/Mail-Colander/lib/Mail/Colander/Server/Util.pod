@@ -1,0 +1,61 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Mail::Colander::Server::Util
+
+
+=head1 SYNOPSIS
+
+   use Mail::Colander::Server::Util qw< xxd_message >;
+
+   my $string = xxd_message($data, max_lines => 5, prefix => '| ');
+
+=head1 DESCRIPTION
+
+Utility function(s) for L<Mail::Colander>.
+
+=head1 INTERFACE
+
+=head2 Functions
+
+=head3 B<< xxd_message >>
+
+   my @lines  = xxd_message($data, %options);   # OR
+   my $string = xxd_message($data, %options);
+
+Use L<Data::HexDump::XXD> to produce an output like
+L<xxd|https://linux.die.net/man/1/xxd>, with some options.
+
+Can return a list of lines or a string, depending on the context.
+
+Options in C<%options>:
+
+=over
+
+=item *
+
+C<max_lines>: remove lines and only keep the beginning and the end.
+
+=item *
+
+C<preamble>: pre-pend a string/list of lines (if array reference) to the
+output.
+
+=item *
+
+C<prefix>: indent each I<xxd>-like line with a fixed string.
+
+=back
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for Mail::Colander.
+
+
+=cut

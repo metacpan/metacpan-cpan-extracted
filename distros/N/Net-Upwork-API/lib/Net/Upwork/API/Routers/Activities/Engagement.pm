@@ -66,7 +66,7 @@ sub get_specific {
     my $self = shift;
     my $engagement_ref = shift;
 
-    return $self->client()->get("/tasks/v2/tasks/contracts/" . $engagement_ref);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item assign
@@ -104,7 +104,7 @@ sub assign {
     my $engagement = shift;
     my %params = @_;
 
-    return $self->client()->put("/otask/v1/tasks/companies/" . $company . "/" . $team . "/engagements/" . $engagement, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item assign_to_engagement
@@ -132,7 +132,7 @@ sub assign_to_engagement {
     my $engagement_ref = shift;
     my %params = @_;
 
-    return $self->client()->put("/tasks/v2/tasks/contracts/" . $engagement_ref, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

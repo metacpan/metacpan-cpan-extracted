@@ -67,7 +67,7 @@ sub get_by_freelancer {
     my $freelancer_ref = shift;
     my %params = @_;
 
-    return $self->client()->get("/finreports/v2/providers/" . $freelancer_ref . "/earnings", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_by_freelancers_team
@@ -91,7 +91,7 @@ sub get_by_freelancers_team {
     my $freelancer_team_ref = shift;
     my %params = @_;
 
-    return $self->client()->get("/finreports/v2/provider_teams/" . $freelancer_team_ref . "/earnings", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_by_freelancers_company
@@ -115,7 +115,7 @@ sub get_by_freelancers_company {
     my $freelancer_company_ref = shift;
     my %params = @_;
 
-    return $self->client()->get("/finreports/v2/provider_companies/" . $freelancer_company_ref . "/earnings", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_by_buyers_team
@@ -139,7 +139,7 @@ sub get_by_buyers_team {
     my $buyer_team_ref = shift;
     my %params = @_;
 
-    return $self->client()->get("/finreports/v2/buyer_teams/" . $buyer_team_ref . "/earnings", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_by_buyers_company
@@ -163,7 +163,7 @@ sub get_by_buyers_company {
     my $buyer_company_ref = shift;
     my %params = @_;
 
-    return $self->client()->get("/finreports/v2/buyer_companies/" . $buyer_company_ref . "/earnings", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

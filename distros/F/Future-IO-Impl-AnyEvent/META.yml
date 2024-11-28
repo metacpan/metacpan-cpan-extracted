@@ -1,0 +1,45 @@
+---
+abstract: 'Future::IO implementation using AnyEvent'
+author:
+  - 'Mathias Kende <mathias@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Readonly: '0'
+  Test2::V0: '0'
+  Test::CPANfile: '0'
+  Test::Future::IO::Impl: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  perl: v5.14.0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - future
+  - io
+  - anyevent
+  - async
+  - fs
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Future-IO-Impl-AnyEvent
+no_index:
+  directory:
+    - t
+    - inc
+    - local
+    - vendor
+    - t
+requires:
+  AnyEvent: '0'
+  Future: '0'
+  Future::IO: '0'
+  Future::IO::ImplBase: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/mkende/perl_future_io_impl_any_event/issues
+  repository: https://github.com/mkende/perl_future_io_impl_any_event
+version: 0.01
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,148 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Mail::Colander::Message
+
+
+=head1 SYNOPSIS
+
+   use Mail::Colander::Message;
+
+   # an email message in EML format, parseable by MIME::Parser
+   my $eml_text = ...;
+
+   # the constructor can take the unparsed text message as well as a
+   # MIME::Entity
+   my $msm = Mail::Colander::Message->new(entity => $eml_text);
+
+   # also a shorthand...
+   my $msm = Mail::Colander::Message->create($eml_text);
+
+   my $to = $msm->to; # array reference of plain email addresses in "To"
+
+   # this gets all "To", "Cc", and "Bcc" available in the message
+   my $all_recipients = $msm->recipients;
+
+   # any combination...
+   my $to_and_cc = $msm->bare_addresses('to', 'cc');
+
+   my $from = $msm->from;      # plain string
+   my $subj = $msm->subject;   # plain string
+
+   my $any_header_string = $msm->header_first('X-Foo');
+   my $any_header_aref   = $msm->header_all('X-Bar');
+
+
+=head1 DESCRIPTION
+
+Wrap a L<MIME::Entity> with some handy accessor so that they can be more
+easily consumed while evaluating chains with L<Data::Annotation>. The
+wrapper also provides caching of the results and methods for reducing
+addresses to their bare minimum (hopefully making it easier to match
+them during the evaluation process).
+
+=head1 INTERFACE
+
+=head2 Constructors
+
+=head3 B<< create >>
+
+   my $msm1 = Mail::Colander::Message->create($eml_message_as_string);  # OR
+   my $msm2 = Mail::Colander::Message->create($mime_entity_object);
+
+Shorthand for C<< Mail::Colander::Message->new(entity => ...) >>.
+
+=head3 B<< new >>
+
+   my $msm1 = Mail::Colander::Message->new(entity => $eml_message_as_string);
+   my $msm2 = Mail::Colander::Message->new(entity => $mime_entity_object);
+
+Create a new instance with the provided entity. The entity might already
+have been parsed into a L<MIME::Entity>-compatible object (anything can
+do actually, but then methods will be called onto the object...), or a
+string that will be parsed into such object via L<MIME::Parser>.
+
+=head2 Accessors
+
+=head3 B<< entity >>
+
+   my $entity = $msm->entity;
+
+Get the L<MIME::Entity> object inside the wrap.
+
+=head2 Methods
+
+=head3 B<< bare_addresses >>
+
+   my $aref = $msm->bare_addresses(@types);
+
+Get any combination of L</to>/L</cc>/L<bcc> passed as C<@types>. Returns
+an array reference with the list of I<de-duplicated> plain addresses.
+
+=head3 B<< bcc >>
+
+   my $aref = $msm->bcc;
+
+Get the list of plain I<de-duplicated> addresses in the C<Bcc> header.
+
+=head3 B<< cc >>
+
+   my $aref = $msm->cc;
+
+Get the list of plain I<de-duplicated> addresses in the C<Cc> header.
+
+=head3 B<< from >>
+
+   my $string = $msm->from;
+
+Get the address from the C<From> header. It is supposed to only occur
+once, so the I<first> is returned as a string. It is not stripped of
+anything (i.e. it might not be a I<plain> address).
+
+=head3 B<< header_all >>
+
+   my $aref = $msm->header_all('X-Foo');
+
+Generic accessor for all occurrences of a header. Returns an array
+reference, possibly empty.
+
+=head3 B<< header_first >>
+
+   my $item = $msm->header_first('X-Foo');
+
+Generic accessor for the first occurrence of a header. Returns that
+occurrence as a string, or C<undef> if none is found.
+
+=head3 B<< recipients >>
+
+   my $aref = $msm->recipients;
+
+Shorthand for C<< $msm->bare_addresses(qw< to cc bcc >) >>, i.e. getting
+all recipients wherever they occur in the headers of the message.
+Returns an array reference with the list of plain I<de-duplicated>
+addresses.
+
+=head3 B<< subject >>
+
+   my $string = $msm->subject;
+
+Get the subject of the message, as a string.
+
+=head3 B<< to >>
+
+   my $aref = $msm->to;
+
+Get the list of plain I<de-duplicated> addresses in the C<To> header.
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for Mail::Colander.
+
+
+=cut

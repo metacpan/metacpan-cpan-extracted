@@ -66,7 +66,7 @@ sub request_approval {
     my $self = shift;
     my %params = @_;
 
-    return $self->client()->post("/hr/v3/fp/submissions", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item approve
@@ -94,7 +94,7 @@ sub approve {
     my $submission_id = shift;
     my %params = @_;
 
-    return $self->client()->put("/hr/v3/fp/submissions/" . $submission_id . "/approve", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item reject
@@ -122,7 +122,7 @@ sub reject {
     my $submission_id = shift;
     my %params = @_;
 
-    return $self->client()->put("/hr/v3/fp/submissions/" . $submission_id . "/reject", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

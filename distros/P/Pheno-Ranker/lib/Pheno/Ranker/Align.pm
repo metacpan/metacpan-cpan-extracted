@@ -618,11 +618,11 @@ sub remap_hash {
 
     # Load values for the for loop
     my $exclude_variables_regex_qr = $self->{exclude_variables_regex_qr};
-    my $misc_regex_qr = qr/1900-01-01|NA0000|P999Y|P9999Y|phenopacket_id/;
+    my $misc_regex_qr = qr/1900-01-01|NA0000|NCIT:C126101|P999Y|P9999Y|phenopacket_id/;
 
     # Pre-compile a list of fixed scalar values to exclude into a hash for quick lookup
     my %exclude_values =
-      map { $_ => 1 } ( 'NA', 'NaN', 'Fake', 'None:No matching concept' );
+      map { $_ => 1 } ( 'NA', 'NaN', 'Fake', 'None:No matching concept', 'Not Available' );
 
     # Now we proceed for each key
     for my $key ( keys %{$hash} ) {

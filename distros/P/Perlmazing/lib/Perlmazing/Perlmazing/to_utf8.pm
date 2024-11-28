@@ -1,4 +1,4 @@
-use Perlmazing;
+use Perlmazing qw(is_utf8);
 use Encode;
 our @ISA = qw(Perlmazing::Listable);
 

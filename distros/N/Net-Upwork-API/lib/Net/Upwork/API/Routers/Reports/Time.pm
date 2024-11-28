@@ -72,7 +72,7 @@ sub get_by_team_full {
     my $team = shift;
     my %params = @_;
 
-    return $self->get_by_type($company, $team, "", 0, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_by_team_limited 
@@ -101,7 +101,7 @@ sub get_by_team_limited {
     my $team = shift;
     my %params = @_;
 
-    return $self->get_by_type($company, $team, "", 1, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_by_agency
@@ -130,7 +130,7 @@ sub get_by_agency {
     my $agency = shift;
     my %params = @_;
 
-    return $self->get_by_type($company, "", $agency, 0, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_by_company
@@ -154,7 +154,7 @@ sub get_by_company {
     my $company = shift;
     my %params = @_;
 
-    return $self->get_by_type($company, "", "", 0, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_by_freelancer_limited
@@ -178,7 +178,7 @@ sub get_by_freelancer_limited {
     my $freelancer_id = shift;
     my %params = @_;
 
-    return $self->client()->get("/timereports/v1/providers/" . $freelancer_id . "/hours", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_by_freelancer_full
@@ -202,7 +202,7 @@ sub get_by_freelancer_full {
     my $freelancer_id = shift;
     my %params = @_;
 
-    return $self->client()->get("/timereports/v1/providers/" . $freelancer_id, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_by_type
@@ -255,7 +255,7 @@ sub get_by_type {
         }
     }
 
-    return $self->client()->get("/timereports/v1/companies/" . $company . $url, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

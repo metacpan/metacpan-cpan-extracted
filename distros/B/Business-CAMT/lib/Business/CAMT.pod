@@ -272,8 +272,8 @@ clearer and easier.
 
 =head1 SEE ALSO
 
-This module is part of Business-CAMT distribution version 0.11,
-built on November 26, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Business-CAMT distribution version 0.12,
+built on November 27, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

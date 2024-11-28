@@ -1,5 +1,5 @@
-=== README for Mail-Message version 3.010
-=   Generated on Wed Oct 14 19:21:52 2020 by OODoc 2.02
+=== README for Mail-Message version 3.016
+=   Generated on Wed Nov 27 10:54:22 2024 by OODoc 2.03
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d Mail-Message-3.010.tar.gz
-       tar -xf Mail-Message-3.010.tar
-       cd Mail-Message-3.010
+       gzip -d Mail-Message-3.016.tar.gz
+       tar -xf Mail-Message-3.016.tar
+       cd Mail-Message-3.016
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/Mail-Message-3.010/
+    http://search.cpan.org/dist/Mail-Message-3.016/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=Mail-Message

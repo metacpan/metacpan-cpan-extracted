@@ -1,3 +1,36 @@
+0.019 2024-11-28
+  [New Features]
+    * Add Add Net::SSLeay#get0_next_proto_negotiated_return_string method.
+    * Add Net::SSLeay#get0_alpn_selected_return_string method.
+    * Add Net::SSLeay::Constant#TLSEXT_NAMETYPE_host_name method.
+    * Add Net::SSLeay::Constant#EVP_MAX_MD_SIZE method.
+    * Add Net::SSLeay::X509_NAME_ENTRY class.
+    * Add Net::SSLeay::X509#pubkey_digest_return_string method.
+    * Add Net::SSLeay::X509#digest_return_string method.
+    * Add Net::SSLeay#get_tlsext_status_type method.
+    * Add Net::SSLeay::ASN1_OCTET_STRING class.
+    * Add Net::SSLeay::X509_EXTENSION class.
+    * Add Net::SSLeay::ASN1_STRING class.
+    * Add Net::SSLeay::ASN1_STRING#length method.
+    * Add Net::SSLeay::OBJ#nid2obj method.
+    * Add Net::SSLeay::OBJ#obj2nid method.
+    * Add Net::SSLeay::X509_NAME#get_entry method.
+    * Add Net::SSLeay::X509_NAME#get_index_by_NID method.
+    * Add Net::SSLeay::X509_NAME#entry_count method.
+    * Add Net::SSLeay::X509_NAME#get_index_by_OBJ method.
+    * Add Net::SSLeay::X509_NAME_ENTRY#get_data method.
+    * Add Net::SSLeay::X509_NAME_ENTRY#get_object method.
+    * Add Net::SSLeay::X509#get_ext_by_NID method.
+    * Add Net::SSLeay::X509#get_ext_by_OBJ method.
+    * Add Net::SSLeay::X509#get_ext_count method.
+    * Add Net::SSLeay::X509#get_ext.
+    * Add Net::SSLeay::X509_EXTENSION#get_data method.
+    * Add Net::SSLeay::X509_EXTENSION#get_object method.
+    * Add Net::SSLeay::X509_EXTENSION#get_critical method.
+  [Deprecations and Rename]
+    * Net::SSLeay#P_dump_peer_certificate is deprecated, and dump_peer_certificate method is added.
+    * Net::SSLeay::X509#P_get_ocsp_uri is deprecated, and get_ocsp_uri method is added.
+    * Net::SSLeay#get_peer_certificate is deprecated, and get_ocsp_uri method is added.
 0.018 2024-11-25
   [New Features]
     * Add Net::SSLeay::Util class.

@@ -17,12 +17,12 @@
             },
             "familyHistory" : false,
             "severity" : {
-               "id" : "NCIT:NA0000",
-               "label" : "NA"
+               "id" : "NCIT:C126101",
+               "label" : "Not Available"
             },
             "stage" : {
-               "id" : "NCIT:NA0000",
-               "label" : "NA"
+               "id" : "NCIT:C126101",
+               "label" : "Not Available"
             }
          }
       ],
@@ -157,8 +157,8 @@
             },
             "dateOfProcedure" : "2021-02-01",
             "procedureCode" : {
-               "id" : "NCIT:NA0000",
-               "label" : "NA"
+               "id" : "NCIT:C126101",
+               "label" : "Not Available"
             }
          }
       ],
@@ -579,16 +579,16 @@
          {
             "excluded" : true,
             "featureType" : {
-               "id" : "NCIT:NA0000",
-               "label" : "NA"
+               "id" : "NCIT:C126101",
+               "label" : "Not Available"
             },
             "notes" : "comorb_copd /// Field Label=Comorbidities - COPD /// Field Note= /// Field Type=yesno"
          },
          {
             "excluded" : true,
             "featureType" : {
-               "id" : "NCIT:NA0000",
-               "label" : "NA"
+               "id" : "NCIT:C126101",
+               "label" : "Not Available"
             },
             "notes" : "comorb_ms /// Field Label=Comorbidities - demyelating disease/multiple sclerosis /// Field Note= /// Field Type=yesno"
          },
@@ -619,16 +619,16 @@
          {
             "excluded" : true,
             "featureType" : {
-               "id" : "NCIT:NA0000",
-               "label" : "NA"
+               "id" : "NCIT:C126101",
+               "label" : "Not Available"
             },
             "notes" : "comorb_ad /// Field Label=Comorbidities - atopic dermatitis /// Field Note= /// Field Type=yesno"
          },
          {
             "excluded" : true,
             "featureType" : {
-               "id" : "NCIT:NA0000",
-               "label" : "NA"
+               "id" : "NCIT:C126101",
+               "label" : "Not Available"
             },
             "notes" : "comorb_cancer /// Field Label=Comorbidities - cancer /// Field Note= /// Field Type=yesno"
          },
@@ -651,8 +651,8 @@
          {
             "excluded" : true,
             "featureType" : {
-               "id" : "NCIT:NA0000",
-               "label" : "NA"
+               "id" : "NCIT:C126101",
+               "label" : "Not Available"
             },
             "notes" : "comorb_lipids /// Field Label=Comorbidities - Hyper-/dyslipidemia /// Field Note= /// Field Type=yesno"
          },
@@ -667,8 +667,8 @@
          {
             "excluded" : true,
             "featureType" : {
-               "id" : "NCIT:NA0000",
-               "label" : "NA"
+               "id" : "NCIT:C126101",
+               "label" : "Not Available"
             },
             "notes" : "comorb_other_ai /// Field Label=Comorbidities - other autoimmune disease /// Field Note= /// Field Type=yesno"
          },
@@ -682,8 +682,8 @@
          },
          {
             "featureType" : {
-               "id" : "NCIT:NA0000",
-               "label" : "NA"
+               "id" : "NCIT:C126101",
+               "label" : "Not Available"
             },
             "notes" : "rectal_bleeding /// Field Label=Rectal bleeding score /// Field Note= /// Field Type=radio"
          }
@@ -712,8 +712,8 @@
             },
             "cumulativeDose" : {
                "unit" : {
-                  "id" : "NCIT:NA0000",
-                  "label" : "NA"
+                  "id" : "NCIT:C126101",
+                  "label" : "Not Available"
                },
                "value" : -1
             },
@@ -746,8 +746,8 @@
             },
             "cumulativeDose" : {
                "unit" : {
-                  "id" : "NCIT:NA0000",
-                  "label" : "NA"
+                  "id" : "NCIT:C126101",
+                  "label" : "Not Available"
                },
                "value" : -1
             },
@@ -780,8 +780,8 @@
             },
             "cumulativeDose" : {
                "unit" : {
-                  "id" : "NCIT:NA0000",
-                  "label" : "NA"
+                  "id" : "NCIT:C126101",
+                  "label" : "Not Available"
                },
                "value" : -1
             },
@@ -814,8 +814,8 @@
             },
             "cumulativeDose" : {
                "unit" : {
-                  "id" : "NCIT:NA0000",
-                  "label" : "NA"
+                  "id" : "NCIT:C126101",
+                  "label" : "Not Available"
                },
                "value" : -1
             },
@@ -848,8 +848,8 @@
             },
             "cumulativeDose" : {
                "unit" : {
-                  "id" : "NCIT:NA0000",
-                  "label" : "NA"
+                  "id" : "NCIT:C126101",
+                  "label" : "Not Available"
                },
                "value" : -1
             },
@@ -882,8 +882,8 @@
             },
             "cumulativeDose" : {
                "unit" : {
-                  "id" : "NCIT:NA0000",
-                  "label" : "NA"
+                  "id" : "NCIT:C126101",
+                  "label" : "Not Available"
                },
                "value" : -1
             },
@@ -916,8 +916,8 @@
             },
             "cumulativeDose" : {
                "unit" : {
-                  "id" : "NCIT:NA0000",
-                  "label" : "NA"
+                  "id" : "NCIT:C126101",
+                  "label" : "Not Available"
                },
                "value" : -1
             },
@@ -950,8 +950,8 @@
             },
             "cumulativeDose" : {
                "unit" : {
-                  "id" : "NCIT:NA0000",
-                  "label" : "NA"
+                  "id" : "NCIT:C126101",
+                  "label" : "Not Available"
                },
                "value" : -1
             },

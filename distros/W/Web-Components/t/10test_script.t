@@ -13,45 +13,44 @@ use_ok 'Web::Components';
    has '+moniker' => default => 'dummy';
 
    sub dispatch_request {
-      sub (GET  + /      + ?*) { [ 'dummy', 'get_index', @_ ] },
-      sub (GET  + /other + ?*) { [ 'dummy/get_other',    @_ ] };
+      return (
+         'GET  + /      + ?*' => sub { [ 'dummy/get_index', @_ ] },
+         'GET  + /other + ?*' => sub { [ 'dummy/get_other', @_ ] },
+      );
    }
 
    $INC{ 'TestApp/Controller/Dummy.pm' } = __FILE__;
-}
-
-{  package TestApp::Model;
-
-   use Scalar::Util qw( blessed );
-   use Web::Components::Util qw( throw );
-   use Moo;
-
-   sub execute {
-      my ($self, $method, @args) = @_;
-
-      $self->can( $method ) and return $self->$method( @args );
-
-      throw 'Class [_1] has no method [_2]', [ blessed $self, $method ];
-   }
-
-   $INC{ 'TestApp/Model.pm' } = __FILE__;
 }
 
 {  package TestApp::Model::Dummy;
 
    use Moo;
 
-   extends 'TestApp::Model';
+   extends 'Web::Components::Model';
    with    'Web::Components::Role';
 
    has '+moniker' => default => 'dummy';
 
    sub get_index {
-      return [ 200, [ 'Content-Type', 'text/plain' ], [ '42' ] ];
+      my ($self, $context) = @_;
+
+      my $response = [ 200, [ 'Content-Type', 'text/plain' ], [ '42' ] ];
+
+      $context->stash(response => $response);
+      return;
    }
 
    sub get_other {
-      return [ 200, [ 'Content-Type', 'text/plain' ], [ '43' ] ];
+      my ($self, $context) = @_;
+
+      my $response = [ 200, [ 'Content-Type', 'text/plain' ], [ '43' ] ];
+
+      $context->stash(response => $response);
+      return;
+   }
+
+   sub is_authorised {
+      return 1;
    }
 
    $INC{ 'TestApp/Model/Dummy.pm' } = __FILE__;
@@ -70,34 +69,29 @@ use_ok 'Web::Components';
 
    use Moo;
 
-   extends 'Class::Usul::Config';
+   has 'appclass' => is => 'ro', default => 'TestApp';
 
-   has 'config_comps' => is => 'ro', default => sub { {} };
+   has 'config_comps' => is => 'ro', default => sub {
+      return { Model  => { 'foo' => [ 'Role::Bar' ] } };
+   };
 
-   has 'components'   => is => 'ro', default => sub { {} };
+   has 'components' => is => 'ro', default => sub {
+      return { 'Model::Foo' => { moniker => 'bar' } };
+   };
 
    $INC{ 'TestApp/Config.pm' } = __FILE__;
 }
 
 {  package TestApp::Server;
 
-   use Class::Usul;
    use Web::Simple;
    use Moo;
 
-   has 'foo' => is => 'ro';
+   has 'config' => is => 'ro', default => sub { TestApp::Config->new };
 
-   has '_usul' => is => 'lazy',
-      handles  => [ 'config', 'debug', 'l10n', 'lock', 'log' ],
-      builder  => sub {
-         Class::Usul->new
-            (  config          => {
-                  appclass     => 'TestApp',
-                  config_comps => {
-                     Model     => { 'foo' => [ 'Role::Bar' ] } },
-                  components   => { 'Model::Foo' => { moniker => 'bar' } },
-                  tempdir      => 't', },
-               config_class    => 'TestApp::Config', ) };
+   has 'log' => is => 'ro', default => sub { Class::Null->new };
+
+   has 'foo' => is => 'ro';
 
    with 'Web::Components::Loader';
 
@@ -113,19 +107,19 @@ my $env = {
    REMOTE_ADDR          => '127.0.0.1',
    REQUEST_METHOD       => 'GET',
    SERVER_PROTOCOL      => 'HTTP/1.1',
-   'psgix.logger'       => sub { warn $_[ 0 ]->{message}."\n" },
+   'psgix.logger'       => sub { warn $_[0]->{message}."\n" },
    'psgix.session'      => { authenticated => 1 },
 };
 
 my $server = TestApp::Server->new;
 
-is $server->dispatch_request, 2, 'Default dispatch';
+is $server->dispatch_request, 4, 'Default dispatch';
 is $server->models->{dummy}->encoding, 'UTF-8', 'Sets encoding';
-is $server->to_psgi_app->( $env )->[ 2 ]->[ 0 ], 42, 'Routes to method';
+is $server->to_psgi_app->( $env )->[2]->[0], 42, 'Routes to method';
 is $server->_action_suffix, '_action','Action suffix';
 
 $env->{PATH_INFO} = '/other';
-is $server->to_psgi_app->( $env )->[ 2 ]->[ 0 ], 43, 'Other route to method';
+is $server->to_psgi_app->( $env )->[2]->[0], 43, 'Other route to method';
 
 use Web::Components::Util qw( deref exception is_arrayref
                               load_components throw );
@@ -144,10 +138,11 @@ is deref( $server, 'foo', '' ), '', 'Deref object with false default';
 
 use Class::Null;
 
-my $comps = load_components '+TestApp::Model',
-   { components => {},
-     config     => { appclass => 'TestApp' },
-     log        => Class::Null->new };
+my $comps = load_components '+TestApp::Model', {
+   components => {},
+   config     => { appclass => 'TestApp' },
+   log        => Class::Null->new,
+};
 
 is $comps->{dummy}->moniker, 'dummy', 'Loads components from minimal config';
 

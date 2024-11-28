@@ -1,9 +1,9 @@
 package TAP::DOM;
-# git description: v0.98-5-gda1ab78
+# git description: v0.99-1-ge8d5935
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: TAP as Document Object Model.
-$TAP::DOM::VERSION = '0.99';
+$TAP::DOM::VERSION = '1.000';
 use 5.006;
 use strict;
 use warnings;

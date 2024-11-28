@@ -1,0 +1,35 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::X509_EXTENSION : pointer {
+  
+  allow Net::SSLeay::X509;
+  
+  use Net::SSLeay::X509;
+  use Net::SSLeay::ASN1_OCTET_STRING;
+  use Net::SSLeay::ASN1_OBJECT;
+  use Fn;
+  
+  # Fields
+  has ref_x509 : Net::SSLeay::X509;
+  
+  # Class Methods
+  private static method new_with_pointer : Net::SSLeay::X509_EXTENSION ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::X509_EXTENSION;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  native method get_data : Net::SSLeay::ASN1_OCTET_STRING ();
+  
+  native method get_object : Net::SSLeay::ASN1_OBJECT ();
+  
+  native method get_critical : int ();
+  
+  native method DESTROY : void ();
+  
+}

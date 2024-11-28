@@ -17,7 +17,7 @@ WriteMakefile(
     Clone    => 0,
     Template => 0,
     Moose    => 0,
-    'Template::Provider::Pandoc' => 0,
+    'Template::Provider::Pandoc' => '0.1.0', # For STRIP_FRONT_MATTER
     'Text::FrontMatter::YAML' => 0,
     'Path::Tiny' => 0,
     'YAML::XS' => 0,

@@ -71,7 +71,7 @@ sub get_by_contract {
     my $contract = shift;
     my $ts = shift;
 
-    return $self->client()->get("/team/v3/snapshots/contracts/" . $contract . "/" . $ts);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item update_by_contract
@@ -104,7 +104,7 @@ sub update_by_contract {
     my $ts = shift;
     my %params = @_;
 
-    return $self->client()->put("/team/v3/snapshots/contracts/" . $contract . "/" . $ts, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item delete_by_contract
@@ -132,7 +132,7 @@ sub delete_by_contract {
     my $contract = shift;
     my $ts = shift;
 
-    return $self->client()->delete("/team/v2/snapshots/contracts/" . $contract . "/" . $ts);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

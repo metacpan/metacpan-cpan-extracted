@@ -80,7 +80,7 @@ sub get {
     my $date = shift;
     my %params = @_;
 
-    return $self->client()->get("/team/v3/workdiaries/companies/" . $company . "/" . $date, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_by_contract
@@ -113,7 +113,7 @@ sub get_by_contract {
     my $date = shift;
     my %params = @_;
 
-    return $self->client()->get("/team/v3/workdiaries/contracts/" . $contract . "/" . $date, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

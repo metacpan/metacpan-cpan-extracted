@@ -4,7 +4,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 # VERSION
 
-version 5.4
+version 6.0
 
 # SYNOPSIS
 
@@ -14,8 +14,8 @@ parsed out.
 
     use Parse::Syslog::Line qw(parse_syslog_line);
 
-    $Parse::Syslog::Line::DateTimeCreate = 1;
     $Parse::Syslog::Line::AutoDetectJSON = 1;
+    $Parse::Syslog::Line::AutoDetectKeyValues = 1;
 
     my $href = parse_syslog_line( $msg );
     #
@@ -28,10 +28,10 @@ parsed out.
     #       date            => 'YYYY-MM-DD',
     #       time            => 'HH::MM:SS',
     #       epoch           => 1361095933,
-    #       datetime_str    => ISO 8601 datetime, $NormalizeToUTC = 1 then UTC, else local
-    #       datetime_obj    => undef,       # If $DateTimeCreate = 1, else undef
+    #       datetime_local  => ISO 8601 datetime, in local timezone (potentially buggy)
+    #       datetime_str    => ISO 8601 datetime, in message timezone
+    #       datetime_utc    => ISO 8601 datetime, in UTC
     #       datetime_raw    => 'Feb 17 11:12:13'
-    #       date_raw        => 'Feb 17 11:12:13'
     #       host_raw        => 'hostname',  # Hostname as it appeared in the message
     #       host            => 'hostname',  # Hostname without domain
     #       domain          => 'blah.com',  # if provided
@@ -92,33 +92,15 @@ Usage:
 
     $Parse::Syslog::Line::DateParsing = 0;
 
-## DateTimeCreate
+## TimeMomentFormatString
 
-If this variable is set to 1 (the default), a DateTime object will be returned in the
-$m->{datetime\_obj} field.  Otherwise, this will be skipped.
-
-NOTE: DateTime timezone calculation is fairly slow. Unless you really need to
-take timezones into account, you're better off using other modes (below).
-
-Usage:
-
-    $Parse::Syslog::Line::DateTimeCreate = 0;
+This defaults to `"%FT%T%f%z"`. See ["EXAMPLE FORMAT STRINGS" in Time::Moment](https://metacpan.org/pod/Time%3A%3AMoment#EXAMPLE-FORMAT-STRINGS) for syntax and usage.
 
 ## EpochCreate
 
 If this variable is set to 1, the default, the number of seconds from UNIX
 epoch will be returned in the $m->{epoch} field.  Setting this to false will
 only delete the epoch before returning the hash reference.
-
-## NormalizeToUTC
-
-When set, the datetime\_str will be ISO8601 UTC.
-
-## OutputTimeZones
-
-Default is false, but is enabled if you call set\_syslog\_timezone() or
-use\_utc\_syslog().  If enabled, this will append the timezone offset to the
-datetime\_str.
 
 ## FmtDate
 
@@ -140,12 +122,6 @@ in your wanted format.
     };
 
 **NOTE**: No further date processing will be done, you're on your own here.
-
-## HiResFmt
-
-Default is `%0.6f`, or microsecond resolution.  This variable only comes into
-play when the syslog date string contains a high resolution timestamp.  It
-defaults to using microsecond resolution.
 
 ## AutoDetectJSON
 
@@ -229,7 +205,7 @@ This should be an array of fields you'd like to be removed from the hash referen
 
 Usage:
 
-    @Parse::Syslog::Line::PruneFields = qw(date_raw facility_int priority_int);
+    @Parse::Syslog::Line::PruneFields = qw(facility_int priority_int);
 
 # FUNCTIONS
 
@@ -241,25 +217,217 @@ Returns a hash reference of syslog message parsed data.
 common sense and processing speed. Care is taken to ensure that any data input
 into the system isn't lost, but with the varieties of vendor and admin crafted
 date formats, we don't always get it right.  Feel free to override date
-processing using by setting the $FmtDate variable or completely disable it with
-$DateParsing set to 0.
+processing using by setting the `$FmtDate` variable or completely disable it with
+`$DateParsing` set to 0.
 
-## set\_syslog\_timezone($timezone\_name)
+### Dates and Version 6+
 
-Sets a timezone $timezone\_name for parsed messages. This timezone will be used
-to calculate offset from UTC if a timezone designation is not present in the
-message being parsed.  This timezone will also serve as the source timezone for
-the datetime\_str field.
+As of version `6.0` and later, the date parsing is handled by [Time::Moment](https://metacpan.org/pod/Time%3A%3AMoment).
+Ideally, I would use [Date](https://metacpan.org/pod/Date) for performance reasons, but it requires some
+heavy XS toolkits to build which don't work on my MacBookPro out of the box.
+This made the decision to use `Time::Moment` kinda automatic. If you are
+**seriously** concerned with performance, enough to figure out how to package
+and run [Date](https://metacpan.org/pod/Date) successfully, you can use the `$FmtDate` parameter to inject
+your own date processing logic.
 
-## get\_syslog\_timezone
+`Time::Moment`'s API and known limitations informed updates to the API and output of dates
+in this module. It is drastic enough a shift to warrant a major version bump.
+
+["The Effect of Daylight Saving Time" in Time::Moment](https://metacpan.org/pod/Time%3A%3AMoment#The-Effect-of-Daylight-Saving-Time) explains that to properly
+convert times during DST transitions, things get messy. This caused issues in testing
+and warrants words of caution here, **ALWAYS** use `datetime_utc` or `epoch`
+fields for datetime portability.
+
+The changes to the API and fields returned are as follows:
+
+- **API Changes**
+    - `DateTimeCreate` is **deprecated**
+
+        [DateTime](https://metacpan.org/pod/DateTime) is slow and memory heavy. I never should've added support for it in
+        this module.  This release removes it. If you need [DateTime](https://metacpan.org/pod/DateTime) objects, you'll
+        need to build it yourself.
+
+    - `HiResFmt` is **deprecated**, use `TimeMomentFormatString`
+    - `NormalizeToUTC` is **deprecated**, every log now returns `datetime_utc`
+    - `OutputTimeZone` is **deprecated**, use `TimeMomentFormatString`
+- **Field Changes**
+    - `date_raw`
+
+        **Removed** from the fields returned, use `datetime_raw`.
+
+    - `datetime_obj`
+
+        **Removed** from the fields returned as we dropped support for [DateTime](https://metacpan.org/pod/DateTime).
+
+    - `datetime_utc`
+
+        Present in every document, use this for portability.
+
+    - `datetime_str`
+
+        Now represents the parsed datetime as from the log without modifying the timezone.
+
+    - `datetime_local`
+
+        Attempts to represent the datetime in the timezone local to the program. This
+        is prone to errors around DST, I don't advise using this, but it's
+        provided as footgun for future generations.
+
+    - `offset` renamed to `tz`
+
+### Fields Returned
+
+- **preamble**
+
+    Syslog preamble without the brackets, i.e., `13`.
+
+- **priority**
+
+    String representation of the priority, i.e., `"warn"`
+
+- **priority\_int**
+
+    Integer representation of the priority, i.e., `1`
+
+- **facility**
+
+    String representation of the facility, i.e., `"daemon"`
+
+- **priority\_int**
+
+    Integer representation of the facility, i.e., `1`
+
+- **datetime\_raw**
+
+    The datetime string from the log as it was discovered
+
+- **epoch**
+
+    Numeric representation of the UNIX time as parsed by the `datetime_str`. This
+    is the most portable format for computers and I recommend using it, and only it
+    for passing onto to computer systems.
+
+- **datetime\_utc**
+
+    UTC representation of the `datetime_raw` in ISO8601 format (via
+    `TimeMomentFormatString`). If you must use a string format, this is the one
+    you should pass to other computers.
+
+- **datetime\_str**
+
+    ISO8601 representation of the `datetime_raw` (via `TimeMomentFormatString`),
+    without manipulating timezones.
+
+- **datetime\_local**
+
+    ISO8601 representation of the `datetime_raw` (via `TimeMomentFormatString`)
+    attempting to manipulate into the timezone of the local computer or the
+    timezone set by `set_syslog_timezone()`.
+
+    **NOTE:** This does not handle DST well as the logic for that requires
+    [DateTime::TimeZone](https://metacpan.org/pod/DateTime%3A%3ATimeZone) when using [Time::Moment](https://metacpan.org/pod/Time%3A%3AMoment). Adding `DateTime` back into
+    this module will kill performance, so I accept the inaccuracy here as you
+    should never use this.
+
+    It is provided for those living in Arizona to mock the rest of us for our
+    stupid DST sins.
+
+- **date**
+
+    The date portion of `datetime_str`
+
+- **time**
+
+    The time portion of `datetime_str`
+
+- **tz**
+
+    The timezone offset of `datetime_str`
+
+- **host\_raw**
+
+    The source host of the log as parsed, i.e., `"host.example.com"`
+
+- **host**
+
+    Host portion of the `host_raw`, i.e., `"host"`
+
+- **domain**
+
+    Domain portion of the `host_raw`, i.e., `"example.com"`
+
+- **origin**
+
+    If relayed, contains the origin of the message, i.e., "host.example.com"
+
+- **origin\_date**
+
+    If relayed, contains the origin timestamp, this is unparsed.
+
+- **program\_raw**
+
+    The program, appname, or syslogtag in full, save the final colon, i.e.,
+    `sshd(pam_unix)[35454]`.
+
+- **program\_name**
+
+    Program name parsed from `program_raw`, i.e., `sshd`.
+
+- **program\_pid**
+
+    The PID as parsed from the `program_raw`, i.e., `35454`.
+
+- **program\_sub**
+
+    The program context as parsed from `program_raw`, i.e., `pam_unix`.
+
+- **content**
+
+    Everything after the syslog tag, except when using `AutoDetectJSON` or
+    `AutoDetectKeyValues`. When detecting structured data, successfully parsed chunks
+    of the message are removed from the string.
+
+    As an example, if the message is:
+
+        2015-09-30T06:26:06.779373-05:00 my-host my-script.pl: updating data {"lunchTime":1443612366.442}
+
+    By default, `content` will be:
+
+        updating data {"lunchTime":1443612366.442}
+
+    However, if `AutoDetectJSON` is set, then `content` will be:
+
+        updating data
+
+    And the JSON will be decoded into the `SDATA` field.
+
+- **SDATA**
+
+    The structured data from the log message. This include RFC5424 Structured Data as well
+    as anything extracted by `AutoDetectJSON` and/or `AutoDetectKeyValues`.
+
+- **message**
+
+    Everything from the syslogtag onward, i.e., `"program_raw content"`
+
+- **message\_raw**
+
+    The entire message passed into the function.
+
+## `set_syslog_timezone($timezone_name)`
+
+Sets a timezone `$timezone_name` for parsed messages. This timezone will be
+used to calculate offset from UTC if a timezone designation is not present in
+the message being parsed.  This timezone will also serve as the source timezone
+for the `datetime_local` field.
+
+## `get_syslog_timezone()`
 
 Returns the name of the timezone currently set by set\_syslog\_timezone.
 
-## use\_utc\_syslog
+## `use_utc_syslog()`
 
-A convenient function which sets the syslog timezone to UTC and sets the config
-variables accordingly.  Automatically sets $NormaizeToUTC and datetime\_str will
-be set to the UTC equivalent.
+A convenient function which sets the syslog timezone to UTC.
 
 ## parse\_syslog\_lines
 

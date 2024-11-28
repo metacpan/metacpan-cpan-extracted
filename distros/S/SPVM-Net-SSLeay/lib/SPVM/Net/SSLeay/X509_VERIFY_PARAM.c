@@ -16,9 +16,9 @@ int32_t SPVM__Net__SSLeay__X509_VERIFY_PARAM__set_hostflags(SPVM_ENV* env, SPVM_
   
   int32_t flags = stack[1].ival;
   
-  X509_VERIFY_PARAM* x509_verify_param = env->get_pointer(env, stack, obj_self);
+  X509_VERIFY_PARAM* self = env->get_pointer(env, stack, obj_self);
   
-  X509_VERIFY_PARAM_set_hostflags(x509_verify_param, flags);
+  X509_VERIFY_PARAM_set_hostflags(self, flags);
   
   return 0;
 }
@@ -49,9 +49,9 @@ int32_t SPVM__Net__SSLeay__X509_VERIFY_PARAM__set1_host(SPVM_ENV* env, SPVM_VALU
   
   const char* name = env->get_chars(env, stack, obj_name);
   
-  X509_VERIFY_PARAM* x509_verify_param = env->get_pointer(env, stack, obj_self);
+  X509_VERIFY_PARAM* self = env->get_pointer(env, stack, obj_self);
   
-  int32_t status = X509_VERIFY_PARAM_set1_host(x509_verify_param, name, namelen);
+  int32_t status = X509_VERIFY_PARAM_set1_host(self, name, namelen);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -77,9 +77,9 @@ int32_t SPVM__Net__SSLeay__X509_VERIFY_PARAM__set_flags(SPVM_ENV* env, SPVM_VALU
   
   int64_t flags = stack[1].lval;
   
-  X509_VERIFY_PARAM* x509_verify_param = env->get_pointer(env, stack, obj_self);
+  X509_VERIFY_PARAM* self = env->get_pointer(env, stack, obj_self);
   
-  int32_t status = X509_VERIFY_PARAM_set_flags(x509_verify_param, flags);
+  int32_t status = X509_VERIFY_PARAM_set_flags(self, flags);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -104,10 +104,10 @@ int32_t SPVM__Net__SSLeay__X509_VERIFY_PARAM__DESTROY(SPVM_ENV* env, SPVM_VALUE*
   
   void* obj_self = stack[0].oval;
   
-  X509_VERIFY_PARAM* pointer = env->get_pointer(env, stack, obj_self);
+  X509_VERIFY_PARAM* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    X509_VERIFY_PARAM_free(pointer);
+    X509_VERIFY_PARAM_free(self);
   }
   
   return 0;

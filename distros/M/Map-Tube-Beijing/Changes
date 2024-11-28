@@ -1,5 +1,11 @@
 Revision history for Perl extension Map::Tube::Beijing.
 
+0.12.1 2024-11-28
+  - Fixed the (Han) name of one line
+  - Removed spurious requirement of XML::Simple from module
+  - Replaced deprecated XML::Simple in tests with XML::Twig
+    (also old, but used by Map::Tube)
+
 0.12.0 2024-11-26
   - Augmented data with per-line station indexes
   - Updated lines and stations, adding many

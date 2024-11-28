@@ -69,6 +69,7 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::ASN1_INTEGER');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::ASN1_OBJECT');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::ASN1_TIME');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::ASN1_OCTET_STRING');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::BIO');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::Constant');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::DER');
@@ -101,6 +102,7 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_CRL');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_NAME');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_NAME_ENTRY');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_STORE');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_STORE_CTX');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_VERIFY_PARAM');

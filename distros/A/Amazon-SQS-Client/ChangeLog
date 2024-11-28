@@ -1,0 +1,418 @@
+Wed Nov 27 18:01:26 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[2.0.7]:
+	* VERSION: bump
+	* cpan/provides: new
+	* cpan/Makefile.am
+	- remove unnecesassary section that was renaming tarball
+	* cpan/resources: pretty
+
+Wed Nov 13 13:50:42 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[2.0.6]:
+	* README.md
+	* VERSION: bump
+	* cpan/requires
+	- added Class::Unload, Class::Inspector
+	* src/main/bash/bin/aws-sqsd.in
+	- find artifacts
+	* src/main/perl/bin/QueueDaemon.pl.in
+	- use Class::Inspector, Class::Unload instead of Module::Loaded
+	- add pidfile option
+	- pod updates
+	(main)
+	- don't close Log::Log4perl file handle
+	- eval load_handler to catch errors
+	- use pidfile if provided
+	(init_logger)
+	- don't use easy mode
+	- support stderr, stdout using Screen appender
+	(load_config)
+	- option override config file
+	- make default logfile stderr
+	(load_handler): use Class::Inspector, Class::Unload
+	* src/main/perl/lib/Amazon/SQS/Client.pm.in
+	- pod tweaks
+	(new): allow token as 3rd arg
+	(_invoke): pass content to _pauseOnRetry
+	(_pauseOnRetry)
+	- add content to exception
+	- die don't croak
+	* src/main/perl/lib/Amazon/SQS/Config.pm.in
+	- remove stdout, stderr
+	- pod tweaks
+	- log_file, log_level
+	- add handler_pidfile
+	(create_config_accessors)
+	- don't die on redefine, just don't redefine
+	* src/main/perl/lib/Amazon/SQS/Exception.pm.in
+	(new): add _httpError
+	(getHTTPError): new
+
+Tue Nov 12 07:42:48 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[2.0.5]:
+	* README.md: reorganize
+	* VERSION: bump
+	* NEWS: update for new version
+	* resources/*: removed
+	* configure.ac: remove above
+	* Makefile.am
+	- change install dir to $datadir/amazon-sqs
+	- remove required-modules
+	- remove resources
+	* src/main/bash/bin/aws-sqsd.in: check for .ini file
+	* src/main/perl/bin/create-queue.pl.in: pod tweaks & fixes
+	* src/main/lib/Amazon/SQS/QueueHandler.pm.in
+	(decode_message): save decoded message
+	* src/main/perl/lib/Amazon/SQS/Client.pm.in: perlcritic cleanup
+	* src/main/perl/lib/Amazon/SQS/Exception.pm.in: likewise
+	* src/main/perl/lib/Amazon/SQS/Model.pm.in: likewise
+	* src/main/perl/lib/Amazon/SQS/Model/Message.pm.in: likewise
+	* src/main/perl/lib/Amazon/SQS/Model/ReceiveMessageRequest.pm.in: likewise
+	* src/main/perl/lib/Amazon/SQS/Model/ReceiveMessageResponse.pm.in: likewise
+	* src/main/perl/lib/Amazon/SQS/Model/SendMessageRequest.pm.in: likewise
+	* src/main/perl/lib/Amazon/SQS/Model/SendMessageResponse.pm.in: likewise
+	* src/main/perl/lib/Amazon/SQS/Constants.pm.in: new
+	* src/main/perl/lib/Makefile.am: add above to build
+	* src/main/perl/lib/t/01-handler.t: fix failing test
+	* cpan/extra-files: replaced .pl examples with .pm
+	* cpan/provides: new
+
+Mon Nov 11 10:30:50 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[2.0.4]:
+	* VERSION: bump
+	* README.md: create-queue.pl
+	* src/main/perl/bin/create-queue.pl.in: new
+	* src/main/perl/bin/Makefile.am: add above to build
+	* src/main/perl/lib/Amazon/SQS/Client.pm.in: loglevel
+
+Sun Nov 10 08:43:30 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[2.0.3]:
+	* VERSION: bump
+	* removed all examples/*.pl files and replace with below
+	* examples/CreateQueue.pm: new
+	* examples/DeleteQueue.pm: new
+	* examples/ListQueues.pm: new
+	* examples/DeleteMessage.pm: new
+	* examples/GetQueueAttributes.pm: new
+	* examples/ReceiveMesasge.pm: new
+	* examples/SendMessage.pm: new
+	* examples/SetQueueAttributes.pm: new
+	* src/main/perl/lib/Amazon/SQS/Sample.pm.in: new
+	* src/main/perl/lib/Makefile.am: add above to build
+	* src/main/perl/lib/Amazon/SQS/Config.pm.in
+	- add aws_access_key_id, aws_secret_key to list of required methods
+	* src/main/perl/lib/Amazon/SQS/Client.pm.in
+	- add last_rqeuire, last_reponse
+	(_httpPost): set above
+
+Mon Nov  4 08:11:46 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[2.0.2]:
+	* VERSION: bump
+	* src/main/perl/bin/QueueDaemon.pl.in
+	- add options --visibility-timeout, --wait-time
+	(get_options): --wait-time, --queue-interval are mutually exclusive
+	(main)
+	- set defaults for queue-interval, max-sleep-time
+	- check url in handler, not in main
+	- only set pid file if daemonizing
+	(get_next_message): move to ::QueueHandler
+	(load_config)
+	- assign $config to avoid return undef issue that caused odd hash elements
+	- initialize visibility-timeout, wait-time
+	(sleep_time): default = 0
+	* src/main/perl/lib/Amazon/SQS/Client.pm.in
+	(_reportAnyErrors)
+	- use XML::Simple to decode error payload
+	- remove die on 500 (die on 400, 500 in main)
+	* src/main/perl/lib/Amazon/SQS/Config.pm.in
+	- add --visibility-timeout, --wait-time
+	* src/main/perl/lib/Amazon/SQS/Model/ReceiveMessageRequest.pm.in
+	- perlcritic cleanup, whitespace
+	* src/main/perl/lib/Amazon/SQS/QueueHandler.pm.in
+	- added request, visibility-timeout, wait-time options
+	- don't use Readonly if we are going to support reloading module
+	- pod updates
+	(new): die if no url set
+	(init_defaults)
+	- set visibility_timeout wait_time form config
+	(get_next_message): new
+	(create_request): new
+	* src/main/perl/lib/t/01-handler.t
+	- set test data via handler instead of creating a ::Model::Mesage
+
+Fri Nov  1 15:09:46 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[2.0.1]:
+	* configure.ac
+	- use VERSION
+	- update requirements
+	(do_subst_command): @PACKAGE_VERSION@
+	* src/main/perl/dist: removed
+	* src/main/perl/Makefile.am: likewise
+	* TESTING.md: removed
+	* Makefile.am: add cpan
+	* README.md: updates
+	* src/main/perl/bin/Makefile.am
+	- move examples
+	- chmod +x
+	* src/main/perl/bin/QueueDaemon.pl.in
+	- major update and refactor
+	* src/main/perl/lib/Amazon/SQS/Client.pm.in: likewise
+	* src/main/perl/lib/Amazon/SQS/Config.pm.in: likewise
+	* src/main/perl/lib/Makefile.am
+	- add Amazon/SQS/QueueHandler.pm.in to build
+	- add test target
+	* src/main/perl/bin/AddPermissionSample.pl.in -> examples/AddPermissionSample.pl: moved
+	* src/main/perl/bin/ChangeMessageVisibilitySample.pl.in -> examples/ChangeMessageVisibilitySample.pl: moved
+	* src/main/perl/bin/CreateQueueSample.pl.in -> examples/CreateQueueSample.pl: moved
+	* src/main/perl/bin/DeleteMessageSample.pl.in -> examples/DeleteMessageSample.pl: moved
+	* src/main/perl/bin/DeleteQueueSample.pl.in -> examples/DeleteQueueSample.pl: moved
+	* src/main/perl/bin/GetQueueAttributesSample.pl.in -> examples/GetQueueAttributesSample.pl: moved
+	* src/main/perl/bin/ListQueuesSample.pl.in -> examples/ListQueuesSample.pl: moved
+	* src/main/perl/bin/ReceiveMessageSample.pl.in -> examples/ReceiveMessageSample.pl: moved
+	* src/main/perl/bin/RemovePermissionSample.pl.in -> examples/RemovePermissionSample.pl: moved
+	* src/main/perl/bin/SendMessageSample.pl.in -> examples/SendMessageSample.pl: moved
+	* src/main/perl/bin/SetQueueAttributesSample.pl.in -> examples/SetQueueAttributesSample.pl: moved
+	* aclocal.m4: removed
+	* autotools/install-sh: removed
+	* autotools/missing: removed
+	* Makefile.in: removed
+	* configure: removed
+	* resources/Makefile.in: removed
+	* src/Makefile.in: removed
+	* src/main/Makefile.in: removed
+	* src/main/bash/Makefile.in: removed
+	* src/main/bash/bin/Makefile.in: removed
+	* src/main/perl/Makefile.in: removed
+	* src/main/perl/bin/Makefile.in: removed
+	* src/main/perl/dist/Makefile.in: removed
+	* src/main/perl/lib/Makefile.in: removed
+	* .gitignore: new
+	* VERSION: new
+	* bootstrap: new
+	* src/main/perl/lib/Amazon/SQS/QueueHandler.pm.in: new
+	* src/main/perl/lib/t/00-config.t: new
+	* src/main/perl/lib/t/00-handler.t: new
+	* src/main/perl/lib/t/00-sqs-client.t: new
+	* src/main/perl/lib/t/01-config.t: new
+	* src/main/perl/lib/t/01-handler.t: new
+	* src/main/perl/lib/t/01-sqs-client.t: new
+
+2017-02-18  Rob Lauer <rlauer6@comcast.net>
+	[changes to support API version 2012-11-05]:
+	* src/main/perl/lib/Amazon/SQS/Model/DeleteMessageBatchRequest.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/DeleteMessageBatchRequestEntry.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/DeleteMessageBatchResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/DeleteMessageBatchResult.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/DeleteMessageBatchResultEntry.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/ListDeadLetterSourceQueuesRequest.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/ListDeadLetterSourceQueuesResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/ListDeadLetterSourceQueuesResult.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/MessageAttribute.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/MessageAttributeValue.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Client.pm.in
+	- remove print statements
+	(new): reuse the LWP::UserAgent object
+	(listDeadLetterSourceQueues): new
+	(_convertListDeadLetterSourceQueues): new
+	(changeMessageVisibilityBatch): new
+	(_convertChangeMessageVisibilityBatch): new
+	(deleteMessageBatch): new
+	(_convertDeleteMessageBatch): new
+	(_convertReceiveMessage(): unload message attributes
+	(_httpPost): use cached UserAgent
+	(_convertSendMessage): support additional parameters (MessageDuplicationId, MessageGroupId, MessageAtributeN, DelaySeconds)
+	* src/main/perl/lib/Makefile.am
+	- addded all of the new modules to build
+	* src/main/perl/lib/Amazon/SQS/Model/ChangeMessageVisibilityBatchResponse.pm.in
+	- remove print statement
+	* src/main/perl/lib/Amazon/SQS/Model/ChangeMessageVisibilityRequest.pm.in: whitespace
+	* src/main/perl/lib/Amazon/SQS/Model/ChangeMessageVisibilityResponse.pm.in: whitespace
+
+	[message attributes]:
+	* src/main/perl/lib/Amazon/SQS/Model/Message.pm.in
+	(new): MessageAttribute
+	(withMessageAttribute): new
+	(isSetMessageAttribute): new
+	(setMessageAttribute): new
+	(getMessageAttribute): new
+
+	[new parameters]:
+	* src/main/perl/lib/Amazon/SQS/Model/ReceiveMessageRequest.pm.in
+	(new): MessageAttributeName, ReceiveRequestAttemptId
+	(withMessageAttributeName): new
+	(isSetMessageAttributeName): new
+	(setMessageAttributeName): new
+	(getMessageAttributeName): new
+	(withReceiveRequestAttemptId): new
+	(isSetReceiveRequestAttemptId): new
+	(setReceiveRequestAttemptId): new
+	(getReceiveRequestAttemptId): new
+
+	[new parameters]:
+	* src/main/perl/lib/Amazon/SQS/Model/SendMessageRequest.pm.in
+	(new): DelaySeconds, MessageDuplicationId, MessageGroupId, MessageAttribute
+	(withMessageAttribute): new
+	(isSetMessageAttribute): new
+	(setMessageAttribute): new
+	(getMessageAttribute): new
+
+	(withDelaySeconds): new
+	(isSetDelaySeconds): new
+	(setDelaySeconds): new
+	(getDelaySeconds): new
+
+	(withMessageDuplicationId): new
+	(isSetMessageDuplicationId): new
+	(setMessageDuplicationId): new
+	(getMessageDuplicationId): new
+
+	(withMessageGroupId): new
+	(isSetMessageGroupId): new
+	(setMessageGroupId): new
+	(getMessageGroupId): new
+
+	* perl-Amazon-SQS-Client.spec.in
+	- list /usr assets
+	- added /usr/share
+	* src/main/perl/dist/Makefile.am
+	- include t/test-01 in distribution
+	- include Makefile.PL, etc in distribution
+	- moved aws-sqsd to bash/bin
+	* src/main/Makefile.am: build bash stuff first
+	* README.md: TODO section
+	* NEWS: update for push
+
+2016-12-26  Rob Lauer <rlauer6@comcast.net>
+	* src/main/perl/lib/Amazon/SQS/Client.pm.in
+	- Signature Version 4 via AWS::Signature4
+	* src/main/perl/t/test-01.t: new
+	* src/main/perl/MANIFEST: new
+	* src/main/perl/Makefile.PL: new
+
+2016-12-26  Rob Lauer <rlauer6@comcast.net>
+	* src/main/perl/lib/Amazon/SQS/Client.pm.in
+	- ServiceVersion (2012-11-05)
+	* src/main/perl/lib/Amazon/SQS/Config.pm.in
+	- $VERSION
+	- copyright
+	* src/main/perl/lib/Amazon/SQS/Model/ReceiveMessageRequest.pm.in: copyright
+	* configure.ac: bump version
+	* README.md: cleanup
+
+2015-11-21  Rob Lauer <rlauer6@comcast.net>
+	* README.md: new from README
+	* configure.ac: LWP::Protocol::https, Crypt::SSLeay
+	* Makefile.am: README.md, required-modules
+	* required-modules
+
+	RELEASED: perl-Amazon-SQS-Client 1.0.1
+
+	* NEWS: set release date
+	* configure.ac: update version
+
+	[Long Polling]:
+	* src/main/perl/lib/Amazon/SQS/Client.pm.in
+	(pod): more of it, tweaks
+	(new): ServiceVersion
+	(_addRequiredParameters): likewise
+	(_convertReceiveMessage): WaitTimeSeconds
+	* src/main/perl/lib/Amazon/SQS/Model/ReceiveMessageRequest.pm.in
+	(new): WaitTimeSeconds
+	(getWaitTimeSeconds): new
+	(setWaitTimeSeconds): new
+	(withWaitTimeSeconds): new
+	(isSetWaitTimeSeconds): new
+
+2012-05-12  Rob Lauer <rlauer6@comcast.net>
+	* configure.ac
+	(ads_PERL_MODULE): Digest::SHA, LWP::UserAgent, Time::HiRes
+
+2012-04-12  Rob Lauer <rlauer6@comcast.net>
+
+	RELEASED: perl-Amazon-SQS-Client 1.0.0
+
+	* configure.ac: bump version for release
+	* NEWS: set release date
+
+	[packaging of AWS SQS perl library]:
+	* AUTHORS: new
+	* autotools/ads_PERL_INCLUDES.m4: new
+	* autotools/ads_PERL_MODULE.m4: new
+	* autotools/ads_PROG_PERL.m4: new
+	* autotools/ax_dist_check_hack.m4: new
+	* ChangeLog: new
+	* configure.ac: new
+	* COPYING: new
+	* INSTALL: new
+	* Makefile.am: new
+	* NEWS: new
+	* perl-Amazon-SQS-Client.spec.in: new
+	* README: new
+	* resources/aws-sqs.ini: new
+	* resrouces/Makefile.am: new
+	* resources/ReadMe.html: new
+	* src/main/bash/bin/aws-sqsd.in: new
+	* src/main/bash/bin/Makefile.am: new
+	* src/main/bash/Makefile.am: new
+	* src/main/Makefile.am: new
+	* src/main/perl/bin/AddPermissionSample.pl.in: new
+	* src/main/perl/bin/amazon.ini: new
+	* src/main/perl/bin/amazon-sqs.ini: new
+	* src/main/perl/bin/ChangeMessageVisibilitySample.pl.in: new
+	* src/main/perl/bin/CreateQueueSample.pl.in: new
+	* src/main/perl/bin/DeleteMessageSample.pl.in: new
+	* src/main/perl/bin/DeleteQueueSample.pl.in: new
+	* src/main/perl/bin/GetQueueAttributesSample.pl.in: new
+	* src/main/perl/bin/ListQueuesSample.pl.in: new
+	* src/main/perl/bin/Makefile.am: new
+	* src/main/perl/bin/QueueDaemon.pl.in: new
+	* src/main/perl/bin/ReceiveMessageSample.pl.in: new
+	* src/main/perl/bin/RemovePermissionSample.pl.in: new
+	* src/main/perl/bin/SendMessageSample.pl.in: new
+	* src/main/perl/bin/SetQueueAttributesSample.pl.in: new
+	* src/main/perl/lib/Amazon/SQS/Client.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Config.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Exception.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/AddPermissionRequest.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/AddPermissionResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/Attribute.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/ChangeMessageVisibilityRequest.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/ChangeMessageVisibilityResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/CreateQueueRequest.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/CreateQueueResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/CreateQueueResult.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/DeleteMessageRequest.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/DeleteMessageResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/DeleteQueueRequest.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/DeleteQueueResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/Error.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/ErrorResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/GetQueueAttributesRequest.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/GetQueueAttributesResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/GetQueueAttributesResult.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/ListQueuesRequest.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/ListQueuesResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/ListQueuesResult.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/Message.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/ReceiveMessageRequest.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/ReceiveMessageResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/ReceiveMessageResult.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/RemovePermissionRequest.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/RemovePermissionResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/ResponseMetadata.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/SendMessageRequest.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/SendMessageResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/SendMessageResult.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/SetQueueAttributesRequest.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model/SetQueueAttributesResponse.pm.in: new
+	* src/main/perl/lib/Amazon/SQS/Model.pm.in: new
+	* src/main/perl/lib/Makefile.am: new
+	* src/main/perl/Makefile.am: new
+	* src/main/Makefile.am: new
+	* TBD: new

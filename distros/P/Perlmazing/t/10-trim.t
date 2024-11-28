@@ -3,7 +3,7 @@ use lib '../lib';
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 7;
 use Perlmazing qw(trim);
 
 my $string = '
@@ -22,3 +22,11 @@ my $backup = $string;
 trim $string;
 isnt $string, $backup, 'original changed';
 is $string, $shouldbe, 'right change';
+
+my $undefined;
+my $trimmed = trim $undefined;
+my @trimmed = trim $undefined;
+
+is $trimmed, '', 'trim on undef becomes empty string';
+is scalar(@trimmed), 1, 'trim on undef to array returns one element';
+is $trimmed[0], '', 'trim on undef to array returns an empty string';

@@ -16,10 +16,10 @@ int32_t SPVM__Net__SSLeay__EVP_CIPHER_CTX__DESTROY(SPVM_ENV* env, SPVM_VALUE* st
   
   void* obj_self = stack[0].oval;
   
-  EVP_CIPHER_CTX* pointer = env->get_pointer(env, stack, obj_self);
+  EVP_CIPHER_CTX* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    EVP_CIPHER_CTX_free(pointer);
+    EVP_CIPHER_CTX_free(self);
   }
   
   return 0;

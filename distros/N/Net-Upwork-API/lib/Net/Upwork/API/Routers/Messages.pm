@@ -61,7 +61,7 @@ sub get_rooms {
     my $company = shift;
     my %params = @_;
 
-    return $self->client()->get("/messages/v3/" . $company . "/rooms", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_room_details
@@ -80,7 +80,7 @@ sub get_room_details {
     my $room_id = shift;
     my %params = @_;
 
-    return $self->client()->get("/messages/v3/" . $company . "/rooms/" . $room_id, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_room_messages
@@ -99,7 +99,7 @@ sub get_room_messages {
     my $room_id = shift;
     my %params = @_;
 
-    return $self->client()->get("/messages/v3/" . $company . "/rooms/" . $room_id . "/stories", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_room_by_offer
@@ -118,7 +118,7 @@ sub get_room_by_offer {
     my $offer_id = shift;
     my %params = @_;
 
-    return $self->client()->get("/messages/v3/" . $company . "/rooms/offers/" + $offer_id, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_room_by_application
@@ -137,7 +137,7 @@ sub get_room_by_application {
     my $application_id = shift;
     my %params = @_;
 
-    return $self->client()->get("/messages/v3/" . $company . "/rooms/applications/" + $application_id, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_room_by_contract
@@ -156,7 +156,7 @@ sub get_room_by_contract {
     my $contract_id = shift;
     my %params = @_;
 
-    return $self->client()->get("/messages/v3/" . $company . "/rooms/contracts/" + $contract_id, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item create_room
@@ -174,7 +174,7 @@ sub create_room {
     my $company = shift;
     my %params = @_;
 
-    return $self->client()->post("/messages/v3/" . $company . "/rooms", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item send_message_to_room
@@ -193,7 +193,7 @@ sub send_message_to_room {
     my $room_id = shift;
     my %params = @_;
 
-    return $self->client()->post("/messages/v3/" . $company . "/rooms/" . $room_id . '/stories', %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item send_message_to_rooms
@@ -211,7 +211,7 @@ sub send_message_to_rooms {
     my $company = shift;
     my %params = @_;
 
-    return $self->client()->post("/messages/v3/" . $company . '/stories/batch', %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item update_room_settings
@@ -231,7 +231,7 @@ sub update_room_settings {
     my $username = shift;
     my %params = @_;
 
-    return $self->client()->put("/messages/v3/" . $company . "/rooms/" . $room_id . "/users/" . $username, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item update_room_metadata
@@ -250,7 +250,7 @@ sub update_room_metadata {
     my $room_id = shift;
     my %params = @_;
 
-    return $self->client()->put("/messages/v3/" . $company . "/rooms/" . $room_id, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

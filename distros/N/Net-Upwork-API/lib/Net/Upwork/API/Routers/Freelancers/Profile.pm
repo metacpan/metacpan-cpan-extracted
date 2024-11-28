@@ -66,7 +66,7 @@ sub get_specific {
     my $self = shift;
     my $key = shift;
 
-    return $self->client()->get("/profiles/v1/providers/" . $key);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_specific_brief
@@ -89,7 +89,7 @@ sub get_specific_brief {
     my $self = shift;
     my $key = shift;
 
-    return $self->client()->get("/profiles/v1/providers/" . $key . "/brief");
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

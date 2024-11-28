@@ -1,4 +1,4 @@
-# Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2024 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -6,9 +6,9 @@
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Mail::Message::Field::AuthResults;
-use vars '$VERSION';
-$VERSION = '3.015';
+package Mail::Message::Field::AuthResults;{
+our $VERSION = '3.016';
+}
 
 use base 'Mail::Message::Field::Structured';
 

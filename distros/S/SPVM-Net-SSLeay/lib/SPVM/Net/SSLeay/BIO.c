@@ -12,9 +12,9 @@ int32_t SPVM__Net__SSLeay__BIO__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  BIO* bio = BIO_new(BIO_s_mem());
+  BIO* self = BIO_new(BIO_s_mem());
   
-  if (!bio) {
+  if (!self) {
     int64_t ssl_error = ERR_peek_last_error();
     
     char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
@@ -27,7 +27,7 @@ int32_t SPVM__Net__SSLeay__BIO__new(SPVM_ENV* env, SPVM_VALUE* stack) {
     return error_id;
   }
   
-  void* obj_self = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::BIO", bio, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_self = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::BIO", self, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   stack[0].oval = obj_self;
@@ -60,9 +60,9 @@ int32_t SPVM__Net__SSLeay__BIO__read(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "The length $dlen must be lower than or equal to the length of the data $data.", __func__, FILE_NAME, __LINE__);
   }
   
-  BIO* bio = env->get_pointer(env, stack, obj_self);
+  BIO* self = env->get_pointer(env, stack, obj_self);
   
-  int32_t read_length = BIO_read(bio, data, dlen);
+  int32_t read_length = BIO_read(self, data, dlen);
   
   if (read_length < 0) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -107,9 +107,9 @@ int32_t SPVM__Net__SSLeay__BIO__write(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "The length $dlen must be lower than or equal to the length of the data $data.", __func__, FILE_NAME, __LINE__);
   }
   
-  BIO* bio = env->get_pointer(env, stack, obj_self);
+  BIO* self = env->get_pointer(env, stack, obj_self);
   
-  int32_t write_length = BIO_write(bio, data, dlen);
+  int32_t write_length = BIO_write(self, data, dlen);
   
   if (write_length < 0) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -149,9 +149,9 @@ int32_t SPVM__Net__SSLeay__BIO__new_file(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   const char* mode = env->get_chars(env, stack, obj_mode);
   
-  BIO* bio = BIO_new_file(filename, mode);
+  BIO* self = BIO_new_file(filename, mode);
   
-  if (!bio) {
+  if (!self) {
     int64_t ssl_error = ERR_peek_last_error();
     
     char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
@@ -164,7 +164,7 @@ int32_t SPVM__Net__SSLeay__BIO__new_file(SPVM_ENV* env, SPVM_VALUE* stack) {
     return error_id;
   }
   
-  void* obj_self = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::BIO", bio, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_self = env->new_pointer_object_by_name(env, stack, "Net::SSLeay::BIO", self, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   stack[0].oval = obj_self;
@@ -178,10 +178,10 @@ int32_t SPVM__Net__SSLeay__BIO__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  BIO* pointer = env->get_pointer(env, stack, obj_self);
+  BIO* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    BIO_free(pointer);
+    BIO_free(self);
   }
   
   return 0;

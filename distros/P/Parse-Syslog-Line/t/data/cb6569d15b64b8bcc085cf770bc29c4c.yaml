@@ -7,10 +7,10 @@ expected:
     USER: root
   content: 'brad : TTY=pts/3 ; PWD=/home/brad/code/CPAN/eris-logging ; USER=root ; COMMAND=/bin/grep pam /var/log/messages'
   date: 2018-05-20
-  date_raw: May 20 06:40:53
-  datetime_obj: ~
+  datetime_local: 2018-05-20T06:40:53Z
   datetime_raw: May 20 06:40:53
   datetime_str: 2018-05-20T06:40:53Z
+  datetime_utc: 2018-05-20T06:40:53Z
   domain: ~
   epoch: 1526798453
   facility: ~
@@ -19,7 +19,6 @@ expected:
   host_raw: janus
   message: 'sudo: brad : TTY=pts/3 ; PWD=/home/brad/code/CPAN/eris-logging ; USER=root ; COMMAND=/bin/grep pam /var/log/messages'
   message_raw: 'May 20 06:40:53 janus sudo:     brad : TTY=pts/3 ; PWD=/home/brad/code/CPAN/eris-logging ; USER=root ; COMMAND=/bin/grep pam /var/log/messages'
-  offset: Z
   preamble: ~
   priority: ~
   priority_int: ~
@@ -28,6 +27,7 @@ expected:
   program_raw: sudo
   program_sub: ~
   time: 06:40:53
+  tz: Z
 name: crond message with key/value detection enabled
 options:
   AutoDetectKeyValues: 1

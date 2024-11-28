@@ -58,6 +58,7 @@ t/movies.json
 t/movies_config.yaml
 t/movies_weights.yaml
 t/ontologies.yaml
+t/output.json
 t/patient.json
 t/plot/bff.png
 t/plot/pxf.png

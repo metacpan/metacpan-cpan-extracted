@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 3;
-use Perlmazing;
+use Perlmazing qw(not_empty);
 
 my @cases = (
 	['', 0, 'empty'],

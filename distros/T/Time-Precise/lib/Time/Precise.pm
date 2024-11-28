@@ -8,10 +8,10 @@ use Time::HiRes;
 
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK $PRECISION );
 use subs qw(localtime gmtime time sleep );
-$VERSION   = '1.0010';
+$VERSION   = '1.0012';
 
 @ISA    = qw(Exporter);
-@EXPORT = qw(time localtime gmtime sleep timegm timelocal is_valid_date is_leap_year time_hashref gmtime_hashref get_time_from get_gmtime_from);
+@EXPORT = qw(time localtime gmtime sleep timegm timelocal is_valid_date is_leap_year time_hashref gmtime_hashref get_time_from get_gmtime_from localtime_ts gmtime_ts);
 
 $PRECISION = 7;
 my @MonthDays = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
@@ -271,8 +271,18 @@ sub time_hashref (;$) {
 	_time_hashref(shift);
 }
 
-sub gmtime_hashref {
+sub gmtime_hashref (;$) {
 	_time_hashref(shift, 1);
+}
+
+sub localtime_ts (;$) {
+	my $t = _time_hashref(shift);
+  "$t->{year}-$t->{month}-$t->{day} $t->{hour}:$t->{minute}:$t->{second}";
+}
+
+sub gmtime_ts (;$) {
+	my $t = _time_hashref(shift, 1);
+  "$t->{year}-$t->{month}-$t->{day} $t->{hour}:$t->{minute}:$t->{second}";
 }
 
 sub _time_hashref {
@@ -347,33 +357,33 @@ C<timelocal> and C<timegm>. It also includes a few extra helper functions descri
 
 B<Note that this module won't affect any other code or modules, it will only affect the standard functions where it is explicitly C<use>d.>
 
-    use Time::Precise;
-    
-    # ...or, if you don't want anything exported by default:
-    use Time::Precise ();
-    
-    # ...or, to import only a certain function:
-    use Time::Precise qw(time localtime);
-    
-    # Time in seconds, but includes nanoseconds. (e.g. 1444217081.0396979)
-    my $time = time;
-    
-    # Localtime includes nanoseconds too. (e.g. Wed Oct  7 06:25:44.0032990 2015)
-    my $localtime = localtime;
-    
-    # Same applies here accordingly:
-    my @localtime = localtime;
-    
-    # Sleep for a second and a half:
-    sleep 1.5;
-    
-    # Use functions from Time::Local as normal, but they will work with nanoseconds:
-    my $seconds = timelocal @localtime;
+  use Time::Precise;
+  
+  # ...or, if you don't want anything exported by default:
+  use Time::Precise ();
+  
+  # ...or, to import only a certain function:
+  use Time::Precise qw(time localtime);
+  
+  # Time in seconds, but includes nanoseconds. (e.g. 1444217081.0396979)
+  my $time = time;
+  
+  # Localtime includes nanoseconds too. (e.g. Wed Oct  7 06:25:44.0032990 2015)
+  my $localtime = localtime;
+  
+  # Same applies here accordingly:
+  my @localtime = localtime;
+  
+  # Sleep for a second and a half:
+  sleep 1.5;
+  
+  # Use functions from Time::Local as normal, but they will work with nanoseconds:
+  my $seconds = timelocal @localtime;
 
 =head1 EXPORT
 
 Functions exported by default: C<time>, C<localtime>, C<gmtime>, C<sleep>, C<timegm>, C<timelocal>, C<is_valid_date>,
-C<is_leap_year>, C<time_hashref>, C<gmtime_hashref>, C<get_time_from>, C<get_gmtime_from>.
+C<is_leap_year>, C<time_hashref>, C<gmtime_hashref>, C<get_time_from>, C<get_gmtime_from>, C<localtime_ts>, C<gmtime_ts>.
 
 =head1 $Time::Precise::PRECISION
 
@@ -385,20 +395,24 @@ This is currently a global setting, so be careful not to alter it if that can ca
 to expect a different number of decimals. A solution to this when you only need to change the precision in a certain
 place is to localize it:
 
-    use Time::Precise;
-    
-    my $time = time; # Will have 7 decimals
-    {
-	    local $Time::Precise::PRECISION = 3;
-	    my $short = time; # Will have 3 decimals
-    }
-    $time = time; # Will have 7 decimals again
+  use Time::Precise;
+  
+  my $time = time; # Will have 7 decimals
+  {
+    local $Time::Precise::PRECISION = 3;
+    my $short = time; # Will have 3 decimals
+  }
+  $time = time; # Will have 7 decimals again
 
 =head1 Functions
 
 =head2 time, localtime, gmtime
 
 Work just like the regular CORE functions, but specify full year in the response and include nanoseconds as decimals.
+
+=head2 localtime_ts, gmtime_ts
+
+Work just like the regular CORE C<localtime> and C<gmtime> functions, except they will return a timestamp SQL style (e.g. C<2024-11-27 20:25:30.8543219>).
 
 =head2 sleep
 
@@ -421,18 +435,18 @@ This will return 1 or 0 depending on the year passed being a leap year.
 This is a variation of C<localtime> and C<gmtime> respectively. It takes an optional C<$seconds> argument or uses the current time if no
 argument is passed. It will return a hashref containing the corresponding elements for it. Example:
 
-    {
-        day          => "07",
-        hour         => "06",
-        is_leap_year => 0,
-        isdst        => 1,
-        minute       => 45,
-        month        => 10,
-        second       => 34.61739,
-        wday         => 3,
-        yday         => 279,
-        year         => 2015,
-    }
+  {
+    day          => "07",
+    hour         => "06",
+    is_leap_year => 0,
+    isdst        => 1,
+    minute       => 45,
+    month        => 10,
+    second       => 34.61739,
+    wday         => 3,
+    yday         => 279,
+    year         => 2015,
+  }
 
 =head2 get_time_from(year => $year, month => $month, day => $day, hour => $hour, minute => $minute, second => $second)
 
@@ -443,20 +457,20 @@ but if you don't specify anything at all, then it will default to the current da
 
 Example:
 
-    my $time = get_time_from (
-        year    => 1975,
-        month   => 9,
-        day     => 3,
-        hour    => 8,
-        minute  => 33,
-        second  => 12.0067514,
-    );
-    
-    # $time is now 178983192.0067514
-    
-    my $date = localtime $time;
-    
-    # $date is now Wed Sep  3 08:33:12.0067514 1975
+  my $time = get_time_from (
+    year    => 1975,
+    month   => 9,
+    day     => 3,
+    hour    => 8,
+    minute  => 33,
+    second  => 12.0067514,
+  );
+  
+  # $time is now 178983192.0067514
+  
+  my $date = localtime $time;
+  
+  # $date is now Wed Sep  3 08:33:12.0067514 1975
 
 =head1 AUTHOR
 
@@ -472,7 +486,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Time::Precise
+  perldoc Time::Precise
 
 You can also look for information at:
 
@@ -503,7 +517,7 @@ L<Time::Local>, from which several lines of code have been taken.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Francisco Zarabozo. Parts taken from L<Time::Local>.
+Copyright 2015-2024 Francisco Zarabozo. Parts taken from L<Time::Local>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

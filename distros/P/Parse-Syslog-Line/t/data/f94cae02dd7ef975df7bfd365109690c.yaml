@@ -2,10 +2,10 @@
 expected:
   content: DHCPINFORM from 172.16.2.137 via vlan3
   date: 2018-01-01
-  date_raw: Jan  1 00:00:00
-  datetime_obj: ~
+  datetime_local: 2018-01-01T00:00:00Z
   datetime_raw: Jan  1 00:00:00
   datetime_str: 2018-01-01T00:00:00Z
+  datetime_utc: 2018-01-01T00:00:00Z
   domain: ~
   epoch: 1514764800
   facility: user
@@ -14,7 +14,6 @@ expected:
   host_raw: 11.22.33.44
   message: 'dhcpd: DHCPINFORM from 172.16.2.137 via vlan3'
   message_raw: '<11>Jan  1 00:00:00 11.22.33.44 dhcpd: DHCPINFORM from 172.16.2.137 via vlan3'
-  offset: Z
   preamble: 11
   priority: err
   priority_int: 3
@@ -23,5 +22,6 @@ expected:
   program_raw: dhcpd
   program_sub: ~
   time: 00:00:00
+  tz: Z
 name: IP as Hostname
 string: '<11>Jan  1 00:00:00 11.22.33.44 dhcpd: DHCPINFORM from 172.16.2.137 via vlan3'

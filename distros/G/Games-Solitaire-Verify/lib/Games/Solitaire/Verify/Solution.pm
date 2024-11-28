@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Solution;
-$Games::Solitaire::Verify::Solution::VERSION = '0.2600';
+$Games::Solitaire::Verify::Solution::VERSION = '0.2601';
 use warnings;
 use strict;
 
@@ -161,7 +161,14 @@ sub verify
     {
         return { error => $err, line_num => $self->_ln(), };
     }
-    else
+    elsif (
+        $err = Exception::Class->caught(
+            'Games::Solitaire::Verify::Exception::State::MissingCards')
+        )
+    {
+        return { error => $err, line_num => $self->_ln(), };
+    }
+    elsif (1)
     {
         $err = Exception::Class->caught();
         ref $err ? $err->rethrow : die $err;
@@ -185,7 +192,7 @@ of Freecell Solver (or a similar solver)
 
 =head1 VERSION
 
-version 0.2600
+version 0.2601
 
 =head1 SYNOPSIS
 

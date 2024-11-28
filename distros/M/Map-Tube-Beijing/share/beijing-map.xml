@@ -1,430 +1,2097 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <tube name="北京地铁" name_alt="Beijing Subway">
   <lines>
-    <line id="L_capitalairportexpress" name="首都机场线[1]" name_alt="Capital Airport Express" color="#A192B2" />
-    <line id="L_changpingline" name="昌平线" name_alt="Changping Line" color="#D986BA" />
-    <line id="L_daxingairportexpress" name="大兴机场线" name_alt="Daxing Airport Express" color="#0049A5" />
-    <line id="L_fangshanline" name="房山线" name_alt="Fangshan Line" color="#D86018" />
-    <line id="L_line10" name="10号线" name_alt="Line 10" color="#0092BC" />
-    <line id="L_line11" name="11号线" name_alt="Line 11" color="#FF8674" />
-    <line id="L_line13" name="13号线" name_alt="Line 13" color="#F4DA40" />
-    <line id="L_line14" name="14号线" name_alt="Line 14" color="#CA9A8E" />
-    <line id="L_line15" name="15号线" name_alt="Line 15" color="#653279" />
-    <line id="L_line16" name="16号线" name_alt="Line 16" color="#6BA539" />
-    <line id="L_line17" name="17号线" name_alt="Line 17" color="#00ABAB" />
-    <line id="L_line19" name="19号线" name_alt="Line 19" color="#D3A3C9" />
-    <line id="L_line1andbatongline" name="1号线 八通线" name_alt="Line 1 and Batong Line" color="#A4343A" />
-    <line id="L_line2" name="2号线" name_alt="Line 2" color="#004B87" />
-    <line id="L_line4" name="4号线 大兴线" name_alt="Line 4" color="#008C95" />
-    <line id="L_line5" name="5号线" name_alt="Line 5" color="#AA0061" />
-    <line id="L_line6" name="6号线" name_alt="Line 6" color="#B58500" />
-    <line id="L_line7" name="7号线" name_alt="Line 7" color="#FFC56E" />
-    <line id="L_line8" name="8号线" name_alt="Line 8" color="#009B77" />
-    <line id="L_line9" name="9号线" name_alt="Line 9" color="#97D700" />
-    <line id="L_lines1" name="S1线 门头沟线" name_alt="Line S1" color="#A45A2A" />
-    <line id="L_xijiaoline" name="西郊线" name_alt="Xijiao Line" color="#D22630" />
-    <line id="L_yanfangline" name="燕房线" name_alt="Yanfang Line" color="#D86018" />
-    <line id="L_yizhuangline" name="亦庄线" name_alt="Yizhuang Line" color="#D0006F" />
-    <line id="L_yizhuangt1line" name="" name_alt="Yizhuang T1 Line" color="#D22630" />
+    <line id="L_capitalairportexpress"
+          name="首都机场线[1]"
+          name_alt="Capital Airport Express"
+          color="#A192B2" />
+    <line id="L_changpingline"
+          name="昌平线"
+          name_alt="Changping Line"
+          color="#D986BA" />
+    <line id="L_daxingairportexpress"
+          name="大兴机场线"
+          name_alt="Daxing Airport Express"
+          color="#0049A5" />
+    <line id="L_fangshanline"
+          name="房山线"
+          name_alt="Fangshan Line"
+          color="#D86018" />
+    <line id="L_line10"
+          name="10号线"
+          name_alt="Line 10"
+          color="#0092BC" />
+    <line id="L_line11"
+          name="11号线"
+          name_alt="Line 11"
+          color="#FF8674" />
+    <line id="L_line13"
+          name="13号线"
+          name_alt="Line 13"
+          color="#F4DA40" />
+    <line id="L_line14"
+          name="14号线"
+          name_alt="Line 14"
+          color="#CA9A8E" />
+    <line id="L_line15"
+          name="15号线"
+          name_alt="Line 15"
+          color="#653279" />
+    <line id="L_line16"
+          name="16号线"
+          name_alt="Line 16"
+          color="#6BA539" />
+    <line id="L_line17"
+          name="17号线"
+          name_alt="Line 17"
+          color="#00ABAB" />
+    <line id="L_line19"
+          name="19号线"
+          name_alt="Line 19"
+          color="#D3A3C9" />
+    <line id="L_line1andbatongline"
+          name="1号线 八通线"
+          name_alt="Line 1 and Batong Line"
+          color="#A4343A" />
+    <line id="L_line2"
+          name="2号线"
+          name_alt="Line 2"
+          color="#004B87" />
+    <line id="L_line4"
+          name="4号线 大兴线"
+          name_alt="Line 4"
+          color="#008C95" />
+    <line id="L_line5"
+          name="5号线"
+          name_alt="Line 5"
+          color="#AA0061" />
+    <line id="L_line6"
+          name="6号线"
+          name_alt="Line 6"
+          color="#B58500" />
+    <line id="L_line7"
+          name="7号线"
+          name_alt="Line 7"
+          color="#FFC56E" />
+    <line id="L_line8"
+          name="8号线"
+          name_alt="Line 8"
+          color="#009B77" />
+    <line id="L_line9"
+          name="9号线"
+          name_alt="Line 9"
+          color="#97D700" />
+    <line id="L_lines1"
+          name="S1线 门头沟线"
+          name_alt="Line S1"
+          color="#A45A2A" />
+    <line id="L_xijiaoline"
+          name="西郊线"
+          name_alt="Xijiao Line"
+          color="#D22630" />
+    <line id="L_yanfangline"
+          name="燕房线"
+          name_alt="Yanfang Line"
+          color="#D86018" />
+    <line id="L_yizhuangline"
+          name="亦庄线"
+          name_alt="Yizhuang Line"
+          color="#D0006F" />
+    <line id="L_yizhuangt1line"
+          name="亦庄T1线"
+          name_alt="Yizhuang T1 Line"
+          color="#D22630" />
   </lines>
   <stations>
-    <station id="s_agriculturalexhibitioncenter" name="农业展览馆" name_alt="Agricultural Exhibition Center" line="L_line10:16" link="s_liangmaqiao,s_tuanjiehu" />
-    <station id="s_andelibeijie" name="安德里北街" name_alt="Andeli Beijie" line="L_line8:15" link="s_anhuaqiao,s_guloudajie" />
-    <station id="s_andingmen" name="安定门" name_alt="Andingmen" line="L_line2:16" link="s_guloudajie,s_yonghegonglamatemple" />
-    <station id="s_anheqiaobei" name="安河桥北" name_alt="Anheqiaobei" line="L_line4:1" link="s_beigongmen" />
-    <station id="s_anhuaqiao" name="安华桥" name_alt="Anhua Qiao" line="L_line8:14" link="s_andelibeijie,s_beitucheng" />
-    <station id="s_anlilu" name="安立路" name_alt="Anli Lu" line="L_line15:5" link="s_datunludong,s_olympicpark" />
-    <station id="s_anzhenmen" name="安贞门" name_alt="Anzhenmen" line="L_line10:10" link="s_beitucheng,s_huixinxijienankou" />
-    <station id="s_babaoshan" name="八宝山" name_alt="Babaoshan" line="L_line1andbatongline:4" link="s_bajiaoamusementpark,s_yuquanlu" />
-    <station id="s_bagou" name="巴沟" name_alt="Bagou" line="L_line10:1,L_xijiaoline:1" link="s_summerpalacewestgate,s_suzhoujie" />
-    <station id="s_baiduizi" name="白堆子" name_alt="Baiduizi" line="L_line9:3" link="s_baishiqiaonan,s_militarymuseum" />
-    <station id="s_baipenyao" name="白盆窑" name_alt="Baipenyao" line="L_fangshanline:4" link="s_guogongzhuang,s_huaxiangdongqiao" />
-    <station id="s_baishiqiaonan" name="白石桥南" name_alt="Baishiqiaonan" line="L_line6:10,L_line9:2" link="s_baiduizi,s_erligou,s_huayuanqiao,s_nationallibrary" />
-    <station id="s_baiziwan" name="百子湾" name_alt="Baiziwan" line="L_line7:15" link="s_dajiaoting,s_huagong" />
-    <station id="s_bajiaoamusementpark" name="八角游乐园" name_alt="Bajiao Amusement Park" line="L_line1andbatongline:3" link="s_babaoshan,s_gucheng" />
-    <station id="s_baliqiao" name="八里桥" name_alt="Baliqiao" line="L_line1andbatongline:28" link="s_guaanzhuang,s_tongzhoubeiyuan" />
-    <station id="s_beianhe" name="北安河" name_alt="Bei'anhe" line="L_line16:1" link="s_wenyanglu" />
-    <station id="s_beigongmen" name="北宫门" name_alt="Beigongmen" line="L_line4:2" link="s_anheqiaobei,s_xiyuan" />
-    <station id="s_beihaibei" name="北海北" name_alt="Beihaibei" line="L_line6:15" link="s_nanluoguxiang,s_pinganli" />
-    <station id="s_beijingetronginternationalexhibitionampconventioncenter" name="亦创会展中心" name_alt="Beijing Etrong International Exhibition &amp; Convention Center" line="L_yizhuangt1line:11" link="s_jinghaiyilu,s_rongchangdongjie" />
-    <station id="s_beijingrailwaystation" name="北京站" name_alt="Beijing railway station" line="L_line2:10" link="s_chongwenmen,s_jianguomen" />
-    <station id="s_beijingsouthrailwaystation" name="北京南站" name_alt="Beijing South railway station" line="L_line14:13,L_line4:21" link="s_jingfengmen,s_majiapu,s_taoranting,s_yongdingmenwai" />
-    <station id="s_beijingunivoftechwestgate" name="北工大西门" name_alt="Beijing Univ. of Tech. West Gate" line="L_line14:19" link="s_pingleyuan,s_shilihe" />
-    <station id="s_beijingwestrailwaystation" name="北京西站" name_alt="Beijing West railway station" line="L_line7:1,L_line9:5" link="s_liuliqiaodong,s_militarymuseum,s_wanzi" />
-    <station id="s_beijingzoo" name="动物园" name_alt="Beijing Zoo" line="L_line4:11" link="s_nationallibrary,s_xizhimen" />
-    <station id="s_beishaowa" name="北邵洼" name_alt="Beishaowa" line="L_changpingline:5" link="s_changpingdongguan,s_nanshao" />
-    <station id="s_beishatan" name="北沙滩" name_alt="Beishatan" line="L_line15:3" link="s_liudaokou,s_olympicpark" />
-    <station id="s_beishenshu" name="北神树" name_alt="Beishenshu" line="L_line17:13" link="s_ciqubei,s_shibalidian" />
-    <station id="s_beitaipingzhuang" name="北太平庄" name_alt="Beitaipingzhuang" line="L_line19:2" link="s_jishuitan,s_mudanyuan" />
-    <station id="s_beitucheng" name="北土城" name_alt="Beitucheng" line="L_line10:9,L_line8:13" link="s_anhuaqiao,s_anzhenmen,s_jiandemen,s_olympicsportscenter" />
-    <station id="s_beixinan" name="北辛安" name_alt="Beixin'an" line="L_line11:3" link="s_jinanqiao,s_xinshougangshougangpark30" />
-    <station id="s_beixinqiao" name="北新桥" name_alt="Beixinqiao" line="L_line5:11" link="s_yonghegonglamatemple,s_zhangzizhonglu" />
-    <station id="s_beiyuan" name="北苑" name_alt="Beiyuan" line="L_line13:12" link="s_lishuiqiao,s_wangjingxi" />
-    <station id="s_beiyuanlubei" name="北苑路北" name_alt="Beiyuanlubei" line="L_line5:18" link="s_datunludong,s_lishuiqiaonan" />
-    <station id="s_beiyunhedong" name="北运河东" name_alt="Beiyunhedong" line="L_line6:31" link="s_beiyunhexi,s_haojiafu" />
-    <station id="s_beiyunhexi" name="北运河西" name_alt="Beiyunhexi" line="L_line6:30" link="s_beiyunhedong,s_tongzhoubeiguan" />
-    <station id="s_biomedicalbase" name="生物医药基地" name_alt="Biomedical Base" line="L_line4:34" link="s_tiangongyuan,s_yihezhuang" />
-    <station id="s_botanicalgarden" name="植物园" name_alt="Botanical Garden" line="L_xijiaoline:5" link="s_fragranthills,s_wanan" />
-    <station id="s_caihuying" name="菜户营" name_alt="Caihuying" line="L_line14:10" link="s_lizeshangwuqu,s_xitieying" />
-    <station id="s_caishikou" name="菜市口" name_alt="Caishikou" line="L_line4:19,L_line7:5" link="s_guanganmennei,s_hufangqiao,s_taoranting,s_xuanwumen" />
-    <station id="s_caofang" name="草房" name_alt="Caofang" line="L_line6:27" link="s_changying,s_wuzixueyuanlu" />
-    <station id="s_caoqiao" name="草桥" name_alt="Caoqiao" line="L_daxingairportexpress:1,L_line10:32,L_line19:8" link="s_daxingxincheng,s_jiaomenxi,s_jijiamiao,s_jingfengmen,s_xinfadi" />
-    <station id="s_capitalunivofeconomicsampbusiness" name="首经贸" name_alt="Capital Univ. of Economics &amp; Business" line="L_fangshanline:2,L_line10:34" link="s_dongguantounan,s_fengtairailwaystation,s_huaxiangdongqiao,s_jijiamiao" />
-    <station id="s_changchunjie" name="长椿街" name_alt="Changchun Jie" line="L_line2:5" link="s_fuxingmen,s_xuanwumen" />
-    <station id="s_changchunqiao" name="长春桥" name_alt="Changchun Qiao" line="L_line10:44" link="s_chedaogou,s_huoqiying" />
-    <station id="s_changping" name="昌平" name_alt="Changping" line="L_changpingline:3" link="s_changpingdongguan,s_mingtombs" />
-    <station id="s_changpingdongguan" name="昌平东关" name_alt="Changping Dongguan" line="L_changpingline:4" link="s_beishaowa,s_changping" />
-    <station id="s_changpingxishankou" name="昌平西山口" name_alt="Changping Xishankou" line="L_changpingline:1" link="s_mingtombs" />
-    <station id="s_changyang" name="长阳" name_alt="Changyang" line="L_fangshanline:8" link="s_daotian,s_libafang" />
-    <station id="s_changying" name="常营" name_alt="Changying" line="L_line6:26" link="s_caofang,s_huangqu" />
-    <station id="s_chaoyangmen" name="朝阳门" name_alt="Chaoyangmen" line="L_line2:12,L_line6:18" link="s_dongdaqiao,s_dongsi,s_dongsishitiao,s_jianguomen" />
-    <station id="s_chaoyangpark" name="朝阳公园" name_alt="Chaoyang Park" line="L_line14:24" link="s_jintailu,s_zaoying" />
-    <station id="s_chapeng" name="茶棚" name_alt="Chapeng" line="L_xijiaoline:3" link="s_summerpalacewestgate,s_wanan" />
-    <station id="s_chedaogou" name="车道沟" name_alt="Chedaogou" line="L_line10:43" link="s_changchunqiao,s_cishousi" />
-    <station id="s_chegongzhuang" name="车公庄" name_alt="Chegongzhuang" line="L_line2:2,L_line6:13" link="s_chegongzhuangxi,s_fuchengmen,s_pinganli,s_xizhimen" />
-    <station id="s_chegongzhuangxi" name="车公庄西" name_alt="Chegongzhuangxi" line="L_line6:12" link="s_chegongzhuang,s_erligou" />
-    <station id="s_chengshousi" name="成寿寺" name_alt="Chengshousi" line="L_line10:26" link="s_fenzhongsi,s_songjiazhuang" />
-    <station id="s_chinaintlexhibitioncenter" name="国展" name_alt="China Int'l Exhibition Center" line="L_line15:14" link="s_hualikan,s_sunhe" />
-    <station id="s_chongwenmen" name="崇文门" name_alt="Chongwenmen" line="L_line2:9,L_line5:6" link="s_beijingrailwaystation,s_ciqikou,s_dongdan,s_qianmen" />
-    <station id="s_ciqikou" name="磁器口" name_alt="Ciqikou" line="L_line5:5,L_line7:9" link="s_chongwenmen,s_guangqumennei,s_qiaowan,s_templeofheaveneastgate" />
-    <station id="s_ciqu" name="次渠" name_alt="Ciqu" line="L_line17:15,L_yizhuangline:13" link="s_ciqubei,s_ciqunan,s_jiahuihu,s_yizhuangrailwaystation" />
-    <station id="s_ciqubei" name="次渠北" name_alt="Ciqubei" line="L_line17:14" link="s_beishenshu,s_ciqu" />
-    <station id="s_ciqunan" name="次渠南" name_alt="Ciqunan" line="L_yizhuangline:12" link="s_ciqu,s_jinghailu" />
-    <station id="s_cishousi" name="慈寿寺" name_alt="Cishousi" line="L_line10:42,L_line6:8" link="s_chedaogou,s_haidianwuluju,s_huayuanqiao,s_xidiaoyutai" />
-    <station id="s_communicationunivofchina" name="传媒大学" name_alt="Communication Univ. of China" line="L_line1andbatongline:25" link="s_gaobeidian,s_shuangqiao" />
-    <station id="s_cuigezhuang" name="崔各庄" name_alt="Cuigezhuang" line="L_line15:11" link="s_maquanying,s_wangjingdong" />
-    <station id="s_dabaotai" name="大葆台" name_alt="Dabaotai" line="L_fangshanline:6" link="s_daotian,s_guogongzhuang" />
-    <station id="s_daguanying" name="达官营" name_alt="Daguanying" line="L_line16:20,L_line7:3" link="s_guanganmennei,s_hongliannanlu,s_muxidi,s_wanzi" />
-    <station id="s_dahongmen" name="大红门" name_alt="Dahongmen" line="L_line10:29,L_line8:28" link="s_dahongmennan,s_haihutun,s_jiaomendong,s_shiliuzhuang" />
-    <station id="s_dahongmennan" name="大红门南" name_alt="Dahongmennan" line="L_line8:29" link="s_dahongmen,s_heyi" />
-    <station id="s_dajiaoting" name="大郊亭" name_alt="Dajiaoting" line="L_line7:14" link="s_baiziwan,s_jiulongshan" />
-    <station id="s_dajing" name="大井" name_alt="Dajing" line="L_line14:5" link="s_guozhuangzi,s_qilizhuang" />
-    <station id="s_dalianpo" name="褡裢坡" name_alt="Dalianpo" line="L_line6:24" link="s_huangqu,s_qingnianlu" />
-    <station id="s_daotian" name="稻田" name_alt="Daotian" line="L_fangshanline:7" link="s_changyang,s_dabaotai" />
-    <station id="s_daoxianghulu" name="稻香湖路" name_alt="Daoxianghu Lu" line="L_line16:3" link="s_tundian,s_wenyanglu" />
-    <station id="s_dashihedong" name="大石河东" name_alt="Dashihedong" line="L_yanfangline:5" link="s_magezhuang,s_xingcheng" />
-    <station id="s_datunludong" name="大屯路东" name_alt="Datunludong" line="L_line15:6,L_line5:17" link="s_anlilu,s_beiyuanlubei,s_guanzhuang,s_huixinxijiebeikou" />
-    <station id="s_dawanglu" name="大望路" name_alt="Dawang Lu" line="L_line14:22,L_line1andbatongline:21" link="s_guomao,s_jintailu,s_jiulongshan,s_sihui" />
-    <station id="s_dawayao" name="大瓦窑" name_alt="Dawayao" line="L_line14:3" link="s_gardenexpopark,s_guozhuangzi" />
-    <station id="s_daxingairport" name="大兴机场" name_alt="Daxing Airport" line="L_daxingairportexpress:3" link="s_daxingxincheng" />
-    <station id="s_daxingxincheng" name="大兴新城" name_alt="Daxing Xincheng" line="L_daxingairportexpress:2" link="s_caoqiao,s_daxingairport" />
-    <station id="s_dazhongsi" name="大钟寺" name_alt="Dazhong Si" line="L_line13:2" link="s_xizhimen,s_zhichunlu" />
-    <station id="s_demao" name="德茂" name_alt="Demao" line="L_line8:34" link="s_wufutang,s_yinghai" />
-    <station id="s_dengshikou" name="灯市口" name_alt="Dengshikou" line="L_line5:8" link="s_dongdan,s_dongsi" />
-    <station id="s_dinghaiyuan" name="定海园" name_alt="Dinghaiyuan" line="L_yizhuangt1line:14" link="s_dinghaiyuanxi" />
-    <station id="s_dinghaiyuanxi" name="定海园西" name_alt="Dinghaiyuanxi" line="L_yizhuangt1line:13" link="s_dinghaiyuan,s_jinghaiyilu" />
-    <station id="s_dongdan" name="东单" name_alt="Dongdan" line="L_line1andbatongline:17,L_line5:7" link="s_chongwenmen,s_dengshikou,s_jianguomen,s_wangfujing" />
-    <station id="s_dongdaqiao" name="东大桥" name_alt="Dongdaqiao" line="L_line6:19" link="s_chaoyangmen,s_hujialou" />
-    <station id="s_dongfengbeiqiao" name="东风北桥" name_alt="Dongfeng Beiqiao" line="L_line14:26" link="s_jiangtai,s_zaoying" />
-    <station id="s_donggaodi" name="东高地" name_alt="Donggaodi" line="L_line8:31" link="s_heyi,s_huojianwanyuan" />
-    <station id="s_dongguantou" name="东管头" name_alt="Dongguantou" line="L_line14:8" link="s_lizeshangwuqu,s_xiju" />
-    <station id="s_dongguantounan" name="东管头南" name_alt="Dongguantounan" line="L_fangshanline:1,L_line16:22" link="s_capitalunivofeconomicsampbusiness,s_fengtairailwaystation,s_hongliannanlu" />
-    <station id="s_donghuqu" name="东湖渠" name_alt="Donghuqu" line="L_line14:31" link="s_laiguangying,s_wangjing" />
-    <station id="s_dongsi" name="东四" name_alt="Dongsi" line="L_line5:9,L_line6:17" link="s_chaoyangmen,s_dengshikou,s_nanluoguxiang,s_zhangzizhonglu" />
-    <station id="s_dongsishitiao" name="东四十条" name_alt="Dongsi Shitiao" line="L_line2:13" link="s_chaoyangmen,s_dongzhimen" />
-    <station id="s_dongxiayuan" name="东夏园" name_alt="Dongxiayuan" line="L_line6:33" link="s_haojiafu,s_lucheng" />
-    <station id="s_dongzhimen" name="东直门" name_alt="Dongzhimen" line="L_capitalairportexpress:1,L_line13:17,L_line2:14" link="s_dongsishitiao,s_liufang,s_sanyuanqiao,s_yonghegonglamatemple" />
-    <station id="s_erligou" name="二里沟" name_alt="Erligou" line="L_line16:16,L_line6:11" link="s_baishiqiaonan,s_chegongzhuangxi,s_ganjiakou,s_nationallibrary" />
-    <station id="s_fangshanchengguan" name="房山城关" name_alt="Fangshan Chengguan" line="L_yanfangline:8" link="s_raolefu,s_yanshan" />
-    <station id="s_fangzhuang" name="方庄" name_alt="Fangzhuang" line="L_line14:17" link="s_puhuangyu,s_shilihe" />
-    <station id="s_fatou" name="垡头" name_alt="Fatou" line="L_line7:19" link="s_happyvalley,s_shuanghe" />
-    <station id="s_fengbo" name="俸伯" name_alt="Fengbo" line="L_line15:20" link="s_shunyi" />
-    <station id="s_fengtaidongdajie" name="丰台东大街" name_alt="Fengtai Dongdajie" line="L_line9:9" link="s_fengtainanlu,s_qilizhuang" />
-    <station id="s_fengtainanlu" name="丰台南路" name_alt="Fengtai Nanlu" line="L_line16:24,L_line9:10" link="s_fengtaidongdajie,s_fengtairailwaystation,s_fufengqiao,s_keyilu" />
-    <station id="s_fengtairailwaystation" name="丰台站" name_alt="Fengtai railway station" line="L_line10:35,L_line16:23" link="s_capitalunivofeconomicsampbusiness,s_dongguantounan,s_fengtainanlu,s_niwa" />
-    <station id="s_fengtaisciencepark" name="丰台科技园" name_alt="Fengtai Science Park" line="L_line9:12" link="s_guogongzhuang,s_keyilu" />
-    <station id="s_fenzhongsi" name="分钟寺" name_alt="Fenzhongsi" line="L_line10:25" link="s_chengshousi,s_shilihe" />
-    <station id="s_forestparksouthgate" name="森林公园南门" name_alt="Forest Park South Gate" line="L_line8:10" link="s_lincuiqiao,s_olympicpark" />
-    <station id="s_fragranthills" name="香山" name_alt="Fragrant Hills" line="L_xijiaoline:6" link="s_botanicalgarden" />
-    <station id="s_fuchengmen" name="阜成门" name_alt="Fuchengmen" line="L_line2:3" link="s_chegongzhuang,s_fuxingmen" />
-    <station id="s_fufengqiao" name="富丰桥" name_alt="Fufengqiao" line="L_line16:25" link="s_fengtainanlu,s_kandan" />
-    <station id="s_futong" name="阜通" name_alt="Futong" line="L_line14:29" link="s_wangjing,s_wangjingnan" />
-    <station id="s_futuresciencecity" name="未来科学城" name_alt="Future Science City" line="L_line17:2" link="s_futuresciencecitynorth,s_tiantongyuandong" />
-    <station id="s_futuresciencecitynorth" name="未来科学城北" name_alt="Future Science City North" line="L_line17:1" link="s_futuresciencecity" />
-    <station id="s_fuxingmen" name="复兴门" name_alt="Fuxingmen" line="L_line1andbatongline:12,L_line2:4" link="s_changchunjie,s_fuchengmen,s_nanlishilu,s_xidan" />
-    <station id="s_ganjiakou" name="甘家口" name_alt="Ganjiakou" line="L_line16:17" link="s_erligou,s_yuyuantandongmenyuyuantanparkeastgate" />
-    <station id="s_gaobeidian" name="高碑店" name_alt="Gaobeidian" line="L_line1andbatongline:24" link="s_communicationunivofchina,s_sihuidong" />
-    <station id="s_gaoloujin" name="高楼金" name_alt="Gaoloujin" line="L_line7:28" link="s_huazhuang,s_qunfang" />
-    <station id="s_gaomidianbei" name="高米店北" name_alt="Gaomidianbei" line="L_line4:27" link="s_gaomidiannan,s_xihongmen" />
-    <station id="s_gaomidiannan" name="高米店南" name_alt="Gaomidiannan" line="L_line4:28" link="s_gaomidianbei,s_zaoyuan" />
-    <station id="s_gardenexpopark" name="园博园" name_alt="Garden Expo Park" line="L_line14:2" link="s_dawayao,s_zhangguozhuang" />
-    <station id="s_gonghuacheng" name="巩华城" name_alt="Gonghuacheng" line="L_changpingline:9" link="s_shahe,s_zhuxinzhuang" />
-    <station id="s_gongyixiqiao" name="公益西桥" name_alt="Gongyi Xiqiao" line="L_line4:24" link="s_jiaomenxi,s_xingong" />
-    <station id="s_gongzhufen" name="公主坟" name_alt="Gongzhufen" line="L_line10:40,L_line1andbatongline:8" link="s_lianhuaqiao,s_militarymuseum,s_wanshoulu,s_xidiaoyutai" />
-    <station id="s_guaanzhuang" name="管庄" name_alt="Guaanzhuang" line="L_line1andbatongline:27" link="s_baliqiao,s_shuangqiao" />
-    <station id="s_guanganmennei" name="广安门内" name_alt="Guang'anmennei" line="L_line7:4" link="s_caishikou,s_daguanying" />
-    <station id="s_guangqumennei" name="广渠门内" name_alt="Guangqumennei" line="L_line7:10" link="s_ciqikou,s_guangqumenwai" />
-    <station id="s_guangqumenwai" name="广渠门外" name_alt="Guangqumenwai" line="L_line7:11" link="s_guangqumennei,s_shuangjing" />
-    <station id="s_guangximen" name="光熙门" name_alt="Guangximen" line="L_line13:15" link="s_liufang,s_shaoyaoju" />
-    <station id="s_guangyangcheng" name="广阳城" name_alt="Guangyangcheng" line="L_fangshanline:10" link="s_liangxiangunivtownnorth,s_libafang" />
-    <station id="s_guanzhuang" name="关庄" name_alt="Guanzhuang" line="L_line15:7" link="s_datunludong,s_wangjingxi" />
-    <station id="s_gucheng" name="古城" name_alt="Gucheng" line="L_line1andbatongline:2" link="s_bajiaoamusementpark,s_pingguoyuan" />
-    <station id="s_guloudajie" name="鼓楼大街" name_alt="Gulou Dajie" line="L_line2:17,L_line8:16" link="s_andelibeijie,s_andingmen,s_jishuitan,s_shichahai" />
-    <station id="s_guogongzhuang" name="郭公庄" name_alt="Guogongzhuang" line="L_fangshanline:5,L_line9:13" link="s_baipenyao,s_dabaotai,s_fengtaisciencepark" />
-    <station id="s_guomao" name="国贸" name_alt="Guomao" line="L_line10:20,L_line1andbatongline:20" link="s_dawanglu,s_jintaixizhao,s_shuangjing,s_yonganli" />
-    <station id="s_guoyuan" name="果园" name_alt="Guoyuan" line="L_line1andbatongline:30" link="s_jiukeshu,s_tongzhoubeiyuan" />
-    <station id="s_guozhuangzi" name="郭庄子" name_alt="Guozhuangzi" line="L_line14:4" link="s_dajing,s_dawayao" />
-    <station id="s_haidianhuangzhuang" name="海淀黄庄" name_alt="Haidian Huangzhuang" line="L_line10:3,L_line4:7" link="s_renmindaxuerenminuniv,s_suzhoujie,s_zhichunli,s_zhongguancun" />
-    <station id="s_haidianwuluju" name="海淀五路居" name_alt="Haidian Wuluju" line="L_line6:7" link="s_cishousi,s_tiancun" />
-    <station id="s_haihutun" name="海户屯" name_alt="Haihutun" line="L_line8:27" link="s_dahongmen,s_muxiyuan" />
-    <station id="s_haojiafu" name="郝家府" name_alt="Haojiafu" line="L_line6:32" link="s_beiyunhedong,s_dongxiayuan" />
-    <station id="s_happyvalley" name="欢乐谷景区" name_alt="Happy Valley" line="L_line7:18" link="s_fatou,s_nanlouzizhuang" />
-    <station id="s_heizhuanghu" name="黑庄户" name_alt="Heizhuanghu" line="L_line7:24" link="s_langxinzhuang,s_wanshengxi" />
-    <station id="s_hepinglibeijie" name="和平里北街" name_alt="Hepingli Beijie" line="L_line5:13" link="s_hepingxiqiao,s_yonghegonglamatemple" />
-    <station id="s_hepingmen" name="和平门" name_alt="Hepingmen" line="L_line2:7" link="s_qianmen,s_xuanwumen" />
-    <station id="s_hepingxiqiao" name="和平西桥" name_alt="Heping Xiqiao" line="L_line5:14" link="s_hepinglibeijie,s_huixinxijienankou" />
-    <station id="s_heyi" name="和义" name_alt="Heyi" line="L_line8:30" link="s_dahongmennan,s_donggaodi" />
-    <station id="s_hongjunying" name="红军营" name_alt="Hongjunying" line="L_line17:5" link="s_qingheying,s_taiyanggong" />
-    <station id="s_hongliannanlu" name="红莲南路" name_alt="Honglian Nanlu" line="L_line16:21" link="s_daguanying,s_dongguantounan" />
-    <station id="s_hongtaizhuang" name="洪泰庄" name_alt="Hongtaizhuang" line="L_line16:28" link="s_wanpingcheng,s_yushuzhuang" />
-    <station id="s_houshayu" name="后沙峪" name_alt="Houshayu" line="L_line15:16" link="s_hualikan,s_nanfaxin" />
-    <station id="s_huagong" name="化工" name_alt="Huagong" line="L_line7:16" link="s_baiziwan,s_nanlouzizhuang" />
-    <station id="s_hualikan" name="花梨坎" name_alt="Hualikan" line="L_line15:15" link="s_chinaintlexhibitioncenter,s_houshayu" />
-    <station id="s_huangchang" name="黄厂" name_alt="Huangchang" line="L_line7:22" link="s_jiaohuachang,s_langxinzhuang" />
-    <station id="s_huangcunrailwaystation" name="黄村火车站" name_alt="Huangcun railway station" line="L_line4:32" link="s_huangcunxidajie,s_yihezhuang" />
-    <station id="s_huangcunxidajie" name="黄村西大街" name_alt="Huangcun Xidajie" line="L_line4:31" link="s_huangcunrailwaystation,s_qingyuanlu" />
-    <station id="s_huangqu" name="黄渠" name_alt="Huangqu" line="L_line6:25" link="s_changying,s_dalianpo" />
-    <station id="s_huaxiangdongqiao" name="花乡东桥" name_alt="Huaxiang Dongqiao" line="L_fangshanline:3" link="s_baipenyao,s_capitalunivofeconomicsampbusiness" />
-    <station id="s_huayuanqiao" name="花园桥" name_alt="Huayuanqiao" line="L_line6:9" link="s_baishiqiaonan,s_cishousi" />
-    <station id="s_huazhuang" name="花庄" name_alt="Huazhuang" line="L_line1andbatongline:35,L_line7:29" link="s_gaoloujin,s_tuqiao,s_universalresort" />
-    <station id="s_hufangqiao" name="虎坊桥" name_alt="Hufangqiao" line="L_line7:6" link="s_caishikou,s_zhushikou" />
-    <station id="s_huilongguan" name="回龙观" name_alt="Huilongguan" line="L_line13:9" link="s_huoying,s_longze" />
-    <station id="s_huilongguandongdajie" name="回龙观东大街" name_alt="Huilongguan Dongdajie" line="L_line8:4" link="s_huoying,s_pingxifu" />
-    <station id="s_huixinxijiebeikou" name="惠新西街北口" name_alt="Huixin Xijie Beikou" line="L_line5:16" link="s_datunludong,s_huixinxijienankou" />
-    <station id="s_huixinxijienankou" name="惠新西街南口" name_alt="Huixin Xijie Nankou" line="L_line10:11,L_line5:15" link="s_anzhenmen,s_hepingxiqiao,s_huixinxijiebeikou,s_shaoyaoju" />
-    <station id="s_hujialou" name="呼家楼" name_alt="Hujialou" line="L_line10:18,L_line6:20" link="s_dongdaqiao,s_jintailu,s_jintaixizhao,s_tuanjiehu" />
-    <station id="s_huojianwanyuan" name="火箭万源" name_alt="Huojian Wanyuan" line="L_line8:32" link="s_donggaodi,s_wufutang" />
-    <station id="s_huoqiying" name="火器营" name_alt="Huoqiying" line="L_line10:45" link="s_changchunqiao" />
-    <station id="s_huoying" name="霍营" name_alt="Huoying" line="L_line13:10,L_line8:5" link="s_huilongguan,s_huilongguandongdajie,s_lishuiqiao,s_yuxin" />
-    <station id="s_jiahuihu" name="嘉会湖[41]" name_alt="Jiahuihu" line="L_line17:16" link="s_ciqu" />
-    <station id="s_jiandemen" name="健德门" name_alt="Jiandemen" line="L_line10:8" link="s_beitucheng,s_mudanyuan" />
-    <station id="s_jiangtai" name="将台" name_alt="Jiangtai" line="L_line14:27" link="s_dongfengbeiqiao,s_wangjingnan" />
-    <station id="s_jianguomen" name="建国门" name_alt="Jianguomen" line="L_line1andbatongline:18,L_line2:11" link="s_beijingrailwaystation,s_chaoyangmen,s_dongdan,s_yonganli" />
-    <station id="s_jiaohuachang" name="焦化厂" name_alt="Jiaohuachang" line="L_line7:21" link="s_huangchang,s_shuanghe" />
-    <station id="s_jiaomendong" name="角门东" name_alt="Jiaomendong" line="L_line10:30" link="s_dahongmen,s_jiaomenxi" />
-    <station id="s_jiaomenxi" name="角门西" name_alt="Jiaomenxi" line="L_line10:31,L_line4:23" link="s_caoqiao,s_gongyixiqiao,s_jiaomendong,s_majiapu" />
-    <station id="s_jijiamiao" name="纪家庙" name_alt="Jijiamiao" line="L_line10:33" link="s_caoqiao,s_capitalunivofeconomicsampbusiness" />
-    <station id="s_jinanqiao" name="金安桥" name_alt="Jin'anqiao" line="L_line11:2,L_line6:1,L_lines1:7" link="s_beixinan,s_moshikou,s_pingguoyuan,s_sidaoqiao" />
-    <station id="s_jingfengmen" name="景风门" name_alt="Jingfengmen" line="L_line14:12,L_line19:7" link="s_beijingsouthrailwaystation,s_caoqiao,s_niujie,s_xitieying" />
-    <station id="s_jinghailu" name="经海路" name_alt="Jinghai Lu" line="L_yizhuangline:11" link="s_ciqunan,s_tongjinanlu" />
-    <station id="s_jinghaiyilu" name="经海一路" name_alt="Jinghai Yilu" line="L_yizhuangt1line:12" link="s_beijingetronginternationalexhibitionampconventioncenter,s_dinghaiyuanxi" />
-    <station id="s_jingsong" name="劲松" name_alt="Jingsong" line="L_line10:22" link="s_panjiayuan,s_shuangjing" />
-    <station id="s_jingtai" name="景泰" name_alt="Jingtai" line="L_line14:15" link="s_puhuangyu,s_yongdingmenwai" />
-    <station id="s_jintailu" name="金台路" name_alt="Jintai Lu" line="L_line14:23,L_line6:21" link="s_chaoyangpark,s_dawanglu,s_hujialou,s_shilipu" />
-    <station id="s_jintaixizhao" name="金台夕照" name_alt="Jintai Xizhao" line="L_line10:19" link="s_guomao,s_hujialou" />
-    <station id="s_jinyuhutong" name="金鱼胡同" name_alt="Jinyu Hutong" line="L_line8:20" link="s_nationalartmuseum,s_wangfujing" />
-    <station id="s_jishuitan" name="积水潭" name_alt="Jishuitan" line="L_line19:3,L_line2:18" link="s_beitaipingzhuang,s_guloudajie,s_pinganli" />
-    <station id="s_jiugong" name="旧宫" name_alt="Jiugong" line="L_yizhuangline:4" link="s_xiaohongmen,s_yizhuangqiao" />
-    <station id="s_jiuhaocun" name="九号村" name_alt="Jiuhaocun" line="L_yizhuangt1line:6" link="s_sihaizhuang,s_taihelu" />
-    <station id="s_jiukeshu" name="九棵树" name_alt="Jiukeshu" line="L_line1andbatongline:31" link="s_guoyuan,s_liyuan" />
-    <station id="s_jiulongshan" name="九龙山" name_alt="Jiulongshan" line="L_line14:21,L_line7:13" link="s_dajiaoting,s_dawanglu,s_pingleyuan,s_shuangjing" />
-    <station id="s_kandan" name="看丹" name_alt="Kandan" line="L_line16:26" link="s_fufengqiao,s_yushuzhuang" />
-    <station id="s_keyilu" name="科怡路" name_alt="Keyi Lu" line="L_line9:11" link="s_fengtainanlu,s_fengtaisciencepark" />
-    <station id="s_laiguangying" name="来广营" name_alt="Laiguangying" line="L_line14:32" link="s_donghuqu,s_shangezhuang" />
-    <station id="s_langxinzhuang" name="郎辛庄" name_alt="Langxinzhuang" line="L_line7:23" link="s_heizhuanghu,s_huangchang" />
-    <station id="s_liangmaqiao" name="亮马桥" name_alt="Liangmaqiao" line="L_line10:15" link="s_agriculturalexhibitioncenter,s_sanyuanqiao" />
-    <station id="s_liangxiangnanguan" name="良乡南关" name_alt="Liangxiang Nanguan" line="L_fangshanline:14" link="s_liangxiangunivtownwest,s_suzhuang" />
-    <station id="s_liangxiangunivtown" name="良乡大学城" name_alt="Liangxiang Univ. Town" line="L_fangshanline:12" link="s_liangxiangunivtownnorth,s_liangxiangunivtownwest" />
-    <station id="s_liangxiangunivtownnorth" name="良乡大学城北" name_alt="Liangxiang Univ. Town North" line="L_fangshanline:11" link="s_guangyangcheng,s_liangxiangunivtown" />
-    <station id="s_liangxiangunivtownwest" name="良乡大学城西" name_alt="Liangxiang Univ. Town West" line="L_fangshanline:13" link="s_liangxiangnanguan,s_liangxiangunivtown" />
-    <station id="s_lianhuaqiao" name="莲花桥" name_alt="Lianhuaqiao" line="L_line10:39" link="s_gongzhufen,s_liuliqiao" />
-    <station id="s_liaogongzhuang" name="廖公庄" name_alt="Liaogongzhuang" line="L_line6:5" link="s_tiancun,s_xihuangcun" />
-    <station id="s_libafang" name="篱笆房" name_alt="Libafang" line="L_fangshanline:9" link="s_changyang,s_guangyangcheng" />
-    <station id="s_lifesciencepark" name="生命科学园" name_alt="Life Science Park" line="L_changpingline:11" link="s_xierqi,s_zhuxinzhuang" />
-    <station id="s_lincuiqiao" name="林萃桥" name_alt="Lincuiqiao" line="L_line8:9" link="s_forestparksouthgate,s_yongtaizhuang" />
-    <station id="s_lingjinghutong" name="灵境胡同" name_alt="Lingjing Hutong" line="L_line4:16" link="s_xidan,s_xisi" />
-    <station id="s_linheli" name="临河里" name_alt="Linheli" line="L_line1andbatongline:33" link="s_liyuan,s_tuqiao" />
-    <station id="s_lishuiqiao" name="立水桥" name_alt="Lishuiqiao" line="L_line13:11,L_line5:20" link="s_beiyuan,s_huoying,s_lishuiqiaonan,s_tiantongyuannan" />
-    <station id="s_lishuiqiaonan" name="立水桥南" name_alt="Lishuiqiaonan" line="L_line5:19" link="s_beiyuanlubei,s_lishuiqiao" />
-    <station id="s_liudaokou" name="六道口" name_alt="Liudaokou" line="L_changpingline:16,L_line15:2" link="s_beishatan,s_qinghuadongluxikou,s_xueyuanqiao,s_xuezhiyuan" />
-    <station id="s_liufang" name="柳芳" name_alt="Liufang" line="L_line13:16" link="s_dongzhimen,s_guangximen" />
-    <station id="s_liujiayao" name="刘家窑" name_alt="Liujiayao" line="L_line5:2" link="s_puhuangyu,s_songjiazhuang" />
-    <station id="s_liuliqiao" name="六里桥" name_alt="Liuliqiao" line="L_line10:38,L_line9:7" link="s_lianhuaqiao,s_liuliqiaodong,s_qilizhuang,s_xiju" />
-    <station id="s_liuliqiaodong" name="六里桥东" name_alt="Liuliqiaodong" line="L_line9:6" link="s_beijingwestrailwaystation,s_liuliqiao" />
-    <station id="s_liyuan" name="梨园" name_alt="Liyuan" line="L_line1andbatongline:32" link="s_jiukeshu,s_linheli" />
-    <station id="s_liyuanzhuang" name="栗园庄" name_alt="Liyuanzhuang" line="L_lines1:3" link="s_shangan,s_xiaoyuan" />
-    <station id="s_lizeshangwuqu" name="丽泽商务区" name_alt="Lize Shangwuqu" line="L_line14:9" link="s_caihuying,s_dongguantou" />
-    <station id="s_longze" name="龙泽" name_alt="Longze" line="L_line13:8" link="s_huilongguan,s_xierqi" />
-    <station id="s_lucheng" name="潞城" name_alt="Lucheng" line="L_line6:34" link="s_dongxiayuan" />
-    <station id="s_lujuandong" name="鹿圈东" name_alt="Lujuandong" line="L_yizhuangt1line:8" link="s_taihelu,s_yizhuangtongren" />
-    <station id="s_magezhuang" name="马各庄" name_alt="Magezhuang" line="L_yanfangline:6" link="s_dashihedong,s_raolefu" />
-    <station id="s_majiapu" name="马家堡" name_alt="Majiapu" line="L_line4:22" link="s_beijingsouthrailwaystation,s_jiaomenxi" />
-    <station id="s_malianwa" name="马连洼" name_alt="Malianwa" line="L_line16:8" link="s_nongdananlu,s_xibeiwang" />
-    <station id="s_maquanying" name="马泉营" name_alt="Maquanying" line="L_line15:12" link="s_cuigezhuang,s_sunhe" />
-    <station id="s_militarymuseum" name="军事博物馆" name_alt="Military Museum" line="L_line1andbatongline:9,L_line9:4" link="s_baiduizi,s_beijingwestrailwaystation,s_gongzhufen,s_muxidi" />
-    <station id="s_mingtombs" name="十三陵景区" name_alt="Ming Tombs" line="L_changpingline:2" link="s_changping,s_changpingxishankou" />
-    <station id="s_moshikou" name="模式口" name_alt="Moshikou" line="L_line11:1" link="s_jinanqiao" />
-    <station id="s_mudanyuan" name="牡丹园" name_alt="Mudanyuan" line="L_line10:7,L_line19:1" link="s_beitaipingzhuang,s_jiandemen,s_xitucheng" />
-    <station id="s_muxidi" name="木樨地" name_alt="Muxidi" line="L_line16:19,L_line1andbatongline:10" link="s_daguanying,s_militarymuseum,s_nanlishilu,s_yuyuantandongmenyuyuantanparkeastgate" />
-    <station id="s_muxiyuan" name="木樨园" name_alt="Muxiyuan" line="L_line8:26" link="s_haihutun,s_yongdingmenwai" />
-    <station id="s_nanfaxin" name="南法信" name_alt="Nanfaxin" line="L_line15:17" link="s_houshayu,s_shimen" />
-    <station id="s_nanlishilu" name="南礼士路" name_alt="Nanlishi Lu" line="L_line1andbatongline:11" link="s_fuxingmen,s_muxidi" />
-    <station id="s_nanlouzizhuang" name="南楼梓庄" name_alt="Nanlouzizhuang" line="L_line7:17" link="s_happyvalley,s_huagong" />
-    <station id="s_nanluoguxiang" name="南锣鼓巷" name_alt="Nanluogu Xiang" line="L_line6:16,L_line8:18" link="s_beihaibei,s_dongsi,s_nationalartmuseum,s_shichahai" />
-    <station id="s_nanshao" name="南邵" name_alt="Nanshao" line="L_changpingline:6" link="s_beishaowa,s_shaheunivpark" />
-    <station id="s_nationalartmuseum" name="中国美术馆" name_alt="National Art Museum" line="L_line8:19" link="s_jinyuhutong,s_nanluoguxiang" />
-    <station id="s_nationallibrary" name="国家图书馆" name_alt="National Library" line="L_line16:15,L_line4:10,L_line9:1" link="s_baishiqiaonan,s_beijingzoo,s_erligou,s_wanshousi,s_weigongcun" />
-    <station id="s_niujie" name="牛街" name_alt="Niujie" line="L_line19:6" link="s_jingfengmen,s_taipingqiao" />
-    <station id="s_niwa" name="泥洼" name_alt="Niwa" line="L_line10:36" link="s_fengtairailwaystation,s_xiju" />
-    <station id="s_nongdananlu" name="农大南路" name_alt="Nongda Nanlu" line="L_line16:9" link="s_malianwa,s_xiyuan" />
-    <station id="s_olympicpark" name="奥林匹克公园" name_alt="Olympic Park" line="L_line15:4,L_line8:11" link="s_anlilu,s_beishatan,s_forestparksouthgate,s_olympicsportscenter" />
-    <station id="s_olympicsportscenter" name="奥体中心" name_alt="Olympic Sports Center" line="L_line8:12" link="s_beitucheng,s_olympicpark" />
-    <station id="s_panjiayuan" name="潘家园" name_alt="Panjiayuan" line="L_line10:23" link="s_jingsong,s_shilihe" />
-    <station id="s_pekinguniveastgate" name="北京大学东门" name_alt="Peking Univ. East Gate" line="L_line4:5" link="s_yuanmingyuanpark,s_zhongguancun" />
-    <station id="s_pinganli" name="平安里" name_alt="Ping'anli" line="L_line19:4,L_line4:14,L_line6:14" link="s_beihaibei,s_chegongzhuang,s_jishuitan,s_taipingqiao,s_xinjiekou,s_xisi" />
-    <station id="s_pingguoyuan" name="苹果园" name_alt="Pingguoyuan" line="L_line1andbatongline:1,L_line6:2,L_lines1:8" link="s_gucheng,s_jinanqiao,s_yangzhuang" />
-    <station id="s_pingleyuan" name="平乐园" name_alt="Pingleyuan" line="L_line14:20" link="s_beijingunivoftechwestgate,s_jiulongshan" />
-    <station id="s_pingxifu" name="平西府" name_alt="Pingxifu" line="L_line8:3" link="s_huilongguandongdajie,s_yuzhilu" />
-    <station id="s_puhuangyu" name="蒲黄榆" name_alt="Puhuangyu" line="L_line14:16,L_line5:3" link="s_fangzhuang,s_jingtai,s_liujiayao,s_templeofheaveneastgate" />
-    <station id="s_qianmen" name="前门" name_alt="Qianmen" line="L_line2:8,L_line8:22" link="s_chongwenmen,s_hepingmen,s_wangfujing,s_zhushikou" />
-    <station id="s_qiaohuying" name="桥户营" name_alt="Qiaohuying" line="L_lines1:5" link="s_shangan,s_sidaoqiao" />
-    <station id="s_qiaowan" name="桥湾" name_alt="Qiaowan" line="L_line7:8" link="s_ciqikou,s_zhushikou" />
-    <station id="s_qilizhuang" name="七里庄" name_alt="Qilizhuang" line="L_line14:6,L_line9:8" link="s_dajing,s_fengtaidongdajie,s_liuliqiao,s_xiju" />
-    <station id="s_qingherailwaystation" name="清河站" name_alt="Qinghe railway station" line="L_changpingline:13,L_line13:6" link="s_qinghexiaoyingqiao,s_shangdi,s_xierqi" />
-    <station id="s_qinghexiaoyingqiao" name="清河小营桥" name_alt="Qinghe Xiaoyingqiao" line="L_changpingline:14" link="s_qingherailwaystation,s_xuezhiyuan" />
-    <station id="s_qingheying" name="清河营" name_alt="Qingheying" line="L_line17:4" link="s_hongjunying,s_tiantongyuandong" />
-    <station id="s_qinghuadongluxikou" name="清华东路西口" name_alt="Qinghua Donglu Xikou" line="L_line15:1" link="s_liudaokou" />
-    <station id="s_qingnianlu" name="青年路" name_alt="Qingnian Lu" line="L_line6:23" link="s_dalianpo,s_shilipu" />
-    <station id="s_qingyuanlu" name="清源路" name_alt="Qingyuan Lu" line="L_line4:30" link="s_huangcunxidajie,s_zaoyuan" />
-    <station id="s_qunfang" name="群芳" name_alt="Qunfang" line="L_line7:27" link="s_gaoloujin,s_wanshengdong" />
-    <station id="s_quzhuang" name="屈庄" name_alt="Quzhuang" line="L_yizhuangt1line:1" link="s_rongxingjie" />
-    <station id="s_raolefu" name="饶乐府" name_alt="Raolefu" line="L_yanfangline:7" link="s_fangshanchengguan,s_magezhuang" />
-    <station id="s_renmindaxuerenminuniv" name="人民大学" name_alt="Renmin Daxue (Renmin Univ.)" line="L_line4:8" link="s_haidianhuangzhuang,s_weigongcun" />
-    <station id="s_rhihezhuang" name="瑞合庄" name_alt="Rhihezhuang" line="L_yizhuangt1line:3" link="s_rongxingjie,s_taiheqiaobei" />
-    <station id="s_rongchangdongjie" name="荣昌东街" name_alt="Rongchang Dongjie" line="L_yizhuangline:9,L_yizhuangt1line:10" link="s_beijingetronginternationalexhibitionampconventioncenter,s_rongjingdongjie,s_tongjinanlu,s_yizhuangtongren" />
-    <station id="s_rongjingdongjie" name="荣京东街" name_alt="Rongjing Dongjie" line="L_yizhuangline:8" link="s_rongchangdongjie,s_wanyuanjie" />
-    <station id="s_rongxingjie" name="融兴街" name_alt="Rongxing Jie" line="L_yizhuangt1line:2" link="s_quzhuang,s_rhihezhuang" />
-    <station id="s_sanyuanqiao" name="三元桥" name_alt="Sanyuanqiao" line="L_capitalairportexpress:2,L_line10:14" link="s_dongzhimen,s_liangmaqiao,s_taiyanggong,s_terminal3" />
-    <station id="s_shahe" name="沙河" name_alt="Shahe" line="L_changpingline:8" link="s_gonghuacheng,s_shaheunivpark" />
-    <station id="s_shaheunivpark" name="沙河高教园" name_alt="Shahe Univ. Park" line="L_changpingline:7" link="s_nanshao,s_shahe" />
-    <station id="s_shangan" name="上岸" name_alt="Shang'an" line="L_lines1:4" link="s_liyuanzhuang,s_qiaohuying" />
-    <station id="s_shangdi" name="上地" name_alt="Shangdi" line="L_line13:5" link="s_qingherailwaystation,s_wudaokou" />
-    <station id="s_shangezhuang" name="善各庄" name_alt="Shangezhuang" line="L_line14:33" link="s_laiguangying" />
-    <station id="s_shaoyaoju" name="芍药居" name_alt="Shaoyaoju" line="L_line10:12,L_line13:14" link="s_guangximen,s_huixinxijienankou,s_taiyanggong,s_wangjingxi" />
-    <station id="s_shibalidian" name="十八里店" name_alt="Shibalidian" line="L_line17:12" link="s_beishenshu,s_zhoujiazhuang" />
-    <station id="s_shichahai" name="什刹海" name_alt="Shichahai" line="L_line8:17" link="s_guloudajie,s_nanluoguxiang" />
-    <station id="s_shichang" name="石厂" name_alt="Shichang" line="L_lines1:1" link="s_xiaoyuan" />
-    <station id="s_shilihe" name="十里河" name_alt="Shilihe" line="L_line10:24,L_line14:18,L_line17:10" link="s_beijingunivoftechwestgate,s_fangzhuang,s_fenzhongsi,s_panjiayuan,s_workersstadium,s_zhoujiazhuang" />
-    <station id="s_shilipu" name="十里堡" name_alt="Shilipu" line="L_line6:22" link="s_jintailu,s_qingnianlu" />
-    <station id="s_shiliuzhuang" name="石榴庄" name_alt="Shiliuzhuang" line="L_line10:28" link="s_dahongmen,s_songjiazhuang" />
-    <station id="s_shimen" name="石门" name_alt="Shimen" line="L_line15:18" link="s_nanfaxin,s_shunyi" />
-    <station id="s_shuanghe" name="双合" name_alt="Shuanghe" line="L_line7:20" link="s_fatou,s_jiaohuachang" />
-    <station id="s_shuangjing" name="双井" name_alt="Shuangjing" line="L_line10:21,L_line7:12" link="s_guangqumenwai,s_guomao,s_jingsong,s_jiulongshan" />
-    <station id="s_shuangqiao" name="双桥" name_alt="Shuangqiao" line="L_line1andbatongline:26" link="s_communicationunivofchina,s_guaanzhuang" />
-    <station id="s_shunyi" name="顺义" name_alt="Shunyi" line="L_line15:19" link="s_fengbo,s_shimen" />
-    <station id="s_sidaoqiao" name="四道桥" name_alt="Sidaoqiao" line="L_lines1:6" link="s_jinanqiao,s_qiaohuying" />
-    <station id="s_sihaizhuang" name="四海庄" name_alt="Sihaizhuang" line="L_yizhuangt1line:5" link="s_jiuhaocun,s_taiheqiaobei" />
-    <station id="s_sihui" name="四惠" name_alt="Sihui" line="L_line1andbatongline:22" link="s_dawanglu,s_sihuidong" />
-    <station id="s_sihuidong" name="四惠东" name_alt="Sihuidong" line="L_line1andbatongline:23" link="s_gaobeidian,s_sihui" />
-    <station id="s_songjiazhuang" name="宋家庄" name_alt="Songjiazhuang" line="L_line10:27,L_line5:1,L_yizhuangline:1" link="s_chengshousi,s_liujiayao,s_shiliuzhuang,s_xiaocun" />
-    <station id="s_summerpalacewestgate" name="颐和园西门" name_alt="Summer Palace West Gate" line="L_xijiaoline:2" link="s_bagou,s_chapeng" />
-    <station id="s_sunhe" name="孙河" name_alt="Sunhe" line="L_line15:13" link="s_chinaintlexhibitioncenter,s_maquanying" />
-    <station id="s_suzhoujie" name="苏州街" name_alt="Suzhou Jie" line="L_line10:2,L_line16:12" link="s_bagou,s_haidianhuangzhuang,s_suzhouqiao,s_wanquanheqiao" />
-    <station id="s_suzhouqiao" name="苏州桥" name_alt="Suzhou Qiao" line="L_line16:13" link="s_suzhoujie,s_wanshousi" />
-    <station id="s_suzhuang" name="苏庄" name_alt="Suzhuang" line="L_fangshanline:15" link="s_liangxiangnanguan,s_yancundong" />
-    <station id="s_taihelu" name="泰河路" name_alt="Taihe Lu" line="L_yizhuangt1line:7" link="s_jiuhaocun,s_lujuandong" />
-    <station id="s_taiheqiaobei" name="太和桥北" name_alt="Taiheqiaobei" line="L_yizhuangt1line:4" link="s_rhihezhuang,s_sihaizhuang" />
-    <station id="s_taipingqiao" name="太平桥" name_alt="Taipingqiao" line="L_line19:5" link="s_niujie,s_pinganli" />
-    <station id="s_taiyanggong" name="太阳宫" name_alt="Taiyanggong" line="L_line10:13,L_line17:6" link="s_hongjunying,s_sanyuanqiao,s_shaoyaoju,s_xibahe" />
-    <station id="s_taoranting" name="陶然亭" name_alt="Taoranting" line="L_line4:20" link="s_beijingsouthrailwaystation,s_caishikou" />
-    <station id="s_templeofheaveneastgate" name="天坛东门" name_alt="Temple of Heaven East Gate" line="L_line5:4" link="s_ciqikou,s_puhuangyu" />
-    <station id="s_terminal2" name="2号航站楼" name_alt="Terminal 2" line="L_capitalairportexpress:4" link="s_terminal3" />
-    <station id="s_terminal3" name="3号航站楼" name_alt="Terminal 3" line="L_capitalairportexpress:3" link="s_sanyuanqiao,s_terminal2" />
-    <station id="s_tiananmendong" name="天安门东" name_alt="Tian'anmendong" line="L_line1andbatongline:15" link="s_tiananmenxi,s_wangfujing" />
-    <station id="s_tiananmenxi" name="天安门西" name_alt="Tian'anmenxi" line="L_line1andbatongline:14" link="s_tiananmendong,s_xidan" />
-    <station id="s_tiancun" name="田村" name_alt="Tiancun" line="L_line6:6" link="s_haidianwuluju,s_liaogongzhuang" />
-    <station id="s_tiangongyuan" name="天宫院" name_alt="Tiangongyuan" line="L_line4:35" link="s_biomedicalbase" />
-    <station id="s_tianqiao" name="天桥" name_alt="Tianqiao" line="L_line8:24" link="s_yongdingmenwai,s_zhushikou" />
-    <station id="s_tiantongyuan" name="天通苑" name_alt="Tiantongyuan" line="L_line5:22" link="s_tiantongyuanbei,s_tiantongyuannan" />
-    <station id="s_tiantongyuanbei" name="天通苑北" name_alt="Tiantongyuanbei" line="L_line5:23" link="s_tiantongyuan" />
-    <station id="s_tiantongyuandong" name="天通苑东" name_alt="Tiantongyuandong" line="L_line17:3" link="s_futuresciencecity,s_qingheying" />
-    <station id="s_tiantongyuannan" name="天通苑南" name_alt="Tiantongyuannan" line="L_line5:21" link="s_lishuiqiao,s_tiantongyuan" />
-    <station id="s_tongjinanlu" name="同济南路" name_alt="Tongji Nanlu" line="L_yizhuangline:10" link="s_jinghailu,s_rongchangdongjie" />
-    <station id="s_tongzhoubeiguan" name="通州北关" name_alt="Tongzhou Beiguan" line="L_line6:29" link="s_beiyunhexi,s_wuzixueyuanlu" />
-    <station id="s_tongzhoubeiyuan" name="通州北苑" name_alt="Tongzhou Beiyuan" line="L_line1andbatongline:29" link="s_baliqiao,s_guoyuan" />
-    <station id="s_tuanjiehu" name="团结湖" name_alt="Tuanjiehu" line="L_line10:17" link="s_agriculturalexhibitioncenter,s_hujialou" />
-    <station id="s_tundian" name="屯佃" name_alt="Tundian" line="L_line16:4" link="s_daoxianghulu,s_yongfeng" />
-    <station id="s_tuqiao" name="土桥" name_alt="Tuqiao" line="L_line1andbatongline:34" link="s_huazhuang,s_linheli" />
-    <station id="s_universalresort" name="环球度假区" name_alt="Universal Resort" line="L_line1andbatongline:36,L_line7:30" link="s_huazhuang" />
-    <station id="s_wanan" name="万安" name_alt="Wan'an" line="L_xijiaoline:4" link="s_botanicalgarden,s_chapeng" />
-    <station id="s_wangfujing" name="王府井" name_alt="Wangfujing" line="L_line1andbatongline:16,L_line8:21" link="s_dongdan,s_jinyuhutong,s_qianmen,s_tiananmendong" />
-    <station id="s_wangjing" name="望京" name_alt="Wangjing" line="L_line14:30,L_line15:9" link="s_donghuqu,s_futong,s_wangjingdong,s_wangjingxi" />
-    <station id="s_wangjingdong" name="望京东" name_alt="Wangjingdong" line="L_line15:10" link="s_cuigezhuang,s_wangjing" />
-    <station id="s_wangjingnan" name="望京南" name_alt="Wangjingnan" line="L_line14:28" link="s_futong,s_jiangtai" />
-    <station id="s_wangjingxi" name="望京西" name_alt="Wangjingxi" line="L_line13:13,L_line15:8" link="s_beiyuan,s_guanzhuang,s_shaoyaoju,s_wangjing" />
-    <station id="s_wanpingcheng" name="宛平城" name_alt="Wanpingcheng" line="L_line16:29" link="s_hongtaizhuang" />
-    <station id="s_wanquanheqiao" name="万泉河桥" name_alt="Wanquanheqiao" line="L_line16:11" link="s_suzhoujie,s_xiyuan" />
-    <station id="s_wanshengdong" name="万盛东" name_alt="Wanshengdong" line="L_line7:26" link="s_qunfang,s_wanshengxi" />
-    <station id="s_wanshengxi" name="万盛西" name_alt="Wanshengxi" line="L_line7:25" link="s_heizhuanghu,s_wanshengdong" />
-    <station id="s_wanshoulu" name="万寿路" name_alt="Wanshou Lu" line="L_line1andbatongline:7" link="s_gongzhufen,s_wukesong" />
-    <station id="s_wanshousi" name="万寿寺" name_alt="Wanshousi" line="L_line16:14" link="s_nationallibrary,s_suzhouqiao" />
-    <station id="s_wanyuanjie" name="万源街" name_alt="Wanyuan Jie" line="L_yizhuangline:7" link="s_rongjingdongjie,s_yizhuangculturepark" />
-    <station id="s_wanzi" name="湾子" name_alt="Wanzi" line="L_line7:2" link="s_beijingwestrailwaystation,s_daguanying" />
-    <station id="s_weigongcun" name="魏公村" name_alt="Weigongcun" line="L_line4:9" link="s_nationallibrary,s_renmindaxuerenminuniv" />
-    <station id="s_wenyanglu" name="温阳路" name_alt="Wenyang Lu" line="L_line16:2" link="s_beianhe,s_daoxianghulu" />
-    <station id="s_workersstadium" name="工人体育场" name_alt="Workers' Stadium" line="L_line17:9" link="s_shilihe,s_zuojiazhuang" />
-    <station id="s_wudaokou" name="五道口" name_alt="Wudaokou" line="L_line13:4" link="s_shangdi,s_zhichunlu" />
-    <station id="s_wufutang" name="五福堂" name_alt="Wufutang" line="L_line8:33" link="s_demao,s_huojianwanyuan" />
-    <station id="s_wukesong" name="五棵松" name_alt="Wukesong" line="L_line1andbatongline:6" link="s_wanshoulu,s_yuquanlu" />
-    <station id="s_wuzixueyuanlu" name="物资学院路" name_alt="Wuzi Xueyuan Lu" line="L_line6:28" link="s_caofang,s_tongzhoubeiguan" />
-    <station id="s_xiaocun" name="肖村" name_alt="Xiaocun" line="L_yizhuangline:2" link="s_songjiazhuang,s_xiaohongmen" />
-    <station id="s_xiaohongmen" name="小红门" name_alt="Xiaohongmen" line="L_yizhuangline:3" link="s_jiugong,s_xiaocun" />
-    <station id="s_xiaoyuan" name="小园" name_alt="Xiaoyuan" line="L_lines1:2" link="s_liyuanzhuang,s_shichang" />
-    <station id="s_xibahe" name="西坝河" name_alt="Xibahe" line="L_line17:7" link="s_taiyanggong,s_zuojiazhuang" />
-    <station id="s_xibeiwang" name="西北旺" name_alt="Xibeiwang" line="L_line16:7" link="s_malianwa,s_yongfengnan" />
-    <station id="s_xidan" name="西单" name_alt="Xidan" line="L_line1andbatongline:13,L_line4:17" link="s_fuxingmen,s_lingjinghutong,s_tiananmenxi,s_xuanwumen" />
-    <station id="s_xidiaoyutai" name="西钓鱼台" name_alt="Xidiaoyutai" line="L_line10:41" link="s_cishousi,s_gongzhufen" />
-    <station id="s_xierqi" name="西二旗" name_alt="Xi'erqi" line="L_changpingline:12,L_line13:7" link="s_lifesciencepark,s_longze,s_qingherailwaystation" />
-    <station id="s_xihongmen" name="西红门" name_alt="Xihongmen" line="L_line4:26" link="s_gaomidianbei,s_xingong" />
-    <station id="s_xihuangcun" name="西黄村" name_alt="Xihuangcun" line="L_line6:4" link="s_liaogongzhuang,s_yangzhuang" />
-    <station id="s_xiju" name="西局" name_alt="Xiju" line="L_line10:37,L_line14:7" link="s_dongguantou,s_liuliqiao,s_niwa,s_qilizhuang" />
-    <station id="s_xinfadi" name="新发地" name_alt="Xinfadi" line="L_line19:9" link="s_caoqiao,s_xingong" />
-    <station id="s_xingcheng" name="星城" name_alt="Xingcheng" line="L_yanfangline:4" link="s_dashihedong,s_yancun" />
-    <station id="s_xingong" name="新宫" name_alt="Xingong" line="L_line19:10,L_line4:25" link="s_gongyixiqiao,s_xihongmen,s_xinfadi" />
-    <station id="s_xinjiekou" name="新街口" name_alt="Xinjiekou" line="L_line4:13" link="s_pinganli,s_xizhimen" />
-    <station id="s_xinshougangshougangpark30" name="新首钢" name_alt="Xinshougang (Shougang Park)[30]" line="L_line11:4" link="s_beixinan" />
-    <station id="s_xisi" name="西四" name_alt="Xisi" line="L_line4:15" link="s_lingjinghutong,s_pinganli" />
-    <station id="s_xitieying" name="西铁营" name_alt="Xitieying" line="L_line14:11" link="s_caihuying,s_jingfengmen" />
-    <station id="s_xitucheng" name="西土城" name_alt="Xitucheng" line="L_changpingline:18,L_line10:6" link="s_mudanyuan,s_xueyuanqiao,s_zhichunlu" />
-    <station id="s_xixiaokou" name="西小口" name_alt="Xixiaokou" line="L_line8:7" link="s_yongtaizhuang,s_yuxin" />
-    <station id="s_xiyuan" name="西苑" name_alt="Xiyuan" line="L_line16:10,L_line4:3" link="s_beigongmen,s_nongdananlu,s_wanquanheqiao,s_yuanmingyuanpark" />
-    <station id="s_xizhimen" name="西直门" name_alt="Xizhimen" line="L_line13:1,L_line2:1,L_line4:12" link="s_beijingzoo,s_chegongzhuang,s_dazhongsi,s_xinjiekou" />
-    <station id="s_xuanwumen" name="宣武门" name_alt="Xuanwumen" line="L_line2:6,L_line4:18" link="s_caishikou,s_changchunjie,s_hepingmen,s_xidan" />
-    <station id="s_xueyuanqiao" name="学院桥" name_alt="Xueyuanqiao" line="L_changpingline:17" link="s_liudaokou,s_xitucheng" />
-    <station id="s_xuezhiyuan" name="学知园" name_alt="Xuezhiyuan" line="L_changpingline:15" link="s_liudaokou,s_qinghexiaoyingqiao" />
-    <station id="s_yancun" name="阎村" name_alt="Yancun" line="L_yanfangline:3" link="s_xingcheng,s_zicaowu" />
-    <station id="s_yancundong" name="阎村东" name_alt="Yancundong" line="L_fangshanline:16,L_yanfangline:1" link="s_suzhuang,s_zicaowu" />
-    <station id="s_yangzhuang" name="杨庄" name_alt="Yangzhuang" line="L_line6:3" link="s_pingguoyuan,s_xihuangcun" />
-    <station id="s_yanshan" name="燕山" name_alt="Yanshan" line="L_yanfangline:9" link="s_fangshanchengguan" />
-    <station id="s_yihezhuang" name="义和庄" name_alt="Yihezhuang" line="L_line4:33" link="s_biomedicalbase,s_huangcunrailwaystation" />
-    <station id="s_yinghai" name="瀛海" name_alt="Yinghai" line="L_line8:35" link="s_demao" />
-    <station id="s_yizhuangculturepark" name="亦庄文化园" name_alt="Yizhuang Culture Park" line="L_yizhuangline:6" link="s_wanyuanjie,s_yizhuangqiao" />
-    <station id="s_yizhuangqiao" name="亦庄桥" name_alt="Yizhuangqiao" line="L_yizhuangline:5" link="s_jiugong,s_yizhuangculturepark" />
-    <station id="s_yizhuangrailwaystation" name="亦庄火车站" name_alt="Yizhuang railway station" line="L_yizhuangline:14" link="s_ciqu" />
-    <station id="s_yizhuangtongren" name="亦庄同仁" name_alt="Yizhuang Tongren" line="L_yizhuangt1line:9" link="s_lujuandong,s_rongchangdongjie" />
-    <station id="s_yonganli" name="永安里" name_alt="Yong'anli" line="L_line1andbatongline:19" link="s_guomao,s_jianguomen" />
-    <station id="s_yongdingmenwai" name="永定门外" name_alt="Yongdingmenwai" line="L_line14:14,L_line8:25" link="s_beijingsouthrailwaystation,s_jingtai,s_muxiyuan,s_tianqiao" />
-    <station id="s_yongfeng" name="永丰" name_alt="Yongfeng" line="L_line16:5" link="s_tundian,s_yongfengnan" />
-    <station id="s_yongfengnan" name="永丰南" name_alt="Yongfengnan" line="L_line16:6" link="s_xibeiwang,s_yongfeng" />
-    <station id="s_yonghegonglamatemple" name="雍和宫" name_alt="Yonghegong Lama Temple" line="L_line2:15,L_line5:12" link="s_andingmen,s_beixinqiao,s_dongzhimen,s_hepinglibeijie" />
-    <station id="s_yongtaizhuang" name="永泰庄" name_alt="Yongtaizhuang" line="L_line8:8" link="s_lincuiqiao,s_xixiaokou" />
-    <station id="s_yuanmingyuanpark" name="圆明园" name_alt="Yuanmingyuan Park" line="L_line4:4" link="s_pekinguniveastgate,s_xiyuan" />
-    <station id="s_yuquanlu" name="玉泉路" name_alt="Yuquan Lu" line="L_line1andbatongline:5" link="s_babaoshan,s_wukesong" />
-    <station id="s_yushuzhuang" name="榆树庄" name_alt="Yushuzhuang" line="L_line16:27" link="s_hongtaizhuang,s_kandan" />
-    <station id="s_yuxin" name="育新" name_alt="Yuxin" line="L_line8:6" link="s_huoying,s_xixiaokou" />
-    <station id="s_yuyuantandongmenyuyuantanparkeastgate" name="玉渊潭东门" name_alt="Yuyuantan Dongmen (Yuyuantan Park East Gate)" line="L_line16:18" link="s_ganjiakou,s_muxidi" />
-    <station id="s_yuzhilu" name="育知路" name_alt="Yuzhi Lu" line="L_line8:2" link="s_pingxifu,s_zhuxinzhuang" />
-    <station id="s_zaoying" name="枣营" name_alt="Zaoying" line="L_line14:25" link="s_chaoyangpark,s_dongfengbeiqiao" />
-    <station id="s_zaoyuan" name="枣园" name_alt="Zaoyuan" line="L_line4:29" link="s_gaomidiannan,s_qingyuanlu" />
-    <station id="s_zhangguozhuang" name="张郭庄" name_alt="Zhangguozhuang" line="L_line14:1" link="s_gardenexpopark" />
-    <station id="s_zhangzizhonglu" name="张自忠路" name_alt="Zhangzizhong Lu" line="L_line5:10" link="s_beixinqiao,s_dongsi" />
-    <station id="s_zhichunli" name="知春里" name_alt="Zhichunli" line="L_line10:4" link="s_haidianhuangzhuang,s_zhichunlu" />
-    <station id="s_zhichunlu" name="知春路" name_alt="Zhichun Lu" line="L_line10:5,L_line13:3" link="s_dazhongsi,s_wudaokou,s_xitucheng,s_zhichunli" />
-    <station id="s_zhongguancun" name="中关村" name_alt="Zhongguancun" line="L_line4:6" link="s_haidianhuangzhuang,s_pekinguniveastgate" />
-    <station id="s_zhoujiazhuang" name="周家庄" name_alt="Zhoujiazhuang" line="L_line17:11" link="s_shibalidian,s_shilihe" />
-    <station id="s_zhushikou" name="珠市口" name_alt="Zhushikou" line="L_line7:7,L_line8:23" link="s_hufangqiao,s_qianmen,s_qiaowan,s_tianqiao" />
-    <station id="s_zhuxinzhuang" name="朱辛庄" name_alt="Zhuxinzhuang" line="L_changpingline:10,L_line8:1" link="s_gonghuacheng,s_lifesciencepark,s_yuzhilu" />
-    <station id="s_zicaowu" name="紫草坞" name_alt="Zicaowu" line="L_yanfangline:2" link="s_yancun,s_yancundong" />
-    <station id="s_zuojiazhuang" name="左家庄" name_alt="Zuojiazhuang" line="L_line17:8" link="s_workersstadium,s_xibahe" />
+    <station id="s_agriculturalexhibitioncenter"
+             name="农业展览馆"
+             name_alt="Agricultural Exhibition Center"
+             line="L_line10:16"
+             link="s_liangmaqiao,s_tuanjiehu" />
+    <station id="s_andelibeijie"
+             name="安德里北街"
+             name_alt="Andeli Beijie"
+             line="L_line8:15"
+             link="s_anhuaqiao,s_guloudajie" />
+    <station id="s_andingmen"
+             name="安定门"
+             name_alt="Andingmen"
+             line="L_line2:16"
+             link="s_guloudajie,s_yonghegonglamatemple" />
+    <station id="s_anheqiaobei"
+             name="安河桥北"
+             name_alt="Anheqiaobei"
+             line="L_line4:1"
+             link="s_beigongmen" />
+    <station id="s_anhuaqiao"
+             name="安华桥"
+             name_alt="Anhua Qiao"
+             line="L_line8:14"
+             link="s_andelibeijie,s_beitucheng" />
+    <station id="s_anlilu"
+             name="安立路"
+             name_alt="Anli Lu"
+             line="L_line15:5"
+             link="s_datunludong,s_olympicpark" />
+    <station id="s_anzhenmen"
+             name="安贞门"
+             name_alt="Anzhenmen"
+             line="L_line10:10"
+             link="s_beitucheng,s_huixinxijienankou" />
+    <station id="s_babaoshan"
+             name="八宝山"
+             name_alt="Babaoshan"
+             line="L_line1andbatongline:4"
+             link="s_bajiaoamusementpark,s_yuquanlu" />
+    <station id="s_bagou"
+             name="巴沟"
+             name_alt="Bagou"
+             line="L_line10:1,L_xijiaoline:1"
+             link="s_summerpalacewestgate,s_suzhoujie" />
+    <station id="s_baiduizi"
+             name="白堆子"
+             name_alt="Baiduizi"
+             line="L_line9:3"
+             link="s_baishiqiaonan,s_militarymuseum" />
+    <station id="s_baipenyao"
+             name="白盆窑"
+             name_alt="Baipenyao"
+             line="L_fangshanline:4"
+             link="s_guogongzhuang,s_huaxiangdongqiao" />
+    <station id="s_baishiqiaonan"
+             name="白石桥南"
+             name_alt="Baishiqiaonan"
+             line="L_line6:10,L_line9:2"
+             link="s_baiduizi,s_erligou,s_huayuanqiao,s_nationallibrary" />
+    <station id="s_baiziwan"
+             name="百子湾"
+             name_alt="Baiziwan"
+             line="L_line7:15"
+             link="s_dajiaoting,s_huagong" />
+    <station id="s_bajiaoamusementpark"
+             name="八角游乐园"
+             name_alt="Bajiao Amusement Park"
+             line="L_line1andbatongline:3"
+             link="s_babaoshan,s_gucheng" />
+    <station id="s_baliqiao"
+             name="八里桥"
+             name_alt="Baliqiao"
+             line="L_line1andbatongline:28"
+             link="s_guaanzhuang,s_tongzhoubeiyuan" />
+    <station id="s_beianhe"
+             name="北安河"
+             name_alt="Bei'anhe"
+             line="L_line16:1"
+             link="s_wenyanglu" />
+    <station id="s_beigongmen"
+             name="北宫门"
+             name_alt="Beigongmen"
+             line="L_line4:2"
+             link="s_anheqiaobei,s_xiyuan" />
+    <station id="s_beihaibei"
+             name="北海北"
+             name_alt="Beihaibei"
+             line="L_line6:15"
+             link="s_nanluoguxiang,s_pinganli" />
+    <station id="s_beijingetronginternationalexhibitionconventioncenter"
+             name="亦创会展中心"
+             name_alt="Beijing Etrong International Exhibition &amp; Convention Center"
+             line="L_yizhuangt1line:11"
+             link="s_jinghaiyilu,s_rongchangdongjie" />
+    <station id="s_beijingrailwaystation"
+             name="北京站"
+             name_alt="Beijing railway station"
+             line="L_line2:10"
+             link="s_chongwenmen,s_jianguomen" />
+    <station id="s_beijingsouthrailwaystation"
+             name="北京南站"
+             name_alt="Beijing South railway station"
+             line="L_line14:13,L_line4:21"
+             link="s_jingfengmen,s_majiapu,s_taoranting,s_yongdingmenwai" />
+    <station id="s_beijingunivoftechwestgate"
+             name="北工大西门"
+             name_alt="Beijing Univ. of Tech. West Gate"
+             line="L_line14:19"
+             link="s_pingleyuan,s_shilihe" />
+    <station id="s_beijingwestrailwaystation"
+             name="北京西站"
+             name_alt="Beijing West railway station"
+             line="L_line7:1,L_line9:5"
+             link="s_liuliqiaodong,s_militarymuseum,s_wanzi" />
+    <station id="s_beijingzoo"
+             name="动物园"
+             name_alt="Beijing Zoo"
+             line="L_line4:11"
+             link="s_nationallibrary,s_xizhimen" />
+    <station id="s_beishaowa"
+             name="北邵洼"
+             name_alt="Beishaowa"
+             line="L_changpingline:5"
+             link="s_changpingdongguan,s_nanshao" />
+    <station id="s_beishatan"
+             name="北沙滩"
+             name_alt="Beishatan"
+             line="L_line15:3"
+             link="s_liudaokou,s_olympicpark" />
+    <station id="s_beishenshu"
+             name="北神树"
+             name_alt="Beishenshu"
+             line="L_line17:13"
+             link="s_ciqubei,s_shibalidian" />
+    <station id="s_beitaipingzhuang"
+             name="北太平庄"
+             name_alt="Beitaipingzhuang"
+             line="L_line19:2"
+             link="s_jishuitan,s_mudanyuan" />
+    <station id="s_beitucheng"
+             name="北土城"
+             name_alt="Beitucheng"
+             line="L_line10:9,L_line8:13"
+             link="s_anhuaqiao,s_anzhenmen,s_jiandemen,s_olympicsportscenter" />
+    <station id="s_beixinan"
+             name="北辛安"
+             name_alt="Beixin'an"
+             line="L_line11:3"
+             link="s_jinanqiao,s_xinshougangshougangpark30" />
+    <station id="s_beixinqiao"
+             name="北新桥"
+             name_alt="Beixinqiao"
+             line="L_line5:11"
+             link="s_yonghegonglamatemple,s_zhangzizhonglu" />
+    <station id="s_beiyuan"
+             name="北苑"
+             name_alt="Beiyuan"
+             line="L_line13:12"
+             link="s_lishuiqiao,s_wangjingxi" />
+    <station id="s_beiyuanlubei"
+             name="北苑路北"
+             name_alt="Beiyuanlubei"
+             line="L_line5:18"
+             link="s_datunludong,s_lishuiqiaonan" />
+    <station id="s_beiyunhedong"
+             name="北运河东"
+             name_alt="Beiyunhedong"
+             line="L_line6:31"
+             link="s_beiyunhexi,s_haojiafu" />
+    <station id="s_beiyunhexi"
+             name="北运河西"
+             name_alt="Beiyunhexi"
+             line="L_line6:30"
+             link="s_beiyunhedong,s_tongzhoubeiguan" />
+    <station id="s_biomedicalbase"
+             name="生物医药基地"
+             name_alt="Biomedical Base"
+             line="L_line4:34"
+             link="s_tiangongyuan,s_yihezhuang" />
+    <station id="s_botanicalgarden"
+             name="植物园"
+             name_alt="Botanical Garden"
+             line="L_xijiaoline:5"
+             link="s_fragranthills,s_wanan" />
+    <station id="s_caihuying"
+             name="菜户营"
+             name_alt="Caihuying"
+             line="L_line14:10"
+             link="s_lizeshangwuqu,s_xitieying" />
+    <station id="s_caishikou"
+             name="菜市口"
+             name_alt="Caishikou"
+             line="L_line4:19,L_line7:5"
+             link="s_guanganmennei,s_hufangqiao,s_taoranting,s_xuanwumen" />
+    <station id="s_caofang"
+             name="草房"
+             name_alt="Caofang"
+             line="L_line6:27"
+             link="s_changying,s_wuzixueyuanlu" />
+    <station id="s_caoqiao"
+             name="草桥"
+             name_alt="Caoqiao"
+             line="L_daxingairportexpress:1,L_line10:32,L_line19:8"
+             link="s_daxingxincheng,s_jiaomenxi,s_jijiamiao,s_jingfengmen,s_xinfadi" />
+    <station id="s_capitalunivofeconomicsbusiness"
+             name="首经贸"
+             name_alt="Capital Univ. of Economics &amp; Business"
+             line="L_fangshanline:2,L_line10:34"
+             link="s_dongguantounan,s_fengtairailwaystation,s_huaxiangdongqiao,s_jijiamiao" />
+    <station id="s_changchunjie"
+             name="长椿街"
+             name_alt="Changchun Jie"
+             line="L_line2:5"
+             link="s_fuxingmen,s_xuanwumen" />
+    <station id="s_changchunqiao"
+             name="长春桥"
+             name_alt="Changchun Qiao"
+             line="L_line10:44"
+             link="s_chedaogou,s_huoqiying" />
+    <station id="s_changping"
+             name="昌平"
+             name_alt="Changping"
+             line="L_changpingline:3"
+             link="s_changpingdongguan,s_mingtombs" />
+    <station id="s_changpingdongguan"
+             name="昌平东关"
+             name_alt="Changping Dongguan"
+             line="L_changpingline:4"
+             link="s_beishaowa,s_changping" />
+    <station id="s_changpingxishankou"
+             name="昌平西山口"
+             name_alt="Changping Xishankou"
+             line="L_changpingline:1"
+             link="s_mingtombs" />
+    <station id="s_changyang"
+             name="长阳"
+             name_alt="Changyang"
+             line="L_fangshanline:8"
+             link="s_daotian,s_libafang" />
+    <station id="s_changying"
+             name="常营"
+             name_alt="Changying"
+             line="L_line6:26"
+             link="s_caofang,s_huangqu" />
+    <station id="s_chaoyangmen"
+             name="朝阳门"
+             name_alt="Chaoyangmen"
+             line="L_line2:12,L_line6:18"
+             link="s_dongdaqiao,s_dongsi,s_dongsishitiao,s_jianguomen" />
+    <station id="s_chaoyangpark"
+             name="朝阳公园"
+             name_alt="Chaoyang Park"
+             line="L_line14:24"
+             link="s_jintailu,s_zaoying" />
+    <station id="s_chapeng"
+             name="茶棚"
+             name_alt="Chapeng"
+             line="L_xijiaoline:3"
+             link="s_summerpalacewestgate,s_wanan" />
+    <station id="s_chedaogou"
+             name="车道沟"
+             name_alt="Chedaogou"
+             line="L_line10:43"
+             link="s_changchunqiao,s_cishousi" />
+    <station id="s_chegongzhuang"
+             name="车公庄"
+             name_alt="Chegongzhuang"
+             line="L_line2:2,L_line6:13"
+             link="s_chegongzhuangxi,s_fuchengmen,s_pinganli,s_xizhimen" />
+    <station id="s_chegongzhuangxi"
+             name="车公庄西"
+             name_alt="Chegongzhuangxi"
+             line="L_line6:12"
+             link="s_chegongzhuang,s_erligou" />
+    <station id="s_chengshousi"
+             name="成寿寺"
+             name_alt="Chengshousi"
+             line="L_line10:26"
+             link="s_fenzhongsi,s_songjiazhuang" />
+    <station id="s_chinaintlexhibitioncenter"
+             name="国展"
+             name_alt="China Int'l Exhibition Center"
+             line="L_line15:14"
+             link="s_hualikan,s_sunhe" />
+    <station id="s_chongwenmen"
+             name="崇文门"
+             name_alt="Chongwenmen"
+             line="L_line2:9,L_line5:6"
+             link="s_beijingrailwaystation,s_ciqikou,s_dongdan,s_qianmen" />
+    <station id="s_ciqikou"
+             name="磁器口"
+             name_alt="Ciqikou"
+             line="L_line5:5,L_line7:9"
+             link="s_chongwenmen,s_guangqumennei,s_qiaowan,s_templeofheaveneastgate" />
+    <station id="s_ciqu"
+             name="次渠"
+             name_alt="Ciqu"
+             line="L_line17:15,L_yizhuangline:13"
+             link="s_ciqubei,s_ciqunan,s_jiahuihu,s_yizhuangrailwaystation" />
+    <station id="s_ciqubei"
+             name="次渠北"
+             name_alt="Ciqubei"
+             line="L_line17:14"
+             link="s_beishenshu,s_ciqu" />
+    <station id="s_ciqunan"
+             name="次渠南"
+             name_alt="Ciqunan"
+             line="L_yizhuangline:12"
+             link="s_ciqu,s_jinghailu" />
+    <station id="s_cishousi"
+             name="慈寿寺"
+             name_alt="Cishousi"
+             line="L_line10:42,L_line6:8"
+             link="s_chedaogou,s_haidianwuluju,s_huayuanqiao,s_xidiaoyutai" />
+    <station id="s_communicationunivofchina"
+             name="传媒大学"
+             name_alt="Communication Univ. of China"
+             line="L_line1andbatongline:25"
+             link="s_gaobeidian,s_shuangqiao" />
+    <station id="s_cuigezhuang"
+             name="崔各庄"
+             name_alt="Cuigezhuang"
+             line="L_line15:11"
+             link="s_maquanying,s_wangjingdong" />
+    <station id="s_dabaotai"
+             name="大葆台"
+             name_alt="Dabaotai"
+             line="L_fangshanline:6"
+             link="s_daotian,s_guogongzhuang" />
+    <station id="s_daguanying"
+             name="达官营"
+             name_alt="Daguanying"
+             line="L_line16:20,L_line7:3"
+             link="s_guanganmennei,s_hongliannanlu,s_muxidi,s_wanzi" />
+    <station id="s_dahongmen"
+             name="大红门"
+             name_alt="Dahongmen"
+             line="L_line10:29,L_line8:28"
+             link="s_dahongmennan,s_haihutun,s_jiaomendong,s_shiliuzhuang" />
+    <station id="s_dahongmennan"
+             name="大红门南"
+             name_alt="Dahongmennan"
+             line="L_line8:29"
+             link="s_dahongmen,s_heyi" />
+    <station id="s_dajiaoting"
+             name="大郊亭"
+             name_alt="Dajiaoting"
+             line="L_line7:14"
+             link="s_baiziwan,s_jiulongshan" />
+    <station id="s_dajing"
+             name="大井"
+             name_alt="Dajing"
+             line="L_line14:5"
+             link="s_guozhuangzi,s_qilizhuang" />
+    <station id="s_dalianpo"
+             name="褡裢坡"
+             name_alt="Dalianpo"
+             line="L_line6:24"
+             link="s_huangqu,s_qingnianlu" />
+    <station id="s_daotian"
+             name="稻田"
+             name_alt="Daotian"
+             line="L_fangshanline:7"
+             link="s_changyang,s_dabaotai" />
+    <station id="s_daoxianghulu"
+             name="稻香湖路"
+             name_alt="Daoxianghu Lu"
+             line="L_line16:3"
+             link="s_tundian,s_wenyanglu" />
+    <station id="s_dashihedong"
+             name="大石河东"
+             name_alt="Dashihedong"
+             line="L_yanfangline:5"
+             link="s_magezhuang,s_xingcheng" />
+    <station id="s_datunludong"
+             name="大屯路东"
+             name_alt="Datunludong"
+             line="L_line15:6,L_line5:17"
+             link="s_anlilu,s_beiyuanlubei,s_guanzhuang,s_huixinxijiebeikou" />
+    <station id="s_dawanglu"
+             name="大望路"
+             name_alt="Dawang Lu"
+             line="L_line14:22,L_line1andbatongline:21"
+             link="s_guomao,s_jintailu,s_jiulongshan,s_sihui" />
+    <station id="s_dawayao"
+             name="大瓦窑"
+             name_alt="Dawayao"
+             line="L_line14:3"
+             link="s_gardenexpopark,s_guozhuangzi" />
+    <station id="s_daxingairport"
+             name="大兴机场"
+             name_alt="Daxing Airport"
+             line="L_daxingairportexpress:3"
+             link="s_daxingxincheng" />
+    <station id="s_daxingxincheng"
+             name="大兴新城"
+             name_alt="Daxing Xincheng"
+             line="L_daxingairportexpress:2"
+             link="s_caoqiao,s_daxingairport" />
+    <station id="s_dazhongsi"
+             name="大钟寺"
+             name_alt="Dazhong Si"
+             line="L_line13:2"
+             link="s_xizhimen,s_zhichunlu" />
+    <station id="s_demao"
+             name="德茂"
+             name_alt="Demao"
+             line="L_line8:34"
+             link="s_wufutang,s_yinghai" />
+    <station id="s_dengshikou"
+             name="灯市口"
+             name_alt="Dengshikou"
+             line="L_line5:8"
+             link="s_dongdan,s_dongsi" />
+    <station id="s_dinghaiyuan"
+             name="定海园"
+             name_alt="Dinghaiyuan"
+             line="L_yizhuangt1line:14"
+             link="s_dinghaiyuanxi" />
+    <station id="s_dinghaiyuanxi"
+             name="定海园西"
+             name_alt="Dinghaiyuanxi"
+             line="L_yizhuangt1line:13"
+             link="s_dinghaiyuan,s_jinghaiyilu" />
+    <station id="s_dongdan"
+             name="东单"
+             name_alt="Dongdan"
+             line="L_line1andbatongline:17,L_line5:7"
+             link="s_chongwenmen,s_dengshikou,s_jianguomen,s_wangfujing" />
+    <station id="s_dongdaqiao"
+             name="东大桥"
+             name_alt="Dongdaqiao"
+             line="L_line6:19"
+             link="s_chaoyangmen,s_hujialou" />
+    <station id="s_dongfengbeiqiao"
+             name="东风北桥"
+             name_alt="Dongfeng Beiqiao"
+             line="L_line14:26"
+             link="s_jiangtai,s_zaoying" />
+    <station id="s_donggaodi"
+             name="东高地"
+             name_alt="Donggaodi"
+             line="L_line8:31"
+             link="s_heyi,s_huojianwanyuan" />
+    <station id="s_dongguantou"
+             name="东管头"
+             name_alt="Dongguantou"
+             line="L_line14:8"
+             link="s_lizeshangwuqu,s_xiju" />
+    <station id="s_dongguantounan"
+             name="东管头南"
+             name_alt="Dongguantounan"
+             line="L_fangshanline:1,L_line16:22"
+             link="s_capitalunivofeconomicsbusiness,s_fengtairailwaystation,s_hongliannanlu" />
+    <station id="s_donghuqu"
+             name="东湖渠"
+             name_alt="Donghuqu"
+             line="L_line14:31"
+             link="s_laiguangying,s_wangjing" />
+    <station id="s_dongsi"
+             name="东四"
+             name_alt="Dongsi"
+             line="L_line5:9,L_line6:17"
+             link="s_chaoyangmen,s_dengshikou,s_nanluoguxiang,s_zhangzizhonglu" />
+    <station id="s_dongsishitiao"
+             name="东四十条"
+             name_alt="Dongsi Shitiao"
+             line="L_line2:13"
+             link="s_chaoyangmen,s_dongzhimen" />
+    <station id="s_dongxiayuan"
+             name="东夏园"
+             name_alt="Dongxiayuan"
+             line="L_line6:33"
+             link="s_haojiafu,s_lucheng" />
+    <station id="s_dongzhimen"
+             name="东直门"
+             name_alt="Dongzhimen"
+             line="L_capitalairportexpress:1,L_line13:17,L_line2:14"
+             link="s_dongsishitiao,s_liufang,s_sanyuanqiao,s_yonghegonglamatemple" />
+    <station id="s_erligou"
+             name="二里沟"
+             name_alt="Erligou"
+             line="L_line16:16,L_line6:11"
+             link="s_baishiqiaonan,s_chegongzhuangxi,s_ganjiakou,s_nationallibrary" />
+    <station id="s_fangshanchengguan"
+             name="房山城关"
+             name_alt="Fangshan Chengguan"
+             line="L_yanfangline:8"
+             link="s_raolefu,s_yanshan" />
+    <station id="s_fangzhuang"
+             name="方庄"
+             name_alt="Fangzhuang"
+             line="L_line14:17"
+             link="s_puhuangyu,s_shilihe" />
+    <station id="s_fatou"
+             name="垡头"
+             name_alt="Fatou"
+             line="L_line7:19"
+             link="s_happyvalley,s_shuanghe" />
+    <station id="s_fengbo"
+             name="俸伯"
+             name_alt="Fengbo"
+             line="L_line15:20"
+             link="s_shunyi" />
+    <station id="s_fengtaidongdajie"
+             name="丰台东大街"
+             name_alt="Fengtai Dongdajie"
+             line="L_line9:9"
+             link="s_fengtainanlu,s_qilizhuang" />
+    <station id="s_fengtainanlu"
+             name="丰台南路"
+             name_alt="Fengtai Nanlu"
+             line="L_line16:24,L_line9:10"
+             link="s_fengtaidongdajie,s_fengtairailwaystation,s_fufengqiao,s_keyilu" />
+    <station id="s_fengtairailwaystation"
+             name="丰台站"
+             name_alt="Fengtai railway station"
+             line="L_line10:35,L_line16:23"
+             link="s_capitalunivofeconomicsbusiness,s_dongguantounan,s_fengtainanlu,s_niwa" />
+    <station id="s_fengtaisciencepark"
+             name="丰台科技园"
+             name_alt="Fengtai Science Park"
+             line="L_line9:12"
+             link="s_guogongzhuang,s_keyilu" />
+    <station id="s_fenzhongsi"
+             name="分钟寺"
+             name_alt="Fenzhongsi"
+             line="L_line10:25"
+             link="s_chengshousi,s_shilihe" />
+    <station id="s_forestparksouthgate"
+             name="森林公园南门"
+             name_alt="Forest Park South Gate"
+             line="L_line8:10"
+             link="s_lincuiqiao,s_olympicpark" />
+    <station id="s_fragranthills"
+             name="香山"
+             name_alt="Fragrant Hills"
+             line="L_xijiaoline:6"
+             link="s_botanicalgarden" />
+    <station id="s_fuchengmen"
+             name="阜成门"
+             name_alt="Fuchengmen"
+             line="L_line2:3"
+             link="s_chegongzhuang,s_fuxingmen" />
+    <station id="s_fufengqiao"
+             name="富丰桥"
+             name_alt="Fufengqiao"
+             line="L_line16:25"
+             link="s_fengtainanlu,s_kandan" />
+    <station id="s_futong"
+             name="阜通"
+             name_alt="Futong"
+             line="L_line14:29"
+             link="s_wangjing,s_wangjingnan" />
+    <station id="s_futuresciencecity"
+             name="未来科学城"
+             name_alt="Future Science City"
+             line="L_line17:2"
+             link="s_futuresciencecitynorth,s_tiantongyuandong" />
+    <station id="s_futuresciencecitynorth"
+             name="未来科学城北"
+             name_alt="Future Science City North"
+             line="L_line17:1"
+             link="s_futuresciencecity" />
+    <station id="s_fuxingmen"
+             name="复兴门"
+             name_alt="Fuxingmen"
+             line="L_line1andbatongline:12,L_line2:4"
+             link="s_changchunjie,s_fuchengmen,s_nanlishilu,s_xidan" />
+    <station id="s_ganjiakou"
+             name="甘家口"
+             name_alt="Ganjiakou"
+             line="L_line16:17"
+             link="s_erligou,s_yuyuantandongmenyuyuantanparkeastgate" />
+    <station id="s_gaobeidian"
+             name="高碑店"
+             name_alt="Gaobeidian"
+             line="L_line1andbatongline:24"
+             link="s_communicationunivofchina,s_sihuidong" />
+    <station id="s_gaoloujin"
+             name="高楼金"
+             name_alt="Gaoloujin"
+             line="L_line7:28"
+             link="s_huazhuang,s_qunfang" />
+    <station id="s_gaomidianbei"
+             name="高米店北"
+             name_alt="Gaomidianbei"
+             line="L_line4:27"
+             link="s_gaomidiannan,s_xihongmen" />
+    <station id="s_gaomidiannan"
+             name="高米店南"
+             name_alt="Gaomidiannan"
+             line="L_line4:28"
+             link="s_gaomidianbei,s_zaoyuan" />
+    <station id="s_gardenexpopark"
+             name="园博园"
+             name_alt="Garden Expo Park"
+             line="L_line14:2"
+             link="s_dawayao,s_zhangguozhuang" />
+    <station id="s_gonghuacheng"
+             name="巩华城"
+             name_alt="Gonghuacheng"
+             line="L_changpingline:9"
+             link="s_shahe,s_zhuxinzhuang" />
+    <station id="s_gongyixiqiao"
+             name="公益西桥"
+             name_alt="Gongyi Xiqiao"
+             line="L_line4:24"
+             link="s_jiaomenxi,s_xingong" />
+    <station id="s_gongzhufen"
+             name="公主坟"
+             name_alt="Gongzhufen"
+             line="L_line10:40,L_line1andbatongline:8"
+             link="s_lianhuaqiao,s_militarymuseum,s_wanshoulu,s_xidiaoyutai" />
+    <station id="s_guaanzhuang"
+             name="管庄"
+             name_alt="Guaanzhuang"
+             line="L_line1andbatongline:27"
+             link="s_baliqiao,s_shuangqiao" />
+    <station id="s_guanganmennei"
+             name="广安门内"
+             name_alt="Guang'anmennei"
+             line="L_line7:4"
+             link="s_caishikou,s_daguanying" />
+    <station id="s_guangqumennei"
+             name="广渠门内"
+             name_alt="Guangqumennei"
+             line="L_line7:10"
+             link="s_ciqikou,s_guangqumenwai" />
+    <station id="s_guangqumenwai"
+             name="广渠门外"
+             name_alt="Guangqumenwai"
+             line="L_line7:11"
+             link="s_guangqumennei,s_shuangjing" />
+    <station id="s_guangximen"
+             name="光熙门"
+             name_alt="Guangximen"
+             line="L_line13:15"
+             link="s_liufang,s_shaoyaoju" />
+    <station id="s_guangyangcheng"
+             name="广阳城"
+             name_alt="Guangyangcheng"
+             line="L_fangshanline:10"
+             link="s_liangxiangunivtownnorth,s_libafang" />
+    <station id="s_guanzhuang"
+             name="关庄"
+             name_alt="Guanzhuang"
+             line="L_line15:7"
+             link="s_datunludong,s_wangjingxi" />
+    <station id="s_gucheng"
+             name="古城"
+             name_alt="Gucheng"
+             line="L_line1andbatongline:2"
+             link="s_bajiaoamusementpark,s_pingguoyuan" />
+    <station id="s_guloudajie"
+             name="鼓楼大街"
+             name_alt="Gulou Dajie"
+             line="L_line2:17,L_line8:16"
+             link="s_andelibeijie,s_andingmen,s_jishuitan,s_shichahai" />
+    <station id="s_guogongzhuang"
+             name="郭公庄"
+             name_alt="Guogongzhuang"
+             line="L_fangshanline:5,L_line9:13"
+             link="s_baipenyao,s_dabaotai,s_fengtaisciencepark" />
+    <station id="s_guomao"
+             name="国贸"
+             name_alt="Guomao"
+             line="L_line10:20,L_line1andbatongline:20"
+             link="s_dawanglu,s_jintaixizhao,s_shuangjing,s_yonganli" />
+    <station id="s_guoyuan"
+             name="果园"
+             name_alt="Guoyuan"
+             line="L_line1andbatongline:30"
+             link="s_jiukeshu,s_tongzhoubeiyuan" />
+    <station id="s_guozhuangzi"
+             name="郭庄子"
+             name_alt="Guozhuangzi"
+             line="L_line14:4"
+             link="s_dajing,s_dawayao" />
+    <station id="s_haidianhuangzhuang"
+             name="海淀黄庄"
+             name_alt="Haidian Huangzhuang"
+             line="L_line10:3,L_line4:7"
+             link="s_renmindaxuerenminuniv,s_suzhoujie,s_zhichunli,s_zhongguancun" />
+    <station id="s_haidianwuluju"
+             name="海淀五路居"
+             name_alt="Haidian Wuluju"
+             line="L_line6:7"
+             link="s_cishousi,s_tiancun" />
+    <station id="s_haihutun"
+             name="海户屯"
+             name_alt="Haihutun"
+             line="L_line8:27"
+             link="s_dahongmen,s_muxiyuan" />
+    <station id="s_haojiafu"
+             name="郝家府"
+             name_alt="Haojiafu"
+             line="L_line6:32"
+             link="s_beiyunhedong,s_dongxiayuan" />
+    <station id="s_happyvalley"
+             name="欢乐谷景区"
+             name_alt="Happy Valley"
+             line="L_line7:18"
+             link="s_fatou,s_nanlouzizhuang" />
+    <station id="s_heizhuanghu"
+             name="黑庄户"
+             name_alt="Heizhuanghu"
+             line="L_line7:24"
+             link="s_langxinzhuang,s_wanshengxi" />
+    <station id="s_hepinglibeijie"
+             name="和平里北街"
+             name_alt="Hepingli Beijie"
+             line="L_line5:13"
+             link="s_hepingxiqiao,s_yonghegonglamatemple" />
+    <station id="s_hepingmen"
+             name="和平门"
+             name_alt="Hepingmen"
+             line="L_line2:7"
+             link="s_qianmen,s_xuanwumen" />
+    <station id="s_hepingxiqiao"
+             name="和平西桥"
+             name_alt="Heping Xiqiao"
+             line="L_line5:14"
+             link="s_hepinglibeijie,s_huixinxijienankou" />
+    <station id="s_heyi"
+             name="和义"
+             name_alt="Heyi"
+             line="L_line8:30"
+             link="s_dahongmennan,s_donggaodi" />
+    <station id="s_hongjunying"
+             name="红军营"
+             name_alt="Hongjunying"
+             line="L_line17:5"
+             link="s_qingheying,s_taiyanggong" />
+    <station id="s_hongliannanlu"
+             name="红莲南路"
+             name_alt="Honglian Nanlu"
+             line="L_line16:21"
+             link="s_daguanying,s_dongguantounan" />
+    <station id="s_hongtaizhuang"
+             name="洪泰庄"
+             name_alt="Hongtaizhuang"
+             line="L_line16:28"
+             link="s_wanpingcheng,s_yushuzhuang" />
+    <station id="s_houshayu"
+             name="后沙峪"
+             name_alt="Houshayu"
+             line="L_line15:16"
+             link="s_hualikan,s_nanfaxin" />
+    <station id="s_huagong"
+             name="化工"
+             name_alt="Huagong"
+             line="L_line7:16"
+             link="s_baiziwan,s_nanlouzizhuang" />
+    <station id="s_hualikan"
+             name="花梨坎"
+             name_alt="Hualikan"
+             line="L_line15:15"
+             link="s_chinaintlexhibitioncenter,s_houshayu" />
+    <station id="s_huangchang"
+             name="黄厂"
+             name_alt="Huangchang"
+             line="L_line7:22"
+             link="s_jiaohuachang,s_langxinzhuang" />
+    <station id="s_huangcunrailwaystation"
+             name="黄村火车站"
+             name_alt="Huangcun railway station"
+             line="L_line4:32"
+             link="s_huangcunxidajie,s_yihezhuang" />
+    <station id="s_huangcunxidajie"
+             name="黄村西大街"
+             name_alt="Huangcun Xidajie"
+             line="L_line4:31"
+             link="s_huangcunrailwaystation,s_qingyuanlu" />
+    <station id="s_huangqu"
+             name="黄渠"
+             name_alt="Huangqu"
+             line="L_line6:25"
+             link="s_changying,s_dalianpo" />
+    <station id="s_huaxiangdongqiao"
+             name="花乡东桥"
+             name_alt="Huaxiang Dongqiao"
+             line="L_fangshanline:3"
+             link="s_baipenyao,s_capitalunivofeconomicsbusiness" />
+    <station id="s_huayuanqiao"
+             name="花园桥"
+             name_alt="Huayuanqiao"
+             line="L_line6:9"
+             link="s_baishiqiaonan,s_cishousi" />
+    <station id="s_huazhuang"
+             name="花庄"
+             name_alt="Huazhuang"
+             line="L_line1andbatongline:35,L_line7:29"
+             link="s_gaoloujin,s_tuqiao,s_universalresort" />
+    <station id="s_hufangqiao"
+             name="虎坊桥"
+             name_alt="Hufangqiao"
+             line="L_line7:6"
+             link="s_caishikou,s_zhushikou" />
+    <station id="s_huilongguan"
+             name="回龙观"
+             name_alt="Huilongguan"
+             line="L_line13:9"
+             link="s_huoying,s_longze" />
+    <station id="s_huilongguandongdajie"
+             name="回龙观东大街"
+             name_alt="Huilongguan Dongdajie"
+             line="L_line8:4"
+             link="s_huoying,s_pingxifu" />
+    <station id="s_huixinxijiebeikou"
+             name="惠新西街北口"
+             name_alt="Huixin Xijie Beikou"
+             line="L_line5:16"
+             link="s_datunludong,s_huixinxijienankou" />
+    <station id="s_huixinxijienankou"
+             name="惠新西街南口"
+             name_alt="Huixin Xijie Nankou"
+             line="L_line10:11,L_line5:15"
+             link="s_anzhenmen,s_hepingxiqiao,s_huixinxijiebeikou,s_shaoyaoju" />
+    <station id="s_hujialou"
+             name="呼家楼"
+             name_alt="Hujialou"
+             line="L_line10:18,L_line6:20"
+             link="s_dongdaqiao,s_jintailu,s_jintaixizhao,s_tuanjiehu" />
+    <station id="s_huojianwanyuan"
+             name="火箭万源"
+             name_alt="Huojian Wanyuan"
+             line="L_line8:32"
+             link="s_donggaodi,s_wufutang" />
+    <station id="s_huoqiying"
+             name="火器营"
+             name_alt="Huoqiying"
+             line="L_line10:45"
+             link="s_changchunqiao" />
+    <station id="s_huoying"
+             name="霍营"
+             name_alt="Huoying"
+             line="L_line13:10,L_line8:5"
+             link="s_huilongguan,s_huilongguandongdajie,s_lishuiqiao,s_yuxin" />
+    <station id="s_jiahuihu"
+             name="嘉会湖[41]"
+             name_alt="Jiahuihu"
+             line="L_line17:16"
+             link="s_ciqu" />
+    <station id="s_jiandemen"
+             name="健德门"
+             name_alt="Jiandemen"
+             line="L_line10:8"
+             link="s_beitucheng,s_mudanyuan" />
+    <station id="s_jiangtai"
+             name="将台"
+             name_alt="Jiangtai"
+             line="L_line14:27"
+             link="s_dongfengbeiqiao,s_wangjingnan" />
+    <station id="s_jianguomen"
+             name="建国门"
+             name_alt="Jianguomen"
+             line="L_line1andbatongline:18,L_line2:11"
+             link="s_beijingrailwaystation,s_chaoyangmen,s_dongdan,s_yonganli" />
+    <station id="s_jiaohuachang"
+             name="焦化厂"
+             name_alt="Jiaohuachang"
+             line="L_line7:21"
+             link="s_huangchang,s_shuanghe" />
+    <station id="s_jiaomendong"
+             name="角门东"
+             name_alt="Jiaomendong"
+             line="L_line10:30"
+             link="s_dahongmen,s_jiaomenxi" />
+    <station id="s_jiaomenxi"
+             name="角门西"
+             name_alt="Jiaomenxi"
+             line="L_line10:31,L_line4:23"
+             link="s_caoqiao,s_gongyixiqiao,s_jiaomendong,s_majiapu" />
+    <station id="s_jijiamiao"
+             name="纪家庙"
+             name_alt="Jijiamiao"
+             line="L_line10:33"
+             link="s_caoqiao,s_capitalunivofeconomicsbusiness" />
+    <station id="s_jinanqiao"
+             name="金安桥"
+             name_alt="Jin'anqiao"
+             line="L_line11:2,L_line6:1,L_lines1:7"
+             link="s_beixinan,s_moshikou,s_pingguoyuan,s_sidaoqiao" />
+    <station id="s_jingfengmen"
+             name="景风门"
+             name_alt="Jingfengmen"
+             line="L_line14:12,L_line19:7"
+             link="s_beijingsouthrailwaystation,s_caoqiao,s_niujie,s_xitieying" />
+    <station id="s_jinghailu"
+             name="经海路"
+             name_alt="Jinghai Lu"
+             line="L_yizhuangline:11"
+             link="s_ciqunan,s_tongjinanlu" />
+    <station id="s_jinghaiyilu"
+             name="经海一路"
+             name_alt="Jinghai Yilu"
+             line="L_yizhuangt1line:12"
+             link="s_beijingetronginternationalexhibitionconventioncenter,s_dinghaiyuanxi" />
+    <station id="s_jingsong"
+             name="劲松"
+             name_alt="Jingsong"
+             line="L_line10:22"
+             link="s_panjiayuan,s_shuangjing" />
+    <station id="s_jingtai"
+             name="景泰"
+             name_alt="Jingtai"
+             line="L_line14:15"
+             link="s_puhuangyu,s_yongdingmenwai" />
+    <station id="s_jintailu"
+             name="金台路"
+             name_alt="Jintai Lu"
+             line="L_line14:23,L_line6:21"
+             link="s_chaoyangpark,s_dawanglu,s_hujialou,s_shilipu" />
+    <station id="s_jintaixizhao"
+             name="金台夕照"
+             name_alt="Jintai Xizhao"
+             line="L_line10:19"
+             link="s_guomao,s_hujialou" />
+    <station id="s_jinyuhutong"
+             name="金鱼胡同"
+             name_alt="Jinyu Hutong"
+             line="L_line8:20"
+             link="s_nationalartmuseum,s_wangfujing" />
+    <station id="s_jishuitan"
+             name="积水潭"
+             name_alt="Jishuitan"
+             line="L_line19:3,L_line2:18"
+             link="s_beitaipingzhuang,s_guloudajie,s_pinganli" />
+    <station id="s_jiugong"
+             name="旧宫"
+             name_alt="Jiugong"
+             line="L_yizhuangline:4"
+             link="s_xiaohongmen,s_yizhuangqiao" />
+    <station id="s_jiuhaocun"
+             name="九号村"
+             name_alt="Jiuhaocun"
+             line="L_yizhuangt1line:6"
+             link="s_sihaizhuang,s_taihelu" />
+    <station id="s_jiukeshu"
+             name="九棵树"
+             name_alt="Jiukeshu"
+             line="L_line1andbatongline:31"
+             link="s_guoyuan,s_liyuan" />
+    <station id="s_jiulongshan"
+             name="九龙山"
+             name_alt="Jiulongshan"
+             line="L_line14:21,L_line7:13"
+             link="s_dajiaoting,s_dawanglu,s_pingleyuan,s_shuangjing" />
+    <station id="s_kandan"
+             name="看丹"
+             name_alt="Kandan"
+             line="L_line16:26"
+             link="s_fufengqiao,s_yushuzhuang" />
+    <station id="s_keyilu"
+             name="科怡路"
+             name_alt="Keyi Lu"
+             line="L_line9:11"
+             link="s_fengtainanlu,s_fengtaisciencepark" />
+    <station id="s_laiguangying"
+             name="来广营"
+             name_alt="Laiguangying"
+             line="L_line14:32"
+             link="s_donghuqu,s_shangezhuang" />
+    <station id="s_langxinzhuang"
+             name="郎辛庄"
+             name_alt="Langxinzhuang"
+             line="L_line7:23"
+             link="s_heizhuanghu,s_huangchang" />
+    <station id="s_liangmaqiao"
+             name="亮马桥"
+             name_alt="Liangmaqiao"
+             line="L_line10:15"
+             link="s_agriculturalexhibitioncenter,s_sanyuanqiao" />
+    <station id="s_liangxiangnanguan"
+             name="良乡南关"
+             name_alt="Liangxiang Nanguan"
+             line="L_fangshanline:14"
+             link="s_liangxiangunivtownwest,s_suzhuang" />
+    <station id="s_liangxiangunivtown"
+             name="良乡大学城"
+             name_alt="Liangxiang Univ. Town"
+             line="L_fangshanline:12"
+             link="s_liangxiangunivtownnorth,s_liangxiangunivtownwest" />
+    <station id="s_liangxiangunivtownnorth"
+             name="良乡大学城北"
+             name_alt="Liangxiang Univ. Town North"
+             line="L_fangshanline:11"
+             link="s_guangyangcheng,s_liangxiangunivtown" />
+    <station id="s_liangxiangunivtownwest"
+             name="良乡大学城西"
+             name_alt="Liangxiang Univ. Town West"
+             line="L_fangshanline:13"
+             link="s_liangxiangnanguan,s_liangxiangunivtown" />
+    <station id="s_lianhuaqiao"
+             name="莲花桥"
+             name_alt="Lianhuaqiao"
+             line="L_line10:39"
+             link="s_gongzhufen,s_liuliqiao" />
+    <station id="s_liaogongzhuang"
+             name="廖公庄"
+             name_alt="Liaogongzhuang"
+             line="L_line6:5"
+             link="s_tiancun,s_xihuangcun" />
+    <station id="s_libafang"
+             name="篱笆房"
+             name_alt="Libafang"
+             line="L_fangshanline:9"
+             link="s_changyang,s_guangyangcheng" />
+    <station id="s_lifesciencepark"
+             name="生命科学园"
+             name_alt="Life Science Park"
+             line="L_changpingline:11"
+             link="s_xierqi,s_zhuxinzhuang" />
+    <station id="s_lincuiqiao"
+             name="林萃桥"
+             name_alt="Lincuiqiao"
+             line="L_line8:9"
+             link="s_forestparksouthgate,s_yongtaizhuang" />
+    <station id="s_lingjinghutong"
+             name="灵境胡同"
+             name_alt="Lingjing Hutong"
+             line="L_line4:16"
+             link="s_xidan,s_xisi" />
+    <station id="s_linheli"
+             name="临河里"
+             name_alt="Linheli"
+             line="L_line1andbatongline:33"
+             link="s_liyuan,s_tuqiao" />
+    <station id="s_lishuiqiao"
+             name="立水桥"
+             name_alt="Lishuiqiao"
+             line="L_line13:11,L_line5:20"
+             link="s_beiyuan,s_huoying,s_lishuiqiaonan,s_tiantongyuannan" />
+    <station id="s_lishuiqiaonan"
+             name="立水桥南"
+             name_alt="Lishuiqiaonan"
+             line="L_line5:19"
+             link="s_beiyuanlubei,s_lishuiqiao" />
+    <station id="s_liudaokou"
+             name="六道口"
+             name_alt="Liudaokou"
+             line="L_changpingline:16,L_line15:2"
+             link="s_beishatan,s_qinghuadongluxikou,s_xueyuanqiao,s_xuezhiyuan" />
+    <station id="s_liufang"
+             name="柳芳"
+             name_alt="Liufang"
+             line="L_line13:16"
+             link="s_dongzhimen,s_guangximen" />
+    <station id="s_liujiayao"
+             name="刘家窑"
+             name_alt="Liujiayao"
+             line="L_line5:2"
+             link="s_puhuangyu,s_songjiazhuang" />
+    <station id="s_liuliqiao"
+             name="六里桥"
+             name_alt="Liuliqiao"
+             line="L_line10:38,L_line9:7"
+             link="s_lianhuaqiao,s_liuliqiaodong,s_qilizhuang,s_xiju" />
+    <station id="s_liuliqiaodong"
+             name="六里桥东"
+             name_alt="Liuliqiaodong"
+             line="L_line9:6"
+             link="s_beijingwestrailwaystation,s_liuliqiao" />
+    <station id="s_liyuan"
+             name="梨园"
+             name_alt="Liyuan"
+             line="L_line1andbatongline:32"
+             link="s_jiukeshu,s_linheli" />
+    <station id="s_liyuanzhuang"
+             name="栗园庄"
+             name_alt="Liyuanzhuang"
+             line="L_lines1:3"
+             link="s_shangan,s_xiaoyuan" />
+    <station id="s_lizeshangwuqu"
+             name="丽泽商务区"
+             name_alt="Lize Shangwuqu"
+             line="L_line14:9"
+             link="s_caihuying,s_dongguantou" />
+    <station id="s_longze"
+             name="龙泽"
+             name_alt="Longze"
+             line="L_line13:8"
+             link="s_huilongguan,s_xierqi" />
+    <station id="s_lucheng"
+             name="潞城"
+             name_alt="Lucheng"
+             line="L_line6:34"
+             link="s_dongxiayuan" />
+    <station id="s_lujuandong"
+             name="鹿圈东"
+             name_alt="Lujuandong"
+             line="L_yizhuangt1line:8"
+             link="s_taihelu,s_yizhuangtongren" />
+    <station id="s_magezhuang"
+             name="马各庄"
+             name_alt="Magezhuang"
+             line="L_yanfangline:6"
+             link="s_dashihedong,s_raolefu" />
+    <station id="s_majiapu"
+             name="马家堡"
+             name_alt="Majiapu"
+             line="L_line4:22"
+             link="s_beijingsouthrailwaystation,s_jiaomenxi" />
+    <station id="s_malianwa"
+             name="马连洼"
+             name_alt="Malianwa"
+             line="L_line16:8"
+             link="s_nongdananlu,s_xibeiwang" />
+    <station id="s_maquanying"
+             name="马泉营"
+             name_alt="Maquanying"
+             line="L_line15:12"
+             link="s_cuigezhuang,s_sunhe" />
+    <station id="s_militarymuseum"
+             name="军事博物馆"
+             name_alt="Military Museum"
+             line="L_line1andbatongline:9,L_line9:4"
+             link="s_baiduizi,s_beijingwestrailwaystation,s_gongzhufen,s_muxidi" />
+    <station id="s_mingtombs"
+             name="十三陵景区"
+             name_alt="Ming Tombs"
+             line="L_changpingline:2"
+             link="s_changping,s_changpingxishankou" />
+    <station id="s_moshikou"
+             name="模式口"
+             name_alt="Moshikou"
+             line="L_line11:1"
+             link="s_jinanqiao" />
+    <station id="s_mudanyuan"
+             name="牡丹园"
+             name_alt="Mudanyuan"
+             line="L_line10:7,L_line19:1"
+             link="s_beitaipingzhuang,s_jiandemen,s_xitucheng" />
+    <station id="s_muxidi"
+             name="木樨地"
+             name_alt="Muxidi"
+             line="L_line16:19,L_line1andbatongline:10"
+             link="s_daguanying,s_militarymuseum,s_nanlishilu,s_yuyuantandongmenyuyuantanparkeastgate" />
+    <station id="s_muxiyuan"
+             name="木樨园"
+             name_alt="Muxiyuan"
+             line="L_line8:26"
+             link="s_haihutun,s_yongdingmenwai" />
+    <station id="s_nanfaxin"
+             name="南法信"
+             name_alt="Nanfaxin"
+             line="L_line15:17"
+             link="s_houshayu,s_shimen" />
+    <station id="s_nanlishilu"
+             name="南礼士路"
+             name_alt="Nanlishi Lu"
+             line="L_line1andbatongline:11"
+             link="s_fuxingmen,s_muxidi" />
+    <station id="s_nanlouzizhuang"
+             name="南楼梓庄"
+             name_alt="Nanlouzizhuang"
+             line="L_line7:17"
+             link="s_happyvalley,s_huagong" />
+    <station id="s_nanluoguxiang"
+             name="南锣鼓巷"
+             name_alt="Nanluogu Xiang"
+             line="L_line6:16,L_line8:18"
+             link="s_beihaibei,s_dongsi,s_nationalartmuseum,s_shichahai" />
+    <station id="s_nanshao"
+             name="南邵"
+             name_alt="Nanshao"
+             line="L_changpingline:6"
+             link="s_beishaowa,s_shaheunivpark" />
+    <station id="s_nationalartmuseum"
+             name="中国美术馆"
+             name_alt="National Art Museum"
+             line="L_line8:19"
+             link="s_jinyuhutong,s_nanluoguxiang" />
+    <station id="s_nationallibrary"
+             name="国家图书馆"
+             name_alt="National Library"
+             line="L_line16:15,L_line4:10,L_line9:1"
+             link="s_baishiqiaonan,s_beijingzoo,s_erligou,s_wanshousi,s_weigongcun" />
+    <station id="s_niujie"
+             name="牛街"
+             name_alt="Niujie"
+             line="L_line19:6"
+             link="s_jingfengmen,s_taipingqiao" />
+    <station id="s_niwa"
+             name="泥洼"
+             name_alt="Niwa"
+             line="L_line10:36"
+             link="s_fengtairailwaystation,s_xiju" />
+    <station id="s_nongdananlu"
+             name="农大南路"
+             name_alt="Nongda Nanlu"
+             line="L_line16:9"
+             link="s_malianwa,s_xiyuan" />
+    <station id="s_olympicpark"
+             name="奥林匹克公园"
+             name_alt="Olympic Park"
+             line="L_line15:4,L_line8:11"
+             link="s_anlilu,s_beishatan,s_forestparksouthgate,s_olympicsportscenter" />
+    <station id="s_olympicsportscenter"
+             name="奥体中心"
+             name_alt="Olympic Sports Center"
+             line="L_line8:12"
+             link="s_beitucheng,s_olympicpark" />
+    <station id="s_panjiayuan"
+             name="潘家园"
+             name_alt="Panjiayuan"
+             line="L_line10:23"
+             link="s_jingsong,s_shilihe" />
+    <station id="s_pekinguniveastgate"
+             name="北京大学东门"
+             name_alt="Peking Univ. East Gate"
+             line="L_line4:5"
+             link="s_yuanmingyuanpark,s_zhongguancun" />
+    <station id="s_pinganli"
+             name="平安里"
+             name_alt="Ping'anli"
+             line="L_line19:4,L_line4:14,L_line6:14"
+             link="s_beihaibei,s_chegongzhuang,s_jishuitan,s_taipingqiao,s_xinjiekou,s_xisi" />
+    <station id="s_pingguoyuan"
+             name="苹果园"
+             name_alt="Pingguoyuan"
+             line="L_line1andbatongline:1,L_line6:2,L_lines1:8"
+             link="s_gucheng,s_jinanqiao,s_yangzhuang" />
+    <station id="s_pingleyuan"
+             name="平乐园"
+             name_alt="Pingleyuan"
+             line="L_line14:20"
+             link="s_beijingunivoftechwestgate,s_jiulongshan" />
+    <station id="s_pingxifu"
+             name="平西府"
+             name_alt="Pingxifu"
+             line="L_line8:3"
+             link="s_huilongguandongdajie,s_yuzhilu" />
+    <station id="s_puhuangyu"
+             name="蒲黄榆"
+             name_alt="Puhuangyu"
+             line="L_line14:16,L_line5:3"
+             link="s_fangzhuang,s_jingtai,s_liujiayao,s_templeofheaveneastgate" />
+    <station id="s_qianmen"
+             name="前门"
+             name_alt="Qianmen"
+             line="L_line2:8,L_line8:22"
+             link="s_chongwenmen,s_hepingmen,s_wangfujing,s_zhushikou" />
+    <station id="s_qiaohuying"
+             name="桥户营"
+             name_alt="Qiaohuying"
+             line="L_lines1:5"
+             link="s_shangan,s_sidaoqiao" />
+    <station id="s_qiaowan"
+             name="桥湾"
+             name_alt="Qiaowan"
+             line="L_line7:8"
+             link="s_ciqikou,s_zhushikou" />
+    <station id="s_qilizhuang"
+             name="七里庄"
+             name_alt="Qilizhuang"
+             line="L_line14:6,L_line9:8"
+             link="s_dajing,s_fengtaidongdajie,s_liuliqiao,s_xiju" />
+    <station id="s_qingherailwaystation"
+             name="清河站"
+             name_alt="Qinghe railway station"
+             line="L_changpingline:13,L_line13:6"
+             link="s_qinghexiaoyingqiao,s_shangdi,s_xierqi" />
+    <station id="s_qinghexiaoyingqiao"
+             name="清河小营桥"
+             name_alt="Qinghe Xiaoyingqiao"
+             line="L_changpingline:14"
+             link="s_qingherailwaystation,s_xuezhiyuan" />
+    <station id="s_qingheying"
+             name="清河营"
+             name_alt="Qingheying"
+             line="L_line17:4"
+             link="s_hongjunying,s_tiantongyuandong" />
+    <station id="s_qinghuadongluxikou"
+             name="清华东路西口"
+             name_alt="Qinghua Donglu Xikou"
+             line="L_line15:1"
+             link="s_liudaokou" />
+    <station id="s_qingnianlu"
+             name="青年路"
+             name_alt="Qingnian Lu"
+             line="L_line6:23"
+             link="s_dalianpo,s_shilipu" />
+    <station id="s_qingyuanlu"
+             name="清源路"
+             name_alt="Qingyuan Lu"
+             line="L_line4:30"
+             link="s_huangcunxidajie,s_zaoyuan" />
+    <station id="s_qunfang"
+             name="群芳"
+             name_alt="Qunfang"
+             line="L_line7:27"
+             link="s_gaoloujin,s_wanshengdong" />
+    <station id="s_quzhuang"
+             name="屈庄"
+             name_alt="Quzhuang"
+             line="L_yizhuangt1line:1"
+             link="s_rongxingjie" />
+    <station id="s_raolefu"
+             name="饶乐府"
+             name_alt="Raolefu"
+             line="L_yanfangline:7"
+             link="s_fangshanchengguan,s_magezhuang" />
+    <station id="s_renmindaxuerenminuniv"
+             name="人民大学"
+             name_alt="Renmin Daxue (Renmin Univ.)"
+             line="L_line4:8"
+             link="s_haidianhuangzhuang,s_weigongcun" />
+    <station id="s_rhihezhuang"
+             name="瑞合庄"
+             name_alt="Rhihezhuang"
+             line="L_yizhuangt1line:3"
+             link="s_rongxingjie,s_taiheqiaobei" />
+    <station id="s_rongchangdongjie"
+             name="荣昌东街"
+             name_alt="Rongchang Dongjie"
+             line="L_yizhuangline:9,L_yizhuangt1line:10"
+             link="s_beijingetronginternationalexhibitionconventioncenter,s_rongjingdongjie,s_tongjinanlu,s_yizhuangtongren" />
+    <station id="s_rongjingdongjie"
+             name="荣京东街"
+             name_alt="Rongjing Dongjie"
+             line="L_yizhuangline:8"
+             link="s_rongchangdongjie,s_wanyuanjie" />
+    <station id="s_rongxingjie"
+             name="融兴街"
+             name_alt="Rongxing Jie"
+             line="L_yizhuangt1line:2"
+             link="s_quzhuang,s_rhihezhuang" />
+    <station id="s_sanyuanqiao"
+             name="三元桥"
+             name_alt="Sanyuanqiao"
+             line="L_capitalairportexpress:2,L_line10:14"
+             link="s_dongzhimen,s_liangmaqiao,s_taiyanggong,s_terminal3" />
+    <station id="s_shahe"
+             name="沙河"
+             name_alt="Shahe"
+             line="L_changpingline:8"
+             link="s_gonghuacheng,s_shaheunivpark" />
+    <station id="s_shaheunivpark"
+             name="沙河高教园"
+             name_alt="Shahe Univ. Park"
+             line="L_changpingline:7"
+             link="s_nanshao,s_shahe" />
+    <station id="s_shangan"
+             name="上岸"
+             name_alt="Shang'an"
+             line="L_lines1:4"
+             link="s_liyuanzhuang,s_qiaohuying" />
+    <station id="s_shangdi"
+             name="上地"
+             name_alt="Shangdi"
+             line="L_line13:5"
+             link="s_qingherailwaystation,s_wudaokou" />
+    <station id="s_shangezhuang"
+             name="善各庄"
+             name_alt="Shangezhuang"
+             line="L_line14:33"
+             link="s_laiguangying" />
+    <station id="s_shaoyaoju"
+             name="芍药居"
+             name_alt="Shaoyaoju"
+             line="L_line10:12,L_line13:14"
+             link="s_guangximen,s_huixinxijienankou,s_taiyanggong,s_wangjingxi" />
+    <station id="s_shibalidian"
+             name="十八里店"
+             name_alt="Shibalidian"
+             line="L_line17:12"
+             link="s_beishenshu,s_zhoujiazhuang" />
+    <station id="s_shichahai"
+             name="什刹海"
+             name_alt="Shichahai"
+             line="L_line8:17"
+             link="s_guloudajie,s_nanluoguxiang" />
+    <station id="s_shichang"
+             name="石厂"
+             name_alt="Shichang"
+             line="L_lines1:1"
+             link="s_xiaoyuan" />
+    <station id="s_shilihe"
+             name="十里河"
+             name_alt="Shilihe"
+             line="L_line10:24,L_line14:18,L_line17:10"
+             link="s_beijingunivoftechwestgate,s_fangzhuang,s_fenzhongsi,s_panjiayuan,s_workersstadium,s_zhoujiazhuang" />
+    <station id="s_shilipu"
+             name="十里堡"
+             name_alt="Shilipu"
+             line="L_line6:22"
+             link="s_jintailu,s_qingnianlu" />
+    <station id="s_shiliuzhuang"
+             name="石榴庄"
+             name_alt="Shiliuzhuang"
+             line="L_line10:28"
+             link="s_dahongmen,s_songjiazhuang" />
+    <station id="s_shimen"
+             name="石门"
+             name_alt="Shimen"
+             line="L_line15:18"
+             link="s_nanfaxin,s_shunyi" />
+    <station id="s_shuanghe"
+             name="双合"
+             name_alt="Shuanghe"
+             line="L_line7:20"
+             link="s_fatou,s_jiaohuachang" />
+    <station id="s_shuangjing"
+             name="双井"
+             name_alt="Shuangjing"
+             line="L_line10:21,L_line7:12"
+             link="s_guangqumenwai,s_guomao,s_jingsong,s_jiulongshan" />
+    <station id="s_shuangqiao"
+             name="双桥"
+             name_alt="Shuangqiao"
+             line="L_line1andbatongline:26"
+             link="s_communicationunivofchina,s_guaanzhuang" />
+    <station id="s_shunyi"
+             name="顺义"
+             name_alt="Shunyi"
+             line="L_line15:19"
+             link="s_fengbo,s_shimen" />
+    <station id="s_sidaoqiao"
+             name="四道桥"
+             name_alt="Sidaoqiao"
+             line="L_lines1:6"
+             link="s_jinanqiao,s_qiaohuying" />
+    <station id="s_sihaizhuang"
+             name="四海庄"
+             name_alt="Sihaizhuang"
+             line="L_yizhuangt1line:5"
+             link="s_jiuhaocun,s_taiheqiaobei" />
+    <station id="s_sihui"
+             name="四惠"
+             name_alt="Sihui"
+             line="L_line1andbatongline:22"
+             link="s_dawanglu,s_sihuidong" />
+    <station id="s_sihuidong"
+             name="四惠东"
+             name_alt="Sihuidong"
+             line="L_line1andbatongline:23"
+             link="s_gaobeidian,s_sihui" />
+    <station id="s_songjiazhuang"
+             name="宋家庄"
+             name_alt="Songjiazhuang"
+             line="L_line10:27,L_line5:1,L_yizhuangline:1"
+             link="s_chengshousi,s_liujiayao,s_shiliuzhuang,s_xiaocun" />
+    <station id="s_summerpalacewestgate"
+             name="颐和园西门"
+             name_alt="Summer Palace West Gate"
+             line="L_xijiaoline:2"
+             link="s_bagou,s_chapeng" />
+    <station id="s_sunhe"
+             name="孙河"
+             name_alt="Sunhe"
+             line="L_line15:13"
+             link="s_chinaintlexhibitioncenter,s_maquanying" />
+    <station id="s_suzhoujie"
+             name="苏州街"
+             name_alt="Suzhou Jie"
+             line="L_line10:2,L_line16:12"
+             link="s_bagou,s_haidianhuangzhuang,s_suzhouqiao,s_wanquanheqiao" />
+    <station id="s_suzhouqiao"
+             name="苏州桥"
+             name_alt="Suzhou Qiao"
+             line="L_line16:13"
+             link="s_suzhoujie,s_wanshousi" />
+    <station id="s_suzhuang"
+             name="苏庄"
+             name_alt="Suzhuang"
+             line="L_fangshanline:15"
+             link="s_liangxiangnanguan,s_yancundong" />
+    <station id="s_taihelu"
+             name="泰河路"
+             name_alt="Taihe Lu"
+             line="L_yizhuangt1line:7"
+             link="s_jiuhaocun,s_lujuandong" />
+    <station id="s_taiheqiaobei"
+             name="太和桥北"
+             name_alt="Taiheqiaobei"
+             line="L_yizhuangt1line:4"
+             link="s_rhihezhuang,s_sihaizhuang" />
+    <station id="s_taipingqiao"
+             name="太平桥"
+             name_alt="Taipingqiao"
+             line="L_line19:5"
+             link="s_niujie,s_pinganli" />
+    <station id="s_taiyanggong"
+             name="太阳宫"
+             name_alt="Taiyanggong"
+             line="L_line10:13,L_line17:6"
+             link="s_hongjunying,s_sanyuanqiao,s_shaoyaoju,s_xibahe" />
+    <station id="s_taoranting"
+             name="陶然亭"
+             name_alt="Taoranting"
+             line="L_line4:20"
+             link="s_beijingsouthrailwaystation,s_caishikou" />
+    <station id="s_templeofheaveneastgate"
+             name="天坛东门"
+             name_alt="Temple of Heaven East Gate"
+             line="L_line5:4"
+             link="s_ciqikou,s_puhuangyu" />
+    <station id="s_terminal2"
+             name="2号航站楼"
+             name_alt="Terminal 2"
+             line="L_capitalairportexpress:4"
+             link="s_terminal3" />
+    <station id="s_terminal3"
+             name="3号航站楼"
+             name_alt="Terminal 3"
+             line="L_capitalairportexpress:3"
+             link="s_sanyuanqiao,s_terminal2" />
+    <station id="s_tiananmendong"
+             name="天安门东"
+             name_alt="Tian'anmendong"
+             line="L_line1andbatongline:15"
+             link="s_tiananmenxi,s_wangfujing" />
+    <station id="s_tiananmenxi"
+             name="天安门西"
+             name_alt="Tian'anmenxi"
+             line="L_line1andbatongline:14"
+             link="s_tiananmendong,s_xidan" />
+    <station id="s_tiancun"
+             name="田村"
+             name_alt="Tiancun"
+             line="L_line6:6"
+             link="s_haidianwuluju,s_liaogongzhuang" />
+    <station id="s_tiangongyuan"
+             name="天宫院"
+             name_alt="Tiangongyuan"
+             line="L_line4:35"
+             link="s_biomedicalbase" />
+    <station id="s_tianqiao"
+             name="天桥"
+             name_alt="Tianqiao"
+             line="L_line8:24"
+             link="s_yongdingmenwai,s_zhushikou" />
+    <station id="s_tiantongyuan"
+             name="天通苑"
+             name_alt="Tiantongyuan"
+             line="L_line5:22"
+             link="s_tiantongyuanbei,s_tiantongyuannan" />
+    <station id="s_tiantongyuanbei"
+             name="天通苑北"
+             name_alt="Tiantongyuanbei"
+             line="L_line5:23"
+             link="s_tiantongyuan" />
+    <station id="s_tiantongyuandong"
+             name="天通苑东"
+             name_alt="Tiantongyuandong"
+             line="L_line17:3"
+             link="s_futuresciencecity,s_qingheying" />
+    <station id="s_tiantongyuannan"
+             name="天通苑南"
+             name_alt="Tiantongyuannan"
+             line="L_line5:21"
+             link="s_lishuiqiao,s_tiantongyuan" />
+    <station id="s_tongjinanlu"
+             name="同济南路"
+             name_alt="Tongji Nanlu"
+             line="L_yizhuangline:10"
+             link="s_jinghailu,s_rongchangdongjie" />
+    <station id="s_tongzhoubeiguan"
+             name="通州北关"
+             name_alt="Tongzhou Beiguan"
+             line="L_line6:29"
+             link="s_beiyunhexi,s_wuzixueyuanlu" />
+    <station id="s_tongzhoubeiyuan"
+             name="通州北苑"
+             name_alt="Tongzhou Beiyuan"
+             line="L_line1andbatongline:29"
+             link="s_baliqiao,s_guoyuan" />
+    <station id="s_tuanjiehu"
+             name="团结湖"
+             name_alt="Tuanjiehu"
+             line="L_line10:17"
+             link="s_agriculturalexhibitioncenter,s_hujialou" />
+    <station id="s_tundian"
+             name="屯佃"
+             name_alt="Tundian"
+             line="L_line16:4"
+             link="s_daoxianghulu,s_yongfeng" />
+    <station id="s_tuqiao"
+             name="土桥"
+             name_alt="Tuqiao"
+             line="L_line1andbatongline:34"
+             link="s_huazhuang,s_linheli" />
+    <station id="s_universalresort"
+             name="环球度假区"
+             name_alt="Universal Resort"
+             line="L_line1andbatongline:36,L_line7:30"
+             link="s_huazhuang" />
+    <station id="s_wanan"
+             name="万安"
+             name_alt="Wan'an"
+             line="L_xijiaoline:4"
+             link="s_botanicalgarden,s_chapeng" />
+    <station id="s_wangfujing"
+             name="王府井"
+             name_alt="Wangfujing"
+             line="L_line1andbatongline:16,L_line8:21"
+             link="s_dongdan,s_jinyuhutong,s_qianmen,s_tiananmendong" />
+    <station id="s_wangjing"
+             name="望京"
+             name_alt="Wangjing"
+             line="L_line14:30,L_line15:9"
+             link="s_donghuqu,s_futong,s_wangjingdong,s_wangjingxi" />
+    <station id="s_wangjingdong"
+             name="望京东"
+             name_alt="Wangjingdong"
+             line="L_line15:10"
+             link="s_cuigezhuang,s_wangjing" />
+    <station id="s_wangjingnan"
+             name="望京南"
+             name_alt="Wangjingnan"
+             line="L_line14:28"
+             link="s_futong,s_jiangtai" />
+    <station id="s_wangjingxi"
+             name="望京西"
+             name_alt="Wangjingxi"
+             line="L_line13:13,L_line15:8"
+             link="s_beiyuan,s_guanzhuang,s_shaoyaoju,s_wangjing" />
+    <station id="s_wanpingcheng"
+             name="宛平城"
+             name_alt="Wanpingcheng"
+             line="L_line16:29"
+             link="s_hongtaizhuang" />
+    <station id="s_wanquanheqiao"
+             name="万泉河桥"
+             name_alt="Wanquanheqiao"
+             line="L_line16:11"
+             link="s_suzhoujie,s_xiyuan" />
+    <station id="s_wanshengdong"
+             name="万盛东"
+             name_alt="Wanshengdong"
+             line="L_line7:26"
+             link="s_qunfang,s_wanshengxi" />
+    <station id="s_wanshengxi"
+             name="万盛西"
+             name_alt="Wanshengxi"
+             line="L_line7:25"
+             link="s_heizhuanghu,s_wanshengdong" />
+    <station id="s_wanshoulu"
+             name="万寿路"
+             name_alt="Wanshou Lu"
+             line="L_line1andbatongline:7"
+             link="s_gongzhufen,s_wukesong" />
+    <station id="s_wanshousi"
+             name="万寿寺"
+             name_alt="Wanshousi"
+             line="L_line16:14"
+             link="s_nationallibrary,s_suzhouqiao" />
+    <station id="s_wanyuanjie"
+             name="万源街"
+             name_alt="Wanyuan Jie"
+             line="L_yizhuangline:7"
+             link="s_rongjingdongjie,s_yizhuangculturepark" />
+    <station id="s_wanzi"
+             name="湾子"
+             name_alt="Wanzi"
+             line="L_line7:2"
+             link="s_beijingwestrailwaystation,s_daguanying" />
+    <station id="s_weigongcun"
+             name="魏公村"
+             name_alt="Weigongcun"
+             line="L_line4:9"
+             link="s_nationallibrary,s_renmindaxuerenminuniv" />
+    <station id="s_wenyanglu"
+             name="温阳路"
+             name_alt="Wenyang Lu"
+             line="L_line16:2"
+             link="s_beianhe,s_daoxianghulu" />
+    <station id="s_workersstadium"
+             name="工人体育场"
+             name_alt="Workers' Stadium"
+             line="L_line17:9"
+             link="s_shilihe,s_zuojiazhuang" />
+    <station id="s_wudaokou"
+             name="五道口"
+             name_alt="Wudaokou"
+             line="L_line13:4"
+             link="s_shangdi,s_zhichunlu" />
+    <station id="s_wufutang"
+             name="五福堂"
+             name_alt="Wufutang"
+             line="L_line8:33"
+             link="s_demao,s_huojianwanyuan" />
+    <station id="s_wukesong"
+             name="五棵松"
+             name_alt="Wukesong"
+             line="L_line1andbatongline:6"
+             link="s_wanshoulu,s_yuquanlu" />
+    <station id="s_wuzixueyuanlu"
+             name="物资学院路"
+             name_alt="Wuzi Xueyuan Lu"
+             line="L_line6:28"
+             link="s_caofang,s_tongzhoubeiguan" />
+    <station id="s_xiaocun"
+             name="肖村"
+             name_alt="Xiaocun"
+             line="L_yizhuangline:2"
+             link="s_songjiazhuang,s_xiaohongmen" />
+    <station id="s_xiaohongmen"
+             name="小红门"
+             name_alt="Xiaohongmen"
+             line="L_yizhuangline:3"
+             link="s_jiugong,s_xiaocun" />
+    <station id="s_xiaoyuan"
+             name="小园"
+             name_alt="Xiaoyuan"
+             line="L_lines1:2"
+             link="s_liyuanzhuang,s_shichang" />
+    <station id="s_xibahe"
+             name="西坝河"
+             name_alt="Xibahe"
+             line="L_line17:7"
+             link="s_taiyanggong,s_zuojiazhuang" />
+    <station id="s_xibeiwang"
+             name="西北旺"
+             name_alt="Xibeiwang"
+             line="L_line16:7"
+             link="s_malianwa,s_yongfengnan" />
+    <station id="s_xidan"
+             name="西单"
+             name_alt="Xidan"
+             line="L_line1andbatongline:13,L_line4:17"
+             link="s_fuxingmen,s_lingjinghutong,s_tiananmenxi,s_xuanwumen" />
+    <station id="s_xidiaoyutai"
+             name="西钓鱼台"
+             name_alt="Xidiaoyutai"
+             line="L_line10:41"
+             link="s_cishousi,s_gongzhufen" />
+    <station id="s_xierqi"
+             name="西二旗"
+             name_alt="Xi'erqi"
+             line="L_changpingline:12,L_line13:7"
+             link="s_lifesciencepark,s_longze,s_qingherailwaystation" />
+    <station id="s_xihongmen"
+             name="西红门"
+             name_alt="Xihongmen"
+             line="L_line4:26"
+             link="s_gaomidianbei,s_xingong" />
+    <station id="s_xihuangcun"
+             name="西黄村"
+             name_alt="Xihuangcun"
+             line="L_line6:4"
+             link="s_liaogongzhuang,s_yangzhuang" />
+    <station id="s_xiju"
+             name="西局"
+             name_alt="Xiju"
+             line="L_line10:37,L_line14:7"
+             link="s_dongguantou,s_liuliqiao,s_niwa,s_qilizhuang" />
+    <station id="s_xinfadi"
+             name="新发地"
+             name_alt="Xinfadi"
+             line="L_line19:9"
+             link="s_caoqiao,s_xingong" />
+    <station id="s_xingcheng"
+             name="星城"
+             name_alt="Xingcheng"
+             line="L_yanfangline:4"
+             link="s_dashihedong,s_yancun" />
+    <station id="s_xingong"
+             name="新宫"
+             name_alt="Xingong"
+             line="L_line19:10,L_line4:25"
+             link="s_gongyixiqiao,s_xihongmen,s_xinfadi" />
+    <station id="s_xinjiekou"
+             name="新街口"
+             name_alt="Xinjiekou"
+             line="L_line4:13"
+             link="s_pinganli,s_xizhimen" />
+    <station id="s_xinshougangshougangpark30"
+             name="新首钢"
+             name_alt="Xinshougang (Shougang Park)[30]"
+             line="L_line11:4"
+             link="s_beixinan" />
+    <station id="s_xisi"
+             name="西四"
+             name_alt="Xisi"
+             line="L_line4:15"
+             link="s_lingjinghutong,s_pinganli" />
+    <station id="s_xitieying"
+             name="西铁营"
+             name_alt="Xitieying"
+             line="L_line14:11"
+             link="s_caihuying,s_jingfengmen" />
+    <station id="s_xitucheng"
+             name="西土城"
+             name_alt="Xitucheng"
+             line="L_changpingline:18,L_line10:6"
+             link="s_mudanyuan,s_xueyuanqiao,s_zhichunlu" />
+    <station id="s_xixiaokou"
+             name="西小口"
+             name_alt="Xixiaokou"
+             line="L_line8:7"
+             link="s_yongtaizhuang,s_yuxin" />
+    <station id="s_xiyuan"
+             name="西苑"
+             name_alt="Xiyuan"
+             line="L_line16:10,L_line4:3"
+             link="s_beigongmen,s_nongdananlu,s_wanquanheqiao,s_yuanmingyuanpark" />
+    <station id="s_xizhimen"
+             name="西直门"
+             name_alt="Xizhimen"
+             line="L_line13:1,L_line2:1,L_line4:12"
+             link="s_beijingzoo,s_chegongzhuang,s_dazhongsi,s_xinjiekou" />
+    <station id="s_xuanwumen"
+             name="宣武门"
+             name_alt="Xuanwumen"
+             line="L_line2:6,L_line4:18"
+             link="s_caishikou,s_changchunjie,s_hepingmen,s_xidan" />
+    <station id="s_xueyuanqiao"
+             name="学院桥"
+             name_alt="Xueyuanqiao"
+             line="L_changpingline:17"
+             link="s_liudaokou,s_xitucheng" />
+    <station id="s_xuezhiyuan"
+             name="学知园"
+             name_alt="Xuezhiyuan"
+             line="L_changpingline:15"
+             link="s_liudaokou,s_qinghexiaoyingqiao" />
+    <station id="s_yancun"
+             name="阎村"
+             name_alt="Yancun"
+             line="L_yanfangline:3"
+             link="s_xingcheng,s_zicaowu" />
+    <station id="s_yancundong"
+             name="阎村东"
+             name_alt="Yancundong"
+             line="L_fangshanline:16,L_yanfangline:1"
+             link="s_suzhuang,s_zicaowu" />
+    <station id="s_yangzhuang"
+             name="杨庄"
+             name_alt="Yangzhuang"
+             line="L_line6:3"
+             link="s_pingguoyuan,s_xihuangcun" />
+    <station id="s_yanshan"
+             name="燕山"
+             name_alt="Yanshan"
+             line="L_yanfangline:9"
+             link="s_fangshanchengguan" />
+    <station id="s_yihezhuang"
+             name="义和庄"
+             name_alt="Yihezhuang"
+             line="L_line4:33"
+             link="s_biomedicalbase,s_huangcunrailwaystation" />
+    <station id="s_yinghai"
+             name="瀛海"
+             name_alt="Yinghai"
+             line="L_line8:35"
+             link="s_demao" />
+    <station id="s_yizhuangculturepark"
+             name="亦庄文化园"
+             name_alt="Yizhuang Culture Park"
+             line="L_yizhuangline:6"
+             link="s_wanyuanjie,s_yizhuangqiao" />
+    <station id="s_yizhuangqiao"
+             name="亦庄桥"
+             name_alt="Yizhuangqiao"
+             line="L_yizhuangline:5"
+             link="s_jiugong,s_yizhuangculturepark" />
+    <station id="s_yizhuangrailwaystation"
+             name="亦庄火车站"
+             name_alt="Yizhuang railway station"
+             line="L_yizhuangline:14"
+             link="s_ciqu" />
+    <station id="s_yizhuangtongren"
+             name="亦庄同仁"
+             name_alt="Yizhuang Tongren"
+             line="L_yizhuangt1line:9"
+             link="s_lujuandong,s_rongchangdongjie" />
+    <station id="s_yonganli"
+             name="永安里"
+             name_alt="Yong'anli"
+             line="L_line1andbatongline:19"
+             link="s_guomao,s_jianguomen" />
+    <station id="s_yongdingmenwai"
+             name="永定门外"
+             name_alt="Yongdingmenwai"
+             line="L_line14:14,L_line8:25"
+             link="s_beijingsouthrailwaystation,s_jingtai,s_muxiyuan,s_tianqiao" />
+    <station id="s_yongfeng"
+             name="永丰"
+             name_alt="Yongfeng"
+             line="L_line16:5"
+             link="s_tundian,s_yongfengnan" />
+    <station id="s_yongfengnan"
+             name="永丰南"
+             name_alt="Yongfengnan"
+             line="L_line16:6"
+             link="s_xibeiwang,s_yongfeng" />
+    <station id="s_yonghegonglamatemple"
+             name="雍和宫"
+             name_alt="Yonghegong Lama Temple"
+             line="L_line2:15,L_line5:12"
+             link="s_andingmen,s_beixinqiao,s_dongzhimen,s_hepinglibeijie" />
+    <station id="s_yongtaizhuang"
+             name="永泰庄"
+             name_alt="Yongtaizhuang"
+             line="L_line8:8"
+             link="s_lincuiqiao,s_xixiaokou" />
+    <station id="s_yuanmingyuanpark"
+             name="圆明园"
+             name_alt="Yuanmingyuan Park"
+             line="L_line4:4"
+             link="s_pekinguniveastgate,s_xiyuan" />
+    <station id="s_yuquanlu"
+             name="玉泉路"
+             name_alt="Yuquan Lu"
+             line="L_line1andbatongline:5"
+             link="s_babaoshan,s_wukesong" />
+    <station id="s_yushuzhuang"
+             name="榆树庄"
+             name_alt="Yushuzhuang"
+             line="L_line16:27"
+             link="s_hongtaizhuang,s_kandan" />
+    <station id="s_yuxin"
+             name="育新"
+             name_alt="Yuxin"
+             line="L_line8:6"
+             link="s_huoying,s_xixiaokou" />
+    <station id="s_yuyuantandongmenyuyuantanparkeastgate"
+             name="玉渊潭东门"
+             name_alt="Yuyuantan Dongmen (Yuyuantan Park East Gate)"
+             line="L_line16:18"
+             link="s_ganjiakou,s_muxidi" />
+    <station id="s_yuzhilu"
+             name="育知路"
+             name_alt="Yuzhi Lu"
+             line="L_line8:2"
+             link="s_pingxifu,s_zhuxinzhuang" />
+    <station id="s_zaoying"
+             name="枣营"
+             name_alt="Zaoying"
+             line="L_line14:25"
+             link="s_chaoyangpark,s_dongfengbeiqiao" />
+    <station id="s_zaoyuan"
+             name="枣园"
+             name_alt="Zaoyuan"
+             line="L_line4:29"
+             link="s_gaomidiannan,s_qingyuanlu" />
+    <station id="s_zhangguozhuang"
+             name="张郭庄"
+             name_alt="Zhangguozhuang"
+             line="L_line14:1"
+             link="s_gardenexpopark" />
+    <station id="s_zhangzizhonglu"
+             name="张自忠路"
+             name_alt="Zhangzizhong Lu"
+             line="L_line5:10"
+             link="s_beixinqiao,s_dongsi" />
+    <station id="s_zhichunli"
+             name="知春里"
+             name_alt="Zhichunli"
+             line="L_line10:4"
+             link="s_haidianhuangzhuang,s_zhichunlu" />
+    <station id="s_zhichunlu"
+             name="知春路"
+             name_alt="Zhichun Lu"
+             line="L_line10:5,L_line13:3"
+             link="s_dazhongsi,s_wudaokou,s_xitucheng,s_zhichunli" />
+    <station id="s_zhongguancun"
+             name="中关村"
+             name_alt="Zhongguancun"
+             line="L_line4:6"
+             link="s_haidianhuangzhuang,s_pekinguniveastgate" />
+    <station id="s_zhoujiazhuang"
+             name="周家庄"
+             name_alt="Zhoujiazhuang"
+             line="L_line17:11"
+             link="s_shibalidian,s_shilihe" />
+    <station id="s_zhushikou"
+             name="珠市口"
+             name_alt="Zhushikou"
+             line="L_line7:7,L_line8:23"
+             link="s_hufangqiao,s_qianmen,s_qiaowan,s_tianqiao" />
+    <station id="s_zhuxinzhuang"
+             name="朱辛庄"
+             name_alt="Zhuxinzhuang"
+             line="L_changpingline:10,L_line8:1"
+             link="s_gonghuacheng,s_lifesciencepark,s_yuzhilu" />
+    <station id="s_zicaowu"
+             name="紫草坞"
+             name_alt="Zicaowu"
+             line="L_yanfangline:2"
+             link="s_yancun,s_yancundong" />
+    <station id="s_zuojiazhuang"
+             name="左家庄"
+             name_alt="Zuojiazhuang"
+             line="L_line17:8"
+             link="s_workersstadium,s_xibahe" />
   </stations>
 </tube>

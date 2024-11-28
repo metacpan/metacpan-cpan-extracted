@@ -137,7 +137,7 @@ sub add_activity {
     my $team = shift;
     my %params = @_;
 
-    return $self->client()->post("/otask/v1/tasks/companies/" . $company . "/teams/" . $team . "/tasks", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item update_activities
@@ -175,7 +175,7 @@ sub update_activities {
     my $code = shift;
     my %params = @_;
 
-    return $self->client()->put("/otask/v1/tasks/companies/" . $company . "/teams/" . $team . "/tasks/" . $code, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item archive_activities
@@ -208,7 +208,7 @@ sub archive_activities {
     my $team = shift;
     my $code = shift;
 
-    return $self->client()->put("/otask/v1/tasks/companies/" . $company . "/teams/" . $team . "/archive/" . $code);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item unarchive_activities
@@ -241,7 +241,7 @@ sub unarchive_activities {
     my $team = shift;
     my $code = shift;
 
-    return $self->client()->put("/otask/v1/tasks/companies/" . $company . "/teams/" . $team . "/unarchive/" . $code);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item update_batch
@@ -269,7 +269,7 @@ sub update_batch {
     my $company = shift;
     my %params = @_;
 
-    return $self->client()->put("/otask/v1/tasks/companies/" . $company . "/tasks/batch", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_by_type
@@ -305,7 +305,7 @@ sub get_by_type {
         $url .= "/" . $code;
     }
 
-    return $self->client()->get("/otask/v1/tasks/companies/" . $company . "/teams/" . $team . "/tasks" . $url);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

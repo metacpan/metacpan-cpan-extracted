@@ -52,10 +52,10 @@
    "provides" : {
       "Markdown::Render" : {
          "file" : "lib/Markdown/Render.pm",
-         "version" : "v1.60.1"
+         "version" : "v1.60.2"
       }
    },
    "release_status" : "stable",
-   "version" : "v1.60.1",
+   "version" : "v1.60.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -16,10 +16,10 @@ int32_t SPVM__Net__SSLeay__ASN1_INTEGER__DESTROY(SPVM_ENV* env, SPVM_VALUE* stac
   
   void* obj_self = stack[0].oval;
   
-  ASN1_INTEGER* pointer = env->get_pointer(env, stack, obj_self);
+  ASN1_INTEGER* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    ASN1_INTEGER_free(pointer);
+    ASN1_INTEGER_free(self);
   }
   
   return 0;

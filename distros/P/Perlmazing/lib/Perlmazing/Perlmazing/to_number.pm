@@ -1,4 +1,4 @@
-use Perlmazing qw(to_number croak);
+use Perlmazing qw(is_number to_number croak);
 our @ISA = qw(Perlmazing::Listable);
 
 sub main {

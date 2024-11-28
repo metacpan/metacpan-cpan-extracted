@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.164     2024-11-27 18:20:14Z
+          - in recognition of how long tooling has understood how to run
+            Build.PL, the default installer is now [ModuleBuildTiny], rather
+            than [ModuleBuildTiny::Fallback] and [MakeMaker::Fallback]
+
 0.163     2023-12-09 22:56:32Z
           - .travis.yml file removed from minting profile
 

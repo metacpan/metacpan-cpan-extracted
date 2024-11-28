@@ -1,0 +1,300 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Mail::Colander::Session
+
+
+=head1 SYNOPSIS
+
+   use Mail::Colander::Session;
+
+   # The session is used during the SMTP dialog to collect data, and
+   # then by Mail::Colander/Data::Annotation to evaluate conditions and
+   # rules based on that data, via Data::Annotation::Overlay. The
+   # accessors are of interest for actually "using" this module.
+
+   # set after the TCP handshake, available since "connect"
+   my $peer_ip = $session->peer_ip;
+   my $peer_port = $session->peer_port;
+   my $ip_port = $session->peer_ip_port;  # like "10.20.30.40:2222"
+   
+   # set after HELO/EHLO
+   my $peer_identity = $session->peer_identity;
+
+   # set after MAIL (FROM)
+   my $from = $session->reverse_path;
+
+   # set/updated after each RCPT (TO)
+   my $to = $session->forward_path;
+
+   # set/updated after each DATA-PART and DATA
+   my $size = $session->mail_min_size;
+
+   # set after DATA
+   my $eml_as_string = $session->mail_data;
+
+=head1 DESCRIPTION
+
+This module encapsulate a session that is then easily consumed through
+L<Data::Annotation::Overlay>, which eventually means that it can be
+easily consumed in L<Data::Annotation> rules.
+
+Some methods in the interface are not really supposed to be called by
+the consumer; they are named after each (E)SMTP command and are called
+by L<Mail::Colander::Server> during the exchange with a connecting peer.
+These methods make sure to save the relevant data in the accessors, so
+that they can be later consumed as described above.
+
+As an example, at TCP session setup the
+L</peer_ip>/L</peer_port>/L<peer_ip_port> accessors become available;
+this means that it's possible to use them in a chain for the C<connect>
+event:
+
+	 # ... chain for Data::Annotation, named "connect"...
+    connect:
+      default: reject
+      rules:
+        - condition:
+            is_element_of:
+              - '.peer_ip'
+              - type: data
+                value:
+                  - '127.0.0.1'
+                  - '10.20.30.40'
+                  - '172.16.17.18'
+          return: accept
+
+Each following (E)SMTP command triggers some addition of data to the
+session, which can be consumed in the corresponding chain. E.g. after
+the C<HELO> or C<EHLO>, the I<peer identity> is available and it can be
+used to do some filtering and/or set some variables in the overlay:
+
+    EHLO:
+      default: reject
+      rules:
+        - condition:
+            and:
+              - eq: [ '.peer_ip', '=127.0.0.1' ]
+              - eq: [ '.peer_identity', '=localhost.localdomain' ]
+          record:
+            set:
+              '.caller': localhost
+          return: accept
+        - condition:
+            and:
+              - eq: [ '.peer_ip', '=10.20.30.40' ]
+              - eq: [ '.peer_identity', '=foo.example.com' ]
+          record:
+            set:
+              '.caller': foo
+          return: accept
+- condition:
+            and:
+              - eq: [ '.peer_ip', '=10.20.30.40' ]
+              - eq: [ '.peer_identity', '=bar.example.com' ]
+          record:
+            set:
+              '.caller': bar
+          return: accept
+        - condition:
+            and:
+              - eq: [ '.peer_ip', '=172.16.17.18' ]
+              - eq: [ '.peer_identity', '=galook.example.com' ]
+          record:
+            set:
+              '.caller': galook
+          return: accept
+
+Setting variables (like C<caller> above) allows implementing dispatch
+tables later in the analysis, to make things more readable.
+
+When the C<DATA> part has been completed, everything is available and
+the corresponding L<Data::Annotation> chain condition can leverage all
+attributes. This is also an occasion where it's handy to implement a
+dispatch table:
+
+    DATA:
+      default: reject
+      rules:
+        - condition:
+            eq: [ '.caller', '=localhost' ]
+          return: { goto: 'localhost' }
+        - condition:
+            eq: [ '.caller', '=foo' ]
+          return: { goto: 'foo' }
+        ...
+
+    localhost:
+      default: reject  # default for this chain
+      rules:
+        - condition:
+            and:
+              - '<': [ '.mail_size', '=2500' ]
+              - eq: [ '.reverse_path', '=foo@example.com' ]
+              - '=~': [ '.subject', '=(?mxs:\A ciao)' ]
+              - is_subset_of:
+                  - '.forward_path'
+                  - type: data
+                    value:
+                      - 'bar@example.com'
+                      - 'foo@bar.com'
+          return: accept
+    ...
+
+
+=head1 INTERFACE
+
+=head2 Constructor
+
+=head2 Accessors
+
+These methods are normally consumed in
+L<Data::Annotation>/L<Mail::Colander> during the evaluation of conditions,
+by means of a L<Data::Annotation::Overlay> mediator. The sections below
+indicate where it is meaningful to consume each accessor.
+
+=head3 B<< last_op >>
+
+   my $name = $session->last_op;
+
+The last operation that was called for setting a value, see L</Methods
+for tracking messages>.
+
+=head3 B<< mail_data >>
+
+   my $eml_as_string = $session->mail_data;
+
+The mail data, as a string. AVailable for chain C<DATA>.
+
+=head2 B<< mail_min_size >>
+
+   my $size = $session->mail_min_size;
+
+The minimum size of the email, updated as new data comes in. This is
+useful in the C<DATA-PART> chain as it allows to check if the message is
+getting too big before it has all been received.
+
+=head3 B<< mail_size >>
+
+   my $size = $session->mail_size;
+
+The definitive size of the message, available for chain C<DATA>.
+
+=head3 B<< message >>
+
+   my $message = $session->message;
+
+The received message, as a L<Mail::Colander::Message>. This also sets
+additional accessors directly mapped from the underlying object, namely:
+
+=over
+
+=item C<bare_addresses>
+
+=item C<bcc>
+
+=item C<cc>
+
+=item C<from>
+
+=item C<header_all>
+
+=item C<header_first>
+
+=item C<recipients>
+
+=item C<subject>
+
+=item C<to>
+
+=back
+
+=head3 B<< peer_ip >>
+
+   my $ip_address = $session->peer_ip;
+
+The IP address of the peer, available for chain C<connect> and following.
+
+=head3 B<< peer_ip_port >>
+
+   my $ip_colon_port = $session->peer_ip_port;
+
+The IP:port string of the peer, available for chain C<connect> and
+following.
+
+=head3 B<< peer_port >>
+
+   my $port_number = $session->peer_port;
+
+The port number of the peer, available for chain C<connect> and
+following.
+
+=head2 Methods for tracking messages
+
+These methods are normally consumed by L<Mail::Colander::Server>. They are
+called after L<Net::Server::Mail::ESMTP> has done its job, and their
+first call parameter is always the L<Net::Server::Mail::ESMTP> object
+that is handling the dialog, then specific parameters.
+
+=head2 B<< DATA >>
+
+   $session->DATA($nsm, $eml_as_string);
+
+=head2 B<< DATA_INIT >>
+
+   $session->DATA($nsm);
+
+=head2 B<< DATA_PART >>
+
+   $session->DATA($nsm, $ref_to_chunk_as_string);
+
+=head2 B<< EHLO >>
+
+   $session->EHLO($nsm, $peer_identity, $extensions);
+
+=head2 B<< HELO >>
+
+   $session->HELO($nsm, $peer_identity);
+
+=head2 B<< MAIL >>
+
+   $session->MAIL($nsm, $reverse_path);
+
+=head2 B<< QUIT >>
+
+   $session->QUIT($nsm);
+
+=head2 B<< RCPT >>
+
+   $session->RCPT($nsm, $forward_path);
+
+=head2 B<< RST >>
+
+   $session->RST($nsm);
+
+=head2 Other methods for setting values
+
+=head2 B<< reset >>
+
+   $session->reset;
+
+Reset the state of the session.
+
+=head2 B<< reset_transaction >>
+
+   $session->reset_transaction;
+
+Reset the state of the current transaction.
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for Mail::Colander.
+
+
+=cut

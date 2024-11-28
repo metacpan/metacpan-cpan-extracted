@@ -3,7 +3,7 @@ package Module::ScanDeps::Static;
 use strict;
 use warnings;
 
-require Module::ScanDeps::VERSION;
+require Module::ScanDeps::Static::VERSION;
 
 use 5.010;
 

@@ -27,7 +27,8 @@
             "Test::More" : "0.88",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "strict" : "0"
          }
       },
       "runtime" : {
@@ -41,16 +42,15 @@
             "English" : "0",
             "Exporter" : "0",
             "Getopt::Long::Descriptive" : "0",
-            "HTTP::Date" : "0",
             "JSON::MaybeXS" : "0",
             "Module::Load" : "0",
             "Module::Loaded" : "0",
             "POSIX" : "0",
             "Pod::Usage" : "0",
             "Ref::Util" : "0",
+            "Time::Moment" : "0",
             "YAML::XS" : "0",
             "perl" : "5.014",
-            "strict" : "0",
             "warnings" : "0"
          }
       },
@@ -70,11 +70,11 @@
             "Test::Deep" : "0",
             "Test::MockTime" : "0",
             "Test::More" : "0",
-            "Time::Moment" : "0",
             "YAML" : "0",
             "bignum" : "0",
             "lib" : "0",
-            "perl" : "5.014"
+            "perl" : "5.014",
+            "strict" : "0"
          }
       }
    },
@@ -89,7 +89,7 @@
          "web" : "https://github.com/reyjrar/Parse-Syslog-Line"
       }
    },
-   "version" : "5.4",
+   "version" : "6.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"
@@ -472,7 +472,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v5.4",
+                  "tag" : "v6.0",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -553,7 +553,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release-5.4",
+                  "tag" : "release-6.0",
                   "tag_format" : "release-%v",
                   "tag_message" : "v%V"
                },

@@ -66,7 +66,7 @@ sub get_active_milestone {
     my $self = shift;
     my $contract_id = shift;
 
-    return $self->client()->get("/hr/v3/fp/milestones/statuses/active/contracts/" . $contract_id);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_submissions
@@ -89,7 +89,7 @@ sub get_submissions {
     my $self = shift;
     my $milestone_id = shift;
 
-    return $self->client()->get("/hr/v3/fp/milestones/" . $milestone_id . "/submissions");
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item create
@@ -112,7 +112,7 @@ sub create {
     my $self = shift;
     my %params = @_;
 
-    return $self->client()->post("/hr/v3/fp/milestones", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item edit
@@ -140,7 +140,7 @@ sub edit {
     my $milestone_id = shift;
     my %params = @_;
 
-    return $self->client()->put("/hr/v3/fp/milestones/" . $milestone_id, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item activate
@@ -168,7 +168,7 @@ sub activate {
     my $milestone_id = shift;
     my %params = @_;
 
-    return $self->client()->put("/hr/v3/fp/milestones/" . $milestone_id . "/activate", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item approve
@@ -196,7 +196,7 @@ sub approve {
     my $milestone_id = shift;
     my %params = @_;
 
-    return $self->client()->put("/hr/v3/fp/milestones/" . $milestone_id . "/approve", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item delete
@@ -219,7 +219,7 @@ sub delete {
     my $self = shift;
     my $milestone_id = shift;
 
-    return $self->client()->delete("/hr/v3/fp/milestones/" . $milestone_id);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

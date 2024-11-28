@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify;
-$Games::Solitaire::Verify::VERSION = '0.2600';
+$Games::Solitaire::Verify::VERSION = '0.2601';
 use warnings;
 use strict;
 
@@ -21,7 +21,7 @@ Games::Solitaire::Verify - verify solutions for solitaire games.
 
 =head1 VERSION
 
-version 0.2600
+version 0.2601
 
 =head1 SYNOPSIS
 

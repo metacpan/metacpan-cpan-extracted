@@ -67,7 +67,7 @@ sub get_owned {
     my $freelancer_ref = shift;
     my %params = @_;
 
-    return $self->client()->get("/finreports/v2/financial_account_owner/" . $freelancer_ref, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_specific
@@ -91,7 +91,7 @@ sub get_specific {
     my $entity_ref = shift;
     my %params = @_;
 
-    return $self->client()->get("/finreports/v2/financial_accounts/" . $entity_ref, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

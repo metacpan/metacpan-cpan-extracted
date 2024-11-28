@@ -4,7 +4,9 @@ Makefile.PL
 MANIFEST			This list of files
 t/00-load.t
 t/01-basic.t
+t/02-front-matter.t
 t/templates/basic.md
 t/templates/basic.tt
+t/templates/front-matter.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

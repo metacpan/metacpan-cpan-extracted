@@ -50,6 +50,12 @@ The length of output buffer $md must be greater than or equal to EVP_MAX_MD_SIZE
 
 If X509_digest failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
+=head2 digest_return_string
+
+C<method digest_return_string : string ($type : Net::SSLeay::EVP_MD);>
+
+Calls L</"digest"> method given appropriate arguments, and returns the output string.
+
 =head2 pubkey_digest
 
 C<method pubkey_digest : int ($type : L<Net::SSLeay::EVP_MD|SPVM::Net::SSLeay::EVP_MD>, $md : mutable string, $len_ref : int*);>
@@ -65,6 +71,12 @@ The output buffer $md must be defined. Otherwise an exception is thrown.
 The length of output buffer $md must be greater than or equal to EVP_MAX_MD_SIZE. Otherwise an exception is thrown.
 
 If X509_pubkey_digest failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
+=head2 pubkey_digest_return_string
+
+C<method pubkey_digest_return_string : string ($type : Net::SSLeay::EVP_MD);>
+
+Calls L</"pubkey_digest"> method given appropriate arguments, and returns the output string.
 
 =head2 dup
 
@@ -82,13 +94,49 @@ Exceptions:
 
 The X509 object $subject must be defined. Otherwise an exception is thrown.
 
-=head2 P_get_ocsp_uri
+=head2 get_ocsp_uri
 
-C<static method P_get_ocsp_uri : string ();>
+C<method get_ocsp_uri : string ();>
 
 Returns OCSP URI in the certificate $cert.
 
 If not found, returns undef.
+
+=head2 get_ext_by_NID
+
+C<method get_ext_by_NID : int ($nid : int, $lastpos : int);>
+
+Calls native L<X509_get_ext_by_NID|https://docs.openssl.org/1.1.1/man3/X509v3_get_ext_by_NID> function given the pointer value of the instance, $nid, $lastpos, and returns its return value.
+
+Exceptions:
+
+If X509_get_ext_by_NID failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
+=head2 get_ext_by_OBJ
+
+C<method get_ext_by_OBJ : int ($obj : L<Net::SSLeay::ASN1_OBJECT|SPVM::Net::SSLeay::ASN1_OBJECT>, $lastpos : int);>
+
+Calls native L<X509_get_ext_by_OBJ|https://docs.openssl.org/1.1.1/man3/X509v3_get_ext_by_NID> function given the pointer value of the instance, $obj, $lastpos, and returns its return value.
+
+Exceptions:
+
+If X509_get_ext_by_OBJ failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
+=head2 get_ext_count
+
+C<method get_ext_count : int ();>
+
+Calls native L<X509_get_ext_count|https://docs.openssl.org/1.1.1/man3/X509v3_get_ext_by_NID> function given the pointer value of the instance, and returns its return value.
+
+=head2 get_ext
+
+C<method get_ext : L<Net::SSLeay::X509_EXTENSION|SPVM::Net::SSLeay::X509_EXTENSION> ($loc : int);>
+
+Calls native L<X509_get_ext|https://docs.openssl.org/1.1.1/man3/X509v3_get_ext_by_NID> function given the pointer value of the instance, $loc, creates a new L<Net::SSLeay::X509_EXTENSION|SPVM::Net::SSLeay::X509_EXTENSION> object, sets the pointer value of the new object to the return value of the native function, sets C<no_free> flag of the new object to 1, creates a reference from the new object to the instance, and returns the new object.
+
+Exceptions:
+
+If X509_get_ext failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
 =head2 DESTROY
 

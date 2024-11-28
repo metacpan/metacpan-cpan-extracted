@@ -27,9 +27,9 @@ provides:
   Module::ScanDeps::Static:
     file: lib/Module/ScanDeps/Static.pm
     version: '0'
-  Module::ScanDeps::VERSION:
-    file: lib/Module/ScanDeps/VERSION.pm
-    version: v1.7.0
+  Module::ScanDeps::Static::VERSION:
+    file: lib/Module/ScanDeps/Static/VERSION.pm
+    version: v1.7.1
 requires:
   CLI::Simple: v0.0.4
   Class::Accessor::Fast: '0.51'
@@ -39,5 +39,5 @@ requires:
   Readonly: '2.05'
   perl: '5.010'
 resources: {}
-version: v1.7.0
+version: v1.7.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

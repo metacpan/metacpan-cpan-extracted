@@ -16,10 +16,10 @@ int32_t SPVM__Net__SSLeay__OCSP_BASICRESP__DESTROY(SPVM_ENV* env, SPVM_VALUE* st
   
   void* obj_self = stack[0].oval;
   
-  OCSP_BASICRESP* pointer = env->get_pointer(env, stack, obj_self);
+  OCSP_BASICRESP* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    OCSP_BASICRESP_free(pointer);
+    OCSP_BASICRESP_free(self);
   }
   
   return 0;

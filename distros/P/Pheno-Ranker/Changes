@@ -1,5 +1,11 @@
 Revision history for Perl distribution Pheno-Ranker
 
+1.00 2024-11-27:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Added DOI to docs
+ - Added term 'phenotypicFeatures' to PXF in bff-pxf-plot
+ - Changed { id => 'NCIT:NA0000', label => 'NA' } to { id => 'NCIT:C126101', label => 'Not Available' }
+
 0.12 2024-10-18T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Added UTF-8 encoding for writing alignment text files
@@ -63,7 +69,7 @@ Revision history for Perl distribution Pheno-Ranker
  - csv2pheno-ranker now accepts .tsv (sep \t)
  - Fixed stringification of weights (read from YAML) on JSON export
  - Added flag --similarity-metric-cohort
- - Added terms <procedures, exposures> to bff-pxf-simulator
+ - Added terms 'procedures,exposures' to bff-pxf-simulator
 
 0.03 2023-11-27T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 

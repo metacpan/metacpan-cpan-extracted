@@ -14,7 +14,7 @@ if ($@)
 }
 else
 {
-    plan tests => 2;
+    plan tests => 5;
 }
 
 {
@@ -34,5 +34,41 @@ else
 
     # TEST
     like( $trap->stderr(), qr#\AWrong.*\n\z#, "Trailing newline in error line.",
+    );
+}
+
+{
+    my $exit_code;
+    trap(
+        sub {
+            $exit_code = system(
+                $^X, "-I", "lib",
+                "bin/verify-solitaire-solution",
+                "t/data/sample-solutions/fcs-seahaven-towers-1977.txt"
+            );
+        }
+    );
+
+    # TEST
+    ok( $exit_code,
+"[Freecell mode trying to verify Seahaven Towers] Non zero (failure) process exit code."
+    );
+
+    # TEST
+    like(
+        $trap->stderr(),
+
+        # qr#\AWrong.*\n\z#,
+        qr#\S#ms,
+"[Freecell mode trying to verify Seahaven Towers] Trailing newline in error line.",
+    );
+
+    # TEST
+    like(
+        $trap->stdout(),
+
+        # qr#\AWrong.*\n\z#,
+        qr#Wrong#ms,
+"[Freecell mode trying to verify Seahaven Towers] stdout says it is wrong.",
     );
 }

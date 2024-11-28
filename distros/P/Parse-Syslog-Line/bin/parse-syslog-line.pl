@@ -1,7 +1,7 @@
 #!perl
 # PODNAME: parse-syslog-line.pl
 # ABSTRACT: Parse a syslog message and display the structured data
-use strict;
+use v5.14;
 use warnings;
 
 use Data::Printer;
@@ -30,10 +30,10 @@ my ($opt,$usage) = describe_options("%c %o",
     ['Output Format'],
     ['format' => 'hidden', {
         one_of => [
-            [ print  => 'Format with Data::Printer' ],
-            [ json   => 'Format as JSON, minified' ],
-            [ pretty => 'Format as JSON, pretty' ],
-            [ yaml   => 'Format as YAML' ],
+            [ 'print|ddp' => 'Format with Data::Printer' ],
+            [ 'json|jq|j' => 'Format as JSON, minified' ],
+            [ pretty      => 'Format as JSON, pretty' ],
+            [ 'yaml|yml'  => 'Format as YAML' ],
         ],
         default => 'print',
     }],
@@ -80,7 +80,7 @@ parse-syslog-line.pl - Parse a syslog message and display the structured data
 
 =head1 VERSION
 
-version 5.4
+version 6.0
 
 =head1 SYNOPSIS
 

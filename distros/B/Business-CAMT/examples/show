@@ -1,15 +1,18 @@
 #!/usr/bin/env perl
 
-# Run with:   $0 <$xml-file>
-# Example:  examples/show examples/dutch-sepa/camt.053.001.02.xml
+# Run with: $0 <$xml-file> [<$out.xml>]
+# Example:  examples/show examples/dutch-sepa/camt.053.001.02.xml /tmp/out.xml
 
 use warnings;
 use strict;
 
-use lib 'lib';
+use lib 'lib';          # because this script is not installed
 use Business::CAMT  ();
 
 use Log::Report; # mode => 'DEBUG';
+
+
+# Collect the command-line arguments.
 
 @ARGV >= 1
 	or error "Usage: $0 \$infile [\$outfile]";
@@ -17,21 +20,45 @@ use Log::Report; # mode => 'DEBUG';
 my ($xml, $outfile) = @ARGV;
 -r $xml or fault "XML file cannot be used";
 
+
+# Parameters affect the compilation of the XML readers and writers.
+# When you need difference settings within one program, then you can create
+# multiple of these objects.  But you can better reuse these object as
+# often as you can: compiling is expensive!
+
 my $camt = Business::CAMT->new(
 #	big_numbers   => 1,
 #	match_schema  => 'NEWEST',
 	long_tagnames => 1,
 );
 
-my $data = $camt->read($xml);
 
-print "** The content of the message.  Compare this with template to learn.\n";
-print $data->toString;
+# Translate the message in an XML file or XML::LibXML(::Document) into
+# a Perl data-structure.  Wow, this is all you need to do!
+
+my $data = $camt->read($xml);
 
 print "** The data is a ". (ref $data) . " object.\n";
 
+
+# Demonstrate how to produce a nice dump from the interpreted data.
+# This structure matches the one explained in the template examples,
+# which you can find in the github repository.
+
+print "** The content of the message.  Compare this with template to learn.\n";
+print $data->toPerl;
+
+
+# Demonstrate the JSON output
+
+print $data->toJSON;     # warning: bytes, so write with :raw
+
+
+# This demonstrates that you can use the standard and the long tagnames
+# to generate CAMT messages.
+
 if($outfile)
-{	print "** Writing the same data to file $outfile\n";
+{	print "** Writing the same data converted back to file $outfile\n";
 	$data->write($outfile);
 }
 

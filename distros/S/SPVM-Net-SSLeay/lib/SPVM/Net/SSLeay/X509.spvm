@@ -7,6 +7,9 @@ class Net::SSLeay::X509 : pointer {
   use Net::SSLeay::Error;
   use Net::SSLeay::X509_NAME;
   use Net::SSLeay::EVP_MD;
+  use Net::SSLeay::Constant as SSL;
+  use Net::SSLeay::ASN1_OBJECT;
+  use Net::SSLeay::X509_EXTENSION;
   
   use Fn;
   
@@ -27,13 +30,52 @@ class Net::SSLeay::X509 : pointer {
   
   native method digest : int ($type : Net::SSLeay::EVP_MD, $md : mutable string, $len_ref : int*);
   
+  method digest_return_string : string ($type : Net::SSLeay::EVP_MD) {
+    
+    my $md = (mutable string)new_string_len SSL->EVP_MAX_MD_SIZE;
+    my $len = 0;
+    
+    $self->digest($type, $md, \$len);
+    
+    Fn->shorten($md, $len);
+    
+    return $md;
+  }
+  
   native method pubkey_digest : int ($type : Net::SSLeay::EVP_MD, $md : mutable string, $len_ref : int*);
+  
+  method pubkey_digest_return_string : string ($type : Net::SSLeay::EVP_MD) {
+    
+    my $md = (mutable string)new_string_len SSL->EVP_MAX_MD_SIZE;
+    my $len = 0;
+    
+    $self->pubkey_digest($type, $md, \$len);
+    
+    Fn->shorten($md, $len);
+    
+    return $md;
+  }
   
   native method dup : Net::SSLeay::X509 ();
   
   native method check_issued : int ($subject : Net::SSLeay::X509);
   
-  native static method P_get_ocsp_uri : string ();
+  native method get_ocsp_uri : string ();
+  
+  method P_get_ocsp_uri : string () {
+    
+    warn "Net::SSLeay::X509#P_get_ocsp_uri method is deprecated.";
+    
+    return $self->get_ocsp_uri;
+  }
+  
+  native method get_ext_by_NID : int ($nid : int, $lastpos : int);
+  
+  native method get_ext_by_OBJ : int ($obj : Net::SSLeay::ASN1_OBJECT, $lastpos : int);
+  
+  native method get_ext_count : int ();
+  
+  native method get_ext : Net::SSLeay::X509_EXTENSION ($loc : int);
   
   native method DESTROY : void ();
   

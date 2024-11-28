@@ -23,7 +23,7 @@ sub import {
 1;
 
 __END__
-=pod
+
 =head1 NAME
 
 Perlmazing::Feature - Use strict and warnigns and enable all modern features from your Perl version in a single call. Currently, the maximum version features we

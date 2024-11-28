@@ -14,28 +14,40 @@ think about it.
 cpanm Random::Simple
 ```
 
+## 🗃️ Functions
+
+#### random_int($min, $max)
+returns a non-biased integer between `$min` and `$max` (inclusive). Range must be no larger than 2**32 - 2.
+
+#### random_float()
+returns a random floating point value between 0 and 1 (inclusive).
+
+#### random_bytes($number)
+returns a string of random bytes with length of `$number`.
+
 ## 💻 Usage
 
 ```perl
 use Random::Simple;
 
-my $integer = random_int($min, $max); # inclusive
-my $float   = random_float();         # 0 - 1 inclusive
-my $bytes   = random_bytes($count);   # string of X bytes
-
+my $coin_flip      = random_int(1, 2);
 my $die_roll       = random_int(1, 6);
 my $random_percent = random_float() * 100;
 my $buffer         = random_bytes(8);
+
+my @arr        = ('red', 'green', 'blue');
+my $rand_item  = $arr[random_int(0, @arr - 1)]; # Random array item
 ```
 
 ## 🧠 Methodology
 
-Perl's internal `rand()` function uses `drand48()` which is an older PRNG,
-and may have limitations. `Random::Simple` uses
+Perl's internal `rand()` function uses `drand48` which is an older
+pseudorandom number generator, and may have limitations. `Random::Simple` uses
 [PCG](https://www.pcg-random.org/download.html) which is: modern, simple,
-well vetted, and fast.
+well vetted, and fast. Using `Random::Simple` will upgrade/override the
+`rand()` function to use a better PRNG.
 
-`Random::Simple` is automatically seeded with high quality entropy directly
+`Random::Simple` is automatically seeded with entropy directly
 from your OS. On Linux this is `/dev/urandom` and on Windows it uses
 CryptGenRandom. You will get statistically unique random numbers
 automatically.

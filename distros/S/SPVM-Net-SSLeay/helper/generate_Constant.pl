@@ -1,13 +1,13 @@
 =pod
   
   # .spvm file
-  cat helper/constants.txt | perl helper/generate_Constant.pl Net::SSLeay::Constant spvm > tmp/Constant.spvm
+  cat helper/constants.txt | perl helper/generate_Constant.pl Net::SSLeay::Constant spvm > .tmp/Constant.spvm
 
   # .c file
-  cat helper/constants.txt | perl helper/generate_Constant.pl Net::SSLeay::Constant c > tmp/Constant.c
+  cat helper/constants.txt | perl helper/generate_Constant.pl Net::SSLeay::Constant c > .tmp/Constant.c
 
   # .pm file
-  cat helper/constants.txt | perl helper/generate_Constant.pl Net::SSLeay::Constant pm > tmp/Constant.pm
+  cat helper/constants.txt | perl helper/generate_Constant.pl Net::SSLeay::Constant pm > .tmp/Constant.pm
 
 =cut
 

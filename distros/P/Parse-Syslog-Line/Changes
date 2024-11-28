@@ -1,9 +1,101 @@
 ==================================================
-Changes from 2022-11-27 00:00:00 +0000 to present.
+Changes from 2022-11-29 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 5.4 at 2024-11-26 20:01:04 +0000
+version 6.0 at 2024-11-28 01:13:56 +0000
+----------------------------------------
+
+  Change: 03feb42143a10130f5ba401d481459fb1452e75f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-11-27 17:08:19 +0000
+
+    Fix bugs in test regeneration
+
+    When running `t/bin/create_test_entry.pl --regenerate --auto`, there was no
+    processing of the `options` in the test file. This was due to my horrible
+    choice to use package variables as configuration options. There's no easy
+    way to "reset" them, so I punted on fixing it.
+
+    This new version of the script forks a child and then munges the variables
+    in the child. This automagically "resets" the global state.
+
+    Use the new code to regenerate the `t/data` YAML. This just sorted keys,
+    everything works as intended. 
+
+  Change: 7619fb4416b87ec7dd9856cad24e72df37b0482d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-11-27 16:12:13 +0000
+
+    Version 6.0 - Migrate to Time::Moment
+
+    The `HTTP::Date::str2time()` is nice, but the `Time::Moment` is **SO MUCH**
+    faster. This reworks the code to use the `Time::Moment` interface.
+    Additionally, I'm making sense out of the date handling parameters.
+
+    I am removing support for `::DateTimeCreate` from this module. This was a
+    terrible idea and we don't need it. If you want to use `DateTime` objects
+    in your code do:
+
+    ```perl
+
+    use DateTime;
+
+    use Parse::Syslog::Line;
+
+    my $msg = parse_syslog_line(<>);
+
+    $msg{datetime_obj} = DateTime->from_epoch( epoch $msg->{epoch} ); ```
+
+    Field Updates ------------- * Added `datetime_utc` - The ISO8601 timestamp
+    as UTC * Added `datetime_local` - The ISO8601 timestamp in the timezone of
+    the local server * Updated `datetime_str` - The ISO8601 timestamp in
+    message local time * Deleted `datetime_obj` * Deleted `date_raw`
+
+    API Updates ----------- * `TimeMomentFormatString` added to control the
+    string formatting for dates * `DateTimeCreate` is **deprecated** *
+    `HiResFmt` is **deprecated**, use `TimeMomentFormatString` *
+    `NormalizeToUTC` is **deprecated**, every log now returns `datetime_utc` *
+    `OutputTimeZone` is **deprecated**, use `TimeMomentFormatString`
+
+    Supporting Updates ------------------ * Documentation updates *
+    Dependencies updated * Updates for the benchmarking tools * Tests updated
+    to pass with Time::Moment
+
+    There's some issues with `Time::Moment` and DST. In the tests, as in
+    production, check `datetime_utc` for those cases instead of using
+    `datetime_local` or `datetime_str`. 
+
+  Change: 60e84965c35c7e66752f48db288ffb076c81f6c0
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-11-27 12:19:52 +0000
+
+    Make Perl 5.14 used in all the places
+
+    * `use v5.14` everywhere * Update CLI options to `parse-syslog-line.pl` 
+
+  Change: 6fef9d1a7f67333fe9debb10ad9d8d7ebad12765
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-11-27 12:19:52 +0000
+
+    Updates for the basic benchmarking tool 
+
+  Change: 62e2979fc06ce690b96526cfba2967151e8de30d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-11-26 16:07:46 +0000
+
+    Updates the test library to make one place for sample data
+
+    * Adds `t/lib/test/Data.pm` to provide `get_test_data()` so tests and
+
+    benchmarks can all use the same body of messages. * Updates `t/00-load.t`
+    to check that the test data loads correctly
+
+    This was done so the tests and benchmarks share the same data. It also
+    prevents copy/pasta and makes things a bit more complete. 
+
+----------------------------------------
+version 5.4 at 2024-11-26 19:59:13 +0000
 ----------------------------------------
 
   Change: 5af3b79a294614272c84c4caff77ad247bd87a33
@@ -202,5 +294,5 @@ version 5.1 at 2024-05-24 18:17:59 +0000
     Attempt to enable GitHub Actions to run the test suite. 
 
 =================================================
-Plus 39 releases after 2022-11-27 00:00:00 +0000.
+Plus 39 releases after 2022-11-29 00:00:00 +0000.
 =================================================

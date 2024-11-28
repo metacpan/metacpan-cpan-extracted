@@ -60,7 +60,7 @@ sub get_user_info {
     my $self = shift;
     my %params = @_;
 
-    return $self->client()->get("/auth/v1/info", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

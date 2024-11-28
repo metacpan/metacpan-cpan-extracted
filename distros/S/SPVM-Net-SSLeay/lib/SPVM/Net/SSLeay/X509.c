@@ -18,9 +18,9 @@ int32_t SPVM__Net__SSLeay__X509__get_issuer_name(SPVM_ENV* env, SPVM_VALUE* stac
   
   void* obj_self = stack[0].oval;
   
-  X509* x509 = env->get_pointer(env, stack, obj_self);
+  X509* self = env->get_pointer(env, stack, obj_self);
   
-  X509_NAME* x509_name = X509_get_issuer_name(x509);
+  X509_NAME* x509_name = X509_get_issuer_name(self);
   
   assert(x509_name);
   
@@ -44,9 +44,9 @@ int32_t SPVM__Net__SSLeay__X509__get_subject_name(SPVM_ENV* env, SPVM_VALUE* sta
   
   void* obj_self = stack[0].oval;
   
-  X509* x509 = env->get_pointer(env, stack, obj_self);
+  X509* self = env->get_pointer(env, stack, obj_self);
   
-  X509_NAME* x509_name = X509_get_subject_name(x509);
+  X509_NAME* x509_name = X509_get_subject_name(self);
   
   assert(x509_name);
   
@@ -76,7 +76,7 @@ int32_t SPVM__Net__SSLeay__X509__digest(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t* len_ref = stack[3].iref;
   
-  X509* x509 = env->get_pointer(env, stack, obj_self);
+  X509* self = env->get_pointer(env, stack, obj_self);
   
   if (!obj_type) {
     return env->die(env, stack, "The digest type $type must be defined.", __func__, FILE_NAME, __LINE__);
@@ -96,7 +96,7 @@ int32_t SPVM__Net__SSLeay__X509__digest(SPVM_ENV* env, SPVM_VALUE* stack) {
   char* md = (char*)env->get_chars(env, stack, obj_md);
   
   unsigned int len_tmp = 0;
-  int32_t status = X509_digest(x509, type, md, &len_tmp);
+  int32_t status = X509_digest(self, type, md, &len_tmp);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -130,7 +130,7 @@ int32_t SPVM__Net__SSLeay__X509__pubkey_digest(SPVM_ENV* env, SPVM_VALUE* stack)
   
   int32_t* len_ref = stack[3].iref;
   
-  X509* x509 = env->get_pointer(env, stack, obj_self);
+  X509* self = env->get_pointer(env, stack, obj_self);
   
   if (!obj_type) {
     return env->die(env, stack, "The digest type $type must be defined.", __func__, FILE_NAME, __LINE__);
@@ -150,7 +150,7 @@ int32_t SPVM__Net__SSLeay__X509__pubkey_digest(SPVM_ENV* env, SPVM_VALUE* stack)
   char* md = (char*)env->get_chars(env, stack, obj_md);
   
   unsigned int len_tmp = 0;
-  int32_t status = X509_pubkey_digest(x509, type, md, &len_tmp);
+  int32_t status = X509_pubkey_digest(self, type, md, &len_tmp);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -178,9 +178,9 @@ int32_t SPVM__Net__SSLeay__X509__dup(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  X509* x509 = env->get_pointer(env, stack, obj_self);
+  X509* self = env->get_pointer(env, stack, obj_self);
   
-  X509* x509_dup = X509_dup(x509);
+  X509* x509_dup = X509_dup(self);
   
   assert(x509_dup);
   
@@ -205,7 +205,7 @@ int32_t SPVM__Net__SSLeay__X509__check_issued(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   void* obj_subject = stack[1].oval;
   
-  X509* x509 = env->get_pointer(env, stack, obj_self);
+  X509* self = env->get_pointer(env, stack, obj_self);
   
   if (!obj_subject) {
     return env->die(env, stack, "The X509 object $subject must be defined.", __func__, FILE_NAME, __LINE__);
@@ -213,22 +213,22 @@ int32_t SPVM__Net__SSLeay__X509__check_issued(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   X509* subject = env->get_pointer(env, stack, obj_subject);
   
-  int32_t status = X509_check_issued(x509, subject);
+  int32_t status = X509_check_issued(self, subject);
   
   stack[0].ival = status;
   
   return 0;
 }
 
-int32_t SPVM__Net__SSLeay__X509__P_get_ocsp_uri(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Net__SSLeay__X509__get_ocsp_uri(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
   void* obj_self = stack[0].oval;
   
-  X509* x509 = env->get_pointer(env, stack, obj_self);
+  X509* self = env->get_pointer(env, stack, obj_self);
   
-  AUTHORITY_INFO_ACCESS* info = X509_get_ext_d2i(x509, NID_info_access, NULL, NULL);
+  AUTHORITY_INFO_ACCESS* info = X509_get_ext_d2i(self, NID_info_access, NULL, NULL);
   
   void* obj_ocsp_uri = NULL;
   
@@ -253,16 +253,144 @@ int32_t SPVM__Net__SSLeay__X509__P_get_ocsp_uri(SPVM_ENV* env, SPVM_VALUE* stack
   return 0;
 }
 
+int32_t SPVM__Net__SSLeay__X509__get_ext_by_NID(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  int32_t nid = stack[1].ival;
+  
+  int32_t lastpos = stack[2].ival;
+  
+  X509* self = env->get_pointer(env, stack, obj_self);
+  
+  int32_t index = X509_get_ext_by_NID(self, nid, lastpos);
+  
+  int32_t success = index != -1;
+  if (!success) {
+    int64_t ssl_error = ERR_peek_last_error();
+    
+    char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
+    ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
+    
+    env->die(env, stack, "[OpenSSL Error]X509_get_ext_by_NID failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+    
+    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    
+    return error_id;
+  }
+  
+  stack[0].ival = index;
+  
+  return 0;
+}
+
+int32_t SPVM__Net__SSLeay__X509__get_ext_by_OBJ(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  void* obj_obj = stack[1].oval;
+  
+  int32_t lastpos = stack[2].ival;
+  
+  X509* self = env->get_pointer(env, stack, obj_self);
+  
+  if (!obj_obj) {
+    return env->die(env, stack, "The ASN1_OBJECT object $obj must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  ASN1_OBJECT* obj = env->get_pointer(env, stack, obj_obj);
+  
+  int32_t index = X509_get_ext_by_OBJ(self, obj, lastpos);
+  
+  int32_t success = index != -1;
+  if (!success) {
+    int64_t ssl_error = ERR_peek_last_error();
+    
+    char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
+    ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
+    
+    env->die(env, stack, "[OpenSSL Error]X509_get_ext_by_OBJ failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+    
+    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    
+    return error_id;
+  }
+  
+  stack[0].ival = index;
+  
+  return 0;
+}
+
+int32_t SPVM__Net__SSLeay__X509__get_ext_count(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  X509* self = env->get_pointer(env, stack, obj_self);
+  
+  int32_t ext_count = X509_get_ext_count(self);
+  
+  stack[0].ival = ext_count;
+  
+  return 0;
+}
+
+int32_t SPVM__Net__SSLeay__X509__get_ext(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  int32_t loc = stack[1].ival;
+  
+  X509* self = env->get_pointer(env, stack, obj_self);
+  
+  X509_EXTENSION* x509_ext = X509_get_ext(self, loc);
+  
+  if (!x509_ext) {
+    int64_t ssl_error = ERR_peek_last_error();
+    
+    char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
+    ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
+    
+    env->die(env, stack, "[OpenSSL Error]X509_get_ext failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+    
+    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    
+    return error_id;
+  }
+  
+  void* obj_address_x509_ext = env->new_pointer_object_by_name(env, stack, "Address", x509_ext, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  stack[0].oval = obj_address_x509_ext;
+  env->call_class_method_by_name(env, stack, "Net::SSLeay::X509_EXTENSION", "new_with_pointer", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  void* obj_x509_ext = stack[0].oval;
+  env->set_no_free(env, stack, obj_x509_ext, 1);
+  
+  env->set_field_object_by_name(env, stack, obj_x509_ext, "ref_x509", obj_self, &error_id, __func__, FILE_NAME, __LINE__); 
+  if (error_id) { return error_id; }
+  
+  stack[0].oval = obj_x509_ext;
+  
+  return 0;
+}
+
 int32_t SPVM__Net__SSLeay__X509__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
   void* obj_self = stack[0].oval;
   
-  X509* pointer = env->get_pointer(env, stack, obj_self);
+  X509* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    X509_free(pointer);
+    X509_free(self);
   }
   
   return 0;

@@ -3,7 +3,13 @@
 
 class Net::SSLeay::OBJ {
   
+  use Net::SSLeay::ASN1_OBJECT;
+  
   # Class Methods
   native static method txt2nid : int ($s : string);
+  
+  native static method nid2obj : Net::SSLeay::ASN1_OBJECT ($n : int);
+  
+  native static method obj2nid : int ($o : Net::SSLeay::ASN1_OBJECT);
   
 }

@@ -1,0 +1,30 @@
+requires 'perl', '5.024000';
+
+requires 'Data::Annotation';
+requires 'Data::HexDump::XXD';
+requires 'Email::Address::XS';
+requires 'Log::Any';
+requires 'Log::Any::Adapter';
+requires 'Log::Any::Adapter::Log4perlTiny';
+requires 'Log::Log4perl::Tiny';
+requires 'MIME::Parser';
+requires 'Minion';
+requires 'Module::Runtime';
+requires 'Mojolicious';
+requires 'Moo';
+requires 'namespace::clean';
+requires 'Net::Server::Mail';
+requires 'Net::Subnet';
+requires 'Ouch';
+requires 'Try::Catch';
+
+on test => sub {
+   requires 'Path::Tiny',      '0.084';
+};
+
+on develop => sub {
+   requires 'Path::Tiny',          '0.084';
+   requires 'Template::Perlish',   '1.52';
+   requires 'Test::Pod::Coverage', '1.04';
+   requires 'Test::Pod',           '1.51';
+};

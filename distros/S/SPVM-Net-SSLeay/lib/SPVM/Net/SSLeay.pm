@@ -1,6 +1,6 @@
 package SPVM::Net::SSLeay;
 
-our $VERSION = "0.018";
+our $VERSION = "0.019";
 
 1;
 
@@ -424,11 +424,23 @@ C<method get0_next_proto_negotiated : void ($data_ref : string[], $len_ref : int
 
 Calls native L<SSL_get0_next_proto_negotiated|https://docs.openssl.org/master/man3/SSL_get_certificate> function given the pointer value of the instance, $data_ref, $len_ref.
 
+=head2 get0_next_proto_negotiated_return_string
+
+C<method get0_next_proto_negotiated_return_string : string ()>
+
+Calls L</"get0_next_proto_negotiated"> method given appropriate arguments, and returns the output string.
+
 =head2 get0_alpn_selected
 
 C<method get0_alpn_selected : void ($data_ref : string[], $len_ref : int*);>
 
 Calls native L<SSL_get0_alpn_selected|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb> function given the pointer value of the instance, $data_ref, $len_ref.
+
+=head2 get0_alpn_selected_return_string
+
+C<method get0_alpn_selected_return_string : string ()>
+
+Calls L</"get0_alpn_selected"> method given appropriate arguments, and returns the output string.
 
 =head2 get_peer_cert_chain
 
@@ -452,13 +464,19 @@ Returns the value of L</"ssl_ctx"> field.
 
 C<method set_msg_callback : void ($cb : L<Net::SSLeay::Callback::Msg|SPVM::Net::SSLeay::Callback::Msg>, $arg : object = undef);>
 
-Calls native L<SSL_set_msg_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_msg_callback> function given $cb, $arg, and returns its return value.
+Calls native L<SSL_set_msg_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_msg_callback> function given the pointer value of the instance, $cb, $arg, and returns its return value.
 
-=head2 P_dump_peer_certificate
+=head2 dump_peer_certificate
 
-C<static method P_dump_peer_certificate : string ();>
+C<static method dump_peer_certificate : string ();>
 
 Returns the same output of Perl's L<Net::SSLeay#dump_peer_certificate|https://metacpan.org/dist/Net-SSLeay/view/lib/Net/SSLeay.pod#Convenience-routines> function.
+
+=head2 get_tlsext_status_type
+
+C<method get_tlsext_status_type : long ();>
+
+Calls native L<SSL_get_tlsext_status_type|https://docs.openssl.org/master/man3/SSL_CTX_set_tlsext_status_cb> function given the pointer value of the instance, and returns its return value.
 
 =head2 DESTROY
 

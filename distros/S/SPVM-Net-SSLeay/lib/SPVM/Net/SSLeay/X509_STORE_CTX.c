@@ -85,9 +85,9 @@ int32_t SPVM__Net__SSLeay__X509_STORE_CTX__set_error(SPVM_ENV* env, SPVM_VALUE* 
   
   int32_t s = stack[1].ival;
   
-  X509_STORE_CTX* x509_store_ctx = env->get_pointer(env, stack, obj_self);
+  X509_STORE_CTX* self = env->get_pointer(env, stack, obj_self);
   
-  X509_STORE_CTX_set_error(x509_store_ctx, s);
+  X509_STORE_CTX_set_error(self, s);
   
   return 0;
 }
@@ -98,9 +98,9 @@ int32_t SPVM__Net__SSLeay__X509_STORE_CTX__get_error(SPVM_ENV* env, SPVM_VALUE* 
   
   void* obj_self = stack[0].oval;
   
-  X509_STORE_CTX* x509_store_ctx = env->get_pointer(env, stack, obj_self);
+  X509_STORE_CTX* self = env->get_pointer(env, stack, obj_self);
   
-  int32_t error = X509_STORE_CTX_get_error(x509_store_ctx);
+  int32_t error = X509_STORE_CTX_get_error(self);
   
   stack[0].ival = error;
   
@@ -113,9 +113,9 @@ int32_t SPVM__Net__SSLeay__X509_STORE_CTX__get_error_depth(SPVM_ENV* env, SPVM_V
   
   void* obj_self = stack[0].oval;
   
-  X509_STORE_CTX* x509_store_ctx = env->get_pointer(env, stack, obj_self);
+  X509_STORE_CTX* self = env->get_pointer(env, stack, obj_self);
   
-  int32_t error_depth = X509_STORE_CTX_get_error_depth(x509_store_ctx);
+  int32_t error_depth = X509_STORE_CTX_get_error_depth(self);
   
   stack[0].ival = error_depth;
   
@@ -128,9 +128,9 @@ int32_t SPVM__Net__SSLeay__X509_STORE_CTX__get_current_cert(SPVM_ENV* env, SPVM_
   
   void* obj_self = stack[0].oval;
   
-  X509_STORE_CTX* x509_store_ctx = env->get_pointer(env, stack, obj_self);
+  X509_STORE_CTX* self = env->get_pointer(env, stack, obj_self);
   
-  X509* x509 = X509_STORE_CTX_get_current_cert(x509_store_ctx);
+  X509* x509 = X509_STORE_CTX_get_current_cert(self);
   
   void* obj_x509 = NULL;
   
@@ -161,7 +161,7 @@ int32_t SPVM__Net__SSLeay__X509_STORE_CTX__Init(SPVM_ENV* env, SPVM_VALUE* stack
   
   void* obj_untrusted_array = stack[3].oval;
   
-  X509_STORE_CTX* x509_store_ctx = env->get_pointer(env, stack, obj_self);
+  X509_STORE_CTX* self = env->get_pointer(env, stack, obj_self);
   
   if (!obj_trust_store) {
     return env->die(env, stack, "The X509_STORE object $trust_store must be defined.", __func__, FILE_NAME, __LINE__);
@@ -189,7 +189,7 @@ int32_t SPVM__Net__SSLeay__X509_STORE_CTX__Init(SPVM_ENV* env, SPVM_VALUE* stack
     sk_X509_push(sk_X509, X509);
   }
   
-  int32_t status = X509_STORE_CTX_init(x509_store_ctx, trust_store, target, sk_X509);
+  int32_t status = X509_STORE_CTX_init(self, trust_store, target, sk_X509);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -215,10 +215,10 @@ int32_t SPVM__Net__SSLeay__X509_STORE_CTX__DESTROY(SPVM_ENV* env, SPVM_VALUE* st
   
   void* obj_self = stack[0].oval;
   
-  X509_STORE_CTX* pointer = env->get_pointer(env, stack, obj_self);
+  X509_STORE_CTX* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    X509_STORE_CTX_free(pointer);
+    X509_STORE_CTX_free(self);
   }
   
   return 0;

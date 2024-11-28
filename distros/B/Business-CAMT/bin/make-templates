@@ -35,14 +35,19 @@ my $camt    = Business::CAMT->new;
 my %abbrevs;
 
 foreach my $version ($camt->knownVersions)
-{	$camt->schemas->importDefinitions("$xsddir/$version.xsd");
-	my $ns   = "$urnbase:$version";
+{	my $schema = "$xsddir/$version.xsd";
+	$camt->schemas->importDefinitions($schema);
 
+	my $ns   = "$urnbase:$version";
 	my $dump = $camt->schemas->template(PERL => "{$ns}Document");
 
 	my $fn   = "$templs/$version.dd";
-	open my $fh, '>:encoding(UTF-8)', $fn or fault $fn;
-	$fh->print($dump);
+	if(! -f $fn || -M $schema < -M $fn)
+	{	say " - creating/updating $version";
+		open my $fh, '>:encoding(UTF-8)', $fn or fault $fn;
+		$fh->print($dump);
+		$fh->close;
+	}
 
 	$abbrevs{$_}++ for $dump =~ /^\s*(\w+)\s+\=\>/gm;
 }
@@ -53,14 +58,15 @@ delete $abbrevs{$_} for qw/_ ANY/;
 ## Detect missing abbreviations
 #
 
-say "Detected unique tags: " . keys %abbrevs;
+say "Build long_tagnames index";
+say "- detected unique tags: " . keys %abbrevs;
 
 my %umltags = reverse map split(/\,/, $_, 2),
 	read_lines "$tagdir/abbreviations.csv";
 
 #warn Dumper \%umltags;
 
-say "UML list of abbreviations: " . keys %umltags;
+say "- UML list of abbreviations: " . keys %umltags;
 
 my %index;
 foreach my $abbrev (keys %abbrevs)
@@ -69,21 +75,28 @@ foreach my $abbrev (keys %abbrevs)
 	}
 }
 
-say "Used UML abbreviations: " . keys %index;
-say "Unused UML abbreviations: " , (keys %umltags) - (keys %index);
+say "- used UML abbreviations: " . keys %index;
+say "- unused UML abbreviations: " , (keys %umltags) - (keys %index);
 
 my %current = map split(/,/, $_, 2), read_lines "$tagdir/index.csv";
 
-say "Please remove tag: $_"
+say "- please remove tag: $_"
 	for grep !$abbrevs{$_}, sort keys %current;
 
-say "UML defines $_ as $index{$_}, overruled as $current{$_}"
+say "- UML defines $_ as $index{$_}, overruled as $current{$_}"
 	for grep $current{$_} && $index{$_} && $current{$_} ne $index{$_}, sort keys %current;
 
-$current{$_} ||= $umltags{$_} || '' for keys %abbrevs;
-say "Missing long names: " . (grep $current{$_} eq '', keys %current);
+my @added = grep !exists $current{$_}, keys %abbrevs;
 
-write_text "$tagdir/index.csv", join '', map "$_,$current{$_}\n", sort keys %current;
+if(@added)
+{   $current{$_} ||= $umltags{$_} || '' for @added;
+
+	say "- updating index file.";
+    write_text "$tagdir/index.csv", join '',
+	    map "$_,$current{$_}\n", sort keys %current;
+}
+
+say "- missing long names: " . (grep $_ eq '', values %current);
 
 #
 ## Create templates with long names
@@ -93,16 +106,22 @@ say "Creating templates with full size tags.";
 my $camt2    = Business::CAMT->new(long_tagnames => 1);
 
 foreach my $version ($camt2->knownVersions)
-{	$camt2->schemas->importDefinitions("$xsddir/$version.xsd");
+{	my $schema = "$xsddir/$version.xsd";
+	$camt2->schemas->importDefinitions($schema);
+
  	my $ns   = "$urnbase:$version";
 	my $fn   = "$templs2/$version.dd";
-	open my $fh, '>:encoding(UTF-8)', $fn or fault $fn;
 
-	$fh->print($camt2->schemas->template(PERL => "{$ns}Document",
-        key_rewrite   => $camt2->tag2fullnameTable,
-	));
+	if(! -f $fn || -M $schema < -M $fn)
+	{	say " - creating/updating $fn";
+		open my $fh, '>:encoding(UTF-8)', $fn or fault $fn;
 
-	$fh->close;
+		$fh->print($camt2->schemas->template(PERL => "{$ns}Document",
+        	key_rewrite   => $camt2->tag2fullnameTable,
+		));
+		$fh->close;
+	}
+
 }
 
 exit 0

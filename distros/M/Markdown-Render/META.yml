@@ -22,7 +22,7 @@ no_index:
 provides:
   Markdown::Render:
     file: lib/Markdown/Render.pm
-    version: v1.60.1
+    version: v1.60.2
 requires:
   Class::Accessor::Fast: '0.51'
   Config::Tiny: '2.28'
@@ -33,5 +33,5 @@ requires:
   LWP::UserAgent: '6.77'
   Readonly: '2.05'
   perl: '5.016'
-version: v1.60.1
+version: v1.60.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

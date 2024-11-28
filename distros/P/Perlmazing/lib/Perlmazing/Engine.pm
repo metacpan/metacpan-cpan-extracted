@@ -22,7 +22,7 @@ sub loaded_symbols {
 	my $self = shift;
 	my $package = (shift or caller);
 	return unless exists $loaded_symbols->{$package};
-	keys %{$loaded_symbols->{$package}};
+    return sort keys %{$loaded_symbols->{$package}};
 }
 
 sub preload {
@@ -213,7 +213,7 @@ package Perlmazing::Listable;
 1;
 
 __END__
-=pod
+
 =head1 NAME
 
 Perlmazing::Engine - Have your functions load their code and associated modules only when needed, automagically.

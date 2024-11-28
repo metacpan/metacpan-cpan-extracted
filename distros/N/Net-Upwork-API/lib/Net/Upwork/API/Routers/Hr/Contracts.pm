@@ -71,7 +71,7 @@ sub suspend_contract {
     my $reference = shift;
     my %params = @_;
 
-    return $self->client()->put("/hr/v2/contracts/" . $reference . "/suspend", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item restart_contract
@@ -99,7 +99,7 @@ sub restart_contract {
     my $reference = shift;
     my %params = @_;
 
-    return $self->client()->put("/hr/v2/contracts/" . $reference . "/restart", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item end_contract
@@ -127,7 +127,7 @@ sub end_contract {
     my $reference = shift;
     my %params = @_;
 
-    return $self->client()->delete("/hr/v2/contracts/" . $reference, %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

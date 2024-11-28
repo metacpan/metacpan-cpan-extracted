@@ -16,18 +16,18 @@ int32_t SPVM__Net__SSLeay__OPENSSL_INIT__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  OPENSSL_INIT_SETTINGS* settings = OPENSSL_INIT_new();
+  OPENSSL_INIT_SETTINGS* self = OPENSSL_INIT_new();
   
-  assert(settings);
+  assert(self);
   
-  void* obj_address_settings = env->new_pointer_object_by_name(env, stack, "Address", settings, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_address_self = env->new_pointer_object_by_name(env, stack, "Address", self, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
-  stack[0].oval = obj_address_settings;
+  stack[0].oval = obj_address_self;
   env->call_class_method_by_name(env, stack, "Net::SSLeay::OPENSSL_INIT_SETTINGS", "new_with_pointer", 1, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
-  void* obj_settings = stack[0].oval;
+  void* obj_self = stack[0].oval;
   
-  stack[0].oval = obj_settings;
+  stack[0].oval = obj_self;
   
   return 0;
 }
@@ -43,7 +43,7 @@ int32_t SPVM__Net__SSLeay__OPENSSL_INIT__set_config_filename(SPVM_ENV* env, SPVM
   
   void* obj_filename = stack[1].oval;
   
-  OPENSSL_INIT_SETTINGS* settings = env->get_pointer(env, stack, obj_self);
+  OPENSSL_INIT_SETTINGS* self = env->get_pointer(env, stack, obj_self);
   
   if (!obj_filename) {
     return env->die(env, stack, "The file name $filename must be defined.", __func__, FILE_NAME, __LINE__);
@@ -51,7 +51,7 @@ int32_t SPVM__Net__SSLeay__OPENSSL_INIT__set_config_filename(SPVM_ENV* env, SPVM
   
   const char* filename = env->get_chars(env, stack, obj_filename);
   
-  int32_t status = OPENSSL_INIT_set_config_filename(settings, filename);
+  int32_t status = OPENSSL_INIT_set_config_filename(self, filename);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -83,9 +83,9 @@ int32_t SPVM__Net__SSLeay__OPENSSL_INIT__set_config_file_flags(SPVM_ENV* env, SP
   
   int64_t flags = stack[1].lval;
   
-  OPENSSL_INIT_SETTINGS* settings = env->get_pointer(env, stack, obj_self);
+  OPENSSL_INIT_SETTINGS* self = env->get_pointer(env, stack, obj_self);
   
-  OPENSSL_INIT_set_config_file_flags(settings, flags);
+  OPENSSL_INIT_set_config_file_flags(self, flags);
   
   return 0;
 #endif
@@ -102,7 +102,7 @@ int32_t SPVM__Net__SSLeay__OPENSSL_INIT__set_config_appname(SPVM_ENV* env, SPVM_
   
   void* obj_name = stack[1].oval;
   
-  OPENSSL_INIT_SETTINGS* settings = env->get_pointer(env, stack, obj_self);
+  OPENSSL_INIT_SETTINGS* self = env->get_pointer(env, stack, obj_self);
   
   if (!obj_name) {
     return env->die(env, stack, "The app name $name must be defined.", __func__, FILE_NAME, __LINE__);
@@ -110,7 +110,7 @@ int32_t SPVM__Net__SSLeay__OPENSSL_INIT__set_config_appname(SPVM_ENV* env, SPVM_
   
   const char* name = env->get_chars(env, stack, obj_name);
   
-  int32_t status = OPENSSL_INIT_set_config_appname(settings, name);
+  int32_t status = OPENSSL_INIT_set_config_appname(self, name);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();

@@ -14,9 +14,9 @@ int32_t SPVM__Net__SSLeay__OCSP_REQUEST__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  OCSP_REQUEST* pointer = OCSP_REQUEST_new();
+  OCSP_REQUEST* self = OCSP_REQUEST_new();
   
-  if (!pointer) {
+  if (!self) {
     int64_t ssl_error = ERR_peek_last_error();
     
     char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
@@ -29,7 +29,7 @@ int32_t SPVM__Net__SSLeay__OCSP_REQUEST__new(SPVM_ENV* env, SPVM_VALUE* stack) {
     return error_id;
   }
   
-  void* obj_address_pointer = env->new_pointer_object_by_name(env, stack, "Address", pointer, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_address_pointer = env->new_pointer_object_by_name(env, stack, "Address", self, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   stack[0].oval = obj_address_pointer;
   env->call_class_method_by_name(env, stack, "Net::SSLeay::OCSP_REQUEST", "new_with_pointer", 1, &error_id, __func__, FILE_NAME, __LINE__);
@@ -47,10 +47,10 @@ int32_t SPVM__Net__SSLeay__OCSP_REQUEST__DESTROY(SPVM_ENV* env, SPVM_VALUE* stac
   
   void* obj_self = stack[0].oval;
   
-  OCSP_REQUEST* pointer = env->get_pointer(env, stack, obj_self);
+  OCSP_REQUEST* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    OCSP_REQUEST_free(pointer);
+    OCSP_REQUEST_free(self);
   }
   
   return 0;

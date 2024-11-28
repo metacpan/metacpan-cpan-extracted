@@ -3782,6 +3782,18 @@ C<static method OPENSSL_INIT_NO_ATEXIT : int ();>
 
 Returns the value of C<OPENSSL_INIT_NO_ATEXIT>. If this constant is not defined on the system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
+=head2 TLSEXT_NAMETYPE_host_name
+
+C<static method TLSEXT_NAMETYPE_host_name : int ();>
+
+Returns the value of C<TLSEXT_NAMETYPE_host_name>. If this constant is not defined on the system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 EVP_MAX_MD_SIZE
+
+C<static method EVP_MAX_MD_SIZE : int ();>
+
+Returns the value of C<EVP_MAX_MD_SIZE>. If this constant is not defined on the system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
 =head1 See Also
 
 =over 2

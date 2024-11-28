@@ -71,7 +71,7 @@ sub submit_bonus {
     my $team_reference = shift;
     my %params = @_;
 
-    return $self->client()->post("/hr/v2/teams/" . $team_reference . "/adjustments", %params);
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

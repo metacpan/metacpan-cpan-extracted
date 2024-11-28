@@ -3,48 +3,37 @@ use Perlmazing::Engine;
 use Perlmazing::Engine::Exporter;
 use Perlmazing::Feature;
 use Win32::Symlinks;
-our $VERSION = '2.0006';
-our @EXPORT = qw(pl dumped define time localtime gmtime mkdir rmdir sleep stat);
+our $VERSION = '2.0014';
 our @found_symbols = Perlmazing::Engine->found_symbols;
 our %EXPORT_TAGS = (
-    all => \@found_symbols,
+  all => \@found_symbols,
+  default => [qw(pl dumped define time localtime gmtime mkdir rmdir sleep stat )],
+  context => [qw(list_context no_void scalar_context void_context )],
+  crypt => [qw(aes_decrypt aes_encrypt md5 md5_file )],
+  error => [qw(carp cluck confess croak longmess shortmess )],
+  file => [qw(abs2rel basename catdir catfile catpath copy cwd devnull dir dirname empty_dir move rel2abs slurp splitdir splitpath unix_path windows_path )],
+  object => [qw(find_parent_classes is_array is_blessed is_code is_filehandle is_format is_glob is_hash is_io is_lvalue is_ref is_regexp is_scalar is_vstring isa_array isa_code isa_filehandle isa_format isa_glob isa_hash isa_io isa_lvalue isa_ref isa_regexp isa_scalar isa_vstring unbless )],
+  string => [qw(commify escape_html escape_quote escape_quotes escape_uri eval_string is_email_address is_empty is_number is_utf8 not_empty numeric replace_accented_characters to_number to_string to_utf8 trim truncate_text unescape_html unescape_uri )],
+  time => [qw(get_time_from gmtime_hashref is_leap_year is_valid_date time_hashref timegm timelocal localtime_ts gmtime_ts)],
+  variables => [qw(in_array merge remove_duplicates shuffle sort_by_key sort_by_value taint tainted untaint )],
 );
+our @EXPORT = @{$EXPORT_TAGS{default}};
 
 Perlmazing::Engine->precompile;
 
 Perlmazing::Engine->preload(
-	qw(
-		
-	)
+  qw(
+  
+  )
 );
 
 no warnings 'redefine';
 sub import {
-	my $self = shift;
-	my @call = caller;
-	Perlmazing::Feature->import;
-	warnings->import(FATAL => qw(closed unopened numeric recursion syntax uninitialized));
-	if (@_) {
-		my (@YES, @NO);
-		for my $i (@_) {
-			if ($i =~ /^!(.*?)$/) {
-				push @NO, $1;
-			} else {
-				push @YES, $i;
-			}
-		}
-		for my $i (@YES, @NO) {
-			croak "Symbol '$i' is not exported by the Perlmazing module" unless (grep {$i eq ":$_"} keys %EXPORT_TAGS) or (grep {$i eq $_} @found_symbols);
-		}
-		if (@YES and @NO) {
-			@EXPORT = @YES;
-		} elsif (@YES) {
-            for my $i (@YES) {
-                push (@EXPORT, $i) unless grep {$i eq $_} @EXPORT;
-            }
-		}
-	}
-	$self->SUPER::import;
+  my $self = shift;
+  my @call = caller;
+  Perlmazing::Feature->import;
+  warnings->import(FATAL => qw(closed unopened numeric recursion syntax uninitialized));
+  $self->SUPER::import(@_);
 }
 
 1;
@@ -71,27 +60,80 @@ You can set the value of $Perlmazing::Feature::VERSION to $] or to any other lim
 
 How this module works at the end:
 
-    use Perlmazing; # or use Perlmazing qw(function1 function2 ...);
-    
-    # First of all, Perlmazing::Feature is automatically imported,
-    # so warnings and strict are automatically enabled and also
-    # any features that your version of Perl can have (similar to
-    # "use $]" (maxed to 5.028), if only that was a valid call)
-    
-    # Now all helper functions are available. Yes, it exports
-    # all symbols by default. Please read the rest of this POD
-    # to understand why and when it's considered a good thing.
-    
-    # Now use any of the helper functions from this module freely!
+  use Perlmazing; # or use Perlmazing qw(function1 function2 ...);
+  
+  # First of all, Perlmazing::Feature is automatically imported,
+  # so warnings and strict are automatically enabled and also
+  # any features that your version of Perl can have (similar to
+  # "use $]" (maxed to 5.028), if only that was a valid call)
+  
+  # Please read on the next section to learn about exported symbols.
     
 
 =head1 EXPORT
 
 In the case of this module, all documented functions are exported by default in versions previous to v2.
-Beggining with v2, only 'pl', 'dumped', 'define' are default now. Also, any function that matches a CORE
-function name (e.g. time, rmdir, stat, etc).
-        
-That doesn't mean you have to work like that in your own module when using L<Perlmazing::Engine>. It also doesn't mean
+Beginning with v2, only 'pl', 'dumped', 'define' are default now. Also, any function that matches a CORE
+function name (specifically: time, localtime, gmtime, mkdir, rmdir, sleep and stat).
+
+These implicitly imported funcions are set in the export tag :default. If you don't want any of the default
+functions imported, then you have two options:
+
+  # Call Perlmazing without any imports eanbled:
+  use Perlmazing qw();
+  
+  # Or call the default tag like this:
+  use Perlmazing qw( !:default );
+  
+  # Which enables you to specify only certain functions from the default tag without the rest:
+  use Perlmazing qw( pl time !:default );
+  
+  # Keep in mind that the order takes precedence. If you first say no to something and later yes, "no" will win.
+  use Perlmazing qw( !:default pl time ); # Won't work as pl and time are part of :default
+
+You have these export tags available for convenience (since version 2.008):
+
+:default
+
+  define, dumped, gmtime, localtime, mkdir, pl, rmdir, sleep, stat, time
+
+:all
+
+  _is_ref, _isa_ref, abs2rel, abs_path, aes_decrypt, aes_encrypt, basename, carp, catdir, catfile, catpath, cluck, commify, confess, copy, croak, cwd, define, devnull, dir, dirname, dumped, empty_dir, escape_html, escape_quote, escape_quotes, escape_uri, eval_string, find_parent_classes, get_aes_cipher, get_time_from, gmtime, gmtime_hashref, in_array, is_array, is_blessed, is_code, is_email_address, is_empty, is_filehandle, is_format, is_glob, is_hash, is_io, is_leap_year, is_lvalue, is_number, is_ref, is_regexp, is_scalar, is_utf8, is_valid_date, is_vstring, isa_array, isa_code, isa_filehandle, isa_format, isa_glob, isa_hash, isa_io, isa_lvalue, isa_ref, isa_regexp, isa_scalar, isa_vstring, list_context, localtime, longmess, md5, md5_file, merge, mkdir, move, no_void, not_empty, numeric, pl, rel2abs, remove_duplicates, replace_accented_characters, rmdir, scalar_context, shortmess, shuffle, sleep, slurp, sort_by_key, sort_by_value, splitdir, splitpath, stat, taint, tainted, time, time_hashref, timegm, timelocal, to_number, to_string, to_utf8, trim, truncate_text, unescape_html, unescape_uri, untaint, unweaken, void_context, weaken
+
+:context
+
+  list_context, no_void, scalar_context, void_context
+
+:crypt
+
+  aes_decrypt, aes_encrypt, md5, md5_file
+
+:error
+
+  carp, cluck, confess, croak, longmess, shortmess
+
+:file
+
+  abs2rel, basename, catdir, catfile, catpath, copy, cwd, devnull, dir, dirname, empty_dir, move, rel2abs, slurp, splitdir, splitpath, unix_path, windows_path
+
+:object
+
+  find_parent_classes, is_array, is_blessed, is_code, is_filehandle, is_format, is_glob, is_hash, is_io, is_lvalue, is_ref, is_regexp, is_scalar, is_vstring, isa_array, isa_code, isa_filehandle, isa_format, isa_glob, isa_hash, isa_io, isa_lvalue, isa_ref, isa_regexp, isa_scalar, isa_vstring, unbless
+
+:string
+
+  commify, escape_html, escape_quote, escape_quotes, escape_uri, eval_string, is_email_address, is_empty, is_number, is_utf8, not_empty, numeric, replace_accented_characters, to_number, to_string, to_utf8, trim, truncate_text, unescape_html, unescape_uri
+
+:time
+
+  get_time_from, gmtime_hashref, gmtime_ts, is_leap_year, is_valid_date, localtime_ts, time_hashref, timegm, timelocal
+
+:variables
+
+  in_array, merge, remove_duplicates, shuffle, sort_by_key, sort_by_value, taint, tainted, untaint
+
+All this doesn't mean you have to work like that in your own module when using L<Perlmazing::Engine>. It also doesn't mean
 that those functions are actually loaded into memory, they are just available to the caller and will
 be loaded and processed as soon as the caller actually calls one of them. Please read the documentation
 of L<Perlmazing::Engine> to learn more about it.
@@ -108,49 +150,49 @@ L<Perlmazing::Engine Listable functions|Perlmazing::Engine/LISTABLE FUNCTIONS> a
 L<Perlmazing::Engine>'s own code. These functions can, of course, do whatever you code them to do too, but they
 are all meant to follow this behavior:
 
-    # Assume 'my_sub' is a function of the type Listable:
-    
-    # Calling my_sub on an array will directly affect elements of @array:
-    
-    my_sub @array;
-    
-    # Calling my_sub on a list will *attempt* to directly affect the
-    # elements of that list, failing on 'read only'/'constant' elements
-    # like the elements in the following list:
-    
-    my_sub (1, 2, 3, 4, 5, 'string element');
-    
-    # Calling my_sub on an array or a list BUT with an assignment,
-    # will *not* affect the original array or list, but assign an
-    # affected copy:
-    
-    my @array_A = my_sub @array;
-    my @array_B = my_sub (1, 2, 3, 4, 5, 'string_element');
-    
-    # Listable functions can be chained to achieve both behaviors
-    # (assignment or direct effect) on a single call. Assume
-    # 'my_sub2', 'my_sub3' and 'my_sub4' are also Listable functions:
-    
-    my_sub my_sub1 my_sub2 my_sub3 my_sub4 @array;
-    my @array_C = my_sub my_sub1 my_sub2 my_sub3 my_sub4 (1, 2, 3, 4, 5, 'string element');
-    
-    # When a Listable function is assigned in scalar context, then only the
-    # first element is assigned, not a list/array count.
-    
-    my $scalar = my_sub @array; # $scalar contains the first element of the resulting list
+  # Assume 'my_sub' is a function of the type Listable:
+  
+  # Calling my_sub on an array will directly affect elements of @array:
+  
+  my_sub @array;
+  
+  # Calling my_sub on a list will *attempt* to directly affect the
+  # elements of that list, failing on 'read only'/'constant' elements
+  # like the elements in the following list:
+  
+  my_sub (1, 2, 3, 4, 5, 'string element');
+  
+  # Calling my_sub on an array or a list BUT with an assignment,
+  # will *not* affect the original array or list, but assign an
+  # affected copy:
+  
+  my @array_A = my_sub @array;
+  my @array_B = my_sub (1, 2, 3, 4, 5, 'string_element');
+  
+  # Listable functions can be chained to achieve both behaviors
+  # (assignment or direct effect) on a single call. Assume
+  # 'my_sub2', 'my_sub3' and 'my_sub4' are also Listable functions:
+  
+  my_sub my_sub1 my_sub2 my_sub3 my_sub4 @array;
+  my @array_C = my_sub my_sub1 my_sub2 my_sub3 my_sub4 (1, 2, 3, 4, 5, 'string element');
+  
+  # When a Listable function is assigned in scalar context, then only the
+  # first element is assigned, not a list/array count.
+  
+  my $scalar = my_sub @array; # $scalar contains the first element of the resulting list
     
 In the following list of functions, each function will be documented by describing what it does and
 specifying C<Listable> functions, in which case you now know how you can use them to take advantage
 of that.
 =cut
 
-	# Get list of current Perlmazing functions and its type:
+  # Get list of current Perlmazing functions and its type:
 
-	for my $i (@Perlmazing::EXPORT) {
-		Perlmazing::Engine::_load_symbol('Perlmazing', $i);
-		my $is_listable = "Perlmazing::Perlmazing::$i"->isa('Perlmazing::Listable') ? '(listable)' : '';
-		pl "$i $is_listable";
-	}
+  for my $i (@Perlmazing::EXPORT) {
+    Perlmazing::Engine::_load_symbol('Perlmazing', $i);
+    my $is_listable = "Perlmazing::Perlmazing::$i"->isa('Perlmazing::Listable') ? '(listable)' : '';
+    pl "$i $is_listable";
+  }
 
 
 =head2 abs2rel
@@ -178,14 +220,13 @@ I<Listable function>
 
 Same as L<File::Basename::basename()|File::Basename>, but it is a listable function.
 
-    use Perlmazing;
-    my @file_names = ($path_to_file_1, $path_to_file_2, $path_to_file_3);
-    
-    my @paths = ($path_to_file_1, $path_to_file_2, $path_to_file_3);
-	# Alter all in @paths to become just file names:
-	basename @file_names;
+  use Perlmazing qw(:file);
+  
+  my @paths = ($path_to_file_1, $path_to_file_2, $path_to_file_3);
+  
+  # Alter all items in @paths to become just file names:
+  basename @file_names;
 
-    
 
 =head2 carp
 
@@ -228,55 +269,55 @@ with C<sprintf>, like money values or any other values that you are puposedly se
 
 This is a listable function, so any of the following examples will work:
 
-	use Perlmazing;
-	
-	my @numbers = qw(
-		123
-		12345
-		1234.56
-		-90120
-		Not_a_number
-	);
-	# More extreme cases:
-	push @numbers, (
-		'123,,456.01',
-		'12,34,56',
-		'12,,3,4,5.010',
-		'123.456.789',
-	);
-	
-	pl @numbers;
-	# Output:
-	# 123
-	# 12345
-	# 1234.56
-	# -90120
-	# Not_a_number
-	# 123,,456.01
-	# 12,34,56
-	# 12,,3,4,5.010
-	# 123.456.789
-	
-	pl commify @numbers;
-	# Output:
-	# 123
-	# 12,345
-	# 1,234.56
-	# -90,120
-	# Not_a_number
-	# 123,456.01
-	# 123,456
-	# 12,345.010
-	# 123.456.789
-	
-	my @copy = commify @numbers;
-	pl @copy;
-	# Output: Same as "pl commify @numbers". @numbers remains unchanged.
-	
-	# Directly affect the elements of @numbers
-	commify @numbers;
-	pl @numbers;
-	# Output: Same as "pl commify @numbers", but this time all values in @numbers where changed.
+  use Perlmazing;
+  
+  my @numbers = qw(
+    123
+    12345
+    1234.56
+    -90120
+    Not_a_number
+  );
+  # More extreme cases:
+  push @numbers, (
+    '123,,456.01',
+    '12,34,56',
+    '12,,3,4,5.010',
+    '123.456.789',
+  );
+  
+  pl @numbers;
+  # Output:
+  # 123
+  # 12345
+  # 1234.56
+  # -90120
+  # Not_a_number
+  # 123,,456.01
+  # 12,34,56
+  # 12,,3,4,5.010
+  # 123.456.789
+  
+  pl commify @numbers;
+  # Output:
+  # 123
+  # 12,345
+  # 1,234.56
+  # -90,120
+  # Not_a_number
+  # 123,456.01
+  # 123,456
+  # 12,345.010
+  # 123.456.789
+  
+  my @copy = commify @numbers;
+  pl @copy;
+  # Output: Same as "pl commify @numbers". @numbers remains unchanged.
+  
+  # Directly affect the elements of @numbers
+  commify @numbers;
+  pl @numbers;
+  # Output: Same as "pl commify @numbers", but this time all values in @numbers where changed.
 
 
 =head2 confess
@@ -306,20 +347,20 @@ I<Listable function>
 
 Converts any undefined element into an empty string. Useful when purposely avoiding warnings on certain operations.
 
-    use Perlmazing;
-    my @array = (1, 2, 3, undef, undef, 6);
-    
-    define @array;
-    # Now @array = (1, 2, 3, '', '', 6);
-    
-    sub my_sub {
-        for my $i (define @_) {
-            # None of the following will cause an 'undefined' warning:
-            print "Received argument $i\n";
-            $i =~ s/\d//;
-            $i = 1 if $i eq 'abc';
-        }
+  use Perlmazing;
+  my @array = (1, 2, 3, undef, undef, 6);
+  
+  define @array;
+  # Now @array = (1, 2, 3, '', '', 6);
+  
+  sub my_sub {
+    for my $i (define @_) {
+      # None of the following will cause an 'undefined' warning:
+      print "Received argument $i\n";
+      $i =~ s/\d//;
+      $i = 1 if $i eq 'abc';
     }
+  }
     
 
 =head2 devnull
@@ -349,12 +390,12 @@ I<Listable function>
 
 Same as L<File::Basename::dirname()|File::Basename>, but it is a listable function.
 
-    use Perlmazing;
-    my @dirs = ($path_to_file_1, $path_to_file_2, $path_to_file_3);
-    
-    my @files = ($path_to_file_1, $path_to_file_2, $path_to_file_3);
-	# Alter all in @files to become just directory names:
-	dirname @files;
+  use Perlmazing;
+  my @dirs = ($path_to_file_1, $path_to_file_2, $path_to_file_3);
+  
+  my @files = ($path_to_file_1, $path_to_file_2, $path_to_file_3);
+  # Alter all in @files to become just directory names:
+  dirname @files;
 
     
 
@@ -364,10 +405,10 @@ Same as L<Data::Dump::dump()|Data::Dump>. It will return a code dump of whatever
 
 For example:
 
-    print dumped @array;
-    print dumped \@array; # Maybe better
-    print dumped \%hash;
-    print dumped $some_object;
+  print dumped @array;
+  print dumped \@array; # Maybe better
+  print dumped \%hash;
+  print dumped $some_object;
 
 
 =head2 empty_dir
@@ -387,13 +428,13 @@ C<< < >> with C<&lt;>. It is a I<Listable function>.
 
 Examples:
 
-    use Perlmazing;
-	
-	print escape_html $some_text;
+  use Perlmazing;
+  
+  print escape_html $some_text;
     
-    escape_html @array_A;
+  escape_html @array_A;
     
-    my @array_B = escape_html @array_C;
+  my @array_B = escape_html @array_C;
     
 
 =head2 escape_quote
@@ -424,15 +465,15 @@ C<=> with C<%3D>. It is a I<Listable function>.
 
 Examples:
 
-    use Perlmazing;
-	
-	my $url = 'https://www.google.com.mx/search?q=';
-    my $query = escape_uri 'how are &, < and > escaped in html';
-    my $final_url = $url.$query;
-    
-    my @escaped_queries = escape_uri @queries;
-    
-    escape_uri @queries;
+  use Perlmazing;
+  
+  my $url = 'https://www.google.com.mx/search?q=';
+  my $query = escape_uri 'how are &, < and > escaped in html';
+  my $final_url = $url.$query;
+  
+  my @escaped_queries = escape_uri @queries;
+  
+  escape_uri @queries;
 
 See also L<unescape_uri|Perlmazing/unescape_uri>.
 
@@ -453,20 +494,20 @@ walks through all namespaces found in its own C<@ISA>, and then recursively on e
 
 For example, the following code:
 
-    use Perlmazing;
-    use WWW::Mechanize;
+  use Perlmazing;
+  use WWW::Mechanize;
 
-    my $mec = WWW::Mechanize->new;
-    my @classes = find_parent_classes $mec;
-    
-    say for @classes;
+  my $mec = WWW::Mechanize->new;
+  my @classes = find_parent_classes $mec;
+  
+  say for @classes;
 
 will print something like:
 
-    WWW::Mechanize
-    LWP::UserAgent
-    LWP::MemberMixin
-    UNIVERSAL
+  WWW::Mechanize
+  LWP::UserAgent
+  LWP::MemberMixin
+  UNIVERSAL
 
 
 =head2 get_time_from
@@ -479,6 +520,11 @@ Same as L<Time::Precise::get_time_from()|Time::Precise/get_time_from>. Returns t
 =head2 gmtime
 
 Same as L<Time::Precise::gmtime()|Time::Precise/gmtime>. Returns time in seconds including nanoseconds.
+
+
+=head2 gmtime_ts
+
+Same as L<Time::Precise::gmtime_ts()|Time::Precise/gmtime_ts>. Works as C<gmtime>, except it returns a timestamp SQL style (e.g. C<2024-11-27 20:50:30>).
 
 
 =head2 gmtime_hashref
@@ -494,13 +540,13 @@ This function will tell you if C<@array> contains an element identical to C<$som
 the index number for that element. For effective boolean effect, it will return the string C<00> when the index is actually
 C<0>. So, the following is a safe case:
 
-    use Perlmazing;
-	
-	my @array = ('first', 'second', 'third');
+  use Perlmazing;
+  
+  my @array = ('first', 'second', 'third');
     
-    if (my $index = in_array @array, 'first') {
-        print "Found $array[$index]";
-    }
+  if (my $index = in_array @array, 'first') {
+    print "Found $array[$index]";
+  }
 
 
 =head2 is_array
@@ -749,6 +795,11 @@ Same as L<Time::Precise::localtime()|Time::Precise/localtime>. Works as the core
 and full year too.
 
 
+=head2 localtime_ts
+
+Same as L<Time::Precise::localtime_ts()|Time::Precise/localtime_ts>. Works as C<localtime>, except it returns a timestamp SQL style (e.g. C<2024-11-27 20:50:30>).
+
+
 =head2 longmess
 
 Same as L<Carp::longmess()|Carp>.
@@ -786,34 +837,34 @@ This function is to a hash what C<push> is to an array. It will allow you to add
 without having to create an splice or having to use the name of the hash for each assignment. If keys are repeated or existent,
 the last used one will be the one remaining. For example:
 
-    use Perlmazing;
-    
-    my %hash = (
-        name        => 'Francisco',
-        lastname    => 'Zarabozo',
-        age         => 'Unknown',
-        email       => undef,
-    );
-    
-    merge %hash, (
-        age     => 20,
-        age     => 30,
-        age     => 40,
-        email   => 'zarabozo@cpan.org',
-        gender  => 'male',
-        pet     => 'dog',
-    );
-    
-    # Now %hash contains the following:
-    
-    %hash = (
-        age         => 40, # Last one used
-        email       => 'zarabozo@cpan.org',
-        gender      => 'male',
-        lastname    => 'Zarabozo',
-        name        => 'Francisco',
-        pet         => 'dog',
-    );
+  use Perlmazing;
+  
+  my %hash = (
+    name        => 'Francisco',
+    lastname    => 'Zarabozo',
+    age         => 'Unknown',
+    email       => undef,
+  );
+  
+  merge %hash, (
+    age     => 20,
+    age     => 30,
+    age     => 40,
+    email   => 'zarabozo@cpan.org',
+    gender  => 'male',
+    pet     => 'dog',
+  );
+  
+  # Now %hash contains the following:
+  
+  %hash = (
+    age         => 40, # Last one used
+    email       => 'zarabozo@cpan.org',
+    gender      => 'male',
+    lastname    => 'Zarabozo',
+    name        => 'Francisco',
+    pet         => 'dog',
+  );
 
 
 =head2 mkdir
@@ -831,21 +882,21 @@ Same as L<File::Copy::Recursive::rmove()|File::Copy::Recursive>. Moves a file us
 This function is meant to be called from inside a subroutine. The purpose of it is to break the execution of that subroutine and immediatly return with a warning if that subroutine was called in void context. This is useful
 when a certain function will do some time or memory consuming operations in order to return the result of those operations, which would be all for nothing if that function was called in void context. For example:
 
-    use Perlmazing;
-    
-    # This will execute and will take a second to return
-    my $result = some_function();
-    say "Result is $result";
-    
-    # Don't even bother, this will return immediatly without executing anything. Also a warning is issued:
-    # Useless call to main::some_function in void context at file.pl line 9.
-    some_function();
-    
-    sub some_function {
-        no_void;
-        sleep 1; # Some time consuming operation;
-        return time;
-    }
+  use Perlmazing;
+  
+  # This will execute and will take a second to return
+  my $result = some_function();
+  say "Result is $result";
+  
+  # Don't even bother, this will return immediatly without executing anything. Also a warning is issued:
+  # Useless call to main::some_function in void context at file.pl line 9.
+  some_function();
+  
+  sub some_function {
+    no_void;
+    sleep 1; # Some time consuming operation;
+    return time;
+  }
 
 
 =head2 not_empty 
@@ -854,21 +905,21 @@ C<not_empty($var)>
 
 This is just an idiomatic way to test if a scalar value is something other than C<undef> or an empty string (''). It avoids warnings when using an undefined value in C<eq ''>. You would use it like this:
 
-    use Perlmazing;
-    
-    my $values = {
-        undefined   => undef,
-        empty       => '',
-        filled      => 'Hello!';
+  use Perlmazing;
+  
+  my $values = {
+    undefined   => undef,
+    empty       => '',
+    filled      => 'Hello!';
+  }
+  
+  for my $key (keys %$values) {
+    if (not_empty $values->{$key}) {
+      say "Key $key conatins $values->{$key}";
     }
-    
-    for my $key (keys %$values) {
-        if (not_empty $values->{$key}) {
-            say "Key $key conatins $values->{$key}";
-        }
-    }
-    
-    # Only key 'filled' will get to say "Key filled contains Hello!"
+  }
+  
+  # Only key 'filled' will get to say "Key filled contains Hello!"
 
 
 =head2 numeric
@@ -877,97 +928,97 @@ C<sort numeric @something>
 
 This function is written to be used in conjuntion with C<sort>. It will sort values numerically when that's possible, numbers before strings and strings before undefined values. Example:
 
-    use Perlmazing;
-    
-    my @values = qw(
-        3
-        8
-        2
-        0
-        1
-        3
-        7
-        5
-        bee
-        4
-        ark
-        9
-        code
-        6
-        20
-        10
-        123string
-        100
-        1000
-        1001
-        001000
-    );
-    
-    @values = sort numeric @values;
-    
-    # Now @values looks like this:
-    # 0, 1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 20, 100, 001000, 1000, 1001, 123string, ark, bee, code
-    
-    # Without 'numeric' it would have been sorted like this:
-    # 0, 001000, 1, 10, 100, 1000, 1001, 123string, 2, 20, 3, 3, 4, 5, 6, 7, 8, 9, ark, bee, code
+  use Perlmazing;
+  
+  my @values = qw(
+    3
+    8
+    2
+    0
+    1
+    3
+    7
+    5
+    bee
+    4
+    ark
+    9
+    code
+    6
+    20
+    10
+    123string
+    100
+    1000
+    1001
+    001000
+  );
+  
+  @values = sort numeric @values;
+  
+  # Now @values looks like this:
+  # 0, 1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 20, 100, 001000, 1000, 1001, 123string, ark, bee, code
+  
+  # Without 'numeric' it would have been sorted like this:
+  # 0, 001000, 1, 10, 100, 1000, 1001, 123string, 2, 20, 3, 3, 4, 5, 6, 7, 8, 9, ark, bee, code
     
 This sort order will also work for mixed cases between numeric and non-numeric cases. For example:
     
-    use Perlmazing;
-    
-    my @values = qw(
-        book_1_page_3
-        book_1_page_1
-        book_1_page_2
-        book_1_page_03
-        book_1_page_01
-        book_1_page_02
-        book_01_page_3
-        book_01_page_1
-        book_01_page_2
-        book_10_page_3
-        book_10_page_3z
-        book_10_page_3a
-        book_10_page_3k
-        book_010_page_1
-        book_0010_page_2
-    );
-    
-    @values = sort numeric @values;
-    
-    # Now @values looks like this:
-    # book_01_page_1
-    # book_1_page_01
-    # book_1_page_1
-    # book_01_page_2
-    # book_1_page_02
-    # book_1_page_2
-    # book_01_page_3
-    # book_1_page_03
-    # book_1_page_3
-    # book_010_page_1
-    # book_0010_page_
-    # book_10_page_3
-    # book_10_page_3a
-    # book_10_page_3k
-    # book_10_page_3z
-    
-    # Without 'numeric' it would have been sorted like this:
-    # book_0010_page_2
-    # book_010_page_1
-    # book_01_page_1
-    # book_01_page_2
-    # book_01_page_3
-    # book_10_page_3
-    # book_10_page_3a
-    # book_10_page_3k
-    # book_10_page_3z
-    # book_1_page_01
-    # book_1_page_02
-    # book_1_page_03
-    # book_1_page_1
-    # book_1_page_2
-    # book_1_page_3
+  use Perlmazing;
+  
+  my @values = qw(
+    book_1_page_3
+    book_1_page_1
+    book_1_page_2
+    book_1_page_03
+    book_1_page_01
+    book_1_page_02
+    book_01_page_3
+    book_01_page_1
+    book_01_page_2
+    book_10_page_3
+    book_10_page_3z
+    book_10_page_3a
+    book_10_page_3k
+    book_010_page_1
+    book_0010_page_2
+  );
+  
+  @values = sort numeric @values;
+  
+  # Now @values looks like this:
+  # book_01_page_1
+  # book_1_page_01
+  # book_1_page_1
+  # book_01_page_2
+  # book_1_page_02
+  # book_1_page_2
+  # book_01_page_3
+  # book_1_page_03
+  # book_1_page_3
+  # book_010_page_1
+  # book_0010_page_
+  # book_10_page_3
+  # book_10_page_3a
+  # book_10_page_3k
+  # book_10_page_3z
+  
+  # Without 'numeric' it would have been sorted like this:
+  # book_0010_page_2
+  # book_010_page_1
+  # book_01_page_1
+  # book_01_page_2
+  # book_01_page_3
+  # book_10_page_3
+  # book_10_page_3a
+  # book_10_page_3k
+  # book_10_page_3z
+  # book_1_page_01
+  # book_1_page_02
+  # book_1_page_03
+  # book_1_page_1
+  # book_1_page_2
+  # book_1_page_3
 
 
 =head2 pl
@@ -985,31 +1036,31 @@ a string containing what it would have printed. If assigning in list context, th
 
 Examples:
 
-    use Perlmazing;
-    
-    my @arr = (1..10);
-    
-    pl "Hello world!";
-    # prints a "Hello world!" followed by a "\n"
-    
-    pl @arr;
-    # Will print this:
-    # 1
-    # 2
-    # 3
-    # 4
-    # 5
-    # 6
-    # 7
-    # 8
-    # 9
-    # 10
-    
-    my $r = pl @arr;
-    # Same, but it will ASSIGN to $r the output instead of printing it
-    
-    my @r = pl @arr;
-    # An element in @r is created for each line that would be printed, including a trailing "\n" in each element
+  use Perlmazing;
+  
+  my @arr = (1..10);
+  
+  pl "Hello world!";
+  # prints a "Hello world!" followed by a "\n"
+  
+  pl @arr;
+  # Will print this:
+  # 1
+  # 2
+  # 3
+  # 4
+  # 5
+  # 6
+  # 7
+  # 8
+  # 9
+  # 10
+  
+  my $r = pl @arr;
+  # Same, but it will ASSIGN to $r the output instead of printing it
+  
+  my @r = pl @arr;
+  # An element in @r is created for each line that would be printed, including a trailing "\n" in each element
 
 
 =head2 rel2abs
@@ -1023,27 +1074,27 @@ C<remove_duplicates(@array)>
 
 A very useful function that will remove dumplicate entries from an array. The behavior and return value will be different according to whether it was called in void, scalar or list context. Look at these examples:
 
-    use Perlmazing;
-    
-    my @values = qw(
-        1 2 3 4 5 6 7
-            3 4 5 6 7 8 9
-                5 6 7 8 9 10 11
-            3 4 5 6 7 8 9
-        1 2 3 4 5 6 7
-    );
-    
-    # Try scalar context:
-    my $scalar = remove_duplicates @values;
-    # $scalar now contains the number of found duplicates (24) and nothing else is affected.
-    
-    # Try list context:
-    my @list = remove_duplicates @values;
-    # Now @list contains a copy of @values WITHOUT duplicates (so it's now 1..11). @values remains untouched.
-    
-    # Try void context:
-    remove_duplicates @values;
-    # You guessed. @values now has no duplicates (so it's now 1..11).
+  use Perlmazing;
+  
+  my @values = qw(
+    1 2 3 4 5 6 7
+        3 4 5 6 7 8 9
+            5 6 7 8 9 10 11
+        3 4 5 6 7 8 9
+    1 2 3 4 5 6 7
+  );
+  
+  # Try scalar context:
+  my $scalar = remove_duplicates @values;
+  # $scalar now contains the number of found duplicates (24) and nothing else is affected.
+  
+  # Try list context:
+  my @list = remove_duplicates @values;
+  # Now @list contains a copy of @values WITHOUT duplicates (so it's now 1..11). @values remains untouched.
+  
+  # Try void context:
+  remove_duplicates @values;
+  # You guessed. @values now has no duplicates (so it's now 1..11).
 
 
 =head2 replace_accented_characters
@@ -1069,14 +1120,14 @@ Works like core C<rmdir>, except it will remove the requested dir even if it's n
 
 This function is meant to be used from inside a subroutine. It will return true if the function was called in scalar context. Example:
 
-    use Perlmazing;
-    
-    sub my_function {
-        my @array;
-        # do something with @array...
-        return $array[0] if scalar_context;
-        return @array;
-    }
+  use Perlmazing;
+  
+  sub my_function {
+    my @array;
+    # do something with @array...
+    return $array[0] if scalar_context;
+    return @array;
+  }
 
 
 =head2 shortmess
@@ -1093,26 +1144,33 @@ Same as L<List::Util::shuffle()|List::Util>.
 
 Same as core C<sleep>, except it will accept fractions and behave accordingly. Example:
 
-    use Perlmazing;
-    
-    # Sleep a quarter of a second:
-    sleep 0.25;
-    
-    # Sleep a second and a half:
-    sleep 1.5;
+  use Perlmazing;
+  
+  # Sleep a quarter of a second:
+  sleep 0.25;
+  
+  # Sleep a second and a half:
+  sleep 1.5;
 
 
 =head2 slurp
 
-C<slurp($path_to_file, $force_binary_read)>
+C<my $content = slurp($path_to_file)>
+
+C<my $content = slurp($path_to_file, $boolean_force_binary_read)>
+
+C<my @content_lines = slurp($path_to_file)>
 
 This function will efficiently read and return the content of a file. Example:
 
-    use Perlmazing;
-    
-    my $data = slurp 'some/file.txt';
+  use Perlmazing;
+  
+  my $data = slurp 'some/file.txt';
+  
+  # Or, if you'd like to have each line as an element of an array:
+  my @data = slurp 'some/file.txt';
 
-It will use binmode on binary files only. If the second argument is a true value, then binmode will be used no matter what type of file is being read.
+It will use binmode on (detected-as) binary files only. If the second argument is a true value, then binmode will be used no matter what type of file is being read.
 
 
 =head2 sort_by_key
@@ -1127,12 +1185,12 @@ difficulty of knowing if core C<sort> is passing a key or a value in C<$a> and C
 This function will send a warning (and do nothing) if called in void context. The reason for this is that a regular hash cannot be sorted (or remain sorted after sorting it).
 Otherwise it will return a series of key-value pairs if called in list context, or an arrayref if called in scalar context. The following is an example of using it in list context:
 
-    use Perlmazing;
-    
-    my @sorted = sort_by_key %ENV;
-    for (my $i = 0; $i < @sorted; $i += 2) {
-        say "$sorted[$i]: $sorted[$i + 1]";
-    }
+  use Perlmazing;
+  
+  my @sorted = sort_by_key %ENV;
+  for (my $i = 0; $i < @sorted; $i += 2) {
+      say "$sorted[$i]: $sorted[$i + 1]";
+  }
 
 
 =head2 sort_by_value
@@ -1140,7 +1198,7 @@ Otherwise it will return a series of key-value pairs if called in list context, 
 This is the same as the previously explained L<sort_by_key|Perlmazing/sort_by_key> function, except it will sort its argument by value instead of by key.
 
 
-=head2 splitidir
+=head2 splitdir
 
 Same as L<File::Spec-E<gt>splitdir()|File::Spec>. Just much more readable and easier/shorter to type.
 
@@ -1154,31 +1212,31 @@ Same as L<File::Spec-E<gt>splitpath()|File::Spec>. Just much more readable and e
 
 Same as Perl's core L<stat>, except that, when assigned to a scalar, you get an object you can call methods on. If stringified, it will have the same value as what you would get originally with stat assigning a scalar. The names of those methods are unchanged in respect to the Perldoc's definitions. Valid methods are:
 
-    dev
-    ino
-    mode
-    nlink
-    uid
-    gid
-    rdev
-    size
-    atime
-    mtime
-    ctime
-    blksize
-    blocks
+  dev
+  ino
+  mode
+  nlink
+  uid
+  gid
+  rdev
+  size
+  atime
+  mtime
+  ctime
+  blksize
+  blocks
 
 Example:
 
-    use Perlmazing;
-    
-    my $s = stat 'some_file.log';
-    
-    # As an interpolated value:
-    pl "Last modified time was $s->{mtime}";
-    
-    # As a method:
-    pl "Last modified time was ".$s->mtime;
+  use Perlmazing;
+  
+  my $s = stat 'some_file.log';
+  
+  # As an interpolated value:
+  pl "Last modified time was $s->{mtime}";
+  
+  # As a method:
+  pl "Last modified time was ".$s->mtime;
 
 
 =head2 taint
@@ -1214,18 +1272,18 @@ This function will return a hashref the current local time if no argument is pas
 
 The following is an example of a hashref returned by this function:
 
-    {
-      day          => 16,
-      hour         => 20,
-      is_leap_year => 1,
-      isdst        => 0,
-      minute       => 16,
-      month        => "02",
-      second       => "31.8393230",
-      wday         => 2,
-      yday         => 46,
-      year         => 2016,
-    }
+  {
+    day          => 16,
+    hour         => 20,
+    is_leap_year => 1,
+    isdst        => 0,
+    minute       => 16,
+    month        => "02",
+    second       => "31.8393230",
+    wday         => 2,
+    yday         => 46,
+    year         => 2016,
+  }
 
 
 =head2 timegm
@@ -1294,12 +1352,25 @@ I<Listable function>
 
 A very usefull function to remove any whitespace from the beginning or the ending of a string. It is a I<listable> function (which makes it even more useful) and will act like any other I<listable> function from this module. Example:
 
-    use Perlmazing;
-    
-    my @lines = slurp $some_file;
-    trim @lines;
-    
-    # Now each element of @lines is trimmed.
+  use Perlmazing;
+  
+  my @lines = slurp $some_file;
+  trim @lines;
+  
+  # Now each element of @lines is trimmed.
+
+
+=head2 unbless
+
+C<unbless($value)>
+
+C<unbless(@values)>
+
+C<my @result = unbless(@values)>
+
+I<Listable function>
+
+This removes the blessing to any blessed references found in the arguments. It's the same as using L<Data::Structure::Util::unbless|Data::Structure::Util>, except this is a listable function.
 
 
 =head2 truncate_text
@@ -1311,65 +1382,65 @@ If that's not possible (e.g. there's no space between position 0 and C<$length>)
 
 For example:
 
-    use Perlmazing;
-    
-    my $string = 'This is an awesome string for testing.';
-    
-    say truncate_text $string, 1;
-    # T
-    
-    say truncate_text $string, 2;
-    # Th
-    
-    say truncate_text $string, 3;
-    # Thi
-    
-    say truncate_text $string, 4;
-    # This
-    
-    say truncate_text $string, 5;
-    # This
-    
-    say truncate_text $string, 6;
-    # This
-    
-    say truncate_text $string, 7;
-    # This is
-    
-    say truncate_text $string, 8;
-    # This is
-    
-    say truncate_text $string, 9;
-    # This is
-    
-    say truncate_text $string, 10;
-    # This is an
-    
-    say truncate_text $string, 11;
-    # This is an
-    
-    say truncate_text $string, 12;
-    # This is an
-    
-    say truncate_text $string, 13;
-    # This is an
-    
-    say truncate_text $string, 14;
-    # This is an
-    
-    say truncate_text $string, 15;
-    # This is an
-    
-    say truncate_text $string, 16;
-    # This is an
-    
-    say truncate_text $string, 17;
-    # This is an
-    
-    say truncate_text $string, 18;
-    # This is an awesome
-    
-    # ...and so on.
+  use Perlmazing;
+  
+  my $string = 'This is an awesome string for testing.';
+  
+  say truncate_text $string, 1;
+  # T
+  
+  say truncate_text $string, 2;
+  # Th
+  
+  say truncate_text $string, 3;
+  # Thi
+  
+  say truncate_text $string, 4;
+  # This
+  
+  say truncate_text $string, 5;
+  # This
+  
+  say truncate_text $string, 6;
+  # This
+  
+  say truncate_text $string, 7;
+  # This is
+  
+  say truncate_text $string, 8;
+  # This is
+  
+  say truncate_text $string, 9;
+  # This is
+  
+  say truncate_text $string, 10;
+  # This is an
+  
+  say truncate_text $string, 11;
+  # This is an
+  
+  say truncate_text $string, 12;
+  # This is an
+  
+  say truncate_text $string, 13;
+  # This is an
+  
+  say truncate_text $string, 14;
+  # This is an
+  
+  say truncate_text $string, 15;
+  # This is an
+  
+  say truncate_text $string, 16;
+  # This is an
+  
+  say truncate_text $string, 17;
+  # This is an
+  
+  say truncate_text $string, 18;
+  # This is an awesome
+  
+  # ...and so on.
     
 
 =head2 unescape_html
@@ -1398,6 +1469,21 @@ I<Listable function>
 This is the I<undo> function for L<escape_uri|Perlmazing/escape_uri>. It is a I<listable> function and it will behave like any other I<listable> function from this module.
 
 
+=head2 unix_path
+
+C<unix_path($value)>
+
+C<unix_path(@values)>
+
+C<my @result = unix_path(@values)>
+
+I<Listable function>
+
+This function converts any path to a Unix path representation. It's short for C<File::Spec::Unix-E<gt>catdir(File::Spec-E<gt>splitdir($path))>.
+
+See also L<windows_path|Perlmazing/windows_path>.
+
+
 =head2 untaint
 
 C<untaint($value)>
@@ -1415,27 +1501,43 @@ This is the I<undo> function for L<taint|Perlmazing/taint>. It is a I<listable> 
 
 This function is meant to be called from inside a subroutine. It will return true if the function was called in void context. For example:
 
-    use Perlmazing;
-    
-    # Will do nothing:
-    my_function();
-    
-    # Will return '1':
-    my $r = my_function();
-    
-    # Will return (1..10):
-    my @list = my_function();
-    
-    sub my_function {
-        return if void_context; # Don't do anything if there's nothing using the return value
-        return 1 if scalar_context;
-        return (1..10) if list_context;
-    }
+  use Perlmazing;
+  
+  # Will do nothing:
+  my_function();
+  
+  # Will return '1':
+  my $r = my_function();
+  
+  # Will return (1..10):
+  my @list = my_function();
+  
+  sub my_function {
+    return if void_context; # Don't do anything if there's nothing using the return value
+    return 1 if scalar_context;
+    return (1..10) if list_context;
+  }
+
+
+=head2 windows_path
+
+C<windows_path($value)>
+
+C<windows_path(@values)>
+
+C<my @result = windows_path(@values)>
+
+I<Listable function>
+
+This function converts any path to a Windows path representation. It's short for C<File::Spec::Win32-E<gt>catdir(File::Spec-E<gt>splitdir($path))>.
+
+See also L<unix_path|Perlmazing/unix_path>.
 
 
 =head1 AUTHOR
 
-Francisco Zarabozo, C<< <zarabozo at cpan.org> >>
+Francisco Zarabozo, C<< <zarabozo at cpan.org> >>. Please take a look at the modules mentioned on many on the functions of this POD
+to see the author/credits for those modules.
 
 
 =head1 BUGS
@@ -1449,7 +1551,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Perlmazing
+  perldoc Perlmazing
 
 
 You can also look for information at:
@@ -1460,24 +1562,12 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perlmazing>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Perlmazing>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Perlmazing>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Perlmazing/>
-
 =back
 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Francisco Zarabozo.
+Copyright 2015-2024 Francisco Zarabozo.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

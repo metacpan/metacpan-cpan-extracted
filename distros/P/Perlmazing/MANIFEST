@@ -47,6 +47,7 @@ lib/Perlmazing/Perlmazing/pl.pm
 lib/Perlmazing/Perlmazing/Precompile/eval_string.pm
 lib/Perlmazing/Perlmazing/Precompile/get_time_from.pm
 lib/Perlmazing/Perlmazing/Precompile/gmtime.pm
+lib/Perlmazing/Perlmazing/Precompile/gmtime_ts.pm
 lib/Perlmazing/Perlmazing/Precompile/gmtime_hashref.pm
 lib/Perlmazing/Perlmazing/Precompile/in_array.pm
 lib/Perlmazing/Perlmazing/Precompile/isa_array.pm
@@ -81,6 +82,7 @@ lib/Perlmazing/Perlmazing/Precompile/is_valid_date.pm
 lib/Perlmazing/Perlmazing/Precompile/is_vstring.pm
 lib/Perlmazing/Perlmazing/Precompile/list_context.pm
 lib/Perlmazing/Perlmazing/Precompile/localtime.pm
+lib/Perlmazing/Perlmazing/Precompile/localtime_ts.pm
 lib/Perlmazing/Perlmazing/Precompile/merge.pm
 lib/Perlmazing/Perlmazing/Precompile/not_empty.pm
 lib/Perlmazing/Perlmazing/Precompile/numeric.pm
@@ -112,11 +114,14 @@ lib/Perlmazing/Perlmazing/to_number.pm
 lib/Perlmazing/Perlmazing/to_string.pm
 lib/Perlmazing/Perlmazing/to_utf8.pm
 lib/Perlmazing/Perlmazing/trim.pm
+lib/Perlmazing/Perlmazing/unbless.pm
 lib/Perlmazing/Perlmazing/unescape_html.pm
 lib/Perlmazing/Perlmazing/unescape_uri.pm
+lib/Perlmazing/Perlmazing/unix_path.pm
 lib/Perlmazing/Perlmazing/untaint.pm
 lib/Perlmazing/Perlmazing/unweaken.pm
 lib/Perlmazing/Perlmazing/weaken.pm
+lib/Perlmazing/Perlmazing/windows_path.pm
 lib/Perlmazing.pm
 t/00-perlmazing_functions.t
 t/00-perlmazing_specific_import.t
@@ -187,9 +192,11 @@ t/10-sort_by_value.t
 t/10-stat.t
 t/10-to_utf8.t
 t/10-trim.t
+t/10-unbless.t
 t/10-truncate_text.t
 t/10-unescape_html.t
 t/10-unescape_uri.t
+t/10-unix_windows_paths.t
 t/10-void_context.t
 t/manifest.t
 t/pod-coverage.t

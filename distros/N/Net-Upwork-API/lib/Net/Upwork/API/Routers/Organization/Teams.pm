@@ -59,7 +59,7 @@ B<Return value>
 sub get_list {
     my $self = shift;
 
-    return $self->client()->get("/hr/v2/teams");
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =item get_users_in_team
@@ -82,7 +82,7 @@ sub get_users_in_team {
     my $self = shift;
     my $team_ref = shift;
 
-    return $self->client()->get("/hr/v2/teams/" . $team_ref . "/users");
+    die "The legacy API was deprecated. Please, use GraphQL call - see example in this library.";
 }
 
 =back

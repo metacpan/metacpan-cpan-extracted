@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Exception;
-$Games::Solitaire::Verify::Exception::VERSION = '0.2600';
+$Games::Solitaire::Verify::Exception::VERSION = '0.2601';
 use strict;
 use warnings;
 
@@ -153,7 +153,7 @@ classes for G::S::Verify.
 
 =head1 VERSION
 
-version 0.2600
+version 0.2601
 
 =head1 SYNOPSIS
 

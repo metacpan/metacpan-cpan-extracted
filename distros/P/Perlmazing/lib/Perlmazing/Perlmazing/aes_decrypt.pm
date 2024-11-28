@@ -1,4 +1,4 @@
-use Perlmazing qw(croak);
+use Perlmazing qw(croak get_aes_cipher);
 
 # Mainly ripped from Crypt::Rijndael::MySQL
 sub main {

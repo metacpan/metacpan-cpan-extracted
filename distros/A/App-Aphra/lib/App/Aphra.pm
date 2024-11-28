@@ -39,7 +39,7 @@ use URI;
 
 use App::Aphra::File;
 
-our $VERSION = '0.2.2';
+our $VERSION = '0.2.4';
 
 has commands => (
   isa => 'HashRef',
@@ -151,9 +151,10 @@ sub _build_template {
   return Template->new(
     LOAD_TEMPLATES => [
       Template::Provider::Pandoc->new(
-        INCLUDE_PATH  => $self->include_path,
-        EXTENSIONS    => $exts,
-        OUTPUT_FORMAT => $self->config->{output},
+        INCLUDE_PATH       => $self->include_path,
+        EXTENSIONS         => $exts,
+        OUTPUT_FORMAT      => $self->config->{output},
+        STRIP_FRONT_MATTER => 1,
       ),
     ],
     VARIABLES    => {

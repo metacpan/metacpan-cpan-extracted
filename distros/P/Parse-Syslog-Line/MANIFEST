@@ -24,7 +24,6 @@ t/data/064eaadcacdcfe59b91cf280f1a25bc9.yaml
 t/data/0cf67252f51bc98c6302cf2d11832db2.yaml
 t/data/0e03a69469bdfe47db4dff53681ae434.yaml
 t/data/21a3db207b78320769f2cb316dd03f60.yaml
-t/data/2e86b433376740f804c3339840271863.yaml
 t/data/3a7ef75494efe41176b9d57a06517a54.yaml
 t/data/3ca7dfaa06c1fd7138e9d7fd75ca49e7.yaml
 t/data/3e119d58d6ea3cf34beabad4f28999f8.yaml
@@ -56,6 +55,7 @@ t/data/cb6569d15b64b8bcc085cf770bc29c4c.yaml
 t/data/e86919071a958d4f24bc13751c2cab47.yaml
 t/data/f94cae02dd7ef975df7bfd365109690c.yaml
 t/data/f9f366cc1bd18536713766bb68d51c77.yaml
+t/lib/test/Data.pm
 xt/author/eol.t
 xt/author/no-tabs.t
 xt/author/pod-coverage.t

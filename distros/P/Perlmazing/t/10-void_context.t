@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More tests => 3;
-use Perlmazing;
+use Perlmazing qw(void_context);
 
 my @arr = do_test('list', 0);
 my $str = do_test('scalar', 0);

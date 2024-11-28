@@ -1,0 +1,219 @@
+---
+abstract: 'Perl classes for interacting with Amazon SQS'
+author:
+  - 'Rob Lauer <bigfoot@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amazon-SQS-Client
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Amazon::SQS::Client:
+    file: lib/Amazon/SQS/Client.pm
+    version: v2.0.7
+  Amazon::SQS::Config:
+    file: lib/Amazon/SQS/Config.pm
+    version: v2.0.6
+  Amazon::SQS::Constants:
+    file: lib/Amazon/SQS/Constants.pm
+    version: '0'
+  Amazon::SQS::Exception:
+    file: lib/Amazon/SQS/Exception.pm
+    version: '0'
+  Amazon::SQS::Model:
+    file: lib/Amazon/SQS/Model.pm
+    version: '0'
+  Amazon::SQS::Model::AddPermissionRequest:
+    file: lib/Amazon/SQS/Model/AddPermissionRequest.pm
+    version: '0'
+  Amazon::SQS::Model::AddPermissionResponse:
+    file: lib/Amazon/SQS/Model/AddPermissionResponse.pm
+    version: '0'
+  Amazon::SQS::Model::Attribute:
+    file: lib/Amazon/SQS/Model/Attribute.pm
+    version: '0'
+  Amazon::SQS::Model::ChangeMessageVisibilityBatchRequest:
+    file: lib/Amazon/SQS/Model/ChangeMessageVisibilityBatchRequest.pm
+    version: '0'
+  Amazon::SQS::Model::ChangeMessageVisibilityBatchRequestEntry:
+    file: lib/Amazon/SQS/Model/ChangeMessageVisibilityBatchRequestEntry.pm
+    version: '0'
+  Amazon::SQS::Model::ChangeMessageVisibilityBatchResponse:
+    file: lib/Amazon/SQS/Model/ChangeMessageVisibilityBatchResponse.pm
+    version: '0'
+  Amazon::SQS::Model::ChangeMessageVisibilityBatchResult:
+    file: lib/Amazon/SQS/Model/ChangeMessageVisibilityBatchResult.pm
+    version: '0'
+  Amazon::SQS::Model::ChangeMessageVisibilityBatchResultEntry:
+    file: lib/Amazon/SQS/Model/ChangeMessageVisibilityBatchResultEntry.pm
+    version: '0'
+  Amazon::SQS::Model::ChangeMessageVisibilityRequest:
+    file: lib/Amazon/SQS/Model/ChangeMessageVisibilityRequest.pm
+    version: '0'
+  Amazon::SQS::Model::ChangeMessageVisibilityResponse:
+    file: lib/Amazon/SQS/Model/ChangeMessageVisibilityResponse.pm
+    version: '0'
+  Amazon::SQS::Model::CreateQueueRequest:
+    file: lib/Amazon/SQS/Model/CreateQueueRequest.pm
+    version: '0'
+  Amazon::SQS::Model::CreateQueueResponse:
+    file: lib/Amazon/SQS/Model/CreateQueueResponse.pm
+    version: '0'
+  Amazon::SQS::Model::CreateQueueResult:
+    file: lib/Amazon/SQS/Model/CreateQueueResult.pm
+    version: '0'
+  Amazon::SQS::Model::DeleteMessageBatchRequest:
+    file: lib/Amazon/SQS/Model/DeleteMessageBatchRequest.pm
+    version: '0'
+  Amazon::SQS::Model::DeleteMessageBatchRequestEntry:
+    file: lib/Amazon/SQS/Model/DeleteMessageBatchRequestEntry.pm
+    version: '0'
+  Amazon::SQS::Model::DeleteMessageBatchResponse:
+    file: lib/Amazon/SQS/Model/DeleteMessageBatchResponse.pm
+    version: '0'
+  Amazon::SQS::Model::DeleteMessageBatchResult:
+    file: lib/Amazon/SQS/Model/DeleteMessageBatchResult.pm
+    version: '0'
+  Amazon::SQS::Model::DeleteMessageBatchResultEntry:
+    file: lib/Amazon/SQS/Model/DeleteMessageBatchResultEntry.pm
+    version: '0'
+  Amazon::SQS::Model::DeleteMessageRequest:
+    file: lib/Amazon/SQS/Model/DeleteMessageRequest.pm
+    version: '0'
+  Amazon::SQS::Model::DeleteMessageResponse:
+    file: lib/Amazon/SQS/Model/DeleteMessageResponse.pm
+    version: '0'
+  Amazon::SQS::Model::DeleteQueueRequest:
+    file: lib/Amazon/SQS/Model/DeleteQueueRequest.pm
+    version: '0'
+  Amazon::SQS::Model::DeleteQueueResponse:
+    file: lib/Amazon/SQS/Model/DeleteQueueResponse.pm
+    version: '0'
+  Amazon::SQS::Model::Error:
+    file: lib/Amazon/SQS/Model/Error.pm
+    version: '0'
+  Amazon::SQS::Model::ErrorResponse:
+    file: lib/Amazon/SQS/Model/ErrorResponse.pm
+    version: '0'
+  Amazon::SQS::Model::GetQueueAttributesRequest:
+    file: lib/Amazon/SQS/Model/GetQueueAttributesRequest.pm
+    version: '0'
+  Amazon::SQS::Model::GetQueueAttributesResponse:
+    file: lib/Amazon/SQS/Model/GetQueueAttributesResponse.pm
+    version: '0'
+  Amazon::SQS::Model::GetQueueAttributesResult:
+    file: lib/Amazon/SQS/Model/GetQueueAttributesResult.pm
+    version: '0'
+  Amazon::SQS::Model::ListDeadLetterSourceQueuesRequest:
+    file: lib/Amazon/SQS/Model/ListDeadLetterSourceQueuesRequest.pm
+    version: '0'
+  Amazon::SQS::Model::ListDeadLetterSourceQueuesResponse:
+    file: lib/Amazon/SQS/Model/ListDeadLetterSourceQueuesResponse.pm
+    version: '0'
+  Amazon::SQS::Model::ListDeadLetterSourceQueuesResult:
+    file: lib/Amazon/SQS/Model/ListDeadLetterSourceQueuesResult.pm
+    version: '0'
+  Amazon::SQS::Model::ListQueuesRequest:
+    file: lib/Amazon/SQS/Model/ListQueuesRequest.pm
+    version: '0'
+  Amazon::SQS::Model::ListQueuesResponse:
+    file: lib/Amazon/SQS/Model/ListQueuesResponse.pm
+    version: '0'
+  Amazon::SQS::Model::ListQueuesResult:
+    file: lib/Amazon/SQS/Model/ListQueuesResult.pm
+    version: '0'
+  Amazon::SQS::Model::Message:
+    file: lib/Amazon/SQS/Model/Message.pm
+    version: '0'
+  Amazon::SQS::Model::MessageAttribute:
+    file: lib/Amazon/SQS/Model/MessageAttribute.pm
+    version: '0'
+  Amazon::SQS::Model::MessageAttributeValue:
+    file: lib/Amazon/SQS/Model/MessageAttributeValue.pm
+    version: '0'
+  Amazon::SQS::Model::ReceiveMessageRequest:
+    file: lib/Amazon/SQS/Model/ReceiveMessageRequest.pm
+    version: '0'
+  Amazon::SQS::Model::ReceiveMessageResponse:
+    file: lib/Amazon/SQS/Model/ReceiveMessageResponse.pm
+    version: '0'
+  Amazon::SQS::Model::ReceiveMessageResult:
+    file: lib/Amazon/SQS/Model/ReceiveMessageResult.pm
+    version: '0'
+  Amazon::SQS::Model::RemovePermissionRequest:
+    file: lib/Amazon/SQS/Model/RemovePermissionRequest.pm
+    version: '0'
+  Amazon::SQS::Model::RemovePermissionResponse:
+    file: lib/Amazon/SQS/Model/RemovePermissionResponse.pm
+    version: '0'
+  Amazon::SQS::Model::ResponseMetadata:
+    file: lib/Amazon/SQS/Model/ResponseMetadata.pm
+    version: '0'
+  Amazon::SQS::Model::SendMessageRequest:
+    file: lib/Amazon/SQS/Model/SendMessageRequest.pm
+    version: '0'
+  Amazon::SQS::Model::SendMessageResponse:
+    file: lib/Amazon/SQS/Model/SendMessageResponse.pm
+    version: '0'
+  Amazon::SQS::Model::SendMessageResult:
+    file: lib/Amazon/SQS/Model/SendMessageResult.pm
+    version: '0'
+  Amazon::SQS::Model::SetQueueAttributesRequest:
+    file: lib/Amazon/SQS/Model/SetQueueAttributesRequest.pm
+    version: '0'
+  Amazon::SQS::Model::SetQueueAttributesResponse:
+    file: lib/Amazon/SQS/Model/SetQueueAttributesResponse.pm
+    version: '0'
+  Amazon::SQS::QueueHandler:
+    file: lib/Amazon/SQS/QueueHandler.pm
+    version: '0'
+  Amazon::SQS::Sample:
+    file: lib/Amazon/SQS/Sample.pm
+    version: '0'
+requires:
+  AWS::Signature4: '1.02'
+  Amazon::Credentials: '0'
+  CGI::Simple: '1.281'
+  Carp: '1.50'
+  Class::Accessor::Fast: '0.51'
+  Class::Inspector: '0'
+  Class::Unload: '0'
+  Config::IniFiles: '3.000003'
+  Data::Dumper: '2.183'
+  Digest::SHA: '6.02'
+  English: '1.05'
+  JSON: '4.10'
+  LWP::UserAgent: '6.77'
+  List::Util: '1.63'
+  Log::Log4perl: '1.57'
+  Log::Log4perl::Level: '0'
+  Module::ScanDeps::Static: '0'
+  Proc::Daemon: '0'
+  Proc::PID::File: '0'
+  Readonly: '2.05'
+  Scalar::Util: '1.63'
+  Test::More: '1.302190'
+  Time::HiRes: '1.9725'
+  URI: '5.10'
+  URI::Escape: '5.10'
+  XML::Simple: '2.25'
+  perl: '5.010000'
+  strict: '1.07'
+  warnings: '1.13'
+resources:
+  homepage: https://git-codecommit.us-east-1.amazonaws.com/v1/repos/perl-Amazon-SQS-Client
+  repository: https://git-codecommit.us-east-1.amazonaws.com/v1/repos/perl-Amazon-SQS-Client
+version: v2.0.7
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -16,10 +16,10 @@ int32_t SPVM__Net__SSLeay__ASN1_TIME__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   void* obj_self = stack[0].oval;
   
-  ASN1_TIME* pointer = env->get_pointer(env, stack, obj_self);
+  ASN1_TIME* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    ASN1_TIME_free(pointer);
+    ASN1_TIME_free(self);
   }
   
   return 0;

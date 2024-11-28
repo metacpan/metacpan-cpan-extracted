@@ -8,7 +8,11 @@ README
 SIGNATURE
 lib/Web/Components.pm
 lib/Web/Components/Loader.pm
+lib/Web/Components/Model.pm
+lib/Web/Components/Navigation.pm
+lib/Web/Components/ReverseMap.pm
 lib/Web/Components/Role.pm
+lib/Web/Components/Role/ConfigLoader.pm
 lib/Web/Components/Util.pm
 t/00report-metadata.dd
 t/00report-metadata.t

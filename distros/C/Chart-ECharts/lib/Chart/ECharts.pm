@@ -12,7 +12,7 @@ use File::Spec;
 use IPC::Open3;
 use File::Basename;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 $VERSION =~ tr/_//d;    ## no critic
 
 use constant DEBUG => $ENV{ECHARTS_DEBUG} || 0;
@@ -75,9 +75,19 @@ sub set_event {
 
 sub on { shift->set_event(@_) }
 
+sub set_xAxis {
+    my ($self, %axis) = @_;
+    $self->{xAxis} = \%axis;
+}
+
 sub add_xAxis {
     my ($self, %axis) = @_;
     push @{$self->{xAxis}}, \%axis;
+}
+
+sub set_yAxis {
+    my ($self, %axis) = @_;
+    $self->{yAxis} = \%axis;
 }
 
 sub add_yAxis {
@@ -124,10 +134,10 @@ sub axies {
     my ($self) = @_;
 
     if ($self->{vertical}) {
-        return {xAxis => $self->{yAxis}, yAxis => $self->{xAxis}};
+        return {xAxis => $self->yAxis, yAxis => $self->xAxis};
     }
 
-    return {xAxis => $self->{xAxis}, yAxis => $self->{yAxis}};
+    return {xAxis => $self->xAxis, yAxis => $self->yAxis};
 
 }
 
@@ -147,11 +157,12 @@ sub render_script {
     my $option = $json->encode($self->options);
 
     foreach my $identifier (keys %{$self->{js}}) {
-        my $search = qr/"\{JS:$identifier\}"/;
-        say $search;
+
+        my $search  = qr/"\{JS:$identifier\}"/;
         my $replace = $self->{js}->{$identifier};
 
         $option =~ s/$search/$replace/;
+
     }
 
     my @script = ();
@@ -162,6 +173,7 @@ sub render_script {
     my $container    = join '', $self->{container_prefix}, $chart_id;
     my $init_options = $json->encode({locale => $locale, renderer => $renderer});
 
+    push @script, q{if (!window.ChartECharts) { window.ChartECharts = {}; window.ChartECharts.charts = {} }};
     push @script, qq{let $chart = echarts.init(document.getElementById('$container'), '$theme', $init_options);};
     push @script, qq{let $opt = $option;};
     push @script, qq{$opt && $chart.setOption($opt);};
@@ -170,6 +182,8 @@ sub render_script {
         my $callback = $self->{events}->{$event};
         push @script, qq{$chart.on('$event', function (params) { $callback });};
     }
+
+    push @script, qq{window.ChartECharts.charts["$chart"] = $chart};
 
     if ($self->{responsive}) {
         push @script, qq{window.addEventListener('resize', function () { chart_$chart_id.resize() });};
@@ -429,6 +443,16 @@ Add single X axis (see Apache ECharts documentations L<https://echarts.apache.or
         data => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     );
 
+=item $chart->set_xAxis(%axis)
+
+Set X axis (see Apache ECharts documentations L<https://echarts.apache.org/en/option.html#xAxis>).
+
+    $chart->set_xAxis(splitLine => {
+        lineStyle=> {
+            type=> 'dashed'
+        }
+    });
+
 =item $chart->add_yAxis(%axis)
 
 Add single Y axis (see Apache ECharts documentations L<https://echarts.apache.org/en/option.html#yAxis>).
@@ -436,6 +460,16 @@ Add single Y axis (see Apache ECharts documentations L<https://echarts.apache.or
     $chart->add_yAxis(
         type => 'value'
     );
+
+=item $chart->set_yAxis(%axis)
+
+Set Y axis (see Apache ECharts documentations L<https://echarts.apache.org/en/option.html#yAxis>).
+
+    $chart->set_yAxis(splitLine => {
+        lineStyle=> {
+            type=> 'dashed'
+        }
+    });
 
 =item $chart->add_series(%series)
 

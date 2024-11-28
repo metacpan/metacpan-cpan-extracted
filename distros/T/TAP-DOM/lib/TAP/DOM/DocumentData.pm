@@ -1,7 +1,7 @@
 package TAP::DOM::DocumentData;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Accessors for key/value document data
-$TAP::DOM::DocumentData::VERSION = '0.99';
+$TAP::DOM::DocumentData::VERSION = '1.000';
 use 5.006;
 use strict;
 use warnings;

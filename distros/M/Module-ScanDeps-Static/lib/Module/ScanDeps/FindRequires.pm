@@ -28,7 +28,9 @@ Readonly::Scalar our $FAILURE => 1;
 
 Readonly::Scalar our $MIN_PERL_VERSION => $PERL_VERSION;
 
-require Module::ScanDeps::VERSION;
+
+require Module::ScanDeps::Static::VERSION;
+our $VERSION = "test $Module::ScanDeps::Static::VERSION";
 
 use parent qw(CLI::Simple);
 

@@ -12,6 +12,11 @@ class TestCase::Net::SSLeay {
   use Sys::Signal::Constant as SIGNAL;
   use Net::SSLeay::Error;
   
+  use Net::SSLeay::OBJ;
+  use Net::SSLeay::X509;
+  use Net::SSLeay::X509_NAME;
+  use Net::SSLeay::X509_NAME_ENTRY;
+  
   static method test : int () {
     
     my $version = SSL->OPENSSL_VERSION_TEXT;

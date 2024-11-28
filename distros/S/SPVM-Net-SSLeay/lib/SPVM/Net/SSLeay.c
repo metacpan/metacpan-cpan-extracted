@@ -19,9 +19,9 @@ int32_t SPVM__Net__SSLeay__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SSL_CTX* ssl_ctx = env->get_pointer(env, stack, obj_ssl_ctx);
   
-  SSL* ssl = SSL_new(ssl_ctx);
+  SSL* self = SSL_new(ssl_ctx);
   
-  if (!ssl) {
+  if (!self) {
     int64_t ssl_error = ERR_peek_last_error();
     
     char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
@@ -34,7 +34,7 @@ int32_t SPVM__Net__SSLeay__new(SPVM_ENV* env, SPVM_VALUE* stack) {
     return error_id;
   }
   
-  void* obj_self = env->new_pointer_object_by_name(env, stack, "Net::SSLeay", ssl, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_self = env->new_pointer_object_by_name(env, stack, "Net::SSLeay", self, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   env->set_field_object_by_name(env, stack, obj_self, "ssl_ctx", obj_ssl_ctx, &error_id, __func__, FILE_NAME, __LINE__);
@@ -128,11 +128,11 @@ int32_t SPVM__Net__SSLeay__set_fd(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t fd = stack[1].ival;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   ERR_clear_error();
   
-  int32_t status = SSL_set_fd(ssl, fd);
+  int32_t status = SSL_set_fd(self, fd);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -166,11 +166,11 @@ int32_t SPVM__Net__SSLeay__set_tlsext_host_name(SPVM_ENV* env, SPVM_VALUE* stack
   
   const char* name = env->get_chars(env, stack, obj_name);
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   ERR_clear_error();
   
-  int32_t status = SSL_set_tlsext_host_name(ssl, name);
+  int32_t status = SSL_set_tlsext_host_name(self, name);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -196,14 +196,14 @@ int32_t SPVM__Net__SSLeay__connect(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   ERR_clear_error();
   
-  int32_t status = SSL_connect(ssl);
+  int32_t status = SSL_connect(self);
   
   if (!(status == 1)) {
-    int32_t ssl_operation_error = SSL_get_error(ssl, status);
+    int32_t ssl_operation_error = SSL_get_error(self, status);
     
     assert(ssl_operation_error != SSL_ERROR_NONE);
     
@@ -233,14 +233,14 @@ int32_t SPVM__Net__SSLeay__accept(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   ERR_clear_error();
   
-  int32_t status = SSL_accept(ssl);
+  int32_t status = SSL_accept(self);
   
   if (!(status == 1)) {
-    int32_t ssl_operation_error = SSL_get_error(ssl, status);
+    int32_t ssl_operation_error = SSL_get_error(self, status);
     
     assert(ssl_operation_error != SSL_ERROR_NONE);
     
@@ -270,14 +270,14 @@ int32_t SPVM__Net__SSLeay__shutdown(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   ERR_clear_error();
   
-  int32_t status = SSL_shutdown(ssl);
+  int32_t status = SSL_shutdown(self);
   
   if (status < 0) {
-    int32_t ssl_operation_error = SSL_get_error(ssl, status);
+    int32_t ssl_operation_error = SSL_get_error(self, status);
     
     assert(ssl_operation_error != SSL_ERROR_NONE);
     
@@ -332,14 +332,14 @@ int32_t SPVM__Net__SSLeay__read(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "The offset $offset + $num must be lower than or equal to the length of the buffer $buf.", __func__, FILE_NAME, __LINE__);
   }
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   ERR_clear_error();
   
-  int32_t read_length = SSL_read(ssl, buf + offset, num);
+  int32_t read_length = SSL_read(self, buf + offset, num);
   
   if (!(read_length > 0)) {
-    int32_t ssl_operation_error = SSL_get_error(ssl, read_length);
+    int32_t ssl_operation_error = SSL_get_error(self, read_length);
     
     assert(ssl_operation_error != SSL_ERROR_NONE);
     
@@ -394,14 +394,14 @@ int32_t SPVM__Net__SSLeay__peek(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "The offset $offset + $num must be lower than or equal to the length of the buffer $buf.", __func__, FILE_NAME, __LINE__);
   }
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   ERR_clear_error();
   
-  int32_t peek_length = SSL_peek(ssl, buf + offset, num);
+  int32_t peek_length = SSL_peek(self, buf + offset, num);
   
   if (!(peek_length > 0)) {
-    int32_t ssl_operation_error = SSL_get_error(ssl, peek_length);
+    int32_t ssl_operation_error = SSL_get_error(self, peek_length);
     
     assert(ssl_operation_error != SSL_ERROR_NONE);
     
@@ -456,14 +456,14 @@ int32_t SPVM__Net__SSLeay__write(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "The offset $offset + $num must be lower than or equal to the length of the buffer $buf.", __func__, FILE_NAME, __LINE__);
   }
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   ERR_clear_error();
   
-  int32_t write_length = SSL_write(ssl, buf + offset, num);
+  int32_t write_length = SSL_write(self, buf + offset, num);
   
   if (!(write_length > 0)) {
-    int32_t ssl_operation_error = SSL_get_error(ssl, write_length);
+    int32_t ssl_operation_error = SSL_get_error(self, write_length);
     
     assert(ssl_operation_error != SSL_ERROR_NONE);
     
@@ -495,9 +495,9 @@ int32_t SPVM__Net__SSLeay__get_servername(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t type = stack[1].ival;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
-  const char* servername = SSL_get_servername(ssl, type);
+  const char* servername = SSL_get_servername(self, type);
   
   void* obj_servername = NULL;
   if (servername) {
@@ -517,9 +517,9 @@ int32_t SPVM__Net__SSLeay__set_tlsext_status_type(SPVM_ENV* env, SPVM_VALUE* sta
   
   int32_t type = stack[1].ival;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
-  int64_t status = SSL_set_tlsext_status_type(ssl, type);
+  int64_t status = SSL_set_tlsext_status_type(self, type);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -545,11 +545,11 @@ int32_t SPVM__Net__SSLeay__set_SSL_CTX(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_ssl_ctx = stack[1].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   SSL_CTX* ctx = env->get_pointer(env, stack, obj_ssl_ctx);
   
-  void* ret_ctx = SSL_set_SSL_CTX(ssl, ctx);
+  void* ret_ctx = SSL_set_SSL_CTX(self, ctx);
   
   if (!ret_ctx) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -583,11 +583,11 @@ int32_t SPVM__Net__SSLeay__set_mode(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   int64_t mode = stack[1].lval;
   
-  int64_t ret = SSL_set_mode(ssl, mode);
+  int64_t ret = SSL_set_mode(self, mode);
   
   stack[0].lval = ret;
   
@@ -600,11 +600,11 @@ int32_t SPVM__Net__SSLeay__clear_mode(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   int64_t mode = stack[1].lval;
   
-  int64_t ret = SSL_clear_mode(ssl, mode);
+  int64_t ret = SSL_clear_mode(self, mode);
   
   stack[0].lval = ret;
   
@@ -617,9 +617,9 @@ int32_t SPVM__Net__SSLeay__get_mode(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
-  int64_t ret = SSL_get_mode(ssl);
+  int64_t ret = SSL_get_mode(self);
   
   stack[0].lval = ret;
   
@@ -632,9 +632,9 @@ int32_t SPVM__Net__SSLeay__version(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
-  int32_t version = SSL_version(ssl);
+  int32_t version = SSL_version(self);
   
   stack[0].ival = version;
   
@@ -647,9 +647,9 @@ int32_t SPVM__Net__SSLeay__session_reused(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
-  int32_t ret = SSL_session_reused(ssl);
+  int32_t ret = SSL_session_reused(self);
   
   stack[0].ival = ret;
   
@@ -662,9 +662,9 @@ int32_t SPVM__Net__SSLeay__get_cipher(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
-  const char* name = SSL_get_cipher(ssl);
+  const char* name = SSL_get_cipher(self);
   
   assert(name);
   
@@ -681,9 +681,9 @@ int32_t SPVM__Net__SSLeay__get_peer_certificate(SPVM_ENV* env, SPVM_VALUE* stack
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
-  X509* x509 = SSL_get_peer_certificate(ssl);
+  X509* x509 = SSL_get_peer_certificate(self);
   
   void* obj_x509 = NULL;
   
@@ -707,9 +707,9 @@ int32_t SPVM__Net__SSLeay__get_shutdown(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
-  int32_t ret = SSL_get_shutdown(ssl);
+  int32_t ret = SSL_get_shutdown(self);
   
   stack[0].ival = ret;
   
@@ -722,9 +722,9 @@ int32_t SPVM__Net__SSLeay__pending(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
-  int32_t ret = SSL_pending(ssl);
+  int32_t ret = SSL_pending(self);
   
   stack[0].ival = ret;
   
@@ -737,9 +737,9 @@ int32_t SPVM__Net__SSLeay__get1_session(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
-  SSL_SESSION* ssl_session = SSL_get1_session(ssl);
+  SSL_SESSION* ssl_session = SSL_get1_session(self);
   
   void* obj_ssl_session = NULL;
   
@@ -765,11 +765,11 @@ int32_t SPVM__Net__SSLeay__set_session(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_ssl_session = stack[1].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   SSL_SESSION* ssl_session = env->get_pointer(env, stack, obj_ssl_session);
   
-  int32_t status = SSL_set_session(ssl, ssl_session);
+  int32_t status = SSL_set_session(self, ssl_session);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -799,9 +799,9 @@ int32_t SPVM__Net__SSLeay__get_certificate(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
-  X509* x509 = SSL_get_certificate(ssl);
+  X509* x509 = SSL_get_certificate(self);
   
   void* obj_x509 = NULL;
   
@@ -831,7 +831,7 @@ int32_t SPVM__Net__SSLeay__get0_next_proto_negotiated(SPVM_ENV* env, SPVM_VALUE*
   
   int32_t* len_ref = stack[2].iref;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   if (!obj_data_ref) {
     return env->die(env, stack, "The data reference $data_ref must be defined.", __func__, FILE_NAME, __LINE__);
@@ -845,7 +845,7 @@ int32_t SPVM__Net__SSLeay__get0_next_proto_negotiated(SPVM_ENV* env, SPVM_VALUE*
   
   const unsigned char* data_ref_tmp[1] = {0};
   unsigned len_ref_tmp = -1;
-  SSL_get0_next_proto_negotiated(ssl, data_ref_tmp, &len_ref_tmp);
+  SSL_get0_next_proto_negotiated(self, data_ref_tmp, &len_ref_tmp);
   
   if (data_ref_tmp) {
     void* obj_data = env->new_string_nolen(env, stack, data_ref_tmp[0]);
@@ -868,7 +868,7 @@ int32_t SPVM__Net__SSLeay__get0_alpn_selected(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   int32_t* len_ref = stack[2].iref;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   if (!obj_data_ref) {
     return env->die(env, stack, "The data reference $data_ref must be defined.", __func__, FILE_NAME, __LINE__);
@@ -882,7 +882,7 @@ int32_t SPVM__Net__SSLeay__get0_alpn_selected(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   const unsigned char* data_ref_tmp[1] = {0};
   unsigned int len_ref_tmp = -1;
-  SSL_get0_alpn_selected(ssl, data_ref_tmp, &len_ref_tmp);
+  SSL_get0_alpn_selected(self, data_ref_tmp, &len_ref_tmp);
   
   if (data_ref_tmp) {
     void* obj_data = env->new_string_nolen(env, stack, data_ref_tmp[0]);
@@ -901,9 +901,9 @@ int32_t SPVM__Net__SSLeay__get_peer_cert_chain(SPVM_ENV* env, SPVM_VALUE* stack)
   
   void* obj_self = stack[0].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
-  STACK_OF(X509)* stack_of_x509 = SSL_get_peer_cert_chain(ssl);
+  STACK_OF(X509)* stack_of_x509 = SSL_get_peer_cert_chain(self);
   
   void* obj_x509s = NULL;
   
@@ -1003,7 +1003,7 @@ int32_t SPVM__Net__SSLeay__set_msg_callback(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_arg = stack[2].oval;
   
-  SSL* ssl = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   void (*native_cb)(int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg) = NULL;
   
@@ -1015,10 +1015,25 @@ int32_t SPVM__Net__SSLeay__set_msg_callback(SPVM_ENV* env, SPVM_VALUE* stack) {
     native_args[1] = stack;
     native_args[2] = obj_cb;
     native_args[3] = obj_arg;
-    SSL_set_msg_callback_arg(ssl, native_args);
+    SSL_set_msg_callback_arg(self, native_args);
   }
   
-  SSL_set_msg_callback(ssl, native_cb);
+  SSL_set_msg_callback(self, native_cb);
+  
+  return 0;
+}
+
+int32_t SPVM__Net__SSLeay__get_tlsext_status_type(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  SSL* self = env->get_pointer(env, stack, obj_self);
+  
+  int64_t type = SSL_get_tlsext_status_type(self);
+  
+  stack[0].lval = type;
   
   return 0;
 }
@@ -1029,10 +1044,10 @@ int32_t SPVM__Net__SSLeay__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
   
-  SSL* pointer = env->get_pointer(env, stack, obj_self);
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   if (!env->no_free(env, stack, obj_self)) {
-    SSL_free(pointer);
+    SSL_free(self);
   }
   
   return 0;

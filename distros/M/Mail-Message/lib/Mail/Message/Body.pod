@@ -496,7 +496,7 @@ want to call L<Mail::Message::decoded()|Mail::Message/"The body"> first.
 
 Returns the transfer-encoding of the data within this body as
 L<Mail::Message::Field|Mail::Message::Field> (which stringifies to its content).  If it
-needs to be changed, call the L<encode()|Mail::Message::Body::Encode/"Constructing a body"> or Mail::Message::Body subroutine ecoded method.
+needs to be changed, call the L<encode()|Mail::Message::Body::Encode/"Constructing a body"> or L<encoded()|Mail::Message::Body::Encode/"Constructing a body"> method.
 When no encoding is present, the field contains the text C<none>.
 
 The optional STRING or $field enforces a new encoding to be set, without the
@@ -939,7 +939,7 @@ In the first case, the body content has no transfer encoding on it
 the body may have transfer encoding and has an (IANA listed) charset
 on it (defaults to C<us-ascii>)
 
-Using L<encode()|Mail::Message::Body::Encode/"Constructing a body"> (maybe via Mail::Message::Body subroutine decode), you can convert bodies from one
+Using L<encode()|Mail::Message::Body::Encode/"Constructing a body"> (maybe via L<decoded()|Mail::Message::Body/"Constructing a body">), you can convert bodies from one
 state into a different one.  In one go, you can change the transfer-encoding,
 the character-set, or whether it is in PERL string format or raw (in bytes).
 
@@ -1006,12 +1006,12 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.015,
-built on December 11, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Message distribution version 3.016,
+built on November 27, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 2001-2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

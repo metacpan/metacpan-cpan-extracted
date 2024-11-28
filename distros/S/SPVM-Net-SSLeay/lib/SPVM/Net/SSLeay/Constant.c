@@ -7542,3 +7542,27 @@ int32_t SPVM__Net__SSLeay__Constant__OPENSSL_INIT_NO_ATEXIT(SPVM_ENV* env, SPVM_
 #endif
   
 }
+
+int32_t SPVM__Net__SSLeay__Constant__TLSEXT_NAMETYPE_host_name(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef TLSEXT_NAMETYPE_host_name
+  stack[0].ival = TLSEXT_NAMETYPE_host_name;
+  return 0;
+#else
+  env->die(env, stack, "TLSEXT_NAMETYPE_host_name is not defined on the system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__EVP_MAX_MD_SIZE(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef EVP_MAX_MD_SIZE
+  stack[0].ival = EVP_MAX_MD_SIZE;
+  return 0;
+#else
+  env->die(env, stack, "EVP_MAX_MD_SIZE is not defined on the system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
