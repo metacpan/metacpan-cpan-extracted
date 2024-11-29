@@ -7,13 +7,13 @@ use 5.0100;
 
 use Chemistry::OpenSMILES qw(
     %bond_symbol_to_order
+    %normal_valence
     is_aromatic
     is_chiral
-    %normal_valence
     toggle_cistrans
 );
 use Graph::Undirected;
-use List::Util qw( any sum );
+use List::Util qw( any first sum0 );
 
 %}
 
@@ -308,15 +308,14 @@ sub parse
                 # Promote implicit hydrogen atoms into explicit ones
                 if( !exists $atom->{hcount} ) {
                     next if !exists $normal_valence{$atom->{symbol}};
-                    my $degree = sum map { $_ ne ':' && exists $bond_symbol_to_order{$_} ? $bond_symbol_to_order{$_} : 1 }
-                                     map { $graph->has_edge_attribute( $atom, $_, 'bond' )
-                                            ? $graph->get_edge_attribute( $atom, $_, 'bond' )
-                                            : '-' }
+                    my $degree = sum0 map { $_ ne ':' && exists $bond_symbol_to_order{$_} ? $bond_symbol_to_order{$_} : 1 }
+                                      map { $graph->has_edge_attribute( $atom, $_, 'bond' )
+                                                ? $graph->get_edge_attribute( $atom, $_, 'bond' )
+                                                : '-' }
                                          $graph->neighbours( $atom );
-                    $degree = 0 unless $degree;
-                    my( $valence ) = grep { $degree <= $_ }
-                                          @{$normal_valence{$atom->{symbol}}};
-                    next if !defined $valence;
+                    my $valence = first { $degree <= $_ }
+                                        @{$normal_valence{$atom->{symbol}}};
+                    next unless defined $valence;
                     $atom->{hcount} = $valence - $degree;
                 }
                 for (1..$atom->{hcount}) {
@@ -376,8 +375,8 @@ sub _add_ring_bond
               $self->{USER}{RINGBONDS}{$ring_bond}{bond} ne '\\')) ) {
             die "$0: ring bond types for ring bond $ring_bond do not match.\n";
         }
-        ( $bond ) = grep { defined }
-                         ( $self->{USER}{RINGBONDS}{$ring_bond}{bond}, $bond );
+        $bond = first { defined }
+                      ( $self->{USER}{RINGBONDS}{$ring_bond}{bond}, $bond );
 
         if( $bond && $bond =~ /^[\\\/]$/ &&
             !defined $self->{USER}{RINGBONDS}{$ring_bond}{bond} ) {
@@ -401,9 +400,9 @@ sub _add_ring_bond
         delete $self->{USER}{RINGBONDS}{$ring_bond};
 
         if( is_chiral $ring_atom &&  $ring_atom->{chirality_neighbours} ) {
-            my( $pos ) = grep { !ref $ring_atom->{chirality_neighbours}[$_] &&
-                                $ring_atom->{chirality_neighbours}[$_] == $ring_bond }
-                              0..$#{$ring_atom->{chirality_neighbours}};
+            my $pos = first { !ref $ring_atom->{chirality_neighbours}[$_] &&
+                              $ring_atom->{chirality_neighbours}[$_] == $ring_bond }
+                            0..$#{$ring_atom->{chirality_neighbours}};
             $ring_atom->{chirality_neighbours}[$pos] = $atom if defined $pos;
         }
         _push_chirality_neighbour( $atom, $ring_atom );

@@ -19,6 +19,10 @@ class Interpreter {
                 const wsClient = new WebSocketClient(connectionData.hostname, null)
 
                 const responseByteArray = await wsClient.send(messageByteArray)
+                if (!responseByteArray) {
+                    // TODO: handle error exception log?
+                    return []
+                } 
                 return new CommandDeserializer(responseByteArray).deserialize()
             }
             else {

@@ -18,14 +18,14 @@ Moose::Util::MetaRole::apply_metaroles(
 
 extends 'Catalyst::View::BasePerRequest';
 
-our $VERSION = 0.001012;
+our $VERSION = 0.001013;
 eval $VERSION;
 
 # Args that get passed cleanly to Template::EmbeddedPerl
 my @temple_args = qw(
   open_tag close_tag expr_marker line_start  
   template_extension auto_flatten_expr prepend
-  use_cache auto_escape);
+  use_cache auto_escape interpolation);
 
 # methods we proxy from the temple object
 my @proxy_methods = qw(

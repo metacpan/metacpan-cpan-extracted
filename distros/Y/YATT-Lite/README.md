@@ -325,7 +325,7 @@ You can look for Source Code Repository at:
 
 In source distribution, 
 basic documents are placed under ``YATT/Lite/docs``. You can read them via:
-https://yl-podview.herokuapp.com/
+https://yatt-yl-podview-rrdekxdjda-an.a.run.app/
 (But for now, most pods are not yet finished and written only in Japanese.)
 
 Also, you can run ylpodview (POD viewer) locally by:
@@ -363,9 +363,9 @@ Copyright (C) 2007..2014 "KOBAYASI, Hiroaki"
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-[YATT::Lite]: https://yl-podview.herokuapp.com/mod/YATT::Lite
+[YATT::Lite]: https://yatt-yl-podview-rrdekxdjda-an.a.run.app/mod/YATT::Lite
 [PSGI]: http://plackperl.org/
-[WebMVC0]: https://yl-podview.herokuapp.com/mod/YATT::Lite::WebMVC0::SiteApp
-[DBIx::Class]: https://yl-podview.herokuapp.com/mod/DBIx::Class
+[WebMVC0]: https://yatt-yl-podview-rrdekxdjda-an.a.run.app/mod/YATT::Lite::WebMVC0::SiteApp
+[DBIx::Class]: https://yatt-yl-podview-rrdekxdjda-an.a.run.app/mod/DBIx::Class
 [Emacs]: http://www.gnu.org/software/emacs/
 [cpanminus]: http://search.cpan.org/perldoc?App::cpanminus#INSTALL

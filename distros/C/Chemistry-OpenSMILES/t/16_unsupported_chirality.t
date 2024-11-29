@@ -14,8 +14,8 @@ my @cases = (
       'N(C(Br)(=C(=C(O([H]))(C([H])([H])([H])))))([H])([H])',
        undef ],
     [ 'N[C@](Br)(O)(C)(Cl)',
-      'N(C(Br)(O([H]))(C([H])([H])([H]))(Cl))([H])([H])',
-      'chirality \'@\' observed for atom with 5 neighbours, can only process tetrahedral chiral centers with possible lone pairs' ],
+      'N([C](Br)(O([H]))(C([H])([H])([H]))(Cl))([H])([H])',
+      'chirality \'@\' observed for atom with 5 neighbours, can only process tetrahedral chiral or square planar centers with possible lone pairs' ],
 );
 
 plan tests => 2 * scalar @cases;

@@ -1,20 +1,30 @@
 package Chemistry::OpenSMILES;
 
+# ABSTRACT: OpenSMILES format reader and writer
+our $VERSION = '0.10.0'; # VERSION
+
 use strict;
 use warnings;
 use 5.0100;
 
-# ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.9.0'; # VERSION
+use Chemistry::OpenSMILES::Stereo::Tables qw( @OH @TB );
+use Graph::Traversal::BFS;
+use List::Util qw( all any first none sum0 );
 
 require Exporter;
 our @ISA = qw( Exporter );
 our @EXPORT_OK = qw(
     %bond_order_to_symbol
     %bond_symbol_to_order
+    %normal_valence
     clean_chiral_centers
     is_aromatic
     is_chiral
+    is_chiral_allenal
+    is_chiral_octahedral
+    is_chiral_planar
+    is_chiral_tetrahedral
+    is_chiral_trigonal_bipyramidal
     is_cis_trans_bond
     is_double_bond
     is_ring_atom
@@ -22,12 +32,9 @@ our @EXPORT_OK = qw(
     is_single_bond
     is_triple_bond
     mirror
-    %normal_valence
     toggle_cistrans
+    valence
 );
-
-use Graph::Traversal::BFS;
-use List::Util qw( all any none );
 
 sub is_chiral($);
 sub is_chiral_planar($);
@@ -65,10 +72,10 @@ our %bond_symbol_to_order = (
     '$' => 4,
 );
 
-# Removes chiral setting from allenal, square planar or tetrahedral chiral centers if deemed unimportant.
-# For allenal and tetrahedral arrangements this means situations with less than four distinct neighbours.
+# Removes chiral setting from allenal, square planar, tetrahedral and trigonal bipyramidal chiral centers if deemed unimportant.
+# For allenal, tetrahedral and trigonal bipyramidal arrangements when not all the neighbours are distinct.
 # For square planar arrangements this means situations when all neighbours are the same.
-# Only chiral centers with four atoms are affected, thus three-atom centers (implying lone pairs) are left untouched.
+# Chiral centers with lone pairs are left untouched.
 # Returns the affected atoms.
 #
 # TODO: check other chiral centers
@@ -80,7 +87,8 @@ sub clean_chiral_centers($$)
     for my $atom ($moiety->vertices) {
         next unless is_chiral_allenal( $atom ) ||
                     is_chiral_planar( $atom )  ||
-                    is_chiral_tetrahedral( $atom );
+                    is_chiral_tetrahedral( $atom ) ||
+                    is_chiral_trigonal_bipyramidal( $atom );
         # Anomers must not loose chirality settings in any way
         next if is_ring_atom( $moiety, $atom, scalar $moiety->edges );
 
@@ -92,7 +100,11 @@ sub clean_chiral_centers($$)
                                @neighbours;
         }
 
-        next if @neighbours + $hcount != 4;
+        if( is_chiral_trigonal_bipyramidal( $atom ) ) {
+            next if @neighbours + $hcount != 5;
+        } else {
+            next if @neighbours + $hcount != 4;
+        }
 
         my %colors;
         for (@neighbours, ( { symbol => 'H' } ) x $hcount) {
@@ -103,6 +115,8 @@ sub clean_chiral_centers($$)
             # Chiral planar center markers make sense even if only two types of atoms are there.
             next if scalar keys %colors  > 2;
             next if scalar keys %colors == 2 && all { $_ == 2 } values %colors;
+        } elsif( is_chiral_trigonal_bipyramidal( $atom ) ) {
+            next if scalar keys %colors == 5;
         } else {
             next if scalar keys %colors == 4;
         }
@@ -158,6 +172,26 @@ sub is_chiral_tetrahedral($)
         return $what->{chirality} && $what->{chirality} =~ /^@@?$/;
     } else {                    # Graph representing moiety
         return any { is_chiral_tetrahedral( $_ ) } $what->vertices;
+    }
+}
+
+sub is_chiral_trigonal_bipyramidal($)
+{
+    my( $what ) = @_;
+    if( ref $what eq 'HASH' ) { # Single atom
+        return $what->{chirality} && $what->{chirality} =~ /^\@TB(1?[1-9]|20)$/;
+    } else {                    # Graph representing moiety
+        return any { is_chiral_trigonal_bipyramidal( $_ ) } $what->vertices;
+    }
+}
+
+sub is_chiral_octahedral($)
+{
+    my( $what ) = @_;
+    if( ref $what eq 'HASH' ) { # Single atom
+        return $what->{chirality} && $what->{chirality} =~ /^\@OH([1-9]|[12][0-9]|30)$/;
+    } else {                    # Graph representing moiety
+        return any { is_chiral_octahedral( $_ ) } $what->vertices;
     }
 }
 
@@ -256,9 +290,31 @@ sub mirror($)
 {
     my( $what ) = @_;
     if( ref $what eq 'HASH' ) { # Single atom
-        # FIXME: currently dealing only with tetrahedral chiral centers
         if( is_chiral_tetrahedral( $what ) ) {
             $what->{chirality} = $what->{chirality} eq '@' ? '@@' : '@';
+        }
+        if( is_chiral_allenal( $what ) ) {
+            $what->{chirality} = $what->{chirality} eq '@AL1' ? '@AL2' : '@AL1';
+        }
+        # Square planar centers are not affected by mirroring, doing nothing
+        if( is_chiral_trigonal_bipyramidal( $what ) ) {
+            my $number = substr $what->{chirality}, 3;
+            my $setting = $TB[$number-1];
+            my $opposite = first { $TB[$_]->{axis}[0] == $setting->{axis}[0] &&
+                                   $TB[$_]->{axis}[1] == $setting->{axis}[1] &&
+                                   $TB[$_]->{order}   ne $setting->{order} }
+                                 0..$#TB;
+            $what->{chirality} = '@TB' . ($opposite + 1);
+        }
+        if( is_chiral_octahedral( $what ) ) {
+            my $number = substr $what->{chirality}, 3;
+            my $setting = $OH[$number-1];
+            my $opposite = first { $OH[$_]->{shape}   eq $setting->{shape} &&
+                                   $OH[$_]->{axis}[0] == $setting->{axis}[0] &&
+                                   $OH[$_]->{axis}[1] == $setting->{axis}[1] &&
+                                   $OH[$_]->{order}   ne $setting->{order} }
+                                 0..$#OH;
+            $what->{chirality} = '@OH' . ($opposite + 1);
         }
     } else {
         for ($what->vertices) {
@@ -270,6 +326,19 @@ sub mirror($)
 sub toggle_cistrans($)
 {
     return $_[0] eq '/' ? '\\' : '/';
+}
+
+sub valence($$)
+{
+    my( $moiety, $atom ) = @_;
+    return ($atom->{hcount} ? $atom->{hcount} : 0) +
+           sum0 map { exists $bond_symbol_to_order{$_}
+                           ? $bond_symbol_to_order{$_}
+                           : 1 }
+                map { $moiety->has_edge_attribute( $atom, $_, 'bond' )
+                           ? $moiety->get_edge_attribute( $atom, $_, 'bond' )
+                           : 1 }
+                    $moiety->neighbours( $atom );
 }
 
 # CAVEAT: requires output from non-raw parsing due issue similar to GH#2
@@ -496,7 +565,12 @@ convert neither implicit nor explicit hydrogen atoms in square brackets
 to atom hashes of their own. Moreover, it will not attempt to unify the
 representations of chirality. It should be noted, though, that many of
 subroutines of Chemistry::OpenSMILES expect non-raw data structures,
-thus processing raw output may produce distorted results.
+thus processing raw output may produce distorted results. In particular,
+C<write_SMILES()> calls from
+L<Chemistry::OpenSMILES::Writer|Chemistry::OpenSMILES::Writer> have to
+be instructed to expect raw data structure:
+
+    write_SMILES( \@moieties, { raw => 1 } );
 
 =back
 

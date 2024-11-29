@@ -18,6 +18,8 @@ use SPVM 'Fn';
 
 ok(SPVM::TestCase::Net::SSLeay->test);
 
+ok(SPVM::TestCase::Net::SSLeay->test_no_mozilla_ca);
+
 ok(SPVM::TestCase::Net::SSLeay::SSL_CTX->set_alpn_protos_with_protocols);
 
 ok(SPVM::TestCase::Net::SSLeay::SSL_CTX->set_alpn_select_cb_with_protocols);

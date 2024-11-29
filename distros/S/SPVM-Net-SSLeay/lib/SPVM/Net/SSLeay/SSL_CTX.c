@@ -6,6 +6,18 @@
 
 #include <assert.h>
 
+// For set_default_verify_paths_windows method
+#ifdef _WIN32
+
+#include <windows.h>
+#include <wincrypt.h>
+#include <cryptuiapi.h>
+
+#pragma comment (lib, "crypt32.lib")
+#pragma comment (lib, "cryptui.lib")
+
+#endif
+
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
@@ -1984,6 +1996,76 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__sess_set_remove_cb(SPVM_ENV* env, SPVM_VALUE
   SSL_CTX_sess_set_remove_cb(self, native_cb);
   
   return 0;
+}
+
+// Originally copied from https://stackoverflow.com/questions/9507184/can-openssl-on-windows-use-the-system-certificate-store
+int32_t SPVM__Net__SSLeay__SSL_CTX__set_default_verify_paths_windows(SPVM_ENV* env, SPVM_VALUE* stack) {
+#if !_WIN32
+  env->die(env, stack, "Net::SSLeay::SSL_CTX#set_default_verify_paths_windows method is not supported on this system(!_WIN32)", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#else
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  SSL_CTX* self = env->get_pointer(env, stack, obj_self);
+  
+  X509_STORE *store = SSL_CTX_get_cert_store(self);
+  
+  HCERTSTORE hStore = CertOpenSystemStore(0, "ROOT");
+  
+  if (!hStore) {
+    error_id = env->die(env, stack, "[Windows Error]CertOpenSystemStore failed.", __func__, FILE_NAME, __LINE__);
+    goto END_OF_FUNC;
+  }
+  
+  PCCERT_CONTEXT pContext = NULL;
+  
+  while (pContext = CertEnumCertificatesInStore(hStore, pContext)) {
+    char *encoded_cert = pContext->pbCertEncoded;
+    
+    X509 *x509 = d2i_X509(NULL, (const unsigned char **)&encoded_cert, pContext->cbCertEncoded);
+    
+    if (!x509) {
+      int64_t ssl_error = ERR_peek_last_error();
+      
+      char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
+      ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
+      
+      env->die(env, stack, "[OpenSSL Error]d2i_X509 failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+      
+      int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+      
+      goto END_OF_FUNC;
+    }
+    
+    int32_t status = X509_STORE_add_cert(store, x509);
+    
+    X509_free(x509);
+    
+    if (!(status == 1)) {
+      int64_t ssl_error = ERR_peek_last_error();
+      
+      char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
+      ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
+      
+      env->die(env, stack, "[OpenSSL Error]X509_STORE_add_cert failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+      
+      int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+      
+      goto END_OF_FUNC;
+    }
+  }
+  
+  END_OF_FUNC:
+  
+  if (hStore) {
+    CertCloseStore(hStore, 0);
+  }
+  
+  return error_id;
+#endif
 }
 
 int32_t SPVM__Net__SSLeay__SSL_CTX__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {

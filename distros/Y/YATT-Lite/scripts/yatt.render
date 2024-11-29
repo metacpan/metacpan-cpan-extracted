@@ -3,7 +3,8 @@
 #----------------------------------------
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
-use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+use FindBin; BEGIN {local $_ = "$FindBin::RealBin/libdir.pl"; -r $_ and do $_}
+sub MY () {__PACKAGE__}
 #----------------------------------------
 
 use CGI;
@@ -49,7 +50,7 @@ my @command;
     MY->parse_params(\@ARGV, \%params);
     my $parameters = Hash::MultiValue->new(%params);
 
-    my $dir = dirname($dispatcher->rel2abs($file));
+    my $dir = File::Basename::dirname($dispatcher->rel2abs($file));
     $dir =~ s,/*$,/,;
     my $dirhandler = $dispatcher->get_dirhandler($dir)
       or die "Can't find dirhandler for $dir";
@@ -80,7 +81,7 @@ foreach my $cmd (@command) {
      , system => $SYS, yatt => $YATT);
 
   my ($part, $sub, $this, $args)
-    = $dirhandler->prepare_part_handler($CON, basename($file));
+    = $dirhandler->prepare_part_handler($CON, File::Basename::basename($file));
 
   my $err = catch {
     $sub->($this, $CON, @$args);

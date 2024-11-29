@@ -6,7 +6,9 @@ use mro 'c3';
 
 use fields;
 
-use YATT::Lite::XHF qw(read_file_xhf);
+require YATT::Lite::XHF;
+*read_file_xhf = *YATT::Lite::XHF::read_file_xhf;
+*read_file_xhf = *YATT::Lite::XHF::read_file_xhf;
 
 require YATT::Lite::Util;
 

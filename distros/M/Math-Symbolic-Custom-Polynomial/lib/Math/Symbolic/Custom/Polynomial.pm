@@ -14,7 +14,7 @@ Math::Symbolic::Custom::Polynomial - Polynomial routines for Math::Symbolic
 
 =head1 VERSION
 
-Version 0.1
+Version 0.11
 
 =cut
 
@@ -23,7 +23,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw/symbolic_poly/;
 
-our $VERSION = '0.1';
+our $VERSION = '0.11';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::Custom::Collect 0.2;
@@ -341,7 +341,7 @@ Matt Johnson, C<< <mjohnson at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-math-symbolic-custom-collect at rt.cpan.org>, or through
+Please report any bugs or feature requests to C<bug-math-symbolic-custom-polynomial at rt.cpan.org>, or through
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-Symbolic-Custom-Polynomial>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 

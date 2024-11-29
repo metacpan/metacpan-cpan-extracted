@@ -2,7 +2,8 @@
 #----------------------------------------
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
-use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+use FindBin; BEGIN {local $_ = "$FindBin::RealBin/libdir.pl"; -r $_ and do $_}
+sub MY () {__PACKAGE__}
 #----------------------------------------
 
 use mro 'c3';
@@ -48,7 +49,7 @@ if ($opts->{cf_tap}) {
 }
 
 foreach my $fn (@ARGV) {
-  my $dir = dirname($fn);
+  my $dir = File::Basename::dirname($fn);
   my $dirhandler = $dispatcher->get_dirhandler($dispatcher->rel2abs($dir));
   $dirhandler->fconfigure_encoding(\*STDOUT, \*STDERR);
 
@@ -72,7 +73,7 @@ foreach my $fn (@ARGV) {
   $dirhandler->configure(error_handler => $error_handler);
 
   my $trans = $dirhandler->open_trans;
-  my $tmpl = $trans->find_file(basename($fn)) or do {
+  my $tmpl = $trans->find_file(File::Basename::basename($fn)) or do {
     warn "No such file: $fn\n";
     $nerror++;
     next;

@@ -6,9 +6,9 @@ use utf8;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-07-08'; # DATE
+our $DATE = '2024-11-21'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 our %SPEC;
 
@@ -229,6 +229,12 @@ my @magnesium_forms = (
         name=>'mg-mg-taurate',
         magnesium_ratio => 24.305/272.6, # 8.92%
         summary => 'Magnesium taurate (C4H12MgN2O6S2), in milligrams',
+    },
+
+    {
+        name=>'mg-magshape',
+        magnesium_ratio => 0.32, # 30-36.6% from COA
+        summary => 'MAGSHAPE (microencapsulated form of magnesium developed for use in dietary supplements and functional foods, containing MgO, modified preserved maize starch, sunflower lecithin), in milligrams',
     },
 );
 
@@ -712,35 +718,40 @@ sub convert_iron_unit {
 our @calcium_forms = (
     {
         name => 'mg-ca-elem',
-        iron_ratio => 1,
+        calcium_ratio => 1,
         summary => 'Elemental calcium, in milligrams',
     },
     {
         name => 'mg-ca-carbonate',
-        iron_ratio => 40.078 / 100.0869, # 40.04%
+        calcium_ratio => 40.078 / 100.0869, # 40.04%
         summary => 'Calcium carbonate (CaCO3), in milligrams',
     },
     {
         name => 'mg-ca-pidolate',
-        iron_ratio => 40.078 / 296.29, # 13.53%
+        calcium_ratio => 40.078 / 296.29, # 13.53%
         summary => 'Calcium pidolate (C10H12CaN2O6), in milligrams',
         tags => ['water-soluble'],
     },
     {
         name => 'mg-ca-lactate',
-        iron_ratio => 40.078 / 218.22, # 18.37%
+        calcium_ratio => 40.078 / 218.22, # 18.37%
         summary => 'Calcium lactate (C6H10CaO6), in milligrams',
         tags => ['water-soluble'],
     },
     { # source: pubchem
         name => 'mg-ca-citrate-anhydrous',
-        iron_ratio => 40.078 / 498.4, # 8.04%
+        calcium_ratio => 40.078 / 498.4, # 8.04%
         summary => 'Calcium citrate anhydrous (C12H10Ca3O14), in milligrams',
     },
     { # source: pubchem
         name => 'mg-ca-citrate-tetrahydrate',
-        iron_ratio => 40.078 / 570.5, # 7.03%
+        calcium_ratio => 40.078 / 570.5, # 7.03%
         summary => 'Calcium citrate tetrahydrate (C12H18Ca3O18) [most common hydrate form of Ca-citrate], in milligrams',
+    },
+    { # source: nih
+        name => 'mg-ca-ascorbate-dihydrate',
+        calcium_ratio => 40.078 / 426.34, # 9.40%
+        summary => 'Calcium ascorbate dihydrate (C12H18CaO14), in milligrams',
     },
 );
 
@@ -799,7 +810,7 @@ sub convert_calcium_unit {
     require Physics::Unit;
 
     Physics::Unit::InitUnit(
-        map {([$_->{name}], sprintf("%.3f mg", $_->{iron_ratio}*($_->{purity}//1)))}
+        map {([$_->{name}], sprintf("%.3f mg", $_->{calcium_ratio}*($_->{purity}//1)))}
         @calcium_forms,
     );
 
@@ -846,7 +857,7 @@ App::MineralUtils - Utilities related to mineral supplements
 
 =head1 VERSION
 
-This document describes version 0.014 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2024-07-08.
+This document describes version 0.015 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2024-11-21.
 
 =head1 DESCRIPTION
 
@@ -921,15 +932,20 @@ Result:
        unit    => "mg-ca-citrate-tetrahydrate",
        summary => "Calcium citrate tetrahydrate (C12H18Ca3O18) [most common hydrate form of Ca-citrate], in milligrams",
      },
+     {
+       amount  => 10.6382978723404,
+       unit    => "mg-ca-ascorbate-dihydrate",
+       summary => "Calcium ascorbate dihydrate (C12H18CaO14), in milligrams",
+     },
    ],
    {
-     "table.fields"        => ["amount", "unit", "summary"],
+     "table.field_aligns"  => ["number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
-     "table.field_aligns"  => ["number", "left", "left"],
+     "table.fields"        => ["amount", "unit", "summary"],
    },
  ]
 
@@ -1001,13 +1017,13 @@ Result:
      },
    ],
    {
+     "table.fields"        => ["amount", "unit", "summary"],
      "table.field_aligns"  => ["number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
-     "table.fields"        => ["amount", "unit", "summary"],
    },
  ]
 
@@ -1232,15 +1248,20 @@ Result:
        unit    => "mg-mg-taurate",
        summary => "Magnesium taurate (C4H12MgN2O6S2), in milligrams",
      },
+     {
+       amount  => 3.125,
+       unit    => "mg-magshape",
+       summary => "MAGSHAPE (microencapsulated form of magnesium developed for use in dietary supplements and functional foods, containing MgO, modified preserved maize starch, sunflower lecithin), in milligrams",
+     },
    ],
    {
-     "table.fields"        => ["amount", "unit", "summary"],
      "table.field_aligns"  => ["number", "left", "left"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
+     "table.fields"        => ["amount", "unit", "summary"],
    },
  ]
 
@@ -1365,12 +1386,12 @@ Result:
      },
    ],
    {
+     "table.field_aligns"  => ["number", "left", "left"],
      "table.field_formats" => [
                                 ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
-     "table.field_aligns"  => ["number", "left", "left"],
      "table.fields"        => ["amount", "unit", "summary"],
    },
  ]
@@ -1486,12 +1507,12 @@ Result:
    ],
    {
      "table.fields"        => ["amount", "unit", "summary"],
-     "table.field_aligns"  => ["number", "left", "left"],
      "table.field_formats" => [
                                 ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
+     "table.field_aligns"  => ["number", "left", "left"],
    },
  ]
 
@@ -1573,7 +1594,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -339,6 +339,16 @@ Converts a binary string into its equivalent ASCII string representation. It tak
 
 =cut
 
+=head2 byte
+
+    self.byte(pos)
+
+Returns the
+
+Aliases: I<byte_at>
+
+=cut
+
 =head2 bytes
 
     str.bytes
@@ -429,6 +439,14 @@ Aliases: I<code_points>
 Returns the
 
 Aliases: I<find_all>, I<findall>
+
+=cut
+
+=head2 cons
+
+    self.cons(n)
+
+Returns the
 
 =cut
 
@@ -525,6 +543,14 @@ Aliases: I<each_char>
     self.each_byte {|byte| ... }
 
 Iterates through each byte value in the string and applies a given block of code to each byte value.
+
+=cut
+
+=head2 each_cons
+
+    self.each_cons(n, block)
+
+Returns the
 
 =cut
 
@@ -682,18 +708,6 @@ Aliases: I<foldcase>
 
 =cut
 
-=head2 first
-
-    str.first(n)
-
-Returns the first C<n> characters of the input string, where C<n> is an integer.
-
-Parameters:
-
-    n : An integer that represents the number of characters to be returned from the beginning of the input string.
-
-=cut
-
 =head2 flip
 
     str.flip
@@ -805,6 +819,18 @@ Parameters:
 When a regular expression is given, it checks if the regular expression pattern matches within the input string starting from a given position.
 
 Aliases: I<contain>, I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 first
+
+    str.first(n)
+
+Returns the first C<n> characters of the input string, where C<n> is an integer.
+
+Parameters:
+
+    n : An integer that represents the number of characters to be returned from the beginning of the input string.
 
 =cut
 
@@ -1037,13 +1063,17 @@ Returns the
 
 =cut
 
-=head2 jaro_distance
+=head2 jaro
 
-    jaro_distance(str1, str2, winkler=false)
+    jaro(str1, str2, winkler=false)
 
-Calculates the Jaro distance between two strings. Jaro distance is a measure of similarity between two strings, based on the number of matching characters and transpositions.
+Calculates the Jaro similarity between two strings. Jaro distance is a measure of similarity between two strings, based on the number of matching characters and transpositions.
 
-When the third argument is true, it returns the Jaro-Winkler distance.
+    say jaro("accommodate", "accomodate")         #=> 0.96969696969697
+
+When the third argument is true, it returns the Jaro-Winkler similarity score.
+
+    say jaro("accommodate", "accomodate", true)   #=> 0.981818181818182
 
 =cut
 
@@ -1254,14 +1284,6 @@ Returns the
 
 =cut
 
-=head2 printlnf
-
-    self.printlnf(*arguments)
-
-Returns the
-
-=cut
-
 =head2 range
 
     from.range(to, step)
@@ -1309,6 +1331,16 @@ Aliases: I<rstrip>, I<trim_end>, I<strip_end>, I<trim_right>, I<strip_right>
     method.run(self, *args)
 
 Returns the
+
+=cut
+
+=head2 sayf
+
+    self.sayf(*arguments)
+
+Returns the
+
+Aliases: I<printlnf>
 
 =cut
 

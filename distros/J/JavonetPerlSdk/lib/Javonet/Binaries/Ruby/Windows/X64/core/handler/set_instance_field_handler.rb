@@ -17,12 +17,16 @@ class SetInstanceFieldHandler < AbstractCommandHandler
   
       merged_value = '@' + command.payload[1]
       begin
-        command.payload[0].instance_variable_set(merged_value, command.payload[2])
-      rescue NameError
+        if command.payload[0].instance_variable_defined?(merged_value)
+          command.payload[0].instance_variable_set(merged_value, command.payload[2])
+        else
+          raise Exception
+        end
+      rescue Exception
         fields = command.payload[0].instance_variables
         message = "Field #{command.payload[1]} not found in class #{command.payload[0].class.name}. Available fields:\n"
         fields.each { |field_iter| message += "#{field_iter} \n" }
-        raise Exception, message
+        raise ArgumentError, message
       end
     rescue Exception => e
       return e

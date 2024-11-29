@@ -1251,6 +1251,22 @@ Returns the
 
 =cut
 
+=head2 isort
+
+    self.isort
+
+Returns the
+
+=cut
+
+=head2 isort_by
+
+    self.isort_by(block)
+
+Returns the
+
+=cut
+
 =head2 item
 
     self.item(index)
@@ -1275,11 +1291,17 @@ Returns the
 
 =cut
 
-=head2 jaro_distance
+=head2 jaro
 
-    self.jaro_distance(arg, winkler)
+    jaro(arr1, arr2, winkler=false)
 
-Returns the
+Calculates the Jaro similarity between two arrays. Jaro distance is a measure of similarity between two sequences of symbols, based on the number of matching symbols and transpositions.
+
+    say jaro("accommodate".chars, "accomodate".chars)         #=> 0.96969696969697
+
+When the third argument is true, it returns the Jaro-Winkler similarity score.
+
+    say jaro("accommodate".chars, "accomodate".chars, true)   #=> 0.981818181818182
 
 =cut
 
@@ -2080,6 +2102,32 @@ Returns the
 =head2 shuffle
 
     self.shuffle
+
+Returns the
+
+=cut
+
+=head2 skip
+
+    self.skip(n)
+
+Returns the
+
+Aliases: I<skip_first>
+
+=cut
+
+=head2 skip_by
+
+    self.skip_by(block)
+
+Returns the
+
+=cut
+
+=head2 skip_last
+
+    self.skip_last(n)
 
 Returns the
 

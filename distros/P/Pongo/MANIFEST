@@ -1,0 +1,22 @@
+lib/Pongo.pm
+lib/Pongo/BSON.pm
+lib/Pongo/BSON.xs
+lib/Pongo/CheckVersion.pm
+lib/Pongo/CheckVersion.xs
+lib/Pongo/Client.pm
+lib/Pongo/Client.xs
+lib/Pongo/Logging.pm
+lib/Pongo/Logging.xs
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/check_version.t
+t/connection.t
+t/get_major_version.t
+t/get_micro_version.t
+t/get_minor_version.t
+t/get_version.t
+todo.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

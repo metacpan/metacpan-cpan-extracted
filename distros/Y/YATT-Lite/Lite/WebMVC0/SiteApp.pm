@@ -698,6 +698,10 @@ sub configure_allow_debug_from {
 
 sub has_htdebug {
   (my MY $self, my $name) = @_;
+  my $envName = uc("htdebug_$name");
+  if (exists $ENV{$envName}) {
+    return $ENV{$envName};
+  }
   defined $self->{cf_app_root}
     and -e "$self->{cf_app_root}/.htdebug_$name"
 }

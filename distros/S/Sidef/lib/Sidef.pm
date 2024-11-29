@@ -3,7 +3,7 @@ package Sidef {
     use utf8;
     use 5.016;
 
-    our $VERSION = '24.05';
+    our $VERSION = '24.11';
 
     our $SPACES      = 0;    # the current number of indentation spaces
     our $SPACES_INCR = 4;    # the number of indentation spaces
@@ -317,6 +317,8 @@ package Sidef {
     sub normalize_type {
         my ($type) = @_;
 
+        $type // return '';
+
         if (index($type, 'Sidef::') == 0) {
 
             if ($type =~ /::[0-9]+::/) {
@@ -332,7 +334,7 @@ package Sidef {
 
     sub normalize_method {
         my ($type, $method) = ($_[0] =~ /^(.*[^:])::(.*)$/);
-        normalize_type($type) . '#' . $method;
+        normalize_type($type) . '#' . ($method // '');
     }
 
     sub jaro {

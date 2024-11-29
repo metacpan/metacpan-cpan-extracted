@@ -19,14 +19,14 @@ class GetInstanceFieldHandler < AbstractCommandHandler
       if command.payload[0].instance_variable_defined?(merged_value)
         response = command.payload[0].instance_variable_get(merged_value)
       else
-        raise "Instance field not defined"
+        raise Exception
       end
       return response
-    rescue NameError
+    rescue Exception => e
       fields = command.payload[0].instance_variables
       message = "Field #{command.payload[1]} not found in object of class #{command.payload[0].class.name}. Available fields:\n"
       fields.each { |field_iter| message += "#{field_iter}\n" }
-      raise Exception, message
+      raise ArgumentError, message
     rescue Exception => e
       return e
     end

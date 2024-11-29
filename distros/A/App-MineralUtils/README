@@ -2,8 +2,8 @@ NAME
     App::MineralUtils - Utilities related to mineral supplements
 
 VERSION
-    This document describes version 0.014 of App::MineralUtils (from Perl
-    distribution App-MineralUtils), released on 2024-07-08.
+    This document describes version 0.015 of App::MineralUtils (from Perl
+    distribution App-MineralUtils), released on 2024-11-21.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -68,15 +68,20 @@ FUNCTIONS
                unit    => "mg-ca-citrate-tetrahydrate",
                summary => "Calcium citrate tetrahydrate (C12H18Ca3O18) [most common hydrate form of Ca-citrate], in milligrams",
              },
+             {
+               amount  => 10.6382978723404,
+               unit    => "mg-ca-ascorbate-dihydrate",
+               summary => "Calcium ascorbate dihydrate (C12H18CaO14), in milligrams",
+             },
            ],
            {
-             "table.fields"        => ["amount", "unit", "summary"],
+             "table.field_aligns"  => ["number", "left", "left"],
              "table.field_formats" => [
-                                        ["number", { thousands_sep => "", precision => 3 }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
-             "table.field_aligns"  => ["number", "left", "left"],
+             "table.fields"        => ["amount", "unit", "summary"],
            },
          ]
 
@@ -139,13 +144,13 @@ FUNCTIONS
              },
            ],
            {
+             "table.fields"        => ["amount", "unit", "summary"],
              "table.field_aligns"  => ["number", "left", "left"],
              "table.field_formats" => [
-                                        ["number", { thousands_sep => "", precision => 3 }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
-             "table.fields"        => ["amount", "unit", "summary"],
            },
          ]
 
@@ -361,15 +366,20 @@ FUNCTIONS
                unit    => "mg-mg-taurate",
                summary => "Magnesium taurate (C4H12MgN2O6S2), in milligrams",
              },
+             {
+               amount  => 3.125,
+               unit    => "mg-magshape",
+               summary => "MAGSHAPE (microencapsulated form of magnesium developed for use in dietary supplements and functional foods, containing MgO, modified preserved maize starch, sunflower lecithin), in milligrams",
+             },
            ],
            {
-             "table.fields"        => ["amount", "unit", "summary"],
              "table.field_aligns"  => ["number", "left", "left"],
              "table.field_formats" => [
                                         ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
+             "table.fields"        => ["amount", "unit", "summary"],
            },
          ]
 
@@ -485,12 +495,12 @@ FUNCTIONS
              },
            ],
            {
+             "table.field_aligns"  => ["number", "left", "left"],
              "table.field_formats" => [
                                         ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
-             "table.field_aligns"  => ["number", "left", "left"],
              "table.fields"        => ["amount", "unit", "summary"],
            },
          ]
@@ -604,12 +614,12 @@ FUNCTIONS
            ],
            {
              "table.fields"        => ["amount", "unit", "summary"],
-             "table.field_aligns"  => ["number", "left", "left"],
              "table.field_formats" => [
                                         ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
+             "table.field_aligns"  => ["number", "left", "left"],
            },
          ]
 
@@ -682,8 +692,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024, 2022, 2021 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

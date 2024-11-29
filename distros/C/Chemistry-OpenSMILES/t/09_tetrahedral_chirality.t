@@ -2,8 +2,12 @@
 
 use strict;
 use warnings;
+
+use Chemistry::OpenSMILES qw( mirror );
 use Chemistry::OpenSMILES::Parser;
-use Chemistry::OpenSMILES::Writer qw(write_SMILES);
+use Chemistry::OpenSMILES::Stereo qw( chirality_to_pseudograph );
+use Chemistry::OpenSMILES::Writer qw( write_SMILES );
+use Data::Dumper;
 use Test::More;
 
 my @cases = (
@@ -20,7 +24,10 @@ my @cases = (
     [ 'C1OCC[C@]1(Cl)Br', 'C1(O(C(C([C@]1(Cl)(Br)))))', 'Br([C@@]1(Cl)(C(C(O(C1)))))' ],
 );
 
-plan tests => 2 * scalar @cases;
+eval 'use Graph::Nauty qw( are_isomorphic )';
+my $has_Graph_Nauty = !$@;
+
+plan tests => 2 * @cases + $has_Graph_Nauty * 3 * @cases;
 
 for my $case (@cases) {
     my $parser;
@@ -30,11 +37,36 @@ for my $case (@cases) {
     $parser = Chemistry::OpenSMILES::Parser->new;
     @moieties = $parser->parse( $case->[0], { raw => 1 } );
 
-    $result = write_SMILES( \@moieties );
-    is( $result, $case->[1] );
+    $result = write_SMILES( \@moieties, { raw => 1 } );
+    is $result, $case->[1];
 
-    $result = write_SMILES( \@moieties, \&reverse_order );
-    is( $result, $case->[2] );
+    $result = write_SMILES( \@moieties, { raw => 1, order_sub => \&reverse_order } );
+    is $result, $case->[2];
+
+    next unless $has_Graph_Nauty;
+
+    # Ensuring the SMILES representations describe isomorphic graphs
+    my @graphs = map { $parser->parse( $_ ) } @$case, $case->[0];
+    mirror $graphs[3];
+    for (@graphs) {
+        chirality_to_pseudograph( $_ );
+    }
+    ok  are_isomorphic( $graphs[0], $graphs[1], \&depict );
+    ok  are_isomorphic( $graphs[1], $graphs[2], \&depict );
+    ok !are_isomorphic( $graphs[0], $graphs[3], \&depict );
+}
+
+sub depict
+{
+    my( $vertex ) = @_;
+
+    if( ref $vertex eq 'HASH' && exists $vertex->{symbol} ) {
+        $vertex = { %$vertex };
+        delete $vertex->{chirality};
+        return write_SMILES( $vertex );
+    }
+
+    return Dumper $vertex;
 }
 
 sub reverse_order

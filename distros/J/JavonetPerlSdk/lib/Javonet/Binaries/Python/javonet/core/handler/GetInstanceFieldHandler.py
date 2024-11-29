@@ -16,7 +16,7 @@ class GetInstanceFieldHandler(AbstractCommandHandler):
                 return getattr(clazz, field)
             except AttributeError:
                 fields = [field for field in dir(clazz) if not callable(getattr(clazz, field))]
-                message = "Field {} not found in class {}. Available fields:\n".format(field, clazz.__name__)
+                message = "Field {} not found in class {}. Available fields:\n".format(field, clazz.__class__.__name__)
                 for field in fields:
                     message += "{}\n".format(field)
                 raise AttributeError(message)

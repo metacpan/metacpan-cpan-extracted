@@ -1,6 +1,9 @@
 require_relative 'abstract_command_handler'
 
 class LoadLibraryHandler < AbstractCommandHandler
+
+  @@loaded_libraries = []
+
   def initialize
     @required_parameters_count = 1
   end
@@ -17,9 +20,14 @@ class LoadLibraryHandler < AbstractCommandHandler
       end
       #noinspection RubyResolve
       require(assembly_name)
+      @@loaded_libraries.push(assembly_name)
       return 0
     rescue Exception => e
       return e
     end
+  end
+
+  def self.get_loaded_libraries
+    @@loaded_libraries
   end
 end

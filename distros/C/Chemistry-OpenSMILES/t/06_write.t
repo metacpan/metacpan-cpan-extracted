@@ -23,6 +23,8 @@ my @cases = (
     [ 'c1(c(cccc1)F)C(=O)[O-]', 'c:1(:c(:c(:c(:c(:c:1))))(F))(C(=O)([O-]))' ],
     # Cyclooctatetraene adapted from OpenSMILES v1.0 specification:
     [ 'C/1=C/C=C\C=C/C=C\1', 'C/1(=C(/C(=C(\C(=C(/C(=C\1)))))))' ],
+    # A regression test for impropertly recorded fact that 0 H atoms are present:
+    [ '[C]#[O]', '[C](#[O])' ],
 );
 
 plan tests => 2 * scalar @cases;
@@ -34,11 +36,11 @@ for my $case (@cases) {
 
     $parser = Chemistry::OpenSMILES::Parser->new;
     @moieties = $parser->parse( $case->[0], { raw => 1 } );
-    $result = write_SMILES( \@moieties );
-    is( $result, $case->[1] );
+    $result = write_SMILES( \@moieties, { raw => 1 } );
+    is $result, $case->[1];
 
     $parser = Chemistry::OpenSMILES::Parser->new;
     @moieties = $parser->parse( $result, { raw => 1 } );
-    $result = write_SMILES( \@moieties );
-    is( $result, $case->[1] );
+    $result = write_SMILES( \@moieties, { raw => 1 } );
+    is $result, $case->[1];
 }

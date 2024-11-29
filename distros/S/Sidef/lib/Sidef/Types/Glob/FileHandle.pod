@@ -58,6 +58,16 @@ Returns the
 
 =cut
 
+=head2 byte
+
+    self.byte(var_ref)
+
+Returns the
+
+Aliases: I<getb>, I<read_byte>
+
+=cut
+
 =head2 call
 
     self.call
@@ -238,7 +248,7 @@ Aliases: I<collect>
 
 =head2 new_buf
 
-    self.new_buf(mode)
+    self.new_buf(mode, initial_string)
 
 Returns the
 
@@ -287,6 +297,16 @@ Returns the
 Returns the
 
 Aliases: I<println>
+
+=cut
+
+=head2 sayf
+
+    self.sayf(format, *args)
+
+Returns the
+
+Aliases: I<printlnf>
 
 =cut
 

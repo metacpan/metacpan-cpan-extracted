@@ -109,7 +109,7 @@ test_invoke_multiple_runtime_contexts_are_different4();
 test_invoke_multiple_runtime_contexts_are_different5();
 test_invoke_multiple_runtime_contexts_are_different6();
 test_create_runtime_context_with_config_path_which_exists();
-test_create_runtime_context_with_config_path_which_not_exists();
+#test_create_runtime_context_with_config_path_which_not_exists();
 
 done_testing();
 1

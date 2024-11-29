@@ -1,5 +1,9 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest
 
+0.001013  28 November 2024
+          - Support new interpolation syntax for variables in
+            newer version of Template::EmbeddedPerl
+
 0.001012  25 November 2024
           - Set a default template if none is provided
           - new helpers to make setting and getting script and

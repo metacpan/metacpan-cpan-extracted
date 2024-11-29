@@ -1,19 +1,23 @@
 package Chemistry::OpenSMILES::Writer;
 
+# ABSTRACT: OpenSMILES format writer
+our $VERSION = '0.10.0'; # VERSION
+
 use strict;
 use warnings;
 
 use Chemistry::OpenSMILES qw(
+    %bond_symbol_to_order
+    %normal_valence
     is_aromatic
     is_chiral
     toggle_cistrans
+    valence
 );
 use Chemistry::OpenSMILES::Parser;
+use Chemistry::OpenSMILES::Stereo::Tables qw( @OH @TB );
 use Graph::Traversal::DFS;
-use List::Util qw( all any uniq );
-
-# ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.9.0'; # VERSION
+use List::Util qw( all any first min none sum0 uniq );
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -21,20 +25,25 @@ our @EXPORT_OK = qw(
     write_SMILES
 );
 
+my %shape_to_SP = ( 'U' => '@SP1', '4' => '@SP2', 'Z' => '@SP3' );
+my %SP_to_shape = reverse %shape_to_SP;
+
 sub write_SMILES
 {
-    my( $what, $order_sub ) = @_;
+    my( $what, $options ) = @_;
+    # Backwards compatibility with the old API where second parameter was
+    # a subroutine reference for ordering:
+    my $order_sub = defined $options && ref $options eq 'CODE' ? $options : \&_order;
+    $options = {} unless defined $options && ref $options eq 'HASH';
 
-    if( ref $what eq 'HASH' ) {
-        # subroutine will also accept and properly represent a single
-        # atom:
-        return _pre_vertex( $what );
-    }
+    $order_sub = $options->{order_sub} if $options->{order_sub};
+    my $raw = $options->{raw};
+
+    # Subroutine will also accept and properly represent a single atom:
+    return _pre_vertex( $what, undef, { raw => $raw } ) if ref $what eq 'HASH';
 
     my @moieties = ref $what eq 'ARRAY' ? @$what : ( $what );
     my @components;
-
-    $order_sub = \&_order unless $order_sub;
 
     for my $graph (@moieties) {
         my @symbols;
@@ -66,9 +75,10 @@ sub write_SMILES
             pre  => sub { my( $vertex, $dfs ) = @_;
                           push @chiral, $vertex if is_chiral $vertex;
                           push @symbols,
-                          _pre_vertex( { map { $_ => $vertex->{$_} }
-                                         grep { $_ ne 'chirality' }
-                                         keys %$vertex } );
+                          _pre_vertex( $vertex,
+                                       $graph,
+                                       { omit_chirality => 1,
+                                         raw => $raw } );
                           $vertex_symbols{$vertex} = $#symbols },
 
             post => sub { push @symbols, ')' },
@@ -95,16 +105,39 @@ sub write_SMILES
 
         # Dealing with chirality
         for my $atom (@chiral) {
-            next unless $atom->{chirality} =~ /^@(@?|SP[123])$/;
+            next unless $atom->{chirality} =~ /^@(@?|SP[123]|TB1?[1-9]|TB20)$/;
 
             my @neighbours = $graph->neighbours($atom);
-            if( scalar @neighbours < 3 || scalar @neighbours > 4 ) {
-                # TODO: process also configurations other than tetrahedral
-                warn "chirality '$atom->{chirality}' observed for atom " .
-                     'with ' . scalar @neighbours . ' neighbours, can only ' .
-                     'process tetrahedral chiral centers with possible ' .
-                     'lone pairs' . "\n";
-                next;
+            my $has_lone_pair;
+            if( $atom->{chirality} =~ /^@(@?|SP[123])$/ ) {
+                if( scalar @neighbours < 3 || scalar @neighbours > 4 ) {
+                    warn "chirality '$atom->{chirality}' observed for atom " .
+                         'with ' . scalar @neighbours . ' neighbours, can only ' .
+                         'process tetrahedral chiral or square planar centers ' .
+                         'with possible lone pairs' . "\n";
+                    next;
+                }
+                $has_lone_pair = @neighbours == 3;
+            }
+            if( $atom->{chirality} =~ /^\@TB..?$/ ) {
+                if( scalar @neighbours < 4 || scalar @neighbours > 5 ) {
+                    warn "chirality '$atom->{chirality}' observed for atom " .
+                         'with ' . scalar @neighbours . ' neighbours, can only ' .
+                         'process trigonal bipyramidal centers ' .
+                         'with possible lone pairs' . "\n";
+                    next;
+                }
+                $has_lone_pair = @neighbours == 4;
+            }
+            if( $atom->{chirality} =~ /^\@OH..?$/ ) {
+                if( scalar @neighbours < 5 || scalar @neighbours > 6 ) {
+                    warn "chirality '$atom->{chirality}' observed for atom " .
+                         'with ' . scalar @neighbours . ' neighbours, can only ' .
+                         'process octahedral centers ' .
+                         'with possible lone pairs' . "\n";
+                    next;
+                }
+                $has_lone_pair = @neighbours == 5;
             }
 
             my $chirality_now = $atom->{chirality};
@@ -120,7 +153,7 @@ sub write_SMILES
                 my %indices;
                 for (0..$#{$atom->{chirality_neighbours}}) {
                     my $pos = $_;
-                    if( scalar @{$atom->{chirality_neighbours}} == 3 && $_ != 0 ) {
+                    if( $has_lone_pair && $_ != 0 ) {
                         # Lone pair is always second in the chiral neighbours array
                         $pos++;
                     }
@@ -128,14 +161,13 @@ sub write_SMILES
                 }
 
                 my @order_new;
-                # In newly established order, the atom from which this one
+                # In the newly established order, the atom from which this one
                 # is discovered (left hand side) will be the first, if any
                 if( $discovered_from{$atom} ) {
                     push @order_new,
                          $indices{$vertex_symbols{$discovered_from{$atom}}};
                 }
-                # Second, there will be ring bonds as they are added the
-                # first of all the neighbours
+                # Second, there will be ring bonds as they are added before all of the neighbours
                 if( $rings->{$vertex_symbols{$atom}} ) {
                     push @order_new, map  { $indices{$_} }
                                      sort { $a <=> $b }
@@ -148,10 +180,10 @@ sub write_SMILES
                                       @neighbours;
                 @order_new = uniq @order_new;
 
-                if( scalar @order_new == 3 ) {
+                if( $has_lone_pair ) {
                     # Accommodate the lone pair
                     if( $discovered_from{$atom} ) {
-                        @order_new = ( $order_new[0], 1, @order_new[1..2] );
+                        @order_new = ( $order_new[0], 1, @order_new[1..$#order_new] );
                     } else {
                         unshift @order_new, 1;
                     }
@@ -162,9 +194,14 @@ sub write_SMILES
                     if( join( '', _permutation_order( @order_new ) ) ne '0123' ) {
                         $chirality_now = $chirality_now eq '@' ? '@@' : '@';
                     }
-                } else {
+                } elsif( $atom->{chirality} =~ /^\@SP[123]$/ ) {
                     # Square planar centers
                     $chirality_now = _square_planar_chirality( @order_new, $chirality_now );
+                } elsif( $atom->{chirality} =~ /^\@TB..?$/ ) {
+                    # Trigonal bipyramidal centers
+                    $chirality_now = _trigonal_bipyramidal_chirality( @order_new, $chirality_now );
+                } else {
+                    # Octahedral centers
                 }
             }
 
@@ -229,7 +266,12 @@ sub _tree_edge
 
 sub _pre_vertex
 {
-    my( $vertex ) = @_;
+    my( $vertex, $graph, $options ) = @_;
+    $options = {} unless $options;
+    my( $omit_chirality,
+        $raw ) =
+      ( $options->{omit_chirality},
+        $options->{raw} );
 
     my $atom = $vertex->{symbol};
     my $is_simple = $atom =~ /^[bcnosp]$/i ||
@@ -240,7 +282,7 @@ sub _pre_vertex
         $is_simple = 0;
     }
 
-    if( is_chiral $vertex ) {
+    if( is_chiral $vertex && !$omit_chirality ) {
         $atom .= $vertex->{chirality};
         $is_simple = 0;
     }
@@ -249,6 +291,7 @@ sub _pre_vertex
         $atom .= 'H' . ($vertex->{hcount} == 1 ? '' : $vertex->{hcount});
         $is_simple = 0;
     }
+    $is_simple = 0 if $raw && exists $vertex->{hcount};
 
     if( $vertex->{charge} ) { # if non-zero
         $atom .= ($vertex->{charge} > 0 ? '+' : '') . $vertex->{charge};
@@ -259,6 +302,13 @@ sub _pre_vertex
     if( $vertex->{class} ) { # if non-zero
         $atom .= ':' . $vertex->{class};
         $is_simple = 0;
+    }
+
+    # Decide whether to put atom in square brackets because of unusual valence
+    if( $is_simple && $graph && !$raw && $normal_valence{ucfirst $atom} ) {
+        my $valence = valence( $graph, $vertex );
+        $is_simple = any { $_ == $valence }
+                         @{$normal_valence{ucfirst $atom}};
     }
 
     return $is_simple ? $atom : "[$atom]";
@@ -342,6 +392,88 @@ sub _square_planar_chirality
     }
 
     return $chirality;
+}
+
+sub _trigonal_bipyramidal_chirality
+{
+    my $chirality = pop @_;
+    my @order = @_;
+
+    $chirality = int substr $chirality, 3;
+    my $TB = $TB[$chirality - 1];
+    my @axis = map { $_ - 1 } @{$TB->{axis}};
+    my $order = $TB->{order};
+    my $opposite = 1 + first { $TB[$_]->{axis}[0] == $TB->{axis}[0] &&
+                               $TB[$_]->{axis}[1] == $TB->{axis}[1] &&
+                               $TB[$_]->{order}   ne $TB->{order} } 0..$#TB;
+
+    if( ($order[$axis[0]] == $axis[0] && $order[$axis[1]] == $axis[1]) ||
+        ($order[$axis[0]] == $axis[1] && $order[$axis[1]] == $axis[0]) ) {
+        # Axis is the same or inverted
+        @order = grep { $_ != $axis[0] && $_ != $axis[1] } @order;
+        while( $order[0] != min @order ) {
+            push @order, shift @order;
+        }
+        if( $order[$axis[0]] == $axis[1] && $order[$axis[1]] == $axis[0] ) {
+            ( $chirality, $opposite ) = ( $opposite, $chirality );
+        }
+        return '@TB' . $chirality if $order[1] < $order[2];
+        return '@TB' . $opposite;
+    } else {
+        # Axis has changed
+        my @axis_now = ( (first { $order[$_] == $axis[0] } 0..4),
+                         (first { $order[$_] == $axis[1] } 0..4) );
+        $chirality = 1 +  first { $TB[$_]->{axis}[0] == $axis_now[0] + 1 &&
+                                  $TB[$_]->{axis}[1] == $axis_now[1] + 1 &&
+                                  $TB[$_]->{order}   eq $order } 0..$#TB;
+        $opposite  = 1 +  first { $TB[$_]->{axis}[0] == $axis_now[0] + 1 &&
+                                  $TB[$_]->{axis}[1] == $axis_now[1] + 1 &&
+                                  $TB[$_]->{order}   ne $order } 0..$#TB;
+        @order = grep { $_ != $axis_now[0] && $_ != $axis_now[1] } @order;
+        while( $order[0] != min @order ) {
+            push @order, shift @order;
+        }
+        return '@TB' . $chirality if $order[1] < $order[2];
+        return '@TB' . $opposite;
+    }
+}
+
+sub _octahedral_chirality
+{
+    my $chirality = pop @_;
+    my @order = @_;
+
+    $chirality = int substr $chirality, 3;
+    my $OH = $OH[$chirality - 1];
+    my $shape = $OH->{shape};
+    my @axis = map { $_ - 1 } @{$OH->{axis}};
+    my $order = $OH->{order};
+
+    if( ($order[$axis[0]] == $axis[0] && $order[$axis[1]] == $axis[1]) ||
+        ($order[$axis[0]] == $axis[1] && $order[$axis[1]] == $axis[0]) ) {
+        # Axis is the same or inverted
+        my $SP = _square_planar_chirality( (map { $_ - 1 } @order), $shape_to_SP{$shape} );
+        # If axis is inverted, direction has to be inverted as well
+        # CHECKME: Does the change of shape affect direction?
+        if( $order[$axis[0]] == $axis[1] && $order[$axis[1]] == $axis[0] ) {
+            $order = $order eq '@' ? '@@' : '@';
+        }
+        $chirality = 1 + first { $OH[$_]->{shape} eq $SP_to_shape{$SP} &&
+                                 $OH[$_]->{axis}[0] == 1 && $OH[$_]->{axis}[1] == 6 &&
+                                 $OH[$_]->{order} eq $order } 0..$#OH;
+        return '@OH' . $chirality;
+    } else {
+        # Axis has changed
+        my @axes = ( \@axis );
+        my @remaining_numbers = grep { $_ != $axis[0] && $_ != $axis[1] } 0..5;
+        @remaining_numbers = map { $remaining_numbers[$_] } ( 0, 3, 1, 2 ) if $shape eq '4';
+        @remaining_numbers = map { $remaining_numbers[$_] } ( 0, 1, 3, 2 ) if $shape eq 'Z';
+        @remaining_numbers = reverse @remaining_numbers if $order eq '@@';
+        # TODO: Change of axis direction inverts the sign.
+        # TODO: When axis A is replaced by axis B, axis C remains unchanged.
+        # TODO: If axis change is to @, A is left untouched, replaces B.
+        # TODO: If axis change is to @@, A is inverted, replaces B.
+    }
 }
 
 sub _order

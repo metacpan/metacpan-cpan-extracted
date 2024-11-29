@@ -1,5 +1,5 @@
 package MooseX::Attribute::Catalyst::View::EmbeddedPerl::ExportedAttribute;
-  
+
 use Moose::Role;
  
 has 'exported_to_template' => (is=>'ro');

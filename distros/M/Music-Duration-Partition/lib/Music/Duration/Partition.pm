@@ -3,13 +3,14 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration into rhythmic phrases
 
-our $VERSION = '0.0820';
+our $VERSION = '0.0823';
 
 use Moo;
 use strictures 2;
-use MIDI::Simple ();
-use Math::Random::Discrete ();
 use List::Util qw(min);
+use Math::Random::Discrete ();
+use MIDI::Util qw(midi_dump reverse_dump);
+use Music::Duration;
 use namespace::clean;
 
 use constant TICKS => 96;
@@ -17,14 +18,14 @@ use constant TICKS => 96;
 
 has size => (
     is      => 'ro',
-    default => sub { return 4 },
+    default => sub { 4 },
 );
 
 
 has pool => (
     is      => 'ro',
     isa     => sub { die 'Empty pool not allowed' unless ref( $_[0] ) eq 'ARRAY' && @{ $_[0] } > 0 },
-    default => sub { return [ keys %MIDI::Simple::Length ] },
+    default => sub { [ keys %{ midi_dump('length') } ] },
 );
 
 has _min_size => (
@@ -35,9 +36,7 @@ has _min_size => (
 
 sub _build__min_size {
     my ($self) = @_;
-
     my @sizes = map { $self->_duration($_) } @{ $self->pool };
-
     return min(@sizes);
 }
 
@@ -63,7 +62,7 @@ has pool_select => (
 
 sub _build_pool_select {
     my ($self) = @_;
-    return sub { return $self->_mrd->rand };
+    return sub { $self->_mrd->rand };
 };
 
 
@@ -99,32 +98,35 @@ has _pool_group => (
 
 sub _build__pool_group {
     my ($self) = @_;
-
     my %pool_group;
     for my $i (0 .. @{ $self->pool } - 1) {
         $pool_group{ $self->pool->[$i] } = $self->groups->[$i];
     }
-
     return \%pool_group;
 }
 
 
 has remainder => (
     is      => 'ro',
-    default => sub { return 1 },
+    default => sub { 1 },
+);
+
+
+has abbreviation => (
+    is      => 'ro',
+    default => sub { 1 },
 );
 
 
 has verbose => (
     is      => 'ro',
-    default => sub { return 0 },
+    default => sub { 0 },
 );
 
 # hash reference of duration lengths (keyed by duration name)
-# Default: \%MIDI::Simple::Length
 has _durations => (
     is      => 'ro',
-    default => sub { return \%MIDI::Simple::Length },
+    default => sub { midi_dump('length') },
 );
 
 
@@ -165,8 +167,16 @@ sub motif {
         if (sprintf( $format, $diff ) < sprintf( $format, $self->_min_size )) {
             warn "WARNING: Leftover duration: $diff\n"
                 if $self->verbose;
-            push @$motif, 'd' . sprintf('%.0f', TICKS * $diff)
-                if $self->remainder && sprintf($format, TICKS * $diff) > 0;
+            my $tick_diff = TICKS * $diff;
+            my $dura = 'd' . sprintf('%.0f', $tick_diff);
+            if ($self->abbreviation) {
+                my $length = reverse_dump('length');
+                my %length = map { TICKS * $_ => $length->{$_} } keys %$length;
+                $dura = $length{$tick_diff}
+                    if exists $length{$tick_diff};
+            }
+            push @$motif, $dura
+                if $self->remainder && sprintf($format, $tick_diff) > 0;
             last;
         }
 
@@ -233,7 +243,7 @@ Music::Duration::Partition - Partition a musical duration into rhythmic phrases
 
 =head1 VERSION
 
-version 0.0820
+version 0.0823
 
 =head1 SYNOPSIS
 
@@ -294,7 +304,7 @@ Default: C<4>
 The list of possible note durations to use in constructing a rhythmic
 motif.
 
-Default: C<[ keys %MIDI::Simple::Length ]> (wn, hn, qn, ...)
+Default: C<[wn, hn, qn, ..., xn, yn, zn]> (see L<Music::Duration>)
 
 This can be either a list of duration names, or duration values,
 specified with a preceding C<d>.  A mixture of both is not well
@@ -339,6 +349,16 @@ entry should have a value greater than one.
   $remainder = $mdp->remainder;
 
 Append any remaining duration ticks to the end of the motif.
+
+Default: C<1> "Yes. Make it so."
+
+=head2 abbreviation
+
+  $abbreviation = $mdp->abbreviation;
+
+Any remaining duration is checked against the L<MIDI::Simple::Length>
+hash to see if it is included. If so, use that abbreviation, instead
+of a C<d> value.
 
 Default: C<1> "Yes. Make it so."
 
@@ -396,9 +416,11 @@ L<List::Util>
 
 L<Math::Random::Discrete>
 
-L<MIDI::Simple>
-
 L<Moo>
+
+L<MIDI::Util>
+
+L<Music::Duration>
 
 =head1 AUTHOR
 

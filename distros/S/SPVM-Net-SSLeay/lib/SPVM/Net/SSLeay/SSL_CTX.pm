@@ -386,6 +386,14 @@ C<method sess_set_remove_cb : void ($cb : L<Net::SSLeay::Callback::RemoveSession
 
 Calls native L<SSL_CTX_sess_set_remove_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_set_get_cb/> function given $cb.
 
+=head2 set_default_verify_paths_windows
+
+C<method set_default_verify_paths_windows : void ();>
+
+It behaves as if L</"set_default_verify_paths"> had been invoked in Windows using the way described below.
+
+L<https://stackoverflow.com/questions/9507184/can-openssl-on-windows-use-the-system-certificate-store>
+
 =head2 DESTROY
 
 C<method DESTROY : void ();>

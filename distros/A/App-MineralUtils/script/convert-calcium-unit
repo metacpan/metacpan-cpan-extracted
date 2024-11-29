@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-07-08'; # DATE
+our $DATE = '2024-11-21'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_calcium_unit",
@@ -39,7 +39,7 @@ convert-calcium-unit - Convert an iron quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.014 of convert-calcium-unit (from Perl distribution App-MineralUtils), released on 2024-07-08.
+This document describes version 0.015 of convert-calcium-unit (from Perl distribution App-MineralUtils), released on 2024-11-21.
 
 =head1 SYNOPSIS
 
@@ -207,6 +207,7 @@ For fish and zsh, install L<shcompgen> as described above.
  |  5.435 | mg-ca-lactate              | Calcium lactate (C6H10CaO6), in milligrams                                                          |
  | 12.500 | mg-ca-citrate-anhydrous    | Calcium citrate anhydrous (C12H10Ca3O14), in milligrams                                             |
  | 14.286 | mg-ca-citrate-tetrahydrate | Calcium citrate tetrahydrate (C12H18Ca3O18) [most common hydrate form of Ca-citrate], in milligrams |
+ | 10.638 | mg-ca-ascorbate-dihydrate  | Calcium ascorbate dihydrate (C12H18CaO14), in milligrams                                            |
  +--------+----------------------------+-----------------------------------------------------------------------------------------------------+
 
 =head1 HOMEPAGE
@@ -241,7 +242,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

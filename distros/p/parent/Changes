@@ -1,3 +1,8 @@
+0.243 2024-11-27
+    . Reinstate test for apostrophe as package separator, as the package
+      separator is allowed again
+    . No code change, only tests have been amended
+
 0.242 2024-08-12
     . Don't test for apostrophe as package separator on Perl versions
       after 5.41 (contributed by Tony Cook)

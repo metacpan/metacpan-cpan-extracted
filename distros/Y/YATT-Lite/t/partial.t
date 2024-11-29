@@ -134,7 +134,7 @@ END
 
   eval_ok(q{
     package t3_App1; use YATT::Lite::Inc; sub MY () {__PACKAGE__}
-    use YATT::Lite::Object -as_base;
+    use YATT::Lite::Object;
     use t3_Foo;
     use t3_Bar;
     sub m1 {
@@ -152,7 +152,7 @@ END
 
   error_like(q{
     package t3_App2; use YATT::Lite::Inc; sub MY () {__PACKAGE__}
-    use YATT::Lite::Object -as_base;
+    use YATT::Lite::Object;
     use t3_Foo;
     use t3_Bar;
     sub m1 {

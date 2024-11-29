@@ -17,7 +17,7 @@ class RuntimeLogger:
                 f"Python Implementation: {platform.python_implementation()}\n"
                 f"OS Version: {platform.system()} {platform.version()}\n"
                 f"Process Architecture: {platform.machine()}\n"
-                f"Current Directory: {os.getcwd()}\n"
+                f"Current Working Directory: {os.getcwd()}\n"
             )
         except Exception as e:
             return "Python Managed Runtime Info: Error while fetching runtime info"

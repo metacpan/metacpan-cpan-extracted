@@ -1,10 +1,24 @@
 package Chemistry::OpenSMILES::Stereo;
 
+# ABSTRACT: Stereochemistry handling routines
+our $VERSION = '0.10.0'; # VERSION
+
 use strict;
 use warnings;
 
-# ABSTRACT: Stereochemistry handling routines
-our $VERSION = '0.9.0'; # VERSION
+use Chemistry::OpenSMILES qw(
+    is_chiral
+    is_cis_trans_bond
+    is_double_bond
+    is_ring_bond
+    is_single_bond
+    toggle_cistrans
+);
+use Chemistry::OpenSMILES::Stereo::Tables qw( @TB );
+use Chemistry::OpenSMILES::Writer qw( write_SMILES );
+use Graph::Traversal::BFS;
+use Graph::Undirected;
+use List::Util qw( all any first max min sum sum0 uniq );
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -14,18 +28,6 @@ our @EXPORT_OK = qw(
     mark_all_double_bonds
     mark_cis_trans
 );
-
-use Chemistry::OpenSMILES qw(
-    is_cis_trans_bond
-    is_double_bond
-    is_ring_bond
-    is_single_bond
-    toggle_cistrans
-);
-use Chemistry::OpenSMILES::Writer qw( write_SMILES );
-use Graph::Traversal::BFS;
-use Graph::Undirected;
-use List::Util qw( all any max min sum sum0 uniq );
 
 sub mark_all_double_bonds
 {
@@ -229,50 +231,103 @@ sub mark_cis_trans
     }
 }
 
-# Store the tetrahedral chirality character as additional pseudo vertices
-# and edges.
+# Store chirality character as additional pseudo vertices and edges.
 sub chirality_to_pseudograph
 {
     my( $moiety ) = @_;
 
     for my $atom ($moiety->vertices) {
-        next unless Chemistry::OpenSMILES::is_chiral_tetrahedral( $atom );
-        next unless @{$atom->{chirality_neighbours}} >= 3 &&
-                    @{$atom->{chirality_neighbours}} <= 4;
+        next unless is_chiral $atom;
 
+        my $has_lone_pair;
         my @chirality_neighbours = @{$atom->{chirality_neighbours}};
-        if( @chirality_neighbours == 3 ) {
+
+        if( Chemistry::OpenSMILES::is_chiral_tetrahedral( $atom ) ||
+            Chemistry::OpenSMILES::is_chiral_planar( $atom ) ) {
+            next unless @chirality_neighbours >= 3 &&
+                        @chirality_neighbours <= 4;
+            $has_lone_pair = @chirality_neighbours == 3;
+        } elsif( Chemistry::OpenSMILES::is_chiral_trigonal_bipyramidal( $atom ) ) {
+            next unless @chirality_neighbours >= 4 &&
+                        @chirality_neighbours <= 5;
+            $has_lone_pair = @chirality_neighbours == 4;
+        }
+
+        if( $has_lone_pair ) {
             @chirality_neighbours = ( $chirality_neighbours[0],
                                       {}, # marking the lone pair
-                                      @chirality_neighbours[1..2] );
-        }
-        if( $atom->{chirality} eq '@' ) {
-            # Reverse the order if counter-clockwise
-            @chirality_neighbours = ( $chirality_neighbours[0],
-                                      reverse @chirality_neighbours[1..3] );
+                                      @chirality_neighbours[1..$#chirality_neighbours] );
         }
 
-        for my $i (0..3) {
-            my $neighbour = $chirality_neighbours[$i];
-            my @chirality_neighbours_now = @chirality_neighbours;
-            
-            if( $i % 2 ) {
-                # Reverse the order due to projected atom change
-                @chirality_neighbours_now = ( $chirality_neighbours_now[0],
-                                              reverse @chirality_neighbours_now[1..3] );
+        if( Chemistry::OpenSMILES::is_chiral_tetrahedral( $atom ) ) {
+            # Algorithm is described in detail in doi:10.1186/s13321-023-00692-1
+            if( $atom->{chirality} eq '@' ) {
+                # Reverse the order if counter-clockwise
+                @chirality_neighbours = ( $chirality_neighbours[0],
+                                          reverse @chirality_neighbours[1..3] );
             }
 
-            my @other = grep { $_ != $neighbour } @chirality_neighbours_now;
-            for my $offset (0..2) {
+            for my $i (0..3) {
+                my $neighbour = $chirality_neighbours[$i];
+                my @chirality_neighbours_now = @chirality_neighbours;
+
+                if( $i % 2 ) {
+                    # Reverse the order due to projected atom change
+                    @chirality_neighbours_now = ( $chirality_neighbours_now[0],
+                                                  reverse @chirality_neighbours_now[1..3] );
+                }
+
+                my @other = grep { $_ != $neighbour } @chirality_neighbours_now;
+                for my $offset (0..2) {
+                    my $connector = {};
+                    $moiety->set_edge_attribute( $neighbour, $connector, 'chiral', 'from' );
+                    $moiety->set_edge_attribute( $atom, $connector, 'chiral', 'to' );
+
+                    $moiety->set_edge_attribute( $connector, $other[0], 'chiral', 1 );
+                    $moiety->set_edge_attribute( $connector, $other[1], 'chiral', 2 );
+                    $moiety->set_edge_attribute( $connector, $other[2], 'chiral', 3 );
+
+                    push @other, shift @other;
+                }
+            }
+        } elsif( Chemistry::OpenSMILES::is_chiral_planar( $atom ) ) {
+            # For square planar environments it is enough to retain the enumeration order of atoms.
+            # To do so, "neighbouring neighbours" are connected together and a link to central atom is placed.
+            if(      $atom->{chirality} eq '@SP2' ) { # 4
+                @chirality_neighbours = map { $chirality_neighbours[$_] } ( 0, 2, 1, 3 );
+            } elsif( $atom->{chirality} eq '@SP3' ) { # Z
+                @chirality_neighbours = map { $chirality_neighbours[$_] } ( 0, 1, 3, 2 );
+            }
+
+            for my $i (0..3) {
                 my $connector = {};
-                $moiety->set_edge_attribute( $neighbour, $connector, 'chiral', 'from' );
-                $moiety->set_edge_attribute( $atom, $connector, 'chiral', 'to' );
+                $moiety->set_edge_attribute( $atom, $connector, 'chiral', 'center' );
+                $moiety->set_edge_attribute( $connector, $chirality_neighbours[$i], 'chiral', 'neighbour' );
+                $moiety->set_edge_attribute( $connector, $chirality_neighbours[($i + 1) % 4], 'chiral', 'neighbour' );
+            }
+        } else { # Trigonal bipyrimidal
+            my $number = substr $atom->{chirality}, 3;
+            my $setting = $TB[$number - 1];
 
-                $moiety->set_edge_attribute( $connector, $other[0], 'chiral', 1 );
-                $moiety->set_edge_attribute( $connector, $other[1], 'chiral', 2 );
-                $moiety->set_edge_attribute( $connector, $other[2], 'chiral', 3 );
+            my @axis  = map  { $chirality_neighbours[$_ - 1] } @{$setting->{axis}};
+            my @other = grep { $_ != $axis[0] && $_ != $axis[1] }
+                        map  { $chirality_neighbours[$_] } 0..4;
+            @other = reverse @other if $setting->{order} eq '@@';
 
-                push @other, shift @other;
+            for my $from (@axis) {
+                my $to = first { $_ != $from } @axis;
+                for my $offset (0..2) {
+                    my $connector = {};
+                    $moiety->set_edge_attribute( $from, $connector, 'chiral', 'from' );
+                    $moiety->set_edge_attribute( $atom, $connector, 'chiral', 'center' );
+                    $moiety->set_edge_attribute( $to,   $connector, 'chiral', 'to' );
+
+                    $moiety->set_edge_attribute( $connector, $other[-1], 'chiral', 'counter-clockwise' );
+                    $moiety->set_edge_attribute( $connector, $other[ 1], 'chiral', 'clockwise' );
+
+                    push @other, shift @other;
+                }
+                @other = reverse @other; # Inverting the axis
             }
         }
     }

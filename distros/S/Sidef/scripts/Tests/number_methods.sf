@@ -991,6 +991,17 @@ assert(!is_cyclic(2**256 - 1))
 assert(!is_cyclic(2**256 - 11))
 assert(!is_cyclic(100!))
 
+# OEIS: A376332
+assert(1..12 -> map {|k|       489118019 - k! }.all{.is_semiprime})
+assert(1..13 -> map {|k|      6233987183 - k! }.all{.is_semiprime})
+assert(1..14 -> map {|k|     87199150463 - k! }.all{.is_semiprime})
+assert(1..15 -> map {|k|   1310334397523 - k! }.all{.is_semiprime})
+assert(1..16 -> map {|k|  20937254735843 - k! }.all{.is_semiprime})
+assert(1..17 -> map {|k| 355693511854763 - k! }.all{.is_semiprime})
+
+assert(33110689978317405605970.phi.is_power(14))
+assert(1262838284613442604484690.phi.is_power(15))
+
 assert_eq(sum_primes(1e6), 37550402023)
 assert_eq(sum_primes(1, 1e6, 2), 24693298341834533)
 assert_eq(sum_primes(2, 1e6, 3), 18393235410255348281725)
@@ -1507,5 +1518,29 @@ assert_eq(gcud(-42.7, 0, 0), 42)
 assert_eq(lcm(1, 1, -42.7), 42)
 assert_eq(gcd(0, 0, -42.7), 42)
 assert_eq(gcud(0, 0, -42.7), 42)
+
+assert_eq(farey(5), [0, 1/5, 1/4, 1/3, 2/5, 1/2, 3/5, 2/3, 3/4, 4/5, 1]);
+assert_eq(10.of{.farey.map{.nu}.sum}, %n[0, 1, 2, 5, 9, 19, 25, 46, 62, 89])
+assert_eq(10.of{.farey.map{.de}.sum}, %n[1, 2, 4, 10, 18, 38, 50, 92, 124, 178])
+
+assert_eq([farey_neighbors(5, 1/5)], [0, 1/4])
+assert_eq([farey_neighbors(5, 1/4)], [1/5, 1/3])
+assert_eq([farey_neighbors(5, 1/3)], [1/4, 2/5])
+assert_eq([farey_neighbors(5, 2/5)], [1/3, 1/2])
+assert_eq([farey_neighbors(5, 1/2)], [2/5, 3/5])
+assert_eq([farey_neighbors(5, 3/5)], [1/2, 2/3])
+assert_eq([farey_neighbors(5, 2/3)], [3/5, 3/4])
+assert_eq([farey_neighbors(5, 3/4)], [2/3, 4/5])
+assert_eq([farey_neighbors(5, 4/5)], [3/4, 1])
+
+assert_eq([farey_neighbors(100, 89/99)], [80/89, 9/10])
+assert_eq([farey_neighbors(100, 50/79)], [31/49, 19/30])
+assert_eq([farey_neighbors(100, 19/30)], [50/79, 45/71])
+
+assert_eq(egypt_greedy(9/10), %n[2, 3, 15])
+assert_eq(egypt_greedy(5/121), %n[25, 757, 763309, 873960180913, 1527612795642093418846225])
+
+assert_eq(egypt_greedy(43/97).sum{.inv}, 43/97)
+assert_eq(egypt_greedy(97/43).sum{.inv}, 97/43)
 
 say "** Tests passed!"

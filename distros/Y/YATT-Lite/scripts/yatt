@@ -2,7 +2,8 @@
 # -*- mode: perl; coding: utf-8 -*-
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
-use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+use FindBin; BEGIN {local $_ = "$FindBin::RealBin/libdir.pl"; -r $_ and do $_}
+sub MY () {__PACKAGE__}
 #----------------------------------------
 use 5.010;
 
@@ -46,7 +47,7 @@ sub usage {
 sub cmd_help {
   my MY $self = shift;
   print STDERR <<END;
-Usage: @{[basename $0]} [--option=value] <command> [<args>]
+Usage: @{[File::Basename::basename $0]} [--option=value] <command> [<args>]
 
 Available commands are:
 END
@@ -97,5 +98,11 @@ sub find_libdir {
 
 sub after_new {
   (my MY $self) = @_;
-  $self->{cf_script_path} //= $self->find_libdir . "/YATT/scripts/";
+  $self->{cf_script_path} //= do {
+    if ($FindBin::Bin =~ m{/YATT/scripts/}) {
+      $self->find_libdir . "/YATT/scripts/"
+    } else {
+      $FindBin::Bin . "/";
+    }
+  };
 }

@@ -1,3 +1,6 @@
+0.020 2024-11-29
+  [New Features]
+    * Add Net::SSLeay::SSL_CTX#set_default_verify_paths_windows method.
 0.019 2024-11-28
   [New Features]
     * Add Add Net::SSLeay#get0_next_proto_negotiated_return_string method.

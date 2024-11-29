@@ -95403,3 +95403,17 @@ S/SC/SCHWIGON/TAP-DOM-1.000.tar.gz
 D/DA/DAVECROSS/Template-Provider-Pandoc-0.1.0.tar.gz
 Z/ZA/ZARABOZO/Time-Precise-1.0012.tar.gz
 P/PJ/PJFL/web-components/Web-Components-0.12.5.tar.gz
+P/PE/PERLANCAR/App-MineralUtils-0.015.tar.gz
+J/JJ/JJNAPIORK/Catalyst-View-EmbeddedPerl-PerRequest-0.001013.tar.gz
+M/ME/MERKYS/Chemistry-OpenSMILES-0.10.0.tar.gz
+J/JA/JAVONET/JavonetPerlSdk-v2.5.8.tar.gz
+G/GW/GWS/Map-Tube-Beijing-v0.12.2.tar.gz
+M/MJ/MJOHNSON/Math-Symbolic-Custom-Polynomial-0.11.tar.gz
+G/GE/GENE/Music-Duration-Partition-0.0823.tar.gz
+C/CO/CORION/parent-0.243.tar.gz
+H/HA/HAPPYBEAR/Pongo-1.0.0.tar.gz
+T/TR/TRIZEN/Sidef-24.11.tar.gz
+K/KI/KIMOTO/SPVM-IO-0.232.tar.gz
+K/KI/KIMOTO/SPVM-Net-SSLeay-0.020.tar.gz
+J/JJ/JJNAPIORK/Template-EmbeddedPerl-0.001010.tar.gz
+H/HK/HKOBA/YATT-Lite-0.120.tar.gz

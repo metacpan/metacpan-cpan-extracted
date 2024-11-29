@@ -1,9 +1,10 @@
-#!perl
+#!perl -T
 use strict;
 use utf8;
 use Test::More 0.82;
-use XML::Twig;
 use Map::Tube::Beijing;
+eval 'use XML::Twig';
+plan skip_all => 'XML::Twig required' if $@;
 
 my $map = Map::Tube::Beijing->new( nametype => 'alt' );
 isa_ok( $map, 'Map::Tube::Beijing', "Map::Tube object for nametype='alt'" );

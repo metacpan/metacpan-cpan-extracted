@@ -1,0 +1,22 @@
+mongoc_client_encryption_datakey_opts_set_keyaltnames
+mongoc_client_encryption_datakey_opts_set_keymaterial
+#define MONGOC_AEAD_AES_256_CBC_HMAC_SHA_512_RANDOM "AEAD_AES_256_CBC_HMAC_SHA_512-Random"
+#define MONGOC_AEAD_AES_256_CBC_HMAC_SHA_512_DETERMINISTIC "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
+#define MONGOC_ENCRYPT_ALGORITHM_INDEXED "Indexed"
+#define MONGOC_ENCRYPT_ALGORITHM_UNINDEXED "Unindexed"
+#define MONGOC_ENCRYPT_ALGORITHM_RANGE "Range"
+#define MONGOC_ENCRYPT_QUERY_TYPE_EQUALITY "equality"
+#define MONGOC_ENCRYPT_QUERY_TYPE_RANGE "range"
+mongoc_delete_flags_t
+mongoc_client_session_with_transaction_cb_t
+mongoc_client_set_sockettimeouts
+mongoc_stream_uncork(stream)
+mongoc_stream_cork(stream)
+bson_copy_to_excluding (const bson_t *src,
+                        bson_t *dst,
+                        const char *first_exclude,
+                        ...);
+bson_copy_to_excluding_noinit_va(src, dst, first_exclude, args);
+
+bson_vsnprintf(str, size, format, ap);
+bson_strdupv_printf(format, args);

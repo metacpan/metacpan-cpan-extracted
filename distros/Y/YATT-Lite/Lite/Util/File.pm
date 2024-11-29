@@ -55,6 +55,7 @@ sub wait_if_near_deadline {
   my $now = Time::HiRes::time;
   my $diff = $deadline - $now;
   return if $diff > $threshold;
+  return if $diff <= 0;
   usleep(int($diff * 1000 * 1000));
   $diff;
 }

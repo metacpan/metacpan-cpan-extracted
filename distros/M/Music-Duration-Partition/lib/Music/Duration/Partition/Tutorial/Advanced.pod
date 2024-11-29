@@ -12,7 +12,7 @@ Music::Duration::Partition::Tutorial::Advanced
 
 =head1 VERSION
 
-version 0.0820
+version 0.0823
 
 =head1 Usage Examples
 

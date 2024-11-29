@@ -1,4 +1,5 @@
 const AbstractHandler = require("./AbstractHandler");
+const LoadLibraryHandler = require("./LoadLibraryHandler");
 const NamespaceCache = require("../namespaceCache/NamespaceCache");
 const TypeCache = require("../typeCache/TypeCache");
 
@@ -21,7 +22,10 @@ class GetTypeHandler extends AbstractHandler {
             typeName = typeName.replace(".js", "")
             let typeToReturn = global[typeName]
             if (typeToReturn === undefined) {
-                throw new Error(`Type ${typeName} not found`)
+                let message = `Type ${typeName} not found\n`
+                message += "Available types:\n"
+                message += this.getAvailableTypes().join("\n")
+                throw new Error(message)
             }
 
             if (
@@ -40,7 +44,18 @@ class GetTypeHandler extends AbstractHandler {
         } catch (error) {
             throw this.process_stack_trace(error, this.constructor.name)
         }
+    }
 
+    getAvailableTypes() {
+        let availableTypes = [];
+        LoadLibraryHandler.getLoadedLibraries().forEach((lib) => {
+            const moduleExports = require(lib);
+            availableTypes.push(moduleExports.name)
+            Object.keys(moduleExports).forEach((key) => {
+                availableTypes.push(key);
+            });
+        });
+        return availableTypes;
     }
 }
 

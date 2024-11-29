@@ -18,8 +18,8 @@ plan tests => 2 * scalar keys %cases;
 for my $case (sort keys %cases) {
     my $parser = Chemistry::OpenSMILES::Parser->new;
     my @moieties = $parser->parse( $case, { raw => 1 } );
-    is( scalar @moieties, 1 );
 
-    is( scalar clean_chiral_centers( $moieties[0], \&write_SMILES ),
-        $cases{$case} );
+    is scalar @moieties, 1;
+    is scalar clean_chiral_centers( $moieties[0], sub { write_SMILES( $_[0], { raw => 1 } ) } ),
+       $cases{$case};
 }

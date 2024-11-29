@@ -5,7 +5,6 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0.82'
-  XML::Simple: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
@@ -23,7 +22,7 @@ no_index:
 provides:
   Map::Tube::Beijing:
     file: lib/Map/Tube/Beijing.pm
-    version: v0.12.1
+    version: v0.12.2
 requires:
   File::Share: '0'
   Map::Tube: '3.77'
@@ -31,5 +30,5 @@ requires:
   namespace::clean: '0'
   perl: '5.010'
 resources: {}
-version: v0.12.1
+version: v0.12.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

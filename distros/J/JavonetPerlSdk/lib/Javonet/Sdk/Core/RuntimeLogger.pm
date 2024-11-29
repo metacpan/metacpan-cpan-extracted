@@ -16,10 +16,10 @@ sub get_runtime_info {
             "Perl \@INC Path: @INC\n" .
             "OS Version: " . $Config{osname} . " " . $Config{osvers} . "\n" .
             "Process Architecture: " . $Config{archname} . "\n" .
-            "Current Directory: " . getcwd() . "\n";
+            "Current Working Directory: " . getcwd() . "\n";
     };
     if ($@) {
-        $info = "Perl Managed Runtime Info: Error while fetching runtime info";
+        $info = "Perl Managed Runtime Info:\n Error while fetching runtime info";
     }
     return $info;
 }

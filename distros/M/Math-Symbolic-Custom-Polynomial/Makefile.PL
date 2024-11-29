@@ -17,11 +17,25 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+        'Math::Symbolic'                  =>  '0.613',
+        'Math::Symbolic::Custom::Collect' =>    '0.2',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Math-Symbolic-Custom-Polynomial-*' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+         resources => {
+             repository => {
+                 type => 'git',
+                 url  => 'https://github.com/mjohnson108/p5-msc-polynomial.git',
+                 web  => 'https://github.com/mjohnson108/p5-msc-polynomial',
+             },
+             bugtracker => {
+                 web => 'https://github.com/mjohnson108/p5-msc-polynomial/issues'
+             },
+             homepage   => 'https://github.com/mjohnson108/',
+         },
+    },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

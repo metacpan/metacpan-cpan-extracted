@@ -90,6 +90,34 @@ foreach my $k (sort keys %tests) {
 
 }
 
-done_testing( 6*scalar(keys %tests) );
+my %tests2 = (
+    # Cubics
+    'Cubic 1'       =>      { coeffs => [1, -6, 11, -6], ans => [1, 2, 3] },
+    'Cubic 2'       =>      { coeffs => [1, -3, 3, -1], ans => [1, 1, 1] },
+    'Cubic 3'       =>      { coeffs => [1, 0, 0, -8], ans => [2, cplx(-1, -sqrt(3)), cplx(-1, sqrt(3))] },
+    'Cubic 4'       =>      { coeffs => [1, -1, 1, -1], ans => [1, cplx(0, 1), cplx(0, -1)] },
+    'Cubic 5'       =>      { coeffs => [1, 1, 1, 1], ans => [-1, cplx(0, 1), cplx(0, -1)] },
+    'Cubic 6'       =>      { coeffs => [1, -4, 5, -2], ans => [2, 1, 1] },
+);
+
+foreach my $k (sort keys %tests2) {
+
+    my $v = $tests2{$k};
+    my $coeffs = $v->{coeffs};
+    my $ans = $v->{ans};
+
+    # create a polynomial with these coefficients using symbolic_poly()
+    my $f = symbolic_poly('x', $coeffs);
+
+    # check that this created expression evaluates to zero (or  
+    # numerically close to it) when evaluated with the roots
+    my $a1 = sprintf("%.9f", abs($f->value('x' => $ans->[0])));
+    my $a2 = sprintf("%.9f", abs($f->value('x' => $ans->[1])));
+    my $a3 = sprintf("%.9f", abs($f->value('x' => $ans->[2])));
+
+    ok(($a1 == 0) && ($a2 == 0) && ($a3 == 0), "Roots take polynomial to zero ($k)");
+}
+
+done_testing( 6*scalar(keys %tests) + scalar(keys %tests2) );
 
 

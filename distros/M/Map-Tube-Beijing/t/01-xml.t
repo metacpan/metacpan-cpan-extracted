@@ -1,9 +1,10 @@
-#!perl
+#!perl -T
 use strict;
 use utf8;
 use Test::More 0.82;
-use XML::Twig;
 use Map::Tube::Beijing;
+eval 'use XML::Twig';
+plan skip_all => 'XML::Twig required' if $@;
 
 my $map = new_ok( 'Map::Tube::Beijing' );
 my $xml = XML::Twig->new( );

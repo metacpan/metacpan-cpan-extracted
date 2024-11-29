@@ -2,6 +2,7 @@ const AbstractHandler = require('./AbstractHandler')
 
 class LoadLibraryHandler extends AbstractHandler {
     requiredParametersCount = 1
+    static loadedLibraries = [];
 
     constructor() {
         super()
@@ -21,6 +22,7 @@ class LoadLibraryHandler extends AbstractHandler {
 
         try {
             moduleExports = require(lib)
+            LoadLibraryHandler.loadedLibraries.push(lib)
         } catch (error) {
             try {
                 moduleExports = require(`${process.cwd()}/${lib}`)
@@ -35,6 +37,10 @@ class LoadLibraryHandler extends AbstractHandler {
             global[key] = value
         }
         return 0
+    }
+
+    getLoadedLibraries() {
+        return LoadLibraryHandler.loadedLibraries
     }
 }
 

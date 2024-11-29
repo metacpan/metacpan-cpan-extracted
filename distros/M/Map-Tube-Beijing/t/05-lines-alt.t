@@ -1,4 +1,4 @@
-#!perl
+#!perl -T
 
 use strict;
 use warnings FATAL => 'all';

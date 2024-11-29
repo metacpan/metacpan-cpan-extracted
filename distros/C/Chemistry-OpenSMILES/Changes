@@ -1,3 +1,22 @@
+0.10.0 2024-11-28
+
+    - Reworking the logic of marking atoms with nonstandard valences.
+    - Introducing Chemistry::OpenSMILES::valence().
+    - Changing the API of Chemistry::OpenSMILES::Writer::write_SMILES() to
+      accept option hash as the second parameter. Backwards compatibility
+      for old calls is retained.
+
+0.9.2 2024-11-26
+
+    - Fix a pair of bugs in valence calculation.
+
+0.9.1 2024-11-26
+
+    - Handling trigonal bipyramidal centers.
+    - Exporting all Chemistry::OpenSMILES::is_chiral_*() subroutines.
+    - Fixing a bug where H atom counts of 0 given in square brackets were
+      not preserved.
+
 0.9.0 2023-10-25
 
     - Handling square planar chirality.

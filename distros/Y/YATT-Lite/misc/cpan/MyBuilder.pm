@@ -37,6 +37,7 @@ sub process_yatt_dist_files {
 
   $self->pm_files(\ my %pm_files);
   $self->pod_files(\ my %pod_files);
+  $self->script_files(\ my %script_files);
 
   foreach my $desc ([pm => \%pm_files], [pod => \%pod_files]) {
     my ($ext, $map) = @$desc;
@@ -61,15 +62,24 @@ sub process_yatt_dist_files {
 	  $self->_yatt_dist_ensure_blib_copied($_, $d);
 	}}, "Lite");
 
-  # scripts/ and elisp/ also should go into blib/lib/YATT/
+  # scripts/
+  find({no_chdir => 1, wanted => sub {
+	  return $self->prune if /^\.git|^lib$/;
+	  return if -d $_;
+	  return unless -x $_ and m{/yatt[^/]*$};
+	  my $d = $script_files{$_} = "bin/". File::Basename::basename($_);
+	  $self->_yatt_dist_ensure_blib_copied($_, $d);
+	  }}, 'scripts');
+
+  # elisp/ also should go into blib/lib/YATT/
   # XXX: This may be changed to blib/lib/YATT/Lite/ or somewhere else.
   find({no_chdir => 1, wanted => sub {
 	  return $self->prune if /^\.git|^lib$/;
 	  return if -d $_;
-	  return unless m{/yatt[^/]*$|\.el$};
+	  return unless m{\.el$};
 	  my $d = $pm_files{$_} = "lib/YATT/$_";
 	  $self->_yatt_dist_ensure_blib_copied($_, $d);
-	  }}, 'scripts', 'elisp');
+	  }}, 'elisp');
 }
 
 sub _yatt_dist_ensure_blib_copied {

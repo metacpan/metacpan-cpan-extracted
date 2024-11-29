@@ -352,6 +352,8 @@ class Net::SSLeay::SSL_CTX : pointer {
     return $deleted;
   }
   
+  native method set_default_verify_paths_windows : void ();
+  
   native method DESTROY : void ();
   
 }

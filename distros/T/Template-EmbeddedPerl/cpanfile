@@ -7,6 +7,7 @@ requires 'Exporter',       '5.78';
 requires 'Scalar::Util',   '1.63';
 requires 'File::Spec',     '3.75';
 requires 'JSON::MaybeXS',  '1.004008';
+requires 'Regexp::Common', '2024080801';
 
 on test => sub {
   requires 'Test::Most' => '0.34';

@@ -1,10 +1,11 @@
 package Template::EmbeddedPerl;
 
-our $VERSION = '0.001009';
+our $VERSION = '0.001010';
 $VERSION = eval $VERSION;
 
 use warnings;
 use strict;
+use utf8;
 
 use PPI::Document;
 use File::Spec;
@@ -13,7 +14,77 @@ use Scalar::Util;
 use Template::EmbeddedPerl::Compiled;
 use Template::EmbeddedPerl::Utils qw(normalize_linefeeds generate_error_message);
 use Template::EmbeddedPerl::SafeString;
+use Regexp::Common qw /balanced/;
 
+# used for the variable interpolation feature
+my $balanced_parens   = $RE{balanced}{-parens => '()'};
+my $balanced_brackets = $RE{balanced}{-parens => '[]'};
+my $balanced_curlies  = $RE{balanced}{-parens => '{}'};
+
+# Custom recursive pattern for ${...}
+my $balanced_dollar_curly = qr/
+    \$\{
+    (?<brace_content>
+        [^{}]+
+        |
+        \{ (?&brace_content) \}
+    )*
+    \}
+    /x;
+
+my $variable_regex = qr/
+    (?<!\\)                           # Negative lookbehind for backslash
+    (?<variable>
+      (?:                             # Variable can be in one of two formats:
+        \$ \w+ (?: :: \w+ )*          # 1. $variable, possibly with package names
+      |
+        $balanced_dollar_curly        # 2. ${...}, using balanced delimiters
+      )
+      (?:                             # Non-capturing group for operators
+        (?:
+          ->                          # Dereference operator
+          (?:
+            \$? \w+                   # Method name, possibly starting with $
+            (?: $balanced_parens )?   # Optional method arguments
+          |
+            $balanced_brackets        # Array dereference after '->'
+          |
+            $balanced_curlies         # Hash dereference after '->'
+          )
+        )
+      |
+        $balanced_brackets            # Array dereference
+      |
+        $balanced_curlies             # Hash dereference
+      )*
+    )
+/x;
+
+
+my $variable_regex2 = qr/
+    (?<!\\)                           # Negative lookbehind for backslash
+    (?<variable>                      # Named capturing group 'variable'
+      \$
+      \w+ (?: :: \w+ )*               # Variable name, possibly with package names
+      (?:                             # Non-capturing group for operators
+        (?:
+          ->                          # Dereference operator
+          (?:
+            \$? \w+                       # Method name
+            (?: $balanced_parens )?   # Optional method arguments
+          |
+            $balanced_brackets        # Array dereference after '->'
+          |
+            $balanced_curlies         # Hash dereference after '->'
+          )
+        )
+      |
+        $balanced_brackets            # Array dereference
+      |
+        $balanced_curlies             # Hash dereference
+      )*
+    )
+/x;
 
 ## New Instance of the core template methods
 
@@ -75,6 +146,7 @@ sub new {
     use_cache => 0,
     vars => 0,
     comment_mark => '#',
+    interpolation => 0,
     @_,
   );
 
@@ -228,7 +300,6 @@ sub parse_template {
   my $line_start = $self->{line_start};
   my $comment_mark = $self->{comment_mark};
 
-
   ## support shorthand line start tags ##
 
   # Convert all lines starting with %= to start with <%= and then add %> to the end
@@ -252,9 +323,10 @@ sub parse_template {
   #my @segments = split /(\Q${open_tag}\E.*?\Q${close_tag}\E)/s, $template;
   my @segments = split /((?<!\\)\Q${open_tag}\E.*?(?<!\\)\Q${close_tag}\E)/s, $template;
   my @parsed = ();
-  foreach my $segment (@segments) {
-    my ($open_type, $content, $close_type) = ($segment =~ /^(\Q${open_tag}${expr_marker}\E|\Q$open_tag\E)(.*?)(\Q${expr_marker}${close_tag}\E|\Q$close_tag\E)?$/s);
 
+  foreach my $segment (@segments) {
+
+    my ($open_type, $content, $close_type) = ($segment =~ /^(\Q${open_tag}${expr_marker}\E|\Q$open_tag\E)(.*?)(\Q${expr_marker}${close_tag}\E|\Q$close_tag\E)?$/s);
     if(!$open_type) {
       # Remove \ from escaped line_start, open_tag, and close_tag
       $segment =~ s/\\${line_start}/${line_start}/g;
@@ -266,8 +338,38 @@ sub parse_template {
       $segment =~ s/^[ \t]*?${comment_mark}.*$/\\/mg;
       $segment =~ s/^[ \t]*?\\${comment_mark}/${comment_mark}/mg;
 
+      if($self->{interpolation}) {
+        my @parts = ();
+        my $pos = 0;
 
-      push @parsed, ['text', $segment];
+        while ($segment =~ /$variable_regex/g) {
+
+            my $match_start = $-[0];
+            my $match_end   = $+[0];
+            my $matched_var = $+{variable};
+
+            # Add non-matching part before the match
+            if ($match_start > $pos) {
+              my $text = substr($segment, $pos, $match_start - $pos);
+              $text =~ s/\\\$/\$/gm; # Any escaped $ (\$) should be unescaped
+              push @parts, ['text', $text ];
+            }
+
+            # Add the matching variable
+            push @parts, ['expr', $matched_var ];
+
+            $pos = $match_end;
+        }
+        # Add any remaining non-matching part
+        if ($pos < length($segment)) {
+            my $text = substr($segment, $pos);
+            $text =~ s/\\\$/\$/gm; # Any escaped $ (\$) should be unescaped
+            push @parts, [ 'text', $text ];
+        }
+        push @parsed, @parts;
+      } else {
+        push @parsed, ['text', $segment];
+      }
     } else {
       # Support trim with =%>
       $content = "trim $content" if $close_type eq "${expr_marker}${close_tag}";
@@ -464,7 +566,7 @@ Compile a template from a string:
 
   my $compiled = $template->from_string('Hello, <%= shift %>!');
 
-#xecute the compiled template:
+execute the compiled template:
 
   my $output = $compiled->render('John');
 
@@ -642,6 +744,32 @@ A comment is declared with a single C<#> at the start of the line (or with only 
 This line will be removed from the output, including its newline.   If you really need a '#'you can escape it
 with C<\#> (this is only needed if the '#' is at the beginning of the line, or there's only preceding whitespace.
 
+=head2 Interpolation Syntax
+
+If you want to embed Perl variables directly in the template without using the C<%= ... %> syntax,
+you can enable interpolation. This allows you to embed Perl variables directly in the template
+without using the C<%= ... %> syntax. For example:
+
+  my $template = Template::EmbeddedPerl->new(interpolation => 1, prepend => 'my $name = shift');
+  my $compiled = $template->from_string('Hello, $name!');
+  my $output = $compiled->render('John');
+
+C<$output> is:
+
+  Hello, John!
+
+This works by noticing a '$' followed by a Perl variable name (and method calls, etc). So if you
+need to put a real '$' in your code you will need to escape it with C<\$>.
+
+This only works on a single line and is intended to help reduce template complexity and noise
+for simple placeholder template sections.  Nevertheless I did try top make it work with reasonable
+complex single variable expressions.  Submit a test case if you find something that doesn't work
+which you think should.
+
+See the section on the interpolation configuration switch below for more information.  This is
+disabled by default and I consider it experimental at this time since parsing Perl code with
+regular expressions is a bit of a hack.
+
 =head1 METHODS
 
 =head2 new
@@ -768,6 +896,62 @@ Obviously this only works usefully in a persistent environment like mod_perl or 
 
 Defaults to '#'. Indicates the beginning of a comment in the template which is to be removed
 from the output.
+
+=item * C<interpolation>
+
+Boolean indicating whether to enable interpolation in the template. Default is C<< 0 >> (disabled).
+
+Interpolation allows you to embed Perl variables directly in the template without using the
+C<%= ... %> syntax. For example:
+
+  my $template = Template::EmbeddedPerl->new(interpolation => 1, prepend => 'my ($name) = @_');
+  my $output = $template->render('Hello, $name!', 'John');
+
+This will output:
+
+  Hello, John!
+
+Interpolation is reasonable sophisticated and will handle many cases including have more
+then one variable in a line.  For example:
+
+  my $template = Template::EmbeddedPerl->new(interpolation => 1, prepend => 'my ($first, $last) = @_');
+  my $output = $template->render('Hello, $first $last!', 'John', 'Doe');
+
+This will output:
+
+  Hello, John Doe!
+
+It can also handle variables that are objects and call methods on them.  For example:
+
+  my $template = Template::EmbeddedPerl->new(interpolation => 1, prepend => 'my ($person_obj) = @_');
+  my $output = $template->render('Hello, $person_obj->first_name $person_obj->last_name!', Person->new('John', 'Doe'));
+
+This will output:
+
+  Hello, John Doe!
+
+If you need to disambiguate a variable from following text you enclose the variable in curly braces.
+
+  my $template = Template::EmbeddedPerl->new(interpolation => 1);
+  my $output = $template->render('Hello, ${arg}XXX', 'John');
+
+This will output:
+
+  Hello, JohnXXX
+
+You can nest method calls and the methods can contain arguments of varying complexity, including
+anonymous subroutines.  However you cannot span lines, you must close all open parens and braces
+on the same line.  You can review the existing test case at C<t/interpolation.t> for examples.
+
+This works by noticing a '$' followed by a Perl variable name (and method calls, etc). So if you
+need to put a real '$' in your code you will need to escape it with C<\$>.  It does not work
+for other perl sigils at this time (for example '@' or '%').  
+
+This feature is experimental so if you have trouble with it submit a trouble ticket with test
+case (review the C<t/interpolation.t> test cases for examples of the type of test cases I need).
+I intend interpolation to be a 'sweet spot' feature that tries to reduce amount of typing
+and overall template 'noise', not something that fully parses Perl code.  Anything super crazy
+should probably be encapsulated in a helper function anyway.
 
 =back
 

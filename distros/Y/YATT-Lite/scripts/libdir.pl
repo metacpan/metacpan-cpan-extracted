@@ -27,14 +27,13 @@ unless (@dir) {
 
 Carp::cluck("dir=@dir\n") if $ENV{DEBUG_INC};
 
-sub MY () {__PACKAGE__}
 sub untaint_any {$_[0] =~ m{(.*)} and $1}
 use base qw/File::Spec/;
 
 my (@libdir);
 
 foreach my $dir (@dir) {
-  if (grep {$_ eq 'YATT'} MY->splitdir($dir)) {
+  if (grep {$_ eq 'YATT'} File::Spec->splitdir($dir)) {
     push @libdir, dirname(dirname($dir));
   }
 

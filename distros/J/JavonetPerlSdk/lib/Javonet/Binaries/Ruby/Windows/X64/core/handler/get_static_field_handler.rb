@@ -22,11 +22,11 @@ class GetStaticFieldHandler < AbstractCommandHandler
         response = command.payload[0].const_get(command.payload[1])
       end
       return response
-    rescue NameError
+    rescue Exception
       fields = command.payload[0].class_variables
       message = "Field #{command.payload[1]} not found in class #{command.payload[0].name}. Available fields:\n"
       fields.each { |field_iter| message += "#{field_iter}\n" }
-      raise Exception, message
+      raise ArgumentError, message
     rescue Exception => e
       return e
     end

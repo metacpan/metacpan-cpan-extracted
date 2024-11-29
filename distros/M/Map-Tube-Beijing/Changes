@@ -1,5 +1,9 @@
 Revision history for Perl extension Map::Tube::Beijing.
 
+0.12.2 2024-11-29
+  - Made test dependencies on XML::Twig and Test::Map::Tube optional
+    but recommended.
+
 0.12.1 2024-11-28
   - Fixed the (Han) name of one line
   - Removed spurious requirement of XML::Simple from module

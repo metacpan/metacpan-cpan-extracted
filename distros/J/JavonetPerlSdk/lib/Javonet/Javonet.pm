@@ -49,4 +49,14 @@ sub get_runtime_info() {
     RuntimeLogger->get_runtime_info();
 }
 
+sub set_config_source {
+    my ($self, $config_path) = @_;
+    try {
+        Transmitter->set_config_source($config_path);
+    } catch {
+        SdkExceptionHelper->send_exception_to_app_insights($_,"setConfigSource");
+        die $_;
+    };
+}
+
 1;

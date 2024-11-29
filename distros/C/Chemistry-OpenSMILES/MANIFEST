@@ -11,6 +11,7 @@ lib/Chemistry/OpenSMILES.pm
 lib/Chemistry/OpenSMILES/Aromaticity.pm
 lib/Chemistry/OpenSMILES/Parser.yp
 lib/Chemistry/OpenSMILES/Stereo.pm
+lib/Chemistry/OpenSMILES/Stereo/Tables.pm
 lib/Chemistry/OpenSMILES/Writer.pm
 t/01_atoms.t
 t/02_chains.t
@@ -36,3 +37,6 @@ t/21_stereo.t
 t/22_rings.t
 t/23_clean_chiral_centers.t
 t/24_square_planar_chirality.t
+t/25_trigonal_bipyramidal_chirality.t
+t/26_octahedral_chirality.t
+t/27_valence.t

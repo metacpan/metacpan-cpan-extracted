@@ -14,6 +14,10 @@ use YATT::t::t_preload; # To make Devel::Cover happy.
 # A.K.A $fn:r, [file rootname] and file-name-sans-extension
 sub rootname { my $fn = shift; $fn =~ s/\.\w+$//; join "", $fn, @_ }
 
+use constant DEBUG_FACTORY => $ENV{DEBUG_YATT_FACTORY};
+use constant DEBUG_REFCNT => $ENV{DEBUG_YATT_REFCNT};
+use if DEBUG_REFCNT, B => qw/svref_2object/;
+
 BEGIN {
   # Because use YATT::Lite::DBSchema::DBIC loads DBIx::Class::Schema.
   foreach my $req (qw(Plack Plack::Test Plack::Response HTTP::Request::Common)) {
@@ -52,6 +56,8 @@ sub is_or_like($$;$) {
 	  , (psgi_fallback => YATT::Lite::WebMVC0::SiteApp
 	     ->psgi_file_app("$rootname.d.fallback"))
 	 );
+
+  printf STDERR "# app1.after_new: refcnt=%d\n", svref_2object($site)->REFCNT if DEBUG_REFCNT && DEBUG_FACTORY;
 
   is $site->cget('no_unicode'), undef, "No no_unicode, by default";
 
@@ -312,6 +318,8 @@ END
 	  , "$theme $p body";
     }
   }
+
+  printf STDERR "# app1.end_of_scope: refcnt=%d\n", svref_2object($site)->REFCNT if DEBUG_REFCNT && DEBUG_FACTORY;
 }
 
 {
@@ -348,9 +356,13 @@ END
 	 )
       ->to_app;
 
+  printf STDERR "# app2.after_new: refcnt=%d\n", svref_2object($app)->REFCNT if DEBUG_REFCNT && DEBUG_FACTORY;
+
   is_deeply [$backend->paths]
     , ['', qw|/beta /cgi-bin /test.lib|]
     , "backend startup is called";
+
+  printf STDERR "# app2.end_of_scope: refcnt=%d\n", svref_2object($app)->REFCNT if DEBUG_REFCNT && DEBUG_FACTORY;
 }
 
 {
@@ -359,15 +371,27 @@ END
       , [2, 2], "Site apps are destroyed correctly.";
   };
 
-  if ($] >= 5.018
-      and not grep(defined && /^-MDevel::Cover/, $ENV{HARNESS_PERL_SWITCHES})
-    ) {
-    $t->();
-  } else {
+  my $todo = do {
+    if (grep(defined && /^-MDevel::Cover/, $ENV{HARNESS_PERL_SWITCHES})) {
+      "This test doesn't work well with Devel::Cover";
+    }
+    elsif ($] < 5.018) {
+      "Perl before 5.018 has problem about this test.";
+    }
+    elsif ($] >= 5.040) {
+      "Perl before 5.040 has problem about this test.";
+    }
+    else {
+    }
+  };
+  if ($todo) {
     TODO: {
-      local $TODO = "Perl before 5.018 has problem about this test.";
+      local $TODO = $todo;
       $t->();
     }
+  }
+  else {
+    $t->();
   }
 }
 

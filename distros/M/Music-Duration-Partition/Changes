@@ -1,5 +1,15 @@
 Revision history for Music-Duration-Partition
 
+0.0823 2024-11-28 13:52:26
+    - Cleaned redundant code.
+    - Fixed pool test, given the addition of M::D.
+
+0.0822 2024-11-28 12:20:55
+    - Use Music::Durations for 32nd, 64th, and 128th duration pool values and remainders.
+
+0.0821 2024-11-28 11:46:32
+    - Implement the "abbreviation" attribute, for remainders.
+
 0.0820 2024-02-29 23:40:52
     - Improve the eg/possibles program again.
 

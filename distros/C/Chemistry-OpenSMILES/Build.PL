@@ -20,7 +20,7 @@ my %module_build_args = (
     "Andrius Merkys <merkys\@cpan.org>"
   ],
   "dist_name" => "Chemistry-OpenSMILES",
-  "dist_version" => "0.9.0",
+  "dist_version" => "0.10.0",
   "license" => "bsd",
   "module_name" => "Chemistry::OpenSMILES",
   "recursive_test_files" => 1,
@@ -31,12 +31,14 @@ my %module_build_args = (
     "perl" => "5.010000"
   },
   "test_requires" => {
+    "Data::Dumper" => 0,
     "Test::More" => 0
   }
 );
 
 
 my %fallback_build_requires = (
+  "Data::Dumper" => 0,
   "Module::Build" => "0.28",
   "Module::Build::Parse::Yapp" => "v0.1.2",
   "Test::More" => 0

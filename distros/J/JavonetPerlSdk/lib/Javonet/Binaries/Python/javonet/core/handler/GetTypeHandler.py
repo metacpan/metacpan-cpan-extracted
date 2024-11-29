@@ -1,5 +1,6 @@
 import importlib
 import inspect
+import logging
 import os
 import sys
 from importlib import import_module
@@ -66,18 +67,20 @@ class GetTypeHandler(AbstractCommandHandler):
 
 
     def get_all_available_types(self):
-        available_types = list()
+        available_types = []
         for directory in LoadLibraryHandler.loaded_directories:
             for root, _, files in os.walk(directory):
                 for file in files:
-                    if file.endswith(".py") and file != "__init__.py":
+                    if file.lower().endswith(".py") and file != "__init__.py":
                         module_name = os.path.splitext(file)[0]
                         module_path = os.path.relpath(os.path.join(root, module_name), directory)
                         module_path = module_path.replace(os.sep, ".")
                         try:
                             module = importlib.import_module(module_path)
                             for name, obj in inspect.getmembers(module, inspect.isclass):
-                                available_types.append(name)
+                                # Store the fully qualified class name
+                                qualified_name = f"{module_path}.{name}"
+                                available_types.append(qualified_name)
                         except Exception as e:
-                            print(f"Error importing {module_path}: {e}")
+                            logging.error(f"Error importing {module_path}: {e}")
         return available_types

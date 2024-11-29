@@ -2,7 +2,8 @@
 #----------------------------------------
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
-use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+use FindBin; BEGIN {local $_ = "$FindBin::RealBin/libdir.pl"; -r $_ and do $_}
+sub MY () {__PACKAGE__}
 #----------------------------------------
 
 use YATT::Lite::Entities qw/*SYS/;
@@ -36,11 +37,11 @@ local $SYS = my $dispatcher = YATT::Lite::Factory->load_factory_offline
 
 my $nerror = 0;
 foreach my $fn (@ARGV) {
-  my $dir = dirname($dispatcher->rel2abs($fn));
+  my $dir = File::Basename::dirname($dispatcher->rel2abs($fn));
   my $dirhandler = $dispatcher->get_dirhandler($dir);
   $dirhandler->fconfigure_encoding(\*STDOUT, \*STDERR);
   my $trans = $dirhandler->open_trans;
-  my $tmpl = $trans->find_file(basename($fn)) or do {
+  my $tmpl = $trans->find_file(File::Basename::basename($fn)) or do {
     warn "No such file: $fn\n";
     $nerror++;
     next;

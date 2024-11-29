@@ -32,10 +32,21 @@ package Sidef::Types::Glob::FileHandle {
     *file = \&parent;
 
     sub new_buf {
-        my ($self, $mode) = @_;
-        $mode //= 'utf8';
-        my $str = "";
-        open(my $fh, "+<:$mode", \$str) or return undef;
+        my ($self, $mode, $initial_string) = @_;
+
+        $mode           //= 'raw';
+        $initial_string //= '';
+        $mode = "$mode" if (ref($mode) ne '');
+
+        my $str = "$initial_string";
+
+        if ($mode ne 'raw' and $str ne '') {
+            require Encode;
+            $str = Encode::encode($mode, $str);
+        }
+
+        CORE::open(my $fh, "+<:$mode", \$str) or return undef;
+        CORE::seek($fh, CORE::length($str), 0) if ($str ne '');
         my $str_obj = bless(\$str, 'Sidef::Types::String::String');
         my $fh_obj  = __PACKAGE__->new($fh, $str_obj);
         wantarray ? ($fh_obj, $str_obj) : $fh_obj;
@@ -101,6 +112,13 @@ package Sidef::Types::Glob::FileHandle {
         my ($self, @args) = @_;
         (CORE::printf {$self->{fh}} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
+
+    sub printlnf {
+        my ($self, $format, @args) = @_;
+        $self->printf("$format\n", @args);
+    }
+
+    *sayf = \&printlnf;
 
     sub iter {
         my ($self) = @_;
@@ -197,6 +215,22 @@ package Sidef::Types::Glob::FileHandle {
 
     *char = \&read_char;
     *getc = \&read_char;
+
+    sub read_byte {
+        my ($self, $var_ref) = @_;
+
+        my $byte = CORE::ord(CORE::getc($self->{fh}));
+
+        if (defined $var_ref) {
+            $$var_ref = Sidef::Types::Number::Number::_set_int($byte // return Sidef::Types::Bool::Bool::FALSE);
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        Sidef::Types::Number::Number::_set_int($byte // return undef);
+    }
+
+    *getb = \&read_byte;
+    *byte = \&read_byte;
 
     sub read_lines {
         my ($self) = @_;

@@ -715,7 +715,7 @@ package Sidef::Types::Array::Array {
     *lev   = \&levenshtein;
     *leven = \&levenshtein;
 
-    sub jaro_distance {
+    sub jaro {
         my ($self, $arg, $winkler) = @_;
 
         if (ref($arg) ne ref($self)) {
@@ -767,7 +767,7 @@ package Sidef::Types::Array::Array {
 
         my $jaro = (($matches / $s_len) + ($matches / $t_len) + (($matches - $transpositions / 2) / $matches)) / 3;
 
-        $winkler || return Sidef::Types::Number::Number->new($jaro);    # return the Jaro distance instead of Jaro-Winkler
+        $winkler || return Sidef::Types::Number::Number->new($jaro);    # return the Jaro similarity instead of Jaro-Winkler
 
         my $prefix = 0;
         foreach my $i (0 .. List::Util::min(3, $#t, $#s)) {
@@ -1960,6 +1960,47 @@ package Sidef::Types::Array::Array {
     }
 
     *tail = \&last;
+
+    sub skip_by {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
+        my @array;
+        foreach my $item (@$self) {
+            $block->run($item) || CORE::push(@array, $item);
+        }
+
+        bless \@array, ref($self);
+    }
+
+    sub skip {
+        my ($self, $n) = @_;
+
+        if (defined($n) and ref($n) eq 'Sidef::Types::Block::Block') {
+            goto &skip_by;
+        }
+
+        $n = defined($n) ? CORE::int($n) : 1;
+        $n == 0 and return $self->clone;
+
+        $self->last(-$n);
+    }
+
+    *skip_first = \&skip;
+
+    sub skip_last {
+        my ($self, $n) = @_;
+
+        if (defined($n) and ref($n) eq 'Sidef::Types::Block::Block') {
+            goto &skip_by;
+        }
+
+        $n = defined($n) ? CORE::int($n) : 1;
+        $n == 0 and return $self->clone;
+
+        $self->first(-$n);
+    }
 
     sub any {
         my ($self, $block) = @_;
@@ -3259,11 +3300,23 @@ package Sidef::Types::Array::Array {
         bless [CORE::sort { $a cmp $b } @$self], ref($self);
     }
 
+    sub isort {
+        my ($self) = @_;
+        bless [CORE::sort { $$a <=> $$b } @$self], ref($self);
+    }
+
     sub sort_by {
         my ($self, $block) = @_;
         $block //= Sidef::Types::Block::Block::IDENTITY;
         my @keys = map { scalar $block->run($_) } @$self;
         bless [@{$self}[CORE::sort { $keys[$a] cmp $keys[$b] } 0 .. $#$self]], ref($self);
+    }
+
+    sub isort_by {
+        my ($self, $block) = @_;
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        my @keys = map { ${$block->run($_)} } @$self;
+        bless [@{$self}[CORE::sort { $keys[$a] <=> $keys[$b] } 0 .. $#$self]], ref($self);
     }
 
     foreach my $name (

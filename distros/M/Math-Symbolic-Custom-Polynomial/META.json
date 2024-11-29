@@ -32,6 +32,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Math::Symbolic" : "0.613",
+            "Math::Symbolic::Custom::Collect" : "0.2",
             "perl" : "5.006"
          }
       },
@@ -42,6 +44,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.1",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mjohnson108/p5-msc-polynomial/issues"
+      },
+      "homepage" : "https://github.com/mjohnson108/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mjohnson108/p5-msc-polynomial.git",
+         "web" : "https://github.com/mjohnson108/p5-msc-polynomial"
+      }
+   },
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

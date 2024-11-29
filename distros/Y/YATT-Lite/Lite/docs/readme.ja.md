@@ -166,7 +166,7 @@ yatt の主な特徴を以下に挙げます。
     ```
 
     URL
-    [/mod/YATT::Lite::doc::readme](https://yl-podview.herokuapp.com/mod/YATT::Lite::doc::readme)
+    [/mod/YATT::Lite::doc::readme](https://yatt-yl-podview-rrdekxdjda-an.a.run.app/mod/YATT::Lite::docs::readme)
     へのリクエストを、
 
     - テンプレートディレクトリの

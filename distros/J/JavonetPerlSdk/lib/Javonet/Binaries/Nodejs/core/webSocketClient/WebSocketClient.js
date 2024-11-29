@@ -42,19 +42,19 @@ class WebSocketClient {
   }
 
   /**
-   * Sends data through websocket connection
+   * Sends messageArray through websocket connection
    * @async
-   * @param {Buffer|ArrayBuffer|Buffer[]} data
+   * @param {Buffer|ArrayBuffer|Buffer[]} messageArray
    * @returns {Promise<Buffer|ArrayBuffer|Buffer[]>}
    */
-  send(data) {
+  send(messageArray) {
     return new Promise((resolve, reject) => {
       try {
-        if (this.isConnected) {
-          this._sendMessage(data, resolve, reject);
+        if (this.isConnected) { 
+          this._sendMessage(messageArray, resolve, reject);
         } else {
           this._connect().then(() => {
-            this._sendMessage(data, resolve, reject);
+            this._sendMessage(messageArray, resolve, reject);
           });
         }
       } catch (error) {
@@ -81,6 +81,7 @@ class WebSocketClient {
    */
   _connect() {
     return new Promise((resolve, reject) => {
+      console.log('[WebSocketClient] init');
       this.instance = new WebSocket(this.url);
 
       this.instance.on(WebSocketStateEnum.OPEN, () => {
@@ -91,7 +92,7 @@ class WebSocketClient {
 
       this.instance.on(WebSocketStateEnum.ERROR, (error) => {
         console.log('[WebSocketClient] error', error);
-        reject(error);
+        reject(null);
       });
 
       this.instance.on(WebSocketStateEnum.CLOSE, () => {

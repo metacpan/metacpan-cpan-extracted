@@ -18,7 +18,7 @@ class GetTypeHandler < AbstractCommandHandler
       type_to_return = _get_type_from_payload(command)
 
       if type_to_return.nil?
-        raise "Type #{command.payload[0]} not found"
+        raise "Type #{command.payload[0]} not found.\n"
       end
 
       if (@namespace_cache.is_namespace_cache_empty? && @type_cache.is_type_cache_empty?) || # both caches are empty
@@ -33,27 +33,38 @@ class GetTypeHandler < AbstractCommandHandler
 
       type_to_return
     rescue Exception => e
-      return e
-    end
-end
-
-    private
-
-    def _get_type_from_payload(command)
-      if command.payload.length == 1
-        type_name = command.payload[0].split("::")
-        if type_name.length == 1
-          return Object::const_get(type_name[0])
-        else
-          return _get_type_from_nested_payload(type_name)
+      begin
+        message = e.message
+        message += "\nLoaded libraries:\n"
+        loaded_libraries = LoadLibraryHandler.get_loaded_libraries
+        # find types in loaded libraries
+        loaded_libraries.each do |library|
+          message += "#{library}\n"
         end
-      else
-        return _get_type_from_nested_payload(command.payload)
+        raise ArgumentError, message
+      rescue Exception => e
+        return e
       end
     end
+  end
 
-    def _get_type_from_nested_payload(payload)
-      loaded_module = Object::const_get(payload[0..-2].join("::"))
-      loaded_module.const_get(payload[-1])
+  private
+
+  def _get_type_from_payload(command)
+    if command.payload.length == 1
+      type_name = command.payload[0].split("::")
+      if type_name.length == 1
+        return Object::const_get(type_name[0])
+      else
+        return _get_type_from_nested_payload(type_name)
+      end
+    else
+      return _get_type_from_nested_payload(command.payload)
     end
   end
+
+  def _get_type_from_nested_payload(payload)
+    loaded_module = Object::const_get(payload[0..-2].join("::"))
+    loaded_module.const_get(payload[-1])
+  end
+end

@@ -295,7 +295,13 @@ sub n_destroyed {$_n_destroyed}
   our %sub2self;
   DESTROY {
     (my MY $self) = @_;
-    print STDERR "# DESTROY $self\n" if DEBUG_FACTORY;
+    if (DEBUG_FACTORY) {
+      if (DEBUG_REFCNT) {
+        printf STDERR "# DESTROY %s refcnt=%d\n", $self, svref_2object($self)->REFCNT;
+      } else {
+        print STDERR "# DESTROY $self\n";
+      }
+    }
     delete $self->{_my_psgi_app};
     if (my $outer = delete $self->{_outer_psgi_app}) {
       delete $sub2self{$outer};
@@ -957,7 +963,9 @@ sub build_yatt {
 		 , $path, join(", ", @unk));
   }
 
+  printf STDERR "build_yatt.before_app_ns_new: refcnt=%d\n", svref_2object($self)->REFCNT if DEBUG_REFCNT && DEBUG_FACTORY;
   my $yatt = $self->{path2yatt}{$path} = $app_ns->new(@args, %opts);
+  printf STDERR "build_yatt.after_app_ns_new: refcnt=%d\n", svref_2object($self)->REFCNT if DEBUG_REFCNT && DEBUG_FACTORY;
 
   unless ($yatt->after_new_is_called) {
     Carp::croak("after_new is not called for $path!");

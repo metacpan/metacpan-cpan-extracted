@@ -171,7 +171,7 @@ L<URL ルーティング|YATT::Lite::docs::yatt_manual/subrouting>
    <!yatt:page mod="/mod/:mod" >
 
 URL
-L</mod/YATT::Lite::doc::readme|https://yl-podview.herokuapp.com/mod/YATT::Lite::doc::readme>
+L</mod/YATT::Lite::doc::readme|https://yatt-yl-podview-rrdekxdjda-an.a.run.app/mod/YATT::Lite::docs::readme>
 へのリクエストを、
 
 =over 4

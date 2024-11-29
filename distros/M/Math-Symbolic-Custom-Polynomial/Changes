@@ -1,5 +1,12 @@
 Revision history for Math-Symbolic-Custom-Polynomial
 
+0.11    Fri Nov 29 10:02 2024
+
+        - Updated POD
+        - Added prereq modules
+        - Added VCS metadata
+        - Updated tests
+
 0.1     Wed Nov 27 17:09 2024
         
         - First version.

@@ -1,4 +1,3 @@
-#!/usr/bin/env perl
 use strict;
 use warnings;
 
@@ -26,19 +25,22 @@ subtest defaults => sub {
     $mdp = new_ok 'Music::Duration::Partition';
     ok ref($mdp->_durations) eq 'HASH', '_durations';
     is $mdp->size, 4, 'size';
-    is_deeply $mdp->pool, [ keys %MIDI::Simple::Length ], 'pool';
+    is @{ $mdp->pool }, 32, 'pool';
 };
 
 subtest motif => sub {
     subtest pool => sub {
         $mdp = new_ok 'Music::Duration::Partition' => [ pool => [qw/ wn /] ];
-        is_deeply $mdp->motif, ['wn'], 'motif';
+        is_deeply $mdp->motif, ['wn'], 'wn motif';
 
         $mdp = new_ok 'Music::Duration::Partition' => [ pool => [qw/ qn /] ];
-        is_deeply $mdp->motif, [ ('qn') x 4 ], 'motif';
+        is_deeply $mdp->motif, [ ('qn') x 4 ], 'qn motif';
 
         $mdp = new_ok 'Music::Duration::Partition' => [ pool => [qw/ tqn /] ];
-        is_deeply $mdp->motif, [ ('tqn') x 6 ], 'motif';
+        is_deeply $mdp->motif, [ ('tqn') x 6 ], 'tqn motif';
+
+        $mdp = new_ok 'Music::Duration::Partition' => [ pool => [qw/ xn /] ];
+        is_deeply $mdp->motif, [ ('xn') x 32 ], 'xn motif';
     };
 
     subtest size => sub {
@@ -81,6 +83,8 @@ subtest motif => sub {
 
     subtest remainder => sub {
         $mdp = new_ok 'Music::Duration::Partition' => [ pool => [qw/ dhn /] ];
+        is_deeply $mdp->motif, [qw/ dhn qn /], 'remainder';
+        $mdp = new_ok 'Music::Duration::Partition' => [ pool => [qw/ dhn /], abbreviation => 0 ];
         is_deeply $mdp->motif, [qw/ dhn d96 /], 'remainder';
     };
 };
