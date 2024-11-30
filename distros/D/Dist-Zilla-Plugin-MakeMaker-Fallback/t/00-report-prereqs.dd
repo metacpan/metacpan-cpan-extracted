@@ -1,14 +1,13 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0',
                                         'Module::Build::Tiny' => '0.034',
                                         'perl' => '5.009005'
                                       }
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.162',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.164',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -31,7 +30,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::Spelling' => '0.12',
+                                      'Test::Spelling' => '0.17',
                                       'Test::Warnings' => '0',
                                       'perl' => '5.006'
                                     }
@@ -106,7 +105,6 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::Keywords' => '0.004',
                                            'Dist::Zilla::Plugin::License' => '5.038',
                                            'Dist::Zilla::Plugin::MakeMaker::Awesome' => '0.26',
-                                           'Dist::Zilla::Plugin::MakeMaker::Fallback' => '0.029',
                                            'Dist::Zilla::Plugin::Manifest' => '0',
                                            'Dist::Zilla::Plugin::MetaConfig' => '0',
                                            'Dist::Zilla::Plugin::MetaJSON' => '0',
@@ -116,7 +114,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::MetaTests' => '0',
                                            'Dist::Zilla::Plugin::MetaYAML' => '0',
                                            'Dist::Zilla::Plugin::MinimumPerl' => '1.006',
-                                           'Dist::Zilla::Plugin::ModuleBuildTiny::Fallback' => '0.018',
+                                           'Dist::Zilla::Plugin::ModuleBuildTiny' => '0.012',
                                            'Dist::Zilla::Plugin::MojibakeTests' => '0.8',
                                            'Dist::Zilla::Plugin::MungeFile::WithDataSection' => '0.003',
                                            'Dist::Zilla::Plugin::NextRelease' => '5.033',

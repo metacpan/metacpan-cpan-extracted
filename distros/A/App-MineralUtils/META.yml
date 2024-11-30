@@ -19,7 +19,7 @@ name: App-MineralUtils
 provides:
   App::MineralUtils:
     file: lib/App/MineralUtils.pm
-    version: '0.015'
+    version: '0.016'
 requires:
   Complete::Sequence: '0.002'
   Data::Sah::Compiler::perl::TH::str: '0.914'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-MineralUtils
   homepage: https://metacpan.org/release/App-MineralUtils
   repository: git://github.com/perlancar/perl-App-MineralUtils.git
-version: '0.015'
+version: '0.016'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

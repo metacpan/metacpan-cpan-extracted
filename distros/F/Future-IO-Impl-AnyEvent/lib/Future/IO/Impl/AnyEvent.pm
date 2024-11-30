@@ -9,18 +9,16 @@ use base 'Future::IO::ImplBase';
 use AnyEvent;
 use Future::IO::Impl::AnyEvent::Future;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 __PACKAGE__->APPLY;
 
 sub sleep {  ## no critic (ProhibitBuiltinHomonyms)
   my (undef, $sec) = @_;
   my $f = Future::IO::Impl::AnyEvent::Future->new;
-
-  my $timer = AnyEvent->timer(after => $sec, cb => sub { $f->done });
-  # This closure has the only reference on timer, so it will be destroyed.
-  $f->on_cancel(sub { undef $timer });
-
+  my $w;
+  $w = AE::timer $sec, 0, sub { undef $w; $f->done };
+  $f->on_cancel(sub { undef $w });
   return $f;
 }
 
@@ -28,7 +26,8 @@ sub ready_for_read {
   my (undef, $fh) = @_;
   my $f = Future::IO::Impl::AnyEvent::Future->new;
   my $w;
-  $w = AnyEvent->io(fh => $fh, poll => 'r', cb => sub { undef $w; $f->done });
+  $w = AE::io $fh, 0, sub { undef $w; $f->done };
+  $f->on_cancel(sub { undef $w });
   return $f;
 }
 
@@ -36,17 +35,17 @@ sub ready_for_write {
   my (undef, $fh) = @_;
   my $f = Future::IO::Impl::AnyEvent::Future->new;
   my $w;
-  $w = AnyEvent->io(fh => $fh, poll => 'w', cb => sub { undef $w; $f->done });
+  $w = AE::io $fh, 1, sub { undef $w; $f->done };
+  $f->on_cancel(sub { undef $w });
   return $f;
 }
 
 sub waitpid {  ## no critic (ProhibitBuiltinHomonyms)
   my (undef, $pid) = @_;
   my $f = Future::IO::Impl::AnyEvent::Future->new;
-
   my $w;
-  $w = AnyEvent->child(pid => $pid, cb => sub { undef $w; $f->done($_[1]) });
-  # Todo handle cancellation properly.
+  $w = AE::child $pid, sub { undef $w; $f->done($_[1]) };
+  $f->on_cancel(sub { undef $w });
   return $f;
 }
 

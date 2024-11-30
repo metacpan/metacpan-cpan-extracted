@@ -55,12 +55,10 @@ $_->amount                 = 0 for $g->gutter->@*;
 $g->gutter->[1]->context   = "middle";
 $g->gutter->[1]->enabled   = 1;
 $g->gutter->[1]->threshold = 2;
-$g->gutter->[1]->set_update(
-    sub {
-        my ( $cell, $index, $amount, $stash ) = @_;
-        return [ $cell->context, $index, $amount, $stash ];
-    }
-);
+$g->gutter->[1]->update    = sub {
+    my ( $cell, $index, $amount, $stash ) = @_;
+    return [ $cell->context, $index, $amount, $stash ];
+};
 $g->rain;
 is [ $g->drain ],           [ [ "middle", 1, 3, undef ] ];
 is $g->gutter->[1]->amount, 0;

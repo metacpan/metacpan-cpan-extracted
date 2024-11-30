@@ -1,5 +1,11 @@
 Revision history for Music-ToRoman
 
+0.2001 2024-11-30 00:35:58
+    - Fix get_scale_degree() regexp logic and documentation.
+
+0.2000 2024-11-29 22:56:54
+    - Add the handy get_scale_degree() method.
+
 0.1902 2022-12-12 06:01:36
     - Use List::SomeUtils, not MoreUtils.
 

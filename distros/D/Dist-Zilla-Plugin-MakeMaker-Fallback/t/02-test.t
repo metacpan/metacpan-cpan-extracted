@@ -44,8 +44,7 @@ LOG_ENVIRONMENT
     }
 }
 
-foreach my $extra_testing (undef, 1)
-{
+foreach my $extra_testing (undef, 1) {
     note '------------ performing a test, with extra testing variables '
         . ($extra_testing ? '' : 'un') . 'set';
 
@@ -77,8 +76,7 @@ foreach my $extra_testing (undef, 1)
     # 'source' dir, rather than 'build' -- seems rather odd...
     my $source_dir = path($tzil->tempdir)->child('source');
 
-    if (not $extra_testing)
-    {
+    if (not $extra_testing) {
         # confirm that just Build.PL ran, with no environment set
         my $env_build = $source_dir->child('environment-Build.PL');
         ok(-e $env_build, 'Build.PL ran and saved some data for us');
@@ -100,8 +98,7 @@ foreach my $extra_testing (undef, 1)
             'the test method does not die; correct diagnostics printed',
         );
     }
-    else
-    {
+    else {
         # confirm that both Build.PL and Makefile.PL ran, with env set and not set.
 
         my $env_build = $source_dir->child('environment-Build.PL');

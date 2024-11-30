@@ -13,7 +13,7 @@ is (AnyEvent::detect, 'AnyEvent::Impl::Perl', 'AnyEvent::detect');
 
 run_tests 'accept';
 run_tests 'connect';
-run_tests 'sleep';
+run_tests 'sleep' if $^O eq 'linux';  # unreliable test under other OSes.
 run_tests 'sysread';
 run_tests 'syswrite';
 run_tests 'waitpid';

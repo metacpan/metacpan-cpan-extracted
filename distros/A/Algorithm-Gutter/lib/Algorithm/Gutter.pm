@@ -1,18 +1,20 @@
 # -*- Perl -*-
 #
-# Algorithm::Gutter - cellular automata to simulate rain in a gutter
+# Algorithm::Gutter - cellular automata to simulate rain in a gutter,
+# or, "the hundred and forty-second worst drum machine in the West".
 
 package Algorithm::Gutter;
 use 5.26.0;
 use Object::Pad 0.66;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 class Algorithm::Gutter::Cell {
     field $amount :mutator :param = 0;
     field $context :mutator;
     field $enabled :mutator :param   = 0;
+    field $id :reader :param         = 0;
     field $threshold :mutator :param = ~0;
-    field $update :writer :param     = undef;
+    field $update :mutator :param    = undef;
 
     method drain ( $index, $all = 1, $stash = undef ) {
         if ( $enabled and $amount >= $threshold ) {
@@ -96,12 +98,10 @@ Algorithm::Gutter - cellular automata to simulate rain in a gutter
         },
     );
     $g->gutter->[1]->enabled = 1;
-    $g->gutter->[1]->set_update(
-        sub {
-            my ( $cell, $index, $amount, $stash ) = @_;
-            return [ $index, $amount ];    
-        }
-    );
+    $g->gutter->[1]->update  = sub {
+        my ( $cell, $index, $amount, $stash ) = @_;
+        return [ $index, $amount ];    
+    };
     $g->gutter->[1]->threshold = 4;
 
     for my $turn ( 1 .. 20 ) {
@@ -131,6 +131,10 @@ to water accumulating and then dripping out of a rain gutter.
 
 The cells are held in an array reference (the B<gutter>); the caller may
 need to fiddle around with the cells directly simulate various effects.
+
+Various methods may throw errors, for example if a cell lacks an update
+callback function. Such callbacks are not mandatory to give the caller
+flexibility in wiring up the gutter in fancy ways.
 
 =head1 FIELDS
 

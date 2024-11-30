@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Convert notes and chords to Roman numeral notation
 
-our $VERSION = '0.1902';
+our $VERSION = '0.2001';
 
 use strictures 2;
 use List::SomeUtils qw(any first_index);
@@ -248,6 +248,38 @@ sub get_scale_mode {
 }
 
 
+sub get_scale_degree {
+    my ($self, $roman) = @_;
+    my $degree = 1; # Default to major/ionian
+    my $type = 'major';
+    if ( $roman =~ /^vii/i ) {
+        $degree = 7;
+    }
+    elsif ( $roman =~ /^vi/i ) {
+        $degree = 6;
+    }
+    elsif ( $roman =~ /^v/i ) {
+        $degree = 5;
+    }
+    elsif ( $roman =~ /^iv/i ) {
+        $degree = 4;
+    }
+    elsif ( $roman =~ /^iii/i ) {
+        $degree = 3;
+    }
+    elsif ( $roman =~ /^ii/i ) {
+        $degree = 2;
+    }
+    if ( $roman =~ /o$/ ) {
+        $type = 'diminished';
+    }
+    elsif ( $roman =~ /^[iv]+$/ ) {
+        $type = 'minor';
+    }
+    return $degree, $type;
+}
+
+
 sub get_scale_chords {
     my ($self) = @_;
 
@@ -362,7 +394,7 @@ Music::ToRoman - Convert notes and chords to Roman numeral notation
 
 =head1 VERSION
 
-version 0.1902
+version 0.2001
 
 =head1 SYNOPSIS
 
@@ -520,6 +552,14 @@ Parsing a double flatted chord will only work in select cases.
 
 Return the Roman representation of the mode.
 
+=head2 get_scale_degree
+
+  ($degree, $type) = $mtr->get_scale_degree($roman);
+
+Return the (Arabic) scale degree number and C<major>, C<minor>,
+C<diminished> chord types, given the Roman representation of the mode
+degree.
+
 =head2 get_scale_chords
 
   @mode = $mtr->get_scale_chords;
@@ -556,7 +596,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2018-2024 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

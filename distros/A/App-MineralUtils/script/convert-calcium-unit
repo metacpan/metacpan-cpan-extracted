@@ -12,7 +12,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-11-21'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_calcium_unit",
@@ -39,7 +39,7 @@ convert-calcium-unit - Convert an iron quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.015 of convert-calcium-unit (from Perl distribution App-MineralUtils), released on 2024-11-21.
+This document describes version 0.016 of convert-calcium-unit (from Perl distribution App-MineralUtils), released on 2024-11-21.
 
 =head1 SYNOPSIS
 
@@ -208,6 +208,7 @@ For fish and zsh, install L<shcompgen> as described above.
  | 12.500 | mg-ca-citrate-anhydrous    | Calcium citrate anhydrous (C12H10Ca3O14), in milligrams                                             |
  | 14.286 | mg-ca-citrate-tetrahydrate | Calcium citrate tetrahydrate (C12H18Ca3O18) [most common hydrate form of Ca-citrate], in milligrams |
  | 10.638 | mg-ca-ascorbate-dihydrate  | Calcium ascorbate dihydrate (C12H18CaO14), in milligrams                                            |
+ | 10.753 | mg-ca-gluconate            | Calcium gluconate (C12H22CaO14), in milligrams                                                      |
  +--------+----------------------------+-----------------------------------------------------------------------------------------------------+
 
 =head1 HOMEPAGE

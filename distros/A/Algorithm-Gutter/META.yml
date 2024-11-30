@@ -17,7 +17,7 @@ name: Algorithm-Gutter
 provides:
   Algorithm::Gutter:
     file: lib/Algorithm/Gutter.pm
-    version: '0.01'
+    version: '0.02'
   Algorithm::Gutter::Cell:
     file: lib/Algorithm/Gutter.pm
 requires:
@@ -26,5 +26,5 @@ requires:
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://thrig.me/src/Algorithm-Gutter.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

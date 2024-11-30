@@ -1,4 +1,9 @@
 Revision history for Algorithm::Gutter
 
+0.02    2024-11-29
+        * break interface, set_update is gone; update field now a mutator
+        * add id field so one can better tell what a random cell is
+        * turn rainmidi3000.pl into more of a drum machine
+
 0.01    2024-11-25
         First version, released on a mostly unsuspecting world.

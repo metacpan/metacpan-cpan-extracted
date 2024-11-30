@@ -4,7 +4,7 @@
       "worthmine <worthmine@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.13",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -60,7 +60,7 @@
    "provides" : {
       "Captcha::reCAPTCHA::V3" : {
          "file" : "lib/Captcha/reCAPTCHA/V3.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -70,15 +70,17 @@
       },
       "homepage" : "https://github.com/worthmine/Captcha-reCAPTCHA-V3",
       "repository" : {
-         "url" : "git://github.com/worthmine/Captcha-reCAPTCHA-V3.git",
+         "type" : "git",
+         "url" : "https://github.com/worthmine/Captcha-reCAPTCHA-V3.git",
          "web" : "https://github.com/worthmine/Captcha-reCAPTCHA-V3"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
+      "Yuki Yoshida(worthmine) <2944869+worthmine@users.noreply.github.com>",
       "worthmine <worthmine@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

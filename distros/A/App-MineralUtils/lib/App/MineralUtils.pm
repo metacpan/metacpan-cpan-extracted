@@ -8,7 +8,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-11-21'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our %SPEC;
 
@@ -753,6 +753,11 @@ our @calcium_forms = (
         calcium_ratio => 40.078 / 426.34, # 9.40%
         summary => 'Calcium ascorbate dihydrate (C12H18CaO14), in milligrams',
     },
+    { # source: nih
+        name => 'mg-ca-gluconate',
+        calcium_ratio => 40.078 / 430.37, # 9.31%
+        summary => 'Calcium gluconate (C12H22CaO14), in milligrams',
+    },
 );
 
 our %argspecs_calcium = (
@@ -857,7 +862,7 @@ App::MineralUtils - Utilities related to mineral supplements
 
 =head1 VERSION
 
-This document describes version 0.015 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2024-11-21.
+This document describes version 0.016 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2024-11-21.
 
 =head1 DESCRIPTION
 
@@ -937,14 +942,19 @@ Result:
        unit    => "mg-ca-ascorbate-dihydrate",
        summary => "Calcium ascorbate dihydrate (C12H18CaO14), in milligrams",
      },
+     {
+       amount  => 10.752688172043,
+       unit    => "mg-ca-gluconate",
+       summary => "Calcium gluconate (C12H22CaO14), in milligrams",
+     },
    ],
    {
-     "table.field_aligns"  => ["number", "left", "left"],
      "table.field_formats" => [
                                 ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
+     "table.field_aligns"  => ["number", "left", "left"],
      "table.fields"        => ["amount", "unit", "summary"],
    },
  ]
@@ -1256,12 +1266,12 @@ Result:
    ],
    {
      "table.field_aligns"  => ["number", "left", "left"],
+     "table.fields"        => ["amount", "unit", "summary"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
-     "table.fields"        => ["amount", "unit", "summary"],
    },
  ]
 
@@ -1387,12 +1397,12 @@ Result:
    ],
    {
      "table.field_aligns"  => ["number", "left", "left"],
+     "table.fields"        => ["amount", "unit", "summary"],
      "table.field_formats" => [
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
-     "table.fields"        => ["amount", "unit", "summary"],
    },
  ]
 
@@ -1507,12 +1517,12 @@ Result:
    ],
    {
      "table.fields"        => ["amount", "unit", "summary"],
+     "table.field_aligns"  => ["number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
-     "table.field_aligns"  => ["number", "left", "left"],
    },
  ]
 

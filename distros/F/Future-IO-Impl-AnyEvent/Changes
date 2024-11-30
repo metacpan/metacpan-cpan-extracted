@@ -1,5 +1,11 @@
 Revision history for Perl distribution Future-IO-Impl-AnyEvent
 
+0.02 - 2024-11-30
+
+ - Swictch to using the AE interface to AnyEvent.
+ - Don’t run all the tests on non-linux platform (manually or in the CI env) as
+   they are unreliable.
+
 0.01 - 2024-11-27
 
  - Initial release

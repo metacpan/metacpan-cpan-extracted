@@ -39,9 +39,9 @@ Now you can omit sitekey (from version 0.0.4).
 You have to get them before running from [here](https://www.google.com/recaptcha/intro/v3.html).
 
     my $rc = Captcha::reCAPTCHA::V3->new(
-       sitekey => '__YOUR_SITEKEY__', # Optinal
+       sitekey => '__YOUR_SITEKEY__', # Optional
        secret  => '__YOUR_SECRET__',
-       query_name => '__YOUR_QUERY_NAME__', # Optinal
+       query_name => '__YOUR_QUERY_NAME__', # Optional
     );
 
 According to the official document, query\_name defaults to 'g-recaptcha-response'

@@ -135,7 +135,8 @@ sub pager_for {
     my $output = $self->join_tags(
       $self->tags->div(+{}, sub {
         my @form_node = $content_block_coderef->($self->view, $builder, $model);
-        return $builder->view->safe_concat(@form_node);
+        return $form_node[0] if scalar(@form_node) == 1;
+        return my $text = $builder->view->safe_concat(@form_node);
       })
     );
     return $output;
@@ -184,7 +185,8 @@ sub _instantiate_builder {
     model => $object,
     name => $model_name,
     uri_base => $options->{uri_base},
-    options => $options
+    options => $options,
+    view => $self->view,
   );
 
   $options->{builder} = $builder;

@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002008 2024 November 29
+          - Fixed issue where pager builder didn't find the correct view
+
 0.002007 2024 November 26
           - attempted fix for issue with changes to boolean module that broke the tests
           - new 'validate_only' method that lets you run validations only for a specific

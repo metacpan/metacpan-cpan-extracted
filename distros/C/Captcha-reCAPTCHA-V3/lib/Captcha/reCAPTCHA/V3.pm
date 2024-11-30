@@ -3,12 +3,11 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use Carp qw(carp croak);
 use JSON qw(decode_json);
 use LWP::UserAgent;
-my $ua = LWP::UserAgent->new();
 
 use overload(
     '""'  => sub { $_[0]->name() },
@@ -53,10 +52,17 @@ sub verify {
         response => $response || croak "missing response token",
     };
 
-    my $res = $ua->post( $self->{'verify_api'}, $params );
-    return decode_json $res->decoded_content() if $res->is_success();
+    my $ua = LWP::UserAgent->new();
 
-    croak "something wrong to POST by " . $ua->agent(), "\n";
+    # Enable LWP debugging
+    use LWP::Debug qw(+);
+
+    my $res = $ua->post( $self->{'verify_api'}, $params );
+    if  ( $res->is_success ) {
+        return decode_json( $res->decoded_content );
+    } else {
+        croak $res->status_line;
+    } 
 }
 
 sub deny_by_score {
@@ -168,9 +174,9 @@ Now you can omit sitekey (from version 0.0.4).
 You have to get them before running from L<here|https://www.google.com/recaptcha/intro/v3.html>.
 
  my $rc = Captcha::reCAPTCHA::V3->new(
-    sitekey => '__YOUR_SITEKEY__', # Optinal
+    sitekey => '__YOUR_SITEKEY__', # Optional
     secret  => '__YOUR_SECRET__',
-    query_name => '__YOUR_QUERY_NAME__', # Optinal
+    query_name => '__YOUR_QUERY_NAME__', # Optional
  );
 
 According to the official document, query_name defaults to 'g-recaptcha-response'

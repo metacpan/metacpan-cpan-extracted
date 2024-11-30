@@ -7,12 +7,10 @@ my $g = Algorithm::Gutter->new(
     },
 );
 $g->gutter->[1]->enabled = 1;
-$g->gutter->[1]->set_update(
-    sub {
-        my ( $cell, $index, $amount, $stash ) = @_;
-        return [ $index, $amount ];
-    }
-);
+$g->gutter->[1]->update  = sub {
+    my ( $cell, $index, $amount, $stash ) = @_;
+    return [ $index, $amount ];
+};
 $g->gutter->[1]->threshold = 4;
 
 for my $turn ( 1 .. 20 ) {

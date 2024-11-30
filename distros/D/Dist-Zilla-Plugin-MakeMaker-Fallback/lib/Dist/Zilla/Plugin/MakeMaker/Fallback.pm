@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::MakeMaker::Fallback; # git description: v0.031-2-gcdebcad
+package Dist::Zilla::Plugin::MakeMaker::Fallback; # git description: v0.032-4-gc047644
 # vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Generate a Makefile.PL containing a warning for legacy users
 # KEYWORDS: plugin installer MakeMaker Makefile.PL toolchain legacy ancient backcompat
 
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::MakeMaker::Awesome' => { -version => '0.47' };
@@ -21,8 +21,7 @@ has skip_release_testing => (
     isa => 'Bool',
 );
 
-around dump_config => sub
-{
+around dump_config => sub {
     my ($orig, $self) = @_;
     my $config = $self->$orig;
 
@@ -35,8 +34,7 @@ around dump_config => sub
     return $config;
 };
 
-sub after_build
-{
+sub after_build {
     my $self = shift;
 
     # if Makefile.PL is missing, someone removed it (probably a bad thing)
@@ -51,8 +49,7 @@ sub after_build
         and not @{ $self->zilla->plugins_with(-ShareDir) };
 }
 
-around _build_WriteMakefile_args => sub
-{
+around _build_WriteMakefile_args => sub {
     my $orig = shift;
     my $self = shift;
     my $WriteMakefile_args = $self->$orig(@_);
@@ -63,8 +60,7 @@ around _build_WriteMakefile_args => sub
     };
 };
 
-sub __preamble
-{
+sub __preamble {
     # this module file gets passed through a template itself at build time, so
     # we need to escape these template markers so they survive
 
@@ -101,8 +97,7 @@ if (grep $_, values %errors)
         };
 }
 
-if (not $ENV{PERL_MM_FALLBACK_SILENCE_WARNING})
-{
+if (not $ENV{PERL_MM_FALLBACK_SILENCE_WARNING}) {
     warn <<'EOW';
 CODE
     . join('', <DATA>)
@@ -114,8 +109,7 @@ EOW
 CODE
 }
 
-around _build_MakeFile_PL_template => sub
-{
+around _build_MakeFile_PL_template => sub {
     my $orig = shift;
     my $self = shift;
 
@@ -137,12 +131,10 @@ sub build {
     $self->log_debug('doing nothing during build...');
 }
 
-sub test
-{
+sub test {
     my $self = shift;
 
-    if ($ENV{RELEASE_TESTING} and not $self->skip_release_testing)
-    {
+    if ($ENV{RELEASE_TESTING} and not $self->skip_release_testing) {
         # we are either performing a 'dzil test' with RELEASE_TESTING set, or
         # a 'dzil release' -- the Build.PL plugin will run tests with extra
         # variables set, so as an extra check, we will perform them without.
@@ -153,8 +145,7 @@ sub test
         $self->log_debug('performing test with RELEASE_TESTING, AUTHOR_TESTING unset');
         return $self->next::method(@_);
     }
-    else
-    {
+    else {
         $self->log_debug('doing nothing during test...');
     }
 }
@@ -203,7 +194,8 @@ __PACKAGE__->meta->make_immutable;
 #pod place, so please file an issue on github.
 #pod
 #pod If you're using a packaging tool through a unix distribution, this issue
-#pod should be reported to the package manager.
+#pod should be reported to the package manager. Remember: build tools should always
+#pod favour Build.PL over Makefile.PL, and (MY)?META.json over (MY)?META.yml.
 #pod
 #pod If you're installing manually, please retrain your fingers to run Build.PL
 #pod when present instead of Makefile.PL.
@@ -272,7 +264,7 @@ Dist::Zilla::Plugin::MakeMaker::Fallback - Generate a Makefile.PL containing a w
 
 =head1 VERSION
 
-version 0.032
+version 0.033
 
 =head1 SYNOPSIS
 
@@ -312,7 +304,8 @@ your distribution, with an added preamble that is printed when it is run:
     place, so please file an issue on github.
 
     If you're using a packaging tool through a unix distribution, this issue
-    should be reported to the package manager.
+    should be reported to the package manager. Remember: build tools should always
+    favour Build.PL over Makefile.PL, and (MY)?META.json over (MY)?META.yml.
 
     If you're installing manually, please retrain your fingers to run Build.PL
     when present instead of Makefile.PL.
@@ -422,7 +415,8 @@ If you're using cpanminus, you shouldn't be seeing this message in the first
 place, so please file an issue on github.
 
 If you're using a packaging tool through a unix distribution, this issue
-should be reported to the package manager.
+should be reported to the package manager. Remember: build tools should always
+favour Build.PL over Makefile.PL, and (MY)?META.json over (MY)?META.yml.
 
 If you're installing manually, please retrain your fingers to run Build.PL
 when present instead of Makefile.PL.

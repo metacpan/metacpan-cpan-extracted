@@ -39,8 +39,7 @@ use Path::Tiny 0.062;
         if not Test::Builder->new->is_passing;
 }
 
-foreach my $eumm_version ('6.00', '6.01', '0', '6.55_02')
-{
+foreach my $eumm_version ('6.00', '6.01', '0', '6.55_02') {
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {
@@ -133,8 +132,7 @@ foreach my $eumm_version ('6.00', '6.01', '0', '6.55_02')
             . ' eumm_version was specified)',
     );
 
-    SKIP:
-    {
+    SKIP: {
         ok($Makefile_PL_content =~ /^my %configure_requires = \($/mg, 'found start of %configure_requires declaration')
             or skip 'failed to test %configure_requires section', 2;
 
@@ -150,18 +148,15 @@ foreach my $eumm_version ('6.00', '6.01', '0', '6.55_02')
         my $configure_requires_content = substr($Makefile_PL_content, $start, $end - $start - 2);
 
         my %configure_requires = %{ $tzil->distmeta->{prereqs}{configure}{requires} };
-        foreach my $prereq (sort keys %configure_requires)
-        {
-            if ($prereq eq 'perl')
-            {
+        foreach my $prereq (sort keys %configure_requires) {
+            if ($prereq eq 'perl') {
                 unlike(
                     $configure_requires_content,
                     qr/perl/m,
                     '%configure_requires does not contain perl',
                 );
             }
-            else
-            {
+            else {
                 like(
                     $configure_requires_content,
                     qr/$prereq\W+$configure_requires{$prereq}\W/m,
@@ -172,8 +167,7 @@ foreach my $eumm_version ('6.00', '6.01', '0', '6.55_02')
     }
 
     subtest 'ExtUtils::MakeMaker->VERSION not asserted (outside of an eval) either' => sub {
-        while ($Makefile_PL_content =~ /^(.*)ExtUtils::MakeMaker\s*->\s*VERSION\s*\(\s*([\d._]+)\s*\)/mg)
-        {
+        while ($Makefile_PL_content =~ /^(.*)ExtUtils::MakeMaker\s*->\s*VERSION\s*\(\s*([\d._]+)\s*\)/mg) {
             like($1, qr/eval/, 'VERSION assertion (on ' . $2 . ') done inside an eval');
         }
         pass 'no-op';

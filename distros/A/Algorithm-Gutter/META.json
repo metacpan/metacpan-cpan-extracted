@@ -35,7 +35,7 @@
    "provides" : {
       "Algorithm::Gutter" : {
          "file" : "lib/Algorithm/Gutter.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Algorithm::Gutter::Cell" : {
          "file" : "lib/Algorithm/Gutter.pm"
@@ -50,6 +50,6 @@
          "url" : "https://thrig.me/src/Algorithm-Gutter.git"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }
