@@ -49,3 +49,7 @@
       - moved Inline'd code in to share/openmp-simple.h
       - somewhat of an experiment to reduce smoker test
         failures
+
+0.1.4  12/01/2024 04:25:00 AM MST
+      - added newline before ppport.h, some errors were indicating that this
+        was causing issues with the preceding line, #include <omp.h>

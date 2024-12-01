@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Alien::OpenMP;
 
-our $VERSION = q{0.1.3};
+our $VERSION = q{0.1.4};
 
 # This module is a wrapper around a ".h" file that is injected into Alien::OpenMP
 # via Inline:C's AUTO_INCLUDE feature. This header file constains C MACROs for reading
@@ -19,7 +19,7 @@ sub Inline {
   my ($self, $lang) = @_;
   my $config = Alien::OpenMP->Inline($lang);
   $config->{INC} = qq{-I$share_dir};
-  $config->{AUTO_INCLUDE} .= qq{#include "$share_dir/ppport.h"\n#include "$share_dir/openmp-simple.h"\n};
+  $config->{AUTO_INCLUDE} .= qq{\n#include "$share_dir/ppport.h"\n#include "$share_dir/openmp-simple.h"\n};
   return $config;
 }
 

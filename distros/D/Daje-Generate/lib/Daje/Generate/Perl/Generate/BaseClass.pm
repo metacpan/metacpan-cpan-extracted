@@ -13,6 +13,8 @@ class Daje::Generate::Perl::Generate::BaseClass {
 
         my $base_name_space = $config->{CLASS}->{base_name_space};
 
+        my $date = localtime();
+        $tpl =~ s/<<date>>/$date/ig;
         $tpl =~ s/<<base_name_space>>/$base_name_space/ig;
 
         my $output = Daje::Generate::Output::Perl::Class->new(

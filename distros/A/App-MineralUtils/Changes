@@ -1,3 +1,11 @@
+0.017   2024-12-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Add column: pct_X.
+
+        - [mineral calcium] Add calcium glycerophosphate, fix calcium ratio
+          for ca citrates.
+
+
 0.016   2024-11-21  Released-By: PERLANCAR; Urgency: medium
 
         - [mineral calcium] Add calcium gluconate.

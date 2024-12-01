@@ -1,4 +1,7 @@
 package String::Diff;
+# git description: v0.09-1-g58a3f48
+
+our $AUTHORITY = 'cpan:SCHWIGON';
 
 use strict;
 use warnings;
@@ -231,11 +234,16 @@ sub diff_regexp {
 }
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-String::Diff - Simple diff to String
+String::Diff
 
 =head1 SYNOPSIS
 
@@ -338,6 +346,9 @@ You can escape callback set to diff function and diff_merge function.
   is($diff_old, 'this is &lt;b&gt;<del>Perl</del>&lt;/b&gt;');
   is($diff_new, 'this is &lt;b&gt;<ins>&lt;BIG&gt;R&lt;/BIG&gt;uby</ins>&lt;/b&gt;');
 
+=head1 NAME
+
+String::Diff - Simple diff to String
 
 =head1 METHODS
 
@@ -377,5 +388,16 @@ Copyright 2008 (C) Kazuhiro Osawa
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Kazuhiro Osawa <yappo {@} shibuya {dot} pl>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Kazuhiro Osawa <yappo {@} shibuya {dot} pl>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

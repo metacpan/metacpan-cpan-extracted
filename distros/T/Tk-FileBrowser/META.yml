@@ -29,5 +29,5 @@ requires:
 resources:
   bugtracker: https://github.com/haje61/Tk-FileBrowser/issues
   repository: git://github.com/haje61/Tk-FileBrowser.git
-version: 0.05
+version: 0.06
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

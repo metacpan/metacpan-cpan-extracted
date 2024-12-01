@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-11-21'; # DATE
+our $DATE = '2024-12-01'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_sodium_unit",
@@ -39,7 +39,7 @@ convert-sodium-unit - Convert a sodium quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.016 of convert-sodium-unit (from Perl distribution App-MineralUtils), released on 2024-11-21.
+This document describes version 0.017 of convert-sodium-unit (from Perl distribution App-MineralUtils), released on 2024-12-01.
 
 =head1 SYNOPSIS
 
@@ -198,14 +198,14 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 Show all possible conversions
 
  % convert-sodium-unit
- +--------+----------------+-------------------------------------------+
- | amount | unit           | summary                                   |
- +--------+----------------+-------------------------------------------+
- |  1.000 | mg-na-elem     | Elemental sodium, in milligrams           |
- |  2.545 | mg-na-chloride | Sodium chloride (NaCl), in milligrams     |
- |  2.545 | mg-na-cl       | Sodium chloride (NaCl), in milligrams     |
- | 11.236 | mg-na-citrate  | Sodium citrate (Na3C6H5O7), in milligrams |
- +--------+----------------+-------------------------------------------+
+ +--------+---------+----------------+-------------------------------------------+
+ | amount |  pct_na | unit           | summary                                   |
+ +--------+---------+----------------+-------------------------------------------+
+ |  1.000 | 100.000 | mg-na-elem     | Elemental sodium, in milligrams           |
+ |  2.545 |  39.339 | mg-na-chloride | Sodium chloride (NaCl), in milligrams     |
+ |  2.545 |  39.339 | mg-na-cl       | Sodium chloride (NaCl), in milligrams     |
+ | 11.236 |   8.909 | mg-na-citrate  | Sodium citrate (Na3C6H5O7), in milligrams |
+ +--------+---------+----------------+-------------------------------------------+
 
 =head2 How much of sodium chloride provides 1000 mg of elemental sodium?
 

@@ -1,0 +1,4 @@
+1.2    2024-11-30
+
+- First release since the palaeolithic
+- Attempts to multiply non-numeric values are fatal

@@ -5,7 +5,7 @@ use strict; use warnings;
 use Test::More;
 
 my $min_ver = '0.87';
-eval "use Map::Tube::London $min_ver tests => 1";
+eval "use Map::Tube::London $min_ver";
 plan skip_all => "Map::Tube::London $min_ver required." if $@;
 
 my $map  = Map::Tube::London->new;

@@ -9,7 +9,7 @@ Tk::FileManager - Tk::FileBrowser based filemanager
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.05;
+$VERSION = 0.06;
 
 use base qw(Tk::Derived Tk::FileBrowser);
 Construct Tk::Widget 'FileManager';
@@ -115,6 +115,7 @@ sub Populate {
 	my $dellist = $deldialog->Scrolled('HList',
 		-scrollbars => 'osoe',
 		-separator => '`',
+		-width => 75,
 	)->pack(-expand => 1, -fill =>'both', @padding);
 	$self->Advertise('DeleteDialog', $deldialog);
 	$self->Advertise('DeleteList', $dellist);

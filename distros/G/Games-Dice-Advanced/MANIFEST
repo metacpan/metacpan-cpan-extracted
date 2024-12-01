@@ -3,4 +3,11 @@ t/all.t
 README
 MANIFEST
 Makefile.PL
-META.yml                                 Module meta-data (added by MakeMaker)
+MANIFEST.SKIP
+t/pod-coverage.t
+t/pod.t
+ARTISTIC.txt
+CHANGELOG
+GPL2.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

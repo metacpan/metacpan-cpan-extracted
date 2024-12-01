@@ -1,47 +1,88 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "It's new $module",
    "author" : [
-      "janskil1525@gmail.com"
+      "janeskil1525 <janeskil1525@gmail.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.15",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Daje-Generate",
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
          "requires" : {
-            "Config::Tiny" : "2.30",
-            "Digest::SHA" : "6.04",
-            "Mojo::File" : "0",
-            "Mojo::JSON" : "0",
-            "String::CamelCase" : "0",
-            "Syntax::Operator::Matches" : "0"
+            "perl" : "5.40"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
          }
       }
    },
+   "provides" : {
+      "Daje::Generate" : {
+         "file" : "lib/Daje/Generate.pm",
+         "version" : "0.08"
+      },
+      "Daje::Generate::Templates::Perl" : {
+         "file" : "lib/Daje/Generate/Templates/Perl.pm",
+         "version" : "0.01"
+      },
+      "Daje::Generate::Templates::Sql" : {
+         "file" : "lib/Daje/Generate/Templates/Sql.pm"
+      },
+      "Daje::Generate::Test::Datasections" : {
+         "file" : "lib/Daje/Generate/Test/Datasections.pm"
+      },
+      "Daje::Generate::Test::TestData" : {
+         "file" : "lib/Daje/Generate/Test/TestData.pm"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/janeskil1525/Daje-Generate/issues"
+      },
+      "homepage" : "https://github.com/janeskil1525/Daje-Generate",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/janeskil1525/Daje-Generate.git",
+         "web" : "https://github.com/janeskil1525/Daje-Generate"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_static_install" : 1
 }

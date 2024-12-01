@@ -33,6 +33,7 @@ class Daje::Generate::Perl::Generate::Methods :isa(Daje::Generate::Perl::Base::C
         my $select = $self->fields->select();
         my $p_key = $self->fields->primary_key();
         my $table_name = $self->json->{table_name};
+
         $tpl =~ s/<<select_fields>>/$select/ig;
         $tpl =~ s/<<primary_key>>/$p_key/ig;
         $tpl =~ s/<<table_name>>/$table_name/ig;

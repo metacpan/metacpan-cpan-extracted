@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/briandfoy/business-isbn-data/issues
   homepage: https://github.com/briandfoy/business-isbn-data
   repository: https://github.com/briandfoy/business-isbn-data
-version: '20241123.001'
+version: '20241130.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

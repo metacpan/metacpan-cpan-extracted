@@ -4,7 +4,7 @@ Data::Verifier - Profile based data verification with Moose type constraints.
 
 # VERSION
 
-version 0.65
+version 0.66
 
 # DESCRIPTION
 
@@ -403,7 +403,7 @@ J. Shirley
 
 Wallace Reis
 
-Mohammad S Anwar
+Mohammad Sajid Anwar
 
 Hernan Lopes
 
@@ -413,7 +413,7 @@ Cory G Watson <gphat@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Cold Hard Code, LLC.
+This software is copyright (c) 2024 by Cold Hard Code, LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

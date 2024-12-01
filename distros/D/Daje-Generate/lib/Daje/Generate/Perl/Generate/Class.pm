@@ -25,7 +25,9 @@ class Daje::Generate::Perl::Generate::Class :isa(Daje::Generate::Perl::Base::Com
         my $insert = $methods->insert();
         my $update = $methods->update();
         my $select_method = $methods->select_method();
+        my $date = localtime();
 
+        $tpl =~ s/<<date>>/$date/ig;
         $tpl =~ s/<<fields>>/$select_fields/ig;
         $tpl =~ s/<<name_space>>/$name_space/ig;
         $tpl =~ s/<<classname>>/$class_name/ig;

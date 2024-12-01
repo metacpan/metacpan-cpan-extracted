@@ -9,7 +9,7 @@ Tk::FilePicker - Tk::FileBrowser based file dialog
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.05;
+$VERSION = 0.06;
 
 use base qw(Tk::Derived Tk::YADialog);
 Construct Tk::Widget 'FilePicker';
@@ -92,6 +92,11 @@ sub Populate {
 		DEFAULT => [ $browser ],
 	);
 	$self->Delegates(
+		pick => $self,
+		pickFileOpen => $self,
+		pickFileOpenMulti => $self,
+		pickFileSave => $self,
+		pickFolderSelect => $self,
 		DEFAULT => $browser
 	);
 }

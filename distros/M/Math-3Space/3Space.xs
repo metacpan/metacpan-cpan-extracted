@@ -72,6 +72,7 @@ struct m3s_4space_frustum_projection {
 	 *  |_ 0    0   -1    0 _|
 	 */
 	double m00, m11, m20, m21, m22, m32;
+	bool centered;
 };
 typedef union m3s_4space_projection {
 	struct m3s_4space_frustum_projection frustum;
@@ -487,7 +488,7 @@ static SV* m3s_wrap_space(m3s_space_t *space) {
 // This code assumes that 8-byte alignment is good enough even if the NV type is
 //  long double
 #define NV_ALIGNMENT_MASK 7
-static void m3s_make_aligned_buffer(SV *buf, size_t size) {
+static char* m3s_make_aligned_buffer(SV *buf, size_t size) {
 	char *p;
 	STRLEN len;
 
@@ -506,6 +507,7 @@ static void m3s_make_aligned_buffer(SV *buf, size_t size) {
 		sv_chop(buf, p + NV_ALIGNMENT_MASK+1 - ((intptr_t)p & NV_ALIGNMENT_MASK));
 		SvCUR_set(buf, size);
 	}
+	return p;
 }
 
 // Create a new Math::3Space::Vector object, which is a blessed scalar-ref containing
@@ -514,8 +516,7 @@ static SV* m3s_wrap_vector(m3s_vector_p vec_array) {
 	SV *obj, *buf;
 	buf= newSVpvn((char*) vec_array, sizeof(NV)*3);
 	if ((intptr_t)SvPVX(buf) & NV_ALIGNMENT_MASK) {
-		m3s_make_aligned_buffer(buf, sizeof(NV)*3);
-		memcpy(SvPVX(buf), vec_array, sizeof(NV)*3);
+		memcpy(m3s_make_aligned_buffer(buf, sizeof(NV)*3), vec_array, sizeof(NV)*3);
 	}
 	obj= newRV_noinc(buf);
 	sv_bless(obj, gv_stashpv("Math::3Space::Vector", GV_ADD));
@@ -662,8 +663,7 @@ static SV* m3s_wrap_projection(m3s_4space_projection_t *p, const char* pkg) {
 	SV *obj, *buf;
 	buf= newSVpvn((char*) p, sizeof(m3s_4space_projection_t));
 	if ((intptr_t)SvPVX(buf) & NV_ALIGNMENT_MASK) {
-		m3s_make_aligned_buffer(buf, sizeof(m3s_4space_projection_t));
-		memcpy(SvPVX(buf), p, sizeof(m3s_4space_projection_t));
+		memcpy(m3s_make_aligned_buffer(buf, sizeof(m3s_4space_projection_t)), p, sizeof(m3s_4space_projection_t));
 	}
 	obj= newRV_noinc(buf);
 	sv_bless(obj, gv_stashpv(pkg, GV_ADD));
@@ -1175,8 +1175,7 @@ get_gl_matrix(space, buffer=NULL)
 		double *dst;
 	PPCODE:
 		if (buffer) {
-			m3s_make_aligned_buffer(buffer, sizeof(double)*16);
-			dst= (double*) SvPVX(buffer);
+			dst= (double*) m3s_make_aligned_buffer(buffer, sizeof(double)*16);
 			src= space->mat;
 			dst[ 0] = src[ 0]; dst[ 1] = src[ 1]; dst[ 2] = src[ 2]; dst[ 3] = 0;
 			dst[ 4] = src[ 3]; dst[ 5] = src[ 4]; dst[ 6] = src[ 5]; dst[ 7] = 0;
@@ -1198,57 +1197,59 @@ get_gl_matrix(space, buffer=NULL)
 MODULE = Math::3Space              PACKAGE = Math::3Space::Projection
 
 SV *
-new_frustum(left, right, bottom, top, near, far)
+_frustum(left, right, bottom, top, near_z, far_z)
 	double left
 	double right
 	double bottom
 	double top
-	double near
-	double far
+	double near_z
+	double far_z
 	INIT:
 		m3s_4space_projection_t proj;
 		double w, h, d, w_1, h_1, d_1;
 	CODE:
 		w= right - left;
 		h= top - bottom;
-		d= far - near;
+		d= far_z - near_z;
 		if (fabs(w) < double_tolerance || fabs(h) < double_tolerance || fabs(d) < double_tolerance)
 			croak("Described frustum has a zero-sized dimension");
 
 		w_1= 1/w;
 		h_1= 1/h;
 		d_1= 1/d;
-		proj.frustum.m00= near * 2 * w_1;
-		proj.frustum.m11= near * 2 * h_1;
+		proj.frustum.m00= near_z * 2 * w_1;
+		proj.frustum.m11= near_z * 2 * h_1;
 		proj.frustum.m20= (right+left) * w_1;
 		proj.frustum.m21= (top+bottom) * h_1;
-		proj.frustum.m22= -(near+far) * d_1;
-		proj.frustum.m32= -2 * near * far * d_1;
+		proj.frustum.m22= -(near_z+far_z) * d_1;
+		proj.frustum.m32= -2 * near_z * far_z * d_1;
+		// use optimized version if m20 and m21 are zero
+		proj.frustum.centered= fabs(proj.frustum.m20) < double_tolerance && fabs(proj.frustum.m21) < double_tolerance;
 		RETVAL= m3s_wrap_projection(&proj,
-			// use optimized version if m20 and m21 are zero
-			fabs(proj.frustum.m20) < double_tolerance && fabs(proj.frustum.m21) < double_tolerance
-			? "Math::3Space::Projection::CenteredFrustum"
-			: "Math::3Space::Projection::Frustum"
+			"Math::3Space::Projection::Frustum"
 		);
 	OUTPUT:
 		RETVAL
 
 SV *
-new_perspective(vertical_field_of_view, aspect, near, far)
+_perspective(vertical_field_of_view, aspect, near_z, far_z)
 	double vertical_field_of_view
 	double aspect
-	double near
-	double far
+	double near_z
+	double far_z
 	INIT:
 		m3s_4space_projection_t proj;
-		double f;
+		double f= tan(M_PI_2 - vertical_field_of_view * M_PI),
+		       neg_inv_range_z= -1 / (far_z - near_z);
 	CODE:
-		f= tan(M_PI_2 - vertical_field_of_view * M_PI);
-		proj.frustum.m00= f /aspect;
+		proj.frustum.m00= f / aspect;
 		proj.frustum.m11= f;
-		proj.frustum.m22= -1;
-		proj.frustum.m32= -near;
-		RETVAL= m3s_wrap_projection(&proj, "Math::3Space::Projection::CenteredFrustum");
+		proj.frustum.m20= 0;
+		proj.frustum.m21= 0;
+		proj.frustum.m22= (near_z+far_z) * neg_inv_range_z;
+		proj.frustum.m32= 2 * near_z * far_z * neg_inv_range_z;
+		proj.frustum.centered= true;
+		RETVAL= m3s_wrap_projection(&proj, "Math::3Space::Projection::Frustum");
 	OUTPUT:
 		RETVAL
 
@@ -1258,83 +1259,70 @@ MODULE = Math::3Space              PACKAGE = Math::3Space::Projection::Frustum
 # zeroes and ones in both the 3Space matrix and the projection matrix.
 
 void
-get_gl_matrix(proj, space, buffer=NULL)
+matrix_colmajor(proj, space=NULL)
 	m3s_4space_projection_t *proj
 	m3s_space_t *space
-	SV *buffer
+	ALIAS:
+		get_gl_matrix      = 0
+		matrix_pack_float  = 1
+		matrix_pack_double = 2
 	INIT:
-		double tmp[16];
-		double *dst= tmp;
+		double dst[16];
 		struct m3s_4space_frustum_projection *f= &proj->frustum;
 	PPCODE:
-		if (buffer) {
-			m3s_make_aligned_buffer(buffer, sizeof(double)*16);
-			dst= (double*) SvPVX(buffer);
+		if (!space) { /* user just wants the matrix itself */
+			dst[ 0]= f->m00; dst[ 4]= 0;      dst[ 8]= f->m20;  dst[12]= 0;
+			dst[ 1]= 0;      dst[ 5]= f->m11; dst[ 9]= f->m21;  dst[13]= 0;
+			dst[ 2]= 0;      dst[ 6]= 0;      dst[10]= f->m22;  dst[14]= f->m32;
+			dst[ 3]= 0;      dst[ 7]= 0;      dst[11]= -1;      dst[15]= 0;
 		}
-		dst[ 0]= f->m00 * SPACE_XV(space)[0] +                               f->m20 * SPACE_XV(space)[2];
-		dst[ 1]=                               f->m11 * SPACE_XV(space)[1] + f->m21 * SPACE_XV(space)[2];
-		dst[ 2]=                                                             f->m22 * SPACE_XV(space)[2];
-		dst[ 3]=                                                                     -SPACE_XV(space)[2];
-		dst[ 4]= f->m00 * SPACE_YV(space)[0] +                               f->m20 * SPACE_YV(space)[2];
-		dst[ 5]=                               f->m11 * SPACE_YV(space)[1] + f->m21 * SPACE_YV(space)[2];
-		dst[ 6]=                                                             f->m22 * SPACE_YV(space)[2];
-		dst[ 7]=                                                                     -SPACE_YV(space)[2];
-		dst[ 8]= f->m00 * SPACE_ZV(space)[0] +                               f->m20 * SPACE_ZV(space)[2];
-		dst[ 9]=                               f->m11 * SPACE_ZV(space)[1] + f->m21 * SPACE_ZV(space)[2];
-		dst[10]=                                                             f->m22 * SPACE_ZV(space)[2];
-		dst[11]=                                                                     -SPACE_ZV(space)[2];
-		dst[12]= f->m00 * SPACE_ORIGIN(space)[0]                           + f->m20 * SPACE_ORIGIN(space)[2];
-		dst[13]=                           f->m11 * SPACE_ORIGIN(space)[1] + f->m21 * SPACE_ORIGIN(space)[2];
-		dst[14]=                                                             f->m22 * SPACE_ORIGIN(space)[2] + f->m32;
-		dst[15]=                                                                     -SPACE_ORIGIN(space)[2];
-		if (buffer)
-			XSRETURN(0);
-		else {
-			int i;
-			EXTEND(SP, 16);
-			for (i= 0; i < 16; i++)
-				mPUSHn(dst[i]);
-			XSRETURN(16);
+		else if (proj->frustum.centered) { /* centered frustum, optimize by assuming m20 and m21 are zero */
+			dst[ 0]= f->m00 * SPACE_XV(space)[0];
+			dst[ 1]= f->m11 * SPACE_XV(space)[1];
+			dst[ 2]= f->m22 * SPACE_XV(space)[2];
+			dst[ 3]=         -SPACE_XV(space)[2];
+			dst[ 4]= f->m00 * SPACE_YV(space)[0];
+			dst[ 5]= f->m11 * SPACE_YV(space)[1];
+			dst[ 6]= f->m22 * SPACE_YV(space)[2];
+			dst[ 7]=         -SPACE_YV(space)[2];
+			dst[ 8]= f->m00 * SPACE_ZV(space)[0];
+			dst[ 9]= f->m11 * SPACE_ZV(space)[1];
+			dst[10]= f->m22 * SPACE_ZV(space)[2];
+			dst[11]=         -SPACE_ZV(space)[2];
+			dst[12]= f->m00 * SPACE_ORIGIN(space)[0];
+			dst[13]= f->m11 * SPACE_ORIGIN(space)[1];
+			dst[14]= f->m22 * SPACE_ORIGIN(space)[2] + f->m32;
+			dst[15]=         -SPACE_ORIGIN(space)[2];
+		} else {
+			dst[ 0]= f->m00 * SPACE_XV(space)[0] +                               f->m20 * SPACE_XV(space)[2];
+			dst[ 1]=                               f->m11 * SPACE_XV(space)[1] + f->m21 * SPACE_XV(space)[2];
+			dst[ 2]=                                                             f->m22 * SPACE_XV(space)[2];
+			dst[ 3]=                                                                     -SPACE_XV(space)[2];
+			dst[ 4]= f->m00 * SPACE_YV(space)[0] +                               f->m20 * SPACE_YV(space)[2];
+			dst[ 5]=                               f->m11 * SPACE_YV(space)[1] + f->m21 * SPACE_YV(space)[2];
+			dst[ 6]=                                                             f->m22 * SPACE_YV(space)[2];
+			dst[ 7]=                                                                     -SPACE_YV(space)[2];
+			dst[ 8]= f->m00 * SPACE_ZV(space)[0] +                               f->m20 * SPACE_ZV(space)[2];
+			dst[ 9]=                               f->m11 * SPACE_ZV(space)[1] + f->m21 * SPACE_ZV(space)[2];
+			dst[10]=                                                             f->m22 * SPACE_ZV(space)[2];
+			dst[11]=                                                                     -SPACE_ZV(space)[2];
+			dst[12]= f->m00 * SPACE_ORIGIN(space)[0]                           + f->m20 * SPACE_ORIGIN(space)[2];
+			dst[13]=                           f->m11 * SPACE_ORIGIN(space)[1] + f->m21 * SPACE_ORIGIN(space)[2];
+			dst[14]=                                                             f->m22 * SPACE_ORIGIN(space)[2] + f->m32;
+			dst[15]=                                                                     -SPACE_ORIGIN(space)[2];
 		}
-
-MODULE = Math::3Space              PACKAGE = Math::3Space::Projection::CenteredFrustum
-
-# This is an optimized version of Projection::Frustum that assumes
-# the projection matrix m20 and m21 are zero.
-
-void
-get_gl_matrix(proj, space, buffer=NULL)
-	m3s_4space_projection_t *proj
-	m3s_space_t *space
-	SV *buffer
-	INIT:
-		double tmp[16];
-		double *dst= tmp;
-		struct m3s_4space_frustum_projection *f= &proj->frustum;
-	PPCODE:
-		if (buffer) {
-			m3s_make_aligned_buffer(buffer, sizeof(double)*16);
-			dst= (double*) SvPVX(buffer);
-		}
-		dst[ 0]= f->m00 * SPACE_XV(space)[0];
-		dst[ 1]= f->m11 * SPACE_XV(space)[1];
-		dst[ 2]= f->m22 * SPACE_XV(space)[2];
-		dst[ 3]=         -SPACE_XV(space)[2];
-		dst[ 4]= f->m00 * SPACE_YV(space)[0];
-		dst[ 5]= f->m11 * SPACE_YV(space)[1];
-		dst[ 6]= f->m22 * SPACE_YV(space)[2];
-		dst[ 7]=         -SPACE_YV(space)[2];
-		dst[ 8]= f->m00 * SPACE_ZV(space)[0];
-		dst[ 9]= f->m11 * SPACE_ZV(space)[1];
-		dst[10]= f->m22 * SPACE_ZV(space)[2];
-		dst[11]=         -SPACE_ZV(space)[2];
-		dst[12]= f->m00 * SPACE_ORIGIN(space)[0];
-		dst[13]= f->m11 * SPACE_ORIGIN(space)[1];
-		dst[14]= f->m22 * SPACE_ORIGIN(space)[2] + f->m32;
-		dst[15]=         -SPACE_ORIGIN(space)[2];
-		if (buffer)
-			XSRETURN(0);
-		else {
+		if (ix & 3) { /* packed something */
+			ST(0)= sv_newmortal();
+			if (ix & 1) { /* packed floats */
+				float *buf;
+				int i;
+				buf= (float*) m3s_make_aligned_buffer(ST(0), sizeof(float)*16);
+				for (i= 0; i < 16; i++) buf[i]= (float) dst[i];
+			} else {
+				memcpy(m3s_make_aligned_buffer(ST(0), sizeof(double)*16), dst, sizeof(double)*16);
+			}
+			XSRETURN(1);
+		} else {
 			int i;
 			EXTEND(SP, 16);
 			for (i= 0; i < 16; i++)
@@ -1546,8 +1534,5 @@ BOOT:
 	AV *isa;
 	hv_stores(inc, "Math::3Space::Projection",                  newSVpvs("Math/3Space.pm"));
 	hv_stores(inc, "Math::3Space::Projection::Frustum",         newSVpvs("Math/3Space.pm"));
-	hv_stores(inc, "Math::3Space::Projection::CenteredFrustum", newSVpvs("Math/3Space.pm"));
 	isa= get_av("Math::3Space::Projection::Frustum::ISA", GV_ADD);
-	av_push(isa, newSVpvs("Math::3Space::Projection"));
-	isa= get_av("Math::3Space::Projection::CenteredFrustum::ISA", GV_ADD);
 	av_push(isa, newSVpvs("Math::3Space::Projection"));

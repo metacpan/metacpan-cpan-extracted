@@ -1,5 +1,9 @@
 Revision history for Perl extension At.pm
 
+0.19 2024-12-01T00:29:53Z
+
+    - Gutted.
+
 0.18 2024-02-19T21:49:55Z
 
     - Update according to lexicon changes in bluesky-social/atproto@8c94979

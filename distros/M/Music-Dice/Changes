@@ -1,0 +1,8 @@
+Revision history for Music-Dice
+
+0.0101 2024-11-30 15:06:03
+    - Fix ugly typo in code.
+
+0.0100 2024-11-30 14:55:31
+    - Do All The Things.
+    - Mint with Dist::Zilla.

@@ -19,7 +19,9 @@ class Daje::Generate::Perl::Generate::Interface {
         my $tpl = $template->get_data_section('interface');
         my $name_space = $config->{CLASS}->{name_space};
         my $interface = $config->{CLASS}->{name_interface};
+        my $date = localtime();
 
+        $tpl =~ s/<<date>>/$date/ig;
         $tpl =~ s/<<interface>>/$interface/ig;
         $tpl =~ s/<<classname>>/$table/ig;
         $tpl =~ s/<<name_space>>/$name_space/ig;

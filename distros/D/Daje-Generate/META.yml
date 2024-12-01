@@ -1,14 +1,14 @@
 ---
-abstract: unknown
+abstract: "It's new $module"
 author:
-  - janskil1525@gmail.com
+  - 'janeskil1525 <janeskil1525@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
-license: unknown
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.15, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -16,13 +16,32 @@ name: Daje-Generate
 no_index:
   directory:
     - t
+    - xt
     - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Daje::Generate:
+    file: lib/Daje/Generate.pm
+    version: '0.08'
+  Daje::Generate::Templates::Perl:
+    file: lib/Daje/Generate/Templates/Perl.pm
+    version: '0.01'
+  Daje::Generate::Templates::Sql:
+    file: lib/Daje/Generate/Templates/Sql.pm
+  Daje::Generate::Test::Datasections:
+    file: lib/Daje/Generate/Test/Datasections.pm
+  Daje::Generate::Test::TestData:
+    file: lib/Daje/Generate/Test/TestData.pm
 requires:
-  Config::Tiny: '2.30'
-  Digest::SHA: '6.04'
-  Mojo::File: '0'
-  Mojo::JSON: '0'
-  String::CamelCase: '0'
-  Syntax::Operator::Matches: '0'
-version: '0.07'
+  perl: '5.40'
+resources:
+  bugtracker: https://github.com/janeskil1525/Daje-Generate/issues
+  homepage: https://github.com/janeskil1525/Daje-Generate
+  repository: https://github.com/janeskil1525/Daje-Generate.git
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

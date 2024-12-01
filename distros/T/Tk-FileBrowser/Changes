@@ -1,5 +1,18 @@
 Revision history for Perl extension Tk::FileBrowser.
 
+0.06  Sat Nov 30 2024
+	- fixed bug with filters.
+	- Tk::FileBrowser now holds all image options.
+	- adjusted the Delegates method in Tk::FilePicker.
+
+0.05  Mon Nov 25 2024
+	- added Tk::FileBrowser::Images to keep pixmaps. FileBrowser.pm is becoming a bit big.
+	- revised Tk::FileBrowser.
+	- added Tk::FileManager.
+	- added Tk::FilePicker.
+	- added optional button to create new folder.
+	- small corrections and bugfixes.
+
 0.04  Mon Apr 8, 2024
 	- fixed header background color
 	

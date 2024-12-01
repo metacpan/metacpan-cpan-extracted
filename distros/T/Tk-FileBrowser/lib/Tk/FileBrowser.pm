@@ -9,7 +9,7 @@ Tk::FileBrowser - Multi column file system explorer
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.05;
+$VERSION = 0.06;
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'FileBrowser';
@@ -674,7 +674,6 @@ sub bgCycle {
 			} else {
 				$fullname = "$folder$sep$item";`																																	`																																																																																																																	
 			}
-
 			next if ((-d $fullname) and (not $self->cget('-showfolders')));
 			next if ((-f $fullname) and (not $self->cget('-showfiles')));
 
@@ -902,6 +901,7 @@ sub EditSelect {
 
 sub filter {
 	my ($self, $filter, $value) = @_;
+	return 1 if $filter eq '';
 	$filter = quotemeta($filter);
 	return 1 if $value eq '';
 	my $case = $self->cget('-filtercase');

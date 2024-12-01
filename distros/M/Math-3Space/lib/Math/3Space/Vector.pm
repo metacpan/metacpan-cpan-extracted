@@ -1,6 +1,6 @@
 package Math::3Space::Vector;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 # ABSTRACT: Object wrapping a buffer of three doubles
 
 use Exporter 'import';
@@ -165,7 +165,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,0 +1,74 @@
+[
+  {
+    "version":[
+      {
+        "number": "1",
+        "tables": [
+          {
+             "table": {
+              "name": "users",
+              "fields": {
+                "userid": "varchar",
+                "username": "varchar",
+                "password": "varchar",
+                "phone": "varchar",
+                "active": "bigint",
+                "support": "bigint",
+                "is_admin": "bigint"
+              },
+              "index": [
+                {"type": "unique", "fields": "userid"}
+              ]
+            }
+          },
+          {
+            "table": {
+            "name": "company_type",
+              "fields": {
+                "company_type": "varchar"
+              }
+            },
+            "index": {
+              "type": "unique",
+              "fields": "company_type"
+            },
+            "sql" : [
+              {
+                "fields":"company_type",
+                "values": "'Office Coffee'",
+                "type": "insert"
+              },
+              {
+                "fields":"company_type",
+                "values":"'Recycling'",
+                "type": "insert"
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "companies",
+              "fields": {
+                "name": "varchar",
+                "regno": "varchar",
+                "homepage": "varchar",
+                "phone": "varchar",
+                "vatno": "varchar",
+                "company_type_fkey": "bigint"
+              }
+            }
+          },
+          {
+            "table": {
+              "name": "companies_users",
+              "fields": {
+                "companies_fkey": "bigint",
+                "users_fkey": "bigint"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

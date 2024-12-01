@@ -4,14 +4,16 @@
    "author" : [
       "Sanko Robinson <sanko@cpan.org>"
    ],
+   "description" : "AT Protocol in Perl",
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "App::mii v1.0.0",
+   "keywords" : [],
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
    },
    "name" : "At",
    "no_index" : {
@@ -40,9 +42,7 @@
    },
    "prereqs" : {
       "configure" : {
-         "requires" : {
-            "Module::Build::Tiny" : "0.035"
-         }
+         "requires" : {}
       },
       "develop" : {
          "recommends" : {
@@ -75,6 +75,7 @@
             "Mojo::UserAgent" : "0"
          },
          "requires" : {
+            "File::ShareDir::Tiny" : "0",
             "IO::Socket::SSL" : "1.42",
             "JSON::Tiny" : "0",
             "MIME::Base64" : "0",
@@ -82,7 +83,7 @@
             "Path::Tiny" : "0",
             "Time::Moment" : "0",
             "URI" : "0",
-            "perl" : "v5.38.0"
+            "perl" : "v5.40.0"
          }
       },
       "test" : {
@@ -94,513 +95,33 @@
    "provides" : {
       "At" : {
          "file" : "lib/At.pm",
-         "version" : "0.18"
-      },
-      "At::Bluesky" : {
-         "file" : "lib/At/Bluesky.pm"
-      },
-      "At::Lexicon::app::bsky::actor" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm",
-         "version" : "0.18"
-      },
-      "At::Lexicon::app::bsky::actor::adultContentPref" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm"
-      },
-      "At::Lexicon::app::bsky::actor::contentLabelPref" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm"
-      },
-      "At::Lexicon::app::bsky::actor::feedViewPref" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm"
-      },
-      "At::Lexicon::app::bsky::actor::interestsPref" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm"
-      },
-      "At::Lexicon::app::bsky::actor::personalDetailsPref" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm"
-      },
-      "At::Lexicon::app::bsky::actor::preferences" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm"
-      },
-      "At::Lexicon::app::bsky::actor::profile" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm"
-      },
-      "At::Lexicon::app::bsky::actor::profileView" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm"
-      },
-      "At::Lexicon::app::bsky::actor::profileViewBasic" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm"
-      },
-      "At::Lexicon::app::bsky::actor::profileViewDetailed" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm"
-      },
-      "At::Lexicon::app::bsky::actor::savedFeedsPref" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm"
-      },
-      "At::Lexicon::app::bsky::actor::threadViewPref" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm"
-      },
-      "At::Lexicon::app::bsky::actor::viewerState" : {
-         "file" : "lib/At/Lexicon/app/bsky/actor.pm"
-      },
-      "At::Lexicon::app::bsky::embed::external" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::external::external" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::external::view" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::external::viewExternal" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::images" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::images::aspectRatio" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::images::image" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::images::view" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::images::viewImage" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::record" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::record::view" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::record::viewBlocked" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::record::viewNotFound" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::record::viewRecord" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::recordWithMedia" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::embed::recordWithMedia::view" : {
-         "file" : "lib/At/Lexicon/app/bsky/embed.pm"
-      },
-      "At::Lexicon::app::bsky::feed" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm",
-         "version" : "0.18"
-      },
-      "At::Lexicon::app::bsky::feed::blockedAuthor" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::blockedPost" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::describeFeedGenerator::feed" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::describeFeedGenerator::links" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::feedViewPost" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::generator" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::generatorView" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::generatorViewerState" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::getLikes::like" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::like" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::notFoundPost" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::post" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::post::replyRef" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::postView" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::reasonRepost" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::replyRef" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::repost" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::skeletonFeedPost" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::skeletonReasonRepost" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::threadViewPost" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::threadgate" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::threadgate::followingRule" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::threadgate::listRule" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::threadgate::mentionRule" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::threadgateView" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::feed::viewerState" : {
-         "file" : "lib/At/Lexicon/app/bsky/feed.pm"
-      },
-      "At::Lexicon::app::bsky::graph" : {
-         "file" : "lib/At/Lexicon/app/bsky/graph.pm",
-         "version" : "0.18"
-      },
-      "At::Lexicon::app::bsky::graph::block" : {
-         "file" : "lib/At/Lexicon/app/bsky/graph.pm"
-      },
-      "At::Lexicon::app::bsky::graph::follow" : {
-         "file" : "lib/At/Lexicon/app/bsky/graph.pm"
-      },
-      "At::Lexicon::app::bsky::graph::list" : {
-         "file" : "lib/At/Lexicon/app/bsky/graph.pm"
-      },
-      "At::Lexicon::app::bsky::graph::listItemView" : {
-         "file" : "lib/At/Lexicon/app/bsky/graph.pm"
-      },
-      "At::Lexicon::app::bsky::graph::listView" : {
-         "file" : "lib/At/Lexicon/app/bsky/graph.pm"
-      },
-      "At::Lexicon::app::bsky::graph::listViewBasic" : {
-         "file" : "lib/At/Lexicon/app/bsky/graph.pm"
-      },
-      "At::Lexicon::app::bsky::graph::listViewerState" : {
-         "file" : "lib/At/Lexicon/app/bsky/graph.pm"
-      },
-      "At::Lexicon::app::bsky::graph::listblock" : {
-         "file" : "lib/At/Lexicon/app/bsky/graph.pm"
-      },
-      "At::Lexicon::app::bsky::graph::listitem" : {
-         "file" : "lib/At/Lexicon/app/bsky/graph.pm"
-      },
-      "At::Lexicon::app::bsky::graph::notFoundActor" : {
-         "file" : "lib/At/Lexicon/app/bsky/graph.pm"
-      },
-      "At::Lexicon::app::bsky::graph::relationship" : {
-         "file" : "lib/At/Lexicon/app/bsky/graph.pm"
-      },
-      "At::Lexicon::app::bsky::notification" : {
-         "file" : "lib/At/Lexicon/app/bsky/notification.pm",
-         "version" : "0.18"
-      },
-      "At::Lexicon::app::bsky::richtext" : {
-         "file" : "lib/At/Lexicon/app/bsky/richtext.pm",
-         "version" : "0.18"
-      },
-      "At::Lexicon::app::bsky::richtext::facet" : {
-         "file" : "lib/At/Lexicon/app/bsky/richtext.pm"
-      },
-      "At::Lexicon::app::bsky::richtext::facet::byteSlice" : {
-         "file" : "lib/At/Lexicon/app/bsky/richtext.pm"
-      },
-      "At::Lexicon::app::bsky::richtext::facet::link" : {
-         "file" : "lib/At/Lexicon/app/bsky/richtext.pm"
-      },
-      "At::Lexicon::app::bsky::richtext::facet::mention" : {
-         "file" : "lib/At/Lexicon/app/bsky/richtext.pm"
-      },
-      "At::Lexicon::app::bsky::richtext::facet::tag" : {
-         "file" : "lib/At/Lexicon/app/bsky/richtext.pm"
-      },
-      "At::Lexicon::app::bsky::unspecced" : {
-         "file" : "lib/At/Lexicon/app/bsky/unspecced.pm",
-         "version" : "0.18"
-      },
-      "At::Lexicon::app::bsky::unspecced::skeletonSearchActor" : {
-         "file" : "lib/At/Lexicon/app/bsky/unspecced.pm"
-      },
-      "At::Lexicon::app::bsky::unspecced::skeletonSearchPost" : {
-         "file" : "lib/At/Lexicon/app/bsky/unspecced.pm"
-      },
-      "At::Lexicon::app::bsky::unspecced::suggestion" : {
-         "file" : "lib/At/Lexicon/app/bsky/unspecced.pm"
-      },
-      "At::Lexicon::com::atproto::admin" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "0.18"
-      },
-      "At::Lexicon::com::atproto::admin::accountView" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::blobView" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::communicationTemplateView" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::imageDetails" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventAcknowledge" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventComment" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventEmail" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventEscalate" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventLabel" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventMute" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventReport" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventResolveAppeal" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventReverseTakedown" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventTag" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventTakedown" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventUnmute" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventView" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::modEventViewDetail" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::moderation" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::moderationDetail" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::recordView" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::recordViewDetail" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::recordViewNotFound" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::repoBlobRef" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::repoRef" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::repoView" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::repoViewDetail" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::repoViewNotFound" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::reportView" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::reportViewDetail" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::statusAttr" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::subjectStatusView" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::admin::videoDetails" : {
-         "file" : "lib/At/Lexicon/com/atproto/admin.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::label" : {
-         "file" : "lib/At/Lexicon/com/atproto/label.pm",
-         "version" : "0.18"
-      },
-      "At::Lexicon::com::atproto::label::selfLabel" : {
-         "file" : "lib/At/Lexicon/com/atproto/label.pm"
-      },
-      "At::Lexicon::com::atproto::label::selfLabels" : {
-         "file" : "lib/At/Lexicon/com/atproto/label.pm"
-      },
-      "At::Lexicon::com::atproto::label::subscribeLabels::info" : {
-         "file" : "lib/At/Lexicon/com/atproto/label.pm"
-      },
-      "At::Lexicon::com::atproto::label::subscribeLabels::labels" : {
-         "file" : "lib/At/Lexicon/com/atproto/label.pm"
-      },
-      "At::Lexicon::com::atproto::moderation" : {
-         "file" : "lib/At/Lexicon/com/atproto/moderation.pm",
-         "version" : "0.18"
-      },
-      "At::Lexicon::com::atproto::moderation::reasonType" : {
-         "file" : "lib/At/Lexicon/com/atproto/moderation.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::repo" : {
-         "file" : "lib/At/Lexicon/com/atproto/repo.pm",
-         "version" : "0.18"
-      },
-      "At::Lexicon::com::atproto::repo::applyWrites::create" : {
-         "file" : "lib/At/Lexicon/com/atproto/repo.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::repo::applyWrites::delete" : {
-         "file" : "lib/At/Lexicon/com/atproto/repo.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::repo::applyWrites::update" : {
-         "file" : "lib/At/Lexicon/com/atproto/repo.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::repo::listRecords::record" : {
-         "file" : "lib/At/Lexicon/com/atproto/repo.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::repo::strongRef" : {
-         "file" : "lib/At/Lexicon/com/atproto/repo.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::server" : {
-         "file" : "lib/At/Lexicon/com/atproto/server.pm",
-         "version" : "0.18"
-      },
-      "At::Lexicon::com::atproto::server::createAppPassword::appPassword" : {
-         "file" : "lib/At/Lexicon/com/atproto/server.pm"
-      },
-      "At::Lexicon::com::atproto::server::createInviteCodes::accountCodes" : {
-         "file" : "lib/At/Lexicon/com/atproto/server.pm"
-      },
-      "At::Lexicon::com::atproto::server::describeServer::links" : {
-         "file" : "lib/At/Lexicon/com/atproto/server.pm"
-      },
-      "At::Lexicon::com::atproto::server::inviteCode" : {
-         "file" : "lib/At/Lexicon/com/atproto/server.pm"
-      },
-      "At::Lexicon::com::atproto::server::inviteCodeUse" : {
-         "file" : "lib/At/Lexicon/com/atproto/server.pm"
-      },
-      "At::Lexicon::com::atproto::server::listAppPasswords::appPassword" : {
-         "file" : "lib/At/Lexicon/com/atproto/server.pm"
-      },
-      "At::Lexicon::com::atproto::sync" : {
-         "file" : "lib/At/Lexicon/com/atproto/sync.pm",
-         "version" : "0.18"
-      },
-      "At::Lexicon::com::atproto::sync::commit" : {
-         "file" : "lib/At/Lexicon/com/atproto/sync.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::sync::handle" : {
-         "file" : "lib/At/Lexicon/com/atproto/sync.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::sync::info" : {
-         "file" : "lib/At/Lexicon/com/atproto/sync.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::sync::migrate" : {
-         "file" : "lib/At/Lexicon/com/atproto/sync.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::sync::repo" : {
-         "file" : "lib/At/Lexicon/com/atproto/sync.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::sync::repoOp" : {
-         "file" : "lib/At/Lexicon/com/atproto/sync.pm",
-         "version" : "1"
-      },
-      "At::Lexicon::com::atproto::sync::tombstone" : {
-         "file" : "lib/At/Lexicon/com/atproto/sync.pm",
-         "version" : "1"
+         "version" : "0.19"
+      },
+      "At::Error" : {
+         "file" : "lib/At/Error.pm",
+         "version" : "1.0"
       },
       "At::Protocol::DID" : {
-         "file" : "lib/At.pm"
+         "file" : "lib/At/Protocol/DID.pm",
+         "version" : "1.0"
       },
       "At::Protocol::Handle" : {
-         "file" : "lib/At.pm"
+         "file" : "lib/At/Protocol/Handle.pm",
+         "version" : "1.0"
+      },
+      "At::Protocol::NSID" : {
+         "file" : "lib/At/Protocol/NSID.pm",
+         "version" : "1.0"
       },
       "At::Protocol::Session" : {
          "file" : "lib/At.pm"
       },
-      "At::Protocol::Timestamp" : {
-         "file" : "lib/At.pm"
+      "At::Protocol::URI" : {
+         "file" : "lib/At/Protocol/URI.pm",
+         "version" : "1.0"
       },
       "At::UserAgent" : {
          "file" : "lib/At.pm"
-      },
-      "Bluesky" : {
-         "file" : "lib/Bluesky.pm",
-         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -609,13 +130,108 @@
          "web" : "https://github.com/sanko/At.pm/issues"
       },
       "homepage" : "https://github.com/sanko/At.pm",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/sanko/At.pm.git",
          "web" : "https://github.com/sanko/At.pm"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
+   "x_contributors" : [
+      "@wwwjim <send@jimmy.email>",
+      "Akiomi Kamakura <akiomik@gmail.com>",
+      "Alberto Roura <mail@albertoroura.com>",
+      "Alice <81575558+aliceisjustplaying@users.noreply.github.com>",
+      "Alona Enraght-Moony <nixon.emoony@gmail.com>",
+      "Ansh <anshnanda10@gmail.com>",
+      "Arthur Pinheiro <arthurpinheiro@protonmail.com>",
+      "Christian De Angelis <christiandeange@gmail.com>",
+      "Connor Stack <sirconnorstack@gmail.com>",
+      "Cooper Edmunds <cooper6789@gmail.com>",
+      "Damien Tournoud <damien@platform.sh>",
+      "Daniel Holmgren <dtholmgren@gmail.com>",
+      "David Buchanan <d@vidbuchanan.co.uk>",
+      "David Wood <davidwood@aliyun.com>",
+      "Dean van Dugteren <31391056+deanpress@users.noreply.github.com>",
+      "Devin Ivy <devinivy@gmail.com>",
+      "Dimitris Apostolou <dimitris.apostolou@icloud.com>",
+      "Elijah <129013612+Evalprime@users.noreply.github.com>",
+      "Emily Liu <emilyliu7321@gmail.com>",
+      "Emily Liu <emilyliu732l@gmail.com>",
+      "Emma MB <emma@meredithblack.com>",
+      "Eric Bailey <git@esb.lol>",
+      "Feroz Salam <feroz@argh.in>",
+      "Foysal Ahamed <cfaion341@gmail.com>",
+      "Foysal Ahamed <foysal@blueskyweb.xyz>",
+      "Gabe <gabemeola@gmail.com>",
+      "Hailey <hailey@blueskyweb.xyz>",
+      "Hailey <me@haileyok.com>",
+      "Harlan T Wood <harlantwood@users.noreply.github.com>",
+      "Hwee-Boon Yar <hboon@motionobj.com>",
+      "Ilya Siamionau <ilya@marshal.dev>",
+      "Jaga Santagostino <jagasantagostino@gmail.com>",
+      "Jake Gold <52801504+Jacob2161@users.noreply.github.com>",
+      "Jake Gold <jake@blueskyweb.xyz>",
+      "James Garbutt <43081j@users.noreply.github.com>",
+      "Jay Graber <arcalinea@gmail.com>",
+      "Jeff Hodges <jeff@somethingsimilar.com>",
+      "Jerry Chen <jerry@apache.org>",
+      "Jess Porter <github@lolnerd.net>",
+      "Josh Soref <2119212+jsoref@users.noreply.github.com>",
+      "Kev 🐶 <kevslashnull@gmail.com>",
+      "Kim Hallberg <hallberg.kim@gmail.com>",
+      "Markus Amalthea Magnuson <markus@polyscopic.works>",
+      "Mary <148872143+mary-ext@users.noreply.github.com>",
+      "Matthieu Sieben <matthieu.sieben@gmail.com>",
+      "Matthieu Sieben <matthieusieben@users.noreply.github.com>",
+      "Max Graey <maxgraey@gmail.com>",
+      "Michał Gibowski <gibowski@gmail.com>",
+      "Miles Zimmerman <miles@zim.dev>",
+      "Mustafa Yafes Akbaş <62028911+yafesdot@users.noreply.github.com>",
+      "Patrick Linnane <patrick@linnane.io>",
+      "Patryk <Matrix89@users.noreply.github.com>",
+      "Paul Frazee <pfrazee@gmail.com>",
+      "Paul Lindner <lindner@inuus.com>",
+      "Pyrox <pyrox@pyrox.dev>",
+      "Roj <rojserbest@gmail.com>",
+      "Ryan Barrett <git@ryanb.org>",
+      "Ryan Barrett <github@ryanb.org>",
+      "Ryan Winchester <ryanwinchester@users.noreply.github.com>",
+      "S. Ota <1632335+susumuota@users.noreply.github.com>",
+      "Safa Safari <safasafari.ss@gmail.com>",
+      "Samuel Newman <mozzius@protonmail.com>",
+      "Shinya Kato / 加藤 真也 <contact@shinyakato.dev>",
+      "Shoshána Abigail <72781354+LilahTovMoon@users.noreply.github.com>",
+      "Takumi Fujiwara <jiftech.stlfy@gmail.com>",
+      "Wes Bos <wesbos@gmail.com>",
+      "Wes Todd <wes@wesleytodd.com>",
+      "Whyrusleeping <why@ipfs.io>",
+      "YOCKOW <YOCKOW@users.noreply.github.com>",
+      "Yoshihiro Sugi <sugi1982@gmail.com>",
+      "bnewbold <bnewbold@robocracy.org>",
+      "dan <dan.abramov@gmail.com>",
+      "dumbmoron <136796770+dumbmoron@users.noreply.github.com>",
+      "futur <me@futuristick.ca>",
+      "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>",
+      "intrnl <intrnl28+github@gmail.com>",
+      "joev <105156480+j0ev@users.noreply.github.com>",
+      "mehdiMj <mehdi.is@live.com>",
+      "noriaki watanabe <nabeyang@gmail.com>",
+      "rafael <rafael@blueskyweb.xyz>",
+      "surfdude29 <149612116+surfdude29@users.noreply.github.com>",
+      "this.julio <julio.valerio2@live.lagcc.cuny.edu>",
+      "tsinghuacoder <tsinghuacoder@icloud.com>",
+      "zhuowei <zhuoweizhang@yahoo.com>"
+   ],
+   "x_ignore" : [
+      "github",
+      ".gitignore",
+      ".tidyallrc",
+      "TODO.md"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

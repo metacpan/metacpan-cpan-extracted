@@ -1,5 +1,9 @@
 Revision history for Data::Verifier
 
+0.66  Nov 30 2024
+      - Replaced JSON::Any with JSON::MaybeXS as suggested by @ether.
+      https://rt.cpan.org/Ticket/Display.html?id=116642
+
 0.65  May 02 2023
       - Added Hernan Lopes to the contributors list.
 

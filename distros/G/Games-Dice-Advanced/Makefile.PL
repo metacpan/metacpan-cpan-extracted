@@ -1,6 +1,12 @@
 use ExtUtils::MakeMaker;
 WriteMakefile(
-		NAME	=> 'Games::Dice::Advanced',
-		VERSION => '1.1',
-		# PREREQ_PM => { Getopt::Declare => 1.09 }
-	     );
+    NAME         => 'Games::Dice::Advanced',
+    VERSION_FROM => 'lib/Games/Dice/Advanced.pm',
+    META_MERGE   => {
+        license   => 'open_source',
+        resources => {
+            repository => 'https://github.com/DrHyde/perl-modules-Games-Dice-Advanced',
+            bugtracker => 'https://github.com/DrHyde/perl-modules-Games-Dice-Advanced/issues'
+        }
+    },
+);

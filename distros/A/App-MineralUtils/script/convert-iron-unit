@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-11-21'; # DATE
+our $DATE = '2024-12-01'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_iron_unit",
@@ -39,7 +39,7 @@ convert-iron-unit - Convert an iron quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.016 of convert-iron-unit (from Perl distribution App-MineralUtils), released on 2024-11-21.
+This document describes version 0.017 of convert-iron-unit (from Perl distribution App-MineralUtils), released on 2024-12-01.
 
 =head1 SYNOPSIS
 
@@ -198,12 +198,12 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 Show all possible conversions
 
  % convert-iron-unit
- +--------+---------------------------------+-----------------------------------------------------------+
- | amount | unit                            | summary                                                   |
- +--------+---------------------------------+-----------------------------------------------------------+
- |  1.000 | mg-fe-elem                      | Elemental iron, in milligrams                             |
- |  4.975 | mg-ferrous-sulfate-heptahydrate | Ferrous sulphate heptahydrate (FeSO4.7H2O), in milligrams |
- +--------+---------------------------------+-----------------------------------------------------------+
+ +--------+---------+---------------------------------+-----------------------------------------------------------+
+ | amount |  pct_fe | unit                            | summary                                                   |
+ +--------+---------+---------------------------------+-----------------------------------------------------------+
+ |  1.000 | 100.000 | mg-fe-elem                      | Elemental iron, in milligrams                             |
+ |  4.975 |  20.087 | mg-ferrous-sulfate-heptahydrate | Ferrous sulphate heptahydrate (FeSO4.7H2O), in milligrams |
+ +--------+---------+---------------------------------+-----------------------------------------------------------+
 
 =head1 HOMEPAGE
 

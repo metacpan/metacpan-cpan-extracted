@@ -1,5 +1,5 @@
 package Data::Verifier::Field;
-$Data::Verifier::Field::VERSION = '0.65';
+$Data::Verifier::Field::VERSION = '0.66';
 use Moose;
 use MooseX::Storage;
 
@@ -57,7 +57,7 @@ Data::Verifier::Field - Field from a Data::Verifier profile
 
 =head1 VERSION
 
-version 0.65
+version 0.66
 
 =head1 SYNOPSIS
 
@@ -174,7 +174,7 @@ Cory G Watson <gphat@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Cold Hard Code, LLC.
+This software is copyright (c) 2024 by Cold Hard Code, LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

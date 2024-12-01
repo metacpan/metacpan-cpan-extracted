@@ -1,6 +1,6 @@
 package Math::3Space;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 # ABSTRACT: 3D Coordinate math with an intuitive cross-space mapping API
 
 use strict;
@@ -18,24 +18,29 @@ use overload '""' => sub {
 
 { package Math::3Space::Exports;
 	use Exporter::Extensible -exporter_setup => 1;
+	require Math::3Space::Vector;
+	require Math::3Space::Projection;
 	*vec3= *Math::3Space::Vector::vec3;
 	*space= *Math::3Space::space;
-	*frustum_projection= *Math::3Space::Projection::new_frustum;
-	*perspective_projection= *Math::3Space::Projection::new_perspective;
-	export qw( vec3 space frustum_projection perspective_projection );
+	*frustum= *frustum_projection= *Math::3Space::Projection::_frustum;
+	*perspective= *perspective_projection= *Math::3Space::Projection::_perspective;
+	export qw( vec3 space frustum frustum_projection perspective perspective_projection );
 }
 sub import { shift; Math::3Space::Exports->import_into(scalar(caller), @_) }
 
-sub parent { $_[0]{parent} }
+sub parent { croak "read-only attribute" if @_ > 1; $_[0]{parent} }
 
-# used by XS to avoid linking directly to PDL
+# Used by XS to avoid linking directly to PDL.  The XS can call out to this perl method to
+# perform the PDL operations of vector subtraction, matrix multiplication, and vector addition,
+# all of which are overloaded operators and would be tedious to call from XS.
+# One single call to this method can operate in parallel on an ndarray of vectors, thanks to
+# PDL's broadcasting system, so this only gets called once per call to 'project_inplace'.
 sub _pdl_project_inplace {
 	$_[0] -= $_[1] if defined $_[1];
 	$_[0] .= $_[0] x $_[2];
 	$_[0] += $_[3] if defined $_[3];
 }
 
-require Math::3Space::Vector;
 1;
 
 __END__
@@ -379,7 +384,7 @@ Ed J <mohawk2@users.noreply.github.com>
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 COPYRIGHT AND LICENSE
 

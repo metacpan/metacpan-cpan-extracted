@@ -2,8 +2,8 @@ NAME
     App::MineralUtils - Utilities related to mineral supplements
 
 VERSION
-    This document describes version 0.016 of App::MineralUtils (from Perl
-    distribution App-MineralUtils), released on 2024-11-21.
+    This document describes version 0.017 of App::MineralUtils (from Perl
+    distribution App-MineralUtils), released on 2024-12-01.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -40,53 +40,68 @@ FUNCTIONS
            [
              {
                amount  => 1,
+               pct_ca  => 100,
                unit    => "mg-ca-elem",
                summary => "Elemental calcium, in milligrams",
              },
              {
                amount  => 2.5,
+               pct_ca  => 40.0432024570648,
                unit    => "mg-ca-carbonate",
                summary => "Calcium carbonate (CaCO3), in milligrams",
              },
              {
                amount  => 7.40740740740741,
+               pct_ca  => 13.5266124405144,
                unit    => "mg-ca-pidolate",
                summary => "Calcium pidolate (C10H12CaN2O6), in milligrams",
              },
              {
                amount  => 5.43478260869565,
+               pct_ca  => 18.3658693062048,
                unit    => "mg-ca-lactate",
                summary => "Calcium lactate (C6H10CaO6), in milligrams",
              },
              {
-               amount  => 12.5,
+               amount  => 4.149377593361,
+               pct_ca  => 24.1239967897271,
                unit    => "mg-ca-citrate-anhydrous",
                summary => "Calcium citrate anhydrous (C12H10Ca3O14), in milligrams",
              },
              {
-               amount  => 14.2857142857143,
+               amount  => 4.739336492891,
+               pct_ca  => 21.0751971954426,
                unit    => "mg-ca-citrate-tetrahydrate",
                summary => "Calcium citrate tetrahydrate (C12H18Ca3O18) [most common hydrate form of Ca-citrate], in milligrams",
              },
              {
                amount  => 10.6382978723404,
+               pct_ca  => 9.40047849134494,
                unit    => "mg-ca-ascorbate-dihydrate",
                summary => "Calcium ascorbate dihydrate (C12H18CaO14), in milligrams",
              },
              {
                amount  => 10.752688172043,
+               pct_ca  => 9.31245207612055,
                unit    => "mg-ca-gluconate",
                summary => "Calcium gluconate (C12H22CaO14), in milligrams",
              },
+             {
+               amount  => 5.23560209424084,
+               pct_ca  => 19.0720472066242,
+               unit    => "mg-ca-glycerophosphate",
+               summary => "Calcium glycerophosphate (C3H7CaO6P), in milligrams",
+             },
            ],
            {
+             "table.fields"        => ["amount", "pct_ca", "unit", "summary"],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
-             "table.field_aligns"  => ["number", "left", "left"],
-             "table.fields"        => ["amount", "unit", "summary"],
            },
          ]
 
@@ -139,23 +154,26 @@ FUNCTIONS
            [
              {
                amount  => 1,
+               pct_fe  => 100,
                unit    => "mg-fe-elem",
                summary => "Elemental iron, in milligrams",
              },
              {
                amount  => 4.97512437810945,
+               pct_fe  => 20.0866844111934,
                unit    => "mg-ferrous-sulfate-heptahydrate",
                summary => "Ferrous sulphate heptahydrate (FeSO4.7H2O), in milligrams",
              },
            ],
            {
-             "table.fields"        => ["amount", "unit", "summary"],
-             "table.field_aligns"  => ["number", "left", "left"],
+             "table.fields"        => ["amount", "pct_fe", "unit", "summary"],
              "table.field_formats" => [
                                         ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
            },
          ]
 
@@ -208,183 +226,218 @@ FUNCTIONS
            [
              {
                amount  => 1,
+               pct_mg  => 100,
                unit    => "mg-mg-elem",
                summary => "Elemental magnesium, in milligrams",
              },
              {
                amount  => 6.17283950617284,
+               pct_mg  => 16.1631051604894,
                unit    => "mg-trimagnesium-dicitrate",
                summary => "Magnesium citrate a.k.a trimagnesium dicitrate (C12H10Mg3O14), in milligrams",
              },
              {
                amount  => 8.84955752212389,
+               pct_mg  => 11.3357585933492,
                unit    => "mg-magnesium-citrate-dibasic",
                summary => "Magnesium citrate dibasic (C6H6MgO7), in milligrams",
              },
              {
                amount  => 6.28930817610063,
+               pct_mg  => 15.9495581415697,
                unit    => "mg-mg-citrate-anhydrous",
                summary => "Magnesium citrate anhydrous ((C6H5O7)2Mg3, C12H16Mg3O14), in milligrams",
              },
              {
                amount  => 6.89655172413793,
+               pct_mg  => 15.9495581415697,
                unit    => "mg-mg-citrate-anhydrous-nowfoods",
                summary => "Magnesium citrate in NOW Foods supplement (anhydrous, C12H16Mg3O14, 90.9% pure, contains citric acid etc), in milligrams",
              },
              {
                amount  => 25,
+               pct_mg  => 3.96331023236853,
                unit    => "mg-mg-citrate-nonahydrate",
                summary => "Magnesium citrate nonahydrate ((C6H5O7)2Mg3 \xB7 9H2O, C12H28Mg3O23) [most common hydrate form of Mg-citrate at room temp], in milligrams",
              },
              {
                amount  => 7.09219858156028,
+               pct_mg  => 14.0963925298689,
                unit    => "mg-mg-glycinate-anhydrous",
                summary => "Magnesium glycinate/bisglycinate anhydrous (C4H8MgN2O4) [most common hydrate form of Mg-glycinate], in milligrams",
              },
              {
                amount  => 7.09219858156028,
+               pct_mg  => 14.0963925298689,
                unit    => "mg-mg-bisglycinate-anhydrous",
                summary => "Magnesium glycinate/bisglycinate (C4H8MgN2O4) [most common hydrate form of Mg-glycinate], in milligrams",
              },
              {
                amount  => 10,
+               pct_mg  => 14.0963925298689,
                unit    => "mg-mg-bisglycinate-nowfoods",
                summary => "Magnesium bisglycinate in NOW Foods supplement (C4H8MgN2O4, 70.5% pure, contains citric acid etc), in milligrams",
              },
              {
                amount  => 15.3846153846154,
+               pct_mg  => 6.48929353340097,
                unit    => "mg-mg-ascorbate-dihydrate",
                summary => "Magnesium ascorbate hydrate (C12H14MgO12) [anhydrous and dihydrate are the most common hydrate forms of Mg-ascorbate at room temp], in milligrams",
              },
              {
                amount  => 11.4942528735632,
+               pct_mg  => 8.66435902280432,
                unit    => "mg-mg-pidolate",
                summary => "Magnesium pidolate (C10H12MgN2O6), in milligrams",
              },
              {
                amount  => 12.0481927710843,
+               pct_mg  => 8.25297113752122,
                unit    => "mg-mg-l-threonate",
                summary => "Magnesium L-threonate (C8H14MgO10), in milligrams",
              },
              {
                amount  => 1.65837479270315,
+               pct_mg  => 60.303589682516,
                unit    => "mg-mg-oxide-anhydrous",
                summary => "Magnesium oxide anhydrous (MgO) [most common hydrate form of MgO at room temp], in milligrams",
              },
              {
                amount  => 8.33333333333333,
+               pct_mg  => 12.0054334403556,
                unit    => "mg-mg-lactate-anhydrous",
                summary => "Magnesium lactate dihydrate (C6H10MgO6), in milligrams",
              },
              {
                amount  => 9.80392156862745,
+               pct_mg  => 10.1916303253942,
                unit    => "mg-mg-lactate-dihydrate",
                summary => "Magnesium lactate dihydrate (C6H14MgO8), in milligrams",
              },
              {
                amount  => 3.92156862745098,
+               pct_mg  => 25.5275125773282,
                unit    => "mg-mg-chloride-ah",
                summary => "Magnesium chloride (anhydrous, MgCl2), in milligrams",
              },
              {
                amount  => 8.33333333333333,
+               pct_mg  => 11.9546505336678,
                unit    => "mg-mg-chloride-hexahydrate",
                summary => "Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams",
              },
              {
                amount  => 6.45161290322581,
+               pct_mg  => 15.54266639382,
                unit    => "mg-mg-malate",
                summary => "Magnesium malate (C4H4MgO5), in milligrams",
              },
              {
                amount  => 8.62068965517241,
+               pct_mg  => 11.5518060836502,
                unit    => "mg-mg-malate-trihydrate",
                summary => "Magnesium malate (MgC4H4O5.3H2O), in milligrams",
              },
              {
                amount  => 4.95049504950495,
+               pct_mg  => 20.1919082827947,
                unit    => "mg-mg-sulfate-anhydrous",
                summary => "Magnesium sulfate anhydrous (MgSO4), in milligrams",
              },
              {
                amount  => 5.68181818181818,
+               pct_mg  => 17.5626851651131,
                unit    => "mg-mg-sulfate-monohydrate",
                summary => "Magnesium sulfate monohydrate (MgSO4.H2O), in milligrams",
              },
              {
                amount  => 10.1010101010101,
+               pct_mg  => 9.86084063615709,
                unit    => "mg-mg-sulfate-heptahydrate",
                summary => "Magnesium sulfate heptahydrate (MgSO4.7H2O) a.k.a. Epsom salt, in milligrams",
              },
              {
                amount  => 3.47222222222222,
+               pct_mg  => 28.8281342663978,
                unit    => "mg-mg-carbonate-anhydrous",
                summary => "Magnesium carbonate anhydrous (MgCO3), in milligrams",
              },
              {
                amount  => 6.02409638554217,
+               pct_mg  => 16.6029100348384,
                unit    => "mg-mg-carbonate-trihydrate",
                summary => "Magnesium carbonate trihydrate (MgCO3.3H2O), in milligrams",
              },
              {
                amount  => 2.39808153477218,
+               pct_mg  => 41.6752400548697,
                unit    => "mg-mg-hydroxide-anhydrous",
                summary => "Magnesium hydroxide anhydrous (Mg(OH)2), in milligrams",
              },
              {
                amount  => 5.68181818181818,
+               pct_mg  => 17.5664932061289,
                unit    => "mg-mg-hydroxide-pentahydrate",
                summary => "Magnesium hydroxide pentahydrate (Mg(OH)2.5H2O), in milligrams",
              },
              {
                amount  => 5.84795321637427,
+               pct_mg  => 17.0693166654962,
                unit    => "mg-mg-acetate-anhydrous",
                summary => "Magnesium acetate anhydrous (Mg(CH3COO)2), in milligrams",
              },
              {
                amount  => 8.84955752212389,
+               pct_mg  => 11.3336442061087,
                unit    => "mg-mg-acetate-tetrahydrate",
                summary => "Magnesium acetate tetrahydrate (Mg(CH3COO)2.4H2O), in milligrams",
              },
              {
                amount  => 18.5185185185185,
+               pct_mg  => 5.3935601269334,
                unit    => "mg-mg-gluconate-dihydrate",
                summary => "Magnesium gluconate dihydrate (C12H26MgO16), in milligrams",
              },
              {
                amount  => 17.8571428571429,
+               pct_mg  => 5.61809440155333,
                unit    => "mg-mg-gluconate-hydrate",
                summary => "Magnesium gluconate dihydrate (C12H26MgO16), in milligrams",
              },
              {
                amount  => 8,
+               pct_mg  => 12.5051450915826,
                unit    => "mg-mg-glycerophosphate-anhydrous",
                summary => "Magnesium glycerophosphate anhydrous (C\x{2083}H\x{2087}MgO\x{2086}P), in milligrams",
              },
              {
                amount  => 8.7719298245614,
+               pct_mg  => 11.4442119973764,
                unit    => "mg-mg-glycerophosphate-hydrate",
                summary => "Magnesium glycerophosphate anhydrous (C\x{2083}H\x{2087}MgO\x{2086}P.H2O, C3H9MgO7P), in milligrams",
              },
              {
                amount  => 11.2359550561798,
+               pct_mg  => 8.91599413059428,
                unit    => "mg-mg-taurate",
                summary => "Magnesium taurate (C4H12MgN2O6S2), in milligrams",
              },
              {
                amount  => 3.125,
+               pct_mg  => 32,
                unit    => "mg-magshape",
                summary => "MAGSHAPE (microencapsulated form of magnesium developed for use in dietary supplements and functional foods, containing MgO, modified preserved maize starch, sunflower lecithin), in milligrams",
              },
            ],
            {
-             "table.field_aligns"  => ["number", "left", "left"],
-             "table.fields"        => ["amount", "unit", "summary"],
              "table.field_formats" => [
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
+             "table.fields"        => ["amount", "pct_mg", "unit", "summary"],
            },
          ]
 
@@ -445,64 +498,76 @@ FUNCTIONS
            [
              {
                amount  => 1,
+               pct_k   => 100,
                unit    => "mg-k-elem",
                summary => "Elemental potassium, in milligrams",
              },
              {
                amount  => 1.90839694656489,
+               pct_k   => 52.4448265825009,
                unit    => "mg-k-chloride-anhydrous",
                summary => "Potassium chloride (KCl) anhydrous [most common hydrate form of KCl at room temp], in milligrams",
              },
              {
                amount  => 2.82485875706215,
+               pct_k   => 35.3574787484174,
                unit    => "mg-k-chloride-dihydrate",
                summary => "Potassium chloride dihydrate (KCl.2H2O) [unstable at room temp], in milligrams",
              },
              {
                amount  => 2.61096605744125,
+               pct_k   => 38.2822500367173,
                unit    => "mg-k-citrate-anhydrous",
                summary => "Tripotassium citrate anhydrous (K3C6H5O7), in milligrams",
              },
              {
                amount  => 2.76243093922652,
+               pct_k   => 36.156376190623,
                unit    => "mg-k-citrate-monohydrate",
                summary => "Tripotassium citrate monohydrate (K3C6H5O7.H2O) [most common hydrate form of K-citrate at room temp], in milligrams",
              },
              {
                amount  => 1.76678445229682,
+               pct_k   => 56.5801526717557,
                unit    => "mg-k-carbonate-anhydrous",
                summary => "Potassium carbonate anhydrous (K2CO3), in milligrams",
              },
              {
                amount  => 2.2271714922049,
+               pct_k   => 44.8786730945822,
                unit    => "mg-k-carbonate-dihydrate",
                summary => "Potassium carbonate dihydrate (K2CO3.2H2O) [most common hydrate form of K-carbonate at room temp], in milligrams",
              },
              {
                amount  => 2.55754475703325,
+               pct_k   => 39.0533886031064,
                unit    => "mg-k-bicarbonate-anhydrous",
                summary => "Potassium bicarbonate anhydrous (KHCO3) [most common hydrate form of K-bicarbonate at room temp], in milligrams",
              },
              {
                amount  => 2.51256281407035,
+               pct_k   => 39.8393111880986,
                unit    => "mg-k-acetate-anhydrous",
                summary => "Potassium acetate anhydrous (C2H3O2K), in milligrams",
              },
              {
                amount  => 2.9673590504451,
+               pct_k   => 33.6590048209366,
                unit    => "mg-k-acetate-monohydrate",
                summary => "Potassium acetate monohydrate (C2H9KO5) [most common hydrate form of K-acetate at room temp], in milligrams",
              },
              {
                amount  => 3.89105058365759,
+               pct_k   => 25.6904527235692,
                unit    => "mg-k-acetate-trihydrate",
                summary => "Potassium acetate trihydrate (C2H9KO5), in milligrams",
              },
            ],
            {
-             "table.field_aligns"  => ["number", "left", "left"],
-             "table.fields"        => ["amount", "unit", "summary"],
+             "table.fields"        => ["amount", "pct_k", "unit", "summary"],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
@@ -598,30 +663,35 @@ FUNCTIONS
            [
              {
                amount  => 1,
+               pct_na  => 100,
                unit    => "mg-na-elem",
                summary => "Elemental sodium, in milligrams",
              },
              {
                amount  => 2.54452926208651,
+               pct_na  => 39.339098220397,
                unit    => "mg-na-chloride",
                summary => "Sodium chloride (NaCl), in milligrams",
              },
              {
                amount  => 2.54452926208651,
+               pct_na  => 39.339098220397,
                unit    => "mg-na-cl",
                summary => "Sodium chloride (NaCl), in milligrams",
              },
              {
                amount  => 11.2359550561798,
+               pct_na  => 8.90869138959932,
                unit    => "mg-na-citrate",
                summary => "Sodium citrate (Na3C6H5O7), in milligrams",
              },
            ],
            {
-             "table.fields"        => ["amount", "unit", "summary"],
-             "table.field_aligns"  => ["number", "left", "left"],
+             "table.fields"        => ["amount", "pct_na", "unit", "summary"],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
-                                        ["number", { thousands_sep => "", precision => 3 }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],

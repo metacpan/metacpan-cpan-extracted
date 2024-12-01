@@ -10,6 +10,8 @@ README.md
 dist.ini
 dzil-prove
 lib/Math/3Space.pm
+lib/Math/3Space/Projection.pm
+lib/Math/3Space/Projection/Frustum.pm
 lib/Math/3Space/Vector.pm
 ppport.h
 t/01-load.t

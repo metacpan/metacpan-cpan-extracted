@@ -2,15 +2,12 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 
-use Mojo::Pg;
-
-
 our $VERSION = '0.01';
 
 class Daje::GenerateSchema :isa(Daje::Generate::Base::Common) {
     use Mojo::JSON qw{to_json};
     use Daje::Generate::Perl::CreateSchema;
-
+    use Mojo::Pg;
 
     method process () {
         $self->_load_config();

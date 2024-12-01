@@ -1,6 +1,6 @@
 package Map::Tube::Utils;
 
-$Map::Tube::Utils::VERSION   = '3.77';
+$Map::Tube::Utils::VERSION   = '3.80';
 $Map::Tube::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Utils - Helper package for Map::Tube.
 
 =head1 VERSION
 
-Version 3.77
+Version 3.80
 
 =cut
 
@@ -100,9 +100,8 @@ sub filter {
     }
 
     return [
-        map [ sort { $a cmp $b }
-              keys %{ $r{$_} } ],
-        sort { $a cmp $b } keys %r
+        map [ sort keys %{ $r{$_} } ],
+        sort { $a <=> $b } keys %r
     ];
 }
 

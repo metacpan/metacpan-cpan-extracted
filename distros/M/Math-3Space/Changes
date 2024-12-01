@@ -1,3 +1,10 @@
+0.008 - 2024-11-30
+  - Rearrange API and officially publish 4D Projection objects
+  - Export 'perspective' and 'frustum' functions from Math::3Space
+
+0.006-0.007
+  - Really actually fix broken tests
+
 0.005 - 2024-10-04
   - Fix failing tests in t/04-transform related to floating point rounding
   - Enable CONTRIBUTORS section of pod

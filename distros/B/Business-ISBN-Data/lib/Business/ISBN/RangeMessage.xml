@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>95b58417-1d01-40dd-bd98-eda853331a36</MessageSerialNumber>
-  <MessageDate>Sat, 23 Nov 2024 03:44:19 GMT</MessageDate>
+  <MessageSerialNumber>0fbfa7be-1205-4747-88ad-f30c0544f7c5</MessageSerialNumber>
+  <MessageDate>Sat, 30 Nov 2024 03:45:14 GMT</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -8085,11 +8085,7 @@
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>0400000-0499999</Range>
-          <Length>0</Length>
-        </Rule>
-        <Rule>
-          <Range>0500000-0999999</Range>
+          <Range>0400000-0999999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
