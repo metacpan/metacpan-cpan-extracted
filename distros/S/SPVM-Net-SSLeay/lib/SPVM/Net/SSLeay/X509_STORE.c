@@ -28,7 +28,9 @@ int32_t SPVM__Net__SSLeay__X509_STORE__add_cert(SPVM_ENV* env, SPVM_VALUE* stack
     
     env->die(env, stack, "[OpenSSL Error]X509_STORE_add_cert failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    error_id = tmp_error_id;
     
     return error_id;
   }
@@ -65,7 +67,9 @@ int32_t SPVM__Net__SSLeay__X509_STORE__set_flags(SPVM_ENV* env, SPVM_VALUE* stac
     
     env->die(env, stack, "[OpenSSL Error]X509_STORE_set_flags failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    error_id = tmp_error_id;
     
     return error_id;
   }
@@ -93,7 +97,9 @@ int32_t SPVM__Net__SSLeay__X509_STORE__add_crl(SPVM_ENV* env, SPVM_VALUE* stack)
     
     env->die(env, stack, "[OpenSSL Error]X509_STORE_add_crl failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    error_id = tmp_error_id;
     
     return error_id;
   }

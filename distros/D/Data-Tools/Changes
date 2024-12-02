@@ -1,5 +1,11 @@
 Revision history for Perl extension Data::Tools
 
+1.46 2024-11-01
+
+   - Data::Tools adds new functions:
+                format_ascii_table()
+                with default right alignment for numbers (no exp)
+
 1.45 2024-11-08
 
    - Data::Tools::Time adds new functions:

@@ -4,177 +4,170 @@ Frequently Asked Questions
 Releasing on PGXN
 -----------------
 
-<span id="extension"></span>
-WTF is an “extension”?
-:   An extension is a piece of software that adds functionality to PostgreSQL
-    itself. Examples are data types ([citext], [hstore]), utilities ([dblink],
-    [pgTAP]), and procedural languages ([PL/Perl], [PL/R]), among others. See
-    [Extending SQL] for details.
+### WTF is an “extension”? [extension]
 
-<span id="allowed"></span>
-What’s allowed to be released on PGXN?
-:   Open-source PostgreSQL extension release packages. The [How To] documents
-    the contents of such packages. Following the [CPAN example], “no commercial
-    software of any kind, not even share/guilt/donateware, will be allowed…any
-    other policy would be open to nitpicking, or maybe even legal challenges.”
+An extension is a piece of software that adds functionality to PostgreSQL
+itself. Examples are data types ([citext], [hstore]), utilities ([dblink],
+[pgTAP]), and procedural languages ([PL/Perl], [PL/R]), among others. See
+[Extending SQL] for details.
 
-<span id="notallowed"></span>
-What’s not allowed to be released on PGXN?
-:   Non-package files (that is, files that are not tarballs, bzip-balls, or zip
-    archives), closed-source distributions, and distributions with no license.
+### What’s allowed to be released on PGXN? [allowed]
+
+Open-source PostgreSQL extension release packages. The [How To] documents the
+contents of such packages. Following the [CPAN example], “no commercial software
+of any kind, not even share/guilt/donateware, will be allowed…any other policy
+would be open to nitpicking, or maybe even legal challenges.”
+
+### What’s not allowed to be released on PGXN? [notallowed]
+
+Non-package files (that is, files that are not tarballs, bzip-balls, or zip
+archives), closed-source distributions, and distributions with no license.
                    
-<span id="whocanrelease"></span>
-Who can release on PGXN?
-:   Any registered user.
+### Who can release on PGXN? [whocanrelease]
 
-<span id="whocanregister"></span>
-Who can register for PGXN?
-:   Anyone who applies. Such registrations will be approved by volunteers, but
-    we’re usually pretty quick to respond to requests.
+Any registered user.
+
+### Who can register for PGXN? [whocanregister]
+
+Anyone who applies. Such registrations will be approved by volunteers, but we’re
+usually pretty quick to respond to requests.
                    
-<span id="howtoapply"></span>
-So how do I apply?
-:   Head on over to [PGXN Manager] and hit the “[Request Account]” link. Once
-    you’ve signed up, unless you’re obviously a [troll], your account will be
-    quickly approved.
+### So how do I apply? [howtoapply]
+
+Head on over to [PGXN Manager] and hit the “[Request Account]” link. Once you’ve
+signed up, unless you’re obviously a [troll], your account will be quickly
+approved.
                    
-<span id="releaseapproval"></span>
-Okay, I have an account and want to release an extension. Is there a release
-approval process?
-:   Short answer: No, because PGXN needs to [KISS]. Longer answer: No. Again
-    following the [CPAN example], PGXN “is and will stay an open and free forum,
-    where the authors decide what they upload. Any further selection belongs to
-    different fora.” This is because “the first goal of PGXN is to make it easy
-    to submit code and redistribute it. Ease of use and quality control are not
-    the central problems ~[it~] tries to solve.” (Original quotation lost to
-    time and internet entropy.) Frankly, moderation of releases is a significant
-    reason that other communities have failed to duplicate the success of CPAN.
+### Okay, I have an account and want to release an extension. Is there a release approval process? [releaseapproval]
+
+Short answer: No, because PGXN needs to [KISS]. Longer answer: No. Again
+following the [CPAN example], PGXN “is and will stay an open and free forum,
+where the authors decide what they upload. Any further selection belongs to
+different fora.” This is because “the first goal of PGXN is to make it easy to
+submit code and redistribute it. Ease of use and quality control are not the
+central problems ~[it~] tries to solve.” (Original quotation lost to time and
+internet entropy.) Frankly, moderation of releases is a significant reason that
+other communities have failed to duplicate the success of CPAN.
                    
-<span id="howto"></span>
-Great, so how do I create an extension distribution and release it?
-:   Basically, you upload an archive file with a [META.json] file describing the
-    distribution. Have a look at the [How To] for all the details.
+### Great, so how do I create an extension distribution and release it? [howto]
 
-<span id="github"></span>
-I read that, but it seems like an awful lot of work for something that should be
-automated. Is there any way I can automatically have my extension appear on PGXN
-when I make a release on GitHub?
-:   Yes! You can use the [pgxn-tools] Docker image as part of your release
-    workflows. It supports both testing an extension with multiple versions of
-    Postgres, as well as releasing extensions on GitHub and PGXN. For details,
-    check out these blog posts:
+Basically, you upload an archive file with a [META.json] file describing the
+distribution. Have a look at the [How To] for all the details.
 
-    *   [Test Postgres Extensions With GitHub Actions]
-    *   [Automate Postgres Extension Releases on GitHub and PGXN]
+### I read that, but it seems like an awful lot of work for something that should be automated. Is there any way I can automatically have my extension appear on PGXN when I make a release on GitHub? [github]
 
-<span id="maillist">
-Is there some place I can go to ask questions and get help from like-minded PGXN
-contributors?
-:   Yes, there is a [Google Group] for this very purpose. Join us!
+Yes! You can use the [pgxn-tools] Docker image as part of your release
+workflows. It supports both testing an extension with multiple versions of
+Postgres, as well as releasing extensions on GitHub and PGXN. For details, check
+out these blog posts:
 
-<span id="goodbadugly"></span>
-How does PGXN make it easy to distinguish the garbage from the viable
-extensions?
-:   The first step is the PGXN search engine, accessible via the [home page],
-    which will allow you to find extensions relevant to you and to read their
-    documentation. This will “often ~[be~] enough to distinguish the good stuff
-    from the crap,” as [Robert Haas says]. As more extensions are released on
-    PGXN with competing features and functionality, the addition of ratings
-    features and dedicated testing will also make it easier to evaluate
-    competing options.
+*   [Test Postgres Extensions With GitHub Actions]
+*   [Automate Postgres Extension Releases on GitHub and PGXN]
+
+### Is there some place I can go to ask questions and get help from like-minded PGXN contributors? [maillist]
+
+Yes, there is a [Google Group] for this very purpose. Join us!
+
+### How does PGXN make it easy to distinguish the garbage from the viable extensions? [goodbadugly]
+
+The first step is the PGXN search engine, accessible via the [home page], which
+will allow you to find extensions relevant to you and to read their
+documentation. This will “often ~[be~] enough to distinguish the good stuff from
+the crap,” as [Robert Haas says]. As more extensions are released on PGXN with
+competing features and functionality, the addition of ratings features and
+dedicated testing will also make it easier to evaluate competing options.
 
 PGXN Client
 -----------
 
-<span id="commandlineclient"></span>
-Is there a command-line client for installing extensions from PGXN?
-:   There is! Install it with this command:
+### Is there a command-line client for installing extensions from PGXN? [commandlineclient]
 
-    ``` sh
-    sudo easy_install pgxnclient
-    ```
+There is! Install it with this command:
 
-    If you use [Homebrew]:
+``` sh
+sudo easy_install pgxnclient
+```
 
-    ``` sh
-    brew install pgxnclient
-    ```
+If you use [Homebrew]:
 
-    Then you can install PGXN extensions with a simple command:
+``` sh
+brew install pgxnclient
+```
 
-    ``` sh
-    pgxn install pair
-    ```
+Then you can install PGXN extensions with a simple command:
 
-    Run `pgxn help` to get a list of supported commands; or check out the
-    introductory [blog][] [posts], the [complete documentation] or the [source
-    code].
+``` sh
+pgxn install pair
+```
+
+Run `pgxn help` to get a list of supported commands; or check out the
+introductory [blog][] [posts], the [complete documentation] or the [source
+code].
                    
-<span id="howclientworks"></span>
-How does the command-line client work?
-:   It uses JSON-based API available on every PGXN mirror to find, download,
-    build, and install extensions. It relies on [PGXS] to do the heavy lifting
-    to build extensions.
+### How does the command-line client work? [howclientworks]
+
+It uses JSON-based API available on every PGXN mirror to find, download, build,
+and install extensions. It relies on [PGXS] to do the heavy lifting to build
+extensions.
                    
-<span id="clientwindows"></span>
-What about Windows?
-:   The PGXN client follows the lead of the PostgreSQL core on installing
-    extensions. If support for installing extensions on Windows improves such
-    that a compiler is no longer required, the PGXN client will be modified as
-    appropriate to take advantage of it. This applies not specifically to
-    Windows, but to the ability of the core installer (or any future
-    community-supported installer) to work on *any* platform.
+### What about Windows? [clientwindows]
+
+The PGXN client follows the lead of the PostgreSQL core on installing
+extensions. If support for installing extensions on Windows improves such that a
+compiler is no longer required, the PGXN client will be modified as appropriate
+to take advantage of it. This applies not specifically to Windows, but to the
+ability of the core installer (or any future community-supported installer) to
+work on *any* platform.
                    
-<span id="clientsecurity"></span>
-What kind of security does PGXN have?
-:   Each release package has an accompanying SHA1 hash that the PGXN client
-    verifies before installing an extension.
+### What kind of security does PGXN have? [clientsecurity]
+
+Each release package has an accompanying SHA1 hash that the PGXN client verifies
+before installing an extension.
 
 Contributing to PGXN
 --------------------
 
-<span id="license"></span>
-Under what license is PGXN’s source code distributed?
-:   [The PostgreSQL License]. Note that the actual extensions themselves may be
-    under any open source license, determined by their authors.
+### Under what license is PGXN’s source code distributed? [license]
 
-<span id="contribute"></span>
-Can other people contribute to PGXN?
-:   Definitely! Contributions and help with refining the specification are very
-    welcome. Major code contributions may be funded out of the PGXN fund based
-    on circumstances. Any contributions must be submitted under The PostgreSQL
-    License.
+[The PostgreSQL License]. Note that the actual extensions themselves may be
+under any open source license, determined by their authors.
 
-<span id="mirroring"></span>
-What about mirroring? Can I create a PGXN mirror?
-:   Absolutely! See [mirroring] for the details.
-                   
-<span id="owners"></span>
-Who owns and runs PGXN?
-:   Currently, PGXN is hosted on a box owned by [depesz]. Eventually it may run
-    on community servers, as the  PostgreSQL.org Web Team determines. Or it may
-    end up on one or more servers to be contributed to the [PostgreSQL Funds
-    Group]. In any case, the PGXN master index and server will always be
-    contributed to the PostgreSQL community.
-                   
-<span id="source"></span>
-Where is the PGXN source code hosted?
-:   [On GitHub]. Please feel free to fork and send pull requests!
-                   
-<span id="language"></span>
-What language is PGXN written in?
-:   Mostly Perl. The database used by [PGXN Manager] is written in SQL,
-    PL/pgSQL, and PL/Perl — and even uses [semver], a [semantic version] data
-    type written in C and distributed right here on PGXN!
-                   
-<span id="api"></span>
-Is there an API?
-:   Yes! The [PGXN API] provides centralized index and API of distribution
-    metadata, as well as the search APIs used here.
+### Can other people contribute to PGXN? [contribute]
 
-<span id="logos"></span>
-Is the PGXN logo available for use?
-:   Yes, see [identity] for the license details and downloadable artwork.
+Definitely! Contributions and help with refining the specification are very
+welcome. Major code contributions may be funded out of the PGXN fund based on
+circumstances. Any contributions must be submitted under The PostgreSQL License.
+
+### What about mirroring? Can I create a PGXN mirror? [mirroring]
+
+Absolutely! See [mirroring] for the details.
+                   
+### Who owns and runs PGXN? [owners]
+
+Currently, PGXN is hosted on a box owned by [depesz]. Eventually it may run on
+community servers, as the  PostgreSQL.org Web Team determines. Or it may end up
+on one or more servers to be contributed to the [PostgreSQL Funds Group]. In any
+case, the PGXN master index and server will always be contributed to the
+PostgreSQL community.
+                   
+### Where is the PGXN source code hosted? [source]
+
+[On GitHub]. Please feel free to fork and send pull requests!
+                   
+### What language is PGXN written in? [language]
+
+Mostly Perl. The database used by [PGXN Manager] is written in SQL, PL/pgSQL,
+and PL/Perl — and even uses [semver], a [semantic version] data type written in
+C and distributed right here on PGXN!
+                   
+### Is there an API? [api]
+
+Yes! The [PGXN API] provides centralized index and API of distribution metadata,
+as well as the search APIs used here.
+
+### Is the PGXN logo available for use? [logos]
+
+Yes, see [identity] for the license details and downloadable artwork.
 
   [citext]: https://www.postgresql.org/docs/current/citext.html
   [hstore]: https://www.postgresql.org/docs/current/hstore.html

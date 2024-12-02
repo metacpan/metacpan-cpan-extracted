@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+use v5.28;
+
+use Object::Pad;
+use Getopt::Long qw(
+  GetOptions
+  :config
+  auto_help
+);
+
+use lib 'lib';
+use App::Standup::Diary;
+
+my $data_dir = 'data';
+my $project_name = 'Diary';
+
+GetOptions ("data-dir:s"       => \$data_dir,
+            "project-name:s"   => \$project_name)
+  or die("Error in command line arguments\n");
+
+my $diary = App::Standup::Diary->new( data_dir => $data_dir, project_name => $project_name );
+
+$diary->write();
+
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+diary - Generate a standup notes file
+
+=head1 SYNOPSIS
+
+    diary [OPTIONS]
+
+    --data-dir        the path to your notes directory
+    --project-name    the name you want to be displayed on each note
+    --help            print this help message
+
+See also perldoc L<App::Standup::Diary>
+
+=head1 DESCRIPTION
+
+Generate a diary notes file for daily standups.
+
+=head1 AUTHOR
+
+Sébastien Feugère
+
+=cut

@@ -1,0 +1,14 @@
+requires 'Config::Tiny', '';
+requires 'Mojolicious', '';
+requires 'Object::Pad', '0.808';
+requires 'Path::Tiny', '';
+
+on 'develop' => sub {
+  requires 'App::ModuleBuildTiny', '';
+  requires 'Data::Printer', '';
+};
+
+on 'test' => sub {
+  requires 'Test2::Harness', '';
+  requires 'Test::Cmd', '';
+};

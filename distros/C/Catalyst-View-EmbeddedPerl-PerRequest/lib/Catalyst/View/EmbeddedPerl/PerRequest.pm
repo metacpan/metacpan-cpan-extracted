@@ -18,7 +18,7 @@ Moose::Util::MetaRole::apply_metaroles(
 
 extends 'Catalyst::View::BasePerRequest';
 
-our $VERSION = 0.001013;
+our $VERSION = 0.001014;
 eval $VERSION;
 
 # Args that get passed cleanly to Template::EmbeddedPerl
@@ -266,6 +266,14 @@ sub get_scripts {
   return $self->raw("<script>\n$js\n</script>");
 }
 
+sub _over_length {
+  my ($self, $arg) = @_;
+  return $arg->length if $arg->can('length');
+  return $arg->size if $arg->can('size');
+  return $arg->count if $arg->can('count');
+  return undef;
+}
+
 sub over {
   my ($self, @args) = @_;
   my $cb = pop @args; # The callback block is always the last argument
@@ -281,13 +289,18 @@ sub over {
       $iterator = $arg;
     } elsif(Scalar::Util::blessed($arg) && $arg->can('next')) {  # $obj->next
       $iterator = sub { return $arg->next };
-      $length = $arg->length if $arg->can('length');
-      $length = $arg->count if $arg->can('count');
-    } elsif((ref(\$arg)||'') eq 'SCALAR') { # A single value, could be undef even
-      $iterator = sub { return $arg };
+      $length = $self->_over_length($arg);
+    } elsif((ref(\$arg)||'') eq 'SCALAR') { # A single value (string or number, or undef)
+      $iterator = sub { return shift @args };
+      $length = 1;
+    } elsif((ref($arg)||'') eq 'HASH') { # A single value (hash)
+      $iterator = sub { return shift @args };
+      $length = 1;
+    } elsif(Scalar::Util::blessed($arg)) { # A single value (object)
+      $iterator = sub { return shift @args };
       $length = 1;
     } else {
-      die "Invalid argument to each";
+      die "Invalid argument to over";
     }
   } else {
     $iterator = sub { return shift @args }; # each(#arry, sub { ... })

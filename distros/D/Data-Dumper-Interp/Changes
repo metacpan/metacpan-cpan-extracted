@@ -1,8 +1,10 @@
 (Recent) Revision history for Perl extension Data-Dumper-Interp
 
-7.010 - Test messages to try to diagnose mystery test failure only on Windows
-7.009 - Diagnose invalid method modifier when imported, not when 1st called
-7.008 - Remove multiple "use 5.xxx" which is deprecated in Perl 5.39.8
+7.009 - Generalized Useqq="style=BEFORE,AFTER" in lieu of "qq=BA"
+7.008 - Diagnose invalid method modifier when imported, not when 1st called
+      - Test messages to try to diagnose mystery test failure only on Windows
+      - Generate META.json
+7.00? - Remove multiple "use 5.xxx" which is deprecated in Perl 5.39.8
 7.005 - Windows portability; Rm multiple use VERSION (deprecated in perl 5.9)
 7.004 - 'd' method modifier ("debug friendly") enables 'condense' and, if
         STDOUT is a utf-encoding handle, 'spacedots'.  Always used by dvis.

@@ -3,7 +3,14 @@
 
 class Net::SSLeay::ASN1_INTEGER : pointer {
   
+  # Class Methods
+  native static method new : Net::SSLeay::ASN1_INTEGER ();
+  
   # Instance Methods
+  native method get_int64 : long ();
+  
+  native method set_int64 : void ($r : long);
+  
   native method DESTROY : void ();
   
 }

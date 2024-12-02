@@ -3,6 +3,7 @@ MANIFEST
 Makefile.PL
 README
 README.md
+bin/camt
 bin/make-abbrvs
 bin/make-templates
 examples/danskeci.com/README.md

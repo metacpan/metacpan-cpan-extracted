@@ -6,6 +6,8 @@ class Net::SSLeay::ASN1_OCTET_STRING : pointer {
   use Fn;
   
   # Class Methods
+  native static method new : Net::SSLeay::ASN1_OCTET_STRING ();
+  
   private static method new_with_pointer : Net::SSLeay::ASN1_OCTET_STRING ($pointer : Address, $options : object[] = undef) {
     
     my $self = new Net::SSLeay::ASN1_OCTET_STRING;
@@ -19,6 +21,8 @@ class Net::SSLeay::ASN1_OCTET_STRING : pointer {
   native method length : int ();
   
   native method get0_data : string ();
+  
+  native method set : void ($data : string, $len : int = -1);
   
   native method DESTROY : void ();
   

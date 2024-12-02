@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::Help - about box and help facilities
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.12";
+$VERSION="0.17";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -375,9 +375,9 @@ sub CmdUpdates {
 			my $output = "$mod\n";
 			my $string = `cpan -D $mod`;
 			while ($string ne '') {
-				if ($string =~ s/^(\s+Installed:.*\n)//) {
+				if ($string =~ s/^(\s+Installed:\s+\d.*\n)//) {
 					$output = $output . $1
-				} elsif ($string =~ s/^(\s+CPAN:.*\n)//) {
+				} elsif ($string =~ s/^(\s+CPAN:\s*\d.*\n)//) {
 					$output = $output . $1;
 					last;
 				} else {

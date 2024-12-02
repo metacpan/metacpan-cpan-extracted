@@ -1,9 +1,9 @@
 package Task::MemManager::PerlAlloc;
-$Task::MemManager::PerlAlloc::VERSION = '0.01';
+$Task::MemManager::PerlAlloc::VERSION = '0.02';
 use strict;
 use warnings;
 use Carp            qw(croak);
-use Convert::Scalar qw(grow);
+use Convert::Scalar qw(grow len);
 use Inline ( C => 'DATA', );
 use constant { ZERO_STRING_BYTE => "\0", };
 
@@ -58,25 +58,23 @@ sub malloc {
 
     my $terminator_byte;
     # Do not want initialized memory, just grow the buffer
-    unless ( defined $init_value ) {
+    unless (  $init_value ) {
         $init_value = ZERO_STRING_BYTE;
         grow $buffer, $buffer_size;
     }
     else {
         if ( lc $init_value eq 'zero' ) {
             $init_value = ZERO_STRING_BYTE;
-            $terminator_byte = 0;
         }
         $buffer = $init_value x ( $buffer_size - 1 )
           ;    # -1 to account for the string terminator
-        $terminator_byte = ord $init_value;
     }
-
     # Die without nuance if the buffer allocation fails
-    unless ( defined $buffer ) {
+    unless ( len $buffer ) {
         croak "Failed to allocate buffer using Perl's string functions";
     }
-    vec( $buffer, $buffer_size - 1, 8 ) = $terminator_byte;
+    $terminator_byte = ord $init_value;
+    vec( $buffer, $buffer_size - 1, 8 ) = $terminator_byte ;
 
     return \$buffer;
 }
@@ -89,7 +87,7 @@ Task::MemManager::PerlAlloc - Allocates buffers using Perl's string functions
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

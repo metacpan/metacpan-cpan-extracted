@@ -1,5 +1,11 @@
 Revision history for Perl extension PGXN::Site
 
+0.23.8  2024-12-01T16:02:33Z
+      - Fixed formatting of the image and first paragraph of the /art page.
+      - Updated the formatting of the FAQ to use headers for questions
+        instead of definition lists and HTML `<span>`s for IDs.
+      - Updated the Mastodon links to the new mastodon.social account.
+
 0.23.7  2024-02-22T20:50:06Z
       - Removed duplicate CC license image and link on the /art page.
       - Moved the generation of HTML from Multimarkdown files from build

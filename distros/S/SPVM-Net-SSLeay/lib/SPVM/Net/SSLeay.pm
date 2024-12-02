@@ -1,6 +1,6 @@
 package SPVM::Net::SSLeay;
 
-our $VERSION = "0.020";
+our $VERSION = "0.021";
 
 1;
 
@@ -35,6 +35,10 @@ OpenSSL 1.1.1
 =item * L<Net::SSLeay::ASN1_INTEGER|SPVM::Net::SSLeay::ASN1_INTEGER>
 
 =item * L<Net::SSLeay::ASN1_OBJECT|SPVM::Net::SSLeay::ASN1_OBJECT>
+
+=item * L<Net::SSLeay::ASN1_OCTET_STRING|SPVM::Net::SSLeay::ASN1_OCTET_STRING>
+
+=item * L<Net::SSLeay::ASN1_STRING|SPVM::Net::SSLeay::ASN1_STRING>
 
 =item * L<Net::SSLeay::ASN1_TIME|SPVM::Net::SSLeay::ASN1_TIME>
 
@@ -122,11 +126,17 @@ OpenSSL 1.1.1
 
 =item * L<Net::SSLeay::SSL_SESSION|SPVM::Net::SSLeay::SSL_SESSION>
 
+=item * L<Net::SSLeay::Util|SPVM::Net::SSLeay::Util>
+
 =item * L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>
 
 =item * L<Net::SSLeay::X509_CRL|SPVM::Net::SSLeay::X509_CRL>
 
+=item * L<Net::SSLeay::X509_EXTENSION|SPVM::Net::SSLeay::X509_EXTENSION>
+
 =item * L<Net::SSLeay::X509_NAME|SPVM::Net::SSLeay::X509_NAME>
+
+=item * L<Net::SSLeay::X509_NAME_ENTRY|SPVM::Net::SSLeay::X509_NAME_ENTRY>
 
 =item * L<Net::SSLeay::X509_STORE|SPVM::Net::SSLeay::X509_STORE>
 

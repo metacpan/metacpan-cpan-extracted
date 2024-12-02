@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Codit.
 
+0.13 Mon Dec 02 2024
+	- New file dialogs. Opening multiple files.
+	- Added file management capabilities to plugin FileBrowser.
+
 0.12 Mon Nov 11 2024
 	- Left and right side bars have rotated labels
 	- Switched to gridded approach for panel layout

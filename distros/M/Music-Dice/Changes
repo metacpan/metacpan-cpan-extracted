@@ -1,5 +1,17 @@
 Revision history for Music-Dice
 
+0.0105 2024-12-02 00:40:09
+    - Remove questionable "gameplay" numeric rolling.
+
+0.0104 2024-12-01 13:13:08
+    - Fix the eg/{melody,modal}.pl semantics.
+
+0.0103 2024-12-01 11:41:00
+    - Add the eg/melody.pl program.
+
+0.0102 2024-12-01 08:10:21
+    - Add the eg/single-note-line.pl program.
+
 0.0101 2024-11-30 15:06:03
     - Fix ugly typo in code.
 

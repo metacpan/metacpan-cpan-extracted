@@ -19,7 +19,7 @@ my $osname = $Config{'osname'};
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
 use File::Basename;
-use File::MimeInfo;
+use File::MimeInfo::Magic qw( magic );
 use Imager;
 use MIME::Base64;
 require FreeDesktop::Icons;
@@ -456,10 +456,12 @@ icon is returned.
 sub getFileIcon {
 	my $self = shift;
 	my $file = shift;
-	my $mime = mimetype($file);
+	my $mime = magic($file);
 	if (defined $mime) {
+#		print "$file: $mime\n";
 		$mime =~ s/\//-/;
 		my $icon = $self->getIcon($mime, @_);
+#		print "found $mime\n" if defined $icon;
 		return $icon if defined $icon
 	}
 	return $self->getIcon('text-plain', @_)

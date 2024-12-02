@@ -1,4 +1,6 @@
 #!/usr/bin/env perl
+# This code is part of distribution Business::CAMT.  It is licensed under the
+# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
 
 # Run with: $0 <$xml-file> [<$out.xml>]
 # Example:  examples/show examples/dutch-sepa/camt.053.001.02.xml /tmp/out.xml

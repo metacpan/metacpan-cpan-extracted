@@ -42,6 +42,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Config::Tiny" : "2.30",
+            "Digest::SHA" : "6.04",
+            "Mojo::File" : "0",
+            "Mojo::JSON" : "0",
+            "String::CamelCase" : "0",
+            "Syntax::Keyword::Match" : "0.15",
+            "Syntax::Operator::Matches" : "0",
             "perl" : "5.40"
          }
       },
@@ -54,7 +61,7 @@
    "provides" : {
       "Daje::Generate" : {
          "file" : "lib/Daje/Generate.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Daje::Generate::Templates::Perl" : {
          "file" : "lib/Daje/Generate/Templates/Perl.pm",
@@ -68,6 +75,10 @@
       },
       "Daje::Generate::Test::TestData" : {
          "file" : "lib/Daje/Generate/Test/TestData.pm"
+      },
+      "Daje::GeneratePerl" : {
+         "file" : "lib/Daje/GeneratePerl.pm",
+         "version" : "0.01"
       }
    },
    "release_status" : "stable",
@@ -82,7 +93,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Generate"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

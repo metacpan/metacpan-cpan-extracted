@@ -56,15 +56,16 @@ sub malloc {
     my ( $num_of_items, $size_of_each_item, $init_value ) = @_;
     my $buffer_size = $num_of_items * $size_of_each_item;
     my $buffer;
-    if ( lc $init_value eq 'zero' ) {
+
+    unless (  $init_value ) {
+        $buffer = _alloc_with_malloc($buffer_size);
+    }
+    elsif ( lc $init_value eq 'zero' ) {
         $buffer = _alloc_with_calloc($buffer_size);
     }
-    elsif ( defined $init_value ) {
+    elsif (  $init_value ) {
         $init_value = ord($init_value);
         $buffer = _alloc_with_malloc_and_set( $buffer_size, $init_value );
-    }
-    else {
-        $buffer = _alloc_with_malloc($buffer_size);
     }
 
     # Die without nuance if the buffer allocation fails
@@ -184,7 +185,6 @@ SV* _alloc_with_malloc(size_t length) {
     if (buffer == NULL) {
         return &PL_sv_undef;
     }
-    buffer[0] = 0;  // Touch the buffer to force allocation
     return newSVuv(PTR2UV(buffer));
 }
 
@@ -202,11 +202,10 @@ SV* _alloc_with_malloc_and_set(size_t length, short initial_value) {
 // allocate a zero-initialized buffer
 SV* _alloc_with_calloc(size_t length) {
     // Allocate memory for the array
-    char* buffer = (char*)malloc(length * sizeof(char));
+    char* buffer = (char *)calloc(length ,sizeof(char));
     if (buffer == NULL) {
         return &PL_sv_undef;
     }
-    buffer[0] = 0;
     return newSVuv(PTR2UV(buffer));
 }
 
@@ -232,5 +231,6 @@ SV* _get_buffer_address(SV* sv) {
     if (!SvPOK(sv)) {
         return &PL_sv_undef;
     }
-    return sv;
+    char* buffer = SvPVbyte_nolen(sv);
+    return newSVuv(PTR2UV(buffer));
 }

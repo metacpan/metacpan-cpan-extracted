@@ -13,27 +13,35 @@ my %opt = (
     tonic  => 'C',
     scale  => 'major',
     octave => 4,
+    bpm    => 80,
 );
 GetOptions(\%opt,
     'tonic=s',
     'scale=s',
     'octave=i',
+    'bpm=i',
 );
+
+my $score = setup_score(patch => 0, bpm => $opt{bpm});
+
+my $cn = Music::Chord::Note->new;
 
 my $d = Music::Dice->new(
     scale_note => $opt{tonic},
     scale_name => $opt{scale},
 );
 
-my $score = setup_score(patch => 0, bpm => 80);
-
-my $cn = Music::Chord::Note->new;
-
 my $phrase = $d->rhythmic_phrase->roll;
-my $note   = $d->note->roll;
+my $tonic  = $d->note->roll;
 my $mode   = $d->mode->roll;
-my @scale  = get_scale_notes($note, $mode);
-print "$note $mode: @scale\n";
+my @scale  = get_scale_notes($tonic, $mode);
+print "$tonic $mode: @scale\n";
+print "degree => chord | duruation\n";
+
+$d = Music::Dice->new(
+    scale_note => $tonic,
+    scale_name => $mode,
+);
 
 for (1 .. 4) {
     for my $i (0 .. $#$phrase) {
@@ -41,7 +49,7 @@ for (1 .. 4) {
         my $index = $degree - 1;
         my $type = $triad eq 'diminished' ? 'dim' : $triad eq 'minor' ? 'm' : '';
         my $chord = "$scale[$index]$type";
-        print "Degree: $degree => $chord | $phrase->[$i]\n";
+        print "$degree => $chord | $phrase->[$i]\n";
         my @tones = $cn->chord_with_octave($chord, $opt{octave});
         $score->n($phrase->[$i], midi_format(@tones))
     }

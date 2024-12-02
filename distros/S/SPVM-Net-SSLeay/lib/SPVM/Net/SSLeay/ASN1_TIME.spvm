@@ -3,7 +3,24 @@
 
 class Net::SSLeay::ASN1_TIME : pointer {
   
+  use Net::SSLeay::BIO;
+  use Sys::Time::Tm;
+  use Net::SSLeay::ASN1_GENERALIZEDTIME;
+  
+  # Class Methods
+  native static method new : Net::SSLeay::ASN1_TIME ();
+  
   # Instance Methods
+  native method set : void ($t : long);
+  
+  native method check : int ();
+  
+  native method print : int ($b : Net::SSLeay::BIO);
+  
+  native method to_tm : int ($tm : Sys::Time::Tm);
+  
+  native method to_generalizedtime : Net::SSLeay::ASN1_GENERALIZEDTIME ();
+  
   native method DESTROY : void ();
   
 }

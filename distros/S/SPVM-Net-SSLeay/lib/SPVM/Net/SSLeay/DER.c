@@ -57,7 +57,9 @@ int32_t SPVM__Net__SSLeay__DER__d2i_OCSP_REQUEST(SPVM_ENV* env, SPVM_VALUE* stac
     
     env->die(env, stack, "[OpenSSL Error]d2i_OCSP_REQUEST failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    error_id = tmp_error_id;
     
     return error_id;
   }
@@ -107,7 +109,9 @@ int32_t SPVM__Net__SSLeay__DER__i2d_OCSP_REQUEST(SPVM_ENV* env, SPVM_VALUE* stac
     
     env->die(env, stack, "[OpenSSL Error]i2d_OCSP_REQUEST failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    error_id = tmp_error_id;
     
     return error_id;
   }
@@ -166,7 +170,9 @@ int32_t SPVM__Net__SSLeay__DER__d2i_OCSP_RESPONSE(SPVM_ENV* env, SPVM_VALUE* sta
     
     env->die(env, stack, "[OpenSSL Error]d2i_OCSP_RESPONSE failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    error_id = tmp_error_id;
     
     return error_id;
   }
@@ -216,7 +222,9 @@ int32_t SPVM__Net__SSLeay__DER__i2d_OCSP_RESPONSE(SPVM_ENV* env, SPVM_VALUE* sta
     
     env->die(env, stack, "[OpenSSL Error]i2d_OCSP_RESPONSE failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    error_id = tmp_error_id;
     
     return error_id;
   }
@@ -275,7 +283,9 @@ int32_t SPVM__Net__SSLeay__DER__d2i_OCSP_CERTID(SPVM_ENV* env, SPVM_VALUE* stack
     
     env->die(env, stack, "[OpenSSL Error]d2i_OCSP_CERTID failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    error_id = tmp_error_id;
     
     return error_id;
   }
@@ -325,7 +335,9 @@ int32_t SPVM__Net__SSLeay__DER__i2d_OCSP_CERTID(SPVM_ENV* env, SPVM_VALUE* stack
     
     env->die(env, stack, "[OpenSSL Error]i2d_OCSP_CERTID failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    error_id = tmp_error_id;
     
     return error_id;
   }

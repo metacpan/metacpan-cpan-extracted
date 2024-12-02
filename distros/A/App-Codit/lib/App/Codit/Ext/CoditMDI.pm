@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.11";
+$VERSION="0.13";
 
 use base qw( Tk::AppWindow::Ext::MDI );
 
@@ -302,12 +302,12 @@ sub CmdDocNew {
 	return $result
 }
 
-sub CmdDocOpen {
-	my $self = shift;
-	my $result = $self->SUPER::CmdDocOpen(@_);
-	$self->disposeUntitled if $result;
-	return $result
-}
+#sub CmdDocOpen {
+#	my $self = shift;
+#	my $result = $self->SUPER::CmdDocOpen(@_);
+#	$self->disposeUntitled if $result;
+#	return $result
+#}
 
 sub contentModified {
 	my $self = shift;

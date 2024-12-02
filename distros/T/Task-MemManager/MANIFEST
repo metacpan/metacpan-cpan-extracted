@@ -8,7 +8,6 @@ Makefile.PL
 README
 dist.ini
 lib/Task/MemManager.pm
-lib/Task/MemManager/CMalloc.pm
 lib/Task/MemManager/PerlAlloc.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t

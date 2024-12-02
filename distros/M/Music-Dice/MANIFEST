@@ -9,8 +9,10 @@ README
 README.md
 cpanfile
 dist.ini
+eg/melody.pl
 eg/modal.pl
 eg/roll-em.pl
+eg/single-note-line.pl
 lib/Music/Dice.pm
 t/00-compile.t
 t/01-methods.t

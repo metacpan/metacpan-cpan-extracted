@@ -61,7 +61,9 @@ int32_t SPVM__Net__SSLeay__OPENSSL_INIT__set_config_filename(SPVM_ENV* env, SPVM
     
     env->die(env, stack, "[OpenSSL Error]OPENSSL_INIT_set_config_filename failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    error_id = tmp_error_id;
     
     return error_id;
   }
@@ -120,7 +122,9 @@ int32_t SPVM__Net__SSLeay__OPENSSL_INIT__set_config_appname(SPVM_ENV* env, SPVM_
     
     env->die(env, stack, "[OpenSSL Error]OPENSSL_INIT_set_config_appname failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    error_id = tmp_error_id;
     
     return error_id;
   }

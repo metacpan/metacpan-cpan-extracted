@@ -5,7 +5,12 @@ class Net::SSLeay::ASN1_GENERALIZEDTIME : pointer {
   
   allow Net::SSLeay::OCSP;
   
+  use Net::SSLeay::BIO;
+  use Sys::Time::Tm;
+  
   # Class Methods
+  native static method new : Net::SSLeay::ASN1_GENERALIZEDTIME ();
+  
   private static method new_with_pointer : Net::SSLeay::ASN1_GENERALIZEDTIME ($pointer : Address, $options : object[] = undef) {
     
     my $self = new Net::SSLeay::ASN1_GENERALIZEDTIME;
@@ -16,6 +21,12 @@ class Net::SSLeay::ASN1_GENERALIZEDTIME : pointer {
   }
   
   # Instance Methods
+  native method set : void ($t : long);
+  
+  native method check : int ();
+  
+  native method print : int ($b : Net::SSLeay::BIO);
+  
   native method DESTROY : void ();
   
 }

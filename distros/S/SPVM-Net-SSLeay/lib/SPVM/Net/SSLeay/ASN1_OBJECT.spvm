@@ -3,6 +3,9 @@
 
 class Net::SSLeay::ASN1_OBJECT : pointer {
   
+  # Class Methods
+  native static method new : Net::SSLeay::ASN1_OBJECT ();
+  
   # Instance Methods
   native method DESTROY : void ();
   

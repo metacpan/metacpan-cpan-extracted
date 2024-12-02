@@ -9,11 +9,11 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.11;
+$VERSION = 0.13;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
-require Tk::FileBrowser;
+require Tk::FileManager;
 
 =head1 DESCRIPTION
 
@@ -33,6 +33,12 @@ Pressing CTRL+F when the file browser has the focus invokes a filter entry at th
 
 my @contextmenu = (
 	[ 'menu_normal', undef, 'Open', 'fb_open',	'document-open', 'CTRL+SHIFT+I'], 
+	[ 'menu_separator', undef, 'f1'],
+	[ 'menu_normal', undef, 'Copy', 'fb_copy',	'edit-copy', '*CTRL+C'], 
+	[ 'menu_normal', undef, 'Cut', 'fb_cut',	'edit-cut', '*CTRL+X'], 
+	[ 'menu_normal', undef, 'Paste', 'fb_paste',	'edit-paste', '*CTRL+V'], 
+	[ 'menu_separator', undef, 'f2'],
+	[ 'menu_normal', undef, 'Delete', 'fb_delete',	'edit-delete', '*SHIFT+DELETE'], 
 );
 
 sub new {
@@ -40,40 +46,56 @@ sub new {
 	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 
-	$self->cmdConfig('fb_open', ['OpenSelection', $self]);
+
 	my $page = $self->ToolNavigPageAdd('FileBrowser', 'folder', undef, 'Browse your file system', 400);
-	my $b = $page->FileBrowser(
-		-invokefile => ['cmdExecute', $self, 'doc_open'],
+	my @images = (
+		['-msgimage', 'dialog-information', 32],
+		['-newfolderimage', 'folder-new', 16],
+		['-reloadimage', 'appointment-recurring', 16],
+		['-warnimage', 'dialog-warning', 32],
+	);
+	my @op = ();
+	for (@images) {
+		my ($opt, $icon, $size) = @$_;
+		my $img = $self->getArt($icon, $size);
+		push @op, $opt, $img if defined $img;
+	}
+
+	my $b = $page->FileManager(@op,
+		-invokefile => ['fbInvoke', $self],
 		-listmenu => $self->extGet('MenuBar')->menuStack(@contextmenu),
-		-diriconcall => ['GetDirIcon', $self],
-		-fileiconcall => ['GetFileIcon', $self],
-		-reloadimage => $self->getArt('appointment-recurring'),
+		-diriconcall => ['getDirIcon', $self],
+		-fileiconcall => ['getFileIcon', $self],
+		-linkiconcall => ['getLinkIcon', $self],
 		-selectmode => 'extended',
 	)->pack(-expand => 1, -fill => 'both');
-	$b->load;
+	$self->cmdConfig(
+		'fb_copy' => ['clipboardCopy', $b],
+		'fb_cut' => ['clipboardCut', $b],
+		'fb_delete' => ['delete', $b],
+		'fb_open' => ['fbOpen', $self],
+		'fb_paste' => ['clipboardPaste', $b],
+	);
+	$self->after(1000, ['load', $b]);
 	$self->{BROWSER} = $b;
 	
 	return $self;
 }
 
-sub GetDirIcon {
-	my ($self, $name) = @_;
-	my $icon = $self->getArt('folder');
-	return $icon if defined $icon;
-	return $self->{BROWSER}->DefaultDirIcon;
+sub browser { return $_[0]->{BROWSER} }
+
+sub fbInvoke {
+	my ($self, $file) = @_;
+	if (-T $file) {
+		$self->cmdExecute('doc_open', $file);
+	} else {
+		$self->openURL($file)
+	}
 }
 
-sub GetFileIcon {
-	my ($self, $name) = @_;
-	my $art = $self->extGet('Art');
-	my $icon = $art->getFileIcon($name);
-	return $icon if defined $icon;
-	return $self->{BROWSER}->DefaultFileIcon;
-}
-
-sub OpenSelection {
+sub fbOpen {
 	my $self = shift;
-	my $b = $self->{BROWSER};
+	my $b = $self->browser;
 	my $mdi = $self->extGet('CoditMDI');
 	$mdi->silentMode(1);
 	my @sel = $b->infoSelection;
@@ -87,7 +109,11 @@ sub OpenSelection {
 
 sub Unload {
 	my $self = shift;
+	$self->cmdRemove('fb_copy');
+	$self->cmdRemove('fb_cut');
+	$self->cmdRemove('fb_delete');
 	$self->cmdRemove('fb_open');
+	$self->cmdRemove('fb_paste');
 	$self->ToolNavigPageRemove('FileBrowser');
 	return $self->SUPER::Unload
 }

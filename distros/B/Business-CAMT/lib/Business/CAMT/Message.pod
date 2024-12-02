@@ -90,13 +90,15 @@ result for regression tests.
 Pass the settings to the JSON generator object, see its manual page.
 Provided settings will overrule the defaults.
 
+=encoding utf-8
+
 =back
 
 =item $obj-E<gt>B<toPerl>()
 
 Convert the HASH into Perl code, using Data::Dumper.  This is
 useful, because you do not want to include the hidden object
-attributes in your output.
+attributes in your output: this method hides that administration.
 
 =item $obj-E<gt>B<write>($file, %options)
 
@@ -111,8 +113,8 @@ example: for write
 
 =head1 SEE ALSO
 
-This module is part of Business-CAMT distribution version 0.12,
-built on November 27, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Business-CAMT distribution version 0.13,
+built on December 02, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

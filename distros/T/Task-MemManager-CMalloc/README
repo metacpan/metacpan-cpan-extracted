@@ -1,0 +1,68 @@
+NAME
+    Task::MemManager::CMalloc - Allocates buffers using C's malloc
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+        use Task::MemManager::CMalloc;
+
+        my $buffer = Task::MemManager::CMalloc::malloc(10, 1, 'A');
+        my $buffer_address = Task::MemManager::CMalloc::get_buffer_address($buffer);
+        Task::MemManager::CMalloc::free($buffer);
+
+DESCRIPTION
+    The "Task::MemManager::CMalloc" module provides access to memory
+    bufffers allocated using C's malloc function. The buffers are allocated
+    immediately, i.e., not using the delayed allocation mechanism one would
+    expect from a garden variety (e.g. glibc) malloc implementation. The
+    module provides methods to allocate uninitialized, zero initialized or
+    custom initialized buffers, access to the buffer's memory address and
+    facilities to free the buffer. The module is intended to be used in
+    conjunction with the "Task::MemManager" module, and thus it is probably
+    best not to use these functions directly.
+
+METHODS
+    *   "malloc($num_of_items, $size_of_each_item, $init_value)"
+
+        Allocates a buffer of size "$num_of_items * $size_of_each_item"
+        bytes. If $init_value is not defined, the buffer is not initialized.
+        If $init_value is the string 'zero', the buffer is zero initialized.
+        Otherwise, the buffer is initialized with the value of $init_value
+        repeated for the entire buffer. The value returned is processed by
+        the "Task::MemManager" module in order to grab the memory address of
+        the buffer just generated.
+
+    *   free($buffer)
+
+        Frees the buffer allocated by "malloc".
+
+    *   get_buffer_address($buffer)
+
+        Returns the memory address of the buffer as a Perl scalar.
+
+DIAGNOSTICS
+    There are no diagnostics that one can use. The module will croak if the
+    allocation fails, so you don't have to worry about error handling.
+
+DEPENDENCIES
+    The module depends on the "Inline::C" module to compile the C code for
+    the memory allocation and deallocation functions.
+
+SEE ALSO
+    *   <https://metacpan.org/pod/Inline::C>
+
+        Inline::C is a module that allows you to write Perl subroutines in
+        C.
+
+AUTHOR
+    Christos Argyropoulos, "<chrisarg at cpan.org>"
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by Christos Argyropoulos.
+
+    This is free software; you can redistribute it and/or modify it under
+    the MIT license. The full text of the license can be found in the
+    LICENSE file See <https://en.wikipedia.org/wiki/MIT_License> for more
+    information.
+

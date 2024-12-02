@@ -4,6 +4,19 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 0.13: Mon  2 Dec 09:23:52 CET 2024
+
+	Changes:
+	- combine set and version arguments to create()
+
+	Improvements:
+	- more rant about the missed chances in the schemas.
+	- only 3 long tagnames are still unclear (too new for docs)
+	- some corrections for long tagnames.
+	- read() accepts file-handles and strings too.
+	- implement bin/camt
+	- generate json and dd from example messages
+
 version 0.12: Wed 27 Nov 16:16:33 CET 2024
 
 	Changes:

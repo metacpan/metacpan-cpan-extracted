@@ -6,7 +6,7 @@
 # same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
 
 package Business::CAMT::Message;{
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 }
 
 
@@ -88,12 +88,15 @@ sub toJSON(%)
 	my %data  = %$self;        # Shallow copy to remove blessing
 	delete $data{_attrs};      # remove object attributes
 
-	my $json     = JSON->new;
 	my $settings = $args{settings} || {};
 	my %settings = (pretty => 1, canonical => 1, %$settings);
+
+	# JSON parameters call methods, copied from to_json behavior
+	my $json     = JSON->new;
 	while(my ($method, $value) = each %settings)
 	{	$json->$method($value);
 	}
+
 	$json->encode(\%data);     # returns bytes
 }
 

@@ -9,7 +9,7 @@ App::Codit::Plugins::Snippets - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.12;
+$VERSION = 0.13;
 
 use Carp;
 
@@ -211,7 +211,7 @@ sub snippetCreate {
 	my $list = $self->_list;
 	my ($sel) = $list->infoSelection;
 	return unless defined $sel;
-	my $file = $self->getSaveFile;
+	my ($file) = $self->pickFileSave;
 	if (defined $file) {
 		my $dh;
 		unless (open($dh, ">", $file)) {

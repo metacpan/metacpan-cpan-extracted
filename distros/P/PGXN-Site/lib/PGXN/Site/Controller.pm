@@ -13,7 +13,7 @@ use Encode;
 use WWW::PGXN;
 use List::MoreUtils qw(any);
 use namespace::autoclean;
-our $VERSION = v0.23.7;
+our $VERSION = v0.23.8;
 
 Template::Declare->init( dispatch_to => ['PGXN::Site::Templates'] );
 

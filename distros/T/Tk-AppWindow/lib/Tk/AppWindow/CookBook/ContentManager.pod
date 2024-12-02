@@ -97,6 +97,8 @@ Hans Jeuken (hanje at cpan dot org)
 
 =item L<Tk::AppWindow::Ext::MDI>
 
+=item L<Tk::AppWindow::Ext::SDI>
+
 =back
 
 =cut

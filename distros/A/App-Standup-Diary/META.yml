@@ -1,0 +1,39 @@
+---
+abstract: 'Manage a simple Markdown journal for your daily standups'
+author:
+  - 'Sébastien Feugère - seb@feugere.net'
+build_requires:
+  Test2::Harness: '0'
+  Test::Cmd: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.047, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Standup-Diary
+provides:
+  App::Standup::Diary:
+    file: lib/App/Standup/Diary.pm
+    version: '0.08'
+  App::Standup::Diary::Template:
+    file: lib/App/Standup/Diary/Template.pm
+  App::Standup::Role::Date:
+    file: lib/App/Standup/Role/Date.pm
+  App::Standup::Role::Project:
+    file: lib/App/Standup/Role/Project.pm
+requires:
+  Config::Tiny: '0'
+  Mojolicious: '0'
+  Object::Pad: '0.808'
+  Path::Tiny: '0'
+resources:
+  Mastodon: https://rivals.space/@smonff
+  bugtracker: https://codeberg.org/smonff/App-Standup-Diary/issues
+  homepage: https://metacpan.org/dist/App-Standup-Diary
+  repository: https://codeberg.org/smonff/App-Standup-Diary
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: Artistic-2.0

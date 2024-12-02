@@ -295,7 +295,7 @@ sub test_wrapper {
             },
             {
                 rel  => 'me',
-                href => 'https://botsin.space/@pgxn',
+                href => 'https://mastodon.social/@pgxn',
             },
         ) {
             ++$i;
@@ -392,7 +392,7 @@ sub test_wrapper {
                 });
                 $tx->is('./span[1][@class="grey"]', '|', 'Should have spacer span');
                 $tx->ok('./a[2]', 'Test second anchor', sub {
-                    $tx->is('./@href', 'https://botsin.space/@pgxn', 'Should link to Mastodon');
+                    $tx->is('./@href', 'https://mastodon.social/@pgxn', 'Should link to Mastodon');
                     $tx->is('./@title', $mt->maketext('Follow PGXN on Mastodon'), 'Should have link title');
                     $tx->is('./@rel', 'me', 'Should have rel=me in Mastodon link');
                     $tx->is('./text()', $mt->maketext('Mastodon'), 'Should have text "Blog"');

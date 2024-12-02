@@ -1,3 +1,32 @@
+0.021 2024-12-02
+  [New Features]
+    * Add Net::SSLeay::ASN1_ENUMERATED#new method.
+    * Add Net::SSLeay::ASN1_ENUMERATED#set_int64 method.
+    * Add Net::SSLeay::ASN1_ENUMERATED#get_int64 method.
+    * Add Net::SSLeay::ASN1_INTEGER#new method.
+    * Add Net::SSLeay::ASN1_INTEGER#set_int64 method.
+    * Add Net::SSLeay::ASN1_INTEGER#get_int64 method.
+    * Add Net::SSLeay::ASN1_OBJECT#new method.
+    * Add Net::SSLeay::ASN1_STRING#new method.
+    * Add Net::SSLeay::ASN1_STRING#set method.
+    * Add Net::SSLeay::ASN1_OCTET_STRING#new method.
+    * Add Net::SSLeay::ASN1_OCTET_STRING#set method.
+    * Add Net::SSLeay::ASN1_TIME#new method.
+    * Add Net::SSLeay::ASN1_TIME#set method.
+    * Add Net::SSLeay::ASN1_TIME#check method.
+    * Add Net::SSLeay::ASN1_TIME#print method.
+    * Add Net::SSLeay::ASN1_TIME#to_tm method.
+    * Add Net::SSLeay::ASN1_TIME#to_generalizedtime method.
+    * Add Net::SSLeay::ASN1_TIME#new method.
+    * Add Net::SSLeay::ASN1_TIME#set method.
+    * Add Net::SSLeay::ASN1_TIME#check method.
+    * Add Net::SSLeay::ASN1_TIME#print method.
+    
+  [Bug Fix]
+    * Fix bugs that exception messages for SSL are not shown well.
+  [Requirement Changes]
+    * Require SPVM 0.990032.
+    
 0.020 2024-11-29
   [New Features]
     * Add Net::SSLeay::SSL_CTX#set_default_verify_paths_windows method.

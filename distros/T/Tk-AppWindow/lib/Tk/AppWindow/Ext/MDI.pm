@@ -11,7 +11,7 @@ use warnings;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION="0.16";
+$VERSION="0.17";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -188,6 +188,7 @@ sub new {
 	$self->{MONITOR} = {};
 	$self->{SELECTDISABLED} = 0;
 	$self->{SELECTED} = undef;
+	$self->{SILENTMODE} = 0;
 
 	my $args = $self->GetArgsRef;
 	my $cmo = delete $args->{'-contentmanageroptions'};
@@ -273,28 +274,32 @@ sub CmdDocNew {
 }
 
 sub CmdDocOpen {
-	my ($self, $file) = @_;
-	unless (defined($file)) {
+	my $self = shift;
+	my @files = @_;
+	unless (@files) {
 		my @op = ();
-		@op = (-popover => 'mainwindow') unless $mswin;
 		my $sel = $self->docSelected;
 		push @op, -initialdir => dirname($sel) if defined $sel;
-		$file = $self->getOpenFile(@op);
+		@files = $self->docOpenDialog(@op);
 	}
-	if (defined $file) {
+	my @o = ();
+	my $silentmode = $self->silentMode;
+	$self->silentMode(1) if @files > 1;
+	for (@files) {
+		my $file = $_;
 		$file = File::Spec->rel2abs($file);
+		next if -d $file;
 		if ($self->docExists($file)) {
-			$self->cmdExecute('doc_select', $file);
-			return $file
-		}
-		if ($self->cmdExecute('doc_new', $file)) {
+#			push @o, $file;
+		} elsif ($self->cmdExecute('doc_new', $file)) {
 			$self->historyRemove($file);
-			$self->cmdExecute('doc_select', $file);
 			$self->log("Opened '$file'");
-			return $file;
+			push @o, $file;
 		}
 	}
- 	return ''
+	$self->silentMode($silentmode) if @files > 1;
+	$self->cmdExecute('doc_select', $o[0]) if @o;
+	return @o
 }
 
 sub CmdDocSave {
@@ -334,9 +339,12 @@ sub CmdDocSaveAs {
 
 	my $doc = $self->docGet($name);
 	if (defined $doc) {
-		my @op = (-initialdir => dirname($name));
-		push @op, -popover => 'mainwindow' unless $mswin;
-		my $file = $self->getSaveFile(@op,);
+		my @op = (
+			-initialdir => dirname($name),
+			-initialfile => basename($name),
+		);
+#		push @op, -popover => 'mainwindow' unless $mswin;
+		my ($file) = $self->pickFileSave(@op,);
 		if (defined $file) {
 			$file = File::Spec->rel2abs($file);
 			if ($doc->Save($file)) {
@@ -786,6 +794,11 @@ sub docModified {
 	croak 'Name not defined' unless defined $name;
 	return 0 if $self->deferredExists($name);
 	return $self->docGet($name)->IsModified;
+}
+
+sub docOpenDialog {
+	my $self = shift;
+	return $self->pickFileOpenMulti(@_);
 }
 
 =item B<docRename>I<($old, $new)>
@@ -1336,9 +1349,9 @@ multiple documents at once.
 sub silentMode {
 	my ($self, $flag) = @_;
 	unless (defined $flag) {
-		croak "You must specify a boolean flag";
-		return
+		return $self->{SILENTMODE};
 	}
+	$self->{SILENTMODE} = $flag;
 	my $if = $self->Interface;
 	if ($flag) {
 		$self->{'autoupdate'} = $if->autoupdate;
@@ -1354,6 +1367,7 @@ sub silentMode {
 		my $a = $self->{'autoupdate'};
 		$if->autoupdate($a) if defined $a;
 		delete $self->{'autoupdate'};
+#		$if->UpdateTabs;
 
 		my $h = $self->{'historydisabled'};
 		$self->historyDisabled($h) if defined $h;

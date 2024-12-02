@@ -77,10 +77,6 @@ The following extenstion are available within Tk::AppWindow:
 
 Everything about images and icons
 
-=item B<Balloon>
-
-Central balloon widget for your application
-
 =item B<ConfigFolder>
 
 Store settings and temp files in a configfolder
@@ -113,9 +109,17 @@ Manage your plugins
 
 Single document interface
 
+=item B<Selector>
+
+Provides a side bar with a document tree for use with B<MDI>-like extensions.
+
 =item B<Settings>
 
 Init and edit your application settings.
+
+=item B<SideBars>
+
+Create and populate side bars.
 
 =item B<StatusBar>
 

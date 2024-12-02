@@ -1,5 +1,12 @@
 Revision history for Perl extension Tk::AppWindow.
 
+0.17 Mon Dec 02 2024
+	- Repaired output for checking updates.
+	- Added file dialog widget Tk::FilePicker to Tk::AppWindow;
+	- Opening multiple files in MDI.
+	- Changed bugtracker.
+	- Updated documentation.
+
 0.16 Sat Nov 09 2024
 	- Removed extensions Navigator NavigatorPanel and ToolPanel, they are obsolete.
 	- Removed methods geo* from Tk::AppWindow and removed it's binding to <Configure>

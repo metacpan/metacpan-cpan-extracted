@@ -16,6 +16,10 @@ use SPVM 'Net::SSLeay';
 use SPVM::Net::SSLeay;
 use SPVM 'Fn';
 
+my $api = SPVM::api();
+
+my $start_memory_blocks_count = $api->get_memory_blocks_count;
+
 ok(SPVM::TestCase::Net::SSLeay->test);
 
 ok(SPVM::TestCase::Net::SSLeay->test_no_mozilla_ca);
@@ -27,6 +31,23 @@ ok(SPVM::TestCase::Net::SSLeay::SSL_CTX->set_alpn_select_cb_with_protocols);
 ok(SPVM::TestCase::Net::SSLeay::SSL_CTX->set_next_proto_select_cb_with_protocols);
 
 ok(SPVM::TestCase::Net::SSLeay::SSL_CTX->set_next_protos_advertised_cb_with_protocols);
+
+ok(SPVM::TestCase::Net::SSLeay->ASN1_ENUMERATED);
+
+ok(SPVM::TestCase::Net::SSLeay->ASN1_INTEGER);
+
+ok(SPVM::TestCase::Net::SSLeay->ASN1_OBJECT);
+
+ok(SPVM::TestCase::Net::SSLeay->ASN1_STRING);
+
+ok(SPVM::TestCase::Net::SSLeay->ASN1_OCTET_STRING);
+
+ok(SPVM::TestCase::Net::SSLeay->ASN1_TIME);
+
+ok(SPVM::TestCase::Net::SSLeay->ASN1_GENERALIZEDTIME);
+
+my $end_memory_blocks_count = $api->get_memory_blocks_count;
+is($end_memory_blocks_count, $start_memory_blocks_count);
 
 # Version
 {

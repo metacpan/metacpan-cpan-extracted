@@ -5,7 +5,7 @@ use Daje::GenerateSQL;
 use Daje::GenerateSchema;
 use Daje::GeneratePerl;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub process ($self) {
     Daje::GenerateSQL->new(

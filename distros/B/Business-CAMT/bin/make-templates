@@ -1,4 +1,7 @@
 #!/usr/bin/env perl
+# This code is part of Perl distribution Business::CAMT.  It is licensed under
+# the same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+
 # Create all templates in the examples/templates directory
 
 use warnings;
@@ -78,7 +81,8 @@ foreach my $abbrev (keys %abbrevs)
 say "- used UML abbreviations: " . keys %index;
 say "- unused UML abbreviations: " , (keys %umltags) - (keys %index);
 
-my %current = map split(/,/, $_, 2), read_lines "$tagdir/index.csv";
+my $indexfn = "$tagdir/index.csv";
+my %current = map split(/,/, $_, 2), read_lines $indexfn;
 
 say "- please remove tag: $_"
 	for grep !$abbrevs{$_}, sort keys %current;
@@ -92,7 +96,7 @@ if(@added)
 {   $current{$_} ||= $umltags{$_} || '' for @added;
 
 	say "- updating index file.";
-    write_text "$tagdir/index.csv", join '',
+    write_text $indexfn, join '',
 	    map "$_,$current{$_}\n", sort keys %current;
 }
 
@@ -112,7 +116,7 @@ foreach my $version ($camt2->knownVersions)
  	my $ns   = "$urnbase:$version";
 	my $fn   = "$templs2/$version.dd";
 
-	if(! -f $fn || -M $schema < -M $fn)
+	if(! -f $fn || -M $schema < -M $fn || -M $indexfn < -M $fn)
 	{	say " - creating/updating $fn";
 		open my $fh, '>:encoding(UTF-8)', $fn or fault $fn;
 

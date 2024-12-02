@@ -16,7 +16,34 @@ Net::SSLeay::ASN1_INTEGER class in L<SPVM> represents L<ASN1_INTEGER|https://doc
 
   use Net::SSLeay::ASN1_INTEGER;
 
+=head1 Class Methods
+
+=head2 new
+
+C<static method new : L<Net::SSLeay::ASN1_INTEGER|SPVM::Net::SSLeay::ASN1_INTEGER> ();>
+
+Calls native L<ASN1_INTEGER_new|https://github.com/google/boringssl/blob/master/include/openssl/asn1.h> function, creates a new  L<Net::SSLeay::ASN1_INTEGER|SPVM::Net::SSLeay::ASN1_INTEGER> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
+
 =head1 Instance Methods
+
+=head2 get_int64
+
+C<method get_int64 : long ();>
+
+Calls native L<ASN1_INTEGER_get_int64|https://docs.openssl.org/master/man3/ASN1_INTEGER_get_int64> function given an appropriate argument, the pointer value of the instance, and returns the output value of the first argument.
+Exceptions:
+
+If ASN1_INTEGER_get_int64 failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
+=head2 set_int64
+
+C<method set_int64 : void ($r : long);>
+
+Calls native L<ASN1_INTEGER_set_int64|https://docs.openssl.org/master/man3/ASN1_INTEGER_get_int64> function given the pointer value of the instance, $r.
+
+Exceptions:
+
+If ASN1_INTEGER_set_int64 failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
 =head2 DESTROY
 

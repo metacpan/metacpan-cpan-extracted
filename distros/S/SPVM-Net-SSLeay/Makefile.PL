@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.990029');
+my %configure_and_runtime_requires = ('SPVM' => '0.990032');
 WriteMakefile(
   NAME => 'SPVM::Net::SSLeay',
   VERSION_FROM => 'lib/SPVM/Net/SSLeay.pm',

@@ -19,7 +19,25 @@ BEGIN {
   $default_pragmas = ($^H//"u").":".hash2str(\%^H);
 }
 
-use strict; use warnings  FATAL => 'all'; use feature qw/say state/;
+use strict;
+
+# Do not fatalize decode warnings (under category 'utf8') because various smokers
+# can have restrictive stdout encodings.
+use warnings  FATAL => 'all';
+use warnings  NONFATAL => qw(
+        utf8
+        exec
+        recursion
+        internal
+        malloc
+        newline
+        experimental
+        deprecated
+        portable
+      );
+#no warnings "once";
+
+use feature qw/say state/;
 
 require Exporter;
 use parent 'Exporter';

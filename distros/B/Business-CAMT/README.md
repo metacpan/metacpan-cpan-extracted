@@ -16,6 +16,20 @@ to make that happen.  Contact the author for support.
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
   * Indexed from CPAN: <https://metacpan.org/release/Business-CAMT>
 
+## Installing
+
+When you install this Perl module, you will get both the perl5 module (which
+is the most efficient interface when you need to process many files) and the
+'camt' program (script).
+
+To install the 'camt' command and the library, simply type
+
+   cpan -i Business::CAMT
+
+Then, read how it works:
+
+   man camt
+
 ## Development &rarr; Release
 
 Important to know, is that I use an extension on POD to write the manuals.
@@ -41,8 +55,6 @@ When you submit an extension, please contribute a set with
 2. code documentation
 
 3. A line in the ChangeLog file
-
-4. regression tests in t/
 
 **Please note:**
 When you contribute in any way, you agree to transfer the copyrights to

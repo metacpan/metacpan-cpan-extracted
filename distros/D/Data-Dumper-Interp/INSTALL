@@ -49,7 +49,7 @@ by running the manual build process described above.
 This distribution requires other modules to be installed before this
 distribution's installer can be run.  They can be found under the
 "configure_requires" key of META.yml or the
-.
+"{prereqs}{configure}{requires}" key of META.json.
 
 ## Other Prerequisites
 
@@ -62,7 +62,7 @@ Look for prerequisites in the following phases:
 * to run tests, PHASE = test
 
 They can all be found in the "PHASE_requires" key of MYMETA.yml or the
-.
+"{prereqs}{PHASE}{requires}" key of MYMETA.json.
 
 ## Documentation
 

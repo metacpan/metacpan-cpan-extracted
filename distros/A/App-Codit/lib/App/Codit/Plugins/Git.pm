@@ -9,7 +9,7 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.11;
+$VERSION = 0.13;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -309,9 +309,8 @@ sub gitRemoveDialog {
 
 sub openDocAfter {
 	my $self = shift;
-	my ($file) = @_;
-	if ($file ne '') {
-		my $folder = $self->projectFind($file);
+	for (@_) {
+		my $folder = $self->projectFind($_);
 		if (defined $folder) {
 			my $name = $self->projectName($folder);
 			$self->projectAdd($name, $folder);

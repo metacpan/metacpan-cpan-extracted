@@ -1,5 +1,16 @@
 package App::Codit;
 
+use strict;
+use warnings;
+use Carp;
+use vars qw($VERSION);
+$VERSION="0.13";
+use Tk;
+use App::Codit::CodeTextManager;
+
+use base qw(Tk::Derived Tk::AppWindow);
+Construct Tk::Widget 'Codit';
+
 =head1 NAME
 
 App::Codit - IDE for and in Perl
@@ -233,17 +244,6 @@ B<App::Codit> inherits L<Tk::AppWindow> and all of its methods.
 =over 4
 
 =cut
-
-use strict;
-use warnings;
-use Carp;
-use vars qw($VERSION);
-$VERSION="0.12";
-use Tk;
-use App::Codit::CodeTextManager;
-
-use base qw(Tk::Derived Tk::AppWindow);
-Construct Tk::Widget 'Codit';
 
 sub Populate {
 	my ($self,$args) = @_;

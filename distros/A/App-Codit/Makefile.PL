@@ -7,10 +7,10 @@ my %prereq = (
 	'File::Spec'          => '3.75',
 	'Getopt::Long'        => '2.54',
 	'Test::Tk'            => '3.04',
-	'Tk'                  => '804.030',
-	'Tk::AppWindow'       => '0.16',
-	'Tk::CodeText'        => '0.53',
-	'Tk::FileBrowser'     =>	'0.04',
+	'Tk'                  => '804.032',
+	'Tk::AppWindow'       => '0.17',
+	'Tk::CodeText'        => '0.55',
+	'Tk::FileBrowser'     =>	'0.06',
 	'Tk::PodViewer'       =>	'0.05',
 	'Tk::Terminal'        =>	'0.03',
 );
@@ -30,6 +30,9 @@ WriteMakefile(
             type => 'git',
             url  => 'git://github.com/haje61/App-Codit.git',
             web  => 'https://github.com/haje61/App-Codit',
+         },
+         bugtracker => {
+            web  => "https://github.com/haje61/App-Codit/issues",
          },
       }}
     ) : () ),

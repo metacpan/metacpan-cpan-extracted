@@ -17,6 +17,12 @@ class TestCase::Net::SSLeay {
   use Net::SSLeay::X509_NAME;
   use Net::SSLeay::X509_NAME_ENTRY;
   use Sys::OS;
+  use Net::SSLeay::ASN1_ENUMERATED;
+  use Net::SSLeay::ASN1_INTEGER;
+  use Net::SSLeay::ASN1_STRING;
+  use Net::SSLeay::ASN1_OCTET_STRING;
+  use Sys::Time::Tm;
+  use Net::SSLeay::ASN1_TIME;
   
   static method test : int () {
     
@@ -232,6 +238,179 @@ class TestCase::Net::SSLeay {
     }
     
     return $read_length;
+  }
+  
+  static method ASN1_ENUMERATED : int () {
+    
+    my $object = Net::SSLeay::ASN1_ENUMERATED->new;
+    
+    unless ($object is_type Net::SSLeay::ASN1_ENUMERATED) {
+      return 0;
+    }
+    
+    $object->set_int64(Fn->LONG_MIN);
+    
+    unless ($object->get_int64 == Fn->LONG_MIN) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method ASN1_INTEGER : int () {
+    
+    my $object = Net::SSLeay::ASN1_INTEGER->new;
+    
+    unless ($object is_type Net::SSLeay::ASN1_INTEGER) {
+      return 0;
+    }
+    
+    $object->set_int64(Fn->LONG_MIN);
+    
+    unless ($object->get_int64 == Fn->LONG_MIN) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method ASN1_OBJECT : int () {
+    
+    my $object = Net::SSLeay::ASN1_OBJECT->new;
+    
+    unless ($object is_type Net::SSLeay::ASN1_OBJECT) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method ASN1_STRING : int () {
+    
+    my $object = Net::SSLeay::ASN1_STRING->new;
+    
+    unless ($object is_type Net::SSLeay::ASN1_STRING) {
+      return 0;
+    }
+    
+    $object->set("abc");
+    
+    unless ($object->get0_data eq "abc") {
+      return 0;
+    }
+    
+    unless ($object->length == 3) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method ASN1_OCTET_STRING : int () {
+    
+    my $object = Net::SSLeay::ASN1_OCTET_STRING->new;
+    
+    unless ($object is_type Net::SSLeay::ASN1_OCTET_STRING) {
+      return 0;
+    }
+    
+    $object->set("abc");
+    
+    unless ($object->get0_data eq "abc") {
+      return 0;
+    }
+    
+    unless ($object->length == 3) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method ASN1_TIME : int () {
+    
+    my $object = Net::SSLeay::ASN1_TIME->new;
+    
+    unless ($object is_type Net::SSLeay::ASN1_TIME) {
+      return 0;
+    }
+    
+    $object->set(1);
+    
+    my $tm = Sys::Time::Tm->new;
+    
+    $object->to_tm($tm);
+    
+    unless ($tm->tm_year == 70) {
+      return 0;
+    }
+    
+    unless ($tm->tm_mon == 0) {
+      return 0;
+    }
+    
+    unless ($tm->tm_mday == 1) {
+      return 0;
+    }
+    
+    unless ($tm->tm_hour == 0) {
+      return 0;
+    }
+    
+    unless ($tm->tm_min == 0) {
+      return 0;
+    }
+    
+    unless ($tm->tm_sec == 1) {
+      return 0;
+    }
+    
+    my $bio = Net::SSLeay::BIO->new;
+    
+    $object->print($bio);
+    
+    my $buffer = (mutable string)new_string_len 256;
+    my $read_length = $bio->read($buffer);
+    Fn->shorten($buffer, $read_length);
+    
+    unless (Fn->contains($buffer, "1970")) {
+      return 0;
+    }
+    
+    unless (Fn->contains($buffer, "00:00:01")) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method ASN1_GENERALIZEDTIME : int () {
+    
+    my $object = Net::SSLeay::ASN1_GENERALIZEDTIME->new;
+    
+    unless ($object is_type Net::SSLeay::ASN1_GENERALIZEDTIME) {
+      return 0;
+    }
+    
+    $object->set(1);
+    
+    my $bio = Net::SSLeay::BIO->new;
+    
+    $object->print($bio);
+    
+    my $buffer = (mutable string)new_string_len 256;
+    my $read_length = $bio->read($buffer);
+    Fn->shorten($buffer, $read_length);
+    
+    unless (Fn->contains($buffer, "1970")) {
+      return 0;
+    }
+    
+    unless (Fn->contains($buffer, "00:00:01")) {
+      return 0;
+    }
+    
+    return 1;
   }
   
 }

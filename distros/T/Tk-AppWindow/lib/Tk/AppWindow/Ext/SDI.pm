@@ -11,10 +11,7 @@ use warnings;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION="0.07";
-use File::Basename;
-use File::Spec;
-require Tk::YAMessage;
+$VERSION="0.17";
 
 use base qw( Tk::AppWindow::Ext::MDI );
 
@@ -57,6 +54,11 @@ sub ContentSpace {
 }
 
 sub CreateInterface {}
+
+sub docOpenDialog {
+	my $self = shift;
+	return $self->pickFileOpen(@_);
+}
 
 sub MenuSaveAll {
 	return ()

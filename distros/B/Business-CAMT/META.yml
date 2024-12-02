@@ -21,6 +21,7 @@ no_index:
     - xt
 requires:
   Data::Dumper: '0'
+  Getopt::Long: '0'
   JSON: '0'
   List::Util: '0'
   Log::Report: '1.32'
@@ -36,5 +37,5 @@ resources:
   homepage: http://perl.overmeer.net
   license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Business-CAMT.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

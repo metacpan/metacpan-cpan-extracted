@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.16";
+$VERSION="0.17";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
@@ -18,13 +18,11 @@ Construct Tk::Widget 'AppWindow';
 use File::Basename;
 require Tk::AppWindow::BaseClasses::Callback;
 require Tk::Balloon;
+require Tk::FilePicker;
+require Tk::DynaMouseWheelBind;
 require Tk::YAMessage;
 use Tk::PNG;
 
-#require Tk::DynaMouseWheelBind;
-my $wheelbind = 0;
-eval 'require Tk::DynaMouseWheelBind';
-$wheelbind = 1 unless $@;
 
 use Config;
 my $mswin = 0;
@@ -164,7 +162,7 @@ sub Populate {
 		'Tk::ITree',
 		'Tk::Pane',
 		'Tk::Tree',
-	) if $wheelbind; # DynaMouseWheelBind does not install on perl 5.40
+	);
 
 	$self->{APPNAME} = $appname;
 	$self->{ARGS} = $args;
@@ -209,6 +207,17 @@ sub Populate {
 			}
 		}
 	}
+
+
+	#create file picker widget
+	my $picker = $self->FilePicker(
+		-diriconcall => ['getDirIcon', $self],
+		-fileiconcall => ['getFileIcon', $self],
+		-linkiconcall => ['getLinkIcon', $self],
+	);
+	$self->Advertise('FilePicker', $picker);
+
+
 	my $pre = $self->{PRECONFIG};
 	my $logcall = sub {
 		my $message = shift;
@@ -224,6 +233,15 @@ sub Populate {
 		-savegeometry => ['PASSIVE', undef, undef, 0],
 		@$pre,
 		DEFAULT => ['SELF'],
+	);
+	
+	$self->Delegates(
+		pick => $picker,
+		pickFileOpen => $picker,
+		pickFileOpenMulti => $picker,
+		pickFileSave => $picker,
+		pickFolderSelect => $picker,
+		DEFAULT => $self,
 	);
 
 	$self->protocol('WM_DELETE_WINDOW', ['CmdQuit', $self]);
@@ -734,49 +752,6 @@ sub fileSeparator {
 	return '/'
 }
 
-#sub geoAddCall {
-#	my $self = shift;
-#	my $panel = shift;
-#	my $call = $self->CreateCallback(@_);
-#	$self->{GEOCALLS}->{$panel} = $call if defined $call; 
-#}
-#
-#sub geoBlock {
-#	my $self = shift;
-#	$self->{GEOBLOCK} = shift if @_;
-#	return $self->{GEOBLOCK};
-#}
-#
-#sub geoCalls {
-#	my $self = shift;
-#	return if $self->configMode;
-#	return if $self->geoBlock;
-#	my $exclusive = $self->geoExclusive;
-#	my $calls = $self->{GEOCALLS};
-#	if ($exclusive eq '') {
-## 		print "resize all\n";
-#		for (keys %$calls) { $calls->{$_}->execute };
-#	} else {
-## 		print "resize $exclusive\n";
-#		$calls->{$exclusive}->execute;
-#	}
-#	delete $self->{'cfid'};
-#}
-#
-#sub geoDeleteCall {
-#	my ($self, $panel) = @_;
-#	delete $self->{GEOCALLS}->{$panel};
-#}
-#
-#sub geoExclusive {
-#	my $self = shift;
-#	$self->{GEOEXCLUSIVE} = shift if @_;
-#	return $self->{GEOEXCLUSIVE};
-#}
-#
-#sub geoRemoveCall {
-#}
-
 sub GetArgsRef { return $_[0]->{ARGS} }
 
 =item B<getArt>I<($icon, $size)>
@@ -793,6 +768,28 @@ sub getArt {
 		return $art->getIcon($icon, $size);
 	}
 	return undef
+}
+
+sub getDirIcon {
+	my ($self, $name) = @_;
+	my $icon = $self->getArt('folder');
+	return $icon if defined $icon;
+	return $self->Subwidget('FilePicker')->Subwidget('Browser')->DefaultDirIcon;
+}
+
+sub getFileIcon {
+	my ($self, $name) = @_;
+	my $art = $self->extGet('Art');
+	my $icon = $art->getFileIcon($name);
+	return $icon if defined $icon;
+	return $self->Subwidget('FilePicker')->Subwidget('Browser')->DefaultFileIcon;
+}
+
+sub getLinkIcon {
+	my ($self, $name) = @_;
+	my $icon = $self->getArt('emblem-symbolic-link');
+	return $icon if defined $icon;
+	return $self->Subwidget('FilePicker')->Subwidget('Browser')->DefaultLinkIcon;
 }
 
 =item B<log>I<($message)>
@@ -847,7 +844,7 @@ sub logWarning {
 
 Returns a list of two items used by the B<MenuBar> extension. The first defines the application menu.
 The second is the menu option Quit in this menu. Overwrite this method to make it return
-a different list. See also B<Tk::AppWindow::Ext::MenuBar>
+a different list. See also L<Tk::AppWindow::Ext::MenuBar>
 
 =cut
 
@@ -899,6 +896,7 @@ sub pause {
 	$self->after($time, sub { $time = 1 });
 	$self->waitVariable(\$time);
 }
+
 
 =item B<popDialog>I<($title, $message, $icon, @buttons)>
 
@@ -1011,6 +1009,21 @@ sub PostConfig {
 	}
 	my $pc = $self->{POSTCONFIG};
 	for (@$pc) { $_->execute }
+
+	#create filepicker images
+	my @images = (
+		['-msgimage', 'dialog-information', 32],
+		['-newfolderimage', 'folder-new', 16],
+		['-reloadimage', 'appointment-recurring', 16],
+		['-warnimage', 'dialog-warning', 32],
+	);
+	my $picker = $self->Subwidget('FilePicker');
+	for (@images) {
+		my ($opt, $icon, $size) = @$_;
+		my $img = $self->getArt($icon, $size);
+		$picker->configure($opt, $img) if defined $img;
+	}
+
 }
 
 =item B<StatusAttach>I<$widget, $text>
@@ -1087,6 +1100,91 @@ sub WorkSpace {
 	$self->{WORKSPACE} = $self->Subwidget(shift) if @_;
 	return $self->{WORKSPACE}
 }
+
+=back
+
+=head1 FILE DIALOGS
+
+The B<pickWhatEver> methods launch filedialogs. They are meant as a replacement
+of the classic B<getOpenFile> and B<getSaveFile> methods. The pick methods
+can be called with a lot of the options for L<Tk::FilePicker> and L<Tk::FileBrowser>.
+See also there. Additionaly, they can also be called with these options:
+
+=over 4
+
+=item B<-initialdir>
+
+Directory to load on pop.
+
+=item B<-initialfile>
+
+Suggested file name.
+
+=back
+
+The pick methods always return their results in list context. So
+even when you expect only one result you have to do:
+
+ my ($file) = $fp->pickWhatEver(%options);
+
+=over 4
+
+=item B<pick>
+
+The basic pick method.
+
+=item B<pickFileOpen>
+
+Calls B<pick> configured to select one file for opening. Equivalent to:
+
+ my ($file) = $window->pick(
+    -checkoverwrite => 0,
+    -showfolders => 1,
+    -showfiles => 1,
+    -selectmode => 'single',
+    -selectstring => 'Open',
+    -title => 'Open file',
+ );
+
+=item B<pickFileOpenMulti>
+
+Calls B<pick> configured to select multiple files for opening. Equivalent to:
+
+ my @files = $window->pick(
+    -checkoverwrite => 0,
+    -showfolders => 1,
+    -showfiles => 1,
+    -selectmode => 'extended',
+    -selectstring => 'Open',
+    -title => 'Open file',
+ );
+
+=item B<pickFileSave>
+
+Calls B<pick> configured to select one file for saving. Pops
+a dialog for overwrite if the selected file exists. Equivalent to:
+
+ my ($file) = $window->pick(
+    -checkoverwrite => 1,
+    -showfolders => 1,
+    -showfiles => 1,
+    -selectmode => 'single',
+    -selectstring => 'Save',
+    -title => 'Save file',
+ );
+
+=item B<pickFolderSelect>
+
+Calls B<pick> configured to select one folder. Equivalent to:
+
+ my ($folder) = $window->pick(
+    -checkoverwrite => 0,
+    -showfolders => 1,
+    -showfiles => 0,
+    -selectmode => 'single',
+    -selectstring => 'Select',
+    -title => 'Select folder',
+ );
 
 =back
 

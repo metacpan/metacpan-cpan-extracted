@@ -8,7 +8,7 @@
 # https://www.betaalvereniging.nl/wp-content/uploads/IG-Bank-to-Customer-Statement-CAMT-053-v1-1.pdf
 
 package Business::CAMT;{
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 }
 
 
@@ -33,19 +33,25 @@ my $xsddir  = $moddir->subdir('CAMT', 'xsd');
 my $tagdir  = $moddir->subdir('CAMT', 'tags');
 sub _rootElement($) { pack_type $_[1], 'Document' }  # $ns parameter
 
-# The XSD filename is like camt.052.001.12.xsd.  camt.052.001.* is expected
-# to be incompatible tiwh camt.052.002.*, but *.12.xsd can parse *.11.xsd
-my (%xsd_files, $tagtable);
+# The XSD filename is like camt.052.001.12.xsd.  camt.052.001.* is
+# expected to be incompatible with camt.052.002.*, but *.12.xsd can
+# usually parse *.11.xsd
+my %xsd_files;
+
+# Translations from abbreviated XML tags to longer names, loaded on
+# demand.
+my $tagtable;
 
 
-sub new {
-    my $class = shift;
-    (bless {}, $class)->init( {@_} );
+sub new(%)
+{	my ($class, %args) = @_;
+    (bless {}, $class)->init(\%args);
 }
 
-sub init($) {
-	my ($self, $args) = @_;
+sub init($)
+{	my ($self, $args) = @_;
 
+	# Collect the names of all CAMT schemes in this distribution
 	foreach my $f (grep !$_->is_dir && $_->basename =~ /\.xsd$/, $xsddir->children)
 	{	$f->basename =~ /^camt\.([0-9]{3}\.[0-9]{3})\.([0-9]+)\.xsd$/ or panic $f;
 		$xsd_files{$1}{$2} = $f->stringify;
@@ -68,8 +74,14 @@ sub schemas() { $_[0]->{RC_schemas} }
 sub read($%)
 {	my ($self, $src, %args) = @_;
 
-	my $dom = blessed $src ? $src : XML::LibXML->load_xml(location => $src);
+	my $dom
+	  = ! ref $src ? XML::LibXML->load_xml($src =~ /\<.*\>/ ? (string => $src) : (location => $src))
+	  : $src->isa('IO::Handle') || $src->isa('GLOB') ? XML::LibXML->load_xml(IO => $src)
+	  : $src->isa('XML::LibXML::Node') ? $src
+	  : error "Unrecognized input";
+
 	my $xml = $dom->isa('XML::LibXML::Document') ? $dom->documentElement : $dom;
+
 	my $ns  = $xml->namespaceURI;
 	my ($set, $version) = $ns =~ m!^\Q$urnbase\E:camt\.([0-9]{3}\.[0-9]{3})\.([0-9]+)$!
 		or error __"Not a CAMT file.";
@@ -81,8 +93,7 @@ sub read($%)
 		or error __"No compatible schema version available.";
 
 	if($xsd_version != $version)
-	{	# implement backwards compatibility
-		trace "Using $set schema version $xsd_version to read a version $version message.";
+	{	trace "Using $set schema version $xsd_version to read a version $version message.";
 		$ns = "$urnbase:camt.$set.$xsd_version";
 		$xml->setNamespaceDeclURI('', $ns);
 	}
@@ -98,8 +109,26 @@ sub read($%)
 }
 
 
-sub create($$$)
-{	my ($self, $set, $version, $data) = @_;
+sub fromHASH($%)
+{	my ($self, $data, %args) = @_;
+	my $type = $args{type} or panic;
+	my ($set, $version) = $type =~ /^(?:camt\.)?([0-9]+\.[0-9]+)\.([0-9]+)$/
+		or error __x"Unknown message type '{type}'", type => $type;
+
+	Business::CAMT::Message->fromData(
+		set     => $set,
+		version => $version,
+		data    => $data,
+		camt    => $self,
+	);
+}
+
+
+sub create($$%)
+{	my ($self, $type, $data) = @_;
+	my ($set, $version) = $type =~ /^(?:camt\.)?([0-9]+\.[0-9]+)\.([0-9]+)$/
+		or error __x"Unknown message type '{type}'", type => $type;
+
 	Business::CAMT::Message->create(
 		set     => $set,
 		version => $version,
@@ -128,7 +157,11 @@ sub write($$%)
 	my $doc    = XML::LibXML::Document->new('1.0', 'UTF-8');
 	my $xml    = $writer->($doc, $msg);
 	$doc->setDocumentElement($xml);
-	$doc->toFile($fn, 1);
+
+	if(ref $fn eq 'GLOB')
+         { $doc->toFH($fn, 1) }
+	else { $doc->toFile($fn, 1) }
+
 	$xml;
 }
 

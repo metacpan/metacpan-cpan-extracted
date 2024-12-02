@@ -3,7 +3,14 @@
 
 class Net::SSLeay::ASN1_ENUMERATED : pointer {
   
+  # Class Methods
+  native static method new : Net::SSLeay::ASN1_ENUMERATED ();
+  
   # Instance Methods
+  native method get_int64 : long ();
+  
+  native method set_int64 : void ($r : long);
+  
   native method DESTROY : void ();
   
 }

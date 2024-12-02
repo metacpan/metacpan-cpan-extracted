@@ -1,0 +1,210 @@
+#!/usr/bin/env perl
+# This code is part of Perl distribution Business::CAMT.  It is licensed under
+# the same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+
+# Example:  examples/show examples/dutch-sepa/camt.053.001.02.xml /tmp/out.xml
+
+use warnings;
+use strict;
+
+use Business::CAMT  ();
+
+use Log::Report; # mode => 'DEBUG';
+use Getopt::Long    qw(GetOptions);
+use JSON            ();
+use File::Slurper   qw(read_binary);
+
+# Collect the command-line arguments.
+
+sub usage { error "Usage: $0 [options] [\$infile|-] [\$outfile|-]" }
+
+GetOptions
+	'to|t=s'           => \(my $to),
+	'from|f=s'         => \(my $from),
+	'big-numbers|b!'   => \(my $big),
+	'long-tagnames|l!' => \(my $long = 0),
+	'match-scheme|s=s' => \(my $match = 'NEWER'),
+	'type=s'           => \(my $camt_type),       # when input is not CAMT
+	;
+
+@ARGV < 3 or usage;
+
+my ($in, $out) = (@ARGV, '-', '-');
+
+$from ||= $in  =~ /\.([^.]+)$/ ? $1 : $in eq '-' ? 'xml' : undef
+	or error "No file-extension on input.  Please use 'from'.";
+
+$to   ||= $out =~ /\.([^.]+)$/ ? $1 : $out eq '-' ? 'xml' : undef
+	or error "No file-extension on output.  Please use 'out'.";
+
+$from eq 'xml' || $to eq 'xml'
+	or error "Either input or output must be an XML file in any CAMT format.";
+
+my $camt = Business::CAMT->new(
+	big_numbers   => $big,
+	match_schema  => $match,
+	long_tagnames => $long,
+);
+
+my %in_handlers  = (
+	xml  => sub { $camt->read($_[0] eq '-' ? \*STDIN : $_[0]) },
+	json => sub {
+		local $/;
+		$camt_type or error __"JSON input requires explicit CAMT type.";
+		my $data = JSON->new->decode($_[0] eq '-' ? scalar <STDIN> : read_binary $_[0]);
+		$camt->fromHASH($data, type => $camt_type);
+	}
+);
+
+my $read = $in_handlers{$from}
+	or error __x"Unrecognized input format '{format}'.", format => $from;
+
+my $message = $read->($in);
+
+#use Data::Dumper;
+#warn Dumper $message;
+
+my %out_handlers  = (
+	xml  => sub { $_[1]->write($_[0]) },
+	json => sub { $_[0]->print($_[1]->toJSON) },
+	dd   => sub { $_[0]->print($_[1]->toPerl) },
+);
+
+my $write = $out_handlers{$to}
+	or error __x"Unrecognized output format '{format}'.", format => $to;
+
+my $fh;
+if($out eq '-')
+{	open $fh, '>-';
+}
+else
+{	open $fh, '>:raw', $out
+		or fault __x"Cannot write to '{fn}'", fn => $out;
+}
+
+$write->($fh, $message);
+$fh->close;
+
+exit 0;
+
+__END__
+=head1 NAME
+
+camt - translate CAMT files from/to other formats
+
+=head1 SYNOPSIS
+
+  camt $input_filename $output_filename
+
+  # to JSON and dd
+  camt camt-053.001.02-message.xml message.json
+  camt camt-message.xml same.dd  # perl data-dumper
+  camt --to dd camt-message.xml - >same.dd
+  camt - same.dd <camt-message.xml
+  cat camt-message.xml | camt --to dd >same.dd
+
+  # from JSON to XML
+  camt --type 053.001.02 same.json message.xml
+
+=head1 DESCRIPTION
+
+This script helps you to access the data from CAMT (Cash Management)
+messages, standardized by SWIFT and used by banks and other financial
+services.  The messages are standardized within ISO20022, see their
+website at F<https://www.iso20022.org>.
+
+Which conversion is requested is detected from the file-name extensions,
+where C<.xml> means C<CAMT message in xml format>. 
+
+At the moment, only JSON and Perl's Data::Dumper serializers are
+implemented.  A useful CSV and MT940 are planned.  (Please support me
+to implement them)
+
+=head2 Quality
+
+You may attempt to parse the XML of CAMT files with regular expressions,
+you may use xpath expresions to extract the data, but both are going
+around the formal message specification.  This script reaches much
+higher quality, by strict validation and predictable data-structures.
+
+Examples of the JSON output (and input) can be found on the C<examples/>
+directory of this module on Github: F<https://github.com/markov2/perl5-Business-CAMT/>
+
+=head2 Files
+
+Either the input file or the output file must be in CAMT format.  When
+both are in CAMT format, then the output will be a cleaned-up version
+(comments stripped, beautified, validated, etc).
+
+You may use a dash (C<->) as filename, to indicate stdin respectively
+stdout.  In this case, the default type expected is C<.xml> (CAMT),
+which can be overruled with C<--from> and C<--to>.
+
+=head2 Options
+
+=over 4
+
+=item -f --from format
+
+Explicitly state the input format to be expected.  This overrules the detected
+type based on the filename extension.  This setting is especially useful
+when the input is received from STDIN, which defaults to xml (C<CAMT>).
+
+=item -t --to format
+
+Explicitly state the requested output format.  This overrules the detected
+type based on the filename extension.  This setting is especially useful
+when the output is directed to STDOUT, which defaults to xml (C<CAMT>).
+
+=item --type msgtype
+
+When the input is not xml (not a C<CAMT> file), then you need to specify which
+CAMT message this is.  Examples are
+
+  --type camt.053.001.02
+  --type 053.001.02
+
+=item -b --big-numbers --no-big-numbers (default false)
+
+The CAMT uses huge values as maximum.  This can be handled for some output, but
+not for (for instance) JSON.  Such values are also usually not needed, so the
+default is not to expect them.
+
+=item -l --log-tagnames --no-long-tagnames (default false)
+
+The CAMT specification contains clear names for the data fields, but decided to
+trim characters from XML fields.  This is really silly and needless.  When you
+want to understand the message content without documentation, use this setting.
+Works for both reading as writing CAMT files.
+
+=item -s --match-scheme EXACT|NEWER|NEWEST|ANY
+
+Each CAMT message comes in many versions.  It has not yet been possible
+to include the most useful once in this distribution (please contribute),
+so you may want to read and write versions which are not contained.  For
+write, this is not flexible.
+
+For reading, a bit more flexibility is implemented.  When there is an
+C<EXACT> match, that is used.  With C<NEWER> (default), an attempt is
+made with the smallest version higher than exact version.  Hopefully,
+your message is compatible enough. The C<NEWEST> takes the latest version
+released as standard, but never an older version.  Finally C<ANY> is
+the newest, even when it is older.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Business-CAMT distribution for Perl.
+Website: F<http://perl.overmeer.net/CPAN/>,
+Github: F<https://github.com/markov2/perl5-Business-CAMT/>
+
+=head1 LICENSE
+
+Copyrights 2024 by [Mark Overmeer <markov@cpan.org>]. For other
+contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

@@ -16,6 +16,12 @@ use feature 'unicode_strings';
 
 no warnings "experimental::lexical_subs";
 
+my $bitwise_supported;
+BEGIN {
+  $bitwise_supported = eval { use feature 'bitwise'; };
+}
+use if $bitwise_supported, "feature", "bitwise";
+
 package
   # newline so Dist::Zilla::Plugin::PkgVersion won't add $VERSION
         DB {
@@ -27,8 +33,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.007'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-04-26'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-01'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Moose;
 
@@ -46,7 +52,6 @@ use List::Util 1.45 qw(min max first none all any sum0);
 use Data::Structure::Util qw/circular_off/;
 use Regexp::Common qw/RE_balanced/;
 use Term::ReadKey ();
-use Capture::Tiny qw/capture_merged/;
 use overload ();
 
 ############################ Exports #######################################
@@ -418,10 +423,9 @@ sub __win_forceqsh(_) {
   # parameter to a command typed to cmd.com in Windows.
   # However parameter parameter parsing is implemented within each command
   # and there is no universal ruleset.   For example Strawberry perl
-  # appears to split parameters on white space only whereas (as I understand
-  # it) Windows commands, at least built-in ones, split words on any of
+  # appears to split parameters on white space only, whereas (as I understand)
+  # Windows commands, at least built-in ones, split words on any of
   # space tab , ; or = and all those must be protected, see
-  #
   #    https://ss64.com/nt/syntax-esc.html
   #
   # For the moment at least, qsh "quotes" words so they come through when
@@ -647,11 +651,12 @@ sub _get_terminal_width() {  # returns undef if unknowable
       # "stty" directly prints "stdin is not a tty" which we can not trap.
       # Probably this is a bug in Term::Readkey where it should redirect
       # such messages to /dev/null.  So we have to do it here.
-      () = capture_merged {
+      require Capture::Tiny;
+      () = Capture::Tiny::capture_merged(sub{
         delete local $INC{__WARN__};
         delete local $INC{__DIE__};
         ($width, $height) = eval{ Term::ReadKey::GetTerminalSize($fh) };
-      }
+      });
     }
     return $width; # possibly undef (sometimes seems to be zero ?!?)
   }
@@ -757,7 +762,7 @@ sub _Do {
 
   &_RestorePunct;
   $our_result;
-}
+}#_Do
 
 #----------------------------------------------------------------------------
 # methods called from Data::Visitor (and helpers) when transforming the input
@@ -1159,14 +1164,7 @@ sub _show_as_number(_) {
   # Attempt uniary & with "string" and see what happens
   my $uand_str_result = eval {
     use warnings "FATAL" => "all"; # Convert warnings into exceptions
-    # 'bitwise' is the default only in newer perls. So disable.
-    BEGIN {
-      eval { # "no feature 'bitwise'" won't compile on Perl 5.20
-        feature->unimport( 'bitwise' );
-        warnings->unimport("experimental::bitwise");
-      };
-      $@ = "";
-    }
+    no if $bitwise_supported, "feature", "bitwise";
     no warnings "once";
     # Use FF... so we can see what $value was in debug messages below
     my $dummy = ($value & "\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}\x{FF}");
@@ -1323,13 +1321,14 @@ sub __unesc_nonoctal () {  # edits $_
   }
 }
 
-sub __change_quotechars($) {  # edits $_
+sub __change_quotechars($$$) {  # edits $_
   if (s/^"//) {
     oops unless s/"$//;
+    my ($pfx, $l, $r) = @_;
     s/\\"/"/g;
-    my ($l, $r) = split //, $_[0]; oops unless $r;
-    s/([\Q$l$r\E])/\\$1/g;
-    $_ = "qq".$l.$_.$r;
+    s/([\Q$l\E])/\\$1/g if length($l)==1; # assume traditional qqLR
+    s/([\Q$r\E])/\\$1/g if length($r)==1; # with single-character brackets
+    $_ = $pfx.$l.$_.$r;
   }
 }
 
@@ -1420,14 +1419,37 @@ sub _postprocess_DD_result {
   my ($debug, $listform, $foldwidth, $foldwidth1)
     = @$self{qw/Debug _Listform Foldwidth Foldwidth1/};
   my $useqq = $self->Useqq();
-  my $unesc_unicode = $useqq =~ /utf|unic/;
-  my $condense_strings = $useqq =~ /cond/;
-  my $octet_strings = $useqq =~ /octet/;
-  my $nums_in_hex   = $useqq =~ /hex/;
-  my $controlpics   = $useqq =~ /pic/;
-  my $spacedots     = $useqq =~ /space/;
-  my $underscores   = $useqq =~ /under/;
-  my $qq            = $useqq =~ /qq(?:=(..))?/ ? ($1//'{}') : '';
+
+  carp "WARNING: The Useqq specification string ",_dbvis($useqq)," contains a non-ASCII character but 'use utf8;' was not in effect when the literal was compiled; the intended chracter was probably not used.\n"
+    if $useqq =~ /[^\x{0}-\x{7F}]/ && !utf8::is_utf8($useqq);
+
+  my ($unesc_unicode,$condense_strings,$octet_strings,$nums_in_hex,
+      $controlpics,$spacedots,$underscores,$q_pfx,$q_lq,$q_rq);
+  if ($useqq && $useqq ne "1") {
+    my @useqq = split /(?<!\\):/, $useqq;
+    foreach (@useqq) {
+      $unesc_unicode    = 1,next if /utf|unic/;
+      $condense_strings = 1,next if /cond/;
+      $octet_strings    = 1,next if /octet/;
+      $nums_in_hex      = 1,next if /hex/;
+      $controlpics      = 1,next if /pic/;
+      $spacedots        = 1,next if /space/;
+      $underscores      = 1,next if /under/;
+      $_ = "qq={}" if $_ eq "qq"; # deprecated
+      if (/^qq=(.)(.)$/) { # deprecated
+        $q_pfx = "qq"; $q_lq = $1; $q_rq = $2;
+        next
+      }
+      next if $_ eq ""; # null specifier
+      if (/style=((?:[^:,]+|\\.)+),((?:[^:]|\\.)+)/) {
+        $q_pfx = ""; $q_lq = $1; $q_rq = $2;
+        $q_lq =~ s/\\(.)/$1/g; $q_rq =~ s/\\(.)/$1/g;
+        next
+      }
+      oops "Invalid ",_dbvis($_)," in Useqq specifier ",_dbvis($useqq),"\n";
+    }
+  }
+
   my $pad = $self->Pad() // "";
 
   $indent_unit = 2; # make configurable?
@@ -1469,7 +1491,7 @@ sub _postprocess_DD_result {
     __subst_controlpic_backesc      if $controlpics;
     __subst_spacedots        if $spacedots;
     __condense_strings(8)    if $condense_strings;
-    __change_quotechars($qq) if $qq;
+    __change_quotechars($q_pfx, $q_lq, $q_rq) if defined($q_pfx);
     __nums_in_hex            if $nums_in_hex;
     __nums_with_underscores  if $underscores;
 
@@ -2289,7 +2311,7 @@ B<l> - omit parenthesis to return a bare list with "avis" or "hvis"; omit quotes
 B<o> - show object internals (see C<Objects>);
 
 
-B<r> - show abbreviated addresses of refs (see C<Refaddr>).
+B<r> - show abbreviated addresses in refs (see C<Refaddr>).
 
 B<< <NUMBER> >> - limit structure depth to <NUMBER> levels (see C<Maxdepth>).
 
@@ -2377,14 +2399,14 @@ via the AUTOLOAD mechanism).
 * To save memory, only stub declarations with prototypes are generated
 for imported functions.
 Bodies are generated when actually used via the AUTOLOAD mechanism.
-The C<:debug> import tag prints messages chronicling these events.
+The C<:debug> import tag prints messages chronicling this process.
 
 =head1 Showing Abbreviated Addresses
 
 =head2 addrvis I<REF_or_NUMBER>
 
-Returns a string showing an address in both decimal and
-hexadecimal, but abbreviated to only the last few digits.
+Returns a string showing an address or number in both decimal and
+hexadecimal, abbreviated to only the last few digits.
 
 The number of digits starts at 3 and increases over time if necessary
 to keep new results unambiguous.
@@ -2392,7 +2414,7 @@ to keep new results unambiguous.
 For REFs, the result is like I<< "HASHE<lt>457:1c9E<gt>" >>
 or I<< "Package::NameE<lt>457:1c9E<gt>" >>.
 
-If the argument is a plain number, just the abbreviated address
+If the argument is a plain number, just the abbreviated value
 is returned, e.g. I<< "E<lt>457:1c9E<gt>" >>.
 
 I<"undef"> is returned if the argument is undefined.
@@ -2454,7 +2476,9 @@ MaxStringwidth=0 (the default) means no limit.
 
 Defaults to the terminal width at the time of first use.
 
-=head2 Objects(I<BOOL>);
+=head2 Objects(I<FALSE>);
+
+=head2 Objects(I<1>);
 
 =head2 Objects(I<"classname">)
 
@@ -2500,7 +2524,7 @@ value, e.g. "A.20" sorts before "A.100".  See C<Data::Dumper> documentation.
 0 means generate 'single quoted' strings when possible.
 
 1 means generate "double quoted" strings as-is from Data::Dumper.
-Non-ASCII charcters will be shown as hex or octal escapes.
+Non-ASCII charcters will likely appeqar as hex or octal escapes.
 
 Otherwise generate "double quoted" strings enhanced according to option
 keywords given as a :-separated list, e.g. Useqq("unicode:controlpics").
@@ -2542,18 +2566,26 @@ For example
   vec(my $s, 31, 1) = 1;
   say unpack "b*", $s;
   say visnew->Useqq("unicode:condense")->visl(unpack "b*", $s);
-    -->11111111111111111111111111111110
-    -->⸨1×31⸩0
+    -->00000000000000000000000000000001
+    -->⸨0×31⸩1
 
 =item "underscores"
 
 Show numbers with '_' seprating groups of 3 digits.
 
-=item "qq"
+=item "style=OPENQUOTE,CLOSEQUOTE"
+
+Use the given symbols instead of double quotes.  The symbols may
+contain multiple characters. E<92>, or E<92>: may be used to
+escape those characters.
 
 =item "qq=XY"
 
-Show using Perl's qq{...} or qqX...Y syntax, rather than "double quotes".
+(Deprecated) Equivalent to "style=qqX,Y"
+
+=item "qq"
+
+(Deprecated) Equivalent to "style=qq{,}"
 
 =back
 
@@ -2616,7 +2648,7 @@ unquoted.  Useful with bash or csh.
 
 Format e.g. a shell command and arguments, quoting when necessary.
 
-Returns a string with the items separated by spaces.
+Returns a single string with items separated by spaces.
 
 =head1 LIMITATIONS
 
@@ -2666,7 +2698,7 @@ will all show the address of the referenced thing.
 =item The special "_" stat filehandle may not be preserved
 
 Data::Dumper::Interp queries the operating
-system to obtain the window size to initialize C<$Foldwidth>, if it
+system for the window size to initialize C<$Foldwidth>, if it
 is not already defined; this may change the "_" filehandle.
 After the first call (or if you pre-set C<$Foldwidth>),
 the "_" filehandle will not change across calls.

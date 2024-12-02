@@ -10,9 +10,9 @@ use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
 
-$quitdelay = 1000;
+$quitdelay = 9000;
 $quitdelay = 3000 if $mswin;
-$delay = 4000;
+$delay = 9000;
 $delay = 5000 if $mswin;
 
 BEGIN { use_ok('App::Codit::Plugins::FileBrowser') };

@@ -6,11 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4;
+plan tests => 3;
 
 my @module_files = (
     'Task/MemManager.pm',
-    'Task/MemManager/CMalloc.pm',
     'Task/MemManager/PerlAlloc.pm'
 );
 

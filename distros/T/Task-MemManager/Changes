@@ -1,4 +1,7 @@
 Revision history for Task-MemManager
 
+0.02      2024-12-01 20:32:10-07:00 America/Denver
+Separated Memory allocator that used C's malloc into its own package and
+corrected typos
 0.01      2024-08-25 17:41:34-06:00 America/Denver
 First version incorporating allocators based on Perl and C (malloc/calloc)

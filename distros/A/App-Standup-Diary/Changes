@@ -1,0 +1,60 @@
+Revision history for App-Standup-Diary
+
+0.08   2024-12-01 17:56:19+0100
+ - Prepare for the first stable public release
+ - Rename the module to App::Standup::Diary as an advent surprise
+ - Move tests to Test2::V0
+ - Fix documentation typos
+
+0.07_03   2024-11-24 18:39:50+0100
+ - A much better documentation
+ - Rename the executable
+ - Improve the executable
+ - Dependencies cleanup
+
+ 0.07_02
+ - Fix a namespace bug in the diary.pl script
+ - Tidy the Changes file
+ - Add a resources file for getting the repository and other metadata
+
+0.07_01
+ - Add a Changes file with most of the history
+ - Declare a $VERSION
+ - Add the distro meta-files
+ - Add a LICENSE
+ - Add a .gitignore
+
+0.07
+ - Give the project an informative name so that we can release to CPAN
+ - Clearer date generation
+
+0.06
+ - Add an accessor on the template field
+ - Improve dependencies management
+
+0.05
+ - Add an auto-generated README.md file
+
+0.04
+ - Add a template field
+
+0.03
+ - Create Project role
+ - Improve message display in case the today's entry already exist
+ - Upgrade Object::Pad and use the field syntax
+ - Move date attribute in Date role
+ - Use indented heredoc
+ - Fix various typos
+ - Add Documentation
+ - Add tests for Diary::Template
+
+0.02
+ - Modularize Diary::Template
+ - Fix bug with year /mont path that is not used in certain cases
+ - Add minimal diary tests
+ - Add documentation and notes
+
+0.01
+ - Sketchup script
+ - Write the diary file and use Path::Tiny
+ - Add command line options --project-name and --project-dir
