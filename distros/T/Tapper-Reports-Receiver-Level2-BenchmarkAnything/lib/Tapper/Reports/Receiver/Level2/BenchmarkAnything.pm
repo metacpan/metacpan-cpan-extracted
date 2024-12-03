@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 package Tapper::Reports::Receiver::Level2::BenchmarkAnything;
-# git description: v5.0.2-1-g556a698
+# git description: v5.0.3-6-g7c02e97
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Tapper - Level2 receiver plugin to forward BenchmarkAnything data
-$Tapper::Reports::Receiver::Level2::BenchmarkAnything::VERSION = '5.0.3';
+$Tapper::Reports::Receiver::Level2::BenchmarkAnything::VERSION = '5.0.4';
 use Try::Tiny;
 use Data::Dumper;
 use Data::DPath 'dpath';
@@ -87,7 +87,7 @@ sub submit {
               {
                 push @test_metrics, { NAME  => "tap.summary.section.${section_metric_name}.${entry}",
                                       VALUE => $section->{tap}{summary}{$entry},
-                                    };
+                                    } if 0;
               }
             # success ratio
             my $section_total  = $section->{tap}{summary}{total};
@@ -95,7 +95,7 @@ sub submit {
             my $section_ratio  = sprintf("%.2f", 100 * ($section_total == 0 ? 0 : $section_passed / $section_total));
             push @test_metrics, { NAME  => "tap.summary.section.${section_metric_name}.success_ratio",
                                   VALUE => $section_ratio,
-                                };
+                                } if 0;
 
             # --- summarize all sections ---
             # - bool metrics
@@ -119,7 +119,7 @@ sub submit {
     foreach my $entry (@boolean_aggregation_metrics, @counter_aggregation_metrics) {
       push @test_metrics, { NAME  => "tap.summary.suite.${suite_name}.${entry}",
                             VALUE => $test_metrics_aggregated{$entry},
-                          };
+                          } if 0;
       push @test_metrics, { NAME  => "tap.summary.all.${entry}", # same as general metric but with suitename as additional key
                             VALUE => $test_metrics_aggregated{$entry},
                             tapper_suite_name => $suite_name,
@@ -127,12 +127,12 @@ sub submit {
     }
 
     # success ratios
-    my $agg_total  = $test_metrics_aggregated{total};
+    my $agg_total  = $test_metrics_aggregated{total} || 0;
     my $agg_passed = $test_metrics_aggregated{passed};
     my $agg_ratio  = sprintf("%.2f", 100 * ($agg_total == 0 ? 0 : $agg_passed / $agg_total));
     push @test_metrics, { NAME  => "tap.summary.suite.${suite_name}.success_ratio",
                           VALUE => $agg_ratio,
-                        };
+                        } if 0;
     push @test_metrics, { NAME  => "tap.summary.all.success_ratio", # same as general metric but with suitename as additional key
                           VALUE => $agg_ratio,
                           tapper_suite_name => $suite_name,
@@ -149,7 +149,7 @@ sub submit {
     }
 
     my @benchmark_entries = dpath($benchmark_entries_path)->match($tap_dom);
-    @benchmark_entries = @{$benchmark_entries[0]} while $benchmark_entries[0] && reftype $benchmark_entries[0] eq "ARRAY"; # deref all array envelops
+    @benchmark_entries = @{$benchmark_entries[0]} if $benchmark_entries[0] && reftype $benchmark_entries[0] eq "ARRAY"; # deref all array envelops
 
     my @metainfo_entries = ();
     if ($additional_metainfo_path)
@@ -181,6 +181,7 @@ sub submit {
 
         # additional context info
         $entry->{tapper_report} ||= $report->id;
+        $entry->{tapper_report_created} ||= $report->created_at->strftime('%F %T');
         $entry->{tapper_testrun} ||= $report->reportgrouptestrun->testrun_id if $report->reportgrouptestrun && $report->reportgrouptestrun->testrun_id;
         $entry->{tapper_reportgroup_arbitrary} ||= $report->reportgrouparbitrary->arbitrary_id if $report->reportgrouparbitrary && $report->reportgrouparbitrary->arbitrary_id;
 
@@ -260,15 +261,21 @@ sub submit {
           }
       }
 
-    # process the queue; cleanup processed queue entries; disconnect.
+    # Remember: the queue needs to be processed separately in *one*
+    # place!
     #
-    # This might take a while but we are a forked child process anyway
-    # and if we would fail the BenchmarkAnything 'processqueue'
-    # mechnanism is robust and the next child will continue. By
-    # doubling the batch size we process more than we submitted which
-    # should help cleaning up a big pile of data in case of crashes.
-    $balib->process_raw_result_queue(2 * $benchmark_counter);
-    $balib->gc;
+    # For example by letting the
+    #   benchmarkanything-storage-frontend-http
+    # daemon run which contains a processing loop.
+    # Or by activating this code here in the Tapper config.
+    #
+    # But only do *ONE* of these options!
+    #
+    if (Tapper::Config->subconfig->{receiver}{level2}{BenchmarkAnything}{process_benchmarkanything_queue}) {
+        $balib->process_raw_result_queue(2 * $benchmark_counter);
+        $balib->gc;
+    }
+
     $balib->disconnect;
   }
 
@@ -334,9 +341,9 @@ your C<tapper.cfg>:
    level2:
      BenchmarkAnything:
        # actual benchmark entries
-       benchmark_entries_path: //data/BenchmarkAnythingData
+       benchmark_entries_path: //data/BenchmarkAnythingData/*
        # optional meta info to merge into each chunk of benchmark entries
-       additional_metainfo_path: //data/PlatformDescription
+       additional_metainfo_path: //data/PlatformDescription/*
        # whether that metainfo should also stored into the benchmark store
        store_metainfo_as_benchmarks: 0
        # whether test/TAP summary metrics should also stored into the benchmark store
@@ -350,7 +357,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Steffen Schwigon.
+This software is copyright (c) 2024 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

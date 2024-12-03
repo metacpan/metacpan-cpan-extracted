@@ -4,7 +4,7 @@
       "Stefan Limbacher <stelim@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -23,7 +23,7 @@
       "runtime" : {
          "requires" : {
             "File::Share" : "0",
-            "Map::Tube" : "3.50",
+            "Map::Tube" : "3.62",
             "Moo" : "2.000000",
             "namespace::clean" : "0",
             "perl" : "5.010"
@@ -33,7 +33,7 @@
    "provides" : {
       "Map::Tube::Nuremberg" : {
          "file" : "lib/Map/Tube/Nuremberg.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -48,8 +48,9 @@
          "web" : "http://github.com/stelim/Map-Tube-Nuremberg"
       }
    },
-   "version" : "0.06",
-   "x_generated_by_perl" : "v5.22.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "version" : "0.08",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

@@ -1,67 +1,61 @@
-# ♻️ Random::Simple
+# NAME
 
-Perl module to generate good random numbers in a user consumable way.
+Random::Simple - Generate good random numbers in a user consumable way.
 
-## ❓ Why Random::Simple?
+# SYNOPSIS
 
-To make generating random numbers as easy as possible _and_ in a manner that
-you can use in real code. Generate "good" random numbers without having to
-think about it.
+    use Random::Simple;
 
-## 📦 Installation
+    my $coin_flip      = random_int(1, 2);
+    my $die_roll       = random_int(1, 6);
+    my $random_percent = random_float() * 100;
+    my $buffer         = random_bytes(8);
 
-```bash
-cpanm Random::Simple
-```
+    my @arr        = ('red', 'green', 'blue');
+    my $rand_item  = $arr[random_int(0, @arr - 1)]; # Random array item
 
-## 🗃️ Functions
-
-#### random_int($min, $max)
-returns a non-biased integer between `$min` and `$max` (inclusive). Range must be no larger than 2**32 - 2.
-
-#### random_float()
-returns a random floating point value between 0 and 1 (inclusive).
-
-#### random_bytes($number)
-returns a string of random bytes with length of `$number`.
-
-## 💻 Usage
-
-```perl
-use Random::Simple;
-
-my $coin_flip      = random_int(1, 2);
-my $die_roll       = random_int(1, 6);
-my $random_percent = random_float() * 100;
-my $buffer         = random_bytes(8);
-
-my @arr        = ('red', 'green', 'blue');
-my $rand_item  = $arr[random_int(0, @arr - 1)]; # Random array item
-```
-
-## 🧠 Methodology
+# DESCRIPTION
 
 Perl's internal `rand()` function uses `drand48` which is an older
-pseudorandom number generator, and may have limitations. `Random::Simple` uses
-[PCG](https://www.pcg-random.org/download.html) which is: modern, simple,
-well vetted, and fast. Using `Random::Simple` will upgrade/override the
-`rand()` function to use a better PRNG.
+pseudorandom number generator and may have limitations. `Random::Simple` uses
+PCG which is: modern, simple, well vetted, and fast. Using `Random::Simple`
+will automatically upgrade/override the core `rand()` function to use a
+better PRNG.
 
 `Random::Simple` is automatically seeded with entropy directly
 from your OS. On Linux this is `/dev/urandom` and on Windows it uses
 CryptGenRandom. You will get statistically unique random numbers
 automatically.
 
-## 🔍 See also
+# METHODS
 
-If you need finer grained control of your random numbers check out one
-of these alternatives:
+- **random\_int($min, $max)**
 
-* [Math::Random::PCG32](https://metacpan.org/pod/Math::Random::PCG32)
-* [Math::Random::ISAAC](https://metacpan.org/pod/Math::Random::ISAAC)
-* [Math::Random::MT](https://metacpan.org/pod/Math::Random::MT)
-* [Math::Random::Secure](https://metacpan.org/pod/Math::Random::Secure)
+    returns a non-biased integer between `$min` and `$max` (inclusive). Range must be no larger than 2\*\*32 - 2.
 
-## 👴 Author
+- **random\_float()**
 
-Scott Baker - https://www.perturb.org/
+    returns a random floating point value between 0 and 1 (inclusive).
+
+- **random\_bytes($number)**
+
+    returns a string of random bytes with length of `$number`.
+
+- **rand()**
+
+    emulates `CORE::rand()` using a better PRNG.
+
+# BUGS
+
+Submit issues on Github: [https://github.com/scottchiefbaker/perl-Date-Parse-Modern/issues](https://github.com/scottchiefbaker/perl-Date-Parse-Modern/issues)
+
+# SEE ALSO
+
+- [Math::Random::PCG32](https://metacpan.org/pod/Math%3A%3ARandom%3A%3APCG32)
+- [Math::Random::ISAAC](https://metacpan.org/pod/Math%3A%3ARandom%3A%3AISAAC)
+- [Math::Random::MT](https://metacpan.org/pod/Math%3A%3ARandom%3A%3AMT)
+- [Math::Random::Secure](https://metacpan.org/pod/Math%3A%3ARandom%3A%3ASecure)
+
+# AUTHOR
+
+Scott Baker - [https://www.perturb.org/](https://www.perturb.org/)

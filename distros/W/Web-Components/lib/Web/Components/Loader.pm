@@ -107,6 +107,17 @@ has '_action_suffix' =>
    isa     => NonEmptySimpleStr,
    default => sub { deref $_[0]->config, 'action_suffix', '_action' };
 
+has '_config_attr' =>
+   is      => 'lazy',
+   isa     => NonEmptySimpleStr,
+   default => sub {
+      my $self = shift;
+
+      # Deprecate use of loader_attr
+      return $self->config->can('component_loader')
+           ? 'component_loader' : 'loader_attr';
+   };
+
 has '_factory' =>
    is      => 'lazy',
    isa     => RequestFactory,
@@ -136,7 +147,7 @@ bubble up
 
 The expected controller return value signature is;
 
-   [ 'model_moniker', 'method_name', @web_simple_request_parameters ]
+   [ 'model_moniker/method_name', @web_simple_request_parameters ]
 
 The L<Web::Simple> request parameters are used to instantiate an instance of
 L<Web::ComposableRequest::Base>
@@ -262,7 +273,8 @@ sub _redirect {
    my $location = $redirect->{location};
 
    if (my $message = $redirect->{message}) {
-      my $attr = deref $self->config, 'loader_attr', {should_log_messages => 1};
+      my $default = {should_log_messages => 1};
+      my $attr    = deref $self->config, $self->_config_attr, $default;
 
       if ($attr->{should_log_messages} && $req->can('loc_default')) {
          my $level = $redirect->{level} ? $redirect->{level} : 'info';
@@ -311,7 +323,8 @@ sub _render_exception {
    $e = exception $e, { level => 2, rv => HTTP_INTERNAL_SERVER_ERROR }
       unless $e && blessed $e && $e->can('rv') && $e->rv > HTTP_BAD_REQUEST;
 
-   my $attr = deref $self->config, 'loader_attr', { should_log_errors => 1 };
+   my $default = { should_log_errors => 1 };
+   my $attr    = deref $self->config, $self->_config_attr, $default;
 
    if ($attr->{should_log_errors}) {
       my $msg = "${e}"; chomp $msg;

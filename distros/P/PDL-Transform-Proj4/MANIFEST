@@ -1,0 +1,11 @@
+Changes
+Demo.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+proj4.pd
+t/gis_proj.t
+t/proj_transform.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/Transform/Proj4.pm         mod=PDL::Transform::Proj4 pd=proj4.pd (added by pdlpp_mkgen)

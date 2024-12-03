@@ -1,6 +1,6 @@
 package Random::Simple;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 our $debug   = 0;
 
 use strict;
@@ -27,7 +27,7 @@ sub warmup {
 	my $iter = $_[0];
 
 	for (my $i = 0; $i < $iter; $i++) {
-		_rand64();
+		Random::Simple::_rand64(); # C API
 	}
 }
 
@@ -39,7 +39,7 @@ sub seed {
 		print "SEEDING MANUALLY\n";
 	}
 
-	_seed($seed1, $seed2);
+	Random::Simple::_seed($seed1, $seed2); # C API
 
 	$has_been_seeded = 1;
 }
@@ -102,15 +102,6 @@ sub seed_with_os_random {
 		die("Did not get enough entropy bytes from OS\n");
 	}
 
-	if ($debug) {
-		print "Seed parts: ";
-		foreach my $x (@parts) {
-			my $str = bin2hex($x);
-			print "0x$str ";
-		}
-		print "\n";
-	}
-
 	# Build the first 64bit seed manually
 	# Cannot use Q because it doesn't exist on 32bit Perls
 	$high  = unpack("L", $parts[0]);
@@ -123,11 +114,11 @@ sub seed_with_os_random {
 	$seed2 = ($high << 32) | $low;
 
 	if ($debug) {
-		print "SEEDING RANDOMLY: $seed1 / $seed2\n";
+		print "RANDOM SEEDS: $seed1 / $seed2\n\n";
 	}
 
 	# Seed the PRNG with the values we just created
-	_seed($seed1, $seed2);
+	Random::Simple::_seed($seed1, $seed2); # C API
 
 	$has_been_seeded = 1;
 
@@ -143,7 +134,7 @@ sub random_bytes {
 
 	my $ret = "";
 	for (my $i = 0; $i < $octets_needed; $i++) {
-		my $num = _rand32();
+		my $num = Random::Simple::_rand32(); # C API
 
 		# Convert the integer into a 4 byte string
 		$ret .= pack("L", $num);
@@ -171,8 +162,8 @@ sub random_int {
 sub random_float {
 	if (!$has_been_seeded) { seed_with_os_random(); }
 
-	my $max = 2**31 - 1;
-	my $num = random_int(0, $max);
+	my $max = 2**32 - 1;
+	my $num = Random::Simple::_rand32(); # C API
 	my $ret = $num / $max;
 
 	#print "$num / $max = $ret\n";
@@ -184,9 +175,16 @@ sub random_float {
 # This prototype is required so we can emulate CORE::rand(@array)
 sub rand(;$) {
 	my $mult = shift() || 1;
-	my $num  = random_float() * $mult;
 
-	return $num;
+	if (!$has_been_seeded) { seed_with_os_random(); }
+
+	my $max  = 2**32 - 2; # minus 2 so we're NOT inclusive
+	my $rand = Random::Simple::_rand32(); # C API
+	my $ret  = $rand / $max;
+
+	$ret = $ret * $mult;
+
+	return $ret;
 }
 
 #############################################################
@@ -197,27 +195,7 @@ sub rand(;$) {
 
 Random::Simple - Generate good random numbers in a user consumable way.
 
-=head2 Why Random::Simple?
-
-To make generating random numbers as easy as possible I<and> in a manner that
-you can use in real code. Generate "good" random numbers without having to
-think about it.
-
-=head2 Functions
-
-=head4 random_int($min, $max)
-
-returns a non-biased integer between C<$min> and C<$max> (inclusive). Range must be no larger than 2**32 - 2.
-
-=head4 random_float()
-
-returns a random floating point value between 0 and 1 (inclusive).
-
-=head4 random_bytes($number)
-
-returns a string of random bytes with length of C<$number>.
-
-=head2 Usage
+=head1 SYNOPSIS
 
     use Random::Simple;
 
@@ -229,43 +207,66 @@ returns a string of random bytes with length of C<$number>.
     my @arr        = ('red', 'green', 'blue');
     my $rand_item  = $arr[random_int(0, @arr - 1)]; # Random array item
 
-=head2 Methodology
+=head1 DESCRIPTION
 
 Perl's internal C<rand()> function uses C<drand48> which is an older
 pseudorandom number generator and may have limitations. C<Random::Simple> uses
 PCG which is: modern, simple, well vetted, and fast. Using C<Random::Simple>
-will upgrade/override the C<rand()> function to use a better PRNG.
+will automatically upgrade/override the core C<rand()> function to use a
+better PRNG.
 
 C<Random::Simple> is automatically seeded with entropy directly
 from your OS. On Linux this is C</dev/urandom> and on Windows it uses
 CryptGenRandom. You will get statistically unique random numbers
 automatically.
 
-=head2 See also
+=head1 METHODS
+
+=over 4
+
+=item B<random_int($min, $max)>
+
+returns a non-biased integer between C<$min> and C<$max> (inclusive). Range must be no larger than 2**32 - 2.
+
+=item B<random_float()>
+
+returns a random floating point value between 0 and 1 (inclusive).
+
+=item B<random_bytes($number)>
+
+returns a string of random bytes with length of C<$number>.
+
+=item B<rand()>
+
+emulates C<CORE::rand()> using a better PRNG.
+
+=back
+
+=head1 BUGS
+
+Submit issues on Github: L<https://github.com/scottchiefbaker/perl-Date-Parse-Modern/issues>
+
+=head1 SEE ALSO
 
 =over
 
 =item *
-Math::Random::PCG32
+L<Math::Random::PCG32>
 
 =item *
-Math::Random::ISAAC
+L<Math::Random::ISAAC>
 
 =item *
-Math::Random::MT
+L<Math::Random::MT>
 
 =item *
-Math::Random::Secure
+L<Math::Random::Secure>
 
 =back
 
-=head2 More information
+=head1 AUTHOR
 
-https://github.com/scottchiefbaker/perl-Random-Simple
-
-=head2 Author
-
-Scott Baker - https://www.perturb.org/
+Scott Baker - L<https://www.perturb.org/>
 
 =cut
 

@@ -1,8 +1,12 @@
+.gitlab-ci.yml
 .perlcriticrc
 .perltidyrc
+CHANGELOG.md
 lib/App/Changelog.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
+README.md
 script/changelog
 t/01_load.t
 t/02_functionality.t

@@ -18,8 +18,6 @@ $::tests = "
 
 2code Riel => khr
 
-2code 'Zimbabwe Dollar' => zwl
-
 2name KHR => Riel
 
 code2code BZD alpha num => 084
@@ -51,8 +49,6 @@ code2code BZD alpha num => 084
 2name rub => 'Russian Ruble'
 
 2name zmw => 'Zambian Kwacha'
-
-2name zwl => 'Zimbabwe Dollar'
 
 all_codes 2 => AED AFN
 

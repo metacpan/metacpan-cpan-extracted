@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -28,6 +28,7 @@ my @files = (
     'lib/Tapper/Cmd/Testplan.pm',
     'lib/Tapper/Cmd/Testrun.pm',
     'lib/Tapper/Cmd/User.pm',
+    't/00-compile.t',
     't/00-load.t',
     't/author-eol.t',
     't/author-no-tabs.t',

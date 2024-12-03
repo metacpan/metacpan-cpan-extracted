@@ -1,7 +1,7 @@
 package Tapper::Cmd::Init;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Backend functions for initially setting up Tapper
-$Tapper::Cmd::Init::VERSION = '5.0.12';
+$Tapper::Cmd::Init::VERSION = '5.0.14';
 use 5.010;
 use strict;
 use warnings;
@@ -249,7 +249,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc.
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

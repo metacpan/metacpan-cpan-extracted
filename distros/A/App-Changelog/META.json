@@ -31,7 +31,9 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Test::MockObject" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -40,6 +42,6 @@
          "url" : "https://gitlab.com/olooeez/app-changelog"
       }
    },
-   "version" : "v1.0.1",
+   "version" : "v1.0.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

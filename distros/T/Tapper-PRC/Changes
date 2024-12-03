@@ -1,5 +1,11 @@
 Revision history for Tapper-PRC
 
+5.0.5     2024-12-02
+        - Implement abstract resources [tu-maurice]
+        - Implement support for attachment upload to OStore [tu-maurice]
+        - TAP headers use '# Test-*' now
+        - Provide testplan-id if available
+
 5.0.4     2019-11-04
         - adapt hot-patched KILL-avoidance code to latest
           reworked signal handling in Minion::Job

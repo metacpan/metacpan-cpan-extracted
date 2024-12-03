@@ -21,6 +21,7 @@ no_index:
 requires:
   perl: '5.012'
 resources:
+  bugtracker: https://github.com/scottchiefbaker/perl-Random-Simple/issues
   repository: https://github.com/scottchiefbaker/perl-Random-Simple.git
-version: '0.12'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

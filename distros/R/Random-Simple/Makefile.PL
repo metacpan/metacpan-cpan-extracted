@@ -27,7 +27,10 @@ WriteMakefile(
 				url => 'https://github.com/scottchiefbaker/perl-Random-Simple.git',
 				web => 'https://github.com/scottchiefbaker/perl-Random-Simple',
 				type => 'git'
-			}
+			},
+			bugtracker => {
+				"web" => "https://github.com/scottchiefbaker/perl-Random-Simple/issues"
+			},
 		}
 	},
 );

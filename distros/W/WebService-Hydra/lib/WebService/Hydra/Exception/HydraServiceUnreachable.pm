@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Object::Pad;
 
-our $VERSION = '0.003'; ## VERSION
+our $VERSION = '0.004'; ## VERSION
 
 class WebService::Hydra::Exception::HydraServiceUnreachable :isa(WebService::Hydra::Exception) {
 

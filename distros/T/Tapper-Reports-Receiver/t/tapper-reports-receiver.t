@@ -195,6 +195,7 @@ else
         if (my ($report_id) = $answer =~ $RECEIVED_RE){
                 my $report = model('TestrunDB')->resultset('Report')->find($report_id);
                 is(ref($report), 'Tapper::Schema::TestrunDB::Result::Report', 'Find report in db');
+                is($report->tap->processed, 1, 'Report TAP got processed');
                 if (defined $report->reportgrouptestrun) {
                         TODO: { local $TODO = 'fix it - this used to work in Tapper v4';
                         is($report->reportgrouptestrun->owner, 'sschwigo', 'Owner set from db');

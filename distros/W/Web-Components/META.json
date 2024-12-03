@@ -74,35 +74,35 @@
    "provides" : {
       "Web::Components" : {
          "file" : "lib/Web/Components.pm",
-         "version" : "v0.12.5"
+         "version" : "v0.12.6"
+      },
+      "Web::Components::ConfigLoader" : {
+         "file" : "lib/Web/Components/ConfigLoader.pm",
+         "version" : "v0.12.6"
       },
       "Web::Components::Loader" : {
          "file" : "lib/Web/Components/Loader.pm",
-         "version" : "v0.12.5"
+         "version" : "v0.12.6"
       },
       "Web::Components::Model" : {
          "file" : "lib/Web/Components/Model.pm",
-         "version" : "v0.12.5"
+         "version" : "v0.12.6"
       },
       "Web::Components::Navigation" : {
          "file" : "lib/Web/Components/Navigation.pm",
-         "version" : "v0.12.5"
+         "version" : "v0.12.6"
       },
       "Web::Components::ReverseMap" : {
          "file" : "lib/Web/Components/ReverseMap.pm",
-         "version" : "v0.12.5"
+         "version" : "v0.12.6"
       },
       "Web::Components::Role" : {
          "file" : "lib/Web/Components/Role.pm",
-         "version" : "v0.12.5"
-      },
-      "Web::Components::Role::ConfigLoader" : {
-         "file" : "lib/Web/Components/Role/ConfigLoader.pm",
-         "version" : "v0.12.5"
+         "version" : "v0.12.6"
       },
       "Web::Components::Util" : {
          "file" : "lib/Web/Components/Util.pm",
-         "version" : "v0.12.5"
+         "version" : "v0.12.6"
       }
    },
    "release_status" : "stable",
@@ -121,7 +121,7 @@
          "web" : "http://github.com/pjfl/p5-web-components"
       }
    },
-   "version" : "0.12.5",
+   "version" : "0.12.6",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

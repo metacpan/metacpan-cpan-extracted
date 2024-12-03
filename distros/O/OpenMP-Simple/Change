@@ -53,3 +53,10 @@
 0.1.4  12/01/2024 04:25:00 AM MST
       - added newline before ppport.h, some errors were indicating that this
         was causing issues with the preceding line, #include <omp.h>
+
+0.1.5  12/02/2024 04:25:00 AM MST
+      - added File::ShareDir as a pre-req in dist.ini, non-functional
+        change for smokers only
+
+0.1.6  12/02/2024 05:25:00 AM MST
+      - added SKIP for double, quad precision perls in test 11

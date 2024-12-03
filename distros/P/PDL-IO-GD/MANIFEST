@@ -1,0 +1,11 @@
+Changes
+GD.pd
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/gd_oo_tests.t
+t/gd_tests.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/IO/GD.pm                   mod=PDL::IO::GD pd=GD.pd (added by pdlpp_mkgen)

@@ -20,7 +20,7 @@ our @EXPORT = qw(
                   print_report_from_file
                 );
 
-our $VERSION = '1.11';
+our $VERSION = '1.14';
 our $DEBUG;
 
 ##############################################################################
@@ -40,6 +40,7 @@ options:
                                -p DB/SELECT/USERS_TABLE
                                -p NETWORK
                                -p DISK/IO
+    -r             -- shows dispersion, requires -p!
     -l level       -- limit display metric-level
     -d             -- increase DEBUG level (can be used multiple times)
     --             -- end of options
@@ -59,6 +60,7 @@ my %SORT_OPTS = (
 my $opt_sort  = 'D';
 my $opt_level;
 my $opt_metric_path;
+my $opt_dispersion;
 
 sub rtm_report_main
 {
@@ -90,6 +92,12 @@ sub rtm_report_main
       print STDERR "status: option: metric path set to [$opt_metric_path]\n";
       next;
       }
+    if( /^-r/ )
+      {
+      $opt_dispersion++;
+      print STDERR "status: option: dispersion graph requested\n";
+      next;
+      }
     if( /^-l/ )
       {
       $opt_level = shift;
@@ -100,7 +108,7 @@ sub rtm_report_main
     if( /^-d/ )
       {
       $DEBUG++;
-      print STDERR "status: option: debug level raised, now is [$DEBUG] \n";
+      print STDERR "status: option: debug level raised, now is [$DEBUG]\n";
       next;
       }
     if( /^(--?h(elp)?|help)$/io )
@@ -114,6 +122,8 @@ sub rtm_report_main
       }  
     push @args, $_;
     }
+
+  die "error: dispersion graph requested but no metric-path was given, use -p\n" if $opt_dispersion and ! $opt_metric_path;
 
   print_report_from_file( shift @args );
 }
@@ -147,14 +157,20 @@ sub print_report_from_file
     }
 
   my @metric_path = split /\//, $opt_metric_path;
-  my $zzz = @metric_path;
-  print "-------------$zzz------$opt_metric_path---->>>>>> [@metric_path]\n";
-  
-  my @table;
-  push @table, [ 'METRIC KEY PATH', 'COUNT', 'TIME', 'MED', 'MED/sec', 'AVG', 'AVG/sec', 'MIN', 'MAX' ];
+
   __precalc_level( $DATA );
-  __format_level( $DATA, $opt_sort, \@table, (@metric_path > 0 ? \@metric_path : undef) );
-  
+
+  my @table;
+  if( $opt_dispersion )
+    {
+    push @table, [ 'DTIME', 'COUNT', 'OPS/sec', 'PERCENT', 'FREQUENCY' ];
+    __format_dispersion( $DATA, \@table, \@metric_path );
+    }
+  else
+    {  
+    push @table, [ 'METRIC KEY PATH', 'COUNT', 'TIME', 'MED', 'MED/sec', 'AVG', 'AVG/sec', 'MIN', 'MAX' ];
+    __format_level( $DATA, $opt_sort, \@table, (@metric_path > 0 ? \@metric_path : undef) );
+    }
   print format_ascii_table( \@table );
 }
 
@@ -208,6 +224,48 @@ sub __format_level
     next if $path and $path->[ $level ] and $path->[ $level ] ne $e;
     push @$table, [ ( ' ' x ( $level * 4 ) ) . $e, $data->{ $e }{ '@' }{ 'C' }, map { sprintf "%.6f", $data->{ $e }{ '@' }{ $_ } } qw[ D MD MS AD AS DI DX ] ];
     __format_level( $data->{ $e }, $sort, $table, $path, $level + 1 );
+    }
+}
+
+sub __format_dispersion
+{
+  my $data  = shift;
+  my $table = shift;
+  my $path  = shift;
+
+  my @p = @$path;
+  my $d = $data;
+  while( @p )
+    {
+    my $p = shift @p;
+    $d = $d->{ $p };
+    die "error: [$p] part of metric-path [@$path] does not exist\n" unless $d;
+    }
+
+  $d = $d->{ '@' };
+
+  my $slots = 21;
+  
+  my $di = $d->{ 'DI' };
+  my $dx = $d->{ 'DX' };
+  
+  my $p = ( $dx - $di ) / $slots;
+  
+  my $c;
+  my $x;
+  my %s;
+  for( @{ $d->{ '@D' } } )
+    {
+    my $k = int( ( $_ - $di ) / $p )*$p + $di;
+    my $v = ++$s{ sprintf( "%.6f", $k ) };
+    $x = $v if $v > $x;
+    $c++;
+    }
+
+  for my $k ( sort { $a <=> $b } keys %s )
+    {
+    my $v = $s{ $k };
+    push @$table, [ $k, $v, sprintf( "%.6f", 1/$k ), sprintf( "%.1f", 100 * $v / $c ), "*" x int( 42 * $v / $x ) ];
     }
 }
 

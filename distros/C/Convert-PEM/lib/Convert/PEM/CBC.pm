@@ -1,7 +1,7 @@
 package Convert::PEM::CBC;
 use strict;
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.13'; # VERSION
 use Carp qw( croak );
 use Digest::MD5 qw( md5 );
 use base qw( Class::ErrorHandler );

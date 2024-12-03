@@ -70,9 +70,9 @@ if ($pid==0) {
         waitpid($pid,0);
 
         is($content, '1..2
-# Tapper-suite-name: ripley
-# Tapper-machine-name: testhost
-# Tapper-reportgroup-testrun: 735710
+# Test-suite-name: ripley
+# Test-machine-name: testhost
+# Test-reportgroup-testrun: 735710
 expected text
 ok - No file appendix. May be the first iteration
 ', 'Upload TAP on behalf of testsuite (option capture => "tap")');
@@ -105,9 +105,9 @@ if ($pid==0) {
         waitpid($pid,0);
 
         is($content, '1..2
-# Tapper-suite-name: ripley
-# Tapper-machine-name: testhost
-# Tapper-reportgroup-testrun: 735710
+# Test-suite-name: ripley
+# Test-machine-name: testhost
+# Test-reportgroup-testrun: 735710
 expected text
 ok - If we find this, capturing works with outfile name appendices
 ', 'Upload TAP on behalf of testsuite (option capture => "tap")');

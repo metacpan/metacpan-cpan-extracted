@@ -1,4 +1,11 @@
 Revision history for Perl module Time::RTM
 
+1.14 2024-12-03 CADE
+  - rt bug typo in Time::RTM::Scope
+
+1.12 2024-12-02 CADE
+  - added dispersion graphs to Time::RTM::Report
+  - added split() and split_str() to Time::RTM::Scope
+
 1.11 2024-12-01 CADE
   - initial release

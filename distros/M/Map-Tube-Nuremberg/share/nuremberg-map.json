@@ -36,7 +36,7 @@
             {
                 "id": "0232",
                 "line": "U3:3",
-                "name": "Friedr.-Ebert-Platz",
+                "name": "Friedrich-Ebert-Platz",
                 "link": "0258,0250"
             },
             {
@@ -61,7 +61,13 @@
                 "id": "0654",
                 "line": "U3:13",
                 "name": "Gustav-Adolf-Straße",
-                "link": "1120"
+                "link": "1120,1180"
+            },
+            {
+                "id": "1180",
+                "line": "U3:14",
+                "name": "Großreuth bei Schweinau",
+                "link": "0654"
             },
             {
                 "id": "1391",
@@ -103,7 +109,7 @@
                 "id": "0332",
                 "line": "U2:7,U3:6",
                 "name": "Rathenauplatz",
-                "link": "0340,0333"
+                "link": "0340,0333,0331"
             },
             {
                 "id": "0333",

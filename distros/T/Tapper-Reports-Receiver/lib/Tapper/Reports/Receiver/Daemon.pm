@@ -1,6 +1,6 @@
 package Tapper::Reports::Receiver::Daemon;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Receiver::Daemon::VERSION = '5.0.1';
+$Tapper::Reports::Receiver::Daemon::VERSION = '5.0.2';
 use 5.010;
 
 use strict;
@@ -61,7 +61,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

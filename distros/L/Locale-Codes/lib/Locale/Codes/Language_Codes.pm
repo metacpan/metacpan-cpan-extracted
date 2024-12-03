@@ -3,7 +3,7 @@ Locale::Codes::Language_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Wed Aug 28 15:10:30 EDT 2024
+#    Generated on: Mon Dec  2 10:25:19 EST 2024
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.80';
+$VERSION='3.81';
 
 $Locale::Codes::Data{'language'}{'id'} = '8032';
 
@@ -367,8 +367,8 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       q(Slave (Athapascan)),
       ],
    q(0109) => [
-      q(Dogrib),
       q(Tlicho),
+      q(Dogrib),
       q(Tllcho),
       ],
    q(0110) => [
@@ -31550,7 +31550,7 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(dogrib) => [
       q(0109),
-      q(0),
+      q(1),
       ],
    q(dogul dom dogon) => [
       q(1955),
@@ -54146,7 +54146,7 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(tlicho) => [
       q(0109),
-      q(1),
+      q(0),
       ],
    q(tlingit) => [
       q(0434),
@@ -65472,7 +65472,7 @@ $Locale::Codes::Data{'language'}{'code2id'} = {
          ],
       q(dgr) => [
          q(0109),
-         q(1),
+         q(0),
          ],
       q(dgs) => [
          q(2010),

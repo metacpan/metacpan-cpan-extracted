@@ -3000,6 +3000,7 @@ country:
   genc-alpha-2: 
     code: 
       A2: Guantanamo Bay Naval Base
+      AA: Abu Musa And Tunb Islands
       AD: Andorra
       AE: United Arab Emirates
       AF: Afghanistan
@@ -3190,10 +3191,18 @@ country:
       PY: Paraguay
       QA: Qatar
       QM: Midway Islands
+      QN: Abyei
+      QO: Aksai Chin And Other Areas
+      QP: Brazilian Island
+      QQ: Conejo Island
+      QR: Congo River Islands
       QS: Bassas Da India
+      QT: Corisco Bay Islands
       QU: Juan de Nova Island
+      QV: Doumeira Islands
       QW: Wake Island
       QX: Glorioso Islands
+      QY: Dramana And Shakhatoe
       QZ: Akrotiri
       RE: Reunion
       RO: Romania
@@ -3214,6 +3223,7 @@ country:
       SM: San Marino
       SN: Senegal
       SO: Somalia
+      SQ: Siachen
       SR: Suriname
       SS: South Sudan
       ST: Sao Tome and Principe
@@ -3257,12 +3267,16 @@ country:
       XC: Coral Sea Islands
       XD: Dhekelia
       XE: Europa Island
+      XF: Geyser Reef
       XG: Gaza Strip
       XH: Howland Island
+      XI: Hans Island
       XJ: Jan Mayen
       XK: Kosovo
       XL: Palmyra Atoll
       XM: Kingman Reef
+      XN: Heipethes Islands
+      XO: Kalapani
       XP: Paracel Islands
       XQ: Jarvis Island
       XR: Svalbard
@@ -3271,18 +3285,31 @@ country:
       XU: Johnston Atoll
       XV: Navassa Island
       XW: West Bank
+      XX: Koalou / Kourou
+      XY: Minerva Reefs
+      XZ: Parsley Island
       YE: Yemen
       YT: Mayotte
       ZA: South Africa
       ZM: Zambia
       ZW: Zimbabwe
+      ZZ: Sapodilla Cayes
     name: 
+      abu musa and tunb islands: 
+        - AA
+        - Abu Musa And Tunb Islands
+      abyei: 
+        - QN
+        - Abyei
       afghanistan: 
         - AF
         - Afghanistan
       akrotiri: 
         - QZ
         - Akrotiri
+      aksai chin and other areas: 
+        - QO
+        - Aksai Chin And Other Areas
       aland islands: 
         - AX
         - Aland Islands
@@ -3382,6 +3409,9 @@ country:
       brazil: 
         - BR
         - Brazil
+      brazilian island: 
+        - QP
+        - Brazilian Island
       british indian ocean territory: 
         - IO
         - British Indian Ocean Territory
@@ -3442,18 +3472,27 @@ country:
       comoros: 
         - KM
         - Comoros
+      conejo island: 
+        - QQ
+        - Conejo Island
       congo: 
         - CG
         - Congo
       congo (the democratic republic of the): 
         - CD
         - Congo (The Democratic Republic of the)
+      congo river islands: 
+        - QR
+        - Congo River Islands
       cook islands: 
         - CK
         - Cook Islands
       coral sea islands: 
         - XC
         - Coral Sea Islands
+      corisco bay islands: 
+        - QT
+        - Corisco Bay Islands
       costa rica: 
         - CR
         - Costa Rica
@@ -3493,6 +3532,12 @@ country:
       dominican republic: 
         - DO
         - Dominican Republic
+      doumeira islands: 
+        - QV
+        - Doumeira Islands
+      dramana and shakhatoe: 
+        - QY
+        - Dramana And Shakhatoe
       ecuador: 
         - EC
         - Ecuador
@@ -3559,6 +3604,9 @@ country:
       germany: 
         - DE
         - Germany
+      geyser reef: 
+        - XF
+        - Geyser Reef
       ghana: 
         - GH
         - Ghana
@@ -3604,9 +3652,15 @@ country:
       haiti: 
         - HT
         - Haiti
+      hans island: 
+        - XI
+        - Hans Island
       heard island and mcdonald islands: 
         - HM
         - Heard Island and McDonald Islands
+      heipethes islands: 
+        - XN
+        - Heipethes Islands
       holy see: 
         - VA
         - Holy See
@@ -3673,6 +3727,9 @@ country:
       juan de nova island: 
         - QU
         - Juan de Nova Island
+      kalapani: 
+        - XO
+        - Kalapani
       kazakhstan: 
         - KZ
         - Kazakhstan
@@ -3685,6 +3742,9 @@ country:
       kiribati: 
         - KI
         - Kiribati
+      koalou / kourou: 
+        - XX
+        - Koalou / Kourou
       korea, north: 
         - KP
         - Korea, North
@@ -3772,6 +3832,9 @@ country:
       midway islands: 
         - QM
         - Midway Islands
+      minerva reefs: 
+        - XY
+        - Minerva Reefs
       moldova: 
         - MD
         - Moldova
@@ -3868,6 +3931,9 @@ country:
       paraguay: 
         - PY
         - Paraguay
+      parsley island: 
+        - XZ
+        - Parsley Island
       peru: 
         - PE
         - Peru
@@ -3931,6 +3997,9 @@ country:
       sao tome and principe: 
         - ST
         - Sao Tome and Principe
+      sapodilla cayes: 
+        - ZZ
+        - Sapodilla Cayes
       saudi arabia: 
         - SA
         - Saudi Arabia
@@ -3943,6 +4012,9 @@ country:
       seychelles: 
         - SC
         - Seychelles
+      siachen: 
+        - SQ
+        - Siachen
       sierra leone: 
         - SL
         - Sierra Leone
@@ -4358,6 +4430,7 @@ country:
       VUT: Vanuatu
       WLF: Wallis and Futuna
       WSM: Samoa
+      XAA: Abu Musa And Tunb Islands
       XAC: Ashmore and Cartier Islands
       XBI: Bassas Da India
       XBK: Baker Island
@@ -4376,24 +4449,50 @@ country:
       XNV: Navassa Island
       XPL: Palmyra Atoll
       XPR: Paracel Islands
+      XQN: Abyei
+      XQO: Aksai Chin And Other Areas
+      XQP: Brazilian Island
+      XQQ: Conejo Island
+      XQR: Congo River Islands
+      XQT: Corisco Bay Islands
+      XQV: Doumeira Islands
+      XQY: Dramana And Shakhatoe
       XQZ: Akrotiri
       XSP: Spratly Islands
+      XSQ: Siachen
       XSV: Svalbard
       XTR: Tromelin Island
       XWB: West Bank
       XWK: Wake Island
       XXD: Dhekelia
+      XXF: Geyser Reef
+      XXI: Hans Island
+      XXN: Heipethes Islands
+      XXO: Kalapani
+      XXX: Koalou / Kourou
+      XXY: Minerva Reefs
+      XXZ: Parsley Island
+      XZZ: Sapodilla Cayes
       YEM: Yemen
       ZAF: South Africa
       ZMB: Zambia
       ZWE: Zimbabwe
     name: 
+      abu musa and tunb islands: 
+        - XAA
+        - Abu Musa And Tunb Islands
+      abyei: 
+        - XQN
+        - Abyei
       afghanistan: 
         - AFG
         - Afghanistan
       akrotiri: 
         - XQZ
         - Akrotiri
+      aksai chin and other areas: 
+        - XQO
+        - Aksai Chin And Other Areas
       aland islands: 
         - ALA
         - Aland Islands
@@ -4493,6 +4592,9 @@ country:
       brazil: 
         - BRA
         - Brazil
+      brazilian island: 
+        - XQP
+        - Brazilian Island
       british indian ocean territory: 
         - IOT
         - British Indian Ocean Territory
@@ -4553,18 +4655,27 @@ country:
       comoros: 
         - COM
         - Comoros
+      conejo island: 
+        - XQQ
+        - Conejo Island
       congo: 
         - COG
         - Congo
       congo (the democratic republic of the): 
         - COD
         - Congo (The Democratic Republic of the)
+      congo river islands: 
+        - XQR
+        - Congo River Islands
       cook islands: 
         - COK
         - Cook Islands
       coral sea islands: 
         - XCS
         - Coral Sea Islands
+      corisco bay islands: 
+        - XQT
+        - Corisco Bay Islands
       costa rica: 
         - CRI
         - Costa Rica
@@ -4604,6 +4715,12 @@ country:
       dominican republic: 
         - DOM
         - Dominican Republic
+      doumeira islands: 
+        - XQV
+        - Doumeira Islands
+      dramana and shakhatoe: 
+        - XQY
+        - Dramana And Shakhatoe
       ecuador: 
         - ECU
         - Ecuador
@@ -4670,6 +4787,9 @@ country:
       germany: 
         - DEU
         - Germany
+      geyser reef: 
+        - XXF
+        - Geyser Reef
       ghana: 
         - GHA
         - Ghana
@@ -4715,9 +4835,15 @@ country:
       haiti: 
         - HTI
         - Haiti
+      hans island: 
+        - XXI
+        - Hans Island
       heard island and mcdonald islands: 
         - HMD
         - Heard Island and McDonald Islands
+      heipethes islands: 
+        - XXN
+        - Heipethes Islands
       holy see: 
         - VAT
         - Holy See
@@ -4784,6 +4910,9 @@ country:
       juan de nova island: 
         - XJN
         - Juan de Nova Island
+      kalapani: 
+        - XXO
+        - Kalapani
       kazakhstan: 
         - KAZ
         - Kazakhstan
@@ -4796,6 +4925,9 @@ country:
       kiribati: 
         - KIR
         - Kiribati
+      koalou / kourou: 
+        - XXX
+        - Koalou / Kourou
       korea, north: 
         - PRK
         - Korea, North
@@ -4883,6 +5015,9 @@ country:
       midway islands: 
         - XMW
         - Midway Islands
+      minerva reefs: 
+        - XXY
+        - Minerva Reefs
       moldova: 
         - MDA
         - Moldova
@@ -4979,6 +5114,9 @@ country:
       paraguay: 
         - PRY
         - Paraguay
+      parsley island: 
+        - XXZ
+        - Parsley Island
       peru: 
         - PER
         - Peru
@@ -5042,6 +5180,9 @@ country:
       sao tome and principe: 
         - STP
         - Sao Tome and Principe
+      sapodilla cayes: 
+        - XZZ
+        - Sapodilla Cayes
       saudi arabia: 
         - SAU
         - Saudi Arabia
@@ -5054,6 +5195,9 @@ country:
       seychelles: 
         - SYC
         - Seychelles
+      siachen: 
+        - XSQ
+        - Siachen
       sierra leone: 
         - SLE
         - Sierra Leone
@@ -5498,13 +5642,40 @@ country:
       931: Tromelin Island
       933: Wake Island
       934: West Bank
+      935: Abu Musa And Tunb Islands
+      936: Abyei
+      937: Aksai Chin And Other Areas
+      938: Brazilian Island
+      939: Conejo Island
+      940: Congo River Islands
+      941: Corisco Bay Islands
+      942: Doumeira Islands
+      943: Dramana And Shakhatoe
+      944: Geyser Reef
+      945: Hans Island
+      946: Heipethes Islands
+      947: Kalapani
+      948: Koalou / Kourou
+      949: Minerva Reefs
+      950: Parsley Island
+      951: Sapodilla Cayes
+      952: Siachen
     name: 
+      abu musa and tunb islands: 
+        - 935
+        - Abu Musa And Tunb Islands
+      abyei: 
+        - 936
+        - Abyei
       afghanistan: 
         - '004'
         - Afghanistan
       akrotiri: 
         - 900
         - Akrotiri
+      aksai chin and other areas: 
+        - 937
+        - Aksai Chin And Other Areas
       aland islands: 
         - 248
         - Aland Islands
@@ -5604,6 +5775,9 @@ country:
       brazil: 
         - '076'
         - Brazil
+      brazilian island: 
+        - 938
+        - Brazilian Island
       british indian ocean territory: 
         - '086'
         - British Indian Ocean Territory
@@ -5664,18 +5838,27 @@ country:
       comoros: 
         - 174
         - Comoros
+      conejo island: 
+        - 939
+        - Conejo Island
       congo: 
         - 178
         - Congo
       congo (the democratic republic of the): 
         - 180
         - Congo (The Democratic Republic of the)
+      congo river islands: 
+        - 940
+        - Congo River Islands
       cook islands: 
         - 184
         - Cook Islands
       coral sea islands: 
         - 906
         - Coral Sea Islands
+      corisco bay islands: 
+        - 941
+        - Corisco Bay Islands
       costa rica: 
         - 188
         - Costa Rica
@@ -5715,6 +5898,12 @@ country:
       dominican republic: 
         - 214
         - Dominican Republic
+      doumeira islands: 
+        - 942
+        - Doumeira Islands
+      dramana and shakhatoe: 
+        - 943
+        - Dramana And Shakhatoe
       ecuador: 
         - 218
         - Ecuador
@@ -5781,6 +5970,9 @@ country:
       germany: 
         - 276
         - Germany
+      geyser reef: 
+        - 944
+        - Geyser Reef
       ghana: 
         - 288
         - Ghana
@@ -5826,9 +6018,15 @@ country:
       haiti: 
         - 332
         - Haiti
+      hans island: 
+        - 945
+        - Hans Island
       heard island and mcdonald islands: 
         - 334
         - Heard Island and McDonald Islands
+      heipethes islands: 
+        - 946
+        - Heipethes Islands
       holy see: 
         - 336
         - Holy See
@@ -5895,6 +6093,9 @@ country:
       juan de nova island: 
         - 923
         - Juan de Nova Island
+      kalapani: 
+        - 947
+        - Kalapani
       kazakhstan: 
         - 398
         - Kazakhstan
@@ -5907,6 +6108,9 @@ country:
       kiribati: 
         - 296
         - Kiribati
+      koalou / kourou: 
+        - 948
+        - Koalou / Kourou
       korea, north: 
         - 408
         - Korea, North
@@ -5994,6 +6198,9 @@ country:
       midway islands: 
         - 925
         - Midway Islands
+      minerva reefs: 
+        - 949
+        - Minerva Reefs
       moldova: 
         - 498
         - Moldova
@@ -6090,6 +6297,9 @@ country:
       paraguay: 
         - 600
         - Paraguay
+      parsley island: 
+        - 950
+        - Parsley Island
       peru: 
         - 604
         - Peru
@@ -6153,6 +6363,9 @@ country:
       sao tome and principe: 
         - 678
         - Sao Tome and Principe
+      sapodilla cayes: 
+        - 951
+        - Sapodilla Cayes
       saudi arabia: 
         - 682
         - Saudi Arabia
@@ -6165,6 +6378,9 @@ country:
       seychelles: 
         - 690
         - Seychelles
+      siachen: 
+        - 952
+        - Siachen
       sierra leone: 
         - 694
         - Sierra Leone
@@ -9499,7 +9715,6 @@ currency:
       ZAR: Rand
       ZMW: Zambian Kwacha
       ZWG: Zimbabwe Gold
-      ZWL: Zimbabwe Dollar
     name: 
       adb unit of account: 
         - XUA
@@ -10023,9 +10238,6 @@ currency:
       zambian kwacha: 
         - ZMW
         - Zambian Kwacha
-      zimbabwe dollar: 
-        - ZWL
-        - Zimbabwe Dollar
       zimbabwe gold: 
         - ZWG
         - Zimbabwe Gold
@@ -10165,7 +10377,6 @@ currency:
       929: Ouguiya
       930: Dobra
       931: Peso Convertible
-      932: Zimbabwe Dollar
       933: Belarusian Ruble
       934: Turkmenistan New Manat
       936: Ghana Cedi
@@ -10735,9 +10946,6 @@ currency:
       zambian kwacha: 
         - 967
         - Zambian Kwacha
-      zimbabwe dollar: 
-        - 932
-        - Zimbabwe Dollar
       zimbabwe gold: 
         - 924
         - Zimbabwe Gold
@@ -44721,7 +44929,7 @@ language:
       del: Delaware
       den: Slave (Athapascan)
       deu: German
-      dgr: Dogrib
+      dgr: Tlicho
       din: Dinka
       div: Divehi
       doi: Dogri
@@ -45436,9 +45644,6 @@ language:
       dogri: 
         - doi
         - Dogri
-      dogrib: 
-        - dgr
-        - Dogrib
       dravidian languages: 
         - dra
         - Dravidian languages
@@ -46405,6 +46610,9 @@ language:
       tiv: 
         - tiv
         - Tiv
+      tlicho: 
+        - dgr
+        - Tlicho
       tlingit: 
         - tli
         - Tlingit
@@ -46625,6 +46833,7 @@ langvar:
       jauer: Jauer dialect of Romansh
       jyutping: Jyutping Cantonese Romanization
       kkcor: Common Cornish orthography of Revived Cornish
+      kleinsch: Kleinschmidt orthography
       kociewie: The Kociewie dialect of Polish
       kscor: Standard Cornish orthography of Revived Cornish
       lemosin: Limousin
@@ -46800,6 +47009,9 @@ langvar:
       kirshenbaum phonetic alphabet: 
         - fonkirsh
         - Kirshenbaum Phonetic Alphabet
+      kleinschmidt orthography: 
+        - kleinsch
+        - Kleinschmidt orthography
       languedocien: 
         - lengadoc
         - Languedocien

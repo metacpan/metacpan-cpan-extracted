@@ -1,6 +1,6 @@
 package Tapper::Reports::Receiver::Level2::Codespeed;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Receiver::Level2::Codespeed::VERSION = '5.0.1';
+$Tapper::Reports::Receiver::Level2::Codespeed::VERSION = '5.0.2';
 use strict;
 use warnings;
 
@@ -109,7 +109,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

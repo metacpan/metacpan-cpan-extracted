@@ -30,6 +30,9 @@ my $testcontrol = Tapper::PRC::Testcontrol->new;
 $testcontrol->cfg->{report_server}   = Tapper::Config->subconfig->{report_server};
 $testcontrol->cfg->{report_api_port} = Tapper::Config->subconfig->{report_api_port};
 
+# No accidental ostore usage during testing
+delete Tapper::Config->subconfig->{ostore};
+
 my $upload_dir = Tapper::Config->subconfig->{paths}{output_dir}."/4";
 if (not -e $upload_dir) {
         $testcontrol->makedir("$upload_dir/install"); # inherited from Tapper::Base;

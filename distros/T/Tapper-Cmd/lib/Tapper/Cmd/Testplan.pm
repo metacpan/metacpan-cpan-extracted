@@ -1,6 +1,6 @@
 package Tapper::Cmd::Testplan;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Testplan::VERSION = '5.0.12';
+$Tapper::Cmd::Testplan::VERSION = '5.0.14';
 use 5.010;
 use Moose;
 
@@ -11,6 +11,7 @@ use Tapper::Model 'model';
 use Tapper::Reports::DPath::TT;
 use File::Slurp 'slurp';
 use Perl6::Junction 'any';
+use UUID 'uuid';
 
 extends 'Tapper::Cmd';
 
@@ -47,6 +48,32 @@ sub add {
         });
         $instance->insert;
 
+        # Collect dependencies
+        my %plan_lookup;
+        my %plan_dependencies;
+        foreach my $plan (@plans) {
+                unless (exists($plan->{identifier})) {
+                        $plan->{identifier} = uuid();
+                }
+                $plan_lookup{$plan->{identifier}} = $plan;
+                if (exists($plan->{depends_on})) {
+                        my $depends_on = $plan->{depends_on};
+                        $depends_on = [ $depends_on ] unless ref($depends_on) eq "ARRAY";
+                        $plan_dependencies{$plan->{identifier}} = $depends_on;
+                }
+        }
+
+        # Check that all dependencies can be resolved
+        foreach my $depender (keys %plan_dependencies) {
+                foreach my $dependee (@{$plan_dependencies{$depender}}) {
+                        die "Plan dependency $dependee in plan $depender could not be resolved"
+                          unless exists $plan_lookup{$dependee};
+                }
+        }
+
+        my %plan_testruns;
+        my %plan_status;
+
         my @testrun_ids;
         foreach my $plan (@plans) {
                 die "Missing plan type for the following testplan: \n".Dump($plan) unless $plan->{type};
@@ -60,10 +87,46 @@ sub add {
 
                 my $handler = "$module"->new();
                 my $description = $plan->{testplan_description} || $plan->{description};
-                my @new_ids = $handler->create($description, $instance->id);
-                push @testrun_ids, @new_ids;
 
+                # Postpone setting the status to schedule So that testruns don't
+                # start before the dependencies were saved as well. To achieve
+                # this we create all testruns with a prepare status and set the
+                # final status later, either the specified one or schedule as
+                # default.
+                my $status = $description->{status} || "schedule";
+                $description->{status} = "prepare";
+
+                my @new_ids = $handler->create($description, $instance->id);
+                $plan_testruns{$plan->{identifier}} = [ @new_ids ];
+                $plan_status{$plan->{identifier}} = $status;
+                push @testrun_ids, @new_ids;
         }
+
+        # Apply dependencies
+        foreach my $depender (keys %plan_dependencies) {
+                foreach my $dependee (@{$plan_dependencies{$depender}}) {
+                        my @depender_testruns = @{$plan_testruns{$depender}};
+                        my @dependee_testruns = @{$plan_testruns{$dependee}};
+
+                        foreach my $depender_testrun (@depender_testruns) {
+                                foreach my $dependee_testrun (@dependee_testruns) {
+                                        model('TestrunDB')->resultset('TestrunDependency')->create({
+                                                dependee_testrun_id => $dependee_testrun,
+                                                depender_testrun_id => $depender_testrun,
+                                        });
+                                }
+                        }
+                }
+        }
+
+        # Set final status on all created testruns
+        # For each plan set all testruns in one go.
+        foreach my $plan_identifier ( keys %plan_status ) {
+                model('TestrunDB')->resultset('TestrunScheduling')
+                  ->search({ testrun_id => $plan_testruns{$plan_identifier} })
+                  ->update({ status => $plan_status{$plan_identifier} });
+        }
+
         return { testplan_id => $instance->id, testrun_ids => \@testrun_ids };
 }
 
@@ -377,7 +440,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc.
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

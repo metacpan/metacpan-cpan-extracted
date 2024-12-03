@@ -1,5 +1,14 @@
 Revision history for Convert::PEM
 
+0.13 -- Mon Dec 02 23:42:25 AST 2024
+
+    [Changes Since 0.12]
+    - Fix several issue implemented in 0.10 that caused issues in Crypt::DSA
+
+    [Detailed Changes]
+    - b430b68 Fix recent issues in Crypt::DSA in RT156495
+    - 3af8d80 Handle undefined values and redefined iv
+
 0.12 -- Mon Oct 21 22:46:47 ADT 2024
 
     [Changes Since 0.09]

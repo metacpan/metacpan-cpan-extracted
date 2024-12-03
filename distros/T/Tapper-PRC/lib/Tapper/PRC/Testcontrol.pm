@@ -1,6 +1,6 @@
 package Tapper::PRC::Testcontrol;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::PRC::Testcontrol::VERSION = '5.0.4';
+$Tapper::PRC::Testcontrol::VERSION = '5.0.5';
 use 5.010;
 use warnings;
 use strict;
@@ -14,8 +14,10 @@ use File::Basename 'dirname';
 use English '-no_match_vars';
 use IO::Handle;
 use File::Basename qw/basename dirname/;
+use LWP::UserAgent;
 
 use Tapper::Remote::Config;
+use Tapper::Config;
 # ABSTRACT: Control running test programs
 
 extends 'Tapper::PRC';
@@ -41,9 +43,9 @@ sub send_output
 
         # add missing minimum Tapper meta information
         my $headerlines = "";
-        $headerlines .= "# Tapper-suite-name: ".basename($testprogram->{program})."\n" unless $captured_output =~ /\# Tapper-suite-name:/;
-        $headerlines .= "# Tapper-machine-name: ".$self->cfg->{hostname}."\n"          unless $captured_output =~ /\# Tapper-machine-name:/;
-        $headerlines .= "# Tapper-reportgroup-testrun: ".$self->cfg->{test_run}."\n"   unless $captured_output =~ /\# Tapper-reportgroup-testrun:/;
+        $headerlines .= "# Test-suite-name: ".basename($testprogram->{program})."\n" unless $captured_output =~ /\# (Tapper|Test)-suite-name:/;
+        $headerlines .= "# Test-machine-name: ".$self->cfg->{hostname}."\n"          unless $captured_output =~ /\# (Tapper|Test)-machine-name:/;
+        $headerlines .= "# Test-reportgroup-testrun: ".$self->cfg->{test_run}."\n"   unless $captured_output =~ /\# (Tapper|Test)-reportgroup-testrun:/;
 
         $captured_output =~ s/^(1\.\.\d+\n)/$1$headerlines/m;
 
@@ -59,12 +61,14 @@ sub send_attachements {
 
     my ( $self ) = @_;
 
+    my $testplan_id = $self->cfg->{testplan}{id} // '';
     my ( $b_error, $s_message ) = $self->tap_report_away(
           "TAP version 13\n"
         . "1..1\n"
-        . "# Tapper-suite-name: PRC" . ( $self->cfg->{guest_number} || 0 ) . "-Attachments\n"
-        . "# Tapper-machine-name: " . $self->cfg->{hostname} . "\n"
-        . "# Tapper-reportgroup-testrun: " . $self->cfg->{test_run} . "\n"
+        . "# Test-suite-name: PRC" . ( $self->cfg->{guest_number} || 0 ) . "-Attachments\n"
+        . "# Test-machine-name: " . $self->cfg->{hostname} . "\n"
+        . "# Test-reportgroup-testrun: " . $self->cfg->{test_run} . "\n"
+        . ( $testplan_id ? "# Test-testplan-id: $testplan_id\n" : '')
         . "ok - Test attachments\n"
     );
 
@@ -85,12 +89,21 @@ sub upload_files
     my $s_host = $or_self->cfg->{report_server};
     my $i_port = $or_self->cfg->{report_api_port};
     my $s_path = $ENV{TAPPER_OUTPUT_PATH};
+    my $i_testrun = $or_self->cfg->{test_run};
+    my $s_testplan = $or_self->cfg->{testplan}{id} || "none";
 
     return 0 unless -d $s_path;
 
     my @a_files = `find $s_path -type f`;
 
     $or_self->log->debug( @a_files );
+
+    my $ostore_endpoint = Tapper::Config->subconfig->{ostore}{endpoint};
+    my $ua = LWP::UserAgent->new();
+    if (defined($ostore_endpoint)) {
+        $ostore_endpoint =~ s,/$,,;
+        $ostore_endpoint .= "/upload";
+    }
 
     foreach my $s_file( @a_files ) {
 
@@ -101,6 +114,20 @@ sub upload_files
            #$s_reportfile =~ s|^./||;
            #$s_reportfile =~ s|[^A-Za-z0-9_-]|_|g;
 
+        if (defined($ostore_endpoint)) {
+            my $resp = $ua->post(
+              $ostore_endpoint,
+              "X-Ostore-report" => $i_reportid,
+              "X-Ostore-testrun" => $i_testrun,
+              "X-Ostore-testplan" => $s_testplan,
+              "X-Ostore-suitename" => "PRC0-Attachments",
+              "X-Ostore-filename" => $s_reportfile,
+              "X-Ostore-uploadedby" => "tapper-minion-worker",
+              Content_Type => "form-data",
+              Content => [ file => [ $s_file ] ],
+            );
+            return "Cannot upload file to object storage at $ostore_endpoint" unless $resp->code == 200;
+        }
         my $or_server = IO::Socket::INET->new(
             PeerAddr => $s_host,
             PeerPort => $i_port,
@@ -454,6 +481,14 @@ sub control_testprogram
         if ($self->{cfg}->{testplan}) {
                 $ENV{TAPPER_TESTPLAN_ID}   = $self->cfg->{testplan}{id};
                 $ENV{TAPPER_TESTPLAN_PATH} = $self->cfg->{testplan}{path};
+        }
+
+        if (defined $self->cfg->{resources} && ref $self->cfg->{resources} eq 'ARRAY') {
+                my $i = 0;
+                foreach my $resource (@{$self->cfg->{resources}}) {
+                        $ENV{"TAPPER_RESOURCE_$i"} = $resource;
+                        $i++;
+                }
         }
 
         my $test_run         = $self->cfg->{test_run};
@@ -883,7 +918,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

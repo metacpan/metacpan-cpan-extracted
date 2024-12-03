@@ -17,8 +17,9 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
+requires:
+  Test::MockObject: '0'
 resources:
   repository: https://gitlab.com/olooeez/app-changelog
-version: v1.0.1
+version: v1.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,4 @@
-package Web::Components::Role::ConfigLoader;
+package Web::Components::ConfigLoader;
 
 use Web::ComposableRequest::Constants qw( FALSE TRUE );
 use File::DataClass::Types qw( Directory File Path );
@@ -11,13 +11,13 @@ use Moo::Role;
 
 =head1 Name
 
-Web::Components::Role::ConfigLoader - Configuration file loading role
+Web::Components::ConfigLoader - Configuration file loading role
 
 =head1 Synopsis
 
    use Moo;
 
-   with 'Web::Components::Role::ConfigLoader';
+   with 'Web::Components::ConfigLoader';
 
 =head1 Description
 
@@ -34,6 +34,10 @@ Defines the following attributes;
 The configuration file is discovered by the loader once the 'home' attribute
 has been established
 
+=item C<has_config_file>
+
+Predicate
+
 =cut
 
 has 'config_file' => is => 'ro', isa => File, predicate => 'has_config_file';
@@ -41,6 +45,10 @@ has 'config_file' => is => 'ro', isa => File, predicate => 'has_config_file';
 =item C<config_home>
 
 The directory containing the configuration file(s)
+
+=item C<has_config_home>
+
+Predicate
 
 =cut
 
@@ -61,6 +69,10 @@ has 'home' => is => 'ro', isa => Directory;
 
 The name of the local configuration file which is optionally set in the
 main configuration file
+
+=item C<has_local_config_file>
+
+Predicate
 
 =cut
 

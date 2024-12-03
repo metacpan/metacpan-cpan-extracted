@@ -1,0 +1,133 @@
+{
+   "X_No_Archive" : "Yes",
+   "abstract" : "The Bluesky Social Network",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org>"
+   ],
+   "description" : "Bluesky Client Library in Perl",
+   "dynamic_config" : 0,
+   "generated_by" : "App::mii v1.0.0",
+   "keywords" : [],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Bluesky",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "optional_features" : {
+      "websockets" : {
+         "description" : "Websocket based streaming services",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "CBOR::Free" : "0",
+                  "Mojo::UserAgent" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "Exporter" : "5.57",
+            "ExtUtils::Helpers" : "0.028",
+            "ExtUtils::Install" : "0",
+            "ExtUtils::InstallPaths" : "0.002",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec::Functions" : "0",
+            "Getopt::Long" : "2.36",
+            "JSON::PP" : "2",
+            "Path::Tiny" : "0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Code::TidyAll" : "0",
+            "Code::TidyAll::Plugin::PodTidy" : "0",
+            "Data::Dump" : "0",
+            "Perl::Tidy" : "0",
+            "Pod::Tidy" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Pod" : "0",
+            "Test::Spellunker" : "0"
+         },
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Minilla" : "0",
+            "Pod::Markdown::Github" : "0",
+            "Software::License::Artistic_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Mojo::UserAgent" : "0"
+         },
+         "requires" : {
+            "At" : "0.19",
+            "HTTP::Tiny" : "0",
+            "Mozilla::CA" : "0",
+            "Path::Tiny" : "0",
+            "URI" : "0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Bluesky" : {
+         "file" : "lib/Bluesky.pm",
+         "version" : "0.19"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/Bluesky.pm/issues"
+      },
+      "homepage" : "https://github.com/sanko/Bluesky.pm",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sanko/Bluesky.pm.git",
+         "web" : "https://github.com/sanko/Bluesky.pm"
+      }
+   },
+   "version" : "0.19",
+   "x_ignore" : [
+      "github",
+      ".gitignore",
+      ".tidyallrc"
+   ]
+}

@@ -1,5 +1,10 @@
 Revision history for Tapper-Reports-Receiver-Level2-BenchmarkAnything
 
+5.0.4     2024-12-02
+        - no longer do process_raw_result_queue() for BenchmarkAnything
+          but require this to be done by the dedicated daemon aka.
+          benchmarkanything-storage-frontend-http
+
 5.0.3     2016-03-11
         - aggregated TAP metrics track suitename as additional key
 

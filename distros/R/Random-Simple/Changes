@@ -1,1 +1,22 @@
-Version 0.1
+0.12 2024-11-28
+	- Simplify unit testing for ranges
+	- Triply verify we are getting enough entropy from the OS
+	- Uprgrade/override rand() to use a good PRNG
+	- More efficient seeding
+
+0.11 2024-11-19
+	- Use grep instead of any because it is more supported
+	- Fix some color output
+	- Only run 64bit test on 64bit platforms
+
+0.10 2024-11-17
+	- Add random_float()
+	- Bump the warmup to 1024 iterations because it is fast
+	- Much improved unit testing
+	- Cleaner XS linking code
+	- Properly use CryptGenRandom on Windows
+	- Error out if we cannot read /dev/urandom or CryptGenRandom so there is no chance of bad seeds
+
+0.5 2024-11-12
+	- Support for older Perls back to v5.12
+	- Better support for 32bit Perls

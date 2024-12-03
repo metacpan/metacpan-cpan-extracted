@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
   "NAME" => "OpenMP::Simple",
   "PREREQ_PM" => {
     "Alien::OpenMP" => 0,
+    "File::ShareDir" => 0,
     "Inline::C" => 0,
     "OpenMP::Environment" => 0,
     "Util::H2O::More" => "0.3.4"
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Util::H2O::More" => "0.3.4"
   },
-  "VERSION" => "0.1.4",
+  "VERSION" => "0.1.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +49,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Alien::OpenMP" => 0,
   "Digest::MD5" => 0,
+  "File::ShareDir" => 0,
   "File::Temp" => 0,
   "Inline::C" => 0,
   "OpenMP::Environment" => 0,

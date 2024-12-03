@@ -3,7 +3,7 @@ Locale::Codes::Currency_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Wed Aug 28 15:38:27 EDT 2024
+#    Generated on: Mon Dec  2 10:29:51 EST 2024
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.80';
+$VERSION='3.81';
 
 $Locale::Codes::Retired{'currency'}{'alpha'}{'code'} = {
    q(ADP) => q(Andorran Peseta),
@@ -70,6 +70,7 @@ $Locale::Codes::Retired{'currency'}{'alpha'}{'code'} = {
    q(ZAL) => q(Financial Rand),
    q(ZRN) => q(New Zaire),
    q(ZWD) => q(Zimbabwe Dollar),
+   q(ZWL) => q(Zimbabwe Dollar),
 };
 
 $Locale::Codes::Retired{'currency'}{'num'}{'code'} = {
@@ -79,6 +80,7 @@ $Locale::Codes::Retired{'currency'}{'num'}{'code'} = {
    q(478) => q(Ouguiya),
    q(654) => q(Saint Helena Pound),
    q(678) => q(Dobra),
+   q(932) => q(Zimbabwe Dollar),
    q(937) => q(Bolivar),
    q(998) => q(US Dollar (Same day)),
 };
@@ -168,6 +170,7 @@ $Locale::Codes::Retired{'currency'}{'alpha'}{'name'} = {
    q(uruguay peso en unidades indexadas) => [ q(UYI), q(Uruguay Peso en Unidades Indexadas) ],
    q(uruguay peso en unidades indexadas (uruiurui)) => [ q(UYI), q(Uruguay Peso en Unidades Indexadas (URUIURUI)) ],
    q(us dollar (same day)) => [ q(USS), q(US Dollar (Same day)) ],
+   q(zimbabwe dollar) => [ q(ZWL), q(Zimbabwe Dollar) ],
 };
 
 $Locale::Codes::Retired{'currency'}{'num'}{'name'} = {
@@ -196,6 +199,7 @@ $Locale::Codes::Retired{'currency'}{'num'}{'name'} = {
    q(unidades de fomento) => [ q(990), q(Unidades de fomento) ],
    q(uruguay peso en unidades indexadas (uruiurui)) => [ q(940), q(Uruguay Peso en Unidades Indexadas (URUIURUI)) ],
    q(us dollar (same day)) => [ q(998), q(US Dollar (Same day)) ],
+   q(zimbabwe dollar) => [ q(932), q(Zimbabwe Dollar) ],
 };
 
 

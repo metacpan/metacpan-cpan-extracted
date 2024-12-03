@@ -17,8 +17,9 @@ use Syntax::Keyword::Try;
 use constant OK_STATUS_CODE          => 200;
 use constant OK_NO_CONTENT_CODE      => 204;
 use constant BAD_REQUEST_STATUS_CODE => 400;
+use constant HTTP_TIMEOUT_SECONDS    => 10;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 field $http;
 field $jwks;
@@ -76,7 +77,7 @@ Return HTTP object.
 =cut
 
 method http {
-    return $http //= HTTP::Tiny->new();
+    return $http //= HTTP::Tiny->new(timeout => HTTP_TIMEOUT_SECONDS);
 }
 
 =head2 jwks

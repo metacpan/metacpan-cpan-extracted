@@ -42,38 +42,31 @@ if( eval "require Alien::FFTW3" ) {
     chomp($cflags, $libs);
 }
 
-my @package = (qw(FFTW3.pd FFTW3 PDL::FFTW3), undef, 1);
+my @package = (qw(fftw3.pd FFTW3 PDL::FFTW3), undef, 1);
 my %descriptor = pdlpp_stdargs(\@package);
 
-$descriptor{VERSION_FROM} = 'FFTW3.pd';
-$descriptor{OPTIMIZE}  = ($Config{ccname} =~ m/gcc/) ? '-O2' : $Config{optimize};
-$descriptor{CCFLAGS} .= ( ($Config{ccname} =~ m/gcc/) ? '--std=gnu99 ' : '' ) . $Config{ccflags};
+$descriptor{VERSION_FROM} = 'fftw3.pd';
 
 # I support single and double precision FFTW calls, so both fftw and fftw3f
 push @{$descriptor{LIBS}  },  $libs;
 
 $descriptor{INC} = '' unless defined $descriptor{INC};
-$descriptor{INC} .= $cflags;
-
-$descriptor{depend} = { 'FFTW3.pm' => join(' ', qw(template_complex.c template_real.c
-                                                   compute_plan_template.xs
-                                                   FFTW3_header_include.pm)) };
+$descriptor{INC} .= " $cflags";
 
 $descriptor{PREREQ_PM} = {
-  'PDL' => '2.049', # as_native
+  'PDL' => '2.091', # t method
 };
 $descriptor{CONFIGURE_REQUIRES} = {
-  'PDL::Core::Dev' =>0,
+  'PDL' => '2.091',
   'IPC::Run'       =>0,
 #  'Alien::FFTW3'   =>0,
 };
 $descriptor{BUILD_REQUIRES} = {'PDL::PP'=>0};
-$descriptor{NO_MYMETA} = 0;
-
-$descriptor{NAME}   = "PDL::FFTW3";
+$descriptor{TEST_REQUIRES} = {'Test::More'=>'0.88'};
 $descriptor{AUTHOR} = "Dima Kogan <dima\@secretsauce.net>, Craig DeForest <deforest\@boulder.swri.edu>";
 $descriptor{ABSTRACT} = "PDL interface to the Fastest Fourier Transform in the West";
 $descriptor{LICENSE}  = "gpl_3";
+$descriptor{MIN_PERL_VERSION}  = "5.016";
 
 $descriptor{META_MERGE} = {
   "meta-spec" => { version => 2 },

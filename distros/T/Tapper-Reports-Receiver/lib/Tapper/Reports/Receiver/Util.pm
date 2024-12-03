@@ -1,7 +1,7 @@
 package Tapper::Reports::Receiver::Util;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Receive test reports
-$Tapper::Reports::Receiver::Util::VERSION = '5.0.1';
+$Tapper::Reports::Receiver::Util::VERSION = '5.0.2';
 use 5.010;
 use strict;
 use warnings;
@@ -241,7 +241,6 @@ sub update_parsed_report_in_db
         $self->create_report_sections($parsed_report);
         $self->create_report_groups($parsed_report);
         $self->create_report_comment($parsed_report);
-
 }
 
 
@@ -304,6 +303,11 @@ sub process_request
 
                         $self->update_parsed_report_in_db( $harness->parsed_report );
                         $self->forward_to_level2_receivers();
+
+                        # mark as processed
+                        $self->report->tap->processed(1);
+                        $self->report->tap->update;
+
                 } catch {
                         # We can not use log4perl, because that might throw another
                         # exception e.g. when logfile is not writable
@@ -399,7 +403,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

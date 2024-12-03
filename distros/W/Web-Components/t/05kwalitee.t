@@ -16,6 +16,8 @@ eval { require Test::Kwalitee; };
 
 $EVAL_ERROR and plan skip_all => 'Test::Kwalitee not installed';
 
+-f 'META.json' or plan skip_all => 'Not in build directory';
+
 # Since we now use a custom Moose exporter this metric is no longer valid
 Test::Kwalitee->import( tests => [ qw(-use_strict) ] );
 

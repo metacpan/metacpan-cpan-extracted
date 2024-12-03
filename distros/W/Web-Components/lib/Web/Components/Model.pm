@@ -65,6 +65,16 @@ has '_default_view' =>
            ? $self->config->default_view : 'HTML';
    };
 
+has '_exception_layout' =>
+   is      => 'lazy',
+   isa     => Str,
+   default => sub {
+      my $self = shift;
+
+      return $self->config->can('exception_layout')
+           ? $self->config->exception_layout : 'page/exception';
+   };
+
 has '_template_wrappers' =>
    is      => 'lazy',
    isa     => HashRef,
@@ -110,7 +120,10 @@ sub error {
    $context->stash(
       code      => $code,
       exception => $exception,
-      page      => { %{$self->_template_wrappers}, layout => 'page/exception' },
+      page      => {
+         %{$self->_template_wrappers},
+         layout => $self->_exception_layout
+      },
    );
 
    $self->_finalise_stash($context);

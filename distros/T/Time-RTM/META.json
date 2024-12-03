@@ -52,6 +52,6 @@
          "web" : "https://github.com/cade-vs/perl-time-rtm"
       }
    },
-   "version" : "1.11",
+   "version" : "1.14",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

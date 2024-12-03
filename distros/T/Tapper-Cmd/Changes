@@ -1,5 +1,10 @@
 Revision history for Tapper-Cmd
 
+5.0.14    2024-12-02
+        - re-upload
+        - Implement dependencies between testruns in a testplan
+        - Implement abstract resource scheduling
+
 5.0.12    2020-12-09
         - introduce 'context' to testplans/testruns
 

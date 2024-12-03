@@ -11,5 +11,6 @@ README
 t/01-general.t
 example.pl
 lib/Random/rand-common.h
+Changes
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -12,11 +12,13 @@ BEGIN {
 
 use English qw( -no_match_vars );
 
-eval { require Test::YAML::Meta; };
+eval { require Test::CPAN::Meta::YAML; };
 
-$EVAL_ERROR and plan skip_all => 'Test::YAML::Meta not installed';
+$EVAL_ERROR and plan skip_all => 'Test::CPAN::Meta::YAML not installed';
 
-Test::YAML::Meta->import();
+-f 'META.yml' or plan skip_all => 'Not in build directory';
+
+Test::CPAN::Meta::YAML->import();
 
 meta_yaml_ok();
 

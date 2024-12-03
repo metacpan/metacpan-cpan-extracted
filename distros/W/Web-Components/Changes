@@ -1,5 +1,6 @@
 Revision history for Web::Components
 
+          - Completed POD for component base classes
           - More prereq fixes
           - Curated dependencies
           - Fixed prereqs

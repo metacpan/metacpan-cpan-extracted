@@ -4,6 +4,6 @@ package WebService::Hydra;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 1;

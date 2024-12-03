@@ -1,6 +1,6 @@
 package Tapper::Cmd::Requested;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Requested::VERSION = '5.0.12';
+$Tapper::Cmd::Requested::VERSION = '5.0.14';
 use Moose;
 
 use Tapper::Model 'model';
@@ -133,7 +133,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc.
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

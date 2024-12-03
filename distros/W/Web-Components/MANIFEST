@@ -7,13 +7,16 @@ META.yml
 README
 SIGNATURE
 lib/Web/Components.pm
+lib/Web/Components/ConfigLoader.pm
 lib/Web/Components/Loader.pm
 lib/Web/Components/Model.pm
 lib/Web/Components/Navigation.pm
 lib/Web/Components/ReverseMap.pm
 lib/Web/Components/Role.pm
-lib/Web/Components/Role/ConfigLoader.pm
 lib/Web/Components/Util.pm
+share/js/wcom-10-util.js
+share/js/wcom-11-modal.js
+share/js/wcom-15-navigation.js
 t/00report-metadata.dd
 t/00report-metadata.t
 t/02pod.t

@@ -15,9 +15,32 @@ use English qw( -no_match_vars );
 
 eval "use Test::Pod::Coverage 1.04";
 
-$EVAL_ERROR and plan skip_all => 'Test::Pod::Coverage 1.04 required';
+sub all_my_pod_coverage_ok {
+   my $parms = (@_ && (ref $_[0] eq "HASH")) ? shift : {};
+   my $msg = shift;
+   my $ok = 1;
+   my @modules = all_modules();
+   if ( @modules ) {
+      for my $module ( @modules ) {
+         next if $module =~ m{ Forms }mx;
+         my $thismsg = defined $msg ? $msg : "Pod coverage on $module";
+         my $thisok = pod_coverage_ok( $module, $parms, $thismsg );
+         $ok = 0 unless $thisok;
+      }
+      done_testing;
+   }
+   else {
+      plan( tests => 1 );
+      ok( 1, "No modules found." );
+   }
+   return $ok;
+}
 
-all_pod_coverage_ok();
+all_my_pod_coverage_ok({
+   also_private => [
+      qr{ \A (BUILD | BUILDARGS | as_string | clone) \z }mx
+   ],
+});
 
 # Local Variables:
 # mode: perl

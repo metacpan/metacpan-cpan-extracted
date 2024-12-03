@@ -28,6 +28,7 @@ my @files = (
     'lib/Tapper/Cmd/Testplan.pm',
     'lib/Tapper/Cmd/Testrun.pm',
     'lib/Tapper/Cmd/User.pm',
+    't/00-compile.t',
     't/00-load.t',
     't/author-eol.t',
     't/author-no-tabs.t',

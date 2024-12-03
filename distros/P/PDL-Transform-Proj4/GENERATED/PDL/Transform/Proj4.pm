@@ -1,0 +1,5787 @@
+#
+# GENERATED WITH PDL::PP from proj4.pd! Don't modify!
+#
+package PDL::Transform::Proj4;
+
+our @EXPORT_OK = qw( t_proj t_proj_adams_hemi t_proj_adams_ws1 t_proj_adams_ws2 t_proj_aea t_proj_aeqd t_proj_affine t_proj_airy t_proj_aitoff t_proj_alsk t_proj_apian t_proj_august t_proj_axisswap t_proj_bacon t_proj_bertin1953 t_proj_bipc t_proj_boggs t_proj_bonne t_proj_calcofi t_proj_cart t_proj_cass t_proj_cc t_proj_ccon t_proj_cea t_proj_chamb t_proj_col_urban t_proj_collg t_proj_comill t_proj_crast t_proj_defmodel t_proj_deformation t_proj_denoy t_proj_eck1 t_proj_eck2 t_proj_eck3 t_proj_eck4 t_proj_eck5 t_proj_eck6 t_proj_eqc t_proj_eqdc t_proj_eqearth t_proj_etmerc t_proj_euler t_proj_fahey t_proj_fouc t_proj_fouc_s t_proj_gall t_proj_geoc t_proj_geogoffset t_proj_geos t_proj_gins8 t_proj_gn_sinu t_proj_gnom t_proj_goode t_proj_gridshift t_proj_gs48 t_proj_gs50 t_proj_gstmerc t_proj_guyou t_proj_hammer t_proj_hatano t_proj_healpix t_proj_helmert t_proj_hgridshift t_proj_horner t_proj_igh t_proj_igh_o t_proj_imoll t_proj_imoll_o t_proj_imw_p t_proj_isea t_proj_kav5 t_proj_kav7 t_proj_krovak t_proj_labrd t_proj_laea t_proj_lagrng t_proj_larr t_proj_lask t_proj_latlon t_proj_lcc t_proj_lcca t_proj_leac t_proj_lee_os t_proj_lonlat t_proj_loxim t_proj_lsat t_proj_mbt_fps t_proj_mbt_s t_proj_mbtfpp t_proj_mbtfpq t_proj_mbtfps t_proj_merc t_proj_mil_os t_proj_mill t_proj_misrsom t_proj_mod_krovak t_proj_moll t_proj_molobadekas t_proj_molodensky t_proj_murd1 t_proj_murd2 t_proj_murd3 t_proj_natearth t_proj_natearth2 t_proj_nell t_proj_nell_h t_proj_nicol t_proj_noop t_proj_nsper t_proj_nzmg t_proj_ob_tran t_proj_ocea t_proj_oea t_proj_omerc t_proj_ortel t_proj_ortho t_proj_patterson t_proj_pconic t_proj_peirce_q t_proj_pipeline t_proj_poly t_proj_pop t_proj_push t_proj_putp1 t_proj_putp2 t_proj_putp3 t_proj_putp3p t_proj_putp4p t_proj_putp5 t_proj_putp5p t_proj_putp6 t_proj_putp6p t_proj_qsc t_proj_qua_aut t_proj_rhealpix t_proj_robin t_proj_rouss t_proj_rpoly t_proj_s2 t_proj_sch t_proj_set t_proj_sinu t_proj_som t_proj_somerc t_proj_stere t_proj_sterea t_proj_tcc t_proj_tcea t_proj_times t_proj_tinshift t_proj_tissot t_proj_tmerc t_proj_tobmerc t_proj_topocentric t_proj_tpeqd t_proj_tpers t_proj_unitconvert t_proj_ups t_proj_urm5 t_proj_urmfps t_proj_utm t_proj_vandg t_proj_vandg2 t_proj_vandg3 t_proj_vandg4 t_proj_vertoffset t_proj_vgridshift t_proj_vitk1 t_proj_wag1 t_proj_wag2 t_proj_wag3 t_proj_wag4 t_proj_wag5 t_proj_wag6 t_proj_wag7 t_proj_webmerc t_proj_weren t_proj_wink1 t_proj_wink2 t_proj_wintri t_proj_xyzgridshift );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
+
+use PDL::Core;
+use PDL::Exporter;
+use DynaLoader;
+
+
+   our $VERSION = '2.096';
+   our @ISA = ( 'PDL::Exporter','DynaLoader','PDL::Transform' );
+   push @PDL::Core::PP, __PACKAGE__;
+   bootstrap PDL::Transform::Proj4 $VERSION;
+
+
+
+
+
+
+
+#line 168 "proj4.pd"
+
+# PDL::Transform::Proj4
+#
+# Judd Taylor, USF IMaRS
+# 4 Apr 2006
+
+use strict;
+use warnings;
+use PDL::LiteF;
+use PDL::Transform;
+use Alien::proj;
+
+=head1 NAME
+
+PDL::Transform::Proj4 - PDL::Transform interface to the Proj4 projection library
+
+=head1 SYNOPSIS
+
+ # Using the generalized proj interface:
+ # Make an orthographic map of Earth
+ use PDL::Transform::Cartography;
+ use PDL::Transform::Proj4;
+ use PDL::Graphics::Simple;
+ $e = earth_image('day');
+ ($c, $pen) = graticule(10,2)->glue(1,earth_coast())->clean_lines;
+ $t = t_proj(proj_params => "+proj=ortho +ellps=WGS84 +lon_0=0 +lat_0=40");
+ $w = pgswin();
+ $w->plot(with=>'fits', $e->map($t),
+   with=>'polylines', clean_lines($c->apply($t), $pen), {j=>1});
+
+ # Using the aliased functions:
+ # Make an orthographic map of Earth
+ use PDL::Transform::Cartography;
+ use PDL::Transform::Proj4;
+ use PDL::Graphics::Simple;
+ $e = earth_image('day');
+ ($c, $pen) = graticule(10,2)->glue(1,earth_coast())->clean_lines;
+ $t = t_proj_ortho( ellps => 'WGS84', lon_0=>0, lat_0=>40 );
+ $w = pgswin();
+ $w->plot(with=>'fits', $e->map($t),
+   with=>'polylines', clean_lines($c->apply($t), $pen), {j=>1});
+
+=head1 DESCRIPTION
+
+Works like PDL::Transform::Cartography, but using the proj library in the background.
+
+Please see the proj library docs at L<http://www.remotesensing.org/proj> for more information
+on proj, and how to use the library.
+
+=head1 GENERALIZED INTERFACE
+
+The main object here is the PDL::Transform::Proj4 object, aliased to the t_proj() function.
+
+This object accepts all of the standard options described below, but mainly is there to be called
+with just the B<proj_params> option defined.
+
+When options are used, they must be used with a '+' before them when placed in the proj_params string,
+but that is not required otherwise. See the SYNOPSIS above.
+
+Please note that unlike PROJ, all angles in these operations are
+in degrees. This is correctly (as of PDL 2.094) reflected in the
+PDL::Transform subclass objects.
+
+=head2 ALIASED INTERFACE
+
+Other than t_proj(), all of the other transforms below have been autogenerated, and may not work
+properly. The main problem is determining the parameters a projection requires from the proj
+library itself.
+
+Due to the difficulties in doing this, there may be times when the proj docs specify a parameter
+for a projection that won't work using the anon-hash type specification. In that case, just throw
+that parameter in the proj_params string, and everything should work fine.
+
+=head1 PARAMETERS AVAILABLE IN ALL PROJECTIONS
+
+=head2 General Parameters
+
+=head3 proj_params
+
+This is a string containing the proj "plus style" parameters. This would be similar to what you
+would put on the command line for the 'proj' tool. Like "+proj=ortho +ellps=WGS84 +lon_0=-90 +lat_0=40".
+
+This parameter overrides the others below when it contains parameters that are also specified
+explicitly.
+
+=head3 proj
+
+The proj projection code to use (like ortho...)
+
+=head3 x_0
+
+Cartesian X offset for the output of the transformation
+
+=head3 y_0
+
+Cartesian Y offset for the output of the transformation
+
+=head3 lat_0
+
+Central latitude for the projection.
+NOTE: This may mean other things depending on the projection selected, read the proj docs!
+
+=head3 lon_0
+
+Central longitude for the projection.
+NOTE: This may mean other things depending on the projection selected, read the proj docs!
+
+=head3 units
+
+Cartesian units used for the output of the projection.
+NOTE: Like most of the options here, this is likely useless in the current implementation
+of this library.
+
+=head3 init
+
+Specify a file:unit for proj to use for its runtime defaults. See the proj docs.
+
+=head3 no_defs
+
+Don't load any defaults. See the proj docs.
+
+=head3 over
+
+Normally, the transformation limits the output to between -180 and 180 degrees (or the
+cartesian equivalent), but with this option that behavior is turned off.
+
+=head3 geoc
+
+Input values are geocentric coordinates.
+
+=head2 Earth Figure Parameters
+
+=head3 ellps
+
+Ellipsoid datum to use. Ex: WGS72, WGS74.
+See the proj docs and command line tool for list of possibilities ('proj -le').
+
+=head3 R
+
+Radius of the Earth.
+
+=head3 R_A
+
+Radius of a sphere with equivalent surface area of specified ellipse.
+
+=head3 R_V
+
+Radius of a sphere with equivalent volume of specified ellipse.
+
+=head3 R_a
+
+Arithmetic mean of the major and minor axis, Ra = (a + b)/2.
+
+=head3 R_g
+
+Geometric mean of the major and minor axis, Rg = (ab)/2.
+
+=head3 R_h
+
+Harmonic mean of the major and minor axis, Rh = 2ab/(a + b).
+
+=head3 R_lat_a=phi
+
+Arithmetic mean of the principle radii at latitude phi.
+
+=head3 R_lat_g=phi
+
+Geometric mean of the principle radii at latitude phi.
+
+=head3 b
+
+Semiminor axis or polar radius
+
+=head3 f
+
+Flattening
+
+=head3 rf
+
+Reciprocal flattening, +rf=1/f
+
+=head3 e
+
+Eccentricity +e=e
+
+=head3 es
+
+Eccentricity squared +es=e2
+
+=cut
+
+# Projection options available to all projections:
+our @GENERAL_PARAMS = qw(proj x_0 y_0 lat_0 lon_0 units init);
+# Options for the Earth figure: (ellipsoid, etc):
+our @EARTH_PARAMS = qw(ellps R R_A R_V R_a R_g R_h R_lat_a R_lat_g b f rf e es);
+# Options that have no value (like "+over"):
+our @BOOL_PARAMS = qw( no_defs over geoc );
+
+# The meat -- just copy and paste from Transform.pm :)
+#    (and do some proj stuff here as well)
+sub _proj4_fwd {
+  my ($in, $opt) = @_;
+  my $out = $in->new_or_inplace();
+  # Always set the badflag to 1 here, to handle possible bad projection values:
+  $out->badflag(1);
+  $out->inplace(1);
+  fwd_transform( $out, $opt->{proj_params} );
+}
+sub _proj4_inv {
+  my ($in, $opt) = @_;
+  my $out = $in->new_or_inplace();
+  # Always set the badflag to 1 here, to handle possible bad projection values:
+  $out->badflag(1);
+  $out->inplace(1);
+  inv_transform( $out, $opt->{proj_params} );
+}
+
+sub new {
+    my $self  = shift->SUPER::new( @_ );
+    my $o = $_[0];
+    $o = {@_} if !ref $o;
+    $self->{name} = "Proj4";
+    $self->{params}{proj_params} = PDL::Transform::_opt( $o, ['proj_params','params'] );
+    foreach my $param ( @BOOL_PARAMS ) {
+        my $val = PDL::Transform::_opt( $o, [ $param ] );
+        $self->{params}{$param} = 'ON' if $val;
+    }
+    foreach my $param (@GENERAL_PARAMS, @EARTH_PARAMS) {
+        my $val = PDL::Transform::_opt( $o, [ $param ] );
+        $self->{params}{$param} = $val if defined $val;
+    }
+    # First process the old params that may already be in the string:
+    # These override the specific params set above:
+    if (defined( $self->{params}{proj_params} )) {
+        $self->{orig_proj_params} = $self->{params}{proj_params};
+        my @params = split( /\s+/, $self->{orig_proj_params} );
+        foreach my $param ( @params ) {
+            if ($param =~ /^\+(\S+)=(\S+)/) {
+                my ($name, $val) = ($1, $2);
+                $self->{params}{$name} = $val;
+            } elsif ($param =~ /^\+(\S+)/) {   # Boolean option
+                $self->{params}{$1} = 'ON';
+            }
+        }
+    }
+    @$self{qw(idim odim)} = (2, 2);
+    # Update proj_string to current options:
+    $self->update_proj_string if $self->{params}{proj};
+    $self->{func} = \&_proj4_fwd; # Forward transformation
+    $self->{inv} = \&_proj4_inv; # Inverse transformation
+    return $self;
+} # End of new()...
+
+sub update_proj_string {
+    my $self = shift;
+    # (Re)Generate the proj_params string from the options passed:
+    my @params = map "+$_".($self->{params}{$_} eq 'ON' ? '' : "=$self->{params}{$_}"),
+      sort grep $_ ne 'proj_params' && defined $self->{params}{$_}, keys %{$self->{params}};
+#line 426 "proj4.pd"
+    $self->{params}{proj_params} = "@params";
+  my ($iunit, $ounit) = PDL::Transform::Proj4::units($self->{params}{proj_params});
+  @$self{qw(iunit ounit)} = ([($iunit)x2], [($ounit)x2]);
+} # End of update_proj_string()...
+
+sub proj_params {
+    my $self = shift;
+    $self->update_proj_string;
+    return $self->{params}{proj_params};
+} # End of proj_params()...
+
+sub t_proj {
+    PDL::Transform::Proj4->new( @_ );
+} # End of t_proj()...
+
+sub _make_class {
+  my ($name, $full_name, $can_inv, $param_list) = @_;
+  eval <<"EOF";
+package PDL::Transform::Proj4::${name};
+our \@ISA = 'PDL::Transform::Proj4';
+our \@PARAM_LIST = $param_list;
+sub new {
+  my \$self  = shift->SUPER::new( \@_ );
+  my \$o = \$_[0];
+  \$o = {\@_} if !ref \$o;
+  \$self->{name} = \$self->{params}{proj} = q{$name};
+  foreach my \$param (\@PARAM_LIST) {
+      my \$val = PDL::Transform::_opt( \$o, [ \$param ] );
+      \$self->{params}{\$param} = \$val if defined \$val;
+  }
+  delete \$self->{inv} if !$can_inv;
+  \$self->update_proj_string;
+  return \$self;
+}
+EOF
+}
+#line 322 "Proj4.pm"
+
+*fwd_transform = \&PDL::fwd_transform;
+
+
+
+
+*inv_transform = \&PDL::inv_transform;
+
+
+
+
+
+#line 150 "proj4.pd"
+
+=head2 proj_version
+
+Returns a 3-element list with PROJ major, minor, patch version-numbers.
+Not exported.
+
+=cut
+
+#line 159 "proj4.pd"
+sub load_projection_information {+{
+  'adams_hemi' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'adams_hemi',
+    'INVERSE' => 0,
+    'NAME' => 'Adams Hemisphere in a Square',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'adams_ws1' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'adams_ws1',
+    'INVERSE' => 0,
+    'NAME' => 'Adams World in a Square I',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'adams_ws2' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'adams_ws2',
+    'INVERSE' => 0,
+    'NAME' => 'Adams World in a Square II',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'aea' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'aea',
+    'INVERSE' => 1,
+    'NAME' => 'Albers Equal Area',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lat_2'
+      ]
+    }
+  },
+  'aeqd' => {
+    'CATEGORIES' => [
+      'Azi',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'aeqd',
+    'INVERSE' => 1,
+    'NAME' => 'Azimuthal Equidistant',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_0',
+        'guam'
+      ]
+    }
+  },
+  'affine' => {
+    'CODE' => 'affine',
+    'INVERSE' => 1,
+    'NAME' => 'Affine transformation',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'airy' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'airy',
+    'INVERSE' => 0,
+    'NAME' => 'Airy',
+    'PARAMS' => {
+      'PROJ' => [
+        'no_cut',
+        'lat_b'
+      ]
+    }
+  },
+  'aitoff' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'aitoff',
+    'INVERSE' => 1,
+    'NAME' => 'Aitoff',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'alsk' => {
+    'CATEGORIES' => [
+      'Azi(mod)'
+    ],
+    'CODE' => 'alsk',
+    'INVERSE' => 1,
+    'NAME' => 'Modified Stereographic of Alaska',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'apian' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'apian',
+    'INVERSE' => 0,
+    'NAME' => 'Apian Globular I',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'august' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'august',
+    'INVERSE' => 0,
+    'NAME' => 'August Epicycloidal',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'axisswap' => {
+    'CODE' => 'axisswap',
+    'INVERSE' => 1,
+    'NAME' => 'Axis ordering',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'bacon' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'bacon',
+    'INVERSE' => 0,
+    'NAME' => 'Bacon Globular',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'bertin1953' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'bertin1953',
+    'INVERSE' => 0,
+    'NAME' => 'Bertin 1953',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'bipc' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph'
+    ],
+    'CODE' => 'bipc',
+    'INVERSE' => 1,
+    'NAME' => 'Bipolar conic of western hemisphere',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'boggs' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'boggs',
+    'INVERSE' => 0,
+    'NAME' => 'Boggs Eumorphic',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'bonne' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'bonne',
+    'INVERSE' => 1,
+    'NAME' => 'Bonne (Werner lat_1=90)',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1'
+      ]
+    }
+  },
+  'calcofi' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'calcofi',
+    'INVERSE' => 1,
+    'NAME' => 'Cal Coop Ocean Fish Invest Lines/Stations',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'cart' => {
+    'CODE' => 'cart',
+    'INVERSE' => 1,
+    'NAME' => 'Geodetic/cartesian conversions',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'cass' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'cass',
+    'INVERSE' => 1,
+    'NAME' => 'Cassini',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'cc' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'cc',
+    'INVERSE' => 1,
+    'NAME' => 'Central Cylindrical',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'ccon' => {
+    'CATEGORIES' => [
+      'Central',
+      'Conic',
+      'Sph'
+    ],
+    'CODE' => 'ccon',
+    'INVERSE' => 1,
+    'NAME' => 'Central Conic',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1'
+      ]
+    }
+  },
+  'cea' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'cea',
+    'INVERSE' => 1,
+    'NAME' => 'Equal Area Cylindrical',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_ts'
+      ]
+    }
+  },
+  'chamb' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'chamb',
+    'INVERSE' => 0,
+    'NAME' => 'Chamberlin Trimetric',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lon_1',
+        'lat_2',
+        'lon_2',
+        'lat_3',
+        'lon_3'
+      ]
+    }
+  },
+  'col_urban' => {
+    'CATEGORIES' => [
+      'Misc'
+    ],
+    'CODE' => 'col_urban',
+    'INVERSE' => 1,
+    'NAME' => 'Colombia Urban',
+    'PARAMS' => {
+      'PROJ' => [
+        'h_0'
+      ]
+    }
+  },
+  'collg' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'collg',
+    'INVERSE' => 1,
+    'NAME' => 'Collignon',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'comill' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'comill',
+    'INVERSE' => 1,
+    'NAME' => 'Compact Miller',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'crast' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'crast',
+    'INVERSE' => 1,
+    'NAME' => 'Craster Parabolic (Putnins P4)',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'defmodel' => {
+    'CODE' => 'defmodel',
+    'INVERSE' => 1,
+    'NAME' => 'Deformation model',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'deformation' => {
+    'CODE' => 'deformation',
+    'INVERSE' => 1,
+    'NAME' => 'Kinematic grid shift',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'denoy' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'denoy',
+    'INVERSE' => 0,
+    'NAME' => 'Denoyer Semi-Elliptical',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'eck1' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'eck1',
+    'INVERSE' => 1,
+    'NAME' => 'Eckert I',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'eck2' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'eck2',
+    'INVERSE' => 1,
+    'NAME' => 'Eckert II',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'eck3' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'eck3',
+    'INVERSE' => 1,
+    'NAME' => 'Eckert III',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'eck4' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'eck4',
+    'INVERSE' => 1,
+    'NAME' => 'Eckert IV',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'eck5' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'eck5',
+    'INVERSE' => 1,
+    'NAME' => 'Eckert V',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'eck6' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'eck6',
+    'INVERSE' => 1,
+    'NAME' => 'Eckert VI',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'eqc' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'eqc',
+    'INVERSE' => 1,
+    'NAME' => 'Equidistant Cylindrical (Plate Carree)',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_ts',
+        'lat_00'
+      ]
+    }
+  },
+  'eqdc' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'eqdc',
+    'INVERSE' => 1,
+    'NAME' => 'Equidistant Conic',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lat_2'
+      ]
+    }
+  },
+  'eqearth' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'eqearth',
+    'INVERSE' => 1,
+    'NAME' => 'Equal Earth',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'etmerc' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'etmerc',
+    'INVERSE' => 1,
+    'NAME' => 'Extended Transverse Mercator',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'euler' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph'
+    ],
+    'CODE' => 'euler',
+    'INVERSE' => 1,
+    'NAME' => 'Euler',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lat_2'
+      ]
+    }
+  },
+  'fahey' => {
+    'CATEGORIES' => [
+      'Pcyl',
+      'Sph'
+    ],
+    'CODE' => 'fahey',
+    'INVERSE' => 1,
+    'NAME' => 'Fahey',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'fouc' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'fouc',
+    'INVERSE' => 1,
+    'NAME' => 'Foucaut',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'fouc_s' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'fouc_s',
+    'INVERSE' => 1,
+    'NAME' => 'Foucaut Sinusoidal',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'gall' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'gall',
+    'INVERSE' => 1,
+    'NAME' => 'Gall (Gall Stereographic)',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'geoc' => {
+    'CODE' => 'geoc',
+    'INVERSE' => 1,
+    'NAME' => 'Geocentric Latitude',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'geogoffset' => {
+    'CODE' => 'geogoffset',
+    'INVERSE' => 1,
+    'NAME' => 'Geographic Offset',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'geos' => {
+    'CATEGORIES' => [
+      'Azi',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'geos',
+    'INVERSE' => 1,
+    'NAME' => 'Geostationary Satellite View',
+    'PARAMS' => {
+      'PROJ' => [
+        'h'
+      ]
+    }
+  },
+  'gins8' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'gins8',
+    'INVERSE' => 0,
+    'NAME' => 'Ginsburg VIII (TsNIIGAiK)',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'gn_sinu' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'gn_sinu',
+    'INVERSE' => 1,
+    'NAME' => 'General Sinusoidal Series',
+    'PARAMS' => {
+      'PROJ' => [
+        'm',
+        'n'
+      ]
+    }
+  },
+  'gnom' => {
+    'CATEGORIES' => [
+      'Azi',
+      'Sph'
+    ],
+    'CODE' => 'gnom',
+    'INVERSE' => 1,
+    'NAME' => 'Gnomonic',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'goode' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'goode',
+    'INVERSE' => 1,
+    'NAME' => 'Goode Homolosine',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'gridshift' => {
+    'CODE' => 'gridshift',
+    'INVERSE' => 1,
+    'NAME' => 'Generic grid shift',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'gs48' => {
+    'CATEGORIES' => [
+      'Azi(mod)'
+    ],
+    'CODE' => 'gs48',
+    'INVERSE' => 1,
+    'NAME' => 'Modified Stereographic of 48 U.S.',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'gs50' => {
+    'CATEGORIES' => [
+      'Azi(mod)'
+    ],
+    'CODE' => 'gs50',
+    'INVERSE' => 1,
+    'NAME' => 'Modified Stereographic of 50 U.S.',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'gstmerc' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'gstmerc',
+    'INVERSE' => 1,
+    'NAME' => 'Gauss-Schreiber Transverse Mercator (aka Gauss-Laborde Reunion)',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_0',
+        'lon_0',
+        'k_0'
+      ]
+    }
+  },
+  'guyou' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'guyou',
+    'INVERSE' => 0,
+    'NAME' => 'Guyou',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'hammer' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'hammer',
+    'INVERSE' => 1,
+    'NAME' => 'Hammer & Eckert-Greifendorff',
+    'PARAMS' => {
+      'PROJ' => [
+        'W',
+        'M'
+      ]
+    }
+  },
+  'hatano' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'hatano',
+    'INVERSE' => 1,
+    'NAME' => 'Hatano Asymmetrical Equal Area',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'healpix' => {
+    'CATEGORIES' => [
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'healpix',
+    'INVERSE' => 1,
+    'NAME' => 'HEALPix',
+    'PARAMS' => {
+      'PROJ' => [
+        'rot_xy'
+      ]
+    }
+  },
+  'helmert' => {
+    'CODE' => 'helmert',
+    'INVERSE' => 1,
+    'NAME' => '3(6)-, 4(8)- and 7(14)-parameter Helmert shift',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'hgridshift' => {
+    'CODE' => 'hgridshift',
+    'INVERSE' => 1,
+    'NAME' => 'Horizontal grid shift',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'horner' => {
+    'CODE' => 'horner',
+    'INVERSE' => 1,
+    'NAME' => 'Horner polynomial evaluation',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'igh' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'igh',
+    'INVERSE' => 1,
+    'NAME' => 'Interrupted Goode Homolosine',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'igh_o' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'igh_o',
+    'INVERSE' => 1,
+    'NAME' => 'Interrupted Goode Homolosine Oceanic View',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'imoll' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'imoll',
+    'INVERSE' => 1,
+    'NAME' => 'Interrupted Mollweide',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'imoll_o' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'imoll_o',
+    'INVERSE' => 1,
+    'NAME' => 'Interrupted Mollweide Oceanic View',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'imw_p' => {
+    'CATEGORIES' => [
+      'Mod.',
+      'Polyconic',
+      'Ell'
+    ],
+    'CODE' => 'imw_p',
+    'INVERSE' => 1,
+    'NAME' => 'International Map of the World Polyconic',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lat_2',
+        'lon_1'
+      ]
+    }
+  },
+  'isea' => {
+    'CATEGORIES' => [
+      'Sph'
+    ],
+    'CODE' => 'isea',
+    'INVERSE' => 1,
+    'NAME' => 'Icosahedral Snyder Equal Area',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'kav5' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'kav5',
+    'INVERSE' => 1,
+    'NAME' => 'Kavrayskiy V',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'kav7' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'kav7',
+    'INVERSE' => 1,
+    'NAME' => 'Kavrayskiy VII',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'krovak' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Ell'
+    ],
+    'CODE' => 'krovak',
+    'INVERSE' => 1,
+    'NAME' => 'Krovak',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'labrd' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'labrd',
+    'INVERSE' => 1,
+    'NAME' => 'Laborde',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_0'
+      ]
+    }
+  },
+  'laea' => {
+    'CATEGORIES' => [
+      'Azi',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'laea',
+    'INVERSE' => 1,
+    'NAME' => 'Lambert Azimuthal Equal Area',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'lagrng' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'lagrng',
+    'INVERSE' => 1,
+    'NAME' => 'Lagrange',
+    'PARAMS' => {
+      'PROJ' => [
+        'W'
+      ]
+    }
+  },
+  'larr' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'larr',
+    'INVERSE' => 0,
+    'NAME' => 'Larrivee',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'lask' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'lask',
+    'INVERSE' => 0,
+    'NAME' => 'Laskowski',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'latlon' => {
+    'CATEGORIES' => [],
+    'CODE' => 'latlon',
+    'INVERSE' => 1,
+    'NAME' => 'Lat/long (Geodetic alias)',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'lcc' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'lcc',
+    'INVERSE' => 1,
+    'NAME' => 'Lambert Conformal Conic',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lat_2',
+        'lat_0',
+        'k_0'
+      ]
+    }
+  },
+  'lcca' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'lcca',
+    'INVERSE' => 1,
+    'NAME' => 'Lambert Conformal Conic Alternative',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_0'
+      ]
+    }
+  },
+  'leac' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'leac',
+    'INVERSE' => 1,
+    'NAME' => 'Lambert Equal Area Conic',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'south'
+      ]
+    }
+  },
+  'lee_os' => {
+    'CATEGORIES' => [
+      'Azi(mod)'
+    ],
+    'CODE' => 'lee_os',
+    'INVERSE' => 1,
+    'NAME' => 'Lee Oblated Stereographic',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'lonlat' => {
+    'CATEGORIES' => [],
+    'CODE' => 'lonlat',
+    'INVERSE' => 1,
+    'NAME' => 'Lat/long (Geodetic)',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'loxim' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'loxim',
+    'INVERSE' => 1,
+    'NAME' => 'Loximuthal',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'lsat' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'lsat',
+    'INVERSE' => 1,
+    'NAME' => 'Space oblique for LANDSAT',
+    'PARAMS' => {
+      'PROJ' => [
+        'lsat',
+        'path'
+      ]
+    }
+  },
+  'mbt_fps' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'mbt_fps',
+    'INVERSE' => 1,
+    'NAME' => 'McBryde-Thomas Flat-Pole Sine (No. 2)',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'mbt_s' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'mbt_s',
+    'INVERSE' => 1,
+    'NAME' => 'McBryde-Thomas Flat-Polar Sine (No. 1)',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'mbtfpp' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'mbtfpp',
+    'INVERSE' => 1,
+    'NAME' => 'McBride-Thomas Flat-Polar Parabolic',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'mbtfpq' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'mbtfpq',
+    'INVERSE' => 1,
+    'NAME' => 'McBryde-Thomas Flat-Polar Quartic',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'mbtfps' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'mbtfps',
+    'INVERSE' => 1,
+    'NAME' => 'McBryde-Thomas Flat-Polar Sinusoidal',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'merc' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'merc',
+    'INVERSE' => 1,
+    'NAME' => 'Mercator',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_ts'
+      ]
+    }
+  },
+  'mil_os' => {
+    'CATEGORIES' => [
+      'Azi(mod)'
+    ],
+    'CODE' => 'mil_os',
+    'INVERSE' => 1,
+    'NAME' => 'Miller Oblated Stereographic',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'mill' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'mill',
+    'INVERSE' => 1,
+    'NAME' => 'Miller Cylindrical',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'misrsom' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'misrsom',
+    'INVERSE' => 1,
+    'NAME' => 'Space oblique for MISR',
+    'PARAMS' => {
+      'PROJ' => [
+        'path'
+      ]
+    }
+  },
+  'mod_krovak' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Ell'
+    ],
+    'CODE' => 'mod_krovak',
+    'INVERSE' => 1,
+    'NAME' => 'Modified Krovak',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'moll' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'moll',
+    'INVERSE' => 1,
+    'NAME' => 'Mollweide',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'molobadekas' => {
+    'CODE' => 'molobadekas',
+    'INVERSE' => 1,
+    'NAME' => 'Molodensky-Badekas transformation',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'molodensky' => {
+    'CODE' => 'molodensky',
+    'INVERSE' => 1,
+    'NAME' => 'Molodensky transform',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'murd1' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph'
+    ],
+    'CODE' => 'murd1',
+    'INVERSE' => 1,
+    'NAME' => 'Murdoch I',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lat_2'
+      ]
+    }
+  },
+  'murd2' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph'
+    ],
+    'CODE' => 'murd2',
+    'INVERSE' => 1,
+    'NAME' => 'Murdoch II',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lat_2'
+      ]
+    }
+  },
+  'murd3' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph'
+    ],
+    'CODE' => 'murd3',
+    'INVERSE' => 1,
+    'NAME' => 'Murdoch III',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lat_2'
+      ]
+    }
+  },
+  'natearth' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'natearth',
+    'INVERSE' => 1,
+    'NAME' => 'Natural Earth',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'natearth2' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'natearth2',
+    'INVERSE' => 1,
+    'NAME' => 'Natural Earth 2',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'nell' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'nell',
+    'INVERSE' => 1,
+    'NAME' => 'Nell',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'nell_h' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'nell_h',
+    'INVERSE' => 1,
+    'NAME' => 'Nell-Hammer',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'nicol' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'nicol',
+    'INVERSE' => 0,
+    'NAME' => 'Nicolosi Globular',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'noop' => {
+    'CODE' => 'noop',
+    'INVERSE' => 1,
+    'NAME' => 'No operation',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'nsper' => {
+    'CATEGORIES' => [
+      'Azi',
+      'Sph'
+    ],
+    'CODE' => 'nsper',
+    'INVERSE' => 1,
+    'NAME' => 'Near-sided perspective',
+    'PARAMS' => {
+      'PROJ' => [
+        'h'
+      ]
+    }
+  },
+  'nzmg' => {
+    'CATEGORIES' => [
+      'fixed Earth'
+    ],
+    'CODE' => 'nzmg',
+    'INVERSE' => 1,
+    'NAME' => 'New Zealand Map Grid',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'ob_tran' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'ob_tran',
+    'INVERSE' => 1,
+    'NAME' => 'General Oblique Transformation',
+    'PARAMS' => {
+      'PROJ' => [
+        'o_proj',
+        'o_lat_p',
+        'o_lon_p',
+        'o_alpha',
+        'o_lon_c',
+        'o_lat_c',
+        'o_lon_1',
+        'o_lat_1',
+        'o_lon_2',
+        'o_lat_2'
+      ]
+    }
+  },
+  'ocea' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sphlonc=',
+      'alpha='
+    ],
+    'CODE' => 'ocea',
+    'INVERSE' => 1,
+    'NAME' => 'Oblique Cylindrical Equal Area',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lat_2',
+        'lon_1',
+        'lon_2'
+      ]
+    }
+  },
+  'oea' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'oea',
+    'INVERSE' => 1,
+    'NAME' => 'Oblated Equal Area',
+    'PARAMS' => {
+      'PROJ' => [
+        'n',
+        'm',
+        'theta'
+      ]
+    }
+  },
+  'omerc' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph',
+      'Ell',
+      'no_rot'
+    ],
+    'CODE' => 'omerc',
+    'INVERSE' => 1,
+    'NAME' => 'Oblique Mercator',
+    'PARAMS' => {
+      'PROJ' => [
+        'alpha',
+        'gamma',
+        'no_off',
+        'lonc',
+        'lon_1',
+        'lat_1',
+        'lon_2',
+        'lat_2'
+      ]
+    }
+  },
+  'ortel' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'ortel',
+    'INVERSE' => 0,
+    'NAME' => 'Ortelius Oval',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'ortho' => {
+    'CATEGORIES' => [
+      'Azi',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'ortho',
+    'INVERSE' => 1,
+    'NAME' => 'Orthographic',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'patterson' => {
+    'CATEGORIES' => [
+      'Cyl'
+    ],
+    'CODE' => 'patterson',
+    'INVERSE' => 1,
+    'NAME' => 'Patterson Cylindrical',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'pconic' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph'
+    ],
+    'CODE' => 'pconic',
+    'INVERSE' => 1,
+    'NAME' => 'Perspective Conic',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lat_2'
+      ]
+    }
+  },
+  'peirce_q' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'peirce_q',
+    'INVERSE' => 0,
+    'NAME' => 'Peirce Quincuncial',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'pipeline' => {
+    'CODE' => 'pipeline',
+    'INVERSE' => 1,
+    'NAME' => 'Transformation pipeline manager',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'poly' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'poly',
+    'INVERSE' => 1,
+    'NAME' => 'Polyconic (American)',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'pop' => {
+    'CODE' => 'pop',
+    'INVERSE' => 1,
+    'NAME' => 'Retrieve coordinate value from pipeline stack',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'push' => {
+    'CODE' => 'push',
+    'INVERSE' => 1,
+    'NAME' => 'Save coordinate value on pipeline stack',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'putp1' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'putp1',
+    'INVERSE' => 1,
+    'NAME' => 'Putnins P1',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'putp2' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'putp2',
+    'INVERSE' => 1,
+    'NAME' => 'Putnins P2',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'putp3' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'putp3',
+    'INVERSE' => 1,
+    'NAME' => 'Putnins P3',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'putp3p' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'putp3p',
+    'INVERSE' => 1,
+    'NAME' => 'Putnins P3\'',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'putp4p' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'putp4p',
+    'INVERSE' => 1,
+    'NAME' => 'Putnins P4\'',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'putp5' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'putp5',
+    'INVERSE' => 1,
+    'NAME' => 'Putnins P5',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'putp5p' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'putp5p',
+    'INVERSE' => 1,
+    'NAME' => 'Putnins P5\'',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'putp6' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'putp6',
+    'INVERSE' => 1,
+    'NAME' => 'Putnins P6',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'putp6p' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'putp6p',
+    'INVERSE' => 1,
+    'NAME' => 'Putnins P6\'',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'qsc' => {
+    'CATEGORIES' => [
+      'Azi',
+      'Sph'
+    ],
+    'CODE' => 'qsc',
+    'INVERSE' => 1,
+    'NAME' => 'Quadrilateralized Spherical Cube',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'qua_aut' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'qua_aut',
+    'INVERSE' => 1,
+    'NAME' => 'Quartic Authalic',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'rhealpix' => {
+    'CATEGORIES' => [
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'rhealpix',
+    'INVERSE' => 1,
+    'NAME' => 'rHEALPix',
+    'PARAMS' => {
+      'PROJ' => [
+        'north_square',
+        'south_square'
+      ]
+    }
+  },
+  'robin' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'robin',
+    'INVERSE' => 1,
+    'NAME' => 'Robinson',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'rouss' => {
+    'CATEGORIES' => [
+      'Azi',
+      'Ell'
+    ],
+    'CODE' => 'rouss',
+    'INVERSE' => 1,
+    'NAME' => 'Roussilhe Stereographic',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'rpoly' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph'
+    ],
+    'CODE' => 'rpoly',
+    'INVERSE' => 0,
+    'NAME' => 'Rectangular Polyconic',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_ts'
+      ]
+    }
+  },
+  's2' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 's2',
+    'INVERSE' => 1,
+    'NAME' => 'S2',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'sch' => {
+    'CATEGORIES' => [
+      'Misc'
+    ],
+    'CODE' => 'sch',
+    'INVERSE' => 1,
+    'NAME' => 'Spherical Cross-track Height',
+    'PARAMS' => {
+      'PROJ' => [
+        'plat_0',
+        'plon_0',
+        'phdg_0',
+        'h_0'
+      ]
+    }
+  },
+  'set' => {
+    'CODE' => 'set',
+    'INVERSE' => 1,
+    'NAME' => 'Set coordinate value',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'sinu' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'sinu',
+    'INVERSE' => 1,
+    'NAME' => 'Sinusoidal (Sanson-Flamsteed)',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'som' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'som',
+    'INVERSE' => 1,
+    'NAME' => 'Space Oblique Mercator',
+    'PARAMS' => {
+      'PROJ' => [
+        'inc_angle',
+        'ps_rev',
+        'asc_lon'
+      ]
+    }
+  },
+  'somerc' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Ell'
+    ],
+    'CODE' => 'somerc',
+    'INVERSE' => 1,
+    'NAME' => 'Swiss. Obl. Mercator',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'stere' => {
+    'CATEGORIES' => [
+      'Azi',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'stere',
+    'INVERSE' => 1,
+    'NAME' => 'Stereographic',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_ts'
+      ]
+    }
+  },
+  'sterea' => {
+    'CATEGORIES' => [
+      'Azimuthal',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'sterea',
+    'INVERSE' => 1,
+    'NAME' => 'Oblique Stereographic Alternative',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'tcc' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'tcc',
+    'INVERSE' => 0,
+    'NAME' => 'Transverse Central Cylindrical',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'tcea' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'tcea',
+    'INVERSE' => 1,
+    'NAME' => 'Transverse Cylindrical Equal Area',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'times' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'times',
+    'INVERSE' => 1,
+    'NAME' => 'Times',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'tinshift' => {
+    'CODE' => 'tinshift',
+    'INVERSE' => 1,
+    'NAME' => 'Triangulation based transformation',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'tissot' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph'
+    ],
+    'CODE' => 'tissot',
+    'INVERSE' => 1,
+    'NAME' => 'Tissot',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lat_2'
+      ]
+    }
+  },
+  'tmerc' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph',
+      'Ell'
+    ],
+    'CODE' => 'tmerc',
+    'INVERSE' => 1,
+    'NAME' => 'Transverse Mercator',
+    'PARAMS' => {
+      'PROJ' => [
+        'approx'
+      ]
+    }
+  },
+  'tobmerc' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Sph'
+    ],
+    'CODE' => 'tobmerc',
+    'INVERSE' => 1,
+    'NAME' => 'Tobler-Mercator',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'topocentric' => {
+    'CODE' => 'topocentric',
+    'INVERSE' => 1,
+    'NAME' => 'Geocentric/Topocentric conversion',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'tpeqd' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'tpeqd',
+    'INVERSE' => 1,
+    'NAME' => 'Two Point Equidistant',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lon_1',
+        'lat_2',
+        'lon_2'
+      ]
+    }
+  },
+  'tpers' => {
+    'CATEGORIES' => [
+      'Azi',
+      'Sph'
+    ],
+    'CODE' => 'tpers',
+    'INVERSE' => 1,
+    'NAME' => 'Tilted perspective',
+    'PARAMS' => {
+      'PROJ' => [
+        'tilt',
+        'azi',
+        'h'
+      ]
+    }
+  },
+  'unitconvert' => {
+    'CODE' => 'unitconvert',
+    'INVERSE' => 1,
+    'NAME' => 'Unit conversion',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'ups' => {
+    'CATEGORIES' => [
+      'Azi',
+      'Ell'
+    ],
+    'CODE' => 'ups',
+    'INVERSE' => 1,
+    'NAME' => 'Universal Polar Stereographic',
+    'PARAMS' => {
+      'PROJ' => [
+        'south'
+      ]
+    }
+  },
+  'urm5' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'urm5',
+    'INVERSE' => 0,
+    'NAME' => 'Urmaev V',
+    'PARAMS' => {
+      'PROJ' => [
+        'n',
+        'q',
+        'alpha'
+      ]
+    }
+  },
+  'urmfps' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'urmfps',
+    'INVERSE' => 1,
+    'NAME' => 'Urmaev Flat-Polar Sinusoidal',
+    'PARAMS' => {
+      'PROJ' => [
+        'n'
+      ]
+    }
+  },
+  'utm' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Ell'
+    ],
+    'CODE' => 'utm',
+    'INVERSE' => 1,
+    'NAME' => 'Universal Transverse Mercator (UTM)',
+    'PARAMS' => {
+      'PROJ' => [
+        'zone',
+        'south',
+        'approx'
+      ]
+    }
+  },
+  'vandg' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'vandg',
+    'INVERSE' => 1,
+    'NAME' => 'van der Grinten (I)',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'vandg2' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'vandg2',
+    'INVERSE' => 0,
+    'NAME' => 'van der Grinten II',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'vandg3' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'vandg3',
+    'INVERSE' => 0,
+    'NAME' => 'van der Grinten III',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'vandg4' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'vandg4',
+    'INVERSE' => 0,
+    'NAME' => 'van der Grinten IV',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'vertoffset' => {
+    'CATEGORIES' => [
+      'Transfmation'
+    ],
+    'CODE' => 'vertoffset',
+    'INVERSE' => 1,
+    'NAME' => 'Vertical Offset and Slope',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_0',
+        'lon_0',
+        'dh',
+        'slope_lat',
+        'slope_lon'
+      ]
+    }
+  },
+  'vgridshift' => {
+    'CODE' => 'vgridshift',
+    'INVERSE' => 1,
+    'NAME' => 'Vertical grid shift',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'vitk1' => {
+    'CATEGORIES' => [
+      'Conic',
+      'Sph'
+    ],
+    'CODE' => 'vitk1',
+    'INVERSE' => 1,
+    'NAME' => 'Vitkovsky I',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1',
+        'lat_2'
+      ]
+    }
+  },
+  'wag1' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'wag1',
+    'INVERSE' => 1,
+    'NAME' => 'Wagner I (Kavrayskiy VI)',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'wag2' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'wag2',
+    'INVERSE' => 1,
+    'NAME' => 'Wagner II',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'wag3' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'wag3',
+    'INVERSE' => 1,
+    'NAME' => 'Wagner III',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_ts'
+      ]
+    }
+  },
+  'wag4' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'wag4',
+    'INVERSE' => 1,
+    'NAME' => 'Wagner IV',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'wag5' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'wag5',
+    'INVERSE' => 1,
+    'NAME' => 'Wagner V',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'wag6' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'wag6',
+    'INVERSE' => 1,
+    'NAME' => 'Wagner VI',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'wag7' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'wag7',
+    'INVERSE' => 0,
+    'NAME' => 'Wagner VII',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'webmerc' => {
+    'CATEGORIES' => [
+      'Cyl',
+      'Ell'
+    ],
+    'CODE' => 'webmerc',
+    'INVERSE' => 1,
+    'NAME' => 'Web Mercator / Pseudo Mercator',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'weren' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'weren',
+    'INVERSE' => 1,
+    'NAME' => 'Werenskiold I',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  },
+  'wink1' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'wink1',
+    'INVERSE' => 1,
+    'NAME' => 'Winkel I',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_ts'
+      ]
+    }
+  },
+  'wink2' => {
+    'CATEGORIES' => [
+      'PCyl',
+      'Sph'
+    ],
+    'CODE' => 'wink2',
+    'INVERSE' => 1,
+    'NAME' => 'Winkel II',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1'
+      ]
+    }
+  },
+  'wintri' => {
+    'CATEGORIES' => [
+      'Misc',
+      'Sph'
+    ],
+    'CODE' => 'wintri',
+    'INVERSE' => 1,
+    'NAME' => 'Winkel Tripel',
+    'PARAMS' => {
+      'PROJ' => [
+        'lat_1'
+      ]
+    }
+  },
+  'xyzgridshift' => {
+    'CODE' => 'xyzgridshift',
+    'INVERSE' => 1,
+    'NAME' => 'Geocentric grid shift',
+    'PARAMS' => {
+      'PROJ' => []
+    }
+  }
+}
+}
+
+#line 467 "proj4.pd"
+
+=head1 FUNCTIONS
+
+=head2 t_proj
+
+This is the main entry point for the generalized interface. See above on its usage.
+
+=cut
+
+#line 484 "proj4.pd"
+=head2 t_proj_adams_hemi
+
+Proj4 projection code C<adams_hemi>, full name "Adams Hemisphere in a Square".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_adams_hemi {'PDL::Transform::Proj4::adams_hemi'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_adams_ws1
+
+Proj4 projection code C<adams_ws1>, full name "Adams World in a Square I".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_adams_ws1 {'PDL::Transform::Proj4::adams_ws1'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_adams_ws2
+
+Proj4 projection code C<adams_ws2>, full name "Adams World in a Square II".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_adams_ws2 {'PDL::Transform::Proj4::adams_ws2'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_aea
+
+Proj4 projection code C<aea>, full name "Albers Equal Area".
+
+Categories: Conic Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item lat_2
+
+=back
+
+=cut
+
+sub t_proj_aea {'PDL::Transform::Proj4::aea'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_aeqd
+
+Proj4 projection code C<aeqd>, full name "Azimuthal Equidistant".
+
+Categories: Azi Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item guam
+
+=item lat_0
+
+=back
+
+=cut
+
+sub t_proj_aeqd {'PDL::Transform::Proj4::aeqd'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_affine
+
+Proj4 projection code C<affine>, full name "Affine transformation".
+
+=cut
+
+sub t_proj_affine {'PDL::Transform::Proj4::affine'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_airy
+
+Proj4 projection code C<airy>, full name "Airy".
+
+Categories: B<no inverse> Misc Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_b
+
+=item no_cut
+
+=back
+
+=cut
+
+sub t_proj_airy {'PDL::Transform::Proj4::airy'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_aitoff
+
+Proj4 projection code C<aitoff>, full name "Aitoff".
+
+Categories: Misc Sph.
+
+=cut
+
+sub t_proj_aitoff {'PDL::Transform::Proj4::aitoff'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_alsk
+
+Proj4 projection code C<alsk>, full name "Modified Stereographic of Alaska".
+
+Categories: Azi(mod).
+
+=cut
+
+sub t_proj_alsk {'PDL::Transform::Proj4::alsk'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_apian
+
+Proj4 projection code C<apian>, full name "Apian Globular I".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_apian {'PDL::Transform::Proj4::apian'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_august
+
+Proj4 projection code C<august>, full name "August Epicycloidal".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_august {'PDL::Transform::Proj4::august'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_axisswap
+
+Proj4 projection code C<axisswap>, full name "Axis ordering".
+
+=cut
+
+sub t_proj_axisswap {'PDL::Transform::Proj4::axisswap'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_bacon
+
+Proj4 projection code C<bacon>, full name "Bacon Globular".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_bacon {'PDL::Transform::Proj4::bacon'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_bertin1953
+
+Proj4 projection code C<bertin1953>, full name "Bertin 1953".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_bertin1953 {'PDL::Transform::Proj4::bertin1953'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_bipc
+
+Proj4 projection code C<bipc>, full name "Bipolar conic of western hemisphere".
+
+Categories: Conic Sph.
+
+=cut
+
+sub t_proj_bipc {'PDL::Transform::Proj4::bipc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_boggs
+
+Proj4 projection code C<boggs>, full name "Boggs Eumorphic".
+
+Categories: B<no inverse> PCyl Sph.
+
+=cut
+
+sub t_proj_boggs {'PDL::Transform::Proj4::boggs'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_bonne
+
+Proj4 projection code C<bonne>, full name "Bonne (Werner lat_1=90)".
+
+Categories: Conic Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=back
+
+=cut
+
+sub t_proj_bonne {'PDL::Transform::Proj4::bonne'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_calcofi
+
+Proj4 projection code C<calcofi>, full name "Cal Coop Ocean Fish Invest Lines/Stations".
+
+Categories: Cyl Sph Ell.
+
+=cut
+
+sub t_proj_calcofi {'PDL::Transform::Proj4::calcofi'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_cart
+
+Proj4 projection code C<cart>, full name "Geodetic/cartesian conversions".
+
+=cut
+
+sub t_proj_cart {'PDL::Transform::Proj4::cart'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_cass
+
+Proj4 projection code C<cass>, full name "Cassini".
+
+Categories: Cyl Sph Ell.
+
+=cut
+
+sub t_proj_cass {'PDL::Transform::Proj4::cass'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_cc
+
+Proj4 projection code C<cc>, full name "Central Cylindrical".
+
+Categories: Cyl Sph.
+
+=cut
+
+sub t_proj_cc {'PDL::Transform::Proj4::cc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_ccon
+
+Proj4 projection code C<ccon>, full name "Central Conic".
+
+Categories: Central Conic Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=back
+
+=cut
+
+sub t_proj_ccon {'PDL::Transform::Proj4::ccon'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_cea
+
+Proj4 projection code C<cea>, full name "Equal Area Cylindrical".
+
+Categories: Cyl Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_ts
+
+=back
+
+=cut
+
+sub t_proj_cea {'PDL::Transform::Proj4::cea'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_chamb
+
+Proj4 projection code C<chamb>, full name "Chamberlin Trimetric".
+
+Categories: B<no inverse> Misc Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item lat_2
+
+=item lat_3
+
+=item lon_1
+
+=item lon_2
+
+=item lon_3
+
+=back
+
+=cut
+
+sub t_proj_chamb {'PDL::Transform::Proj4::chamb'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_col_urban
+
+Proj4 projection code C<col_urban>, full name "Colombia Urban".
+
+Categories: Misc.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item h_0
+
+=back
+
+=cut
+
+sub t_proj_col_urban {'PDL::Transform::Proj4::col_urban'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_collg
+
+Proj4 projection code C<collg>, full name "Collignon".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_collg {'PDL::Transform::Proj4::collg'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_comill
+
+Proj4 projection code C<comill>, full name "Compact Miller".
+
+Categories: Cyl Sph.
+
+=cut
+
+sub t_proj_comill {'PDL::Transform::Proj4::comill'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_crast
+
+Proj4 projection code C<crast>, full name "Craster Parabolic (Putnins P4)".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_crast {'PDL::Transform::Proj4::crast'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_defmodel
+
+Proj4 projection code C<defmodel>, full name "Deformation model".
+
+=cut
+
+sub t_proj_defmodel {'PDL::Transform::Proj4::defmodel'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_deformation
+
+Proj4 projection code C<deformation>, full name "Kinematic grid shift".
+
+=cut
+
+sub t_proj_deformation {'PDL::Transform::Proj4::deformation'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_denoy
+
+Proj4 projection code C<denoy>, full name "Denoyer Semi-Elliptical".
+
+Categories: B<no inverse> PCyl Sph.
+
+=cut
+
+sub t_proj_denoy {'PDL::Transform::Proj4::denoy'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_eck1
+
+Proj4 projection code C<eck1>, full name "Eckert I".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_eck1 {'PDL::Transform::Proj4::eck1'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_eck2
+
+Proj4 projection code C<eck2>, full name "Eckert II".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_eck2 {'PDL::Transform::Proj4::eck2'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_eck3
+
+Proj4 projection code C<eck3>, full name "Eckert III".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_eck3 {'PDL::Transform::Proj4::eck3'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_eck4
+
+Proj4 projection code C<eck4>, full name "Eckert IV".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_eck4 {'PDL::Transform::Proj4::eck4'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_eck5
+
+Proj4 projection code C<eck5>, full name "Eckert V".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_eck5 {'PDL::Transform::Proj4::eck5'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_eck6
+
+Proj4 projection code C<eck6>, full name "Eckert VI".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_eck6 {'PDL::Transform::Proj4::eck6'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_eqc
+
+Proj4 projection code C<eqc>, full name "Equidistant Cylindrical (Plate Carree)".
+
+Categories: Cyl Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_00
+
+=item lat_ts
+
+=back
+
+=cut
+
+sub t_proj_eqc {'PDL::Transform::Proj4::eqc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_eqdc
+
+Proj4 projection code C<eqdc>, full name "Equidistant Conic".
+
+Categories: Conic Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item lat_2
+
+=back
+
+=cut
+
+sub t_proj_eqdc {'PDL::Transform::Proj4::eqdc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_eqearth
+
+Proj4 projection code C<eqearth>, full name "Equal Earth".
+
+Categories: PCyl Sph Ell.
+
+=cut
+
+sub t_proj_eqearth {'PDL::Transform::Proj4::eqearth'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_etmerc
+
+Proj4 projection code C<etmerc>, full name "Extended Transverse Mercator".
+
+Categories: Cyl Sph.
+
+=cut
+
+sub t_proj_etmerc {'PDL::Transform::Proj4::etmerc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_euler
+
+Proj4 projection code C<euler>, full name "Euler".
+
+Categories: Conic Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item lat_2
+
+=back
+
+=cut
+
+sub t_proj_euler {'PDL::Transform::Proj4::euler'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_fahey
+
+Proj4 projection code C<fahey>, full name "Fahey".
+
+Categories: Pcyl Sph.
+
+=cut
+
+sub t_proj_fahey {'PDL::Transform::Proj4::fahey'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_fouc
+
+Proj4 projection code C<fouc>, full name "Foucaut".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_fouc {'PDL::Transform::Proj4::fouc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_fouc_s
+
+Proj4 projection code C<fouc_s>, full name "Foucaut Sinusoidal".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_fouc_s {'PDL::Transform::Proj4::fouc_s'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_gall
+
+Proj4 projection code C<gall>, full name "Gall (Gall Stereographic)".
+
+Categories: Cyl Sph.
+
+=cut
+
+sub t_proj_gall {'PDL::Transform::Proj4::gall'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_geoc
+
+Proj4 projection code C<geoc>, full name "Geocentric Latitude".
+
+=cut
+
+sub t_proj_geoc {'PDL::Transform::Proj4::geoc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_geogoffset
+
+Proj4 projection code C<geogoffset>, full name "Geographic Offset".
+
+=cut
+
+sub t_proj_geogoffset {'PDL::Transform::Proj4::geogoffset'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_geos
+
+Proj4 projection code C<geos>, full name "Geostationary Satellite View".
+
+Categories: Azi Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item h
+
+=back
+
+=cut
+
+sub t_proj_geos {'PDL::Transform::Proj4::geos'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_gins8
+
+Proj4 projection code C<gins8>, full name "Ginsburg VIII (TsNIIGAiK)".
+
+Categories: B<no inverse> PCyl Sph.
+
+=cut
+
+sub t_proj_gins8 {'PDL::Transform::Proj4::gins8'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_gn_sinu
+
+Proj4 projection code C<gn_sinu>, full name "General Sinusoidal Series".
+
+Categories: PCyl Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item m
+
+=item n
+
+=back
+
+=cut
+
+sub t_proj_gn_sinu {'PDL::Transform::Proj4::gn_sinu'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_gnom
+
+Proj4 projection code C<gnom>, full name "Gnomonic".
+
+Categories: Azi Sph.
+
+=cut
+
+sub t_proj_gnom {'PDL::Transform::Proj4::gnom'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_goode
+
+Proj4 projection code C<goode>, full name "Goode Homolosine".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_goode {'PDL::Transform::Proj4::goode'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_gridshift
+
+Proj4 projection code C<gridshift>, full name "Generic grid shift".
+
+=cut
+
+sub t_proj_gridshift {'PDL::Transform::Proj4::gridshift'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_gs48
+
+Proj4 projection code C<gs48>, full name "Modified Stereographic of 48 U.S.".
+
+Categories: Azi(mod).
+
+=cut
+
+sub t_proj_gs48 {'PDL::Transform::Proj4::gs48'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_gs50
+
+Proj4 projection code C<gs50>, full name "Modified Stereographic of 50 U.S.".
+
+Categories: Azi(mod).
+
+=cut
+
+sub t_proj_gs50 {'PDL::Transform::Proj4::gs50'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_gstmerc
+
+Proj4 projection code C<gstmerc>, full name "Gauss-Schreiber Transverse Mercator (aka Gauss-Laborde Reunion)".
+
+Categories: Cyl Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item k_0
+
+=item lat_0
+
+=item lon_0
+
+=back
+
+=cut
+
+sub t_proj_gstmerc {'PDL::Transform::Proj4::gstmerc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_guyou
+
+Proj4 projection code C<guyou>, full name "Guyou".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_guyou {'PDL::Transform::Proj4::guyou'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_hammer
+
+Proj4 projection code C<hammer>, full name "Hammer & Eckert-Greifendorff".
+
+Categories: Misc Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item M
+
+=item W
+
+=back
+
+=cut
+
+sub t_proj_hammer {'PDL::Transform::Proj4::hammer'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_hatano
+
+Proj4 projection code C<hatano>, full name "Hatano Asymmetrical Equal Area".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_hatano {'PDL::Transform::Proj4::hatano'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_healpix
+
+Proj4 projection code C<healpix>, full name "HEALPix".
+
+Categories: Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item rot_xy
+
+=back
+
+=cut
+
+sub t_proj_healpix {'PDL::Transform::Proj4::healpix'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_helmert
+
+Proj4 projection code C<helmert>, full name "3(6)-, 4(8)- and 7(14)-parameter Helmert shift".
+
+=cut
+
+sub t_proj_helmert {'PDL::Transform::Proj4::helmert'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_hgridshift
+
+Proj4 projection code C<hgridshift>, full name "Horizontal grid shift".
+
+=cut
+
+sub t_proj_hgridshift {'PDL::Transform::Proj4::hgridshift'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_horner
+
+Proj4 projection code C<horner>, full name "Horner polynomial evaluation".
+
+=cut
+
+sub t_proj_horner {'PDL::Transform::Proj4::horner'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_igh
+
+Proj4 projection code C<igh>, full name "Interrupted Goode Homolosine".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_igh {'PDL::Transform::Proj4::igh'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_igh_o
+
+Proj4 projection code C<igh_o>, full name "Interrupted Goode Homolosine Oceanic View".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_igh_o {'PDL::Transform::Proj4::igh_o'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_imoll
+
+Proj4 projection code C<imoll>, full name "Interrupted Mollweide".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_imoll {'PDL::Transform::Proj4::imoll'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_imoll_o
+
+Proj4 projection code C<imoll_o>, full name "Interrupted Mollweide Oceanic View".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_imoll_o {'PDL::Transform::Proj4::imoll_o'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_imw_p
+
+Proj4 projection code C<imw_p>, full name "International Map of the World Polyconic".
+
+Categories: Mod. Polyconic Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item lat_2
+
+=item lon_1
+
+=back
+
+=cut
+
+sub t_proj_imw_p {'PDL::Transform::Proj4::imw_p'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_isea
+
+Proj4 projection code C<isea>, full name "Icosahedral Snyder Equal Area".
+
+Categories: Sph.
+
+=cut
+
+sub t_proj_isea {'PDL::Transform::Proj4::isea'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_kav5
+
+Proj4 projection code C<kav5>, full name "Kavrayskiy V".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_kav5 {'PDL::Transform::Proj4::kav5'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_kav7
+
+Proj4 projection code C<kav7>, full name "Kavrayskiy VII".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_kav7 {'PDL::Transform::Proj4::kav7'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_krovak
+
+Proj4 projection code C<krovak>, full name "Krovak".
+
+Categories: PCyl Ell.
+
+=cut
+
+sub t_proj_krovak {'PDL::Transform::Proj4::krovak'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_labrd
+
+Proj4 projection code C<labrd>, full name "Laborde".
+
+Categories: Cyl Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_0
+
+=back
+
+=cut
+
+sub t_proj_labrd {'PDL::Transform::Proj4::labrd'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_laea
+
+Proj4 projection code C<laea>, full name "Lambert Azimuthal Equal Area".
+
+Categories: Azi Sph Ell.
+
+=cut
+
+sub t_proj_laea {'PDL::Transform::Proj4::laea'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_lagrng
+
+Proj4 projection code C<lagrng>, full name "Lagrange".
+
+Categories: Misc Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item W
+
+=back
+
+=cut
+
+sub t_proj_lagrng {'PDL::Transform::Proj4::lagrng'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_larr
+
+Proj4 projection code C<larr>, full name "Larrivee".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_larr {'PDL::Transform::Proj4::larr'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_lask
+
+Proj4 projection code C<lask>, full name "Laskowski".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_lask {'PDL::Transform::Proj4::lask'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_latlon
+
+Proj4 projection code C<latlon>, full name "Lat/long (Geodetic alias)".
+
+=cut
+
+sub t_proj_latlon {'PDL::Transform::Proj4::latlon'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_lcc
+
+Proj4 projection code C<lcc>, full name "Lambert Conformal Conic".
+
+Categories: Conic Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item k_0
+
+=item lat_0
+
+=item lat_1
+
+=item lat_2
+
+=back
+
+=cut
+
+sub t_proj_lcc {'PDL::Transform::Proj4::lcc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_lcca
+
+Proj4 projection code C<lcca>, full name "Lambert Conformal Conic Alternative".
+
+Categories: Conic Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_0
+
+=back
+
+=cut
+
+sub t_proj_lcca {'PDL::Transform::Proj4::lcca'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_leac
+
+Proj4 projection code C<leac>, full name "Lambert Equal Area Conic".
+
+Categories: Conic Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item south
+
+=back
+
+=cut
+
+sub t_proj_leac {'PDL::Transform::Proj4::leac'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_lee_os
+
+Proj4 projection code C<lee_os>, full name "Lee Oblated Stereographic".
+
+Categories: Azi(mod).
+
+=cut
+
+sub t_proj_lee_os {'PDL::Transform::Proj4::lee_os'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_lonlat
+
+Proj4 projection code C<lonlat>, full name "Lat/long (Geodetic)".
+
+=cut
+
+sub t_proj_lonlat {'PDL::Transform::Proj4::lonlat'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_loxim
+
+Proj4 projection code C<loxim>, full name "Loximuthal".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_loxim {'PDL::Transform::Proj4::loxim'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_lsat
+
+Proj4 projection code C<lsat>, full name "Space oblique for LANDSAT".
+
+Categories: Cyl Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lsat
+
+=item path
+
+=back
+
+=cut
+
+sub t_proj_lsat {'PDL::Transform::Proj4::lsat'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_mbt_fps
+
+Proj4 projection code C<mbt_fps>, full name "McBryde-Thomas Flat-Pole Sine (No. 2)".
+
+Categories: Cyl Sph.
+
+=cut
+
+sub t_proj_mbt_fps {'PDL::Transform::Proj4::mbt_fps'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_mbt_s
+
+Proj4 projection code C<mbt_s>, full name "McBryde-Thomas Flat-Polar Sine (No. 1)".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_mbt_s {'PDL::Transform::Proj4::mbt_s'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_mbtfpp
+
+Proj4 projection code C<mbtfpp>, full name "McBride-Thomas Flat-Polar Parabolic".
+
+Categories: Cyl Sph.
+
+=cut
+
+sub t_proj_mbtfpp {'PDL::Transform::Proj4::mbtfpp'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_mbtfpq
+
+Proj4 projection code C<mbtfpq>, full name "McBryde-Thomas Flat-Polar Quartic".
+
+Categories: Cyl Sph.
+
+=cut
+
+sub t_proj_mbtfpq {'PDL::Transform::Proj4::mbtfpq'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_mbtfps
+
+Proj4 projection code C<mbtfps>, full name "McBryde-Thomas Flat-Polar Sinusoidal".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_mbtfps {'PDL::Transform::Proj4::mbtfps'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_merc
+
+Proj4 projection code C<merc>, full name "Mercator".
+
+Categories: Cyl Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_ts
+
+=back
+
+=cut
+
+sub t_proj_merc {'PDL::Transform::Proj4::merc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_mil_os
+
+Proj4 projection code C<mil_os>, full name "Miller Oblated Stereographic".
+
+Categories: Azi(mod).
+
+=cut
+
+sub t_proj_mil_os {'PDL::Transform::Proj4::mil_os'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_mill
+
+Proj4 projection code C<mill>, full name "Miller Cylindrical".
+
+Categories: Cyl Sph.
+
+=cut
+
+sub t_proj_mill {'PDL::Transform::Proj4::mill'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_misrsom
+
+Proj4 projection code C<misrsom>, full name "Space oblique for MISR".
+
+Categories: Cyl Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item path
+
+=back
+
+=cut
+
+sub t_proj_misrsom {'PDL::Transform::Proj4::misrsom'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_mod_krovak
+
+Proj4 projection code C<mod_krovak>, full name "Modified Krovak".
+
+Categories: PCyl Ell.
+
+=cut
+
+sub t_proj_mod_krovak {'PDL::Transform::Proj4::mod_krovak'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_moll
+
+Proj4 projection code C<moll>, full name "Mollweide".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_moll {'PDL::Transform::Proj4::moll'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_molobadekas
+
+Proj4 projection code C<molobadekas>, full name "Molodensky-Badekas transformation".
+
+=cut
+
+sub t_proj_molobadekas {'PDL::Transform::Proj4::molobadekas'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_molodensky
+
+Proj4 projection code C<molodensky>, full name "Molodensky transform".
+
+=cut
+
+sub t_proj_molodensky {'PDL::Transform::Proj4::molodensky'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_murd1
+
+Proj4 projection code C<murd1>, full name "Murdoch I".
+
+Categories: Conic Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item lat_2
+
+=back
+
+=cut
+
+sub t_proj_murd1 {'PDL::Transform::Proj4::murd1'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_murd2
+
+Proj4 projection code C<murd2>, full name "Murdoch II".
+
+Categories: Conic Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item lat_2
+
+=back
+
+=cut
+
+sub t_proj_murd2 {'PDL::Transform::Proj4::murd2'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_murd3
+
+Proj4 projection code C<murd3>, full name "Murdoch III".
+
+Categories: Conic Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item lat_2
+
+=back
+
+=cut
+
+sub t_proj_murd3 {'PDL::Transform::Proj4::murd3'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_natearth
+
+Proj4 projection code C<natearth>, full name "Natural Earth".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_natearth {'PDL::Transform::Proj4::natearth'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_natearth2
+
+Proj4 projection code C<natearth2>, full name "Natural Earth 2".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_natearth2 {'PDL::Transform::Proj4::natearth2'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_nell
+
+Proj4 projection code C<nell>, full name "Nell".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_nell {'PDL::Transform::Proj4::nell'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_nell_h
+
+Proj4 projection code C<nell_h>, full name "Nell-Hammer".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_nell_h {'PDL::Transform::Proj4::nell_h'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_nicol
+
+Proj4 projection code C<nicol>, full name "Nicolosi Globular".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_nicol {'PDL::Transform::Proj4::nicol'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_noop
+
+Proj4 projection code C<noop>, full name "No operation".
+
+=cut
+
+sub t_proj_noop {'PDL::Transform::Proj4::noop'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_nsper
+
+Proj4 projection code C<nsper>, full name "Near-sided perspective".
+
+Categories: Azi Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item h
+
+=back
+
+=cut
+
+sub t_proj_nsper {'PDL::Transform::Proj4::nsper'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_nzmg
+
+Proj4 projection code C<nzmg>, full name "New Zealand Map Grid".
+
+Categories: fixed Earth.
+
+=cut
+
+sub t_proj_nzmg {'PDL::Transform::Proj4::nzmg'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_ob_tran
+
+Proj4 projection code C<ob_tran>, full name "General Oblique Transformation".
+
+Categories: Misc Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item o_alpha
+
+=item o_lat_1
+
+=item o_lat_2
+
+=item o_lat_c
+
+=item o_lat_p
+
+=item o_lon_1
+
+=item o_lon_2
+
+=item o_lon_c
+
+=item o_lon_p
+
+=item o_proj
+
+=back
+
+=cut
+
+sub t_proj_ob_tran {'PDL::Transform::Proj4::ob_tran'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_ocea
+
+Proj4 projection code C<ocea>, full name "Oblique Cylindrical Equal Area".
+
+Categories: Cyl Sphlonc= alpha=.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item lat_2
+
+=item lon_1
+
+=item lon_2
+
+=back
+
+=cut
+
+sub t_proj_ocea {'PDL::Transform::Proj4::ocea'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_oea
+
+Proj4 projection code C<oea>, full name "Oblated Equal Area".
+
+Categories: Misc Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item m
+
+=item n
+
+=item theta
+
+=back
+
+=cut
+
+sub t_proj_oea {'PDL::Transform::Proj4::oea'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_omerc
+
+Proj4 projection code C<omerc>, full name "Oblique Mercator".
+
+Categories: Cyl Sph Ell no_rot.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item alpha
+
+=item gamma
+
+=item lat_1
+
+=item lat_2
+
+=item lon_1
+
+=item lon_2
+
+=item lonc
+
+=item no_off
+
+=back
+
+=cut
+
+sub t_proj_omerc {'PDL::Transform::Proj4::omerc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_ortel
+
+Proj4 projection code C<ortel>, full name "Ortelius Oval".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_ortel {'PDL::Transform::Proj4::ortel'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_ortho
+
+Proj4 projection code C<ortho>, full name "Orthographic".
+
+Categories: Azi Sph Ell.
+
+=cut
+
+sub t_proj_ortho {'PDL::Transform::Proj4::ortho'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_patterson
+
+Proj4 projection code C<patterson>, full name "Patterson Cylindrical".
+
+Categories: Cyl.
+
+=cut
+
+sub t_proj_patterson {'PDL::Transform::Proj4::patterson'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_pconic
+
+Proj4 projection code C<pconic>, full name "Perspective Conic".
+
+Categories: Conic Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item lat_2
+
+=back
+
+=cut
+
+sub t_proj_pconic {'PDL::Transform::Proj4::pconic'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_peirce_q
+
+Proj4 projection code C<peirce_q>, full name "Peirce Quincuncial".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_peirce_q {'PDL::Transform::Proj4::peirce_q'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_pipeline
+
+Proj4 projection code C<pipeline>, full name "Transformation pipeline manager".
+
+=cut
+
+sub t_proj_pipeline {'PDL::Transform::Proj4::pipeline'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_poly
+
+Proj4 projection code C<poly>, full name "Polyconic (American)".
+
+Categories: Conic Sph Ell.
+
+=cut
+
+sub t_proj_poly {'PDL::Transform::Proj4::poly'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_pop
+
+Proj4 projection code C<pop>, full name "Retrieve coordinate value from pipeline stack".
+
+=cut
+
+sub t_proj_pop {'PDL::Transform::Proj4::pop'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_push
+
+Proj4 projection code C<push>, full name "Save coordinate value on pipeline stack".
+
+=cut
+
+sub t_proj_push {'PDL::Transform::Proj4::push'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_putp1
+
+Proj4 projection code C<putp1>, full name "Putnins P1".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_putp1 {'PDL::Transform::Proj4::putp1'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_putp2
+
+Proj4 projection code C<putp2>, full name "Putnins P2".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_putp2 {'PDL::Transform::Proj4::putp2'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_putp3
+
+Proj4 projection code C<putp3>, full name "Putnins P3".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_putp3 {'PDL::Transform::Proj4::putp3'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_putp3p
+
+Proj4 projection code C<putp3p>, full name "Putnins P3'".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_putp3p {'PDL::Transform::Proj4::putp3p'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_putp4p
+
+Proj4 projection code C<putp4p>, full name "Putnins P4'".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_putp4p {'PDL::Transform::Proj4::putp4p'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_putp5
+
+Proj4 projection code C<putp5>, full name "Putnins P5".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_putp5 {'PDL::Transform::Proj4::putp5'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_putp5p
+
+Proj4 projection code C<putp5p>, full name "Putnins P5'".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_putp5p {'PDL::Transform::Proj4::putp5p'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_putp6
+
+Proj4 projection code C<putp6>, full name "Putnins P6".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_putp6 {'PDL::Transform::Proj4::putp6'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_putp6p
+
+Proj4 projection code C<putp6p>, full name "Putnins P6'".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_putp6p {'PDL::Transform::Proj4::putp6p'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_qsc
+
+Proj4 projection code C<qsc>, full name "Quadrilateralized Spherical Cube".
+
+Categories: Azi Sph.
+
+=cut
+
+sub t_proj_qsc {'PDL::Transform::Proj4::qsc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_qua_aut
+
+Proj4 projection code C<qua_aut>, full name "Quartic Authalic".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_qua_aut {'PDL::Transform::Proj4::qua_aut'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_rhealpix
+
+Proj4 projection code C<rhealpix>, full name "rHEALPix".
+
+Categories: Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item north_square
+
+=item south_square
+
+=back
+
+=cut
+
+sub t_proj_rhealpix {'PDL::Transform::Proj4::rhealpix'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_robin
+
+Proj4 projection code C<robin>, full name "Robinson".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_robin {'PDL::Transform::Proj4::robin'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_rouss
+
+Proj4 projection code C<rouss>, full name "Roussilhe Stereographic".
+
+Categories: Azi Ell.
+
+=cut
+
+sub t_proj_rouss {'PDL::Transform::Proj4::rouss'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_rpoly
+
+Proj4 projection code C<rpoly>, full name "Rectangular Polyconic".
+
+Categories: B<no inverse> Conic Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_ts
+
+=back
+
+=cut
+
+sub t_proj_rpoly {'PDL::Transform::Proj4::rpoly'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_s2
+
+Proj4 projection code C<s2>, full name "S2".
+
+Categories: Misc Sph Ell.
+
+=cut
+
+sub t_proj_s2 {'PDL::Transform::Proj4::s2'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_sch
+
+Proj4 projection code C<sch>, full name "Spherical Cross-track Height".
+
+Categories: Misc.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item h_0
+
+=item phdg_0
+
+=item plat_0
+
+=item plon_0
+
+=back
+
+=cut
+
+sub t_proj_sch {'PDL::Transform::Proj4::sch'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_set
+
+Proj4 projection code C<set>, full name "Set coordinate value".
+
+=cut
+
+sub t_proj_set {'PDL::Transform::Proj4::set'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_sinu
+
+Proj4 projection code C<sinu>, full name "Sinusoidal (Sanson-Flamsteed)".
+
+Categories: PCyl Sph Ell.
+
+=cut
+
+sub t_proj_sinu {'PDL::Transform::Proj4::sinu'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_som
+
+Proj4 projection code C<som>, full name "Space Oblique Mercator".
+
+Categories: Cyl Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item asc_lon
+
+=item inc_angle
+
+=item ps_rev
+
+=back
+
+=cut
+
+sub t_proj_som {'PDL::Transform::Proj4::som'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_somerc
+
+Proj4 projection code C<somerc>, full name "Swiss. Obl. Mercator".
+
+Categories: Cyl Ell.
+
+=cut
+
+sub t_proj_somerc {'PDL::Transform::Proj4::somerc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_stere
+
+Proj4 projection code C<stere>, full name "Stereographic".
+
+Categories: Azi Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_ts
+
+=back
+
+=cut
+
+sub t_proj_stere {'PDL::Transform::Proj4::stere'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_sterea
+
+Proj4 projection code C<sterea>, full name "Oblique Stereographic Alternative".
+
+Categories: Azimuthal Sph Ell.
+
+=cut
+
+sub t_proj_sterea {'PDL::Transform::Proj4::sterea'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_tcc
+
+Proj4 projection code C<tcc>, full name "Transverse Central Cylindrical".
+
+Categories: B<no inverse> Cyl Sph.
+
+=cut
+
+sub t_proj_tcc {'PDL::Transform::Proj4::tcc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_tcea
+
+Proj4 projection code C<tcea>, full name "Transverse Cylindrical Equal Area".
+
+Categories: Cyl Sph.
+
+=cut
+
+sub t_proj_tcea {'PDL::Transform::Proj4::tcea'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_times
+
+Proj4 projection code C<times>, full name "Times".
+
+Categories: Cyl Sph.
+
+=cut
+
+sub t_proj_times {'PDL::Transform::Proj4::times'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_tinshift
+
+Proj4 projection code C<tinshift>, full name "Triangulation based transformation".
+
+=cut
+
+sub t_proj_tinshift {'PDL::Transform::Proj4::tinshift'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_tissot
+
+Proj4 projection code C<tissot>, full name "Tissot".
+
+Categories: Conic Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item lat_2
+
+=back
+
+=cut
+
+sub t_proj_tissot {'PDL::Transform::Proj4::tissot'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_tmerc
+
+Proj4 projection code C<tmerc>, full name "Transverse Mercator".
+
+Categories: Cyl Sph Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item approx
+
+=back
+
+=cut
+
+sub t_proj_tmerc {'PDL::Transform::Proj4::tmerc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_tobmerc
+
+Proj4 projection code C<tobmerc>, full name "Tobler-Mercator".
+
+Categories: Cyl Sph.
+
+=cut
+
+sub t_proj_tobmerc {'PDL::Transform::Proj4::tobmerc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_topocentric
+
+Proj4 projection code C<topocentric>, full name "Geocentric/Topocentric conversion".
+
+=cut
+
+sub t_proj_topocentric {'PDL::Transform::Proj4::topocentric'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_tpeqd
+
+Proj4 projection code C<tpeqd>, full name "Two Point Equidistant".
+
+Categories: Misc Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item lat_2
+
+=item lon_1
+
+=item lon_2
+
+=back
+
+=cut
+
+sub t_proj_tpeqd {'PDL::Transform::Proj4::tpeqd'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_tpers
+
+Proj4 projection code C<tpers>, full name "Tilted perspective".
+
+Categories: Azi Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item azi
+
+=item h
+
+=item tilt
+
+=back
+
+=cut
+
+sub t_proj_tpers {'PDL::Transform::Proj4::tpers'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_unitconvert
+
+Proj4 projection code C<unitconvert>, full name "Unit conversion".
+
+=cut
+
+sub t_proj_unitconvert {'PDL::Transform::Proj4::unitconvert'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_ups
+
+Proj4 projection code C<ups>, full name "Universal Polar Stereographic".
+
+Categories: Azi Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item south
+
+=back
+
+=cut
+
+sub t_proj_ups {'PDL::Transform::Proj4::ups'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_urm5
+
+Proj4 projection code C<urm5>, full name "Urmaev V".
+
+Categories: B<no inverse> PCyl Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item alpha
+
+=item n
+
+=item q
+
+=back
+
+=cut
+
+sub t_proj_urm5 {'PDL::Transform::Proj4::urm5'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_urmfps
+
+Proj4 projection code C<urmfps>, full name "Urmaev Flat-Polar Sinusoidal".
+
+Categories: PCyl Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item n
+
+=back
+
+=cut
+
+sub t_proj_urmfps {'PDL::Transform::Proj4::urmfps'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_utm
+
+Proj4 projection code C<utm>, full name "Universal Transverse Mercator (UTM)".
+
+Categories: Cyl Ell.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item approx
+
+=item south
+
+=item zone
+
+=back
+
+=cut
+
+sub t_proj_utm {'PDL::Transform::Proj4::utm'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_vandg
+
+Proj4 projection code C<vandg>, full name "van der Grinten (I)".
+
+Categories: Misc Sph.
+
+=cut
+
+sub t_proj_vandg {'PDL::Transform::Proj4::vandg'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_vandg2
+
+Proj4 projection code C<vandg2>, full name "van der Grinten II".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_vandg2 {'PDL::Transform::Proj4::vandg2'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_vandg3
+
+Proj4 projection code C<vandg3>, full name "van der Grinten III".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_vandg3 {'PDL::Transform::Proj4::vandg3'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_vandg4
+
+Proj4 projection code C<vandg4>, full name "van der Grinten IV".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_vandg4 {'PDL::Transform::Proj4::vandg4'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_vertoffset
+
+Proj4 projection code C<vertoffset>, full name "Vertical Offset and Slope".
+
+Categories: Transfmation.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item dh
+
+=item lat_0
+
+=item lon_0
+
+=item slope_lat
+
+=item slope_lon
+
+=back
+
+=cut
+
+sub t_proj_vertoffset {'PDL::Transform::Proj4::vertoffset'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_vgridshift
+
+Proj4 projection code C<vgridshift>, full name "Vertical grid shift".
+
+=cut
+
+sub t_proj_vgridshift {'PDL::Transform::Proj4::vgridshift'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_vitk1
+
+Proj4 projection code C<vitk1>, full name "Vitkovsky I".
+
+Categories: Conic Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=item lat_2
+
+=back
+
+=cut
+
+sub t_proj_vitk1 {'PDL::Transform::Proj4::vitk1'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_wag1
+
+Proj4 projection code C<wag1>, full name "Wagner I (Kavrayskiy VI)".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_wag1 {'PDL::Transform::Proj4::wag1'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_wag2
+
+Proj4 projection code C<wag2>, full name "Wagner II".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_wag2 {'PDL::Transform::Proj4::wag2'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_wag3
+
+Proj4 projection code C<wag3>, full name "Wagner III".
+
+Categories: PCyl Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_ts
+
+=back
+
+=cut
+
+sub t_proj_wag3 {'PDL::Transform::Proj4::wag3'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_wag4
+
+Proj4 projection code C<wag4>, full name "Wagner IV".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_wag4 {'PDL::Transform::Proj4::wag4'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_wag5
+
+Proj4 projection code C<wag5>, full name "Wagner V".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_wag5 {'PDL::Transform::Proj4::wag5'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_wag6
+
+Proj4 projection code C<wag6>, full name "Wagner VI".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_wag6 {'PDL::Transform::Proj4::wag6'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_wag7
+
+Proj4 projection code C<wag7>, full name "Wagner VII".
+
+Categories: B<no inverse> Misc Sph.
+
+=cut
+
+sub t_proj_wag7 {'PDL::Transform::Proj4::wag7'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_webmerc
+
+Proj4 projection code C<webmerc>, full name "Web Mercator / Pseudo Mercator".
+
+Categories: Cyl Ell.
+
+=cut
+
+sub t_proj_webmerc {'PDL::Transform::Proj4::webmerc'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_weren
+
+Proj4 projection code C<weren>, full name "Werenskiold I".
+
+Categories: PCyl Sph.
+
+=cut
+
+sub t_proj_weren {'PDL::Transform::Proj4::weren'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_wink1
+
+Proj4 projection code C<wink1>, full name "Winkel I".
+
+Categories: PCyl Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_ts
+
+=back
+
+=cut
+
+sub t_proj_wink1 {'PDL::Transform::Proj4::wink1'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_wink2
+
+Proj4 projection code C<wink2>, full name "Winkel II".
+
+Categories: PCyl Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=back
+
+=cut
+
+sub t_proj_wink2 {'PDL::Transform::Proj4::wink2'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_wintri
+
+Proj4 projection code C<wintri>, full name "Winkel Tripel".
+
+Categories: Misc Sph.
+
+Projection Parameters
+
+=for options
+
+=over 4
+
+=item lat_1
+
+=back
+
+=cut
+
+sub t_proj_wintri {'PDL::Transform::Proj4::wintri'->new(@_)}
+#line 484 "proj4.pd"
+
+=head2 t_proj_xyzgridshift
+
+Proj4 projection code C<xyzgridshift>, full name "Geocentric grid shift".
+
+=cut
+
+sub t_proj_xyzgridshift {'PDL::Transform::Proj4::xyzgridshift'->new(@_)}
+#line 499 "proj4.pd"
+
+_make_class(q{adams_hemi}, q{Adams Hemisphere in a Square}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{adams_ws1}, q{Adams World in a Square I}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{adams_ws2}, q{Adams World in a Square II}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{aea}, q{Albers Equal Area}, 1, q{qw(lat_1 lat_2)});
+
+#line 499 "proj4.pd"
+_make_class(q{aeqd}, q{Azimuthal Equidistant}, 1, q{qw(lat_0 guam)});
+
+#line 499 "proj4.pd"
+_make_class(q{affine}, q{Affine transformation}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{airy}, q{Airy}, 0, q{qw(no_cut lat_b)});
+
+#line 499 "proj4.pd"
+_make_class(q{aitoff}, q{Aitoff}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{alsk}, q{Modified Stereographic of Alaska}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{apian}, q{Apian Globular I}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{august}, q{August Epicycloidal}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{axisswap}, q{Axis ordering}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{bacon}, q{Bacon Globular}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{bertin1953}, q{Bertin 1953}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{bipc}, q{Bipolar conic of western hemisphere}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{boggs}, q{Boggs Eumorphic}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{bonne}, q{Bonne (Werner lat_1=90)}, 1, q{qw(lat_1)});
+
+#line 499 "proj4.pd"
+_make_class(q{calcofi}, q{Cal Coop Ocean Fish Invest Lines/Stations}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{cart}, q{Geodetic/cartesian conversions}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{cass}, q{Cassini}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{cc}, q{Central Cylindrical}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{ccon}, q{Central Conic}, 1, q{qw(lat_1)});
+
+#line 499 "proj4.pd"
+_make_class(q{cea}, q{Equal Area Cylindrical}, 1, q{qw(lat_ts)});
+
+#line 499 "proj4.pd"
+_make_class(q{chamb}, q{Chamberlin Trimetric}, 0, q{qw(lat_1 lon_1 lat_2 lon_2 lat_3 lon_3)});
+
+#line 499 "proj4.pd"
+_make_class(q{col_urban}, q{Colombia Urban}, 1, q{qw(h_0)});
+
+#line 499 "proj4.pd"
+_make_class(q{collg}, q{Collignon}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{comill}, q{Compact Miller}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{crast}, q{Craster Parabolic (Putnins P4)}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{defmodel}, q{Deformation model}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{deformation}, q{Kinematic grid shift}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{denoy}, q{Denoyer Semi-Elliptical}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{eck1}, q{Eckert I}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{eck2}, q{Eckert II}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{eck3}, q{Eckert III}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{eck4}, q{Eckert IV}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{eck5}, q{Eckert V}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{eck6}, q{Eckert VI}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{eqc}, q{Equidistant Cylindrical (Plate Carree)}, 1, q{qw(lat_ts lat_00)});
+
+#line 499 "proj4.pd"
+_make_class(q{eqdc}, q{Equidistant Conic}, 1, q{qw(lat_1 lat_2)});
+
+#line 499 "proj4.pd"
+_make_class(q{eqearth}, q{Equal Earth}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{etmerc}, q{Extended Transverse Mercator}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{euler}, q{Euler}, 1, q{qw(lat_1 lat_2)});
+
+#line 499 "proj4.pd"
+_make_class(q{fahey}, q{Fahey}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{fouc}, q{Foucaut}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{fouc_s}, q{Foucaut Sinusoidal}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{gall}, q{Gall (Gall Stereographic)}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{geoc}, q{Geocentric Latitude}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{geogoffset}, q{Geographic Offset}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{geos}, q{Geostationary Satellite View}, 1, q{qw(h)});
+
+#line 499 "proj4.pd"
+_make_class(q{gins8}, q{Ginsburg VIII (TsNIIGAiK)}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{gn_sinu}, q{General Sinusoidal Series}, 1, q{qw(m n)});
+
+#line 499 "proj4.pd"
+_make_class(q{gnom}, q{Gnomonic}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{goode}, q{Goode Homolosine}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{gridshift}, q{Generic grid shift}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{gs48}, q{Modified Stereographic of 48 U.S.}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{gs50}, q{Modified Stereographic of 50 U.S.}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{gstmerc}, q{Gauss-Schreiber Transverse Mercator (aka Gauss-Laborde Reunion)}, 1, q{qw(lat_0 lon_0 k_0)});
+
+#line 499 "proj4.pd"
+_make_class(q{guyou}, q{Guyou}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{hammer}, q{Hammer & Eckert-Greifendorff}, 1, q{qw(W M)});
+
+#line 499 "proj4.pd"
+_make_class(q{hatano}, q{Hatano Asymmetrical Equal Area}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{healpix}, q{HEALPix}, 1, q{qw(rot_xy)});
+
+#line 499 "proj4.pd"
+_make_class(q{helmert}, q{3(6)-, 4(8)- and 7(14)-parameter Helmert shift}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{hgridshift}, q{Horizontal grid shift}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{horner}, q{Horner polynomial evaluation}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{igh}, q{Interrupted Goode Homolosine}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{igh_o}, q{Interrupted Goode Homolosine Oceanic View}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{imoll}, q{Interrupted Mollweide}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{imoll_o}, q{Interrupted Mollweide Oceanic View}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{imw_p}, q{International Map of the World Polyconic}, 1, q{qw(lat_1 lat_2 lon_1)});
+
+#line 499 "proj4.pd"
+_make_class(q{isea}, q{Icosahedral Snyder Equal Area}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{kav5}, q{Kavrayskiy V}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{kav7}, q{Kavrayskiy VII}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{krovak}, q{Krovak}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{labrd}, q{Laborde}, 1, q{qw(lat_0)});
+
+#line 499 "proj4.pd"
+_make_class(q{laea}, q{Lambert Azimuthal Equal Area}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{lagrng}, q{Lagrange}, 1, q{qw(W)});
+
+#line 499 "proj4.pd"
+_make_class(q{larr}, q{Larrivee}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{lask}, q{Laskowski}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{latlon}, q{Lat/long (Geodetic alias)}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{lcc}, q{Lambert Conformal Conic}, 1, q{qw(lat_1 lat_2 lat_0 k_0)});
+
+#line 499 "proj4.pd"
+_make_class(q{lcca}, q{Lambert Conformal Conic Alternative}, 1, q{qw(lat_0)});
+
+#line 499 "proj4.pd"
+_make_class(q{leac}, q{Lambert Equal Area Conic}, 1, q{qw(lat_1 south)});
+
+#line 499 "proj4.pd"
+_make_class(q{lee_os}, q{Lee Oblated Stereographic}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{lonlat}, q{Lat/long (Geodetic)}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{loxim}, q{Loximuthal}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{lsat}, q{Space oblique for LANDSAT}, 1, q{qw(lsat path)});
+
+#line 499 "proj4.pd"
+_make_class(q{mbt_fps}, q{McBryde-Thomas Flat-Pole Sine (No. 2)}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{mbt_s}, q{McBryde-Thomas Flat-Polar Sine (No. 1)}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{mbtfpp}, q{McBride-Thomas Flat-Polar Parabolic}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{mbtfpq}, q{McBryde-Thomas Flat-Polar Quartic}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{mbtfps}, q{McBryde-Thomas Flat-Polar Sinusoidal}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{merc}, q{Mercator}, 1, q{qw(lat_ts)});
+
+#line 499 "proj4.pd"
+_make_class(q{mil_os}, q{Miller Oblated Stereographic}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{mill}, q{Miller Cylindrical}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{misrsom}, q{Space oblique for MISR}, 1, q{qw(path)});
+
+#line 499 "proj4.pd"
+_make_class(q{mod_krovak}, q{Modified Krovak}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{moll}, q{Mollweide}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{molobadekas}, q{Molodensky-Badekas transformation}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{molodensky}, q{Molodensky transform}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{murd1}, q{Murdoch I}, 1, q{qw(lat_1 lat_2)});
+
+#line 499 "proj4.pd"
+_make_class(q{murd2}, q{Murdoch II}, 1, q{qw(lat_1 lat_2)});
+
+#line 499 "proj4.pd"
+_make_class(q{murd3}, q{Murdoch III}, 1, q{qw(lat_1 lat_2)});
+
+#line 499 "proj4.pd"
+_make_class(q{natearth}, q{Natural Earth}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{natearth2}, q{Natural Earth 2}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{nell}, q{Nell}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{nell_h}, q{Nell-Hammer}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{nicol}, q{Nicolosi Globular}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{noop}, q{No operation}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{nsper}, q{Near-sided perspective}, 1, q{qw(h)});
+
+#line 499 "proj4.pd"
+_make_class(q{nzmg}, q{New Zealand Map Grid}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{ob_tran}, q{General Oblique Transformation}, 1, q{qw(o_proj o_lat_p o_lon_p o_alpha o_lon_c o_lat_c o_lon_1 o_lat_1 o_lon_2 o_lat_2)});
+
+#line 499 "proj4.pd"
+_make_class(q{ocea}, q{Oblique Cylindrical Equal Area}, 1, q{qw(lat_1 lat_2 lon_1 lon_2)});
+
+#line 499 "proj4.pd"
+_make_class(q{oea}, q{Oblated Equal Area}, 1, q{qw(n m theta)});
+
+#line 499 "proj4.pd"
+_make_class(q{omerc}, q{Oblique Mercator}, 1, q{qw(alpha gamma no_off lonc lon_1 lat_1 lon_2 lat_2)});
+
+#line 499 "proj4.pd"
+_make_class(q{ortel}, q{Ortelius Oval}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{ortho}, q{Orthographic}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{patterson}, q{Patterson Cylindrical}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{pconic}, q{Perspective Conic}, 1, q{qw(lat_1 lat_2)});
+
+#line 499 "proj4.pd"
+_make_class(q{peirce_q}, q{Peirce Quincuncial}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{pipeline}, q{Transformation pipeline manager}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{poly}, q{Polyconic (American)}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{pop}, q{Retrieve coordinate value from pipeline stack}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{push}, q{Save coordinate value on pipeline stack}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{putp1}, q{Putnins P1}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{putp2}, q{Putnins P2}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{putp3}, q{Putnins P3}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{putp3p}, q{Putnins P3'}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{putp4p}, q{Putnins P4'}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{putp5}, q{Putnins P5}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{putp5p}, q{Putnins P5'}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{putp6}, q{Putnins P6}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{putp6p}, q{Putnins P6'}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{qsc}, q{Quadrilateralized Spherical Cube}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{qua_aut}, q{Quartic Authalic}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{rhealpix}, q{rHEALPix}, 1, q{qw(north_square south_square)});
+
+#line 499 "proj4.pd"
+_make_class(q{robin}, q{Robinson}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{rouss}, q{Roussilhe Stereographic}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{rpoly}, q{Rectangular Polyconic}, 0, q{qw(lat_ts)});
+
+#line 499 "proj4.pd"
+_make_class(q{s2}, q{S2}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{sch}, q{Spherical Cross-track Height}, 1, q{qw(plat_0 plon_0 phdg_0 h_0)});
+
+#line 499 "proj4.pd"
+_make_class(q{set}, q{Set coordinate value}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{sinu}, q{Sinusoidal (Sanson-Flamsteed)}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{som}, q{Space Oblique Mercator}, 1, q{qw(inc_angle ps_rev asc_lon)});
+
+#line 499 "proj4.pd"
+_make_class(q{somerc}, q{Swiss. Obl. Mercator}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{stere}, q{Stereographic}, 1, q{qw(lat_ts)});
+
+#line 499 "proj4.pd"
+_make_class(q{sterea}, q{Oblique Stereographic Alternative}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{tcc}, q{Transverse Central Cylindrical}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{tcea}, q{Transverse Cylindrical Equal Area}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{times}, q{Times}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{tinshift}, q{Triangulation based transformation}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{tissot}, q{Tissot}, 1, q{qw(lat_1 lat_2)});
+
+#line 499 "proj4.pd"
+_make_class(q{tmerc}, q{Transverse Mercator}, 1, q{qw(approx)});
+
+#line 499 "proj4.pd"
+_make_class(q{tobmerc}, q{Tobler-Mercator}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{topocentric}, q{Geocentric/Topocentric conversion}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{tpeqd}, q{Two Point Equidistant}, 1, q{qw(lat_1 lon_1 lat_2 lon_2)});
+
+#line 499 "proj4.pd"
+_make_class(q{tpers}, q{Tilted perspective}, 1, q{qw(tilt azi h)});
+
+#line 499 "proj4.pd"
+_make_class(q{unitconvert}, q{Unit conversion}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{ups}, q{Universal Polar Stereographic}, 1, q{qw(south)});
+
+#line 499 "proj4.pd"
+_make_class(q{urm5}, q{Urmaev V}, 0, q{qw(n q alpha)});
+
+#line 499 "proj4.pd"
+_make_class(q{urmfps}, q{Urmaev Flat-Polar Sinusoidal}, 1, q{qw(n)});
+
+#line 499 "proj4.pd"
+_make_class(q{utm}, q{Universal Transverse Mercator (UTM)}, 1, q{qw(zone south approx)});
+
+#line 499 "proj4.pd"
+_make_class(q{vandg}, q{van der Grinten (I)}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{vandg2}, q{van der Grinten II}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{vandg3}, q{van der Grinten III}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{vandg4}, q{van der Grinten IV}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{vertoffset}, q{Vertical Offset and Slope}, 1, q{qw(lat_0 lon_0 dh slope_lat slope_lon)});
+
+#line 499 "proj4.pd"
+_make_class(q{vgridshift}, q{Vertical grid shift}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{vitk1}, q{Vitkovsky I}, 1, q{qw(lat_1 lat_2)});
+
+#line 499 "proj4.pd"
+_make_class(q{wag1}, q{Wagner I (Kavrayskiy VI)}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{wag2}, q{Wagner II}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{wag3}, q{Wagner III}, 1, q{qw(lat_ts)});
+
+#line 499 "proj4.pd"
+_make_class(q{wag4}, q{Wagner IV}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{wag5}, q{Wagner V}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{wag6}, q{Wagner VI}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{wag7}, q{Wagner VII}, 0, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{webmerc}, q{Web Mercator / Pseudo Mercator}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{weren}, q{Werenskiold I}, 1, q{qw()});
+
+#line 499 "proj4.pd"
+_make_class(q{wink1}, q{Winkel I}, 1, q{qw(lat_ts)});
+
+#line 499 "proj4.pd"
+_make_class(q{wink2}, q{Winkel II}, 1, q{qw(lat_1)});
+
+#line 499 "proj4.pd"
+_make_class(q{wintri}, q{Winkel Tripel}, 1, q{qw(lat_1)});
+
+#line 499 "proj4.pd"
+_make_class(q{xyzgridshift}, q{Geocentric grid shift}, 1, q{qw()});
+
+#line 526 "proj4.pd"
+
+=head1 AUTHOR
+
+Judd Taylor, Orbital Systems, Ltd.
+judd dot t at orbitalsystems dot com
+
+=cut
+#line 5784 "Proj4.pm"
+
+# Exit with OK status
+
+1;

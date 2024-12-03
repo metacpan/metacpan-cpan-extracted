@@ -6,6 +6,7 @@ use v5.16;
 
 use Random::Simple;
 use Getopt::Long;
+use Config;
 
 my $debug = 0;
 
@@ -66,15 +67,22 @@ for (1 .. 5) {
 
 print "\n";
 
-for (1 .. 5) {
-	my $x = Random::Simple::_rand64();
-	my $per = sprintf("%0.1f%%", ($x / (2**64 - 1) * 100));
+# Check if the UV (unsigned value) Perl type is 64bit
+my $has_64bit_ints = ($Config{uvsize} == 8);
 
-	if ($debug) {
-		print "64bit #$_: $x ($per)\n";
-	} else {
-		print "64bit #$_: $x\n";
+if ($has_64bit_ints) {
+	for (1 .. 5) {
+		my $x = Random::Simple::_rand64();
+		my $per = sprintf("%0.1f%%", ($x / (2**64 - 1) * 100));
+
+		if ($debug) {
+			print "64bit #$_: $x ($per)\n";
+		} else {
+			print "64bit #$_: $x\n";
+		}
 	}
+} else {
+	print "* Skipping _rand64() on 32bit platform\n";
 }
 
 ###############################################################################

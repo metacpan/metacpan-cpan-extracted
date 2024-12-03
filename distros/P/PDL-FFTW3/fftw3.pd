@@ -1,0 +1,711 @@
+=head1 NAME
+
+PDL::FFTW3 - PDL interface to the Fastest Fourier Transform in the West v3
+
+=cut
+
+# -*- cperl -*-
+
+##### General layout of the module #####
+#
+# Each type of transform that is supported by this module has a plain,
+# unthreaded perl entry point the user calls. This entry point makes sure the
+# FFTW plan exists (or makes it). Then it calls the THREADED PP function to
+# actually compute the transform
+
+use strict;
+use warnings;
+
+# I generate code for up to 10-dimensional FFTs
+my $maxrank = 10;
+
+our $VERSION = '0.20';
+pp_setversion($VERSION);
+
+pp_addpm( {At => 'Top'}, slurp('README.pod') . <<'EOF' );
+
+use strict;
+use warnings;
+
+EOF
+
+pp_addhdr( '
+#include <fftw3.h>
+
+/* the Linux kernel does something similar to assert at compile time */
+#define static_assert_fftw(x) (void)( sizeof( int[ 1 - 2* !(x) ]) )
+' );
+
+# I want to be able to say $X = fft1($x); rank is required. 'fft()' is ambiguous
+# about whether threading is desired or if a large fft is desired. Old PDL::FFTW
+# did one thing, matlab does another, so I do not include this function at all
+
+my $TEMPLATE_REAL_R2C = <<'EOF';
+// make sure the PDL data type I'm using matches the FFTW data type
+static_assert_fftw(sizeof($GENERIC())*2 == sizeof($TFD(fftwf_,fftw_)complex));
+$TFD(fftwf_,fftw_)plan plan = INT2PTR($TFD(fftwf_,fftw_)plan, $COMP(plan));
+$TFD(fftwf_,fftw_)execute_dft_r2c(plan, (void*)$P(real), (void*)$P(complexv));
+EOF
+my $TEMPLATE_REAL_C2R = <<'EOF';
+// make sure the PDL data type I'm using matches the FFTW data type
+static_assert_fftw(sizeof($GENERIC()) == sizeof($TGC(fftwf_,fftw_)complex));
+$TGC(fftwf_,fftw_)plan plan = INT2PTR($TGC(fftwf_,fftw_)plan, $COMP(plan));
+// FFTW inverse real transforms clobber their input. I thus make a new
+// buffer and transform from there
+PDL_Indx i, nbytes = sizeof($GENERIC());
+PDL_Indx rank = $PRIV(vtable)->par_realdims[0], *dims = $PDL(complexv)->dims;
+for (i=0; i<rank; i++) nbytes *= dims[i];
+void *input_copy = fftw_malloc(nbytes);
+broadcastloop %{
+  memcpy(input_copy, $P(complexv), nbytes);
+  $TGC(fftwf_,fftw_)execute_dft_c2r(plan, input_copy, (void*)$P(real));
+%}
+fftw_free(input_copy);
+EOF
+my $TEMPLATE_COMPLEX = <<'EOF';
+// This is the template used by PP to generate the FFTW routines.
+// make sure the PDL data type I'm using matches the FFTW data type
+static_assert_fftw(sizeof($GENERIC()) == sizeof($TGC(fftwf_,fftw_)complex));
+$TGC(fftwf_,fftw_)plan plan = INT2PTR($TGC(fftwf_,fftw_)plan, $COMP(plan));
+$TGC(fftwf_,fftw_)execute_dft(plan, (void*)$P(in), (void*)$P(out));
+EOF
+
+# I define up to rank-10 FFTs. This is annoyingly arbitrary, but hopefully
+# should be sufficient
+for my $rank (1..$maxrank)
+{
+  generateDefinitions($rank);
+}
+pp_export_nothing();
+
+pp_addxs('', <<'EOXS');
+MODULE = PDL::FFTW3 PACKAGE = PDL::FFTW3
+
+SV *
+dump_plan(planIV)
+  IV planIV
+CODE:
+  void* plan = NUM2PTR(void *, planIV);
+  char *s = fftw_sprint_plan((const fftw_plan)plan);
+  if (!s) croak("Got NULL string from fftw_sprint_plan");
+  RETVAL = newSVpv(s, 0);
+  free(s);
+OUTPUT:
+  RETVAL
+
+IV
+compute_plan( dims_ref, do_double_precision, is_real_fft, do_inverse_fft, in_pdl, out_pdl, in_alignment, out_alignment )
+  SV*  dims_ref
+  bool do_double_precision
+  bool is_real_fft
+  bool do_inverse_fft
+  pdl* in_pdl
+  pdl* out_pdl
+  int  in_alignment
+  int  out_alignment
+CODE:
+{
+  // Given input and output matrices, this function computes the FFTW plan
+
+  // PDL stores its data in the opposite dimension order from what FFTW wants. I
+  // handle this by passing in the dimension counts backwards.
+  AV* dims_av = (AV*)SvRV(dims_ref);
+  int rank = av_len(dims_av) + 1;
+
+  int dims_row_first[rank];
+  for( int i=0; i<rank; i++)
+    dims_row_first[i] = SvIV( *av_fetch( dims_av, rank-i-1, 0) );
+
+  // I apply the requested mis-alignment. This comes from later thread slices
+  UVTYPE in_data = PTR2UV(in_pdl->data);
+  if( in_alignment < 16 )
+    in_data |= in_alignment;
+
+  UVTYPE out_data = PTR2UV(out_pdl->data);
+  if( out_alignment < 16 )
+    out_data |= out_alignment;
+
+  void* plan;
+  if( !is_real_fft )
+  {
+    int direction = do_inverse_fft ? FFTW_BACKWARD : FFTW_FORWARD;
+
+    // complex-complex FFT. Input/output have identical dimensions
+    if( !do_double_precision )
+      plan =
+        fftwf_plan_dft( rank, dims_row_first,
+                        NUM2PTR(void*, in_data), NUM2PTR(void*, out_data),
+                        direction, FFTW_ESTIMATE);
+    else
+      plan =
+        fftw_plan_dft( rank, dims_row_first,
+                       NUM2PTR(void*, in_data), NUM2PTR(void*, out_data),
+                       direction, FFTW_ESTIMATE);
+  }
+  else
+  {
+    // real-complex FFT. Input/output have different dimensions
+    if( !do_double_precision)
+    {
+      if( !do_inverse_fft )
+        plan =
+          fftwf_plan_dft_r2c( rank, dims_row_first,
+                              NUM2PTR(void*, in_data), NUM2PTR(void*, out_data),
+                              FFTW_ESTIMATE );
+      else
+        plan =
+          fftwf_plan_dft_c2r( rank, dims_row_first,
+                              NUM2PTR(void*, in_data), NUM2PTR(void*, out_data),
+                              FFTW_ESTIMATE );
+    }
+    else
+    {
+      if( !do_inverse_fft )
+        plan =
+          fftw_plan_dft_r2c( rank, dims_row_first,
+                             NUM2PTR(void*, in_data), NUM2PTR(void*, out_data),
+                             FFTW_ESTIMATE );
+      else
+        plan =
+          fftw_plan_dft_c2r( rank, dims_row_first,
+                             NUM2PTR(void*, in_data), NUM2PTR(void*, out_data),
+                             FFTW_ESTIMATE );
+    }
+  }
+
+  if( plan == NULL )
+    XSRETURN_UNDEF;
+  else
+    RETVAL = PTR2IV(plan);
+}
+OUTPUT:
+ RETVAL
+
+
+
+int
+is_same_data( in, out )
+  pdl* in
+  pdl* out
+CODE:
+{
+  RETVAL = (in->data == out->data) ? 1 : 0;
+}
+OUTPUT:
+ RETVAL
+
+
+#define _get_data_alignment_int( x )            \
+ ( (x & 0xF) == 0 ) ? 16 :                      \
+ ( (x & 0x7) == 0 ) ?  8 :                      \
+ ( (x & 0x3) == 0 ) ?  4 :                      \
+ ( (x & 0x1) == 0 ) ?  2 : 1;
+
+int
+get_data_alignment_int( x )
+  UV x
+CODE:
+{
+  RETVAL = _get_data_alignment_int( x );
+}
+OUTPUT:
+ RETVAL
+
+
+int
+get_data_alignment_pdl( in )
+  pdl* in
+CODE:
+{
+  RETVAL = _get_data_alignment_int( PTR2UV(in->data) );
+}
+OUTPUT:
+ RETVAL
+EOXS
+
+pp_addpm( {At => 'Middle'}, <<'EOINCLUDE' );
+use PDL::Types;
+use List::Util 'reduce';
+use threads::shared;
+
+# When I compute an FFTW plan, it goes here.
+# This is :shared so that it can be used with Perl threads.
+my %existingPlans :shared;
+
+# these are for the unit tests
+our $_Nplans = 0;
+our $_last_do_double_precision;
+
+# This is a function that sits between the user's call into this module and the
+# PP-generated internals. Specifically, this function is called BEFORE any PDL
+# threading happens. Here I make sure the FFTW plan exists, or if it doesn't, I
+# make it. Thus the PP-based internals can safely assume that the plan exists
+sub __fft_internal {
+  my $thisfunction = shift;
+
+  my ($do_inverse_fft, $is_real_fft, $rank) = $thisfunction =~ /^(i?)(r?)N?.*fft([0-9]+)/;
+
+  # first I parse the variables. This is a very direct translation of what PP
+  # does normally. Plan-creation has to be outside of PP, so I must re-do this
+  # here
+  my $Nargs = scalar @_;
+
+  my ($in, $out);
+  if ( $Nargs == 2 ) {
+    # all variables on stack, read in output and temp vars
+    ($in, $out) = map {defined $_ ? PDL::Core::topdl($_) : $_} @_;
+  } elsif ( $Nargs == 1 ) {
+    $in = PDL::Core::topdl $_[0];
+    if ( $in->is_inplace ) {
+      barf <<EOF if $is_real_fft;
+$thisfunction: in-place real FFTs are not supported since the input/output types and data sizes differ.
+Giving up.
+EOF
+      $out = $in;
+      $in->set_inplace(0);
+    } else {
+      $out = PDL::null();
+    }
+  } else {
+    barf( <<EOF );
+$thisfunction must be given the input or the input and output as args.
+Exactly 1 or 2 arguments are required. Instead I got $Nargs args. Giving up.
+EOF
+  }
+
+  # make sure the in/out types match. Convert $in if needed. This needs to
+  # happen before we instantiate $out (if it's null) to make sure we know the
+  # type
+  processTypes( $thisfunction, \$in, \$out );
+
+  # I now create an ndarray for the null output. Normally PP does this, but I need
+  # to have the ndarray made to create plans. If I don't, the alignment may
+  # differ between plan-time and run-time
+  if ( $out->isnull ) {
+    my ($type, @dims) = getOutArgs($in, $is_real_fft, $do_inverse_fft);
+    $out->set_datatype($type->enum); $out->setdims(\@dims); $out->make_physical;
+  }
+
+  validateArguments( $rank, $is_real_fft, $do_inverse_fft, $thisfunction, $in, $out );
+
+  # I need to physical-ize the ndarrays before I make a plan. Again, normally PP
+  # does this, but to make sure alignments match, I need to do this myself, now
+  $in->make_physical;
+  $out->make_physical;
+
+  my $plan = getPlan( $thisfunction, $rank, $is_real_fft, $do_inverse_fft, $in, $out );
+  barf "$thisfunction couldn't make a plan. Giving up\n" unless defined $plan;
+
+  my $is_native = !$in->type->real; # native complex
+  # I now have the arguments and the plan. Go!
+  my $internal_function = 'PDL::__';
+  $internal_function .=
+    !$is_real_fft ? 'N' :
+    ($is_native && $do_inverse_fft) ? 'irN' :
+    $do_inverse_fft ? barf("irfft no longer supports PDL::Complex") :
+    'rN';
+  $internal_function .= "fft$rank";
+  eval { no strict 'refs'; $internal_function->( $in, $out, $plan ) };
+  barf $@ if $@;
+  $out;
+}
+
+sub getOutArgs {
+  my ($in, $is_real_fft, $do_inverse_fft) = @_;
+
+  my @dims = $in->dims;
+  my $is_native = !$in->type->real;
+  my $out_type = $in->type;
+
+  if ( !$is_real_fft ) {
+    # complex fft. Output is the same size as the input.
+  } elsif ( !$do_inverse_fft ) {
+    # forward real fft
+    $dims[0] = int($dims[0]/2)+1;
+    $out_type = typeWithComplexity(getPrecision($out_type), 1);
+  } else {
+    # backward real fft
+    #
+    # there's an ambiguity here. I want int($out->dim(0)/2) + 1 == $in->dim(1),
+    # however this could mean that
+    #  $out->dim(0) = 2*$in->dim(1) - 2
+    # or
+    #  $out->dim(0) = 2*$in->dim(1) - 1
+    #
+    # WITHOUT ANY OTHER INFORMATION, I ASSUME EVEN INPUT SIZES, SO I ASSUME
+    #  $out->dim(0) = 2*$in->dim(1) - 2
+    if ($is_native) {
+      $out_type = ($out_type == cfloat) ? float : double;
+    } else {
+      shift @dims;
+    }
+    $dims[0] = 2*($dims[0]-1);
+  }
+  ($out_type, @dims);
+}
+
+sub validateArguments
+{
+  my ($rank, $is_real_fft, $do_inverse_fft, $thisfunction, $in, $out) = @_;
+
+  for my $arg ( $in, $out )
+  {
+    barf <<EOF unless defined $arg;
+$thisfunction arguments must all be defined. If you want an auto-growing ndarray, use 'null' such as
+$thisfunction( \$in, \$out = null )
+Giving up.
+EOF
+
+    my $type = ref $arg;
+    $type = 'scalar' unless defined $arg;
+    barf <<EOF unless ref $arg && $arg->isa('PDL');
+$thisfunction arguments must be of type 'PDL'.
+Instead I got an arg of type '$type'. Giving up.
+EOF
+  }
+
+  # validate dimensionality of the ndarrays
+  my @inout = ($in, $out);
+
+  for my $iarg ( 0..1 )
+  {
+    my $arg = $inout[$iarg];
+
+    if( $arg->isnull )
+    {
+      barf "$thisfunction: don't know what to do with a null input. Giving up";
+    }
+
+    if( !$is_real_fft )
+    { validateArgumentDimensions_complex( $rank, $thisfunction, $arg); }
+    else
+    { validateArgumentDimensions_real( $rank, $do_inverse_fft, $thisfunction, $iarg, $arg); }
+  }
+
+  # we have an explicit output ndarray we're filling in. Make sure the
+  # input/output dimensions match up
+  if ( !$is_real_fft )
+  { matchDimensions_complex($thisfunction, $rank, $in, $out); }
+  else
+  { matchDimensions_real($thisfunction, $rank, $do_inverse_fft, $in, $out); }
+}
+
+sub validateArgumentDimensions_complex
+{
+  my ( $rank, $thisfunction, $arg ) = @_;
+  barf "Tried to compute a complex FFT, but non-native-complex argument given"
+    if $arg->type->real;
+  my $dims_cmp = $arg->ndims;
+  barf <<EOF if $dims_cmp < $rank;
+Tried to compute a $rank-dimensional FFT, but an array has fewer than $rank dimensions.
+Giving up.
+EOF
+}
+
+sub validateArgumentDimensions_real {
+  my ( $rank, $do_inverse_fft, $thisfunction, $iarg, $arg ) = @_;
+  my $is_native = !$arg->type->real; # native complex
+
+  # real FFT. Forward transform takes in real and spits out complex;
+  # backward transform does the reverse
+  if (!!$do_inverse_fft == !!($iarg == 0)) { # need complex for this
+    my ($verb, $var, $reason) = ($iarg == 0) ? qw(takes input) : qw(produces output);
+    if ( ($iarg == 1 && !$is_native) ||
+      ($iarg == 0 && !$is_native)
+    ) {
+      $reason = "\$$var should be native-complex";
+    } elsif (!$is_native && $arg->dim(0) != 2) {
+      $reason = "\$$var->dim(0) == 2 should be true";
+    }
+    barf <<EOF if $reason;
+$thisfunction $verb complex $var, so $reason,
+but it's not (in @{[$arg->info]}: $arg). Giving up.
+EOF
+  }
+
+  my ($min_dimensionality, $var) = ($rank, $iarg == 0 ? 'input' : 'output');
+  if ( $arg->ndims < $min_dimensionality ) {
+    barf <<EOF;
+$thisfunction: The $var needs at least $min_dimensionality dimensions, but
+it has fewer. Giving up.
+EOF
+  }
+}
+
+sub matchDimensions_complex {
+  my ($thisfunction, $rank, $in, $out) = @_;
+  for my $idim (0..$rank) {
+    if ( $in->dim($idim) != $out->dim($idim) ) {
+      barf <<EOF;
+$thisfunction was given input/output matrices of non-matching sizes.
+Giving up.
+EOF
+    }
+  }
+}
+
+sub matchDimensions_real {
+  my ($thisfunction, $rank, $do_inverse_fft, $in, $out) = @_;
+  my ($varname1, $varname2, $var1, $var2);
+  if ( !$do_inverse_fft ) {
+    # Forward FFT. The input is real, the output is complex.
+    # $output->dim(1) should be int($input->dim(0)/2) + 1 (Section 2.4 of
+    # the FFTW3 documentation)
+    ($varname1, $varname2, $var1, $var2) = (qw(input output), $in, $out);
+  } else {
+    # Backward FFT. The input is complex, the output is real.
+    ($varname1, $varname2, $var1, $var2) = (qw(output input), $out, $in);
+  }
+  barf <<EOF if int($var1->dim(0)/2) + 1 != $var2->dim(0);
+$thisfunction: mismatched first dimension:
+\$$varname2->dim(0) == int(\$$varname1->dim(0)/2) + 1 wasn't true.
+$varname1: @{[$var1->info]}
+$varname2: @{[$var2->info]}
+Giving up.
+EOF
+  for my $idim (1..$rank-1) {
+    if ( $var1->dim($idim) != $var2->dim($idim) ) {
+      barf <<EOF;
+$thisfunction was given input/output matrices of non-matching sizes.
+Giving up.
+EOF
+    }
+  }
+}
+
+sub processTypes
+{
+  my ($thisfunction, $in, $out) = @_;
+
+  # types:
+  #
+  # Input and output types must match, and I can only really deal with float and
+  # double. If given an output, I refuse to tweak the type of the output,
+  # otherwise, I upgrade to float and then to double
+  if( $$out->isnull ) {
+    if( $$in->type < float ) {
+      forceType( $in, (float) );
+    }
+  } else {
+    # I'm given an output. Make sure this is of a type I can work with,
+    # otherwise give up
+    my $out_type = $$out->type;
+    barf <<EOF if $out_type < float;
+$thisfunction can only generate 'float' or 'double' output. You gave an output
+of type '$out_type'. I can't change this so I give up
+EOF
+    my $in_type = $$in->type;
+    my $in_precision = getPrecision($in_type);
+    my $out_precision = getPrecision($out_type);
+    return if $in_precision == $out_precision;
+    forceType( $in, typeWithComplexity($out_precision, !$in_type->real) );
+    forceType( $out, typeWithComplexity($out_precision, !$out_type->real) );
+  }
+}
+
+sub typeWithComplexity {
+  my ($precision, $complex) = @_;
+  $complex ? ($precision == 1 ? cfloat : cdouble) :
+    $precision == 1 ? float : double;
+}
+
+sub getPrecision {
+  my ($type) = @_;
+  ($type <= float || $type == cfloat) ? 1 : # float
+  2; # double
+}
+
+sub forceType
+{
+  my ($x, $type) = @_;
+  $$x = convert( $$x, $type ) unless $$x->type == $type;
+}
+
+sub getPlan
+{
+  my ($thisfunction, $rank, $is_real_fft, $do_inverse_fft, $in, $out) = @_;
+
+  # I get the plan ID, check if I already have a plan, and make a new plan if I
+  # don't already have one
+
+  my @dims = ((!$is_real_fft || !$do_inverse_fft) ? $in : $out)->dims; # FFT dimensionality
+
+  my $Nslices = reduce {$a*$b} 1, splice(@dims, $rank);
+
+  my $do_double_precision = ($in->get_datatype == $PDL_F || $in->get_datatype == $PDL_CF)
+    ? 0 : 1;
+  $_last_do_double_precision = $do_double_precision;
+
+  my $do_inplace = is_same_data( $in, $out );
+
+  # I compute a single plan for the whole set of thread slices. I make a
+  # worst-case plan, so I find the worst-aligned thread slice and plan off of
+  # it. So if $Nslices>1 then the worst-case alignment is the worse of (1st,
+  # 2nd) slices
+  my $in_alignment  = get_data_alignment_pdl( $in );
+  my $out_alignment = get_data_alignment_pdl( $out );
+  my $stride_bytes  = ($do_double_precision ? 8 : 4) * reduce {$a*$b} @dims;
+  if( $Nslices > 1 )
+  {
+    my $in_alignment_2nd  = get_data_alignment_int($in_alignment  + $stride_bytes);
+    my $out_alignment_2nd = get_data_alignment_int($out_alignment + $stride_bytes);
+    $in_alignment         = $in_alignment_2nd  if $in_alignment_2nd  < $in_alignment;
+    $out_alignment        = $out_alignment_2nd if $out_alignment_2nd < $out_alignment;
+  }
+
+  my $planID = join('_',
+                    $thisfunction,
+                    $do_double_precision,
+                    $do_inplace,
+                    $in_alignment,
+                    $out_alignment,
+                    @dims);
+  if ( !exists $existingPlans{$planID} )
+  {
+    lock(%existingPlans);
+    $existingPlans{$planID} = compute_plan( \@dims, $do_double_precision, $is_real_fft, $do_inverse_fft,
+                                            $in, $out, $in_alignment, $out_alignment );
+    $_Nplans++;
+  }
+
+  return $existingPlans{$planID};
+}
+EOINCLUDE
+
+for my $rank (1..$maxrank)
+{
+  my $shapestr = sprintf(q{$a->shape->slice('0:%d')->prodover},$rank-1);
+
+  pp_addpm({At => 'Bot'}, pp_line_numbers(__LINE__, <<EOF));
+sub fft$rank { __fft_internal( "fft$rank",\@_ ); }
+*PDL::fft$rank = \\&fft$rank;
+
+sub ifft$rank {
+  my \$a = __fft_internal( "ifft$rank", \@_ );
+  \$a /= $shapestr;
+  \$a;
+}
+*PDL::ifft$rank = \\&ifft$rank;
+
+sub rfft$rank { __fft_internal( "rfft$rank", \@_ ); }
+*PDL::rfft$rank = \\&rfft$rank;
+
+sub rNfft$rank { __fft_internal( "rNfft$rank", \@_ ); }
+*PDL::rNfft$rank = \\&rNfft$rank;
+
+sub irfft$rank { my \$a = __fft_internal( "irfft$rank", \@_ ); \$a /= $shapestr; \$a; }
+*PDL::irfft$rank = \\&irfft$rank;
+EOF
+
+  pp_add_exported( map "${_}fft$rank", '', 'i', 'r', 'rN', 'ir' );
+}
+
+
+##########
+# Generate the fftn case.  This should probably be done more prettily; for now it's just 
+# a springboard that jumps into __fft_internal.
+pp_addpm({At=> 'Bot'}, pp_line_numbers(__LINE__, sprintf <<'EOF', $maxrank));
+sub _rank_springboard {
+  my ($name, $source, $rank, @rest) = @_;
+  my $inverse = ($name =~ m/^i/);
+
+  unless(defined $rank) {
+    die "${name}n: second argument must be the rank of the transform you want";
+  }
+  $rank = 0+$rank;  # force numeric context
+  unless($rank>=1 ) {
+    die "${name}n: second argument (rank) must be between 1 and %d";
+  }
+
+  my $active_lo = 0;
+  my $active_hi = $rank-1;
+
+  unless($source->ndims > $active_hi) {
+    die "${name}n: rank is $rank but input has only ".($active_hi-$active_lo)." active dims!";
+  }
+
+  my $out = __fft_internal( $name.$rank, $source, @rest );
+
+  if($inverse) {
+    $out /= $out->shape->slice("$active_lo:$active_hi")->prodover;
+  }
+  return $out;
+}
+
+sub fftn    { _rank_springboard( "fft",      @_ ) }
+sub ifftn   { _rank_springboard( "ifft",     @_ ) }
+sub rfftn   { _rank_springboard( "rfft",  @_ ) }
+sub irfftn  { _rank_springboard( "irfft", @_ ) }
+
+*PDL::fftn   = \&fftn;
+*PDL::ifftn  = \&ifftn;
+*PDL::rfftn  = \&rfftn;
+*PDL::irfftn = \&irfftn;
+
+EOF
+pp_add_exported( map "${_}fftn", '','i','r','ir' );
+
+pp_done();
+
+sub generateDefinitions
+{
+  my $rank = shift;
+
+  my %pp_def = (
+    HandleBad => 0,
+    OtherPars    => 'IV plan', # comes from pre-fft code not user
+    # this is a private function so I don't want to create
+    # user-visible documentation or exports
+    Doc          => undef,
+    PMFunc       => ''
+  );
+
+  ################################################################################
+  ####### first I generate the definitions for the simple complex-complex FFT case
+  # make dimension string 'n1,n2,n3,n4...'.
+  my @dims_real = my @dims_complex = my @dims = map "n$_", 1..$rank;
+  my $dims_string = join(',', @dims);
+  $pp_def{Pars} = "in($dims_string); [o]out($dims_string);";
+  $pp_def{GenericTypes} = [qw(G C)];
+  pp_def( "__Nfft$rank", %pp_def, Code => $TEMPLATE_COMPLEX );
+
+  ##################################################################################
+  ####### real-native complex and native complex-real
+  $dims_complex[0] = 'nhalf'; # first complex dim is real->dim(0)/2+1
+  my $dims_real_string    = join(',', @dims_real);
+  my $dims_complex_string = join(',', @dims_complex);
+
+  # backward
+  $pp_def{RedoDimsCode} = <<'EOF';
+if( $PDL(real)->dims[0] <= 0 )
+  $SIZE(n1) = 2*$PDL(complexv)->dims[0] - 2;
+EOF
+  $pp_def{Pars} = "complexv($dims_complex_string); real [o]real($dims_real_string);";
+  pp_def( "__irNfft$rank", %pp_def, Code => $TEMPLATE_REAL_C2R );
+
+  # forward
+  $pp_def{RedoDimsCode} = <<'EOF';
+if( $PDL(complexv)->ndims <= 1 || $PDL(complexv)->dims[1] <= 0 )
+  $SIZE(nhalf) = (int)( $PDL(real)->dims[0]/2 ) + 1;
+EOF
+  $pp_def{Pars} = "real($dims_real_string); complex [o]complexv($dims_complex_string);";
+  $pp_def{GenericTypes} = [qw(F D)];
+  pp_def("__rNfft$rank",
+    %pp_def,
+    Code => $TEMPLATE_REAL_R2C,
+    NewXSTypeCoerceNS => <<'EOF',
+  $PRIV(__datatype) = $PDL(real)->datatype;
+  pdl_transvtable *vtable = $PRIV(vtable);
+  PDL_Indx i, nchildren = vtable->npdls - vtable->nparents;
+  pdl **pdls = $PRIV(pdls);
+  for (i=vtable->nparents; i<vtable->npdls; i++) pdls[i+nchildren] = pdls[i];
+EOF
+  );
+}
+
+sub slurp {
+  my $filename = shift;
+  open my $fh, '<', $filename or die "open '$filename' for reading: $!";
+  local $/ = undef;
+  return qq{\n#line 0 "$filename"\n\n} . <$fh>;
+}

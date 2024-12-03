@@ -1,16 +1,12 @@
 Changes
-compute_plan_template.xs
-FFTW3.pd
-FFTW3_header_include.pm
+fftw3.pd
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.pod
 t/fftw.t
 t/threads.t
-template_complex.c
-template_real.c
 TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
-GENERATED/PDL/FFTW3.pm                   mod=PDL::FFTW3 pd=FFTW3.pd (added by pdlpp_mkgen)
+GENERATED/PDL/FFTW3.pm                   mod=PDL::FFTW3 pd=fftw3.pd (added by pdlpp_mkgen)

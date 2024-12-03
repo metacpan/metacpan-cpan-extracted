@@ -31,7 +31,8 @@ Defines the following attributes;
 
 =item C<action_path_map>
 
-A reverse map of routes regexed out of the controller source
+A reverse map of routes extracted using regular expression from the controller
+source
 
 =cut
 

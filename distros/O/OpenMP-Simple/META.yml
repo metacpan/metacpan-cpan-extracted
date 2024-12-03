@@ -23,13 +23,14 @@ meta-spec:
 name: OpenMP-Simple
 requires:
   Alien::OpenMP: '0'
+  File::ShareDir: '0'
   Inline::C: '0'
   OpenMP::Environment: '0'
   Util::H2O::More: v0.3.4
 resources:
   homepage: https://github.com/Perl-OpenMP/p5-OpenMP-Simple
   repository: https://github.com/Perl-OpenMP/p5-OpenMP-Simple.git
-version: 0.1.4
+version: 0.1.6
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

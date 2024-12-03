@@ -1,9 +1,9 @@
 package Tapper::Reports::Receiver;
-# git description: v5.0.0-2-g454017d
+# git description: v5.0.1-2-ga576b50
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Receiver for Tapper test reports as TAP or TAP::Archive
-$Tapper::Reports::Receiver::VERSION = '5.0.1';
+$Tapper::Reports::Receiver::VERSION = '5.0.2';
 use 5.010;
 use strict;
 use warnings;
@@ -87,7 +87,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2024 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 
