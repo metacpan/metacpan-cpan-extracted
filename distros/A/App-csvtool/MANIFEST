@@ -4,6 +4,7 @@ Build.PL
 Changes
 lib/App/csvtool.pm
 lib/App/csvtool/Smudge.pm
+lib/App/csvtool/Summarizing.pm
 lib/App/csvtool/Timetools.pm
 LICENSE
 MANIFEST			This list of files
@@ -22,5 +23,6 @@ t/20strftime.t
 t/20strptime.t
 t/20tsort.t
 t/30smudge.t
+t/40count.t
 t/99pod.t
 t/lib/TestAppcsvtool.pm

@@ -1,0 +1,18 @@
+0.003   2024-12-04  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Bencher-Scenarios-RefUtil ->
+          Bencher-ScenarioBundle-Ref-Util.
+
+
+0.002   2017-01-25  Released-By: PERLANCAR
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.001   2016-04-30  Released-By: PERLANCAR
+
+        - First release.

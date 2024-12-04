@@ -4,7 +4,7 @@ File::Open::NoCache::ReadOnly - Open a file and flush from memory on closing
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SUBROUTINES/METHODS
 

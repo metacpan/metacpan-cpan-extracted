@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc;
 # ABSTRACT: Chargeur Koha par Tamil
-$Koha::Contrib::Sudoc::VERSION = '2.45';
+$Koha::Contrib::Sudoc::VERSION = '2.46';
 use Moose;
 use Modern::Perl;
 use YAML qw( LoadFile Dump );
@@ -313,13 +313,13 @@ Koha::Contrib::Sudoc - Chargeur Koha par Tamil
 
 =head1 VERSION
 
-version 2.45
+version 2.46
 
 =head1 DESCRIPTION
 
 Koha::Contrib::Sudoc est le Chargeur Sudoc pour Koha développé par Tamil. Le
 fonctionnement de cet outil est décrit ici :
-L<http://www.tamil.fr/sudoc/sudoc.html>.
+L<https://www.tamil.fr/sudoc/sudoc.html>.
 
 =head1 AUTHOR
 

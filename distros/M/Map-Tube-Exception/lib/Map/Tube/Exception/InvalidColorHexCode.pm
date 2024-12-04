@@ -1,13 +1,13 @@
 package Map::Tube::Exception::InvalidColorHexCode;
 $Map::Tube::Exception::InvalidColorHexCode::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::InvalidColorHexCode::VERSION = '3.21';
+$Map::Tube::Exception::InvalidColorHexCode::VERSION = '3.23';
 =head1 NAME
 
 Map::Tube::Exception::InvalidColorHexCode - Represent 'invalid color hex code' exception.
 
 =head1 VERSION
 
-version 3.21
+version 3.23
 
 =cut
 
@@ -27,7 +27,7 @@ B<FOR INTERNAL USE ONLY>.
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -35,8 +35,7 @@ L<https://github.com/manwar/Map-Tube-Exception>
 
 =head1 BUGS
 
-Please  report  any  bugs  or  feature requests to C<bug-map-tube-exception at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Map-Tube-Exception>.
+Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/Map-Tube-Exception/issues>.
 I will be notified, and then you'll automatically be notified of progress on your
 bug as I make changes.
 
@@ -44,33 +43,29 @@ bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Map::Tube::Exception::InvalidColorHexCode
+    perldoc Map::Tube::Exception
 
 You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * BUG Report
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Map-Tube-Exception>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Map-Tube-Exception>
+L<https://github.com/manwar/Map-Tube-Exception/issues>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Map-Tube-Exception>
 
-=item * Search CPAN
+=item * Search MetaCPAN
 
-L<http://search.cpan.org/dist/Map-Tube-Exception/>
+L<https://metacpan.org/dist/Map-Tube-Exception/>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2016 Mohammad S Anwar.
+Copyright (C) 2015 - 2024 Mohammad Sajid Anwar.
 
 This  program  is  free software; you can redistribute it and/or  modify it under
 the  terms  of the the Artistic License (2.0).  You may obtain a copy of the full

@@ -16,15 +16,18 @@ name: App-csvtool
 provides:
   App::csvtool:
     file: lib/App/csvtool.pm
-    version: '0.03'
+    version: '0.04'
   App::csvtool::Smudge:
     file: lib/App/csvtool/Smudge.pm
-    version: '0.03'
+    version: '0.04'
+  App::csvtool::Summarizing:
+    file: lib/App/csvtool/Summarizing.pm
+    version: '0.04'
   App::csvtool::Timetools:
     file: lib/App/csvtool/Timetools.pm
-    version: '0.03'
+    version: '0.04'
 requires:
-  Commandable::Finder::Packages: '0.12'
+  Commandable::Finder::Packages: '0.14'
   Commandable::Invocation: '0.03'
   File::Basename: '0'
   Getopt::Long: '0'
@@ -36,5 +39,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

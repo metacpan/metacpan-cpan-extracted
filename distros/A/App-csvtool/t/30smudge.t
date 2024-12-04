@@ -63,6 +63,15 @@ is(
    'smudge -F 1:ravg5' );
 
 is(
+   run_cmd( $cmd, "-F 1:total", [
+      map { [ $_ ] } ( 1, 1, 1, 2, 3, 5 )
+   ] ),
+   [
+      map { [ $_ ] } ( 1, 2, 3, 5, 8, 13 ),
+   ],
+   'smudge -F 1:total' );
+
+is(
    run_cmd( $cmd, "-F 1,2:avg3", [
       map { [ $_, $_+1 ] } 1 .. 5
    ] ),

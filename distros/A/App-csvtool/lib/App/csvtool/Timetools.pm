@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package App::csvtool::Timetools 0.03;
+package App::csvtool::Timetools 0.04;
 
 use v5.26;
 use warnings;

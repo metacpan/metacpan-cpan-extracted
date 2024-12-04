@@ -1,5 +1,11 @@
 Revision history for File-Open-NoCache-ReadOnly
 
+0.04	Tue Dec  3 14:35:40 EST 2024
+	Use Test::DescribeMe to simplify tests
+	Added t/30-basics.t
+	Avoid closing a filedescriptor when object goes out of scope
+		by file is still in use
+
 0.03	Tue Jul 23 10:56:57 EDT 2024
 	Close now warns about attempting to close twice
 	Use Test::Needs

@@ -13,6 +13,7 @@ use strict;
 use warnings;
 use Carp;
 use IO::AIO;
+use Scalar::Util;
 
 =head1 NAME
 
@@ -20,11 +21,11 @@ File::Open::NoCache::ReadOnly - Open a file and flush from memory on closing
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SUBROUTINES/METHODS
 
@@ -43,26 +44,38 @@ once the file has been used it's a waste of RAM to keep it in cache.
 =cut
 
 sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
+	my $class = shift;
 
-	return unless(defined($class));
-
+	# Handle hash or hashref arguments
 	my %params;
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
 	} elsif(ref($_[0]) || !defined($_[0])) {
-		Carp::carp('Usage: ', __PACKAGE__, '->new(%args)');
-	} elsif(scalar(@_) % 2 == 0) {
+		Carp::carp('Usage: ', __PACKAGE__, '->new(%params)');
+		return;
+	} elsif((scalar(@_) % 2) == 0) {
 		%params = @_;
 	} else {
 		$params{'filename'} = shift;
 	}
 
+	if(!defined($class)) {
+		# Using CGI::Info->new(), not CGI::Info::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
+		return bless { %{$class}, %params }, ref($class);
+	}
+
+	# Open file if filename is provided
 	if(my $filename = $params{'filename'}) {
 		if(open(my $fd, '<', $filename)) {
 			IO::AIO::fadvise($fd, 0, 0, IO::AIO::FADV_SEQUENTIAL|IO::AIO::FADV_NOREUSE|IO::AIO::FADV_DONTNEED);
-			return bless { fd => $fd }, $class;
+			return bless { filename => $filename, fd => $fd }, $class;
 		}
 		if($params{'fatal'}) {
 			Carp::croak("$filename: $!");
@@ -71,7 +84,8 @@ sub new {
 	} else {
 		Carp::carp('Usage: ', __PACKAGE__, '->new(filename => $filename)');
 	}
-	return;	# return undef
+
+	return;	# Return undef if unsuccessful
 }
 
 =head2	fd
@@ -117,7 +131,7 @@ sub DESTROY {
 	}
 	my $self = shift;
 
-	if(defined($self->{'fd'})) {
+	if(my $fd = delete $self->{'fd'}) {
 		$self->close();
 	}
 }

@@ -1,3 +1,21 @@
+0.019   2024-12-03  Released-By: PERLANCAR; Urgency: medium
+
+        - [mineral magnesium] Add trimagnesium orthophosphate & SunActive
+          Mg.
+
+        - [mineral iron] Add lipofer, SunActive Fe.
+
+        - Tweak some unit names.
+
+
+0.018   2024-12-01  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] [mineral magnesium] Add example of sorting by highest
+          magnesium content.
+
+
 0.017   2024-12-01  Released-By: PERLANCAR; Urgency: medium
 
         - Add column: pct_X.

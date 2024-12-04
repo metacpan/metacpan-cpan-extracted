@@ -1,5 +1,11 @@
 Revision history for Map::Tube
 
+3.82  2024-12-03T21:00:00+00:00
+      - Handle duplicate station name.
+
+3.81  2024-12-03T14:35:00+00:00
+      - Added test for invalid station line id.
+
 3.80  2024-12-01T00:40:00+00:00
       - Tidied up unit test to make less noisy as reported by @srezic and @gwselke.
       https://rt.cpan.org/Ticket/Display.html?id=157584

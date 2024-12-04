@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-12-01'; # DATE
+our $DATE = '2024-12-03'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_calcium_unit",
@@ -39,7 +39,7 @@ convert-calcium-unit - Convert an iron quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.017 of convert-calcium-unit (from Perl distribution App-MineralUtils), released on 2024-12-01.
+This document describes version 0.019 of convert-calcium-unit (from Perl distribution App-MineralUtils), released on 2024-12-03.
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ Can also be specified as the 1st command-line argument.
 
 Valid values:
 
- ["mg","mg-fe-elem","mg-ferrous-sulfate-heptahydrate"]
+ ["mg","mg-fe-elem","mg-ferrous-sulfate-heptahydrate","mg-lipofer","mg-sunactive-fe"]
 
 Can also be specified as the 2nd command-line argument.
 

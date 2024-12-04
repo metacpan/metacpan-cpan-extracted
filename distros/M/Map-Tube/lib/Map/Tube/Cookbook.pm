@@ -1,6 +1,6 @@
 package Map::Tube::Cookbook;
 
-$Map::Tube::Cookbook::VERSION   = '3.80';
+$Map::Tube::Cookbook::VERSION   = '3.82';
 $Map::Tube::Cookbook::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Cookbook - Cookbook for Map::Tube library.
 
 =head1 VERSION
 
-Version 3.80
+Version 3.82
 
 =cut
 
@@ -400,10 +400,6 @@ You can also look for information at:
 =item * BUG Report
 
 L<https://github.com/manwar/Map-Tube/issues>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Map-Tube>
 
 =item * CPAN Ratings
 

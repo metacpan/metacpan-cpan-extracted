@@ -1,10 +1,10 @@
 {
    "abstract" : "Base exception package as Moo Role for Map::Tube::* family.",
    "author" : [
-      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+      "Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -49,148 +49,153 @@
    "provides" : {
       "Map::Tube::Exception" : {
          "file" : "lib/Map/Tube/Exception.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::DuplicateStationId" : {
          "file" : "lib/Map/Tube/Exception/DuplicateStationId.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::DuplicateStationName" : {
          "file" : "lib/Map/Tube/Exception/DuplicateStationName.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::FoundMultiLinedStation" : {
          "file" : "lib/Map/Tube/Exception/FoundMultiLinedStation.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::FoundMultiLinkedStation" : {
          "file" : "lib/Map/Tube/Exception/FoundMultiLinkedStation.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::FoundSelfLinkedStation" : {
          "file" : "lib/Map/Tube/Exception/FoundSelfLinkedStation.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::FoundUnsupportedMap" : {
          "file" : "lib/Map/Tube/Exception/FoundUnsupportedMap.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::FoundUnsupportedMapDataFormat" : {
          "file" : "lib/Map/Tube/Exception/FoundUnsupportedMapDataFormat.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::FoundUnsupportedObject" : {
          "file" : "lib/Map/Tube/Exception/FoundUnsupportedObject.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::InvalidBackgroundColor" : {
          "file" : "lib/Map/Tube/Exception/InvalidBackgroundColor.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::InvalidColorHexCode" : {
          "file" : "lib/Map/Tube/Exception/InvalidColorHexCode.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::InvalidColorName" : {
          "file" : "lib/Map/Tube/Exception/InvalidColorName.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::InvalidLineColor" : {
          "file" : "lib/Map/Tube/Exception/InvalidLineColor.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::InvalidLineId" : {
          "file" : "lib/Map/Tube/Exception/InvalidLineId.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::InvalidLineName" : {
          "file" : "lib/Map/Tube/Exception/InvalidLineName.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::InvalidLineStructure" : {
          "file" : "lib/Map/Tube/Exception/InvalidLineStructure.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::InvalidNodeObject" : {
          "file" : "lib/Map/Tube/Exception/InvalidNodeObject.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::InvalidStationId" : {
          "file" : "lib/Map/Tube/Exception/InvalidStationId.pm",
-         "version" : "3.21"
+         "version" : "3.23"
+      },
+      "Map::Tube::Exception::InvalidStationLineId" : {
+         "file" : "lib/Map/Tube/Exception/InvalidStationLineId.pm",
+         "version" : "3.23"
       },
       "Map::Tube::Exception::InvalidStationName" : {
          "file" : "lib/Map/Tube/Exception/InvalidStationName.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::InvalidStationStructure" : {
          "file" : "lib/Map/Tube/Exception/InvalidStationStructure.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::InvalidSupportedObject" : {
          "file" : "lib/Map/Tube/Exception/InvalidSupportedObject.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::MalformedMapData" : {
          "file" : "lib/Map/Tube/Exception/MalformedMapData.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::MissingLineId" : {
          "file" : "lib/Map/Tube/Exception/MissingLineId.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::MissingLineName" : {
          "file" : "lib/Map/Tube/Exception/MissingLineName.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::MissingMapData" : {
          "file" : "lib/Map/Tube/Exception/MissingMapData.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::MissingNodeObject" : {
          "file" : "lib/Map/Tube/Exception/MissingNodeObject.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::MissingPluginFormatter" : {
          "file" : "lib/Map/Tube/Exception/MissingPluginFormatter.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::MissingPluginFuzzyFind" : {
          "file" : "lib/Map/Tube/Exception/MissingPluginFuzzyFind.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::MissingPluginGraph" : {
          "file" : "lib/Map/Tube/Exception/MissingPluginGraph.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::MissingStationId" : {
          "file" : "lib/Map/Tube/Exception/MissingStationId.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::MissingStationName" : {
          "file" : "lib/Map/Tube/Exception/MissingStationName.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::MissingSupportedMap" : {
          "file" : "lib/Map/Tube/Exception/MissingSupportedMap.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       },
       "Map::Tube::Exception::MissingSupportedObject" : {
          "file" : "lib/Map/Tube/Exception/MissingSupportedObject.pm",
-         "version" : "3.21"
+         "version" : "3.23"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/Manwar/Map-Tube-Exception",
+      "homepage" : "https://github.com/manwar/Map-Tube-Exception",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/Manwar/Map-Tube-Exception.git",
-         "web" : "https://github.com/Manwar/Map-Tube-Exception"
+         "url" : "https://github.com/manwar/Map-Tube-Exception.git",
+         "web" : "https://github.com/manwar/Map-Tube-Exception"
       }
    },
-   "version" : "3.21",
-   "x_generated_by_perl" : "v5.18.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+   "version" : "3.23",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

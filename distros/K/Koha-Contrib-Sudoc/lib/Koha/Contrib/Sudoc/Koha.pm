@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Koha;
 # ABSTRACT: Lien à Koha
-$Koha::Contrib::Sudoc::Koha::VERSION = '2.45';
+$Koha::Contrib::Sudoc::Koha::VERSION = '2.46';
 use Moose;
 use Modern::Perl;
 use Carp;
@@ -8,7 +8,7 @@ use XML::Simple;
 use DBI;
 use ZOOM;
 use MARC::Moose::Record;
-use C4::Biblio qw/ GetMarcFromKohaField GetFrameworkCode /;;
+use C4::Biblio qw/ GetFrameworkCode /;;
 use Search::Elasticsearch;
 use YAML;
 use MIME::Base64;
@@ -28,6 +28,27 @@ has es => ( is => 'rw' );
 has es_index => ( is=> 'rw' );
 
 has sth_biblio => (is => 'rw' );
+
+has biblionumber_where => (
+    is => 'rw',
+    isa => 'Str',
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        my $dbh = $self->dbh;
+        my $where = $self->dbh->selectall_arrayref("
+            SELECT tagfield, tagsubfield
+              FROM marc_subfield_structure
+             WHERE kohafield ='biblio.biblionumber'
+               AND frameworkcode=''",
+            {}
+        );
+        $where = join('', @{$where->[0]});
+        my $tag = substr($where, 0, 3);
+        $where = substr($where, 0, 3) if $tag lt '010';
+        return $where;
+    },
+);
 
 
 sub BUILD {
@@ -150,10 +171,12 @@ sub zauth {
 
 sub get_biblionumber {
     my ($self, $record) = @_;
-    my ($tag, $letter) = GetMarcFromKohaField("biblio.biblionumber", '');
-    $tag < 10
-        ? $record->field($tag)->value
-        : $record->field($tag)->subfield($letter);
+    my $where = $self->biblionumber_where;
+    my $tag = substr($where, 0, 3);
+    my $letter = substr($where, 3);
+    $letter
+        ? $record->field($tag)->subfield($letter)
+        : $record->field($tag)->value;
 }
 
 
@@ -372,7 +395,7 @@ Koha::Contrib::Sudoc::Koha - Lien à Koha
 
 =head1 VERSION
 
-version 2.45
+version 2.46
 
 =head1 DESCRIPTION
 

@@ -5,6 +5,15 @@ use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 # yum install libaio-devel
 # apk install libaio-dev
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
 	NAME		=> 'File::Open::NoCache::ReadOnly',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
@@ -17,7 +26,9 @@ WriteMakefile(
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
 		'autodie' => 0,
+		'File::Temp' => 0,
 		'IPC::System::Simple' => 0,
+		'Test::DescribeMe' => 0,
 		'Test::Exception' => 0.42,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
@@ -26,12 +37,12 @@ WriteMakefile(
 		'Test::Carp' => 0,
 		# 'Test::CleanNamespaces' => 0,
 		# 'Test::Kwalitee' => 0,
-		'Test::Warn' => 0,
+		'Test::Warn' => 0
 	}, PREREQ_PM => {
 		'Carp' => 0,
 		'IO::AIO' => 0,
-	},
-	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+		'Scalar::Util' => 0
+	}, dist => $dist,
 	clean		=> { FILES => 'File-Open-NoCache-ReadOnly-*' },
 	# META_ADD => {
 		# provides => {}

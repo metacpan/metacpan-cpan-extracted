@@ -1,5 +1,11 @@
 Revision history for Map::Tube::Exception
 
+3.23  Tue Dec 03 14:40:00 2024
+      - Tidied up pod for Map::Tube::Exception::InvalidStationLineId.
+
+3.22  Tue Dec 03 13:50:00 2024
+      - Added exception for Invalid Station Line Id.
+
 3.21  Thu Sep 19 10:45:00 2019
       - Added RT #130521, missing entry in the Changes file.
 

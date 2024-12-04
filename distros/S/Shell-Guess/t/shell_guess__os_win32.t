@@ -9,9 +9,9 @@ my $fake_is_win95 = 0;
 
 eval q{
   package Win32;
-  
+
   $INC{'Win32.pm'} = __FILE__;
-  
+
   no warnings;
   sub IsWin95 { $fake_is_win95 ? 1 : 0 }
   sub IsWinNT { $fake_is_win95 ? 0 : 1 }

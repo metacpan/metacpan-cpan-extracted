@@ -1,5 +1,11 @@
 Revision history for App-csvtool
 
+0.04    2024-12-03
+        [CHANGES]
+         * Ensure the `--tab` option actually works
+         * Added `smudge total` filter
+         * Added `count` command
+
 0.03    2024-08-21
         [CHANGES]
          * Added `smudge` command, for smoothing out data observed over a

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package App::csvtool 0.03;
+package App::csvtool 0.04;
 
 use v5.26;
 use warnings;

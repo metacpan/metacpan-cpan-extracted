@@ -1,5 +1,12 @@
 Revision history for Map::Tube::CLI
 
+0.71  Tue Dec 03 17:15:00 2024
+      - Updated pod w.r.t option --list_lines.
+
+0.70  Tue Dec 03 17:10:00 2024
+      - Added option --list_lines.
+      - Upgraded dependency on Map::Tube v3.81.
+
 0.69  Tue Oct 08 17:30:00 2024
       - Upgraded dependency on Map::Tube v3.77.
       - Tidied up pod document.

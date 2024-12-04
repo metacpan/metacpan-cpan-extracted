@@ -10,7 +10,7 @@ my $build = Module::Build->new(
       'perl' => '5.026',
       'experimental' => 0,
 
-      'Commandable::Finder::Packages' => '0.12',
+      'Commandable::Finder::Packages' => '0.14',
       'Commandable::Invocation' => '0.03',
       'File::Basename' => 0,
       'Getopt::Long' => 0,

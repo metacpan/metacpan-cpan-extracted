@@ -4,6 +4,7 @@
 <%perl>
     my @fields;
     my @elements = @{ $pages->{$page}{'content'} };
+    my %field_value;
     for my $element (@elements) {
         my ( $input_name, $is_html );
         my $name;
@@ -20,6 +21,7 @@
                 my $cf = RT::CustomField->new( $session{'CurrentUser'} );
                 $cf->LoadByName( Name => $name, Queue => $queue->Id );
                 $cf->LoadByName( Name => $name, Queue => 0 ) unless $cf->Id;
+                $cf->LoadByName( Name => $name, LookupType => RT::Ticket->CustomFieldLookupType ) unless $cf->Id;
                 if ( $cf->Id ) {
                     $input_name = GetCustomFieldInputName(
                         Object      => RT::Ticket->new( $session{CurrentUser} ),
@@ -31,6 +33,20 @@
         }
 
         if ($input_name) {
+
+            my $args = $element->{arguments} || {};
+            if ( $args->{show_condition} && $args->{show_condition}{enabled} && $args->{show_condition}{name} ) {
+                my $value = $field_value{$args->{show_condition}{name}} // '';
+                my $matched;
+                for my $val ( ref $value ? @$value : $value ) {
+                    if ( grep { $val eq $_ } @{$args->{show_condition}{values} || []} ) {
+                        $matched = 1;
+                        last;
+                    }
+                }
+                next unless $matched;
+            }
+
             if ( $input_name eq 'Attach' ) {
                 push @fields, { name => $name, value => $ARGS{AttachedFilenames} };
             }
@@ -40,6 +56,8 @@
             else {
                 push @fields, { name => $name, value => $DECODED_ARGS->{$input_name} };
             }
+
+            $field_value{$name} = $fields[-1]{value} || $fields[-1]{raw_value};
         }
     }
 </%perl>

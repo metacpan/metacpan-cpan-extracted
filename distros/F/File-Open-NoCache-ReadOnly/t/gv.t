@@ -3,16 +3,10 @@
 use strict;
 use warnings;
 
+use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs 'Test::GreaterVersion';
 
-if(not $ENV{AUTHOR_TESTING}) {
-	plan(skip_all => 'Author tests not required for installation');
-}
-
-eval "use Test::GreaterVersion";
-
-plan skip_all => "Test::GreaterVersion required for checking versions" if $@;
-
-Test::GreaterVersion::has_greater_version_than_cpan('File::Open::NoCache::ReadOnly');
+Test::GreaterVersion::has_greater_version_than_cpan('CGI::Info');
 
 done_testing();

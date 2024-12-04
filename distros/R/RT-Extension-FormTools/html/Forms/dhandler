@@ -6,11 +6,21 @@
     form_config => $form_config,
 &>
 
-<%perl>
-# Build the current page here dyamically from config
+% # Build the current page here dyamically from config
+% my $button_label = loc('Next');
+% foreach my $element ( @{$form_config->{'formtools-pages'}{$page}{'content'}} ) {
 
-my $button_label = loc('Next');
-foreach my $element ( @{$form_config->{'formtools-pages'}{$page}{'content'}} ) {
+<div class="formtools-item"
+% my $args = $element->{arguments} || {};
+% if ( $args->{show_condition} && $args->{show_condition}{enabled} && $args->{show_condition}{name} ) {
+%   if ( my $show_cf = $load_cf->($args->{show_condition}{name}) ) {
+    data-show-condition-name="<% GetCustomFieldInputName( Object => RT::Ticket->new($session{CurrentUser}), CustomField => $show_cf ) %>"
+    data-show-condition-values="<% JSON($args->{show_condition}{values} || []) %>"
+%   }
+% }
+>
+
+<%perl>
     if ( $element->{type} eq 'raw_html' ) {
         $m->out( RT::Extension::FormTools->_ParseContent( TicketObj => $ticket_obj, Content => $element->{html} ) );
     }
@@ -28,8 +38,10 @@ foreach my $element ( @{$form_config->{'formtools-pages'}{$page}{'content'}} ) {
         # This is the page that will submit, so change the button label
         $button_label = loc('Submit');
     }
-}
 </%perl>
+</div>
+
+% }
 
 % if ( $form_config->{'formtools-pages'}{$page}{'next'} ) {
  <& /FormTools/Next, Label => $button_label, Back => $show_back, Name => 'Submit' &>
@@ -159,6 +171,81 @@ jQuery(function () {
         // Handle the case where dependent input is on previous pages
         if ( jQuery(':input[type=hidden][name="' + dependent_name +'"]').length ) {
             syncValidation(jQuery(':input[type=hidden][name="' + dependent_name +'"]'));
+        }
+    });
+
+    jQuery('[data-show-condition-name]').each(function () {
+        const show_condition_name = jQuery(this).attr('data-show-condition-name');
+        const values = JSON.parse(jQuery(this).attr('data-show-condition-values'));
+        const target = jQuery(this);
+        const syncShowCondition = function(source) {
+            let source_values = [];
+            if ( source ) {
+                if ( source.target ) {
+                    source = jQuery(source.target);
+                }
+
+                const name = source.attr('name');
+                if ( source.closest('.formtools-item.hidden').length ) {
+                    // this is a field hidden by other fields, ignoring all current values
+                }
+                else if (source.is(':checkbox') || source.is(':radio')) {
+                    jQuery(':input[name="' + name +'"]:checked').each(function () {
+                        source_values.push(jQuery(this).val());
+                    });
+                }
+                else {
+                    jQuery(':input[name="' + name +'"]').each(function () {
+                        const val = jQuery(this).val();
+                        if ( Array.isArray(val) ) {
+                            source_values.push(...val);
+                        }
+                        else {
+                            source_values.push(val);
+                        }
+                    });
+                }
+            }
+
+            let matched;
+            for ( let source_value of source_values ) {
+                if ( values.includes(source_value) ) {
+                    matched = true;
+                }
+            }
+
+            let changed;
+            if ( matched ) {
+                if ( target.closest('.formtools-item').hasClass('hidden') ) {
+                    target.closest('.formtools-item').removeClass('hidden');
+                    changed = 1;
+                }
+            }
+            else {
+                if ( !target.closest('.formtools-item').hasClass('hidden') ) {
+                    target.closest('.formtools-item').addClass('hidden');
+                    changed = 1;
+                }
+            }
+
+            // cascade changes
+            if ( changed && target.find('select[name^="Object-RT::Ticket--CustomField"]').length ) {
+                const target_select = target.find('select[name^="Object-RT::Ticket--CustomField"]');
+                const target_name = target_select.attr('name');
+                if (jQuery('[data-show-condition-name="' + target_name + '"]').length) {
+                    target_select.change();
+                }
+            }
+        };
+        jQuery(':input[type!=hidden][name="' + show_condition_name +'"]').change(syncShowCondition).change();
+
+        // Handle the case where show condition input is on previous pages
+        if ( jQuery(':input[type=hidden][name="' + show_condition_name +'"]').length ) {
+            syncShowCondition(jQuery(':input[type=hidden][name="' + show_condition_name +'"]'));
+        }
+        else if ( !jQuery(':input[name="' + show_condition_name +'"]').length && jQuery(':input[type=hidden][name="' + show_condition_name +'-Magic"]').length ) {
+            // Nothing is selected, hide the target element
+            syncShowCondition();
         }
     });
 
@@ -344,7 +431,65 @@ if ( $ARGS{Back} and $ARGS{Back} eq 'Back' ) {
 # page.
 
 my ($ticket_obj, @results);
+
+my %cf_map;
+my $load_cf = sub {
+    my $name = shift;
+    if ( !$cf_map{ $name } ) {
+        my $cf = RT::CustomField->new( $session{'CurrentUser'} );
+        # try loading CFs for this Queue, followed by Global, followed by any CF of given $cf_name
+        $cf->LoadByName( Name => $name, Queue => $queue_obj->id ) if defined $queue_obj;
+        $cf->LoadByName( Name => $name, Queue => 0 ) unless $cf->id;
+        $cf->LoadByName(
+            Name       => $name,
+            LookupType => RT::Ticket->CustomFieldLookupType,
+        ) unless $cf->id;
+        $cf_map{ $name } = $cf;
+    }
+    return $cf_map{$name}->Id ? $cf_map{$name} : undef;
+};
+
 if ( $create_ticket ) {
+    # Drop conditionally hidden fields
+    for my $page ( keys %{ $form_config->{'formtools-pages'} || {} } ) {
+        for my $element ( @{$form_config->{'formtools-pages'}{$page}{'content'}} ) {
+            my $args = $element->{arguments} || {};
+            next unless $args->{name};
+            if ( $args->{show_condition} && $args->{show_condition}{enabled} && $args->{show_condition}{name} ) {
+                if ( my $cf = $load_cf->( $args->{show_condition}{name} ) ) {
+                    my $input_name = GetCustomFieldInputName(
+                        Object      => RT::Ticket->new( $session{CurrentUser} ),
+                        CustomField => $cf,
+                    );
+                    my $value = $ARGS{$input_name} // '';
+                    my $matched;
+                    for my $val ( ref $value ? @$value : $value ) {
+                        if ( grep { $val eq $_ } @{$args->{show_condition}{values} || []} ) {
+                            $matched = 1;
+                            last;
+                        }
+                    }
+
+                    if ( !$matched ) {
+                        if ( RT::Extension::FormTools::is_core_field( $args->{name} ) ) {
+                            delete $ARGS{$args->{name}};
+                        }
+                        else {
+                            if ( my $cf = $load_cf->( $args->{name} ) ) {
+                                my $input_name = GetCustomFieldInputName(
+                                    Object      => RT::Ticket->new( $session{CurrentUser} ),
+                                    CustomField => $cf,
+                                );
+                                delete $ARGS{$input_name};
+                                delete $ARGS{"$input_name-Magic"};
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     # add include_in_content fields to Content arg
     my @include_in_content;
     foreach my $page ( keys %{ $form_config->{'formtools-pages'} || {} } ) {
@@ -358,14 +503,7 @@ if ( $create_ticket ) {
             }
             else {
                 my $cf_name = $field->{arguments}{name};
-                my $cf = RT::CustomField->new( $session{'CurrentUser'} );
-
-                # try loading CFs for this Queue, followed by Global, followed by any CF of given $cf_name
-                $cf->LoadByName( Name => $cf_name, Queue => $queue_obj->id ) if (defined $queue_obj);
-                $cf->LoadByName( Name => $cf_name, Queue => 0 ) unless ( $cf->id );
-                unless ( $cf->Id ) {
-                    $cf->LoadByName( Name => $cf_name );
-                }
+                my $cf = $load_cf->($cf_name);
                 unless ( $cf->id ) {
                     my $msg = "Could not find a custom field called $cf_name";
                     $msg .= " for the queue ".$queue_obj->Name if (defined $queue_obj);

@@ -3,7 +3,7 @@
 use 5.006;
 use strict;
 use warnings FATAL => 'all';
-use Test::More tests => 29;
+use Test::More tests => 30;
 
 BEGIN {
     use_ok('Map::Tube::Exception')                          || print "Bail out!\n";
@@ -11,6 +11,7 @@ BEGIN {
     use_ok('Map::Tube::Exception::InvalidStationName')      || print "Bail out!\n";
     use_ok('Map::Tube::Exception::MissingStationId')        || print "Bail out!\n";
     use_ok('Map::Tube::Exception::InvalidStationId')        || print "Bail out!\n";
+    use_ok('Map::Tube::Exception::InvalidStationLineId')    || print "Bail out!\n";
     use_ok('Map::Tube::Exception::MissingLineName')         || print "Bail out!\n";
     use_ok('Map::Tube::Exception::InvalidLineName')         || print "Bail out!\n";
     use_ok('Map::Tube::Exception::MissingNodeObject')       || print "Bail out!\n";

@@ -27,6 +27,6 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/bestpractical/rt-extension-formtools
-version: '1.15'
+version: '1.16'
 x_module_install_rtx_version: '0.43'
 x_requires_rt: 5.0.5

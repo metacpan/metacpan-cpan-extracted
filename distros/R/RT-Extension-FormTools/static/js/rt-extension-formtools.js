@@ -241,6 +241,31 @@ formTools = {
             value['input-value'] = form.find(':input[name=value]').val();
             element.find('span.content').text(value['input-name'] + ': ' + value['input-value']);
         }
+
+        const show_condition = form.find(':input[name=show_condition]');
+        if ( show_condition.length ) {
+            value.arguments ||= {};
+            value.arguments.show_condition ||= {};
+            if ( show_condition.is(':checked') ) {
+                value.arguments.show_condition.enabled = 1;
+            }
+            else {
+                value.arguments.show_condition.enabled = 0;
+            }
+        }
+
+        const show_condition_name = form.find(':input[name=show_condition_name]');
+        if ( show_condition_name.length ) {
+            value.arguments.show_condition ||= {};
+            value.arguments.show_condition.name = show_condition_name.val();
+        }
+
+        const show_condition_value = form.find(':input[name=show_condition_value]');
+        if ( show_condition_value.length ) {
+            value.arguments.show_condition ||= {};
+            value.arguments.show_condition.values = show_condition_value.val();
+        }
+
         element.data('value', value);
         form.closest('.formtools-element-modal').modal('hide');
         formTools.submit();

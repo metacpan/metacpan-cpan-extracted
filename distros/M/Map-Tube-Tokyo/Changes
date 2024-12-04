@@ -1,5 +1,9 @@
 Revision history for Map::Tube::Tokyo
 
+0.60  Tue Dec 03 21:15:00 2024
+      - Cleaned up map data.
+      - Updated dependency on Map::Tube v3.82.
+
 0.59  Wed Sep 04 11:25:00 2019
       - Moved author test scripts to xt/ subfolder.
 

@@ -1,6 +1,6 @@
 package Map::Tube::Node;
 
-$Map::Tube::Node::VERSION   = '3.80';
+$Map::Tube::Node::VERSION   = '3.82';
 $Map::Tube::Node::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Node - Class to represent the station in the map.
 
 =head1 VERSION
 
-Version 3.80
+Version 3.82
 
 =cut
 
@@ -118,10 +118,6 @@ You can also look for information at:
 =item * BUG Report
 
 L<https://github.com/manwar/Map-Tube/issues>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Map-Tube>
 
 =item * CPAN Ratings
 

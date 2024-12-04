@@ -1,5 +1,8 @@
 Revision history for Shell-Guess
 
+0.10      2024-12-03 20:58:50 -0700
+  - Supress warning in Makefile.PL about calling getppid in void context (gh#12, gh#13)
+
 0.09      2018-12-06 21:07:21 -0500
   - Detect PowerShell on Unix (pwsh)
 

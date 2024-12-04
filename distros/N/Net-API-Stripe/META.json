@@ -32,7 +32,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Random" : "0.13",
             "Data::UUID" : "1.224",
             "DateTime" : "1.51",
             "DateTime::Format::Strptime" : "1.76",
@@ -78,6 +77,6 @@
          "web" : "https://gitlab.com/jackdeguest/Net-API-Stripe"
       }
    },
-   "version" : "v2.0.5",
+   "version" : "v2.0.6",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

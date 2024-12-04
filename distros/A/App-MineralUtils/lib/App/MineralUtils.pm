@@ -6,9 +6,9 @@ use utf8;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-12-01'; # DATE
+our $DATE = '2024-12-03'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 our %SPEC;
 
@@ -34,7 +34,7 @@ my @magnesium_forms = (
     },
     {
         # source: pubchem
-        name => 'mg-magnesium-citrate-dibasic',
+        name => 'mg-mg-citrate-dibasic',
         magnesium_ratio => 24.305/214.41, # 11.34%
         summary => 'Magnesium citrate dibasic (C6H6MgO7), in milligrams',
     },
@@ -117,7 +117,13 @@ my @magnesium_forms = (
         magnesium_ratio => 24.305 / 40.3044, # 60.3%
         summary => 'Magnesium oxide anhydrous (MgO) [most common hydrate form of MgO at room temp], in milligrams',
     },
+    {
+        name=>'mg-magshape',
+        magnesium_ratio => 0.32, # 30-36.6% from COA
+        summary => 'MAGSHAPE (microencapsulated form of magnesium oxide), in milligrams',
+    },
 
+    # ---- others
     {
         name=>'mg-mg-lactate-anhydrous',
         magnesium_ratio => 24.305 / 202.45, # 12.01%
@@ -223,18 +229,22 @@ my @magnesium_forms = (
     },
     # XXX Magnesium glycerophosphate dihydrate?
     # XXX magnesium phosphate?
-    # XXX magnesium phosphate trihydrate?
+
+    {
+        name=>'mg-trimagnesium-orthophosphate-anhydrous',
+        magnesium_ratio => 3*24.305/262.8577, # 27.74%
+        summary => 'Trimagnesium orthophosphate (Mg3O8P2), in milligrams',
+    },
+    {
+        name=>'mg-sunactive-mg',
+        magnesium_ratio => 0.12, # >12% according to spec
+        summary => 'SunActive Magnesium (a micronized, microencapsulated form of trimagnesium orthophosphate), in milligrams',
+    },
 
     {
         name=>'mg-mg-taurate',
         magnesium_ratio => 24.305/272.6, # 8.92%
         summary => 'Magnesium taurate (C4H12MgN2O6S2), in milligrams',
-    },
-
-    {
-        name=>'mg-magshape',
-        magnesium_ratio => 0.32, # 30-36.6% from COA
-        summary => 'MAGSHAPE (microencapsulated form of magnesium developed for use in dietary supplements and functional foods, containing MgO, modified preserved maize starch, sunflower lecithin), in milligrams',
     },
 );
 
@@ -290,6 +300,11 @@ MARKDOWN
         {
             args=>{quantity=>'350 mg-mg-oxide-anhydrous', to_unit=>'mg-mg-elem'},
             summary=>'How much of magnesium oxide provides 350 mg of elemental magnesium?',
+        },
+        {
+            src_plang => 'bash',
+            src=>'[[prog]] | td sort -- -pct_mg',
+            summary=>'Sort by highest magnesium content',
         },
     ],
 };
@@ -629,6 +644,16 @@ our @iron_forms = (
         iron_ratio => 55.845/278.02, # 20.09%
         summary => 'Ferrous sulphate heptahydrate (FeSO4.7H2O), in milligrams',
     },
+    {
+        name => 'mg-lipofer', #
+        iron_ratio => 8/100, # 8%, 7.8-9% according to spec
+        summary => 'Lipofer (micronized, microencapsulated, water-soluble form of iron pyrophosphate), in milligrams',
+    },
+    {
+        name => 'mg-sunactive-fe', #
+        iron_ratio => 8/100, # >8% according to spec
+        summary => 'SunActive Fe (micronized, microencapsulated form of iron pyrophosphate), in milligrams',
+    },
 );
 
 our %argspecs_iron = (
@@ -872,7 +897,7 @@ App::MineralUtils - Utilities related to mineral supplements
 
 =head1 VERSION
 
-This document describes version 0.017 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2024-12-01.
+This document describes version 0.019 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2024-12-03.
 
 =head1 DESCRIPTION
 
@@ -974,13 +999,13 @@ Result:
    ],
    {
      "table.fields"        => ["amount", "pct_ca", "unit", "summary"],
-     "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
+     "table.field_aligns"  => ["number", "number", "left", "left"],
    },
  ]
 
@@ -1052,16 +1077,28 @@ Result:
        unit    => "mg-ferrous-sulfate-heptahydrate",
        summary => "Ferrous sulphate heptahydrate (FeSO4.7H2O), in milligrams",
      },
+     {
+       amount  => 12.5,
+       pct_fe  => 8,
+       unit    => "mg-lipofer",
+       summary => "Lipofer (micronized, microencapsulated, water-soluble form of iron pyrophosphate), in milligrams",
+     },
+     {
+       amount  => 12.5,
+       pct_fe  => 8,
+       unit    => "mg-sunactive-fe",
+       summary => "SunActive Fe (micronized, microencapsulated form of iron pyrophosphate), in milligrams",
+     },
    ],
    {
      "table.fields"        => ["amount", "pct_fe", "unit", "summary"],
+     "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { precision => 3, thousands_sep => "" }],
                                 ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
-     "table.field_aligns"  => ["number", "number", "left", "left"],
    },
  ]
 
@@ -1136,7 +1173,7 @@ Result:
      {
        amount  => 8.84955752212389,
        pct_mg  => 11.3357585933492,
-       unit    => "mg-magnesium-citrate-dibasic",
+       unit    => "mg-mg-citrate-dibasic",
        summary => "Magnesium citrate dibasic (C6H6MgO7), in milligrams",
      },
      {
@@ -1198,6 +1235,12 @@ Result:
        pct_mg  => 60.303589682516,
        unit    => "mg-mg-oxide-anhydrous",
        summary => "Magnesium oxide anhydrous (MgO) [most common hydrate form of MgO at room temp], in milligrams",
+     },
+     {
+       amount  => 3.125,
+       pct_mg  => 32,
+       unit    => "mg-magshape",
+       summary => "MAGSHAPE (microencapsulated form of magnesium oxide), in milligrams",
      },
      {
        amount  => 8.33333333333333,
@@ -1314,22 +1357,28 @@ Result:
        summary => "Magnesium glycerophosphate anhydrous (C\x{2083}H\x{2087}MgO\x{2086}P.H2O, C3H9MgO7P), in milligrams",
      },
      {
+       amount  => 3.6101083032491,
+       pct_mg  => 27.7393433785657,
+       unit    => "mg-trimagnesium-orthophosphate-anhydrous",
+       summary => "Trimagnesium orthophosphate (Mg3O8P2), in milligrams",
+     },
+     {
+       amount  => 8.33333333333333,
+       pct_mg  => 12,
+       unit    => "mg-sunactive-mg",
+       summary => "SunActive Magnesium (a micronized, microencapsulated form of trimagnesium orthophosphate), in milligrams",
+     },
+     {
        amount  => 11.2359550561798,
        pct_mg  => 8.91599413059428,
        unit    => "mg-mg-taurate",
        summary => "Magnesium taurate (C4H12MgN2O6S2), in milligrams",
      },
-     {
-       amount  => 3.125,
-       pct_mg  => 32,
-       unit    => "mg-magshape",
-       summary => "MAGSHAPE (microencapsulated form of magnesium developed for use in dietary supplements and functional foods, containing MgO, modified preserved maize starch, sunflower lecithin), in milligrams",
-     },
    ],
    {
      "table.field_formats" => [
-                                ["number", { precision => 3, thousands_sep => "" }],
                                 ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
@@ -1470,14 +1519,14 @@ Result:
      },
    ],
    {
-     "table.fields"        => ["amount", "pct_k", "unit", "summary"],
      "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
+     "table.fields"        => ["amount", "pct_k", "unit", "summary"],
    },
  ]
 
@@ -1595,14 +1644,14 @@ Result:
      },
    ],
    {
-     "table.fields"        => ["amount", "pct_na", "unit", "summary"],
      "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
+     "table.fields"        => ["amount", "pct_na", "unit", "summary"],
    },
  ]
 

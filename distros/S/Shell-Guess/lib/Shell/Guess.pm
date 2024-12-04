@@ -7,7 +7,7 @@ use File::Spec;
 # TODO: see where we can use P9Y::ProcessTable
 
 # ABSTRACT: Make an educated guess about the shell in use
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub _win32_getppid
@@ -64,14 +64,14 @@ sub running_shell
     $command_line =~ s/\0.*$//;
     _unixy_shells($command_line);
   }
-  
+
   || eval {
     require Unix::Process;
     my $method = $^O eq 'solaris' ? 'comm' : 'command';
     my($command) = map { s/\s+.*$//; $_ } Unix::Process->$method(getppid);
     _unixy_shells($command);
   };
-  
+
   $shell || __PACKAGE__->login_shell;
 }
 
@@ -214,7 +214,7 @@ Shell::Guess - Make an educated guess about the shell in use
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -242,10 +242,10 @@ guessing an arbitrary user's login shell:
 
 =head1 DESCRIPTION
 
-Shell::Guess makes a reasonably aggressive attempt to determine the 
-shell being employed by the user, either the shell that executed the 
-perl script directly (the "running" shell), or the users' login shell 
-(the "login" shell).  It does this by a variety of means available to 
+Shell::Guess makes a reasonably aggressive attempt to determine the
+shell being employed by the user, either the shell that executed the
+perl script directly (the "running" shell), or the users' login shell
+(the "login" shell).  It does this by a variety of means available to
 it, depending on the platform that it is running on.
 
 =over 4
@@ -262,7 +262,7 @@ so the dscl command is used instead.
 
 =item * proc file systems
 
-On UNIXy systems with a proc filesystems (such as Linux), Shell::Guess 
+On UNIXy systems with a proc filesystems (such as Linux), Shell::Guess
 will attempt to use that to determine the running shell.
 
 =item * ps
@@ -291,7 +291,7 @@ this is cmd.exe.  UNIXy platforms fallback to bourne shell.
 
 =back
 
-The intended use of this module is to enable a Perl developer to write 
+The intended use of this module is to enable a Perl developer to write
 a script that generates shell configurations for the calling shell so they
 can be imported back into the calling shell using C<eval> and backticks
 or C<source>.  For example, if your script looks like this:
@@ -321,7 +321,7 @@ such shell configurations, and is designed to work with this module.
 
 =head1 CLASS METHODS
 
-These class methods return an instance of Shell::Guess, which can then be 
+These class methods return an instance of Shell::Guess, which can then be
 interrogated by the instance methods in the next section below.
 
 =head2 running_shell
@@ -694,9 +694,9 @@ and /bin/csh for c shell.  May not be defined for all shells.
 
 =head1 CAVEATS
 
-Shell::Guess shouldn't ever die or crash, instead it will attempt to make a guess or use a fallback 
-about either the login or running shell even on unsupported operating systems.  The fallback is the 
-most common shell on the particular platform that you are using, so on UNIXy platforms the fallback 
+Shell::Guess shouldn't ever die or crash, instead it will attempt to make a guess or use a fallback
+about either the login or running shell even on unsupported operating systems.  The fallback is the
+most common shell on the particular platform that you are using, so on UNIXy platforms the fallback
 is bourne, and on OpenVMS the fallback is dcl.
 
 These are the operating systems that have been tested in development and are most likely to guess
@@ -724,7 +724,7 @@ Always detected as dcl (a more nuanced view of OpenVMS is probably possible, pat
 
 =back
 
-UNIXy platforms without a proc filesystem will use L<Unix::Process> if installed, which will execute 
+UNIXy platforms without a proc filesystem will use L<Unix::Process> if installed, which will execute
 ps to determine the running shell.
 
 It is pretty easy to fool the -E<gt>running_shell method by using fork, or if your Perl script
@@ -744,7 +744,7 @@ Julien Fiegehenn (SIMBABQUE)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Graham Ollis.
+This software is copyright (c) 2012-2023 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

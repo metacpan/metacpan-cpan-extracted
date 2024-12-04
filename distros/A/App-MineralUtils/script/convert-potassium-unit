@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-12-01'; # DATE
+our $DATE = '2024-12-03'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_potassium_unit",
@@ -39,7 +39,7 @@ convert-potassium-unit - Convert a potassium quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.017 of convert-potassium-unit (from Perl distribution App-MineralUtils), released on 2024-12-01.
+This document describes version 0.019 of convert-potassium-unit (from Perl distribution App-MineralUtils), released on 2024-12-03.
 
 =head1 SYNOPSIS
 

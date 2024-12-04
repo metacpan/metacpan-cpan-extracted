@@ -4,8 +4,10 @@ author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
   IPC::System::Simple: '0'
   Test::Carp: '0'
+  Test::DescribeMe: '0'
   Test::Exception: '0.42'
   Test::Most: '0'
   Test::Needs: '0'
@@ -29,9 +31,10 @@ no_index:
 requires:
   Carp: '0'
   IO::AIO: '0'
+  Scalar::Util: '0'
   perl: '5.006002'
 resources:
   bugtracker: https://github.com/nigelhorne/File-Open-NoCache-ReadOnly/issues
   repository: git://github.com/nigelhorne/File-Open-NoCache-ReadOnly.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

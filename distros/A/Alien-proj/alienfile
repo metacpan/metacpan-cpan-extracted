@@ -102,7 +102,7 @@ share {
   #}
 
   plugin 'Build::SearchDep' => (
-    aliens   => [ @dep_aliens ],
+    aliens   => [ grep {$_->install_type eq 'share'} @dep_aliens ],
     public_I => 1,
     public_l => 1,
   );

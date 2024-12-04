@@ -1,5 +1,9 @@
 Revision history for Alien::proj
 
+1.30 2024-12-04
+    - Ensure Alien::sqlite system aliens are not pass to Plugin::SearchDeps.
+      This was missed in the previous release.  
+
 1.29 2024-10-24
     - Use Alien::Build::Plugin::Build::SearchDep only for shared aliens.
       This should avoid issues with system libs overriding shared aliens

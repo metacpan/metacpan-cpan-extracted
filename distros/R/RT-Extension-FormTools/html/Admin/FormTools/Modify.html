@@ -20,7 +20,7 @@
           <p class="m-1 p-2 border rounded">
             <span class="badge badge-primary align-text-bottom"><% $item eq 'html' ? 'HTML' : uc($item) %></span>
             <span class="content"><% loc('[_1] Element', uc($item)) %></span>
-%           if ( $item ne 'hr' ) {
+%           if ( $item ne 'hr' || %dependent_custom_fields ) {
             <a href="#" class="edit" data-toggle="modal" data-target="#formtools-element-modal">
               <span class="fas fa-pencil-alt" alt="<% loc('Edit') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Edit') %>"></span>
             </a>
@@ -30,7 +30,7 @@
             </a>
           </p>
         </div>
-%       if ( $item ne 'hr' ) {
+%       if ( $item ne 'hr' || %dependent_custom_fields ) {
         <div class="modal fade formtools-element-modal" id="formtools-element-<% $item %>-modal" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -61,6 +61,7 @@
                     </select>
                   </&>
 %               }
+                  <& SELF:ShowCondition, For => CSSClass($item), Options => \%dependent_custom_fields &>
                 </div>
                 <div class="modal-footer">
                   <button type="submit" class="btn btn-primary button form-control"><% loc('Update') %></button>
@@ -130,6 +131,7 @@
                       </label>
                     </div>
                   </&>
+                  <& SELF:ShowCondition, For => CSSClass($item), Options => \%dependent_custom_fields &>
 %               if ( $item ne 'Content' ) {
                   <&| /Elements/LabeledValue, Label => '' &>
                     <div class="custom-control custom-checkbox">
@@ -250,6 +252,7 @@
                       </label>
                     </div>
                   </&>
+                  <& SELF:ShowCondition, For => CSSClass($item), Options => \%dependent_custom_fields &>
                   <&| /Elements/LabeledValue, Label => '' &>
                     <div class="custom-control custom-checkbox">
                       <input class="custom-control-input" id="<% CSSClass($item) %>-readonly" type="checkbox" name="readonly" value="1" />
@@ -283,7 +286,7 @@
           <p class="m-1 p-2 border rounded">
             <span class="badge badge-primary align-text-bottom"><% $other_components{$item}{type} eq 'hidden' ? loc('Hidden') : loc('Component') %></span>
             <span class="content"><% $item %></span>
-%         if ( $item eq 'Hidden' ) {
+%         if ( $item eq 'Hidden' || ( $item =~ /ShowChoices|ShowBanner/ && %dependent_custom_fields ) ) {
             <a href="#" class="edit" data-toggle="modal" data-target="#formtools-element-modal">
               <span class="fas fa-pencil-alt" alt="<% loc('Edit') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Edit') %>"></span>
             </a>
@@ -293,7 +296,7 @@
             </a>
           </p>
         </div>
-%       if ( $item eq 'Hidden' ) {
+%       if ( $item eq 'Hidden' || ( $item =~ /ShowChoices|ShowBanner/ && %dependent_custom_fields ) ) {
         <div class="modal fade formtools-element-modal" id="formtools-element-<% $item %>-modal" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -305,12 +308,16 @@
                   </a>
                 </div>
                 <div class="modal-body">
+%               if ( $item eq 'Hidden' ) {
                   <&| /Elements/LabeledValue, Label => loc('Name') &>
                     <input name="name" type="text" class="form-control" value="" />
                   </&>
                   <&| /Elements/LabeledValue, Label => loc('Value') &>
                     <input name="value" type="text" class="form-control" value="" />
                   </&>
+%               } else {
+                  <& SELF:ShowCondition, For => CSSClass($item), Options => \%dependent_custom_fields &>
+%               }
                 </div>
                 <div class="modal-footer">
                   <button type="submit" class="btn btn-primary button form-control"><% loc('Update') %></button>
@@ -408,7 +415,7 @@
                 <span class="content">
 %               if ( $item->{type} eq 'raw_html' ) {
 %                 if ( $item->{wrapper} ) {
-                    <% length $item->{content} > 40 ? substr($item->{content}, 0, 40) . '...' : $item->{content} %>
+                    <% length( $item->{content} // '' ) > 40 ? substr($item->{content}, 0, 40) . '...' : ( $item->{content} // '' ) %>
 %                 } else {
                     <% length $item->{html} > 40 ? substr($item->{html}, 0, 40) . '...' : $item->{html} %>
 %                 }
@@ -421,7 +428,7 @@
                   <% $item->{comp_name} %>
 %               }
                 </span>
-%             if ( ( $item->{type} eq 'raw_html' && ( $item->{wrapper} // '' ) ne 'hr' ) || ( $item->{type} eq 'component' && $item->{comp_name} eq 'Field' ) || $item->{type} eq 'hidden' ) {
+%             if ( ( $item->{type} eq 'raw_html' && ( ( $item->{wrapper} // '' ) ne 'hr' || %dependent_custom_fields ) ) || ( $item->{type} eq 'component' && ( $item->{comp_name} eq 'Field' || ( $item->{comp_name} =~ /ShowChoices|ShowBanner/ && %dependent_custom_fields ) ) ) || $item->{type} eq 'hidden' ) {
                 <a href="#" class="edit" data-toggle="modal" data-target="#formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-modal">
                   <span class="fas fa-pencil-alt" alt="<% loc('Edit') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Edit') %>"></span>
                 </a>
@@ -440,7 +447,7 @@
 %         $i = 0;
 %         for my $item ( grep { $_->{type} ne 'hidden' || $_->{'input-name'} ne 'create_ticket' } @{$form->{'formtools-pages'}{$page_name}{content} || []} ) {
             <div class="modal fade formtools-element-modal" id="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-modal" tabindex="-1" role="dialog" data-type="<% $item->{type} %>" data-name="<% $item->{arguments} && $item->{arguments}{name} ? $item->{arguments}{name} : '' %>">
-              <div class="modal-dialog <% $item->{type} eq 'component' && $item->{comp_name} ne 'ShowBanner' && $item->{comp_name} ne 'ShowChoices' && %dependent_custom_fields && !RT::Extension::FormTools::is_core_field($item->{arguments}{name}) ? 'modal-lg' : '' %>" role="document">
+              <div class="modal-dialog <% %dependent_custom_fields ? 'modal-lg' : '' %>" role="document">
                 <div class="modal-content">
                   <form class="formtools-element-form">
                     <div class="modal-header">
@@ -469,6 +476,9 @@
                         </select>
                       </&>
 %                     }
+                      <& SELF:ShowCondition, For => "$form_page_id{$page_name}-$i", Item => $item, Options => \%dependent_custom_fields &>
+%                   } elsif ( $item->{type} eq 'component' && $item->{comp_name} =~ /ShowChoices|ShowBanner/ ) {
+                      <& SELF:ShowCondition, For => "$form_page_id{$page_name}-$i", Item => $item, Options => \%dependent_custom_fields &>
 %                   } elsif ( $item->{type} eq 'component' && $item->{comp_name} eq 'Field' ) {
 %                     if ( $item->{arguments}{name} ne 'Content' ) {
                       <&| /Elements/LabeledValue, Label => loc('Label') &>
@@ -517,27 +527,27 @@
                             <div class="d-inline-block">
                               <select name="dependent_name" class="form-control selectpicker">
                                 <option value=""><&|/l&>(no value)</&></option>
-%                               for my $name ( sort keys %dependent_custom_fields ) {
-                                  <option value="<% $name %>" <% ($item->{arguments}{dependent_validation}{name} // '') eq $name ? 'selected="selected"' : '' |n %>><% $name %></option>
-%                               }
-                                </select>
-                              </div>
-                              is
-                              <div class="d-inline-block">
-                                <select name="dependent_value" data-dependent-name="dependent_name" multiple class="form-control selectpicker">
-                                  <option value=""><&|/l&>(no value)</&></option>
-%                               for my $name ( sort keys %dependent_custom_fields ) {
-                                  <optgroup label="<% $name %>">
-%                                 for my $value ( @{$dependent_custom_fields{$name}} ) {
-                                    <option value="<% $value %>" <% ($item->{arguments}{dependent_validation}{name} // '') eq $name && grep( { $value eq $_ } @{$item->{arguments}{dependent_validation}{values} || []} ) ? 'selected="selected"' : '' |n %>><% $value %></option>
-%                                 }
-                                  </optgroup>
-%                               }
-                                </select>
-                              </div>
-                            </label>
-                          </div>
-                        </&>
+%                             for my $name ( sort keys %dependent_custom_fields ) {
+                                <option value="<% $name %>" <% ($item->{arguments}{dependent_validation}{name} // '') eq $name ? 'selected="selected"' : '' |n %>><% $name %></option>
+%                             }
+                              </select>
+                            </div>
+                            is
+                            <div class="d-inline-block">
+                              <select name="dependent_value" data-dependent-name="dependent_name" multiple class="form-control selectpicker">
+                                <option value=""><&|/l&>(no value)</&></option>
+%                              for my $name ( sort keys %dependent_custom_fields ) {
+                                <optgroup label="<% $name %>">
+%                                for my $value ( @{$dependent_custom_fields{$name}} ) {
+                                  <option value="<% $value %>" <% ($item->{arguments}{dependent_validation}{name} // '') eq $name && grep( { $value eq $_ } @{$item->{arguments}{dependent_validation}{values} || []} ) ? 'selected="selected"' : '' |n %>><% $value %></option>
+%                                }
+                                </optgroup>
+%                              }
+                              </select>
+                            </div>
+                          </label>
+                        </div>
+                      </&>
 %                     }
 %                     }
 
@@ -549,6 +559,7 @@
                           </label>
                         </div>
                       </&>
+                      <& SELF:ShowCondition, For => "$form_page_id{$page_name}-$i", Item => $item, Options => \%dependent_custom_fields &>
 %                     if ( $item->{arguments}{name} ne 'Content' ) {
                         <&| /Elements/LabeledValue, Label => '' &>
                           <div class="custom-control custom-checkbox">
@@ -640,10 +651,21 @@ jQuery(function() {
         target.closest('div').find('li.dropdown-divider').slice(1).hide();
     });
 
+    jQuery('[name=show_condition_name]').change(function () {
+        const modal = jQuery(this).closest('.modal');
+        const target = modal.find('[data-show-condition-name="' + jQuery(this).attr('name') + '"');
+        const name = jQuery(this).val();
+        target.find('optgroup').addClass('hidden');
+        target.find('optgroup[label="' + name + '"]').removeClass('hidden');
+        target.selectpicker('refresh');
+        // Hide duplicate dividers
+        target.closest('div').find('li.dropdown-divider').slice(1).hide();
+    });
+
     jQuery('.formtools-element-modal').on('shown.bs.modal', function (e) {
         const name = jQuery(this).attr('data-name');
 
-        const select = jQuery(this).find('select[name=dependent_name]');
+        const select = jQuery(this).find('select[name=dependent_name], select[name=show_condition_name]');
 
         select.find('option').addClass('hidden');
         jQuery('.formtools-form-pages [data-type=component][data-name]').each(function () {
@@ -837,3 +859,47 @@ $ActiveTab => ''
 $Update => undef
 $AddPage => undef
 </%ARGS>
+
+<%METHOD ShowCondition>
+
+<&| /Elements/LabeledValue, Label => '' &>
+  <div class="custom-control custom-checkbox">
+    <input class="custom-control-input" id="formtools-element-<% $For %>-show-condition" type="checkbox" name="show_condition" value="1" <% $Item->{arguments}{show_condition}{enabled} ? 'checked="checked"' : '' |n %> />
+    <label class="custom-control-label has-text-input" for="formtools-element-<% $For %>-show-condition">
+      <&|/l&>Show only if</&>
+      <div class="d-inline-block">
+        <select name="show_condition_name" class="form-control selectpicker">
+          <option value=""><&|/l&>(no value)</&></option>
+%       for my $name ( sort keys %$Options ) {
+          <option value="<% $name %>" <% ($Item->{arguments}{show_condition}{name} // '') eq $name ? 'selected="selected"' : '' |n %>><% $name %></option>
+%       }
+        </select>
+      </div>
+      is
+      <div class="d-inline-block">
+        <select name="show_condition_value" data-show-condition-name="show_condition_name" multiple class="form-control selectpicker">
+          <option value=""><&|/l&>(no value)</&></option>
+%       for my $name ( sort keys %$Options ) {
+          <optgroup label="<% $name %>">
+%         for my $value ( @{$Options->{$name}} ) {
+            <option value="<% $value %>" <% ($Item->{arguments}{show_condition}{name} // '') eq $name && grep( { $value eq $_ } @{$Item->{arguments}{show_condition}{values} || []} ) ? 'selected="selected"' : '' |n %>><% $value %></option>
+%         }
+          </optgroup>
+%       }
+        </select>
+      </div>
+    </label>
+  </div>
+</&>
+
+
+<%INIT>
+return unless %$Options;
+</%INIT>
+
+<%ARGS>
+$For  => ''
+$Item => {}
+$Options
+</%ARGS>
+</%METHOD>

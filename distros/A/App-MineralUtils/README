@@ -2,8 +2,8 @@ NAME
     App::MineralUtils - Utilities related to mineral supplements
 
 VERSION
-    This document describes version 0.017 of App::MineralUtils (from Perl
-    distribution App-MineralUtils), released on 2024-12-01.
+    This document describes version 0.019 of App::MineralUtils (from Perl
+    distribution App-MineralUtils), released on 2024-12-03.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -95,13 +95,13 @@ FUNCTIONS
            ],
            {
              "table.fields"        => ["amount", "pct_ca", "unit", "summary"],
-             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
                                         ["number", { thousands_sep => "", precision => 3 }],
-                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
            },
          ]
 
@@ -164,16 +164,28 @@ FUNCTIONS
                unit    => "mg-ferrous-sulfate-heptahydrate",
                summary => "Ferrous sulphate heptahydrate (FeSO4.7H2O), in milligrams",
              },
+             {
+               amount  => 12.5,
+               pct_fe  => 8,
+               unit    => "mg-lipofer",
+               summary => "Lipofer (micronized, microencapsulated, water-soluble form of iron pyrophosphate), in milligrams",
+             },
+             {
+               amount  => 12.5,
+               pct_fe  => 8,
+               unit    => "mg-sunactive-fe",
+               summary => "SunActive Fe (micronized, microencapsulated form of iron pyrophosphate), in milligrams",
+             },
            ],
            {
              "table.fields"        => ["amount", "pct_fe", "unit", "summary"],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
-                                        ["number", { precision => 3, thousands_sep => "" }],
                                         ["number", { thousands_sep => "", precision => 3 }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
-             "table.field_aligns"  => ["number", "number", "left", "left"],
            },
          ]
 
@@ -239,7 +251,7 @@ FUNCTIONS
              {
                amount  => 8.84955752212389,
                pct_mg  => 11.3357585933492,
-               unit    => "mg-magnesium-citrate-dibasic",
+               unit    => "mg-mg-citrate-dibasic",
                summary => "Magnesium citrate dibasic (C6H6MgO7), in milligrams",
              },
              {
@@ -301,6 +313,12 @@ FUNCTIONS
                pct_mg  => 60.303589682516,
                unit    => "mg-mg-oxide-anhydrous",
                summary => "Magnesium oxide anhydrous (MgO) [most common hydrate form of MgO at room temp], in milligrams",
+             },
+             {
+               amount  => 3.125,
+               pct_mg  => 32,
+               unit    => "mg-magshape",
+               summary => "MAGSHAPE (microencapsulated form of magnesium oxide), in milligrams",
              },
              {
                amount  => 8.33333333333333,
@@ -417,22 +435,28 @@ FUNCTIONS
                summary => "Magnesium glycerophosphate anhydrous (C\x{2083}H\x{2087}MgO\x{2086}P.H2O, C3H9MgO7P), in milligrams",
              },
              {
+               amount  => 3.6101083032491,
+               pct_mg  => 27.7393433785657,
+               unit    => "mg-trimagnesium-orthophosphate-anhydrous",
+               summary => "Trimagnesium orthophosphate (Mg3O8P2), in milligrams",
+             },
+             {
+               amount  => 8.33333333333333,
+               pct_mg  => 12,
+               unit    => "mg-sunactive-mg",
+               summary => "SunActive Magnesium (a micronized, microencapsulated form of trimagnesium orthophosphate), in milligrams",
+             },
+             {
                amount  => 11.2359550561798,
                pct_mg  => 8.91599413059428,
                unit    => "mg-mg-taurate",
                summary => "Magnesium taurate (C4H12MgN2O6S2), in milligrams",
              },
-             {
-               amount  => 3.125,
-               pct_mg  => 32,
-               unit    => "mg-magshape",
-               summary => "MAGSHAPE (microencapsulated form of magnesium developed for use in dietary supplements and functional foods, containing MgO, modified preserved maize starch, sunflower lecithin), in milligrams",
-             },
            ],
            {
              "table.field_formats" => [
-                                        ["number", { precision => 3, thousands_sep => "" }],
                                         ["number", { thousands_sep => "", precision => 3 }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
@@ -564,14 +588,14 @@ FUNCTIONS
              },
            ],
            {
-             "table.fields"        => ["amount", "pct_k", "unit", "summary"],
              "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
-                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
+             "table.fields"        => ["amount", "pct_k", "unit", "summary"],
            },
          ]
 
@@ -687,14 +711,14 @@ FUNCTIONS
              },
            ],
            {
-             "table.fields"        => ["amount", "pct_na", "unit", "summary"],
              "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
-                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
+             "table.fields"        => ["amount", "pct_na", "unit", "summary"],
            },
          ]
 

@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader;
 # ABSTRACT: Classe de base pour le chargement de notices biblio/autorité
-$Koha::Contrib::Sudoc::Loader::VERSION = '2.45';
+$Koha::Contrib::Sudoc::Loader::VERSION = '2.46';
 use Moose;
 use Modern::Perl;
 use utf8;
@@ -93,7 +93,7 @@ sub BUILD {
 
 
 
-# C'est cette méthodes qui est surchargée par les sous-classes dédiées au
+# C'est cette méthode qui est surchargée par les sous-classes dédiées au
 # traitement des notices biblio et d'autorités
 sub handle_record {
     my ($self, $record) = @_;
@@ -144,7 +144,7 @@ Koha::Contrib::Sudoc::Loader - Classe de base pour le chargement de notices bibl
 
 =head1 VERSION
 
-version 2.45
+version 2.46
 
 =head1 AUTHOR
 

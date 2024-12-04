@@ -22,7 +22,7 @@ use Travel::Status::DE::HAFAS::Product;
 use Travel::Status::DE::HAFAS::Services;
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '6.12';
+our $VERSION = '6.13';
 
 # {{{ Endpoint Definition
 
@@ -766,48 +766,37 @@ sub station {
 		return $self->{station_info};
 	}
 
-	# no need to use Location instances here
-	my @locL = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
+	my %eva_count;
+	my %name_count;
+	my %eva_by_name;
 
-	my %prefc_by_loc;
-
-	if ( $self->{active_service} and $self->{active_service} eq 'ÖBB' ) {
-		for my $jny ( @{ $self->{raw_json}{svcResL}[0]{res}{jnyL} // [] } ) {
-			if ( defined $jny->{stbStop}{locX} ) {
-				$prefc_by_loc{ $jny->{stbStop}{locX} } += 1;
-			}
-		}
-	}
-	else {
-		for my $i ( 0 .. $#locL ) {
-			my $loc = $locL[$i];
-			if ( $loc->{pRefL} ) {
-				$prefc_by_loc{$i} = $#{ $loc->{pRefL} };
-			}
-		}
+	for my $result ( $self->results ) {
+		$eva_count{ $result->station_eva } += 1;
+		$name_count{ $result->station }    += 1;
+		$eva_by_name{ $result->station_eva } = $result->station;
 	}
 
-	my @prefcounts = sort { $b->[1] <=> $a->[1] }
-	  map { [ $_, $prefc_by_loc{$_} ] } keys %prefc_by_loc;
+	my @most_frequent_evas = map { $_->[0] } sort { $b->[1] <=> $a->[1] }
+	  map { [ $_, $eva_count{$_} ] } keys %eva_count;
 
-	if ( not @prefcounts ) {
+	my @most_frequent_names = map { $_->[0] } sort { $b->[1] <=> $a->[1] }
+	  map { [ $_, $name_count{$_} ] } keys %name_count;
+
+	my @shortest_names = map { $_->[0] } sort { $a->[1] <=> $b->[1] }
+	  map { [ $_, length($_) ] } keys %name_count;
+
+	if ( not @shortest_names ) {
 		$self->{station_info} = {};
 		return $self->{station_info};
 	}
 
-	my $loc = $locL[ $prefcounts[0][0] ];
-
-	if ($loc) {
-		$self->{station_info} = {
-			name  => $loc->{name},
-			eva   => $loc->{extId},
-			names => [ map { $locL[ $_->[0] ]{name} } @prefcounts ],
-			evas  => [ map { $locL[ $_->[0] ]{extId} } @prefcounts ],
-		};
-	}
-	else {
-		$self->{station_info} = {};
-	}
+	# The shortest name is typically the most helpful one, e.g. "Wien Hbf" vs. "Wien Hbf Süd (Sonnwendgasse)"
+	$self->{station_info} = {
+		name  => $shortest_names[0],
+		eva   => $eva_by_name{ $shortest_names[0] },
+		names => \@most_frequent_names,
+		evas  => \@most_frequent_evas,
+	};
 
 	return $self->{station_info};
 }
@@ -892,7 +881,7 @@ monitors
 
 =head1 VERSION
 
-version 6.12
+version 6.13
 
 =head1 DESCRIPTION
 
@@ -1085,7 +1074,7 @@ Returns a list of Travel::Status::DE::HAFAS::Message(3pm) objects with service
 messages. Each message belongs to at least one arrival/departure (station,
 journey) or to at least stop alongside its route (journey).
 
-=item $status->station
+=item $status->station (station)
 
 Returns a hashref describing the departure stations in all requested journeys.
 The hashref contains four entries: B<names> (station names), B<name> (most
@@ -1095,8 +1084,6 @@ These are subject to change.
 Note that the most common name and ID may be different from the station for
 which departures were requested, as HAFAS uses different identifiers for train
 stations, bus stops, and other modes of transit even if they are interlinked.
-
-Not available in journey mode.
 
 =item $status->similar_stops
 

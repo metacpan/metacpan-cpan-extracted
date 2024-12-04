@@ -7,12 +7,9 @@ use Carp;
 use App::csvtool;
 
 use Commandable::Invocation;
-use Commandable::Finder::Packages 0.10;
+use Commandable::Finder::Packages 0.14;
 
-use Getopt::Long qw( GetOptionsFromArray );
 use Text::CSV;
-
-Getopt::Long::Configure( "bundling" );
 
 my $DELIM = ",";
 
@@ -20,15 +17,12 @@ sub new_csv
 {
    return Text::CSV->new({
       binary => 1,
-      #sep_char => $DELIM,
+      sep_char => $DELIM,
       @_,
    });
 }
 
 my $cinv = Commandable::Invocation->new_from_tokens( @ARGV );
-
-my @common_opts;
-push @common_opts, $cinv->pull_token while ( $cinv->peek_token // "" ) =~ m/^-/;
 
 my $tool = $cinv->pull_token // die "Need TOOL name\n";
 
@@ -38,14 +32,18 @@ my $finder = Commandable::Finder::Packages->new(
 );
 $finder->configure( bundling => 1 );
 
+$finder->add_global_options(
+   { name => "d=", into => \$DELIM,
+      description => "Sets the field delimiter character" },
+   { name => "tab", into => sub { $DELIM = "\t" },
+      description => "Sets the field delimiter character to tab (\\t)" },
+);
+
+$finder->handle_global_options( $cinv );
+
 my $cmd = $finder->find_command( $tool ) or die "Unrecognised tool $tool\n";
 
 my $toolpkg = $cmd->package;
-
-GetOptionsFromArray( \@common_opts,
-   'd=s' => \$DELIM,
-   'tab' => sub { $DELIM = "\t" },
-) or exit(1);
 
 my @args = $finder->parse_invocation( $cmd, $cinv );
 

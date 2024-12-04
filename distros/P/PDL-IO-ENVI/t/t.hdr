@@ -1,0 +1,19 @@
+ENVI
+description = {
+ ENVI Spectral Index Result [Tue Dec 19 10:12:05 2023]}
+samples = 3409
+lines   = 2370
+bands   = 1
+data type = 4
+interleave = bsq
+file type = ENVI Standard
+header offset = 0
+byte order = 0
+map info = {UTM, 1.000, 1.000, 466860.000, 3353870.000, 1.000000e+01, 1.000000e+01, 15, North, WGS-84, units=Meters}
+coordinate system string = {PROJCS["WGS_1984_UTM_Zone_15N",GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Transverse_Mercator"],PARAMETER["False_Easting",500000.0],PARAMETER["False_Northing",0.0],PARAMETER["Central_Meridian",-93.0],PARAMETER["Scale_Factor",0.9996],PARAMETER["Latitude_Of_Origin",0.0],UNIT["Meter",1.0]]}
+x start = 6691
+y start = 4616
+band names = {
+ Modified Normalized Difference Water Index}
+data ignore value = -1.000000e+34
+acquisition time = 2020-09-30T16:50:19.024Z

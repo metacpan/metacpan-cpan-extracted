@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.69';
+$Map::Tube::CLI::VERSION   = '0.71';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.69
+Version 0.71
 
 =cut
 
@@ -58,6 +58,7 @@ You can list all command line options by giving C<-h> flag.
         --bgcolor=String  Map background color
         --line_mappings   Generate line mappings
         --line_notes      Generate line notes
+        --list_lines      List lines
 
         --usage           show a short help message
         -h                show a compact help message
@@ -109,6 +110,10 @@ In case you want different background color to the map then you can try below:
 =head2 Generate Line Notes
 
     $ map-tube --map London --line Bakerloo --line_notes
+
+=head2 List lines for the given map
+
+    $ map-tube --map London --list_lines
 
 =head2 General Error
 
@@ -223,7 +228,7 @@ sub BUILD {
     my $plugins = [ plugins ];
     foreach my $plugin (@$plugins) {
         my $key = _map_key($plugin);
-        if (defined $key) {
+        if (defined $key && (uc($self->{map}) eq $key)) {
             $self->{maps}->{uc($key)} = $plugin->new;
         }
     }
@@ -289,6 +294,9 @@ sub run {
         if ($self->line_notes) {
             print _line_notes($map_obj, $map, $line, $line_map_notes);
         }
+    }
+    elsif ($self->list_lines) {
+        print join(",\n", sort @{$map_obj->get_lines}), "\n";
     }
     else {
         print $map_obj->get_shortest_route($start, $end), "\n";
@@ -478,7 +486,10 @@ sub _validate_param {
             unless defined $self->{maps}->{uc($map)}->get_line_by_name($line);
     }
 
-    unless ($self->generate_map || $self->line_mappings || $self->line_notes) {
+    unless (   $self->generate_map
+            || $self->line_mappings
+            || $self->line_notes
+            || $self->list_lines) {
         Map::Tube::Exception::MissingStationName->throw({
             method      => __PACKAGE__."::_validate_param",
             message     => "ERROR: Missing Station Name [start].",
@@ -580,9 +591,13 @@ You can also look for information at:
 
 =over 4
 
-=item * BUGS / ISSUES
+=item * BUG Report
 
 L<https://github.com/manwar/Map-Tube-CLI/issues>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Map-Tube-CLI>
 
 =item * Search MetaCPAN
 

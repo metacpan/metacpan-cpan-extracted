@@ -1,5 +1,8 @@
 Revision history for Perl module Net::API::Stripe
 
+v2.0.6 2024-12-04T02:27:52+0900
+    - Removal of unused dependency Data::Random
+
 v2.0.5 2024-09-05T21:51:03+0900
     - Updated dependencies
 

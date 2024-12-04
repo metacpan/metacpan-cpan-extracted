@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe.pm
-## Version v2.0.5
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v2.0.6
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/07/19
-## Modified 2024/09/05
+## Modified 2024/12/04
 ## All rights reserved.
 ## 
 ## 
@@ -28,9 +28,6 @@ BEGIN
     use Cookie;
     use Encode ();
     use Data::UUID;
-    # use Net::OAuth;
-    # use Crypt::OpenSSL::RSA;
-    use Data::Random qw( rand_chars );
     use DateTime;
     use DateTime::Format::Strptime;
     use Digest::MD5 qw( md5_base64 );
@@ -51,7 +48,7 @@ BEGIN
     use constant API_BASE => 'https://api.stripe.com/v1';
     use constant FILES_BASE => 'https://files.stripe.com/v1';
     use constant STRIPE_WEBHOOK_SOURCE_IP => [qw( 54.187.174.169 54.187.205.235 54.187.216.72 54.241.31.99 54.241.31.102 54.241.34.107 )];
-    our $VERSION = 'v2.0.5';
+    our $VERSION = 'v2.0.6';
     our $EXCEPTION_CLASS = 'Net::API::Stripe::Exception';
 };
 

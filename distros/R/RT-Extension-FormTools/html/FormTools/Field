@@ -39,16 +39,13 @@ if ( RT::Extension::FormTools::is_core_field($name) ) {
 } else {
 
     $cf = RT::CustomField->new( $session{'CurrentUser'} );
-    $cf->SetContextObject($ticket) if $cf->can('SetContextObject');
+    $cf->SetContextObject($ticket);
 
     # try loading CFs for this Queue, followed by Global, followed by any CF of given $name
     $cf->LoadByName( Name => $name, Queue => $queue->id ) if (defined $queue);
     $cf->LoadByName( Name => $name, Queue => 0 ) unless ( $cf->id );
     unless ( $cf->Id ) {
-        # Clear context object because previous call made it global
-        # Not needed for RT >= 4.2.5 where this is fixed in LoadByName
-        $cf->SetContextObject(undef) if $cf->can('SetContextObject');
-        $cf->LoadByName( Name => $name );
+        $cf->LoadByName( Name => $name, LookupType => RT::Ticket->CustomFieldLookupType );
     }
     unless ( $cf->id ) {
         my $msg = "Could not find a custom field called $name";
@@ -179,12 +176,13 @@ $default = '' unless defined $default;
 % if ( $ARGS{dependent_validation} && $ARGS{dependent_validation}{enabled} && $ARGS{dependent_validation}{name} ) {
 %   my $dependent_cf = RT::CustomField->new($session{CurrentUser});
 %   $dependent_cf = RT::CustomField->new( $session{'CurrentUser'} );
-%   $dependent_cf->SetContextObject($ticket) if $cf->can('SetContextObject');
+%   $dependent_cf->SetContextObject($ticket);
 
 %   # try loading CFs for this Queue, followed by Global, followed by any CF of given $name
 %   $dependent_cf->LoadByName( Name => $ARGS{dependent_validation}{name}, Queue => $queue->id ) if (defined $queue);
 %   $dependent_cf->LoadByName( Name => $ARGS{dependent_validation}{name}, Queue => 0 ) unless ( $dependent_cf->id );
-%   if ( $dependent_cf ) {
+%   $dependent_cf->LoadByName( Name => $ARGS{dependent_validation}{name}, LookupType => RT::Ticket->CustomFieldLookupType ) unless ( $dependent_cf->id );
+%   if ( $dependent_cf->Id ) {
     data-dependent-name="<% GetCustomFieldInputName( Object => $ticket, CustomField => $dependent_cf ) %>"
     data-dependent-values="<% JSON($ARGS{dependent_validation}{values} || []) %>"
 %   }

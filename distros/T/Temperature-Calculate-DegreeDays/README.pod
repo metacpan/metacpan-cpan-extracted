@@ -1,0 +1,216 @@
+=head1 NAME
+
+Temperature::Calculate::DegreeDays - Perl package to compute cooling, heating, and growing degree days
+
+=head1 VERSION
+
+Version 0.50
+
+
+=cut
+
+=head1 SYNOPSIS
+
+ use Temperature::Calculate::DegreeDays;
+ 
+ my $dd_nws   = Temperature::Calculate::DegreeDays->new();  # Default values (65 degF base for CDDs and HDDs, corn GDDs)
+ # Set params to degC (Canadian style), use wheat growing degree days
+ my $dd_can   = Temperature::Calculate::DegreeDays->new({
+    BASE => 18,
+    GBASE => 0,
+    GCEILING => 27,
+ });
+
+ my $daily_high_temperature = 80;
+ my $daily_low_temperature  = 60;
+ my $cdd = $dd_nws->cooling($daily_high_temperature,$daily_low_temperature);  # Result is 5
+ my $hdd = $dd_nws->heating($daily_high_temperature,$daily_low_temperature);  # Result is 0
+ my $gdd = $dd_nws->growing($daily_high_temperature,$daily_low_temperature);  # Result is 20
+
+=head1 DESCRIPTION
+
+A degree day is a measure of sensible temperature compared to a baseline 
+temperature, typically integrated over time. Degree days have numerous 
+applications in agriculture, as temperatures during the growing season have a 
+direct impact on crop growth progress. Degree days also inform energy usage 
+monitoring, as the costs to heat or cool climate controlled structures is 
+directly related to temperature. The simplest method to calculate degree days 
+is to compare the daily mean temperature (the average of the daily high and low 
+observed temperatures) to a baseline temperature. This is how degree days are 
+L<defined by the United States National Weather Service|https://forecast.weather.gov/glossary.php?word=degree%20day>.
+
+The Temperature::Calculate::DegreeDays package provides methods to calculate 
+the following types of degree days:
+
+=over 4
+
+=item * Cooling degree days - the difference between the daily mean and the baseline temperatures when the daily average is warmer than the baseline, otherwise 0
+
+=item * Heating degree days - the difference between the daily mean and the baseline temperatures when the daily average is colder than the baseline, otherwise 0
+
+=item * Growing degree days - set the daily high and low temperatures to a ceiling threshold temperature if they exceed it before calculating the daily mean, and then follow the procedure of cooling degree days
+
+=back
+
+This package was designed using an object-oriented (OO) framework, because it's 
+helpful to save the baseline, ceiling, and missing data parameters through multiple 
+method calls, and a calling program may defined different types of degree days. 
+The temperture units, e.g., Celsius or Fahrenheit, do not matter, but the baseline 
+and ceiling temperatures should have the same units as the input temperatures if you 
+want the results to make sense.
+
+Temperature::Calculate::DegreeDays attempts to handle missing or invalid (non-numeric 
+or undefined) data by returning the missing value instead of throwing an exception.
+
+=head1 METHODS
+
+=head2 new
+
+ my $dd_nws     = Temperature::Calculate::DegreeDays->new();              # Uses default values for everything
+ my $dd_degC    = Temperature::Calculate::DegreeDays->new({BASE => 18});  # Canadian heating and cooling degree days, deg C
+ # Canadian heating and cooling degree days, wheat growing degree days in deg C, different missing value
+ my $gdd_canada = Temperature::Calculate::DegreeDays->new({
+    BASE  => 18,
+    GBASE => 0,
+    GCEIL => 27,
+    MISSING => -9999
+ });
+
+Constructs a Temperature::Calculate::DegreeDays object (blessed reference) and 
+returns it to the calling program. The baseline temperatures for the different 
+degree days methods, the ceiling threshold temperature for growing degree days, 
+and a value to be interpreted as missing data can some or all optionally be 
+passed to the constructor with a hash ref, e.g.:
+
+ $params = {
+    BASE     => [baseline temperature for cooling and heating degree days],
+    GBASE    => [baseline temperature for growing degree days],
+    GCEILING => [ceiling/heat threshold temperature for growing degree days]
+    MISSING  => [missing value]
+ }
+
+If supplied, these parameters must have defined and numeric values or the constructor will 
+L<croak|https://perldoc.perl.org/Carp>. If not supplied, the default values are BASE = 65, 
+which matches the United States NWS standard definition of heating and cooling degree days 
+in degrees Fahrenheit, and GBASE = 50 and GCEILING = 86, which is the definition of corn 
+(maize) growing degree days in degrees Fahrenheit. The default missing value is 
+MISSING => NaN.
+
+
+=cut
+
+=head2 cooling
+
+ my $maxT = 88;
+ my $minT = 60;
+ my $mean = ($maxT + $minT) / 2;
+ my $cdd  = $dd->cooling($maxT,$minT); # Order of the args does not matter
+ $cdd     = $dd->cooling($mean);       # Same result
+
+Given one temperature argument taken to be the daily mean temperature, or two 
+arguments taken to be the daily maximum and minimum temperatures, returns the 
+cooling degree days accumulated to the nearest integer. If the argument value(s) 
+are undefined, non-numeric, NaN, or equal to the missing value, the missing value 
+is returned. The method will croak if no argument is supplied.
+
+
+=cut
+
+=head2 heating
+
+ my $maxT = 50;
+ my $minT = 35;
+ my $mean = ($maxT + $minT) / 2;
+ my $hdd  = $dd->heating($maxT,$minT); # Order of the args does not matter
+ $hdd     = $dd->heating($mean);       # Same result
+
+Given one temperature argument taken to be the daily mean temperature, or two
+arguments taken to be the daily maximum and minimum temperatures, returns the
+heating degree days accumulated to the nearest integer. If the argument value(s)
+are undefined, non-numeric, NaN, or equal to the missing value, the missing value 
+is returned. The method will croak if no argument is supplied.
+
+
+=cut
+
+=head2 growing
+
+ my $maxT = 90;
+ my $minT = 70;
+ my $gdd  = $dd->growing($maxT,$minT); # Order of args does not matter
+
+Given two arguments taken to be the daily maximum and minimum temperatures, returns 
+the growing degree days accumulated to the nearest integer. If the argument values
+are undefined, non-numeric, NaN, or equal to the missing value, the missing value is
+returned. If fewer than two arguments are supplied, the method will croak.
+
+
+=cut
+
+=head1 INSTALLATION
+
+The best way to install this module is with a CPAN client, which will resolve and 
+install the dependencies:
+
+ cpan Temperature::Calculate::DegreeDays
+ cpanm Temperature::Calculate::DegreeDays
+
+You can also install the module directly from the distribution directory after 
+downloading it and extracting the files, which will also install the dependencies:
+
+ cpan .
+ cpanm .
+
+If you want to install the module manually do the following in the distribution 
+directory:
+
+ perl Makefile.PL
+ make
+ bmake test
+ make install
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+ perldoc Temperature::Calculate::DegreeDays
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Temperature-Calculate-DegreeDays>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/d/Temperature-Calculate-DegreeDays>
+
+=item * Search CPAN
+
+L<https://metacpan.org/release/Temperature-Calculate-DegreeDays>
+
+=back
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-temperature-calculate-degreedays at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Temperature-Calculate-DegreeDays>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 AUTHOR
+
+Adam Allgood
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2024 by Adam Allgood.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+
+=cut
+

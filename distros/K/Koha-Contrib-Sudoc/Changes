@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Sudoc
 
+2.46 2024-11-04
+
+  - Koha v24.05
+
 2.44 2024-02-29
 
   - Méthode GET en SFTP

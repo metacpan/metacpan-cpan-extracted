@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package App::csvtool::Smudge 0.03;
+package App::csvtool::Smudge 0.04;
 
 use v5.26;
 use warnings;
@@ -76,6 +76,10 @@ well-behaved, N should be an odd number.
 
 Recursive average with weighting of C<2 ** -NNN>.
 
+=head3 total
+
+Running total of every value seen so far.
+
 =cut
 
 my @FILTERS = (
@@ -116,6 +120,17 @@ my @FILTERS = (
             #         =  $prev * 1 - $prev * $alpha + $new * $alpha
             return $prev = $prev + $alpha * ( $new - $prev );
          };
+      }
+   },
+   {
+      name => "total",
+      desc => "Running total",
+      make => sub ( $ ) {
+         my $total = 0;
+         return sub ( $new ) {
+            $total += $new;
+            return $total;
+         }
       }
    },
 );
