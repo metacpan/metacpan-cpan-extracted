@@ -2,13 +2,12 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.021";
+  version "0.022";
   
   use Net::SSLeay::Constant;
   use Net::SSLeay::SSL_CTX;
   use Net::SSLeay::ERR;
   use Net::SSLeay::Error;
-  use Net::SSLeay::SSL_CIPHER;
   use Net::SSLeay::X509;
   use Net::SSLeay::X509_NAME;
   use Net::SSLeay::SSL_SESSION;

@@ -2,13 +2,17 @@ package Crypt::DSA::Util;
 
 use strict;
 use Math::BigInt 1.78 try => 'GMP, Pari';
+use Crypt::URandom qw (urandom);
+
 use Fcntl;
 use Carp qw( croak );
 
+our $VERSION = '1.19'; #VERSION
+
 use vars qw( $VERSION @ISA @EXPORT_OK );
 use Exporter;
+
 BEGIN {
-    $VERSION   = '1.17';
     @ISA       = qw( Exporter );
     @EXPORT_OK = qw( bitsize bin2mp mp2bin mod_inverse mod_exp makerandom isprime );
 }
@@ -52,24 +56,7 @@ sub makerandom {
     my %param = @_;
     my $size = $param{Size};
     my $bytes = int($size / 8) + 1;
-    my $r = '';
-    if ( sysopen my $fh, '/dev/random', O_RDONLY ) {
-        my $read = 0;
-        while ($read < $bytes) {
-            my $got = sysread $fh, my($chunk), $bytes - $read;
-            next unless $got;
-            die "Error: $!" if $got == -1;
-            $r .= $chunk;
-            $read = length $r;
-        }
-        close $fh;
-    }
-    elsif ( require Data::Random ) {
-        $r .= Data::Random::rand_chars( set=>'numeric' ) for 1..$bytes;
-    }
-    else {
-        croak "makerandom requires /dev/random or Data::Random";
-    }
+    my $r = urandom($bytes);
     my $down = $size - 1;
     $r = unpack 'H*', pack 'B*', '0' x ( $size % 8 ? 8 - $size % 8 : 0 ) .
         '1' . unpack "b$down", $r;

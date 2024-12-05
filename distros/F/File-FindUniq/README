@@ -1,0 +1,400 @@
+NAME
+    File::FindUniq - Find unique or duplicate file {contents,names}
+
+VERSION
+    This document describes version 0.002 of File::FindUniq (from Perl
+    distribution File-FindUniq), released on 2024-12-05.
+
+SYNOPSIS
+    Given this directory content:
+
+     filename          size (bytes)              content
+     --------          ------------              -------
+     foo               0
+     bar               0
+     baz               3                         123
+     qux               3                         456
+     quux              3                         123
+     sub/foo           5                         abcde
+     sub/bar           0
+
+    To list files and skip duplicate contents:
+
+     use File::FindUniq (dupe_files uniq_files);
+     my $res = uniq_files(files => [glob "*"], recurse=>1);
+     # => [200, "OK", ["bar", "baz", "qux", "sub/foo"], {}]
+     # although bar content (0 bytes) is not unique, it's the first seen copy, so included
+     # foo is deemed as duplicate of bar, so skipped
+     # although baz content ("1234") is not unique, it's the first seen copy, so included
+     # quux is deemed as duplicate of baz, so skipped
+     # sub/bar is deemed as duplicate of bar, so skipped
+
+    To list only duplicate files (including the first copy):
+
+     my $res = dupe_files(files => [glob "*"], recurse=>1);
+     # => [200, "OK", ["bar", "baz", "foo", "quux", "sub/bar"], {}]
+     # qux's content is unique, so skipped
+     # sub/foo's content is unique, so skipped
+     # foo's content is not unique, but it's the first
+
+    To only report unique filenames:
+
+     my $res = uniq_files(files => [glob "*"], recurse=>1,
+                          algorithm=>'name');
+     # => [200, "OK", ["bar", "baz", "foo", "quux", "qux"], {}]
+
+    To report filenames that have duplicates:
+
+     my $res = dupe_files(files => [glob "*"], recurse=>1,
+                          algorithm=>'name');
+     # => [200, "OK", ["bar", "foo", "sub/bar", "sub/foo"], {}]
+
+DESCRIPTION
+    Keywords: unique files, unique file names, duplicate files, duplicate
+    file names.
+
+NOTES
+FUNCTIONS
+  dupe_files
+    Usage:
+
+     dupe_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Report duplicate or unique files, optionally perform action on them.
+
+    This is a thin wrapper for uniq-files. It defaults "report_unique" to 0
+    and "report_duplicate" to 1.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   algorithm => *str*
+
+        What algorithm is used to compute the digest of the content.
+
+        The default is to use "md5". Some algorithms supported include
+        "crc32", "sha1", "sha256", as well as "Digest" to use Perl Digest
+        which supports a lot of other algorithms, e.g. "SHA-1", "BLAKE2b".
+
+        If set to '', 'none', or 'size', then digest will be set to file
+        size. This means uniqueness will be determined solely from file
+        size. This can be quicker but will generate a false positive when
+        two files of the same size are deemed as duplicate even though their
+        content may be different.
+
+        If set to 'name' then only name comparison will be performed. This
+        of course can potentially generate lots of false positives, but in
+        some cases you might want to compare filename for uniqueness.
+
+    *   authoritative_dirs => *array[str]*
+
+        Denote director(y|ies) where authoritative/"Original" copies are
+        found.
+
+    *   detail => *true*
+
+        Show details (a.k.a. --show-digest, --show-size, --show-count).
+
+    *   digest_args => *array*
+
+        Some Digest algorithms require arguments, you can pass them here.
+
+    *   exclude_empty_files => *bool*
+
+        (No description)
+
+    *   exclude_file_patterns => *array[str]*
+
+        Filename (including path) regex patterns to include.
+
+    *   files* => *array[str]*
+
+        (No description)
+
+    *   group_by_digest => *bool*
+
+        Sort files by its digest (or size, if not computing digest),
+        separate each different digest.
+
+    *   include_file_patterns => *array[str]*
+
+        Filename (including path) regex patterns to exclude.
+
+    *   max_size => *filesize*
+
+        Maximum file size to consider.
+
+    *   min_size => *filesize*
+
+        Minimum file size to consider.
+
+    *   recurse => *bool*
+
+        If set to true, will recurse into subdirectories.
+
+    *   report_duplicate => *int* (default: 1)
+
+        Whether to return duplicate items.
+
+        Can be set to either 0, 1, 2, or 3.
+
+        If set to 0, duplicate items will not be returned.
+
+        If set to 1 (the default for "dupe-files"), will return all the the
+        duplicate files. For example: "file1" contains text 'a', "file2"
+        'b', "file3" 'a'. Then "file1" and "file3" will be returned.
+
+        If set to 2 (the default for "uniq-files"), will only return the
+        first of duplicate items. Continuing from previous example, only
+        "file1" will be returned because "file2" is unique and "file3"
+        contains 'a' (already represented by "file1"). If one or more
+        "--authoritative-dir" ("-O") options are specified, files under
+        these directories will be preferred.
+
+        If set to 3, will return all but the first of duplicate items.
+        Continuing from previous example: "file3" will be returned. This is
+        useful if you want to keep only one copy of the duplicate content.
+        You can use the output of this routine to "mv" or "rm". Similar to
+        the previous case, if one or more "--authoritative-dir" ("-O")
+        options are specified, then files under these directories will not
+        be listed if possible.
+
+    *   report_unique => *bool* (default: 0)
+
+        Whether to return unique items.
+
+    *   show_count => *bool* (default: 0)
+
+        Whether to return each file content's number of occurence.
+
+        1 means the file content is only encountered once (unique), 2 means
+        there is one duplicate, and so on.
+
+    *   show_digest => *true*
+
+        Show the digest value (or the size, if not computing digest) for
+        each file.
+
+        Note that this routine does not compute digest for files which have
+        unique sizes, so they will show up as empty.
+
+    *   show_size => *true*
+
+        Show the size for each file.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  uniq_files
+    Usage:
+
+     uniq_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Report duplicate or unique files, optionally perform action on them.
+
+    Given a list of filenames, will check each file's content (and/or size,
+    and/or only name) to decide whether the file is a duplicate of another.
+
+    There is a certain amount of flexibility on how duplicate is determined:
+    - when comparing content, various hashing algorithm is supported; - when
+    comparing size, a certain tolerance % is allowed; - when comparing
+    filename, munging can first be done.
+
+    There is flexibility on what to do with duplicate files: - just print
+    unique/duplicate files (and let other utilities down the pipe deal with
+    them); - move duplicates to some location; - open the files first and
+    prompt for action; - let a Perl code process the files.
+
+    Interface is loosely based on the "uniq" Unix command-line program.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   algorithm => *str*
+
+        What algorithm is used to compute the digest of the content.
+
+        The default is to use "md5". Some algorithms supported include
+        "crc32", "sha1", "sha256", as well as "Digest" to use Perl Digest
+        which supports a lot of other algorithms, e.g. "SHA-1", "BLAKE2b".
+
+        If set to '', 'none', or 'size', then digest will be set to file
+        size. This means uniqueness will be determined solely from file
+        size. This can be quicker but will generate a false positive when
+        two files of the same size are deemed as duplicate even though their
+        content may be different.
+
+        If set to 'name' then only name comparison will be performed. This
+        of course can potentially generate lots of false positives, but in
+        some cases you might want to compare filename for uniqueness.
+
+    *   authoritative_dirs => *array[str]*
+
+        Denote director(y|ies) where authoritative/"Original" copies are
+        found.
+
+    *   detail => *true*
+
+        Show details (a.k.a. --show-digest, --show-size, --show-count).
+
+    *   digest_args => *array*
+
+        Some Digest algorithms require arguments, you can pass them here.
+
+    *   exclude_empty_files => *bool*
+
+        (No description)
+
+    *   exclude_file_patterns => *array[str]*
+
+        Filename (including path) regex patterns to include.
+
+    *   files* => *array[str]*
+
+        (No description)
+
+    *   group_by_digest => *bool*
+
+        Sort files by its digest (or size, if not computing digest),
+        separate each different digest.
+
+    *   include_file_patterns => *array[str]*
+
+        Filename (including path) regex patterns to exclude.
+
+    *   max_size => *filesize*
+
+        Maximum file size to consider.
+
+    *   min_size => *filesize*
+
+        Minimum file size to consider.
+
+    *   recurse => *bool*
+
+        If set to true, will recurse into subdirectories.
+
+    *   report_duplicate => *int* (default: 2)
+
+        Whether to return duplicate items.
+
+        Can be set to either 0, 1, 2, or 3.
+
+        If set to 0, duplicate items will not be returned.
+
+        If set to 1 (the default for "dupe-files"), will return all the the
+        duplicate files. For example: "file1" contains text 'a', "file2"
+        'b', "file3" 'a'. Then "file1" and "file3" will be returned.
+
+        If set to 2 (the default for "uniq-files"), will only return the
+        first of duplicate items. Continuing from previous example, only
+        "file1" will be returned because "file2" is unique and "file3"
+        contains 'a' (already represented by "file1"). If one or more
+        "--authoritative-dir" ("-O") options are specified, files under
+        these directories will be preferred.
+
+        If set to 3, will return all but the first of duplicate items.
+        Continuing from previous example: "file3" will be returned. This is
+        useful if you want to keep only one copy of the duplicate content.
+        You can use the output of this routine to "mv" or "rm". Similar to
+        the previous case, if one or more "--authoritative-dir" ("-O")
+        options are specified, then files under these directories will not
+        be listed if possible.
+
+    *   report_unique => *bool* (default: 1)
+
+        Whether to return unique items.
+
+    *   show_count => *bool* (default: 0)
+
+        Whether to return each file content's number of occurence.
+
+        1 means the file content is only encountered once (unique), 2 means
+        there is one duplicate, and so on.
+
+    *   show_digest => *true*
+
+        Show the digest value (or the size, if not computing digest) for
+        each file.
+
+        Note that this routine does not compute digest for files which have
+        unique sizes, so they will show up as empty.
+
+    *   show_size => *true*
+
+        Show the size for each file.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-FindUniq>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-FindUniq>.
+
+SEE ALSO
+    App::FindUtils
+
+    move-duplicate-files-to from App::DuplicateFilesUtils, which is
+    basically a shortcut for "uniq-files -D -R . | while read f; do mv "$f"
+    SOMEDIR/; done".
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-FindUniq>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

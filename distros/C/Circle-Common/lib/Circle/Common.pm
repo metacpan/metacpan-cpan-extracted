@@ -21,7 +21,7 @@ our @EXPORT_OK = qw(
   http_json_get
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $config = undef;
 
@@ -174,7 +174,7 @@ Circle::Common - the common module for Circle::Chain SDK
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 

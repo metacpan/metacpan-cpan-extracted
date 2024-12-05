@@ -22,13 +22,33 @@ Net::SSLeay::OPENSSL class in L<SPVM> represetns L<OPENSSL|https://docs.openssl.
 
 C<static method add_ssl_algorithms : int ();>
 
-Calls L<OpenSSL_add_ssl_algorithms|https://docs.openssl.org/1.1.1/man3/SSL_library_init> function, and returns its return value.
+Calls native L<OpenSSL_add_ssl_algorithms|https://docs.openssl.org/1.1.1/man3/SSL_library_init> function.
 
 =head2 add_all_algorithms
 
 C<add_all_algorithms : void();>
 
-Calls L<OpenSSL_add_all_algorithms|https://docs.openssl.org/1.1.1/man3/SSL_library_init> function.
+Calls native L<OpenSSL_add_all_algorithms|https://docs.openssl.org/1.1.1/man3/OPENSSL_init_crypto> function.
+
+=head2 init_crypto
+
+C<static method init_crypto : int ($opts : long, $settings : L<Net::SSLeay::OPENSSL_INIT_SETTINGS|SPVM::Net::SSLeay::OPENSSL_INIT_SETTINGS>);>
+
+Calls native L<OpenSSL_init_crypto|https://docs.openssl.org/1.1.1/man3/SSL_library_init> function, and returns its return value.
+
+Exceptions:
+
+If OpenSSL_init_crypto failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
+=head2 init_ssl
+
+C<static method init_ssl : int ($opts : long, $settings : L<Net::SSLeay::OPENSSL_INIT_SETTINGS|SPVM::Net::SSLeay::OPENSSL_INIT_SETTINGS>);>
+
+Calls native L<OpenSSL_init_ssl|https://docs.openssl.org/1.1.1/man3/OPENSSL_init_ssl/> function, and returns its return value.
+
+Exceptions:
+
+If OpenSSL_init_ssl failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
 =head1 See Also
 

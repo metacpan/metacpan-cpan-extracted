@@ -35,7 +35,7 @@ int32_t SPVM__Net__SSLeay__X509_NAME__oneline(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   void* obj_ret = env->new_string_nolen(env, stack, ret);
   
-  free(ret);
+  OPENSSL_free(ret);
   
   stack[0].oval = obj_ret;
   

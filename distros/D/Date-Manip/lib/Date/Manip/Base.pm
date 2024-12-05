@@ -27,7 +27,7 @@ use Encode qw(encode_utf8 from_to find_encoding decode _utf8_off _utf8_on is_utf
 require Date::Manip::Lang::index;
 
 our $VERSION;
-$VERSION='6.95';
+$VERSION='6.96';
 END { undef $VERSION; }
 
 ###############################################################################

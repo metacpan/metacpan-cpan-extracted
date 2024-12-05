@@ -41,8 +41,8 @@ wallet:
     searchTxByTime: /wallet/v1/node/searchTxByTime
     assetsOfAddress: /wallet/v1/node/getAssetsOfAddress
     letMeTry: /activity/v1/node/letMeTry
-    fetchMyBlock: /miner/v1/node/fetchMyBlock
-    postMyBlock: /miner/v1/node/postMyBlock
+    fetchMyBlock: /public/v1/miner/fetchMyBlock
+    postMyBlock: /public/v1/miner/postMyBlock
     ## public wallet apis
     getAddressByUid: /wallet/public/v1/get-address-by-uid
     uploadUidAndAddress: /wallet/public/v1/upload-uid-and-address

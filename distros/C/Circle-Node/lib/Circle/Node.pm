@@ -9,7 +9,7 @@ use Try::Tiny;
 use URL::Encode;
 use Circle::Common qw(load_config build_url_template http_json_post http_json_get);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @EXPORT = qw(
   subscribe
@@ -44,7 +44,7 @@ Circle::Node - The Circle Chain's Node module.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

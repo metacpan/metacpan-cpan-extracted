@@ -34,6 +34,18 @@ C<static method sha1 : L<Net::SSLeay::EVP_MD|SPVM::Net::SSLeay::EVP_MD> ();>
 
 Calls native L<EVP_sha1|https://docs.openssl.org/1.1.1/man3/EVP_sha1/> function, creates a L<Net::SSLeay::EVP_MD|SPVM::Net::SSLeay::EVP_MD> object, sets the pointer value of the new object to the return value of the native function, sets C<no_free> flag of the new object to 1, and returns the new object.
 
+=head2 sha256
+
+C<static method sha256 : L<Net::SSLeay::EVP_MD|SPVM::Net::SSLeay::EVP_MD> ();>
+
+Calls native L<EVP_sha256|https://docs.openssl.org/1.1.1/man3/EVP_sha256/> function, creates a L<Net::SSLeay::EVP_MD|SPVM::Net::SSLeay::EVP_MD> object, sets the pointer value of the new object to the return value of the native function, sets C<no_free> flag of the new object to 1, and returns the new object.
+
+=head2 sha512
+
+C<static method sha512 : L<Net::SSLeay::EVP_MD|SPVM::Net::SSLeay::EVP_MD> ();>
+
+Calls native L<EVP_sha512|https://docs.openssl.org/1.1.1/man3/EVP_sha512/> function, creates a L<Net::SSLeay::EVP_MD|SPVM::Net::SSLeay::EVP_MD> object, sets the pointer value of the new object to the return value of the native function, sets C<no_free> flag of the new object to 1, and returns the new object.
+
 =head1 See Also
 
 =over 2

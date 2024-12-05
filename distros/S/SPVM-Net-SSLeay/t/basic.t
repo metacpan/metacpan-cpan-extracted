@@ -46,6 +46,24 @@ ok(SPVM::TestCase::Net::SSLeay->ASN1_TIME);
 
 ok(SPVM::TestCase::Net::SSLeay->ASN1_GENERALIZEDTIME);
 
+ok(SPVM::TestCase::Net::SSLeay->OBJ);
+
+ok(SPVM::TestCase::Net::SSLeay->SSL_METHOD);
+
+ok(SPVM::TestCase::Net::SSLeay->BIO);
+
+ok(SPVM::TestCase::Net::SSLeay->DH);
+
+ok(SPVM::TestCase::Net::SSLeay->PEM);
+
+ok(SPVM::TestCase::Net::SSLeay->EVP);
+
+ok(SPVM::TestCase::Net::SSLeay->OPENSSL_INIT);
+
+ok(SPVM::TestCase::Net::SSLeay->PKCS12);
+
+$api->set_exception(undef);
+
 my $end_memory_blocks_count = $api->get_memory_blocks_count;
 is($end_memory_blocks_count, $start_memory_blocks_count);
 

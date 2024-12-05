@@ -1,0 +1,12 @@
+0.002   2024-12-05  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Allow arguments prefixed by /^-/, so it can be used by
+          Perinci::CmdLine scripts.
+
+
+0.001   2024-12-05  Released-By: PERLANCAR
+
+        - First release, extracted from App-UniqFiles to reduce dependencies
+          when used as a function.
+
+        - Fix bugs with algorithm 'name'.

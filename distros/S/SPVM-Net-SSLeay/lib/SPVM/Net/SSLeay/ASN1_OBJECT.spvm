@@ -3,8 +3,21 @@
 
 class Net::SSLeay::ASN1_OBJECT : pointer {
   
+  allow Net::SSLeay::OBJ;
+  
+  use Fn;
+  
   # Class Methods
   native static method new : Net::SSLeay::ASN1_OBJECT ();
+  
+  private static method new_with_pointer : Net::SSLeay::ASN1_OBJECT ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::ASN1_OBJECT;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
   
   # Instance Methods
   native method DESTROY : void ();

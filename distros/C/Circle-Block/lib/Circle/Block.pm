@@ -9,7 +9,7 @@ use Try::Tiny;
 use URL::Encode;
 use Circle::Common qw(load_config build_url_template http_json_post http_json_get);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @EXPORT = qw(
   get_block_hashlist
@@ -158,7 +158,7 @@ Circle::Block - the block module for Circle::Chain SDK
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

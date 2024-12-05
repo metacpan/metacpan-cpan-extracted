@@ -2,17 +2,16 @@ package Crypt::DSA;
 
 use 5.006;
 use strict;
-use Digest::SHA1 qw( sha1 );
+use Digest::SHA qw( sha1 );
 use Carp qw( croak );
 use Crypt::DSA::KeyChain;
 use Crypt::DSA::Key;
 use Crypt::DSA::Signature;
 use Crypt::DSA::Util qw( bitsize bin2mp mod_inverse mod_exp makerandom );
 
+our $VERSION = '1.19'; #VERSION
+
 use vars qw( $VERSION );
-BEGIN {
-    $VERSION = '1.17';
-}
 
 sub new {
     my $class = shift;
@@ -140,6 +139,18 @@ are provided by the I<Math::Pari> library.
 This package provides DSA signing, signature verification, and key
 generation.
 
+=head1 SECURITY
+
+DSA (Digital Signature Algorithm) signatures are no longer considered
+to be adequate for security.   
+
+This module should only be used for verifying old signatures and
+should not be used for new signatures.
+
+That being said, some technologies still require DSA signatures even
+in 2024. Consider using other solutions or explicitly not using DSA
+signatures.
+
 =head1 USAGE
 
 The I<Crypt::DSA> public interface is similar to that of
@@ -225,7 +236,7 @@ use that as the digest to sign. Thus writing
 
 is a shorter way of writing
 
-    use Digest::SHA1 qw( sha1 );
+    use Digest::SHA qw( sha1 );
     my $sig = $dsa->sign(Digest => sha1( $message ), ... );
 
 =back

@@ -1,6 +1,6 @@
 package SPVM::Net::SSLeay;
 
-our $VERSION = "0.021";
+our $VERSION = "0.022";
 
 1;
 
@@ -117,8 +117,6 @@ OpenSSL 1.1.1
 =item * L<Net::SSLeay::PKCS12|SPVM::Net::SSLeay::PKCS12>
 
 =item * L<Net::SSLeay::RAND|SPVM::Net::SSLeay::RAND>
-
-=item * L<Net::SSLeay::SSL_CIPHER|SPVM::Net::SSLeay::SSL_CIPHER>
 
 =item * L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX>
 

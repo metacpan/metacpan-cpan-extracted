@@ -6,11 +6,12 @@ use strict;
 use FindBin qw($Bin);
 
 use lib 't/lib';
-use Test::Most tests => 16;
+use Test::Most tests => 19;
 
 use_ok('MyLogger');
 use_ok('Database::test1');
 use_ok('Database::test2');
+use_ok('Database::test4');
 
 my $test1 = new_ok('Database::test1' => [{ directory => "$Bin/../data", logger => new_ok('MyLogger') }]);
 
@@ -42,3 +43,11 @@ is($test2->number('four'), undef, 'PSV AUTOLOAD works not found');
 	like($@, qr/Usage: /, 'set_logger dies with correct error message if logger is missing');
 }
 
+# set_logger with subroutine ref
+{
+	my $logger = sub {
+		diag($_[0]->{'level'}, ': ', @{$_[0]->{'message'}}) if($ENV{'TEST_VERBOSE'});
+	};
+	my $test4 = new_ok('Database::test4' => [{ directory => "$Bin/../data", logger => $logger }] );
+	ok(!defined($test4->ordinal(cardinal => 'four')), 'CSV AUTOLOAD works');
+}

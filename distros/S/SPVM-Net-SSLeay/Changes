@@ -1,3 +1,24 @@
+0.022 2024-12-04
+  [New Features]
+    * Add Net::SSLeay::DH#new method.
+    * Add Net::SSLeay::EVP_PKEY#new method.
+    * Add Net::SSLeay::PEM#read_bio_PrivateKey method.
+    * Add Net::SSLeay::EVP#sha256 method.
+    * Add Net::SSLeay::EVP#sha512 method.
+    * Add Net::SSLeay::PKCS12#new method.
+    * Add Net::SSLeay::DER#(i2d_TYPE|d2i_TYPE|d2i_TYPE_bio) methods.
+    * Add Net::SSLeay::PKCS12#parse method.
+    * Add Net::SSLeay::OPENSSL#init_crypto method.
+    
+  [Incompatible Changes]
+    * Add an exception to Net::SSLeay::OBJ#nid2obj method.
+    * Add an exception to Net::SSLeay::OBJ#obj2nid method.
+  [Bug Fix]
+    * Fix bugs in methods in Net::SSLeay::OBJ class.
+  [Changes]
+    * Remove SSL_CIPHER class.
+  [Requirement Changes]
+    * Require SPVM::FindBin 0.031 for tests.
 0.021 2024-12-02
   [New Features]
     * Add Net::SSLeay::ASN1_ENUMERATED#new method.

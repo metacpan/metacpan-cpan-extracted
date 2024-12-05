@@ -32,7 +32,7 @@ OpenSSL 3.0
 
 =over 2
 
-=item * L<Net::SSLeay|SPVM::Net::EVP>
+=item * L<Net::SSLeay::EVP|SPVM::Net::EVP>
 
 =item * L<Net::SSLeay|SPVM::Net::SSLeay>
 

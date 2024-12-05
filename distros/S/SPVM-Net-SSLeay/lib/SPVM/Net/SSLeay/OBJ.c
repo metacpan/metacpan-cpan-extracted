@@ -51,6 +51,21 @@ int32_t SPVM__Net__SSLeay__OBJ__nid2obj(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   ASN1_OBJECT* oid = OBJ_nid2obj(n);
   
+  if (!oid) {
+    int64_t ssl_error = ERR_peek_last_error();
+    
+    char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
+    ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
+    
+    env->die(env, stack, "[OpenSSL Error]OBJ_nid2obj failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+    
+    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    error_id = tmp_error_id;
+    
+    return error_id;
+  }
+  
   void* obj_address_oid = env->new_pointer_object_by_name(env, stack, "Address", oid, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   stack[0].oval = obj_address_oid;
@@ -68,9 +83,31 @@ int32_t SPVM__Net__SSLeay__OBJ__obj2nid(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  ASN1_OBJECT* o = stack[0].oval;
+  void* obj_o = stack[0].oval;
+  
+  if (!obj_o) {
+    return env->die(env, stack, "The ASN1_OBJECT object $o must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  ASN1_OBJECT* o = env->get_pointer(env, stack, obj_o);
   
   int32_t nid = OBJ_obj2nid(o);
+  
+  int32_t success = nid != NID_undef;
+  if (!success) {
+    int64_t ssl_error = ERR_peek_last_error();
+    
+    char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
+    ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
+    
+    env->die(env, stack, "[OpenSSL Error]OBJ_obj2nid failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+    
+    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    error_id = tmp_error_id;
+    
+    return error_id;
+  }
   
   stack[0].ival = nid;
   

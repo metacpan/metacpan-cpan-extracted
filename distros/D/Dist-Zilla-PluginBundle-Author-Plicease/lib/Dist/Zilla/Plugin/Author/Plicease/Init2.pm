@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.75 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.76 {
 
   use 5.020;
   use Moose;
@@ -117,12 +117,12 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.75 {
         {
           for(1..100)
           {
-            my $answer = $self->chrome->prompt_str("Minimum required Perl (min: 5.008004, old: 5.014, def: 5.020 (default), or an explicit Perl version)",
+            my $answer = $self->chrome->prompt_str("Minimum required Perl (min/old: 5.016, def: 5.020 (default), or an explicit Perl version)",
               { default => "def" },
             );
             return $answer    if $answer =~ /^5\.[0-9]{3,6}$/;
-            return '5.008004' if $answer eq 'min';
-            return '5.014'    if $answer eq 'old';
+            return '5.016'    if $answer eq 'min';
+            return '5.016'    if $answer eq 'old';
             return '5.020'    if $answer eq 'def';
             if($answer =~ /^5\.([0-9]+)\.([0-9]+)$/)
             {
@@ -433,7 +433,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.75
+version 2.76
 
 =head1 DESCRIPTION
 
@@ -749,7 +749,9 @@ jobs:
       fail-fast: false
       matrix:
         cip_tag:
-          - "5.37"
+          - "5.41"
+          - "5.40"
+          - "5.38"
           - "5.36"
           - "5.34"
           - "5.32"
@@ -761,10 +763,6 @@ jobs:
           - "5.20"
           - "5.18"
           - "5.16"
-          - "5.14"
-          - "5.12"
-          - "5.10"
-          - "5.8"
 
     env:
       CIP_TAG: ${{ matrix.cip_tag }}

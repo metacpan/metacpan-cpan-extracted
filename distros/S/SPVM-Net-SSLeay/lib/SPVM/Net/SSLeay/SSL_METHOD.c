@@ -87,5 +87,3 @@ int32_t SPVM__Net__SSLeay__SSL_METHOD__TLS_server_method(SPVM_ENV* env, SPVM_VAL
   
   return 0;
 }
-
-// SSL_CIPHER is always constant data structure.

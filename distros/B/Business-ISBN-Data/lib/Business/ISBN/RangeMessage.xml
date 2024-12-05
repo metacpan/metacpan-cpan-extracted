@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>0fbfa7be-1205-4747-88ad-f30c0544f7c5</MessageSerialNumber>
-  <MessageDate>Sat, 30 Nov 2024 03:45:14 GMT</MessageDate>
+  <MessageSerialNumber>449e659e-c99e-41d0-aa46-6cce34e3fb98</MessageSerialNumber>
+  <MessageDate>Thu, 5 Dec 2024 03:46:56 GMT</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -5605,11 +5605,15 @@
       <Agency>Azerbaijan</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-1999999</Range>
+          <Range>0000000-0999999</Range>
           <Length>1</Length>
         </Rule>
         <Rule>
-          <Range>2000000-3999999</Range>
+          <Range>1000000-1499999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>1500000-3999999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>

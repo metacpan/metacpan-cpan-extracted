@@ -17,8 +17,4 @@ class Net::SSLeay::SSL_METHOD : pointer {
   native static method TLS_client_method : Net::SSLeay::SSL_METHOD ();
   
   native static method TLS_server_method : Net::SSLeay::SSL_METHOD ();
-  
-  # Instance Methods
-  
-  # There is no DESTROY method because generally, there is no need to explicitly free the SSL_METHOD structure.
 }

@@ -4,9 +4,10 @@ use strict;
 use MIME::Base64 qw( decode_base64 );
 use Crypt::DSA::Key;
 
+our $VERSION = '1.19'; #VERSION
+
 use vars qw{$VERSION @ISA};
 BEGIN {
-    $VERSION = '1.17';
     @ISA     = 'Crypt::DSA::Key';
 }
 

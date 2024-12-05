@@ -30,6 +30,8 @@ Calls native L<OPENSSL_INIT_free|https://docs.openssl.org/1.1.1/man3/OPENSSL_ini
 
 =item * L<Net::SSLeay::OPENSSL|SPVM::Net::SSLeay::OPENSSL>
 
+=item * L<Net::SSLeay::OPENSSL_INIT|SPVM::Net::SSLeay::OPENSSL_INIT>
+
 =item * L<Net::SSLeay|SPVM::Net::SSLeay>
 
 =back

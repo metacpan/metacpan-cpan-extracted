@@ -54,6 +54,18 @@ The BIO $bp must be defined. Otherwise an exception is thrown.
 
 If read_bio_DHparams failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
+=head2 read_bio_PrivateKey
+
+C<static method read_bio_PrivateKey : L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY> ($bp : L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO>);>
+
+Calls native L<PEM_read_bio_PrivateKey|https://docs.openssl.org/3.1/man3/PEM_read_bio_PrivateKey> function, creates a new L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
+
+Exceptions:
+
+The BIO $bp must be defined. Otherwise an exception is thrown.
+
+If PEM_read_bio_PrivateKey failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
 =head1 See Also
 
 =over 2

@@ -72,6 +72,10 @@ The app name $name must be defined. Otherwise an exception is thrown.
 
 =over 2
 
+=item * L<Net::SSLeay::OPENSSL_INIT_SETTINGS|SPVM::Net::SSLeay::OPENSSL_INIT_SETTINGS>
+
+=item * L<Net::SSLeay::OPENSSL|SPVM::Net::SSLeay::OPENSSL>
+
 =item * L<Net::SSLeay|SPVM::Net::SSLeay>
 
 =back
@@ -81,10 +85,3 @@ The app name $name must be defined. Otherwise an exception is thrown.
 Copyright (c) 2024 Yuki Kimoto
 
 MIT License
-
-=head1 Copyright & License
-
-Copyright (c) 2024 Yuki Kimoto
-
-MIT License
-

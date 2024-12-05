@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Koha;
 # ABSTRACT: Lien à Koha
-$Koha::Contrib::Sudoc::Koha::VERSION = '2.46';
+$Koha::Contrib::Sudoc::Koha::VERSION = '2.47';
 use Moose;
 use Modern::Perl;
 use Carp;
@@ -183,7 +183,12 @@ sub get_biblionumber {
 sub get_biblionumber_framework {
     my ($self, $record) = @_;
     my $biblionumber = $self->get_biblionumber($record);
-    ( $biblionumber,  GetFrameworkCode($biblionumber) );
+    my $framework = $self->dbh->selectall_arrayref("
+        SELECT frameworkcode FROM biblio WHERE biblionumber=$biblionumber",
+        {}
+    );
+    $framework = $framework->[0]->[0];
+    ($biblionumber,  $framework);
 }
 
 
@@ -395,7 +400,7 @@ Koha::Contrib::Sudoc::Koha - Lien à Koha
 
 =head1 VERSION
 
-version 2.46
+version 2.47
 
 =head1 DESCRIPTION
 

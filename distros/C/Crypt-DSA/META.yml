@@ -3,34 +3,40 @@ abstract: 'DSA Signatures and Key Generation'
 author:
   - 'Benjamin Trott <ben@sixapart.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::More: 0.42
+  Convert::PEM: '0.13'
+  Crypt::DES_EDE3: '0'
+  Data::Buffer: '0.01'
+  ExtUtils::MakeMaker: '6.42'
+  File::Which: '0.05'
+  Math::BigInt: '1.78'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 1.01'
+  ExtUtils::MakeMaker: '6.42'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: Crypt::DSA
+  version: '1.4'
 name: Crypt-DSA
-no_index:
-  directory:
-    - inc
-    - t
-    - xt
 requires:
-  Data::Buffer: 0.01
-  Digest::SHA1: 0
-  File::Spec: 0
-  File::Which: 0.05
-  IPC::Open3: 0
-  MIME::Base64: 0
-  Math::BigInt: 1.78
-  perl: 5.6.0
+  Convert::ASN1: '0'
+  Convert::PEM: '0.13'
+  Crypt::URandom: '0'
+  Data::Buffer: '0.01'
+  Digest::SHA: '0'
+  File::Spec: '0'
+  File::Which: '0.05'
+  IPC::Open3: '0'
+  MIME::Base64: '0'
+  Math::BigInt: '1.78'
+  perl: '5.006'
 resources:
-  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Crypt-DSA
-  license: http://dev.perl.org/licenses/
-  repository: http://svn.ali.as/cpan/trunk/Crypt-DSA
-version: 1.17
+  homepage: https://github.com/perl-Crypt-OpenPGP/Crypt-DSA
+  repository: https://github.com/perl-Crypt-OpenPGP/Crypt-DSA.git
+version: '1.19'
+x_generated_by_perl: v5.38.2
+x_maintainers:
+  - 'Timothy Legge <timlegge@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

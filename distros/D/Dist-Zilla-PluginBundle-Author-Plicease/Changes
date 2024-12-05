@@ -1,7 +1,7 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
-2.75      2023-01-20 11:02:49 +1100
-  - Added clean_keep option to [@Author::Plicease] and [Author::Plicease::Cleaner]
+2.76      2024-12-04 04:34:05 -0700
+  - Update Perls used in CI for template and for this dist
 
 2.74      2023-01-04 20:30:24 -0700
   - Removing support fir cirrus-ci since I no longer use it.

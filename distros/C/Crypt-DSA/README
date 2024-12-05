@@ -31,6 +31,17 @@ DESCRIPTION
     This package provides DSA signing, signature verification, and key
     generation.
 
+SECURITY
+    DSA (Digital Signature Algorithm) signatures are no longer considered
+    to be adequate for security.   
+
+    This module should only be used for verifying old signatures and
+    should not be used for new signatures.
+
+    That being said, some technologies still require DSA signatures even
+    in 2024. Consider using other solutions or explicitly not using DSA
+    signatures.
+
 USAGE
     The *Crypt::DSA* public interface is similar to that of *Crypt::RSA*.
     This was done intentionally.
@@ -104,7 +115,7 @@ USAGE
 
         is a shorter way of writing
 
-            use Digest::SHA1 qw( sha1 );
+            use Digest::SHA qw( sha1 );
             my $sig = $dsa->sign(Digest => sha1( $message ), ... );
 
   $verified = $dsa->verify(%arg)

@@ -10,4 +10,8 @@ class Net::SSLeay::EVP : pointer {
   
   native static method sha1 : Net::SSLeay::EVP_MD ();
   
+  native static method sha256 : Net::SSLeay::EVP_MD ();
+  
+  native static method sha512 : Net::SSLeay::EVP_MD ();
+  
 }

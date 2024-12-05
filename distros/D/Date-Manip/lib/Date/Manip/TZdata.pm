@@ -14,7 +14,7 @@ use integer;
 use warnings;
 
 our $VERSION;
-$VERSION='6.95';
+$VERSION='6.96';
 END { undef $VERSION; }
 
 ###############################################################################
@@ -735,7 +735,10 @@ sub _rule_Month {
    my($self,$mmm) = @_;
 
    my %months = qw(jan 1 feb 2 mar 3 apr 4 may 5 jun 6
-                   jul 7 aug 8 sep 9 oct 10 nov 11 dec 12);
+                   jul 7 aug 8 sep 9 oct 10 nov 11 dec 12
+                   january 1 february 2 march 3 april 4 june 6
+                   july 7 august 8 september 9 october 10 november 11 december 12
+                  );
 
    if (exists $months{ lc($mmm) }) {
       return $months{ lc($mmm) };

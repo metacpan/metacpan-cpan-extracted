@@ -5,12 +5,9 @@ use Math::BigInt 1.78 try => 'GMP, Pari';
 use Carp qw( croak );
 use Crypt::DSA::Util qw( bitsize );
 
-
+our $VERSION = '1.19'; #VERSION
 
 use vars qw{$VERSION};
-BEGIN {
-    $VERSION = '1.17';
-}
 
 sub new {
     my $class = shift;

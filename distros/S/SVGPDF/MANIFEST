@@ -77,9 +77,6 @@ t/regtest/08_path1a4.ref
 t/regtest/08_path1a4.svg
 t/regtest/08_path1a5.ref
 t/regtest/08_path1a5.svg
-t/regtest/08_path1a6.ref
-t/regtest/08_path1a6-ld.ref
-t/regtest/08_path1a6.svg
 t/regtest/08_path1a7.ref
 t/regtest/08_path1a7.svg
 t/regtest/08_path1c1.ref

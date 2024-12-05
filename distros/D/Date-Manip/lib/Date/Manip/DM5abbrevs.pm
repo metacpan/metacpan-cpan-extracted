@@ -32,7 +32,7 @@ use strict;
 use warnings;
 
 our($VERSION);
-$VERSION='6.95';
+$VERSION='6.96';
 
 END {
    my $tmp;
@@ -164,8 +164,6 @@ $Date::Manip::DM5::Abbrevs = join(' ',qw(
       l      -1100
       m      -1200
       mdt    -0600
-      mest   +0200
-      met    +0100
       mmt    +0454
       mpt    -0600
       msd    +0400
@@ -335,9 +333,7 @@ The following timezones are defined:
       L      -1100
       M      -1200
       MDT    -0600
-      MEST   +0200
       MESZ   +0200
-      MET    +0100
       METDST +0200
       MEWT   +0100
       MEZ    +0100

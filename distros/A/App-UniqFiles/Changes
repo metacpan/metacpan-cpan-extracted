@@ -1,9 +1,25 @@
-0.142   2024-06-26  Released-By: PERLANCAR; Urgency: low
+0.143.1 2024-12-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Merge changes 0.142 & 0.142.1.
+
+
+0.143   2024-12-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Bump prereq version File::FindUniq 0.002.
+
+
+0.142.1 2024-12-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Split backend to File-FindUniq.
+
+        - UPDATE: Rename release 0.142 to 0.142.1 due to conflict.
+
+
+0.142   2023-06-26  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.
 
-        - [dist] Edit Changes metadata
-          (Backward-{Compatible,Incompatible}).
+        - [dist] Edit Changes metadata (Backward-{Compatible,Incompatible}).
 
 
 0.141   2023-02-06  Released-By: PERLANCAR; Urgency: medium

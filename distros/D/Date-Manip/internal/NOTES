@@ -96,9 +96,9 @@ so that I am explicitly notified of every change to the zoneinfo data
 which could impact Date::Manip.  Any output reflects potential changes
 so every entry should be checked to ensure that it acceptable. Then,
 the output needs to be added to the appropriate data.* file, replacing
-any previous value for the entry.  It is especially important that the first
-line in each entry should remain unchanged unless there is good reason
-to change it. The order of remaining lines may change to some extent.
+any previous value for the entry.  It is especially important that the entries
+for 'important' values remain unchanged unless there is good reason
+to change it.
 
 If the '-o' option produces any output, the entries need to be verified and
 added to the data.offset.pl file.

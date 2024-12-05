@@ -1,5 +1,40 @@
 Revision history for Perl extension Crypt-DSA
 
+1.19 -- Wed Dec 04 10:49:10 AST 2024
+
+    [Changes since 1.17]
+    - Release 1.18-TRIAL as a production release
+    - New Maintainer
+    - This release resolves CVE-2011-3599 
+    - Added a statement to recommend against using DSA
+    - Fixed a few long standing bugs
+    - The build process is moved to Dist::Zilla
+    - Thanks to all the people who contributed to the tickets that were closed
+
+    [Detailed Change List]
+    - 47bda33 Increment Repo Version
+    - ffd39e8 (tag: 1.18) Update Changes for a Release
+
+    [Changes since 1.17]
+    - New Maintainer
+    - This release resolves CVE-2011-3599 
+    - Added a statement to recommend against using DSA
+    - Fixed a few long standing bugs
+    - The build process is moved to Dist::Zilla
+    - Thanks to all the people who contributed to the tickets that were closed
+
+    [Detailed Change List]
+    - 3411005 Add a SECURITY statement about DSA
+    - 1f5df72 Fixes RT#71342: Patch to use Digest::SHA
+    - 06f420d Fix missed version numbers
+    - 1946ead Remove old MANIFEST and META.yml from repo
+    - 6c813c7 Fixes #19477: Crypt::DSA::Key -write comment wrong for public key
+    - c28a8a3 Fix some of the Dependencies in dist.ini
+    - fe15637 Fixed RT#71421: Systems without /dev/random may leak secret key
+    - cf81bfc Fixes RT #156495 for Crypt-DSA t/04-pem.t
+    - 24ac55b Convert build process to Dist::Zilla
+    - b680374 (tag: 1.17) Import Crypt::DSA-1.17 from CPAN release
+
 1.17 2011.06.16
 	- Upgrade to Module::Install 1.01
 	- Added support for OpenSSL 1.0.0 dsaparam format change.

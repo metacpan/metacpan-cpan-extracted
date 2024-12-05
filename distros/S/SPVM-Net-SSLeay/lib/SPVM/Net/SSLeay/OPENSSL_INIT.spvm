@@ -10,7 +10,7 @@ class Net::SSLeay::OPENSSL_INIT {
   
   native static method set_config_filename : int ($init : Net::SSLeay::OPENSSL_INIT_SETTINGS, $filename : string);
   
-  native static method set_config_file_flags : int ($init : Net::SSLeay::OPENSSL_INIT_SETTINGS, $flags : long);
+  native static method set_config_file_flags : void ($init : Net::SSLeay::OPENSSL_INIT_SETTINGS, $flags : long);
   
   native static method set_config_appname : int ($init : Net::SSLeay::OPENSSL_INIT_SETTINGS, $name : string);
   

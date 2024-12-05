@@ -1,6 +1,6 @@
 #!perl
 
-# Note: This script is a CLI for Riap function /App/UniqFiles/uniq_files
+# Note: This script is a CLI for Riap function /File/FindUniq/uniq_files
 # and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
@@ -11,12 +11,12 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-26'; # DATE
+our $DATE = '2024-12-05'; # DATE
 our $DIST = 'App-UniqFiles'; # DIST
-our $VERSION = '0.142'; # VERSION
+our $VERSION = '0.143.1'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
-    url => "/App/UniqFiles/uniq_files",
+    url => "/File/FindUniq/uniq_files",
     program_name => "uniq-files",
     log => 1,
     read_config => 0,
@@ -40,7 +40,7 @@ uniq-files - Report duplicate or unique files, optionally perform action on them
 
 =head1 VERSION
 
-This document describes version 0.142 of uniq-files (from Perl distribution App-UniqFiles), released on 2024-06-26.
+This document describes version 0.143.1 of uniq-files (from Perl distribution App-UniqFiles), released on 2024-12-05.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<uniq-files> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L
 
 B<uniq-files> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<uniq-files> [(B<L<--action|/"--actions-json=s">>=I<str>)+|B<L<--actions-json|/"--actions-json=s">>=I<json>] [B<L<--algorithm|/"--algorithm=s">>=I<str>] [(B<L<--authoritative-dir|/"--authoritative-dirs-json=s">>=I<str>)+|B<L<--authoritative-dirs-json|/"--authoritative-dirs-json=s">>=I<json>|(B<L<-O|/"--authoritative-dirs-json=s">>=I<str>)+] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>] [B<L<--digest-args|/"--digest-args=s">>=I<s>|B<L<--digest-args-json|/"--digest-args=s">>=I<json>|B<L<-A|/"--digest-args=s">>=I<s>] [B<L<--exclude-empty-files|/"--exclude-empty-files, -Z">>|B<L<-Z|/"--exclude-empty-files, -Z">>|B<L<--include-empty-files|/"--exclude-empty-files, -Z">>] [(B<L<--exclude-file-pattern|/"--exclude-file-patterns-json=s">>=I<str>)+|B<L<--exclude-file-patterns-json|/"--exclude-file-patterns-json=s">>=I<json>|(B<L<-X|/"--exclude-file-patterns-json=s">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--group-by-digest|/"--group-by-digest">>|B<L<--no-group-by-digest|/"--group-by-digest">>|B<L<--nogroup-by-digest|/"--group-by-digest">>] [(B<L<--include-file-pattern|/"--include-file-patterns-json=s">>=I<str>)+|B<L<--include-file-patterns-json|/"--include-file-patterns-json=s">>=I<json>|(B<L<-I|/"--include-file-patterns-json=s">>=I<str>)+] [B<L<--max-size|/"--max-size=s">>=I<L<filesize|Sah::Schema::filesize>>] [B<L<--min-size|/"--min-size=s">>=I<L<filesize|Sah::Schema::filesize>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--recurse|/"--recurse, -R">>|B<L<-R|/"--recurse, -R">>|B<L<--no-recurse|/"--recurse, -R">>|B<L<--norecurse|/"--recurse, -R">>] [B<L<--report-duplicate|/"--report-duplicate=s">>=I<int>] [B<L<--report-unique|/"-u">>|B<L<-D|/"-u">>|B<L<-a|/"-u">>|B<L<-d|/"-u">>|B<L<-u|/"-u">>|B<L<--no-report-unique|/"-u">>|B<L<--noreport-unique|/"-u">>] [B<L<--show-count|/"--show-count, --count, -c">>|B<L<-c|/"--show-count, --count, -c">>|B<L<--count|/"--show-count, --count, -c">>|B<L<--no-show-count|/"--show-count, --count, -c">>|B<L<--noshow-count|/"--show-count, --count, -c">>] [B<L<--show-digest|/"--show-digest">>] [B<L<--show-size|/"--show-size">>] -- E<lt>I<L<files|/"--files=s@*">>E<gt> ...
+B<uniq-files> [B<L<--algorithm|/"--algorithm=s">>=I<str>] [(B<L<--authoritative-dir|/"--authoritative-dirs-json=s">>=I<str>)+|B<L<--authoritative-dirs-json|/"--authoritative-dirs-json=s">>=I<json>|(B<L<-O|/"--authoritative-dirs-json=s">>=I<str>)+] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>] [B<L<--digest-args|/"--digest-args=s">>=I<s>|B<L<--digest-args-json|/"--digest-args=s">>=I<json>|B<L<-A|/"--digest-args=s">>=I<s>] [B<L<--exclude-empty-files|/"--exclude-empty-files, -Z">>|B<L<-Z|/"--exclude-empty-files, -Z">>|B<L<--include-empty-files|/"--exclude-empty-files, -Z">>] [(B<L<--exclude-file-pattern|/"--exclude-file-patterns-json=s">>=I<str>)+|B<L<--exclude-file-patterns-json|/"--exclude-file-patterns-json=s">>=I<json>|(B<L<-X|/"--exclude-file-patterns-json=s">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--group-by-digest|/"--group-by-digest">>|B<L<--no-group-by-digest|/"--group-by-digest">>|B<L<--nogroup-by-digest|/"--group-by-digest">>] [(B<L<--include-file-pattern|/"--include-file-patterns-json=s">>=I<str>)+|B<L<--include-file-patterns-json|/"--include-file-patterns-json=s">>=I<json>|(B<L<-I|/"--include-file-patterns-json=s">>=I<str>)+] [B<L<--max-size|/"--max-size=s">>=I<L<filesize|Sah::Schema::filesize>>] [B<L<--min-size|/"--min-size=s">>=I<L<filesize|Sah::Schema::filesize>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--recurse|/"--recurse, -R">>|B<L<-R|/"--recurse, -R">>|B<L<--no-recurse|/"--recurse, -R">>|B<L<--norecurse|/"--recurse, -R">>] [B<L<--report-duplicate|/"--report-duplicate=s">>=I<int>] [B<L<--report-unique|/"-u">>|B<L<-D|/"-u">>|B<L<-a|/"-u">>|B<L<-d|/"-u">>|B<L<-u|/"-u">>|B<L<--no-report-unique|/"-u">>|B<L<--noreport-unique|/"-u">>] [B<L<--show-count|/"--show-count, --count, -c">>|B<L<-c|/"--show-count, --count, -c">>|B<L<--count|/"--show-count, --count, -c">>|B<L<--no-show-count|/"--show-count, --count, -c">>|B<L<--noshow-count|/"--show-count, --count, -c">>] [B<L<--show-digest|/"--show-digest">>] [B<L<--show-size|/"--show-size">>] -- E<lt>I<L<files|/"--files=s@*">>E<gt> ...
 
 
 
@@ -230,15 +230,15 @@ Alias for --report-unique --report-duplicate=1 (report all files).
 
 See C<--no-report-unique>.
 
-=item B<-D>
-
-Alias for --noreport-unique --report-duplicate=3.
-
-See C<--no-report-unique>.
-
 =item B<-d>
 
 Alias for --noreport-unique --report-duplicate=1.
+
+See C<--no-report-unique>.
+
+=item B<-D>
+
+Alias for --noreport-unique --report-duplicate=3.
 
 See C<--no-report-unique>.
 
@@ -253,25 +253,6 @@ See C<--no-report-unique>.
 =head2 Input options
 
 =over
-
-=item B<--action>=I<s@>
-
-What action(s) to perform.
-
-Default value:
-
- ["report"]
-
-The following actions are available. More than one action can be
-
-
-Can be specified multiple times.
-
-=item B<--actions-json>=I<s>
-
-What action(s) to perform (JSON-encoded).
-
-See C<--action>.
 
 =item B<--files-json>=I<s>
 
@@ -500,7 +481,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2017, 2015, 2014, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

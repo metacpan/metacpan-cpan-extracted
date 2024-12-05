@@ -6,9 +6,9 @@ Date::Manip::Offset::off041;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Fri Mar  1 11:05:45 EST 2024
-#    Data version: tzdata2024a
-#    Code version: tzcode2024a
+#    Generated on: Wed Dec  4 14:48:49 EST 2024
+#    Data version: tzdata2024b
+#    Code version: tzcode2024b
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.95';
+$VERSION='6.96';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -32,16 +32,15 @@ $Offset        = '+02:00:00';
 
 %Offset        = (
    0 => [
-      'eet',
+      'europe/athens',
       'asia/beirut',
       'europe/sofia',
       'asia/gaza',
       'asia/hebron',
       'africa/cairo',
       'africa/johannesburg',
-      'africa/maputo',
       'africa/windhoek',
-      'europe/athens',
+      'africa/maputo',
       'asia/jerusalem',
       'europe/vilnius',
       'europe/helsinki',
@@ -68,16 +67,14 @@ $Offset        = '+02:00:00';
       'europe/warsaw',
       ],
    1 => [
-      'cet',
-      'europe/berlin',
       'europe/brussels',
+      'europe/berlin',
       'europe/budapest',
       'europe/malta',
       'europe/prague',
       'europe/rome',
       'europe/vienna',
       'europe/warsaw',
-      'met',
       'europe/madrid',
       'europe/paris',
       'europe/tirane',

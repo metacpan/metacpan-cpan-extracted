@@ -3,10 +3,9 @@ package Crypt::DSA::Signature;
 use strict;
 use Carp qw( croak );
 
+our $VERSION = '1.19'; #VERSION
+#
 use vars qw{$VERSION};
-BEGIN {
-    $VERSION = '1.17';
-}
 
 sub new {
     my $class = shift;

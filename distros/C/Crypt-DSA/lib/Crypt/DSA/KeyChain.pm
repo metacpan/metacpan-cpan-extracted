@@ -2,17 +2,16 @@ package Crypt::DSA::KeyChain;
 
 use strict;
 use Math::BigInt 1.78 try => 'GMP, Pari';
-use Digest::SHA1 qw( sha1 );
+use Digest::SHA qw( sha1 );
 use Carp qw( croak );
 use IPC::Open3;
 use File::Spec;
 use File::Which ();
 use Symbol qw( gensym );
 
+our $VERSION = '1.19'; #VERSION
+
 use vars qw{$VERSION};
-BEGIN {
-    $VERSION = '1.17';
-}
 
 use Crypt::DSA::Key;
 use Crypt::DSA::Util qw( bin2mp bitsize mod_exp makerandom isprime );
@@ -57,7 +56,7 @@ sub generate_params {
                     next;
                 }
                 if (/^\s*((?:[0-9a-f]{2,2}:?)+)\s*$/) {
-                    $parts{$cur_part} .= $1;
+                    $parts{$cur_part} .= $1 if defined $cur_part;
                 }
             }
 

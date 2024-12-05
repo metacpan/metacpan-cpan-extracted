@@ -3,6 +3,21 @@
 
 class Net::SSLeay::EVP_PKEY : pointer {
   
+  use Fn;
+  use Net::SSLeay::EVP_PKEY;
+  
+  # Class Methods
+  native static method new : Net::SSLeay::EVP_PKEY ();
+  
+  private static method new_with_pointer : Net::SSLeay::EVP_PKEY ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::EVP_PKEY;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
+  
   # Instance Methods
   native method DESTROY : void ();
   

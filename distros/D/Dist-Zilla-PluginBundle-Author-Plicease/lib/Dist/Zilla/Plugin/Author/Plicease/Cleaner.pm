@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Cleaner 2.75 {
+package Dist::Zilla::Plugin::Author::Plicease::Cleaner 2.76 {
 
   use 5.020;
   use Moose;
@@ -18,13 +18,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Cleaner 2.75 {
     default => sub { [] },
   );
 
-  has clean_keep => (
-    is      => 'ro',
-    isa     => 'ArrayRef[Str]',
-    default => sub { [] },
-  );
-
-  sub mvp_multivalue_args { qw( clean clean_keep ) }
+  sub mvp_multivalue_args { qw( clean ) }
 
   sub BUILD ($self, $) {
 
@@ -81,11 +75,6 @@ package Dist::Zilla::Plugin::Author::Plicease::Cleaner 2.75 {
 
     sub remove_file_or_dir ($self, $path, $dry)
     {
-      foreach my $keep ($self->clean_keep->@*)
-      {
-        return if $path =~ /$keep/;
-      }
-
       if($dry)
       {
         $self->log("clean: would remove $path");
@@ -128,7 +117,7 @@ Dist::Zilla::Plugin::Author::Plicease::Cleaner - Clean things up
 
 =head1 VERSION
 
-version 2.75
+version 2.76
 
 =head1 SYNOPSIS
 

@@ -9,7 +9,7 @@ use File::Path qw(make_path);
 use File::Basename;
 use Circle::Common qw(load_config build_url_template http_json_post http_json_get);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 our @EXPORT  = qw(
   send_register_verify_code
   register
@@ -157,7 +157,7 @@ Circle::User - the user module for Circle::Chain SDK
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 

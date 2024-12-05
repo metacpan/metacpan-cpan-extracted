@@ -5,8 +5,6 @@ class TestCase::Net::SSLeay {
   use Net::SSLeay::SSL_METHOD;
   use Net::SSLeay::Constant as SSL;
   use Net::SSLeay::ERR;
-  use Net::SSLeay::BIO;
-  use Net::SSLeay::PEM;
   use StringBuffer;
   use Mozilla::CA;
   use Sys::Signal::Constant as SIGNAL;
@@ -23,6 +21,22 @@ class TestCase::Net::SSLeay {
   use Net::SSLeay::ASN1_OCTET_STRING;
   use Sys::Time::Tm;
   use Net::SSLeay::ASN1_TIME;
+  use Net::SSLeay::OBJ;
+  use Net::SSLeay::BIO;
+  use FindBin;
+  use Net::SSLeay::PEM;
+  use Net::SSLeay::EVP_MD;
+  use Net::SSLeay::EVP;
+  use Net::SSLeay::OPENSSL_INIT;
+  use Net::SSLeay::OPENSSL_INIT_SETTINGS;
+  use Net::SSLeay::PKCS12;
+  use Net::SSLeay::DER;
+  
+  our $FILE_DIR : string;
+  
+  INIT {
+    $FILE_DIR = FindBin->Bin . "/file";
+  }
   
   static method test : int () {
     
@@ -242,15 +256,15 @@ class TestCase::Net::SSLeay {
   
   static method ASN1_ENUMERATED : int () {
     
-    my $object = Net::SSLeay::ASN1_ENUMERATED->new;
+    my $asn1_object = Net::SSLeay::ASN1_ENUMERATED->new;
     
-    unless ($object is_type Net::SSLeay::ASN1_ENUMERATED) {
+    unless ($asn1_object is_type Net::SSLeay::ASN1_ENUMERATED) {
       return 0;
     }
     
-    $object->set_int64(Fn->LONG_MIN);
+    $asn1_object->set_int64(Fn->LONG_MIN);
     
-    unless ($object->get_int64 == Fn->LONG_MIN) {
+    unless ($asn1_object->get_int64 == Fn->LONG_MIN) {
       return 0;
     }
     
@@ -259,15 +273,15 @@ class TestCase::Net::SSLeay {
   
   static method ASN1_INTEGER : int () {
     
-    my $object = Net::SSLeay::ASN1_INTEGER->new;
+    my $asn1_object = Net::SSLeay::ASN1_INTEGER->new;
     
-    unless ($object is_type Net::SSLeay::ASN1_INTEGER) {
+    unless ($asn1_object is_type Net::SSLeay::ASN1_INTEGER) {
       return 0;
     }
     
-    $object->set_int64(Fn->LONG_MIN);
+    $asn1_object->set_int64(Fn->LONG_MIN);
     
-    unless ($object->get_int64 == Fn->LONG_MIN) {
+    unless ($asn1_object->get_int64 == Fn->LONG_MIN) {
       return 0;
     }
     
@@ -276,9 +290,9 @@ class TestCase::Net::SSLeay {
   
   static method ASN1_OBJECT : int () {
     
-    my $object = Net::SSLeay::ASN1_OBJECT->new;
+    my $asn1_object = Net::SSLeay::ASN1_OBJECT->new;
     
-    unless ($object is_type Net::SSLeay::ASN1_OBJECT) {
+    unless ($asn1_object is_type Net::SSLeay::ASN1_OBJECT) {
       return 0;
     }
     
@@ -287,19 +301,19 @@ class TestCase::Net::SSLeay {
   
   static method ASN1_STRING : int () {
     
-    my $object = Net::SSLeay::ASN1_STRING->new;
+    my $asn1_object = Net::SSLeay::ASN1_STRING->new;
     
-    unless ($object is_type Net::SSLeay::ASN1_STRING) {
+    unless ($asn1_object is_type Net::SSLeay::ASN1_STRING) {
       return 0;
     }
     
-    $object->set("abc");
+    $asn1_object->set("abc");
     
-    unless ($object->get0_data eq "abc") {
+    unless ($asn1_object->get0_data eq "abc") {
       return 0;
     }
     
-    unless ($object->length == 3) {
+    unless ($asn1_object->length == 3) {
       return 0;
     }
     
@@ -308,19 +322,19 @@ class TestCase::Net::SSLeay {
   
   static method ASN1_OCTET_STRING : int () {
     
-    my $object = Net::SSLeay::ASN1_OCTET_STRING->new;
+    my $asn1_object = Net::SSLeay::ASN1_OCTET_STRING->new;
     
-    unless ($object is_type Net::SSLeay::ASN1_OCTET_STRING) {
+    unless ($asn1_object is_type Net::SSLeay::ASN1_OCTET_STRING) {
       return 0;
     }
     
-    $object->set("abc");
+    $asn1_object->set("abc");
     
-    unless ($object->get0_data eq "abc") {
+    unless ($asn1_object->get0_data eq "abc") {
       return 0;
     }
     
-    unless ($object->length == 3) {
+    unless ($asn1_object->length == 3) {
       return 0;
     }
     
@@ -329,17 +343,17 @@ class TestCase::Net::SSLeay {
   
   static method ASN1_TIME : int () {
     
-    my $object = Net::SSLeay::ASN1_TIME->new;
+    my $asn1_object = Net::SSLeay::ASN1_TIME->new;
     
-    unless ($object is_type Net::SSLeay::ASN1_TIME) {
+    unless ($asn1_object is_type Net::SSLeay::ASN1_TIME) {
       return 0;
     }
     
-    $object->set(1);
+    $asn1_object->set(1);
     
     my $tm = Sys::Time::Tm->new;
     
-    $object->to_tm($tm);
+    $asn1_object->to_tm($tm);
     
     unless ($tm->tm_year == 70) {
       return 0;
@@ -367,7 +381,7 @@ class TestCase::Net::SSLeay {
     
     my $bio = Net::SSLeay::BIO->new;
     
-    $object->print($bio);
+    $asn1_object->print($bio);
     
     my $buffer = (mutable string)new_string_len 256;
     my $read_length = $bio->read($buffer);
@@ -386,17 +400,17 @@ class TestCase::Net::SSLeay {
   
   static method ASN1_GENERALIZEDTIME : int () {
     
-    my $object = Net::SSLeay::ASN1_GENERALIZEDTIME->new;
+    my $asn1_object = Net::SSLeay::ASN1_GENERALIZEDTIME->new;
     
-    unless ($object is_type Net::SSLeay::ASN1_GENERALIZEDTIME) {
+    unless ($asn1_object is_type Net::SSLeay::ASN1_GENERALIZEDTIME) {
       return 0;
     }
     
-    $object->set(1);
+    $asn1_object->set(1);
     
     my $bio = Net::SSLeay::BIO->new;
     
-    $object->print($bio);
+    $asn1_object->print($bio);
     
     my $buffer = (mutable string)new_string_len 256;
     my $read_length = $bio->read($buffer);
@@ -408,6 +422,428 @@ class TestCase::Net::SSLeay {
     
     unless (Fn->contains($buffer, "00:00:01")) {
       return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method OBJ : int () {
+    
+    {
+      my $nid = Net::SSLeay::OBJ->txt2nid("commonName");
+      
+      unless ($nid == SSL->NID_commonName) {
+        return 0;
+      }
+    }
+    
+    {
+      my $obj = Net::SSLeay::OBJ->nid2obj(SSL->NID_commonName);
+      
+      unless ($obj) {
+        return 0;
+      }
+      
+      my $nid = Net::SSLeay::OBJ->obj2nid($obj);
+      
+      unless ($nid == SSL->NID_commonName) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method SSL_METHOD : int () {
+    
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->SSLv23_method;
+      unless ($ssl_method is_type Net::SSLeay::SSL_METHOD) {
+        return 0;
+      }
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+    }
+    
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->SSLv23_client_method;
+      unless ($ssl_method is_type Net::SSLeay::SSL_METHOD) {
+        return 0;
+      }
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+    }
+    
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->SSLv23_server_method;
+      unless ($ssl_method is_type Net::SSLeay::SSL_METHOD) {
+        return 0;
+      }
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+    }
+    
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      unless ($ssl_method is_type Net::SSLeay::SSL_METHOD) {
+        return 0;
+      }
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+    }
+    
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_client_method;
+      unless ($ssl_method is_type Net::SSLeay::SSL_METHOD) {
+        return 0;
+      }
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+    }
+    
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_server_method;
+      unless ($ssl_method is_type Net::SSLeay::SSL_METHOD) {
+        return 0;
+      }
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+    }
+    
+    return 1;
+  }
+  
+  static method BIO : int () {
+    
+    {
+      my $bio = Net::SSLeay::BIO->new;
+      
+      unless ($bio is_type Net::SSLeay::BIO) {
+        return 0;
+      }
+      
+      $bio->write("abc");
+      
+      my $buffer = (mutable string)new_string_len 3;
+      my $read_length = $bio->read($buffer);
+      
+      unless ($read_length == 3) {
+        return 0;
+      }
+      
+      unless ($buffer eq "abc") {
+        return 0;
+      }
+    }
+    
+    {
+      my $bio = Net::SSLeay::BIO->new;
+      
+      unless ($bio is_type Net::SSLeay::BIO) {
+        return 0;
+      }
+      
+      $bio->write("abc", 2);
+      
+      my $buffer = (mutable string)new_string_len 3;
+      my $read_length = $bio->read($buffer, 2);
+      
+      unless ($read_length == 2) {
+        return 0;
+      }
+      
+      unless ($buffer eq "ab\0") {
+        return 0;
+      }
+    }
+    
+    {
+      my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.cert.pem", "r");
+      
+      unless ($bio is_type Net::SSLeay::BIO) {
+        return 0;
+      }
+      
+      my $buffer = (mutable string)new_string_len 3;
+      my $read_length = $bio->read($buffer, 3);
+      
+      unless ($read_length == 3) {
+        return 0;
+      }
+      
+      unless ($buffer eq "---") {
+        return 0;
+      }
+    }
+    return 1;
+  }
+  
+  static method DH : int () {
+    
+    {
+      my $dh = Net::SSLeay::DH->new;
+      
+      unless ($dh is_type Net::SSLeay::DH) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method PEM : int () {
+    
+    {
+      
+      my $dh_pem = <<'EOS';
+-----BEGIN DH PARAMETERS-----
+MIIBCAKCAQEAr8wskArj5+1VCVsnWt/RUR7tXkHJ7mGW7XxrLSPOaFyKyWf8lZht
+iSY2Lc4oa4Zw8wibGQ3faeQu/s8fvPq/aqTxYmyHPKCMoze77QJHtrYtJAosB9SY
+CN7s5Hexxb5/vQ4qlQuOkVrZDiZO9GC4KaH9mJYnCoAsXDhDft6JT0oRVSgtZQnU
+gWFKShIm+JVjN94kGs0TcBEesPTK2g8XVHK9H8AtSUb9BwW2qD/T5RmgNABysApO
+Ps2vlkxjAHjJcqc3O+OiImKik/X2rtBTZjpKmzN3WWTB0RJZCOWaLlDO81D01o1E
+aZecz3Np9KIYey900f+X7zC2bJxEHp95ywIBAg==
+-----END DH PARAMETERS-----
+EOS
+      
+      my $bio = Net::SSLeay::BIO->new;
+      
+      $bio->write($dh_pem);
+      
+      my $dh = Net::SSLeay::PEM->read_bio_DHparams($bio);
+      
+      unless ($dh is_type Net::SSLeay::DH) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.cert.pem", "r");
+      
+      my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
+      
+      unless ($x509 is_type Net::SSLeay::X509) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/intermediate-ca.crl.pem", "r");
+      
+      my $x509_crl = Net::SSLeay::PEM->read_bio_X509_CRL($bio);
+      
+      unless ($x509_crl is_type Net::SSLeay::X509_CRL) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/intermediate-ca.key.pem", "r");
+      
+      my $evp_pkey = Net::SSLeay::PEM->read_bio_PrivateKey($bio);
+      
+      unless ($evp_pkey is_type Net::SSLeay::EVP_PKEY) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method EVP : int () {
+    
+    {
+      my $md = Net::SSLeay::EVP->sha1;
+      
+      unless ($md is_type Net::SSLeay::EVP_MD) {
+        return 0;
+      }
+    }
+    
+    {
+      my $md = Net::SSLeay::EVP->sha256;
+      
+      unless ($md is_type Net::SSLeay::EVP_MD) {
+        return 0;
+      }
+    }
+    
+    {
+      my $md = Net::SSLeay::EVP->sha512;
+      
+      unless ($md is_type Net::SSLeay::EVP_MD) {
+        return 0;
+      }
+    }
+    
+    {
+      my $md = Net::SSLeay::EVP->get_digestbyname("sha512");
+      
+      unless ($md is_type Net::SSLeay::EVP_MD) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method OPENSSL_INIT : int () {
+    
+    {
+      my $init_setting = Net::SSLeay::OPENSSL_INIT->new;
+      
+      unless ($init_setting is_type Net::SSLeay::OPENSSL_INIT_SETTINGS) {
+        return 0;
+      }
+      
+      {
+        eval  {Net::SSLeay::OPENSSL_INIT->set_config_filename(undef, undef); }
+        
+        if ($@ && eval_error_id isa_error Error::NotSupported) {
+          warn "[Test Skip]Skip tests for Net::SSLeay::OPENSSL_INIT#set_config_filename method.";
+        }
+        else {
+          Net::SSLeay::OPENSSL_INIT->set_config_filename($init_setting, "foo.config");
+        }
+      }
+      
+      {
+        eval  {Net::SSLeay::OPENSSL_INIT->set_config_file_flags(undef, 0); }
+        
+        if ($@ && eval_error_id isa_error Error::NotSupported) {
+          warn "[Test Skip]Skip tests for Net::SSLeay::OPENSSL_INIT#set_config_file_flags method.";
+        }
+        else {
+          Net::SSLeay::OPENSSL_INIT->set_config_file_flags($init_setting, 0);
+        }
+      }
+      
+      {
+        eval  {Net::SSLeay::OPENSSL_INIT->set_config_appname(undef, undef); }
+        
+        if ($@ && eval_error_id isa_error Error::NotSupported) {
+          warn "[Test Skip]Skip tests for Net::SSLeay::OPENSSL_INIT#set_config_appname method.";
+        }
+        else {
+          Net::SSLeay::OPENSSL_INIT->set_config_appname($init_setting, "foo");
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method OPENSSL : int () {
+    
+    Net::SSLeay::OPENSSL->add_ssl_algorithms;
+    
+    Net::SSLeay::OPENSSL->add_all_algorithms;
+    
+    Net::SSLeay::OPENSSL->init_crypto(SSL->OPENSSL_INIT_NO_ADD_ALL_CIPHERS | SSL->OPENSSL_INIT_NO_ADD_ALL_DIGESTS, undef);
+                    
+    my $init_setting = Net::SSLeay::OPENSSL_INIT->new;
+    
+    Net::SSLeay::OPENSSL->init_ssl(0, $init_setting);
+    
+    return 1;
+  }
+  
+  static method PKCS12 : int () {
+    
+    {
+      my $pkcs12 = Net::SSLeay::PKCS12->new;
+      
+      unless ($pkcs12 is_type Net::SSLeay::PKCS12) {
+        return 0;
+      }
+    }
+    
+    {
+      my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.enc.p12", "rb");
+      
+      my $pkcs12 = Net::SSLeay::DER->d2i_PKCS12_bio($bio);
+      
+      unless ($pkcs12 is_type Net::SSLeay::PKCS12) {
+        return 0;
+      }
+      
+      my $pass = (string)"test";
+      my $pkey_ref = new Net::SSLeay::EVP_PKEY[1];
+      my $cert_ref = new Net::SSLeay::X509[1];
+      
+      $pkcs12->parse($pass, $pkey_ref, $cert_ref);
+      
+      unless ($pkey_ref->[0] isa Net::SSLeay::EVP_PKEY) {
+        return 0;
+      }
+      
+      my $subject_name = $cert_ref->[0]->get_subject_name;
+      
+      unless (Fn->contains($subject_name->oneline, "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example")) {
+        return 0;
+      }
+    }
+    
+    {
+      my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.enc.p12", "rb");
+      
+      my $pkcs12 = Net::SSLeay::DER->d2i_PKCS12_bio($bio);
+      
+      unless ($pkcs12 is_type Net::SSLeay::PKCS12) {
+        return 0;
+      }
+      
+      my $pass = (string)"test";
+      my $pkey_ref = new Net::SSLeay::EVP_PKEY[1];
+      my $cert_ref = new Net::SSLeay::X509[1];
+      my $csa_ref = new Net::SSLeay::X509[][1];
+      
+      $pkcs12->parse($pass, $pkey_ref, $cert_ref, $csa_ref);
+      
+      unless ($pkey_ref->[0] isa Net::SSLeay::EVP_PKEY) {
+        return 0;
+      }
+      
+      unless (Fn->contains($cert_ref->[0]->get_subject_name->oneline, "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example")) {
+        return 0;
+      }
+      
+      unless (@{$csa_ref->[0]} == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.certchain.enc.p12", "rb");
+      
+      my $pkcs12 = Net::SSLeay::DER->d2i_PKCS12_bio($bio);
+      
+      unless ($pkcs12 is_type Net::SSLeay::PKCS12) {
+        return 0;
+      }
+      
+      my $pass = (string)"test";
+      my $pkey_ref = new Net::SSLeay::EVP_PKEY[1];
+      my $cert_ref = new Net::SSLeay::X509[1];
+      my $csa_ref = new Net::SSLeay::X509[][1];
+      
+      $pkcs12->parse($pass, $pkey_ref, $cert_ref, $csa_ref);
+      
+      unless ($pkey_ref->[0] isa Net::SSLeay::EVP_PKEY) {
+        return 0;
+      }
+      
+      unless (Fn->contains($cert_ref->[0]->get_subject_name->oneline, "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example")) {
+        return 0;
+      }
+      
+      unless (@{$csa_ref->[0]} == 2) {
+        return 0;
+      }
     }
     
     return 1;
