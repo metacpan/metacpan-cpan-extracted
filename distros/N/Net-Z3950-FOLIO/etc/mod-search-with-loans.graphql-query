@@ -1,0 +1,85 @@
+query($cql: String, $offset: Int, $limit: Int) {
+  search_instances(query: $cql, offset: $offset, limit: $limit) {
+    totalRecords
+    instances {
+      id
+      hrid title # Not used by the Z-server but useful for debugging
+      holdingsRecords2 {
+        temporaryLocation {
+          institution { name }
+          library { name }
+          name
+        }
+        permanentLocation {
+          institution { name }
+          library { name }
+          name
+        }
+        callNumberPrefix
+        callNumber
+        callNumberSuffix
+        shelvingTitle
+        copyNumber
+        notes {
+          holdingsNoteType { name }
+          note
+        }
+        holdingsStatements {
+          statement
+          note
+          staffNote
+        }
+        holdingsStatementsForIndexes {
+          statement
+          note
+          staffNote
+        }
+        holdingsStatementsForSupplements {
+          statement
+          note
+          staffNote
+        }
+        bareHoldingsItems {
+          discoverySuppress
+          status { name }
+          loans {
+            dueDate
+            borrower { barcode firstName lastName }
+            status { name }
+          }
+          materialType { name }
+          barcode
+          enumeration
+          chronology
+          temporaryLocation {
+            name
+            institution { name }
+            campus { name }
+            library { name }
+            primaryServicePointObject { name }
+          }
+          permanentLocation {
+            name
+            institution { name }
+            campus { name }
+            library { name }
+            primaryServicePointObject { name }
+          }
+          effectiveCallNumberComponents {
+            callNumber
+            prefix
+            suffix
+          }
+          volume
+          yearCaption
+          accessionNumber
+          copyNumber
+          descriptionOfPieces
+          hrid
+          id
+          itemIdentifier
+        }
+      }
+    }
+  }
+}

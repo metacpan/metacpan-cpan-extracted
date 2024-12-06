@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Template-EmbeddedPerl
 
+0.001011 05 December 2024
+          - fixed issue with if/else/elsif not working properly
+
 0.001010 27 November 2024
           - Experimental single line variable interpolation feature
 

@@ -5,10 +5,13 @@ class Net::SSLeay::X509_CRL : pointer {
   allow Net::SSLeay::PEM;
   
   use Net::SSLeay::Error;
+  use Net::SSLeay::X509_REVOKED;
   
   use Fn;
   
   # Class Methods
+  native static method new : Net::SSLeay::X509_CRL ();
+  
   private static method new_with_pointer : Net::SSLeay::X509_CRL ($pointer : Address, $options : object[] = undef) {
     
     my $self = new Net::SSLeay::X509_CRL;
@@ -19,6 +22,8 @@ class Net::SSLeay::X509_CRL : pointer {
   }
   
   # Instance Methods
+  native method get_REVOKED : Net::SSLeay::X509_REVOKED[] ();
+  
   native method DESTROY : void ();
   
 }

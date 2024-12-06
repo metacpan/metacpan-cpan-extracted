@@ -5,6 +5,7 @@ use Scalar::Util;
 use Module::Runtime;
 use Valiant::Naming;
 use Carp;
+use Valiant::HTML::FormBuilder::DefaultModel;
 
 extends 'Valiant::HTML::Util::FormTags';
 

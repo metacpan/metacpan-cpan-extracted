@@ -1,3 +1,30 @@
+0.023 2024-12-06
+  [New Features]
+    * Add Net::SSLeay::X509_VERIFY_PARAM#clear_flags method.
+    * Add Net::SSLeay::X509_VERIFY_PARAM#get_flags method.
+    * Add Net::SSLeay::X509_VERIFY_PARAM#get_hostflags method.
+    * Add Net::SSLeay::X509_VERIFY_PARAM#set1_email method.
+    * Add Net::SSLeay::X509_VERIFY_PARAM#set1_ip_asc method.
+    * Add Net::SSLeay::X509_VERIFY_PARAM#new method.
+    * Add Net::SSLeay::X509_NAME_ENTRY#new method.
+    * Add Net::SSLeay::X509_NAME#new method.
+    * Add Net::SSLeay::X509_NAME#add_entry_by_NID method.
+    * Add Net::SSLeay::X509_NAME#delete_entry method.
+    * Add Net::SSLeay::X509_CRL#new method.
+    * Add Net::SSLeay::X509_REVOKED class.
+    * Add Net::SSLeay::X509_REVOKED#get_REVOKED method.
+  [Changes]
+    * Change the default value of $namele in Net::SSLeay::X509_VERIFY_PARAM#set1_host method.
+      [Before]
+      method set1_host : int ($name : string, $namelen : int = 0);
+      
+      [After]
+      method set1_host : int ($name : string, $namelen : int = -1);
+  [Incompatibe Changes]
+    * Remove Net::SSLeay::X509#get_ext_by_OBJ method.
+    * Remove Net::SSLeay::X509_NAME#get_index_by_OBJ method.
+    * Remove Net::SSLeay::X509_NAME#get_text_by_NID method.
+    * Net::SSLeay::X509_NAME#get_entry method returns copied value.
 0.022 2024-12-04
   [New Features]
     * Add Net::SSLeay::DH#new method.

@@ -10,6 +10,15 @@ class Net::SSLeay::ASN1_TIME : pointer {
   # Class Methods
   native static method new : Net::SSLeay::ASN1_TIME ();
   
+  private static method new_with_pointer : Net::SSLeay::ASN1_TIME ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::ASN1_TIME;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
+  
   # Instance Methods
   native method set : void ($t : long);
   

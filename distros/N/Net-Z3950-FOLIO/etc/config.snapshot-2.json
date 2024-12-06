@@ -1,0 +1,10 @@
+{
+  "okapi": {
+    "url": "https://folio-snapshot-2-okapi.dev.folio.org",
+    "tenant": "diku"
+  },
+  "login": {
+    "username": "${OKAPI_USER-diku_admin}",
+    "password": "${OKAPI_SNAPSHOT_PASSWORD}"
+  }
+}

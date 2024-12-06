@@ -71,8 +71,6 @@ class Net::SSLeay::X509 : pointer {
   
   native method get_ext_by_NID : int ($nid : int, $lastpos : int);
   
-  native method get_ext_by_OBJ : int ($obj : Net::SSLeay::ASN1_OBJECT, $lastpos : int);
-  
   native method get_ext_count : int ();
   
   native method get_ext : Net::SSLeay::X509_EXTENSION ($loc : int);

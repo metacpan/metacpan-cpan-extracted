@@ -5,6 +5,7 @@ use Scalar::Util;
 use Module::Runtime;
 use Valiant::Naming;
 use Carp;
+use Valiant::HTML::FormBuilder::DefaultModel;
 
 extends 'Valiant::HTML::Util::FormTags';
 
@@ -127,8 +128,9 @@ sub form_for {
   $options->{model} = $model;
   $options->{scope} = $object_name;
   $options->{skip_default_ids} = 0;
-  $options->{allow_method_names_outside_object} = exists $options->{allow_method_names_outside_object} ?
-  $options->{allow_method_names_outside_object} : 0;
+  $options->{allow_method_names_outside_object} = exists $options->{allow_method_names_outside_object}
+    ? $options->{allow_method_names_outside_object}
+    : 0;
 
   return $self->form_with($options, $content_block_coderef);
 }
@@ -170,8 +172,9 @@ sub form_with {
     $options->{skip_default_ids} = 0;
     $options->{controller} ||= $self->controller if $self->has_controller;
 
-    $options->{allow_method_names_outside_object} = exists $options->{allow_method_names_outside_object} ?
-    $options->{allow_method_names_outside_object} : 1;
+    $options->{allow_method_names_outside_object} = exists $options->{allow_method_names_outside_object}
+      ? $options->{allow_method_names_outside_object}
+      : 1;
 
     my ($model, $model_path, $url);
     if($options->{model}) {
@@ -191,6 +194,7 @@ sub form_with {
 
   my $html_options = $self->_html_options_for_form_with($url, $model, $options);
   $options->{html}{csrf_token} = $html_options->{csrf_token} if exists $html_options->{csrf_token};
+ 
   my $builder = $self->_instantiate_builder($scope, $model, $options);
 
   if($html_options->{data}{remote}) {

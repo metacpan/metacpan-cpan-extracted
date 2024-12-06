@@ -9,6 +9,8 @@ class Net::SSLeay::X509_VERIFY_PARAM : pointer {
   use Fn;
   
   # Class Methods
+  native static method new : Net::SSLeay::X509_VERIFY_PARAM ();
+  
   private static method new_with_pointer : Net::SSLeay::X509_VERIFY_PARAM ($pointer : Address, $options : object[] = undef) {
     
     my $self = new Net::SSLeay::X509_VERIFY_PARAM;
@@ -19,11 +21,21 @@ class Net::SSLeay::X509_VERIFY_PARAM : pointer {
   }
   
   # Instance Methods
-  native method set_hostflags : void ($flags : int);
-  
-  native method set1_host : int ($name : string, $namelen : int = 0);
+  native method get_flags : long ();
   
   native method set_flags : int ($flags : long);
+  
+  native method clear_flags : int ($flags : long);
+  
+  native method get_hostflags : int ();
+  
+  native method set_hostflags : void ($flags : int);
+  
+  native method set1_host : int ($name : string, $namelen : int = -1);
+  
+  native method set1_ip_asc : int ($ipasc : string);
+                                 
+  native method set1_email : int ($email : string, $emaillen : int = -1);
   
   native method DESTROY : void ();
 }

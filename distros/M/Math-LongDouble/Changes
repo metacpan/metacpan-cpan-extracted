@@ -1,6 +1,12 @@
+ 0.26
+  - Set allowable error for test 17 of t/log_exp.t to a reasonable value (2 ** -57).
+    See http://www.cpantesters.org/cpan/report/3119fdfe-e9c5-11ee-83a6-c4cdc49bac1d
+  - Workaround the possibility that [-Wimplicit-function-declaration] warnings are fatal.
+    Fixes https://rt.cpan.org/Ticket/Display.html?id=157670. Thanks to Michael Peters.
+
  0.25
   - Silence pointless warnings.
-  - Fix https://rt.cpan.org/Ticket/Display.html?id=151230. Thanks, Peter Acklam.
+  - Fix https://rt.cpan.org/Ticket/Display.html?id=151230. Thanks to Peter Acklam.
 
  0.24
   - Simplify overloading of '++' and '--'.

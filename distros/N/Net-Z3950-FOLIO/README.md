@@ -1,6 +1,6 @@
 # z2folio - the Z39.50-to-FOLIO gateway
 
-Copyright (C) 2018-2021 The Open Library Foundation
+Copyright (C) 2018-2024 The Open Library Foundation
 
 This software is distributed under the terms of the Apache License,
 Version 2.0. See the file "[LICENSE](LICENSE)" for more information.
@@ -13,6 +13,7 @@ Version 2.0. See the file "[LICENSE](LICENSE)" for more information.
 * [Building and running from Docker](#building-and-running-from-docker)
 * [Authentication](#authentication)
 * [Access via SRU](#access-via-sru)
+* [Obtaining information about loans](#obtaining-information-about-loans)
 * [Troubleshooting](#troubleshooting)
 * [Additional information](#additional-information)
     * [Other documentation](#other-documentation)
@@ -68,7 +69,7 @@ If you don't want to install, you can run directly from the development checkout
     Z> format opac
     Z> show 1
 
-Note: if running in Kubernetes, it may be useful to turn of session logging by adding the `-v-session` parameter to the arguments. For example, `perl -I lib bin/z2folio -c etc/config -- -f etc/yazgfs.xml -v-session`. Session logs can be quite noisy on Kubernetes due to tcp healthchecks.
+Note: if running in Kubernetes, it may be useful to turn off session logging by adding the `-v-session` parameter to the arguments. For example, `perl -I lib bin/z2folio -c etc/config -- -f etc/yazgfs.xml -v-session`. Session logs can be quite noisy on Kubernetes due to tcp healthchecks.
 
 Docker containers get published as [folioorg/mod-z3950](https://hub.docker.com/r/folioorg/mod-z3950/tags?page=1&ordering=last_updated) and [folioci/mod-z3950](https://hub.docker.com/r/folioci/mod-z3950/tags?page=1&ordering=last_updated).
 
@@ -81,6 +82,16 @@ Whichever approach to running the server you prefer, the [default configuration 
 Thanks to the magic of the protocol-polyglot [YAZ GFS](https://software.indexdata.com/yaz/doc/server.html), the FOLIO Z39.50 server also serves the SRU (REST-like) and SRW (SOAP-based) protocols. For example, if running the server on your local host, you can use the following to obtain an XML-formatted OPAC record containing both bibliographic metadata in MARCXML format and holdings-and-item information such as might be used by an OPAC. Replace placeholder <dbname> with the real database name (or tenant id).
 
     http://localhost:9997/<dbname>?version=1.1&operation=searchRetrieve&query=title=a&maximumRecords=1&recordSchema=opac
+
+## Obtaining information about loans
+
+The Z39.50 server obtains information about the holdings and items associated with each instance record from FOLIO using `mod-graphql`, which behind the scenes performs searches for each holding record associated with the instance, and for each item in each of those holdings -- returning the aggregated tree-shaped record. This process can be expensive on the back-end.
+
+In order to obtain information about loans -- specifically, the availability date of those items that are on loan -- it is unfortunately necessary to have `mod-graphql` run yet another search for each item in the response, fetching information about that item's open loans. For records with many items, this is likely to nearly double the load on the back-end system, and the response time when fetching the record.
+
+Rather than impose this burden on all users of the FOLIO Z39.50 service, the default configuration does not request information about loans. However, as well as the regular GraphQL query `mod-search.graphql-query`, which is used by the default Z39.50 server configuration, the supplied set of configuration files also includes `etc/mod-search-with-loans.graphql-query`, which is identical except that it _does_ request the loan information. Clients that need availability dates should use this extended version of the GraphQL query. The easiest way to do this is to append the string `|withLoans` to the end of the Z39.50 database name: for example, instead of the database name `books`, use `books|withLoans`. This version of the database will include the `availabilityDate` field in its OPAC records.
+
+Fetching information about loans requires the FOLIO installation to provide version 1.4 or better of the `graphql` interface, most likely though `mod-graphql` version 1.13.1 or higher.
 
 ## Troubleshooting
 

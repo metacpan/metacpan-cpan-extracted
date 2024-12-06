@@ -145,7 +145,9 @@ sub insert {
   }
 
   debug 2, "About to run validations for @{[$self]} on insert";
-  $self->validate(%args) if $self->auto_validation;
+  if($self->auto_validation) {
+    $self->validate(%args) unless $self->{__valiant_donot_insert} || $self->{__valiant_add};
+  }
 
   if($self->errors->size) {
     debug 2, "Skipping insert for @{[$self]} because its invalid";
@@ -154,7 +156,7 @@ sub insert {
     debug 2, "proceeding to insert  @{[$self]} because its valid";
   }
 
-  if($self->{__valiant_donot_insert}) {
+  if($self->{__valiant_donot_insert} || $self->{__valiant_add}) {
     debug 2, "Skipping insert for @{[$self]} because its probably and _add";
     return $self;
   }
@@ -254,8 +256,9 @@ sub update {
   }
 
   debug 2, "About to run validations for @{[$self]} on update";
-  $self->validate(%validate_args) if $self->auto_validation;
-
+  if($self->auto_validation) {
+    $self->validate(%validate_args) unless $self->{__valiant_donot_insert} || $self->{__valiant_add};
+  }
 
   if($self->has_errors) {
     debug 2, "Validation errors found, skipping mutate for @{[ ref $self ]} ";
@@ -420,7 +423,10 @@ sub build_related {
   my ($self, $related, $attrs) = @_;
   debug 2, "Building related entity '$related' for @{[ ref $self ]}";
 
-  my $related_obj = $attrs ? $self->find_or_new_related($related, $attrs) : $self->new_related($related, +{});
+  my $related_obj = ($attrs && scalar(%$attrs))
+    ? $self->find_or_new_related($related, $attrs)
+    : $self->new_related($related, +{});
+
   return if $related_obj->in_storage;  #I think we can skip if its found
 
   # TODO do this dance need to go into other places???
@@ -709,6 +715,7 @@ sub set_multi_related_from_params {
     if(blessed $param_row) {
       debug 1, "params are an object";
       $related_model = $param_row;
+      $related_model->{__valiant_add} = 1 if $was_add;
     } elsif( (ref($param_row)||'') eq 'HASH') {
 
       # The first thing to do is to see if we can find a row either in the existing cache
@@ -732,6 +739,7 @@ sub set_multi_related_from_params {
           if($a eq $b) {
             $related_model = $row;
             if($related_model) {
+              $related_model->{__valiant_add} = 1 if $was_add;
               debug 2, "found related model for $related with $key in cache";
               %keys_used_to_find = (%keys_used_to_find, %matching);
               last SEARCH_UNIQUE_KEYS
@@ -776,6 +784,7 @@ sub set_multi_related_from_params {
         #$related_model->errors->add(undef, 'newwww');
         #$related_model->skip_validate;   Need to leave this off for now because doesn't play well with new models
         $related_model->{__valiant_donot_insert} = 1;
+        $related_model->{__valiant_add} = 1 if $was_add;
       }
 
       if($allow_destroy) {

@@ -1,5 +1,18 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002009 2024 December 5
+          - Adding a blank record via _add in DBIC Validate no longer runs 
+            validation on th eempty record
+          - Fixes to issues when you want to use formbuilder on attributes
+            that don't actually exist in the model
+          - New 'form_action_for' method on formbuilder to make it easier to create
+            action button links off the main action
+          - New 'emit_hidden_ids' method on formbuilder when the record ID fields new
+            custom placement in the HTML
+          - 'select' formbuilder method now properly localizes option labels
+          - Default formbuilder model now properly localizes
+          - Docs and test cases fixed as needed for above.
+
 0.002008 2024 November 29
           - Fixed issue where pager builder didn't find the correct view
 

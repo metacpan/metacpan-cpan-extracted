@@ -1,0 +1,26 @@
+0.004   2024-12-06  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Rename --until to --until-time, --bail to
+          --until-fail; add --until-success.
+
+
+0.003   2024-12-06  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] --dry-run now actually perform delays. To skip
+          delaying, use --dry-run-delay.
+
+        - Add --dry-run-delay.
+
+
+0.002   2024-12-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Implement --delay-strategy.
+
+        - Add dry-run mode (--dry-run).
+
+        - [doc] Mention App::AlgorithmBackoffUtils.
+
+
+0.001   2024-12-06  Released-By: PERLANCAR
+
+        - First release, no tests yet.

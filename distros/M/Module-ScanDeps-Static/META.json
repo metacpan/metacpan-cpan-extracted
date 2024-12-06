@@ -52,15 +52,15 @@
    "provides" : {
       "Module::ScanDeps::FindRequires" : {
          "file" : "lib/Module/ScanDeps/FindRequires.pm",
-         "version" : "0"
+         "version" : "v1.7.2"
       },
       "Module::ScanDeps::Static" : {
          "file" : "lib/Module/ScanDeps/Static.pm",
-         "version" : "0"
+         "version" : "v1.7.2"
       },
       "Module::ScanDeps::Static::VERSION" : {
          "file" : "lib/Module/ScanDeps/Static/VERSION.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       }
    },
    "release_status" : "stable",
@@ -70,6 +70,6 @@
          "type" : "git"
       }
    },
-   "version" : "v1.7.1",
+   "version" : "v1.7.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

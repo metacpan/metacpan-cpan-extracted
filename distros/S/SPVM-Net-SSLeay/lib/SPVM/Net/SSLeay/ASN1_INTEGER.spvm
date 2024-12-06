@@ -3,8 +3,19 @@
 
 class Net::SSLeay::ASN1_INTEGER : pointer {
   
+  use Fn;
+  
   # Class Methods
   native static method new : Net::SSLeay::ASN1_INTEGER ();
+  
+  private static method new_with_pointer : Net::SSLeay::ASN1_INTEGER ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::ASN1_INTEGER;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
   
   # Instance Methods
   native method get_int64 : long ();

@@ -298,9 +298,9 @@ ok !$person->valid;
 }
 
 {
-  my $result = $f->fields_for('foo', sub {
+  my $result = $f->fields_for('foo', {allow_method_names_outside_object=>1}, sub {
     my ($view, $fb) = @_;
-    ok $fb->isa('Valiant::HTML::FormBuilder');
+    ok $fb->isa('Valiant::HTML::FormBuilder'), 'here now';
     return $fb->input('first_name'),
   });
 

@@ -7,6 +7,7 @@ use Module::Runtime 'use_module';
 use Cpanel::JSON::XS ();
 use Valiant::HTML::Util::Collection;
 use Valiant::Naming;
+use Valiant::HTML::FormBuilder::DefaultModel;
 
 has model => (is=>'rw', required=>1);
 has has_custom_view => ( is=>'ro', required=>1);

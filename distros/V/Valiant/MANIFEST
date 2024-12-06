@@ -156,6 +156,7 @@ lib/Valiant/Filterable.pm
 lib/Valiant/Filters.pm
 lib/Valiant/HTML/FormBuilder.pm
 lib/Valiant/HTML/FormBuilder/Checkbox.pm
+lib/Valiant/HTML/FormBuilder/DefaultModel.pm
 lib/Valiant/HTML/FormBuilder/RadioButton.pm
 lib/Valiant/HTML/PagerBuilder.pm
 lib/Valiant/HTML/SafeString.pm

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ no_index:
 requires:
   Cpanel::JSON::XS: '4.08'
   DateTime: '1.65'
-  HTTP::Cookies: '6.1'
+  HTTP::Cookies: '6.08'
   LWP::Protocol::https: '6.04'
   LWP::UserAgent: '6.05'
   MARC::File::XML: v1.0.5
@@ -28,11 +28,12 @@ requires:
   Net::Z3950::PQF: '1'
   Net::Z3950::SimpleServer: '1.21'
   Net::Z3950::ZOOM: '1.3'
+  Params::ValidationCompiler: '0.3'
   Test::Differences: '0.61'
   Unicode::Diacritic::Strip: '0.13'
   XML::Simple: '2.25'
 resources:
   bugtracker: https://issues.folio.org/projects/ZF/issues
   repository: https://github.com/folio-org/Net-Z3950-FOLIO.git
-version: v4.0.0
+version: v4.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

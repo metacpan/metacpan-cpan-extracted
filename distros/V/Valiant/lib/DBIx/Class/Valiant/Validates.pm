@@ -11,6 +11,12 @@ around default_validator_namespaces => sub {
   return 'DBIx::Class::Valiant::Validator', $self->$orig(@args);
 };
 
+around validate => sub {
+  my ($orig, $self, @args) = @_;
+  return if $self->{__valiant_add};
+  return $self->$orig(@args);
+};
+
 1;
 
 =head1 NAME

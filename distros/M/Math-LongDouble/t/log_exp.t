@@ -160,11 +160,12 @@ else {
   print "not ok 16\n";
 }
 
-# powerpc requires some leeway here (gcc-4.6.3). The compile-time rendition of powl(3.0. 4.0)
-# yields a precise result, but the runtime rendition of powl(3.0, 4.0) does not.
+# Set allowable error for test 17  to a reasonable value of 2 ** -57.
+# (It was 2 ** -104, which is good enough for PPC double-double, but not for solaris long double.)
+# See http://www.cpantesters.org/cpan/report/3119fdfe-e9c5-11ee-83a6-c4cdc49bac1d
 
 pow_LD($check, NVtoLD(3), NVtoLD(4));
-if(approx($check, NVtoLD(81.0), -104)) {print "ok 17\n"}
+if(approx($check, NVtoLD(81.0), -57)) {print "ok 17\n"}
 else {
   warn "\nExpected ", NVtoLD(81.0), " (", ld_bytes(NVtoLD(81.0)), ")\nGot $check (", ld_bytes($check), ")\n";
   print "not ok 17\n";

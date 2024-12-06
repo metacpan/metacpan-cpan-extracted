@@ -30,6 +30,7 @@ etc/config.able.json
 etc/config.atplt.json
 etc/config.bugfest_nolana.json
 etc/config.bugfest_orchid.json
+etc/config.bugfest_ramsons.json
 etc/config.chicago.json
 etc/config.dummy.json
 etc/config.fieldPerItem.json
@@ -41,12 +42,15 @@ etc/config.lehigh.json
 etc/config.local.json
 etc/config.localgql.json
 etc/config.marcHoldings.json
+etc/config.snapshot-2.json
 etc/config.snapshot.json
 etc/config.unsuppressed-holdings.json
 etc/config.unsuppressed-items.json
+etc/config.withLoans.json
 etc/folio2marcxml.xsl
 etc/folio2opac.xsl
 etc/instances.graphql-query
+etc/mod-search-with-loans.graphql-query
 etc/mod-search.graphql-query
 etc/yazgfs.xml
 lib/DummyRecord.pm

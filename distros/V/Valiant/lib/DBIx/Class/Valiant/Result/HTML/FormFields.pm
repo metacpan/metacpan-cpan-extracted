@@ -210,7 +210,9 @@ sub _auto_read_attribute_for_html {
     return $self->$attribute if($rel_type eq 'single');
   }
 
-  die "Can't find a value for attribute '$attribute'";
+  # If we can't find a value just return because the formhandler will decide
+  # if this is an error or not
+  return bless +{}, 'Valiant::BadAttribute';
 }
 
 1;

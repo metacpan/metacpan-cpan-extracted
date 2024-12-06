@@ -16,6 +16,7 @@ lib/Template/EmbeddedPerl/Utils.pm
 t/basic.t
 t/crazy.t
 t/ff.t
+t/if.t
 t/interpolated.t
 t/templates/ff.epl
 t/templates/hello.epl

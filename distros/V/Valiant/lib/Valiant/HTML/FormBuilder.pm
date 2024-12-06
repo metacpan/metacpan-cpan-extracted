@@ -63,8 +63,9 @@ sub form_enctype { shift->options->{html}{method} }
 sub csrf_token { shift->options->{html}{data}{csrf_token} }
 
 sub allow_method_names_outside_object {
-  return exists(shift->options->{allow_method_names_outside_object})
-  ? shift->options->{allow_method_names_outside_object}
+  my $self = shift;
+  return exists($self->options->{allow_method_names_outside_object})
+  ? $self->options->{allow_method_names_outside_object}
   : 1;
 }
 
@@ -104,8 +105,13 @@ sub tag_name_for_attribute {
 }
 
 sub tag_value_for_attribute {
-  my ($self, $attribute) = @_;
-  return $self->tag_helpers->field_value($self->model, $attribute);
+  my ($self, $attribute, $options) = @_;
+  my %options = (
+    strict => delete($options->{strict_method_check}),
+    no_strict_method_check =>  delete($options->{no_strict_method_check}),
+    allow_method_names_outside_object => $self->allow_method_names_outside_object,
+  );
+  return $self->tag_helpers->field_value($self->model, $attribute, \%options);
 }
 
 sub tag_errors_for_attribute {
@@ -130,6 +136,21 @@ sub human_name_for_label {
 sub attribute_has_errors {
   my ($self, $attribute) = @_;
   return $self->model->can('errors') && $self->model->errors->where($attribute) ? 1:0;
+}
+
+# my $u = $fb->form_action->clone; $u->query_param_append('add_comment', 1);
+
+sub form_action_for {
+  my $self = shift;
+  my $params = pop @_ if (ref($_[-1])||'') eq 'HASH';
+  my @path_parts = @_;
+  my $url = $self->form_action->clone;
+  my @segments = $url->path_segments;
+
+  $url->query_param_append(%$params) if $params;
+  $url->path_segments(@segments, @path_parts) if @path_parts;
+
+  return $url;
 }
 
 # $fb->has_errors()
@@ -575,7 +596,7 @@ sub button {
   my $content = shift;
 
   $attrs->{type} = 'submit' unless exists($attrs->{type});
-  $attrs->{value} = $self->tag_value_for_attribute($attribute) unless exists($attrs->{value});
+  $attrs->{value} = $self->tag_value_for_attribute($attribute, $attrs) unless exists($attrs->{value});
   $attrs->{name} = $self->tag_name_for_attribute($attribute) unless exists($attrs->{name});
   $attrs->{id} = $self->tag_id_for_attribute($attribute) unless exists($attrs->{id});
   $attrs = $self->merge_theme_field_opts('button', $attribute, $attrs);
@@ -708,13 +729,25 @@ sub fields_for_nested_model {
     my $view = shift;
     my $fb = shift;
     my @output = $codeblock->($view, $fb, $model);
-    if(@output && $emit_hidden_id && $model->can('primary_columns')) {
-      foreach my $id_field ($model->primary_columns) {
-        push @output, $fb->hidden($id_field); #TODO this cant be right...
-      }
+    if(@output && $emit_hidden_id) {
+      push @output, $fb->emit_hidden_ids;
     }
     return $self->tag_helpers->join_tags(@output);
   });
+}
+
+## TODO this seems very much tied to DBIx::Class
+sub emit_hidden_ids {
+  my ($self) = @_;
+  my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;  
+  
+  return '' unless $model->can('primary_columns');
+
+  my @output = ();
+  foreach my $id_field ($model->primary_columns) {
+    push @output, $self->hidden($id_field);
+  }
+  return $self->tag_helpers->join_tags(@output);
 }
 
 sub select {
@@ -764,6 +797,23 @@ sub select {
   my $options_tags = '';
   if(!$block) {
     my $option_tags_proto = @_ ? shift : ();
+
+    # if $option_tags_proto is a string then we assume it is a method name on the model
+    if((ref(\$option_tags_proto)||'') eq 'SCALAR') {
+      $option_tags_proto = $model->$option_tags_proto;
+    }
+    # if $option_tags_proto is an array ref, where each element is a string
+    # then we assume it is a list of values to use for the options
+    if((ref($option_tags_proto)||'') eq 'ARRAY') {
+      $option_tags_proto = [
+        map { 
+          ((ref(\$_)||"") eq 'SCALAR')
+          ? [$self->human_name_for_label($_), $_]
+          : $_;
+        } @$option_tags_proto
+      ];
+    }
+
     my @disabled = ( @{delete($options->{disabled})||[]});
     @selected = @{ delete($options->{selected})||[]} if exists($options->{selected});
     $options_tags = $self->tag_helpers->options_for_select($option_tags_proto, +{
@@ -959,6 +1009,7 @@ sub collection_checkbox {
   $collection = $model->$collection if (ref(\$collection)||'') eq 'SCALAR';
   $collection = $self->tag_helpers->array_to_collection(@$collection)
     if (ref($collection)||'') eq 'ARRAY';
+
 
   while (my $checkbox_model = $collection->next) {
     #my $index = $self->nested_child_index($attribute); 
@@ -1259,15 +1310,6 @@ The current index of a collection for which the current formbuilder is one item 
 
 Used to add a prefix to the ID for your form elements.
 
-=head2 allow_method_names_outside_model
-
-Default is false.  Generally we expect C<method_name> to be an actual method on the
-C<model> and if its not we expect an exception.  This helps to prevent typos from
-leading to unexpected results.  However sometimes you may wish create a form field that
-has a name that isn't on the model but still respects the current namespace and index.
-These names would appear in the POST request body and could be used for things other than
-updating or creating a model.
-
 =head2 skip_default_ids
 
 Defaults to false.  Generally we create an html C<id> attribute for the field based
@@ -1362,6 +1404,33 @@ to control the behavior of what happens when you try to access a model attribute
 =head2 tag_errors_for_attribute
 
 Given an attribute return an array of error messages for that attribute if any.
+
+=head2 tag_value_for_attribute
+
+    $fb->tag_value_for_attribute('name');
+    $fb->tag_value_for_attribute('name', \%options);
+
+Given an attribute return the value of that attribute on the model.
+
+Currently the only option is C<no_strict_method_check> which if true will allow you use an attribute
+name that strictly isn't a method on the model.  This is useful if you want to create a form field
+that doesn't correspond to a model attribute but still respects the current namespace and index.
+
+You can pass this via the options hashref for most tag generating methods.
+
+=head2 form_action_for
+
+Usage:
+
+    $fb->form_action_for('path1');
+    $fb->form_action_for('path1', 'path2');
+    $fb->form_action_for(\%options);
+    $fb->form_action_for('path1', \%options);
+    $fb->form_action_for('path1', 'path2', \%options);
+
+Used to create additional URLs under the current form action.  Useful if you have form
+buttons that when activated should go to a different URL than the main form action or
+where you want to pass query parameters that influence the form action.
 
 =head2 form_has_errors
 
@@ -2030,8 +2099,8 @@ The index of the sub object. Can be a coderef.   Used if you need explicit contr
 
 Defaults to true.   If the sub model does C<in_storage> and C<primary_columns> then add hidden form fields
 with those IDs to the sub model namespace.  Often needed to properly match a record to its existing state
-in storage (such as a database).  Not sure why you'd want to turn this off but the option is a carry over
-from Rails so I presume there is a use case.
+in storage (such as a database).  If you don't want this behavior then set this to false.  Or
+if you want to control where the ids are placed you can set this to false and then use C<emit_hidden_ids>
 
 =item id
 
@@ -2453,6 +2522,24 @@ separately.  Example:
 
 Supports using a template subroutine reference (like L</collection_radio_buttons>) when you need to be
 fussy about style and positioning.
+
+=head2 emit_hidden_ids
+
+    $fb->emit_hidden_ids;
+
+If the model has C<in_storage> and C<primary_columns> then we will emit hidden fields for each of the
+primary columns.  This is useful when you are editing an existing record and you want to make sure
+the form submission can be matched to the existing record.  Example:
+
+    $fb->emit_hidden_ids;
+
+    # <input id="person_id" name="person.id" type="hidden" value="1"/>
+
+B<NOTE> In general you should not need to call this method directly.  It is called automatically by
+the form builder when needed.  However you might find you need tricky placement of the hidden fields
+(for example some tricky CSS) and in that case you can call this method manually in fields that allow
+you to disable the automatic placement of the hidden fields (for example in C<fields_for>, you can set 
+the C<include_id> option to false and then call this method manually).
 
 =head1 REMOTE FORMS
 

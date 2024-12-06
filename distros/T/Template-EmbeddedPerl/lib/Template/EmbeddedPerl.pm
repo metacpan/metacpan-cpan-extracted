@@ -1,6 +1,6 @@
 package Template::EmbeddedPerl;
 
-our $VERSION = '0.001010';
+our $VERSION = '0.001011';
 $VERSION = eval $VERSION;
 
 use warnings;
@@ -467,10 +467,9 @@ sub is_control_block {
   # Get the parent of the block
   my $parent = $block->parent;
 
-    # Check if the parent is a control statement
-  if ($parent && $parent->isa('PPI::Statement::Compound')) {
+  # Check if the parent is a control statement
+  if ($parent && ($parent->isa('PPI::Statement::Compound') || $parent->isa('PPI::Statement'))) {
     my $keyword = $parent->schild(0); # Get the first child of the statement, which should be the control keyword
-
     if ($keyword && $keyword->isa('PPI::Token::Word')) {
       # Check if the keyword is a control structure keyword
       return 1 if $keyword->content =~ /^(if|else|elsif|while|for|foreach|unless|given|when|until)$/;

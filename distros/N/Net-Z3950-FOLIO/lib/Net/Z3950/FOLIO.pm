@@ -18,7 +18,7 @@ use Net::Z3950::FOLIO::OPACXMLRecord qw(makeOPACXMLRecord);
 use Net::Z3950::FOLIO::RPN;;
 
 
-our $VERSION = 'v4.0.0';
+our $VERSION = 'v4.0.1';
 
 
 sub FORMAT_USMARC { '1.2.840.10003.5.10' }
@@ -175,6 +175,8 @@ sub _search_handler {
 sub _fetch_handler {
     my($args) = @_;
     my $session = $args->{HANDLE};
+    _throw(30, $args->{SETNAME}) if !$session;
+
     $session->maybeRefreshToken();
 
     my $rs = $session->{resultsets}->{$args->{SETNAME}};

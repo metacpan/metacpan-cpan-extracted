@@ -1,5 +1,9 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest
 
+0.001015 05 December 2024
+          - Use latest version of Template::EmbeddedPerl for important
+            bug fixes
+
 0.001014  01 December 2024
           - Fixed issue with 'over' helper not working correctly
             when passed a single value that is an object or hashref

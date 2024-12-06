@@ -1,0 +1,32 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::X509_REVOKED {
+  allow Net::SSLeay::PEM;
+  
+  use Net::SSLeay::Error;
+  use Net::SSLeay::ASN1_INTEGER;
+  use Net::SSLeay::ASN1_TIME;
+  
+  use Fn;
+  
+  # Class Methods
+  native static method new : Net::SSLeay::X509_REVOKED ();
+  
+  private static method new_with_pointer : Net::SSLeay::X509_REVOKED ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::X509_REVOKED;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  native method get0_serialNumber : Net::SSLeay::ASN1_INTEGER ();
+  
+  native method get0_revocationDate : Net::SSLeay::ASN1_TIME ();
+  
+  native method DESTROY : void ();
+  
+}

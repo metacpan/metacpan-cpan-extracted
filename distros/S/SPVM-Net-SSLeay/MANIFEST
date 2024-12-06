@@ -205,6 +205,10 @@ lib/SPVM/Net/SSLeay/X509_NAME_ENTRY.c
 lib/SPVM/Net/SSLeay/X509_NAME_ENTRY.config
 lib/SPVM/Net/SSLeay/X509_NAME_ENTRY.pm
 lib/SPVM/Net/SSLeay/X509_NAME_ENTRY.spvm
+lib/SPVM/Net/SSLeay/X509_REVOKED.c
+lib/SPVM/Net/SSLeay/X509_REVOKED.config
+lib/SPVM/Net/SSLeay/X509_REVOKED.pm
+lib/SPVM/Net/SSLeay/X509_REVOKED.spvm
 lib/SPVM/Net/SSLeay/X509_STORE.c
 lib/SPVM/Net/SSLeay/X509_STORE.config
 lib/SPVM/Net/SSLeay/X509_STORE.pm

@@ -59,7 +59,7 @@ use subs qw(
             M_1_PIl M_2_PIl  M_2_SQRTPIl M_SQRT2l M_SQRT1_2l
             );
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 #$VERSION = eval $VERSION;
 
 Math::LongDouble->DynaLoader::bootstrap($Math::LongDouble::VERSION);

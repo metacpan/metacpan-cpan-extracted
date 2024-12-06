@@ -38,8 +38,9 @@ my $opt = $Config{optimize};
 
 print WR "\nCC = $cc\nOPTMIZE = $opt\n" if $open;
 
-
-my $out = `$cc $opt -o try.exe -x c try.in -lm 2>&1`;
+# Build with "-Wno-implicit-function-declaration" to work around the problem of
+# such warnings being fatal with gcc-14 and later.
+my $out = `$cc $opt -Wno-implicit-function-declaration -o try.exe -x c try.in -lm 2>&1`;
 
 print WR "erfl & isnanl check (build): $out\n" if $open;
 
@@ -131,7 +132,9 @@ else {
 # Try to detect whether signbitl() is available and
 # implement a workaround if it's not.
 
-$out = `$cc $opt -o try4.exe -x c try4.in -lm 2>&1`;
+# Build with "-Wno-implicit-function-declaration" to work around the problem of
+# such warnings being fatal with gcc-14 and later.
+$out = `$cc $opt -Wno-implicit-function-declaration -o try4.exe -x c try4.in -lm 2>&1`;
 
 print WR "build output (signbitl check): $out\n" if $open;
 
@@ -159,7 +162,9 @@ else {
 # Try to detect the absence of sincosl and implement
 # workaround (-DSINCOSL_IS_UNAVAILABLE) when absence is detected.
 
-$out = `$cc $opt -o try5.exe -x c try5.in -lm 2>&1`;
+# Build with "-Wno-implicit-function-declaration" to work around the problem of
+# such warnings being fatal with gcc-14 and later.
+$out = `$cc $opt -Wno-implicit-function-declaration -o try5.exe -x c try5.in -lm 2>&1`;
 
 print WR "build output (sincosl check): $out\n" if $open;
 
@@ -230,6 +235,7 @@ my %options = %{
   VERSION_FROM => 'LongDouble.pm',
   DEFINE   => $defines,
   clean   => { FILES => '*.exe myconfig.log' },
+  CCFLAGS => "$Config{ccflags}" . " -Wno-implicit-function-declaration", # such warnings are fatal with gcc-14 onwards
   META_MERGE => {
    'meta-spec' => { version => 2 },
     resources => {

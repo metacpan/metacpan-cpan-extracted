@@ -3,8 +3,6 @@ package Module::ScanDeps::Static;
 use strict;
 use warnings;
 
-require Module::ScanDeps::Static::VERSION;
-
 use 5.010;
 
 use Carp;
@@ -63,6 +61,8 @@ our $HAVE_VERSION = eval {
   require version;
   return $TRUE;
 };
+
+our $VERSION = '1.7.2';
 
 caller or __PACKAGE__->main();
 

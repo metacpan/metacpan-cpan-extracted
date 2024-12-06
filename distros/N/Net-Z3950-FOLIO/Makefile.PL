@@ -2,6 +2,7 @@ use 5.008000;
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
+
 WriteMakefile(
     NAME              => 'Net::Z3950::FOLIO',
     VERSION_FROM      => 'lib/Net/Z3950/FOLIO.pm', # finds $VERSION
@@ -9,7 +10,7 @@ WriteMakefile(
 	Net::Z3950::SimpleServer => 1.21,
 	LWP::UserAgent => 6.05,
 	LWP::Protocol::https => 6.04,
-	HTTP::Cookies => 6.10,
+	HTTP::Cookies => 6.08,
 	DateTime => 1.65,
 	Mozilla::CA => 20200520,
 	Cpanel::JSON::XS => 4.08,
@@ -20,6 +21,7 @@ WriteMakefile(
 	Net::Z3950::PQF => 1.0,
 	Unicode::Diacritic::Strip => 0.13,
 	Test::Differences => 0.61,
+	Params::ValidationCompiler => 0.30,
     },
     META_ADD => {
 	no_index => {

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+Daje-Tools-Datasections.iml
+LICENSE
+README.md
+cpanfile
+lib/Daje/Tools/Datasections.pm
+minil.toml
+t/00_compile.t
+t/load_templates.t
+META.json
+META.yml
+MANIFEST

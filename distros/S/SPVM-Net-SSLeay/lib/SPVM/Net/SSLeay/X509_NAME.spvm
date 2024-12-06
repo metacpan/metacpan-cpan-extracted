@@ -4,10 +4,11 @@
 class Net::SSLeay::X509_NAME : pointer {
   
   use Net::SSLeay::X509_NAME_ENTRY;
-  use Net::SSLeay::ASN1_OBJECT;
   use Fn;
   
   # Class Methods
+  native static method new : Net::SSLeay::X509_NAME ();
+  
   private static method new_with_pointer : Net::SSLeay::X509_NAME ($pointer : Address, $options : object[] = undef) {
     
     my $self = new Net::SSLeay::X509_NAME;
@@ -20,15 +21,15 @@ class Net::SSLeay::X509_NAME : pointer {
   # Instance Methods
   native method oneline : string ();
   
-  native method get_text_by_NID : int ($nid : int, $buf : mutable string, $len : int = -1);
-  
   native method get_entry : Net::SSLeay::X509_NAME_ENTRY ($loc : int);
   
   native method get_index_by_NID : int ($nid : int, $lastpos : int);
   
   native method entry_count : int ();
   
-  native method get_index_by_OBJ : int ($obj : Net::SSLeay::ASN1_OBJECT, $lastpos : int);
+  native method add_entry_by_NID : int ($nid : int, $type : int, $bytes : string, $len : int = -1, $loc : int = -1, $set : int = 0);
+  
+  native method delete_entry : Net::SSLeay::X509_NAME_ENTRY ($loc : int);
   
   native method DESTROY : void ();
   

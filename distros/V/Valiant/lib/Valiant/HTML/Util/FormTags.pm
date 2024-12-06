@@ -379,12 +379,22 @@ sub _sanitize {
 sub field_value {
   my ($self, $model, $attribute, $options) = @_;
   $options = +{} unless defined $options;
-  return $model->read_attribute_for_html($attribute) if $model->can('read_attribute_for_html');
-  return $model->$attribute if $model->can($attribute);
-  croak "Model '@{ $model->model_name->human}' has no attribute '' with a readable value" if $options->{strict}; 
-  return '' if $self->can('allow_method_names_outside_object') && $self->allow_method_names_outside_object;
-  croak "Model '@{ $model->model_name->human}' has no attribute '' with a readable value" if $options->{strict}; 
-  return '';
+
+  if($model->can('read_attribute_for_html')) {
+    my $value = $model->read_attribute_for_html($attribute);
+    return $value unless Scalar::Util::blessed($value) && $value->isa('Valiant::BadAttribute'); 
+  } elsif($model->can($attribute)) {
+    my $value = $model->$attribute;
+    return $value unless Scalar::Util::blessed($value) && $value->isa('Valiant::BadAttribute');
+  }
+
+  # if we are here its because $attribute can't be found on the model
+  return '' if $options->{no_strict_method_check};
+
+  my $msg = "Model '@{[$model->model_name->human]}' has no attribute '$attribute'.";
+  croak $msg if $options->{strict}; 
+  return '' if $options->{allow_method_names_outside_object};
+  croak "$msg";
 }
 
 sub field_id {

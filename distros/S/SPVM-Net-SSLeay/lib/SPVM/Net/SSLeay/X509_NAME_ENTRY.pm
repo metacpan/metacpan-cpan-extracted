@@ -16,19 +16,25 @@ Net::SSLeay::X509_NAME_ENTRY class in L<SPVM> represents L<X509_NAME_ENTRY|https
 
   use Net::SSLeay::X509_NAME_ENTRY;
 
-=head1 Fields
+=head1 Class Methods
 
-=head2 ref_x509_name
+=head2 new
 
-C<has ref_x509_name : L<Net::SSLeay::X509_NAME|SPVM::Net::SSLeay::X509_NAME>;>
+C<static method new : L<Net::SSLeay::X509_NAME_ENTRY|SPVM::Net::SSLeay::X509_NAME_ENTRY> ();>
+
+Calls native L<X509_NAME_ENTRY_new|https://docs.openssl.org/1.1.1/man3/X509_dup/> function, creates a new  L<Net::SSLeay::X509_NAME_ENTRY|SPVM::Net::SSLeay::X509_NAME_ENTRY> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
+
+Exceptions:
+
+If X509_NAME_ENTRY_new failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
 =head1 Instance Methods
 
 =head2 get_data
 
-C<method get_data : L<Net::SSLeay::ASN1_STRING|SPVM::Net::SSLeay::ASN1_STRING> ();>
+C<method get_data : L<Net::SSLeay::X509_NAME_ENTRY|SPVM::Net::SSLeay::X509_NAME_ENTRY> ();>
 
-Calls native L<X509_NAME_ENTRY_get_data|https://docs.openssl.org/1.1.1/man3/X509_NAME_ENTRY_get_object> functions given the pointer value of the instance, copies the return value of the native function, creates a new L<Net::SSLeay::ASN1_STRING|SPVM::Net::SSLeay::ASN1_STRING> object, sets the pointer value of the new object to the copied value, and returns the new object.
+Calls native L<X509_NAME_ENTRY_get_data|https://docs.openssl.org/1.1.1/man3/X509_NAME_ENTRY_get_object> functions given the pointer value of the instance, copies the return value of the native function, creates a new L<Net::SSLeay::X509_NAME_ENTRY|SPVM::Net::SSLeay::X509_NAME_ENTRY> object, sets the pointer value of the new object to the copied value, and returns the new object.
 
 =head2 get_object
 
@@ -42,11 +48,21 @@ C<method DESTROY : void ();>
 
 Calls native L<X509_free|https://docs.openssl.org/3.2/man3/X509_new> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
 
+=head1 FAQ
+
+=head2 How to convert a Net::SSLeay::ASN1_OBJECT object to NID?
+
+Use L<Net::SSLeay::OBJ#obj2nid|SPVM::Net::SSLeay::OBJ/"obj2nid"> method.
+
 =head1 See Also
 
 =over 2
 
-=item * L<Net::SSLeay::PEM|SPVM::Net::SSLeay::X509>
+=item * L<Net::SSLeay::X509_NAME|SPVM::Net::SSLeay::X509_NAME>
+
+=item * L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>
+
+=item * L<Net::SSLeay::OBJ|SPVM::Net::SSLeay::OBJ>
 
 =item * L<Net::SSLeay|SPVM::Net::SSLeay>
 

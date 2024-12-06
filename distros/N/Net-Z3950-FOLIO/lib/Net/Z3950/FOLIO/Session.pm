@@ -110,6 +110,10 @@ sub maybeRefreshToken {
     my $ua = $this->{ua};
     my $cj = $ua->cookie_jar();
     if ($cj->as_string()) {
+	my $accessToken = $cj->as_string();
+	$accessToken =~ s/.*folioAccessToken=(.*?);.*/$1/s;
+	$this->{accessToken} = $accessToken;
+
 	# We have some cookies, so initial login must have succeeded
 	my $now = DateTime->now();
 	my $nowEpoch = $now->epoch();
@@ -161,7 +165,11 @@ sub doSearch {
     my $url = $okapiCfg->{url};
     my $graphqlUrl = $okapiCfg->{graphqlUrl};
     my $req = $this->_makeHTTPRequest(POST => ($graphqlUrl || $url) . '/graphql');
-    $req->header('X-Okapi-Url' => $url) if $graphqlUrl;
+    if ($graphqlUrl) {
+	$req->header('X-Okapi-Url' => $url);
+	# Okapi-moderated modules do not need an explicit token, but side-loaded mod-graphql does
+	$req->header('X-Okapi-Token' => $this->{accessToken});
+    }
 
     my %variables = ();
     # warn "searching for $cql";

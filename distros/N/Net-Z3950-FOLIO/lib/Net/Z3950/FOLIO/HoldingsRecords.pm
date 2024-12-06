@@ -305,13 +305,10 @@ sub _makeAvailableNow {
 }
 
 
-# Availability Date is not in the FOLIO inventory data. It should be
-# possible to obtain it as the Due Date in mod-circulation, if we want
-# to add the necessary extra queries.
-#
 sub _makeAvailabilityDate {
     my($item) = @_;
-    return undef; # XXX for now
+
+    return $item->{loans} && $item->{loans}->{dueDate};
 }
 
 
