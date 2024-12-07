@@ -4,7 +4,7 @@ Object::Signature::Portable - generate portable fingerprints of objects
 
 # VERSION
 
-version v1.1.2
+version v1.2.0
 
 # SYNOPSIS
 
@@ -179,12 +179,18 @@ structures, as a simple means of determining whether two structures
 are different.
 
 For that purpose, the MD5 algorithm is probably good enough.  However,
-if you are hashing that in part comes from untrusted sources, or the
+if you are hashing data that in part comes from untrusted sources, or the
 consequences of two different data structures having the same
 signature are significant, then you should consider using a different
 algorithm.
 
 This module is _not_ intended for hashing passwords.
+
+# SUPPORT FOR OLDER PERL VERSIONS
+
+This module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
 
 # SEE ALSO
 
@@ -238,6 +244,12 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+## Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.
+Please see `SECURITY-POLICY.md` for instructions how to report
+security vulnerabilities
+
 # AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -247,9 +259,13 @@ Robert Rothenberg <rrwo@cpan.org>
 Thanks to various people at YAPC::EU 2014 for suggestions about
 [Sereal::Encoder](https://metacpan.org/pod/Sereal%3A%3AEncoder).
 
+# CONTRIBUTOR
+
+Slaven Rezić <slaven@rezic.de>
+
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2014, 2019-2022 by Robert Rothenberg.
+This software is Copyright (c) 2013-2014, 2019-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

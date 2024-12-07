@@ -2,7 +2,7 @@ package Daje::Tools::Datasections;
 use Mojo::Base -base, -signatures;
 
 use v5.40;
-use Mojo::Loader qw {data_section};
+use Mojo::Loader qw {data_section load_class};
 
 # Daje::Tools::Datasections - Load and store data sections in memory from a named *.pm
 #
@@ -17,6 +17,7 @@ use Mojo::Loader qw {data_section};
 # =========
 #
 # use GenerateSQL::Tools::Datasections
+#
 #
 # my $data = GenerateSQL::Tools::Datasections->new(
 #
@@ -58,7 +59,7 @@ use Mojo::Loader qw {data_section};
 # Copyright (C) 2024 Jan Eskilsson.
 #
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has 'data_sections';
 has 'data_sec';
@@ -69,14 +70,13 @@ sub load_data_sections($self) {
 
     try {
         my $class = $self->source();
-        require $class;
-        $class->import();
+        my $c = load_class($class);
         my @data_sec = split(',', $self->data_sections) ;
         my $length = scalar @data_sec;
         for(my $i = 0; $i < $length; $i++){
             my $section = $data_sec[$i];
             if (!exists($self->data_sec->{$section})) {
-                my $sec = data_section($self->source, $section);
+                my $sec = data_section($class, $section);
                 $self->set_data_section($section, $sec);
             }
         }
@@ -105,6 +105,7 @@ sub add_data_section($self, $section) {
 1;
 
 __END__
+
 
 
 
@@ -152,10 +153,19 @@ $data->add_data_section('test');
 
 
 
+=head1 Abstract
+
+
+Get and store data sections from perl classes
+
+
+
+
 =head1 Synopsis
 
 
 use GenerateSQL::Tools::Datasections
+
 
 my $data = GenerateSQL::Tools::Datasections->new(
 
@@ -164,14 +174,6 @@ my $data = GenerateSQL::Tools::Datasections->new(
       source => 'Class::Containing::Datasections
 
   )->load_data_sections();
-
-
-
-=head1 Abstract
-
-
-Get and store data sections from perl classes
-
 
 
 

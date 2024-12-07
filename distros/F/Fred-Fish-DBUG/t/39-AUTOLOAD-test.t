@@ -6,6 +6,7 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -27,7 +28,7 @@ my $start_level;
 
 sub my_warn
 {
-   ok2 (0, "There were no unexpected warnings!");
+   dbug_ok (0, "There were no unexpected warnings!");
 }
 
 BEGIN {
@@ -38,15 +39,14 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {     # Test # 2
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
              join (" ", @opts) . " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -62,16 +62,16 @@ BEGIN {
    DBUG_ENTER_FUNC ();
 
    $start_level = test_fish_level ();
-   my $a = ok2 (1, "In the BEGIN block ...");
-   ok2 (ok2 ($a, "First Return value check worked!"),
-                 "Second Return value check worked!");
+   my $a = dbug_ok (1, "In the BEGIN block ...");
+   dbug_ok (dbug_ok ($a, "First Return value check worked!"),
+                         "Second Return value check worked!");
 
    my $lvl = test_fish_level ();
-   is2 ($lvl, $start_level, "Begin Block Level Check");
+   dbug_is ($lvl, $start_level, "Begin Block Level Check");
 
-   ok2 ( dbug_active_ok_test () );
+   dbug_ok ( dbug_active_ok_test () );
 
-   ok2 ( 1, "Fish Log: " . DBUG_FILE_NAME () );
+   dbug_ok ( 1, "Fish Log: " . DBUG_FILE_NAME () );
 
    DBUG_VOID_RETURN ();
 }
@@ -82,7 +82,7 @@ END {
    # Can only do failed tests in the END func.
    my $end_level = test_fish_level ();
    if ( $start_level != $end_level) {
-      ok2 (0, "In the END block ...");
+      dbug_ok (0, "In the END block ...");
    }
 
    DBUG_VOID_RETURN ();
@@ -96,25 +96,25 @@ my $auto_mode = 0;
 {
    DBUG_ENTER_FUNC (@ARGV);
 
-   ok2 (1, "In the MAIN block ...");
+   dbug_ok (1, "In the MAIN block ...");
 
    my $lvl = test_fish_level ();
 
    run_tests ();
    my $lvl2 = test_fish_level ();
-   is2 ( $lvl2, $lvl, "At correct level after 1st test run!");
+   dbug_is ( $lvl2, $lvl, "At correct level after 1st test run!" );
 
    DBUG_PRINT ("-----", "------------------------------------");
    $auto_mode = 1;
    run_tests ();
    $lvl2 = test_fish_level ();
-   is2 ( $lvl2, $lvl, "At correct level after 2nd test run!");
+   dbug_is ( $lvl2, $lvl, "At correct level after 2nd test run!" );
 
    DBUG_PRINT ("-----", "------------------------------------");
    $auto_mode = -1;
    run_tests ();
    $lvl2 = test_fish_level ();
-   is2 ( $lvl2, $lvl, "At correct level after 3rd test run!");
+   dbug_is ( $lvl2, $lvl, "At correct level after 3rd test run!" );
 
    DBUG_PRINT ("-----", "------------------------------------");
    $auto_mode = 0;
@@ -123,7 +123,7 @@ my $auto_mode = 0;
    run_other_tests (0, "Never Calls AUTOLOAD");
 
    $lvl2 = test_fish_level ();
-   is2 ( $lvl2, $lvl, "At correct level after 4th test run!");
+   dbug_is ( $lvl2, $lvl, "At correct level after 4th test run!" );
 
    # Terminate the test case.
    done_testing ();
@@ -211,7 +211,7 @@ sub forget_me_not
    DBUG_ENTER_FUNC (@_);
    my $c1 = (caller(1))[3];
    my $c2 = (caller(0))[3];
-   ok2 (1, "We got help!  <====>  Caller: $c1 -> $c2");
+   dbug_ok (1, "We got help!  <====>  Caller: $c1 -> $c2");
    DBUG_RETURN ( qw /1 2 3 4 5 6 7/ );
 }
 
@@ -235,17 +235,17 @@ sub run_other_tests
 
    my @h = help (qw/Did help call forget_me_not? /);
    my $lvl2 = test_fish_level ();
-   is2 ( $lvl2, $lvl, "At correct level after trapping undefined function 'help'." );
+   dbug_is ( $lvl2, $lvl, "At correct level after trapping undefined function 'help'." );
    DBUG_PRINT ("????", "?????????????????????????????")  if ( $print );
 
    my $a = helpless ("one", "two");
    $lvl2 = test_fish_level ();
-   is2 ( $lvl2, $lvl, "At correct level after trapping undefined function 'helpless'." );
+   dbug_is ( $lvl2, $lvl, "At correct level after trapping undefined function 'helpless'." );
    DBUG_PRINT ("????", "?????????????????????????????")  if ( $print );
 
    helper ("Says", "He, He!");
    $lvl2 = test_fish_level ();
-   is2 ( $lvl2, $lvl, "At correct level after trapping undefined function 'helper'." );
+   dbug_is ( $lvl2, $lvl, "At correct level after trapping undefined function 'helper'." );
 
    DBUG_VOID_RETURN;
 }
@@ -265,25 +265,25 @@ sub run_tests
    # -------------------------------------------------------
    junk_yard_dog (qw / One fine day in May! /);
    $lvl2 = test_fish_level ();
-   is2 ( $lvl2, $lvl, "At correct level after trapping undefined function." );
+   dbug_is ( $lvl2, $lvl, "At correct level after trapping undefined function." );
 
    $a = hocus_pocus (qw / Where's that black cat? /);
    $lvl2 = test_fish_level ();
-   is2 ( $a, "a", "hocus_pocus correctly returned it's value.");
-   is2 ( $lvl2, $lvl, "At correct level after trapping undefined function." );
+   dbug_is ( $a, "a", "hocus_pocus correctly returned it's value.");
+   dbug_is ( $lvl2, $lvl, "At correct level after trapping undefined function." );
 
    ($a, $b) = two_fish (qw / One fish two fish. /);
    $lvl2 = test_fish_level ();
-   ok2 ( $a eq "a" && $b eq "b", "two_fish correctly returned ($a, $b).");
-   is2 ( $lvl2, $lvl, "At correct level after trapping undefined function." );
+   dbug_ok ( $a eq "a" && $b eq "b", "two_fish correctly returned ($a, $b).");
+   dbug_is ( $lvl2, $lvl, "At correct level after trapping undefined function." );
 
    my @l = many_many_fishes (qw / Who knows what's next? /);
    $lvl2 = test_fish_level ();
    my $cnt = @l;
-   ok2 ( $cnt == 7, "many_many_fishes correctly returned $cnt value(s)!");
+   dbug_is ( $cnt, 7, "many_many_fishes correctly returned $cnt value(s)!");
    my $res = join (",", @l);
-   is2 ( $res, "a,b,c,d,e,f,g", "many_many_fishes returned all the correct value(s)!");
-   is2 ( $lvl2, $lvl, "At correct level after trapping undefined function." );
+   dbug_is ( $res, "a,b,c,d,e,f,g", "many_many_fishes returned all the correct value(s)!");
+   dbug_is ( $lvl2, $lvl, "At correct level after trapping undefined function." );
 
    DBUG_VOID_RETURN ();
 }

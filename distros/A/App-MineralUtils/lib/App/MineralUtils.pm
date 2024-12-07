@@ -6,9 +6,9 @@ use utf8;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-12-03'; # DATE
+our $DATE = '2024-12-04'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our %SPEC;
 
@@ -639,10 +639,19 @@ our @iron_forms = (
         iron_ratio => 1,
         summary => 'Elemental iron, in milligrams',
     },
+
+    # sulfate
     {
         name => 'mg-ferrous-sulfate-heptahydrate', # the natural hydrate form, loses water to tetrahydrate at 57C and monohydrate at 65C
         iron_ratio => 55.845/278.02, # 20.09%
         summary => 'Ferrous sulphate heptahydrate (FeSO4.7H2O), in milligrams',
+    },
+
+    # pyrophosphate
+    {
+        name => 'mg-fe-iii-pyrophosphate', #
+        iron_ratio => 4*55.845/745.21, # 29.98%
+        summary => 'Iron (III) pyrophosphate (Fe4O21P6), in milligrams',
     },
     {
         name => 'mg-lipofer', #
@@ -653,6 +662,25 @@ our @iron_forms = (
         name => 'mg-sunactive-fe', #
         iron_ratio => 8/100, # >8% according to spec
         summary => 'SunActive Fe (micronized, microencapsulated form of iron pyrophosphate), in milligrams',
+    },
+
+    # glycinate
+    {
+        name => 'mg-fe-glycinate', #
+        iron_ratio => 55.845/203.96, # 27.38%
+        summary => 'Iron glycinate a.k.a. ferrous bisglycinate (C4H8FeN2O4), in milligrams',
+    },
+    {
+        name => 'mg-fe-bisglycinate', #
+        iron_ratio => 55.845/203.96, # 27.38%
+        summary => 'Iron glycinate a.k.a. ferrous bisglycinate (C4H8FeN2O4), in milligrams',
+    },
+
+    # gluconate
+    {
+        name => 'mg-fe-gluconate', #
+        iron_ratio => 55.845/448.156, # 12.46%
+        summary => 'Iron (II) gluconate (C12H22FeO14), in milligrams',
     },
 );
 
@@ -897,7 +925,7 @@ App::MineralUtils - Utilities related to mineral supplements
 
 =head1 VERSION
 
-This document describes version 0.019 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2024-12-03.
+This document describes version 0.020 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2024-12-04.
 
 =head1 DESCRIPTION
 
@@ -999,13 +1027,13 @@ Result:
    ],
    {
      "table.fields"        => ["amount", "pct_ca", "unit", "summary"],
+     "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
-     "table.field_aligns"  => ["number", "number", "left", "left"],
    },
  ]
 
@@ -1078,6 +1106,12 @@ Result:
        summary => "Ferrous sulphate heptahydrate (FeSO4.7H2O), in milligrams",
      },
      {
+       amount  => 3.33333333333333,
+       pct_fe  => 29.975443163672,
+       unit    => "mg-fe-iii-pyrophosphate",
+       summary => "Iron (III) pyrophosphate (Fe4O21P6), in milligrams",
+     },
+     {
        amount  => 12.5,
        pct_fe  => 8,
        unit    => "mg-lipofer",
@@ -1089,12 +1123,30 @@ Result:
        unit    => "mg-sunactive-fe",
        summary => "SunActive Fe (micronized, microencapsulated form of iron pyrophosphate), in milligrams",
      },
+     {
+       amount  => 3.64963503649635,
+       pct_fe  => 27.380368699745,
+       unit    => "mg-fe-glycinate",
+       summary => "Iron glycinate a.k.a. ferrous bisglycinate (C4H8FeN2O4), in milligrams",
+     },
+     {
+       amount  => 3.64963503649635,
+       pct_fe  => 27.380368699745,
+       unit    => "mg-fe-bisglycinate",
+       summary => "Iron glycinate a.k.a. ferrous bisglycinate (C4H8FeN2O4), in milligrams",
+     },
+     {
+       amount  => 8,
+       pct_fe  => 12.4610626656789,
+       unit    => "mg-fe-gluconate",
+       summary => "Iron (II) gluconate (C12H22FeO14), in milligrams",
+     },
    ],
    {
-     "table.fields"        => ["amount", "pct_fe", "unit", "summary"],
      "table.field_aligns"  => ["number", "number", "left", "left"],
+     "table.fields"        => ["amount", "pct_fe", "unit", "summary"],
      "table.field_formats" => [
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
@@ -1519,14 +1571,14 @@ Result:
      },
    ],
    {
-     "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
      "table.fields"        => ["amount", "pct_k", "unit", "summary"],
+     "table.field_aligns"  => ["number", "number", "left", "left"],
    },
  ]
 
@@ -1645,13 +1697,13 @@ Result:
    ],
    {
      "table.field_aligns"  => ["number", "number", "left", "left"],
+     "table.fields"        => ["amount", "pct_na", "unit", "summary"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
-     "table.fields"        => ["amount", "pct_na", "unit", "summary"],
    },
  ]
 

@@ -21,7 +21,7 @@ no_index:
 provides:
   SVGPDF:
     file: lib/SVGPDF.pm
-    version: v0.89.1
+    version: '0.090'
 requires:
   File::LoadLines: '1.044'
   Image::Info: '1.42'
@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/sciurius/perl-SVGPDF/issues
   license: https://dev.perl.org/licenses/
   repository: https://github.com/sciurius/perl-SVGPDF
-version: v0.089.1
+version: '0.090'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

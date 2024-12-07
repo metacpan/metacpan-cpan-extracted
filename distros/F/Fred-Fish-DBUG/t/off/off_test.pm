@@ -13,9 +13,10 @@ use Exporter;
 
 use Fred::Fish::DBUG  qw / OFF /;
 use Fred::Fish::DBUG::Signal;
+use Fred::Fish::DBUG::Test;
 use helper1234;
 
-$VERSION = "2.03";
+$VERSION = "2.09";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( OFF_FILE OFF_BAD_SIGNAL OFF_PRINT1 OFF_PRINT2 OFF_WARN_TEST );
@@ -25,8 +26,8 @@ $VERSION = "2.03";
 BEGIN
 {
   my $mod = get_fish_module (__FILE__);
-  ok2 ($mod =~ m/::OFF$/,
-       "Loaded ${mod} via Fred::Fish::DBUG qw / OFF / in " . __PACKAGE__); 
+  dbug_ok ($mod =~ m/::OFF$/,
+          "Loaded ${mod} via Fred::Fish::DBUG qw / OFF / in " . __PACKAGE__); 
 }
 
 END
@@ -42,7 +43,7 @@ my $total = 0;
 sub my_off_signal_func
 {
    DBUG_ENTER_FUNC (@_);
-   ok2 (1, "Signal Trapped in: off_test::my_off_signal_func! (" . ++$total . ")");
+   dbug_ok (1, "Signal Trapped in: off_test::my_off_signal_func! (" . ++$total . ")");
    DBUG_VOID_RETURN ();
 }
 
@@ -64,7 +65,7 @@ sub OFF_PRINT1
    DBUG_PRINT ("INFO", "Hello World!");
    DBUG_PRINT ("INFO", "How are you?");
 
-   ok2 (1, "In OFF module - Func 1!");
+   dbug_ok (1, "In OFF module - Func 1!");
 
    DBUG_FILTER ( DBUG_FILTER_LEVEL_ERROR );
 
@@ -82,7 +83,7 @@ sub OFF_PRINT2
    DBUG_PRINT ("INFO", "Good Bye Cruel World!");
    DBUG_PRINT ("INFO", "I hope you're satisfied now!");
 
-   ok2 (1, "In OFF module - Func 2!");
+   dbug_ok (1, "In OFF module - Func 2!");
 
    DBUG_RETURN ("a", "b", "c", "d", "e");
 }
@@ -90,7 +91,7 @@ sub OFF_PRINT2
 sub local_warn_trap
 {
    chomp (my $msg = shift);
-   ok2 (1, $msg);
+   dbug_ok (1, $msg);
 }
 
 sub OFF_WARN_TEST

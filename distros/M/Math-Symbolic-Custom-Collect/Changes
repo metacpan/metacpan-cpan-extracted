@@ -1,13 +1,35 @@
 Revision history for Math-Symbolic-Custom-Collect
 
+0.21    Fri Dec 06 20:00 2024
+
+        - Updated tests
+        - Patched issue with denominator sign
+
+0.2     Mon Nov 25 10:00 2024
+
+        - Added some initial complex number support
+        - Improved cancelling down
+        - Improved handling of exponents
+
+0.1     Thu Nov 14 11:12 2024
+
+        - Added to_terms()
+        - Improved cancelling down
+        - Improved handling of exponents
+        - Updated variable ordering
+        - Updated tests
+
 0.03    Wed Nov 06 10:53 2024
-        Stop folding "special" constants
-        Fix out-of-memory errors by restricting decimal to rational conversion
-        Return intermediate data structures if called in list context
+
+        - Stop folding "special" constants
+        - Fix out-of-memory errors by restricting decimal to rational conversion
+        - Return intermediate data structures if called in list context
 
 0.02    Fri Oct 04 14:00 2024
-        Bug fix in combining fractions
+
+        - Bug fix in combining fractions
 
 0.01    Fri Sep 27 10:00 2024
-        First version
+
+        - First version
 

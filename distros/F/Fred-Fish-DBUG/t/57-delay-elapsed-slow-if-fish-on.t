@@ -6,6 +6,7 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -23,7 +24,7 @@ sub my_warn
 {
    my $msg = shift;
    chomp($msg);
-   ok2 (0, "There was an expected warning!  Check fish.");
+   dbug_ok (0, "There was an expected warning!  Check fish.");
 }
 
 BEGIN {
@@ -43,15 +44,14 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {     # Test # 2
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
-             join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -63,7 +63,7 @@ BEGIN {
    my $off = ( get_fish_state () != 0 ) ? 1 : 0;
    my $lvl = ( get_fish_state () == -1 ) ? -1 : 1;
 
-   $delay = 2.5;     # Must be > 1.0 for the tests to work properly.
+   $delay = 1.5;     # Must be > 1.0 for the tests to work properly.
 
    DBUG_PUSH ( get_fish_log(), delay => ${delay}, elapsed => 1, off => ${off} );
 
@@ -79,11 +79,11 @@ BEGIN {
    DBUG_ENTER_FUNC ();
 
    $start_level = test_fish_level ();
-   is2 ($start_level, $lvl, "In the BEGIN block ...");   # Test # 2
+   dbug_is ($start_level, $lvl, "In the BEGIN block ...");   # Test # 2
 
-   ok2 ( dbug_active_ok_test () );
+   dbug_ok ( dbug_active_ok_test () );
 
-   ok2 ( 1, "Fish Log: " . DBUG_FILE_NAME() );
+   dbug_ok ( 1, "Fish Log: " . DBUG_FILE_NAME() );
 
    DBUG_VOID_RETURN ();
 }
@@ -96,7 +96,7 @@ END {
    # We're not supposed to do any testing in this end block!
    my $lvl = test_fish_level ();
    if ( $start_level != $lvl ) {
-      ok2 (0, "In the END block ...");
+      dbug_ok (0, "In the END block ...");
    }
 
    DBUG_VOID_RETURN ();
@@ -119,14 +119,14 @@ END {
    DBUG_ENTER_FUNC (@ARGV);
 
    my $lvl = test_fish_level ();
-   is2 ($lvl, $start_level, "In the MAIN program ...");
+   dbug_is ($lvl, $start_level, "In the MAIN program ...");
 
    test_1 ();
    test_2 ();
    test_pause ();
 
    $lvl = test_fish_level ();
-   is2 ($lvl, $start_level, "MAIN Level Final Check ...");
+   dbug_is ($lvl, $start_level, "MAIN Level Final Check ...");
 
    # Terminate the test case.
    done_testing ();
@@ -142,9 +142,9 @@ sub delay_test
    DBUG_ENTER_FUNC (@_);
 
    my $begin = time ();
-   ok2 (1, "First Wait Test");
-   ok2 (1, "Second Wait Test");
-   ok2 (1, "Third Wait Test");
+   dbug_ok (1, "First Wait Test");
+   dbug_ok (1, "Second Wait Test");
+   dbug_ok (1, "Third Wait Test");
    my $end = time ();
 
    DBUG_RETURN ( 3, $end - $begin );
@@ -162,7 +162,7 @@ sub test_1
    # Allow for rounding errors in total sleep time!
    $total -= 0.5  if ( $delay );
 
-   ok2 ( $elapsed >= $total, "Elapsed time for ${cnt} tests was greater than ${total} second(s)." );
+   dbug_cmp_ok ( $elapsed, '>=', $total, "Elapsed time for ${cnt} tests was greater than ${total} second(s)." );
 
    DBUG_VOID_RETURN ();
 }
@@ -184,7 +184,7 @@ sub test_2
    # Allow for rounding errors in total sleep time!
    $total -= 0.5  if ( $delay && DBUG_ACTIVE() );
 
-   ok2 ( $ttl_elapsed >= $total, "Elapsed time for ${ttl_cnt} tests was greater than ${total} second(s)." );
+   dbug_cmp_ok ( $ttl_elapsed, '>=', $total, "Elapsed time for ${ttl_cnt} tests was greater than ${total} second(s)." );
 
    DBUG_VOID_RETURN ();
 }
@@ -193,7 +193,7 @@ sub test_pause
 {
    DBUG_ENTER_FUNC (@_);
    DBUG_PAUSE ();
-   ok2 (1, "Pause is turned on ...");
+   dbug_ok (1, "Pause is turned on ...");
    test_2 ();
    DBUG_VOID_RETURN ();
 }

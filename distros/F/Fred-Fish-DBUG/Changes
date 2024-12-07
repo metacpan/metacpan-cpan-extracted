@@ -2,7 +2,7 @@
 #                and Fred::Fish::DBUG::ON
 #                and Fred::Fish::DBUG::OFF
 
-# The basic algorighm is in the public domain and this implementation has been
+# The basic algorithm is in the public domain and this implementation has been
 # customized to support Perl features while remaining faithful to the original
 # intent.
 
@@ -23,6 +23,20 @@
 
 Version - YYYY/MM/DD
 ---------------------
+2.09 2024-12-06 08:30:00
+  - Success!  It now passes all CPAN Testers tests for all versions of perl.
+  - Fixed some POD typos.
+  - Added Fred::Fish::DBUG::Test to handle common Test::More functions so that
+    info is written to fish as well.
+  - t/15-basic-test-and-helper.t replaced t/15-basic-helper.t
+  - t/*.t - Modified to use Fred::Fish::DBUG::Test.  Simplified a lot of code.
+  - helper1234.pm - removed a lot of unneeded code due to the above changes.
+  - t/57-delay-elapsed-slow-if-fish-on.t - Decreased the delay for each fish
+    write from 2.5 sec to 1.5 sec (the minimum for the test to work).  Done
+    since a CPAN Tester forced a timeout on this slow running test.  If it
+    sill fails it won't be fixed, since it isn't really a fatal error.  Just
+    anoying.
+
 2.08 2024-10-09 08:30:00
   - Finally found the bug!  The debugging helper methods in DBUG.pm was giving
     credit to the wrong file for who was sourcing in the module.  So when asked
@@ -30,7 +44,7 @@ Version - YYYY/MM/DD
   - Fixed all the test cases after t/15 to do "use helper1234" rather than
     use_ok since "make test" aborts at t/15 if there are issues, so we don't
     need to repeat this test over & over again.
-  - Backed out the above fix for the multi-thead tests.
+  - Backed out the above fix for the 3 multi-thread tests.
 
 2.07 2024-10-08 08:30:00
   - Added more tests to  t/15-basic-help.t to help narrow down the issue.
@@ -62,10 +76,10 @@ Version - YYYY/MM/DD
     expected.  Since so much logic depends on it.
   - CPAN Tester hack, didn't like me calling dbug_level() from BEGIN ?
     So added test in DBUG.pm to verify since I can't reproduce it (-100).
-    (used to verfy CPAN Tester issue described more fully in v2.05)
+    (used to verify CPAN Tester issue described more fully in v2.05)
   - Updated the POD NAME for all *.pm files to be fully qualified.
   - Depreciate DEBUG.pm & Log.pm, now just POD stubs.
-  - Fixed unexpected warning error ecountered by a CPAN tester on test case
+  - Fixed unexpected warning error encountered by a CPAN tester on test case
     t/70_multi_thread-test.t
 
 2.03 2024-08-05 08:30:00

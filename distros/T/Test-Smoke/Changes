@@ -1,3 +1,7 @@
+1.83 2024-12-07
+ - "Hello World!" from tib
+ - Maintenance release: cleaning, moving some files in distribution/repository
+
 1.82 2024-04-28T13:51:53+01:00 (70842fe => Abe Timmerman)
  - (Abe Timmerman, Sun, 28 Apr 2024 13:51:53 +0100) Autocommit for
    distribution Test-Smoke 1.82 (minor)

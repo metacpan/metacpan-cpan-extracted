@@ -2,8 +2,8 @@ NAME
     App::MineralUtils - Utilities related to mineral supplements
 
 VERSION
-    This document describes version 0.019 of App::MineralUtils (from Perl
-    distribution App-MineralUtils), released on 2024-12-03.
+    This document describes version 0.020 of App::MineralUtils (from Perl
+    distribution App-MineralUtils), released on 2024-12-04.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -95,13 +95,13 @@ FUNCTIONS
            ],
            {
              "table.fields"        => ["amount", "pct_ca", "unit", "summary"],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
                                         ["number", { thousands_sep => "", precision => 3 }],
-                                        ["number", { thousands_sep => "", precision => 3 }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
-             "table.field_aligns"  => ["number", "number", "left", "left"],
            },
          ]
 
@@ -165,6 +165,12 @@ FUNCTIONS
                summary => "Ferrous sulphate heptahydrate (FeSO4.7H2O), in milligrams",
              },
              {
+               amount  => 3.33333333333333,
+               pct_fe  => 29.975443163672,
+               unit    => "mg-fe-iii-pyrophosphate",
+               summary => "Iron (III) pyrophosphate (Fe4O21P6), in milligrams",
+             },
+             {
                amount  => 12.5,
                pct_fe  => 8,
                unit    => "mg-lipofer",
@@ -176,12 +182,30 @@ FUNCTIONS
                unit    => "mg-sunactive-fe",
                summary => "SunActive Fe (micronized, microencapsulated form of iron pyrophosphate), in milligrams",
              },
+             {
+               amount  => 3.64963503649635,
+               pct_fe  => 27.380368699745,
+               unit    => "mg-fe-glycinate",
+               summary => "Iron glycinate a.k.a. ferrous bisglycinate (C4H8FeN2O4), in milligrams",
+             },
+             {
+               amount  => 3.64963503649635,
+               pct_fe  => 27.380368699745,
+               unit    => "mg-fe-bisglycinate",
+               summary => "Iron glycinate a.k.a. ferrous bisglycinate (C4H8FeN2O4), in milligrams",
+             },
+             {
+               amount  => 8,
+               pct_fe  => 12.4610626656789,
+               unit    => "mg-fe-gluconate",
+               summary => "Iron (II) gluconate (C12H22FeO14), in milligrams",
+             },
            ],
            {
-             "table.fields"        => ["amount", "pct_fe", "unit", "summary"],
              "table.field_aligns"  => ["number", "number", "left", "left"],
+             "table.fields"        => ["amount", "pct_fe", "unit", "summary"],
              "table.field_formats" => [
-                                        ["number", { thousands_sep => "", precision => 3 }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
@@ -588,14 +612,14 @@ FUNCTIONS
              },
            ],
            {
-             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
                                         ["number", { thousands_sep => "", precision => 3 }],
-                                        ["number", { thousands_sep => "", precision => 3 }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
              "table.fields"        => ["amount", "pct_k", "unit", "summary"],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
            },
          ]
 
@@ -712,13 +736,13 @@ FUNCTIONS
            ],
            {
              "table.field_aligns"  => ["number", "number", "left", "left"],
+             "table.fields"        => ["amount", "pct_na", "unit", "summary"],
              "table.field_formats" => [
                                         ["number", { thousands_sep => "", precision => 3 }],
-                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
-             "table.fields"        => ["amount", "pct_na", "unit", "summary"],
            },
          ]
 

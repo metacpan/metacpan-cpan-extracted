@@ -54,7 +54,7 @@ use Fred::Fish::DBUG::ON;
 # use Config qw( %Config );
 # use Sub::Identify 'sub_fullname';
 
-$VERSION = "2.08";
+$VERSION = "2.09";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( 
@@ -453,6 +453,9 @@ L<Fred::Fish::DBUG::Signal> - Allows you to trap and log signals to B<fish>.
 L<Fred::Fish::DBUG::SignalKiller> - Allows you to implement action
 DBUG_SIG_ACTION_LOG for B<die>.  Really dangerous to use.  Will break most
 code bases.
+
+L<Fred::Fish::DBUG::Test> - A L<Test::More> wrapper to redirect test results to
+B<fish>.
 
 L<Fred::Fish::DBUG::Tutorial> - Sample code demonstrating using DBUG module.
 

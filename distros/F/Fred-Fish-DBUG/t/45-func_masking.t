@@ -22,6 +22,7 @@ use warnings;
 use Test::More tests => 27;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -29,7 +30,7 @@ my $start_level;
 
 sub my_warn
 {
-   ok3 (0, "There was an expected warning!  Check fish.");
+   dbug_ok (0, "There was an expected warning!  Check fish.");
 }
 
 # Used to determine how many arguments were actually
@@ -55,7 +56,7 @@ sub func2
    my $mask = shift;    # Remove the expected mask count ...
    DBUG_ENTER_FUNC (@_);
    my $cnt = mask_assist ( $mask );
-   ok3 ( $cnt == $mask, "Function func2(${cnt}) had ${mask} paramerter(s) masked!");
+   dbug_is ( $cnt, $mask, "Function func2(${cnt}) had ${mask} paramerter(s) masked!");
    DBUG_VOID_RETURN ();
 }
 
@@ -68,15 +69,14 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {     # Test # 2
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
-             join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -94,18 +94,18 @@ BEGIN {
    DBUG_ENTER_FUNC (@ARGV);
 
    $start_level = test_fish_level ();
-   is2 ($start_level, $lvl, "In the BEGIN block ...");   # Test # 2
+   dbug_is ($start_level, $lvl, "In the BEGIN block ...");   # Test # 2
    DBUG_PRINT ("PURPOSE", "\nJust verifying that the masking of function arguments are good!\n.");
 
    DBUG_MASK_NEXT_FUNC_CALL (-1);
    func2(4, "B01", "B02", "B03", "B04");
 
    $lvl = test_fish_level ();
-   is2 ($lvl, $start_level, "BEGIN Level Check Worked!");
+   dbug_is ($lvl, $start_level, "BEGIN Level Check Worked!");
 
-   ok3 ( dbug_active_ok_test () );
+   dbug_ok ( dbug_active_ok_test () );
 
-   ok3 ( 1, "Fish Log: " . DBUG_FILE_NAME() );
+   dbug_ok ( 1, "Fish Log: " . DBUG_FILE_NAME() );
 
    DBUG_VOID_RETURN ();
 }
@@ -114,12 +114,12 @@ BEGIN {
 END {
    DBUG_ENTER_FUNC (@_);
 
-   ok3 (1, "In the END block ...");     # Test # 12
+   dbug_ok (1, "In the END block ...");     # Test # 12
    DBUG_MASK_NEXT_FUNC_CALL (-1);
    DBUG_MASK_NEXT_FUNC_CALL (1);
    func2(1, "E01", "E02", "E03");
    my $lvl = test_fish_level ();
-   is2 ($lvl, $start_level, "END Level Check Worked!");
+   dbug_is ($lvl, $start_level, "END Level Check Worked!");
 
    DBUG_VOID_RETURN ();
 }
@@ -130,7 +130,7 @@ END {
 {
    DBUG_ENTER_FUNC (@ARGV);
 
-   ok3 (1, "In the MAIN program ...");  # Test # 4 ...
+   dbug_ok (1, "In the MAIN program ...");  # Test # 4 ...
 
    func1(0, 1, 2, 3);
    block_test(0, "Test-1", "Test-2", "Test-3");
@@ -141,7 +141,7 @@ END {
    level_test();
 
    my $lvl = test_fish_level ();
-   is2 ($lvl, $start_level, "MAIN Level Check Worked!");
+   dbug_is ($lvl, $start_level, "MAIN Level Check Worked!");
 
    DBUG_LEAVE (0);
 }
@@ -160,7 +160,7 @@ sub func1
    DBUG_ENTER_FUNC (@_);
 
    my $cnt = mask_assist ($mask);
-   ok3 ( $cnt == $mask, "Function func1() had ${mask} paramerter(s) masked!");
+   dbug_is ( $cnt, $mask, "Function func1() had ${mask} paramerter(s) masked!");
 
    DBUG_MASK_NEXT_FUNC_CALL ("hint");
    DBUG_MASK_NEXT_FUNC_CALL (0, 2, 4, 6);
@@ -179,12 +179,12 @@ sub func3
    DBUG_ENTER_FUNC (@_);
 
    my $cnt = mask_assist ($mask);
-   ok3 ( $cnt == $mask, "Function func3($cnt) had ${mask} paramerter(s) masked!");
+   dbug_is ( $cnt, $mask, "Function func3($cnt) had ${mask} paramerter(s) masked!");
 
    if (1==1) {
       DBUG_ENTER_BLOCK ("nameless");
       $cnt = mask_assist (0);
-      ok3 ($cnt == 0, "Nameless block test!");
+      dbug_is ($cnt, 0, "Nameless block test!");
       DBUG_VOID_RETURN ();
    }
 
@@ -196,7 +196,7 @@ sub block_test
    my $mask = shift;   # Remove the expected mask count ...
    DBUG_ENTER_BLOCK ("block_test");
    my $cnt = mask_assist (0);
-   ok3 ($cnt == 0, "Block test without FUNC!");
+   dbug_is ($cnt, 0, "Block test without FUNC!");
    DBUG_VOID_RETURN ();
 }
 
@@ -206,7 +206,7 @@ sub eval_test
    DBUG_ENTER_FUNC (@_);
 
    my $cnt = mask_assist ($mask);
-   ok3 ($cnt == $mask, "Function eval_test() masked $mask parameters.");
+   dbug_is ($cnt, $mask, "Function eval_test() masked $mask parameters.");
 
    eval {
       DBUG_MASK_NEXT_FUNC_CALL (-1);
@@ -214,7 +214,7 @@ sub eval_test
       $cnt = mask_assist (0);
       DBUG_MASK_NEXT_FUNC_CALL (2, 33);
       func2(1, "EVAL-1", "EVAL-2", "EVAL-3");
-      ok3 ($cnt == 0, "Eval test!");
+      dbug_is ($cnt, 0, "Eval test!");
       DBUG_VOID_RETURN ();
    };
    DBUG_VOID_RETURN ();
@@ -226,7 +226,7 @@ sub eval_block_test
    DBUG_ENTER_BLOCK ("eval_block_test");
 
    my $cnt = mask_assist (0);
-   ok3 ($cnt == 0, "Function eval_block_test() masked 0 parameters.");
+   dbug_is ($cnt, 0, "Function eval_block_test() masked 0 parameters.");
 
    eval {
       DBUG_MASK_NEXT_FUNC_CALL (-1);
@@ -234,7 +234,7 @@ sub eval_block_test
       $cnt = mask_assist (0);
       DBUG_MASK_NEXT_FUNC_CALL (0, 22);
       func2(1, "EVAL-1", "EVAL-2", "EVAL-3");
-      ok3 ($cnt == 0, "Eval block test!");
+      dbug_is ($cnt, 0, "Eval block test!");
       DBUG_VOID_RETURN ();
    };
    DBUG_VOID_RETURN ();

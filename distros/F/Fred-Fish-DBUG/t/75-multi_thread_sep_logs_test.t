@@ -8,6 +8,7 @@ use File::Spec;
 use Config qw ( %Config );
 
 # Defered since has to be done after Test::More due to multi-threading.
+# use Fred::Fish::DBUG::Test;
 # BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 # use helper1234;
 
@@ -82,34 +83,37 @@ BEGIN {
    # Can't use any of the constants defined by this module
    # unless we use them in a separate BEGIN block!
 
+   unless (use_ok ("Fred::Fish::DBUG::Test")) {
+      done_testing ();
+      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Test" );   # Test # 1
+      exit (0);
+   }
+
    push (@INC, File::Spec->catdir (".", "t", "off"));
 
    # Helper module makes sure DIE & WARN traps are set ...
    unless (use_ok ("helper1234")) {
-      done_testing ();
-      BAIL_OUT ( "Can't load helper1234" );   # Test # 1
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load helper1234" );   # Test # 1
    }
 
    my $fish_module = get_fish_module ();
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
-              join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");
 
    if ( is_threads_supported() ) {
-      ok (1, "${fish_module} says threads ARE supported!");
+      dbug_ok (1, "${fish_module} says threads ARE supported!");
    } else {
-      ok (1, "${fish_module} says threads are NOT supported!" );
+      dbug_ok (1, "${fish_module} says threads are NOT supported!" );
    }
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -119,7 +123,7 @@ my %fish_opts;
 
 sub my_warn
 {
-   ok3 (0, "There was an expected warning!  Check fish.");
+   dbug_ok (0, "There was an expected warning!  Check fish.");
 }
 
 BEGIN {
@@ -144,10 +148,10 @@ BEGIN {
    DBUG_ENTER_FUNC ();
 
    $start_level = test_fish_level_no_warn ( 1 );
-   is2 ($start_level, 1, "In the BEGIN block ...");
+   dbug_is ($start_level, 1, "In the BEGIN block ...");
 
-   ok3 ( ! DBUG_ACTIVE(), "Fish is turned OFF for now." );
-   ok3 ( 1, "Fish Log: " . DBUG_FILE_NAME() );
+   dbug_ok ( ! DBUG_ACTIVE(), "Fish is turned OFF for now." );
+   dbug_ok ( 1, "Fish Log: " . DBUG_FILE_NAME() );
 
    DBUG_VOID_RETURN ();
 }
@@ -160,7 +164,7 @@ END {
 
    my $end_level = test_fish_level_no_warn ($start_level);
    unless ( $start_level == $end_level ) {
-      ok3 (0, "In the END block ... Level test worked!");
+      dbug_ok (0, "In the END block ... Level test worked!");
    }
 
    DBUG_VOID_RETURN ();
@@ -176,14 +180,14 @@ END {
    DBUG_ENTER_FUNC (@ARGV);
 
    unless ( is_threads_supported () ) {
-      ok2 (1, get_fish_module () . " says threads are not supported for your Perl!  Skipping threads tests.");
+      dbug_ok (1, get_fish_module () . " says threads are not supported for your Perl!  Skipping threads tests.");
       done_testing ();
       DBUG_LEAVE (0);
    }
 
-   ok2 (1, "NOTE: Each thread will write to it's own fish logs.  So it's output is cleaner!");
+   dbug_ok (1, "NOTE: Each thread will write to it's own fish logs.  So it's output is cleaner!");
 
-   is2 (test_fish_level_no_warn($start_level), $start_level, "In the MAIN program ...");
+   dbug_is (test_fish_level_no_warn($start_level), $start_level, "In the MAIN program ...");
 
    my $thr1 = threads->create ( \&new_thread, 5, "one", "test" );
    my $thr2 = threads->create ( \&new_thread, 3, "two", "test" );
@@ -198,7 +202,7 @@ END {
    # the main thread!
    # ----------------------------------------------------
    my $res = new_thread (0, "Not a thread call!");
-   ok2 (1, "Function returned: $res");
+   dbug_ok (1, "Function returned: $res");
 
    DBUG_PRINT ("NOTE", ".\n%s\n%s\n%s\n.",
                        "We must wait on thread 5 to complete before the program terminates!",
@@ -210,27 +214,27 @@ END {
    $thr6->detach ();   # Does complete!
 
    $res = $thr3->join ();
-   ok2 ( ! defined $res, "Thread 3 returned: <undef>" );
+   dbug_ok ( ! defined $res, "Thread 3 returned: <undef>" );
    $res = $thr2->join ();
-   ok2 ( defined $res, "Thread 2 returned: $res" );
+   dbug_ok ( defined $res, "Thread 2 returned: $res" );
    $res = $thr1->join ();
-   ok2 ( defined $res, "Thread 1 returned: $res" );
+   dbug_ok ( defined $res, "Thread 1 returned: $res" );
    $res = $thr4->join ();
-   ok2 ( defined $res, "Thread 4 returned: $res" );
+   dbug_ok ( defined $res, "Thread 4 returned: $res" );
 
-   ok2 (1, "-----------------------------------------------------");
+   dbug_ok (1, "-----------------------------------------------------");
 
-   ok3 (1, "Each thread has it's own log file!");
+   dbug_ok (1, "Each thread has it's own log file!");
 
-   is2 (test_fish_level_no_warn($start_level), $start_level, "Ending the MAIN program ...");
+   dbug_is (test_fish_level_no_warn($start_level), $start_level, "Ending the MAIN program ...");
 
    # Must wait until this thread finishes running.  Else when the main thread
    # finishes it will kill thread 5 and leave trash on the file system.
    while ( $thr5->is_running () ) {
-      ok3 ( 1, "Detached Thread 5 is still running." );
+      dbug_ok ( 1, "Detached Thread 5 is still running." );
       sleep (2);
    }
-   ok3 ( 1, "Detached Thread 5 has stopped running." );
+   dbug_ok ( 1, "Detached Thread 5 has stopped running." );
 
    # Tell Test::More we're done with the testing!
    done_testing ();
@@ -276,14 +280,14 @@ sub new_thread
 
    my $tid = threads->tid();
 
-   ok2 (1, "Fish Log in Thread-$lbl ($$, $tid) is: " . DBUG_FILE_NAME());
+   dbug_ok (1, "Fish Log in Thread-$lbl ($$, $tid) is: " . DBUG_FILE_NAME());
 
    if ( $sleep > 0 ) {
-      ok2 (1, "In Thread-$lbl: ($$, $tid).   Sleeping for ${sleep} second(s)");
+      dbug_ok (1, "In Thread-$lbl: ($$, $tid).   Sleeping for ${sleep} second(s)");
       sleep ($sleep);
-      ok2 (1, "In Thread-$lbl: ($$, $tid).   Slept for ${sleep} second(s)");
+      dbug_ok (1, "In Thread-$lbl: ($$, $tid).   Slept for ${sleep} second(s)");
    } else {
-      ok2 (1, "In Thread-$lbl: ($$, $tid).   Not sleeping!");
+      dbug_ok (1, "In Thread-$lbl: ($$, $tid).   Not sleeping!");
    }
 
    # If we're running in a thread instead of the main program ...
@@ -309,8 +313,8 @@ sub undef_thread
    DBUG_PUSH ($fish, \%fish_opts);
 
    my $tid = threads->tid();
-   ok2 (1, "Fish Log in Thread-$tid ($$, $tid) is: " . DBUG_FILE_NAME());
-   ok2 (1, "In Thread-$tid: ($$, $tid).   Not sleeping!");
+   dbug_ok (1, "Fish Log in Thread-$tid ($$, $tid) is: " . DBUG_FILE_NAME());
+   dbug_ok (1, "In Thread-$tid: ($$, $tid).   Not sleeping!");
 
    DBUG_VOID_RETURN ();
 }
@@ -335,7 +339,7 @@ sub recursive_thread
    # Only call's OK on failure!  Otherwise too verbose ...
    if ( $level != test_fish_level_no_warn ($level) ) {
       my $tid = threads->tid ();
-      ok3 (0, "Thread ${tid}'s trace balanced out to level ${level}");
+      dbug_ok (0, "Thread ${tid}'s trace balanced out to level ${level}");
    }
 
    DBUG_RETURN ( $res );
@@ -353,7 +357,7 @@ sub recursive_thread_wrapper
    # Only call's OK on failure!  Otherwise too verbose ...
    if ( $level != test_fish_level_no_warn ($level) ) {
       my $tid = threads->tid ();
-      ok3 (0, "Thread ${tid}'s trace balanced out to level ${level}");
+      dbug_ok (0, "Thread ${tid}'s trace balanced out to level ${level}");
    }
 
    DBUG_RETURN ( $res );

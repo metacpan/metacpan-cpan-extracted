@@ -6,6 +6,7 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -19,7 +20,7 @@ my $start_level;
 
 sub my_warn
 {
-   ok3 (0, "There was an expected warning!  Check fish.");
+   dbug_ok (0, "There was an expected warning!  Check fish.");
 }
 
 BEGIN {
@@ -30,15 +31,14 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {     # Test # 2
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
-             join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -55,11 +55,11 @@ BEGIN {
    DBUG_ENTER_FUNC ();
 
    $start_level = test_fish_level ();
-   is2 ($start_level, $lvl, "In the BEGIN block ...");
+   dbug_is ($start_level, $lvl, "In the BEGIN block ...");
 
-   ok3 ( dbug_active_ok_test () );
+   dbug_ok ( dbug_active_ok_test () );
 
-   ok3 ( 1, "Fish Log: " . DBUG_FILE_NAME() );
+   dbug_ok ( 1, "Fish Log: " . DBUG_FILE_NAME() );
 
    DBUG_VOID_RETURN ();
 }
@@ -69,7 +69,7 @@ END {
    DBUG_ENTER_FUNC (@_);
 
    my $lvl = test_fish_level ();
-   is2 ($lvl, $start_level, "In the END block ...");
+   dbug_is ($lvl, $start_level, "In the END block ...");
 
    # So we don't have to count the test cases ...
    # Per standards it's a No-No to put into an end block,
@@ -87,7 +87,7 @@ END {
 {
    DBUG_ENTER_FUNC (@ARGV);
 
-   ok3 (1, "In the MAIN program ...");
+   dbug_ok (1, "In the MAIN program ...");
 
    pause_1 ();
    pause_2 ();
@@ -96,7 +96,7 @@ END {
    pause_good_warn ();
 
    my $lvl = test_fish_level ();
-   is2 ($lvl, $start_level, "MAIN Level Check");
+   dbug_is ($lvl, $start_level, "MAIN Level Check");
 
    DBUG_LEAVE (0);
 }
@@ -105,18 +105,18 @@ sub pause_1
 {
    DBUG_ENTER_FUNC (@_);
    DBUG_PAUSE ();
-   ok3 (1, "First pause test");
+   dbug_ok (1, "First pause test");
    DBUG_VOID_RETURN ();
 }
 
 sub pause_2
 {
    DBUG_ENTER_FUNC (@_);
-   ok3 (1, "Pause Test 1 (of 3)");
+   dbug_ok (1, "Pause Test 1 (of 3)");
    DBUG_PAUSE ();
-   ok3 (1, "Pause Test 2 (of 3)");
+   dbug_ok (1, "Pause Test 2 (of 3)");
    DBUG_PAUSE ();
-   ok3 (1, "Pause Test 3 (of 3)");
+   dbug_ok (1, "Pause Test 3 (of 3)");
    DBUG_VOID_RETURN ();
 }
 
@@ -124,11 +124,11 @@ sub eval_pause
 {
    DBUG_ENTER_FUNC (@_);
    eval {
-      ok3 (1, "Eval Test # 1!");
+      dbug_ok (1, "Eval Test # 1!");
       DBUG_PAUSE();
-      ok3 (1, "Eval Test # 2!");
+      dbug_ok (1, "Eval Test # 2!");
       DBUG_PAUSE();
-      ok3 (1, "Eval Test # 3!");
+      dbug_ok (1, "Eval Test # 3!");
    };
    DBUG_VOID_RETURN ();
 }
@@ -136,13 +136,13 @@ sub eval_pause
 sub pause_block
 {
    DBUG_ENTER_FUNC (@_);
-   ok3 (1, "Pause Block Test");
+   dbug_ok (1, "Pause Block Test");
 
    DBUG_ENTER_BLOCK ("unknown");
    DBUG_PAUSE ();
-   ok3 (1, "Pause Block Test 2!");
+   dbug_ok (1, "Pause Block Test 2!");
    DBUG_VOID_RETURN ();
-   ok3 (1, "Pause Block Test Ended!");
+   dbug_ok (1, "Pause Block Test Ended!");
 
    DBUG_VOID_RETURN ();
 }
@@ -150,7 +150,7 @@ sub pause_block
 sub my_warn_ok
 {
    chomp (my $msg = shift);
-   ok3 (1, "__WARN__ : " . $msg);
+   dbug_ok (1, "__WARN__ : " . $msg);
 }
 
 # Shows even when fish is paused, the warning still
@@ -159,11 +159,11 @@ sub pause_good_warn
 {
    DBUG_ENTER_FUNC (@_);
    DBUG_PAUSE ();
-   ok3 (1, "Pause Good Warn test 1!");
+   dbug_ok (1, "Pause Good Warn test 1!");
    DBUG_TRAP_SIGNAL ( "__WARN__", DBUG_SIG_ACTION_LOG, \&my_warn_ok );
    warn ("This warning was generated while Pause is on!");
    DBUG_TRAP_SIGNAL ( "__WARN__", DBUG_SIG_ACTION_LOG, \&my_warn );
-   ok3 (2, "Pause Good Warn test 22");
+   dbug_ok (2, "Pause Good Warn test 2!");
    DBUG_VOID_RETURN ();
 }
 

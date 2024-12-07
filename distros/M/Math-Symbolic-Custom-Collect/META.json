@@ -38,11 +38,22 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::Simple" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mjohnson108/p5-msc-collect/issues"
+      },
+      "homepage" : "https://github.com/mjohnson108/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mjohnson108/p5-msc-collect.git",
+         "web" : "https://github.com/mjohnson108/p5-msc-collect"
+      }
+   },
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

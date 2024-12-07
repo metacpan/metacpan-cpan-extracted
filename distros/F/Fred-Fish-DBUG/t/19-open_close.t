@@ -10,6 +10,7 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -17,7 +18,7 @@ my $start_level;
 
 sub my_warn
 {
-   ok3 (0, "There were no unexpected warnings!");
+   dbug_ok (0, "There were no unexpected warnings!");
 }
 
 BEGIN {
@@ -28,15 +29,14 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {      # Test # 2
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
-             join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -56,9 +56,9 @@ BEGIN {
    DBUG_ENTER_FUNC ();
 
    $start_level = test_fish_level ();
-   is2 ($start_level, $lvl, "In the BEGIN block ...");   # Test # 3
+   dbug_is ($start_level, $lvl, "In the BEGIN block ...");   # Test # 3
 
-   ok3 ( dbug_active_ok_test () );
+   dbug_ok ( dbug_active_ok_test () );
 
    DBUG_VOID_RETURN ();
 }
@@ -70,7 +70,7 @@ END {
 
    my $end_level = test_fish_level ();
    if ( $start_level != $end_level ) {
-      ok3 (0, "In the END block ... ($start_level vs $end_level)");
+      dbug_ok (0, "In the END block ... ($start_level vs $end_level)");
    }
 
    DBUG_VOID_RETURN ();
@@ -82,21 +82,21 @@ END {
 {
    DBUG_ENTER_FUNC (@ARGV);
 
-   ok3 (1, "In the MAIN program ...");  # Test # 5 ...
+   dbug_ok (1, "In the MAIN program ...");  # Test # 5 ...
 
    # -----------------------------------
    # Tests # 6 to 9 ...
    # -----------------------------------
    my $msg = "Hello World!\n";
    my $ans = DBUG_PRINT ("INFO", "%s", $msg);
-   is2 ($ans, $msg, "The print statement returned the formatted string!");
+   dbug_is ($ans, $msg, "The print statement returned the formatted string!");
 
-   ok3 ( chdir ("t"), "Entered the test directory \"t\".");
+   dbug_ok ( chdir ("t"), "Entered the test directory \"t\".");
    DBUG_PRINT ("INFO", "%s", "Good Bye!");
 
-   ok3 (1, "Fish File: " . DBUG_FILE_NAME ());
+   dbug_ok (1, "Fish File: " . DBUG_FILE_NAME ());
 
-   is2 (test_fish_level(), $start_level, "Level Check");
+   dbug_is (test_fish_level(), $start_level, "Level Check");
 
    # Terminate the test case.
    done_testing ();

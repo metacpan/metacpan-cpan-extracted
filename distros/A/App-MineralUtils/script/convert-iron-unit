@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-12-03'; # DATE
+our $DATE = '2024-12-04'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_iron_unit",
@@ -39,7 +39,7 @@ convert-iron-unit - Convert an iron quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.019 of convert-iron-unit (from Perl distribution App-MineralUtils), released on 2024-12-03.
+This document describes version 0.020 of convert-iron-unit (from Perl distribution App-MineralUtils), released on 2024-12-04.
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ Can also be specified as the 1st command-line argument.
 
 Valid values:
 
- ["mg","mg-fe-elem","mg-ferrous-sulfate-heptahydrate","mg-lipofer","mg-sunactive-fe"]
+ ["mg","mg-fe-elem","mg-ferrous-sulfate-heptahydrate","mg-fe-iii-pyrophosphate","mg-lipofer","mg-sunactive-fe","mg-fe-glycinate","mg-fe-bisglycinate","mg-fe-gluconate"]
 
 Can also be specified as the 2nd command-line argument.
 
@@ -203,8 +203,12 @@ For fish and zsh, install L<shcompgen> as described above.
  +--------+---------+---------------------------------+--------------------------------------------------------------------------------------------------+
  |  1.000 | 100.000 | mg-fe-elem                      | Elemental iron, in milligrams                                                                    |
  |  4.975 |  20.087 | mg-ferrous-sulfate-heptahydrate | Ferrous sulphate heptahydrate (FeSO4.7H2O), in milligrams                                        |
+ |  3.333 |  29.975 | mg-fe-iii-pyrophosphate         | Iron (III) pyrophosphate (Fe4O21P6), in milligrams                                               |
  | 12.500 |   8.000 | mg-lipofer                      | Lipofer (micronized, microencapsulated, water-soluble form of iron pyrophosphate), in milligrams |
  | 12.500 |   8.000 | mg-sunactive-fe                 | SunActive Fe (micronized, microencapsulated form of iron pyrophosphate), in milligrams           |
+ |  3.650 |  27.380 | mg-fe-glycinate                 | Iron glycinate a.k.a. ferrous bisglycinate (C4H8FeN2O4), in milligrams                           |
+ |  3.650 |  27.380 | mg-fe-bisglycinate              | Iron glycinate a.k.a. ferrous bisglycinate (C4H8FeN2O4), in milligrams                           |
+ |  8.000 |  12.461 | mg-fe-gluconate                 | Iron (II) gluconate (C12H22FeO14), in milligrams                                                 |
  +--------+---------+---------------------------------+--------------------------------------------------------------------------------------------------+
 
 =head1 HOMEPAGE

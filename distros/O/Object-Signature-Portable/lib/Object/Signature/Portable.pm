@@ -2,9 +2,7 @@ package Object::Signature::Portable;
 
 # ABSTRACT: generate portable fingerprints of objects
 
-use v5.10;
-
-use strict;
+use v5.14;
 use warnings;
 
 use Carp;
@@ -12,7 +10,9 @@ use Crypt::Digest;
 use Exporter 5.57 qw/ import /;
 use JSON::MaybeXS;
 
-our $VERSION = 'v1.1.2';
+# RECOMMEND PREREQ: Crypt::Digest 0.062
+
+our $VERSION = 'v1.2.0';
 
 our @EXPORT    = qw/ signature /;
 our @EXPORT_OK = @EXPORT;
@@ -67,7 +67,7 @@ Object::Signature::Portable - generate portable fingerprints of objects
 
 =head1 VERSION
 
-version v1.1.2
+version v1.2.0
 
 =head1 SYNOPSIS
 
@@ -261,16 +261,22 @@ structures, as a simple means of determining whether two structures
 are different.
 
 For that purpose, the MD5 algorithm is probably good enough.  However,
-if you are hashing that in part comes from untrusted sources, or the
+if you are hashing data that in part comes from untrusted sources, or the
 consequences of two different data structures having the same
 signature are significant, then you should consider using a different
 algorithm.
 
 This module is I<not> intended for hashing passwords.
 
-=for readme continue
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+This module requires Perl v5.14 or later.
+
+Future releases may only support Perl versions released in the last ten years.
 
 =head1 SEE ALSO
+
+=for readme continue
 
 =head2 Similar Modules
 
@@ -328,6 +334,12 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.
+Please see F<SECURITY-POLICY.md> for instructions how to report
+security vulnerabilities
+
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
@@ -337,9 +349,15 @@ Robert Rothenberg <rrwo@cpan.org>
 Thanks to various people at YAPC::EU 2014 for suggestions about
 L<Sereal::Encoder>.
 
+=head1 CONTRIBUTOR
+
+=for stopwords Slaven Rezić
+
+Slaven Rezić <slaven@rezic.de>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2014, 2019-2022 by Robert Rothenberg.
+This software is Copyright (c) 2013-2014, 2019-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

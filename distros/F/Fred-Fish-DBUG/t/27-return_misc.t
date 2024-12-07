@@ -6,6 +6,7 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -20,13 +21,13 @@ my $compile_warn;
 sub ignore_compile_warnings
 {
    chomp (my $msg = shift);
-   ok2 (1, "__WARN___: " . $msg);
+   dbug_ok (1, "__WARN___: " . $msg);
    ++$compile_warn;
 }
 
 sub my_warn
 {
-   ok2 (0, "There was an expected warning!");
+   dbug_ok (0, "There was an expected warning!");
 }
 
 BEGIN {
@@ -37,15 +38,14 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {     # Test # 2
-      bail ( "Can't load $fish_module via Fred::Fish::Dbug qw / " .
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::Dbug qw / " .
              join (" ", @opts) . " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -62,11 +62,11 @@ BEGIN {
 
    DBUG_ENTER_FUNC ();
 
-   my $a = ok2 (1, "In the BEGIN block ...");
+   my $a = dbug_ok (1, "In the BEGIN block ...");
 
-   ok2 ( dbug_active_ok_test () );
+   dbug_ok ( dbug_active_ok_test () );
 
-   ok2 (1, "Fish File: " . DBUG_FILE_NAME ());
+   dbug_ok (1, "Fish File: " . DBUG_FILE_NAME ());
 
    # Done to trap the compile time warnings so they
    # are not treated as failed test cases.
@@ -92,22 +92,22 @@ END {
 
    my $lvl1 = test_fish_level ();
 
-   is2 ($compile_warn, 2, "There were only 2 compiler warnings!");
+   dbug_is ($compile_warn, 2, "There were only 2 compiler warnings!");
 
    # --------------------------------------------------------------
    DBUG_PRINT ("----", "%s", "-"x50);
    DBUG_PRINT ("----", "The DBUG_RETURN Void Tests ...");
    # --------------------------------------------------------------
    return_test ();
-   ok2 (1, "Ignoring the return values");
+   dbug_ok (1, "Ignoring the return values");
 
    # This generates compile time warnings if not disabled ...
    (return_test ())[0];
-   ok2 (1, "Ignoring the return values");
+   dbug_ok (1, "Ignoring the return values");
 
    # This generates compile time warnings if not disabled ...
    (return_test ())[0,2,4];
-   ok2 (1, "Ignoring the return values");
+   dbug_ok (1, "Ignoring the return values");
 
    # --------------------------------------------------------------
    DBUG_PRINT ("----", "%s", "-"x50);
@@ -119,7 +119,7 @@ END {
 
    my @lst = reverse return_test ();
    my $res = join (", ", @lst);
-   ok2 ($rev eq $res, "The list reversed OK.  $res");
+   dbug_is ($rev, $res, "The list reversed OK.  $res");
 
    # --------------------------------------------------------------
    DBUG_PRINT ("----", "%s", "-"x50);
@@ -130,8 +130,8 @@ END {
    @lst = (return_test ())[1,3,5];
    $cnt = @lst;
    $res = join (", ", @lst);
-   ok2 ($cnt == 3, "List contains 3 entries in it.");
-   ok2 ($lst[0] eq "b" && $lst[1] eq "d" && $lst[2] eq "f",
+   dbug_is ($cnt, 3, "List contains 3 entries in it.");
+   dbug_ok ($lst[0] eq "b" && $lst[1] eq "d" && $lst[2] eq "f",
                    "All 3 values were correct!  $res");
 
    DBUG_PRINT ("----", "%s", "-"x50);
@@ -139,22 +139,22 @@ END {
    @lst = (return_test ())[-1];
    $cnt = @lst;
    $res = join (", ", @lst);
-   ok2 ($cnt == 1, "List contains 1 entries in it.");
-   ok2 ($lst[0] eq "g", "It held the correct last value.  $res");
+   dbug_is ($cnt, 1, "List contains 1 entries in it.");
+   dbug_is ($lst[0], "g", "It held the correct last value.  $res");
 
    DBUG_PRINT ("----", "%s", "-"x50);
 
    @lst = (return_test ())[-2,1];
    $cnt = @lst;
    $res = join (", ", @lst);
-   ok2 ($cnt == 2, "List contains 2 entries in it.");
-   ok2 ($lst[0] eq "f" && $lst[1] eq "b",
+   dbug_is ($cnt, 2, "List contains 2 entries in it.");
+   dbug_ok ($lst[0] eq "f" && $lst[1] eq "b",
                    "It held the correct values.  $res");
 
    DBUG_PRINT ("----", "%s", "-"x50);
 
    my $lvl2 = test_fish_level ();
-   is2 ( $lvl2, $lvl1, "Fish Levels are good!" );
+   dbug_is ( $lvl2, $lvl1, "Fish Levels are good!" );
 
    # Terminate the test case.
    done_testing ();

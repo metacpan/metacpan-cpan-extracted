@@ -11,6 +11,7 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -18,9 +19,7 @@ my $start_level;
 
 sub my_warn
 {
-   done_testing ();
-   BAIL_OUT ( "An Unexpected Warning was trapped!");
-   exit (0);
+   dbug_BAIL_OUT ( "An Unexpected Warning was trapped!" );
 }
 
 BEGIN {
@@ -31,19 +30,18 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {              # Test # 2
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
-             join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");   # Test # 3
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");   # Test # 3
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {           # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
    }
 
    unless (use_ok ("Fred::Fish::DBUG::SignalKiller")) {       # Test # 5
-      bail ( "Can't load Fred::Fish::DBUG::SignalKiller" );
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::SignalKiller" );
    }
 }
 
@@ -62,12 +60,12 @@ BEGIN {
    DBUG_ENTER_FUNC ();
 
    $start_level = test_fish_level ();
-   is2 ($start_level, $lvl, "In the BEGIN block ...");   # Test # 5
+   dbug_is ($start_level, $lvl, "In the BEGIN block ...");   # Test # 5
 
-   ok2 ( dbug_active_ok_test () );                    # Test # 6
+   dbug_ok ( dbug_active_ok_test () );                    # Test # 6
 
    my $f = DBUG_FILE_NAME ();                         # Test # 7
-   ok2 (1, "Fish File: $f");
+   dbug_ok (1, "Fish File: $f");
 
    DBUG_VOID_RETURN ();
 }
@@ -86,12 +84,12 @@ BEGIN {
       require Try::Tiny;
       Try::Tiny->import ();
 
-      ok2 (1, "Try::Tiny is installed.");
+      dbug_ok (1, "Try::Tiny is installed.");
       $try_tiny_flag = 1;
    };
 
    if ( $@ ) {
-      ok2 (1, "Try::Tiny isn't installed, so skipping those tests!");
+      dbug_ok (1, "Try::Tiny isn't installed, so skipping those tests!");
    }
 
    DBUG_VOID_RETURN ();
@@ -104,7 +102,7 @@ END {
 
    my $end_level = test_fish_level ();
    if ( $start_level != $end_level ) {
-      ok2 (0, "In the END block ... ($start_level vs $end_level)");
+      dbug_ok (0, "In the END block ... ($start_level vs $end_level)");
    }
 
    DBUG_VOID_RETURN ();
@@ -116,7 +114,7 @@ END {
 {
    DBUG_ENTER_FUNC (@ARGV);
 
-   ok2 (1, "In the MAIN program ...");  # Test # 7 ...
+   dbug_ok (1, "In the MAIN program ...");  # Test # 7 ...
 
    # -----------------------------------
    # A normal die trap ...
@@ -125,12 +123,12 @@ END {
    DBUG_TRAP_SIGNAL ("DIE", DBUG_SIG_ACTION_DIE);
    eval {
       die ("Act 1: Why oh why did we have to die!", "ACTION_DIE", "\n");
-      ok2 (0, "We should get here!");
+      dbug_ok (0, "We should get here!");
    };
 
    my $worked = 0;
    if ($@) { $worked = 1; }
-   ok2 ($worked, "EVAL was trapped as expected.");
+   dbug_ok ($worked, "EVAL was trapped as expected.");
 
    # -----------------------------------
    # A non-normal die trap ...
@@ -139,11 +137,11 @@ END {
    DBUG_TRAP_SIGNAL ("DIE", DBUG_SIG_ACTION_LOG);
    eval {
       die ("Act 2: Why oh why didn't we die!", "ACTION_LOG", "\n");
-      ok2 (1, "We should get here!");
+      dbug_ok (1, "We should get here!");
    };
    $worked = 1;
    if ($@) { $worked = 0; }
-   ok2 ($worked, "2nd EVAL was ignored as expected.");
+   dbug_ok ($worked, "2nd EVAL was ignored as expected.");
 
    # -----------------------------------
    # A back to a normal die trap again!
@@ -154,11 +152,11 @@ END {
       local $SIG{__DIE__} = "IGNORE";
       eval {
          die ("Act 3: Why oh why did we have to die!", "IGNORE", "\n");
-         ok2 (0, "We should get here!");
+         dbug_ok (0, "We should get here!");
       };
       $worked = 0;
       if ($@) { $worked = 1; }
-      ok2 ($worked, "3rd EVAL was trapped as expected.  And the die wasn't logged!");
+      dbug_ok ($worked, "3rd EVAL was trapped as expected.  And the die wasn't logged!");
    }
 
    # -----------------------------------
@@ -180,7 +178,7 @@ END {
 
    DBUG_PRINT ("----", "-"x40);
 
-   is2 (test_fish_level(), $start_level, "Level Check");
+   dbug_is (test_fish_level(), $start_level, "Level Check");
 
    # Terminate the test case.
    done_testing ();
@@ -214,12 +212,12 @@ sub try_tiny_test
    };
 
    if ( $catch_call ) {
-      ok2 ( $called_catch, "We caught the $tst_num die request correctly" );
+      dbug_ok ( $called_catch, "We caught the $tst_num die request correctly" );
    } else {
-      ok2 ( ! $called_catch, "We ignored the $tst_num die request correctly" );
+      dbug_ok ( ! $called_catch, "We ignored the $tst_num die request correctly" );
    }
 
-   ok2 ( $called_finally, "We also called finally!" );
+   dbug_ok ( $called_finally, "We also called finally!" );
 
    DBUG_VOID_RETURN ();
 }

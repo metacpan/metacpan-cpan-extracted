@@ -14,6 +14,7 @@ use warnings;
 use Test::More;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -22,17 +23,7 @@ my $start_level;
 sub my_warn
 {
    chomp (my $msg = shift);
-   ok3 (0, "There was an expected warning! ${msg}");
-}
-
-sub ok3
-{
-   DBUG_ENTER_BLOCK ("Test::More::ok", @_);
-   my $status = shift || 0;
-   my $msg    = shift;
-
-   my $res = ok ( $status, $msg );
-   DBUG_RETURN ($res);
+   dbug_ok (0, "There was an expected warning! ${msg}");
 }
 
 my $fish_module;
@@ -50,15 +41,14 @@ BEGIN {
    # use $fish_module;
    eval "use Fred::Fish::DBUG qw / " . join (" ", @opts) . " /";
    if ( $@ ) {
-      bail ( "Can't load ${fish_module} via Fred::Fish::DBUG qw / " .
-             join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load ${fish_module} via Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Loaded ${fish_module} using alternate method! " . join (" ", @opts));
+   dbug_ok (1, "Loaded ${fish_module} using alternate method! " . join (" ", @opts));
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -76,37 +66,37 @@ BEGIN {
 
    # The two conflicting test modules ...
    unless ( use_ok ("on_test") ) {      # This module only uses Fred::Fish::DBUG
-      bail ( "Can't load the 'on_test' module!" );
+      dbug_BAIL_OUT ( "Can't load the 'on_test' module!" );
    }
    $module = get_fish_module (__FILE__);
-   ok2 ($fish_module eq $module, "Selected correct module ($module vs $fish_module)");
+   dbug_is ($fish_module, $module, "Selected correct module ($module vs $fish_module)");
 
-   unless ( use_ok ("off_test") ) {     # This module only uses Fred::Fish::DBUG:OFF
-      bail ( "Can't load the 'off_test' module!" );
+   unless ( use_ok ("off_test") ) {    # This mod only uses Fred::Fish::DBUG:OFF
+      dbug_BAIL_OUT ( "Can't load the 'off_test' module!" );
    }
    $module = get_fish_module (__FILE__);
-   ok2 ($fish_module eq $module, "Selected correct module ($module vs $fish_module)");
+   dbug_is ($fish_module, $module, "Selected correct module ($module vs $fish_module)");
 
    $module = get_fish_module ( ON_FILE() );
-   ok2 ( $module =~ m/::ON$/, "Statically linked to ON --> $module");
+   dbug_ok ( $module =~ m/::ON$/, "Statically linked to ON --> $module");
    $module = get_fish_module ( OFF_FILE() );
-   ok2 ( $module =~ m/::OFF$/, "Statically linked to OFF --> $module");
+   dbug_ok ( $module =~ m/::OFF$/, "Statically linked to OFF --> $module");
 
    DBUG_ENTER_FUNC ();
 
    $start_level = test_fish_level ();
-   is2 ($start_level, $lvl, "In the BEGIN block ...");
+   dbug_is ($start_level, $lvl, "In the BEGIN block ...");
    DBUG_PRINT ("PURPOSE", "\nDemonstrates how to swap between Fred::Fish:DBUG::ON & Fred::Fish::DBUG::OFF in your code!\n.");
    $lvl = test_fish_level ();
-   is2 ($lvl, $start_level, "BEGIN Level Check Worked!");
+   dbug_is ($lvl, $start_level, "BEGIN Level Check Worked!");
 
-   ok2 ( dbug_active_ok_test () );
+   dbug_ok ( dbug_active_ok_test () );
 
-   ok2 ( 1, "Fish Log: " . DBUG_FILE_NAME() );
+   dbug_ok ( 1, "Fish Log: " . DBUG_FILE_NAME() );
 
    my %usr = find_fish_users ();
    my $cnt = keys %usr;
-   cmp_ok ($cnt, '==', 4, "Found ${cnt} users of DBUG (4).");
+   dbug_cmp_ok ($cnt, '==', 4, "Found ${cnt} users of DBUG (4).");
 
    DBUG_VOID_RETURN ();
 }
@@ -123,21 +113,21 @@ END {
 {
    DBUG_ENTER_FUNC (@ARGV);
 
-   ok2 (1, "In the MAIN program ...");
+   dbug_ok (1, "In the MAIN program ...");
 
    DBUG_PRINT ("----", "%s", "="x70);
-   ok2 (1, "Calling the ON Module ...");
+   dbug_ok (1, "Calling the ON Module ...");
    ON_PRINT1 (1, 2, 3);
    ON_PRINT2 (4, 5, 6);
    DBUG_PRINT ("----", "%s", "="x70);
-   ok2 (1, "Calling the OFF Module ...");
+   dbug_ok (1, "Calling the OFF Module ...");
    OFF_PRINT1 (1, 2, 3);
    OFF_PRINT2 (4, 5, 6);
    DBUG_PRINT ("----", "%s", "="x70);
-   ok2 (1, "Back to normal operation ...");
+   dbug_ok (1, "Back to normal operation ...");
 
    my $lvl = test_fish_level ();
-   is2 ($lvl, $start_level, "MAIN Level Check Worked!");
+   dbug_is ($lvl, $start_level, "MAIN Level Check Worked!");
 
    done_testing ();
 

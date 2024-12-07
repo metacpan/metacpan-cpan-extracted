@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.76 {
+package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.77 {
 
   use 5.020;
   use Moose;
@@ -136,7 +136,7 @@ Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod - Personal subclass of D
 
 =head1 VERSION
 
-version 2.76
+version 2.77
 
 =head1 SYNOPSIS
 

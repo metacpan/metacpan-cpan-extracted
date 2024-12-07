@@ -13,9 +13,10 @@ use Exporter;
 
 use Fred::Fish::DBUG::ON;
 use Fred::Fish::DBUG::Signal;
+use Fred::Fish::DBUG::Test;
 use helper1234;
 
-$VERSION = "2.03";
+$VERSION = "2.09";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( ON2_FILE ON2_BAD_SIGNAL ON2_PRINT1 ON2_PRINT2 ON2_WARN_TEST );
@@ -25,8 +26,8 @@ $VERSION = "2.03";
 BEGIN
 {
    my $mod = get_fish_module (__FILE__);
-   ok2 ($mod =~ m/::Unknown$/,
-        "Loaded ${mod} via Fred::Fish::DBUG::ON in " . __PACKAGE__);
+   dbug_ok ($mod =~ m/::Unknown$/,
+            "Loaded ${mod} via Fred::Fish::DBUG::ON in " . __PACKAGE__);
 }
 
 END
@@ -54,7 +55,7 @@ sub ON2_PRINT1
    DBUG_PRINT ("INFO", "Hello World!");
    DBUG_PRINT ("INFO", "How are you?");
 
-   ok2 (1, "In ON module Func 1");
+   dbug_ok (1, "In ON module Func 1");
 
    DBUG_FILTER ( DBUG_FILTER_LEVEL_WARN );
 
@@ -72,7 +73,7 @@ sub ON2_PRINT2
    DBUG_PRINT ("INFO", "Good Bye Cruel World!");
    DBUG_PRINT ("INFO", "I hope you're satisfied now!");
 
-   ok2 (1, "In ON module Func 2");
+   dbug_ok (1, "In ON module Func 2");
 
    DBUG_RETURN ("a", "b", "c", "d", "e");
 }
@@ -80,7 +81,7 @@ sub ON2_PRINT2
 sub local_warn_trap
 {
    chomp (my $msg = shift);
-   ok2 (1, $msg);
+   dbug_ok (1, $msg);
 }
 
 sub ON2_WARN_TEST

@@ -4,7 +4,7 @@
 
 After editing, please do not forget to run:
 
-    pod2markdown lib/configsmoke.pod > README2.md
+    pod2markdown lib/configsmoke.pod > HOWTO.md
 
 =end Instruction
 

@@ -1,4 +1,4 @@
-#!/user/bin/perl
+#!/user/bin/perlmy args;
 
 # Program:  42-func_who_called_trace.t
 # Tests program traces function calls with line #'s of the caller
@@ -9,6 +9,7 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -18,7 +19,7 @@ sub my_warn
 {
    my $msg = shift;
    unless ( $msg =~ m/^Skip -/ ) {
-      ok9 (0, "There was an expected warning!  Check fish.");
+      dbug_ok (0, "There was an expected warning!  Check fish.");
    }
 }
 
@@ -37,15 +38,14 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {     # Test # 2
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
-             join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -72,7 +72,7 @@ BEGIN {
    # Ignore the fancy overrides for the DIE signal ...
    local $SIG{__DIE__} = "DEFAULT";
 
-   ok9 (1, "Loading optional Try::Tiny module ...");
+   dbug_ok (1, "Loading optional Try::Tiny module ...");
    $try_tiny_flag = 0;
    eval {
       require Try::Tiny;
@@ -92,7 +92,7 @@ BEGIN {
    local $SIG{__DIE__} = "DEFAULT";
    local $SIG{__WARN__} = "IGNORE";
 
-   ok9 (1, "Loading special test_object module ...");
+   dbug_ok (1, "Loading special test_object module ...");
    eval {
       require test_object;
       $test_obj_flag = 1;
@@ -106,7 +106,7 @@ BEGIN {
 
 BEGIN {
    DBUG_ENTER_FUNC ();
-   ok9 (1, "In the noop BEGIN block ...");
+   dbug_ok (1, "In the noop BEGIN block ...");
    DBUG_VOID_RETURN ();
 }
 
@@ -123,11 +123,11 @@ sub validate_line
    # "" - means its a bad parse ...
    my $func = ( $msg =~ m/^([^\s]+)\s/ ) ? $1 : "";
 
-   ok9 ( ($line == $expected), $msg . "   ($line vs $expected)" );
+   dbug_is ( $line, $expected, $msg . "   ($line vs $expected)" );
    if ( $name ) {
-      ok9 ( ($name eq $func), "Correct function name provided. ($name vs $func)" );
+      dbug_is ( $name, $func, "Correct function name provided. ($name vs $func)" );
    } else {
-      ok9 ( ($func ne ""), "Correct function name provided. ($func)" );
+      dbug_isnt ( $func, "", "Correct function name provided. ($func)" );
    }
 
    return ($expected);
@@ -141,14 +141,14 @@ BEGIN {
    my $lvl = ( get_fish_state () == -1 ) ? -1 : 1;
 
    $start_level = test_fish_level ();
-   ok9 ($lvl == $start_level, "In the 4th BEGIN block ...");   # Test # 3
+   dbug_is ($lvl, $start_level, "In the 4th BEGIN block ...");   # Test # 3
    DBUG_PRINT ("PURPOSE", "\nJust verifying the trace caller & line numbers are good!\nFor all DBUG_ENTER_* & DBUG_PRINT calls.\n.");
    func2();
    $lvl = test_fish_level ();
-   ok9 ($start_level == $lvl, "BEGIN Level Check Worked!");    # Test # 4
+   dbug_is ($start_level, $lvl, "BEGIN Level Check Worked!");    # Test # 4
 
-   ok9 ( dbug_active_ok_test () );
-   ok9 ( 1, "Fish Log: " . DBUG_FILE_NAME() );
+   dbug_ok ( dbug_active_ok_test () );
+   dbug_ok ( 1, "Fish Log: " . DBUG_FILE_NAME() );
 
    my $line = ${fish_called_by}->(1);
    validate_line ( $line );                # Tests # 6 & 7.
@@ -165,7 +165,7 @@ END {
 
    my $lvl = test_fish_level ();
    if ( $start_level != $lvl ) {
-      ok9 (0, "END Level Check Worked!");
+      dbug_ok (0, "END Level Check Worked!");
    }
 
    DBUG_VOID_RETURN ();
@@ -189,15 +189,15 @@ my $indirect_value = "";
 {
    $root = DBUG_ENTER_FUNC (@ARGV);
 
-   ok9 (1, "In the MAIN program ...");
+   dbug_ok (1, "In the MAIN program ...");
 
    # Tests the low level functions ...
-   ok9 (1, '-'x60);
+   dbug_ok (1, '-'x60);
 
    if ( 1 ) {
-      ok9 (1, "IF (test)");
+      dbug_ok (1, "IF (test)");
    } else {
-      ok9 (1, "ELSE (test)");
+      dbug_ok (1, "ELSE (test)");
    }
 
    # Correct way to call it ...
@@ -215,14 +215,14 @@ my $indirect_value = "";
    low_level_test_eval_3 ();
 
    # Strange failure tests ...
-   ok9 (1, '-'x60);
+   dbug_ok (1, '-'x60);
 
    # Comment out the following 2 functions once issues resolved ...
    # no_such_function ();
    # no_such_func_called_1 ();
 
    # Change to 1 once program is debugged.
-   ok9 (1, "Passed Die/Warn Tests.");
+   dbug_ok (1, "Passed Die/Warn Tests.");
 
    eval {
       no_such_function ();
@@ -245,7 +245,7 @@ my $indirect_value = "";
    warn ("Skip - Has line numbers.");
 
    # Tests at a higher level ...
-   ok9 (1, '-'x60);
+   dbug_ok (1, '-'x60);
    func1();
    block_test();
    eval_test();
@@ -253,30 +253,30 @@ my $indirect_value = "";
 
    # DBUG_RETURN_SPECIAL tests ...
    indirect_test ( "no return value expected." );
-   ok9 ($indirect_value eq "", "Void return didn't call the indirect_call()");
+   dbug_is ($indirect_value, "", "Void return didn't call the indirect_call()");
 
    my $i = indirect_test ( "scalar return value expected." );
-   ok9 ($indirect_value ne "" && $indirect_value eq $i, "The indirect_call() returned the correct value!");
+   dbug_ok ($indirect_value ne "" && $indirect_value eq $i, "The indirect_call() returned the correct value!");
 
    my @i = indirect_test ( "list return value expected." );
    my $cnt = @i;
-   ok9 ($indirect_value eq "" && $cnt == 4, "List return didn't call the indirect_call() & returned the right list.");
+   dbug_ok ($indirect_value eq "" && $cnt == 4, "List return didn't call the indirect_call() & returned the right list.");
 
    DBUG_PRINT ("INFO", "This is a test line!");
    level_test();
 
    # Calling an anonymous function to test how it works!
    $anon_func1->( qw / a b c / );
-   ok9 (1, "Anonymous function called.");
+   dbug_ok (1, "Anonymous function called.");
    $anon_func2->( qw / a b c / );
-   ok9 (1, "Anonymous function called.");
+   dbug_ok (1, "Anonymous function called.");
 
    DBUG_PRINT ("INFO", "--------------------------------------------------");
    if ( $try_tiny_flag ) {
       my $res = try_tiny_test ( qw / x y z / );
-      ok9 ($res == 3, "The try/catch/finally test worked with Tiny::Try!");
+      dbug_is ($res, 3, "The try/catch/finally test worked with Tiny::Try!");
    } else {
-      ok9 (1, "Tiny::Try not installed.  Skipping try/catch/finally test.");
+      dbug_ok (1, "Tiny::Try not installed.  Skipping try/catch/finally test.");
    }
 
    my $extra;
@@ -286,12 +286,12 @@ my $indirect_value = "";
       DBUG_PRINT ("INFO", "--------------------------------------------------");
       $extra = test_my_object_2 ();
    } else {
-      ok9 (1, "The test_object module has isues.  Skipping these tests.");
+      dbug_ok (1, "The test_object module has isues.  Skipping these tests.");
       $extra = "Junk Food!";
    }
 
    my $lvl = test_fish_level ();
-   ok9 ($start_level == $lvl, "MAIN Level Check Worked!");
+   dbug_is ($start_level, $lvl, "MAIN Level Check Worked!");
 
    # Tells Test::More we are done!
    done_testing ();
@@ -425,7 +425,7 @@ sub func3
 
    if (1==1) {
       DBUG_ENTER_BLOCK ("nameless");
-      ok9 (1, "Nameless block test!");
+      dbug_ok (1, "Nameless block test!");
       DBUG_VOID_RETURN ();
    }
 
@@ -435,7 +435,7 @@ sub func3
 sub block_test
 {
    DBUG_ENTER_BLOCK ("block_testing");
-   ok9 (1, "Block test without FUNC!");
+   dbug_ok (1, "Block test without FUNC!");
    DBUG_VOID_RETURN ();
 }
 
@@ -445,11 +445,11 @@ sub eval_test
    eval {
       DBUG_ENTER_FUNC ();
       func2();
-      ok9 (1, "Eval test!");
+      dbug_ok (1, "Eval test!");
       eval {
          DBUG_ENTER_FUNC ();
          func2();
-         ok9 (1, "Eval test 2!");
+         dbug_ok (1, "Eval test 2!");
          DBUG_VOID_RETURN ();
       };
       DBUG_VOID_RETURN ();
@@ -464,11 +464,11 @@ sub eval_block_test
    eval {
       DBUG_ENTER_BLOCK ("**EVAL**");
       func2();
-      ok9 (1, "Eval block test!");
+      dbug_ok (1, "Eval block test!");
       eval {
          DBUG_ENTER_BLOCK ("***EVAL 2***");
          func2();
-         ok9 (1, "Eval test 2!");
+         dbug_ok (1, "Eval test 2!");
          DBUG_VOID_RETURN ();
       };
       DBUG_VOID_RETURN ();
@@ -524,14 +524,17 @@ sub test_my_object_1
 {
    DBUG_ENTER_FUNC (@_);
 
-   my $obj = test_object->new ("Destroyed on Return!");
-   ok9 ( defined $obj, "Test Object was created!");
+   # my $obj = test_object->new ("Destroyed on Return!");
+   # dbug_ok ( defined $obj, "Test Object was created!");
+   my @args;
+   push (@args, "Destroyed on Return!");
+   my $obj = dbug_new_ok ('test_object' => \@args);
 
    my $res = $obj->talk ("Talk to me!");
-   ok9 ( $res, "Was able to call method in object!");
+   dbug_ok ( $res, "Was able to call method in object!");
 
    $res = $obj->no_such_function ("Why should I talk to you?");
-   ok9 ( $res, "Was able to call a non-existant method in object!");
+   dbug_ok ( $res, "Was able to call a non-existant method in object!");
 
    DBUG_VOID_RETURN ();
    # The DESTROY method was called here!
@@ -545,10 +548,10 @@ sub test_my_object_2
 
    if ( 1 == 1 ) {
       my $obj = test_object->new ("Destroyed in 'if' block!");
-      ok9 ( defined $obj, "Test Object was created!");
+      dbug_ok ( defined $obj, "Test Object was created!");
 
       my $res = $obj->talk ("Talk to me!");
-      ok9 ( $res, "Was able to call method in object!");
+      dbug_ok ( $res, "Was able to call method in object!");
    }
    # The DESTROY method was called here for $obj!
 

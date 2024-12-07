@@ -7,6 +7,7 @@ use Test::More;
 use File::Spec;
 use Sub::Identify 'sub_fullname';
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -22,7 +23,7 @@ my $start_level;
 
 sub my_warn
 {
-   ok3 (0, "There was an expected warning!  Check fish.");
+   ok (0, "There was an expected warning!  Check fish.");
 }
 
 my $ignore_count = 0;
@@ -42,13 +43,12 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {     # Test # 2
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
              join (" ", @opts) . " /" );
    }
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -68,12 +68,12 @@ BEGIN {
 
    DBUG_ENTER_FUNC ();
 
-   ok2 ( $trap, "Trapped WARNINGS with error checking!" );
+   dbug_ok ( $trap, "Trapped WARNINGS with error checking!" );
 
    $start_level = test_fish_level ();
-   is2 ($start_level, $lvl, "In the BEGIN block ...");
+   dbug_is ($start_level, $lvl, "In the BEGIN block ...");
 
-   ok3 ( dbug_active_ok_test () );
+   dbug_ok ( dbug_active_ok_test () );
 
    DBUG_VOID_RETURN ();
 }
@@ -108,17 +108,17 @@ my $global_flag = 1;
    DBUG_ENTER_FUNC (@ARGV);
 
    # Don't treat these explicit warnings as errors ...
-   ok2 (DBUG_TRAP_SIGNAL ( "__WARN__", DBUG_SIG_ACTION_LOG, \&my_warn_ignore ),
-        "Now ignoring WARNINGS!");
+   dbug_ok (DBUG_TRAP_SIGNAL ( "__WARN__", DBUG_SIG_ACTION_LOG, \&my_warn_ignore ),
+            "Now ignoring WARNINGS!");
 
    warn ("Adding line number to the fish message.\n");
    warn ("No line number added to the fish message.  Since already there.");
 
    # Re-enable treating any warnings as an error ...
-   ok2 (DBUG_TRAP_SIGNAL ( "__WARN__", DBUG_SIG_ACTION_LOG, \&my_warn ),
-        "Now treating WARNINGS as failed test cases again!");
+   dbug_ok (DBUG_TRAP_SIGNAL ( "__WARN__", DBUG_SIG_ACTION_LOG, \&my_warn ),
+            "Now treating WARNINGS as failed test cases again!");
 
-   is2 ($ignore_count, 2, "Ignored only 2 explicit warnings with line numbers.");
+   dbug_is ($ignore_count, 2, "Ignored only 2 explicit warnings with line numbers.");
 
    # An undocumented trace level to also show DBUG internal fish usage.
    # Can't use DBUG_FILER_LEVEL_INTERNAL in BEGIN()!
@@ -126,129 +126,129 @@ my $global_flag = 1;
    DBUG_FILTER ( DBUG_FILTER_LEVEL_INTERNAL );
    DBUG_PRINT ("-----", "-"x40);
 
-   is2 (test_fish_level(), $start_level, "In the MAIN program ...");
+   dbug_is (test_fish_level(), $start_level, "In the MAIN program ...");
 
    # Signal INT is ^C.
-   ok2 (DBUG_TRAP_SIGNAL ("INT", DBUG_SIG_ACTION_DIE, "custom_trap_sig"),
-        "Signal INT has been trapped to die on trap!");
+   dbug_ok (DBUG_TRAP_SIGNAL ("INT", DBUG_SIG_ACTION_DIE, "custom_trap_sig"),
+            "Signal INT has been trapped to die on trap!");
 
    # Defines an anonymous function ...
-   my $f = sub { ok3 (0, "Hello my friend!  I should never be called!"); };
+   my $f = sub { dbug_ok (0, "Hello my friend!  I should never be called!"); };
 
    # Traps all calls to die ... (Including when hit ^C!)
    # Demonstrates all 4 ways to specify a fuction to call!
-   ok2 (DBUG_TRAP_SIGNAL ("__DIE__", DBUG_SIG_ACTION_DIE, "main::custom_trap_die", "custom_die_and_die_again", \&custom_die_never_called, $f),
-        "Signal DIE has been trapped with custom functions!");
+   dbug_ok (DBUG_TRAP_SIGNAL ("__DIE__", DBUG_SIG_ACTION_DIE, "main::custom_trap_die", "custom_die_and_die_again", \&custom_die_never_called, $f),
+            "Signal DIE has been trapped with custom functions!");
 
    my ($action, @flst) = DBUG_FIND_CURRENT_TRAPS ("__DIE__");
    my $num = @flst;
-   ok3 ($num == 4, "Trap found the correct number of functions returned! ($num vs 4): " . join (", ", @flst));
+   dbug_is ($num, 4, "Trap found the correct number of functions returned! ($num vs 4): " . join (", ", @flst));
 
    my $x;
-   ok2 ( chk_func_names ($flst[0], 'main::custom_trap_die',          "Correct 1st trap func.") );
-   ok2 ( chk_func_names ($flst[1], 'main::custom_die_and_die_again', "Correct 2nd trap func.") );
-   ok2 ( chk_func_names ($flst[2], 'main::custom_die_never_called',  "Correct 3rd trap func.") );
-   ok2 ( chk_func_names ($flst[3], 'main::__ANON__',                 "Correct 4th trap func.") );
+   dbug_ok ( chk_func_names ($flst[0], 'main::custom_trap_die',          "Correct 1st trap func.") );
+   dbug_ok ( chk_func_names ($flst[1], 'main::custom_die_and_die_again', "Correct 2nd trap func.") );
+   dbug_ok ( chk_func_names ($flst[2], 'main::custom_die_never_called',  "Correct 3rd trap func.") );
+   dbug_ok ( chk_func_names ($flst[3], 'main::__ANON__',                 "Correct 4th trap func.") );
 
    DBUG_PRINT ("INFO", "Hello %s%s\nGood Bye!\n\n", "World", "!");
 
    DBUG_PRINT ("====", "%s", "="x80);
-   ok3 (1, "Starting DBUG_ENTER_FUNC()/DBUG_CATCH() balancing for signal tests ...");
+   dbug_ok (1, "Starting DBUG_ENTER_FUNC()/DBUG_CATCH() balancing for signal tests ...");
 
-   ok3 (1, "----------------------------------------------");
+   dbug_ok (1, "----------------------------------------------");
    my $level = 1;
    foreach my $i (0..1) {
       trigger_int ("INT");
-      is2 (test_fish_level(), $start_level, "Level ${level} Test ...");
+      dbug_is (test_fish_level(), $start_level, "Level ${level} Test ...");
       ++$level;
 
       DBUG_PRINT ("====", "%s", "!"x80);
 
       trigger_int ("INT", 1);
-      is2 (test_fish_level(), $start_level, "Level ${level} Test ...");
+      dbug_is (test_fish_level(), $start_level, "Level ${level} Test ...");
       ++$level;
 
       DBUG_PRINT ("----", "%s", "^"x80);
 
       trigger_die ();
-      is2 (test_fish_level(), $start_level, "Level ${level} Test ...");
+      dbug_is (test_fish_level(), $start_level, "Level ${level} Test ...");
       ++$level;
 
       DBUG_PRINT ("----", "%s", "?"x80);
 
       trigger_die (1);
-      is2 (test_fish_level(), $start_level, "Level ${level} Test ...");
+      dbug_is (test_fish_level(), $start_level, "Level ${level} Test ...");
       ++$level;
 
       DBUG_PRINT ("~~~~", "%s", "~"x80);
 
       my ( $act, @funcs ) = DBUG_FIND_CURRENT_TRAPS ("INT");
       my $cnt = $#funcs + 1;
-      is2 ( $cnt, 1, "Trap found correct number of functions returned!");
+      dbug_is ( $cnt, 1, "Trap found correct number of functions returned!");
       push (@funcs, "extra_signal");
-      ok2 (DBUG_TRAP_SIGNAL ("INT", $act, @funcs),
-           "Added extra forward function to Signal INT Trap!");
+      dbug_ok (DBUG_TRAP_SIGNAL ("INT", $act, @funcs),
+               "Added extra forward function to Signal INT Trap!");
 
       ( $act, @funcs ) = DBUG_FIND_CURRENT_TRAPS ("INT");
       $cnt = $#funcs + 1;
-      is2 ( $cnt, 2, "Trap found correct number of functions returned!");
-      ok3 ( chk_func_names ($funcs[0], 'main::custom_trap_sig', "Correct 1st trap func.") );
-      ok3 ( chk_func_names ($funcs[1], 'main::extra_signal',    "Correct 2nd trap func.") );
+      dbug_is ( $cnt, 2, "Trap found correct number of functions returned!");
+      dbug_ok ( chk_func_names ($funcs[0], 'main::custom_trap_sig', "Correct 1st trap func.") );
+      dbug_ok ( chk_func_names ($funcs[1], 'main::extra_signal',    "Correct 2nd trap func.") );
 
       DBUG_PRINT ("INFO", "Adding an extra trap signal!  (%s)", join (", ", @funcs));
 
       DBUG_PRINT ("----", "%s", "-"x80);
 
       trigger_int ("INT", 0);
-      is2 (test_fish_level(), $start_level, "Level ${level} Test ...");
+      dbug_is (test_fish_level(), $start_level, "Level ${level} Test ...");
       ++$level;
 
       DBUG_PRINT ("~~~~", "%s", "~"x80);
 
       # Reset back to default action ...
-      ok2 (DBUG_TRAP_SIGNAL ("INT", DBUG_SIG_ACTION_DIE, "custom_trap_sig"),
-           "Reset Signal INT back to defaultl trap!");
+      dbug_ok (DBUG_TRAP_SIGNAL ("INT", DBUG_SIG_ACTION_DIE, "custom_trap_sig"),
+               "Reset Signal INT back to defaultl trap!");
 
-      ok3 (1, "----------------------------------------------");
-      ok3 (1, "Starting DBUG_PRINT_BLOCK() eval tests ...")  if ( $global_flag );
+      dbug_ok (1, "----------------------------------------------");
+      dbug_ok (1, "Starting DBUG_PRINT_BLOCK() eval tests ...")  if ( $global_flag );
 
       # Now use DBUG_ENTER_BLOCK() instead ...
       $global_flag = 0;
    }
 
    # When being removed, it ignores the forward to funcions ...
-   ok2 (DBUG_TRAP_SIGNAL ("INT", DBUG_SIG_ACTION_REMOVE, "custom_trap_sig"),
-        "Removed the trap for Signal INT!");
+   dbug_ok (DBUG_TRAP_SIGNAL ("INT", DBUG_SIG_ACTION_REMOVE, "custom_trap_sig"),
+            "Removed the trap for Signal INT!");
 
    ($action, @flst) = DBUG_FIND_CURRENT_TRAPS ("INT");
-   ok3 ( $#flst == -1 && ! $action,
-         "The INT Signal is no longer being trapped! " . join ("\n", @flst) );
+   dbug_ok ( $#flst == -1 && ! $action,
+           "The INT Signal is no longer being trapped! " . join ("\n", @flst) );
 
 
     $global_flag = 1;
 
    # Don't put any more tests after this warning test ...
-   ok2 (DBUG_TRAP_SIGNAL ("WARN", DBUG_SIG_ACTION_DIE, "custom_trap_sig"),
-        "Now causing WARN to die!");
+   dbug_ok (DBUG_TRAP_SIGNAL ("WARN", DBUG_SIG_ACTION_DIE, "custom_trap_sig"),
+            "Now causing WARN to die!");
 
    eval {
       warn ("Will you let us die for warning you?\n");
    };
    if ($@) {
-      ok2 (1, "Trapped warning!  We rescued you from dying!");
+      dbug_ok (1, "Trapped warning!  We rescued you from dying!");
    } else {
-      ok2 (0, "Trapped warning!  We rescued you from dying!");
+      dbug_ok (0, "Trapped warning!  We rescued you from dying!");
    }
 
    my ($managed, $eval_catch, $triggered_by, $rethrown, $die_action) = DBUG_DIE_CONTEXT ();
    my $flg = (! $eval_catch) && (! $managed);
-   ok3 ($flg, "Called outside a trapped Signal calling die [Context: $managed, $eval_catch, $triggered_by, $rethrown, $die_action]");
+   dbug_ok ($flg, "Called outside a trapped Signal calling die [Context: $managed, $eval_catch, $triggered_by, $rethrown, $die_action]");
 
    eval {
       DBUG_ENTER_FUNC("XXXXXXXXXXXXXXXXXXXXXXX");
       ($managed, $eval_catch, $triggered_by, $rethrown, $die_action) = DBUG_DIE_CONTEXT ();
       $flg = $eval_catch && (! $managed);
-      ok3 ($flg, "Calling from eval block & outside a trapped Signal [Context: $managed, $eval_catch, $triggered_by, $rethrown, $die_action]");
+      dbug_ok ($flg, "Calling from eval block & outside a trapped Signal [Context: $managed, $eval_catch, $triggered_by, $rethrown, $die_action]");
       die ("For the final time!\n");
       DBUG_VOID_RETURN ();
    };
@@ -256,7 +256,7 @@ my $global_flag = 1;
       DBUG_CATCH();
    }
 
-   ok3 ( 1, "Fish File: " . DBUG_FILE_NAME () );
+   dbug_ok ( 1, "Fish File: " . DBUG_FILE_NAME () );
 
    # Tell Test::More we're done with the testing!
    done_testing ();
@@ -305,7 +305,7 @@ sub custom_trap_die
    chomp($msg);
    DBUG_PRINT ("TRAP-DIE", "%s", "Oh why, oh why did I have to die?");
    my ($managed, $eval_catch, $triggered_by, $rethrown, $die_action) = DBUG_DIE_CONTEXT ();
-   ok3 ($managed, "Caught the trapped die request! ($msg) [Context: $managed, $eval_catch, $triggered_by, $rethrown, $die_action]");
+   dbug_ok ($managed, "Caught the trapped die request! ($msg) [Context: $managed, $eval_catch, $triggered_by, $rethrown, $die_action]");
    DBUG_VOID_RETURN ();
 }
 
@@ -320,7 +320,7 @@ sub custom_die_and_die_again
    chomp($msg);
 
    my ($managed, $eval_catch, $triggered_by, $rethrown, $die_action) = DBUG_DIE_CONTEXT ();
-   ok3 ($managed, "Caught the trapped die request! ($msg) [Context: $managed, $eval_catch, $triggered_by, $rethrown, $die_action]");
+   dbug_ok ($managed, "Caught the trapped die request! ($msg) [Context: $managed, $eval_catch, $triggered_by, $rethrown, $die_action]");
 
    die ( $msg . "\n" );
    DBUG_VOID_RETURN ();
@@ -339,9 +339,9 @@ sub custom_die_never_called
    chomp($msg);
 
    my ($managed, $eval_catch, $triggered_by, $rethrown, $die_action) = DBUG_DIE_CONTEXT ();
-   ok3 ($managed, "Caught the trapped die request! ($msg) [Context: $managed, $eval_catch, $triggered_by, $rethrown, $die_action]");
+   dbug_ok ($managed, "Caught the trapped die request! ($msg) [Context: $managed, $eval_catch, $triggered_by, $rethrown, $die_action]");
 
-   ok3 (0, "Expected to make this call!");
+   dbug_ok (0, "Expected to make this call!");
    DBUG_VOID_RETURN ();
 }
 
@@ -353,7 +353,7 @@ sub custom_trap_sig
       DBUG_ENTER_BLOCK ("custom_trap_sig", @_);
    }
    DBUG_PRINT ("TRAP-$_[0]", "Trapped Signal: [%s]", $_[0]);
-   ok3 (1, "Caught the trapped signal! ($_[0])");
+   dbug_ok (1, "Caught the trapped signal! ($_[0])");
    DBUG_VOID_RETURN ();
 }
 
@@ -366,7 +366,7 @@ sub extra_signal
    }
    my $opt = shift;
    chomp($opt);
-   ok3 (1, "Caught the extra trapped signal! ($opt)");
+   dbug_ok (1, "Caught the extra trapped signal! ($opt)");
    DBUG_VOID_RETURN ();
 }
 
@@ -395,10 +395,10 @@ sub trigger_die
       DBUG_CATCH ();
       my $name = test_func_name_no_warn ( $func );
       DBUG_PRINT ("EVAL", "The Die was trapped in *** %s ***!", $func);
-      ok3 (($func eq $name), "Popped the Fish stack correctly in eval!  ($func vs $name)");
+      dbug_is ($func, $name, "Popped the Fish stack correctly in eval!  ($func vs $name)");
    }
    my $lvl = test_fish_level ();
-   is2 ($lvl, $orig_lvl, "Stack balanced after 1st DIE test.");
+   dbug_is ($lvl, $orig_lvl, "Stack balanced after 1st DIE test.");
 
    DBUG_PRINT ("--2nd--", "---------------------------------------------------------");
 
@@ -411,10 +411,10 @@ sub trigger_die
       DBUG_CATCH ();
       my $name = test_func_name_no_warn ( $func );
       DBUG_PRINT ("EVAL", "The Die was trapped in *** %s ***!", $func);
-      is2 ($name, $func, "Popped the Fish stack correctly in eval!");
+      dbug_is ($name, $func, "Popped the Fish stack correctly in eval!");
    }
    $lvl = test_fish_level ();
-   is2 ($lvl, $orig_lvl, "Stack balanced after 2nd DIE test.");
+   dbug_is ($lvl, $orig_lvl, "Stack balanced after 2nd DIE test.");
 
    DBUG_PRINT ("--3rd--", "---------------------------------------------------------");
 
@@ -434,10 +434,10 @@ sub trigger_die
       DBUG_CATCH ();
       my $name = test_func_name_no_warn ( $func );
       DBUG_PRINT ("EVAL", "The Die was trapped in *** %s ***!", $func);
-      is2 ($name, $func, "Popped the Fish stack correctly in eval!");
+      dbug_is ($name, $func, "Popped the Fish stack correctly in eval!");
    }
    $lvl = test_fish_level ();
-   is2 ($lvl, $orig_lvl, "Stack balanced after 3rd DIE test.");
+   dbug_is ($lvl, $orig_lvl, "Stack balanced after 3rd DIE test.");
 
    DBUG_VOID_RETURN ();
 }
@@ -471,11 +471,11 @@ sub trigger_int
       DBUG_CATCH ();
       my $name = test_func_name_no_warn ( $func );
       DBUG_PRINT ("EVAL", "The Die was trapped in *** %s ***!", $func);
-      is2 ($name, $func, "Popped the Fish stack correctly in eval!");
+      dbug_is ($name, $func, "Popped the Fish stack correctly in eval!");
    }
 
    my $lvl = test_fish_level ();
-   is2 ($lvl, $orig_lvl, "Stack balanced after INT tests.");
+   dbug_is ($lvl, $orig_lvl, "Stack balanced after INT tests.");
 
    DBUG_PRINT ("--2nd--", "---------------------------------------------------------");
 
@@ -488,11 +488,11 @@ sub trigger_int
       DBUG_CATCH ();
       my $name = test_func_name_no_warn ( $func );
       DBUG_PRINT ("EVAL", "The Die was trapped in *** %s ***!", $func);
-      is2 ($name, $func, "Popped the Fish stack correctly in eval!");
+      dbug_is ($name, $func, "Popped the Fish stack correctly in eval!");
    }
 
    $lvl = test_fish_level ();
-   is2 ($lvl, $orig_lvl, "Stack balanced after more INT tests.");
+   dbug_is ($lvl, $orig_lvl, "Stack balanced after more INT tests.");
 
    DBUG_VOID_RETURN ();
 }
@@ -522,7 +522,7 @@ sub trigger_int_level_23 {
       DBUG_CATCH ();
       my $name = test_func_name_no_warn ( $func );
       DBUG_PRINT ("EVAL", "The Die was trapped in *** %s ***!", $func);
-      is2 ($name, $func, "Popped the Fish stack correctly in eval!");
+      dbug_is ($name, $func, "Popped the Fish stack correctly in eval!");
       DBUG_PRINT ("DUP", "**** Calling die() with the same trapped message!  Context should say Rethrown TRUE! ****");
       die ( $@ );    # Rethrow the error!
    }

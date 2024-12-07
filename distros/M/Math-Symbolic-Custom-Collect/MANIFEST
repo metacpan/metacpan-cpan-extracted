@@ -6,7 +6,7 @@ MANIFEST			This list of files
 README
 README.md
 t/00-load.t
-t/01-to_collected.t
+t/01-to_collected-to_terms.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

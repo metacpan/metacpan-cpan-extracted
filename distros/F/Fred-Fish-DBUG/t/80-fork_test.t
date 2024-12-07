@@ -8,6 +8,7 @@ use File::Spec;
 use Sub::Identify 'sub_fullname';
 use Config qw( %Config );
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -64,21 +65,20 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
-             join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Uses options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Uses options qw / " . join (" ", @opts) . " /");
 
    if ( is_fork_supported() ) {
-     ok (1, "${fish_module} says forking IS supported!");
+     dbug_ok (1, "${fish_module} says forking IS supported!");
    } else {
-     ok (1, "${fish_module} says forking is NOT supported!");
+     dbug_ok (1, "${fish_module} says forking is NOT supported!");
    }
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -86,7 +86,7 @@ sub my_warn
 {
    chomp (my $msg = shift);
    my $sts = ( $msg =~ m/^In a depth of \d+/ ) ? 1 : 0;
-   ok3 ($sts, "There was an expected warning!  Check fish. (Fork $$)");
+   dbug_ok ($sts, "There was an expected warning!  Check fish. (Fork $$)");
 }
 
 BEGIN {
@@ -104,10 +104,10 @@ BEGIN {
    DBUG_ENTER_FUNC ();
 
    $start_level = test_fish_level_no_warn (1);
-   is2 ($start_level, 1, "In the BEGIN block ...");
+   dbug_is ($start_level, 1, "In the BEGIN block ...");
 
-   ok3 ( dbug_active_ok_test () );
-   ok3 ( 1, "Fish Log: " . DBUG_FILE_NAME() );
+   dbug_ok ( dbug_active_ok_test () );
+   dbug_ok ( 1, "Fish Log: " . DBUG_FILE_NAME() );
 
    DBUG_VOID_RETURN ();
 }
@@ -119,7 +119,7 @@ END {
    # Only print out on failure!  Tests have aleady ended!
    my $end_level = test_fish_level_no_warn ($start_level);
    unless ( $start_level == $end_level ) {
-      ok3 (0, "In the END block ... Level test worked!");
+      dbug_ok (0, "In the END block ... Level test worked!");
    }
 
    DBUG_VOID_RETURN ();
@@ -137,24 +137,24 @@ END {
    my $fish_file = DBUG_FILE_NAME ();
 
    unless ( is_fork_supported () ) {
-      ok2 (1, get_fish_module () . " says forks are not supported for your Perl!  Skipping fork tests.");
+      dbug_ok (1, get_fish_module () . " says forks are not supported for your Perl!  Skipping fork tests.");
       done_testing ();
       DBUG_LEAVE (0);
    }
 
-   ok2 (1, "NOTE: All forked processes will write to the same fish logs.  So it's a mess to follow!");
+   dbug_ok (1, "NOTE: All forked processes will write to the same fish logs.  So it's a mess to follow!");
    DBUG_PRINT ("NOTE", "%s\n%s\n%s",
                        "This test program waits until all forked processes completes.",
                        "Otherwise the 'make test' case fails with unknown error.",
                        "Even though it doesn't kill the child process or stop it from writing to fish.");
 
-   is2 (test_fish_level_no_warn($start_level), $start_level, "In the MAIN program ...");
+   dbug_is (test_fish_level_no_warn($start_level), $start_level, "In the MAIN program ...");
 
    my $res = new_fork_func (0, "Not a forked call!");
-   ok2 (1, "Function returned: $res");
+   dbug_ok (1, "Function returned: $res");
 
    undef_fork_func (0, "Not a forked call!");
-   ok2 (1, "Function returned");
+   dbug_ok (1, "Function returned");
 
    # Has 2 tests ...
    my $sleep = 1;
@@ -176,16 +176,16 @@ END {
    waitpid ( $pid1, 0 );
 
    # Got the 7 by trial and error!
-   ok2 ("=====", "="x40);
+   DBUG_PRINT ("=====", "="x40);
    my $pid4 = fork_ok (7, \&multiple_forks);
    waitpid ( $pid4, 0 );
-   ok2 ("=====", "="x40);
+   DBUG_PRINT ("=====", "="x40);
 
    # Turning numbers back on is optional here!
    # But can only do after all child threads have terminated!
    # So that the order of the tests remain unimportant!
    Test::More->builder->use_numbers (1);
-   ok3 (1, "All forks have completed!");
+   dbug_ok (1, "All forks have completed!");
 
    # Tell Test::More we're done with the testing!
    done_testing ();
@@ -209,14 +209,14 @@ sub fork_ok
       $pid = fork ();   # Undef, 0, CPID  (fail, child, parrent)
    };
    if ($@) {
-      ok3 (1, "Fork not supported by this Perl build!  Aborting this test!");
+      dbug_ok (1, "Fork not supported by this Perl build!  Aborting this test!");
       done_testing ();
       DBUG_LEAVE (0);
    }
 
    # The fork command exists, but it failed!
    unless ( defined $pid ) {
-      ok3 (0, "Fork Succeeded!");
+      dbug_ok (0, "Fork Succeeded!");
       done_testing ();
       DBUG_LEAVE (0);
    }
@@ -245,7 +245,7 @@ sub fork_child
    my $name = sub_fullname ( $child_func );
 
    # Not counted when counting child test cases!
-   ok3 (1, "In Child (pid $$) -- $name()");     # The +1 test.
+   dbug_ok (1, "In Child (pid $$) -- $name()");     # The +1 test.
 
    my @res = $child_func->( @args );
 
@@ -261,7 +261,7 @@ sub run_parent
    my $cnt1 = Test::More->builder->current_test();
    my $cnt2 = Test::More->builder->current_test ($cnt1 + $num_tests + 1);
 
-   ok3 (1, "Fork Succeeded!  Running child pid [$$]  ($cnt1 -> $cnt2)");
+   dbug_ok (1, "Fork Succeeded!  Running child pid [$$]  ($cnt1 -> $cnt2)");
 
    # waitpid ( $pid, 0 );
 
@@ -281,12 +281,12 @@ sub new_fork_func
    my $id = "???";
 
    if ( $sleep > 0 ) {
-      ok2 (1, "In Fork-$_[0]: ($$).   Sleeping for ${sleep} second(s)");
+      dbug_ok (1, "In Fork-$_[0]: ($$).   Sleeping for ${sleep} second(s)");
       sleep ($sleep);
-      ok2 (1, "In Fork-$_[0]: ($$).   Slept for ${sleep} second(s)");
+      dbug_ok (1, "In Fork-$_[0]: ($$).   Slept for ${sleep} second(s)");
    } else {
-      ok2 (1, "In Fork-$_[0]: ($$).   Not sleeping!");
-      ok2 (1, "Noop");
+      dbug_ok (1, "In Fork-$_[0]: ($$).   Not sleeping!");
+      dbug_ok (1, "Noop");
    }
 
    # If we're running in a thread instead of the main program ...
@@ -299,7 +299,7 @@ sub new_fork_func
 sub undef_fork_func
 {
    DBUG_ENTER_FUNC (@_);
-   ok2 (1, "In Fork-$_[0]: ($$).   Not sleeping!");
+   dbug_ok (1, "In Fork-$_[0]: ($$).   Not sleeping!");
    DBUG_VOID_RETURN ();
 }
 

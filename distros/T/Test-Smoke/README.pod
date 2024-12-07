@@ -78,7 +78,7 @@ If something useful happens, do it every night using a scheduler.
 
 =head1 CONFIGURATION
 
-Please also read F<README2.md> for instructions.
+Please also read F<HOWTO.md> for instructions.
 
 =over 4
 
@@ -149,7 +149,7 @@ run time of Test::Smoke.
 
     http://metacpan.org/pod/Test::Smoke/
 
-    https://github.com/abeltje/Test-Smoke
+    https://github.com/Perl-Toolchain-Gang/Test-Smoke
 
 =item B<Archives>
 
@@ -254,16 +254,6 @@ As always, have the appropriate amount of fun!
 
 =head1 SEE ALSO
 
-L<ReleaseNotes>, L<FAQ>
-
-=head1 TODO
-
-=over 4
-
-=item * More test-suite
-
-=item * VMS?
-
-=back
+L<FAQ>
 
 =cut

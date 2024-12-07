@@ -6,6 +6,7 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -21,11 +22,11 @@ my $global_tie_stdout_flag = 0;
 my $fish_paused = 0;
 my $fish_disabled;
 
-my ($myok, $myok3);
+my ($myok, $myis);
 
 sub my_warn
 {
-   $myok3->(0, "There was an expected warning!  Check fish.");
+   $myok->(0, "There was an expected warning!  Check fish.");
 }
 
 BEGIN {
@@ -36,20 +37,18 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {     # Test # 2
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
-             join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 
    unless (use_ok ( "Fred::Fish::DBUG::TIE" )) {         # Test # 5
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::TIE" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::TIE" );
   }
 }
 
@@ -64,15 +63,17 @@ BEGIN {
    my $who_called = 1;
    DBUG_PUSH ( get_fish_log(), off => ${off}, who_called => ${who_called} );
 
-   $myok  = $who_called ? \&ok9 : \&ok2;
-   $myok3 = $who_called ? \&ok9 : \&ok3;
+   # $myok  = $who_called ? \&ok9 : \&ok2;
+   # $myok3 = $who_called ? \&ok9 : \&ok3;
+   $myok = \&dbug_ok;
+   $myis = \&dbug_is;
 
    $fish_disabled = $off;
 
    DBUG_ENTER_FUNC ();
 
    $start_level = test_fish_level ();
-   $myok->($lvl == $start_level, "In the BEGIN block ...");
+   $myis->($lvl, $start_level, "In the BEGIN block ...");
 
    $myok->( dbug_active_ok_test () );
 
@@ -102,10 +103,10 @@ END {
 {
    DBUG_ENTER_FUNC (@ARGV);
 
-   $myok3->(1, "In the MAIN program ...");
+   $myok->(1, "In the MAIN program ...");
 
    my $lvl = test_fish_level ();
-   $myok->($lvl == $start_level, "MAIN Level Check");
+   $myis->($lvl, $start_level, "MAIN Level Check");
 
    DBUG_PRINT ("-----", "------------------------------");
    write_stderr_test ();
@@ -122,7 +123,7 @@ END {
    DBUG_PRINT ("-----", "------------------------------");
 
    $lvl = test_fish_level ();
-   $myok->($lvl == $start_level, "Last MAIN Level Check");
+   $myis->($lvl, $start_level, "Last MAIN Level Check");
 
    done_testing ();
 

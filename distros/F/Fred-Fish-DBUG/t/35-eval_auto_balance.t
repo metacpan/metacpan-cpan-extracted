@@ -6,6 +6,7 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -17,7 +18,7 @@ my $start_level;
 
 sub my_warn
 {
-   ok2 (0, "There were no unexpected warnings!");
+   dbug_ok (0, "There were no unexpected warnings!");
 }
 
 BEGIN {
@@ -28,15 +29,14 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw /" .
-             join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw /" .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -53,14 +53,14 @@ BEGIN {
 
    $start_level = test_fish_level_no_warn (1);
 
-   my $a = ok2 (1, "In the BEGIN block ...");
+   my $a = dbug_ok (1, "In the BEGIN block ...");
 
    my $lvl = test_fish_level_no_warn (1);
-   is2 ( $lvl, $start_level, "Begin Block Level Check" );
+   dbug_is ( $lvl, $start_level, "Begin Block Level Check" );
 
-   ok2 ( dbug_active_ok_test () );
+   dbug_ok ( dbug_active_ok_test () );
 
-   ok2 ( 1, "Fish File: " . DBUG_FILE_NAME () );
+   dbug_ok ( 1, "Fish File: " . DBUG_FILE_NAME () );
 
    DBUG_VOID_RETURN ();
 }
@@ -133,7 +133,7 @@ sub check_depth
    my $lvl = test_fish_level_no_warn ($expected_lvl);   # Actual ...
 
    unless ($lvl == $expected_lvl) {
-      ok2 (0, "check_depth($expected_lvl) fish level is good ($lvl)");
+      dbug_ok (0, "check_depth($expected_lvl) fish level is good ($lvl)");
    }
 
    my $depth = $deep ? "deep": "shallow";
@@ -230,7 +230,7 @@ sub repeat_fixed_2
 
       DBUG_PRINT ("INFO", "Rebalanced ...");
       my $lvl = test_fish_level_no_warn (2);
-      is2 ( $lvl, $eval_level, "DBUG_PRINT call rebalanced the fish logs!" );
+      dbug_is ( $lvl, $eval_level, "DBUG_PRINT call rebalanced the fish logs!" );
 
       eval {
          DBUG_ENTER_FUNC();
@@ -264,24 +264,24 @@ sub repeat_fixed_2
 
    result ();
    my $lvl = test_fish_level_no_warn (1);
-   is2 ( $lvl, $start_level, "result call rebalanced the fish logs!" );
+   dbug_is ( $lvl, $start_level, "result call rebalanced the fish logs!" );
 
    DBUG_PRINT ("END-EVAL", "="x40);
    repeat_broken_1 ();
    $lvl = test_fish_level_no_warn (1);
-   is2 ( $lvl, $start_level, "repeat_broken_1 call eventually rebalanced the fish logs!" );
+   dbug_is ( $lvl, $start_level, "repeat_broken_1 call eventually rebalanced the fish logs!" );
    DBUG_PRINT ("END-EVAL", "-"x40);
    repeat_fixed_1 ();
    $lvl = test_fish_level_no_warn (1);
-   is2 ( $lvl, $start_level, "repeat_fixed call rebalanced the fish logs correctly!" );
+   dbug_is ( $lvl, $start_level, "repeat_fixed call rebalanced the fish logs correctly!" );
    DBUG_PRINT ("END-EVAL", "="x40);
    repeat_broken_2 ();
    $lvl = test_fish_level_no_warn (1);
-   is2 ( $lvl, $start_level, "repeat_broken_2 call eventually rebalanced the fish logs!" );
+   dbug_is ( $lvl, $start_level, "repeat_broken_2 call eventually rebalanced the fish logs!" );
    DBUG_PRINT ("END-EVAL", "-"x40);
    repeat_fixed_2 ();
    $lvl = test_fish_level_no_warn (1);
-   is2 ( $lvl, $start_level, "repeat_fixed call rebalanced the fish logs correctly!" );
+   dbug_is ( $lvl, $start_level, "repeat_fixed call rebalanced the fish logs correctly!" );
    DBUG_PRINT ("END-EVAL", "="x40);
 
    DBUG_PRINT ("INFO", "First call outside of an eval block!");
@@ -297,7 +297,7 @@ sub repeat_fixed_2
       DBUG_VOID_RETURN();
    };
 
-   # We didn't use ok2/is2 here on purpose, it's not a bug!
+   # We didn't use dbug_ok/dbug_is here on purpose, it's not a bug!
    # We don't want to write this result to fish, it would break the
    # test of DBUG_LEAVE fixing things.
    $lvl = test_fish_level_no_warn (2);

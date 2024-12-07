@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.76 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.77 {
 
   use 5.020;
   use Moose;
@@ -320,8 +320,10 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.76 {
       $self->_my_add_plugin(['ArchiveTar']);
     }
 
-    $self->_my_add_plugin(['Author::Plicease::Cleaner' => { maybe clean => $self->payload->{clean} }]);
-
+    $self->_my_add_plugin(['Author::Plicease::Cleaner' => {
+      maybe clean      => $self->payload->{clean},
+      maybe clean_keep => $self->payload->{clean_keep}
+    }]);
   }
 
   __PACKAGE__->meta->make_immutable;
@@ -341,7 +343,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.76
+version 2.77
 
 =head1 SYNOPSIS
 

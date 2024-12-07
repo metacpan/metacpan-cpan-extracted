@@ -99,7 +99,7 @@ DESTROY {
 }
 
 # --------------------------------------------------------------
-# Another special function caled when you call a non-existant
+# Another special function called when you call a non-existant
 # function for this class!
 # There can only be one of these per module!
 # --------------------------------------------------------------

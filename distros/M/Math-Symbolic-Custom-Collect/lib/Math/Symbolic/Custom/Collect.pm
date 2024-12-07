@@ -15,18 +15,18 @@ Math::Symbolic::Custom::Collect - Collect up Math::Symbolic expressions
 
 =head1 VERSION
 
-Version 0.03
+Version 0.21
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.21';
 
 use Math::Symbolic qw(:all);
 use Math::Symbolic::Custom::Base;
 
 BEGIN {*import = \&Math::Symbolic::Custom::Base::aggregate_import}
    
-our $Aggregate_Export = [qw/to_collected/];
+our $Aggregate_Export = [qw/to_collected to_terms/];
 
 use Carp;
 
@@ -63,9 +63,19 @@ use Carp;
     print "Output: ", parse_from_string($t7)->to_collected()->to_string(), "\n";
     # Output: (b - a) / ((3 * (a ^ 2)) - (3 * (b ^ 2)))
 
+    my $t8 = "(x+y+z)/2";
+    my @terms = parse_from_string($t8)->to_terms();
+    print "Terms: (", join("), (", @terms), ")\n";
+    # Terms: (x / 2), (y / 2), (z / 2)
+
+    $Math::Symbolic::Custom::Collect::COMPLEX_VAR = 'j';   # default is 'i'
+    my $t9 = "j*(3-7*j)*(2-j)";
+    print "Output: ", parse_from_string($t9)->to_collected()->to_string(), "\n";
+    # Output: 17 - j
+
 =head1 DESCRIPTION
 
-Provides "to_collected()" through the Math::Symbolic module extension class. "to_collected" performs the following operations on the inputted Math::Symbolic tree:-
+Provides "to_collected()" and "to_terms()" through the Math::Symbolic module extension class. "to_collected" performs the following operations on the inputted Math::Symbolic tree:-
 
 =over
 
@@ -85,7 +95,36 @@ Provides "to_collected()" through the Math::Symbolic module extension class. "to
 
 The result is often a more concise expression. However, because it does not (yet) factor the expression, the result is not always the simplest representation. Hence it is not offered as a simplify().
 
+"to_terms()" uses "to_collected()" and returns the expression as a list of terms, that is a list of sub-expressions that can be summed to create an expression which is (numerically) equivalent to the original expression.
+
+=head1 COMPLEX NUMBERS
+
+From version 0.2, there is some support for complex numbers. The symbol in $Math::Symbolic::Custom::Collect::COMPLEX_VAR (set to 'i' by default) is considered by the module to be the symbol for the imaginary unit and treated as such when collecting up the expression. It is a Math::Symbolic variable to permit easy conversion to Math::Complex numbers using the value() method, for example:
+
+    use strict;
+    use Math::Symbolic qw(:all);
+    use Math::Symbolic::Custom::Collect;
+    use Math::Complex;
+
+    my $t = "x+sqrt(-100)+y*i";
+    my $M_S = parse_from_string($t)->to_collected();
+    print "$M_S\n"; # ((10 * i) + x) + (i * y)
+
+    # we want some kind of actual number from this expression
+    my $M_C = $M_S->value( 
+                    'x' => 2,
+                    'y' => 3, 
+                    'i' => i,  # glue Math::Symbolic and Math::Complex 
+                    );
+
+    # $M_C is a Math::Complex number
+    print "$M_C\n"; # 2+13i
+
 =cut
+
+# this symbol represents the solution to x^2 = -1. If for some reason 'i' is being used as a variable for a different 
+# purpose in the expression, this should be changed (e.g. to 'j'). Otherwise things will get very confusing
+our $COMPLEX_VAR = "i";     
 
 sub to_collected {
     my ($t1) = @_;
@@ -98,10 +137,7 @@ sub to_collected {
     if (!defined $t2) {
         return undef;
     }
-    elsif ( !$t1->test_num_equiv($t2) ) {
-        return undef;
-    }
-   
+    
     # 2. collect like terms
     if ( ($t2->term_type() == T_OPERATOR) && ($t2->type() == B_DIVISION) ) {
     
@@ -152,6 +188,64 @@ sub to_collected {
     }
 }
 
+#### to_terms()
+# Return an array of Math::Symbolic expressions which can be added to recreate an expression 
+# numerically equivalent to the passed expression.
+# Called in a scalar context, returns the number of terms. 
+
+sub to_terms {
+    my ($t1) = @_;
+
+    return undef unless defined wantarray;
+
+    my ($t2, $n_hr, $d_hr) = to_collected($t1);
+
+    return undef unless defined $t2;
+
+    my @terms;
+    if ( exists($d_hr->{terms}) && exists($n_hr->{terms}) ) {
+
+        my $terms = $n_hr->{terms};
+        my $trees = $n_hr->{trees};
+
+        my $denominator = build_summation_tree($d_hr);
+        
+        my $const_acc = $terms->{constant_accumulator};
+        $const_acc = 0 if not defined $const_acc;
+        push @terms, Math::Symbolic::Constant->new($const_acc) / $denominator if $const_acc != 0;
+        delete $terms->{constant_accumulator};
+        while ( my ($k, $v) = each %{$terms} ) {
+            my $numerator = build_summation_tree({ terms => { constant_accumulator => 0, $k => $v }, trees => $trees });
+            my $expr = $numerator / $denominator;
+            my $expr2 = to_collected($expr);
+            $expr = $expr2 if defined $expr2;
+            push @terms, $expr;
+        }        
+
+    }
+    elsif ( exists $n_hr->{terms} ) {
+
+        my $terms = $n_hr->{terms};
+        my $trees = $n_hr->{trees};
+
+        my $const_acc = $terms->{constant_accumulator};
+        $const_acc = 0 if not defined $const_acc;
+        push @terms, Math::Symbolic::Constant->new($const_acc) if $const_acc != 0;
+        delete $terms->{constant_accumulator};
+        while ( my ($k, $v) = each %{$terms} ) {
+            push @terms, build_summation_tree({ terms => { constant_accumulator => 0, $k => $v }, trees => $trees });
+        }
+    }
+    else {
+        push @terms, $t2;
+    }
+
+    if ( scalar(@terms) == 0 ) {
+        push @terms, Math::Symbolic::Constant->new(0);
+    }
+
+    return wantarray ? @terms : scalar(@terms);
+}
 
 #### cancel_down. 
 # Checks numerator and denominator expressions for constants and variables which can cancel.
@@ -217,6 +311,7 @@ sub cancel_down {
         # see if there are any common variables we can cancel
         # count up the number of unique vars within numerator and denominator
         my %c_vars;
+        my %c_pow;
         foreach my $e (\%n_terms, \%d_terms) {
             foreach my $key (keys %{$e}) {
                 my @v1 = split(/,/, $key);
@@ -224,6 +319,14 @@ sub cancel_down {
                     my ($v, $c) = split(/:/, $v2);
                     if ( ($v =~ /^CONST/) or ($v =~ /^VAR/) ) {
                         $c_vars{$v}++;
+                        if ( exists $c_pow{$v} ) {
+                            if ( $c_pow{$v} > $c ) {
+                                $c_pow{$v} = $c;
+                            }
+                        }
+                        else {
+                            $c_pow{$v} = $c;
+                        }
                     }
                 }
             }            
@@ -232,39 +335,19 @@ sub cancel_down {
         # if a variable exists in each term, perhaps we can cancel it
         my @all_terms;
         while ( my ($v, $c) = each %c_vars ) {
-            if ( $c == (scalar(keys %n_terms)+scalar(keys %d_terms)) ) {
-                push @all_terms, $v
-                    unless ($v =~ /^VAR/) && (scalar(%d_terms) == 1);   # don't get rid of all instances of a variable from the denominator
+            if (    ($c == (scalar(keys %n_terms)+scalar(keys %d_terms))) && 
+                    ($n_funcs{$v}->{name} ne $COMPLEX_VAR )     
+                    ) {
+
+                push @all_terms, $v;
             }
         }
 
         while ( my $v = pop @all_terms ) {
             my %n_ct_new;
             my %d_ct_new;
-    
-            # cancel from numerator
-            while ( my ($t, $c) = each %n_terms ) {
-                my @v1 = split(/,/, $t);
-                my @nt;
-                foreach my $v2 (@v1) {
-                    my ($vv, $cc) = split(/:/, $v2);
-                    if ($vv eq $v) {
-                        $cc--;
-                        if ($cc > 0) {
-                            push @nt, "$vv:$cc";
-                        }
-                        elsif ( scalar(@v1) == 1 ) {  
-                            $n_acc = $c;
-                        } 
-                    }
-                    else {
-                        push @nt, $v2;
-                    }
-                }
-                if ( scalar(@nt) ) {
-                    $n_ct_new{join(",", @nt)} = $c;              
-                }
-            }
+
+            $did_some_cancellation = 0;
 
             # cancel from denominator
             while ( my ($t, $c) = each %d_terms ) {
@@ -273,13 +356,25 @@ sub cancel_down {
                 foreach my $v2 (@v1) {
                     my ($vv, $cc) = split(/:/, $v2);
                     if ($vv eq $v) {
-                        $cc--;
-                        if ($cc > 0) {
-                            push @nt, "$vv:$cc";
+                        if ( (scalar(%d_terms) == 1) && ($cc == 1) ) {                        
+                            # refuse to cancel all instances of a variable from the denominator
+                            push @nt, $v2;
                         }
-                        elsif ( scalar(@v1) == 1 ) {  
-                            $d_acc = $c;
-                        } 
+                        else {
+                            my $c_sub = $c_pow{$v};
+                            if ( $cc < $c_sub ) {
+                                croak "cancel_down: Variable $v has index $cc but want to cancel $c_sub";
+                            }                            
+                            $cc -= $c_sub;
+                            if ($cc > 0) {
+                                push @nt, "$vv:$cc";
+                                $did_some_cancellation = 1;
+                            }
+                            elsif ( scalar(@v1) == 1 ) {  
+                                $d_acc = $c;
+                                $did_some_cancellation = 1;
+                            } 
+                        }
                     }
                     else {
                         push @nt, $v2;
@@ -290,9 +385,48 @@ sub cancel_down {
                 }
             }
 
-            %n_terms = %n_ct_new;
-            %d_terms = %d_ct_new;
-           
+            if ( $did_some_cancellation ) {
+        
+                # cancel from numerator
+                while ( my ($t, $c) = each %n_terms ) {
+                    my @v1 = split(/,/, $t);
+                    my @nt;
+                    foreach my $v2 (@v1) {
+                        my ($vv, $cc) = split(/:/, $v2);
+                        if ($vv eq $v) {
+                            my $c_sub = $c_pow{$v};
+                            if ( $cc < $c_sub ) {
+                                croak "cancel_down: Variable $v has index $cc but want to cancel $c_sub";
+                            }                            
+                            $cc -= $c_sub;
+                            if ($cc > 0) {
+                                push @nt, "$vv:$cc";
+                            }
+                            elsif ( scalar(@v1) == 1 ) {  
+                                $n_acc = $c;
+                            } 
+                        }
+                        else {
+                            push @nt, $v2;
+                        }
+                    }
+                    if ( scalar(@nt) ) {
+                        $n_ct_new{join(",", @nt)} = $c;              
+                    }
+                }
+               
+                %n_terms = %n_ct_new;
+                %d_terms = %d_ct_new;
+            }               
+
+        }
+    }
+
+    if ( (scalar(keys %n_terms) == 0) && (scalar(keys %d_terms) == 0) ) {
+        # do some tidying up of constant fractions with negative denominators
+        if ( $d_acc < 0 ) {
+            $n_acc *= -1;
+            $d_acc = abs($d_acc);
             $did_some_cancellation = 1;
         }
     }
@@ -608,6 +742,67 @@ sub collect_terms {
         }
     }    
 
+    # Post-process for complex numbers
+    # see if expression contains the designated complex variable.
+    my $contains_complex = 0;
+    my $complex_name;
+    GET_COMPLEX: foreach my $k (grep { /^VAR/ } keys %trees) {
+        if ( $trees{$k}->{name} eq $COMPLEX_VAR ) {
+            $contains_complex = 1;
+            $complex_name = $k;
+            last GET_COMPLEX;
+        }
+    }
+
+    if ( $contains_complex ) {
+
+        my %c_ct_new;
+
+        while ( my ($t, $c) = each %{$collected_terms{terms}} ) {
+            my @v1 = split(/,/, $t);
+            my @nt;
+            foreach my $v2 (@v1) {
+                my ($vv, $cc) = split(/:/, $v2);
+                if (($vv eq $complex_name) && ($cc > 1) && ($cc == int($cc))) {
+                    # various results from different powers of the imaginary unit
+                    my $pmod = $cc % 4;
+                    if ( $pmod == 0 ) {
+                        if ( scalar(@v1) == 1 ) {
+                            $accumulator += $c;
+                        }
+                    }
+                    elsif ( $pmod == 1 ) {
+                        push @nt, "$vv:1";
+                    }
+                    elsif ( $pmod == 2 ) {
+                        $c *= -1;
+                        if ( scalar(@v1) == 1 ) {
+                            $accumulator += $c;
+                        }
+                    }
+                    elsif ( $pmod == 3 ) {
+                        $c *= -1;
+                        push @nt, "$vv:1";
+                    }
+                }
+                else {
+                    push @nt, $v2;
+                }
+            }
+            if ( scalar(@nt) ) {
+                my $nk = join(",", @nt);
+                if ( exists $c_ct_new{$nk} ) {
+                    $c_ct_new{$nk} += $c;
+                }
+                else {
+                    $c_ct_new{$nk} = $c;
+                }
+            }
+        }
+
+         $collected_terms{terms} = \%c_ct_new;
+    }
+
     # put the accumulator into the data structure
     $collected_terms{terms}{constant_accumulator} = $accumulator;
     # and the functions 
@@ -623,7 +818,7 @@ sub get_term_name {
 
         my ($n,$p) = split(/:/, $tn);
         if ( exists $thr->{$n} ) {
-            $tn = $thr->{$n}{name};
+            $tn = $thr->{$n}{name} . $p;
         }
     }
 
@@ -702,13 +897,7 @@ sub build_summation_tree {
                 }
             }
             else {
-                 die "build_summation_tree: Found something without an associated Math::Symbolic object!: $var";
-#                if ( $pow == 1 ) {
-#                    push @product_list, Math::Symbolic::Variable->new($var);
-#                }
-#                else {
-#                    push @product_list, Math::Symbolic::Operator->new('^', Math::Symbolic::Variable->new($var), Math::Symbolic::Constant->new($pow));
-#                }
+                 croak "build_summation_tree: Found something without an associated Math::Symbolic object!: $var";
             }
         }
 
@@ -752,6 +941,21 @@ sub build_summation_tree {
 
 ###########################
 
+sub get_frac_GCF {
+    my ($n, $d) = @_;
+
+    my $min = ($n < $d ? $n : $d);
+    my $GCF = 1;
+    DIV_GCF: foreach my $div (reverse(2..$min)) {
+        if ( (($n % $div) == 0) && (($d % $div) == 0) ) {
+            $GCF = $div;
+            last DIV_GCF;
+        } 
+    }
+
+    return $GCF;
+}
+
 sub prepare {
     my ($t, $d) = @_;
 
@@ -783,8 +987,9 @@ sub prepare {
             my (undef, $frac) = split(/\./, $val);
             if ( defined($frac) && (length($frac)>=1) && (length($frac)<10) ) {
                 my $mult = 10**length($frac);
-                # this will (possibly) be cancelled down later 
-                $return_t = Math::Symbolic::Operator->new( '/', Math::Symbolic::Constant->new($val*$mult), Math::Symbolic::Constant->new($mult) )
+                my $n = $val*$mult;
+                my $GCF = get_frac_GCF($n, $mult);
+                $return_t = Math::Symbolic::Operator->new( '/', Math::Symbolic::Constant->new($n/$GCF), Math::Symbolic::Constant->new($mult/$GCF) );
             }
             else {
                 $return_t = $t->new();
@@ -926,10 +1131,20 @@ sub prepare {
                 # Division by unity found, removing division
                 $return_t = $op1;
             }
-            elsif ( ($op1->term_type() == T_CONSTANT) && ($op1->special() eq '') && ($op2->term_type() == T_CONSTANT) && ($op2->special() eq '') &&
-                    (($op1->value()/$op2->value()) eq int($op1->value()/$op2->value())) ) {
-                # Denominator evenly divides into numerator, removing division
-                $return_t = Math::Symbolic::Constant->new($op1->value()/$op2->value())
+            elsif ( ($op1->term_type() == T_CONSTANT) && ($op1->special() eq '') && ($op2->term_type() == T_CONSTANT) && ($op2->special() eq '') ) {
+                if ( ($op1->value()/$op2->value()) eq int($op1->value()/$op2->value()) ) {
+                    # Denominator evenly divides into numerator, removing division
+                    $return_t = Math::Symbolic::Constant->new($op1->value()/$op2->value())
+                }
+                elsif ( ($op1->value() == int($op1->value())) && ($op2->value() == int($op2->value())) ) {
+                    # Cancel down constant fraction
+                    my $GCF = get_frac_GCF( abs($op1->value()), abs($op2->value()) );
+                    $return_t = Math::Symbolic::Operator->new('/', Math::Symbolic::Constant->new($op1->value()/$GCF), Math::Symbolic::Constant->new($op2->value()/$GCF));
+                }
+                else {
+                    # Passing through division
+                    $return_t = Math::Symbolic::Operator->new('/', $op1, $op2);
+                }
             }
             elsif ( ($op2->term_type() == T_CONSTANT) && ($op2->special() eq '') && ($op2->value() < 0) ) {
                 # Pulling negative out of denominator
@@ -1006,6 +1221,13 @@ sub prepare {
                 my $numerator = Math::Symbolic::Operator->new( '*', $op2->op1(), $op1 );
                 $return_t = Math::Symbolic::Operator->new( '/', prepare($numerator, $d), $op2->op2() );   
             }
+            elsif (     ($op1->term_type() == T_OPERATOR) && ($op1->type() == B_EXP) &&
+                        ($op2->term_type() == T_OPERATOR) && ($op2->type() == B_EXP) &&
+                        $op1->op1()->is_identical($op2->op1())
+                        ) {
+                # x^m * x^n = x^(m+n)
+                $return_t = Math::Symbolic::Operator->new( '^', $op1->op1(), prepare(Math::Symbolic::Operator->new('+', $op1->op2(), $op2->op2()), $d) );
+            }
             elsif (     (($op1->term_type() == T_OPERATOR) && (($op1->type() == B_SUM) || ($op1->type() == B_DIFFERENCE))) || 
                         (($op2->term_type() == T_OPERATOR) && (($op2->type() == B_SUM) || ($op2->type() == B_DIFFERENCE))) ) {
                 # Attempting to multiply out brackets
@@ -1073,14 +1295,23 @@ sub prepare {
                 $return_t = Math::Symbolic::Operator->new('*', $op1, $op2);
             }
         }
-        elsif ( ($t->type() == B_EXP) && ($op2->term_type() == T_CONSTANT) ) {          
-            my $val = $op2->value();
-            if ( ($val eq int($val)) && ($val > 0) ) {
-                if ( $val == 1 ) {
+        elsif ( $t->type() == B_EXP ) {
+
+            if ( ($op1->term_type() == T_OPERATOR) && ($op1->type() == B_EXP) ) {
+                $return_t = prepare( Math::Symbolic::Operator->new('^', $op1->op1(), Math::Symbolic::Operator->new('*', $op1->op2(), $op2)), $d);
+            }
+            elsif ( ($op2->term_type() == T_CONSTANT) && ($op2->special() eq '') ) {         
+     
+                my $val = $op2->value();
+
+                if ( $val == 0 ) {
+                    $return_t = Math::Symbolic::Constant->new(1);
+                }   
+                elsif ( $val == 1 ) {
                     # Found expression^1. Return the expression
                     $return_t = $op1;
                 }
-                else {
+                elsif ( ($val > 1) && ($val eq int($val)) ) {
                     # Found constant positive integer power. Removing exponent through multiplication                    
                     my @product_list = ($op1) x $val;
                     my $ntp = shift @product_list;
@@ -1090,10 +1321,65 @@ sub prepare {
                     }
                     $return_t = prepare($ntp, $d);
                 }
-            }               
+                elsif ( $val == -1 ) {
+                    # remove negative index
+                    $return_t = prepare( Math::Symbolic::Operator->new('/', Math::Symbolic::Constant->new(1), $op1), $d );
+                }
+                elsif ( $val < -1 ) {
+                    $return_t = prepare( Math::Symbolic::Operator->new( '/', 
+                                            Math::Symbolic::Constant->new(1), 
+                                            Math::Symbolic::Operator->new('^', $op1, Math::Symbolic::Constant->new(abs($val))) 
+                                        ), $d);
+                }  
+                else {
+                    # Passing through exponentiation
+                    my $op1_col;
+                    if ( $op1->term_type() == T_OPERATOR ) {
+                        $op1_col = $op1->to_collected(); # try to collect up the subexpression
+                    }
+                    if ( defined($op1_col) && !$op1->is_identical($op1_col) ) {
+                        $op1 = $op1_col;
+                    }
+
+                    $return_t = Math::Symbolic::Operator->new('^', $op1, $op2);
+                }
+            }
+            elsif ( ($op1->term_type() == T_CONSTANT) && ($op1->special() eq '') &&
+                    ($op2->term_type() == T_OPERATOR) && ($op2->type() == B_DIVISION) &&
+                    ($op2->op1()->term_type == T_CONSTANT) && ($op2->op1()->value() == 1) &&
+                    ($op2->op2()->term_type == T_CONSTANT) && ($op2->op2()->value() == 2)
+                    ) {                
+
+                if ( $op1->value() < 0 ) {                    
+                    $return_t = Math::Symbolic::Operator->new('*',  Math::Symbolic::Variable->new($COMPLEX_VAR), 
+                                                                    prepare(Math::Symbolic::Operator->new('^', Math::Symbolic::Constant->new(abs($op1->value())), $op2), $d));
+                }
+                elsif ( $op1->value() == 0 ) {
+                    $return_t = Math::Symbolic::Constant->new(0);
+                }
+                else {
+                    # sqrt of a positive constant.
+                    my $sqrt = sqrt($op1->value());
+                    if ( $sqrt == int($sqrt) ) {
+                        $return_t = Math::Symbolic::Constant->new($sqrt);
+                    }
+                    else {
+                        # Passing through exponentiation
+                        $return_t = Math::Symbolic::Operator->new('^', $op1, $op2 );
+                    }
+                }
+            }
             else {
                 # Passing through exponentiation
-                $return_t = Math::Symbolic::Operator->new('^', $op1, $op2 );
+                my $op1_col;
+                if ( $op1->term_type() == T_OPERATOR ) {
+                    $op1_col = $op1->to_collected();
+                }
+                if ( defined($op1_col) && !$op1->is_identical($op1_col) ) {
+                    $op1 = $op1_col;
+                }
+
+                $return_t = Math::Symbolic::Operator->new('^', $op1, $op2);
             }
         }
         else {
@@ -1339,8 +1625,6 @@ sub create_product_tree {
     return Math::Symbolic::Operator->new( '/', $ntp1, $ntp2 );
 }
 
-
-
 =head1 SEE ALSO
 
 L<Math::Symbolic>
@@ -1366,7 +1650,6 @@ This software is copyright (c) 2024 by Matt Johnson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
 
 =cut
 

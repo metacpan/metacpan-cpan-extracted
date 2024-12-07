@@ -22,11 +22,14 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'Crypt::Digest' => '0.062'
+                                      },
                       'requires' => {
                                       'Crypt::Digest' => '0',
                                       'Exporter' => '5.57',
                                       'JSON::MaybeXS' => '0',
-                                      'perl' => 'v5.10.0'
+                                      'perl' => 'v5.14.0'
                                     }
                     },
        'test' => {

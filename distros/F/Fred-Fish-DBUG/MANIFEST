@@ -11,6 +11,7 @@ lib/Fred/Fish/DBUG/OFF.pm
 lib/Fred/Fish/DBUG/ON.pm
 lib/Fred/Fish/DBUG/Signal.pm
 lib/Fred/Fish/DBUG/SignalKiller.pm
+lib/Fred/Fish/DBUG/Test.pm
 lib/Fred/Fish/DBUG/TIE.pm
 lib/Fred/Fish/DBUG/Tutorial.pm
 t/00-basic-min-perl.t
@@ -25,7 +26,7 @@ t/10-basic-dbug-on.t
 t/11-basic-dbug-off.t
 t/12-basic-dbug-maybe-off.t
 t/12-basic-dbug-maybe-on.t
-t/15-basic-help.t
+t/15-basic-test-and-helper.t
 t/19-open_close.t
 t/20-return_tests.t
 t/21-return_simple.t

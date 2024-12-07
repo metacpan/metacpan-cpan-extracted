@@ -56,7 +56,7 @@
    "provides" : {
       "Daje::Tools::Datasections" : {
          "file" : "lib/Daje/Tools/Datasections.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Tools-Datasections"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "janeskil1525 <janeskil1525@gmail.com>"
    ],

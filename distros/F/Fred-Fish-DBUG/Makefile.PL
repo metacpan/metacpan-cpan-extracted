@@ -46,7 +46,7 @@ unlink ( $prog );
 ## Add these new keywords supported since 5.005
 if ( $] >= 5.005 ) {
    $params{AUTHOR}   = 'Curtis Leach <cleach at cpan dot com>';
-   $params{ABSTRACT} = 'Perl implementation of the Fred Fish C/C++ macros for Perl.';
+   $params{ABSTRACT} = 'Perl implementation of the Fred Fish C/C++ macros.';
 }
 
 ## An Extra Kwalitee Metric setting.
@@ -58,7 +58,6 @@ if ( $ExtUtils::MakeMaker::VERSION >= 6.31 ) {
 ## The earliest release of Perl I've personally tested this module with!
 ## Comment out this section out if you wish to try it with an earlier release!
 if ( $ExtUtils::MakeMaker::VERSION >= 6.48 ) {
-#  $params{MIN_PERL_VERSION} = '5.014000';      # Perl Version 5.14.0
    $params{MIN_PERL_VERSION} = '5.008008';      # Perl Version 5.8.8
 }
 

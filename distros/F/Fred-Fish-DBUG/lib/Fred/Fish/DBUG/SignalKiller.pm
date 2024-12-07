@@ -66,9 +66,9 @@ use Exporter;
 
 # The module whose behaviour we want to modify
 # so that we can sabotage everything else!
-use Fred::Fish::DBUG::Signal 2.08;
+use Fred::Fish::DBUG::Signal 2.09;
 
-$VERSION = "2.08";
+$VERSION = "2.09";
 @ISA = qw( Exporter );
 @EXPORT = qw( );
 @EXPORT_OK = qw( );
@@ -145,7 +145,11 @@ L<Fred::Fish::DBUG::OFF> - The stub version of the B<fish> module.
 
 L<Fred::Fish::DBUG::TIE> - Allows you to trap and log STDOUT/STDERR to B<fish>.
 
-L<Fred::Fish::DBUG::Signal> - Handles the trapping and logging all signals to fish.
+L<Fred::Fish::DBUG::Signal> - Handles the trapping and logging all signals to
+B<fish>.
+
+L<Fred::Fish::DBUG::Test> - A L<Test::More> wrapper to redirect test results to
+B<fish>.
 
 L<Fred::Fish::DBUG::Tutorial> - Sample code demonstrating using the B<fish>
 module.

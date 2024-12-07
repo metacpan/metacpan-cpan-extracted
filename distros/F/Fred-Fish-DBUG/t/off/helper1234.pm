@@ -12,14 +12,15 @@ use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
 use Test::More 0.88;
+use Fred::Fish::DBUG::Test;
+
 use File::Basename;
 use File::Spec;
 
-$VERSION = "2.07";
+$VERSION = "2.09";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( get_fish_state
-              bail
               dbug_active_ok_test
               get_fish_log
               get_delay_file
@@ -36,9 +37,6 @@ $VERSION = "2.07";
               test_mask_return
               test_mask_args
               simulate_windows_signal
-              is2
-              ok2 ok3 ok9
-              isa_ok2 isa_ok3
             );
 
 @EXPORT_OK = qw( );
@@ -89,16 +87,14 @@ BEGIN
    }
    unlink ( $delay_file );
 
-   # Can't use use_ok() here!  It messes the flow of the tests ...
-   # use_ok ("Fred::Fish::DBUG", @fish_opts);
+   # Can't use dbug_use_ok() here!  It messes the flow of the tests ...
+   # dbug_use_ok ("Fred::Fish::DBUG", @fish_opts);
 
    # Let's source in the prefered version of the module ...
    eval "use Fred::Fish::DBUG qw / " . join (" ", @fish_opts) . " /";
    if ( $@ ) {
-      done_testing ();
-      BAIL_OUT ( "Module helper1234 can't load Fred::Fish::DBUG qw / " .
-                 join (" ", @fish_opts) . " /" );
-      exit (0);
+      dbug_BAIL_OUT ( "Module helper1234 can't load Fred::Fish::DBUG qw / " .
+                      join (" ", @fish_opts) . " /" );
    }
 }
 
@@ -113,9 +109,7 @@ BEGIN
    # Let's source in the Signal handler for the module ...
    eval "use Fred::Fish::DBUG::Signal";
    if ( $@ ) {
-      done_testing ();
-      BAIL_OUT ( "Module helper1234 can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Module helper1234 can't load Fred::Fish::DBUG::Signal" );
    }
 }
 
@@ -143,42 +137,9 @@ END
 # -----------------------------------------------------------------------
 # Non-exposed functions ...
 # -----------------------------------------------------------------------
-sub the_real_caller
-{
-   # Get the caller's filename & line number ...
-   my @c = (caller(1))[1,2];
-   diag ("  at $c[0] line $c[1].\n");
-}
-
-sub paused
-{
-   my $msg = shift;
-
-   # Always paused when fish is turned off ...
-   unless ( DBUG_ACTIVE () ) {
-      if ( get_fish_state () == -1 ) {
-         $msg = "OFF - " . $msg
-      } else {
-         $msg = "PAUSED - " . $msg
-      }
-   }
-
-   return ($msg);
-}
-
 
 # -----------------------------------------------------------------------
 # The exposed funtions ...
-# -----------------------------------------------------------------------
-sub bail
-{
-   my $msg = shift || "Unknown reason for bailing!";
-
-   done_testing ();
-   BAIL_OUT ( $msg );
-   exit (0);
-}
-
 # -----------------------------------------------------------------------
 sub dbug_active_ok_test
 {
@@ -208,7 +169,7 @@ sub get_fish_module
 
    my ($module, $file) = Fred::Fish::DBUG::dbug_module_used ($mode);
 
-   # ok2 ( $file eq $mode, "Selected file: $file  -->  $module" );
+   # dbug_cmp_ok ( $file, 'eq', $mode, "Selected file: $file  -->  $module" );
 
    return ( wantarray ? ($module, $file ) : $module );
 }
@@ -220,7 +181,7 @@ sub find_fish_users
    my %h = Fred::Fish::DBUG::find_all_fish_users ();
 
    if ( $opt ) {
-      $h{z_EXTRA_FILE} = (caller(0))[1] . " (IGNORE-ME)";
+      $h{z_EXTRA_FILE} = (caller(0))[1] . ' (IGNORE-ME)';
    }
 
    return ( %h );
@@ -374,132 +335,12 @@ sub simulate_windows_signal
       die ( $@ )   if ( $@ );
 
    } else {
-      ok2 (0, "Called the ${sig} signal cheat successfully!");
+      dbug_ok (0, "Called the ${sig} signal cheat successfully!");
    }
 
    return ( $called );
 }
 
-# -----------------------------------------------------------------------
-sub is2
-{
-   my $got      = shift;
-   my $expected = shift;
-   my $msg      = shift;
-
-   my $res = is ($got, $expected, $msg);
-   if ( $res ) {
-      DBUG_PRINT ("OK2", "[$msg]");
-   } else {
-      DBUG_PRINT ("NOT OK2", "[%s]\n#        got: [%s]\n#   expected: [%s]\n",
-                  $msg, $got, $expected);
-      the_real_caller ();
-   }
-
-   return ( $res );
-}
-
-# -----------------------------------------------------------------------
-sub ok2
-{
-   my $status = shift || 0;
-   my $msg    = shift;
-
-   $msg = paused ($msg);
-
-   my $lbl = ($status) ? "OK2" : "NOT OK2";
-   DBUG_PRINT ($lbl, "[%s], [%s]", $status, $msg);
-
-   my $res = ok ( $status, $msg );
-   the_real_caller ()  unless ( $res );
-
-   return ( $res );
-}
-
-sub ok3
-{
-   DBUG_ENTER_BLOCK ("Test::More::ok", @_);
-   my $status = shift || 0;
-   my $msg    = shift;
-
-   $msg = paused ($msg);
-
-   my $res = ok ( $status, $msg );
-   the_real_caller ()  unless ( $res );
-
-   DBUG_RETURN ($res);
-}
-
-# A variant of ok2() above that doesn't use DBUG_PRINT().
-# For use when option "who_called => 1" is in use.  So it tells
-# who called ok9() instead of the location of DBUG_PRINT call.
-sub ok9
-{
-   my $status = shift || 0;
-   my $msg    = shift;
-
-   $msg = paused ($msg);
-
-   my $res = ok ( $status, $msg );
-   the_real_caller ()  unless ( $res );
-
-   my $lbl = ($res) ? "OK9" : "NOT OK9";
-
-   # Only do this work if we're actually going to write to fish!
-   # Does an abreviated DBUG_PRINT();
-   if ( DBUG_EXECUTE ($lbl) ) {
-      my $fh = DBUG_FILE_HANDLE ();
-      my $str = Fred::Fish::DBUG::dbug_indent ( "" );
-      if ( $fh && $str ) {
-         printf $fh ("%s%s: [%d], [%s]\n", $str, $lbl, $res, $msg);
-
-         # Who called ok9() ??
-         my $who = Fred::Fish::DBUG::dbug_called_by (1, 1);
-
-         my $len = length ($lbl);
-         $lbl = " "x${len};
-         printf $fh ("%s%s: %s\n", $str, $lbl, $who);
-      }
-   }
-
-   return ( $res );
-}
-
-# -----------------------------------------------------------------------
-sub isa_ok2
-{
-   my ( $obj, $ref, $msg ) = ( shift, shift, shift );
-
-   my $res = isa_ok ( $obj, $ref, $msg );
-   the_real_caller ()  unless ( $res );
-
-   my $lbl = ($res) ? "ISA_OK2" : "NOT ISA_OK2";
-
-   # So DBUG_PRINT() will match isa_ok()!
-   if ( $msg ) {
-      $msg = "'${msg}' isa '${ref}'";
-   } elsif ( $obj && $res ) {
-      $msg = "An object of class '" . ref ($obj) . "' isa '${ref}'";
-   } elsif ( ref ($obj) ne "" ) {
-      $msg = "A reference of type '" . ref ($obj) . "' isa '${ref}'";
-   } elsif ( defined $obj ) {
-      $msg = "The class (or class-like) '${obj}' isa '${ref}'";
-   } else {
-      $msg = "undef isa '${ref}'";
-   }
-   DBUG_PRINT ( $lbl, "[%d] [%s]", $res , $msg );
-
-   return ( $res );
-}
-
-sub isa_ok3
-{
-   DBUG_ENTER_BLOCK ("Test::More::isa_ok", @_);
-   my ( $obj, $ref, $msg ) = ( shift, shift, shift );
-   my $res = isa_ok ( $obj, $ref, $msg );
-   the_real_caller ()  unless ( $res );
-   DBUG_RETURN ($res);
-}
 
 # ============================================================
 #required if module is included w/ require command;

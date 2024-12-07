@@ -4,7 +4,7 @@
       "Sebastian Riedel <sri@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -34,7 +34,7 @@
          "requires" : {
             "File::Which" : "1.21",
             "IPC::Run3" : "0.048",
-            "Mojolicious" : "9.0"
+            "Mojolicious" : "9.34"
          }
       },
       "test" : {
@@ -55,6 +55,6 @@
          "web" : "https://github.com/mojolicious/mojo-assetpack"
       }
    },
-   "version" : "2.14",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "2.15",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -6,6 +6,7 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -30,7 +31,7 @@ my @ret_val = qw / a b c d e f /;
 
 sub my_warn
 {
-   ok2 (0, "There were no unexpected warnings!");
+   dbug_ok (0, "There were no unexpected warnings!");
 }
 
 BEGIN {
@@ -41,15 +42,14 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {     # Test # 2
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
-             join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -64,9 +64,9 @@ BEGIN {
 
    DBUG_ENTER_FUNC ();
 
-   my $a = ok2 (1, "In the BEGIN block ...");
+   my $a = dbug_ok (1, "In the BEGIN block ...");
 
-   ok2 ( dbug_active_ok_test () );
+   dbug_ok ( dbug_active_ok_test () );
 
    DBUG_VOID_RETURN ();
 }
@@ -93,18 +93,18 @@ END {
    DBUG_PRINT ("----", "-"x50);
 
    my $no = no_dbug ();
-   ok2 ( $no eq 6, "Returned the count of return values: ${no} (ans: 6)" );
+   dbug_is ( $no, 6, "Returned the count of return values: ${no} (ans: 6)" );
    my ($m, $n) = no_dbug();
-   ok2 ($m eq "a" && $n eq "b", "Keeping 2 of 6 values ($m, $n)");
+   dbug_ok ($m eq "a" && $n eq "b", "Keeping 2 of 6 values ($m, $n)");
 
    DBUG_PRINT ("----", "-"x50);
 
-   ok2 (1, "Manually check the fish logs to verify that everything is OK!\n----  " . DBUG_FILE_NAME ());
+   dbug_ok (1, "Manually check the fish logs to verify that everything is OK!\n----  " . DBUG_FILE_NAME ());
 
    my $lvl2 = test_fish_level ();
-   is2 ( $lvl2, $lvl1, "Fish Levels are good!" );
+   dbug_is ( $lvl2, $lvl1, "Fish Levels are good!" );
 
-   ok2 (1, "Done!");
+   dbug_ok (1, "Done!");
 
    # Terminate the test case.
    done_testing ();
@@ -123,16 +123,16 @@ sub test_wrapper
    my $msg  = shift;
 
    $func->();
-   ok2 (1, "Ignoring the return values");
+   dbug_ok (1, "Ignoring the return values");
 
    my $last = $func->();
-   ok2 ( $last eq "f", "Returned the correct value: ${last} (ans: f)" );
+   dbug_is ( $last, "f", "Returned the correct value: ${last} (ans: f)" );
 
    my ($m, $n) = $func->();
-   ok2 ($m eq "a" && $n eq "b", "Keeping 2 of 6 values ($m, $n)");
+   dbug_ok ($m eq "a" && $n eq "b", "Keeping 2 of 6 values ($m, $n)");
 
    my ($x, $y, $z) = $func->();
-   ok2 ($x eq "a" && $y eq "b" && $z eq "c", "Keeping 1st 3 values ($x, $y, $z)");
+   dbug_ok ($x eq "a" && $y eq "b" && $z eq "c", "Keeping 1st 3 values ($x, $y, $z)");
 
    DBUG_VOID_RETURN ();
 }

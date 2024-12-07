@@ -1,0 +1,64 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.89.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 70cf1457afa5b4dfcf1eb1b3e9ff4e0c23042421ef6fb316ab7158e21ba564f4 Changes
+SHA256 e0bda12b44a7d20e78f094fdea32576f824d366e79216701607da2e6b14a17ec INSTALL
+SHA256 5e0861080c39835beeb39ba632acc44cb010cd7f8cb27f69dcf35de86463ee58 LICENSE
+SHA256 9bb345c6390a8b9f0f15d1bf242879cd23d1e8a43329ebf3fc9d8f4aa14bf054 MANIFEST
+SHA256 b749c04253f2bedece9c49495048a63a22ce4059dc387d47d4cf0d5d6e7ed8ee MANIFEST.SKIP
+SHA256 374fc3cc0325db189ac192cd0259f01128ea229d26b5519006686eece9639bb2 META.json
+SHA256 64bad5b1f3c6c8aa41479686f05cf6002806fed505a773df0f8ebcfe52bc0254 META.yml
+SHA256 cff550a464a5081fe7e8d1879b475c13b901579e6b25cf204543b069cc86822c Makefile.PL
+SHA256 ac384eecdcf64b72cb0d0a2b55a55e20fb1e34189520841adf7ee92975d3b0a7 README.bak
+SHA256 d027c4516027b7ba3f89122eeda377ecedd0f5f8d51f1f3f1c050e25400cfc1f README.md
+SHA256 1201e642ebca416f52d86d0571fdd9b71869c129158fddabac820ba2fcd4f05b SECURITY-POLICY.md
+SHA256 15232c0ae24f654349c62749a93f87bdd689d2f3b67c208de5c7ea41410e18de cpanfile
+SHA256 a6cbccc4ad2f60d5dbda466cb62837379e57ced1d11c812a89d10f386c4369cd dist.ini
+SHA256 3c2ae7f6cc47cfb4e5206134813aee34d80ba7138243f29b920450d40120fece lib/Object/Signature/Portable.pm
+SHA256 dcbafd7a846b174d33a5572860404917eaa8310c224b4859839e6e9617e60e60 t/00-report-prereqs.dd
+SHA256 35a67d4060249cfab6583ec6abd291a32fcb07524067c8efaf3bd437522ce579 t/00-report-prereqs.t
+SHA256 e5bab84ea3bf87c793fd33295c79e6a96f9286dfb61e95658fc07f77323c6d11 t/author-critic.t
+SHA256 fbe6cdd54a8c2e95b5eb624cdc1799f9ea3d28e4fca551e23738cf9a0a829e32 t/author-eof.t
+SHA256 41aedb89d6697fbc6d7b8b5b3f753332fc37df33e440e2da91baeece34d53090 t/author-eol.t
+SHA256 914bde9f0ea3cadd6afb992b32d87f5027d1a0921b6b8fec75db045bac31956e t/author-minimum-version.t
+SHA256 334c41907295eade12782647bd31420451924d09dabb8d0f9f98e5be27cef7ac t/author-no-tabs.t
+SHA256 b6b98c35caa1713f7b7d10283e033065eb578adc8ac59c71ee2ed97671cfecb1 t/author-pod-coverage.t
+SHA256 8835ccb71da79a1b53a576dd349e188d444fce139e1f9f62976458c066b8edf9 t/author-pod-linkcheck.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 da2b42d19f0e73aaab56a0bb5dffc2d761be48ee53e305c7fe9f0921279fa2a1 t/author-portability.t
+SHA256 60ff6613aa80c3643c4373c2584f0b3b35cbdf755d50e1164eba11c3c1303946 t/basic.t
+SHA256 654a9e19d816b4619b24deea82260c4574e983320fcc95e1dbf5b92df934572a t/etc/custom-dictionary.txt
+SHA256 f5326032bff7d9ae639f9480bd0589baf51e7fff98f3b1bf5af889b1ef082202 t/object-signature.t
+SHA256 b5232d273bbe74d423210cfa2a2a12e583900fa420f1c093e1147e9625db790c t/release-check-manifest.t
+SHA256 6817b484798f726a44e9aee17da6e80979b4ace77349f0d0b4a13cd935172cba t/release-fixme.t
+SHA256 3e60d6abbee303709a8c178512c985bca115d83750235db24fcdc02dd98d5e08 t/release-kwalitee.t
+SHA256 6157040bb26db4ca06dd9c19043099fe31004612d27961308558fa2e3e6a7bbe t/release-trailing-space.t
+SHA256 0851db2a62dc87d0780157656039da09bc1746d4e91e5324b60784a41c926cca t/yaml.t
+SHA256 2874c342a6e56113f66a7fa70136d3bfaf763a94bdaba5d57a0d7f34b8def87c weaver.ini
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEeIwq7Pfyfxtssr5nHmWrcYGDC6wFAmdTUSwACgkQHmWrcYGD
+C6y0rgwAhwUfoLHuwION/zmWRTNOBKJl0qPoObg9nDSNHP4JG8CFp9Qp5VqKfNj+
+N6g0jsjBapDgmuxX92WbAgHmfXHPMWwsQSvl3TybtMy4DuNFx7U2FVMd/STom/a4
+1WXWKbI7UxBNWzG86kqVgB6AoMm2m2SLv3+b71kdMXMpJplHfwqEEAK9oRS+wmFz
+8wNQ+/pVGnRaL3VC4+ffSTF6s/XbYN+E9zBGa9qKSYGJLVdFzLqwaop8S3eY10Va
++ORalz3ROGbAXS2dD10A4AQbm7wehlk7DwsYDKJEMX51PQlihfIrv1nleKOskF/+
+ko4TdRyIKKFYeoh+PYlU2yEwLstKswvqnVD8Wwfw2ed6oM6+aPPIiCfqSAX3XaVf
+OAGMXtO4esFMbRHrG9u/7JGqH2HiiXrAuZs3C2+q4gK/1298zRn1Rn4cyjKegbhK
+VPd2uUMEKM4FzkdJpYgJXeRc8xN03Wz5uciMCBMY65KJ+Pl65HEPtJnysF3xCL50
+4m4psari
+=7MT9
+-----END PGP SIGNATURE-----

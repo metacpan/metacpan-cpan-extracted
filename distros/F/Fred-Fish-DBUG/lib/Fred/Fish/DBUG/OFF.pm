@@ -56,7 +56,7 @@ The exposed constants falls into this category so your code won't break
 when swapping between the two modules in the same program.
 
 So feel free to always reference the POD from L<Fred::Fish::DBUG> and/or
-L<Fred::Fish::DBUG:::ON> when using any of the DBUG modules.
+L<Fred::Fish::DBUG::ON> when using any of the DBUG modules.
 
 =head1 SWAPPING BETWEEN FISH MODULES
 
@@ -94,7 +94,7 @@ use Exporter;
 
 use FileHandle;
 
-$VERSION = "2.08";
+$VERSION = "2.09";
 @ISA = qw( Exporter );
 @EXPORT = qw( );
 @EXPORT_OK = qw( );
@@ -166,7 +166,7 @@ BEGIN
 
 =item DBUG_PUSH ( [$file [, %opts]] )
 
-This stub does nothing since B<fish> can't be turned on for this module.
+This stub does nothing since B<fish> can't be turned on by this module.
 
 =cut
 
@@ -817,6 +817,9 @@ L<Fred::Fish::DBUG::Signal> - Allows you to trap and log signals to B<fish>.
 L<Fred::Fish::DBUG::SignalKiller> - Allows you to implement action
 DBUG_SIG_ACTION_LOG for B<die>.  Really dangerous to use.  Will break most
 code bases.
+
+L<Fred::Fish::DBUG::Test> - A L<Test::More> wrapper to redirect test results to
+B<fish>.
 
 L<Fred::Fish::DBUG::Tutorial> - Sample code demonstrating using DBUG module.
 

@@ -76,8 +76,8 @@ logging to B<fish> of all trappable signals for your OS.  This list of signals
 varies per OS.  But the most common two being B<__DIE__> and B<__WARN__>.
 
 But in order to trace these signals you must first ask B<fish> to do so by
-by first sourcing in F<Fred::Fish::DBUG::Signal>, and then calling
-L<DBUG_TRAP_SIGNAL>.  See that module for more details.  You don't have to
+by first sourcing in L<Fred::Fish::DBUG::Signal>, and then calling
+B<DBUG_TRAP_SIGNAL>.  See that module for more details.  You don't have to
 use that module, but it can make thigs easier if you do.
 
 Just be aware that both B<__DIE__> and B<__WARN__> signals can be thrown
@@ -190,7 +190,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-$VERSION = "2.08";
+$VERSION = "2.09";
 @ISA = qw( Exporter );
 
 # ------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ sub import
    my @imports;
    my $fish_module = __PACKAGE__ . "::";
 
-   my $minVer = 2.08;
+   my $minVer = 2.09;
    if ( $on_flag ) {
       $fish_module .= "ON";
       require Fred::Fish::DBUG::ON;
@@ -380,7 +380,7 @@ sub _find_module
    my $key = shift;
    my $mod = $global_fish_module{$key} || 'Fred::Fish::DBUG::Unknown';
    if ( $mod =~ m/::Unknown$/ ) {
-      print STDERR "# DBUG Warning: Unknown caller: ${key}\n";
+      print STDERR "# Fred::Fish::DBUG Warning: Unknown user module: ${key}\n";
    }
    return ( $mod );
 }
@@ -610,7 +610,7 @@ code ref is only called if there is a B<fish> log to potentially remove.
 
 B<no_addresses> - (1/0) - (0) Default, print variable reference addresses like
 S<HASH(0x202f4028)> which change between runs.  (1) Suppress addresses so shows
-up like S<HASN(001)> so it's easier to compare fish files between runs.  Only
+up like S<HASH(001)> so it's easier to compare fish files between runs.  Only
 works for arguments and return values.
 
 B<allow_utf8> - Writes to B<fish> in UTF-8 mode.  Use if you get warnings
@@ -1130,6 +1130,9 @@ L<Fred::Fish::DBUG::Signal> - Allows you to trap and log signals to B<fish>.
 L<Fred::Fish::DBUG::SignalKiller> - Allows you to implement action
 DBUG_SIG_ACTION_LOG for B<die>.  Really dangerous to use.  Will break most
 code bases.
+
+L<Fred::Fish::DBUG::Test> - A L<Test::More> wrapper to redirect test results to
+B<fish>.
 
 L<Fred::Fish::DBUG::Tutorial> - Sample code demonstrating using the DBUG module.
 

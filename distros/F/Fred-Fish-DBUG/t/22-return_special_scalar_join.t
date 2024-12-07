@@ -6,6 +6,7 @@ use warnings;
 use Test::More 0.88;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -36,7 +37,7 @@ my $ret_scalar_func = sub { DBUG_ENTER_FUNC(@_); $global_flag = 1; my $l = join 
 
 sub my_warn
 {
-   ok2 (0, "There were no unexpected warnings!");
+   dbug_ok (0, "There were no unexpected warnings!");
 }
 
 BEGIN {
@@ -47,15 +48,14 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {     # Test # 2
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
-             join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -70,9 +70,9 @@ BEGIN {
 
    DBUG_ENTER_FUNC ();
 
-   my $a = ok2 (1, "In the BEGIN block ...");
+   my $a = dbug_ok (1, "In the BEGIN block ...");
 
-   ok2 ( dbug_active_ok_test () );
+   dbug_ok ( dbug_active_ok_test () );
 
    DBUG_VOID_RETURN ();
 }
@@ -99,12 +99,12 @@ END {
    test_wrapper ( \&deep_test_1,      2, "Recursive use of DBUG_RETURN_SPECIAL test 1.");
    test_wrapper ( \&deep_test_2,      1, "Recursive use of DBUG_RETURN_SPECIAL test 2.");
 
-   ok2 (1, "Manually check the fish logs to verify that everything is OK!\n----  " . DBUG_FILE_NAME ());
+   dbug_ok (1, "Manually check the fish logs to verify that everything is OK!\n----  " . DBUG_FILE_NAME ());
 
    my $lvl2 = test_fish_level ();
-   is2 ( $lvl2, $lvl1, "Fish Levels are good!" );
+   dbug_is ( $lvl2, $lvl1, "Fish Levels are good!" );
 
-   ok2 (1, "Done!");
+   dbug_ok (1, "Done!");
 
    # Terminate the test case.
    done_testing ();
@@ -124,25 +124,25 @@ sub test_wrapper
    my $msg     = shift;
 
    $func->();
-   ok2 (1, "Ignoring the return values");
-   ok2 ($global_flag == 0, "Global flag not set as expected.")  if ( $chk_flg );
+   dbug_ok (1, "Ignoring the return values");
+   dbug_is ($global_flag, 0, "Global flag not set as expected.")  if ( $chk_flg );
 
    my $a = $func->();
    if ( $chk_flg == 2 ) {
-      ok2 ($a eq "a", "*** Scalar result is NOT a join.  ($a) ***");
-      ok2 ($global_flag == 0, "Global flag was not set as expected.");
+      dbug_is ($a, "a", "*** Scalar result is NOT a join.  ($a) ***");
+      dbug_is ($global_flag, 0, "Global flag was not set as expected.");
    } else {
-      ok2 ($a eq "a b c", "*** Scalar result is a join.  ($a) ***");
-      ok2 ($global_flag == 1, "Global flag set as expected.")  if ( $chk_flg );
+      dbug_is ($a, "a b c", "*** Scalar result is a join.  ($a) ***");
+      dbug_is ($global_flag, 1, "Global flag set as expected.")  if ( $chk_flg );
    }
 
    my ($m, $n) = $func->();
-   ok2 ($m eq "a" && $n eq "b", "Keeping 2 of 3 values ($m, $n)");
-   ok2 ($global_flag == 0, "Global flag was not set as expected.")  if ( $chk_flg );
+   dbug_ok ($m eq "a" && $n eq "b", "Keeping 2 of 3 values ($m, $n)");
+   dbug_is ($global_flag, 0, "Global flag was not set as expected.")  if ( $chk_flg );
 
    my ($x, $y, $z) = $func->();
-   ok2 ($x eq "a" && $y eq "b" && $z eq "c", "Keeping all 3 values ($x, $y, $z)");
-   ok2 ($global_flag == 0, "Global flag was not set as expected.")  if ( $chk_flg );
+   dbug_ok ($x eq "a" && $y eq "b" && $z eq "c", "Keeping all 3 values ($x, $y, $z)");
+   dbug_is ($global_flag, 0, "Global flag was not set as expected.")  if ( $chk_flg );
 
    DBUG_VOID_RETURN ();
 }
@@ -176,7 +176,7 @@ sub return_test_2
    # anything since used in a void context.
    DBUG_RETURN_SPECIAL ($ret_scalar_func, @ret_val);
 
-   ok2 ( $global_flag == 0, "Anonymous function in return_test_2 was handled correctly!" );
+   dbug_is ( $global_flag, 0, "Anonymous function in return_test_2 was handled correctly!" );
 
    # Do some more work here ...
 
@@ -212,7 +212,7 @@ sub return_test_4
       $err_flag = $global_flag ? 0 : 1;
    }
 
-   ok2 ( ! $err_flag, "Anonymous function in return_test_4 was handled correctly!" );
+   dbug_ok ( ! $err_flag, "Anonymous function in return_test_4 was handled correctly!" );
 
    # This is what DBUG_RETURN_SPECIAL() does ... in this case ...
    return ( wantarray ? @lst : $scalar );

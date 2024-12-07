@@ -11,6 +11,7 @@ use Test::More;
 use File::Spec;
 use File::Glob qw (bsd_glob);
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -19,7 +20,7 @@ my $warn_found = 0;
 
 sub my_warn
 {
-   ok2 (0, "There was an expected warning!  Check fish.");
+   dbug_ok (0, "There was an expected warning!  Check fish.");
    $warn_found = 1;
 }
 
@@ -31,15 +32,14 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) { # Test # 2
-      bail ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
-             join (" ", @opts) . " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module via Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . " /" );
    }
 
-   ok (1, "Uses options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Uses options qw / " . join (" ", @opts) . " /");
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -57,12 +57,12 @@ BEGIN {
    DBUG_ENTER_FUNC (@ARGV);
 
    $start_level = test_fish_level ();
-   is2 ($start_level, $lvl, "In the BEGIN block ...");
+   dbug_is ($start_level, $lvl, "In the BEGIN block ...");
    DBUG_PRINT ("PURPOSE", "\nJust verifying that we can handle the UTF8 character set!\n.");
 
-   ok2 ( dbug_active_ok_test () );
+   dbug_ok ( dbug_active_ok_test () );
 
-   ok2 ( 1, "Fish Log: " . DBUG_FILE_NAME() );
+   dbug_ok ( 1, "Fish Log: " . DBUG_FILE_NAME() );
 
    DBUG_VOID_RETURN ();
 }
@@ -159,17 +159,17 @@ BEGIN {
    eval {
       require Date::Language;
       Date::Language->import ();
-      ok2 (1, "use Date::Language;");
+      dbug_ok (1, "use Date::Language;");
    };
    if ($@) {
-      ok2 (1, "Date::Language not installed, so can't test alternate character sets.");
+      dbug_ok (1, "Date::Language not installed, so can't test alternate character sets.");
       done_testing ();
       DBUG_LEAVE (0);
    }
 
    my @languages = find_installed_languages ();
    if ( $#languages == -1 ) {
-      ok2 (1, "No languages are installed, so can't test alternate character sets.");
+      dbug_ok (1, "No languages are installed, so can't test alternate character sets.");
       done_testing ();
       DBUG_LEAVE (0);
    }
@@ -179,10 +179,10 @@ BEGIN {
       require Encode::Guess;
       Encode::Guess->import ();
       $skip_encode_tests = 0;
-      ok2 (1, "use Encode::Guess;");
+      dbug_ok (1, "use Encode::Guess;");
    };
    if ($@) {
-      ok2 (1, "Encode::Guess is not installed, so can't guess what character sets need to be used.");
+      dbug_ok (1, "Encode::Guess is not installed, so can't guess what character sets need to be used.");
       # done_testing ();
       # DBUG_LEAVE (0);
    }
@@ -204,7 +204,7 @@ END {
 
    my $lvl = test_fish_level ();
    if ( $start_level != $lvl ) {
-      ok2 (0, "END Level Check Worked!");
+      dbug_ok (0, "END Level Check Worked!");
    }
 
    DBUG_VOID_RETURN ();
@@ -216,7 +216,7 @@ END {
 {
    DBUG_ENTER_BLOCK ("main-prog-\x{263A}", @ARGV);
 
-   ok2 (1, "In the MAIN program ...");
+   dbug_ok (1, "In the MAIN program ...");
 
    # The progam hangs if binmode() is called multiple time.
    # my $fh = DBUG_FILE_HANDLE ();
@@ -237,12 +237,12 @@ END {
          next;
       }
       my $ok = test_language ( $_, $language_data{$_} );
-      ok2 ($ok, "Language '$_' written to fish OK!");
+      dbug_ok ($ok, "Language '$_' written to fish OK!");
       DBUG_PRINT ("---", '-'x40);
    }
 
    my $lvl = test_fish_level ();
-   is2 ($lvl, $start_level, "Final MAIN Level Check Worked!");
+   dbug_is ($lvl, $start_level, "Final MAIN Level Check Worked!");
 
    done_testing ();
 

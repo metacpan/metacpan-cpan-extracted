@@ -3,9 +3,9 @@ Changes
 MANIFEST			This list of files
 MANIFEST.SKIP
 Makefile.PL
-README2.md
+HOWTO.md
+cpanfile
 README.pod
-ReleaseNotes
 bin/chkbcfg.pl
 bin/patchtree.pl
 bin/smokestatus.pl

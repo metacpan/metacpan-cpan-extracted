@@ -6,6 +6,7 @@ use warnings;
 use Test::More;
 use File::Spec;
 
+use Fred::Fish::DBUG::Test;
 BEGIN { push (@INC, File::Spec->catdir (".", "t", "off")); }
 use helper1234;
 
@@ -26,9 +27,9 @@ sub my_warn
    my $msg = shift;
    chomp($msg);
    if ( $msg ne "Hello World!") {
-      ok3 (0, "There was an expected warning!  Check fish.");
+      dbug_ok (0, "There was an expected warning!  Check fish.");
    } else {
-      ok3 (1, "Hit expected warning for: ${msg}");
+      dbug_ok (1, "Hit expected warning for: ${msg}");
    }
 }
 
@@ -40,15 +41,14 @@ BEGIN {
    my @opts = get_fish_opts ();
 
    unless (use_ok ('Fred::Fish::DBUG', @opts)) {    # Test # 2
-      bail ( "Can't load $fish_module vi Fred::Fish::DBUG qw / " .
-             join (" ", @opts) . qw " /" );
+      dbug_BAIL_OUT ( "Can't load $fish_module vi Fred::Fish::DBUG qw / " .
+                      join (" ", @opts) . qw " /" );
    }
 
-   ok (1, "Used options qw / " . join (" ", @opts) . " /");
+   dbug_ok (1, "Used options qw / " . join (" ", @opts) . " /");
 
    unless (use_ok ( "Fred::Fish::DBUG::Signal" )) {         # Test # 4
-      BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
-      exit (0);
+      dbug_BAIL_OUT ( "Can't load Fred::Fish::DBUG::Signal" );
   }
 }
 
@@ -66,11 +66,11 @@ BEGIN {
    DBUG_ENTER_FUNC ();
 
    $start_level = test_fish_level ();
-   is2 ($start_level, $lvl, "In the BEGIN block ...");   # Test # 2
+   dbug_is ($start_level, $lvl, "In the BEGIN block ...");   # Test # 2
 
-   ok3 ( dbug_active_ok_test () );
+   dbug_ok ( dbug_active_ok_test () );
 
-   ok3 ( 1, "Fish Log: " . DBUG_FILE_NAME() );
+   dbug_ok ( 1, "Fish Log: " . DBUG_FILE_NAME() );
 
    DBUG_VOID_RETURN ();
 }
@@ -91,10 +91,10 @@ BEGIN {
       require Term::ANSIColor;
       Term::ANSIColor->import (':constants');
       # Term::ANSIColor->import (':constants256');   # Works also!
-      ok3 (1, "Color MACROS are supported!");
+      dbug_ok (1, "Color MACROS are supported!");
    };
    if ($@) {
-      ok3 (1, "Color MACROS are NOT supported!");
+      dbug_ok (1, "Color MACROS are NOT supported!");
       done_testing ();
       DBUG_LEAVE (0);
    }
@@ -109,7 +109,7 @@ END {
    # We're not supposed to do any testing in this end block!
    my $lvl = test_fish_level ();
    if ( $start_level != $lvl ) {
-      ok3 (0, "In the END block ...");
+      dbug_ok (0, "In the END block ...");
    }
 
    DBUG_VOID_RETURN ();
@@ -125,18 +125,18 @@ END {
    DBUG_ENTER_FUNC (@ARGV);
 
    my $lvl = test_fish_level ();
-   is2 ($lvl, $start_level, "In the MAIN program ...");  # Test # 4 ...
+   dbug_is ($lvl, $start_level, "In the MAIN program ...");  # Test # 4 ...
 
    # If coloring is supported ...
    if ( $bool ) {
       # Unexposed constant value ...
       my $bad_lvl = get_fish_module()->DBUG_FILTER_LEVEL_MAX + 1;
       my $bad_tst = DBUG_SET_FILTER_COLOR ($bad_lvl, BOLD, BLUE, ON_BLACK);
-      ok3 ( ($bad_tst == 0), "Unable to set colors for unknown filter level ($bad_lvl)" );
+      dbug_is ( $bad_tst, 0, "Unable to set colors for unknown filter level ($bad_lvl)" );
    }
 
    # Tag everything to use colors if available ...
-   ok3 (1, "Using color strings ...")  if ( $bool );
+   dbug_ok (1, "Using color strings ...")  if ( $bool );
    DBUG_SET_FILTER_COLOR (DBUG_FILTER_LEVEL_FUNC,     BOLD, GREEN, ON_BLACK);
    DBUG_SET_FILTER_COLOR (DBUG_FILTER_LEVEL_ARGS,     YELLOW, ON_BLACK);
    DBUG_SET_FILTER_COLOR (DBUG_FILTER_LEVEL_ERROR,    RED, ON_BLACK);
@@ -153,13 +153,13 @@ END {
    # Test without colors ...
    if ( $bool ) {
       local $ENV{ANSI_COLORS_DISABLED} = 1;
-      ok3 (1, "------------- No Color --------------------");
+      dbug_ok (1, "------------- No Color --------------------");
       run_all_tests ( ($start_level + 1), 'a', 'b', 'c', 'd' );
-      ok3 (1, "------------- End No Color ----------------");
+      dbug_ok (1, "------------- End No Color ----------------");
    }
 
    $lvl = test_fish_level ();
-   is2 ($lvl, $start_level, "MAIN Level Final Check ...");
+   dbug_is ($lvl, $start_level, "MAIN Level Final Check ...");
 
    # Terminate the test case.
    done_testing ();
@@ -179,52 +179,52 @@ sub run_all_tests
    my $cnt = 0;
    DBUG_FILTER (DBUG_FILTER_LEVEL_FUNC);
    ($cnt, @ans) = test_case (@args);
-   ok3 (comp(\@args, \@ans), "Filtered Return Values OK ($cnt)");
-   ok3 (fcmp ($cnt, 0), "Wrote the correct number of lines to fish.");
+   dbug_ok (comp(\@args, \@ans), "Filtered Return Values OK ($cnt)");
+   dbug_ok (fcmp ($cnt, 0), "Wrote the correct number of lines to fish.");
 
    DBUG_FILTER (DBUG_FILTER_LEVEL_ARGS);
    push (@args, 4);
    ($cnt, @ans) = test_case (@args);
-   ok3 (comp(\@args, \@ans), "Filtered Return Values OK ($cnt)");
-   ok3 (fcmp ($cnt, 0), "Wrote the correct number of lines to fish.");
+   dbug_ok (comp(\@args, \@ans), "Filtered Return Values OK ($cnt)");
+   dbug_ok (fcmp ($cnt, 0), "Wrote the correct number of lines to fish.");
 
    DBUG_FILTER (DBUG_FILTER_LEVEL_ERROR);
    push (@args, 5);
    ($cnt, @ans) = test_case (@args);
-   ok3 (comp(\@args, \@ans), "Filtered Return Values OK ($cnt)");
-   ok3 (fcmp ($cnt, 2), "Wrote the correct number of lines to fish.");
+   dbug_ok (comp(\@args, \@ans), "Filtered Return Values OK ($cnt)");
+   dbug_ok (fcmp ($cnt, 2), "Wrote the correct number of lines to fish.");
 
    DBUG_FILTER (DBUG_FILTER_LEVEL_WARN);
    push (@args, 6);
    ($cnt, @ans) = test_case (@args);
-   ok3 (comp(\@args, \@ans), "Filtered Return Values OK ($cnt)");
-   ok3 (fcmp ($cnt, 4), "Wrote the correct number of lines to fish.");
+   dbug_ok (comp(\@args, \@ans), "Filtered Return Values OK ($cnt)");
+   dbug_ok (fcmp ($cnt, 4), "Wrote the correct number of lines to fish.");
 
    DBUG_FILTER (DBUG_FILTER_LEVEL_DEBUG);
    push (@args, 7);
    ($cnt, @ans) = test_case (@args);
-   ok3 (comp(\@args, \@ans), "Filtered Return Values OK ($cnt)");
-   ok3 (fcmp ($cnt, 6), "Wrote the correct number of lines to fish.");
+   dbug_ok (comp(\@args, \@ans), "Filtered Return Values OK ($cnt)");
+   dbug_ok (fcmp ($cnt, 6), "Wrote the correct number of lines to fish.");
 
    DBUG_FILTER (DBUG_FILTER_LEVEL_INFO);
    push (@args, 8);
    ($cnt, @ans) = test_case (@args);
-   ok3 (comp(\@args, \@ans), "Filtered Return Values OK ($cnt)");
-   ok3 (fcmp ($cnt, 7), "Wrote the correct number of lines to fish.");
+   dbug_ok (comp(\@args, \@ans), "Filtered Return Values OK ($cnt)");
+   dbug_ok (fcmp ($cnt, 7), "Wrote the correct number of lines to fish.");
 
    DBUG_FILTER (DBUG_FILTER_LEVEL_OTHER);
    push (@args, 9);
    $cnt = test_case (@args);
-   ok3 (fcmp ($cnt, 9), "Filtered Return Values OK ($cnt)");
+   dbug_ok (fcmp ($cnt, 9), "Filtered Return Values OK ($cnt)");
 
    # Skip this test for Fred::Fish::DBUG::OFF ...
    if ( $new_level ) {
       my $lvl = test_fish_level ();
-      ok3 ($new_level == $lvl, "${func} Level Check (level: $lvl)");
+      dbug_is ($new_level, $lvl, "${func} Level Check (level: $lvl)");
 
       my $blk = DBUG_ENTER_BLOCK ("block");
       $lvl = test_fish_level ();
-      ok3 ( ($new_level + 1) == $lvl, "${blk} Level Check (level: $lvl)");
+      dbug_is ( ($new_level + 1), $lvl, "${blk} Level Check (level: $lvl)");
       DBUG_VOID_RETURN ();
    }
 

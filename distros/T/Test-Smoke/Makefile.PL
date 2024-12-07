@@ -208,11 +208,11 @@ my %wm = (
             homepage   => "http://perl5.test-smoke.org/",
             repository => {
                 type => "git",
-                url  => "https://github.com/abeltje/Test-Smoke.git",
-                web  => "https://github.com/abeltje/Test-Smoke",
+                url  => "https://github.com/Perl-Toolchain-Gang/Test-Smoke.git",
+                web  => "https://github.com/Perl-Toolchain-Gang/Test-Smoke"
             },
             bugtracker => {
-                web => 'https://github.com/abeltje/Test-Smoke/issues',
+                web  => "https://github.com/Perl-Toolchain-Gang/Test-Smoke/issues"
             },
             x_IRC => "irc://irc.perl.org/#smoke",
         },

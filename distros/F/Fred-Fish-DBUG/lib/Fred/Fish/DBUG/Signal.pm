@@ -46,7 +46,7 @@ use warnings;
 use vars qw( @ISA @EXPORT @EXPORT_OK $VERSION );
 use Exporter;
 
-use Fred::Fish::DBUG::ON 2.08;
+use Fred::Fish::DBUG::ON 2.09;
 
 use Perl::AtEndOfScope;
 use Config qw( %Config );
@@ -57,7 +57,7 @@ use File::Basename;
 use Cwd 'abs_path';
 use Sub::Identify 'sub_fullname';
 
-$VERSION = "2.08";
+$VERSION = "2.09";
 @ISA = qw( Exporter );
 
 @EXPORT = qw( DBUG_TRAP_SIGNAL  DBUG_FIND_CURRENT_TRAPS  DBUG_DIE_CONTEXT
@@ -1051,6 +1051,9 @@ L<Fred::Fish::DBUG::TIE> - Allows you to trap and log STDOUT/STDERR to B<fish>.
 L<Fred::Fish::DBUG::SignalKiller> - Allows you to implement action
 DBUG_SIG_ACTION_LOG for B<die>.  Really dangerous to use.  Will break most
 code bases.
+
+L<Fred::Fish::DBUG::Test> - A L<Test::More> wrapper to redirect test results to
+B<fish>.
 
 L<Fred::Fish::DBUG::Tutorial> - Sample code demonstrating using DBUG module.
 

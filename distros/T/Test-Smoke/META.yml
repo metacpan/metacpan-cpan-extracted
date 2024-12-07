@@ -38,8 +38,8 @@ requires:
   perl: '5.010'
 resources:
   IRC: irc://irc.perl.org/#smoke
-  bugtracker: https://github.com/abeltje/Test-Smoke/issues
+  bugtracker: https://github.com/Perl-Toolchain-Gang/Test-Smoke/issues
   homepage: http://perl5.test-smoke.org/
-  repository: https://github.com/abeltje/Test-Smoke.git
-version: '1.82'
+  repository: https://github.com/Perl-Toolchain-Gang/Test-Smoke.git
+version: '1.83'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
