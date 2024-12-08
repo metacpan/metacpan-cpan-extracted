@@ -13,17 +13,22 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Perl-Version-Bumper",
+  "EXE_FILES" => [
+    "bin/perl-version-bump"
+  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Perl::Version::Bumper",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Exporter" => 0,
+    "Getopt::Long" => 0,
     "PPI" => "1.279",
     "PPI::Document" => 0,
     "PPI::Token::Attribute" => 0,
     "PPI::Token::Operator" => 0,
     "Path::Tiny" => "0.119",
+    "Pod::Usage" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -38,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.157",
+  "VERSION" => "0.162",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +55,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "Getopt::Long" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => 0,
@@ -58,6 +64,7 @@ my %FallbackPrereqs = (
   "PPI::Token::Attribute" => 0,
   "PPI::Token::Operator" => 0,
   "Path::Tiny" => "0.119",
+  "Pod::Usage" => 0,
   "Test2::Tools::Exception" => 0,
   "Test2::V0" => 0,
   "Test::More" => 0,

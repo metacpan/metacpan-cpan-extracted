@@ -4,20 +4,20 @@ use strict;
 use warnings;
 use feature qw( lexical_subs signatures );
 ---
-use v5.XX;
+use VERSION;
 use strict;
 use warnings;
 use feature qw( lexical_subs signatures );
 --- v5.12
-use v5.XX;
+use VERSION;
 use warnings;
 use feature qw( lexical_subs signatures );
 --- v5.26
-use v5.XX;
+use VERSION;
 use warnings;
 use feature 'signatures';
 --- v5.36
-use v5.XX;
+use VERSION;
 ########## don't remove future feature (also backwards-compat ones)
 use strict;
 use warnings;
@@ -28,17 +28,17 @@ use strict;
 use warnings;
 use feature 'lexical_subs', 'signatures';
 --- v5.12
-use v5.XX;
+use VERSION;
 use warnings;
 use feature 'lexical_subs', 'signatures';
 --- v5.26
-use v5.XX;
+use VERSION;
 use warnings;
 use feature 'signatures';
 --- v5.36
-use v5.XX;
+use VERSION;
 --- v5.38
-use v5.XX;
+use VERSION;
 use feature 'bareword_filehandles';
 ########## multiple features enabled at once
 use v5.20;
@@ -47,42 +47,42 @@ use warnings;
 use feature qw( lexical_subs signatures );
 no warnings "experimental::lexical_subs", "experimental::signatures";
 --- v5.20
-use v5.XX;
+use VERSION;
 use warnings;
 use feature qw( lexical_subs signatures );
 no warnings "experimental::lexical_subs", "experimental::signatures";
 --- v5.26
-use v5.XX;
+use VERSION;
 use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 --- v5.36
-use v5.XX;
+use VERSION;
 ########## multiple features enabled at once with experimental
 use v5.20;
 use strict;
 use warnings;
 use experimental qw( lexical_subs signatures );
 --- v5.20
-use v5.XX;
+use VERSION;
 use warnings;
 use experimental qw( lexical_subs signatures );
 --- v5.26
-use v5.XX;
+use VERSION;
 use warnings;
 use experimental 'signatures';
 --- v5.36
-use v5.XX;
+use VERSION;
 ########## multiple no feature on the same line
 no feature qw( indirect bareword_filehandles );
 ---
-use v5.XX;
+use VERSION;
 no feature qw( indirect bareword_filehandles );
 --- v5.36
-use v5.XX;
+use VERSION;
 no feature 'bareword_filehandles';
 --- v5.38
-use v5.XX;
+use VERSION;
 ########## pay attention to non-significant elements
 #!/usr/bin/env perl
 use strict; use warnings; use v5.20; use feature qw/signatures/;
@@ -90,12 +90,12 @@ sub main {
 }
 --- v5.20
 #!/usr/bin/env perl
-use v5.XX;
+use VERSION;
 use warnings; use feature qw/signatures/;
 sub main {
 }
 --- v5.36
 #!/usr/bin/env perl
-use v5.XX;
+use VERSION;
 sub main {
 }

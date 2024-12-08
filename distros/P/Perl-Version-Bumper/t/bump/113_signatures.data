@@ -1,50 +1,50 @@
 ########## feature signature
 use feature 'signatures';
 ---
-use v5.XX;
+use VERSION;
 use feature 'signatures';
 --- v5.36
-use v5.XX;
+use VERSION;
 ########## signatures + empty prototype
 sub foo () { }
 ---
-use v5.XX;
+use VERSION;
 sub foo () { }
 --- v5.36
-use v5.XX;
+use VERSION;
 sub foo :prototype() { }
 ########## signatures + scalar prototype
 sub foo ($) { }
 ---
-use v5.XX;
+use VERSION;
 sub foo ($) { }
 --- v5.36
-use v5.XX;
+use VERSION;
 sub foo :prototype($) { }
 ########## experimental signatures +  prototype
 use v5.20;
 use feature 'signatures';
 sub foo ($) { } # valid signature, not a prototype
 --- v5.20
-use v5.XX;
+use VERSION;
 use feature 'signatures';
 sub foo ($) { } # valid signature, not a prototype
 --- v5.36
-use v5.XX;
+use VERSION;
 sub foo ($) { } # valid signature, not a prototype
 ########## a prototype that's not a signature
 sub money ($$) { }
 ---
-use v5.XX;
+use VERSION;
 sub money ($$) { }
 --- v5.36
-use v5.XX;
+use VERSION;
 sub money :prototype($$) { }
 ########## prototype on anonymous subs
 my $sub = sub ($@) { ... }
 ---
-use v5.XX;
+use VERSION;
 my $sub = sub ($@) { ... }
 --- v5.36
-use v5.XX;
+use VERSION;
 my $sub = sub :prototype($@) { ... }

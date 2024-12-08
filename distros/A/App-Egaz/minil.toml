@@ -3,4 +3,3 @@ badges = ['travis', 'codecov', 'metacpan']
 authority="cpan:WANGQ"
 
 module_maker="ModuleBuildTiny"
-

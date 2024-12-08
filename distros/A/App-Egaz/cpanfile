@@ -11,7 +11,6 @@ requires 'Number::Format',     '1.75';
 requires 'JSON',               '2.97001';
 requires 'Path::Tiny',         '0.076';
 requires 'Set::Scalar',        '1.29';
-requires 'Statistics::R',      '0.34';
 requires 'String::Similarity', '1.04';
 requires 'Template',           '2.26';
 requires 'Tie::IxHash',        '1.23';

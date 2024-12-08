@@ -124,8 +124,8 @@ reached.
 
 IMPORTANT: This implies the version numbers must be in increasing order.
 
-To simplify writing the expected results, every "use v5.XX" will have the
-"v5.XX" replaced with the Perl version being tested.
+To simplify writing the expected results, every "use vXX" will have the
+"vXX" replaced with the Perl version being tested.
 
 The first "---" line can be empty, in which case the version is assumed
 to be v5.10.

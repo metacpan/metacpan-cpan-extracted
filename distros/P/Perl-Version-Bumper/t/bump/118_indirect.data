@@ -1,40 +1,40 @@
 ########## no feature 'indirect'
 no feature 'indirect';
 ---
-use v5.XX;
+use VERSION;
 no feature 'indirect';
 --- v5.36
-use v5.XX;
+use VERSION;
 ########## feature indirect
 use feature 'indirect';
 ---
-use v5.XX;
+use VERSION;
 --- v5.36
-use v5.XX;
+use VERSION;
 use feature 'indirect';
 ########## no indirect
 use strict;
 use warnings;
 no indirect;
 ---
-use v5.XX;
+use VERSION;
 use strict;
 use warnings;
 no indirect;
 --- v5.12
-use v5.XX;
+use VERSION;
 use warnings;
 no indirect;
 --- v5.32
-use v5.XX;
+use VERSION;
 use warnings;
 no feature 'indirect';
 --- v5.36
-use v5.XX;
+use VERSION;
 ########## use indirect
 use indirect;
 ---
-use v5.XX;
+use VERSION;
 --- v5.36
-use v5.XX;
+use VERSION;
 use feature 'indirect';

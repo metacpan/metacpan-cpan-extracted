@@ -42,6 +42,11 @@ sub validate_each {
     }
   }
 
+  my $count = scalar(@rows) > 1 ? scalar(@rows) : 2;
+  $opts->{count} = $count; # Even if there are zero or one row since we use the plural form
+                      # of the class name we need to set this to 2 so that the error message
+                      # is correct grammatically.
+
   $record->errors->add($attribute, $self->invalid_msg, $opts) if $found_errors;
 }
 

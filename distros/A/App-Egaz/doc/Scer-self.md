@@ -23,7 +23,7 @@ Each .fa files in <path/target> should contain only one sequences.
 ## self alignment
 
 ```bash
-cd ~/data/alignment/egaz
+cd ~/data/egaz
 
 egaz lastz \
     --set set01 -C 0 --parallel 8 --isself --verbose \
@@ -34,66 +34,124 @@ egaz lpcnam \
     --parallel 8 --verbose \
     S288c S288c S288cvsSelf
 
-fasops axt2fas \
-    -l 1000 -t S288c -q S288c -s S288c/chr.sizes \
-    S288cvsSelf/axtNet/*.net.axt.gz -o S288cvsSelf_axt.fas
+fasr axt2fas --tname S288c --qname S288c \
+    S288c/chr.sizes S288cvsSelf/axtNet/*.net.axt.gz |
+    fasr filter --ge 1000 stdin -o S288cvsSelf_axt.fas
 
-fasops check S288cvsSelf_axt.fas S288c.fa --name S288c -o stdout | grep -v "OK"
+fasr check --name S288c S288c.fa S288cvsSelf_axt.fas | grep -v "OK"
 
-fasops covers S288cvsSelf_axt.fas -n S288c -o stdout |
+fasr cover --name S288c S288cvsSelf_axt.fas |
     spanr stat S288c/chr.sizes stdin -o S288cvsSelf_axt.csv
+
+cat S288cvsSelf_axt.fas |
+    grep "^>S288c." |
+    rgr prop S288c/repeat.json stdin |
+    tsv-summarize --quantile "2:0.1,0.5,0.9"
+#0       0.0053  0.2281
+
+```
+
+## minimap2
+
+```shell
+cd ~/data/egaz
+
+# https://github.com/lh3/minimap2/blob/master/cookbook.md#constructing-self-homology-map
+minimap2 -DP -k19 -w19 -m200 S288c/chr.fasta S288c/chr.fasta > mm.paf
+
+# https://github.com/lh3/miniasm/blob/master/PAF.md
+# 10	int	Number of residue matches
+cat mm.paf |
+    tsv-filter --ge "10:1000" |
+    tsv-sort -k1,1 -k6,6 -k3,3n -k8,8n \
+    > mm.length.paf
+
+# convert to rg
+cat mm.length.paf |
+     perl -nla -e '
+        my $f_id = $F[0];
+        my $f_begin = $F[2] + 1;
+        my $f_end = $F[3];
+
+        my $g_id = $F[5];
+        my $g_begin = $F[7] + 1;
+        my $g_end = $F[8];
+
+        print "$f_id:$f_begin-$f_end";
+        print "$g_id:$g_begin-$g_end";
+    ' |
+    tsv-uniq |
+    rgr sort stdin \
+    > mm.rg
+
+# remove repeats
+rgr prop S288c/repeat.json mm.rg |
+    tsv-filter --le "2:0.3" |
+    tsv-select -f 1 \
+    > mm.filter.rg
+
+faops region S288c/chr.fasta mm.filter.rg mm.gl.fasta
+
+# stats
+spanr cover mm.rg |
+    spanr stat S288c/chr.sizes stdin --all
+
+spanr cover mm.filter.rg |
+    spanr stat S288c/chr.sizes stdin --all
+
+spanr stat S288c/chr.sizes S288c/repeat.json --all
+
+# draw the dotplot
+cat mm.length.paf |
+    tsv-select -f 1-12 |
+    rgr field stdin --chr 1 --start 3 --end 4 -a |
+    rgr runlist --op overlap -f 13 \
+        <(spanr cover mm.filter.rg) \
+        stdin |
+    tsv-select -f 1-12 \
+    > mm.filter.paf
+
+paf2dotplot png medium mm.filter.paf
+
+```
+
+## `wfmash -X`
+
+```shell
+cd ~/data/egaz
+
+wfmash -X -p 70 S288c/chr.fasta S288c/chr.fasta > self.paf
+
+paf2dotplot png medium self.paf
 
 ```
 
 ## blast
 
 ```bash
-cd ~/data/alignment/egaz
+cd ~/data/egaz
 
 mkdir -p S288c_proc
 mkdir -p S288c_result
 
-cd ~/data/alignment/egaz/S288c_proc
-
-# genome
-find ../S288c -type f -name "*.fa" |
-    sort |
-    xargs cat |
-    perl -nl -e "/^>/ or \$_ = uc; print" \
-    > genome.fa
-faops size genome.fa > chr.sizes
+cd ~/data/egaz/S288c_proc
 
 # Get exact copies in the genome
-fasops axt2fas ../S288cvsSelf/axtNet/*.axt.gz -l 1000 -s chr.sizes -o stdout > axt.fas
-fasops separate axt.fas --nodash -s .sep.fasta
-
-echo "* Target positions"
-egaz exactmatch target.sep.fasta genome.fa \
-    --length 500 -o replace.target.tsv
-fasops replace axt.fas replace.target.tsv -o axt.target.fas
-
-echo "* Query positions"
-egaz exactmatch query.sep.fasta genome.fa \
-    --length 500 -o replace.query.tsv
-fasops replace axt.target.fas replace.query.tsv -o axt.correct.fas
-
-# coverage stats
-fasops covers axt.correct.fas -o axt.correct.yml
-spanr split axt.correct.yml -s .temp.yml -o .
-spanr compare --op union target.temp.yml query.temp.yml -o axt.union.yml
-spanr stat chr.sizes axt.union.yml -o union.csv
+fasr axt2fas \
+    ../S288c/chr.sizes ../S288cvsSelf/axtNet/*.net.axt.gz |
+    fasr filter --ge 1000 stdin -o axt.fas
 
 # links by lastz-chain
-fasops links axt.correct.fas -o stdout |
+fasr link axt.fas |
     perl -nl -e 's/(target|query)\.//g; print;' \
     > links.lastz.tsv
 
 # remove species names
 # remove duplicated sequences
 # remove sequences with more than 250 Ns
-fasops separate axt.correct.fas --nodash --rc -o stdout |
+fasr separate axt.fas --rc |
     perl -nl -e '/^>/ and s/^>(target|query)\./\>/; print;' |
-    faops filter -u stdin stdout |
+    faops filter -u -d stdin stdout |
     faops filter -n 250 stdin stdout \
     > axt.gl.fasta
 
@@ -119,32 +177,36 @@ egaz blastlink axt.all.blast -c 0.95 -o links.blast.tsv
 ## merge
 
 ```bash
-cd ~/data/alignment/egaz/S288c_proc
+cd ~/data/egaz/S288c_proc
 
 # merge
 linkr sort -o links.sort.tsv \
     links.lastz.tsv links.blast.tsv
 
 linkr clean   links.sort.tsv       -o links.sort.clean.tsv
-linkr merge   links.sort.clean.tsv -o links.merge.tsv       -c 0.95
+rgr   merge   links.sort.clean.tsv -o links.merge.tsv       -c 0.95
 linkr clean   links.sort.clean.tsv -o links.clean.tsv       -r links.merge.tsv --bundle 500
 linkr connect links.clean.tsv      -o links.connect.tsv     -r 0.9
 linkr filter  links.connect.tsv    -o links.filter.tsv      -r 0.8
 
 # recreate links
-fasops create links.filter.tsv -o multi.temp.fas       -g genome.fa
-fasops refine multi.temp.fas   -o multi.refine.fas     --msa mafft -p 8 --chop 10
-fasops links  multi.refine.fas -o stdout |
+fasr create genome.fa links.filter.tsv -o multi.temp.fas
+#fasr check genome.fa multi.temp.fas | grep -v "OK"
+
+fasr refine multi.temp.fas -o multi.refine.fas --msa mafft -p 8 --chop 10
+#fasr check genome.fa multi.refine.fas | grep -v "OK"
+
+fasr link multi.refine.fas |
     linkr sort stdin -o links.refine.tsv
 
-fasops links  multi.refine.fas -o stdout --best |
+fasr link multi.refine.fas --best |
     linkr sort stdin -o links.best.tsv
-fasops create links.best.tsv -o pair.temp.fas    -g genome.fa
-fasops refine pair.temp.fas  -o pair.refine.fas  --msa mafft -p 8
+fasr create genome.fa links.best.tsv -o pair.temp.fas
+fasr refine pair.temp.fas -o pair.refine.fas  --msa mafft -p 8
 
 cat links.refine.tsv |
     perl -nla -F"\t" -e 'print for @F' |
-    spanr cover stdin -o cover.yml
+    spanr cover stdin -o cover.json
 
 echo "* Stats of links"
 echo "key,count" > links.count.csv
@@ -154,7 +216,7 @@ for n in 2 3 4-50; do
 
     cat links.copy${n}.tsv |
         perl -nla -F"\t" -e 'print for @F' |
-        spanr cover stdin -o copy${n}.yml
+        spanr cover stdin -o copy${n}.json
 
     wc -l links.copy${n}.tsv |
         perl -nl -e '
@@ -168,20 +230,20 @@ for n in 2 3 4-50; do
     rm links.copy${n}.tsv
 done
 
-spanr merge copy2.yml copy3.yml copy4-50.yml -o copy.all.yml
-spanr stat chr.sizes copy.all.yml --all -o links.copy.csv
+spanr merge copy2.json copy3.json copy4-50.json -o copy.all.json
+spanr stat chr.sizes copy.all.json --all -o links.copy.csv
 
 fasops mergecsv links.copy.csv links.count.csv --concat -o copy.csv
 
 echo "* Coverage figure"
-spanr stat chr.sizes cover.yml -o cover.yml.csv
+spanr stat chr.sizes cover.json -o cover.json.csv
 
 ```
 
 ## clean
 
 ```bash
-cd ~/data/alignment/egaz/S288c_proc
+cd ~/data/egaz/S288c_proc
 
 # clean
 find . -type f -name "*genome.fa*" | xargs rm
@@ -198,18 +260,16 @@ find . -type f -name "copy*.yml" | xargs rm
 # Template steps
 
 ```bash
-cd ~/data/alignment/egaz
+cd ~/data/egaz
 
 egaz template \
     S288c \
     --self -o selfS288c/ \
-    --circos --aligndb --parallel 8 -v
+    --circos --parallel 8 -v
 
 bash selfS288c/1_self.sh
 bash selfS288c/3_proc.sh
 bash selfS288c/4_circos.sh
-bash selfS288c/6_chr_length.sh
-bash selfS288c/7_self_aligndb.sh
 bash selfS288c/9_pack_up.sh
 
 ```

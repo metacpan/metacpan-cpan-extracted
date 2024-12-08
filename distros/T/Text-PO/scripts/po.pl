@@ -15,7 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    # use lib './lib';
+    use lib './lib'; # REMOVE ME
     use DateTime;
     use Getopt::Class;
     use IO::File;
@@ -47,46 +47,46 @@ BEGIN
     
     my $dict =
     {
-    # Actions
-    as_json             => { type => 'boolean' },
-    as_po               => { type => 'boolean' },
-    add                 => { type => 'boolean' },
-    compile             => { type => 'boolean' },
-    dump                => { type => 'boolean' },
-    init                => { type => 'boolean' },
-    sync                => { type => 'boolean' },
+        # Actions
+        as_json             => { type => 'boolean' },
+        as_po               => { type => 'boolean' },
+        add                 => { type => 'boolean' },
+        compile             => { type => 'boolean' },
+        dump                => { type => 'boolean' },
+        init                => { type => 'boolean' },
+        sync                => { type => 'boolean' },
+        
+        # Attributes
+        bugs_to             => { type => 'string', class => [qw( init meta )] },
+        charset             => { type => 'string', class => [qw( init meta )], default => 'utf-8' },
+        created_on          => { type => 'datetime', class => [qw( init meta )] },
+        domain              => { type => 'string' },
+        encoding            => { type => 'string', class => [qw( init meta )], default => '8bit' },
+        header              => { type => 'string' },
+        lang                => { type => 'string', alias => [qw( language )], class => [qw( init meta )], re => qr/^[a-z]{2}(?:_[A-Z]{2})?$/ },
+        msgid               => { type => 'string', class => [qw( edit )] },
+        msgstr              => { type => 'string', class => [qw( edit )] },
+        output              => { type => 'string' },
+        output_dir          => { type => 'string' },
+        overwrite           => { type => 'boolean', default => 0 },
+        po_debug            => { type => 'integer', default => 0 },
+        # Used as a template to create the po file with --init
+        pot                 => { type => 'string', class => [qw( init )] },
+        project             => { type => 'string', class => [qw( init meta )] },
+        revised_on          => { type => 'datetime', class => [qw( init meta )] },
+        settings            => { type => 'string' },
+        team                => { type => 'string', class => [qw( init meta )], alias => [qw( language-team )] },
+        translator          => { type => 'string', class => [qw( init meta )] },
+        tz                  => { type => 'string', alias => [qw( time_zone timezone )], class => [qw( init meta )] },
+        version             => { type => 'string', class => [qw( init meta )] },
     
-    # Attributes
-    bugs_to             => { type => 'string', class => [qw( init meta )] },
-    charset             => { type => 'string', class => [qw( init meta )], default => 'utf-8' },
-    created_on          => { type => 'datetime', class => [qw( init meta )] },
-    domain              => { type => 'string' },
-    encoding            => { type => 'string', class => [qw( init meta )], default => '8bit' },
-    header              => { type => 'string' },
-    lang                => { type => 'string', alias => [qw( language )], class => [qw( init meta )], re => qr/^[a-z]{2}(?:_[A-Z]{2})?$/ },
-    msgid               => { type => 'string', class => [qw( edit )] },
-    msgstr              => { type => 'string', class => [qw( edit )] },
-    output              => { type => 'string' },
-    output_dir          => { type => 'string' },
-    overwrite           => { type => 'boolean', default => 0 },
-    po_debug            => { type => 'integer', default => 0 },
-    # Used as a template to create the po file with --init
-    pot                 => { type => 'string', class => [qw( init )] },
-    project             => { type => 'string', class => [qw( init meta )] },
-    revised_on          => { type => 'datetime', class => [qw( init meta )] },
-    settings            => { type => 'string' },
-    team                => { type => 'string', class => [qw( init meta )], alias => [qw( language-team )] },
-    translator          => { type => 'string', class => [qw( init meta )] },
-    tz                  => { type => 'string', alias => [qw( time_zone timezone )], class => [qw( init meta )] },
-    version             => { type => 'string', class => [qw( init meta )] },
-
-    # Generic options
-    quiet               => { type => 'boolean', default => 0 },
-    debug               => { type => 'integer', alias => [qw(d)], default => \$DEBUG },
-    verbose             => { type => 'integer', default => \$VERBOSE },
-    v                   => { type => 'code', code => sub{ printf( STDOUT "2f\n", $VERSION ); } },
-    help                => { type => 'code', alias => [qw(?)], code => sub{ pod2usage(1); } },
-    man                 => { type => 'code', code => sub{ pod2usage( -exitstatus => 0, -verbose => 2 ); } },
+        # Generic options
+        quiet               => { type => 'boolean', default => 0 },
+        debug               => { type => 'integer', alias => [qw(d)], default => \$DEBUG },
+        verbose             => { type => 'integer', default => \$VERBOSE },
+        v                   => { type => 'code', code => sub{ printf( STDOUT "2f\n", $VERSION ); } },
+        help                => { type => 'code', alias => [qw(?)], code => sub{ pod2usage(1); } },
+        man                 => { type => 'code', code => sub{ pod2usage( -exitstatus => 0, -verbose => 2 ); } },
     };
     
     our $opt = Getopt::Class->new({ dictionary => $dict }) || die( "Error instantiating Getopt::Class object: ", Getopt::Class->error, "\n" );
@@ -202,7 +202,7 @@ sub add
     {
         my $p = 
         {
-        debug => $opts->{debug},
+            debug => $opts->{debug},
         };
         $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
         $po = Text::PO->new( %$p ) || bailout( Text::PO->error );
@@ -212,8 +212,8 @@ sub add
     {
         my $p = 
         {
-        use_json => 1,
-        debug => $opts->{debug},
+            use_json => 1,
+            debug => $opts->{debug},
         };
         $p->{domain} = $opts->{domain} if( length( $opts->{domain} ) );
         $po = Text::PO->new( %$p ) || bailout( Text::PO->error );

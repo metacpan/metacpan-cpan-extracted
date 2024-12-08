@@ -1,5 +1,5 @@
 ---
-abstract: 'Backend of B<E>asy B<G>enome B<A>ligner'
+abstract: 'B<E>asy B<G>enome B<A>ligner'
 author:
   - 'Qiang Wang <wang-q@outlook.com>'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Egaz:
     file: lib/App/Egaz.pm
-    version: v0.2.5
+    version: v0.2.9
   App::Egaz::Command::blastlink:
     file: lib/App/Egaz/Command/blastlink.pm
   App::Egaz::Command::blastmatch:
@@ -47,8 +47,6 @@ provides:
     file: lib/App/Egaz/Command/lav2psl.pm
   App::Egaz::Command::lpcnam:
     file: lib/App/Egaz/Command/lpcnam.pm
-  App::Egaz::Command::masked:
-    file: lib/App/Egaz/Command/masked.pm
   App::Egaz::Command::maskfasta:
     file: lib/App/Egaz/Command/maskfasta.pm
   App::Egaz::Command::multiz:
@@ -57,8 +55,6 @@ provides:
     file: lib/App/Egaz/Command/normalize.pm
   App::Egaz::Command::partition:
     file: lib/App/Egaz/Command/partition.pm
-  App::Egaz::Command::plottree:
-    file: lib/App/Egaz/Command/plottree.pm
   App::Egaz::Command::prepseq:
     file: lib/App/Egaz/Command/prepseq.pm
   App::Egaz::Command::raxml:
@@ -86,7 +82,6 @@ requires:
   Number::Format: '1.75'
   Path::Tiny: '0.076'
   Set::Scalar: '1.29'
-  Statistics::R: '0.34'
   String::Similarity: '1.04'
   Template: '2.26'
   Tie::IxHash: '1.23'
@@ -95,8 +90,8 @@ requires:
 resources:
   bugtracker: https://github.com/wang-q/App-Egaz/issues
   homepage: https://github.com/wang-q/App-Egaz
-  repository: git://github.com/wang-q/App-Egaz.git
-version: 0.2.5
+  repository: https://github.com/wang-q/App-Egaz.git
+version: 0.2.9
 x_authority: cpan:WANGQ
 x_contributors:
   - 'Qiang Wang <wang-q@users.noreply.github.com>'

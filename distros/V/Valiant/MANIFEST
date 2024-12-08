@@ -134,6 +134,7 @@ lib/DBIx/Class/Valiant/Validator/Result.pm
 lib/DBIx/Class/Valiant/Validator/ResultSet.pm
 lib/DBIx/Class/Valiant/Validator/SetSize.pm
 lib/DBIx/Class/Valiant/Validator/locale/errors.pl
+lib/DBIx/Class/Valiant/locale/errors.pl
 lib/Valiant.pm
 lib/Valiant/Error.pm
 lib/Valiant/Errors.pm

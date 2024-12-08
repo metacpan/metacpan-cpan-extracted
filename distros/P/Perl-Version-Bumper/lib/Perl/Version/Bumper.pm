@@ -1,7 +1,7 @@
 use v5.10;
 
 package Perl::Version::Bumper;
-$Perl::Version::Bumper::VERSION = '0.157';
+$Perl::Version::Bumper::VERSION = '0.162';
 
 use strict;
 use warnings;
@@ -567,12 +567,17 @@ sub _insert_version_stmt {
 }
 
 sub _try_compile_file {
-    my ( $file ) = @_;
+    my ( $file, $env ) = @_;
+    $env //= {};
 
     # redirect STDERR for quietness
     my $tmperr = Path::Tiny->tempfile;
     open( \*OLDERR, '>&', \*STDERR ) or die "Can't dup STDERR: $!";
     open( \*STDERR, '>',  $tmperr )  or die "Can't re-open STDERR: $!";
+
+    # setup a local environment
+    local %ENV = %ENV;
+    $ENV{$_} = $env->{$_} for keys %$env;
 
     # try to compile the file
     my $status = system $^X, '-c', $file;
@@ -622,7 +627,8 @@ sub bump_ppi {
 sub bump {
     my ( $self, $code, $filename ) = @_;
     my $doc = PPI::Document->new( \$code, filename => $filename );
-    croak "Parsing failed" unless defined $doc;
+    $filename //= 'input code';
+    croak "Parsing of $filename failed" unless defined $doc;
     return $self->bump_ppi($doc)->serialize;
 }
 
@@ -640,7 +646,8 @@ sub bump_file {
 # this one is private and returns an array ref with two values:
 # the new PPI::Document, and the version it was actually bumped to
 sub _bump_ppi_safely {
-    my ( $self, $doc, $version_limit ) = @_;
+    my ( $self, $doc, $options ) = @_;
+    my $version_limit = $options->{version_limit};
     $version_limit &&= stable_version($version_limit);
     $version_limit //= do {
         my @versions = map eval { version_fmt( $_->version ) },
@@ -652,7 +659,7 @@ sub _bump_ppi_safely {
     my $source = $doc->filename // 'input code';
     my $tmp    = Path::Tiny->tempfile;
     $tmp->spew( $doc->serialize );
-    unless ( _try_compile_file($tmp) ) {
+    unless ( _try_compile_file( $tmp, $options->{env} ) ) {
         warn "Can't bump Perl version safely for $source: it does not compile\n";
         return [ $doc->clone, undef ];    # undef means "didn't compile"
     }
@@ -669,7 +676,7 @@ sub _bump_ppi_safely {
         # try to compile the file
         $tmp = Path::Tiny->tempfile;
         $tmp->spew( $bumped_doc->serialize );
-        last if _try_compile_file($tmp);
+        last if _try_compile_file( $tmp, $options->{env} );
 
         # bump version down and repeat
         $version = stable_version_dec($version);
@@ -679,24 +686,24 @@ sub _bump_ppi_safely {
 }
 
 sub bump_ppi_safely {
-    my ( $self, $doc, $version_limit ) = @_;
-    return $self->_bump_ppi_safely( $doc, $version_limit )->[0];
+    my ( $self, $doc, $options ) = @_;
+    return $self->_bump_ppi_safely( $doc, $options )->[0];
 }
 
 sub bump_safely {
-    my ( $self, $code, $version_limit, $filename ) = @_;
-    my $doc = PPI::Document->new( \$code,
-        filename => $filename ? "$filename" : 'input code' );
-    croak "Parsing failed" unless defined $doc;
-    return $self->_bump_ppi_safely( $doc, $version_limit )->[0]->serialize;
+    my ( $self, $code, $options ) = @_;
+    my $filename = $options->{filename} // 'input code';
+    my $doc      = PPI::Document->new( \$code, filename => $filename );
+    croak "Parsing of $filename failed" unless defined $doc;
+    return $self->_bump_ppi_safely( $doc, $options )->[0]->serialize;
 }
 
 sub bump_file_safely {
-    my ( $self, $file, $version_limit ) = @_;
+    my ( $self, $file, $options ) = @_;
     my $doc = PPI::Document->new("$file");    # stringify any object
-    croak "Parsing failed" unless defined $doc;
+    croak "Parsing of $file failed" unless defined $doc;
     my ( $bumped_doc, $version ) =
-      @{ $self->_bump_ppi_safely( $doc, $version_limit ) };
+      @{ $self->_bump_ppi_safely( $doc, $options ) };
     Path::Tiny->new($file)->spew( $bumped_doc->serialize ) if $version;
     return $version;
 }
@@ -842,6 +849,8 @@ To address this issue, L</bump_ppi_safely>, L</bump_safely> and
 L</bump_file_safely> methods work as the regular methods, but will only
 produce code that actually compiles.
 
+If all attempts fail, the return value is identical to the input value.
+
 =head2 Example of a safe bump
 
 The following code uses L<multidimensional array emulation|perlvar/$;>:
@@ -876,41 +885,66 @@ bundle). Leaving us with the following code:
 The code needs to be updated to not use multidimensional array emulation
 before it can I<safely> be bumped past version C<v5.34>.
 
-=head2 bump_ppi_safely
+=head2 Process of a safe bump
 
-    my $bumped_ppi = $perv->bump_ppi_safely( $ppi_doc, $version_limit );
-
-Take a L<PPI::Document> as input, and try to compile its content.
+The process for a safe bump is to take some input, and try to compile it.
 If the compilation fails, return immediately.
 
-Otherwise, continue with the process: bump its content, and try to
-compile that. Return as soon as compilation succeeds.
+Otherwise, continue with the process: bump the content, and try to
+compile the result. Return as soon as compilation succeeds.
 
-If compilation fails, decrease the target Perl version number, bump the
-content to that version, and try to compile that again. Keep decreasing
-the target version, all the way back to the currently declared version
-in the document, or C<$version_limit>, whichever is more recent. Give up
-after the last compilation failure.
+If compilation fails, decrease the target Perl version number, bump
+the content to that version, and try to compile the result again. Keep
+decreasing the target version, all the way back to the currently
+declared version in the document, or L<version_limit>, whichever is more
+recent. Give up after the last compilation failure.
+
+=head2 Options for a safe bump
+
+All the methods below take one input argument (a L<PPI::Document>,
+a string of code or a filename) and one optional hash reference
+for options.
+
+The possible options are:
+
+=over 4
+
+=item version_limit
+
+The version at which to stop decreasing the target version.
+Defaults to C<v5.10>.
+
+=item env
+
+A hash reference of key/value pairs for environment variables
+to be set when trying to compile the bumped code.
+
+=back
+
+=head2 bump_ppi_safely
+
+    my $bumped_ppi = $perv->bump_ppi_safely( $ppi_doc, \%options );
+
+Safely bump the source code in the given L<PPI::Document>.
 
 The return value is a new L<PPI::Document> containing the result of the
 "safe bump" (its content might be the same as the original if there's
 no safe way to bump the code).
 
-C<$version_limit> is optional, and defaults to C<v5.10>.
-
 =head2 bump_safely
 
-    my $bumped_code = $perv->bump_safely($code, $version_limit);
+    my $bumped_code = $perv->bump_safely( $code, \%options );
     my ( $bumped_code, $new_version ) = $perv->bump_safely($code);
 
-Safely bump the declared Perl version in the given source code to
-L</version>, and return the new source code as a string.
+Safely bump the source code given as a string.
+
+The return value is a string containing the new source code.
 
 =head2 bump_file_safely
 
-    $perv->bump_file_safely( $filename, $version_limit );
+    $perv->bump_file_safely( $filename, \%options );
 
-Safely bump the code of the file argument in-place. The file will
+Safely bump the code in the file argument in-place. The file will
 not be modified if the code can't be bumped safely.
 
 The return value is C<undef> if the original didn't compile, false

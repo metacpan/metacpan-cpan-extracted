@@ -20,9 +20,12 @@ hash mummer 2>/dev/null || hash sparsemem 2>/dev/null || {
     exit 1;
 }
 
-hash raxmlHPC 2>/dev/null || hash raxmlHPC-SSE3 2>/dev/null || hash raxmlHPC-PTHREADS 2>/dev/null || {
-    echo >&2 "raxml is required but it's not installed.";
-    exit 1;
+hash FastTree 2>/dev/null || {
+    echo >&2 "FastTree is required but it's not installed.";
+}
+
+hash nw_order 2>/dev/null || {
+    echo >&2 "newick-utils is required but it's not installed.";
 }
 
 hash makeblastdb 2>/dev/null || hash blastn 2>/dev/null || {
@@ -47,11 +50,6 @@ hash multiz 2>/dev/null || {
 
 hash mafft 2>/dev/null || {
     echo >&2 "mafft is required but it's not installed.";
-    exit 1;
-}
-
-hash fasops 2>/dev/null || {
-    echo >&2 "fasops is required but it's not installed.";
     exit 1;
 }
 
@@ -82,6 +80,23 @@ hash Rscript 2>/dev/null || {
     echo >&2 "R is required but it's not installed.";
 }
 
+Rscript -e 'if(!require(ape)){ q(status = 1) }' 2>/dev/null || {
+    echo >&2 "R package ape is optional but it's not installed.";
+}
+
+Rscript -e 'if(!require(tidyr)){ q(status = 1) }' 2>/dev/null || {
+    echo >&2 "R package tidyr is optional but it's not installed.";
+}
+
+Rscript -e 'if(!require(readr)){ q(status = 1) }' 2>/dev/null || {
+    echo >&2 "R package readr is optional but it's not installed.";
+}
+
+hash tsv-select 2>/dev/null || {
+    echo >&2 "tsv-utils is optional but it's not installed.";
+    exit 1;
+}
+
 hash circos 2>/dev/null || {
     echo >&2 "circos is optional but it's not installed.";
 }
@@ -98,8 +113,9 @@ hash bcftools 2>/dev/null || {
     echo >&2 "bcftools is optional but it's not installed.";
 }
 
-hash FastTree 2>/dev/null || {
-    echo >&2 "FastTree is optional but it's not installed.";
+hash raxmlHPC 2>/dev/null || hash raxmlHPC-SSE3 2>/dev/null || hash raxmlHPC-PTHREADS 2>/dev/null || {
+    echo >&2 "raxml is optional but it's not installed.";
+    exit 1;
 }
 
 echo >&2 OK

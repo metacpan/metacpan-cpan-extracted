@@ -7,7 +7,7 @@ use App::Egaz -command;
 use App::Egaz::Common;
 
 sub abstract {
-    return 'create executing bash files';
+    return 'create pipeline files';
 }
 
 sub opt_spec {
@@ -22,27 +22,27 @@ sub opt_spec {
             }
         ],
         [],
-        [ "outdir|o=s",   "Output directory",  { default => "." }, ],
-        [ "queue=s",      "QUEUE_NAME",        { default => "mpi" }, ],
+        [ "outdir|o=s",   "Output directory", { default => "." }, ],
+        [ "queue=s",      "QUEUE_NAME",       { default => "mpi" }, ],
         [ "separate",     "separate each Target-Query groups", ],
         [ "tmp=s",        "user defined tempdir", ],
         [ "parallel|p=i", "number of threads", { default => 2 }, ],
         [ "verbose|v",    "verbose mode", ],
         [],
-        [ "length=i", "minimal length of alignment fragments",  { default => 1000 }, ],
-        [ "partition",  "use partitioned sequences if available", ],
-        [ "msa=s",    "aligning program for refine alignments", { default => "mafft" }, ],
-        [ "taxon=s",  "taxon.csv for this project", ],
-        [ "aligndb",  "create aligndb scripts", ],
+        [ "length=i",  "minimal length of alignment fragments", { default => 1000 }, ],
+        [ "partition", "use partitioned sequences if available", ],
+        [ "msa=s",     "aligning program for refine alignments", { default => "mafft" }, ],
+        [ "taxon=s",   "taxon.csv for this project", ],
+        [ "aligndb",   "create aligndb scripts", ],
         [],
         [ "multiname=s", "naming multiply alignment", ],
         [ "outgroup=s",  "the name of outgroup", ],
         [ "tree=s",      "a predefined guiding tree for multiz", ],
         [ "order",       "multiple alignments with original order (using fake_tree.nwk)", ],
-        [ "rawphylo",    "create guiding tree by joining pairwise alignments", ],
-        [ "vcf",         "create vcf files", ],
+        [ "fasttree", "use FastTree instead of RaxML to create a phylotree", ],
+        [ "mash",     "create guiding tree by mash", ],
+        [ "vcf",      "create vcf files", ],
         [],
-        [ "noblast", "don't blast paralogs against genomes", ],
         [ "circos",  "create circos script", ],
         [],
         [ "repeatmasker=s", "options passed to RepeatMasker", ],
@@ -67,16 +67,30 @@ sub description {
     $desc .= ucfirst(abstract) . ".\n";
     $desc .= <<'MARKDOWN';
 
-* <path/seqdir> are directories containing multiple .fa files that represent genomes
-* Each .fa files in <path/target> should contain only one sequences, otherwise second or latter sequences will be omitted
-* Species/strain names in result files are the basenames of <path/seqdir>
-* Default --multiname is the basename of --outdir. This option is for more than one aligning combinations
-* without --tree and --rawphylo, the order of multiz stitch is the same as the one from command line
-* --tree > --order > --rawphylo
+* `path/seqdir` are directories containing multiple .fa files that represent genomes
+
+* Each .fa files in `path/target` should contain only one sequences, otherwise second or latter
+  sequences will be omitted
+
+* Species/strain names in result files are the basenames of `path/seqdir`
+
+* Default --multiname is the basename of --outdir. This option is for more than one aligning
+  combinations
+
+* without --tree, or --mash, the order of multiz stitch is the same as the one from
+  command line
+
+* --tree > --order > --mash
+
 * --outgroup uses basename, not full path. *DON'T* set --outgroup to target
-* --taxon may also contain unused taxons, for constructing chr_length.csv
-* --preq is designed for NCBI ASSEMBLY and WGS, <path/seqdir> are directories containing multiple
-    directories
+
+* --taxon may also contain unused taxonomy terms, for the construction of chr_length.csv
+
+* --preq is designed for NCBI ASSEMBLY and WGS, `path/seqdir` are directories containing multiple
+  directories
+
+* By default, `RAxML` is used to produce a phylotree. Turn on `--fasttree` to use FastTree, which is
+  less accurate and doesn't support outgroups by itself
 
 MARKDOWN
 
@@ -195,7 +209,18 @@ sub execute {
     }
     $opt->{data} = \@data;    # store in $opt
 
-    print STDERR YAML::Syck::Dump( $opt->{data} ) if $opt->{verbose} and $opt->{mode} ne "prep";
+    print STDERR YAML::Syck::Dump( $opt->{data} )
+        if $opt->{verbose} and $opt->{mode} ne "prep";
+
+    # genome.lst
+    if ( $opt->{mode} ne "prep" ) {
+        print STDERR "Create genome.lst\n";
+        my $fh = Path::Tiny::path( $opt->{outdir}, "genome.lst" )->openw;
+        for my $i ( 0 .. $#data ) {
+            print {$fh} "$data[$i]->{name}\n";
+        }
+        close $fh;
+    }
 
     # If there's no phylo tree, generate a fake one.
     if ( $opt->{mode} eq "multi" and !$opt->{tree} ) {
@@ -212,35 +237,43 @@ sub execute {
     #----------------------------#
     # prep *.sh files
     #----------------------------#
-    $self->gen_prep( $opt, $args );
+    if ( $opt->{mode} eq "prep" ) {
+        $self->gen_prep( $opt, $args );
+    }
 
     #----------------------------#
     # multi *.sh files
     #----------------------------#
-    $self->gen_pair( $opt, $args );
-    $self->gen_rawphylo( $opt, $args );
-    $self->gen_multi( $opt, $args );
-    $self->gen_vcf( $opt, $args );
+    if ( $opt->{mode} eq "multi" ) {
+        $self->gen_pair( $opt, $args );
+
+        # $self->gen_rawphylo( $opt, $args ) if $opt->{rawphylo};
+        $self->gen_multi( $opt, $args );
+        $self->gen_vcf( $opt, $args ) if $opt->{vcf};
+    }
 
     #----------------------------#
     # self *.sh files
     #----------------------------#
-    $self->gen_self( $opt, $args );
-    $self->gen_proc( $opt, $args );
-    $self->gen_circos( $opt, $args );
+    if ( $opt->{mode} eq "self" ) {
+        $self->gen_self( $opt, $args );
+        $self->gen_proc( $opt, $args );
+        $self->gen_circos( $opt, $args ) if $opt->{circos};
+    }
 
-    $self->gen_aligndb( $opt, $args );
-    $self->gen_packup( $opt, $args );
+    if ( $opt->{mode} eq "multi" or $opt->{mode} eq "self" ) {
+        $self->gen_mash( $opt, $args );
 
+        $self->gen_aligndb( $opt, $args ) if $opt->{aligndb};
+        $self->gen_packup( $opt, $args );
+    }
 }
 
 sub gen_prep {
     my ( $self, $opt, $args ) = @_;
 
-    return unless $opt->{mode} eq "prep";
-
     my @patterns = map {"*$_"} @{ $opt->{suffix} };
-    my %perseq = map { $_ => 1, } @{ $opt->{perseq} };
+    my %perseq   = map { $_ => 1, } @{ $opt->{perseq} };
 
     my @files;
     for ( @{$args} ) {
@@ -252,8 +285,10 @@ sub gen_prep {
         @files = map  { Path::Tiny::path($_)->absolute()->stringify } @files;
         @files = map {
             {   basename => Path::Tiny::path($_)->parent()->basename(),
-                perseq   => exists $perseq{ Path::Tiny::path($_)->parent()->basename() } ? 1 : 0,
-                file     => $_,
+                perseq   => exists $perseq{ Path::Tiny::path($_)->parent()->basename() }
+                ? 1
+                : 0,
+                file => $_,
             }
         } @files;
 
@@ -313,8 +348,6 @@ EOF
 
 sub gen_aligndb {
     my ( $self, $opt, $args ) = @_;
-
-    return unless ( $opt->{mode} eq "multi" or $opt->{mode} eq "self" ) and $opt->{aligndb};
 
     my $tt = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
     my $template;
@@ -376,42 +409,42 @@ cd Results
 #----------------------------#
 # Create anno.yml
 #----------------------------#
-log_info create anno.yml
+log_info create anno.json
 
-if [ -e [% opt.data.0.dir -%]/anno.yml ]; then
-    cp [% opt.data.0.dir -%]/anno.yml anno.yml;
+if [ -e [% opt.data.0.dir -%]/anno.json ]; then
+    cp [% opt.data.0.dir -%]/anno.json anno.json;
 else
-    if [ -e [% opt.data.0.dir -%]/cds.yml ]; then
-        cp [% opt.data.0.dir -%]/cds.yml cds.yml;
+    if [ -e [% opt.data.0.dir -%]/cds.json ]; then
+        cp [% opt.data.0.dir -%]/cds.json cds.json;
     else
         spanr gff --tag CDS \
             [% opt.data.0.dir -%]/*.gff \
-            -o cds.yml
+            -o cds.json
     fi
 
-    if [ -e [% opt.data.0.dir -%]/repeat.yml ]; then
-        cp [% opt.data.0.dir -%]/repeat.yml repeat.yml;
+    if [ -e [% opt.data.0.dir -%]/repeat.json ]; then
+        cp [% opt.data.0.dir -%]/repeat.json repeat.json;
     else
         spanr gff \
             [% opt.data.0.dir -%]/*.rm.gff \
-            -o repeat.yml
+            -o repeat.json
     fi
 
-    # create empty cds.yml or repeat.yml
-    spanr genome [% opt.data.0.dir -%]/chr.sizes -o chr.yml
-    spanr compare --op diff chr.yml chr.yml -o empty.yml
+    # create empty cds.json or repeat.json
+    spanr genome [% opt.data.0.dir -%]/chr.sizes -o chr.json
+    spanr compare --op diff chr.json chr.json -o empty.json
 
     for type in cds repeat; do
-        if [ ! -e ${type}.yml ]; then
-            cp empty.yml ${type}.yml
+        if [ ! -e ${type}.json ]; then
+            cp empty.json ${type}.json
         fi
     done
 
     spanr merge \
-        cds.yml repeat.yml \
-        -o anno.yml
+        cds.json repeat.json \
+        -o anno.json
 
-    rm -f repeat.yml cds.yml chr.yml empty.yml
+    rm -f repeat.json cds.json chr.json empty.json
 fi
 
 #----------------------------#
@@ -422,7 +455,7 @@ log_info run alignDB.pl
 alignDB.pl \
     -d [% opt.multiname %] \
     --da [% opt.outdir %]/[% opt.multiname %]_refined \
-    -a [% opt.outdir %]/Results/anno.yml \
+    -a [% opt.outdir %]/Results/anno.json \
 [% IF opt.outgroup -%]
     --outgroup \
 [% END -%]
@@ -513,98 +546,33 @@ EOF
 sub gen_packup {
     my ( $self, $opt, $args ) = @_;
 
-    return unless ( $opt->{mode} eq "multi" or $opt->{mode} eq "self" );
+    my $tt       = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
+    my $sh_name  = "9_pack_up.sh";
+    my $template = "9_pack_up.tt2.sh";
 
-    my $tt = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
-    my $template;
-    my $sh_name;
-
-    $sh_name = "9_pack_up.sh";
     print STDERR "Create $sh_name\n";
-    $template = <<'EOF';
-[% INCLUDE header.tt2 %]
 
-#----------------------------#
-# [% sh %]
-#----------------------------#
-log_warn [% sh %]
-
-find . -type f |
-    grep -v -E "\.(sh|2bit)$" |
-    grep -v -E "(_fasta|_raw)\/" |
-    grep -v -F "fake_tree.nwk" \
-    > file_list.txt
-
-tar -czvf [% opt.multiname %].tar.gz -T file_list.txt
-
-log_info [% opt.multiname %].tar.gz generated
-
-exit;
-
-EOF
     $tt->process(
-        \$template,
+        $template,
         {   args => $args,
             opt  => $opt,
             sh   => $sh_name,
         },
         Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
     ) or Carp::confess Template->error;
-
 }
 
 sub gen_pair {
     my ( $self, $opt, $args ) = @_;
 
-    return unless $opt->{mode} eq "multi";
+    my $tt       = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
+    my $sh_name  = "1_pair.sh";
+    my $template = "1_pair.tt2.sh";
 
-    my $tt = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
-    my $template;
-    my $sh_name;
-
-    $sh_name = "1_pair.sh";
     print STDERR "Create $sh_name\n";
-    $template = <<'EOF';
-[% INCLUDE header.tt2 %]
 
-#----------------------------#
-# [% sh %]
-#----------------------------#
-log_warn [% sh %]
-
-mkdir -p Pairwise
-
-[% FOREACH item IN opt.data -%]
-[% IF loop.first -%]
-# Target [% item.name %]
-
-[% ELSE -%]
-[% t = opt.data.0.name -%]
-[% q = item.name -%]
-if [ -e Pairwise/[% t %]vs[% q %] ]; then
-    log_info Skip Pairwise/[% t %]vs[% q %]
-else
-    log_info lastz Pairwise/[% t %]vs[% q %]
-    egaz lastz \
-        --set set01 -C 0 [% IF opt.partition %]--tp --qp [% END %]\
-        --parallel [% opt.parallel %] --verbose \
-        [% opt.data.0.dir %] [% item.dir %] \
-        -o Pairwise/[% t %]vs[% q %]
-
-    log_info lpcnam Pairwise/[% t %]vs[% q %]
-    egaz lpcnam \
-        --syn --parallel [% opt.parallel %] --verbose \
-        [% opt.data.0.dir %] [% item.dir %] Pairwise/[% t %]vs[% q %]
-fi
-
-[% END -%]
-[% END -%]
-
-exit;
-
-EOF
     $tt->process(
-        \$template,
+        $template,
         {   args => $args,
             opt  => $opt,
             sh   => $sh_name,
@@ -613,190 +581,17 @@ EOF
     ) or Carp::confess Template->error;
 }
 
-sub gen_rawphylo {
+sub gen_mash {
     my ( $self, $opt, $args ) = @_;
 
-    return unless $opt->{mode} eq "multi" and $opt->{rawphylo};
+    my $tt       = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
+    my $sh_name  = "2_mash.sh";
+    my $template = "2_mash.tt2.sh";
 
-    my $tt = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
-    my $template;
-    my $sh_name;
-
-    $sh_name = "2_rawphylo.sh";
     print STDERR "Create $sh_name\n";
-    $template = <<'EOF';
-[% INCLUDE header.tt2 %]
 
-#----------------------------#
-# [% sh %]
-#----------------------------#
-log_warn [% sh %]
-
-if [ -e Results/[% opt.multiname %].raw.nwk ]; then
-    log_info Results/[% opt.multiname %].raw.nwk exists
-    exit;
-fi
-
-mkdir -p [% opt.multiname %]_raw
-mkdir -p Results
-
-#----------------------------#
-# maf2fas
-#----------------------------#
-log_info Convert maf to fas
-
-[% FOREACH item IN opt.data -%]
-[% IF not loop.first -%]
-[% t = opt.data.0.name -%]
-[% q = item.name -%]
-log_debug "    [% t %]vs[% q %]"
-mkdir -p [% opt.multiname %]_raw/[% t %]vs[% q %]
-
-find Pairwise/[% t %]vs[% q %] -name "*.maf" -or -name "*.maf.gz" |
-    parallel --no-run-if-empty -j 1 \
-        fasops maf2fas {} -o [% opt.multiname %]_raw/[% t %]vs[% q %]/{/}.fas
-
-fasops covers \
-    [% opt.multiname %]_raw/[% t %]vs[% q %]/*.fas \
-    -n [% t %] -l [% opt.length %] -t 10 \
-    -o [% opt.multiname %]_raw/[% t %]vs[% q %].yml
-
-[% END -%]
-[% END -%]
-
-[% IF opt.data.size > 2 -%]
-#----------------------------#
-# Intersect
-#----------------------------#
-log_info Intersect
-
-spanr compare --op intersect \
-[% FOREACH item IN opt.data -%]
-[% IF not loop.first -%]
-[% t = opt.data.0.name -%]
-[% q = item.name -%]
-    [% opt.multiname %]_raw/[% t %]vs[% q %].yml \
-[% END -%]
-[% END -%]
-    -o stdout |
-    spanr span stdin \
-        --op excise -n [% opt.length %] \
-        -o [% opt.multiname %]_raw/intersect.yml
-[% END -%]
-
-#----------------------------#
-# Coverage
-#----------------------------#
-log_info Coverage
-
-spanr merge [% opt.multiname %]_raw/*.yml \
-    -o stdout |
-    spanr stat \
-        [% args.0 %]/chr.sizes \
-        stdin \
-        --all \
-        -o Results/pairwise.coverage.csv
-
-[% IF opt.data.size > 2 -%]
-#----------------------------#
-# Slicing
-#----------------------------#
-log_info Slicing with intersect
-
-[% FOREACH item IN opt.data -%]
-[% IF not loop.first -%]
-[% t = opt.data.0.name -%]
-[% q = item.name -%]
-log_debug "    [% t %]vs[% q %]"
-if [ -e [% opt.multiname %]_raw/[% t %]vs[% q %].slice.fas ]; then
-    rm [% opt.multiname %]_raw/[% t %]vs[% q %].slice.fas
-fi
-find [% opt.multiname %]_raw/[% t %]vs[% q %]/ -name "*.fas" -or -name "*.fas.gz" |
-    sort |
-    parallel --no-run-if-empty --keep-order -j 1 ' \
-        fasops slice {} \
-            [% opt.multiname %]_raw/intersect.yml \
-            -n [% t %] -l [% opt.length %] -o stdout \
-            >> [% opt.multiname %]_raw/[% t %]vs[% q %].slice.fas
-        '
-
-[% END -%]
-[% END -%]
-
-[% END -%]
-
-#----------------------------#
-# Joining
-#----------------------------#
-log_info Joining intersects
-
-log_debug "    fasops join"
-fasops join \
-[% FOREACH item IN opt.data -%]
-[% IF not loop.first -%]
-[% t = opt.data.0.name -%]
-[% q = item.name -%]
-    [% opt.multiname %]_raw/[% t %]vs[% q %].slice.fas \
-[% END -%]
-[% END -%]
-    -n [% opt.data.0.name %] \
-    -o [% opt.multiname %]_raw/join.raw.fas
-
-echo [% opt.data.0.name %] > [% opt.multiname %]_raw/names.list
-[% FOREACH item IN opt.data -%]
-[% IF not loop.first -%]
-[% t = opt.data.0.name -%]
-[% q = item.name -%]
-echo [% q %] >> [% opt.multiname %]_raw/names.list
-[% END -%]
-[% END -%]
-
-# Blocks not containing all queries, e.g. Mito, will be omitted
-log_debug "    fasops subset"
-fasops subset \
-    [% opt.multiname %]_raw/join.raw.fas \
-    [% opt.multiname %]_raw/names.list \
-    --required \
-    -o [% opt.multiname %]_raw/join.filter.fas
-
-log_debug "    fasops refine"
-fasops refine \
-    --msa mafft --parallel [% opt.parallel %] \
-    [% opt.multiname %]_raw/join.filter.fas \
-    -o [% opt.multiname %]_raw/join.refine.fas
-
-#----------------------------#
-# RAxML
-#----------------------------#
-[% IF opt.data.size > 3 -%]
-log_info RAxML
-
-egaz raxml \
-    --parallel [% IF opt.parallel > 3 %] [% opt.parallel - 1 %] [% ELSE %] 2 [% END %] \
-[% IF opt.outgroup -%]
-    --outgroup [% opt.outgroup %] \
-[% END -%]
-[% IF opt.verbose -%]
-    -v \
-[% END -%]
-    [% opt.multiname %]_raw/join.refine.fas \
-    -o Results/[% opt.multiname %].raw.nwk
-
-egaz plottree Results/[% opt.multiname %].raw.nwk
-
-[% ELSIF opt.data.size == 3 -%]
-echo "(([% opt.data.0.name %],[% opt.data.1.name %]),[% opt.data.2.name %]);" > Results/[% opt.multiname %].raw.nwk
-
-[% ELSE -%]
-echo "([% opt.data.0.name %],[% opt.data.1.name %]);" > Results/[% opt.multiname %].raw.nwk
-
-[% END -%]
-
-exit;
-
-EOF
     $tt->process(
-        \$template,
+        $template,
         {   args => $args,
             opt  => $opt,
             sh   => $sh_name,
@@ -808,167 +603,14 @@ EOF
 sub gen_multi {
     my ( $self, $opt, $args ) = @_;
 
-    return unless $opt->{mode} eq "multi";
+    my $tt       = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
+    my $sh_name  = "3_multi.sh";
+    my $template = "3_multi.tt2.sh";
 
-    my $tt = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
-    my $template;
-    my $sh_name;
-
-    $sh_name = "3_multi.sh";
     print STDERR "Create $sh_name\n";
-    $template = <<'EOF';
-[% INCLUDE header.tt2 %]
 
-#----------------------------#
-# [% sh %]
-#----------------------------#
-log_warn [% sh %]
-
-if [ -e Results/[% opt.multiname %].nwk ]; then
-    log_info Results/[% opt.multiname %].nwk exists
-    exit;
-fi
-
-if [ -d [% opt.multiname %]_mz ]; then
-    rm -fr [% opt.multiname %]_mz;
-fi;
-mkdir -p [% opt.multiname %]_mz
-
-if [ -d [% opt.multiname %]_fasta ]; then
-    rm -fr [% opt.multiname %]_fasta;
-fi;
-mkdir -p [% opt.multiname %]_fasta
-
-if [ -d [% opt.multiname %]_refined ]; then
-    rm -fr [% opt.multiname %]_refined;
-fi;
-mkdir -p [% opt.multiname %]_refined
-
-mkdir -p Results
-
-#----------------------------#
-# mz
-#----------------------------#
-log_info multiz
-
-[% IF opt.tree -%]
-egaz multiz \
-[% FOREACH item IN opt.data -%]
-[% IF not loop.first -%]
-[% t = opt.data.0.name -%]
-[% q = item.name -%]
-    Pairwise/[% t %]vs[% q %] \
-[% END -%]
-[% END -%]
-    --tree [% opt.tree %] \
-    -o [% opt.multiname %]_mz \
-    --parallel [% opt.parallel %]
-
-[% ELSIF opt.order %]
-egaz multiz \
-[% FOREACH item IN opt.data -%]
-[% IF not loop.first -%]
-[% t = opt.data.0.name -%]
-[% q = item.name -%]
-    Pairwise/[% t %]vs[% q %] \
-[% END -%]
-[% END -%]
-    --tree fake_tree.nwk \
-    -o [% opt.multiname %]_mz \
-    --parallel [% opt.parallel %]
-
-[% ELSE %]
-if [ -f Results/[% opt.multiname %].raw.nwk ]; then
-    egaz multiz \
-[% FOREACH item IN opt.data -%]
-[% IF not loop.first -%]
-[% t = opt.data.0.name -%]
-[% q = item.name -%]
-        Pairwise/[% t %]vs[% q %] \
-[% END -%]
-[% END -%]
-        --tree Results/[% opt.multiname %].raw.nwk \
-        -o [% opt.multiname %]_mz \
-        --parallel [% opt.parallel %]
-
-else
-    egaz multiz \
-[% FOREACH item IN opt.data -%]
-[% IF not loop.first -%]
-[% t = opt.data.0.name -%]
-[% q = item.name -%]
-        Pairwise/[% t %]vs[% q %] \
-[% END -%]
-[% END -%]
-        --tree fake_tree.nwk \
-        -o [% opt.multiname %]_mz \
-        --parallel [% opt.parallel %]
-
-fi
-[% END -%]
-
-find [% opt.multiname %]_mz -type f -name "*.maf" |
-    parallel --no-run-if-empty -j 2 pigz -p [% opt.parallel2 %] {}
-
-#----------------------------#
-# maf2fas
-#----------------------------#
-log_info Convert maf to fas
-find [% opt.multiname %]_mz -name "*.maf" -or -name "*.maf.gz" |
-    parallel --no-run-if-empty -j [% opt.parallel %] \
-        fasops maf2fas {} -o [% opt.multiname %]_fasta/{/}.fas
-
-#----------------------------#
-# refine fasta
-#----------------------------#
-log_info Refine fas
-find [% opt.multiname %]_fasta -name "*.fas" -or -name "*.fas.gz" |
-    parallel --no-run-if-empty -j 2 '
-        fasops refine \
-            --msa [% opt.msa %] --parallel [% opt.parallel2 %] \
-            --quick --pad 100 --fill 100 \
-[% IF opt.outgroup -%]
-            --outgroup \
-[% END -%]
-            {} \
-            -o [% opt.multiname %]_refined/{/}
-    '
-
-find [% opt.multiname %]_refined -type f -name "*.fas" |
-    parallel --no-run-if-empty -j 2 pigz -p [% opt.parallel2 %] {}
-
-#----------------------------#
-# RAxML
-#----------------------------#
-[% IF opt.data.size > 3 -%]
-log_info RAxML
-
-egaz raxml \
-    --parallel [% IF opt.parallel > 3 %] [% opt.parallel - 1 %] [% ELSE %] 2 [% END %] \
-[% IF opt.outgroup -%]
-    --outgroup [% opt.outgroup %] \
-[% END -%]
-[% IF opt.verbose -%]
-    -v \
-[% END -%]
-    [% opt.multiname %]_refined/*.fas.gz \
-    -o Results/[% opt.multiname %].nwk
-
-egaz plottree Results/[% opt.multiname %].nwk
-
-[% ELSIF opt.data.size == 3 -%]
-echo "(([% opt.data.0.name %],[% opt.data.1.name %]),[% opt.data.2.name %]);" > Results/[% opt.multiname %].nwk
-
-[% ELSE -%]
-echo "([% opt.data.0.name %],[% opt.data.1.name %]);" > Results/[% opt.multiname %].nwk
-
-[% END -%]
-
-exit;
-
-EOF
     $tt->process(
-        \$template,
+        $template,
         {   args => $args,
             opt  => $opt,
             sh   => $sh_name,
@@ -980,122 +622,33 @@ EOF
 sub gen_vcf {
     my ( $self, $opt, $args ) = @_;
 
-    return unless $opt->{mode} eq "multi" and $opt->{vcf};
+    my $tt       = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
+    my $sh_name  = "4_vcf.sh";
+    my $template = "4_vcf.tt2.sh";
 
-    my $tt = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
-    my $template;
-    my $sh_name;
-
-    $sh_name = "4_vcf.sh";
     print STDERR "Create $sh_name\n";
-    $template = <<'EOF';
-[% INCLUDE header.tt2 %]
 
-#----------------------------#
-# [% sh %]
-#----------------------------#
-log_warn [% sh %]
-
-if [ -e [% opt.multiname %]_vcf/[% opt.multiname %].vcf ]; then
-    log_info [% opt.multiname %]_vcf/[% opt.multiname %].vcf exists
-    exit;
-fi
-
-mkdir -p [% opt.multiname %]_vcf
-
-log_info Write name.list
-
-# Make sure all queries present
-# Don't write outgroup
-rm -f [% opt.multiname %]_vcf/name.list
-[% FOREACH item IN opt.data -%]
-[% IF not loop.last -%]
-echo [% item.name %] >> [% opt.multiname %]_vcf/name.list
-[% ELSE -%]
-[% IF not opt.outgroup -%]
-echo [% item.name %] >> [% opt.multiname %]_vcf/name.list
-[% END -%]
-[% END -%]
-[% END -%]
-
-log_info fas2vcf
-find [% opt.multiname %]_refined -type f -name "*.fas" -or -type f -name "*.fas.gz" |
-    sort |
-    parallel --no-run-if-empty -j [% opt.parallel %] '
-        egaz fas2vcf \
-            {} \
-            [% args.0 %]/chr.sizes \
-            --verbose --list [% opt.multiname %]_vcf/name.list \
-            -o [% opt.multiname %]_vcf/{/}.vcf
-        '
-
-log_info concat and sort vcf
-bcftools concat [% opt.multiname %]_vcf/*.vcf |
-    bcftools sort \
-    > [% opt.multiname %]_vcf/[% opt.multiname %].vcf
-
-find [% opt.multiname %]_vcf -type f -name "*.vcf" -not -name "multi4.vcf" |
-    parallel --no-run-if-empty -j 1 rm
-
-exit;
-
-EOF
     $tt->process(
-        \$template,
+        $template,
         {   args => $args,
             opt  => $opt,
             sh   => $sh_name,
         },
         Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
     ) or Carp::confess Template->error;
-
 }
 
 sub gen_self {
     my ( $self, $opt, $args ) = @_;
 
-    return unless $opt->{mode} eq "self";
+    my $tt       = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
+    my $sh_name  = "1_self.sh";
+    my $template = "1_self.tt2.sh";
 
-    my $tt = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
-    my $template;
-    my $sh_name;
-
-    $sh_name = "1_self.sh";
     print STDERR "Create $sh_name\n";
-    $template = <<'EOF';
-[% INCLUDE header.tt2 %]
 
-#----------------------------#
-# [% sh %]
-#----------------------------#
-log_warn [% sh %]
-
-mkdir -p Pairwise
-
-[% FOREACH item IN opt.data -%]
-if [ -e Pairwise/[% item.name %]vsSelf ]; then
-    log_info Skip Pairwise/[% item.name %]vsSelf
-else
-    log_info lastz Pairwise/[% item.name %]vsSelf
-    egaz lastz \
-        --isself --set set01 -C 0 [% IF opt.partition %]--tp --qp [% END %]\
-        --parallel [% opt.parallel %] --verbose \
-        [% item.dir %] [% item.dir %] \
-        -o Pairwise/[% item.name %]vsSelf
-
-    log_info lpcnam Pairwise/[% item.name %]vsSelf
-    egaz lpcnam \
-        --parallel [% opt.parallel %] --verbose \
-        [% item.dir %] [% item.dir %] Pairwise/[% item.name %]vsSelf
-fi
-
-[% END -%]
-
-exit;
-
-EOF
     $tt->process(
-        \$template,
+        $template,
         {   args => $args,
             opt  => $opt,
             sh   => $sh_name,
@@ -1107,249 +660,17 @@ EOF
 sub gen_proc {
     my ( $self, $opt, $args ) = @_;
 
-    return unless $opt->{mode} eq "self";
+    my $tt       = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
+    my $sh_name  = "3_proc.sh";
+    my $template = "3_proc.tt2.sh";
 
-    my $tt = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
-    my $template;
-    my $sh_name;
-
-    $sh_name = "3_proc.sh";
     print STDERR "Create $sh_name\n";
-    $template = <<'EOF';
-[% INCLUDE header.tt2 %]
 
-#----------------------------#
-# [% sh %]
-#----------------------------#
-log_warn [% sh %]
-
-mkdir -p Processing
-mkdir -p Results
-
-#----------------------------#
-# genome sequences
-#----------------------------#
-[% FOREACH item IN opt.data -%]
-if [ -d Processing/[% item.name %] ]; then
-    log_info Skip Processing/[% item.name %]
-else
-    log_info Symlink genome sequences for [% item.name %]
-    mkdir -p Processing/[% item.name %]
-
-    ln -s [% item.dir %]/chr.fasta Processing/[% item.name %]/genome.fa
-    cp -f [% item.dir %]/chr.sizes Processing/[% item.name %]/chr.sizes
-fi
-
-[% END -%]
-
-#----------------------------#
-# parallel
-#----------------------------#
-log_info Blast paralogs against genomes and each other
-
-parallel --no-run-if-empty --linebuffer -k -j 2 '
-
-if [ -d Results/{} ]; then
-    echo >&2 "==> Skip Results/{}";
-    exit;
-fi
-
-cd Processing/{}
-
-#----------------------------#
-# Get exact copies in the genome
-#----------------------------#
-echo >&2 "==> Get exact copies in the genome"
-
-echo >&2 "    * axt2fas"
-fasops axt2fas \
-    ../../Pairwise/{}vsSelf/axtNet/*.axt.gz \
-    -l [% opt.length %] -s chr.sizes -o stdout > axt.fas
-fasops separate axt.fas -o . --nodash -s .sep.fasta
-
-echo >&2 "    * Target positions"
-egaz exactmatch target.sep.fasta genome.fa \
-    --length 500 --discard 50 -o replace.target.tsv
-fasops replace axt.fas replace.target.tsv -o axt.target.fas
-
-echo >&2 "    * Query positions"
-egaz exactmatch query.sep.fasta genome.fa \
-    --length 500 --discard 50 -o replace.query.tsv
-fasops replace axt.target.fas replace.query.tsv -o axt.correct.fas
-
-#----------------------------#
-# Coverage stats
-#----------------------------#
-echo >&2 "==> Coverage stats"
-fasops covers axt.correct.fas -o axt.correct.yml
-spanr split axt.correct.yml -s .temp.yml -o .
-spanr compare --op union target.temp.yml query.temp.yml -o axt.union.yml
-spanr stat chr.sizes axt.union.yml -o union.csv
-
-# links by lastz-chain
-fasops links axt.correct.fas -o stdout |
-    perl -nl -e "s/(target|query)\.//g; print;" \
-    > links.lastz.tsv
-
-# remove species names
-# remove duplicated sequences
-# remove sequences with more than 250 Ns
-fasops separate axt.correct.fas --nodash --rc -o stdout |
-    perl -nl -e "/^>/ and s/^>(target|query)\./\>/; print;" |
-    faops filter -u stdin stdout |
-    faops filter -n 250 stdin stdout \
-    > axt.gl.fasta
-
-[% IF opt.noblast -%]
-#----------------------------#
-# Lastz paralogs
-#----------------------------#
-cat axt.gl.fasta > axt.all.fasta
-[% ELSE -%]
-#----------------------------#
-# Get more paralogs
-#----------------------------#
-echo >&2 "==> Get more paralogs"
-egaz blastn axt.gl.fasta genome.fa -o axt.bg.blast --parallel [% opt.parallel2 %]
-egaz blastmatch axt.bg.blast -c 0.95 -o axt.bg.region --parallel [% opt.parallel2 %]
-samtools faidx genome.fa -r axt.bg.region --continue |
-    perl -p -e "/^>/ and s/:/(+):/" \
-    > axt.bg.fasta
-
-cat axt.gl.fasta axt.bg.fasta |
-    faops filter -u stdin stdout |
-    faops filter -n 250 stdin stdout \
-    > axt.all.fasta
-[% END -%]
-
-#----------------------------#
-# Link paralogs
-#----------------------------#
-echo >&2 "==> Link paralogs"
-egaz blastn axt.all.fasta axt.all.fasta -o axt.all.blast --parallel [% opt.parallel2 %]
-egaz blastlink axt.all.blast -c 0.95 -o links.blast.tsv --parallel [% opt.parallel2 %]
-
-#----------------------------#
-# Merge paralogs
-#----------------------------#
-echo >&2 "==> Merge paralogs"
-
-echo >&2 "    * Sort links"
-linkr sort -o links.sort.tsv \
-[% IF opt.noblast -%]
-   links.lastz.tsv
-[% ELSE -%]
-    links.lastz.tsv links.blast.tsv
-[% END -%]
-
-echo >&2 "    * Clean links"
-linkr clean   links.sort.tsv       -o links.sort.clean.tsv
-linkr merge   links.sort.clean.tsv -o links.merge.tsv       -c 0.95
-linkr clean   links.sort.clean.tsv -o links.clean.tsv       -r links.merge.tsv --bundle 500
-
-echo >&2 "    * Connect links"
-linkr connect links.clean.tsv    -o links.connect.tsv     -r 0.9
-linkr filter  links.connect.tsv  -o links.filter.tsv      -r 0.8
-
-    ' ::: [% FOREACH item IN opt.data %][% item.name %] [% END %]
-
-[% FOREACH item IN opt.data -%]
-[% id = item.name -%]
-#----------------------------#
-# [% id %]
-#----------------------------#
-if [ -d Results/[% id %] ]; then
-    log_info Skip Results/[% id %]
-else
-
-mkdir -p Results/[% id %]
-pushd Processing/[% id %] > /dev/null
-
-log_info Create multiple/pairwise alignments for [% id %]
-
-log_debug multiple links
-fasops create links.filter.tsv -o multi.temp.fas    -g genome.fa
-fasops refine multi.temp.fas   -o multi.refine.fas  --msa mafft -p [% opt.parallel %] --chop 10
-fasops links  multi.refine.fas -o stdout |
-    linkr sort stdin -o stdout |
-    linkr filter stdin -n 2-50 -o links.refine.tsv
-
-log_debug pairwise links
-fasops   links  multi.refine.fas    -o stdout     --best |
-    linkr sort stdin -o links.best.tsv
-fasops create links.best.tsv   -o pair.temp.fas    -g genome.fa --name [% id %]
-fasops refine pair.temp.fas    -o pair.refine.fas  --msa mafft -p [% opt.parallel %]
-
-cat links.refine.tsv |
-    perl -nla -F"\t" -e "print for @F" |
-    spanr cover stdin -o cover.yml
-
-log_debug Stats of links
-echo "key,count" > links.count.csv
-for n in 2 3 4-50; do
-    linkr filter links.refine.tsv -n ${n} -o stdout \
-        > links.copy${n}.tsv
-
-    cat links.copy${n}.tsv |
-        perl -nla -F"\t" -e "print for @F" |
-        spanr cover stdin -o copy${n}.temp.yml
-
-    wc -l links.copy${n}.tsv |
-        perl -nl -e "
-            @fields = grep {/\S+/} split /\s+/;
-            next unless @fields == 2;
-            next unless \$fields[1] =~ /links\.([\w-]+)\.tsv/;
-            printf qq{%s,%s\n}, \$1, \$fields[0];
-        " \
-        >> links.count.csv
-
-    rm links.copy${n}.tsv
-done
-
-spanr merge copy2.temp.yml copy3.temp.yml copy4-50.temp.yml -o copy.yml
-spanr stat chr.sizes copy.yml --all -o links.copy.csv
-
-fasops mergecsv links.copy.csv links.count.csv --concat -o copy.csv
-
-log_debug Coverage figure
-spanr stat chr.sizes cover.yml -o cover.yml.csv
-#perl cover_figure.pl --size chr.sizes -f cover.yml
-
-log_info Results for [% id %]
-
-cp cover.yml        ../../Results/[% id %]/[% id %].cover.yml
-cp copy.yml         ../../Results/[% id %]/[% id %].copy.yml
-mv cover.yml.csv    ../../Results/[% id %]/[% id %].cover.csv
-mv copy.csv         ../../Results/[% id %]/[% id %].copy.csv
-cp links.refine.tsv ../../Results/[% id %]/[% id %].links.tsv
-#mv cover.png        ../../Results/[% id %]/[% id %].cover.png
-mv multi.refine.fas ../../Results/[% id %]/[% id %].multi.fas
-mv pair.refine.fas  ../../Results/[% id %]/[% id %].pair.fas
-
-log_info Clean up
-
-find . -type f -name "*genome.fa*"   | parallel --no-run-if-empty rm
-find . -type f -name "*all.fasta*"   | parallel --no-run-if-empty rm
-find . -type f -name "*.sep.fasta"   | parallel --no-run-if-empty rm
-find . -type f -name "axt.*"         | parallel --no-run-if-empty rm
-find . -type f -name "replace.*.tsv" | parallel --no-run-if-empty rm
-find . -type f -name "*.temp.yml"    | parallel --no-run-if-empty rm
-find . -type f -name "*.temp.fas"    | parallel --no-run-if-empty rm
-
-popd > /dev/null
-
-fi
-
-[% END -%]
-
-exit;
-
-EOF
     $tt->process(
-        \$template,
-        {   args   => $args,
-            opt    => $opt,
-            sh     => $sh_name,
+        $template,
+        {   args => $args,
+            opt  => $opt,
+            sh   => $sh_name,
         },
         Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
     ) or Carp::confess Template->error;
@@ -1358,13 +679,12 @@ EOF
 sub gen_circos {
     my ( $self, $opt, $args ) = @_;
 
-    return unless $opt->{mode} eq "self" and $opt->{circos};
-
     my $tt = Template->new( INCLUDE_PATH => [ File::ShareDir::dist_dir('App-Egaz') ], );
 
     # circos.conf and karyotype.id.txt
     for my $item ( @{ $opt->{data} } ) {
-        print STDERR "Create circos.conf for $item->{name}\n" if $opt->{verbose};
+        print STDERR "Create circos.conf for $item->{name}\n"
+            if $opt->{verbose};
         $tt->process(
             "circos.conf.tt2",
             {   dir => $opt->{outdir},
@@ -1379,7 +699,8 @@ sub gen_circos {
                 "share", "karyotype", "karyotype.$item->{taxon}.txt" );
 
             if ( $karyo->is_file ) {
-                print STDERR "    Copy prebuilt karyotype.$item->{name}.txt\n" if $opt->{verbose};
+                print STDERR "    Copy prebuilt karyotype.$item->{name}.txt\n"
+                    if $opt->{verbose};
                 $karyo->copy( $opt->{outdir}, 'Circos', $item->{name},
                     "karyotype.$item->{name}.txt" );
             }

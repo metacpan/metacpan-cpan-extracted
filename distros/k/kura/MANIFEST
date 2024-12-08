@@ -29,7 +29,9 @@ t/10-integration/Valiant/TestValiant.pm
 t/10-integration/Valiant/basic.t
 t/10-integration/builtin-class/TestBuiltinClass.pm
 t/10-integration/builtin-class/basic.t
+t/99-simple-synopsis.t
 t/99-synopsis.t
+t/lib/MyBar.pm
 t/lib/MyConstraint.pm
 t/lib/MyFoo.pm
 t/lib/mykura.pm

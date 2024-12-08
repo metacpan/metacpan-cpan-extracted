@@ -1,0 +1,63 @@
+---
+abstract: 'A simple, composable, and extensible data validation library for Perl.'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  Data::UUID: '1.227'
+  Test::Exception: '0.43'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Poz
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Poz:
+    file: lib/Poz.pm
+    version: '0.01'
+  Poz::Builder:
+    file: lib/Poz/Builder.pm
+  Poz::Types:
+    file: lib/Poz/Types.pm
+  Poz::Types::array:
+    file: lib/Poz/Types/array.pm
+  Poz::Types::enum:
+    file: lib/Poz/Types/enum.pm
+  Poz::Types::number:
+    file: lib/Poz/Types/number.pm
+  Poz::Types::object:
+    file: lib/Poz/Types/object.pm
+  Poz::Types::scalar:
+    file: lib/Poz/Types/scalar.pm
+  Poz::Types::string:
+    file: lib/Poz/Types/string.pm
+requires:
+  DateTime::Format::Duration::ISO8601: '0.008'
+  DateTime::Format::ISO8601: '0.16'
+  DateTime::Format::Strptime: '1.79'
+  Email::Address: '1.912'
+  Net::IPv6Addr: '1.02'
+  Try::Tiny: '0.32'
+  URI: '5.07'
+  perl: '5.032'
+resources:
+  bugtracker: https://github.com/ytnobody/p5-Poz/issues
+  homepage: https://github.com/ytnobody/p5-Poz
+  repository: https://github.com/ytnobody/p5-Poz.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

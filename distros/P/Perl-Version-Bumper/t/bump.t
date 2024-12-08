@@ -16,7 +16,7 @@ test_dir(
         my ( $perv, $src, $expected, $name, $ctx ) = @_;
         my $version = $perv->version;
         my $this    = qq{"$name" [$version]};
-        $expected =~ s/use v5\.XX;/use $version;/g;
+        $expected =~ s/use VERSION;/use $version;/g;
 
         # bump_ppi
         my $doc = $ctx->{$src} //= do {    # cache the PPI document

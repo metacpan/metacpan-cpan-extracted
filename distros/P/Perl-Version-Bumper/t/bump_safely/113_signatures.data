@@ -1,16 +1,16 @@
 ########## signatures + empty prototype
 sub foo () { }
 ---
-use v5.XX;
+use VERSION;
 sub foo () { }
 --- v5.36
-use v5.XX;
+use VERSION;
 sub foo :prototype() { }
 ########## a prototype that's not a signature
 sub money ($$) { }
 ---
-use v5.XX;
+use VERSION;
 sub money ($$) { }
 --- v5.36
-use v5.XX;
+use VERSION;
 sub money :prototype($$) { }

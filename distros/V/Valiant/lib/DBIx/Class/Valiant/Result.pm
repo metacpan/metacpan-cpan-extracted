@@ -13,6 +13,7 @@ use namespace::autoclean -also => ['debug'];
 use DBIx::Class::Valiant::Util::Exception::TooManyRows;
 use DBIx::Class::Valiant::Util::Exception::BadParameterFK;
 use DBIx::Class::Valiant::Util::Exception::BadParameters;
+use Valiant::I18N;
 
 with 'DBIx::Class::Valiant::Validates';
 with 'Valiant::Filterable';
@@ -1043,11 +1044,18 @@ sub set_single_related_from_params {
           debug 3, "setting with exact record matching pk %pk";
           $related_result = $self->result_source->related_source($related)->resultset->find(\%pk);
           #   $self->set_from_related($related, $related_result);
+          unless($related_result) {
+            debug 2, "did not find related result for $related so creating new one";
+            $related_result = $self->new_related($related, +{});
+            # If the user supplied PK and we didn't find them we defintely need to set an error
+            # since that's a hacking attempt possibly
+            $self->errors->add($related, _t('related_not_found'), {related=>$related_result->model_name->human});
+          }
           $related_result->{__valiant_allow_destroy} = 1 if $allow_destroy;
           $related_result->set_from_params_recursively(%$params);
         } else {
           debug 3, "No PK for $related, lets see if there's other ways to find it";
-          if($nested{$related}{find_with_uniques}) {
+          if(my $flag = $nested{$related}{find_with_uniques}) {
             debug 3, "finding $related for $self with find_with_uniques matching";
             my %uniques = $self->result_source->related_source($related)->unique_constraints;
             foreach my $unique (keys %uniques) {
@@ -1061,6 +1069,17 @@ sub set_single_related_from_params {
               if($related_result) {
                 debug 3, "Found result via unique keys";
                 last;  
+              } else {
+                debug 3, "Did not find result via unique keys";
+                $related_result = $self->new_related($related, +{});
+                # So this is tricky.  Generally if there's no PK  and create is allowed
+                # we should just create a new record.  But if we arw saying 'find_with_uniques'
+                # that means the unique is pretty much a key and possible we don't want to let
+                # a possible hacker slip in a new record.   So unless find_with_uniques is
+                # 'allow_create' we should set an error.
+                unless($flag eq 'allow_create') {
+                  $self->errors->add($related, _t('related_not_found'), {related=>$related_result->model_name->human});
+                }
               }
             }
           }
@@ -1303,6 +1322,12 @@ deleted and a new one inserted.  Default is false.
 
 Generally we only try to find a matching row in the DB if a primary key is given.   If you set 
 this to true then we also try to match using and unique keys establish for the related row.
+
+If you set this flag to 'allow_create' then we will allow the creation of a new related row if
+we can't find one in the DB.  Otherwise we will set an error if the related row can't be found.
+You should be careful here because allowing the creation of a new related row could be a security
+risk (a hacker could try to insert a new related row by guessing the unique keys).  That's
+why the default behavior is to set an error if the related row can't be found.
 
 =back
 

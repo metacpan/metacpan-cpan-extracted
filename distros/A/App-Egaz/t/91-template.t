@@ -26,7 +26,7 @@ like( $result->error, qr{doesn't exist}, 'not exists' );
 
     $result = test_app(
         'App::Egaz' => [
-            "template", "$t_path/pseudocat", "$t_path/pseudopig", "--rawphylo",
+            "template", "$t_path/pseudocat", "$t_path/pseudopig",
             "--vcf",    "--aligndb",         "--verbose",
         ]
     );
@@ -34,7 +34,6 @@ like( $result->error, qr{doesn't exist}, 'not exists' );
     is( $result->error, undef, 'threw no exceptions' );
     is( ( scalar grep {/\S/} split( /\n/, $result->stdout ) ), 0, 'no stdout' );
     ok( $tempdir->child("1_pair.sh")->is_file,          '1_pair.sh exists' );
-    ok( $tempdir->child("2_rawphylo.sh")->is_file,      '2_rawphylo.sh exists' );
     ok( $tempdir->child("4_vcf.sh")->is_file,           '4_vcf.sh exists' );
     ok( $tempdir->child("6_chr_length.sh")->is_file,    '6_chr_length.sh exists' );
     ok( $tempdir->child("7_multi_aligndb.sh")->is_file, '7_multi_aligndb.sh exists' );

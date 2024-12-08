@@ -1,12 +1,12 @@
 ########## use feature 'module_true'
 use feature 'module_true';
 ---
-use v5.XX;
+use VERSION;
 use feature 'module_true';
 --- v5.38
-use v5.XX;
+use VERSION;
 ########## use feature 'module_true'
 no feature 'module_true';
 ---
-use v5.XX;
+use VERSION;
 no feature 'module_true';

@@ -1,5 +1,21 @@
 Revision history for Perl extension App-Egaz
 
+0.2.9 2024-12-07T12:05:28Z
+
+    - Remove dependencies on the `fasops` executable
+    - Remove --rawphylow from `egaz template`
+    - `spanr` is now generating .json instead of .yml
+
+0.2.6 2022-03-25T19:33:02Z
+
+    - Move `egaz plottree` to `plotr tree`
+    - Remove `egaz masked`, use `faops masked` instead
+    - Move tt2 to share/
+    - `egaz template`
+        - Add `--mash`
+        - Add `--fasttree`
+        - Apply `nw_order` to trees
+
 0.2.5 2020-03-06T19:07:31Z
 
     - `egaz template`

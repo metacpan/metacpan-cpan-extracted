@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.596';
+our $VERSION = '0.597';
 
 use 5.020;
 use Moo;
@@ -38,8 +38,7 @@ sub keywords ($class, $spec_version) {
 }
 
 sub _traverse_keyword_contentEncoding ($class, $schema, $state) {
-  return if not assert_keyword_type($state, $schema, 'string');
-  return 1;
+  return assert_keyword_type($state, $schema, 'string');
 }
 
 sub _eval_keyword_contentEncoding ($class, $data, $schema, $state) {
@@ -60,11 +59,10 @@ sub _eval_keyword_contentEncoding ($class, $data, $schema, $state) {
     };
   }
 
-  A($state, $schema->{$state->{keyword}});
-  return 1;
+  return A($state, $schema->{$state->{keyword}});
 }
 
-sub _traverse_keyword_contentMediaType { goto \&_traverse_keyword_contentEncoding }
+*_traverse_keyword_contentMediaType = \&_traverse_keyword_contentEncoding;
 
 sub _eval_keyword_contentMediaType ($class, $data, $schema, $state) {
   return 1 if not is_type('string', $data);
@@ -88,8 +86,7 @@ sub _eval_keyword_contentMediaType ($class, $data, $schema, $state) {
     }
   }
 
-  A($state, $schema->{$state->{keyword}});
-  return 1;
+  return A($state, $schema->{$state->{keyword}});
 }
 
 sub _traverse_keyword_contentSchema ($class, $schema, $state) {
@@ -107,8 +104,7 @@ sub _eval_keyword_contentSchema ($class, $data, $schema, $state) {
         { %$state, schema_path => $state->{schema_path}.'/contentSchema' });
   }
 
-  A($state, dclone($schema->{contentSchema}));
-  return 1;
+  return A($state, dclone($schema->{contentSchema}));
 }
 
 1;
@@ -125,7 +121,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.596
+version 0.597
 
 =head1 DESCRIPTION
 

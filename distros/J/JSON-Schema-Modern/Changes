@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-Modern
 
+0.597     2024-12-07 23:30:38Z
+          - report installed version of builtin
+
 0.596     2024-11-24 00:57:13Z
           - properly handle changing of dialects (including swapping out
             vocabularies and keywords) when evaluating a local subschema

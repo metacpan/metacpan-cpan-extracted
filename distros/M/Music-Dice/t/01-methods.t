@@ -10,7 +10,9 @@ subtest defaults => sub {
     my $obj = new_ok 'Music::Dice';
     is $obj->flats, 1, 'flats';
     is $obj->beats, 4, 'beats';
-    is_deeply $obj->pool, [qw(wn dhn hn dqn qn den en)], 'pool';
+    is_deeply $obj->phrase_pool, [qw(wn dhn hn dqn qn den en)], 'phrase_pool';
+    is_deeply $obj->phrase_weights, [(1) x @{$obj->phrase_pool } ], 'phrase_weights';
+    is_deeply $obj->phrase_groups, [(1) x @{$obj->phrase_pool } ], 'phrase_groups';
     is_deeply $obj->octaves, [2 .. 6], 'octaves';
     is_deeply $obj->notes, [qw(C Db D Eb E F Gb G Ab A Bb B)], 'notes';
     is_deeply $obj->intervals, [ (1) x 12 ], 'intervals';
@@ -18,7 +20,7 @@ subtest defaults => sub {
     is_deeply $obj->chord_triad_weights, [qw(2 2 1 1 1)], 'chord_triad_weights';
     is_deeply $obj->chord_qualities_major, [qw(add2 sus2 add4 sus4 -5 -6 6 M7 7 add9)], 'chord_qualities_major';
     is_deeply $obj->chord_qualities_major_7, [qw|7sus4 7b5 7#5 69 M79 7b9 9 7#9 7(b9,13) 7(9,13) 9b5 M11 11 7#11 M13 13 7#13|], 'chord_qualities_major_7';
-    is_deeply $obj->chord_qualities_minor, [qw(madd4 m6 mM7 m7)], 'chord_qualities_minor';
+    is_deeply $obj->chord_qualities_minor, [qw(madd4 m6 m7)], 'chord_qualities_minor';
     is_deeply $obj->chord_qualities_minor_7, [qw|m7b5 m7#5 m9 m7(9,11) m11 m13|], 'chord_qualities_minor_7';
     is_deeply $obj->chord_qualities_diminished, [qw(dim6 dim7)], 'chord_qualities_diminished';
     is_deeply $obj->chord_qualities_augmented, [qw(augM7 aug7)], 'chord_qualities_augmented';
@@ -27,8 +29,8 @@ subtest defaults => sub {
     is_deeply $obj->tonnetzen, [qw(P R L N S H)], 'tonnetzen';
     is_deeply $obj->tonnetzen_7, [qw(S23 S32 S34 S43 S56 S65 C32 C34 C65)], 'tonnetzen_7';
     is_deeply $obj->rhythmic_phrase_constraints, [3,4,5], 'rhythmic_phrase_constraints';
-    $obj = new_ok 'Music::Dice' => [ pool => 'all' ];
-    is @{ $obj->pool }, 32, 'all pool';
+    $obj = new_ok 'Music::Dice' => [ phrase_pool => 'all' ];
+    is @{ $obj->phrase_pool }, 32, 'all phrase_pool';
 };
 
 subtest scales => sub {

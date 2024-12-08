@@ -19,7 +19,6 @@ use MCE;
 use Number::Format qw();
 use Path::Tiny qw();
 use Set::Scalar;
-use Statistics::R;
 use String::Similarity;
 use Template;
 use YAML::Syck qw();

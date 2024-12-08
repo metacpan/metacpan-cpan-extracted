@@ -621,7 +621,7 @@ Schema->resultset("Role")->populate([
 
   is_deeply +{$person->errors->to_hash(full_messages=>1)}, +{
     person_roles => [
-      "Person Roles Is Invalid",
+      "Person Roles Are Invalid",
     ],
     "person_roles[0].role" => [
       "Person Roles Role Is Invalid",
@@ -697,7 +697,7 @@ Schema->resultset("Role")->populate([
 
   is_deeply +{$parent->errors->to_hash(full_messages=>1)}, +{
     children => [
-      "Children Is Invalid",
+      "Children Are Invalid",
     ],
     "children[0].value" => [
       "Children Value is too short (minimum is 5 characters)",

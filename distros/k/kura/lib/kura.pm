@@ -2,7 +2,7 @@ package kura;
 use strict;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use Carp ();
 use Sub::Util ();
@@ -33,85 +33,70 @@ sub import {
     $pkg->import_into($caller, @_);
 }
 
+# Import into the caller package.
 sub import_into {
     my $pkg = shift;
     my ($caller, $name, $constraint) = @_;
 
-    my $err;
-
-    $err = _validate_name($name);
+    my ($kura_item, $err) = _new_kura_item($name, $constraint, $caller);
     Carp::croak $err if $err;
 
-    $err = _validate_constraint($constraint);
-    Carp::croak $err if $err;
-
-    $err = _install_constraint($name, $constraint, $caller);
-    Carp::croak $err if $err;
-
-    $err = _setup_inc($caller);
-    Carp::croak $err if $err;
+    _save_kura_item($kura_item, $caller);
+    _save_inc($caller);
 }
 
-sub _validate_name {
-    my ($name) = @_;
-
-    if (!defined $name) {
-        return 'name is required';
-    }
-    elsif ($FORBIDDEN_NAME{$name}) {
-        return "'$name' is forbidden.";
-    }
-    return;
-}
-
-sub _validate_constraint {
-    my ($constraint) = @_;
-
-    unless (defined $constraint) {
-        return 'constraint is required';
-    }
-
-    return if Scalar::Util::blessed($constraint) && $constraint->can('check');
-
-    my $ref = Scalar::Util::reftype($constraint) // '';
-
-    return if $ref eq 'CODE';
-
-    return "Invalid constraint. It must be an object that has a 'check' method or a code reference.";
-}
-
-sub _constraint_to_code {
+# Create a new kura item which is Dict[name => Str, code => CodeRef].
+# If the name or constraint is invalid, it returns (undef, $error_message).
+# Otherwise, it returns ($kura_item, undef).
+sub _new_kura_item {
     my ($name, $constraint, $caller) = @_;
-
-    if (Scalar::Util::reftype($constraint) eq 'CODE') {
-        $constraint = $CALLABLE_TO_OBJECT->($name, $constraint, $caller);
-    }
-
-    sub { $constraint };
-}
-
-sub _install_constraint {
-    my ($name, $constraint, $caller) = @_;
-
-    if ($caller->can($name)) {
-        return "'$name' is already defined";
-    }
-
-    my $code = _constraint_to_code(@_);
 
     {
+        return (undef, 'name is required') if !defined $name;
+        return (undef, "'$name' is forbidden.") if $FORBIDDEN_NAME{$name};
+        return (undef, "'$name' is already defined") if $caller->can($name);
+    }
+
+    {
+        return (undef, 'constraint is required') if !defined $constraint;
+
+        if (Scalar::Util::blessed($constraint)) {
+            return (undef, 'Invalid constraint. It requires a `check` method.') if !$constraint->can('check');
+        }
+        elsif ( (Scalar::Util::reftype($constraint)||'') eq 'CODE') {
+            $constraint = $CALLABLE_TO_OBJECT->($name, $constraint, $caller);
+        }
+        else {
+            return (undef, 'Invalid constraint. It must be an object that has a `check` method or a code reference.');
+        }
+    }
+
+    my $kura_item = { name => $name, code => sub { $constraint } };
+    return ($kura_item, undef);
+}
+
+# Save the kura item to the caller package
+sub _save_kura_item {
+    my ($kura_item, $caller) = @_;
+
+    {
+        my $name = $kura_item->{name};
+        my $code = Sub::Util::set_subname("$caller\::$name", $kura_item->{code});
+
         no strict "refs";
-        *{"$caller\::$name"} = Sub::Util::set_subname( "$caller\::$name", $code);
+        no warnings "once";
+        *{"$caller\::$name"} = $code;
         push @{"$caller\::EXPORT_OK"}, $name;
+        push @{"$caller\::KURA"}, $name;
     }
 
     return;
 }
 
-sub _setup_inc {
+# Hack to make the caller package already loaded. Useful for multi-packages in a single file.
+sub _save_inc {
     my ($caller) = @_;
 
-    # Hack to make the caller package already loaded. Useful for multi-packages in a single file.
     ( my $file = $caller ) =~ s{::}{/}g;
     $INC{"$file.pm"} ||= __FILE__;
 
@@ -128,6 +113,72 @@ __END__
 kura - Store constraints for Data::Checks, Type::Tiny, Moose, and more.
 
 =head1 SYNOPSIS
+
+    use Exporter 'import';
+
+    use Types::Common -types;
+    use Email::Valid;
+
+    use kura Name  => StrLength[1, 255];
+    use kura Email => sub { Email::Valid->address($_[0]) };
+
+=head1 DESCRIPTION
+
+Kura - means "Traditional Japanese storehouse" - stores constraints, such as L<Data::Checks>, L<Type::Tiny>, L<Moose::Meta::TypeConstraint>, L<Mouse::Meta::TypeConstraint>, L<Specio>, and more.
+This module is useful for storing constraints in a package and exporting them to other packages. Following are the features of Kura:
+
+=over 2
+
+=item * Simple Declaration
+
+=item * Export Constraints
+
+=item * Store Multiple Constraints
+
+=back
+
+=head2 FEATURES
+
+=head3 Simple Declaration
+
+Kura makes it easy to store constraints in a package.
+
+    use kura NAME => CONSTRAINT;
+
+C<CONSTRAINT> must be a any object that has a C<check> method or a code reference that returns true or false.
+The following is an example of a constraint declaration:
+
+    use kura Name => StrLength[1, 255];
+
+=head3 Export Constraints
+
+Kura allows you to export constraints to other packages using your favorite exporter such as L<Exporter>, L<Exporter::Tiny>, and more.
+
+    package MyPkg {
+        use parent 'Exporter::Tiny';
+        use Data::Checks qw(StrEq);
+
+        use kura Foo => StrEq('foo');
+    }
+
+    use MyPkg qw(Foo);
+    Foo->check('foo'); # true
+    Foo->check('bar'); # false
+
+=head3 Store Multiple Constraints
+
+Kura supports multiple constraints such as L<Data::Checks>, L<Type::Tiny>, L<Moose::Meta::TypeConstraint>, L<Mouse::Meta::TypeConstraint>, L<Specio>, and more.
+
+    Data::Checks -----------------> +--------+
+                                    |        |
+    Type::Tiny -------------------> |        |
+                                    |  Kura  | ---> Named Value Constraints!
+    Moose::Meta::TypeConstraint --> |        |
+                                    |        |
+    YourFavoriteConstraint -------> +--------+
+
+If your project uses multiple constraint libraries, kura allows you to simplify your codes and making it easier to manage different constraint systems. This is especially useful in large projects or when migrating from one constraint system to another.
+Here is an example of using multiple constraints:
 
     package MyFoo {
         use Exporter 'import';
@@ -162,43 +213,71 @@ kura - Store constraints for Data::Checks, Type::Tiny, Moose, and more.
     ok !Baz->check('foo') && !Baz->check('bar') &&  Baz->check('baz') && !Baz->check('qux');
     ok !Qux->check('foo') && !Qux->check('bar') && !Qux->check('baz') &&  Qux->check('qux');
 
-=head1 DESCRIPTION
+=head2 WHY USE KURA
 
-Kura - means "Traditional Japanese storehouse" - stores constraints, such as L<Data::Checks>, L<Type::Tiny>, L<Moose::Meta::TypeConstraint>, L<Mouse::Meta::TypeConstraint>, L<Specio>, and more. It can even be used with L<Moo> when combined with L<Type::Tiny> constraints.
+Kura serves a similar purpose to L<Type::Library> which is bundled with L<Type::Tiny> but provides distinct advantages in specific use cases:
 
-    Data::Checks -----------------> +--------+
-                                    |        |
-    Type::Tiny -------------------> |        |
-                                    |  Kura  | ---> Named Value Constraints!
-    Moose::Meta::TypeConstraint --> |        |
-                                    |        |
-    YourFavoriteConstraint -------> +--------+
+=over 2
 
-If your project uses multiple constraint libraries, kura allows you to simplify your codes and making it easier to manage different constraint systems. This is especially useful in large projects or when migrating from one constraint system to another.
+=item * Built-in Class Support
 
-=head1 HOW TO USE
+While Type::Library tightly integrates with Type::Tiny, Kura works with built-in classes.
 
-=head2 Declaring a constraint
+    class Fruit {
+        use Exporter 'import';
+        use Types::Common -types;
 
-It's easy to use to store constraints in a package:
+        # kura meets built-in class!
+        use kura Name => StrLength[1, 255];
 
-    use kura NAME => CONSTRAINT;
+        field $name :param :reader;
+    }
 
-This constraint must be a any object that has a C<check> method or a code reference that returns true or false.
-The following is an example of a constraint declaration:
+=item * Simpler Declaration
+
+Kura simplifies type constraint declarations. Unlike Type::Library, there's no need to write name twice.
+
+Kura:
 
     use Exporter 'import';
-    use Types::Standard -types;
+    use Types::Common -types;
 
-    use kura Name  => Str & sub { qr/^[A-Z][a-z]+$/ };
-    use kura Level => Int & sub { $_[0] >= 1 && $_[0] <= 100 };
+    use kura Name => StrLength[1, 255];
+    use kura Level => IntRange[1, 100];
+    use kura Player => Dict[ name => Name, level => Level ];
 
-    use kura Character => Dict[
-        name  => Name,
-        level => Level,
-    ];
+Type::Library:
 
-When declaring constraints, it is important to define child constraints before their parent constraints to avoid errors. For example:
+    use Types::Library -declare => [qw(Name Level Player)]; # Need to write name twice
+    use Types::Common -types;
+    use Type::Utils -all;
+
+    declare Name, as StrLength[1, 255];
+    declare Level, as IntRange[1, 100];
+    declare Player, as Dict[ name => Name, level => Level ];
+
+=item * Minimal Exported Functions
+
+Kura avoids the extra C<is_*>, C<assert_*>, and C<to_*> functions exported by Type::Library.
+This keeps your namespace cleaner and focuses on the essential C<check> method.
+
+=item * Multiple Constraints
+
+Kura is not limited to Type::Tiny. It supports multiple constraint libraries such as Moose, Mouse, Specio, and Data::Checks.
+This flexibility allows consistent management of type constraints in projects that mix different libraries.
+
+=back
+
+While Type::Library is powerful and versatile, Kura stands out for its simplicity, flexibility, and ability to integrate with multiple constraint systems.
+It’s particularly useful in projects where multiple type constraint libraries coexist or when leveraging built-in class syntax.
+
+=head2 NOTE
+
+=head3 Order of declaration
+
+When declaring constraints, it is important to define child constraints before their parent constraints to avoid errors.
+If constraints are declared in the wrong order, you might encounter errors like B<Bareword not allowed>. Ensure that all dependencies are declared beforehand to prevent such issues.
+For example:
 
     # Bad order
     use kura Parent => Dict[ name => Child ]; # => Bareword "Child" not allowed
@@ -208,23 +287,8 @@ When declaring constraints, it is important to define child constraints before t
     use kura Child => Str;
     use kura Parent => Dict[ name => Child ];
 
-If constraints are declared in the wrong order, you might encounter errors like “Bareword not allowed.” Ensure that all dependencies are declared beforehand to prevent such issues.
 
-=head2 Export a constraint
-
-You can export the declared constraints by your favorite Exporter package such as L<Exporter>, L<Exporter::Tiny>, and more.
-Internally, Kura automatically adds the declared constraint to C<@EXPORT_OK>, so you just put C<use Exporter 'import';> in your package:
-
-    package MyFoo {
-        use Exporter 'import';
-
-        use Data::Checks qw(StrEq);
-        use kura Foo => StrEq('foo');
-    }
-
-    use MyFoo qw(Foo);
-    Foo->check('foo'); # true
-    Foo->check('bar'); # false
+=head3 Need to load Exporter
 
 If you forget to put C<use Exporter 'import';>, you get an error like this:
 
@@ -238,6 +302,42 @@ If you forget to put C<use Exporter 'import';>, you get an error like this:
     # => ERROR!
     Attempt to call undefined import method with arguments ("Foo" ...) via package "MyFoo"
     (Perhaps you forgot to load the package?)
+
+=head2 C<@EXPORT_OK> and C<@KURA> are automatically set
+
+Package variables C<@EXPORT_OK> and C<@KURA> are automatically set when you use C<kura> in your package:
+
+    package MyFoo {
+        use Exporter 'import';
+        use Types::Common -types;
+        use kura Foo1 => StrLength[1, 255];
+        use kura Foo2 => StrLength[1, 1000];
+
+        our @EXPORT_OK;
+        push @EXPORT_OK, qw(hello);
+
+        sub hello { 'Hello, Foo!' }
+    }
+
+    # Automatically set the caller package to MyFoo
+    MyFoo::EXPORT_OK # => ('Foo1', 'Foo2', 'hello')
+    MyFoo::KURA      # => ('Foo1', 'Foo2')
+
+It is useful when you want to export constraints. For example, you can tag C<@KURA> with C<%EXPORT_TAGS>:
+
+    package MyBar {
+        use Exporter 'import';
+        use Types::Common -types;
+        use kura Bar1 => StrLength[1, 255];
+        use kura Bar2 => StrLength[1, 1000];
+
+        our %EXPORT_TAGS = (
+            types => \@MyBar::KURA,
+        );
+    }
+
+    use MyBar qw(:types);
+    # => Bar1, Bar2 are exported
 
 =head1 LICENSE
 

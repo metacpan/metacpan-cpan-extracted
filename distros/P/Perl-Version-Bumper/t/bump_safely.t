@@ -22,7 +22,7 @@ test_dir(
         my $this    = "$name [$version]";
 
         # perform the version expectations bump
-        $expected =~ s/use v5\.XX;/use $version;/g;
+        $expected =~ s/use VERSION;/use $version;/g;
 
         # make a PPI document
         my $doc = $ctx->{$src} //= do {         # cache the PPI document

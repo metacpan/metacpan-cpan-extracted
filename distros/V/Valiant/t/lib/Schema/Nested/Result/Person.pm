@@ -47,8 +47,8 @@ __PACKAGE__->validates(person_roles => (presence=>1, set_size=>{min=>1}, on=>'mi
 __PACKAGE__->validates(roles => (presence=>1, set_size=>{min=>1}, on=>'min'));
 
 
-__PACKAGE__->accept_nested_for('person_roles', +{find_with_uniques=>1, allow_destroy=>1});
-__PACKAGE__->accept_nested_for('roles', +{find_with_uniques=>1, allow_destroy=>1});
+__PACKAGE__->accept_nested_for('person_roles', +{find_with_uniques=>'allow_create', allow_destroy=>1});
+__PACKAGE__->accept_nested_for('roles', +{find_with_uniques=>'allow_create', allow_destroy=>1});
 
 sub default_roles {
   my ($self, $attribute_name, $record, $opts) = @_;

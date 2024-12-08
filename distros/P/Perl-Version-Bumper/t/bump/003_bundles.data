@@ -8,9 +8,9 @@ use feature 'say';
 use feature 'state';
 use feature 'switch';
 ---
-use v5.XX;
+use VERSION;
 --- v5.36
-use v5.XX;
+use VERSION;
 use feature 'switch';
 ########## :5.12
 require v5.12;
@@ -20,9 +20,9 @@ use feature 'state';
 use feature 'switch';
 use feature 'unicode_strings';
 --- v5.12
-use v5.XX;
+use VERSION;
 --- v5.36
-use v5.XX;
+use VERSION;
 use feature 'switch';
 ########## :5.14
 require v5.14;
@@ -32,9 +32,9 @@ use feature 'state';
 use feature 'switch';
 use feature 'unicode_strings';
 --- v5.14
-use v5.XX;
+use VERSION;
 --- v5.36
-use v5.XX;
+use VERSION;
 use feature 'switch';
 ########## :5.16
 require v5.16;
@@ -48,9 +48,9 @@ use feature 'switch';
 use feature 'unicode_eval';
 use feature 'unicode_strings';
 --- v5.16
-use v5.XX;
+use VERSION;
 --- v5.36
-use v5.XX;
+use VERSION;
 use feature 'switch';
 ########## :5.18
 require v5.18;
@@ -64,9 +64,9 @@ use feature 'switch';
 use feature 'unicode_eval';
 use feature 'unicode_strings';
 --- v5.18
-use v5.XX;
+use VERSION;
 --- v5.36
-use v5.XX;
+use VERSION;
 use feature 'switch';
 ########## :5.20
 require v5.20;
@@ -80,9 +80,9 @@ use feature 'switch';
 use feature 'unicode_eval';
 use feature 'unicode_strings';
 --- v5.20
-use v5.XX;
+use VERSION;
 --- v5.36
-use v5.XX;
+use VERSION;
 use feature 'switch';
 ########## :5.22
 require v5.22;
@@ -96,9 +96,9 @@ use feature 'switch';
 use feature 'unicode_eval';
 use feature 'unicode_strings';
 --- v5.22
-use v5.XX;
+use VERSION;
 --- v5.36
-use v5.XX;
+use VERSION;
 use feature 'switch';
 ########## :5.24
 require v5.24;
@@ -113,9 +113,9 @@ use feature 'switch';
 use feature 'unicode_eval';
 use feature 'unicode_strings';
 --- v5.24
-use v5.XX;
+use VERSION;
 --- v5.36
-use v5.XX;
+use VERSION;
 use feature 'switch';
 ########## :5.26
 require v5.26;
@@ -131,9 +131,9 @@ use feature 'switch';
 use feature 'unicode_eval';
 use feature 'unicode_strings';
 --- v5.26
-use v5.XX;
+use VERSION;
 --- v5.36
-use v5.XX;
+use VERSION;
 use feature 'switch';
 ########## don't get medieval
 require v5.28;
@@ -150,9 +150,9 @@ use feature 'switch';
 use feature 'unicode_eval';
 use feature 'unicode_strings';
 --- v5.28
-use v5.XX;
+use VERSION;
 --- v5.36
-use v5.XX;
+use VERSION;
 use feature 'switch';
 ########## :5.30
 require v5.30;
@@ -170,12 +170,12 @@ use feature 'switch';
 use feature 'unicode_eval';
 use feature 'unicode_strings';
 --- v5.30
-use v5.XX;
+use VERSION;
 --- v5.36
-use v5.XX;
+use VERSION;
 use feature 'switch';
 --- v5.38
-use v5.XX;
+use VERSION;
 use feature 'bareword_filehandles';
 use feature 'switch';
 ########## what happened to perl 7
@@ -198,9 +198,9 @@ use feature 'unicode_strings';
 no feature 'indirect';
 no feature 'multidimensional';
 --- v5.36
-use v5.XX;
+use VERSION;
 --- v5.38
-use v5.XX;
+use VERSION;
 use feature 'bareword_filehandles';
 ########## :5.38
 require v5.38;
@@ -223,7 +223,7 @@ no feature 'indirect';
 no feature 'multidimensional';
 no feature 'bareword_filehandles';
 --- v5.38
-use v5.XX;
+use VERSION;
 ########## :5.40
 require v5.40;
 use strict;
@@ -246,4 +246,4 @@ no feature 'indirect';
 no feature 'multidimensional';
 no feature 'bareword_filehandles';
 --- v5.40
-use v5.XX;
+use VERSION;

@@ -1,5 +1,17 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002011 2024 December 7
+          - Closed potential security issue with deeply nested paramters in the DBIC
+            glue code.  This was a hack that could let someone create a child record
+            if you were allowing find_by_unique rather than find by primary key.
+
+0.002010 2024 December 7
+          - Resultset level error messages are smarter about making sure the message
+            knows the set is plural so that the message is properly grammatical.
+          - Improvements to the Date validator around time zone control and addition
+            helpers for when you want constraints that are greater than or equal to
+            or less than or equal to a date.
+
 0.002009 2024 December 5
           - Adding a blank record via _add in DBIC Validate no longer runs 
             validation on th eempty record

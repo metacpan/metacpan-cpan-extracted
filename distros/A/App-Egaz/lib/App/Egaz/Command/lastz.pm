@@ -12,7 +12,7 @@ sub abstract {
 
 sub opt_spec {
     return (
-        [ "outdir|o=s",   "Output directory",  { default => "." }, ],
+        [ "outdir|o=s",   "Output directory", { default => "." }, ],
         [ "tp",           "target sequences are partitioned", ],
         [ "qp",           "query sequences are partitioned", ],
         [ "paired",       "relationships between target and query are one-to-one", ],
@@ -44,15 +44,24 @@ sub description {
     $desc .= ucfirst(abstract) . ".\n";
     $desc .= <<'MARKDOWN';
 
-* <path/target> or <path/query> can be .fa files or directory containing multiple .fa files
-* Lastz will take the first sequence in target fasta files and all sequences in query fasta files.
-* For less confusions, each fasta files should contain only one sequence. Use `egaz prepseq` to do this.
-* Fasta file naming rules: "seqfile.fa" or "seqfile.fa[from,to]"
-* Lav file naming rules: "[target]vs[query].N.lav"
-* Predefined parameter sets and scoring matrix can be found in `share/`
 * `lastz` should be in $PATH
-* [`lastz` help](http://www.bx.psu.edu/~rsharris/lastz/README.lastz-1.04.00.html)
-* [`--isself`](http://www.bx.psu.edu/~rsharris/lastz/README.lastz-1.04.00.html#ex_self)
+
+* `path/target` or `path/query` can be .fa files or directory containing multiple .fa files
+
+* Lastz will take the first sequence in target fasta files and all sequences in query fasta files.
+
+* For less confusions, each fasta files should contain only one sequence. Use `egaz prepseq` to do
+  this.
+
+* Fasta file naming rules: "seqfile.fa" or "seqfile.fa[from,to]"
+
+* Lav file naming rules: "[target]vs[query].N.lav"
+
+* Predefined parameter sets and scoring matrix can be found in `share/`
+
+* [`lastz` help](http://www.bx.psu.edu/~rsharris/lastz/README.lastz-1.04.15.html)
+
+* [`--isself`](http://www.bx.psu.edu/~rsharris/lastz/README.lastz-1.04.15.html#ex_self)
 
 MARKDOWN
 
@@ -78,7 +87,7 @@ sub validate_args {
     if ( $opt->{set} ) {
         print STDERR "* Use parameter set $opt->{set}\n";
         my $yml_file = File::ShareDir::dist_file( 'App-Egaz', 'parameters.yml' );
-        my $yml = YAML::Syck::LoadFile($yml_file);
+        my $yml      = YAML::Syck::LoadFile($yml_file);
 
         if ( !exists $yml->{ $opt->{set} } ) {
             $self->usage_error("--set [$opt->{set}] doesn't exist.");
@@ -128,13 +137,13 @@ sub execute {
     if ( $opt->{tp} ) {
         @t_files = File::Find::Rule->file->name(qr{\.fa\[.+\]$})->in( $args->[0] );
     }
-    if (!scalar @t_files) {
+    if ( !scalar @t_files ) {
         @t_files = File::Find::Rule->file->name('*.fa')->in( $args->[0] );
     }
     if ( $opt->{qp} ) {
         @q_files = File::Find::Rule->file->name(qr{\.fa\[.+\]$})->in( $args->[1] );
     }
-    if (!scalar @q_files) {
+    if ( !scalar @q_files ) {
         @q_files = File::Find::Rule->file->name('*.fa')->in( $args->[1] );
     }
     printf STDERR "* T files: [%d]; Q files: [%d]\n", scalar @t_files, scalar @q_files;
@@ -144,7 +153,7 @@ sub execute {
     #----------------------------#
     {
         my $lz_opt;
-        for my $key (qw{O E Q C T M K L H Y Z }) {
+        for my $key (qw{O E Q C T M K L H Y Z}) {
             my $value = $opt->{ lc $key };
             if ( defined $value ) {
                 $lz_opt .= " $key=$value";
@@ -194,7 +203,7 @@ sub execute {
         my @jobs;
         if ( $opt->{paired} ) {    # use the most similar chr name
             for my $t_file ( sort @t_files ) {
-                my $t_base = Path::Tiny::path($t_file)->basename;
+                my $t_base   = Path::Tiny::path($t_file)->basename;
                 my ($q_file) = map { $_->[0] }
                     sort { $b->[1] <=> $a->[1] }
                     map { [ $_, similarity( Path::Tiny::path($_)->basename, $t_base ) ] } @q_files;

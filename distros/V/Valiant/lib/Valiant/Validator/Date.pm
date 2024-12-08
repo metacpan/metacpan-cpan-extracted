@@ -12,15 +12,32 @@ with 'Valiant::Validator::Each';
 
 has min => (is=>'ro', required=>0, predicate=>'has_min');
 has max => (is=>'ro', required=>0, predicate=>'has_max');
+has min_eq => (is=>'ro', required=>0, predicate=>'has_min_eq');
+has max_eq => (is=>'ro', required=>0, predicate=>'has_max_eq');
+
 has cb => (is=>'ro', required=>0, predicate=>'has_cb');
 
 has pattern => (is=>'ro', required=>1, default=>sub { $_pattern });
-has _strp => (is=>'ro', required=>1, lazy=>1, default=>sub { DateTime::Format::Strptime->new(pattern => shift->pattern) });
+
+has _strp => (
+  is=>'ro',
+  required=>1,
+  lazy=>1, 
+  default=>sub {
+    my $self = shift;
+    return DateTime::Format::Strptime->new(time_zone=>$self->tz, pattern => $self->pattern);
+  },
+);
 
 
 has below_min_msg => (is=>'ro', required=>1, default=>sub {_t 'below_min'});
+has below_min_eq_msg => (is=>'ro', required=>1, default=>sub {_t 'below_min_eq'});
 has above_max_msg => (is=>'ro', required=>1, default=>sub {_t 'above_max'});
+has above_max_eq_msg => (is=>'ro', required=>1, default=>sub {_t 'above_max_eq'});
+
 has invalid_date_msg => (is=>'ro', required=>1, default=>sub {_t 'invalid_date'});
+
+has tz => (is=>'ro', required=>1, default=>sub { 'UTC' });
 
 sub normalize_shortcut {
   my ($class, $arg) = @_;
@@ -60,6 +77,20 @@ sub validate_each {
       unless $dt < $max_dt_obj;
   }
 
+  if($self->has_min_eq) {
+    my $min = $self->_cb_value($record, $self->min_eq);
+    my $min_dt_obj = $self->parse_if_needed($min);
+    $record->errors->add($attribute, $self->below_min_eq_msg, +{%$opts, min=>$min_dt_obj->strftime($self->pattern)})
+      unless $dt >= $min_dt_obj;
+  }
+
+  if($self->has_max_eq) {
+    my $max = $self->_cb_value($record, $self->max_eq);
+    my $max_dt_obj = $self->parse_if_needed($max);
+    $record->errors->add($attribute, $self->above_max_eq_msg, +{%$opts, max=>$max_dt_obj->strftime($self->pattern)})
+      unless $dt <= $max_dt_obj;
+  }
+
   if($self->has_cb) {
     $self->cb->($record, $attribute, $dt, $self, $opts);
   }
@@ -73,7 +104,8 @@ sub to_pattern {
 sub parse_if_needed {
   my ($self, $value_proto) = @_;
   return $value_proto if blessed($value_proto) && $value_proto->isa('DateTime');
-  return $self->_strp->parse_datetime($value_proto);
+  my $dt = $self->_strp->parse_datetime($value_proto);
+  return $dt;
 }
 
 sub looks_like_a_date {
@@ -85,30 +117,38 @@ sub looks_like_a_date {
 sub is_future {
   my ($self, $value) = @_;
   my $dt = $self->parse_if_needed($value);
-  return $dt > DateTime->now;
+  return $dt > $self->_datetime->today;
 }
 
 sub is_past {
   my ($self, $value) = @_;
   my $dt = $self->parse_if_needed($value);
-  return $dt < DateTime->now;
+  return $dt < $self->_datetime->today;
 }
 
-sub now { DateTime->now }
+sub now { shift->_datetime->now }
+
+sub today { shift->_datetime->today }
 
 sub datetime {
   my($self, %args) = @_;
+  $args{time_zone} ||= $self->tz;
   return DateTime->new(%args);
+}
+
+sub _datetime {
+  my($self) = @_;
+  return 'DateTime';
 }
 
 sub years_ago {
   my($self, $years) = @_;
-  return DateTime->now->subtract(years => $years);
+  return $self->_datetime->now->subtract(years => $years);
 }
 
 sub years_from_now {
   my($self, $years) = @_;
-  return DateTime->now->add(years => $years);
+  return $self->_datetime->now->add(years => $years);
 }
 
 1;
@@ -157,9 +197,29 @@ standard form or a M<DateTime> object.
 If you are using the Form helpers the max and min attributes can be reflected into
 the date input type automatically.
 
+=head1 A NOTE ON TIMEZONES
+
+Please keep in mind that a lot of the shortcut helpers just call methods directly
+on L<DateTime> which means they are using the system timezone.  If you are working
+with dates that are stored in a database you should be aware that the timezone
+of the database and the timezone of the system running your code might not be the
+same.  This can lead to unexpected results.  I don't have a lot of test cases
+around this, please shout out your experiences if you run into issues.  You can use
+the C<tz> attribute (described below) to set the timezone of the L<DateTime> object
+we create locally if needed
+
 =head1 ATTRIBUTES
 
 This validator supports the following attributes:
+
+=head2 tz
+
+Default is 'UTC'.
+
+If you are working with dates that are stored in a database you should be aware
+that the timezone of the database and the timezone of the system running your code
+might not be the same.  This can lead to unexpected results.  You can use the C<tz>
+attribute to set the timezone of the L<DateTime> object we create locally if needed.
 
 =head2 pattern
 
@@ -179,6 +239,20 @@ Value may also be a coderef so that you can set dynamic dates (such as always to
 
 If provided set an upper limit on the allowed date.  Either a string in YYYY-MM-DD
 format or a L<DateTime> object.
+
+Value may also be a coderef so that you can set dynamic dates (such as always today)
+
+=head2 min_eq
+
+If provided set a bottom limit on the allowed date.  Either a string in YYYY-MM-DD
+format or a L<DateTime> object.  The date must be greater than or equal to this value.
+
+Value may also be a coderef so that you can set dynamic dates (such as always today)
+
+=head2 max_eq
+
+If provided set an upper limit on the allowed date.  Either a string in YYYY-MM-DD
+format or a L<DateTime> object.  The date must be less than or equal to this value.
 
 Value may also be a coderef so that you can set dynamic dates (such as always today)
 
@@ -219,6 +293,10 @@ so that you can take advantage of the type helpers (see below L<\HELPERS>).
 
 =head2 above_max_msg
 
+=head2 below_min_eq_msg
+
+=head2 above_max_eq_msg
+
 =head2 invalid_date_msg
 
 The error message / tag associated with the given validation failures.  Default messages
@@ -237,7 +315,22 @@ be passed to C<new>.
 
 =head2 now
 
-returns L<DateTime> now
+returns L<DateTime> now.
+
+Please note that C<now> returns a L<DateTime> object that is both the current
+date AND current time.  In the context of a date validator this might be less 
+useful especially for comparisons since a date come out of a storage like a
+DB will be at hour zero, where as C<now> will likely be after that.
+
+If you want just the current date you should use C<today>. In fact I'd say that
+C<today> is the more useful of the two in the context of a date validator.  I'm 
+leaving C<now> for back compatibility.
+
+=head2 today
+
+returns L<DateTime> today.   This is the current date at hour zero.  If you
+are writing constraints like 'must be in the past' or 'must be in the future'
+you probably want to use this method instead of C<now>.
 
 =head2 years_ago
 

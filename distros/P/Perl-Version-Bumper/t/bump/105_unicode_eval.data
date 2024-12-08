@@ -1,7 +1,7 @@
 ########## feature unicode_eval
 use feature 'unicode_eval';
 ---
-use v5.XX;
+use VERSION;
 use feature 'unicode_eval';
 --- v5.16
-use v5.XX;
+use VERSION;

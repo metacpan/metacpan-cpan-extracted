@@ -1,10 +1,10 @@
 ########## use feature 'class'
 use feature 'class';
 ---
-use v5.XX;
+use VERSION;
 use feature 'class';
 ########## use feature 'class'
 no feature 'class';
 ---
-use v5.XX;
+use VERSION;
 no feature 'class';

@@ -26,7 +26,7 @@ __PACKAGE__->belongs_to(
   { 'foreign.id' => 'self.role_id' }
 );
 
-__PACKAGE__->accept_nested_for('role', +{find_with_uniques=>1});
+__PACKAGE__->accept_nested_for('role', +{find_with_uniques=>'allow_create', allow_destroy=>1});
 __PACKAGE__->validates(role => presence=>1, with=>'unique_role');
 
 sub unique_role {

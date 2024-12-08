@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Element.pm
-## Version v0.2.3
+## Version v0.3.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/23
-## Modified 2023/10/31
+## Modified 2024/12/07
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,8 +17,15 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
+    use overload (
+        '=='  => sub { _obj_eq(@_) },
+        '!='  => sub { !_obj_eq(@_) },
+        'eq'  => sub { _obj_eq(@_) },
+        'ne'  => sub { !_obj_eq(@_) },
+        fallback => 1,
+    );
     use Text::Wrap ();
-    our $VERSION = 'v0.2.3';
+    our $VERSION = 'v0.3.0';
     use open ':std' => ':utf8';
 };
 
@@ -185,6 +192,13 @@ sub msgid_as_string
     return( $self->normalise( 'msgid', $self->{msgid} ) );
 }
 
+sub msgid_as_text
+{
+    my $self = shift( @_ );
+    my $msgid = $self->_is_array( $self->{msgid} ) ? join( '', @{$self->{msgid}} ) : $self->{msgid};
+    return( $msgid );
+}
+
 sub msgid_plural { return( shift->_set_get( 'msgid_plural', @_ ) ); }
 
 sub msgid_plural_as_string 
@@ -252,6 +266,13 @@ sub msgstr_as_string
     {
         return( $self->normalise( 'msgstr', $self->{msgstr} ) );
     }
+}
+
+sub msgstr_as_text
+{
+    my $self = shift( @_ );
+    my $msgstr = $self->_is_array( $self->{msgstr} ) ? join( '', @{$self->{msgstr}} ) : $self->{msgstr};
+    return( $msgstr );
 }
 
 sub normalise
@@ -387,6 +408,30 @@ sub _add
     return( $self );
 }
 
+sub _obj_eq
+{
+    no overloading;
+    my $self = shift( @_ );
+    my $other = shift( @_ );
+    my $msgid = $self->_is_array( $self->{msgid} ) ? join( '', @{$self->{msgid}} ) : $self->{msgid};
+    if( $self->_is_a( $other => 'Text::PO::Element' ) )
+    {
+        my $msgstr = $self->_is_array( $self->{msgstr} ) ? join( '', @{$self->{msgstr}} ) : $self->{msgstr};
+        my $other_msgid = $self->_is_array( $other->{msgid} ) ? join( '', @{$other->{msgid}} ) : $other->{msgid};
+        my $other_msgstr = $self->_is_array( $other->{msgstr} ) ? join( '', @{$other->{msgstr}} ) : $other->{msgstr};
+        return( ( ( $msgid // '' ) eq ( $other_msgid // '' ) && ( $msgstr // '' ) eq ( $other_msgstr // '' ) ) ? 1 : 0 );
+    }
+    # Comparing an undefined value would trigger a Perl warning
+    elsif( !defined( $other ) )
+    {
+        return( !defined( $msgid ) ? 1 : 0 );
+    }
+    else
+    {
+        return( ( $msgid // '' ) eq $other ? 1 : 0 );
+    }
+}
+
 sub _set_get
 {
     my $self = shift( @_ );
@@ -432,12 +477,12 @@ Text::PO::Element - PO Element
 
     use Text::PO::Element;
 	my $po = Text::PO::Element->new;
-	$po->debug( 2 );
+	$po->debug(2);
 	$po->dump;
 
 =head1 VERSION
 
-    v0.2.3
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -448,6 +493,40 @@ This is the class for PO elements.
 =head2 new
 
 Create a new Text::PO::Element object acting as an accessor.
+
+You can pass it an hash or hash reference of the following keys. For more information on those, see their corresponding method:
+
+=over 4
+
+=item * C<msgid>
+
+=item * C<msgstr>
+
+=item * C<msgid_plural>
+
+=item * C<auto_comment>
+
+=item * C<comment>
+
+=item * C<context>
+
+=item * C<encoding>
+
+=item * C<file>
+
+=item * C<flags>
+
+=item * C<is_meta>
+
+=item * C<line>
+
+=item * C<fuzzy>
+
+=item * C<plural>
+
+=item * C<po>
+
+=back
 
 =head2 ATTRIBUTES
 
@@ -636,6 +715,10 @@ Sets or gets the C<msgid> version for plural. This is typically a 2-elements arr
 
 This returns the msgid escaped and with surrounding quotes, suitable for L</dump>
 
+=head2 msgid_as_text
+
+This returns a simple text representation of the C<msgid>. It differs from L<msgid_as_string|/msgid_as_string> in that this is simply the string representation of the C<msgid>, but would not be suitable for a PO file.
+
 =head2 msgid_plural_as_string
 
 Returns the C<msgid> property as a string when it has plural implemented.
@@ -647,6 +730,10 @@ Set or return the msgstr as a value without surrounding quote and without escapi
 =head2 msgstr_as_string
 
 This returns the msgstr escaped and with surrounding quotes, suitable for L</dump>
+
+=head2 msgstr_as_text
+
+This returns a simple text representation of the C<msgstr>. It differs from L<msgstr_as_string|/msgstr_as_string> in that this is simply the string representation of the C<msgstr>, but would not be suitable for a PO file.
 
 =head2 normalise
 

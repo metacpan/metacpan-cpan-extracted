@@ -23,9 +23,9 @@ for my $D (3..N+2) { #first differences
 
 for my $D (3..N+2){ #second differences
     #solve b_{n+1}-2{b_n}+b_{n-1}=1 with kinda homogeneous BCs
-    my $c=ones($D)*(1+i()); $c->(,(-1)).=0;
+    my $c=ones($D)*(1+i()); $c->((-1)).=0;
     my $d=-2*ones($D)*(1+i());
-    my $e=ones($D)*(1+i()); $e->(,(-1)).=0;
+    my $e=ones($D)*(1+i()); $e->((-1)).=0;
     my $b=ones($D)*(1-i());
     my $info=pdl(short,0);
     cgtsv($c, $d, $e, $b, $info);

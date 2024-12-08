@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.7.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.7.2
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2024/09/05
+## Modified 2024/12/07
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -28,7 +28,7 @@ BEGIN
     use Scalar::Util;
     use Text::PO::Element;
     use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
-    our $VERSION = 'v0.7.1';
+    our $VERSION = 'v0.7.2';
 };
 
 use strict;
@@ -36,35 +36,35 @@ use warnings;
 
 struct 'Text::PO::Comment' => 
 {
-'text'  => '@',
+    'text'  => '@',
 };
 our @META = qw(
-Project-Id-Version
-Report-Msgid-Bugs-To
-POT-Creation-Date
-PO-Revision-Date
-Last-Translator
-Language-Team
-Language
-Plural-Forms
-MIME-Version
-Content-Type
-Content-Transfer-Encoding
+    Project-Id-Version
+    Report-Msgid-Bugs-To
+    POT-Creation-Date
+    PO-Revision-Date
+    Last-Translator
+    Language-Team
+    Language
+    Plural-Forms
+    MIME-Version
+    Content-Type
+    Content-Transfer-Encoding
 );
 our $DEF_META =
 {
-'Project-Id-Version'    => 'Project 0.1',
-'Report-Msgid-Bugs-To'  => 'bugs@example.com',
-# 2011-07-02 20:53+0900
-'POT-Creation-Date'     => DateTime->from_epoch( 'epoch' => time(), 'time_zone' => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) )->strftime( '%Y-%m-%d %H:%M%z' ),
-'PO-Revision-Date'      => DateTime->from_epoch( 'epoch' => time(), 'time_zone' => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) )->strftime( '%Y-%m-%d %H:%M%z' ),
-'Last-Translator'       => 'Unknown <hello@example.com>',
-'Language-Team'         => 'Unknown <hello@example.com>',
-'Language'              => '',
-'Plural-Forms'          => 'nplurals=1; plural=0;',
-'MIME-Version'          => '1.0',
-'Content-Type'          => 'text/plain; charset=utf-8',
-'Content-Transfer-Encoding' => '8bit',
+    'Project-Id-Version'    => 'Project 0.1',
+    'Report-Msgid-Bugs-To'  => 'bugs@example.com',
+    # 2011-07-02 20:53+0900
+    'POT-Creation-Date'     => DateTime->from_epoch( 'epoch' => time(), 'time_zone' => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) )->strftime( '%Y-%m-%d %H:%M%z' ),
+    'PO-Revision-Date'      => DateTime->from_epoch( 'epoch' => time(), 'time_zone' => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) )->strftime( '%Y-%m-%d %H:%M%z' ),
+    'Last-Translator'       => 'Unknown <hello@example.com>',
+    'Language-Team'         => 'Unknown <hello@example.com>',
+    'Language'              => '',
+    'Plural-Forms'          => 'nplurals=1; plural=0;',
+    'MIME-Version'          => '1.0',
+    'Content-Type'          => 'text/plain; charset=utf-8',
+    'Content-Transfer-Encoding' => '8bit',
 };
 
 sub init
@@ -97,7 +97,7 @@ sub add_element
     if( $self->_is_a( $_[0] => 'Text::PO::Element' ) )
     {
         $e = shift( @_ );
-        $id = $e->msgid;
+        $id = $e->msgid_as_text;
     }
     elsif( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' )
     {
@@ -122,9 +122,7 @@ sub add_element
     my $elem = $self->elements;
     foreach my $e2 ( @$elem )
     {
-        my $msgid = $e2->msgid;
-        my $thisId = ref( $msgid ) ? join( '', @$msgid ) : $msgid;
-        if( $thisId eq $id )
+        if( $e2->msgid_as_text eq $id )
         {
             # return( $self->error( "There already is an id '$id' in the po file" ) );
             return( $e2 );
@@ -159,10 +157,10 @@ sub as_json
     my $elem = $self->elements;
     foreach my $e ( @$elem )
     {
-        my $msgid = $e->msgid;
+        my $msgid  = $e->msgid_as_text;
         my $msgstr = $e->msgstr;
-        next if( $e->is_meta || !CORE::length( $e->msgid ) );
-        my $k = ref( $msgid ) ? join( '', @$msgid ) : $msgid;
+        next if( $e->is_meta || !CORE::length( $msgid // '' ) );
+        my $k = $msgid;
         # my $v = ref( $msgstr ) ? join( '', @$msgstr ) : $msgstr;
         my $v;
         if( $e->plural )
@@ -322,10 +320,11 @@ sub dump
     }
     foreach my $e ( @$elem )
     {
-        next if( $e->is_meta || !CORE::length( $e->msgid ) );
+        my $msgid  = $e->msgid;
+        next if( $e->is_meta || !CORE::length( $msgid ) || ( ref( $msgid // '' ) eq 'ARRAY' && !scalar( @$msgid ) ) );
         if( $e->po ne $self )
         {
-            warn( "This element '", $e->msgid, "' does not belong to us. Its po object is different than our current object.\n" ) if( $self->_is_warnings_enabled );
+            warn( "This element '", $e->msgid_as_text, "' does not belong to us. Its po object is different than our current object.\n" ) if( $self->_is_warnings_enabled );
         }
         $fh->print( $e->dump, "\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
         $fh->print( "\n" ) || return( $self->error( "Unable to print po data to file handle: $!" ) );
@@ -346,11 +345,11 @@ sub exists
     $opts->{msgid_only} //= 0;
     my $elems = $self->{elements};
     # No need to go further if the object provided does not even have a msgid
-    return(0) if( !length( $elem->msgid ) );
+    return(0) if( !length( $elem->msgid_as_text ) );
     foreach my $e ( @$elems )
     {
-        if( ( $opts->{msgid_only} && $e->msgid eq $elem->msgid ) ||
-            ( $e->msgid eq $elem->msgid && $e->msgstr eq $elem->msgstr ) )
+        if( ( $opts->{msgid_only} && $e->msgid_as_text eq $elem->msgid_as_text ) ||
+            ( $e->msgid_as_text eq $elem->msgid_as_text && $e->msgstr_as_text eq $elem->msgstr_as_text ) )
         {
             if( length( $elem->context ) )
             {
@@ -375,11 +374,9 @@ sub hash
     my $hash = {};
     foreach my $e ( @$elem )
     {
-        my $msgid = $e->msgid;
-        my $msgstr = $e->msgstr;
-        my $k = ref( $msgid ) ? join( '', @$msgid ) : $msgid;
-        my $v = ref( $msgstr ) ? join( '', @$msgstr ) : $msgstr;
-        $hash->{ $k } = $v;
+        my $msgid = $e->msgid_as_text;
+        my $msgstr = $e->msgstr_as_text;
+        $hash->{ $msgid } = $msgstr;
     }
     return( $self->new_hash( $hash ) );
 }
@@ -536,7 +533,6 @@ sub parse
         if( /^\#+[[:blank:]\h]*domain[[:blank:]]+\"([^\"]+)\"/ )
         {
             $self->domain( $1 );
-            $self->message_colour( 3, "Setting domain to <green>$1</>" );
         }
         else
         {
@@ -571,10 +567,10 @@ sub parse
             {
                 # Case where msgid and msgstr are separated by a blank line
                 if( scalar( @$elem ) > 1 &&
-                    !length( $e->msgid ) && 
-                    length( $e->msgstr ) &&
-                    length( $elem->[-1]->msgid ) &&
-                    !length( $elem->[-1]->msgstr ) )
+                    !length( $e->msgid_as_text ) && 
+                    length( $e->msgstr_as_text ) &&
+                    length( $elem->[-1]->msgid_as_text ) &&
+                    !length( $elem->[-1]->msgstr_as_text ) )
                 {
                     $elem->[-1]->merge( $e );
                 }
@@ -740,7 +736,12 @@ sub parse
     $io->close unless( $fh_was_open );
     if( scalar( @$elem ) )
     {
-        push( @$elem, $e ) if( $elem->[-1] ne $e && CORE::length( $e->msgid ) && ++$seen->{ $e->msgid } < 2 );
+        if( $elem->[-1] ne $e && 
+            CORE::length( $e->msgid_as_text ) && 
+            ++$seen->{ $e->msgid_as_text } < 2 )
+        {
+            push( @$elem, $e );
+        }
         shift( @$elem ) if( $elem->[0]->is_meta );
     }
     return( $self );
@@ -1092,6 +1093,7 @@ sub sync_fh
         {
             my $removedObj = splice( @$elems, $i, 1 );
             push( @removed, $removedObj ) if( $removedObj );
+            $i--;
         }
     }
     # Now check each one of ours against this parsed file and add our items if missing
@@ -1335,12 +1337,23 @@ Text::PO - Read and write PO files
     $po->elements->foreach(sub
     {
         my $e = shift( @_ ); # $_ is also available
-        if( $e->msgid eq $other->msgid )
+        if( $e->msgid_as_text eq $other->msgid_as_text )
         {
             # do something
         }
     });
-    
+
+Or, maybe using the object overloading directly:
+
+    $po->elements->foreach(sub
+    {
+        my $e = shift( @_ ); # $_ is also available
+        if( $e eq $other )
+        {
+            # do something
+        }
+    });
+
     # Write in a PO format to STDOUT
     $po->dump;
     # or to a file handle
@@ -1354,7 +1367,7 @@ Text::PO - Read and write PO files
 
 =head1 VERSION
 
-    v0.7.1
+    v0.7.2
 
 =head1 DESCRIPTION
 

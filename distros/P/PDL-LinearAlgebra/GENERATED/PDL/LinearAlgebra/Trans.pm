@@ -31,7 +31,6 @@ use DynaLoader;
 
 #line 30 "trans.pd"
 
-use PDL::Func;
 use PDL::Core;
 use PDL::Slices;
 use PDL::Ops qw//;
@@ -63,7 +62,7 @@ acsc, csch, acsch. Beware, importing this module will overwrite the hidden
 PDL routine sec. If you need to call it specify its origin module : PDL::Basic::sec(args)
 
 =cut
-#line 67 "Trans.pm"
+#line 66 "Trans.pm"
 
 
 =head1 FUNCTIONS
@@ -157,7 +156,7 @@ sub PDL::cgeexp {
   goto &PDL::__Ncgeexp;
 }
 *cgeexp = \&PDL::cgeexp;
-#line 161 "Trans.pm"
+#line 160 "Trans.pm"
 
 *__Nctrsqrt = \&PDL::__Nctrsqrt;
 
@@ -187,7 +186,7 @@ sub PDL::ctrsqrt {
   goto &PDL::__Nctrsqrt;
 }
 *ctrsqrt = \&PDL::ctrsqrt;
-#line 191 "Trans.pm"
+#line 190 "Trans.pm"
 
 *__Nctrfun = \&PDL::__Nctrfun;
 
@@ -215,7 +214,7 @@ sub PDL::ctrfun {
 }
 *ctrfun = \&PDL::ctrfun;
 
-#line 804 "trans.pd"
+#line 803 "trans.pd"
 my $pi;
 BEGIN { $pi = pdl(3.1415926535897932384626433832795029) }
 sub pi () { $pi->copy };
@@ -1200,7 +1199,7 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 1204 "Trans.pm"
+#line 1203 "Trans.pm"
 
 # Exit with OK status
 

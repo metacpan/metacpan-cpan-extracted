@@ -2,19 +2,19 @@
 use feature 'say';
 say "Hello, world!";
 --- v5.10
-use v5.XX;
+use VERSION;
 say "Hello, world!";
 ########## feature say replaces Perl6::Say
 use Perl6::Say;
 say "Hello, world!";
 --- v5.10
-use v5.XX;
+use VERSION;
 say "Hello, world!";
 ########## feature say replaces Say::Compat
 use Say::Compat;
 say "Hello, world!";
 --- v5.10
-use v5.XX;
+use VERSION;
 say "Hello, world!";
 ########## correctly handle `no Say::Compat`
 use Say::Compat;
@@ -22,6 +22,6 @@ say "Hello, world!";
 # no-op
 no Say::Compat;
 --- v5.10
-use v5.XX;
+use VERSION;
 say "Hello, world!";
 # no-op

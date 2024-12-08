@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.596';
+our $VERSION = '0.597';
 
 use 5.020;
 use Moo;
@@ -215,7 +215,7 @@ sub _eval_keyword_recursiveAnchor ($class, $data, $schema, $state) {
   return 1;
 }
 
-sub _traverse_keyword_dynamicAnchor { goto \&_traverse_keyword_anchor }
+*_traverse_keyword_dynamicAnchor = \&_traverse_keyword_anchor;
 
 # we already indexed the $dynamicAnchor uri, so there is nothing more to do at evaluation time.
 # we explicitly do NOT set $state->{initial_schema_uri}.
@@ -231,7 +231,7 @@ sub _eval_keyword_ref ($class, $data, $schema, $state) {
   $class->eval_subschema_at_uri($data, $schema, $state, $uri);
 }
 
-sub _traverse_keyword_recursiveRef { goto \&_traverse_keyword_ref }
+*_traverse_keyword_recursiveRef = \&_traverse_keyword_ref;
 
 sub _eval_keyword_recursiveRef ($class, $data, $schema, $state) {
   my $uri = Mojo::URL->new($schema->{'$recursiveRef'})->to_abs($state->{initial_schema_uri});
@@ -250,7 +250,7 @@ sub _eval_keyword_recursiveRef ($class, $data, $schema, $state) {
   return $class->eval_subschema_at_uri($data, $schema, $state, $uri);
 }
 
-sub _traverse_keyword_dynamicRef { goto \&_traverse_keyword_ref }
+*_traverse_keyword_dynamicRef = \&_traverse_keyword_ref;
 
 sub _eval_keyword_dynamicRef ($class, $data, $schema, $state) {
   my $uri = Mojo::URL->new($schema->{'$dynamicRef'})->to_abs($state->{initial_schema_uri});
@@ -342,7 +342,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.596
+version 0.597
 
 =head1 DESCRIPTION
 

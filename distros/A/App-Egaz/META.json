@@ -1,10 +1,10 @@
 {
-   "abstract" : "Backend of B<E>asy B<G>enome B<A>ligner",
+   "abstract" : "B<E>asy B<G>enome B<A>ligner",
    "author" : [
       "Qiang Wang <wang-q@outlook.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.9",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,6 @@
             "Number::Format" : "1.75",
             "Path::Tiny" : "0.076",
             "Set::Scalar" : "1.29",
-            "Statistics::R" : "0.34",
             "String::Similarity" : "1.04",
             "Template" : "2.26",
             "Tie::IxHash" : "1.23",
@@ -75,7 +74,7 @@
    "provides" : {
       "App::Egaz" : {
          "file" : "lib/App/Egaz.pm",
-         "version" : "v0.2.5"
+         "version" : "v0.2.9"
       },
       "App::Egaz::Command::blastlink" : {
          "file" : "lib/App/Egaz/Command/blastlink.pm"
@@ -107,9 +106,6 @@
       "App::Egaz::Command::lpcnam" : {
          "file" : "lib/App/Egaz/Command/lpcnam.pm"
       },
-      "App::Egaz::Command::masked" : {
-         "file" : "lib/App/Egaz/Command/masked.pm"
-      },
       "App::Egaz::Command::maskfasta" : {
          "file" : "lib/App/Egaz/Command/maskfasta.pm"
       },
@@ -121,9 +117,6 @@
       },
       "App::Egaz::Command::partition" : {
          "file" : "lib/App/Egaz/Command/partition.pm"
-      },
-      "App::Egaz::Command::plottree" : {
-         "file" : "lib/App/Egaz/Command/plottree.pm"
       },
       "App::Egaz::Command::prepseq" : {
          "file" : "lib/App/Egaz/Command/prepseq.pm"
@@ -148,15 +141,16 @@
       },
       "homepage" : "https://github.com/wang-q/App-Egaz",
       "repository" : {
-         "url" : "git://github.com/wang-q/App-Egaz.git",
+         "type" : "git",
+         "url" : "https://github.com/wang-q/App-Egaz.git",
          "web" : "https://github.com/wang-q/App-Egaz"
       }
    },
-   "version" : "0.2.5",
+   "version" : "0.2.9",
    "x_authority" : "cpan:WANGQ",
    "x_contributors" : [
       "Qiang Wang <wang-q@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

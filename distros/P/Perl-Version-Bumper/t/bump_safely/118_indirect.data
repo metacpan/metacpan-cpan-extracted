@@ -2,7 +2,7 @@
 { package Foo }
 my $o = new Foo;
 ---
-use v5.XX;
+use VERSION;
 { package Foo }
 my $o = new Foo;
 --- v5.36

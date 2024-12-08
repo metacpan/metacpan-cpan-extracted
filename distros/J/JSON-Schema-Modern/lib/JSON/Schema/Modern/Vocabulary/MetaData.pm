@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::MetaData;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Meta-Data vocabulary
 
-our $VERSION = '0.596';
+our $VERSION = '0.597';
 
 use 5.020;
 use Moo;
@@ -46,35 +46,33 @@ sub _eval_keyword_title ($class, $data, $schema, $state) {
   annotate_self($state, $schema);
 }
 
-sub _traverse_keyword_description { goto \&_traverse_keyword_title }
+*_traverse_keyword_description = \&_traverse_keyword_title;
 
-sub _eval_keyword_description { goto \&_eval_keyword_title }
+*_eval_keyword_description = \&_eval_keyword_title;
 
 sub _traverse_keyword_default { 1 }
 
-sub _eval_keyword_default { goto \&_eval_keyword_title }
+*_eval_keyword_default = \&_eval_keyword_title;
 
 sub _traverse_keyword_deprecated ($class, $schema, $state) {
-  return if not assert_keyword_type($state, $schema, 'boolean');
-  return 1;
+  return assert_keyword_type($state, $schema, 'boolean');
 }
 
-sub _eval_keyword_deprecated { goto \&_eval_keyword_title }
+*_eval_keyword_deprecated = \&_eval_keyword_title;
 
-sub _traverse_keyword_readOnly { goto \&_traverse_keyword_deprecated }
+*_traverse_keyword_readOnly = \&_traverse_keyword_deprecated;
 
-sub _eval_keyword_readOnly { goto \&_eval_keyword_title }
+*_eval_keyword_readOnly = \&_eval_keyword_title;
 
-sub _traverse_keyword_writeOnly { goto \&_traverse_keyword_deprecated }
+*_traverse_keyword_writeOnly = \&_traverse_keyword_deprecated;
 
-sub _eval_keyword_writeOnly { goto \&_eval_keyword_title }
+*_eval_keyword_writeOnly = \&_eval_keyword_title;
 
 sub _traverse_keyword_examples ($class, $schema, $state) {
-  return if not assert_keyword_type($state, $schema, 'array');
-  return 1;
+  return assert_keyword_type($state, $schema, 'array');
 }
 
-sub _eval_keyword_examples { goto \&_eval_keyword_title }
+*_eval_keyword_examples = \&_eval_keyword_title;
 
 1;
 
@@ -90,7 +88,7 @@ JSON::Schema::Modern::Vocabulary::MetaData - Implementation of the JSON Schema M
 
 =head1 VERSION
 
-version 0.596
+version 0.597
 
 =head1 DESCRIPTION
 

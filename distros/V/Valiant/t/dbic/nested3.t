@@ -56,13 +56,52 @@ ok !exists $new_meeting->{related_resultsets}{attendees};
 
 ok $new_meeting->valid;
 
-# RThis is not a bug its due to DBIC clearing the cache after insert
-# #$new_meeting->transcript('Hey hey hey');
-#$new_meeting->update;
+{
 
-#ok $new_meeting->valid;
+  # Find it like as in a web session
+  ok my $person_for_meeting = Schema->resultset('Person')->find($person->id);
+  ok my $meetings_nested_attendees = $person_for_meeting->meetings->search({},{prefetch=>'attendees'});
+  ok my $new_meeting = $meetings_nested_attendees->new_result(+{});
 
-#use Devel::Dwarn;
-#Dwarn $new_meeting->errors->to_hash(full_messages=>1);
+  ok $new_meeting->set_columns_recursively({
+      title=>'first meeting',
+      purpose=>'test this',
+      attendees=>[
+        {
+          role => 'o',
+          background => 'back1',
+          desired_outcome => 'misery',
+          personality => 'hateful',
+          motivation => 'much',
+        },
+        {
+          role => 't',
+          background => 'back2',
+          desired_outcome => 'happy',
+          personality => 'lawful evil',
+          motivation => 'slacker',
+        },
+      ],
+    });
+
+  $new_meeting->insert_or_update;
+
+  # This test is mostly about checking the pluralization of the error message
+  # for attendees.
+  is_deeply +{$new_meeting->errors->to_hash(full_messages=>1)}, {
+    "attendees[0].role"
+    => [
+      "Attendees Role is too short (minimum is 2 characters)",
+    ],
+    "attendees"
+    => [
+      "Attendees Are Invalid",
+    ],
+    "attendees[1].role"
+    => [
+      "Attendees Role is too short (minimum is 2 characters)",
+    ],
+  };
+}
 
 done_testing;

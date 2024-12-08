@@ -86,6 +86,11 @@ sub _lookup_translation_by_count {
   $translated = $translated->{other} if $count > 1 and exists $translated->{other};
   $translated = $translated->{many} if $count > 1 and ref($translated) and exists $translated->{many}; 
 
+  # if we got here check for a _default
+  if(ref($translated)) {
+    $translated = $translated->{_default} if exists $translated->{_default};
+  }
+
   throw_exception('MissingCountKey', tag=>$original, count=>$count) if ref $translated;
 
   # Ok, need to do any variable subsitutions again. Just stole this from
@@ -124,6 +129,15 @@ sub translate {
   $translated = $self->_lookup_translation_by_count($count, $key, $translated, %args)
     if ref($translated) && defined($count);
 
+  # If we still have a hashref, check for a default
+  if(ref($translated)) {
+    $translated = $translated->{_default} if exists $translated->{_default};
+  }
+
+  # If we still have a hashref that means we failed to figure out which of
+  # the options to use so throw an error
+  throw_exception('MissingCountKey', tag=>$key, count=>$count) if ref $translated;
+
   # Is this a bug in Data::Localize?  Seems like ->localize just returns
   # the $key if it fails to actually localize.  I would think it should
   # return undef;
@@ -157,6 +171,13 @@ sub translate {
     my $translated = $self->dl->localize($tag, \%args);
     $translated = $self->_lookup_translation_by_count($count, $tag, $translated, %args)
       if ref($translated) and defined($count);
+
+    # If we still have a hashref, check for a default
+    $translated = $translated->{_default} if ref($translated);
+
+    # If we still have a hashref that means we failed to figure out which of
+    # the options to use so throw an error
+    throw_exception('MissingCountKey', tag=>$key, count=>$count) if ref $translated;
 
     debug 2, "Proposed translation: '$translated'";
     unless($translated eq $tag) {

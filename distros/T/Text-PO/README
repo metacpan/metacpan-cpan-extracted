@@ -17,12 +17,23 @@ SYNOPSIS
         $po->elements->foreach(sub
         {
             my $e = shift( @_ ); # $_ is also available
-            if( $e->msgid eq $other->msgid )
+            if( $e->msgid_as_text eq $other->msgid_as_text )
             {
                 # do something
             }
         });
-    
+
+    Or, maybe using the object overloading directly:
+
+        $po->elements->foreach(sub
+        {
+            my $e = shift( @_ ); # $_ is also available
+            if( $e eq $other )
+            {
+                # do something
+            }
+        });
+
         # Write in a PO format to STDOUT
         $po->dump;
         # or to a file handle
@@ -35,7 +46,7 @@ SYNOPSIS
         $po->merge( $file_handle );
 
 VERSION
-        v0.5.0
+        v0.7.2
 
 DESCRIPTION
     This module parse GNU PO (portable object) and POT (portable object

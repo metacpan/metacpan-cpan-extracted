@@ -1,7 +1,7 @@
 ########## feature lexical_subs
 use feature qw( say lexical_subs );
 ---
-use v5.XX;
+use VERSION;
 use feature 'lexical_subs';
 --- v5.26
-use v5.XX;
+use VERSION;

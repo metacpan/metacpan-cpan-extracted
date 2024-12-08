@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Define and roll musical dice
 
-our $VERSION = '0.0105';
+our $VERSION = '0.0200';
 
 use Moo;
 use strictures 2;
@@ -46,7 +46,17 @@ has beats => (
 );
 
 
-has pool => (
+has phrase_pool => (
+    is => 'rw',
+);
+
+
+has phrase_weights => (
+    is => 'rw',
+);
+
+
+has phrase_groups => (
     is => 'rw',
 );
 
@@ -147,7 +157,7 @@ has chord_qualities_minor => (
         [qw(
             madd4
             m6
-            mM7 m7
+            m7
         )],
     },
 );
@@ -307,28 +317,16 @@ has rhythmic_phrase_constraints => (
 );
 
 
-has mdp => (
-    is => 'lazy',
-);
-
-sub _build_mdp {
-    my ($self) = @_;
-    my $mdp = Music::Duration::Partition->new(
-        size => $self->beats,
-        pool => $self->pool,
-    );
-    return $mdp;
-}
-
-
 sub BUILD {
     my ($self, $args) = @_;
-    if (exists $args->{pool} && !ref $args->{pool} && $args->{pool} eq 'all') {
-        $self->pool([ sort keys %{ midi_dump('length') } ]);
+    if (exists $args->{phrase_pool} && !ref $args->{phrase_pool} && $args->{phrase_pool} eq 'all') {
+        $self->phrase_pool([ sort keys %{ midi_dump('length') } ]);
     }
     else {
-        $self->pool([qw(wn dhn hn dqn qn den en)]);
+        $self->phrase_pool([qw(wn dhn hn dqn qn den en)]);
     }
+    $self->phrase_weights([ (1) x @{ $self->phrase_pool } ]);
+    $self->phrase_groups([ (1) x @{ $self->phrase_pool } ]);
 }
 
 
@@ -616,7 +614,7 @@ sub tonnetz_7 {
 sub rhythmic_value {
     my ($self) = @_;
     my $d = sub {
-        return choose_weighted($self->pool, [ (1) x @{ $self->pool } ])
+        return choose_weighted($self->phrase_pool, [ (1) x @{ $self->phrase_weights } ])
     };
     return Games::Dice::Advanced->new($d);
 }
@@ -624,8 +622,14 @@ sub rhythmic_value {
 
 sub rhythmic_phrase {
     my ($self) = @_;
+    my $mdp = Music::Duration::Partition->new(
+        size    => $self->beats,
+        pool    => $self->phrase_pool,
+        weights => $self->phrase_weights,
+        groups  => $self->phrase_groups ,
+    );
     my $d = sub {
-        return $self->mdp->motif;
+        return $mdp->motif;
     };
     return Games::Dice::Advanced->new($d);
 }
@@ -633,10 +637,16 @@ sub rhythmic_phrase {
 
 sub rhythmic_phrase_constrained {
     my ($self) = @_;
+    my $mdp = Music::Duration::Partition->new(
+        size    => $self->beats,
+        pool    => $self->phrase_pool,
+        weights => $self->phrase_weights,
+        groups  => $self->phrase_groups ,
+    );
     my $d = sub {
         my $motif;
         while (!$motif || !grep { $_ == @$motif } @{ $self->rhythmic_phrase_constraints }) {
-            $motif = $self->mdp->motif;
+            $motif = $mdp->motif;
         }
         return $motif;
     };
@@ -670,7 +680,7 @@ Music::Dice - Define and roll musical dice
 
 =head1 VERSION
 
-version 0.0105
+version 0.0200
 
 =head1 SYNOPSIS
 
@@ -753,9 +763,10 @@ The number of quarter-note beats in a rhythmic phrase.
 
 Default: C<4> (standard measure)
 
-=head2 pool
+=head2 phrase_pool
 
-  $pool = $d->pool;
+  $pool = $d->phrase_pool;
+  $d->phrase_pool(\@pool);
 
 The pool of durations in a rhythmic phrase.
 
@@ -763,6 +774,24 @@ Default: C<[wn dhn hn dqn qn den en]>
 
 The keyword C<all> may also be given, which will use the keys of the
 C<MIDI::Simple::Length> hash (all the known MIDI-Perl durations).
+
+=head2 phrase_weights
+
+  $phrase_weights = $d->phrase_weights;
+  $d->phrase_weights(\@weights);
+
+The weights of the duration pool, in a rhythmic phrase.
+
+Default: C<1> for each B<phrase_pool> member (equal probability)
+
+=head2 phrase_groups
+
+  $phrase_groups = $d->phrase_groups;
+  $d->phrase_groups(\@groups);
+
+The groups of the duration pool, in a rhythmic phrase.
+
+Default: C<1> for each B<phrase_pool> member (equal probability)
 
 =head2 octaves
 
@@ -873,7 +902,7 @@ Default:
 
   madd4
   m6
-  mM7 m7
+  m7
 
 =head2 chord_qualities_minor_7
 
@@ -1045,12 +1074,6 @@ The number of rhythmic values in a phrase, given as an array reference.
 
 Default: C<[3,4,5]>
 
-=head2 mdp
-
-  $mdp = $d->mdp;
-
-The L<Music::Duration::Partition> object.
-
 =head1 METHODS
 
 =head2 new
@@ -1061,7 +1084,9 @@ The L<Music::Duration::Partition> object.
     scale_name                  => $name,
     flats                       => $bool,
     beats                       => $beats,
-    pool                        => \@pool, # or 'all'
+    phrase_pool                 => \@pool, # or 'all'
+    phrase_weights              => \@weights,
+    phrase_groups               => \@groups,
     notes                       => \@notes,
     intervals                   => \@intervals,
     chord_triads                => \@triads,
@@ -1306,6 +1331,8 @@ L<Moo>
 L<Music::Duration::Partition>
 
 L<Music::Scales>
+
+L<usic::ToRoman>
 
 L<Types::Standard>
 

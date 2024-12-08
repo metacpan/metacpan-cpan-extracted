@@ -95540,3 +95540,17 @@ S/SR/SRI/Mojolicious-Plugin-AssetPack-2.15.tar.gz
 R/RR/RRWO/Object-Signature-Portable-v1.2.0.tar.gz
 J/JV/JV/SVGPDF-0.090.tar.gz
 C/CO/CONTRA/Test-Smoke-1.83.tar.gz
+W/WA/WANGQ/App-Egaz-0.2.9.tar.gz
+B/BR/BRIANDFOY/Business-ISBN-Data-20241206.001.tar.gz
+J/JA/JANESKIL/Tools/Daje-Tools-Datasections-0.08.tar.gz
+J/JA/JANESKIL/Tools/Daje-Tools-Filechanged-0.01.tar.gz
+J/JJ/JJNAPIORK/Valiant-0.002011.tar.gz
+P/PL/PLICEASE/JSON-LD-0.01.tar.gz
+E/ET/ETHER/JSON-Schema-Modern-0.597.tar.gz
+K/KF/KFLY/kura-0.05.tar.gz
+G/GE/GENE/Music-Dice-0.0200.tar.gz
+E/ET/ETJ/PDL-LinearAlgebra-0.42.tar.gz
+B/BO/BOOK/Perl-Version-Bumper-0.162.tar.gz
+Y/YT/YTURTLE/Poz-0.01.tar.gz
+P/PE/PERLANCAR/SortKey-Num-file_num_links-0.001.tar.gz
+J/JD/JDEGUEST/Text-PO-v0.7.2.tar.gz

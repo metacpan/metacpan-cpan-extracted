@@ -69,7 +69,7 @@
          "web" : "https://github.com/ology/Music-Dice"
       }
    },
-   "version" : "0.0105",
+   "version" : "0.0200",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

@@ -4,40 +4,40 @@ basic tests
 # is this a Perl program?
 ---
 # is this a Perl program?
-use v5.XX;
+use VERSION;
 ########## this is the end
 __END__
 ---
-use v5.XX;
+use VERSION;
 __END__
 ########## keep possibly meaningful comments
 use v5.10; ## no critic
 ---
-use v5.XX;
+use VERSION;
 ## no critic
 ########## no version
 ...;
 { use strict; ... }
 ---
-use v5.XX;
+use VERSION;
 ...;
 { use strict; ... }
 ########## recent version
 use v5.28;
 --- v5.28
-use v5.XX;
+use VERSION;
 ########## numeric version
 use 5.028;
 ---
 use 5.028;
 --- v5.28
-use v5.XX;
+use VERSION;
 ########## move version to the top
 ...;
 use v5.10;
 no strict 'refs';
 ---
-use v5.XX;
+use VERSION;
 ...;
 no strict 'refs';
 ########## reorder no strict
@@ -45,7 +45,7 @@ no strict 'refs';
 no strict 'refs';
 use v5.10;
 ---
-use v5.XX;
+use VERSION;
 ...;
 no strict 'refs';
 ########## move version after package
@@ -53,24 +53,24 @@ use v5.10;
 package Foo;
 ---
 package Foo;
-use v5.XX;
+use VERSION;
 ########## version remain after package
 package Foo;
 use v5.10;
 ---
 package Foo;
-use v5.XX;
+use VERSION;
 ########## move to the top if package is not first
 use utf8;
 package Bar;
 use strict;
 ---
-use v5.XX;
+use VERSION;
 use utf8;
 package Bar;
 use strict;
 --- v5.12
-use v5.XX;
+use VERSION;
 use utf8;
 package Bar;
 ########## move version after comments
@@ -79,7 +79,7 @@ package Bar;
 use v5.10;
 ---
 #!/usr/bin/env perl
-use v5.XX;
+use VERSION;
 ...;
 ########## a version with comments
 #!/usr/bin/env perl
@@ -89,7 +89,7 @@ use v5.XX;
 ...;
 ---
 #!/usr/bin/env perl
-use v5.XX;
+use VERSION;
 ...;
 # some comment about use version
 # more stuff
@@ -100,7 +100,7 @@ use v5.XX;
     no warnings;
 }
 ---
-use v5.XX;
+use VERSION;
 {
     no warnings;
 }
@@ -110,7 +110,7 @@ BEGIN {
     no warnings;
 }
 ---
-use v5.XX;
+use VERSION;
 BEGIN {
     no warnings;
 }
@@ -118,25 +118,25 @@ BEGIN {
 use Foo;
 use 5.010; use strict; use warnings; # comment
 ---
-use v5.XX;
+use VERSION;
 use Foo;
 use strict; use warnings; # comment
 --- v5.12
-use v5.XX;
+use VERSION;
 use Foo;
 use warnings; # comment
 --- v5.36
-use v5.XX;
+use VERSION;
 use Foo;
 # comment
 ########## no warning before v line
 no warnings 'once';
 use v5.10;
 ---
-use v5.XX;
+use VERSION;
 no warnings 'once';
 ########## no warning before v5.36 line
 no warnings 'once';
 use v5.36;
 --- v5.36 use v5.36 re-enables all warnings
-use v5.XX;
+use VERSION;

@@ -1,7 +1,7 @@
 ########## no strict
 $one = 1;
 ---
-use v5.XX;
+use VERSION;
 $one = 1;
 --- v5.12
 use v5.10;

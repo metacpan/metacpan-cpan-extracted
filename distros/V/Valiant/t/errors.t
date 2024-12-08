@@ -19,7 +19,7 @@ use Test::Most;
   sub validate {
     my $self = shift;
     $self->errors->add('test01', _t('testerror'), +{message=>'another test error1'});
-    $self->errors->add('test01', _t('invalid') );
+    $self->errors->add('test01', _t('invalid'));
     $self->errors->add('test02', 'test error');
     $self->errors->add(undef, 'test model error');
   }

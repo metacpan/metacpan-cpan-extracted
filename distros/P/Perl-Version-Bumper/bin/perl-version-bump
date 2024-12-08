@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+use v5.10;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Perl::Version::Bumper;
+
+my %option = (
+    safe    => !!1,    # default to safely bump
+    version => $],     # to the version of the running perl
+);
+
+GetOptions(
+    \%option,
+    'version=s',                    # the version to bump to
+    'min_version|min-version=s',    # the lowest version to stop at
+    'env|environment=s@',           # environment variables to set
+    'safe!',                        # check the bumped code compiles
+    'help',                         # short help
+    'manual',                       # full manual
+) or pod2usage(2);
+
+pod2usage(1)                              if $option{help};
+pod2usage( -exitval => 0, -verbose => 2 ) if $option{manual};
+
+warn "--env options are useless without the --safe option!\n"
+  if $option{env} && !$option{safe};
+
+my %env;
+for my $env ( @{ $option{env} } ) {
+    my ( $key, $value ) = split /=/, $env;
+    $env{$key} = $value // $ENV{$key};    # pass-through existing env vars
+}
+
+my %args;
+$args{version_limit} = $option{min_version} if exists $option{min_version};
+$args{env}           = \%env                if %env;
+
+my $perv = Perl::Version::Bumper->new( version => $option{version} );
+
+# files on the command-line
+if (@ARGV) {
+    for my $file (@ARGV) {
+        if ( $option{safe} ) { $perv->bump_file_safely( $file, \%args ); }
+        else                 { $perv->bump_file($file); }
+    }
+}
+
+# behave as a filter
+else {
+    my $code = do { local $/; <> };    # slurp STDIN
+    if   ( $option{safe} ) { print $perv->bump_safely( $code, \%args ); }
+    else                   { print $perv->bump($code); }
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+perl-version-bump - Bump the declared Perl version of some Perl code
+
+=head1 SYNOPSIS
+
+  perl-version-bump [options] <file> ...
+
+=head1 OPTIONS
+
+  --version <version>      Update to a specific Perl version
+
+  --min-version <version>  When going down the version trying to find one
+                           that compiles, stop at the given version
+
+  --no-safe                Skip trying to compile the bumped code,
+                           and just bump the version
+
+  --env VAR=VALUE          Set the given environment variable to the
+                           given value, and pass it to the compilation
+                           setup
+
+  --env VAR                Pass-through the given environment variable
+                           to the compilation setup
+
+  --help                   Show the option summary and exit
+
+  --manual                 Show the full documentation
+
+=head1 DESCRIPTION
+
+B<perl-version-bump> updates the Perl version declaration in the given
+files to the requested one.
+
+The Perl language version the code expects to run against is declared
+with C<use VERSION> in the code itself.
+
+By default, B<perl-version-bump> updates the source code and then tries to
+compile it. If compilation fails, it tries again with an earlier version,
+all the way back to the currently declared version in the file, the value
+of the I<--min-version> option, or C<v5.10>, whichever is the more recent.
+
+The environment in which the files are compiled can be setup using
+one or more I<--env> options.
+
+=cut

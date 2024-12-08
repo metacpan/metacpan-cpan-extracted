@@ -13,6 +13,10 @@ For help with App::Egaz, run "egaz help"
 
 __END__
 
+minil install --notest && minil clean -y
+
+FAKE_RELEASE=1 minil release
+
 perl -I lib/ script/egaz help
 
 lastz t/pseudocat.fa t/pseudopig.fa > t/default.lav
@@ -32,10 +36,6 @@ perl -I lib/ t/06-formats.t
 
 perl -I lib/ t/07-maskfasta.t
 
-perl -I lib/ script/egaz masked <(echo -e ">1\nNNNN\n")
-perl -I lib/ script/egaz masked <(echo -e ">1\nAAAA\n")
-perl -I lib/ t/08-masked.t
-
 perl -I lib/ script/egaz partition
 perl -I lib/ t/09-partition.t
 
@@ -53,9 +53,6 @@ perl -I lib/ t/10-normalize.t
 perl -I lib/ script/egaz raxml t/YDL184C.fas --verbose
 perl -I lib/ script/egaz raxml t/YDL184C.fas --seed 999 --tmp . --outgroup Spar -o t/YDL184C.nwk
 perl -I lib/ t/11-raxml.t
-
-perl -I lib/ script/egaz plottree t/YDL184C.nwk
-perl -I lib/ t/12-plottree.t
 
 perl -I lib/ script/egaz blastn t/pig2.fa t/pseudopig.fa --verbose -o t/pig2.blast
 perl -I lib/ t/13-blastn.t

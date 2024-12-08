@@ -26,7 +26,7 @@ no_index:
 provides:
   kura:
     file: lib/kura.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Sub::Util: '1.40'
   perl: '5.016000'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/kfly8/kura/issues
   homepage: https://github.com/kfly8/kura
   repository: https://github.com/kfly8/kura.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:KFLY
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

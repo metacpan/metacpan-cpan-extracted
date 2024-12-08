@@ -1,10 +1,10 @@
 ########## use feature class DIE < v5.38
 use feature 'class';
 ---
-use v5.XX;
+use VERSION;
 use feature 'class';
 ########## no feature class DIE < v5.38
 no feature 'class';
 ---
-use v5.XX;
+use VERSION;
 no feature 'class';

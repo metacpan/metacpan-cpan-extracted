@@ -73,6 +73,8 @@
         #date
         above_max => "chosen date can't be later than {{max}}",
         below_min => "chosen date can't be earlier than {{min}}",
+        above_max_eq => "chosen date can't be later than or equal to {{max}}",
+        below_min_eq => "chosen date can't be earlier than or equal to {{min}}",
         invalid_date => "doesn't look like a date",
         #object
         not_blessed => 'is not an object',

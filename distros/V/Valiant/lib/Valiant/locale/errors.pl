@@ -3,7 +3,11 @@
     errors => {
       format => '{{attribute}} {{message}}',
       messages => {
-        invalid => 'Is Invalid',
+        invalid => {
+          one => "Is Invalid",
+          other => "Are Invalid",
+          _default => "Is Invalid",
+        },
       },
     }
   },

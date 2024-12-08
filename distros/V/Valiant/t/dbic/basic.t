@@ -121,7 +121,7 @@ ok $state->id;
   is_deeply +{$person->errors->to_hash(full_messages=>1)}, +{
     credit_cards => [
       "Credit Cards has too few rows (minimum is 2)",
-      "Credit Cards Is Invalid",
+      "Credit Cards Are Invalid",
     ],
     "credit_cards[0].card_number" => [
       "Credit Cards Card Number is too short (minimum is 13 characters)",
@@ -303,7 +303,7 @@ ok $state->id;
 
   is_deeply +{$person_invalid->errors->to_hash(full_messages=>1)}, +{
     credit_cards => [
-      "Credit Cards Is Invalid",
+      "Credit Cards Are Invalid",
     ],
     "credit_cards[1].expiration" => [
       "Credit Cards Expiration must be in the future",
@@ -548,7 +548,7 @@ ok $state->id;
 
   is_deeply +{ $person->errors->to_hash }, +{
     credit_cards => [
-      "Is Invalid",
+      "Are Invalid",
     ],
     "credit_cards[0].card_number" => [
       "is too short (minimum is 13 characters)",

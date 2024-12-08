@@ -28,7 +28,6 @@ typedef PDL_Long ftnlen;
 ');
 
 pp_addpm({At=>'Top'},<<'EOD');
-use PDL::Func;
 use PDL::Core;
 use PDL::Slices;
 use PDL::Ops qw//;

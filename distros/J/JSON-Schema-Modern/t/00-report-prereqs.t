@@ -76,6 +76,7 @@ my @include = qw(
   Sereal::Decoder
   Math::BigInt
   Math::BigFloat
+  builtin
 );
 
 my @exclude = qw(

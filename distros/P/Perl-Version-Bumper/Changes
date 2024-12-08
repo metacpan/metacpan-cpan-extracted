@@ -1,5 +1,8 @@
 Revision history for Perl-Version-Bumper
 
+0.162 2024-12-07 BOOK
+    - add a CLI tool for bumping files: perl-version-bump
+
 0.157 2024-11-20 BOOK
     - First release, based on software originally developed at Booking.com.
     - This version contains over 100 extra commits on top of the
