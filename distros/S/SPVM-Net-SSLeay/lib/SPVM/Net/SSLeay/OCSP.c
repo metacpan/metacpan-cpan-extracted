@@ -74,19 +74,21 @@ int32_t SPVM__Net__SSLeay__OCSP__basic_verify(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   OCSP_BASICRESP* bs = env->get_pointer(env, stack, obj_bs);
   
-  STACK_OF(X509)* sk_X509 = sk_X509_new_null();
+  STACK_OF(X509)* x509s_stack = sk_X509_new_null();
   
   int32_t list_length = env->length(env, stack, obj_certs);
   
   for (int32_t i = 0; i < list_length; i++) {
     void* obj_X509 = env->get_elem_object(env, stack, obj_certs, i);
     X509* X509 = env->get_pointer(env, stack, obj_X509);
-    sk_X509_push(sk_X509, X509);
+    sk_X509_push(x509s_stack, X509);
   }
   
   X509_STORE* st = env->get_pointer(env, stack, obj_st);
   
-  int32_t status = OCSP_basic_verify(bs, sk_X509, st, flags);
+  int32_t status = OCSP_basic_verify(bs, x509s_stack, st, flags);
+  
+  sk_X509_free(x509s_stack);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();

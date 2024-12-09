@@ -23,5 +23,10 @@ no_index:
     - inc
 requires:
   PDL: '2.094'
-version: '2.001'
+resources:
+  IRC: irc://irc.perl.org/#pdl
+  bugtracker: https://github.com/PDLPorters/PDL-IO-HDF/issues
+  homepage: http://pdl.perl.org/
+  repository: git://github.com/PDLPorters/PDL-IO-HDF.git
+version: '2.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

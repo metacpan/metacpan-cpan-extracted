@@ -1,3 +1,29 @@
+0.024 2024-12-08
+  [New Features]
+    * Add Net::SSLeay::XX509_EXTENSION#new method.
+    * Add Net::SSLeay::XX509_EXTENSION#set_object method.
+    * Add Net::SSLeay::XX509_EXTENSION#set_critical method.
+    * Add Net::SSLeay::XX509_EXTENSION#set_data method.
+    * Add Net::SSLeay::X509#new method.
+    * Add Net::SSLeay::X509#get_pubkey method.
+    * Add Net::SSLeay::X509#get_serialNumber method.
+    * Add Net::SSLeay::GENERAL_NAME class.
+    * Add Net::SSLeay::X509#get_subjectAltNames method.
+    * Add Net::SSLeay::X509_STORE#new method.
+    * Add Net::SSLeay::SSL_SESSION#new method.
+  [Incompatibe Changes]
+    * Remove deprecated Net::SSLeay::X509#P_get_ocsp_uri method.
+    * Net::SSLeay::XX509#get_issuer_name method returns a copied value.
+    * Net::SSLeay::XX509#get_subject_name method returns a copied value.
+    * Net::SSLeay::XX509#get_ext method returns a copied value.
+    * Net::SSLeay::XX509#check_issued method becomes a static method.
+  [Bug Fix]
+    * Fix STACK_OF memory bugs.
+    * Fix a memory bug of Net::SSLeay::X509_STORE_CTX#get_current_cert method.
+    * Fix the type of 1th argument of Net::SSLeay::X509_STORE_CTX#get1_issuer method.
+  [Incompatibe Changes]
+    * Remove Net::SSLeay::Net::SSLeay::X509_STORE_CTX#Init method.
+    * Remove Net::SSLeay::Net::SSLeay::SSL_SESSION#up_ref method.
 0.023 2024-12-06
   [New Features]
     * Add Net::SSLeay::X509_VERIFY_PARAM#clear_flags method.

@@ -83,29 +83,29 @@ my @valid_ids = (
 
     # Archaea
     [ 'Methanobrevibacter ruminantium_634498@288561462',
-        'cellular organisms; Archaea; Euryarchaeota; Methanomada group; Methanobacteria; Methanobacteriales; Methanobacteriaceae; Methanobrevibacter; Methanobrevibacter ruminantium; Methanobrevibacter ruminantium M1',
-        'cellular organisms; Archaea; Euryarchaeota; Methanomada group; Methanobacteria; Methanobacteriales; Methanobacteriaceae; Methanobrevibacter; Methanobrevibacter ruminantium',
-       ('cellular organisms; Archaea; Euryarchaeota; Methanomada group; Methanobacteria; Methanobacteriales; Methanobacteriaceae; Methanobrevibacter; Methanobrevibacter ruminantium; Methanobrevibacter ruminantium M1') x 3,
+        'cellular organisms; Archaea; Methanobacteriati; Methanobacteriota; Methanomada group; Methanobacteria; Methanobacteriales; Methanobacteriaceae; Methanobrevibacter; Methanobrevibacter ruminantium; Methanobrevibacter ruminantium M1',
+        'cellular organisms; Archaea; Methanobacteriati; Methanobacteriota; Methanomada group; Methanobacteria; Methanobacteriales; Methanobacteriaceae; Methanobrevibacter; Methanobrevibacter ruminantium',
+       ('cellular organisms; Archaea; Methanobacteriati; Methanobacteriota; Methanomada group; Methanobacteria; Methanobacteriales; Methanobacteriaceae; Methanobrevibacter; Methanobrevibacter ruminantium; Methanobrevibacter ruminantium M1') x 3,
         q{'Methanobrevibacter ruminantium M1'},
         q{'Methanobrevibacter ruminantium M1 [288561462]'} ],
 
     # Bacteria
     [ 'Acholeplasma laidlawii_441768@162448101',
-        'cellular organisms; Bacteria; Terrabacteria group; Mycoplasmatota; Mollicutes; Acholeplasmatales; Acholeplasmataceae; Acholeplasma; Acholeplasma laidlawii; Acholeplasma laidlawii PG-8A',
-        'cellular organisms; Bacteria; Terrabacteria group; Mycoplasmatota; Mollicutes; Acholeplasmatales; Acholeplasmataceae; Acholeplasma; Acholeplasma laidlawii',
-       ('cellular organisms; Bacteria; Terrabacteria group; Mycoplasmatota; Mollicutes; Acholeplasmatales; Acholeplasmataceae; Acholeplasma; Acholeplasma laidlawii; Acholeplasma laidlawii PG-8A') x 3,
+        'cellular organisms; Bacteria; Bacillati; Mycoplasmatota; Mollicutes; Acholeplasmatales; Acholeplasmataceae; Acholeplasma; Acholeplasma laidlawii; Acholeplasma laidlawii PG-8A',
+        'cellular organisms; Bacteria; Bacillati; Mycoplasmatota; Mollicutes; Acholeplasmatales; Acholeplasmataceae; Acholeplasma; Acholeplasma laidlawii',
+       ('cellular organisms; Bacteria; Bacillati; Mycoplasmatota; Mollicutes; Acholeplasmatales; Acholeplasmataceae; Acholeplasma; Acholeplasma laidlawii; Acholeplasma laidlawii PG-8A') x 3,
         q{'Acholeplasma laidlawii PG-8A'},
         q{'Acholeplasma laidlawii PG-8A [162448101]'} ],
     [ 'Curvibacter putative_667019@260221396',
-        'cellular organisms; Bacteria; Pseudomonadota; Betaproteobacteria; Burkholderiales; Comamonadaceae; Curvibacter; Curvibacter putative symbiont of Hydra magnipapillata',
+        'cellular organisms; Bacteria; Pseudomonadati; Pseudomonadota; Betaproteobacteria; Burkholderiales; Comamonadaceae; Curvibacter; Curvibacter putative symbiont of Hydra magnipapillata',
         '',         # Note the unusual 'organism' name
-       ('cellular organisms; Bacteria; Pseudomonadota; Betaproteobacteria; Burkholderiales; Comamonadaceae; Curvibacter; Curvibacter putative symbiont of Hydra magnipapillata') x 3,
+       ('cellular organisms; Bacteria; Pseudomonadati; Pseudomonadota; Betaproteobacteria; Burkholderiales; Comamonadaceae; Curvibacter; Curvibacter putative symbiont of Hydra magnipapillata') x 3,
         q{'Curvibacter putative symbiont of Hydra magnipapillata'},
         q{'Curvibacter putative symbiont of Hydra magnipapillata [260221396]'} ],
     [ 'Desulfotomaculum gibsoniae_767817@357041591',
-        'cellular organisms; Bacteria; Terrabacteria group; Bacillota; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae; Desulfoscipio gibsoniae DSM 7213',
-        'cellular organisms; Bacteria; Terrabacteria group; Bacillota; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae',
-       ('cellular organisms; Bacteria; Terrabacteria group; Bacillota; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae; Desulfoscipio gibsoniae DSM 7213') x 3,
+        'cellular organisms; Bacteria; Bacillati; Bacillota; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae; Desulfoscipio gibsoniae DSM 7213',
+        'cellular organisms; Bacteria; Bacillati; Bacillota; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae',
+       ('cellular organisms; Bacteria; Bacillati; Bacillota; Clostridia; Eubacteriales; Desulfallaceae; Desulfoscipio; Desulfoscipio gibsoniae; Desulfoscipio gibsoniae DSM 7213') x 3,
         q{'Desulfoscipio gibsoniae DSM 7213'},
         q{'Desulfoscipio gibsoniae DSM 7213 [357041591]'} ],
 
@@ -167,9 +167,9 @@ my @valid_ids = (
         q{'Ulnaria acus'},
         q{'Ulnaria acus [123456]'} ],
     [ 'Oscillatoriales cyanobacterium_627090@ABCDEF',
-        'cellular organisms; Bacteria; Terrabacteria group; Cyanobacteriota/Melainabacteria group; Cyanobacteriota; unclassified Cyanobacteriota; [Leptolyngbya] sp. JSC-1',
-        'cellular organisms; Bacteria; Terrabacteria group; Cyanobacteriota/Melainabacteria group; Cyanobacteriota; Cyanophyceae; Oscillatoriophycideae; Oscillatoriales; unclassified Oscillatoriales; Oscillatoriales cyanobacterium',
-       ('cellular organisms; Bacteria; Terrabacteria group; Cyanobacteriota/Melainabacteria group; Cyanobacteriota; unclassified Cyanobacteriota; [Leptolyngbya] sp. JSC-1') x 3,
+        'cellular organisms; Bacteria; Bacillati; Cyanobacteriota/Melainabacteria group; Cyanobacteriota; unclassified Cyanobacteriota; [Leptolyngbya] sp. JSC-1',
+        'cellular organisms; Bacteria; Bacillati; Cyanobacteriota/Melainabacteria group; Cyanobacteriota; Cyanophyceae; Oscillatoriophycideae; Oscillatoriales; unclassified Oscillatoriales; Oscillatoriales cyanobacterium',
+       ('cellular organisms; Bacteria; Bacillati; Cyanobacteriota/Melainabacteria group; Cyanobacteriota; unclassified Cyanobacteriota; [Leptolyngbya] sp. JSC-1') x 3,
         q{'[Leptolyngbya] sp. JSC-1'},
         q{'[Leptolyngbya] sp. JSC-1 [ABCDEF]'} ],
 #     [ 'Fistulifera sp._880758@xyz789',
@@ -317,9 +317,9 @@ SKIP: {
     check_legacy('get_taxid_from_seq_id', $tax);
 }
 
-
-{
-    my $infile = 'get_taxonomy_from_gca.test';
+sub get_taxonomy_from_gca {
+    my $tax    = shift;
+    my $infile = shift;
 
     open my $in, '<', file('test', $infile);
 
@@ -354,8 +354,11 @@ SKIP: {
     # compare file contents
     compare_filter_ok(file('test', $outfile), file('test', $infile), \&canonize,
         "Fetched expected taxonomy from GCAs: $infile");
+
+    return;
 }
 
+get_taxonomy_from_gca($tax, 'get_ncbi_taxonomy_from_gca.test');
 
 # duplicate taxa
 my @dupe_tests = (
@@ -371,16 +374,18 @@ my @dupe_tests = (
         [ qw(Eukaryota Metazoa Arthropoda Insecta Diptera Culicidae Aedes undef) ]  ],
     [ 'Aedes', 'cellular organisms; Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Protostomia; Ecdysozoa; Panarthropoda; Arthropoda; Mandibulata; Pancrustacea; Hexapoda; Insecta; Dicondylia; Pterygota; Neoptera; Holometabola; Diptera; Nematocera; Culicomorpha; Culicoidea; Culicidae; Culicinae; Aedini; Aedes', 7158,
         [ qw(Eukaryota Metazoa Arthropoda Insecta Diptera Culicidae Aedes undef) ]  ],
-    [ 'Aquificae', 'cellular organisms; Bacteria; Aquificota; Aquificae', 187857,
-        [ qw(Bacteria undef Aquificota Aquificae undef undef undef undef) ]  ],
-    [ 'Aquificae', 'cellular organisms; Bacteria; Aquificota', 200783,
-        [ qw(Bacteria undef Aquificota undef undef undef undef undef) ]  ],
+
     # formerly problematic taxa
     # Actinomycetia were once known as Actinobacteria too
     [ 'Actinomycetes', 'cellular organisms; Bacteria; Terrabacteria group; Actinomycetota; Actinomycetes', 1760,
-        [ qw(Bacteria undef Actinomycetota Actinomycetes undef undef undef undef) ]  ],
+        [ qw(Bacteria Bacillati Actinomycetota Actinomycetes undef undef undef undef) ]  ],
     [ 'Actinomycetota', 'cellular organisms; Bacteria; Terrabacteria group; Actinomycetota', 201174,
-        [ qw(Bacteria undef Actinomycetota undef undef undef undef undef) ]  ],
+        [ qw(Bacteria Bacillati Actinomycetota undef undef undef undef undef) ]  ],
+    # Aquificae were once both a phylum and a class
+    [ 'Aquificia', 'cellular organisms; Bacteria; Aquificota; Aquificia', 187857,
+        [ qw(Bacteria Pseudomonadati Aquificota Aquificia undef undef undef undef) ]  ],
+    [ 'Aquificota', 'cellular organisms; Bacteria; Aquificota', 200783,
+        [ qw(Bacteria Pseudomonadati Aquificota undef undef undef undef undef) ]  ],
 
     # duplicate genera
     [ 'Uronema', 'cellular organisms; Eukaryota; Sar; Alveolata; Ciliophora; Intramacronucleata; Oligohymenophorea; Scuticociliatia; Philasterida; Uronematidae; Uronema', 35106,
@@ -402,7 +407,7 @@ my @dupe_tests = (
 
     # names impossible to disambiguate due to completely identical lineage
     [ 'Frankia', 'cellular organisms; Bacteria; Terrabacteria group; Actinomycetota; Actinomycetes; Frankiales; Frankiaceae; Frankia; unclassified Frankia; Frankia sp. NRRL B-16315', 683320,
-        [ qw(Bacteria undef Actinomycetota Actinomycetes Frankiales Frankiaceae Frankia), 'Frankia sp. NRRL B-16315' ]  ],
+        [ qw(Bacteria Bacillati Actinomycetota Actinomycetes Frankiales Frankiaceae Frankia), 'Frankia sp. NRRL B-16315' ]  ],
 );
 
 {
@@ -837,7 +842,7 @@ my @eq_tests = (
 my @exp_names = (
     'Acidobacteria',
     'Actinomycetota',
-    'Aquificae',
+    'Aquificota',
     'Bacillota',
     'Bacteroidetes',
     'Chlamydiae',
@@ -1231,5 +1236,12 @@ use aliased 'Bio::MUST::Core::Tree::Splits';
 #   open my $out4, '>', file('test', 'test4.pdf');
 #   print {$out4} $td->draw;
 # }
+
+# GTDB tests
+my $gtdb_dir = dir('test', 'gtdb')->stringify;
+my $gtdb = $class->new_from_cache( tax_dir => $gtdb_dir );
+isa_ok $gtdb, $class;
+
+get_taxonomy_from_gca($gtdb, 'get_gtdb_taxonomy_from_gca.test');
 
 done_testing;

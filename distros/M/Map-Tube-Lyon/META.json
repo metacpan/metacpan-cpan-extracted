@@ -41,16 +41,20 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "Graph" : "0",
+            "Test::Map::Tube" : "0",
+            "XML::Twig" : "0"
+         },
          "requires" : {
-            "Test::More" : "0.82",
-            "XML::Simple" : "0"
+            "Test::More" : "0.82"
          }
       }
    },
    "provides" : {
       "Map::Tube::Lyon" : {
          "file" : "lib/Map/Tube/Lyon.pm",
-         "version" : "v0.62.0"
+         "version" : "v0.62.1"
       }
    },
    "release_status" : "stable",
@@ -59,6 +63,6 @@
          "mailto" : "bug-Map-Tube-Lyon@rt.cpan.org"
       }
    },
-   "version" : "v0.62.0",
+   "version" : "v0.62.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

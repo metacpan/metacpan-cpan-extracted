@@ -24,7 +24,6 @@ WriteMakefile(
                             'File::ShareDir::Install' => 0,
                           },
 	TEST_REQUIRES	   => { 'Test::More' => 0.82,
-                            'XML::Simple' => 0,
                           },
     PREREQ_PM          => {
                             'Moo'              => 0,
@@ -38,6 +37,15 @@ WriteMakefile(
     META_MERGE         => {
                             'meta-spec' => { version => 2 },
                             dynamic_config => 0,
+							prereqs => {
+										 test => {
+												   recommends => {
+																   'Test::Map::Tube' => 0,
+																   'XML::Twig'       => 0,
+																   'Graph'           => 0,
+																 },
+												 },
+									   },
                             provides    => {
                                              $mod_name => {
                                                             file    => $mod_file,

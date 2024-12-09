@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use PDL::Core::Dev;
 
 WriteMakefile(
   NAME => 'PDL::Graphics::Limits',
@@ -9,6 +10,7 @@ WriteMakefile(
   LICENSE => 'perl',
   MIN_PERL_VERSION => '5.016',
   CONFIGURE_REQUIRES => {
+    'PDL' => '2.095',
     'ExtUtils::MakeMaker' => '7.14',
   },
   PREREQ_PM => {
@@ -35,3 +37,8 @@ WriteMakefile(
     },
   },
 );
+
+sub MY::postamble {
+  my $oneliner = PDL::Core::Dev::_oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(shift); }});
+  qq|\ninstall :: pure_install\n\t$oneliner \$(NAME)\n|;
+}

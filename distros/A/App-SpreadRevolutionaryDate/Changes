@@ -1,6 +1,23 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.33 2023-05-28T20:40:25
+0.35 2024-12-08T22:30:42
+ - Fix detection of the position of an url for Bluesky in bytes
+ - Fix detection of url starting with punctuation
+ - Bump v.0.34
+ - Update doc for Bluesky target
+ - Update tests for Bluesky target
+ - Add minimal worker for Bluesky target
+ - Add support for Bluesky target
+ - Use relative URL to post on Twitter
+
+0.34 2024-12-08T19:30:35Z
+ - Update doc for Bluesky target
+ - Update tests for Bluesky target
+ - Add minimal worker for Bluesky target
+ - Add support for Bluesky target
+ - Use relative URL to post on Twitter
+
+0.33 2023-05-28T20:40:25Z
  - Upgrade copyright year
  - Upgrade to Twitter API v2
  - Remove tests for Freenode and Liberachat

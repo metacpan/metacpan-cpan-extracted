@@ -105,4 +105,21 @@ $hash{AUTHOR} = 'PerlDL Developers <pdl-general@lists.sourceforge.net>';
 
 sub MY::postamble { pdlpp_postamble( $package ); }
 
-WriteMakefile(%hash);
+(my $repo = $package_name) =~ s#::#-#g;
+$repo = "PDLPorters/$repo";
+WriteMakefile(
+  META_MERGE => {
+    "meta-spec" => { version => 2 },
+    resources => {
+      homepage => 'http://pdl.perl.org/',
+      bugtracker  => {web=>"https://github.com/$repo/issues"},
+      repository  => {
+        url => "git://github.com/$repo.git",
+        type => 'git',
+        web => "https://github.com/$repo",
+      },
+      x_IRC => 'irc://irc.perl.org/#pdl',
+    },
+  },
+  %hash,
+);

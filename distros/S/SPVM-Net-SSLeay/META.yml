@@ -24,5 +24,5 @@ requires:
   SPVM: '0.990032'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Net-SSLeay.git
-version: '0.023'
+version: '0.024'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

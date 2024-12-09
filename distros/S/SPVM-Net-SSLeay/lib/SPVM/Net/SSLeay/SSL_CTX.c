@@ -864,19 +864,19 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_client_CA_list(SPVM_ENV* env, SPVM_VALUE
     return env->die(env, stack, "The list $list must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
-  STACK_OF(X509_NAME)* sk_x509_name = sk_X509_NAME_new_null();
+  STACK_OF(X509_NAME)* x509_names_stack = sk_X509_NAME_new_null();
   
   int32_t list_length = env->length(env, stack, obj_list);
   
   for (int32_t i = 0; i < list_length; i++) {
     void* obj_x509_name = env->get_elem_object(env, stack, obj_list, i);
     X509_NAME* x509_name = env->get_pointer(env, stack, obj_x509_name);
-    sk_X509_NAME_push(sk_x509_name, x509_name);
+    sk_X509_NAME_push(x509_names_stack, x509_name);
   }
   
-  SSL_CTX_set_client_CA_list(self, sk_x509_name);
+  SSL_CTX_set_client_CA_list(self, x509_names_stack);
   
-  sk_X509_NAME_free(sk_x509_name);
+  sk_X509_NAME_free(x509_names_stack);
   
   return 0;
 }

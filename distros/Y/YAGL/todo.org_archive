@@ -1,0 +1,343 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file c:/Users/rml/Dropbox/Code/personal/essential-algorithms/graphs/todo.org
+
+
+* DONE implement 'get_edges' method
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-09-21 Sat 10:50
+  :ARCHIVE_FILE: c:/Users/rml/Dropbox/Code/personal/essential-algorithms/graphs/todo.org
+  :ARCHIVE_OLPATH: Current
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+
+
+* DONE Rewrite graph representation
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-10-05 Sat 12:08
+  :ARCHIVE_FILE: ~/Dropbox/Code/personal/essential-algorithms/graphs/todo.org
+  :ARCHIVE_OLPATH: Current
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+
+  Currently (September 2019), the graph representation looks like
+  this:
+
+  #+BEGIN_SRC perl
+    my $g =  [['s', ['a', 'd']],
+              ['a', ['s', 'b', 'd']],
+              ['b', ['a', 'c', 'e']],
+              ['c', ['b']],
+              ['d', ['s', 'a', 'e']],
+              ['e', ['b', 'd', 'f']]];
+  #+END_SRC
+
+  This is very simple to visualize and understand (and to
+  implement!).  However it has a few problems:
+
+  - Slow to do O(n) array lookup to get the index of a vertex, so we
+    can then iterate across its neighbors (another O(n), thus O(n^2)
+    altogether).
+  - We can't easily add new "hidden" fields to hold e.g. edge
+    attributes, vertex attributes, etc.
+
+  We could solve the 'O(N) array lookup' and 'hard to add hidden
+  fields' issues by using a hash of arrays.  That would make the
+  representation something like:
+
+  #+BEGIN_SRC perl
+    my $g =  {
+              's' => ['a', 'd'],
+              'a' => ['s', 'b', 'd'],
+              'b' => ['a', 'c', 'e'],
+              'c' => ['b'],
+              'd' => ['s', 'a', 'e'],
+              'e' => ['b', 'd', 'f'],
+              '_eattrs' => {},
+              '_vattrs' => {},
+             };
+  #+END_SRC
+
+
+* DONE Rename to YAGL
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-10-05 Sat 12:17
+  :ARCHIVE_FILE: ~/Dropbox/Code/personal/essential-algorithms/graphs/todo.org
+  :ARCHIVE_OLPATH: Current
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+   
+
+* DONE implement object equals check
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-10-05 Sat 12:21
+  :ARCHIVE_FILE: ~/Dropbox/Code/personal/essential-algorithms/graphs/todo.org
+  :ARCHIVE_OLPATH: Staging
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+
+  To include:
+
+  - [X] Vertices
+  - [X] Edge attributes
+  - [X] Following PBP (see [[Reference]] section)
+
+  -----
+
+  Saturday, October 5, 2019:
+
+  - Now that we have rewritten the graph representation, this is
+    done.  The edge attributes are now stored in a hash inside the
+    object, and are copied properly (and there are tests to check
+    this, although they could probably use improvement).
+
+  -----
+
+  Saturday, September 21, 2019:
+
+  - Currently waiting on [[Rewrite graph representation]] to make more
+    progress on this.
+
+  -----
+
+  Saturday, September 21, 2019:
+
+  - Currently, =$self->equals($a, $b)= checks if:
+    - the vertices are the same
+    - the edges are the same
+  - This is necessary but not sufficient.  However, it will require
+    figuring out how to bring =$attrs= inside the object, which is
+    probaby going to require us to rewrite the base data structure as
+    a hash of arrays (See that issue for more info).
+   
+** TODO Follow practices from PBP
+
+** TODO Check edge attributes
+** DONE Check vertices and edges
+
+
+* DONE Reorganize methods into sections with headers
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-10-05 Sat 19:58
+  :ARCHIVE_FILE: c:/Users/rml/Dropbox/Code/personal/essential-algorithms/graphs/todo.org
+  :ARCHIVE_OLPATH: Current
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+
+  The Elisp below makes it possible to more easily read inline POD
+  headers in outline-minor-mode.
+
+  #+BEGIN_SRC elisp
+    ;; Suggested by Mark A. Hershberger
+    (defun cperl-outline-level ()
+      (looking-at outline-regexp)
+      (cond ((not (match-beginning 1)) 0)	; beginning-of-file
+    ;;;; 2=package-group, 5=package-name 8=sub-name 16=head-level
+            ((match-beginning 2) 0)         ; package
+            ((match-beginning 8) 1)         ; sub
+            ((match-beginning 16)
+             (- (char-after (match-beginning 16)) ?1)) ; headN ==> N
+            (t 5)))				; should not happen   
+  #+END_SRC
+
+
+* DONE Reorganize methods into sections with headers
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-10-05 Sat 20:04
+  :ARCHIVE_FILE: c:/Users/rml/Dropbox/Code/personal/essential-algorithms/graphs/todo.org
+  :ARCHIVE_OLPATH: Current
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+
+  The Elisp below makes it possible to more easily read inline POD
+  headers in outline-minor-mode.
+
+  #+BEGIN_SRC elisp
+    ;; Suggested by Mark A. Hershberger
+    (defun cperl-outline-level ()
+      (looking-at outline-regexp)
+      (cond ((not (match-beginning 1)) 0)	; beginning-of-file
+    ;;;; 2=package-group, 5=package-name 8=sub-name 16=head-level
+            ((match-beginning 2) 0)         ; package
+            ((match-beginning 8) 1)         ; sub
+            ((match-beginning 16)
+             (- (char-after (match-beginning 16)) ?1)) ; headN ==> N
+            (t 5)))				; should not happen   
+  #+END_SRC
+
+
+* DONE Implement =$self->add_vertex_attribute= method (and friends)
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-10-05 Sat 23:54
+  :ARCHIVE_FILE: c:/Users/rml/Dropbox/Code/personal/essential-algorithms/graphs/todo.org
+  :ARCHIVE_OLPATH: Current
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+
+  This is necessary so we can implement graph coloring.
+
+  - =add_vertex_attribute($vertex, { weight => 123})=
+  - =add_vertex_attributes(@v_attrs)=
+  - =remove_vertex_attribute($vertex, 'weight')=
+
+
+* DONE Wrap various =$h{$a . $b}= usages in methods
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-10-05 Sat 23:56
+  :ARCHIVE_FILE: c:/Users/rml/Dropbox/Code/personal/essential-algorithms/graphs/todo.org
+  :ARCHIVE_OLPATH: Someday/Maybe
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+
+  It would almost certainly be slower but would make the code easier
+  to read and maintain, DRY, etc.
+
+  -----
+
+  Saturday, October 5, 2019:
+
+  - Did a lot of this in the recent refactor to the hash of arrays
+    representation.
+
+
+* DONE Speed up $self->edge_between()
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-10-06 Sun 00:03
+  :ARCHIVE_FILE: c:/Users/rml/Dropbox/Code/personal/essential-algorithms/graphs/todo.org
+  :ARCHIVE_OLPATH: Someday/Maybe
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+
+  This could be speeded up in a few different ways:
+
+  - Checking the $attrs hashref.  This is hacky, but would be
+    faster.  I'd have to get more confident that the base data
+    structure and the attrs hash are being updated in lockstep,
+    though.
+
+  - Converting base graph data structure to hash of arrays
+    (better).  This would also have the nice properties:
+
+    - Store attrs in the hash, e.g., =$self->{_attrs) = ...=
+
+
+  -----
+
+  Sunday, October 6, 2019:
+
+  - This fell out of the refactoring to the hash of arrays data
+    structure.
+
+
+* DONE Implement is_tree and prerequisite is_connected
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2019-10-06 Sun 13:48
+  :ARCHIVE_FILE: c:/Users/rml/Dropbox/Code/personal/essential-algorithms/graphs/todo.org
+  :ARCHIVE_OLPATH: Current
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+
+  Following definitions (from Even, _Graph Algorithms_, pp.22-24) are all
+  equivalent.
+
+  - G is a tree
+  - G is circuit-free, but if a new edge is added to G, a circuit is
+    formed
+  - G contains no self-loops and for every two vertices there is a
+    unique simple path connecting them
+  - G is connected, but if any edge is deleted from G, the
+    connectivity of G is interrupted
+  - G is circuit-free and has n-1 edges (where n = |V|)
+  - G is connected and has n-1 edges (where n = |V|)
+
+
+* DONE Implement graph coloring
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2020-01-16 Thu 08:15
+  :ARCHIVE_FILE: ~/Dropbox/Code/personal/essential-algorithms/YAGL/todo.org
+  :ARCHIVE_OLPATH: Staging
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+
+  Several algorithms:
+
+  - Vertex merging from Lukacz
+  - The one from Skiena's _Implementing Discrete Mathematics_
+
+
+  Thursday, January 16, 2020:
+
+  - This was fixed in [[orgit-rev:~/Dropbox/Code/personal/essential-algorithms/::e3e34b8][e3e34b8: Add graph coloring methods and tests]]
+
+
+* DONE Fix bug in Hamiltonian path code that treats reversed cycles as unique :bugs:
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-04-04 Sun 14:47
+  :ARCHIVE_FILE: ~/Dropbox/Code/personal/YAGL/todo.org
+  :ARCHIVE_OLPATH: Current
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+
+  See test #7 in [[file:t/24-ham.t]], which should return *1* cycle, per
+  https://mathoverflow.net/questions/255784/what-is-the-smallest-uniquely-hamiltonian-graph-with-minimum-degree-at-least-3/
+
+  In fact, the 2 cycles returned are just mirrors of each other.
+  There should really just be 1.
+
+
+* DONE Add more tests to =hamiltonian_walk= method to exercise state mgmt
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-04-04 Sun 14:47
+  :ARCHIVE_FILE: ~/Dropbox/Code/personal/YAGL/todo.org
+  :ARCHIVE_OLPATH: Current
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+
+  I have found a number of bugs when using a =state= variable, where
+  it wasn't getting cleared between calls to the method.
+
+  E.g., see the way =exhaustive_search= was rewritten to use an
+  internal helper subroutine that does recursive self-calls.
+
+  So the tasks are:
+
+  - [ ] Adding more tests that exercise state, esp. via multiple
+    method calls on different graphs
+  - [ ] Probably rewriting =_visit=, as mentioned in the subtask
+    below.
+
+** TODO Rewrite =_visit= to avoid keeping internal state across method calls
+
+   See the rewritten =exhaustive_search= for details of how to do
+   this.
+
+
+* DONE Minimum spanning tree
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2021-04-04 Sun 14:48
+  :ARCHIVE_FILE: ~/Dropbox/Code/personal/YAGL/todo.org
+  :ARCHIVE_OLPATH: Current
+  :ARCHIVE_CATEGORY: todo
+  :ARCHIVE_TODO: DONE
+  :END:
+
+  ... for weighted, undirected graphs
+
+  Sunday, April 4, 2021:
+
+  - See [[./t/23-mst.t]]
+

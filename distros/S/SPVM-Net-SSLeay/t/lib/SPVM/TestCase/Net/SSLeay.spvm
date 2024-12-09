@@ -34,6 +34,8 @@ class TestCase::Net::SSLeay {
   use Net::SSLeay::X509_NAME_ENTRY;
   use Net::SSLeay::ASN1_INTEGER;
   use Net::SSLeay::ASN1_TIME;
+  use Array;
+  use Net::SSLeay::X509_STORE;
   
   our $FILE_DIR : string;
   
@@ -1019,4 +1021,299 @@ EOS
     return 1;
   }
   
+  static method X509_EXTENSION : int () {
+    
+    {
+      my $x509_ext = Net::SSLeay::X509_EXTENSION->new;
+      
+      unless ($x509_ext is_type Net::SSLeay::X509_EXTENSION) {
+        return 0;
+      }
+      
+      $x509_ext->set_object(Net::SSLeay::OBJ->nid2obj(Net::SSLeay::OBJ->txt2nid("C")));
+      
+      unless (Net::SSLeay::OBJ->obj2nid($x509_ext->get_object) == Net::SSLeay::OBJ->txt2nid("C")) {
+        return 0;
+      }
+      
+      $x509_ext->set_critical(1);
+      
+      unless ($x509_ext->get_critical == 1) {
+        return 0;
+      }
+      
+      my $data = Net::SSLeay::ASN1_OCTET_STRING->new;
+      $data->set("ABC");
+      
+      $x509_ext->set_data($data);
+      
+      unless ($x509_ext->get_data->get0_data eq "ABC") {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method X509 : int () {
+    
+    {
+      my $x509 = Net::SSLeay::X509->new;
+      
+      unless ($x509 is_type Net::SSLeay::X509) {
+        return 0;
+      }
+    }
+    
+    {
+      my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.cert.pem", "r");
+      
+      my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
+      
+      unless ($x509 is_type Net::SSLeay::X509) {
+        return 0;
+      }
+      
+      my $serialNumber = $x509->get_serialNumber;
+      
+      unless ($serialNumber->get_int64 == 1) {
+        return 0;
+      }
+      my $issuer_name = $x509->get_issuer_name;
+      
+      unless ($issuer_name is_type Net::SSLeay::X509_NAME) {
+        return 0;
+      }
+      
+      unless ($issuer_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=Intermediate CA") {
+        return 0;
+      }
+      
+      my $subject_name = $x509->get_subject_name;
+      
+      unless ($subject_name is_type Net::SSLeay::X509_NAME) {
+        return 0;
+      }
+      
+      unless ($subject_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example") {
+        return 0;
+      }
+      
+      my $sha1_digest = Net::SSLeay::EVP->get_digestbyname("sha1");
+      
+      my $pubkey_digest = $x509->pubkey_digest_return_string($sha1_digest);
+      
+      unless (Array->equals_byte((byte[])$pubkey_digest, [(byte)-7, 125, -9, 111, -37, -33, 64, -29, -92, -79, 35, -72, -95, 23, 101, -119, -4, 122, 91, -11])) {
+        return 0;
+      }
+      
+      my $digest = $x509->digest_return_string($sha1_digest);
+      
+      my $digest_expected = [(byte)
+        -100,
+        46,
+        -112,
+        -71,
+        -89,
+        -124,
+        122,
+        58,
+        43,
+        -66,
+        -3,
+        -91,
+        -47,
+        70,
+        -22,
+        49,
+        117,
+        -23,
+        3,
+        38
+      ];
+      
+      unless (Array->equals_byte((byte[])$digest, $digest_expected)) {
+        return 0;
+      }
+      
+      my $x509_dup = $x509->dup;
+      
+      if ($x509 == $x509_dup) {
+        return 0;
+      }
+      
+      unless ($x509_dup->get_serialNumber->get_int64 == $x509->get_serialNumber->get_int64) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/extended-cert.cert.pem", "r");
+      
+      my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
+      
+      unless ($x509 is_type Net::SSLeay::X509) {
+        return 0;
+      }
+      
+      my $subjectAltNames = $x509->get_subjectAltNames;
+      
+      unless ($subjectAltNames is_type Net::SSLeay::GENERAL_NAME[]) {
+        return 0;
+      }
+
+=begin comment
+
+# define GEN_OTHERNAME   0
+# define GEN_EMAIL       1
+# define GEN_DNS         2
+# define GEN_X400        3
+# define GEN_DIRNAME     4
+# define GEN_EDIPARTY    5
+# define GEN_URI         6
+# define GEN_IPADD       7
+# define GEN_RID         8
+
+=end comment
+
+=cut
+
+      unless (@$subjectAltNames == 7) {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[0]->get_type == SSL->GEN_EMAIL) {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[0]->get_data_as_string eq "john.doe@net-ssleay.example") {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[1]->get_type == SSL->GEN_URI) {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[1]->get_data_as_string eq "http://johndoe.net-ssleay.example") {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[2]->get_type == SSL->GEN_DNS) {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[2]->get_data_as_string eq "johndoe.net-ssleay.example") {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[3]->get_type == SSL->GEN_RID) {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[3]->get_data_as_string eq "1.2.3.4") {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[4]->get_type == SSL->GEN_IPADD) {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[4]->get_data_as_string eq "\x{C0}\x{A8}\x{00}\x{02}") {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[5]->get_type == SSL->GEN_IPADD) {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[5]->get_data_as_string eq "\x{FD}%\x{F8}\x{14}\x{AF}\x{B5}\x{98}s\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{02}") {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[6]->get_type == SSL->GEN_OTHERNAME) {
+        return 0;
+      }
+      
+      unless ($subjectAltNames->[6]->get_data_as_string eq "jd@net-ssleay.example") {
+        return 0;
+      }
+      
+      my $ext_count = $x509->get_ext_count;
+      
+      unless ($ext_count == 10) {
+        return 0;
+      }
+      
+      my $ext_loc = $x509->get_ext_by_NID(SSL->NID_ext_key_usage);
+      my $ext = $x509->get_ext($ext_loc);
+      
+      unless ($ext is_type Net::SSLeay::X509_EXTENSION) {
+        return 0;
+      }
+      
+      unless (Net::SSLeay::OBJ->obj2nid($ext->get_object) == SSL->NID_ext_key_usage) {
+        return 0;
+      }
+      
+      my $issued = Net::SSLeay::X509->check_issued($x509, $x509);
+      
+      my $ocsp_uri = $x509->get_ocsp_uri;
+    }
+    
+    return 1;
+  }
+  
+  static method X509_STORE : int () {
+    
+    {
+      my $x509_store = Net::SSLeay::X509_STORE->new;
+      
+      unless ($x509_store is_type Net::SSLeay::X509_STORE) {
+        return 0;
+      }
+      
+      $x509_store->set_flags(SSL->X509_V_FLAG_CRL_CHECK);
+      
+      {
+        my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.cert.pem", "r");
+        
+        my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
+        
+        unless ($x509 is_type Net::SSLeay::X509) {
+          return 0;
+        }
+        
+        $x509_store->add_cert($x509);
+      }
+      
+      {
+        my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/intermediate-ca.crl.pem", "r");
+        
+        my $x509_crl = Net::SSLeay::PEM->read_bio_X509_CRL($bio);
+        
+        unless ($x509_crl is_type Net::SSLeay::X509_CRL) {
+          return 0;
+        }
+        
+        $x509_store->add_crl($x509_crl);
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method SSL_SESSION : int () {
+    
+    {
+      my $ssl_session = Net::SSLeay::SSL_SESSION->new;
+      
+      unless ($ssl_session is_type Net::SSLeay::SSL_SESSION) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
 }

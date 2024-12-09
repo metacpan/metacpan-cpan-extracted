@@ -16,6 +16,18 @@ Net::SSLeay::X509_EXTENSION class in L<SPVM> represents L<X509_EXTENSION|https:/
 
   use Net::SSLeay::X509_EXTENSION;
 
+=head1 Class Methods
+
+=head2 new
+
+C<static method new : L<Net::SSLeay::X509_EXTENSION|SPVM::Net::SSLeay::X509_EXTENSION> ();>
+
+Calls native L<X509_EXTENSION_new|https://docs.openssl.org/3.1/man3/X509_dup/> function, creates a new  L<Net::SSLeay::X509_EXTENSION|SPVM::Net::SSLeay::X509_EXTENSION> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
+
+Exceptions:
+
+If X509_EXTENSION_new failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
 =head1 Instance Methods
 
 =head2 get_data
@@ -35,6 +47,24 @@ Calls native L<X509_EXTENSION_get_object|https://docs.openssl.org/1.1.1/man3/X50
 C<method get_critical : int ();>
 
 Calls native L<X509_EXTENSION_get_critical|https://docs.openssl.org/1.1.1/man3/X509_EXTENSION_get_object> functions given the pointer value of the instance, and returns its return value.
+
+=head2 set_object
+
+C<method set_object : int ($obj : L<Net::SSLeay::ASN1_OBJECT|SPVM::Net::SSLeay::ASN1_OBJECT>);>
+
+Calls native L<X509_EXTENSION_set_object|https://docs.openssl.org/1.1.1/man3/X509_EXTENSION_get_object> functions given the pointer value of the instance, the pointer value of $obj, and returns its return value.
+
+=head2 set_critical
+
+C<method set_critical : int ($crit ; int);>
+
+Calls native L<X509_EXTENSION_set_critical|https://docs.openssl.org/1.1.1/man3/X509_EXTENSION_get_object> functions given the pointer value of the instance, $crit, and returns its return value.
+
+=head2 set_data
+
+C<method set_data : int ($data : L<Net::SSLeay::ASN1_OCTET_STRING|SPVM::Net::SSLeay::ASN1_OCTET_STRING>);>
+
+Calls native L<X509_EXTENSION_set_data|https://docs.openssl.org/1.1.1/man3/X509_EXTENSION_get_object> functions given the pointer value of the instance, the pointer value of $data, and returns its return value.
 
 =head2 DESTROY
 

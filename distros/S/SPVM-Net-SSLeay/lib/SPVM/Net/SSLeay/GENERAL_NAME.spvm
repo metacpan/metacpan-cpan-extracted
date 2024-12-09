@@ -1,0 +1,27 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::GENERAL_NAME {
+  
+  use Fn;
+  
+  # Class Methods
+  native static method new : Net::SSLeay::GENERAL_NAME ();
+  
+  private static method new_with_pointer : Net::SSLeay::GENERAL_NAME ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::GENERAL_NAME;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  native method get_type : int ();
+  
+  native method get_data_as_string : string ();
+  
+  native method DESTROY : void ();
+  
+}

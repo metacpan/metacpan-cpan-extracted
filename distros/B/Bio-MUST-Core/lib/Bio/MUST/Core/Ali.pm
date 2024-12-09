@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.242020';
+$Bio::MUST::Core::Ali::VERSION = '0.243430';
 use Moose;
 use namespace::autoclean;
 
@@ -20,8 +20,10 @@ use Statistics::Descriptive;
 use Tie::IxHash;
 
 use Bio::MUST::Core::Types;
-use Bio::MUST::Core::Constants qw(:gaps :files);
+use Bio::MUST::Core::Constants qw(:ncbi :gaps :files);
+
 use aliased 'Bio::MUST::Core::Seq';
+use aliased 'Bio::MUST::Core::SeqId';
 use aliased 'Bio::MUST::Core::SeqMask';
 
 # TODO: add information about methods available in Ali-like objects
@@ -743,6 +745,69 @@ sub load_stockholm {
 }
 
 
+# <TSeq>
+#  <TSeq_seqtype value="nucleotide"/>
+#  <TSeq_gi>160476623</TSeq_gi>
+#  <TSeq_accver>EY249574.1</TSeq_accver>
+#  <TSeq_sid>gnl|dbEST|50783737</TSeq_sid>
+#  <TSeq_taxid>5061</TSeq_taxid>
+#  <TSeq_orgname>Aspergillus niger</TSeq_orgname>
+#  <TSeq_defline>CATY7117.fwd CATY Aspergillus niger fungal ...</TSeq_defline>
+#  <TSeq_length>906</TSeq_length>
+#  <TSeq_sequence>ACGT...</TSeq_sequence>
+# </TSeq>
+
+sub load_tinyseq {
+    my $class  = shift;
+    my $infile = shift;
+    my $args   = shift // {};           # HashRef (should not be empty...)
+
+    my $kps = $args->{keep_strain} // 0;
+
+    open my $in, '<', $infile;
+
+    my $ali = $class->new( file => $infile );
+    my ($acc, $tax, $org, $seq);
+
+    # Note: crude parser derived from old tseq2ali.pl
+    while (my $line = <$in>) {
+        chomp $line;
+
+        # capture attributes
+        if      ($line =~ m{<TSeq_accver>      (.*?) </TSeq_accver>  }xms) {
+            $acc = $1;
+        } elsif ($line =~ m{<TSeq_taxid> ($NCBIPKEY) </TSeq_taxid>   }xms) {
+            $tax = $1;
+        } elsif ($line =~ m{<TSeq_orgname>  (.*?)    </TSeq_orgname> }xms) {
+            $org = $1;
+        } elsif ($line =~ m{<TSeq_sequence> (.*?)    </TSeq_sequence>}xms) {
+            $seq = $1;
+        }
+
+        # process current seq (if any)
+        if ($seq) {
+
+            # build full_id from NCBI org
+            my $seq_id = SeqId->new_with(
+                org         => $org,
+                taxon_id    => $tax,
+                accession   => $acc,
+                keep_strain => $kps,
+            );
+
+            # add current seq to ali
+            my $new_seq = Seq->new( seq_id => $seq_id, seq => $seq );
+            $ali->add_seq($new_seq);
+
+            # clear attributes for next seq
+            ($acc, $tax, $org, $seq) = () x 4;
+        }
+    }
+
+    return $ali;
+}
+
+
 sub instant_store {
     my $class   = shift;
     my $outfile = shift;
@@ -824,7 +889,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.242020
+version 0.243430
 
 =head1 SYNOPSIS
 
@@ -1558,6 +1623,11 @@ comment classes (=GS, =GR and =GC).
     # RL    J Virol 1997;71:5990-5996.
 
 This method requires one argument.
+
+=head2 load_tinyseq
+
+Class method (constructor) returning a new Ali read from a file in NCBI
+TinySeq XML format.
 
 =head2 instant_store
 

@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2024 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::PromptUser;
-$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.33';
+$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.35';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message by prompting user
 
 use Moose;
@@ -103,7 +103,7 @@ App::SpreadRevolutionaryDate::MsgMaker::PromptUser - MsgMaker class for L<App::S
 
 =head1 VERSION
 
-version 0.33
+version 0.35
 
 =head1 METHODS
 
@@ -121,7 +121,11 @@ Prompts user for the message to be spread. Takes no argument. Returns message as
 
 =item L<App::SpreadRevolutionaryDate::Config>
 
+=item L<App::SpreadRevolutionaryDate::BlueskyLite>
+
 =item L<App::SpreadRevolutionaryDate::Target>
+
+=item L<App::SpreadRevolutionaryDate::Target::Bluesky>
 
 =item L<App::SpreadRevolutionaryDate::Target::Twitter>
 
@@ -159,7 +163,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2023 by Gérald Sédrati.
+This software is Copyright (c) 2019-2024 by Gérald Sédrati.
 
 This is free software, licensed under:
 

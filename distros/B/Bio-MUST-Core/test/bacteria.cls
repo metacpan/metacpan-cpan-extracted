@@ -2,7 +2,7 @@
 # RGB values obtained with Mountain Lion's Digital Color Meter
 Acidobacteria	#E5585D
 Actinomycetota	#B64348
-Aquificae	#DDA35D
+Aquificota	#DDA35D
 Bacillota	#02AE94
 Bacteroidetes	#AF8147
 Chlamydiae	#C6D95E

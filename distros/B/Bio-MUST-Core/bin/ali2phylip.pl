@@ -40,25 +40,22 @@ for my $infile (@ARGV_infiles) {
     dump_stats($infile, $ali, 'in');
 
     # remove shared gaps (and more if asked to do so)
-    $ali->idealize($ARGV_max_res_drop_site);
+    _apply_mask( $ali, SeqMask->ideal_mask($ali, $ARGV_max_res_drop_site) );
 
     # TODO: allow deleting #NEW# sequences made identical to existing seqs
     # of the same org after mask application (to handle 42 mini-inserts)
 
     # apply Gblocks mask
-    $ali->apply_mask(
-        SeqMask->gblocks_mask($ali, $ARGV_gb_mask)
-    ) if $ARGV_gb_mask;
+    _apply_mask( $ali, SeqMask->gblocks_mask($ali, $ARGV_gb_mask) )
+        if $ARGV_gb_mask;
 
     # apply BMGE mask
-    $ali->apply_mask(
-        SeqMask->bmge_mask($ali, $ARGV_bmge_mask)
-    ) if $ARGV_bmge_mask;
+    _apply_mask( $ali, SeqMask->bmge_mask($ali, $ARGV_bmge_mask) )
+        if $ARGV_bmge_mask;
 
     # apply parsimony mask
-    $ali->apply_mask(
-        SeqMask->parsimony_mask($ali)
-    ) if $ARGV_pars_mask;
+    _apply_mask( $ali, SeqMask->parsimony_mask($ali) )
+        if $ARGV_pars_mask;
 
     # discard partial sequences and report their ids
     if ($ARGV_min_res_seq) {
@@ -80,10 +77,8 @@ for my $infile (@ARGV_infiles) {
     }
 
     # optionally delete constant sites
-    if ($ARGV_del_const) {
-        my $mask = SeqMask->variable_mask($ali);
-        $ali->apply_mask($mask);
-    }
+    _apply_mask( $ali, SeqMask->variable_mask($ali) )
+        if $ARGV_del_const;
 
     # export Ali to phylip format (or ALI) format
     my $outfile = change_suffix($infile,
@@ -102,6 +97,24 @@ for my $infile (@ARGV_infiles) {
     }
 }
 
+# wrapper to native methods to transparently handle codon_mask
+sub _apply_mask {
+    my $ali  = shift;
+    my $mask = shift;
+
+    if ($ARGV_keep_codons) {
+        $mask = $mask->codon_mask( {
+            frame => $ARGV_coding_frame,
+              max => $ARGV_codon_max_nt_drop,
+        } );
+
+        # frame should be fixed only once
+        $ARGV_coding_frame = 1;
+    }
+
+    $ali->apply_mask($mask);
+    return;
+}
 
 sub dump_stats {
     my $file = shift;
@@ -145,7 +158,7 @@ ali2phylip.pl - Convert (and filter) ALI files to PHYLIP files for tree building
 
 =head1 VERSION
 
-version 0.242020
+version 0.243430
 
 =head1 USAGE
 
@@ -221,6 +234,31 @@ The C<bmge.sh> script should be as follows:
 
 Apply a simple parsimony mask where only parsimony-informative sites are
 retained [default: no].
+
+=item --keep-codons
+
+When specified, this option forces the various applied masks to follow the
+codon structure [default: no]. This option only makes sense with nt seqs. See
+options C<--codon-max> and C<--coding-frame> for more control on this
+behavior.
+
+=item --codon-max[-nt-drop]=<n>
+
+Number of non-dropped nt sites allowed in a codon to be dropped [default: 1].
+Allowed values are 0, 1 and 2. To be used when the option C<--keep-codons> is
+also specified.
+
+=for Euclid: n.type:    integer, 0 <= n && n <= 2
+    n.default: 1
+
+=item --coding-frame=<n>
+
+Reading frame to be used when determining the ALI codon structure [default:
++1]. Allowed values are -3 to -1 and +1 to +3. To be used when the option
+C<--keep-codons> is also specified.
+
+=for Euclid: n.type:    integer, -3 <= n && n <= 3 && n != 0
+    n.default: +1
 
 =item --min[-res-seq]=<n>
 

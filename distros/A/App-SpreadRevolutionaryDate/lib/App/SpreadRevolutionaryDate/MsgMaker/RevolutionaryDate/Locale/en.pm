@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2024 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en::VERSION = '0.33';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en::VERSION = '0.35';
 # ABSTRACT: English localization of (part of) L<DateTime::Calendar::FrenchRevolutionary::Locale::en>
 
 use Moose;
@@ -445,7 +445,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en - English 
 
 =head1 VERSION
 
-version 0.33
+version 0.35
 
 =head1 DESCRIPTION
 
@@ -485,7 +485,11 @@ When L<DateTime::Calendar::FrenchRevolutionary::Locale::en> leaves some translat
 
 =item L<App::SpreadRevolutionaryDate::Config>
 
+=item L<App::SpreadRevolutionaryDate::BlueskyLite>
+
 =item L<App::SpreadRevolutionaryDate::Target>
+
+=item L<App::SpreadRevolutionaryDate::Target::BlueSky>
 
 =item L<App::SpreadRevolutionaryDate::Target::Twitter>
 
@@ -523,7 +527,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2023 by Gérald Sédrati.
+This software is Copyright (c) 2019-2024 by Gérald Sédrati.
 
 This is free software, licensed under:
 

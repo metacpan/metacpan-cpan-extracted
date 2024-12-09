@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.242020';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.243430';
 use Moose;
 use namespace::autoclean;
 
@@ -19,6 +19,7 @@ use Moose::Util::TypeConstraints;
 use Algorithm::NeedlemanWunsch;
 use Carp;
 use Const::Fast;
+use File::Basename;
 use File::Find::Rule;
 use IPC::System::Simple qw(system);
 use List::AllUtils 0.12
@@ -555,6 +556,9 @@ around qw( get_taxonomy get_taxonomy_with_levels get_term_at_level ) => sub {
         $taxon_id = $self->merged_for($taxon_id);
         carp "$msg using $taxon_id instead!" unless $noted;
     }
+
+    # enforce use of GCA accessions even with GCF accessions
+    $taxon_id =~ tr/F/A/ if defined $taxon_id && $taxon_id =~ $GCAONLY;
 
     return $self->$method($taxon_id, @_);
 };
@@ -1427,7 +1431,7 @@ sub new_from_cache {                        ## no critic (RequireArgUnpacking)
     my $class = shift;
     my %args  = @_;                         # TODO: handle HashRef?
 
-    ### Loading NCBI Taxonomy from binary cache file...
+    ### Loading NCBI (or GTDB) Taxonomy from binary cache file...
     my $tax_dir = dir( glob $args{tax_dir} );
     my $cachefile = file($tax_dir, $CACHEDB);
     my $tax = $class->load($cachefile, inject => { tax_dir => $tax_dir } );
@@ -1555,6 +1559,46 @@ sub _setup_ncbi_taxdir {
     return 0;
 }
 
+# December 2024
+# $ cd ~/taxdump
+# $ wc -l assembly_summary_*txt
+#  2698890 assembly_summary_genbank.txt
+#    75493 assembly_summary_genbank_historical.txt
+#   414559 assembly_summary_refseq.txt
+#    93051 assembly_summary_refseq_historical.txt
+#  3281993 total
+#
+# $ cut -f1 *genbank_historical.txt | cut -c5- | sort | uniq > gca_hist
+# $ cut -f1 *genbank.txt | cut -c5- | sort | uniq > gca
+# $ cut -f1  *refseq_historical.txt | cut -c5- | sort | uniq > gcf_hist
+# $ cut -f1  *refseq.txt | cut -c5- | sort | uniq > gcf
+#
+# $ cat gca gca_hist | sort | uniq -d
+#        2              # header
+# $ cat gcf gcf_hist | sort | uniq -d
+#        2              # header
+# $ cat gca gcf | sort | uniq -d | wc -l
+#   411120              # incl. header
+# $ cat gca gcf_hist | sort | uniq -d | wc -l
+#    79371              # incl. header
+#
+# $ sort gca_hist gca > gca_all
+# $ sort gcf_hist gcf > gcf_all
+#
+# $ join gcf_all gca_all > redund_gcf
+# $ wc -l redund_gcf
+#   507183 redund_gcf
+# $ diff redund_gcf gcf_all | grep \> | cut -c3- > uniq_gcf
+# $ wc -l uniq_gcf
+#      433 uniq_gcf     # these RefSeq's GCFs are not found in GenBank's GCAs
+#
+# # check output of BMC's (smart) skipping of redundant GCFs
+# $ grep GCF gca0-names.dmp | cut -f1 | cut -c5- | sort > uniq_gcf_bmc
+# $ wc -l uniq_gcf_bmc
+#      431 uniq_gcf_bmc # identical (only missing header)
+#
+# # now these are turned to GCAs in cachedb.bin
+
 sub _make_gca_files {
     my $class   = shift;
     my $tax_dir = shift;
@@ -1585,8 +1629,8 @@ sub _make_gca_files {
     # Note: the order is significant (last files dominate over first files)
     my @targets_acc = qw(
         assembly_summary_genbank_historical.txt
-        assembly_summary_refseq_historical.txt
         assembly_summary_genbank.txt
+        assembly_summary_refseq_historical.txt
         assembly_summary_refseq.txt
     );
 
@@ -1630,6 +1674,14 @@ sub _make_gca_files {
 
             # skip deleted nodes (again mostly from historical assembly files)
             next LINE if $tax->is_deleted($taxon_id);
+
+            # skip GCF entries with corresponding GCA already available...
+            # ... and transform remaining GCF entries into GCA entries
+            # Note: versions are considered relevant; only prefix is ignored
+            if ($accession =~ $GCAONLY) {
+                $accession =~ tr/F/A/;
+                next LINE if defined $name_for{$accession};
+            }
 
             # fetch taxonomy and org using taxon_id
             my @taxonomy = $tax->get_taxonomy($taxon_id);
@@ -1777,10 +1829,21 @@ sub _setup_gtdb_taxdir {
 
     # setup remote archive access
     my $base = 'https://data.gtdb.ecogenomic.org/releases/latest';
+
+    # get directory listing of latest GTDB release
+    my $listing = get($base)
+        or croak "[BMC] Error: cannot download $base: error $!; aborting!";
+
+    croak "[BMC] Error: cannot determine path to GTDB files; aborting!"
+        unless $listing;
+
+    # determine filenames from directory listing
     my @targets = (
-        'ar122_metadata.tar.gz' , 'bac120_metadata.tar.gz',
+        grep { m/metadata.*\.gz/xms } $listing =~ m/href="([^"]+?)"/xmsg,
+        # Note: did try with Regexp::Common (delimiters) but less handy
         'FILE_DESCRIPTIONS', 'METHODS', 'RELEASE_NOTES', 'VERSION'
     );
+    #### @targets
 
     for my $target (@targets) {
         my $url = "$base/$target";
@@ -1793,21 +1856,24 @@ sub _setup_gtdb_taxdir {
 
         if ($target =~ m/metadata/xms) {
             ### Unarchiving: $zipfile
-            system("tar -xzf $zipfile -C $tax_dir");
-            file($zipfile)->remove;
+            system("gunzip $zipfile");
+            # file($zipfile)->remove;
         }
     }
 
-    my $arc_file = file($tax_dir, 'ar122_metadata*.tsv');
-    my $bac_file = file($tax_dir, 'bac120_metadata*.tsv');
-    my $new_arcfile = file($tax_dir, 'archaea_metadata.tsv');
+    # change file names to avoid GTDB version in basenames
+    my $new_arcfile = file($tax_dir,  'archaea_metadata.tsv');
     my $new_bacfile = file($tax_dir, 'bacteria_metadata.tsv');
-
-    # change file name to avoid GTDB version in basename
     $new_arcfile->remove if -e $new_arcfile;
     $new_bacfile->remove if -e $new_bacfile;
-    system("mv $arc_file $new_arcfile");
-    system("mv $bac_file $new_bacfile");
+
+    my ($arcbase) = fileparse($targets[0], qr{\.[^.]*}xms);
+    my ($bacbase) = fileparse($targets[1], qr{\.[^.]*}xms);
+    my $old_arcfile = file($tax_dir, $arcbase);
+    my $old_bacfile = file($tax_dir, $bacbase);
+
+    $old_arcfile->move_to($new_arcfile);
+    $old_bacfile->move_to($new_bacfile);
 
     # return true on success (only check main files)
     if ( -r $new_arcfile && -r $new_bacfile ) {
@@ -1887,7 +1953,7 @@ sub _setup_gtdb_taxdir {
 
                 # change GCF to GCA and store it
                 if ($gca =~ m/^GCF/xms) {
-                    (my $new_gca = $gca ) =~ s/GCF/GCA/xms;
+                    my $new_gca = $gca =~ tr/F/A/r;
                     push @{ $tree_ref->{$taxon_id}{gca} }, $new_gca;
                 }
 
@@ -2025,7 +2091,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.242020
+version 0.243430
 
 =head1 SYNOPSIS
 

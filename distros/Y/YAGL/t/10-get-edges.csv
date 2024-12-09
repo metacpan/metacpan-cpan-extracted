@@ -1,0 +1,11 @@
+node,neighbor,weight
+gt7079,zw9308,96
+zw9308,gt7079,96
+zw9308,kn534,78
+zw9308,yl4524,84
+kn534,zw9308,78
+yl4524,zw9308,84
+abc123,xyz789,1000000
+abc123,I_AM_A_TEST,12345
+xyz789,abc123,1000000
+I_AM_A_TEST,abc123,12345

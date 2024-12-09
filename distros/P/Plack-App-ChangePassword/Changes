@@ -1,3 +1,6 @@
+0.05 2024-12-08T18:18:38+01:00
+ - Fix default value of messages.
+
 0.04 2024-05-10T13:12:59+02:00
  - Add lang() and text() accessor for translations.
  - Add test for translation.

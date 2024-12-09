@@ -4,11 +4,9 @@ stuff
 xtest
 dist\.ini
 weaver\.ini
-\btest\/taxdump/readme\.txt
-\btest\/taxdump/(?!mis)[^_]+\.dmp
-\btest\/taxdump/assembly_.*
-\btest\/taxdump/.*?\.bin
-\btest\/my_.*
+test\/gtdb
+test\/taxdump
+test\/my_.*
 nytprof*
 tags
 .DS_Store

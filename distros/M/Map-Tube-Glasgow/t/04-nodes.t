@@ -1,5 +1,4 @@
 #!perl
-
 use strict;
 use warnings FATAL => 'all';
 use Test::More tests => 23;
@@ -21,7 +20,11 @@ my $map = new_ok( 'Map::Tube::Glasgow' );
 is( $map->name( ), 'Glasgow tube', 'Name of map does not match' );
 
 eval { $map->get_node_by_name('XYZ'); };
-like($@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E/, 'Node XYZ should not exist' );
+# Different Map::Tube versions give different error messages for the following:
+like( $@,
+      qr/(\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E)|(\QMap::Tube::get_node_by_id(): ERROR: Missing Station ID\E)/,
+      'Node XYZ should not exist'
+    );
 
 {
   my $ret = $map->get_node_by_name('Cowcaddens');

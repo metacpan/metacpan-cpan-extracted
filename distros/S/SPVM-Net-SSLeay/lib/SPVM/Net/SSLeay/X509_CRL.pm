@@ -32,13 +32,13 @@ If X509_CRL_new failed, an exception is thrown with C<eval_error_id> set to the 
 
 =head2 get_REVOKED
 
-C<method get_REVOKED : L<X509_REVOKED|SPVM::X509_REVOKED>[] ();>
+C<method get_REVOKED : L<Net::SSLeay::X509_REVOKED|SPVM::Net::SSLeay::X509_REVOKED>[] ();>
 
 Calls native L<get_REVOKED|https://docs.openssl.org/master/man3/X509_CRL_get0_by_serial/> function given the pointer value of the instance.
 
-And creates a new L<X509_REVOKED|SPVM::X509_REVOKED> array,
+And creates a new L<Net::SSLeay::X509_REVOKED|SPVM::Net::SSLeay::X509_REVOKED> array,
 
-And runs the following loop: copies the element at index $i of the return value(C<STACK_OF(X509_REVOKED)>) of the native function using native L<X509_REVOKED_dup|https://docs.openssl.org/1.1.1/man3/X509_dup/>, creates a new L<X509_REVOKED|SPVM::X509_REVOKED> object, sets the pointer value of the new object to the native copied value, and puses the new object to the new array.
+And runs the following loop: copies the element at index $i of the return value(C<STACK_OF(X509_REVOKED)>) of the native function using native L<X509_REVOKED_dup|https://docs.openssl.org/1.1.1/man3/X509_dup/>, creates a new L<Net::SSLeay::X509_REVOKED|SPVM::Net::SSLeay::X509_REVOKED> object, sets the pointer value of the new object to the native copied value, and puses the new object to the new array.
 
 And returns the new array.
 

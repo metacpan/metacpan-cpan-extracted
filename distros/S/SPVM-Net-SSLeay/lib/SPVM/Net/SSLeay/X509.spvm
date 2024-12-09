@@ -10,10 +10,15 @@ class Net::SSLeay::X509 : pointer {
   use Net::SSLeay::Constant as SSL;
   use Net::SSLeay::ASN1_OBJECT;
   use Net::SSLeay::X509_EXTENSION;
+  use Net::SSLeay::EVP_PKEY;
+  use Net::SSLeay::ASN1_INTEGER;
+  use Net::SSLeay::GENERAL_NAME;
   
   use Fn;
   
   # Class Methods
+  native static method new : Net::SSLeay::X509 ();
+  
   private static method new_with_pointer : Net::SSLeay::X509 ($pointer : Address, $options : object[] = undef) {
     
     my $self = new Net::SSLeay::X509;
@@ -23,24 +28,14 @@ class Net::SSLeay::X509 : pointer {
     return $self;
   }
   
+  native static method check_issued : int ($issuer : Net::SSLeay::X509, $subject : Net::SSLeay::X509);
+  
   # Instance Methods
+  native method get_serialNumber : Net::SSLeay::ASN1_INTEGER ();
+  
   native method get_issuer_name : Net::SSLeay::X509_NAME ();
   
   native method get_subject_name : Net::SSLeay::X509_NAME ();
-  
-  native method digest : int ($type : Net::SSLeay::EVP_MD, $md : mutable string, $len_ref : int*);
-  
-  method digest_return_string : string ($type : Net::SSLeay::EVP_MD) {
-    
-    my $md = (mutable string)new_string_len SSL->EVP_MAX_MD_SIZE;
-    my $len = 0;
-    
-    $self->digest($type, $md, \$len);
-    
-    Fn->shorten($md, $len);
-    
-    return $md;
-  }
   
   native method pubkey_digest : int ($type : Net::SSLeay::EVP_MD, $md : mutable string, $len_ref : int*);
   
@@ -56,24 +51,31 @@ class Net::SSLeay::X509 : pointer {
     return $md;
   }
   
-  native method dup : Net::SSLeay::X509 ();
-  
-  native method check_issued : int ($subject : Net::SSLeay::X509);
-  
-  native method get_ocsp_uri : string ();
-  
-  method P_get_ocsp_uri : string () {
-    
-    warn "Net::SSLeay::X509#P_get_ocsp_uri method is deprecated.";
-    
-    return $self->get_ocsp_uri;
-  }
-  
-  native method get_ext_by_NID : int ($nid : int, $lastpos : int);
+  native method get_ext_by_NID : int ($nid : int, $lastpos : int = 0);
   
   native method get_ext_count : int ();
   
   native method get_ext : Net::SSLeay::X509_EXTENSION ($loc : int);
+  
+  native method get_subjectAltNames : Net::SSLeay::GENERAL_NAME[] ();
+  
+  native method get_ocsp_uri : string ();
+  
+  native method digest : int ($type : Net::SSLeay::EVP_MD, $md : mutable string, $len_ref : int*);
+  
+  method digest_return_string : string ($type : Net::SSLeay::EVP_MD) {
+    
+    my $md = (mutable string)new_string_len SSL->EVP_MAX_MD_SIZE;
+    my $len = 0;
+    
+    $self->digest($type, $md, \$len);
+    
+    Fn->shorten($md, $len);
+    
+    return $md;
+  }
+  
+  native method dup : Net::SSLeay::X509 ();
   
   native method DESTROY : void ();
   

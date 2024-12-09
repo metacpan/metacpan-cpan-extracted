@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2024 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker;
-$App::SpreadRevolutionaryDate::MsgMaker::VERSION = '0.33';
+$App::SpreadRevolutionaryDate::MsgMaker::VERSION = '0.35';
 # ABSTRACT: Role providing interface for crafting a message to be spread by L<App::SpreadRevolutionaryDate>.
 
 use Moose::Role;
@@ -60,7 +60,7 @@ App::SpreadRevolutionaryDate::MsgMaker - Role providing interface for crafting a
 
 =head1 VERSION
 
-version 0.33
+version 0.35
 
 =head1 DESCRIPTION
 
@@ -80,7 +80,11 @@ This role provides a C<locale> required attribute (defaults to C<'fr'>), which h
 
 =item L<App::SpreadRevolutionaryDate::Config>
 
+=item L<App::SpreadRevolutionaryDate::BlueskyLite>
+
 =item L<App::SpreadRevolutionaryDate::Target>
+
+=item L<App::SpreadRevolutionaryDate::Target::Bluesky>
 
 =item L<App::SpreadRevolutionaryDate::Target::Twitter>
 
@@ -118,7 +122,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2023 by Gérald Sédrati.
+This software is Copyright (c) 2019-2024 by Gérald Sédrati.
 
 This is free software, licensed under:
 

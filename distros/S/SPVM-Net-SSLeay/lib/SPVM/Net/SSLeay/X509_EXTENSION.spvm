@@ -10,10 +10,9 @@ class Net::SSLeay::X509_EXTENSION : pointer {
   use Net::SSLeay::ASN1_OBJECT;
   use Fn;
   
-  # Fields
-  has ref_x509 : Net::SSLeay::X509;
-  
   # Class Methods
+  native static method new : Net::SSLeay::X509_EXTENSION ();
+  
   private static method new_with_pointer : Net::SSLeay::X509_EXTENSION ($pointer : Address, $options : object[] = undef) {
     
     my $self = new Net::SSLeay::X509_EXTENSION;
@@ -29,6 +28,12 @@ class Net::SSLeay::X509_EXTENSION : pointer {
   native method get_object : Net::SSLeay::ASN1_OBJECT ();
   
   native method get_critical : int ();
+  
+  native method set_object : int ($obj : Net::SSLeay::ASN1_OBJECT);
+  
+  native method set_critical : int ($crit : int);
+  
+  native method set_data : int ($data : Net::SSLeay::ASN1_OCTET_STRING);
   
   native method DESTROY : void ();
   

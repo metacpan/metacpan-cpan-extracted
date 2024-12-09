@@ -41,16 +41,20 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "Graph" : "0",
+            "Test::Map::Tube" : "0",
+            "XML::Twig" : "0"
+         },
          "requires" : {
-            "Test::More" : "0.82",
-            "XML::Simple" : "0"
+            "Test::More" : "0.82"
          }
       }
    },
    "provides" : {
       "Map::Tube::KoelnBonn" : {
          "file" : "lib/Map/Tube/KoelnBonn.pm",
-         "version" : "v0.92.0"
+         "version" : "v0.92.1"
       }
    },
    "release_status" : "stable",
@@ -59,6 +63,6 @@
          "mailto" : "bug-Map-Tube-KoelnBonn@rt.cpan.org"
       }
    },
-   "version" : "v0.92.0",
+   "version" : "v0.92.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

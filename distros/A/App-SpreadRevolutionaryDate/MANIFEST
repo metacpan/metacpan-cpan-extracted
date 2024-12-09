@@ -16,6 +16,7 @@ bin/spread-revolutionary-date
 dist.ini
 etc/sample-spread-revolutionary-date.conf
 lib/App/SpreadRevolutionaryDate.pm
+lib/App/SpreadRevolutionaryDate/BlueskyLite.pm
 lib/App/SpreadRevolutionaryDate/Config.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker/PromptUser.pm
@@ -27,6 +28,7 @@ lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/es.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/fr.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/it.pm
 lib/App/SpreadRevolutionaryDate/Target.pm
+lib/App/SpreadRevolutionaryDate/Target/Bluesky.pm
 lib/App/SpreadRevolutionaryDate/Target/Freenode.pm
 lib/App/SpreadRevolutionaryDate/Target/Freenode/Bot.pm
 lib/App/SpreadRevolutionaryDate/Target/Liberachat.pm
@@ -39,6 +41,7 @@ lib/LocaleData/es/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
 lib/LocaleData/fr/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
 lib/LocaleData/it/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
 t/00-compile.t
+t/bluesky.t
 t/command_line.t
 t/config.t
 t/locale.t

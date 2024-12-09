@@ -1,0 +1,10 @@
+node,neighbor,weight,is_directed
+a,b,0,0
+a,f,0,0
+f,e,0,0
+e,d,0,0
+a,g,0,0
+g,c,0,0
+j,k,0,0
+j,l,0,0
+l,m,0,0

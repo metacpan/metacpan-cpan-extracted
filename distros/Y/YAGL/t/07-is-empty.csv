@@ -1,0 +1,13 @@
+node,neighbor,weight
+sk132,io9729,62
+sk132,bj2518,60
+sk132,io9729,62
+io9729,sk132,62
+io9729,sk132,62
+io9729,ds2196,69
+bj2518,sk132,60
+ds2196,io9729,69
+abc123,xyz789,1000000
+abc123,I_AM_A_TEST,12345
+xyz789,abc123,1000000
+I_AM_A_TEST,abc123,12345

@@ -277,7 +277,7 @@ SKIP: {
     my $got_mask = $class->and_mask($mask1, $mask2);
 
     is_deeply $got_mask, $exp_mask,
-        'correctly created the new mask with';
+        'correctly created the new mask with and';
 }
 
 # or_mask
@@ -290,7 +290,20 @@ SKIP: {
     my $got_mask = $class->or_mask($mask1, $mask2);
 
     is_deeply $got_mask, $exp_mask,
-        'correctly create the new mask with or';
+        'correctly created the new mask with or';
+}
+
+# codon_mask
+{
+    my @mask =       qw( 1  1 1 1  0 0 1  0 0 1  1 1 0  0 0 0  1 1 0  1 0 1  1 );
+    my $mask = $class->new( mask => \@mask );
+
+    my @exp_states = qw( 0  1 1 1  0 0 0  0 0 0  1 1 1  0 0 0  1 1 1  1 1 1  0 );
+    my $exp_mask = $class->new( mask => \@exp_states );
+    my $got_mask = $mask->codon_mask( { frame => 2, max => 1 } );
+
+    is_deeply $got_mask, $exp_mask,
+        'correctly codonized the mask with frame 2 and max 1';
 }
 
 # store_blocks

@@ -43,6 +43,7 @@ WriteMakefile(
 												   recommends => {
 																   'Test::Map::Tube' => 0,
 																   'XML::Twig'       => 0,
+																   'Graph'           => 0,
 																 },
 												 },
 									   },

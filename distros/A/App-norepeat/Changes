@@ -1,32 +1,37 @@
-Revision history for App-norepeat
+0.060   2024-12-06  Released-By: PERLANCAR; Urgency: low
 
-0.05    2015-05-16 (PERLANCAR)
+        - No functional changes.
+
+        - [doc] Mention App::repeat.
+
+
+0.05    2015-05-16  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [Bugfix] 2h was not allowed, it should be allowed like 2hour.
 
 
-0.04    2014-10-07 (PERLANCAR)
+0.04    2014-10-07  Released-By: PERLANCAR
 
 	- Bugfix: Add aliases --hourly, --daily, --weekly, --monthly,
 	  --yearly (like described already in doc).
 
 
-0.03    2014-06-07 (SHARYANTO)
+0.03    2014-06-07  Released-By: SHARYANTO
 
         - Implement 'n weeks' and 'weekly' periods.
 
         - Document the DEBUG and NOW environment variables. Add some more POD.
 
 
-0.02    2014-04-04 (SHARYANTO)
+0.02    2014-04-04  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Bugfix: fix exit code when command is not specified.
 
 
-0.01    2013-11-08 (SHARYANTO)
+0.01    2013-11-08  Released-By: SHARYANTO
 
         - First release, no tests yet.

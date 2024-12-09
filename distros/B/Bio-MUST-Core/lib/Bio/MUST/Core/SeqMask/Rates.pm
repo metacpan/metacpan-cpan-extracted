@@ -1,6 +1,6 @@
 package Bio::MUST::Core::SeqMask::Rates;
 # ABSTRACT: Evolutionary rates for sequence sites
-$Bio::MUST::Core::SeqMask::Rates::VERSION = '0.242020';
+$Bio::MUST::Core::SeqMask::Rates::VERSION = '0.243430';
 use Moose;
 use namespace::autoclean;
 
@@ -262,7 +262,7 @@ Bio::MUST::Core::SeqMask::Rates - Evolutionary rates for sequence sites
 
 =head1 VERSION
 
-version 0.242020
+version 0.243430
 
 =head1 SYNOPSIS
 

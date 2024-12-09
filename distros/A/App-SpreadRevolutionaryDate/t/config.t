@@ -2,7 +2,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2024 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -14,7 +14,7 @@ BEGIN {
 }
 binmode(DATA, ":encoding(UTF-8)");
 
-use Test::More tests => 29;
+use Test::More tests => 32;
 use Test::NoWarnings;
 
 use App::SpreadRevolutionaryDate;
@@ -29,11 +29,15 @@ isa_ok($spread_revolutionary_date->config, 'App::SpreadRevolutionaryDate::Config
 is($spread_revolutionary_date->config->test, 1, 'Test option set');
 is($spread_revolutionary_date->config->locale, 'fr', 'Locale option value');
 
-is_deeply($spread_revolutionary_date->config->targets, ['twitter', 'mastodon', 'freenode', 'liberachat'], 'Default targets options set by default');
+is_deeply($spread_revolutionary_date->config->targets, ['bluesky', 'twitter', 'mastodon', 'freenode', 'liberachat'], 'Default targets options set by default');
 
+ok($spread_revolutionary_date->config->twitter, 'Bluesky option set by default');
 ok($spread_revolutionary_date->config->twitter, 'Twitter option set by default');
 ok($spread_revolutionary_date->config->mastodon, 'Mastodon option set by default');
 ok($spread_revolutionary_date->config->freenode, 'Freenode option set by default');
+
+is($spread_revolutionary_date->config->bluesky_identifier, 'Identifier', 'Bluesky identifier value');
+is($spread_revolutionary_date->config->bluesky_password, 'Password', 'Bluesky password value');
 
 is($spread_revolutionary_date->config->twitter_consumer_key, 'ConsumerKey', 'Twitter consumer_key value');
 is($spread_revolutionary_date->config->twitter_consumer_secret, 'ConsumerSecret', 'Twitter consumer_secret value');
@@ -68,6 +72,11 @@ my $spread_freenode = App::SpreadRevolutionaryDate->new(\*DATA);
 is_deeply($spread_freenode->config->freenode_test_channels, ['#TestOnlyMe'], 'Freenode multivalued test_channels option overridden by command line argument');
 
 __DATA__
+
+[bluesky]
+# Get these values from https://bsky.app/
+identifier = 'Identifier'
+password   = 'Password'
 
 [twitter]
 # Get these values from https://apps.twitter.com/

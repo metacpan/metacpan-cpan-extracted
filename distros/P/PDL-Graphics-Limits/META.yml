@@ -10,6 +10,7 @@ build_requires:
   Test::PDL: '0.21'
 configure_requires:
   ExtUtils::MakeMaker: '7.14'
+  PDL: '2.095'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -30,5 +31,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/PDL-Graphics-Limits/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/PDL-Graphics-Limits.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

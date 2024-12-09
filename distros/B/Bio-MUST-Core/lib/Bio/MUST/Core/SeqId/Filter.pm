@@ -1,6 +1,6 @@
 package Bio::MUST::Core::SeqId::Filter;
 # ABSTRACT: Helper class for filtering seqs according to SeqId components
-$Bio::MUST::Core::SeqId::Filter::VERSION = '0.242020';
+$Bio::MUST::Core::SeqId::Filter::VERSION = '0.243430';
 use Moose;
 use namespace::autoclean;
 
@@ -38,7 +38,7 @@ Bio::MUST::Core::SeqId::Filter - Helper class for filtering seqs according to Se
 
 =head1 VERSION
 
-version 0.242020
+version 0.243430
 
 =head1 SYNOPSIS
 

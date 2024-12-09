@@ -52,7 +52,7 @@ inst-split-seqs.pl - Split sequences of FASTA files into shorter sequences (opti
 
 =head1 VERSION
 
-version 0.242020
+version 0.243430
 
 =head1 USAGE
 

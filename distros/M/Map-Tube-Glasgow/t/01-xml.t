@@ -1,36 +1,50 @@
-#!perl
-
+#!perl -T
 use strict;
-use warnings FATAL => 'all';
 use utf8;
 use Test::More 0.82;
-use XML::Simple;
 use Map::Tube::Glasgow;
+eval 'use XML::Twig';
+plan skip_all => 'XML::Twig required' if $@;
 
 my $map = new_ok( 'Map::Tube::Glasgow' );
-my $xml = XMLin( $map->xml( ) , KeyAttr => [ ], KeepRoot => 1, );
+my $xml = XML::Twig->new( );
+$xml->parsefile( $map->xml( ) );
+my $root = $xml->root( );
 
-ok( exists $xml->{'tube'},               'There should be a <tube> tag at the top level' );
-ok( exists $xml->{'tube'}->{'name'},     'There should be one <name> tag directly under the top level' );
-ok( exists $xml->{'tube'}->{'lines'},    'There should be one <lines> tag directly under the top level' );
-ok( exists $xml->{'tube'}->{'stations'}, 'There should be one <stations> tag directly under the top level' );
+# This test operates on the original XML data, not the digested data
+is( $root->tag( ), 'tube',                     'The root element should be a <tube> tag' );
+ok( defined( $root->att('name') ),             '<tube> tag should have a name attribute' );
+isnt( $root->att('name'),     '',              'name attribute of <tube> tag should not be empty' )     if defined( $root->att('name') );
 
-cmp_ok( scalar( @{ $xml->{'tube'}->{'stations'}->{'station'} } ), '>=', 5, 'There should be several <station> tags directly under <stations>' );
-isa_ok( $xml->{'tube'}->{'lines'   }->{'line'   }, 'HASH', 'There should be exactly one <line> tag directly under <lines>' );
-
-for my $station( @{ $xml->{'tube'}->{'stations'}->{'station'} } ) {
-  ok( exists $station->{'id'},   '<station> tags should have an id attribute'  );
-  ok( exists $station->{'name'}, '<station> tags should have a name attribute' );
-  ok( exists $station->{'line'}, '<station> tags should have a line attribute' );
-  ok( exists $station->{'link'}, '<station> tags should have a link attribute' );
+my $lines = $root->first_child('lines');
+ok( defined($lines), 'There should be a <lines> tag directly under the root' );
+if ( defined($lines) ) {
+  is( $lines->children_count('line'), 1, 'There should be exactly one <line> tag directly under <lines>' );
+  my $line = $lines->first_child('line');
+  my $i = 0;
+  while ($line) {
+    ok( $line->att('id'),       "<line> tag #$i should have a non-empty id attribute"        );
+    ok( $line->att('name'),     "<line> tag #$i should have a non-empty name attribute"      );
+    ok( $line->att('color'),    "<line> tag #$i should have a non-empty color attribute"     );
+    $line = $line->next_sibling( );
+    $i++;
+  }
 }
 
-{
-  my $line = $xml->{'tube'}->{'lines'}->{'line'};
-  ok( exists $line->{'id'},      '<line> tags should have an id attribute'   );
-  ok( exists $line->{'name'},    '<line> tags should have a name attribute'  );
-  ok( exists $line->{'color'},   '<line> tags should have a color attribute' );
-  like( $line->{'color'}, qr/^#[0-9A-F]{6}$/i, 'color attribute of <line> should be six-digit hex format HTML color spec' );
+my $stations = $root->first_child('stations');
+ok( defined($stations), 'There should be a <stations> tag directly under the root' );
+if ( defined($stations) ) {
+  cmp_ok( $stations->children_count('station'), '>=', 5, 'There should be several <station> tags directly under <stations>' );
+  my $station = $stations->first_child('station');
+  my $i = 0;
+  while ($station) {
+    ok( $station->att('id'),       "<station> tag #$i should have a non-empty id attribute"        );
+    ok( $station->att('name'),     "<station> tag #$i should have a non-empty name attribute"      );
+    ok( $station->att('line'),     "<station> tag #$i should have a non-empty line attribute"      );
+    ok( $station->att('link'),     "<station> tag #$i should have a non-empty link attribute"      );
+    $station = $station->next_sibling( );
+    $i++;
+  }
 }
 
 done_testing( );

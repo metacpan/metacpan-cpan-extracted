@@ -1,0 +1,7 @@
+To update the local perl libs being used when jumping machines:
+
+    perl Makefile.PL
+
+To update the MANIFEST file:
+
+    make manifest

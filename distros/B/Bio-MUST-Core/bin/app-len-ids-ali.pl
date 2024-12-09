@@ -38,7 +38,7 @@ app-len-ids-ali.pl - Appends seq lengths to ids in ALI files (as SCaFoS)
 
 =head1 VERSION
 
-version 0.242020
+version 0.243430
 
 =head1 USAGE
 

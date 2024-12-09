@@ -1,0 +1,53 @@
+CDF/Demo.pm
+CDF/gsl_cdf.pd
+CDF/Makefile.PL
+CDF/t/cdf.t
+Changes
+DIFF/FUNC.c
+DIFF/gsl_diff.pd
+DIFF/Makefile.PL
+DIFF/t/gsl_diff.t
+Distr/distr.pd
+Distr/Makefile.PL
+Distr/t/stats_distr.t
+GSL.pm
+gslerr.h
+INTEG/FUNC.c
+INTEG/gsl_integ.pd
+INTEG/Makefile.PL
+INTEG/t/gsl_integ.t
+INTERP/gsl_interp.pd
+INTERP/Makefile.PL
+INTERP/t/gsl_interp.t
+INTERP/typemap
+LINALG/gsl_linalg.pd
+LINALG/Makefile.PL
+LINALG/t/gsl_linalg.t
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+MROOT/FUNC.c
+MROOT/gsl_mroot.pd
+MROOT/Makefile.PL
+MROOT/t/gsl_mroot.t
+RNG/Demo.pm
+RNG/gsl_random.pd
+RNG/Makefile.PL
+RNG/README
+RNG/t/gsl_rng.t
+RNG/typemap
+SF/gsl_sf.pd
+SF/Makefile.PL
+SF/README
+SF/t/gsl_sf.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/GSL/CDF.pm                 mod=PDL::GSL::CDF pd=CDF/gsl_cdf.pd (added by pdlpp_mkgen)
+GENERATED/PDL/GSL/DIFF.pm                mod=PDL::GSL::DIFF pd=DIFF/gsl_diff.pd (added by pdlpp_mkgen)
+GENERATED/PDL/GSL/INTEG.pm               mod=PDL::GSL::INTEG pd=INTEG/gsl_integ.pd (added by pdlpp_mkgen)
+GENERATED/PDL/GSL/INTERP.pm              mod=PDL::GSL::INTERP pd=INTERP/gsl_interp.pd (added by pdlpp_mkgen)
+GENERATED/PDL/GSL/LINALG.pm              mod=PDL::GSL::LINALG pd=LINALG/gsl_linalg.pd (added by pdlpp_mkgen)
+GENERATED/PDL/GSL/MROOT.pm               mod=PDL::GSL::MROOT pd=MROOT/gsl_mroot.pd (added by pdlpp_mkgen)
+GENERATED/PDL/GSL/RNG.pm                 mod=PDL::GSL::RNG pd=RNG/gsl_random.pd (added by pdlpp_mkgen)
+GENERATED/PDL/GSL/SF.pm                  mod=PDL::GSL::SF pd=SF/gsl_sf.pd (added by pdlpp_mkgen)
+GENERATED/PDL/Stats/Distr.pm             mod=PDL::Stats::Distr pd=Distr/distr.pd (added by pdlpp_mkgen)

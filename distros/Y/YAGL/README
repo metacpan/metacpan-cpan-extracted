@@ -1,0 +1,704 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+YAGL - Yet Another Graph Library
+
+=head1 VERSION
+
+version 0.1
+
+=head1 SYNOPSIS
+
+    use YAGL;
+
+    my $g = YAGL->new;
+
+    # Populate the graph with 124 vertices, with randomly allocated
+    # weighted edges between some of the vertices. The 'p' argument is
+    # the probability that a given node A will *not* be connected to
+    # another randomly selected node B.
+
+    $g->generate_random_vertices(
+        { n => 124, p => 0.1, max_weight => 100_000 } );
+
+    # Add vertices to the graph.
+
+    $g->add_vertex('abc123');
+    $g->add_vertex('xyz789');
+    $g->add_vertex('I_AM_A_TEST');
+
+    # Add edges to the graph.  You can store arbitrary attributes on
+    # edges in hashrefs.
+
+    $g->add_edge( 'abc123', 'xyz789', { weight => 1_000_000 } );
+    $g->add_edge( 'I_AM_A_TEST', 'abc123', { weight => 12345 } );
+
+    # Write the graph out to a CSV file.  This file can be read back
+    # in later with the 'read_csv' method. The CSV format is limited,
+    # it can only store the following columns:
+    # node,neighbor,weight,is_directed
+
+    $g->write_csv('foo.csv');
+
+    # Pick a start and end vertex at random from the graph.
+
+    my @vertices = $g->get_vertices;
+
+    my $i     = int rand @vertices;
+    my $j     = int rand @vertices;
+    my $start = $vertices[$i];
+    my $end   = $vertices[$j];
+
+    # Using breadth-first search, find a path between the start and
+    # end vertices, if any such path exists.  Otherwise, this method
+    # returns undef.
+
+    my @path;
+    @path = $g->find_path_between( $start, $end );
+
+    # Get a string representation of the graph in the graphviz
+    # language for passing along to graphviz tools like `dot`.
+
+    my $dot_string = $g->to_graphviz;
+
+    # Color the vertices
+
+    $g->color_vertices;
+
+    # Find a Hamiltonian cycle in the graph, if any exist:
+
+    $g->hamiltonian_walks(closed => 1, n_solutions => 1);
+
+=head1 DESCRIPTION
+
+This library implements a
+L<graph|https://en.wikipedia.org/wiki/Graph_(discrete_mathematics)>
+data structure, and a number of common algorithms on graphs.  It can
+be used for both directed and undirected graphs.  Features include:
+
+=over
+
+=item * Generating random graphs.
+
+=item * Serializing graphs to and from CSV files.
+
+=item * Vertices and edges can have arbitrary attributes associated
+with them (stored in hashrefs).
+
+=item * Breadth-first search (BFS) to find the shortest path between
+two nodes.
+
+=item * Depth-first search (DFS).
+
+=item * Find minimum spanning trees of weighted graphs.
+
+=item * List the connected components.
+
+=item * Dijkstra's algorithm for finding the shortest path through a
+weighted graph.
+
+=item * A general method for exhaustive search with backtracking.
+
+=item * Finding Hamiltonian walks (open and closed) using exhaustive
+search with backtracking.
+
+=item * Vertex coloring.
+
+=back
+
+For a possibly interesting example, see the file
+C<examples/ladders.pl>, which is an approximate port to Perl of the
+C<LADDERS> program from the book I<The Stanford GraphBase> by Donald
+E. Knuth.  It uses Dijkstra's algorithm to build a "word ladder" of
+the form:
+
+WORDS - WOODS - GOODS - GOADS - GRADS - GRADE - GRAPE - GRAPH
+
+Finally, note that this library is still in development.  There are
+some important algorithms that are not yet implemented.  Also, some
+algorithms that are implemented for undirected graphs are not yet
+implemented for directed graphs.  Test coverage is OK, but can still
+be improved.
+
+=head1 METHODS
+
+=head2 INITIALIZATION AND RANDOMIZATION
+
+=over
+
+=item C<new>
+
+Initialize a new undirected graph:
+
+    my $g = YAGL->new;
+
+To make a directed graph, set the C<is_directed> argument:
+
+    my $g = YAGL->new(is_directed => 1);
+
+Note that a YAGL object must be set as directed or undirected when
+it's created, and it can't be changed later.
+
+=item C<generate_random_vertices>
+
+Generate C<n> vertices with random names, and distribute edges
+randomly among them with a 1-C<p> probability of connection.  Further,
+assign random weights to each edge up to the value of C<max_weight>.
+
+Note that this needs to be called on a graph object that already
+exists.  Also, it is usually best to call this on a brand new, empty
+graph, since it will overwrite or update existing vertices and edges
+if the random vertex name generator comes up with a name that is
+already in use.  This is unlikely in practice since the random names
+are alphanumeric gibberish like "cu991".
+
+Example:
+
+    my $g = YAGL->new;
+    $g->generate_random_vertices({n => 48, p => 0.1, max_weight => 1000});
+
+Arguments:
+
+=over
+
+=item C<n>
+
+Number of vertices.
+
+=item C<p>
+
+Probability that a given vertex I<A> will B<not> be connected to
+another randomly selected vertex I<B>.  In other words, the
+probability that I<A> will be connected to I<B> is 1-C<p>.
+
+=item C<max_weight>
+
+All edges are given a random integer weight less than or equal to this
+number.
+
+=back
+
+=back
+
+=head2 SERIALIZATION
+
+=over
+
+=item write_csv
+
+Write a CSV representation of this graph out to a (named) file.
+
+=item read_lst
+
+Read in a *.lst file that represents a graph (from L<https://hog.grinvin.org>).
+
+=item read_hcp
+
+Read in a *.hcp file that represents a graph (from L<https://sites.flinders.edu.au/flinders-hamiltonian-cycle-project/fhcp-challenge-set>).
+
+=item read_csv
+
+Read in a CSV file that represents a graph.
+
+=item to_graphviz
+
+Generate a Graphviz representation of this graph (really, a string).
+
+=item draw
+
+Given a file name, dumps a representation of the graph (as GraphViz)
+and uses C<dot> to build an image of the graph.  All of this happens
+in C<$TMPDIR>. This assumes you have a copy of C<dot> on your system.
+
+    $g->draw('24-ham-00');
+    # To view the file, open $TMPDIR/24-ham-00.jpg
+
+=back
+
+=head2 BOOLEAN METHODS
+
+=over
+
+=item is_empty
+
+Returns true if the graph is empty - that is, if it has no vertices.
+
+=item is_complete
+
+Return true if this is a complete graph.  A complete graph is one
+wherein each vertex is connected to every other vertex.
+
+=item is_tree
+
+Return true if this graph is a tree.  A graph is a tree if its number
+of edges is one fewer than its number of vertices.  This definition is
+taken from Even's book I<Graph Algorithms>.
+
+=item is_connected
+
+Return true if for each vertex A in this graph, there is a path
+between A and every other vertex in the graph.
+
+=item has_cycle
+
+Return true if there is a cycle in this graph; in other words, if this
+graph is not a tree.
+
+=item is_colored
+
+Return true if this graph has already been colored using the
+C<color_vertices> method.
+
+=item is_directed
+
+Return true if this is a directed graph.  Graphs can only be marked as
+directed during object initialization, by setting the C<is_directed>
+argument to C<new>.
+
+=item C<is_bipartite>
+
+Returns true if the graph G is bipartite.  False otherwise.
+
+Note that this method operates on a copy of the graph, to avoid
+overwriting any existing vertex colorings.
+
+=back
+
+=head2 METHODS ON VERTICES
+
+=over
+
+=item add_vertex
+
+Add a vertex V to this graph, if it does not already exist.  Return
+C<undef> if V already exists.
+
+    $g->add_vertex('s');
+
+=item add_vertices
+
+Add multiple vertices to this graph.  Takes an array as its argument.
+
+    my @to_add = qw/a b c d e f/;
+    $g->add_vertices(@to_add);
+
+=item get_neighbors
+
+Given a vertex in the graph, get its neighbors - that is, the other
+vertices to which it is connected.
+
+    $g->get_neighbors('s');
+
+=item has_vertex
+
+Return true if the vertex in question is a part of the graph.
+
+    $g->has_vertex('a');
+
+=item remove_vertex
+
+Remove the named vertex from the graph, if it exists.
+
+    $g->remove_vertex('s');
+
+Note that removing a vertex will also delete all edges (and edge
+attributes) between the given vertex and its former neighbors.
+
+=item get_vertices
+
+Return a list of the vertices in the graph.
+
+    my @v = $g->get_vertices;
+
+=item get_degree
+
+Given a vertex V, return the degree of that vertex -- that is, the
+number of edges between V and other vertices (its neighbors).
+
+=item set_vertex_attribute
+
+Given a vertex V, store a hashref of attributes about that vertex.
+
+=item get_vertex_attribute
+
+Given a vertex V and an attribute string, retrieve the value of that attribute.
+
+    my $weight = $g->get_vertex_attribute('s', 'weight');
+    # 123
+
+=item get_vertex_attributes
+
+Given a vertex V, return all of the vertex's attributes, whatever they
+are.  Reads from the object's internal hashref, so beware: these
+values could be anything.
+
+    my $attrs = $g->get_vertex_attributes('s');
+
+=item delete_vertex_attributes
+
+Given a vertex V, delete all of its attributes (if any).
+
+    $g->delete_vertex_attributes('s');
+
+=item set_vertex_color
+
+Given a vertex V and some color C, sets a 'color' attribute on
+V. Shorthand for using C<set_vertex_attribute>.
+
+    $g->set_vertex_color('s', 'red');
+
+=item get_vertex_color
+
+Given a vertex V, get its color (if any).  Shorthand for calling
+C<get_vertex_attribute>.
+
+    $g->get_vertex_color('s');
+
+=back
+
+=head2 METHODS ON EDGES
+
+=over
+
+=item get_edge
+
+Get the edge between two vertices, A and B.  Return C<undef> if no
+such edge exists.  If the edge does exist, return an array reference
+containing A, B, and a (possibly empty) hash reference of edge
+attributes.
+
+    my $edge = $g->get_edge('s', 'a');
+
+=item get_edges
+
+Get a list containing all of the edges in the graph.  Specifically,
+this will be a list of array references, with the contents of each
+array reference as described in the documentation for C<get_edge()>.
+
+    my @edges = $g->get_edges;
+
+=item edge_between
+
+Given two vertices A and B, return something truthy if there exists an
+edge between A and B.  Otherwise, return C<undef>.
+
+    if ($g->edge_between('s', 'a')) {
+      say 'Yes';
+    }
+
+=item get_edge_attributes
+
+Given two vertices A and B that have an edge between them, return
+whatever attributes are stored for that edge.  Note that this can be
+any arbitrary Perl data structure that could be stored in a hash
+reference.
+
+=item get_edge_attribute
+
+Given two vertices A and B that have an edge between them, and a
+specific (text) attribute T, return whatever values are associated
+with T for that edge.  For example, a (numeric) weight.
+
+    my $edge_weight = $g->get_edge_attribute('s', 'a', 'weight');
+
+=item get_edge_weight
+
+Shortcut for the following call to C<get_edge_attribute()>.
+
+    my $edge_weight = $g->get_edge_attribute('s', 'a', 'weight');
+
+=item set_edge_attribute
+
+Given two vertices A and B that have an edge between them, store a
+specific attribute key-value pair (a hash reference) that you want to
+associate with that edge.
+
+    my $edge_weight = $g->set_edge_attribute('s', 'a', { weight => 123 });
+
+=item delete_edge_attributes
+
+Given two vertices A and B that have an edge between them, delete all
+of the attributes (weight, color, etc.) associated with that edge.
+
+    $g->delete_edge_attributes('s', 'a');
+
+=item add_edge
+
+Given two vertices A and B, add an edge between them, as well as a
+hash reference containing any attributes that should be associated
+with that edge.  Note that if either of the vertices do not yet exist,
+they will be created.
+
+    $g->add_edge('s', 'a', { name => 'my great edge'});
+
+=item add_edges
+
+Given a list of array references that describe vertices in the format
+
+    [['a', 'b', { weight => 123 }], ... ]
+
+add all of the edges listed, as well as the attributes that should be
+associated with each edge.  Note that if either of the vertices do not
+yet exist, they will be created.
+
+    $g->add_edge('s', 'a', { name => 'my great edge'});
+
+=item remove_edge
+
+Given two vertices A and B, remove the edge (if any) between them, as
+well as any associated attributes.
+
+    $g->remove_edge('s', 'a');
+
+=back
+
+=head2 SEARCH
+
+=over
+
+=item dijkstra
+
+Given two vertices START and END on a graph with weighted edges, find
+the shortest path between them using Dijkstra's algorithm.
+
+    $g->dijkstra($a, $b);
+
+=item has_walk
+
+Given a list of vertices, determine whether they constitute a walk.
+Given an optional argument, will determine if it is a closed walk.
+
+    $walk = qw/a f d b c e l m j k i h g/;
+    $g->has_walk($walk, {closed => 1});
+
+=item paths_between
+
+Given two vertices I<START> and I<END>, return a list of all the paths
+between them.
+
+Note that this method is implemented using exhaustive search, so it
+will grind to a halt for larger graphs.
+
+=item find_path_between
+
+Given two vertices START and END in an unweighted graph, find the
+shortest path between them using breadth-first search.
+
+=item mst
+
+The F<mst> method finds the minimum spanning tree of the current graph
+object.  As such, it takes no arguments; instead, it searches for the
+lowest-weight edge in the graph, chooses a vertex from one end of that
+edge as the starting vertex, and builds the spanning tree from there.
+
+=item dfs
+
+The F<dfs> method performs depth-first-search on the graph beginning
+at the vertex START; for each vertex visited by the search, invoke
+C<$sub>.
+
+=item connected_components
+
+The F<connected_components> method returns the connected components of
+the graph, as a list of lists.
+
+If there are no connected components, it will return an empty list:
+
+    []
+
+If there is only one connected component, it will return a list with
+one element: a list of the vertices of the connected component:
+
+    [['a', 'b', 'c', 'd']]
+
+If there are I<n> connected components, it will return a list with
+I<n> elements:
+
+    [['a', 'b'], ['c', 'd'], ['e', 'f', 'g']]
+
+=item exhaustive_search
+
+The F<exhaustive_search> method performs an exhaustive search of all
+trees in the graph.  The way this works is very close to the algorithm
+for depth-first-search, except that F<exhaustive_search> unmarks the
+vertices it has visited after the recursive self-call; this is
+described in more detail on p.623 of Sedgewick's I<Algorithms>, 2nd
+ed.
+
+It takes two arguments: the name of the starting vertex, and an
+optional subroutine argument.
+
+    $g->exhaustive_search('a', sub { say $_[0] });
+
+=item hamiltonian_walks
+
+The C<hamiltonian_walks> method does an exhaustive search to find all
+of the open or closed Hamiltonian walks on the graph, if they exist.
+It takes an optional C<closed> argument to determine which type to
+look for.
+
+    $g->hamiltonian_walks(closed => 1);
+    $g->hamiltonian_walks;      # Finds open walks by default.
+
+=item is_planar
+
+The C<is_planar> method tests whether a graph is planar.
+
+=back
+
+=head2 CLONING (OBJECT COPYING) AND EQUALITY CHECKS
+
+=over
+
+=item clone
+
+Given a graph object, the C<clone> method makes a fresh copy of that object.
+
+=back
+
+=head2 INTERNAL HELPER METHODS
+
+=over
+
+=item _array_eq
+
+Given two array references, are their contents equal?  NB. Only works on flat, non-nested arrays.
+
+=item _memberp
+
+Given a string element and an array, return true if the element is in the array.
+
+=item _add_neighbor
+
+The C<_add_neighbor> method is the internal helper used to add an edge
+(and any edge attributes) between two vertices.
+
+=item _remove_neighbor
+
+The C<_remove_neighbor> method is an internal helper used for deleting
+an edge between two vertices.
+
+=item _st_walk
+
+The C<_st_walk> method is used internally for building walks (paths)
+along spanning trees, such as are built inside C<find_path_between>
+and C<dijkstra>.
+
+=item _edge_attrs
+
+The C<_edge_attrs> method is an internal helper that returns all of
+the graph's edge attributes.
+
+=item _vertex_attrs
+
+The C<_vertex_attrs> method is an internal helper that returns all of
+the graph's vertex attributes.
+
+=item _make_vertex_name
+
+The C<_make_vertex_name> method is used to generate random vertex
+names, such as when generating random graphs.
+
+=back
+
+=head2 COLORING
+
+=over
+
+=item get_color_degree
+
+The C<get_color_degree> method returns the "color degree" of a vertex:
+that is, how many colors its neighbors have.
+
+=item color_vertices
+
+The C<color_vertices> method colors the vertices of the graph using
+the algorithm due to Brelaz, as described in Skiena, I<Implementing
+Discrete Mathematics>.  Specifically:
+
+=over
+
+=item 1. Number the colors from 1 to k.
+
+=item 2. Color the vertex of largest degree with color 1.
+
+=item 3. Then repeatedly select the vertex with highest I<color
+degree>, where the color degree is the number of adjacent vertices
+which have already been colored, and color it with the smallest
+possible color.
+
+=back
+
+=item uncolor_vertices
+
+The C<uncolor_vertices> method "uncolors" every vertex in the graph by
+setting its color attribute to C<undef>.
+
+=item vertex_colors
+
+The C<vertex_colors> method returns a list containing each vertex and its color.
+
+=item chromatic_number
+
+The C<chromatic_number> method does not actually return the chromatic
+number.  It returns the number of colors that were used to color the
+vertices of the graph using the C<color_vertices> method.
+
+=item set_cover
+
+=item _covers_all_items
+
+=item del
+
+=item _disjoint
+
+=item get_anti_neighbors
+
+=item complement
+
+=back
+
+=pod
+
+=head1 REFERENCES
+
+=over
+
+=item Even, Shimon. I<Graph Algorithms>.
+
+=item Skiena, Steven. I<Implementing Discrete Mathematics>.
+
+=item Sedgewick, Robert. I<Algorithms, 2nd ed.>
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Graph> by Jarkko Hietaniemi
+
+=item * L<Graph::Fast> by Lars Stoltenow
+
+=item * L<Boost::Graph> by David Burdick
+
+=back
+
+=head1 BUGS
+
+Undoubtedly! Please file any issues at L<https://github.com/rmloveland/YAGL>.
+
+=head1 AUTHOR
+
+Richard Loveland <r@rmloveland.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2020, 2021, 2022, 2023, 2024 by Rich Loveland
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

@@ -12,7 +12,7 @@ our @EXPORT_OK = qw( readenvi readenvi_hdr );
 our @EXPORT = @EXPORT_OK;
 our %EXPORT_TAGS = ( Func=>[@EXPORT_OK] );
 
-our $VERSION = "2.096";
+our $VERSION = "2.097";
 $VERSION = eval $VERSION;
 
 our $verbose = 0;  # for diagnostics

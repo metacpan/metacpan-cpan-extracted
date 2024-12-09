@@ -325,8 +325,6 @@ EOT
 
 # TODO: test apply_mask and apply_list here?
 
-
-
 {
     for my $stk ( qw(cbs upsk) ) {
         my $infile = "test/$stk.stockholm";
@@ -339,6 +337,21 @@ EOT
             obj => $ali, method => 'store',
             file => "$stk.ali",
             test => 'wrote expected Ali from stockholm',
+        );
+    }
+}
+
+{
+    for my $ks (0, 1) {
+        my $infile = "test/tinyseq.xml";
+        my $ali = $class->load_tinyseq($infile, { keep_strain => $ks } );
+        is $ali->filename, $infile, 'got expected filename from tinyseq file';
+        my $flag = not $ali->is_protein;
+        ok( $flag, "rightly detected alignment type: $infile" );
+        cmp_store(
+            obj => $ali, method => 'store',
+            file => "tinyseq_ks$ks.ali",
+            test => 'wrote expected Ali from tinyseq (keeping strains)',
         );
     }
 }

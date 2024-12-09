@@ -3,6 +3,20 @@
 
 class Net::SSLeay::SSL_SESSION : pointer {
   
+  use Fn;
+  
+  # Class Methods
+  native static method new : Net::SSLeay::SSL_SESSION ();
+  
+  private static method new_with_pointer : Net::SSLeay::SSL_SESSION ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::SSL_SESSION;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
+  
   # Instance Methods
   native method DESTROY : void ();
 

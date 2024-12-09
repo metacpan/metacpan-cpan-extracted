@@ -12,7 +12,7 @@ use Plack::Session;
 use Tags::HTML::ChangePassword;
 use Tags::HTML::Container;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub _css {
 	my ($self, $env) = @_;
@@ -98,7 +98,7 @@ sub _process_actions {
 	my $messages_ar = [];
 	if (exists $env->{'psgix.session'}) {
 		my $session = Plack::Session->new($env);
-		$messages_ar = $session->get('messages');
+		$messages_ar = $session->get('messages') || [];
 		$session->set('messages', []);
 		$self->{'_tags_change_password'}->init($messages_ar);
 	}
@@ -540,6 +540,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

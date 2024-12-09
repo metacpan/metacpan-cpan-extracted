@@ -2,9 +2,7 @@ package Bio::MUST::Core::SeqMask;
 # ABSTRACT: Sequence mask for selecting specific sites
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Raphael LEONARD <rleonard@doct.uliege.be>
-$Bio::MUST::Core::SeqMask::VERSION = '0.242020';
-# TODO: handle codons with gblocks/bmge (and idealize?)
-
+$Bio::MUST::Core::SeqMask::VERSION = '0.243430';
 use Moose;
 use namespace::autoclean;
 
@@ -16,7 +14,7 @@ use feature qw(say);
 use Carp;
 use File::Basename;
 use IPC::System::Simple qw(system);
-use List::AllUtils 0.08 qw(uniq max sum natatime first_index last_index pairmap mesh);
+use List::AllUtils 0.08 qw(uniq max sum natatime first_index last_index pairmap mesh bundle_by);
 use Path::Class qw(file);
 use POSIX qw(ceil floor);
 
@@ -492,6 +490,10 @@ sub bmge_mask {
 }
 
 
+# mask manipulation methods
+# TODO: improve interface? $mask1 should be $self for and_mask and or_mask
+
+
 sub and_mask {
     my $class = shift;
     my $mask1 = shift;
@@ -524,8 +526,28 @@ sub negative_mask {
     # Note the '+ 0' to ensure proper numeric context (0 or 1)
     my $width = $ali->width;
     my @mask = map { ( not $self->state_at($_) ) + 0 } 0..$width-1;
+
     return $self->new( mask => \@mask );
 }
+
+
+sub codon_mask {                        ## no critic (RequireArgUnpacking)
+    my $self = shift;                   # the critic stems from @_ below
+    my $args = shift // {};             # HashRef (should not be empty...)
+
+    my $frame = $args->{frame} // 1;    # defaults to frame +1
+    my $chunk = $args->{chunk} // 3;    # defaults to codon
+    my $max   = $args->{max}   // 1;
+
+    my @states = $self->all_states;
+    my $offset = (abs $frame) - 1;
+    my @mask = ( (0) x $offset,         # first skip frame-1 sites
+        map { ( ($_ > $max) + 0 ) x $chunk } bundle_by { sum @_ } $chunk,
+        @states[$offset..$#states]      # then filter sites by chunks
+    );
+
+    return $self->new( mask => [ @mask[0..$#states] ] );
+}                                       # truncate mask to original length
 
 
 # SeqMask-based Ali factory methods
@@ -748,7 +770,7 @@ Bio::MUST::Core::SeqMask - Sequence mask for selecting specific sites
 
 =head1 VERSION
 
-version 0.242020
+version 0.243430
 
 =head1 SYNOPSIS
 
@@ -797,6 +819,8 @@ version 0.242020
 =head2 or_mask
 
 =head2 negative_mask
+
+=head2 codon_mask
 
 =head2 filtered_ali
 

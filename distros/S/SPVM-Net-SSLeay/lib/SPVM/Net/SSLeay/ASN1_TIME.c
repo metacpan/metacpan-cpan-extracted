@@ -100,11 +100,7 @@ int32_t SPVM__Net__SSLeay__ASN1_TIME__print(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   BIO* b = env->get_pointer(env, stack, obj_b);
   
-  spvm_warn("%p %p", b, self);
-  
   int32_t status = ASN1_TIME_print(b, self);
-  
-  spvm_warn("");
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();

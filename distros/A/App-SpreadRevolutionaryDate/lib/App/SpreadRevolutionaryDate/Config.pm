@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2024 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Config;
-$App::SpreadRevolutionaryDate::Config::VERSION = '0.33';
+$App::SpreadRevolutionaryDate::Config::VERSION = '0.35';
 # ABSTRACT: Companion class of L<App::SpreadRevolutionaryDate>, to handle configuration file and command line arguments, subclass of L<AppConfig>.
 
 use Moose;
@@ -68,6 +68,7 @@ sub new {
                                       'test' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'no|n'},
                                       'locale' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'l'},
                                       'acab' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'a'},
+                                      'bluesky' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'b'},
                                       'twitter' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 't'},
                                       'mastodon' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'm'},
                                       'freenode' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'f'},
@@ -91,9 +92,10 @@ sub new {
   }
 
   # Set default targets if no target specified
-  if (!$config_targets->twitter && !$config_targets->mastodon && !$config_targets->freenode && !$config_targets->liberachat && !scalar(@targets)) {
-    push @targets, 'twitter', 'mastodon', 'freenode', 'liberachat';
+  if (!$config_targets->bluesky && !$config_targets->twitter && !$config_targets->mastodon && !$config_targets->freenode && !$config_targets->liberachat && !scalar(@targets)) {
+    push @targets, 'bluesky', 'twitter', 'mastodon', 'freenode', 'liberachat';
     $config_targets->targets(@targets);
+    $config_targets->bluesky(1);
     $config_targets->twitter(1);
     $config_targets->mastodon(1);
     $config_targets->freenode(1);
@@ -160,10 +162,13 @@ sub new {
     'acab' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'a'},
     # Overwrite found attributes for default targets
     # for backward compatibility with aliases
+    'bluesky' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'b'},
     'twitter' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 't'},
     'mastodon' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'm'},
     'freenode' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'f'},
     'liberachat' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'lt'},
+    'bluesky_identifier' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'bi'},
+    'bluesky_password' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'bp'},
     'twitter_consumer_key' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'tck'},
     'twitter_consumer_secret' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'tcs'},
     'twitter_access_token' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'tat'},
@@ -224,9 +229,10 @@ sub new {
   }
 
   # Set default targets if no target specified
-  if (!$self->twitter && !$self->mastodon && !$self->freenode && !$self->liberachat && !scalar(@targets)) {
-    push @targets, 'twitter', 'mastodon', 'freenode', 'liberachat';
+  if (!$self->bluesky && !$self->twitter && !$self->mastodon && !$self->freenode && !$self->liberachat && !scalar(@targets)) {
+    push @targets, 'bluesky', 'twitter', 'mastodon', 'freenode', 'liberachat';
     map { $self->targets($_); } @targets;
+    $self->bluesky(1);
     $self->twitter(1);
     $self->mastodon(1);
     $self->freenode(1);
@@ -329,15 +335,18 @@ Usage: $0 <OPTIONS>
     --conf|-c <file>: path to configuration file (default: ~/.config/spread-revolutionary-date/spread-revolutionary-date.conf or ~/.spread-revolutionary-date.conf)'
     --version|-v': print out version
     --help|-h|-?': print out this help
-    --targets|-tg <target_1> [--targets|-tg <target_2> […--targets|-tg <target_n>]]': define targets (default: twitter, mastodon, freenode, liberachat)
+    --targets|-tg <target_1> [--targets|-tg <target_2> […--targets|-tg <target_n>]]': define targets (default: bluesky, twitter, mastodon, freenode, liberachat)
     --msgmaker|-mm <MsgMakerClass>: define message maker (default: RevolutionaryDate)
     --locale|-l <fr|en|it|es>: define locale (default: fr for msgmaker=RevolutionaryDate, en otherwise)
     --test|--no|-n: do not spread, just print out message or spread to test channels for Freenode or Liberachat
     --acab|-a: DEPRECATED, use --revolutionarydate-acab
+    --bluesksy|-b: DEPRECATED, use --targets=bluesky
     --twitter|-t: DEPRECATED, use --targets=twitter
     --mastodon|-m: DEPRECATED, use --targets=mastodon
     --freenode|-f: DEPRECATED, use --targets=freenode
     --liberachat|-lt: DEPRECATED, use --targets=liberachat
+    --bluesky_identifier|-bi <key>: define Bluesky identifier
+    --bluesky_password|-bp <key>: define Bluesky password
     --twitter_consumer_key|-tck <key>: define Twitter consumer key
     --twitter_consumer_secret|-tcs <secret>: define Twitter consumer secret
     --twitter_access_token|-tat <token>: define Twitter access token
@@ -383,7 +392,7 @@ App::SpreadRevolutionaryDate::Config - Companion class of L<App::SpreadRevolutio
 
 =head1 VERSION
 
-version 0.33
+version 0.35
 
 =head1 METHODS
 
@@ -405,7 +414,7 @@ Checks whether target configuration options are set to authenticate on specified
 
 =head2 get_target_arguments
 
-Takes one mandatory argument: C<target> as a string in lower case, without any underscore (like C<'twitter'>, C<'mastodon'>, C<'freenode'> or C<'liberachat'>). Returns a hash with configuration options relative to the passed C<target> argument. If C<test> option is true, any value for an option starting with C<"test_"> will be set for the option with the same name without C<"test_"> (eg. values of C<test_channels> are set to option C<channels> for C<Liberachat> target).
+Takes one mandatory argument: C<target> as a string in lower case, without any underscore (like C<'bluesky'>, C<'twitter'>, C<'mastodon'>, C<'freenode'> or C<'liberachat'>). Returns a hash with configuration options relative to the passed C<target> argument. If C<test> option is true, any value for an option starting with C<"test_"> will be set for the option with the same name without C<"test_"> (eg. values of C<test_channels> are set to option C<channels> for C<Liberachat> target).
 
 =head2 get_msgmaker_arguments
 
@@ -423,7 +432,11 @@ Prints usage with command line parameters and exits.
 
 =item L<App::SpreadRevolutionaryDate>
 
+=item L<App::SpreadRevolutionaryDate::BlueskyLite>
+
 =item L<App::SpreadRevolutionaryDate::Target>
+
+=item L<App::SpreadRevolutionaryDate::Target::Bluesky>
 
 =item L<App::SpreadRevolutionaryDate::Target::Twitter>
 
@@ -463,7 +476,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2023 by Gérald Sédrati.
+This software is Copyright (c) 2019-2024 by Gérald Sédrati.
 
 This is free software, licensed under:
 

@@ -43,6 +43,18 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.101",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PDLPorters/PDL-IO-GD/issues"
+      },
+      "homepage" : "http://pdl.perl.org/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/PDL-IO-GD.git",
+         "web" : "https://github.com/PDLPorters/PDL-IO-GD"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pdl"
+   },
+   "version" : "2.102",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

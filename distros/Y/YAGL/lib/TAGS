@@ -1,0 +1,373 @@
+
+YAGL.pm,14073
+package YAGL;1,0
+use constant DEBUG 14,221
+    my $g g35,455
+    my @vertices vertices64,1382
+    my $i i66,1420
+    my $j j67,1456
+    my $start start68,1492
+    my $end end69,1523
+    my @path;path75,1714
+    my $dot_string dot_string81,1907
+    my $g g144,3614
+    my $g g148,3698
+sub new 155,3859
+    my ($self, @args)($self, @args156,3869
+    my $graph graph157,3897
+    my %args args159,3918
+    my $g g184,4770
+sub generate_random_vertices 212,5239
+    my ($self, $args)($self, $args214,5295
+    my $n n216,5324
+    my $p p222,5577
+    my $max_weight max_weight223,5610
+    my %seen;seen225,5653
+        my $name name228,5697
+    my @nodes nodes233,5803
+    my @pairs;pairs235,5832
+        my $maybe_neighbor maybe_neighbor238,5876
+        my $connection_prob connection_prob240,5969
+        my $dist dist241,6007
+sub write_csv 266,6595
+    my ($self, $f)($self, $f268,6641
+    my @vertices vertices274,6796
+        my $neighbors neighbors277,6870
+            my $weightweight280,7009
+            my @cols cols282,7110
+            my $line line284,7232
+sub read_lst 297,7436
+    my ($self, $lst_file)($self, $lst_file298,7451
+    my $csv_file csv_file300,7484
+        my ($node, $neighbors)($node, $neighbors310,7870
+        my @neighbors neighbors313,8014
+sub read_hcp 331,8420
+    my ($self, $hcp_file)($self, $hcp_file332,8435
+    my $csv_file csv_file334,8468
+        my ($e1, $e2)($e1, $e2342,8790
+sub read_csv 358,9064
+    my ($self, $f)($self, $f360,9109
+    my $csv csv362,9135
+    my %seen;seen366,9259
+        my @cols cols368,9321
+        my $vertex vertex369,9355
+        my $neighbor neighbor370,9391
+        my $weight weight371,9427
+        my $is_directed is_directed372,9463
+sub to_graphviz 397,10137
+    my ($self)($self399,10181
+    my %seen;seen401,10203
+    my $gv gv403,10218
+        my $vertex_color vertex_color406,10341
+        my $neighbors neighbors408,10481
+            my $edge_weightedge_weight411,10578
+            my $edge_coloredge_color413,10679
+            my $penwidth penwidth415,10778
+            my $vertex_color vertex_color416,10829
+sub draw 443,11601
+    my ($self, $basename)($self, $basename445,11640
+    my $tmpdir tmpdir449,11747
+    my $filename filename450,11804
+    my $viz viz451,11850
+sub is_empty 469,12098
+    my $self self471,12131
+    my @vertices vertices472,12157
+sub is_complete 489,12439
+    my $self self490,12457
+    my @vertices vertices492,12480
+    my $v v493,12520
+    my $neighbors neighbors495,12555
+    my @neighbors neighbors498,12663
+sub is_tree 513,12995
+    my ($self)($self514,13009
+    my @e e518,13071
+    my @v v519,13101
+    my $e e521,13135
+    my $v v522,13151
+sub is_connected 534,13341
+    my ($self)($self535,13360
+    my @vertices vertices540,13477
+    my $start start542,13518
+sub has_cycle 557,13777
+    my ($self)($self558,13793
+sub is_colored 569,13968
+    my ($self)($self571,14002
+    my @vertices vertices572,14023
+    my @colors colors573,14063
+sub is_directed 586,14365
+    my ($self)($self587,14383
+sub is_bipartite 602,14658
+    my ($self)($self604,14702
+    my $n n606,14750
+sub add_vertex 625,15016
+    my ($self, $vertex)($self, $vertex627,15057
+    my @to_add to_add636,15250
+sub add_vertices 641,15322
+    my ($self, @vertices)($self, @vertices642,15341
+sub get_neighbors 655,15577
+    my ($self, $vertex)($self, $vertex657,15623
+sub has_vertex 675,15905
+    my ($self, $vertex)($self, $vertex677,15947
+sub remove_vertex 695,16319
+    my ($self, $vertex)($self, $vertex697,16363
+    my $neighbors neighbors699,16394
+    my @v v729,17442
+sub get_vertices 733,17479
+    my $self self735,17514
+    my @vertices;vertices736,17536
+sub get_degree 765,18475
+    my ($self, $vertex)($self, $vertex766,18492
+        my $neighbors neighbors768,18560
+sub set_vertex_attribute 780,18773
+    my ($self, $vertex, $new_attrs)($self, $vertex, $new_attrs782,18832
+    my $weight weight798,19322
+sub get_vertex_attribute 803,19397
+    my ($self, $vertex, $attribute)($self, $vertex, $attribute805,19463
+    my $attrs attrs815,19772
+sub get_vertex_attributes 819,19827
+    my ($self, $vertex)($self, $vertex821,19889
+sub delete_vertex_attributes 834,20162
+    my ($self, $vertex)($self, $vertex836,20230
+sub set_vertex_color 850,20548
+    my ($self, $vertex, $color)($self, $vertex, $color852,20615
+sub get_vertex_color 867,20877
+    my ($self, $vertex)($self, $vertex869,20937
+    my $edge edge884,21281
+sub get_edge 888,21327
+    my ($self, $a, $b)($self, $a, $b890,21375
+    my $attrs attrs894,21453
+    my @edges edges905,21760
+sub get_edges 909,21798
+    my ($self)($self911,21830
+    my @vertices vertices913,21852
+    my @answer;answer914,21892
+    my %seen;seen915,21908
+        my $neighbors neighbors918,21956
+sub edge_between 944,22593
+    my ($self, $a, $b)($self, $a, $b946,22644
+    my $neighbors neighbors951,22747
+sub get_edge_attributes 967,23115
+    my ($self, $start, $end)($self, $start, $end969,23182
+    my $pairkey pairkey971,23218
+    my $edge_weight edge_weight981,23526
+sub get_edge_attribute 985,23599
+    my ($self, $start, $end, $attribute)($self, $start, $end, $attribute987,23670
+    my $pairkey pairkey989,23718
+    my $edge_weight edge_weight997,23909
+sub get_edge_weight 1001,23982
+    my ($self, $start, $end, $attribute)($self, $start, $end, $attribute1003,24043
+    my $edge_weight edge_weight1014,24346
+sub set_edge_attribute 1018,24428
+    my ($self, $start, $end, $new_attrs)($self, $start, $end, $new_attrs1020,24492
+    my $pairkey1 pairkey11022,24540
+    my $pairkey2 pairkey21023,24574
+sub delete_edge_attributes 1044,25184
+    my ($self, $start, $end)($self, $start, $end1046,25257
+    my $pairkey1 pairkey11049,25343
+    my $pairkey2 pairkey21050,25377
+sub add_edge 1069,25981
+    my ($self, $v1, $v2, $attrs)($self, $v1, $v2, $attrs1071,26027
+sub add_edges 1090,26556
+    my ($self, @edges)($self, @edges1091,26572
+        my ($a, $b, $attrs)($a, $b, $attrs1094,26630
+sub remove_edge 1110,26888
+    my ($self, $a, $b)($self, $a, $b1112,26954
+sub dijkstra 1140,27540
+    my ($self, $start, $end)($self, $start, $end1142,27585
+    my @path;path1146,27675
+    my @queue;queue1147,27689
+    my %seen;seen1148,27704
+    my $heap heap1149,27718
+    my $st st1150,27759
+        my $neighbors neighbors1164,28121
+            my $distance_to_self distance_to_self1173,28462
+            my $old_distance_to_neighbor old_distance_to_neighbor1174,28528
+            my $neighbor_edge_weightneighbor_edge_weight1175,28601
+            my $new_distance_to_neighbornew_distance_to_neighbor1177,28706
+sub has_walk 1214,29860
+    my ($self, $walk, $args)($self, $walk, $args1216,29910
+    my $len len1218,29946
+    my $closed;closed1220,29973
+        my $j j1229,30217
+sub paths_between 1247,30587
+  my ($self, $start, $end)($self, $start, $end1248,30607
+  my @paths;paths1257,30914
+  my $lambda lambda1259,30928
+    my ($current, $path)($current, $path1260,30949
+sub find_path_between 1279,31319
+    my ($self, $start, $end)($self, $start, $end1281,31373
+    my @path;path1285,31463
+    my @queue;queue1286,31495
+    my %seen;seen1287,31540
+    my $found;found1288,31583
+    my $st st1289,31644
+        my $v v1301,31852
+        my $neighbors neighbors1303,31883
+sub mst 1332,32722
+    my ($self)($self1334,32756
+    my @queue;queue1338,32818
+    my %seen;seen1339,32833
+    my $heap heap1340,32847
+    my @vertices vertices1342,32889
+    my @edges edges1343,32929
+    my $start start1351,33254
+    my $mst mst1353,33287
+        my $neighbors neighbors1367,33692
+            my $distance_to_self distance_to_self1376,34033
+            my $old_distance_to_neighborold_distance_to_neighbor1377,34112
+            my $neighbor_edge_weightneighbor_edge_weight1379,34220
+            my $new_distance_to_neighbornew_distance_to_neighbor1381,34325
+sub dfs 1420,35609
+    my ($self, $start, $sub)($self, $start, $sub1422,35658
+    my $dfs dfs1425,35731
+        my ($self, $current, $sub, $seen)($self, $current, $sub, $seen1426,35751
+        my $neighbors neighbors1430,35855
+    my $seen seen1440,36228
+    my @unseen unseen1444,36330
+sub connected_components 1477,37168
+    my ($self)($self1478,37195
+    my @components;components1480,37217
+    my $lambda lambda1482,37238
+        my ($current)($current1483,37261
+        my $delim delim1485,37290
+    my @vertices vertices1500,37720
+    my $start start1502,37823
+    my @p1 p11505,37887
+    my @answer;answer1506,37954
+        my @parts parts1508,37996
+sub exhaustive_search 1531,38638
+    my ($self, $start, $sub)($self, $start, $sub1532,38662
+    my $search search1536,38736
+        my ($self, $current, $sub, $seen, $path)($self, $current, $sub, $seen, $path1537,38759
+        my $len len1541,38872
+        my $last;last1542,38902
+            my $rv rv1570,40082
+        my $neighbors neighbors1584,40576
+    my $seen seen1599,41117
+    my $path path1600,41136
+sub hamiltonian_walks 1616,41560
+    my ($self, @args)($self, @args1618,41613
+    my %args args1620,41642
+    my $closed closed1621,41666
+    my $allow_reversals allow_reversals1623,41699
+    my $n_solutions;n_solutions1625,41750
+    my @vertices vertices1632,41972
+    my $n_vertices n_vertices1633,42014
+    my $start;start1634,42046
+    my $is_tree is_tree1646,42450
+    my @hams;hams1664,42838
+    my $lambda lambda1666,42853
+        my ($current, $path)($current, $path1668,42913
+                    my @p p1693,43690
+                    my $p1 p11694,43727
+                    my $p2 p21695,43780
+sub is_planar 1721,44361
+    my ($self)($self1722,44377
+    my $edge_count edge_count1724,44399
+    my $vertex_count vertex_count1725,44440
+sub clone 1744,44718
+    my ($self)($self1745,44730
+    my $copy copy1746,44751
+sub equals 1760,44997
+    my ($self, $other)($self, $other1761,45010
+    my @xs xs1765,45102
+    my @ys ys1766,45136
+    my @es es1770,45203
+    my @fs fs1771,45234
+    my $self_attrs self_attrs1775,45298
+    my $other_attrs other_attrs1776,45340
+sub _add_neighbor 1796,45704
+    my ($self, $vertex, $new_neighbor, $edge_attrs)($self, $vertex, $new_neighbor, $edge_attrs1798,45765
+        my ($package, $filename, $line)($package, $filename, $line1801,45869
+        my $neighbors neighbors1810,46139
+sub _remove_neighbor 1829,46624
+    my ($self, $vertex, $neighbor)($self, $vertex, $neighbor1831,46687
+    my $neighbors neighbors1852,47348
+        my $this this1855,47447
+sub _st_walk 1871,47799
+    my ($self, $st, $start, $end)($self, $st, $start, $end1873,47852
+    my @path;path1875,47893
+        my $prev prev1879,48027
+        my $prev prev1896,48471
+sub _edge_attrs 1917,48897
+    my ($self)($self1918,48915
+sub _vertex_attrs 1929,49113
+    my ($self)($self1930,49133
+sub _make_vertex_name 1943,49355
+    my $n n1945,49396
+    my $chars chars1946,49428
+    my @chars chars1947,49501
+    my $i i1949,49537
+    my $c1 c11950,49570
+    my $c2 c21951,49595
+sub get_color_degree 1967,49836
+    my ($self, $vertex)($self, $vertex1969,49884
+    my $count count1970,49914
+    my @colors;colors1971,49933
+    my $neighbors neighbors1972,49949
+        my $color color1974,50037
+sub color_vertices 2004,50749
+    my ($self)($self2006,50787
+        my ($package, $filename, $line)($package, $filename, $line2009,50839
+    my @colorscolors2017,51035
+    my @vertices_by_degreevertices_by_degree2019,51129
+    my $v v2023,51247
+    my @vertices_by_color_degreevertices_by_color_degree2026,51330
+        my ($count, @adjacent_colors)($count, @adjacent_colors2031,51518
+sub uncolor_vertices 2049,52030
+    my ($self)($self2050,52053
+sub vertex_colors 2062,52284
+    my ($self)($self2064,52329
+    my @colors;colors2065,52350
+sub chromatic_number 2082,52751
+    my ($self)($self2084,52801
+    my $n n2085,52822
+    my @colors colors2086,52842
+    my %colors;colors2089,52909
+        my $color color2091,52954
+    my @keys keys2094,53028
+sub set_cover 2105,53148
+    my ($self, @args)($self, @args2106,53164
+    my $is_bipartite is_bipartite2108,53193
+    my @vertices vertices2111,53307
+    my @green green2112,53347
+    my @red red2113,53424
+    my @options;options2114,53499
+    my @items;items2115,53516
+    my %args args2131,53768
+    my $n_solutions;n_solutions2132,53790
+    my $is_exact;is_exact2138,53948
+    my @covers;covers2143,54044
+    my $found;found2144,54060
+    my %found;found2145,54075
+    my %seen;seen2146,54090
+    my $lambda lambda2148,54105
+      my ($current, $path)($current, $path2149,54128
+      my @path_options path_options2151,54162
+      my $path_options path_options2152,54219
+    my @option_elems option_elems2193,55656
+    my @wanted;wanted2196,55787
+    my $other other2214,56377
+sub _covers_all_items 2238,56775
+    my ($the_options, $the_items)($the_options, $the_items2240,56837
+    my @option_elems;option_elems2247,57032
+    my @item_elems;item_elems2248,57054
+sub _del 2270,57550
+    my ($xs, $item)($xs, $item2272,57594
+sub _disjoint 2285,57847
+    my (@options)(@options2287,57887
+    my @elems elems2293,58077
+    my @uniq uniq2296,58165
+sub _get_anti_neighbors 2312,58450
+    my ($self, $vertex)($self, $vertex2313,58476
+    my %seen;seen2314,58506
+    my $neighbors neighbors2316,58542
+    my @antineighbors;antineighbors2320,58664
+    my @vertices vertices2321,58687
+sub complement 2332,58865
+    my ($self)($self2333,58882
+    my @vertices vertices2334,58903
+    my $h h2335,58943
+        my @antineighbors antineighbors2337,59029
+            my $v_attrs v_attrs2340,59160
+            my $a_attrs a_attrs2342,59272

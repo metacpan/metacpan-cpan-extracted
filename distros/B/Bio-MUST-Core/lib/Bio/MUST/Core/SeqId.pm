@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.242020';
+$Bio::MUST::Core::SeqId::VERSION = '0.243430';
 use Moose;
 use namespace::autoclean;
 
@@ -193,43 +193,544 @@ no warnings "qw";
 # Note: in BEGIN block because the hash must be built before any call to BUILD
 
 const my @GENERA  => qw(
+    0-14-0-10-38-17
+    0-14-0-20-30-16
+    0-14-0-20-34-12
+    0-14-0-20-40-13
+    0-14-0-20-44-26
+    0-14-0-20-45-22
+    0-14-0-20-51-18
+    0-14-0-80-44-23
+    0-14-0-80-59-12
+    0-14-0-80-60-11
+    0-14-3-00-41-53
+    0-14-3-00-62-12
+    01-FULL-36-10b
+    01-FULL-36-15b
+    01-FULL-38-12b
+    01-FULL-39-12b
+    01-FULL-43-11b
+    01-FULL-43-15b
+    01-FULL-44-24b
+    01-FULL-45-10b
+    01-FULL-45-15b
+    01-FULL-45-25b
+    01-FULL-45-34b
+    01-FULL-48-32b
+    01-FULL-49-22b
+    01-FULL-54-110
+    02-12-FULL-59-9
+    02-FULL-45-10c
+    02-FULL-45-11b
+    02-FULL-45-17b
     1,4-dioxane-degrading
+    1-14-0-10-31-34
+    1-14-0-10-32-24
+    1-14-0-10-34-10
+    1-14-0-10-34-76
+    1-14-0-10-36-11
+    1-14-0-10-36-16
+    1-14-0-10-36-19
+    1-14-0-10-36-32
+    1-14-0-10-37-12
+    1-14-0-10-37-14
+    1-14-0-10-40-38
+    1-14-0-10-41-10
+    1-14-0-10-41-12
+    1-14-0-10-41-28
+    1-14-0-10-42-12
+    1-14-0-10-42-19
+    1-14-0-10-42-22
+    1-14-0-10-43-10
+    1-14-0-10-43-11
+    1-14-0-10-43-13
+    1-14-0-10-43-42
+    1-14-0-10-44-13
+    1-14-0-10-44-23
+    1-14-0-10-45-20
+    1-14-0-10-45-29
+    1-14-0-10-45-34
+    1-14-0-10-46-23
+    1-14-0-10-46-36
+    1-14-0-10-47-10
+    1-14-0-10-47-16
+    1-14-0-10-48-11
+    1-14-0-10-49-15
+    1-14-0-10-49-17
+    1-14-0-10-51-16
+    1-14-0-10-55-24
+    1-14-0-10-56-10
+    1-14-0-20-35-14
+    1-14-0-20-39-34
+    1-14-0-20-39-49
+    1-14-0-20-42-23
+    1-14-0-20-45-16
+    1-14-0-20-46-22
+    1-14-0-20-47-16
+    1-14-0-20-49-13
+    1-14-0-20-64-10
+    1-14-0-65-60-17
+    1-14-2-50-31-20
+    1-14-2-50-48-13
+    1-19
     1-butene
     1-hexene
+    1162T-S-0a-05
+    12-FULL-43-12b
+    12-FULL-44-12b
+    12-FULL-45-19b
+    12-FULL-67-14b
+    13-1-40CM-64-14
+    13-1-40CM-70-15
+    13-2-20CM-66-19
+    13-2-20CM-68-14
+    14-2
+    16-39-46
     16SrXXII-A
     16SrXXII-B
+    172606-1
+    17J80-11
+    188UL27-1
+    18H4-34
+    1XD8-76
     2,3-D
     2,4-D
     2,4-D-degrading
+    2-01-FULL-33-17
+    2-01-FULL-36-15
+    2-01-FULL-37-20
+    2-01-FULL-38-13
+    2-01-FULL-38-21
+    2-01-FULL-38-26
+    2-01-FULL-39-10
+    2-01-FULL-39-10-A
+    2-01-FULL-39-12
+    2-01-FULL-39-13
+    2-01-FULL-39-19
+    2-01-FULL-39-21
+    2-01-FULL-39-24
+    2-01-FULL-39-28
+    2-01-FULL-39-33
+    2-01-FULL-40-13
+    2-01-FULL-40-14
+    2-01-FULL-40-24
+    2-01-FULL-40-39
+    2-01-FULL-40-42
+    2-01-FULL-41-11
+    2-01-FULL-41-12
+    2-01-FULL-41-14
+    2-01-FULL-41-18
+    2-01-FULL-41-18-A
+    2-01-FULL-41-21
+    2-01-FULL-41-22
+    2-01-FULL-41-26
+    2-01-FULL-42-13
+    2-01-FULL-42-15
+    2-01-FULL-42-20
+    2-01-FULL-43-14
+    2-01-FULL-43-22
+    2-01-FULL-43-38
+    2-01-FULL-44-10
+    2-01-FULL-44-11
+    2-01-FULL-44-17
+    2-01-FULL-44-21
+    2-01-FULL-44-22
+    2-01-FULL-45-10
+    2-01-FULL-45-10-A
+    2-01-FULL-45-10-B
+    2-01-FULL-45-11
+    2-01-FULL-45-18
+    2-01-FULL-45-33
+    2-01-FULL-46-13
+    2-01-FULL-46-14
+    2-01-FULL-46-14-A
+    2-01-FULL-47-10
+    2-01-FULL-47-10-A
+    2-01-FULL-48-10
+    2-01-FULL-48-14
+    2-01-FULL-48-16
+    2-01-FULL-49-10
+    2-01-FULL-49-14
+    2-01-FULL-49-17
+    2-01-FULL-49-22
+    2-01-FULL-50-11
+    2-01-FULL-50-23
+    2-01-FULL-50-24
+    2-01-FULL-50-25
+    2-01-FULL-50-28
+    2-01-FULL-51-10
+    2-01-FULL-51-21
+    2-01-FULL-51-34
+    2-01-FULL-52-15
+    2-01-FULL-53-15
+    2-01-FULL-56-20
+    2-01-FULL-58-14
+    2-01-FULL-59-12
+    2-01-FULL-60-11
+    2-01-FULL-63-20
+    2-01-FULL-64-13
+    2-01-FULL-66-17
+    2-02-FULL-34-10
+    2-02-FULL-34-12
+    2-02-FULL-35-15
+    2-02-FULL-36-13
+    2-02-FULL-37-13
+    2-02-FULL-38-14
+    2-02-FULL-38-14-A
+    2-02-FULL-38-15
+    2-02-FULL-38-15-A
+    2-02-FULL-39-11
+    2-02-FULL-39-13
+    2-02-FULL-39-14
+    2-02-FULL-39-32
+    2-02-FULL-40-10
+    2-02-FULL-40-11
+    2-02-FULL-40-12
+    2-02-FULL-40-13
+    2-02-FULL-40-20
+    2-02-FULL-42-16
+    2-02-FULL-42-43
+    2-02-FULL-43-11
+    2-02-FULL-43-11-A
+    2-02-FULL-43-13
+    2-02-FULL-43-16
+    2-02-FULL-44-16
+    2-02-FULL-44-35
+    2-02-FULL-45-10
+    2-02-FULL-45-11
+    2-02-FULL-45-18
+    2-02-FULL-45-21
+    2-02-FULL-45-22
+    2-02-FULL-45-22_A
+    2-02-FULL-46-11
+    2-02-FULL-46-13
+    2-02-FULL-46-19
+    2-02-FULL-47-12
+    2-02-FULL-47-50
+    2-02-FULL-48-11
+    2-02-FULL-48-11-A
+    2-02-FULL-48-12
+    2-02-FULL-48-14
+    2-02-FULL-48-16
+    2-02-FULL-49-11
+    2-02-FULL-49-12
+    2-02-FULL-49-16
+    2-02-FULL-50-16
+    2-02-FULL-50-16-A
+    2-02-FULL-50-9b
+    2-02-FULL-51-10
+    2-02-FULL-51-18
+    2-02-FULL-52-10
+    2-02-FULL-52-16
+    2-02-FULL-52-23
+    2-02-FULL-53-10
+    2-02-FULL-55-14
+    2-02-FULL-56-15
+    2-02-FULL-56-16
+    2-02-FULL-58-16
+    2-02-FULL-61-13
+    2-02-FULL-61-28
+    2-02-FULL-62-14
+    2-02-FULL-62-17
+    2-02-FULL-63-19
+    2-02-FULL-65-29
+    2-02-FULL-66-14
+    2-02-FULL-66-22
+    2-02-FULL-67-20
+    2-02-FULL-67-57
+    2-12-FULL-35-11
+    2-12-FULL-35-15
+    2-12-FULL-35-23
+    2-12-FULL-36-22
+    2-12-FULL-37-11
+    2-12-FULL-37-12
+    2-12-FULL-37-14
+    2-12-FULL-37-34
+    2-12-FULL-37-7b
+    2-12-FULL-38-22
+    2-12-FULL-39-13
+    2-12-FULL-40-10
+    2-12-FULL-40-12
+    2-12-FULL-40-28
+    2-12-FULL-41-12
+    2-12-FULL-41-13
+    2-12-FULL-41-16
+    2-12-FULL-41-17
+    2-12-FULL-41-20
+    2-12-FULL-42-10
+    2-12-FULL-42-15
+    2-12-FULL-43-11
+    2-12-FULL-43-12
+    2-12-FULL-43-28
+    2-12-FULL-44-25
+    2-12-FULL-45-10
+    2-12-FULL-45-12
+    2-12-FULL-45-22
+    2-12-FULL-48-17
+    2-12-FULL-49-11
+    2-12-FULL-50-11
+    2-12-FULL-50-11-A
+    2-12-FULL-52-36
+    2-12-FULL-53-21
+    2-12-FULL-54-10
+    2-12-FULL-55-11
+    2-12-FULL-57-11
+    2-12-FULL-57-22
+    2-12-FULL-60-19
+    2-12-FULL-60-25
+    2-12-FULL-62-27
+    2-12-FULL-64-23
+    2-12-FULL-65-11
+    2-12-FULL-66-21
+    2-12-FULL-67-15
+    2-12-FULL-68-20
+    2-12-FULL-69-37
+    20-14-0-80-47-9
+    20-14-0-80-50-8
+    20-14-all-45-10
+    20-14-all-54-14
+    20-60-12
+    2011-GWA2-47-8b
+    2011-GWC2-44-17
+    2013-40CM-41-45
+    20CM-2-55-15
+    20CM-2-65-7
+    20CM-2-70-11
+    20CM-4-69-16
+    21-14-0-10-32-9
+    21-14-0-10-35-9
+    21-14-0-10-42-9
+    21-14-0-10-47-8
+    21-14-0-10-47-8-A
+    21-14-0-20-44-7
+    21-14-0-20-46-8
+    21-14-0-20-56-8
+    21-14-0-20-63-9
+    21-14-all-36-13
+    21-14-all-37-9
+    21-14-all-39-27
+    21-14-all-40-8
+    21-14-all-47-15
+    21-14-all-47-17
+    21-64-14
     229E-related
+    28-57-27
+    28-YEA-48
+    3-1-20CM-2-70-9
+    3-1-20CM-3-53-8
+    3-1-20CM-4-69-9
+    32-111
+    33-17
+    336-3
+    34-128
+    34-65-8
+    38-11
+    39-52-133
     4-nitrophenol
+    40-19
+    40-80
+    40CM-2-53-6
+    40CM-2-70-7
+    40CM-3-55-5
+    40CM-3-62-11
+    40CM-4-65-16
+    40CM-4-68-19
+    40CM-4-69-5
+    40CM-68-15
+    41-12-T18
+    41-269
+    41T-STBD-0c-01a
+    42-11
+    42-54-T18
+    43-108
+    43-37
+    4484-100
+    4484-107
+    4484-113
+    4484-171
+    4484-188
+    4484-190-2
+    4484-211
+    4484-213
+    4484-219
+    4484-230
+    4484-232
+    4484-275
+    4484-276
+    4484-49
+    4484-7
+    4484-87
+    4484-93
+    4484-95
+    4572-104
+    4572-112
+    4572-123
+    4572-128
+    4572-13
+    4572-130
+    4572-55
+    4572-78
+    46-47
+    46-80
+    47-G6
+    4M-Z18
+    50-218
+    50-400-T64
+    51-20
+    54-19
+    55-13
+    58-81
+    62-47
+    629B-23
+    63-22
+    630D-37
+    64-32
+    65-79
+    65-9
+    66-26
+    66-474
+    67-14
+    6H3-1
+    70-18
+    70-9
+    73-13
+    79-D21
+    9FT-COMBO-42-15
+    9FT-COMBO-48-23
+    9FT-COMBO-53-11
+    9FT-COMBO-55-16
     A-2
+    A-MIC-10
+    A05DMB-2
+    AAA044-D11
+    AAA071-K20
+    AAA164-E04
+    AAA240-E13
+    AAA261-N23
+    AAA300-D14
+    AAA536-G10
+    AABM5-125-24
+    AABM5-25-91
+    AaIE-18
+    Aalborg-AAW-1
+    AB-137-C09
+    AB-539-J10
+    AB-629-J13
+    AB001-6
+    AB1-6
+    AC-14
+    AC-16
+    AC-21
+    AC-25
+    AC-32
+    AC-35
+    AC-37
+    AC-38
+    AC-48
+    AC-49
+    AC-50
+    AC-51
+    AC-52
+    AC-55
+    AC-56
+    AC-64
+    AC-67
+    AC-69
+    AC-9
+    AcAMD-2
+    AcAMD-5
+    ACE-ARM1
     acetamiprid-degrading
     Activation-tagging
+    AD8-1
+    Adeno-Associated
     adeno-associated
     Adeno-associated
-    Adeno-Associated
+    AE-B3A
+    AE-B3B
+    AEGEAN-183
+    AER2-1
+    AF33-28
+    AG-12
+    AG-337-I02
+    AG-339-G14
+    AG-343-D04
+    AG-363-A16
+    AG-363-B04
+    AG-363-J23
+    AG-363-K07
+    AG-363-N16
+    AG-363-N20
+    AG-363-O06
+    AG-363-O15
+    AG-363-P08
+    AG-402-N21
+    AG-409-A19
+    AG-409-B05
+    AG-409-B13
+    AG-409-D09
+    AG-409-G20
+    AG-409-I11
+    AG-409-J16
+    AG-409-J19
+    AG-409-L14
+    AG-409-L18
+    AG-409-M05
+    AG-409-N21
+    AG-409-O23
+    AG-409-P01
+    AG-409-P03
+    AG-410-N11
+    AG-414-E02
+    AG-422-B15
+    AG-426-I14
+    AG-426-M11
+    AG-430-B22
+    AG-432-D11
+    AG-463-P14
     Agave-associated
     Aids-associated
     Aksy-Durug
-    Alfalfa-associated
+    AKYH767-A
+    AL-N1
     alfalfa-associated
+    Alfalfa-associated
+    Alg239-R122
+    Alg240-R148
     alk-system
     allo-octoploid
+    Alpha-05
     Altai-like
+    AM-0621
+    AM-1111
+    AM-2324
     Amalga-like
+    AMARA-1
     ammonia-oxidizing
     aniline-degrading
     ANME-1
+    ANME-1-THS
     ANME-2
     ANMV-1
     Anopheline-associated
+    ANT-38
+    ANT-B6
     antibiotic-resistant
     antimony-reducing
+    AP-15
+    AP-16
+    AQU-01
+    AQU-03
+    AQU-09
     Araraquara-like
+    Arctic95D-9
+    Arctic96AD-7
     Ardenna-associated
     Argemone-Cactus
     Aristolochia-associated
+    ARK-14
+    ARK-15
+    ARM-1
     Arrabida-like
     arsenate-reducing
     arsenic-metabolizing
@@ -240,24 +741,193 @@ const my @GENERA  => qw(
     ARV-138
     ARV-176
     ASFV-like
+    ASO4-4
+    ASP10-02a
+    ASP10-05a
+    ATCC-39006
+    ATX-6F1
+    Aved-18
     Avian-like
     Avon-Heathcote
+    AWTP1-13
+    AWTP1-18
+    AWTP1-30
+    AWTP1-31
+    AWTP1-35
+    AWTP1-9
     Aydin-like
+    B-17B0
+    B-17BO
+    B-1AR
+    B-DKE
     B-lymphotropic
+    B1-Br10-U2g19
+    B1-Br10-U2g21
+    B1-G15
+    B1-G9
+    B10-G16
+    B10-G4
+    B10-G9
+    B109-G9
+    B11-G15
+    B11-G9
+    B111-G9
+    B118-G9
+    B119-G9
+    B12-G15
+    B12-G16
+    B12-G17
+    B12-G4
+    B120-G9
+    B129-G9
+    B13-G15
+    B13-G4
+    B130-G9
+    B137-G9
+    B14-G1
+    B14-G17
+    B14-G2
+    B14-G9
+    B140-G9
+    B143-G9
+    B15-G16
+    B15-G2
+    B15-G4
+    B15-G9
+    B16-G9
+    B17-G15
+    B17-G16
+    B17-G17
+    B17-G2
+    B18-G2
+    B18-G4
+    B1SED10-159
+    B1SED10-16
+    B1Sed10-166
+    B1SED10-173
+    B1SED10-174
+    B1Sed10-187
+    B1SED10-225
+    B1Sed10-231
+    B1SED10-245
+    B1Sed10-29
+    B1SED10-74M
+    B1SED10-75
+    B2-G16
+    B20-G17
+    B21-G15
+    B21-G16
+    B21-G9
+    B22-G1
+    B22-G15
+    B23-G16
+    B24-2
+    B24-G1
+    B24-G6
+    B24-G9
+    B25-G16
+    B26-1
+    B26-G2
+    B26-G9
+    B28-G16
+    B28-G17
+    B29-G15
+    B29-G16
+    B3-B38
+    B3-Chlor
+    B3-G11
+    B3-G13
+    B3-G15
+    B3-G16
+    B3-LCP
+    B3-TA06
+    B3-WOES
+    B30-G15
+    B30-G16
+    B30-G6
+    B31-G17
+    B32-G16
+    B33-G15
+    B33-G16
+    B36-G15
+    B39-G2
+    B39-G9
+    B4-G1
+    B40-G2
+    B44-G15
+    B46-G15
+    B46-G9
+    B47-G15
+    B47-G16
+    B47-G6
+    B47-G6B
+    B48-G16
+    B48-G9
+    B5-G15
+    B5-G16
+    B50-G16
+    B51-G9
+    B54-G15
+    B6-G13
+    B6-G9
+    B60-G16
+    B61-G2
+    B62-G9
+    B64-G9
+    B65-G9
+    B66-G16
+    B67-G16
+    B68-G16
+    B68-G9
+    B69-G16
+    B7-G16
+    B7-G4
+    B70-G16
+    B70-G9
+    B72-G16
+    B73-G16
+    B75-G9
+    B78-G9
+    B79-G16
+    B79-G9
+    B8-G13
+    B8-G4
+    B8-G9
+    B82-G9
+    B83-G16
+    B87-G9
+    B88-G9
+    B9-G15
+    B9-G16
+    B9-G17
+    B91-G9
+    BA-13
+    BA-19
+    Bact-08
+    Bact-11
+    Bact-19
     Bacteroides-like
+    Badici-like
+    BAIKAL-G1
+    BAIKAL-G1-2R
     Banna-like
+    bar-headed
     Barkedji-like
+    Barnacle-like
     Bastrovirus-like_virus/VietNam/Bat/17819_21
     Bat-associated
     Bayan-Khairhan-Ula
     BD1-11
+    BD1-5
     BD1-7
     BD2-11
+    BE-D
     Bean-associated
     Bean-pod
     Bear-associated
     Begomovirus-associated
     Bemisia-associated
+    Bengt-jonsellia
     benzene-decomposing
     benzene-degrading
     benzoapyrene-degrading
@@ -268,27 +938,120 @@ const my @GENERA  => qw(
     Bi-allelically
     Bi-directional
     Bi-molecular
+    BICA1-8
     Bidnavirus-like
     Bifidobacterium-E.
     biocide-degrading
     biphenthrin-degrading
     biphenyl-degrading
     Birds-foot
+    birds-foot
+    BK-30
     Black-and-white
     Black-eyed
     black-headed
     Black-headed
     Blackcurrant-associated
     Bo-Circo-like
+    Bog-105
+    BOG-1112
+    Bog-1112
+    Bog-113
+    BOG-1155
+    Bog-1181
+    Bog-1183
+    BOG-1184
+    Bog-1198
+    BOG-1338
+    Bog-1340
+    BOG-1363
+    BOG-1369
+    BOG-1370
+    BOG-1457
+    BOG-1460
+    Bog-159
+    BOG-224
+    BOG-234
+    Bog-257
+    Bog-366
+    Bog-375
+    Bog-38
+    Bog-473
+    Bog-515
+    Bog-532
+    Bog-564
+    Bog-752
+    Bog-756
+    Bog-793
+    Bog-877
+    BOG-908
+    BOG-930
+    BOG-931
+    BOG-932
+    BOG-933
+    BOG-935
+    BOG-938
+    BOG-944
+    Bog-950
+    BOG-994
     Bombus-associated
     Bos-associated
     Bovine-like
+    BP-101
+    BP-133
+    BP-173
+    BP-191
+    BP-197
+    BRH-c0
+    BRH-c25
+    BRH-c32
+    BRH-c54
+    BRH-c57
+    BRH-c8a
+    BrNp1-15
     Broad-billed
     Broad-leafed
     bromate-reducing
     bromoform-metabolizing
     Bromus-associated
     Bronnoya-like
+    BS150m-G50
+    BS150m-G51
+    BS150m-G53
+    BS150m-G59
+    BS150m-G60
+    BS150m-G62
+    BS150m-G63
+    BS150m-G64
+    BS150m-G65
+    BS150m-G66
+    BS150m-G67
+    BS750-G32
+    BS750m-G10
+    BS750m-G14
+    BS750m-G15
+    BS750m-G21
+    BS750m-G22
+    BS750m-G24
+    BS750m-G25
+    BS750m-G28
+    BS750m-G30
+    BS750m-G34
+    BS750m-G37
+    BS750m-G39
+    BS750m-G4
+    BS750m-G44
+    BS750m-G57
+    BS750m-G60
+    BS750m-G62
+    BS750m-G65
+    BS750m-G69
+    BS750m-G71
+    BS750m-G77
+    BS750m-G78
+    BS750m-G79
+    BS750m-G81
+    BSW11-IV
     BTEX-degrading
     BtMd-BetaCoV/HuB2013
     BtMf-AlphaCoV/AH2011
@@ -325,16 +1088,100 @@ const my @GENERA  => qw(
     Burke-Gilman
     butyrate-producing
     Buxtonella-like
+    BW-2
+    BWSM-131
+    C-114
+    C-19
+    C-53
     C-terminal
     C.glutamicum-E.coli
+    C7867-001
+    C7867-002
+    C7867-005
+    C7867-006
     Cachavirus-1B
+    CACIAM-22H2
+    CACIAM-69d
     Cafeteriavirus-dependent
+    CAG-1000
+    CAG-1024
+    CAG-103
+    CAG-1031
+    CAG-1138
+    CAG-115
+    CAG-1193
+    CAG-1252
+    CAG-138
+    CAG-170
+    CAG-177
+    CAG-1782
+    CAG-194
+    CAG-196
+    CAG-217
+    CAG-238
+    CAG-239
+    CAG-245
+    CAG-266
+    CAG-267
+    CAG-269
+    CAG-272
+    CAG-273
+    CAG-274
+    CAG-288
+    CAG-302
+    CAG-303
+    CAG-307
+    CAG-312
+    CAG-313
+    CAG-314
+    CAG-345
+    CAG-349
+    CAG-382
+    CAG-390
+    CAG-411
+    CAG-417
+    CAG-433
+    CAG-448
+    CAG-449
+    CAG-452
+    CAG-465
+    CAG-475
+    CAG-488
+    CAG-492
+    CAG-508
+    CAG-510
+    CAG-533
+    CAG-552
+    CAG-557
+    CAG-568
+    CAG-582
+    CAG-590
+    CAG-605
+    CAG-611
+    CAG-628
+    CAG-631
+    CAG-632
+    CAG-698
+    CAG-710
+    CAG-724
+    CAG-762
+    CAG-791
+    CAG-793
+    CAG-826
+    CAG-841
+    CAG-873
+    CAG-877
+    CAG-882
+    CAG-884
+    CAG-914
+    CAG-917
+    CAG-964
+    CAG-977
     Calf-giraffe
     Calhevirus-2a
     Calhevirus-2b
     Camellia-associated
     Campylobacter-like
-    Candida/CUG-Ser1
     Caraparu-like
     carbazole-degrading
     Carpediemonas-like
@@ -343,26 +1190,132 @@ const my @GENERA  => qw(
     Carrot-associated
     Cas-Br-E
     Cas-NS-1
+    Casp-actino5
+    Casp-actino8
+    Casp-alpha2
+    Casp-Chloro-G3
+    Casp-Chloro-G4
     Cassava-Congo
     CASV-2
     CAT-levansucrase
     Catch-me-cave
+    CAU-1509
     CBA120-like
+    CC-CFT747
+    CCA-013414725
+    CCAP-1448
+    CECT-8803
     Cell-free
     Ceratium-like
+    CF-105
+    CF-107
+    CF-113
+    CF-118
+    CF-120
+    CF-121
+    CF-13
+    CF-134
+    CF-154
+    CF-16
+    CF-161
+    CF-162
+    CF-163
+    CF-165
+    CF-167
+    CF-28
+    CF-39
+    CF-46
+    CF-54
+    CF-72
+    CF-75
+    CF-82
+    CF-96
     CFB-group
+    CFBP-8762
+    CFH-32150
+    Cfx2-01
+    Cfx3-03
+    CG-Epi1
+    CG07-land
+    CG08-08-20-14
+    CG1-02-31-27
+    CG1-02-33-12
+    CG1-02-35-32
+    CG1-02-35-72
+    CG1-02-37-114
+    CG1-02-37-13
+    CG1-02-37-22
+    CG1-02-39-14
+    CG1-02-40-25
+    CG1-02-40-82
+    CG1-02-41-12
+    CG1-02-41-21
+    CG1-02-41-26
+    CG1-02-43-26
+    CG1-02-43-31
+    CG1-02-47-18
+    CG1-02-47-37
+    CG1-02-47-40
+    CG1-02-49-23
+    CG1-02-57-44
+    CG1-02-64-396
+    CG10-46-32
+    CG10238-14
+    CG2-30-32-10
+    CG2-30-33-13
+    CG2-30-33-31
+    CG2-30-33-46
+    CG2-30-36-11
+    CG2-30-36-16
+    CG2-30-36-38
+    CG2-30-36-39
+    CG2-30-37-29
+    CG2-30-39-44
+    CG2-30-40-12
+    CG2-30-40-21
+    CG2-30-43-20
+    CG2-30-44-17
+    CG2-30-45-37
+    CG2-30-46-19
+    CG2-30-46-9
+    CG2-30-49-12
+    CG2-30-51-40
+    CG2-30-53-67
+    CG2-30-54-10
+    CG2-30-54-11
+    CG2-30-58-95
+    CG2-30-59-28
+    CG2-30-60-27
+    CG2-30-61-12
+    CG2-30-64-16
+    CG2-30-66-41
+    CG2-30-68-42
+    CG2-30-70-394
+    CGMCC-115125
     chain-forming
     Chaq-like
     Cherry-associated
+    Chersky-265
+    Chersky-267
+    Chersky-299
+    Chersky-534
+    Chersky-683
+    Chersky-806
+    Chersky-822
+    Chersky-840
+    CHH4-2
     Chiba-040502
     chieh-qua
+    CHK158-818
     chlamydia-associated
     Chlorante-Aster
     chloromethane-metabolizing
     chlortetracycline-resistant
+    ChocPot-Mid
     Choricystis-like
     Chryso-hypnum
     Chrysovirus-like
+    Chth-196
     chu-like
     cilia-associated
     Circo-like
@@ -373,6 +1326,7 @@ const my @GENERA  => qw(
     Co-expression
     Co-reporter
     Colwellia-like
+    COMBO-56-21
     Corn-reddening
     Corynebacterium-like
     COS-degrading
@@ -380,8 +1334,11 @@ const my @GENERA  => qw(
     Counter-selectable
     Cowpox-Vaccinia
     Coxiella-like
+    CP2-2F
     CP52-degrading
     Cr(VI)-reducing
+    CR-1
+    CR-4
     Crab-eating
     Crane-associated
     CrAss-like
@@ -524,66 +1481,392 @@ const my @GENERA  => qw(
     Crucivirus-like
     Cryphonectria-Endothia
     Cryptaulaxoides-like
+    CS1-C013
+    CS2-K091
+    CS3-C152
+    CS4-C045
+    CSBR16-104
+    CSBR16-107
+    CSBr16-110
+    CSBR16-113R1
+    CSBR16-119
+    CSBr16-161
+    CSBR16-174
+    CSBR16-193
+    CSBR16-202
+    CSBR16-224
+    CSBR16-49
+    CSBr16-57R1
+    CSBr16-58
+    CSBR16-87
+    CSBR16-88
+    CSK15Z-1
+    CSP1-1
+    CSP1-2
+    CSP1-3
+    CSP1-4
+    CSP1-5
+    CSP1-6
+    CSP1-8
+    CSSED10-109M
+    CSSED10-239
+    CSSED10-269
+    CSSED10-310
+    CSSED10-335
+    CSSED10-376
+    CSSed10-48
+    CSSED10-83
+    CSSED11-109
+    CSSED11-154
+    CSSed11-175R1
+    CSSED11-181
+    CSSed11-197
+    CSSed11-243R1
+    CSSED11-302
+    CSSED11-315
     Ctenophore-associated
     CTFE4-defluorinating
-    CUG-Ala
-    CUG-Ser1
-    CUG-Ser2
+    CTSoil-043
+    CTSoil-045
+    CTSoil-072
+    CTSoil-075
+    CTSoil-080
+    CTSoil-081
+    CTSOIL-112
+    CU05-9
+    CUG-92003
     Culex-associated
     Culicine-associated
+    Cx-87
     cyanobacteria-associated
     Cyrto-hypnum
     Cysteine-free
     Cytophaga-like
+    D16-63
+    D1FN1-002
+    D2-FULL-39-29
+    DA-C8
+    Damh-18
+    DAT-1
+    DC-out156
+    DC-out160
     DCM-degrading
-    deep-sea
     Deep-sea
+    deep-sea
     Deinococcus-like
     Deinococcus-Thermus
+    Delta-02
     Dendro-hypnum
     Dermatophilus-like
+    DG-23
+    DG-26
+    DG-26_A
+    DG-27
+    DG-33
+    DG-60
+    DG-74-1
+    DG-74-3
     DG-75
+    DG-78
+    DHVEG-1
     dibenzofuran-degrading
     dichloromethane-degrading
     Dietzia-Escherichia
     Diporeia-associated
+    diuron-degrading
+    DKR-5
     DMSP-degrading
     DNA-binding
+    DP-1
+    DP-19
+    DP-20
+    DP-23
+    DP-3
+    DP-36
+    DP-6
+    DP16D-bin41
     Dragonfly-associated
+    DRI-13
     Drosophila-associated
+    DSM-100275
+    DSM-100316
+    DSM-103792
+    DSM-111022
+    DSM-12255
+    DSM-12270
+    DSM-1321
+    DSM-13327
+    DSM-15969
+    DSM-16000
+    DSM-16054
+    DSM-16500
+    DSM-1736
+    DSM-17781
+    DSM-18226
+    DSM-19205
+    DSM-19610
+    DSM-21159
+    DSM-21967
+    DSM-22653
+    DSM-22679
+    DSM-23052
+    DSM-23947
+    DSM-2461
+    DSM-24629
+    DSM-25080
+    DSM-25186
+    DSM-25281
+    DSM-26407
+    DSM-27016
+    DSM-27196
+    DSM-28697
+    DSM-29158
+    DSM-2933
+    DSM-4216
+    DSM-44207
+    DSM-44946
+    DSM-45169
+    DSM-4660
+    DSM-5069
+    DSM-5130
+    DSM-5807
+    DSM-6294
+    DSM-6578
+    DSM-8532
+    DSM-8902
+    DSM-9736
+    DSM-9756
     DSMP-degrading
+    DT-108
+    DT-110
+    DT-111
+    DT-14
+    DT-32
+    DT-33
+    DT-34
+    DT-35
+    DT-38
+    DT-50
+    DT-59
+    DT-68
+    DT-91
+    Dual-luciferase
     Dual-tagging
     Duck-associated
     Duck-dominant
+    Duin-like
     dye-degrading
+    E26-bin7
+    E29-bin14
+    E29-bin15
+    E29-bin54
+    E29-bin73
+    E4-135
+    E4-60
+    E44-bin10
+    E44-bin15
+    E44-bin18
+    E44-bin26
+    E44-bin32
+    E44-bin39
+    E44-bin46
+    E44-bin52
+    E44-bin80
+    E44-bin88
+    E44-bin89
+    EA-19
+    EA-27
+    ECH-B-1
     Echarate-like
+    Echinacea-associated
+    ECT2AJA-044
+    ECT2AJA-110-A
     EDTA-degrading
+    EFPC-124
+    EFPC-2
     Ehrlichia-like
     EIAV-based
+    ELB16-189
     Endornaviridae-like
     Endornavirus-like
     Entamoeba-associated
-    Epomophorini-Myonycterini
     Epstein-barr
     Erythrobacter-like
+    ES-bin-26
+    EsbW-18
     Escherichia-Pseudomonas
+    ESFC-1
+    ESH-2018B
+    Ess09-12
+    Ess09-15
     estrogen-degrading
+    ETH-SRB1
     ethanol-producing
     EX-H1
+    EX4484-135
+    EX4484-15
+    EX4484-2
+    EX4484-204
+    EX4484-205
+    EX4484-217-1
+    EX4484-218
+    EX4484-224
+    EX4484-31
+    EX4484-36
+    EX4484-52
+    EX4484-58
+    EX4484-6
+    EX4484-71
+    EX4572-165
+    EX4572-44
+    EX4572-64
     F-11
+    F-183
+    F1-12-MAGs170
+    F1-120-MAGs023
+    F1-120-MAGs055
+    F1-120-MAGs118
+    F1-120-MAGs170
+    F1-120-MAGs238
+    F1-140-MAGs086
+    F1-140-MAGs142
+    F1-20-MAGs016
+    F1-20-MAGs119
+    F1-20-MAGs160
+    F1-60-MAGs027
+    F1-60-MAGs104
+    F1-60-MAGs140
+    F1-60-MAGs149
+    F1-60-MAGs163
+    F1-80-MAGs030
+    F1-80-MAGs062
+    F1-80-MAGS106
+    F23-B02
+    F23-D06
+    FACHB-1237
+    FACHB-1375
+    FACHB-1406
+    FACHB-1407
+    FACHB-261
+    FACHB-36
+    FACHB-40
+    FACHB-46
+    FACHB-68
+    FACHB-8
+    FACHB-800
+    FACHB-831
+    FACHB-886
+    FACHB-T130
     Faecal-associated
+    Fancy-tailed
     FCV-like
     Fe(III)-reducing
     Fe-oxidizing
+    FEB-10
+    FEB-12
+    FEB-17
+    FEB-22
+    FEB-25
+    FEB-35
+    FEB-7
+    Felisa-like
+    Fen-1038
+    Fen-1039
+    Fen-1058
+    Fen-1064
+    FEN-1073
+    Fen-1077
+    Fen-1087
+    FEN-1088
+    Fen-1088
+    FEN-1099
+    Fen-1118
+    Fen-1135
+    Fen-1137
+    FEN-1139
+    FEN-1143
+    FEN-1160
+    Fen-1166
+    FEN-1173
+    Fen-1174
+    FEN-1185
+    FEN-1191
+    FEN-1219
+    FEN-1226
+    Fen-1231
+    Fen-1245
+    Fen-1247
+    FEN-1250
+    FEN-1251
+    Fen-1254
+    Fen-1255
+    FEN-1257
+    Fen-1258
+    Fen-1260
+    Fen-1262
+    Fen-1273
+    FEN-1279
+    FEN-1297
+    Fen-1298
+    Fen-1301
+    Fen-1308
+    Fen-1317
+    FEN-1320
+    FEN-1322
+    Fen-1326
+    FEN-1329
+    Fen-1342
+    FEN-1343
+    FEN-1344
+    FEN-1346
+    FEN-1349
+    FEN-1350
+    Fen-1359
+    Fen-1362
+    Fen-1364
+    FEN-1388
+    Fen-1467
+    Fen-178
+    Fen-181
+    Fen-183
+    FEN-299
+    FEN-33
+    Fen-330
+    FEN-336
+    Fen-336
+    FEN-413
+    Fen-455
+    Fen-549
+    Fen-668
+    Fen-671
+    FEN-672
+    FEN-680
+    Fen-7
+    FEN-727
+    Fen-727
+    FEN-943
+    FEN-979
+    FEN-987
+    Fen-999
     fenpropathrin-degrading
     fenthion-degrading
     Fer-de-lance
     Fermo-like
     Fesa-like
+    Fibro-01
     Fibropapilloma-associated
     Finkel-Biskis-Jinkins
+    Firm-04
+    Firm-07
+    Firm-08
+    Firm-09
+    Firm-10
+    Firm-13
+    Firm-16
+    Firm-18
     Fisa-like
     Fish-associated
+    FJAT-45350
     FLAG-tagging
     Flavi-like
     Flaviridae-like
@@ -597,14 +1880,471 @@ const my @GENERA  => qw(
     Four-toed
     Francisella-like
     FRT-Tp-FRT
+    FS08-3
+    FT1-004
+    FT1-020
     furfural-degrading
+    FW021-bin31
+    FW021-bin43
+    FW300-bin19
+    FW305-bin1
+    FW602-bin16
+    FW602-bin19
+    FW602-bin22
+    G3-4614
     GABA-v2-NaVbeta1-myc
     GABA-v3-NaVbeta1-myc
     GABA-v4-NaVbeta1-myc
     gamma-symbiont
     Ganwon-do
     Gardner-Arnstein
+    GBS-1
+    GBS-2
+    GBS-DC
     GBV-A-like
+    GCA-000496135
+    GCA-001602625
+    GCA-001730085
+    GCA-001735895
+    GCA-001788215
+    GCA-001856825
+    GCA-002050365
+    GCA-002282575
+    GCA-002401295
+    GCA-002401385
+    GCA-002402085
+    GCA-002684695
+    GCA-002686595
+    GCA-002687715
+    GCA-002688135
+    GCA-002690875
+    GCA-002691585
+    GCA-002694895
+    GCA-002697625
+    GCA-002700125
+    GCA-002701365
+    GCA-002701455
+    GCA-002701945
+    GCA-002704045
+    GCA-002704185
+    GCA-002705045
+    GCA-002705445
+    GCA-002707245
+    GCA-002707645
+    GCA-002707905
+    GCA-002708145
+    GCA-002708315
+    GCA-002708715
+    GCA-002712045
+    GCA-002712965
+    GCA-002713455
+    GCA-002715585
+    GCA-002715885
+    GCA-002716945
+    GCA-002717915
+    GCA-002718135
+    GCA-002718395
+    GCA-002718515
+    GCA-002718655
+    GCA-002719095
+    GCA-002719695
+    GCA-002720895
+    GCA-002721295
+    GCA-002722245
+    GCA-002723415
+    GCA-002724395
+    GCA-002724975
+    GCA-002726655
+    GCA-002727615
+    GCA-002727735
+    GCA-002728675
+    GCA-002728855
+    GCA-002729875
+    GCA-002731945
+    GCA-002733105
+    GCA-002733185
+    GCA-002733465
+    GCA-002748355
+    GCA-002748415
+    GCA-002770795
+    GCA-002772825
+    GCA-002772895
+    GCA-002773005
+    GCA-002779355
+    GCA-002779425
+    GCA-002779465
+    GCA-002779875
+    GCA-002780085
+    GCA-002780795
+    GCA-002782225
+    GCA-002782285
+    GCA-002782345
+    GCA-002784865
+    GCA-002785045
+    GCA-002787175
+    GCA-002787255
+    GCA-002787375
+    GCA-00278855
+    GCA-002788555
+    GCA-002789015
+    GCA-002790365
+    GCA-002790575
+    GCA-002790615
+    GCA-002790695
+    GCA-002791395
+    GCA-002792115
+    GCA-002793235
+    GCA-002793355
+    GCA-002793575
+    GCA-002795985
+    GCA-002796325
+    GCA-002838935
+    GCA-002840015
+    GCA-002840305
+    GCA-002840935
+    GCA-002841655
+    GCA-002862325
+    GCA-003054495
+    GCA-003244245
+    GCA-004216475
+    GCA-012562765
+    GCA-013348725
+    GCA-013414725
+    GCA-013693735
+    GCA-014075295
+    GCA-014931565
+    GCA-016432245
+    GCA-016432345
+    GCA-016432425
+    GCA-016432445
+    GCA-016432465
+    GCA-016432525
+    GCA-016432625
+    GCA-016699085
+    GCA-016699105
+    GCA-016699145
+    GCA-016699305
+    GCA-016699365
+    GCA-016699445
+    GCA-016699515
+    GCA-016699535
+    GCA-016699595
+    GCA-016699755
+    GCA-016699835
+    GCA-016699855
+    GCA-016699895
+    GCA-016699975
+    GCA-016700035
+    GCA-016700095
+    GCA-016700155
+    GCA-016700315
+    GCA-016700335
+    GCA-020341775
+    GCA-020343435
+    GCA-020343575
+    GCA-020343615
+    GCA-020343675
+    GCA-020343715
+    GCA-020344235
+    GCA-020344395
+    GCA-020344555
+    GCA-020344715
+    GCA-020345705
+    GCA-020345945
+    GCA-020346225
+    GCA-020346805
+    GCA-020347585
+    GCA-020348065
+    GCA-020348265
+    GCA-020348365
+    GCA-020348445
+    GCA-020350385
+    GCA-020350865
+    GCA-020351305
+    GCA-020352575
+    GCA-020352645
+    GCA-020354555
+    GCA-020354575
+    GCA-020355125
+    GCA-020356005
+    GCA-020356105
+    GCA-020356305
+    GCA-021513135
+    GCA-022846635
+    GCA-023898365
+    GCA-024661895
+    GCA-030583725
+    GCA-16432305
+    GCA-1730015
+    GCA-2400775
+    GCA-2400975
+    GCA-2401155
+    GCA-2401345
+    GCA-2401425
+    GCA-2401445
+    GCA-2401635
+    GCA-2401725
+    GCA-2401735
+    GCA-2401785
+    GCA-2401865
+    GCA-2402025
+    GCA-2402105
+    GCA-2402195
+    GCA-2683135
+    GCA-2683315
+    GCA-2683405
+    GCA-2683775
+    GCA-2683825
+    GCA-2684655
+    GCA-2685815
+    GCA-2685855
+    GCA-2685935
+    GCA-2685965
+    GCA-2686065
+    GCA-2686265
+    GCA-2686295
+    GCA-2686365
+    GCA-2686445
+    GCA-2686465
+    GCA-2686595
+    GCA-2686765
+    GCA-2686855
+    GCA-2686945
+    GCA-2686955
+    GCA-2686995
+    GCA-2687015
+    GCA-2687025
+    GCA-2687185
+    GCA-2687275
+    GCA-2687515
+    GCA-2687715
+    GCA-2687795
+    GCA-2687815
+    GCA-2688035
+    GCA-2688095
+    GCA-2688105
+    GCA-2688265
+    GCA-2688355
+    GCA-2688435
+    GCA-2688775
+    GCA-2688925
+    GCA-2688965
+    GCA-2689605
+    GCA-2689925
+    GCA-2689995
+    GCA-2690215
+    GCA-2690565
+    GCA-2690645
+    GCA-2691085
+    GCA-2691145
+    GCA-2691245
+    GCA-2691785
+    GCA-2692065
+    GCA-2693325
+    GCA-2693335
+    GCA-2696645
+    GCA-2696965
+    GCA-2697345
+    GCA-2697505
+    GCA-2698665
+    GCA-2698995
+    GCA-2699025
+    GCA-2699105
+    GCA-2699335
+    GCA-2699365
+    GCA-2699445
+    GCA-2700365
+    GCA-2700405
+    GCA-2701545
+    GCA-2701705
+    GCA-2701885
+    GCA-2701925
+    GCA-2702065
+    GCA-2702235
+    GCA-2702655
+    GCA-2704625
+    GCA-2704665
+    GCA-2705055
+    GCA-2705205
+    GCA-2705445
+    GCA-2705995
+    GCA-2706205
+    GCA-2706465
+    GCA-2706885
+    GCA-2707145
+    GCA-2707185
+    GCA-2707205
+    GCA-2707495
+    GCA-2707695
+    GCA-2707915
+    GCA-2708265
+    GCA-2708415
+    GCA-2709075
+    GCA-2709385
+    GCA-2709565
+    GCA-2709665
+    GCA-2710765
+    GCA-2711125
+    GCA-2711415
+    GCA-2711515
+    GCA-2711565
+    GCA-2711625
+    GCA-2711925
+    GCA-2712005
+    GCA-2712105
+    GCA-2712585
+    GCA-2712665
+    GCA-2712715
+    GCA-2712985
+    GCA-2713145
+    GCA-2714055
+    GCA-2715305
+    GCA-2715465
+    GCA-2715505
+    GCA-2715565
+    GCA-2715645
+    GCA-2715965
+    GCA-2716065
+    GCA-2716345
+    GCA-2716485
+    GCA-2716585
+    GCA-2716765
+    GCA-2716945
+    GCA-2717185
+    GCA-2717285
+    GCA-2717385
+    GCA-2717465
+    GCA-2717485
+    GCA-2717565
+    GCA-2717625
+    GCA-2717925
+    GCA-2718035
+    GCA-2718595
+    GCA-2718715
+    GCA-2718815
+    GCA-2718845
+    GCA-2718895
+    GCA-2719315
+    GCA-2719675
+    GCA-2719775
+    GCA-2720125
+    GCA-2720195
+    GCA-2720855
+    GCA-2720865
+    GCA-2720935
+    GCA-2720975
+    GCA-2721105
+    GCA-2721365
+    GCA-2721545
+    GCA-2721815
+    GCA-2722105
+    GCA-2722175
+    GCA-2722315
+    GCA-2722455
+    GCA-2722775
+    GCA-2722955
+    GCA-2723085
+    GCA-2723275
+    GCA-2724185
+    GCA-2724215
+    GCA-2724505
+    GCA-2724675
+    GCA-2725445
+    GCA-2725625
+    GCA-2725915
+    GCA-2725955
+    GCA-2726205
+    GCA-2726245
+    GCA-2726865
+    GCA-2728135
+    GCA-2728255
+    GCA-2728355
+    GCA-2729495
+    GCA-2729515
+    GCA-2730555
+    GCA-2730855
+    GCA-2730975
+    GCA-2731375
+    GCA-2732015
+    GCA-2732755
+    GCA-2732805
+    GCA-2733415
+    GCA-2733545
+    GCA-2733575
+    GCA-2733885
+    GCA-2737125
+    GCA-2737595
+    GCA-2737665
+    GCA-2737725
+    GCA-2742885
+    GCA-2742935
+    GCA-2746115
+    GCA-2746155
+    GCA-2746185
+    GCA-2746235
+    GCA-2746255
+    GCA-2746335
+    GCA-2746365
+    GCA-2746425
+    GCA-2746535
+    GCA-2746565
+    GCA-2746605
+    GCA-2746795
+    GCA-2746885
+    GCA-2747035
+    GCA-2747105
+    GCA-2747255
+    GCA-2747325
+    GCA-2747355
+    GCA-2747515
+    GCA-2747695
+    GCA-2747955
+    GCA-2748055
+    GCA-2748265
+    GCA-2748355
+    GCA-2748425
+    GCA-2748505
+    GCA-2748575
+    GCA-2748835
+    GCA-2749205
+    GCA-2753255
+    GCA-2753275
+    GCA-2753565
+    GCA-2753745
+    GCA-2770975
+    GCA-2774365
+    GCA-2785325
+    GCA-2786165
+    GCA-2786225
+    GCA-2792135
+    GCA-2794515
+    GCA-2794595
+    GCA-2861585
+    GCA-2861595
+    GCA-2862085
+    GCA-2862225
+    GCA-2862545
+    GCA-2862585
+    GCA-2862715
+    GCA-2863045
+    GCA-2863065
+    GCA-2863085
+    GCA-900066905
+    GCA-918320885
+    GCA-958296115
+    GCA-965745
+    GCF-000287335
+    GCF-000287355
+    GCF-000787395
+    GCF-001939115
+    GCF-002002485
+    GCF-002020805
+    GCF-002020875
+    GCF-002259525
+    GCF-002776555
+    GCF-013343005
+    GCF-1484045
+    GCF-900161835
     Gemmata-like
     Gene-editing
     Gene-trap
@@ -612,49 +2352,277 @@ const my @GENERA  => qw(
     Giardia-associated
     Gill-associated
     Ginkgoaceae-associated
+    GJ-E10
     Glaucous-winged
     Glaucus-gull
+    GLO-12
+    Glo-13
+    Glo-17
+    GLO-3
     Gluconacetobacter-like
     glycerol-degrading
+    GMQP-bins7
+    GN02-872
+    GN02-873
     GO-respiring
     Golden-headed
     Gonad-specific
     Goose-dominant
     Gordonia-like
+    Gp1-AA112
+    Gp1-AA117
+    Gp1-AA122
+    Gp1-AA124
+    Gp1-AA133
+    Gp1-AA142
+    Gp1-AA145
+    Gp13-AA74
+    Gp13-AA77
+    Gp18-AA60
+    Gp22-AA2
+    Gp22-AA3
+    Gp6-AA38
+    Gp6-AA40
+    Gp6-AA45
+    Gp7-AA10
+    Gp7-AA6
+    Gp7-AA8
+    GPF-1
     Gram-negative
     Gram-positive
     Grapevine-associated
     Grass-Cactus
     Gray-bellied
+    GSA-30
+    GSPS2-BC2016
+    GW-Firmicutes-8
+    GW-Nitrospira-1
+    GW2011-AR1
+    GW2011-AR10
+    GW2011-AR11
+    GW2011-AR13
+    GW2011-AR15
+    GW2011-AR17
+    GW2011-AR18
+    GW2011-AR20
+    GW2011-AR4
+    GW2011-AR5
+    GW2011-AR9
+    GW928-bin9
+    GWA1-39-11
+    GWA1-40-21
+    GWA1-42-19
+    GWA1-42-9
+    GWA1-44-24
+    GWA1-44-25
+    GWA1-44-29
+    GWA1-48-11
+    GWA1-52-35
+    GWA1-54-10
+    GWA1-54-12
+    GWA2-31-9
+    GWA2-32-17
+    GWA2-33-14
+    GWA2-35-9
+    GWA2-36-10
+    GWA2-37-10
+    GWA2-37-8
+    GWA2-38-11
+    GWA2-38-13
+    GWA2-38-13b
+    GWA2-38-27
+    GWA2-38-27_A
+    GWA2-41-24
+    GWA2-42-14
+    GWA2-42-15
+    GWA2-43-13
+    GWA2-43-14
+    GWA2-44-10
+    GWA2-44-7
+    GWA2-44-9
+    GWA2-45-9
+    GWA2-46-10
+    GWA2-46-15
+    GWA2-46-9
+    GWA2-47-10
+    GWA2-47-10b
+    GWA2-47-26
+    GWA2-47-8
+    GWA2-49-15
+    GWA2-52-8
+    GWA2-54-12
+    GWA2-56-11
+    GWA2-58-10
+    GWA2-66-18
+    GWA2-73-35
+    GWB1-36-13
+    GWB1-36-5
+    GWB1-37-8
+    GWB1-38-13
+    GWB1-39-10
+    GWB1-39-12
+    GWB1-40-14
+    GWB1-41-6
+    GWB1-42-6
+    GWB1-45-5
+    GWB1-45-9
+    GWB1-50-10
+    GWB1-54-5
+    GWB1-55-8
+    GWB2-37-7
+    GWB2-47-37
+    GWB2-55-19
+    GWC1-27-15
+    GWC1-37-10
+    GWC1-37-12b
+    GWC1-40-35
+    GWC1-40-9
+    GWC1-42-9
+    GWC1-47-15
+    GWC1-49-16
+    GWC2-33-13
+    GWC2-36-17
+    GWC2-37-13
+    GWC2-37-14
+    GWC2-37-73
+    GWC2-37-8
+    GWC2-39-10
+    GWC2-39-14
+    GWC2-40-17
+    GWC2-42-11
+    GWC2-42-12
+    GWC2-42-7
+    GWC2-42-7-A
+    GWC2-45-19
+    GWC2-45-44
+    GWC2-55-46
+    GWC2-56-14
+    GWC2-57-13
+    GWC2-65-14
+    GWC2-70-10
+    GWC2-71-9
+    GWC2-73-18
+    GWE1-39-12
+    GWE2-29-8
+    GWE2-31-10
+    GWE2-37-16
+    GWE2-39-37
+    GWE2-40-63
+    GWE2-41-16
+    GWE2-42-24
+    GWE2-42-39
+    GWE2-51-13
+    GWF1-31-35
+    GWF1-45-5
+    GWF1-51-8
+    GWF2-30-66
+    GWF2-32-72
+    GWF2-33-10
+    GWF2-33-38
+    GWF2-33-9
+    GWF2-35-18
+    GWF2-35-48
+    GWF2-35-9
+    GWF2-37-15
+    GWF2-37-49
+    GWF2-38-10
+    GWF2-38-335
+    GWF2-38-69
+    GWF2-38-85
+    GWF2-39-127
+    GWF2-39-15
+    GWF2-40-263
+    GWF2-43-52
+    GWF2-43-63
+    GWF2-44-16
+    GWF2-45-14
+    GWF2-50-10
+    GWF2-50-93
+    GWF2-57-35
     Gyrovirus-like
+    GYS-P2D
     H-1
     H-Pelican
     H-Stinger
+    H02-43-120
+    H02-43-30
+    H02-45-13
+    H02-45-28
+    H02-48-17
+    H1-PLA3
+    H2-BAC3
     H2/CO2-metabolizing
+    H3-PLA7
+    H5-PLA8
+    H5-SPI1
+    H5-UNCL2
     Hantaan-like
     Hardy-Zuckerman
     Haruka-associated
+    HB2-32-21
     HCV/GBV-B
+    HDB-SIOI813
+    HDS-20
+    HDS-28
     Heart-leaved
     Hedyotis-Oldenlandia
+    HEL-GB-A
+    HEL-GB-B
+    Hel1-33-131
     Helper-independent
     Hemibarbus-Squalidus
     Henipa-like
+    Hepe-virga-like
     HERV-H/env59
     HERV-H/env60
     HERV-H/env62
+    HGW-1
+    HGW-15
+    HGW-17
+    HGW-BRC1-1
     Hibiscus-infecting
+    HIGH02-12-38-15
+    HIGHO2-12-38-15
     Himar1-delivery
     his-3
     HIV-1
     HIV-2
     HIV-2.D205
     HIV-like
+    HK-STAS-PATE-10
+    HK-STAS-PATE-2
+    HK-STAS-PATE-3
+    HK-STAS-PATE-34
+    HK-STAS-PATE-36
+    HK-STAS-PATE-42
+    HK-STAS-PATE-9
+    HKI-0501
+    HKST-UBA178
+    HKST-UBA22
+    HKST-UBA223
+    HKST-UBA85
     HMWdDNA-degrading
+    HO2-37-13b
+    HO2-39-17
+    HO2-43-120
+    HO2-43-30
+    HO2-45-11b
+    HO2-45-13
+    HO2-45-28
+    HO2-48-17
+    HO2-49-34
+    HO2-52-23
+    HO2-FULL-38-9
+    HO2-FULL-47-45
     Hom-1
+    HOT-345
     HPIV-1
+    HS-7
+    HS-T3
     HSV-tk-containing
     hSyn-NaVbeta1-myc
+    HT-58-2
+    HT1-32
     HTLV-1
     HTLV-3
     Humaita-Tubiacanga
@@ -663,50 +2631,155 @@ const my @GENERA  => qw(
     Hump-back
     Husa-like
     HVAC-associated
+    HXMU1420-13
+    HXMU1420-2
+    HXMU1428-3
     hydrocarbon-degrading
     hydrogen-producing
     Hyphomicrobium-like
+    HyVt-105
+    HyVt-16
+    HyVt-206
+    HyVt-337
+    HyVt-429
+    HyVt-443
+    HyVt-448
+    HyVt-477
+    HyVt-539
+    HyVt-560
+    HyVt-613
     Ichthyobodo-related
+    ICN-92133
+    IDS-52
+    IDS-8
     Iflaviridae-like
+    IGHO2-01-FULL-4-A
+    IGHO2-12-FULL-4
     IncP-1
     IncP-1beta
     IncQ-like
     Insect-associated
+    Io17-Chloro-G2
     iodate-reducing
     iodide-accumulating
     iodide-oxidizing
     IRE/CTVM19-associated
     iron-reducing
+    iron-reduction
+    ISCAR-4553
     Isosphaera-like
     Issyk-Kul
     Janibacter-like
+    JCM-10596
+    JCM-19050
+    JCM-19058
+    JCVI-SCAAA005
+    JdFR-07
+    JDFR-13
+    JdFR-19
+    JdFR-22
+    JdFR-37
+    JdFR-41
+    JdFR-42
+    JdFR-43
+    JdFR-45
+    JdFR-47
+    JdFR-54
+    JdFR-56
+    JdFR-76
+    JdFR-78
+    JdFR-80
+    JdFR-81
+    JdFR-85
+    JdFR-86
+    JdFR-88
+    JdFR-95
+    JdFR-97
     jellyfish-degrading
+    JGIOTU-2
     Jiangxi12-B14
+    JIR-001
+    JN-9
     Jodiemicrovirus-1
     Johnson-sea-linkia
+    JS7-9
+    JSC-12
     Juquitiba-like
     K139-like
+    K23-9
+    KACC-23026
+    Kalu-18
+    KAN-5
+    Kazan-3B-28
+    KBS-83
+    KBS-96
     Kineococcus-like
+    KJ1-10-99
+    KM106-2
+    KMM-3653
     Knock-in
     Korle-bu
+    KS3-K002
+    L227-5C
+    L227-S17
     LANV-2
     Large-insert
+    LB-PLM-3
+    LB3-1
+    LC-2
+    LC-3
+    LC2-1
+    LC3-1
+    LC5-1
+    LC5-5
+    LD1-PB3_B
+    LDC-1
     Leafhopper-borne
     Leafy-liverwort
+    LEGE-06147
+    LEGE-07092
+    LEGE-11386
     Legionella-like
     Leguminosae-associated
+    Lenti-01
+    Lenti-02
     Leptotrichia-like
+    LFW-46
+    LH-M37
     lignocellulose-degrading
     Lily-associated
+    LiPW-15
+    LiPW-41
+    LLD-282
+    LM3-B42
+    LMEP-10873
+    LMEP-6097
     LMWdDNA-degrading
+    LNNU-3342
+    Loki-b32
     Long-fingered
     long-tailed
+    LOWO2-01-FULL-3
     LPP-group
+    LS-NOB
     Luna-1
     Luna-2
     lung-eye-trachea
     Lupinus-Cactus
+    LW40-45
+    LW60-42
+    LZORAL124-50-18
+    LZORAL124-64-63
+    M1-B18
+    M10-OD1-1
+    M10-OD1-4
+    M3-22
+    MA-ANB-1
     Maedi-Visna-related
+    MAG-120531
+    MAG-120802
+    MAG-121220-bin8
+    MAG-NZ
     magnetite-containing
     magneto-ovoid
     Magpie-robin
@@ -715,13 +2788,26 @@ const my @GENERA  => qw(
     male-killing
     manganese-oxidation
     manganese-oxidizing
+    Many-flowered
     Marcus-kochia
+    MarineAlpha4-Bin1
+    MarineAlpha5-Bin12
+    MarineAlpha5-Bin3
+    MarineAlpha5-Bin7
+    MarineAlpha9-Bin2
     Marinobacter-like
+    Marseille-P2935
+    Marseille-P3160
+    Marseille-P3662
     Mason-Pfizer
     Massilia-like
     MAST-4
     Maus-Elberfeld
     Maverick-related
+    MB-PLM-1
+    MB-PLM-2
+    MB1-2
+    MB2-83
     MCG-1
     MCG-10
     MCG-11
@@ -739,8 +2825,31 @@ const my @GENERA  => qw(
     MCG-7
     MCG-8
     MCG-9
+    MCMV-bacmid
     mDlx-NaVbeta1-myc
     Meaban-like
+    MED-G09
+    MED-G10
+    MED-G105
+    MED-G107
+    MED-G116
+    MED-G13
+    MED-G138
+    MED-G14
+    MED-G16
+    MED-G17
+    MED-G20
+    MED-G21
+    MED-G40
+    MED-G52
+    MED-G78
+    MED-G82
+    MED-G85
+    MedAcidi-G1
+    MedAcidi-G2B
+    MedAcidi-G3
+    MEDG-81
+    MedPE-SWsnd-G2
     Melon-headed
     mercury-resistant
     Merida-like
@@ -749,44 +2858,97 @@ const my @GENERA  => qw(
     methane-seep
     methylotroph-related
     Metopion-like
+    MEX13ELK6-19
+    MFBS3-17
+    MGIIa-I
+    MGIIa-K1
+    MGIIa-K2
+    MGIIa-L1
+    MGIIa-L2
+    MGIIa-L3
+    MGIIa-L4
+    MGIIb-N1
+    MGIIb-N2
+    MGIIb-O1
+    MGIIb-O2
+    MGIIb-O3
+    MGIIb-O5
+    MGIIb-P
+    MGIIb-Q1
+    MGR-bin208
+    MGR-bin340
     Mimivirus-dependent
     mini-chromosome
     mini-Tn5*7-lux
     Mini-Tn7
     Mint-like
     Mirim-like
+    MIT-9215
     Mito-like
+    MK-D1
+    ML615J-28
+    ML635J-15
+    ML8-F1
+    MLS-D
     MLV-like
     MLV-related
+    MMGLQ5-1
     MMTV-luciferase
-    Mongoose-associated
+    MnB-11
     mongoose-associated
+    Mongoose-associated
     monochloroacetic-acid-degrading
     Mononegavirus-like
     mosquito-borne
     mouse-rat
+    MP5-2226
+    MP8T-1
+    MR-S7
+    MS024-2A
+    MS499-59
+    MSB-5A5
+    MSJ-26
+    MSJ-34
     Mu-like
     Multi-host
     Multi-promoter
     Murine-associated
     Murray-Darling
+    MWH-TA3
     Mx-Lox
     Mycobacteria-E.coli
+    MYW30-H2
     N-peptide-mCherry
     N-terminal
     N-tropic
+    NAC60-12
     Nanovirus-like
+    Nap2-2B
     naphthalene-degrading
     naphthalene-utilizing
     narna-like
     Narnaviridae-like
+    Narrow-ridged
+    NBRC-103111
+    NBRC-107566
+    NBRC-107688
+    NEAU-GS5
     Nebraska-like
+    Nege-like
     nege-like
     Negelike-virus
     Negev-like
     Negeviridae-like
     Neo-uvaria
     NFAT-DsRed
+    NIC37A-2
+    NICIL-2
+    NIES-3974
+    NIES-981
+    NIOZ-UU106
+    NIOZ-UU13
+    NIOZ-UU35
+    NIT-T3
     nitrite-oxidizing
     nitrogen-fixing
     Nivun-Haamir
@@ -797,8 +2959,8 @@ const my @GENERA  => qw(
     Non-geniculate
     Non-human
     non-mammal
-    Non-primate
     non-primate
+    Non-primate
     Norovirus/GII.4/1993-6/UK
     Norovirus/Hu/GII.2/V1/09/18-Jan-2009/Slovenia
     Norovirus/Hu/GII.4/1732/07/07-Jun-2007/Slovenia
@@ -819,25 +2981,161 @@ const my @GENERA  => qw(
     Norovirus/Hu/GII.4/V47/09/25-Feb-2009/Slovenia
     Norovirus/Hu/GII.4/V7/09/11-Jan-2009/Slovenia
     Norwalk-like
+    NP-4
+    NP-7
+    NPL-UPA2
+    NS-11
+    NS-12
+    NS-4
+    NS-7
+    NS11-12g
+    NSJ-53
     Nuclearia-like
+    NZ13-RE01
+    O2-01-FULL-39-8
+    O2-01-FULL-48-27b
+    O2-02-FULL-42-17
+    O2-02-FULL-42-9
+    O2-02-FULL-48-8
+    O2-02-FULL-57-9
+    O2-12-FULL-27-8
+    O2-12-FULL-42-9
+    O2-12-FULL-43-9
+    O2-12-FULL-44-13
+    O2-12-FULL-45-9
+    O2-12-FULL-45-9-A
+    O2-12-FULL-49-9
+    O2-12-FULL-51-8
+    O2-12-FULL-59-9
+    O2-FULL-52-10
+    OACT-916
     Oak-Vale
     Oceanospirillum-like
     Ochlerotatus-associated
     Odonata-associated
+    Of7-15
     oil-degrading
     oil-susceptible
+    Okutama-like
+    OLZORAL124-38-8
     OM05-12
     Onyong-nyong
     oomycete-like
+    Opi-474
+    OPU3-GD-OMZ
     oral-nasopharyngeal
     Orange-breasted
     Orange-spotted
+    Orthomyxo-like
+    OSU-TB39
     Ourmia-like
     oxamyl-degrading
+    OXYB2-FULL-32-7
+    OXYB2-FULL-41-6
+    OXYB2-FULL-48-7
+    OXYB2-FULL-48-7-A
+    OXYB2-FULL-49-7
+    OXYD1-FULL-39-9
     P-decomposing
     P-element
     P1-specific
+    P2-11E
+    P52-10
     PAH-contaminated
+    PALSA-1003
+    PALSA-1004
+    PALSA-1005
+    PALSA-1006
+    Palsa-1032
+    Palsa-1033
+    PALSA-1081
+    PALSA-1104
+    Palsa-1104
+    Palsa-1150
+    PALSA-1152
+    PALSA-1153
+    PALSA-1176
+    PALSA-1178
+    Palsa-1178
+    PALSA-1180
+    Palsa-1180
+    Palsa-1188
+    PALSA-1196
+    Palsa-1233
+    Palsa-1248
+    PALSA-129
+    PALSA-1295
+    Palsa-1295
+    PALSA-1296
+    Palsa-1315
+    PALSA-1316
+    PALSA-1332
+    PALSA-1335
+    PALSA-1336
+    PALSA-1337
+    PALSA-1353
+    PALSA-1355
+    Palsa-1382
+    Palsa-1392
+    PALSA-1396
+    Palsa-1400
+    Palsa-1439
+    PALSA-1440
+    PALSA-1444
+    Palsa-1447
+    Palsa-147
+    Palsa-1515
+    Palsa-187
+    PALSA-188
+    Palsa-189
+    PALSA-243
+    PALSA-270
+    PALSA-278
+    Palsa-288
+    Palsa-295
+    Palsa-343
+    PALSA-350
+    Palsa-360
+    PALSA-457
+    Palsa-459
+    Palsa-461
+    Palsa-465
+    Palsa-504
+    PALSA-505
+    Palsa-506
+    Palsa-513
+    PALSA-555
+    PALSA-600
+    Palsa-601
+    PALSA-607
+    PALSA-610
+    PALSA-612
+    PALSA-647
+    PALSA-660
+    Palsa-661
+    Palsa-688
+    PALSA-688
+    PALSA-693
+    Palsa-739
+    PALSA-743
+    Palsa-744
+    PALSA-747
+    Palsa-851
+    Palsa-870
+    Palsa-872
+    Palsa-875
+    Palsa-881
+    Palsa-883
+    Palsa-89
+    Palsa-892
+    PALSA-894
+    PALSA-911
+    PALSA-926
+    Palsa-948
+    Palsa-948_A
+    Palsa-965
+    PALSA-967
+    PALSA-968
     Paracoccus-like
     Parecho-like
     Paromomycin-resistant
@@ -845,33 +3143,60 @@ const my @GENERA  => qw(
     Partitiviridae-like
     Partitivirus-like
     Parvo-like
+    parvo-like
+    Pasla-948_A
+    Passerine-like
     Passionfruit-associated
+    PB-SRB1
+    PC08-66
     PCB-dechlorinating
+    PCC-10605
+    PCC-6303
+    PCC-6304
+    PCC-6307
+    PCC-6312
+    PCC-6406
+    PCC-6802
+    PCC-7336
+    PCC-7367
+    PCC-7407
+    PCC-7502
+    PCC-9006
+    PCC-9228
+    PCC-9333
+    PD-1
     peach-associated
     Peach-associated
     Pechuel-loeschea
     Peixe-Boi
+    Pepper-associated
     Peptococcus-like
     Percalates-clade
     Perchlorate-reducing
     perchlorate-reducing
     Perkinsela-like
     Perkinsiella-like
+    peste-des-petits-ruminants
     pesticide-degrading
     Petroica-associated
     Pfiesteria-like
+    PH28-bin88
     PHA-producing
     pharmaceutical-degrading
     Pheasant-associated
+    Phellodendron-associated
     phenanthrene-degrading
     phenanthrene-metabolizing
     phenol-degrading
     Phenuiviridae-like
     Phlebotomus-associated
     Phoma-like
+    PHOS-HE28
     phosphorous-removal
     Picorna-like
+    Picornavirales-like
     Pig-tailed
+    Pigeon-associated
     Pigeon-dominant
     piggyBac-based
     piggyBac-helper
@@ -881,7 +3206,17 @@ const my @GENERA  => qw(
     Piscirickettsia-like
     Pistacia-associated
     pkBIG-alpha
+    PL-Br10-E2g29
+    PL-Br10-U2g16
+    PLanc-01
     pLEV-TeLS
+    PLOWO2-12-38-17
+    PLOWO2-12-39-15
+    Plut-88865
+    Plut-88900
+    PMG-095
+    PMM-0068
+    PN-J185
     pnpB-pnpA
     Po-Circo-like
     Point-Douro
@@ -896,16 +3231,98 @@ const my @GENERA  => qw(
     Promoter-probe
     Promoter-trap
     propionate-degrading
+    PRT-SC02
     Pseudo-nitzschia
     Pseudoalteromonas-like
     PTE-S5
     Puumala-like
     PVB_OTU_4-like
+    Q3-R57-64
     Qinvirus-like
+    QS-1-68-17
+    QS-1-68-20
+    QS-4-48-99
+    QS-4-69-31
+    QS-5-54-17
+    QS-5-68-33
+    QS-5-72-10
+    QS-8-64-10
+    QS-8-64-29
+    QS-9-68-17
     Quinoa-associated
+    R-H-3
+    R-RK-3
+    R3-B46
     R6K-based
+    RAAP-1
+    RAAP-2
     Raccoon-associated
+    RACS-045
+    RACS-047
+    RAOX-1
     ray-finned
+    RBC-AMX1
+    RBG-1
+    RBG-13-33-26
+    RBG-13-36-15
+    RBG-13-38-9
+    RBG-13-39-12
+    RBG-13-40-15
+    RBG-13-40-8-A
+    RBG-13-41-10
+    RBG-13-42-11
+    RBG-13-43-14
+    RBG-13-43-22
+    RBG-13-44-9
+    RBG-13-46-10
+    RBG-13-46-13
+    RBG-13-46-9
+    RBG-13-49-15
+    RBG-13-50-9
+    RBG-13-51-18
+    RBG-13-51-36
+    RBG-13-52-11
+    RBG-13-53-26
+    RBG-13-55-18
+    RBG-13-61-14
+    RBG-13-66-14
+    RBG-13-68-16
+    RBG-16-34-14
+    RBG-16-39-9b
+    RBG-16-40-8
+    RBG-16-42-10
+    RBG-16-42-24
+    RBG-16-43-11
+    RBG-16-43-9
+    RBG-16-45-19
+    RBG-16-48-13
+    RBG-16-49-10
+    RBG-16-49-21
+    RBG-16-49-23
+    RBG-16-51-14
+    RBG-16-51-16
+    RBG-16-52-11
+    RBG-16-54-11
+    RBG-16-54-18
+    RBG-16-55-9
+    RBG-16-56-11
+    RBG-16-57-11
+    RBG-16-57-12
+    RBG-16-57-9
+    RBG-16-58-11
+    RBG-16-60-22
+    RBG-16-64-13
+    RBG-16-64-22
+    RBG-16-64-32
+    RBG-16-64-43
+    RBG-16-65-34
+    RBG-16-66-20
+    RBG-16-66-30
+    RBG-16-68-12
+    RBG-16-68-14
+    RBG-16-68-21
+    RBG-16-71-46
+    RBS10-35
     RDHV-like
     Reagent-associated
     Red-bellied
@@ -919,13 +3336,41 @@ const my @GENERA  => qw(
     Red-necked
     Red-recombineering
     red-rumped
+    REDSEA-S09-B13
     Regulator-reporter
     Reoviridae-like
     Reptile-associated
     Retro-megavirus
     Retropinna-associated
+    RH-AL1
+    RH-chloro-G1
+    RH2-MAG17b
     Rhabdoviridae-like
+    RHBSTW-00994
     Rhinopithecus-associated
+    RI-106
+    RI-112
+    RI-121
+    RI-153
+    RI-182
+    RI-185
+    RI-211
+    RI-212
+    RI-213
+    RI-231
+    RI-242
+    RI-283
+    RI-29
+    RI-34
+    RI-342
+    RI-372
+    RI-382
+    RI-421
+    RI-43
+    RI-461
+    RI-55
+    RI-92
+    RI-95
     rice-associated
     Rigidomastix-like
     RIOMV-3
@@ -933,13 +3378,16 @@ const my @GENERA  => qw(
     Rm-Bat-CoV
     RML-105355
     rod-shaped
+    Rodent-like
     root-associated
     Rosaceae-associated
     Roseobacter-like
     Rous-associated
     rpL23-fusion
+    Rs-D84
     Rubrivivax-like
     Rudolf-kamelinia
+    RumEn-M2
     RV-African
     RV-Bower
     RV-Brook
@@ -968,29 +3416,209 @@ const my @GENERA  => qw(
     RVA/Human-wt/ZAF/3133WC/2009/G12P4
     RVA/Human-wt/ZAF/3176WC/2009/G12P6
     RVA/Human-wt/ZAF/3203WC/2009/G2P4
+    RVW-14
+    RYN-111
+    RYN-115
+    RYN-122
+    RYN-124
+    RYN-133
+    RYN-140
+    RYN-150
+    RYN-170
+    RYN-182
+    RYN-227
+    RYN-230
+    RYN-353
+    RYN-404
+    RYN-405
+    RYN-417
+    RYN-425
+    RYN-427
+    RYN-428
+    RYN-431
+    RYN-433
+    RYN-46
+    RYN-50
+    RYN-84
+    RYN-85
+    RYN-87
+    S009-29
+    S009-33
+    S010-17
+    S010-25
+    S010-51
+    S010-53
+    S012-109
+    S012-113
+    S012-128
+    S012-135
+    S012-138
+    S012-15
+    S012-22
+    S012-25
+    S012-40
+    S012-47
+    S012-72
+    S012-77
+    S012-89
+    S012-90
+    S013-73
+    S014-12
+    S014-18
+    S014-19
+    S014-41
+    S014-50
+    S014-63
+    S015-18
+    S015-6
+    S016-13
+    S016-19
+    S016-27
+    S016-38
+    S016-54
+    S016-85
+    S016-97
+    S017-3
     S10-like
+    S139-112
+    S139-113
+    S139-126
+    S139-133
+    S139-149
+    S139-169
+    S139-18
+    S139-21
+    S139-23
+    S139-57
+    S139-71
+    S139-92
+    S140-20
+    S140-43
+    S140-46
+    S141-128
+    S141-161
+    S141-23
+    S141-3
+    S141-38
+    S141-43
+    S141-50
+    S141-55
+    S141-66
+    S141-70
+    S141-80
+    S141-84
+    S143-107
+    S143-136
+    S143-140
+    S143-145
+    S143-32
+    S143-33
+    S143-34
+    S143-42
+    S143-5
+    S143-63
+    S143-66
+    S143-82
+    S143-98
+    S144-17
+    S144-22
+    S144-23
+    S144-34
+    S144-35
+    S144-45
+    S144-5
+    S144-51
+    S145-11
+    S145-15
+    S145-22
+    S145-25
+    S145-28
+    S145-42
+    S146-22
+    S146-30
+    S146-37
+    S146-42
+    S146-62
+    S146-64
+    S146-70
+    S146-73
+    S146-80
+    S146-88
+    S15-B10
+    S15B-MN24
     S2-like
+    S20-B6
+    S3-3
+    S36-B12
+    S5-A14a
+    S5-K13
     S5-like
     S7-like
+    SA5d-4
+    Saffron-associated
     SAfia-400D
     SAfia-838D_Ambidensovirus
     Saint-Floris
+    Sam29DG08-bin30
     Santee-Cooper
     Sapelovirus-like
     Sapporo-HK299
+    SAR202-VII-2
     SARS-CoV-2
     SARS-like
     SARS-related
     Saw-shelled
     Saxo-fridericia
+    SB-45
+    SB3-54
+    SCADC1-2-3
+    SCBR16-9
+    SCGC-AAA003-L08
+    SCGC-AAA011-G17
+    SCGC-AAA076-P13
+    SCGC-AAA160-P02
+    SCGC-AAA252-I15
+    SCGC-AAA471-B05
+    SCGC-AG-212-F23
+    SCGC-AG-212-J23
     Sciuro-hypnum
+    SCN-52-12
+    SCN-57-10
+    SCN-67-18
+    SCN-69-37
+    SCN-70-22
+    SCSIO-06110
+    SCSIO-12696
+    SCSIO-12741
+    SCSIO-59966
+    SCSIO-75732
+    SCUT-3
+    SDB-A
+    SDU3-3
     Sea-firefly
     Sebastiano-Schaueria
     selenate-reducing
     Selenomonas-like
     Self-inactivating
     Sewage-associated
+    SG-bin7
+    SG-bin9
+    SG8-11
+    SG8-13
+    SG8-24
+    SG8-30
+    SG8-32-3
+    SG8-38
+    SG8-39
+    SG8-4
+    SG8-40
+    SG8-41
+    SG8-5
+    SG8-52-3
+    SH-MAG3
+    SHA-98
     Sharp-tailed
+    short-finned
     Short-finned
     short-tailed
     Shuttle-expression
@@ -1003,9 +3631,40 @@ const my @GENERA  => qw(
     Single-copy
     Sint-Jan
     Sisal-associated
+    Site-B1
+    Site-B15
     Site-specific
     SIV-derived
     SIV-wrc
+    SJA-28
+    SK-Y3
+    SL1-B47
+    SLM-1
+    SM1-40
+    SM1-46
+    SM1-50
+    SM1-73
+    SM1-B181
+    SM23-28-2
+    SM23-30
+    SM23-31
+    SM23-32
+    SM23-33
+    SM23-35
+    SM23-39
+    SM23-42
+    SM23-61
+    SM23-62
+    SM23-73-2
+    SM23-73-3
+    SM23-78
+    SM23-81
+    SM3-B121
+    SM3-B41
+    SM3-B62
+    SMO-BIN1
+    SMTZ1-45
+    SMTZ1-83
     Snail-Cactus
     SNAP-XDocII
     Snyder-Theilen
@@ -1014,24 +3673,88 @@ const my @GENERA  => qw(
     Soft-shelled
     Soil-borne
     Solemoviridae-like
+    Solidago-associated
     Solms-laubachia
+    Soudan-22
+    Soudan-30
     Soybean-associated
     Spawner-isolated
     Sphingobacterium-like
     Sphingomonas-like
     Sphinx1.76-related
     Sphinx2.36-related
+    Spiro-02
     Spiroplasma-symbiont
     Spirosoma-like
+    SPLOWO2-01-44-7
+    Spot-less
+    SpSt-1050
+    SpSt-1133
+    SpSt-1165
+    SpSt-1174
+    SpSt-1190
+    SpSt-150
+    SpSt-205
+    SpSt-223
+    SpSt-227
+    SpSt-28
+    SpSt-313
+    SpSt-315
+    SpSt-333
+    SpSt-398
+    SpSt-501
+    SpSt-539
+    SpSt-583
+    SpSt-600
+    SpSt-77
+    SpSt-899
+    SpSt-956
     Spumella-like
     Spur-thighed
+    SR-FBR-E99
+    SS1-B-03-39
+    SSGW-16
     St-Valerien
     star-like
+    STB-63
+    STB-87
+    STC-113
+    STC-54
+    STC-74
+    STD1-117
+    STD1-204
+    STD1-80
+    STD1-84
+    STD2-102
+    STD2-12
+    STD2-154
+    STD2-204
+    STD2-258
+    STD2-77
+    STE-11
+    STE-63
+    STE-71
+    STE-72
     Stenotrophomonas-like
+    STF1-107
+    STF1-138
+    STF1-152
+    STF1-184
+    STF1-284
+    STF1-71
+    STF1-98
+    STF2-111
+    STF2-152
+    STF2-20
+    STF2-203
+    STF2-222
+    STF2-37
+    STF2-47
     Sticholonche-like
     Stolbur-It
     Stolbur-Rus
     stool-associated
+    strawberry-associated
     Striga-associated
     String-of-pearls
     Stripa-derived
@@ -1042,25 +3765,254 @@ const my @GENERA  => qw(
     Stx2c-converting
     Stx2d-converting
     StxXX-converting
+    Styphnolobium-associated
     sulfate-reducing
     sulfide-oxidizing
     sulfite-reducing
     sulfo-oxidizing
     sulfur-oxidizing
     Sunn-hemp
+    SURF-10
+    SURF-12
+    SURF-13
+    SURF-15
+    SURF-16
+    SURF-17
+    SURF-19
+    SURF-21
+    SURF-23
+    SURF-24
+    SURF-25
+    SURF-27
+    SURF-28
+    SURF-3
+    SURF-32
+    SURF-33
+    SURF-36
+    SURF-37
+    SURF-38
+    SURF-40
+    SURF-43
+    SURF-47
+    SURF-5
+    SURF-52
+    SURF-54
+    SURF-55
+    SURF-56
+    SURF-57
+    SURF-58
+    SURF-60
+    SURF-62
+    SURF-65
+    SURF-7
+    SURF-8
+    SURF-9
+    SV3-B141
+    SV3-B162
+    Sva-07
+    Sva-25
+    SW-10-69-26
+    SW-11-45-7
+    SW-4-43-9
+    SW-4-49-11
+    SW-6-46-9
+    SW-7-71-33
+    SW-9-67-25
     Synechococcus-like
     Synechocystis-like
+    Syner-03
+    SYSU-D60014
+    SYSU-D60015
+    SZ-28-30
+    SZAS-1
+    SZAS-103
+    SZAS-13
+    SZAS-15
+    SZAS-17
+    SZAS-18
+    SZAS-26
+    SZAS-3
+    SZAS-5
+    SZAS-6
+    SZAS-7
+    SZAS-72
+    SZAS-79
+    SZUA-100
+    SZUA-104
+    SZUA-1055
+    SZUA-115
+    SZUA-116
+    SZUA-117
+    SZUA-124
+    SZUA-1377
+    SZUA-140
+    SZUA-1403
+    SZUA-1433
+    SZUA-1435
+    SZUA-1443
+    SZUA-1452
+    SZUA-146
+    SZUA-147
+    SZUA-149
+    SZUA-1492
+    SZUA-1497
+    SZUA-150
+    SZUA-1508
+    SZUA-1514
+    SZUA-1515
+    SZUA-152
+    SZUA-1535
+    SZUA-161
+    SZUA-178
+    SZUA-179
+    SZUA-181
+    SZUA-182
+    SZUA-185
+    SZUA-186
+    SZUA-191
+    SZUA-204
+    SZUA-21
+    SZUA-217
+    SZUA-22
+    SZUA-224
+    SZUA-226
+    SZUA-229
+    SZUA-230
+    SZUA-232
+    SZUA-236
+    SZUA-24
+    SZUA-242
+    SZUA-250
+    SZUA-252
+    SZUA-254
+    SZUA-259
+    SZUA-265
+    SZUA-272
+    SZUA-287
+    SZUA-3
+    SZUA-309
+    SZUA-318
+    SZUA-320
+    SZUA-33
+    SZUA-336
+    SZUA-35
+    SZUA-359
+    SZUA-36
+    SZUA-360
+    SZUA-365
+    SZUA-368
+    SZUA-37
+    SZUA-370
+    SZUA-371
+    SZUA-378
+    SZUA-38
+    SZUA-381
+    SZUA-401
+    SZUA-41
+    SZUA-411
+    SZUA-415
+    SZUA-421
+    SZUA-423
+    SZUA-425
+    SZUA-426
+    SZUA-430
+    SZUA-442
+    SZUA-444
+    SZUA-448
+    SZUA-451
+    SZUA-46
+    SZUA-467
+    SZUA-47
+    SZUA-472
+    SZUA-474
+    SZUA-486
+    SZUA-493
+    SZUA-5
+    SZUA-500
+    SZUA-51
+    SZUA-521
+    SZUA-533
+    SZUA-534
+    SZUA-540
+    SZUA-544
+    SZUA-545
+    SZUA-547
+    SZUA-55
+    SZUA-561
+    SZUA-567
+    SZUA-575
+    SZUA-580
+    SZUA-582
+    SZUA-584
+    SZUA-592
+    SZUA-6
+    SZUA-601
+    SZUA-605
+    SZUA-611
+    SZUA-76
+    SZUA-79
+    SZUA-8
+    SZUA-82
+    SZUA-87
     T-DNA
     T-vector
+    T1Sed10-126
+    T1SED10-157
+    T1SED10-198M
+    T1SED10-24
+    T1SED10-26
+    T1SED10-28
+    T1Sed10-49
+    T1Sed10-7
+    T1SED10-78
+    T1SED10-81
+    T1SED10-84
+    T1Sed10-97
+    T1SED10-99
+    T33-2
+    T3Sed10-11
+    T3Sed10-140
+    T3Sed10-183
+    T3Sed10-213
+    T3Sed10-241
+    T3SED10-260
+    T3Sed10-336
+    T3SED10-354
+    T3SED10-47
+    T3Sed10-66
+    T3SED10-7
     T4-like
     T7-like
+    TA-13
+    TA-20
+    TA-21
+    TAE3-ERU5
     Taro-associated
     Taxeobacter-like
+    Tb-RUG-53
+    Tb-RUG-64
+    Tb-RUG-66
+    TC-15
+    TC-195
+    TC-71
+    Tc-Br11
+    Tc-Br11-B2g6-7
+    Tc-Br11-E2g1
+    Tc-Br11-E2g8
+    TCS-49
     Tea-oil
+    TEKIR-12S
+    TEKIR-14
+    TEKIR-21
+    TEKIR-8
     Temperature-sensitive
+    Tener-01
     Tent-making
     Teosinte-associated
     Tetracycline-inducible
+    TFI-002
+    TH-plancto1
+    TH1-2
     Theileria-related
     Theilers-like
     thiocyanate-degrading
@@ -1069,18 +4021,28 @@ const my @GENERA  => qw(
     Thrips-associated
     Ti-curing
     Tick-associated
-    tick-borne
     Tick-borne
+    tick-borne
     TIM5-like
+    TIUS-1
+    TK10-74A
+    TMED-70
+    TMP-24
+    TMP-7
+    TMP-86
+    TNE-4
     toluene-degrading
     Tombus-like
+    Toti-like
     Totivirus-like
+    Tous-C4FEB
     Tri-shuttle
     trichloroacetic-acid-degrading
     triclosan-degrading
     Trifolium-associated
     tris(2-butoxyethyl)
     TSE-associated
+    TTA-H9
     TTV-like
     Twisted-stalk
     TYLCAxV-Sic1-IT:Sic2/2:04
@@ -1097,12 +4059,59 @@ const my @GENERA  => qw(
     UAS-less
     UAS-Red
     UAS-Stinger
+    UDEA-SF1
     Ui-te-Rangiora
+    UKL13-2
+    UKL13-3
+    UM-FILTER-33-9
+    UM-FILTER-34-10
+    UM-FILTER-34-12
+    UM-FILTER-36-11
+    UM-FILTER-36-13
+    UM-FILTER-36-7
+    UM-FILTER-37-10
+    UM-FILTER-37-12
+    UM-FILTER-38-24
+    UM-FILTER-39-15
+    UM-FILTER-39-64
+    UM-FILTER-40-11
+    UM-FILTER-40-16
+    UM-FILTER-40-17
+    UM-FILTER-40-9
+    UM-FILTER-41-14
+    UM-FILTER-41-21
+    UM-FILTER-41-35
+    UM-FILTER-42-10
+    UM-FILTER-42-14
+    UM-FILTER-42-9
+    UM-FILTER-43-11
+    UM-FILTER-43-11-A
+    UM-FILTER-45-8
+    UM-FILTER-46-8
+    UM-FILTER-47-13
+    UM-FILTER-48-10
+    UM-FILTER-49-7
+    UM-FILTER-50-9
+    UM-FILTER-53-11
+    UM-FILTER-53-9
+    UM-FILTER-63-12
+    UphvI-Ar2
+    USCg-Taylor
+    UWMA-0041
+    UWMA-0117
+    UWMA-0217
+    UWMA-0277
+    UWMA-0346
+    UWPOB-MICAV1
     Uzun-Agach
+    V1-115
+    V1-33
+    VA-1
     Vaccinium-associated
     Van-royena
     VDV-1/DWV
     Vera-duthiea
+    Verruco-01
     VESV-like
     Violaceae-associated
     Virga-like
@@ -1113,36 +4122,169 @@ const my @GENERA  => qw(
     Virus-like
     Visna-maedi
     Vittaforma-like
+    VKM-B-2647
+    VKMB-3413
+    W-Chloroflexi-9
+    W-Firmicutes-14
+    W02-35-19
+    W0P28-013
+    W0P31-042
+    W0P33-017
+    W1P20-047
+    W2P13-069
+    W3P20-009
     WA-like
     wall-less
-    Weivirus-like
+    WCHB1-27
+    WCHB1-69
+    Wei-like
+    WG-1
+    WGA-3G
+    WGA-4E
+    WH-5701
     White-eye
+    White-flower
     White-headed
     white-rot
+    White-rumped
     White-sloanea
     White-tailed
     white-throated
     White-tufted-ear
     Whitefly-associated
+    whitefly-associated
     Whitefly-transmitted
+    WM-009
+    WM-3-3
+    WO2-01-48-18
+    WO2-35-19
+    WO2-39-10b
+    WO2-40-15
+    WO2-42-50
+    WO2-43-9
+    WO2-44-18
+    WO2-46-25
+    WO2-47-17b
+    WO2-48-25
+    WO2-49-40
+    WO2-54-10
+    WO2-FULL-39-10
+    WO2-FULL-39-9
+    WO2-FULL-40-11
+    WOR-1
+    WOR-3
+    WOR-SM1-SCG
     WPS-2
+    WS-11
+    WS-2
+    WS-3
+    WS-7
+    WS-8
+    WS-9
+    WYZ-LMO10
+    WYZ-LMO11
+    WYZ-LMO2
+    WYZ-LMO6
+    WYZ-LMO8
     X-symbiont
     Xanthomonas-like
     XMRV-like
     XMRV-related
     Xuzhou-associated
+    XY-R5
+    XYA12-FULL-58-9
+    XYA2-FULL-35-8
+    XYA2-FULL-39-19
+    XYA2-FULL-43-10
+    XYA2-FULL-43-15
+    XYA2-FULL-47-19
+    XYA2-FULL-47-53
+    XYB1-36-10
+    XYB1-40-15
+    XYB1-FULL-32-11
+    XYB1-FULL-40-15
+    XYB1-FULL-42-16
+    XYB1-FULL-44-23
+    XYB1-FULL-47-11
+    XYB12-FULL-38-5
+    XYB2-FULL-36-35
+    XYB2-FULL-38-15
+    XYB2-FULL-45-11
+    XYB2-FULL-45-9
+    XYB2-FULL-48-7
+    XYB2-FULL-49-35
+    XYB2-FULL-50-12
+    XYC1-FULL-37-79
+    XYC1-FULL-56-13
+    XYC2-34-220
+    XYC2-FULL-35-21
+    XYC2-FULL-37-10
+    XYC2-FULL-38-9
+    XYC2-FULL-41-22
+    XYC2-FULL-46-14
+    XYC2-FULL-47-12
+    XYD1-37-29
+    XYD1-FULL-39-28
+    XYD1-FULL-40-9
+    XYD1-FULL-44-32
+    XYD1-FULL-46-19
+    XYD1-FULL-53-11
+    XYD1-FULL-55-31
+    XYD12-FULL-36-8
+    XYD12-FULL-50-9
+    XYD2-FULL-39-9
+    XYD2-FULL-41-14
+    XYD2-FULL-41-16
+    XYD2-FULL-41-8
+    XYD2-FULL-50-16
     xylene-degrading
+    XZGYJ-43
     Y-symbiont
+    YA12-FULL-48-11
+    YA12-FULL-51-18
+    YA12-FULL-60-10
+    YA12-FULL-61-11
     Yaba-7
     Yaba-like
+    YAC-BAC
+    yado-kari
     Yado-kari
     Yado-nushi
     Yaounde-like
+    YB1-3
+    YB12-FULL-65-16
+    YB3-1
+    YC12-FULL-57-11
+    YC2-FULL-38-9
+    YD12-FULL-39-22
+    YD12-FULL-57-12
+    YD12-FULL-61-37
     Yellow-bellied
     Yellow-breasted
     Yellow-eyed
+    Yellow-fronted
     yellow-necked
     Yellow-wax
+    Yes70-04
+    Yes70-35
+    Yes71-27
+    YIM-151500
+    YIM-152171
+    YIM-78166
+    YIM-B00363
+    YT-029
+    YT-063
+    YT1-039
+    YT1-057
+    YT1-065
+    Z-2901
+    Z2-YC6860
+    ZCTH02-B2
+    ZCTH02-B3
+    ZCTH02-B6
+    ZG21-1
+    Zgenome-0002
+    Zgenome-0027
     Zostera-associated
     );
 
@@ -1336,6 +4478,7 @@ const my @SPECIES => qw(
     206_oclvp485
     207_oclvp487
     20_xplvp148
+    2126_10
     21_oclvp54
     21a7_large
     21a7_orange
@@ -1347,11 +4490,16 @@ const my @SPECIES => qw(
     22C12_green
     22c12_orange
     22E1_Frozen
+    2316_26
+    2316_32
     23_oclvp517
     24_xplvp459
     25_xplvp140
     26_xplvp434
     27_xplvp395
+    2885_18H
+    2885_18K
+    2885_18L
     28_xplvp13
     29_xplvp147
     2_xplvp435
@@ -1767,13 +4915,138 @@ const my @SPECIES => qw(
     A6T_VP8_G7
     A6T_VP8_H6
     A_20
+    abscessus_A
+    abyssi_A
+    acanthamoebae_A
+    acetatoxydans_A
+    aceti_B
+    acetivorans_A
+    acetylicum_B
+    acetylicum_C
+    achromogenes_A
+    acidaminiphila_A
+    acidiceleris_A
+    acidiceleris_B
+    acidilactici_A
+    acidiphilum_A
+    acidocaldarius_A
+    acidophilus_A
+    acidophilus_C
+    acidovorans_A
+    actinomycetemcomitans_A
+    actinomycetemcomitans_B
+    activa_A
+    activa_B
+    actuosus_A
     ADB_BD003
     ADB_BD015
     ADB_BD042
     ADB_BD111
+    adecarboxylata_A
+    adecarboxylata_B
+    adecarboxylata_C
+    adecarboxylata_D
+    adhaerens_A
+    adhaerens_B
+    adhaerens_D
+    adhaerens_E
+    adhaerens_G
+    adhaerens_H
+    adhaerens_I
+    adiacens_A
     Ae_JM910
+    aeolica_A
+    aeolicus_A
+    aeolicus_B
+    aeriphila_A
+    aerocolonigenes_A
+    aerofaciens_A
+    aerofaciens_AA
+    aerofaciens_AB
+    aerofaciens_AC
+    aerofaciens_AD
+    aerofaciens_AE
+    aerofaciens_AF
+    aerofaciens_AG
+    aerofaciens_AH
+    aerofaciens_AI
+    aerofaciens_AJ
+    aerofaciens_AK
+    aerofaciens_AL
+    aerofaciens_AM
+    aerofaciens_AN
+    aerofaciens_AO
+    aerofaciens_AP
+    aerofaciens_AQ
+    aerofaciens_AR
+    aerofaciens_AS
+    aerofaciens_AT
+    aerofaciens_AU
+    aerofaciens_AV
+    aerofaciens_AW
+    aerofaciens_AX
+    aerofaciens_AY
+    aerofaciens_AZ
+    aerofaciens_BA
+    aerofaciens_E
+    aerofaciens_F
+    aerofaciens_G
+    aerofaciens_H
+    aerofaciens_I
+    aerofaciens_J
+    aerofaciens_K
+    aerofaciens_L
+    aerofaciens_M
+    aerofaciens_N
+    aerofaciens_O
+    aerofaciens_P
+    aerofaciens_Q
+    aerofaciens_R
+    aerofaciens_S
+    aerofaciens_T
+    aerofaciens_V
+    aerofaciens_W
+    aerofaciens_X
+    aerofaciens_Y
+    aerofaciens_Z
+    aerogenes_A
+    aerosaccus_A
+    aerosaccus_B
+    aerosaccus_C
+    aeruginosa_C
+    aeruginosa_D
+    aeruginosa_E
+    aeruginosa_F
+    aeruginosa_G
+    aeruginosa_H
+    aeruginosa_I
+    aeruginosavorus_A
+    aeruginosavorus_B
+    aeruginosavorus_C
+    aestuarii_A
+    aethiopicum_A
     AF_NAK1-3
+    agalactiae_A
+    agalactiae_B
+    agarilyticus_A
+    agarilyticus_B
+    agarilyticus_C
+    agarilyticus_D
+    agarivorans_A
+    agassizii_A
     AGG1095_KMOsgRNAs
+    AGG1186_pIE1-Koz-FF-SV4
+    AGG1187_-_pIE1-Lep-FF-S
+    AGG1188_pIE1-BmHi-FF-SV
+    AGG1189_-_pIE1-BmLo-FF-
+    AGG1191_-_pIE1-Koz-FF-K
+    AGG1192_-_pIE1-Lep-FF-K
+    AGG1193_-_pIE1-BmHi-FF-
+    AGG1194_-_pIE1-BmLo-FF-
+    AGG1196_-_pIE1-Koz-FF-P
+    AGG1197_-_pIE1-Lep-FF-P
+    AGG1198_-_pIE1-BmHi-FF-
+    AGG1199_-_pIE1-BmLo-FF-
     AGG1207_AeBGCN-Cas9
     AGG1208_sds3-Cas9
     AGG1245_Pub_AaHyPiggyBac_SV40
@@ -1793,13 +5066,239 @@ const my @SPECIES => qw(
     AGG2145_PUb(-565)-AmC-SV40
     AGG2146_PUb(-2565)-AmC-SV40
     AGG2196_pGL3_PUb(-2565)-FF
+    aggregans_A
+    aggregans_B
+    aggregatum_A
+    aggregatum_B
+    aggregatum_C
+    agilis_B
+    agilis_D
+    agilis_E
+    agri_A
     AH_HY1
+    aidingensis_A
     Al31_1
+    alba_A
+    alba_B
+    alba_C
+    alba_D
+    albidus_A
+    albireticuli_B
+    albulus_A
+    albulus_C
+    album_A
+    album_C
+    album_D
+    albus_A
+    albus_B
+    albus_E
+    alcalifaciens_A
+    alcalifaciens_B
+    alcalifaciens_C
+    alcaligenes_A
+    alcaligenes_B
+    alcaligenes_C
+    alcaliphila_B
+    alexandrii_A
+    algarum_A
+    algericum_A
+    algicola_B
+    alimentarius_A
+    aliphaticivorans_A
+    aliphaticivorans_B
+    alkaliantarctica_A
+    alkalilenta_A
+    alkaliphila_A
+    alkaliphila_B
+    alkaliphilum_B
+    alkaliphilus_A
+    alkaliphilus_B
+    alkylphenolica_A
+    alkylphenolica_B
+    alocis_A
+    alpina_A
+    alpinus_A
+    alpinus_C
+    altamirensis_A
+    altamirensis_B
+    alvei_B
+    alvi_B
+    alvi_C
+    alvi_D
+    alvi_E
+    alvi_G
+    amalonaticus_A
+    amalonaticus_C
+    amalonaticus_E
+    amalonaticus_F
+    amalonaticus_G
+    amamiensis_A
+    amazonense_A
+    amazonense_B
+    amazonense_C
+    ambifaria_A
+    americana_A
+    aminisulfidivorans_A
+    aminophilum_A
+    aminophilus_A
+    aminovorans_B
+    amorphae_A
+    ampullae_A
+    amycolatum_A
+    amygdalina_A
+    amylolytica_A
+    amylolyticus_A
+    amylolyticus_B
+    amylolyticus_D
+    amylolyticus_E
+    anatipestifer_B
+    anatipestifer_C
+    anatipestifer_D
+    anatipestifer_E
+    anguilliseptica_A
+    angulatum_A
+    angusta_A
+    angustum_A
+    anhuiense_A
+    animalis_B
+    anomala_A
+    anseris_A
+    anserisalpingitidis_A
+    ansorpii_A
+    antarctica_A
+    antarctica_B
+    antarctica_C
+    antarcticus_A
+    anthina_B
+    antibioticus_A
+    antibioticus_B
+    antiquum_A
+    anulatus_C
     AO2_32
+    aphanizomenoides_A
+    aphidicola_A
+    aphidicola_AA
+    aphidicola_AB
+    aphidicola_AC
+    aphidicola_AD
+    aphidicola_AE
+    aphidicola_AF
+    aphidicola_AG
+    aphidicola_AH
+    aphidicola_AI
+    aphidicola_AJ
+    aphidicola_AK
+    aphidicola_AL
+    aphidicola_AM
+    aphidicola_AN
+    aphidicola_AO
+    aphidicola_AP
+    aphidicola_AQ
+    aphidicola_AR
+    aphidicola_AS
+    aphidicola_AT
+    aphidicola_AU
+    aphidicola_AV
+    aphidicola_AW
+    aphidicola_AX
+    aphidicola_AY
+    aphidicola_AZ
+    aphidicola_B
+    aphidicola_BA
+    aphidicola_BB
+    aphidicola_BC
+    aphidicola_BD
+    aphidicola_BE
+    aphidicola_BF
+    aphidicola_BG
+    aphidicola_BH
+    aphidicola_BI
+    aphidicola_BJ
+    aphidicola_BK
+    aphidicola_C
+    aphidicola_D
+    aphidicola_E
+    aphidicola_F
+    aphidicola_G
+    aphidicola_H
+    aphidicola_I
+    aphidicola_J
+    aphidicola_K
+    aphidicola_L
+    aphidicola_M
+    aphidicola_N
+    aphidicola_P
+    aphidicola_R
+    aphidicola_S
+    aphidicola_T
+    aphidicola_U
+    aphidicola_V
+    aphidicola_W
+    aphidicola_X
+    aphidicola_Y
+    aphidicola_Z
+    apicola_A
+    apicola_C
+    apicola_E
+    apicola_F
+    apicola_G
+    apicola_H
+    apicola_I
+    apicola_J
+    apicola_K
+    apicola_L
+    apicola_M
+    apicola_N
+    apicola_P
+    apicola_Q
+    apicola_R
+    apis_A
     apr34_000142F
     apr34_1784
     apr34_1789
     apr34_1792
+    aquaemixtae_A
+    aquamarina_A
+    aquarii_A
+    aquatica_A
+    aquaticum_A
+    aquaticum_B
+    aquaticum_C
+    aquidurense_B
+    aquimarina_A
+    aquimarinus_A
+    aquimaris_A
+    aquimaris_B
+    aquimaris_C
+    aquimaris_D
+    aquimaris_E
+    aquimaris_F
+    aquimixticola_A
+    arboricola_A
+    arboricola_B
+    arboricola_C
+    arboricola_E
+    arboricola_F
+    arboriphilus_A
+    arcachonense_A
+    arctica_A
+    arctica_B
+    arcticum_A
+    arenae_A
+    arenilitoris_A
+    arenilitoris_B
+    arenilitoris_C
+    arenilitoris_D
+    arenilitoris_E
+    arenilitoris_F
+    argentinensis_B
+    argentoratense_A
+    arginini_A
+    aridicollis_A
+    aromatica_A
+    aromaticivorans_A
+    aromaticus_B
+    arosiense_A
     ARS04068_00002
     ARS04158_00005
     ARS04414_00003
@@ -1808,11 +5307,79 @@ const my @SPECIES => qw(
     ARS06759_00001
     ARS06980_00002
     ARS07370_00002
+    arsenicoxydans_A
+    arsenicus_B
+    arthritidis_A
+    aryabhattai_A
+    aryabhattai_B
+    asahii_A
+    asburiae_B
+    asburiae_C
+    asburiae_D
+    asburiae_E
+    asburiae_F
+    ascorbata_B
+    ascorbata_C
+    asiaticum_A
+    asiaticum_B
+    asiaticum_C
+    asiaticum_D
+    astaxanthinifaciens_A
+    asteroides_A
+    asteroides_F
+    asteroides_G
+    asteroides_H
+    asteroides_I
+    asteroides_J
     AstV_Rat1
     AstV_Rat4
+    asymbioticus_C
     ATA3_5Q_KO9_cl1
     ATA3_5Q_KO9_cl2
+    atlantica_A
+    atlantica_B
+    atlantica_C
+    atlantica_D
+    atlantica_E
+    atlantica_F
+    atlantica_G
+    atlanticus_A
+    atratus_B
+    atrocyanea_A
+    atrocyanea_B
+    atsumiense_A
+    aurantia_A
+    aurantiaca_A
+    aurantiacum_A
+    aurantiacum_B
+    aurantiacus_A
+    aurea_B
+    aureofaciens_A
+    aurescens_A
+    aurescens_B
+    aureus_A
+    aureus_B
+    auricola_A
+    aurimucosum_F
+    auris_A
+    aurum_A
+    australicum_A
+    australiensis_A
+    australiensis_B
+    australis_A
+    australis_B
+    australis_C
+    australis_D
+    autotrophica_A
+    autotrophicus_A
+    autotrophicus_B
+    autotrophicus_C
+    autotrophicus_D
+    avenae_A
+    aviarius_B
+    aviarius_C
     AZ4_17
+    azadirachtae_A
     AZD10a_EZLN1
     AZD10a_EZLN2
     AZD11_3
@@ -1822,6 +5389,8 @@ const my @SPECIES => qw(
     AZD9_B2
     AZD9_W1
     AZD9_W2
+    azotifigens_A
+    azotoformans_A
     B01_8wb_b10_2005-12-15
     B15_CLW
     B18_CLW
@@ -1854,6 +5423,8 @@ const my @SPECIES => qw(
     B_EHO
     B_UC1
     BAC_Igh_FGFR3-EGFP
+    bacchi_A
+    bacilliformis_A
     backbone_CONEXER_BAC_Universal1
     backbone_CONEXER_BAC_Universal2
     Bact_1
@@ -1898,15 +5469,70 @@ const my @SPECIES => qw(
     Bact_7
     Bact_8
     Bact_9
+    bacteremicum_A
+    bacteriovorus_A
+    bacteriovorus_B
+    bacteriovorus_C
+    bacteriovorus_D
+    bacteriovorus_E
+    bacteriovorus_F
+    bacteriovorus_G
     bacteriumRM12EL_02D
     bacteriumRM12EL_05A
+    bactoclasticus_A
+    baderi_A
+    baekdonensis_A
+    baekdonensis_B
+    baetica_A
+    baldri_A
+    balearica_A
+    balearica_B
+    balneolensis_A
+    baltica_A
+    bambusae_A
+    bambusae_B
+    bangladeshense_B
+    bannensis_A
+    baratii_A
+    barkeri_A
+    barkeri_B
+    barkeri_C
+    bartlettii_A
+    basilensis_B
+    basilensis_D
+    basilensis_E
+    basilensis_F
+    bataviensis_A
     BCoV/PB675/Art_lit/PAN/2011
+    beibuense_A
+    beijerinckii_A
+    beijerinckii_D
+    beijerinckii_E
+    beijingensis_A
+    beijingensis_B
+    benefaciens_A
+    benthica_A
+    bentonitica_A
+    benzenivorans_A
+    bereziniae_A
+    bermudensis_A
+    bermudensis_B
+    bernardetii_B
     Beta_07_inf_18
+    betae_A
+    betae_B
+    bethesdensis_B
+    bethesdensis_C
     BgL12_3S_Black
     BgL12_3S_Purple
     BgL12_3S_Red
+    biceps_A
+    biceps_B
     bII_SDSRA_K68
+    bilis_B
+    bisanense_A
     BJCX4_extB9.1
+    blattaphilus_A
     BM0354_1
     BM0354_2
     Bog1183_53
@@ -1915,6 +5541,32 @@ const my @SPECIES => qw(
     Bog5712_52
     Bog8989_22
     Bog9017_22
+    bogorensis_A
+    bogorensis_B
+    bogorensis_C
+    bombi_A
+    boreus_A
+    boreus_B
+    boreus_C
+    bornimense_A
+    boronicumulans_A
+    boronicumulans_B
+    boronicumulans_C
+    boroniphilus_A
+    bostrichidophilus_A
+    bostrichidophilus_B
+    bostrichidophilus_C
+    bostrichidophilus_D
+    bostrichidophilus_E
+    bostrichidophilus_F
+    bostrichidophilus_G
+    bostrichidophilus_H
+    bostrichidophilus_I
+    botulinum_A
+    botulinum_B
+    bouvetii_A
+    bovienii_C
+    bovigenitalium_A
     bovine/GIII.2/216_0114/2006/NOR
     bovine/GIII.2/240_0243/2005/NOR
     bovine/GIII.2/300_0250/2006/NOR
@@ -1929,7 +5581,38 @@ const my @SPECIES => qw(
     bovine/GIII/chimeric/661_1570/2006/NOR
     bovine/GIII/chimeric/752_3024/2006/NOR
     bovine/GIII/chimeric/785_0449/2006/NOR
+    bovis_A
+    brandeum_A
+    brasilense_B
+    brasilense_C
+    brasilense_D
+    brasilense_F
+    brasilense_G
+    brasiliense_A
+    brasiliensis_A
+    brasiliensis_B
+    brasiliensis_C
+    brassicacearum_A
+    brassicacearum_D
+    brassicacearum_E
+    brassicacearum_F
+    brassicacearum_G
+    breve_A
+    brevis_B
+    brevis_C
+    brevis_D
     BRH_c32
+    briensis_A
+    brisouii_A
+    britannica_A
+    bromii_A
+    bromii_B
+    bronchiseptica_F
+    bronchisepticus_A
+    bryantii_A
+    bryantii_B
+    bryantii_C
+    bryantii_D
     BtCoV/BRA100/Car_per/BRA/2009
     BtCoV/BRA114/Car_bre/BRA/2009
     BtCoV/BRA118/Car_per/BRA/2009
@@ -1999,7 +5682,13 @@ const my @SPECIES => qw(
     BtCoV/Rhi_hip/Slo57/SLO/2009
     BtCoV/Rhi_hip/Slo69/SLO/2009
     BtCoV/VH_NC2/Neo_cap/RSA/2012
+    buctense_A
+    buctense_B
+    bullata_A
     bunya-arena-like_virus
+    butyricum_A
+    butyricum_B
+    byssoidea_A
     C01_2wb_b10_2005-12-15
     C02_1ub_b10_2005-12-15
     C100_CLW
@@ -2024,7 +5713,71 @@ const my @SPECIES => qw(
     C79_CLW
     C84_CLW
     C92_CLW
+    cacaoi_A
+    caecigallinarius_B
+    caecigallinarum_A
+    caecigallinarum_B
+    caecimuris_A
+    caelestis_A
+    caeni_A
+    caeni_B
+    caeruleus_A
+    calcoaceticus_B
+    calcoaceticus_C
+    calcoaceticus_D
+    calcoaceticus_E
+    caldarium_A
+    caldicuralii_A
+    calvum_A
+    cambriense_A
+    cambriense_B
+    camelliae_A
+    camelliae_B
+    campaniensis_A
+    campestris_A
+    campestris_B
+    campestris_C
+    campestris_D
+    canadensis_A
+    canariense_A
+    canariense_C
+    canariense_D
+    canis_B
+    canus_C
+    canus_D
+    canus_E
+    canus_F
+    capeferrum_A
+    capillosus_A
+    capleta_B
+    capleta_C
+    capleta_D
+    capleta_E
+    capleta_F
+    capleta_G
+    capleta_H
+    capleta_I
+    capleta_J
+    capleta_K
+    capleta_L
+    capsici_A
+    capsulatum_A
+    capsulatus_B
+    capsulatus_C
+    cardiocondylae_A
+    cardiocondylae_B
+    cardiocondylae_C
+    carnea_A
+    carnea_B
+    carnea_C
+    carotovorum_I
+    casei_A
+    caseolyticus_A
+    casseliflavus_A
     cat_SB2894
+    catarrhalis_C
+    catus_A
+    cavernae_A
     CCSD_DF2030_Ag37_isolate_1
     CCSD_DF2030_Ag37_isolate_2
     CCSD_DF2030_Ag68_isolate_1
@@ -2033,7 +5786,49 @@ const my @SPECIES => qw(
     CCSD_DF2030_CL68_isolate_2
     CCSD_DF2030_TE37_isolate_1
     CCSD_DF2030_TE37_isolate_2
+    cecembensis_A
+    cecembensis_B
+    cecorum_A
+    cecorum_B
     Ced_B08
+    celere_A
+    celerecrescens_B
+    cellasea_A
+    cellostaticus_A
+    cellulans_A
+    cellulans_D
+    cellulans_E
+    cellulans_F
+    cellulans_G
+    cellulosae_A
+    cellulositrophicus_A
+    cellulosum_B
+    cellulosum_D
+    cellulosum_E
+    cellulosum_F
+    cellulosum_G
+    cepacia_C
+    cepacia_D
+    cepacia_F
+    cereus_AG
+    cereus_AK
+    cereus_AQ
+    cereus_AT
+    cereus_AU
+    cereus_AV
+    cereus_BA
+    cereus_BB
+    cereus_BC
+    cereus_BD
+    cereus_BE
+    cereus_K
+    cereus_S
+    cereus_U
+    cerinum_A
+    cerinus_A
+    cervicalis_A
+    cetorum_B
+    cetorum_C
     CFTR_BAC01
     CFTR_BAC02
     CFTR_BAC03
@@ -2066,14 +5861,165 @@ const my @SPECIES => qw(
     CH336b_11D
     CH35_1T
     CH64b_2B
+    chagasii_A
+    chagasii_B
+    chartreusis_D
+    chelonae_A
+    chengduensis_A
+    chikugoensis_A
+    chilikensis_A
+    chitinivorans_A
+    chlorellavorus_A
+    chlorellavorus_B
+    chlorellavorus_D
+    chlorophenolicus_A
+    chlororaphis_D
+    chlororaphis_E
+    chlororaphis_H
+    chlororaphis_I
+    choanae_A
+    chokoriensis_B
+    choshinensis_A
+    chromiireducens_A
+    chromiiresistens_A
+    chubuense_A
+    chungangensis_A
+    cibaria_A
+    cibarius_A
+    cibarius_B
+    cibarius_C
+    cicadellinicola_A
+    cicadellinicola_B
+    cicadellinicola_C
+    ciceri_B
+    cichorii_B
+    cichorii_D
+    cichorii_E
+    ciconiae_A
+    cincinnatiensis_A
+    cinnabarinus_B
+    cinnamea_A
+    cinnamoneus_A
+    circulans_A
+    circulans_B
+    citri_A
+    citronellolis_A
+    clevelandensis_A
+    cloacae_A
+    cloacae_I
+    cloacae_L
+    cloacae_M
+    cloacae_N
+    cloacae_O
+    cloacae_P
+    cloacae_Q
+    clostridioformis_A
     CN30_LM100
+    coccineus_A
+    coeruleorubidus_A
     Col_A
+    coleohominis_A
+    coli_A
+    coli_B
+    coli_E
+    coli_F
+    colihominis_A
+    collinus_A
+    colombiense_A
+    colombiense_B
+    colombiense_C
+    columbae_A
+    columbina_A
+    comes_A
+    commune_A
+    communis_A
+    communis_B
+    composti_A
+    composti_B
+    concisus_A
+    concisus_AA
+    concisus_AB
+    concisus_AC
+    concisus_AD
+    concisus_AE
+    concisus_AF
+    concisus_AG
+    concisus_AH
+    concisus_AI
+    concisus_AJ
+    concisus_AK
+    concisus_AL
+    concisus_AM
+    concisus_AN
+    concisus_AO
+    concisus_AP
+    concisus_AQ
+    concisus_AR
+    concisus_AS
+    concisus_AT
+    concisus_B
+    concisus_C
+    concisus_D
+    concisus_E
+    concisus_F
+    concisus_G
+    concisus_H
+    concisus_I
+    concisus_J
+    concisus_K
+    concisus_L
+    concisus_M
+    concisus_N
+    concisus_O
+    concisus_P
+    concisus_Q
+    concisus_R
+    concisus_S
+    concisus_T
+    concisus_U
+    concisus_V
+    concisus_W
+    concisus_X
+    concisus_Y
+    concisus_Z
+    confusa_A
+    confusa_B
+    confusa_C
+    congolensis_A
+    congolensis_B
+    congonensis_A
+    constellatus_A
+    contorta_A
+    contortus_B
+    contortus_C
+    contractile_A
+    copri_A
+    copri_B
+    copri_C
+    copri_E
+    copri_F
+    copri_G
+    copri_H
+    copri_I
+    copri_J
+    coralicida_A
+    coralliilyticus_A
     coronavirus/KP817/Phy_dis/PAN/2011
+    corrodens_B
+    corynebacterioides_A
+    cosmeticum_A
+    cowanii_A
     CR1_10_MR-20148
     CR1_11_MR-2014
     CR5_1_MR-2014
     CR5_2_MR-2014
     CR7_6_MR-2014
+    crassostreae_C
+    crateris_A
+    crateris_B
+    cremea_A
+    cremeus_A
+    cremoricolorata_A
     CRF01_AE
     CRF02_AG:08GQ032
     CRF02_AG:08GQ057
@@ -2106,6 +6052,23 @@ const my @SPECIES => qw(
     CRF22_01A1:08GQ346
     CRF26_A5U:08GQ019
     CRF26_A5U:08GQ323
+    crinochetorum_A
+    cristatus_A
+    cristatus_B
+    cristatus_C
+    cristatus_D
+    cristatus_E
+    cristatus_F
+    cristatus_G
+    cristatus_H
+    cristatus_I
+    cristatus_J
+    cristatus_K
+    cristatus_L
+    cristatus_M
+    crithidii_A
+    crithidii_B
+    crithidii_C
     CRO1006_1
     CRO1006_2
     CRO1091_1
@@ -2132,14 +6095,80 @@ const my @SPECIES => qw(
     CRO832_1
     CRO832_2
     CRO834_3
+    croceus_A
+    crocodyli_A
     Cry7_14
     Cry7_9.1
     Cry7_extC18.1
+    cryaerophilus_A
+    cryaerophilus_B
+    cryoconitis_A
+    cryoconitis_B
+    cryoconitis_C
+    cryoconitis_D
+    cryoconitis_E
+    cryocrescens_A
+    crystallopoietes_A
+    crystallopoietes_B
     CSeA30_26
     CSeA30_42
     CSeA30_59
     CSeA30_60
     CSu4_9
+    cucumis_A
+    cucumis_B
+    cucumis_C
+    cuenoti_A
+    cuenoti_AA
+    cuenoti_AB
+    cuenoti_AC
+    cuenoti_AD
+    cuenoti_AE
+    cuenoti_AF
+    cuenoti_AG
+    cuenoti_AH
+    cuenoti_AI
+    cuenoti_AJ
+    cuenoti_AK
+    cuenoti_AL
+    cuenoti_AM
+    cuenoti_AN
+    cuenoti_B
+    cuenoti_C
+    cuenoti_D
+    cuenoti_E
+    cuenoti_F
+    cuenoti_G
+    cuenoti_H
+    cuenoti_I
+    cuenoti_J
+    cuenoti_K
+    cuenoti_L
+    cuenoti_M
+    cuenoti_N
+    cuenoti_O
+    cuenoti_P
+    cuenoti_Q
+    cuenoti_R
+    cuenoti_S
+    cuenoti_T
+    cuenoti_U
+    cuenoti_V
+    cuenoti_W
+    cuenoti_X
+    cuenoti_Y
+    cuenoti_Z
+    culicis_A
+    cuniculi_A
+    curvispora_A
+    cyclitrophicus_A
+    cypripedii_A
+    cyriacigeorgica_B
+    cyriacigeorgica_C
+    cyriacigeorgica_D
+    cyriacigeorgica_E
+    cyriacigeorgica_F
+    cytotoxicus_A
     D01_9wb_b10_2005-12-15
     D02_1pb_b10_2005-12-15
     D2_1_1F-16sF
@@ -2211,20 +6240,103 @@ const my @SPECIES => qw(
     D_HF7_66
     D_HF7_9
     DAB_16s_R32(2)
+    daeponensis_A
+    danieliae_A
     Davis_19N
     DB_16s_F5
     DB_16s_F77
     DB_16s_F8
     DB_16s_R8
+    debontii_A
+    debontii_B
+    defensa_A
+    defluvii_A
+    defluvii_B
+    defluvii_C
+    dehalogenans_B
+    delafieldii_A
+    delafieldii_B
+    delafieldii_C
+    delaneyi_A
+    delbrueckii_B
+    deleyi_A
+    dendritiformis_A
+    dendritiformis_C
+    denitrificans_A
+    denitrificans_B
+    denitrificans_C
+    denitrificans_E
+    denitrificans_F
+    denitrificans_G
+    dentiae_A
+    denticola_A
+    denticola_B
+    denticola_C
+    denticola_D
+    depolymerans_A
+    deserti_A
+    deserti_B
+    deserti_C
+    deserti_D
+    desertorum_A
+    desertorum_B
+    desulfatans_A
+    desulfuricans_B
+    desulfuricans_C
+    desulfuricans_D
+    desulfuricans_E
+    detoxificans_A
+    devorans_A
+    devorans_B
+    dextrinosolvens_A
+    dextrinosolvens_B
+    diastatochromogenes_A
+    diazoefficiens_A
+    diazoefficiens_B
+    diazoefficiens_C
+    diazoefficiens_D
+    diazoefficiens_E
+    diazoefficiens_F
+    diazoefficiens_G
+    diazoefficiens_H
+    difficile_A
+    difficile_D
+    difficile_E
+    difficile_F
+    difficile_G
+    diffusa_B
+    diminuta_A
+    diminuta_B
+    diminuta_C
+    dinghuensis_A
+    dinghuensis_B
+    discipulorum_A
+    discipulorum_B
+    dismutans_A
+    dispar_B
+    disporicum_B
+    distasonis_A
+    distasonis_B
+    distasonis_C
+    distributa_B
+    distributa_C
+    distributa_D
+    distributa_E
+    divergens_A
+    diversum_A
     Djaks_4
     Djaks_6
     DmelCS_103
     dog/GVI.1/HKU_Ca026F/2007/HKG
     dog/GVI.1/HKU_Ca035F/2007/HKG
+    dokdonensis_B
     DOLJORAL78_63_78
     DOLJORAL78_65_58
     DOLZORAL124_38_8
     DOLZORAL124_64_63
+    donghaensis_A
+    donghaensis_B
+    drentensis_A
     DSFBPG_3R2A
     DSFBPG_3R2B
     DSFBPG_4R3A
@@ -2270,11 +6382,44 @@ const my @SPECIES => qw(
     DSS3_MAL1
     DSS3_PM1
     DSS3_VP1
+    durus_B
     E01_10wb_b10_2005-12-15
     E56_UTI
     E60_UTI
     E81_UTI
+    echini_A
+    echinofusca_A
+    echinoides_A
+    echinospora_A
+    ectosymbiont_A
+    ectosymbiont_B
+    edaphicum_A
+    edaphicum_B
+    eiseniae_A
+    elegans_A
+    eligens_A
+    elkanii_A
+    elongata_B
+    elongatus_A
+    elongatus_B
+    elsdenii_A
     EMG_100139454
+    enclense_A
+    enclensis_A
+    endoloripes_D
+    endophytica_A
+    endophyticus_A
+    enshiense_A
+    enterocolitica_E
+    entomophila_A
+    entomophila_B
+    entomophila_C
+    entomophila_D
+    entomophila_E
+    entomophila_F
+    entomophila_G
+    enzymogenes_C
+    enzymogenes_D
     Ep06i_A10B
     Ep06i_A1B
     Ep06i_A4C
@@ -2283,12 +6428,52 @@ const my @SPECIES => qw(
     EqCoPV_8
     EqCoPV_9
     EqCoPV_A4
+    equi_A
+    equinus_B
+    equinus_D
+    equisanguinis_A
+    equolifaciens_A
+    equorum_A
+    equorum_C
+    erythraea_A
+    erythrophlei_A
+    erythrophlei_B
+    erythrophlei_C
+    erythrophlei_D
+    erythropolis_D
     ES5_1357
     ES6_1418
     ES6_478
     ES_ALL_000190F
+    esperanzae_A
+    esteraromaticum_B
+    esteraromaticum_C
+    esteraromaticum_D
+    estertheticum_A
+    estertheticum_B
+    estertheticum_C
+    estertheticum_D
+    estunensis_A
+    ethanivorans_B
+    ethanivorans_C
+    etli_B
+    etli_C
+    euphylliae_A
+    euphylliae_B
+    euphylliae_C
+    europaea_B
+    europaeum_A
+    eutropha_A
+    eutropha_B
     ex4484_74
     Ex_DG74
+    exalbescens_A
+    excellens_B
+    excentricus_A
+    exercitus_A
+    exile_A
+    exile_C
+    extorquens_A
     F01_14wb_b10_2005-12-15
     F3_an4
     F3_an5
@@ -2304,9 +6489,22 @@ const my @SPECIES => qw(
     FA_183B
     FA_2CB*
     FA_86
+    fabrum_A
+    faecalis_A
+    faecalis_D
+    faecihominis_A
+    faeni_A
+    faeni_B
+    faeni_C
     FAKO05_000032F
     FAKO27_000238F
     FAKO27_000271F
+    falsenii_A
+    falsenii_B
+    farcinica_A
+    fascians_E
+    fastidiosus_A
+    faulkneri_A
     Fen2266_11
     Fen418_41
     Fen4707_41
@@ -2318,14 +6516,195 @@ const my @SPECIES => qw(
     Fen7895_21
     Fen7918_21
     Fen7940_21
+    fermentans_A
+    fermentans_B
+    ferrariae_A
+    ferrireducens_A
+    ferrivorans_A
+    ferrooxidans_B
+    ferrugineus_A
     FGPV_KD09.ZAF
+    fibrisolvens_A
+    fibrisolvens_C
+    ficellus_A
+    ficellus_B
+    filiformis_A
+    filiformis_B
+    fimi_A
+    fimi_B
+    fimi_C
+    finisterrensis_A
+    finlayi_A
+    finnmarkense_A
+    firmus_A
+    firmus_B
+    firmus_C
+    fischeri_A
+    fischeri_B
+    fissicatena_A
+    flaccumfaciens_A
+    flaccumfaciens_B
+    flaccumfaciens_C
+    flaccumfaciens_D
+    flaccumfaciens_E
+    flagellatus_A
+    flagelliforme_A
+    flagelliforme_B
+    flava_A
+    flavefaciens_A
+    flavefaciens_AA
+    flavefaciens_AB
+    flavefaciens_AC
+    flavefaciens_AD
+    flavefaciens_B
+    flavefaciens_C
+    flavefaciens_D
+    flavefaciens_E
+    flavefaciens_F
+    flavefaciens_G
+    flavefaciens_H
+    flavefaciens_I
+    flavefaciens_J
+    flavefaciens_K
+    flavefaciens_L
+    flavefaciens_M
+    flavefaciens_N
+    flavefaciens_O
+    flavefaciens_P
+    flavefaciens_Q
+    flavefaciens_R
+    flavefaciens_S
+    flavefaciens_T
+    flavefaciens_U
+    flavefaciens_V
+    flavefaciens_W
+    flavefaciens_X
+    flavefaciens_Y
+    flavefaciens_Z
+    flaveolus_A
+    flavescens_A
+    flavescens_B
+    flavescens_C
+    flavescens_D
+    flavithermus_E
+    flavithermus_G
+    flavofungini_A
+    flavorosea_A
+    flavus_A
     flour_#16
+    fluorescens_A
+    fluorescens_AA
+    fluorescens_AJ
+    fluorescens_AM
+    fluorescens_AN
+    fluorescens_AO
+    fluorescens_AP
+    fluorescens_AQ
+    fluorescens_B
+    fluorescens_BD
+    fluorescens_BE
+    fluorescens_BF
+    fluorescens_BG
+    fluorescens_BH
+    fluorescens_BI
+    fluorescens_BJ
+    fluorescens_BK
+    fluorescens_BM
+    fluorescens_BO
+    fluorescens_BP
+    fluorescens_BQ
+    fluorescens_BR
+    fluorescens_BS
+    fluorescens_BT
+    fluorescens_BU
+    fluorescens_BV
+    fluorescens_BW
+    fluorescens_BX
+    fluorescens_BY
+    fluorescens_BZ
+    fluorescens_CA
+    fluorescens_CB
+    fluorescens_CC
+    fluorescens_CD
+    fluorescens_E
+    fluorescens_G
+    fluorescens_H
+    fluorescens_M
+    fluorescens_O
+    fluorescens_Q
+    fluorescens_S
+    fluorescens_W
+    fluorescens_X
+    fluvialis_A
+    fluvialis_B
+    fluvialis_C
+    fluvialis_D
+    fluvialis_E
+    fluvialis_F
+    fluviatilis_A
     FMAS_PN2
     FMAS_PN3
     FMAS_PN5
+    foliaceum_A
+    foliorum_A
+    foliorum_B
+    fonticola_A
+    fonticola_B
+    fonticola_C
+    formicae_A
+    formicicum_A
+    formicilis_A
+    formicilis_B
+    formigenes_C
+    formigenes_D
+    formigenes_E
+    formosum_A
+    forsythia_A
+    fortis_A
     FR1_11-MR-2014
     FR1_16_MR-2014
     FR3_2_MR-2014
+    fragariae_A
+    fragi_D
+    fragi_E
+    fragilis_B
+    frankenforstense_A
+    franklandus_A
+    frederiksbergense_A
+    frederiksbergense_B
+    frederiksbergensis_A
+    frederiksbergensis_B
+    frederiksbergensis_D
+    frederiksbergensis_F
+    frederiksbergensis_G
+    frederiksbergensis_H
+    frederiksbergensis_I
+    frederiksbergensis_K
+    fredii_A
+    fredii_B
+    fredii_C
+    frigoris_A
+    frigoritolerans_A
+    frigoritolerans_B
+    frisingense_B
+    fugitiva_A
+    fulva_A
+    fulva_B
+    fulva_C
+    fulva_D
+    fulvum_A
+    fulvum_B
+    fungivorans_A
+    fungivorans_B
+    fungorum_A
+    fungorum_B
+    fuscovaginae_A
+    fuscovaginae_B
+    fuscus_A
+    fusiformis_A
+    fusiformis_D
+    fusiformis_E
+    fusiformis_F
     G01_1mb_b10_2005-12-15
     G3_GreenLake
     G5_GreenLake
@@ -2338,7 +6717,30 @@ const my @SPECIES => qw(
     G_20
     G_22
     G_23
+    gaetbuli_A
+    gaetbuli_B
+    galactitolivorans_A
+    galegae_A
+    galegae_B
+    galegae_C
+    galegae_D
+    gallaeciensis_A
+    gallinacea_A
+    gallolyticus_B
+    gallolyticus_C
+    gandavensis_A
+    gangwonense_A
+    garvieae_A
+    gazogenes_A
+    gelatinosus_A
+    gelatinosus_B
     geoffroys_cat/URU-01/2009
+    geofontis_A
+    georgiana_A
+    geothermicum_A
+    geothermicum_B
+    geothermicum_C
+    gephyra_A
     GF1-2_000079F
     GI/Hu/BG/2011/GI.P3_GI.3/RV1253
     GI/Hu/BG/2011/GI.Pb_GI.6/NV2(341)
@@ -2348,6 +6750,8 @@ const my @SPECIES => qw(
     GI/Hu/KH/2004-2006/GI.P8_GI.8/NP-451_1
     GI/Hu/KH/2004-2006/GI.Pc_GI.5/NP-093_2
     GI/PBV/bovine/BRA/PBV18_PR/2014
+    gigasporarum_A
+    gigasporarum_B
     GII.4/Cordoba/Sds_August09/2009/ARG
     GII.4/Cordoba/Sds_July09-2/2009/ARG
     GII.4/Cordoba/Sds_July09-3/2009/ARG
@@ -2631,11 +7035,76 @@ const my @SPECIES => qw(
     GII/Hu/ZAF/2012/GII.P4_GII.4/Empangeni/8604
     GII/Hu/ZAF/2012/GII.P4_GII.4/Empangeni/9693
     GII/Hu/ZAF/2012/GII.P4_GII.4/Johannesburg/BW
+    gilardii_C
+    gilardii_D
+    gilardii_E
+    gingeri_A
+    gingeri_C
+    gingeri_D
+    ginsengisoli_A
+    ginsengisoli_B
+    ginsengisoli_C
+    ginsengisoli_D
+    ginsengisoli_E
+    ginsengisoli_F
+    ginsenosidimutans_A
+    glacialis_A
+    glacincola_B
+    glacincola_C
+    gladioli_A
+    gladioli_B
+    glaucescens_B
+    globiformis_A
+    globiformis_B
+    globiformis_C
+    globiformis_D
+    globisporus_A
+    globisporus_D
+    globulus_B
+    gloriosae_A
+    glossinidia_A
+    glossinidia_B
+    glossinidia_C
+    glucosidilyticum_B
+    glucuronolyticum_A
+    glycanilyticus_A
+    glycanilyticus_B
+    glycinis_A
+    glycyrrhizinilytica_A
+    glycyrrhizinilyticus_A
+    gomsonensis_A
+    goodii_B
+    gordonae_B
+    gordonae_D
+    gordonii_A
+    gottheilii_A
+    gracilis_A
+    gracilis_B
+    gracilis_C
+    gracilis_D
+    grahamii_A
+    graminis_B
+    graminis_D
+    grandis_A
+    grandis_C
+    granulomatis_A
+    griffiniae_A
+    griseocarneus_A
+    griseoluteus_A
+    griseorubiginosus_B
+    griseoviridis_A
+    griseus_G
+    griseus_I
     GS2_2_25
     GS2_2_29
     GS3_1_3
     GSM_I_36B_cl_10_2
     GSM_I_36B_cl_11_3
+    guangdongense_A
+    guariconensis_A
+    guariconensis_B
+    guariconensis_C
+    guariconensis_D
     GW2011_AR1
     GW2011_AR10
     GW2011_AR11
@@ -2652,6 +7121,7 @@ const my @SPECIES => qw(
     GW2011_AR5
     GW2011_AR6
     GW2011_AR9
+    gwangjuense_A
     H01_1mb1_b10_2005-12-15
     H9_DGR
     H_A17_151
@@ -2666,6 +7136,38 @@ const my @SPECIES => qw(
     H_C49_69
     H_C49_72
     H_C49_73
+    haematequi_A
+    haemolysans_A
+    haemolysans_B
+    haemolysans_C
+    haemolysans_D
+    haemolytica_A
+    haemolyticum_A
+    haemolyticus_A
+    haemolyticus_G
+    haemolyticus_I
+    haemolyticus_J
+    haemolyticus_K
+    haemolyticus_L
+    haemolyticus_M
+    haemolyticus_N
+    haemolyticus_O
+    haikouensis_A
+    halitosis_A
+    halitosis_B
+    haloalkaliphilus_A
+    halocryophilus_A
+    halocynthiae_B
+    halodurans_A
+    halophila_A
+    halophilus_A
+    halophilus_B
+    halophilus_C
+    halotolerans_A
+    hampsonii_B
+    hampsonii_C
+    hankookensis_A
+    haoranii_A
     Hare_CoV/La06_377/Lep_gra/ESP/2006
     Hare_CoV/La06_378/Lep_gra/ESP/2006
     Hare_CoV/La06_379/Lep_gra/ESP/2006
@@ -2675,6 +7177,30 @@ const my @SPECIES => qw(
     Hare_CoV/La08_60/Lep_gra/ESP/2008
     Hare_CoV/La08_96/Lep_gra/ESP/2008
     Hare_CoV/La08_99/Lep_gra/ESP/2008
+    harei_A
+    harenae_A
+    harundinacea_A
+    harundinacea_B
+    harundinacea_D
+    hathewayi_A
+    heliothermus_B
+    helleri_A
+    helvetica_A
+    helveticum_A
+    hengshuiensis_A
+    hepatarius_A
+    hepatarius_B
+    heraklionense_A
+    heraklionense_C
+    herbae_A
+    hermannii_A
+    hertigii_A
+    hertigii_B
+    heylii_A
+    higoensis_A
+    hippei_A
+    hippocampi_A
+    hispanicum_A
     HMP_JCVI_SC0102
     HMP_JCVI_SC0110
     HMP_JCVI_SC0119
@@ -2692,9 +7218,26 @@ const my @SPECIES => qw(
     HMP_JCVI_SC0278
     HMP_JCVI_SC0281
     hmp_mda_pilot_jcvi_0005
+    hodleri_A
+    hodleri_B
+    hominis_A
+    hominis_B
+    hominis_C
+    hopiensis_A
     Hoplo_CB025_CB025_18_01
+    hordeovulneris_A
+    horikoshii_A
+    horikoshii_B
+    horikoshii_C
+    horikoshii_D
+    horikoshii_E
+    horikoshii_F
+    hormaechei_B
+    hormaechei_C
     Horo_12
     Horo_15
+    hortorum_B
+    hortorum_C
     Hu/Caterer_Company_1_pat_1/10-04-2003/NL
     Hu/Caterer_Company_1_pat_2/10-04-2003/NL
     Hu/Caterer_Company_2_pat_1/12-04-2003/NL
@@ -3402,6 +7945,9 @@ const my @SPECIES => qw(
     Hu/USA/2016/GI.P9_GI.9/SC6350
     Hu/WC_Feb11_6926/ZAF
     Hu/WC_Jun10_5755/ZAF
+    huakuii_A
+    huautlense_A
+    hugenholtzii_A
     Human/GII/InDRE1839_Camp/2006/Mexico
     Human/GII/InDRE2307_Camp/2006/Mexico
     Human/GII/InDRE2378_QRoo/2006/Mexico
@@ -3441,6 +7987,25 @@ const my @SPECIES => qw(
     Human/GII/InDRE3402_Ver/2006/Mexico
     Human/GII/InDRE3432_Tamps/2006/Mexico
     Human/GII/InDRE3437_Tamps/2006/Mexico
+    humilata_A
+    hungatei_A
+    hungatei_B
+    hwajinpoensis_A
+    hwajinpoensis_B
+    hwajinpoensis_C
+    hwajinpoensis_D
+    hydrocarbonoxydans_A
+    hydrocarbonoxydans_B
+    hydrocarbonoxydans_C
+    hydrogenitrophicus_A
+    hydrogenivorans_A
+    hydrophilus_A
+    hydrothermalis_A
+    hygroscopicus_B
+    hygroscopicus_C
+    hygroscopicus_D
+    hyointestinalis_A
+    hypermegale_A
     I_35_MF_cl1
     I_35_MF_cl2
     idli_24
@@ -3468,6 +8033,7 @@ const my @SPECIES => qw(
     IK_MB7-800R
     IK_MB8-800R
     IK_MB9-800R
+    illinoisensis_A
     IM_14
     IM_15
     IM_4
@@ -3476,11 +8042,59 @@ const my @SPECIES => qw(
     IM_8A
     IM_9A
     IM_9B
+    immobilis_A
+    immobilis_B
+    immobilis_C
+    immobilis_D
+    immobilis_E
+    immobilis_F
+    immobilis_G
+    immobilis_H
     INBio_4054J
     INBio_4099AF
     INBio_4100K
     INBio_4507A
     INBio_4510E
+    incarnatus_A
+    indica_A
+    indica_B
+    indicum_A
+    indicus_A
+    indigofera_A
+    indolica_A
+    indologenes_A
+    indologenes_B
+    indologenes_E
+    indologenes_F
+    indologenes_G
+    infantis_A
+    infantis_B
+    infantis_C
+    infantis_E
+    infantis_F
+    infantis_G
+    infantis_H
+    infantis_I
+    infantis_J
+    infantis_K
+    infantis_L
+    infantis_M
+    infantium_A
+    infera_B
+    infera_D
+    influenzae_D
+    influenzae_E
+    influenzae_H
+    inhae_A
+    inopinata_A
+    insuavis_A
+    interjectum_B
+    intermedia_A
+    intermedia_B
+    intermedia_C
+    intermedius_A
+    intestinalis_A
+    intracellularis_B
     Ips_1
     Ips_2
     Ips_3
@@ -3488,6 +8102,11 @@ const my @SPECIES => qw(
     Ips_5
     Ips_6
     Ips_7
+    iranensis_A
+    iranicum_A
+    iranicum_B
+    iriomotense_A
+    iriomotense_B
     IRQ_01
     IRQ_02
     IRQ_03
@@ -3531,20 +8150,67 @@ const my @SPECIES => qw(
     IRQ_60
     IRQ_61
     IRQ_62
+    ishigakensis_A
+    ishizawai_A
     Iso11_2
+    isronensis_A
+    isronensis_B
     ISW_15
     ISW_2
+    itersonii_A
+    ixodetis_A
+    jadensis_A
+    japonica_A
+    japonica_C
+    japonicum_B
+    japonicum_C
+    japonicum_F
+    japonicum_G
+    japonicum_H
+    japonicus_A
     JCVI_control_MDA_Ecoli_02
     JCVI_control_MDA_Saureus_10
+    jeikeium_C
+    jeikeium_D
+    jejuense_A
+    jejuensis_A
+    jejuni_A
+    jejuni_B
+    jejuni_C
+    jejuni_D
+    jeotgali_A
     JGI_KR11_SmLR_4_I6
     JGI_KR11_SmLR_5_K8
     JGI_KR13_SmLR_4_D7
+    jiangningensis_B
+    jiangningensis_C
+    jiangsuensis_A
+    jiangxiensis_A
+    jicamae_A
+    jicamae_B
     JL4_S
     JN18_A7_F*
+    johnsoniae_A
+    johnsoniae_C
+    johnsonii_A
     Jomon_CT89
+    jostii_A
     JPL_7
+    jumonjinensis_A
     K12_27
     K12_28b
+    kashiwanohense_A
+    kashmirensis_A
+    katrae_A
+    katrae_B
+    kieliensis_A
+    kilianii_A
+    kilonensis_B
+    kimbladii_B
+    kirkii_B
+    kisseleviana_A
+    kitaharae_A
+    kluyveri_B
     kmd_008
     kmd_043
     kmd_065
@@ -3567,12 +8233,203 @@ const my @SPECIES => qw(
     kmd_332
     kmd_340
     kmd_360
+    kobei_A
+    komagatae_A
+    koreensis_A
+    koreensis_B
+    koreensis_C
+    koreensis_F
+    koreensis_G
+    koreensis_H
+    koyamae_A
+    koyamae_B
+    koyamae_C
+    kribbensis_B
+    kroppenstedtii_B
+    kujiense_A
+    kunkeei_C
+    kunkeei_E
+    kunkeei_F
+    kururiensis_A
+    kushneri_A
+    kyeonggiensis_A
+    kyeonggiensis_B
+    kyorinense_A
+    kyotonensis_B
     L3_Loihi
+    lablabi_A
+    lablabi_C
+    lablabi_D
     LaBonte_alg10
+    lactamica_A
+    lactamica_B
+    lactatifermentans_A
+    lactis_A
+    lactosutens_A
+    lactucae_A
+    lacunata_B
+    lacus_C
+    lacus_D
+    lacuscaerulensis_A
+    lacuscaerulensis_B
+    lacuscaerulensis_C
+    lacustris_A
     Lad_11K
     Lad_23K
+    laidlawii_A
+    Lak_Megaphage_RVC_AP1_GC26
+    Lak_Megaphage_RVC_AP3_GC26
+    Lak_Megaphage_RVC_AP3_GC31
+    Lak_Megaphage_RVC_AP4_GC26
+    Lak_Megaphage_RVC_JS4_GC31
+    Lak_Megaphage_Sonny
+    laminariae_A
+    lari_C
+    lari_D
+    lari_E
+    larrymoorei_A
+    larrymoorei_B
+    lata_B
+    lata_C
+    latens_A
+    laterosporus_D
+    laterosporus_E
+    lathyri_A
+    lautus_A
+    leadbetteri_A
+    legallii_A
+    leguminosarum_D
+    leguminosarum_G
+    leguminosarum_I
+    leguminosarum_J
+    leguminosarum_M
+    leguminosarum_N
+    leguminosarum_P
+    leguminosarum_Q
+    leguminosarum_R
+    leguminosarum_S
+    leguminosarum_T
+    leguminosarum_U
+    leguminosarum_V
+    lekithochrous_A
+    lentis_A
+    lentus_A
+    liaoningense_A
+    liaoningense_B
+    liaoningense_C
+    lichenicola_A
+    lichenicola_B
+    lichenicola_C
+    lichenicola_D
+    lichenicola_E
+    limicola_A
+    limnetica_A
+    limneticus_A
+    limneticus_B
+    limnophila_A
+    limnophila_B
+    limnophila_C
+    limosum_B
+    limosus_A
+    limosus_C
+    limosus_D
+    limosus_E
+    linckia_A
+    linckia_B
+    lini_A
+    lipoferum_B
+    lipoferum_C
+    lipolytica_A
+    lipolytica_C
+    lipolyticus_A
+    lipolyticus_B
+    lipolyticus_C
+    liquefaciens_A
+    listeri_A
+    lithotrophica_A
+    lithotrophicus_A
+    litopenaei_A
+    litorale_A
+    litorale_B
+    litoralis_A
+    litoralis_B
+    litoralis_C
+    litoralis_D
+    litoralis_E
+    litoralis_F
+    litorea_A
+    litorea_B
+    lituseburensis_A
     Liv16S_LC_L1
+    lividum_C
+    lividum_D
+    lividum_E
+    lividum_F
+    ljungdahlii_A
+    longbeachae_A
+    longispororuber_A
+    longum_A
+    longum_D
+    loti_A
+    loti_B
+    loti_C
+    loti_D
+    loti_E
+    loti_F
+    loti_G
+    lovleyi_A
+    lovleyi_B
     LUC13011_P14
+    lucentensis_A
+    lucentensis_B
+    luciferensis_B
+    ludwigii_A
+    lundensis_A
+    lupini_A
+    lupini_B
+    lusitanum_A
+    lusitanum_B
+    lusitanum_C
+    lusitanum_D
+    lutea_A
+    luteola_A
+    luteola_B
+    luteola_C
+    luteola_D
+    luteolum_B
+    luteolum_C
+    luteoviolacea_A
+    luteoviolacea_B
+    luteoviolacea_C
+    luteoviolacea_D
+    luteoviolacea_E
+    luteoviolacea_F
+    luteoviolacea_G
+    luteoviolacea_H
+    luteoviolacea_I
+    luteoviolacea_J
+    luteoviolacea_K
+    luteum_A
+    luteus_A
+    luti_A
+    lutilitoris_A
+    lutimaris_A
+    lwoffii_C
+    lwoffii_D
+    lwoffii_E
+    lwoffii_F
+    lwoffii_G
+    lwoffii_H
+    lwoffii_I
+    lwoffii_J
+    lwoffii_K
+    lwoffii_L
+    lwoffii_M
+    lwoffii_N
+    lwoffii_O
+    lwoffii_P
+    lydicus_C
+    lyticus_A
     M12R1_907R_F06
     M13K07_deltapIII_deltaf1ori
     M32_bin.2
@@ -5379,19 +10236,185 @@ const my @SPECIES => qw(
     M_Sw_oHS_08/11_6_2(1)
     MA_11
     MA_26
+    macerans_A
+    macleodii_A
+    macrogoltabida_A
+    macrogoltabida_B
+    macrosporangiidus_B
+    macrosporus_A
+    macuxiense_A
+    magna_F
+    magna_H
+    magna_I
+    magna_J
+    magnetica_A
+    magneticus_A
+    magneticus_B
+    magnusonii_B
+    magnusonii_C
+    mali_A
+    mallensis_A
+    malorum_A
+    maltophilia_A
+    maltophilia_AA
+    maltophilia_AB
+    maltophilia_AC
+    maltophilia_AD
+    maltophilia_AE
+    maltophilia_AG
+    maltophilia_AH
+    maltophilia_AJ
+    maltophilia_AL
+    maltophilia_AM
+    maltophilia_AN
+    maltophilia_AP
+    maltophilia_AQ
+    maltophilia_AR
+    maltophilia_AS
+    maltophilia_AT
+    maltophilia_AU
+    maltophilia_AV
+    maltophilia_AW
+    maltophilia_AX
+    maltophilia_AY
+    maltophilia_G
+    maltophilia_J
+    maltophilia_K
+    maltophilia_L
+    maltophilia_N
+    maltophilia_O
+    maltophilia_P
+    maltophilia_Q
+    maltophilia_R
+    maltophilia_S
+    maltophilia_Z
+    manausense_A
+    manausense_B
+    manausense_C
+    manausense_D
+    mandelii_B
+    mandelii_C
+    mandelii_E
+    mandelii_F
+    mangenotii_A
+    mangrovi_A
+    mantenii_A
     MAR_274_D06_2010-01-20
+    marcescens_A
+    marcescens_F
+    marcescens_J
+    marcescens_K
+    marcescens_L
+    marginalis_D
+    marina_A
+    marina_B
+    marincola_A
+    marinum_A
+    marinus_A
+    marinus_AA
+    marinus_AB
+    marinus_AC
+    marinus_AD
+    marinus_AE
+    marinus_AF
+    marinus_AG
+    marinus_AH
+    marinus_B
+    marinus_C
+    marinus_D
+    marinus_E
+    marinus_F
+    marinus_G
+    marinus_H
+    marinus_I
+    marinus_J
+    marinus_K
+    marinus_L
+    marinus_M
+    marinus_N
+    marinus_O
+    marinus_P
+    marinus_Q
+    marinus_R
+    marinus_T
+    marinus_U
+    marinus_V
+    marinus_W
+    marinus_X
+    marinus_Y
+    marinus_Z
+    maripaludis_A
+    maripaludis_D
+    maris_A
+    marisflavi_A
+    marisflavi_B
+    marisnigri_B
+    maritima_A
+    maritimus_A
+    maritimus_B
+    maritimus_C
+    maritypicum_A
+    marmoris_A
+    massiliana_A
+    massiliensis_A
+    massiliensis_B
+    massiliensis_C
+    massiliensis_D
+    mayombei_A
     MC1_11
     MC1_16
     MC1_2
     MC1_26
     MC2_24_MR-2014
     MC3_11
+    mccartyi_A
+    mccartyi_B
+    mediolanus_A
+    mediterranea_A
+    mediterranea_B
+    mediterranea_C
+    mediterraneensis_A
+    mediterraneus_A
+    megaterium_B
+    megaterium_C
+    megaterium_D
+    melaninogenica_A
+    melaninogenica_B
+    melaninogenica_C
+    melaninogenica_D
+    meliloti_A
+    mellis_A
+    melonis_A
+    meluiroseus_A
+    meluiroseus_B
+    meluiroseus_C
+    meluiroseus_D
+    meluiroseus_E
+    meluiroseus_F
+    meluiroseus_G
+    meluiroseus_H
+    mendocina_C
+    mendocina_D
+    meningitidis_C
     MEP_002
     MEP_003
     MEP_007
     MEP_009
     MEP_010
     MEP_014
+    merdigallinarum_A
+    mesenteroides_B
+    mesonae_A
+    mesophila_A
+    mesophilicum_A
+    metallireducens_B
+    methanica_A
+    methanica_B
+    methanolica_A
+    methanolicus_A
+    methanolicus_B
+    methylutens_A
+    metoecus_B
     Mex_CoV-1
     Mex_CoV-10
     Mex_CoV-11a
@@ -5405,6 +10428,8 @@ const my @SPECIES => qw(
     Mex_CoV-7
     Mex_CoV-8
     Mex_CoV-9
+    mexicana_A
+    mexicanum_A
     MF1_21
     MF1_22_MR-2014
     MF_isolate_1
@@ -5428,7 +10453,135 @@ const my @SPECIES => qw(
     MF_isolate_42
     MF_isolate_43
     MF_isolate_8
+    michiganensis_A
+    michiganensis_C
+    michiganensis_K
+    michiganensis_O
+    microaerophila_A
+    migulae_B
+    milii_A
+    millerae_A
+    millerae_B
     mink/NLD/2020/NT_4
+    minutissimum_A
+    minutissimum_B
+    minutum_A
+    minutum_B
+    minutum_C
+    mirabilis_B
+    misionensis_A
+    mitis_A
+    mitis_AC
+    mitis_AD
+    mitis_AF
+    mitis_AH
+    mitis_AI
+    mitis_AK
+    mitis_AP
+    mitis_AQ
+    mitis_AR
+    mitis_AT
+    mitis_AV
+    mitis_AW
+    mitis_AX
+    mitis_AY
+    mitis_AZ
+    mitis_BA
+    mitis_BB
+    mitis_BC
+    mitis_BD
+    mitis_BE
+    mitis_BF
+    mitis_BG
+    mitis_BH
+    mitis_BI
+    mitis_BJ
+    mitis_BK
+    mitis_BL
+    mitis_BM
+    mitis_BN
+    mitis_BO
+    mitis_BP
+    mitis_BQ
+    mitis_BR
+    mitis_BS
+    mitis_BT
+    mitis_BU
+    mitis_BV
+    mitis_BW
+    mitis_BX
+    mitis_BY
+    mitis_BZ
+    mitis_C
+    mitis_CA
+    mitis_CB
+    mitis_CC
+    mitis_CD
+    mitis_CE
+    mitis_CF
+    mitis_CG
+    mitis_CH
+    mitis_CI
+    mitis_CJ
+    mitis_CK
+    mitis_CL
+    mitis_CM
+    mitis_CN
+    mitis_CO
+    mitis_CP
+    mitis_CQ
+    mitis_CR
+    mitis_CS
+    mitis_CT
+    mitis_CU
+    mitis_CV
+    mitis_CW
+    mitis_CX
+    mitis_CY
+    mitis_CZ
+    mitis_D
+    mitis_DA
+    mitis_DB
+    mitis_DC
+    mitis_DD
+    mitis_DE
+    mitis_DF
+    mitis_DG
+    mitis_E
+    mitis_F
+    mitis_H
+    mitis_I
+    mitis_J
+    mitis_K
+    mitis_L
+    mitis_M
+    mitis_N
+    mitis_O
+    mitis_P
+    mitis_Q
+    mitis_W
+    mitis_Y
+    mixtus_A
+    mobilis_A
+    mobilis_B
+    monocytogenes_B
+    monocytogenes_C
+    monocytogenes_D
+    montana_A
+    montanisoli_A
+    monteilii_A
+    moraviensis_A
+    morganii_A
+    morganii_B
+    morganii_C
+    morganii_D
+    morganii_E
+    mori_A
+    moriokaense_A
+    moriokaense_B
+    mortivallis_A
+    mosselii_B
+    mosselii_C
     MPB_DPBA28
     MPB_DPFF10B
     MPB_DPFF1a
@@ -5458,7 +10611,47 @@ const my @SPECIES => qw(
     MSK18_59
     MSK20_81
     MSX_63619
+    mucilaginosa_A
+    mucilaginosa_B
+    mucilaginosa_C
+    mucilaginosus_A
+    muciniphila_A
+    muciniphila_C
+    muciniphila_D
+    muciniphila_E
+    muciniphila_F
+    muciniphilus_A
+    muciniphilus_B
+    muciniphilus_C
+    muciniphilus_D
+    muciniphilus_E
+    mucogenicum_B
+    mucor_C
+    mucosa_A
+    mucosus_A
+    muelleri_A
+    mulieris_A
+    multiformis_A
+    multiformis_B
+    multiformis_D
+    multiformis_E
+    multiformis_F
+    multipara_A
+    multivorans_A
+    multocida_A
+    mundtii_B
+    mundtii_C
+    murale_A
+    muralis_A
+    muris_A
+    muris_B
+    muscicola_A
+    muscorum_A
+    mycoides_B
+    mycoides_C
     Myotis/13rs384_31/Italy/2012
+    myrsinacearum_A
+    myxococcoides_A
     N118_L5885_C67.5
     N11_011-8
     N127_L5035_C77.3
@@ -5476,6 +10669,56 @@ const my @SPECIES => qw(
     N_OV_137
     N_YBF106
     N_YBF30
+    naejangsanensis_A
+    naejangsanensis_B
+    namurensis_A
+    nanhaiensis_A
+    nanhaiensis_B
+    nanhaiensis_C
+    nanhaiensis_D
+    nanshensis_A
+    naphthalenivorans_A
+    nasicola_B
+    nasicola_C
+    nasimurium_B
+    nasimurium_D
+    nasimurium_E
+    nasimurium_F
+    nasimurium_G
+    nasimurium_H
+    natronolimnaea_A
+    neapolitanus_A
+    neapolitanus_B
+    necator_A
+    necator_B
+    necator_C
+    necator_D
+    necessarius_E
+    necessarius_F
+    necessarius_G
+    necessarius_H
+    necessarius_I
+    necessarius_J
+    necessarius_K
+    nectariphila_A
+    negativus_A
+    negevensis_A
+    nelsonii_A
+    nelsonii_B
+    neoaurum_A
+    neocaledoniensis_A
+    neohaematopini_A
+    neohaematopini_B
+    neohaematopini_C
+    neohaematopini_D
+    neohaematopini_E
+    neohaematopini_F
+    neohaematopini_G
+    neptunia_A
+    neteri_A
+    neteri_B
+    neteri_C
+    nevei_A
     NG_camel27
     NG_camel37
     NG_camel40
@@ -5514,7 +10757,38 @@ const my @SPECIES => qw(
     NG_cow2
     NG_cow23
     NG_sheep50
+    niabensis_A
+    niabensis_B
+    niacini_A
+    niacini_B
+    niacini_C
+    niacini_D
+    niacini_E
+    niacini_F
+    niacini_G
+    nicotinovorans_A
+    nicotinovorans_B
+    nimipressuralis_A
     NIO_00081
+    nitratireducens_A
+    nitritireducens_A
+    nitroguajacolicus_A
+    nitroguajacolicus_B
+    nitroreducens_A
+    nitroreducens_B
+    nitroreducens_C
+    nivea_A
+    niveus_A
+    nivimaris_A
+    nivimaris_B
+    nivis_A
+    nodosa_A
+    norvegicus_A
+    norvegicus_B
+    nosocomialis_A
+    nova_A
+    nova_B
+    novellum_A
     NQ1K_cl_15_1d
     NQ1K_cl_15_2b
     NQ1K_cl_15_3b
@@ -5522,8 +10796,57 @@ const my @SPECIES => qw(
     NQ2B_9
     NSA_12
     NSA_23
+    nucleatum_D
+    nucleatum_J
+    numerosa_A
+    numerosa_B
     O_ANT70
     O_MVP5180
+    obscurus_A
+    obscurus_B
+    oceani_A
+    oceani_B
+    oceanisediminis_A
+    oceanisediminis_C
+    oceanisediminis_D
+    oculi_A
+    odensis_A
+    odontolytica_A
+    odontolytica_B
+    odontolytica_C
+    odontolytica_D
+    odontotermitis_A
+    odontotermitis_B
+    odontotermitis_C
+    odoratimimum_A
+    odoratum_A
+    odorimutans_A
+    odysseyi_A
+    okenii_A
+    okinawensis_A
+    okinawensis_B
+    okinawensis_C
+    okinawensis_D
+    olei_A
+    oleivorans_A
+    oleivorans_B
+    oleivorans_C
+    oleivorans_D
+    oleovorans_B
+    oligotropha_A
+    oligotropha_B
+    oligotrophus_A
+    olivaria_A
+    olivochromogenes_A
+    olleyae_A
+    omphalii_A
+    omphalii_B
+    oncorhynchi_A
+    onubensis_A
+    onubensis_B
+    onubensis_C
+    opacus_C
+    opacus_D
     ophiovirus_agro
     ophiovirus_brac
     ophiovirus_den
@@ -5536,8 +10859,104 @@ const my @SPECIES => qw(
     ophiovirus_sela
     ophiovirus_tri
     ophiovirus_visco
+    oralis_A
+    oralis_AA
+    oralis_AB
+    oralis_AC
+    oralis_AD
+    oralis_B
+    oralis_BA
+    oralis_BC
+    oralis_BD
+    oralis_BE
+    oralis_BF
+    oralis_BG
+    oralis_BH
+    oralis_BI
+    oralis_BJ
+    oralis_BK
+    oralis_BL
+    oralis_BM
+    oralis_BN
+    oralis_BO
+    oralis_BP
+    oralis_BQ
+    oralis_BR
+    oralis_BS
+    oralis_BT
+    oralis_BU
+    oralis_BV
+    oralis_BW
+    oralis_BX
+    oralis_BY
+    oralis_BZ
+    oralis_C
+    oralis_CA
+    oralis_CB
+    oralis_CC
+    oralis_CD
+    oralis_CE
+    oralis_CF
+    oralis_CG
+    oralis_CH
+    oralis_CI
+    oralis_CJ
+    oralis_CK
+    oralis_CL
+    oralis_CM
+    oralis_CN
+    oralis_CO
+    oralis_D
+    oralis_E
+    oralis_F
+    oralis_G
+    oralis_H
+    oralis_I
+    oralis_J
+    oralis_K
+    oralis_L
+    oralis_M
+    oralis_N
+    oralis_O
+    oralis_Q
+    oralis_R
+    oralis_S
+    oralis_T
+    oralis_U
+    oralis_V
+    oralis_W
+    oralis_X
+    oralis_Y
+    oralis_Z
+    oranimense_A
+    orientale_A
+    orientalis_A
+    orientalis_B
+    orientalis_D
+    oris_A
+    oris_B
+    oris_C
+    oris_D
+    oris_E
+    oryzae_A
+    oryzae_B
+    oryzae_C
+    oryzihabitans_B
+    oryzihabitans_D
+    oryzihabitans_E
+    oryzisoli_A
+    oryzisoli_B
+    oryzisoli_C
+    ostreistagni_A
     OSW_10
+    ottawaense_A
     OU_20
+    ovatus_A
+    ovipneumoniae_A
+    ovipneumoniae_B
+    ovipneumoniae_C
+    ovipneumoniae_D
+    ovipneumoniae_E
     OX_B
     OX_D
     OX_LEAF1
@@ -5553,6 +10972,14 @@ const my @SPECIES => qw(
     OX_V1
     OX_V2
     OX_Y
+    oxalaticus_A
+    oxydans_A
+    oxydans_B
+    oxydans_C
+    oxydans_D
+    oxyfera_C
+    oxyfera_D
+    oxytoca_C
     p5_H12
     p62_G06
     p8_G05
@@ -5560,6 +10987,13 @@ const my @SPECIES => qw(
     P_270_FSTHT
     P_278_FSTHT
     P_321_FSTCO
+    pAAV_pCAG_eGFP_2A_Halo_HAPLN1
+    pAAV_pCAG_mGFP_2A_Halo_HAPLN1
+    pAAV_pCAG_mGFP_2A_Halo_HAPLN1_del68AA
+    pAAV_pCAG_mGFP_2A_Halo_HAPLN1Z307-313A
+    pAAV_pSyn_eGFP_2A_Halo_HAPLN1
+    pAAV_pSyn_eGFP_HAPLN1
+    pAAV_pSyn_mGFP_2A_Halo_HAPLN1
     pAAVsc_gLDLR
     pAAVsc_gPCSK9
     pAAVsc_gSerpina1a
@@ -5568,9 +11002,122 @@ const my @SPECIES => qw(
     pAAVsc_gSerpina1d
     pAAVsc_gSerpina1e
     pAAVsc_LP1-Cre
+    pabuli_B
+    pacifica_A
+    pacificus_A
+    pacificus_B
+    pactum_A
     pAH05_PsodB-100-GFPova_RhyB2-10-BFP_mCh
+    paludicola_A
+    paludicola_B
+    paludicola_C
+    palustris_A
+    palustris_C
+    palustris_F
+    palustris_G
+    palustris_H
+    palustris_I
+    palustris_J
+    palustris_K
+    palustris_L
+    panacihumi_A
+    panaciterrae_A
+    panipatense_A
+    panis_A
+    panniformis_A
+    papyrosolvens_A
+    paradoxus_A
+    paradoxus_C
+    paradoxus_E
+    paradoxus_F
+    paradoxus_G
+    paradoxus_H
+    paradoxus_I
+    paradoxus_J
+    paradoxus_K
+    paradoxus_L
+    paradoxus_M
+    paradoxus_N
+    paradoxus_O
+    paraffinicum_A
+    parafulva_A
+    parafulva_B
+    parahaemolyticus_A
+    parahaemolyticus_B
+    parainfluenzae_A
+    parainfluenzae_AA
+    parainfluenzae_AB
+    parainfluenzae_AC
+    parainfluenzae_J
+    parainfluenzae_K
+    parainfluenzae_L
+    parainfluenzae_M
+    parainfluenzae_N
+    parainfluenzae_O
+    parainfluenzae_P
+    parainfluenzae_Q
+    parainfluenzae_R
+    parainfluenzae_S
+    parainfluenzae_T
+    parainfluenzae_U
+    parainfluenzae_V
+    parainfluenzae_W
+    parainfluenzae_X
+    parainfluenzae_Y
+    parainfluenzae_Z
+    paralvinellae_A
+    paraoxydans_B
+    paraoxydans_C
+    parapertussis_A
+    parapertussis_B
+    parapertussis_C
+    parapertussis_D
+    parapertussis_E
+    parapertussis_F
+    parapertussis_G
+    parapertussis_H
+    parapertussis_I
+    parapertussis_J
+    parapertussis_K
+    paraphrohaemolyticus_A
+    parasanguinis_A
+    parasanguinis_B
+    parasanguinis_C
+    parasanguinis_D
+    parasanguinis_F
+    parasanguinis_G
+    parasanguinis_H
+    parasanguinis_I
+    parasanguinis_J
+    parasanguinis_K
+    parasanguinis_L
+    parasanguinis_M
+    parasanguinis_N
+    parasanguinis_O
+    parasanguinis_P
+    parasanguinis_Q
+    parasanguinis_R
+    parasanguinis_S
+    parasanguinis_T
+    parasanguinis_U
+    parvula_A
+    parvula_B
+    parvula_C
+    parvum_A
+    parvum_B
     PAS_122122
+    pasadenensis_A
+    pascens_A
+    pascens_B
     pasteuri_A
+    pasteurianum_A
+    paucimobilis_A
+    pauculus_B
+    pauculus_C
+    pauculus_D
+    pauculus_E
+    paurometabola_A
+    pBADamp_npmC
     pBbB1c-CBGA_PlacUV5
     pBbB1c-CBGA_Ptrc
     pBbB2c-CBGA_J23100
@@ -5581,6 +11128,10 @@ const my @SPECIES => qw(
     pBbB2c-CBGA_pBAD
     pBbB5c-CBGA_PlacUV5
     pBbB5c-CBGA_Ptrc
+    pBSY3Z-DAS2-NcAA9C_nat
+    pCDFDuet-1-ectD_Ac
+    pCDFDuet-1-ectD_He
+    pCDFDuet-1-ectD_Ps
     pcDNA3.1_AU1_Shble10_FLAG_STOP_eGFP
     pcDNA3.1_AU1_Shble10mut_FLAG_STOP_eGFP
     pcDNA3.1_AU1_Shble11_FLAG_STOP_eGFP
@@ -5607,6 +11158,7 @@ const my @SPECIES => qw(
     pCH50_HG8_MG_reductase_KO
     pCH51_HG8_MG_synthase_KO
     pCH53_HG8_GlycerolDH_KO
+    pCH_pglB_SV
     pCOMB3xss_dsbA_Li005_LPS
     pComb3XXT_dSBA_Nb_C20
     PE_BacIPD31B
@@ -5631,6 +11183,11 @@ const my @SPECIES => qw(
     pEAQ-HT_OsD27-myc
     pEAQ-HT_OsD27deltaDIS-myc
     pEBO_BDBV-GP
+    pectinoschiza_A
+    pectinoschiza_B
+    pectinovorum_A
+    pectinovorum_B
+    pecuniae_A
     pEG01_128_pLux-TruD
     pEG02_192_RSTN-PapoA
     pEG02_194_RSTN-BamA
@@ -5754,12 +11311,35 @@ const my @SPECIES => qw(
     pEG07_172_pCym-HalM1
     pEG07_173_pCym-HalM2
     pEGY_EC_13655
+    pelagia_A
+    pelagica_B
+    pelagius_A
+    penaeicida_A
+    penaeicida_B
+    pennivorans_A
+    pentastirinorum_A
+    peptidovorans_A
     PEPV_San92
+    peregrinum_A
+    peregrinum_B
+    perflava_A
+    perflava_B
+    perfringens_A
+    periodonticum_B
+    periodonticum_D
+    permense_A
+    persicina_A
+    persicus_A
+    pestifer_A
     pET19b_DAD2cpGFP(G166)
     pET19b_DAD2cpGFP(G166)LSSmOrange
     pET19b_HisDAD2
     pET19b_HisDAD2cpGFP(G166)
     pET19b_ShHTL7cpGFP(L166)LSSmOrange
+    petrii_C
+    petrii_D
+    petrii_E
+    peucetius_A
     pFR015_pBAD_retron-RT_araC_bsaI
     pFR156_pBAD_CspRecT_MutL-E32K_tracRNA
     Pgap_Dual_Kana
@@ -5789,6 +11369,8 @@ const my @SPECIES => qw(
     PGPVO_Pi4
     Ph1_Loihi
     Ph2_Loihi
+    phaeobacteroides_A
+    phaeum_A
     phage_Deep-GF0-KM16-C193
     phage_Deep1-GF2-KM23-C739
     phage_EC_HWW_001
@@ -5804,24 +11386,79 @@ const my @SPECIES => qw(
     phage_MedDCM-OCT-S42-C7
     phage_MedDCM-OCT-S45-C18
     phage_MedDCM-OCT-S45-C4
-    phage_MedDCM-OCT-S46-C10
     phage_vB_CfrD_Devorator
     phage_vB_EcoD_Punny
+    phagocytophilum_A
+    phaseoli_A
     pHBA008_BASIS-components_rK_3-prime
     pHBA010_BASIS-components_pH_3-prime
     pHBA031_BASIS-LS-rK-BAC266-PH-3
     pHC_pUC_ori
+    phenacola_C
+    phenacola_D
+    phenanthrenivorans_B
+    phenazinium_A
+    phenazinium_B
+    phenolica_A
+    phenolica_B
+    phenoliruptrix_A
+    philomiragia_B
+    phocae_A
+    phocaeensis_A
+    phocaeensis_B
+    phoceense_A
+    phoeniceum_A
+    phosalacinea_A
+    phosalacinea_C
+    phosphatis_A
+    phosphatis_G
+    phosphorivorans_A
+    phosphorivorans_B
+    phosphorivorans_C
+    phosphorivorans_D
+    phototrophica_A
+    phyllosphaerae_B
+    phyllosphaerae_C
+    phytofermentans_A
     PI_GH1.1.B5
     PI_GH2.1.C2
+    pickettii_A
+    pickettii_B
+    pickettii_D
+    pictum_A
+    piezotolerans_A
     pig/P15_2/2004/SVN
     pig/sw-90_1/SWE/2010
     pig/sw-92_2/SWE/2010
     pig/Swebo_1/SWE
+    piger_A
     PII_GH2.2.C11
     Pili_CB159_MCB012_18_01
+    pilosicoli_A
+    pilosicoli_B
+    pinensis_A
+    pinensis_B
+    pinensis_C
+    pinensis_D
+    pinensis_E
+    pinensis_F
+    pinensis_G
     Pip1_Cr_FR_2014
     Pip2_Cr_FR_2014
     Pip3_M_FR_2014
+    pipientis_A
+    pipientis_B
+    pipientis_C
+    pipientis_D
+    piscatorii_A
+    piscicida_A
+    piscicida_B
+    piscicola_A
+    piscisalsi_A
+    piscolens_A
+    pittii_E
+    pittii_H
+    pittii_I
     pIVTRA_hADAR1
     pJM_CO_001
     pJM_CO_002
@@ -5846,14 +11483,63 @@ const my @SPECIES => qw(
     pKW20_CDFtet_pAraRedCas9_TracrRNA
     pKW3_MB1amp_tracr_Universal1
     pKW3_MB1amp_tracr_Universal2
+    plakortidis_A
+    planktonicus_A
+    plantarum_A
     pLC_pBBR1_ori
+    plebeius_A
+    plebeius_B
+    plebeius_C
     pLF118_Gm_pAraRed(rec)_TracrRNA
+    pLSU1/t35s(TMV)_mNG-CI(AGO198)_NosT
+    pLSU1/t35s(TMV)_mNG-I(AGO198)_NosT
+    pLSU1/t35s(TMV)_mNG-I(PIV198)_NosT
+    plymuthica_B
     PM58B_RA
+    pMETE_M
+    pMETE_N
     pMis1_1B
     pMU2105_M0795_tdk_KO
     pMVA_NR2
+    pneumoniae_A
+    pneumoniae_B
+    pneumoniae_C
+    pneumoniae_E
     pNL4-3_gag-pol(Delta1443-4553)_EGFP
+    poae_A
+    poae_C
+    polaris_A
+    polyisoprenivorans_A
+    polymorphus_A
+    polymyxa_B
+    polymyxa_C
+    polymyxa_D
+    polymyxa_E
+    polysaccharea_A
+    polysaccharea_B
+    polysaccharolyticus_A
+    polyspora_A
+    polyspora_B
+    polytropus_A
+    pontis_A
+    populi_A
+    populi_B
+    porcinum_A
+    porcinus_A
+    porphyrae_A
+    portucalensis_A
+    postgatei_A
+    postgatei_B
     pPGG_tRNAarI_sgRNA_Cas9
+    pratensis_A
+    prausnitzii_A
+    prausnitzii_D
+    prausnitzii_E
+    prausnitzii_F
+    prausnitzii_I
+    prausnitzii_J
+    prausnitzii_L
+    prausnitzii_M
     PREDICT_AdV-12
     PREDICT_AdV-13
     PREDICT_AdV-14
@@ -6311,6 +11997,38 @@ const my @SPECIES => qw(
     PREDICT_RbdV-33
     PREDICT_RbdV-34
     PREDICT_RbdV-35
+    pretoriensis_A
+    priestleyi_A
+    priestleyi_B
+    primitia_A
+    producens_A
+    profundi_A
+    profundicola_A
+    profundimaris_B
+    profundimaris_C
+    profundimaris_D
+    profundum_A
+    profundus_A
+    profusus_A
+    prolificus_A
+    proomii_A
+    proomii_B
+    propionica_A
+    propionica_B
+    propionica_C
+    propionicus_A
+    propionicus_B
+    propionicus_C
+    protaetiae_A
+    proteamaculans_D
+    proteamaculans_E
+    protegens_A
+    protegens_B
+    proteoclasticus_A
+    proteoclasticus_B
+    proteolyticum_A
+    proteolyticus_A
+    provencensis_A
     pRS315_AnSuc1:pep1
     pRS315_Ppdc_xyr1V821F:ace1
     pRS315_Pxyn1_ReCel3a:slp1
@@ -6321,8 +12039,32 @@ const my @SPECIES => qw(
     pRS425_OsD27
     pRS425_YPRCtau3-BTS1-CrtI-CrtYB
     pRS425_YPRCtau3-CrtE-CrtI-CrtYB
+    pRSFDuet-ectA-ectB(E407D)-ectC_Hv
+    pRSFDuet-ectABC_Hv
+    prydzensis_A
     pSC101_rK-sacB_selection-construct
     pSC101_sC-rpsL_selection-construct
+    pseudoflava_A
+    pseudolongum_C
+    pseudomultivorans_A
+    pseudomycoides_B
+    pseudomycoides_C
+    pseudonitzschiae_A
+    pseudopneumoniae_A
+    pseudopneumoniae_C
+    pseudopneumoniae_D
+    pseudopneumoniae_E
+    pseudopneumoniae_G
+    pseudopneumoniae_H
+    pseudopneumoniae_J
+    pseudopneumoniae_L
+    pseudopneumoniae_M
+    pseudopneumoniae_N
+    pseudopneumoniae_P
+    pseudopneumoniae_Q
+    pseudopneumoniae_R
+    pseudotrichonymphae_A
+    pseudovenezuelae_A
     pSGK_ChoD
     pSGK_P45_F3213
     pSP43_pKW3spec(rec)_SapI_insert_gRNA
@@ -6332,17 +12074,112 @@ const my @SPECIES => qw(
     pStA0.BBa_J23113
     pStA0.BBa_J23116
     pStA0.BBa_J23118
+    psychrerythraea_A
+    psychrerythraea_B
+    psychrerythraea_C
+    psychrerythraea_D
+    psychrophenolicus_A
+    psychrophila_A
+    psychrophila_B
+    psychrophilum_A
+    psychrophilum_B
+    psychrophilum_C
+    psychrophilum_D
+    psychrophilum_E
+    psychrophilum_F
+    psychrophilum_G
+    psychrophilum_H
+    psychrophilum_I
+    psychrophilum_J
+    psychrophilum_K
+    psychrophilum_L
+    psychrophilum_M
+    psychrophilum_N
+    psychrophilum_O
+    psychrophilum_P
+    psychrophilum_Q
+    psychrophilum_R
+    psychrophilum_S
+    psychrophilum_T
+    psychrotolerans_A
+    psychrotolerans_B
+    psychrotolerans_C
     pT7SA11NSP1_3xFL_UnaG
     Ptet_Dual_Spe
     pTLAB21_Bs314EBE_avrGf2
     pTTC_FusionRed_eGFP_3UTR
     pTU2-b_TrxD27-TrxCCD7-MBPCCD8
+    ptyseos_A
+    pullicaecorum_A
+    pullicaecorum_B
+    pullicaecorum_C
+    pullorum_B
+    pullorum_C
+    pulmonis_A
+    pumilus_G
+    pumilus_M
+    pumilus_N
+    pumilus_O
+    pumilus_P
+    punctiforme_A
+    pusillum_A
+    pusillum_B
+    pusillum_C
+    putida_A
+    putida_AA
+    putida_AB
+    putida_AC
+    putida_AD
+    putida_AE
+    putida_AF
+    putida_AG
+    putida_B
+    putida_E
+    putida_F
+    putida_H
+    putida_J
+    putida_K
+    putida_L
+    putida_N
+    putida_P
+    putida_Q
+    putida_R
+    putida_S
+    putida_T
+    putida_U
+    putida_V
+    putida_W
+    putida_X
+    putida_Y
+    putida_Z
+    putrefaciens_C
     pVMG0266_nanos-Cas9_Ice2
     pVMG0278_ebony_gRNA1
     pVMG0288_LbCpf1_D156R
     pVMG0295_Cquin_white-sgRNA-6_recoded
     pVMG0313_ebony_gRNA4
     pVMG090_White_gRNA2
+    pylori_A
+    pylori_BU
+    pylori_C
+    pylori_CG
+    pylori_CH
+    pylori_CI
+    pylori_CJ
+    pylori_CK
+    pylori_CL
+    pylori_CM
+    pylori_CN
+    pylori_CO
+    pylori_CP
+    pylori_CQ
+    pylori_CR
+    pylori_CS
+    pyogenes_A
+    pyrrocinia_B
+    pyrrocinia_C
+    pyrrocinia_D
+    pyrrocinia_E
     pYTNB01K_1G7
     pYTRW07K_0G5
     pYTRW08K_0C5
@@ -6378,6 +12215,13 @@ const my @SPECIES => qw(
     Q_sR_OV_036
     Q_sR_OV_041
     Q_sR_OV_042
+    qingshengii_A
+    qingshengii_B
+    queenslandensis_A
+    queenslandensis_B
+    quercina_D
+    quinivorans_A
+    quinlivanii_A
     R1_CDLR_pACNR-FL-POWV-DTV
     R1_CpG-H-M1_pACNR-FL-POWV-DTV
     R1_CpG-H-M2_pACNR-FL-POWV-DTV
@@ -6395,9 +12239,17 @@ const my @SPECIES => qw(
     Rabbit_CoV/La09_31/Ory_cun/ESP/2009
     Rabbit_CoV/La09_32/Ory_cun/ESP/2009
     Rabbit_CoV/La09_48/Ory_cun/ESP/2009
+    radicis_A
+    radingae_A
+    radiosa_A
+    radiosum_A
+    raffinosus_A
+    ramosus_A
+    ramulus_A
     RBC_A_MPN10_2
     RBC_B_mpn_10_2_GM
     RBG_16_50_20
+    RCC_150
     RCoV/Bor473/Rat_rat/MYS/2012
     RCoV/D_RMU10_1055/Myo_gla/GER/2010
     RCoV/D_RMU10_1087/Apo_fla/GER/2010
@@ -6440,6 +12292,34 @@ const my @SPECIES => qw(
     RCoV/SPB40/Liomys_spec/MEX/2011
     RCoV/TP3_22/Ban_ind/THA/2005
     RCoV/TP3_26/Rat_rat/THA/2005
+    resinovorans_A
+    resinovorans_C
+    resinovorans_D
+    resinovorum_A
+    restrictus_A
+    rettgeri_A
+    rettgeri_D
+    rettgeri_E
+    rettgeri_F
+    reuszeri_A
+    reuteri_D
+    reuteri_E
+    reuteri_F
+    reuteri_G
+    reuteri_H
+    rhinotracheale_A
+    rhinotracheale_B
+    rhizogenes_A
+    rhizogenes_C
+    rhizogenes_D
+    rhizomae_A
+    rhizophila_A
+    rhizophila_B
+    rhizophila_C
+    rhizophilum_A
+    rhizovicinus_B
+    rhodesiae_A
+    rhodesiae_B
     Ri1Ps_4703
     Ri1Ps_4749
     Ri1Pw_5477
@@ -6455,6 +12335,9 @@ const my @SPECIES => qw(
     Ri3Ps_5313
     Ri3Pw_6170
     Ri3Pw_6328
+    rigui_A
+    rimosus_A
+    rishiriensis_A
     RK10_tank
     RK10a_tank
     RK11_tank
@@ -6518,6 +12401,48 @@ const my @SPECIES => qw(
     RO_isolate_32
     RO_isolate_6
     RO_isolate_7
+    robiniae_A
+    robusta_A
+    rosea_A
+    roseus_A
+    roseus_B
+    rossiae_B
+    ruber_A
+    rubeus_A
+    rubi_A
+    rubra_A
+    rubra_B
+    rubra_D
+    rubra_E
+    rubra_F
+    rubra_G
+    rudis_A
+    ruminantium_A
+    ruminantium_B
+    ruminantium_C
+    ruminantium_D
+    ruminantium_E
+    ruminantium_G
+    ruminantium_I
+    ruminantium_J
+    ruminantium_K
+    ruminantium_L
+    ruminantium_M
+    ruminantium_N
+    ruminantium_O
+    ruminicola_A
+    ruminicola_B
+    ruminicola_C
+    ruminicola_D
+    ruminis_A
+    ruminis_B
+    ruminis_C
+    ruminis_D
+    ruminis_E
+    ruminis_F
+    rumoiensis_A
+    russellii_A
+    rwandensis_B
     S-RIM12_Np_14_0310
     S-RIM12_Np_15_0310
     S-RIM12_Np_22_1112
@@ -6566,17 +12491,70 @@ const my @SPECIES => qw(
     SA08_00821
     SA_07_02434
     SA_0800821
+    sabuli_A
+    sabulinigri_A
+    sacchari_B
+    sacchari_C
+    saccharolyticum_A
+    saccharolyticum_B
+    saccharolyticum_C
+    saccharophilus_A
+    saccharophilus_B
+    safensis_B
+    sakei_A
     SAL_1
     SAL_18
     SAL_7
+    salarius_A
+    salexigens_A
+    salicanalis_A
     salicis_cluster2
     salicis_cluster3
+    salina_A
+    salina_B
+    salina_C
+    saliphilus_A
+    salivarius_D
+    salmonicolor_A
+    sandarakina_A
+    sandarakinum_A
+    sanguineus_A
+    sanguinis_A
+    sanguinis_B
+    sanguinis_C
+    sanguinis_D
+    sanguinis_E
+    sanguinis_F
+    sanguinis_G
+    sanguinis_H
+    sanguinis_I
+    sanguinis_J
+    sanguinis_K
+    sanguinis_L
+    sanguinis_M
+    sanguinis_N
+    sanguinis_O
+    sanguinis_P
+    sanguinis_Q
+    sanguinis_R
+    sanguinis_S
+    sanguinis_T
+    sanguinis_U
+    sanguinis_V
+    sanxanigenens_A
+    sanyensis_A
+    saphenum_A
+    sartagoforme_A
+    sartagoforme_B
+    satyanarayanai_B
     SAV/Human/BRA/IAL01_42160/2010
     SAV/Human/BRA/IAL03_21214/2010
     SAV/Human/BRA/IAL03_21218/2010
     SAV/Human/BRA/IAL03_21220/2010
     SAV/Human/BRA/IAL11_10818/2010
     SAV/Human/BRA/IAL11_9928/2010
+    saxobsidens_A
+    saxobsidens_B
     SB_Bac1
     SB_Bac10
     SB_Bac11
@@ -6589,12 +12567,25 @@ const my @SPECIES => qw(
     SBN1_DGR
     SBOS_U
     SC_4_H6H8_2017
+    scabrispora_A
+    schaalii_A
+    schaalii_B
+    schaalii_C
+    schaedleri_A
+    schinkii_B
+    schleiferi_A
+    schmidteae_A
+    schmidteae_B
     Schreyahn_AOB_Sali_Kultur_19
     Schreyahn_AOB_Sali_Kultur_8
     Schreyahn_AOB_SSU_Aster_6
     Schreyahn_AOB_SSU_Aster_8
     Schreyahn_K10.Sali
     Schreyahn_K9.Sali
+    schumannianae_A
+    sciuri_A
+    sclerotialus_B
+    scrofulaceum_C
     SCS_04Z1_1
     SCS_04Z1_26_2
     SCS_04Z1_29
@@ -6642,11 +12633,63 @@ const my @SPECIES => qw(
     Se3Ps_2679
     Se3Ps_2758
     Se3Pw_3619
+    seckii_A
+    sediminis_A
+    sediminum_A
+    segnicrescens_A
+    segnis_A
+    segnis_B
+    segnis_C
+    segnis_D
+    sejongensis_A
+    selenatarsenatis_A
+    selenatireducens_A
+    selenitireducens_A
+    senegalense_A
+    senegalensis_A
+    senegalensis_B
+    senioris_A
+    seoulensis_A
     SH_25-50_Exo70_native
+    shenzhenensis_A
+    shigense_A
+    shinshuensis_A
+    shinshuensis_B
+    shioyasakiensis_A
+    shioyasakiensis_B
+    showae_A
+    showae_B
+    showae_D
+    showae_E
+    sibiricum_A
+    sicca_A
+    sicca_B
+    sicca_C
+    sicca_E
+    siccitolerans_A
+    sifiae_A
+    silvestris_A
+    simiae_A
+    simplex_A
+    simplex_B
+    simplex_D
+    simplex_E
+    simulans_A
+    simulans_B
+    sinaloensis_C
+    sinaloensis_D
+    sinense_A
+    sinense_B
+    sinense_C
+    singularis_A
+    singularis_B
+    sinuspersici_A
+    sinuspersici_B
     SM23_31
     SM23_57
     SM_12
     SM_3
+    smithii_A
     SNISO_A2
     SNISO_B12
     SNISO_C1
@@ -6672,12 +12715,53 @@ const my @SPECIES => qw(
     So3Pw_1027
     So3Pw_2867
     SOB_395
+    sobria_A
+    sojae_A
+    soli_A
+    somerae_A
+    sonorensis_A
+    sordidicola_A
+    sordidicola_C
     sp.48_UnivF-1183
+    sp.CRBC_G2051
+    sp.CRBC_G2061
+    sp.CRBC_G2073
+    sp.CRBC_G2107
+    sp.CRBC_G2174
+    sp.CRBC_G2230
+    sp.CRBC_G2377
+    sp.CRBC_G2430
+    sp.CRBC_G2451
     sp.R0101_021
     sp_1_GP
     sp_2_GP
     sp_AL
+    spadix_A
+    spanius_B
+    spanius_C
+    spanius_D
+    spanius_E
+    spartinae_A
     Spd2B_4
+    sphaericus_A
+    sphaericus_B
+    sphaericus_D
+    sphaericus_E
+    sphaeroides_A
+    sphenoides_A
+    spinoverrucosus_A
+    spiritivorum_A
+    spiroformis_A
+    splendidus_F
+    splendidus_I
+    splendidus_J
+    splendidus_K
+    spongiarum_B
+    spongiarum_C
+    spongiarum_E
+    spongiarum_F
+    sporothermodurans_A
+    sputorum_B
     SRC_DS3
     SRC_DS3a
     SRC_DSE1
@@ -6691,8 +12775,161 @@ const my @SPECIES => qw(
     SRU_1
     SRU_17
     SRU_35
+    stadtmanae_A
+    stadtmanae_B
+    stadtmanae_C
+    staleyi_A
+    staleyi_B
+    staleyi_C
+    stanieri_B
+    stearothermophilus_A
+    stenotrophus_A
+    stenotrophus_B
+    stenotrophus_C
+    stenotrophus_D
+    stercorihominis_A
+    stercoris_A
+    stetteri_A
+    steynii_A
+    stimsonii_A
+    stipitatus_A
+    stratosphericus_B
+    stuttgartiensis_A
+    stutzeri_A
+    stutzeri_AA
+    stutzeri_AB
+    stutzeri_AC
+    stutzeri_AD
+    stutzeri_AE
+    stutzeri_AF
+    stutzeri_AH
+    stutzeri_AI
+    stutzeri_AK
+    stutzeri_AN
+    stutzeri_AO
+    stutzeri_AP
+    stutzeri_AQ
+    stutzeri_AR
+    stutzeri_B
+    stutzeri_C
+    stutzeri_D
+    stutzeri_E
+    stutzeri_G
+    stutzeri_H
+    stutzeri_N
+    stutzeri_O
+    stutzeri_P
+    stutzeri_Q
+    stutzeri_R
+    stutzeri_S
+    stutzeri_T
+    stutzeri_U
+    subflava_A
+    subflava_B
+    subflava_D
+    subflava_E
+    subglaciescola_A
+    subrutilus_A
+    subsalsa_A
+    subterranea_A
+    subterraneum_A
+    subterraneum_E
+    subterraneus_B
+    subterraneus_C
+    subtilis_G
+    subvibrioides_B
+    subvibrioides_C
+    subvibrioides_D
+    succinatutens_A
+    succinatutens_B
+    succinicans_A
+    succinicivorans_A
+    succinogenes_A
+    succinogenes_B
+    succinogenes_C
+    succinogenes_D
+    succinogenes_E
+    succinogenes_F
+    succinogenes_G
+    succinogenes_H
+    succinogenes_I
+    succinogenes_J
+    succinogenes_K
+    succinogenes_L
+    succinogenes_M
+    succinogenes_N
+    succinogenes_O
+    succinogenes_P
+    succinogenes_Q
+    suis_A
+    suis_AA
+    suis_AB
+    suis_AC
+    suis_AD
+    suis_AE
+    suis_AF
+    suis_AG
+    suis_AH
+    suis_B
+    suis_F
+    suis_I
+    suis_L
+    suis_O
+    suis_P
+    suis_R
+    suis_S
+    suis_T
+    suis_U
+    suis_V
+    suis_W
+    suis_X
+    suis_Y
+    suis_Z
+    sukumoe_B
+    sulfexigens_A
+    sulfexigens_B
+    sulfidiphilus_A
+    sulfonivorans_A
+    sulfonivorans_B
     SUND_HBM1
+    suwonensis_A
+    suwonensis_B
+    suwonensis_C
     SV72_D
+    symbiosa_A
+    symbiotica_A
+    symbiotica_D
+    symbiotica_E
+    symbiotica_F
+    synxantha_A
+    synxantha_B
+    syringae_A
+    syringae_F
+    syringae_J
+    syringae_M
+    syringae_P
+    syringae_Q
+    syringae_R
+    syringae_S
+    syringae_T
+    taeanensis_A
+    taeanensis_B
+    taichungensis_A
+    taiwanensis_B
+    taiwanensis_C
+    taiwanensis_D
+    tanakaei_A
+    tanakaei_B
+    tanakaei_C
+    tannerae_A
+    tannerae_B
+    tasmaniensis_A
+    tataouinensis_A
+    tataouinensis_B
+    tataouinensis_C
+    taxi_A
+    taxi_B
+    taylorii_A
     TC1_29
     TC1_4
     TC2_12
@@ -6701,17 +12938,133 @@ const my @SPECIES => qw(
     TC3_23_MR-2014
     TC3_29
     TC3_7_MR-2014
+    tenebrarum_A
+    tengchongensis_A
+    tepidamans_A
+    tepidum_A
+    termitidis_A
+    terrae_A
+    terrae_B
+    terrae_C
     terrain_en_construction
+    tertiaricarbonis_A
+    tertiaricarbonis_B
+    tessellarius_A
+    testaceum_A
+    testaceum_B
+    testaceum_C
+    testaceum_E
+    testaceum_F
+    testaceum_G
+    testaceum_H
+    testosteroni_B
+    testosteroni_C
+    testosteroni_D
+    testosteroni_E
+    testosteroni_F
+    testosteroni_G
+    testosteroni_H
     TF4_16
     TF4_17
     TF4_17_MR-2014
     TF5_22_MR-2014
+    thalassa_A
+    thalpophilum_A
+    thalpophilum_B
+    thaueri_A
+    thaueri_B
+    thaueri_C
+    thermautotrophicus_A
+    thermoacetica_A
+    thermoglucosidasius_A
+    thermohalophila_A
+    thermoleovorans_A
+    thermophila_A
+    thermophilum_A
+    thermophilus_C
+    thermosulfidooxidans_A
+    thermotolerans_A
+    thetaiotaomicron_A
+    thiaminolyticus_A
+    thiocyanaticus_A
+    thiodismutans_A
+    thiooxidans_A
+    thiooxydans_A
+    thiotaurini_A
+    thuringiensis_AA
+    thuringiensis_AB
+    thuringiensis_K
+    thuringiensis_N
+    thuringiensis_S
+    tibiigranuli_A
+    tiedjei_A
+    timonense_A
+    timonensis_A
+    timorensis_A
     tombus-like_virus
+    towneri_A
+    toxinivorans_A
     TPMV_P-EGFP
     TPMV_P-EGFP_H-His6
     TPMV_P-EGFP_HaCD20
     TPMV_P-EGFP_HaEGFR
+    trachydisci_A
+    translucens_C
+    transvalensis_A
+    trapanicum_A
+    triatomae_A
+    tribocorum_A
+    tribocorum_B
+    trichothecenolyticum_B
+    triculaminicus_A
+    tropica_A
+    tropici_A
+    tropici_B
+    tropici_C
+    tropiciagri_A
+    tropiciagri_B
     TsCyV-1_JP-NUBS-2014
+    tsukubensis_B
+    tsuruhatensis_A
+    tsutsugamushi_C
+    tuberculostearicum_C
+    tuberculostearicum_D
+    tuberculostearicum_E
+    tubiashii_A
+    tubiashii_B
+    tuirus_A
+    tumefaciens_B
+    tumefaciens_C
+    tumefaciens_I
+    tundrae_A
+    tundripaludum_A
+    turgidiscabies_A
+    turicensis_A
+    turicensis_B
+    turnerae_B
+    tusciae_A
+    typhi_A
+    typhi_B
+    typicum_A
+    tyrfis_A
+    tyrfis_B
+    tyrobutyricum_A
+    uberis_A
+    ubique_A
+    ubique_B
+    ubique_D
+    ubique_E
+    ubique_F
+    ubique_G
+    ubique_J
+    ubique_K
+    ubique_N
+    ubique_O
+    ubique_P
+    ubique_Q
+    ubique_S
+    ubique_T
+    ubonensis_B
     UBP10_UBA1149
     UBP10_UBA1160
     UBP11_UBA4055
@@ -6761,7 +13114,64 @@ const my @SPECIES => qw(
     UBP9_UBA6438
     Udayana_MDPVA
     Udayana_MDPVB
+    uenonis_A
     UK_ancient_CT89
+    ulcerans_A
+    uli_A
+    uli_B
+    uliginosa_B
+    ulvae_A
+    ulvanivorans_A
+    umbonata_A
+    umbrinus_A
+    undulata_A
+    universalis_A
+    universalis_B
+    uraniireducens_A
+    urativorans_A
+    urativorans_B
+    urativorans_C
+    ureae_A
+    ureae_B
+    ureae_C
+    ureae_D
+    urealyticum_A
+    ureilytica_A
+    ureisolvens_A
+    ureolyticus_A
+    urinae_A
+    urinae_B
+    urinae_C
+    urinae_D
+    urinae_E
+    usitatum_A
+    utahensis_B
+    vadi_A
+    vagans_C
+    vaginale_A
+    vaginale_B
+    vaginale_C
+    vaginale_D
+    vaginale_E
+    vaginale_F
+    vaginale_H
+    vaginale_I
+    vaginalis_B
+    vaginalis_C
+    vaginatus_A
+    vaginatus_B
+    valericigenes_A
+    valericigenes_B
+    vanbaalenii_A
+    vancanneytii_A
+    variabilis_A
+    variabilis_B
+    variabilis_C
+    varians_A
+    varians_B
+    varium_A
+    varium_C
+    vaviloviae_B
     vB_EcoM-p111
     vB_KsaM-C1
     vB_LmoS_P7
@@ -6769,9 +13179,71 @@ const my @SPECIES => qw(
     vB_RanS_PJN03
     vB_SabS_Sds2
     vB_SauM_SDQ
+    venezuelae_B
+    venezuelae_C
+    venezuelae_D
+    venezuelae_E
+    venezuelae_F
+    venezuelae_G
+    ventosae_B
+    ventosae_C
+    vermicola_A
+    veronii_A
+    versatilis_A
+    versatilis_B
+    versiforme_A
+    vesicularis_B
+    vesicularis_C
+    vesicularis_D
+    vesicularis_E
+    vestfoldensis_A
+    vestfoldensis_B
+    vibrioides_A
+    vibrioides_C
+    vibrioides_D
+    vibrioides_E
+    vicinus_A
+    vietnamensis_A
+    vietnamensis_B
+    violaceoruber_B
+    violaceum_A
+    violaceum_B
+    violaceus_A
+    violaceusniger_A
+    violascens_A
+    virginiae_A
+    viridans_A
+    viridans_B
+    viridans_C
+    viridarii_A
+    viridescens_A
+    viridiflava_C
+    viridiflava_D
+    viridochromogenes_A
+    viridochromogenes_B
+    viscerum_A
+    vitaeruminis_A
+    vitis_B
+    vitis_D
+    vitis_E
+    vitis_F
+    vitis_G
+    vitis_H
     Vk*MYCDLoxP_MYC_FULL_LENGTH_ONLY
     Vk*MYCDLoxP_MYCS
+    volcania_A
+    voltae_C
+    voltae_D
+    volucris_A
+    Vph_2K
     VPXV_CA85
+    vulcani_A
+    vulcania_A
+    vulcanus_A
+    vulgaris_A
+    vulgaris_B
+    vulgaris_C
+    vulnificus_B
     W13C10_B
     W13C11_B
     W13C12_B
@@ -6841,6 +13313,13 @@ const my @SPECIES => qw(
     W15S84a_F
     W15S84b_F
     W15S87a_F
+    wadei_A
+    wadsworthensis_A
+    wallacei_A
+    wallacei_B
+    walsbyi_A
+    walsbyi_B
+    warneri_A
     wastewater/GI.1/GP_Dec11_1395_1/2011/ZAF
     wastewater/GI.1/GP_Oct11_1145_3/2011/ZAF
     wastewater/GI.1/MP_Aug10_992/2010/ZAF
@@ -6932,7 +13411,17 @@ const my @SPECIES => qw(
     water/LP_Jan12_7/ZAF
     water/LP_Mar12_7/ZAF
     water/LP_Mar12_PVT/ZAF
+    wautersii_A
     WBUT_C01
+    weilii_A
+    wenxiniae_A
+    wenyonii_C
+    wesenbergii_A
+    wexlerae_B
+    wexlerae_C
+    wieringae_A
+    willei_A
+    winogradskyi_A
     WM06i_A10G
     WM06i_A11B
     WM06i_A1D
@@ -6943,7 +13432,13 @@ const my @SPECIES => qw(
     WM06i_B6A
     WM06i_B8F
     WM06i_B9F
+    woesei_A
+    woluwensis_A
+    woodii_A
+    woodruffii_A
+    woosongensis_A
     WOR_2
+    wratislaviensis_A
     WS01_1416
     WS01_480
     WS06_481
@@ -6953,9 +13448,35 @@ const my @SPECIES => qw(
     WS13_484
     WS18_483
     WS19_479
+    wynnii_A
     XAN_1
     XAN_14
     XAN_8
+    xanthomarina_A
+    xanthopallidus_A
+    xanthophaeus_A
+    xanthus_A
+    xanthus_B
+    xiamenensis_A
+    xiamenensis_B
+    xinganensis_A
+    xinjiangensis_A
+    xylanexedens_A
+    xylanexedens_B
+    xylanexedens_C
+    xylanilyticus_A
+    xylanivorans_A
+    xylanolytica_B
+    xylanolytica_C
+    xylanophilus_A
+    xyli_A
+    xyli_C
+    xylinus_C
+    xylinus_D
+    xylinus_E
+    xylosoxidans_B
+    xylosoxidans_C
+    xylosus_B
     XZ110_XZ_CHN_2017
     XZ111_XZ_CHN_2017
     XZ112_XZ_CHN_2017
@@ -6967,8 +13488,25 @@ const my @SPECIES => qw(
     XZ99_XZ_CHN_2017
     Y2H-GFP_URA3
     Y4_579_1
+    yabuuchiae_A
+    yamanorum_A
+    yanchengensis_A
+    yannicii_A
+    yanoikuyae_A
+    yeojuensis_A
+    yomogidense_A
     YS1-2_2434
     YS1-2_2437
+    yuanmingense_A
+    zalophi_A
+    zeae_A
+    zhangzhouensis_A
+    zhoushanensis_A
+    zoogloeoides_A
+    zoogloeoides_B
+    zoogloeoides_C
+    zucineum_B
+    zundukense_A
     );
 
 my %is_hyphenated  = map { $_ => 1 } @GENERA;
@@ -7409,7 +13947,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.242020
+version 0.243430
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Ali::Stash;
 # ABSTRACT: Thin wrapper for an indexed Ali read from disk
-$Bio::MUST::Core::Ali::Stash::VERSION = '0.242020';
+$Bio::MUST::Core::Ali::Stash::VERSION = '0.243430';
 use Moose;
 use namespace::autoclean;
 
@@ -23,7 +23,7 @@ has 'seqs' => (
     isa      => 'Bio::MUST::Core::Ali',
     required => 1,
     handles  => [
-        qw(count_comments all_comments get_comment
+        qw(filename count_comments all_comments get_comment
             guessing all_seq_ids has_uniq_ids is_protein is_aligned
             get_seq first_seq all_seqs filter_seqs count_seqs
             gapmiss_regex
@@ -99,7 +99,7 @@ Bio::MUST::Core::Ali::Stash - Thin wrapper for an indexed Ali read from disk
 
 =head1 VERSION
 
-version 0.242020
+version 0.243430
 
 =head1 SYNOPSIS
 

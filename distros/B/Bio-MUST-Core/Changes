@@ -1,3 +1,16 @@
+0.243430  2024-12-08 23:10:32+01:00 Europe/Brussels
+    - Additions
+      - binaries: new script tseq2ali.pl (for TinySeq files)
+      - binaries: idealize.pl and ali2phylip.pl are now codon-compatible
+      - Ali: new method load_tinyseq to import NCBI TinySeq XML files
+      - Seq: now silently converts '!' (used as a frameshift symbol) to 'x'
+      - SeqMask: new method codon_mask to allow all masks to preserve codons
+    - Changes
+      - Taxonomy: now silently handles GCF numbers as GCA numbers to spare space
+    - Fixes
+      - Ali::Stash: fixed missing method filename
+      - Taxonomy: restored support for GTDB setup (following remote changes)
+
 0.242020  2024-07-20 12:23:52+02:00 Europe/Rome
     - Additions
       - Filterable: new role to generalize filtering of SeqId objects beyond taxonomy

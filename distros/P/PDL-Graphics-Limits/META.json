@@ -27,7 +27,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "7.14"
+            "ExtUtils::MakeMaker" : "7.14",
+            "PDL" : "2.095"
          }
       },
       "runtime" : {
@@ -59,6 +60,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

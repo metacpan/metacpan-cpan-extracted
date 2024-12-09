@@ -75,9 +75,9 @@ int32_t SPVM__Net__SSLeay__PKCS12__parse(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   EVP_PKEY* pkey_tmp = NULL;
   X509* cert_tmp = NULL;
-  STACK_OF(X509)* stack_of_cas_tmp = NULL;
+  STACK_OF(X509)* cas_stack = NULL;
   
-  int32_t status = PKCS12_parse(self, pass, &pkey_tmp, &cert_tmp, &stack_of_cas_tmp);
+  int32_t status = PKCS12_parse(self, pass, &pkey_tmp, &cert_tmp, &cas_stack);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -120,28 +120,22 @@ int32_t SPVM__Net__SSLeay__PKCS12__parse(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   env->set_elem_object(env, stack, obj_cert_ref, 0, obj_cert);
   
-  void* obj_cas = NULL;
   if (obj_cas_ref) {
-    if (stack_of_cas_tmp) {
-      int32_t length = sk_X509_num(stack_of_cas_tmp);
-      obj_cas = env->new_object_array_by_name(env, stack, "Net::SSLeay::X509", length, &error_id, __func__, FILE_NAME, __LINE__);
+    int32_t length = cas_stack ? sk_X509_num(cas_stack) : 0;
+    void* obj_cas = env->new_object_array_by_name(env, stack, "Net::SSLeay::X509", length, &error_id, __func__, FILE_NAME, __LINE__);
+    
+    for (int32_t i = 0; i < length; i++) {
+      X509* ca = sk_X509_value(cas_stack, i);
+      X509_up_ref(ca);
       
-      for (int32_t i = 0; i < length; i++) {
-        X509* ca = sk_X509_value(stack_of_cas_tmp, i);
-        X509_up_ref(ca);
-        
-        void* obj_address_ca = env->new_pointer_object_by_name(env, stack, "Address", ca, &error_id, __func__, FILE_NAME, __LINE__);
-        if (error_id) { return error_id; }
-        stack[0].oval = obj_address_ca;
-        env->call_class_method_by_name(env, stack, "Net::SSLeay::X509", "new_with_pointer", 1, &error_id, __func__, FILE_NAME, __LINE__);
-        if (error_id) { return error_id; }
-        void* obj_ca = stack[0].oval;
-        
-        env->set_elem_object(env, stack, obj_cas, i, obj_ca);
-      }
-    }
-    else {
-      obj_cas = env->new_object_array_by_name(env, stack, "Net::SSLeay::X509", 0, &error_id, __func__, FILE_NAME, __LINE__);
+      void* obj_address_ca = env->new_pointer_object_by_name(env, stack, "Address", ca, &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      stack[0].oval = obj_address_ca;
+      env->call_class_method_by_name(env, stack, "Net::SSLeay::X509", "new_with_pointer", 1, &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      void* obj_ca = stack[0].oval;
+      
+      env->set_elem_object(env, stack, obj_cas, i, obj_ca);
     }
     
     env->set_elem_object(env, stack, obj_cas_ref, 0, obj_cas);

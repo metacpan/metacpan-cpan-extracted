@@ -12,9 +12,9 @@ use CPAN::Audit::Discover;
 use CPAN::Audit::Filter;
 use CPAN::Audit::Version;
 use CPAN::Audit::Query;
-use CPAN::Audit::DB;
+use CPANSA::DB;
 
-our $VERSION = '20240910.001';
+our $VERSION = '20241208.001';
 
 sub new {
 	my( $class, %params ) = @_;
@@ -196,7 +196,7 @@ sub command_installed {
 		  || $self->{db}->{module2dist}->{ $dep->{module} };
 		next unless $dist;
 
-		$dists->{ $dep->{dist} } = $dep->{version};
+		$dists->{ $dep->{dist} } = '==' . $dep->{version};
 	}
 
 	return;

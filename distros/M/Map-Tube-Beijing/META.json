@@ -42,6 +42,7 @@
       },
       "test" : {
          "recommends" : {
+            "Graph" : "0",
             "Test::Map::Tube" : "0",
             "XML::Twig" : "0"
          },
@@ -53,7 +54,7 @@
    "provides" : {
       "Map::Tube::Beijing" : {
          "file" : "lib/Map/Tube/Beijing.pm",
-         "version" : "v0.12.2"
+         "version" : "v0.12.3"
       }
    },
    "release_status" : "stable",
@@ -62,6 +63,6 @@
          "mailto" : "bug-Map-Tube-Beijing@rt.cpan.org"
       }
    },
-   "version" : "v0.12.2",
+   "version" : "v0.12.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

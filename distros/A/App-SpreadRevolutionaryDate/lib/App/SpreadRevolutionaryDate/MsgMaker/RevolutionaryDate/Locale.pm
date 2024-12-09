@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019-2023 by Gérald Sédrati.
+# This software is Copyright (c) 2019-2024 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::VERSION = '0.33';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::VERSION = '0.35';
 # ABSTRACT: Role providing interface for localization of revolutionary date built by L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>.
 
 use Moose::Role;
@@ -116,7 +116,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale - Role providi
 
 =head1 VERSION
 
-version 0.33
+version 0.35
 
 =head1 DESCRIPTION
 
@@ -243,7 +243,11 @@ Returns the wikipedia entry (the end of the wikipedia url) corresponding to the 
 
 =item L<App::SpreadRevolutionaryDate::Config>
 
+=item L<App::SpreadRevolutionaryDate::BlueskyLite>
+
 =item L<App::SpreadRevolutionaryDate::Target>
+
+=item L<App::SpreadRevolutionaryDate::Target::Bluesky>
 
 =item L<App::SpreadRevolutionaryDate::Target::Twitter>
 
@@ -281,7 +285,7 @@ Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2023 by Gérald Sédrati.
+This software is Copyright (c) 2019-2024 by Gérald Sédrati.
 
 This is free software, licensed under:
 

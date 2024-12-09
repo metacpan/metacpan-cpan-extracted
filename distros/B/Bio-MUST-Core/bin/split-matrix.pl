@@ -64,7 +64,7 @@ split-matrix.pl - Extract individual gene ALIs from a SCaFoS supermatrix
 
 =head1 VERSION
 
-version 0.242020
+version 0.243430
 
 =head1 USAGE
 

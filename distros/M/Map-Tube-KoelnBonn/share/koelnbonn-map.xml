@@ -62,7 +62,7 @@
     <station id="s271" name="Beuel Bf" line="62:18,65:15" link="s270,s272" />
     <station id="s269" name="Beuel Rathaus" line="62:16,65:13" link="s268,s270" />
     <station id="s054" name="Bf Deutz / LANXESS Arena" line="3:20,4:17" link="s053,s055" other_link="bfdeutz:s020" />
-    <station id="s158" name="Bf Mülheim" line="13:4,18:42" link="s059,s068" />
+    <station id="s158" name="Bf Mülheim" line="13:4,18:42,S11:5,S6:8" link="s059,s068,s309,s311,s321" />
     <station id="s342" name="Blankenberg" line="S12:8,S19:8" link="s341,s343" />
     <station id="s303" name="Blumenberg" line="S11:16,S6:19" link="s302,s304" />
     <station id="s039" name="Bocklemünd" line="3:4,4:1" link="s038,s040" />
@@ -82,7 +82,7 @@
     <station id="s233" name="Brühl-Schwadorf" line="18:14" link="s232,s234" />
     <station id="s228" name="Brühl-Vochem" line="18:19" link="s227,s229" />
     <station id="s244" name="Brühler Str." line="18:3,68:7" link="s202,s243" />
-    <station id="s309" name="Buchforst" line="S11:6,S6:9" link="s401,s310" />
+    <station id="s309" name="Buchforst" line="S11:6,S6:9" link="s401,s158" />
     <station id="s057" name="Buchforst Waldecker Str." line="3:23" link="s056,s058" />
     <station id="s058" name="Buchheim Frankfurter Str." line="3:24" link="s057,s059" />
     <station id="s059" name="Buchheim Herler Str." line="13:3,18:43,3:25" link="s058,s060,s158" />
@@ -100,7 +100,7 @@
     <station id="s064" name="Dellbrück Mauspfad" line="18:48,3:30" link="s063,s065" />
     <station id="s237" name="Dersdorf" line="18:10" link="s236,s238" />
     <station id="s401" name="Köln Messe / Deutz" line="S11:7,S12:19,S13:13,S19:18,S6:10" link="s400,s309,s333" other_link="bfdeutz:s020" />
-    <station id="s020" name="Bf Deutz / Messe" line="1:18,9:12" link="s019,s021" other_link="bfdeutz:s401|s054" />
+    <station id="s020" name="Bf Deutz / Messe" line="1:18,9:12" link="s019,s021" other_link="bfdeutz:s401,bfdeutz:s054" />
     <station id="s021" name="Deutz Technische Hochschule" line="1:17,9:11" link="s020,s022" />
     <station id="s019" name="Deutzer Freiheit" line="1:19,7:19,9:13" link="s018,s020,s103" />
     <station id="s319" name="Dormagen" line="S11:19" link="s318,s320" />
@@ -176,7 +176,7 @@
     <station id="s208" name="Heussallee / Museumsmeile" line="16:9,63:9,66:18,67:9,68:14" link="s207,s209" />
     <station id="s246" name="Hindenburgplatz" line="61:22,62:2" link="s245,s247" />
     <station id="s212" name="Hochkreuz / Deutsches Museum Bonn" line="16:5,63:5,67:5" link="s211,s213" />
-    <station id="s321" name="Holweide" line="S11:4" link="s310,s322" />
+    <station id="s321" name="Holweide" line="S11:4" link="s158,s322" />
     <station id="s061" name="Holweide Vischeringstr." line="13:1,18:45,3:27" link="s060,s062" />
     <station id="s301" name="Honnef" line="66:1" link="s300" />
     <station id="s329" name="Horrem" line="S12:27,S13:5,S19:26" link="s328,s330" />
@@ -207,7 +207,7 @@
     <station id="s176" name="Köln Chlodwigplatz" line="15:22,16:36,17:3" link="s175,s177,s404,s405" />
     <station id="s404" name="Bonner Wall" line="17:4" link="s183,s176" />
     <station id="s405" name="Kartäuserhof" line="17:2" link="s176,s052" />
-    <station id="s400" name="Köln Hbf" line="S11:8,S12:20,S13:12,S19:19,S6:11" link="s401,s148" other_link="hbfkoeln:s182|s090" />
+    <station id="s400" name="Köln Hbf" line="S11:8,S12:20,S13:12,S19:19,S6:11" link="s401,s148" other_link="hbfkoeln:s182,hbfkoeln:s090" />
     <station id="s090" name="Dom / Hbf" line="16:43,18:34,5:3" link="s050,s089,s091,s182" other_link="hbfkoeln:s400" />
     <station id="s088" name="Köln West" line="5:6" link="s049,s087" />
     <station id="s034" name="Kölner Str." line="1:3" link="s033,s035" />
@@ -263,7 +263,6 @@
     <station id="s118" name="Mommsenstr." line="9:23" link="s117,s119" />
     <station id="s207" name="Museum Koenig" line="16:10,63:10,66:19,67:10,68:13" link="s206,s208" />
     <station id="s093" name="Mühlengasse" line="7:2" link="s092,s094" />
-    <station id="s310" name="Bf Mülheim" line="S11:5,S6:8" link="s309,s311,s321" />
     <station id="s071" name="Mülheim Berliner Str." line="4:24" link="s070,s072" />
     <station id="s068" name="Mülheim Wiener Platz" line="13:5,18:41,4:21" link="s067,s069,s158,s159" />
     <station id="s332" name="Müngersdorf / Technologiepark" line="S12:23,S13:9,S19:22" link="s045,s331" />
@@ -345,7 +344,7 @@
     <station id="s077" name="Sparkasse Am Butzweilerhof" line="5:17" link="s078" />
     <station id="s338" name="Spich" line="S12:13,S13:18,S19:13" link="s337,s339" />
     <station id="s256" name="Stadthaus" line="61:11,62:13,66:24,67:15" link="s203,s255,s257,s267" />
-    <station id="s311" name="Stammheim" line="S6:7" link="s310,s312" />
+    <station id="s311" name="Stammheim" line="S6:7" link="s158,s312" />
     <station id="s056" name="Stegerwaldsiedlung" line="3:22,4:19" link="s055,s057,s067" />
     <station id="s335" name="Steinstr." line="S12:16" link="s334,s336" />
     <station id="s129" name="Steinweg" line="9:5" link="s128,s130" />

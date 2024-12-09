@@ -1,5 +1,10 @@
 Revision history for Perl extension Map::Tube::Glasgow.
 
+0.72.1 2024-12-09
+  - Added tests
+  - Switched tests from deprecated XML::Simple to XML::Twig
+    (also old, but also used by Map::Tube itself)
+
 0.72.0 2024-11-11
   - Augmented data with per-line station indexes
   - Fixed test 02-xml.t

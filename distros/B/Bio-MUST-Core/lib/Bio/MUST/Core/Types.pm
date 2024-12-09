@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Types;
 # ABSTRACT: Distribution-wide Moose types for Bio::MUST::Core
-$Bio::MUST::Core::Types::VERSION = '0.242020';
+$Bio::MUST::Core::Types::VERSION = '0.243430';
 use Moose::Util::TypeConstraints;
 
 use autodie;
@@ -86,8 +86,8 @@ coerce 'Bio::MUST::Core::Types::full_ids'
 ;
 
 # quite tolerant subtype designed to preserve original casing
-# however FASTA '-' symbols are converted to ALI '*' during coercion
-# whereas spaces and '?' are left untouched
+# however FASTA '-' symbols are converted to ALI '*' (and MACSE's '!' to 'x')
+# during coercion whereas spaces and '?' are left untouched
 # Note: \A are \z are absolutely required for converting hard-wrapped seqs
 subtype 'Bio::MUST::Core::Types::Seq'
     => as 'Str'
@@ -97,8 +97,8 @@ subtype 'Bio::MUST::Core::Types::Seq'
 
 coerce 'Bio::MUST::Core::Types::Seq'
     => from 'Str'
-    => via { tr/-\n/*/dr }          # convert FASTA on the fly
-;                                   # ('-' => '*' and delete newlines)
+    => via { tr|-!\n|*x|dr }        # convert FASTA on the fly
+;                                   # ('-' => '*', '!' => 'x' and delete \n)
 
 # subtype for a stringified NCBI Taxonomy lineage
 subtype 'Bio::MUST::Core::Types::Lineage'
@@ -220,7 +220,7 @@ Bio::MUST::Core::Types - Distribution-wide Moose types for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.242020
+version 0.243430
 
 =head1 SYNOPSIS
 

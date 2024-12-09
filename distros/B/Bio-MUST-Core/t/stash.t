@@ -16,6 +16,7 @@ my $class = 'Bio::MUST::Core::Ali::Stash';
 {
     my $infile = file('test', 'stash.fasta');
     my $db = $class->load($infile);
+    cmp_ok $db->filename, 'eq', $infile, "got expected filename: $infile";
     cmp_ok $db->count_seqs, '==', 15, 'got expected number of seqs';
 
     cmp_ok $db->get_seq_with_id('gi|451783224|2520-2584 definition')->seq,

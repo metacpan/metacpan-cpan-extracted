@@ -85,9 +85,9 @@ int32_t SPVM__Net__SSLeay__load_client_CA_file(SPVM_ENV* env, SPVM_VALUE* stack)
   
   const char* file = env->get_chars(env, stack, obj_file);
   
-  STACK_OF(X509_NAME)* stack_of_x509_name = SSL_load_client_CA_file(file);
+  STACK_OF(X509_NAME)* x509_names_stack = SSL_load_client_CA_file(file);
   
-  if (!stack_of_x509_name) {
+  if (!x509_names_stack) {
     int64_t ssl_error = ERR_peek_last_error();
     
     char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
@@ -102,11 +102,11 @@ int32_t SPVM__Net__SSLeay__load_client_CA_file(SPVM_ENV* env, SPVM_VALUE* stack)
     return error_id;
   }
   
-  int32_t length = sk_X509_NAME_num(stack_of_x509_name);
+  int32_t length = sk_X509_NAME_num(x509_names_stack);
   void* obj_x509_names = env->new_object_array_by_name(env, stack, "Net::SSLeay::X509_NAME", length, &error_id, __func__, FILE_NAME, __LINE__);
   
   for (int32_t i = 0; i < length; i++) {
-    X509_NAME* x509_name = sk_X509_NAME_value(stack_of_x509_name, i);
+    X509_NAME* x509_name = sk_X509_NAME_value(x509_names_stack, i);
     
     void* obj_address_x509_name = env->new_pointer_object_by_name(env, stack, "Address", x509_name, &error_id, __func__, FILE_NAME, __LINE__);
     if (error_id) { return error_id; }
@@ -929,12 +929,12 @@ int32_t SPVM__Net__SSLeay__get_peer_cert_chain(SPVM_ENV* env, SPVM_VALUE* stack)
   
   SSL* self = env->get_pointer(env, stack, obj_self);
   
-  STACK_OF(X509)* stack_of_x509 = SSL_get_peer_cert_chain(self);
+  STACK_OF(X509)* x509s_stack = SSL_get_peer_cert_chain(self);
   
-  int32_t length = sk_X509_num(stack_of_x509);
+  int32_t length = x509s_stack ? sk_X509_num(x509s_stack) : 0;
   void* obj_x509s = env->new_object_array_by_name(env, stack, "Net::SSLeay::X509", length, &error_id, __func__, FILE_NAME, __LINE__);
   for (int32_t i = 0; i < length; i++) {
-    X509* x509 = sk_X509_value(stack_of_x509, i);
+    X509* x509 = sk_X509_value(x509s_stack, i);
     X509_up_ref(x509);
     
     void* obj_address_x509 = env->new_pointer_object_by_name(env, stack, "Address", x509, &error_id, __func__, FILE_NAME, __LINE__);
