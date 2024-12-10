@@ -25,6 +25,7 @@ Commands:
   addish    <pkgs>       Add pkgs + dependencies, do not mark as manually added.
   tackish   <pkgs>       Add pkgs, do not mark as manually added.
   rm        <pkgs>       Remove pkg(s).
+  clean                  Remove unnecessary pkgs.
   deps      <pkg>        Print dependencies for pkg.
   depadd    <pkg> <deps> Add deps to pkg's dependencies.
   deprm     <pkg> <deps> Remove deps from pkg's dependencies.
@@ -64,10 +65,10 @@ my %COMMAND_HELP = (
 	'add' => <<END,
 Usage: add <pkg> ...
 
-Add one or more packages to package database. Automatically add dependencies.
-Packages directly added will be marked as manually added and will not be removed
-when cleaned. If an added package is already present in the database, it will be
-marked as manually added.
+Add one or more packages to package database, marking them as manually added.
+Dependencies will automatically be added as well. If a specified package is
+already present in the database but is not marked as manually added, sbokeeper
+will mark it as manually added.
 END
 	'tack' => <<END,
 Usage: tack <pkg> ...
@@ -90,6 +91,12 @@ Usage: rm <pkg> ...
 
 Removes one or more packages from package database. Dependencies are not
 automatically removed.
+END
+	'clean' => <<END,
+Usage: clean
+
+Removes unnecessary packages from package database. This command is the same
+as running 'sbokeeper rm \@unnecessary'.
 END
 	'deps' => <<END,
 Usage: deps <pkg>
@@ -169,8 +176,6 @@ Usage: tree [<pkgs>] ...
 Prints a dependency tree. If pkgs is not specified, prints a dependency tree
 for each manually added package. If pkgs are given, prints a dependency tree of
 each package specified.
-
-Print package tree.
 END
 	'dump' => <<END,
 Usage: dump
@@ -207,6 +212,7 @@ my %COMMANDS = (
 	'addish'    => \&sbokeeper_addish,
 	'tackish'   => \&sbokeeper_tackish,
 	'rm'        => \&sbokeeper_rm,
+	'clean'     => \&sbokeeper_clean,
 	'deps'      => \&sbokeeper_deps,
 	'depadd'    => \&sbokeeper_depadd,
 	'deprm'     => \&sbokeeper_deprm,
@@ -233,9 +239,69 @@ my %COMMANDS = (
 #   Val   => $current_value_of_field,
 # }
 my %CONFIG_READERS = (
-	'DataFile'    => \&config_datafile,
-	'SBoPath'     => \&config_sbopath,
-	'PkgtoolLogs' => \&config_pkgtoollogs,
+	'DataFile' => sub {
+
+		my $params = shift;
+		my $fstate = shift;
+
+		my $config = $fstate->{Path};
+		my $line   = $fstate->{Line};
+		my $field  = $fstate->{Field};
+		my $val    = $fstate->{Val};
+
+		return if $params->{$field};
+
+		$val =~ s/^~/$HOME/;
+
+		die "$config line $line: $field must be absolute path\n"
+			unless File::Spec->file_name_is_absolute($val);
+
+		$params->{$field} = $val;
+	},
+	'SBoPath' => sub {
+
+		my $params = shift;
+		my $fstate = shift;
+
+		my $config = $fstate->{Path};
+		my $line   = $fstate->{Line};
+		my $field  = $fstate->{Field};
+		my $val    = $fstate->{Val};
+
+		return if $params->{$field};
+
+		$val =~ s/^~/$HOME/;
+
+		die "$config line $line: $field must be absolute path\n"
+			unless File::Spec->file_name_is_absolute($val);
+
+		die "$config line $line: $val is not a directory or does not exist\n"
+			unless -d $val;
+
+		$params->{$field} = $val;
+	},
+	'PkgtoolLogs' => sub {
+
+		my $params = shift;
+		my $fstate = shift;
+
+		my $config = $fstate->{Path};
+		my $line   = $fstate->{Line};
+		my $field  = $fstate->{Field};
+		my $val    = $fstate->{Val};
+
+		return if $params->{$field};
+
+		$val =~ s/^~/$HOME/;
+
+		die "$config line $line: $field must be absolute path\n"
+			unless File::Spec->file_name_is_absolute($val);
+
+		die "$config line $line: $val is not a directory or does not exist\n"
+			unless -d $val;
+
+		$params->{$field} = $val;
+	},
 );
 
 sub slackware_version {
@@ -265,82 +331,13 @@ sub slackware_version {
 
 }
 
-sub config_datafile {
-
-	my $params = shift;
-	my $fstate = shift;
-
-	my $config = $fstate->{Path};
-	my $line   = $fstate->{Line};
-	my $field  = $fstate->{Field};
-	my $val    = $fstate->{Val};
-
-	return if $params->{$field};
-
-	$val =~ s/^~/$HOME/;
-
-	die "$config line $line: $field must be absolute path\n"
-		unless File::Spec->file_name_is_absolute($val);
-
-	$params->{$field} = $val;
-
-}
-
-sub config_sbopath {
-
-	my $params = shift;
-	my $fstate = shift;
-
-	my $config = $fstate->{Path};
-	my $line   = $fstate->{Line};
-	my $field  = $fstate->{Field};
-	my $val    = $fstate->{Val};
-
-	return if $params->{$field};
-
-	$val =~ s/^~/$HOME/;
-
-	die "$config line $line: $field must be absolute path\n"
-		unless File::Spec->file_name_is_absolute($val);
-
-	die "$config line $line: $val is not a directory or does not exist\n"
-		unless -d $val;
-
-	$params->{$field} = $val;
-
-}
-
-sub config_pkgtoollogs {
-
-	my $params = shift;
-	my $fstate = shift;
-
-	my $config = $fstate->{Path};
-	my $line   = $fstate->{Line};
-	my $field  = $fstate->{Field};
-	my $val    = $fstate->{Val};
-
-	return if $params->{$field};
-
-	$val =~ s/^~/$HOME/;
-
-	die "$config line $line: $field must be absolute path\n"
-		unless File::Spec->file_name_is_absolute($val);
-
-	die "$config line $line: $val is not a directory or does not exist\n"
-		unless -d $val;
-
-	$params->{$field} = $val;
-
-}
-
 sub read_config {
 
 	my $config = shift;
 	my $params = shift;
 
 	open my $fh, '<', $config
-		or die "Failed to open $config for reading: $!\n";
+		or die "Failed to open config file $config for reading: $!\n";
 
 	my $ln = 0;
 	while (my $l = readline $fh) {
@@ -456,7 +453,8 @@ sub sbokeeper_init {
 	$params->{PkgtoolLogs} = $DEFAULT_PKGTOOL_LOGS unless $params->{PkgtoolLogs};
 
 	unless (-d $params->{PkgtoolLogs}) {
-		die "$params->{PkgtoolLogs} does not exist or is not a directory\n";
+		die "pkgtool log directory $params->{PkgtoolLogs} does not exist or " .
+		    "is not a directory\n";
 	}
 
 	unless ($params->{SBoPath}) {
@@ -466,7 +464,8 @@ sub sbokeeper_init {
 	}
 
 	unless (-d $params->{SBoPath}) {
-		die "$params->{SBoPath} does not exit or is not a directory\n";
+		die "SlackBuild repo directory $params->{SBoPath} does not exit or " . 
+		    "is not a directory\n";
 	}
 
 	return $params;
@@ -782,6 +781,16 @@ sub sbokeeper_rm {
 	$sbokeeper->write($params->{DataFile});
 
 	printf "%d packages removed\n", scalar @rm;
+
+}
+
+sub sbokeeper_clean {
+
+	my $params = shift;
+
+	$params->{Args} = ['@unnecessary'];
+
+	sbokeeper_rm($params);
 
 }
 
@@ -1123,7 +1132,8 @@ sub sbokeeper_dump {
 	my $params = shift;
 
 	open my $fh, '<', $params->{DataFile}
-		or die "Failed to open $params->{DataFile} for reading: $!\n";
+		or die "Failed to open sbokeeper data file $params->{DataFile} for " .
+		       "reading: $!\n";
 
 	while (my $l = readline $fh) {
 		print $l;
@@ -1297,7 +1307,7 @@ that is specified is already present in the database but not marked as manually
 added, it will be marked as manually added.
 
 If add encounters a package that is already present in the package database, it
-will skip adding it. These means that if the package is missing dependencies, it
+will skip adding it. This means that if the package is missing dependencies, it
 will not try to re-add those dependencies. If this poses a problem, the
 B<depwant> command can help users track down missing dependencies.
 
@@ -1330,6 +1340,11 @@ Remove packages from package database. Does not remove dependencies.
 
 This command supports aliases.
 
+=item B<clean>
+
+Remove unnecessary packages from package database. This command is the same
+as running C<sbokeeper rm @unnecessary>.
+
 =item B<deps> I<pkg>
 
 Prints list of dependencies for I<pkg>. Does not print dependencies of those
@@ -1358,7 +1373,7 @@ This command supports aliases for I<deps>, they do not work for I<pkg>.
 
 =item B<pull>
 
-Find any SlackBuilds.org package installed on your system that is not present
+Finds any SlackBuilds.org package installed on your system that is not present
 in your package database and tries to add it to your database. All packages that
 are added are marked as manually added. Packages that are already present in
 your database are skipped.

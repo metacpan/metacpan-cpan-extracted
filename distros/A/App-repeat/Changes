@@ -1,3 +1,8 @@
+0.005   2024-12-06  Released-By: PERLANCAR; Urgency: low
+
+        - Make dependency to DateTime::Format::Natural optional.
+
+
 0.004   2024-12-06  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         - [incompatible change] Rename --until to --until-time, --bail to

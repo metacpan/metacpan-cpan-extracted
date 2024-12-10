@@ -2,7 +2,7 @@ package kura;
 use strict;
 use warnings;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use Carp ();
 use Sub::Util ();
@@ -71,7 +71,10 @@ sub _new_kura_item {
         }
     }
 
-    my $kura_item = { name => $name, code => sub { $constraint } };
+    # Prefix '_' means private, so it is not exported.
+    my $is_private = $name =~ /^_/ ? 1 : 0;
+
+    my $kura_item = { name => $name, code => sub { $constraint }, is_private => $is_private };
     return ($kura_item, undef);
 }
 
@@ -79,13 +82,14 @@ sub _new_kura_item {
 sub _save_kura_item {
     my ($kura_item, $caller) = @_;
 
-    {
-        my $name = $kura_item->{name};
-        my $code = Sub::Util::set_subname("$caller\::$name", $kura_item->{code});
+    my $name = $kura_item->{name};
+    my $code = Sub::Util::set_subname("$caller\::$name", $kura_item->{code});
 
-        no strict "refs";
-        no warnings "once";
-        *{"$caller\::$name"} = $code;
+    no strict "refs";
+    no warnings "once";
+    *{"$caller\::$name"} = $code;
+
+    if (!$kura_item->{is_private}) {
         push @{"$caller\::EXPORT_OK"}, $name;
         push @{"$caller\::KURA"}, $name;
     }
@@ -338,6 +342,11 @@ It is useful when you want to export constraints. For example, you can tag C<@KU
 
     use MyBar qw(:types);
     # => Bar1, Bar2 are exported
+
+If you don't want to export constraints, put a prefix C<_> to the constraint name:
+
+    use kura _PrivateFoo => Str;
+    # => "_PrivateFoo" is not exported
 
 =head1 LICENSE
 

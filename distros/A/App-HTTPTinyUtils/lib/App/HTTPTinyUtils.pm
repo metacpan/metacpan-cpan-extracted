@@ -1,16 +1,16 @@
 package App::HTTPTinyUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-17'; # DATE
-our $DIST = 'App-HTTPTinyUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
 use Perinci::Sub::Util qw(gen_modified_sub);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-12-09'; # DATE
+our $DIST = 'App-HTTPTinyUtils'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 our %SPEC;
 
@@ -29,6 +29,7 @@ sub _http_tiny {
         my %opts;
         if (defined $args{content}) {
             $opts{content} = $args{content};
+            ## no critic: InputOutput::ProhibitInteractiveTest
         } elsif (!(-t STDIN)) {
             local $/;
             $opts{content} = <STDIN>;
@@ -95,13 +96,13 @@ $SPEC{http_tiny} = {
         },
         ignore_errors => {
             summary => 'Ignore errors',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Normally, when given multiple URLs, the utility will exit after the first
 non-success response. With `ignore_errors` set to true, will just log the error
 and continue. Will return with the last error response.
 
-_
+MARKDOWN
             schema => 'bool*',
             cmdline_aliases => {i=>{}},
         },
@@ -118,12 +119,12 @@ gen_modified_sub(
     output_name => 'http_tiny_cache',
     base_name   => 'http_tiny',
     summary => 'Perform request(s) with HTTP::Tiny::Cache',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Like `http_tiny`, but uses <pm:HTTP::Tiny::Cache> instead of <pm:HTTP::Tiny>.
 See the documentation of HTTP::Tiny::Cache on how to set cache period.
 
-_
+MARKDOWN
     output_code => sub { _http_tiny('HTTP::Tiny::Cache', @_) },
 );
 
@@ -131,12 +132,12 @@ gen_modified_sub(
     output_name => 'http_tiny_plugin',
     base_name   => 'http_tiny',
     summary => 'Perform request(s) with HTTP::Tiny::Plugin',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Like `http_tiny`, but uses <pm:HTTP::Tiny::Plugin> instead of <pm:HTTP::Tiny>.
 See the documentation of HTTP::Tiny::Plugin for more details.
 
-_
+MARKDOWN
     output_code => sub { _http_tiny('HTTP::Tiny::Plugin', @_) },
 );
 
@@ -144,12 +145,12 @@ gen_modified_sub(
     output_name => 'http_tiny_retry',
     base_name   => 'http_tiny',
     summary => 'Perform request(s) with HTTP::Tiny::Retry',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Like `http_tiny`, but uses <pm:HTTP::Tiny::Retry> instead of <pm:HTTP::Tiny>.
 See the documentation of HTTP::Tiny::Retry for more details.
 
-_
+MARKDOWN
     modify_meta => sub {
         my $meta = shift;
 
@@ -171,13 +172,13 @@ gen_modified_sub(
     output_name => 'http_tiny_customretry',
     base_name   => 'http_tiny',
     summary => 'Perform request(s) with HTTP::Tiny::CustomRetry',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Like `http_tiny`, but uses <pm:HTTP::Tiny::CustomRetry> instead of
 <pm:HTTP::Tiny>. See the documentation of HTTP::Tiny::CustomRetry for more
 details.
 
-_
+MARKDOWN
     modify_meta => sub {
         my $meta = shift;
 
@@ -206,12 +207,12 @@ gen_modified_sub(
     output_name => 'http_tiny_plugin_every',
     base_name   => 'http_tiny',
     summary => 'Perform request(s) with HTTP::Tiny::Plugin every N seconds, log result in a directory',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Like `http_tiny_plugin`, but perform the request every N seconds and log the
 result in a directory.
 
-_
+MARKDOWN
     modify_meta => sub {
         my $meta = shift;
         $meta->{args}{every} = {
@@ -268,6 +269,30 @@ _
     },
 );
 
+gen_modified_sub(
+    output_name => 'http_tinyish',
+    base_name   => 'http_tiny',
+    summary => 'Perform request(s) with HTTP::Tinyish',
+    description => <<'MARKDOWN',
+
+Like `http_tiny`, but uses <pm:HTTP::Tinyish> instead of <pm:HTTP::Tiny>.
+See the documentation of HTTP::Tinyish for more details.
+
+Observes `HTTP_TINYISH_PREFERRED_BACKEND` to set
+`$HTTP::Tinyish::PreferredBackend`. For example:
+
+    % HTTP_TINYISH_PREFERRED_BACKEND=HTTP::Tinyish::Curl http-tinyish https://foo/
+
+MARKDOWN
+    output_code => sub {
+        require HTTP::Tinyish;
+        if (defined $ENV{HTTP_TINYISH_PREFERRED_BACKEND}) {
+            $HTTP::Tinyish::PreferredBackend = $ENV{HTTP_TINYISH_PREFERRED_BACKEND};
+        }
+        _http_tiny('HTTP::Tinyish', @_);
+    },
+);
+
 1;
 # ABSTRACT: Command-line utilities related to HTTP::Tiny
 
@@ -283,7 +308,7 @@ App::HTTPTinyUtils - Command-line utilities related to HTTP::Tiny
 
 =head1 VERSION
 
-This document describes version 0.009 of App::HTTPTinyUtils (from Perl distribution App-HTTPTinyUtils), released on 2020-11-17.
+This document describes version 0.010 of App::HTTPTinyUtils (from Perl distribution App-HTTPTinyUtils), released on 2024-12-09.
 
 =head1 SYNOPSIS
 
@@ -293,17 +318,19 @@ This distribution includes several utilities related to L<HTTP::Tiny>:
 
 =over
 
-=item * L<http-tiny>
+=item 1. L<http-tiny>
 
-=item * L<http-tiny-cache>
+=item 2. L<http-tiny-cache>
 
-=item * L<http-tiny-customretry>
+=item 3. L<http-tiny-customretry>
 
-=item * L<http-tiny-plugin>
+=item 4. L<http-tiny-plugin>
 
-=item * L<http-tiny-plugin-every>
+=item 5. L<http-tiny-plugin-every>
 
-=item * L<http-tiny-retry>
+=item 6. L<http-tiny-retry>
+
+=item 7. L<http-tinyish>
 
 =back
 
@@ -314,7 +341,7 @@ This distribution includes several utilities related to L<HTTP::Tiny>:
 
 Usage:
 
- http_tiny(%args) -> [status, msg, payload, meta]
+ http_tiny(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Perform request(s) with HTTP::Tiny.
 
@@ -330,7 +357,11 @@ Pass attributes to HTTP::Tiny constructor.
 
 =item * B<content> => I<str>
 
+(No description)
+
 =item * B<headers> => I<hash>
+
+(No description)
 
 =item * B<ignore_errors> => I<bool>
 
@@ -342,21 +373,27 @@ and continue. Will return with the last error response.
 
 =item * B<method> => I<str> (default: "GET")
 
+(No description)
+
 =item * B<raw> => I<bool>
 
+(No description)
+
 =item * B<urls>* => I<array[str]>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -366,7 +403,7 @@ Return value:  (any)
 
 Usage:
 
- http_tiny_cache(%args) -> [status, msg, payload, meta]
+ http_tiny_cache(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Perform request(s) with HTTP::Tiny::Cache.
 
@@ -385,7 +422,11 @@ Pass attributes to HTTP::Tiny constructor.
 
 =item * B<content> => I<str>
 
+(No description)
+
 =item * B<headers> => I<hash>
+
+(No description)
 
 =item * B<ignore_errors> => I<bool>
 
@@ -397,21 +438,27 @@ and continue. Will return with the last error response.
 
 =item * B<method> => I<str> (default: "GET")
 
+(No description)
+
 =item * B<raw> => I<bool>
 
+(No description)
+
 =item * B<urls>* => I<array[str]>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -421,7 +468,7 @@ Return value:  (any)
 
 Usage:
 
- http_tiny_customretry(%args) -> [status, msg, payload, meta]
+ http_tiny_customretry(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Perform request(s) with HTTP::Tiny::CustomRetry.
 
@@ -441,7 +488,11 @@ Pass attributes to HTTP::Tiny constructor.
 
 =item * B<content> => I<str>
 
+(No description)
+
 =item * B<headers> => I<hash>
+
+(No description)
 
 =item * B<ignore_errors> => I<bool>
 
@@ -453,21 +504,27 @@ and continue. Will return with the last error response.
 
 =item * B<method> => I<str> (default: "GET")
 
+(No description)
+
 =item * B<raw> => I<bool>
 
+(No description)
+
 =item * B<urls>* => I<array[str]>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -477,7 +534,7 @@ Return value:  (any)
 
 Usage:
 
- http_tiny_plugin(%args) -> [status, msg, payload, meta]
+ http_tiny_plugin(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Perform request(s) with HTTP::Tiny::Plugin.
 
@@ -496,7 +553,11 @@ Pass attributes to HTTP::Tiny constructor.
 
 =item * B<content> => I<str>
 
+(No description)
+
 =item * B<headers> => I<hash>
+
+(No description)
 
 =item * B<ignore_errors> => I<bool>
 
@@ -508,21 +569,27 @@ and continue. Will return with the last error response.
 
 =item * B<method> => I<str> (default: "GET")
 
+(No description)
+
 =item * B<raw> => I<bool>
 
+(No description)
+
 =item * B<urls>* => I<array[str]>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -532,7 +599,7 @@ Return value:  (any)
 
 Usage:
 
- http_tiny_plugin_every(%args) -> [status, msg, payload, meta]
+ http_tiny_plugin_every(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Perform request(s) with HTTP::Tiny::Plugin every N seconds, log result in a directory.
 
@@ -551,11 +618,19 @@ Pass attributes to HTTP::Tiny constructor.
 
 =item * B<content> => I<str>
 
+(No description)
+
 =item * B<dir>* => I<dirname>
+
+(No description)
 
 =item * B<every>* => I<duration>
 
+(No description)
+
 =item * B<headers> => I<hash>
+
+(No description)
 
 =item * B<ignore_errors> => I<bool>
 
@@ -567,21 +642,27 @@ and continue. Will return with the last error response.
 
 =item * B<method> => I<str> (default: "GET")
 
+(No description)
+
 =item * B<raw> => I<bool>
 
+(No description)
+
 =item * B<urls>* => I<array[str]>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -591,7 +672,7 @@ Return value:  (any)
 
 Usage:
 
- http_tiny_retry(%args) -> [status, msg, payload, meta]
+ http_tiny_retry(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Perform request(s) with HTTP::Tiny::Retry.
 
@@ -610,7 +691,11 @@ Pass attributes to HTTP::Tiny constructor.
 
 =item * B<content> => I<str>
 
+(No description)
+
 =item * B<headers> => I<hash>
+
+(No description)
 
 =item * B<ignore_errors> => I<bool>
 
@@ -622,21 +707,97 @@ and continue. Will return with the last error response.
 
 =item * B<method> => I<str> (default: "GET")
 
+(No description)
+
 =item * B<raw> => I<bool>
 
+(No description)
+
 =item * B<urls>* => I<array[str]>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 http_tinyish
+
+Usage:
+
+ http_tinyish(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Perform request(s) with HTTP::Tinyish.
+
+Like C<http_tiny>, but uses L<HTTP::Tinyish> instead of L<HTTP::Tiny>.
+See the documentation of HTTP::Tinyish for more details.
+
+Observes C<HTTP_TINYISH_PREFERRED_BACKEND> to set
+C<$HTTP::Tinyish::PreferredBackend>. For example:
+
+ % HTTP_TINYISH_PREFERRED_BACKEND=HTTP::Tinyish::Curl http-tinyish https://foo/
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<attributes> => I<hash>
+
+Pass attributes to HTTP::Tiny constructor.
+
+=item * B<content> => I<str>
+
+(No description)
+
+=item * B<headers> => I<hash>
+
+(No description)
+
+=item * B<ignore_errors> => I<bool>
+
+Ignore errors.
+
+Normally, when given multiple URLs, the utility will exit after the first
+non-success response. With C<ignore_errors> set to true, will just log the error
+and continue. Will return with the last error response.
+
+=item * B<method> => I<str> (default: "GET")
+
+(No description)
+
+=item * B<raw> => I<bool>
+
+(No description)
+
+=item * B<urls>* => I<array[str]>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -648,6 +809,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-HTTPTi
 
 Source repository is at L<https://github.com/perlancar/perl-App-HTTPTinyUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-HTTPTinyUtils>
@@ -655,16 +845,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

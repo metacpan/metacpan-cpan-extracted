@@ -1,0 +1,32 @@
+---
+abstract: unknown
+author:
+  - 'PerlDL Developers <pdl-general@lists.sourceforge.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
+configure_requires:
+  ExtUtils::F77: '1.26'
+  ExtUtils::MakeMaker: '0'
+  PDL: '2.094'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDL-Slatec
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  PDL: '2.094'
+  perl: '5.016'
+resources:
+  IRC: irc://irc.perl.org/#pdl
+  bugtracker: https://github.com/PDLPorters/PDL-Slatec/issues
+  homepage: http://pdl.perl.org/
+  repository: git://github.com/PDLPorters/PDL-Slatec.git
+version: '2.096'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

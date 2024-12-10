@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Zonemaster::LDNS;
+use Zonemaster::LDNS::RRList;
 
 use MIME::Base64;
 
@@ -26,6 +27,14 @@ sub data {
     return $self->wireformat;
 }
 
+sub question_rrlist {
+    my ( $self ) = @_;
+
+    my @records = sort $self->question();
+
+    return Zonemaster::LDNS::RRList->new( \@records );
+}
+
 sub answer {
     my ( $self ) = @_;
 
@@ -42,6 +51,14 @@ sub answer {
     return @records;
 }
 
+sub answer_rrlist {
+    my ( $self ) = @_;
+
+    my @records = sort $self->answer();
+
+    return Zonemaster::LDNS::RRList->new( \@records );
+}
+
 sub authority {
     my ( $self ) = @_;
 
@@ -56,6 +73,14 @@ sub authority {
     return @records;
 }
 
+sub authority_rrlist {
+    my ( $self ) = @_;
+
+    my @records = sort $self->authority();
+
+    return Zonemaster::LDNS::RRList->new( \@records );
+}
+
 sub additional {
     my ( $self ) = @_;
 
@@ -68,6 +93,14 @@ sub additional {
     }
 
     return @records;
+}
+
+sub additional_rrlist {
+    my ( $self ) = @_;
+
+    my @records = sort $self->additional();
+
+    return Zonemaster::LDNS::RRList->new( \@records );
 }
 
 1;
@@ -89,8 +122,8 @@ Zonemaster::LDNS::Packet - objects representing DNS packets
 
 =item new($name, $type, $class)
 
-Create a new packet, holding nothing by a query record for the provided triplet. C<$type> and C<$class> are optional, and default to A and IN
-respectively.
+Creates a new L<Zonemaster::LDNS::Packet> object, holding nothing but a query record for the provided triplet.
+C<$name> corresponds to the QNAME. C<$type> and C<$class> are optional, and default to A and IN respectively.
 
 =item new_from_wireformat($data)
 
@@ -208,16 +241,57 @@ The time when the query was sent or received (the ldns docs don't specify), as a
 kind of value used by L<Time::HiRes::time()>). Conversion effects between floating-point and C<struct timeval> means that the precision of the
 value is probably not reliable at the microsecond level, even if you computer's clock happen to be.
 
+=item all()
+
+Returns a L<Zonemaster::LDNS::RRList> object, containing the resource records from all sections except for the question section.
+
 =item question()
+
+Returns a list of objects representing the RRs in the question section. They will be of classes appropriate to their types, but all will have
+L<Zonemaster::LDNS::RR> as a base class.
+
+=item question_rrlist()
+
+Similar to L<question()>, but instead returns a single (and sorted) L<Zonemaster::LDNS::RRList> object.
 
 =item answer()
 
+Similar to L<answer_unfiltered()>, but ignores incomplete resource records.
+
+=item answer_rrlist()
+
+Similar to L<answer()>, but instead returns a single (and sorted) L<Zonemaster::LDNS::RRList> object.
+
+=item answer_unfiltered()
+
+Returns a list of objects representing the RRs in the answer section. They will be of classes appropriate to their types, but all will have
+L<Zonemaster::LDNS::RR> as a base class.
+
 =item authority()
+
+Similar to L<authority_unfiltered()>, but ignores incomplete resource records.
+
+=item authority_rrlist()
+
+Similar to L<authority()>, but instead returns a single (and sorted) L<Zonemaster::LDNS::RRList> object.
+
+=item authority_unfiltered()
+
+Returns a list of objects representing the RRs in the authority section. They will be of classes appropriate to their types, but all will have
+L<Zonemaster::LDNS::RR> as a base class.
 
 =item additional()
 
-Returns list of objects representing the RRs in the named section. They will be of classes appropriate to their types, but all will have
-C<Zonemaster::LDNS::RR> as a base class.
+Similar to L<additional_unfiltered()>, but ignores incomplete resource records.
+
+=item additional_rrlist()
+
+Similar to L<additional()>, but instead returns a single (and sorted) L<Zonemaster::LDNS::RRList> object.
+
+=item additional_unfiltered()
+
+Returns a list of objects representing the RRs in the additional section. They will be of classes appropriate to their types, but all will have
+L<Zonemaster::LDNS::RR> as a base class.
 
 =item unique_push($section, $rr)
 

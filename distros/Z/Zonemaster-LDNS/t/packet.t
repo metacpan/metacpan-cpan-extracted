@@ -20,6 +20,9 @@ foreach my $r (qw[QUERY IQUERY STATUS NOTIFY UPDATE]) {
 }
 like( exception {$p->opcode('gurksallad')}, qr/Unknown OPCODE: gurksallad/, 'Expected exception' );
 
+is( scalar $p->question, 1,   'One RR in question section' );
+isa_ok( ($p->question)[0], 'Zonemaster::LDNS::RR' );
+
 is($p->id(4711), 4711, 'Setting ID');
 is($p->id(2147488359), 4711, 'Wraparound ID');
 
@@ -69,6 +72,12 @@ subtest "Answer section" => sub {
     my $rr_count = scalar $p->answer;
 
     is $rr_count, 1, "keep complete RRs but ignore incomplete ones";
+
+    # Retrieve section as a Zonemaster::LDNS::RRList object
+    my $rrlist = $p->answer_rrlist;
+    is( $rrlist->count, 1,      'One RR in RRList' );
+    ok( $rrlist->string,        'example.se. 86400 IN A 192.0.2.1');
+    isa_ok( $rrlist->pop,       'Zonemaster::LDNS::RR' );
 };
 
 subtest "Authority section" => sub {
@@ -79,6 +88,12 @@ subtest "Authority section" => sub {
     my $rr_count = scalar $p->authority;
 
     is $rr_count, 1, "keep complete RRs but ignore incomplete ones";
+
+    # Retrieve section as a Zonemaster::LDNS::RRList object
+    my $rrlist = $p->authority_rrlist;
+    is( $rrlist->count, 1,      'One RR in RRList' );
+    ok( $rrlist->string,        'example.se. 86400 IN A 192.0.2.1');
+    isa_ok( $rrlist->pop,       'Zonemaster::LDNS::RR' );
 };
 
 subtest "Additional section" => sub {
@@ -89,6 +104,30 @@ subtest "Additional section" => sub {
     my $rr_count = scalar $p->additional;
 
     is $rr_count, 1, "keep complete RRs but ignore incomplete ones";
+
+    # Retrieve section as a Zonemaster::LDNS::RRList object
+    my $rrlist = $p->additional_rrlist;
+    is( $rrlist->count, 1,      'One RR in RRList' );
+    ok( $rrlist->string,        'example.se. 86400 IN A 192.0.2.1');
+    isa_ok( $rrlist->pop,       'Zonemaster::LDNS::RR' );
+};
+
+subtest "All sections" => sub {
+    my $p = Zonemaster::LDNS::Packet->new( 'example.se', 'SOA', 'IN' );
+
+    my $rrlist = $p->question_rrlist();
+    is( $rrlist->count, 1,   'One RR in RRList' );
+    isa_ok( $rrlist->get(0), 'Zonemaster::LDNS::RR' );
+
+    $p->unique_push( 'authority',  Zonemaster::LDNS::RR->new_from_string( 'example.se. IN SOA dnsmaster.example.se hostmaster.example.se 2024000000 7200 1800 2419200 5400' ) );
+    $p->unique_push( 'answer',     Zonemaster::LDNS::RR->new_from_string( 'example.se. IN NS ns1.example.se' ) );
+    $p->unique_push( 'additional', Zonemaster::LDNS::RR->new_from_string( 'ns1.example.se. IN A 192.0.2.1' ) );
+
+    $rrlist = $p->all;
+    is( $rrlist->count, 3,      'Three RRs in RRList' );
+    while ( my $rr = $rrlist->pop ) {
+        isa_ok( $rr, 'Zonemaster::LDNS::RR' );
+    }
 };
 
 done_testing();

@@ -94,6 +94,14 @@ Returns the algorithm number.
 
 Returns the cryptographic key in binary form.
 
+=item hexkeydata()
+
+Returns the cryptographic key as a hexadecimal string.
+
+=item keytag()
+
+Calculates the keytag.
+
 =item ds($hash)
 
 Returns a L<Zonemaster::LDNS::RR::DS> record matching this key. The argument must be one of the strings 'sha1', 'sha256', 'sha384' or 'gost'. GOST may not

@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/HTTPTinyUtils.pm','script/http-tiny','script/http-tiny-cache','script/http-tiny-customretry','script/http-tiny-plugin','script/http-tiny-plugin-every','script/http-tiny-retry'];
+my $filenames = ['lib/App/HTTPTinyUtils.pm','script/http-tiny','script/http-tiny-cache','script/http-tiny-customretry','script/http-tiny-plugin','script/http-tiny-plugin-every','script/http-tiny-retry','script/http-tinyish'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

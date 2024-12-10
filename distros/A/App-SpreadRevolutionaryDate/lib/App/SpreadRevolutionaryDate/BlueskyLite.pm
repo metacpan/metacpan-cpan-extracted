@@ -105,9 +105,8 @@ sub _generate_facets {
       $attrib = 'uri';
       $val = $w;
 
-      use bytes;
-      $pos = index($text, $w, $pos);
-      no bytes;
+      utf8::encode(my $text_bytes = $text);
+      $pos = index($text_bytes, $w, $pos);
       my $end = $pos + length($w);
       push @$output, {
         features => [{
@@ -145,7 +144,7 @@ App::SpreadRevolutionaryDate::BlueskyLite - .
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 Methods
 

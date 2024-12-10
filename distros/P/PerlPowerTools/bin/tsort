@@ -11,7 +11,6 @@ License: perl
 
 =cut
 
-
 use strict;
 
 use File::Basename qw(basename);
@@ -50,17 +49,29 @@ if ($file eq '-') {
 my %pairs;	# all pairs ($l, $r)
 my %npred;	# number of predecessors
 my %succ;	# list of successors
+my @input;
 
 while (<$fh>) {
-    my ($l, $r) = my @l = split;
-    next unless @l == 2;
+    next unless m/\w/;
+    s/\A\s+//;
+    s/\s+\z//;
+    my @l = split;
+    push @input, @l if scalar(@l);
+}
+if (scalar(@input) % 2 == 1) {
+    warn "$Program: odd number of tokens\n";
+    exit EX_FAILURE;
+}
+while (@input) {
+    my $l = shift @input;
+    my $r = shift @input;
     next if defined $pairs{$l}{$r};
     $pairs{$l}{$r}++;
-    $npred {$l} += 0;
+    $npred{$l} += 0;
+    next if $l eq $r;
     ++$npred{$r};
     push @{$succ{$l}}, $r;
 }
-close $fh;
 
 # create a list of nodes without predecessors
 my @list = grep {!$npred{$_}} keys %npred;
@@ -79,6 +90,10 @@ while (@list) {
 }
 
 warn "$Program: cycle detected\n" if grep {$npred{$_}} keys %npred;
+unless (close $fh) {
+    warn "$Program: failed to close input: $!\n";
+    exit EX_FAILURE;
+}
 exit EX_SUCCESS;
 
 sub usage {
@@ -118,14 +133,9 @@ breadth-first or depth-first (default) traversal
 =item B<filename>
 
 Optional input file.
-Input format is pairs of white-space-separated fields,
-one pair per line.
+Input format is pairs of white-space-separated fields.
 Each field is the name of a node.
-
 Output is the topologically sorted list of nodes.
-
-Ignores lines without at least two fields.
-Ignores all fields on the line except the first two.
 
 =back
 

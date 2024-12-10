@@ -2,6 +2,10 @@ Written by:
    Sullivan Beck (sbeck@cpan.org)
 Any suggestions, bug reports, or donations :-) should be sent to me.
 
+1.12  2024-12-09
+  - Fixed some comparisons so that perl 5.41.* won't give warnings.  Reported in
+    GitHub #51 (for Date::Manip distribution).
+
 1.11  2024-02-26
   - Fixed a bug where options passed to 'new' were not used.
   - Changed RELEASE_TESTING variable.

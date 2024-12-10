@@ -28,7 +28,7 @@ to_idn(...)
                }
                else
                {
-                  croak("Error: %s\n", idn2_strerror(status));
+                  croak("IDN encoding error: %s\n", idn2_strerror_name(status));
                }
             }
         }
@@ -1552,11 +1552,69 @@ packet_CLONE(class)
 
 MODULE = Zonemaster::LDNS        PACKAGE = Zonemaster::LDNS::RRList           PREFIX=rrlist_
 
+SV *
+rrlist_new(objclass, ...)
+    char* objclass;
+    CODE:
+    {
+        AV *rrs_in = NULL;
+        ldns_rr_list *rrs = ldns_rr_list_new();
+
+        /* Take RRs out of the array and stick them in a list */
+        if (items > 1) {
+            SSize_t i;
+            rrs_in = (AV *) SvRV(ST(1));
+
+            for(i = 0; i <= av_len(rrs_in); ++i)
+            {
+                ldns_rr *rr;
+                SV **rrsv = av_fetch(rrs_in,i,1);
+                if (rrsv != NULL && sv_isobject(*rrsv) && sv_derived_from(*rrsv, "Zonemaster::LDNS::RR")) {
+                    SvGETMAGIC(*rrsv);
+                    IV tmp = SvIV((SV*)SvRV(*rrsv));
+                    rr = INT2PTR(ldns_rr *,tmp);
+                    if(rr != NULL)
+                    {
+                        ldns_rr_list_push_rr(rrs, ldns_rr_clone(rr));
+                    }
+                }
+                else {
+                    croak("Incorrect type in list");
+                }
+            }
+        }
+
+        RETVAL = newSV(0);
+        sv_setref_pv(RETVAL, objclass, rrs);
+#ifdef USE_ITHREADS
+        net_ldns_remember_rrlist(RETVAL);
+#endif
+    }
+    OUTPUT:
+        RETVAL
+
 size_t
 rrlist_count(obj)
     Zonemaster::LDNS::RRList obj;
     CODE:
         RETVAL = ldns_rr_list_rr_count(obj);
+    OUTPUT:
+        RETVAL
+
+SV *
+rrlist_get(obj,pos)
+    Zonemaster::LDNS::RRList obj;
+    size_t pos;
+    CODE:
+        size_t n;
+        n = ldns_rr_list_rr_count(obj);
+
+        if(n==0 || pos > n-1)
+        {
+            XSRETURN_UNDEF;
+        }
+
+        RETVAL = rr2sv(ldns_rr_clone(ldns_rr_list_rr(obj, pos)));
     OUTPUT:
         RETVAL
 
@@ -1592,6 +1650,42 @@ rrlist_is_rrset(obj)
         RETVAL = ldns_is_rrset(obj);
     OUTPUT:
         RETVAL
+
+I32
+rrlist_compare(obj1,obj2)
+    Zonemaster::LDNS::RRList obj1;
+    Zonemaster::LDNS::RRList obj2;
+    CODE:
+        ldns_rr_list *rrl1 = ldns_rr_list_clone(obj1);
+        ldns_rr_list *rrl2 = ldns_rr_list_clone(obj2);
+
+        ldns_rr_list_sort(rrl1);
+        ldns_rr_list_sort(rrl2);
+
+        RETVAL = ldns_rr_list_compare(rrl1, rrl2);
+
+        ldns_rr_list_deep_free(rrl1);
+        ldns_rr_list_deep_free(rrl2);
+    OUTPUT:
+        RETVAL
+
+char *
+rrlist_string(obj)
+    Zonemaster::LDNS::RRList obj;
+    CODE:
+        RETVAL = ldns_rr_list2str(obj);
+        if(RETVAL == NULL)
+        {
+            croak("Failed to convert RRList to string");
+        }
+        else
+        {
+            strip_newline(RETVAL);
+        }
+    OUTPUT:
+        RETVAL
+    CLEANUP:
+        free(RETVAL);
 
 void
 rrlist_DESTROY(obj)
@@ -1732,7 +1826,7 @@ rr_check_rd_count(obj)
     Zonemaster::LDNS::RR obj;
     CODE:
         ldns_rr_type rr_type = ldns_rr_get_type(obj);
-        ldns_rr_descriptor *desc = ldns_rr_descript(rr_type);
+        const ldns_rr_descriptor *desc = ldns_rr_descript(rr_type);
         size_t rd_min = ldns_rr_descriptor_minimum(desc);
         size_t rd_max = ldns_rr_descriptor_maximum(desc);
         size_t rd_count = ldns_rr_rd_count(obj);
@@ -2011,6 +2105,16 @@ rr_dnskey_keydata(obj)
     }
     OUTPUT:
         RETVAL
+
+char *
+rr_dnskey_hexkeydata(obj)
+    Zonemaster::LDNS::RR::DNSKEY obj;
+    CODE:
+        RETVAL = D_STRING(obj,3);
+    OUTPUT:
+        RETVAL
+    CLEANUP:
+        free(RETVAL);
 
 U16
 rr_dnskey_keytag(obj)
@@ -2402,7 +2506,6 @@ rr_nsec3_covers(obj,name)
         ldns_rdf *next_owner = ldns_nsec3_next_owner(obj);
         if (!next_owner || ldns_rdf_size(next_owner) <= 1)
             XSRETURN_UNDEF;
-
     CODE:
     {
         ldns_rr *clone;
@@ -2435,6 +2538,38 @@ rr_nsec3_covers(obj,name)
         ldns_rdf_deep_free(hashed);
         ldns_rdf_deep_free(chopped);
         ldns_rr_free(clone);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+rr_nsec3_hash_name(obj,name)
+    Zonemaster::LDNS::RR::NSEC3 obj;
+    const char *name;
+    INIT:
+        /* Sanity test on owner name */
+        if (ldns_dname_label_count(ldns_rr_owner(obj)) == 0)
+            XSRETURN_UNDEF;
+    CODE:
+    {
+        ldns_rdf *hashed;
+        ldns_rdf *dname;
+
+        dname = ldns_rdf_new_frm_str(LDNS_RDF_TYPE_DNAME, name);
+        if (!dname)
+            XSRETURN_UNDEF;
+
+        hashed = ldns_nsec3_hash_name_frm_nsec3(obj, dname);
+
+        ldns_rdf_deep_free(dname);
+
+        if (!hashed || ldns_rdf_size(hashed) < 1 ) {
+            XSRETURN_UNDEF;
+        }
+
+        char *hash_str = ldns_rdf2str(hashed);
+        RETVAL = newSVpv(hash_str, ldns_rdf_size(hashed) - 2);
+        free(hash_str);
     }
     OUTPUT:
         RETVAL
@@ -2477,6 +2612,38 @@ rr_nsec3param_salt(obj)
         {
             RETVAL = newSVpvn((char *)(ldns_rdf_data(rdf) + 1), size - 1);
         }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+rr_nsec3param_hash_name(obj,name)
+    Zonemaster::LDNS::RR::NSEC3PARAM obj;
+    const char *name;
+    INIT:
+        /* Sanity test on owner name */
+        if (ldns_dname_label_count(ldns_rr_owner(obj)) == 0)
+            XSRETURN_UNDEF;
+    CODE:
+    {
+        ldns_rdf *hashed;
+        ldns_rdf *dname;
+
+        dname = ldns_rdf_new_frm_str(LDNS_RDF_TYPE_DNAME, name);
+        if (!dname)
+            XSRETURN_UNDEF;
+
+        hashed = ldns_nsec3_hash_name_frm_nsec3(obj, dname);
+
+        ldns_rdf_deep_free(dname);
+
+        if (!hashed || ldns_rdf_size(hashed) < 1 ) {
+            XSRETURN_UNDEF;
+        }
+
+        char *hash_str = ldns_rdf2str(hashed);
+        RETVAL = newSVpv(hash_str, ldns_rdf_size(hashed) - 2);
+        free(hash_str);
     }
     OUTPUT:
         RETVAL

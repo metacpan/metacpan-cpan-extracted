@@ -2,6 +2,7 @@
 use 5.20.0;
 use strict;
 use warnings FATAL => 'all';
+no warnings 'once';
 BEGIN { $ENV{MAIL_BIMI_CACHE_BACKEND} = 'Null' };
 use lib 't';
 use Test::RequiresInternet;

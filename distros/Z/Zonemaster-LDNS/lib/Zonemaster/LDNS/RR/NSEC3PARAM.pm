@@ -35,4 +35,8 @@ Returns the iteration count.
 
 Returns the contents of the salt field as a binary string, if non-empty; otherwise, returns an empty string.
 
+=item hash_name($name)
+
+Computes and returns a hash, in canonical form, of the given name using the parameters (algorithm, iterations, salt) of the resource record.
+
 =back

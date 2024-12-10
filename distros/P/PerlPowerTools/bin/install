@@ -17,7 +17,7 @@ use strict;
 use File::Basename qw(basename dirname);
 use Getopt::Std qw(getopts);
 
-our $VERSION = '1.4';
+our $VERSION = '1.7';
 my $Program = basename($0);
 
 sub VERSION_MESSAGE {
@@ -27,8 +27,8 @@ sub VERSION_MESSAGE {
 
 sub usage {
     print <<EOUsage;
-Usage: $Program [-CcDps] [-g group] [-m mode] [-o owner] file1 file2
-       $Program [-CcDps] [-g group] [-m mode] [-o owner] file ... directory
+Usage: $Program [-bCcDps] [-g group] [-m mode] [-o owner] file1 file2
+       $Program [-bCcDps] [-g group] [-m mode] [-o owner] file ... directory
        $Program -d [-g group] [-m mode] [-o owner] directory ...
 EOUsage
     exit 1;
@@ -47,7 +47,7 @@ my $Errors = 0;
 
 # process options
 my %opt;
-getopts('CcDdf:g:m:o:ps', \%opt) or usage();
+getopts('bCcDdf:g:m:o:ps', \%opt) or usage();
 usage() unless @ARGV;
 
 if ($opt{d} and grep($_, @opt{qw/ C c D p /}) > 0) {
@@ -92,7 +92,7 @@ exit($Errors == 0 ? 0 : 1);
 sub modify_file {
     my($path,$mode,$st) = @_;
 
-    if ($mode) {
+    if (defined $mode) {
         unless (chmod $mode, $path) {
             printf STDERR "$Program: chmod %o $path: $!\n", $mode;
             $Errors++;
@@ -126,7 +126,7 @@ sub modify_file {
 }
 
 sub install_dirs {
-    my $mode = $opt{m} || '755';
+    my $mode = defined $opt{'m'} ? $opt{'m'} : '755';
     my $symbolic = $mode =~ /^[0-7]{1,4}$/ ? 0 : 1;
 
     # credit Abigail
@@ -184,6 +184,25 @@ sub install_dirs {
     }
 }
 
+sub copy_one {
+    my ($src, $dst) = @_;
+
+    require File::Copy;
+    if (-e $dst && $opt{'b'}) {
+        my $bak = $dst . '.old';
+        warn "$Program: creating backup file '$bak'\n" if $Debug;
+        unless (rename $dst, $bak) {
+            warn "$Program: rename failed for '$dst'\n";
+            return;
+        }
+    }
+    unless (File::Copy::copy($src, $dst)) {
+        warn "$Program: copy failed: $src -> $dst: $!\n";
+        return;
+    }
+    return 1;
+}
+
 sub install_files {
     my $dst = pop @ARGV;
     my $dir = -d $dst;
@@ -196,10 +215,9 @@ sub install_files {
         usage();
     }
 
-    my $mode = $opt{m} || '755';
+    my $mode = defined $opt{'m'} ? $opt{'m'} : '755';
     my $symbolic = ($mode =~ /^[0-7]{1,4}$/) ? 0 : 1;
 
-    require File::Copy;
     require File::Spec;
 
     foreach my $file (@ARGV) {
@@ -221,33 +239,22 @@ sub install_files {
         }
 
         if ($opt{C}) {
-            if (system "cmp", "-s", $file, $targ) {
-                warn "$Program: copy $file $targ\n" if $Debug;
-
-                unless ( File::Copy::copy($file, $targ) ) {
-                    warn "$Program: copy $file $targ: $!\n";
-                    $Errors++;
-                    next;
-                }
-            }
-            else {
+            if (system("cmp", "-s", $file, $targ) == 0) {
                 warn("$Program: $file not copied to $targ\n") if $Debug;
                 next;
             }
         }
-        else { # default -c
-            warn "$Program: copy $file $targ\n" if $Debug;
 
-            unless ( File::Copy::copy($file, $targ) ) {
-                warn "$Program: copy $file $targ: $!\n";
-                $Errors++;
-                next;
-            }
+        warn "$Program: copy $file $targ\n" if $Debug;
+        unless (copy_one($file, $targ)) {
+            $Errors++;
+            next;
         }
 
+        next unless $Unix;
         my $bits;
         if ($symbolic) {
-            unless ( $bits = mod($mode, $targ) ) {
+            unless ( $bits = mod($mode, $file) ) {
                 die "$Program: invalid mode: $mode\n";
             }
             $bits = oct $bits;
@@ -255,8 +262,7 @@ sub install_files {
         else {
             $bits = oct $mode;
         }
-
-        modify_file $targ, $bits, \@st if $Unix;
+        modify_file($targ, $bits, \@st);
     }
 }
 
@@ -272,18 +278,12 @@ sub install_files {
 #
 #
 
-sub mod ($$) {
+sub mod {
     my $symbolic     = shift;
     my $file         = shift;
 
-    # Initialization.
-    # The 'user', 'group' and 'other' groups.
-    my @ugo          = qw /u g o/;
-    # Bit masks for '[sg]uid', 'sticky', 'read', 'write' and 'execute'.
-    # Can't use qw // cause silly Perl doesn't know '2' is a number
-    # when dealing with &= ~$bit.
-    my %bits         = (s => 8, t => 8, r => 4, w => 2, x => 1);
-
+    my @ugo          = qw/u g o/;
+    my %bits         = ('s' => 8, 't' => 8, 'r' => 4, 'w' => 2, 'x' => 1);
 
     # For parsing.
     my $who_re       = '[augo]*';
@@ -291,7 +291,13 @@ sub mod ($$) {
 
 
     # Find the current permissions. This is what we start with.
-    my $mode         = sprintf "%04o" => (stat $file) [2] || 0;
+    my $mode = '000';
+    if ($symbolic =~ m/[\-\+]/) {
+        my @st = stat $file;
+        if (@st) {
+            $mode = sprintf '%04o', $st[2];
+        }
+    }
     my $current      = substr $mode => -3;  # rwx permissions for ugo.
 
     my %perms;
@@ -376,7 +382,7 @@ sub mod ($$) {
                 next;
             }
             if ($operator eq '=') {
-                %perms = ( 'u' => 0, 'g' => 0, 'o' => 0);
+                $perms{$who} = 0;
             }
 
             # If we arrive here, $perms is a string.
@@ -474,9 +480,9 @@ install - install files and directories
 
 =head1 SYNOPSIS
 
-B<install> [B<-CcDps>] [B<-g> I<group>] [B<-m> I<mode>] [B<-o> I<owner>] I<file1> I<file2>
+B<install> [B<-bCcDps>] [B<-g> I<group>] [B<-m> I<mode>] [B<-o> I<owner>] I<file1> I<file2>
 
-B<install> [B<-CcDps>] [B<-g> I<group>] [B<-m> I<mode>] [B<-o> I<owner>] I<file> ... I<directory>
+B<install> [B<-bCcDps>] [B<-g> I<group>] [B<-m> I<mode>] [B<-o> I<owner>] I<file> ... I<directory>
 
 B<install> B<-d> [B<-g> I<group>] [B<-m> I<mode>] [B<-o> I<owner>] I<directory> ...
 
@@ -490,6 +496,11 @@ parent directories as necessary, similar to B<mkdir -p>).
 B<install> accepts these options:
 
 =over 4
+
+=item B<-b>
+
+Create a backup of an existing file before copying over it.
+This is done by renaming the original file to have a '.old' extension.
 
 =item B<-C>
 

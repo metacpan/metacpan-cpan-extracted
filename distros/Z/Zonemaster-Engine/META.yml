@@ -34,6 +34,7 @@ requires:
   File::ShareDir: 1
   File::Slurp: 0
   IO::Socket::INET6: 2.69
+  List::Compare: 0
   List::MoreUtils: 0
   Locale::TextDomain: 1.2
   Log::Any: 0
@@ -44,10 +45,10 @@ requires:
   Readonly: 0
   Text::CSV: 0
   YAML::XS: 0
-  Zonemaster::LDNS: 4.000002
+  Zonemaster::LDNS: 4.001
   perl: 5.16.0
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-engine/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-engine
-version: '6.000000'
+version: '7.000000'

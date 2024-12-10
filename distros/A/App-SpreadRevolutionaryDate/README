@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.35
+    version 0.36
 
 DESCRIPTION
 
@@ -128,7 +128,7 @@ CONFIGURATION
 
   msgmaker
 
-    This option can only be specified once, with a value as string. Spread
+    This option can only be specified once, with a value as string. Spreads
     a message computed by the class defined by the value of this option,
     defaults to RevolutionaryDate. The Value (case sensitive) of this
     option should correspond to an existing
@@ -141,12 +141,12 @@ CONFIGURATION
 
   locale
 
-    This option can only be specified once, with a value as string. Spread
+    This option can only be specified once, with a value as string. Spreads
     with chosen language. As of App::SpreadRevolutionaryDate 0.11 locale is
     limited to 'fr', 'en', 'it' or 'es' for RevolutionaryDate and 'fr',
-    'en', 'it', 'es' or 'de'. Defaults to 'fr' for RevolutionaryDate and
-    'en' otherwise. To add more languages see "INTERNATIONALIZATION AND
-    LOCALIZATION".
+    'en', 'it', 'es' or 'de' otherwise. Defaults to 'fr' for
+    RevolutionaryDate and 'en' otherwise. To add more languages see
+    "INTERNATIONALIZATION AND LOCALIZATION".
 
   test
 
@@ -166,7 +166,7 @@ CONFIGURATION
 
     This option is deprecated starting from version 0.07 of this
     distribution and may be removed in future release. Please use "targets"
-    option, as described above. Spread on Bluesky explicitly. If none of
+    option, as described above. Spreads on Bluesky explicitly. If none of
     the bluesky, twitter, mastodon, freenode, liberachat option is set, the
     revolutionary date is spread on all of these five targets.
 
@@ -174,7 +174,7 @@ CONFIGURATION
 
     This option is deprecated starting from version 0.07 of this
     distribution and may be removed in future release. Please use "targets"
-    option, as described above. Spread on Twitter explicitly. If none of
+    option, as described above. Spreads on Twitter explicitly. If none of
     the bluesky, twitter, mastodon, freenode, liberachat option is set, the
     revolutionary date is spread on all of these five targets.
 
@@ -182,7 +182,7 @@ CONFIGURATION
 
     This option is deprecated starting from version 0.07 of this
     distribution and may be removed in future release. Please use "targets"
-    option, as described above. Spread on Mastodon explicitly. If none of
+    option, as described above. Spreads on Mastodon explicitly. If none of
     the bluesky, twitter, mastodon, freenode, liberachat option is set, the
     revolutionary date is spread on all of these five targets.
 
@@ -190,7 +190,7 @@ CONFIGURATION
 
     This option is deprecated starting from version 0.07 of this
     distribution and may be removed in future release. Please use "targets"
-    option, as described above. Spread on Freenode explicitly. If none of
+    option, as described above. Spreads on Freenode explicitly. If none of
     the twitter, mastodon, freenode, liberachat option is set, the
     revolutionary date is spread on all of these five targets.
 
@@ -198,9 +198,9 @@ CONFIGURATION
 
     This option is deprecated starting from version 0.07 of this
     distribution and may be removed in future release. Please use "targets"
-    option, as described above. Spread on Liberachat explicitly. If none of
-    the bluesky, twitter, mastodon, freenode, liberachat option is set, the
-    revolutionary date is spread on all of these five targets.
+    option, as described above. Spreads on Liberachat explicitly. If none
+    of the bluesky, twitter, mastodon, freenode, liberachat option is set,
+    the revolutionary date is spread on all of these five targets.
 
  Bluesky options
 
@@ -212,12 +212,14 @@ CONFIGURATION
   identifier
 
     This option can only be specified once, with a value as string: your
-    Bluesky identifier.
+    Bluesky identifier (ending with .bsky.social by default).
 
   password
 
     This option can only be specified once, with a value as string: your
-    Bluesky password.
+    Bluesky password. You can define a special password for this
+    application, in order to not use your main Bluesky password in your
+    Bluesky account settings <https://bsky.app/settings/app-passwords>.
 
  Twitter options
 
@@ -601,11 +603,12 @@ EXTENDING TO NEW TARGETS
 
     Should you extend spread-revolutionary-date to a new target, we advise
     you to have a look on how default targets are implemented:
-    App::SpreadRevolutionaryDate::Target::Bluesky with Bluesky worker,
+    App::SpreadRevolutionaryDate::Target::Bluesky with
+    App::SpreadRevolutionaryDate::BlueskyLite worker,
     App::SpreadRevolutionaryDate::Target::Twitter with Twitter::API worker,
     App::SpreadRevolutionaryDate::Target::Mastodon with Mastodon::Client
-    worker. Both are using OAuth2 protocol <https://oauth.net/2/> to
-    perform authentication. The third and fourth default targets,
+    worker. The last two are using OAuth2 protocol <https://oauth.net/2/>
+    to perform authentication. The third and fourth default targets,
     App::SpreadRevolutionaryDate::Target::Freenode
     <App::SpreadRevolutionaryDate::Target::Liberachat>, uses a chatbot
     <https://en.wikipedia.org/wiki/Chatbot>:
@@ -708,7 +711,7 @@ INTERNATIONALIZATION AND LOCALIZATION
     namespace for each translated language. These classes are named after
     the two-letter (ISO 639-1 <https://en.wikipedia.org/wiki/ISO_639-1>) or
     three-letter (ISO 639-2 <https://en.wikipedia.org/wiki/ISO_639-2> and
-    hISO 639-3 <ttps://en.wikipedia.org/wiki/ISO_639-3>) lowercase
+    ISO 639-3 <https://en.wikipedia.org/wiki/ISO_639-3>) lowercase
     abbreviation of the corresponding language. For example, a German
     translator would work on
     App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::de
@@ -758,7 +761,7 @@ INTERNATIONALIZATION AND LOCALIZATION
     some feast can be translated by '1carotte', '2amaranthe', '0panais'
     (because you say: jour de la carotte, with prefix number 1, jour de
     l'amaranthe, with prefix number 2, and jour du panais, with prefix
-    number 0. If the language does not use any prefix before the feast of
+    number 0). If the language does not use any prefix before the feast of
     the day, each translation for the feast of the day should start with 0,
     and the array of prefixes should include an empty string as its single
     element. If the language does not use a suffix after the feast of the

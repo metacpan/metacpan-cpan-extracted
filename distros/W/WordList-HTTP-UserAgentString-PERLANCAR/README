@@ -3,9 +3,9 @@ NAME
     User-Agent strings
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     WordList::HTTP::UserAgentString::PERLANCAR (from Perl distribution
-    WordList-HTTP-UserAgentString-PERLANCAR), released on 2019-06-17.
+    WordList-HTTP-UserAgentString-PERLANCAR), released on 2024-12-10.
 
 SYNOPSIS
      use WordList::HTTP::UserAgentString::PERLANCAR;
@@ -13,34 +13,44 @@ SYNOPSIS
      my $wl = WordList::HTTP::UserAgentString::PERLANCAR->new;
 
      # Pick a (or several) random word(s) from the list
-     my $word = $wl->pick;
-     my @words = $wl->pick(3);
+     my ($word) = $wl->pick;
+     my ($word) = $wl->pick(1);  # ditto
+     my @words  = $wl->pick(3);  # no duplicates
 
      # Check if a word exists in the list
-     if ($wl->word_exists('foo')) { ... }
+     if ($wl->word_exists('foo')) { ... }  # case-sensitive
 
      # Call a callback for each word
      $wl->each_word(sub { my $word = shift; ... });
 
-     # Get all the words
+     # Iterate
+     my $first_word = $wl->first_word;
+     while (defined(my $word = $wl->next_word)) { ... }
+
+     # Get all the words (beware, some wordlists are *huge*)
      my @all_words = $wl->all_words;
 
 DESCRIPTION
     My selection: recent Firefox (Linux & Windows), recent Chrome (Linux &
     Windows).
 
-STATISTICS
-     +----------------------------------+------------------+
-     | key                              | value            |
-     +----------------------------------+------------------+
-     | avg_word_len                     | 95.6666666666667 |
-     | longest_word_len                 | 113              |
-     | num_words                        | 6                |
-     | num_words_contains_nonword_chars | 6                |
-     | num_words_contains_unicode       | 0                |
-     | num_words_contains_whitespace    | 6                |
-     | shortest_word_len                | 68               |
-     +----------------------------------+------------------+
+    NOTE: My Windows version is still at 7
+
+WORDLIST STATISTICS
+     +----------------------------------+-------+
+     | key                              | value |
+     +----------------------------------+-------+
+     | avg_word_len                     | 90.25 |
+     | longest_word_len                 | 111   |
+     | num_words                        | 4     |
+     | num_words_contain_nonword_chars  | 4     |
+     | num_words_contain_unicode        | 0     |
+     | num_words_contain_whitespace     | 4     |
+     | num_words_contains_nonword_chars | 4     |
+     | num_words_contains_unicode       | 0     |
+     | num_words_contains_whitespace    | 4     |
+     | shortest_word_len                | 70    |
+     +----------------------------------+-------+
 
     The statistics is available in the %STATS package variable.
 
@@ -53,6 +63,31 @@ SOURCE
     <https://github.com/perlancar/perl-WordList-HTTP-UserAgentString-PERLANC
     AR>.
 
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-HTTP-UserAge
@@ -60,13 +95,4 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

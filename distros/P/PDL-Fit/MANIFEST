@@ -1,0 +1,19 @@
+Changes
+examples/lmfit.pl
+Fit.pm
+Gaussian/gauss.c
+Gaussian/gaussian.pd
+Gaussian/Makefile.PL
+Gaussian/t/gauss.t
+Linfit.pm
+LM.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+Polynomial.pm
+t/linfit.t
+t/lm.t
+t/poly.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/Fit/Gaussian.pm            mod=PDL::Fit::Gaussian pd=Gaussian/gaussian.pd (added by pdlpp_mkgen)

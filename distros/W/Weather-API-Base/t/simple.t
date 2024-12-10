@@ -83,6 +83,11 @@ subtest 'ts_to_date' => sub {
     like(ts_to_date(1000000), qr/1970-01-1\d \d\d:\d\d:40/, 'Date OK');
 };
 
+subtest 'ts_to_iso_date' => sub {
+    is(ts_to_iso_date(1000000, 1), '1970-01-12T13:46:40Z', 'UTC Date OK');
+    like(ts_to_iso_date(1000000), qr/1970-01-1\dT\d\d:\d\d:40/, 'Date OK');
+};
+
 subtest 'datetime_to_ts' => sub {
     is(datetime_to_ts('1970-01-12 13:46:40Z'), 1000000, 'Date OK');
     is(datetime_to_ts('1970-01-12 13:46:40', 1), 1000000, 'Date OK');

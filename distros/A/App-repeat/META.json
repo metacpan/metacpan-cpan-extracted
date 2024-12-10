@@ -29,13 +29,15 @@
       },
       "runtime" : {
          "requires" : {
-            "DateTime::Format::Natural" : "0",
             "Getopt::Long::Less" : "0",
             "Log::ger" : "0.038",
             "Time::HiRes" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
+         },
+         "suggests" : {
+            "DateTime::Format::Natural" : "0"
          }
       },
       "test" : {
@@ -50,7 +52,7 @@
    "provides" : {
       "App::repeat" : {
          "file" : "lib/App/repeat.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -65,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-App-repeat"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"
@@ -572,6 +574,17 @@
                }
             },
             "name" : "Prereqs",
+            "version" : "6.032"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "suggests"
+               }
+            },
+            "name" : "RuntimeSuggests",
             "version" : "6.032"
          },
          {

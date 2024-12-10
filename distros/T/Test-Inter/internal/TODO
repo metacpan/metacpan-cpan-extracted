@@ -1,3 +1,6 @@
+Add full support for naming tests:
+   TI_NAME is the name of the current test
+
 Consider adding the following from Test::More
 
    note

@@ -1121,6 +1121,12 @@ sub get_entity_symbol {
   look_for_globref($entns, $symbol_name);
 }
 
+sub maybe_findbin_bin {
+  my $symtab = $main::{'FindBin::'} or return undef;
+  my $globref = $ {*{$symtab}{HASH}}{Bin} or return undef;
+  $ {*{$globref}{SCALAR}}
+}
+
 #
 # to put all functions into @EXPORT_OK.
 #

@@ -1,6 +1,10 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.35 2024-12-08T22:30:42
+0.36 2024-12-09T12:58:34
+ - Fix some docs
+ - Better use utf8::encode for detection of the position of an url for
+   Bluesky in bytes, bytes pragama is only for debugging
+ - Bump v0.35
  - Fix detection of the position of an url for Bluesky in bytes
  - Fix detection of url starting with punctuation
  - Bump v.0.34
@@ -9,6 +13,10 @@ Changelog for App-SpreadRevolutionaryDate
  - Add minimal worker for Bluesky target
  - Add support for Bluesky target
  - Use relative URL to post on Twitter
+
+0.35 2024-12-08T22:30:42Z
+ - Fix detection of the position of an url for Bluesky in bytes
+ - Fix detection of url starting with punctuation
 
 0.34 2024-12-08T19:30:35Z
  - Update doc for Bluesky target

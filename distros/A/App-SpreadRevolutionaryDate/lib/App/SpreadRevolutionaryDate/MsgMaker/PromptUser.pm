@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::PromptUser;
-$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.35';
+$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.36';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message by prompting user
 
 use Moose;
@@ -103,7 +103,7 @@ App::SpreadRevolutionaryDate::MsgMaker::PromptUser - MsgMaker class for L<App::S
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 METHODS
 

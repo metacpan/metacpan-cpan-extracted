@@ -1,0 +1,36 @@
+---
+abstract: 'Send SMS via smsaero.ru'
+author:
+  - 'SmsAero <admin@smsaero.ru>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SmsAero
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Email::Valid: '0'
+  Exception::Class: '0'
+  Getopt::Long: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Log::Log4perl: '0'
+  MIME::Base64: '0'
+  Pod::Usage: '0'
+  Time::Piece: '0'
+  URI::Escape: '0'
+resources:
+  repository: https://github.com/smsaero/smsaero_perl
+version: v3.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

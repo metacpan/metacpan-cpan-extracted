@@ -13,8 +13,6 @@ License: gpl
 
 # What: A perl version of Unix ed editor.
 #
-#    Based on the v7 documentation using GNU ed version 0.2 as a reference.
-#
 #   Currently implemented:
 #        - most addressing modes (".","$","#","/pat/","?pat?","[+-]#, etc.)
 #        - command parsing
@@ -35,36 +33,26 @@ License: gpl
 #
 # Irony:  This was, of course, edited originaly with emacs...
 #
-# Commentary:
-#        The guiding principals of this implentation are:
-#                - Functionality
-#                - Understandability
-#
-#        "perl coolness" was not a guiding principal, as the author is at best
-#        an accomplished perl user.  If you like the program, use it.
-#        If you don't, don't.
-#
 # Legaleese:
 #        This program is released under the GNU Public License.
 #
 # Todo:
-#        - Implement the following commands from the v7 docs:
-#                g - global command
-#                k - mark
-#                u - undo
-#                v - global command "inVerted"
-#
-#        - Create regression test suite...test against "real" ed.
 #        - add a "-e" flag to allow it to be used in sed(1) like fashion.
 #        - add buffer size limitations for strict compatability
 #        - discard NULS, chars after \n
 #        - refuse to read non-ascii files
 #        - Add BSD/GNU extentions
-#
 
 use strict;
 
+use File::Temp qw();
 use Getopt::Std qw(getopts);
+
+use constant A_NOMATCH => -1;
+use constant A_NOPAT   => -2;
+use constant A_PATTERN => -3;
+use constant A_NOMARK  => -4;
+use constant A_RANGE   => -5;
 
 use constant E_ADDREXT => 'unexpected address';
 use constant E_ADDRBAD => 'invalid address';
@@ -79,6 +67,11 @@ use constant E_UNSAVED => 'buffer modified';
 use constant E_CMDBAD  => 'unknown command';
 use constant E_PATTERN => 'invalid pattern delimiter';
 use constant E_NOMATCH => 'no match';
+use constant E_NOPAT   => 'no previous pattern';
+use constant E_UNDO    => 'nothing to undo';
+
+use constant EX_SUCCESS => 0;
+use constant EX_FAILURE => 1;
 
 # important globals
 
@@ -88,14 +81,18 @@ my $NeedToSave = 0;             # buffer modified
 my $UserHasBeenWarned = 0;      # warning given regarding modified buffer
 my $Error = undef;              # saved error string for h command
 my $Prompt = undef;             # saved prompt string for -p option
-my $SupressCounts = 0;          # byte counts are printed by default
+my $SearchPat;                  # saved pattern for repeat search
+my $Scripted = 0;
 my @lines;                      # buffer for file being edited.
 my $command;                    # single letter command entered by user
 my $commandsuf;                 # single letter modifier of command
 my @adrs;                       # 1 or 2 line numbers for commands to operate on
 my @args;                       # command arguments (filenames, search patterns...)
-
-my $EXTENDED_MESSAGES = 0;
+my %marks;
+my $isGlobal;
+my $HelpMode = 0;
+my $UndoFile;
+my $UndoLine;
 
 # constants
 
@@ -108,17 +105,41 @@ my $NO_QUESTIONS_MODE = 0;
 my $PRINT_NUM = 1;
 my $PRINT_BIN = 2;
 
-our $VERSION = '0.4';
+our $VERSION = '0.22';
 
-my %ESC = (
-    7  => '\a',
-    8  => '\b',
-    9  => '\t',
-    10 => "\$\n",
-    11 => '\v',
-    12 => '\f',
-    13 => '\r',
-    92 => '\\\\',
+my @ESC = (
+    '\\000', '\\001', '\\002', '\\003', '\\004', '\\005', '\\006', '\\a',
+    '\\b',   '\\t',   "\$\n",  '\\v',   '\\f',   '\\r',   '\\016', '\\017',
+    '\\020', '\\021', '\\022', '\\023', '\\024', '\\025', '\\026', '\\027',
+    '\\030', '\\031', '\\032', '\\033', '\\034', '\\035', '\\036', '\\037',
+    ' ',     '!',     '"',     '#',     '\\$',   '%',     '&',     q('),
+    '(',     ')',     '*',     '+',     ',',     '-',     '.',     '/',
+    '0',     '1',     '2',     '3',     '4',     '5',     '6',     '7',
+    '8',     '9',     ':',     ';',     '<',     '=',     '>',     '?',
+    '@',     'A',     'B',     'C',     'D',     'E',     'F',     'G',
+    'H',     'I',     'J',     'K',     'L',     'M',     'N',     'O',
+    'P',     'Q',     'R',     'S',     'T',     'U',     'V',     'W',
+    'X',     'Y',     'Z',     '[',     '\\\\',  ']',     '^',     '_',
+    '`',     'a',     'b',     'c',     'd',     'e',     'f',     'g',
+    'h',     'i',     'j',     'k',     'l',     'm',     'n',     'o',
+    'p',     'q',     'r',     's',     't',     'u',     'v',     'w',
+    'x',     'y',     'z',     '{',     '|',     '}',     '~',     '\\177',
+    '\\200', '\\201', '\\202', '\\203', '\\204', '\\205', '\\206', '\\207',
+    '\\210', '\\211', '\\212', '\\213', '\\214', '\\215', '\\216', '\\217',
+    '\\220', '\\221', '\\222', '\\223', '\\224', '\\225', '\\226', '\\227',
+    '\\230', '\\231', '\\232', '\\233', '\\234', '\\235', '\\236', '\\237',
+    '\\240', '\\241', '\\242', '\\243', '\\244', '\\245', '\\246', '\\247',
+    '\\250', '\\251', '\\252', '\\253', '\\254', '\\255', '\\256', '\\257',
+    '\\260', '\\261', '\\262', '\\263', '\\264', '\\265', '\\266', '\\267',
+    '\\270', '\\271', '\\272', '\\273', '\\274', '\\275', '\\276', '\\277',
+    '\\300', '\\301', '\\302', '\\303', '\\304', '\\305', '\\306', '\\307',
+    '\\310', '\\311', '\\312', '\\313', '\\314', '\\315', '\\316', '\\317',
+    '\\320', '\\321', '\\322', '\\323', '\\324', '\\325', '\\326', '\\327',
+    '\\330', '\\331', '\\332', '\\333', '\\334', '\\335', '\\336', '\\337',
+    '\\340', '\\341', '\\342', '\\343', '\\344', '\\345', '\\346', '\\347',
+    '\\350', '\\351', '\\352', '\\353', '\\354', '\\355', '\\356', '\\357',
+    '\\360', '\\361', '\\362', '\\363', '\\364', '\\365', '\\366', '\\367',
+    '\\370', '\\371', '\\372', '\\373', '\\374', '\\375', '\\376', '\\377',
 );
 
 my %WANT_FILE = (
@@ -142,6 +163,7 @@ my %cmdtab = (
     't' => \&edMove,
     'H' => \&edSetHelp,
     'h' => \&edHelp,
+    'k' => \&edMark,
     'm' => \&edMoveDel,
     'n' => \&edPrintNum,
     'l' => \&edPrintBin,
@@ -155,8 +177,28 @@ my %cmdtab = (
     'E' => \&edEdit,
     'e' => \&edEditAsk,
     'r' => \&edRead,
+    'u' => \&edUndo,
     '_' => \&edSetCurrentLine,
     'nop' => sub {},
+);
+
+my %ro_cmds = (
+    '!' => 1,
+    '=' => 1,
+    'f' => 1,
+    'P' => 1,
+    'p' => 1,
+    'H' => 1,
+    'h' => 1,
+    'k' => 1,
+    'n' => 1,
+    'l' => 1,
+    'Q' => 1,
+    'q' => 1,
+    'W' => 1,
+    'w' => 1,
+    '_' => 1,
+    'nop' => 1,
 );
 
 $SIG{HUP} = sub {
@@ -168,19 +210,18 @@ $SIG{HUP} = sub {
             close $fh;
         }
     }
-    exit 1;
+    exit EX_FAILURE;
 };
 
 my %opt;
-getopts('dp:s', \%opt) or Usage();
+getopts('p:s', \%opt) or Usage();
 if (defined $opt{'p'}) {
     $Prompt = $opt{'p'};
 }
 $args[0] = shift;
 $args[0] = undef if (defined($args[0]) && $args[0] eq '-');
 Usage() if @ARGV;
-$SupressCounts = 1 if ($opt{'s'} || !defined($args[0]));
-
+$Scripted = $opt{'s'};
 edEdit($NO_QUESTIONS_MODE, $NO_APPEND_MODE);
 input() while 1;
 
@@ -188,9 +229,9 @@ sub input {
     $command = $commandsuf = '';
     @adrs = ();
     @args = ();
-
     print $Prompt if defined $Prompt;
-    unless ($_ = <>) {
+    $_ = <>;
+    unless (defined $_) {
         edQuitAsk() or return;
     }
     chomp;
@@ -199,18 +240,19 @@ sub input {
         edWarn(E_CMDBAD);
         return;
     }
-    if ($opt{'d'}) {
-        print "command: /$command/ ";
-        print "adrs[0]: /$adrs[0]/ " if defined($adrs[0]);
-        print "adrs[1]: /$adrs[1]/ " if defined($adrs[1]);
-        print "args[0]: /$args[0]/ " if defined($args[0]);
-        print "\n";
-    }
-
     # sanity check addresses
     foreach my $ad (@adrs) {
         next unless defined $ad;
-        if ($ad > maxline() || $ad < 0) {
+        if ($ad == A_NOMATCH) {
+            edWarn(E_NOMATCH);
+            return;
+        } elsif ($ad == A_NOPAT) {
+            edWarn(E_NOPAT);
+            return;
+        } elsif ($ad == A_PATTERN) {
+            edWarn(E_PATTERN);
+            return;
+        } elsif ($ad < 0) {
             edWarn(E_ADDRBAD);
             return;
         }
@@ -227,12 +269,24 @@ sub input {
         edWarn(E_CMDBAD);
         return;
     }
-    $func->();
+
+    my ($saved_buf, $saved_ln);
+    if (!exists($ro_cmds{$command})) {
+        $saved_buf = write_undo();
+        $saved_ln = $CurrentLineNum;
+    }
+    my $err = $func->();
+    edWarn($err) if $err;
+    if ($NeedToSave && $saved_buf) {
+        $UndoFile = $saved_buf;
+        $UndoLine = $saved_ln;
+    }
+    return;
 }
 
 sub VERSION_MESSAGE {
     print "ed version $VERSION\n";
-    exit 0;
+    exit EX_SUCCESS;
 }
 
 sub maxline {
@@ -243,46 +297,57 @@ sub maxline {
     return $n;
 }
 
+sub getrc {
+    return EX_FAILURE if defined $Error;
+    return EX_SUCCESS;
+}
+
 sub edChangeLines {
-    if (edDelete()) {
+    my $err = edDelete();
+    unless ($err) {
         $adrs[1] = undef;
         edInsert();
     }
+    return $err;
 }
 
 sub edPrompt {
-    if (defined $adrs[0]) {
-        edWarn(E_ADDREXT);
-        return;
-    }
-    if (defined $args[0]) {
-        edWarn(E_ARGEXT);
-        return;
-    }
+    return E_ADDREXT if defined $adrs[0];
+    return E_ARGEXT if defined $args[0];
+
     if (defined $Prompt) {
 	$Prompt = undef;
     } else {
 	$Prompt = defined $opt{'p'} ? $opt{'p'} : '*';
     }
+    return;
 }
 
 sub edHelp {
     my $toggle = shift;
 
-    if (defined $adrs[0]) {
-        edWarn(E_ADDREXT);
-        return;
-    }
-    if (defined $args[0]) {
-        edWarn(E_ARGEXT);
-        return;
-    }
+    return E_ADDREXT if defined $adrs[0];
+    return E_ARGEXT if defined $args[0];
+
     if ($toggle) {
-        $EXTENDED_MESSAGES ^= 1;
+        $HelpMode ^= 1;
     }
-    if (defined($Error) && ($EXTENDED_MESSAGES || !$toggle)) {
+    if (defined($Error) && ($HelpMode || !$toggle)) {
          print "$Error\n";
     }
+    return;
+}
+
+sub edMark {
+    my $c = $args[0];
+    if (!defined($c) || $c !~ m/\A[a-z]\z/) {
+        return E_SUFFBAD;
+    }
+    my $ad = $adrs[1];
+    $ad = $adrs[0] unless defined $ad;
+    $ad = $CurrentLineNum unless defined $ad;
+    $marks{$c} = $ad;
+    return;
 }
 
 #
@@ -292,61 +357,53 @@ sub edHelp {
 sub edPrint {
     my $mode = shift;
 
-    $adrs[0] = $CurrentLineNum unless (defined($adrs[0]));
-    $adrs[1] = $adrs[0] unless (defined($adrs[1]));
+    my $do_bin = $mode == $PRINT_BIN;
+    my $do_num = $mode == $PRINT_NUM;
 
-    if ($adrs[0] == 0 || $adrs[1] == 0) {
-        edWarn(E_ADDRBAD);
-        return;
-    }
-    if (defined($args[0])) {
-        edWarn(E_ARGEXT);
-        return;
-    }
-
-    if ($mode == $PRINT_NUM) {
-        for my $i ($adrs[0] .. $adrs[1]) {
-            print $i, "\t", $lines[$i];
+    if (defined $args[0]) {
+        if ($args[0] =~ s/\A([lnp]+)//) {
+            my $arg = $1;
+            $do_bin = 1 if $arg =~ m/l/;
+            $do_num = 1 if $arg =~ m/n/;
         }
-    } elsif ($mode == $PRINT_BIN) {
-        for my $i ($adrs[0] .. $adrs[1]) {
+        return E_ARGEXT if length $args[0];
+    }
+    unless ($isGlobal) {
+        $adrs[0] = $CurrentLineNum unless (defined($adrs[0]));
+        $adrs[1] = $adrs[0] unless (defined($adrs[1]));
+        return E_ADDRBAD if ($adrs[0] == 0 || $adrs[1] == 0);
+
+        my $start = $adrs[0];
+        my $end = $adrs[1];
+        @adrs = ($start .. $end);
+    }
+    for my $i (@adrs) {
+        if ($do_num) {
+            print $i, "\t";
+        }
+        if ($do_bin) {
             print escape_line($i);
-        }
-    } else {
-        for my $i ($adrs[0] .. $adrs[1]) {
+        } else {
             print $lines[$i];
         }
     }
-
-    $CurrentLineNum = $adrs[1];
+    $CurrentLineNum = $adrs[-1];
+    return;
 }
 
 sub escape_line {
     my $idx = shift;
 
     my @chars = unpack 'C*', $lines[$idx];
-    if (scalar(@chars) == 0) {
-        die 'internal error: unpack';
-    }
-    my $s = '';
-    foreach my $c (@chars) {
-        if (exists $ESC{$c}) {
-            $s .= $ESC{$c};
-        } elsif (chr($c) !~ m/[[:print:]]/) {
-            $s .= sprintf '\%03o', $c;
-        } else {
-            $s .= chr($c);
-        }
-    }
-    return $s;
+    die 'internal error: unpack' unless @chars;
+    my @s = map { $ESC[$_] } @chars;
+    return join '', @s;
 }
 
 # does not modify buffer
 sub edPipe {
-    if (defined $adrs[0]) {
-        edWarn(E_ADDREXT);
-        return;
-    }
+    return E_ADDREXT if defined $adrs[0];
+
     if (defined $args[0]) {
         my $rc = system $args[0];
         print "$args[0]: $!\n" if ($rc == -1);
@@ -357,22 +414,16 @@ sub edPipe {
 
 # merge lines back into $lines[$adrs[0]]
 sub edJoin {
-    if (defined($args[0])) {
-        edWarn(E_ARGEXT);
-        return;
-    }
+    return E_ARGEXT if defined $args[0];
     if (defined($adrs[0]) && $adrs[0] == 0) {
-        edWarn(E_ADDRBAD);
-        return;
+        return E_ADDRBAD;
     }
     if (defined($adrs[1]) && $adrs[1] == 0) {
-        edWarn(E_ADDRBAD);
-        return;
+        return E_ADDRBAD;
     }
     if (!defined($adrs[0]) && !defined($adrs[1])) {
         if ($CurrentLineNum == maxline()) {
-            edWarn(E_ADDRBAD);
-            return;
+            return E_ADDRBAD;
         }
         $adrs[0] = $CurrentLineNum;
         $adrs[1] = $CurrentLineNum + 1;
@@ -395,6 +446,7 @@ sub edJoin {
     $NeedToSave = 1;
     $UserHasBeenWarned = 0;
     $CurrentLineNum = $adrs[0];
+    return;
 }
 
 sub edMove {
@@ -409,11 +461,16 @@ sub edMove {
         $end = $start;
     }
     if ($start == 0 || $end == 0) { # allowed for $dst only
-        edWarn(E_ADDRBAD);
-        return;
+        return E_ADDRBAD;
     }
-    my $dst = $args[0];
-    unless (defined $dst) {
+    $_ = $args[0];
+    my $dst = getAddr();
+    return E_SUFFBAD if m/\S/;
+    if (defined $dst) {
+        return E_NOMATCH if $dst == A_NOMATCH;
+        return E_NOPAT if $dst == A_NOPAT;
+        return E_ADDRBAD if $dst < 0;
+    } else {
         $dst = $CurrentLineNum;
     }
     if ($delete) {
@@ -423,8 +480,7 @@ sub edMove {
         }
         # move a range into itself
         if ($dst >= $start && $dst <= $end) {
-            edWarn(E_ADDRBAD);
-            return;
+            return E_ADDRBAD;
         }
     }
 
@@ -441,7 +497,8 @@ sub edMove {
 
     $NeedToSave = 1;
     $UserHasBeenWarned = 0;
-    $CurrentLineNum = $dst + scalar(@copy)
+    $CurrentLineNum = $dst + scalar(@copy);
+    return;
 }
 
 sub edMoveDel { edMove(1); }
@@ -451,7 +508,7 @@ sub edPrintBin { edPrint($PRINT_BIN); }
 sub edQuitAsk { edQuit(1); }
 sub edAppend { edInsert(1); }
 sub edWriteAppend { edWrite(1); }
-sub edEditAsk { edEdit($QUESTIONS_MODE,$NO_INSERT_MODE); }
+sub edEditAsk { edEdit(!$Scripted, $NO_INSERT_MODE); }
 sub edRead { edEdit($QUESTIONS_MODE,$INSERT_MODE); }
 
 #
@@ -461,18 +518,19 @@ sub edRead { edEdit($QUESTIONS_MODE,$INSERT_MODE); }
 sub edSubstitute {
     my($LastMatch,$char,$first,$middle,$last,$whole,$flags,$PrintLastLine);
 
-    # parse args
-
-    $adrs[0] = $CurrentLineNum unless (defined($adrs[0]));
-    $adrs[1] = $adrs[0] unless (defined $adrs[1]);
-
-    if ($adrs[0] == 0 || $adrs[1] == 0) {
-        edWarn(E_ADDRBAD);
-        return;
-    }
     if (!defined($args[0]) || length($args[0]) == 0) {
-        edWarn(E_PATTERN);
-        return;
+        return E_PATTERN;
+    }
+    unless ($isGlobal) {
+        $adrs[0] = $CurrentLineNum unless (defined($adrs[0]));
+        $adrs[1] = $adrs[0] unless (defined $adrs[1]);
+
+        if ($adrs[0] == 0 || $adrs[1] == 0) {
+            return E_ADDRBAD;
+        }
+        my $start = $adrs[0];
+        my $end = $adrs[1];
+        @adrs = ($start .. $end);
     }
 
     # do wierdness to match semantics if last character
@@ -483,8 +541,7 @@ sub edSubstitute {
         ($whole,$first,$middle,$last,$flags) = ($args[0] =~ /(($char)[^"$char"]*($char)[^"$char"]*($char)?)([imsx]*)/);
         1;
     } or do {
-        edWarn(E_PATTERN);
-        return;
+        return E_PATTERN;
     };
 
     if (defined($char) and defined($whole) and
@@ -494,7 +551,7 @@ sub edSubstitute {
     }
 
     # do the search and substitution
-    for my $lineno ($adrs[0]..$adrs[1]) {
+    for my $lineno (@adrs) {
         my $evalstring = "\$lines[\$lineno] =~ s$args[0]";
 
         if (eval $evalstring) {
@@ -504,14 +561,11 @@ sub edSubstitute {
         }
 
     }
-    unless (defined $LastMatch) {
-        edWarn(E_NOMATCH);
-        return;
-    }
-
+    return E_NOMATCH unless defined $LastMatch;
     $CurrentLineNum = $LastMatch;
 
     print $lines[$LastMatch] if ($PrintLastLine);
+    return;
 }
 
 #
@@ -519,22 +573,20 @@ sub edSubstitute {
 #
 
 sub edDelete {
-    $adrs[0] = $CurrentLineNum unless (defined($adrs[0]));
-    $adrs[1] = $adrs[0] unless (defined($adrs[1]));
+    return E_ARGEXT if defined $args[0];
 
-    if ($adrs[0] == 0 || $adrs[1] == 0) {
-        edWarn(E_ADDRBAD);
-        return;
+    unless ($isGlobal) {
+        $adrs[0] = $CurrentLineNum unless (defined($adrs[0]));
+        $adrs[1] = $adrs[0] unless (defined($adrs[1]));
+        return E_ADDRBAD if ($adrs[0] == 0 || $adrs[1] == 0);
+
+        my $start = $adrs[0];
+        my $end = $adrs[1];
+        @adrs = ($start .. $end);
     }
-    if (defined $args[0]) {
-        edWarn(E_ARGEXT);
-        return;
+    for my $i (reverse @adrs) {
+        splice @lines, $i, 1;
     }
-
-    my $NumLines = $adrs[1]-$adrs[0]+1;
-
-    splice(@lines,$adrs[0],$NumLines);
-
     $NeedToSave = 1;
     $UserHasBeenWarned = 0;
 
@@ -542,7 +594,7 @@ sub edDelete {
     if ($CurrentLineNum > maxline()) {
         $CurrentLineNum = maxline();
     }
-    return 1;
+    return;
 }
 
 #
@@ -551,21 +603,21 @@ sub edDelete {
 
 sub edFilename {
     if (defined($adrs[0]) or defined($adrs[1])) {
-        edWarn(E_ADDREXT);
-        return;
+        return E_ADDREXT;
     }
-
     if (defined($args[0])) {
+        return E_FNAME if $args[0] =~ m/\A\!/;
+        return E_FNAME if $args[0] =~ m/\/\Z/;
+        return E_FNAME if ($args[0] eq '.' || $args[0] eq '..');
         $RememberedFilename = $args[0];
-        return;
     }
-
     if (defined($RememberedFilename)) {
         print "$RememberedFilename\n";
     }
     else {
-        edWarn(E_NOFILE);
+        return E_NOFILE;
     }
+    return;
 }
 
 #
@@ -584,16 +636,13 @@ sub edWrite {
     } elsif (defined($adrs[0]) && !defined($adrs[1])) {
         $adrs[1] = $adrs[0];
     }
-    if ($adrs[0] == 0) {
-        edWarn(E_ADDRBAD);
-        return;
-    }
+    return E_ADDRBAD if $adrs[0] == 0;
+
     if (length $commandsuf) {
         if ($commandsuf eq 'q') {
             $qflag = 1;
         } else {
-            edWarn(E_SUFFBAD);
-            return;
+            return E_SUFFBAD;
         }
     }
 
@@ -602,33 +651,30 @@ sub edWrite {
     } elsif (defined $RememberedFilename) {
         $filename = $RememberedFilename;
     } else {
-        edWarn(E_NOFILE);
-        return;
+        return E_NOFILE;
     }
-    my $mode = $AppendMode ? '>>' : '>';
-    unless (open $fh, $mode, $filename) {
-        warn "$filename: $!\n";
-        edWarn(E_OPEN);
-        return;
+    if ($filename =~ s/\A\!//) {
+        return unless (open $fh, "| $filename"); # no error
+    } else {
+        my $mode = $AppendMode ? '>>' : '>';
+        unless (open $fh, $mode, $filename) {
+            warn "$filename: $!\n";
+            return E_OPEN;
+        }
     }
-
     for my $line (@lines[$adrs[0]..$adrs[1]]) {
         print {$fh} $line;
         $chars += length($line);
     }
     unless (close $fh) {
         warn "$filename: $!\n";
-        edWarn(E_CLOSE);
-        return;
+        return E_CLOSE;
     }
 
-    $NeedToSave = 0;
-    $UserHasBeenWarned = 0;
-    print "$chars\n" unless ($SupressCounts);
-
-    if ($qflag) {
-        exit 0;
-    }
+    $NeedToSave = $UserHasBeenWarned = 0;
+    print "$chars\n" unless $Scripted;
+    exit getrc() if $qflag;
+    return;
 }
 
 
@@ -652,41 +698,37 @@ sub edEdit {
         }
     } else {
         if (defined($adrs[0]) or defined($adrs[1])) {
-            edWarn(E_ADDREXT);
-            return 0;
+            return E_ADDREXT;
         }
         if ($NeedToSave && $QuestionsMode && !$UserHasBeenWarned) {
             $UserHasBeenWarned = 1;
-            edWarn(E_UNSAVED);
-            return 0;
+            return E_UNSAVED;
         }
     }
 
     if (defined $args[0]) {
-        if (length($args[0]) == 0) {
-            edWarn(E_FNAME);
-            return 0;
-        }
+        return E_FNAME unless (length $args[0]);
         $filename = $RememberedFilename = $args[0];
     } elsif (defined $RememberedFilename) {
         $filename = $RememberedFilename;
     } else {
         $CurrentLineNum = 0;
         @lines = (0);
-        return 1;
+        return;
     }
 
     if (-d $filename) {
         warn "$filename: is a directory\n";
-        edWarn(E_READ);
-        return 0;
+        return E_READ;
     }
-    unless (open $fh, '<', $filename) {
-        warn "$filename: $!\n";
-        edWarn(E_OPEN);
-        return 0;
+    if ($filename =~ s/\A\!//) {
+        return unless (open $fh, "$filename |"); # no error
+    } else {
+        unless (open $fh, '<', $filename) {
+            warn "$filename: $!\n";
+            return E_OPEN;
+        }
     }
-
     $chars = 0;
     while (<$fh>) {
         push @tmp_lines, $_;
@@ -694,15 +736,14 @@ sub edEdit {
     }
     unless (close $fh) {
         warn "$filename: $!\n";
-        edWarn(E_CLOSE);
-        return 0;
+        return E_CLOSE;
     }
     if ($chars == 0) {
         $UserHasBeenWarned = 0;
         $CurrentLineNum = 0;
         @lines = (0);
-        print "0\n" unless $SupressCounts;
-        return 1;
+        print "0\n" unless $Scripted;
+        return;
     }
     if (substr($tmp_lines[-1], -1, 1) ne "\n") {
         $tmp_lines[-1] .= "\n";
@@ -729,8 +770,8 @@ sub edEdit {
     }
 
     $UserHasBeenWarned = 0;
-    print "$chars\n" unless $SupressCounts;
-    return 1;
+    print "$chars\n" unless $Scripted;
+    return;
 }
 
 #
@@ -741,10 +782,8 @@ sub edInsert {
     my $append = shift;
     my(@tmp_lines);
 
-    if (defined($args[0])) {
-        edWarn(E_ARGEXT);
-        return;
-    }
+    return E_ARGEXT if defined $args[0];
+
     if (defined($adrs[1])) {
         $adrs[0] = $adrs[1];
     }
@@ -757,9 +796,7 @@ sub edInsert {
         last if (/^\.$/);
         push(@tmp_lines,$_);
     }
-    if (scalar(@tmp_lines) == 0) {
-        return 1;
-    }
+    return unless (@tmp_lines); # no change
 
     my $src = $adrs[0];
     $src++ if ($src && $append);
@@ -769,7 +806,7 @@ sub edInsert {
 
     $NeedToSave = 1;
     $UserHasBeenWarned = 0;
-    return 1;
+    return;
 }
 
 
@@ -778,10 +815,7 @@ sub edInsert {
 #
 
 sub edPrintLineNum {
-    if (defined($args[0])) {
-        edWarn(E_ARGEXT);
-        return;
-    }
+    return E_ARGEXT if defined $args[0];
 
     my $adr = $adrs[1];
     if (!defined($adr)) {
@@ -791,9 +825,29 @@ sub edPrintLineNum {
         $adr = maxline();
     }
     print "$adr\n";
+    return;
+}
 
-    # v7 docs say this does not affect current line.  GNU ed sets the line.
-    # We go with the v7 docs.
+sub write_undo {
+    my $fh = File::Temp->new;
+    foreach (@lines) {
+         print {$fh} $_;
+    }
+    seek $fh, 0, 0;
+    return $fh;
+}
+
+sub edUndo {
+    return E_ADDREXT if defined $adrs[0];
+    return E_ARGEXT if defined $args[0];
+    return E_UNDO unless defined $UndoFile;
+
+    $CurrentLineNum = $UndoLine;
+    @lines = <$UndoFile>;
+    unshift @lines, undef;
+    $UserHasBeenWarned = 0;
+    $NeedToSave = 1; # new tmpfile
+    return;
 }
 
 #
@@ -803,21 +857,14 @@ sub edPrintLineNum {
 sub edQuit {
     my($QuestionMode) = @_;
 
-    if (defined $adrs[0]) {
-        edWarn(E_ADDREXT);
-        return;
-    }
-    if (defined($args[0])) {
-        edWarn(E_ARGEXT);
-        return;
-    }
+    return E_ADDREXT if defined $adrs[0];
+    return E_ARGEXT if defined $args[0];
+
     if ($QuestionMode && $NeedToSave && !$UserHasBeenWarned) {
         $UserHasBeenWarned = 1;
-        edWarn(E_UNSAVED);
-        return;
+        return E_UNSAVED;
     }
-
-    exit 0;
+    exit getrc();
 }
 
 #
@@ -832,10 +879,7 @@ sub edQuit {
 #        2. The new current line is printed.
 
 sub edSetCurrentLine {
-    if (defined($args[0])) {
-        edWarn(E_ARGEXT);
-        return 0;
-    }
+    return E_ARGEXT if defined $args[0];
 
     my $adr = $adrs[1];
     if (!defined($adr)) {
@@ -843,20 +887,16 @@ sub edSetCurrentLine {
     }
     if (defined($adr)) {
         if ($adr <= 0 || maxline() == 0 || $adr > maxline()) {
-            edWarn(E_ADDRBAD);
-            return 0;
+            return E_ADDRBAD;
         }
         $CurrentLineNum = $adr; # jump to specified line
     } else {
-        if ($CurrentLineNum == maxline()) {
-            edWarn(E_ADDRBAD);
-            return 0;
-        }
+        return E_ADDRBAD if $CurrentLineNum == maxline();
         $CurrentLineNum++;
     }
 
     print $lines[$CurrentLineNum];
-    return 1;
+    return;
 }
 
 #
@@ -874,157 +914,125 @@ sub edSetCurrentLine {
 #
 
 sub edParse {
+    $isGlobal = 0;
+    $command = 'nop';
     s/\A\s+//;
-    my @fields =
-             (/^(
-                 (
-                  ((\d+)|(\.)|(\$)|([\/\?]([^\/\?+-]+)[\/\?]?))?
-                                        # num,.,$,pattern
-                  (([+-])?(\d+))?         # [+]num | -num
-                  (([\+]+)|([-^]+))?        # + | -
-                )                        # first expression
-                (,                        # comma between adrs
-                  ((\d+)|(\.)|(\$)|([\/\?]([^\/\?+-]+)[\/\?]?))?
-                                        # num,.,$,pattern
-                  (([+-])?(\d+))?         # [+]num | -num
-                  (([\+]+)|([-^]+))?        # + | -
-                )?
-                 ([acdeEfhHijlmnpPqQrstwW=\!])?        # command char
-                 ([a-z])?                # command suffix
-                 (\s*)(.+)?                # argument (filename, etc.)
-                 )$/x);
-
-
-    return 0 if ($#fields == -1);  # bad syntax
-
-    my $space_sep = length $fields[29];
-    if (defined($fields[27])) {
-        $command = $fields[27];
-    } else {
-        $command = '_';
+    $adrs[0] = getAddr();
+    if (defined($adrs[0]) && ($adrs[0] == A_NOPAT || $adrs[0] == A_NOMATCH)) {
+        return 1;
     }
-    if (defined $fields[28]) {
-        $commandsuf = $fields[28];
-        if ($command eq '!' && !$space_sep) { # allow !ls
-            $fields[30] = $commandsuf . $fields[30];
-        } elsif (lc($command) ne 'w') {
-            return 0;
+    if (s/\A([,;\%])//) {
+        my $sep = $1;
+        return 0 if $sep eq '%' && defined($adrs[0]);
+        $adrs[1] = getAddr();
+        return 1 if defined($adrs[1]) && $adrs[1] < 0;
+
+        unless (defined $adrs[0]) {
+            $adrs[0] = $sep eq ';' ? $CurrentLineNum : 1;
+            $adrs[1] = maxline() unless defined $adrs[1];
         }
-    } else {
-        $commandsuf = '';
     }
-
-    $args[0] = $fields[30];
-
-    $adrs[0] = CalculateLine(splice(@fields, 1, 13));
-    if ($adrs[0] == -1) {
-        edWarn(E_NOMATCH);
-        $command = 'nop';
-        undef $adrs[0];
+    if (s/\A([gv])\///) {
+        my $invert = $1 eq 'v';
+        my $re = getRe('/', 1);
+        unless (defined $re) {
+            $adrs[0] = A_PATTERN;
+            return 1;
+        }
+        if (length($re) == 0) {
+            unless (defined $SearchPat) {
+                $adrs[0] = A_NOPAT;
+                return 1;
+            }
+            $re = $SearchPat;
+        }
+        my @found = edSearchGlobal($re, $invert);
+        return 1 unless @found; # nothing to do
+        $isGlobal = 1;
+        @adrs = @found;
     }
-    my $commarange = $fields[1] =~ /,/;
-
-    $adrs[1] = CalculateLine(splice(@fields, 1, 13));
-    if ($adrs[1] == -1) {
-        edWarn(E_NOMATCH);
-        $command = 'nop';
-        undef $adrs[1];
-    }
-    if ($commarange && !defined($adrs[0])) {
-        $adrs[0] = 1;
-        $adrs[1] = maxline() unless defined $adrs[1];
-    }
-    if (defined($args[0]) && $WANT_FILE{$command} && !$space_sep) {
-        return 0;
-    }
-
-    return 1;
-}
-
-#
-# Given a parsed address expression, calcuate & return the indicated line
-#
-
-sub CalculateLine {
-
-    my($expr1,
-       $adrexpr1,
-       $decimaladr,$dotadr,$dollaradr,
-       $wholesearch,$searchadr,
-       $offsetexpr,$offsetdir,$offsetammount,
-       $plusesorminusesexpr,$pluses,$minuses) = @_;
-
-    my($myline);
-
-    if ($opt{'d'}) {
-        print "expr1=/$expr1/\n" if (defined($expr1));
-        print "decimaladr=/$decimaladr/\n" if (defined($decimaladr));
-        print "dotadr=/$dotadr/\n" if (defined($dotadr));
-        print "dollaradr=/$dollaradr/\n" if (defined($dollaradr));
-        print "wholesearch=/$wholesearch/\n" if (defined($wholesearch));
-        print "searchadr=/$searchadr/\n" if (defined($searchadr));
-        print "offsetexpr=/$offsetexpr/\n" if (defined($offsetexpr));
-        print "offsetdir=/$offsetdir/\n" if (defined($offsetdir));
-        print "offsetammount=/$offsetammount/\n"
-            if (defined($offsetammount));
-        print "plusesorminusesexpr=/$plusesorminusesexpr/\n"
-            if (defined($plusesorminusesexpr));
-        print "pluses=/$pluses/\n" if (defined($pluses));
-        print "minuses=/$minuses/\n" if (defined($minuses));
-    }
-
-    if (defined($expr1)) {
-        if (defined($decimaladr)) {
-            $myline = $decimaladr;
-        } elsif (defined($dotadr)) {
-            $myline = $CurrentLineNum;
-        } elsif (defined($dollaradr)) {
-            $myline = maxline();
-        } elsif (defined($searchadr)) {
-            my $pattern = $searchadr;
-            $pattern =~ s/[\?\/]$//;
-            $pattern =~ s/^[\?\/]//;
-
-            if ($wholesearch =~ /^\?/) {
-                $myline = edSearchBackward($pattern);
-                return -1 unless $myline;
-            } else {
-                $myline = edSearchForward($pattern);
-                return -1 unless $myline;
+    if (s/\A([acdEefHhijklmnPpQqrstuWw=\!])//) { # optional argument
+        $command = $1;
+        if ($command eq 'W' || $command eq 'w') {
+            if (s/\A[Qq]//) {
+                $commandsuf = 'q';
             }
         }
+        if ($WANT_FILE{$command} && m/\A\S/) {
+            return 0; # space before filename
+        }
+        s/\A\s+//;
+        $args[0] = $_ if length;
+        return 1;
     }
-
-    if (defined($offsetexpr)) {
-        $myline = $CurrentLineNum unless defined($myline);
-        $myline += int $offsetexpr;
+    if (m/\A\s*\z/) { # set line if command omitted
+        $command = '_';
+        return 1;
     }
-
-    if (defined($plusesorminusesexpr)) {
-        $myline = $CurrentLineNum unless defined($myline);
-        $myline += length($pluses||'') - length($minuses||'');
-    }
-
-    return $myline;
+    return 0;
 }
 
-#
-# Search forward for a pattern...wrap if not found
-#
-# Inputs:
-#        pattern                - via argument
-#        CurrentLineNum        - global
-#        lines                - global
-#
-# Return:
-#        0                - not found
-#        >0                - line where first found
-#
+sub getAddr {
+    my $n;
+    if (s/\A([\-\^\+]+)//) { # '++--' == current+0
+        $n = $CurrentLineNum;
+        foreach my $c (split //, $1) {
+            $n += $c eq '+' ? 1 : -1;
+        }
+    } elsif (s/\A\'([a-z])//) {
+        $n = exists $marks{$1} ? $marks{$1} : A_NOMARK;
+    } elsif (s/\A([0-9]+)//) { # '10' == 10
+        $n = $1;
+    } elsif (s/\A\.//) { # '.' == current line
+        $n = $CurrentLineNum;
+    } elsif (s/\A\$//) { # '$' == max line
+        $n = maxline();
+    } elsif (s/\A([\/\?])//) { # search: '/re/' or '?re?'
+        my $delim = $1;
+        my $re = getRe($delim);
+        $re = '' unless defined $re; # delim not needed
+        if (length($re) == 0) {
+            return A_NOPAT unless defined $SearchPat;
+            $re = $SearchPat;
+        }
+        $n = edSearch($re, $delim eq '?');
+        $n = A_NOMATCH unless $n;
+    }
+    if (defined $n) {
+        return A_RANGE if $n < 0 || $n > maxline();
+    }
+    return $n;
+}
 
-sub edSearchForward {
-    my($pattern) = @_;
+sub getRe {
+    my ($delim, $delimreq) = @_;
+    my $i;
+    my @chars = split //;
+    my $sz = scalar @chars;
 
-    for my $line (($CurrentLineNum + 1) .. maxline(), 1 .. $CurrentLineNum) {
+    for ($i = 0; $i < $sz; $i++) {
+        my $j = $i - 1;
+        $j = 0 if $j < 0;
+        last if $chars[$i] eq $delim && $chars[$j] ne '\\';
+    }
+    return if $delimreq && $i == $sz;
+    my $re = substr $_, 0, $i;
+    $_ = substr $_, $i + 1;
+    return $re;
+}
+
+sub edSearch {
+    my ($pattern, $backward) = @_;
+
+    $SearchPat = $pattern;
+    my $cur = $CurrentLineNum;
+    my @idx;
+    if ($backward) {
+        @idx = reverse ($cur .. maxline(), 1 .. ($cur - 1));
+    } else {
+        @idx = (($cur + 1) .. maxline(), 1 .. $cur);
+    }
+    foreach my $line (@idx) {
         if ($lines[$line] =~ /$pattern/) {
             return $line;
         }
@@ -1032,40 +1040,42 @@ sub edSearchForward {
     return 0;
 }
 
-#
-# Search backward for a pattern...wrap if not found
-#
-# Inputs:
-#        pattern                - via argument
-#        CurrentLineNum        - global
-#        lines                - global
-#
-# Return:
-#        0                - not found
-#        >0                - line where first found
-#
+sub edSearchGlobal {
+    my($pattern, $invert) = @_;
 
-sub edSearchBackward {
-    my($pattern) = @_;
-
-    my @idx = ($CurrentLineNum .. maxline(), 1 .. ($CurrentLineNum - 1));
-    foreach my $line (reverse @idx) {
-        if ($lines[$line] =~ /$pattern/) {
-            return $line;
+    my $end = maxline();
+    my $start = 1;
+    if (defined $adrs[0]) {
+        if ($adrs[0] == 0) {
+            edWarn(E_ADDRBAD);
+            return;
         }
+        $start = $end = $adrs[0];
     }
-    return 0;
+    if (defined $adrs[1]) {
+        if ($adrs[1] == 0) {
+            edWarn(E_ADDRBAD);
+            return;
+        }
+        $end = $adrs[1];
+    }
+    $SearchPat = $pattern;
+    my @found;
+    for my $i ($start .. $end) {
+        my $match;
+        if ($invert) {
+            $match = $lines[$i] !~ m/$pattern/;
+        } else {
+            $match = $lines[$i] =~ m/$pattern/;
+        }
+        push @found, $i if $match;
+    }
+    return @found;
 }
-
-
-#
-# Print usage and exit
-#
-# Usage()
-#
 
 sub Usage {
-    die "Usage: ed [-p prompt] [-ds] [file]\n";
+    print "usage: ed [-p prompt] [-s] [file]\n";
+    exit EX_FAILURE;
 }
 
 #
@@ -1079,7 +1089,7 @@ sub edWarn {
 
     $Error = $msg;
     print "?\n";
-    if ($EXTENDED_MESSAGES) {
+    if ($HelpMode) {
         print "$msg\n";
     }
 }
@@ -1094,7 +1104,7 @@ ed - text editor
 
 =head1 SYNOPSIS
 
-ed [-p prompt] [-ds] [file]
+ed [-p prompt] [-s] [file]
 
 =head1 DESCRIPTION
 
@@ -1135,10 +1145,6 @@ The following options are available:
 
 =over 4
 
-=item -d
-
-Print debugging information on standard output.
-
 =item -p STRING
 
 Use the specified STRING as a command prompt.
@@ -1146,7 +1152,7 @@ By default no prompt is displayed.
 
 =item -s
 
-Suppress byte counts
+Suppress byte counts and diagnostics
 
 =back
 
@@ -1195,6 +1201,11 @@ Insert text
 Join a range of lines into a single line.
 The current address is set to the destination address.
 
+=item kCH
+
+Mark an address with the lowercase letter CH.
+The mark can then be used as 'CH in place of an address.
+
 =item l
 
 Print lines with escape sequences for non-printable characters
@@ -1229,6 +1240,28 @@ Quit program
 
 Read named FILE into buffer
 
+=item /PATTERN
+
+Search for PATTERN in the buffer, starting from the current line.
+If no pattern is given the previous search is repeated.
+
+=item ?PATTERN
+
+Search backwards for PATTERN in the buffer, starting from the current line.
+If no pattern is given the previous search is repeated.
+
+=item g/PATTERN/CMD
+
+Search globally in buffer for PATTERN and run command CMD on each matching line.
+CMD is one of the following commands: 'd', 'l', 'n', 'p' and 's'.
+CMD can be omitted.
+
+=item v/PATTERN/CMD
+
+Repeatedly run command CMD for each line in the buffer not matching PATTERN.
+CMD is one of the following commands: 'd', 'l', 'n', 'p' and 's'.
+CMD can be omitted.
+
 =item s///
 
 Substitute text with a regular expression
@@ -1238,6 +1271,12 @@ Substitute text with a regular expression
 Copy (transfer) lines to a destination address.
 The current address is set to the last line copied.
 
+=item u
+
+Undo the last command, restoring the editor buffer to its previous state.
+The current address is set to what it was before the previous command.
+The undo function is its own inverse, so multiple levels of undo are not possible.
+
 =item W [FILE]
 
 Write buffer to file in append mode
@@ -1246,9 +1285,23 @@ Write buffer to file in append mode
 
 Write buffer to file
 
+=item wq [FILE]
+
+Write buffer to file, then quit
+
 =item =
 
 Display current line number
+
+=back
+
+=head1 EXIT STATUS
+
+=over 4
+
+=item * 0 - All commands were processed successfully
+
+=item * 1 - An error occurred
 
 =back
 

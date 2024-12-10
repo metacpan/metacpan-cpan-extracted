@@ -19,9 +19,8 @@ name: App-repeat
 provides:
   App::repeat:
     file: lib/App/repeat.pm
-    version: '0.004'
+    version: '0.005'
 requires:
-  DateTime::Format::Natural: '0'
   Getopt::Long::Less: '0'
   Log::ger: '0.038'
   Time::HiRes: '0'
@@ -32,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-repeat
   homepage: https://metacpan.org/release/App-repeat
   repository: git://github.com/perlancar/perl-App-repeat.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.040000'
@@ -428,6 +427,14 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
+      version: '6.032'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: suggests
+      name: RuntimeSuggests
       version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode

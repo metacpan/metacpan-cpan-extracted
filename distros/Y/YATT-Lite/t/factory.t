@@ -716,6 +716,23 @@ END
   }
 }
 
+++$i;
+{
+  my $THEME = "[default app_root]";
+  my $CLS = myapp($i);
+  my $approot = "$TMP/app$i";
+  my $docroot = "$approot/docs";
+
+  MY->mkfile("$docroot/foo.yatt", q|FOO|);
+
+  #----------------------------------------
+  my $F = Factory->new(app_ns => $CLS
+		       , doc_root => $docroot
+		      );
+  is $F->app_root, $FindBin::Bin, "default app_root eq \$FindBin::Bin";
+}
+
+
 #----------------------------------------
 # misc
 #----------------------------------------

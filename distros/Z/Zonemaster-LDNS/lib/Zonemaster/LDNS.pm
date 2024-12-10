@@ -2,7 +2,7 @@ package Zonemaster::LDNS;
 
 use 5.014;
 
-our $VERSION = '4.0.2';
+our $VERSION = '4.1.0';
 
 use parent 'Exporter';
 our @EXPORT_OK = qw[to_idn has_idn ldns_version load_zonefile];
@@ -12,6 +12,7 @@ require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
 
 use Zonemaster::LDNS::RR;
+use Zonemaster::LDNS::RRList;
 use Zonemaster::LDNS::Packet;
 
 1;

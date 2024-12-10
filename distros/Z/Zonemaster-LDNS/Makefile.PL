@@ -1,7 +1,10 @@
+use v5.14;
+
 use inc::Module::Install;
 use Devel::CheckLib;
-use Getopt::Long;
+use ExtUtils::PkgConfig;
 use File::Spec::Functions;
+use Getopt::Long;
 
 BEGIN {
     if ( $Module::Install::AUTHOR ) {
@@ -39,7 +42,7 @@ Enabled by default.
 
 =item --[no-]randomize
 
-Experimental.
+This feature is deprecated and will be removed in Zonemaster 2025.1.
 Randomizes the capitalization of returned domain names.
 Disabled by default.
 
@@ -119,6 +122,7 @@ GetOptions(
 );
 
 configure_requires 'Devel::CheckLib'         => 0;
+configure_requires 'ExtUtils::PkgConfig'     => 0;
 configure_requires 'Module::Install'         => 1.19;
 configure_requires 'Module::Install::XSUtil' => 0;
 #
@@ -127,6 +131,7 @@ test_requires      'MIME::Base32'            => 0;
 test_requires      'Test::Fatal'             => 0;
 test_requires      'Test::Differences'       => 0;
 test_requires      'Test::More'              => 1.302015;
+test_requires      'Test::NoWarnings'        => 0;
 
 use_ppport 3.19;
 cc_include_paths 'include';
@@ -144,13 +149,14 @@ sub custom_assets
     my ( $href ) = @_;
     # $href = { key => "openssl", lib => "crypto", name => "OpenSSL" }
 
-    my $key  = $$href{key};
-    my $name = $$href{name};
-    my $lib  = $$href{lib};
+    my $key    = $href->{key};
+    my $name   = $href->{name};
+    my $lib    = $href->{lib};
+    my $pcname = $href->{pcname};
 
-    my $input_prefix = $$opt_assets{$key}{prefix};
-    my $input_inc    = $$opt_assets{$key}{inc};
-    my $input_lib    = $$opt_assets{$key}{lib};
+    my $input_prefix = $opt_assets->{$key}{prefix};
+    my $input_inc    = $opt_assets->{$key}{inc};
+    my $input_lib    = $opt_assets->{$key}{lib};
 
     my $custom_lib = ( $input_prefix or $input_inc or $input_lib );
     if ( $custom_lib ) {
@@ -180,7 +186,22 @@ sub custom_assets
         $assert_lib_args{$key}{libpath} = "$libpath";
     }
     else {
-        cc_libs "$lib";
+        my %pkg_info = eval { ExtUtils::PkgConfig->find($pcname); };
+        if ($@) {
+            warn "$@\n";
+            say "Guessing LDFLAGS for $name: -l${lib}";
+            cc_libs $lib;
+        }
+        else {
+            if ((my $cflags = $pkg_info{cflags}) ne '') {
+                say "Adding CFLAGS for $name using pkg-config: $cflags";
+                cc_include_paths $cflags;
+            }
+            if ((my $libs = $pkg_info{libs}) ne '') {
+                say "Adding LDFLAGS for $name using pkg-config: $libs";
+                cc_libs $libs;
+            }
+        }
     }
 }
 
@@ -188,9 +209,10 @@ sub custom_assets
 
 custom_assets(
     {
-        name => "OpenSSL",
-        lib  => "crypto",
-        key  => "openssl"
+        name   => "OpenSSL",
+        lib    => "crypto",
+        key    => "openssl",
+        pcname => "openssl"
     }
 );
 
@@ -231,9 +253,10 @@ else {
 
     custom_assets(
         {
-            name => "LDNS",
-            lib  => "ldns",
-            key  => "ldns"
+            name   => "LDNS",
+            lib    => "ldns",
+            key    => "ldns",
+            pcname => "libldns"
         }
     );
 
@@ -274,9 +297,10 @@ if ( $opt_idn ) {
 
     custom_assets(
         {
-            name => "Libidn",
-            lib  => "idn2",
-            key  => "libidn"
+            name   => "Libidn",
+            lib    => "idn2",
+            key    => "libidn",
+            pcname => "libidn2"
         }
     );
 
@@ -298,6 +322,7 @@ else {
 
 if ( $opt_randomize ) {
     print "Feature randomized capitalization enabled\n";
+    print "WARNING: This feature is DEPRECATED and will be removed in Zonemaster v2025.1.\n";
     cc_define '-DRANDOMIZE';
 }
 else {

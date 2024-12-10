@@ -10,7 +10,7 @@ use Getopt::Long::Less;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-12-06'; # DATE
 our $DIST = 'App-repeat'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our %Opts = (
     n => undef,
@@ -212,7 +212,7 @@ repeat - Repeat a command a number of times
 
 =head1 VERSION
 
-This document describes version 0.004 of repeat (from Perl distribution App-repeat), released on 2024-12-06.
+This document describes version 0.005 of repeat (from Perl distribution App-repeat), released on 2024-12-06.
 
 =head1 SYNOPSIS
 
@@ -282,6 +282,10 @@ C<--until-time> (with optional C<--max>) instead.
 
 String representation of time. Will be parsed using
 L<DateTime::Format::Natural>. Alternatively, you can use C<-n> instead.
+
+Note that dependency to L<DateTime::Format::Natural> is declared optionally
+(RuntimeSuggests). You need to install the module first if you want to use
+C<--until-time>.
 
 =item * --max
 

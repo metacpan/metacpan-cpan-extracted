@@ -1,3 +1,7 @@
+3.20241209 2024-12-10 Australia/Sydney
+  - Tests: Fix test error when not running with AUTHOR_TEST.  
+    Thanks to Kurt Starsinic
+
 3.20241111 2024-11-11 Australia/Melbourne
   - Minor: Fix precedence problem warning with regex and newer Perl versions
 

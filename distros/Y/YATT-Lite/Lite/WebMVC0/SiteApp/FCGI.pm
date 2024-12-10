@@ -176,8 +176,8 @@ sub fcgi_handle_response {
     }
     else {
         return Plack::Util::inline_object
-            write => $cb,
-            close => sub { };
+            (write => $cb,
+            close => sub { });
     }
 }
 

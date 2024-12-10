@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-12-06'; # DATE
 our $DIST = 'App-repeat'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Repeat a command a number of times
@@ -22,7 +22,7 @@ App::repeat - Repeat a command a number of times
 
 =head1 VERSION
 
-This document describes version 0.004 of App::repeat (from Perl distribution App-repeat), released on 2024-12-06.
+This document describes version 0.005 of App::repeat (from Perl distribution App-repeat), released on 2024-12-06.
 
 =head1 SYNOPSIS
 

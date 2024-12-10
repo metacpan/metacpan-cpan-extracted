@@ -47,7 +47,7 @@
    "provides" : {
       "Test::Inter" : {
          "file" : "lib/Test/Inter.pm",
-         "version" : "1.11"
+         "version" : "1.12"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "web" : "https://github.com/SBECK-github/Test-Inter"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

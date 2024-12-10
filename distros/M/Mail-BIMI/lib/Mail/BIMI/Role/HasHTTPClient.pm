@@ -1,6 +1,6 @@
 package Mail::BIMI::Role::HasHTTPClient;
 # ABSTRACT: Class to model a HTTP client
-our $VERSION = '3.20241111'; # VERSION
+our $VERSION = '3.20241209'; # VERSION
 use 5.20.0;
 use Moose::Role;
 use Mail::BIMI::Prelude;
@@ -93,7 +93,7 @@ Mail::BIMI::Role::HasHTTPClient - Class to model a HTTP client
 
 =head1 VERSION
 
-version 3.20241111
+version 3.20241209
 
 =head1 DESCRIPTION
 

@@ -23,13 +23,13 @@ A subclass of L<Zonemaster::LDNS::RR>, so it has all the methods of that class a
 
 Returns the keytag value.
 
-=item digtype()
-
-Returns the numeric digest type.
-
 =item algorithm()
 
 Returns the algorithm number.
+
+=item digtype()
+
+Returns the numeric digest type.
 
 =item digest()
 

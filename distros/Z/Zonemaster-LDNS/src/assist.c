@@ -184,6 +184,7 @@ char *
 randomize_capitalization(char *in)
 {
 #ifdef RANDOMIZE
+#warning "Case randomization is deprecated and will be removed in v2025.1."
     char *str;
     str = in;
     while(*str) {

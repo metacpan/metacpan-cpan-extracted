@@ -2,7 +2,7 @@
 **sbokeeper** is a utility for Slackware administrators to help manage installed
 SlackBuid packages by maintaining a database of added packages and their
 dependencies. It is not a package manager itself, it could more accurately be
-described as a package helper or tracker.
+described as a package manager helper.
 
 ## Building
 **sbokeeper** should be able to run on most Unix-like systems, although it
@@ -46,7 +46,7 @@ not using any sort of package manager, you will have to clone the repo yourself.
 git clone git://git.slackbuilds.org/slackbuilds.git
 ```
 You will now need to tell **sbokeeper** where the repo is on your system. You
-can do that either through the `-s` option for the `SBoPath` configuration
+can do that either through the `-s` option or the `SBoPath` configuration
 field.
 ```
 echo "SBoPath = /absolute/path/to/repo" >> ~/.config/sbokeeper.conf

@@ -5,7 +5,7 @@ use Encode qw(decode);
 use base 'Exporter';
 our @EXPORT = qw(convert_to_ascii);
 our @EXPORT_OK = qw(convert_to_ascii);
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 my %char_map;
 
 =encoding utf8
@@ -1075,6 +1075,35 @@ __DATA__
 1803 3A
 1809 3A
 180E 20
+1951 61
+1952 6E
+1954 75
+1955 57
+1959 75
+195F 6E
+1960 61
+1961 79
+1963 6C
+1967 4C
+1968 4C
+1969 55
+1971 65
+1972 6F
+1973 75
+1974 63
+1986 68
+199E 6F
+19A1 33
+19A2 75
+19A4 33
+19A5 75
+19B4 75
+19B5 6E
+19C7 79
+19C8 36
+19C9 65
+19D0 6F
+19D7 6D
 1D00 41
 1D01 41+45
 1D03 42
@@ -1861,7 +1890,7 @@ __DATA__
 2179 78
 217A 78+69
 217B 78+69+69
-217C 4C
+217C 6C
 217D 63
 217E 64
 217F 6D

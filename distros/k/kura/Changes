@@ -1,5 +1,8 @@
 Revision history for Perl extension kura
 
+0.06 2024-12-10T00:43:29Z
+    - Feature: store private constraints #5
+
 0.05 2024-12-07T11:40:25Z
     - Improve docs and tests #4
     - Add @KURA variable #3

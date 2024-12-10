@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::repeat",
   "PREREQ_PM" => {
-    "DateTime::Format::Natural" => 0,
     "Getopt::Long::Less" => 0,
     "Log::ger" => "0.038",
     "Time::HiRes" => 0,
@@ -33,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +40,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "DateTime::Format::Natural" => 0,
   "File::Spec" => 0,
   "Getopt::Long::Less" => 0,
   "IO::Handle" => 0,

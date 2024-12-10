@@ -15,60 +15,50 @@ use strict;
 
 use Getopt::Std qw(getopts);
 
+my $matches = 0;
 my %opt;
 getopts('s', \%opt) or usage();
 @ARGV or usage();
 
 for my $file (@ARGV)
     {
-        open(FILE, '<', $file) or die "Unable to read $file: $!";
-        printWhat(\*FILE, $file, $opt{'s'});
-        close FILE;
+        my $fh;
+        unless (open $fh, '<', $file) {
+            warn "Unable to open '$file': $!\n";
+            last;
+        }
+        printWhat($fh, $file, $opt{'s'});
+        close $fh;
     }
+exit ($matches ? 0 : 1);
 
 #### read open file and print "what" statements...
 #### pass in file handle, file name, and whether to stop printing after 1st "what"
 sub printWhat
 {
-    my $file_handle = $_[0];
-    my $file_name   = $_[1];
-    my $stop_flag   = $_[2];
+    my $file_handle = shift;
+    my $file_name   = shift;
+    my $stop_flag   = shift;
+    my $line;
     print "$file_name:\n" if $file_name ne "";
-    my $done = 0;
-    while (! $done)
+    while (defined($line = <$file_handle>))
     {
-        my $line = <$file_handle>;
-        if (defined $line)
+        next unless $line =~ m/\@\(#\)/;
+        $matches++;
+        my @match = ($line);
+        if ($line =~ m/\0/) ## there may be more than 1 in here
         {
-            if ($line =~ /\@\(#\)/)
-            {
-                if ((! $stop_flag) && ($line =~ /\0/)) ## there may be more than 1 in here
-                {
-                    my @F = split(/\0/,$line);
-                    for my $f (@F)
-                    {
-                        last if $done;
-                        if ($f =~ /\@\(#\)/)
-                        {
-                            $f =~ s|.*\@\(#\)||;
-                            $f =~ s|[">\0\\].*||; ##BSD spec says print to 1st " > \ or null
-                            chomp $f;
-                            print "        $f\n";
-                            $done = 1 if $stop_flag;
-                        }
-                    }
-                }
-                else
-                {
-                    $line =~ s|.*\@\(#\)||;
-                    $line =~ s|[">\0\\].*||; ##BSD spec says print to 1st " > \ or null
-                    chomp $line;
-                    print "        $line\n";
-                }
-                $done = 1 if $stop_flag;
-            }
+            my @F = split(/\0/, $line);
+            @match = grep { m/\@\(#\)/ } @F;
         }
-        else { $done = 1; }
+        for my $f (@match)
+        {
+            $f =~ s|.*\@\(#\)||;
+            $f =~ s|[">\0\\].*||; ##BSD spec says print to 1st " > \ or null
+            chomp $f;
+            print "\t$f\n";
+            return if $stop_flag;
+        }
     }
 }
 
@@ -76,8 +66,6 @@ sub usage {
     require Pod::Usage;
     Pod::Usage::pod2usage({ -exitval => 1, -verbose => 0 });
 }
-
-exit;
 
 __END__
 
@@ -103,6 +91,11 @@ pattern in your file and you are set.
 =head2 OPTIONS
 
 B<->B<s> Stop after the first occurrence of the pattern.
+
+=head1 EXIT STATUS
+
+The what utility exits with status of 0 if any version information was found,
+or with a status of 1 otherwise.
 
 =head1 ENVIRONMENT
 

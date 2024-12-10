@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Define and roll musical dice
 
-our $VERSION = '0.0200';
+our $VERSION = '0.0201';
 
 use Moo;
 use strictures 2;
@@ -680,7 +680,7 @@ Music::Dice - Define and roll musical dice
 
 =head1 VERSION
 
-version 0.0200
+version 0.0201
 
 =head1 SYNOPSIS
 

@@ -142,9 +142,11 @@ Creates a new RR object of a suitable subclass, given a string representing an R
 
 =item owner()
 
+Returns the owner name of the RR.
+
 =item name()
 
-These two both return the owner name of the RR.
+An alias of L<owner()>.
 
 =item ttl()
 
@@ -161,6 +163,12 @@ Returns the class of the RR.
 =item string()
 
 Returns a string with the RR in presentation format.
+
+=item compare($other)
+
+Compares two L<Zonemaster::LDNS::RR>. The TTL field is ignored, and the comparison of domain names is case insensitive.
+
+Returns an integer, where 0 indicates equality.
 
 =item do_compare($other)
 

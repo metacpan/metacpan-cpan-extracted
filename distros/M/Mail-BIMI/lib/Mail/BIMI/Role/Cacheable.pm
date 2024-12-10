@@ -1,6 +1,6 @@
 package Mail::BIMI::Role::Cacheable;
 # ABSTRACT: Cache handling
-our $VERSION = '3.20241111'; # VERSION
+our $VERSION = '3.20241209'; # VERSION
 use 5.20.0;
 use Moose::Role;
 use Mail::BIMI;
@@ -149,7 +149,7 @@ Mail::BIMI::Role::Cacheable - Cache handling
 
 =head1 VERSION
 
-version 3.20241111
+version 3.20241209
 
 =head1 DESCRIPTION
 

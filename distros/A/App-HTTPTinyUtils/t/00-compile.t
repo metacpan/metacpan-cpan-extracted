@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/HTTPTinyUtils.pm'
@@ -18,7 +18,8 @@ my @scripts = (
     'script/http-tiny-customretry',
     'script/http-tiny-plugin',
     'script/http-tiny-plugin-every',
-    'script/http-tiny-retry'
+    'script/http-tiny-retry',
+    'script/http-tinyish'
 );
 
 # no fake home requested

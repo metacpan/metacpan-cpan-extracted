@@ -245,6 +245,13 @@ use MyBar qw(:types);
 # => Bar1, Bar2 are exported
 ```
 
+If you don't want to export constraints, put a prefix `_` to the constraint name:
+
+```perl
+use kura _PrivateFoo => Str;
+# => "_PrivateFoo" is not exported
+```
+
 # LICENSE
 
 Copyright (C) kobaken.

@@ -14,7 +14,7 @@
   * [Ed25519]
   * [IDN]
   * [Internal ldns]
-  * [Randomized capitalization](#randomized-capitalization)
+  * [Randomized capitalization (deprecated)](#randomized-capitalization-deprecated)
   * [Custom OpenSSL]
   * [Custom LDNS]
   * [Custom Libidn]
@@ -50,6 +50,7 @@ Run-time dependencies:
 Compile-time dependencies (only when installing from source):
  * `make`
  * `Devel::CheckLib`
+ * `ExtUtils::PkgConfig`
  * `Module::Install`
  * `Module::Install::XSUtil`
  * `Test::More >= 1.302015`
@@ -166,12 +167,12 @@ When enabled, an included version of ldns is statically linked into
 Zonemaster::LDNS.
 When disabled, libldns is dynamically linked just like other dependencies.
 
-### Randomized capitalization
+### Randomized capitalization (deprecated)
 
 Disabled by default.
 Enable with `--randomize`.
 
-> **Note:** This feature is experimental.
+> **Note:** This feature is deprecated and will be removed in Zonemaster 2025.1.
 
 Randomizes the capitalization of returned domain names.
 

@@ -1,5 +1,23 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
+4.1.0 2024-12-09 (part of Zonemaster v2024.2 release)
+
+ [Deprecation]
+ - Deprecates case randomization feature, to be removed in v2025.1 release (#206)
+
+ [Features]
+ - Adds a method to compute the hash of a name based on the settings of a NSEC3
+   or NSEC3PARAM record (#211)
+ - Allows construction of empty Zonemaster::LDNS::RRList objects (#209)
+ - Extends the functionalities of Zonemaster::LDNS::RRList (#203)
+ - Extends CDS/CDNSKEY support (#199)
+
+ [Fixes]
+ - Uses ExtUtils::PkgConfig to discover the CFLAGS and LDFLAGS for external
+   libraries (#210, #212)
+ - Makes to_idn() croak with locale-independent message (#205)
+ - Fixes compiler warning in XS code (#204)
+
 
 4.0.2 2024-07-01 (part of Zonemaster v2024.1 release)
 

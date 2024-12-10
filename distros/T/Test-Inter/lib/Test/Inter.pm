@@ -14,7 +14,7 @@ use IO::File;
 use Cwd 'abs_path';
 
 our($VERSION);
-$VERSION='1.11';
+$VERSION='1.12';
 
 ###############################################################################
 # BASE METHODS
@@ -867,7 +867,7 @@ sub file {
    my($self,$func,$input,$outputdir,$expected,$name,@args) = @_;
    $name = ""  if (! $name);
 
-   if (! ref($func) eq 'CODE') {
+   if (! (ref($func) eq 'CODE')) {
       $self->_die("file method required a coderef");
    }
 

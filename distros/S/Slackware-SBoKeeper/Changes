@@ -1,5 +1,14 @@
 Revision history for sbokeeper.
 
+1.02 (12/9/2024):
+  Added:
+    * 'clean' command (equivalent to 'rm @unnecessary').
+  Fixes:
+    * Fix incorrect info in help messages.
+    * Fix grammatical errors.
+  Improvements:
+    * Made error messages more helpful.
+
 1.01 (11/21/2024):
   Fixes:
     * LICENSE file now contains perl license rather than Artistic License 2.0.

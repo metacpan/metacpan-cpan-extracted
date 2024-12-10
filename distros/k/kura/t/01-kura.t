@@ -23,6 +23,14 @@ subtest 'Test `kura` features' => sub {
         is \@MyBar::KURA, [qw(Bar1 Bar2 Bar3)], 'types defined by kura are stored in $PACKAGE::KURA';
         is \@MyBar::EXPORT_OK, [qw(Bar1 Bar2 Bar3 bar_hello)];
     };
+
+    subtest '`kura` with private constraint' => sub {
+        use MyFoo qw(call_private_foo);
+        ok lives { call_private_foo() }; # _PrivateFoo is called at `call_private_foo`
+
+        eval 'use MyFoo qw(_PrivateFoo)';
+        like $@, qr/^"_PrivateFoo" is not exported by the MyFoo module/;
+    };
 };
 
 subtest 'Test `kura` exceptions' => sub {

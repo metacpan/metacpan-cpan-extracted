@@ -1,3 +1,5 @@
+use v5.16;
+
 use Test::More;
 use Test::Fatal;
 use Devel::Peek;
@@ -67,7 +69,7 @@ subtest 'AAAA' => sub {
     SKIP: {
         skip 'no network', 1 unless $ENV{TEST_WITH_NETWORK};
 
-        $p = $s->query( 'a.ns.se', 'AAAA' );
+        my $p = $s->query( 'a.ns.se', 'AAAA' );
         plan skip_all => 'No response, cannot test' if not $p;
 
         foreach my $rr ( $p->answer ) {
@@ -94,35 +96,81 @@ subtest 'TXT' => sub {
 };
 
 subtest 'DNSKEY' => sub {
-    SKIP: {
-        skip 'no network', 1 unless $ENV{TEST_WITH_NETWORK};
+    subtest 'Good RR' => sub {
+        my @data = (
+            q{dnskey.test. 0 IN DNSKEY 257 3 8 BleFgAABAAEAAAAADW5sYWdyaWN1bHR1cmUCbmwAAAEAAcAMADAAAQAAAAAABAEBAwg=},
+        );
+        my @rrs = map { Zonemaster::LDNS::RR->new($_) } @data;
 
-        my $se = Zonemaster::LDNS->new( '192.36.144.107' );
-        my $pk = $se->query( 'se', 'DNSKEY' );
-        plan skip_all => 'No response, cannot test' if not $pk;
-
-        foreach my $rr ( $pk->answer ) {
+        foreach my $rr ( @rrs ) {
             isa_ok( $rr, 'Zonemaster::LDNS::RR::DNSKEY' );
-            ok( $rr->flags == 256 or $rr->flags == 257 );
-            is( $rr->protocol,  3 );
-            # Alg 8 has replaced 5. Now (February 2022) only alg 8 is used.
-            ok( $rr->algorithm == 8 );
         }
-    }
 
-    my $data = decode_base64( "BleFgAABAAEAAAAADW5sYWdyaWN1bHR1cmUCbmwAAAEAAcAMADAAAQAAAAAABAEBAwg=");
-    my $p = Zonemaster::LDNS::Packet->new_from_wireformat( $data );
-    my ( $rr, @extra ) = $p->answer_unfiltered;
-    eq_or_diff \@extra, [], "no extra RRs found";
-    if ( !defined $rr ) {
-        BAIL_OUT( "no RR found" );
-    }
-    is $rr->keydata, "", "we're able to extract the public key field even when it's empty";
-    is $rr->keysize, -1, "insufficient data to calculate key size is reported as -1";
+        is( $rrs[0]->flags(),        q{257} );
+        is( $rrs[0]->protocol(),     q{3} );
+        is( $rrs[0]->algorithm(),    q{8} );
+        ok( $rrs[0]->keydata() );
+        is( $rrs[0]->hexkeydata(),   q{BleFgAABAAEAAAAADW5sYWdyaWN1bHR1cmUCbmwAAAEAAcAMADAAAQAAAAAABAEBAwg=} );
+        is( $rrs[0]->keytag(),       q{27018} );
+        is( $rrs[0]->ds('sha256'),   Zonemaster::LDNS::RR->new(q{dnskey.test. 0 IN DS 27018 8 2 cd9b8881a72400a89b0f5ec4b096b07469aa3b316e870291d9e4e0f30f7dd4ed} ));
+        is( $rrs[0]->keysize(),      q{344} );
+    };
 
-    my ( @rrs ) = $p->answer;
-    eq_or_diff \@rrs, [], "DNSKEY record with empty public key is filtered out by answer()";
+    subtest 'Empty RDATA' => sub {
+        my $data = decode_base64( "BleFgAABAAEAAAAADW5sYWdyaWN1bHR1cmUCbmwAAAEAAcAMADAAAQAAAAAABAEBAwg=");
+        my $p = Zonemaster::LDNS::Packet->new_from_wireformat( $data );
+        my ( $rr, @extra ) = $p->answer_unfiltered;
+        eq_or_diff \@extra, [], "no extra RRs found";
+        if ( !defined $rr ) {
+            BAIL_OUT( "no RR found" );
+        }
+        is $rr->keydata, "", "we're able to extract the public key field even when it's empty";
+        is $rr->hexkeydata, undef, "hexkeydata() returns undef when the public key field is empty";
+        is $rr->keysize, -1, "insufficient data to calculate key size is reported as -1";
+
+        my ( @rrs ) = $p->answer;
+        eq_or_diff \@rrs, [], "DNSKEY record with empty public key is filtered out by answer()";
+    };
 };
+
+subtest 'CDNSKEY' => sub {
+    subtest 'Good RR' => sub {
+        my @data = (
+            q{cdnskey.test. 0 IN CDNSKEY 257 3 8 BleFgAABAAEAAAAADW5sYWdyaWN1bHR1cmUCbmwAAAEAAcAMADAAAQAAAAAABAEBAwg=},
+        );
+        my @rrs = map { Zonemaster::LDNS::RR->new($_) } @data;
+
+        foreach my $rr ( @rrs ) {
+            isa_ok( $rr, 'Zonemaster::LDNS::RR::CDNSKEY' );
+        }
+
+        is( $rrs[0]->flags(),        q{257} );
+        is( $rrs[0]->protocol(),     q{3} );
+        is( $rrs[0]->algorithm(),    q{8} );
+        ok( $rrs[0]->keydata() );
+        is( $rrs[0]->hexkeydata(),   q{BleFgAABAAEAAAAADW5sYWdyaWN1bHR1cmUCbmwAAAEAAcAMADAAAQAAAAAABAEBAwg=} );
+        is( $rrs[0]->keytag(),       q{0} );  # RR type not supported by LDNS
+        is( $rrs[0]->ds('sha256'),   undef ); # RR type not supported by LDNS
+        is( $rrs[0]->keysize(),      q{344} );
+    };
+
+    subtest 'Empty RDATA' => sub {
+        my $data = decode_base64( "BleFgAABAAEAAAAADW5sYWdyaWN1bHR1cmUCbmwAAAEAAcAMADAAAQAAAAAABAEBAwg=");
+        my $p = Zonemaster::LDNS::Packet->new_from_wireformat( $data );
+        my ( $rr, @extra ) = $p->answer_unfiltered;
+        eq_or_diff \@extra, [], "no extra RRs found";
+        if ( !defined $rr ) {
+            BAIL_OUT( "no RR found" );
+        }
+        is $rr->keydata, "", "we're able to extract the public key field even when it's empty";
+        is $rr->hexkeydata, undef, "hexkeydata() returns undef when the public key field is empty";
+        is $rr->keysize, -1, "insufficient data to calculate key size is reported as -1";
+
+        my ( @rrs ) = $p->answer;
+        eq_or_diff \@rrs, [], "CDNSKEY record with empty public key is filtered out by answer()";
+    };
+};
+
 
 subtest 'RRSIG' => sub {
     SKIP: {
@@ -158,7 +206,7 @@ subtest 'NSEC' => sub {
             ok( $rr->typehref->{TXT} );
             ok( !$rr->typehref->{MX} );
             ok( $rr->typehref->{TXT} );
-            is( $rr->typelist, 'NS SOA TXT RRSIG NSEC DNSKEY ' );
+            is( $rr->typelist, 'NS SOA TXT RRSIG NSEC DNSKEY ZONEMD ' );
         }
     }
 };
@@ -180,31 +228,55 @@ subtest 'From string' => sub {
 };
 
 subtest 'DS' => sub {
-    SKIP: {
-        skip 'no network', 1 unless $ENV{TEST_WITH_NETWORK};
-
-        my $se      = Zonemaster::LDNS->new( '192.36.144.107' );
-        my $pd      = $se->query( 'nic.se', 'DS' );
-        plan skip_all => 'No response, cannot test' if not $pd;
-
-        # As of February 2022, new KSK with keytag 22643 and algo 13 is used
-        my $nic_key = Zonemaster::LDNS::RR->new(
-    'nic.se IN DNSKEY 257 3 13 lkpZSlU70pd1LHrXqZttOAYKmX046YqYQg1aQJsv1y0xKr+qJS+3Ue1tM5VCYPU3lKuzq93nz0Lm/AV9jeoumQ=='
+    subtest 'Good RR' => sub {
+        my @data = (
+            q{nic.se 3600 IN DS 22643 13 2 aa0b38f6755c2777992a74935d50a2a3480effef1a60bf8643d12c307465c9da},
         );
-        my $made = Zonemaster::LDNS::RR->new_from_string( 'nic.se IN NS a.ns.se' );
-        foreach my $rr ( $pd->answer ) {
+        my @rrs = map { Zonemaster::LDNS::RR->new($_) } @data;
+
+        foreach my $rr ( @rrs ) {
             isa_ok( $rr, 'Zonemaster::LDNS::RR::DS' );
-            is( $rr->keytag,    22643 );
-            is( $rr->algorithm, 13 );
-            ok( $rr->digtype == 1 or $rr->digtype == 2 );
-            ok( $rr->hexdigest eq 'aa0b38f6755c2777992a74935d50a2a3480effef1a60bf8643d12c307465c9da' );
-            ok( $rr->verify( $nic_key ), 'derived from expected DNSKEY' );
-            ok( !$rr->verify( $made ),   'does not match a non-DS non-DNSKEY record' );
         }
-    }
+
+        my $key = Zonemaster::LDNS::RR->new( 'nic.se IN DNSKEY 257 3 13 lkpZSlU70pd1LHrXqZttOAYKmX046YqYQg1aQJsv1y0xKr+qJS+3Ue1tM5VCYPU3lKuzq93nz0Lm/AV9jeoumQ==' );
+        my $other = Zonemaster::LDNS::RR->new( 'nic.se IN NS a.ns.se' );
+
+        is( $rrs[0]->keytag(),       q{22643} );
+        is( $rrs[0]->algorithm(),    q{13} );
+        is( $rrs[0]->digtype(),      q{2} );
+        ok( $rrs[0]->digest() );
+        is( $rrs[0]->hexdigest(),    q{aa0b38f6755c2777992a74935d50a2a3480effef1a60bf8643d12c307465c9da} );
+        ok( $rrs[0]->verify( $key ) );
+        ok( !$rrs[0]->verify( $other ) );
+    };
+};
+
+subtest 'CDS' => sub {
+    subtest 'Good RR' => sub {
+        my @data = (
+            q{nic.se 3600 IN CDS 22643 13 2 aa0b38f6755c2777992a74935d50a2a3480effef1a60bf8643d12c307465c9da},
+        );
+        my @rrs = map { Zonemaster::LDNS::RR->new($_) } @data;
+
+        foreach my $rr ( @rrs ) {
+            isa_ok( $rr, 'Zonemaster::LDNS::RR::CDS' );
+        }
+
+        my $key = Zonemaster::LDNS::RR->new( 'nic.se IN CDNSKEY 257 3 13 lkpZSlU70pd1LHrXqZttOAYKmX046YqYQg1aQJsv1y0xKr+qJS+3Ue1tM5VCYPU3lKuzq93nz0Lm/AV9jeoumQ==' );
+        my $other = Zonemaster::LDNS::RR->new( 'nic.se IN NS a.ns.se' );
+
+        is( $rrs[0]->keytag(),       q{22643} );
+        is( $rrs[0]->algorithm(),    q{13} );
+        is( $rrs[0]->digtype(),      q{2} );
+        ok( $rrs[0]->digest() );
+        is( $rrs[0]->hexdigest(),    q{aa0b38f6755c2777992a74935d50a2a3480effef1a60bf8643d12c307465c9da} );
+        ok( !$rrs[0]->verify( $key ) ); # RR type not supported by LDNS
+        ok( !$rrs[0]->verify( $other ) );
+    };
 };
 
 subtest 'NSEC3 without salt' => sub {
+    my $name = 'com';
     my $nsec3 = Zonemaster::LDNS::RR->new_from_string(
         'VD0J8N54V788IUBJL9CN5MUD416BS5I6.com. 86400 IN NSEC3 1 1 0 - VD0N3HDL5MG940MOUBCF5MNLKGDT9RFT NS DS RRSIG' );
     isa_ok( $nsec3, 'Zonemaster::LDNS::RR::NSEC3' );
@@ -215,26 +287,47 @@ subtest 'NSEC3 without salt' => sub {
     is( $nsec3->salt,                        '' );
     is( encode_base32hex( $nsec3->next_owner ), "VD0N3HDL5MG940MOUBCF5MNLKGDT9RFT" );
     is( $nsec3->typelist,                    'NS DS RRSIG ' );
+    eq_or_diff( $nsec3->hash_name( $name ), 'ck0pojmg874ljref7efn8430qvit8bsm' );
 
     is_deeply( [ sort keys %{ $nsec3->typehref } ], [qw(DS NS RRSIG)] );
 };
 
 subtest 'NSEC3 with salt' => sub {
+    my $name = 'bad-values.dnssec03.xa';
     my $nsec3 = Zonemaster::LDNS::RR->new_from_string(
-        'BP7OICBR09FICEULBF46U8DMJ1J1V8R3.bad-values.dnssec03.xa. 900 IN NSEC3 2 1 1 8104 c91qe244nd0q5qh3jln35a809mik8d39 A NS SOA MX TXT RRSIG DNSKEY NSEC3PARAM' );
+        'BP7OICBR09FICEULBF46U8DMJ1J1V8R3.bad-values.dnssec03.xa. 900 IN NSEC3 1 1 3 8104 c91qe244nd0q5qh3jln35a809mik8d39 A NS SOA MX TXT RRSIG DNSKEY NSEC3PARAM' );
     isa_ok( $nsec3, 'Zonemaster::LDNS::RR::NSEC3' );
-    is( $nsec3->algorithm, 2 );
+    is( $nsec3->algorithm, 1 );
     is( $nsec3->flags,     1 );
     ok( $nsec3->optout );
-    is( $nsec3->iterations,                  1 );
+    is( $nsec3->iterations,                  3 );
     is( unpack('H*', $nsec3->salt),          '8104' );
     is( encode_base32hex( $nsec3->next_owner ), "C91QE244ND0Q5QH3JLN35A809MIK8D39" );
     is( $nsec3->typelist,                    'A NS SOA MX TXT RRSIG DNSKEY NSEC3PARAM ' );
+    eq_or_diff( $nsec3->hash_name( $name ), 'u6sj7nlrc80gcqem0ip18mji3vk60djt' );
 
     is_deeply( [ sort keys %{ $nsec3->typehref } ], [qw(A DNSKEY MX NS NSEC3PARAM RRSIG SOA TXT)] );
 };
 
+subtest 'NSEC3 with unknown algorithm' => sub {
+    my $name = 'nsec3-mismatches-apex-1.dnssec10.xa.';
+    my $nsec3 = Zonemaster::LDNS::RR->new_from_string(
+        'G4CPF6T01H8B5U5O996K8HI4OTEE12AA.nsec3-mismatches-apex-1.dnssec10.xa. 86400 IN NSEC3 3 0 0 - UP848IGD2MT1JGD0ISJEB6LAS1DCB11R NS SOA RRSIG DNSKEY NSEC3PARAM TYPE65534' );
+    isa_ok( $nsec3, 'Zonemaster::LDNS::RR::NSEC3' );
+    is( $nsec3->algorithm, 3 );
+    is( $nsec3->flags,     0 );
+    is( $nsec3->optout,    '' );
+    is( $nsec3->iterations,                  0 );
+    is( unpack('H*', $nsec3->salt),          '' );
+    is( encode_base32hex( $nsec3->next_owner ), "UP848IGD2MT1JGD0ISJEB6LAS1DCB11R" );
+    is( $nsec3->typelist,                    'NS SOA RRSIG DNSKEY NSEC3PARAM TYPE65534 ' );
+    eq_or_diff( $nsec3->hash_name( $name ), undef );
+
+    is_deeply( [ sort keys %{ $nsec3->typehref } ], [qw(DNSKEY NS NSEC3PARAM RRSIG SOA TYPE65534)] );
+};
+
 subtest 'NSEC3PARAM without salt and non-zero flags' => sub {
+    my $name = 'empty-nsec3param.example';
     my $nsec3param = Zonemaster::LDNS::RR->new_from_string(
         'empty-nsec3param.example. 86400 IN NSEC3PARAM 1 165 0 -' );
     isa_ok( $nsec3param, 'Zonemaster::LDNS::RR::NSEC3PARAM' );
@@ -243,16 +336,31 @@ subtest 'NSEC3PARAM without salt and non-zero flags' => sub {
     is( $nsec3param->iterations, 0 );
     is( $nsec3param->salt,       '', 'Salt');
     is( lc($nsec3param->owner),  'empty-nsec3param.example.' );
+    eq_or_diff( $nsec3param->hash_name( $name ), 'l73q01jb3imjq6krmm5h00evfsdpmbvl' );
 };
 
 subtest 'NSEC3PARAM with salt' => sub {
-    my $nsec3param = Zonemaster::LDNS::RR->new_from_string( 'whitehouse.gov.		3600	IN	NSEC3PARAM 1 0 1 B2C19AB526819347' );
+    my $name = 'whitehouse.gov.';
+    my $nsec3param = Zonemaster::LDNS::RR->new_from_string( 'whitehouse.gov.		3600	IN	NSEC3PARAM 1 0 2 B2C19AB526819347' );
     isa_ok( $nsec3param, 'Zonemaster::LDNS::RR::NSEC3PARAM' );
     is( $nsec3param->algorithm,  1 );
     is( $nsec3param->flags,      0 );
-    is( $nsec3param->iterations, 1, "Iterations" );
+    is( $nsec3param->iterations, 2, "Iterations" );
     is( uc(unpack( 'H*', $nsec3param->salt )), 'B2C19AB526819347', "Salt" );
     is( lc($nsec3param->owner), 'whitehouse.gov.' );
+    eq_or_diff( $nsec3param->hash_name( $name ), '2mo42ugf34bnruvljv91vv9vqd4kckda' );
+};
+
+subtest 'NSEC3PARAM with unknown algorithm' => sub {
+    my $name = 'GOOD-NSEC3-1.dnssec10.xa';
+    my $nsec3param = Zonemaster::LDNS::RR->new_from_string( 'good-nsec3-1.dnssec10.xa. 0     IN      NSEC3PARAM 3 0 0 -' );
+    isa_ok( $nsec3param, 'Zonemaster::LDNS::RR::NSEC3PARAM' );
+    is( $nsec3param->algorithm, 3 );
+    is( $nsec3param->flags,     0 );
+    is( $nsec3param->iterations,                  0 );
+    is( unpack('H*', $nsec3param->salt),          '' );
+    is( lc($nsec3param->owner), 'good-nsec3-1.dnssec10.xa.' );
+    eq_or_diff( $nsec3param->hash_name( $name ), undef );
 };
 
 subtest 'SIG' => sub {
@@ -286,7 +394,7 @@ subtest 'SPF' => sub {
 subtest 'DNAME' => sub {
     my $rr = Zonemaster::LDNS::RR->new( 'examplë.fake 3600  IN  DNAME example.fake' );
     isa_ok( $rr, 'Zonemaster::LDNS::RR::DNAME' );
-    is($rr->dname(), 'example.fake.');
+    is(fc($rr->dname()), fc('example.fake.'));
 };
 
 subtest 'croak when given malformed CAA records' => sub {
@@ -297,7 +405,7 @@ subtest 'croak when given malformed CAA records' => sub {
         # This will always croak
         $bad_caa->string();
     };
-    like( exception { $will_croak->() }, qr/^Failed to convert RR to string/ );
+    like( exception(sub { $will_croak->() }), qr/^Failed to convert RR to string/ );
 };
 
 done_testing;

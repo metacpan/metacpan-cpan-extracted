@@ -468,6 +468,7 @@ sub init_app_ns {
 sub after_new {
   (my MY $self) = @_;
   $self->SUPER::after_new;
+  $self->{cf_app_root} //= YATT::Lite::Util::maybe_findbin_bin();
   $self->{cf_index_name} //= $self->default_index_name;
   $self->{cf_ext_public} //= $self->default_ext_public;
   $self->{cf_ext_private} //= $self->default_ext_private;

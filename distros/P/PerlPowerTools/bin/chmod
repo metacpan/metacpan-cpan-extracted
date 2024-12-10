@@ -11,34 +11,17 @@ License: perl
 
 =cut
 
-
 use strict;
 
-my ($VERSION) = '1.2';
+use File::Basename qw(basename);
 
-my $warnings = 0;
+use constant EX_SUCCESS => 0;
+use constant EX_FAILURE => 1;
 
-# Print a usuage message on a unknown option.
-# Requires my patch to Getopt::Std of 25 Feb 1999.
-$SIG {__WARN__} = sub {
-    if (substr ($_ [0], 0, 14) eq "Unknown option") {die "Usage"};
-    require File::Basename;
-    $0 = File::Basename::basename ($0);
-    $warnings = 1;
-    warn "$0: @_";
-};
+my $Program = basename($0);
+my $VERSION = '1.6';
 
-$SIG {__DIE__} = sub {
-    require File::Basename;
-    $0 = File::Basename::basename ($0);
-    if (substr ($_ [0], 0,  5) eq "Usage") {
-        die <<EOF;
-$0 (Perl bin utils) $VERSION
-$0 [-R [-H | -L | -P]] mode file [files ...]
-EOF
-    }
-    die "$0: @_";
-};
+my $rc = EX_SUCCESS;
 
 # Get the options.
 # We can't use Getopts, as the order is important.
@@ -47,27 +30,30 @@ while (@ARGV && $ARGV [0] =~ /^-/) {
     my $opt = reverse shift;
     chop $opt;
     last if ($opt eq '-');
-    die "Usage" unless $opt =~ /^[RHLP]+$/;
+    unless ($opt =~ /^[RHLP]+$/) {
+        warn "$Program: invalid option -- $opt\n";
+        usage();
+    }
     local $_;
     while (length ($_ = chop $opt)) {
         /R/ && do {$options {R} = 1; next};
-        die "Usage" unless $options {R};
+        usage() unless $options{'R'};
         /H/ && do {$options {L} = $options {P} = 0; $options {H} = 1; next};
         /L/ && do {$options {H} = $options {P} = 0; $options {L} = 1; next};
         /P/ && do {$options {H} = $options {L} = 0; $options {P} = 1; next};
     }
 }
 
-die "Usage" unless @ARGV > 1;
-
 my $mode = shift;
+usage() unless @ARGV;
 
 my $symbolic = 0;
 if ($mode =~ /[^0-7]/) {
     $symbolic = 1;
 }
 elsif ($mode !~ /^[0-7]{1,4}$/) {
-    die "invalid mode: $mode\n"
+    warn "$Program: invalid mode: '$mode'\n";
+    exit EX_FAILURE;
 }
 
 my %ARGV;
@@ -82,8 +68,14 @@ if (exists $options {R}) {
 }
 else {
     foreach my $file (@ARGV) {
-        modify_file $file;
+        modify_file($file);
     }
+}
+exit $rc;
+
+sub usage {
+    print "usage: $Program [-R [-H | -L | -P]] mode file...\n";
+    exit EX_FAILURE;
 }
 
 # File::Find is weird. If called with a directory, it will call
@@ -102,23 +94,33 @@ sub modify_file {
         # We don't want to recurse symlinks that just happen to
         # have the same name as one of the arguments, hence the local.
         # Remember that $file is relative to the current directory.
-        local $ARGV {readlink $file} = 0;
-        File::Find::find (\&modify_file, readlink $file);
+        my $src = readlink $file;
+        unless (defined $src) {
+            warn "$Program: readlink failed for '$file': $!\n";
+            $rc = EX_FAILURE;
+            return;
+        }
+        local $ARGV{$src} = 0;
+        File::Find::find(\&modify_file, $src);
         return;
     }
     unless (-e $file) {
-        warn "$file does not exist\n";
+        warn "$Program: '$file' does not exist\n";
+        $rc = EX_FAILURE;
         return;
     }
     my $realmode = $mode;
     if ($symbolic) {
-        $realmode = mod($mode, $file) or
-                       die "invalid mode: $mode\n";
+        $realmode = mod($mode, $file) or do {
+            warn "$Program: invalid mode: '$mode'\n";
+            exit EX_FAILURE;
+        };
     }
-    chmod oct ($realmode), $file or warn "$!\n";
+    unless (chmod oct($realmode), $file) {
+        warn "$Program: failed to change mode for '$file': $!\n";
+        $rc = EX_FAILURE;
+    }
 }
-
-exit $warnings;
 
 #
 # $Id: SymbolicMode.pm,v 1.1 2004/07/23 20:10:01 cwest Exp $
@@ -132,18 +134,12 @@ exit $warnings;
 #
 #
 
-sub mod ($$) {
+sub mod {
     my $symbolic     = shift;
     my $file         = shift;
 
-    # Initialization.
-    # The 'user', 'group' and 'other' groups.
-    my @ugo          = qw /u g o/;
-    # Bit masks for '[sg]uid', 'sticky', 'read', 'write' and 'execute'.
-    # Can't use qw // cause silly Perl doesn't know '2' is a number
-    # when dealing with &= ~$bit.
-    my %bits         = (s => 8, t => 8, r => 4, w => 2, x => 1);
-
+    my @ugo          = qw/u g o/;
+    my %bits         = ('s' => 8, 't' => 8, 'r' => 4, 'w' => 2, 'x' => 1);
 
     # For parsing.
     my $who_re       = '[augo]*';
@@ -151,7 +147,13 @@ sub mod ($$) {
 
 
     # Find the current permissions. This is what we start with.
-    my $mode         = sprintf "%04o" => (stat $file) [2] || 0;
+    my $mode = '000';
+    if ($symbolic =~ m/[\-\+]/) {
+        my @st = stat $file;
+        if (@st) {
+            $mode = sprintf '%04o', $st[2];
+        }
+    }
     my $current      = substr $mode => -3;  # rwx permissions for ugo.
 
     my %perms;
@@ -235,6 +237,9 @@ sub mod ($$) {
                 else      {%perms             = %umask;}
                 next;
             }
+            if ($operator eq '=') {
+                $perms{$who} = 0;
+            }
 
             # If we arrive here, $perms is a string.
             # We can iterate over the characters.
@@ -295,9 +300,8 @@ sub mod ($$) {
 
                 # Apply.
                 foreach my $s (@set) {
-                    do {$perms {$s} |=  $bit; next} if $operator eq '+';
+                    do {$perms {$s} |=  $bit; next} if ($operator eq '+' || $operator eq '=');
                     do {$perms {$s} &= ~$bit; next} if $operator eq '-';
-                    do {$perms {$s}  =  $bit; next} if $operator eq '=';
                     die "Weird operator `$operator' found\n";
                                                             # Should not happen.
                 }
@@ -332,7 +336,7 @@ chmod - change permissions of files
 
 =head1 SYNOPSIS
 
-B<chmod> [B<-R> [B<-H> | B<-L> | B<-P>]] I<mode> I<file> [I<files> ...]
+B<chmod> [B<-R> [B<-H> | B<-L> | B<-P>]] I<mode> I<file>...
 
 =head1 DESCRIPTION
 
@@ -342,7 +346,7 @@ options is permission the files should be given.
 =head2 OPTIONS
 
 B<chmod> accepts the options described below. The options B<-L>,
-B<-H> and B<-P> are mutally exclusive, and only the last given
+B<-H> and B<-P> are mutually exclusive, and only the last given
 option will be honoured. All of B<-L>, B<-H> and B<-P> require the
 B<-R> option to be set first.
 

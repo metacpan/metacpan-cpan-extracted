@@ -36,8 +36,10 @@ my $d = Music::Dice->new(
     scale_name => $opt{scale},
 );
  
-my $c_phrase = $d->rhythmic_phrase->roll; # harmony
-print "H: @{ $c_phrase }\n";
+# get the initial settings by rolling
+my $h_phrase = $d->rhythmic_phrase->roll; # harmony
+print "Harmony rhythm: @{ $h_phrase }\n";
+# define the "melody"
 if ($opt{triplets}) {
     my $pool    = $d->phrase_pool;
     my $weights = $d->phrase_weights;
@@ -47,19 +49,21 @@ if ($opt{triplets}) {
     $d->phrase_groups([ @$groups, 3, 3 ]);
 }
 my $m_phrase = $d->rhythmic_phrase->roll; # melody
-print "M: @{ $m_phrase }\n";
-my $tonic    = $d->note->roll;
-my $mode     = $d->mode->roll;
-my @scale    = get_scale_notes($tonic, $mode);
+print "Melody rhythm: @{ $m_phrase }\n";
+my $tonic = $d->note->roll;
+my $mode  = $d->mode->roll;
+my @scale = get_scale_notes($tonic, $mode);
 print "$tonic $mode: @scale\n";
-print "degree => chord | duruation\n";
-my @bass_notes;
+print "degree => chord | duration\n";
+my @bass_notes; # global bucket defined by the harmony
 
+# get a new set of dice with the new tonic and mode
 $d = Music::Dice->new(
     scale_note => $tonic,
     scale_name => $mode,
 );
 
+# play the parts simultaneously
 $score->synch(
     \&harmony,
     \&melody,
@@ -71,11 +75,11 @@ sub harmony {
     set_chan_patch($score, 0, 4);
     my $volume = $score->Volume;
     $score->Volume($volume - $opt{factor});
-    for my $i (0 .. $#$c_phrase) {
+    for my $i (0 .. $#$h_phrase) {
         my ($degree, $triad) = $d->mode_degree_triad_roll($mode);
         my $index = $degree - 1;
         my $type = $triad eq 'diminished' ? 'dim' : $triad eq 'minor' ? 'm' : '';
-        if ($opt{quality} && $i == $#$c_phrase) {
+        if ($opt{quality} && $i == $#$h_phrase) {
             if ($triad eq 'diminished') {
                 $type = $d->chord_quality_diminished->roll;
             }
@@ -87,9 +91,9 @@ sub harmony {
             }
         }
         my $chord = "$scale[$index]$type";
-        print "$degree => $chord | $c_phrase->[$i]\n";
+        print "$degree => $chord | $h_phrase->[$i]\n";
         my @tones = $cn->chord_with_octave($chord, $opt{octave});
-        $score->n($c_phrase->[$i], midi_format(@tones));
+        $score->n($h_phrase->[$i], midi_format(@tones));
         push @bass_notes, $scale[$index] if $i == 0;
     }
     $score->Volume($volume);

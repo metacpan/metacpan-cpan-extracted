@@ -10,7 +10,7 @@ use Time::Local;
 
 use Exporter 'import';
 
-our @EXPORT_OK   = qw(ts_to_date datetime_to_ts convert_units);
+our @EXPORT_OK   = qw(ts_to_date ts_to_iso_date datetime_to_ts convert_units);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 =head1 NAME
@@ -19,7 +19,7 @@ Weather::API::Base - Base/util module for Weather API clients
 
 =cut
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 =head1 SYNOPSIS
 
@@ -187,6 +187,13 @@ convenience you can use C<ts_to_date>, which is a very fast function that will
 return the format C<YYYY-MM-DD HH:mm:ss> in your local time zone, or
 C<YYYY-MM-DD HH:mm:ssZ> in UTC if the second argument is true.
 
+=head2 C<ts_to_iso_date>
+
+    my $datetime = ts_to_iso_date($timestamp, $utc?);
+
+Same as C<ts_to_date> but returns a strict ISO date with the C<T> date/time
+separator.
+
 =head2 C<datetime_to_ts>
 
     my $ts = datetime_to_ts($datetime, $utc?);
@@ -230,14 +237,23 @@ sub new {
 }
 
 sub ts_to_date {
-    my $ts = shift;
-    my $gm = shift;
+    return _ts_to_date(@_);
+}
+
+sub ts_to_iso_date {
+    return _ts_to_date($_[0], $_[1], 'T');
+}
+
+sub _ts_to_date {
+    my $ts  = shift;
+    my $gm  = shift;
+    my $iso = shift || ' ';
     $gm = $gm ? 'Z' : '';
     my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) =
         $gm ? gmtime($ts) : localtime($ts);
     $mon++;
     $year += 1900;
-    return sprintf "%04d-%02d-%02d %02d:%02d:%02d%s", $year, $mon, $mday,
+    return sprintf "%04d-%02d-%02d%s%02d:%02d:%02d%s", $year, $mon, $mday, $iso,
         $hour, $min, $sec, $gm;
 }
 

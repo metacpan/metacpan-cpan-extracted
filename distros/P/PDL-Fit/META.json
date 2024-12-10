@@ -1,0 +1,55 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "PerlDL Developers <pdl-general@lists.sourceforge.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PDL-Fit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "PDL" : "2.094"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "2.094"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PDLPorters/PDL-Fit/issues"
+      },
+      "homepage" : "http://pdl.perl.org/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/PDL-Fit.git",
+         "web" : "https://github.com/PDLPorters/PDL-Fit"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pdl"
+   },
+   "version" : "2.097",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

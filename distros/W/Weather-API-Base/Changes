@@ -1,5 +1,8 @@
 Revision history for Weather-API-Base
 
+0.3     2024-12-09
+        ts_to_iso_date added.
+
 0.2     2024-11-04
         Unit conversion changes/additions.
 

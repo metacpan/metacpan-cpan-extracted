@@ -1,5 +1,8 @@
 Revision history for Music-Dice
 
+0.0201 2024-12-09 16:01:03
+    - Improve the eg/melody program a bit.
+
 0.0200 2024-12-08 02:23:16
     - Remove the mM7 chord quality, because.. it is always ugly, imho.
     - Complicate the eg/melody program in order to exercise more things.

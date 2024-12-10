@@ -2,7 +2,7 @@ NAME
     App::repeat - Repeat a command a number of times
 
 VERSION
-    This document describes version 0.004 of App::repeat (from Perl
+    This document describes version 0.005 of App::repeat (from Perl
     distribution App-repeat), released on 2024-12-06.
 
 SYNOPSIS

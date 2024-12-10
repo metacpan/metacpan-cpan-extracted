@@ -51,9 +51,14 @@ use strict;
 
 use File::Basename qw(basename);
 use File::Spec;
+use File::Temp qw();
 use Getopt::Std;
 
-our $VERSION = '1.006';
+use constant EX_MATCHED => 0;
+use constant EX_NOMATCH => 1;
+use constant EX_FAILURE => 2;
+
+our $VERSION = '1.018';
 
 $| = 1;                   # autoflush output
 
@@ -74,27 +79,26 @@ my %Compress = (
 my ($opt, $matcher) = parse_args();    # get command line options and patterns
 matchfile( $opt, $matcher, @ARGV );   # process files
 
-exit(2) if $Errors;
-exit(0) if $Grand_Total;
-exit(1);
+exit(EX_FAILURE) if $Errors;
+exit(EX_MATCHED) if $Grand_Total;
+exit(EX_NOMATCH);
 
 ###################################
 
 sub VERSION_MESSAGE {
 	print "$Me version $VERSION\n";
-	exit 0;
+	exit EX_MATCHED;
 }
 
 sub usage {
 	die <<EOF;
-usage: $Me [-inCcwsxvHhLlF1gurpaqT] [-e pattern]
-        [-f pattern-file] [-P sep] [pattern] [file...]
+usage: $Me [-IincwsxvHhLlFguRraqT] [-e pattern] [-A NUM] [-B NUM] [-C NUM]
+           [-m NUM] [-f pattern-file] [pattern] [file...]
 
 Options:
 	-i   case insensitive
 	-n   number lines
 	-c   give count of lines matching
-	-C   ditto, but >1 match per line possible
 	-w   word boundaries only
 	-q   quiet; nothing is written to standard output
 	-x   exact matches only
@@ -106,64 +110,176 @@ Options:
 	-l   list filenames matching
 	-L   list filenames which do not match
 	-F   search for fixed strings (disable regular expressions)
-	-1   1 match per file
+	-m   limit total matches per file
 	-g   highlight matches
 	-u   underline matches
 	-r   recursive on directories or dot if none
-	-p   paragraph mode (default: line mode)
-	-P   ditto, but specify separator, e.g. -P '%%\\n'
-	-a   all files, not just plain text files
+	-C   show lines of context around each matching line
+	-B   show lines before each matching line
+	-A   show lines after each matching line
+	-a   treat binary files as plain text files
+	-I   ignore binary files
 	-s   suppress errors for failed file and dir opens
 	-T   trace files as opened
+	-Z   force grep to behave as zgrep
 
 May use GREP_OPTIONS environment variable to set default options.
 EOF
 	}
 
 ###################################
+sub run_tput {
+	my $arg = shift;
+	my $term = $ENV{'TERM'} || 'vt100';
+
+	open my $oldout, '>&', STDOUT or die "$Me: can't save stdout: $!\n";
+	my $tmp = File::Temp->new;
+	open STDOUT, '>&', $tmp or die "$Me: can't redirect stdout: $!\n";
+	system 'tput', '-T', $term, $arg;
+	seek $tmp, 0, 0 or die "$Me: can't rewind temporary file: $!\n";
+	my $bin = <$tmp>;
+	close $tmp or die "$Me: can't close temporary file: $!\n";
+	open STDOUT, '>&', $oldout or die "$Me: can't restore stdout: $!\n";
+	return $bin;
+}
 
 sub parse_args {
-	my (%opt, $pattern, @patterns, $match_code, $SO, $SE);
+	my (%opt, $pattern, @patterns, $SO, $SE);
+
+	my $cls_grep = sub {
+		for my $pattern (@patterns) {
+			$Matches++ if m/$pattern/;
+		}
+	};
+	my $cls_grep_v = sub {
+		for my $pattern (@patterns) {
+			$Matches += !/$pattern/;
+		}
+	};
+	my $cls_grep_g = sub {
+		for my $pattern (@patterns) {
+			$Matches += s/($pattern)/${SO}$1${SE}/g;
+		}
+	};
+	my $cls_fgrep = sub {
+		for my $pattern (@patterns) {
+			$Matches++ if index($_, $pattern) != -1;
+		}
+	};
+	my $cls_fgrep_v = sub {
+		for my $pattern (@patterns) {
+			$Matches++ if index($_, $pattern) == -1;
+		}
+	};
+	my $cls_fgrep_i = sub {
+		my $s = lc $_;
+		for my $pattern (@patterns) {
+			$Matches++ if index($s, lc $pattern) != -1;
+		}
+	};
+	my $cls_fgrep_iv = sub {
+		my $s = lc $_;
+		for my $pattern (@patterns) {
+			$Matches++ if index($s, lc $pattern) == -1;
+		}
+	};
+	my $cls_fgrep_x = sub {
+		my $s = $_;
+		chomp $s;
+		for my $pattern (@patterns) {
+			$Matches++ if $s eq $pattern;
+		}
+	};
+	my $cls_fgrep_xv = sub {
+		my $s = $_;
+		chomp $s;
+		for my $pattern (@patterns) {
+			$Matches++ if $s ne $pattern;
+		}
+	};
+	my $cls_fgrep_xi = sub {
+		my $s = lc $_;
+		chomp $s;
+		for my $pattern (@patterns) {
+			$Matches++ if $s eq lc($pattern);
+		}
+	};
+	my $cls_fgrep_xiv = sub {
+		my $s = lc $_;
+		chomp $s;
+		for my $pattern (@patterns) {
+			$Matches++ if $s ne lc($pattern);
+		}
+	};
 
 	if ( defined( $_ = $ENV{'GREP_OPTIONS'} ) ) {
 		s/^([^\-])/-$1/;    # add leading - if missing
 		unshift @ARGV, $_;
 		}
 
-	$opt{'p'} = $opt{'P'} = ''; # argument to print()
-	getopts('inCcwsxvHhe:f:Ll1gurpP:aqTF', \%opt) or usage();
+	# multiple -e/-f options
+	my $opt_f = 0;
+	my @tmparg;
+	while (@ARGV) {
+		my $arg = shift @ARGV;
+		if ($arg =~ s/\A\-e//) {
+			$pattern = length($arg) ? $arg : shift(@ARGV);
+			usage() unless defined $pattern;
+			push @patterns, $pattern;
+		}
+		elsif ($arg =~ s/\A\-f//) {
+			$opt_f = 1;
+			my $file = length($arg) ? $arg : shift(@ARGV);
+			usage() unless defined $file;
+			die "$Me: $file: is a directory\n" if -d $file;
+			my $fh;
+			open($fh, '<', $file) or die "$Me: Can't open '$file': $!\n";
+			my $line;
+			while (defined($line = <$fh>)) {
+				chomp $line;
+				$pattern = $line;
+				push @patterns, $pattern;
+			}
+			close $fh;
 
+		}
+		else {
+			push @tmparg, $arg;
+		}
+	}
+	@ARGV = @tmparg;
+
+	getopts('IinC:cwsxvHhLlguRraqTFZm:A:B:', \%opt) or usage();
+
+	$opt{'r'} ||= $opt{'R'};
+	if (defined $opt{'m'} && $opt{'m'} !~ m/\A[0-9]+\z/) {
+		die "$Me: invalid max count\n";
+	}
+	foreach my $o (qw(A B C)) {
+		if (defined $opt{$o} && $opt{$o} !~ m/\A[0-9]+\z/) {
+			die "$Me: bad context count for -$o\n";
+		}
+	}
+	if (defined $opt{'C'}) {
+		$opt{'A'} = $opt{'B'} = $opt{'C'};
+	}
 	$opt{'l'} = 0 if $opt{'L'};
 	my $no_re = $opt{F} || ( $Me =~ /\bfgrep\b/ );
-	$match_code = '';
 
-	if (defined $opt{'f'}) {           # -f patfile
-		my $path = $opt{'f'};
-		my $patfile;
-		die "$Me: $path: is a directory\n" if -d $path;
-		open($patfile, '<', $path) or die "$Me: Can't open '$path': $!\n";
-
-		# make sure each pattern in file is valid
-		while ( defined( $pattern = <$patfile> ) ) {
-			chomp $pattern;
-			unless ($no_re) {
-				eval { 'foo' =~ /$pattern/, 1 }
-					or die "$Me: $path: $.: bad pattern: $@\n";
-				}
-			push @patterns, $pattern;
-			}
-		close $patfile;
-		}
-	else {    # make sure pattern is valid
-		$pattern = $opt{'e'};
-		$pattern = shift(@ARGV) unless length $pattern;
+	if ($opt_f && scalar(@patterns) == 0) { # empty -f file allowed
+		exit EX_NOMATCH;
+	}
+	unless (@patterns) {
+		$pattern = shift @ARGV;
 		usage() unless defined $pattern;
-		unless ($no_re) {
+		push @patterns, $pattern;
+	}
+	unless ($no_re) {
+		foreach $pattern (@patterns) {
 			eval { 'foo' =~ /$pattern/, 1 }
 				or die "$Me: bad pattern: $@\n";
-			}
-		@patterns = ($pattern);
 		}
+	}
 	if ($opt{'H'}) {
 		$Mult = 1;
 	}
@@ -197,37 +313,37 @@ sub parse_args {
 				: ( $terminal->Tputs('us'), $terminal->Tputs('ue') );
 			}
 		else {                # if use of Term::Cap fails,
-			my $term = $ENV{'TERM'} || 'vt100';
-			( $SO, $SE ) = $opt{'g'}    # use tput command to get escapes
-				? ( `tput -T $term smso`, `tput -T $term rmso` )
-				: ( `tput -T $term smul`, `tput -T $term rmul` );
+			if ($opt{'g'}) {
+				$SO = run_tput('smso');
+				$SE = run_tput('rmso');
+			}
+			else {
+				$SO = run_tput('smul');
+				$SE = run_tput('rmul');
 			}
 		}
+	}
 
 	if ($no_re) {
 		if ($opt{'g'} || $opt{'u'} || $opt{'w'}) {
 			die "$Me: -g, -u and -w are incompatible with -F\n";
 		}
 		if ($opt{'x'}) { # exact match
-			my $testop = $opt{'v'} ? 'ne' : 'eq';
 			if ($opt{'i'}) {
-				$match_code = "my \$c=\$_; chomp \$c; for my \$pat (\@patterns) {\$Matches++ if (lc(\$c) $testop lc(\$pat)) }";
+				$matcher = $opt{'v'} ? $cls_fgrep_xiv : $cls_fgrep_xi;
 			}
 			else { # case sensitive
-				$match_code = "my \$c=\$_; chomp \$c; for my \$pat (\@patterns) {\$Matches++ if (\$c $testop \$pat) }";
+				$matcher = $opt{'v'} ? $cls_fgrep_xv : $cls_fgrep_x;
 			}
 		}
 		else { # regular match
-			my $testop = $opt{'v'} ? '==' : '!=';
 			if ($opt{'i'}) {
-				$match_code = "for my \$pat (\@patterns) { \$Matches++ if (index(lc \$_, lc \$pat) $testop -1) }";
+				$matcher = $opt{'v'} ? $cls_fgrep_iv : $cls_fgrep_i;
 			}
 			else { # case sensitive
-				$match_code = "for my \$pat (\@patterns) { \$Matches++ if (index(\$_, \$pat) $testop -1) }";
+				$matcher = $opt{'v'} ? $cls_fgrep_v : $cls_fgrep;
 			}
 		}
-		$matcher = eval "sub { $match_code }";
-		die if $@;
 		return (\%opt, $matcher);
 	}
 
@@ -240,43 +356,15 @@ sub parse_args {
 		@patterns = map {"(?i)$_"} @patterns;
 		}
 
-	if ( $opt{p} || $opt{P} ) {
-		@patterns = map {"(?m)$_"} @patterns;
-		}
-
-	$opt{p}   && ( $/        = '' );
-	$opt{P}   && ( $/        = eval(qq("$opt{P}")) );                                         # for -P '%%\n'
 	$opt{w}   && ( @patterns = map { '(?:\b|(?!\w))' . $_ . '(?:\b|(?<!\w))' } @patterns );
 	$opt{'x'} && ( @patterns = map {"^$_\$"} @patterns );
-	$opt{'1'} ||= $opt{'l'}; # that's a one and an ell
 	$opt{'g'} ||= $opt{'u'};
-	$opt{'c'} ||= $opt{'C'};
 
 	foreach (@patterns) {s(/)(\\/)g}
 
-	if ( $opt{'g'} ) {
-		for my $pattern (@patterns) {
-			$match_code .= "\$Matches += s/($pattern)/${SO}\$1${SE}/g;";
-			}
-		}
-	elsif ( $opt{v} ) {
-		for my $pattern (@patterns) {
-			$match_code .= "\$Matches += !/$pattern/;";
-			}
-		}
-	elsif ( $opt{C} ) {
-		for my $pattern (@patterns) {
-			$match_code .= "\$Matches++ while /$pattern/g;";
-			}
-		}
-	else {
-		for my $pattern (@patterns) {
-			$match_code .= "\$Matches++ if /$pattern/;";
-			}
-		}
-
-	$matcher = eval "sub { $match_code }";
-	die if $@;
+	if    ($opt{'g'}) { $matcher = $cls_grep_g; }
+	elsif ($opt{'v'}) { $matcher = $cls_grep_v; }
+	else              { $matcher = $cls_grep;   }
 
 	return ( \%opt, $matcher );
 	}
@@ -292,6 +380,7 @@ sub matchfile {
 	$total = 0;
 
 FILE: while ( defined( $file = shift(@_) ) ) {
+		my $is_binary = 0;
 		my $compressed = 0;
 
 		if ( $file eq '-' ) {
@@ -339,14 +428,11 @@ FILE: while ( defined( $file = shift(@_) ) ) {
 				}
 
 			my ($ext) = $file =~ /\.([^.]+)$/;
-			if ( defined $ext && exists $Compress{$ext} ) {
+			if ($opt->{'Z'} && defined $ext && exists $Compress{$ext}) {
 				$file       = "$Compress{$ext} $file |";
 				$compressed = 1;
 				}
-			elsif (!$opt->{'a'} && -B $file) {
-				warn qq($Me: skipping binary file "$file"\n) if $opt->{T};
-				next FILE;
-				}
+			$is_binary = 1 if -B $file;
 			}
 
 		warn "$Me: checking $name\n" if $opt->{'T'};
@@ -368,38 +454,82 @@ FILE: while ( defined( $file = shift(@_) ) ) {
 				$Errors++;
 				next FILE;
 				}
+			if ($is_binary) {
+				next FILE if $opt->{'I'};
+				binmode $fh;
+				}
 			}
 
 		$total = $Matches = 0;
+		my $ctx_a = 0;
+		my @ctx_b;
 
 	LINE: while (<$fh>) {
+			my $ctxb_dump = 0;
+			if (defined $opt->{'m'}) { # maximum may be zero
+				last LINE if $total >= $opt->{'m'} && $ctx_a == 0;
+			}
 			$Matches = 0;
 
 			##############
 			&{$matcher}();    # do it! (check for matches)
 			##############
 
-			next LINE unless $Matches;
+			if (!$Matches && defined($opt->{'B'})) {
+				push @ctx_b, $_;
+				shift @ctx_b if scalar(@ctx_b) > $opt->{'B'};
+			}
+			if ($ctx_a > 0) {
+				$ctx_a--; # show context line
+			} elsif (!$Matches) {
+				next LINE;
+			}
+
+			if ($Matches && @ctx_b) {
+				$ctxb_dump = 1;
+				my $n = $. - $opt->{'B'};
+				foreach my $bline (@ctx_b) {
+					print($n++, '-') if $opt->{'n'};
+					print $bline;
+				}
+				@ctx_b = ();
+			}
 
 			$total += $Matches;
 			last FILE if $opt->{'q'}; # single match for all files
 			last LINE if $opt->{'L'}; # one match is enough
 
-			if ( $opt->{p} || $opt->{P} ) {
-				s/\n{2,}$/\n/ if $opt->{p};
-				chomp         if $opt->{P};
+			if (defined $opt->{'A'} && $Matches) {
+				unless (defined($opt->{'m'}) && $opt->{'m'} < $total) {
+					$ctx_a = $opt->{'A'};
 				}
+			}
 			if ($opt->{'l'}) {
 				print $name, "\n";
 				last LINE;
 			}
+			if ($is_binary && !$opt->{'a'}) {
+				warn "$Me: $file: binary file matches\n";
+				last LINE; # single match for binfile unless -a
+			}
 			unless ($opt->{'c'}) {
 				print($name, ':') if $Mult;
-				print $opt->{n} ? "$.:" : "", $_,
-					( $opt->{p} || $opt->{P} ) && ( '-' x 20 ) . "\n";
+				if ($opt->{'n'}) {
+					print $.;
+					if ($Matches) {
+						print ':';
+					} else {
+						print '-';
+					}
+				}
+				print $_;
 			}
-
-			last LINE if $opt->{'1'}; # single match per file
+			if ($ctx_a == 0 && !$Matches) {
+				print "--\n";
+			}
+			if ($ctxb_dump && $ctx_a == 0) {
+				print "--\n";
+			}
 			}
 			close $fh;
 		}
@@ -425,12 +555,12 @@ grep - search for regular expressions and print
 
 =head1 SYNOPSIS
 
-B<grep> [ B<-[incCwsxvhHlLF1igurpaqT]> ] [ B<-e> I<pattern> ]
-[ B<-f> I<pattern-file> ] [ B<-P> I<sep> ] [ I<pattern> ] [ I<files> ... ]
+    grep [-IincwsxvhHlLFiguRraqT] [-e pattern] [-A NUM] [-B NUM] [-C NUM]
+         [-m NUM] [-f pattern-file] [pattern] [file ...]
 
 =head1 DESCRIPTION
 
-B<grep> searches for lines (or, optionally, paragraphs) in files
+B<grep> searches for lines in files
 that satisfy the criteria specified by the user-supplied patterns.
 Because this B<grep> is a Perl program, the user has full access to
 Perl's rich regular expression engine.  See L<perlre>.
@@ -448,24 +578,29 @@ The following options are accepted:
 
 =over 4
 
-=item B<-1>
+=item B<-m> I<NUM>
 
-Allow at most one match per file.
+Display a maximum of NUM matches per file.
+
+=item B<-A> I<NUM>
+
+Display NUM lines of context after each matching line.
 
 =item B<-a>
 
-Search all files.  The default is to only search plain text files
-and compressed files.
+List matching lines from binary files as if they were plain text files.
 
-=item B<-C>
+=item B<-B> I<NUM>
 
-Output the count of the matching lines or paragraphs.  This is similar
-to the B<-c> option (in fact, it implies the B<-c> option), except more
-than one match is possible in each line or paragraph.
+Display NUM lines of context before each matching line.
+
+=item B<-C> I<NUM>
+
+Display NUM lines of context surrounding each matching line.
 
 =item B<-c>
 
-Output the count of the matching lines or paragraphs.
+Output only the count of the matching lines.
 
 =item B<-e> I<pattern>
 
@@ -492,17 +627,21 @@ the B<-f> option supercedes the B<-e> option.
 
 Highlight matches.  This option causes B<grep> to attempt to use
 your terminal's stand-out (emboldening) functionality to highlight
-those portions of each matching line or paragraph that actually
+those portions of each matching line that actually
 triggered the match.  This feature is very similar to the way the
 less(1) pager highlights matches.  See also B<-u>.
 
 =item B<-H>
 
-Always include filename headers for matching lines or paragraphs.
+Always include filename headers for matching lines.
 
 =item B<-h>
 
-Hide filenames.  Only print matching lines or paragraphs.
+Hide filenames.  Only print matching lines.
+
+=item B<-I>
+
+Ignore binary files.
 
 =item B<-i>
 
@@ -524,26 +663,15 @@ This option implies the B<-1> option.
 
 =item B<-n>
 
-Number lines or paragraphs.  Before outputting a given match, B<grep>
-will first output its line or paragraph number corresponding to the
+Number lines.  Before outputting a given match, B<grep>
+will first output its line corresponding to the
 value of the Perl magic scalar $. (whose documentation is in L<perlvar>).
-
-=item B<-P> I<sep>
-
-Put B<grep> in paragraph mode, and use I<sep> as the paragraph
-separator.  This is implemented by assigning I<sep> to Perl's magic
-$/ scalar.  See L<perlvar>.
-
-=item B<-p>
-
-Paragraph mode.  This causes B<grep> to set Perl's magic $/ to C<''>.
-(Note that the default is to process files in line mode.)  See L<perlvar>.
 
 =item B<-s>
 
 Suppress diagnostic messages to the standard error.
 
-=item B<-r>
+=item B<-R> and B<-r>
 
 Recursively scan directories.  This option causes B<grep> to
 descend directories in a left-first, depth-first manner and search
@@ -571,12 +699,12 @@ when opening a file for searching
 
 Underline matches.  This option causes B<grep> to attempt to use
 your terminal's underline functionality to underline those portions of
-each matching line or paragraph that actually triggered the match.
+each matching line that actually triggered the match.
 See also B<-H>.
 
 =item B<-v>
 
-Invert the sense of the match, i.e. print those lines or paragraphs
+Invert the sense of the match, i.e. print those lines
 that do B<not> match.  When using this option in conjunction with B<-f>,
 keep in mind that the entire set of patterns are grouped together in
 one pattern for the purposes of negation.  See L<"EXAMPLES">.
@@ -590,7 +718,12 @@ for the precise definition of C<\b>.
 
 =item B<-x>
 
-Exact matches only.  The pattern must match the entire line or paragraph.
+Exact matches only.  The pattern must match the entire line.
+
+=item B<-Z>
+
+Operate in zgrep mode.  Compressed file arguments are decompressed before
+searching for the pattern.
 
 =back
 

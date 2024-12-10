@@ -32,7 +32,7 @@ spread-revolutionary-date - Spread date and time from Revolutionary (Republican)
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 DESCRIPTION
 
@@ -108,11 +108,11 @@ This option can be specified multiple times, with values as strings. It explicit
 
 =head3 msgmaker
 
-This option can only be specified once, with a value as string. Spread a message computed by the class defined by the value of this option, defaults to C<RevolutionaryDate>. The C<Value> (case sensitive) of this option should correspond to an existing C<App::SpreadRevolutionaryDate::MsgMaker::Value> class consuming L<App::SpreadRevolutionaryDate::MsgMaker> role. Message makers values pre-defined in this distribution are C<RevolutionaryDate>, which spreads the revolutionary date, and C<PromptUser>, which prompts the user for the message to be spread (with confirmation). See L</"EXTENDING TO NEW MESSAGE MAKERS"> for details on using a new value for this option.
+This option can only be specified once, with a value as string. Spreads a message computed by the class defined by the value of this option, defaults to C<RevolutionaryDate>. The C<Value> (case sensitive) of this option should correspond to an existing C<App::SpreadRevolutionaryDate::MsgMaker::Value> class consuming L<App::SpreadRevolutionaryDate::MsgMaker> role. Message makers values pre-defined in this distribution are C<RevolutionaryDate>, which spreads the revolutionary date, and C<PromptUser>, which prompts the user for the message to be spread (with confirmation). See L</"EXTENDING TO NEW MESSAGE MAKERS"> for details on using a new value for this option.
 
 =head3 locale
 
-This option can only be specified once, with a value as string. Spread with chosen language. As of L<App::SpreadRevolutionaryDate> 0.11 locale is limited to C<'fr'>, C<'en'>, C<'it'> or C<'es'> for C<RevolutionaryDate> and C<'fr'>, C<'en'>, C<'it'>, C<'es'> or C<'de'>. Defaults to C<'fr'> for C<RevolutionaryDate> and C<'en'> otherwise. To add more languages see L</INTERNATIONALIZATION AND LOCALIZATION>.
+This option can only be specified once, with a value as string. Spreads with chosen language. As of L<App::SpreadRevolutionaryDate> 0.11 locale is limited to C<'fr'>, C<'en'>, C<'it'> or C<'es'> for C<RevolutionaryDate> and C<'fr'>, C<'en'>, C<'it'>, C<'es'> or C<'de'> otherwise. Defaults to C<'fr'> for C<RevolutionaryDate> and C<'en'> otherwise. To add more languages see L</INTERNATIONALIZATION AND LOCALIZATION>.
 
 =head3 test
 
@@ -124,23 +124,23 @@ This option is I<deprecated> starting from version 0.09 of this distribution and
 
 =head3 I<DEPRECATED> bluesky
 
-This option is I<deprecated> starting from version 0.07 of this distribution and may be removed in future release. Please use L</targets> option, as described above. Spread on Bluesky explicitly. If none of the C<bluesky>, C<twitter>, C<mastodon>, C<freenode>, C<liberachat> option is set, the revolutionary date is spread on all of these five targets.
+This option is I<deprecated> starting from version 0.07 of this distribution and may be removed in future release. Please use L</targets> option, as described above. Spreads on Bluesky explicitly. If none of the C<bluesky>, C<twitter>, C<mastodon>, C<freenode>, C<liberachat> option is set, the revolutionary date is spread on all of these five targets.
 
 =head3 I<DEPRECATED> twitter
 
-This option is I<deprecated> starting from version 0.07 of this distribution and may be removed in future release. Please use L</targets> option, as described above. Spread on Twitter explicitly. If none of the C<bluesky>, C<twitter>, C<mastodon>, C<freenode>, C<liberachat> option is set, the revolutionary date is spread on all of these five targets.
+This option is I<deprecated> starting from version 0.07 of this distribution and may be removed in future release. Please use L</targets> option, as described above. Spreads on Twitter explicitly. If none of the C<bluesky>, C<twitter>, C<mastodon>, C<freenode>, C<liberachat> option is set, the revolutionary date is spread on all of these five targets.
 
 =head3 I<DEPRECATED> mastodon
 
-This option is I<deprecated> starting from version 0.07 of this distribution and may be removed in future release. Please use L</targets> option, as described above. Spread on Mastodon explicitly. If none of the C<bluesky>, C<twitter>, C<mastodon>, C<freenode>, C<liberachat> option is set, the revolutionary date is spread on all of these five targets.
+This option is I<deprecated> starting from version 0.07 of this distribution and may be removed in future release. Please use L</targets> option, as described above. Spreads on Mastodon explicitly. If none of the C<bluesky>, C<twitter>, C<mastodon>, C<freenode>, C<liberachat> option is set, the revolutionary date is spread on all of these five targets.
 
 =head3 I<DEPRECATED> freenode
 
-This option is I<deprecated> starting from version 0.07 of this distribution and may be removed in future release. Please use L</targets> option, as described above. Spread on Freenode explicitly. If none of the C<twitter>, C<mastodon>, C<freenode>, C<liberachat> option is set, the revolutionary date is spread on all of these five targets.
+This option is I<deprecated> starting from version 0.07 of this distribution and may be removed in future release. Please use L</targets> option, as described above. Spreads on Freenode explicitly. If none of the C<twitter>, C<mastodon>, C<freenode>, C<liberachat> option is set, the revolutionary date is spread on all of these five targets.
 
 =head3 I<DEPRECATED> liberachat
 
-This option is I<deprecated> starting from version 0.07 of this distribution and may be removed in future release. Please use L</targets> option, as described above. Spread on Liberachat explicitly. If none of the C<bluesky>, C<twitter>, C<mastodon>, C<freenode>, C<liberachat> option is set, the revolutionary date is spread on all of these five targets.
+This option is I<deprecated> starting from version 0.07 of this distribution and may be removed in future release. Please use L</targets> option, as described above. Spreads on Liberachat explicitly. If none of the C<bluesky>, C<twitter>, C<mastodon>, C<freenode>, C<liberachat> option is set, the revolutionary date is spread on all of these five targets.
 
 =head2 Bluesky options
 
@@ -148,11 +148,11 @@ These options are credentials for C<spread-revolutionary-date> to spread on a Bl
 
 =head3 identifier
 
-This option can only be specified once, with a value as string: your Bluesky identifier.
+This option can only be specified once, with a value as string: your Bluesky identifier (ending with C<.bsky.social> by default).
 
 =head3 password
 
-This option can only be specified once, with a value as string: your Bluesky password.
+This option can only be specified once, with a value as string: your Bluesky password. You can define a special password for this application, in order to not use your main Bluesky password in your L<Bluesky account settings|https://bsky.app/settings/app-passwords>.
 
 =head2 Twitter options
 
@@ -434,7 +434,7 @@ Such a target class is actually just a wrapper. Usually a target has to use an e
 
 To perform authentication and to post a message, there is a strong likelihood that the new target requires specific parameters (e.g.: tokens, keys, account name, password, channels, etc.). These parameters should be defined as required attributes of the target class. Values for such attributes should be set in the L<configuration file|/CONFIGURATION>, inside a section named after the target in lower case (C<[mytarget]>), or as L<command line parameters|/"COMMAND LINE PARAMETERS"> prefixed with the name of the target in lower case, followed by an underscore (C<--mytarget_myparam>).
 
-Should you extend C<spread-revolutionary-date> to a new target, we advise you to have a look on how default targets are implemented: L<App::SpreadRevolutionaryDate::Target::Bluesky> with L<Bluesky> C<worker>, L<App::SpreadRevolutionaryDate::Target::Twitter> with L<Twitter::API> C<worker>, L<App::SpreadRevolutionaryDate::Target::Mastodon> with L<Mastodon::Client> C<worker>. Both are using L<OAuth2 protocol|https://oauth.net/2/> to perform authentication. The third and fourth default targets, C<App::SpreadRevolutionaryDate::Target::Freenode> <App::SpreadRevolutionaryDate::Target::Liberachat>, uses a L<chatbot|https://en.wikipedia.org/wiki/Chatbot>: L<App::SpreadRevolutionaryDate::Target::Freenode::Bot> L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot> subclassing L<Bot::BasicBot>. You can also see a very simple example with a test file provided in this distribution at C<t/new_target.t>, which just prints out the revolutionary date on the standard output using core module L<IO::Handle>.
+Should you extend C<spread-revolutionary-date> to a new target, we advise you to have a look on how default targets are implemented: L<App::SpreadRevolutionaryDate::Target::Bluesky> with L<App::SpreadRevolutionaryDate::BlueskyLite> C<worker>, L<App::SpreadRevolutionaryDate::Target::Twitter> with L<Twitter::API> C<worker>, L<App::SpreadRevolutionaryDate::Target::Mastodon> with L<Mastodon::Client> C<worker>. The last two are using L<OAuth2 protocol|https://oauth.net/2/> to perform authentication. The third and fourth default targets, C<App::SpreadRevolutionaryDate::Target::Freenode> <App::SpreadRevolutionaryDate::Target::Liberachat>, uses a L<chatbot|https://en.wikipedia.org/wiki/Chatbot>: L<App::SpreadRevolutionaryDate::Target::Freenode::Bot> L<App::SpreadRevolutionaryDate::Target::Liberachat::Bot> subclassing L<Bot::BasicBot>. You can also see a very simple example with a test file provided in this distribution at C<t/new_target.t>, which just prints out the revolutionary date on the standard output using core module L<IO::Handle>.
 
 =head1 EXTENDING TO NEW MESSAGE MAKERS
 
@@ -471,7 +471,7 @@ When the string to be translated includes some words in curly braces, these word
 
 And that's it! As of version 0.11 of C<spread-revolutionary-date>, there is only about a dozen of strings to translate, mainly for C<PromptUser> message maker. But with the possibility to extend to other message makers, you may need more and more strings to be translated.
 
-Translating days, months and feasts used in the C<RevolutionaryDate> message maker do not use the C<gettext> system. Mainly because it uses L<DateTime::Calendar::FrenchRevolutionary> which proposes French and English translations in dedicated Perl modules. C<spread-revolutionary-date> keeps the same way for translating expressions used in the French revolutionary calendar, but, thanks to L<Moose::Role> L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale>, translatable nominal groups have been isolated from other Perl code. Their translations lie in a consuming class in the C<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::> namespace for each translated language. These classes are named after the two-letter (L<ISO 639-1|https://en.wikipedia.org/wiki/ISO_639-1>) or three-letter (L<ISO 639-2|https://en.wikipedia.org/wiki/ISO_639-2> and L<hISO 639-3|ttps://en.wikipedia.org/wiki/ISO_639-3>) lowercase abbreviation of the corresponding language. For example, a German translator would work on C<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::de> class.
+Translating days, months and feasts used in the C<RevolutionaryDate> message maker do not use the C<gettext> system. Mainly because it uses L<DateTime::Calendar::FrenchRevolutionary> which proposes French and English translations in dedicated Perl modules. C<spread-revolutionary-date> keeps the same way for translating expressions used in the French revolutionary calendar, but, thanks to L<Moose::Role> L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale>, translatable nominal groups have been isolated from other Perl code. Their translations lie in a consuming class in the C<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::> namespace for each translated language. These classes are named after the two-letter (L<ISO 639-1|https://en.wikipedia.org/wiki/ISO_639-1>) or three-letter (L<ISO 639-2|https://en.wikipedia.org/wiki/ISO_639-2> and L<ISO 639-3|https://en.wikipedia.org/wiki/ISO_639-3>) lowercase abbreviation of the corresponding language. For example, a German translator would work on C<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::de> class.
 
 Just copy the French class (from C<lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/fr.pm> file) into the desired language, change the name of the class and replace every French string. E.g.: the names of the months should be replace in:
 
@@ -497,7 +497,7 @@ by names in German:
     ]},
   );
 
-Feasts include a special trick, because they can be used in sentences like I<this is C<feast name> day> or I<c'est le jour de la C<feast name>>. Depending on the language, it could then be prefixed or suffixed: in English it is suffixed by C< day>, whereas in French it is prefixed by C<jour de la >. Prefixes are translated as an array of strings, while the suffix is translated in a single string. The reason is that in languages where the feast of the day is prefixed, the prefix often depends on the gender or the number of the noun used for the feast, or whereas this noun starts by a vowel, and other factors depending on the language. Therefore, each translation of the feast of each day should starts with a digit specifying the index (starting from 0) in the translated array of prefixes to use for this word. E.g.: with prefixes translated by C<['jour du ', 'jour de la ', "jour de l'", 'jour des ']>, some feast can be translated by C<'1carotte', '2amaranthe', '0panais'> (because you say: I<jour de la carotte>, with prefix number C<1>, I<jour de l'amaranthe>, with prefix number C<2>, and I<jour du panais>, with prefix number C<0>. If the language does not use any prefix before the feast of the day, each translation for the feast of the day should start with C<0>, and the array of prefixes should include an empty string as its single element. If the language does not use a suffix after the feast of the day, the translation of the sufix should be an empty string.
+Feasts include a special trick, because they can be used in sentences like I<this is C<feast name> day> or I<c'est le jour de la C<feast name>>. Depending on the language, it could then be prefixed or suffixed: in English it is suffixed by C< day>, whereas in French it is prefixed by C<jour de la >. Prefixes are translated as an array of strings, while the suffix is translated in a single string. The reason is that in languages where the feast of the day is prefixed, the prefix often depends on the gender or the number of the noun used for the feast, or whereas this noun starts by a vowel, and other factors depending on the language. Therefore, each translation of the feast of each day should starts with a digit specifying the index (starting from 0) in the translated array of prefixes to use for this word. E.g.: with prefixes translated by C<['jour du ', 'jour de la ', "jour de l'", 'jour des ']>, some feast can be translated by C<'1carotte', '2amaranthe', '0panais'> (because you say: I<jour de la carotte>, with prefix number C<1>, I<jour de l'amaranthe>, with prefix number C<2>, and I<jour du panais>, with prefix number C<0>). If the language does not use any prefix before the feast of the day, each translation for the feast of the day should start with C<0>, and the array of prefixes should include an empty string as its single element. If the language does not use a suffix after the feast of the day, the translation of the sufix should be an empty string.
 
 Note also that any space in the name of the feast of the day should be replaced by an underscore (C<_>).
 

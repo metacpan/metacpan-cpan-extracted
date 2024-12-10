@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC;
 # ABSTRACT: Class to model a VMC
-our $VERSION = '3.20241111'; # VERSION
+our $VERSION = '3.20241209'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -338,7 +338,7 @@ Mail::BIMI::VMC - Class to model a VMC
 
 =head1 VERSION
 
-version 3.20241111
+version 3.20241209
 
 =head1 DESCRIPTION
 

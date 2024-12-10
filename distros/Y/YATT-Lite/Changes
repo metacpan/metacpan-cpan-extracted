@@ -1,8 +1,12 @@
 Revision history for YATT::Lite
 
+0.121 2024-12-10
+    * GH-223 - Fix another `yatt*` scripts failure
+    * GH-222 - Set app_root to $FindBin::Bin by default
+
 0.120 2024-11-29
-    * GH-219 - Remove use of smartmatch, given... for perl5.40
     * GH-220 - Fix `yatt*` scripts to be installed correctly under bin/
+    * GH-219 - Remove use of smartmatch, given... for perl5.40
 
 0.110 2024-08-16
     * GH-216, GH-217 - More LRXML parser fix (for Language Server)

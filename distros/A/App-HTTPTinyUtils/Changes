@@ -1,3 +1,8 @@
+0.010   2024-12-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLI: http-tinyish.
+
+
 0.009   2020-11-17  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix logging parameter (max_size -> max_files) which caused
