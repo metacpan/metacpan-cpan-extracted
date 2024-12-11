@@ -18,12 +18,6 @@ Net::SSLeay::SSL_CTX class in L<SPVM> represents L<SSL_CTX|https://docs.openssl.
 
 =head1 Fields
 
-=head2 pkeys_list
-
-C<has pkeys_list : L<List|SPVM::List> of L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY>;>
-
-A list of private keys.
-
 =head1 Class Methods
 
 =head2 new
@@ -40,17 +34,17 @@ If SSL_CTX_new failed, an exception is thrown with C<eval_error_id> set to the b
 
 =head1 Instance Methods
 
+=head2 get_mode
+
+C<method get_mode : long ();>
+
+Calls native L<SSL_CTX_get_mode|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_mode> function given the pointer value of the instance, and returns its return value.
+
 =head2 set_mode
 
 C<method set_mode : long ($mode : long);>
 
-Calls native L<SSL_CTX_set_mode|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_mode> function given the pointer value of the instance, $mode, and returns the updated mode.
-
-=head2 set_verify
-
-C<method set_verify : void ($mode : int);>
-
-Calls native L<SSL_CTX_set_verify|https://docs.openssl.org/master/man3/SSL_CTX_set_verify/> function given the pointer value of the instance, $mode.
+Calls native L<SSL_CTX_set_mode|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_mode> function given the pointer value of the instance, $mode, and returns its return value.
 
 =head2 get0_param
 
@@ -60,9 +54,9 @@ Calls native L<SSL_CTX_get0_param|https://docs.openssl.org/master/man3/SSL_CTX_g
 
 =head2 load_verify_locations
 
-C<method load_verify_locations : int ($path : string);>
+C<method load_verify_locations : int ($CAfile : string, $CApath : string);>
 
-Calls native L<SSL_CTX_load_verify_locations|https://docs.openssl.org/master/man3/SSL_CTX_load_verify_locations/> function given the pointer value of the instance, $path, and returns its return value.
+Calls native L<SSL_CTX_load_verify_locations|https://docs.openssl.org/master/man3/SSL_CTX_load_verify_locations/> function given the pointer value of the instance, $CAfile, $CApath, and returns its return value.
 
 Exceptions:
 
@@ -111,6 +105,12 @@ Exceptions:
 The file $file must be defined. Otherwise an exception is thrown.
 
 If SSL_CTX_use_PrivateKey_file failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
+=head2 use_PrivateKey
+
+C<method use_PrivateKey : int ($pkey : L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY>);>
+
+Calls native L<SSL_CTX_use_PrivateKey|https://docs.openssl.org/master/man3/SSL_CTX_use_certificate> function given the pointer value of the instance, $pkey, pushes $pkey to the end of L</"pkeys_list"> field, and returns the return value of the native function.
 
 =head2 set_cipher_list
 
@@ -174,18 +174,6 @@ The protocols $protos must be defined. Otherwise an exception is thrown.
 
 If SSL_CTX_set_alpn_protos failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
-=head2 set_tmp_ecdh
-
-C<method set_tmp_ecdh : long ($ecdh : L<Net::SSLeay::EC_KEY|SPVM::Net::SSLeay::EC_KEY>);>
-
-Calls native L<SSL_CTX_set_tmp_ecdh|https://docs.openssl.org/master/man3/SSL_CTX_set_tmp_ecdh> function given the ECDH parameters $ecdh, and returns its return value.
-
-Exceptions:
-
-The ECDH parameters $ecdh must be defined. Otherwise an exception is thrown.
-
-If SSL_CTX_set_tmp_ecdh failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
-
 =head2 set1_groups_list
 
 C<method set1_groups_list : int ($list : string);>
@@ -198,21 +186,11 @@ The group list $list must be defined. Otherwise an exception is thrown.
 
 If set1_groups_list failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
-Requirements:
+=head2 get_session_cache_mode
 
-OpenSSL 3.0
+C<method get_session_cache_mode : long ();>
 
-=head2 set1_curves_list
-
-C<method set1_curves_list : int ($list : string);>
-
-Calls native L<SSL_CTX_set1_curves_list|https://docs.openssl.org/3.1/man3/SSL_CTX_set1_curves> function given the group list $list, and returns its return value.
-
-Exceptions:
-
-The group list $list must be defined. Otherwise an exception is thrown.
-
-If set1_curves_list failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+Calls native L<SSL_CTX_get_session_cache_mode|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_session_cache_mode/> function given the pointer value of the instance, and returns its return value.
 
 =head2 set_session_cache_mode
 
@@ -220,37 +198,11 @@ C<method set_session_cache_mode : long ($mode : long);>
 
 Calls native L<SSL_CTX_set_session_cache_mode|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_session_cache_mode/> function given the pointer value of the instance, $mode, and returns its return value.
 
-=head2 set_ecdh_auto
-
-C<method set_ecdh_auto : long ($state : int);>
-
-Calls native L<SSL_CTX_set_ecdh_auto|https://docs.openssl.org/3.1/man3/SSL_CTX_set_tmp_ecdh/> function given the pointer value of the instance, $state, and returns its return value.
-
-Exceptions:
-
-If set_ecdh_auto failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
-
-=head2 set_tmp_dh
-
-C<method set_tmp_dh : long ($dh : L<Net::SSLeay::DH|SPVM::Net::SSLeay::DH>);>
-
-Calls native L<SSL_CTX_set_tmp_dh|https://docs.openssl.org/master/man3/SSL_CTX_set_tmp_dh_callback> function given the pointer value of $dh, and returns its return value.
-
-Exceptions:
-
-If set_tmp_dh failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
-
 =head2 set_post_handshake_auth
 
 C<method set_post_handshake_auth : void ($val : int);>
 
 Calls native L<SSL_CTX_set_post_handshake_auth|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_verify> function given the pointer value of the instance, $val.
-
-=head2 use_PrivateKey
-
-C<method use_PrivateKey : int ($pkey : L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY>);>
-
-Calls native L<SSL_CTX_use_PrivateKey|https://docs.openssl.org/master/man3/SSL_CTX_use_certificate> function given the pointer value of the instance, $pkey, pushes $pkey to the end of L</"pkeys_list"> field, and returns the return value of the native function.
 
 =head2 set_session_id_context
 
@@ -310,6 +262,12 @@ The X509 object $x509 must be defined. Otherwise an exception is thrown.
 
 If SSL_CTX_add_extra_chain_cert failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
+=head2 set_verify
+
+C<method set_verify : void ($mode : int, $verify_callback : L<Net::SSLeay::Callback::Verify|SPVM::Net::SSLeay::Callback::Verify> = undef);>
+
+Calls native L<SSL_CTX_set_verify|https://docs.openssl.org/master/man3/SSL_CTX_set_verify/> function given the pointer value of the instance, $mode, $verify_callback.
+
 =head2 set_tlsext_servername_callback
 
 C<method set_tlsext_servername_callback : long ($cb : L<Net::SSLeay::Callback::TlsextServername|SPVM::Net::SSLeay::Callback::TlsextServername>, $arg : object = undef);>
@@ -332,7 +290,7 @@ If SSL_CTX_set_tlsext_status_cb failed, an exception is thrown with C<eval_error
 
 =head2 set_default_passwd_cb
 
-C<method set_default_passwd_cb : void ($cb : L<Net::SSLeay::Callback::PemPasswd|SPVM::Net::SSLeay::Callback::PemPasswd>, $arg : object = undef);>
+C<method set_default_passwd_cb : void ($cb : L<Net::SSLeay::Callback::PemPassword|SPVM::Net::SSLeay::Callback::PemPassword>, $arg : object = undef);>
 
 Calls native L<SSL_CTX_set_default_passwd_cb|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_default_passwd_cb> function given $cb, and returns its return value.
 

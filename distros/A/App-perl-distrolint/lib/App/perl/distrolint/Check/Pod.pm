@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.807;
 
-class App::perl::distrolint::Check::Pod 0.06;
+class App::perl::distrolint::Check::Pod 0.07;
 
 apply App::perl::distrolint::CheckRole::EachFile;
 apply App::perl::distrolint::CheckRole::TreeSitterPerl;
@@ -109,6 +109,8 @@ method check_file ( $file )
          if( defined $command and $command eq "=head1" ) {
             push @head1_titles, $content;
             $last_head1 = $content;
+            # Take the final word if it's "... METHODS" or "... FUNCTIONS"
+            $last_head1 = $1 if $last_head1 =~ m/\b(METHODS|FUNCTIONS)$/;
          }
          else {
             push $nodes_per_head1{$last_head1 // ""}->@*, $captures->{para};
@@ -276,6 +278,11 @@ method _check_nodes_func ( $file, $head1_title, @nodes )
                " minisynopsis should look like [[my] VAR(S) =] [await] [VAR->] $funcname [(ARGS...)];" );
             $ok = 0;
             next;
+         }
+
+         if( $minisynopsis =~ m/->get;$/ ) {
+            App->diag( App->format_file( $file, $node->start_row + 1 ),
+               " minisynopsis should use 'await' expression rather than trailing ->get call" );
          }
 
          if( $minisynopsis !~ m/\A.*;$/sm ) {

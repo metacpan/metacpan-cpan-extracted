@@ -7566,3 +7566,15 @@ int32_t SPVM__Net__SSLeay__Constant__EVP_MAX_MD_SIZE(SPVM_ENV* env, SPVM_VALUE* 
 #endif
   
 }
+
+int32_t SPVM__Net__SSLeay__Constant__SSL_MODE_SEND_FALLBACK_SCSV(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef SSL_MODE_SEND_FALLBACK_SCSV
+  stack[0].ival = SSL_MODE_SEND_FALLBACK_SCSV;
+  return 0;
+#else
+  env->die(env, stack, "SSL_MODE_SEND_FALLBACK_SCSV is not defined on the system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}

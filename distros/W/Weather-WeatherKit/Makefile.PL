@@ -21,10 +21,18 @@ my %WriteMakefileArgs = (
         'JSON'                    => '0'
     },
     PREREQ_PM => {
-        'Crypt::JWT' => '0',
+        'Weather::API::Base' => '0.3',
+        'Crypt::JWT'         => '0',
     },
     META_MERGE        => {
         "meta-spec" => { version => 2 },
+        prereqs => {
+            runtime => {
+                suggests => {
+                    'JSON' => '0',
+                }
+            }
+        },
         resources => {
             repository => {
                 type => 'git',

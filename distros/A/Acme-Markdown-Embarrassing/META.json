@@ -4,7 +4,7 @@
       "Thibault DUPONCHELLE <thibault.duponchelle@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -45,10 +45,10 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "web" : "https://github.com/thibaultduponchelle/Acme-Markdown-Embarrassing"
+         "web" : "https://github.com/thibaultduponchelle/CPAN-modules/Acme-Markdown-Embarrassing"
       }
    },
    "version" : "3.2",
-   "x_homepage" : "https://github.com/thibaultduponchelle/Acme-Markdown-Embarrassing",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "x_homepage" : "https://github.com/thibaultduponchelle/CPAN-modules/Acme-Markdown-Embarrassing",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

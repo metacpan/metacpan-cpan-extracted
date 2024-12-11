@@ -20,7 +20,7 @@
 #  respective owners and no grant or license is provided thereof.
 
 package PDL::Opt::Simplex::Simple;
-$VERSION = '2.003';
+$VERSION = '2.004';
 
 use 5.010;
 use strict;
@@ -582,9 +582,11 @@ sub scale_ssize
 	$self->{opts}{ssize} *= $scale;
 }
 
-# Iterate the vars that are enabled in order that they
-# will be populated (sorted by name) and call $f->($var)
-# each iteration.  Return the result as a piddle.
+# Iterate the vars that are enabled in order that they will be populated
+# (sorted by name) and call $f->($var) each iteration.  This `$f` is not the
+# optimization function {f}, it is an arbitrary sub defined by the caller.
+#
+# Returns the result as a piddle.
 sub _build_enabled_var_list
 {
 	my ($self, $f) = @_;
@@ -1129,7 +1131,7 @@ sub _clamp_minmax
 	}
 	elsif ($val < $min)
 	{
-			$val = $min;
+		$val = $min;
 	}
 	elsif ($val > $max)
 	{

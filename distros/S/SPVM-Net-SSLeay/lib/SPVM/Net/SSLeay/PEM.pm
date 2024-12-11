@@ -28,7 +28,7 @@ Exceptions:
 
 The BIO $bp must be defined. Otherwise an exception is thrown.
 
-If PEM_read_bio_X509 failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+If PEM_read_bio_X509 failed and the error is C<PEM_R_NO_START_LINE>, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error::PEM_R_NO_START_LINE|SPVM::Net::SSLeay::Error::PEM_R_NO_START_LINE> class. If the error is something else, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
 =head2 read_bio_X509_CRL
 
@@ -40,7 +40,7 @@ Exceptions:
 
 The BIO $bp must be defined. Otherwise an exception is thrown.
 
-If PEM_read_bio_X509_CRL failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+If PEM_read_bio_X509_CRL failed and the error is C<PEM_R_NO_START_LINE>, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error::PEM_R_NO_START_LINE|SPVM::Net::SSLeay::Error::PEM_R_NO_START_LINE> class. If the error is something else, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
 =head2 read_bio_DHparams
 
@@ -52,7 +52,7 @@ Exceptions:
 
 The BIO $bp must be defined. Otherwise an exception is thrown.
 
-If read_bio_DHparams failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+If read_bio_DHparams failed and the error is C<PEM_R_NO_START_LINE>, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error::PEM_R_NO_START_LINE|SPVM::Net::SSLeay::Error::PEM_R_NO_START_LINE> class. If the error is something else, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
 =head2 read_bio_PrivateKey
 

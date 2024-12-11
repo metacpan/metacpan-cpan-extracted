@@ -6,11 +6,11 @@ package SPVM::Net::SSLeay::Callback::TlsextStatus;
 
 =head1 Name
 
-SPVM::Net::SSLeay::Callback::TlsextStatus - Callback for SSL_CTX_set_tlsext_status_cb function in OpenSSL.
+SPVM::Net::SSLeay::Callback::TlsextStatus - Function Pointer Type of SSL_CTX_set_tlsext_status_cb function's Callback Argument in OpenSSL.
 
 =head1 Description
 
-Net::SSLeay::Callback::TlsextStatus interface in L<SPVM> is the callback for L<SSL_CTX_set_tlsext_status_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_status_cb> function in OpenSSL.
+Net::SSLeay::Callback::TlsextStatus interface in L<SPVM> represents the function pointer type of L<SSL_CTX_set_tlsext_status_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_status_cb> function's callback argument in OpenSSL.
 
 =head1 Usage
 
@@ -20,7 +20,7 @@ Net::SSLeay::Callback::TlsextStatus interface in L<SPVM> is the callback for L<S
 
 C<required method : int ($ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $arg : object);>
 
-This method is callback for native L<SSL_CTX_set_tlsext_status_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_status_cb> function.
+This method represents the function pointer type of L<SSL_CTX_set_tlsext_status_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_status_cb> function's callback argument in OpenSSL.
 
 =head1 See Also
 

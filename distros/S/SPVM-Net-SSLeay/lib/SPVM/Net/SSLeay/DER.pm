@@ -68,54 +68,6 @@ If d2i_TYPE_bio failed, an exception is thrown with C<eval_error_id> set to the 
 
 =head1 Class Methods
 
-=head2 d2i_OCSP_REQUEST
-
-C<static method d2i_OCSP_REQUEST : L<Net::SSLeay::OCSP_REQUEST|SPVM::Net::SSLeay::OCSP_REQUEST> ($a_ref : L<Net::SSLeay::OCSP_REQUEST|SPVM::Net::SSLeay::OCSP_REQUEST>[], $ppin_ref : string[], $length : long);>
-
-See L</"d2i_TYPE"> template method.
-
-=head2 i2d_OCSP_REQUEST
-
-C<static method i2d_OCSP_REQUEST : int ($a : L<Net::SSLeay::OCSP_REQUEST|SPVM::Net::SSLeay::OCSP_REQUEST>, $ppout_ref : string[]);>
-
-See L</"i2d_TYPE"> template method.
-
-=head2 d2i_OCSP_REQUEST_bio
-
-C<static method d2i_OCSP_REQUEST_bio : L<Net::SSLeay::OCSP_REQUEST|SPVM::Net::SSLeay::OCSP_REQUEST> ($bio : L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO>);>
-
-See L</"d2i_TYPE_bio"> template method.
-
-=head2 d2i_OCSP_RESPONSE
-
-C<static method d2i_OCSP_RESPONSE : L<Net::SSLeay::OCSP_RESPONSE|SPVM::Net::SSLeay::OCSP_RESPONSE> ($a_ref : L<Net::SSLeay::OCSP_RESPONSE|SPVM::Net::SSLeay::OCSP_RESPONSE>[], $ppin_ref : string[], $length : long);>
-
-See L</"d2i_TYPE"> template method.
-
-=head2 i2d_OCSP_RESPONSE
-
-C<static method i2d_OCSP_RESPONSE : int ($a : L<Net::SSLeay::OCSP_RESPONSE|SPVM::Net::SSLeay::OCSP_RESPONSE>, $ppout_ref : string[]);>
-
-See L</"i2d_TYPE"> template method.
-
-=head2 d2i_OCSP_RESPONSE_bio
-
-C<static method d2i_OCSP_RESPONSE_bio : L<Net::SSLeay::OCSP_RESPONSE|SPVM::Net::SSLeay::OCSP_RESPONSE> ($bio : L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO>);>
-
-See L</"d2i_TYPE_bio"> template method.
-
-=head2 d2i_OCSP_CERTID
-
-C<static method d2i_OCSP_CERTID : L<Net::SSLeay::OCSP_CERTID|SPVM::Net::SSLeay::OCSP_CERTID> ($a_ref : L<Net::SSLeay::OCSP_CERTID|SPVM::Net::SSLeay::OCSP_CERTID>[], $ppin_ref : string[], $length : long);>
-
-See L</"d2i_TYPE"> template method.
-
-=head2 i2d_OCSP_CERTID
-
-C<static method i2d_OCSP_CERTID : int ($a : L<Net::SSLeay::OCSP_CERTID|SPVM::Net::SSLeay::OCSP_CERTID>, $ppout_ref : string[]);>
-
-See L</"i2d_TYPE"> template method.
-
 =head2 d2i_PKCS12
 
 C<static method d2i_PKCS12 : L<Net::SSLeay::PKCS12|SPVM::Net::SSLeay::PKCS12> ($a_ref : L<Net::SSLeay::PKCS12|SPVM::Net::SSLeay::PKCS12>[], $ppin_ref : string[], $length : long);>

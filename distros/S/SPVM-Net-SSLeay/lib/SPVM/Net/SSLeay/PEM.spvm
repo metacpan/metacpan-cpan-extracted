@@ -4,6 +4,7 @@
 class Net::SSLeay::PEM {
   
   use Net::SSLeay::Error;
+  use Net::SSLeay::Error::PEM_R_NO_START_LINE;
   
   use Net::SSLeay::BIO;
   use Net::SSLeay::X509;

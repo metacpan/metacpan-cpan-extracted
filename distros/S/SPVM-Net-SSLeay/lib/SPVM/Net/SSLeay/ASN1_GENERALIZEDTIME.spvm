@@ -3,10 +3,9 @@
 
 class Net::SSLeay::ASN1_GENERALIZEDTIME : pointer {
   
-  allow Net::SSLeay::OCSP;
-  
   use Net::SSLeay::BIO;
   use Sys::Time::Tm;
+  use Fn;
   
   # Class Methods
   native static method new : Net::SSLeay::ASN1_GENERALIZEDTIME ();

@@ -56,8 +56,8 @@ lib/SPVM/Net/SSLeay/Callback/NextProtosAdvertised.pm
 lib/SPVM/Net/SSLeay/Callback/NextProtosAdvertised.spvm
 lib/SPVM/Net/SSLeay/Callback/NextProtoSelect.pm
 lib/SPVM/Net/SSLeay/Callback/NextProtoSelect.spvm
-lib/SPVM/Net/SSLeay/Callback/PemPasswd.pm
-lib/SPVM/Net/SSLeay/Callback/PemPasswd.spvm
+lib/SPVM/Net/SSLeay/Callback/PemPassword.pm
+lib/SPVM/Net/SSLeay/Callback/PemPassword.spvm
 lib/SPVM/Net/SSLeay/Callback/PskClient.pm
 lib/SPVM/Net/SSLeay/Callback/PskClient.spvm
 lib/SPVM/Net/SSLeay/Callback/PskServer.pm
@@ -70,6 +70,8 @@ lib/SPVM/Net/SSLeay/Callback/TlsextStatus.pm
 lib/SPVM/Net/SSLeay/Callback/TlsextStatus.spvm
 lib/SPVM/Net/SSLeay/Callback/TlsextTicketKey.pm
 lib/SPVM/Net/SSLeay/Callback/TlsextTicketKey.spvm
+lib/SPVM/Net/SSLeay/Callback/Verify.pm
+lib/SPVM/Net/SSLeay/Callback/Verify.spvm
 lib/SPVM/Net/SSLeay/ConfigBuilder.pm
 lib/SPVM/Net/SSLeay/Constant.c
 lib/SPVM/Net/SSLeay/Constant.config
@@ -93,6 +95,8 @@ lib/SPVM/Net/SSLeay/ERR.pm
 lib/SPVM/Net/SSLeay/ERR.spvm
 lib/SPVM/Net/SSLeay/Error.pm
 lib/SPVM/Net/SSLeay/Error.spvm
+lib/SPVM/Net/SSLeay/Error/PEM_R_NO_START_LINE.pm
+lib/SPVM/Net/SSLeay/Error/PEM_R_NO_START_LINE.spvm
 lib/SPVM/Net/SSLeay/EVP.c
 lib/SPVM/Net/SSLeay/EVP.config
 lib/SPVM/Net/SSLeay/EVP.pm
@@ -121,34 +125,6 @@ lib/SPVM/Net/SSLeay/OBJ.c
 lib/SPVM/Net/SSLeay/OBJ.config
 lib/SPVM/Net/SSLeay/OBJ.pm
 lib/SPVM/Net/SSLeay/OBJ.spvm
-lib/SPVM/Net/SSLeay/OCSP.c
-lib/SPVM/Net/SSLeay/OCSP.config
-lib/SPVM/Net/SSLeay/OCSP.pm
-lib/SPVM/Net/SSLeay/OCSP.spvm
-lib/SPVM/Net/SSLeay/OCSP_BASICRESP.c
-lib/SPVM/Net/SSLeay/OCSP_BASICRESP.config
-lib/SPVM/Net/SSLeay/OCSP_BASICRESP.pm
-lib/SPVM/Net/SSLeay/OCSP_BASICRESP.spvm
-lib/SPVM/Net/SSLeay/OCSP_CERTID.c
-lib/SPVM/Net/SSLeay/OCSP_CERTID.config
-lib/SPVM/Net/SSLeay/OCSP_CERTID.pm
-lib/SPVM/Net/SSLeay/OCSP_CERTID.spvm
-lib/SPVM/Net/SSLeay/OCSP_ONEREQ.c
-lib/SPVM/Net/SSLeay/OCSP_ONEREQ.config
-lib/SPVM/Net/SSLeay/OCSP_ONEREQ.pm
-lib/SPVM/Net/SSLeay/OCSP_ONEREQ.spvm
-lib/SPVM/Net/SSLeay/OCSP_REQUEST.c
-lib/SPVM/Net/SSLeay/OCSP_REQUEST.config
-lib/SPVM/Net/SSLeay/OCSP_REQUEST.pm
-lib/SPVM/Net/SSLeay/OCSP_REQUEST.spvm
-lib/SPVM/Net/SSLeay/OCSP_RESPONSE.c
-lib/SPVM/Net/SSLeay/OCSP_RESPONSE.config
-lib/SPVM/Net/SSLeay/OCSP_RESPONSE.pm
-lib/SPVM/Net/SSLeay/OCSP_RESPONSE.spvm
-lib/SPVM/Net/SSLeay/OCSP_SINGLERESP.c
-lib/SPVM/Net/SSLeay/OCSP_SINGLERESP.config
-lib/SPVM/Net/SSLeay/OCSP_SINGLERESP.pm
-lib/SPVM/Net/SSLeay/OCSP_SINGLERESP.spvm
 lib/SPVM/Net/SSLeay/OPENSSL.c
 lib/SPVM/Net/SSLeay/OPENSSL.config
 lib/SPVM/Net/SSLeay/OPENSSL.pm
@@ -374,5 +350,6 @@ t/lib/SPVM/TestCase/Net/SSLeay.spvm
 t/lib/SPVM/TestCase/Net/SSLeay/SSL_CTX.spvm
 t/lib/SPVM/TestCase/Net/SSLeay/Util.spvm
 t/OPENSSL.t
+t/SSL_CTX.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

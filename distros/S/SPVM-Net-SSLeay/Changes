@@ -1,3 +1,31 @@
+0.026 2024-12-11
+  [Incompatibe Changes]
+    * Remove X509#get_ocsp_uri method.
+    * Remove all OCSP related classes.
+    * Remove all OCSP related methods in Net::SSLeay::DER class.
+0.025 2024-12-10
+  [New Features]
+    * Add Net::SSLeay::Error::PEM_R_NO_START_LINE class.
+    * Add Net::SSLeay::SSL_CTX#get_mode method.
+    * Add Net::SSLeay::Constant#SSL_MODE_SEND_FALLBACK_SCSV method.
+    * Add Net::SSLeay::Callback::Verify class.
+    * Add $verify_callback argument to Net::SSLeay::SSL_CTX#set_verify method.
+  [Changes]
+    * Every Net::SSLeay::PEM#read_* method throwns an exception with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error::PEM_R_NO_START_LINE|SPVM::Net::SSLeay::Error::PEM_R_NO_START_LINE> class if the error is PEM_R_NO_START_LINE.
+  [Incompatibe Changes]
+    * Rename Net::SSLeay::Callback::PemPasswd class to Net::SSLeay::Callback::PemPassword class.
+    * Remove Net::SSLeay::SSL_CTX#set_tmp_dh method because the corresponding native function is deprecated and set1_groups_list eixsts.
+    * Remove Net::SSLeay::SSL_CTX#set_tmp_ecdh method because the corresponding native function is deprecated and set1_groups_list eixsts.
+    * Remove Net::SSLeay::SSL_CTX#set1_curves_list method because set1_groups_list eixsts.
+    * Remove Net::SSLeay::SSL_METHOD#SSLv23_method method because TSL_method eixsts.
+    * Remove Net::SSLeay::SSL_METHOD#SSLv23_client_method method because TSL_client_method eixsts.
+    * Remove Net::SSLeay::SSL_METHOD#SSLv23_server_method method because TSL_server_method eixsts.
+    * Remove Net::SSLeay::SSL_CTX#set_ecdh_auto method because this has no effect.
+  [Bug Fix]
+    * Fix Net::SSLeay::SSL_CTX#set_client_CA_list bugs.
+    * Fix Net::SSLeay::SSL_CTX#add_extra_chain_cert bugs.
+    * Fix Net::SSLeay::SSL_CTX#get0_param bugs.
+    * Fix Net::SSLeay::SSL_CTX#get_cert_store bugs.
 0.024 2024-12-08
   [New Features]
     * Add Net::SSLeay::XX509_EXTENSION#new method.
@@ -13,10 +41,11 @@
     * Add Net::SSLeay::SSL_SESSION#new method.
   [Incompatibe Changes]
     * Remove deprecated Net::SSLeay::X509#P_get_ocsp_uri method.
-    * Net::SSLeay::XX509#get_issuer_name method returns a copied value.
-    * Net::SSLeay::XX509#get_subject_name method returns a copied value.
-    * Net::SSLeay::XX509#get_ext method returns a copied value.
-    * Net::SSLeay::XX509#check_issued method becomes a static method.
+    * Net::SSLeay::X509#get_issuer_name method returns a copied value.
+    * Net::SSLeay::X509#get_subject_name method returns a copied value.
+    * Net::SSLeay::X509#get_ext method returns a copied value.
+    * Net::SSLeay::X509#check_issued method becomes a static method.
+    * Net::SSLeay::X509#check_issued method becomes a static method.
   [Bug Fix]
     * Fix STACK_OF memory bugs.
     * Fix a memory bug of Net::SSLeay::X509_STORE_CTX#get_current_cert method.

@@ -59,8 +59,6 @@ class Net::SSLeay::X509 : pointer {
   
   native method get_subjectAltNames : Net::SSLeay::GENERAL_NAME[] ();
   
-  native method get_ocsp_uri : string ();
-  
   native method digest : int ($type : Net::SSLeay::EVP_MD, $md : mutable string, $len_ref : int*);
   
   method digest_return_string : string ($type : Net::SSLeay::EVP_MD) {

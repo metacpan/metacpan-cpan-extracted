@@ -1,0 +1,33 @@
+Changes
+lib/Config/HAProxy.pm
+lib/Config/Pound.pm
+lib/Config/Pound/Node/IP.pm
+lib/Config/Pound/Node/Section.pm
+lib/Config/Pound/Node/Verbatim.pm
+lib/Config/Proxy.pm
+lib/Config/Proxy/Base.pm
+lib/Config/Proxy/Impl/haproxy.pm
+lib/Config/Proxy/Impl/pound.pm
+lib/Config/Proxy/Iterator.pm
+lib/Config/Proxy/Node.pm
+lib/Config/Proxy/Node/Comment.pm
+lib/Config/Proxy/Node/Empty.pm
+lib/Config/Proxy/Node/Root.pm
+lib/Config/Proxy/Node/Section.pm
+lib/Config/Proxy/Node/Statement.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/hformat.t
+t/hlint.t
+t/hsect.t
+t/hselect.t
+t/pformat.t
+t/pnot.t
+t/pselect.t
+t/Test/HAProxy.pm
+t/Test/Pound.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

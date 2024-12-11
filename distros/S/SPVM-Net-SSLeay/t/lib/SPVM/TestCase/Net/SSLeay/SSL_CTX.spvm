@@ -5,6 +5,395 @@ class TestCase::Net::SSLeay::SSL_CTX {
   
   use Net::SSLeay::SSL_METHOD;
   use Net::SSLeay::SSL_CTX;
+  use Net::SSLeay::Constant as SSL;
+  
+  use FindBin;
+  
+  our $FILE_DIR : string;
+  
+  INIT {
+    $FILE_DIR = FindBin->Bin . "/file";
+  }
+  
+  static method basic : int () {
+    
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      unless ($ssl_ctx is_type Net::SSLeay::SSL_CTX) {
+        return 0;
+      }
+      
+    }
+    
+    # set_mode, get_mode
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      $ssl_ctx->set_mode(SSL->SSL_MODE_ENABLE_PARTIAL_WRITE);
+      
+      $ssl_ctx->set_mode(SSL->SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
+      
+      $ssl_ctx->set_mode(SSL->SSL_MODE_AUTO_RETRY);
+      
+      $ssl_ctx->set_mode(SSL->SSL_MODE_RELEASE_BUFFERS);
+      
+      $ssl_ctx->set_mode(SSL->SSL_MODE_SEND_FALLBACK_SCSV);
+      
+      my $mode = $ssl_ctx->get_mode;
+      
+      unless ($mode & SSL->SSL_MODE_SEND_FALLBACK_SCSV) {
+        return 0;
+      }
+      
+    }
+    
+    # get0_param
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      my $veryfy_param = $ssl_ctx->get0_param;
+      
+      unless ($veryfy_param is_type Net::SSLeay::X509_VERIFY_PARAM) {
+        return 0;
+      }
+      
+    }
+    
+    # load_verify_locations
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      eval { $ssl_ctx->load_verify_locations(".", "."); }
+      
+    }
+    
+    # set_default_verify_paths
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      $ssl_ctx->set_default_verify_paths;
+      
+    }
+    
+    # use_certificate_file
+    {
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        $ssl_ctx->use_certificate_file("$FILE_DIR/simple-cert.cert.pem", SSL->SSL_FILETYPE_PEM);
+        
+      }
+      
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        $ssl_ctx->use_certificate_file("$FILE_DIR/strange-cert.cert.der", SSL->SSL_FILETYPE_ASN1);
+        
+      }
+    }
+    
+    # use_certificate_chain_file
+    {
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        $ssl_ctx->use_certificate_chain_file("$FILE_DIR/simple-cert.certchain.pem");
+        
+      }
+    }
+    
+    # use_PrivateKey_file
+    {
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        $ssl_ctx->use_PrivateKey_file("$FILE_DIR/simple-cert.key.pem", SSL->SSL_FILETYPE_PEM);
+        
+      }
+      
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        $ssl_ctx->use_PrivateKey_file("$FILE_DIR/simple-cert.key.der", SSL->SSL_FILETYPE_ASN1);
+        
+      }
+    }
+    
+    # use_PrivateKey
+    {
+      {
+        my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.key.pem", "r");
+        
+        my $evp_pkey = Net::SSLeay::PEM->read_bio_PrivateKey($bio);
+        
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        $ssl_ctx->use_PrivateKey($evp_pkey);
+        
+      }
+    }
+    
+    # set_cipher_list
+    {
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        $ssl_ctx->set_cipher_list("ALL");
+        
+      }
+      
+    }
+    
+    # set_ciphersuites
+    {
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        $ssl_ctx->set_ciphersuites("TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256");
+        
+      }
+      
+    }
+    
+    # get_cert_store
+    {
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        my $cert_store = $ssl_ctx->get_cert_store;
+        
+        unless ($cert_store is_type Net::SSLeay::X509_STORE) {
+          return 0;
+        }
+      }
+    }
+    
+    # clear_options, get_options, set_options
+    {
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        $ssl_ctx->set_options(SSL->SSL_OP_ALL);
+        
+        {
+          my $options = $ssl_ctx->get_options;
+          
+          unless ($options & SSL->SSL_OP_ALL) {
+            return 0;
+          }
+        }
+        
+        $ssl_ctx->clear_options(SSL->SSL_OP_ALL);
+        
+        {
+          my $options = $ssl_ctx->get_options;
+          
+          if ($options & SSL->SSL_OP_ALL) {
+            return 0;
+          }
+        }
+        
+      }
+    }
+    
+    # set1_groups_list
+    {
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        $ssl_ctx->set1_groups_list("P-521:P-384");
+      }
+      
+    }
+    
+    # set_session_cache_mode, get_session_cache_mode
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_OFF);
+      
+      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_CLIENT);
+      
+      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_SERVER);
+      
+      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_BOTH);
+      
+      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_NO_AUTO_CLEAR);
+      
+      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_NO_INTERNAL_LOOKUP);
+      
+      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_NO_INTERNAL_STORE);
+      
+      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_NO_INTERNAL);
+      
+      my $mode = $ssl_ctx->get_session_cache_mode;
+      
+      unless ($mode & SSL->SSL_SESS_CACHE_NO_INTERNAL) {
+        return 0;
+      }
+      
+    }
+    
+    # set_session_cache_mode, get_session_cache_mode
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      $ssl_ctx->set_post_handshake_auth(1);
+      
+    }
+    
+    # set_session_id_context
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      $ssl_ctx->set_session_id_context("my_host");
+      
+    }
+    
+    # set_min_proto_version
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      $ssl_ctx->set_min_proto_version(SSL->TLS1_3_VERSION);
+      
+    }
+    
+    # set_min_proto_version
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      $ssl_ctx->set_min_proto_version(SSL->TLS1_3_VERSION);
+      
+    }
+    
+    # set_client_CA_list
+    {
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.cert.pem", "r");
+        
+        my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
+        
+        $ssl_ctx->set_client_CA_list([$x509->get_issuer_name]);
+        
+      }
+    }
+    
+    # add_client_CA
+    {
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.cert.pem", "r");
+        
+        my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
+        
+        $ssl_ctx->add_client_CA($x509);
+        
+      }
+    }
+    
+    # add_extra_chain_cert
+    {
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.certchain.pem", "r");
+        
+        my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
+        
+        $ssl_ctx->add_extra_chain_cert($x509);
+        
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method new : int () {
+    
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      unless ($ssl_ctx is_type Net::SSLeay::SSL_CTX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_client_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      unless ($ssl_ctx is_type Net::SSLeay::SSL_CTX) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_server_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      unless ($ssl_ctx is_type Net::SSLeay::SSL_CTX) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
   
   static method set_alpn_protos_with_protocols : int () {
     

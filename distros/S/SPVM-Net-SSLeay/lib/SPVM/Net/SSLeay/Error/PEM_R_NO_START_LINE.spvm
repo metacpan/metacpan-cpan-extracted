@@ -1,0 +1,4 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::Error::PEM_R_NO_START_LINE extends Net::SSLeay::Error;

@@ -3794,6 +3794,12 @@ C<static method EVP_MAX_MD_SIZE : int ();>
 
 Returns the value of C<EVP_MAX_MD_SIZE>. If this constant is not defined on the system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
+=head2 SSL_MODE_SEND_FALLBACK_SCSV
+
+C<static method SSL_MODE_SEND_FALLBACK_SCSV : int ();>
+
+Returns the value of C<SSL_MODE_SEND_FALLBACK_SCSV>. If this constant is not defined on the system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
 =head1 See Also
 
 =over 2

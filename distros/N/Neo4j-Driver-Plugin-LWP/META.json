@@ -1,0 +1,80 @@
+{
+   "abstract" : "Neo4j::Driver plug-in for libwww-perl",
+   "author" : [
+      "Arne Johannessen <ajnn@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Neo4j-Driver-Plugin-LWP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "LWP::Protocol::https" : "0"
+         },
+         "requires" : {
+            "JSON::MaybeXS" : "1.003003",
+            "LWP::UserAgent" : "6.04",
+            "Neo4j::Driver" : "0.34",
+            "URI" : "1.31",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Headers" : "0",
+            "HTTP::Response" : "0",
+            "Mock::Quick" : "0",
+            "Neo4j::Driver" : "0.34",
+            "Scalar::Util" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.94",
+            "Test::Warnings" : "0.010"
+         }
+      }
+   },
+   "provides" : {
+      "Neo4j::Driver::Net::HTTP::LWP" : {
+         "file" : "lib/Neo4j/Driver/Net/HTTP/LWP.pm",
+         "version" : "1.02"
+      },
+      "Neo4j::Driver::Plugin::LWP" : {
+         "file" : "lib/Neo4j/Driver/Plugin/LWP.pm",
+         "version" : "1.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/johannessen/Neo4j-Driver-Plugin-LWP/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/johannessen/Neo4j-Driver-Plugin-LWP.git",
+         "web" : "https://github.com/johannessen/Neo4j-Driver-Plugin-LWP"
+      }
+   },
+   "version" : "1.02",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

@@ -1,5 +1,9 @@
+## no critic: TestingAndDebugging::RequireUseStrict
 package Unixish; # just to make PodWeaver happy
 
+# AUTHORITY
+# DATE
+our $DIST = 'Unixish'; # DIST
 # VERSION
 
 1;
@@ -21,7 +25,7 @@ Unixish - Data transformation framework, inspired by Unix toolbox philosophy
 
 =head1 VERSION
 
-This document describes version 1.0.6 of Unixish (from Perl distribution Unixish), released on 2019-05-07.
+This document describes version 1.0.7 of Unixish (from Perl distribution Unixish), released on 2024-12-10.
 
 =head1 ABSTRACT
 
@@ -156,19 +160,20 @@ Please visit the project's homepage at L<https://metacpan.org/release/Unixish>.
 
 Source repository is at L<https://github.com/perlancar/perl-Unixish>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Unixish>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
+
+=head2 Related specifications
 
 L<Rinci> and L<Rinci::function>, another specification to leverage functions.
 
-L<Log::ger>.
+L<CellFunc> and L<RowFunc>, two other specification (convention) for writing
+(respectively) value function (function that operates on a single data item) and
+row function (function that operates on a single "row" or record).
+
+=head2 Related data manipulation frameworks
+
+L<Data::TableData::Object>, a common table interface to manipulate several kinds
+of data structure that are "table-like".
 
 =head2 Similar projects on CPAN
 
@@ -192,15 +197,45 @@ many text-oriented Unix utilities (like B<wc>, B<sum>, B<head>, B<tail>, etc).
 
 =back
 
+=head2 Others
+
+L<Log::ger>, a logging framework, used by this specification.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2015, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Unixish>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

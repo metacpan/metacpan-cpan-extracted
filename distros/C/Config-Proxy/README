@@ -1,0 +1,66 @@
+Config::Proxy
+===============
+
+This module converts the configuration file of an HTTP proxy
+server to a parse tree and provides methods for various operations
+on this tree, such as: searching, modifying and saving it to a file.
+
+Two proxy implementations are supported: HAProxy and Pound.
+
+EXAMPLE 1
+
+   use Config::HAProxy;
+  
+   # Parse HAProxy configuration file
+   my $cfg = Config::HAProxy->new->parse;
+
+   # Print IP addresses and ports of the configured backends
+   foreach my $srv (map { $_->select(name => 'server') }
+                   $cfg->tree->select(name => 'backend')) {
+      print $srv->arg(1),"\n";
+   }
+
+EXAMPLE 2
+
+   use Config::Pound;
+
+   # Parse pound configuration file
+   my $cfg = Config::Pound->new->parse;
+
+   # Print IP addresses and ports of the configured backends
+   foreach my $lstn ($cfg->select(name => 'ListenHTTPS')) {
+       foreach my $svc ($lstn->select(name => 'Service')) {
+  	   foreach my $be ($svc->select(name => 'Backend')) {
+	       my ($addr, $port) = ($be->select(name => 'Address'),
+				    $be->select(name => 'Port'));
+	       next unless defined($addr) && defined($port);
+	       print $be->locus, ": ", $addr->arg(0), ":", $port->arg(0), "\n";
+	   }
+       }
+   }
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2018-2024 by Sergey Poznyakoff
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3 of the License, or (at your
+option) any later version.
+
+It is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this library. If not, see <http://www.gnu.org/licenses/>.    

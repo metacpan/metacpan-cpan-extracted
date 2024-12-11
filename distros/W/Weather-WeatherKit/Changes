@@ -1,7 +1,11 @@
 Revision history for Weather-WeatherKit
 
-0.1     2023-02-22
-        First public release.
+0.12    2024-12-10
+        Refactored to base on Weather::API::Base.
+        Improved documantation.
 
 0.11    2023-02-23
         Changes for CPANTS.
+
+0.1     2023-02-22
+        First public release.

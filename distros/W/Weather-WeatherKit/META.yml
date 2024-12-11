@@ -24,8 +24,9 @@ no_index:
     - inc
 requires:
   Crypt::JWT: '0'
+  Weather::API::Base: '0.3'
   perl: '5.008'
 resources:
   repository: git://github.com/dkechag/Weather-WeatherKit.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

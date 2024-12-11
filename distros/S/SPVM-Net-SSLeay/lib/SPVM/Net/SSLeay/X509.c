@@ -368,39 +368,6 @@ int32_t SPVM__Net__SSLeay__X509__get_subjectAltNames(SPVM_ENV* env, SPVM_VALUE* 
   return 0;
 }
 
-int32_t SPVM__Net__SSLeay__X509__get_ocsp_uri(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  void* obj_self = stack[0].oval;
-  
-  X509* self = env->get_pointer(env, stack, obj_self);
-  
-  STACK_OF(ACCESS_DESCRIPTION)* ads_stack = X509_get_ext_d2i(self, NID_info_access, NULL, NULL);
-  
-  void* obj_ocsp_uri = NULL;
-  
-  if (ads_stack) {
-    for (int32_t i = 0; i < sk_ACCESS_DESCRIPTION_num(ads_stack); i++) {
-      ACCESS_DESCRIPTION *ad = sk_ACCESS_DESCRIPTION_value(ads_stack, i);
-      
-      if (OBJ_obj2nid(ad->method) == NID_ad_OCSP && ad->location->type == GEN_URI) {
-        
-        const char* ocsp_uri = (const char*)ASN1_STRING_get0_data(ad->location->d.uniformResourceIdentifier);
-        int32_t ocsp_uri_length = ASN1_STRING_length(ad->location->d.uniformResourceIdentifier);
-        
-        obj_ocsp_uri = env->new_string(env, stack, ocsp_uri, ocsp_uri_length);
-        
-        break;
-      }
-    }
-  }
-  
-  stack[0].oval = obj_ocsp_uri;
-  
-  return 0;
-}
-
 int32_t SPVM__Net__SSLeay__X509__digest(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;

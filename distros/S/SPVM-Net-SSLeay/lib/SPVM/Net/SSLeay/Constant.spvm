@@ -1263,4 +1263,6 @@ class Net::SSLeay::Constant {
 
   native static method EVP_MAX_MD_SIZE : int ();
 
+  native static method SSL_MODE_SEND_FALLBACK_SCSV : int ();
+
 }

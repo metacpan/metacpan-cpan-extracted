@@ -322,7 +322,19 @@ sub _initParticles
 
 	if ($self->{randStartVelocity})
 	{
-		$prtcls->{velocity} .= $self->_randInRangePDL(
+		# I think this is off by the Nth-root of the number of particles?
+		#
+		# ... but I would need some review help from someone who is
+		# good with spacial math. Basically we want the velocity to be
+		# a maximum of 1/100th of the size of space, and scaled by
+		# randStartVelocity (see deltaMax, above).  Thus if
+		# randStartVelocity is 10, then it should take at least 10
+		# iterations to cross the entire space given some "corner-
+		# point" and the velocity vector.  For now this is close enough
+		# for our purpose because all we need to do is give some
+		# reasonably-sized initial random direction.
+
+		$prtcls->{velocity} .= $self->{randStartVelocity} * $self->_randInRangePDL(
 			-$self->{deltaMax},  $self->{deltaMax},
 			$self->{dimensions}, $numParticles
 			);
@@ -552,6 +564,7 @@ sub _calcNextPos
 	$prtcls->{nextFit} .= $self->_calcPosFit($prtcls->{nextPos});
 }
 
+# generate an PDL with @dims elements that range between $min and $max
 sub _randInRangePDL
 {
 	my ($self, $min, $max, @dims) = @_;
@@ -843,14 +856,18 @@ values by passing a vector of length C<dimension>.
 Defaults to -I<-posMax> (if I<-posMax> is negative I<-posMin> should be set
 more negative).
 
-=item I<-randStartVelocity>: boolean, optional
+=item I<-randStartVelocity>: float, optional
 
-Set true to initialize particles with a random velocity. Otherwise particle
-velocity is set to 0 on initalization.
+Set to a non-zero value to initialize particles with a random velocity. Otherwise,
+particle velocity is set to 0 on initalization.
 
 A range based on 1/100th of -I<-posMax> - I<-posMin> is used for the initial
 speed in each dimension of the velocity vector if a random start velocity is
-used.
+used. Velocity is multiplied by the random result, so this value can be used to
+scale the initial velocity of the particles. Thus, a value of 10 will take at
+least 10 iterations to traverse the space, because the velocity can be no more
+than one-tenth of the space. (This velocity will then be modified each
+iteration based on the result of the evaluation function.)
 
 =item I<-stallSpeed>: positive number, optional
 

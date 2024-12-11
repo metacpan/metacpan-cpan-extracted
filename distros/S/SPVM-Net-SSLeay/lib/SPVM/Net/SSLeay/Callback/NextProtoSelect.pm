@@ -6,11 +6,11 @@ package SPVM::Net::SSLeay::Callback::NextProtoSelect;
 
 =head1 Name
 
-SPVM::Net::SSLeay::Callback::NextProtoSelect - Callback for SSL_CTX_set_next_proto_select_cb function in OpenSSL
+SPVM::Net::SSLeay::Callback::NextProtoSelect - Function Pointer Type of SSL_CTX_set_next_proto_select_cb's Callback Argument in OpenSSL
 
 =head1 Description
 
-Net::SSLeay::Callback::NextProtoSelect interface in L<SPVM> representas the callback for L<SSL_CTX_set_next_proto_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb/> function in OpenSSL.
+Net::SSLeay::Callback::NextProtoSelect interface in L<SPVM> represents the function pointer type of L<SSL_CTX_set_next_proto_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb/> function's callback argument in OpenSSL.
 
 =head1 Usage
 
@@ -20,11 +20,13 @@ Net::SSLeay::Callback::NextProtoSelect interface in L<SPVM> representas the call
 
 C<required method : int ($ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $out : string[], $outlen_ref : int*, $in : string, $inlen : int, $arg : object);>
 
-This method is a callback for native L<SSL_CTX_set_next_proto_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb/> function in OpenSSL.
+This method represents the function pointer type of L<SSL_CTX_set_next_proto_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb/> function's callback argument in OpenSSL.
 
 =head1 See Also
 
 =over 2
+
+=item * L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX>
 
 =item * L<Net::SSLeay|SPVM::Net::SSLeay>
 

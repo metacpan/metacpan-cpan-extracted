@@ -28,12 +28,12 @@ my %WriteMakefileArgs = (
             url     => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec',
         },
 
-        homepage    => 'https://github.com/thibaultduponchelle/Acme-Markdown-Embarrassing',
+        homepage    => 'https://github.com/thibaultduponchelle/CPAN-modules/Acme-Markdown-Embarrassing',
         resources   => {
             repository => {
                 type => 'git',
-                url  => 'git@github.com:thibaultduponchelle/Acme-Markdown-Embarrassing.git',
-                web  => 'https://github.com/thibaultduponchelle/Acme-Markdown-Embarrassing',
+                url  => 'git@github.com:thibaultduponchelle/CPAN-modules/Acme-Markdown-Embarrassing.git',
+                web  => 'https://github.com/thibaultduponchelle/CPAN-modules/Acme-Markdown-Embarrassing',
             },
         },
     },

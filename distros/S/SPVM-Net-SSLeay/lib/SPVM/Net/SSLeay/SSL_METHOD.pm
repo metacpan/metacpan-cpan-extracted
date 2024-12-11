@@ -18,24 +18,6 @@ Net::SSLeay::SSL_METHOD class in L<SPVM> represents OpenSSL L<SSL_METHOD|https:/
 
 =head1 Class Methods
 
-=head2 SSLv23_method
-
-C<static method SSLv23_method : L<Net::SSLeay::SSL_METHOD|SPVM::Net::SSLeay::SSL_METHOD> ();>
-
-Calls native L<SSLv23_method|https://docs.openssl.org/3.0/man3/SSL_CTX_new/> function, creates a new L<Net::SSLeay::SSL_METHOD|SPVM::Net::SSLeay::SSL_METHOD> object, sets the pointer value of the new object to the return value of L<SSLv23_method|https://docs.openssl.org/3.0/man3/SSL_CTX_new/> function, and returns the new object.
-
-=head2 SSLv23_client_method
-
-C<static method SSLv23_client_method : L<Net::SSLeay::SSL_METHOD|SPVM::Net::SSLeay::SSL_METHOD> ();>
-
-Calls native L<SSLv23_client_method|https://docs.openssl.org/3.0/man3/SSL_CTX_new/> function, creates a new L<Net::SSLeay::SSL_METHOD|SPVM::Net::SSLeay::SSL_METHOD> object, sets the pointer value of the new object to the return value of L<SSLv23_client_method|https://docs.openssl.org/3.0/man3/SSL_CTX_new/> function, and returns the new object.
-
-=head2 SSLv23_server_method
-
-C<static method SSLv23_server_method : L<Net::SSLeay::SSL_METHOD|SPVM::Net::SSLeay::SSL_METHOD> ();>
-
-Calls native L<SSLv23_server_method|https://docs.openssl.org/3.0/man3/SSL_CTX_new/> function, creates a new L<Net::SSLeay::SSL_METHOD|SPVM::Net::SSLeay::SSL_METHOD> object, sets the pointer value of the new object to the return value of L<SSLv23_server_method|https://docs.openssl.org/3.0/man3/SSL_CTX_new/> function, and returns the new object.
-
 =head2 TLS_method
 
 C<static method TLS_method : L<Net::SSLeay::SSL_METHOD|SPVM::Net::SSLeay::SSL_METHOD> ();>

@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2019 Joelle Maslak
+# Copyright (C) 2015-2024 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -89,6 +89,16 @@ queue sub { return 'BIG' x 500000; };
 @results = waitall;
 
 is( $results[0], 'BIG' x 500000, 'Result for big return callback as expected' );
+
+# We want to make sure that we can return call queueall
+
+queueall [1, 2, 3], sub { return $_[0]; };
+
+@results = waitall;
+
+is( $results[0], 1, 'Result for queueall (1) callback as expected' );
+is( $results[1], 2, 'Result for queueall (2) callback as expected' );
+is( $results[2], 3, 'Result for queueall (3) callback as expected' );
 
 # We want to test that we can return a more complex data type
 

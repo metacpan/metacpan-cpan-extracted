@@ -1,10 +1,10 @@
 
-# Copyright (C) 2015-2019 Joelle Maslak
+# Copyright (C) 2015-2024 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package Parallel::WorkUnit::Procedural;
-$Parallel::WorkUnit::Procedural::VERSION = '2.232180';
+$Parallel::WorkUnit::Procedural::VERSION = '2.243450';
 use v5.8;
 
 # ABSTRACT: Provide procedural paradigm forking with ability to pass back data
@@ -16,7 +16,7 @@ use autodie;
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
-  async asyncs proc_count proc_wait queue start waitall waitone WorkUnit
+  async asyncs proc_count proc_wait queue queueall start waitall waitone WorkUnit
 );
 our %EXPORT_TAGS = ( all => [@EXPORT_OK] );
 
@@ -56,6 +56,9 @@ sub proc_count() { return WorkUnit->count() }
 sub queue { return WorkUnit->queue(@_) }
 
 
+sub queueall { return WorkUnit->queueall(@_) }
+
+
 sub start(&) { return WorkUnit->start(@_) }
 
 1;
@@ -72,7 +75,7 @@ Parallel::WorkUnit::Procedural - Provide procedural paradigm forking with abilit
 
 =head1 VERSION
 
-version 2.232180
+version 2.243450
 
 =head1 SYNOPSIS
 
@@ -90,6 +93,7 @@ version 2.232180
   #
   WorkUnit->max_children(5);
   queue sub { ... }, \&callback;
+  queueall \@data, sub { ... }, \&callback;
   waitall;
 
 
@@ -179,6 +183,12 @@ Executes C<Parallel::WorkUnit->count()>
 =head2 queue sub { ... }, \&callback
 
 Executes C<Parallel::WorkUnit->queue()>
+
+=head2 queueall $data, sub { ... }, \&callback
+
+Added in 2.243450.
+
+Executes C<Parallel::WorkUnit->queueall()>
 
 =head2 start { ... };
 

@@ -6,11 +6,11 @@ package SPVM::Net::SSLeay::Callback::NewSession;
 
 =head1 Name
 
-SPVM::Net::SSLeay::Callback::NewSession - Callback for SSL_CTX_sess_set_new_cb function in OpenSSL.
+SPVM::Net::SSLeay::Callback::NewSession - Function Pointer Type of SSL_CTX_sess_set_new_cb function's Callback Argument in OpenSSL.
 
 =head1 Description
 
-Net::SSLeay::Callback::NewSession interface in L<SPVM> is the callback for L<SSL_CTX_sess_set_new_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_set_get_cb/> function in OpenSSL.
+Net::SSLeay::Callback::NewSession interface in L<SPVM> represents the function pointer type of L<SSL_CTX_sess_set_new_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_set_get_cb/> function's callback argument in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::Callback::NewSession interface in L<SPVM> is the callback for L<SSL
 
 C<required method : int ($ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $session : L<Net::SSLeay::SSL_SESSION|SPVM::Net::SSLeay::SSL_SESSION>);>
 
-This method is the callback for native L<SSL_CTX_sess_set_new_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_set_get_cb/> function.
+This method represents the function pointer type of L<SSL_CTX_sess_set_new_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_set_get_cb/> function's callback argument in OpenSSL.
 
 =head1 See Also
 

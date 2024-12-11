@@ -1,11 +1,11 @@
-[![Build Status](https://travis-ci.com/kaz-utashiro/greple-xp.svg?branch=master)](https://travis-ci.com/kaz-utashiro/greple-xp)
+[![Actions Status](https://github.com/kaz-utashiro/greple-xp/workflows/test/badge.svg)](https://github.com/kaz-utashiro/greple-xp/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple-xp.svg)](https://metacpan.org/release/App-Greple-xp)
 # NAME
 
 App::Greple::xp - extended pattern module
 
 # VERSION
 
-Version 0.04
+Version 1.00
 
 # SYNOPSIS
 
@@ -36,6 +36,9 @@ and region options.
     fixed string rather than regular expression.
 
 ## COMMENT
+
+You can insert comment lines in pattern file.  As for fixed string
+file, there is no way to write comment.
 
 Lines start with hash mark (`#`) is ignored as a comment line.
 

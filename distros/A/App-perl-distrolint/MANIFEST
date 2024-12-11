@@ -8,6 +8,7 @@ lib/App/perl/distrolint/Check/Editorconfig.pm
 lib/App/perl/distrolint/Check/FilePaths.pm
 lib/App/perl/distrolint/Check/HardTabs.pm
 lib/App/perl/distrolint/Check/NoStrictRefs.pm
+lib/App/perl/distrolint/Check/PerlVersionVar.pm
 lib/App/perl/distrolint/Check/Pod.pm
 lib/App/perl/distrolint/Check/StrictAndWarnings.pm
 lib/App/perl/distrolint/Check/Test2.pm
@@ -23,4 +24,12 @@ META.json
 META.yml
 README
 t/00use.t
+t/50deprecated-features.t
+t/50no-strict-refs.t
+t/50perl-version-var.t
+t/50strict-and-warnings.t
+t/50unimport.t
+t/50use-version.t
+t/50version-var.t
 t/99pod.t
+t/lib/TestCheck.pm

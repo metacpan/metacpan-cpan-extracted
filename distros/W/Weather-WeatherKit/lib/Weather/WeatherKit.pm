@@ -7,17 +7,16 @@ use warnings;
 use Carp;
 use Crypt::JWT qw(encode_jwt);
 
+use parent 'Weather::API::Base';
+use Weather::API::Base qw(:all);
+
 =head1 NAME
 
 Weather::WeatherKit - Apple WeatherKit REST API client
 
-=head1 VERSION
-
-Version 0.11
-
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -30,11 +29,30 @@ our $VERSION = '0.11';
         key        => $private_key             # Encrypted private key (PEM)
     );
     
+    # Request current weather:
     my $report = $wk->get(
         lat      => $lat,      # Latitude
         lon      => $lon,      # Longitude
-        dataSets => $datasets  # e.g. currentWeather (comma-separated list)
+        dataSets => 'currentWeather'
     );
+
+    # Request forecast for 8 days, use Weather::API::Base helper functions
+    # for ISO dates, and get full HTTP::Response object to check for success
+    use Weather::API::Base qw(:all);
+
+    my $response = $wk->get_response(
+        lat         => $lat,
+        lon         => $lon,
+        dataSets    => 'forecastHourly',
+        hourlyStart => ts_to_iso_date(time()),
+        hourlyEnd   => ts_to_iso_date(time()+8*24*3600)
+    );
+
+    if ($response->is_success) {
+        my $json = $response->decoded_content;
+    } else {
+        die $response->status_line;
+    }
 
 =head1 DESCRIPTION
 
@@ -84,7 +102,7 @@ which you first need to convert to the PEM format. On a Mac you can convert it s
    openssl pkcs8 -nocrypt -in AuthKey_<key_id>.p8 -out AuthKey_<key_id>.pem
 
 =item * C<key> : Instead of the C<.pem> file, you can pass its contents directly
-as a string.
+as a string. If both are provided C<key> takes precedence over C<key_file>.
 
 =back
 
@@ -100,7 +118,8 @@ Optional parameters:
 
 =item * C<curl> : If true, fall back to using the C<curl> command line program.
 This is useful if you have issues adding http support to L<LWP::UserAgent>, which
-is the default method for the WeatherKit requests.
+is the default method for the WeatherKit requests. It assumes the C<curl> program
+is installed in C<$PATH>.
 
 =item * C<expiration> : Token expiration time in seconds. Tokens are cached until
 there are less than 10 minutes left to expiration. Default: C<7200>.
@@ -179,33 +198,74 @@ specified in the constructor).
 
 =back
 
+=head1 HELPER FUNCTIONS (from Weather::API::Base)
+
+The parent class L<Weather::API::Base> contains some useful functions e.g.:
+
+  use Weather::API::Base qw(:all);
+
+  # Get time in ISO (YYYY-MM-DDTHH:mm:ss) format
+  my $datetime = ts_to_iso_date(time());
+
+  # Convert 30 degrees Celsius to Fahrenheit
+  my $result = convert_units('C', 'F', 30);
+
+See the doc for that module for more details.
+
+=head1 KNOWN ISSUES
+
+=head2 400 errors on 10 day forecast
+
+Although WeatherKit is supposed to provide 10 days of forecast, at some point users
+started getting C<400> errors when requesting (e.g. with C<hourlyEnd>) more than 8 or 9
+days of forecast. If you encounter this issue, limit your forecast request to 9 or
+8 days in the future.
+
+=head1 OTHER PERL WEATHER MODULES
+
+Some Perl modules for current weather and forecasts from other sources:
+
+=head2 L<Weather::OWM>
+
+OpenWeatherMap uses various weather sources combined with their own ML and offers
+a couple of free endpoints (the v2.5 current weather and 5d/3h forecast) with generous
+request limits. Their newer One Call 3.0 API also offers some free usage (1000 calls/day)
+and the cost is per call above that. If you want access to history APIs, extended
+hourly forecasts etc, there are monthly subscriptions. L<Weather::OWM> is from the
+same author as this module and similar in use.
+
+=head2 L<Weather::Astro7Timer>
+
+The 7Timer! weather forecast is completely free and would be of extra interest if
+you are interested in astronomy/stargazing. It uses the standard NOAA forecast,
+but also calculates astronomical seeing and transparency. It can be accessed with
+L<Weather::Astro7Timer>, which is another module similar to this (same author).
+
 =cut
 
 sub new {
-    my $class = shift;
+    my ($class, %args) = @_;
+    croak("10 digit team_id expected.")
+        unless $args{team_id} && length($args{team_id}) == 10;
 
-    my $self = {};
-    bless($self, $class);
-
-    my %args = @_;
-
-    croak("10 digit team_id expected.") unless $args{team_id} && length($args{team_id}) == 10;
-    $self->{team_id} = $args{team_id};
+    my $self = $class->SUPER::new(
+        language => 'en_US',
+        error    => 'die',
+        %args
+    );
 
     ($self->{$_} = $args{$_} || croak("$_ required."))
-        foreach qw/service_id key_id/;
+        for qw/service_id key_id/;
 
     unless ($args{key}) {
         croak("key or key_file required.") unless $args{key_file};
-        open my $fh, '<', $args{key_file} or die "Can't open file $!";
-        $args{key} = do { local $/; <$fh> };
+        open my $fh, '<', $args{key_file} or die "Can't open file $args{key_file}: $!";
+        $args{key} = do {local $/; <$fh>};
     }
+
     $self->{key}        = \$args{key};
-    $self->{language}   = $args{language} || "en_US";
-    $self->{timeout}    = $args{timeout}  || 30;
-    $self->{expiration} = $args{expiration}  || 7200;
-    $self->{ua}         = $args{ua};
-    $self->{curl}       = $args{curl};
+    $self->{team_id}    = $args{team_id};
+    $self->{expiration} = $args{expiration} || 7200;
 
     return $self;
 }
@@ -213,17 +273,9 @@ sub new {
 sub get {
     my $self = shift;
     my %args = @_;
-
     my $resp = $self->get_response(%args);
 
-    return _output($resp, wantarray) if $self->{curl};
-
-    if ($resp->is_success) {
-        return _output($resp->decoded_content, wantarray);
-    }
-    else {
-        die $resp->status_line;
-    }
+    return $self->_get_output($resp, wantarray);
 }
 
 sub get_response {
@@ -231,24 +283,11 @@ sub get_response {
     my %args = @_;
     $args{language} ||= $self->{language};
 
-    croak("lat between -90 and 90 expected")
-        unless defined $args{lat} && abs($args{lat}) <= 90;
+    Weather::API::Base::_verify_lat_lon(\%args);
 
-    croak("lon between -180 and 180 expected")
-        unless defined $args{lon} && abs($args{lon}) <= 180;
+    $self->_ua unless $self->{ua} || $self->{curl};
 
-    my $url = _weather_url(%args);
-    my $jwt = $self->jwt;
-
-    unless ($self->{curl} || $self->{ua}) {
-        require LWP::UserAgent;
-        $self->{ua} = LWP::UserAgent->new(
-            agent   => "libwww-perl Weather::WeatherKit/$VERSION",
-            timeout => $self->{timeout}
-        );
-    }
-
-    return _fetch($self->{ua}, $url, $jwt);
+    return _fetch($self->{ua}, _weather_url(%args), $self->jwt);
 }
 
 sub jwt {
@@ -305,16 +344,6 @@ sub _weather_url {
     $url .= "?$params" if $params;
 
     return $url;
-}
-
-sub _output {
-    my $str  = shift;
-    my $json = shift;
-
-    return $str unless $json;
-
-    require JSON;
-    return %{JSON::decode_json($str)};
 }
 
 =head1 AUTHOR

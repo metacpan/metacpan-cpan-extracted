@@ -2,7 +2,7 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.024";
+  version "0.026";
   
   use Net::SSLeay::Constant;
   use Net::SSLeay::SSL_CTX;
@@ -11,7 +11,6 @@ class Net::SSLeay {
   use Net::SSLeay::X509;
   use Net::SSLeay::X509_NAME;
   use Net::SSLeay::SSL_SESSION;
-  use Net::SSLeay::OCSP_ONEREQ;
   use Net::SSLeay::Callback::Msg;
   use Net::SSLeay::OPENSSL;
   use Net::SSLeay::OPENSSL_INIT_SETTINGS;

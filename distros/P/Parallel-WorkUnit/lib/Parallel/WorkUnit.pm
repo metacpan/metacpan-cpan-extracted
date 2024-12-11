@@ -1,10 +1,10 @@
 #
-# Copyright (C) 2015-2023 Joelle Maslak
+# Copyright (C) 2015-2024 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package Parallel::WorkUnit;
-$Parallel::WorkUnit::VERSION = '2.232180';
+$Parallel::WorkUnit::VERSION = '2.243450';
 use v5.8;
 
 # ABSTRACT: Provide multi-paradigm forking with ability to pass back data
@@ -531,6 +531,23 @@ sub queue {
     return $self->_start_queued_children();
 }
 
+
+sub queueall {
+    if ( $#_ < 2 ) { confess 'invalid call'; }
+    my $self = shift;
+    my $data = shift;
+    my $sub  = shift;
+
+    for my $ele (@$data) {
+        if (scalar(@_) > 0) {
+            $self->queue(sub { $sub->($ele) }, @_);
+        } else {
+            $self->queue(sub { $sub->($ele) });
+        }
+    }
+    return 1;
+}
+
 sub _send_result {
     if ( $#_ != 2 ) { confess 'invalid call'; }
     my ( $self, $fh, $msg ) = @_;
@@ -864,7 +881,7 @@ Parallel::WorkUnit - Provide multi-paradigm forking with ability to pass back da
 
 =head1 VERSION
 
-version 2.232180
+version 2.243450
 
 =head1 SYNOPSIS
 
@@ -882,6 +899,7 @@ version 2.232180
   #
   $wu->max_children(5);
   $wu->queue( sub { ... }, \&callback );
+  $wu->queueall( \@data, sub { ... }, \&callback );
   $wu->waitall();
 
 
@@ -960,14 +978,14 @@ The default value is false.
   say "Max number of children: " . $wu->max_children();
 
 If set to a value other than zero or undef, limits the number of outstanding
-queue children (created by the C<queue()> method) that can be executing
-at any given time.
+queue children (created by the C<queue()> or C<queueall()> method) that can be
+executing at any given time.
 
 This defaults to 5.
 
 This attribute does not impact the C<async()> method's ability to
 create children, but these children will count against the limit used
-by C<queue()>.
+by C<queue()> or C<queueall()>.
 
 Calling without any parameters will return the number of children.
 
@@ -979,8 +997,8 @@ Create a new workunit class.  Optionally, takes a list that corresponds
 to a hashref, in the form of key and value.  This accepts the key
 C<max_children>, which, if present (and not undef) will limit the
 number of spawned subprocesses that can be active when using the
-C<queue()> method.  Defaults to 5.  See the C<max_children> method
-for additional information.
+C<queue()> or C<queueall()> methods.  Defaults to 5.  See the C<max_children>
+method for additional information.
 
 =head2 async( sub { ... }, \&callback )
 
@@ -1016,7 +1034,7 @@ this method is executed.
 The C<max_children> attribute is not examined in this method - you
 can spawn a new child regardless of the number of children already
 spawned. However, you children started with this method still count
-against the limit used by C<queue()>.
+against the limit used by C<queue()> or C<queueall()>.
 
 =head2 asyncs( $children, sub { ... }, \&callback )
 
@@ -1106,6 +1124,30 @@ callback function (if provided) with the unserialized return value.
 
 If a callback is not provided, the parent, in the C<waitall()> call,
 will gather these results and return them as an ordered list.
+
+=head2 queueall( $data, sub { ... }, \&callback )
+
+Added in 2.243450.
+
+The C<$data> paraemter should be a reference to a list.
+
+Spawns work on a new forked process, for each element in C<@$data>,
+doing so immediately if less than C<max_children> are running.  If there
+are already C<max_children> are running, this will run the process once
+a slot becomes available.
+
+This method should be treated as nearly identical to C<queue()>, if
+C<queue()> was called within a for loop, and the work subroutine took
+one paramenter (the element of the data to operate on).
+
+The result is serialized and streamed back to the parent process
+via a pipe.  The parent, in a C<waitall()> call, will call the
+callback function (if provided) with the unserialized return value.
+
+If a callback is not provided, the parent, in the C<waitall()> call,
+will gather these results and return them as an ordered list.
+
+This always returns 1 on enqueuing the processes.
 
 =head2 start( sub { ... } );
 

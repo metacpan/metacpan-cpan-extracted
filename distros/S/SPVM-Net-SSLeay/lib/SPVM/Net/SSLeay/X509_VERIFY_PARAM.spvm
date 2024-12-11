@@ -8,6 +8,9 @@ class Net::SSLeay::X509_VERIFY_PARAM : pointer {
   
   use Fn;
   
+  # Fields
+  has ref_ssl_ctx : Net::SSLeay::SSL_CTX; # For Net::SSLeay::SSL_CTX#get0_param method
+  
   # Class Methods
   native static method new : Net::SSLeay::X509_VERIFY_PARAM ();
   

@@ -6,7 +6,7 @@
 use v5.36;
 use Object::Pad 0.800;
 
-package App::perl::distrolint 0.06;
+package App::perl::distrolint 0.07;
 class App::perl::distrolint;
 
 use List::Util qw( max );
@@ -19,6 +19,8 @@ use String::Tagged::Terminal;
 C<App::perl::distrolint> - distribution-wide linting tools for Perl distributions
 
 =head1 SYNOPSIS
+
+=for highlighter perl
 
    use App::perl::distrolint;
 

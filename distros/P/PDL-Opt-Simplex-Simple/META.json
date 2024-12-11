@@ -34,6 +34,7 @@
          "requires" : {
             "Math::Round" : "0",
             "PDL" : "2.056",
+            "PDL::Opt::Simplex" : "2.096",
             "Parallel::Pipes" : "0.200",
             "perl" : "5.010"
          }
@@ -56,6 +57,6 @@
          "web" : "https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple.git"
       }
    },
-   "version" : "2.003",
+   "version" : "2.004",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

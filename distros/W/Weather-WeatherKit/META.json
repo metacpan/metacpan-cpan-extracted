@@ -33,7 +33,11 @@
       "runtime" : {
          "requires" : {
             "Crypt::JWT" : "0",
+            "Weather::API::Base" : "0.3",
             "perl" : "5.008"
+         },
+         "suggests" : {
+            "JSON" : "0"
          }
       },
       "test" : {
@@ -54,6 +58,6 @@
          "web" : "https://github.com/dkechag/Weather-WeatherKit"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -6,11 +6,11 @@ package SPVM::Net::SSLeay::Callback::RemoveSession;
 
 =head1 Name
 
-SPVM::Net::SSLeay::Callback::RemoveSession - Callback for SSL_CTX_sess_set_remove_cb function in OpenSSL.
+SPVM::Net::SSLeay::Callback::RemoveSession - Function Pointer Type of SSL_CTX_sess_set_remove_cb function's Callback Argument in OpenSSL.
 
 =head1 Description
 
-Net::SSLeay::Callback::RemoveSession interface in L<SPVM> is the callback for L<SSL_CTX_sess_set_remove_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_set_get_cb/> function in OpenSSL.
+Net::SSLeay::Callback::RemoveSession interface in L<SPVM> represents the function pointer type of L<SSL_CTX_sess_set_remove_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_set_get_cb/> function's callback argument in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::Callback::RemoveSession interface in L<SPVM> is the callback for L<
 
 C<required method : void ($ctx : L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX>, $session : L<Net::SSLeay::SSL_SESSION|SPVM::Net::SSLeay::SSL_SESSION>);>
 
-This method is the callback for native L<SSL_CTX_sess_set_remove_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_set_get_cb/> function.
+This method represents the function pointer type of L<SSL_CTX_sess_set_remove_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_set_get_cb/> function's callback argument in OpenSSL.
 
 =head1 See Also
 

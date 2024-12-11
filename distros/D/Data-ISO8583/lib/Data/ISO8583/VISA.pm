@@ -16,7 +16,7 @@ package Data::ISO8583::VISA;
 use strict;
 use Exporter;
 
-our $VERSION = '2.43';
+our $VERSION = '2.44';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -211,7 +211,7 @@ our $VISA_MESSAGE_FIELD_61 = {
 
 our $VISA_MESSAGE_FIELD_62 = {
 
-  1 => { N => 'Authorization Characteristics Indicator',      T => 1, L =>  1, C => 0, K => 3, D => '1 AN'            },
+  1 => { N => 'Authorization Characteristics Indicator',      T => 1, L =>  1, C => 2, K => 3, D => '1 AN'            },
   2 => { N => 'Transaction Identifier',                       T => 1, L =>  8, C => 1, K => 1, D => '15 BCD'          },
   3 => { N => 'Validation Code',                              T => 1, L =>  4, C => 0, K => 3, D => '4 AN'            },
   4 => { N => 'Market-Specific Data Identifier',              T => 1, L =>  1, C => 0, K => 3, D => '1 AN'            },

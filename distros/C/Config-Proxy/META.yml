@@ -1,0 +1,75 @@
+---
+abstract: 'Loader class for HTTP proxy configuration parsers.'
+author:
+  - 'Sergey Poznyakoff <gray@gnu.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Proxy
+no_index:
+  directory:
+    - t
+    - inc
+    - lib/Config/Proxy/Node
+    - lib/Config/Pound/Node
+    - lib/Config/Proxy/Impl
+  file:
+    - lib/Config/Proxy/Base.pm
+    - lib/Config/Proxy/Iterator.pm
+    - lib/Config/Proxy/Node.pm
+provides:
+  Config::HAProxy:
+    file: lib/Config/HAProxy.pm
+  Config::Pound:
+    file: lib/Config/Pound.pm
+  Config::Pound::Node::IP:
+    file: lib/Config/Pound/Node/IP.pm
+  Config::Pound::Node::Section:
+    file: lib/Config/Pound/Node/Section.pm
+  Config::Pound::Node::Verbatim:
+    file: lib/Config/Pound/Node/Verbatim.pm
+  Config::Proxy:
+    file: lib/Config/Proxy.pm
+    version: '1.0'
+  Config::Proxy::Base:
+    file: lib/Config/Proxy/Base.pm
+  Config::Proxy::Impl::haproxy:
+    file: lib/Config/Proxy/Impl/haproxy.pm
+    version: '1.0'
+  Config::Proxy::Impl::pound:
+    file: lib/Config/Proxy/Impl/pound.pm
+    version: '1.0'
+  Config::Proxy::Iterator:
+    file: lib/Config/Proxy/Iterator.pm
+  Config::Proxy::Node:
+    file: lib/Config/Proxy/Node.pm
+  Config::Proxy::Node::Comment:
+    file: lib/Config/Proxy/Node/Comment.pm
+  Config::Proxy::Node::Empty:
+    file: lib/Config/Proxy/Node/Empty.pm
+  Config::Proxy::Node::Root:
+    file: lib/Config/Proxy/Node/Root.pm
+  Config::Proxy::Node::Section:
+    file: lib/Config/Proxy/Node/Section.pm
+  Config::Proxy::Node::Statement:
+    file: lib/Config/Proxy/Node/Statement.pm
+requires:
+  Carp: '0'
+  File::Basename: '0'
+  File::Temp: '0'
+  IPC::Cmd: '0'
+  Text::Locus: '1'
+  Text::ParseWords: '0'
+  perl: '5.016001'
+resources:
+  bugtracker: https://puszcza.gnu.org.ua/bugs/?group=config-pound
+  repository: git://git.gnu.org.ua/config-pound.git
+version: '1.0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

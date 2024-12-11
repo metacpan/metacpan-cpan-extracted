@@ -8,7 +8,6 @@ BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
 use SPVM 'TestCase::Net::SSLeay';
 use SPVM 'TestCase::Net::SSLeay::Util';
-use SPVM 'TestCase::Net::SSLeay::SSL_CTX';
 
 use SPVM 'TestCase::Net::SSLeay::Util';
 
@@ -23,14 +22,6 @@ my $start_memory_blocks_count = $api->get_memory_blocks_count;
 ok(SPVM::TestCase::Net::SSLeay->test);
 
 ok(SPVM::TestCase::Net::SSLeay->test_no_mozilla_ca);
-
-ok(SPVM::TestCase::Net::SSLeay::SSL_CTX->set_alpn_protos_with_protocols);
-
-ok(SPVM::TestCase::Net::SSLeay::SSL_CTX->set_alpn_select_cb_with_protocols);
-
-ok(SPVM::TestCase::Net::SSLeay::SSL_CTX->set_next_proto_select_cb_with_protocols);
-
-ok(SPVM::TestCase::Net::SSLeay::SSL_CTX->set_next_protos_advertised_cb_with_protocols);
 
 ok(SPVM::TestCase::Net::SSLeay->ASN1_ENUMERATED);
 

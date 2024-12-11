@@ -1,5 +1,16 @@
 Revision history for PDL-Opt-Simplex-Simple
 
+2.004	2024-12-10T10:20:47-08:00
+	- Updated ParticleSwarm.pm:
+	  * Modified _initParticles to scale random velocity
+	  * Updated documentation for -randStartVelocity parameter
+	  * Added comment to _randInRangePDL function
+
+	- Updated Simplex/Simple.pm:
+	  * Improved comments in _build_enabled_var_list function
+	  * Minor formatting fix in _clamp_minmax function
+	- add PDL::Opt::Simplex dependency, closes #5
+
 2.003	2024-07-21T15:49:34-07:00
 	- bugfix: work-around NaNs that may arise in ::Simplex::Core.
 	  this bugfix is slightly different from the previous one,
@@ -73,4 +84,4 @@ Revision history for PDL-Opt-Simplex-Simple
 	- has lots of great documentation.
 
 1.0	2021-11-17T20:21:53-08:00
-	- Initial internal release 
+	- Initial internal release

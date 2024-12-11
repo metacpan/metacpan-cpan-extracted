@@ -1,0 +1,81 @@
+Revision history for Neo4j::Driver::Plugin::LWP
+
+released as part of the Neo4j-Driver distribution up until 1.01
+
+
+1.02 / 2024-12-11
+
+ - Spin off net adapter module Neo4j::Driver::Net::HTTP::LWP into the
+   separate distribution Neo4j-Driver-Plugin-LWP. Earlier versions of the
+   module were released as part of the Neo4j-Driver distribution.
+
+ - Add Neo4j::Driver::Plugin::LWP.
+
+ - Fix Unicode bug in username/password handling of LWP net adapter.
+
+
+1.01 / 2024-11-28
+
+ - Tests no longer use config options deprecated in Neo4j::Driver version 1.
+ - Refactor trust_ca error check.
+ - Replace docs reference to Neo4j::Driver::Net documentation with pointer
+   to Neo4j::Driver::Plugin.
+
+1.00 / 2024-11-21
+
+ - Remove deprecated agent() method.
+ - Remove deprecated protocol() method.
+
+0.38 / 2023-06-18
+
+ - Tests no longer fail for unexpected warnings, except during author testing.
+
+0.36 / 2023-02-05
+
+ - Add support for non-standard Access-Mode HTTP header, which is needed
+   for managed transaction functions.
+
+0.34 / 2023-01-22
+
+ - Update to match changes in the Neo4j::Driver plug-in API:
+   - Change synopsis to use add_handler() instead of add_event_handler().
+   - Implement specified behaviour for internal error responses generated
+     by libwww-perl.
+
+0.31 / 2022-06-13
+
+ - Update docs: Neo4j::Driver has replaced the net_module config option
+   with an experimental plug-in interface.
+
+0.30 / 2022-05-20
+
+ - Deprecate method protocol() in LWP net module.
+ - Rename method agent() to ua() in LWP net module.
+
+0.27 / 2021-08-28
+
+ - Use config() method to read Neo4j::Driver options.
+ - Rework auth handling.
+
+0.26 / 2021-07-30
+
+ - The experimental protocol() method is now discouraged.
+
+0.23 / 2021-04-23
+
+ - Work around breaking change in Neo4j 4.2.5 Jolt implementation.
+
+0.21 / 2021-02-06
+
+ - Add experimental support for HTTP responses in Jolt format.
+ - Add experimental http_reason() and result_handlers() methods.
+ - Add Neo4j::Driver::Net::HTTP::LWP, remove REST::Client dependency.
+
+0.20 / 2021-01-10
+
+ - Add experimental date_header() for HTTP transaction timeout.
+
+0.19 / 2021-01-09
+
+ - Internal redesign (removes private Transport modules).
+ - Add experimental protocol() method for ServerInfo.

@@ -1,5 +1,14 @@
 Revision history for App-perl-distrolint
 
+0.07    2024-12-10
+        [CHANGES]
+         * Have Pod checker also check that minisynopsis does not use trailing
+           `->get` method notation
+         * Treat any `=head1 FOO METHODS` as `METHODS`; similar to FUNCTIONS
+         * Added a check for use of stringy comparisons with the `$]` special
+           Perl variable
+         * Added some basic unit tests for the tree-sitter-based checks
+
 0.06    2024-01-04
         [BUGFIXES]
          * Don't attempt to test unreleased check modules (RT151015)

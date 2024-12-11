@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2020 Joelle Maslak
+# Copyright (C) 2015-2024 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -77,7 +77,7 @@ for ( 0 .. $PROCS - 1 ) {
 }
 
 my $r = $wu->waitone();
-ok( defined($r), "waitone() returned a defined value" );
+ok( defined($r),                    "waitone() returned a defined value" );
 ok( ( $r >= 0 ) && ( $r < $PROCS ), "waitone() returned a valid return value" );
 is( $wu->count, 2, "waitone() properly kept two processes running" );
 
@@ -105,7 +105,7 @@ for ( 0 .. $PROCS - 1 ) {
 }
 
 $r = $wu->waitone();
-ok( defined($r), "waitone() returned a defined value" );
+ok( defined($r),                    "waitone() returned a defined value" );
 ok( ( $r >= 0 ) && ( $r < $PROCS ), "waitone() returned a valid return value" );
 is( $wu->count, 9, "waitone() properly kept nine processes running" );
 
@@ -135,7 +135,7 @@ for ( 0 .. $PROCS - 1 ) {
 }
 
 $r = $wu->waitone();
-ok( defined($r), "(W2) waitone() returned a defined value" );
+ok( defined($r),                    "(W2) waitone() returned a defined value" );
 ok( ( $r >= 0 ) && ( $r < $PROCS ), "(W2) waitone() returned a valid return value" );
 is( $wu->count, 2, "(W2) waitone() properly kept two processes running" );
 
@@ -176,6 +176,23 @@ for ( 0 .. $PROCS - 1 ) {
     ok( exists( $RESULTS{ $_ + 100 } ), "Worker Second Exec $_ returned properly" );
 }
 
+# Now we're going to try queue all.
+%RESULTS = ();
+$wu->queueall( [( 0 .. $PROCS - 1 )], sub { return $_[0] + 100; }, \&cb );
+$wu->waitall();
+for ( 0 .. $PROCS - 1 ) {
+    ok( exists( $RESULTS{ $_ + 100 } ), "queueall() Exec $_ returned properly" );
+}
+
+# Now we're going to try queue all w/o a callback
+%RESULTS = ();
+$wu->queueall( [( 0 .. $PROCS - 1 )], sub { return $_[0] + 100; } );
+my @ret = $wu->waitall();
+is( scalar(@ret), $PROCS, "queueall() w/o cb Exec returned proper number of results" );
+for ( 0 .. $PROCS - 1 ) {
+    is( $ret[$_], $_ + 100, "queueall() w/o cb Exec $_ returned properly" );
+}
+
 # We want to make sure that we can return a lot of data
 
 $wu->queue( sub { return 'BIG' x 500000; }, \&cb_big );
@@ -209,11 +226,7 @@ is( $RESULTS{BIG}, \@cmp, 'Array reference contains proper values' );
 # We want to test that we properly handle a child process that die()'s.
 
 $wu->queue( sub { die "Error!"; }, sub { return; } );
-like(
-    dies { $wu->waitall(); },
-    qr/Error!/,
-    'Die when child throws an error',
-);
+like( dies { $wu->waitall(); }, qr/Error!/, 'Die when child throws an error', );
 
 # We want to test that we handle a process that returns undef properly
 

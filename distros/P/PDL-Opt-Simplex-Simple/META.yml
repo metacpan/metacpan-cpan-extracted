@@ -21,11 +21,12 @@ no_index:
 requires:
   Math::Round: '0'
   PDL: '2.056'
+  PDL::Opt::Simplex: '2.096'
   Parallel::Pipes: '0.200'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple/issues
   homepage: https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple
   repository: git://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple.git
-version: '2.003'
+version: '2.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,11 +1,18 @@
-1.0.6   2019-05-07 (PERLANCAR)
+1.0.7   2024-12-10  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+        - [doc] Mention more related modules.
+
+
+1.0.6   2019-05-07  Released-By: PERLANCAR
 
         - No spec changes.
 
 	- Replace mention of Log::Any with Log::ger.
 
 
-1.0.5   2015-09-06 (PERLANCAR)
+1.0.5   2015-09-06  Released-By: PERLANCAR
 
 	- No spec changes.
 
@@ -14,27 +21,27 @@
 	  requirement.
 
 
-1.0.4   2013-06-26 (SHARYANTO)
+1.0.4   2013-06-26  Released-By: SHARYANTO
 
         - No spec changes. Fix some typo and update some references.
 
 
-1.0.3   2013-04-06 (SHARYANTO)
+1.0.3   2013-04-06  Released-By: SHARYANTO
 
         - No spec changes. Tweak some wordings.
 
 
-1.0.2   2012-07-27 (SHARYANTO)
+1.0.2   2012-07-27  Released-By: SHARYANTO
 
         - No spec changes. Mention similar project on CPAN: Text::Pipe.
 
 
-1.0.1   2012-07-21 (SHARYANTO)
+1.0.1   2012-07-21  Released-By: SHARYANTO
 
         - No spec changes. Rename specification from Data-Unixish (now used for
           the implementation) to Unixish (now only for specification).
 
 
-1.0.0   2012-07-13 (SHARYANTO)
+1.0.0   2012-07-13  Released-By: SHARYANTO
 
         - First version.

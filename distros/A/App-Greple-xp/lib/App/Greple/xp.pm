@@ -4,7 +4,7 @@ App::Greple::xp - extended pattern module
 
 =head1 VERSION
 
-Version 0.04
+Version 1.00
 
 =head1 SYNOPSIS
 
@@ -48,6 +48,9 @@ fixed string rather than regular expression.
 
 =head2 COMMENT
 
+You can insert comment lines in pattern file.  As for fixed string
+file, there is no way to write comment.
+
 Lines start with hash mark (C<#>) is ignored as a comment line.
 
 String after double slash (C<//>) is also ignored with preceding
@@ -87,7 +90,7 @@ use v5.14;
 use strict;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "1.00";
 
 use Exporter 'import';
 our @EXPORT = qw(&xp_pattern_file);
@@ -113,7 +116,7 @@ sub xp_pattern_file {
     for my $file (@files) {
 	open my $fh, $file or die "$file: $!";
 	while (my $p = <$fh>) {
-	    chomp $p;
+	    $p =~ s/\R\z//;
 	    if ($opt{hash_comment} and !$opt{fixed}) {
 		next if $p =~ /^\s*#/;
 	    }
@@ -126,6 +129,16 @@ sub xp_pattern_file {
 	}
     }
     merge_regions @r;
+}
+
+sub block_match {
+    my $grep = shift;
+    $grep->{RESULT} = [
+	[ [ 0, length ],
+	  map {
+	      [ $_->[0][0], $_->[0][1], 0, $grep->{callback}->[0] ]
+	  } $grep->result
+      ] ];
 }
 
 1;
@@ -143,3 +156,5 @@ option  --inside-string  --inside &xp_pattern_file(fixed,file="$<shift>")
 option --outside-string --outside &xp_pattern_file(fixed,file="$<shift>")
 option --include-string --include &xp_pattern_file(fixed,file="$<shift>")
 option --exclude-string --exclude &xp_pattern_file(fixed,file="$<shift>")
+
+option --block-match    --postgrep &__PACKAGE__::block_match

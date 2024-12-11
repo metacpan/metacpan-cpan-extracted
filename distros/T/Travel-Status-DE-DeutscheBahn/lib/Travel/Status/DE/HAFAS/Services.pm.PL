@@ -68,6 +68,9 @@ sub load_instance {
 	if ( $data->{options}{ver} ) {
 		$ret{request}{ver} = $data->{options}{ver};
 	}
+	elsif ( $data->{options}{version} ) {
+		$ret{request}{ver} = $data->{options}{version};
+	}
 
 	if ( $opt{lang} ) {
 		$ret{request}{lang} = $opt{lang};
@@ -132,8 +135,8 @@ my %hafas_instance = (
 				type => 'IPH',
 				name => 'DB Navigator',
 			},
-			ext  => 'DB.R21.12.a',
-			ver  => '1.18',
+			ext  => 'DB.R22.04.a',
+			ver  => '1.78',
 			auth => {
 				type => 'AID',
 				aid  => 'n91dB8Z77MLdoR0K'
@@ -153,9 +156,9 @@ my %hafas_instance = (
 		salt   => 'i5s7m3q9z6b4k1c2',
 		micmac => 1,
 	},
-	KVB   => { load_instance( 'de/kvb', lang => 'deu' ), },
+	KVB        => { load_instance( 'de/kvb',           lang => 'deu' ), },
 	mobiliteit => { load_instance( 'lu/mobiliteit-lu', lang => 'deu' ) },
-	NAHSH => {
+	NAHSH      => {
 		load_instance('de/nahsh'),
 		stopfinder => 'https://nah.sh.hafas.de/bin/ajax-getstop.exe',
 	},
@@ -231,7 +234,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '6.13';
+our $VERSION = '6.14';
 
 # Most of these have been adapted from
 # <https://github.com/public-transport/transport-apis> and

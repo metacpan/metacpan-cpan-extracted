@@ -18,7 +18,7 @@ class Net::SSLeay::SSL_CTX : pointer {
   
   use Net::SSLeay::Callback::TlsextServername;
   use Net::SSLeay::Callback::TlsextStatus;
-  use Net::SSLeay::Callback::PemPasswd;
+  use Net::SSLeay::Callback::PemPassword;
   use Net::SSLeay::Callback::PskClient;
   use Net::SSLeay::Callback::PskServer;
   use Net::SSLeay::Callback::TlsextTicketKey;
@@ -26,6 +26,7 @@ class Net::SSLeay::SSL_CTX : pointer {
   use Net::SSLeay::Callback::NewSession;
   use Net::SSLeay::Callback::RemoveSession;
   use Net::SSLeay::Callback::Msg;
+  use Net::SSLeay::Callback::Verify;
   
   use Net::SSLeay::Callback::AlpnSelect; 
   use Net::SSLeay::Callback::NextProtoSelect;
@@ -46,6 +47,8 @@ class Net::SSLeay::SSL_CTX : pointer {
   
   our $REMOVE_SESSION_CBS : Hash of Net::SSLeay::Callback::RemoveSession;
   
+  our $VERIFY_CBS : Hash of Net::SSLeay::Callback::Verify;
+  
   our $MUTEX : Sync::Mutex;
   
   INIT {
@@ -59,12 +62,12 @@ class Net::SSLeay::SSL_CTX : pointer {
     
     $REMOVE_SESSION_CBS = Hash->new;
     
+    $VERIFY_CBS = Hash->new;
+    
     $MUTEX = Sync::Mutex->new;
   }
   
   # Fields
-  has pkeys_list : List of Net::SSLeay::EVP_PKEY;
-  
   has cb_output_strings_list : StringList; # For SSL_CTX_set_alpn_select_cb, SSL_CTX_set_next_proto_select_cb
   
   # Class Methods
@@ -72,21 +75,18 @@ class Net::SSLeay::SSL_CTX : pointer {
   
   protected method init : void ($options : object[] = undef) {
     
-    my $pkeys_list = List->new(new Net::SSLeay::EVP_PKEY[0]);
-    $self->{pkeys_list} = $pkeys_list;
-    
     my $cb_output_strings_list = StringList->new;
     $self->{cb_output_strings_list} = $cb_output_strings_list;
   }
   
   # Instance Methods
-  native method set_mode : long ($mode : long);
+  native method get_mode : long ();
   
-  native method set_verify : void ($mode : int);
+  native method set_mode : long ($mode : long);
   
   native method get0_param : Net::SSLeay::X509_VERIFY_PARAM ();
   
-  native method load_verify_locations : int ($path : string);
+  native method load_verify_locations : int ($CAfile : string, $CApath : string);
   
   native method set_default_verify_paths : int ();
   
@@ -95,6 +95,8 @@ class Net::SSLeay::SSL_CTX : pointer {
   native method use_certificate_chain_file : int ($file : string);
   
   native method use_PrivateKey_file : int ($file : string, $type : int);
+  
+  native method use_PrivateKey : int ($pkey : Net::SSLeay::EVP_PKEY);
   
   native method set_cipher_list : int ($str : string);
   
@@ -119,21 +121,13 @@ class Net::SSLeay::SSL_CTX : pointer {
     return $ret;
   }
   
-  native method set_tmp_ecdh : long ($ecdh : Net::SSLeay::EC_KEY);
-  
   native method set1_groups_list : int ($list : string);
   
-  native method set1_curves_list : int ($list : string);
+  native method get_session_cache_mode : long ();
   
   native method set_session_cache_mode : long ($mode : long);
   
-  native method set_ecdh_auto : long ($state : int);
-  
-  native method set_tmp_dh : long ($dh : Net::SSLeay::DH);
-  
   native method set_post_handshake_auth : void ($val : int);
-  
-  native method use_PrivateKey : int ($pkey : Net::SSLeay::EVP_PKEY);
   
   native method set_session_id_context : int ($sid_ctx : string, $sid_ctx_len : int = -1);
   
@@ -145,11 +139,13 @@ class Net::SSLeay::SSL_CTX : pointer {
   
   native method add_extra_chain_cert : long ($x509 : Net::SSLeay::X509);
   
+  native method set_verify : void ($mode : int, $verify_callback : Net::SSLeay::Callback::Verify = undef);
+  
   native method set_tlsext_servername_callback : long ($cb : Net::SSLeay::Callback::TlsextServername, $arg : object = undef);
   
   native method set_tlsext_status_cb : long ($cb : Net::SSLeay::Callback::TlsextStatus, $arg : object = undef);
   
-  native method set_default_passwd_cb : void ($cb : Net::SSLeay::Callback::PemPasswd, $arg : object = undef);
+  native method set_default_passwd_cb : void ($cb : Net::SSLeay::Callback::PemPassword, $arg : object = undef);
   
   native method set_psk_client_callback : void ($cb : Net::SSLeay::Callback::PskClient);
   
@@ -348,6 +344,43 @@ class Net::SSLeay::SSL_CTX : pointer {
     $MUTEX->lock;
     
     my $deleted = (Net::SSLeay::Callback::RemoveSession)$REMOVE_SESSION_CBS->delete($key);
+    
+    return $deleted;
+  }
+  
+  private method GET_VERIFY_CB : Net::SSLeay::Callback::Verify ($key : string) {
+    
+    Fn->defer(method : void () {
+      $MUTEX->reader_unlock;
+    });
+    
+    $MUTEX->reader_lock;
+    
+    my $psk_server_cb = (Net::SSLeay::Callback::Verify)$VERIFY_CBS->get($key);
+    
+    return $psk_server_cb;
+  }
+  
+  private method SET_VERIFY_CB : void ($key : string, $psk_server_cb : Net::SSLeay::Callback::Verify) {
+    
+    Fn->defer(method : void () {
+      $MUTEX->unlock;
+    });
+    
+    $MUTEX->lock;
+    
+    $VERIFY_CBS->set($key, $psk_server_cb);
+  }
+  
+  private method DELETE_VERIFY_CB : Net::SSLeay::Callback::Verify ($key : string) {
+    
+    Fn->defer(method : void () {
+      $MUTEX->unlock;
+    });
+    
+    $MUTEX->lock;
+    
+    my $deleted = (Net::SSLeay::Callback::Verify)$VERIFY_CBS->delete($key);
     
     return $deleted;
   }

@@ -6,11 +6,11 @@ package SPVM::Net::SSLeay::Callback::PskServer;
 
 =head1 Name
 
-SPVM::Net::SSLeay::Callback::PskServer - Callback for SSL_CTX_set_psk_server_callback function in OpenSSL.
+SPVM::Net::SSLeay::Callback::PskServer - Function Pointer Type of SSL_CTX_set_psk_server_callback function's Callback Argument in OpenSSL.
 
 =head1 Description
 
-Net::SSLeay::Callback::PskServer interface in L<SPVM> is the callback for L<SSL_CTX_set_psk_server_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_use_psk_identity_hint/> function in OpenSSL.
+Net::SSLeay::Callback::PskServer interface in L<SPVM> represents the function pointer type of L<SSL_CTX_set_psk_server_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_use_psk_identity_hint/> function's callback argument in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::Callback::PskServer interface in L<SPVM> is the callback for L<SSL_
 
 C<required method : int ($ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $identity : string, $identity_len : int, $sess_ref : L<Net::SSLeay::SSL_SESSION|SPVM::Net::SSLeay::SSL_SESSION>[]);>
 
-This method is callback for native L<SSL_CTX_set_psk_server_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_use_psk_identity_hint/> function.
+This method represents the function pointer type of L<SSL_CTX_set_psk_server_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_use_psk_identity_hint/> function's callback argument in OpenSSL.
 
 =head1 See Also
 
