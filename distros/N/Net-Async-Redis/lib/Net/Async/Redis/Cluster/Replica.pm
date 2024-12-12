@@ -2,7 +2,7 @@ package Net::Async::Redis::Cluster::Replica;
 use Object::Pad;
 class Net::Async::Redis::Cluster::Replica;
 
-our $VERSION = '6.005'; # VERSION
+our $VERSION = '6.006'; # VERSION
 
 use Scalar::Util qw(refaddr);
 use Future::AsyncAwait;

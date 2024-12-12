@@ -24,6 +24,7 @@ my @files = (
     't/data/sample_eu.xml',
     't/data/sample_hmt.csv',
     't/data/sample_ofac_consolidated.xml',
+    't/data/sample_unsc.xml',
     't/data/sdn.xml',
     't/rc/perlcriticrc',
     't/rc/perltidyrc',

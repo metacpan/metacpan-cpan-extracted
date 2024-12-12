@@ -30,7 +30,8 @@ $dbh->do(
     artistid INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, 
     name VARCHAR(100),
     rank INTEGER NOT NULL DEFAULT 13,
-    charfield CHAR(10)
+    charfield CHAR(10),
+    picture MEDIUMBLOB
 )"
 );
 $dbh->do("DROP TABLE IF EXISTS owner");
@@ -397,6 +398,17 @@ subtest 'mariadb_auto_reconnect' => sub {
     ok( !defined $orig_dbh,
         'DBIC operation triggered reconnect - old $dbh is gone' );
     ok( $rs->find( { name => "test" } ), 'Expected row created' );
+};
+
+subtest 'blob round trip' => sub {
+    my $new =
+      $schema->resultset('Artist')->create( { name => 'blob round trip', picture => "\302\243" } );
+    ok( $new->artistid, 'Auto-PK worked' );
+
+    my $artist2_rs =
+      $schema->resultset('Artist')->search( { artistid => $new->artistid } );
+
+    is($artist2_rs->single->picture, "\302\243", "Round-tripped a blob");
 };
 
 done_testing;

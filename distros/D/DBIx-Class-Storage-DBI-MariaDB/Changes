@@ -1,0 +1,6 @@
+0.1.1
+  * Pass BLOBs correctly.
+  * Make Kwalitee happier.
+
+0.1.0
+  * Initial CPAN release.

@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use parent qw(CPANPLUS::Dist::Base);
 
@@ -218,7 +218,7 @@ CPANPLUS::Dist::Debora - Create Debian or RPM packages from Perl modules
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -258,30 +258,33 @@ Or create packages from the command-line.
 Start an interactive shell to edit the CPANPLUS settings.
 
   $ cpanp
-  CPAN Terminal> s reconfigure
 
-Make CPANPLUS::Dist::Debora your default format by setting the C<dist_type>
-key.
+Signature checks might be enabled by default, but many Perl distributions do
+not provide signatures.
 
-  CPAN Terminal> s conf dist_type CPANPLUS::Dist::Debora
+  CPAN Terminal> s conf signature 0
 
 Some Perl distributions fail to show interactive prompts if the C<verbose>
 option is not set.
 
   CPAN Terminal> s conf verbose 1
 
-On some systems signature checks might be enabled by default, but many Perl
-distributions do not provide signatures.
-
-  CPAN Terminal> s conf signature 0
-
 CPANPLUS uses less memory if the SQLite backend is enabled.
 
   CPAN Terminal> s conf source_engine CPANPLUS::Internals::Source::SQLite
 
+Make CPANPLUS::Dist::Debora your default format by setting the C<dist_type>
+key.
+
+  CPAN Terminal> s conf dist_type CPANPLUS::Dist::Debora
+
 Make your changes permanent.
 
   CPAN Terminal> s save
+
+Other settings such as your CPAN mirror can be set interactively.
+
+  CPAN Terminal> s reconfigure
 
 The settings are stored in F<~/.cpanplus/lib/CPANPLUS/Config/User.pm>.
 

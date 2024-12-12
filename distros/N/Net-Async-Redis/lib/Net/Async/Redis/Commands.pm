@@ -2,7 +2,7 @@ package Net::Async::Redis::Commands;
 
 use Full::Class qw(:v1), extends => 'IO::Async::Notifier';
 
-our $VERSION = '6.005'; # VERSION
+our $VERSION = '6.006'; # VERSION
 
 =head1 NAME
 

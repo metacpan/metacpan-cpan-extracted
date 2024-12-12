@@ -1,11 +1,9 @@
-package Extism::Plugin::CancelHandle;
+package Extism::Plugin::CancelHandle v0.3.0;
 
 use 5.016;
 use strict;
 use warnings;
 use Extism::XS qw(plugin_cancel);
-use version 0.77;
-our $VERSION = qv(v0.2.0);
 
 sub new {
     my ($name, $raw_cancel_handle) = @_;

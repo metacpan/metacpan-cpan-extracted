@@ -19,7 +19,7 @@ name: App-repeat
 provides:
   App::repeat:
     file: lib/App/repeat.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Getopt::Long::Less: '0'
   Log::ger: '0.038'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-repeat
   homepage: https://metacpan.org/release/App-repeat
   repository: git://github.com/perlancar/perl-App-repeat.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

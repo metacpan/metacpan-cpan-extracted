@@ -1,10 +1,8 @@
-package Extism::Plugin::CallException;
+package Extism::Plugin::CallException v0.3.0;
 
 use 5.016;
 use strict;
 use warnings;
-use version 0.77;
-our $VERSION = qv(v0.2.0);
 use Carp qw(croak shortmess);
 our @CARP_NOT = qw(Extism::Plugin);
 use overload '""' => sub {

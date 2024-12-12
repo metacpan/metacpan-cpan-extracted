@@ -7,7 +7,7 @@ use Clone qw(clone);
 use File::ShareDir;
 use YAML::XS qw(LoadFile);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ Finance::Exchange - represents a financial stock exchange object.
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 

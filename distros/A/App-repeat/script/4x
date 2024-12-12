@@ -1,0 +1,400 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Getopt::Long::Less;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-12-10'; # DATE
+our $DIST = 'App-repeat'; # DIST
+our $VERSION = '0.006'; # VERSION
+
+our %Opts = (
+    n => undef,
+    until_time => undef,
+    max => undef,
+
+    delay => undef,
+    delay_max => undef,
+    delay_strategy => undef,
+
+    until_fail => 0,
+    until_success => 0,
+    dry_run => 0,
+    dry_run_delay => 0,
+);
+
+my $Exit_Code = 0;
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'n=i'              => \$Opts{n},
+        'until-time=s'     => sub {
+            require DateTime::Format::Natural;
+            my $dt = DateTime::Format::Natural->new->parse_datetime($_[1]);
+            warn "TZ is not set!" unless $ENV{TZ};
+            $dt->set_time_zone($ENV{TZ});
+            log_debug "--until-time is set to %s (%.3f)", "$dt", $dt->epoch;
+            $Opts{until_time} = $dt->epoch;
+        },
+        'max=i'            => \$Opts{max},
+
+        'delay|d=f'        => \$Opts{delay},
+        'delay-min=f'      => \$Opts{delay_min},
+        'delay-max=f'      => \$Opts{delay_max},
+        'delay-strategy=s' => sub {
+            no strict 'refs';  ## no critic: TestingAndDebugging::ProhibitNoStrict
+            my $s = $_[1];
+            my ($mod, $args) = $s =~ /\A(\w+(?:\::\w+)*)(?:[=,](.*))?/;
+            $args //= ''; $args = { split /,/, $args };
+            $mod = "Algorithm::Backoff::$mod";
+            (my $modpm = "$mod.pm") =~ s!::!/!g;
+            require $modpm;
+            $s = $mod->new(%$args);
+
+            $Opts{delay_strategy} = $s;
+        },
+
+        'until-fail'       => \$Opts{until_fail},
+        'until-success'    => \$Opts{until_success},
+
+        'dry-run!'         => \$Opts{dry_run},
+        'dry-run-delay'    => \$Opts{dry_run_delay},
+        'help|h|?'         => sub {
+            print <<USAGE;
+Usage:
+  repeat [repeat options] -- [command] [command options ...]
+  repeat --help, -h, -?
+Options:
+  -n=i
+  --until-time=s
+  --max=i
+  --until-fail
+  --until-success
+  --delay=f, -d
+  --delay-strategy=s
+  --(no-)dry-run
+  --dry-run-sleep
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+
+    if ($0 =~ m![/\\](\d+)(?:times|x)$!) {
+        $Opts{n} //= $1;
+    } elsif ($0 =~ m![/\\](twice)$!) {
+        $Opts{n} //= 2;
+    }
+
+    unless ((defined $Opts{n}) xor (defined $Opts{until_time})) {
+        warn "repeat: Please specify -n or --until-time\n";
+        exit 99;
+    }
+    if (defined $Opts{delay_min} && !defined $Opts{delay_max}) {
+        warn "repeat: --delay-max must be specified\n";
+        exit 99;
+    }
+    if ($Opts{until_fail} && $Opts{until_success}) {
+        warn "repeat: --until-fail and --until-success cannot be specified at the same time\n";
+        exit 99;
+    }
+    $Opts{delay_min} //= 0;
+    unless (@ARGV) {
+        warn "repeat: No command specified\n";
+        exit 99;
+    }
+}
+
+sub run_cmd {
+    my ($is_dry_run, $i, $max) = @_;
+
+    if (log_is_debug()) {
+        log_debug "\%s[repeat: %d%s] Executing command: %s",
+            ($is_dry_run ? "[DRY_RUN]" : ""),
+            $i,
+            (defined($max) ? "/$max" : ""),
+            join(" ", @ARGV);
+    }
+    unless ($is_dry_run) {
+        system @ARGV;
+        $Exit_Code = $? >> 8;
+        log_debug "exit code is $Exit_Code";
+    }
+}
+
+sub run {
+    require Time::HiRes;
+
+    my $i = 0;
+    my $now;
+    while (1) {
+        $i++;
+
+        # check whether we should exit
+        $now = Time::HiRes::time();
+        if (defined $Opts{n} && $i > $Opts{n}) {
+            log_debug "Number of times (%d) exceeded", $Opts{n};
+            goto EXIT;
+        }
+        if (defined $Opts{max} && $i > $Opts{max}) {
+            log_debug "Maximum number of times (%d) exceeded", $Opts{max};
+            goto EXIT;
+        }
+        if (defined $Opts{until_time}) {
+            log_debug "Comparing current time ($now) with --until-time ($Opts{until_time})";
+            if ($now > $Opts{until_time}) {
+                log_debug "--until time (%f) exceeded", $Opts{until_time};
+                goto EXIT;
+            }
+        }
+
+        run_cmd($Opts{dry_run}, $i, $Opts{n} // $Opts{max});
+
+        if ($Opts{until_fail} && $Exit_Code) {
+            log_debug "exit code is non-zero, bailing because of --until-fail ...";
+            goto EXIT;
+        }
+        if ($Opts{until_success} && !$Exit_Code) {
+            log_debug "exit code is zero, bailing because of --until-success ...";
+            goto EXIT;
+        }
+
+        # delay
+        if (defined $Opts{delay}) {
+            if ($Opts{dry_run} && $Opts{dry_run_delay}) {
+                log_debug "[DRY_RUN] Sleeping for %.3f second(s)", $Opts{delay};
+            } else {
+                log_debug "Sleeping for %.3f second(s)", $Opts{delay};
+                Time::HiRes::sleep($Opts{delay});
+            }
+        } elsif (defined $Opts{delay_max}) {
+            my $delay = $Opts{delay_min} + rand()*($Opts{delay_max} - $Opts{delay_min});
+            if ($Opts{dry_run} && $Opts{dry_run_delay}) {
+                log_debug "[DRY_RUN] Sleeping for %.3f second(s)", $delay;
+            } else {
+                log_debug "Sleeping for %.3f second(s)", $delay;
+                Time::HiRes::sleep($delay);
+            }
+        } elsif (defined $Opts{delay_strategy}) {
+            my $delay = $Opts{delay_strategy}->failure;
+            if ($Opts{dry_run} && $Opts{dry_run_delay}) {
+                log_debug "[DRY_RUN] Sleeping for %.3f second(s)", $delay;
+            } else {
+                log_debug "Sleeping for %.3f second(s)", $delay;
+                Time::HiRes::sleep($delay);
+            }
+        }
+    } # while (1)
+
+  EXIT:
+    log_debug "Exiting with exit code $Exit_Code ...";
+    exit $Exit_Code;
+}
+
+# MAIN
+
+parse_cmdline();
+
+run();
+exit $Exit_Code;
+
+1;
+# ABSTRACT: Repeat a command a number of times
+# PODNAME: 4x
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+4x - Repeat a command a number of times
+
+=head1 VERSION
+
+This document describes version 0.006 of 4x (from Perl distribution App-repeat), released on 2024-12-10.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % repeat [REPEAT OPTIONS] -- [PROGRAM] [PROGRAM OPTIONS ...]
+ % 2x     [REPEAT OPTIONS] -- [PROGRAM] [PROGRAM OPTIONS ...]
+ % 3x     [REPEAT OPTIONS] -- [PROGRAM] [PROGRAM OPTIONS ...]
+ % 4x     [REPEAT OPTIONS] -- [PROGRAM] [PROGRAM OPTIONS ...]
+ % 5x     [REPEAT OPTIONS] -- [PROGRAM] [PROGRAM OPTIONS ...]
+
+Below are some examples.
+
+This will run C<somecmd> 10 times:
+
+ % repeat -n10 -- somecmd --cmdopt
+
+This will run C<somecmd> 10 times with a delay of 2 seconds in between:
+
+ % repeat -n10 -d2 -- somecmd --cmdopt
+
+This will repeatedly run C<somecmd> until tomorrow at 10am with a delay of
+between 2 and 10 seconds in between (keywords: jitter):
+
+ % repeat --until-time 'tomorrow at 10AM' --delay-min=2 --delay-max=10 -- somecmd --cmdopt
+
+This will run C<somecmd> 10 times with exponentially increasing delay from 1, 2,
+4, and so on:
+
+ % repeat -n10 --delay-strategy=Exponential=initial_delay,1 -- somecmd --cmdopt
+
+Dry-run mode and show debugging messages: do not actually run the command, just
+show it in the log (require L<Log::ger::Screen>).
+
+ % TRACE=1 PERL5OPT=-MLog::ger::Screen repeat -n10 --dry-run -- foo
+
+=head1 DESCRIPTION
+
+C<repeat> is a CLI utility that lets you repeat running a command a number of
+times. In its most basic usage, it simplifies this shell construct:
+
+ % for i in `seq 1 10`; do somecmd --cmdopt; done
+
+into:
+
+ % repeat -n10 -- somecmd --cmdopt
+
+You can either specify a fixed number of times to repeat (C<-n>) or until a
+certain point of time (C<--until-time>) with an optional maximum number of
+repetition (C<--max>).
+
+Delay between command can be specified as a fixed number of seconds (C<--delay>)
+or a random range of seconds (C<--delay-min>, C<--delay-max>) or using a backoff
+strategy (see L<Algorithm::Backoff>).
+
+You can opt to bail immediately after a failure (C<--until-fail>) or after a
+success (C<--until-success>).
+
+=head1 OPTIONS
+
+=over
+
+=item * --help, -h, -?
+
+=item * -n
+
+Uint. Number of times to run the command. Alternatively, you can use
+C<--until-time> (with optional C<--max>) instead.
+
+=item * --until-time
+
+String representation of time. Will be parsed using
+L<DateTime::Format::Natural>. Alternatively, you can use C<-n> instead.
+
+Note that dependency to L<DateTime::Format::Natural> is declared optionally
+(RuntimeSuggests). You need to install the module first if you want to use
+C<--until-time>.
+
+=item * --max
+
+Uint. When C<--until-time> is specified, specify maximum number of repetition.
+
+=item * --delay, -d
+
+Float. Number of seconds to delay between running a command. Alternatively, you
+can specify C<--delay-min> and C<--delay-max>, or C<--delay-strategy>.
+
+=item * --delay-min
+
+Float.
+
+=item * --delay-max
+
+Float.
+
+=item * --delay-strategy
+
+Str. Pick a backoff strategy from L<Algorithm::Backoff>. It should be a module
+name under C<Algorithm::Backoff::> namespace, without the prefix, optionally
+followed by C<,> (or C<=>) and a comma-separated list of arguments. For example:
+
+ Exponential=initial_delay,1,max_delay,10
+
+Note that the failure delay values are used as the delays.
+
+Also note that the dependency is not specified explicitly; you have to install
+it yourself.
+
+=item * --until-fail
+
+Bool. Stop repeating as soon as exit code of command is non-zero (failure).
+Alternatively, you can specify C<--until-success> instead.
+
+=item * --dry-run
+
+Dry-run mode. Don't actually run the command, just show it in the log. But
+delays will be performed; use C<--dry-run-delay> to skip delaying also.
+
+=item * --dry-run-delay
+
+Dry-run mode for delay. Don't actually delay, just show it in the log.
+
+=back
+
+=head1 ENVIRONMENT
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-repeat>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-repeat>.
+
+=head1 SEE ALSO
+
+L<norepeat> from L<App::norepeat>.
+
+L<retry> from L<App::AlgorithmBackoffUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-repeat>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

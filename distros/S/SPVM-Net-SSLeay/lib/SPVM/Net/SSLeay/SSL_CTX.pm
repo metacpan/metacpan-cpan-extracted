@@ -72,6 +72,14 @@ Exceptions:
 
 If SSL_CTX_set_default_verify_paths failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
+=head2 set_default_verify_paths_windows
+
+C<method set_default_verify_paths_windows : void ();>
+
+It behaves as if L</"set_default_verify_paths"> had been invoked in Windows using the way described below.
+
+L<https://stackoverflow.com/questions/9507184/can-openssl-on-windows-use-the-system-certificate-store>
+
 =head2 use_certificate_file
 
 C<method use_certificate_file : int ($file : string, $type : int);>
@@ -186,37 +194,11 @@ The group list $list must be defined. Otherwise an exception is thrown.
 
 If set1_groups_list failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
-=head2 get_session_cache_mode
-
-C<method get_session_cache_mode : long ();>
-
-Calls native L<SSL_CTX_get_session_cache_mode|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_session_cache_mode/> function given the pointer value of the instance, and returns its return value.
-
-=head2 set_session_cache_mode
-
-C<method set_session_cache_mode : long ($mode : long);>
-
-Calls native L<SSL_CTX_set_session_cache_mode|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_session_cache_mode/> function given the pointer value of the instance, $mode, and returns its return value.
-
 =head2 set_post_handshake_auth
 
 C<method set_post_handshake_auth : void ($val : int);>
 
 Calls native L<SSL_CTX_set_post_handshake_auth|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_verify> function given the pointer value of the instance, $val.
-
-=head2 set_session_id_context
-
-C<method set_session_id_context : int ($sid_ctx : string, $sid_ctx_len : int = -1);>
-
-Calls native L<SSL_CTX_set_session_id_context|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb> function given the pointer value of the instance, $sid_ctx, $sid_ctx_len, and returns its return value.
-
-If $sid_ctx_len is less than 0, it is set to the length of $sid_ctx.
-
-Exceptions:
-
-The context $sid_ctx must be defined. Otherwise an exception is thrown.
-
-If SSL_CTX_set_session_id_context failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
 =head2 set_min_proto_version
 
@@ -268,25 +250,17 @@ C<method set_verify : void ($mode : int, $verify_callback : L<Net::SSLeay::Callb
 
 Calls native L<SSL_CTX_set_verify|https://docs.openssl.org/master/man3/SSL_CTX_set_verify/> function given the pointer value of the instance, $mode, $verify_callback.
 
-=head2 set_tlsext_servername_callback
+=head2 set_alpn_select_cb
 
-C<method set_tlsext_servername_callback : long ($cb : L<Net::SSLeay::Callback::TlsextServername|SPVM::Net::SSLeay::Callback::TlsextServername>, $arg : object = undef);>
+C<method set_alpn_select_cb : void ($cb : Net::SSLeay::Callback::AlpnSelect, $arg : object);>
 
-Calls native L<SSL_CTX_set_tlsext_servername_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_servername_callback> function given $cb, and returns its return value.
+Calls native L<SSL_CTX_set_alpn_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb> function given $cb, $arg.
 
-$arg is expected to be passed to native L<SSL_CTX_set_tlsext_servername_arg|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_servername_callback> function.
+=head2 set_alpn_select_cb_with_protocols
 
-=head2 set_tlsext_status_cb
+C<method set_alpn_select_cb_with_protocols : void ($protocols : string[]);>
 
-C<method set_tlsext_status_cb : long ($cb : L<Net::SSLeay::Callback::TlsextStatus|SPVM::Net::SSLeay::Callback::TlsextStatus>, $arg : object = undef);>
-
-Calls native L<SSL_CTX_set_tlsext_status_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_status_cb> function given $cb, and returns its return value.
-
-$arg is expected to be passed to native L<SSL_CTX_set_tlsext_status_arg|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_status_cb> function.
-
-Exceptions:
-
-If SSL_CTX_set_tlsext_status_cb failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+Calls native L<SSL_CTX_set_alpn_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb> function defined to select $protocols.
 
 =head2 set_default_passwd_cb
 
@@ -296,61 +270,13 @@ Calls native L<SSL_CTX_set_default_passwd_cb|https://docs.openssl.org/1.0.2/man3
 
 $arg is expected to be passed to native L<SSL_CTX_set_default_passwd_cb_userdata|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_default_passwd_cb> function.
 
-=head2 set_psk_client_callback
+=head2 set_tlsext_servername_callback
 
-C<method set_psk_client_callback : void ($cb : L<Net::SSLeay::Callback::PskClient|SPVM::Net::SSLeay::Callback::PskClient>);>
+C<method set_tlsext_servername_callback : long ($cb : L<Net::SSLeay::Callback::TlsextServername|SPVM::Net::SSLeay::Callback::TlsextServername>, $arg : object = undef);>
 
-Calls native L<SSL_CTX_set_psk_client_callback|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_psk_client_callback> function given $cb.
+Calls native L<SSL_CTX_set_tlsext_servername_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_servername_callback> function given $cb, and returns its return value.
 
-=head2 set_psk_server_callback
-
-C<method set_psk_server_callback : void ($cb : L<Net::SSLeay::Callback::PskServer|SPVM::Net::SSLeay::Callback::PskServer>);>
-
-Calls native L<SSL_CTX_set_psk_server_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_use_psk_identity_hint> function given $cb.
-
-=head2 set_tlsext_ticket_key_cb
-
-C<method set_tlsext_ticket_key_cb : void ($cb : L<Net::SSLeay::Callback::TlsextTicketKey|SPVM::Net::SSLeay::Callback::TlsextTicketKey>);>
-
-Calls native L<SSL_CTX_set_tlsext_ticket_key_cb|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_tlsext_ticket_key_cb> function given $cb.
-
-=head2 set_alpn_select_cb_with_protocols
-
-C<method set_alpn_select_cb_with_protocols : void ($protocols : string[]);>
-
-Calls native L<SSL_CTX_set_alpn_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb> function defined to select $protocols.
-
-=head2 set_next_proto_select_cb_with_protocols
-
-C<method set_next_proto_select_cb_with_protocols : void ($protocols : string[]);>
-
-Calls native L<SSL_CTX_set_next_proto_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_next_proto_select_cb> function defined to select $protocols.
-
-=head2 set_next_protos_advertised_cb_with_protocols
-
-C<method set_next_protos_advertised_cb : void ($protocols : string[]);>
-
-Calls native L<SSL_CTX_set_next_protos_advertised_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb> function defined to select $protocols.
-
-=head2 sess_set_new_cb
-
-C<method sess_set_new_cb : void ($cb : L<Net::SSLeay::Callback::NewSession|SPVM::Net::SSLeay::Callback::NewSession>)>
-
-Calls native L<SSL_CTX_sess_set_new_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_set_get_cb> function given $cb.
-
-=head2 sess_set_remove_cb
-
-C<method sess_set_remove_cb : void ($cb : L<Net::SSLeay::Callback::RemoveSession|SPVM::Net::SSLeay::Callback::RemoveSession>)>
-
-Calls native L<SSL_CTX_sess_set_remove_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_set_get_cb/> function given $cb.
-
-=head2 set_default_verify_paths_windows
-
-C<method set_default_verify_paths_windows : void ();>
-
-It behaves as if L</"set_default_verify_paths"> had been invoked in Windows using the way described below.
-
-L<https://stackoverflow.com/questions/9507184/can-openssl-on-windows-use-the-system-certificate-store>
+$arg is expected to be passed to native L<SSL_CTX_set_tlsext_servername_arg|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_servername_callback> function.
 
 =head2 DESTROY
 

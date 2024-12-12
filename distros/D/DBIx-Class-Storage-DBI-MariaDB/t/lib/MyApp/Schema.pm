@@ -25,6 +25,10 @@ __PACKAGE__->add_columns(
         size        => 10,
         is_nullable => 1,
     },
+    picture => {
+        data_type   => 'MEDIUMBLOB',
+        is_nullable => 1,
+    },
 );
 __PACKAGE__->set_primary_key('artistid');
 __PACKAGE__->add_unique_constraint( ['name'] );

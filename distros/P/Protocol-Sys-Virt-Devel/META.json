@@ -4,7 +4,7 @@
       "Erik Huelsmann <ehuels@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -51,6 +51,6 @@
          "web" : "https://github.com/ehuelsmann/perl-protocol-sys-virt-devel"
       }
    },
-   "version" : "v0.0.5",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,12 +1,12 @@
 package Random::Simple;
 
-our $VERSION = '0.14';
-our $debug   = 0;
-
 use strict;
 use warnings;
 use Time::HiRes;
 use Carp qw(croak);
+
+our $VERSION = '0.15';
+our $debug   = 0;
 
 #############################################################
 
@@ -244,7 +244,7 @@ emulates C<CORE::rand()> using a better PRNG.
 
 =head1 BUGS
 
-Submit issues on Github: L<https://github.com/scottchiefbaker/perl-Date-Parse-Modern/issues>
+Submit issues on Github: L<https://github.com/scottchiefbaker/perl-Random-Simple/issues>
 
 =head1 SEE ALSO
 

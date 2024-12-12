@@ -13,9 +13,12 @@ use Text::Trim qw(trim);
 use Syntax::Keyword::Try;
 use XML::Fast;
 use Locale::Country;
+use JSON        qw(to_json);
+use Digest::SHA qw(sha256_hex);
+use Encode      qw(encode);
 
 use constant MAX_REDIRECTS => 3;
-our $VERSION = '0.17';    # VERSION
+our $VERSION = '0.18';    # VERSION
 
 =head2 config
 
@@ -81,6 +84,11 @@ sub config {
             description => 'EUROPA.EU: Consolidated list of persons, groups and entities subject to EU financial sanctions',
             url         => $eu_url,
             parser      => \&_eu_xml,
+        },
+        'UNSC-Sanctions' => {
+            description => 'UN: United Nations Security Council Consolidated List',
+            url         => $args{unsc_url} || 'https://scsanctions.un.org/resources/xml/en/consolidated.xml',
+            parser      => \&_unsc_xml,
         },
     };
 }
@@ -424,6 +432,105 @@ sub _eu_xml {
     };
 }
 
+sub _unsc_xml {
+    my ($xml_content) = @_;
+
+    # Preprocess the XML content to escape unescaped ampersands
+    $xml_content =~ s/&(?!(?:amp|lt|gt|quot|apos);)/&amp;/g;
+    my $data = xml2hash($xml_content,
+        array =>
+            ['INDIVIDUAL', 'INDIVIDUAL_ALIAS', 'INDIVIDUAL_ADDRESS', 'INDIVIDUAL_DATE_OF_BIRTH', 'INDIVIDUAL_PLACE_OF_BIRTH', 'INDIVIDUAL_DOCUMENT'])
+        ->{CONSOLIDATED_LIST};
+
+    # Extract the dateGenerated attribute from the first line of the XML content
+    my ($date_generated) = $data->{'-dateGenerated'};
+    die "Corrupt data. Release date is missing\n" unless $date_generated;
+
+    # Convert the dateGenerated to epoch milliseconds
+    my $publish_epoch = _date_to_epoch($date_generated // '');
+
+    my $dataset = [];
+
+    for my $individual (@{$data->{'INDIVIDUALS'}->{'INDIVIDUAL'}}) {
+        my %entry;
+
+        $entry{first_name}           = $individual->{'FIRST_NAME'};
+        $entry{second_name}          = $individual->{'SECOND_NAME'};
+        $entry{third_name}           = $individual->{'THIRD_NAME'}           // '';
+        $entry{fourth_name}          = $individual->{'FOURTH_NAME'}          // '';
+        $entry{name_original_script} = $individual->{'NAME_ORIGINAL_SCRIPT'} // '';
+
+        my @names = (
+            $entry{first_name}           // '',
+            $entry{second_name}          // '',
+            $entry{third_name}           // '',
+            $entry{fourth_name}          // '',
+            $entry{name_original_script} // '',
+        );
+
+        foreach my $alias (@{$individual->{INDIVIDUAL_ALIAS}}) {
+            if (ref($alias->{'ALIAS_NAME'}) ne 'HASH' || %{$alias->{'ALIAS_NAME'}}) {
+                push @names, $alias->{'ALIAS_NAME'} // '';
+            }
+        }
+        my @dob_list;
+
+        if ($individual->{'INDIVIDUAL_DATE_OF_BIRTH'}[0]{'TYPE_OF_DATE'} && $individual->{'INDIVIDUAL_DATE_OF_BIRTH'}[0]{'TYPE_OF_DATE'} eq 'BETWEEN')
+        {
+            push @dob_list, $individual->{'INDIVIDUAL_DATE_OF_BIRTH'}[0]{'FROM_YEAR'} // '';
+            push @dob_list, $individual->{'INDIVIDUAL_DATE_OF_BIRTH'}[0]{'TO_YEAR'}   // '';
+        } else {
+            if ($individual->{'INDIVIDUAL_DATE_OF_BIRTH'}[0]{'DATE'}) {
+                @dob_list = $individual->{'INDIVIDUAL_DATE_OF_BIRTH'}[0]{'DATE'};
+            } elsif ($individual->{'INDIVIDUAL_DATE_OF_BIRTH'}[0]{'YEAR'}) {
+                @dob_list = $individual->{'INDIVIDUAL_DATE_OF_BIRTH'}[0]{'YEAR'};
+            }
+        }
+
+        my @place_of_birth = (
+            $individual->{'INDIVIDUAL_PLACE_OF_BIRTH'}[0]{'CITY'}           // '',
+            $individual->{'INDIVIDUAL_PLACE_OF_BIRTH'}[0]{'STATE_PROVINCE'} // '',
+            $individual->{'INDIVIDUAL_PLACE_OF_BIRTH'}[0]{'COUNTRY'}        // ''
+        );
+
+        my @residence   = (map { $_->{'COUNTRY'}  // '' } @{$individual->{'INDIVIDUAL_ADDRESS'}});
+        my @postal_code = (map { $_->{'ZIP_CODE'} // '' } @{$individual->{'INDIVIDUAL_ADDRESS'}});
+
+        my @nationality = ($individual->{'NATIONALITY'}->{'VALUE'} // '');
+        my @national_id = [];
+        my @passport_no = [];
+
+        # Extract passport and national identification numbers
+        foreach my $document (@{$individual->{INDIVIDUAL_DOCUMENT}}) {
+            if ($document ne "") {
+                if ($document->{'TYPE_OF_DOCUMENT'} eq 'Passport') {
+                    push @passport_no, $document->{'NUMBER'} // '';
+                } elsif ($document->{'TYPE_OF_DOCUMENT'} eq 'National Identification Number') {
+                    push @national_id, $document->{'NUMBER'} // '';
+                }
+            }
+        }
+
+        _process_sanction_entry(
+            $dataset,
+            names          => \@names,
+            date_of_birth  => \@dob_list,
+            place_of_birth => \@place_of_birth,
+            residence      => \@residence,
+            nationality    => \@nationality,
+            citizen        => \@nationality,      # no seprate field for citizenship in the XML
+            postal_code    => \@postal_code,
+            national_id    => \@national_id,
+            passport_no    => \@passport_no,
+        );
+    }
+
+    return {
+        updated => $publish_epoch,
+        content => $dataset,
+    };
+}
+
 =head2 run
 
 Fetches latest version of lists, and returns combined hash of successfully downloaded ones
@@ -435,8 +542,14 @@ sub run {
 
     my $result = {};
 
-    my $config  = config(%args);
+    my $config = config(%args);
+
     my $retries = $args{retries} // 3;
+
+    # Ensure the handler subroutine reference is provided
+    die "Handler subroutine reference 'handler' is required" unless $args{handler};
+
+    my $handler = $args{handler};
 
     foreach my $id (sort keys %$config) {
         my $source = $config->{$id};
@@ -462,9 +575,14 @@ sub run {
                 my $count = $data->{content}->@*;
                 print "Source $id: $count entries fetched \n" if $args{verbose};
             }
+
+            my $hash = _create_hash($data->{content});
+            $handler->($id, _clean_url($source->{url}), _epoch_to_date($data->{updated}), $hash, scalar $data->{content}->@*);
+
         } catch ($e) {
             $result->{$id}->{error} = $e;
         }
+
     }
 
     return $result;
@@ -514,10 +632,8 @@ sub _entries_from_remote_src {
 
         try {
             my $resp = $ua->get($src_url);
-
             die "File not downloaded for $id\n" if $resp->result->is_error;
             $entries = $resp->result->body;
-
             last;
         } catch ($e) {
             $error_log = $e;
@@ -525,6 +641,67 @@ sub _entries_from_remote_src {
     }
 
     return $entries // die "An error occurred while fetching data from '$src_url' due to $error_log\n";
+}
+
+=head2 _epoch_to_date
+
+Converts an epoch timestamp to a date string in YYYY-MM-DD format.
+
+  my $date = $fetcher->_epoch_to_date(1672444800);
+
+=cut
+
+sub _epoch_to_date {
+    my $epoch = shift;
+
+    # Input validation
+    die "Epoch timestamp must be defined" unless defined $epoch;
+
+    # Convert epoch to DateTime object
+    my $dt = DateTime->from_epoch(epoch => $epoch);
+
+    # Return formatted date string
+    return $dt->ymd('-');
+}
+
+=head2 _clean_url
+
+Removes specific query parameters from a URL.
+
+  my $clean_url = $fetcher->_clean_url($url);
+
+=cut
+
+sub _clean_url {
+    my $url = shift;
+
+    # Remove the token parameter from the URL
+    $url =~ s/[?&]token=[^&]+//;
+
+    return $url;
+}
+
+=head2 _create_hash
+
+Converts the data to a string and creates a SHA-256 hash.
+
+  my $hash = $fetcher->create_hash($data);
+
+=cut
+
+sub _create_hash {
+    my ($data) = @_;
+
+    # Convert the data to a JSON string
+    my $json_string = to_json(
+        $data,
+        {
+            canonical => 1,
+            utf8      => 1
+        });
+
+    # Generate and return the SHA-256 hash
+    return sha256_hex($json_string);
 }
 
 1;

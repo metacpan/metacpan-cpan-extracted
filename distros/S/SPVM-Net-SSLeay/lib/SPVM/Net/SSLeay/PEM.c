@@ -104,54 +104,6 @@ int32_t SPVM__Net__SSLeay__PEM__read_bio_X509_CRL(SPVM_ENV* env, SPVM_VALUE* sta
   return 0;
 }
 
-int32_t SPVM__Net__SSLeay__PEM__read_bio_DHparams(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  void* obj_bp = stack[0].oval;
-  
-  if (!obj_bp) {
-    return env->die(env, stack, "The BIO $bp must be defined.", __func__, FILE_NAME, __LINE__);
-  }
-  
-  BIO* bp = env->get_pointer(env, stack, obj_bp);
-  
-  DH* dh = PEM_read_bio_DHparams(bp, NULL, NULL, NULL);
-  
-  if (!dh) {
-    int64_t ssl_error = ERR_peek_last_error();
-    
-    char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
-    ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
-    
-    env->die(env, stack, "[OpenSSL Error]PEM_read_bio_DHparams failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
-    
-    if (ERR_GET_REASON(ssl_error) == PEM_R_NO_START_LINE) {
-      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error::PEM_R_NO_START_LINE", &error_id, __func__, FILE_NAME, __LINE__);
-      if (error_id) { return error_id; }
-      error_id = tmp_error_id;
-    }
-    else {
-      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
-      if (error_id) { return error_id; }
-      error_id = tmp_error_id;
-    }
-    
-    return error_id;
-  }
-  
-  void* obj_address_dh = env->new_pointer_object_by_name(env, stack, "Address", dh, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  stack[0].oval = obj_address_dh;
-  env->call_class_method_by_name(env, stack, "Net::SSLeay::DH", "new_with_pointer", 1, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
-  void* obj_dh = stack[0].oval;
-  
-  stack[0].oval = obj_dh;
-  
-  return 0;
-}
-
 int32_t SPVM__Net__SSLeay__PEM__read_bio_PrivateKey(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;

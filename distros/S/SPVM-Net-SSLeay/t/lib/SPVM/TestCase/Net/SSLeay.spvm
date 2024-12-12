@@ -556,88 +556,7 @@ class TestCase::Net::SSLeay {
     return 1;
   }
   
-  static method DH : int () {
-    
-    {
-      my $dh = Net::SSLeay::DH->new;
-      
-      unless ($dh is_type Net::SSLeay::DH) {
-        return 0;
-      }
-    }
-    
-    return 1;
-  }
-  
   static method PEM : int () {
-    
-    {
-      
-      my $dh_pem = <<'EOS';
------BEGIN DH PARAMETERS-----
-MIIBCAKCAQEAr8wskArj5+1VCVsnWt/RUR7tXkHJ7mGW7XxrLSPOaFyKyWf8lZht
-iSY2Lc4oa4Zw8wibGQ3faeQu/s8fvPq/aqTxYmyHPKCMoze77QJHtrYtJAosB9SY
-CN7s5Hexxb5/vQ4qlQuOkVrZDiZO9GC4KaH9mJYnCoAsXDhDft6JT0oRVSgtZQnU
-gWFKShIm+JVjN94kGs0TcBEesPTK2g8XVHK9H8AtSUb9BwW2qD/T5RmgNABysApO
-Ps2vlkxjAHjJcqc3O+OiImKik/X2rtBTZjpKmzN3WWTB0RJZCOWaLlDO81D01o1E
-aZecz3Np9KIYey900f+X7zC2bJxEHp95ywIBAg==
------END DH PARAMETERS-----
-EOS
-      
-      my $bio = Net::SSLeay::BIO->new;
-      
-      $bio->write($dh_pem);
-      
-      my $dh = Net::SSLeay::PEM->read_bio_DHparams($bio);
-      
-      unless ($dh is_type Net::SSLeay::DH) {
-        return 0;
-      }
-      
-    }
-    
-    {
-      
-      my $dh_pem = <<'EOS';
------BEGIN DH PARAMETERS-----
-MIIBCAKCAQEAr8wskArj5+1VCVsnWt/RUR7tXkHJ7mGW7XxrLSPOaFyKyWf8lZht
-iSY2Lc4oa4Zw8wibGQ3faeQu/s8fvPq/aqTxYmyHPKCMoze77QJHtrYtJAosB9SY
-CN7s5Hexxb5/vQ4qlQuOkVrZDiZO9GC4KaH9mJYnCoAsXDhDft6JT0oRVSgtZQnU
-gWFKShIm+JVjN94kGs0TcBEesPTK2g8XVHK9H8AtSUb9BwW2qD/T5RmgNABysApO
-Ps2vlkxjAHjJcqc3O+OiImKik/X2rtBTZjpKmzN3WWTB0RJZCOWaLlDO81D01o1E
-aZecz3Np9KIYey900f+X7zC2bJxEHp95ywIBAg==
------END DH PARAMETERS-----
-EOS
-      
-      my $bio = Net::SSLeay::BIO->new;
-      
-      $bio->write($dh_pem);
-      
-      my $dh = Net::SSLeay::PEM->read_bio_DHparams($bio);
-      
-      unless ($dh is_type Net::SSLeay::DH) {
-        return 0;
-      }
-      
-      while (1) {
-        my $dh = (Net::SSLeay::DH)undef;
-        
-        eval { $dh = Net::SSLeay::PEM->read_bio_DHparams($bio); }
-        
-        if ($@) {
-          if (eval_error_id isa_error Net::SSLeay::Error::PEM_R_NO_START_LINE) {
-            last;
-          }
-          else {
-            die $@;
-          }
-        }
-        
-        unless ($dh is_type Net::SSLeay::DH) {
-          return 0;
-        }
-      }
-    }
     
     {
       my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.cert.pem", "r");
@@ -1364,16 +1283,4 @@ EOS
     return 1;
   }
   
-  static method SSL_SESSION : int () {
-    
-    {
-      my $ssl_session = Net::SSLeay::SSL_SESSION->new;
-      
-      unless ($ssl_session is_type Net::SSLeay::SSL_SESSION) {
-        return 0;
-      }
-    }
-    
-    return 1;
-  }
 }

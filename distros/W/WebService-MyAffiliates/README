@@ -161,6 +161,8 @@ METHODS
 
  request
 
+ reset_errstr
+
 AUTHOR
 
     Binary.com <fayland@binary.com>

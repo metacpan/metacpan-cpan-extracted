@@ -3,7 +3,7 @@ package Net::Async::Blockchain::BTC;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 =head1 NAME
 
@@ -95,7 +95,7 @@ async sub subscribe {
         $self->$curry::weak(
             sub {
                 my ($self, $message) = @_;
-                return $self->subscription_response($subscription, $message);
+                return $self->subscription_response($subscription, unpack('H*', $message));
             }));
 }
 

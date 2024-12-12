@@ -43,8 +43,6 @@ ok(SPVM::TestCase::Net::SSLeay->SSL_METHOD);
 
 ok(SPVM::TestCase::Net::SSLeay->BIO);
 
-ok(SPVM::TestCase::Net::SSLeay->DH);
-
 ok(SPVM::TestCase::Net::SSLeay->PEM);
 
 ok(SPVM::TestCase::Net::SSLeay->EVP);

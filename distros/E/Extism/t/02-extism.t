@@ -7,7 +7,7 @@ use Extism ':all';
 use JSON::PP qw(encode_json decode_json);
 use File::Temp qw(tempfile);
 use Devel::Peek qw(Dump);
-plan tests => 45;
+plan tests => 54;
 
 # ...
 ok(Extism::version());
@@ -213,3 +213,68 @@ eval {
 ok($@);
 ok($@->{code} != 0);
 ok($@->{message});
+
+# Test host_context
+{
+    my $voidfunction = Extism::Function->new("hello_void", [], [], sub {
+        ok(! defined Extism::CurrentPlugin::host_context);
+        return;
+    });
+    my $paramsfunction = Extism::Function->new("hello_params", [Extism_F64, Extism_I32, Extism_F32, Extism_I64], [Extism_I64], sub {
+        # not called
+    });
+    my $fplugin = Extism::Plugin->new($hostwasm, {functions => [$voidfunction, $paramsfunction], wasi => 1});
+    $fplugin->call('call_hello_void');
+}
+{
+    my %context = ( abc => 123);
+    my $voidfunction = Extism::Function->new("hello_void", [], [], sub {
+        my $ctx = Extism::CurrentPlugin::host_context;
+        is_deeply($ctx, \%context);
+        ok($ctx == \%context);
+        return;
+    });
+    my $paramsfunction = Extism::Function->new("hello_params", [Extism_F64, Extism_I32, Extism_F32, Extism_I64], [Extism_I64], sub {
+        # not called
+    });
+    my $fplugin = Extism::Plugin->new($hostwasm, {functions => [$voidfunction, $paramsfunction], wasi => 1});
+    $fplugin->call('call_hello_void', '', \%context);
+}
+
+# fuel
+{
+    my $plugin = Extism::Plugin->new($wasm, {wasi => 1, fuel_limit => 100000});
+    my $output = $plugin->call('count_vowels', "this is a test");
+    my $outputhash = decode_json($output);
+    ok($outputhash->{count} == 4);
+}
+{
+    my $plugin = Extism::Plugin->new($wasm, {wasi => 1, fuel_limit => 5});
+    eval {
+        my $output = $plugin->call('count_vowels', "this is a test");
+    };
+    ok($@);
+}
+
+# http headers
+{
+    my $plugin = Extism::Plugin->new($wasm, {wasi => 1, allow_http_response_headers => 1});
+    ok($plugin);
+}
+
+# compiled plugin
+{
+    my $compiled = Extism::CompiledPlugin->new($wasm, {wasi => 1});
+    for (1..2) {
+        my $plugin = Extism::Plugin->new($compiled);
+        my $output = $plugin->call('count_vowels', "this is a test");
+        my $outputhash = decode_json($output);
+        ok($outputhash->{count} == 4);
+    }
+}
+{
+    eval {
+        Extism::CompiledPlugin->new($wasm, {wasi => 1, fuel_limit => 20});
+    };
+    ok($@);
+}

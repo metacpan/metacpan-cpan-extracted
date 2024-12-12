@@ -1,4 +1,4 @@
-package Extism::Plugin;
+package Extism::Plugin v0.3.0;
 
 use 5.016;
 use strict;
@@ -6,6 +6,9 @@ use warnings;
 use Carp qw(croak);
 use Extism::XS qw(
     plugin_new
+    plugin_new_with_fuel_limit
+    plugin_new_from_compiled
+    plugin_allow_http_response_headers
     plugin_new_error_free
     plugin_call
     plugin_error
@@ -20,35 +23,35 @@ use Extism::XS qw(
     );
 use Extism::Plugin::CallException;
 use Extism::Plugin::CancelHandle;
+use Extism::CompiledPlugin qw(BuildPluginNewParams);
 use Data::Dumper qw(Dumper);
 use Devel::Peek qw(Dump);
 use JSON::PP qw(encode_json);
 use Scalar::Util qw(reftype);
-use version 0.77;
-our $VERSION = qv(v0.2.0);
 
 sub new {
     my ($name, $wasm, $options) = @_;
-    my $functions = [];
-    my $with_wasi = 0;
-    if ($options) {
-        if (exists $options->{functions}) {
-            $functions = $options->{functions};
-        }
-        if (exists $options->{wasi}) {
-            $with_wasi = $options->{wasi};
-        }
+    my ($plugin, $opt, $errptr);
+    if (!ref($wasm) || !$wasm->isa('Extism::CompiledPlugin')) {
+        $opt = defined $options ? {%$options} : {};
+        my $p = BuildPluginNewParams($wasm, $opt);
+        $plugin = ! defined $p->{fuel_limit}
+            ? plugin_new($p->{wasm}, length($p->{wasm}), $p->{functions}, $p->{n_functions}, $p->{wasi}, $p->{errmsg})
+            : plugin_new_with_fuel_limit($p->{wasm}, length($p->{wasm}), $p->{functions}, $p->{n_functions}, $p->{wasi}, $p->{fuel_limit}, $p->{errmsg});
+        $errptr = $p->{errptr};
+    } else {
+        $opt = $wasm->{options};
+        $errptr = "\x00" x 8;
+        my $errmsg = unpack('Q', pack('P', $errptr));
+        $plugin = plugin_new_from_compiled($wasm->{compiled}, $errmsg);
     }
-    my $errptr = "\x00" x 8;
-    my $errptrptr = unpack('Q', pack('P', $errptr));
-    my @rawfunctions = map {$$_} @{$functions};
-    my $functionsarray = pack('Q*', @rawfunctions);
-    my $functionsptr = unpack('Q', pack('P', $functionsarray));
-    my $plugin = plugin_new($wasm, length($wasm), $functionsptr, scalar(@rawfunctions), $with_wasi, $errptrptr);
     if (! $plugin) {
         my $errmsg = unpack('p', $errptr);
         plugin_new_error_free(unpack('Q', $errptr));
         croak $errmsg;
+    }
+    if ($opt->{allow_http_response_headers}) {
+        plugin_allow_http_response_headers($plugin);
     }
     bless \$plugin, $name
 }
@@ -59,14 +62,14 @@ sub new {
 # passed to the plugin. If INPUT is a reference, the referenced item will be
 # encoded with json and then passed to the plugin.
 sub call {
-    my ($self, $func_name, $input) = @_;
+    my ($self, $func_name, $input, $host_context) = @_;
     $input //= '';
     my $type = reftype($input);
     if ($type) {
         $input = $$input if($type eq 'SCALAR');
         $input = encode_json($input);
     }
-    my $rc = plugin_call($$self, $func_name, $input, length($input));
+    my $rc = plugin_call($$self, $func_name, $input, length($input), $host_context);
     if ($rc != 0) {
         die Extism::Plugin::CallException->new($rc, plugin_error($$self));
     }

@@ -26,15 +26,15 @@ requires:
   IO::Async::Notifier: '0'
   IO::Async::Stream: '0'
   Log::Any: '0'
-  Protocol::Sys::Virt: v10.9.13
-  Protocol::Sys::Virt::KeepAlive: v10.9.13
-  Protocol::Sys::Virt::Remote: v10.9.13
-  Protocol::Sys::Virt::Remote::XDR: v10.9.13
-  Protocol::Sys::Virt::UNIXSocket: v10.9.13
-  Protocol::Sys::Virt::URI: v10.9.13
+  Protocol::Sys::Virt: v10.10.13
+  Protocol::Sys::Virt::KeepAlive: v10.10.13
+  Protocol::Sys::Virt::Remote: v10.10.13
+  Protocol::Sys::Virt::Remote::XDR: v10.10.13
+  Protocol::Sys::Virt::UNIXSocket: v10.10.13
+  Protocol::Sys::Virt::URI: v10.10.13
   Sublike::Extended: '0'
   perl: v5.26.0
 resources:
   repository: git://github.com/ehuelsmann/perl-sys-async-virt.git
-version: v0.0.12
+version: v0.0.13
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

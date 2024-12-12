@@ -24,9 +24,13 @@ no_index:
     - inc
 requires:
   DBD::MariaDB: '1.00'
+  DBI: '0'
   DBIx::Class: '0.082820'
+  perl: v5.8.9
 resources:
   bugtracker: https://github.com/Siemplexus/DBIx-Class-Storage-DBI-MariaDB/issues
   repository: https://github.com/Siemplexus/DBIx-Class-Storage-DBI-MariaDB.git
-version: v0.1.0
+version: v0.1.1
+x_contributors:
+  - 'Dave Lambley <dave@lambley.me.uk>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

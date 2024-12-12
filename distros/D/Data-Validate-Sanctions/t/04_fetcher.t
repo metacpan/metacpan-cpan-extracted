@@ -4,6 +4,7 @@ use utf8;
 
 use Class::Unload;
 use Data::Validate::Sanctions;
+use Data::Validate::Sanctions::Fetcher;
 use YAML::XS   qw(Dump);
 use Path::Tiny qw(tempfile);
 use List::Util qw(first);
@@ -14,12 +15,17 @@ use Test::MockModule;
 use Test::Warn;
 use Test::MockObject;
 use List::Util;
+use Digest::SHA qw(sha256_hex);
+
+use JSON;
 
 my %args = (
     eu_url                => "file://t/data/sample_eu.xml",
     ofac_sdn_url          => "file://t/data/sample_ofac_sdn.zip",
     ofac_consolidated_url => "file://t/data/sample_ofac_consolidated.xml",
     hmt_url               => "file://t/data/sample_hmt.csv",
+    unsc_url              => "file://t/data/sample_unsc.xml",
+    handler               => sub { },
 );
 
 my $mocked_ua = Test::MockModule->new('Mojo::UserAgent');
@@ -38,6 +44,7 @@ subtest 'source url arguments' => sub {
         ofac_sdn_url          => 'ofac_snd.binary.com',
         ofac_consolidated_url => 'ofac_con.binary.com',
         hmt_url               => 'hmt.binary.com',
+        handler               => sub { },
     );
 
     my $data = Data::Validate::Sanctions::Fetcher::run(%test_args);
@@ -55,10 +62,13 @@ subtest 'source url arguments' => sub {
         'OFAC-SDN' => {
             error => ignore(),
         },
+        'UNSC-Sanctions' => {
+            error => ignore(),
+        },
         },
         'All sources return errors - no content';
 
-    is $calls, 3 * 4, 'the fetcher tried thrice per source and failed finally.';
+    is $calls, 3 * 5, 'the fetcher tried thrice per source and failed finally.';
 
 };
 
@@ -253,10 +263,142 @@ subtest 'OFAC Sanctions' => sub {
     }
 };
 
+# Test _epoch_to_date
+subtest '_epoch_to_date' => sub {
+    # Test valid epoch
+    is Data::Validate::Sanctions::Fetcher::_epoch_to_date(1672444800), '2022-12-31', 'Valid epoch timestamp';
+
+    # Test another valid epoch
+    is Data::Validate::Sanctions::Fetcher::_epoch_to_date(1609459200), '2021-01-01', 'Another valid epoch timestamp';
+
+    # Test invalid epoch (undefined)
+    {
+        my $error;
+        eval { Data::Validate::Sanctions::Fetcher::_epoch_to_date(undef) };
+        $error = $@;
+        like($error, qr/Epoch timestamp must be defined/, 'Undefined epoch timestamp');
+    }
+
+    # Test invalid epoch (non-numeric)
+    {
+        my $error;
+        eval { Data::Validate::Sanctions::Fetcher::_epoch_to_date('invalid') };
+        $error = $@;
+        like($error, qr/Validation failed for type named Num/, 'Non-numeric epoch timestamp');
+    }
+
+    # Test epoch for a date in the past
+    is Data::Validate::Sanctions::Fetcher::_epoch_to_date(-315619200), '1960-01-01', 'Epoch timestamp for a date in the past';
+};
+
+# Test _clean_url
+subtest '_clean_url' => sub {
+    # Test URL with token parameter
+    is Data::Validate::Sanctions::Fetcher::_clean_url('http://example.com?token=abc123'), 'http://example.com', 'URL with token parameter';
+
+    # Test URL with multiple parameters including token
+    is Data::Validate::Sanctions::Fetcher::_clean_url('http://example.com?param1=value1&token=abc123&param2=value2'),
+        'http://example.com?param1=value1&param2=value2', 'URL with multiple parameters including token';
+
+    # Test URL without token parameter
+    is Data::Validate::Sanctions::Fetcher::_clean_url('http://example.com?param1=value1&param2=value2'),
+        'http://example.com?param1=value1&param2=value2', 'URL without token parameter';
+
+    # Test URL with token parameter at the end
+    is Data::Validate::Sanctions::Fetcher::_clean_url('http://example.com?param1=value1&param2=value2&token=abc123'),
+        'http://example.com?param1=value1&param2=value2', 'URL with token parameter at the end';
+
+    # Test URL with token parameter in the middle
+    is Data::Validate::Sanctions::Fetcher::_clean_url('http://example.com?param1=value1&token=abc123&param2=value2'),
+        'http://example.com?param1=value1&param2=value2', 'URL with token parameter in the middle';
+
+    # Test URL with only token parameter
+    is Data::Validate::Sanctions::Fetcher::_clean_url('http://example.com?token=abc123'), 'http://example.com', 'URL with only token parameter';
+};
+
+# Test _create_hash
+subtest '_create_hash' => sub {
+    # Test hash creation for simple data
+    is Data::Validate::Sanctions::Fetcher::_create_hash({key => 'value'}), sha256_hex(to_json({key => 'value'}, {canonical => 1, utf8 => 1})),
+        'Hash creation for simple data';
+
+    # Test hash creation for complex data
+    my $complex_data = {
+        key1 => 'value1',
+        key2 => [1, 2, 3],
+        key3 => {subkey => 'subvalue'}};
+    is Data::Validate::Sanctions::Fetcher::_create_hash($complex_data), sha256_hex(to_json($complex_data, {canonical => 1, utf8 => 1})),
+        'Hash creation for complex data';
+
+    # Test hash creation for empty data
+    is Data::Validate::Sanctions::Fetcher::_create_hash({}), sha256_hex(to_json({}, {canonical => 1, utf8 => 1})), 'Hash creation for empty data';
+
+    # Test hash creation for nested data
+    my $nested_data = {
+        key1 => 'value1',
+        key2 => {
+            subkey1 => 'subvalue1',
+            subkey2 => [4, 5, 6]}};
+    is Data::Validate::Sanctions::Fetcher::_create_hash($nested_data), sha256_hex(to_json($nested_data, {canonical => 1, utf8 => 1})),
+        'Hash creation for nested data';
+
+    # Test hash creation for data with special characters
+    my $special_data = {
+        key1 => 'value1',
+        key2 => 'value with special characters: !@#$%^&*()'
+    };
+    is Data::Validate::Sanctions::Fetcher::_create_hash($special_data), sha256_hex(to_json($special_data, {canonical => 1, utf8 => 1})),
+        'Hash creation for data with special characters';
+};
+
+subtest 'UNSC Sanctions' => sub {
+    my $data = Data::Validate::Sanctions::Fetcher::run(%args);
+
+    my $source_name = 'UNSC-Sanctions';
+    ok $data->{$source_name}, 'Sanctions are loaded from the sample file';
+    is $data->{$source_name}{updated},           1729123202, "Sanctions update date matches the content of sample file";
+    is scalar @{$data->{$source_name}{content}}, 7,          "Number of names matches the content of the sample file";
+
+    is_deeply find_entry_by_name($data->{$source_name}, 'MOHAMMAD NAIM'),
+        {
+        'national_id'    => [[]],
+        'place_of_birth' => ['af'],
+        'citizen'        => ['af'],
+        'nationality'    => ['af'],
+        'postal_code'    => ['63000'],
+        'passport_no'    => [[]],
+        'dob_year'       => ['1975'],
+        'names'          => [
+            'MOHAMMAD NAIM',
+            'BARICH',
+            'KHUDAIDAD',
+            "\x{645}\x{62d}\x{645}\x{62f} \x{646}\x{639}\x{64a}\x{645} \x{628}\x{631}\x{64a}\x{62e} \x{62e}\x{62f}\x{627}\x{64a}\x{62f}\x{627}\x{62f}",
+            'Mullah Naeem Barech',
+            'Mullah Naeem Baraich',
+            'Mullah Naimullah',
+            'Mullah Naim Bareh',
+            'Mohammad Naim',
+            'Mullah Naim Barich',
+            'Mullah Naim Barech',
+            'Mullah Naim Barech Akhund',
+            'Mullah Naeem Baric',
+            'Naim Berich',
+            'Haji Gul Mohammed Naim Barich',
+            'Gul Mohammad',
+            'Haji Ghul Mohammad',
+            'Spen Zrae',
+            'Gul Mohammad Kamran',
+            'Mawlawi Gul Mohammad'
+        ]
+        },
+        'Alias names as saved in a single entry';
+};
+
 sub find_entry_by_name {
     my ($data, $name) = @_;
 
     my @result;
+
     for my $entry ($data->{content}->@*) {
         push(@result, $entry) if List::Util::any { $_ eq $name } $entry->{names}->@*;
     }
@@ -268,4 +410,4 @@ sub find_entry_by_name {
     return \@result;
 }
 
-done_testing;
+done_testing();

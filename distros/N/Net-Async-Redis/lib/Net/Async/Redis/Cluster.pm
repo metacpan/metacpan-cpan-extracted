@@ -2,7 +2,7 @@ package Net::Async::Redis::Cluster;
 
 use Full::Class qw(:v1), extends => qw(Net::Async::Redis::Commands);
 
-our $VERSION = '6.005'; # VERSION
+our $VERSION = '6.006'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
@@ -684,27 +684,49 @@ sub execute_command {
     return $self->find_node_and_execute_command(@cmd)->retain;
 }
 
-async sub find_node_and_execute_command ($self, @cmd) {
-    my $node = await $self->find_node(@cmd);
-    my $redis = await (
-           $self->{use_read_replica}
-        && $node->replica_count
-        && Net::Async::Redis->extract_spec_for_command(\@cmd)->{acl_cat}{'@read'}
-        ? $node->replica_connection
-        : $node->primary_connection
-    );
+async sub execute_command_on_node ($self, %args) {
+    my $node = delete $args{node} or die 'need a node';
+    my $command = delete $args{command} or die 'need a command';
+    $log->tracef('Will execute %s on cluster', join ' ', $command->@*);
 
     # Some commands have modifiers around them for RESP2/3 transparent support
-    my ($command, @args) = @cmd;
-    try {
-        $command = lc $command;
-        return await $redis->$command(@args);
-    } catch ($e) {
-        die $e unless $e =~ /MOVED/;
-        my ($moved, $slot, $host_port) = split ' ', $e;
-        await $self->register_moved_slot($slot => $host_port);
-        return await $self->execute_command(@cmd);
+    my ($method, @args) = $command->@*;
+    $method = lc $method;
+    ATTEMPT:
+    for my $attempt (1..5) {
+        try {
+            my $redis = await (
+                   $self->{use_read_replica}
+                && $node->replica_count
+                && Net::Async::Redis->extract_spec_for_command($command)->{acl_cat}{'@read'}
+                ? $node->replica_connection
+                : $node->primary_connection
+            );
+            return await $redis->$method(@args);
+        } catch ($e) {
+            # Only catch cluster-migration responses - everything else needs to be reported upstream
+            die $e unless $e =~ /^(?:MOVED|ASK)\s+/;
+
+            my ($moved, $slot, $host_port) = split ' ', $e;
+            if($moved eq 'ASK') { # Apply this temporarily - don't record the new slot, it's probably migrating
+                my ($host, $port) = split /:/, $host_port;
+                $node = $self->node_by_host_port($host, $port);
+                next ATTEMPT;
+            } else { # the princess is in a different castle
+                await $self->register_moved_slot($slot => $host_port);
+                $node = await $self->find_node($command->@*);
+                next ATTEMPT;
+            }
+        }
     }
+}
+
+async sub find_node_and_execute_command ($self, @cmd) {
+    my $node = await $self->find_node(@cmd);
+    return await $self->execute_command_on_node(
+        node => $node,
+        command => \@cmd
+    );
 }
 
 async sub find_node {

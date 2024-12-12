@@ -3,7 +3,7 @@ use warnings;
 
 
 package XDR::Gen;
-$XDR::Gen::VERSION = '0.0.5';
+$XDR::Gen::VERSION = '1.0.0';
 use Carp qw(croak confess);
 use IO::Handle;
 use List::Util qw(max);
@@ -1249,7 +1249,7 @@ XDR::Gen - Generator for XDR (de)serializers
 
 =head1 VERSION
 
-version 0.0.5
+version 1.0.0
 
 =head1 SYNOPSIS
 

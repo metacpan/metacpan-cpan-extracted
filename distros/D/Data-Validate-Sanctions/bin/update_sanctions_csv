@@ -38,7 +38,7 @@ my %args = (
     hmt_url               => $hmt_url,
     ofac_sdn_url          => $ofac_sdn_url,
     ofac_consolidated_url => $ofac_consolidated_url,
-
+    handler               => sub { },
 );
 
 Data::Validate::Sanctions->new(%args)->update_data;

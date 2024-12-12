@@ -72,6 +72,21 @@ my $sample_data = {
                 passport_no    => ['asdffdsa'],
             }]
     },
+    'UNSC-Sanctions' => {
+        updated => 91,
+        content => [{
+                names     => ['UBL'],
+                dob_epoch => [],
+                dob_year  => []
+            },
+            {
+                names     => ['USAMA BIN LADEN'],
+                dob_epoch => [],
+                dob_year  => []
+            },
+        ],
+        error => ''
+    },
 };
 
 subtest 'Class constructor' => sub {
@@ -106,6 +121,12 @@ subtest 'Class constructor' => sub {
             updated  => 0,
             error    => ''
         },
+        'UNSC-Sanctions' => {
+            content  => [],
+            verified => 0,
+            updated  => 0,
+            error    => ''
+        },
         },
         'There is no sanction data';
 };
@@ -115,6 +136,10 @@ subtest 'Update Data' => sub {
     my $mock_fetcher = Test::MockModule->new('Data::Validate::Sanctions::Fetcher');
     my $mock_data    = {
         'EU-Sanctions' => {
+            updated => 90,
+            content => []
+        },
+        'UNSC-Sanctions' => {
             updated => 90,
             content => []
         },
@@ -157,22 +182,30 @@ subtest 'Update Data' => sub {
             updated  => 0,
             error    => ''
         },
+        'UNSC-Sanctions' => {
+            content  => [],
+            verified => 1500,
+            updated  => 90,
+        },
     };
     is_deeply $validator->data, $expected, 'Data is correctly loaded';
-    check_redis_content('EU-Sanctions',      $mock_data->{'EU-Sanctions'}, 1500);
-    check_redis_content('HMT-Sanctions',     {},                           1500);
-    check_redis_content('OFAC-Consolidated', {},                           1500);
-    check_redis_content('OFAC-SDN',          {},                           1500);
+    check_redis_content('EU-Sanctions',      $mock_data->{'EU-Sanctions'},   1500);
+    check_redis_content('HMT-Sanctions',     {},                             1500);
+    check_redis_content('OFAC-Consolidated', {},                             1500);
+    check_redis_content('OFAC-SDN',          {},                             1500);
+    check_redis_content('UNSC-Sanctions',    $mock_data->{'UNSC-Sanctions'}, 1500);
     is $index_call_counter, 1, 'index called after update';
     $validator->update_data();
     is $index_call_counter, 1, 'index not been called after update, due to unchanged data';
 
     # rewrite to redis if update (publish) time is changed
     set_fixed_time(1600);
-    $mock_data->{'EU-Sanctions'}->{updated} = 91;
+    $mock_data->{'EU-Sanctions'}->{updated}   = 91;
+    $mock_data->{'UNSC-Sanctions'}->{updated} = 91;
     $validator->update_data();
-    $expected->{'EU-Sanctions'}->{updated} = 91;
-    $expected->{$_}->{verified} = 1600 for keys %$expected;
+    $expected->{'EU-Sanctions'}->{updated}   = 91;
+    $expected->{'UNSC-Sanctions'}->{updated} = 91;
+    $expected->{$_}->{verified}              = 1600 for keys %$expected;
     is_deeply $validator->data, $expected, 'Data is loaded with new update time';
     check_redis_content('EU-Sanctions', $mock_data->{'EU-Sanctions'}, 1600, 'Redis content changed by increased update time');
     is $index_call_counter, 2, 'index called after update';
@@ -193,8 +226,23 @@ subtest 'Update Data' => sub {
                 },
             ]
         },
+        'UNSC-Sanctions' => {
+            updated => 91,
+            content => [{
+                    names     => ['UBL'],
+                    dob_epoch => [],
+                    dob_year  => []
+                },
+                {
+                    names     => ['USAMA BIN LADEN'],
+                    dob_epoch => [],
+                    dob_year  => []
+                },
+            ]
+        },
     };
-    $expected->{'EU-Sanctions'} = clone($mock_data->{'EU-Sanctions'});
+    $expected->{'EU-Sanctions'}   = clone($mock_data->{'EU-Sanctions'});
+    $expected->{'UNSC-Sanctions'} = clone($mock_data->{'UNSC-Sanctions'});
     set_fixed_time(1700);
     $validator->update_data();
     $expected->{$_}->{verified} = 1700 for keys %$expected;
@@ -215,7 +263,7 @@ subtest 'Update Data' => sub {
 
     set_fixed_time(1850);
     $validator = Data::Validate::Sanctions::Redis->new(connection => $redis);
-    is_deeply $validator->data->{'EU-Sanctions'}, $expected->{'EU-Sanctions'}, 'All fieds are correctly loaded form redis in constructor';
+    is_deeply $validator->data->{'EU-Sanctions'}, $expected->{'EU-Sanctions'}, 'All fields are correctly loaded form redis in constructor';
 
     # All sources are updated at the same time
     $mock_data = $sample_data;
@@ -256,6 +304,12 @@ subtest 'load data' => sub {
             error    => ''
         },
         'OFAC-SDN' => {
+            content  => [],
+            verified => 0,
+            updated  => 0,
+            error    => ''
+        },
+        'UNSC-Sanctions' => {
             content  => [],
             verified => 0,
             updated  => 0,

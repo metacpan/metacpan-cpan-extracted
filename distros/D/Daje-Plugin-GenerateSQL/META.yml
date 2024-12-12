@@ -1,0 +1,69 @@
+---
+abstract: "It's new $module"
+author:
+  - 'janeskil1525 <janeskil1525@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daje-Plugin-GenerateSQL
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Daje::Plugin::Database::Operations:
+    file: lib/Daje/Plugin/Database/Operations.pm
+    version: '0.01'
+  Daje::Plugin::Database::SqlLite:
+    file: lib/Daje/Plugin/Database/SqlLite.pm
+  Daje::Plugin::GenerateSQL:
+    file: lib/Daje/Plugin/GenerateSQL.pm
+    version: '0.02'
+  Daje::Plugin::Input::ConfigManager:
+    file: lib/Daje/Plugin/Input/ConfigManager.pm
+    version: '0.01'
+  Daje::Plugin::Output::Table:
+    file: lib/Daje/Plugin/Output/Table.pm
+    version: '0.01'
+  Daje::Plugin::SQL::Base::Common:
+    file: lib/Daje/Plugin/SQL/Base/Common.pm
+    version: '0.01'
+  Daje::Plugin::SQL::Manager:
+    file: lib/Daje/Plugin/SQL/Manager.pm
+  Daje::Plugin::SQL::Script::Fields:
+    file: lib/Daje/Plugin/SQL/Script/Fields.pm
+    version: '0.01'
+  Daje::Plugin::SQL::Script::ForeignKey:
+    file: lib/Daje/Plugin/SQL/Script/ForeignKey.pm
+    version: '0.01'
+  Daje::Plugin::SQL::Script::Index:
+    file: lib/Daje/Plugin/SQL/Script/Index.pm
+    version: '0.01'
+  Daje::Plugin::SQL::Script::Sql:
+    file: lib/Daje/Plugin/SQL/Script/Sql.pm
+    version: '0.01'
+requires:
+  Mojo::Base: '0'
+  Mojo::File: '0'
+  Syntax::Keyword::Match: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/janeskil1525/Daje-Plugin-GenerateSQL/issues
+  homepage: https://github.com/janeskil1525/Daje-Plugin-GenerateSQL
+  repository: https://github.com/janeskil1525/Daje-Plugin-GenerateSQL.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.83  2024-12-11T20:10:00+00:00
+      - Updated get_node_by_name() to handle invalid name.
+
 3.82  2024-12-03T21:00:00+00:00
       - Handle duplicate station name.
 

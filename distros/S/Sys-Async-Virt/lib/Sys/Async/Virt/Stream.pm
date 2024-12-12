@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v10.9.0
+#                   and LibVirt version v10.10.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -15,7 +15,7 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Stream v0.0.12;
+package Sys::Async::Virt::Stream v0.0.13;
 
 use parent qw( IO::Async::Notifier );
 
@@ -23,7 +23,7 @@ use Carp qw(croak);
 use Future::Queue;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.12;
+use Protocol::Sys::Virt::Remote::XDR v0.0.13;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 sub new($class, %args) {
@@ -166,7 +166,7 @@ Sys::Async::Virt::Stream - Client side of a data transfer channel
 
 =head1 VERSION
 
-v0.0.12
+v0.0.13
 
 =head1 SYNOPSIS
 

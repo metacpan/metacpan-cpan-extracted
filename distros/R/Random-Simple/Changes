@@ -1,3 +1,14 @@
+0.15 2024-12-11
+	- Require Win32::API for Windows builds
+	- Update POD documentation with correct bug reporting location
+	- Minor perlcritic fixes
+
+0.14 2024-11-28
+	- Better documentation of individual functions
+	- POD is more consistent with other Perl modules
+	- BUGFIX: rand() is no longer inclusive
+	- BUGFIX: random_float() uses the full range now (we were off by one)
+
 0.12 2024-11-28
 	- Simplify unit testing for ranges
 	- Triply verify we are getting enough entropy from the OS

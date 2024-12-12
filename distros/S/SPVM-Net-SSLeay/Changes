@@ -1,3 +1,50 @@
+0.027 2024-12-12
+  [New Features]
+    * Add Net::SSLeay::SSL_CTX#set_alpn_select_cb method.
+  [Incompatibe Changes]
+    * Remove Net::SSLeay::SSL_CTX#set_next_proto_select_cb method.
+    * Remove Net::SSLeay::SSL_CTX#set_next_proto_select_cb_with_protocols method.
+    * Remove Net::SSLeay::SSL_CTX#set_next_protos_advertised_cb_with_protocols method.
+    * Remove Net::SSLeay::SSL_CTX#set_tlsext_servername_callback method.
+    * Remove Net::SSLeay::SSL_CTX#set_psk_client_callback method.
+    * Remove Net::SSLeay::SSL_CTX#set_psk_server_callback method.
+    * Remove Net::SSLeay::SSL_CTX#set_tlsext_ticket_key_cb method.
+    * Remove Net::SSLeay::SSL_CTX#sess_set_new_cb method.
+    * Remove Net::SSLeay::SSL_CTX#sess_remove_new_cb method.
+    * Remove Net::SSLeay::SSL_CTX#get_session_cache_mode method.
+    * Remove Net::SSLeay::SSL_CTX#set_session_cache_mode method.
+    * Remove Net::SSLeay::SSL_CTX#set_session_id_context method.
+    * Remove Net::SSLeay::Callback::TlsextTicketKey class.
+    * Remove Net::SSLeay::Callback::TlsextStatus class.
+    * Remove Net::SSLeay::Callback::RemoveSession class.
+    * Remove Net::SSLeay::Callback::PskServer class.
+    * Remove Net::SSLeay::Callback::PskClient class.
+    * Remove Net::SSLeay::Callback::NewSession class.
+    * Remove Net::SSLeay::Callback::NextProtoSelect class.
+    * Remove Net::SSLeay::Callback::NextProtosAdvertised class.
+    * Remove Net::SSLeay::HMAC_CTX class.
+    * Remove Net::SSLeay::EC_KEY class.
+    * Remove Net::SSLeay::PEM#read_bio_DHparams method.
+    * Remove Net::SSLeay::DH class.
+    * Remove Net::SSLeay#get0_next_proto_negotiated method.
+    * Remove Net::SSLeay#get0_next_proto_negotiated_return_string method.
+    * Remove Net::SSLeay#ssl_session field.
+    * Remove Net::SSLeay#session_reused method.
+    * Remove Net::SSLeay#get1_session method.
+    * Remove Net::SSLeay#set_session method.
+    * Remove Net::SSLeay::SSL_SESSION class.
+    * Remove Net::SSLeay#load_error_strings method.
+    * Net::SSLeay#get_SSL_CTX returns a new object.
+    * Remove Net::SSLeay#get_tlsext_status_type method.
+    * Remove Net::SSLeay#pending method.
+    * Remove Net::SSLeay#peek method.
+    * Remove Net::SSLeay#set_tlsext_status_type method.
+    * Remove deprecated Net::SSLeay#P_dump_peer_certificate method.
+  [Bug Fix]
+    * Fix bugs of Net::SSLeay#get0_alpn_selected method.
+    * Fix bugs of Net::SSLeay#get0_next_proto_negotiated method.
+  [Requirement Bug Fix]
+    * Fix a SPVM::Sys dependency bug.
 0.026 2024-12-11
   [Incompatibe Changes]
     * Remove X509#get_ocsp_uri method.

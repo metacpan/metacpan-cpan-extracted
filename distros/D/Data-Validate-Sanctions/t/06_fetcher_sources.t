@@ -13,9 +13,10 @@ subtest 'Fetch and process all sources from default urls' => sub {
         eu_url => "file://t/data/sample_eu.xml",
         # the default HMT url takes too long to download. Let's use sample data to speed it up
         hmt_url => "file://t/data/sample_hmt.csv",
+        handler => sub { },
     );
 
-    is_deeply [sort keys %$data], [qw(EU-Sanctions HMT-Sanctions OFAC-Consolidated OFAC-SDN )], 'sanction source list is correct';
+    is_deeply [sort keys %$data], [qw(EU-Sanctions HMT-Sanctions OFAC-Consolidated OFAC-SDN UNSC-Sanctions)], 'sanction source list is correct';
 
     cmp_ok($data->{'EU-Sanctions'}{updated}, '>=', 1541376000, "Fetcher::run HMT-Sanctions sanctions.yml");
 
@@ -24,6 +25,8 @@ subtest 'Fetch and process all sources from default urls' => sub {
     cmp_ok($data->{'OFAC-SDN'}{updated}, '>=', 1541376000, "Fetcher::run OFAC-SDN sanctions.yml");
 
     cmp_ok($data->{'OFAC-Consolidated'}{updated}, '>=', 1541376000, "Fetcher::run OFAC-Consolidated sanctions.yml");
+
+    cmp_ok($data->{'UNSC-Sanctions'}{updated}, '>=', 1541376000, "Fetcher::run HMT-Sanctions sanctions.yml");
 
     cmp_ok(scalar $data->{'HMT-Sanctions'}{'content'}->@*, '==', 23, "HMT-Sanctions namelist - sample file");
 };

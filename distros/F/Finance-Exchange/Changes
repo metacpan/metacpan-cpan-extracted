@@ -1,5 +1,8 @@
 Revision history for Finance-Exchange
 
+0.03      2024-12-11 14:55:16+00:00 UTC
+        - update exchange.yml
+
 0.02      2024-06-21 08:36:16+00:00 UTC
         - Add new OTC exchanges (CME_OTC and SGX_OTC) for new symbols
 

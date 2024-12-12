@@ -22,13 +22,13 @@ no_index:
 provides:
   Map::Tube::Hamburg:
     file: lib/Map/Tube/Hamburg.pm
-    version: v0.1.0
+    version: v0.1.1
 requires:
   File::Share: '0'
-  Map::Tube: '3.77'
+  Map::Tube: '3.83'
   Moo: '0'
   namespace::clean: '0'
   perl: '5.010'
 resources: {}
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

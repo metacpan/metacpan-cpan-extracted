@@ -3,7 +3,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures';
 
-package Protocol::Sys::Virt::Devel v0.0.5;
+package Protocol::Sys::Virt::Devel v1.0.0;
 
 use parent 'Exporter';
 our @EXPORT_OK = qw( extract_all );

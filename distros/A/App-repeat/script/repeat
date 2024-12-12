@@ -8,9 +8,9 @@ use Log::ger;
 use Getopt::Long::Less;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-12-06'; # DATE
+our $DATE = '2024-12-10'; # DATE
 our $DIST = 'App-repeat'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our %Opts = (
     n => undef,
@@ -84,6 +84,13 @@ USAGE
         },
     );
     exit 99 if !$res;
+
+    if ($0 =~ m![/\\](\d+)(?:times|x)$!) {
+        $Opts{n} //= $1;
+    } elsif ($0 =~ m![/\\](twice)$!) {
+        $Opts{n} //= 2;
+    }
+
     unless ((defined $Opts{n}) xor (defined $Opts{until_time})) {
         warn "repeat: Please specify -n or --until-time\n";
         exit 99;
@@ -212,13 +219,17 @@ repeat - Repeat a command a number of times
 
 =head1 VERSION
 
-This document describes version 0.005 of repeat (from Perl distribution App-repeat), released on 2024-12-06.
+This document describes version 0.006 of repeat (from Perl distribution App-repeat), released on 2024-12-10.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % repeat [REPEAT OPTIONS] -- [PROGRAM] [PROGRAM OPTIONS ...]
+ % 2x     [REPEAT OPTIONS] -- [PROGRAM] [PROGRAM OPTIONS ...]
+ % 3x     [REPEAT OPTIONS] -- [PROGRAM] [PROGRAM OPTIONS ...]
+ % 4x     [REPEAT OPTIONS] -- [PROGRAM] [PROGRAM OPTIONS ...]
+ % 5x     [REPEAT OPTIONS] -- [PROGRAM] [PROGRAM OPTIONS ...]
 
 Below are some examples.
 

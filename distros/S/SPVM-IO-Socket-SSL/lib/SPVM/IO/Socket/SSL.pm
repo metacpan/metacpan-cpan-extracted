@@ -1,6 +1,6 @@
 package SPVM::IO::Socket::SSL;
 
-our $VERSION = "0.004";
+our $VERSION = "0.005";
 
 1;
 
@@ -219,17 +219,11 @@ An exception is thrown.
 
 C<method dump_peer_certificate : string ();>
 
-Calls L<Net::SSLeay#P_dump_peer_certificate|SPVM::Net::SSLeay/"P_dump_peer_certificate"> method given the value of L</"ssl"> field, and returns its return value.
+Calls L<Net::SSLeay#dump_peer_certificate|SPVM::Net::SSLeay/"dump_peer_certificate"> method given the value of L</"ssl"> field, and returns its return value.
 
 Exceptions:
 
-Exceptions thrown by L<Net::SSLeay#P_dump_peer_certificate|SPVM::Net::SSLeay/"P_dump_peer_certificate"> method could be thrown.
-
-=head2 next_proto_negotiated
-
-C<method next_proto_negotiated : string ();>
-
-Calls L<Net::SSLeay#get0_next_proto_negotiated|SPVM::Net::SSLeay/"get0_next_proto_negotiated"> method given appropriate arguments, converts the value of output argument to a string of appropriate length, and retunrs it.
+Exceptions thrown by L<Net::SSLeay#dump_peer_certificate|SPVM::Net::SSLeay/"dump_peer_certificate"> method could be thrown.
 
 =head2 alpn_selected
 
@@ -328,7 +322,17 @@ Returns the same output of Perl's L<IO::Socket::SSL|/"get_fingerprint"> method.
   my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
   
   my $SSL_ca = $x509;
-  
+
+=head1 See Also
+
+=over 2
+
+=item * L<IO::Socket::IP|SPVM::IO::Socket::IP>
+
+=item * L<Net::SSLeay|SPVM::Net::SSLeay>
+
+=back
+
 =head1 Repository
 
 L<SPVM::IO::Socket::SSL - Github|https://github.com/yuki-kimoto/SPVM-IO-Socket-SSL>

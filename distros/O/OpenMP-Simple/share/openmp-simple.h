@@ -145,6 +145,20 @@ void PerlOMP_1D_Array_TO_1D_FLOAT_ARRAY(SV *AVref, int numElements, float retArr
   }
 }
 
+/* threaded version */
+void PerlOMP_1D_Array_TO_1D_FLOAT_ARRAY_r(SV *AVref, int numElements, float retArray[numElements]) {
+  AV *array    = (AV*)SvRV(AVref);
+  SV **element;
+  PerlOMP_GETENV_BASIC
+  #pragma omp parallel for
+  for (int i=0; i<numElements;i++) {
+    element = av_fetch(array, i, 0);
+    if (!element || !*element || !SvOK(*element))
+      croak("Expected value at array[%d]", i);
+    retArray[i] = SvNV(*element);
+  }
+}
+
 /* 1D Array reference to 1D int C array ...
  * Convert a regular M-element Perl array consisting of inting point values, e.g.,
  *
@@ -157,6 +171,20 @@ void PerlOMP_1D_Array_TO_1D_FLOAT_ARRAY(SV *AVref, int numElements, float retArr
 void PerlOMP_1D_Array_TO_1D_INT_ARRAY(SV *AVref, int numElements, int retArray[numElements]) {
   AV *array    = (AV*)SvRV(AVref);
   SV **element;
+  for (int i=0; i<numElements;i++) {
+    element = av_fetch(array, i, 0);
+    if (!element || !*element || !SvOK(*element))
+      croak("Expected value at array[%d]", i);
+    retArray[i] = SvIV(*element);
+  }
+}
+
+/* threaded version */
+void PerlOMP_1D_Array_TO_1D_INT_ARRAY_r(SV *AVref, int numElements, int retArray[numElements]) {
+  AV *array    = (AV*)SvRV(AVref);
+  SV **element;
+  PerlOMP_GETENV_BASIC
+  #pragma omp parallel for
   for (int i=0; i<numElements;i++) {
     element = av_fetch(array, i, 0);
     if (!element || !*element || !SvOK(*element))
@@ -192,6 +220,27 @@ void PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY(SV *AoA, int numRows, int rowSize, float r
   }
 }
 
+/* threaded version */
+void PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY_r(SV *AoA, int numRows, int rowSize, float retArray[numRows][rowSize]) {
+  SV **AVref;
+  if (!SvROK(AoA) || SvTYPE(SvRV(AoA)) != SVt_PVAV)
+    croak("Expected Arrayref");
+
+  PerlOMP_GETENV_BASIC
+  #pragma omp parallel for private(AVref)
+  for (int i=0; i<numRows; i++) {
+    AVref = av_fetch((AV*)SvRV(AoA), i, 0);
+    if (!AVref || !*AVref || !SvROK(*AVref) || SvTYPE(SvRV(*AVref)) != SVt_PVAV)
+      croak("Expected arrayref at array[%d]", i);
+    for (int j=0; j<rowSize;j++) {
+      SV **element = av_fetch((AV*)SvRV(*AVref), j, 0);
+      if (!element || !*element || !SvOK(*element))
+        croak("Expected value at array[%d][%d]", i, j);
+      retArray[i][j] = SvNV(*element);
+    }
+  }
+}
+
 /* 2D AoA to 2D int C array ...
  * Convert a regular MxN Perl array of arrays (AoA) consisting of inting point values, e.g.,
  *
@@ -205,6 +254,27 @@ void PerlOMP_2D_AoA_TO_2D_INT_ARRAY(SV *AoA, int numRows, int rowSize, int retAr
   SV **AVref;
   if (!SvROK(AoA) || SvTYPE(SvRV(AoA)) != SVt_PVAV)
     croak("Expected Arrayref");
+  for (int i=0; i<numRows; i++) {
+    AVref = av_fetch((AV*)SvRV(AoA), i, 0);
+    if (!AVref || !*AVref || !SvROK(*AVref) || SvTYPE(SvRV(*AVref)) != SVt_PVAV)
+      croak("Expected arrayref at array[%d]", i);
+    for (int j=0; j<rowSize;j++) {
+      SV **element = av_fetch((AV*)SvRV(*AVref), j, 0);
+      if (!element || !*element || !SvOK(*element))
+        croak("Expected value at array[%d][%d]", i, j);
+      retArray[i][j] = SvNV(*element);
+    }
+  }
+}
+
+/* threaded version */
+void PerlOMP_2D_AoA_TO_2D_INT_ARRAY_r(SV *AoA, int numRows, int rowSize, int retArray[numRows][rowSize]) {
+  SV **AVref;
+  if (!SvROK(AoA) || SvTYPE(SvRV(AoA)) != SVt_PVAV)
+    croak("Expected Arrayref");
+
+  PerlOMP_GETENV_BASIC
+  #pragma omp parallel for private(AVref)
   for (int i=0; i<numRows; i++) {
     AVref = av_fetch((AV*)SvRV(AoA), i, 0);
     if (!AVref || !*AVref || !SvROK(*AVref) || SvTYPE(SvRV(*AVref)) != SVt_PVAV)

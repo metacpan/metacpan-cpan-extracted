@@ -3,9 +3,10 @@ package DBIx::Class::Storage::DBI::MariaDB;
 use strict;
 use warnings;
 
+use DBI;
 use base qw/DBIx::Class::Storage::DBI/;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 __PACKAGE__->sql_maker_class('DBIx::Class::SQLMaker::MySQL');
 __PACKAGE__->sql_limit_dialect('LimitXY');
@@ -173,6 +174,13 @@ sub lag_behind_master {
       ->{Seconds_Behind_Master};
 }
 
+sub bind_attribute_by_data_type {
+    if ( $_[1] = ~ /^(?:tiny|medium|long)blob$/i ) {
+        return DBI::SQL_BINARY;
+    }
+    return;
+}
+
 1;
 
 =head1 NAME
@@ -188,7 +196,7 @@ module, so check that for further documentation.
 =head1 USAGE
 
 Similar to other storage modules that are builtin to DBIx::Class, all you need
-to do is ensure DBIx::Class::Storage::DBI::MariaDB is loaded and specify 
+to do is ensure DBIx::Class::Storage::DBI::MariaDB is loaded and specify
 MariaDB in the DSN. For example:
 
     package MyApp::Schema;

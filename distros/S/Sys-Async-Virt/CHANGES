@@ -1,5 +1,13 @@
 -----
 
+0.0.13   2024-12-11
+    [Changed]
+       * Updated to libvirt tag v10.10.0 (from v10.9.0)
+
+0.0.12   2024-11-19
+    [Changed]
+       * Updated to libvirt tag v10.9.0 (from v10.3.0)
+
 0.0.11   2024-10-11
     [Breaking]
        * Callback event futures resolved data no longer includes

@@ -6,7 +6,7 @@ use File::Temp qw(tempfile);
 use FindBin    qw($Bin);
 use File::stat;
 use Path::Tiny;
-use YAML::XS qw(Dump);
+use YAML::XS       qw(Dump);
 use Test::MockTime qw(set_fixed_time);
 
 my $sanction_file;

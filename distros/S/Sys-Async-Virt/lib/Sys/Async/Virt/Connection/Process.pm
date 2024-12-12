@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v10.9.0
+#                   and LibVirt version v10.10.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -15,7 +15,7 @@ use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
 
-package Sys::Async::Virt::Connection::Process v0.0.12;
+package Sys::Async::Virt::Connection::Process v0.0.13;
 
 use parent qw(Sys::Async::Virt::Connection);
 
@@ -23,7 +23,7 @@ use Carp qw(croak);
 use IO::Async::Stream;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::URI v10.9.13; # imports parse_url
+use Protocol::Sys::Virt::URI v10.10.13; # imports parse_url
 
 sub new($class, $url, %args) {
     return bless {
@@ -76,7 +76,7 @@ Sys::Async::Virt::Connection::Process - Connection to LibVirt server using
 
 =head1 VERSION
 
-v0.0.12
+v0.0.13
 
 =head1 SYNOPSIS
 

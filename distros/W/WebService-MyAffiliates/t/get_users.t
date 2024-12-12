@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use strict;
+
 # use warnings;
 use WebService::MyAffiliates;
 use Test::More;

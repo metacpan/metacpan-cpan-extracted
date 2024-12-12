@@ -1,5 +1,8 @@
 Revision history for WebService-MyAffiliates
 
+0.10      2024-12-11 15:12:54+00:00 UTC
+        - Replace Mojo::UserAgent with HTTP::Tiny for stable API calls
+
 0.09      2022-11-13 08:12:28+00:00 UTC
 
         - Add support for creating affiliate accounts.

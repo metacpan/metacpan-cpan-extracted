@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "File::Share" : "0",
-            "Map::Tube" : "3.77",
+            "Map::Tube" : "3.83",
             "Moo" : "0",
             "namespace::clean" : "0",
             "perl" : "5.010"
@@ -54,7 +54,7 @@
    "provides" : {
       "Map::Tube::Hamburg" : {
          "file" : "lib/Map/Tube/Hamburg.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       }
    },
    "release_status" : "stable",
@@ -63,6 +63,6 @@
          "mailto" : "bug-Map-Tube-Hamburg@rt.cpan.org"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -103,70 +103,75 @@
    "provides" : {
       "Net::Async::Blockchain" : {
          "file" : "lib/Net/Async/Blockchain.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Net::Async::Blockchain::BTC" : {
          "file" : "lib/Net/Async/Blockchain/BTC.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Net::Async::Blockchain::Client::RPC" : {
          "file" : "lib/Net/Async/Blockchain/Client/RPC.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Net::Async::Blockchain::Client::RPC::BTC" : {
          "file" : "lib/Net/Async/Blockchain/Client/RPC/BTC.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Net::Async::Blockchain::Client::RPC::ETH" : {
          "file" : "lib/Net/Async/Blockchain/Client/RPC/ETH.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Net::Async::Blockchain::Client::RPC::Omni" : {
          "file" : "lib/Net/Async/Blockchain/Client/RPC/Omni.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Net::Async::Blockchain::Client::Websocket" : {
          "file" : "lib/Net/Async/Blockchain/Client/Websocket.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Net::Async::Blockchain::Client::ZMQ" : {
          "file" : "lib/Net/Async/Blockchain/Client/ZMQ.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Net::Async::Blockchain::ETH" : {
          "file" : "lib/Net/Async/Blockchain/ETH.pm",
-         "version" : "0.004"
+         "version" : "0.005"
+      },
+      "Net::Async::Blockchain::TRX" : {
+         "file" : "lib/Net/Async/Blockchain/TRX.pm",
+         "version" : "0.005"
       },
       "Net::Async::Blockchain::Transaction" : {
          "file" : "lib/Net/Async/Blockchain/Transaction.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/binary-com/perl-Net-Async-Blockchain/issues"
+         "web" : "https://github.com/deriv-com/perl-Net-Async-Blockchain/issues"
       },
-      "homepage" : "https://github.com/binary-com/perl-Net-Async-Blockchain",
+      "homepage" : "https://github.com/deriv-com/perl-Net-Async-Blockchain",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/binary-com/perl-Net-Async-Blockchain.git",
-         "web" : "https://github.com/binary-com/perl-Net-Async-Blockchain"
+         "url" : "https://github.com/deriv-com/perl-Net-Async-Blockchain.git",
+         "web" : "https://github.com/deriv-com/perl-Net-Async-Blockchain"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "Reginaldo Costa <53163145+reginaldo-binary@users.noreply.github.com>",
       "Mohanad Zarzour <51309057+Binary-Mohanad@users.noreply.github.com>",
       "Tanya Sahni <54654631+binary-tanya@users.noreply.github.com>",
-      "Arshad <arshad@binary.com>",
       "Reginaldo Costa <regcostajr@gmail.com>",
       "Zak B. Elep <zakame@zakame.net>",
       "Arshad Munir <55420460+arshad-binary@users.noreply.github.com>",
-      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
-      "kathleen-deriv <122329285+lim-deriv@users.noreply.github.com>",
       "Arshad Munir <55420460+arshad-deriv@users.noreply.github.com>",
+      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
+      "chylli-deriv <chylli@deriv.com>",
+      "kathleen-deriv <122329285+lim-deriv@users.noreply.github.com>",
+      "Mohanad Zarzour <51309057+mohanad-deriv@users.noreply.github.com>",
       "mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>",
       "nihal-deriv <105702884+nihal-deriv@users.noreply.github.com>",
       "Paul Evans <leonerd@leonerd.org.uk>",

@@ -1,3 +1,9 @@
+0.006   2024-12-10  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux][experimental] Add shorter alias commands: 2x, 3x, 4x, 5x,
+          twice, 2times.
+
+
 0.005   2024-12-06  Released-By: PERLANCAR; Urgency: low
 
         - Make dependency to DateTime::Format::Natural optional.

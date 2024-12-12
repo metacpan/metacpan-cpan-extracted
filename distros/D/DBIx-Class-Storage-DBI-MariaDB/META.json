@@ -34,7 +34,9 @@
       "runtime" : {
          "requires" : {
             "DBD::MariaDB" : "1.00",
-            "DBIx::Class" : "0.082820"
+            "DBI" : "0",
+            "DBIx::Class" : "0.082820",
+            "perl" : "v5.8.9"
          }
       },
       "test" : {
@@ -57,6 +59,9 @@
          "web" : "https://github.com/Siemplexus/DBIx-Class-Storage-DBI-MariaDB"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
+   "x_contributors" : [
+      "Dave Lambley <dave@lambley.me.uk>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

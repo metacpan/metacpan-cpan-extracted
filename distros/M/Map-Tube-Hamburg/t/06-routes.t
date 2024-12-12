@@ -13,18 +13,10 @@ eval { $map->get_shortest_route('Schlump'); };
 like( $@, qr/ERROR: Missing Station Name\./, 'Just one station for get_shortest_route( )'  );
 
 eval { $map->get_shortest_route( 'XYZ', 'Schlump' ); };
-# Different Map::Tube versions give different error messages for the following:
-like( $@,
-      qr/(\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E)|(\QMap::Tube::get_node_by_id(): ERROR: Missing Station ID\E)/,
-      'Must specify two existing stations for get_shortest_route( )'
-    );
+like( $@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E/, 'Node XYZ should not exist' );
 
 eval { $map->get_shortest_route( 'Schlump', 'XYZ' ); };
-# Different Map::Tube versions give different error messages for the following:
-like( $@,
-      qr/(\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E)|(\QMap::Tube::get_node_by_id(): ERROR: Missing Station ID\E)/,
-      'Must specify two existing stations for get_shortest_route( )'
-    );
+like( $@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E/, 'Node XYZ should not exist' );
 
 {
   my $ret = $map->get_shortest_route( 'Schlump', 'Othmarschen' );

@@ -1,9 +1,0 @@
-# Copyright (c) 2024 Yuki Kimoto
-# MIT License
-
-class Net::SSLeay::Callback::PskClient : interface_t {
-  use Net::SSLeay;
-  
-  required method : int ($ssl : Net::SSLeay, $hint : string, $identity : mutable string, $max_identity_len : int, $psk : mutable string, $max_psk_len : int);
-  
-}

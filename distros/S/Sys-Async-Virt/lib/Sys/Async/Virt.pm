@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v10.9.0
+#                   and LibVirt version v10.10.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -18,7 +18,7 @@ use Feature::Compat::Try;
 use Future::AsyncAwait;
 use Sublike::Extended; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-package Sys::Async::Virt v0.0.12;
+package Sys::Async::Virt v0.0.13;
 
 use parent qw(IO::Async::Notifier);
 
@@ -28,30 +28,30 @@ use Future::Queue;
 use Log::Any qw($log);
 use Scalar::Util qw(reftype weaken);
 
-use Protocol::Sys::Virt::Remote::XDR v10.9.13;
+use Protocol::Sys::Virt::Remote::XDR v10.10.13;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Protocol::Sys::Virt::KeepAlive v10.9.13;
-use Protocol::Sys::Virt::Remote v10.9.13;
-use Protocol::Sys::Virt::Transport v10.9.13;
-use Protocol::Sys::Virt::URI v10.9.13; # imports parse_url
+use Protocol::Sys::Virt::KeepAlive v10.10.13;
+use Protocol::Sys::Virt::Remote v10.10.13;
+use Protocol::Sys::Virt::Transport v10.10.13;
+use Protocol::Sys::Virt::URI v10.10.13; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.0.12;
-use Sys::Async::Virt::Domain v0.0.12;
-use Sys::Async::Virt::DomainCheckpoint v0.0.12;
-use Sys::Async::Virt::DomainSnapshot v0.0.12;
-use Sys::Async::Virt::Network v0.0.12;
-use Sys::Async::Virt::NetworkPort v0.0.12;
-use Sys::Async::Virt::NwFilter v0.0.12;
-use Sys::Async::Virt::NwFilterBinding v0.0.12;
-use Sys::Async::Virt::Interface v0.0.12;
-use Sys::Async::Virt::StoragePool v0.0.12;
-use Sys::Async::Virt::StorageVol v0.0.12;
-use Sys::Async::Virt::NodeDevice v0.0.12;
-use Sys::Async::Virt::Secret v0.0.12;
+use Sys::Async::Virt::Connection::Factory v0.0.13;
+use Sys::Async::Virt::Domain v0.0.13;
+use Sys::Async::Virt::DomainCheckpoint v0.0.13;
+use Sys::Async::Virt::DomainSnapshot v0.0.13;
+use Sys::Async::Virt::Network v0.0.13;
+use Sys::Async::Virt::NetworkPort v0.0.13;
+use Sys::Async::Virt::NwFilter v0.0.13;
+use Sys::Async::Virt::NwFilterBinding v0.0.13;
+use Sys::Async::Virt::Interface v0.0.13;
+use Sys::Async::Virt::StoragePool v0.0.13;
+use Sys::Async::Virt::StorageVol v0.0.13;
+use Sys::Async::Virt::NodeDevice v0.0.13;
+use Sys::Async::Virt::Secret v0.0.13;
 
-use Sys::Async::Virt::Callback v0.0.12;
-use Sys::Async::Virt::Stream v0.0.12;
+use Sys::Async::Virt::Callback v0.0.13;
+use Sys::Async::Virt::Stream v0.0.13;
 
 use constant {
     CLOSE_REASON_ERROR                                 => 0,
@@ -2233,9 +2233,9 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.0.12
+v0.0.13
 
-Based on LibVirt tag v10.9.0
+Based on LibVirt tag v10.10.0
 
 =head1 SYNOPSIS
 
@@ -2270,7 +2270,7 @@ C<on_reply> event.
 
 =head2 RUNNING AGAINST OLDER SERVERS
 
-The reference LibVirt version of this module is v10.9.0. This means
+The reference LibVirt version of this module is v10.10.0. This means
 all API entry points have been implemented as they are declared in the
 protocol of that version (except for the ones listed in the section
 L</UNIMPLEMENTED ENTRYPOINTS>).  The consequence of a server being of a lower
@@ -2279,7 +2279,7 @@ supported by the server.
 
 =head2 RUNNING AGAINST NEWER SERVERS
 
-The module can run against any version of LibVirt newer than v10.9.0;
+The module can run against any version of LibVirt newer than v10.10.0;
 any new entry points in the API will not be available, but all existing APIs
 can be used as per the stability guarantees.
 

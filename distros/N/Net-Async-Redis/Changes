@@ -1,5 +1,12 @@
 Revision history for Net-Async-Redis
 
+6.006     2024-12-11 23:15:20+08:00 Asia/Singapore
+    [Bugs fixed]
+
+    - live migrations in a cluster would return the ASK error, we now handle that
+    automatically rather than propagating it back to the client (with a limit on
+    the number of attempts we'll make, to avoid cycles and broken cluster situations)
+
 6.005     2024-11-08 23:45:45+08:00 Asia/Singapore
     [New features]
 

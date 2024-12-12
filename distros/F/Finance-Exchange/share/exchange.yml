@@ -260,6 +260,18 @@ CME_OTC:
   symbol: CME_OTC
   trading_days: weekdays
   trading_timezone: America/New_York
+CRYPTOCURRENCY:
+  delay_amount: '0'
+  display_name: Cryptocurrency
+  market_times:
+    partial_trading: {}
+    standard:
+      daily_close: 23h59m59s
+      daily_open: 0s
+      daily_settlement: 23h59m59s
+  symbol: CRYPTOCURRENCY
+  trading_days: everyday
+  trading_timezone: UTC
 DFM:
   currency: AED
   delay_amount: '1440'
@@ -586,6 +598,23 @@ HKSE_OTC:
   symbol: HKSE_OTC
   trading_days: weekdays
   trading_timezone: Asia/Hong_Kong
+ICE:
+  currency: USD
+  delay_amount: '1440'
+  display_name: Intercontinental Exchange
+  market_times:
+    dst:
+      daily_close: 20h
+      daily_open: -2h
+      daily_settlement: 19h30m
+    partial_trading: {}
+    standard:
+      daily_close: 21h
+      daily_open: -1h
+      daily_settlement: 20h30m
+  symbol: ICE
+  trading_days: weekdays
+  trading_timezone: America/New_York
 ICE_LIFFE:
   currency: GBP
   delay_amount: '1440'
@@ -1594,15 +1623,3 @@ TSE_S:
   symbol: TSE_S
   trading_days: weekdays
   trading_timezone: Asia/Tokyo
-CRYPTOCURRENCY:
-  delay_amount: '0'
-  display_name: Cryptocurrency
-  market_times:
-    partial_trading: {}
-    standard:
-      daily_close: 23h59m59s
-      daily_open: 0s
-      daily_settlement: 23h59m59s
-  symbol: CRYPTOCURRENCY
-  trading_days: everyday
-  trading_timezone: UTC

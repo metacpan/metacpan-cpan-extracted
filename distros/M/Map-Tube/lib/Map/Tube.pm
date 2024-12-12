@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.82';
+$Map::Tube::VERSION   = '3.83';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.82
+Version 3.83
 
 =cut
 
@@ -335,24 +335,14 @@ sub get_node_by_name {
         filename    => $caller[1],
         line_number => $caller[2] }) unless defined $name;
 
-    my @nodes = $self->_get_node_id($name);
+    my $id = $self->_get_node_id($name);
     Map::Tube::Exception::InvalidStationName->throw({
         method      => __PACKAGE__."::get_node_by_name",
         message     => "ERROR: Invalid Station Name [$name].",
         filename    => $caller[1],
-        line_number => $caller[2] }) unless scalar(@nodes);
+        line_number => $caller[2] }) unless defined $id;
 
-    my $nodes = [];
-    foreach (@nodes) {
-        push @$nodes, $self->get_node_by_id($_);
-    }
-
-    if (wantarray) {
-        return @{$nodes};
-    }
-    else {
-        return $nodes->[0];
-    }
+    return $self->get_node_by_id($id);
 }
 
 =head2 get_line_by_id($line_id)

@@ -3,7 +3,7 @@ package Net::Async::Blockchain::Client::ZMQ;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 =head1 NAME
 
@@ -233,8 +233,7 @@ sub subscribe {
                 sub {
                     my $self = shift;
                     while (my @msg = $self->_recv_multipart($socket)) {
-                        my $hex = unpack('H*', zmq_msg_data($msg[1]));
-                        $self->source->emit($hex);
+                        $self->source->emit(zmq_msg_data($msg[1]));
                     }
                 }
             ),

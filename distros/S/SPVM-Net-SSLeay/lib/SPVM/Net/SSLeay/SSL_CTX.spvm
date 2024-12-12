@@ -5,78 +5,47 @@ class Net::SSLeay::SSL_CTX : pointer {
   
   use Net::SSLeay::Error;
   
+  use Net::SSLeay;
   use Net::SSLeay::SSL_METHOD;
   use Net::SSLeay::X509_STORE;
   use Net::SSLeay::X509_NAME;
   use Net::SSLeay::X509_VERIFY_PARAM;
-  use Net::SSLeay::EC_KEY;
-  use Net::SSLeay::DH;
   use Net::SSLeay::EVP_PKEY;
   use Net::SSLeay::EVP_CIPHER_CTX;
-  use Net::SSLeay::HMAC_CTX;
   use List;
   
   use Net::SSLeay::Callback::TlsextServername;
-  use Net::SSLeay::Callback::TlsextStatus;
   use Net::SSLeay::Callback::PemPassword;
-  use Net::SSLeay::Callback::PskClient;
-  use Net::SSLeay::Callback::PskServer;
-  use Net::SSLeay::Callback::TlsextTicketKey;
-  use Net::SSLeay::Callback::AlpnSelect;
-  use Net::SSLeay::Callback::NewSession;
-  use Net::SSLeay::Callback::RemoveSession;
   use Net::SSLeay::Callback::Msg;
   use Net::SSLeay::Callback::Verify;
-  
   use Net::SSLeay::Callback::AlpnSelect; 
-  use Net::SSLeay::Callback::NextProtoSelect;
-  use Net::SSLeay::Callback::NextProtosAdvertised;
+  
   use Net::SSLeay::Util;
   
   use Sync::Mutex;
   use StringList;
   
   # Class Variables
-  our $PSK_CLIENT_CBS : Hash of Net::SSLeay::Callback::PskClient;
-  
-  our $PSK_SERVER_CBS : Hash of Net::SSLeay::Callback::PskServer;
-  
-  our $TLSEXT_TICKET_KEY_CBS : Hash of Net::SSLeay::Callback::TlsextTicketKey;
-  
-  our $NEW_SESSION_CBS : Hash of Net::SSLeay::Callback::NewSession;
-  
-  our $REMOVE_SESSION_CBS : Hash of Net::SSLeay::Callback::RemoveSession;
-  
-  our $VERIFY_CBS : Hash of Net::SSLeay::Callback::Verify;
+  our $VERIFY_CBS_H : Hash of Net::SSLeay::Callback::Verify;
   
   our $MUTEX : Sync::Mutex;
   
   INIT {
-    $PSK_CLIENT_CBS = Hash->new;
-    
-    $PSK_SERVER_CBS = Hash->new;
-    
-    $TLSEXT_TICKET_KEY_CBS = Hash->new;
-    
-    $NEW_SESSION_CBS = Hash->new;
-    
-    $REMOVE_SESSION_CBS = Hash->new;
-    
-    $VERIFY_CBS = Hash->new;
+    $VERIFY_CBS_H = Hash->new;
     
     $MUTEX = Sync::Mutex->new;
   }
   
   # Fields
-  has cb_output_strings_list : StringList; # For SSL_CTX_set_alpn_select_cb, SSL_CTX_set_next_proto_select_cb
+  has ref_ssl : Net::SSLeay;
+  
+  has ref_output_for_set_alpn_select_cb : string;
   
   # Class Methods
   native static method new : Net::SSLeay::SSL_CTX ($method : Net::SSLeay::SSL_METHOD);
   
   protected method init : void ($options : object[] = undef) {
     
-    my $cb_output_strings_list = StringList->new;
-    $self->{cb_output_strings_list} = $cb_output_strings_list;
   }
   
   # Instance Methods
@@ -89,6 +58,8 @@ class Net::SSLeay::SSL_CTX : pointer {
   native method load_verify_locations : int ($CAfile : string, $CApath : string);
   
   native method set_default_verify_paths : int ();
+  
+  native method set_default_verify_paths_windows : void ();
   
   native method use_certificate_file : int ($file : string, $type : int);
   
@@ -123,13 +94,7 @@ class Net::SSLeay::SSL_CTX : pointer {
   
   native method set1_groups_list : int ($list : string);
   
-  native method get_session_cache_mode : long ();
-  
-  native method set_session_cache_mode : long ($mode : long);
-  
   native method set_post_handshake_auth : void ($val : int);
-  
-  native method set_session_id_context : int ($sid_ctx : string, $sid_ctx_len : int = -1);
   
   native method set_min_proto_version : int ($version : int);
   
@@ -141,212 +106,15 @@ class Net::SSLeay::SSL_CTX : pointer {
   
   native method set_verify : void ($mode : int, $verify_callback : Net::SSLeay::Callback::Verify = undef);
   
-  native method set_tlsext_servername_callback : long ($cb : Net::SSLeay::Callback::TlsextServername, $arg : object = undef);
-  
-  native method set_tlsext_status_cb : long ($cb : Net::SSLeay::Callback::TlsextStatus, $arg : object = undef);
-  
   native method set_default_passwd_cb : void ($cb : Net::SSLeay::Callback::PemPassword, $arg : object = undef);
   
-  native method set_psk_client_callback : void ($cb : Net::SSLeay::Callback::PskClient);
-  
-  private method GET_PSK_CLIENT_CB : Net::SSLeay::Callback::PskClient ($key : string) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->reader_unlock;
-    });
-    
-    $MUTEX->reader_lock;
-    
-    my $psk_client_cb = (Net::SSLeay::Callback::PskClient)$PSK_CLIENT_CBS->get($key);
-    
-    return $psk_client_cb;
-  }
-  
-  private method SET_PSK_CLIENT_CB : void ($key : string, $psk_client_cb : Net::SSLeay::Callback::PskClient) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->unlock;
-    });
-    
-    $MUTEX->lock;
-    
-    $PSK_CLIENT_CBS->set($key, $psk_client_cb);
-  }
-  
-  private method DELETE_PSK_CLIENT_CB : Net::SSLeay::Callback::PskClient ($key : string) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->unlock;
-    });
-    
-    $MUTEX->lock;
-    
-    my $deleted = (Net::SSLeay::Callback::PskClient)$PSK_CLIENT_CBS->delete($key);
-    
-    return $deleted;
-  }
-  
-  native method set_psk_server_callback : void ($cb : Net::SSLeay::Callback::PskServer);
-  
-  private method GET_PSK_SERVER_CB : Net::SSLeay::Callback::PskServer ($key : string) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->reader_unlock;
-    });
-    
-    $MUTEX->reader_lock;
-    
-    my $psk_server_cb = (Net::SSLeay::Callback::PskServer)$PSK_SERVER_CBS->get($key);
-    
-    return $psk_server_cb;
-  }
-  
-  private method SET_PSK_SERVER_CB : void ($key : string, $psk_server_cb : Net::SSLeay::Callback::PskServer) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->unlock;
-    });
-    
-    $MUTEX->lock;
-    
-    $PSK_SERVER_CBS->set($key, $psk_server_cb);
-  }
-  
-  private method DELETE_PSK_SERVER_CB : Net::SSLeay::Callback::PskServer ($key : string) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->unlock;
-    });
-    
-    $MUTEX->lock;
-    
-    my $deleted = (Net::SSLeay::Callback::PskServer)$PSK_SERVER_CBS->delete($key);
-    
-    return $deleted;
-  }
-  
-  native method set_tlsext_ticket_key_cb : void ($cb : Net::SSLeay::Callback::TlsextTicketKey);
-  
-  private method GET_TLSEXT_TICKET_KEY_CB : Net::SSLeay::Callback::TlsextTicketKey ($key : string) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->reader_unlock;
-    });
-    
-    $MUTEX->reader_lock;
-    
-    my $psk_server_cb = (Net::SSLeay::Callback::TlsextTicketKey)$TLSEXT_TICKET_KEY_CBS->get($key);
-    
-    return $psk_server_cb;
-  }
-  
-  private method SET_TLSEXT_TICKET_KEY_CB : void ($key : string, $psk_server_cb : Net::SSLeay::Callback::TlsextTicketKey) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->unlock;
-    });
-    
-    $MUTEX->lock;
-    
-    $TLSEXT_TICKET_KEY_CBS->set($key, $psk_server_cb);
-  }
-  
-  private method DELETE_TLSEXT_TICKET_KEY_CB : Net::SSLeay::Callback::TlsextTicketKey ($key : string) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->unlock;
-    });
-    
-    $MUTEX->lock;
-    
-    my $deleted = (Net::SSLeay::Callback::TlsextTicketKey)$TLSEXT_TICKET_KEY_CBS->delete($key);
-    
-    return $deleted;
-  }
+  native method set_alpn_select_cb : void ($cb : Net::SSLeay::Callback::AlpnSelect, $arg : object);
   
   native method set_alpn_select_cb_with_protocols : void ($protocols : string[]);
   
-  native method set_next_proto_select_cb_with_protocols : void ($protocols : string[]);
+  native method set_tlsext_servername_callback : long ($cb : Net::SSLeay::Callback::TlsextServername, $arg : object = undef);
   
-  native method set_next_protos_advertised_cb_with_protocols : void ($protocols : string[]);
-  
-  native method sess_set_new_cb : void ($cb : Net::SSLeay::Callback::NewSession);
-  
-  private method GET_NEW_SESSION_CB : Net::SSLeay::Callback::NewSession ($key : string) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->reader_unlock;
-    });
-    
-    $MUTEX->reader_lock;
-    
-    my $psk_server_cb = (Net::SSLeay::Callback::NewSession)$NEW_SESSION_CBS->get($key);
-    
-    return $psk_server_cb;
-  }
-  
-  private method SET_NEW_SESSION_CB : void ($key : string, $psk_server_cb : Net::SSLeay::Callback::NewSession) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->unlock;
-    });
-    
-    $MUTEX->lock;
-    
-    $NEW_SESSION_CBS->set($key, $psk_server_cb);
-  }
-  
-  private method DELETE_NEW_SESSION_CB : Net::SSLeay::Callback::NewSession ($key : string) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->unlock;
-    });
-    
-    $MUTEX->lock;
-    
-    my $deleted = (Net::SSLeay::Callback::NewSession)$NEW_SESSION_CBS->delete($key);
-    
-    return $deleted;
-  }
-  
-  native method sess_set_remove_cb : void ($cb : Net::SSLeay::Callback::NewSession);
-  
-  private method GET_REMOVE_SESSION_CB : Net::SSLeay::Callback::RemoveSession ($key : string) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->reader_unlock;
-    });
-    
-    $MUTEX->reader_lock;
-    
-    my $psk_server_cb = (Net::SSLeay::Callback::RemoveSession)$REMOVE_SESSION_CBS->get($key);
-    
-    return $psk_server_cb;
-  }
-  
-  private method SET_REMOVE_SESSION_CB : void ($key : string, $psk_server_cb : Net::SSLeay::Callback::RemoveSession) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->unlock;
-    });
-    
-    $MUTEX->lock;
-    
-    $REMOVE_SESSION_CBS->set($key, $psk_server_cb);
-  }
-  
-  private method DELETE_REMOVE_SESSION_CB : Net::SSLeay::Callback::RemoveSession ($key : string) {
-    
-    Fn->defer(method : void () {
-      $MUTEX->unlock;
-    });
-    
-    $MUTEX->lock;
-    
-    my $deleted = (Net::SSLeay::Callback::RemoveSession)$REMOVE_SESSION_CBS->delete($key);
-    
-    return $deleted;
-  }
+  native method DESTROY : void ();
   
   private method GET_VERIFY_CB : Net::SSLeay::Callback::Verify ($key : string) {
     
@@ -356,7 +124,7 @@ class Net::SSLeay::SSL_CTX : pointer {
     
     $MUTEX->reader_lock;
     
-    my $psk_server_cb = (Net::SSLeay::Callback::Verify)$VERIFY_CBS->get($key);
+    my $psk_server_cb = (Net::SSLeay::Callback::Verify)$VERIFY_CBS_H->get($key);
     
     return $psk_server_cb;
   }
@@ -369,7 +137,7 @@ class Net::SSLeay::SSL_CTX : pointer {
     
     $MUTEX->lock;
     
-    $VERIFY_CBS->set($key, $psk_server_cb);
+    $VERIFY_CBS_H->set($key, $psk_server_cb);
   }
   
   private method DELETE_VERIFY_CB : Net::SSLeay::Callback::Verify ($key : string) {
@@ -380,13 +148,9 @@ class Net::SSLeay::SSL_CTX : pointer {
     
     $MUTEX->lock;
     
-    my $deleted = (Net::SSLeay::Callback::Verify)$VERIFY_CBS->delete($key);
+    my $deleted = (Net::SSLeay::Callback::Verify)$VERIFY_CBS_H->delete($key);
     
     return $deleted;
   }
-  
-  native method set_default_verify_paths_windows : void ();
-  
-  native method DESTROY : void ();
   
 }

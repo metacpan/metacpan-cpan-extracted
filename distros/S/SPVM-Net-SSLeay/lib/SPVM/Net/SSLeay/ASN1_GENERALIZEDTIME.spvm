@@ -4,7 +4,6 @@
 class Net::SSLeay::ASN1_GENERALIZEDTIME : pointer {
   
   use Net::SSLeay::BIO;
-  use Sys::Time::Tm;
   use Fn;
   
   # Class Methods

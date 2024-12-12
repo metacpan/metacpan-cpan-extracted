@@ -53,7 +53,7 @@ subtest 'receive msg' => sub {
 
     $zmq_client_source->take(10)->each(
         sub {
-            is shift, unpack("H*", $msg[1]), "Correct message received";
+            is shift, $msg[1], "Correct message received";
         })->get;
 };
 

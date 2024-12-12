@@ -6,7 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.12'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -19,9 +19,10 @@ no_index:
     - t
     - inc
 requires:
+  ExtUtils::MakeMaker: '7.12'
   perl: '5.012'
 resources:
   bugtracker: https://github.com/scottchiefbaker/perl-Random-Simple/issues
   repository: https://github.com/scottchiefbaker/perl-Random-Simple.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

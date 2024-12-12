@@ -1,14 +1,13 @@
-package Extism;
+package Extism v0.3.0;
 
 use 5.016;
 use strict;
 use warnings;
 use Extism::XS qw(version log_file);
+use Extism::CompiledPlugin;
 use Extism::Plugin;
 use Extism::Function ':all';
 use Exporter 'import';
-use version 0.77;
-our $VERSION = qv(v0.2.0);
 
 sub log_custom {
   my ($level) = @_;

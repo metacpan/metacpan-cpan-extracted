@@ -29,6 +29,8 @@ lib/Net/Async/Blockchain/Client/ZMQ.pm
 lib/Net/Async/Blockchain/Client/ZMQ.pod
 lib/Net/Async/Blockchain/ETH.pm
 lib/Net/Async/Blockchain/ETH.pod
+lib/Net/Async/Blockchain/TRX.pm
+lib/Net/Async/Blockchain/TRX.pod
 lib/Net/Async/Blockchain/Transaction.pm
 t/00-check-deps.t
 t/00-compile.t

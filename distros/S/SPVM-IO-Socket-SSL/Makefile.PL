@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.990023');
+my %configure_and_runtime_requires = ('SPVM' => '0.990032');
 WriteMakefile(
   NAME => 'SPVM::IO::Socket::SSL',
   VERSION_FROM => 'lib/SPVM/IO/Socket/SSL.pm',
@@ -51,8 +51,9 @@ WriteMakefile(
   PREREQ_PM         => {
     %configure_and_runtime_requires,
     'SPVM::IO' => '0.229',
-    'SPVM::Net::SSLeay' => '0.017',
+    'SPVM::Net::SSLeay' => '0.026',
     'SPVM::Mozilla::CA' => '0.002',
+    'SPVM::Sys' => '0.528',
   },
   TEST_REQUIRES => {
     

@@ -4,6 +4,7 @@ count_vowels_kvstore.wasm
 fail.wasm
 host.wasm
 lib/Extism.pm
+lib/Extism/CompiledPlugin.pm
 lib/Extism/CurrentPlugin.pm
 lib/Extism/Function.pm
 lib/Extism/Plugin.pm
@@ -12,6 +13,7 @@ lib/Extism/Plugin/CancelHandle.pm
 lib/Extism/ppport.h
 lib/Extism/XS.pm
 lib/Extism/XS.xs
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README

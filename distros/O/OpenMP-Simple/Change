@@ -60,3 +60,9 @@
 
 0.1.6  12/02/2024 05:25:00 AM MST
       - added SKIP for double, quad precision perls in test 11
+
+0.1.7  12/12/2024 01:08:00 AM MST
+      - added 4 new macros, threaded versions of the 1D and 2D routines
+        that will unpack AVs and AVs of AVs into regular C arrays, both
+        integer and floating point types - after determining that av_fetch
+        is thread-safe provided the option to "grow" the array of off 

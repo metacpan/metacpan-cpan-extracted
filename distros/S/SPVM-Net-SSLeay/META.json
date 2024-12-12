@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.990032"
+            "SPVM" : "0.990032",
+            "SPVM::Sys" : "0.528"
          }
       },
       "test" : {
@@ -51,6 +52,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Net-SSLeay"
       }
    },
-   "version" : "0.026",
+   "version" : "0.027",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

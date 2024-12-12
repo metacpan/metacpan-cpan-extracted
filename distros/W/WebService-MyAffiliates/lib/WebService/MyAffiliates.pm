@@ -2,12 +2,14 @@ package WebService::MyAffiliates;
 
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Carp;
-use Mojo::UserAgent;
 use Mojo::Util qw(b64_encode url_escape);
 use XML::Simple 'XMLin';    ## no critic
+use JSON::MaybeUTF8 qw(encode_json_utf8);
+use HTTP::Tiny;
+use Mojo::URL;
 
 use vars qw/$errstr/;
 sub errstr { return $errstr }
@@ -24,24 +26,20 @@ sub new {    ## no critic (ArgUnpacking)
     $args{host} = 'http://' . $args{host} unless $args{host} =~ m{^https?\://};
     $args{host} =~ s{/$}{};
 
-    $args{timeout} ||= 30;    # for ua timeout
+    $args{timeout} ||= 300;    # for HTTP::Tiny timeout
 
     return bless \%args, $class;
 }
 
-sub __ua {
+sub __http_tiny {
     my $self = shift;
 
-    return $self->{ua} if exists $self->{ua};
+    return $self->{http_tiny} if exists $self->{http_tiny};
 
-    my $ua = Mojo::UserAgent->new;
-    $ua->max_redirects(3);
-    $ua->inactivity_timeout($self->{timeout});
-    $ua->proxy->detect;    # env proxy
-    $ua->max_connections(100);
-    $self->{ua} = $ua;
+    my $http_tiny = HTTP::Tiny->new(timeout => $self->{timeout});
+    $self->{http_tiny} = $http_tiny;
 
-    return $ua;
+    return $http_tiny;
 }
 
 ## https://myaffiliates.atlassian.net/wiki/display/PUB/Feed+1%3A+Users+Feed
@@ -49,6 +47,14 @@ sub get_users {    ## no critic (ArgUnpacking)
     my $self = shift;
     my %args = @_ % 2 ? %{$_[0]} : @_;
     my $url  = Mojo::URL->new('/feeds.php?FEED_ID=1');
+    $url->query(\%args) if %args;
+    return $self->request($url->to_string);
+}
+
+sub get_users_status {    ## no critic (ArgUnpacking)
+    my $self = shift;
+    my %args = @_ % 2 ? %{$_[0]} : @_;
+    my $url  = Mojo::URL->new('/feeds.php?FEED_ID=3');
     $url->query(\%args) if %args;
     return $self->request($url->to_string);
 }
@@ -64,8 +70,11 @@ sub create_affiliate {    ## no critic (ArgUnpacking)
 
     my $error_count = $res->{INIT}->{ERROR_COUNT};
     if ($error_count) {
-        my $init   = $res->{INIT};
-        my @errors = ref $init->{ERROR} eq 'ARRAY' ? $init->{ERROR}->@* : ($init->{ERROR});
+        my $init = $res->{INIT};
+        my @errors =
+            ref $init->{ERROR} eq 'ARRAY'
+            ? $init->{ERROR}->@*
+            : ($init->{ERROR});
         $errstr = map { $_->{MSG} . " " . $_->{DETAIL} } @errors;
         return;
     }
@@ -80,6 +89,13 @@ sub get_user {
 
     $id                                         or croak "id is required.";
     my $user = $self->get_users(USER_ID => $id) or return;
+    return $user->{USER};
+}
+
+sub get_users_status_by_affiliate_id {
+    my ($self, $ids) = @_;
+    $ids or croak "id is required.";
+    my $user = $self->get_users_status(USER_IDS => $ids);
     return $user->{USER};
 }
 
@@ -122,6 +138,7 @@ sub get_customers {    ## no critic (ArgUnpacking)
 
     my $url = Mojo::URL->new('/feeds.php?FEED_ID=10');
     $url->query(\%args) if %args;
+
     my $res = $self->request($url->to_string);
 
     my $customers =
@@ -137,22 +154,24 @@ sub request {
 
     $method ||= 'GET';
 
-    my $ua     = $self->__ua;
-    my $header = {Authorization => 'Basic ' . b64_encode($self->{user} . ':' . $self->{pass}, '')};
-    my @extra  = %params ? (form => \%params) : ();
-    my $tx     = $ua->build_tx($method => $self->{host} . $url => $header => @extra);
+    my $http_tiny = $self->__http_tiny;
+    my $header    = {Authorization => 'Basic ' . b64_encode($self->{user} . ':' . $self->{pass}, '')};
+    my @extra     = %params ? (form => \%params) : ();
+    my $response =
+        $http_tiny->get($self->{host} . $url, {headers => $header});
 
-    $tx = $ua->start($tx);
-    # use Data::Dumper; print STDERR Dumper(\$tx);
-    if ($tx->res->headers->content_type and $tx->res->headers->content_type =~ 'text/xml') {
-        return XMLin($tx->res->body);
-    }
-    if (!$tx->success) {
-        $errstr = $tx->error->{message};
+    unless ($response->{success}) {
+        $errstr = $response->{reason};
         return;
     }
 
-    $errstr = "Unknown Response.";
+    if (    $response->{headers}{"content-type"}
+        and $response->{headers}{"content-type"} =~ 'text/xml')
+    {
+        return XMLin($response->{content});
+    }
+
+    $errstr = $response->{content};
     return;
 }
 
@@ -187,6 +206,11 @@ sub get_affiliate_details {
 
     my $token_info = $self->decode_token($token) or return;
     return $token_info;
+}
+
+sub reset_errstr {
+    $errstr = '';
+    return;
 }
 
 1;
@@ -345,6 +369,8 @@ Returns a hashref with the details for the created account, in particular a nume
 =head2 get_affiliate_id_from_token
 
 =head2 request
+
+=head2 reset_errstr
 
 =head1 AUTHOR
 

@@ -1,0 +1,74 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Blockchain::TRX
+at lib/Net/Async/Blockchain/TRX.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Blockchain::TRX - Tron based subscription.
+
+=head1 SYNOPSIS
+
+    my $loop = IO::Async::Loop->new;
+
+    $loop->add(
+        my $trx_client = Net::Async::Blockchain::TRX->new(
+            subscription_url => "tcp://127.0.0.1:5555",
+            blockchain_code  => 'Tron',
+        )
+    );
+
+    $trx_client->subscribe("blocks")->each(sub { print shift->{hash} })->get;
+
+=head1 DESCRIPTION
+
+Tron subscription using ZMQ from the tron based blockchain nodes
+
+=over 4
+
+=back
+
+=head2 zmq_client
+
+Returns the current instance for L<Net::Async::Blockchain::Client::ZMQ> if not created
+create a new one.
+
+=over 4
+
+=back
+
+L<Net::Async::Blockchain::Client::ZMQ>
+
+=head2 subscribe
+
+Connect to the ZMQ port and subscribe to the implemented subscription: https://tronprotocol.github.io/documentation-en/architecture/event/#using-java-trons-built-in-message-queue-for-event-subscription
+
+=over 4
+
+=item * C<subscription> string subscription name
+
+=back
+
+L<Ryu::Source>
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Net::Async::Blockchain>
+
+L<blockchain_code|Net::Async::Blockchain/blockchain_code>, L<configure|Net::Async::Blockchain/configure>, L<subscription_msg_timeout|Net::Async::Blockchain/subscription_msg_timeout>, L<subscription_response|Net::Async::Blockchain/subscription_response>, L<subscription_timeout|Net::Async::Blockchain/subscription_timeout>, L<subscription_url|Net::Async::Blockchain/subscription_url>
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+

@@ -60,7 +60,7 @@ xdr-gen - Generate Perl code from an XDR (RFC4506) AST from XDR::Parse
 
 =head1 VERSION
 
-version 0.0.5
+version 1.0.0
 
 =head1 DESCRIPTION
 

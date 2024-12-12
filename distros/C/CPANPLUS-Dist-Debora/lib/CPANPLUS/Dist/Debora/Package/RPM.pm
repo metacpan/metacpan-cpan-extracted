@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -383,9 +383,7 @@ if ($package->is_noarch) {
     $OUT .= "AutoReq:   0\n";
 }
 else {
-    if (!$has_shared_objects) {
-        $OUT .= "%global debug_package %{nil}\n";
-    }
+    $OUT .= "%global _enable_debug_packages 0\n";
     $OUT .= "%global __perl_requires /bin/true\n";
     $OUT .= "%global __perllib_requires /bin/true\n";
     $OUT .= "%global __perltest_requires /bin/true\n";
@@ -423,8 +421,6 @@ local $Text::Wrap::unexpand = 0;
 $escape->(Text::Wrap::wrap(q{}, q{}, $package->description))
 %]
 
-%{?debug_package}
-
 %prep
 
 %build
@@ -432,6 +428,13 @@ $escape->(Text::Wrap::wrap(q{}, q{}, $package->description))
 %check
 
 %install
+[%
+for my $so (@{$package->shared_objects}) {
+    $OUT .= "%if %{defined __strip}\n";
+    $OUT .= "%{__strip} -g '" . $escape->($so) . "'\n";
+    $OUT .= "%endif\n";
+}
+%]
 tar -C '[% $escape->($package->stagingdir) %]' -cf - . | tar -C %{buildroot} -xf -
 
 %clean
@@ -571,7 +574,7 @@ CPANPLUS::Dist::Debora::Package::RPM - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

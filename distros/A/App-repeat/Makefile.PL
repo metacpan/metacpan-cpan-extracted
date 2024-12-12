@@ -14,7 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-repeat",
   "EXE_FILES" => [
-    "script/repeat"
+    "script/2times",
+    "script/2x",
+    "script/3x",
+    "script/4x",
+    "script/5x",
+    "script/repeat",
+    "script/twice"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -32,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }

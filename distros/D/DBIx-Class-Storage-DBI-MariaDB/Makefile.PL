@@ -19,11 +19,16 @@ WriteMakefile(
                 web => "https://github.com/Siemplexus/DBIx-Class-Storage-DBI-MariaDB/issues",
             },
         },
+        x_contributors => [
+          'Dave Lambley <dave@lambley.me.uk>',
+        ],
     },
     VERSION_FROM => "lib/DBIx/Class/Storage/DBI/MariaDB.pm",
     PREREQ_PM    => {
         'DBD::MariaDB' => '>= 1.00',
         'DBIx::Class'  => '>= 0.082820',
+        'DBI'          => 0,
+        'perl'         => '>= 5.8.9',
     },
     TEST_REQUIRES => {
         'Test::More'      => 0,

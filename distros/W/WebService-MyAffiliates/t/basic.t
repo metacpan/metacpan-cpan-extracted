@@ -11,6 +11,7 @@ my $aff = WebService::MyAffiliates->new(
 ok($aff);
 
 throws_ok { $aff->decode_token() } qr/Must pass at least one token/;
-throws_ok { $aff->get_affiliate_id_from_token() } qr/Must pass a token to get_affiliate_id_from_token/, 'Throws exception if no token given.';
+throws_ok { $aff->get_affiliate_id_from_token() }
+qr/Must pass a token to get_affiliate_id_from_token/, 'Throws exception if no token given.';
 
 done_testing;

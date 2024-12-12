@@ -47,19 +47,21 @@ no_index:
 provides:
   Data::Validate::Sanctions:
     file: lib/Data/Validate/Sanctions.pm
-    version: '0.17'
+    version: '0.18'
   Data::Validate::Sanctions::Fetcher:
     file: lib/Data/Validate/Sanctions/Fetcher.pm
-    version: '0.17'
+    version: '0.18'
   Data::Validate::Sanctions::Redis:
     file: lib/Data/Validate/Sanctions/Redis.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   Carp: '0'
   Clone: '0'
   Data::Compare: '0'
   Date::Utility: '0'
   DateTime::Format::Strptime: '0'
+  Digest::SHA: '0'
+  Encode: '0'
   Exporter: '0'
   File::ShareDir: '0'
   File::Temp: '0'
@@ -67,6 +69,7 @@ requires:
   FindBin: '0'
   Getopt::Long: '2.42'
   IO::Uncompress::Unzip: '0'
+  JSON: '0'
   JSON::MaybeUTF8: '0'
   List::Util: '0'
   Locale::Country: '3.66'
@@ -85,10 +88,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/binary-com/perl-Data-Validate-Sanctions/issues
-  homepage: https://github.com/binary-com/perl-Data-Validate-Sanctions
-  repository: https://github.com/binary-com/perl-Data-Validate-Sanctions.git
-version: '0.17'
+  bugtracker: https://github.com/deriv-com/perl-Data-Validate-Sanctions/issues
+  homepage: https://github.com/deriv-com/perl-Data-Validate-Sanctions
+  repository: https://github.com/deriv-com/perl-Data-Validate-Sanctions.git
+version: '0.18'
 x_authority: cpan:DERIV
 x_contributors:
   - 'Tazeek <tazeek.rakib@gmail.com>'
@@ -99,19 +102,21 @@ x_contributors:
   - 'Raunak Kathuria <raunakkathuria@gmail.com>'
   - 'Tom Molesworth <tom@binary.com>'
   - 'mat-fs <53427463+mat-fs@users.noreply.github.com>'
+  - 'chylli-deriv <chylli@deriv.com>'
   - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
   - 'Kirill Sysoev <55120154+kirill-binary@users.noreply.github.com>'
   - 'Mahdi Zarei <60599487+mehdi-fs@users.noreply.github.com>'
+  - 'mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>'
   - 'nihal-deriv <105702884+nihal-deriv@users.noreply.github.com>'
   - 'Anthony-Wong <34021543+Anthony-Wong@users.noreply.github.com>'
   - 'Chylli <chylli.email@gmail.com>'
   - 'chylli-deriv <52912308+chylli-deriv@users.noreply.github.com>'
-  - 'chylli-deriv <chylli@deriv.com>'
   - 'Evgeniy Vostrov <107458551+evgeniy-deriv@users.noreply.github.com>'
+  - 'heshan-deriv <109588077+heshan-deriv@users.noreply.github.com>'
   - 'jafrul-deriv <150781410+jafrul-deriv@users.noreply.github.com>'
   - 'lq <liuqiang1981@gmail.com>'
-  - 'mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>'
   - 'ragheb <91007977+ragheb-deriv@users.noreply.github.com>'
+  - 'saad-deriv <muhammad.saad@deriv.com>'
   - 'Zak B. Elep <zakame@zakame.net>'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

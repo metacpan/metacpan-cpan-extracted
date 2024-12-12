@@ -1,9 +1,0 @@
-# Copyright (c) 2024 Yuki Kimoto
-# MIT License
-
-class Net::SSLeay::Callback::TlsextStatus : interface_t {
-  use Net::SSLeay;
-  
-  required method : int ($ssl : Net::SSLeay, $arg : object);
-  
-}

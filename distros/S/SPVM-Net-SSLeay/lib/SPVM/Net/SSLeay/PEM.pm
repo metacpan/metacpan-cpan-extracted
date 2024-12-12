@@ -42,18 +42,6 @@ The BIO $bp must be defined. Otherwise an exception is thrown.
 
 If PEM_read_bio_X509_CRL failed and the error is C<PEM_R_NO_START_LINE>, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error::PEM_R_NO_START_LINE|SPVM::Net::SSLeay::Error::PEM_R_NO_START_LINE> class. If the error is something else, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
-=head2 read_bio_DHparams
-
-C<static method read_bio_DHparams : L<Net::SSLeay::DH|SPVM::Net::SSLeay::DH> ($bp : L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO>);>
-
-Calls native L<read_bio_DHparams|https://docs.openssl.org/3.0/man3/read_bio_DHparams/> function, creates a new L<Net::SSLeay::X509_CRL|SPVM::Net::SSLeay::X509_CRL> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
-
-Exceptions:
-
-The BIO $bp must be defined. Otherwise an exception is thrown.
-
-If read_bio_DHparams failed and the error is C<PEM_R_NO_START_LINE>, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error::PEM_R_NO_START_LINE|SPVM::Net::SSLeay::Error::PEM_R_NO_START_LINE> class. If the error is something else, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
-
 =head2 read_bio_PrivateKey
 
 C<static method read_bio_PrivateKey : L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY> ($bp : L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO>);>

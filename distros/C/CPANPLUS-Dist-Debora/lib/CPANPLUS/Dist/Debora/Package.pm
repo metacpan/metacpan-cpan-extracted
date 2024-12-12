@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use Carp qw(croak);
 use Config;
@@ -826,13 +826,15 @@ sub _get_dependencies {
     # Sometimes versions are numified and cannot be compared with stringified
     # versions.
     my %version_for = (
-        'Algorithm-Diff'   => sub {0},
-        'BioPerl'          => sub { $self->_unnumify_version($_[0]) },
-        'Catalyst'         => sub {0},
-        'Catalyst-Runtime' => sub {0},
-        'CGI-Simple'       => sub {0},
-        'DBD-Pg'           => sub { $self->_unnumify_version($_[0]) },
-        'Time-Local'       => sub {0},
+        'Algorithm::Diff'   => sub {0},
+        'BioPerl'           => sub { $self->_unnumify_version($_[0]) },
+        'Catalyst'          => sub {0},
+        'Catalyst::Runtime' => sub {0},
+        'CGI::Simple'       => sub {0},
+        'DBD::Pg'           => sub { $self->_unnumify_version($_[0]) },
+        'strict'            => sub {0},
+        'Time::Local'       => sub {0},
+        'warnings'          => sub {0},
     );
 
     my %dependency;
@@ -856,8 +858,8 @@ sub _get_dependencies {
             || module_is_distributed_with_perl($module_name, $version)
             || $module->package_is_perl_core;
 
-        if (exists $version_for{$dist_name}) {
-            $version = $version_for{$dist_name}->($version);
+        if (exists $version_for{$module_name}) {
+            $version = $version_for{$module_name}->($version);
         }
 
         if (!exists $dependency{$module_name}
@@ -1219,7 +1221,7 @@ CPANPLUS::Dist::Debora::Package - Base class for package formats
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

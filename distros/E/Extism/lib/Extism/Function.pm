@@ -1,4 +1,4 @@
-package Extism::Function;
+package Extism::Function v0.3.0;
 
 use 5.016;
 use strict;
@@ -11,10 +11,6 @@ use Devel::Peek qw(Dump);
 use Exporter 'import';
 use Carp qw(croak);
 use Data::Dumper;
-
-use version 0.77;
-our $VERSION = qv(v0.2.0);
-
 
 use constant {
   Extism_I32 => 0,

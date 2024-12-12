@@ -6,7 +6,7 @@ use Test::More 0.82;
 use Map::Tube::Hamburg;
 
 my $map = Map::Tube::Hamburg->new( );
-isa_ok( $map, 'Map::Tube::Hamburg', "Map::Tube object" );
+isa_ok( $map, 'Map::Tube::Hamburg', 'Map::Tube object' );
 ok_unique_names($map);
 ok_unique_ids($map);
 ok_lines_defined_and_used($map);

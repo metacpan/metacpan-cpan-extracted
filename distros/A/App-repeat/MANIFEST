@@ -8,7 +8,13 @@ Makefile.PL
 README
 dist.ini
 lib/App/repeat.pm
+script/2times
+script/2x
+script/3x
+script/4x
+script/5x
 script/repeat
+script/twice
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

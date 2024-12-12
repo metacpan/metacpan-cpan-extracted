@@ -80,12 +80,43 @@ ExtismCurrentPlugin * T_PTR
 ExtismMemoryHandle T_UV
 const ExtismCancelHandle * T_PTR
 PV T_PV
+uint64_t T_UV
+ExtismCompiledPlugin * T_PTR
+const ExtismCompiledPlugin * T_PTR
 HERE
 
 const char *
 version()
     CODE:
         RETVAL = extism_version();
+    OUTPUT:
+        RETVAL
+
+ExtismCompiledPlugin *
+compiled_plugin_new(wasm, wasm_size, functions, n_functions, with_wasi, errmsg)
+    const uint8_t *wasm
+    ExtismSize wasm_size
+    const ExtismFunction **functions
+    ExtismSize n_functions
+    bool with_wasi
+    char **errmsg
+    CODE:
+        RETVAL = extism_compiled_plugin_new(wasm, wasm_size, functions, n_functions, with_wasi, errmsg);
+    OUTPUT:
+        RETVAL
+
+void
+compiled_plugin_free(compiled_plugin)
+    ExtismCompiledPlugin *compiled_plugin
+    CODE:
+        extism_compiled_plugin_free(compiled_plugin);
+
+ExtismPlugin *
+plugin_new_from_compiled(compiled_plugin, errmsg)
+    const ExtismCompiledPlugin *compiled_plugin
+    char **errmsg
+    CODE:
+        RETVAL = extism_plugin_new_from_compiled(compiled_plugin, errmsg);
     OUTPUT:
         RETVAL
 
@@ -102,20 +133,41 @@ plugin_new(wasm, wasm_size, functions, n_functions, with_wasi, errmsg)
     OUTPUT:
         RETVAL
 
+ExtismPlugin *
+plugin_new_with_fuel_limit(wasm, wasm_size, functions, n_functions, with_wasi, fuel_limit, errmsg)
+    const uint8_t *wasm
+    ExtismSize wasm_size
+    const ExtismFunction **functions
+    ExtismSize n_functions
+    bool with_wasi
+    uint64_t fuel_limit
+    char **errmsg
+    CODE:
+        RETVAL = extism_plugin_new_with_fuel_limit(wasm, wasm_size, functions, n_functions, with_wasi, fuel_limit, errmsg);
+    OUTPUT:
+        RETVAL
+
 void
-plugin_new_error_free(err);
+plugin_allow_http_response_headers(plugin)
+    ExtismPlugin *plugin
+    CODE:
+        extism_plugin_allow_http_response_headers(plugin);
+
+void
+plugin_new_error_free(err)
     void *err
     CODE:
         extism_plugin_new_error_free(err);
 
 int32_t
-plugin_call(plugin, func_name, data, data_len)
+plugin_call(plugin, func_name, data, data_len, host_context=&PL_sv_undef)
     ExtismPlugin *plugin
     const char *func_name
     const uint8_t *data
     ExtismSize data_len
+    SV *host_context
     CODE:
-        RETVAL = extism_plugin_call(plugin, func_name, data, data_len);
+        RETVAL = extism_plugin_call_with_host_context(plugin, func_name, data, data_len, host_context);
     OUTPUT:
         RETVAL
 
@@ -260,6 +312,17 @@ current_plugin_memory_free(plugin, handle)
     ExtismMemoryHandle handle
     CODE:
         extism_current_plugin_memory_free(plugin, handle);
+
+SV *
+current_plugin_host_context(plugin)
+    ExtismCurrentPlugin *plugin
+    CODE:
+        RETVAL = extism_current_plugin_host_context(plugin);
+        if (RETVAL != &PL_sv_undef) {
+            SvREFCNT_inc_simple_NN(RETVAL);
+        }
+    OUTPUT:
+        RETVAL
 
 void
 log_file(filename, log_level)

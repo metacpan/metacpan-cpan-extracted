@@ -6,13 +6,78 @@ class TestCase::Net::SSLeay::SSL_CTX {
   use Net::SSLeay::SSL_METHOD;
   use Net::SSLeay::SSL_CTX;
   use Net::SSLeay::Constant as SSL;
+  use Net::SSLeay::X509_STORE_CTX;
   
   use FindBin;
+  use Sys::OS;
   
   our $FILE_DIR : string;
   
   INIT {
     $FILE_DIR = FindBin->Bin . "/file";
+  }
+  
+  static method callback : int () {
+    
+    # set_verify
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      unless ($ssl_ctx is_type Net::SSLeay::SSL_CTX) {
+        return 0;
+      }
+      
+      $ssl_ctx->set_verify(SSL->SSL_VERIFY_NONE, method : int ($preverify_ok : int, $x509_ctx : Net::SSLeay::X509_STORE_CTX) {
+        return 0;
+      });
+      
+    }
+    
+    # set_default_passwd_cb
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      unless ($ssl_ctx is_type Net::SSLeay::SSL_CTX) {
+        return 0;
+      }
+      
+      $ssl_ctx->set_default_passwd_cb(method : int ($buf : mutable string, $size : int, $rwflag : int, $arg : object) { return 0; }, undef);
+      
+    }
+    
+    # set_alpn_select_cb
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      unless ($ssl_ctx is_type Net::SSLeay::SSL_CTX) {
+        return 0;
+      }
+      
+      $ssl_ctx->set_alpn_select_cb(method : int ($ssl : Net::SSLeay, $out_ref : string[], $outlen_ref : byte*, $in : string, $inlen : int, $arg : object) { return 0; }, undef);
+      
+    }
+    
+    # set_tlsext_servername_callback
+    {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      unless ($ssl_ctx is_type Net::SSLeay::SSL_CTX) {
+        return 0;
+      }
+      
+      $ssl_ctx->set_tlsext_servername_callback(method : int ($ssl : Net::SSLeay, $al_ref : int*, $arg : object) { return 0; }, undef);
+      
+    }
+    
+    return 1;
   }
   
   static method basic : int () {
@@ -83,6 +148,16 @@ class TestCase::Net::SSLeay::SSL_CTX {
       my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
       
       $ssl_ctx->set_default_verify_paths;
+      
+    }
+    
+    # set_default_verify_paths_windows
+    if (Sys::OS->is_windows) {
+      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+      
+      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+      
+      $ssl_ctx->set_default_verify_paths_windows;
       
     }
     
@@ -239,53 +314,13 @@ class TestCase::Net::SSLeay::SSL_CTX {
       
     }
     
-    # set_session_cache_mode, get_session_cache_mode
-    {
-      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
-      
-      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
-      
-      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_OFF);
-      
-      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_CLIENT);
-      
-      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_SERVER);
-      
-      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_BOTH);
-      
-      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_NO_AUTO_CLEAR);
-      
-      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_NO_INTERNAL_LOOKUP);
-      
-      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_NO_INTERNAL_STORE);
-      
-      $ssl_ctx->set_session_cache_mode(SSL->SSL_SESS_CACHE_NO_INTERNAL);
-      
-      my $mode = $ssl_ctx->get_session_cache_mode;
-      
-      unless ($mode & SSL->SSL_SESS_CACHE_NO_INTERNAL) {
-        return 0;
-      }
-      
-    }
-    
-    # set_session_cache_mode, get_session_cache_mode
+    # set_post_handshake_auth
     {
       my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
       
       my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
       
       $ssl_ctx->set_post_handshake_auth(1);
-      
-    }
-    
-    # set_session_id_context
-    {
-      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
-      
-      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
-      
-      $ssl_ctx->set_session_id_context("my_host");
       
     }
     
@@ -425,36 +460,6 @@ class TestCase::Net::SSLeay::SSL_CTX {
       my $protocols = ["spdy/1", "http/1.1"];
       
       $ssl_ctx->set_alpn_select_cb_with_protocols($protocols);
-    }
-    
-    return 1;
-  }
-  
-  static method set_next_proto_select_cb_with_protocols : int () {
-    
-    {
-      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
-      
-      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
-      
-      my $protocols = ["spdy/1", "http/1.1"];
-      
-      $ssl_ctx->set_next_proto_select_cb_with_protocols($protocols);
-    }
-    
-    return 1;
-  }
-  
-  static method set_next_protos_advertised_cb_with_protocols : int () {
-    
-    {
-      my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
-      
-      my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
-      
-      my $protocols = ["spdy/1", "http/1.1"];
-      
-      $ssl_ctx->set_next_protos_advertised_cb_with_protocols($protocols);
     }
     
     return 1;

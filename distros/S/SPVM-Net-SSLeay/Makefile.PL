@@ -47,6 +47,7 @@ WriteMakefile(
   },
   PREREQ_PM         => {
     %configure_and_runtime_requires,
+    'SPVM::Sys' => '0.528',
   },
   TEST_REQUIRES => {
     'SPVM::Mozilla::CA' => '0.001',
@@ -74,15 +75,12 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::BIO');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::Constant');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::DER');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::DH');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::EC_KEY');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::ERR');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::EVP');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::EVP_CIPHER_CTX');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::EVP_MD');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::EVP_PKEY');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::GENERAL_NAME');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::HMAC_CTX');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::OBJ');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::OPENSSL');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::OPENSSL_INIT');
@@ -92,7 +90,6 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::RAND');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::SSL_CTX');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::SSL_METHOD');
-    $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::SSL_SESSION');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_CRL');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Net::SSLeay::X509_NAME');

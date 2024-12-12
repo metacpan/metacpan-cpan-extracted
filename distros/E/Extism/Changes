@@ -1,5 +1,12 @@
 Revision history for Extism
 
+v0.3.0  2024-12-11
+        Add per call host context
+        Add setting fuel_limit to Extism::Plugin->new
+        Add allow_http_response_headers to Plugin->new to allow plugins
+        to access http response headers
+        Add compiled plugin
+
 v0.2.0  2024-10-23
         Add configure check to bail out on unsupported platforms
         Update to work with latest libextism

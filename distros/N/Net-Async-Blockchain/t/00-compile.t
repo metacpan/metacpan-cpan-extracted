@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Net/Async/Blockchain.pm',
@@ -18,6 +18,7 @@ my @module_files = (
     'Net/Async/Blockchain/Client/Websocket.pm',
     'Net/Async/Blockchain/Client/ZMQ.pm',
     'Net/Async/Blockchain/ETH.pm',
+    'Net/Async/Blockchain/TRX.pm',
     'Net/Async/Blockchain/Transaction.pm'
 );
 

@@ -20,11 +20,7 @@ my $map = new_ok( 'Map::Tube::Hamburg' );
 is( $map->name( ), 'Hamburg U- and S-Bahn and AKN', 'Name of map does not match' );
 
 eval { $map->get_node_by_name('XYZ'); };
-# Different Map::Tube versions give different error messages for the following:
-like( $@,
-      qr/(\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E)|(\QMap::Tube::get_node_by_id(): ERROR: Missing Station ID\E)/,
-      'Node XYZ should not exist'
-    );
+like( $@, qr/\QMap::Tube::get_node_by_name(): ERROR: Invalid Station Name [XYZ]\E/, 'Node XYZ should not exist' );
 
 {
   my $ret = $map->get_node_by_name('Schlump');
@@ -66,6 +62,6 @@ like( $@,
   my @stations = @{ $stationref };
   isa_ok( $stations[0], 'Map::Tube::Node' );
   is( scalar(@stations), 4, 'Number of neighbouring stations incorrect for Schlump' );
-  like( join( ',', sort map { $_->name( ) } @stations ), qr(^Christuskirche.*Sternschanze \(Messe\)$), 'Neighbouring stations not correct for Schlump' );
+  like( join( ',', sort map { $_->name( ) } @stations ), qr(^Christuskirche.*Sternschanze [(]Messe[)]$), 'Neighbouring stations not correct for Schlump' );
 }
 

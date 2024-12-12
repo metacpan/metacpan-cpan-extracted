@@ -2,7 +2,7 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.026";
+  version "0.027";
   
   use Net::SSLeay::Constant;
   use Net::SSLeay::SSL_CTX;
@@ -10,16 +10,11 @@ class Net::SSLeay {
   use Net::SSLeay::Error;
   use Net::SSLeay::X509;
   use Net::SSLeay::X509_NAME;
-  use Net::SSLeay::SSL_SESSION;
   use Net::SSLeay::Callback::Msg;
   use Net::SSLeay::OPENSSL;
   use Net::SSLeay::OPENSSL_INIT_SETTINGS;
   
   # Fields
-  has ssl_ctx : Net::SSLeay::SSL_CTX;
-  
-  has ssl_session : Net::SSLeay::SSL_SESSION;
-  
   has operation_error : ro int;
   
   # Class Methods
@@ -36,72 +31,46 @@ class Net::SSLeay {
   
   native static method alert_desc_string_long : string ($value : int);
   
-  native static method load_error_strings : void ();
-  
   native static method load_client_CA_file : Net::SSLeay::X509_NAME[] ($file : string);
   
   # Instance Methods
-  native method set_fd : int ($fd : int);
+  native method version : int ();
   
-  native method set_tlsext_host_name : int ($name : string);
-  
-  native method connect : int ();
-  
-  native method accept : int ();
-  
-  native method shutdown : int ();
-  
-  native method read : int ($buf : mutable string, $num : int = -1, $offset : int = 0);
-  
-  native method peek : int ($buf : mutable string, $num : int = -1, $offset : int = 0);
-  
-  native method write : int ($buf : string, $num : int = -1, $offset : int = 0);
-  
-  native method get_servername : string ($type : int);
-  
-  native method set_tlsext_status_type : long  ($type : int);
+  native method get_mode : long ();
   
   native method set_mode : long ($mode : long);
   
   native method clear_mode : long ($mode : long);
   
-  native method get_mode : long ();
+  native method set_tlsext_host_name : int ($name : string);
   
-  native method version : int ();
+  native method get_servername : string ($type : int);
   
-  native method session_reused : int ();
+  native method get_SSL_CTX : Net::SSLeay::SSL_CTX ();
   
-  native method get_cipher : string ();
+  native method set_SSL_CTX : Net::SSLeay::SSL_CTX ($ctx : Net::SSLeay::SSL_CTX);
   
-  native method get_peer_certificate : Net::SSLeay::X509 ();
+  native method set_fd : int ($fd : int);
+  
+  native method connect : int ();
+  
+  native method accept : int ();
+  
+  native method read : int ($buf : mutable string, $num : int = -1, $offset : int = 0);
+  
+  native method write : int ($buf : string, $num : int = -1, $offset : int = 0);
+  
+  native method shutdown : int ();
   
   native method get_shutdown : int ();
   
-  native method pending : int ();
-  
-  native method get1_session :  Net::SSLeay::SSL_SESSION ();
-  
-  native method set_session : int ($session : Net::SSLeay::SSL_SESSION);
+  native method get_cipher : string ();
   
   native method get_certificate : Net::SSLeay::X509 ();
   
-  native method get0_next_proto_negotiated : void ($data_ref : string[], $len_ref : int*);
+  native method get_peer_certificate : Net::SSLeay::X509 ();
   
-  method get0_next_proto_negotiated_return_string : string () {
-    
-    my $data_ref = new string[1];
-    my $len = 0;
-    
-    $self->get0_next_proto_negotiated($data_ref, \$len);
-    
-    my $protocol = (string)undef;
-    if ($data_ref) {
-      $protocol = $data_ref->[0];
-      Fn->shorten((mutable string)$protocol, $len);
-    }
-    
-    return $protocol;
-  }
+  native method get_peer_cert_chain : Net::SSLeay::X509[] ();
   
   native method get0_alpn_selected : void ($data_ref : string[], $len_ref : int*);
   
@@ -121,22 +90,7 @@ class Net::SSLeay {
     return $protocol;
   }
   
-  native method get_peer_cert_chain : Net::SSLeay::X509[] ();
-  
-  method get_SSL_CTX : Net::SSLeay::SSL_CTX () {
-    return $self->{ssl_ctx};
-  }
-  
-  native method set_SSL_CTX : Net::SSLeay::SSL_CTX ($ctx : Net::SSLeay::SSL_CTX);
-  
   native method set_msg_callback : void ($cb : Net::SSLeay::Callback::Msg, $arg : object = undef);
-  
-  method P_dump_peer_certificate : string () {
-    
-    warn "P_dump_peer_certificate is deprecated.";
-    
-    return $self->dump_peer_certificate;
-  }
   
   method dump_peer_certificate : string () {
     
@@ -154,8 +108,6 @@ class Net::SSLeay {
     
     return $dump;
   }
-  
-  native method get_tlsext_status_type : long ();
   
   native method DESTROY : void ();
   

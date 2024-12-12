@@ -1,4 +1,8 @@
 Revision history for Perl extension Map::Tube::Hamburg.
 
-0.0.1 2024-12-09
+0.1.1 2024-12-11
+  - Require Map::Tube 3.83 and adapt tests accordingly.
+  - Fix test failing on older Perls.
+
+0.1.0 2024-12-09
   - initial release

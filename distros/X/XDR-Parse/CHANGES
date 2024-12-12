@@ -1,5 +1,14 @@
 -----
 
+1.0.0   2024-12-11
+    No changes from 0.3.1
+
+0.3.1   2024-05-29
+    [Fixed]
+        * Install bin/xdr-parse
+        * Add support for 'unsigned' (without 'int'), because apparently
+          rpcgen accepts it and libvirt uses it
+
 0.3.0   2024-05-20
     [Breaking]
         * 'struct' members 'type' description moved into 'declaration' key

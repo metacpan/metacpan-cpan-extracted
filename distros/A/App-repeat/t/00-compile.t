@@ -6,14 +6,20 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/repeat.pm'
 );
 
 my @scripts = (
-    'script/repeat'
+    'script/2times',
+    'script/2x',
+    'script/3x',
+    'script/4x',
+    'script/5x',
+    'script/repeat',
+    'script/twice'
 );
 
 # no fake home requested
