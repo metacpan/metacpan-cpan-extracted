@@ -45,7 +45,7 @@
             "autodie" : "0",
             "namespace::autoclean" : "0",
             "overload" : "0",
-            "perl" : "v5.8.0",
+            "perl" : "5.022",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -56,23 +56,24 @@
          },
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "Feature::Compat::Class" : "0.006",
             "File::Spec" : "0",
+            "Object::Pad" : "0.804",
             "Symbol" : "0",
             "Test2::V0" : "0",
             "Test::More" : "0",
-            "Test::UseAllModules" : "0.15"
+            "Test::UseAllModules" : "0.15",
+            "feature" : "0"
          }
       }
    },
    "provides" : {
       "Parallel::WorkUnit" : {
          "file" : "lib/Parallel/WorkUnit.pm",
-         "version" : "2.243450"
+         "version" : "2.243480"
       },
       "Parallel::WorkUnit::Procedural" : {
          "file" : "lib/Parallel/WorkUnit/Procedural.pm",
-         "version" : "2.243450"
+         "version" : "2.243480"
       }
    },
    "release_status" : "stable",
@@ -86,7 +87,7 @@
          "web" : "https://github.com/jmaslak/Parallel-WorkUnit"
       }
    },
-   "version" : "2.243450",
+   "version" : "2.243480",
    "x_contributor_covenant" : {
       "version" : 0.02
    },

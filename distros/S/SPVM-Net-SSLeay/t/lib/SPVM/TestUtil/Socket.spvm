@@ -1,0 +1,263 @@
+class TestUtil::Socket extends IO::Socket::IP  {
+  
+  use Sys::Socket::Errno;
+  use Sys::Socket::Sockaddr;
+  use Net::SSLeay::Constant as SSL;
+  
+  # Fields
+  has ssl : rw Net::SSLeay;
+  
+  # Class Methods
+  static method new : TestUtil::Socket ($options : object[] = undef) {
+    
+    my $self = new TestUtil::Socket;
+    
+    $self->init($options);
+    
+    $self->configure;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  protected method configure : void () {
+    
+    $self->SUPER::configure;
+    
+    $self->configure_SSL;
+  }
+  
+  protected method init : void ($options : object[] = undef) {
+    
+    $self->SUPER::init($options);
+    
+  }
+  
+  protected method configure_SSL : void () {
+    
+    my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+    
+    my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+    
+    my $ssl = Net::SSLeay->new($ssl_ctx);
+    
+    my $socket_fileno = $self->fileno;
+    
+    $ssl->set_fd($socket_fileno);
+    
+    $self->{ssl} = $ssl;
+    
+  }
+  
+  method connect_SSL : void () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $timeout = $self->{Timeout};
+    
+    my $fd = $self->{FD};
+    
+    while (1) {
+      eval { $ssl->connect; }
+      
+      if ($@) {
+        my $again_read = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_READ;
+        
+        my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
+        
+        if ($again_read) {
+          Go->gosched_io_read($fd, $timeout);
+          next;
+        }
+        elsif ($again_write) {
+          Go->gosched_io_write($fd, $timeout);
+          next;
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+  }
+  
+  method accept : TestUtil::Socket ($peer_ref : Sys::Socket::Sockaddr[] = undef) {
+    
+    my $client_socket = (TestUtil::Socket)$self->SUPER::accept($peer_ref);
+    
+    $client_socket->ssl->set_SSL_CTX($self->ssl->get_SSL_CTX);
+    
+    return $client_socket;
+  }
+  
+  method accept_SSL : void () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $fd = $self->{FD};
+    
+    my $timeout = $self->{Timeout};
+    
+    while (1) {
+      eval { $ssl->accept; }
+      
+      if ($@) {
+        my $again_read = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_READ;
+        
+        my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
+        
+        if ($again_read) {
+          Go->gosched_io_read($fd, $timeout);
+          next;
+        }
+        elsif ($again_write) {
+          Go->gosched_io_write($fd, $timeout);
+          next;
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+  }
+  
+  method read : int ($buffer : mutable string, $length : int = -1, $offset : int = 0) {
+    
+    my $ssl = $self->{ssl};
+    
+    my $fd = $self->{FD};
+    
+    my $timeout = $self->{Timeout};
+    
+    my $read_length = -1;
+    while (1) {
+      eval { $read_length = $ssl->read($buffer, $length, $offset); }
+      
+      if ($@) {
+        my $again_read = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_READ;
+        
+        my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
+        
+        if ($again_read) {
+          Go->gosched_io_read($fd, $timeout);
+          next;
+        }
+        elsif ($again_write) {
+          Go->gosched_io_write($fd, $timeout);
+          next;
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+    
+    return $read_length;
+  }
+  
+  method write : int ($buffer : string, $length : int = -1, $offset : int = 0) {
+    
+    my $ssl = $self->{ssl};
+    
+    my $fd = $self->{FD};
+    
+    my $timeout = $self->{Timeout};
+    
+    my $write_length = -1;
+    while (1) {
+      
+      eval { $write_length = $ssl->write($buffer, $length, $offset); }
+      
+      if ($@) {
+        my $again_read = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_READ;
+        
+        my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
+        
+        if ($again_read) {
+          Go->gosched_io_read($fd, $timeout);
+          next;
+        }
+        elsif ($again_write) {
+          Go->gosched_io_write($fd, $timeout);
+          next;
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+    
+    return $write_length;
+  }
+  
+  method shutdown_SSL : int () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $fd = $self->{FD};
+    
+    my $timeout = $self->{Timeout};
+    
+    my $status = -1;
+    while (1) {
+      
+      eval { $status = $ssl->shutdown; }
+      
+      if ($@) {
+        my $again_read = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_READ;
+        
+        my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
+        
+        if ($again_read) {
+          Go->gosched_io_read($fd, $timeout);
+          next;
+        }
+        elsif ($again_write) {
+          Go->gosched_io_write($fd, $timeout);
+          next;
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+    
+    return $status;
+  }
+  
+  method close : void () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $shutdown_status = $ssl->get_shutdown;
+    
+    my $listen = $self->{Listen};
+    
+    # Only client sockets and accpected sockets
+    unless ($listen > 0) {
+      $self->shutdown_SSL;
+    }
+    
+    $self->SUPER::close;
+    
+  }
+  
+  method DESTROY : void () {
+    $self->close;
+  }
+
+}

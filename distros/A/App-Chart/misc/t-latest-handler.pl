@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -18,15 +18,17 @@
 
 use strict;
 use warnings;
+use App::Chart;
 use App::Chart::Gtk2::Symlist;
 use App::Chart::LatestHandler;
+$App::Chart::option{'verbose'} = 2;
 
 App::Chart::symbol_setups ('X.LME');
 App::Chart::symbol_setups ('BHP.AX');
 use Data::Dumper;
 print Dumper (\@App::Chart::LatestHandler::handler_list);
 
-my $symbol = 'LNN.AX';
+my $symbol = 'BHP.AX';
 my $h = App::Chart::LatestHandler->handler_for_symbol ($symbol);
 print Dumper ($h);
 $h->download([$symbol]);

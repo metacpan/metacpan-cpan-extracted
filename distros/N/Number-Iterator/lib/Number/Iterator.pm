@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '1.01';
 
 use overload (
 	'""' => sub {
@@ -66,7 +66,7 @@ Number::Iterator - The great new Number::Iterator!
 
 =head1 VERSION
 
-Version 0.01
+Version 1.01
 
 =cut
 

@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -87,7 +87,7 @@ __END__
 
 # =head1 NAME
 # 
-# App::Chart::DownloadHandler::IndivInfo -- individual symbols in date range chunks
+# App::Chart::DownloadHandler::IndivInfo -- individual symbols info
 # 
 # =for test_synopsis my ($pred)
 # 
@@ -98,16 +98,38 @@ __END__
 #      (name  => __('FooEX'),
 #       pred  => $pred,
 #       url_func => \&my_url,
-#       parse    => \&my_page_parser);
+#       parse    => \&my_info_parser,
+#       key      => 'Foo-info',
+#       recheck_days => 10);
 # 
 # =head1 DESCRIPTION
 # 
-# This module downloads and processes daily data in date range chunks for one
-# symbol at a time.  This is the style required for Yahoo Finance for
-# instance.
+# This module downloads and processes information for a given symbol,
+# such as the name.  Info is re-checked at intervals of a given
+# number of days.
+# 
+# This is for use when information is a separate download for each
+# symbol (rather than say a single big download of many symbols).
+# 
+# C<url_func> is a function which returns a URL (a string),
+# 
+#     sub my_url {
+#       my ($symbol) = @_;
+#       return "http://example.com/info/$symbol";
+#     }
+# 
+# C<parse> is a function which returns a C<write_daily_group()> style
+# hashref,
+# 
+#     sub my_info_parse {
+#       my ($symbol, $resp) = @_;
+#       my $h = { ... };
+#       return $h;
+#     }
 # 
 # =head1 SEE ALSO
 # 
-# L<App::Chart::DownloadHandler>
+# L<App::Chart::DownloadHandler>,
+# L<App::Chart::DownloadHandler::IndivChunks>
 # 
 # =cut

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Data::Delete;
-$Data::Delete::VERSION = '0.06';
+$Data::Delete::VERSION = '0.07';
 use Moo;
 use MooX::Types::MooseLike::Base qw/HashRef Bool/;
 
@@ -71,7 +71,7 @@ has 'debug_delete' => (
 
 =head2 will_delete_empty_string
 
-Choose to remove empty string hash values
+Choose to remove empty string hash values - default true
 
 =cut
 
@@ -80,6 +80,20 @@ has 'will_delete_empty_string' => (
     isa     => Bool,
     builder => sub { 1 },
 );
+
+=head2 will_delete_empty_ref
+
+Choose to remove empty array, hash and scalar ref values - default false
+
+=cut
+
+
+has 'will_delete_empty_ref' => (
+    is      => 'lazy',
+    isa     => Bool,
+    builder => sub { 0 },
+);
+
 
 =head1 METHODS
 
@@ -144,16 +158,31 @@ sub _delete_hash {
             else { }
         }
 
-        # Defined and not the zero string
+        # Look inside HashRefs
         elsif ( $ref_value eq 'HASH' ) {
-
-            # Recurse when a value is a HashRef
-            $hashref->{$key} = $self->_delete_hash($value);
+            if (!%$value and $self->will_delete_empty_ref) {
+                 delete $hashref->{$key};
+            }
+            else {
+                # Recurse when a value is a HashRef
+                $hashref->{$key} = $self->_delete_hash($value);
+            }
         }
 
         # Look inside ArrayRefs for HashRefs
         elsif ( $ref_value eq 'ARRAY' ) {
-            $hashref->{$key} = $self->_delete_array($value);
+            if (!@$value and $self->will_delete_empty_ref) {
+                 delete $hashref->{$key};
+            }
+            else {
+                $hashref->{$key} = $self->_delete_array($value);
+            }
+        }
+
+        elsif ( $ref_value eq 'SCALAR' ) {
+            if ( length($$value) == 0 and $self->will_delete_empty_ref ) {
+                 delete $hashref->{$key};
+            }
         }
 
         # Leave alone
@@ -199,11 +228,11 @@ sub _delete_array {
 
 =head1 AUTHORS
 
-Mateu X Hunter C<hunter@missoula.org>
+Mateu X Hunter C<hunter@406mt.org>
 
 =head1 COPYRIGHT
 
-Copyright 2015, Mateu X Hunter
+Copyright 2024, Mateu X Hunter
 
 =head1 LICENSE
 

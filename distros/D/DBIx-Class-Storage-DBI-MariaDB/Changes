@@ -1,3 +1,6 @@
+0.1.2
+  * Fix breaking of non-ASCII unicode in previous release.
+
 0.1.1
   * Pass BLOBs correctly.
   * Make Kwalitee happier.

@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000815';
+our $VERSION='1.0000816';
 
 #print `env`,"\n\n\n";
 
@@ -861,6 +861,7 @@ END
       ($version,$cpanfil,$instfile,$mod_info)=cpan_modules($module_fail);
       fa_system("sudo echo y | /bin/rm -rf \"$instfile\"");
    } elsif (2<$exec_cnt) {
+print "EXEC_CNT=$exec_cnt\n";
       my $timeout=300;
       ($version,$cpanfil,$instfile,$mod_info)=cpan_modules($module_fail);
       eval {
@@ -1695,6 +1696,7 @@ sub fa_find_latest {
    my $new='';my $file='';
    opendir(DH,$d) or
       fa_die("ERROR - Can't read Directory $d: $!\n");
+   my %timestamps=();
    while ($_ = readdir(DH)) {
       next if ($_ eq ".") || ($_ eq "..") || (/\.yml$/);
       if ($_!~/^$look[-][vV]?\d/) {
@@ -1703,18 +1705,15 @@ sub fa_find_latest {
             $new=&look_inside_dir($dr,$look);
          } next
       }
-      $file=sprintf("%s/%s",$CPAN::Config->{build_dir},$_);
+      $file=sprintf("%s/%s",$CPAN::Config->{build_dir},$_,'Makefile.PL');
+      $file=sprintf("%s/%s",$CPAN::Config->{build_dir},$_,'Build.PL')
+         unless (-e $file); 
       my $attrs = stat $file;
-      my $diff = time()-$attrs->[9];
-      if ($temp == 0 && $_=~/^$look[-][vV]?\d/) {
-         $temp=$diff;
-         $new=$file;
-      }
-      if ($diff<$temp) {
-         $temp=$diff;
-         $new=$CPAN::Config->{build_dir}.'/'.$_;
-      }
+      $timestamps{$attrs}=$_;
    }
+   close(DH);
+   my $newest=(sort keys %timestamps)[0];
+   $new=$CPAN::Config->{build_dir}.'/'.$timestamps{$newest}; 
    close(DH);
    $new=$file if !$new && $file;
    print "***** Module Directory ",$new,"\n";
@@ -1870,11 +1869,11 @@ sub fa_install_mod {
          local $SIG{__DIE__}; # No sigdie handler
          eval "require $p;1";
       };
-      if ($@) {
+      if ($@ and $p ne 'BerkeleyDB') {
          print "\n\n";
          print "   FATAL ERROR!: $@\n\n";
          exit 1;
-      } return '';
+      } return '' unless $p eq 'BerkeleyDB';
    }
    if ($@ || $instfile eq '(not' || $force) {
       if ($ENV{'AUTOMATED_TESTING'}) {
@@ -3042,7 +3041,7 @@ version         $VERSION;
 name            'Net-FullAuto';
 sign;
 author          'Brian M. Kelly <Brian.Kelly@FullAuto.com>';
-license         'gpl-3.0';
+license         'AGPLv3.0';
 perl_version    '5.006';
 
 }
@@ -6394,6 +6393,9 @@ sub cpan_modules {
    my $p=$_[0];
    my $mod_info='';
    my $version='';
+   @CPAN::Defaultsites = map {
+      CPAN::URL->new(TEXT => $_, FROM => "DEF")
+   } "http://www.cpan.org/CPAN/", "ftp://ftp.cpan.org/pub/CPAN/";
    eval {
       local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
       alarm 10;

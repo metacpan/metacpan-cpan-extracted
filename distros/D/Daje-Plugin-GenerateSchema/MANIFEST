@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+README.md
+cpanfile
+lib/Daje/Plugin/Base/Common.pm
+lib/Daje/Plugin/GenerateSchema.pm
+lib/Daje/Plugin/Schema/Create.pm
+minil.toml
+t/00_compile.t
+META.json
+META.yml
+MANIFEST

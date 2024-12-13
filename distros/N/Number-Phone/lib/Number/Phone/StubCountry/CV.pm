@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240910191015;
+our $VERSION = 1.20241212130804;
 
 my $formatters = [
                 {
@@ -74,45 +74,45 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{pt} = {};
-$areanames{en} = {"238227", "Lajedos\/Alto\ Mira\ \(Santo\ Antão\ Island\)",
-"238267", "Cidade\ Velha\,\ Santiago",
-"238232", "Mindelo\,\ São\ Vicente",
-"238236", "Tarrafal\ de\ São\ Nicolau\,\ São\ Nicolau",
-"238230", "Mindelo\,\ São\ Vicente",
-"238283", "Mosteiros\,\ Fogo",
-"238273", "Calheta\ de\ São\ Miguel\,\ Santiago",
-"238285", "Nova\ Sintra\,\ Brava",
-"238238", "Praia\ Branca\,\ São\ Nicolau",
-"238255", "Vila\ do\ Maio\,\ Maio",
-"238281", "São\ Filipe\,\ Fogo",
+$areanames{en} = {"238231", "Mindelo\,\ São\ Vicente",
 "238271", "Orgão\/São\ Jorge\ \(Santiago\ Island\)",
-"238251", "Sal\ Rei\,\ Boa\ Vista",
-"238263", "Praia\,\ Santiago",
-"238223", "Paúl\,\ Santo\ Antão",
-"238225", "Ponta\ do\ Sol\,\ Santo\ Antão",
-"238265", "Santa\ Catarina\,\ Santiago",
-"238261", "Praia\,\ Santiago",
-"238221", "Ribeira\ Grande\,\ Santo\ Antão",
+"238267", "Cidade\ Velha\,\ Santiago",
+"238224", "Cocoli\,\ Santo\ Antão",
 "238242", "Santa\ Maria\,\ Sal",
-"238235", "Ribeira\ Brava\,\ São\ Nicolau",
-"238231", "Mindelo\,\ São\ Vicente",
+"238282", "Cova\ Figueira\,\ Fogo",
+"238262", "Praia\,\ Santiago",
+"238273", "Calheta\ de\ São\ Miguel\,\ Santiago",
+"238230", "Mindelo\,\ São\ Vicente",
 "238268", "São\ Domingos\,\ Santiago",
 "238269", "Pedra\ Badejo\,\ Santiago",
-"238266", "Tarrafal\,\ Santiago",
-"238226", "Manta\ Velha\/Chã\ de\ Igreja\ \ \(Santo\ Antão\ Island\)",
-"238252", "Funda\ das\ Figueiras\,\ Boa\ Vista",
-"238282", "Cova\ Figueira\,\ Fogo",
-"238272", "Picos\,\ Santiago",
-"238264", "Praia\,\ Santiago",
-"238224", "Cocoli\,\ Santo\ Antão",
-"238260", "Praia\,\ Santiago",
 "238256", "Calheta\,\ Maio",
+"238226", "Manta\ Velha\/Chã\ de\ Igreja\ \ \(Santo\ Antão\ Island\)",
+"238255", "Vila\ do\ Maio\,\ Maio",
+"238225", "Ponta\ do\ Sol\,\ Santo\ Antão",
+"238261", "Praia\,\ Santiago",
+"238281", "São\ Filipe\,\ Fogo",
 "238237", "Fajã\,\ São\ Nicolau",
 "238241", "Espargos\,\ Sal",
-"238284", "São\ Jorge\,\ Fogo",
+"238283", "Mosteiros\,\ Fogo",
+"238263", "Praia\,\ Santiago",
+"238260", "Praia\,\ Santiago",
+"238238", "Praia\ Branca\,\ São\ Nicolau",
+"238272", "Picos\,\ Santiago",
+"238232", "Mindelo\,\ São\ Vicente",
+"238252", "Funda\ das\ Figueiras\,\ Boa\ Vista",
 "238222", "Porto\ Novo\,\ Santo\ Antão",
-"238262", "Praia\,\ Santiago",};
+"238284", "São\ Jorge\,\ Fogo",
+"238264", "Praia\,\ Santiago",
+"238235", "Ribeira\ Brava\,\ São\ Nicolau",
+"238236", "Tarrafal\ de\ São\ Nicolau\,\ São\ Nicolau",
+"238227", "Lajedos\/Alto\ Mira\ \(Santo\ Antão\ Island\)",
+"238223", "Paúl\,\ Santo\ Antão",
+"238266", "Tarrafal\,\ Santiago",
+"238265", "Santa\ Catarina\,\ Santiago",
+"238221", "Ribeira\ Grande\,\ Santo\ Antão",
+"238251", "Sal\ Rei\,\ Boa\ Vista",
+"238285", "Nova\ Sintra\,\ Brava",};
+$areanames{pt} = {};
 my $timezones = {
                '' => [
                        'Atlantic/Cape_Verde'

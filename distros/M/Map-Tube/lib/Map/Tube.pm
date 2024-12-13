@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.83';
+$Map::Tube::VERSION   = '3.85';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.83
+Version 3.85
 
 =cut
 
@@ -43,6 +43,7 @@ use Map::Tube::Exception::MissingPluginFuzzyFind;
 use Map::Tube::Exception::MalformedMapData;
 use Map::Tube::Exception::InvalidLineStructure;
 use Map::Tube::Exception::InvalidStationStructure;
+use Map::Tube::Exception::RouteNotFound;
 use Map::Tube::Utils qw(to_perl is_same trim common_lines get_method_map is_valid_color);
 use Map::Tube::Types qw(Routes Tables Lines NodeMap LineMap Color);
 
@@ -77,7 +78,8 @@ documented in L<Map::Tube::Cookbook>.
     | Mohammad Sajid Anwar | MANWAR   | 7 (Barcelona, Delhi, Kolkatta, London,   |
     |                      |          | Madrid, NYC, Tokyo)                      |
     |                      |          |                                          |
-    | Gisbert W Selke      | GWS      | 4 (Beijing, Glasgow, KoelnBonn, Lyon)    |
+    | Gisbert W Selke      | GWS      | 5 (Beijing, Glasgow, Hamburg, KoelnBonn, |
+    |                      |          | Lyon)                                    |
     |                      |          |                                          |
     | Renee Baecker        | RENEEB   | 1 (Frankfurt)                            |
     |                      |          |                                          |
@@ -94,6 +96,8 @@ documented in L<Map::Tube::Cookbook>.
     | FUNG Cheok Yin       | CYFUNG   | 1 (Hong Kong)                            |
     |                      |          |                                          |
     | Vitali Peil          | VPEIL    | 1 (Bielefeld)                            |
+    |                      |          |                                          |
+    | Giuseppe Di Terlizzi | GDT      | 1 (Rome)                                 |
     +----------------------+----------+------------------------------------------+
 
 =cut
@@ -233,9 +237,28 @@ sub get_shortest_route {
         $_nodes = [ reverse(@$nodes) ];
     }
 
+    my $start = $_nodes->[0];
+    my $end   = $_nodes->[-1];
+
+    # If you end up with just 2 nodes i.e. start and end, then
+    # double check, if start is directly linked to end node.
+    if (scalar(@$_nodes) == 2) {
+        my $start_name = $start->name;
+        my $end_name   = $end->name;
+        unless ($self->_is_directly_linked($start_name, $end_name)) {
+            my @caller = caller(0);
+            @caller    = caller(2) if $caller[3] eq '(eval)';
+            Map::Tube::Exception::RouteNotFound->throw({
+                method      => __PACKAGE__."::get_shortest_route",
+                message     => "ERROR: Ruote not found from [$start_name] to [$end_name].",
+                filename    => $caller[1],
+                line_number => $caller[2] });
+        }
+    }
+
     return Map::Tube::Route->new(
-        { from  => $_nodes->[0],
-          to    => $_nodes->[-1],
+        { from  => $start,
+          to    => $end,
           nodes => $_nodes,
         }
     );
@@ -494,6 +517,24 @@ sub get_next_stations {
     }
 
     return $nodes;
+}
+
+=head2 get_linked_stations($station_name)
+
+Returns ref to a list of linked stations from the given C<$station_name>.
+
+=cut
+
+sub get_linked_stations {
+    my ($self, $station_name) = @_;
+
+    my $nodes = $self->get_next_stations($station_name);
+    my $linked_stations = [];
+    foreach my $node (@$nodes) {
+        push @$linked_stations, $node->name;
+    }
+
+    return $linked_stations;
 }
 
 =head2 bgcolor($color)
@@ -986,6 +1027,13 @@ sub _init_map {
 
     $self->nodes($nodes);
     $self->tables($tables);
+}
+
+sub _is_directly_linked {
+    my ($self, $start_station, $end_station) = @_;
+    my $linked_stations = $self->get_linked_stations($start_station);
+
+    return grep /$end_station/, @$linked_stations;
 }
 
 sub _init_table {

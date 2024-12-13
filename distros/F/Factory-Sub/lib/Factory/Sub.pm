@@ -1,7 +1,7 @@
 package Factory::Sub;
 use 5.006; use strict; use warnings;
 use Import::Into; use Carp qw/croak/; use Coerce::Types::Standard qw//;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use overload 
 	"&{}" => sub {my $self = shift; sub { $self->call(@_) }},
@@ -78,7 +78,7 @@ Factory::Sub - Generate a factory of subs
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
@@ -107,14 +107,13 @@ Perhaps a little code snippet.
 	});
 
 	$factory->add(StrToArray->by(', '), StrToHash->by(' '), HashToArray->by('keys'), sub { 
-		return $_[1];
+		return 4;
 	});
 	
-	$factory->('go', 'tell'); # 1
-	$factory->('all', { your => 'friends' }); # 2
-	$factory->([qw/t h a t/], { this => 'is' }); # 3
-	$factory->('t, h, e', 'end', { name => 'day ender' }); 
-	# destiny
+	$factory->('hello', 'world'); # 1
+	$factory->('hello', { one => 1 }); # 2
+	$factory->([qw/h e l l o/], { one => 1 }); # 3
+	$factory->('h, e, l, l, o', 'world', { one => 1 }); # 4 
 
 =head1 SUBROUTINES/METHODS
 
@@ -142,9 +141,9 @@ Add a new condition to the factory.
 
 Call the factory. If o matching factory sub is not found for the given params then the code currently croaks with an error.
 
-	$factory->call('t, h, e', 'end', { name => 'day ender' });
+	$factory->call('h, e, l, l, o', 'world', { one => 1 });
 ...
-	$factory->('t, h, e', 'end', { name => 'day ender' });	
+	$factory->('h, e, l, l, o', 'world', { one => 1 });	
 
 =cut
 

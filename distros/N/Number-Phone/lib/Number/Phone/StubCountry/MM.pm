@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240910191016;
+our $VERSION = 1.20241212130806;
 
 my $formatters = [
                 {
@@ -37,9 +37,12 @@ my $formatters = [
                 {
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
-            [45]|
+            4(?:
+              [2-46]|
+              5[3-5]
+            )|
+            5|
             6(?:
-              0[23]|
               [1-689]|
               7[235-7]
             )|
@@ -47,14 +50,23 @@ my $formatters = [
               [0-4]|
               5[2-7]
             )|
-            8[1-6]
+            8[1-5]|
+            (?:
+              60|
+              86
+            )[23]
           ',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{3})'
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[12]',
+                  'leading_digits' => '
+            [12]|
+            452|
+            6788|
+            86
+          ',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d)(\\d{3})(\\d{3,4})'
                 },
@@ -110,9 +122,11 @@ my $validators = {
           (?:
             1(?:
               (?:
-                2\\d|
+                12|
+                [28]\\d|
                 3[56]|
-                [89][0-6]
+                7[3-6]|
+                9[0-6]
               )\\d|
               4(?:
                 2[29]|
@@ -149,7 +163,10 @@ my $validators = {
                 56
               )|
               420\\d|
-              5470
+              5(?:
+                2\\d|
+                470
+              )
             )|
             6(?:
               0(?:
@@ -170,11 +187,12 @@ my $validators = {
                 472
               )|
               7(?:
-                (?:
-                  3\\d|
-                  8[01459]
-                )\\d|
-                4[67]0
+                3\\d\\d|
+                4[67]0|
+                8(?:
+                  [01459]\\d|
+                  8
+                )
               )
             )
           )\\d{4}|
@@ -300,7 +318,10 @@ my $validators = {
             8(?:
               1[2-689]|
               2[2-8]|
-              [35]2\\d
+              (?:
+                [35]2|
+                64
+              )\\d
             )
           )\\d{4}|
           25\\d{5,6}|
@@ -326,9 +347,11 @@ my $validators = {
           (?:
             1(?:
               (?:
-                2\\d|
+                12|
+                [28]\\d|
                 3[56]|
-                [89][0-6]
+                7[3-6]|
+                9[0-6]
               )\\d|
               4(?:
                 2[29]|
@@ -365,7 +388,10 @@ my $validators = {
                 56
               )|
               420\\d|
-              5470
+              5(?:
+                2\\d|
+                470
+              )
             )|
             6(?:
               0(?:
@@ -386,11 +412,12 @@ my $validators = {
                 472
               )|
               7(?:
-                (?:
-                  3\\d|
-                  8[01459]
-                )\\d|
-                4[67]0
+                3\\d\\d|
+                4[67]0|
+                8(?:
+                  [01459]\\d|
+                  8
+                )
               )
             )
           )\\d{4}|
@@ -516,7 +543,10 @@ my $validators = {
             8(?:
               1[2-689]|
               2[2-8]|
-              [35]2\\d
+              (?:
+                [35]2|
+                64
+              )\\d
             )
           )\\d{4}|
           25\\d{5,6}|
@@ -593,145 +623,146 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"9569200", "Aunglan",
-"9545470", "Pyapon",
-"956124640", "Bagan",
-"951688", "Bayintnaung",
-"95812824", "Moenae",
-"958542", "Pyinoolwin",
-"9585443", "Pyinoolwin",
-"9554470", "Taungoo",
-"956320", "Magway",
-"955645", "Tandar",
-"95522224", "Bago",
-"951472", "Yangon",
-"9585441", "Pyinoolwin",
-"9557480", "Mawlamyine\/Thanbyuzayat",
-"951422", "Yangon",
-"9570470", "Hakha",
-"951684", "Bayintnaung",
-"95812820", "Moenae",
-"9582490", "Shan\ \(North\)",
-"958529", "Padaythar\ Myothit",
-"9581471", "Shan\ \(South\)",
-"956124622", "Chauk",
-"958541", "Pyinoolwin",
-"954353", "Buthidaung",
-"9564472", "Meiktila",
-"951483", "Yangon",
-"9582320", "Manton",
-"9575470", "Shwebo",
-"951471", "Yangon",
-"958528", "Pyinoolwin",
-"956323", "Magway",
-"951465", "Yangon",
-"956124623", "Chauk",
-"956124643", "Bagan",
-"958551", "Yangon",
-"952426", "Mandalay",
-"958549", "Pyinoolwin",
-"952470", "Yangon",
-"958521", "Pyinoolwin",
-"952462", "Mandalay",
-"958625", "Kyatpyin",
-"958130", "Pinlon",
-"951429", "Yangon",
-"95712032", "Ohbotaung",
-"9542480", "Pathein",
-"951552", "Bahan",
-"951424", "Yangon",
-"951682", "Bayintnaung",
-"956124642", "Bagan",
+$areanames{en} = {"95712032", "Ohbotaung",
 "9559470", "Dawei",
-"958548", "Pyinoolwin",
-"955620", "Mandalay",
-"958630", "Thabeikkyin",
-"958620", "Mogoke",
-"958522", "Pyinoolwin",
-"951439", "Yangon",
-"9585448", "Pyinoolwin",
-"95522222", "Bago",
-"9522000", "Mingalar\ Mandalay",
-"951551", "Bahan",
-"9574470", "Myitkyinar\/Bahmaw",
-"951681", "Bayintnaung",
-"958635", "Sintkuu",
-"9585447", "Pyinoolwin",
-"95812822", "Moenae",
-"956124620", "Chauk",
-"9558470", "Hpa\-An",
-"95812823", "Moenae",
-"952472", "Mandalay",
-"956124641", "Bagan",
-"9552472", "Bago",
-"952422", "Mandalay",
-"958621", "Mogoke",
-"958523", "Pyinoolwin",
-"958149", "Sesin",
-"9567550", "Naypyidaw",
-"956324", "Magway",
-"95522223", "Bago",
-"9543565", "Palatwa",
-"951550", "Bahan",
-"951686", "Bayintnaung",
-"95256", "Amarapura",
+"951465", "Yangon",
+"952462", "Mandalay",
+"951422", "Yangon",
+"951429", "Yangon",
+"9582490", "Shan\ \(North\)",
+"955645", "Tandar",
 "9585440", "Pyinoolwin",
-"951680", "Bayintnaung",
-"9557481", "Mawlamyine",
-"9571483", "Monywa",
-"952471", "Mandalay",
-"9543483", "Sittwe\/Thandwe",
-"9585449", "Pyinoolwin",
-"9581470", "Taunggyi",
-"952483", "Mandalay",
-"9583470", "Loikaw",
-"955851", "Myawaddy",
-"956260", "Kanma",
-"951683", "Bayintnaung",
-"956124644", "Bagan",
-"951685", "Bayintnaung",
+"9542480", "Pathein",
 "958547", "Pyinoolwin",
-"951553", "Bahan",
-"95642487", "Shawpin",
-"958131", "Loilem",
-"9543202", "Rakhine",
-"9567470", "Naypyitaw",
-"956940", "Sinpaungwae",
-"958238", "Tantyan",
-"9543470", "Sittwe",
-"958540", "Ohn\ Chaw",
-"952424", "Mandalay",
-"9561200", "Chauk",
-"958546", "Pyinoolwin",
-"9562472", "Pakokku",
-"9567460", "Naypyitaw",
-"956124624", "Chauk",
-"9585444", "Pyinoolwin",
+"95812824", "Moenae",
+"95522222", "Bago",
 "951426", "Yangon",
-"9542481", "Pathein",
-"9563470", "Magway",
-"958639", "Letpanhla",
-"951462", "Yangon",
-"95522230", "Oathar\ Myothit",
-"9542483", "Ayeyarwaddy\/Pathein",
 "9585445", "Pyinoolwin",
-"951470", "Yangon",
-"958141", "Naungtayar",
-"9552470", "Bago",
+"9543202", "Rakhine",
+"9585448", "Pyinoolwin",
+"9567470", "Naypyitaw",
+"956124640", "Bagan",
+"956124624", "Chauk",
+"958529", "Padaythar\ Myothit",
 "951687", "Bayintnaung",
-"958545", "Pyinoolwin",
-"9558472", "Hpa\-An",
-"95522221", "Bago",
-"958543", "Pyinoolwin",
+"95522223", "Bago",
+"958522", "Pyinoolwin",
+"9561200", "Chauk",
 "9556483", "Thanlyin",
-"9585442", "Pyinoolwin",
-"95812821", "Moenae",
-"951423", "Yangon",
-"9553472", "Pyay",
-"956525", "Ngape",
-"956124621", "Chauk",
+"958630", "Thabeikkyin",
+"952424", "Mandalay",
+"9575470", "Shwebo",
+"9543470", "Sittwe",
+"958131", "Loilem",
+"9511", "Yangon",
+"9585447", "Pyinoolwin",
+"9554470", "Taungoo",
+"958149", "Sesin",
+"9543483", "Sittwe\/Thandwe",
+"951686", "Bayintnaung",
+"958130", "Pinlon",
+"956124641", "Bagan",
+"958549", "Pyinoolwin",
+"9564472", "Meiktila",
 "9571470", "Monywa",
-"952439", "Mandalay",};
+"958542", "Pyinoolwin",
+"951551", "Bahan",
+"9571483", "Monywa",
+"955620", "Mandalay",
+"951553", "Bahan",
+"951550", "Bahan",
+"95642487", "Shawpin",
+"9574470", "Myitkyinar\/Bahmaw",
+"952472", "Mandalay",
+"9581471", "Shan\ \(South\)",
+"952439", "Mandalay",
+"952483", "Mandalay",
+"9567460", "Naypyitaw",
+"958635", "Sintkuu",
+"958546", "Pyinoolwin",
+"9557480", "Mawlamyine\/Thanbyuzayat",
+"958551", "Yangon",
+"9552472", "Bago",
+"956124643", "Bagan",
+"95522230", "Oathar\ Myothit",
+"956124642", "Bagan",
+"95812821", "Moenae",
+"951471", "Yangon",
+"951682", "Bayintnaung",
+"951470", "Yangon",
+"955851", "Myawaddy",
+"9567550", "Naypyidaw",
+"9558472", "Hpa\-An",
+"9545470", "Pyapon",
+"9569200", "Aunglan",
+"9585444", "Pyinoolwin",
+"956260", "Kanma",
+"9585442", "Pyinoolwin",
+"956124620", "Chauk",
+"952471", "Mandalay",
+"958543", "Pyinoolwin",
+"958540", "Ohn\ Chaw",
+"958541", "Pyinoolwin",
+"951552", "Bahan",
+"951685", "Bayintnaung",
+"952470", "Yangon",
+"95522224", "Bago",
+"956324", "Magway",
+"958639", "Letpanhla",
+"9522000", "Mingalar\ Mandalay",
+"95256", "Amarapura",
+"956124644", "Bagan",
+"958141", "Naungtayar",
+"958238", "Tantyan",
+"9585441", "Pyinoolwin",
+"958545", "Pyinoolwin",
+"9570470", "Hakha",
+"95812823", "Moenae",
+"951681", "Bayintnaung",
+"9542481", "Pathein",
+"951680", "Bayintnaung",
+"951472", "Yangon",
+"951683", "Bayintnaung",
+"951483", "Yangon",
+"951439", "Yangon",
+"958528", "Pyinoolwin",
+"951424", "Yangon",
+"95812820", "Moenae",
+"95812822", "Moenae",
+"951423", "Yangon",
+"9583470", "Loikaw",
+"9582320", "Manton",
+"954353", "Buthidaung",
+"958548", "Pyinoolwin",
+"952426", "Mandalay",
+"9542483", "Ayeyarwaddy\/Pathein",
+"9585443", "Pyinoolwin",
+"956124622", "Chauk",
+"958625", "Kyatpyin",
+"9557481", "Mawlamyine",
+"956124623", "Chauk",
+"951684", "Bayintnaung",
+"9585449", "Pyinoolwin",
+"9562472", "Pakokku",
+"9543565", "Palatwa",
+"952422", "Mandalay",
+"956525", "Ngape",
+"958523", "Pyinoolwin",
+"956124621", "Chauk",
+"95522221", "Bago",
+"9558470", "Hpa\-An",
+"9581470", "Taunggyi",
+"9563470", "Magway",
+"958521", "Pyinoolwin",
+"956940", "Sinpaungwae",
+"9552470", "Bago",
+"958621", "Mogoke",
+"958620", "Mogoke",
+"951462", "Yangon",
+"9553472", "Pyay",
+"956320", "Magway",
+"951688", "Bayintnaung",
+"956323", "Magway",};
 my $timezones = {
                '' => [
                        'Asia/Rangoon'

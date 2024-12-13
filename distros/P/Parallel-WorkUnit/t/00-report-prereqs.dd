@@ -30,7 +30,7 @@ do { my $x = {
                                       'autodie' => '0',
                                       'namespace::autoclean' => '0',
                                       'overload' => '0',
-                                      'perl' => 'v5.8.0',
+                                      'perl' => '5.022',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -41,12 +41,13 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
-                                   'Feature::Compat::Class' => '0.006',
                                    'File::Spec' => '0',
+                                   'Object::Pad' => '0.804',
                                    'Symbol' => '0',
                                    'Test2::V0' => '0',
                                    'Test::More' => '0',
-                                   'Test::UseAllModules' => '0.15'
+                                   'Test::UseAllModules' => '0.15',
+                                   'feature' => '0'
                                  }
                  }
      };

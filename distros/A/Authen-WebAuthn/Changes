@@ -1,5 +1,8 @@
 Revision history for Authen-WebAuthn
  
+0.005
+  - Add allow_unknown_attestation_format option
+
 0.004
   - Add allow_untrusted_attestation option
 

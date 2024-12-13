@@ -3,9 +3,8 @@
 Valiant - Object validation inspired by Ruby on Rails and more.
 
 <div>
-    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/linux.yml/badge.svg"></a>
-    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/macos.yml/badge.svg"></a>
-    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/windows.yml/badge.svg"></a>
+    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/linux.yml/badge.svg?tag=0.002012"></a>
+    <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/macos.yml/badge.svg?tag=0.002012"></a>
     <a href="https://metacpan.org/pod/Valiant"><img src="https://badge.fury.io/pl/Valiant.svg"></a>
     <a href="https://codecov.io/github/jjn1056/Valiant/?branch=main"><img alt="Coverage" src="https://codecov.io/github/jjn1056/Valiant/coverage.svg?branch=main"></a>
 </div>
@@ -61,16 +60,7 @@ Valiant - Object validation inspired by Ruby on Rails and more.
 
 # DESCRIPTION
 
-**WARNING**: This is early release code.  I've been using it for a while on personal projects
-and have a lot of test cases but there's probably corners I've not hit yet.   All documented
-features should work as described.  I will only change API and functionality in a breaking
-manner if its the only way to fix problems (caveat that I am reserving the right to change
-the way errors are listed and structured for nested validations, for now, as well as the
-way we resolve files for internationalization, whose current code may not be as performant
-as needed; additionally the [Valiant::DBIx::Class](https://metacpan.org/pod/Valiant%3A%3ADBIx%3A%3AClass) packages are all currently subject to
-breaking changes as needed).
-
-Domain level validations for [Moo](https://metacpan.org/pod/Moo) classes and related capabilities such as attribute
+Domain level validations for [Moo](https://metacpan.org/pod/Moo) or [Moose](https://metacpan.org/pod/Moose) classes and related capabilities such as attribute
 filtering and internationalization.  Provides a domain specific language
 which allows you to defined for a given class what a valid state for an instance of that
 class would be and to gather reportable error messages.  Used to defined constraints
@@ -1416,13 +1406,13 @@ reviewed.
 # DEDICATIONS
 
 This module is eternally dedicated to the memory of my beloved animal companions; our Bernese 
-Mountain Dog 'Tornado' who we lost to cancer in 16 August 2020; our Akita 'Sunshine' who passed
-from complications due to age on July 14th, 2021 and their pup 'Squeaker' also lost to cancer on
-December 18th, 2021.
+Mountain Dog 'Tornado' who we lost to cancer on 16 August 2020; our Akita 'Sunshine' who passed
+from complications due to age on July 14th, 2021 and their pups 'Squeaker', lost to cancer on
+December 18th, 2021 and Bear, also lost to cancer 17 August 2024.
 
 The distribution as a whole is dedicated in their memory, but specifically the core [Valiant](https://metacpan.org/pod/Valiant)
-code is dedicated to Tornado, the DBIC integration work to Sunshine and the HTML form generation
-and templating code to Squeaker.
+code is dedicated to Tornado, the DBIC integration work to Sunshine, the HTML form generation
+and templating code to Squeaker and all the documentation and example code to Bear.
 
 If you find this code useful, if it helps your company or makes you money please consider a donation
 to help other owners of these dog breeds or aid in the quest to end dog cancer: 
@@ -1430,11 +1420,14 @@ to help other owners of these dog breeds or aid in the quest to end dog cancer:
 [http://www.berner.org/pages/charities.php](http://www.berner.org/pages/charities.php), [https://akitarescue.rescuegroups.org/info/donate](https://akitarescue.rescuegroups.org/info/donate),
 [https://wearethecure.org/donations/](https://wearethecure.org/donations/).
 
+You can also very easily donate to the Austin Texas Humane society, where I live, via their Amazon
+wish page: [https://www.amazon.com/hz/wishlist/ls/OZGD9S34VITI?leftNavSection=Reorder&ref\_=abls\_lnv\_rl](https://www.amazon.com/hz/wishlist/ls/OZGD9S34VITI?leftNavSection=Reorder&ref_=abls_lnv_rl).
+
 Or to any dog charity that fits best with your personal beliefs and economic means.
 
 # COPYRIGHT & LICENSE
 
-Copyright 2022, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+Copyright 2024, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

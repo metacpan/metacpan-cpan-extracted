@@ -42,6 +42,11 @@ use constant DEBUG => 0;
 
 #------------------------------------------------------------------------------
 
+sub http_code_is_allowed {
+  my ($aref, $code) = @_;
+  return (grep {$code eq $_} @{$aref // []}) > 0;
+}
+
 sub get {
   my ($class, $url, %options) = @_;
   ### Download get(): $url
@@ -52,6 +57,7 @@ sub get {
   my $ua = $options{'ua'} || do { require App::Chart::UserAgent;
                                   App::Chart::UserAgent->instance };
   $ua->cookie_jar ($options{'cookie_jar'});  # undef for none
+  ### cookie_jar object: ($options{'cookie_jar'} // "").""
 
   require HTTP::Request;
   my $method = $options{'method'} || 'GET';
@@ -82,40 +88,29 @@ sub get {
   if ($etag)    { $req->header ('If-None-Match' => $etag); }
   if ($lastmod) { $req->header ('If-Modified-Since' => $lastmod); }
 
-  $ua->prepare_request ($req);
-  if (DEBUG) { print $req->as_string; }
-
-  if ($App::Chart::option{'verbose'} || DEBUG) {
-    if ($App::Chart::option{'verbose'} >= 2 || DEBUG >= 2) {
-      print $req->as_string;
-    } else {
-      print "$method $url\n";
-    }
-    if (defined $data) {
-      print "$data\n";
-    }
-  }
-
   my $resp = $ua->request ($req);
-  if (DEBUG) { print $resp->status_line,"\n";
-               print $resp->headers->as_string,"\n"; }
 
   # internal message from LWP when a keep-alive has missed the boat
   if ($resp->status_line =~ /500 Server closed connection/i) {
     substatus (__('retry'));
     $resp = $ua->request ($req);
-    if (DEBUG) { print $resp->status_line,"\n";
-                 print $resp->headers->as_string,"\n"; }
   }
 
+  my $code = $resp->code;
   if ($resp->is_success
-      || ($options{'allow_401'} && $resp->code == 401)
-      || ($options{'allow_404'} && $resp->code == 404)
-      || (($etag || $lastmod) && $resp->code == 304)) {
+      || ($options{'allow_401'} && $code == 401)
+      || ($options{'allow_404'} && $code == 404)
+      || (($etag || $lastmod) && $code == 304)
+      || http_code_is_allowed($options{'allow_http_codes'}, $code)) {
     substatus (__('processing'));
     return $resp;
   } else {
-    croak "Cannot download $url\n",$resp->status_line,"\n";
+    my $error = $resp->status_line . "\n";
+    if ($code == 500) {
+      $error .= $resp->decoded_content;
+      unless ($error =~ /\n$/s) { $error .= "\n"; }
+    }
+    croak "Cannot download $url\n" . $error;
   }
 }
 
@@ -155,6 +150,8 @@ sub split_lines {
 
 #------------------------------------------------------------------------------
 
+# Return $str with trailing "0"s removed.
+# Don't go below $want_deicmals digits after the decimal point.
 sub trim_decimals {
   my ($str, $want_decimals) = @_;
   if ($str && $str =~ /(.*\.[0-9]{$want_decimals}[0-9]*?)0+$/) {

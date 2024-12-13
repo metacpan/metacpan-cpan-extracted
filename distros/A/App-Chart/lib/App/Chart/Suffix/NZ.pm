@@ -1,6 +1,6 @@
 # New Zealand Stock Exchange setups.
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2017, 2018 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2017, 2018, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -20,6 +20,7 @@ package App::Chart::Suffix::NZ;
 use 5.006;
 use strict;
 use warnings;
+use JSON;
 use URI::Escape;
 use Locale::TextDomain 'App-Chart';
 
@@ -92,63 +93,122 @@ App::Chart::Weblink->new
 
 
 #------------------------------------------------------------------------------
-# dividends
+# Dividends
 #
 # This uses the dividend page at
+# 
+#     https://www.nzx.com/markets/NZSX/dividends
+#     
+# The dividend table is buried in a JSON data structure in <script>
+# so as minimise the number browsers which will display it.
+# As of Sept 2024 the page was about 100 kbytes with 50 dividends
+# (declared or to be paid).
+# So set to weekly downloads.
 #
 use constant DIVIDENDS_URL =>
   'https://www.nzx.com/markets/NZSX/dividends';
 
 App::Chart::DownloadHandler::DividendsPage->new
-  (name     => __('NZX dividends'),
-   pred     => $pred_shares,
-   url      => DIVIDENDS_URL,
-   parse    => \&dividends_parse,
-   key      => 'NZ-dividends',
+  (name         => __('NZX dividends'),
+   pred         => $pred_shares,
+   url          => DIVIDENDS_URL,
+   parse        => \&dividends_parse,
+   key          => 'NZ-dividends',
+   recheck_days => 7,
    # low priority so prices fetched first
    priority => -10);
 
 sub dividends_parse {
   my ($resp) = @_;
   ### NZ dividends_parse() ...
-  
-  # note: want wide-chars for HTML::TableExtract parse
-  my $body = $resp->decoded_content (raise_error => 1);
-  ### $body
 
   my @dividends = ();
   my $h = { source          => __PACKAGE__,
             resp            => $resp,
             dividends       => \@dividends,
             copyright_key   => 'NZ-dividends-copyright',
-            copyright       => 'http://www.nzx.com/terms',
-            date_format     => 'dmy', # dates like "27 Sep 2018"
+            copyright       => 'https://www.nzx.com/meta-pages/terms-of-use',
+            date_format     => 'ymd', # ISO 2024-09-09
             prefer_decimals => 2,
           };
 
-  # Column "Dividend Period" for "interim" or "final" not very interesting.
-  # FIXME: what's the "Supp." column?
-  require HTML::TableExtract;
-  my $te = HTML::TableExtract->new
-    (headers   => ['Code',
-                   'Ex',
-                   'Payable',
-                   'Amount',
-                   'Currency',
-                   'Imputation' ]);
+  # note: want wide-chars for HTML::TableExtract parse
+  my $content = $resp->decoded_content (raise_error => 1);
+  $content =~ /<script id="__NEXT_DATA__".*?>(.*?)<\/script>/i
+    or die "NZX dividends cannot find JSON table";
+  my $str = $1;
+  my $json = JSON::from_json($1) // {};
 
-  $te->parse($body);
-  if (! $te->tables) {
-    die "NZX dividend table not matched";
+  my $props           = $json->{'props'} // {};
+  my $pageProps       = $props->{'pageProps'} // {};
+  my $data            = $pageProps->{'data'} // {};
+
+  # marketInstruments array of hashrefs like
+  #   "code" : "AFI",
+  #   "isin" : "AU000000AFI5",
+  #   "name" : "Australian Foundation Investment Company Limited Ord Shares",
+  #   "currencyCode" : "NZD",
+  # Maps "isin" to exchange "code".
+  # "name" is longer than want to display, so stay with Yahoo "shortname".
+  #
+  my $marketInstruments = $data->{'marketInstruments'} // [];
+  my %isin_to_symbol;
+  foreach my $href (@$marketInstruments) {
+    my $isin = $href->{'isin'} // next;
+    my $code = $href->{'code'} // next;
+    $isin_to_symbol{$isin} = "$code.NZ";
   }
+  # print JSON->new->pretty->encode($marketInstruments), "\n"; exit 0;
 
-  foreach my $ts ($te->tables) {
-    foreach my $row ($ts->rows) {
-      my ($symbol, $ex_date, $pay_date, $amount, $currency, $imput)
-        = @$row;
-      push @dividends,
-        dividend_parse ($symbol, $ex_date,$pay_date,$amount, $currency,$imput);
+  my $marketDividends = $data->{'marketDividends'}
+    // die "NZX dividends parse failed";
+  # print JSON->new->pretty->encode($marketDividends), "\n"; exit 0;
+
+  # eg. "amount" : "23.000000000",
+  #     "currencyCode" : "NZD",
+  #     "imputationCreditAmount" : "0.08166667",
+  #     "baseQuantity" : "100",
+  #     "expectedDate" : 1724673600
+  #     "payableDate"  : 1727352000,
+  #     "supplementaryAmount" : "0.03705882",
+  # Dates are Unix seconds since 1970 GMT and in NZ timezone is
+  # midnight on the relevant date.
+  #
+  foreach my $href (@$marketDividends) {
+    my $isin = $href->{'isin'};
+    my $symbol = $isin_to_symbol{$href->{'isin'}}
+      // die "NZX dividends, no symbol for ISIN $isin";
+
+    my $amount = App::Chart::Download::trim_decimals
+      (App::Chart::Download::cents_to_dollars($href->{'amount'}),
+       2);
+    my $imput  = $href->{'imputationCreditAmount'};
+    my $ex_date  = $timezone_newzealand->iso_date($href->{'expectedDate'});
+    my $pay_date = $timezone_newzealand->iso_date($href->{'payableDate'});
+
+    # Dividends not in NZD shown just as note.
+    # Can have AUD for dual-listed Aust/NZ shares, eg. DOW.AX = DOW.NZ
+    # In the past had some GBP.
+    my $note;
+    my $currency = $href->{'currencyCode'} // '';
+    if ($currency ne 'NZD') {
+      if ($imput ne '' && $imput != 0) {
+        $note = "$amount + $imput $currency";
+      } else {
+        $note = "$amount $currency";
+      }
+      $note = App::Chart::collapse_whitespace ($note);
+      $amount = undef;
+      $imput = undef;
     }
+
+    push @dividends, { symbol     => $symbol,
+                       ex_date    => $ex_date,
+                       pay_date   => $pay_date,
+                       amount     => $amount,
+                       imputation => $imput,
+                       note       => $note,
+                     };
   }
   my $count = scalar(@dividends);
   App::Chart::Download::verbose_message ("NZX dividends total $count found");
@@ -160,40 +220,59 @@ sub dividend_parse {
   ### NZ dividend_parse(): @_
 
   # leading and trailing whitespace
-  $symbol = App::Chart::collapse_whitespace($symbol);
-  $amount = App::Chart::collapse_whitespace ($amount);
-  $imput  = App::Chart::collapse_whitespace ($imput);
-  $currency = App::Chart::collapse_whitespace ($currency);
 
   foreach ($amount, $imput) {
     # eg. "3.900c" with c for cents, or latin-1 0xA2 cents symbol
     if (s/ *[c\xA2]$//) {
-      $_ = App::Chart::Download::cents_to_dollars ($_);
+      $_ =  ($_);
     }
     # discard trailing zeros, when a whole number of cents
     $_ = App::Chart::Download::trim_decimals ($_, 2);
   }
 
   # foreign like AUD or GBP turned into merely a note
-  my $note;
-  if ($currency ne 'NZD') {
-    if ($imput ne '' && $imput != 0) {
-      $note = "$amount + $imput $currency";
-    } else {
-      $note = "$amount $currency";
-    }
-    $note = App::Chart::collapse_whitespace ($note);
-    $amount = undef;
-    $imput = undef;
-  }
 
-  return { symbol     => "$symbol.NZ",
-           ex_date    => $ex_date,
-           pay_date   => $pay_date,
-           amount     => $amount,
-           imputation => $imput,
-           note       => $note };
+  return ;
 }
+
+#------------------------------------------------------------------------------
+
+# (String quoting for parsing of <script> in HTML to get crumb.)
+# undo javascript string backslash quoting in STR, per
+#
+#     https://developer.mozilla.org/en/JavaScript/Guide/Values,_Variables,_and_Literals#String_Literals
+#
+# Encode::JavaScript::UCS does \u, but not the rest
+#
+# cf Java as such not quite the same:
+#   unicode: http://java.sun.com/docs/books/jls/third_edition/html/lexical.html#100850
+#   strings: http://java.sun.com/docs/books/jls/third_edition/html/lexical.html#101089
+#
+my %javascript_backslash = ('b' => "\b",   # backspace
+                            'f' => "\f",   # formfeed
+                            'n' => "\n",   # newline
+                            'r' => "\r",
+                            't' => "\t",   # tab
+                            'v' => "\013", # vertical tab
+                           );
+sub javascript_string_unquote {
+  my ($str) = @_;
+  $str =~ s{\\(?:
+              ((?:[0-3]?[0-7])?[0-7]) # $1 \377 octal latin-1
+            |x([0-9a-fA-F]{2})        # $2 \xFF hex latin-1
+            |u([0-9a-fA-F]{4})        # $3 \uFFFF hex unicode
+            |(.)                      # $4 \n etc escapes
+            )
+         }{
+           (defined $1 ? chr(oct($1))
+            : defined $4 ? ($javascript_backslash{$4} || $4)
+            : chr(hex($2||$3)))   # \x,\u hex
+         }egx;
+  return $str;
+}
+
+
+#------------------------------------------------------------------------------
 
 1;
 __END__

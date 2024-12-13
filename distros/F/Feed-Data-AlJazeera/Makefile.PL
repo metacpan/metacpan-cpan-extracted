@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
        	'Rope' => 0.25,
-	'Feed::Data' => 0.08
+	'Feed::Data' => 0.09
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Feed-Data-AlJazeera-*' },

@@ -3,7 +3,7 @@ package Array::Objectify;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use Array::Objectify::Tie;
 
 use overload '@{}' => sub { ${$_[0]}->{array}; }, fallback => 1;
@@ -30,7 +30,7 @@ Array::Objectify - objectify an array
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

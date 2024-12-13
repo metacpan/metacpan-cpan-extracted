@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240910191017;
+our $VERSION = 1.20241212130807;
 
 my $formatters = [
                 {
@@ -114,35 +114,35 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"3861", "Ljubljana",
-"38653", "Gorica\/Koper\/Postojna",
-"38633", "Celje\/Trbovlje",
-"38644", "Kranj",
-"38676", "Novo\ Mesto\/Krško",
-"38672", "Novo\ Mesto\/Krško",
-"38634", "Celje\/Trbovlje",
-"38654", "Gorica\/Koper\/Postojna",
-"38678", "Novo\ Mesto\/Krško",
+$areanames{en} = {"38673", "Novo\ Mesto\/Krško",
 "38677", "Novo\ Mesto\/Krško",
-"38675", "Novo\ Mesto\/Krško",
-"38673", "Novo\ Mesto\/Krško",
-"38646", "Kranj",
-"38642", "Kranj",
-"38656", "Gorica\/Koper\/Postojna",
-"38652", "Gorica\/Koper\/Postojna",
-"38674", "Novo\ Mesto\/Krško",
-"38632", "Celje\/Trbovlje",
-"3862", "Maribor\/Ravne\ na\ Koroškem\/Murska\ Sobota",
-"38636", "Celje\/Trbovlje",
-"38647", "Kranj",
-"38648", "Kranj",
-"38645", "Kranj",
-"38657", "Gorica\/Koper\/Postojna",
-"38658", "Gorica\/Koper\/Postojna",
+"3861", "Ljubljana",
 "38655", "Gorica\/Koper\/Postojna",
-"38635", "Celje\/Trbovlje",
+"38652", "Gorica\/Koper\/Postojna",
+"38633", "Celje\/Trbovlje",
 "38637", "Celje\/Trbovlje",
-"38638", "Celje\/Trbovlje",};
+"38634", "Celje\/Trbovlje",
+"38676", "Novo\ Mesto\/Krško",
+"38645", "Kranj",
+"38678", "Novo\ Mesto\/Krško",
+"38642", "Kranj",
+"38674", "Novo\ Mesto\/Krško",
+"38636", "Celje\/Trbovlje",
+"38638", "Celje\/Trbovlje",
+"38656", "Gorica\/Koper\/Postojna",
+"38658", "Gorica\/Koper\/Postojna",
+"38654", "Gorica\/Koper\/Postojna",
+"38647", "Kranj",
+"38644", "Kranj",
+"38632", "Celje\/Trbovlje",
+"38635", "Celje\/Trbovlje",
+"38653", "Gorica\/Koper\/Postojna",
+"38657", "Gorica\/Koper\/Postojna",
+"3862", "Maribor\/Ravne\ na\ Koroškem\/Murska\ Sobota",
+"38648", "Kranj",
+"38675", "Novo\ Mesto\/Krško",
+"38672", "Novo\ Mesto\/Krško",
+"38646", "Kranj",};
 my $timezones = {
                '' => [
                        'Europe/Ljubljana'

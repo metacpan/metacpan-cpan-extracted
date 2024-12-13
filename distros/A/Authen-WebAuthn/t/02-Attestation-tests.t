@@ -4,6 +4,7 @@ use strict;
 
 use Authen::WebAuthn;
 
+use lib ".";
 require 't/certs.pl';
 
 # Simulate a unix date where the test certificates are still valid

@@ -778,7 +778,7 @@ Ascii::Text::Font::Chunky - Chunky font
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 

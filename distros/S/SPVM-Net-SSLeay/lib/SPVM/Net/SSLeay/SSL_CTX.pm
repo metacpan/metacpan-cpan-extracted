@@ -82,9 +82,11 @@ L<https://stackoverflow.com/questions/9507184/can-openssl-on-windows-use-the-sys
 
 =head2 use_certificate_file
 
-C<method use_certificate_file : int ($file : string, $type : int);>
+C<method use_certificate_file : int ($file : string, $type : int = -1);>
 
 Calls native L<use_certificate_file|https://docs.openssl.org/master/man3/SSL_CTX_use_certificate/> function given the pointer value of the instance, $file, $type, and returns its return value.
+
+If $type is a negative integer, $type is set to C<SSL_FILETYPE_PEM>.
 
 Exceptions:
 
@@ -104,9 +106,11 @@ If SSL_CTX_use_certificate_chain_file failed, an exception is thrown with C<eval
 
 =head2 use_PrivateKey_file
 
-C<method use_PrivateKey_file : int ($file : string, $type : int);>
+C<method use_PrivateKey_file : int ($file : string, $type : int = -1);>
 
 Calls native L<use_PrivateKey_file|https://docs.openssl.org/3.1/man3/SSL_CTX_use_certificate> function given the pointer value of the instance, $file, $type, and returns its return value.
+
+If $type is a negative integer, $type is set to C<SSL_FILETYPE_PEM>.
 
 Exceptions:
 

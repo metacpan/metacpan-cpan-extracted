@@ -1,0 +1,4 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class Net::SSLeay::Error::SSL_ERROR_WANT_READ extends Net::SSLeay::Error;

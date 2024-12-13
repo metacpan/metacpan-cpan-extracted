@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Exception
 
+3.24  Thu Dec 12 15:45:00 2024
+      - Added exception for route not found.
+
 3.23  Tue Dec 03 14:40:00 2024
       - Tidied up pod for Map::Tube::Exception::InvalidStationLineId.
 

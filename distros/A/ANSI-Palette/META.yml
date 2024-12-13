@@ -1,5 +1,5 @@
 ---
-abstract: 'The great new ANSI::Palette!'
+abstract: 'ANSI Color palettes'
 author:
   - 'LNATION <email@lnation.org>'
 build_requires:
@@ -21,5 +21,5 @@ no_index:
 requires:
   Import::Export: '0'
   perl: '5.006'
-version: '0.03'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.72';
+$Map::Tube::CLI::VERSION   = '0.77';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.72
+Version 0.77
 
 =cut
 
@@ -59,6 +59,8 @@ You can list all command line options by giving C<-h> flag.
         --line_mappings   Generate line mappings
         --line_notes      Generate line notes
         --list_lines      List lines
+        --force           Force unsupported map (map name becomes case
+                          sensitive)
 
         --usage           show a short help message
         -h                show a compact help message
@@ -131,7 +133,7 @@ message like below:
 The command line parameter C<map> can take one of the following map names.  It is
 case insensitive i.e. 'London' and 'lOndOn' are the same.
 
-You could use L<Task::Map::Tube::Metro> to install the supported maps.Please make
+You could use L<Task::Map::Tube::Bundle> to install the supported maps.Please make
 sure you have the latest maps when you install.
 
 =over 4
@@ -159,6 +161,8 @@ sure you have the latest maps when you install.
 =item * L<Frankfurt|Map::Tube::Frankfurt>
 
 =item * L<Glasgow|Map::Tube::Glasgow>
+
+=item * L<Hamburg|Map::Tube::Hamburg>
 
 =item * L<Hongkong|Map::Tube::Hongkong>
 
@@ -200,6 +204,8 @@ sure you have the latest maps when you install.
 
 =item * L<Prague|Map::Tube::Prague>
 
+=item * L<Rome|Map::Tube::Rome>
+
 =item * L<SaintPetersburg|Map::Tube::SaintPetersburg>
 
 =item * L<Samara|Map::Tube::Samara>
@@ -226,10 +232,27 @@ sub BUILD {
     my ($self) = @_;
 
     my $plugins = [ plugins ];
+    my $map = $self->{map};
     foreach my $plugin (@$plugins) {
         my $key = _map_key($plugin);
-        if (defined $key && (uc($self->{map}) eq $key)) {
+        if (defined $key && (uc($map) eq $key)) {
             $self->{maps}->{uc($key)} = $plugin->new;
+        }
+    }
+
+    if ($self->force) {
+        if ($map =~ /^[A-Za-z]+$/) {
+            $self->{maps}->{uc($map)} = "Map::Tube::$map"->new;
+        }
+        else {
+            my @caller = caller(0);
+            @caller = caller(2) if $caller[3] eq '(eval)';
+
+            Map::Tube::Exception::FoundUnsupportedMap->throw({
+                method      => __PACKAGE__."::BUILD",
+                message     => "ERROR: Can't force invalid map [$map].",
+                filename    => $caller[1],
+                line_number => $caller[2] });
         }
     }
 
@@ -324,16 +347,8 @@ sub _prepare_mapping_notes {
     my $map_notes = {};
     foreach (@station_names) {
         my $a = $station_names[$i];
-        my $b = '';
-        if ($i == 0) {
-            $b = $station_names[$i+1];
-        }
-        elsif ($i == (@station_names-1)) {
-            $b = $station_names[$i-1];
-        }
-        else {
-            $b = sprintf("%s, %s", $station_names[$i-1], $station_names[$i+1]);
-        }
+        my $linked_stations = $map->get_linked_stations($a);
+        my $b = join(", ", @$linked_stations);
 
         $map_table->addRow($a, $b);
 
@@ -437,6 +452,10 @@ sub _validate_param {
     my $bgcolor = $self->bgcolor;
 
     my $supported_maps = _supported_maps();
+    if ($self->force) {
+        $supported_maps->{uc($map)} = 'Map::Tube::'. $map;
+    }
+
     Map::Tube::Exception::FoundUnsupportedMap->throw({
         method      => __PACKAGE__."::_validate_param",
         message     => "ERROR: Unsupported Map [$map].",
@@ -535,6 +554,7 @@ sub _supported_maps {
         'DNIPROPETROVSK'  => 'Map::Tube::Dnipropetrovsk',
         'FRANKFURT'       => 'Map::Tube::Frankfurt',
         'GLASGOW'         => 'Map::Tube::Glasgow',
+        'HAMBURG'         => 'Map::Tube::Hamburg',
         'HONGKONG'        => 'Map::Tube::Hongkong',
         'KAZAN'           => 'Map::Tube::Kazan',
         'KHARKIV'         => 'Map::Tube::Kharkiv',
@@ -555,6 +575,7 @@ sub _supported_maps {
         'NIZHNYNOVGOROD'  => 'Map::Tube::NizhnyNovgorod',
         'NOVOSIBIRSK'     => 'Map::Tube::Novosibirsk',
         'PRAGUE'          => 'Map::Tube::Prague',
+        'ROME'            => 'Map::Tube::Rome',
         'SAINTPETERSBURG' => 'Map::Tube::SaintPetersburg',
         'SAMARA'          => 'Map::Tube::Samara',
         'SINGAPORE'       => 'Map::Tube::Singapore',

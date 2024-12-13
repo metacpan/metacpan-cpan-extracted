@@ -1,3 +1,17 @@
+0.028 2024-12-13
+  [Bug Fix]
+    * Fix bugs of Net::SSLeay#get_SSL_CTX method.
+    * Fix bugs of Net::SSLeay#set_SSL_CTX method.
+  [Test Improvement]
+    * Online tests are skipped in offline systems.
+  [Changes]
+    * $type argument of Net::SSLeay::SSL_CTX#use_certificate_file method becomes optional.
+    * $type argument of Net::SSLeay::SSL_CTX#use_PrivateKey_file method becomes optional.
+    * Net::SSLeay::Error::SSL_ERROR_WANT_READ and Net::SSLeay::Error::SSL_ERROR_WANT_WRITE are thrown in connect_SSL, accept_SSL, write, read, shutdown methods in Net::SSLeay class.
+  [New Features]
+    * Add SSL_ERROR_WANT_WRITE class.
+    * Add SSL_ERROR_WANT_READ class.
+    
 0.027 2024-12-12
   [New Features]
     * Add Net::SSLeay::SSL_CTX#set_alpn_select_cb method.

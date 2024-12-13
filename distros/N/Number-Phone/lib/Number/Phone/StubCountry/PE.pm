@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240910191016;
+our $VERSION = 1.20241212130806;
 
 my $formatters = [
                 {
@@ -54,12 +54,18 @@ my $validators = {
                 'fixed_line' => '
           (?:
             (?:
-              4[34]|
-              5[14]
-            )[0-8]\\d|
+              (?:
+                4[34]|
+                5[14]
+              )[0-8]|
+              687
+            )\\d|
             7(?:
               173|
-              3[0-8]\\d
+              (?:
+                3[0-8]|
+                55
+              )\\d
             )|
             8(?:
               10[05689]|
@@ -69,7 +75,7 @@ my $validators = {
                 29
               )|
               7(?:
-                0[569]|
+                0[0569]|
                 [56]0
               )
             )
@@ -86,12 +92,18 @@ my $validators = {
                 'geographic' => '
           (?:
             (?:
-              4[34]|
-              5[14]
-            )[0-8]\\d|
+              (?:
+                4[34]|
+                5[14]
+              )[0-8]|
+              687
+            )\\d|
             7(?:
               173|
-              3[0-8]\\d
+              (?:
+                3[0-8]|
+                55
+              )\\d
             )|
             8(?:
               10[05689]|
@@ -101,7 +113,7 @@ my $validators = {
                 29
               )|
               7(?:
-                0[569]|
+                0[0569]|
                 [56]0
               )
             )
@@ -123,30 +135,32 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"5184", "Cusco",
-"5183", "Apurímac",
-"5172", "Tumbes",
-"5141", "Amazonas",
-"5152", "Tacna",
-"5162", "Huánuco",
-"5144", "La\ Libertad",
-"5143", "Ancash",
-"5142", "San\ Martín",
-"5166", "Ayacucho",
+$areanames{en} = {"5164", "Junín",
 "5151", "Puno",
-"5164", "Junín",
-"5165", "Loreto",
-"5167", "Huancavelica",
-"5163", "Pasco",
+"5183", "Apurímac",
+"5166", "Ayacucho",
+"5175", "Lima",
+"5156", "Ica",
+"5154", "Arequipa",
+"5161", "Ucayali",
+"5143", "Ancash",
+"5174", "Lambayeque",
 "5182", "Madre\ de\ Dios",
-"5173", "Piura",
+"5176", "Cajamarca",
+"5165", "Loreto",
+"5142", "San\ Martín",
+"5141", "Amazonas",
+"5163", "Pasco",
+"5168", "Lima",
+"5184", "Cusco",
+"5172", "Tumbes",
+"5167", "Huancavelica",
 "511", "Lima\/Callao",
 "5153", "Moquegua",
-"5174", "Lambayeque",
-"5176", "Cajamarca",
-"5154", "Arequipa",
-"5156", "Ica",
-"5161", "Ucayali",};
+"5144", "La\ Libertad",
+"5173", "Piura",
+"5162", "Huánuco",
+"5152", "Tacna",};
 my $timezones = {
                '' => [
                        'America/Lima'

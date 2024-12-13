@@ -76,6 +76,10 @@ int32_t SPVM__Net__SSLeay__X509_STORE__add_cert(SPVM_ENV* env, SPVM_VALUE* stack
   void* obj_x509 = stack[1].oval;
   X509* x509 = env->get_pointer(env, stack, obj_x509);
   
+  if (!obj_x509) {
+    return env->die(env, stack, "The X509 object $x509 must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
   int32_t status = X509_STORE_add_cert(self, x509);
   
   if (!(status == 1)) {

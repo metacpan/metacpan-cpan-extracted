@@ -115,8 +115,8 @@ our %NANP_areas = (
         $usa    = join('|', $usa, 710);
     },
     # see https://en.wikipedia.org/wiki/North_American_Numbering_Plan#Countries_and_territories
-    # checked on 2023-12-10
-    # next check due 2024-12-01 (annually)
+    # checked on 2024-12-11
+    # next check due 2025-12-01 (annually)
     AS => '684',         # American Samoa
     AI => '264',         # Anguilla
     AG => '268',         # Antigua and Barbude
@@ -244,18 +244,19 @@ Number::Phone::Country - Lookup country of phone number
 
   use Number::Phone::Country;
 
-  #returns 'CA' for Canada
-  my $iso_country_code = phone2country("1 (604) 111-1111");
+  #returns 'CA', '1' for Canada
+  my ($iso_country_code, $idd) = Number::Phone::Country::phone2country_and_idd("1 (604) 111-1111");
 
 or
 
   use Number::Phone::Country qw(uk);
 
-  my $iso_country_code = Number::Phone::Country::phone2country(...);
+  my ($iso_country_code, $idd) = Number::Phone::Country::phone2country_and_idd(...);
 
 or
 
-  my ($iso_country_code, $idd) = Number::Phone::Country::phone2country_and_idd(...);
+  #returns '49'
+  my $idd = Number::Phone::Country::country_code("DE");
 
 =head1 INCOMPATIBLE CHANGES
 
@@ -361,7 +362,7 @@ country.
 
 =item phone2country($phone)
 
-Returns the ISO country code (or XK for Kosovo) for a phone number.
+B<DEPRECATED> Returns the ISO country code (or XK for Kosovo) for a phone number.
 eg, for +441234567890 it returns 'GB' (or 'UK' if you've told it to).
 
 =item phone2country_and_idd($phone)

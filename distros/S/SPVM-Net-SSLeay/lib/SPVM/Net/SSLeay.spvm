@@ -2,7 +2,7 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.027";
+  version "0.028";
   
   use Net::SSLeay::Constant;
   use Net::SSLeay::SSL_CTX;
@@ -13,6 +13,8 @@ class Net::SSLeay {
   use Net::SSLeay::Callback::Msg;
   use Net::SSLeay::OPENSSL;
   use Net::SSLeay::OPENSSL_INIT_SETTINGS;
+  use Net::SSLeay::Error::SSL_ERROR_WANT_READ;
+  use Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
   
   # Fields
   has operation_error : ro int;

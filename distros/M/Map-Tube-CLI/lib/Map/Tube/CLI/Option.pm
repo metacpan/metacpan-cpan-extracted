@@ -1,6 +1,6 @@
 package Map::Tube::CLI::Option;
 
-$Map::Tube::CLI::Option::VERSION   = '0.72';
+$Map::Tube::CLI::Option::VERSION   = '0.77';
 $Map::Tube::CLI::Option::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI::Option - Option as Moo Role for Map::Tube::CLI.
 
 =head1 VERSION
 
-Version 0.72
+Version 0.77
 
 =cut
 
@@ -33,6 +33,7 @@ option bgcolor       => (is => 'ro', order => 7,  isa => Str, format => 's', doc
 option line_mappings => (is => 'ro', order => 8,  doc => 'Generate line mappings');
 option line_notes    => (is => 'ro', order => 9,  doc => 'Generate line notes');
 option list_lines    => (is => 'ro', order => 10, doc => 'List lines');
+option force         => (is => 'ro', order => 11, doc => 'Force unsupported map (map name becomes case sensitive)');
 
 =head1 DESCRIPTION
 

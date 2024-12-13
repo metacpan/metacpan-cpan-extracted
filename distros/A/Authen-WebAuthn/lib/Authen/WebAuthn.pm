@@ -1,5 +1,5 @@
 package Authen::WebAuthn;
-$Authen::WebAuthn::VERSION = '0.004';
+$Authen::WebAuthn::VERSION = '0.005';
 use strict;
 use warnings;
 use Mouse;
@@ -67,12 +67,14 @@ sub validate_registration {
         $client_data_json_b64,      $attestation_object_b64,
         $token_binding_id_b64,      $trust_anchors,
         $allowed_attestation_types, $allow_untrusted_attestation,
+        $allow_unknown_attestation_format,
       )
       = @params{ qw(
           challenge_b64        requested_uv
           client_data_json_b64 attestation_object_b64
           token_binding_id_b64 trust_anchors
           allowed_attestation_types allow_untrusted_attestation
+          allow_unknown_attestation_format
         )
       };
 
@@ -183,8 +185,16 @@ sub validate_registration {
     my $attestation_function =
       $ATTESTATION_FUNCTIONS->{$attestation_statement_format};
     unless ( ref($attestation_function) eq "CODE" ) {
-        croak( "Unsupported attestation format during WebAuthn registration: "
-              . $attestation_statement_format );
+        if ($allow_unknown_attestation_format) {
+
+            # Treat unknown attestation as None
+            $attestation_function = $ATTESTATION_FUNCTIONS->{none};
+        }
+        else {
+            croak(
+                "Unsupported attestation format during WebAuthn registration: "
+                  . $attestation_statement_format );
+        }
     }
 
     # 19. Verify that attStmt is a correct attestation statement, conveying a
@@ -543,14 +553,14 @@ sub check_attestation_trust {
          # NOTE: However, if permitted by policy, the Relying Party MAY register
          # the credential ID and credential public key but treat the credential
          # as one with self attestation
-         %$attestation_result = (
-             success    => 1,
-             type       => "Self",
-             trust_path => [],
-         );
-         return 1;
-     }
- }
+            %$attestation_result = (
+                success    => 1,
+                type       => "Self",
+                trust_path => [],
+            );
+            return 1;
+        }
+    }
 }
 
 # Try to find a DER-encoded certificate in a list of PEM-encoded certificates

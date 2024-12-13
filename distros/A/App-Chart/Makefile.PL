@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2020 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2020, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -133,6 +133,7 @@ my %PREREQ_PM
     'HTML::TableExtract' => 0,
     'HTML::TreeBuilder' => 0,   # only for LME plastics hack actually
 
+    # Yahoo quotes and daily
     'JSON' => 0,
 
     # anything Archive::Zip is happy with is enough, 1.07 looks likely

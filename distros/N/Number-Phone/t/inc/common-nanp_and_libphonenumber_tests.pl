@@ -162,11 +162,7 @@ skip_if_libphonenumber("Stubs don't support operator", 1, sub {
         ['+1 441 222 0000' => 'BERMUDA CABLEVISION LIMITED - BM'],
         ['+1 473 230 0000' => 'COLUMBUS COMMUNICATIONS (GRENADA) LIMITED'],
         ['+1 649 231 0000' => 'CABLE & WIRELESS (TC)'],
-        # No data yet.
-        # checked on 2023-12-10
-        # next check due 2024-12-01 (annually) until there's data
-        # at https://localcallingguide.com/xmlprefix.php?npa=658&blocks=1
-        # ['+1 658 ??? 0000' => '???'],
+        ['+1 658 201 0000' => 'JAMAICA TEL. CO. (JM)'],
         ['+1 664 349 0000' => 'CABLE & WIRELESS (RT)'],
         ['+1 670 233 0000' => 'MICRONESIAN TELECOMMUNICATIONS CORPORATION'],
         ['+1 671 472 7679' => 'TELEGUAM HOLDINGS, LLC'],
@@ -190,16 +186,15 @@ skip_if_libphonenumber("Stubs don't support operator", 1, sub {
     }
     is_deeply(
         \@codes_seen,
-        [grep { $_ != 658 } Number::Phone::Country::_non_US_CA_area_codes()],
-        "Oh good, the database contains data for all the non-US/CA area codes (except 658, for which no data are yet available)"
+        [Number::Phone::Country::_non_US_CA_area_codes()],
+        "Oh good, the database contains data for all the non-US/CA area codes"
     );
 
-    # checked on 2023-12-10 that these are consolidated ten-thousand blocks
-    # next check due 2024-12-01 (annually)
-    # https://localcallingguide.com/xmlprefix.php?npa=630&blocks=1
-    is($CLASS->new('+1 630 847 0000')->operator(), 'YMAX COMMUNICATIONS CORP. - IL', 'USA, thousands blocks all for same operator, so consolidated into one to save space in database');
-    # checked on 2022-12-10
-    # next check due 2024-12-01 (annually)
+    # checked on 2024-11-06 that these are consolidated ten-thousand blocks
+    # next check due 2025-12-01 (annually)
+    is($CLASS->new('+1 202 201 0000')->operator(), 'VERIZON WASHINGTON DC, INC.', 'USA, thousands blocks all for same operator, so consolidated into one to save space in database');
+    # checked on 2024-11-06
+    # next check due 2025-12-01 (annually)
     # https://localcallingguide.com/xmlprefix.php?npa=242&blocks=1
     is($CLASS->new('+1 242 367 0000')->operator(), 'BARTELCO (BA)', 'Bahamas, thousands blocks all for same operator, so consolidated into one to save space in database');
 
@@ -207,12 +202,12 @@ skip_if_libphonenumber("Stubs don't support operator", 1, sub {
         [ 'USA',     '+1 512 373 0000', 'METROPCS, INC.' ],
         [ 'USA',     '+1 512 373 1000', undef ],
         [ 'USA',     '+1 512 373 2000', 'METROPCS, INC.', ],
-        [ 'USA',     '+1 512 373 3000', 'TIME WARNER CBLE INFO SVC (TX) DBA TIME WARNER CBL', ],
+        [ 'USA',     '+1 512 373 3000', 'TWC IP ENABLED SERVICES, LLC', ],
         [ 'USA',     '+1 512 373 4000', undef ],
         [ 'USA',     '+1 512 373 5000', 'METROPCS, INC.' ],
         [ 'USA',     '+1 512 373 6000', 'METROPCS, INC.' ],
         [ 'USA',     '+1 512 373 7000', undef ],
-        [ 'USA',     '+1 512 373 8000', 'TIME WARNER CBLE INFO SVC (TX) DBA TIME WARNER CBL' ],
+        [ 'USA',     '+1 512 373 8000', 'TWC IP ENABLED SERVICES, LLC' ],
         [ 'USA',     '+1 512 373 9000', 'METROPCS, INC.' ]
     ) {
         is(

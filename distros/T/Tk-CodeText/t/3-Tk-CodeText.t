@@ -15,6 +15,7 @@ if (defined $app) {
 		-autoindent => 1,
 		-tabs => '7m',
 		-font => 'Monospace 12',
+		-logcall => sub { print STDERR shift, "\n" },
 		-modifiedcall => sub { my $index = shift; print "index $index\n"; },
 #		-readonly => 1,
 		-syntax => 'XML',

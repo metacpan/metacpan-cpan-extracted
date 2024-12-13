@@ -12,7 +12,7 @@
 @copying
 This manual describes how to install and use Chart, version @value{VERSION}.
 
-Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2019, 2023 Kevin Ryde
+Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2019, 2023, 2024 Kevin Ryde
 
 Chart is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
@@ -2247,7 +2247,7 @@ bearish) sentiment and can be bought (or sold).  The 10-day period is a
 parameter in Chart.
 
 The channel bands need daily high/low data, so when that's not available (a
-few indexes for instance) they can't be drawn.  The centre line is still shown
+few indices for instance) they can't be drawn.  The centre line is still shown
 (it ends up as just a simple moving average of the closes).
 
 
@@ -2520,7 +2520,7 @@ The idea behind ATR is that when traders are enthusiastic, either in an
 uptrend or downtrend, the range will be higher as the stock or commodity is
 bid up or sold down through the day.  A lesser range suggests waning interest.
 
-When a data source doesn't provide high/low values (some indexes for
+When a data source doesn't provide high/low values (some indices for
 instance), then just close-to-close changes are used.  This may be of limited
 use.
 
@@ -2654,7 +2654,7 @@ where Chaikin uses close within the day's range as a fraction, not just an
 ``all or nothing'' up or down.
 
 High/low and volume data are required before Chaikin money flow can be drawn,
-this may not be available for some data sources (some stock indexes in
+this may not be available for some data sources (some stock indices in
 particular).
 
 It should be noted that ``money flow'' here is a shorthand for the enthusiasm
@@ -3619,7 +3619,7 @@ PVI = PVI[prev] * |  close[prev]
 @end example
 @end ifnottex
 
-The fraction @m{close/close_{prev}, close/close[prev]} means that the indexes
+The fraction @m{close/close_{prev}, close/close[prev]} means that the indices
 follow percentage daily changes in the closing prices, but only changes on the
 selected lower or higher volume days are used.  The starting point for the
 changes is arbitrary, only the shape of the resulting line matters.  In Chart
@@ -4985,7 +4985,7 @@ The effect is to include any ``gap'' left between yesterday's close and
 today's range.  Quite often there's no gap, but when overnight news makes
 prices jump it can be desirable in some algorithms to include that distance.
 
-When a stock doesn't have high/low values (some indexes for instance), then
+When a stock doesn't have high/low values (some indices for instance), then
 just close-to-close changes are used for true range, which may or may not be
 particularly useful.
 
@@ -5330,7 +5330,7 @@ C.tsp.FQ
 @c SYMBOL: C.tsp.FQ
 
 Some of the FQ methods are covered by Chart natively (like US shares and
-indexes from Yahoo).
+indices from Yahoo).
 
 An FQ method not in the default builtin packages must be added to the
 @env{FQ_LOAD_QUOTELET} environment variable in the usual way.  Chart also
@@ -5565,22 +5565,24 @@ Yahoo provides the following for many stock exchanges around the world
 
 @itemize
 @item
-Quotes, real-time for indexes and delayed for shares.
+Quotes, delayed for some shares and real-time for indices.
 @c @item
 @c Intraday graphs.
 @item
 Historical daily data, dividends and splits.
-@c @item
-@c Upcoming dividends.
+(But not upcoming dividends and splits.)
+@item
+Company information (name, exchanges, decimal places).
 @end itemize
 
-Yahoo does not allow commercial use, see the terms of service at
+Yahoo terms of service can be found at the following link.
+At the time of writing believe they are personal use and no re-publication,
 
 @quotation
-@uref{https://policies.yahoo.com/us/en/yahoo/terms/utos/index.htm}
+@uref{https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html}
 @end quotation
 
-Chart uses the Yahoo stock symbol conventions.  For US stocks (AMEX, Nasdaq,
+Chart uses the Yahoo stock symbol conventions.  For US shares (AMEX, Nasdaq,
 NYSE) this is just the exchange symbol like @samp{AAPL} for Apple Computer.
 Stocks from elsewhere are the exchange symbol and a suffix, like @samp{BMW.DE}
 for BMW on Xetra.  See @ref{Yahoo Exchanges}, below, for those supported in
@@ -5590,37 +5592,25 @@ sites),
 @c SYMBOL: BMW.DE
 
 @quotation
-@uref{http://finance.yahoo.com/lookup}
+@uref{https://finance.yahoo.com/lookup}
 @end quotation
 
 @cindex Currencies
 @cindex Metals, spot prices
-Some currency cross-rates are available, they take a form like @samp{AUDUSD=X}
-for the value of one Australian dollar in US dollars.  Some spot metals prices
-are available similarly, for example @samp{XAUUSD=X} for Gold in US dollars
-(but perhaps only quotes, not historical).
+Some currency cross-rates are available, like @samp{AUDUSD=X} for the value of
+one Australian dollar in US dollars.  Some futures prices are available, like
+@samp{GC=F} for front month Gold in US dollars.
 @c SYMBOL: AUDUSD=X
-@c SYMBOL: XAUUSD=X
+@c SYMBOL: GC=F
 
-Yahoo gives some information on market closing times, but Chart doesn't make
-use of that.  A day's trading is written as daily data at 6pm (in the
-exchange's timezone).  Before that the current day is a latest quote.
-Downloads are slightly overlapped so that if 6pm was too soon then its prices
-are replaced on a subsequent download.
+Yahoo has some information on market closing times, but Chart doesn't use
+that.  A day's trading is written as daily data at 6pm (in the exchange's
+timezone).  Before that the current day is a latest quote.  Downloads are
+slightly overlapped so that if 6pm was too soon then its prices are replaced
+on a subsequent download.
 
-Currently quotes are only the current day's open/high/low/last in the manner
-of the historical data, so without bid/offer.
-
-Currently splits are not handled properly.  Yahoo supplies historical prices
-adjusted for subsequent splits, but the intention in Chart is to have original
-prices and adjust on display if desired.  The effect in the database is to
-make a bit of a mess with new downloads having new splits and past downloads
-not.
-
-@c Dividends are re-downloaded weekly.  They seem to be a bit patchy, with not
-@c all dividends actually appearing in the data for some stocks.  The most recent
-@c dividend on the quotes pages is added to the database, so the latest should be
-@c available at least.
+Quotes are only the current day's open/high/low/last in the manner of the
+historical data, without bid/offer.
 
 @menu
 * Yahoo Exchanges::
@@ -5676,10 +5666,9 @@ not.
 See also @ref{New Zealand Stock Exchange}, which uses Yahoo and is described
 in its own section.
 
-@c See also @ref{Australian Stock Exchange}, and @ref{New Zealand Stock
-@c Exchange}, which use Yahoo, and are described in their own sections.
-
-@c @url{https://help.yahoo.com/kb/SLN2310.html}
+@quotation
+@uref{https://help.yahoo.com/kb/finance-app-for-android/exchanges-data-providers-yahoo-finance-sln2310.html}
+@end quotation
 
 @quotation
 @multitable {Suffix} {Mmmmmmmmmm} {MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM}

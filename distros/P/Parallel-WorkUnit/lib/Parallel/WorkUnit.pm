@@ -4,7 +4,7 @@
 #
 
 package Parallel::WorkUnit;
-$Parallel::WorkUnit::VERSION = '2.243450';
+$Parallel::WorkUnit::VERSION = '2.243480';
 use v5.8;
 
 # ABSTRACT: Provide multi-paradigm forking with ability to pass back data
@@ -881,7 +881,7 @@ Parallel::WorkUnit - Provide multi-paradigm forking with ability to pass back da
 
 =head1 VERSION
 
-version 2.243450
+version 2.243480
 
 =head1 SYNOPSIS
 
@@ -1182,7 +1182,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2023 by Joelle Maslak.
+This software is copyright (c) 2015-2024 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

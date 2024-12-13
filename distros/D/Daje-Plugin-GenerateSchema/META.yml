@@ -1,0 +1,52 @@
+---
+abstract: "It's new $module"
+author:
+  - 'This library is free software; you can redistribute it and/or modify'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daje-Plugin-GenerateSchema
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Daje::Plugin::Base::Common:
+    file: lib/Daje/Plugin/Base/Common.pm
+    version: '0.01'
+  Daje::Plugin::GenerateSchema:
+    file: lib/Daje/Plugin/GenerateSchema.pm
+    version: '0.01'
+  Daje::Plugin::Schema::Create:
+    file: lib/Daje/Plugin/Schema/Create.pm
+    version: '0.01'
+requires:
+  Config::Tiny: '0'
+  Daje::Tools::Datasections: '0'
+  Mojo::JSON: '0'
+  Mojo::Pg: '0'
+  Scalar::Util: '0'
+  Syntax::Operator::Matches: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/janeskil1525/Daje-Plugin-GenerateSchema/issues
+  homepage: https://github.com/janeskil1525/Daje-Plugin-GenerateSchema
+  repository: https://github.com/janeskil1525/Daje-Plugin-GenerateSchema.git
+version: '0.01'
+x_contributors:
+  - 'Jan Eskilsson <janeskil1525@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

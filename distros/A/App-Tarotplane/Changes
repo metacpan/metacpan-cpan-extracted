@@ -1,5 +1,10 @@
 Revision history for perl module App::Tarotplane
 
+2.01 Thu 12 Dec 2024
+  Fixes:
+    - Grammar issues in documentation.
+    - LICENSE file now contains perl license rather than Artistic License 2.0.
+
 2.00 Tue 5 Nov 2024
   This update uses a new card file format which is incompatible with the
   previous one. You are going to have to rewrite your card files to conform to

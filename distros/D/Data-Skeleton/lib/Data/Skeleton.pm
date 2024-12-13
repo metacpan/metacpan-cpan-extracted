@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Data::Skeleton;
-$Data::Skeleton::VERSION = '0.06';
+$Data::Skeleton::VERSION = '0.07';
 use Moo;
 use MooX::Types::MooseLike::Base qw/Str HashRef Bool/;
 use Scalar::Util qw(blessed);

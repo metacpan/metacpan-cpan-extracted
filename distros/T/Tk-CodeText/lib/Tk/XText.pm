@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.54';
+$VERSION = '0.56';
 use strict;
 use warnings;
 use Carp;
@@ -327,18 +327,25 @@ sub canRedo {
 
 sub ClassInit {
 	my ($class,$mw) = @_;
-	$class->SUPER::ClassInit($mw);
 	$class->bindRdOnly($mw);
  
- 	$mw->bind($class, '<<Find>>','FindPopUp');
-	$mw->bind($class, '<<Replace>>','FindAndReplacePopUp');
-	$mw->bind($class, '<<Comment>>','comment');
-	$mw->bind($class, '<<Comment>>','comment');
-	$mw->bind($class,'<<UnComment>>','uncomment');
-	$mw->bind($class, '<<Indent>>','indent');
-	$mw->bind($class,'<<UnIndent>>','unindent');
-	$mw->bind($class, '<<Undo>>','undo');
-	$mw->bind($class,'<<Redo>>','redo');
+	$mw->bind($class,'<Tab>', 'insertTab');
+	$mw->bind($class,'<Return>', ['Insert',"\n"]);
+	$mw->bind($class,'<Delete>','Delete');
+	$mw->bind($class,'<BackSpace>','Backspace');
+	$mw->bind($class,'<Insert>', \&ToggleInsertMode ) ;
+	$mw->bind($class,'<KeyPress>',['InsertKeypress',Ev('A')]);
+	$class->clipboardOperations($mw,'Copy', 'Cut', 'Paste');
+	
+ 	$mw->bind($class, '<<Find>>', 'FindPopUp');
+	$mw->bind($class, '<<Replace>>', 'FindAndReplacePopUp');
+	$mw->bind($class, '<<Comment>>', 'comment');
+	$mw->bind($class, '<<Comment>>', 'comment');
+	$mw->bind($class, '<<UnComment>>', 'uncomment');
+	$mw->bind($class, '<<Indent>>', 'indent');
+	$mw->bind($class, '<<UnIndent>>', 'unindent');
+	$mw->bind($class, '<<Undo>>', 'undo');
+	$mw->bind($class, '<<Redo>>', 'redo');
 	return $class
 }
 
@@ -382,7 +389,7 @@ sub clipboardCopy {
  
 sub clipboardCut {
 	my $self = shift;
-	return if $self->cget('-readonly');
+	return $self->clipboardCopy(@_) if $self->cget('-readonly');
 	$self->SUPER::clipboardCut(@_) if $self->tagRanges('sel');
 }
  
@@ -527,10 +534,40 @@ sub findandreplacepopup {
 	}
 }
 
+sub FindAll {
+	my ($self, $mode, $case, $pattern) = @_;
+	if ($mode eq '-regexp') {
+		return unless $self->FindValidateReg($pattern);
+	}
+	$self->SUPER::FindAll($mode, $case, $pattern);
+}
 
 sub FindandReplaceAll {
-	my $self = shift;
-	return $self->SUPER::FindandReplaceAll(@_);
+	my ($self, $mode, $case, $find, $replace) = @_;
+	if ($mode eq '-regexp') {
+		return unless $self->FindValidateReg($find);
+	}
+	return $self->SUPER::FindandReplaceAll($mode, $case, $find, $replace);
+}
+
+sub FindNext {
+	my ($self, $direction, $mode, $case, $pattern) = @_;
+	if ($mode eq '-regexp') {
+		return unless $self->FindValidateReg($pattern);
+	}
+	$self->SUPER::FindNext($direction, $mode, $case, $pattern);
+}
+
+sub FindValidateReg {
+	my ($self, $regexp) = @_;
+	eval "qr/$regexp/";
+	my $error = $@;
+	if ($error) {
+		$error =~ s/\n//;
+		$self->log($error);
+		return ''
+	}
+	return 1
 }
 
 sub Flush {

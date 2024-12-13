@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240910191017;
+our $VERSION = 1.20241212130807;
 
 my $formatters = [
                 {
@@ -95,33 +95,33 @@ my $validators = {
                 'voip' => '55[0-37-9]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"67641", "Masilamea",
-"67631", "Muʻa",
-"67643", "Matangiake",
-"67629", "Pea",
+$areanames{en} = {"67670", "Vava\’u",
 "67633", "Kolonga",
-"67679", "Vava\’u",
-"67634", "Kolonga",
-"67672", "Vava\’u",
-"67676", "Vava\’u",
-"67675", "Vava\’u",
-"67670", "Vava\’u",
-"67671", "Vava\’u",
+"67637", "Vaini",
+"67631", "Muʻa",
+"67630", "Pea",
 "67680", "Niuas",
-"67685", "Niuas",
-"67642", "Masilamea",
+"67671", "Vava\’u",
 "67636", "Nakolo",
 "67669", "Ha\’apai",
-"6762", "Nuku\'alofa",
-"67632", "Muʻa",
+"67638", "Vaini",
 "67674", "Vava\’u",
+"67676", "Vava\’u",
+"67642", "Masilamea",
+"67634", "Kolonga",
+"67643", "Matangiake",
+"67629", "Pea",
+"67641", "Masilamea",
 "67640", "Kolovai",
 "67660", "Ha\’apai",
-"67630", "Pea",
-"67638", "Vaini",
+"67675", "Vava\’u",
 "67650", "\‘Eua",
-"67637", "Vaini",
-"67635", "Nakolo",};
+"67672", "Vava\’u",
+"67679", "Vava\’u",
+"6762", "Nuku\'alofa",
+"67635", "Nakolo",
+"67632", "Muʻa",
+"67685", "Niuas",};
 my $timezones = {
                '' => [
                        'Pacific/Tongatapu'

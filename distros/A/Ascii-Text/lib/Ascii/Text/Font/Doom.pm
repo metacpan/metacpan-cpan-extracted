@@ -899,7 +899,7 @@ Ascii::Text::Font::Doom - Doom font
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 

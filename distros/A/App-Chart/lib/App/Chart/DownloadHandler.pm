@@ -1,6 +1,6 @@
 # Download data handlers.
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2014, 2016 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2014, 2016, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -48,15 +48,14 @@ sub new {
   my $self = bless \%self, $class;
   push @handler_list, $self;
 
-  $self{'name'} ||= do { my ($package,$filename,$line) = caller();
-                         "$package:"
-                           . Glib::filename_to_unicode($filename)
-                             . ":$line" };
+  $self{'name'} ||= do {
+    my ($package,$filename,$line) = caller();
+    "$package:" . Glib::filename_to_unicode($filename) . ":$line" };
 
   # highest priority first and 'stable' above for order added for equals
   @handler_list
     = sort { ($b->{'priority'}||0) <=> ($a->{'priority'}||0) }
-      @handler_list;
+    @handler_list;
 
   return $self;
 }

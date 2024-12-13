@@ -41,6 +41,7 @@ lib/Map/Tube/Exception/MissingStationId.pm
 lib/Map/Tube/Exception/MissingStationName.pm
 lib/Map/Tube/Exception/MissingSupportedMap.pm
 lib/Map/Tube/Exception/MissingSupportedObject.pm
+lib/Map/Tube/Exception/RouteNotFound.pm
 t/00-load.t
 t/01-map-tube-exception.t
 xt/author/pod-syntax.t

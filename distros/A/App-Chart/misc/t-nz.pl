@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2016, 2017, 2018, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -21,6 +21,7 @@ use warnings;
 use LWP;
 use Data::Dumper;
 use File::Slurp 'slurp';
+use POSIX 'strftime';
 use App::Chart::Suffix::NZ;
 
 # uncomment this to run the ### lines
@@ -32,13 +33,16 @@ use Smart::Comments;
   # old jul 09
   # my $content = slurp ("$ENV{'HOME'}/chart/samples/nzx/Dividends.html");
   # new sep 17
-  my $content = slurp ("$ENV{HOME}/chart/samples/nzx/dividends-sep18.html");
+  # my $content = slurp ("$ENV{HOME}/chart/samples/nzx/dividends-sep18.html");
+  # new sep 24
+  my $content = slurp ("$ENV{HOME}/chart/samples/nzx/dividends-sep24-json.html");
 
-  my $resp = HTTP::Response->new (200, 'OK',
-                                  ['Content-Type' => 'text/html; charset=utf-8'],
-                                  $content);
+  my $resp = HTTP::Response->new
+    (200, 'OK',
+     ['Content-Type' => 'text/html; charset=utf-8'],
+     $content);
   # my $req = HTTP::Request->new();
-  # $req->uri(App::Chart::Suffix::NZ::DIVIDENDS_URL);
+  # $req->uri(App::Chart::Suffix::NZ->DIVIDENDS_URL);
   # $resp->request ($req);
 
   ### charset: $resp->content_charset
@@ -48,7 +52,14 @@ use Smart::Comments;
   my $h = App::Chart::Suffix::NZ::dividends_parse ($resp);
   App::Chart::Download::crunch_h($h);
   print Dumper ($h);
-   # App::Chart::Download::write_daily_group ($h);
+  # App::Chart::Download::write_daily_group ($h);
+  exit 0;
+}
+{
+  my $t = 1724673600;
+  my @t = gmtime($t);
+  print join(',',@t),"\n";
+  print "GMT     ",strftime('%H:%M:%S  %d %m %Y',@t),"\n";
   exit 0;
 }
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2017 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2017, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -19,7 +19,7 @@
 
 use strict;
 use warnings;
-use Test::More 0.82 tests => 18;
+use Test::More 0.82 tests => 6;
 
 use lib 't';
 use MyTestHelpers;
@@ -47,6 +47,9 @@ BEGIN {
 }
 
 use Locale::TextDomain 'App-Chart';
+
+# uncomment this to run the ### lines
+# use Smart::Comments;
 
 require App::Chart::Suffix::NZ;
 
@@ -82,33 +85,36 @@ is (App::Chart::symbol_source_help ('^NZ50'),
 
 
 #------------------------------------------------------------------------------
-# dividend_parse
+# dividend_parse()
 
-foreach my $elem ([ [ 'FOO.NZ','05/12/2017','05/01/2018',
-                      '0.55c', 'NZD', '0.0000'],
-                    '0.0055', '0.00', undef ],
+# The previous HTML table based way:
+#
+# foreach my $elem ([ [ 'FOO.NZ','05/12/2017','05/01/2018',
+#                       '0.55c', 'NZD', '0.0000'],
+#                     '0.0055', '0.00', undef ],
+# 
+#                   [ [ 'FOO.NZ','05/12/2017','05/01/2018',
+#                       '15.000c', 'NZD', '7.3881c'],
+#                     '0.15', '0.073881', undef ],
+# 
+#                   [ [ 'FOO.NZ','05/12/2017','05/01/2018',
+#                       '15.00c', 'GBP', '7.3881c'],
+#                     undef, undef, '0.15 + 0.073881 GBP' ],
+# 
+#                   [ [ 'FOO.NZ','05/12/2017','05/01/2018',
+#                       '15.00c', 'GBP', ''],
+#                     undef, undef, '0.15 GBP' ],
+# 
+#                  ) {
+#   my ($args, $want_amount, $want_imputation, $want_note) = @$elem;
+#   # diag explain $args;
+# 
+#   my $div = App::Chart::Suffix::NZ::dividend_parse(@$args);
+#   is ($div->{'amount'}, $want_amount, "amount");
+#   is ($div->{'imputation'}, $want_imputation, "imputation");
+#   is ($div->{'note'}, $want_note, "note");
+# }
 
-                  [ [ 'FOO.NZ','05/12/2017','05/01/2018',
-                      '15.000c', 'NZD', '7.3881c'],
-                    '0.15', '0.073881', undef ],
-
-                  [ [ 'FOO.NZ','05/12/2017','05/01/2018',
-                      '15.00c', 'GBP', '7.3881c'],
-                    undef, undef, '0.15 + 0.073881 GBP' ],
-
-                  [ [ 'FOO.NZ','05/12/2017','05/01/2018',
-                      '15.00c', 'GBP', ''],
-                    undef, undef, '0.15 GBP' ],
-
-                 ) {
-  my ($args, $want_amount, $want_imputation, $want_note) = @$elem;
-  # diag explain $args;
-
-  my $div = App::Chart::Suffix::NZ::dividend_parse(@$args);
-  is ($div->{'amount'}, $want_amount, "amount");
-  is ($div->{'imputation'}, $want_imputation, "imputation");
-  is ($div->{'note'}, $want_note, "note");
-}
 
 #------------------------------------------------------------------------------
 exit 0;

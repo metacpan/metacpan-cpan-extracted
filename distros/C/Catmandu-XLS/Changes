@@ -1,5 +1,8 @@
 Revision history for Catmandu-XLS
 
+0.11  2024-12-12 16:33:12 CET
+  - Catmandu::Exporter::XLSX: mark all fields with format '@' so that no fields are formatted unexpectedly (like numbers)
+
 0.10  2021-01-04 11:56:00 CET
   - use the TabularExporter role
   - new empty option

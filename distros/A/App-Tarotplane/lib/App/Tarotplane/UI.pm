@@ -1,5 +1,5 @@
 package App::Tarotplane::UI;
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 use 5.016;
 use strict;
 use warnings;

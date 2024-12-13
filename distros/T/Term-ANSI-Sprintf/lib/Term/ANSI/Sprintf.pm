@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use base 'Import::Export';
 
@@ -30,7 +30,7 @@ Term::ANSI::Sprintf - sprintf with ANSI colors
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -47,38 +47,38 @@ Version 0.04
 	%italic
 	%underline
 
-        %black
-        %red
-        %green
-        %yellow
-        %blue
-        %magento
-        %cyan
-        %white
+	%black
+	%red
+	%green
+	%yellow
+	%blue
+	%magento
+	%cyan
+	%white
 
-        %bright_black
-        %bright_red
-        %bright_green
-        %bright_yellow
-        %bright_blue
-        %bright_magento
-        %bright_cyan
-        %bright_white
+	%bright_black
+	%bright_red
+	%bright_green
+	%bright_yellow
+	%bright_blue
+	%bright_magento
+	%bright_cyan
+	%bright_white
 
-        %black_on_red
-        %black_on_green
-        %black_on_yellow
-        %black_on_blue
-        %black_on_magento
-        %black_on_cyan
-        %black_on_white
-        %black_on_bright_red
-        %black_on_bright_green
-        %black_on_bright_yellow
-        %black_on_bright_blue
-        %black_on_bright_magento
-        %black_on_bright_cyan
-        %black_on_bright_white
+	%black_on_red
+	%black_on_green
+	%black_on_yellow
+	%black_on_blue
+	%black_on_magento
+	%black_on_cyan
+	%black_on_white
+	%black_on_bright_red
+	%black_on_bright_green
+	%black_on_bright_yellow
+	%black_on_bright_blue
+	%black_on_bright_magento
+	%black_on_bright_cyan
+	%black_on_bright_white
 
 	%red_on_black
 	...

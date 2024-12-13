@@ -1,6 +1,6 @@
 package Catmandu::Importer::XLSX;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use namespace::clean;
 use Catmandu::Sane;

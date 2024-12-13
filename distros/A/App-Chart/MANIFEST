@@ -713,8 +713,10 @@ t/WatchlistModel.t
 t/Yahoo.t
 unused/CommSec.pm
 unused/Float.pm
+unused/NZX-old.pm
 unused/t-tradingroom.pl
 unused/TradingRoom.pm
+unused/Yahoo-v7.pm
 unused/YahooOld.pm
 xt/0-desktop-file-validate.t
 xt/0-exe-shebang.t

@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = 274;
+our $VERSION = 275;
 
 sub chartprog_quotes {
   my ($quoter, @symbol_list) = @_;

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -23,6 +23,7 @@ use Data::Dumper;
 {
   require App::Chart::Gtk2::Job::Latest;
   # my $job = App::Chart::Gtk2::Job::Latest->new;
+  $App::Chart::option{'verbose'} = 2;
   App::Chart::Gtk2::Job::Latest->start (['BHP.AX']);
   Gtk2->main;
   exit 0;

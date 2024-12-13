@@ -1,5 +1,11 @@
 Tk::CodeText module changes log
 
+0.56 13 Dec 2024
+	- Got rid of all classic Tk::Text keybindings.
+	- Codefolding encompasses the entire section.
+	- Changed bugtracker.
+	- Regex is now validated before search.
+
 0.55 11 Nov 2024
 	Only clear highlighting of the section about to be highlighted in the highlightLoop method.
 

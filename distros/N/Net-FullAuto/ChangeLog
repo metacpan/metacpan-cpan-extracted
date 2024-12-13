@@ -19,6 +19,12 @@
 #
 #######################################################################
 
+2024-12-12  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000815 released
+
+	* Fixed Makefile.PL for BerkeleyDB reinstall
+
 2024-10-05  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000815 released

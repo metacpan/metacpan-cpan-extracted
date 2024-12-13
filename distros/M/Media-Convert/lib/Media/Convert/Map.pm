@@ -191,7 +191,8 @@ sub arguments {
                         croak("Invalid audio channel choice");
                 }
 		$stream_id = $self->input->astream_id;
-                return ("-filter_complex", "[$index:$stream_id]channelsplit=channel_layout=" . $channel_layout . "[left][right]", "-map", $self->choice);
+                my $choice = $self->choice eq "left" ? 1 : 2;
+                return ("-filter_complex", "[$index:$stream_id]channelsplit=channel_layout=" . $channel_layout . ":channels=${choice}" . "[out]", "-map", "[out]");
 	} elsif($self->type eq "stream") {
 		if($self->choice eq 'audio') {
 			return ('-map', "$index:a");

@@ -1,5 +1,21 @@
 Revision history for Map::Tube::CLI
 
+0.77  Thu Dec 12 16:10:00 2024
+      - Handle unidirection route for switch --line_mappings.
+
+0.76  Thu Dec 12 14:40:00 2024
+      - Added switch --force to try unsupported map.
+
+0.75  Thu Dec 12 13:40:00 2024
+      - Added support for 2 new maps: Hamburg and Rome.
+      - Upgraded dependency on Map::Tube v3.84.
+
+0.74  Thu Dec 12 11:40:00 2024
+      - Updated pod w.r.t. Task::Map::Tube::Bundle.
+
+0.73  Thu Dec 12 11:29:00 2024
+      - Updated pod w.r.t. Task::Map::Tube.
+
 0.72  Wed Dec 11 20:15:00 2024
       - Upgraded dependency on Map::Tube v3.83.
 

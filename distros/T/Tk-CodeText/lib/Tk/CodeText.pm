@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.55';
+$VERSION = '0.56';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -943,7 +943,7 @@ sub foldCollapse {
 	$data->{'button'}->configure(-image => $self->cget('-plusimg'));
 	my $end = $data->{'data'}->{'end'};
 	$line ++;
-	while ($line < $end) {
+	while ($line <= $end) {
 		$self->hideLine($line);
 		$line ++;
 	}
@@ -974,7 +974,7 @@ sub foldExpand {
 	$self->lnumberCheck;
 	my $end = $data->{'data'}->{'end'};
 	$line ++;
-	while ($line < $end) {
+	while ($line <= $end) {
 		$self->showLine($line);
 		my $nested = $self->FoldButtons->{$line};
 		if (defined $nested) {

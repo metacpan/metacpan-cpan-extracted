@@ -4,12 +4,13 @@ author:
   - 'Joelle Maslak <jmaslak@antelope.net>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Feature::Compat::Class: '0.006'
   File::Spec: '0'
+  Object::Pad: '0.804'
   Symbol: '0'
   Test2::V0: '0'
   Test::More: '0'
   Test::UseAllModules: '0.15'
+  feature: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -22,10 +23,10 @@ name: Parallel-WorkUnit
 provides:
   Parallel::WorkUnit:
     file: lib/Parallel/WorkUnit.pm
-    version: '2.243450'
+    version: '2.243480'
   Parallel::WorkUnit::Procedural:
     file: lib/Parallel/WorkUnit/Procedural.pm
-    version: '2.243450'
+    version: '2.243480'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -39,13 +40,13 @@ requires:
   autodie: '0'
   namespace::autoclean: '0'
   overload: '0'
-  perl: v5.8.0
+  perl: '5.022'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/jmaslak/Parallel-WorkUnit/issues
   repository: git://github.com/jmaslak/Parallel-WorkUnit.git
-version: '2.243450'
+version: '2.243480'
 x_contributor_covenant:
   version: 0.02
 x_generated_by_perl: v5.40.0

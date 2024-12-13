@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2015, 2016, 2020 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2015, 2016, 2020, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -103,7 +103,8 @@ App::Chart::Download::consider_latest_from_daily
 
 #------------------------------------------------------------------------------
 
-ok( App::Chart::Download::set_symbol_name('NOSUCHSYMBOL','Blah Blah') == 0);
+ok( App::Chart::Download::set_symbol_name('NOSUCHSYMBOL','Blah Blah') == 0,
+    "set_symbol_name()");
 ok( App::Chart::Download::set_currency   ('NOSUCHSYMBOL','AUD')       == 0);
 ok( App::Chart::Download::set_decimals   ('NOSUCHSYMBOL',2)           == 0);
 ok( App::Chart::Download::set_exchange   ('NOSUCHSYMBOL','ASX')       == 0);

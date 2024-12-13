@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008000;
+use 5.022;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Parallel-WorkUnit",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008000",
+  "MIN_PERL_VERSION" => "5.022",
   "NAME" => "Parallel::WorkUnit",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -34,14 +34,15 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
-    "Feature::Compat::Class" => "0.006",
     "File::Spec" => 0,
+    "Object::Pad" => "0.804",
     "Symbol" => 0,
     "Test2::V0" => 0,
     "Test::More" => 0,
-    "Test::UseAllModules" => "0.15"
+    "Test::UseAllModules" => "0.15",
+    "feature" => 0
   },
-  "VERSION" => "2.243450",
+  "VERSION" => "2.243480",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,11 +53,11 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
-  "Feature::Compat::Class" => "0.006",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IO::Pipely" => 0,
   "IO::Select" => 0,
+  "Object::Pad" => "0.804",
   "POSIX" => 0,
   "Scalar::Util" => 0,
   "Storable" => 0,
@@ -66,6 +67,7 @@ my %FallbackPrereqs = (
   "Test::UseAllModules" => "0.15",
   "Try::Tiny" => 0,
   "autodie" => 0,
+  "feature" => 0,
   "namespace::autoclean" => 0,
   "overload" => 0,
   "strict" => 0,

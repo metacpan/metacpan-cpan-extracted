@@ -56,11 +56,12 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
+  warnings::register: '0'
 resources:
   bugtracker: https://github.com/jimav/Text-Table-Boxed/issues
   homepage: https://github.com/jimav/Text-Table-Boxed
   repository: https://github.com/jimav/Text-Table-Boxed.git
-version: '1.000'
+version: '1.002'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: CC0-1.0

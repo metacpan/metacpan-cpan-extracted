@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2016, 2017 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2016, 2017, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -25,13 +25,16 @@ use App::Chart::Latest;
 binmode(STDOUT,":encoding(latin-1)") or die;
 
 {
+  # App::Chart::Latest->get ()
+  #   from the database
+
   my $symbol = 'AUDZAR.RBA';
   $symbol = 'HGI.AX';
   $symbol = 'STO.AX';
-  $symbol = 'WOW.AX';
   $symbol = 'SXA.MON';
   $symbol = 'NOSUCH.AX';
   $symbol = 'NONOSUCH';
+  $symbol = 'SCT.AX';
   my $latest = App::Chart::Latest->get ($symbol);
   require Data::Dumper;
   print Data::Dumper->new([$latest])->Sortkeys(1)->Dump;

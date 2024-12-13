@@ -153,6 +153,30 @@ sub progress {
   return $self->SUPER::progress ($status, $response);
 }
 
+sub run_handlers {
+  my ($self, $phase, $o) = @_;
+  if ($phase eq 'request_send') {
+    if ($App::Chart::option{'verbose'} >= 2) {
+      print $o->as_string,"\n";
+    } elsif ($App::Chart::option{'verbose'} >= 1) {
+      print $o->method," ",$o->url,"\n";
+    }
+  }
+  if ($phase eq 'response_done') {
+    if ( $App::Chart::option{'verbose'} >= 1) {
+      print $o->status_line,"\n";
+    }
+    if ( $App::Chart::option{'verbose'} >= 2) {
+      print $o->headers->as_string,"\n";
+      my $content = $o->decoded_content;
+      if (length $content <= 1000) {
+        print "content:\n", $content, "\n\n";
+      }
+    }
+  }
+  return $self->SUPER::run_handlers ($phase, $o);
+}
+
 # use Data::Dumper;
 # *LWP::Protocol::http::SocketMethods::configure = sub {
 #   my $self = shift;

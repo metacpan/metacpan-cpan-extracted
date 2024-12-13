@@ -30,7 +30,8 @@ my %WriteMakefileArgs = (
     "parent" => 0,
     "strict" => 0,
     "utf8" => 0,
-    "warnings" => 0
+    "warnings" => 0,
+    "warnings::register" => 0
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
@@ -62,7 +63,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "multidimensional" => 0
   },
-  "VERSION" => "1.000",
+  "VERSION" => "1.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -110,7 +111,8 @@ my %FallbackPrereqs = (
   "parent" => 0,
   "strict" => 0,
   "utf8" => 0,
-  "warnings" => 0
+  "warnings" => 0,
+  "warnings::register" => 0
 );
 
 

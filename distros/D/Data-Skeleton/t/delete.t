@@ -32,8 +32,8 @@ my $dd = Data::Delete->new;
         ]
     };
 
-    is_deeply( $dd->delete($deep_data_structure),
-        $expected_result, 'Trivial hash values deleted' );
+    my $result = $dd->delete($deep_data_structure);
+    is_deeply( $result, $expected_result, 'Trivial hash values deleted' );
 }
 
 {
@@ -41,11 +41,21 @@ my $dd = Data::Delete->new;
       [ 1, '0', { fu => 'bar', bon => undef }, { a => undef, b => q{} }, 'z' ];
 
     my $expected_result = [ 1, '0', { 'fu' => 'bar' }, {}, 'z' ];
-    is_deeply( $dd->delete($arrayref), $expected_result, 'ArrayRef handled' );
+    my $result = $dd->delete($arrayref);
+    is_deeply( $result, $expected_result, 'ArrayRef handled' );
     
     my $dd_dos = Data::Delete->new( will_delete_empty_string => 0 );
     my $expected_result_dos = [ 1, '0', { 'fu' => 'bar' }, { b => q{} }, 'z' ];
-    is_deeply( $dd_dos->delete($arrayref), $expected_result_dos, 'empty string preserved' );
+    $result = $dd_dos->delete($arrayref);
+    is_deeply( $result, $expected_result_dos, 'empty string preserved' );
+}
+
+{
+    my $data = {that_which_is_not => undef, empty_arrayref => [], empty_hashref => {}, empty_scalarref => \''};
+    my $expect = {};
+    my $dd_dor = Data::Delete->new( will_delete_empty_ref => 1 );
+    my $got = $dd_dor->delete($data);
+    is_deeply($got, $expect, 'delete empty ref');
 }
 
 done_testing;

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240910191016;
+our $VERSION = 1.20241212130806;
 
 my $formatters = [
                 {
@@ -2309,6 +2309,9 @@ my $timezones = {
                         ],
                '326' => [
                           'America/New_York'
+                        ],
+               '327' => [
+                          'America/Chicago'
                         ],
                '329' => [
                           'America/New_York'
@@ -6246,182 +6249,10 @@ my $timezones = {
                '928' => [
                           'America/Phoenix'
                         ],
-               '928206' => [
+               '928688' => [
                              'America/Denver',
                              'America/Phoenix'
                            ],
-               '928209' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928212' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '92826' => [
-                            'America/Denver',
-                            'America/Phoenix'
-                          ],
-               '928280' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928283' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '92830' => [
-                            'America/Denver',
-                            'America/Phoenix'
-                          ],
-               '928319' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928349' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '92835' => [
-                            'America/Denver',
-                            'America/Phoenix'
-                          ],
-               '928360' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '92838' => [
-                            'America/Denver',
-                            'America/Phoenix'
-                          ],
-               '92840' => [
-                            'America/Denver',
-                            'America/Phoenix'
-                          ],
-               '92841' => [
-                            'America/Denver',
-                            'America/Phoenix'
-                          ],
-               '928429' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928461' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '92848' => [
-                            'America/Denver',
-                            'America/Phoenix'
-                          ],
-               '928545' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928608' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '92861' => [
-                            'America/Denver',
-                            'America/Phoenix'
-                          ],
-               '928640' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928645' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '92865' => [
-                            'America/Denver',
-                            'America/Phoenix'
-                          ],
-               '928660' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928663' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928672' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928673' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928674' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928675' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928686' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928691' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928693' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928697' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928698' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928724' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928725' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928755' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928781' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '928787' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '92879' => [
-                            'America/Denver',
-                            'America/Phoenix'
-                          ],
-               '92881' => [
-                            'America/Denver',
-                            'America/Phoenix'
-                          ],
-               '928871' => [
-                             'America/Denver',
-                             'America/Phoenix'
-                           ],
-               '92890' => [
-                            'America/Denver',
-                            'America/Phoenix'
-                          ],
-               '92896' => [
-                            'America/Denver',
-                            'America/Phoenix'
-                          ],
                '929' => [
                           'America/New_York'
                         ],
@@ -6451,6 +6282,9 @@ my $timezones = {
                         ],
                '941' => [
                           'America/New_York'
+                        ],
+               '942' => [
+                          'America/Toronto'
                         ],
                '943' => [
                           'America/New_York'

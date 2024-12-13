@@ -10,8 +10,8 @@ package Text::Table::Boxed;
 use base 'Text::Table';
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '1.000'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-11'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1.002'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-12'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Scalar::Util qw/reftype/;
@@ -24,6 +24,8 @@ use overload (
 );
 
 use Data::Dumper::Interp qw/visnew ivis dvis vis avis u/;
+
+use warnings::register;  # creates category name same as __PACKAGE__
 
 sub btw  { goto &Data::Dumper::Interp::btw }
 sub btwN { goto &Data::Dumper::Interp::btwN }
@@ -78,6 +80,13 @@ sub _handle_rulepicture($) {
 
   if ($debug) { btw "--- INPUT PICRURE ---\n",(map{ "$_\n" } @lines),"---(end)---\n"; }
 
+  croak "The 'picture' contains only ",scalar(@lines)," line.\n",
+        "Please provide two or more lines either as an array\n",
+        "    [\"line1\", \"line2\", ... ]\n",
+        "or a plain multi-line string\n",
+        "    \"line1\\nline2\\n...\"\n"
+    if @lines < 2;
+
   my sub _is_sepspec($) { $_[0] =~ /$opts->{CONTENT_CHAR}/ }
   my sub _is_rule($)    { ! _is_sepspec($_[0]) }
   my $first_rulespec;
@@ -85,6 +94,10 @@ sub _handle_rulepicture($) {
     my ($aref, $spec) = @_;
     croak "Rule lines must have the same length\n"
       unless length($first_rulespec//=$spec) == length($spec);
+    state $warned_once;
+    if ($spec =~ /( [a-z] )/ && !$warned_once++ && warnings::enabled()) {
+      carp "A rule line contains an isolated letter '$1' which is not the letter '$opts->{CONTENT_CHAR}' used as a stand-in for cell content.  Was '$opts->{CONTENT_CHAR}' intended?\n";
+    }
     push @$aref, $spec;
   }
 
@@ -148,8 +161,8 @@ btw dvis 'BEFORE PIC-LEN-ADJ: $num_cols $pic_cols @sepsegs\n@top_rule\n@mid_rule
     #             ^^^^^^^^^^ #replicate or delete these
     #             $#-2   $#-1  $#
     if ($pic_cols < $num_cols) {
-      croak "Picture must have three columns if data has >= three columns\n"
-        if $pic_cols < 3; # no separator to replicate
+      croak "Picture must have at least two columns\n"
+        if $pic_cols < 2; # no separator to replicate
       foreach (\@sepsegs, @top_rule, @mid_rule, @bot_rule) {
         splice @$_, $#$_, 0, @$_[$#$_-2..$#$_-1];
       }
@@ -476,13 +489,13 @@ Text::Table::Boxed - Automate separators and rules for Text::Table
     # Custom rules and separators
     my $tb = Text::Table::Boxed->new({
       columns => [ "Planet", "Radius\nkm", "Density\ng/cm^3" ],
-      picture => [<<'EOF'],
+      picture => <<'EOF',
     ┌───╥───┬───┐
-    │ a ║ a │ a │
+    │ c ║ c │ c │
     ╞═══╬═══╪═══╡
-    │ a ║ a │ a │
+    │ c ║ c │ c │
     ├───╫───┼───┤
-    │ a ║ a │ a │
+    │ c ║ c │ c │
     ╘═══╩═══╧═══╛
     EOF
     });
@@ -518,7 +531,7 @@ contain embedded newlines.
 Methods with "B<row>" in their name return lines segregated into rows, each
 row represented by an array of the constituent lines.
 In contrast, similar methods without "row" in their name return a flat
-list of lines (or in scalar context, a single ultiline string).
+list of lines (or in scalar context, a single multiline string).
 
 Methods with "B<rendered>" in their name include I<rule lines> in their
 result.  For example B<rendered_table()> returns all lines in the table
@@ -566,7 +579,7 @@ data row in a given column).
 The separator between the last two columns is re-used if the table has
 more columns than the picture.
 
-Similarly, the picture must contain at least rows and
+Similarly, the picture must contain at least two rows and
 the rule between the last two rows is re-used if the actual table has more
 rows than the picture.
 Often pictures have three rows to allow a different separator
@@ -624,8 +637,8 @@ Like C<table()> but includes rule lines.
     @lines = $tb->rendered_tables;               # all lines
     @lines = $tb->rendered_tables($line_index, $num_tables);
 
-Line index 0 is the top rule line,
-index 1 is the first "real" title line (if there is a title), etc.
+Line index 0 is the top rule line (if there is one),
+index 1 is the first "real" title line, etc.
 
 =item body_rows()
 
@@ -634,7 +647,8 @@ index 1 is the first "real" title line (if there is a title), etc.
 Returns I<rows>, each of which is a ref to an array containing
 possibly-multiple lines.  In scalar context, returns a single array ref
 (valid only for a single row).
-B<rendered_body_rows()> includes a rule line as the last line in each row.
+B<rendered_body_rows()> includes a rule line as the last line in each row
+if an interior rule was defined in the I<picture> (it is possible to omit interior rules -- see PICTURE SPECIFICATIONS).
 
 Row index 0 is the first body row.
 
@@ -679,17 +693,17 @@ other than the first interior rule in the picture.
 =head1 PICTURE SPECIFICATIONS
 
 Custom separators and rules are specified as a "picture" built from several
-lines.  Four kinds of rules may be included:
+lines.  There are four kinds of rules.  All are optional:
 
 =over 4
 
-=item * Top rule (optional)
+=item * Top rule
 
-=item * Special rule(s) used only at the indicated initial position(s)
+=item * Special "mid" rule(s) used only at the indicated position.
 
-=item * Default mid rule, used between other body rows
+=item * Default "mid" rule, also used between subsequent body rows
 
-=item * Bottom rule (optional)
+=item * Bottom rule
 
 =back
 
@@ -714,7 +728,7 @@ if there are any.  And analogously for columns:
               ⏐   ⏐   ⮦ Default separator
               ↓   ↓   ↓   ⮦ Right-edge separator
     ┌─╥─┬─┐   ┌───╥───┬───┐   ==============  ⇦  top rule
-    │c║c│c│   │ c ║ c │ c │   | c || a | c |
+    │c║c│c│   │ c ║ c │ c │   | c || c | c |
     ╞═╬═╪═╡   ╞═══╬═══╪═══╡   |===++===+===|  ⇦  special rule after title
     │c║c│c│   │ c ║ c │ c │   | c || c | c |
     ┝━╋━┿━┥   ┝━━━╋━━━┿━━━┥   |___||___|___|  ⇦  special after 1st body row
@@ -787,7 +801,7 @@ e.g. the object stringifies to "".
 =head1 PAGER EXAMPLE
 
 Please see L<Text::Table::Boxed::Pager> for an example of using B<rows> to view a table on a terminal,
-keeping multi-lines rows together when possible.
+keeping multi-line rows together when possible.
 
 =head1 ACKNOWLEDGMENTS
 
@@ -801,6 +815,8 @@ by stackoverflow user "ThisSuitIsBlackNot".
 
 Text::Table::Boxed is new in 2024 and actively maintained.
 Please report issues!
+
+L<https://github.com/jimav/Text-Table-Boxed/issues>
 
 =head1 AUTHOR
 

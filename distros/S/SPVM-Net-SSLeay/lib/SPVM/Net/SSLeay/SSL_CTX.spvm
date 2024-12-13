@@ -44,6 +44,15 @@ class Net::SSLeay::SSL_CTX : pointer {
   # Class Methods
   native static method new : Net::SSLeay::SSL_CTX ($method : Net::SSLeay::SSL_METHOD);
   
+  private static method new_with_pointer : Net::SSLeay::SSL_CTX ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::SSL_CTX;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
+  
   protected method init : void ($options : object[] = undef) {
     
   }
@@ -61,11 +70,11 @@ class Net::SSLeay::SSL_CTX : pointer {
   
   native method set_default_verify_paths_windows : void ();
   
-  native method use_certificate_file : int ($file : string, $type : int);
+  native method use_certificate_file : int ($file : string, $type : int = -1);
   
   native method use_certificate_chain_file : int ($file : string);
   
-  native method use_PrivateKey_file : int ($file : string, $type : int);
+  native method use_PrivateKey_file : int ($file : string, $type : int = -1);
   
   native method use_PrivateKey : int ($pkey : Net::SSLeay::EVP_PKEY);
   

@@ -7,6 +7,7 @@ use Authen::WebAuthn::SSLeayChainVerifier;
 # Simulate a unix date where the test certificates are still valid
 $Authen::WebAuthn::SSLeayChainVerifier::verification_time = 1698765432;
 
+use lib ".";
 require 't/certs.pl';
 
 my $cert = decode_base64(

@@ -13,7 +13,7 @@ Authen::WebAuthn - A library to add Web Authentication support to server applica
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -159,6 +159,15 @@ attestation.
 This setting allows you to successfully validate registration, but change the
 type to C<Self> if a trusted certificate was not provided in the
 C<trust_anchors> parameter.
+
+=item allow_unknown_attestation_format
+
+By default, if an unimplemented attestation format is encountered, registration
+validation will fail.
+
+This setting allows you to successfully validate registration, but change the
+attestation type to C<None> if an unimplemented attestation format is
+encountered.
 
 =back
 

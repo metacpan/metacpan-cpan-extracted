@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011, 2017 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2017, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -41,6 +41,7 @@ sub new {
 
 sub indivchunks_download {
   my ($self, $symbol_list) = @_;
+  my $allow_http_codes = $self->{'allow_http_codes'} // [404];
 
   foreach my $symbol (@$symbol_list) {
     my $avail_tdate = $self->available_tdate_for_symbol ($symbol)
@@ -65,7 +66,8 @@ sub indivchunks_download {
            App::Chart::Download::tdate_range_string ($lo_tdate, $hi_tdate));
 
       my $url = $self->{'url_func'}->($symbol, $lo_tdate, $hi_tdate);
-      my $resp = App::Chart::Download->get ($url, allow_404 => 1);
+      my $resp = App::Chart::Download->get
+        ($url, allow_http_codes => $allow_http_codes);
 
       my $h;
       if ($resp->is_success) {
@@ -89,9 +91,9 @@ sub indivchunks_download {
 
       App::Chart::Download::write_daily_group ($h);
 
-      # FIXME: This works badly for recently listed shares where there can
-      # be a lot of empty chunks until current ... maybe should download
-      # "backto" from newest to oldest ...
+      # FIXME: This works badly for recently listed shares where
+      # there can be a lot of empty chunks until current.
+      # Maybe should download "backto" from newest to oldest.
       #
       #       if ($empty_count >= 2) {
       #         App::Chart::Download::verbose_message
@@ -107,6 +109,7 @@ sub indivchunks_download {
 
 sub backto {
   my ($self, $symbol_list, $backto_tdate) = @_;
+  my $allow_http_codes = $self->{'allow_http_codes'} // [404];
 
   foreach my $symbol (@$symbol_list) {
     my $hi_tdate = App::Chart::Download::start_tdate_for_backto ($symbol);
@@ -120,7 +123,8 @@ sub backto {
            App::Chart::Download::tdate_range_string ($lo_tdate, $hi_tdate));
 
       my $url = $self->{'url_func'}->($symbol, $lo_tdate, $hi_tdate);
-      my $resp = App::Chart::Download->get ($url, allow_404 => 1);
+      my $resp = App::Chart::Download->get
+        ($url, allow_http_codes => $allow_http_codes);
 
       my $h;
       if ($resp->is_success) {
@@ -163,14 +167,28 @@ __END__
 #  App::Chart::DownloadHandler::IndivChunks-> new
 #      (name  => __('FooEX'),
 #       pred  => $pred,
-#       url_func => \&my_url,
-#       parse    => \&my_page_parser);
+#       url_func   => \&my_url,
+#       parse      => \&my_page_parser,
+#       chunk_size => 250);
 # 
 # =head1 DESCRIPTION
 # 
-# This module downloads and processes daily data in date range chunks for one
-# symbol at a time.  This is the style required for Yahoo Finance for
-# instance.
+# This module downloads and processes daily data for one symbol
+# at a time and in date range chunks of at most a given number
+# of trading days.
+# 
+# The mandatory keys are
+# 
+#     name         exchange name for display
+#     pred         App::Chart::Sympred
+#     proc         subroutine to call
+#     chunk_size   number of "tdate"
+# 
+# The optional keys are
+# 
+#     available_tdate            subroutine returning data tdate
+#     available_tdate_by_symbol  subroutine, taking a symbol
+#     available_tdate_extra      number of days to download ahead
 # 
 # =head1 SEE ALSO
 # 

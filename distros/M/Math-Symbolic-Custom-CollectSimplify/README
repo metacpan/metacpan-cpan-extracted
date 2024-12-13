@@ -1,0 +1,45 @@
+Math::Symbolic::Custom::CollectSimplify
+=======================================
+
+Simplify Math::Symbolic expressions using Math::Symbolic::Custom::Collect
+
+Redefines Math::Symbolic's "simplify()" method using the Math::Symbolic module extension class Math::Symbolic::Custom::Simplification. 
+This new simplify() method uses "to_collected()" in Math::Symbolic::Custom::Collect. Because "to_collected()" doesn't always produce a 
+simpler expression, this module uses a measure of expression complexity based on the number of constants, variables and operators to 
+try to determine if the resultant expression is any simpler; if not it will return the expression passed to it.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::Symbolic::Custom::CollectSimplify
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Symbolic-Custom-CollectSimplify
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Math-Symbolic-Custom-CollectSimplify
+
+    Search CPAN
+        https://metacpan.org/release/Math-Symbolic-Custom-CollectSimplify
+
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2024 by Matt Johnson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

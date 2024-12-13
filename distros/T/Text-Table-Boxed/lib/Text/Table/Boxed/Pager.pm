@@ -12,12 +12,12 @@ use utf8;
 package Text::Table::Boxed::Pager;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '1.000'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-11'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1.002'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-12'; # DATE from Dist::Zilla::Plugin::OurDate
 
 require Exporter;
 use parent 'Exporter';
-our @EXPORT = qw/view_table/;
+our @EXPORT = qw/view_table paginate_table/;
 
 use Carp;
 use Scalar::Util qw/blessed/;
@@ -32,15 +32,30 @@ sub view_table($;@) {
     croak "Object must be a Text::Table::Boxed\n"
   }
 
-  $opts{lines_per_page} //= get_terminal_rows();
+  foreach (keys %opts) {
+    next if /^(lines_per_page|endpage_cb|lpp_reduction|output_cb|fill_last_page|endpage_text)$/;
+    croak "Unkown option '$_'\n";
+  }
 
-  my $usable_lpp = $opts{lines_per_page} - 1; # leave room for prompt
+  $opts{lines_per_page} //= get_terminal_rows();
+  $opts{endpage_cb} //= sub{
+      print "Press ENTER to continue or q<ENTER> to stop: ";
+      STDOUT->flush;
+      if (<STDIN> =~ /[qQ]/) {
+        return 0;
+      }
+      return 1;
+  };
+  $opts{lpp_reduction} //= 1;
+  $opts{output_cb} //= sub{ print @_; };
+
+  # leave room for prompt
+  my $usable_lpp = $opts{lines_per_page} - $opts{lpp_reduction}; 
 
   my @title_with_rules = $tb->rendered_title();
   my $lines_after_title = $usable_lpp - @title_with_rules;
   my $num_body_rows = $tb->num_body_rows();
 
-  my $rows_viewed_at_quit;
   my $ln_remaining = $usable_lpp;
   my $title_visible = 0;
   TOP:
@@ -58,32 +73,59 @@ sub view_table($;@) {
                   )
                  )
               {
-                  while ($ln_remaining > 0) { print "\n"; --$ln_remaining; } #skip
+                  while ($ln_remaining > 0) { 
+                    $opts{output_cb}->("\n"); 
+                    --$ln_remaining; 
+                  } #skip to bottom of page
               }
           }
           if ($ln_remaining==0) {
-              print "Press ENTER to continue or q<ENTER> to stop: ";
-              STDOUT->flush;
-              if (<STDIN> =~ /[qQ]/) {
-                $rows_viewed_at_quit = $rx+1;
-                last TOP;
+              my $continue = $opts{endpage_cb}->();
+              if (! $continue) {
+                return -($rx+1); # -(num rows viewed at quit)
               }
               $ln_remaining = $usable_lpp;
               $title_visible = 0;
           }
           if ($i==0 && !$title_visible) { # need title first
               die "bug" if $ln_remaining < @title_with_rules;
-              print @title_with_rules;
+              $opts{output_cb}->( @title_with_rules );
               $ln_remaining -= @title_with_rules;
               $title_visible = 1;
           }
           die "bug" if $ln_remaining <= 0;
-          print $aref->[$i];
+          $opts{output_cb}->($aref->[$i]);
           --$ln_remaining;
       }
   }
-  return $rows_viewed_at_quit;
+  if ($opts{fill_last_page}) {
+    while ($ln_remaining > 0) { 
+      $opts{output_cb}->("\n"); 
+      --$ln_remaining; 
+      } #skip to bottom of page
+  }
+  return $num_body_rows+1; # +1 for the title row
 }#view_table
+
+sub paginate_table($;@) {
+  my $tb = shift;
+  my %opts = @_;
+  croak "lines_per_page must be specified" unless $opts{lines_per_page};
+
+  my $result = "";
+
+  # Allow caller to override or augment internals for special purposes
+  $opts{endpage_text}  //= "\f"; # form-feed
+  $opts{output_cb}     //= sub{ $result .= join("",@_) };
+  $opts{lpp_reduction} //= 0;
+  $opts{endpage_cb}    //= sub{
+    $opts{output_cb}->($opts{endpage_text});
+    return 1;
+  };
+  
+  view_table($tb, %opts);
+  return $result;
+}
 
 #######################################################
 # Local copy of Terminalsize.pm (which is not on CPAN)
@@ -203,7 +245,7 @@ Text::Table::Boxed::Pager - Display table on terminal ala 'more'
 =head1 SYNOPSIS
 
  use Text::Table::Boxed;
- use Text::Table::Boxed::Pager qw/view_table/;
+ use Text::Table::Boxed::Pager qw/view_table paginate_table/;
 
  my $tb = Text::Table::Boxed->new({
    columns => [ ... ],
@@ -213,9 +255,15 @@ Text::Table::Boxed::Pager - Display table on terminal ala 'more'
 
  $rows_before_quit = view_table($tb);
 
- $rows_before_quit = view_table($tb, $num_terminal_rows);
+ $text = paginate_table($tb, lines_per_page => 55);
 
 =head1 DESCRIPTION
+
+These demonstrate use of the "rows" feature of L<Text::Table::Boxed>.  See the code.
+
+=over
+
+=item B<view_table($tb)>
 
 This displays a table on the terminal, pausing after each screen-full
 for the user to press ENTER (or q to stop).
@@ -224,21 +272,48 @@ The titles are re-displayed on every screen so they are always visible.
 
 Multi-line rows are kept together on the same screen if possible.
 
-If the size of the terminal is not specified, it is obtained from the OS.
+RETURNS: The total number of table rows which were displayed, as
+either a positive or negative value.  A negative value is returned
+if the user entered 'q' to quit early, and the absolute value indicates
+how far they got before giving up.
 
-This is basically a demo of using the "rows" feature of L<Text::Table::Boxed>.
-See the code.
+C<view_table()> is an application of the more general C<paginate_table> API.
+
+=item B<$text = paginate_table($tb, pages_per_line =E<gt> NUMER, OPTIONS)>
+
+This "paginates" a table for displaying I<NUMBER> lines per page,
+by default returning all the output in a single string without user interaction.
+The table is rendered in sections which fit on a page, repeating the titles at the top
+of each page, etc.
+
+B<OPTIONS>
 
 =over
 
-=item B<view_table($tb)>
+=item B<output_cb =E<gt> SUBREF>
 
-Call this to display the table. 
+A callback called to output one or more text fragments passed as parameterss.
+The default appends the fragments to an internal buffer which is eventually returned:
+S<< C<output_cb =E<gt> sub{ $buffer .= join("",@_) };> >>
 
-Undef is returned if the user paged through the entire table,
-otherwise
-the number of rows which were displayed before the user
-entered 'q' to quit.
+=item B<endpage_cb =E<gt> SUBREF>
+
+A callback called at the bottom of each page.  If it returns TRUE
+processing continues, otherwise processing aborts.
+
+The default outputs I<endpage_text> (via the C<output_cb> callback).
+
+=item B<endpage_text =E<gt> "\f">
+
+A string to output at the bottom of each page, by default a "form feed" character.
+
+=item B<lpp_reduction =E<gt> 0>
+
+A number of lines to leave unoccupied at the bottom of each page
+before calling the I<endpage_cb> callback.  Default is zero.
+(This is used by C<view_table> to use the bottom line of each screen for user interaction.)
+
+=back 
 
 =back
 

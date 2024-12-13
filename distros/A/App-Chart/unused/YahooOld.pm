@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011, 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2015, 2016, 2017, 2018, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -415,3 +415,530 @@ SKIP: {
   is (App::Chart::Yahoo::quote_parse_div_date('Sep 24, 2004'), '2004-09-24');
   Test::MockTime::restore_time();
 }
+
+
+#-----------------------------------------------------------------------------
+# stock info
+#
+# Eg. http://download.finance.yahoo.com/d?f=snxc4qr1d&s=TLS.AX
+#
+# This was the past info fetching using fields from the quote feature.
+# That feature now gone.
+
+# max symbols to any /q? quotes request
+# Finance::Quote::Yahoo uses a limit of 40 to stop the url getting too
+# long, which apparently some servers or proxies can't handle
+use constant MAX_QUOTES => 40;
+
+# App::Chart::DownloadHandler->new
+#   (name         => __('Yahoo info'),
+#    key          => 'Yahoo-info',
+#    pred         => $download_pred,
+#    proc         => \&info_download,
+#    recheck_days => 7,
+#    max_symbols  => MAX_QUOTES);
+# 
+# sub info_download {
+#   my ($symbol_list) = @_;
+# 
+#   App::Chart::Download::status
+#       (__x('Yahoo info {symbolrange}',
+#            symbolrange =>
+#            App::Chart::Download::symbol_range_string ($symbol_list)));
+# 
+#   my $url = 'http://download.finance.yahoo.com/d?f=snxc4qr1d&s='
+#     . join (',', map { URI::Escape::uri_escape($_) } @$symbol_list);
+#   my $resp = App::Chart::Download->get ($url);
+#   my $h = info_parse($resp);
+#   $h->{'recheck_list'} = $symbol_list;
+#   App::Chart::Download::write_daily_group ($h);
+# }
+# 
+# sub info_parse {
+#   my ($resp) = @_;
+# 
+#   my $content = $resp->decoded_content (raise_error => 1);
+#   if (DEBUG >= 2) { print "Yahoo info:\n$content\n"; }
+# 
+#   my @info;
+#   my @dividends;
+#   my $h = { source    => __PACKAGE__,
+#             info      => \@info,
+#             dividends => \@dividends };
+# 
+#   require Text::CSV_XS;
+#   my $csv = Text::CSV_XS->new;
+# 
+#   foreach my $line (App::Chart::Download::split_lines ($content)) {
+#     $csv->parse($line);
+#     my ($symbol, $name, $exchange, $currency, $ex_date, $pay_date, $amount)
+#       = $csv->fields();
+# 
+#     $ex_date  = quote_parse_div_date ($ex_date);
+#     $pay_date = quote_parse_div_date ($pay_date);
+# 
+#     push @info, { symbol => $symbol,
+#                   name   => $name,
+#                   currency => $currency,
+#                   exchange => $exchange };
+#     # circa 2015 the "d" dividend amount field is "N/A" when after the
+#     # dividend payment (with "r1" pay date "N/A" too)
+#     if ($ex_date && $amount ne 'N/A' && $amount != 0) {
+#       push @dividends, { symbol   => $symbol,
+#                          ex_date  => $ex_date,
+#                          pay_date => $pay_date,
+#                          amount   => $amount };
+#     }
+#   }
+#   return $h;
+# }
+
+
+#--------------------------------------------------------------------
+# Past Weblink info page
+#
+# For reference, past was like http://finance.yahoo.com/q?s=BHP.AX
+# but that's been taken away so as to break everybody's bookmarks.
+
+
+#-----------------------------------------------------------------------------
+# v7 cookies and crumb
+# Download Data
+#
+# This uses the historical prices page like
+#
+#     https://finance.yahoo.com/quote/AMP.AX/history?p=AMP.AX
+#
+# which puts a cookie like
+#
+#     Set-Cookie: B=fab5sl9cqn2rd&b=3&s=i3; expires=Sun, 03-Sep-2018 04:56:13 GMT; path=/; domain=.yahoo.com
+#
+# and contains buried within 1.5 mbytes of hideous script
+#
+#    <script type="application/json" data-sveltekit-fetched data-url="https://query1.finance.yahoo.com/v1/test/getcrumb?lang=en-US&amp;region=US" data-ttl="59">{"status":200,"statusText":"OK","headers":{},"body":"DKVWQE/ggh4"}</script>
+#
+# Any \u002F or similar is escaped "/" character or similar.
+# The crumb is included in a CSV download query like the following
+# (alas can't use http, it redirects to https)
+#
+#     https://query1.finance.yahoo.com/v7/finance/download/AMP.AX?period1=1503810440&period2=1504415240&interval=1d&events=history&crumb=hdDX/HGsZ0Q
+#
+# period1 is the start time, period2 the end time, both as Unix seconds
+# since 1 Jan 1970.  Not sure of the timezone needed.  Some experiments
+# suggest it depends on the timezone of the symbol.  http works as well as
+# https.  The result is like
+#
+#     Date,Open,High,Low,Close,Adj Close,Volume
+#     2017-09-07,30.299999,30.379999,30.000000,30.170000,30.170000,3451099
+#
+# The "9999s" are some bad rounding off to what would be usually at most
+# 3 (maybe 4?) decimal places.
+#
+# Response is 404 if no such symbol, 401 unauthorized if no cookie or crumb.
+#
+# "events=div" gives dividends like
+#
+#     Date,Dividends
+#     2017-08-11,0.161556
+#
+# "events=div" gives splits like, for a consolidation (GXY.AX)
+#
+#     Date,Stock Splits
+#     2017-05-22,1/5
+#
+#----------------
+# For reference, there's a "v8" which is json format (%7C = "|")
+#
+#     https://query2.finance.yahoo.com/v8/finance/chart/IBM?formatted=true&lang=en-US&region=US&period1=1504028419&period2=1504428419&interval=1d&events=div%7Csplit&corsDomain=finance.yahoo.com
+#
+# This doesn't require a cookie and crumb, has some info like symbol
+# timezone.  The numbers look like they're rounded through 32-bit single
+# precision floating point, for example "142.55999755859375" which is 142.55
+# in a 23-bit mantissa.  log(14255000)/log(2) = 23.76 bits
+# Are they about the same precision as the CSV ?
+#
+# FIXME: All prices look like they're split-adjusted, which is ok if that's
+# what you want and are downloading a full data set, but bad for incremental
+# since you don't know when a change is applied.
+#
+
+App::Chart::DownloadHandler->new
+  (name       => __('Yahoo'),
+   pred       => $download_pred,
+   available_tdate_by_symbol => \&daily_available_tdate,
+   available_tdate_extra     => 2,
+   proc       => \&daily_download,
+   chunk_size => 150);
+
+sub daily_available_tdate {
+  my ($symbol) = @_;
+
+  # Sep 2017: daily data is present for the current day's trade, during the
+  # trading session.  Try reckoning it complete at 6pm.
+  return App::Chart::Download::tdate_today_after
+    (18,0, App::Chart::TZ->for_symbol ($symbol));
+
+  # return App::Chart::Download::tdate_today_after
+  #   (10,30, App::Chart::TZ->for_symbol ($symbol))
+  #     - 1;
+}
+
+sub daily_download {
+  my ($symbol_list) = @_;
+  App::Chart::Download::status (__('Yahoo daily data'));
+
+  # App::Chart::Download::verbose_message ("Yahoo crumb $crumb cookies\n"
+  #                                        . $jar->as_string);
+
+  my $crumb_errors = 0;
+ SYMBOL: foreach my $symbol (@$symbol_list) {
+    my $lo_tdate = App::Chart::Download::start_tdate_for_update (@$symbol_list);
+    my $hi_tdate = daily_available_tdate ($symbol);
+
+    App::Chart::Download::status
+        (__('Yahoo data'), $symbol,
+         App::Chart::Download::tdate_range_string ($lo_tdate, $hi_tdate));
+
+    my $lo_timet = tdate_to_unix($lo_tdate - 2);
+    my $hi_timet = tdate_to_unix($hi_tdate + 2);
+
+    my $data  = daily_cookie_data($symbol);
+    if (! defined $data) {
+      print "Yahoo $symbol no daily cookie data\n";
+      next SYMBOL;
+    }
+    my $crumb = URI::Escape::uri_escape($data->{'crumb'});
+    my $jar = http_cookies_from_string($data->{'cookies'} // '');
+
+    my $h = { source          => __PACKAGE__,
+              prefer_decimals => 2,
+              date_format   => 'ymd',
+            };
+    foreach my $elem (['history',\&daily_parse],
+                      ['div',    \&daily_parse_div],
+                      ['split',  \&daily_parse_split]) {
+      my ($events,$parse) = @$elem;
+      my $url = "https://query1.finance.yahoo.com/v7/finance/download/"
+        . URI::Escape::uri_escape($symbol)
+        . "?period1=$lo_timet"
+        . "&period2=$hi_timet"
+        . "&interval=1d"
+        . "&events=$events"
+        . "&crumb=$crumb"
+        ;
+
+      my $resp = App::Chart::Download->get ($url,
+                                            allow_401 => 1,
+                                            allow_404 => 1,
+                                            # cookie_jar => $jar,
+                                           );
+      if ($resp->code == 401) {
+        if (++$crumb_errors >= 2) {
+          die "Yahoo: crumb authorization failed"; 
+        }
+        App::Chart::Database->write_extra ('', 'yahoo-daily-cookies', undef);
+        redo SYMBOL;
+      }
+      if ($resp->code == 404) {
+        print "Yahoo $symbol does not exist\n";
+        next SYMBOL;
+      }
+      $parse->($symbol,$resp,$h, $hi_tdate);
+    }
+    ### $h
+    App::Chart::Download::write_daily_group ($h);
+  }
+}
+
+sub daily_parse {
+  my ($symbol, $resp, $h, $hi_tdate) = @_;
+  my @data = ();
+  $h->{'data'} = \@data;
+  my $hi_tdate_iso;
+  if (defined $hi_tdate){ $hi_tdate_iso = App::Chart::tdate_to_iso($hi_tdate); }
+
+  my $body = $resp->decoded_content (raise_error => 1);
+  my @line_list = App::Chart::Download::split_lines($body);
+
+  unless ($line_list[0] =~ /^Date,Open,High,Low,Close,Adj Close,Volume/) {
+    die "Yahoo: unrecognised daily data headings: " . $line_list[0];
+  }
+  shift @line_list;
+
+  foreach my $line (@line_list) {
+    my ($date, $open, $high, $low, $close, $adj_volume, $volume)
+      = split (/,/, $line);
+
+    $date = daily_date_fixup ($symbol, $date);
+    if (defined $hi_tdate_iso && $date gt $hi_tdate_iso) {
+      # Sep 2017: There's a daily data record during the trading day, but
+      # want to write the database only at the end of trading.
+      ### skip date after hi_tdate ...
+      next;
+    }
+
+    # Sep 2017 have seen "null,null,null,...", maybe for non-trading days
+    foreach my $field ($open, $high, $low, $close, $adj_volume, $volume) {
+      if ($field eq 'null') {
+        $field = undef;
+      }
+    }
+
+    if ($index_pred->match($symbol)) {
+      # In the past indexes which not calculated intraday had
+      # open==high==low==close and volume==0, eg. ^WIL5.  Use the close
+      # alone in this case, with the effect of drawing line segments instead
+      # of OHLC or Candle figures with no range.
+
+      if (defined $open && defined $high && defined $low && defined $close
+          && $open == $high && $high == $low && $low == $close && $volume == 0){
+        $open = undef;
+        $high = undef;
+        $low = undef;
+      }
+
+    } else {
+      # In the past shares with no trades had volume==0,
+      # open==low==close==bid price, and high==offer price, from some time
+      # during the day, maybe the end of day.  Zap all the prices in this
+      # case.
+      #
+      # For a public holiday it might be good to zap the volume to undef
+      # too, but don't have anything to distinguish holiday, suspension,
+      # delisting vs just no trades.
+      #
+      # On the ASX when shares are suspended the bid/offer can be crossed as
+      # usual for pre-open auction, and this gives high<low.  For a part-day
+      # suspension then can have volume!=0 in this case too.  Don't want to
+      # show a high<low, so massage high/low to open/close range if the high
+      # looks like a crossed offer.
+
+      if (defined $high && defined $low && $high < $low) {
+        $high = App::Chart::max_maybe ($open, $close);
+        $low  = App::Chart::min_maybe ($open, $close);
+      }
+
+      if (defined $open && defined $low && defined $close && defined $volume
+          && $open == $low && $low == $close && $volume == 0) {
+        $open  = undef;
+        $high  = undef;
+        $low   = undef;
+        $close = undef;
+      }
+    }
+
+    push @data, { symbol => $symbol,
+                  date   => $date,
+                  open   => crunch_trailing_nines($open),
+                  high   => crunch_trailing_nines($high),
+                  low    => crunch_trailing_nines($low),
+                  close  => crunch_trailing_nines($close),
+                  volume => $volume };
+  }
+  return $h;
+}
+sub daily_parse_div {
+  my ($symbol, $resp, $h) = @_;
+  my @dividends = ();
+  $h->{'dividends'} = \@dividends;
+
+  my $body = $resp->decoded_content (raise_error => 1);
+  my @line_list = App::Chart::Download::split_lines($body);
+
+  # Date,Dividends
+  # 2015-11-04,1.4143
+  # 2016-05-17,1.41428
+  # 2017-05-16,1.4143
+  # 2016-11-03,1.4143
+
+  unless ($line_list[0] =~ /^Date,Dividends/) {
+    warn "Yahoo: unrecognised dividend headings: " . $line_list[0];
+    return;
+  }
+  shift @line_list;
+
+  foreach my $line (@line_list) {
+    my ($date, $amount) = split (/,/, $line);
+
+    push @dividends, { symbol  => $symbol,
+                       ex_date => daily_date_fixup ($symbol, $date),
+                       amount  => $amount };
+  }
+  return $h;
+}
+sub daily_parse_split {
+  my ($symbol, $resp, $h) = @_;
+  my @splits = ();
+  $h->{'splits'} = \@splits;
+
+  my $body = $resp->decoded_content (raise_error => 1);
+  my @line_list = App::Chart::Download::split_lines($body);
+
+  # For example GXY.AX split so $10 shares become $2
+  # Date,Stock Splits
+  # 2017-05-22,1:5
+  #
+  # In the past it was a "/" instad of ":"
+  # 2017-05-22,1/5
+
+  unless ($line_list[0] =~ /^Date,Stock Splits/) {
+    warn "Yahoo: unrecognised split headings: " . $line_list[0];
+    return;
+  }
+  shift @line_list;
+
+  foreach my $line (@line_list) {
+    my ($date, $ratio) = split (/,/, $line);
+    my ($old, $new) = split m{[:/]}, $ratio;
+
+    push @splits, { symbol  => $symbol,
+                    date    => daily_date_fixup ($symbol, $date),
+                    new     => $new,
+                    old     => $old };
+  }
+  return $h;
+}
+
+# return a hashref
+#   { cookies => string,   # in format HTTP::Cookies ->as_string()
+#     crumb   => string
+#   }
+#
+# If no such $symbol then return undef;
+#
+# Any $symbol which exists is good enough to get a crumb for all later use.
+# Could hard-code something likely here, but better to go from the symbol
+# which is wanted.
+#
+# As of April 2024, some User-Agent strings result in 503 Service Unavailable.
+# Doesn't seem to affect other download parts, just this cookie/crumb
+# getting part.  "Mozilla/5.0" works.
+#
+sub daily_cookie_data {
+  my ($symbol) = @_;
+  require App::Chart::Pagebits;
+  $symbol = URI::Escape::uri_escape($symbol);
+  return App::Chart::Pagebits::get
+    (name       => __('Yahoo daily cookie'),
+     url        => "https://finance.yahoo.com/quote/$symbol/history?p=$symbol",
+     key        => 'yahoo-daily-cookies',
+     freq_days  => 3,
+     parse      => \&daily_cookie_parse,
+     user_agent => 'Mozilla/5.0',
+     allow_404  => 1);
+}
+sub daily_cookie_parse {
+  my ($content, $resp) = @_;
+
+  # script like, with backslash escaping on "\uXXXX"
+  #   "user":{"age":0,"crumb":"8OyCBPyO4ZS"
+  # The form prior to about July 2023 was
+  #   "user":{"crumb":"hdDX\u002FHGsZ0Q",
+  # The form prior to about January 2023 was
+  #   "CrumbStore":{"crumb":"hdDX\u002FHGsZ0Q"}
+  # The form prior to about May 2024 was
+  #   "RequestPlugin":{"user":{"age":0,"crumb":"8OyCBPyO4ZS"
+  #
+  $content =~ /getcrumb.*?"body":"([^"]*)"/
+    or die "Yahoo daily data: getcrumb not found in parse";
+  my $crumb = App::Chart::Yahoo::javascript_string_unquote($1);
+
+  # header like
+  # Set-Cookie: B=fab5sl9cqn2rd&b=3&s=i3; expires=Sun, 03-Sep-2018 04:56:13 GMT; path=/; domain=.yahoo.com
+  #
+  # Expiry time is +1 year.  Who knows whether would really work that long.
+  #
+  require HTTP::Cookies;
+  my $jar = HTTP::Cookies->new;
+  $jar->extract_cookies($resp);
+  my $cookies_str = $jar->as_string;
+
+  App::Chart::Download::verbose_message ("Yahoo new crumb $crumb\n"
+                                         . $cookies_str);
+  return { crumb   => $crumb,
+           cookies => $cookies_str };
+}
+
+# $str is an ISO date string like 2017-11-05
+# It is date GMT of 9:30am in the timezone of $symbol.
+# Return the date in the symbol timezone.
+# 
+# This was a fix needed for CSV where dates were (unhelpfully)
+# in GMT rather than the timezone of the exchange.
+#
+sub daily_date_fixup {
+  my ($symbol, $str) = @_;
+  ### daily_date_fixup: "$symbol  $str"
+  my ($year, $month, $day) = App::Chart::iso_to_ymd ($str);
+
+  my $timezone = App::Chart::TZ->for_symbol($symbol);
+  if (timezone_gmtoffset_at_ymd($timezone, $year, $month, $day+1)
+      <= - (10*60+20)*60) {
+    my $adate = App::Chart::ymd_to_adate ($year, $month, $day);
+    $str = App::Chart::adate_to_iso ($adate+1);
+    my $today = $timezone->iso_date();
+    if ($str gt $today) {
+      $str = $today;
+    }
+  }
+  return $str;
+}
+sub timezone_gmtoffset_at_ymd {
+  my ($timezone, $year, $month, $day) = @_;
+  my $timet = $timezone->call(\&POSIX::mktime,
+                              0, 0, 0, $day, $month-1, $year-1900);
+  my ($sec,$min,$hour,$gmt_day) = gmtime($timet);
+  return $sec + 60*$min + 3600*$hour + 86400*($gmt_day - $day);
+}
+
+# $str is a string from previous HTTP::Cookies ->as_string()
+# Return a new HTTP::Cookies object with that content.
+sub http_cookies_from_string {
+  my ($str) = @_;
+  require File::Temp;
+  my $fh = File::Temp->new (TEMPLATE => 'chart-XXXXXX',
+                            TMPDIR => 1);
+  print $fh "#LWP-Cookies-1.0\n", $str or die;
+  close $fh or die;
+  require HTTP::Cookies;
+  my $jar = HTTP::Cookies->new;
+  $jar->load($fh->filename);
+  return $jar;
+}
+
+# (String quoting for parsing of <script> in HTML to get crumb.)
+# undo javascript string backslash quoting in STR, per
+#
+#     https://developer.mozilla.org/en/JavaScript/Guide/Values,_Variables,_and_Literals#String_Literals
+#
+# Encode::JavaScript::UCS does \u, but not the rest
+#
+# cf Java as such not quite the same:
+#   unicode: http://java.sun.com/docs/books/jls/third_edition/html/lexical.html#100850
+#   strings: http://java.sun.com/docs/books/jls/third_edition/html/lexical.html#101089
+#
+my %javascript_backslash = ('b' => "\b",   # backspace
+                            'f' => "\f",   # formfeed
+                            'n' => "\n",   # newline
+                            'r' => "\r",
+                            't' => "\t",   # tab
+                            'v' => "\013", # vertical tab
+                           );
+sub javascript_string_unquote {
+  my ($str) = @_;
+  $str =~ s{\\(?:
+              ((?:[0-3]?[0-7])?[0-7]) # $1 \377 octal latin-1
+            |x([0-9a-fA-F]{2})        # $2 \xFF hex latin-1
+            |u([0-9a-fA-F]{4})        # $3 \uFFFF hex unicode
+            |(.)                      # $4 \n etc escapes
+            )
+         }{
+           (defined $1 ? chr(oct($1))
+            : defined $4 ? ($javascript_backslash{$4} || $4)
+            : chr(hex($2||$3)))   # \x,\u hex
+         }egx;
+  return $str;
+}
+
+
+#-----------------------------------------------------------------------------

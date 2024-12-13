@@ -291,9 +291,14 @@ int32_t SPVM__Net__SSLeay__set_SSL_CTX(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   SSL_CTX* ctx = env->get_pointer(env, stack, obj_ssl_ctx);
   
+  SSL_CTX_up_ref(ctx);
+  
+  // The reference count of ctx is decremented if this function succeed.
   void* ret_ctx = SSL_set_SSL_CTX(self, ctx);
   
   if (!ret_ctx) {
+    SSL_CTX_free(ctx);
+    
     int64_t ssl_error = ERR_peek_last_error();
     
     char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
@@ -314,9 +319,6 @@ int32_t SPVM__Net__SSLeay__set_SSL_CTX(SPVM_ENV* env, SPVM_VALUE* stack) {
   env->call_class_method_by_name(env, stack, "Net::SSLeay::SSL_CTX", "new_with_pointer", 1, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   void* obj_ret_ctx = stack[0].oval;
-  
-  env->set_field_object_by_name(env, stack, obj_self, "ssl_ctx", obj_ret_ctx, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { return error_id; }
   
   return 0;
 }
@@ -382,9 +384,21 @@ int32_t SPVM__Net__SSLeay__connect(SPVM_ENV* env, SPVM_VALUE* stack) {
     
     env->die(env, stack, "[OpenSSL Error]SSL_connect failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
-    if (error_id) { return error_id; }
-    error_id = tmp_error_id;
+    if (ssl_operation_error == SSL_ERROR_WANT_READ) {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error::SSL_ERROR_WANT_READ", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
+    else if (ssl_operation_error == SSL_ERROR_WANT_WRITE) {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error::SSL_ERROR_WANT_WRITE", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
+    else {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
     
     return error_id;
   }
@@ -421,9 +435,21 @@ int32_t SPVM__Net__SSLeay__accept(SPVM_ENV* env, SPVM_VALUE* stack) {
     
     env->die(env, stack, "[OpenSSL Error]SSL_accept failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
-    if (error_id) { return error_id; }
-    error_id = tmp_error_id;
+    if (ssl_operation_error == SSL_ERROR_WANT_READ) {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error::SSL_ERROR_WANT_READ", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
+    else if (ssl_operation_error == SSL_ERROR_WANT_WRITE) {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error::SSL_ERROR_WANT_WRITE", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
+    else {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
     
     return error_id;
   }
@@ -485,9 +511,21 @@ int32_t SPVM__Net__SSLeay__read(SPVM_ENV* env, SPVM_VALUE* stack) {
     
     env->die(env, stack, "[OpenSSL Error]SSL_read failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
-    if (error_id) { return error_id; }
-    error_id = tmp_error_id;
+    if (ssl_operation_error == SSL_ERROR_WANT_READ) {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error::SSL_ERROR_WANT_READ", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
+    else if (ssl_operation_error == SSL_ERROR_WANT_WRITE) {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error::SSL_ERROR_WANT_WRITE", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
+    else {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
     
     return error_id;
   }
@@ -549,9 +587,21 @@ int32_t SPVM__Net__SSLeay__write(SPVM_ENV* env, SPVM_VALUE* stack) {
     
     env->die(env, stack, "[OpenSSL Error]SSL_write failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
-    if (error_id) { return error_id; }
-    error_id = tmp_error_id;
+    if (ssl_operation_error == SSL_ERROR_WANT_READ) {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error::SSL_ERROR_WANT_READ", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
+    else if (ssl_operation_error == SSL_ERROR_WANT_WRITE) {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error::SSL_ERROR_WANT_WRITE", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
+    else {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
     
     return error_id;
   }
@@ -588,9 +638,21 @@ int32_t SPVM__Net__SSLeay__shutdown(SPVM_ENV* env, SPVM_VALUE* stack) {
     
     env->die(env, stack, "[OpenSSL Error]SSL_shutdown failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
     
-    int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
-    if (error_id) { return error_id; }
-    error_id = tmp_error_id;
+    if (ssl_operation_error == SSL_ERROR_WANT_READ) {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error::SSL_ERROR_WANT_READ", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
+    else if (ssl_operation_error == SSL_ERROR_WANT_WRITE) {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error::SSL_ERROR_WANT_WRITE", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
+    else {
+      int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { return error_id; }
+      error_id = tmp_error_id;
+    }
     
     return error_id;
   }

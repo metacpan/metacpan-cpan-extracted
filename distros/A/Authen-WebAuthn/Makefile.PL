@@ -35,9 +35,10 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Crypt::URandom" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "lib" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,6 +61,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "URI" => 0,
   "constant" => 0,
+  "lib" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0

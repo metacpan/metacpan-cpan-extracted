@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240910191015;
+our $VERSION = 1.20241212130805;
 
 my $formatters = [
                 {
@@ -103,7 +103,7 @@ my $validators = {
                 )|
                 (?:
                   1(?:
-                    0[236]|
+                    0[2-6]|
                     1\\d
                   )|
                   (?:
@@ -125,7 +125,7 @@ my $validators = {
                 )|
                 (?:
                   (?:
-                    [124-6]\\d|
+                    [124-69]\\d|
                     3[5-9]
                   )\\d|
                   7(?:
@@ -175,25 +175,6 @@ my $validators = {
         ',
                 'voip' => ''
               };
-my %areanames = ();
-$areanames{en} = {"37245", "Kuressaare",
-"37248", "Rapla",
-"37247", "Haapsalu",
-"37275", "Tartu",
-"37278", "Võru",
-"37277", "Jõgeva",
-"37238", "Paide",
-"37235", "Narva\/Sillamäe",
-"37244", "Pärnu",
-"37279", "Põlva",
-"37246", "Kärdla",
-"37276", "Valga",
-"37232", "Rakvere",
-"37274", "Tartu",
-"37243", "Viljandi",
-"37273", "Tartu",
-"3726", "Tallinn\/Harju\ County",
-"37233", "Kohtla\-Järve",};
 my $timezones = {
                '' => [
                        'Europe/Bucharest'
@@ -204,7 +185,7 @@ my $timezones = {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+372|\D)//g;
-      my $self = bless({ country_code => '372', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, areanames => \%areanames}, $class);
+      my $self = bless({ country_code => '372', number => $number, formatters => $formatters, validators => $validators, timezones => $timezones, }, $class);
         return $self->is_valid() ? $self : undef;
     }
 1;

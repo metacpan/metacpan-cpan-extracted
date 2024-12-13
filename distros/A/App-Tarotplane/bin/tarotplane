@@ -29,7 +29,7 @@ and definitions, then displays them in a TUI.
 
 A B<tarotplane> card file is a text file that contains cards. Each card must
 contain a term and definition, which are seperated by a colon (:). Terms
-precede the colon, definitions follow the colon Cards are.
+precede the colon, definitions follow the colon. Cards are
 seperated from each other by a delimitting line, which is a line that only
 contains a percentage (%) sign. Any whitespace found in the terms and
 definitions will be truncated to a single space character. Leading and trailing
@@ -173,7 +173,7 @@ An example of a valid card file:
  Brothers Karamazov.
  %
  Aleksander Solzhenitsyn:
- Author fo One Day in the Life of Ivan Denisovich.
+ Author of One Day in the Life of Ivan Denisovich.
  %
  Vladimir Nabokov:
  Author of Lolita and Pale Fire.

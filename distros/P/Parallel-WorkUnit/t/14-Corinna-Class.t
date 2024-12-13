@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2023 Joelle Maslak
+# Copyright (C) 2024 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -14,8 +14,22 @@ use warnings;
 use autodie;
 
 use Carp;
-use Test2::V0;
-use Feature::Compat::Class;
+use feature ();
+use Test2::V0 "!warnings";
+
+# Allow compilation even if Corina is not part of the Perl
+# Inspired by Feature::Compat::Class by Paul Evans.
+BEGIN {
+    if ($^V and $^V ge v5.38.0) {
+        feature->import(qw(class));
+        warnings->unimport(qw(experimental::class));
+    } else {
+        require Object::Pad;
+        Object::Pad->import(qw(class method field),
+            ':experimental(init_expr)',
+            ':config(only_field_attrs=param)');
+    }
+};
 
 # Set Timeout
 local $SIG{ALRM} = sub { die "timeout\n"; };

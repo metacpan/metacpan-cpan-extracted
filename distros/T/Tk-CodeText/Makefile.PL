@@ -31,6 +31,9 @@ WriteMakefile(
 				url  => 'git://github.com/haje61/Tk-CodeText.git',
 				web  => 'https://github.com/haje61/Tk-CodeText',
 			},
+			bugtracker => {
+				web  => "https://github.com/haje61/Tk-CodeText/issues",
+			},
 		}}) : ()
 	),
 );

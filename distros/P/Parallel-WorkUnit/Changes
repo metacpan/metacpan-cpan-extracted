@@ -1,3 +1,8 @@
+2.243480  2024-12-12 20:16:25-07:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * [bugfix] Tests were failing on Perl 5.38 with
+   Feature::Compat::Class > 0.06.
+
 2.243450  2024-12-10 11:11:54-07:00 America/Denver
  Joelle Maslak <jmaslak@antelope.net>
  * Added queueall() method to call queue() over a list of data.

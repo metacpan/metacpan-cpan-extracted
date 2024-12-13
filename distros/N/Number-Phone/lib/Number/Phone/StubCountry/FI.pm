@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20240910191015;
+our $VERSION = 1.20241212130805;
 
 my $formatters = [
                 {
@@ -77,7 +77,7 @@ my $formatters = [
                   'format' => '$1 $2',
                   'leading_digits' => '
             (?:
-              1[49]|
+              19|
               [2568]
             )[1-8]|
             3(?:
@@ -93,9 +93,9 @@ my $formatters = [
 
 my $validators = {
                 'fixed_line' => '
-          1[35-7][1-8]\\d{3,6}|
+          1[3-7][1-8]\\d{3,6}|
           (?:
-            1[49][1-8]|
+            19[1-8]|
             [23568][1-8]\\d|
             9(?:
               00|
@@ -104,9 +104,9 @@ my $validators = {
           )\\d{2,6}
         ',
                 'geographic' => '
-          1[35-7][1-8]\\d{3,6}|
+          1[3-7][1-8]\\d{3,6}|
           (?:
-            1[49][1-8]|
+            19[1-8]|
             [23568][1-8]\\d|
             9(?:
               00|
@@ -150,104 +150,104 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
+$areanames{en} = {"35862", "Vaasa",
+"35865", "Vaasa",
+"35819", "Uusimaa",
+"35823", "Turku\/Pori",
+"35827", "Turku\/Pori",
+"35815", "Mikkeli",
+"3589", "Helsinki",
+"35887", "Oulu",
+"35855", "Kymi",
+"35833", "Häme",
+"35852", "Kymi",
+"35883", "Oulu",
+"35837", "Häme",
+"35832", "Häme",
+"35853", "Kymi",
+"35835", "Häme",
+"35885", "Oulu",
+"35857", "Kymi",
+"35882", "Oulu",
+"35822", "Turku\/Pori",
+"35825", "Turku\/Pori",
+"35817", "Kuopio",
+"35813", "North\ Karelia",
+"35890", "Uusimaa",
+"35867", "Vaasa",
+"35863", "Vaasa",
+"35834", "Häme",
+"35884", "Oulu",
+"35821", "Turku\/Pori",
+"35888", "Oulu",
+"35836", "Häme",
+"35838", "Häme",
+"35886", "Oulu",
+"35824", "Turku\/Pori",
+"35831", "Häme",
+"35881", "Oulu",
+"35826", "Turku\/Pori",
+"35828", "Turku\/Pori",
+"35851", "Kymi",
+"35816", "Lapland",
+"35864", "Vaasa",
+"35868", "Vaasa",
+"35866", "Vaasa",
+"35814", "Central\ Finland",
+"35856", "Kymi",
+"35858", "Kymi",
+"35854", "Kymi",
+"35861", "Vaasa",};
 $areanames{fi} = {"35813", "Pohjois\-Karjala",
-"35816", "Lappi",
-"35814", "Keski\-Suomi",};
-$areanames{sv} = {"35863", "Vasa",
-"35826", "Åbo\/Björneborg",
-"35833", "Tavastland",
+"35814", "Keski\-Suomi",
+"35816", "Lappi",};
+$areanames{sv} = {"35824", "Åbo\/Björneborg",
 "35828", "Åbo\/Björneborg",
-"35813", "Norra\ Karelen",
-"35851", "Kymmene",
-"35883", "Uleåborg",
-"35854", "Kymmene",
-"35824", "Åbo\/Björneborg",
-"35887", "Uleåborg",
-"35885", "Uleåborg",
-"35882", "Uleåborg",
+"35826", "Åbo\/Björneborg",
+"35881", "Uleåborg",
+"35831", "Tavastland",
+"35884", "Uleåborg",
+"35834", "Tavastland",
+"35838", "Tavastland",
+"35886", "Uleåborg",
+"35836", "Tavastland",
+"35888", "Uleåborg",
 "35821", "Åbo\/Björneborg",
+"35858", "Kymmene",
+"35856", "Kymmene",
+"35861", "Vasa",
+"35854", "Kymmene",
+"35864", "Vasa",
+"35816", "Lappland",
+"35851", "Kymmene",
+"35814", "Mellersta\ Finland",
+"35866", "Vasa",
+"35868", "Vasa",
+"35837", "Tavastland",
+"35883", "Uleåborg",
+"3589", "Helsingfors",
+"35887", "Uleåborg",
+"35833", "Tavastland",
+"35855", "Kymmene",
+"35852", "Kymmene",
 "35819", "Nyland",
 "35865", "Vasa",
-"35867", "Vasa",
-"35858", "Kymmene",
-"35835", "Tavastland",
-"35837", "Tavastland",
 "35862", "Vasa",
-"35856", "Kymmene",
 "35815", "St\ Michel",
-"35832", "Tavastland",
-"35822", "Åbo\/Björneborg",
-"35853", "Kymmene",
-"35861", "Vasa",
-"35884", "Uleåborg",
-"35825", "Åbo\/Björneborg",
 "35827", "Åbo\/Björneborg",
-"35831", "Tavastland",
-"3589", "Helsingfors",
-"35814", "Mellersta\ Finland",
-"35881", "Uleåborg",
-"35864", "Vasa",
-"35834", "Tavastland",
-"35888", "Uleåborg",
-"35886", "Uleåborg",
-"35868", "Vasa",
-"35857", "Kymmene",
-"35855", "Kymmene",
-"35816", "Lappland",
-"35838", "Tavastland",
-"35890", "Nyland",
 "35823", "Åbo\/Björneborg",
-"35866", "Vasa",
-"35852", "Kymmene",
-"35836", "Tavastland",};
-$areanames{en} = {"35884", "Oulu",
-"35861", "Vaasa",
-"35825", "Turku\/Pori",
-"35827", "Turku\/Pori",
-"35831", "Häme",
-"3589", "Helsinki",
-"35822", "Turku\/Pori",
-"35853", "Kymi",
-"35881", "Oulu",
-"35864", "Vaasa",
-"35834", "Häme",
-"35814", "Central\ Finland",
-"35886", "Oulu",
-"35888", "Oulu",
-"35890", "Uusimaa",
-"35823", "Turku\/Pori",
-"35866", "Vaasa",
-"35852", "Kymi",
-"35836", "Häme",
-"35868", "Vaasa",
-"35857", "Kymi",
-"35855", "Kymi",
-"35816", "Lapland",
-"35838", "Häme",
-"35828", "Turku\/Pori",
-"35813", "North\ Karelia",
-"35851", "Kymi",
-"35863", "Vaasa",
-"35826", "Turku\/Pori",
-"35833", "Häme",
-"35854", "Kymi",
-"35883", "Oulu",
-"35882", "Oulu",
-"35824", "Turku\/Pori",
-"35887", "Oulu",
-"35885", "Oulu",
-"35862", "Vaasa",
-"35856", "Kymi",
-"35817", "Kuopio",
-"35832", "Häme",
-"35815", "Mikkeli",
-"35821", "Turku\/Pori",
-"35819", "Uusimaa",
-"35865", "Vaasa",
-"35867", "Vaasa",
-"35858", "Kymi",
-"35835", "Häme",
-"35837", "Häme",};
+"35813", "Norra\ Karelen",
+"35822", "Åbo\/Björneborg",
+"35825", "Åbo\/Björneborg",
+"35863", "Vasa",
+"35867", "Vasa",
+"35890", "Nyland",
+"35857", "Kymmene",
+"35882", "Uleåborg",
+"35885", "Uleåborg",
+"35853", "Kymmene",
+"35832", "Tavastland",
+"35835", "Tavastland",};
 my $timezones = {
                '' => [
                        'Europe/Helsinki',

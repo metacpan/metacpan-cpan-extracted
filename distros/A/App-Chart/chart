@@ -1,6 +1,6 @@
 #!perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2018 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2018, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -34,6 +34,10 @@ use Locale::Messages;
 use Locale::TextDomain 'App-Chart';
 
 use App::Chart;
+$|=1;
+
+# uncomment this to run the ### lines
+# use Smart::Comments;
 
 if (@ARGV >= 1 && ($ARGV[0] eq '--subprocess' || $ARGV[0] eq '--emacs')) {
   binmode (STDOUT, ':utf8') or die;
@@ -143,7 +147,14 @@ my @args;
               emacs      => $set_mode,  # undocumented
               vacuum     => $set_mode,  # undocumented yet
 
-              verbose    => \$App::Chart::option{'verbose'},
+              'verbose:i' => sub {
+                my ($opt, $value) = @_;
+                if ($value==0) {
+                  $App::Chart::option{'verbose'}++;
+                } else {
+                  $App::Chart::option{'verbose'} = $value;
+                }
+              },
               'all-status' => $set_output,  # undocumented
 
               'lwp-debug' => sub {
@@ -380,7 +391,7 @@ L<http://user42.tuxfamily.org/chart/index.html>
 
 =head1 LICENCE
 
-Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2018 Kevin Ryde
+Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2018, 2024 Kevin Ryde
 
 Chart is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

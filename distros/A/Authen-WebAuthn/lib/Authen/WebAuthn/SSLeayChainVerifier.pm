@@ -1,5 +1,5 @@
 package Authen::WebAuthn::SSLeayChainVerifier;
-$Authen::WebAuthn::SSLeayChainVerifier::VERSION = '0.004';
+$Authen::WebAuthn::SSLeayChainVerifier::VERSION = '0.005';
 use warnings;
 use strict;
 use Net::SSLeay 1.88;

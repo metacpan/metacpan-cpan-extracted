@@ -242,6 +242,8 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__use_certificate_file(SPVM_ENV* env, SPVM_VAL
   
   void* obj_file = stack[1].oval;
   
+  int32_t type = stack[2].ival;
+  
   if (!obj_file) {
     return env->die(env, stack, "The file $file must be defined.", __func__, FILE_NAME, __LINE__);
   }
@@ -249,7 +251,9 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__use_certificate_file(SPVM_ENV* env, SPVM_VAL
   const char* file = env->get_chars(env, stack, obj_file);
   int32_t file_length = env->length(env, stack, obj_file);
   
-  int32_t type = stack[2].ival;
+  if (type < 0) {
+    type = SSL_FILETYPE_PEM;
+  }
   
   SSL_CTX* self = env->get_pointer(env, stack, obj_self);
   
@@ -332,6 +336,10 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__use_PrivateKey_file(SPVM_ENV* env, SPVM_VALU
   int32_t type = stack[2].ival;
   
   SSL_CTX* self = env->get_pointer(env, stack, obj_self);
+  
+  if (type < 0) {
+    type = SSL_FILETYPE_PEM;
+  }
   
   int32_t status = SSL_CTX_use_PrivateKey_file(self, file, type);
   

@@ -1,5 +1,5 @@
 package Acme::Matrix;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use 5.006; use strict; use warnings;
 use Term::ReadKey; 
 
@@ -93,7 +93,7 @@ Acme::Matrix - Heavenly digital rain
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 

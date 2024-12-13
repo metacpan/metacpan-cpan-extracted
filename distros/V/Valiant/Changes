@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002012 2024 December 12
+          - Updated github workflow to fix broken badges
+
 0.002011 2024 December 7
           - Closed potential security issue with deeply nested paramters in the DBIC
             glue code.  This was a hack that could let someone create a child record

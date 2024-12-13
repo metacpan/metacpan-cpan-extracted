@@ -1,6 +1,6 @@
 package Catmandu::Exporter::XLSX;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use namespace::clean;
 use Catmandu::Sane;
@@ -12,6 +12,7 @@ with 'Catmandu::TabularExporter';
 has xlsx      => (is => 'ro', lazy => 1, builder => '_build_xlsx');
 has worksheet => (is => 'ro', lazy => 1, builder => '_build_worksheet');
 has _n => (is => 'rw', default => sub {0});
+has _num_format => (is => 'lazy', init_arg => undef);
 
 sub BUILD {
     my $self    = shift;
@@ -29,6 +30,10 @@ sub _build_xlsx {
     $xlsx;
 }
 
+sub _build__num_format {
+    $_[0]->xlsx->add_format(num_format => '@');
+}
+
 sub _build_worksheet {
     $_[0]->xlsx->add_worksheet;
 }
@@ -38,6 +43,7 @@ sub encoding {':raw'}
 sub add {
     my ($self, $data) = @_;
     my $fields = $self->fields || $self->fields([sort keys %$data]);
+    my $num_format = $self->_num_format;
 
     if ($self->header && $self->_n == 0) {
         for (my $i = 0; $i < @$fields; $i++) {
@@ -46,14 +52,14 @@ sub add {
             # keep for backward compatibility (header could be a hashref)
             $field = $self->header->{$field}
                 if ref $self->header && defined $self->header->{$field};
-            $self->worksheet->write_string($self->_n, $i, $field);
+            $self->worksheet->write_string($self->_n, $i, $field, $num_format);
         }
         $self->{_n}++;
     }
 
     for (my $i = 0; $i < @$fields; $i++) {
         $self->worksheet->write_string($self->_n, $i,
-            $data->{$fields->[$i]} // "");
+            $data->{$fields->[$i]} // "", $num_format);
     }
     $self->{_n}++;
 }

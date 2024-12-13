@@ -1,6 +1,10 @@
+0.07      2024-12-12 12:57:45-07:00 America/Denver
+
+         - Add will_delete_empty_ref (thanks ZARQUON)
+
 0.06      2015-08-04 12:44:57-06:00 America/Denver
           - Replace with an empty array reference instead of an empty string
-            in th ecase of an array with no HASH or ARRAY values (thanks steveb)
+            in the case of an array with no HASH or ARRAY values (thanks steveb)
           - Remove un-needed portion of conditional (thanks rafl)
 
 0.05      2015-08-03 12:34:15-06:00 America/Denver

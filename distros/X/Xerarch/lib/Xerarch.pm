@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use meta;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub import {
 	my $caller = caller();
@@ -51,11 +51,11 @@ sub import {
 
 =head1 NAME
 
-Xerarch - Xerarch
+Xerarch - Introspection
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -138,8 +138,6 @@ LNATION, C<< <email at lnation.org> >>
 Please report any bugs or feature requests to C<bug-xerarch at rt.cpan.org>, or through
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Xerarch>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
 
 
 =head1 SUPPORT

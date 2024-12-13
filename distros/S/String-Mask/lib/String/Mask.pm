@@ -2,7 +2,7 @@ package String::Mask;
 use 5.006; use strict; use warnings;
 use base 'Import::Export';
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 our %EX = (
 	mask => [qw/all/]
 );
@@ -41,7 +41,7 @@ String::Mask - mask sensitive data
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 
@@ -102,6 +102,30 @@ The mask character that will replace any masked text. The default is *.
 =back
 
 =cut
+
+=head1 BENCHMARK
+
+	use Benchmark qw(:all);
+	use lib '.';
+	use String::Mask;
+	use String::Mask::XS;
+
+	timethese(10000000, {
+		'Mask' => sub {
+			my $string = 'thisusedtobeanemail@gmail.com';
+			String::Mask::mask($string);
+		},
+		'XS' => sub {
+			my $string = 'thisusedtobeanemail@gmail.com';
+			String::Mask::XS::mask($string);
+		}
+	});
+
+...
+
+	Benchmark: timing 10000000 iterations of Mask, XS...
+		Mask: 17 wallclock secs (16.78 usr +  0.00 sys = 16.78 CPU) @ 595947.56/s (n=10000000)
+		XS:  0 wallclock secs ( 1.43 usr +  0.00 sys =  1.43 CPU) @ 6993006.99/s (n=10000000)
 
 =head1 AUTHOR
 

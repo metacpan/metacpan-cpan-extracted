@@ -402,13 +402,27 @@ subtest 'mariadb_auto_reconnect' => sub {
 
 subtest 'blob round trip' => sub {
     my $new =
-      $schema->resultset('Artist')->create( { name => 'blob round trip', picture => "\302\243" } );
+      $schema->resultset('Artist')->create( { name => 'blob round trip', picture => "\302\243", name => "\302\243" } );
     ok( $new->artistid, 'Auto-PK worked' );
 
     my $artist2_rs =
       $schema->resultset('Artist')->search( { artistid => $new->artistid } );
 
     is($artist2_rs->single->picture, "\302\243", "Round-tripped a blob");
+    is($artist2_rs->single->name,    "\302\243", "Round-tripped non-ASCII characters");
+};
+
+# We don't want to assume that the database has defaulted to utf8mb4, so we
+# only test with a >255 basic multilingual plane character.
+subtest 'basic multilingual plane round trip' => sub {
+    my $new =
+      $schema->resultset('Artist')->create( { name => chr(0x2603) } );
+    ok( $new->artistid, 'Auto-PK worked' );
+
+    my $artist2_rs =
+      $schema->resultset('Artist')->search( { artistid => $new->artistid } );
+
+    is($artist2_rs->single->name, chr(0x2603), "Round-tripped a snowman");
 };
 
 done_testing;

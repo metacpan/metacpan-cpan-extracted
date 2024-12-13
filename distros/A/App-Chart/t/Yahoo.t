@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2017, 2018, 2020 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2017, 2018, 2020, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -19,7 +19,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 28;
+use Test::More tests => 27;
 
 use lib 't';
 use MyTestHelpers;
@@ -100,17 +100,17 @@ is (App::Chart::Yahoo::crunch_trailing_nines('4.0'), '4.00');
 #------------------------------------------------------------------------------
 # http_cookies_from_string()
 
-{
-  # round trip ->as_string(), primarily to see that the hack in
-  # http_cookies_from_string() is ok
-  #
-  my $str = <<'HERE';
-Set-Cookie3: foo="bar"; path="/"; domain=.example.com; path_spec; expires="2037-06-02 20:00:00Z"; version=0
-HERE
-  my $cookies = App::Chart::Yahoo::http_cookies_from_string($str);
-  my $got = $cookies->as_string;
-  ok ($got,$str);
-}
+# {
+#   # round trip ->as_string(), primarily to see that the hack in
+#   # http_cookies_from_string() is ok
+#   #
+#   my $str = <<'HERE';
+# Set-Cookie3: foo="bar"; path="/"; domain=.example.com; path_spec; expires="2037-06-02 20:00:00Z"; version=0
+# HERE
+#   my $cookies = App::Chart::Yahoo::http_cookies_from_string($str);
+#   my $got = $cookies->as_string;
+#   ok ($got,$str);
+# }
 
 
 #------------------------------------------------------------------------------

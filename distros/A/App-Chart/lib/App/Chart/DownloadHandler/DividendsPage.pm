@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2024 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -86,7 +86,7 @@ __END__
 #  App::Chart::DownloadHandler::DividendsPage-> new
 #      (name  => __('FooEX'),
 #       pred  => $pred,
-#       url   => 'http://fooex.com/dividends.html',
+#       url   => 'http://example.com/dividends.html',
 #       parse => \&my_page_parser,
 #       key   => 'FEX-dividends');
 # 

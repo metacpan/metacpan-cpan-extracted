@@ -131,17 +131,54 @@ sub _probe_mtime {
 	return $statdata[9];
 }
 
-=head2 duration
+=head2 canonical_duration
 
-The duration of this asset.
+Which value to take as the canonical duration while probing the duration
+of a media file.
+
+Unfortunately, some versions of ffprobe have bugs in that they either
+read or write corrupt values for some parts of a media file. Sometimes
+the video stream length is correct but the container length is not,
+sometimes it is the other way around.
+
+Since, given that, it is not possible to choose a source that will
+always work as the probed value for the L<duration> attribute, this
+needs to be configurable in some way.
+
+This option can take the following values:
+
+=over 4
+
+=item container
+
+Uses the duration value that is parsed from the container file, rather
+than any particular stream. If the parsing of that value is not buggy,
+this is the right thing to do, and therefore this is also the default.
+
+=item video
+
+Uses the duration value that is parsed from the first video stream.
+
+=item audio
+
+Uses the duration value that is parsed from the first audio stream.
+
+=back
 
 =cut
 
 has 'canonical_duration' => (
-        is => 'ro',
-        isa => 'Str',
-        default => 'container',
+	is => 'ro',
+	isa => 'Str',
+	default => 'container',
 );
+
+=head2 duration
+
+The duration of this asset. See C<canonical_duration> for details on how
+it is probed.
+
+=cut
 
 has 'duration' => (
 	is => 'rw',
@@ -155,16 +192,16 @@ sub _probe_duration {
 		return $self->reference->duration;
 	}
 	if($self->duration_style eq "seconds") {
-                if($self->canonical_duration eq 'container') {
-                        return $self->_get_probedata->{format}{duration};
-                } elsif($self->canonical_duration eq 'video') {
-                        return $self->_get_videodata->{duration};
-                } elsif($self->canonical_duration eq 'audio') {
-                        return $self->_get_audiodata->{duration};
-                } else {
-                        # don't support this
-                        ...
-                }
+		if($self->canonical_duration eq 'container') {
+			return $self->_get_probedata->{format}{duration};
+		} elsif($self->canonical_duration eq 'video') {
+			return $self->_get_videodata->{duration};
+		} elsif($self->canonical_duration eq 'audio') {
+			return $self->_get_audiodata->{duration};
+		} else {
+			# don't support this
+			...
+		}
 	} else {
 		return $self->duration_frames;
 	}
@@ -205,6 +242,29 @@ has 'duration_style' => (
 	default => 'seconds',
 	trigger => \&_warn_duration,
 );
+
+=head2 force_key_frames
+
+Can be set to an expression that can be passed to ffmpeg's C<-force_key_frames>
+parameter. Will not be probed.
+
+=cut
+
+has 'force_key_frames' => (
+	is => 'rw',
+	isa => 'Maybe[Str]',
+	builder => '_probe_force_key_frames',
+	lazy => 1,
+	predicate => 'has_force_key_frames',
+);
+
+sub _probe_force_key_frames {
+	my $self = shift;
+	if($self->has_reference) {
+		return $self->reference->force_key_frames;
+	}
+	return;
+}
 
 =head2 video_codec
 
@@ -694,22 +754,22 @@ Returns an array of audio channel layouts, as detected by ffprobe.
 =cut
 
 has 'channel_layouts' => (
-        is => 'rw',
-        traits => ['Array'],
-        isa => 'ArrayRef[Str]',
-        builder => '_probe_channel_layouts',
-        lazy => 1,
+	is => 'rw',
+	traits => ['Array'],
+	isa => 'ArrayRef[Str]',
+	builder => '_probe_channel_layouts',
+	lazy => 1,
 );
 
 sub _probe_channel_layouts {
-        my $self = shift;
-        my $rv = [];
-        foreach my $stream(@{$self->_get_probedata->{streams}}) {
-                if($stream->{codec_type} eq "audio") {
-                        push @$rv, $stream->{channel_layout};
-                }
-        }
-        return $rv;
+	my $self = shift;
+	my $rv = [];
+	foreach my $stream(@{$self->_get_probedata->{streams}}) {
+		if($stream->{codec_type} eq "audio") {
+			push @$rv, $stream->{channel_layout};
+		}
+	}
+	return $rv;
 }
 
 =head2 astream_ids
@@ -949,6 +1009,9 @@ sub writeopts {
 		}
 		if(defined($self->video_preset)) {
 			push @opts, ('-preset', $self->video_preset);
+		}
+		if(defined($self->force_key_frames)) {
+			push @opts, ('-force_key_frames', $self->force_key_frames);
 		}
 		if($self->has_pass) {
 			push @opts, ('-pass', $self->pass, '-passlogfile', $self->url . '-multipass');
