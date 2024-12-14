@@ -1,3 +1,6 @@
+0.244 2024-12-13
+    . Update (commented) comparison with $] to use quotes (contributed by BOOK)
+
 0.243 2024-11-27
     . Reinstate test for apostrophe as package separator, as the package
       separator is allowed again

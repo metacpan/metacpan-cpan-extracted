@@ -1,7 +1,8 @@
 package Neo4j_Test;
-use strict;
+use v5.14;
 use warnings;
 
+use Feature::Compat::Try;
 use URI;
 use Neo4j::Driver;
 use Neo4j_Test::NetModulePlugin;
@@ -22,15 +23,16 @@ our $sim;
 sub driver_maybe {
 	
 	my $driver;
-	eval {
+	try {
 		# a default URI (localhost) is built into the driver
 		$driver = Neo4j::Driver->new( $server );
-	};
-	return unless $driver;
+	}
+	catch ($e) { return }
 	
 	$driver->basic_auth($user, $pass);
 	$driver->config(timeout => 2);  # 2 seconds timeout may speed up testing
 	$driver->config(cypher_params => v2);
+	$driver->config(trust_ca => $ENV{HTTPS_CA_FILE});
 	
 	$bolt = $driver->config('uri') && $driver->config('uri')->scheme eq 'bolt';
 	if ($ENV{TEST_NEO4J_NETMODULE}) {
@@ -52,12 +54,12 @@ sub driver {
 	my $driver = driver_maybe;
 	
 	# verify that the supplied credentials actually work
-	eval {
+	try {
 		# the Neo4j HTTP API allows running empty statements
 		$driver->session->run('');
-	};
-	if ($@) {
-		$error = $@;
+	}
+	catch ($e) {
+		$error = $e;
 		return;
 	}
 	
@@ -79,7 +81,7 @@ sub driver_no_connect {
 sub driver_no_auth {
 	my $driver = driver_maybe;
 	if ($sim) {
-		delete $driver->{plugins}->{handlers}->{http_adapter_factory};
+		delete $driver->{events}->{handlers}->{http_adapter_factory};
 		$driver->plugin(Neo4j_Test::NetModulePlugin->new( Neo4j_Test::Sim->new({auth => 0}) ));
 	}
 	$driver->{config}->{auth} = { scheme => 'basic', principal => "no\tuser", credentials => "no\tpass" };
@@ -138,7 +140,7 @@ export TEST_NEO4J_PASSWORD=neo4j
 
 # server with auth disabled
 export TEST_NEO4J_SERVER=http://127.0.0.1:7474
-export TEST_NEO4J_NETMODULE=Neo4j::Driver::Net::HTTP::LWP
+export TEST_NEO4J_NETMODULE=Neo4j::Driver::Net::HTTP::Tiny
 
 
 #! csh

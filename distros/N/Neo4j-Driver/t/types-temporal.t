@@ -12,12 +12,7 @@ use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 use Time::Piece;
 use Neo4j_Test::MockQuery;
 use Neo4j::Driver;
-
-BEGIN {
-	require Neo4j::Types;
-	plan skip_all => 'Test requires Neo4j::Types v2' unless eval { Neo4j::Types->VERSION('2.00') };
-}
-
+use Neo4j::Types 2.00;
 
 
 # Confirm that the deep_bless Jolt parser correctly converts
@@ -39,9 +34,6 @@ sub mock_jolt {
 	return $query;
 }
 
-
-# Trigger Jolt.pm to load DateTime.pm (with require instead of use to allow for 1.00)
-$s->run(mock_jolt { 'T' => '00:00:00' })->fetch;
 
 SKIP: { skip '(Time-Piece#47: strftime broken on Win32)', 1 if $^O =~ /Win32/;
 neo4j_datetime_ok 'Neo4j::Driver::Type::DateTime', sub {
@@ -73,9 +65,8 @@ neo4j_datetime_ok 'Neo4j::Driver::Type::DateTime', sub {
 
 
 subtest 'LocalDateTime' => sub {
-	plan tests => 6;
+	plan tests => 5;
 	$v = $s->run(mock_jolt { 'T' => '2015-07-04T19:32:24' })->single->get;
-	isa_ok $v, 'Neo4j::Driver::Type::Temporal', 'LocalDateTime legacy';
 	isa_ok $v, 'Neo4j::Types::DateTime', 'LocalDateTime';
 	is $v->type, 'LOCAL DATETIME', 'LocalDateTime type';
 	is $v->epoch, 1436038344, 'LocalDateTime epoch';
@@ -85,9 +76,8 @@ subtest 'LocalDateTime' => sub {
 
 
 subtest 'ZonedDateTime full' => sub {
-	plan tests => 6;
+	plan tests => 5;
 	$v = $s->run(mock_jolt { 'T' => '1987-12-18T12:00:00-08:00[America/Los_Angeles]' })->single->get;
-	isa_ok $v, 'Neo4j::Driver::Type::Temporal', 'ZonedDateTime legacy';
 	isa_ok $v, 'Neo4j::Types::DateTime', 'ZonedDateTime';
 	$v->seconds;  # init _parse
 	is $v->type, 'ZONED DATETIME', 'ZonedDateTime type';
@@ -98,9 +88,8 @@ subtest 'ZonedDateTime full' => sub {
 
 
 subtest 'ZonedDateTime offset' => sub {
-	plan tests => 6;
+	plan tests => 5;
 	$v = $s->run(mock_jolt { 'T' => '1987-12-18T12:00:00-08:00' })->single->get;
-	isa_ok $v, 'Neo4j::Driver::Type::Temporal', 'ZonedDateTime legacy';
 	isa_ok $v, 'Neo4j::Types::DateTime', 'ZonedDateTime';
 	$v->days;  # init _parse
 	is $v->type, 'ZONED DATETIME', 'ZonedDateTime type';
@@ -111,9 +100,8 @@ subtest 'ZonedDateTime offset' => sub {
 
 
 subtest 'ZonedDateTime name' => sub {
-	plan tests => 6;
+	plan tests => 5;
 	$v = $s->run(mock_jolt { 'T' => '1987-12-18T12:00:00[America/Los_Angeles]' })->single->get;
-	isa_ok $v, 'Neo4j::Driver::Type::Temporal', 'ZonedDateTime legacy';
 	isa_ok $v, 'Neo4j::Types::DateTime', 'ZonedDateTime';
 	$v->nanoseconds;  # init _parse
 	is $v->type, 'ZONED DATETIME', 'ZonedDateTime type';
@@ -124,9 +112,8 @@ subtest 'ZonedDateTime name' => sub {
 
 
 subtest 'ZonedTime' => sub {
-	plan tests => 7;
+	plan tests => 6;
 	$v = $s->run(mock_jolt { 'T' => '12:50:35.000556Z' })->single->get;
-	isa_ok $v, 'Neo4j::Driver::Type::Temporal', 'ZonedTime legacy';
 	isa_ok $v, 'Neo4j::Types::DateTime', 'ZonedTime';
 	$v->tz_name;  # init _parse
 	is $v->type, 'ZONED TIME', 'ZonedTime type';
@@ -138,9 +125,8 @@ subtest 'ZonedTime' => sub {
 
 
 subtest 'LocalTime' => sub {
-	plan tests => 5;
+	plan tests => 4;
 	$v = $s->run(mock_jolt { 'T' => '12:34:56' })->single->get;
-	isa_ok $v, 'Neo4j::Driver::Type::Temporal', 'LocalTime legacy';
 	isa_ok $v, 'Neo4j::Types::DateTime', 'LocalTime';
 	$v->tz_offset;  # init _parse
 	is $v->type, 'LOCAL TIME', 'LocalTime type';
@@ -150,9 +136,8 @@ subtest 'LocalTime' => sub {
 
 
 subtest 'Date' => sub {
-	plan tests => 5;
+	plan tests => 4;
 	$v = $s->run(mock_jolt { 'T' => '2002-04-16' })->single->get;
-	isa_ok $v, 'Neo4j::Driver::Type::Temporal', 'Date legacy';
 	isa_ok $v, 'Neo4j::Types::DateTime', 'Date';
 	is $v->type, 'DATE', 'Date type';
 	is $v->days, 11793, 'Date epoch';
@@ -180,9 +165,6 @@ subtest 'ZonedDateTime non-standard offsets' => sub {
 };
 
 
-# Trigger Jolt.pm to load DateTime.pm (with require instead of use to allow for 1.00)
-$s->run(mock_jolt { 'T' => 'PT0S' })->fetch;
-
 neo4j_duration_ok 'Neo4j::Driver::Type::Duration', sub {
 	my ($class, $params) = @_;
 	my $iso = sprintf 'P%sM%sDT%.9fS',
@@ -193,9 +175,8 @@ neo4j_duration_ok 'Neo4j::Driver::Type::Duration', sub {
 
 
 subtest 'Duration simple' => sub {
-	plan tests => 6;
+	plan tests => 5;
 	$v = $s->run(mock_jolt { 'T' => 'P29WT31M' })->single->get;
-	isa_ok $v, 'Neo4j::Driver::Type::Temporal', 'Duration legacy';
 	isa_ok $v, 'Neo4j::Types::Duration', 'Duration';
 	$v->nanoseconds;  # init _parse
 	is $v->months, 0, 'months';
@@ -206,9 +187,8 @@ subtest 'Duration simple' => sub {
 
 
 subtest 'Duration time' => sub {
-	plan tests => 6;
+	plan tests => 5;
 	$v = $s->run(mock_jolt { 'T' => 'PT13H17M19.023S' })->single->get;
-	isa_ok $v, 'Neo4j::Driver::Type::Temporal', 'Duration legacy';
 	isa_ok $v, 'Neo4j::Types::Duration', 'Duration';
 	$v->days;  # init _parse
 	is $v->months, 0, 'no months';
@@ -219,9 +199,8 @@ subtest 'Duration time' => sub {
 
 
 subtest 'Duration no time' => sub {
-	plan tests => 6;
+	plan tests => 5;
 	$v = $s->run(mock_jolt { 'T' => 'P3Y5M7W11D' })->single->get;
-	isa_ok $v, 'Neo4j::Driver::Type::Temporal', 'Duration legacy';
 	isa_ok $v, 'Neo4j::Types::Duration', 'Duration';
 	$v->seconds;  # init _parse
 	is $v->months, 41, 'months';
@@ -234,9 +213,8 @@ subtest 'Duration no time' => sub {
 subtest 'Duration negative' => sub {
 	# Negative/reverse durations were specified by ISO in a 2019 update:
 	# https://www.postgresql.org/message-id/9q0ftb37dv7.fsf%40gmx.us
-	plan tests => 6;
+	plan tests => 5;
 	$v = $s->run(mock_jolt { 'T' => 'P-3Y-5M-7W-11DT-13H-17M-19.023S' })->single->get;
-	isa_ok $v, 'Neo4j::Driver::Type::Temporal', 'Duration legacy';
 	isa_ok $v, 'Neo4j::Types::Duration', 'Duration';
 	is $v->months, -41, 'months';
 	is $v->days, -60, 'days';
@@ -250,9 +228,8 @@ subtest 'Duration reverse' => sub {
 	# but there seem to be a number of bugs around ISO duration handling
 	# in the Neo4j server, so maybe reverse-direction durations will be
 	# added if/when those issues are addressed.
-	plan tests => 6;
+	plan tests => 5;
 	$v = $s->run(mock_jolt { 'T' => '-P3Y5M7W11DT13H17M19.023S' })->single->get;
-	isa_ok $v, 'Neo4j::Driver::Type::Temporal', 'Duration legacy';
 	isa_ok $v, 'Neo4j::Types::Duration', 'Duration';
 	is $v->months, -41, 'months';
 	is $v->days, -60, 'days';

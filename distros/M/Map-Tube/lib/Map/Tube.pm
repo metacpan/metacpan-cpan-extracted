@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.85';
+$Map::Tube::VERSION   = '3.87';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.85
+Version 3.87
 
 =cut
 
@@ -208,9 +208,10 @@ sub get_shortest_route {
                                 ->{uc($_common_line)}
                                 ->{$_to->id};
 
-        $reverse = 1 if (defined $from_index
-                         && defined $to_index
-                         && ($from_index < $to_index));
+        # TODO: This cause issue with unidirection route with station index.
+        # $reverse = 1 if (defined $from_index
+        #                  && defined $to_index
+        #                  && ($from_index < $to_index));
     }
 
     if ($reverse) {
@@ -250,7 +251,7 @@ sub get_shortest_route {
             @caller    = caller(2) if $caller[3] eq '(eval)';
             Map::Tube::Exception::RouteNotFound->throw({
                 method      => __PACKAGE__."::get_shortest_route",
-                message     => "ERROR: Ruote not found from [$start_name] to [$end_name].",
+                message     => "ERROR: Route not found from [$start_name] to [$end_name].",
                 filename    => $caller[1],
                 line_number => $caller[2] });
         }

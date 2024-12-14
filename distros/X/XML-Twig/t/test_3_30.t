@@ -304,19 +304,24 @@ else
 { my $doc= q{<d><elt>foo <b>bar</b> baz <b>foobar</b><c>xyz</c><b>toto</b>tata<b>tutu</b></elt></d>};
   my $t= XML::Twig->parse( twig_handlers => { b => sub { $_->erase } }, $doc);
   is( scalar( $t->descendants( '#TEXT')), 3, 'text descendants, no melding');
-  $t->normalize;  
+  $t->normalize;
   is( scalar( $t->descendants( '#TEXT')), 3, 'text descendants, normalized');
 }
 
 { my $doc=q{<d><e>e</e><e1>e1</e1><e1>e1-2</e1></d>};
   XML::Twig::Elt->init_global_state(); # depending on which modules are available, the state could have been modified
-  my $tmp= "tmp";
+  my $tmp= "tmp-t30";
   open( TMP, ">$tmp") or die "cannot create temp file";
   XML::Twig->parse( twig_roots => { e1 => sub { $_->flush( \*TMP) } }, twig_print_outside_roots => \*TMP, $doc);
   close TMP;
-  my $res= slurp( $tmp);
-  is( $res, $doc, "bug in flush with twig_print_outside_roots");
-  unlink $tmp;
+  if ( -f $tmp ) {
+      my $res= slurp( $tmp);
+      is( $res, $doc, "bug in flush with twig_print_outside_roots");
+      unlink $tmp;
+  } else {
+      skip( 1,
+            "problem with writing $tmp, likely linked to missing write permission on the current directory" );
+  }
 }
 
 { # test bug where #default appeared in attributes (RT #27617)

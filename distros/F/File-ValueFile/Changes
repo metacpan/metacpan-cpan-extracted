@@ -1,0 +1,6 @@
+v0.03   2024-12-14Z
+    - Fixed bug which resulted in comments being written to the wrong handle
+    - Improved UTF-8 support, including autodetection of binary/UTF-8 mode
+    - Added more helpful write_*() methods to File::ValueFile::Simple::Writer
+    - Added read_as_taglist() to File::ValueFile::Simple::Reader with automatic format detection
+    - Added write_taglist() to File::ValueFile::Simple::Writer with automatic format/feature detection

@@ -13,7 +13,7 @@ Neo4j::Driver::Types - Type mapping from Neo4j to Perl and vice versa
 
 =head1 VERSION
 
-version 0.52
+version 1.02
 
 =head1 MAPPING
 
@@ -69,9 +69,9 @@ E<ndash> booleans
 
 =over
 
-=item * hash ref  C<{ ... }> E<ndash> Neo4j maps
-
 =item * array ref C<[ ... ]> E<ndash> Neo4j lists
+
+=item * hash ref  C<{ ... }> E<ndash> Neo4j maps
 
 =back
 
@@ -149,12 +149,15 @@ L<JSON::Types> or with simple unary coercions like this:
 
 =item Properties hash reference
 
-The C<properties()> method of node and relationship objects
-currently makes a new defensive copy of the properties hash
-each time it's called. S<Version 1.xx> of the driver will
-change this to give a reference to the internal hash instead,
-providing a significant performance increase. Until then,
-you might consider caching the hash ref locally.
+Since driver version 1.02, the C<properties()> method of node
+and relationship objects returns a reference to the internal
+hash. This makes C<properties()> the preferred way to retrieve a
+single property, as it's both faster and clearer than C<get()>.
+
+ $value = $node->properties->{key};
+ 
+ # Chaining get() is a potentially confusing anti-pattern
+ $value = $record->get('field')->get('key');  # avoid this!
 
 =back
 
@@ -177,13 +180,6 @@ be converted to a Cypher C<null> value
 Neo4j C<ZONED DATETIME> values defined by time zone name rather
 than just by offset are not supported
 (L<libneo4j-omni#5|https://github.com/majensen/libneo4j-omni/issues/5>).
-
-=item *
-With L<Neo4j::Bolt> version 0.01, the value of node or
-relationship properties named C<_end>, C<_node>, C<_labels>,
-C<_relationship>, C<_start>, or C<_type> may not be returned
-correctly. Note that support for all L<Neo4j::Bolt> versions
-earlier than 0.4201 will be phased out entirely soon.
 
 =item *
 The use of L<builtin::true|builtin/"true">,
@@ -236,10 +232,6 @@ The use of L<builtin::true|builtin/"true"> and
 L<builtin::false|builtin/"false"> in query parameters
 requires recent enough JSON module versions
 (S<L<Cpanel::JSON::XS> 4.38> / S<L<JSON::PP> 4.11>).
-
-=item *
-The value of node or relationship properties named C<_meta>
-may not be returned correctly.
 
 =item *
 Fields in records containing maps, lists, or temporal values

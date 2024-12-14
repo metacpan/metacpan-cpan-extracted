@@ -12,7 +12,7 @@ use File::Spec;
 use IPC::Open3;
 use File::Basename;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 $VERSION =~ tr/_//d;    ## no critic
 
 use constant DEBUG => $ENV{ECHARTS_DEBUG} || 0;
@@ -22,21 +22,20 @@ sub new {
     my $class = shift;
 
     my %params = (
-        chart_prefix     => 'chart_',
+        charts_object    => 'ChartECharts',
         class            => 'chart-container',
-        container_prefix => 'id_',
+        container_prefix => '',
         events           => {},
+        scripts          => [],
         height           => undef,
-        id               => get_random_id(),
+        id               => ('chart_' . get_random_id()),
         locale           => 'en',
-        option_prefix    => 'option_',
         options          => {},
         renderer         => 'canvas',
         responsive       => 0,
         series           => [],
         styles           => ['min-width:auto', 'min-height:300px'],
         theme            => 'white',
-        toolbox          => [],
         vertical         => 0,
         width            => undef,
         xAxis            => [],
@@ -54,14 +53,58 @@ sub new {
 
 sub chart_id { shift->{id} }
 
+sub set_options {
+    my ($self, %options) = @_;
+    $self->{options} = {%{$self->{options}}, %options};
+}
+
 sub set_option {
-    my ($self, $options) = @_;
-    $self->{options} = $options;
+    Carp::carp 'DEPRECATED use $chart->set_options(%params)';
+    shift->set_options(@_);
 }
 
 sub set_option_item {
     my ($self, $name, $params) = @_;
     $self->{options}->{$name} = $params;
+}
+
+sub set_title {
+    my ($self, %params) = @_;
+    $self->set_option(title => \%params);
+}
+
+sub set_tooltip {
+    my ($self, %params) = @_;
+    $self->set_option(tooltip => \%params);
+}
+
+sub set_toolbox {
+    my ($self, %params) = @_;
+    $self->set_option(toolbox => \%params);
+}
+
+sub set_legend {
+    my ($self, %params) = @_;
+    $self->set_option(legend => \%params);
+}
+
+sub set_timeline {
+    my ($self, %params) = @_;
+    $self->set_option(timeline => \%params);
+}
+
+sub set_data_zoom {
+    my ($self, %params) = @_;
+    $self->set_option(dataZoom => \%params);
+}
+
+sub add_data_zoom {
+
+    my ($self, %params) = @_;
+
+    $self->{options}->{dataZoom} //= [];
+    push @{$self->{options}}, \%params;
+
 }
 
 sub get_random_id {
@@ -71,6 +114,11 @@ sub get_random_id {
 sub set_event {
     my ($self, $event, $callback) = @_;
     $self->{events}->{$event} = $callback;
+}
+
+sub add_script {
+    my ($self, $script) = @_;
+    push @{$self->{scripts}}, $script;
 }
 
 sub on { shift->set_event(@_) }
@@ -145,10 +193,22 @@ sub render_script {
 
     my ($self, %params) = @_;
 
-    my $chart_id = $self->{id};
-    my $theme    = $self->{theme};
-    my $renderer = $self->{renderer};
-    my $wrap     = $params{wrap} //= 0;
+    my $chart_id      = $self->{id};
+    my $charts_object = $self->{charts_object};
+    my $theme         = $self->{theme};
+    my $renderer      = $self->{renderer};
+    my $locale        = $self->{locale};
+    my $container     = join '', $self->{container_prefix}, $chart_id;
+
+    my $wrap = $params{wrap} //= 0;
+
+    if ($chart_id !~ /^[a-zA-Z0-9_-]*$/) {
+        Carp::croak 'Malformed chart "id" name';
+    }
+
+    if ($charts_object !~ /^[a-zA-Z0-9_-]*$/) {
+        Carp::croak 'Malformed "charts_object" name';
+    }
 
     my $json = JSON::PP->new;
 
@@ -167,27 +227,35 @@ sub render_script {
 
     my @script = ();
 
-    my $locale       = $self->{locale};
-    my $chart        = join '', $self->{chart_prefix},     $chart_id;
-    my $opt          = join '', $self->{option_prefix},    $chart_id;
-    my $container    = join '', $self->{container_prefix}, $chart_id;
     my $init_options = $json->encode({locale => $locale, renderer => $renderer});
 
-    push @script, q{if (!window.ChartECharts) { window.ChartECharts = {}; window.ChartECharts.charts = {} }};
-    push @script, qq{let $chart = echarts.init(document.getElementById('$container'), '$theme', $init_options);};
-    push @script, qq{let $opt = $option;};
-    push @script, qq{$opt && $chart.setOption($opt);};
+    push @script, '(function () {';
+
+    # Add "charts_object"
+    push @script, qq{\tif (!window.$charts_object) { window.$charts_object = {} }};
+    push @script, qq{\tif (!window.$charts_object.charts) { window.$charts_object.charts = {} }};
+
+    push @script, qq{\tlet chart = echarts.init(document.getElementById('$container'), '$theme', $init_options);};
+
+    foreach my $script (@{$self->{scripts}}) {
+        push @script, "\t$script";
+    }
+
+    push @script, qq{\tlet option = $option;};
+    push @script, qq{\toption && chart.setOption(option);};
 
     foreach my $event (keys %{$self->{events}}) {
         my $callback = $self->{events}->{$event};
-        push @script, qq{$chart.on('$event', function (params) { $callback });};
+        push @script, qq{\tchart.on('$event', function (params) { $callback });};
     }
 
-    push @script, qq{window.ChartECharts.charts["$chart"] = $chart};
+    push @script, qq{\twindow.$charts_object.charts["$chart_id"] = chart;};
 
     if ($self->{responsive}) {
-        push @script, qq{window.addEventListener('resize', function () { chart_$chart_id.resize() });};
+        push @script, qq{\twindow.addEventListener('resize', function () { chart.resize() });};
     }
+
+    push @script, '})();';
 
     my $script = join "\n", @script;
 
@@ -338,8 +406,12 @@ Chart::ECharts - Apache ECharts wrapper for Perl
     # Render in HTML
     say $chart->render_html;
 
-    # Render chart in image (require Node.js)
-    $chart->render_image(output => 'charts/bar.png', width => 800, height => 600);
+    # Render chart image (require Node.js)
+    $chart->render_image(
+        output => 'charts/bar.png',
+        width  => 800,
+        height => 600
+    );
 
 =begin html
 
@@ -367,21 +439,19 @@ B<Params>
 
 =over
 
-=item C<chart_prefix>,  Default chart prefix (default C<chart_>)
+=item C<charts_object>, Charts object accessible via C<window> object (default C<ChartEcharts>)
 
 =item C<class>, Chart container CSS class (default C<chart-container>)
 
-=item C<container_prefix>, Default chart container prefix (default C<id_>)
+=item C<container_prefix>, Default chart container prefix (default C<undef>)
 
 =item C<events>, Events (default C<[]>)
 
 =item C<height>, Chart height
 
-=item C<id>, Chart ID
+=item C<id>, Chart ID (default C<chart_ + "random string">)
 
 =item C<locale>, Chart locale (default C<en>)
-
-=item C<option_prefix>, Default options prefix (default C<option_>)
 
 =item C<options>, EChart options (L<https://echarts.apache.org/en/option.html>) (default C<{}>)
 
@@ -395,8 +465,6 @@ B<Params>
 
 =item C<theme>. Chart theme (default C<white>)
 
-=item C<toolbox>, ECharts toolbox (default C<>)
-
 =item C<vertical>, Set the chart in vertical (default C<0>)
 
 =item C<width>, Chart width
@@ -409,14 +477,18 @@ B<Params>
 
 Return L<Chart::ECharts> object.
 
-=item $chart->set_option(%options)
+=item $chart->set_options(%options)
 
 Set Apache EChart options (see Apache ECharts documentations L<https://echarts.apache.org/en/option.html>).
 
-        $chart->set_option(
-            title => {text => 'My Chart'},
-            grid  => {left => 10, bottom => 10, right => 10, containLabel => \1}
-        );
+    $chart->set_options(
+        title => {text => 'My Chart'},
+        grid  => {left => 10, bottom => 10, right => 10, containLabel => \1}
+    );
+
+=item $chart->set_option(%params)
+
+(DEPRECATED) Alias of C<set_options>
 
 =item $chart->set_option_item($name, $params)
 
@@ -428,11 +500,19 @@ Get the random chart ID.
 
 Set a JS event.
 
-    $chart->on('click', 'console.log(params);');
+    $chart->on('click', q{ console.log(params); });
 
 =item $chart->on($event, $callback)
 
 Alias of L<set_event>.
+
+=item $chart->add_script($script)
+
+Add custom JS script. All scripts are rendered via C<render_html> and C<render_script>.
+
+    $chart->add_script(q{
+        console.log('Hello World');
+    });
 
 =item $chart->add_xAxis(%axis)
 
@@ -447,11 +527,13 @@ Add single X axis (see Apache ECharts documentations L<https://echarts.apache.or
 
 Set X axis (see Apache ECharts documentations L<https://echarts.apache.org/en/option.html#xAxis>).
 
-    $chart->set_xAxis(splitLine => {
-        lineStyle=> {
-            type=> 'dashed'
+    $chart->set_xAxis(
+        splitLine => {
+            lineStyle => {
+                type => 'dashed'
+            }
         }
-    });
+    );
 
 =item $chart->add_yAxis(%axis)
 
@@ -465,11 +547,13 @@ Add single Y axis (see Apache ECharts documentations L<https://echarts.apache.or
 
 Set Y axis (see Apache ECharts documentations L<https://echarts.apache.org/en/option.html#yAxis>).
 
-    $chart->set_yAxis(splitLine => {
-        lineStyle=> {
-            type=> 'dashed'
+    $chart->set_yAxis(
+        splitLine => {
+            lineStyle => {
+                type => 'dashed'
+            }
         }
-    });
+    );
 
 =item $chart->add_series(%series)
 
@@ -483,9 +567,46 @@ Add single series (see Apache ECharts documentations L<https://echarts.apache.or
 
 =item $chart->js($expression)
 
-Embed arbritaty JS code.
+Embed arbritaty JS code in chart options.
 
-    $chart->set_option_item( tooltip => { valueformatter => $chart->js( q{(value) => '$' + Math.round(value)} ) });
+    $chart->set_tooltip(
+        valueFormatter => $chart->js( q{(value) => '$' + Math.round(value)} )
+    );
+
+=back
+
+
+=head3 OPTION HELPERS
+
+=over
+
+=item $chart->set_title(%params)
+
+Set the chart title
+
+=item $chart->set_toolbox(%params)
+
+Set the chart toolbox
+
+=item $chart->set_tooltip(%params)
+
+Set the chart tooltip
+
+=item $chart->set_legend(%params)
+
+Set the chart legend
+
+=item $chart->set_timeline(%params)
+
+Set the chart timeline
+
+=item $chart->set_data_zoom(%params)
+
+Set the chart data zoom
+
+=item $chart->add_data_zoom(%params)
+
+Add the chart data zoom
 
 =back
 
@@ -537,7 +658,7 @@ Render the chart in HTML including the output of L<render_script> with a C<div> 
 
 =item $chart->render_image(%params)
 
-Render the chart in file (require Node.js).
+Render the chart image file (require Node.js).
 
 B<Parameters>
 
@@ -634,6 +755,51 @@ C<node_bin> if Node.js is not in C<$ENV{PATH}> and C<output> image file:
         width  => 800,
         height => 600
     );
+
+=head2 Charts object
+
+By default L<Chart::ECharts> expose an object in C<window.ChartECharts> object
+(use C<charts_object> config to rename).
+
+Properties:
+
+=over
+
+=item C<charts>, ARRAY of chart IDs
+
+This property contains an ARRAY of all generated graphs (via C<render_html> and
+C<render_script>). It is useful to allow customization of the graph via JS.
+
+    my $chart = Chart::ECharts(id => 'myChart');
+
+    # ...
+
+    $chart->render_html;
+
+    # in your JS
+
+    if ('myChart' in window.ChartECharts.charts) {
+
+        let myChart = window.ChartECharts.charts.myChart;
+
+        let newLabels = [];
+        let newData   = [];
+
+        // Update chart data
+        myChart.setOption({
+            xAxis: {
+                data: newLabels
+            },
+            series: [
+                {
+                    data: newData
+                }
+            ]
+        });
+
+    }
+
+=back
 
 =head1 SUPPORT
 

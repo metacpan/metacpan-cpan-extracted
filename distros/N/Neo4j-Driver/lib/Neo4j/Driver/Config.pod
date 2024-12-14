@@ -13,7 +13,7 @@ Neo4j::Driver::Config - Driver configuration options
 
 =head1 VERSION
 
-version 0.52
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -99,11 +99,9 @@ the C<http:> or C<https:> protocol scheme.
 This driver allows concurrent transactions on HTTP when the
 C<concurrent_tx> config option is enabled. Trying to enable this
 option on a Bolt connection is a fatal error.
-The driver will currently give warnings when using concurrent
-transactions on HTTP I<without> enabling this option, but these
-warnings will become fatal errors in driver S<version 1.xx>.
 
-Using concurrent transactions will make your code less portable.
+Using concurrent transactions in new code is discouraged,
+because it will make your code less portable.
 This feature exists primarily to support legacy applications.
 
 =head2 cypher_params
@@ -143,8 +141,8 @@ This option is only useful for Bolt connections. For HTTP
 connections, the use of TLS encryption is governed by the chosen
 URI scheme (C<http> / C<https>).
 
-Before version 0.27, this option was named C<tls>. Use of the
-former name is now discouraged.
+Before version 0.27, this option was named C<tls>. That name has since
+been deprecated, matching a corresponding change in S<Neo4j 3.2>.
 
 =head2 max_transaction_retry_time
 
@@ -160,9 +158,6 @@ will retry before failing. The default value is S<30 seconds>.
 Specifies the connection timeout. The semantics of this config
 option vary by network library. Its default value is therefore
 not defined here and is subject to change.
-
-For details, see L<LWP::UserAgent/"timeout"> when using HTTP or
-L<select(2)> when using Bolt.
 
 =head2 trust_ca
 
@@ -181,8 +176,8 @@ the certificates in this file (or by an intermediary).
 Self-signed certificates (such as those automatically provided by
 some Neo4j versions) should also work if their S<"CA bit"> is set.
 
-Before version 0.27, this option was named C<tls_ca>. Use of the
-former name is now discouraged.
+Before version 0.27, this option was named C<tls_ca>. That name has
+since been deprecated, as it didn't match Neo4j terminology.
 
 =head2 uri
 
@@ -192,7 +187,7 @@ Specifies the Neo4j server connection URI. The URI scheme determines
 the type of driver created. Supported schemes are C<bolt>, C<http>,
 C<https>, and C<neo4j>.
 Use of C<bolt> URIs requires L<Neo4j::Bolt> to be installed; use
-of C<https> URIs requires L<LWP::Protocol::https> to be installed.
+of C<https> URIs requires L<IO::Socket::SSL> to be installed.
 
 All URIs using the C<neo4j> scheme are interpreted either as C<bolt>
 or as C<http>/C<https> URIs. The conditions that influence this
@@ -222,8 +217,7 @@ if no port is specified, the protocol's default port will be used.
 Note that there sometimes are issues with IPv4/IPv6 dual-stack
 hostnames such as C<localhost> when using HTTP. The connection may
 appear to "hang". Literal IP addresses like C<127.0.0.1> are not
-affected. See L<Neo4j::Driver::Net/"IPv6 / dual-stack support">
-for further discussion.
+affected.
 
 =head1 SEE ALSO
 

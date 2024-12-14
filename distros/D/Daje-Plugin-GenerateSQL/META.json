@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Daje::Tools::Filechanged" : "0",
             "Mojo::Base" : "0",
             "Mojo::File" : "0",
             "Syntax::Keyword::Match" : "0",
@@ -64,7 +65,7 @@
       },
       "Daje::Plugin::GenerateSQL" : {
          "file" : "lib/Daje/Plugin/GenerateSQL.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Daje::Plugin::Input::ConfigManager" : {
          "file" : "lib/Daje/Plugin/Input/ConfigManager.pm",
@@ -110,7 +111,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Plugin-GenerateSQL"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

@@ -7,7 +7,7 @@
 ```.pl
 use Chart::ECharts;
 
-my $chart = Chart::ECharts->new();
+my $chart = Chart::ECharts->new( responsive => 1 );
 
 $chart->add_xAxis(
     type => 'category',
@@ -25,8 +25,12 @@ $chart->add_series(
 # Render in HTML
 $chart->render_html;
 
-# Render chart in image (require Node.js)
-$chart->render_image(output => '/my-path/cool-chart.png', width => 800, height => 600);
+# Render chart image (require Node.js)
+$chart->render_image(
+    output => '/my-path/cool-chart.png',
+    width  => 800,
+    height => 600
+);
 ```
 ### Rendered HTML
 

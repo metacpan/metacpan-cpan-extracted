@@ -14,13 +14,18 @@ use warnings;
 use Carp;
 use Fcntl qw(SEEK_SET);
 use URI::Escape qw(uri_unescape);
+use Encode ();
 
-use Data::Identifier;
+use Data::Identifier v0.06;
+use File::ValueFile;
 
-use constant KEYWORD_OK => qr/^[a-zA-Z0-9\-:\._~]*$/;
-use constant FORMAT_ISE => '54bf8af4-b1d7-44da-af48-5278d11e8f32';
+use constant RE_ISE         => qr/^(?:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}|[0-2](?:\.(?:0|[1-9][0-9]*))+|[a-zA-Z][a-zA-Z0-9\+\.\-]+:.*)$/;
+use constant KEYWORD_OK     => qr/^[a-zA-Z0-9\-:\._~]*$/;
+use constant FORMAT_ISE     => '54bf8af4-b1d7-44da-af48-5278d11e8f32';
+use constant ASI_ISE        => 'ddd60c5c-2934-404f-8f2d-fcb4da88b633';
+use constant TAGNAME_ISE    => 'bfae7574-3dae-425d-89b1-9c087c140c23';
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 
 
@@ -47,6 +52,13 @@ sub new {
                 $entry = Data::Identifier->new(ise => $entry) unless ref $entry;
             }
         }
+    }
+
+    $self->{utf8} = $opts{utf8} //= 'auto';
+    if ($opts{utf8} && $opts{utf8} ne 'auto') {
+        $self->{unescape} = \&_unescape_utf8;
+    } else {
+        $self->{unescape} = \&uri_unescape;
     }
 
     return $self;
@@ -93,6 +105,8 @@ sub _handle_special {
             $self->_check_supported(supported_formats => $self->{format} = Data::Identifier->new(ise => $args[1]));
         }
 
+        $self->_check_utf8($marker => $self->{format}) if $self->{utf8} eq 'auto';
+
         return;
     } elsif ($marker eq 'Feature') {
         my $id;
@@ -102,16 +116,27 @@ sub _handle_special {
         push(@{$self->{features} //= []}, $id = Data::Identifier->new(ise => $args[0]));
 
         $self->_check_supported(supported_features => $id) if $type eq '!';
+        $self->_check_utf8($marker => $id) if $self->{utf8} eq 'auto';
 
         return;
     }
+
     croak 'Invalid marker: '.$marker;
+}
+
+sub _check_utf8 {
+    my ($self, $marker, $id) = @_;
+    if (File::ValueFile->_is_utf8($id)) {
+        $self->{unescape} = \&_unescape_utf8;
+        $self->{utf8} = 1;
+    }
 }
 
 
 sub read_to_cb {
     my ($self, $cb) = @_;
     my $fh = $self->{fh};
+    my $unescape = $self->{unescape};
 
     $fh->seek(0, SEEK_SET);
     $fh->input_line_number(0);
@@ -133,14 +158,18 @@ sub read_to_cb {
             my $type = $1;
             $self->_handle_special($type, map{
                     $_ =~ KEYWORD_OK ? $_ :
-                    $_ =~ /^\!/ ? _special($_) : uri_unescape($_)
+                    $_ =~ /^\!/ ? _special($_) : $unescape->($_)
                 }(split(/\s+/, $line)));
+
+            # Reload:
+            $unescape = $self->{unescape};
+
             next;
         }
 
         $self->$cb(map{
                 $_ =~ KEYWORD_OK ? $_ :
-                $_ =~ /^\!/ ? _special($_) : uri_unescape($_)
+                $_ =~ /^\!/ ? _special($_) : $unescape->($_)
             }(split(/\s+/, $line)));
     }
 }
@@ -213,6 +242,67 @@ sub read_as_simple_tree {
 }
 
 
+sub read_as_taglist {
+    state $tagpool_source_format = Data::Identifier->new(uuid => 'e5da6a39-46d5-48a9-b174-5c26008e208e', displayname => 'tagpool-source-format');
+    state $tagpool_taglist_format_v1 = Data::Identifier->new(uuid => 'afdb46f2-e13f-4419-80d7-c4b956ed85fa', displayname => 'tagpool-taglist-format-v1');
+    state $tagpool_httpd_htdirectories_format = Data::Identifier->new(uuid => '25990339-3913-4b5a-8bcf-5042ef6d8b5e', displayname => 'tagpool-httpd-htdirectories-format');
+    my ($self) = @_;
+    my %list;
+    my $format;
+
+    $self->read_to_cb(sub {
+            my (undef, @line) = @_;
+            my $tag;
+
+            $format //= $self->format(default => undef);
+
+            if ((Data::Identifier::eq($format, $tagpool_source_format) || Data::Identifier::eq($format, $tagpool_taglist_format_v1)) && scalar(@line) >= 2 && defined($line[0]) && defined($line[1])) {
+                if ($line[0] eq 'tag' && scalar(@line) == 3) {
+                    $tag = Data::Identifier->new(ise => $line[1], displayname => $line[2]);
+                } elsif ($line[0] eq 'tag-metadata' && scalar(@line) == 7 && defined($line[2]) && !defined($line[3]) && defined($line[4]) && !defined($line[5]) && defined($line[6]) && $line[2] eq ASI_ISE && $line[4] eq TAGNAME_ISE) {
+                    $tag = Data::Identifier->new(ise => $line[1], displayname => $line[6]);
+                } elsif ($line[0] =~ /^tag(?:-.+)?$/ || $line[0] eq 'rule' || $line[0] eq 'filter' || $line[0] eq 'subject') {
+                    $tag = Data::Identifier->new(ise => $line[1]);
+                }
+            } elsif (Data::Identifier::eq($format, $tagpool_httpd_htdirectories_format) && scalar(@line) == 3 && defined($line[0]) && defined($line[1]) && defined($line[2]) && $line[0] eq 'directory') {
+                $tag = Data::Identifier->new(ise => $line[1]);
+            } elsif (!defined($format)) {
+                if (scalar(@line) > 1 && defined($line[0]) && defined($line[1]) && $line[0] =~ /^tag-(?:ise|metadata|relation)$/) {
+                    if ($line[0] eq 'tag-metadata' && scalar(@line) == 7 && defined($line[2]) && !defined($line[3]) && defined($line[4]) && !defined($line[5]) && defined($line[6]) && $line[2] eq ASI_ISE && $line[4] eq TAGNAME_ISE) {
+                        $tag = Data::Identifier->new(ise => $line[1], displayname => $line[6]);
+                    } else {
+                        $tag = Data::Identifier->new(ise => $line[1]);
+                    }
+                } elsif ($line[0] eq 'tag' && scalar(@line) == 3) {
+                    $tag = Data::Identifier->new(ise => $line[1], displayname => $line[2]);
+                }
+
+                unless (defined $tag) {
+                    foreach my $entry (@line) {
+                        if (defined($entry) && $entry =~ RE_ISE) {
+                            my $tag = Data::Identifier->new(ise => $entry);
+                            $list{$tag->ise} //= $tag;
+                        }
+                    }
+                }
+            }
+
+            if (defined $tag) {
+                my $ise = $tag->ise;
+                my $old = $list{$ise};
+
+                if (defined $old) {
+                    $tag = $old if defined $old->displayname(default => undef, no_defaults => 1);
+                }
+
+                $list{$tag->ise} = $tag;
+            }
+        });
+
+    return [values %list];
+}
+
+
 #@returns Data::Identifier
 sub format {
     my ($self, %opts) = @_;
@@ -229,6 +319,15 @@ sub features {
     croak 'No value for features';
 }
 
+
+# ---- Private helpers ----
+
+sub _unescape_utf8 {
+    my ($text) = @_;
+    state $utf8 = Encode::find_encoding('UTF-8');
+    return $utf8->decode(uri_unescape($text));
+}
+
 1;
 
 __END__
@@ -243,7 +342,7 @@ File::ValueFile::Simple::Reader - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -275,6 +374,13 @@ Formats can be given by ISE or as L<Data::Identifier>.
 
 The list of supported features. This can be a single format, a arrayref of formats, or C<'all'>.
 Formats can be given by ISE or as L<Data::Identifier>.
+
+=item C<utf8>
+
+The UTF-8 flag for the decoded data. If set to true, values are decoded as UTF-8.
+If set to (non-C<undef>) false values are decoded as 8-bit strings (binary).
+If set to C<auto> the UTF-8 flag is automatically detected using the format and features.
+This is the default.
 
 =back
 
@@ -318,6 +424,20 @@ or a scalar holding the actual value.
 For every branch values must be on the same level. Values and subkeys on the same level are not permitted.
 
 If there is any error, this method dies.
+
+=head2 read_as_taglist
+
+    my $list = $reader->read_as_taglist;
+
+Reads the file as a tag list. Returns the list of found tags as an arrayref of L<Data::Identifier> elements.
+
+This method supports a number of standard formats.
+If the format is not known the code falls back to a generic handler.
+
+If there is any error, this method dies.
+
+See also:
+L<File::ValueFile::Simple::Writer/write_taglist>.
 
 =head2 format
 

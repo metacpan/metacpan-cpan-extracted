@@ -1,1 +1,0 @@
-{"results":[{"columns":["\"no stats 1\""],"data":[{"row":["no stats 1"],"meta":[null],"rest":["no stats 1"]}]}],"errors":[],"commit":"http://localhost:7474/db/neo4j/tx/1726/commit","transaction":{"expires":"Tue, 01 Jan 2999 00:00:00 +0000"}}

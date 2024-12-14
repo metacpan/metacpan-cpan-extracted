@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.77';
+$Map::Tube::CLI::VERSION   = '0.78';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.77
+Version 0.78
 
 =cut
 
@@ -61,6 +61,7 @@ You can list all command line options by giving C<-h> flag.
         --list_lines      List lines
         --force           Force unsupported map (map name becomes case
                           sensitive)
+        --debug           Run in debug mode
 
         --usage           show a short help message
         -h                show a compact help message
@@ -322,7 +323,15 @@ sub run {
         print join(",\n", sort @{$map_obj->get_lines}), "\n";
     }
     else {
-        print $map_obj->get_shortest_route($start, $end), "\n";
+        eval { print $map_obj->get_shortest_route($start, $end), "\n"; };
+        if ($@ || $self->debug) {
+            print "\n--------------------\n";
+            foreach my $id (sort keys %{$map_obj->{tables}}) {
+                print "$map_obj->{tables}->{$id}\n";
+            }
+            print "--------------------\n";
+            print "$@\n";
+        }
     }
 }
 

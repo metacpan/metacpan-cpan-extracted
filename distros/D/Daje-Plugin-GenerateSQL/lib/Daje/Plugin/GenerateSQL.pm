@@ -33,7 +33,7 @@ use Daje::Plugin::SQL::Manager;
 use Daje::Plugin::Output::Table;
 use Config::Tiny;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 has 'config_path';
 has 'config_manager';

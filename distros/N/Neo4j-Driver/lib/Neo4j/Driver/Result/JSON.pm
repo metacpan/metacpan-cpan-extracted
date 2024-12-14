@@ -1,24 +1,27 @@
-use 5.010;
-use strict;
+use v5.14;
 use warnings;
-use utf8;
 
-package Neo4j::Driver::Result::JSON;
+package Neo4j::Driver::Result::JSON 1.02;
 # ABSTRACT: JSON/REST result handler
-$Neo4j::Driver::Result::JSON::VERSION = '0.52';
+
 
 # This package is not part of the public Neo4j::Driver API.
 
 
 use parent 'Neo4j::Driver::Result';
 
-use Carp qw(carp croak);
+use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP);
+use Feature::Compat::Try;
 use JSON::MaybeXS 1.002004 ();
-use Try::Tiny;
 
-use URI 1.31;
-
+use Neo4j::Driver::Type::Bytes;
+use Neo4j::Driver::Type::DateTime;
+use Neo4j::Driver::Type::Duration;
+use Neo4j::Driver::Type::Path;
+use Neo4j::Driver::Type::Point;
+use Neo4j::Driver::Type::V1::Node;
+use Neo4j::Driver::Type::V1::Relationship;
 use Neo4j::Error;
 
 
@@ -38,14 +41,14 @@ sub new {
 	my @results = ();
 	@results = @{ $json->{results} } if ref $json->{results} eq 'ARRAY';
 	@results = map { $class->_new_result($_, $json, $params) } @results;
-	$results[$_]->{statement} = $params->{statements}->[$_] for (0 .. $#results);
+	$results[$_]->{query} = $params->{queries}->[$_] for (0 .. $#results);
 	
 	if (@results == 1) {
 		$results[0]->{json} = $json;  # for _info()
 		return $results[0];
 	}
 	
-	# If the number of Cypher statements run wasn't exactly one, provide
+	# If the number of Cypher queries run wasn't exactly one, provide
 	# a dummy result containing the raw JSON so that callers can do their
 	# own parsing. Also, provide a list of all results so that callers
 	# get a uniform interface for all of them.
@@ -68,9 +71,8 @@ sub _new_result {
 		exhausted => 0,  # 1: all records read by the client; fetch() will fail
 		result => $result,
 		buffer => [],
-		columns => undef,
+		field_names_cache => undef,
 		summary => undef,
-		cypher_types => $params->{cypher_types},
 		notifications => $json->{notifications},
 		server_info => $params->{server_info},
 	};
@@ -89,12 +91,12 @@ sub _parse_json {
 	try {
 		$json = $params->{http_agent}->json_coder->decode($response);
 	}
-	catch {
+	catch ($e) {
 		$error = $error->append_new( Internal => {
-			as_string => "$_",
+			as_string => "$e",
 			raw => $response,
 		});
-	};
+	}
 	if (ref $json->{errors} eq 'ARRAY') {
 		$error = $error->append_new( Server => $_ ) for @{$json->{errors}};
 	}
@@ -143,35 +145,34 @@ sub _info {
 sub _init_record {
 	my ($self, $record) = @_;
 	
-	$record->{column_keys} = $self->{columns};
+	$record->{field_names_cache} = $self->{field_names_cache};
 	$self->_deep_bless( $record->{row}, $record->{meta}, $record->{rest} );
+	delete $record->{meta};
+	delete $record->{rest};
 	return bless $record, 'Neo4j::Driver::Record';
 }
 
 
 sub _deep_bless {
 	my ($self, $data, $meta, $rest) = @_;
-	my $cypher_types = $self->{cypher_types};
 	
 	# "meta" is broken, so we primarily use "rest", see neo4j #12306
 	
 	if (ref $data eq 'HASH' && ref $rest eq 'HASH' && ref $rest->{metadata} eq 'HASH' && $rest->{self} && $rest->{self} =~ m|/db/[^/]+/node/|) {  # node
-		my $node = bless \$data, $cypher_types->{node};
-		$data->{_meta} = $rest->{metadata};
-		$data->{_meta}->{deleted} = $meta->{deleted} if ref $meta eq 'HASH';
-		$cypher_types->{init}->($node) if $cypher_types->{init};
-		return $node;
+		return bless [
+			$rest->{metadata}->{id},
+			$rest->{metadata}->{labels} // [],
+			$data,
+		], 'Neo4j::Driver::Type::V1::Node';
 	}
 	if (ref $data eq 'HASH' && ref $rest eq 'HASH' && ref $rest->{metadata} eq 'HASH' && $rest->{self} && $rest->{self} =~ m|/db/[^/]+/relationship/|) {  # relationship
-		my $rel = bless \$data, $cypher_types->{relationship};
-		$data->{_meta} = $rest->{metadata};
-		$rest->{start} =~ m|/([0-9]+)$|;
-		$data->{_meta}->{start} = 0 + $1;
-		$rest->{end} =~ m|/([0-9]+)$|;
-		$data->{_meta}->{end} = 0 + $1;
-		$data->{_meta}->{deleted} = $meta->{deleted} if ref $meta eq 'HASH';
-		$cypher_types->{init}->($rel) if $cypher_types->{init};
-		return $rel;
+		return bless [
+			$rest->{metadata}->{id},
+			do { $rest->{start} =~ m/(\d+)$/a; 0 + $1 },
+			$rest->{metadata}->{type},
+			do { $rest->{end} =~ m/(\d+)$/a; 0 + $1 },
+			$data,
+		], 'Neo4j::Driver::Type::V1::Relationship';
 	}
 	
 	if (ref $data eq 'ARRAY' && ref $rest eq 'HASH') {  # path
@@ -179,44 +180,34 @@ sub _deep_bless {
 		my $path = [];
 		for my $n ( 0 .. $#{ $rest->{nodes} } ) {
 			my $i = $n * 2;
-			my $uri = $rest->{nodes}->[$n];
-			$uri =~ m|/([0-9]+)$|;
-			$data->[$i]->{_meta} = { id => 0 + $1 };
-			$data->[$i]->{_meta}->{deleted} = $meta->[$i]->{deleted} if ref $meta eq 'ARRAY';
-			$path->[$i] = bless \( $data->[$i] ), $cypher_types->{node};
+			$path->[$i] = bless [
+				do { $rest->{nodes}->[$n] =~ m/(\d+)$/a; 0 + $1 },
+				[],  # see neo4j#12613
+				$data->[$i],
+			], 'Neo4j::Driver::Type::V1::Node';
 		}
 		for my $r ( 0 .. $#{ $rest->{relationships} } ) {
 			my $i = $r * 2 + 1;
-			my $uri = $rest->{relationships}->[$r];
-			$uri =~ m|/([0-9]+)$|;
-			$data->[$i]->{_meta} = { id => 0 + $1 };
-			my $rev = $rest->{directions}->[$r] eq '<-' ? -1 : 1;
-			$data->[$i]->{_meta}->{start} = $data->[$i - 1 * $rev]->{_meta}->{id};
-			$data->[$i]->{_meta}->{end} =   $data->[$i + 1 * $rev]->{_meta}->{id};
-			$data->[$i]->{_meta}->{deleted} = $meta->[$i]->{deleted} if ref $meta eq 'ARRAY';
-			$path->[$i] = bless \( $data->[$i] ), $cypher_types->{relationship};
+			my $dir = $rest->{directions}->[$r] eq '->' ? 1 : -1;
+			$path->[$i] = bless [
+				do { $rest->{relationships}->[$r] =~ m/(\d+)$/a; 0 + $1 },
+				$path->[$i - 1 * $dir]->[0],
+				undef,  # see neo4j#12613
+				$path->[$i + 1 * $dir]->[0],
+				$data->[$i],
+			], 'Neo4j::Driver::Type::V1::Relationship';
 		}
-		$path = bless { path => $path }, $cypher_types->{path};
-		$cypher_types->{init}->($_) for $cypher_types->{init} ? ( @$path, $path ) : ();
-		return $path;
+		return bless { '..' => $path }, 'Neo4j::Driver::Type::Path';
 	}
 	
 	if (ref $data eq 'HASH' && ref $rest eq 'HASH' && ref $rest->{crs} eq 'HASH') {  # spatial
-		bless $rest, $cypher_types->{point};
-		$cypher_types->{init}->($data) if $cypher_types->{init};
-		return $rest;
+		$rest->{srid} = $rest->{crs}->{srid};
+		return bless $rest, 'Neo4j::Driver::Type::Point';
 	}
 	if (ref $data eq '' && ref $rest eq '' && ref $meta eq 'HASH' && $meta->{type} && $meta->{type} =~ m/date|time|duration/) {  # temporal (depends on meta => doesn't always work)
-		my $type = $cypher_types->{temporal};
-		if ($type eq 'Neo4j::Driver::Type::Temporal') {
-			$type = 'Neo4j::Driver::Type::DateTime';
-			$type = 'Neo4j::Driver::Type::Duration' if $data =~ m/^-?P/;
-			require Neo4j::Driver::Type::DateTime;
-			require Neo4j::Driver::Type::Duration;
-		}
-		$data = bless { data => $data, type => $meta->{type} }, $type;
-		$cypher_types->{init}->($data) if $cypher_types->{init};
-		return $data;
+		return bless { T => $data }, $meta->{type} eq 'duration'
+			? 'Neo4j::Driver::Type::Duration'
+			: 'Neo4j::Driver::Type::DateTime';
 	}
 	
 	if (ref $data eq 'ARRAY' && ref $rest eq 'ARRAY') {  # array

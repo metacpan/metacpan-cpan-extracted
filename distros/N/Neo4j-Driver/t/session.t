@@ -42,7 +42,7 @@ subtest 'database selection (HTTP)' => sub {
 	my ($version, $db);
 	# no database option (or undefined)
 	lives_ok { $s = 0; $s = $driver->session( database => undef ); } 'default lives';
-	($version) = $s->server->version =~ m(Neo4j/([0-9]+)\.)i;
+	($version) = $s->server->agent =~ m(Neo4j/([0-9]+)\.)i;
 	ok defined $version, 'version number';
 	if ($version >= 4) {
 		# this test assumes that the default database is always named neo4j
@@ -91,7 +91,7 @@ subtest 'error handling' => sub {
 	plan skip_all => "(subtest not supported with Neo4j::Bolt)" if $Neo4j_Test::bolt;
 	throws_ok {
 		Neo4j_Test->driver_no_connect->session->run('');
-	} qr/\b(?:Connection refused|Can't connect|Unknown host|Address family not supported)\b/i, 'no connection';
+	} qr/\b(?:Connection refused|Could not connect|Can't connect|Unknown host|Address family not supported)\b/i, 'no connection';
 	return unless $Neo4j_Test::sim || $ENV{TEST_NEO4J_PASSWORD};  # next test requires a real or simulated server with auth enabled
 	throws_ok {
 		Neo4j_Test->driver_no_auth->session->run('');

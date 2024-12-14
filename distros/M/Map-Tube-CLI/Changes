@@ -1,5 +1,8 @@
 Revision history for Map::Tube::CLI
 
+0.78  Fri Dec 13 12:10:00 2024
+      - Added switch --debug to dump internal table.
+
 0.77  Thu Dec 12 16:10:00 2024
       - Handle unidirection route for switch --line_mappings.
 

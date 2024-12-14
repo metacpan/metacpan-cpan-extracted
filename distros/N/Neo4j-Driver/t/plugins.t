@@ -223,7 +223,7 @@ subtest 'register via driver' => sub {
 	plan skip_all => '(driver constructor failed)' unless eval { $d = Neo4j::Driver->new };
 	plan tests => 5;
 	lives_ok { $d->plugin( Neo4j_Test::Plugin::RegisterFoo->new ) } 'plugin with instance';
-	is $d->{plugins}->{_foo}, 'foo', 'package set _foo';
+	is $d->{events}->{_foo}, 'foo', 'package set _foo';
 	throws_ok { $d->plugin( Neo4j_Test::Plugin::RegisterFoo->new, 1 ) }
 		qr/\bplugin\b.*\bmore than one argument\b.*\bunsupported\b/i, 'extra';
 	lives_ok { $d->plugin( Neo4j_Test::MockHTTP->new )->session } 'get MockHTTP session';

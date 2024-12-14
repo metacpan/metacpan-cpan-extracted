@@ -1,11 +1,9 @@
-use 5.010;
-use strict;
+use v5.12;
 use warnings;
-use utf8;
 
-package Neo4j::Driver::Events;
+package Neo4j::Driver::Events 1.02;
 # ABSTRACT: Event manager for Neo4j::Driver plug-ins
-$Neo4j::Driver::Events::VERSION = '0.52';
+
 
 # This package is not part of the public Neo4j::Driver API.
 # (except as far as documented in Plugin.pm)
@@ -49,17 +47,9 @@ sub _init_default_handlers {
 		my @errors;
 		do { push @errors, $error } while $error = $error->related;
 		@errors = map { $_->as_string } @errors;
-		croak join "\n", @errors if $self->{die_on_error};
-		Carp::carp join "\n", @errors;
+		croak join "\n", @errors;
 	};
 	weaken $self;
-}
-
-
-sub add_event_handler {
-	# uncoverable pod (see Deprecations.pod)
-	warnings::warnif deprecated => __PACKAGE__ . "->add_event_handler() is deprecated";
-	shift->add_handler(@_);
 }
 
 
@@ -72,13 +62,6 @@ sub add_handler {
 	croak "Event name must be defined" unless defined $event;
 	
 	push @{$self->{handlers}->{$event}}, $handler;
-}
-
-
-sub trigger_event {
-	# uncoverable pod (see Deprecations.pod)
-	warnings::warnif deprecated => __PACKAGE__ . "->trigger_event() is deprecated";
-	shift->trigger(@_);
 }
 
 
@@ -106,12 +89,10 @@ sub trigger {
 sub _register_plugin {
 	my ($self, $plugin) = @_;
 	
-	croak "Can't locate object method new() via package $plugin (perhaps you forgot to load \"$plugin\"?)" unless $plugin->can('new');
-	croak "Package $plugin is not a Neo4j::Driver::Plugin" unless $plugin->DOES('Neo4j::Driver::Plugin');
-	croak "Method register() not implemented by package $plugin (is this a Neo4j::Driver plug-in?)" unless $plugin->can('register');
-	warnings::warnif deprecated => "Neo4j::Driver->plugin() with module name is deprecated" if ref $plugin eq '';
+	croak sprintf "Package %s is not a Neo4j::Driver::Plugin", $plugin unless $plugin->DOES('Neo4j::Driver::Plugin');
+	croak sprintf "Method register() not implemented by package %s (is this a Neo4j::Driver plug-in?)", $plugin unless $plugin->can('register');
+	croak "Neo4j::Driver->plugin() requires a plug-in object" unless ref $plugin ne '';
 	
-	$plugin = $plugin->new if ref $plugin eq '';
 	$plugin->register($self);
 }
 

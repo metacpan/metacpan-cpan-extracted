@@ -51,12 +51,10 @@ $cf->LoadByName(
 if ( $cf->Id ) {
     $ARGSRef->{"CustomField-".$cf->Id} = $ProblemValue;
 
-    # For RT 5, ignore submitted "Problem Type" value on problem change.
-    if ( $ARGSRef->{QueueChanged} ) {
-        my $id = $cf->Id;
-        for my $field ( keys %$ARGSRef ) {
-            delete $ARGSRef->{$field} if $field =~ /^Object-RT::Ticket--CustomField(?::.+)?-$id-/;
-        }
+    my $id = $cf->Id;
+    if ( $ARGSRef->{SubmitTicket} && RT::Handle::cmp_version($RT::VERSION, '5.0.0') >= 0 ) {
+        $ARGSRef->{"Object-RT::Ticket--CustomField-$id->Id-Values-Magic"} = 1;
+        $ARGSRef->{"Object-RT::Ticket--CustomField-$id->Id-Values"} = $ProblemValue;
     }
 
     # For RT 5, update Subject only on problem change, to avoid overriding user input value on "Create"

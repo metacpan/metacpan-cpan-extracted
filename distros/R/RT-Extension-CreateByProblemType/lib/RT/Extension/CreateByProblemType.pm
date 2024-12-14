@@ -1,6 +1,6 @@
 package RT::Extension::CreateByProblemType;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use warnings;
 use strict;
@@ -83,7 +83,7 @@ or via the web at
 
 =head1 COPYRIGHT
 
-This extension is Copyright (C) 2008-2022 Best Practical Solutions, LLC.
+This extension is Copyright (C) 2008-2024 Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

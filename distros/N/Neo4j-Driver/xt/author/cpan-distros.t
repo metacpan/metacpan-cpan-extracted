@@ -25,7 +25,7 @@ use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 use Neo4j_Test;
 
 my $driver = $ENV{NO_NETWORK_TESTING} ? 0 : Neo4j_Test->driver();
-my $neo4j_ver = $driver && $driver->session->server->version;
+my $neo4j_ver = $driver && $driver->session->server->agent;
 plan skip_all => "no connection to Neo4j server" unless $driver && ! $Neo4j_Test::sim;
 plan skip_all => "Neo4j server version too old" if $neo4j_ver =~ m{^Neo4j/[12]\.};
 

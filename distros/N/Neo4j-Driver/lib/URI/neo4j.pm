@@ -1,9 +1,8 @@
-use 5.010;
-use strict;
+use v5.12;
 use warnings;
 
-package URI::neo4j;
-$URI::neo4j::VERSION = '0.52';
+package URI::neo4j 1.02;
+
 
 use parent 'URI::_server';
 

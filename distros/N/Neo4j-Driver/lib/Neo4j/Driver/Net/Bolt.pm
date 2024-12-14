@@ -1,39 +1,25 @@
-use 5.010;
-use strict;
+use v5.14;
 use warnings;
-use utf8;
 
-package Neo4j::Driver::Net::Bolt;
+package Neo4j::Driver::Net::Bolt 1.02;
 # ABSTRACT: Network controller for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.52';
+
 
 # This package is not part of the public Neo4j::Driver API.
 
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction Neo4j::Driver::Transaction::Bolt);
-
-use Try::Tiny;
-use URI 1.25;
+use Feature::Compat::Try;
 
 use Neo4j::Driver::Result::Bolt;
 use Neo4j::Driver::ServerInfo;
 use Neo4j::Error;
 
 
-# Neo4j::Bolt < 0.10 didn't report human-readable error messages
-# (perlbolt#24), so we re-create the most common ones here
-my %BOLT_ERROR = (
-	 61 => "Connection refused",
-	-13 => "Unknown host",
-	-14 => "Could not agree on a protocol version",
-	-15 => "Username or password is invalid",
-	-22 => "Statement evaluation failed",
-);
-
 my $RESULT_MODULE = 'Neo4j::Driver::Result::Bolt';
 
-our $verify_lib_version = 1;
+our $verify_version = 1;
 
 
 sub new {
@@ -49,13 +35,8 @@ sub new {
 		$uri->userinfo( $auth->{principal} . ':' . $auth->{credentials} );
 	}
 	
-	my $net_module = $driver->config('net_module') || 'Neo4j::Bolt';
-	if ($net_module eq 'Neo4j::Bolt') {
-		croak "Protocol scheme 'bolt' is not supported (Neo4j::Bolt not installed)\n"
-			. "Neo4j::Driver will support 'bolt' URLs if the Neo4j::Bolt module is installed.\n"
-			unless eval { require Neo4j::Bolt; 1 };
-		_verify_lib_version() if $verify_lib_version;
-	}
+	my $net_module = $driver->{config}->{net_module} || 'Neo4j::Bolt';
+	_verify_version() if $verify_version && $net_module eq 'Neo4j::Bolt';
 	
 	my $cxn;
 	if ($driver->config('encrypted')) {
@@ -67,7 +48,7 @@ sub new {
 	else {
 		$cxn = $net_module->connect( "$uri", $driver->config('timeout') );
 	}
-	$class->_trigger_bolt_error( $cxn, $driver->{plugins} ) unless $cxn->connected;
+	$class->_trigger_bolt_error( $cxn, $driver->{events} ) unless $cxn->connected;
 	
 	return bless {
 		net_module => $net_module,
@@ -75,7 +56,6 @@ sub new {
 		uri => $uri,
 		result_module => $net_module->can('result_handlers') ? ($net_module->result_handlers)[0] : $RESULT_MODULE,
 		server_info => $driver->{server_info},
-		cypher_types => $driver->config('cypher_types'),
 		active_tx => 0,
 	}, $class;
 }
@@ -91,20 +71,23 @@ sub new {
 #  0.4203  0.46  4.4
 #  0.20    0.17  3.4
 #  0.12     -    3.4  (system libneo4j-client)
-sub _verify_lib_version {
-	no warnings 'uninitialized';
-	
+sub _verify_version {
 	# Running this check once (for the first session) is enough.
-	$verify_lib_version = 0;
+	$verify_version = 0;
 	
-	my $bolt_version = eval { Neo4j::Bolt->VERSION };
-	return unless $bolt_version eq '0.4203';
-	my $client_version = eval { require Neo4j::Client; Neo4j::Client->VERSION };
-	return unless $client_version =~ m/^0\.5[012]$/;
-	
-	warnings::warnif misc => sprintf
-		"Installed Neo4j::Client version %s is defective (downgrade to Neo4j::Client %s and reinstall Neo4j::Bolt %s, or use HTTP)",
-		$client_version, "0.46", $bolt_version;
+	try {
+		require Neo4j::Bolt;
+		my $bolt_version = Neo4j::Bolt->VERSION('0.4201');
+		
+		return if $bolt_version ge '0.5000';
+		my $client_version = eval { Neo4j::Client->VERSION } // '';
+		$client_version =~ m/^0\.5[012]$/ and die
+			sprintf "Installed Neo4j::Client version %s is defective (known-good versions are 0.46 and 0.54 or later; you may also need to reinstall Neo4j::Bolt)\n", $client_version;
+	}
+	catch ($e) {
+		$e =~ s/\.?\s*$//;
+		croak sprintf "Protocol scheme 'bolt' is not supported (Neo4j::Bolt not installed).\nNeo4j::Driver will support 'bolt' URLs if the Neo4j::Bolt module is installed.\n%s", $e;
+	}
 }
 
 
@@ -120,35 +103,36 @@ sub _trigger_bolt_error {
 	$error = $error->append_new( Server => {
 		code => scalar $ref->server_errcode,
 		message => scalar $ref->server_errmsg,
-		raw => scalar try { $ref->get_failure_details },  # Neo4j::Bolt >= 0.41
-	}) if try { $ref->server_errcode || $ref->server_errmsg };
+		raw => scalar $ref->get_failure_details,
+	}) if eval { $ref->server_errcode || $ref->server_errmsg };
 	
 	$error = $error->append_new( Network => {
 		code => scalar $ref->client_errnum,
-		message => scalar $ref->client_errmsg // $BOLT_ERROR{$ref->client_errnum},
+		message => scalar $ref->client_errmsg,
 		as_string => $self->_bolt_error($ref),
-	}) if try { $ref->client_errnum || $ref->client_errmsg };
+	}) if eval { $ref->client_errnum || $ref->client_errmsg };
 	
 	$error = $error->append_new( Network => {
 		code => scalar $ref->errnum,
-		message => scalar $ref->errmsg // $BOLT_ERROR{$ref->errnum},
+		message => scalar $ref->errmsg,
 		as_string => $self->_bolt_error($ref),
-	}) if try { $ref->errnum || $ref->errmsg };
+	}) if eval { $ref->errnum || $ref->errmsg };
 	
 	try {
 		my $cxn = $connection // $self->{connection};
 		$error = $error->append_new( Network => {
 			code => scalar $cxn->errnum,
-			message => scalar $cxn->errmsg // $BOLT_ERROR{$cxn->errnum},
+			message => scalar $cxn->errmsg,
 			as_string => $self->_bolt_error($cxn),
-		}) if try { $cxn->errnum || $cxn->errmsg } && $cxn != $ref;
+		}) if eval { $cxn->errnum || $cxn->errmsg } && $cxn != $ref;
 		$cxn->reset_cxn;
 		$error = $error->append_new( Internal => {  # perlbolt#51
 			code => scalar $cxn->errnum,
-			message => scalar $cxn->errmsg // $BOLT_ERROR{$cxn->errnum},
+			message => scalar $cxn->errmsg,
 			as_string => $self->_bolt_error($cxn),
-		}) if try { $cxn->errnum || $cxn->errmsg };
-	};
+		}) if eval { $cxn->errnum || $cxn->errmsg };
+	}
+	catch ($e) {}
 	
 	return $error_handler->($error) if ref $error_handler eq 'CODE';
 	$error_handler->trigger(error => $error);
@@ -162,7 +146,6 @@ sub _bolt_error {
 	($errnum, $errmsg) = ($ref->errnum, $ref->errmsg) if $ref->can('errnum');
 	($errnum, $errmsg) = ($ref->client_errnum, $ref->client_errmsg) if $ref->can('client_errnum');
 	
-	$errmsg //= $BOLT_ERROR{$errnum};
 	return "Bolt error $errnum: $errmsg" if $errmsg;
 	return "Bolt error $errnum";
 }
@@ -175,7 +158,7 @@ sub _server {
 	return $self->{server_info} = Neo4j::Driver::ServerInfo->new({
 		uri => $self->{uri},
 		version => $cxn->server_id,
-		protocol => $cxn->can('protocol_version') ? $cxn->protocol_version : '',
+		protocol => $cxn->protocol_version,
 	});
 }
 
@@ -188,23 +171,18 @@ sub _set_database {
 }
 
 
-# Send statements to the Neo4j server and return a list of all results.
+# Send queries to the Neo4j server and return a list of all results.
 sub _run {
-	my ($self, $tx, @statements) = @_;
+	my ($self, $tx, @queries) = @_;
 	
-	die "multiple statements not supported for Bolt" if @statements > 1;
-	my ($statement) = @statements;
-	
-	my $statement_json = {
-		statement => $statement->[0],
-		parameters => $statement->[1],
-	};
+	die "multiple queries not supported for Bolt" if @queries > 1;
+	my ($query) = @queries;
 	
 	my $query_runner = $tx->{bolt_txn} ? $tx->{bolt_txn} : $self->{connection};
 	
 	my ($stream, $result);
-	if ($statement->[0]) {
-		$stream = $query_runner->run_query( @$statement, $self->{database} );
+	if ($query->[0]) {
+		$stream = $query_runner->run_query( @$query, $self->{database} );
 		
 		if (! $stream || $stream->failure) {
 			# failure() == -1 is an error condition because run_query_()
@@ -218,11 +196,14 @@ sub _run {
 		$result = $self->{result_module}->new({
 			bolt_stream => $stream,
 			bolt_connection => $self->{connection},
-			statement => $statement_json,
-			cypher_types => $self->{cypher_types},
+			query => $query,
 			server_info => $self->{server_info},
 			error_handler => $tx->{error_handler},
 		});
+	}
+	else {
+		$result = Neo4j::Driver::Result->new;
+		$result->{server_info} = $self->{server_info};
 	}
 	
 	return ($result);
@@ -236,7 +217,6 @@ sub _new_tx {
 	$params->{mode} = lc substr $driver_tx->{mode}, 0, 1 if $driver_tx->{mode};
 	
 	my $transaction = "$self->{net_module}::Txn";
-	return unless $transaction->can('new');
 	return $transaction->new( $self->{connection}, $params, $self->{database} );
 }
 

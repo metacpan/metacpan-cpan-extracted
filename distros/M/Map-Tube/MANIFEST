@@ -11,7 +11,7 @@ lib/Map/Tube/Utils.pm
 lib/Test/Map/Tube.pm
 LICENSE
 Makefile.PL
-MANIFEST    		This list of files
+MANIFEST        	This list of files
 MANIFEST.SKIP
 README
 script/map-data-converter
@@ -20,6 +20,8 @@ t/00-load.t
 t/bad-sample.xml
 t/common-lines-map.json
 t/common-lines-map.t
+t/unidirection-map.xml
+t/unidirection-map.t
 t/good-map.xml
 t/invalid-role.t
 t/line-stations.t

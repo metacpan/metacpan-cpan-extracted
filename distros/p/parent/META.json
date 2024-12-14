@@ -49,7 +49,7 @@
          "web" : "https://github.com/Corion/parent"
       }
    },
-   "version" : "0.243",
+   "version" : "0.244",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

@@ -1,21 +1,28 @@
-use 5.010;
-use strict;
+use v5.12;
 use warnings;
-use utf8;
 
-package Neo4j::Driver::Result::Jolt;
+package Neo4j::Driver::Result::Jolt 1.02;
 # ABSTRACT: Jolt result handler
-$Neo4j::Driver::Result::Jolt::VERSION = '0.52';
+
 
 # This package is not part of the public Neo4j::Driver API.
 
 
 use parent 'Neo4j::Driver::Result';
 
-use Carp qw(carp croak);
+use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP Neo4j::Driver::Result);
 use JSON::MaybeXS 1.002004 ();
 
+use Neo4j::Driver::Type::Bytes;
+use Neo4j::Driver::Type::DateTime;
+use Neo4j::Driver::Type::Duration;
+use Neo4j::Driver::Type::Node;
+use Neo4j::Driver::Type::Path;
+use Neo4j::Driver::Type::Point;
+use Neo4j::Driver::Type::Relationship;
+use Neo4j::Driver::Type::V1::Node;
+use Neo4j::Driver::Type::V1::Relationship;
 use Neo4j::Error;
 
 my ($FALSE, $TRUE) = Neo4j::Driver::Result->_bool_values;
@@ -26,6 +33,17 @@ my $ACCEPT_HEADER_V1 = "$MEDIA_TYPE+json-seq";
 my $ACCEPT_HEADER_STRICT = "$MEDIA_TYPE+json-seq;strict=true";
 my $ACCEPT_HEADER_SPARSE = "$MEDIA_TYPE+json-seq;strict=false";
 my $ACCEPT_HEADER_NDJSON = "$MEDIA_TYPE";
+
+my @CYPHER_TYPES = (
+	{  # Types with legacy numeric ID (Jolt v1)
+		node => 'Neo4j::Driver::Type::V1::Node',
+		relationship => 'Neo4j::Driver::Type::V1::Relationship',
+	},
+	{  # Types with element ID (Jolt v2)
+		node => 'Neo4j::Driver::Type::Node',
+		relationship => 'Neo4j::Driver::Type::Relationship',
+	},
+);
 
 
 our $gather_results = 1;  # 1: detach from the stream immediately (yields JSON-style result; used for testing)
@@ -43,8 +61,7 @@ sub new {
 		server_info => $params->{server_info},
 		json_coder => $params->{http_agent}->json_coder,
 		http_agent => $params->{http_agent},
-		cypher_types => $params->{cypher_types},
-		v2_id_prefix => $jolt_v2 ? 'element_' : '',
+		jolt_v2 => $jolt_v2,
 	};
 	bless $self, $class;
 	
@@ -75,7 +92,7 @@ sub _gather_results {
 			croak "Jolt error: unexpected data event $prev" unless $state == 1 || $state == 2;
 			croak "Jolt error: expected reference to ARRAY, received " . (ref $event ? "reference to " . ref $event : "scalar") . " in $type event $prev" unless ref $event eq 'ARRAY';
 			$state = 2;
-			push @data, { row => $event, meta => [] };
+			push @data, { row => $event };
 		}
 		elsif ($type eq 'summary') {  # StatementEndEvent
 			croak "Jolt error: unexpected summary event $prev" unless $state == 1 || $state == 2;
@@ -85,7 +102,7 @@ sub _gather_results {
 				data => [@data],
 				stats => $event->{stats},
 				plan => $event->{plan},
-				columns => $columns // [],
+				columns => $columns,
 			};
 			@data = ();
 			$columns = undef;
@@ -125,14 +142,14 @@ sub _gather_results {
 	
 	if (@results == 1) {
 		$self->{result} = $results[0];
-		$self->{statement} = $params->{statements}->[0];
+		$self->{query} = $params->{queries}->[0];
 		return $self->_as_fully_buffered;
 	}
 	
-	# If the number of Cypher statements run wasn't exactly one, provide a list
+	# If the number of Cypher queries run wasn't exactly one, provide a list
 	# of all results so that callers get a uniform interface for all of them.
 	@results = map { __PACKAGE__->_new_result($_, undef, $params) } @results;
-	$results[$_]->{statement} = $params->{statements}->[$_] for (0 .. $#results);
+	$results[$_]->{query} = $params->{queries}->[$_] for (0 .. $#results);
 	$self->{attached} = 0;
 	$self->{exhausted} = 1;
 	$self->{result_list} = \@results if @results;
@@ -143,17 +160,15 @@ sub _gather_results {
 sub _new_result {
 	my ($class, $result, $json, $params) = @_;
 	
-	my $jolt_v2 = $params->{http_header}->{content_type} =~ m/^\Q$MEDIA_TYPE\E-v2\b/i;
 	my $self = {
 		attached => 0,   # 1: unbuffered records may exist on the stream
 		exhausted => 0,  # 1: all records read by the client; fetch() will fail
 		result => $result,
 		buffer => [],
-		columns => undef,
+		field_names_cache => undef,
 		summary => undef,
-		cypher_types => $params->{cypher_types},
 		server_info => $params->{server_info},
-		v2_id_prefix => $jolt_v2 ? 'element_' : '',
+		jolt_v2 => $params->{jolt_v2},
 	};
 	bless $self, $class;
 	
@@ -165,10 +180,9 @@ sub _next_event {
 	my ($self) = @_;
 	
 	my $line = $self->{http_agent}->fetch_event;
-	return unless defined $line;
+	return unless length $line;
 	
 	my $json = $self->{json_coder}->decode($line);
-	croak "Jolt error: expected reference to HASH, received " . (ref $json ? "reference to " . ref $json : "scalar") unless ref $json eq 'HASH';
 	
 	my @events = keys %$json;
 	croak "Jolt error: expected exactly 1 event, received " . scalar @events unless @events == 1;
@@ -197,7 +211,7 @@ sub _info {
 sub _init_record {
 	my ($self, $record) = @_;
 	
-	$record->{column_keys} = $self->{columns};
+	$record->{field_names_cache} = $self->{field_names_cache};
 	$self->_deep_bless( $record->{row} );
 	return bless $record, 'Neo4j::Driver::Record';
 }
@@ -205,20 +219,18 @@ sub _init_record {
 
 sub _deep_bless {
 	my ($self, $data) = @_;
-	my $cypher_types = $self->{cypher_types};
 	
 	if (JSON::MaybeXS::is_bool $data) {  # Boolean (sparse)
 		return $data ? $TRUE : $FALSE;
 	}
 	if (ref $data eq 'ARRAY') {  # List (sparse)
-		$data->[$_] = $self->_deep_bless($data->[$_]) for 0 .. $#{$data};
+		$_ = $self->_deep_bless($_) for @$data;
 		return $data;
 	}
 	if (ref $data eq '') {  # Null or Integer (sparse) or String (sparse)
 		return $data;
 	}
 	
-	die "Assertion failed: unexpected type: " . ref $data unless ref $data eq 'HASH';
 	die "Assertion failed: sigil count: " . scalar keys %$data if scalar keys %$data != 1;
 	my $sigil = (keys %$data)[0];
 	my $value = $data->{$sigil};
@@ -238,78 +250,40 @@ sub _deep_bless {
 		return $value;
 	}
 	if ($sigil eq '[]') {  # List (strict)
-		die "Assertion failed: unexpected list type: " . ref $value unless ref $value eq 'ARRAY';
-		$value->[$_] = $self->_deep_bless($value->[$_]) for 0 .. $#{$value};
+		$_ = $self->_deep_bless($_) for @$value;
 		return $value;
 	}
 	if ($sigil eq '{}') {  # Map
-		die "Assertion failed: unexpected map type: " . ref $value unless ref $value eq 'HASH';
-		delete $data->{'{}'};
-		$data->{$_} = $self->_deep_bless($value->{$_}) for keys %$value;
-		return $data;
+		$_ = $self->_deep_bless($_) for values %$value;
+		return $value;
 	}
 	if ($sigil eq '()') {  # Node
-		die "Assertion failed: unexpected node type: " . ref $value unless ref $value eq 'ARRAY';
 		die "Assertion failed: unexpected node fields: " . scalar @$value unless @$value == 3;
-		die "Assertion failed: unexpected prop type: " . ref $value->[2] unless ref $value->[2] eq 'HASH';
-		my $props = $value->[2];
-		$props->{$_} = $self->_deep_bless($props->{$_}) for keys %$props;
-		my $node = \( $props );
-		bless $node, $cypher_types->{node};
-		$$node->{_meta} = {
-			"$self->{v2_id_prefix}id" => $value->[0],
-			labels => $value->[1],
-		};
-		$cypher_types->{init}->($node) if $cypher_types->{init};
-		return $node;
+		$_ = $self->_deep_bless($_) for values %{ $value->[2] };
+		return bless $value, $CYPHER_TYPES[ $self->{jolt_v2} ]->{node};
 	}
 	if ($sigil eq '->' || $sigil eq '<-') {  # Relationship
-		die "Assertion failed: unexpected rel type: " . ref $value unless ref $value eq 'ARRAY';
 		die "Assertion failed: unexpected rel fields: " . scalar @$value unless @$value == 5;
-		die "Assertion failed: unexpected prop type: " . ref $value->[4] unless ref $value->[4] eq 'HASH';
-		my $props = $value->[4];
-		$props->{$_} = $self->_deep_bless($props->{$_}) for keys %$props;
-		my $rel = \( $props );
-		bless $rel, $cypher_types->{relationship};
-		$$rel->{_meta} = {
-			"$self->{v2_id_prefix}id" => $value->[0],
-			type => $value->[2],
-			"$self->{v2_id_prefix}start" => $sigil eq '->' ? $value->[1] : $value->[3],
-			"$self->{v2_id_prefix}end" => $sigil eq '->' ? $value->[3] : $value->[1],
-		};
-		$cypher_types->{init}->($rel) if $cypher_types->{init};
-		return $rel;
+		$_ = $self->_deep_bless($_) for values %{ $value->[4] };
+		@{$value}[ 3, 1 ] = @{$value}[ 1, 3 ] if $sigil eq '<-';
+		return bless $value, $CYPHER_TYPES[ $self->{jolt_v2} ]->{relationship};
 	}
 	if ($sigil eq '..') {  # Path
-		die "Assertion failed: unexpected path type: " . ref $value unless ref $value eq 'ARRAY';
 		die "Assertion failed: unexpected path fields: " . scalar @$value unless @$value & 1;
-		$value->[$_] = $self->_deep_bless($value->[$_]) for 0 .. $#{$value};
-		my $path = bless { path => $value }, $cypher_types->{path};
-		$cypher_types->{init}->($path) if $cypher_types->{init};
-		return $path;
+		$_ = $self->_deep_bless($_) for @$value;
+		return bless $data, 'Neo4j::Driver::Type::Path';
 	}
 	if ($sigil eq '@') {  # Spatial
-		bless $data, $cypher_types->{point};
-		return $data;
+		return bless $data, 'Neo4j::Driver::Type::Point';
 	}
 	if ($sigil eq 'T') {  # Temporal
-		if ($cypher_types->{temporal} ne 'Neo4j::Driver::Type::Temporal') {
-			return bless $data, $cypher_types->{temporal};
-		}
-		if ($value =~ m/^-?P/) {
-			require Neo4j::Driver::Type::Duration;
-			bless $data, 'Neo4j::Driver::Type::Duration';
-		}
-		else {
-			require Neo4j::Driver::Type::DateTime;
-			bless $data, 'Neo4j::Driver::Type::DateTime';
-		}
-		return $data;
+		return bless $data, $value =~ m/^-?P/
+			? 'Neo4j::Driver::Type::Duration'
+			: 'Neo4j::Driver::Type::DateTime';
 	}
 	if ($sigil eq '#') {  # Bytes
 		$value =~ tr/ //d;  # spaces were allowed in the Jolt draft, but aren't actually implemented in Neo4j 4.2's jolt.JoltModule
 		$value = pack 'H*', $value;  # see neo4j#12660
-		require Neo4j::Driver::Type::Bytes;
 		return bless \$value, 'Neo4j::Driver::Type::Bytes';
 	}
 	

@@ -1,23 +1,16 @@
-use 5.010;
-use strict;
+use v5.12;
 use warnings;
-use utf8;
 
-package Neo4j::Driver;
+package Neo4j::Driver 1.02;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.52';
+
 
 use Carp qw(croak);
+use List::Util 1.33 qw(none);
 
 use URI 1.25;
 use Neo4j::Driver::Events;
 use Neo4j::Driver::Session;
-
-use Neo4j::Driver::Type::Node;
-use Neo4j::Driver::Type::Relationship;
-use Neo4j::Driver::Type::Path;
-use Neo4j::Driver::Type::Point;
-use Neo4j::Driver::Type::Temporal;
 
 
 my %NEO4J_DEFAULT_PORT = (
@@ -28,38 +21,23 @@ my %NEO4J_DEFAULT_PORT = (
 
 my %OPTIONS = (
 	auth => 'auth',
-	ca_file => 'tls_ca',
-	cypher_filter => 'cypher_filter',
 	cypher_params => 'cypher_params_v2',
-	cypher_types => 'cypher_types',
-	encrypted => 'tls',
-	jolt => 'jolt',
 	concurrent_tx => 'concurrent_tx',
+	encrypted => 'encrypted',
 	max_transaction_retry_time => 'max_transaction_retry_time',
-	net_module => 'net_module',
 	timeout => 'timeout',
-	tls => 'tls',
-	tls_ca => 'tls_ca',
-	trust_ca => 'tls_ca',
+	tls => 'encrypted',
+	tls_ca => 'trust_ca',
+	trust_ca => 'trust_ca',
 	uri => 'uri',
-);
-
-my %DEFAULTS = (
-	cypher_types => {
-		node => 'Neo4j::Driver::Type::Node',
-		relationship => 'Neo4j::Driver::Type::Relationship',
-		path => 'Neo4j::Driver::Type::Path',
-		point => 'Neo4j::Driver::Type::Point',
-		temporal => 'Neo4j::Driver::Type::Temporal',
-	},
 );
 
 
 sub new {
 	my ($class, $config, @extra) = @_;
 	
-	my $self = bless { config => { %DEFAULTS }, die_on_error => 1 }, $class;
-	$self->{plugins} = Neo4j::Driver::Events->new;
+	my $self = bless {}, $class;
+	$self->{events} = Neo4j::Driver::Events->new;
 	
 	croak __PACKAGE__ . "->new() with multiple arguments unsupported" if @extra;
 	$config = { uri => $config } if ref $config ne 'HASH';
@@ -79,12 +57,10 @@ sub _check_uri {
 		$uri =~ s|^|neo4j:| if $uri =~ m{^//};
 		$uri = URI->new($uri);
 		
-		if ( ! $uri->scheme ) {
-			croak sprintf "Failed to parse URI '%s'", $uri;
-		}
-		if ( $uri->scheme !~ m/^https?$|^bolt$|^neo4j$/ ) {
-			croak sprintf "URI scheme '%s' unsupported; use 'bolt', 'http', or 'neo4j'", $uri->scheme // "";
-		}
+		$uri->scheme or croak
+			sprintf "Failed to parse URI '%s'", $uri;
+		$uri->scheme =~ m/^(?:https?|bolt|neo4j)$/i or croak
+			sprintf "URI scheme '%s' unsupported; use 'bolt', 'http', or 'neo4j'", $uri->scheme;
 		
 		if (my $userinfo = $uri->userinfo(undef)) {
 			my @userinfo = $userinfo =~ m/^([^:]*):?(.*)/;
@@ -111,7 +87,7 @@ sub _fix_neo4j_uri {
 	croak "The concurrent_tx config option may only be used with http:/https: URIs" if $self->{config}->{concurrent_tx};
 	
 	my $uri = $self->{config}->{uri};
-	$uri->scheme( exists $INC{'Neo4j/Bolt.pm'} ? 'bolt' : $self->{config}->{tls} ? 'https' : 'http' );
+	$uri->scheme( exists $INC{'Neo4j/Bolt.pm'} ? 'bolt' : $self->{config}->{encrypted} ? 'https' : 'http' );
 	$uri->port( $NEO4J_DEFAULT_PORT{ $uri->scheme } ) if ! $uri->_port;
 }
 
@@ -119,7 +95,7 @@ sub _fix_neo4j_uri {
 sub basic_auth {
 	my ($self, $username, $password) = @_;
 	
-	warnings::warnif deprecated => "Deprecated sequence: call basic_auth() before session()" if $self->{server_info};
+	croak "Unsupported sequence: call basic_auth() before session()" if $self->{server_info};
 	
 	$self->{config}->{auth} = {
 		scheme => 'basic',
@@ -140,8 +116,8 @@ sub config {
 	if (@options < 2) {
 		# get config option
 		my $key = $options[0];
-		croak "Unsupported config option: $key" unless grep m/^$key$/, keys %OPTIONS;
-		return $self->{$OPTIONS{$key}} // $self->{config}->{$OPTIONS{$key}};
+		croak sprintf "Unsupported config option: %s", $key if none {$_ eq $key} keys %OPTIONS;
+		return $self->{config}->{$OPTIONS{$key}};
 	}
 	
 	croak "Unsupported sequence: call config() before session()" if $self->{server_info};
@@ -160,15 +136,6 @@ sub config {
 sub session {
 	my ($self, @options) = @_;
 	
-	if (! $self->{server_info}) {
-		warnings::warnif deprecated => sprintf "Internal API %s->{%s} may be unavailable in Neo4j::Driver 1.00", __PACKAGE__, $_ for grep { $self->{$_} } @OPTIONS{ sort keys %OPTIONS };
-	}
-	
-	$self->{plugins}->{die_on_error} = $self->{die_on_error};
-	warnings::warnif deprecated => __PACKAGE__ . "->{die_on_error} is deprecated" unless $self->{die_on_error};
-	warnings::warnif deprecated => __PACKAGE__ . "->{http_timeout} is deprecated; use config()" if defined $self->{http_timeout};
-	$self->{config}->{timeout} //= $self->{http_timeout};
-	
 	@options = %{$options[0]} if @options == 1 && ref $options[0] eq 'HASH';
 	my %options = $self->_parse_options('session', ['database'], @options);
 	
@@ -182,46 +149,32 @@ sub session {
 sub _parse_options {
 	my (undef, $context, $supported, @options) = @_;
 	
-	croak "Odd number of elements in $context options hash" if @options & 1;
+	croak sprintf "Odd number of elements in %s options hash", $context if @options & 1;
 	my %options = @options;
 	
-	warnings::warnif deprecated => "Config option ca_file is deprecated; use trust_ca" if $options{ca_file};
-	warnings::warnif deprecated => "Config option cypher_types is deprecated" if $options{cypher_types};
-	if ($options{cypher_params}) {
-		croak "Unimplemented cypher params filter '$options{cypher_params}'" if $options{cypher_params} !~ m<^\x02|v2$>;
-	}
-	elsif ($options{cypher_filter}) {
-		warnings::warnif deprecated => "Config option cypher_filter is deprecated; use cypher_params";
-		croak "Unimplemented cypher filter '$options{cypher_filter}'" if $options{cypher_filter} ne 'params';
-		$options{cypher_params} = v2;
-	}
-	warnings::warnif deprecated => "Config option jolt is deprecated: Jolt is now enabled by default" if defined $options{jolt};
-	warnings::warnif deprecated => "Config option net_module is deprecated; use plug-in interface" if defined $options{net_module};
+	warnings::warnif deprecated => "Config option tls is deprecated; use encrypted" if $options{tls};
+	warnings::warnif deprecated => "Config option tls_ca is deprecated; use trust_ca" if $options{tls_ca};
 	
-	my @unsupported = ();
-	foreach my $key (keys %options) {
-		push @unsupported, $key unless grep m/^$key$/, @$supported;
+	if ($options{cypher_params}) {
+		$options{cypher_params} =~ m<^(?:\x02|v2)$> or croak
+			sprintf "Unimplemented cypher params filter '%s'", $options{cypher_params};
 	}
-	croak "Unsupported $context option: " . join ", ", sort @unsupported if @unsupported;
+	
+	my @unsupported = grep { my $key = $_; none {$_ eq $key} @$supported } keys %options;
+	@unsupported and croak
+		sprintf "Unsupported %s option: %s", $context, join ", ", sort @unsupported;
 	
 	return %options;
 }
 
 
 sub plugin {
-	# uncoverable pod (experimental feature)
-	my ($self, $package, @extra) = @_;
+	my ($self, $plugin, @extra) = @_;
 	
 	croak "plugin() with more than one argument is unsupported" if @extra;
 	croak "Unsupported sequence: call plugin() before session()" if $self->{server_info};
-	$self->{plugins}->_register_plugin($package);
+	$self->{events}->_register_plugin($plugin);
 	return $self;
-}
-
-
-sub close {
-	# uncoverable pod (see Deprecations.pod)
-	warnings::warnif deprecated => __PACKAGE__ . "->close() is deprecated";
 }
 
 
@@ -250,7 +203,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.52
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -298,14 +251,14 @@ L<"Configure connectors" in the Neo4j Operations Manual|https://neo4j.com/docs/o
 =item Bolt
 
 Bolt is a Neo4j proprietary, binary protocol, available with
-S<Neo4j 3.0> and newer. Bolt communication may be encrypted or
+S<Neo4j 3.5> and newer. Bolt communication may be encrypted or
 unencrypted. Because Bolt is faster than HTTP, it is generally
 the recommended protocol. However, Perl support for it tends
 to lag behind after major updates to Neo4j.
 
 This driver supports Bolt, but doesn't bundle the necessary XS
-packages. You will need to install L<Neo4j::Bolt> separately
-to enable Bolt for this driver.
+packages. You will need to install S<L<Neo4j::Bolt> 0.4201> or
+later separately to enable Bolt for this driver.
 
 =item HTTP / HTTPS
 
@@ -320,19 +273,16 @@ will automatically fall back to slower REST-style JSON.
 
 The driver also supports encrypted communication using HTTPS,
 but doesn't bundle the necessary packages. You will need to
-install L<LWP::Protocol::https> separately to enable HTTPS.
+install L<IO::Socket::SSL> separately to enable HTTPS.
 
 =back
 
 The protocol is automatically chosen based on the URI scheme.
 See L<Neo4j::Driver::Config/"uri"> for details.
 
-B<This is the last release in the 0.x branch of Neo4j::Driver.>
-
-See L<Neo4j::Driver::Deprecations> for features set to be removed
-with the next major update.
-Version 0.x of Neo4j::Driver has been targeting S<Perl v5.10>
-and later.
+Version 1 of Neo4j::Driver is targeting Perl v5.20 and later.
+Patches will be accepted to address issues with Perl versions
+as old as v5.16.3 for as long as practical.
 
 =head1 METHODS
 
@@ -425,18 +375,6 @@ Interacting with a Neo4j database:
 =item * L<Neo4j::Driver::B<Session>>
 
 =item * L<Neo4j::Driver::Types>
-
-=back
-
-Official API documentation:
-
-=over
-
-=item * L<Neo4j Driver API Specification|https://github.com/neo4j/docs-bolt/blob/main/modules/ROOT/pages/driver-api/index.adoc>
-
-=item * L<Neo4j Drivers Manual|https://neo4j.com/docs/java-manual/5/>
-
-=item * L<Neo4j HTTP API Docs|https://neo4j.com/docs/http-api/5/>
 
 =back
 

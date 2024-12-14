@@ -1,5 +1,40 @@
 Revision history for Neo4j::Driver
 
+1.02  2024-12-14
+
+ - Pass through Neo4j::Bolt values unchanged, reducing overhead. (GH #22)
+
+ - Optimise parsing of Jolt result values and events, improving performance.
+   (GH #23, #25)
+
+ - Spin off net adapter module Neo4j::Driver::Net::HTTP::LWP into the
+   separate distribution Neo4j-Driver-Plugin-LWP. The driver now defaults
+   to HTTP::Tiny. This drops the dependency on libwww-perl. (GH #25)
+
+ - Fix bug causing data() in Record to have extra or missing entries. (GH #21)
+
+ - The properties() method of nodes and relationships now returns a reference
+   to the internal hash. (GH #24)
+
+
+1.01  2024-11-28  (TRIAL RELEASE)
+
+ - Using Jolt byte array objects in string context now yields the class name.
+
+ - Deprecate renamed methods summary() in Result, statement() in ResultSummary,
+   version() in ServerInfo and config options 'tls' / 'tls_ca'. (GH #20)
+
+ - Raise minimum supported versions to Neo4j::Bolt 0.4201, Neo4j::Types 2.00,
+   Perl v5.14. Raise support target for Perl to v5.20. (GH #18)
+
+ - Various internal changes affecting object structure, ResultColumns and more.
+
+
+1.00  2024-11-21  (TRIAL RELEASE)
+
+ - Disallow all deprecated features. (GH #19)
+
+
 0.52  2024-11-21
 
  - Minor documentation updates.

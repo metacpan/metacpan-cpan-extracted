@@ -7,7 +7,7 @@ return
 
 for my $field (@$Fields) {
     if ( $field->{name} eq 'Queue' ) {
-        $field->{name} = 'Problem';
+        $field->{name} = 'Problem Type';
         $field->{comp} = '/Elements/SelectProblem';
         $field->{args} = {
             Name => 'Problem',
@@ -18,6 +18,13 @@ for my $field (@$Fields) {
         last;
     }
 }
+
+if ( $ARGS{QueueObj} ) {
+    my $queue_name = $ARGS{QueueObj}->Name;
+    RT::Interface::Web::EscapeHTML( \$queue_name );
+    unshift @$Fields, { name => 'Queue', html => qq{<span class="current-value">$queue_name</span>}, };
+}
+
 </%INIT>
 
 <%ARGS>

@@ -1,22 +1,18 @@
-use 5.010;
-use strict;
+use v5.14;
 use warnings;
-use utf8;
 
-package Neo4j::Driver::Session;
+package Neo4j::Driver::Session 1.02;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.52';
+
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
 	Neo4j::Driver
-	Try::Tiny
 );
+use Feature::Compat::Try;
 use List::Util qw(min);
 use Scalar::Util qw(blessed);
 use Time::HiRes ();
-use Try::Tiny;
-use URI 1.25;
 
 use Neo4j::Driver::Net::Bolt;
 use Neo4j::Driver::Net::HTTP;
@@ -67,54 +63,45 @@ sub _execute {
 	croak sprintf "%s->execute_%s() requires subroutine ref", __PACKAGE__, lc $mode unless ref $func eq 'CODE';
 	
 	$self->{retry_sleep} //= 1;
-	my (@r, $r);
-	my $wantarray = wantarray;
 	my $time_stop = Time::HiRes::time
 		+ ($self->{driver}->config('max_transaction_retry_time') // 30);  # seconds
 	my $tries = 0;
-	my $success = 0;
-	do {
+	while () {
 		my $tx = $self->new_tx($mode);
 		$tx->{error_handler} = sub { die shift };
 		
 		try {
 			$tx->_begin;
 			$tx->{managed} = 1;  # Disallow commit() in $func
-			if ($wantarray) {
-				@r = $func->($tx);
-			}
-			else {
-				$r = $func->($tx);
-			}
+			wantarray ? (my @r = $func->($tx)) : (my $r = $func->($tx));
 			$tx->{managed} = 0;
 			$tx->commit;
-			$success = 1;  # return from sub not possible in a Try::Tiny block
+			
+			return unless defined wantarray;
+			$r = $r[0] if wantarray;
+			warnings::warnif closure => "Result object may not be valid outside the transaction function"
+				if blessed $r && $r->isa('Neo4j::Driver::Result');
+			
+			return wantarray ? @r : $r;
 		}
-		catch {
+		catch ($e) {
 			# The tx may or may not already be closed; we need to make sure
 			$tx->{managed} = 0;
-			try { $tx->rollback };
+			try { $tx->rollback } catch ($f) {}
 			
 			# Never retry non-Neo4j errors
-			croak $_ unless blessed $_ && $_->isa('Neo4j::Error');
+			croak $e unless blessed $e && $e->isa('Neo4j::Error');
 			
-			if (! $_->is_retryable || Time::HiRes::time >= $time_stop) {
-				$self->{driver}->{plugins}->trigger( error => $_ );
-				$success = -1;  # return in case the event handler doesn't die
+			if (! $e->is_retryable || Time::HiRes::time >= $time_stop) {
+				$self->{driver}->{events}->trigger( error => $e );
+				return;  # in case the event handler doesn't die
 			}
-			else {
-				Time::HiRes::sleep min
-					$self->{retry_sleep} * (1 << $tries++),
-					$time_stop - Time::HiRes::time;
-			}
-		};
-	} until ($success);
-	
-	$r = $r[0] if $wantarray;
-	if (defined $wantarray && blessed $r && $r->isa('Neo4j::Driver::Result')) {
-		warnings::warnif closure => "Result object may not be valid outside the transaction function";
+		}
+		
+		Time::HiRes::sleep min
+			$self->{retry_sleep} * (1 << $tries++),
+			$time_stop - Time::HiRes::time;
 	}
-	return $wantarray ? @r : $r;
 }
 
 
@@ -129,12 +116,6 @@ sub execute_write {
 	my ($self, $func) = @_;
 	
 	return $self->_execute( WRITE => $func );
-}
-
-
-sub close {
-	# uncoverable pod (see Deprecations.pod)
-	warnings::warnif deprecated => __PACKAGE__ . "->close() is deprecated";
 }
 
 
@@ -207,7 +188,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.52
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -272,10 +253,6 @@ queries will never be retried. See L</"run"> below.
 Only one open transaction per session at a time is supported. To
 work with multiple concurrent transactions, simply use more than
 one session.
-On C<http:> and C<https:> connections, you can
-alternatively enable concurrent transactions within the same
-session through a config option; see
-L<Neo4j::Driver::Config/"concurrent_tx"> for details.
 
 To create a new session, call L<Neo4j::Driver/"session">.
 
@@ -333,7 +310,7 @@ which is always safe to do.
 
  $result = $session->run('...');
 
-Run and commit a statement using an auto-commit transaction and return
+Run and commit a query using an auto-commit transaction and return
 the L<Result|Neo4j::Driver::Result>.
 
 This method is semantically exactly equivalent to the following code,
@@ -370,14 +347,9 @@ regard.
 
 =item * L<Neo4j::Driver>
 
-=item * L<Neo4j::Driver::B<Transaction>>,
-L<Neo4j::Driver::B<ServerInfo>>,
-L<Neo4j::Driver::B<Result>>
+=item * L<Neo4j::Driver::B<Result>>
 
-=item * Equivalent documentation for the official Neo4j drivers:
-L<Session (Java)|https://neo4j.com/docs/api/java-driver/5.26/org.neo4j.driver/org/neo4j/driver/Session.html>,
-L<Session (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.26/class/lib6/session.js~Session.html>,
-L<ISession (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.13/html/6bcf5d8c-98e7-b521-03e7-210cd6155850.htm>
+=item * L<Neo4j::Driver::B<Transaction>>
 
 =back
 

@@ -1,11 +1,9 @@
-use 5.010;
-use strict;
+use v5.12;
 use warnings;
-use utf8;
 
-package Neo4j::Driver::ResultSummary;
-# ABSTRACT: Details about the result of running a statement
-$Neo4j::Driver::ResultSummary::VERSION = '0.52';
+package Neo4j::Driver::ResultSummary 1.02;
+# ABSTRACT: Details about the result of running a query
+
 
 use Carp qw(croak);
 
@@ -14,32 +12,22 @@ use Neo4j::Driver::SummaryCounters;
 
 sub new {
 	# uncoverable pod (private method)
-	my ($class, $result, $notifications, $statement, $server_info) = @_; 
-	my $self = {};
-	if ($result && $result->{stats}) {
-		$self->{counters} = $result->{stats};
-		$self->{plan} = $result->{plan};
-		$self->{notifications} = $notifications;
-		$self->{statement} = $statement;
-		$self->{server_info} = $server_info;
-	}
-	return bless $self, $class;
-}
-
-
-sub _init {
-	my ($self) = @_; 
+	my ($class, $result, $notifications, $query, $server_info) = @_; 
 	
-	# The purpose of this method is to fail as early as possible if we don't
-	# have all necessary info. This should improve the user experience.
-	croak 'Result missing stats' unless $self->{statement};
-	return $self;
+	return bless {
+		counters => $result->{stats},
+		notifications => $notifications,
+		plan => $result->{plan},
+		query => $query,
+		server_info => $server_info,
+	}, $class;
 }
 
 
 sub counters {
 	my ($self) = @_;
 	
+	$self->{counters} //= {};
 	return Neo4j::Driver::SummaryCounters->new( $self->{counters} );
 }
 
@@ -60,11 +48,22 @@ sub plan {
 
 
 sub statement {
+	# uncoverable pod (see query)
+	warnings::warnif deprecated => "statement() in Neo4j::Driver::ResultSummary is deprecated; use query() instead";
+	&query;
+}
+
+
+sub query {
 	my ($self) = @_;
 	
-	return {
-		text => $self->{statement}->{statement},
-		parameters => $self->{statement}->{parameters} // {},
+	$self->{query} //= [ '', {} ];
+	return ref $self->{query} eq 'ARRAY' ? {
+		text       => $self->{query}->[0],
+		parameters => $self->{query}->[1],
+	} : {
+		text       => $self->{query}->{statement},
+		parameters => $self->{query}->{parameters} // {},
 	};
 }
 
@@ -86,11 +85,11 @@ __END__
 
 =head1 NAME
 
-Neo4j::Driver::ResultSummary - Details about the result of running a statement
+Neo4j::Driver::ResultSummary - Details about the result of running a query
 
 =head1 VERSION
 
-version 0.52
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -102,8 +101,8 @@ version 0.52
  $counters = $summary->counters;
  
  # Query information
- $query  = $summary->statement->{text};
- $params = $summary->statement->{parameters};
+ $query  = $summary->query->{text};
+ $params = $summary->query->{parameters};
  $plan   = $summary->plan;
  @notes  = $summary->notifications;
  
@@ -113,7 +112,7 @@ version 0.52
 
 =head1 DESCRIPTION
 
-The result summary of running a statement. The result summary can be
+The result summary of running a query. The result summary can be
 used to investigate details about the result, like the Neo4j server
 version, how many and which kinds of updates have been executed, and
 query plan information if available.
@@ -129,32 +128,46 @@ L<Neo4j::Driver::ResultSummary> implements the following methods.
  $summary_counters = $summary->counters;
 
 Returns the L<SummaryCounters|Neo4j::Driver::SummaryCounters> with
-statistics counts for operations the statement triggered.
+statistics counts for operations the query triggered.
 
 =head2 notifications
 
- use Data::Dumper;
  @notifications = $summary->notifications;
- print Dumper @notifications;
+ 
+ use Data::Printer;
+ p @notifications;
 
 A list of notifications that might arise when executing the
-statement. Notifications can be warnings about problematic statements
+query. Notifications can be warnings about problematic queries
 or other valuable information that can be presented in a client.
 Unlike failures or errors, notifications do not affect the execution
-of a statement.
+of a query.
 In scalar context, return the number of notifications.
 
 This driver only supports notifications over HTTP.
 
 =head2 plan
 
- use Data::Dumper;
- print Dumper $summary->plan;
+ $plan = $summary->plan;
+ 
+ use Data::Printer;
+ p $plan;
 
-This describes how the database will execute your statement.
-Available if this is the summary of a Cypher C<EXPLAIN> statement.
+This describes how the database will execute your query.
+Available if this is the summary of a Cypher C<EXPLAIN> query.
 
 This driver only supports execution plans over HTTP.
+
+=head2 query
+
+ $query  = $summary->query->{text};
+ $params = $summary->query->{parameters};
+
+The executed query and query parameters this summary is for.
+
+Before driver S<version 1.00>, the query was retrieved with the
+C<statement()> method. That method has since been deprecated,
+matching a corresponding change in S<Neo4j 4.0>.
 
 =head2 server
 
@@ -164,26 +177,15 @@ This driver only supports execution plans over HTTP.
 The L<ServerInfo|Neo4j::Driver::ServerInfo>, consisting of
 the host, port, protocol and Neo4j version.
 
-=head2 statement
-
- $query  = $summary->statement->{text};
- $params = $summary->statement->{parameters};
-
-The statement and parameters this summary is for.
-
 =head1 SEE ALSO
 
 =over
 
 =item * L<Neo4j::Driver>
 
-=item * L<Neo4j::Driver::B<ServerInfo>>,
-L<Neo4j::Driver::B<SummaryCounters>>
+=item * L<Neo4j::Driver::B<ServerInfo>>
 
-=item * Equivalent documentation for the official Neo4j drivers:
-L<ResultSummary (Java)|https://neo4j.com/docs/api/java-driver/5.26/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html>,
-L<ResultSummary (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.26/class/lib6/result-summary.js~ResultSummary.html>,
-L<IResultSummary (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.26/api/Neo4j.Driver.IResultSummary.html>
+=item * L<Neo4j::Driver::B<SummaryCounters>>
 
 =back
 

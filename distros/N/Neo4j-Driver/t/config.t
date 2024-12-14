@@ -1,5 +1,5 @@
 #!perl
-use strict;
+use v5.14;
 use warnings;
 use lib qw(./lib t/lib);
 
@@ -16,11 +16,11 @@ use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 use Neo4j_Test;
 use Neo4j_Test::MockHTTP;
 
-use Try::Tiny;
+use Feature::Compat::Try;
 
 my ($d, $r, $w);
 
-plan tests => 17 + $no_warnings;
+plan tests => 18 + $no_warnings;
 
 
 my $default_scheme = 'neo4j';
@@ -94,16 +94,14 @@ subtest 'config illegal args' => sub {
 
 
 subtest 'config/session sequence' => sub {
-	plan tests => 8;
+	plan tests => 7;
 	lives_ok { $d = 0; $d = Neo4j::Driver->new->plugin(Neo4j_Test::MockHTTP->new) } 'new mock driver';
 	lives_ok { $d->basic_auth(user => 'pw') } 'basic_auth before session';
 	lives_ok { $d->config(auth => undef) } 'config before session';
 	lives_ok { $d->session(database => 'dummy') } 'first session';
-	lives_ok { $w = ''; $w = warning {
+	throws_ok {
 		$d->basic_auth(user => 'pw');
-	}} 'basic_auth after session lives';
-	like $w, qr/\bDeprecated sequence\b.*\bsession\b/i, 'basic_auth after session deprecated'
-		or diag 'got warning(s): ', explain $w;
+	} qr/\bUnsupported sequence\b.*\bbasic_auth\b/i, 'basic_auth after session';
 	throws_ok {
 		$d->config(auth => undef);
 	} qr/\bUnsupported sequence\b.*\bsession\b/i, 'config after session';
@@ -238,7 +236,7 @@ subtest 'neo4j uri scheme' => sub {
 		$d = Neo4j::Driver->new('neo4j://bb');
 		my $is_bolt;
 		try { $d->session }
-		catch { $is_bolt = m/\bconnect\b.*\bpackage\b.*\bNeo4j::Bolt\b/ };
+		catch ($e) { $is_bolt = $e =~ m<\bNeo4j::Bolt\b.* at lib/Neo4j/Driver/Net/Bolt\.pm\b> }
 		ok $is_bolt && $d->{config}{uri} eq 'bolt://bb:7687';
 	} 'neo4j bolt uri default port';
 	lives_and {
@@ -247,7 +245,7 @@ subtest 'neo4j uri scheme' => sub {
 		$d = Neo4j::Driver->new('neo4j://bbp:80');
 		my $is_bolt;
 		try { $d->session }
-		catch { $is_bolt = m/\bconnect\b.*\bpackage\b.*\bNeo4j::Bolt\b/ };
+		catch ($e) { $is_bolt = $e =~ m<\bNeo4j::Bolt\b.* at lib/Neo4j/Driver/Net/Bolt\.pm\b> }
 		ok $is_bolt && $d->{config}{uri} eq 'bolt://bbp:80';
 	} 'neo4j bolt uri explicit port';
 };
@@ -298,7 +296,7 @@ subtest 'uris with path/query' => sub {
 
 
 subtest 'tls' => sub {
-	plan tests => 9;
+	plan tests => 7;
 	my $ca_file = '8aA6EPsGYE7sbB7bLWiu.';  # doesn't exist
 	lives_ok { $d = Neo4j::Driver->new('https://test/')->config(trust_ca => $ca_file); } 'create https with CA file';
 	is $d->config('trust_ca'), $ca_file, 'trust_ca';
@@ -314,8 +312,26 @@ subtest 'tls' => sub {
 	throws_ok {
 		Neo4j::Driver->new('http://test/')->config(encrypted => 1)->session;
 	} qr/\bHTTP does not support encrypted communication\b/i, 'no encrypted http';
-	lives_and { is(Neo4j::Driver->new->config(tls => 4)->config('encrypted'), 4) } 'config tls';
-	lives_and { is(Neo4j::Driver->new->config(tls_ca => $ca_file)->config('trust_ca'), $ca_file) } 'config tls_ca';
+};
+
+
+subtest 'tls deprecated' => sub {
+	plan tests => 6 + 4;
+	my $ca_file = '/dev/null';
+	my ($d1, $d2);
+	lives_ok { $d1 = Neo4j::Driver->new(); } 'new driver tls';
+	lives_ok { $d2 = Neo4j::Driver->new(); } 'new driver tls_ca';
+	lives_ok { $w = ''; $w = warning { $d1->config(tls => 7) }; } 'set config tls';
+	like $w, qr/\btls is deprecated\b/i, 'tls deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_ok { $w = ''; $w = warning { $d2->config(tls_ca => $ca_file) }; } 'set config tls_ca';
+	like $w, qr/\btls_ca is deprecated\b/i, 'tls_ca deprecated'
+		or diag 'got warning(s): ', explain $w;
+	no warnings 'deprecated';  # there may or may not be warnings for the getters
+	lives_and { is $d1->config('tls'), 7; } 'get tls';
+	lives_and { is $d1->config('encrypted'), 7; } 'get tls encrypted';
+	lives_and { is $d2->config('tls_ca'), $ca_file; } 'get tls_ca';
+	lives_and { is $d2->config('trust_ca'), $ca_file; } 'get tls_ca trust_ca';
 };
 
 
@@ -343,7 +359,9 @@ subtest 'auth' => sub {
 
 subtest 'auth encoding unit' => sub {
 	plan tests => 12;
-	# The implied assumption here is that anything that *can* be decoded as UTF-8 probably *is* UTF-8.
+	# The Neo4j server expects UTF-8 in the Authorization header. The implied assumption
+	# here is that anything that *can* be decoded as UTF-8 probably *is* UTF-8, and anything
+	# else must be treated as Latin-1. This is exactly the behaviour of utf8::decode().
 	my $a = { scheme => 'basic', principal => "foo\x{100}foo", credentials => '' };
 	lives_ok { $d = 0; $d = Neo4j::Driver->new("http://foo\x{c4}\x{80}foo\@test") } 'uri utf8 auth lives';
 	lives_and { is_deeply $d->config('auth'), $a } 'uri utf8 auth';
@@ -366,12 +384,12 @@ subtest 'auth encoding integration' => sub {
 	my ($m, $uri);
 	$uri = 'http://utf8:%C4%80@test1:10001';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new($uri) } 'utf8 driver lives';
-	lives_ok { $m = 0; $m = Neo4j::Driver::Net::HTTP::LWP->new($d) } 'utf8 net module lives';
+	lives_ok { $m = 0; $m = Neo4j::Driver::Net::HTTP::Tiny->new($d) } 'utf8 net module lives';
 	lives_and { is ''.$m->uri(), $uri } 'utf8 uri';
 	$uri = 'http://latin1:%C4%80%FF@test2:10002';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new($uri) } 'latin1 driver lives';
-	lives_ok { $m = 0; $m = Neo4j::Driver::Net::HTTP::LWP->new($d) } 'latin1 net module lives';
-	lives_and { is ''.$m->uri(), $uri } 'latin1 uri';
+	lives_ok { $m = 0; $m = Neo4j::Driver::Net::HTTP::Tiny->new($d) } 'latin1 net module lives';
+	lives_and { like ''.$m->uri(), qr/latin1:%C3%84%C2%80%C3%BF@/i } 'latin1 uri after utf8::encode';
 };
 
 

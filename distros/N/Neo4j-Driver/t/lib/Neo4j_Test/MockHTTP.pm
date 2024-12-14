@@ -5,7 +5,7 @@ package Neo4j_Test::MockHTTP;
 use parent 'Neo4j::Driver::Plugin';
 
 use JSON::MaybeXS;
-use Neo4j::Driver::Net::HTTP::LWP;
+use Neo4j::Driver::Net::HTTP::Tiny;
 
 sub new {
 	my ($class, %params) = @_;
@@ -101,7 +101,11 @@ sub fetch_all { '' . shift->_r->{content} }
 
 # Use the exact same Jolt split implementation that is
 # normally used, so that we get to test that one, too.
-sub fetch_event { &Neo4j::Driver::Net::HTTP::LWP::fetch_event }
+sub fetch_event {
+	my $self = shift;
+	$self->{content} //= $self->fetch_all;
+	Neo4j::Driver::Net::HTTP::Tiny::fetch_event({ response => $self });
+}
 
 sub request {
 	my ($self, $method, $url, $json, $accept, $mode) = @_;
@@ -110,7 +114,7 @@ sub request {
 	$self->{request} = $json;
 	$self->{accept}  = $accept;
 	$self->{mode}    = $mode;
-	$self->{buffer}  = undef;   # for ::LWP::fetch_event
+	$self->{content} = undef;   # for fetch_event()
 	$self->{query}   = $method eq 'GET' ? 'GET' : $json->{statements}[0]{statement} // '';
 }
 

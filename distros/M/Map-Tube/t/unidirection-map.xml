@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="UnidirectionMap">
+  <lines>
+    <line id="1" name="Line1" color="black"/>
+    <line id="2" name="Line2" color="blue"/>
+    <line id="3" name="Line3" color="red"/>
+    <line id="4" name="Line4" color="yellow"/>
+    <line id="5" name="Line5" color="green"/>
+  </lines>
+
+  <stations>
+    <!-- Line 1: unidirectional, no station indices -->
+    <station id="1-01" name="A street"   line="1" link="1-02"/>
+    <station id="1-02" name="B road"     line="1" link="1-03"/>
+    <station id="1-03" name="C alley"    line="1" link="1-04"/>
+    <station id="1-04" name="D drive"    line="1" link="1-03"/>
+
+    <!-- Line 2: unidirectional, with station indices -->
+    <station id="2-01" name="E street"   line="2:1" link="2-02"/>
+    <station id="2-02" name="F road"     line="2:2" link="2-03"/>
+    <station id="2-03" name="G alley"    line="2:3" link="2-04"/>
+    <station id="2-04" name="H drive"    line="2:4" link="2-03"/>
+
+    <!-- Line 3: bidirectional, with station indices -->
+    <station id="3-01" name="K street"   line="3:1" link="3-02"/>
+    <station id="3-02" name="L road"     line="3:2" link="3-01,3-03"/>
+    <station id="3-03" name="M alley"    line="3:3" link="3-02,3-04"/>
+    <station id="3-04" name="N drive"    line="3:4" link="3-03"/>
+
+    <!-- Line 4: bidirectional, with incomplete station indices -->
+    <station id="4-01" name="P street"   line="4:1" link="4-02"/>
+    <station id="4-02" name="Q road"     line="4"   link="4-01,4-03"/>
+    <station id="4-03" name="R alley"    line="4:3" link="4-02,4-04"/>
+    <station id="4-04" name="S drive"    line="4:4" link="4-03"/>
+
+    <!-- Line 5: unidirectional but circular, with station indices -->
+    <station id="5-01" name="T street"   line="5:1" link="5-02"/>
+    <station id="5-02" name="U road"     line="5:2" link="5-03"/>
+    <station id="5-03" name="V alley"    line="5:3" link="5-04"/>
+    <station id="5-04" name="W drive"    line="5:4" link="5-01"/>
+  </stations>
+</tube>

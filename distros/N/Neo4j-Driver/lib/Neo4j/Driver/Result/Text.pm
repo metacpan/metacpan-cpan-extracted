@@ -1,11 +1,9 @@
-use 5.010;
-use strict;
+use v5.12;
 use warnings;
-use utf8;
 
-package Neo4j::Driver::Result::Text;
+package Neo4j::Driver::Result::Text 1.02;
 # ABSTRACT: Fallback handler for result errors
-$Neo4j::Driver::Result::Text::VERSION = '0.52';
+
 
 # This package is not part of the public Neo4j::Driver API.
 

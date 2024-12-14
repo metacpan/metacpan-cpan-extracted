@@ -196,7 +196,7 @@ CLEANUP: {
 MATCH (n) WHERE id(n) = {node_id} DELETE n
 END
 		lives_ok { $r = $t->run( $q, node_id => 0 + $undo_id ) } "undo commit [id $undo_id]";
-		lives_and { ok $r->summary->counters->nodes_deleted } 'undo commit verified';
+		lives_and { ok $r->consume->counters->nodes_deleted } 'undo commit verified';
 		lives_ok { $t->commit } 'undo commit execute';
 	}
 }

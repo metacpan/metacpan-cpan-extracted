@@ -22,7 +22,7 @@ use Neo4j_Test;
 use Neo4j_Test::EchoHTTP;
 use Neo4j_Test::MockQuery;
 
-plan tests => 9 + $no_warnings;
+plan tests => 10 + $no_warnings;
 
 
 my ($d, $s, $r, @r);
@@ -154,6 +154,17 @@ subtest 'commit/rollback' => sub {
 	})} 'rollback q1';
 	weaken $s;
 	is $commit, 1, 'no commit q1';
+};
+
+
+subtest 'function executed exactly once for no retry' => sub {
+	plan tests => 2;
+	$s = Neo4j::Driver->new({ max_transaction_retry_time => 0 })->plugin($mock)->session;
+	my $run;
+	$r = $s->execute_write(sub { ++$run });
+	is $run, 1, 'scalar context runs once';
+	@r = $s->execute_write(sub { ++$run });
+	is $run, 2, 'list context runs once';
 };
 
 

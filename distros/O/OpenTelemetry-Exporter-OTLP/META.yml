@@ -30,22 +30,22 @@ no_index:
 provides:
   OpenTelemetry::Exporter::OTLP:
     file: lib/OpenTelemetry/Exporter/OTLP.pm
-    version: '0.018'
+    version: '0.019'
   OpenTelemetry::Exporter::OTLP::Encoder::JSON:
     file: lib/OpenTelemetry/Exporter/OTLP/Encoder/JSON.pm
-    version: '0.018'
+    version: '0.019'
   OpenTelemetry::Exporter::OTLP::Encoder::Protobuf:
     file: lib/OpenTelemetry/Exporter/OTLP/Encoder/Protobuf.pm
-    version: '0.018'
+    version: '0.019'
   OpenTelemetry::Exporter::OTLP::Logs:
     file: lib/OpenTelemetry/Exporter/OTLP/Logs.pm
-    version: '0.018'
+    version: '0.019'
   OpenTelemetry::Exporter::OTLP::Traces:
     file: lib/OpenTelemetry/Exporter/OTLP/Traces.pm
-    version: '0.018'
+    version: '0.019'
   OpenTelemetry::Proto:
     file: lib/OpenTelemetry/Proto.pm
-    version: '0.018'
+    version: '0.019'
 recommends:
   Compress::Zlib: '0'
   Google::ProtocolBuffers::Dynamic: '0'
@@ -66,10 +66,10 @@ requires:
 resources:
   bugtracker: https://github.com/jjatria/perl-opentelemetry-exporter-otlp/issues
   repository: git://github.com/jjatria/perl-opentelemetry-exporter-otlp
-version: '0.018'
+version: '0.019'
 x_Dist_Zilla:
   perl:
-    version: '5.032001'
+    version: '5.040000'
   plugins:
     -
       class: Dist::Zilla::Plugin::NextRelease
@@ -118,7 +118,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
+          bail_out_on_fail: 0
           fail_on_warning: author
           fake_home: 0
           filename: xt/author/00-compile.t
@@ -218,7 +218,7 @@ x_Dist_Zilla:
           add_files_in:
             - /
           commit_msg: 'Release v%V%t'
-          signoff: '0'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -242,7 +242,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.018'
+          tag: '0.019'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:
@@ -269,7 +269,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: 'Bump version'
-          signoff: '0'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -316,11 +316,11 @@ x_Dist_Zilla:
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
-          inherit_missing: '1'
-          inherit_version: '1'
-          meta_noindex: '1'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000038'
           version: '0.006'
       name: '@Starter::Git/MetaProvides::Package'
       version: '2.004003'
@@ -406,10 +406,10 @@ x_Dist_Zilla:
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
+      is_trial: 0
     version: '6.032'
 x_contributors:
   - 'Ask Bjørn Hansen <ask@develooper.com>'
-x_generated_by_perl: v5.32.1
+x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

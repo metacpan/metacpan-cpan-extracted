@@ -60,6 +60,7 @@ $mock_plugin->response_for('/db/dummy/tx/commit',   '' => \%empty_jolt);
 	package Local::Bolt;
 	sub new { bless \(my $b = undef), shift }
 	sub connect { &new }
+	sub protocol_version { 0 }
 	
 	# Cxn
 	sub connected { 1 }
@@ -220,36 +221,30 @@ subtest 'http autocommit, concurrent enabled' => sub {
 
 
 subtest 'http explicit, concurrent disabled' => sub {
-	plan tests => 11;
+	plan tests => 6;
 	$d = Neo4j::Driver->new->plugin($mock_plugin);
 	lives_ok { $d->config( uri => 'http:', concurrent_tx => 0 ); } 'config on lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session';
 	my ($t1, $t2);
 	lives_and { ok $t1 = $s->begin_transaction } 'begin 1';
 	lives_and { isa_ok $r = $t1->run('foo'), Neo4j::Driver::Result:: } 'run 1';
-	lives_and { ok $t2 = $s->begin_transaction } 'begin 2';
-	lives_ok { $w = ''; $w = warning { $r = $t2->run('bar') } } 'run 2 lives';
-	like $w, qr/\bConcurrent transactions\b/i, 'run 2 warns'
-		or diag 'got warning(s): ', explain $w;
-	isa_ok $r, Neo4j::Driver::Result::, 'run 2 result';
-	lives_ok { $w = ''; $w = warning { $t2->commit } } 'commit 2';
-	like $w, qr/\bConcurrent transactions\b/i, 'commit 2 warns'
-		or diag 'got warning(s): ', explain $w;
+	throws_ok {
+		$s->begin_transaction->run('bar');
+	}  qr/\bConcurrent transactions\b.*\bHTTP\b.*\bdisabled\b/i, 'concurrent run dies';
 	lives_ok { $t1->commit } 'commit 1';
 };
 
 
 subtest 'http autocommit, concurrent disabled' => sub {
-	plan tests => 8;
+	plan tests => 6;
 	$d = Neo4j::Driver->new->plugin($mock_plugin);
 	lives_ok { $d->config( uri => 'http:', concurrent_tx => 0 ); } 'config on lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session';
 	lives_and { ok $t = $s->begin_transaction } 'begin expl';
 	lives_and { isa_ok $r = $t->run('bar'), Neo4j::Driver::Result:: } 'run expl';
-	lives_ok { $w = ''; $w = warning { $r = $s->run('') } } 'run auto lives';
-	like $w, qr/\bConcurrent transactions\b/i, 'run auto warns'
-		or diag 'got warning(s): ', explain $w;
-	isa_ok $r, Neo4j::Driver::Result::, 'run auto result';
+	throws_ok {
+		$s->run('');
+	}  qr/\bConcurrent transactions\b.*\bHTTP\b.*\bdisabled\b/i, 'concurrent auto dies';
 	lives_ok { $t->commit } 'commit expl';
 };
 
@@ -271,22 +266,22 @@ subtest 'http managed, concurrent enabled' => sub {
 
 
 subtest 'http managed, concurrent disabled' => sub {
-	plan tests => 5;
+	plan tests => 2;
 	$d = Neo4j::Driver->new->plugin($mock_plugin);
 	$d->config( uri => 'http:', concurrent_tx => 0 );
 	$s = $d->session;
-	my ($r1, $r2, $w1, $w2);
-	lives_ok { $s->execute_write(sub {
-		shift->run('foo');
-		$w1 = warning { $r1 = $s->run(''); };
-		$w2 = warning { $s->execute_write(sub { $r2 = shift->run('bar'); 1 }); };
-	})} 'concurrent in execute lives';
-	like $w1, qr/\bConcurrent transactions\b/i, 'auto in execute warns'
-		or diag 'got warning(s): ', explain $w1;
-	isa_ok $r1, Neo4j::Driver::Result::, 'run auto result';
-	like eval { $w2->[0] }, qr/\bConcurrent transactions\b/i, 'execute in execute warns'
-		or diag 'got warning(s): ', explain $w2;
-	isa_ok $r2, Neo4j::Driver::Result::, 'execute result';
+	throws_ok {
+		$s->execute_write(sub {
+			shift->run('foo');
+			$s->run('');
+		});
+	}  qr/\bConcurrent transactions\b.*\bHTTP\b.*\bdisabled\b/i, 'concurrent auto in managed dies';
+	throws_ok {
+		$s->execute_write(sub {
+			shift->run('foo');
+			$s->execute_write(sub { shift->run('bar') });
+		});
+	}  qr/\bConcurrent transactions\b.*\bHTTP\b.*\bdisabled\b/i, 'concurrent explicit in managed dies';
 };
 
 
@@ -295,29 +290,24 @@ subtest 'http managed, concurrent disabled' => sub {
 
 subtest 'live: explicit (REST)' => sub {
 	my $session = eval { Neo4j_Test->driver->session };
-	plan skip_all => "(no session)" unless $session;
-	plan skip_all => '(currently testing Bolt)' if $Neo4j_Test::bolt;
-	plan tests => 5;
-	my ($t1, $t2, $w2);
+	plan skip_all => "(test wants live HTTP)" if ! $session || $Neo4j_Test::bolt || $Neo4j_Test::sim;
+	plan tests => 3;
+	my ($t1, $t2);
 	lives_ok {
 		$t1 = $session->begin_transaction;
 		$t1->run("CREATE (nested1:Test)");
 	} 'explicit nested transactions: 1st';
-	lives_ok {
+	throws_ok {
 		$t2 = $session->begin_transaction;
-		$w2 = warning { $t2->run("CREATE (nested2:Test)"); };
-	} 'explicit nested transactions: 2nd';
-	like $w2, qr/\bConcurrent transactions\b/i, 'explicit in explicit warns'
-		or diag 'got warning(s): ', explain $w2;
+		$t2->run("CREATE (nested2:Test)");
+	}  qr/\bConcurrent transactions\b.*\bHTTP\b.*\bdisabled\b/i, 'explicit in explicit dies';
 	lives_ok { $t1->rollback; } 'explicit nested transactions: close 1st';
-	lives_ok { $t2->rollback; } 'explicit nested transactions: close 2nd';
 };
 
 
 subtest 'live: explicit (Bolt)' => sub {
 	my $session = eval { Neo4j_Test->driver->session };
-	plan skip_all => "(no session)" unless $session;
-	plan skip_all => '(currently testing HTTP)' if ! $Neo4j_Test::bolt;
+	plan skip_all => "(test wants live Bolt)" if ! $session || ! $Neo4j_Test::bolt;
 	plan tests => 4 if $Neo4j_Test::bolt;
 	my ($t1, $t2);
 	lives_ok {
@@ -335,23 +325,13 @@ subtest 'live: explicit (Bolt)' => sub {
 
 subtest 'live: autocommit' => sub {
 	my $session = eval { Neo4j_Test->driver->session };
-	plan skip_all => "(no session)" unless $session;
-	plan tests => 2;
-	my $value = 0;
+	plan skip_all => "(test wants live session)" if ! $session || $Neo4j_Test::sim;
+	plan tests => 1;
 	my $t = $session->begin_transaction;
 	$t->run("CREATE (explicit1:Test)");
-	lives_ok {
-		warning { $value = $session->run("RETURN 42")->single->get(0); };
-		$t->run("CREATE (explicit2:Test)");
-		$t->rollback;
-	} 'nested autocommit transactions: success' if ! $Neo4j_Test::bolt;
 	throws_ok {
-		$value = $session->run("RETURN 42")->single->get(0);
-		$t->run("CREATE (explicit2:Test)");
-		$t->rollback;
-	} qr/support.*Bolt/i, 'nested autocommit transactions: no success' if $Neo4j_Test::bolt;
-	my $expected = $Neo4j_Test::bolt ? 0 : 42;
-	is $value, $expected, 'nested autocommit transactions: result';
+		$session->run("RETURN 42")->single->get(0);
+	}  qr/\bConcurrent transactions\b/i, 'nested autocommit transactions: no success';
 };
 
 

@@ -1,10 +1,9 @@
-use 5.010;
-use strict;
+use v5.12;
 use warnings;
 
-package Neo4j::Driver::Plugin;
+package Neo4j::Driver::Plugin 1.02;
 # ABSTRACT: Plug-in interface for Neo4j::Driver
-$Neo4j::Driver::Plugin::VERSION = '0.52';
+
 
 1;
 
@@ -20,7 +19,7 @@ Neo4j::Driver::Plugin - Plug-in interface for Neo4j::Driver
 
 =head1 VERSION
 
-version 0.52
+version 1.02
 
 =head1 SYNPOSIS
 
@@ -34,10 +33,10 @@ version 0.52
    $events->add_handler( http_adapter_factory => sub {
      my ($continue, $driver) = @_;
      
-     # Get and modify the default adapter
-     # (currently Neo4j::Driver::Net::HTTP::LWP)
+     # Get and modify the default adapter (internal API)
+     # (currently Neo4j::Driver::Net::HTTP::Tiny)
      my $adapter = $continue->();
-     $adapter->ua->proxy('http', 'http://192.0.2.2:3128/');
+     $adapter->{http}->proxy('http://192.0.2.2:3128/');
      return $adapter;
    });
  }
@@ -82,7 +81,7 @@ is triggered. Events triggered by the driver are specified in
 L</"EVENTS"> below. Plug-ins can also define custom events.
 
 I<The plug-in interface as described in this document is available
-since version 0.34.>
+since version 1.02.>
 
 =head1 EVENTS
 
@@ -137,8 +136,8 @@ reference for continuing with the next handler registered for
 this event and the driver.
 
 A handler for this event must return the blessed instance of
-an HTTP adapter module (formerly known as "networking module")
-to be used instead of the default adapter built into the driver.
+an HTTP adapter module to be used instead of the default adapter
+built into the driver.
 See L</"Network adapter API for HTTP"> below.
 
 =back
@@ -177,8 +176,7 @@ of the driver.
 
 =head1 THE EVENT MANAGER
 
-The job of the event manager (formerly known as the "plug-in
-manager") is to invoke the appropriate
+The job of the event manager is to invoke the appropriate
 event handlers when events are triggered. It also allows clients
 to modify the list of registered handlers. A reference to the
 event manager is provided to your plug-in when it is loaded;
@@ -217,9 +215,6 @@ to provide additional arguments. Because subroutine signatures
 perform strict checks of the number of arguments, they are not
 recommended for event handlers.
 
-This method used to be named C<add_event_handler()>.
-There is a compatibility alias, but its use is deprecated.
-
 =item trigger
 
  $events->trigger( 'event_name', @parameters );
@@ -245,9 +240,6 @@ ignored. This will likely change in a future version of the driver.
 Calling this method in list context is discouraged, because doing
 so might be treated specially by a future version of the driver.
 Use C<scalar> to be safe.
-
-This method used to be named C<trigger_event()>.
-There is a compatibility alias, but its use is deprecated.
 
 =back
 
@@ -278,7 +270,9 @@ for future use by the driver itself:
 
 =item * Neo4j::Driver::Net::HTTP::Role
 
-=item * Neo4j::Driver::Net::HTTP::Tiny
+=item * Neo4j::Driver::Net::HTTP::Query
+
+=item * Neo4j::Driver::Net::Query
 
 =back
 
@@ -314,7 +308,9 @@ of Cypher queries or custom object-graph mapping.
 The driver primarily uses HTTP network adapters by first calling
 the C<request()> method, which initiates a request on the network,
 and then calling other methods to obtain information about the
-response. See L<Neo4j::Driver::Net> for more information.
+response. See
+L<Neo4j::Driver::Net|https://github.com/johannessen/neo4j-driver-perl/blob/1.02/lib/Neo4j/Driver/Net.pod>
+for more information.
 
  $adapter->request('GET', '/', undef, 'application/json');
  $status  = $adapter->http_header->{status};
@@ -363,7 +359,8 @@ the same request is undefined.
 
 Return the next Jolt event from the response to the last network
 request as a string. When there are no further Jolt events, this
-method returns an undefined value. If the response hasn't been
+method returns the empty string. (Prior to S<version 1.02>, it
+needed to return an undefined value.) If the response hasn't been
 fully received at the time this method is called and the internal
 response buffer does not contain at least one event, this method
 will block until at least one event is available.
@@ -407,6 +404,7 @@ For error responses generated internally by the networking
 library, for example because the connection failed, C<status>
 and C<content_type> should both be the empty string, with
 the C<http_reason()> method providing the error message.
+C<success> should be false for errors.
 Optionally, additional information may be made available in
 a plain text response content; in this case, the C<status>
 should preferably be C<"599">.
@@ -441,7 +439,7 @@ The default adapter included with the driver uses L<JSON::MaybeXS>.
 =item request
 
  sub request {
-   my ($self, $method, $url, $json, $accept) = @_;
+   my ($self, $method, $url, $json, $accept, $mode) = @_;
    ...
  }
 
@@ -458,6 +456,8 @@ parameters are given:
 
 =item * C<$accept> – string with value for the C<Accept:> header
 
+=item * C<$mode> – value for the C<Access-Mode:> header
+
 =back
 
 The request C<$url> is to be interpreted relative to the server
@@ -471,6 +471,10 @@ of C<$json> will be C<undef>.
 C<$accept> will have different values depending on C<$method>;
 this is a workaround for a known issue in the Neo4j server
 (L<#12644|https://github.com/neo4j/neo4j/issues/12644>).
+
+C<Access-Mode> is a non-standard header used by Neo4j for
+server-side routing. C<$mode> can be either C<"READ"> or C<"WRITE">.
+A value of C<undef> will suppress generation of the header.
 
 The C<request()> method may or may not block until the response
 has been received.
@@ -492,7 +496,7 @@ a Neo4j HTTP adapter module. It may only be implemented by
 network adapters that actually offer custom result handlers.
 Note that the result handler API is currently internal and
 expected to change, and this method will likely disappear
-entirely in future; see L</"RESULT HANDLER API"> below.
+entirely in future; see L</"Result handler API"> below.
 
 =item uri
 

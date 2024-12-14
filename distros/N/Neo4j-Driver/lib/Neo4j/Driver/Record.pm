@@ -1,107 +1,124 @@
-use 5.010;
-use strict;
+use v5.12;
 use warnings;
-use utf8;
 
-package Neo4j::Driver::Record;
+package Neo4j::Driver::Record 1.02;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.52';
+
 
 use Carp qw(croak);
-use JSON::MaybeXS 1.003003 qw(is_bool);
+use List::Util qw(first);
 
 use Neo4j::Driver::ResultSummary;
 
 
-# Based on _looks_like_number() in JSON:PP 4.05, originally by HAARG.
-# Modified on 2020 OCT 13 to detect only integers (column index).
-sub _looks_like_int {
-	my $value = shift;
-	# if the utf8 flag is on, it almost certainly started as a string
-	return if utf8::is_utf8($value);
-	# detect numbers
-	# string & "" -> ""
-	# number & "" -> 0 (with warning)
-	# nan and inf can detect as numbers, so check with * 0
+# Check if the given value was created as a number. Older Perls lack stable
+# tracking of numbers vs. strings, but a quirk of bitwise string operators
+# can be used to determine whether the scalar contains a number (see perlop).
+# That isn't quite the same, but it should be good enough for us.
+# (original idea from https://github.com/makamaka/JSON-PP/commit/87bd6a4)
+sub _SvNIOKp {
 	no warnings 'numeric';
-	return unless length((my $dummy = "") & $value);
-	return unless $value eq int $value;
-	return unless $value * 0 == 0;
-	return 1;
+	return length( (my $string = '') & shift );
 }
+*created_as_number = $^V ge v5.36 ? \&builtin::created_as_number : \&_SvNIOKp;
 
 
 sub get {
 	my ($self, $field) = @_;
 	
 	if ( ! defined $field ) {
-		warnings::warnif ambiguous => "Ambiguous get() on " . __PACKAGE__ . " with multiple fields" if @{$self->{row}} > 1;
+		warnings::warnif ambiguous =>
+			sprintf "Ambiguous get() on %s with multiple fields", __PACKAGE__
+			if @{$self->{row}} > 1;
 		return $self->{row}->[0];
 	}
 	
-	croak "Field '' not present in query result" if ! length $field;
+	my $index = $self->{field_names_cache}->{$field};
+	return $self->{row}->[$index] if defined $index && length $field;
 	
-	my $unambiguous_key = $self->{column_keys}->{$field};
-	return $self->{row}->[$unambiguous_key] if defined $unambiguous_key;
+	# At this point, it looks like the given $field is both a valid name and
+	# a valid index, which should be pretty rare.
+	# Callers usually specify the field as a literal in the method call, so we
+	# can DWIM and disambiguate by using Perl's created_as_number() built-in.
 	
-	if ( _looks_like_int $field ) {
-		croak "Field $field not present in query result" if $field < 0 || $field >= @{$self->{row}};
+	no if $^V ge v5.36, 'warnings', 'experimental::builtin';
+	if ( created_as_number($field) ) {
+		croak sprintf "Field %s not present in query result", $field
+			unless $field == int $field && $field >= 0 && $field < @{$self->{row}};
 		return $self->{row}->[$field];
 	}
 	
-	my $key = $self->{column_keys}->key($field);
-	croak "Field '$field' not present in query result" if ! defined $key;
-	return $self->{row}->[$key];
-}
-
-
-# The various JSON modules for Perl tend to represent a boolean false value
-# using a blessed scalar overloaded to evaluate to false in Perl expressions.
-# This almost always works perfectly fine. However, some tests might not expect
-# a non-truthy value to be blessed, which can result in wrong interpretation of
-# query results. The get_bool method was meant to ensure boolean results would
-# evaluate correctly in such cases. Given that such cases are rare and that no
-# specific examples for such cases are currently known, this method now seems
-# superfluous.
-sub get_bool {
-	# uncoverable pod (see Deprecations.pod)
-	my ($self, $field) = @_;
-	warnings::warnif deprecated => __PACKAGE__ . "->get_bool is deprecated";
-	
-	my $value = $self->get($field);
-	no if $^V ge v5.36, 'warnings', 'experimental::builtin';
-	return undef if ! $value && $^V ge v5.36 && builtin::is_bool $value;
-	return $value if ! is_bool $value;
-	return $value if !! $value;
-	return undef;  ##no critic (ProhibitExplicitReturnUndef)
+	my $field_names = $self->{field_names_cache}->{''};
+	$index = first { $field eq $field_names->[$_] } 0 .. $#$field_names;
+	croak sprintf "Field '%s' not present in query result", $field
+		unless defined $index;
+	return $self->{row}->[$index];
 }
 
 
 sub data {
 	my ($self) = @_;
 	
-	my %data = ();
-	foreach my $key (keys %{ $self->{column_keys} }) {
-		$data{$key} = $self->{row}->[ $self->{column_keys}->key($key) ];
-	}
-	return \%data;
+	return $self->{hash} if exists $self->{hash};
+	
+	my $field_names = $self->{field_names_cache}->{''};
+	my %data;
+	$data{ $field_names->[$_] } = $self->{row}->[$_] for 0 .. $#$field_names;
+	return $self->{hash} = \%data;
 }
+
+
+# Parse the field names (result column keys) provided by the server and
+# return them as a hash ref for fast index lookups
+sub _field_names_cache {
+	my ($result) = @_;
+	
+	my $field_names = $result->{columns};
+	my $cache = { '' => $field_names };
+	for my $index (0 .. $#$field_names) {
+		my $name = $field_names->[$index];
+		
+		# Create lookup cache for both index and field name to the index.
+		# Skip ambiguous index/name pairs.
+		
+		if ( exists $cache->{$name} ) {
+			delete $cache->{$name};
+		}
+		else {
+			$cache->{$name} = $index;
+		}
+		
+		if ( exists $cache->{$index} ) {
+			delete $cache->{$index};
+		}
+		else {
+			$cache->{$index} = $index;
+		}
+	}
+	
+	return $cache;
+}
+
+# The field names (column keys / ex ResultColumns) are stored in a hash ref.
+# For each field, there are entries with keys for the name and the column index
+# in the result record array. The value is always the column index.
+# For example, for `RETURN 1 AS foo`, it would look like this:
+#   $cache = { 'foo' => 0, '0' => 0 };
+
+# Exceptionally, index/name collisions can occur (see record-ambiguous.t).
+# The field names lookup cache is limited to cases where no ambiguity exists.
+# A reference to the original list of field names is kept in
+# the entry '' (empty string). Neo4j doesn't allow zero-length
+# field names, so '' itself is never ambiguous.
 
 
 sub summary {
+	# uncoverable pod (see consume)
 	my ($self) = @_;
+	warnings::warnif deprecated => "summary() in Neo4j::Driver::Record is deprecated; use consume() in Neo4j::Driver::Result instead";
 	
-	$self->{_summary} //= Neo4j::Driver::ResultSummary->new;
-	return $self->{_summary}->_init;
-}
-
-
-sub stats {
-	# uncoverable pod (see Deprecations.pod)
-	my ($self) = @_;
-	warnings::warnif deprecated => __PACKAGE__ . "->stats is deprecated; use summary instead";
-	
-	return $self->{_summary} ? $self->{_summary}->counters : {};
+	croak 'Summary unavailable for Record retrieved with fetch() or list(); use consume() in Neo4j::Driver::Result' unless $self->{_summary};
+	return $self->{_summary};
 }
 
 
@@ -119,7 +136,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.52
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -136,7 +153,7 @@ version 0.52
 =head1 DESCRIPTION
 
 Container for Cypher result values. Records are returned from Cypher
-statement execution, contained within a Result. A record is
+query execution, contained within a Result. A record is
 a form of ordered map and, as such, contained values can be accessed
 by either positional index or textual key.
 
@@ -178,12 +195,9 @@ Return the keys and values of this record as a hash reference.
 
 =item * L<Neo4j::Driver>
 
-=item * L<Neo4j::Driver::Types>
+=item * L<Neo4j::Driver::B<Result>>
 
-=item * Equivalent documentation for the official Neo4j drivers:
-L<Record (Java)|https://neo4j.com/docs/api/java-driver/5.26/org.neo4j.driver/org/neo4j/driver/Record.html>,
-L<Record (JavaScript)|https://neo4j.com/docs/api/javascript-driver/5.26/class/lib6/record.js~Record.html>,
-L<IRecord (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.26/api/Neo4j.Driver.IRecord.html>
+=item * L<Neo4j::Driver::Types>
 
 =back
 

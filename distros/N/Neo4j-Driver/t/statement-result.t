@@ -49,10 +49,11 @@ subtest 'result with no statement' => sub {
 
 
 subtest 'keys()' => sub {
-	plan tests => 2;
+	plan tests => 3;
 	my @r = $s->run('RETURN 1 AS one, 2 AS two')->keys;
 	is $r[0], 'one', 'key 1';
 	is $r[1], 'two', 'key 2';
+	lives_and { is_deeply [$s->run->keys], [] } 'empty query keys lives';
 };
 
 

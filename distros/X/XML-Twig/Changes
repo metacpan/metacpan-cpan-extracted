@@ -1,4 +1,19 @@
 CHANGES
+3.53 - 2024-12-10 - minor maintenance release
+
+- fixed warning from recent perl version
+  See RT#155759 https://rt.cpan.org/Public/Bug/Display.html?id=155759
+
+- fixed bug with namespaced elements in navigation
+
+- added multiclass selectors in navigation and handler triggers
+  (css style, eg elt.class1.class2)
+
+- fixed bug with dots in element names confusing navigation
+  conditions in some cases
+
+- fixed output when a CDATA section includes a CDATA end marker
+  spotted by Djibril
 
 3.52 - 2016-11-23  - minor maintenance release
 

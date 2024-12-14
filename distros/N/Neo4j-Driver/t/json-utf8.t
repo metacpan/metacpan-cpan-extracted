@@ -94,7 +94,7 @@ subtest 'read full property list' => sub {
 	lives_ok {
 		$node = $r->list->[0]->get(0);
 	} 'get node';
-	is ref $node, 'Neo4j::Driver::Type::Node', '$node is blessed node';
+	isa_ok $node, 'Neo4j::Types::Node', '$node is blessed node';
 	foreach my $key (@keys) {
 		is to_hex $node->get($key), to_hex $props{$key}, "prop: $key";
 	}
@@ -103,7 +103,7 @@ subtest 'read full property list' => sub {
 
 subtest 'no utf8' => sub {
 	plan tests => 3;
-	TODO: { local $TODO = 'no utf8 unsupported by Neo4j::Bolt 0.4201 (perlbolt#38)' if $Neo4j_Test::bolt;
+	TODO: { local $TODO = 'no utf8 unsupported by Neo4j::Bolt 0.4201 (perlbolt#38)' if $Neo4j_Test::bolt && ! eval { require Neo4j::Bolt; Neo4j::Bolt->VERSION('0.4202') };
 	no utf8;
 	my $smp = "😀";  # 0xf09f9880 = LATIN SMALL LETTER ETH + APPLICATION PROGRAM COMMAND + START OF STRING + PADDING CHARACTER (Latin-1)
 	lives_ok {

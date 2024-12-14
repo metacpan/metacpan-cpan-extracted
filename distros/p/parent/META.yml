@@ -22,6 +22,6 @@ requires:
   perl: '5.006'
 resources:
   repository: git://github.com/Corion/parent.git
-version: '0.243'
+version: '0.244'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

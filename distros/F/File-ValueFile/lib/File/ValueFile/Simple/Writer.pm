@@ -12,12 +12,18 @@ use strict;
 use warnings;
 
 use Carp;
-use URI::Escape qw(uri_escape_utf8);
+use URI::Escape qw(uri_escape uri_escape_utf8);
 use Data::Identifier v0.03;
 
-use constant FORMAT_ISE => '54bf8af4-b1d7-44da-af48-5278d11e8f32';
+use File::ValueFile;
 
-our $VERSION = v0.02;
+use constant FORMAT_ISE => '54bf8af4-b1d7-44da-af48-5278d11e8f32';
+use constant SF_ISE     => 'e5da6a39-46d5-48a9-b174-5c26008e208e'; # tagpool-source-format
+use constant TLv1_ISE   => 'afdb46f2-e13f-4419-80d7-c4b956ed85fa'; # tagpool-taglist-format-v1
+use constant F_M_L_ISE  => 'f06c2226-b33e-48f2-9085-cd906a3dcee0'; # tagpool-source-format-modern-limited
+use constant F_M_F_ISE  => '1c71f5b1-216d-4a9b-81a1-54dc22d8a067'; # tagpool-source-format-modern-full
+
+our $VERSION = v0.03;
 
 
 
@@ -25,6 +31,8 @@ sub new {
     my ($pkg, $out, %opts) = @_;
     my $fh;
     my $self = bless \%opts;
+    my $_is_utf8;
+    my %features;
 
     if (ref $out) {
         $fh = $out;
@@ -33,29 +41,61 @@ sub new {
     }
 
     $self->{fh} = $fh;
+    $self->{features} = \%features;
+    $self->{escape} = \&uri_escape; # set here, so we can write the markers.
 
     if (defined $opts{format}) {
-        $self->_write_marker(required => 'ValueFile', FORMAT_ISE, $opts{format});
+        my $format = $self->{format} = Data::Identifier->new(from => $opts{format});
+
+        $self->_write_marker(required => 'ValueFile', FORMAT_ISE, $format);
+        $_is_utf8 ||= File::ValueFile->_is_utf8($format);
     }
 
     foreach my $type (qw(required copy optional)) {
         my $list = $opts{$type.'_feature'} // next;
         $list = [$list] unless ref($list) eq 'ARRAY';
         foreach my $entry (@{$list}) {
-            $self->_write_marker($type, 'Feature', $entry);
+            my $feature = Data::Identifier->new(from => $entry);
+
+            $self->_write_marker($type, 'Feature', $feature);
+            $_is_utf8 ||= File::ValueFile->_is_utf8($feature);
+            $features{$feature->ise} = $feature;
         }
     }
+
+    $opts{utf8} //= 'auto';
+
+    if ($opts{utf8} eq 'auto') {
+        $opts{utf8} = $_is_utf8;
+    }
+
+    $self->{escape} = $opts{utf8} ? \&uri_escape_utf8 : \&uri_escape;
 
     return $self;
 }
 
+
+#@returns Data::Identifier
+sub format {
+    my ($self, %opts) = @_;
+    return $self->{format} if defined $self->{format};
+    return $opts{default} if exists $opts{default};
+    croak 'No value for format';
+}
+
+
+sub features {
+    my ($self, %opts) = @_;
+    return values %{$self->{features}};
+}
+
 sub _escape {
-    my ($in) = @_;
+    my ($self, $in) = @_;
 
     return '!null' if !defined $in;
     return '!empty' if $in eq '';
 
-    return uri_escape_utf8($in);
+    return $self->{escape}->($in);
 }
 
 sub _write_marker {
@@ -70,7 +110,7 @@ sub _write_marker {
         croak 'Bug: Bad marker: '.$type;
     }
 
-    @line = map {_escape($_)} map {ref($_) ? $_->ise : $_} @line;
+    @line = map {$self->_escape($_)} map {ref($_) ? $_->ise : $_} @line;
 
     local $, = ' ';
     $self->{fh}->say(@line);
@@ -85,7 +125,7 @@ sub write {
         return;
     }
 
-    @line = map {_escape($_)} map {ref($_) ? $_->ise : $_} @line;
+    @line = map {$self->_escape($_)} map {ref($_) ? $_->ise : $_} @line;
 
     {
         my $l = length($line[0]);
@@ -101,6 +141,41 @@ sub write {
 }
 
 
+sub write_with_comment {
+    my ($self, @line) = @_;
+    my $comment = pop(@line);
+    my $valid_comment = defined($comment) && length($comment);
+
+    croak 'Unsupported comment: Bad characters' if $valid_comment && $comment =~ /[\x00-\x1F]/;
+
+    if (scalar(@line)) {
+        local $self->{no_eol} = $valid_comment;
+        $self->write(@line);
+        $self->{fh}->print(' ') if $valid_comment;
+    }
+
+    if ($valid_comment) {
+        $self->{fh}->say('# ', $comment);
+    }
+}
+
+
+sub write_blank {
+    my ($self) = @_;
+    return $self->write;
+}
+
+
+sub write_comment {
+    my ($self, @comment) = @_;
+
+    foreach my $comment_line (map {split /[\r\n]/} grep {defined} @comment) {
+        croak 'Unsupported comment: Bad characters' if $comment_line =~ /[\x00-\x1F]/;
+        $self->{fh}->say('# ', $comment_line);
+    }
+}
+
+
 sub write_hash {
     my ($self, $hash) = @_;
 
@@ -111,6 +186,43 @@ sub write_hash {
 
         foreach my $entry (@{$value}) {
             $self->write($key => $entry);
+        }
+    }
+}
+
+
+sub write_taglist {
+    my ($self, @list) = @_;
+    my $format = $self->format;
+    my $mode;
+
+    if ($format->eq(SF_ISE)) { # tagpool-source-format
+        if (defined $self->{features}{F_M_L_ISE()}) { # tagpool-source-format-modern-limited
+            $mode = 'tag-ise';
+        } elsif (defined $self->{features}{F_M_F_ISE()}) { # tagpool-source-format-modern-full
+            $mode = 'full';
+        } else {
+            $mode = 'tag';
+        }
+    } elsif ($format->eq(TLv1_ISE)) { # tagpool-taglist-format-v1
+        $mode = 'tag';
+    } else {
+        croak 'Unsupported format';
+    }
+
+    if ($mode eq 'full') {
+        foreach my $sublist (@list) {
+            $sublist = [$sublist] unless ref($sublist) eq 'ARRAY';
+            foreach my $id (@{$sublist}) {
+                $self->write_tag_ise($id);
+            }
+        }
+    } else {
+        foreach my $sublist (@list) {
+            $sublist = [$sublist] unless ref($sublist) eq 'ARRAY';
+            foreach my $id (@{$sublist}) {
+                $self->write($mode, Data::Identifier->new(from => $id)->uuid);
+            }
         }
     }
 }
@@ -141,9 +253,7 @@ sub write_tag_ise {
 
     croak 'No ISEs found' unless scalar(keys(%{$collected{uuid}})) + scalar(keys(%{$collected{oid}})) +  scalar(keys(%{$collected{uri}}));
 
-    local $self->{no_eol} = defined($displayname);
-    $self->write('tag-ise', keys(%{$collected{uuid}}), keys(%{$collected{oid}}), keys(%{$collected{uri}}));
-    say ' # '.$displayname if defined $displayname;
+    $self->write_with_comment('tag-ise', keys(%{$collected{uuid}}), keys(%{$collected{oid}}), keys(%{$collected{uri}}), $displayname);
 }
 
 
@@ -203,9 +313,7 @@ sub write_tag_relation {
         }
     }
 
-    local $self->{no_eol} = defined($comment);
-    $self->write('tag-relation', $tag, $relation, $related, $context, $filter);
-    say ' # '.$comment if defined $comment;
+    $self->write_with_comment('tag-relation', $tag, $relation, $related, $context, $filter, $comment);
 }
 
 
@@ -261,9 +369,7 @@ sub write_tag_metadata {
         $comment .= '('.$type_displayname.')';
     }
 
-    local $self->{no_eol} = defined($comment);
-    $self->write('tag-metadata', $tag, $relation, $context, $type, $encoding, $data_raw);
-    say ' # '.$comment if defined $comment;
+    $self->write_with_comment('tag-metadata', $tag, $relation, $context, $type, $encoding, $data_raw, $comment);
 }
 
 1;
@@ -280,7 +386,7 @@ File::ValueFile::Simple::Writer - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -317,7 +423,33 @@ Optional features do not need to be understood by the reader.
 May be a single feature or a list (as array ref).
 Each feature is given by the ISE or an instances of L<Data::Identifier>.
 
+=item C<utf8>
+
+The UTF-8 flag for encoding strings.
+If set true all data with code points outside the ASCII range is encoded as UTF-8.
+If set (non-C<undef>) false all data is encoded as binary (code points outside the 8 bit range are invalid).
+If set to C<auto> UTF-8 is enabled based on the set format and features.
+This is the default.
+
 =back
+
+=head2 format
+
+    my Data::Identifier $format = $reader->format;
+    # or:
+    my Data::Identifier $format = $reader->format(default => $def);
+
+Returns the format of the file. This requires the format to be given via L</new>.
+If no format is set the default is returned.
+If no default is given this method dies.
+
+=head2 features
+
+    my @features = $reader->features;
+
+Returns the list of features of the file. This requires the features to be given via L</new>.
+
+Elements of the list returned are instances L<Data::Identifier>.
 
 =head2 write
 
@@ -327,6 +459,31 @@ Writes a single line (record). Correctly escapes the output.
 
 Values in C<@line> may be strings, numbers, or instances of L<Data::Identifier>.
 
+=head2 write_with_comment
+
+    $writer->write_with_comment(@line, $comment);
+
+Write a line alike L</write> but finishes the line with a comment.
+The comment must be a single line comment or C<undef>.
+
+If the comment is C<undef> no comment is written.
+
+For writing comments individually see L</write_comment>.
+
+=head2 write_blank
+
+    $writer->write_blank;
+
+Write a blank line. Such lines have no technical meaning, however are sometimes used to make the result more readable.
+
+=head2 write_comment
+
+    $writer->write_comment($comment [, ...]);
+
+Writes one or more comments. Each comment begins a new line.
+If a comment contains line breaks it is split into a individual comments.
+If any comment is C<undef> it is skipped without any warnings.
+
 =head2 write_hash
 
     $writer->write_hash($hashref);
@@ -334,6 +491,30 @@ Values in C<@line> may be strings, numbers, or instances of L<Data::Identifier>.
 Writes a hash as returned by L<File::ValueFile::Simple::Reader/read_as_hash> or L<File::ValueFile::Simple::Reader/read_as_hash_of_arrays>.
 
 Values in C<$hashref> may be strings, numbers, or instances of L<Data::Identifier>.
+
+=head2 write_taglist
+
+    $writer->write_taglist($tag [, ...]);
+    # or:
+    $writer->write_taglist($arrayref_of_tags);
+
+Writes a taglist using the selected format.
+The exact output depends on the selected format and features.
+
+This method takes the tags to be written as arguments.
+If any argument is an arrayref then the tags contained in that arrayref
+are also written.
+
+A tag here is anything that can be used as input to L<Data::Identifier/new>'s C<from>.
+If a given tag uses an identifier that is not supported by the selected format (and features)
+this method might try to convert or die.
+
+B<Note:> UUIDs are the only identifier type supported by all formats.
+
+If there is any error, this method dies.
+
+See also:
+L<File::ValueFile::Simple::Reader/read_as_taglist>.
 
 =head2 write_tag_ise
 

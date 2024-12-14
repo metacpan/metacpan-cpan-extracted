@@ -1,3 +1,8 @@
+1.05 2024-12-13
+ - Show queue info on ticket create page
+ - Hide redundant "Problem Type" custom field on ticket create page
+ - Remove extraneous closing brace
+
 1.04 2022-04-30
  - Add odd/even css classes to problem options
  - Split queue and problem options to ease future changes

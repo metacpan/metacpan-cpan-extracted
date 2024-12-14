@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,29 +14,27 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Neo4j-Driver",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Neo4j::Driver",
   "PREREQ_PM" => {
+    "Feature::Compat::Try" => 0,
+    "HTTP::Tiny" => "0.034",
     "JSON::MaybeXS" => "1.003003",
-    "LWP::UserAgent" => "6.04",
+    "List::Util" => "1.33",
     "Neo4j::Error" => 0,
-    "Neo4j::Types" => "1.00",
-    "Time::Piece" => "1.20",
-    "Try::Tiny" => 0,
+    "Neo4j::Types" => "2.00",
     "URI" => "1.31",
-    "parent" => 0
+    "URI::Escape" => "3.26"
   },
   "TEST_REQUIRES" => {
-    "HTTP::Headers" => 0,
-    "HTTP::Response" => 0,
-    "Mock::Quick" => 0,
-    "Neo4j::Types" => "1.00",
+    "Neo4j::Types" => "2.00",
+    "Test2::V0" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.94",
     "Test::Neo4j::Types" => "0.03",
     "Test::Warnings" => "0.010"
   },
-  "VERSION" => "0.52",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,21 +42,19 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "HTTP::Headers" => 0,
-  "HTTP::Response" => 0,
+  "Feature::Compat::Try" => 0,
+  "HTTP::Tiny" => "0.034",
   "JSON::MaybeXS" => "1.003003",
-  "LWP::UserAgent" => "6.04",
-  "Mock::Quick" => 0,
+  "List::Util" => "1.33",
   "Neo4j::Error" => 0,
-  "Neo4j::Types" => "1.00",
+  "Neo4j::Types" => "2.00",
+  "Test2::V0" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.94",
   "Test::Neo4j::Types" => "0.03",
   "Test::Warnings" => "0.010",
-  "Time::Piece" => "1.20",
-  "Try::Tiny" => 0,
   "URI" => "1.31",
-  "parent" => 0
+  "URI::Escape" => "3.26"
 );
 
 

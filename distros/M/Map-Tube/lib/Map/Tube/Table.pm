@@ -1,6 +1,6 @@
 package Map::Tube::Table;
 
-$Map::Tube::Table::VERSION   = '3.85';
+$Map::Tube::Table::VERSION   = '3.87';
 $Map::Tube::Table::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Table - Class to represent the table in the map.
 
 =head1 VERSION
 
-Version 3.85
+Version 3.87
 
 =cut
 
@@ -17,8 +17,16 @@ use 5.006;
 use Moo;
 use namespace::autoclean;
 
+use overload q{""} => 'as_string', fallback => 1;
+
 has id => (is => 'ro', required => 1);
 has [ qw(path length) ] => (is => 'rw');
+
+sub as_string {
+    my ($self) = @_;
+    return sprintf("[id:%s, path:%s, length:%s]",
+        $self->id, $self->path||'', $self->length||'');
+}
 
 =head1 DESCRIPTION
 

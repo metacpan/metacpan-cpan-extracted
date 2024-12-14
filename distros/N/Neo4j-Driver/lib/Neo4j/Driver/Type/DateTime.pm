@@ -1,25 +1,18 @@
-use 5.010;
-use strict;
+use v5.12;
 use warnings;
-use utf8;
 
-package Neo4j::Driver::Type::DateTime;
+package Neo4j::Driver::Type::DateTime 1.02;
 # ABSTRACT: Represents a Neo4j temporal instant value
-$Neo4j::Driver::Type::DateTime::VERSION = '0.52';
+
 
 # For documentation, see Neo4j::Driver::Types.
 
 
 use parent 'Neo4j::Types::DateTime';
-use parent 'Neo4j::Driver::Type::Temporal';
 
 
 sub _parse {
 	my ($self) = @_;
-	
-	if ( ! exists $self->{T} ) {  # JSON format
-		$self->{T} = $self->{data};
-	}
 	
 	my ($days, $hours, $mins, $secs, $nanos, $tz) = $self->{T} =~ m/^(?:([-+]?[0-9]{4,}-[0-9]{2}-[0-9]{2}))?T?(?:([0-9]{2}):([0-9]{2}):([0-9]{2})(?:[,.]([0-9]+))?)?(.*)$/;
 	

@@ -95684,3 +95684,17 @@ M/MA/MANWAR/Task-Map-Tube-Bundle-0.03.tar.gz
 L/LN/LNATION/Term-ANSI-Sprintf-0.05.tar.gz
 J/JI/JIMAVERA/Text-Table-Boxed-1.002.tar.gz
 L/LN/LNATION/Xerarch-0.03.tar.gz
+G/GD/GDT/Chart-ECharts-1.02.tar.gz
+J/JA/JANESKIL/Tools/Daje-Plugin-GeneratePerl-0.03.tar.gz
+J/JA/JANESKIL/Tools/Daje-Plugin-GenerateSQL-0.03.tar.gz
+L/LI/LION/File-ValueFile-v0.03.tar.gz
+J/JA/JAVONET/JavonetPerlSdk-v2.5.9.tar.gz
+P/PL/PLICEASE/Linux-Inotify-0.06.tar.gz
+M/MA/MANWAR/Map-Tube-3.87.tar.gz
+M/MA/MANWAR/Map-Tube-CLI-0.78.tar.gz
+A/AJ/AJNN/Neo4j-Driver-1.02.tar.gz
+J/JJ/JJATRIA/OpenTelemetry-Exporter-OTLP-0.019.tar.gz
+C/CO/CORION/parent-0.244.tar.gz
+B/BP/BPS/RT-Extension-CreateByProblemType-1.05.tar.gz
+C/CE/CEEJAY/UserPassManagerForWindows-0.0.8.tar.gz
+M/MI/MIROD/XML-Twig-3.53.tar.gz

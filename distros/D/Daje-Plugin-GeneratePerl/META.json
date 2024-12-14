@@ -1,0 +1,118 @@
+{
+   "abstract" : "It's new $module",
+   "author" : [
+      "This library is free software; you can redistribute it and/or modify"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.25",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Daje-Plugin-GeneratePerl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Tiny" : "0",
+            "Mojo::Base" : "0",
+            "Mojo::File" : "0",
+            "Mojo::JSON" : "0",
+            "String::CamelCase" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Daje::Plugin::Base::Perl::Common" : {
+         "file" : "lib/Daje/Plugin/Base/Perl/Common.pm"
+      },
+      "Daje::Plugin::GeneratePerl" : {
+         "file" : "lib/Daje/Plugin/GeneratePerl.pm",
+         "version" : "0.03"
+      },
+      "Daje::Plugin::Output::Class" : {
+         "file" : "lib/Daje/Plugin/Output/Class.pm",
+         "version" : "0.01"
+      },
+      "Daje::Plugin::Perl::Base::Common" : {
+         "file" : "lib/Daje/Plugin/Perl/Base/Common.pm",
+         "version" : "0.01"
+      },
+      "Daje::Plugin::Perl::Generate::BaseClass" : {
+         "file" : "lib/Daje/Plugin/Perl/Generate/BaseClass.pm",
+         "version" : "0.01"
+      },
+      "Daje::Plugin::Perl::Generate::Class" : {
+         "file" : "lib/Daje/Plugin/Perl/Generate/Class.pm",
+         "version" : "0.01"
+      },
+      "Daje::Plugin::Perl::Generate::Fields" : {
+         "file" : "lib/Daje/Plugin/Perl/Generate/Fields.pm",
+         "version" : "0.01"
+      },
+      "Daje::Plugin::Perl::Generate::Interface" : {
+         "file" : "lib/Daje/Plugin/Perl/Generate/Interface.pm",
+         "version" : "0.01"
+      },
+      "Daje::Plugin::Perl::Generate::Methods" : {
+         "file" : "lib/Daje/Plugin/Perl/Generate/Methods.pm",
+         "version" : "0.01"
+      },
+      "Daje::Plugin::Perl::Manager" : {
+         "file" : "lib/Daje/Plugin/Perl/Manager.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/janeskil1525/Daje-Plugin-GeneratePerl/issues"
+      },
+      "homepage" : "https://github.com/janeskil1525/Daje-Plugin-GeneratePerl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/janeskil1525/Daje-Plugin-GeneratePerl.git",
+         "web" : "https://github.com/janeskil1525/Daje-Plugin-GeneratePerl"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [
+      "janeskil1525 <janeskil1525@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

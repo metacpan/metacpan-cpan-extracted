@@ -1,11 +1,9 @@
-use 5.010;
-use strict;
+use v5.12;
 use warnings;
-use utf8;
 
-package Neo4j::Driver::Type::Point;
+package Neo4j::Driver::Type::Point 1.02;
 # ABSTRACT: Represents a Neo4j spatial point value
-$Neo4j::Driver::Type::Point::VERSION = '0.52';
+
 
 # For documentation, see Neo4j::Driver::Types.
 
@@ -15,11 +13,6 @@ use parent 'Neo4j::Types::Point';
 
 sub _parse {
 	my ($self) = @_;
-	
-	if ( ! exists $self->{'@'} ) {  # JSON format
-		$self->{srid} = $self->{crs}{srid};
-		return;
-	}
 	
 	my ($srid, $x, $y, $z) = $self->{'@'} =~ m/^SRID=([0-9]+);POINT(?: Z)? ?\(([-0-9.]+) ([-0-9.]+)(?: ([-0-9.]+))?\)$/;
 	

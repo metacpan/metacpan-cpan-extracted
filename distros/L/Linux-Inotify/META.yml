@@ -1,22 +1,36 @@
 ---
-name: Linux-Inotify
-version: 0.05
+abstract: 'Classes for supporting inotify in Linux Kernel >= 2.6.13'
 author:
-  - |-
-    Copyright 2005 by Torsten Werner <twerner@debian.org>. The code is licensed
-    under the same license as perl: L<perlgpl> or L<perlartistic>.
-abstract: Classes for supporting inotify in Linux Kernel >= 2.6.13
+  - 'Torsten Werner <twerner@debian.org>'
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.98'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linux-Inotify
 requires:
-  Carp: 0
-  POSIX: 0
-  perl: 5.6.1
-provides:
-  Linux::Inotify:
-    file: lib/Linux/Inotify.pm
-    version: 0.05
-  Linux::Inotify::Event:
-    file: lib/Linux/Inotify/Event.pm
-  Linux::Inotify::Watch:
-    file: lib/Linux/Inotify/Watch.pm
-generated_by: Module::Build version 0.26
+  Carp: '0'
+  POSIX: '0'
+  constant: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/uperl/Linux-Inotify/issues
+  homepage: https://metacpan.org/pod/Linux::Inotify
+  repository: git://github.com/uperl/Linux-Inotify.git
+version: '0.06'
+x_contributors:
+  - 'Torsten Werner'
+  - 'Graham Ollis <plicease@cpan.org>'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

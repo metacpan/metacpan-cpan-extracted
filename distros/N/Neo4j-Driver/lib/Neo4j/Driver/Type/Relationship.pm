@@ -1,49 +1,44 @@
-use 5.010;
-use strict;
+use v5.12;
 use warnings;
-use utf8;
 
-package Neo4j::Driver::Type::Relationship;
+package Neo4j::Driver::Type::Relationship 1.02;
 # ABSTRACT: Describes a relationship from a Neo4j graph
-$Neo4j::Driver::Type::Relationship::VERSION = '0.52';
+
 
 # For documentation, see Neo4j::Driver::Types.
 
+# Jolt relationship: [ rel_id, start_node_id, rel_type, end_node_id, {properties} ]
+
 
 use parent 'Neo4j::Types::Relationship';
-use overload '%{}' => \&_hash, fallback => 1;
 
 
 sub get {
 	my ($self, $property) = @_;
 	
-	return $$self->{$property};
+	return $self->[4]->{$property};
 }
 
 
 sub type {
 	my ($self) = @_;
 	
-	return $$self->{_meta}->{type};
+	return $self->[2];
 }
 
 
 sub start_element_id {
 	my ($self) = @_;
 	
-	return $$self->{_meta}->{element_start} if defined $$self->{_meta}->{element_start};
-	warnings::warnif 'Neo4j::Types', 'start_element_id unavailable';
-	return $$self->{_meta}->{start};
+	return $self->[1];
 }
 
 
 sub start_id {
 	my ($self) = @_;
 	
-	return $$self->{_meta}->{start} if defined $$self->{_meta}->{start};
-	
 	warnings::warnif deprecated => "Relationship->start_id() is deprecated since Neo4j 5; use start_element_id()";
-	my ($id) = $$self->{_meta}->{element_start} =~ m/^4:[^:]*:([0-9]+)/;
+	my ($id) = $self->[1] =~ m/^4:[^:]*:([0-9]+)/;
 	$id = 0 + $id if defined $id;
 	return $id;
 }
@@ -52,19 +47,15 @@ sub start_id {
 sub end_element_id {
 	my ($self) = @_;
 	
-	return $$self->{_meta}->{element_end} if defined $$self->{_meta}->{element_end};
-	warnings::warnif 'Neo4j::Types', 'end_element_id unavailable';
-	return $$self->{_meta}->{end};
+	return $self->[3];
 }
 
 
 sub end_id {
 	my ($self) = @_;
 	
-	return $$self->{_meta}->{end} if defined $$self->{_meta}->{end};
-	
 	warnings::warnif deprecated => "Relationship->end_id() is deprecated since Neo4j 5; use end_element_id()";
-	my ($id) = $$self->{_meta}->{element_end} =~ m/^4:[^:]*:([0-9]+)/;
+	my ($id) = $self->[3] =~ m/^4:[^:]*:([0-9]+)/;
 	$id = 0 + $id if defined $id;
 	return $id;
 }
@@ -73,63 +64,26 @@ sub end_id {
 sub properties {
 	my ($self) = @_;
 	
-	my $properties = { %$$self };
-	delete $properties->{_meta};
-	return $properties;
+	return $self->[4];
 }
 
 
 sub element_id {
 	my ($self) = @_;
 	
-	return $$self->{_meta}->{element_id} if defined $$self->{_meta}->{element_id};
-	warnings::warnif 'Neo4j::Types', 'element_id unavailable';
-	return $$self->{_meta}->{id};
+	return $self->[0];
 }
 
 
 sub id {
 	my ($self) = @_;
 	
-	return $$self->{_meta}->{id} if defined $$self->{_meta}->{id};
-	
 	warnings::warnif deprecated => "Relationship->id() is deprecated since Neo4j 5; use element_id()";
-	my ($id) = $$self->{_meta}->{element_id} =~ m/^5:[^:]*:([0-9]+)/;
+	my ($id) = $self->[0] =~ m/^5:[^:]*:([0-9]+)/;
 	$id = 0 + $id if defined $id;
 	return $id;
 }
-
-
-sub deleted {
-	# uncoverable pod
-	my ($self) = @_;
-	
-	warnings::warnif deprecated => __PACKAGE__ . "->deleted() is deprecated";
-	return $$self->{_meta}->{deleted};
-}
-
-
-sub _hash {
-	my ($self) = @_;
-	
-	warnings::warnif deprecated => "Direct hash access is deprecated; use " . __PACKAGE__ . "->properties()";
-	return $$self;
-}
-
-
-# for experimental Cypher type system customisation only
-sub _private {
-	my ($self) = @_;
-	
-	return $$self;
-}
-
-
-# As long as we remain compatible with Neo4j::Types 1.00,
-# we need to register the warning category explicitly.
-package # private
-        Neo4j::Types;
-use warnings::register;
+# see Node.pm for background on legacy ID parsing
 
 
 1;

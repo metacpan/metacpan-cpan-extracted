@@ -12,9 +12,9 @@ use strict;
 use warnings;
 
 use Carp;
-use Data::Identifier v0.03;
+use Data::Identifier v0.04;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my @wellknown = (
     Data::Identifier->new(uuid => '54bf8af4-b1d7-44da-af48-5278d11e8f32', displayname => 'ValueFile'),
@@ -25,6 +25,13 @@ my @wellknown = (
     Data::Identifier->new(uuid => '5a1895b8-61f1-4ce1-a44f-1a239b7d9de7', displayname => 'tagpool-source-format-hybrid'),
     Data::Identifier->new(uuid => 'f06c2226-b33e-48f2-9085-cd906a3dcee0', displayname => 'tagpool-source-format-modern-limited'),
     Data::Identifier->new(uuid => '1c71f5b1-216d-4a9b-81a1-54dc22d8a067', displayname => 'tagpool-source-format-modern-full'),
+);
+
+my %_is_utf8 = (
+    (map {$_ => undef} (
+            'e5da6a39-46d5-48a9-b174-5c26008e208e', # tagpool-source-format
+            '11431b85-41cd-4be5-8d88-a769ebbd603f', # tagpool-directory-info-format
+        )),
 );
 
 $_->register foreach @wellknown;
@@ -55,6 +62,28 @@ sub known {
     return @list;
 }
 
+
+sub add_utf8_marker {
+    my ($pkg, $class, $id) = @_;
+
+    if (!defined($class) || !defined($id)) {
+        croak 'Class or identifier not defined';
+    }
+
+    if ($class ne 'format' && $class ne 'feature') {
+        croak 'Class given with an unsupported value: '.$class;
+    }
+
+    $_is_utf8{Data::Identifier->new(from => $id)->ise} = undef;
+}
+
+# ---- Private helpers ----
+
+sub _is_utf8 {
+    my ($pkg, $id) = @_;
+    return exists $_is_utf8{Data::Identifier->new(from => $id)->ise};
+}
+
 1;
 
 __END__
@@ -69,13 +98,14 @@ File::ValueFile - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
     use File::ValueFile;
 
 This module only provides some global functionality.
+
 For reading and writing ValueFiles see L<File::ValueFile::Simple::Reader> and L<File::ValueFile::Simple::Writer>.
 
 =head1 METHODS
@@ -87,6 +117,9 @@ For reading and writing ValueFiles see L<File::ValueFile::Simple::Reader> and L<
 This method will return a list of well known tags of the given class C<$class>.
 
 Currently no specific classes is defined. The pseudo class C<:all> is however supported.
+
+B<Note:> This method might soon be reimplemented to implement the interface defined by
+L<Data::Identifier::Interface::Known>.
 
 The following options are supported (all optional):
 
@@ -106,6 +139,20 @@ The value to be returned when the given class is not supported. This must be an 
 This can be set to C<[]> to switching C<die>ing off for unsupported classes.
 
 =back
+
+=head2 add_utf8_marker
+
+    File::ValueFile->add_utf8_marker(format => $id);
+    # or:
+    File::ValueFile->add_utf8_marker(feature => $id);
+
+Add a format or feature (given by C<$id>) as a marker for UTF-8 en/decoding.
+Formats and features that have been marked to use UTF-8 are autodetected
+in L<File::ValueFile::Simple::Reader> and L<File::ValueFile::Simple::Writer>.
+
+C<$id> can be any value supported by L<Data::Identifier/new>'s C<from> mode.
+However It is often wise to pass an instance of L<Data::Identifier> which is already
+registered using L<Data::Identifier/register>.
 
 =head1 AUTHOR
 

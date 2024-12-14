@@ -59,12 +59,12 @@ END
 };
 
 
-eval { $ver = '??'; $ver = $s->server->version; };
+eval { $ver = '??'; $ver = $s->server->agent; };
 
 
 subtest 'Property types: spatial type semantics' => sub {
 	plan skip_all => "(spatial types unavailable in server $ver)" if $ver lt 'Neo4j/3.4';
-	plan skip_all => "(spatial types unavailable in old Neo4j::Bolt)" if $Neo4j_Test::bolt && ! eval { require Neo4j::Bolt; Neo4j::Bolt->VERSION('0.4500') };
+	plan skip_all => "(spatial types unavailable in old Neo4j::Bolt)" if $Neo4j_Test::bolt && ! eval { require Neo4j::Bolt; Neo4j::Bolt->VERSION('0.5000') };
 	plan tests => 4;
 	$q = <<END;
 RETURN point({ x:3, y:0 })
@@ -79,8 +79,7 @@ END
 
 subtest 'Property types: temporal type semantics' => sub {
 	plan skip_all => "(temporal types unavailable in server $ver)" if $ver lt 'Neo4j/3.4';
-	plan skip_all => "(temporal types unavailable in old Neo4j::Types)" unless eval { Neo4j::Types->VERSION('2.00') };
-	plan skip_all => "(temporal types unavailable in old Neo4j::Bolt)" if $Neo4j_Test::bolt && ! eval { require Neo4j::Bolt; Neo4j::Bolt->VERSION('0.4500') };
+	plan skip_all => "(temporal types unavailable in old Neo4j::Bolt)" if $Neo4j_Test::bolt && ! eval { require Neo4j::Bolt; Neo4j::Bolt->VERSION('0.5000') };
 	plan tests => 4;
 	$q = <<END;
 RETURN
@@ -140,8 +139,8 @@ subtest 'Structural types: node meta data and props' => sub {
 	ok my $n1 = $r0->get('n1'), 'get node 1';
 	ok my $n2 = $r0->get('n2'), 'get node 2';
 	ok defined($id = $r0->get('id(n1)')), 'get node 1 id';
-	is ref $n1, 'Neo4j::Driver::Type::Node', 'node 1 blessed';
-	is ref $n2, 'Neo4j::Driver::Type::Node', 'node 2 blessed';
+	isa_ok $n1, 'Neo4j::Types::Node', 'node 1 blessed';
+	isa_ok $n2, 'Neo4j::Types::Node', 'node 2 blessed';
 	{ no warnings 'deprecated';  # id()
 	is $n1->id, $id, 'node 1 id matches';
 	isnt $n2->id, $n1->id, 'node 2 id distinct';
@@ -163,8 +162,8 @@ subtest 'Structural types: relation meta data and props' => sub {
 	ok my $n2 = $r0->get('n2'), 'get node 2';
 	ok my $e1 = $r0->get('e1'), 'get rel 1';
 	ok my $e2 = $r0->get('e2'), 'get rel 2';
-	is ref $e1, 'Neo4j::Driver::Type::Relationship', 'rel 1 blessed';
-	is ref $e2, 'Neo4j::Driver::Type::Relationship', 'rel 2 blessed';
+	isa_ok $e1, 'Neo4j::Types::Relationship', 'rel 1 blessed';
+	isa_ok $e2, 'Neo4j::Types::Relationship', 'rel 2 blessed';
 	{ no warnings 'deprecated';  # id()
 	is $e1->id, $r0->get('id(e1)'), 'rel 1 id matches';
 	isnt $e2->id, $e1->id, 'rel 2 id distinct';
@@ -181,17 +180,17 @@ subtest 'Structural types: path accessors' => sub {
 	plan skip_all => '(query failed)' if ! $r0;
 	plan tests => 2 + (6 + 5 + 4);
 	ok my $p = $r0->get('p1'), 'get path';
-	is ref $p, 'Neo4j::Driver::Type::Path', 'path blessed';
+	isa_ok $p, 'Neo4j::Types::Path', 'path blessed';
 	SKIP: {
-		skip '(path not blessed)', (6 + 5 + 4) unless ref $p eq 'Neo4j::Driver::Type::Path';
+		skip '(path not blessed)', (6 + 5 + 4) if ref $p !~ m/^Neo4j::/;
 		ok my @nodes = $p->nodes, 'get nodes';
 		ok my @rels = $p->relationships, 'get rels';
 		ok my @all = $p->elements, 'get elements';
 		is scalar @nodes, 3, 'node count';
 		is scalar @rels, 2, 'rels count';
 		is scalar @all, 5, 'element count';
-		is ref $_, 'Neo4j::Driver::Type::Node', 'node blessed' for @nodes;
-		is ref $_, 'Neo4j::Driver::Type::Relationship', 'rel blessed' for @rels;
+		isa_ok $_, 'Neo4j::Types::Node', 'node blessed' for @nodes;
+		isa_ok $_, 'Neo4j::Types::Relationship', 'rel blessed' for @rels;
 		{ no warnings 'deprecated';  # id()
 		is $nodes[0]->id, $nodes[2]->id, 'path circular';
 		isnt $nodes[0]->id, $nodes[1]->id, 'nodes distinct';
@@ -228,14 +227,14 @@ END
 	is ref $l, 'ARRAY', 'list =array';
 	is scalar @$l, 4, 'list size';
 	is $l->[0], 17, 'number in list';
-	is ref $l->[1], 'Neo4j::Driver::Type::Node', 'blessed node in list';
+	isa_ok $l->[1], 'Neo4j::Types::Node', 'blessed node in list';
 	is $l->[2], undef, 'null in list';
-	is ref $l->[3], 'Neo4j::Driver::Type::Path', 'blessed path in list';
+	isa_ok $l->[3], 'Neo4j::Types::Path', 'blessed path in list';
 	ok my $m = $r->get(1), 'get map';
 	is ref $m, 'HASH', 'map =hash';
 	is scalar keys %$m, 3, 'map size';
 	is $m->{first}, undef, 'null in map';
-	is ref $m->{second}, 'Neo4j::Driver::Type::Relationship', 'blessed rel in map';
+	isa_ok $m->{second}, 'Neo4j::Types::Relationship', 'blessed rel in map';
 	is $m->{third}, 23, 'number in map';
 	ok $l = $r->get(2), 'get empty list';
 	is ref $l, 'ARRAY', 'empty list =array';
@@ -262,15 +261,15 @@ END
 	lives_ok { $a1 = $r->get(0)->[0]->{node}; } 'list: get node "a"';
 	lives_ok { $b1 = $r->get(0)->[2]; } 'list: get node "b"';
 	lives_ok { $p1 = $r->get(0)->[1]->{path}; } 'list: get path "p"';
-	is ref $a1, 'Neo4j::Driver::Type::Node', 'list: blessed node "a"';
-	is ref $b1, 'Neo4j::Driver::Type::Node', 'list: blessed node "b"';
-	is ref $p1, 'Neo4j::Driver::Type::Path', 'list: blessed path "p"';
+	isa_ok $a1, 'Neo4j::Types::Node', 'list: blessed node "a"';
+	isa_ok $b1, 'Neo4j::Types::Node', 'list: blessed node "b"';
+	isa_ok $p1, 'Neo4j::Types::Path', 'list: blessed path "p"';
 	lives_ok { $a2 = $r->get(1)->{list}->[1]; } 'map: get node "a"';
 	lives_ok { $b2 = $r->get(1)->{node}; } 'map: get node "b"';
 	lives_ok { $p2 = $r->get(1)->{list}->[0]; } 'map: get node "p"';
-	is ref $a2, 'Neo4j::Driver::Type::Node', 'map: blessed node "a"';
-	is ref $b2, 'Neo4j::Driver::Type::Node', 'map: blessed node "b"';
-	is ref $p2, 'Neo4j::Driver::Type::Path', 'map: blessed path "p"';
+	isa_ok $a2, 'Neo4j::Types::Node', 'map: blessed node "a"';
+	isa_ok $b2, 'Neo4j::Types::Node', 'map: blessed node "b"';
+	isa_ok $p2, 'Neo4j::Types::Path', 'map: blessed path "p"';
 	{ no warnings 'deprecated';  # id()
 	lives_and { is $a1->id, $a2->id } 'node "a": id match';
 	lives_and { is $b1->id, $b2->id } 'node "b": id match';

@@ -5,7 +5,7 @@ use lib qw(./lib t/lib);
 
 use Test::More 0.94;
 use Test::Exception;
-use Test::Warnings 0.010 qw(:no_end_test);
+use Test::Warnings 0.010 qw(warning :no_end_test);
 my $no_warnings;
 use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
@@ -15,11 +15,11 @@ use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 use Neo4j_Test;
 use Neo4j_Test::MockHTTP;
 
-plan tests => 4 + $no_warnings;
+plan tests => 5 + $no_warnings;
 
 
 subtest 'full' => sub {
-	plan tests => 6;
+	plan tests => 5;
 	my $info = {
 		uri => URI->new('http://user:auth@localhost:14000/'),
 		version => 'ServerInfo/0.0',
@@ -29,7 +29,6 @@ subtest 'full' => sub {
 	my $si;
 	lives_and { ok $si = Neo4j::Driver::ServerInfo->new($info) } 'new';
 	lives_and { is $si->address(), 'localhost:14000' } 'address';
-	lives_and { is $si->version(), $info->{version} } 'version';
 	lives_and { is $si->agent(), $info->{version} } 'agent';
 	lives_and { is $si->protocol_version(), $info->{protocol} } 'protocol_version';
 	is $si->{time_diff}, -12, 'time_diff';
@@ -37,16 +36,28 @@ subtest 'full' => sub {
 
 
 subtest 'partial' => sub {
-	plan tests => 5;
+	plan tests => 4;
 	my $info = {
 		uri => 'http://localhost:14000',
 	};
 	my $si;
 	lives_and { ok $si = Neo4j::Driver::ServerInfo->new($info) } 'new';
 	lives_and { is $si->address(), 'localhost:14000' } 'address';
-	lives_and { is $si->version(), $info->{version} } 'version';
 	lives_and { is $si->agent(), $info->{version} } 'agent';
 	lives_and { is $si->protocol_version(), $info->{protocol} } 'protocol_version';
+};
+
+
+subtest 'deprecated' => sub {
+	plan tests => 2;
+	my $info = { uri => 'http:', version => 'ServerInfo/1.01' };
+	my $w;
+	lives_and {
+		my $si = Neo4j::Driver::ServerInfo->new($info);
+		$w = warning { is $si->version, $info->{version} };
+	} 'version';
+	like $w, qr/\bversion\b.* deprecated\b/i, 'version deprecated'
+		or diag 'got warning(s): ', explain $w;
 };
 
 

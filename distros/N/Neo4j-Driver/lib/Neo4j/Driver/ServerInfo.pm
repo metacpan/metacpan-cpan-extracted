@@ -1,14 +1,13 @@
-use 5.010;
-use strict;
+use v5.14;
 use warnings;
-use utf8;
 
-package Neo4j::Driver::ServerInfo;
+package Neo4j::Driver::ServerInfo 1.02;
 # ABSTRACT: Provides Neo4j server address and version
-$Neo4j::Driver::ServerInfo::VERSION = '0.52';
+
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Session);
+use Feature::Compat::Try;
 use URI 1.25;
 
 
@@ -25,7 +24,6 @@ sub new {
 
 sub address  { shift->{uri} }
 sub agent    { shift->{version} }
-sub version  { shift->{version} }
 
 
 sub protocol_version {
@@ -33,13 +31,10 @@ sub protocol_version {
 }
 
 
-sub protocol {
-	# uncoverable pod (see Deprecations.pod)
-	my ($self) = @_;
-	warnings::warnif deprecated => __PACKAGE__ . "->protocol() is deprecated; use protocol_version() instead";
-	my $bolt_version = $self->{protocol};
-	return "Bolt/$bolt_version" if $bolt_version;
-	return defined $bolt_version ? "Bolt" : "HTTP";
+sub version {
+	# uncoverable pod (see agent)
+	warnings::warnif deprecated => "version() in Neo4j::Driver::ServerInfo is deprecated; use agent() instead";
+	&agent;
 }
 
 
@@ -51,13 +46,15 @@ sub _default_database {
 	return $database if defined $database;
 	
 	return if $self->{version} =~ m{^Neo4j/[123]\.};
-	eval {
+	try {
 		my $sys = $driver->session(database => 'system');
 		$database = $sys->run('SHOW DEFAULT DATABASE')->single->get('name');
-	};
-	croak $@ . "Session creation failed because the default "
-	         . "database of $self->{version} at $self->{uri} "
-	         . "could not be determined" unless defined $database;
+	}
+	catch ($e) {
+		croak sprintf
+			"%sSession creation failed because the default database of %s at %s could not be determined",
+			$e, $self->{version}, $self->{uri};
+	}
 	return $self->{default_database} = $database;
 }
 
@@ -76,7 +73,7 @@ Neo4j::Driver::ServerInfo - Provides Neo4j server address and version
 
 =head1 VERSION
 
-version 0.52
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -112,6 +109,10 @@ of an URL authority string (for example: C<localhost:7474>).
 Returns the product name and version number. Takes the form of
 a server agent string (for example: C<Neo4j/3.5.17>).
 
+Before driver S<version 0.26>, the agent string was retrieved with
+the C<version()> method. That method has since been deprecated,
+matching a corresponding change in S<Neo4j 4.3>.
+
 =head2 protocol_version
 
  $bolt_version = $session->server->protocol_version;
@@ -123,32 +124,15 @@ where the major and minor version numbers both are integers.
 When the HTTP protocol is used instead of Bolt, this method
 returns an undefined value.
 
-If the Bolt protocol is used, but the version number is unknown,
-an empty string is returned. This situation shouldn't occur unless
-you use L<Neo4j::Bolt> S<version 0.20> or older.
-
-=head2 version
-
- $agent_string = $session->server->version;
-
-Alias for L<C<agent()>|/"agent">.
-
-Use of C<version()> is discouraged since version 0.26.
-This method may be deprecated and removed in future.
-
 =head1 SEE ALSO
 
 =over
 
 =item * L<Neo4j::Driver>
 
-=item * L<Neo4j::Driver::B<Session>>,
-L<Neo4j::Driver::B<ResultSummary>>
+=item * L<Neo4j::Driver::B<ResultSummary>>
 
-=item * Equivalent documentation for the official Neo4j drivers:
-L<ServerInfo (Java)|https://neo4j.com/docs/api/java-driver/5.26/org.neo4j.driver/org/neo4j/driver/summary/ServerInfo.html>,
-L<IServerInfo (.NET)|https://neo4j.com/docs/api/dotnet-driver/5.26/api/Neo4j.Driver.IServerInfo.html>,
-L<ServerInfo (Python)|https://neo4j.com/docs/api/python-driver/5.26/api.html#serverinfo>
+=item * L<Neo4j::Driver::B<Session>>
 
 =back
 

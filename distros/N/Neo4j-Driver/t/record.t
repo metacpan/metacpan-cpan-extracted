@@ -29,7 +29,7 @@ my ($q, $r, $w);
 
 
 subtest 'wrong/ambiguous field names for get()' => sub {
-	plan tests => 1 + 4 + 5 + 7;
+	plan tests => 1 + 4 + 3 + 8;
 	lives_ok { $r = 0; $r = $s->run('RETURN 1, 0, 2 AS NaN')->single; } 'query lives';
 	# index/key collisions
 	is $r->get( 0 ), 1, 'get( 0 )';
@@ -40,12 +40,6 @@ subtest 'wrong/ambiguous field names for get()' => sub {
 	lives_ok { $w = warning { $r->get; }; } 'get without field lives';
 	(like $w, qr/\bambiguous\b.*\bget\b.*\bfield/i, 'get without field ambiguous') or diag 'got warning(s): ', explain($w);
 	dies_ok { $r->get("nAn"); } 'field treated as case sensitive';
-	# The string representation of numeric NaN differs by OS and by
-	# Perl version. See <https://en.wikipedia.org/wiki/NaN#Display>.
-	# Actually observed values include 'NaN', 'nan', '1.#QNAN'.
-	# That any NaN or Inf is treated as a string is all we care about.
-	use Neo4j::Driver::Record;
-	ok ! Neo4j::Driver::Record::_looks_like_int(0+"NaN"), 'NaN is string';
 	# unambiguous cases
 	lives_and { is $r->get( 2.0 ), 2 } 'get(2.0)';
 	$q = 'RETURN 1 AS a';
@@ -60,14 +54,15 @@ subtest 'wrong/ambiguous field names for get()' => sub {
 
 
 subtest 'hashref' => sub {
-	plan tests => 2 + 3;
+	plan tests => 3 + 3;
 	my $fields = {
 		first  => 17,
 		second => 19,
 		third  => 23,
 	};
 	$q = 'RETURN {first} AS first, {second} AS second, {third} AS third';
-	lives_ok { $r = $s->run($q, $fields)->single->data; } 'get hashref';
+	lives_ok { $r = $s->run($q, $fields)->single; } 'get record';
+	lives_and { is $r->data, $r = $r->data } 'get cached hashref';
 	is ref $r, 'HASH', '$r is HASH ref';
 	foreach my $key ( sort keys %$fields ) {
 		is $r->{$key}, $fields->{$key}, "hashref key $key";

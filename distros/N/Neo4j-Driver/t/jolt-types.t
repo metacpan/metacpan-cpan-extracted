@@ -154,10 +154,7 @@ subtest 'property types' => sub {
 	lives_ok { $v = undef; $v = $r->fetch->get() } 'Bytes';
 	isa_ok $v, 'Neo4j::Types::ByteArray';
 	lives_and { is $v->as_string(), 'Foo' } 'Bytes as_string';
-	lives_and {
-		no warnings 'deprecated';
-		is "$v", 'Foo';
-	} 'Bytes stringify overload';
+	lives_and { no warnings 'misc'; ok "$v" } 'Bytes stringify overload';
 	lives_and { ok ! $r->has_next } 'no has_next';
 };
 

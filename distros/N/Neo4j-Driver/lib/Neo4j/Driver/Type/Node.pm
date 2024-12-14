@@ -1,61 +1,51 @@
-use 5.010;
-use strict;
+use v5.12;
 use warnings;
-use utf8;
 
-package Neo4j::Driver::Type::Node;
+package Neo4j::Driver::Type::Node 1.02;
 # ABSTRACT: Describes a node from a Neo4j graph
-$Neo4j::Driver::Type::Node::VERSION = '0.52';
+
 
 # For documentation, see Neo4j::Driver::Types.
 
+# Jolt node: [ node_id, [node_labels], {properties} ]
+
 
 use parent 'Neo4j::Types::Node';
-use overload '%{}' => \&_hash, fallback => 1;
-
-use Carp qw(croak);
 
 
 sub get {
 	my ($self, $property) = @_;
 	
-	return $$self->{$property};
+	return $self->[2]->{$property};
 }
 
 
 sub labels {
 	my ($self) = @_;
 	
-	$$self->{_meta}->{labels} //= [];
-	return @{ $$self->{_meta}->{labels} };
+	return @{ $self->[1] };
 }
 
 
 sub properties {
 	my ($self) = @_;
 	
-	my $properties = { %$$self };
-	delete $properties->{_meta};
-	return $properties;
+	return $self->[2];
 }
 
 
 sub element_id {
 	my ($self) = @_;
 	
-	return $$self->{_meta}->{element_id} if defined $$self->{_meta}->{element_id};
-	warnings::warnif 'Neo4j::Types', 'element_id unavailable';
-	return $$self->{_meta}->{id};
+	return $self->[0];
 }
 
 
 sub id {
 	my ($self) = @_;
 	
-	return $$self->{_meta}->{id} if defined $$self->{_meta}->{id};
-	
 	warnings::warnif deprecated => "Node->id() is deprecated since Neo4j 5; use element_id()";
-	my ($id) = $$self->{_meta}->{element_id} =~ m/^4:[^:]*:([0-9]+)/;
+	my ($id) = $self->[0] =~ m/^4:[^:]*:([0-9]+)/;
 	$id = 0 + $id if defined $id;
 	return $id;
 }
@@ -63,42 +53,11 @@ sub id {
 # numeric ID from the response entirely. Therefore we generate it
 # here using the algorithm from Neo4j's DefaultElementIdMapperV1;
 # the final part of the element ID is identical to the legacy ID
-# according to CypherFunctions in Neo4j 5.3. This may break with
-# future Neo4j versions.
-# https://github.com/neo4j/neo4j/blob/0c092b70cc/community/kernel/src/main/java/org/neo4j/kernel/api/DefaultElementIdMapperV1.java#L62-L68
-# https://github.com/neo4j/neo4j/blob/0c092b70cc/community/cypher/runtime-util/src/main/java/org/neo4j/cypher/operations/CypherFunctions.java#L771-L802
-
-
-sub deleted {
-	# uncoverable pod
-	my ($self) = @_;
-	
-	warnings::warnif deprecated => __PACKAGE__ . "->deleted() is deprecated";
-	return $$self->{_meta}->{deleted};
-}
-
-
-sub _hash {
-	my ($self) = @_;
-	
-	warnings::warnif deprecated => "Direct hash access is deprecated; use " . __PACKAGE__ . "->properties()";
-	return $$self;
-}
-
-
-# for experimental Cypher type system customisation only
-sub _private {
-	my ($self) = @_;
-	
-	return $$self;
-}
-
-
-# As long as we remain compatible with Neo4j::Types 1.00,
-# we need to register the warning category explicitly.
-package # private
-        Neo4j::Types;
-use warnings::register;
+# according to CypherFunctions in Neo4j 5.0-5.25.
+# But this may break with future Neo4j versions.
+# https://github.com/neo4j/neo4j/blob/5.25/community/values/src/main/java/org/neo4j/values/DefaultElementIdMapperV1.java#L61-L67
+# https://github.com/neo4j/neo4j/blob/5.25/community/cypher/runtime-util/src/main/java/org/neo4j/cypher/operations/CypherFunctions.java#L1024-L1062
+# https://community.neo4j.com/t/id-function-deprecated-how-to-replace-easily/62554/17
 
 
 1;

@@ -160,13 +160,8 @@ sub http_reason {
 }
 
 
-sub protocol {
-	return "Neo4j_Test::Sim";
-}
-
-
 package Neo4j_Test::Sim::Store;
-use parent 'Neo4j::Driver::Net::HTTP::LWP';
+use parent 'Neo4j::Driver::Net::HTTP::Tiny';
 sub new {
 	my ($class, $driver) = @_;
 	$driver->{config}->{jolt} = 0;  # sim currently only supports JSON
