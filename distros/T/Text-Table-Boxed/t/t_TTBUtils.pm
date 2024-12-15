@@ -11,7 +11,7 @@ use t_Common qw/oops btw btwN/; # strict, warnings, Carp, oops etc.
 
 use Text::Table::Boxed;
 
-use feature 'signatures';
+no warnings 'experimental'; use feature 'signatures';
 
 sub cx2let :prototype(_) {
   my $cx = shift;

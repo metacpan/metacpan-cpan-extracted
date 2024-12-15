@@ -1,5 +1,6 @@
 Changes to Text::Table::Boxed
 
+1.003 : Support building on older Perls
 1.002 : Corrected wrong example code in SYNOPSIS.
 1.001 : Fix bug which wrongly required pictures to have >= 3 columns (not 2)
 1.000 : Initial release

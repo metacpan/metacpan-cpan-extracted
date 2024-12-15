@@ -79,4 +79,14 @@ throws_ok(sub {
     $numbersSchemaLength->parse([1, 2, 3, 4]);
 }, qr/^Array is not of length 3/, "Array of numbers with invalid data");
 
+subtest 'isa' => sub {
+    my $array = z->array(z->number);
+    isa_ok $array, 'Poz::Types', 'Poz::Types::array';
+};
+
+subtest 'safe_parse must handle error' => sub {
+    my $array = z->array(z->number);
+    throws_ok(sub { $array->safe_parse([]) }, qr/^Must handle error/, 'Must handle error');
+};
+
 done_testing;

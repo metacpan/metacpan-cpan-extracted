@@ -17,7 +17,7 @@ use Digest;
 
 use Data::Identifier;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 
 sub integer {
@@ -153,6 +153,18 @@ sub generic {
             } else {
                 croak 'Invalid request for tagcombiner generator: '.$request;
             }
+        } elsif ($style eq 'colour') {
+            if (defined $request) {
+                my $req = lc($request);
+
+                $req = sprintf('#%s%s%s', $1 x 6, $2 x 6, $3 x 6) if $req =~ /^#([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/;
+
+                if ($req =~ /^#[a-f0-9]{36}$/) {
+                    $opts{input} //= $req;
+                } else {
+                    croak 'Bad format for colour';
+                }
+            }
         } else {
             croak 'Style not supported: '.$style;
         }
@@ -264,7 +276,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -397,7 +409,7 @@ Exactly one of C<request> or C<input> must be given.
 
 The style to be used by the generator.
 
-Currently supported: C<integer-based>, C<id-based>, C<name-based>, C<tag-based>, C<tagcombiner>.
+Currently supported: C<integer-based>, C<id-based>, C<name-based>, C<tag-based>, C<tagcombiner>, C<colour>.
 
 This option is required unless C<input> is provided.
 

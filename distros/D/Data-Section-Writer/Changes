@@ -1,5 +1,16 @@
 Revision history for Data-Section-Writer
 
+0.03      2024-12-14 18:14:10 -0700
+  - Corrected merge errors in 0.02
+
+0.02      2024-12-14 18:12:23 -0700
+  - Don't write file if __DATA__ hasn't changed (gh#2)
+  - Added ->unchanged method (gh#2)
+  - Added integration tests and documentation re: Data::Section::Pluggable (gh#3)
+  - Added Data::Section::Pluggable::FormatContentPlugin (gh#4)
+  - Added ->add_format method (gh#2)
+  - Added ->add_plugin method (gh#2)
+
 0.01      2024-12-03 17:15:21 -0700
   - initial version
 

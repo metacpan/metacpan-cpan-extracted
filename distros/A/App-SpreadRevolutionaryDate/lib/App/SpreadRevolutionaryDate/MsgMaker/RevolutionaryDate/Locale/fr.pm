@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr::VERSION = '0.36';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr::VERSION = '0.38';
 # ABSTRACT: French localization of (part of) L<DateTime::Calendar::FrenchRevolutionary::Locale::fr>
 
 use Moose;
@@ -395,7 +395,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr - French l
 
 =head1 VERSION
 
-version 0.36
+version 0.38
 
 =head1 DESCRIPTION
 

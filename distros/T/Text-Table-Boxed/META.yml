@@ -7,7 +7,6 @@ build_requires:
   Carp::Always: '0'
   Cwd: '0'
   Data::Dumper: '0'
-  Data::Dumper::Interp: '6.006'
   Encode: '0'
   English: '0'
   Env: '0'
@@ -27,7 +26,6 @@ build_requires:
   Test2::V0: '0'
   Time::HiRes: '0'
   autovivification: '0'
-  feature: '0'
   indirect: '0'
   lib: '0'
   multidimensional: '0'
@@ -42,7 +40,7 @@ meta-spec:
 name: Text-Table-Boxed
 requires:
   Carp: '0'
-  Data::Dumper::Interp: '6.006'
+  Data::Dumper::Interp: '7.010'
   Exporter: '0'
   List::MoreUtils: '0'
   List::Util: '0'
@@ -50,9 +48,10 @@ requires:
   Text::Table: '0'
   base: '0'
   constant: '0'
+  feature: '0'
   overload: '0'
   parent: '0'
-  perl: v5.10.0
+  perl: v5.20.0
   strict: '0'
   utf8: '0'
   warnings: '0'
@@ -61,7 +60,7 @@ resources:
   bugtracker: https://github.com/jimav/Text-Table-Boxed/issues
   homepage: https://github.com/jimav/Text-Table-Boxed
   repository: https://github.com/jimav/Text-Table-Boxed.git
-version: '1.002'
+version: '1.003'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: CC0-1.0

@@ -10,6 +10,7 @@ dist.ini
 lib/Text/Table/Boxed.pm
 lib/Text/Table/Boxed/Pager.pm
 t/10_Basic.t
+t/20_defaults.t
 t/90_Pager.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

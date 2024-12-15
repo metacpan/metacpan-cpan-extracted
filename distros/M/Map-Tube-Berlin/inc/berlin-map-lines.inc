@@ -7,6 +7,7 @@
   <line id="S8"      name="S8"      color="#62AD2D" />
   <line id="S9"      name="S9"      color="#9B2B48" />
   <line id="S25"     name="S25"     color="#03D169" />
+  <line id="S26"     name="S26"     color="#018A47" />
   <line id="S41/S42" name="S41/S42" color="#AF5937" />
   <line id="S45"     name="S45"     color="#CD9C53" />
   <line id="S46"     name="S46"     color="#E0BE8E" />

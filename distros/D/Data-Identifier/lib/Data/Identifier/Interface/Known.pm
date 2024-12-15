@@ -7,14 +7,14 @@
 
 package Data::Identifier::Interface::Known;
 
-use v5.14;
+use v5.20;
 use strict;
 use warnings;
 
 use Carp;
 use Data::Identifier;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 
 sub known {
@@ -62,7 +62,7 @@ Data::Identifier::Interface::Known - format independent identifier object
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

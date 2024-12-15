@@ -1,5 +1,7 @@
  strict; use warnings FATAL => 'all';
-use v5.10;
+use v5.20; # signatures
+no warnings "experimental::lexical_subs";
+use feature qw/say state lexical_subs/;
 use utf8;
 # vi:set ai expandtab ts=4:
 
@@ -7,11 +9,12 @@ use utf8;
 # https://stackoverflow.com/questions/30762521/how-can-i-print-a-table-with-multi-line-strings-using-the-texttable-module
 
 package Text::Table::Boxed;
+require Text::Table; # old versions of 'base' don't auto-require?
 use base 'Text::Table';
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '1.002'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-12'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1.003'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-14'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Scalar::Util qw/reftype/;
@@ -23,7 +26,7 @@ use overload (
     '""' => 'rendered_stringify',
 );
 
-use Data::Dumper::Interp qw/visnew ivis dvis vis avis u/;
+use Data::Dumper::Interp 7.010 qw/visnew ivis dvis vis avis u/;
 
 use warnings::register;  # creates category name same as __PACKAGE__
 
@@ -254,6 +257,10 @@ sub new {
   my %opts = (@_==1 && ref($_[0]) eq "HASH" && exists($_[0]->{columns}))
       ? %{ shift(@_) }       # new API
       : ( columns => [@_] ); # old API
+
+  foreach (keys %opts) {
+    croak "Invalid option key '$_'\n" unless /^(?:columns|picture|style)$/;
+  }
 
   croak "'columns' must be provided in OPTIONS\n"
     unless defined ($opts{columns});

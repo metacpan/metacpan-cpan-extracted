@@ -6,9 +6,10 @@ requires "Digest" => "1.17_01";
 requires "Encode" => "3.06";
 requires "Math::BigInt" => "1.999715";
 requires "URI" => "1.5";
-requires "perl" => "v5.16.0";
+requires "perl" => "v5.20.0";
 recommends "Crypt::URandom" => "0.36";
 recommends "Digest::SHA" => "5.95_01";
+recommends "Math::BigInt::GMP" => "1.6011";
 recommends "Math::Random::Secure" => "0.080001";
 
 on 'test' => sub {

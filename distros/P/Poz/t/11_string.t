@@ -5,7 +5,6 @@ use Test::Exception;
 use Poz qw/z/;
 
 my $strSchema = z->string;
-isa_ok($strSchema, 'Poz::Types::string');
 is($strSchema->parse('foo'), 'foo', 'string: foo');
 is($strSchema->parse(''), '', 'string: ""');
 is($strSchema->parse(0), 0, 'number: 0 (however it looks as a string in Perl)');
@@ -14,6 +13,14 @@ is($strSchema->parse(-3), -3, 'number: -3 (however it looks as a string in Perl)
 throws_ok { $strSchema->parse(undef) } qr/^required/, 'undef is not a string';
 throws_ok { $strSchema->parse({test => "foo"}) } qr/^Not a string/, 'hashref: {test => "foo"}';
 throws_ok { $strSchema->parse([1, 2, 3]) } qr/^Not a string/, 'arrayref: [1, 2, 3]';
+
+my ($valid, $error) = $strSchema->safe_parse('foo');
+is($valid, 'foo', 'string: foo');
+is($error, undef, 'no error');
+
+($valid, $error) = $strSchema->safe_parse(undef);
+is($valid, undef, 'undef is not a string');
+is($error, 'required', 'required error');
 
 my $strSchemaRequiredError = z->string({required_error => 'tuna is required string'});
 is($strSchemaRequiredError->parse('foo'), 'foo', 'string: foo');
@@ -339,5 +346,15 @@ throws_ok { $strSchemaBase64->parse('!VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGluZw') } qr/
 my $strSchemaBase64WithMessage = z->string->base64({message => 'tuna wants base64'});
 is($strSchemaBase64WithMessage->parse('VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGluZw=='), 'VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGluZw==', 'string: VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGluZw==');
 throws_ok { $strSchemaBase64WithMessage->parse('!VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGluZw') } qr/^tuna wants base64/, 'string: !VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGluZw';
+
+subtest 'isa' => sub {
+    my $str = z->string;
+    isa_ok $str, 'Poz::Types', 'Poz::Types::scalar';
+};
+
+subtest 'safe_parse must handle error' => sub {
+    my $str = z->string;
+    throws_ok(sub { $str->safe_parse([]) }, qr/^Must handle error/, 'Must handle error');
+};
 
 done_testing();

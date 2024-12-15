@@ -4,7 +4,7 @@ use experimental qw( signatures );
 use stable qw( postderef );
 use true;
 
-package JSON::LD 0.01 {
+package JSON::LD 0.02 {
 
   # ABSTRACT: Load and dump JSON files
 
@@ -20,7 +20,7 @@ package JSON::LD 0.01 {
   }
 
   sub DumpFile ($filename, $data) {
-    Path::Tiny->new($filename)->spew_utf8(JSON::MaybeXS::encode_json($data));
+    Path::Tiny->new($filename)->spew_raw(JSON::MaybeXS::encode_json($data));
     return undef;
   }
 
@@ -38,7 +38,7 @@ JSON::LD - Load and dump JSON files
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

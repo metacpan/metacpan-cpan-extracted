@@ -4,7 +4,7 @@ use true;
 use experimental qw( signatures );
 use stable qw( postderef );
 
-package Data::Section::Pluggable::Plugin::Trim 0.01 {
+package Data::Section::Pluggable::Plugin::Trim 0.02 {
 
     # ABSTRACT: Data::Section::Pluggable plugin that trims whitespace
 
@@ -40,7 +40,7 @@ Data::Section::Pluggable::Plugin::Trim - Data::Section::Pluggable plugin that tr
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

@@ -12,8 +12,8 @@ use utf8;
 package Text::Table::Boxed::Pager;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '1.002'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-12'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1.003'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-14'; # DATE from Dist::Zilla::Plugin::OurDate
 
 require Exporter;
 use parent 'Exporter';

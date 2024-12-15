@@ -52,9 +52,19 @@ is(
     };
     call render_section => $section;
 
+    call unchanged => U();
+
     call update_file => object {
       prop isa => 'Data::Section::Writer';
     };
+
+    call unchanged => F();
+
+    call update_file => object {
+      prop isa => 'Data::Section::Writer';
+    };
+
+    call unchanged => T();
 
   },
   'add_section_file',

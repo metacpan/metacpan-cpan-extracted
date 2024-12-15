@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use utf8;
 use parent 'Poz::Types::scalar';
-use Carp ();
 use Email::Address ();
 use URI::URL ();
 use Net::IPv6Addr ();
@@ -24,8 +23,8 @@ sub new {
 
 sub rule {
     my ($self, $value) = @_;
-    Carp::croak($self->{required_error}) unless defined $value;
-    Carp::croak($self->{invalid_type_error}) unless !ref $value;
+    return $self->{required_error} unless defined $value;
+    return $self->{invalid_type_error} unless !ref $value;
     return;
 }
 
@@ -40,7 +39,7 @@ sub max {
     $opts->{message} //= "Too long";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) if CORE::length($value) > $max;
+        return $opts->{message} if CORE::length($value) > $max;
         return;
     };
     return $self;
@@ -52,7 +51,7 @@ sub min {
     $opts->{message} //= "Too short";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) if CORE::length($value) < $min;
+        return $opts->{message} if CORE::length($value) < $min;
         return;
     };
     return $self;
@@ -64,7 +63,7 @@ sub length {
     $opts->{message} //= "Not the right length";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) if CORE::length($value) != $length;
+        return $opts->{message} if CORE::length($value) != $length;
         return;
     };
     return $self;
@@ -77,7 +76,7 @@ sub email {
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
         my ($addr) = Email::Address->parse($value);
-        Carp::croak($opts->{message}) unless defined $addr;
+        return $opts->{message} unless defined $addr;
         return;
     };
     return $self;
@@ -90,7 +89,7 @@ sub url {
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
         my $url = URI::URL->new($value);
-        Carp::croak($opts->{message}) if !defined $url || !defined $url->scheme;
+        return $opts->{message} if !defined $url || !defined $url->scheme;
         return;
     };
     return $self;
@@ -99,10 +98,10 @@ sub url {
 sub emoji {
     my ($self, $opts) = @_;
     $opts = $opts || {};
-    $opts->{message} //= "Not an emoji";    
+    $opts->{message} //= "Not an emoji";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) unless $value =~ /\p{Emoji}/;
+        return $opts->{message} unless $value =~ /\p{Emoji}/;
         return;
     };
     return $self;
@@ -114,7 +113,7 @@ sub uuid {
     $opts->{message} //= "Not an UUID";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) unless lc($value) =~ /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+        return $opts->{message} unless lc($value) =~ /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
         return;
     };
     return $self;
@@ -126,7 +125,7 @@ sub nanoid {
     $opts->{message} //= "Not a nanoid";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) unless $value =~ /^[0-9a-zA-Z_-]{21}$/;
+        return $opts->{message} unless $value =~ /^[0-9a-zA-Z_-]{21}$/;
         return;
     };
     return $self;
@@ -138,7 +137,7 @@ sub cuid {
     $opts->{message} //= "Not a cuid";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) unless $value =~ /^c[a-z0-9]{24}$/;
+        return $opts->{message} unless $value =~ /^c[a-z0-9]{24}$/;
         return;
     };
     return $self;
@@ -150,7 +149,7 @@ sub cuid2 {
     $opts->{message} //= "Not a cuid2";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) unless $value =~ /^[a-z0-9]{24,32}$/;
+        return $opts->{message} unless $value =~ /^[a-z0-9]{24,32}$/;
         return;
     };
     return $self;
@@ -162,7 +161,7 @@ sub ulid {
     $opts->{message} //= "Not an ulid";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) unless $value =~ /^[0-9A-HJKMNP-TV-Z]{26}$/;
+        return $opts->{message} unless $value =~ /^[0-9A-HJKMNP-TV-Z]{26}$/;
         return;
     };
     return $self;
@@ -174,7 +173,7 @@ sub regex {
     $opts->{message} //= "Not match regex";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) unless $value =~ $regex;
+        return $opts->{message} unless $value =~ $regex;
         return;
     };
     return $self;
@@ -186,7 +185,7 @@ sub includes {
     $opts->{message} //= "Not includes $includes";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) unless index($value, $includes) != -1;
+        return $opts->{message} unless index($value, $includes) != -1;
         return;
     };
     return $self;
@@ -198,7 +197,7 @@ sub startsWith {
     $opts->{message} //= "Not starts with $startWith";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) unless index($value, $startWith) == 0;
+        return $opts->{message} unless index($value, $startWith) == 0;
         return;
     };
     return $self;
@@ -210,7 +209,7 @@ sub endsWith {
     $opts->{message} //= "Not ends with $endsWith";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) unless substr($value, -1 * CORE::length($endsWith)) eq $endsWith;
+        return $opts->{message} unless substr($value, -1 * CORE::length($endsWith)) eq $endsWith;
         return;
     };
     return $self;
@@ -229,16 +228,16 @@ sub ip {
             my @octets = split(/\./, $value);
             if (scalar(@octets) == 4) {
                 foreach my $octet (@octets) {
-                    Carp::croak($opts->{message}) unless $octet =~ /^\d+$/ && $octet >= 0 && $octet <= 255;
+                    return $opts->{message} unless $octet =~ /^\d+$/ && $octet >= 0 && $octet <= 255;
                 }
                 $pass = 1;
             }
             if ($version eq "v4" && !$pass) {
-                Carp::croak($opts->{message});
+                return $opts->{message};
             }
         }
         if (!$pass && ($version eq "v6" || $version eq "any")) {
-            Carp::croak($opts->{message}) unless Net::IPv6Addr::is_ipv6($value);
+            return $opts->{message} unless Net::IPv6Addr::is_ipv6($value);
         }
         return;
     };
@@ -247,7 +246,7 @@ sub ip {
 
 sub trim {
     my ($self) = @_;
-    push @{$self->{transform}}, sub { 
+    push @{$self->{transform}}, sub {
         my ($self, $value) = @_;
         $value =~ s/^\s+|\s+$//g;
         return $value;
@@ -257,7 +256,7 @@ sub trim {
 
 sub toLowerCase {
     my ($self) = @_;
-    push @{$self->{transform}}, sub { 
+    push @{$self->{transform}}, sub {
         my ($self, $value) = @_;
         return lc($value);
     };
@@ -266,7 +265,7 @@ sub toLowerCase {
 
 sub toUpperCase {
     my ($self) = @_;
-    push @{$self->{transform}}, sub { 
+    push @{$self->{transform}}, sub {
         my ($self, $value) = @_;
         return uc($value);
     };
@@ -279,8 +278,8 @@ sub date {
     $opts->{message} //= "Not a date";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) unless $value =~ /^\d{4}-\d{2}-\d{2}$/;
-        Carp::croak($opts->{message}) unless eval { Time::Piece->strptime($value, "%Y-%m-%d") };
+        return $opts->{message} unless $value =~ /^\d{4}-\d{2}-\d{2}$/;
+        return $opts->{message} unless eval { Time::Piece->strptime($value, "%Y-%m-%d") };
         return;
     };
     return $self;
@@ -296,12 +295,12 @@ sub time {
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
         my $format = "%H:%M:%S";
-        Carp::croak($opts->{message}) unless $value =~ $format_check;
+        return $opts->{message} unless $value =~ $format_check;
         if ($value =~ /\.[0-9]+/) {
             $format = "%H:%M:%S.%N";
         }
         my $formatter = DateTime::Format::Strptime->new(pattern => $format);
-        Carp::croak($opts->{message}) unless eval { $formatter->parse_datetime($value) };
+        return $opts->{message} unless eval { $formatter->parse_datetime($value) };
         return;
     };
     return $self;
@@ -323,8 +322,8 @@ sub datetime {
     my $format_check = qr/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$precision_regex$offset_regex$/;
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) unless $value =~ $format_check;
-        Carp::croak($opts->{message}) unless eval { DateTime::Format::ISO8601->parse_datetime($value) };
+        return $opts->{message} unless $value =~ $format_check;
+        return $opts->{message} unless eval { DateTime::Format::ISO8601->parse_datetime($value) };
         return;
     };
     return $self;
@@ -347,7 +346,7 @@ sub duration {
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
         my $format = DateTime::Format::Duration::ISO8601->new;
-        Carp::croak($opts->{message}) unless eval { $format->parse_duration($value) };
+        return $opts->{message} unless eval { $format->parse_duration($value) };
         return;
     };
     return $self;
@@ -359,7 +358,7 @@ sub base64 {
     $opts->{message} //= "Not a base64";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) unless $value =~ /^[A-Za-z0-9+\/]+={0,2}$/;
+        return $opts->{message} unless $value =~ /^[A-Za-z0-9+\/]+={0,2}$/;
         return;
     };
     return $self;

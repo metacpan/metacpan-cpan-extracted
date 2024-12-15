@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.020000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,11 +14,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Text-Table-Boxed",
   "LICENSE" => "unrestricted",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "Text::Table::Boxed",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Data::Dumper::Interp" => "6.006",
+    "Data::Dumper::Interp" => "7.010",
     "Exporter" => 0,
     "List::MoreUtils" => 0,
     "List::Util" => 0,
@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
     "Text::Table" => 0,
     "base" => 0,
     "constant" => 0,
+    "feature" => 0,
     "overload" => 0,
     "parent" => 0,
     "strict" => 0,
@@ -38,7 +39,6 @@ my %WriteMakefileArgs = (
     "Carp::Always" => 0,
     "Cwd" => 0,
     "Data::Dumper" => 0,
-    "Data::Dumper::Interp" => "6.006",
     "Encode" => 0,
     "English" => 0,
     "Env" => 0,
@@ -58,12 +58,11 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Time::HiRes" => 0,
     "autovivification" => 0,
-    "feature" => 0,
     "indirect" => 0,
     "lib" => 0,
     "multidimensional" => 0
   },
-  "VERSION" => "1.002",
+  "VERSION" => "1.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -76,7 +75,7 @@ my %FallbackPrereqs = (
   "Carp::Always" => 0,
   "Cwd" => 0,
   "Data::Dumper" => 0,
-  "Data::Dumper::Interp" => "6.006",
+  "Data::Dumper::Interp" => "7.010",
   "Encode" => 0,
   "English" => 0,
   "Env" => 0,

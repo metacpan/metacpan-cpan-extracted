@@ -8,17 +8,17 @@ package Data::Section::Pluggable::Plugin::MyPlugin {
     use Class::Tiny qw( extensions );
     with 'Data::Section::Pluggable::Role::ContentProcessorPlugin';
 
-    sub process_content ($self, $dps, $content) {
+    sub process_content ($self, $dsp, $content) {
         $content =~ s/\s*\z//;  # trim trailing whitespace
         return "[$content]";
     }
 }
 
-my $dps = Data::Section::Pluggable->new
+my $dsp = Data::Section::Pluggable->new
                                   ->add_plugin('my_plugin', extensions => ['txt']);
 
 # prints '[Welcome to Perl]'
-say $dps->get_data_section('hello.txt');
+say $dsp->get_data_section('hello.txt');
 
 __DATA__
 @@ hello.txt

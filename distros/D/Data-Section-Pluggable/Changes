@@ -1,5 +1,9 @@
 Revision history for Data-Section-Pluggable
 
+0.02      2024-12-14 18:20:03 -0700
+  - Added support for Data::Section::Pluggable::FormatContentPlugin if installed (gh#4)
+  - Some documentation fixes (gh#4)
+
 0.01      2024-12-04 22:26:57 -0700
   - initial version
 

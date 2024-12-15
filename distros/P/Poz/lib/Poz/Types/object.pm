@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use Carp ();
 use Try::Tiny;
+use parent 'Poz::Types';
 
 sub new {
     my ($class, $struct) = @_;
-    my $self = bless { 
+    my $self = bless {
         __struct__ => {},
         __as__     => undef,
     }, $class;
@@ -37,6 +38,8 @@ sub parse {
 }
 
 sub safe_parse {
+    Carp::croak "Must handle error" unless wantarray;
+
     my ($self, $data) = @_;
     my @errors = ();
     if (ref($data) ne 'HASH') {

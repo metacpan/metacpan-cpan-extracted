@@ -4,13 +4,14 @@ use strict;
 use warnings;
 use Carp ();
 use Try::Tiny;
+use parent 'Poz::Types';
 
 sub new {
     my ($class, $validator) = @_;
     if (!$validator->isa('Poz::Types')) {
         Carp::croak("Invalid validator: is not a subclass of Poz::Types");
     }
-    my $self = bless { 
+    my $self = bless {
         __validator__ => $validator,
         __as__        => undef,
         __rules__     => [],
@@ -35,6 +36,8 @@ sub parse {
 }
 
 sub safe_parse {
+    Carp::croak "Must handle error" unless wantarray;
+
     my ($self, $data) = @_;
     my @errors = ();
     if (ref($data) ne 'ARRAY') {
@@ -79,7 +82,7 @@ sub _errors_to_string {
     my $errors = shift;
     my @error_strings = ();
     for my $error (@$errors) {
-        my $message = $error->{key} ? 
+        my $message = $error->{key} ?
             sprintf("%s on key `%s`", $error->{error}, $error->{key}) :
             sprintf("%s", $error->{error});
         push @error_strings, $message;

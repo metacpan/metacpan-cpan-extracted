@@ -15,13 +15,21 @@ is($numberSchema->parse("-1"), -1, "number: '-1'");
 is($numberSchema->parse("-1.1"), -1.1, "number: '-1.1'");
 is($numberSchema->parse(10), 10, "number: 10");
 is(
-    $numberSchema->parse(1_000_000_000_000_000_000), 
-    1_000_000_000_000_000_000, 
+    $numberSchema->parse(1_000_000_000_000_000_000),
+    1_000_000_000_000_000_000,
     "number: 1_000_000_000_000_000_000"
 ); # 1e18
 throws_ok { $numberSchema->parse("a") } qr/^Not a number/, "number: 'a'";
 throws_ok { $numberSchema->parse("1a") } qr/^Not a number/, "number: '1a'";
 throws_ok { $numberSchema->parse(undef)} qr/^required/, "number: undef";
+
+my ($valid, $error) = $numberSchema->safe_parse(123);
+is($valid, 123, 'number: 123');
+is($error, undef, 'no error');
+
+($valid, $error) = $numberSchema->safe_parse(undef);
+is($valid, undef, 'undef is not a number');
+is($error, 'required', 'required error');
 
 my $numberSchemaRequiredError = z->number({required_error => "required number"});
 is($numberSchemaRequiredError->parse(1), 1, "number: 1");
@@ -115,5 +123,15 @@ my $numberSchemaStep = z->number->step(4);
 is($numberSchemaStep->parse(4), 4, "number: 4");
 is($numberSchemaStep->parse(8), 8, "number: 8");
 throws_ok { $numberSchemaStep->parse(5) } qr/^Not a multiple of 4/, "number: 5";
+
+subtest 'isa' => sub {
+    my $num = z->number;
+    isa_ok $num, 'Poz::Types', 'Poz::Types::scalar';
+};
+
+subtest 'safe_parse must handle error' => sub {
+    my $num = z->number;
+    throws_ok(sub { $num->safe_parse([]) }, qr/^Must handle error/, 'Must handle error');
+};
 
 done_testing;

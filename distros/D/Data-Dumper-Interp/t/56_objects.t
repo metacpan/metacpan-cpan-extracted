@@ -6,6 +6,10 @@ use t_TestCommon ':silent', qw/bug/; # Test2::V0 etc.
 
 use Data::Dumper::Interp;
 
+package main::StrObj;
+sub new { bless [42], shift }
+use overload '""'  => sub { "stringified value" };
+
 # Verify evaluation of overloaded deref operators.
 
 package main::HVObj;
@@ -53,12 +57,14 @@ package main;
 
 $Data::Dumper::Interp::Foldwidth = 0; # disable wrap
 
+my $strobj = main::StrObj->new();
 my $hvobj = main::HVObj->new();
 my $hobj = main::HObj->new();
 my $sobj = main::SObj->new();
 my $cobj = main::CObj->new();
 my $gobj = main::GObj->new();
 
+is($strobj, "stringified value", "StrObj basic test");
 is(\@$hvobj, [0..9], "\\\@Hvobj basic test");
 is(\%$hvobj, {c => 333 , a => 111,b => 222}, "\\\%HVobj basic test");
 is(\%$hobj, {a => 111,b => 222,c => 333}, "Hobj basic test");
@@ -73,6 +79,7 @@ $Data::Dumper::Interp::Objects = 0;
 is (vis \@$hvobj, '[0,1,2,3,4,5,6,7,8,9]', "\@{HVObj}");
 is (vis \%$hvobj, '{a => 111,b => 222,c => 333}', "\%{HVObj}");
 is (vis $hvobj, q!bless(do{\(my $o = [[0,1,2,3,4,5,6,7,8,9],{a => 111,b => 222,c => 333}])},'main::HVObj')!, "HVObj: Objects handling disabled");
+is (vis $strobj, q!bless([42],'main::StrObj')!, "strobj: Objects handling disabled");
 
 is (vis $hobj, q<bless(do{\(my $o = \42)},'main::HObj')>, "HObj: Objects handling disabled");
 is (vis \%$hobj, '{a => 111,b => 222,c => 333}', "\%{HObj}");
@@ -84,14 +91,18 @@ is(vis $gobj,q!bless({},'main::GObj')! , "Gobj: Objects handling disabled");
 #is(vis *{ $gobj }{HASH},q!{hash_via_virtual_glob => 123}!, "*{Gobj}{HASH} basic test");
 
 foreach (0,1) {
-  my ($desc, $HVcn, $Hcn, $Ccn, $Scn, $Gcn);
-  if ($_) {
+  local $Data::Dumper::Interp::Objects;
+  my ($desc, $STcn, $HVcn, $Hcn, $Ccn, $Scn, $Gcn);
+  if ($_ == 0) {
     $Data::Dumper::Interp::Objects
-      = {show_classname => 0, objects => 1};
-    $HVcn = $Hcn = $Ccn = $Scn = $Gcn = "";
+      #= {show_classname => 0, objects => 1};
+      = {overloads => "transparent", objects => 1};
+    $STcn = $HVcn = $Hcn = $Ccn = $Scn = $Gcn = "";
     $desc = "Objects enabled but not showing overloaded classnames";
-  } else {
+  }
+  elsif ($_ == 1) {
     $Data::Dumper::Interp::Objects = 1;
+    $STcn = '(main::StrObj)';
     $HVcn = '(main::HVObj)';
     $Hcn  = '(main::HObj)';
     $Ccn  = '(main::CObj)';
@@ -99,6 +110,8 @@ foreach (0,1) {
     $Gcn  = '(main::GObj)';
     $desc = "Objects enabled";
   }
+  else { oops }
+  is (vis $strobj, "\"${STcn}stringified value\"", "StrObj: $desc");
   is (vis \@$hvobj, '[0,1,2,3,4,5,6,7,8,9]', "\@{HVObj} again");
   is (vis \%$hvobj, '{a => 111,b => 222,c => 333}', "\%{HVObj} again");
   is (vis $hvobj, $HVcn.'[0,1,2,3,4,5,6,7,8,9]', "HVObj: $desc");
@@ -110,6 +123,19 @@ foreach (0,1) {
        qr/^\Q${Ccn}\Esub\s*{.*['"]from virtual coderef['"]\s*;?\s*}$/,
        "Cobj: $desc");
   is(vis $gobj, $Gcn.q!\*::GObj::Global! , "Gobj: $desc");
+}
+
+{
+  local $Data::Dumper::Interp::Objects = {overloads => "ignore", objects => 1};
+  my $desc = "(overloads => \"ignore\")";
+  like (vis $strobj, qr/^main::StrObj<[\da-f:]*>$/, "StrObj: $desc");
+  like (vis $hvobj, qr/^main::HVObj<[\da-f:]*>$/, "HVObj: $desc");
+  like (vis $hobj, qr/^main::HObj<[\da-f:]*>$/, "HObj: $desc");
+  like (vis $sobj, qr/^main::SObj<[\da-f:]*>$/, "SObj: $desc");
+  like(Data::Dumper::Interp->new()->Deparse(1)->vis($cobj),
+       qr/^main::CObj<[\da-f:]*>$/,
+       "Cobj: $desc");
+  like(vis $gobj, qr/^main::GObj<[\da-f:]*>$/ , "Gobj: $desc");
 }
 
 done_testing();

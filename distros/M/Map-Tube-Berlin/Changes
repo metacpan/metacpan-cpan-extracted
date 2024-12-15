@@ -1,5 +1,12 @@
 Revision history for Perl extension Map::Tube::Berlin.
 
+2024.1215
+	- data changes
+	  - changed station rename (Messe Nord ICC -> ZOB)
+	  - temporarily removed north U6 because of long construction works
+	- bug fix
+	  - S26 was missing in lines list
+
 2023.1210
 	- data changes
 	  - S26 and S85 swap north sections

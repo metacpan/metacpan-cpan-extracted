@@ -11,10 +11,6 @@ use Text::Table::Boxed;
 $Text::Table::Boxed::debug = $debug;
 
 use Data::Dumper::Interp;
-{ no warnings 'once';
-  # Don't follow overloads e.g. stringify
-  $Data::Dumper::Interp::Objects = {overloads => "ignore"};
-}
 
 # Preliminary test using rules with all-different characters 
 { my $tb = Text::Table::Boxed->new({ columns => ["aaa","bbb"],

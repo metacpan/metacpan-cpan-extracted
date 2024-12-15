@@ -1,5 +1,9 @@
 Revision history for Perl extension Poz
 
+0.02 2024-12-15T01:21:25Z
+
+    - Added safe_parse to all Poz types (kfly8)
+
 0.01 2024-12-08T07:08:19Z
 
     - original version

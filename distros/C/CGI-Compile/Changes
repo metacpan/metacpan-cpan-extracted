@@ -1,5 +1,9 @@
 Revision history for Perl extension CGI::Compile
 
+0.27  2024-12-14 14:00:17 UTC
+	- Make t/race-conditions.t run only with AUTHOR_TESTING due to problems
+	  reported by users and CPAN Testers.
+
 0.26  2023-07-30 23:21:04 UTC
 	- test with simple source filter rather than Switch.pm (haarg)
 

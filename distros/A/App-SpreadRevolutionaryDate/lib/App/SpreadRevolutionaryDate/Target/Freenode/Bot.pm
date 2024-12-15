@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Freenode::Bot;
-$App::SpreadRevolutionaryDate::Target::Freenode::Bot::VERSION = '0.36';
+$App::SpreadRevolutionaryDate::Target::Freenode::Bot::VERSION = '0.38';
 # ABSTRACT: Subclass overloading L<Bot::BasicBot> to post a message on some Freenode channels
 
 use Moose;
@@ -121,7 +121,7 @@ App::SpreadRevolutionaryDate::Target::Freenode::Bot - Subclass overloading L<Bot
 
 =head1 VERSION
 
-version 0.36
+version 0.38
 
 =head1 SEE ALSO
 

@@ -16,8 +16,8 @@ sub new {
 
 sub rule {
     my ($self, $value) = @_;
-    Carp::croak($self->{required_error}) unless defined $value;
-    Carp::croak($self->{invalid_type_error}) unless grep { $_ eq $value } @{$self->{__enum__}};
+    return $self->{required_error} unless defined $value;
+    return $self->{invalid_type_error} unless grep { $_ eq $value } @{$self->{__enum__}};
     return;
 }
 

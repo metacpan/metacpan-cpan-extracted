@@ -18,7 +18,7 @@ no warnings "experimental::lexical_subs";
 
 my $bitwise_supported;
 BEGIN {
-  $bitwise_supported = eval { use feature 'bitwise'; };
+  $bitwise_supported = eval "use feature 'bitwise'";
 }
 use if $bitwise_supported, "feature", "bitwise";
 
@@ -33,8 +33,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-01'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.010'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-14'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Moose;
 
@@ -204,9 +204,10 @@ sub _tf($) { $_[0] ? "T" : "F" }
 sub _showfalse(_) { $_[0] ? $_[0] : 0 }
 sub _dbvisnew($) {
   my $v = shift;
-  Data::Dumper->new([$v])->Terse(1)->Indent(0)->Quotekeys(0)->Useqq(1)
-              #->Useperl(1)
+  Data::Dumper->new([$v])->Terse(1)->Indent(0)->Quotekeys(0)
+              ->Sortkeys(1)->Useqq(1)
               ###->Sortkeys(\&__sortkeys)->Pair("=>")
+              #->Useperl(1)
 }
 sub _dbvis(_) {chomp(my $s=_dbvisnew(shift)->Useqq(1)->Dump); $s }
 sub _dbvisq(_){chomp(my $s=_dbvisnew(shift)->Useqq(0)->Dump); $s }
@@ -483,7 +484,7 @@ sub __getself_s { &__getself->Values([$_[0]]) }
 sub __getself_a { &__getself->Values([[@_]])   }
 sub __getself_h {
   my $obj = &__getself;
-  ($#_ % 2)==1 or croak "Uneven arg count for key => val pairs";
+  ($#_ % 2)==1 or confess "Uneven arg count for key => val pairs";
   $obj->Values([{@_}])
 }
 
@@ -682,7 +683,7 @@ my  $my_maxdepth;
 our $my_visit_depth = 0;
 
 my ($maxstringwidth, $truncsuffix, $objects, $opt_refaddr, $listform, $debug);
-my ($sortkeys, $show_classname);
+my ($sortkeys, $ovopt);
 
 sub _Do {
   oops unless @_ == 1;
@@ -697,15 +698,27 @@ sub _Do {
 
   $maxstringwidth = 0 if ($maxstringwidth //= 0) >= INT_MAX;
   $truncsuffix //= "...";
+  $ovopt = "tagged";
   if (ref($objects) eq "HASH") {
-    for (qw/show_classname objects/) {
-      confess "Objects value is a hashref but '${_}' key is missing\n"
-        unless exists $objects->{$_};
+    foreach my $key (keys %$objects) {
+      if ($key eq 'show_classname') { # DEPRECATED
+        $ovopt = $objects->{$key} ? "tagged" : "transparent"
+      }
+      elsif ($key eq 'overloads') {
+        if (!defined($objects->{$key})) {
+          $ovopt = "tagged";
+        }
+        elsif ($objects->{$key} =~ /^(?:tagged|transparent|ignore)$/) {
+          $ovopt = $objects->{$key}
+        }
+        else { confess "Invalid 'overloads' sub-opt value '$objects->{$key}'" }
+      }
+      elsif ($key eq 'objects') { }
+      else {
+        confess "Objects hashref value has unknown key '$key'\n";
+      }
     }
-    $show_classname = $objects->{show_classname};
-    $objects = $objects->{objects};
-  } else {
-    $show_classname = 1;
+    $objects = $objects->{objects} // (ref($Objects) ? 1 : $Objects);
   }
   $objects = [ $objects ] unless ref($objects //= []) eq 'ARRAY';
 
@@ -817,13 +830,13 @@ btw '@@@repl item is obj ',$item if $debug;
       }
       last CHECKObject
         unless $enabled;
-      if (overload::Overloaded($item)) {
+      if ($ovopt ne "ignore" && overload::Overloaded($item)) {
 btw '@@@repl obj is overloaded' if $debug;
         # N.B. Overloaded(...) also returns true if it's a NAME of an
         # overloaded package; should not happen in this case.
         warn("Recursive overloads on $item ?\n"),last
           if $overload_depth++ > 10;
-        my $cn = $show_classname ? "($class)" : "";
+        my $cn = $ovopt eq "tagged" ? "($class)" : "";
         # Stringify objects which have the stringification operator
         if (overload::Method($class,'""')) {
           my $prefix = _show_as_number($item) ? _MAGIC_NOQUOTES_PFX : "";
@@ -2125,7 +2138,9 @@ sub DB_Vis_Eval($$) {
   if ($errmsg) {
     $errmsg = Data::Dumper::Interp::_chop_ateval($errmsg);
     Carp::carp("${label_for_errmsg} interpolation error: $errmsg\n");
-    @result = ( (defined($result[0]) ? $result[0] : "")."<invalid/error>" );
+    @result = ( (defined($result[0]) ? $result[0] : "")."<invalid/error>"
+                , "" # second item in case this ends up in %{ ... }
+              );
   }
 
   wantarray ? @result : (do{die "bug" if @result>1}, $result[0])
@@ -2498,18 +2513,29 @@ or array-, hash-, scalar-, or glob- deref operators;
 in that case the first overloaded operator found will be evaluated,
 the object replaced by the result, and the check repeated.
 
-By default, "(classname)" is prepended when an overloaded operator is
-evaluated to make clear what happened.
+By default, "(classname)" is prepended to the result of an overloaded operator
+to make clear what happened.
 
-=head2 Objects(I<< {objects => VALUE, show_classname => BOOL} >>)
+=head2 Objects(I<< {objects => VALUE, overloads => OVOPT} >>)
 
 This form, passing a hashref,
-allows control of whether "(classname)" is prepended to the result
-from an overloaded operator.
+allows passing additional options for blessed objects:
 
-If the I<show_classname> value is false, then overload results
+=over
+
+B<overloads =E<gt> "tagged"> (the default): "(classname)" is prepended to the result when an overloaded operator is evaluated.
+
+B<overloads =E<gt> "transparent"> : The overload results
 will appear unadorned, i.e. they will look as if the overload result
 was the original value.
+
+B<overloads =E<gt> "ignore"> : Overloaded operators are not evaluated at all;
+the original object's abbreviated refaddr is shown
+(if you want to see object internals, disable I<Objects> entirely.)
+
+Deprecated: B<show_classname =E<gt> False> : Please use S<< B<overloads =E<gt> "transparent"> instead. >>
+
+=back
 
 The I<objects> value indicates whether and for which classes special
 object handling is enabled (false, "1", "classname" or [list of classnames]).
@@ -2714,6 +2740,10 @@ Results differ from plain C<Data::Dumper> output in the following ways
 
 =item *
 
+Punctuation variables such as $@, $!, and $?, are preserved over calls.
+
+=item *
+
 A final newline is I<never> included.
 
 Everything is shown on a single line if possible, otherwise wrapped to
@@ -2757,10 +2787,6 @@ The "virtual" value of objects which overload a dereference operator
 
 Hash keys are sorted treating numeric "components" numerically.
 For example "A.20" sorts before "A.100".
-
-=item *
-
-Punctuation variables such as $@, $!, and $?, are preserved over calls.
 
 =item *
 

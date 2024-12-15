@@ -119,7 +119,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/uri/path',
+          instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo/bar)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
           error => 'templated operation does not match provided operation_id',
@@ -130,12 +130,28 @@ YAML
   );
 
   cmp_result(
+    $openapi->validate_request($request, { path_template => '/foo/bar', operation_id => 'my_components_pathItem_operation' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request',
+          keywordLocation => '/components/pathItems/my_path_item',
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/pathItems/my_path_item')->to_string,
+          error => 'operation at operation_id does not match provided path_template',
+        },
+      ],
+    },
+    'providing a path template will never work here',
+  );
+
+  cmp_result(
     $openapi->validate_request($request, { operation_id => 'my_webhook_operation' })->TO_JSON,
     {
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/uri/path',
+          instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo/bar)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
           error => 'templated operation does not match provided operation_id',
@@ -151,7 +167,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/uri/path',
+          instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo/bar)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
           error => 'templated operation does not match provided operation_id',
@@ -167,7 +183,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/uri/path',
+          instanceLocation => '/request',
           keywordLocation => jsonp(qw(/paths /foo/bar)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
           error => 'templated operation does not match provided operation_id',
@@ -192,7 +208,7 @@ YAML
           instanceLocation => '/request/uri/path',
           keywordLocation => '/paths',
           absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
-          error => 'no match found for URI "http://example.com/bloop/blah"',
+          error => 'no match found for request URI "http://example.com/bloop/blah"',
         },
       ],
     },
@@ -257,7 +273,7 @@ YAML
           instanceLocation => '/request/uri/path',
           keywordLocation => jsonp(qw(/paths /foo)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo)))->to_string,
-          error => 'provided path_captures values do not match request URI',
+          error => 'provided path_captures names do not match path template "/foo"',
         },
       ],
     },

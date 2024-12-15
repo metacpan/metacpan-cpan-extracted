@@ -12,11 +12,14 @@ dist.ini
 examples/foo.pl
 examples/hello.c
 examples/synopsis.pl
+lib/Data/Section/Pluggable/Role/FormatContentPlugin.pm
 lib/Data/Section/Writer.pm
 perlcriticrc
 t/00_diag.t
+t/data_section_pluggable_role_formatcontentplugin.t
 t/data_section_writer.t
 t/integration_data_section.t
+t/integration_data_section_pluggable.t
 t/integration_data_section_simple.t
 t/integration_mojo.t
 t/lib/MyIntegration.pm

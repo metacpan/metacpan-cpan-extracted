@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2014,2015,2016,2017,2018,2019,2020,2021,2023 Slaven Rezic. All rights reserved.
+# Copyright (C) 2014,2015,2016,2017,2018,2019,2020,2021,2023,2024 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -12,7 +12,7 @@
 
 package Map::Tube::Berlin;
 
-$VERSION = '2023.1210';
+$VERSION = '2024.1215';
 
 =head1 NAME
 
@@ -59,7 +59,7 @@ to I<END> is returned.
 The XML file was generated using data from the L<BBBike
 project|https://github.com/eserte/bbbike>. A Makefile rule
 C<build-map> for regenerating the XML file exists (assuming that
-BBBike was cloned/extracted into F<$HOME/src/bbbike>.
+BBBike was cloned/extracted into F<$HOME/src/bbbike>).
 
 =head1 AUTHOR
 

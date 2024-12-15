@@ -3,7 +3,6 @@ use 5.032;
 use strict;
 use warnings;
 use parent 'Poz::Types::scalar';
-use Carp ();
 
 sub new {
     my ($class, $opts) = @_;
@@ -16,8 +15,8 @@ sub new {
 
 sub rule {
     my ($self, $value) = @_;
-    return Carp::croak($self->{required_error}) unless defined $value;
-    return Carp::croak($self->{invalid_type_error}) unless $value =~ /^-?\d+\.?\d*$/;
+    return $self->{required_error} unless defined $value;
+    return $self->{invalid_type_error} unless $value =~ /^-?\d+\.?\d*$/;
     return;
 };
 
@@ -32,7 +31,7 @@ sub gt {
     $opts->{message} //= "Too small";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) if $value <= $min;
+        return $opts->{message} if $value <= $min;
         return;
     };
     return $self;
@@ -44,7 +43,7 @@ sub gte {
     $opts->{message} //= "Too small";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) if $value < $min;
+        return $opts->{message} if $value < $min;
         return;
     };
     return $self;
@@ -56,7 +55,7 @@ sub lt {
     $opts->{message} //= "Too large";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) if $value >= $max;
+        return $opts->{message} if $value >= $max;
         return;
     };
     return $self;
@@ -68,7 +67,7 @@ sub lte {
     $opts->{message} //= "Too large";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) if $value > $max;
+        return $opts->{message} if $value > $max;
         return;
     };
     return $self;
@@ -81,7 +80,7 @@ sub int {
     $opts->{message} //= "Not an integer";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) if $value !~ /^-?\d+$/;
+        return $opts->{message} if $value !~ /^-?\d+$/;
         return;
     };
     return $self;
@@ -93,7 +92,7 @@ sub positive {
     $opts->{message} //= "Not a positive number";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) if $value <= 0;
+        return $opts->{message} if $value <= 0;
         return;
     };
     return $self;
@@ -105,7 +104,7 @@ sub negative {
     $opts->{message} //= "Not a negative number";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) if $value >= 0;
+        return $opts->{message} if $value >= 0;
         return;
     };
     return $self;
@@ -117,7 +116,7 @@ sub nonpositive {
     $opts->{message} //= "Not a non-positive number";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) if $value > 0;
+        return $opts->{message} if $value > 0;
         return;
     };
     return $self;
@@ -129,7 +128,7 @@ sub nonnegative {
     $opts->{message} //= "Not a non-negative number";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) if $value < 0;
+        return $opts->{message} if $value < 0;
         return;
     };
     return $self;
@@ -142,7 +141,7 @@ sub multipleOf {
     $opts->{message} //= "Not a multiple of $divisor";
     push @{$self->{rules}}, sub {
         my ($self, $value) = @_;
-        Carp::croak($opts->{message}) if $value % $divisor != 0;
+        return $opts->{message} if $value % $divisor != 0;
         return;
     };
     return $self;
@@ -163,18 +162,18 @@ Poz::Types::number - A module for number type validation and coercion
 =head1 SYNOPSIS
 
     use Poz qw/z/;
-    
+
     my $number = z->number;
-    
+
     # Validate a number
     $number->rule(42); # No error
-    
+
     # Coerce a value to a number
     my $coerced_value = $number->coerce("42.5");
-    
+
     # Add validation rules
     $number->gt(10)->lt(100);
-    
+
     # Validate with custom rules
     $number->rule(50); # No error
 

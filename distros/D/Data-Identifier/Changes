@@ -1,3 +1,12 @@
+v0.07  2024-12-15Z
+    - Feature: Added Data::Identifier::Wellknown
+    - Added support for RGB colours in Data::Identifier::Generate
+    - Improved performance
+    - Made OID support optional (to allow performance improvements for applications not requiring it)
+    - Improved POD
+    - Changed required Perl from v5.16 to v5.20
+    - Fixed a number of smaller bugs
+
 v0.06  2024-11-02Z
     - Added methods: eq, cmp, as
     - Feature: Added Data::Identifier::Interface::Known

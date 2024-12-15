@@ -4,6 +4,7 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   Capture::Tiny: '0'
+  Role::Tiny::With: '0'
   Test2::API: '1.302015'
   Test2::Require::Module: '0.000121'
   Test2::V0: '0.000121'
@@ -23,13 +24,15 @@ requires:
   Class::Tiny: '0'
   Path::Tiny: '0'
   Ref::Util: '0'
+  Role::Tiny: '1.003001'
   perl: v5.20.0
   stable: '0'
+  'true': '0'
 resources:
   bugtracker: https://github.com/uperl/Data-Section-Writer/issues
   homepage: https://metacpan.org/pod/Data::Section::Writer
   repository: git://github.com/uperl/Data-Section-Writer.git
-version: '0.01'
+version: '0.03'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -278,6 +278,30 @@ YAML
   );
 
   cmp_result(
+    $openapi->validate_response($res, $options = { path_template => '/foo/bar', operation_id => 'my_components_pathItem_operation' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response',
+          keywordLocation => '/components/pathItems/my_path_item',
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment('/components/pathItems/my_path_item')->to_string,
+          error => 'operation at operation_id does not match provided path_template',
+        },
+      ],
+    },
+    'response is processed',
+  );
+  cmp_result(
+    $options,
+    {
+      path_template => '/foo/bar',
+      operation_id => 'my_components_pathItem_operation',
+    },
+    'providing a path template will never work here',
+  );
+
+  cmp_result(
     $openapi->validate_response($res, $options = { operation_id => 'my_webhook_operation' })->TO_JSON,
     {
       valid => false,
@@ -379,7 +403,7 @@ YAML
           instanceLocation => '/request/uri/path',
           keywordLocation => '/paths',
           absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
-          error => 'no match found for URI "http://example.com/foo/bar"',
+          error => 'no match found for request URI "http://example.com/foo/bar"',
         },
       ],
     },
@@ -399,7 +423,7 @@ YAML
             instanceLocation => '/request/uri/path',
             keywordLocation => '/paths',
             absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
-            error => 'no match found for URI "http://example.com/foo/bar"',
+            error => 'no match found for request URI "http://example.com/foo/bar"',
           },
         ],
       },

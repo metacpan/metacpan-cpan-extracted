@@ -26,6 +26,7 @@ use LWP::UserAgent;
 use DateTime;
 use JSON qw(encode_json decode_json);
 use URI;
+use Encode qw(decode_utf8);
 
 use namespace::autoclean;
 
@@ -36,6 +37,121 @@ BEGIN {
   }
 }
 
+sub _fetch_embed_url_card {
+  my $self = shift;
+  my $url = shift || return;
+
+  my $card = {uri => $url};
+
+  my $ua = LWP::UserAgent->new(env_proxy => 1, timeout => 10, agent =>'App::SpreadRevolutionaryDate bot');
+  my $response = $ua->get($url);
+  return unless $response->is_success;
+  my $content = $response->content;
+  return unless $content;
+
+  if ($content =~ /<meta\s+property="og:title"\s+content="([^"]+)"/) {
+    my $title = $1;
+    ($card->{title}) = decode_utf8($title);
+  } else {
+    $card->{title} = '';
+  }
+  if ($content =~ /<meta\s+property="og:description"\s+content="([^"]+)"/) {
+    my $description = $1;
+    ($card->{description}) = decode_utf8($description);
+  } else {
+    $card->{description} = '';
+  }
+  if ($content =~ /<meta\s+property="og:image"\s+content="([^"]+)"/) {
+    my $img_url = $1;
+    unless ($img_url =~ m!://!) {
+      $url = "$url/" unless $url =~ m!/$!;
+      $img_url = $url . $img_url;
+    }
+    my $img_response = $ua->get($img_url);
+    return unless $img_response->is_success;
+
+    my $blob_req = HTTP::Request->new('POST', 'https://bsky.social/xrpc/com.atproto.repo.uploadBlob');
+    $blob_req->header('Content-Type' => $img_response->header('Content-Type'));
+    $blob_req->content($img_response->content);
+    my $blob_response = $self->{ua}->request($blob_req);
+    return unless $blob_response->is_success;
+
+    my $blob_content = decode_json($blob_response->decoded_content);
+    ($card->{thumb}) = $blob_content->{blob};
+  }
+
+  return $card;
+}
+
+sub _lookup_repo {
+  my $self = shift;
+  my $account = shift || return;
+  $account .= '.bsky.social' unless $account =~ /[⋅]/;
+  my $uri = URI->new('https://bsky.social/xrpc/com.atproto.identity.resolveHandle');
+  $uri->query_form(handle => $account);
+  my $response = $self->{ua}->get($uri);
+  return if !$response->is_success;
+
+  my $content = decode_json($response->decoded_content);
+  return $content->{did};
+}
+
+sub _generate_facets {
+  my $self = shift;
+  my $text = shift || return;
+  my $facets = [];
+  my $embed;
+  my $pos = 0;
+  foreach my $w (split /\s+/, $text) {
+    my ($type, $attrib, $val);
+    $w =~ s/[.,:;'"!\?()]+$//;
+    $w =~ s/^[.,:;'"!\?()]+//g;
+    if ($w =~ /^https?\:\/\//) {
+      $type = 'app.bsky.richtext.facet#link';
+      $attrib = 'uri';
+      $val = $w;
+    } elsif ($self->{did} && $w =~ /^@/) {
+      $val = $self->_lookup_repo(substr($w, 1));
+      if (defined $val) {
+        $type = 'app.bsky.richtext.facet#mention';
+        $attrib = 'did';
+      }
+    }
+
+    if (defined $type) {
+      utf8::encode(my $text_bytes = $text);
+      $pos = index($text_bytes, $w, $pos);
+      my $end = $pos + length($w);
+
+      push @$facets, {
+        features => [
+          {
+            '$type' => $type,
+            $attrib => $val,
+          },
+        ],
+        index => {
+          byteStart => $pos,
+          byteEnd   => $end,
+        },
+      };
+
+      unless ($embed) {
+        my $card = $self->_fetch_embed_url_card($val);
+        if ($card) {
+          $embed = {
+                '$type'    => 'app.bsky.embed.external',
+                'external' => $card,
+          };
+        }
+      }
+
+      $pos = $end;
+    }
+  }
+  return ($facets, $embed);
+}
+
 
 sub new {
   my ($class, %args) = @_;
@@ -43,7 +159,6 @@ sub new {
   my %self;
   $self{ua} = LWP::UserAgent->new(env_proxy => 1, timeout => 10, agent =>'App::SpreadRevolutionaryDate bot');
   $self{ua}->default_header('Accept' => 'application/json');
-  $self{ua}->default_header('Content-Type' => 'application/json');
 
   my %payload = (
     identifier => $args{'identifier'},
@@ -51,11 +166,10 @@ sub new {
   );
   my $json = encode_json(\%payload);
 
-  my $response = $self{ua}->post(
-    'https://bsky.social/xrpc/com.atproto.server.createSession',
-    Content_Type => 'application/json',
-    Content => $json
-  );
+  my $req = HTTP::Request->new('POST', 'https://bsky.social/xrpc/com.atproto.server.createSession');
+  $req->header('Content-Type' => 'application/json');
+  $req->content($json);
+  my $response = $self{ua}->request($req);
 
   if ($response->is_success) {
     my $content = decode_json($response->decoded_content);
@@ -73,55 +187,25 @@ sub new {
 sub create_post {
   my ($self, $text) = @_;
 
-  my $facets = $self->_generate_facets($text);
+  my ($facets, $embed) = $self->_generate_facets($text);
   my $json = encode_json({
     repo => $self->{did},
     collection => 'app.bsky.feed.post',
     record => {
       text => $text,
       facets => $facets,
+      ($embed ?
+        (embed => $embed)
+        : ()
+      ),
       createdAt => DateTime->now->iso8601 . 'Z',
     },
   });
-  my $response = $self->{ua}->post(
-    "https://bsky.social/xrpc/com.atproto.repo.createRecord",
-    Content_Type => 'application/json',
-    Content => $json,
-  );
-  $response
-}
-
-sub _generate_facets {
-  my $self = shift;
-  my $text = shift || return [];
-  my $output = [];
-  my $pos = 0;
-  foreach my $w (split /\s+/, $text) {
-    my ($type, $attrib, $val);
-    $w =~ s/[.,:;'"!\?()]+$//;
-    $w =~ s/^[.,:;'"!\?()]+//g;
-    if ($w =~ /^https?\:\/\//) {
-      $type = 'app.bsky.richtext.facet#link';
-      $attrib = 'uri';
-      $val = $w;
-
-      utf8::encode(my $text_bytes = $text);
-      $pos = index($text_bytes, $w, $pos);
-      my $end = $pos + length($w);
-      push @$output, {
-        features => [{
-          '$type' => $type,
-          uri     => $val,
-        }],
-        index => {
-          byteStart => $pos,
-          byteEnd   => $end,
-        },
-      };
-      $pos = $end;
-    }
-  }
-  $output
+  my $req = HTTP::Request->new('POST', 'https://bsky.social/xrpc/com.atproto.repo.createRecord');
+  $req->header('Content-Type' => 'application/json');
+  $req->content($json);
+  my $response = $self->{ua}->request($req);
+  return $response;
 }
 
 
@@ -144,7 +228,7 @@ App::SpreadRevolutionaryDate::BlueskyLite - .
 
 =head1 VERSION
 
-version 0.36
+version 0.38
 
 =head1 Methods
 

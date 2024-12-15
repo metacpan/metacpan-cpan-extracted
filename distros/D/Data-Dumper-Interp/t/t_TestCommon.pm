@@ -113,7 +113,7 @@ use Config;
 
 BEGIN {
   unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
-    # unless we are testing DDI
+    # Unless we are testing DDI
     #$Data::Dumper::Interp::Foldwidth = undef; # use terminal width
     $Data::Dumper::Interp::Useqq = "controlpics:unicode";
   }

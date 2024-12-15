@@ -14,10 +14,10 @@ package Data::Section::Pluggable::Plugin::MyPlugin1 {
       );
       return ('txt')
     }
-    sub process_content ($class, $dps, $content) {
+    sub process_content ($class, $dsp, $content) {
       package main;
       is(
-        [ $class, $dps, $content ],
+        [ $class, $dsp, $content ],
         [ 'Data::Section::Pluggable::Plugin::MyPlugin1', object { prop isa => 'Data::Section::Pluggable' }, "Hello\n" ],
         'arguments to ->process_content',
       );
@@ -42,7 +42,7 @@ package Data::Section::Pluggable::Plugin::MyPlugin2 {
     use Role::Tiny::With;
     with 'Data::Section::Pluggable::Role::ContentProcessorPlugin';
     sub extensions ($class) { ('txt','html') }
-    sub process_content ($class, $dps, $content) { "[$content]" }
+    sub process_content ($class, $dsp, $content) { "[$content]" }
 }
 
 is(
@@ -62,7 +62,7 @@ package Data::Section::Pluggable::Plugin::MyPlugin3 {
     use Role::Tiny::With;
     with 'Data::Section::Pluggable::Role::ContentProcessorPlugin';
     sub extensions ($class) { ['txt','html'] }
-    sub process_content ($class, $dps, $content) { "[$content]" }
+    sub process_content ($class, $dsp, $content) { "[$content]" }
 }
 
 is(
@@ -100,10 +100,10 @@ package Data::Section::Pluggable::Plugin::MyPlugin4 {
       );
       return ('txt')
     }
-    sub process_content ($self, $dps, $content) {
+    sub process_content ($self, $dsp, $content) {
       package main;
       is(
-        [ $self, $dps, $content ],
+        [ $self, $dsp, $content ],
         [ object { prop isa => 'Data::Section::Pluggable::Plugin::MyPlugin4' }, object { prop isa => 'Data::Section::Pluggable' }, "Hello\n" ],
         'arguments to ->process_content',
       );

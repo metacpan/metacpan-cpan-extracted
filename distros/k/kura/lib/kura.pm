@@ -2,7 +2,7 @@ package kura;
 use strict;
 use warnings;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 use Carp ();
 use Sub::Util ();
@@ -13,18 +13,10 @@ my %FORBIDDEN_NAME = map { $_ => 1 } qw{
     AUTOLOAD STDIN STDOUT STDERR ARGV ARGVOUT ENV INC SIG
 };
 
-# This is a default constraint code to object.
-# You can change this code by setting $kura::CALLABLE_TO_OBJECT.
-#
-# NOTE: This variable will probably change. Use caution when overriding it.
-our $CALLABLE_TO_OBJECT = sub {
-    my ($name, $constraint, $caller) = @_;
-
-    require Type::Tiny;
-    Type::Tiny->new(
-        constraint => $constraint,
-    );
-};
+my @ALLOWED_CONSTRAINT_CLASSES = qw(
+    Data::Validator
+    Poz::Types
+);
 
 sub import {
     my $pkg = shift;
@@ -38,18 +30,73 @@ sub import_into {
     my $pkg = shift;
     my ($caller, $name, $constraint) = @_;
 
-    my ($kura_item, $err) = _new_kura_item($name, $constraint, $caller);
+    my ($kura_item, $err) = _new_kura_item($caller, $name, $constraint);
     Carp::croak $err if $err;
 
     _save_kura_item($kura_item, $caller);
     _save_inc($caller);
 }
 
+# Create a constraint object.
+#
+# @param $constraint Defined. Following `create_constraint` function allows these types: Object, CodeRef, HashRef.
+# @param $opts Dict[name => Str, caller => Str]
+# @return ($constraint, undef) | (undef, $error_message)
+#
+# NOTE: This function is a hook point. If you want to customize the constraint object, you can override this function.
+sub create_constraint {
+    my ($constraint, $opts) = @_;
+
+    if (my $blessed = Scalar::Util::blessed($constraint)) {
+        return ($constraint, undef) if $constraint->can('check');
+        return ($constraint, undef) if grep { $constraint->isa($_) } @ALLOWED_CONSTRAINT_CLASSES;
+        return (undef, "Invalid constraint. Object must have a `check` method or allowed constraint class: $blessed");
+    }
+    elsif (my $reftype = Scalar::Util::reftype($constraint)) {
+        if ($reftype eq 'CODE') {
+            return _create_constraint_from_coderef($constraint, $opts);
+        }
+        elsif ($reftype eq 'HASH') {
+            return _create_constraint_from_hashref($constraint, $opts);
+        }
+    }
+
+    return (undef, 'Invalid constraint');
+}
+
+# Create a constraint object from a code reference.
+sub _create_constraint_from_coderef {
+    my ($coderef, $opts) = @_;
+
+    require Type::Tiny;
+
+    my $args = {};
+    $args->{name} = $opts->{name};
+    $args->{caller} = $opts->{caller};
+    $args->{constraint} = sub { !!eval { $coderef->($_[0]) } };
+    $args->{message} = sub { sprintf('%s did not pass the constraint "%s"', Type::Tiny::_dd($_[0]), $args->{name}) };
+
+    return (Type::Tiny->new(%$args), undef);
+}
+
+# Create a constraint object from a hash reference.
+sub _create_constraint_from_hashref {
+    my ($args, $opts) = @_;
+
+    my $blessed = delete $args->{blessed} || 'Type::Tiny';
+    eval "require $blessed" or die $@;
+
+    $args->{name}   //= $opts->{name};
+    $args->{caller} //= $opts->{caller};
+
+    return ($blessed->new(%$args), undef);
+}
+
 # Create a new kura item which is Dict[name => Str, code => CodeRef].
 # If the name or constraint is invalid, it returns (undef, $error_message).
 # Otherwise, it returns ($kura_item, undef).
 sub _new_kura_item {
-    my ($name, $constraint, $caller) = @_;
+    my ($caller, $name, $constraint) = @_;
 
     {
         return (undef, 'name is required') if !defined $name;
@@ -57,19 +104,9 @@ sub _new_kura_item {
         return (undef, "'$name' is already defined") if $caller->can($name);
     }
 
-    {
-        return (undef, 'constraint is required') if !defined $constraint;
-
-        if (Scalar::Util::blessed($constraint)) {
-            return (undef, 'Invalid constraint. It requires a `check` method.') if !$constraint->can('check');
-        }
-        elsif ( (Scalar::Util::reftype($constraint)||'') eq 'CODE') {
-            $constraint = $CALLABLE_TO_OBJECT->($name, $constraint, $caller);
-        }
-        else {
-            return (undef, 'Invalid constraint. It must be an object that has a `check` method or a code reference.');
-        }
-    }
+    return (undef, 'constraint is required') if !defined $constraint;
+    ($constraint, my $err) = create_constraint($constraint, { name => $name, caller => $caller });
+    return (undef, $err) if $err;
 
     # Prefix '_' means private, so it is not exported.
     my $is_private = $name =~ /^_/ ? 1 : 0;
@@ -137,7 +174,7 @@ This module is useful for storing constraints in a package and exporting them to
 
 =item * Export Constraints
 
-=item * Store Multiple Constraints
+=item * Store Favorite Constraints
 
 =back
 
@@ -145,14 +182,45 @@ This module is useful for storing constraints in a package and exporting them to
 
 =head3 Simple Declaration
 
-Kura makes it easy to store constraints in a package.
-
     use kura NAME => CONSTRAINT;
 
-C<CONSTRAINT> must be a any object that has a C<check> method or a code reference that returns true or false.
-The following is an example of a constraint declaration:
+Kura makes it easy to declare constraints. This usage is same as L<constant> pragma!
+Default implementation of C<CONSTRAINT> can accept following these types:
 
+=over 2
+
+=item Object having a C<check> method
+
+Many constraint libraries has a C<check> method, such as L<Type::Tiny>, L<Moose::Meta::TypeConstraint>, L<Mouse::Meta::TypeConstraint>, L<Specio> and more. Kura accepts these objects.
+
+    use Types::Common -types;
     use kura Name => StrLength[1, 255];
+
+=item Allowed constraint classes
+
+Kura allows these classes: L<Data::Validator>, L<Poz::Types>. Here is an example of using L<Poz>:
+
+    use Poz qw(z);
+    use kura Name  => z->string->min(1)->max(255);
+
+=item Code reference
+
+Code reference makes Type::Tiny object internally.
+
+    use kura Name => sub { length($_[0]) > 0 };
+    # => Name isa Type::Tiny and check method equals to this coderef.
+
+=item Hash reference
+
+Hash reference also makes Type::Tiny object internally.
+
+    use kura Name => {
+        constraint => sub { length($_[0]) > 0,
+        message    => sub { 'Invalid name' },
+    };
+    # => Name isa Type::Tiny
+
+=back
 
 =head3 Export Constraints
 
@@ -169,9 +237,9 @@ Kura allows you to export constraints to other packages using your favorite expo
     Foo->check('foo'); # true
     Foo->check('bar'); # false
 
-=head3 Store Multiple Constraints
+=head3 Store Favorite Constraints
 
-Kura supports multiple constraints such as L<Data::Checks>, L<Type::Tiny>, L<Moose::Meta::TypeConstraint>, L<Mouse::Meta::TypeConstraint>, L<Specio>, and more.
+Kura stores your favorite constraints such as L<Data::Checks>, L<Type::Tiny>, L<Moose::Meta::TypeConstraint>, L<Mouse::Meta::TypeConstraint>, L<Specio>, L<Data::Validator>, L<Poz::Types> and more.
 
     Data::Checks -----------------> +--------+
                                     |        |
@@ -267,8 +335,7 @@ This keeps your namespace cleaner and focuses on the essential C<check> method.
 
 =item * Multiple Constraints
 
-Kura is not limited to Type::Tiny. It supports multiple constraint libraries such as Moose, Mouse, Specio, and Data::Checks.
-This flexibility allows consistent management of type constraints in projects that mix different libraries.
+Kura is not limited to Type::Tiny. It supports multiple constraint libraries such as Moose, Mouse, Specio, Data::Checks and more. This flexibility allows consistent management of type constraints in projects that mix different libraries.
 
 =back
 
@@ -347,6 +414,38 @@ If you don't want to export constraints, put a prefix C<_> to the constraint nam
 
     use kura _PrivateFoo => Str;
     # => "_PrivateFoo" is not exported
+
+=head2 Customizing Constraints
+
+If you want to customize constraints, C<create_constraint> function is a hook point. You can override this function to customize constraints.
+Following are examples of customizing constraints:
+
+    package mykura {
+        use kura ();
+        use MyConstraint;
+
+        sub import {
+            shift;
+            my ($name, $args) = @_;
+
+            my $caller = caller;
+
+            no strict 'refs';
+            local *{"kura::create_constraint"} = \&create_constraint;
+
+            kura->import_into($caller, $name, $args);
+        }
+
+        sub create_constraint {
+            my ($args, $opts) = @_;
+            return (undef, "Invalid mykura arguments") unless (ref $args||'') eq 'HASH';
+            return (MyConstraint->new(%$args), undef);
+        }
+    }
+
+    package main {
+        use mykura Name => { constraint => sub { length($_[0]) > 0 } };
+    }
 
 =head1 LICENSE
 

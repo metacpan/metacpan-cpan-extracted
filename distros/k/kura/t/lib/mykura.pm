@@ -3,16 +3,24 @@ use strict;
 use warnings;
 
 use kura ();
+use MyConstraint;
 
 sub import {
-    my $class = shift;
+    shift;
+    my ($name, $args) = @_;
+
     my $caller = caller;
 
-    my ($name, $constraint) = @_;
+    no strict 'refs';
+    local *{"kura::create_constraint"} = \&create_constraint;
 
-    $name = 'My' . $name;
+    kura->import_into($caller, $name, $args);
+}
 
-    kura->import_into($caller, $name, $constraint);
+sub create_constraint {
+    my ($args, $opts) = @_;
+    return (undef, "Invalid mykura arguments") unless (ref $args||'') eq 'HASH';
+    return (MyConstraint->new(%$args), undef);
 }
 
 1;

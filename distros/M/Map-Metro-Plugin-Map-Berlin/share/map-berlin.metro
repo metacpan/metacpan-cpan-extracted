@@ -125,7 +125,7 @@ Bundesplatz
 Heidelberger Platz
 Hohenzollerndamm
 Halensee
-Messe Nord/ICC
+Messe Nord/ZOB
 Westend
 Jungfernheide
 Beusselstr.
@@ -297,11 +297,6 @@ Seestr.
 Rehberge
 Afrikanische Str.
 Kurt-Schumacher-Platz
-Scharnweberstr.
-Otisstr.
-Holzhauser Str.
-Borsigwerke
-Alt-Tegel
 
 # U7
 Rudow
@@ -449,7 +444,6 @@ Schloßstr.
 1001|Borgsdorf|Lehnitz
 1008,1002,1026|Bornholmer Str.|Pankow
 1001,1025,1085|Bornholmer Str.|Wollankstr.
-6|Borsigwerke|Alt-Tegel
 1001|Botanischer Garten|Rathaus Steglitz
 1001,1025,1002,1026|Brandenburger Tor|Friedrichstr.
 5|Brandenburger Tor|Unter den Linden
@@ -546,7 +540,6 @@ Schloßstr.
 1041|Hohenzollerndamm|Halensee
 1046|Hohenzollerndamm|Heidelberger Platz
 3|Hohenzollernplatz|Fehrbelliner Platz
-6|Holzhauser Str.|Borsigwerke
 1005|Hoppegarten|Birkenstein
 1001,1025,1002,1026|Humboldthain|Gesundbrunnen
 1041|Innsbrucker Platz|Bundesplatz
@@ -579,7 +572,6 @@ Schloßstr.
 9|Kurfürstendamm|Spichernstr.
 1|Kurfürstendamm|Uhlandstr.
 1,3|Kurfürstenstr.|Nollendorfplatz
-6|Kurt-Schumacher-Platz|Scharnweberstr.
 1046,1045|Köllnische Heide|Baumschulenweg
 1047|Köllnische Heide|Neukölln
 1003|Köpenick|Wuhlheide
@@ -608,8 +600,8 @@ Schloßstr.
 7|Mehringdamm|Möckernbrücke
 1007|Mehrower Allee|Raoul-Wallenberg-Str.
 2|Mendelssohn-Bartholdy-Park|Gleisdreieck
-1041|Messe Nord/ICC|Westend
-1046|Messe Nord/ICC|Westkreuz
+1041|Messe Nord/ZOB|Westend
+1046|Messe Nord/ZOB|Westkreuz
 1009,1003|Messe Süd|Heerstr.
 1001|Mexikoplatz|Zehlendorf
 7|Mierendorffplatz|Jungfernheide
@@ -647,7 +639,6 @@ Schloßstr.
 1008,1085|Ostkreuz|Frankfurter Allee
 1041|Ostkreuz|Treptower Park
 1003,1005,1007,1075|Ostkreuz|Warschauer Str.
-6|Otisstr.|Holzhauser Str.
 1008,1002,1026|Pankow|Pankow-Heinersdorf
 2|Pankow|Vinetastr.
 1008,1002,1026|Pankow-Heinersdorf|Blankenburg
@@ -689,7 +680,6 @@ Schloßstr.
 5|Samariterstr.|Frankfurter Allee
 1003,1005,1007,1009|Savignyplatz|Charlottenburg
 1003|Savignyplatz|Zoologischer Garten
-6|Scharnweberstr.|Otisstr.
 1002|Schichauweg|Buckower Chaussee
 5|Schillingstr.|Strausberger Platz
 1001|Schlachtensee|Mexikoplatz
@@ -769,13 +759,13 @@ Schloßstr.
 6|Wedding|Leopoldplatz
 8|Weinmeisterstr.|Rosenthaler Platz
 1041|Westend|Jungfernheide
-1046|Westend|Messe Nord/ICC
+1046|Westend|Messe Nord/ZOB
 9|Westhafen|Birkenstr.
 1041|Westhafen|Wedding
 1003|Westkreuz|Charlottenburg
 1007|Westkreuz|Grunewald
 1046|Westkreuz|Halensee
-1041|Westkreuz|Messe Nord/ICC
+1041|Westkreuz|Messe Nord/ZOB
 1009,1003|Westkreuz|Messe Süd
 6|Westphalweg|Ullsteinstr.
 1046|Wildau|Königs Wusterhausen

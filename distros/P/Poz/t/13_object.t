@@ -7,7 +7,7 @@ use Time::Piece ();
 use Data::UUID ();
 
 my $bookSchema = z->object({
-    id         => z->string->uuid->default(sub { Data::UUID->new->create_str }),   
+    id         => z->string->uuid->default(sub { Data::UUID->new->create_str }),
     title      => z->string,
     author     => z->string->default("Anonymous"),
     published  => z->date,
@@ -51,5 +51,15 @@ is($errors, undef);
 });
 is($valid, undef);
 is_deeply($errors, [{key => "published", error => "Not a date"}]);
+
+subtest 'isa' => sub {
+    my $object = z->object({});
+    isa_ok($object, 'Poz::Types', 'Poz::Types::object');
+};
+
+subtest 'safe_parse must handle error' => sub {
+    my $object = z->object({});
+    throws_ok(sub { $object->safe_parse({}) }, qr/^Must handle error/, 'Must handle error');
+};
 
 done_testing;

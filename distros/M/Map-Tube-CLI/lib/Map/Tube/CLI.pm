@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.78';
+$Map::Tube::CLI::VERSION   = '0.79';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.78
+Version 0.79
 
 =cut
 
@@ -324,14 +324,14 @@ sub run {
     }
     else {
         eval { print $map_obj->get_shortest_route($start, $end), "\n"; };
-        if ($@ || $self->debug) {
-            print "\n--------------------\n";
+        if ($self->debug) {
+            print "\n---------DEBUG-----------\n";
             foreach my $id (sort keys %{$map_obj->{tables}}) {
                 print "$map_obj->{tables}->{$id}\n";
             }
-            print "--------------------\n";
-            print "$@\n";
+            print "-------------------------\n";
         }
+        print "$@\n" if ($@);
     }
 }
 

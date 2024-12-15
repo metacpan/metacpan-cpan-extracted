@@ -22,24 +22,57 @@ This module is useful for storing constraints in a package and exporting them to
 
 - Simple Declaration
 - Export Constraints
-- Store Multiple Constraints
+- Store Favorite Constraints
 
 ## FEATURES
 
 ### Simple Declaration
 
-Kura makes it easy to store constraints in a package.
-
 ```perl
 use kura NAME => CONSTRAINT;
 ```
 
-`CONSTRAINT` must be a any object that has a `check` method or a code reference that returns true or false.
-The following is an example of a constraint declaration:
+Kura makes it easy to declare constraints. This usage is same as [constant](https://metacpan.org/pod/constant) pragma!
+Default implementation of `CONSTRAINT` can accept following these types:
 
-```perl
-use kura Name => StrLength[1, 255];
-```
+- Object having a `check` method
+
+    Many constraint libraries has a `check` method, such as [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny), [Moose::Meta::TypeConstraint](https://metacpan.org/pod/Moose%3A%3AMeta%3A%3ATypeConstraint), [Mouse::Meta::TypeConstraint](https://metacpan.org/pod/Mouse%3A%3AMeta%3A%3ATypeConstraint), [Specio](https://metacpan.org/pod/Specio) and more. Kura accepts these objects.
+
+    ```perl
+    use Types::Common -types;
+    use kura Name => StrLength[1, 255];
+    ```
+
+- Allowed constraint classes
+
+    Kura allows these classes: [Data::Validator](https://metacpan.org/pod/Data%3A%3AValidator), [Poz::Types](https://metacpan.org/pod/Poz%3A%3ATypes). Here is an example of using [Poz](https://metacpan.org/pod/Poz):
+
+    ```perl
+    use Poz qw(z);
+    use kura Name  => z->string->min(1)->max(255);
+    ```
+
+- Code reference
+
+    Code reference makes Type::Tiny object internally.
+
+    ```perl
+    use kura Name => sub { length($_[0]) > 0 };
+    # => Name isa Type::Tiny and check method equals to this coderef.
+    ```
+
+- Hash reference
+
+    Hash reference also makes Type::Tiny object internally.
+
+    ```perl
+    use kura Name => {
+        constraint => sub { length($_[0]) > 0,
+        message    => sub { 'Invalid name' },
+    };
+    # => Name isa Type::Tiny
+    ```
 
 ### Export Constraints
 
@@ -58,9 +91,9 @@ Foo->check('foo'); # true
 Foo->check('bar'); # false
 ```
 
-### Store Multiple Constraints
+### Store Favorite Constraints
 
-Kura supports multiple constraints such as [Data::Checks](https://metacpan.org/pod/Data%3A%3AChecks), [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny), [Moose::Meta::TypeConstraint](https://metacpan.org/pod/Moose%3A%3AMeta%3A%3ATypeConstraint), [Mouse::Meta::TypeConstraint](https://metacpan.org/pod/Mouse%3A%3AMeta%3A%3ATypeConstraint), [Specio](https://metacpan.org/pod/Specio), and more.
+Kura stores your favorite constraints such as [Data::Checks](https://metacpan.org/pod/Data%3A%3AChecks), [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny), [Moose::Meta::TypeConstraint](https://metacpan.org/pod/Moose%3A%3AMeta%3A%3ATypeConstraint), [Mouse::Meta::TypeConstraint](https://metacpan.org/pod/Mouse%3A%3AMeta%3A%3ATypeConstraint), [Specio](https://metacpan.org/pod/Specio), [Data::Validator](https://metacpan.org/pod/Data%3A%3AValidator), [Poz::Types](https://metacpan.org/pod/Poz%3A%3ATypes) and more.
 
 ```
 Data::Checks -----------------> +--------+
@@ -164,8 +197,7 @@ Kura serves a similar purpose to [Type::Library](https://metacpan.org/pod/Type%3
 
 - Multiple Constraints
 
-    Kura is not limited to Type::Tiny. It supports multiple constraint libraries such as Moose, Mouse, Specio, and Data::Checks.
-    This flexibility allows consistent management of type constraints in projects that mix different libraries.
+    Kura is not limited to Type::Tiny. It supports multiple constraint libraries such as Moose, Mouse, Specio, Data::Checks and more. This flexibility allows consistent management of type constraints in projects that mix different libraries.
 
 While Type::Library is powerful and versatile, Kura stands out for its simplicity, flexibility, and ability to integrate with multiple constraint systems.
 It’s particularly useful in projects where multiple type constraint libraries coexist or when leveraging built-in class syntax.
@@ -250,6 +282,40 @@ If you don't want to export constraints, put a prefix `_` to the constraint name
 ```perl
 use kura _PrivateFoo => Str;
 # => "_PrivateFoo" is not exported
+```
+
+## Customizing Constraints
+
+If you want to customize constraints, `create_constraint` function is a hook point. You can override this function to customize constraints.
+Following are examples of customizing constraints:
+
+```perl
+package mykura {
+    use kura ();
+    use MyConstraint;
+
+    sub import {
+        shift;
+        my ($name, $args) = @_;
+
+        my $caller = caller;
+
+        no strict 'refs';
+        local *{"kura::create_constraint"} = \&create_constraint;
+
+        kura->import_into($caller, $name, $args);
+    }
+
+    sub create_constraint {
+        my ($args, $opts) = @_;
+        return (undef, "Invalid mykura arguments") unless (ref $args||'') eq 'HASH';
+        return (MyConstraint->new(%$args), undef);
+    }
+}
+
+package main {
+    use mykura Name => { constraint => sub { length($_[0]) > 0 } };
+}
 ```
 
 # LICENSE

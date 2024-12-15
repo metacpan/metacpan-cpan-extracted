@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,10 +33,10 @@ requires:
   Sub::Name: '0'
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/miyagawa/cgi-compile/issues
-  homepage: https://github.com/miyagawa/cgi-compile
-  repository: https://github.com/miyagawa/cgi-compile.git
-version: '0.26'
+  bugtracker: https://github.com/miyagawa/CGI-Compile/issues
+  homepage: https://github.com/miyagawa/CGI-Compile
+  repository: https://github.com/miyagawa/CGI-Compile.git
+version: '0.27'
 x_contributors:
   - 'Graham Knop <haarg@haarg.org>'
   - 'Hans Dieter Pearcey <hdp@cpan.org>'
@@ -47,7 +47,7 @@ x_contributors:
   - 'Rafael Kitover <rkitover@cpan.org>'
   - 'Rafael Kitover <rkitover@gmail.com>'
   - 'Torsten Förtsch <torsten@binary.com>'
-x_generated_by_perl: v5.38.0
+x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

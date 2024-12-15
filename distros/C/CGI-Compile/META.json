@@ -4,7 +4,7 @@
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -65,16 +65,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/miyagawa/cgi-compile/issues"
+         "web" : "https://github.com/miyagawa/CGI-Compile/issues"
       },
-      "homepage" : "https://github.com/miyagawa/cgi-compile",
+      "homepage" : "https://github.com/miyagawa/CGI-Compile",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/miyagawa/cgi-compile.git",
-         "web" : "https://github.com/miyagawa/cgi-compile"
+         "url" : "https://github.com/miyagawa/CGI-Compile.git",
+         "web" : "https://github.com/miyagawa/CGI-Compile"
       }
    },
-   "version" : "0.26",
+   "version" : "0.27",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>",
       "Hans Dieter Pearcey <hdp@cpan.org>",
@@ -86,8 +86,8 @@
       "Rafael Kitover <rkitover@gmail.com>",
       "Torsten F\u00f6rtsch <torsten@binary.com>"
    ],
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

@@ -4,9 +4,9 @@ use true;
 use experimental qw( signatures );
 use stable qw( postderef );
 
-package Data::Section::Pluggable::Role::ContentProcessorPlugin 0.01 {
+package Data::Section::Pluggable::Role::ContentProcessorPlugin 0.02 {
 
-    # ABSTRACT: Plugin role for Data::Section::ContentProcessorPlugin
+    # ABSTRACT: Plugin role for Data::Section::Pluggable to process content
 
 
     use Role::Tiny;
@@ -24,11 +24,11 @@ __END__
 
 =head1 NAME
 
-Data::Section::Pluggable::Role::ContentProcessorPlugin - Plugin role for Data::Section::ContentProcessorPlugin
+Data::Section::Pluggable::Role::ContentProcessorPlugin - Plugin role for Data::Section::Pluggable to process content
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -42,17 +42,17 @@ Instance mode:
      use Class::Tiny qw( extensions );
      with 'Data::Section::Pluggable::Role::ContentProcessorPlugin';
  
-     sub process_content ($self, $dps, $content) {
+     sub process_content ($self, $dsp, $content) {
          $content =~ s/\s*\z//;  # trim trailing whitespace
          return "[$content]";
      }
  }
  
- my $dps = Data::Section::Pluggable->new
+ my $dsp = Data::Section::Pluggable->new
                                    ->add_plugin('my_plugin', extensions => ['txt']);
  
  # prints '[Welcome to Perl]'
- say $dps->get_data_section('hello.txt');
+ say $dsp->get_data_section('hello.txt');
  
  __DATA__
  @@ hello.txt
@@ -71,17 +71,17 @@ Class mode:
          return ('txt');
      }
  
-     sub process_content ($class, $dps, $content) {
+     sub process_content ($class, $dsp, $content) {
          $content =~ s/\s*\z//;  # trim trailing whitespace
          return "[$content]";
      }
  }
  
- my $dps = Data::Section::Pluggable->new
+ my $dsp = Data::Section::Pluggable->new
                                    ->add_plugin('my_plugin');
  
  # prints '[Welcome to Perl]'
- say $dps->get_data_section('hello.txt');
+ say $dsp->get_data_section('hello.txt');
  
  __DATA__
  @@ hello.txt
@@ -118,7 +118,7 @@ should apply to.
 
 =head2 process_content
 
- my $processed = $plugin->process_content($dps, $content);
+ my $processed = $plugin->process_content($dsp, $content);
 
 Takes the L<Data::Section::Pluggable> instance and content and returns
 the process content.

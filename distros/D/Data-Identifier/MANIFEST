@@ -12,6 +12,7 @@ dist.ini
 lib/Data/Identifier.pm
 lib/Data/Identifier/Generate.pm
 lib/Data/Identifier/Interface/Known.pm
+lib/Data/Identifier/Wellknown.pm
 t/01_load.t
 t/02_uuid.t
 t/10_mixandmatch.t

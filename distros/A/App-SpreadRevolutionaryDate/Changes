@@ -1,18 +1,16 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.36 2024-12-09T12:58:34
+0.38 2024-12-14T15:09:51
+ - Fix og:* detection for website cards
+
+0.37 2024-12-14T14:45:52Z
+ - Process mentions in posts to bluesky
+ - Post website card embed to bluesky if url is posted
+
+0.36 2024-12-09T12:58:34Z
  - Fix some docs
  - Better use utf8::encode for detection of the position of an url for
    Bluesky in bytes, bytes pragama is only for debugging
- - Bump v0.35
- - Fix detection of the position of an url for Bluesky in bytes
- - Fix detection of url starting with punctuation
- - Bump v.0.34
- - Update doc for Bluesky target
- - Update tests for Bluesky target
- - Add minimal worker for Bluesky target
- - Add support for Bluesky target
- - Use relative URL to post on Twitter
 
 0.35 2024-12-08T22:30:42Z
  - Fix detection of the position of an url for Bluesky in bytes

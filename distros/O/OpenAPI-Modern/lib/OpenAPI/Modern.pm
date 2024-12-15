@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.072-2-g82668d5
+package OpenAPI::Modern; # git description: v0.073-19-gb954060
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.073';
+our $VERSION = '0.074';
 
 use 5.020;
 use utf8;
@@ -87,7 +87,8 @@ sub validate_request ($self, $request, $options = {}) {
   croak '$request and $options->{request} are inconsistent'
     if $options->{request} and $request != $options->{request};
 
-  my $state = {}; # populated by find_path
+  # mostly populated by find_path
+  my $state = { data_path => '/request' };
 
   try {
     $options->{request} //= $request;
@@ -101,7 +102,6 @@ sub validate_request ($self, $request, $options = {}) {
     # of response is likely to leave oversights in the specification go unnoticed.
     return $self->_result($state, 1) if not $path_ok;
 
-    $state->{data_path} = '/request';
     $request = $options->{request};   # now guaranteed to be a Mojo::Message::Request
 
     my $method = lc $request->method;
@@ -135,7 +135,7 @@ sub validate_request ($self, $request, $options = {}) {
           $request_parameters_processed->{$param_obj->{in}}{$fc_name} = $section;
         }
 
-        $state->{data_path} = jsonp($state->{data_path},
+        $state->{data_path} = jsonp('/request',
           ((grep $param_obj->{in} eq $_, qw(path query)) ? 'uri' : ()), $param_obj->{in},
           $param_obj->{name});
         my $valid =
@@ -153,7 +153,7 @@ sub validate_request ($self, $request, $options = {}) {
     # $ref and the referencing path could be from another document and is therefore unknowable until
     # runtime.
     foreach my $path_name (sort keys $options->{path_captures}->%*) {
-      abort({ %$state, data_path => jsonp($state->{data_path}, qw(uri path), $path_name) },
+      abort({ %$state, data_path => jsonp('/request/uri/path', $path_name) },
           'missing path parameter specification for "%s"', $path_name)
         if not exists(($request_parameters_processed->{path}//{})->{$path_name});
     }
@@ -162,18 +162,18 @@ sub validate_request ($self, $request, $options = {}) {
 
     # RFC9112 §6.2-2: A sender MUST NOT send a Content-Length header field in any message that
     # contains a Transfer-Encoding header field.
-    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header', 'Content-Length') },
+    ()= E({ %$state, data_path => '/request/header/Content-Length', },
         'Content-Length cannot appear together with Transfer-Encoding')
       if defined $request->headers->content_length and $request->content->is_chunked;
 
     # RFC9112 §6.3-7: A user agent that sends a request that contains a message body MUST send
     # either a valid Content-Length header field or use the chunked transfer coding.
-    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header'),
+    ()= E({ %$state, data_path => '/request/header',
         recommended_response => [ 411, 'Length Required' ] }, 'missing header: Content-Length')
       if $request->body_size and not $request->headers->content_length
         and not $request->content->is_chunked;
 
-    $state->{data_path} = jsonp($state->{data_path}, 'body');
+    $state->{data_path} = '/request/body';
 
     if (my $body_obj = $operation->{requestBody}) {
       $state->{schema_path} = jsonp($state->{schema_path}, 'requestBody');
@@ -221,7 +221,8 @@ sub validate_response ($self, $response, $options = {}) {
     $options->{request} //= $request;
   }
 
-  my $state = {}; # populated by find_path
+  # mostly populated by find_path
+  my $state = { data_path => '/response' };
 
   try {
     # FIXME: if the operation is shared by multiple paths, path_template may not be inferrable, and
@@ -237,30 +238,28 @@ sub validate_response ($self, $response, $options = {}) {
     return $self->_result($state, 0, 1) if not exists $operation->{responses};
 
     $state->{schema_path} = jsonp($state->{schema_path}, $method);
-    $state->{data_path} = '/response';
-
     $response = _convert_response($response);   # now guaranteed to be a Mojo::Message::Response
 
     if ($response->headers->header('Transfer-Encoding')) {
-      ()= E({ %$state, data_path => jsonp($state->{data_path}, qw(header Transfer-Encoding)) },
+      ()= E({ %$state, data_path => '/response/header/Transfer-Encoding' },
         'RFC9112 §6.1-10: A server MUST NOT send a Transfer-Encoding header field in any response with a status code of 1xx (Informational) or 204 (No Content)')
         if $response->is_info or $response->code == 204;
 
       # connect method is not supported in openapi 3.1.0, but this may be possible in the future
-      ()= E({ %$state, data_path => jsonp($state->{data_path}, qw(header Transfer-Encoding)) },
+      ()= E({ %$state, data_path => '/response/header/Transfer-Encoding' },
         'RFC9112 §6.1-10: A server MUST NOT send a Transfer-Encoding header field in any 2xx (Successful) response to a CONNECT request')
         if $response->is_success and $method eq 'connect';
     }
 
     # RFC9112 §6.2-2: A sender MUST NOT send a Content-Length header field in any message that
     # contains a Transfer-Encoding header field.
-    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header', 'Content-Length') },
+    ()= E({ %$state, data_path => '/response/header/Content-Length' },
         'Content-Length cannot appear together with Transfer-Encoding')
       if defined $response->headers->content_length and $response->content->is_chunked;
 
     # RFC9112 §6.3-7: A user agent that sends a request that contains a message body MUST send
     # either a valid Content-Length header field or use the chunked transfer coding.
-    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header') }, 'missing header: Content-Length')
+    ()= E({ %$state, data_path => '/response/header' }, 'missing header: Content-Length')
       if $response->body_size and not $response->headers->content_length
         and not $response->content->is_chunked;
 
@@ -293,11 +292,11 @@ sub validate_response ($self, $response, $options = {}) {
       }
 
       ()= $self->_validate_header_parameter({ %$state,
-          data_path => jsonp($state->{data_path}, 'header', $header_name), depth => $state->{depth}+1 },
+          data_path => jsonp('/response/header', $header_name), depth => $state->{depth}+1 },
         $header_name, $header_obj, $response->headers);
     }
 
-    $self->_validate_body_content({ %$state, data_path => jsonp($state->{data_path}, 'body'), depth => $state->{depth}+1 },
+    $self->_validate_body_content({ %$state, data_path => '/response/body', depth => $state->{depth}+1 },
         $response_obj->{content}, $response)
       if exists $response_obj->{content} and $response->headers->content_length // $response->body_size;
   }
@@ -318,7 +317,7 @@ sub validate_response ($self, $response, $options = {}) {
 }
 
 sub find_path ($self, $options, $state = {}) {
-  $state->{data_path} = '/request/uri/path';
+  $state->{data_path} //= '';
   $state->{initial_schema_uri} = $self->openapi_uri;   # the canonical URI as of the start or last $id, or the last traversed $ref
   $state->{traversed_schema_path} = '';    # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
   $state->{schema_path} = '';              # the rest of the path, since the last $id or the last traversed $ref
@@ -358,22 +357,27 @@ sub find_path ($self, $options, $state = {}) {
     # FIXME: what if the operation is defined in another document? Need to look it up across
     # all documents, and localize $state->{initial_schema_uri}
     my $operation_path = $self->openapi_document->get_operationId_path($options->{operation_id});
-    return E({ %$state, keyword => 'paths' }, 'unknown operation_id "%s"', $options->{operation_id})
+    return E($state, 'unknown operation_id "%s"', $options->{operation_id})
       if not $operation_path;
 
     my @bits = unjsonp($operation_path);
     ($path_template, $method) = @bits[-2,-1];
 
     # path_template not found if path is not directly under /paths (FIXME: does not support $refs to
-    # path-items - in this case we will do a URI -> path_template lookup later on)
+    # path-items - in this case we will do a URI -> path_template lookup later on, if the operation
+    # does not correspond to a webhook or callback)
     undef $path_template if $operation_path ne jsonp('/paths', $path_template, $method);
 
     pop @bits;  # remove method from operation_path to get path-item path
     $path_item_path = jsonp(@bits);
 
-    return E({ %$state, schema_path => jsonp('/paths', $path_template) },
-        'operation does not match provided path_template')
-      if $path_template and exists $options->{path_template} and $options->{path_template} ne $path_template;
+    # the path_template need not be provided, but if it is, the operation must be located at the
+    # path-item directly underneath that /paths/<path_template>.
+    # TODO: revise for 3.1.1, as provided path_template may be correct but require resolving $refs
+    # in order to verify the operation matches (which we will do later on)
+    return E({ %$state, schema_path => $path_item_path },
+        'operation at operation_id does not match provided path_template')
+      if exists $options->{path_template} and $options->{path_template} ne ($path_template//'');
 
     if ($options->{method} and lc $options->{method} ne $method) {
       delete $options->{operation_id};
@@ -381,174 +385,117 @@ sub find_path ($self, $options, $state = {}) {
         'wrong HTTP method "%s"', $options->{method});
     }
 
-    $options->{method} = lc $method;
-    $options->{_path_item} = $self->openapi_document->get($path_item_path);
-    $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment(jsonp($path_item_path, $method));
+    $options->{method} = $method;
   }
 
   # TODO: support passing $options->{operation_uri}
 
   # by now we will have extracted method from request or operation_id
   return E({ %$state, data_path => '', exception => 1 }, 'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided')
-    if not $options->{request} and not ($options->{path_template} and $method) and not $options->{operation_id};
+    if not $options->{request}
+      and not ($options->{path_template} and $method)
+      and not $options->{operation_id};
+
+  my $schema = $self->openapi_document->schema;
 
   # path_template from options
   if (exists $options->{path_template}) {
     $path_template = $options->{path_template};
 
-    my $path_item = $self->openapi_document->schema->{paths}{$path_template};
-    return E({ %$state, keyword => 'paths' }, 'missing path-item "%s"', $path_template) if not $path_item;
-
-    # FIXME: follow $ref chain in path-item
-    $options->{_path_item} = $path_item;
-    return E({ %$state, data_path => '/request/method', schema_path => jsonp('/paths', $path_template),
-        keyword => $method, recommended_response => [ 405, 'Method Not Allowed' ] },
-        'missing operation for HTTP method "%s"', $method)
-      if not $path_item->{$method};
-
-    $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment(jsonp('/paths', $path_template, $method));
+    return E({ %$state, data_path => '/request/uri/path', keyword => 'paths' }, 'missing path-item "%s"', $path_template)
+      if not exists $schema->{paths}{$path_template};
   }
 
-  # path_template from request URI
-  if (not $path_template and $options->{request}) {
-    my $uri_path = $options->{request}->url->path->to_string;
-    $uri_path = '/' if not length $uri_path;
+  if (not $path_template and not $options->{request}) {
+    # some operations don't exist directly under a /paths/$path_template - e.g. webhooks or
+    # callbacks, but they are still usable
+    # TODO: only return successfully here if the operation corresponds to a webhook or callback,
+    # or we were not provided a request object.
+    # otherwise, we need to continue on and match the request uri against /paths/* and possibly fail
+    # if there is no match found.
+    $state->{schema_path} = $path_item_path;
+    $options->{_path_item} = $self->openapi_document->get($path_item_path);
 
-    my $schema = $self->openapi_document->schema;
+    # FIXME: this is not accurate if the operation lives in another document
+    $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path.'/'.$method);
+    return 1;
+  }
+
+  my $capture_values;
+
+  if (not $path_template and $options->{request}) {
+    # derive path_template and capture values from the request URI
 
     # sorting (ascii-wise) gives us the desired results that concrete path components sort ahead of
     # templated components, except when the concrete component is a non-ascii character or matches
     # 0x7c (pipe), 0x7d (close-brace) or 0x7e (tilde)
-    foreach $path_template (sort keys(($schema->{paths}//{})->%*)) {
-      # §3.2: "The value for these path parameters MUST NOT contain any unescaped “generic syntax”
-      # characters described by [RFC3986]: forward slashes (/), question marks (?), or hashes (#)."
-      my $path_pattern = join '',
-        map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)), # { for the editor
-        split /(\{[^}]+\})/, $path_template;
+    foreach my $pt (sort keys(($schema->{paths}//{})->%*)) {
+      $capture_values = $self->_match_uri($options->{request}->url, $pt);
 
-      # TODO: consider 'servers' fields when matching request URIs: this requires looking at
-      # path prefixes present in server urls
-      next if $uri_path !~ m/^$path_pattern$/;
-
-      # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
-      my @capture_values = map
-        Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_])),
-          Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#-;
-
-      # FIXME: follow $ref chain in path-item
-      $state->{schema_path} = $path_item_path = jsonp('/paths', $path_template);
-      $options->{path_template} = $path_template;
-      $options->{_path_item} = my $path_item = $self->openapi_document->get($path_item_path);
-
-      return E($state, 'templated operation does not match provided operation_id')
-        if $options->{operation_id} and ($path_item->{$method}{operationId}//'') ne $options->{operation_id};
-
-      return E({ %$state, data_path => '/request/method', keyword => $method,
-          recommended_response => [ 405, 'Method Not Allowed' ] },
-          'missing operation for HTTP method "%s"', $method)
-        if not exists $path_item->{$method};
-
-      # { for the editor
-      my @capture_names = ($path_template =~ m!\{([^}]+)\}!g);
-      my %path_captures; @path_captures{@capture_names} = @capture_values;
-
-      if (exists $options->{path_captures}) {
-        return E($state, 'provided path_captures values do not match request URI')
-          if not is_equal($options->{path_captures}, \%path_captures, { stringy_numbers => 1 });
-      }
-      else {
-        $options->{path_captures} = \%path_captures;
-      }
-
-      $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path.'/'.$method);
-      $options->{operation_id} = $options->{_path_item}{$method}{operationId};
-      delete $options->{operation_id} if not defined $options->{operation_id};
-
-      # TODO: extract 'servers' variables into $options
-      # Since we didn't take a servers url prefix into consideration when matching path templates
-      # earlier, we may have a mismatch now, which should constitute an error
-
-      return 1;
+      # this might not be the intended match, as multiple templates can match the same URI
+      $path_template = $pt, last if $capture_values;
     }
 
-    return E({ %$state, keyword => 'paths' }, 'no match found for URI "%s"',
-      $options->{request}->url->clone->query(undef)->fragment(undef));
+    return E({ %$state, data_path => '/request/uri/path', keyword => 'paths' }, 'no match found for request URI "%s"',
+        $options->{request}->url->clone->query(undef)->fragment(undef))
+      if not $capture_values;
   }
 
-  if (not $path_template) {
-    $state->{schema_path} = $path_item_path;
-    return 1;
+  elsif ($options->{request}) {
+    # we were passed path_template in options or we calculated it from operation_id, and now we
+    # verify it against path_captures and the request URI.
+    $capture_values = $self->_match_uri($options->{request}->url, $path_template);
+
+    if (not $capture_values) {
+      delete $options->{operation_id};
+      return E({ %$state, data_path => '/request/uri/path',
+          schema_path => jsonp('/paths', $path_template, exists $options->{path_template} ? () : $method) }, 'provided %s does not match request URI',
+        exists $options->{path_template} ? 'path_template' : 'operation_id');
+    }
   }
+
+  # if we weren't passed a request, we can't verify that the path_template matches, but we may have
+  # derived it from looking upward from the operation_id
+  $options->{path_template} = $path_template;
 
   # FIXME: follow $ref chain in path-item
-  $path_item_path = jsonp('/paths', $path_template);
-  my $path_item = $self->openapi_document->get($path_item_path);
-  die 'path_item unexpectedly does not exist' if not $path_item;
+  $state->{schema_path} = $path_item_path = jsonp('/paths', $path_template);
+  $options->{_path_item} = my $path_item = $schema->{paths}{$path_template};
+
+  # this can only happen if we were not able to derive the path_template from the provided
+  # operation_id earlier, but we still matched the request against some other path-item
+  return E($state, 'templated operation does not match provided operation_id')
+    if $options->{operation_id} and ($path_item->{$method}{operationId}//'') ne $options->{operation_id};
+
+  return E({ %$state, data_path => '/request/method',
+      recommended_response => [ 405, 'Method Not Allowed' ] },
+      'missing operation for HTTP method "%s"', $method)
+    if not exists $path_item->{$method};
+
+  # FIXME: this is not accurate if the operation lives in another document
+  $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path.'/'.$method);
+  $options->{operation_id} = $path_item->{$method}{operationId} if exists $path_item->{$method}{operationId};
 
   # note: we aren't doing anything special with escaped slashes. this bit of the spec is hazy.
   # { for the editor
   my @capture_names = ($path_template =~ m!\{([^}]+)\}!g);
-  return E({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
-      'provided path_captures names do not match path template "%s"', $path_template)
+  return E({ %$state, $options->{request} ? ( data_path => '/request/uri/path' ) : () }, 'provided path_captures names do not match path template "%s"', $path_template)
     if exists $options->{path_captures}
       and not is_equal([ sort keys $options->{path_captures}->%* ], [ sort @capture_names ]);
 
-  if (not $options->{request}) {
-    $options->@{qw(path_template operation_id _path_item operation_uri)} =
-      ($path_template, $self->openapi_document->schema->{paths}{$path_template}{$method}{operationId},
-      $path_item, Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path.'/'.$method));
-    delete $options->{operation_id} if not defined $options->{operation_id};
-    $state->{schema_path} = $path_item_path;
-    return 1;
-  }
-
-  # if we're still here, we were passed path_template in options or we calculated it from
-  # operation_id, and now we verify it against path_captures and the request URI.
-  my $uri_path = $options->{request}->url->path->to_string;
-  $uri_path = '/' if not length $uri_path;
-
-  # §3.2: "The value for these path parameters MUST NOT contain any unescaped “generic syntax”
-  # characters described by [RFC3986]: forward slashes (/), question marks (?), or hashes (#)."
-  my $path_pattern = join '',
-    map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)), # { for the editor
-    split /(\{[^}]+\})/, $path_template;
-
-  if ($uri_path !~ m/^$path_pattern$/) {
-    delete $options->@{qw(operation_id operation_uri _path_item)};
-    return E({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
-      'provided %s does not match request URI', exists $options->{path_template} ? 'path_template' : 'operation_id');
-  }
-
-  # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
-  my @capture_values = map
-    Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_])),
-      Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#-;
+  return 1 if not $capture_values;
 
   if (exists $options->{path_captures}) {
-    my %provided_captures = $options->{path_captures}->%*;
-    return E({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
-        'provided path_captures values do not match request URI')
-      if not is_equal([ map $_.'', @provided_captures{@capture_names} ], \@capture_values);
+    # $equal_state will contain { path => '/0' } indicating the index of the mismatch
+    if (not is_equal([ $options->{path_captures}->@{@capture_names} ], $capture_values, my $equal_state = { stringy_numbers => 1 })) {
+      return E({ %$state, data_path => '/request/uri/path' }, 'provided path_captures values do not match request URI (value for %s differs)', $capture_names[substr($equal_state->{path}, 1)]);
+    }
   }
   else {
-    my %path_captures; @path_captures{@capture_names} = @capture_values;
+    my %path_captures; @path_captures{@capture_names} = @$capture_values;
     $options->{path_captures} = \%path_captures;
   }
 
-  # TODO: validate request uri against the nearest 'servers' object and extract server variables
-  # Since we didn't take a servers uri prefix into consideration earlier, we may have a mismatch
-  # now, which should constitute an error
-
-  # FIXME: follow $ref chain in path-item using path_template
-  $options->@{qw(path_template _path_item)} =
-    ($path_template, $self->openapi_document->schema->{paths}{$path_template}{$method});
-
-  $options->{operation_id} = $options->{_path_item}{operationId};
-  delete $options->{operation_id} if not defined $options->{operation_id};
-
-  $options->{_path_item} = $self->openapi_document->get(jsonp('/paths', $path_template));
-  $options->{operation_uri} = Mojo::URL->new($state->{initial_schema_uri})->fragment($path_item_path.'/'.$method);
-  $state->{schema_path} = $path_item_path;
   return 1;
 }
 
@@ -580,6 +527,27 @@ sub recursive_get ($self, $uri_reference, $entity_type = undef) {
 }
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
+
+# given a request uri and a path_template, check that these match, and extract capture values.
+sub _match_uri ($self, $uri, $path_template) {
+  my $uri_path = $uri->path->to_string;
+  $uri_path = '/' if not length $uri_path;
+
+  # §3.2: "The value for these path parameters MUST NOT contain any unescaped “generic syntax”
+  # characters described by [RFC3986]: forward slashes (/), question marks (?), or hashes (#)."
+  my $path_pattern = join '',
+    map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)), # { for the editor
+    split /(\{[^}]+\})/, $path_template;
+
+  # TODO: consider 'servers' fields when matching request URIs: this requires looking at
+  # path prefixes present in server urls
+  return if $uri_path !~ m/^$path_pattern$/;
+
+  # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
+  return [ map
+    Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_])),
+      Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#- ];
+}
 
 sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
   # 'required' is always true for path parameters
@@ -955,7 +923,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.073
+version 0.074
 
 =head1 SYNOPSIS
 

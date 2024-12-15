@@ -6,7 +6,8 @@ use warnings;
 use Test::More $^O eq 'MSWin32' ? (
     skip_all => 'no fork() on Win32')
 : (
-    tests => $ENV{AUTOMATED_TESTING} ? 3600 : 75
+    !$ENV{AUTHOR_TESTING} ? (skip_all => 'AUTHOR_TESTING not set') :
+    (tests => $ENV{AUTOMATED_TESTING} ? 3600 : 75)
 );
 use CGI;
 use CGI::Compile;

@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Bluesky;
-$App::SpreadRevolutionaryDate::Target::Bluesky::VERSION = '0.36';
+$App::SpreadRevolutionaryDate::Target::Bluesky::VERSION = '0.38';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Bluesky.
 
 use Moose;
@@ -95,7 +95,7 @@ App::SpreadRevolutionaryDate::Target::Bluesky - Target class for L<App::SpreadRe
 
 =head1 VERSION
 
-version 0.36
+version 0.38
 
 =head1 METHODS
 

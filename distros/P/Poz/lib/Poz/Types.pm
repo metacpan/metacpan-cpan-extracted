@@ -1,7 +1,7 @@
 package Poz::Types;
 use strict;
 use warnings;
-use Carp;
+use Carp ();
 
 sub new {
     my ($class, $opts) = @_;
@@ -23,6 +23,15 @@ sub rule {
 }
 
 sub parse {
+    my $self = shift;
+    my ($ret, $err) = $self->safe_parse(@_);
+    Carp::croak $err if defined $err;
+    $ret;
+}
+
+sub safe_parse {
+    Carp::croak "Must handle error" unless wantarray;
+
     my ($self, $value) = @_;
     if (length($self->{transform}) > 0) {
         for my $transformer (@{$self->{transform}}) {
@@ -31,15 +40,15 @@ sub parse {
     }
     for my $rule (@{$self->{rules}}) {
         my $err = $rule->($self, $value);
-        if (defined $err && ref($err) eq "Poz::Result::ShortCircuit") {
+        if ( (ref($err)||'') eq 'Poz::Result::ShortCircuit') {
             return;
         }
-        return $err if defined $err;
+        return (undef, $err) if defined $err;
     }
     if ($self->{need_coerce}) {
         $value = $self->coerce($value);
     }
-    return $value;
+    return ($value, undef);
 }
 
 1;
@@ -51,17 +60,17 @@ Poz::Types - A module for handling type validation and transformation
 =head1 SYNOPSIS
 
     use Poz::Types;
-    
+
     my $type = Poz::Types->new({
         required_error => 'This field is required',
         invalid_type_error => 'Invalid type provided',
     });
-    
+
     my $result = $type->parse($value);
 
 =head1 DESCRIPTION
 
-Poz::Types is a module designed to handle type validation and transformation. 
+Poz::Types is a module designed to handle type validation and transformation.
 It provides a flexible way to define rules and transformations for different types.
 
 =head1 METHODS
@@ -78,15 +87,23 @@ Creates a new Poz::Types object. The optional hash reference can contain the fol
 
     $type->rule();
 
-This method should be overridden in subclasses to provide specific validation rules. 
+This method should be overridden in subclasses to provide specific validation rules.
 By default, it throws a "Not implemented" error.
 
 =head2 parse
 
     my $result = $type->parse($value);
 
-Parses the given value according to the defined rules and transformations. 
+Parses the given value according to the defined rules and transformations.
 Returns the transformed value or an error if validation fails.
+
+=head2 safe_parse
+
+    my ($result, $error) = $type->safe_parse($value);
+
+Parses the given value and returns the transformed value.
+If succeeds, returns a tuple of the transformed value and undef.
+If fails, returns a tuple of undef and an error message.
 
 =head1 LICENSE
 

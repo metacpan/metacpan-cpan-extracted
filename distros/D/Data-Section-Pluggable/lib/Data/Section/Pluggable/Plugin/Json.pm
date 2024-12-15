@@ -2,9 +2,8 @@ use warnings;
 use 5.020;
 use true;
 use experimental qw( signatures );
-use stable qw( postderef );
 
-package Data::Section::Pluggable::Plugin::Json 0.01 {
+package Data::Section::Pluggable::Plugin::Json 0.02 {
 
     # ABSTRACT: Data::Section::Pluggable Plugin for JSON
 
@@ -13,6 +12,9 @@ package Data::Section::Pluggable::Plugin::Json 0.01 {
     use JSON::MaybeXS ();
 
     with 'Data::Section::Pluggable::Role::ContentProcessorPlugin';
+    if(eval { require Data::Section::Pluggable::Role::FormatContentPlugin }) {
+        with 'Data::Section::Pluggable::Role::FormatContentPlugin';
+    }
 
     sub extensions ($class) {
         return ('json');
@@ -20,6 +22,10 @@ package Data::Section::Pluggable::Plugin::Json 0.01 {
 
     sub process_content ($class, $dsp, $content) {
         JSON::MaybeXS::decode_json($content);
+    }
+
+    sub format_content ($class, $dsw, $content) {
+        JSON::MaybeXS::encode_json($content);
     }
 }
 
@@ -35,7 +41,7 @@ Data::Section::Pluggable::Plugin::Json - Data::Section::Pluggable Plugin for JSO
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

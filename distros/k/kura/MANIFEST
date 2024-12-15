@@ -10,6 +10,8 @@ t/01-kura.t
 t/02-import_into.t
 t/10-integration/Data-Checks/TestDataChecks.pm
 t/10-integration/Data-Checks/basic.t
+t/10-integration/Data-Validator/TestDataValidator.pm
+t/10-integration/Data-Validator/basic.t
 t/10-integration/Exporter-Tiny/TestExporterTiny.pm
 t/10-integration/Exporter-Tiny/basic.t
 t/10-integration/Moo/TestMoo.pm
@@ -20,6 +22,8 @@ t/10-integration/MooseX-Types/TestMooseXTypes.pm
 t/10-integration/MooseX-Types/basic.t
 t/10-integration/Mouse/TestMouse.pm
 t/10-integration/Mouse/basic.t
+t/10-integration/Poz/TestPoz.pm
+t/10-integration/Poz/basic.t
 t/10-integration/Specio/TestSpecio.pm
 t/10-integration/Specio/basic.t
 t/10-integration/Type-Tiny/TestTypeTiny.pm

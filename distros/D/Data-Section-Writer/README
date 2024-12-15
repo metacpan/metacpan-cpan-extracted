@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 0.03
 
 SYNOPSIS
 
@@ -40,7 +40,8 @@ DESCRIPTION
     This class is an interface for updating the __DATA__ section of your
     Perl module or script programmatically for it to work with one of the
     many modules that allows for multiple files in a __DATA__ section, such
-    as Data::Section, Data::Section::Simple or Mojo::Loader.
+    as Data::Section, Data::Section::Simple, Data::Section::Pluggable or
+    Mojo::Loader.
 
     Data::Section uses a different header format by default, but you can
     still use this module with it if you set header_re to qr/^@@ (.*)$/.
@@ -75,6 +76,73 @@ METHODS
     Update the existing Perl source file, OR create a new Perl source file
     with just the __DATA__ section.
 
+    [version 0.02]
+
+    Starting with version 0.02, this method will not write to the file if
+    the content won't change.
+
+ unchanged
+
+    [version 0.02]
+
+     my $bool = $writer->unchanged;
+
+    Returns:
+
+    `undef`
+
+      If </update_file> hasn't been called yet.
+
+    `0`
+
+      If the last call to </update_file> modified the file.
+
+    `1`
+
+      If the last call to </update_file> did not modify the file.
+
+ add_format
+
+     $writer->add_format( $ext, sub ($writer, $content) { return ... } );
+
+    Adds a content formatter to the given filename extension. The extension
+    should be a filename extension without the ., for example txt or json.
+
+    The callback takes the Data::Section::Writable instance as its first
+    argument and the content to be processed as the second. This callback
+    should return the format content as a scalar.
+
+    You can chain multiple content formatters to the same filename
+    extension, and they will be called in the order that they were added.
+
+ add_plugin
+
+     $writer->add_plugin( $name, %args );
+
+    Applies the plugin with $name. If the plugin supports instance mode
+    (that is: it has a constructor named new), then %args will be passed to
+    the constructor. For included plugins see "CORE PLUGINS". To write your
+    own see "PLUGIN ROLES".
+
+CORE PLUGINS
+
+    This module will work with some core Data::Section::Pluggable plugins
+    listed here.
+
+ json
+
+    Automatically encode json into Perl data structures.
+
+    See Data::Section::Pluggable::Plugin::Json.
+
+PLUGIN ROLES
+
+ FormatContentPlugin
+
+    Used for adding content formatting for specific formats. This is
+    essentially a way to wrap the add_format method as a module. See
+    Data::Section::Pluggable::Role::FormatContentPlugin.
+
 CAVEATS
 
     Added text files will get an added trailing new line if they do not
@@ -86,6 +154,10 @@ CAVEATS
 
     Not tested, and probably not working for Windows formatted text files,
     though patches for this are welcome.
+
+SEE ALSO
+
+    Data::Section::Pluggable
 
 AUTHOR
 

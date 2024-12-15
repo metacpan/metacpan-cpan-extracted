@@ -1,5 +1,8 @@
 (Recent) Revision history for Perl extension Data-Dumper-Interp
 
+7.010 - Revise Objects() sub-options to allow better control of how
+        overloaded operators are handled in displayed objects.
+        Updated shared test libraries.  Fixed support for older Perls.
 7.009 - Generalized Useqq="style=BEFORE,AFTER" in lieu of "qq=BA"
 7.008 - Diagnose invalid method modifier when imported, not when 1st called
       - Test messages to try to diagnose mystery test failure only on Windows

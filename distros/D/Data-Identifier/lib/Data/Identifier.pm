@@ -9,25 +9,25 @@
 
 package Data::Identifier;
 
-use v5.14;
+use v5.20;
 use strict;
 use warnings;
 
 use parent qw(Data::Identifier::Interface::Known);
 
 use Carp;
-use Math::BigInt;
+use Math::BigInt lib => 'GMP';
 use URI;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
     RE_OID  => qr/^[0-2](?:\.(?:0|[1-9][0-9]*))+$/,
     RE_URI  => qr/^[a-zA-Z][a-zA-Z0-9\+\.\-]+/,
     RE_UINT => qr/^(?:0|[1-9][0-9]*)$/,
-    RE_WD   => qr/^[QPL][1-9][0-9]*$/,
+    RE_QID  => qr/^[QPL][1-9][0-9]*$/,
     RE_DOI  => qr/^10\.[1-9][0-9]+(?:\.[0-9]+)*\/./,
 };
 
@@ -41,11 +41,16 @@ use constant {
     WK_IBAN => 'b1418262-6bc9-459c-b4b0-a054d77db0ea', # iban
     WK_BIC  => 'c8a3a132-f160-473c-b5f3-26a748f37e62', # bic
     WK_DOI  => '931f155e-5a24-499b-9fbb-ed4efefe27fe', # doi
+    WK_FC   => 'd576b9d1-47d4-43ae-b7ec-bbea1fe009ba', # factgrid-identifier
 
     NS_WD   => '9e10aca7-4a99-43ac-9368-6cbfa43636df', # Wikidata-namespace
+    NS_FC   => '6491f7a9-0b29-4ef1-992c-3681cea18182', # factgrid-namespace
     NS_INT  => '5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99', # integer-namespace
     NS_DATE => 'fc43fbba-b959-4882-b4c8-90a288b7d416', # gregorian-date-namespace
 };
+
+# Features:
+my $enabled_oid = 1;
 
 my %uuid_to_uriid_org = (
     WK_UUID() => 'uuid',
@@ -65,7 +70,8 @@ my %well_known = (
     oid  => __PACKAGE__->new($well_known_uuid => WK_OID,    validate => RE_OID),
     uri  => __PACKAGE__->new($well_known_uuid => WK_URI,    validate => RE_URI),
     sid  => __PACKAGE__->new($well_known_uuid => WK_SID,    validate => RE_UINT),
-    wd   => __PACKAGE__->new($well_known_uuid => WK_WD,     validate => RE_WD,   namespace => NS_WD, generate => 'id-based'),
+    wd   => __PACKAGE__->new($well_known_uuid => WK_WD,     validate => RE_QID, namespace => NS_WD, generate => 'id-based'),
+    fc   => __PACKAGE__->new($well_known_uuid => WK_FC,     validate => RE_QID, namespace => NS_FC, generate => 'id-based'),
     gtin => __PACKAGE__->new($well_known_uuid => WK_GTIN,   validate => RE_UINT),
     iban => __PACKAGE__->new($well_known_uuid => WK_IBAN),
     bic  => __PACKAGE__->new($well_known_uuid => WK_BIC),
@@ -143,7 +149,9 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
         WK_IBAN()                               => 'iban',
         WK_BIC()                                => 'bic',
         WK_DOI()                                => 'doi',
+        WK_FC()                                 => 'factgrid-identifier',
         NS_WD()                                 => 'Wikidata-namespace',
+        NS_FC()                                 => 'factgrid-namespace',
         NS_INT()                                => 'integer-namespace',
         NS_DATE()                               => 'gregorian-date-namespace',
 
@@ -231,6 +239,8 @@ sub new {
     }
 
     if (!ref($type) && $type eq 'ise') {
+        croak 'Undefined identifier but type is ISE' unless defined $id;
+
         if ($id =~ /^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/) { # allow less normalised form than RE_UUID
             $type = $well_known_uuid;
 
@@ -399,15 +409,15 @@ sub oid {
     my ($self, %opts) = @_;
     my $type = $well_known{oid};
 
-    return $self->{id_cache}{$type->ise} if !$opts{no_defaults} && defined($self->{id_cache}) && defined($self->{id_cache}{$type->ise});
+    return $self->{id_cache}{WK_OID()} if !$opts{no_defaults} && defined($self->{id_cache}) && defined($self->{id_cache}{WK_OID()});
 
     if ($self->{type} == $type) {
         return $self->{id};
     }
 
     unless ($opts{no_defaults}) {
-        if (defined(my $uuid = eval {$self->uuid})) {
-            return $self->{id_cache}{$type->ise} = sprintf('2.25.%s', Math::BigInt->new('0x'.$uuid =~ tr/-//dr));
+        if (defined(my $uuid = $self->uuid(default => undef))) {
+            return $self->{id_cache}{WK_OID()} = sprintf('2.25.%s', Math::BigInt->new('0x'.$uuid =~ tr/-//dr));
         }
     }
 
@@ -419,7 +429,7 @@ sub uri {
     my ($self, %opts) = @_;
     my $type = $well_known{uri};
 
-    return $self->{id_cache}{$type->ise} if !$opts{no_defaults} && defined($self->{id_cache}) && defined($self->{id_cache}{$type->ise});
+    return $self->{id_cache}{WK_URI()} if !$opts{no_defaults} && defined($self->{id_cache}) && defined($self->{id_cache}{WK_URI()});
 
     if ($self->{type} == $type) {
         return $self->{id};
@@ -427,18 +437,18 @@ sub uri {
 
     unless ($opts{no_defaults}) {
         if ($self->{type} == $well_known{wd}) {
-            return $self->{id_cache}{$type->ise} = sprintf('http://www.wikidata.org/entity/%s', $self->{id});
+            return $self->{id_cache}{WK_URI()} = sprintf('http://www.wikidata.org/entity/%s', $self->{id});
         } elsif ($self->{type} == $well_known{doi}) {
-            return $self->{id_cache}{$type->ise} = sprintf('https://doi.org/%s', $self->{id});
-        } elsif (defined(my $uuid = eval {$self->uuid})) {
-            return $self->{id_cache}{$type->ise} = sprintf('urn:uuid:%s', $uuid);
-        } elsif (defined(my $oid = eval {$self->oid})) {
-            return $self->{id_cache}{$type->ise} = sprintf('urn:oid:%s', $oid);
+            return $self->{id_cache}{WK_URI()} = sprintf('https://doi.org/%s', $self->{id});
+        } elsif (defined(my $uuid = $self->uuid(default => undef))) {
+            return $self->{id_cache}{WK_URI()} = sprintf('urn:uuid:%s', $uuid);
+        } elsif ($enabled_oid && defined(my $oid = $self->oid(default => undef))) {
+            return $self->{id_cache}{WK_URI()} = sprintf('urn:oid:%s', $oid);
         } else {
             my $u = URI->new("https://uriid.org/");
             my $type_uuid = $self->{type}->uuid;
             $u->path_segments('', $uuid_to_uriid_org{$type_uuid} // $type_uuid, $self->{id});
-            return $self->{id_cache}{$type->ise} = $u;
+            return $self->{id_cache}{WK_URI()} = $u;
         }
     }
 
@@ -449,7 +459,7 @@ sub uri {
 sub sid {
     my ($self, %opts) = @_;
     my $type = $well_known{sid};
-    return $self->{id_cache}{$type->ise} if defined($self->{id_cache}) && defined($self->{id_cache}{$type->ise});
+    return $self->{id_cache}{WK_SID()} if defined($self->{id_cache}) && defined($self->{id_cache}{WK_SID()});
     if ($self->{type} == $type) {
         return $self->{id};
     }
@@ -462,9 +472,17 @@ sub sid {
 
 sub ise {
     my ($self, %opts) = @_;
+    my $type = $self->{type};
     my $have_default = exists $opts{default};
     my $default = delete $opts{default};
-    my $value = eval {$self->uuid(%opts)} // eval {$self->oid(%opts)} // eval { $self->uri(%opts); };
+    my $value;
+
+    if ($type == $well_known{uuid} || $type == $well_known{oid} || $type == $well_known{uri}) {
+        $value = $self->{id};
+    } else {
+        $opts{default} = undef;
+        $value = $self->uuid(%opts) // $self->oid(%opts) // $self->uri(%opts);
+    }
 
     return $value if defined $value;
     return $default if $have_default;
@@ -586,7 +604,7 @@ sub register {
 
     foreach my $type_name (qw(uuid oid uri sid)) {
         my $f = $self->can($type_name) || next;
-        my $v = eval {$self->$f()} // next;
+        my $v = $self->$f(default => undef) // next;
         $registered{$well_known{$type_name}->uuid}{$v} = $self;
     }
 }
@@ -621,6 +639,24 @@ sub icontext { my ($self, %opts) = @_; return $opts{default}; }
 sub description { my ($self, %opts) = @_; return $opts{default}; }
 
 # ---- Private helpers ----
+
+sub import {
+    my ($pkg, $opts) = @_;
+    return unless defined $opts;
+    croak 'Bad options' unless ref($opts) eq 'HASH';
+
+    if (defined(my $disable = $opts->{disable})) {
+        $disable = [split /\s*,\s*/, $disable] unless ref $disable;
+        foreach my $to_disable (@{$disable}) {
+            if ($to_disable eq 'oid') {
+                $enabled_oid = undef;
+                undef *oid;
+            } else {
+                croak 'Unknown feature: '.$to_disable;
+            }
+        }
+    }
+}
 
 sub _generate {
     my ($self) = @_;
@@ -686,11 +722,13 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
     use Data::Identifier;
+    # or:
+    use Data::Identifier {option => value, ...};
 
     my Data::Identifier $id = Data::Identifier->new(uuid => 'ddd60c5c-2934-404f-8f2d-fcb4da88b633');
     my Data::Identifier $id = Data::Identifier->new(oid => '2.1.0.1.0');
@@ -720,6 +758,38 @@ Also note that deduplication is done with performance in mind. This means that t
 guarantee for two equal identifiers to become deduplicated. See also L</register>.
 
 This package inherits from L<Data::Identifier::Interface::Known>.
+
+=head2 OPTIONS
+
+The following options are supported. Some are marked as experimental.
+
+=head3 disable
+
+B<Note:>
+This is an B<experimental> option. It may be changed, renamed, or removed without notice.
+
+This option allows to disable a feature.
+This is a global setting, and therefore should only be used at the top level code.
+
+In order for this to be most effective this should be used in the top level code
+before any other module is C<use>-ed or C<require>-ed that makes use of this module.
+
+This setting takes an arrayref of strings or a single string that is a comma separated list.
+
+Currently the following features can be disabled:
+
+=over
+
+=item C<oid>
+
+Support for OID. This removes the L</oid> function from this package,
+removes internal OID based caches, and parts of the OID detection and normalisation logic.
+
+However this improves the speed of L</register> and some others significantly.
+
+This feature should only be disabled if you're sure you will not use OIDs in your code.
+
+=back
 
 =head1 METHODS
 
@@ -763,6 +833,10 @@ An URI.
 =item C<wd>
 
 An wikidata identifier (Q, P, or L).
+
+=item C<fc>
+
+An FactGrid identifier (Q, P, or L).
 
 =item C<gtin>
 
@@ -967,7 +1041,7 @@ Same as in L</uuid>.
 =item C<rawtype>
 
 If C<$as> is given as C<raw> then this value is used for C<$as>.
-This c*can be used to ease implementation of other methods that are required to accept C<raw>.
+This can be used to ease implementation of other methods that are required to accept C<raw>.
 
 =item C<extractor>
 
@@ -992,7 +1066,7 @@ If it has still no match L</new> with the virtual type C<from> is used.
 
 =head2 cmp
 
-    my $val = $identifier->cmp($other); # $identifier musst be non-undef
+    my $val = $identifier->cmp($other); # $identifier must be non-undef
     # or:
     my $val = Data::Identifier::cmp($identifier, $other); # $identifier can be undef
 
