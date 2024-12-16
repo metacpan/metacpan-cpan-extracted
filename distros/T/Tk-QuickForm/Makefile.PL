@@ -8,7 +8,8 @@ WriteMakefile(
 		'Test::Tk'		=> '3.02',
 		'Tk'			=> '804.033',
 		'Tk::ColorEntry'	=> '0.08',
-		'Tk::FontDialog'	=> 0,
+		'Tk::FileBrowser'	=> '0.06',
+		'Tk::FontDialog'	=> '0.15',
 		'Tk::ListEntry'	=> '0.01',
 	},
 	ABSTRACT_FROM		=> 'lib/Tk/QuickForm.pm',
@@ -21,6 +22,9 @@ WriteMakefile(
 				type => 'git',
 				url  => 'git://github.com/haje61/Tk-QuickForm.git',
 				web  => 'https://github.com/haje61/Tk-QuickForm',
+			},
+			bugtracker => {
+				web  => "https://github.com/haje61/Tk-QuickForm/issues",
 			},
 		}}) : ()
 	),

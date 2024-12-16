@@ -8,6 +8,9 @@ Tk::QuickForm::CListItem - ListEntry widget for Tk::QuickForm.
 
 use strict;
 use warnings;
+use vars qw($VERSION);
+$VERSION = '0.06';
+
 use Tk;
 use base qw(Tk::Derived Tk::QuickForm::CTextItem);
 Construct Tk::Widget 'CListItem';

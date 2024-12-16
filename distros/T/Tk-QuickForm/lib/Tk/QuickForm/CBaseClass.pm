@@ -8,9 +8,14 @@ Tk::QuickForm::CBaseClass - Base class for items in Tk::QuickForm.
 
 use strict;
 use warnings;
+use vars qw($VERSION);
+$VERSION = '0.06';
+
 use base qw(Tk::Derived Tk::Frame);
-use Tie::Watch;
 Construct Tk::Widget 'CBaseClass';
+
+use Tie::Watch;
+use Carp;
 
 =head1 SYNOPSIS
 
@@ -51,6 +56,9 @@ Callback, called after validation with the result as parameter.
 sub Populate {
 	my ($self,$args) = @_;
 
+	my $quickform = delete $args->{'-quickform'};
+	croak "Option '-quickform' not specified" unless defined $quickform;
+	
 	$self->SUPER::Populate($args);
 	my $var = '';
 	Tie::Watch->new(
@@ -63,6 +71,7 @@ sub Populate {
 	);
 	$self->createHandler(\$var);
 	$self->{VARIABLE} = \$var;
+	$self->{QUICKFORM} = $quickform;
 
 	$self->ConfigSpecs(
 		-regex => ['PASSIVE', undef, undef, '.*'],
@@ -98,6 +107,14 @@ sub put {
 	my $var = $self->variable;
 	$$var = $value;
 }
+
+=item B<quickform>
+
+Returns a reference to the Tk::QuickForm mother widget.
+
+=cut
+
+sub quickform { return $_[0]->{QUICKFORM} }
 
 =item B<validate>I<(?$value?)>
 

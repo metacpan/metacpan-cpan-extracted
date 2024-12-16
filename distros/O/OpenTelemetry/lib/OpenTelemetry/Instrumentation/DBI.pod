@@ -1,0 +1,25 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenTelemetry::Instrumentation::DBI - OpenTelemetry instrumentation for DBI
+
+=head1 SYNOPSIS
+
+    use OpenTelemetry::Instrumentation 'DBI';
+    my $dbh = DBI->connect(...);
+    my $result = $dbh->selectall_hashref($statement);
+
+=head1 DESCRIPTION
+
+See L<OpenTelemetry::Instrumentation> for more details.
+
+Since this is a core module, it's included in the L<OpenTelemetry> core
+distribution as well.
+
+=head1 COPYRIGHT
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

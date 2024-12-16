@@ -31,7 +31,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 use parent 'Data::URIID::Base';
 
@@ -96,6 +96,8 @@ my %attributes = (
 
     # TODO: define type.
     (map {$_ => {source_type => 'string'}} qw(date_of_birth date_of_death)),
+
+    ext => {},
 );
 
 my %id_conv = (
@@ -106,6 +108,7 @@ my %id_conv = (
 );
 
 my %lookup_services;
+my %lookup_services_digest;
 
 my %best_services = (
     'wikidata-identifier'           => 'wikidata',
@@ -160,6 +163,15 @@ my %best_services = (
         }
     }
 }
+{
+    my $extra = Data::URIID::Service->_extra_lookup_services_digests;
+    foreach my $service_name (keys %{$extra}) {
+        foreach my $digest (@{$extra->{$service_name}}) {
+            $lookup_services_digest{$digest} //= [];
+            push(@{$lookup_services_digest{$digest}}, $service_name);
+        }
+    }
+}
 
 my %url_templates = (
     'wikidata' => [
@@ -186,6 +198,7 @@ my %url_templates = (
     'e621' => [
         ['e621tagtype'          => 'https://e621.net/wiki_pages/show_or_new?title=%s', undef, [qw(info)]],
         ['e621-post-identifier' => 'https://e621.net/posts/%u',                        undef, [qw(info render)]],
+        ['e621-post-identifier' => 'https://e621.net/posts.json?limit=1&tags=id:%u',   undef, [qw(metadata)]],
     ],
     'dnb' => [
         ['gnd-identifier' => 'https://d-nb.info/gnd/%s', undef, [qw(info)]],
@@ -266,6 +279,18 @@ my %url_templates = (
     ],
     'oidref' => [
         ['oid' => 'https://oidref.com/%s' => undef, [qw(info)]],
+    ],
+);
+my %digest_url_templates = (
+    'e621' => [
+        ['md-5-128'     => 'https://e621.net/posts/random?tags=md5:%{digest}', [qw(info render)]],
+        ['md-5-128'     => 'https://static1.e621.net/data/%{digest,0,2}/%{digest,2,2}/%{digest}.%{ext}', [qw(file-fetch fetch)]],
+        ['md-5-128'     => 'https://e621.net/posts.json?limit=1&tags=md5:%{digest}', [qw(metadata)]],
+    ],
+    'fellig' => [
+        (map {[$_ => 'https://files.fellig.org/v2/by/'.$_.'/%{digest}.%{ext}', [qw(file-fetch fetch)]]}
+            qw(sha-3-224 sha-3-512 md-5-128),
+        ),
     ],
 );
 
@@ -645,6 +670,29 @@ my %fellig_tables = (
     TXT => 'texts',
 );
 
+my %media_subtype_to_ext = (
+    'application/gzip'      => 'gz',
+    'application/json'      => 'json',
+    'application/ogg'       => 'ogg',
+    'application/pdf'       => 'pdf',
+    'application/vnd.debian.binary-package' => 'deb',
+    'application/xml'       => 'xml',
+    'audio/flac'            => 'flac',
+    'audio/matroska'        => 'mkv',
+    'audio/ogg'             => 'oga',
+    'image/gif'             => 'gif',
+    'image/jpeg'            => 'jpg',
+    'image/png'             => 'png',
+    'image/svg+xml'         => 'svg',
+    'image/svg+xml'         => 'svg',
+    'text/html'             => 'html',
+    'text/plain'            => 'txt',
+    'video/matroska'        => 'mkv',
+    'video/matroska-3d'     => 'mkv',
+    'video/ogg'             => 'ogv',
+    'video/webm'            => 'webm',
+);
+
 
 # Private method.
 sub new {
@@ -672,16 +720,18 @@ sub _set {
     my $best_service;
     my $type_name;
 
-    $type      = $extractor->name_to_ise(type => $type);
-    $type_name = $extractor->ise_to_name(type => $type);
+    if (defined $type) {
+        $type      = $extractor->name_to_ise(type => $type);
+        $type_name = $extractor->ise_to_name(type => $type);
 
-    croak 'Invalid syntax for identifier type' unless $id =~ $syntax{$type_name};
+        croak 'Invalid syntax for identifier type' unless $id =~ $syntax{$type_name};
+    }
 
     $ise_order //= ISEORDER_UOR;
     $service = $extractor->service($service) if defined $service;
     $action  = $extractor->name_to_ise(action  => $action) if defined $action;
 
-    if (defined(my $best_service_name = $best_services{$type_name})) {
+    if (defined(my $best_service_name = $best_services{$type_name // ''})) {
         $best_service = $extractor->service($best_service_name);
     }
 
@@ -693,9 +743,11 @@ sub _set {
         action       => $action,
         best_service => $best_service,
     };
-    $self->{id} = {
-        $type => $id,
-    };
+    if (defined($type) && defined($id)) {
+        $self->{id} = {
+            $type => $id,
+        };
+    }
 }
 
 sub _lookup {
@@ -779,9 +831,20 @@ sub _lookup_with_mode {
     return if $mode eq 'online' && !$extractor->online;
 
     foreach my $pass (0..2) {
+        my %done;
         foreach my $id_type_ise (keys %{$self->{id}}) {
             my $id_type = eval {$extractor->ise_to_name(type => $id_type_ise)} // next;
             foreach my $service (@{$lookup_services{$id_type}}) {
+                next if $done{$service};
+                $done{$service} = 1;
+                $self->_lookup_one($service, %opts);
+            }
+        }
+        foreach my $digest (keys %lookup_services_digest) {
+            $self->digest($digest, as => 'hex', default => undef) // next;
+            foreach my $service (@{$lookup_services_digest{$digest}}) {
+                next if $done{$service};
+                $done{$service} = 1;
                 $self->_lookup_one($service, %opts);
             }
         }
@@ -865,6 +928,32 @@ sub _lookup__https {
             $extractor->online($old_online);
             if (defined $result) {
                 $self->_set(uriid => $result->id_type => $result->id, undef, $action);
+            }
+        }
+    } elsif ($host eq 'static1.e621.net') {
+        my @segments = $uri->path_segments;
+        if (scalar(@segments) == 5 &&
+            $segments[0] eq '' && $segments[1] eq 'data' &&
+            length($segments[2]) == 2 && length($segments[3]) == 2 &&
+            length($segments[4]) > 32) {
+            my ($md5, $ext) = $segments[4] =~ /^([0-9a-f]{32})\.([0-9a-z]+)$/;
+            $self->_set('e621', undef, undef, undef, 'file-fetch');
+            $self->{primary}{ext} = $ext;
+            $self->{primary}{digest} //= {};
+            $self->{primary}{digest}{'md-5-128'} = $md5;
+        }
+    } elsif ($host eq 'files.fellig.org' || $host eq 'thumbnails.fellig.org') {
+        my @segments = $uri->path_segments;
+        if (scalar(@segments) == 5 &&
+            $segments[0] eq '' && $segments[1] eq 'v2' && $segments[2] eq 'by' &&
+            $segments[3] =~ /^[a-z]+-[0-9]+-[0-9]+$/ &&
+            length($segments[4]) > 32) {
+            my ($hash, $ext) = $segments[4] =~ /^([0-9a-f]{32,})\.([0-9a-z]+)$/;
+            if (length($hash) == int(($segments[3] =~ /^[a-z]+-[0-9]+-([0-9]+)$/)[0]/4)) {
+                $self->_set('fellig', undef, undef, undef, 'file-fetch');
+                $self->{primary}{ext} = $ext;
+                $self->{primary}{digest} //= {};
+                $self->{primary}{digest}{$segments[3]} = $hash;
             }
         }
     }
@@ -1184,8 +1273,7 @@ sub url {
     $opts{action} //= eval {$extractor->ise_to_name(action => $self->attribute('action', as => 'ise'))};
 
     # First pass: try original id type
-    {
-        my $id = $self->id;
+    if (defined(my $id = eval {$self->id})) {
         my $id_type = $extractor->ise_to_name(type => $self->id_type);
 
         foreach my $template (@{$url_templates{$service} // []}) {
@@ -1224,10 +1312,9 @@ sub url {
         }
     }
 
-    if ($service eq 'uriid') {
+    if ($service eq 'uriid' && defined(my $type = eval {$self->id_type})) {
         my Data::URIID::Service $uriid = $extractor->service($service);
         my $types = $uriid->_get_uriid_decompiled_types_json;
-        my $type = $self->id_type;
 
         $type = $types->{backward}{$type} // $type;
 
@@ -1235,6 +1322,37 @@ sub url {
             my $u = URI->new("https://uriid.org/");
             $u->path_segments('', $type, $self->id);
             return $u;
+        }
+    }
+
+    # Now try digest based:
+    {
+        my %base = (
+            ext => $self->attribute('ext', default => undef),
+        );
+
+        unless (defined($base{ext})) {
+            my $media_subtype = $self->attribute('media_subtype', as => 'media_subtype', default => undef);
+            if (defined $media_subtype) {
+                $base{ext} = $media_subtype_to_ext{$media_subtype};
+            }
+        }
+
+        foreach my $digest ($self->available_keys('digest')) {
+            my $value = $self->digest($digest, default => undef) // next;
+            my %map = (%base, digest => $value);
+
+            foreach my $tpl (@{$digest_url_templates{$service}}) {
+                my ($t_digest, $t_url, $t_actions) = @{$tpl};
+                my $url;
+                next unless $t_digest eq $digest;
+                next unless $self->_match_actions([undef, undef, undef, $t_actions], \%opts);
+
+                $url = $t_url;
+                $url =~ s/%\{([a-z]+)(?:,([0-9]+)(?:,([0-9]+))?)?\}/uri_escape_utf8(substr($map{$1} || next, $2 || 0, $3 || 9999))/ge;
+
+                return URI->new($url);
+            }
         }
     }
 
@@ -1350,7 +1468,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 

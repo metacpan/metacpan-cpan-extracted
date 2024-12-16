@@ -8,8 +8,13 @@ Tk::QuickForm::CFileItem - File select entry widget for Tk::QuickForm.
 
 use strict;
 use warnings;
+use vars qw($VERSION);
+$VERSION = '0.06';
+
 use base qw(Tk::Derived Tk::QuickForm::CTextItem);
 Construct Tk::Widget 'CFileItem';
+
+use File::Basename;
 
 =head1 SYNOPSIS
 
@@ -49,20 +54,25 @@ sub Populate {
 	);
 }
 
+sub buttonClicked {
+	my $self = shift;
+	my $var = $self->cget('-textvariable');
+	my %opt = ();
+	if ($$var ne '') {
+		my $base = basename($$var);
+		$opt{'-initialfile'} = $base if $base ne '';
+		my $dir = dirname($$var);
+		$opt{'-initialdir'} = $dir if $dir ne '';
+	}
+	my ($file) = $self->quickform->pickFile(%opt);
+	$$var = $file if defined $file;
+}
+
 sub createHandler {
 	my ($self, $var) = @_;
 	$self->SUPER::createHandler($var);
 	my $b = $self->Button(
-		-command => sub {
-			my $file = $self->getOpenFile(
-# 				-initialdir => $initdir,
-# 				-popover => 'mainwindow',
-			);
-			if (defined $file) {
-				my $var = $self->cget('-variable');
-				$$var = $file
-			}
-		}
+		-command => ['buttonClicked', $self],
 	)->pack(-side => 'left', -padx => 2, -pady => 2);
 	$self->Advertise(Select => $b);
 }

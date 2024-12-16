@@ -132,10 +132,11 @@ if ($can_cvt_spreadsheets) {
 ########################################################################
 sub do_encoding_tests($) {
   my $exp_chars = shift;
+  confess dvis 'Unexpected CR in $exp_chars' if $exp_chars =~ /\x{0D}/;
   my $exp_CRLFchars = $exp_chars =~ s/\n/\x0D\x0A/gr;
   my $emptydata = $exp_chars eq "";
 
-  # Well, we can't prevent CR,LF line endings being written on Windows
+  # Well, we can't prevent CRLF line endings being written on Windows
   # (when writing with :crlf).  This prevents comparing :crlf-written
   # results with our golden files written on Linux.
   #
@@ -269,7 +270,9 @@ warn "#------------ _passthru_test ------------------\n" if $debug_opts{debug};
     eval { _passthru_test(debug => $debug, verbose => $verbose) };
     if ($@) {
       warn __FILE__,":",__LINE__," - failed: $@\nRE_TRYING WITH DEBUG...\n";
-      $Carp::Verbose = 1;
+      $Carp::Verbose = 1; # redundant with Carp::Always
+      require Carp::Always;
+      Carp::Always->import();
        _passthru_test(debug => 1, verbose => 1);
       die "should have died by now";
     }

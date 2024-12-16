@@ -1,5 +1,8 @@
 Revision history for Perl extension Syntax-Keyword-Assert
 
+0.13 2024-12-15T14:04:56Z
+    - [BREAKING CHANGE] Improve error message and change assert syntax. #4 (PEVANS helped me. Thanks!)
+
 0.12 2024-08-24T13:17:33Z
     - Fixed threaded perls bug #1
 

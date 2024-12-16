@@ -1,5 +1,8 @@
 Revision history for List-Util-MaybeXS
 
+1.500013 - 2024-12-16
+  - fix comparisons on perl version ($]) to always use numeric operators
+
 1.500012 - 2022-04-29
   - fix handling of various Inf forms on platforms like Windows
 

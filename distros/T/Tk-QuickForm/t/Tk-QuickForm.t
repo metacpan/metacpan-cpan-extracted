@@ -82,13 +82,23 @@ createapp;
 $delay = 1000;
 
 my @coltests1 = ();
-for (0 .. 9) {
+for (0 .. 3) {
 	push @coltests1, "-color1_$_", ['color', "Color1 $_"],
 }
 
 my @coltests2 = ();
-for (0 .. 9) {
+for (0 .. 3) {
 	push @coltests2, "-color2_$_", ['color', "Color2 $_"],
+}
+
+my @coltests3 = ();
+for (0 .. 3) {
+	push @coltests3, "-color3_$_", ['color', "Color3 $_"],
+}
+
+my @coltests4 = ();
+for (0 .. 3) {
+	push @coltests4, "-color4_$_", ['color', "Color4 $_"],
 }
 
 
@@ -165,10 +175,18 @@ if (defined $app) {
 			'*end',
 			'*page' => 'Colors',
 			'*section' => 'Color tests',
+			'*frame',
 			@coltests1,
-			'*column',
+			'*end',
+			'*frame',
 			@coltests2,
-			'*end'
+			'*column',
+			@coltests3,
+			'*end',
+			'*frame',
+			@coltests4,
+			'*end',
+			'*end',
 		],
 	)->pack(-side => 'left', -expand => 1, -fill => 'both');
 	$form->createForm;

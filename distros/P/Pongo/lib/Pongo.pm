@@ -3,7 +3,7 @@ package Pongo;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 1;
 
@@ -12,12 +12,6 @@ __END__
 =head1 NAME
 
 Pongo - A Perl MongoDB interface using XS and the MongoDB C driver.
-
-=head1 SYNOPSIS
-
-    use Pongo::Connect;
-
-    # Connect to MongoDB using the Connect module
 
 =head1 DESCRIPTION
 

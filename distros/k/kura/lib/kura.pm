@@ -2,7 +2,7 @@ package kura;
 use strict;
 use warnings;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 use Carp ();
 use Sub::Util ();
@@ -48,6 +48,7 @@ sub create_constraint {
     my ($constraint, $opts) = @_;
 
     if (my $blessed = Scalar::Util::blessed($constraint)) {
+        return _create_constraint_from_typetiny($constraint, $opts) if $constraint->isa('Type::Tiny');
         return ($constraint, undef) if $constraint->can('check');
         return ($constraint, undef) if grep { $constraint->isa($_) } @ALLOWED_CONSTRAINT_CLASSES;
         return (undef, "Invalid constraint. Object must have a `check` method or allowed constraint class: $blessed");
@@ -64,6 +65,15 @@ sub create_constraint {
     return (undef, 'Invalid constraint');
 }
 
+# Create a constraint object from a Type::Tiny object.
+sub _create_constraint_from_typetiny {
+    my ($type, $opts) = @_;
+
+    $type->{name} = $opts->{name} if $type->is_anon;
+
+    return ($type, undef);
+}
+
 # Create a constraint object from a code reference.
 sub _create_constraint_from_coderef {
     my ($coderef, $opts) = @_;
@@ -72,7 +82,6 @@ sub _create_constraint_from_coderef {
 
     my $args = {};
     $args->{name} = $opts->{name};
-    $args->{caller} = $opts->{caller};
     $args->{constraint} = sub { !!eval { $coderef->($_[0]) } };
     $args->{message} = sub { sprintf('%s did not pass the constraint "%s"', Type::Tiny::_dd($_[0]), $args->{name}) };
 
@@ -86,8 +95,7 @@ sub _create_constraint_from_hashref {
     my $blessed = delete $args->{blessed} || 'Type::Tiny';
     eval "require $blessed" or die $@;
 
-    $args->{name}   //= $opts->{name};
-    $args->{caller} //= $opts->{caller};
+    $args->{name} //= $opts->{name};
 
     return ($blessed->new(%$args), undef);
 }

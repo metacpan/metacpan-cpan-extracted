@@ -3,7 +3,7 @@ use 5.020;
 use true;
 use experimental qw( signatures );
 
-package Data::Section::Pluggable::Role::FormatContentPlugin 0.03 {
+package Data::Section::Pluggable::Role::FormatContentPlugin 0.04 {
 
     # ABSTRACT: Plugin role for Data::Section::Writer
 
@@ -25,7 +25,7 @@ Data::Section::Pluggable::Role::FormatContentPlugin - Plugin role for Data::Sect
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

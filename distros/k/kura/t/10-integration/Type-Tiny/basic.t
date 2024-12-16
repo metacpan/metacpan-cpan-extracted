@@ -4,30 +4,38 @@ use Test2::Require::Module 'Type::Tiny', '2.000000';
 use FindBin qw($Bin);
 use lib "$Bin";
 
-use TestTypeTiny qw(Foo Bar Baz);
+use TestTypeTiny qw(NamedType NoNameType CodeRefType HashRefType);
 
 subtest 'Test `kura` with Type::Tiny' => sub {
-    for my $type (Foo, Bar, Baz) {
+    for my $type (NamedType, NoNameType, CodeRefType HashRefType) {
         ok !$type->check('');
         ok $type->check('dog');
     }
 
-    is Foo, object {
-        prop blessed => 'Type::Tiny';
-        call name => '__ANON__';
+    is NamedType, object {
+        prop blessed      => 'Type::Tiny';
+        call name         => 'NamedType';
+        call display_name => 'NamedType';
     };
 
-    is Bar, object {
-        prop blessed => 'Type::Tiny';
-        call name => 'Bar';
+    is NoNameType, object {
+        prop blessed      => 'Type::Tiny';
+        call name         => 'NoNameType';
+        call display_name => 'NoNameType';
     };
 
-    is Baz, object {
-        prop blessed => 'Type::Tiny';
-        call name => 'Baz';
+    is CodeRefType, object {
+        prop blessed      => 'Type::Tiny';
+        call name         => 'CodeRefType';
+        call display_name => 'CodeRefType';
     };
 
-    is +Baz->validate(''), 'too short', 'Bar has a message';
+    is HashRefType, object {
+        prop blessed      => 'Type::Tiny';
+        call name         => 'HashRefType';
+        call display_name => 'HashRefType';
+        call sub { $_[0]->validate('') }, 'too short';
+    };
 };
 
 done_testing;

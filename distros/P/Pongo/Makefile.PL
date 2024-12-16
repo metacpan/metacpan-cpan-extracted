@@ -13,7 +13,7 @@ my %config = (
   AUTHOR         => 'Rudraditya Thakur',
   CCFLAGS        => '-Wall -std=c99 -I/usr/local/include/libmongoc-1.0 -I/usr/local/include/libbson-1.0',
   OPTIMIZE       => '-O3',
-  LICENSE        => 'Apache License 2.0',
+  LICENSE        => 'GPL-3.0 License',
   XSMULTI        => 1,
 );
 

@@ -21,18 +21,14 @@ use v5.40;
 use Benchmark qw(cmpthese);
 
 BEGIN {
-    # Disable STRICT mode. SEE ALSO: Devel::StrictMode
-    $ENV{EXTENDED_TESTING} = 0;
-    $ENV{AUTHOR_TESTING}   = 0;
-    $ENV{RELEASE_TESTING}  = 0;
-    $ENV{PERL_STRICT}      = 0;
+    $ENV{PERL_ASSERT_ENABLED} = 0;
 }
 
 use Syntax::Keyword::Assert;
 
 # Function with assertion block but it is ignored at runtime
 sub with_assertion($message) {
-    assert { defined $message };
+    assert( defined $message );
     return $message;
 }
 

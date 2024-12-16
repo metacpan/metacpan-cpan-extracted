@@ -1,3 +1,5 @@
+COPYRIGHT
+INSTALL
 lib/Pongo.pm
 lib/Pongo/BSON.pm
 lib/Pongo/BSON.xs
@@ -11,6 +13,23 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
+recipes/aggregate.pl
+recipes/count.pl
+recipes/delete-all.pl
+recipes/delete-many.pl
+recipes/delete-one.pl
+recipes/distinct.pl
+recipes/find-one.pl
+recipes/find.pl
+recipes/get-major-version.pl
+recipes/get-micro-version.pl
+recipes/get-minor-version.pl
+recipes/get-mongoc-version.pl
+recipes/insert-many.pl
+recipes/insert-one.pl
+recipes/mongoc-check-version.pl
+recipes/update-many.pl
+recipes/update-one.pl
 t/check_version.t
 t/connection.t
 t/get_major_version.t

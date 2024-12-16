@@ -6,6 +6,7 @@ build_requires:
   Capture::Tiny: '0'
   Carp::Always: '0'
   Cwd: '0'
+  Data::Dumper::Interp: '7.009'
   English: '0'
   Env: '0'
   File::Path: '0'
@@ -34,9 +35,10 @@ meta-spec:
 name: Spreadsheet-Edit
 requires:
   Carp: '0'
+  Carp::Always: '0'
   Clone: '0'
   Data::Dumper: '0'
-  Data::Dumper::Interp: '7.003'
+  Data::Dumper::Interp: '7.009'
   Data::Hexify: '0'
   Devel::Symdump: '0'
   Digest::MD5: '0'
@@ -79,7 +81,7 @@ resources:
   bugtracker: https://github.com/jimav/Spreadsheet-Edit/issues
   homepage: https://github.com/jimav/Spreadsheet-Edit
   repository: https://github.com/jimav/Spreadsheet-Edit.git
-version: '1000.021'
+version: '1000.023'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: CC0-1.0

@@ -1,0 +1,39 @@
+Pongo - MongoDB Driver for Perl
+=============================
+
+Installation Instructions
+=========================
+
+For Linux:
+-----------
+To install the necessary dependencies on a Linux system, use the following command:
+
+    sudo apt-get install libmongoc-1.0-0 libbson-1.0-0 libmongoc-dev libbson-dev
+
+For macOS:
+----------
+To install the MongoDB C driver on macOS, use the following Homebrew command:
+
+    brew install mongo-c-driver
+
+Development Setup
+================
+To build and install the package, follow these steps:
+
+1. Run the following command to generate the Makefile:
+
+       perl Makefile.PL
+
+2. Build the package using:
+
+       make
+
+3. Install the package with:
+
+       make install
+
+Clean the Build
+===============
+To clean up the build files, use the following command:
+
+    make clean

@@ -9,7 +9,7 @@ Tk::QuickForm - Quickly set up a form.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 use Tk;
 use base qw(Tk::Frame);
@@ -18,6 +18,7 @@ Construct Tk::Widget 'QuickForm';
 require Tk::LabFrame;
 require Tk::NoteBook;
 require Tk::PopColor;
+require Tk::FilePicker;
 use Tk::PNG;
 
 
@@ -142,6 +143,30 @@ Only available at create time. See below.
 
 =back
 
+=head1 FILE DIALOG VARIABLES
+
+A number of config variables are forwarded to the file dialog widget used
+in this module. Look in L<Tk::FilePicker> and L<Tk::FileBrowser> for their meaning.
+They are:
+
+=over4
+
+=item B<-diriconcall>
+
+=item B<-fileiconcall>
+
+=item B<-linkiconcall>
+
+=item B<-msgimage>
+
+=item B<-newfolderimage>
+
+=item B<-reloadimage>
+
+=item B<-warnimage>
+
+=back
+
 =head1 THE STRUCTURE OPTION
 
 
@@ -166,8 +191,13 @@ Creates a NoteBook widget if needed and adds a page with the name in $option.
 
 =item B<*section>
 
-Creates a new section with the name in $option.
+Creates a new section with the name in $option as label on a L<Tk::LabFrame>.
 You can create nested sections.
+
+=item B<*frame>
+
+Similar to B<*section> just does not take a name parameter. Useful for dividing
+the space.
 
 =item B<*column>
 
@@ -346,13 +376,20 @@ sub Populate {
 		-acceptempty => ['PASSIVE', undef, undef, 0],
 		-autovalidate => ['PASSIVE', undef, undef, 1],
 		-background => ['SELF', 'DESCENDANTS'],
+		-diriconcall => ['PASSIVE'],
+		-fileiconcall => ['PASSIVE'],
 		-fileimage => ['PASSIVE', undef, undef, $fil_icon],
 		-folderimage => ['PASSIVE', undef, undef, $dir_icon],
 		-fontimage => ['PASSIVE', undef, undef, $fon_icon],
+		-linkiconcall => ['PASSIVE'],
 		-listcall => ['CALLBACK', undef, undef, sub {}],
+		-msgimage => ['PASSIVE'],
+		-newfolderimage => ['PASSIVE'],
 		-postvalidatecall => ['CALLBACK', undef, undef, sub {}],
+		-reloadimage => ['PASSIVE'],
 		-structure => ['PASSIVE', undef, undef, []],
 		-tabside => ['PASSIVE', undef, undef, 'top'],
+		-warnimage => ['PASSIVE'],
 		DEFAULT => ['SELF'],
 	);
 }
@@ -398,7 +435,7 @@ sub createForm {
 			shift @options;
 			next;
 		}
-		next if ($key eq '*end') or ($key eq '*column') or ($key eq '*expand');
+		next if ($key eq '*end') or ($key eq '*column') or ($key eq '*expand') or ($key eq '*frame');
 		my $conf = shift @options;
 		my $l = length $conf->[1];
 		unless ($conf->[0] eq 'ext2') { $labelwidth = $l if $l > $labelwidth; }
@@ -454,6 +491,24 @@ sub createForm {
 				offset => 0,
 				row => 0,
 				type => 'section',
+			};
+			
+		} elsif ($key eq '*frame') {
+			my $h = $holderstack[0];
+			my $offset = $h->{offset};
+			my $f = $h->{holder}->Frame->grid(@padding, 
+				-column => 0 + $offset, 
+				-row => $h->{row}, 
+				-columnspan => 2, 
+				-sticky => 'nsew',
+			);
+			$f->gridColumnconfigure(1, -weight => 1);
+			$holderstack[0]->{row} ++;
+			unshift @holderstack, {
+				holder => $f,
+				offset => 0,
+				row => 0,
+				type => 'frame',
 			};
 			
 		} elsif ($key eq '*column') {
@@ -513,7 +568,7 @@ sub createForm {
 					-row => $row, 
 					-sticky => 'e'
 				);
-				my $w = $self->CreateClass($holder, $class, -validatecall => ['validate', $self], @opt);
+				my $w = $self->CreateClass($holder, $class, -quickform => $self, -validatecall => ['validate', $self], @opt);
 				$w->grid(
 					-column => 1 + $offset,
 					-row => $row, 
@@ -524,12 +579,10 @@ sub createForm {
 				$options{$key} = $w;
 			} elsif ($type eq 'ext2') {
 					# $label is now actually the reference to the external object
-					# $avlues is now actually a boolean scalar to instruct the widget to expand
+					# $values is now actually a boolean scalar to instruct the widget to expand
 					my $class = shift @opt;
 					my $w = $self->CreateClass($holder, $class, -validatecall => ['validate', $self], @opt);
-# 					$holder->gridRowconfigure($row, -weight => 1) if (defined $values) and ($values eq 1);
 					$w->grid(
-# 					-in => $holder,
 					-column => 0, 
 					-row => $row, 
 					-columnspan => 2 + $offset,
@@ -571,7 +624,7 @@ sub createForm {
 					}
 				}
 
-				my $widg = $self->CreateClass($holder, $class, %opthash)->grid(
+				my $widg = $self->CreateClass($holder, $class, %opthash, -quickform => $self)->grid(
 					-column => 1 + $offset, 
 					-row => $row,
 					-sticky => 'nsew', 
@@ -618,10 +671,59 @@ sub get {
 	return @get
 }
 
+sub getFilePicker {
+	my $self = shift;
+	my $pick = $self->Subwidget('picker');
+	return $pick if defined $pick;
+
+	my %options = ();
+	for ('-diriconcall', '-fileiconcall', '-linkiconcall', '-msgimage', '-newfolderimage', '-reloadimage', '-warnimage') {
+		my $opt = $self->cget($_);
+		$options{$_} = $opt if defined $opt
+	}
+	$pick = $self->FilePicker(%options);
+	$self->Advertise('picker', $pick);
+	return $pick;
+}
+
 sub getKeys {
 	my $self = shift;
 	my $opt = $self->{OPTIONS};
 	return sort keys %$opt;
+}
+
+sub pick {
+	my $self = shift;
+	my $pick = $self->getFilePicker;
+	$pick->pick(@_);
+}
+
+sub pickFile {
+	my $self = shift;
+	my %args = @_;
+	return $self->pick(
+		-checkoverwrite => 0,
+		-showfolders => 1,
+		-showfiles => 1,
+		-selectmode => 'single',
+		-selectstring => 'Select',
+		-title => 'Select file',
+		%args,
+	);
+}
+
+sub pickFolder {
+	my $self = shift;
+	my %args = @_;
+	return $self->pick(
+		-checkoverwrite => 0,
+		-showfolders => 1,
+		-showfiles => 0,
+		-selectmode => 'single',
+		-selectstring => 'Select',
+		-title => 'Select folder',
+		%args,
+	);
 }
 
 =item B<put>(%values)

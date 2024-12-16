@@ -6,9 +6,10 @@
 #include <bson/bson.h>
 #define XS_BOTHVERSION_SETXSUBFN_POPMARK_BOOTCHECK 1
 
-static mongoc_client_t *client = NULL;
-
 MODULE = Pongo::Client PACKAGE=Pongo::Client
+
+BOOT:
+mongoc_init();
 
 TYPEMAP : <<HERE
 
@@ -147,37 +148,6 @@ uint16_t T_PTROBJ
 HERE
 
 PROTOTYPES: DISABLE
-
-void
-connect_mongodb(host, port)
-    const char *host;
-    int port;
-    PREINIT:
-        char uri_string[256];
-    CODE:
-        // Initialize the MongoDB C driver
-        mongoc_init();
-
-        // Construct the MongoDB URI
-        snprintf(uri_string, sizeof(uri_string), "mongodb://%s:%d", host, port);
-
-        // Create a new MongoDB client
-        client = mongoc_client_new(uri_string);
-        if (!client) {
-            croak("Failed to connect to MongoDB at %s", uri_string);
-        }
-
-void
-disconnect_mongodb()
-    CODE:
-        // Disconnect the MongoDB client
-        if (client) {
-            mongoc_client_destroy(client);
-            client = NULL;
-        }
-
-        // Cleanup the MongoDB C driver
-        mongoc_cleanup();
 
 bool
 error_has_label(reply, label)
@@ -2089,14 +2059,21 @@ handshake_data_append(driver_name, driver_version, platform)
         RETVAL
 
 mongoc_cursor_t *
-colleciton_aggregate(collection, flags, pipeline, opts, read_prefs)
+collection_aggregate(collection, flags, pipeline, opts, read_prefs)
     mongoc_collection_t *collection;
-    mongoc_query_flags_t flags;
-    const bson_t *pipeline;
-    const bson_t *opts;
-    const mongoc_read_prefs_t *read_prefs;
+    int flags;
+    SV *pipeline;
+    SV *opts;
+    SV *read_prefs;
     CODE:
-        RETVAL = mongoc_collection_aggregate(collection, flags, pipeline, opts, read_prefs);
+        mongoc_query_flags_t flag_value = (mongoc_query_flags_t) flags;
+        const bson_t *bson_pipeline = (const bson_t *) SvIV(SvRV(pipeline));
+        const bson_t *bson_opts = (const bson_t *) SvIV(SvRV(opts));
+        const mongoc_read_prefs_t *read_prefs_value = NULL;
+        if (SvOK(read_prefs)) {
+            read_prefs_value = (const mongoc_read_prefs_t*) SvIV(SvRV(read_prefs));
+        }
+        RETVAL = mongoc_collection_aggregate(collection, flag_value, bson_pipeline, bson_opts, read_prefs_value);
     OUTPUT:
         RETVAL
 
@@ -2173,17 +2150,30 @@ collection_estimated_document_count(collection, opts, read_prefs, reply, error)
     OUTPUT:
         RETVAL
 
-int64_t
+int
 collection_count(collection, flags, query, skip, limit, read_prefs, error)
     mongoc_collection_t *collection;
-    mongoc_query_flags_t flags;
-    const bson_t *query;
-    int64_t skip;
-    int64_t limit;
-    const mongoc_read_prefs_t *read_prefs;
-    bson_error_t *error;
+    int flags;
+    SV *query;
+    SV *skip;
+    SV *limit;
+    SV *read_prefs;
+    SV *error;
     CODE:
-        RETVAL = mongoc_collection_count(collection, flags, query, skip, limit, read_prefs, error);
+        mongoc_query_flags_t query_flag = (mongoc_query_flags_t) flags;
+        const bson_t *bson_query = (const bson_t *) SvIV(SvRV(query));
+        int64_t skip_value = SvIV(skip);
+        int64_t limit_value = SvIV(limit);
+        const mongoc_read_prefs_t *read_prefs_value = NULL;
+        if (SvOK(read_prefs)) {
+            read_prefs_value = (const mongoc_read_prefs_t*) SvIV(SvRV(read_prefs));
+        }
+        bson_error_t *bson_error = NULL;
+        if (SvOK(error)) {
+            bson_error = (bson_error_t*) SvIV(SvRV(error));
+        }
+        int64_t output = mongoc_collection_count(collection, query_flag, bson_query, skip_value, limit_value, read_prefs_value, bson_error);
+        RETVAL = (int) output;
     OUTPUT:
         RETVAL
 
@@ -2288,24 +2278,32 @@ collection_delete(collection, flags, selector, write_concern, error)
 bool
 collection_delete_many(collection, selector, opts, reply, error)
     mongoc_collection_t *collection;
-    const bson_t *selector;
-    const bson_t *opts;
-    bson_t *reply;
-    bson_error_t *error;
+    SV *selector;
+    SV *opts;
+    SV *reply;
+    SV *error;
     CODE:
-        RETVAL = mongoc_collection_delete_many(collection, selector, opts, reply, error);
+        const bson_t *bson_selector = (const bson_t*) SvIV(SvRV(selector));
+        const bson_t *bson_opts = (opts && SvOK(opts)) ? (const bson_t*) SvIV(SvRV(opts)) : NULL;
+        bson_t * bson_reply = (reply && SvOK(reply)) ? (bson_t *) SvIV(SvRV(reply)) : NULL;
+        bson_error_t * bson_error = (error && SvOK(error)) ? (bson_error_t*) SvIV(SvRV(error)) : NULL;
+        RETVAL = mongoc_collection_delete_many(collection, bson_selector, bson_opts, bson_reply, bson_error);
     OUTPUT:
         RETVAL
 
 bool
 collection_delete_one(collection, selector, opts, reply, error)
     mongoc_collection_t *collection;
-    const bson_t *selector;
-    const bson_t *opts;
-    bson_t *reply;
-    bson_error_t *error;
+    SV *selector;
+    SV *opts;
+    SV *reply;
+    SV *error;
     CODE:
-        RETVAL = mongoc_collection_delete_one(collection, selector, opts, reply, error);
+        const bson_t *bson_selector = (const bson_t*) SvIV(SvRV(selector));
+        const bson_t *bson_opts = (opts && SvOK(opts)) ? (const bson_t*) SvIV(SvRV(opts)) : NULL;
+        bson_t * bson_reply = (reply && SvOK(reply)) ? (bson_t *) SvIV(SvRV(reply)) : NULL;
+        bson_error_t * bson_error = (error && SvOK(error)) ? (bson_error_t*) SvIV(SvRV(error)) : NULL;
+        RETVAL = mongoc_collection_delete_one(collection, bson_selector, bson_opts, bson_reply, bson_error);
     OUTPUT:
         RETVAL
 
@@ -2369,15 +2367,35 @@ collection_ensure_index(collection, keys, opt, error)
 mongoc_cursor_t *
 collection_find(collection, flags, skip, limit, batch_size, query, fields, read_prefs)
     mongoc_collection_t *collection;
-    mongoc_query_flags_t flags;
-    uint32_t skip;
-    uint32_t limit;
-    uint32_t batch_size;
-    const bson_t *query;
-    const bson_t *fields;
-    const mongoc_read_prefs_t *read_prefs;
+    int flags;
+    SV *skip;
+    SV *limit;
+    SV *batch_size;
+    SV *query;
+    SV *fields;
+    SV *read_prefs;
     CODE:
-        RETVAL = mongoc_collection_find(collection, flags, skip, limit, batch_size, query, fields, read_prefs);
+        mongoc_query_flags_t flag_value = (mongoc_query_flags_t)flags;
+        uint32_t skip_value = SvUV(skip);
+        uint32_t limit_value = SvUV(limit);
+        uint32_t batch_size_value = SvUV(batch_size);
+        const bson_t *bson_query = NULL;
+        if (SvOK(query)) {
+            bson_query = (const bson_t *) SvIV(SvRV(query));  // Convert to BSON pointer
+        } else {
+            warn("Query is invalid or undef");
+        }
+        const bson_t *bson_fields = NULL;
+        if (SvOK(fields)) {
+            bson_fields = (const bson_t *) SvIV(SvRV(fields));  // Convert to BSON pointer
+        } else {
+            warn("Fields are invalid or undef");
+        }
+        const mongoc_read_prefs_t *read_prefs_value = NULL;
+        if (SvOK(read_prefs)) {
+            read_prefs_value = (const mongoc_read_prefs_t *) SvIV(SvRV(read_prefs)); // Dereference read_prefs
+        }
+        RETVAL = mongoc_collection_find(collection, flag_value, skip_value, limit_value, batch_size_value, bson_query, bson_fields, read_prefs_value);
     OUTPUT:
         RETVAL
 
@@ -2520,12 +2538,16 @@ collection_insert_many(collection, documents, n_documents, opts, reply, error)
 bool
 collection_insert_one(collection, document, opts ,reply, error)
     mongoc_collection_t *collection;
-    const bson_t *document;
-    const bson_t *opts;
-    bson_t *reply;
-    bson_error_t *error;
+    SV *document;
+    SV *opts;
+    SV *reply;
+    SV *error;
     CODE:
-        RETVAL = mongoc_collection_insert_one(collection, document, opts, reply, error);
+        const bson_t *bson_document = (const bson_t *) SvIV(SvRV(document));
+        const bson_t *bson_opts = (opts && SvOK(opts)) ? (const bson_t*) SvIV(SvRV(opts)) : NULL;
+        bson_t *bson_reply = (reply && SvOK(reply)) ? (bson_t*) SvIV(SvRV(reply)) : NULL;
+        bson_error_t *bson_error = (error && SvOK(error)) ? (bson_error_t*) SvIV(SvRV(error)) : NULL;
+        RETVAL = mongoc_collection_insert_one(collection, bson_document, bson_opts, bson_reply, bson_error);
     OUTPUT:
         RETVAL
 
@@ -2659,13 +2681,18 @@ collection_update(collection, flags, selector, update, write_concern, error)
 bool
 collection_update_one(collection, selector, update, opts, reply, error)
     mongoc_collection_t *collection;
-    const bson_t *selector;
-    const bson_t *update;
-    const bson_t *opts;
-    bson_t *reply;
-    bson_error_t *error;
+    SV *selector;
+    SV *update;
+    SV *opts;
+    SV *reply;
+    SV *error;
     CODE:
-        RETVAL = mongoc_collection_update_one(collection, selector, update, opts, reply, error);
+        const bson_t *bson_selector = (const bson_t*) SvIV(SvRV(selector));
+        const bson_t *bson_update = (const bson_t*) SvIV(SvRV(update));
+        const bson_t *bson_opts = (opts && SvOK(opts)) ? (const bson_t*) SvIV(SvRV(opts)) : NULL;
+        bson_t *bson_reply = (reply && SvOK(reply)) ? (bson_t*) SvIV(SvRV(reply)) : NULL;
+        bson_error_t *bson_error = (error && SvOK(error)) ? (bson_error_t*) SvIV(SvRV(error)) : NULL;
+        RETVAL = mongoc_collection_update_one(collection, bson_selector, bson_update, bson_opts, bson_reply, bson_error);
     OUTPUT:
         RETVAL
 
@@ -2838,11 +2865,26 @@ cursor_new_from_command_reply_with_opts(client, reply, opts)
         RETVAL
 
 bool
-cursor_next(cursor, bson)
-    mongoc_cursor_t *cursor;
-    const bson_t **bson;
+cursor_next(cursor, bson_ref)
+    mongoc_cursor_t *cursor
+    AV *bson_ref
     CODE:
-        RETVAL = mongoc_cursor_next(cursor, bson);
+        if (!SvROK(ST(1)) || SvTYPE(SvRV(ST(1))) != SVt_PVAV) {
+            croak("bson_ref is not an ARRAY reference");
+        }
+        const bson_t *bson = NULL;
+        RETVAL = mongoc_cursor_next(cursor, &bson);
+        if (RETVAL) {
+            if (bson) {
+                char *json_str = bson_as_json(bson, NULL);
+                if (json_str) {
+                    SV *json_sv = newSVpv(json_str, 0);
+                    bson_free(json_str);
+                    av_clear(bson_ref);
+                    av_push(bson_ref, json_sv);
+                }
+            }
+        }
     OUTPUT:
         RETVAL
 

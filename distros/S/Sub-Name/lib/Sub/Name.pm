@@ -1,4 +1,4 @@
-package Sub::Name; # git description: v0.26-4-gf9cd47d
+package Sub::Name; # git description: v0.27-3-g0429db7
 # ABSTRACT: (Re)name a sub
 # KEYWORDS: subroutine function utility name rename symbol
 
@@ -54,7 +54,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Exporter ();
 *import = \&Exporter::import;
@@ -82,7 +82,7 @@ Sub::Name - (Re)name a sub
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 

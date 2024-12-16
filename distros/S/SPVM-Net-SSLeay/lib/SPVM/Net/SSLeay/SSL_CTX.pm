@@ -186,6 +186,12 @@ The protocols $protos must be defined. Otherwise an exception is thrown.
 
 If SSL_CTX_set_alpn_protos failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
+=head2 set_alpn_protos_with_protocols
+
+C<method set_alpn_protos_with_protocols : int ($protocols : string[]);>
+
+Calls L<Net::SSLeay::Util#convert_to_wire_format|SPVM::Net::SSLeay::Util/"convert_to_wire_format"> method given $protocols, calls L</"set_alpn_protos"> method given the return value of C<convert_to_wire_format> method, and returns its return value.
+
 =head2 set1_groups_list
 
 C<method set1_groups_list : int ($list : string);>

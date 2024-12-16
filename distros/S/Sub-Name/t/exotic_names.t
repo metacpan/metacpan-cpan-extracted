@@ -101,8 +101,8 @@ for my $ord (@ordinal) {
     my $expected;
   SKIP: {
     skip 'single quote as a package separator has been '.
-        ("$]" gt '5.041001' ? 'removed' : 'deprecated'), 3
-        if $ord == 39 and "$]" gt '5.037009';
+        ("$]" > 5.041001 ? 'removed' : 'deprecated'), 3
+        if $ord == 39 and "$]" > 5.037009;
 
     if ( chr($ord) =~ m/^[$legal_ident_char]$/o ) { # compile directly
         $expected = "native::$fullname";

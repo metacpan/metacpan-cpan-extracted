@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/uperl/Data-Section-Writer/issues
   homepage: https://metacpan.org/pod/Data::Section::Writer
   repository: git://github.com/uperl/Data-Section-Writer.git
-version: '0.03'
+version: '0.04'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,5 +1,8 @@
 Revision history for Sub-Name
 
+0.28      2024-12-15 20:57:44Z
+    - fix version comparison logic for forward compatibility
+
 0.27      2023-04-29 12:32:26Z
     - skip quote-separator tests on newer perls that deprecate this behaviour
 

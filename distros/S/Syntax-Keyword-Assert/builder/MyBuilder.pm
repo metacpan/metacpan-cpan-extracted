@@ -12,6 +12,7 @@ sub new {
 
     my @flags = @{ $build->extra_compiler_flags };
     push @flags, XS::Parse::Keyword::Builder->extra_compiler_flags;
+    push @flags, '-Ihax';
 
     $build->extra_compiler_flags( @flags );
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension kura
 
+0.08 2024-12-16T00:44:13Z
+    - Assign name for anon type tiny #8
+
 0.07 2024-12-15T07:59:25Z
     - Feature: more flexibility in creating type constraints #6
 

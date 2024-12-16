@@ -1,0 +1,114 @@
+NAME
+    Software::Security::Policy - packages that provide templated Security
+    Policys
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+      my $policy = Software::Security::Policy::SingleDeveloper->new({
+        maintainer => 'Timothy Legge',
+      });
+
+      print $output_fh $policy->fulltext;
+
+METHODS
+  new
+      my $policy = $subclass->new(\%arg);
+
+    This method returns a new security policy object for the given security
+    policy class. Valid arguments are:
+
+  support_years
+  timeframe
+  maintainer
+    These methods are attribute readers.
+
+  program
+    Name of software for using in the middle of a sentence.
+
+    The method returns value of "program" constructor argument (if it
+    evaluates as true, i. e. defined, non-empty, non-zero), or value of
+    "Program" constructor argument (if it is true), or "this program" as the
+    last resort.
+
+  Program
+    Name of software for using at the beginning of a sentence.
+
+    The method returns value of "Program" constructor argument (if it is
+    true), or value of "program" constructor argument (if it is true), or
+    "This program" as the last resort.
+
+  name
+    This method returns the name of the policy, suitable for shoving in the
+    middle of a sentence, generally with a leading capitalized "The."
+
+  url
+    This method returns the URL at which a canonical text of the security
+    policy can be found, if one is available. If possible, this will point
+    at plain text, but it may point to an HTML resource.
+
+  summary
+    This method returns a snippet of text, usually a few lines, indicating
+    the maintainer as well as an indication of the policy under which the
+    software is maintained.
+
+  security_policy
+    This method returns the full text of the policy.
+
+  fulltext
+    This method returns the complete text of the policy.
+
+  version
+    This method returns the version of the policy. If the security policy is
+    not versioned, this method will return false.
+
+  meta_name
+    This method returns the string that should be used for this security
+    policy in the CPAN META.yml file, according to the CPAN Meta spec v1, or
+    undef if there is no known string to use.
+
+  meta2_name
+    This method returns the string that should be used for this security
+    policy in the CPAN META.json or META.yml file, according to the CPAN
+    Meta spec v2, or undef if there is no known string to use. If this
+    method does not exist, and "meta_name" returns open_source, restricted,
+    unrestricted, or unknown, that value will be used.
+
+    "program" and "Program" arguments may be specified both, either one or
+    none. Each argument, if not specified, is defaulted to another one, or
+    to properly capitalized "this program", if both arguments are omitted.
+
+LOOKING UP LICENSE CLASSES
+    FIXME: Remove - unneeded If you have an entry in a META.yml or META.json
+    file, or similar metadata, and want to look up the
+    Software::Security::Policy class to use, there are useful tools in
+    Software::Security::Policy::Utils.
+
+TODO
+SEE ALSO
+    The specific policy:
+
+    Extra policys are maintained on CPAN in separate modules.
+
+    FIXME Remove The App::Software::Security::Policy module comes with a
+    script software-policy
+    <https://metacpan.org/pod/distribution/App-Software-Security::Policy/scr
+    ipt/software-policy>, which provides a command-line interface to
+    Software::Security::Policy.
+
+COPYRIGHT
+    This module is based extensively on Software::License. Only the changes
+    required for this module are attributable to the author of this module.
+    All other code is attributable to the author of Software::License.
+
+AUTHOR
+    Timothy Legge <timlegge@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by Timothy Legge
+    <timlegge@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

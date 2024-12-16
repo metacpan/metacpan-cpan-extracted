@@ -36,6 +36,7 @@ class TestCase::Net::SSLeay {
   use Net::SSLeay::ASN1_TIME;
   use Array;
   use Net::SSLeay::X509_STORE;
+  use Net::SSLeay::OPENSSL;
   
   use TestUtil::Socket;
   use Sys::Socket::Constant as SOCKET;
@@ -65,6 +66,8 @@ class TestCase::Net::SSLeay {
     
     $ssl_ctx->use_certificate_file("$FILE_DIR/simple-cert.cert.pem");
     
+    $ssl_ctx->use_certificate_chain_file("$FILE_DIR/simple-cert.certchain.pem");
+    
     my $accepted_socket = $server_socket->accept;
     
     $accepted_socket->accept_SSL;
@@ -88,6 +91,38 @@ class TestCase::Net::SSLeay {
   }
   
   static method accept : int ($port : int) {
+    
+    # Clsss Methods
+    {
+      {
+        my $alert_desc_string_long = Net::SSLeay->alert_desc_string_long(1);
+        
+        unless ($alert_desc_string_long is_type string) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x509_names = Net::SSLeay->load_client_CA_file("$FILE_DIR/simple-cert.certchain.pem");
+        
+        unless (@$x509_names == 3) {
+          return 0;
+        }
+        
+        unless ($x509_names->[0]->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example") {
+          return 0;
+        }
+        
+        unless ($x509_names->[1]->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=Intermediate CA") {
+          return 0;
+        }
+        
+        unless ($x509_names->[2]->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=Root CA") {
+          return 0;
+        }
+        
+      }
+    }
     
     my $success_ref = [1];
     
@@ -120,7 +155,61 @@ class TestCase::Net::SSLeay {
         
         my $ssl_ctx = $ssl->get_SSL_CTX;
         
+        $ssl_ctx->use_PrivateKey_file("$FILE_DIR/simple-cert.key.pem");
+        
+        $ssl_ctx->use_certificate_file("$FILE_DIR/simple-cert.cert.pem");
+        
+        $ssl_ctx->set_post_handshake_auth(1);
+        
+        $ssl_ctx->set_alpn_protos_with_protocols(["http1.1"]);
+        
+        if ($ssl->get_peer_certificate) {
+          $success_ref->[0] = 0;
+        }
+        
+        if ($ssl->get_peer_cert_chain) {
+          $success_ref->[0] = 0;
+        }
+        
         $socket->connect_SSL;
+        
+        my $certificate = $ssl->get_certificate;
+        
+        my $peer_certificate = $ssl->get_peer_certificate;
+        
+        unless ($peer_certificate->get_subject_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example") {
+          $success_ref->[0] = 0;
+        }
+        
+        my $peer_cert_chains = $ssl->get_peer_cert_chain;
+        
+        unless (@$peer_cert_chains == 3) {
+          $success_ref->[0] = 0;
+        }
+        
+        unless ($peer_cert_chains->[0]->get_subject_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example") {
+          $success_ref->[0] = 0;
+        }
+        
+        unless ($peer_cert_chains->[1]->get_subject_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=Intermediate CA") {
+          $success_ref->[0] = 0;
+        }
+        
+        unless ($peer_cert_chains->[2]->get_subject_name->oneline eq "/C=PL/O=Net-SSLeay/OU=Test Suite/CN=Root CA") {
+          $success_ref->[0] = 0;
+        }
+        
+        my $dump_peer_certificate = $ssl->dump_peer_certificate;
+        
+        unless (Fn->contains($dump_peer_certificate, "Subject Name: /C=PL/O=Net-SSLeay/OU=Test Suite/CN=simple-cert.net-ssleay.example")) {
+          $success_ref->[0] = 0;
+        }
+        
+        unless (Fn->contains($dump_peer_certificate, "Issuer  Name: /C=PL/O=Net-SSLeay/OU=Test Suite/CN=Intermediate CA")) {
+          $success_ref->[0] = 0;
+        }
+        
+        my $alpn_selected_protocol = $ssl->get0_alpn_selected_return_string;
         
         my $cipher = $ssl->get_cipher;
         

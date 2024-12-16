@@ -1,3 +1,7 @@
+v0.11  2024-12-15Z
+    - Added support for digest/hash based URLs
+    - Added support for Data::Identifier as a source
+
 v0.10  2024-11-02Z
     - Feature: Added Data::URIID::Base
     - Fix: Only allow $extractor->service() on services that exist to begin with

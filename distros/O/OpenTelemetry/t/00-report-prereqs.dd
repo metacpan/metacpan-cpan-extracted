@@ -26,6 +26,7 @@ do { my $x = {
                                       'List::Util' => '1.45',
                                       'Log::Any' => '0',
                                       'Module::Pluggable' => '0',
+                                      'Module::Runtime' => '0',
                                       'Mutex' => '0',
                                       'Object::Pad' => '0.74',
                                       'Ref::Util' => '0',

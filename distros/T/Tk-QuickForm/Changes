@@ -1,5 +1,10 @@
 Revision history for Perl extension Tk::QuickForm.
 
+0.06  Sun Dec 15 2024
+	- Changed bug tracker
+	- Added switch '*frame'
+	- File dialogs are done with Tk::FilePicker.
+
 0.05  Tue Sep 10 2024
 	All color types now use one popcolor widget
 

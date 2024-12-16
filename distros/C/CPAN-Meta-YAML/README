@@ -2,7 +2,7 @@ NAME
     CPAN::Meta::YAML - Read and write a subset of YAML for CPAN Meta files
 
 VERSION
-    version 0.018
+    version 0.019
 
 SYNOPSIS
         use CPAN::Meta::YAML;
@@ -45,6 +45,9 @@ AUTHORS
     *   Adam Kennedy <adamk@cpan.org>
 
     *   David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    Karen Etheridge <ether@cpan.org>
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2010 by Adam Kennedy.

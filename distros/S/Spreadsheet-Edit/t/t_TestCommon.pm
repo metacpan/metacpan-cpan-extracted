@@ -113,7 +113,7 @@ use Config;
 
 BEGIN {
   unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
-    # unless we are testing DDI
+    # Unless we are testing DDI
     #$Data::Dumper::Interp::Foldwidth = undef; # use terminal width
     $Data::Dumper::Interp::Useqq = "controlpics:unicode";
   }
@@ -290,7 +290,7 @@ warn "============= DUMP OF -$1$2 FILE ===========\n", "".scalar($tf->slurp_utf8
     }
     for (my $ix=0; $ix <= $#perlargs; $ix++) {
       for ($perlargs[$ix]) {
-        if (/^-\*[Ee]/) { oops "unhandled perl arg" }
+        if (/^-[eE]/ or /^-[^-CIM].*[Ee]/) { oops "unhandled perl arg '$_'" }
         s/"/\\"/g;
         if (/[\s\/"']/) {
           $_ = '"' . $_ . '"';

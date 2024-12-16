@@ -4,7 +4,7 @@ use true;
 use experimental qw( signatures );
 use stable qw( postderef );
 
-package Data::Section::Pluggable 0.02 {
+package Data::Section::Pluggable 0.03 {
 
     # ABSTRACT: Read structured data from __DATA__
 
@@ -186,7 +186,7 @@ Data::Section::Pluggable - Read structured data from __DATA__
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

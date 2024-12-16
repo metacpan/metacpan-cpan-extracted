@@ -1,5 +1,8 @@
 Revision history for Data-Section-Writer
 
+0.04      2024-12-15 20:35:06 -0700
+  - I somehow forgot how to write POD and had to fix some (gh#5)
+
 0.03      2024-12-14 18:14:10 -0700
   - Corrected merge errors in 0.02
 

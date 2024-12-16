@@ -24,7 +24,7 @@ use DateTime::Format::ISO8601;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 use parent 'Data::URIID::Base';
 
@@ -677,11 +677,22 @@ sub _extra_lookup_services {
             qw(uuid oid uri),                               # ISE,
             keys %{_own_well_known()},
         ],
+        'Data::Identifier'      => [
+            qw(uuid oid uri),                               # ISE,
+            keys %{_own_well_known()},
+        ],
         'factgrid'              => [values(%{$config_factgrid->{idmap}}), qw(factgrid-identifier)],
         'doi'                   => [qw(doi)],
         'iconclass'             => ['iconclass-identifier'],
         'xkcd'                  => ['xkcd-num'],
+        'e621'                  => ['e621-post-identifier'],
     }
+}
+
+sub _extra_lookup_services_digests {
+    return {
+        'e621'                  => ['md-5-128'],
+    };
 }
 
 # Private helper:
@@ -797,6 +808,43 @@ sub _offline_lookup__Data__URIID {
 
         foreach my $id_type (keys %{$ids//{}}) {
             $ids{$id_type} //= $ids->{$id_type};
+        }
+    }
+
+    {
+        my %res;
+        $res{id} = \%ids if scalar keys %ids;
+        $res{attributes} = \%attr if scalar keys %attr;
+        return \%res;
+    }
+}
+
+sub _offline_lookup__Data__Identifier {
+    my ($self, $result) = @_;
+    my $ise_order = $result->{primary}{ise_order} // [qw(uuid oid uri)];
+    my %attr;
+    my %ids;
+
+    foreach my $id (
+        map {
+            eval {$result->id($_, as => 'Data::Identifier', _no_convert => 1)}
+        } (
+            $result->{primary}{type},
+            @{$ise_order},
+        )) {
+
+        next unless defined $id;
+
+        if (defined(my $displayname = $id->displayname(default => undef, no_defaults => 1))) {
+            $attr{displayname} //= {'*' => $displayname};
+        }
+
+        foreach my $type (qw(uuid oid uri sid)) {
+            my $func = $id->can($type);
+
+            if (defined(my $value = $id->$func(default => undef))) {
+                $ids{$type eq 'sid' ? 'small-identifier' : $type} //= $value;
+            }
         }
     }
 
@@ -1164,6 +1212,30 @@ sub _online_lookup__iconclass {
     return \%res;
 }
 
+sub _online_lookup__e621 {
+    my ($self, $result, %opts) = @_;
+    my $json = $self->_get_json($result->url(service => 'e621', action => 'metadata')) // return undef;
+    my %ids;
+    my %attr;
+    my %digest;
+    my %res = (id => \%ids, attributes => \%attr, digest => \%digest);
+
+    return undef unless scalar(@{$json->{posts}}) == 1;
+
+    foreach my $post (@{$json->{posts}}) {
+        my $preview = $post->{preview};
+        my $file = $post->{file};
+
+        $ids{'e621-post-identifier'} = int($post->{id});
+        $attr{ext}              = {'*' => $file->{ext}}     if defined $file->{ext};
+        $attr{final_file_size}  = {'*' => $file->{size}}    if defined $file->{size};
+        $attr{thumbnail}        = {'*' => $preview->{url}}  if defined $preview->{url};
+        $digest{'md-5-128'}     = $file->{md5}              if defined $file->{md5};
+    }
+
+    return \%res;
+}
+
 # --- Overrides for Data::URIID::Base ---
 
 sub displayname {
@@ -1185,7 +1257,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 

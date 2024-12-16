@@ -1,7 +1,8 @@
-# License: Public Domain or CC0
-# See https://creativecommons.org/publicdomain/zero/1.0/
-# The author, Jim Avera (jim.avera at gmail) has waived all copyright and
-# related or neighboring rights.  Attribution is requested but is not required.
+# License: http://creativecommons.org/publicdomain/zero/1.0/
+# (CC0 or Public Domain).  To the extent possible under law, the author,
+# Jim Avera (email jim.avera at gmail) has waived all copyright and
+# related or neighboring rights to this document.
+# Attribution is requested but not required.
 
 # Pod documentation is below (use perldoc to view)
 
@@ -15,8 +16,8 @@ package Spreadsheet::Edit;
 # Allow "use <thismodule> <someversion>;" in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
 
-our $VERSION = '1000.021'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-11-25'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.023'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-15'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # FIXME: cmd_nesting does nothing except prefix >s to log messages.
 #        Shouldn't it skip that many "public" call frames???
@@ -401,7 +402,7 @@ sub __fmt_colspec_cx($$) {
 }
 sub __fmt_cx($) {
   my ($cx) = @_;
-  defined($cx) ? "cx $cx=".cx2let($cx) : "(undefined)"
+  defined($cx) ? "col ".cx2let($cx)." (cx $cx)" : "(undefined)"
 }
 
 # Format %colx keys "intelligently".  cx values are not shown for keys which are
@@ -1494,7 +1495,7 @@ sub _apply_to_rows($$$;$$$) {
     unless ref($code) eq "CODE";
   foreach (@$cxlist) {
     if ($_ < 0 || $_ >= $num_cols) {
-      croak $self->_methmsg("cx $_ is out of range")
+      croak $self->_methmsg(__fmt_cx($_)." is out of range")
     }
   }
 
@@ -1700,7 +1701,7 @@ sub _specs2cxdesclist {
         # Note: We can't use /s here!  The regex compiler has already
         # encapsulated /s or lack thereof in the compiled regex
         if ($title =~ /$spec/) {
-          push @results, [$cx, "cx $cx: regex matched title '$title'"];
+          push @results, [$cx, __fmt_cx($cx).": regex matched title '$title'"];
           $matched++;
         }
       }
@@ -3296,12 +3297,12 @@ Spreadsheet::Edit - Slice and dice spreadsheets, optionally using tied variables
   our ($Foo, $Bar, $Income);
 
   read_spreadsheet "file1.csv";
-  tie_column_vars;              # tie all vars that ever become valid
+  tie_column_vars ':all';       # tie all vars that ever become valid
 
   my $s1 = sheet undef ;        # Save ref to current sheet & forget it
 
   read_spreadsheet "file2.csv"; # Auto-creates sheet bc current is undef
-  tie_column_vars;
+  tie_column_vars ':all';
 
   my $s2 = sheet ;              # Save ref to second sheet
 
@@ -3559,7 +3560,7 @@ Forget alias(es).  Any masked COLSPECs become usable again.
 
 =head2 tie_column_vars VARNAME, ...
 
-Create tied package variables (scalars) for use during C<apply>.
+Create tied package global variables (scalars) for use during C<apply>.
 
 Each variable corresponds to a column, and reading or writing
 it accesses the corresponding cell in the row being visited during C<apply>.

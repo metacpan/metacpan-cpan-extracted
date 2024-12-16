@@ -3,16 +3,11 @@ package TestBridge;
 use strict;
 use warnings;
 use lib 't/lib';
+use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use Test::More 0.88;
 use SubtestCompat;
 use TestUtils;
 use TestML::Tiny;
-
-BEGIN {
-    $|  = 1;
-    binmode(Test::More->builder->$_, ":utf8")
-        for qw/output failure_output todo_output/;
-}
 
 use CPAN::Meta::YAML;
 
@@ -352,11 +347,13 @@ sub test_code_point {
         my $data = { chr($code) => chr($code) };
         my $dump = CPAN::Meta::YAML::Dump($data);
         $dump =~ s/^---\n//;
-        is $dump, $yaml, "Dump key and value of code point char $code";
+        ok($dump eq $yaml or "'$dump'" eq $yaml,
+            "Dump key and value of code point char $code");
 
         my $yny = CPAN::Meta::YAML::Dump(CPAN::Meta::YAML::Load($yaml));
         $yny =~ s/^---\n//;
-        is $yny, $yaml, "YAML for code point $code YNY roundtrips";
+        ok($yny eq $yaml or "'$yny'" eq $yaml,
+            "YAML for code point $code YNY roundtrips");
 
         my $nyn = CPAN::Meta::YAML::Load(CPAN::Meta::YAML::Dump($data));
         cmp_deeply( $nyn, $data, "YAML for code point $code NYN roundtrips" );

@@ -3,7 +3,7 @@ use 5.020;
 use true;
 use experimental qw( signatures );
 
-package Data::Section::Pluggable::Plugin::Json 0.02 {
+package Data::Section::Pluggable::Plugin::Json 0.03 {
 
     # ABSTRACT: Data::Section::Pluggable Plugin for JSON
 
@@ -25,7 +25,7 @@ package Data::Section::Pluggable::Plugin::Json 0.02 {
     }
 
     sub format_content ($class, $dsw, $content) {
-        JSON::MaybeXS::encode_json($content);
+        JSON::MaybeXS->new->pretty->canonical->encode($content);
     }
 }
 
@@ -41,7 +41,7 @@ Data::Section::Pluggable::Plugin::Json - Data::Section::Pluggable Plugin for JSO
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

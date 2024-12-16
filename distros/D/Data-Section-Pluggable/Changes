@@ -1,5 +1,9 @@
 Revision history for Data-Section-Pluggable
 
+0.03      2024-12-15 08:05:51 -0700
+  - Alter Data::Section::Pluggable::Plugin::Json to use pretty mode when invoked via
+    Data::Section::Writer (gh#5)
+
 0.02      2024-12-14 18:20:03 -0700
   - Added support for Data::Section::Pluggable::FormatContentPlugin if installed (gh#4)
   - Some documentation fixes (gh#4)

@@ -10,7 +10,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.162',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.164',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -34,7 +34,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::Spelling' => '0.12'
+                                      'Test::Spelling' => '0.17'
                                     }
                     },
        'runtime' => {

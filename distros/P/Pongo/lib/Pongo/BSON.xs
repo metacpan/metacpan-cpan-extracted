@@ -12,6 +12,7 @@ PROTOTYPES: DISABLE
 TYPEMAP : <<HERE
 
 bson_t * T_PTROBJ
+char ** T_PTROBJ
 const bson_t * T_PTROBJ
 bson_subtype_t T_PTROBJ
 const uint8_t * T_PTROBJ
@@ -67,22 +68,26 @@ HERE
 bool
 append_array(bson, key, key_length, array)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    const bson_t *array;
+    SV *array;
     CODE:
-        RETVAL = bson_append_array(bson, key, key_length, array);
+        const char *bson_key = SvPV_nolen(key);
+        const bson_t *bson_array = (const bson_t*) SvIV(SvRV(array));
+        RETVAL = bson_append_array(bson, bson_key, key_length, bson_array);
     OUTPUT:
         RETVAL
 
 bool
 append_array_begin(bson, key, key_length, child)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    bson_t *child;
+    SV *child;
     CODE:
-        RETVAL = bson_append_array_begin(bson, key, key_length, child);
+        const char *bson_key = SvPV_nolen(key);
+        bson_t *bson_child = (bson_t*) SvIV(SvRV(child));
+        RETVAL = bson_append_array_begin(bson, bson_key, key_length, bson_child);
     OUTPUT:
         RETVAL
 
@@ -98,511 +103,587 @@ append_array_end(bson, child)
 bool
 append_binary(bson, key, key_length, subtype, binary, length)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    bson_subtype_t subtype;
-    const uint8_t *binary;
+    int subtype;
+    SV *binary;
     uint32_t length;
     CODE:
-        RETVAL = bson_append_binary(bson, key, key_length, subtype, binary, length);
+        const char *bson_key = SvPV_nolen(key);
+        const uint8_t *bson_binary = (const uint8_t*) SvPV_nolen(binary);
+        RETVAL = bson_append_binary(bson, bson_key, key_length, (bson_subtype_t)subtype, bson_binary, length);
     OUTPUT:
         RETVAL
 
 bool
 append_bool(bson, key, key_length, value)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    bool value;
+    SV *value;
     CODE:
-        RETVAL = bson_append_bool(bson, key, key_length, value);
+        const char *bson_key = SvPV_nolen(key);
+        bool bson_value = SvTRUE(value);
+        RETVAL = bson_append_bool(bson, bson_key, key_length, bson_value);
     OUTPUT:
         RETVAL
 
 bool
 append_code(bson, key, key_length, javascript)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    const char *javascript;
+    SV *javascript;
     CODE:
-        RETVAL = bson_append_code(bson, key, key_length, javascript);
+        const char *bson_key = SvPV_nolen(key);
+        const char *bson_javascript = SvPV_nolen(javascript);
+        RETVAL = bson_append_code(bson, bson_key, key_length, bson_javascript);
     OUTPUT:
         RETVAL
 
 bool
 append_code_with_scope(bson, key, key_length, javascript, scope)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    const char *javascript;
-    const bson_t *scope;
+    SV *javascript;
+    SV *scope;
     CODE:
-        RETVAL = bson_append_code_with_scope(bson, key, key_length, javascript, scope);
+        const char *bson_key = SvPV_nolen(key);
+        const char *bson_javascript = SvPV_nolen(javascript);
+        const bson_t *bson_scope = (const bson_t*) SvIV(SvRV(scope));
+        RETVAL = bson_append_code_with_scope(bson, bson_key, key_length, bson_javascript, bson_scope);
     OUTPUT:
         RETVAL
 
 bool
 append_date_time(bson, key, key_length, value)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    int64_t value;
+    SV *value;
     CODE:
-        RETVAL = bson_append_date_time(bson, key, key_length, value);
+        const char *bson_key = SvPV_nolen(key);
+        int64_t bson_value = SvIV(value);
+        RETVAL = bson_append_date_time(bson, bson_key, key_length, bson_value);
     OUTPUT:
         RETVAL
 
 bool
 append_dbpointer(bson, key, key_length, collection, oid)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    const char *collection;
-    const bson_oid_t *oid;
+    SV *collection;
+    SV *oid;
     CODE:
-        RETVAL = bson_append_dbpointer(bson, key, key_length, collection, oid);
+        const char *bson_key = SvPV_nolen(key);
+        const char *bson_collection = SvPV_nolen(collection);
+        const bson_oid_t *bson_oid = (const bson_oid_t*) SvIV(SvRV(oid));
+        RETVAL = bson_append_dbpointer(bson, bson_key, key_length, bson_collection, bson_oid);
     OUTPUT:
         RETVAL
 
 bool
 append_decimal128(bson, key, key_length, value)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    const bson_decimal128_t *value;
+    SV *value;
     CODE:
-        RETVAL = bson_append_decimal128(bson, key, key_length, value);
+        const char *bson_key = SvPV_nolen(key);
+        const bson_decimal128_t *bson_value = (const bson_decimal128_t*) SvIV(SvRV(value));
+        RETVAL = bson_append_decimal128(bson, bson_key, key_length, bson_value);
     OUTPUT:
         RETVAL
 
 bool
 append_document(bson, key, key_length, value)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    const bson_t *value;
+    SV *value;
     CODE:
-        RETVAL = bson_append_document(bson, key, key_length, value);
+        const char *bson_key = SvPV_nolen(key);
+        const bson_t *bson_value = (const bson_t*) SvIV(SvRV(value));
+        RETVAL = bson_append_document(bson, bson_key, key_length, bson_value);
     OUTPUT:
         RETVAL
 
 bool
 append_document_begin(bson, key, key_length, child)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    bson_t *child;
+    SV *child;
     CODE:
-        RETVAL = bson_append_document_begin(bson, key, key_length, child);
+        const char *bson_key = SvPV_nolen(key);
+        bson_t *bson_child = (bson_t*) SvIV(SvRV(child));
+        RETVAL = bson_append_document_begin(bson, bson_key, key_length, bson_child);
     OUTPUT:
         RETVAL
 
 bool
 append_document_end(bson, child)
     bson_t *bson;
-    bson_t *child;
+    SV *child;
     CODE:
-        RETVAL = bson_append_document_end(bson, child);
+        bson_t *bson_child = (bson_t*) SvIV(SvRV(child));
+        RETVAL = bson_append_document_end(bson, bson_child);
     OUTPUT:
         RETVAL
 
 bool
 append_double(bson, key, key_length, value)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    double value;
+    SV *value;
     CODE:
-        RETVAL = bson_append_double(bson, key, key_length, value);
+        const char *bson_key = SvPV_nolen(key);
+        double bson_value = SvNV(value);
+        RETVAL = bson_append_double(bson, bson_key, key_length, bson_value);
     OUTPUT:
         RETVAL
 
 bool
 append_int32(bson, key, key_length, value)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    int32_t value;
+    SV *value;
     CODE:
-        RETVAL = bson_append_int32(bson, key, key_length, value);
+        const char *bson_key = SvPV_nolen(key);
+        int32_t bson_value = SvIV(value);
+        RETVAL = bson_append_int32(bson, bson_key, key_length, bson_value);
     OUTPUT:
         RETVAL
 
 bool
 append_int64(bson, key, key_length, value)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    int64_t value;
+    SV *value;
     CODE:
-        RETVAL = bson_append_int64(bson, key, key_length, value);
+        const char *bson_key = SvPV_nolen(key);
+        int64_t bson_value = SvIV(value);
+        RETVAL = bson_append_int64(bson, bson_key, key_length, bson_value);
     OUTPUT:
         RETVAL
 
 bool
 append_iter(bson, key, key_length, iter)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_append_iter(bson, key, key_length, iter);
+        const char *bson_key = SvPV_nolen(key);
+        const bson_iter_t *bson_iter = (const bson_iter_t*) SvIV(SvRV(iter));
+        RETVAL = bson_append_iter(bson, bson_key, key_length, bson_iter);
     OUTPUT:
         RETVAL
 
 bool
 append_maxkey(bson, key, key_length)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
     CODE:
-        RETVAL = bson_append_maxkey(bson, key, key_length);
+        const char *bson_key = SvPV_nolen(key);
+        RETVAL = bson_append_maxkey(bson, bson_key, key_length);
     OUTPUT:
         RETVAL
 
 bool
 append_minkey(bson, key, key_length)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
     CODE:
-        RETVAL = bson_append_minkey(bson, key, key_length);
+        const char *bson_key = SvPV_nolen(key);
+        RETVAL = bson_append_minkey(bson, bson_key, key_length);
     OUTPUT:
         RETVAL
 
 bool
 append_now_utc(bson, key, key_length)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
     CODE:
-        RETVAL = bson_append_now_utc(bson, key, key_length);
+        const char *bson_key = SvPV_nolen(key);
+        RETVAL = bson_append_now_utc(bson, bson_key, key_length);
     OUTPUT:
         RETVAL
 
 bool
 append_null(bson, key, key_length)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
     CODE:
-        RETVAL = bson_append_null(bson, key, key_length);
+        const char *bson_key = SvPV_nolen(key);
+        RETVAL = bson_append_null(bson, bson_key, key_length);
     OUTPUT:
         RETVAL
 
 bool
 append_oid(bson, key, key_length, oid)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    const bson_oid_t *oid;
+    SV *oid;
     CODE:
-        RETVAL = bson_append_oid(bson, key, key_length, oid);
+        const char *bson_key = SvPV_nolen(key);
+        const bson_oid_t *bson_oid = (const bson_oid_t*) SvIV(SvRV(oid));
+        RETVAL = bson_append_oid(bson, bson_key, key_length, bson_oid);
     OUTPUT:
         RETVAL
 
 bool
 append_regex(bson, key, key_length, regex, options)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    const char *regex;
-    const char *options;
+    SV *regex;
+    SV *options;
     CODE:
-        RETVAL = bson_append_regex(bson, key, key_length, regex, options);
+        const char *bson_key = SvPV_nolen(key);
+        const char *bson_regex = SvPV_nolen(regex);
+        const char *bson_options = SvPV_nolen(options);
+        RETVAL = bson_append_regex(bson, bson_key, key_length, bson_regex, bson_options);
     OUTPUT:
         RETVAL
 
 bool
 append_regex_w_len(bson, key, key_length, regex, regex_length, options)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    const char *regex;
+    SV *regex;
     int regex_length;
-    const char *options;
+    SV *options;
     CODE:
-        RETVAL = bson_append_regex_w_len(bson, key, key_length, regex, regex_length, options);
+        const char *bson_key = SvPV_nolen(key);
+        const char *bson_regex = SvPV_nolen(regex);
+        const char *bson_options = SvPV_nolen(options);
+        RETVAL = bson_append_regex_w_len(bson, bson_key, key_length, bson_regex, regex_length, bson_options);
     OUTPUT:
         RETVAL
 
 bool
 append_symbol(bson, key, key_length, value, length)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    const char *value;
+    SV *value;
     int length;
     CODE:
-        RETVAL = bson_append_symbol(bson, key, key_length, value, length);
+        const char *bson_key = SvPV_nolen(key);
+        const char *bson_value = SvPV_nolen(value);
+        RETVAL = bson_append_symbol(bson, bson_key, key_length, bson_value, length);
     OUTPUT:
         RETVAL
 
 bool
 append_time_t(bson, key, key_length, value)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    time_t value;
+    SV *value;
     CODE:
-        RETVAL = bson_append_time_t(bson, key, key_length, value);
+        const char *bson_key = SvPV_nolen(key);
+        time_t bson_value = SvIV(value);
+        RETVAL = bson_append_time_t(bson, bson_key, key_length, bson_value);
     OUTPUT:
         RETVAL
 
 bool
 append_timestamp(bson, key, key_length, timestamp, increment)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    uint32_t timestamp;
-    uint32_t increment;
+    SV *timestamp;
+    SV *increment;
     CODE:
-        RETVAL = bson_append_timestamp(bson, key, key_length, timestamp, increment);
+        const char *bson_key = SvPV_nolen(key);
+        uint32_t bson_timestamp = SvUV(timestamp);
+        uint32_t bson_increment = SvUV(increment);
+        RETVAL = bson_append_timestamp(bson, bson_key, key_length, bson_timestamp, bson_increment);
     OUTPUT:
         RETVAL
 
 bool
 append_timeval(bson, key, key_length, value)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    struct timeval *value;
+    SV *value;
     CODE:
-        RETVAL = bson_append_timeval(bson, key, key_length, value);
+        const char *bson_key = SvPV_nolen(key);
+        struct timeval *bson_value = (struct timeval*) SvIV(value);
+        RETVAL = bson_append_timeval(bson, bson_key, key_length, bson_value);
     OUTPUT:
         RETVAL
 
 bool
 append_undefined(bson, key, key_length)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
     CODE:
-        RETVAL = bson_append_undefined(bson, key, key_length);
+        const char *bson_key = SvPV_nolen(key);
+        RETVAL = bson_append_undefined(bson, bson_key, key_length);
     OUTPUT:
         RETVAL
 
 bool
 append_utf8(bson, key, key_length, value, length)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    const char *value;
+    SV *value;
     int length;
     CODE:
-        RETVAL = bson_append_utf8(bson, key, key_length, value, length);
+        const char *bson_key = SvPV_nolen(key);
+        const char *bson_value = SvPV_nolen(value);
+        RETVAL = bson_append_utf8(bson, bson_key, key_length, bson_value, length);
     OUTPUT:
         RETVAL
 
 bool
 append_value(bson, key, key_length, value)
     bson_t *bson;
-    const char *key;
+    SV *key;
     int key_length;
-    const bson_value_t *value;
+    SV *value;
     CODE:
-        RETVAL = bson_append_value(bson, key, key_length, value);
+        const char *bson_key = SvPV_nolen(key);
+        const bson_value_t *bson_value = (bson_value_t*) SvPV_nolen(value);
+        RETVAL = bson_append_value(bson, bson_key, key_length, bson_value);
     OUTPUT:
         RETVAL
 
 char *
 array_as_canonical_extended_json(bson, length)
-    const bson_t *bson;
-    size_t *length;
+    SV *bson;
+    SV *length;
     CODE:
-        RETVAL = bson_as_canonical_extended_json(bson, length);
+        size_t len = 0;
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        RETVAL = bson_as_canonical_extended_json(bson_ptr, &len);
+        sv_setiv(length, (IV)len);
     OUTPUT:
         RETVAL
 
 char *
 array_as_json(bson, length)
-    const bson_t *bson;
-    size_t *length;
+    SV *bson;
+    SV *length;
     CODE:
-        RETVAL = bson_as_json(bson, length);
-    OUTPUT:
-        RETVAL
-
-char *
-array_as_legacy_extended_json(bson, length)
-    const bson_t *bson;
-    size_t *length;
-    CODE:
-        RETVAL = bson_as_legacy_extended_json(bson, length);
+        size_t len = 0;
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        RETVAL = bson_as_json(bson_ptr, &len);
+        sv_setiv(length, (IV)len);
     OUTPUT:
         RETVAL
 
 char *
 array_as_relaxed_extended_json(bson, length)
-    const bson_t *bson;
-    size_t *length;
+    SV *bson;
+    SV *length;
     CODE:
-        RETVAL = bson_as_relaxed_extended_json(bson, length);
+        size_t len = 0;
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        RETVAL = bson_as_relaxed_extended_json(bson_ptr, &len);
+        sv_setiv(length, (IV)len);
     OUTPUT:
         RETVAL
 
 char *
 as_canonical_extended_json(bson, length)
-    const bson_t *bson;
-    size_t *length;
+    SV *bson;
+    SV *length;
     CODE:
-        RETVAL = bson_as_canonical_extended_json(bson, length);
+        size_t len = 0;
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        RETVAL = bson_as_canonical_extended_json(bson_ptr, &len);
+        sv_setiv(length, (IV)len);
     OUTPUT:
         RETVAL
 
 char *
 as_json(bson, length)
-    const bson_t *bson;
-    size_t *length;
+    SV *bson;
+    SV *length;
     CODE:
-        RETVAL = bson_as_json(bson, length);
+        size_t len = 0;
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        RETVAL = bson_as_json(bson_ptr, &len);
+        sv_setiv(length, (IV)len);
     OUTPUT:
         RETVAL
 
 char *
 as_json_with_opts(bson, length, opts)
-    const bson_t *bson;
-    size_t *length;
-    const bson_json_opts_t *opts;
+    SV *bson;
+    SV *length;
+    SV *opts;
     CODE:
-        RETVAL = bson_as_json_with_opts(bson, length, opts);
-    OUTPUT:
-        RETVAL
-
-char *
-as_legacy_extended_json(bson, length)
-    const bson_t *bson;
-    size_t *length;
-    CODE:
-        RETVAL = bson_as_legacy_extended_json(bson, length);
+        size_t len = 0;
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        const bson_json_opts_t *opts_ptr = (const bson_json_opts_t*)SvPV_nolen(opts);
+        RETVAL = bson_as_json_with_opts(bson_ptr, &len, opts_ptr);
+        sv_setiv(length, (IV)len);
     OUTPUT:
         RETVAL
 
 char *
 as_relaxed_extended_json(bson, length)
-    const bson_t *bson;
-    size_t *length;
+    SV *bson;
+    SV *length;
     CODE:
-        RETVAL = bson_as_relaxed_extended_json(bson, length);
+        size_t len = 0;
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        RETVAL = bson_as_relaxed_extended_json(bson_ptr, &len);
+        sv_setiv(length, (IV)len);
     OUTPUT:
         RETVAL
 
 int
 compare(bson, other)
-    const bson_t *bson;
-    const bson_t *other;
+    SV *bson;
+    SV *other;
     CODE:
-        RETVAL = bson_compare(bson, other);
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        const bson_t *other_ptr = (const bson_t*)SvPV_nolen(other);
+        RETVAL = bson_compare(bson_ptr, other_ptr);
     OUTPUT:
         RETVAL
 
 bool
 concat(dst, src)
     bson_t *dst;
-    const bson_t *src;
+    SV *src;
     CODE:
-        RETVAL = bson_concat(dst, src);
+        const bson_t *src_ptr = (const bson_t*)SvPV_nolen(src);
+        RETVAL = bson_concat(dst, src_ptr);
     OUTPUT:
         RETVAL
 
 bson_t *
 copy(bson)
-    const bson_t *bson;
+    SV *bson;
     CODE:
-        RETVAL = bson_copy(bson);
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        RETVAL = bson_copy(bson_ptr);
     OUTPUT:
         RETVAL
 
 void
 copy_to(src, dst)
-    const bson_t *src;
+    SV *src;
     bson_t *dst;
     CODE:
-        bson_copy_to(src, dst);
+        const bson_t *src_ptr = (const bson_t*)SvPV_nolen(src);
+        bson_copy_to(src_ptr, dst);
 
 void
 copy_to_excluding_noinit(src, dst, first_exclude)
-    const bson_t *src;
+    SV *src;
     bson_t *dst;
     const char *first_exclude;
     CODE:
-        bson_copy_to_excluding_noinit(src, dst, first_exclude, NULL);
+        const bson_t *src_ptr = (const bson_t*)SvPV_nolen(src);
+        bson_copy_to_excluding_noinit(src_ptr, dst, first_exclude, NULL);
 
 uint32_t
 count_keys(bson)
-    const bson_t *bson;
+    SV *bson;
     CODE:
-        RETVAL = bson_count_keys(bson);
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        RETVAL = bson_count_keys(bson_ptr);
     OUTPUT:
         RETVAL
 
 void
 destroy(bson)
-    bson_t *bson;
+    SV *bson;
     CODE:
-        bson_destroy(bson);
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        bson_destroy(bson_ptr);
 
 uint8_t *
 destroy_with_steal(bson, steal, length)
-    bson_t *bson;
+    SV *bson;
     bool steal;
     uint32_t *length;
     CODE:
-        RETVAL = bson_destroy_with_steal(bson, steal, length);
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        RETVAL = bson_destroy_with_steal(bson_ptr, steal, length);
     OUTPUT:
         RETVAL
 
 bool
 equal(bson, other)
-    const bson_t *bson;
-    const bson_t *other;
+    SV *bson;
+    SV *other;
     CODE:
-        RETVAL = bson_equal(bson, other);
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        const bson_t *other_ptr = (const bson_t*)SvPV_nolen(other);
+        RETVAL = bson_equal(bson_ptr, other_ptr);
     OUTPUT:
         RETVAL
 
 const uint8_t *
 get_data(bson)
-    const bson_t *bson;
+    SV *bson;
     CODE:
-        RETVAL = bson_get_data(bson);
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        RETVAL = bson_get_data(bson_ptr);
     OUTPUT:
         RETVAL
 
 bool
 has_field(bson, key)
-    const bson_t *bson;
+    SV *bson;
     const char *key;
     CODE:
-        RETVAL = bson_has_field(bson, key);
+        const bson_t *bson_ptr = (const bson_t*)SvPV_nolen(bson);
+        RETVAL = bson_has_field(bson_ptr, key);
     OUTPUT:
         RETVAL
 
 void
 init(b)
-    bson_t *b;
+    SV *b;
     CODE:
-        bson_init(b);
+        bson_t *bson_ptr = (bson_t*)SvPV_nolen(b);
+        bson_init(bson_ptr);
 
 bool
 init_from_json(b, data, len, error)
-    bson_t *b;
+    SV *b;
     const char *data;
     ssize_t len;
-    bson_error_t *error;
+    SV *error;
     CODE:
-        RETVAL = bson_init_from_json(b, data, len, error);
+        bson_t *bson_ptr = (bson_t*)SvPV_nolen(b);
+        bson_error_t *error_ptr = (bson_error_t*)SvPV_nolen(error);
+        RETVAL = bson_init_from_json(bson_ptr, data, len, error_ptr);
     OUTPUT:
         RETVAL
 
 bool
 init_static(b, data, length)
-    bson_t *b;
+    SV *b;
     const uint8_t *data;
     size_t length;
     CODE:
-        RETVAL = bson_init_static(b, data, length);
+        bson_t *bson_ptr = (bson_t*)SvPV_nolen(b);
+        RETVAL = bson_init_static(bson_ptr, data, length);
     OUTPUT:
         RETVAL
 
@@ -617,9 +698,10 @@ json_opts_new(mode, max_len)
 
 void
 json_opts_destroy(opts)
-    bson_json_opts_t *opts;
+    SV *opts;
     CODE:
-        bson_json_opts_destroy(opts);
+        bson_json_opts_t *opts_ptr = (bson_json_opts_t*)SvPV_nolen(opts);
+        bson_json_opts_destroy(opts_ptr);
 
 bson_t *
 new()
@@ -630,398 +712,487 @@ new()
 
 bson_t *
 new_from_buffer(buf, buf_len, realloc_func, realloc_func_ctx)
-    uint8_t **buf;
-    size_t *buf_len;
-    bson_realloc_func realloc_func;
-    void *realloc_func_ctx;
+    SV *buf;
+    SV *buf_len;
+    SV *realloc_func;
+    SV *realloc_func_ctx;
     CODE:
-        RETVAL = bson_new_from_buffer(buf, buf_len, realloc_func, realloc_func_ctx);
+        uint8_t *buf_ptr = (uint8_t*)SvPV_nolen(buf);
+        size_t buf_len_val = (size_t)SvIV(buf_len);
+        bson_realloc_func realloc_func_ptr = (bson_realloc_func)SvIV(realloc_func);
+        void *realloc_func_ctx_ptr = (void*)SvIV(realloc_func_ctx);
+        RETVAL = bson_new_from_buffer(&buf_ptr, &buf_len_val, realloc_func_ptr, realloc_func_ctx_ptr);
     OUTPUT:
         RETVAL
 
 bson_t *
 new_from_data(data, length)
-    const uint8_t *data;
-    size_t length;
+    SV *data;
+    SV *length;
     CODE:
-        RETVAL = bson_new_from_data(data, length);
+        uint8_t *data_ptr = (uint8_t*)SvPV_nolen(data);
+        size_t length_val = (size_t)SvIV(length);
+        RETVAL = bson_new_from_data(data_ptr, length_val);
     OUTPUT:
         RETVAL
 
 bson_t *
 new_from_json(data, len, error)
-    const uint8_t *data;
-    ssize_t len;
-    bson_error_t *error;
+    SV *data;
+    SV *len;
+    SV *error;
     CODE:
-        RETVAL = bson_new_from_json(data, len, error);
+        uint8_t *data_ptr = (uint8_t*)SvPV_nolen(data);
+        ssize_t len_val = (ssize_t)SvIV(len);
+        bson_error_t *error_ptr = (bson_error_t*)SvIV(error);
+        RETVAL = bson_new_from_json(data_ptr, len_val, error_ptr);
     OUTPUT:
         RETVAL
 
 void
 reinit(b)
-    bson_t *b;
+    SV *b;
     CODE:
-        bson_reinit(b);
+        bson_t *b_ptr = (bson_t*)SvIV(b);
+        bson_reinit(b_ptr);
 
 uint8_t *
 reserve_buffer(bson, size)
-    bson_t *bson;
-    uint32_t size;
+    SV *bson;
+    SV *size;
     CODE:
-        RETVAL = bson_reserve_buffer(bson, size);
+        bson_t *b_ptr = (bson_t*)SvIV(bson);
+        uint32_t size_val = (uint32_t)SvIV(size);
+        RETVAL = bson_reserve_buffer(b_ptr, size_val);
     OUTPUT:
         RETVAL
 
 bson_t *
 sized_new(size)
-    size_t size;
+    SV *size;
     CODE:
-        RETVAL = bson_sized_new(size);
+        size_t size_val = (size_t)SvIV(size);
+        RETVAL = bson_sized_new(size_val);
     OUTPUT:
         RETVAL
 
 bool
 steal(dst, src)
-    bson_t *dst;
-    bson_t *src;
+    SV *dst;
+    SV *src;
     CODE:
-        RETVAL = bson_steal(dst, src);
+        bson_t *dst_ptr = (bson_t*)SvIV(dst);
+        bson_t *src_ptr = (bson_t*)SvIV(src);
+        RETVAL = bson_steal(dst_ptr, src_ptr);
     OUTPUT:
         RETVAL
 
 bool
 validate(bson, flags, offset)
-    const bson_t *bson;
-    bson_validate_flags_t flags;
-    size_t *offset;
+    SV *bson;
+    SV *flags;
+    SV *offset;
     CODE:
-        RETVAL = bson_validate(bson, flags, offset);
+        bson_t *b_ptr = (bson_t*)SvIV(bson);
+        bson_validate_flags_t flags_val = (bson_validate_flags_t)SvIV(flags);
+        size_t *offset_ptr = (size_t*)SvIV(offset);
+        RETVAL = bson_validate(b_ptr, flags_val, offset_ptr);
     OUTPUT:
         RETVAL
 
 bool
 validate_with_error(bson, flags, error)
-    const bson_t *bson;
-    bson_validate_flags_t flags;
-    bson_error_t *error;
+    SV *bson;
+    SV *flags;
+    SV *error;
     CODE:
-        RETVAL = bson_validate_with_error(bson, flags, error);
+        bson_t *b_ptr = (bson_t*)SvIV(bson);
+        bson_validate_flags_t flags_val = (bson_validate_flags_t)SvIV(flags);
+        bson_error_t *error_ptr = (bson_error_t*)SvIV(error);
+        RETVAL = bson_validate_with_error(b_ptr, flags_val, error_ptr);
     OUTPUT:
         RETVAL
 
 bool
 validate_with_error_and_offset(bson, flags, offset, error)
-    const bson_t *bson;
-    bson_validate_flags_t flags;
-    size_t *offset;
-    bson_error_t *error;
+    SV *bson;
+    SV *flags;
+    SV *offset;
+    SV *error;
     CODE:
-        RETVAL = bson_validate_with_error_and_offset(bson, flags, offset, error);
+        bson_t *b_ptr = (bson_t*)SvIV(bson);
+        bson_validate_flags_t flags_val = (bson_validate_flags_t)SvIV(flags);
+        size_t *offset_ptr = (size_t*)SvIV(offset);
+        bson_error_t *error_ptr = (bson_error_t*)SvIV(error);
+        RETVAL = bson_validate_with_error_and_offset(b_ptr, flags_val, offset_ptr, error_ptr);
     OUTPUT:
         RETVAL
 
 bool
 append_array_builder_begin(bson, key, key_length, child)
-    bson_t *bson;
-    const char *key;
-    int key_length;
-    bson_array_builder_t **child;
+    SV *bson;
+    SV *key;
+    SV *key_length;
+    SV *child;
     CODE:
-        RETVAL = bson_append_array_builder_begin(bson, key, key_length, child);
+        bson_t *b_ptr = (bson_t*)SvIV(bson);
+        const char *key_str = SvPV(key, PL_na);
+        int key_length_val = (int)SvIV(key_length);
+        bson_array_builder_t **child_ptr = (bson_array_builder_t**)SvIV(child);
+        RETVAL = bson_append_array_builder_begin(b_ptr, key_str, key_length_val, child_ptr);
     OUTPUT:
         RETVAL
 
 bool
 append_array_builder_end(bson, child)
-    bson_t *bson;
-    bson_array_builder_t *child;
+    SV *bson;
+    SV *child;
     CODE:
-        RETVAL = bson_append_array_builder_end(bson, child);
+        bson_t *b_ptr = (bson_t*)SvIV(bson);
+        bson_array_builder_t *child_ptr = (bson_array_builder_t*)SvIV(child);
+        RETVAL = bson_append_array_builder_end(b_ptr, child_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_value(bab, value)
-    bson_array_builder_t *bab;
-    const bson_value_t *value;
+    SV *bab;
+    SV *value;
     CODE:
-        RETVAL = bson_array_builder_append_value(bab, value);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        const bson_value_t *value_ptr = (const bson_value_t*)SvIV(value);
+        RETVAL = bson_array_builder_append_value(bab_ptr, value_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_array(bab, array)
-    bson_array_builder_t *bab;
-    const bson_t *array;
+    SV *bab;
+    SV *array;
     CODE:
-        RETVAL = bson_array_builder_append_array(bab, array);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        const bson_t *array_ptr = (const bson_t*)SvIV(array);
+        RETVAL = bson_array_builder_append_array(bab_ptr, array_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_binary(bab, subtype, binary, length)
-    bson_array_builder_t *bab;
-    bson_subtype_t subtype;
-    const uint8_t *binary;
-    uint32_t length;
+    SV *bab;
+    SV *subtype;
+    SV *binary;
+    SV *length;
     CODE:
-        RETVAL = bson_array_builder_append_binary(bab, subtype, binary, length);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        bson_subtype_t subtype_val = (bson_subtype_t)SvIV(subtype);
+        const uint8_t *binary_ptr = (const uint8_t*)SvIV(binary);
+        uint32_t length_val = (uint32_t)SvIV(length);
+        RETVAL = bson_array_builder_append_binary(bab_ptr, subtype_val, binary_ptr, length_val);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_bool(bab, value)
-    bson_array_builder_t *bab;
-    bool value;
+    SV *bab;
+    SV *value;
     CODE:
-        RETVAL = bson_array_builder_append_bool(bab, value);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        bool value_val = (bool)SvIV(value);
+        RETVAL = bson_array_builder_append_bool(bab_ptr, value_val);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_code(bab, javascript)
-    bson_array_builder_t *bab;
-    const char *javascript;
+    SV *bab;
+    SV *javascript;
     CODE:
-        RETVAL = bson_array_builder_append_code(bab, javascript);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        const char *javascript_str = SvPV(javascript, PL_na);
+        RETVAL = bson_array_builder_append_code(bab_ptr, javascript_str);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_code_with_scope(bab, javascript, scope)
-    bson_array_builder_t *bab;
-    const char *javascript;
-    const bson_t *scope;
+    SV *bab;
+    SV *javascript;
+    SV *scope;
     CODE:
-        RETVAL = bson_array_builder_append_code_with_scope(bab, javascript, scope);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        const char *javascript_str = SvPV(javascript, PL_na);
+        const bson_t *scope_ptr = (const bson_t*)SvIV(scope);
+        RETVAL = bson_array_builder_append_code_with_scope(bab_ptr, javascript_str, scope_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_dbpointer(bab, collection, oid)
-    bson_array_builder_t *bab;
-    const char *collection;
-    const bson_oid_t *oid;
+    SV *bab;
+    SV *collection;
+    SV *oid;
     CODE:
-        RETVAL = bson_array_builder_append_dbpointer(bab, collection, oid);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        const char *collection_str = SvPV(collection, PL_na);
+        const bson_oid_t *oid_ptr = (const bson_oid_t*)SvIV(oid);
+        RETVAL = bson_array_builder_append_dbpointer(bab_ptr, collection_str, oid_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_double(bab, value)
-    bson_array_builder_t *bab;
+    SV *bab;
     double value;
     CODE:
-        RETVAL = bson_array_builder_append_double(bab, value);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        RETVAL = bson_array_builder_append_double(bab_ptr, value);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_document(bab, value)
-    bson_array_builder_t *bab;
-    const bson_t *value;
+    SV *bab;
+    SV *value;
     CODE:
-        RETVAL = bson_array_builder_append_document(bab, value);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        const bson_t *value_ptr = (const bson_t*)SvIV(value);
+        RETVAL = bson_array_builder_append_document(bab_ptr, value_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_document_begin(bab, child)
-    bson_array_builder_t *bab;
-    bson_t *child;
+    SV *bab;
+    SV *child;
     CODE:
-        RETVAL = bson_array_builder_append_document_begin(bab, child);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        bson_t *child_ptr = (bson_t*)SvIV(child);
+        RETVAL = bson_array_builder_append_document_begin(bab_ptr, child_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_document_end(bab, child)
-    bson_array_builder_t *bab;
-    bson_t *child;
+    SV *bab;
+    SV *child;
     CODE:
-        RETVAL = bson_array_builder_append_document_end(bab, child);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        bson_t *child_ptr = (bson_t*)SvIV(child);
+        RETVAL = bson_array_builder_append_document_end(bab_ptr, child_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_int32(bab, value)
-    bson_array_builder_t *bab;
+    SV *bab;
     int32_t value;
     CODE:
-        RETVAL = bson_array_builder_append_int32(bab, value);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        RETVAL = bson_array_builder_append_int32(bab_ptr, value);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_int64(bab, value)
-    bson_array_builder_t *bab;
+    SV *bab;
     int64_t value;
     CODE:
-        RETVAL = bson_array_builder_append_int64(bab, value);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        RETVAL = bson_array_builder_append_int64(bab_ptr, value);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_decimal128(bab, value)
-    bson_array_builder_t *bab;
-    const bson_decimal128_t *value;
+    SV *bab;
+    SV *value;
     CODE:
-        RETVAL = bson_array_builder_append_decimal128(bab, value);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        bson_decimal128_t *value_ptr = (bson_decimal128_t*)SvIV(value);
+        RETVAL = bson_array_builder_append_decimal128(bab_ptr, value_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_iter(bab, iter)
-    bson_array_builder_t *bab;
-    const bson_iter_t *iter;
+    SV *bab;
+    SV *iter;
     CODE:
-        RETVAL = bson_array_builder_append_iter(bab, iter);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        RETVAL = bson_array_builder_append_iter(bab_ptr, iter_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_minkey(bab)
-    bson_array_builder_t *bab;
+    SV *bab;
     CODE:
-        RETVAL = bson_array_builder_append_minkey(bab);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        RETVAL = bson_array_builder_append_minkey(bab_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_maxkey(bab)
-    bson_array_builder_t *bab;
+    SV *bab;
     CODE:
-        RETVAL = bson_array_builder_append_maxkey(bab);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        RETVAL = bson_array_builder_append_maxkey(bab_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_null(bab)
-    bson_array_builder_t *bab;
+    SV *bab;
     CODE:
-        RETVAL = bson_array_builder_append_null(bab);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        RETVAL = bson_array_builder_append_null(bab_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_oid(bab, oid)
-    bson_array_builder_t *bab;
-    const bson_oid_t *oid;
+    SV *bab;
+    SV *oid;
     CODE:
-        RETVAL = bson_array_builder_append_oid(bab, oid);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        bson_oid_t *oid_ptr = (bson_oid_t*)SvIV(oid);
+        RETVAL = bson_array_builder_append_oid(bab_ptr, oid_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_regex(bab, regex, options)
-    bson_array_builder_t *bab;
-    const char *regex;
-    const char *options;
+    SV *bab;
+    SV *regex;
+    SV *options;
     CODE:
-        RETVAL = bson_array_builder_append_regex(bab, regex, options);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        const char *regex_str = SvPV(regex, PL_na);
+        const char *options_str = SvPV(options, PL_na);
+        RETVAL = bson_array_builder_append_regex(bab_ptr, regex_str, options_str);
     OUTPUT:
         RETVAL
 
+
 bool
 array_builder_append_regex_w_len(bab, regex, regex_length, options)
-    bson_array_builder_t *bab;
-    const char *regex;
+    SV *bab;
+    SV *regex;
     int regex_length;
-    const char *options;
+    SV *options;
     CODE:
-        RETVAL = bson_array_builder_append_regex_w_len(bab, regex, regex_length, options);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        const char *regex_str = SvPV(regex, PL_na);
+        const char *options_str = SvPV(options, PL_na);
+        RETVAL = bson_array_builder_append_regex_w_len(bab_ptr, regex_str, regex_length, options_str);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_utf8(bab, value, length)
-    bson_array_builder_t *bab;
-    const char *value;
+    SV *bab;
+    SV *value;
     int length;
     CODE:
-        RETVAL = bson_array_builder_append_utf8(bab, value, length);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        const char *value_str = SvPV(value, PL_na);
+        RETVAL = bson_array_builder_append_utf8(bab_ptr, value_str, length);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_symbol(bab, value, length)
-    bson_array_builder_t *bab;
-    const char *value;
+    SV *bab;
+    SV *value;
     int length;
     CODE:
-        RETVAL = bson_array_builder_append_symbol(bab, value, length);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        const char *value_str = SvPV(value, PL_na);
+        RETVAL = bson_array_builder_append_symbol(bab_ptr, value_str, length);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_time_t(bab, value)
-    bson_array_builder_t *bab;
+    SV *bab;
     time_t value;
     CODE:
-        RETVAL = bson_array_builder_append_time_t(bab, value);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        RETVAL = bson_array_builder_append_time_t(bab_ptr, value);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_timeval(bab, value)
-    bson_array_builder_t *bab;
-    struct timeval *value;
+    SV *bab;
+    SV *value;
     CODE:
-        RETVAL = bson_array_builder_append_timeval(bab, value);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        struct timeval *value_ptr = (struct timeval*)SvIV(value);
+        RETVAL = bson_array_builder_append_timeval(bab_ptr, value_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_date_time(bab, value)
-    bson_array_builder_t *bab;
+    SV *bab;
     int64_t value;
     CODE:
-        RETVAL = bson_array_builder_append_date_time(bab, value);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        RETVAL = bson_array_builder_append_date_time(bab_ptr, value);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_now_utc(bab)
-    bson_array_builder_t *bab;
+    SV *bab;
     CODE:
-        RETVAL = bson_array_builder_append_now_utc(bab);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        RETVAL = bson_array_builder_append_now_utc(bab_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_timestamp(bab, timestamp, increment)
-    bson_array_builder_t *bab;
+    SV *bab;
     uint32_t timestamp;
     uint32_t increment;
     CODE:
-        RETVAL = bson_array_builder_append_timestamp(bab, timestamp, increment);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        RETVAL = bson_array_builder_append_timestamp(bab_ptr, timestamp, increment);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_undefined(bab)
-    bson_array_builder_t *bab;
+    SV *bab;
     CODE:
-        RETVAL = bson_array_builder_append_undefined(bab);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        RETVAL = bson_array_builder_append_undefined(bab_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_array_builder_begin(bab, child)
-    bson_array_builder_t *bab;
-    bson_array_builder_t **child;
+    SV *bab;
+    SV *child;
     CODE:
-        RETVAL = bson_array_builder_append_array_builder_begin(bab, child);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        bson_array_builder_t **child_ptr = (bson_array_builder_t**)SvIV(child);
+        RETVAL = bson_array_builder_append_array_builder_begin(bab_ptr, child_ptr);
     OUTPUT:
         RETVAL
 
 bool
 array_builder_append_array_builder_end(bab, child)
-    bson_array_builder_t *bab;
-    bson_array_builder_t **child;
+    SV *bab;
+    SV *child;
     CODE:
-        RETVAL = bson_array_builder_append_array_builder_end(bab, child);
+        bson_array_builder_t *bab_ptr = (bson_array_builder_t*)SvIV(bab);
+        bson_array_builder_t **child_ptr = (bson_array_builder_t**)SvIV(child);
+        RETVAL = bson_array_builder_append_array_builder_end(bab_ptr, child_ptr);
     OUTPUT:
         RETVAL
 
@@ -1042,481 +1213,600 @@ context_new(flags)
 
 void
 context_destroy(context)
-    bson_context_t *context;
+    SV *context;
     CODE:
-        bson_context_destroy(context);
+        bson_context_t *context_ptr = (bson_context_t*)SvIV(context);
+        bson_context_destroy(context_ptr);
 
 bool
 decimal128_from_string(string, dec)
-    const char *string;
-    bson_decimal128_t *dec;
+    SV *string;
+    SV *dec;
     CODE:
-        RETVAL = bson_decimal128_from_string(string, dec);
+        STRLEN len;
+        const char *str = SvPV(string, len);
+        bson_decimal128_t *dec_ptr = (bson_decimal128_t*)SvIV(dec);
+        RETVAL = bson_decimal128_from_string(str, dec_ptr);
     OUTPUT:
         RETVAL
 
 bool
 decimal128_from_string_w_len(string, len, dec)
-    const char *string;
+    SV *string;
     int len;
-    bson_decimal128_t *dec;
+    SV *dec;
     CODE:
-        RETVAL = bson_decimal128_from_string_w_len(string, len, dec);
+        STRLEN actual_len;
+        const char *str = SvPV(string, actual_len);
+        if (len > actual_len) len = actual_len;
+        bson_decimal128_t *dec_ptr = (bson_decimal128_t*)SvIV(dec);
+        RETVAL = bson_decimal128_from_string_w_len(str, len, dec_ptr);
     OUTPUT:
         RETVAL
 
 void
 decimal128_to_string(dec, str)
-    const bson_decimal128_t *dec;
-    char *str;
+    SV *dec;
+    SV *str;
     CODE:
-        bson_decimal128_to_string(dec, str);
+        char buffer[128];
+        bson_decimal128_t *dec_ptr = (bson_decimal128_t*)SvIV(dec);
+        bson_decimal128_to_string(dec_ptr, buffer);
+        sv_setpv(str, buffer);
 
 void
 set_error(error, domain, code, format, ...)
-    bson_error_t *error;
+    SV *error;
     uint32_t domain;
     uint32_t code;
     const char *format;
     CODE:
-        bson_set_error(error, domain, code, format);
+        bson_error_t *error_ptr = (bson_error_t*)SvIV(error);
+        bson_set_error(error_ptr, domain, code, format);
 
 char *
 strerror_r(err_code, buf, buflen)
     int err_code;
-    char *buf;
+    SV *buf;
     size_t buflen;
     CODE:
-        RETVAL = bson_strerror_r(err_code, buf, buflen);
+        char *buf_ptr = SvPV_nolen(buf);
+        RETVAL = bson_strerror_r(err_code, buf_ptr, buflen);
     OUTPUT:
         RETVAL
 
 void
 iter_array(iter, array_len, array)
-    const bson_iter_t *iter;
-    uint32_t *array_len;
-    const uint8_t **array;
+    SV *iter;
+    SV *array_len;
+    SV *array;
     CODE:
-        bson_iter_array(iter, array_len, array);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        uint32_t *len_ptr = (uint32_t*)SvIV(array_len);
+        const uint8_t **array_ptr = (const uint8_t**)SvIV(array);
+        bson_iter_array(iter_ptr, len_ptr, array_ptr);
 
 bool
 iter_as_bool(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_as_bool(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_as_bool(iter_ptr);
     OUTPUT:
         RETVAL
 
 double
 iter_as_double(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_as_double(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_as_double(iter_ptr);
     OUTPUT:
         RETVAL
 
 int64_t
 iter_as_int64(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_as_int64(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_as_int64(iter_ptr);
     OUTPUT:
         RETVAL
 
 void
 iter_binary(iter, subtype, binary_len, binary)
-    const bson_iter_t *iter;
-    bson_subtype_t *subtype;
-    uint32_t *binary_len;
-    const uint8_t **binary;
+    SV *iter;
+    SV *subtype;
+    SV *binary_len;
+    SV *binary;
     CODE:
-        bson_iter_binary(iter, subtype, binary_len, binary);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        bson_subtype_t *subtype_ptr = (bson_subtype_t*)SvIV(subtype);
+        uint32_t *binary_len_ptr = (uint32_t*)SvIV(binary_len);
+        const uint8_t **binary_ptr = (const uint8_t**)SvIV(binary);
+        bson_iter_binary(iter_ptr, subtype_ptr, binary_len_ptr, binary_ptr);
 
 bool
 iter_bool(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_bool(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_bool(iter_ptr);
     OUTPUT:
         RETVAL
 
 const char *
 iter_code(iter, length)
-    const bson_iter_t *iter;
-    uint32_t *length;
+    SV *iter;
+    SV *length;
     CODE:
-        RETVAL = bson_iter_code(iter, length);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        uint32_t *length_ptr = (uint32_t*)SvIV(length);
+        RETVAL = bson_iter_code(iter_ptr, length_ptr);
     OUTPUT:
         RETVAL
 
 const char *
 iter_codewscope(iter, length, scope_len, scope)
-    const bson_iter_t *iter;
-    uint32_t *length;
-    uint32_t *scope_len;
-    const uint8_t **scope;
+    SV *iter;
+    SV *length;
+    SV *scope_len;
+    SV *scope;
     CODE:
-        RETVAL = bson_iter_codewscope(iter, length, scope_len, scope);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        uint32_t *length_ptr = (uint32_t*)SvIV(length);
+        uint32_t *scope_len_ptr = (uint32_t*)SvIV(scope_len);
+        const uint8_t **scope_ptr = (const uint8_t**)SvIV(scope);
+        RETVAL = bson_iter_codewscope(iter_ptr, length_ptr, scope_len_ptr, scope_ptr);
     OUTPUT:
         RETVAL
 
 int64_t
 iter_date_time(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_date_time(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_date_time(iter_ptr);
     OUTPUT:
         RETVAL
 
 void
 iter_dbpointer(iter, collection_len, collection, oid)
-    const bson_iter_t *iter;
-    uint32_t *collection_len;
-    const char **collection;
-    const bson_oid_t **oid;
+    SV *iter;
+    SV *collection_len;
+    SV *collection;
+    SV *oid;
     CODE:
-        bson_iter_dbpointer(iter, collection_len, collection, oid);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        uint32_t *collection_len_ptr = (uint32_t*)SvIV(collection_len);
+        const char **collection_ptr = (const char**)SvIV(collection);
+        const bson_oid_t **oid_ptr = (const bson_oid_t**)SvIV(oid);
+        bson_iter_dbpointer(iter_ptr, collection_len_ptr, collection_ptr, oid_ptr);
 
 bool
 iter_decimal128(iter, dec)
-    const bson_iter_t *iter;
-    bson_decimal128_t *dec;
+    SV *iter;
+    SV *dec;
     CODE:
-        RETVAL = bson_iter_decimal128(iter, dec);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        bson_decimal128_t *dec_ptr = (bson_decimal128_t*)SvIV(dec);
+        RETVAL = bson_iter_decimal128(iter_ptr, dec_ptr);
     OUTPUT:
         RETVAL
 
 void
 iter_document(iter, document_len, document)
-    const bson_iter_t *iter;
-    uint32_t *document_len;
-    const uint8_t **document;
+    SV *iter;
+    SV *document_len;
+    SV *document;
     CODE:
-        bson_iter_document(iter, document_len, document);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        uint32_t *document_len_ptr = (uint32_t*)SvIV(document_len);
+        const uint8_t **document_ptr = (const uint8_t**)SvIV(document);
+        bson_iter_document(iter_ptr, document_len_ptr, document_ptr);
 
 double
 iter_double(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_double(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_double(iter_ptr);
     OUTPUT:
         RETVAL
 
 char *
 iter_dup_utf8(iter, length)
-    const bson_iter_t *iter;
-    uint32_t *length;
+    SV *iter;
+    SV *length;
     CODE:
-        RETVAL = bson_iter_dup_utf8(iter, length);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        uint32_t *length_ptr = (uint32_t*)SvIV(length);
+        RETVAL = bson_iter_dup_utf8(iter_ptr, length_ptr);
     OUTPUT:
         RETVAL
 
 bool
 iter_find(iter, key)
-    bson_iter_t *iter;
-    const char *key;
+    SV *iter;
+    SV *key;
     CODE:
-        RETVAL = bson_iter_find(iter, key);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        const char *key_ptr = SvPV_nolen(key);
+        RETVAL = bson_iter_find(iter_ptr, key_ptr);
     OUTPUT:
         RETVAL
 
 bool
 iter_find_case(iter, key)
-    bson_iter_t *iter;
-    const char *key;
+    SV *iter;
+    SV *key;
     CODE:
-        RETVAL = bson_iter_find_case(iter, key);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        const char *key_ptr = SvPV_nolen(key);
+        RETVAL = bson_iter_find_case(iter_ptr, key_ptr);
     OUTPUT:
         RETVAL
 
 bool
 iter_find_descendant(iter, dotkey, descendant)
-    bson_iter_t *iter;
-    const char *dotkey;
-    bson_iter_t *descendant;
+    SV *iter;
+    SV *dotkey;
+    SV *descendant;
     CODE:
-        RETVAL = bson_iter_find_descendant(iter, dotkey, descendant);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        const char *dotkey_ptr = SvPV_nolen(dotkey);
+        bson_iter_t *descendant_ptr = (bson_iter_t*)SvIV(descendant);
+        RETVAL = bson_iter_find_descendant(iter_ptr, dotkey_ptr, descendant_ptr);
     OUTPUT:
         RETVAL
 
 bool
 iter_find_w_len(iter, key, keylen)
-    bson_iter_t *iter;
-    const char *key;
+    SV *iter;
+    SV *key;
     int keylen;
     CODE:
-        RETVAL = bson_iter_find_w_len(iter, key, keylen);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        const char *key_ptr = SvPV_nolen(key);
+        RETVAL = bson_iter_find_w_len(iter_ptr, key_ptr, keylen);
     OUTPUT:
         RETVAL
 
 bool
 iter_init(iter, bson)
-    bson_iter_t *iter;
-    const bson_t *bson;
+    SV *iter;
+    SV *bson;
     CODE:
-        RETVAL = bson_iter_init(iter, bson);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        const bson_t *bson_ptr = (const bson_t*)SvIV(bson);
+        RETVAL = bson_iter_init(iter_ptr, bson_ptr);
     OUTPUT:
         RETVAL
 
-
 bool
 iter_init_find(iter, bson, key)
-    bson_iter_t *iter;
-    const bson_t *bson;
-    const char *key;
+    SV *iter;
+    SV *bson;
+    SV *key;
     CODE:
-        RETVAL = bson_iter_init_find(iter, bson, key);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        const bson_t *bson_ptr = (const bson_t*)SvIV(bson);
+        const char *key_ptr = SvPV_nolen(key);
+        RETVAL = bson_iter_init_find(iter_ptr, bson_ptr, key_ptr);
     OUTPUT:
         RETVAL
 
 bool
 iter_init_find_case(iter, bson, key)
-    bson_iter_t *iter;
-    const bson_t *bson;
-    const char *key;
+    SV *iter;
+    SV *bson;
+    SV *key;
     CODE:
-        RETVAL = bson_iter_init_find_case(iter, bson, key);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        const bson_t *bson_ptr = (const bson_t*)SvIV(bson);
+        const char *key_ptr = SvPV_nolen(key);
+        RETVAL = bson_iter_init_find_case(iter_ptr, bson_ptr, key_ptr);
     OUTPUT:
         RETVAL
 
 bool
 iter_init_find_w_len(iter, bson, key, keylen)
-    bson_iter_t *iter;
-    const bson_t *bson;
-    const char *key;
+    SV *iter;
+    SV *bson;
+    SV *key;
     int keylen;
     CODE:
-        RETVAL = bson_iter_init_find_w_len(iter, bson, key, keylen);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        const bson_t *bson_ptr = (const bson_t*)SvIV(bson);
+        const char *key_ptr = SvPV_nolen(key);
+        RETVAL = bson_iter_init_find_w_len(iter_ptr, bson_ptr, key_ptr, keylen);
     OUTPUT:
         RETVAL
 
 bool
 iter_init_from_data(iter, data, length)
-    bson_iter_t *iter;
-    const uint8_t *data;
+    SV *iter;
+    SV *data;
     size_t length;
     CODE:
-        RETVAL = bson_iter_init_from_data(iter, data, length);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        const uint8_t *data_ptr = (const uint8_t*)SvPV_nolen(data);
+        RETVAL = bson_iter_init_from_data(iter_ptr, data_ptr, length);
     OUTPUT:
         RETVAL
 
 bool
 iter_init_from_data_at_offset(iter, data, length, offset, keylen)
-    bson_iter_t *iter;
-    const uint8_t *data;
+    SV *iter;
+    SV *data;
     size_t length;
     uint32_t offset;
     uint32_t keylen;
     CODE:
-        RETVAL = bson_iter_init_from_data_at_offset(iter, data, length, offset, keylen);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        const uint8_t *data_ptr = (const uint8_t*)SvPV_nolen(data);
+        RETVAL = bson_iter_init_from_data_at_offset(iter_ptr, data_ptr, length, offset, keylen);
     OUTPUT:
         RETVAL
 
 int32_t
 iter_int32(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_int32(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_int32(iter_ptr);
     OUTPUT:
         RETVAL
 
 int64_t
 iter_int64(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_int64(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_int64(iter_ptr);
     OUTPUT:
         RETVAL
 
 const char *
 iter_key(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_key(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_key(iter_ptr);
     OUTPUT:
         RETVAL
 
 uint32_t
 iter_key_len(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_key_len(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_key_len(iter_ptr);
     OUTPUT:
         RETVAL
 
 bool
 iter_next(iter)
-    bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_next(iter);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_next(iter_ptr);
     OUTPUT:
         RETVAL
 
 uint32_t
 iter_offset(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_offset(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_offset(iter_ptr);
     OUTPUT:
         RETVAL
 
 const bson_oid_t *
 iter_oid(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_oid(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_oid(iter_ptr);
     OUTPUT:
         RETVAL
 
 void
 iter_overwrite_bool(iter, value)
-    bson_iter_t *iter;
+    SV *iter;
     bool value;
     CODE:
-        bson_iter_overwrite_bool(iter, value);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        bson_iter_overwrite_bool(iter_ptr, value);
 
 void
 iter_overwrite_date_time(iter, value)
-    bson_iter_t *iter;
+    SV *iter;
     int64_t value;
     CODE:
-        bson_iter_overwrite_date_time(iter, value);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        bson_iter_overwrite_date_time(iter_ptr, value);
 
 void
 iter_overwrite_decimal128(iter, value)
-    bson_iter_t *iter;
-    const bson_decimal128_t *value;
+    SV *iter;
+    SV *value;
     CODE:
-        bson_iter_overwrite_decimal128(iter, value);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        const bson_decimal128_t *value_ptr = (const bson_decimal128_t*)SvIV(value);
+        bson_iter_overwrite_decimal128(iter_ptr, value_ptr);
 
 void
 iter_overwrite_double(iter, value)
-    bson_iter_t *iter;
+    SV *iter;
     double value;
     CODE:
-        bson_iter_overwrite_double(iter, value);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        bson_iter_overwrite_double(iter_ptr, value);
 
 void
 iter_overwrite_int32(iter, value)
-    bson_iter_t *iter;
+    SV *iter;
     int32_t value;
     CODE:
-        bson_iter_overwrite_int32(iter, value);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        bson_iter_overwrite_int32(iter_ptr, value);
 
 void
 iter_overwrite_int64(iter, value)
-    bson_iter_t *iter;
+    SV *iter;
     int64_t value;
     CODE:
-        bson_iter_overwrite_int64(iter, value);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        bson_iter_overwrite_int64(iter_ptr, value);
 
 void
 iter_overwrite_oid(iter, value)
-    bson_iter_t *iter;
-    const bson_oid_t *value;
+    SV *iter;
+    SV *value;
     CODE:
-        bson_iter_overwrite_oid(iter, value);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        const bson_oid_t *value_ptr = (const bson_oid_t*)SvIV(value);
+        bson_iter_overwrite_oid(iter_ptr, value_ptr);
 
 void
 iter_overwrite_timestamp(iter, timestamp, increment)
-    bson_iter_t *iter;
+    SV *iter;
     uint32_t timestamp;
     uint32_t increment;
     CODE:
-        bson_iter_overwrite_timestamp(iter, timestamp, increment);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        bson_iter_overwrite_timestamp(iter_ptr, timestamp, increment);
 
 bool
 iter_recurse(iter, child)
-    const bson_iter_t *iter;
-    bson_iter_t *child;
+    SV *iter;
+    SV *child;
     CODE:
-        RETVAL = bson_iter_recurse(iter, child);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        bson_iter_t *child_ptr = (bson_iter_t*)SvIV(child);
+        RETVAL = bson_iter_recurse(iter_ptr, child_ptr);
     OUTPUT:
         RETVAL
 
 const char *
 iter_regex(iter, options)
-    const bson_iter_t *iter;
-    const char **options;
+    SV *iter;
+    SV *options;
     CODE:
-        RETVAL = bson_iter_regex(iter, options);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        const char *options_ptr;
+        RETVAL = bson_iter_regex(iter_ptr, &options_ptr);
+        if (options) {
+            SvPV_set(options, options_ptr);
+        }
     OUTPUT:
         RETVAL
 
 const char *
 iter_symbol(iter, length)
-    const bson_iter_t *iter;
-    uint32_t *length;
+    SV *iter;
+    SV *length;
     CODE:
-        RETVAL = bson_iter_symbol(iter, length);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        uint32_t *length_ptr;
+        RETVAL = bson_iter_symbol(iter_ptr, length_ptr);
+        if (length) {
+            SvIV_set(length, *length_ptr);
+        }
     OUTPUT:
         RETVAL
 
 time_t
 iter_time_t(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_time_t(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_time_t(iter_ptr);
     OUTPUT:
         RETVAL
 
 void
 iter_timestamp(iter, timestamp, increment)
-    const bson_iter_t *iter;
-    uint32_t *timestamp;
-    uint32_t *increment;
+    SV *iter;
+    SV *timestamp;
+    SV *increment;
     CODE:
-        bson_iter_timestamp(iter, timestamp, increment);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        uint32_t ts, inc;
+        bson_iter_timestamp(iter_ptr, &ts, &inc);
+        if (timestamp) {
+            SvIV_set(timestamp, ts);
+        }
+        if (increment) {
+            SvIV_set(increment, inc);
+        }
 
 void
 iter_timeval(iter, tv)
-    const bson_iter_t *iter;
-    struct timeval *tv;
+    SV *iter;
+    SV *tv;
     CODE:
-        bson_iter_timeval(iter, tv);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        struct timeval *tv_ptr = (struct timeval*)SvIV(tv);
+        bson_iter_timeval(iter_ptr, tv_ptr);
 
 bson_type_t
 iter_type(iter)
-    const bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_type(iter);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_type(iter_ptr);
     OUTPUT:
         RETVAL
 
 const char *
 iter_utf8(iter, length)
-    const bson_iter_t *iter;
-    uint32_t *length;
+    SV *iter;
+    SV *length;
     CODE:
-        RETVAL = bson_iter_utf8(iter, length);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        uint32_t *length_ptr;
+        RETVAL = bson_iter_utf8(iter_ptr, length_ptr);
+        if (length) {
+            SvIV_set(length, *length_ptr);
+        }
     OUTPUT:
         RETVAL
 
 const bson_value_t *
 iter_value(iter)
-    bson_iter_t *iter;
+    SV *iter;
     CODE:
-        RETVAL = bson_iter_value(iter);
+        bson_iter_t *iter_ptr = (bson_iter_t*)SvIV(iter);
+        RETVAL = bson_iter_value(iter_ptr);
     OUTPUT:
         RETVAL
 
 bool
 iter_visit_all(iter, visitor, data)
-    bson_iter_t *iter;
-    const bson_visitor_t *visitor;
-    void *data;
+    SV *iter;
+    SV *visitor;
+    SV *data;
     CODE:
-        RETVAL = bson_iter_visit_all(iter, visitor, data);
+        const bson_iter_t *iter_ptr = (const bson_iter_t*)SvIV(iter);
+        const bson_visitor_t *visitor_ptr = (const bson_visitor_t*)SvIV(visitor);
+        void *data_ptr = (void*)SvIV(data);
+        RETVAL = bson_iter_visit_all(iter_ptr, visitor_ptr, data_ptr);
     OUTPUT:
         RETVAL
 
 void
 json_data_reader_ingest(reader, data, len)
-    bson_json_reader_t *reader;
-    const uint8_t *data;
-    size_t len;
+    SV *reader;
+    SV *data;
+    SV *len;
     CODE:
-        bson_json_data_reader_ingest(reader, data, len);
+        bson_json_reader_t *reader_ptr = (bson_json_reader_t*)SvIV(reader);
+        const uint8_t *data_ptr = (const uint8_t*)SvPV(data, PL_na);
+        size_t len_val = (size_t)SvIV(len);
+        bson_json_data_reader_ingest(reader_ptr, data_ptr, len_val);
 
 bson_json_reader_t *
 json_data_reader_new(allow_multiple, size)
@@ -1529,19 +1819,23 @@ json_data_reader_new(allow_multiple, size)
 
 void
 json_reader_destroy(reader)
-    bson_json_reader_t *reader;
+    SV *reader;
     CODE:
-        bson_json_reader_destroy(reader);
+        bson_json_reader_t *reader_ptr = (bson_json_reader_t*)SvIV(reader);
+        bson_json_reader_destroy(reader_ptr);
 
 bson_json_reader_t *
 json_reader_new(data, cb, dcb, allow_multiple, buf_size)
-    void *data;
-    bson_json_reader_cb cb;
-    bson_json_destroy_cb dcb;
+    SV *data;
+    SV *cb;
+    SV *dcb;
     bool allow_multiple;
     size_t buf_size;
     CODE:
-        RETVAL = bson_json_reader_new(data, cb, dcb, allow_multiple, buf_size);
+        void *data_ptr = (void*)SvIV(data);
+        bson_json_reader_cb cb_ptr = (bson_json_reader_cb)SvIV(cb);
+        bson_json_destroy_cb dcb_ptr = (bson_json_destroy_cb)SvIV(dcb);
+        RETVAL = bson_json_reader_new(data_ptr, cb_ptr, dcb_ptr, allow_multiple, buf_size);
     OUTPUT:
         RETVAL
 

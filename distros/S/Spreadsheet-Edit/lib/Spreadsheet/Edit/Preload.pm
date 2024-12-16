@@ -1,8 +1,8 @@
 # License: http://creativecommons.org/publicdomain/zero/1.0/
-# (CC0 or Public Domain).  To the extent possible under law, the author, 
-# Jim Avera (email jim.avera at gmail) has waived all copyright and 
-# related or neighboring rights to this document.  Attribution is requested
-# but not required.
+# (CC0 or Public Domain).  To the extent possible under law, the author,
+# Jim Avera (email jim.avera at gmail) has waived all copyright and
+# related or neighboring rights to this document.
+# Attribution is requested but not required.
 
 use strict; use warnings FATAL => 'all'; use feature qw/say state/;
 use utf8;
@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Preload;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 998.999; }
-our $VERSION = '1000.021'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-11-25'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.023'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-15'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Import::Into;
@@ -29,7 +29,7 @@ sub import {
 
   # Load the spreadsheet
   my $opthash = ref($_[0]) eq "HASH" ? shift(@_) : {};
-  
+
   # Create new sheet, setting verbose, etc. from options
   my $sh = Spreadsheet::Edit->new(
              map{ exists($opthash->{$_}) ? ($_ => delete $opthash->{$_}) : () }
@@ -60,7 +60,7 @@ Spreadsheet::Edit::Preload - load and auto-import column variables
 
   use Spreadsheet::Edit::Preload {OPTIONS}, PATH
 
-  use Spreadsheet::Edit::Preload 
+  use Spreadsheet::Edit::Preload
     {sheet => "Sheet1", title_rx => 2}, "/path/to/file.xls" ;
 
   apply {
@@ -88,6 +88,7 @@ The example above is equivalent to
     title_rx 2;
     tie_column_vars ':all';
   }
+  ...
 
 You need not (and may not) explicitly declare the tied variables.
 
@@ -103,10 +104,10 @@ specified, the title row is auto-detected.
 
 =head1 SECURITY
 
-A fatal error occurs if a column letter ('A', 'B' etc.), a title, 
-or identifier derived from the title (any COLSPEC)
-clashes with an object already existing in the caller's package,
-or in package main.
+A fatal error occurs if a column letter ('A', 'B' etc.), a title,
+or identifier derived from a title (that is, any COLSPEC)
+clashes with an object already existing in the caller's package
+or in package "main".
 
 =head1 SEE ALSO
 

@@ -5,7 +5,6 @@ require XSLoader;
 
 XSLoader::load('Pongo::CheckVersion', $Pongo::VERSION);
 
-# 1 ->  true, 0 -> false
 sub GetMongoCheckVersion {
     my ($required_major, $required_minor, $required_micro) = @_;
     my $compatible = Pongo::CheckVersion::get_mongoc_check_version($required_major, $required_minor, $required_micro);

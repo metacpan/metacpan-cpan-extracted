@@ -23,7 +23,6 @@ my %args = (
     },
 
     requires => {
-        'Devel::StrictMode' => '0.003',
         'XS::Parse::Keyword' => '0.36',
         'perl' => '5.016000',
     },

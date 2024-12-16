@@ -3,14 +3,19 @@ package TestTypeTiny;
 use Exporter 'import';
 use Types::Standard qw(Str);
 
-use kura Foo => Type::Tiny->new(
+use kura NamedType => Type::Tiny->new(
+    name => 'NamedType',
     constraint => sub { length $_ > 0 },
 );
 
-use kura Bar => sub { length $_ > 0 };
+use kura NoNameType  => Type::Tiny->new(
+    constraint => sub { length $_ > 0 },
+);
 
-use kura Baz => {
-    parent => Foo,
+use kura CodeRefType => sub { length $_ > 0 };
+
+use kura HashRefType => {
+    parent => NamedType,
     message => sub { "too short" },
 };
 

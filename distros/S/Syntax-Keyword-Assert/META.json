@@ -43,7 +43,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Devel::StrictMode" : "0.003",
             "XS::Parse::Keyword" : "0.36",
             "perl" : "5.016000"
          }
@@ -57,7 +56,7 @@
    "provides" : {
       "Syntax::Keyword::Assert" : {
          "file" : "lib/Syntax/Keyword/Assert.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -72,7 +71,7 @@
          "web" : "https://github.com/kfly8/Syntax-Keyword-Assert"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_authority" : "cpan:KFLY",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0

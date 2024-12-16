@@ -9,6 +9,9 @@ Tk::QuickForm::CFolderItem - Folder select entry widget for Tk::QuickForm.
 use strict;
 use warnings;
 use Tk;
+use vars qw($VERSION);
+$VERSION = '0.06';
+
 use base qw(Tk::Derived Tk::QuickForm::CFileItem);
 Construct Tk::Widget 'CFolderItem';
 
@@ -38,21 +41,13 @@ Image to be used for the dialog button.
 
 =cut
 
-sub createHandler {
-	my ($self, $var) = @_;
-	$self->SUPER::createHandler($var);
-	$self->Subwidget('Select')->configure(
-		-command => sub {
-			my $file = $self->chooseDirectory(
-# 				-initialdir => $initdir,
-				-popover => $self->toplevel,
-			);
-			if (defined $file) {
-				my $var = $self->cget('-variable');
-				$$var = $file
-			}
-		}
-	);
+sub buttonClicked {
+	my $self = shift;
+	my $var = $self->cget('-textvariable');
+	my %opt = ();
+	$opt{'-initialdir'} = $$var if $$var ne '';
+	my ($dir) = $self->quickform->pickFolder(%opt);
+	$$var = $dir if defined $dir;
 }
 
 =head1 LICENSE

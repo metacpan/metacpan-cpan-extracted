@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.021'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-11-25'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.023'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-15'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -339,9 +339,9 @@ our @sane_CSV_write_options = (
 my %Saved_Sigs;
 sub _sighandler {
   if (! $Saved_Sigs{$_[0]} or $Saved_Sigs{$_[0]} eq 'DEFAULT') {
-    # The user isn't catching this, so the process will abort without
-    # running destructors: Call exit instead
-    warn "($$)".__PACKAGE__." caught signal $_[0], exiting\n";
+    # The user isn't catching this, so the process would have aborted
+    # without running destructors: Call exit instead
+    ##warn "($$)".__PACKAGE__." caught signal $_[0], exiting\n";
     Carp::cluck "($$)".__PACKAGE__." caught signal $_[0], exiting\n";
     exit 1;
   }
@@ -350,8 +350,10 @@ sub _sighandler {
   oops "Default (or user-defined) sig $_[0] action was to ignore!";
 }
 sub _signals_guard() {
-  %Saved_Sigs = ( map{ ($_ => ($SIG{$_} // undef)) } qw/HUP INT QUIT TERM/ );
-  $SIG{HUP} = $SIG{INT} = $SIG{QUIT} = $SIG{TERM} = \&_sighandler;
+  foreach my $name (qw/HUP INT QUIT TERM/) {
+    $Saved_Sigs{$name} = $SIG{$name};
+    $SIG{$name} = \&_sighandler;
+  }
   return guard { @SIG{keys %Saved_Sigs} = (values %Saved_Sigs) }
 }
 
@@ -1181,6 +1183,7 @@ sub _slurp_ifnotslurped($$) {
   seek($fh, 0, SEEK_SET) or die $!;
   local $/ = undef;
   $$ref2octets = <$fh>//"";  # Now known to not have a BOM.
+                             # ^^^^ IS THIS REALLY TRUE???
 }
 sub _decode_slurped_data($$$;$) {
   my ($enc, $ref2octets, $start_pos, $check) = @_;
@@ -1377,7 +1380,7 @@ sub _preprocess($$) {
       }
     }
     else {
-      warn dvis '#### CSV DETECTED $opts->{quote_char} $opts->{sep_char}'
+      warn dvis '#### CSV DETECTED $opts->{quote_char} $opts->{sep_char} $start_pos'
         if $debug;
     }
   }#determine_csv_q_sep
@@ -1397,8 +1400,7 @@ sub _preprocess($$) {
       return unless $debug;
       $as_msg //= " as ".vis($col_formats[$cx])." format";
       if (length($thing) > 35) { $thing = substr($thing,0,32)."..."; }
-      @_ = ("Recognized ",$thing," in ", cxrx2sheetaddr($cx,$rx), $as_msg);
-      goto &btw
+      btwN 1, "Recognized $thing in ", cxrx2sheetaddr($cx,$rx), $as_msg;
     }
     CX:
     for my $cx (0..$max_cols-1) {
@@ -1469,7 +1471,12 @@ sub _preprocess($$) {
       $opts->{cvt_from} = $1;
     }
   }
-  $opts->{cvt_from} =~ s/^\.txt$/.csv/i if $opts->{cvt_from};
+  if ($opts->{cvt_from}) {
+    $opts->{cvt_from} = lc($opts->{cvt_from}); # CSV -> csv
+    croak ivis 'cvt_from must be a suffix without a dot (not $opts->{cvt_from})'
+      if $opts->{cvt_from} =~ /[^a-z]/;
+    $opts->{cvt_from} = "csv" if $opts->{cvt_from} eq "txt";
+  }
 
   # Detect input file format and, if CSV, encoding etc.
   my $rows;

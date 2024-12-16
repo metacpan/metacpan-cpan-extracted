@@ -21,7 +21,7 @@ use I18N::LangTags::Detect;
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 my %names = (
     service => {
@@ -42,6 +42,7 @@ my %names = (
         'overpass'          => '5350885e-92f5-4aee-b72e-dd9d95c6700a',
         'xkcd'              => '6d90e7e2-c193-4e96-8d0a-c9a3d42beecf',
         'Data::URIID'       => '65a5000f-c37f-4fa1-9ad0-c9682fcd8756',
+        'Data::Identifier'  => '1d1e84e9-dac5-43d6-9ff9-a72fb7de38d5',
         'viaf'              => 'b542f123-b304-4f60-a2a9-15a0cc62e25d',
         'europeana'         => '2ddf371f-20b5-4fdb-99d5-934b212ed596',
         'open-library'      => '173f7237-9ca0-490d-8a98-6a04c386769a',
@@ -367,7 +368,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 

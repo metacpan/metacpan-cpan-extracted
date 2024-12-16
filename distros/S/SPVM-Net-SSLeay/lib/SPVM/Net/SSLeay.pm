@@ -1,6 +1,6 @@
 package SPVM::Net::SSLeay;
 
-our $VERSION = "0.028";
+our $VERSION = "0.029";
 
 1;
 
@@ -48,25 +48,11 @@ OpenSSL 1.1.1
 
 =item * L<Net::SSLeay::Callback::Msg|SPVM::Net::SSLeay::Callback::Msg>
 
-=item * L<Net::SSLeay::Callback::NewSession|SPVM::Net::SSLeay::Callback::NewSession>
-
-=item * L<Net::SSLeay::Callback::NextProtosAdvertised|SPVM::Net::SSLeay::Callback::NextProtosAdvertised>
-
-=item * L<Net::SSLeay::Callback::NextProtoSelect|SPVM::Net::SSLeay::Callback::NextProtoSelect>
-
 =item * L<Net::SSLeay::Callback::PemPassword|SPVM::Net::SSLeay::Callback::PemPassword>
-
-=item * L<Net::SSLeay::Callback::PskClient|SPVM::Net::SSLeay::Callback::PskClient>
-
-=item * L<Net::SSLeay::Callback::PskServer|SPVM::Net::SSLeay::Callback::PskServer>
-
-=item * L<Net::SSLeay::Callback::RemoveSession|SPVM::Net::SSLeay::Callback::RemoveSession>
 
 =item * L<Net::SSLeay::Callback::TlsextServername|SPVM::Net::SSLeay::Callback::TlsextServername>
 
-=item * L<Net::SSLeay::Callback::TlsextStatus|SPVM::Net::SSLeay::Callback::TlsextStatus>
-
-=item * L<Net::SSLeay::Callback::TlsextTicketKey|SPVM::Net::SSLeay::Callback::TlsextTicketKey>
+=item * L<Net::SSLeay::Callback::Verify|SPVM::Net::SSLeay::Callback::Verify>
 
 =item * L<Net::SSLeay::Constant|SPVM::Net::SSLeay::Constant>
 
@@ -76,6 +62,12 @@ OpenSSL 1.1.1
 
 =item * L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error>
 
+=item * L<Net::SSLeay::Error::PEM_R_NO_START_LINE|SPVM::Net::SSLeay::Error::PEM_R_NO_START_LINE>
+
+=item * L<Net::SSLeay::Error::SSL_ERROR_WANT_READ|SPVM::Net::SSLeay::Error::SSL_ERROR_WANT_READ>
+
+=item * L<Net::SSLeay::Error::SSL_ERROR_WANT_WRITE|SPVM::Net::SSLeay::Error::SSL_ERROR_WANT_WRITE>
+
 =item * L<Net::SSLeay::EVP|SPVM::Net::SSLeay::EVP>
 
 =item * L<Net::SSLeay::EVP_CIPHER_CTX|SPVM::Net::SSLeay::EVP_CIPHER_CTX>
@@ -84,7 +76,7 @@ OpenSSL 1.1.1
 
 =item * L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY>
 
-=item * L<Net::SSLeay::HMAC_CTX|SPVM::Net::SSLeay::HMAC_CTX>
+=item * L<Net::SSLeay::GENERAL_NAME|SPVM::Net::SSLeay::GENERAL_NAME>
 
 =item * L<Net::SSLeay::OBJ|SPVM::Net::SSLeay::OBJ>
 
@@ -115,6 +107,8 @@ OpenSSL 1.1.1
 =item * L<Net::SSLeay::X509_NAME|SPVM::Net::SSLeay::X509_NAME>
 
 =item * L<Net::SSLeay::X509_NAME_ENTRY|SPVM::Net::SSLeay::X509_NAME_ENTRY>
+
+=item * L<Net::SSLeay::X509_REVOKED|SPVM::Net::SSLeay::X509_REVOKED>
 
 =item * L<Net::SSLeay::X509_STORE|SPVM::Net::SSLeay::X509_STORE>
 

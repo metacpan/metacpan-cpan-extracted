@@ -2,19 +2,18 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.028";
+  version "0.029";
   
-  use Net::SSLeay::Constant;
+  use Net::SSLeay::Constant as SSL;
   use Net::SSLeay::SSL_CTX;
-  use Net::SSLeay::ERR;
-  use Net::SSLeay::Error;
   use Net::SSLeay::X509;
   use Net::SSLeay::X509_NAME;
-  use Net::SSLeay::Callback::Msg;
-  use Net::SSLeay::OPENSSL;
-  use Net::SSLeay::OPENSSL_INIT_SETTINGS;
+  
+  use Net::SSLeay::Error;
   use Net::SSLeay::Error::SSL_ERROR_WANT_READ;
   use Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
+  
+  use Net::SSLeay::Callback::Msg;
   
   # Fields
   has operation_error : ro int;
@@ -79,12 +78,12 @@ class Net::SSLeay {
   method get0_alpn_selected_return_string : string () {
     
     my $data_ref = new string[1];
-    my $len = 0;
+    my $len = -1;
     
     $self->get0_alpn_selected($data_ref, \$len);
     
     my $protocol = (string)undef;
-    if ($data_ref) {
+    if ($data_ref->[0]) {
       $protocol = $data_ref->[0];
       Fn->shorten((mutable string)$protocol, $len);
     }
