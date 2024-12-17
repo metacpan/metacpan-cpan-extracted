@@ -1,5 +1,12 @@
 Change history for URI-PackageURL
 
+2.22 2024-12-16
+    - Improved parsing of non-canonical PURL (package-url/purl-spec#363)
+    - Improved "URI::VersionRange->constraint_contains"
+    - Updated "maven" repository URL
+    - FIX typo in documentation
+    - Synced "test-suite-data.json" from "package-url/purl-spec"
+
 2.21 2024-07-24
     - Use RFC 2119 terms for CPAN purl type specification (sjn)
     - Added "swid" purl type support

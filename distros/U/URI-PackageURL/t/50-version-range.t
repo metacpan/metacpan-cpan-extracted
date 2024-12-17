@@ -44,4 +44,9 @@ foreach (sort keys %TESTS) {
 is $v1->contains($_), !!1, "$_ version in range ($v1)"     for (sort @in_range);
 is $v1->contains($_), !!0, "$_ version not in range ($v1)" for (sort @not_in_range);
 
+is decode_vers('vers:cpan/<v13.37')->contains($_), !!1, "$_ version in range" for (sort @in_range);
+
+eval { decode_vers('foo:bar<baz') };
+like "$@", qr/Malformed Version Range string/;
+
 done_testing();

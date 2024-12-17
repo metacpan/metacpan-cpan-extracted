@@ -1,5 +1,7 @@
 (Recent) Revision history for Perl extension Data-Dumper-Interp
 
+7.011 - Require bigrat 0.65 (per rt 145960). Update shared test library.
+        Avoid defeating Data::Dumper's special handling of booleans (!!0 etc.)
 7.010 - Revise Objects() sub-options to allow better control of how
         overloaded operators are handled in displayed objects.
         Updated shared test libraries.  Fixed support for older Perls.

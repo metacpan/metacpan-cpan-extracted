@@ -1,4 +1,17 @@
 Revision history for Perl extension Software::Security::Policy
 
-0.01 -- Sun Dec 15 23:22:32 AST 2024
+0.02 -- Mon Dec 16 18:58:38 AST 2024
 
+    [Major items]
+    - Add missing Security Policy :-)
+    - Mix a few minor issues and the url
+
+    [Detailed Change Log]
+    - 24e53c6 Fix issue with the URL not being set
+    - 63529cd Add a gitignore
+    - 9e44884 Add missing security policy
+    - 58c9e47 Fix minor issues
+    - 8414f43 v0.01
+
+0.01 -- Sun Dec 15 23:22:32 AST 2024
+    - 854c76e Initial version

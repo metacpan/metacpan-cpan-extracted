@@ -18,7 +18,7 @@ use constant FALSE => !!0;
 
 use overload '""' => 'to_string', fallback => 1;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 our @EXPORT  = qw(encode_vers decode_vers);
 
 my $VERS_REGEXP = qr{^vers:[a-z\\.\\-\\+][a-z0-9\\.\\-\\+]*/.+};
@@ -178,8 +178,8 @@ sub constraint_contains {
     return ($v1 != $v2) if ($constraint->comparator eq '!=');
     return ($v1 <= $v2) if ($constraint->comparator eq '<=');
     return ($v1 >= $v2) if ($constraint->comparator eq '>=');
-    return ($v1 > $v2)  if ($constraint->comparator eq '<');
-    return ($v1 < $v2)  if ($constraint->comparator eq '>');
+    return ($v1 < $v2)  if ($constraint->comparator eq '<');
+    return ($v1 > $v2)  if ($constraint->comparator eq '>');
 
     return FALSE;
 
@@ -339,11 +339,11 @@ URI::VersionRange - Perl extension for Version Range Specification
   }
 
   # Parse "vers" string
-  $vers = URI::VersionRange->from_string('vers:cpan/>2.00|<2.20');
+  $vers = URI::VersionRange->from_string('vers:cpan/>2.00|<2.22');
 
   # exported functions
 
-  $vers = decode_vers('vers:cpan/>2.00|<2.20');
+  $vers = decode_vers('vers:cpan/>2.00|<2.22');
   say $vers->scheme;  # cpan
 
   $vers_string = encode_vers(scheme => cpan, constraints => ['>2.00']);
@@ -400,9 +400,9 @@ This function call is functionally identical to:
 
 =over
 
-=item $vers = URI::VersionRange->new( scheme => STRING, constraints -> ARRAY )
+=item $vers = URI::VersionRange->new( scheme => STRING, constraints => ARRAY )
 
-Create new B<URI::Version> instance using provided C<vers> components
+Create new B<URI::VersionRange> instance using provided C<vers> components
 (scheme, constraints).
 
 =item $vers->scheme
@@ -418,7 +418,7 @@ C<constraints> is ARRAY of L<URI::VersionRange::Constraint> object.
 
 Check if a version is contained within a range
 
-    my $vers = URI::VersionRange::from_string('vers:cpan/>2.00|<2.20');
+    my $vers = URI::VersionRange::from_string('vers:cpan/>2.00|<2.22');
 
     if ($vers->contains('2.10')) {
         say "The version is in range";
@@ -442,7 +442,7 @@ Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>
 
     use Mojo::JSON qw(encode_json);
 
-    say encode_json($vers);  # {"constraints":[{"comparator":">","version":"2.00"},{"comparator":"<","version":"2.20"}],"scheme":"cpan"}
+    say encode_json($vers);  # {"constraints":[{"comparator":">","version":"2.00"},{"comparator":"<","version":"2.22"}],"scheme":"cpan"}
 
 =item $vers = URI::VersionRange->from_string($vers_string);
 

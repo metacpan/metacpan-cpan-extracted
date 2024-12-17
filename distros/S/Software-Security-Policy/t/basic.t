@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 my $class = 'Software::Security::Policy::Individual';
 require_ok($class);
@@ -18,8 +18,9 @@ my $policy = $class->new({
 is($policy->maintainer, 'X. Ample <x.example@example.com>', 'maintainer');
 like($policy->name, qr/individual/i, "Individual Security Policy");
 like($policy->fulltext, qr/6 days/i, 'timeframe updated in policy');
-like($policy->fulltext, qr/8 years/i, 'timeframe updated in policy');
-like($policy->fulltext, qr/maintained by a single person/i, 'policy text');
+like($policy->fulltext, qr/8 years/i, 'support_years updated in policy');
+like($policy->fulltext, qr/maintained by a single person/i, 'Individual Security Policy');
+like($policy->fulltext, qr(https://www.example.com/INDIVIDUAL-SECURITY-POLICY), 'policy url');
 
 $policy = $class->new({
         maintainer  => 'X. Ample <x.example@example.com>',
@@ -28,5 +29,5 @@ $policy = $class->new({
 is($policy->maintainer, 'X. Ample <x.example@example.com>', 'maintainer');
 like($policy->name, qr/individual/i, "Individual Security Policy");
 like($policy->fulltext, qr/5 days/i, 'timeframe updated in policy');
-like($policy->fulltext, qr/10 years/i, 'timeframe updated in policy');
-like($policy->fulltext, qr/maintained by a single person/i, 'policy text');
+like($policy->fulltext, qr/10 years/i, 'support_years updated in policy');
+like($policy->fulltext, qr/maintained by a single person/i, 'Individual Security Policy');

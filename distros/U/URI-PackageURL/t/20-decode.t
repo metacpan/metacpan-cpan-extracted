@@ -7,10 +7,11 @@ use Test::More;
 
 use URI::PackageURL;
 
-my $t1 = 'pkg:cpan/GDT/URI-PackageURL@2.00';
+my $t1 = 'pkg:cpan/GDT/URI-PackageURL@2.22';
 my $t2 = 'pkg:deb/debian/curl@7.50.3-1?arch=i386&distro=jessie';
 my $t3 = 'pkg:golang/google.golang.org/genproto@abcdedf#googleapis/api/annotations';
 my $t4 = 'pkg:docker/customer/dockerimage@sha256:244fd47e07d1004f0aed9c?repository_url=gcr.io';
+my $t5 = 'pkg:generic/ns/n@m#?@version?qualifier=#v@lue#subp@th?';
 
 subtest "Decode '$t1'" => sub {
 
@@ -19,7 +20,7 @@ subtest "Decode '$t1'" => sub {
     is($purl->type,      'cpan',           'Type');
     is($purl->namespace, 'GDT',            'Namespace');
     is($purl->name,      'URI-PackageURL', 'Name');
-    is($purl->version,   '2.00',           'Version');
+    is($purl->version,   '2.22',           'Version');
 
     is($purl->to_string, $t1, 'PackageURL');
 
@@ -66,6 +67,19 @@ subtest "Decode '$t4'" => sub {
     is($purl->qualifiers->{repository_url}, 'gcr.io',                        'Qualifier "repository_url"');
 
     is($purl->to_string, $t4, 'PackageURL');
+
+};
+
+subtest "Decode '$t5'" => sub {
+
+    my $purl = decode_purl($t5);
+
+    is($purl->type,                    'generic',  'Type');
+    is($purl->namespace,               'ns',       'Namespace');
+    is($purl->name,                    'n@m#?',    'Name');
+    is($purl->version,                 'version',  'Version');
+    is($purl->qualifiers->{qualifier}, '#v@lue',   'Qualifier "qualifier"');
+    is($purl->subpath,                 'subp@th?', 'Subpath');
 
 };
 

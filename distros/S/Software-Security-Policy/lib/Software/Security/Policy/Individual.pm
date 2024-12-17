@@ -2,13 +2,12 @@ use strict;
 use warnings;
 package Software::Security::Policy::Individual;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 use parent 'Software::Security::Policy';
 # ABSTRACT: The Individual Security Policy
 
 sub name { 'individual' }
-sub url  { 'https://security.metacpan.org/docs/guides/security-policy-for-authors.html' }
 sub meta_name  { 'individual' }
 
 1;
@@ -23,7 +22,7 @@ Software::Security::Policy::Individual - The Individual Security Policy
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 
@@ -40,7 +39,7 @@ the same terms as the Perl 5 programming language system itself.
 
 __DATA__
 __SUMMARY__
-Security Policy for the {{ $self->program }} distribution.
+# Security Policy for the {{ $self->program }} distribution.
 
 Report issues via email at: {{ $self->maintainer }}.
 

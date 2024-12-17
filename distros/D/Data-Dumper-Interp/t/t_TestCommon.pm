@@ -290,7 +290,7 @@ warn "============= DUMP OF -$1$2 FILE ===========\n", "".scalar($tf->slurp_utf8
     }
     for (my $ix=0; $ix <= $#perlargs; $ix++) {
       for ($perlargs[$ix]) {
-        if (/^-\*[Ee]/) { oops "unhandled perl arg" }
+        if (/^-[eE]/ or /^-[^-CIM].*[Ee]/) { oops "unhandled perl arg '$_'" }
         s/"/\\"/g;
         if (/[\s\/"']/) {
           $_ = '"' . $_ . '"';

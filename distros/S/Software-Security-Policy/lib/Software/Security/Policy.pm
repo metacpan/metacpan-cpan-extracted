@@ -3,7 +3,7 @@ use warnings;
 package Software::Security::Policy;
 # ABSTRACT: packages that provide templated Security Policys
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 use Data::Section -setup => { header_re => qr/\A__([^_]+)__\Z/ };
 use Text::Template ();
@@ -17,6 +17,8 @@ sub new {
   bless $arg => $class;
 }
 
+
+sub url { $_[0]->{url} || 'SECURITY.md' }
 
 sub support_years { $_[0]->{support_years} || '10'}
 
@@ -102,11 +104,11 @@ Software::Security::Policy - packages that provide templated Security Policys
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
-  my $policy = Software::Security::Policy::SingleDeveloper->new({
+  my $policy = Software::Security::Policy::Individual->new({
     maintainer => 'Timothy Legge',
   });
 

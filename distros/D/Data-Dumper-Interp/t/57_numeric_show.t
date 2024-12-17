@@ -73,6 +73,9 @@ diag "=== prelim checks ===";
 
 check_numeric("mumble", 0);
 check_numeric("-1",     0);
+check_numeric(1,        1);
+check_numeric(-1,       1);
+check_numeric(3 < 4,    0); # is_bool
 
 diag "=== numerics ===";
 for my $v (-1, 0, 1, 42, $nan, $inf, $minf) {

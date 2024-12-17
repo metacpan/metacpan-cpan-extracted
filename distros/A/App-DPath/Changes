@@ -1,5 +1,14 @@
 Revision history for App-DPath
 
+0.12      2024-12-17
+        - trim values in TAP::DOM(::Archive) by default
+        - use 'noempty_tap' in TAP::DOM(::Archive) by default
+        - fix getopt specification duplicate of -s
+        - support for using YAML::Syck no longer tested
+          * it is still possible to specify with --yaml-module
+          * but root cause for test fails (t/yaml.t) not clear
+          * test for YAML::Syck commented out, patches welcome
+
 0.11      2019-02-20
         - stringify SCALARS, usually blessed JSON::PP::Boolean;
           this enables the output type 'flat' when getting json

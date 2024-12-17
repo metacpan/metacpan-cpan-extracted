@@ -1,9 +1,9 @@
 package App::DPath;
-# git description: v0.10-5-gd6d7a5e
+# git description: v0.11-4-gbbe97b0
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Cmdline tool around Data::DPath
-$App::DPath::VERSION = '0.11';
+$App::DPath::VERSION = '0.12';
 use 5.008; # Data::DPath requires it
 use strict;
 use warnings;
@@ -72,12 +72,12 @@ sub read_in
         elsif ($intype eq "tap") {
                 require TAP::DOM;
                 require TAP::Parser;
-                $data = new TAP::DOM( tap => $filecontent, $TAP::Parser::VERSION > 3.22 ? (version => 13) : () );
+                $data = new TAP::DOM( tap => $filecontent, trim_fieldvalues => 1, noempty_tap => 1, $TAP::Parser::VERSION > 3.22 ? (version => 13) : () );
         }
         elsif ($intype eq "taparchive") {
                 require TAP::DOM::Archive;
                 require TAP::Parser;
-                $data = new TAP::DOM::Archive( filecontent => $filecontent, $TAP::Parser::VERSION > 3.22 ? (version => 13) : () );
+                $data = new TAP::DOM::Archive( filecontent => $filecontent, trim_fieldvalues => 1, noempty_tap => 1, $TAP::Parser::VERSION > 3.22 ? (version => 13) : () );
         }
         else
         {
@@ -353,7 +353,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Steffen Schwigon.
+This software is copyright (c) 2024 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

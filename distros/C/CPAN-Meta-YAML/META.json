@@ -127,7 +127,7 @@
    "provides" : {
       "CPAN::Meta::YAML" : {
          "file" : "lib/CPAN/Meta/YAML.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       }
    },
    "release_status" : "stable",
@@ -142,7 +142,7 @@
          "web" : "https://github.com/Perl-Toolchain-Gang/CPAN-Meta-YAML"
       }
    },
-   "version" : "0.019",
+   "version" : "0.020",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Karen Etheridge <ether@cpan.org>"

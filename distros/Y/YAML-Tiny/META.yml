@@ -45,7 +45,7 @@ no_index:
 provides:
   YAML::Tiny:
     file: lib/YAML/Tiny.pm
-    version: '1.75'
+    version: '1.76'
 requires:
   B: '0'
   Carp: '0'
@@ -60,7 +60,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=YAML-Tiny
   homepage: https://github.com/Perl-Toolchain-Gang/YAML-Tiny
   repository: https://github.com/Perl-Toolchain-Gang/YAML-Tiny.git
-version: '1.75'
+version: '1.76'
 x_Dist_Zilla:
   perl:
     version: '5.041006'
@@ -601,7 +601,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.75
+          tag: v1.76
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -830,6 +830,6 @@ x_contributors:
   - 'Slaven Rezic <slaven@rezic.de>'
   - 'Tim Bunce <Tim.Bunce@pobox.com>'
 x_generated_by_perl: v5.41.6
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_serialization_backend: 'YAML::Tiny version 1.75'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

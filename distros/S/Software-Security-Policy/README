@@ -3,10 +3,10 @@ NAME
     Policys
 
 VERSION
-    version 0.01
+    version 0.02
 
 SYNOPSIS
-      my $policy = Software::Security::Policy::SingleDeveloper->new({
+      my $policy = Software::Security::Policy::Individual->new({
         maintainer => 'Timothy Legge',
       });
 

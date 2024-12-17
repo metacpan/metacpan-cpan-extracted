@@ -14,13 +14,7 @@ use feature qw(say state lexical_subs current_sub);
 use feature 'lexical_subs';
 use feature 'unicode_strings';
 
-no warnings "experimental::lexical_subs";
 
-my $bitwise_supported;
-BEGIN {
-  $bitwise_supported = eval "use feature 'bitwise'";
-}
-use if $bitwise_supported, "feature", "bitwise";
 
 package
   # newline so Dist::Zilla::Plugin::PkgVersion won't add $VERSION
@@ -33,16 +27,26 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.010'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-14'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.011'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-16'; # DATE from Dist::Zilla::Plugin::OurDate
 
+# Arrgh!  Moose forcibly enables experimental feature warnings!
+# So import Moose first and then adjust warnings...
 use Moose;
 
 extends 'Data::Visitor' => { -version => 0.32 },
         'Exporter'      => { -version => 5.57 },
         ;
 
-no warnings "experimental::lexical_subs"; # un-do Moose forcing these on!!
+no warnings "experimental::lexical_subs";
+
+use constant _SUPPORTS_CORE_BOOLS => defined &builtin::is_bool;
+my $bitwise_supported;
+BEGIN {
+  $bitwise_supported = eval "use feature 'bitwise'";
+  warnings->unimport("experimental::builtin") if _SUPPORTS_CORE_BOOLS;
+}
+use if $bitwise_supported, "feature", "bitwise";
 
 use Data::Dumper ();
 use Carp;
@@ -926,7 +930,7 @@ sub visit_value {
   #     cross-platform issue.  For our purposes we want all numbers
   #     to appear unquoted.
   #
-  if (looks_like_number($item) && $item !~ /^0\d/) {
+  if (looks_like_number($item) && $item !~ /^0\d/ && !_is_bool($item)) {
     my $prefix = _show_as_number($item) ? _MAGIC_NOQUOTES_PFX
                                         : _MAGIC_KEEPQUOTES_PFX ;
     $item = $prefix.$item;
@@ -1150,6 +1154,10 @@ btw '##         orig=",addrvis($orig_itemref)," -> ",_dbvis($$orig_itemref)' if 
   }
 }
 
+sub _is_bool(_) {
+  _SUPPORTS_CORE_BOOLS && builtin::is_bool($_[0])
+}
+
 sub _show_as_number(_) {
   my $value = shift;
 
@@ -1163,6 +1171,8 @@ sub _show_as_number(_) {
 
   # if the utf8 flag is on, it almost certainly started as a string
   return 0 if (ref($value) eq "") && utf8::is_utf8($value);
+
+  return 0 if _is_bool($value);
 
   # There was a Perl bug where looks_like_number() provoked a warning from
   # BigRat.pm if it is called under 'use bigrat;' so we must not do that.

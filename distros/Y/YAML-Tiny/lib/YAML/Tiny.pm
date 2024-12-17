@@ -1,12 +1,12 @@
 use 5.008001; # sane UTF-8 support
 use strict;
 use warnings;
-package YAML::Tiny; # git description: v1.74-6-g56f1f15
+package YAML::Tiny; # git description: v1.75-3-g85169f1
 # XXX-INGY is 5.8.1 too old/broken for utf8?
 # XXX-XDG Lancaster consensus was that it was sufficient until
 # proven otherwise
 
-our $VERSION = '1.75';
+our $VERSION = '1.76';
 
 #####################################################################
 # The YAML::Tiny API.
@@ -138,10 +138,7 @@ my %UNESCAPES = (
 # These 3 values have special meaning when unquoted and using the
 # default YAML schema. They need quotes if they are strings.
 my %QUOTE = map { $_ => 1 } qw{
-    null Null NULL
-    y Y yes Yes YES n N no No NO
-    true True TRUE false False FALSE
-    on On ON off Off OFF
+    null true false
 };
 
 # The commented out form is simpler, but overloaded the Perl regex
@@ -879,7 +876,7 @@ YAML::Tiny - Read/Write YAML files with as little code as possible
 
 =head1 VERSION
 
-version 1.75
+version 1.76
 
 =head1 PREAMBLE
 

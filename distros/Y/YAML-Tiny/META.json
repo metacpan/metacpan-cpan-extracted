@@ -189,7 +189,7 @@
    "provides" : {
       "YAML::Tiny" : {
          "file" : "lib/YAML/Tiny.pm",
-         "version" : "1.75"
+         "version" : "1.76"
       }
    },
    "release_status" : "stable",
@@ -206,7 +206,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#yaml"
    },
-   "version" : "1.75",
+   "version" : "1.76",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.041006"
@@ -918,7 +918,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.75",
+                  "tag" : "v1.76",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

@@ -95728,3 +95728,13 @@ E/ET/ETHER/Sub-Name-0.28.tar.gz
 K/KF/KFLY/Syntax-Keyword-Assert-0.13.tar.gz
 H/HA/HANJE/Tk-QuickForm-0.06.tar.gz
 E/ET/ETHER/YAML-Tiny-1.75.tar.gz
+I/IN/INGY/Alien-YAMLScript-0.1.87.tar.gz
+S/SC/SCHWIGON/App-DPath-0.12.tar.gz
+E/ET/ETHER/CPAN-Meta-YAML-0.020.tar.gz
+J/JI/JIMAVERA/Data-Dumper-Interp-7.011.tar.gz
+T/TI/TIMLEGGE/Software-Security-Policy-0.02.tar.gz
+K/KI/KIMOTO/SPVM-0.990033.tar.gz
+G/GD/GDT/URI-PackageURL-2.22.tar.gz
+L/LN/LNATION/WebService-Chroma-0.02.tar.gz
+E/ET/ETHER/YAML-Tiny-1.76.tar.gz
+I/IN/INGY/YAMLScript-0.1.87.tar.gz

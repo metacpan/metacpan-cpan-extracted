@@ -60,7 +60,8 @@ my @tests = (
     {
         purl           => 'pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?packaging=sources',
         repository_url => 'https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-anim/1.9.1',
-        download_url   => 'https://repo1.maven.org/maven2/org/apache/xmlgraphics/batik-anim/1.9.1/batik-anim-1.9.1.jar'
+        download_url   =>
+            'https://repo.maven.apache.org/maven2/org/apache/xmlgraphics/batik-anim/1.9.1/batik-anim-1.9.1.jar'
     },
 
     {purl => 'pkg:pypi/django@1.11.1', repository_url => 'https://pypi.org/project/django/1.11.1'},

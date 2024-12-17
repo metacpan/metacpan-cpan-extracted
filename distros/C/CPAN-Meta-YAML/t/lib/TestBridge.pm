@@ -347,13 +347,11 @@ sub test_code_point {
         my $data = { chr($code) => chr($code) };
         my $dump = CPAN::Meta::YAML::Dump($data);
         $dump =~ s/^---\n//;
-        ok($dump eq $yaml or "'$dump'" eq $yaml,
-            "Dump key and value of code point char $code");
+        is $dump, $yaml, "Dump key and value of code point char $code";
 
         my $yny = CPAN::Meta::YAML::Dump(CPAN::Meta::YAML::Load($yaml));
         $yny =~ s/^---\n//;
-        ok($yny eq $yaml or "'$yny'" eq $yaml,
-            "YAML for code point $code YNY roundtrips");
+        is $yny, $yaml, "YAML for code point $code YNY roundtrips";
 
         my $nyn = CPAN::Meta::YAML::Load(CPAN::Meta::YAML::Dump($data));
         cmp_deeply( $nyn, $data, "YAML for code point $code NYN roundtrips" );

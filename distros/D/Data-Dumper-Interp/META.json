@@ -40,6 +40,7 @@
             "Regexp::Common" : "0",
             "Scalar::Util" : "0",
             "Term::ReadKey" : "0",
+            "bigrat" : "0.65",
             "constant" : "0",
             "feature" : "0",
             "if" : "0",
@@ -83,7 +84,7 @@
             "autovivification" : "0",
             "bigint" : "0",
             "bignum" : "0",
-            "bigrat" : "0",
+            "bigrat" : "0.65",
             "indirect" : "0",
             "lib" : "0",
             "multidimensional" : "0",
@@ -95,7 +96,7 @@
    "provides" : {
       "Data::Dumper::Interp" : {
          "file" : "lib/Data/Dumper/Interp.pm",
-         "version" : "7.010"
+         "version" : "7.011"
       }
    },
    "release_status" : "stable",
@@ -110,7 +111,7 @@
          "web" : "https://github.com/jimav/Data-Dumper-Interp"
       }
    },
-   "version" : "7.010",
+   "version" : "7.011",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "CC0-1.0"

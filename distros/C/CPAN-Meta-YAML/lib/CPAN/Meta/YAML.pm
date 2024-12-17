@@ -1,11 +1,11 @@
 use 5.008001; # sane UTF-8 support
 use strict;
 use warnings;
-package CPAN::Meta::YAML; # git description: v1.74-6-g56f1f15
+package CPAN::Meta::YAML; # git description: v1.75-3-g85169f1
 # XXX-INGY is 5.8.1 too old/broken for utf8?
 # XXX-XDG Lancaster consensus was that it was sufficient until
 # proven otherwise
-$CPAN::Meta::YAML::VERSION = '0.019';
+$CPAN::Meta::YAML::VERSION = '0.020';
 ; # original $VERSION removed by Doppelgaenger
 
 #####################################################################
@@ -138,10 +138,7 @@ my %UNESCAPES = (
 # These 3 values have special meaning when unquoted and using the
 # default YAML schema. They need quotes if they are strings.
 my %QUOTE = map { $_ => 1 } qw{
-    null Null NULL
-    y Y yes Yes YES n N no No NO
-    true True TRUE false False FALSE
-    on On ON off Off OFF
+    null true false
 };
 
 # The commented out form is simpler, but overloaded the Perl regex
@@ -879,7 +876,7 @@ CPAN::Meta::YAML - Read and write a subset of YAML for CPAN Meta files
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
