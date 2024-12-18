@@ -21,25 +21,40 @@ class Net::SSLeay::SSL_CTX : pointer {
   use Net::SSLeay::Callback::AlpnSelect; 
   
   use Net::SSLeay::Util;
+  use Net::SSLeay::X509_STORE_CTX;
   
   use Sync::Mutex;
   use StringList;
   
   # Class Variables
-  our $VERIFY_CBS_H : Hash of Net::SSLeay::Callback::Verify;
+  our $INSTANCES_H : Hash of Net::SSLeay::SSL_CTX;
   
   our $MUTEX : Sync::Mutex;
   
   INIT {
-    $VERIFY_CBS_H = Hash->new;
+    $INSTANCES_H = Hash->new;
     
     $MUTEX = Sync::Mutex->new;
   }
   
   # Fields
-  has ref_ssl : Net::SSLeay;
-  
   has ref_output_for_set_alpn_select_cb : string;
+  
+  has verify_callback : Net::SSLeay::Callback::Verify;
+  
+  has verify_callback_arg : object;
+  
+  has default_passwd_cb : Net::SSLeay::Callback::PemPassword;
+  
+  has default_passwd_cb_arg : object;
+  
+  has alpn_select_cb : Net::SSLeay::Callback::AlpnSelect;
+  
+  has alpn_select_cb_arg : object;
+  
+  has tlsext_servername_callback : Net::SSLeay::Callback::TlsextServername;
+  
+  has tlsext_servername_callback_arg : object;
   
   # Class Methods
   native static method new : Net::SSLeay::SSL_CTX ($method : Net::SSLeay::SSL_METHOD);
@@ -113,7 +128,7 @@ class Net::SSLeay::SSL_CTX : pointer {
   
   native method add_extra_chain_cert : long ($x509 : Net::SSLeay::X509);
   
-  native method set_verify : void ($mode : int, $verify_callback : Net::SSLeay::Callback::Verify = undef);
+  native method set_verify : void ($mode : int, $verify_callback : Net::SSLeay::Callback::Verify = undef, $arg : object = undef);
   
   native method set_default_passwd_cb : void ($cb : Net::SSLeay::Callback::PemPassword, $arg : object = undef);
   
@@ -125,7 +140,7 @@ class Net::SSLeay::SSL_CTX : pointer {
   
   native method DESTROY : void ();
   
-  private method GET_VERIFY_CB : Net::SSLeay::Callback::Verify ($key : string) {
+  private static method GET_INSTANCE : Net::SSLeay::SSL_CTX ($address : string) {
     
     Fn->defer(method : void () {
       $MUTEX->reader_unlock;
@@ -133,12 +148,12 @@ class Net::SSLeay::SSL_CTX : pointer {
     
     $MUTEX->reader_lock;
     
-    my $psk_server_cb = (Net::SSLeay::Callback::Verify)$VERIFY_CBS_H->get($key);
+    my $self = (Net::SSLeay::SSL_CTX)$INSTANCES_H->get($address);
     
-    return $psk_server_cb;
+    return $self;
   }
   
-  private method SET_VERIFY_CB : void ($key : string, $psk_server_cb : Net::SSLeay::Callback::Verify) {
+  private static method INIT_INSTANCE : void ($address : string, $self : Net::SSLeay::SSL_CTX) {
     
     Fn->defer(method : void () {
       $MUTEX->unlock;
@@ -146,10 +161,14 @@ class Net::SSLeay::SSL_CTX : pointer {
     
     $MUTEX->lock;
     
-    $VERIFY_CBS_H->set($key, $psk_server_cb);
+    unless ($INSTANCES_H->exists($address)) {
+      $INSTANCES_H->set($address, $self);
+      
+      $INSTANCES_H->weaken($address);
+    }
   }
   
-  private method DELETE_VERIFY_CB : Net::SSLeay::Callback::Verify ($key : string) {
+  private static method DELETE_INSTANCE : Net::SSLeay::SSL_CTX ($address : string) {
     
     Fn->defer(method : void () {
       $MUTEX->unlock;
@@ -157,7 +176,7 @@ class Net::SSLeay::SSL_CTX : pointer {
     
     $MUTEX->lock;
     
-    my $deleted = (Net::SSLeay::Callback::Verify)$VERIFY_CBS_H->delete($key);
+    my $deleted = (Net::SSLeay::SSL_CTX)$INSTANCES_H->delete($address);
     
     return $deleted;
   }

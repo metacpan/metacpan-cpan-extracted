@@ -66,6 +66,16 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   thread_env = env;
   
+  thread_env = env;
+  
+  char* tmp_buffer = env->get_stack_tmp_buffer(env, stack);
+  snprintf(tmp_buffer, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE, "%p", self);
+  void* obj_address = env->new_string(env, stack, tmp_buffer, strlen(tmp_buffer));
+  stack[0].oval = obj_address;
+  stack[1].oval = obj_self;
+  env->call_class_method_by_name(env, stack, "Net::SSLeay::SSL_CTX", "INIT_INSTANCE", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
   stack[0].oval = obj_self;
   
   return 0;
@@ -848,6 +858,8 @@ static int SPVM__Net__SSLeay__SSL_CTX__my__verify_cb(int preverify_ok, X509_STOR
   
   SPVM_VALUE* stack = env->new_stack(env);
   
+  int32_t scope_id = env->enter_scope(env, stack);
+  
   SSL* ssl = (SSL*)X509_STORE_CTX_get_ex_data(x509_store_ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
   
   if (!ssl) {
@@ -871,17 +883,29 @@ static int SPVM__Net__SSLeay__SSL_CTX__my__verify_cb(int preverify_ok, X509_STOR
   char* tmp_buffer = env->get_stack_tmp_buffer(env, stack);
   snprintf(tmp_buffer, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE, "%p", self);
   stack[0].oval = env->new_string(env, stack, tmp_buffer, strlen(tmp_buffer));
-  env->call_instance_method_by_name(env, stack, "GET_VERIFY_CB", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  env->call_class_method_by_name(env, stack, "Net::SSLeay::SSL_CTX", "GET_INSTANCE", 1, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     env->print_exception_to_stderr(env, stack);
     
     goto END_OF_FUNC;
   }
-  void* obj_cb = stack[0].oval;
+  void* obj_self = stack[0].oval;
+  
+  void* obj_cb = env->get_field_object_by_name(env, stack, obj_self, "verify_callback", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    env->print_exception_to_stderr(env, stack);
+    goto END_OF_FUNC;
+  }
   
   if (!obj_cb) {
-    env->die(env, stack, "GET_VERIFY_CB method returns undef.", __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "verify_callback field must be defined.", __func__, FILE_NAME, __LINE__);
     
+    env->print_exception_to_stderr(env, stack);
+    goto END_OF_FUNC;
+  }
+  
+  void* obj_arg = env->get_field_object_by_name(env, stack, obj_self, "verify_callback_arg", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
     env->print_exception_to_stderr(env, stack);
     goto END_OF_FUNC;
   }
@@ -903,6 +927,7 @@ static int SPVM__Net__SSLeay__SSL_CTX__my__verify_cb(int preverify_ok, X509_STOR
   stack[0].oval = obj_cb;
   stack[1].ival = preverify_ok;
   stack[2].oval = obj_x509_store_ctx;
+  stack[3].oval = obj_arg;
   
   env->call_instance_method_by_name(env, stack, "", 3, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
@@ -913,6 +938,8 @@ static int SPVM__Net__SSLeay__SSL_CTX__my__verify_cb(int preverify_ok, X509_STOR
   ret_status = stack[0].ival;
   
   END_OF_FUNC:
+  
+  env->leave_scope(env, stack, scope_id);
   
   env->free_stack(env, stack);
   
@@ -929,20 +956,20 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_verify(SPVM_ENV* env, SPVM_VALUE* stack)
   
   void* obj_cb = stack[2].oval;
   
+  void* obj_arg = stack[3].oval;
+  
   SSL_CTX* self = env->get_pointer(env, stack, obj_self);
   
   SSL_verify_cb native_cb = NULL;
   if (obj_cb) {
     native_cb = &SPVM__Net__SSLeay__SSL_CTX__my__verify_cb;
     
-    stack[0].oval = obj_self;
-    char* tmp_buffer = env->get_stack_tmp_buffer(env, stack);
-    snprintf(tmp_buffer, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE, "%p", self);
-    stack[1].oval = env->new_string(env, stack, tmp_buffer, strlen(tmp_buffer));
-    stack[2].oval = obj_cb;
-    env->call_instance_method_by_name(env, stack, "SET_VERIFY_CB", 3, &error_id, __func__, FILE_NAME, __LINE__);
+    env->set_field_object_by_name(env, stack, obj_self, "verify_callback", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
     if (error_id) { return error_id; }
   }
+  
+  env->set_field_object_by_name(env, stack, obj_self, "verify_callback_arg", obj_arg, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
   
   SSL_CTX_set_verify(self, mode, native_cb);
   
@@ -957,29 +984,58 @@ static int SPVM__Net__SSLeay__SSL_CTX__my__alpn_select_cb(SSL* ssl, const unsign
   
   void** native_args = (void**)native_arg;
   
-  SPVM_ENV* env = (SPVM_ENV*)native_args[0];
+  SPVM_ENV* env = thread_env;
   
-  SPVM_VALUE* stack = (SPVM_VALUE*)native_args[1];
+  SPVM_VALUE* stack = env->new_stack(env);
   
-  void* obj_self = native_args[2];
+  int32_t scope_id = env->enter_scope(env, stack);
   
-  void* obj_cb = native_args[3];
+  SSL_CTX* self = SSL_get_SSL_CTX(ssl);
   
-  void* obj_arg = native_args[4];
+  char* tmp_buffer = env->get_stack_tmp_buffer(env, stack);
+  snprintf(tmp_buffer, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE, "%p", self);
+  stack[0].oval = env->new_string(env, stack, tmp_buffer, strlen(tmp_buffer));
+  env->call_class_method_by_name(env, stack, "Net::SSLeay::SSL_CTX", "GET_INSTANCE", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    env->print_exception_to_stderr(env, stack);
+    
+    goto END_OF_FUNC;
+  }
+  void* obj_self = stack[0].oval;
+  
+  void* obj_cb = env->get_field_object_by_name(env, stack, obj_self, "alpn_select_cb", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    env->print_exception_to_stderr(env, stack);
+    goto END_OF_FUNC;
+  }
+  
+  if (!obj_cb) {
+    env->die(env, stack, "alpn_select_cb field must be defined.", __func__, FILE_NAME, __LINE__);
+    
+    env->print_exception_to_stderr(env, stack);
+    goto END_OF_FUNC;
+  }
+  
+  void* obj_arg = env->get_field_object_by_name(env, stack, obj_self, "alpn_select_cb_arg", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    env->print_exception_to_stderr(env, stack);
+    goto END_OF_FUNC;
+  }
   
   void* obj_address_ssl = env->new_pointer_object_by_name(env, stack, "Address", ssl, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     env->print_exception_to_stderr(env, stack);
     goto END_OF_FUNC;
   }
-  stack[0].oval = obj_address_ssl;
-  env->call_class_method_by_name(env, stack, "Net::SSLeay", "new_with_pointer", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  snprintf(tmp_buffer, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE, "%p", ssl);
+  stack[0].oval = env->new_string(env, stack, tmp_buffer, strlen(tmp_buffer));
+  env->call_class_method_by_name(env, stack, "Net::SSLeay", "GET_INSTANCE", 1, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     env->print_exception_to_stderr(env, stack);
+    
     goto END_OF_FUNC;
   }
   void* obj_ssl = stack[0].oval;
-  env->set_no_free(env, stack, obj_ssl, 1);
   
   void* obj_out_ref = env->new_string_array(env, stack, 1);
   
@@ -1019,6 +1075,10 @@ static int SPVM__Net__SSLeay__SSL_CTX__my__alpn_select_cb(SSL* ssl, const unsign
   
   END_OF_FUNC:
   
+  env->leave_scope(env, stack, scope_id);
+  
+  env->free_stack(env, stack);
+  
   return ret_status;
 }
 
@@ -1036,37 +1096,53 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_alpn_select_cb(SPVM_ENV* env, SPVM_VALUE
   
   int (*native_cb) (SSL *ssl, const unsigned char **out, unsigned char *outlen, const unsigned char *in, unsigned int inlen, void *arg) = NULL;
   
-  void* native_args[SPVM__Net__SSLeay__SSL_CTX__my__NATIVE_ARGS_MAX_LENGTH] = {0};
   if (obj_cb) {
     native_cb = &SPVM__Net__SSLeay__SSL_CTX__my__alpn_select_cb;
     
-    native_args[0] = env;
-    native_args[1] = stack;
-    native_args[2] = obj_self;
-    native_args[3] = obj_cb;
-    native_args[4] = obj_arg;
+    env->set_field_object_by_name(env, stack, obj_self, "alpn_select_cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
   }
   
-  SSL_CTX_set_alpn_select_cb(self, native_cb, native_args);
+  env->set_field_object_by_name(env, stack, obj_self, "alpn_select_cb_arg", obj_arg, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
+  SSL_CTX_set_alpn_select_cb(self, native_cb, self);
   
   return 0;
 }
 
 static int SPVM__Net__SSLeay__SSL_CTX__my__alpn_select_cb_for_protocols (SSL* ssl, const unsigned char** out_ref, unsigned char* outlen_ref, const unsigned char* in, unsigned int inlen, void* native_arg) {
   
+  spvm_warn("");
+  
   int32_t error_id = 0;
   
   int32_t ret_status = SSL_TLSEXT_ERR_NOACK;
   
-  void** native_args = (void**)native_arg;
+  SPVM_ENV* env = thread_env;
   
-  SPVM_ENV* env = (SPVM_ENV*)native_args[0];
+  SPVM_VALUE* stack = env->new_stack(env);
   
-  SPVM_VALUE* stack = (SPVM_VALUE*)native_args[1];
+  int32_t scope_id = env->enter_scope(env, stack);
   
-  void* obj_self = native_args[2];
+  SSL_CTX* self = SSL_get_SSL_CTX(ssl);
   
-  void* obj_protocols = native_args[3];
+  char* tmp_buffer = env->get_stack_tmp_buffer(env, stack);
+  snprintf(tmp_buffer, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE, "%p", self);
+  stack[0].oval = env->new_string(env, stack, tmp_buffer, strlen(tmp_buffer));
+  env->call_class_method_by_name(env, stack, "Net::SSLeay::SSL_CTX", "GET_INSTANCE", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    env->print_exception_to_stderr(env, stack);
+    
+    goto END_OF_FUNC;
+  }
+  void* obj_self = stack[0].oval;
+  
+  void* obj_protocols = env->get_field_object_by_name(env, stack, obj_self, "alpn_select_cb_arg", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    env->print_exception_to_stderr(env, stack);
+    goto END_OF_FUNC;
+  }
   
   assert(obj_protocols);
   
@@ -1094,6 +1170,10 @@ static int SPVM__Net__SSLeay__SSL_CTX__my__alpn_select_cb_for_protocols (SSL* ss
   
   END_OF_FUNC:
   
+  env->leave_scope(env, stack, scope_id);
+  
+  env->free_stack(env, stack);
+  
   return ret_status;
 }
 
@@ -1113,13 +1193,10 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_alpn_select_cb_with_protocols(SPVM_ENV* 
     native_cb = &SPVM__Net__SSLeay__SSL_CTX__my__alpn_select_cb_for_protocols;
   }
   
-  void* native_args[SPVM__Net__SSLeay__SSL_CTX__my__NATIVE_ARGS_MAX_LENGTH] = {0};
-  native_args[0] = env;
-  native_args[1] = stack;
-  native_args[2] = obj_self;
-  native_args[3] = obj_protocols;
+  env->set_field_object_by_name(env, stack, obj_self, "alpn_select_cb_arg", obj_protocols, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
   
-  SSL_CTX_set_alpn_select_cb(self, native_cb, native_args);
+  SSL_CTX_set_alpn_select_cb(self, native_cb, NULL);
   
   return 0;
 }
@@ -1130,17 +1207,45 @@ static int SPVM__Net__SSLeay__SSL_CTX__my__default_passwd_cb(char* buf, int size
   
   int32_t ret_buf_length = 0;
   
-  void** native_args = (void**)native_arg;
+  SPVM_ENV* env = thread_env;
   
-  SPVM_ENV* env = (SPVM_ENV*)native_args[0];
+  SPVM_VALUE* stack = env->new_stack(env);
   
-  SPVM_VALUE* stack = (SPVM_VALUE*)native_args[1];
+  int32_t scope_id = env->enter_scope(env, stack);
   
-  void* obj_self = native_args[2];
+  SSL_CTX* self = (SSL_CTX*)native_arg;
   
-  void* obj_cb = native_args[3];
+  char* tmp_buffer = env->get_stack_tmp_buffer(env, stack);
+  snprintf(tmp_buffer, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE, "%p", self);
+  stack[0].oval = env->new_string(env, stack, tmp_buffer, strlen(tmp_buffer));
+  env->call_class_method_by_name(env, stack, "Net::SSLeay::SSL_CTX", "GET_INSTANCE", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    env->print_exception_to_stderr(env, stack);
+    
+    goto END_OF_FUNC;
+  }
+  void* obj_self = stack[0].oval;
   
-  void* obj_arg = native_args[4];
+  assert(obj_self);
+  
+  void* obj_cb = env->get_field_object_by_name(env, stack, obj_self, "default_passwd_cb", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    env->print_exception_to_stderr(env, stack);
+    goto END_OF_FUNC;
+  }
+  
+  if (!obj_cb) {
+    env->die(env, stack, "default_passwd_cb field must be defined.", __func__, FILE_NAME, __LINE__);
+    
+    env->print_exception_to_stderr(env, stack);
+    goto END_OF_FUNC;
+  }
+  
+  void* obj_arg = env->get_field_object_by_name(env, stack, obj_self, "default_passwd_cb_arg", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    env->print_exception_to_stderr(env, stack);
+    goto END_OF_FUNC;
+  }
   
   void* obj_buf = env->new_string(env, stack, buf, size);
   
@@ -1162,6 +1267,10 @@ static int SPVM__Net__SSLeay__SSL_CTX__my__default_passwd_cb(char* buf, int size
   
   END_OF_FUNC:
   
+  env->leave_scope(env, stack, scope_id);
+  
+  env->free_stack(env, stack);
+  
   return ret_buf_length;
 }
 
@@ -1182,16 +1291,16 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_default_passwd_cb(SPVM_ENV* env, SPVM_VA
   if (obj_cb) {
     native_cb = &SPVM__Net__SSLeay__SSL_CTX__my__default_passwd_cb;
     
-    void* native_args[SPVM__Net__SSLeay__SSL_CTX__my__NATIVE_ARGS_MAX_LENGTH] = {0};
-    native_args[0] = env;
-    native_args[1] = stack;
-    native_args[2] = obj_self;
-    native_args[3] = obj_cb;
-    native_args[4] = obj_arg;
-    SSL_CTX_set_default_passwd_cb_userdata(self, native_args);
+    env->set_field_object_by_name(env, stack, obj_self, "default_passwd_cb", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
   }
   
+  env->set_field_object_by_name(env, stack, obj_self, "default_passwd_cb_arg", obj_arg, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
+  
   SSL_CTX_set_default_passwd_cb(self, native_cb);
+  
+  SSL_CTX_set_default_passwd_cb_userdata(self, self);
   
   return 0;
 }
@@ -1202,26 +1311,47 @@ static int SPVM__Net__SSLeay__SSL_CTX__my__tlsext_servername_callback(SSL* ssl, 
   
   int32_t ret_status = SSL_TLSEXT_ERR_NOACK;
   
-  void** native_args = (void**)native_arg;
+  SPVM_ENV* env = thread_env;
   
-  SPVM_ENV* env = (SPVM_ENV*)native_args[0];
+  SPVM_VALUE* stack = env->new_stack(env);
   
-  SPVM_VALUE* stack = (SPVM_VALUE*)native_args[1];
+  int32_t scope_id = env->enter_scope(env, stack);
   
-  void* obj_self = native_args[2];
+  SSL_CTX* self = SSL_get_SSL_CTX(ssl);
   
-  void* obj_cb = native_args[3];
-  
-  void* obj_arg = native_args[4];
-  
-  void* obj_address_ssl = env->new_pointer_object_by_name(env, stack, "Address", ssl, &error_id, __func__, FILE_NAME, __LINE__);
+  char* tmp_buffer = env->get_stack_tmp_buffer(env, stack);
+  snprintf(tmp_buffer, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE, "%p", self);
+  stack[0].oval = env->new_string(env, stack, tmp_buffer, strlen(tmp_buffer));
+  env->call_class_method_by_name(env, stack, "Net::SSLeay::SSL_CTX", "GET_INSTANCE", 1, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     env->print_exception_to_stderr(env, stack);
     
     goto END_OF_FUNC;
   }
-  stack[0].oval = obj_address_ssl;
-  env->call_class_method_by_name(env, stack, "Net::SSLeay", "new_with_pointer", 1, &error_id, __func__, FILE_NAME, __LINE__);
+  void* obj_self = stack[0].oval;
+  
+  void* obj_cb = env->get_field_object_by_name(env, stack, obj_self, "tlsext_servername_callback", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    env->print_exception_to_stderr(env, stack);
+    goto END_OF_FUNC;
+  }
+  
+  if (!obj_cb) {
+    env->die(env, stack, "verify_callback field must be defined.", __func__, FILE_NAME, __LINE__);
+    
+    env->print_exception_to_stderr(env, stack);
+    goto END_OF_FUNC;
+  }
+  
+  void* obj_arg = env->get_field_object_by_name(env, stack, obj_self, "tlsext_servername_callback_arg", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) {
+    env->print_exception_to_stderr(env, stack);
+    goto END_OF_FUNC;
+  }
+  
+  snprintf(tmp_buffer, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE, "%p", ssl);
+  stack[0].oval = env->new_string(env, stack, tmp_buffer, strlen(tmp_buffer));
+  env->call_class_method_by_name(env, stack, "Net::SSLeay", "GET_INSTANCE", 1, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     env->print_exception_to_stderr(env, stack);
     
@@ -1229,7 +1359,7 @@ static int SPVM__Net__SSLeay__SSL_CTX__my__tlsext_servername_callback(SSL* ssl, 
   }
   void* obj_ssl = stack[0].oval;
   
-  env->set_no_free(env, stack, obj_ssl, 1);
+  assert(obj_ssl);
   
   stack[0].oval = obj_cb;
   stack[1].oval = obj_ssl;
@@ -1249,6 +1379,10 @@ static int SPVM__Net__SSLeay__SSL_CTX__my__tlsext_servername_callback(SSL* ssl, 
   }
   
   END_OF_FUNC:
+  
+  env->leave_scope(env, stack, scope_id);
+  
+  env->free_stack(env, stack);
   
   return ret_status;
 }
@@ -1270,14 +1404,12 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_tlsext_servername_callback(SPVM_ENV* env
   if (obj_cb) {
     native_cb = &SPVM__Net__SSLeay__SSL_CTX__my__tlsext_servername_callback;
     
-    void* native_args[SPVM__Net__SSLeay__SSL_CTX__my__NATIVE_ARGS_MAX_LENGTH] = {0};
-    native_args[0] = env;
-    native_args[1] = stack;
-    native_args[2] = obj_self;
-    native_args[3] = obj_cb;
-    native_args[4] = obj_arg;
-    SSL_CTX_set_tlsext_servername_arg(self, native_args);
+    env->set_field_object_by_name(env, stack, obj_self, "tlsext_servername_callback", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
   }
+  
+  env->set_field_object_by_name(env, stack, obj_self, "tlsext_servername_callback_arg", obj_arg, &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { return error_id; }
   
   int64_t status = SSL_CTX_set_tlsext_servername_callback(self, native_cb);
   
@@ -1288,105 +1420,18 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_tlsext_servername_callback(SPVM_ENV* env
   return 0;
 }
 
-static unsigned int SPVM__Net__SSLeay__SSL_CTX__my__psk_client_cb(SSL* ssl, const char* hint, char* identity, unsigned int max_identity_len, unsigned char* psk, unsigned int max_psk_len) {
-  
-  int32_t error_id = 0;
-  
-  int32_t ret_status = 0;
-  
-  SPVM_ENV* env = thread_env;
-  
-  SPVM_VALUE* stack = env->new_stack(env);
-  
-  SSL_CTX* self = SSL_get_SSL_CTX(ssl);
-  
-  if (!self) {
-    env->die(env, stack, "SSL_get_SSL_CTX(ssl) failed.", __func__, FILE_NAME, __LINE__);
-    
-    env->print_exception_to_stderr(env, stack);
-    
-    goto END_OF_FUNC;
-  }
-  
-  char* tmp_buffer = env->get_stack_tmp_buffer(env, stack);
-  snprintf(tmp_buffer, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE, "%p", self);
-  stack[0].oval = env->new_string(env, stack, tmp_buffer, strlen(tmp_buffer));
-  env->call_instance_method_by_name(env, stack, "GET_PSK_CLIENT_CB", 1, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    env->print_exception_to_stderr(env, stack);
-    
-    goto END_OF_FUNC;
-  }
-  void* obj_cb = stack[0].oval;
-  
-  if (!obj_cb) {
-    env->die(env, stack, "GET_PSK_CLIENT_CB method returns undef.", __func__, FILE_NAME, __LINE__);
-    
-    env->print_exception_to_stderr(env, stack);
-    
-    goto END_OF_FUNC;
-  }
-  
-  void* obj_address_ssl = env->new_pointer_object_by_name(env, stack, "Address", ssl, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    env->print_exception_to_stderr(env, stack);
-    
-    goto END_OF_FUNC;
-  }
-  
-  stack[0].oval = obj_address_ssl;
-  env->call_class_method_by_name(env, stack, "Net::SSLeay", "new_with_pointer", 1, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    env->print_exception_to_stderr(env, stack);
-    
-    goto END_OF_FUNC;
-  }
-  void* obj_ssl = stack[0].oval;
-  
-  void* obj_identity = env->new_string(env, stack, identity, max_identity_len);
-  
-  void* obj_psk = env->new_string(env, stack, psk, max_psk_len);
-  
-  stack[0].oval = obj_cb;
-  stack[1].oval = obj_ssl;
-  stack[2].oval = obj_identity;
-  stack[3].ival = max_identity_len;
-  stack[4].oval = obj_psk;
-  stack[5].ival = max_psk_len;
-  
-  env->call_instance_method_by_name(env, stack, "", 6, &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) {
-    env->print_exception_to_stderr(env, stack);
-    
-    goto END_OF_FUNC;
-  }
-  ret_status = stack[0].ival;
-  
-  memcpy(identity, env->get_chars(env, stack, obj_identity), max_identity_len);
-  
-  memcpy(psk, env->get_chars(env, stack, obj_psk), max_psk_len);
-  
-  END_OF_FUNC:
-  
-  env->free_stack(env, stack);
-  
-  return ret_status;
-}
-
 int32_t SPVM__Net__SSLeay__SSL_CTX__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
-  
-  char* tmp_buffer = env->get_stack_tmp_buffer(env, stack);
   
   void* obj_self = stack[0].oval;
   
   SSL_CTX* self = env->get_pointer(env, stack, obj_self);
   
-  stack[0].oval = obj_self;
+  char* tmp_buffer = env->get_stack_tmp_buffer(env, stack);
   snprintf(tmp_buffer, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE, "%p", self);
-  stack[1].oval = env->new_string(env, stack, tmp_buffer, strlen(tmp_buffer));
-  env->call_instance_method_by_name(env, stack, "DELETE_VERIFY_CB", 2, &error_id, __func__, FILE_NAME, __LINE__);
+  stack[0].oval = env->new_string(env, stack, tmp_buffer, strlen(tmp_buffer));
+  env->call_class_method_by_name(env, stack, "Net::SSLeay::SSL_CTX", "DELETE_INSTANCE", 1, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   if (!env->no_free(env, stack, obj_self)) {

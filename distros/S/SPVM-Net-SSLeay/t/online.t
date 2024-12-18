@@ -17,7 +17,7 @@ my $ok = 0;
 eval { $ok = SPVM::TestCase::Net::SSLeay::Online->https_google };
 
 if ($@) {
-  warn "[Skip]https_google test failed. The system may be offline.";
+  warn "[Skip]https_google test failed. The system may be offline:$@";
 }
 else {
   ok($ok);
@@ -26,7 +26,7 @@ else {
 eval { $ok = SPVM::TestCase::Net::SSLeay::Online->https_google_with_mozilla_ca };
 
 if ($@) {
-  warn "[Skip]https_google test failed. The system may be offline.";
+  warn "[Skip]https_google test failed. The system may be offline:$@";
 }
 else {
   ok($ok);

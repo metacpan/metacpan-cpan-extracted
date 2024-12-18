@@ -1110,7 +1110,7 @@
          {
             "id" : "H020",
             "line" : "Elizabeth:1,Piccadilly:17",
-            "link" : "H017,H022",
+            "link" : "H022",
             "name" : "Heathrow Terminal 4"
          },
          {
@@ -1122,8 +1122,8 @@
          {
             "id" : "H022",
             "line" : "Elizabeth:3,Piccadilly:16",
-            "link" : "H017,H018,H020,H021",
-            "name" : "Heathrow Terminals 1 2 3"
+            "link" : "H017,H021",
+            "name" : "Heathrow Terminals 2 & 3"
          },
          {
             "id" : "H023",

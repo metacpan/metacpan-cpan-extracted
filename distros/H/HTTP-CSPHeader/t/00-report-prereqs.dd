@@ -25,16 +25,14 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'Math::Random::ISAAC::XS' => '0',
                                         'Ref::Util::XS' => '0',
                                         'Type::Tiny::XS' => '0'
                                       },
                       'requires' => {
-                                      'Crypt::URandom' => '0.37',
                                       'Fcntl' => '0',
                                       'List::Util' => '1.29',
-                                      'Math::Random::ISAAC' => '0',
                                       'Moo' => '0',
+                                      'Session::Token' => '0',
                                       'Types::Common' => '2.000000',
                                       'namespace::autoclean' => '0',
                                       'perl' => 'v5.14.0'

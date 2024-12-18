@@ -8,7 +8,16 @@ class Net::SSLeay::X509_STORE_CTX : pointer {
   use Net::SSLeay::X509_STORE;
   
   # Class Methods
-  native method get1_issuer : int ($issuer_ref : Net::SSLeay::X509[], $ctx : Net::SSLeay::X509_STORE_CTX, $x : Net::SSLeay::X509);
+  private static method new_with_pointer : Net::SSLeay::X509_STORE_CTX ($pointer : Address, $options : object[] = undef) {
+    
+    my $self = new Net::SSLeay::X509_STORE_CTX;
+    
+    Fn->set_pointer($self, $pointer);
+    
+    return $self;
+  }
+  
+  native static method get1_issuer : int ($issuer_ref : Net::SSLeay::X509[], $ctx : Net::SSLeay::X509_STORE_CTX, $x : Net::SSLeay::X509);
   
   # Instance Methods
   native method set_error : void ($s : int);

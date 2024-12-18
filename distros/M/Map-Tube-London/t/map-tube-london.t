@@ -43,3 +43,7 @@ Route 24|Liverpool Street|Monument|Liverpool Street,Bank,Monument
 Route 25|Baker Street|Farringdon|Baker Street,Bond Street,Tottenham Court Road,Farringdon
 Route 26|Bank|Monument|Bank,Monument
 Route 27|Euston|King's Cross St Pancras|Euston,King's Cross St Pancras
+Route 28|Hatton Cross|Heathrow Terminals 2 & 3|Hatton Cross,Heathrow Terminals 2 & 3
+Route 29|Heathrow Terminal 4|Hatton Cross|Heathrow Terminal 4, Heathrow Terminals 2 & 3, Hatton Cross
+Route 30|Heathrow Terminal 4|Heathrow Terminal 5|Heathrow Terminal 4, Heathrow Terminals 2 & 3, Heathrow Terminal 5
+Route 31|Heathrow Terminal 4|Hatton Cross|Heathrow Terminal 4, Heathrow Terminals 2 & 3, Hatton Cross

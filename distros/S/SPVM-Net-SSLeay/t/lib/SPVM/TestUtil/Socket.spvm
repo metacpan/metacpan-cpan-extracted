@@ -4,8 +4,17 @@ class TestUtil::Socket extends IO::Socket::IP  {
   use Sys::Socket::Sockaddr;
   use Net::SSLeay::Constant as SSL;
   
+  use TestUtil::Socket::Callback::BeforeConnectSSL;
+  use TestUtil::Socket::Callback::BeforeAcceptSSL;
+  
   # Fields
-  has ssl : rw Net::SSLeay;
+  has ssl_ctx : ro Net::SSLeay::SSL_CTX;
+  
+  has ssl : ro Net::SSLeay;
+  
+  has before_connect_SSL_cbs_list : ro List of TestUtil::Socket::Callback::BeforeConnectSSL;
+  
+  has before_accept_SSL_cbs_list : ro List of TestUtil::Socket::Callback::BeforeAcceptSSL;
   
   # Class Methods
   static method new : TestUtil::Socket ($options : object[] = undef) {
@@ -31,6 +40,10 @@ class TestUtil::Socket extends IO::Socket::IP  {
     
     $self->SUPER::init($options);
     
+    $self->{before_connect_SSL_cbs_list} = List->new(new TestUtil::Socket::Callback::BeforeConnectSSL[0]);
+    
+    $self->{before_accept_SSL_cbs_list} = List->new(new TestUtil::Socket::Callback::BeforeAcceptSSL[0]);
+    
   }
   
   protected method configure_SSL : void () {
@@ -39,23 +52,27 @@ class TestUtil::Socket extends IO::Socket::IP  {
     
     my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
     
-    my $ssl = Net::SSLeay->new($ssl_ctx);
-    
-    my $socket_fileno = $self->fileno;
-    
-    $ssl->set_fd($socket_fileno);
-    
-    $self->{ssl} = $ssl;
-    
+    $self->{ssl_ctx} = $ssl_ctx;
   }
   
   method connect_SSL : void () {
     
-    my $ssl = $self->{ssl};
-    
     my $timeout = $self->{Timeout};
     
     my $fd = $self->{FD};
+    
+    my $ssl_ctx = $self->{ssl_ctx};
+    
+    my $ssl = Net::SSLeay->new($ssl_ctx);
+    
+    $ssl->set_fd($fd);
+    
+    my $before_connect_SSL_cbs_list = $self->{before_connect_SSL_cbs_list};
+    my $before_connect_SSL_cbs_length = $before_connect_SSL_cbs_list->length;
+    for (my $i = 0; $i < $before_connect_SSL_cbs_length; $i++) {
+      my $cb = (TestUtil::Socket::Callback::BeforeConnectSSL)$before_connect_SSL_cbs_list->get($i);
+      $cb->($ssl);
+    }
     
     while (1) {
       eval { $ssl->connect; }
@@ -81,24 +98,38 @@ class TestUtil::Socket extends IO::Socket::IP  {
         last;
       }
     }
+    
+    $self->{ssl} = $ssl;
+    
   }
   
   method accept : TestUtil::Socket ($peer_ref : Sys::Socket::Sockaddr[] = undef) {
     
     my $client_socket = (TestUtil::Socket)$self->SUPER::accept($peer_ref);
     
-    $client_socket->ssl->set_SSL_CTX($self->ssl->get_SSL_CTX);
+    $client_socket->{ssl_ctx} = $self->{ssl_ctx};
     
     return $client_socket;
   }
   
   method accept_SSL : void () {
     
-    my $ssl = $self->{ssl};
-    
     my $fd = $self->{FD};
     
     my $timeout = $self->{Timeout};
+    
+    my $ssl_ctx = $self->{ssl_ctx};
+    
+    my $ssl = Net::SSLeay->new($ssl_ctx);
+    
+    $ssl->set_fd($fd);
+    
+    my $before_accept_SSL_cbs_list = $self->{before_accept_SSL_cbs_list};
+    my $before_accept_SSL_cbs_length = $before_accept_SSL_cbs_list->length;
+    for (my $i = 0; $i < $before_accept_SSL_cbs_length; $i++) {
+      my $cb = (TestUtil::Socket::Callback::BeforeAcceptSSL)$before_accept_SSL_cbs_list->get($i);
+      $cb->($ssl);
+    }
     
     while (1) {
       eval { $ssl->accept; }
@@ -124,6 +155,8 @@ class TestUtil::Socket extends IO::Socket::IP  {
         last;
       }
     }
+    
+    $self->{ssl} = $ssl;
   }
   
   method read : int ($buffer : mutable string, $length : int = -1, $offset : int = 0) {
@@ -243,16 +276,32 @@ class TestUtil::Socket extends IO::Socket::IP  {
     
     my $ssl = $self->{ssl};
     
-    my $shutdown_status = $ssl->get_shutdown;
-    
-    my $listen = $self->{Listen};
-    
-    # Only client sockets and accpected sockets
-    unless ($listen > 0) {
-      $self->shutdown_SSL;
+    if ($ssl) {
+      my $listen = $self->{Listen};
+      
+      # Only client sockets and accpected sockets
+      unless ($listen > 0) {
+        $self->shutdown_SSL;
+      }
     }
     
     $self->SUPER::close;
+    
+  }
+  
+  method add_before_connect_SSL_cb : void ($cb : TestUtil::Socket::Callback::BeforeConnectSSL) {
+    
+    my $before_connect_SSL_cbs_list = $self->{before_connect_SSL_cbs_list};
+    
+    $before_connect_SSL_cbs_list->push($cb);
+    
+  }
+  
+  method add_before_accept_SSL_cb : void ($cb : TestUtil::Socket::Callback::BeforeAcceptSSL) {
+    
+    my $before_accept_SSL_cbs_list = $self->{before_accept_SSL_cbs_list};
+    
+    $before_accept_SSL_cbs_list->push($cb);
     
   }
   

@@ -2,16 +2,10 @@
 
 use strict;
 use warnings;
+
+use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs 'Test::Synopsis';
 
-if($ENV{AUTHOR_TESTING}) {
-	eval 'use Test::Synopsis';
-
-	if($@) {
-		plan(skip_all => 'Test::Synopsis required for testing POD Synopsis');
-	} else {
-		all_synopsis_ok();
-	}
-} else {
-	plan(skip_all => 'Author tests not required for installation');
-}
+Test::Synopsis->import();
+all_synopsis_ok();

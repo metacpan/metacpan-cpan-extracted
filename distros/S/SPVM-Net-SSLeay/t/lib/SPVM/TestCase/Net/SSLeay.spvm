@@ -60,7 +60,7 @@ class TestCase::Net::SSLeay {
     
     my $ssl = $server_socket->ssl;
     
-    my $ssl_ctx = $ssl->get_SSL_CTX;
+    my $ssl_ctx = $server_socket->ssl_ctx;
     
     $ssl_ctx->use_PrivateKey_file("$FILE_DIR/simple-cert.key.pem");
     
@@ -91,6 +91,29 @@ class TestCase::Net::SSLeay {
   }
   
   static method accept : int ($port : int) {
+    
+    # set_SSL_CTX, get_SSL_CTX
+    {
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx1 = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        my $ssl_ctx2 = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        my $ssl = Net::SSLeay->new($ssl_ctx1);
+        
+        unless (Fn->eq_pointer($ssl->get_SSL_CTX, $ssl_ctx1)) {
+          return 0;
+        }
+        
+        $ssl->set_SSL_CTX($ssl_ctx2);
+        
+        unless (Fn->eq_pointer($ssl->get_SSL_CTX, $ssl_ctx2)) {
+          return 0;
+        }
+      }
+    }
     
     # Clsss Methods
     {
@@ -151,9 +174,7 @@ class TestCase::Net::SSLeay {
         my $host = "127.0.0.1";
         my $socket = TestUtil::Socket->new({PeerAddr => $host, PeerPort => $port});
         
-        my $ssl = $socket->ssl;
-        
-        my $ssl_ctx = $ssl->get_SSL_CTX;
+        my $ssl_ctx = $socket->ssl_ctx;
         
         $ssl_ctx->use_PrivateKey_file("$FILE_DIR/simple-cert.key.pem");
         
@@ -163,15 +184,69 @@ class TestCase::Net::SSLeay {
         
         $ssl_ctx->set_alpn_protos_with_protocols(["http1.1"]);
         
-        if ($ssl->get_peer_certificate) {
-          $success_ref->[0] = 0;
-        }
+        my $msg_callback_results = new object[10];
         
-        if ($ssl->get_peer_cert_chain) {
-          $success_ref->[0] = 0;
-        }
+        my $msg_callback = [$msg_callback_results : object[]]method : void ($write_p : int, $version : int, $content_type : int, $buf : string, $len : int, $ssl : Net::SSLeay, $arg : object) {          
+          unless ($msg_callback_results->[0]) {
+            warn "[Test Output]\$write_p:$write_p,\$version:$version,\$content_type:$content_type,\$buf:" . dump $buf . ",\$len:$len,\$ssl:" . type_name($ssl) . ",\$arg:" . $arg->(int);
+            
+            $msg_callback_results->[0] = $write_p;
+            $msg_callback_results->[1] = $version;
+            $msg_callback_results->[2] = $content_type;
+            $msg_callback_results->[3] = $buf;
+            $msg_callback_results->[4] = $len;
+            
+            my $ssl_hash = Hash->new;
+            $ssl_hash->set("ssl", $ssl);
+            $ssl_hash->weaken("ssl");
+            
+            $msg_callback_results->[5] = $ssl_hash;
+            $msg_callback_results->[6] = $arg;
+            
+          }
+        };
+        
+        my $msg_callback_arg = Int->new(10);
+        
+        $socket->add_before_connect_SSL_cb([$msg_callback : Net::SSLeay::Callback::Msg, $msg_callback_arg : object] method : void ($ssl : Net::SSLeay) {
+          $ssl->set_msg_callback($msg_callback, $msg_callback_arg);
+        });
         
         $socket->connect_SSL;
+        
+        my $ssl = $socket->ssl;
+        
+        $ssl = $socket->ssl;
+        
+        $ssl->set_msg_callback(undef);
+        
+        unless ($msg_callback_results->[0]->(int) >= 0) {
+          $success_ref->[0] = 0;
+        }
+        
+        unless ($msg_callback_results->[1]->(int) >= 0) {
+          $success_ref->[0] = 0;
+        }
+        
+        unless ($msg_callback_results->[2]->(int) > 0) {
+          $success_ref->[0] = 0;
+        }
+        
+        unless (length $msg_callback_results->[3]->(string) > 0) {
+          $success_ref->[0] = 0;
+        }
+        
+        unless ($msg_callback_results->[4]->(int) > 0) {
+          $success_ref->[0] = 0;
+        }
+        
+        unless ($msg_callback_results->[5]->(Hash)->get("ssl") is_type Net::SSLeay) {
+          $success_ref->[0] = 0;
+        }
+        
+        unless ($msg_callback_results->[6]->(int) == 10) {
+          $success_ref->[0] = 0;
+        }
         
         my $certificate = $ssl->get_certificate;
         

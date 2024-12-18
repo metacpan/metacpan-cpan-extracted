@@ -34,7 +34,11 @@
          "requires" : {
             "JSON" : "0",
             "LWP::UserAgent" : "0",
+            "Module::Load" : "0",
             "Moo" : "0",
+            "MooX::ValidateSubs" : "0",
+            "OpenAI::API" : "0",
+            "Type::Tiny" : "0",
             "perl" : "5.006"
          }
       },
@@ -45,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

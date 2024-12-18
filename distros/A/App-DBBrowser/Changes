@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.418  2024-12-18
+        - Update input filter Choose_Rows.
+        - New input filter Empty_Rows.
+        - Text::CSV_XS: use 'getline_all' instead of 'getline'.
+
 2.417  2024-11-17
         - Confirm update/delete without where clause.
 

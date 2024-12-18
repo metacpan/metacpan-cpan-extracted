@@ -3,9 +3,42 @@ package WebService::Chroma::UA;
 use Moo;
 use LWP::UserAgent;
 use JSON;
+use Module::Load;
 
 has base_url => (
 	is => 'ro',
+);
+
+has embeddings_model => (
+	is => 'rw',
+	trigger => sub {
+		if ($_[1] && $_[0]->embeddings) {
+			$_[0]->embeddings->model($_[1]);
+		}
+	}
+);
+
+has embeddings_base_url => (
+	is => 'rw',
+	trigger => sub {
+		if ($_[1] && $_[0]->embeddings) {
+			$_[0]->embeddings->base_url($_[1]);
+		}
+	}
+);
+
+has embeddings_class => (
+	is => 'ro',
+	trigger => sub {
+		return unless $_[1];
+		my $class = 'WebService::Chroma::Embeddings::' . $_[1];
+		load $class;
+		$_[0]->embeddings($class->new(($_[0]->embeddings_model ? (model => $_[0]->embeddings_model) : ())));
+	}
+);
+
+has embeddings => (
+	is => 'rw',
 );
 
 has ua => (

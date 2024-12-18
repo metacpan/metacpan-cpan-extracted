@@ -45,7 +45,6 @@ sub parse_with_Text_CSV {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $sf->__print_waiting_str;
     seek $fh, 0, 0;
-    my $rows_of_cols = [];
     require String::Unescape;
     my $options = {
         map { $_ => String::Unescape::unescape( $sf->{o}{csv_in}{$_} ) }
@@ -65,7 +64,7 @@ sub parse_with_Text_CSV {
             my $error_input = $csv->error_input() // 'No Error Input defined.';
             my $prompt = "Error Input:";
             $error_input =~ s/\R/ /g;
-            my $info = "Close with ENTER\nText::CSV_XS\n$code $str\nposition:$pos record:$rec field:$fld\n";
+            my $info = "Close with ENTER\nText::CSV_XS\n$code $str\nrecord:$rec field:$fld position:$pos\n";
             $tc->choose(
                 [ line_fold( $error_input, get_term_width() ) ],
                 { info => $info, prompt => $prompt  }
@@ -74,9 +73,7 @@ sub parse_with_Text_CSV {
             return;
         }
     } );
-    while ( my $cols = $csv->getline( $fh ) ) {
-        push @$rows_of_cols, $cols;
-    }
+    my $rows_of_cols = $csv->getline_all( $fh );
     $sql->{insert_args} = $rows_of_cols;
     return 1;
 }

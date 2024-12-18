@@ -1,12 +1,52 @@
 use Test::More;
 
-use WebService::Chroma;
 =pod
-my $chroma = WebService::Chroma->new();
+use WebService::Chroma;
+my $chroma = WebService::Chroma->new(
+	embeddings_class => 'Ollama'
+);
 
 my $version = $chroma->version();
 
 diag explain $version;
+
+
+my $collection = $chroma->get_collection(
+	tenant => 'testing-tenant',
+	db => 'testing-db',
+	name => 'my-collection'
+);
+
+diag explain $collection;
+
+$collection->delete(
+	ids => [ "1", "2" ],
+);
+
+diag explain $collection->add(
+	documents => [
+		'a blue scarf, a red hat, a wolly jumper, black gloves',
+		'a pink scarf, a blue hat, a wolly jumper, green gloves'
+	],
+	ids => [
+		"1",
+		"2"
+	]
+);
+
+diag explain $collection->query(
+  "query_texts"=> [
+     'a blue scarf, a red hat, a wolly jumper, green gloves'
+  ],
+  "n_results"=> 1,
+  "include"=> [
+    "metadatas",
+    "documents",
+    "distances"
+  ]
+);
+
+diag explain $collection->count();
 
 #my $reset = $chroma->reset();
 
@@ -42,24 +82,7 @@ my $collection = $db->get_collection(name => 'my-collection');
 
 diag explain $collection;
 
-$collection->delete(
-	ids => [ "1", "2" ],
-);
 
-diag explain $collection->add(
-	embeddings => [
-		[1.1, 2.3, 3.2],
-		[2.1, 3.3, 4.2],
-	],
-	documents => [
-		'a blue scarf, a red hat, a wolly jumper, black gloves',
-		'a pink scarf, a blue hat, a wolly jumper, green gloves'
-	],
-	ids => [
-		"1",
-		"2"
-	]
-);
 
 diag explain $collection->get(
 	ids => [

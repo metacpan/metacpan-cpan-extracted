@@ -2,7 +2,7 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.029";
+  version "0.030";
   
   use Net::SSLeay::Constant as SSL;
   use Net::SSLeay::SSL_CTX;
@@ -15,8 +15,23 @@ class Net::SSLeay {
   
   use Net::SSLeay::Callback::Msg;
   
+  # Class Variables
+  our $INSTANCES_H : Hash of Net::SSLeay;
+  
+  our $MUTEX : Sync::Mutex;
+  
+  INIT {
+    $INSTANCES_H = Hash->new;
+    
+    $MUTEX = Sync::Mutex->new;
+  }
+  
   # Fields
   has operation_error : ro int;
+  
+  has msg_callback : Net::SSLeay::Callback::Msg;
+  
+  has msg_callback_arg : object;
   
   # Class Methods
   native static method new : Net::SSLeay ($ssl_ctx : Net::SSLeay::SSL_CTX);
@@ -27,6 +42,8 @@ class Net::SSLeay {
     
     Fn->set_pointer($self, $pointer);
     
+    $self->init($options);
+    
     return $self;
   }
   
@@ -35,6 +52,13 @@ class Net::SSLeay {
   native static method load_client_CA_file : Net::SSLeay::X509_NAME[] ($file : string);
   
   # Instance Methods
+  protected method init : void ($objects : object[] = undef) {
+    
+    $self->_init_native;
+  }
+  
+  native private method _init_native : void ($objects : object[] = undef);
+  
   native method version : int ();
   
   native method get_mode : long ();
@@ -111,5 +135,46 @@ class Net::SSLeay {
   }
   
   native method DESTROY : void ();
+  
+  private static method GET_INSTANCE : Net::SSLeay ($address : string) {
+    
+    Fn->defer(method : void () {
+      $MUTEX->reader_unlock;
+    });
+    
+    $MUTEX->reader_lock;
+    
+    my $self = (Net::SSLeay)$INSTANCES_H->get($address);
+    
+    return $self;
+  }
+  
+  private static method INIT_INSTANCE : void ($address : string, $self : Net::SSLeay) {
+    
+    Fn->defer(method : void () {
+      $MUTEX->unlock;
+    });
+    
+    $MUTEX->lock;
+    
+    unless ($INSTANCES_H->exists($address)) {
+      $INSTANCES_H->set($address, $self);
+      
+      $INSTANCES_H->weaken($address);
+    }
+  }
+  
+  private static method DELETE_INSTANCE : Net::SSLeay ($address : string) {
+    
+    Fn->defer(method : void () {
+      $MUTEX->unlock;
+    });
+    
+    $MUTEX->lock;
+    
+    my $deleted = (Net::SSLeay)$INSTANCES_H->delete($address);
+    
+    return $deleted;
+  }
   
 }

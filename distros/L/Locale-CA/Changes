@@ -1,5 +1,10 @@
 Revision history for Locale-CA
 
+0.07	Tue Dec 17 08:20:35 EST 2024
+	Allow Newfoundland, as well as Newfoundland and Labrador
+	Use Test::DescribeMe to simplify tests
+	Use Test::Needs
+
 0.06	Thu Sep 26 08:42:57 EDT 2024
 	Fix synopsis syntax
 	Map Ablt. to AB

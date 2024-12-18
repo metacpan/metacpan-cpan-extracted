@@ -101,6 +101,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'delete_embedded_binary_objects' => {
+    	datatype => 'boolean',
+    	base_name => 'DeleteEmbeddedBinaryObjects',
+    	description => 'True to delete delete all embedded binary objects.',
+    	format => '',
+    	read_only => '',
+    		},
     'gradient_style' => {
     	datatype => 'string',
     	base_name => 'GradientStyle',
@@ -182,6 +189,7 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'default_regular_font' => 'string',
+    'delete_embedded_binary_objects' => 'boolean',
     'gradient_style' => 'string',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'font_subst_rules' => 'ARRAY[FontSubstRule]',
@@ -197,6 +205,7 @@ __PACKAGE__->swagger_types( {
 
 __PACKAGE__->attribute_map( {
     'default_regular_font' => 'DefaultRegularFont',
+    'delete_embedded_binary_objects' => 'DeleteEmbeddedBinaryObjects',
     'gradient_style' => 'GradientStyle',
     'font_fallback_rules' => 'FontFallbackRules',
     'font_subst_rules' => 'FontSubstRules',

@@ -323,6 +323,8 @@ t/lib/SPVM/TestCase/Net/SSLeay/Online.spvm
 t/lib/SPVM/TestCase/Net/SSLeay/SSL_CTX.spvm
 t/lib/SPVM/TestCase/Net/SSLeay/Util.spvm
 t/lib/SPVM/TestUtil/Socket.spvm
+t/lib/SPVM/TestUtil/Socket/Callback/BeforeAcceptSSL.spvm
+t/lib/SPVM/TestUtil/Socket/Callback/BeforeConnectSSL.spvm
 t/online.t
 t/OPENSSL.t
 t/SSL_CTX.t

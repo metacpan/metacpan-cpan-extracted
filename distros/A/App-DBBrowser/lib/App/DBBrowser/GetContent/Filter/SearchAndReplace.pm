@@ -119,7 +119,7 @@ sub search_and_replace {
                 }
             }
             if ( $header_changed ) {
-                my ( $yes, $no ) = ( 'Yes', 'No' );
+                my ( $yes, $no ) = ( '- YES', '- NO' );
                 my $menu = [ undef, $yes, $no ];
                 my @tmp_info_addition = ( 'Header: ' . join( ', ', map { $_ // '' } @{$sql->{insert_args}[0]} ), ' ' );
                 $info = $cf->__get_filter_info( $sql, join( "\n", @tmp_info, @tmp_info_addition ) );

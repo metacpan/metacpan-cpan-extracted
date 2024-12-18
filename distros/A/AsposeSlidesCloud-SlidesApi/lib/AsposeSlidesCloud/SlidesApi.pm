@@ -583,6 +583,158 @@ sub compress_embedded_fonts_online {
 }
 
 #
+# compress_image
+#
+# Deletes cropped areas of a pictire.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index (must refer to a picture frame). (required)
+# @param double $resolution Target resolution in DPI. (optional)
+# @param boolean $delete_picture_cropped_areas true to delete picture cropped areas. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Presentation storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index (must refer to a picture frame).',
+        required => '1',
+    },
+    'resolution' => {
+        data_type => 'double',
+        description => 'Target resolution in DPI.',
+        required => '0',
+    },
+    'delete_picture_cropped_areas' => {
+        data_type => 'boolean',
+        description => 'true to delete picture cropped areas.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'compress_image' } = { 
+    	summary => 'Deletes cropped areas of a pictire.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub compress_image {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling compress_image");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling compress_image");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling compress_image");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/compressImage';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'resolution'} && defined $args{'resolution'}) {
+        $query_params->{'resolution'} = $self->{api_client}->to_query_value($args{'resolution'});
+    }
+
+    # query params
+    if (exists $args{'delete_picture_cropped_areas'} && defined $args{'delete_picture_cropped_areas'}) {
+        $query_params->{'deletePictureCroppedAreas'} = $self->{api_client}->to_boolean_query_value($args{'delete_picture_cropped_areas'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    return;
+}
+
+#
 # convert
 #
 # Convert presentation from request content to format specified.
@@ -21344,7 +21496,7 @@ sub get_shape_geometry_path {
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
 # @param string $shape_type Shape type. (optional)
-# @param string $sub_shape Sub-shape path (e.g. \&quot;3\&quot;, \&quot;3/shapes/2). (optional)
+# @param string $sub_shape Sub-shape path (e.g. \&quot;3\&quot;, \&quot;3/shapes/2\&quot;). (optional)
 {
     my $params = {
     'name' => {
@@ -21379,7 +21531,7 @@ sub get_shape_geometry_path {
     },
     'sub_shape' => {
         data_type => 'string',
-        description => 'Sub-shape path (e.g. \&quot;3\&quot;, \&quot;3/shapes/2).',
+        description => 'Sub-shape path (e.g. \&quot;3\&quot;, \&quot;3/shapes/2\&quot;).',
         required => '0',
     },
     };

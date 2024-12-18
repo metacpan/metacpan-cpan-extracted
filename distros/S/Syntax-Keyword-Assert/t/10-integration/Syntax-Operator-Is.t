@@ -1,6 +1,7 @@
 use Test2::V0;
 use Test2::Require::Module 'Syntax::Operator::Is', '0.02';
 use Test2::Require::Module 'XS::Parse::Infix', '0.44';
+use Test2::Require::Module 'Data::Checks', '0.09';
 
 use Syntax::Keyword::Assert;
 use Syntax::Operator::Is is => { -as => "is_" };

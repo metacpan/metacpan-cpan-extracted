@@ -50,6 +50,93 @@ sub new {
 
 
 #
+# download
+#
+# 
+# 
+# @param string $path  (required)
+# @param string $storage_name  (optional)
+# @param string $version_id  (optional)
+{
+    my $params = {
+    'path' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'version_id' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'download' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub download {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'} && defined $args{'path'} && $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling download");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/async/storage/file/{path}';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'storage_name'} && defined $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # query params
+    if (exists $args{'version_id'} && defined $args{'version_id'}) {
+        $query_params->{'versionId'} = $self->{api_client}->to_query_value($args{'version_id'});
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
 # get_operation_result
 #
 # 
@@ -1349,6 +1436,96 @@ sub start_upload_and_split {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# upload
+#
+# 
+# 
+# @param string $path  (required)
+# @param File $file File to upload (required)
+# @param string $storage_name  (optional)
+{
+    my $params = {
+    'path' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'file' => {
+        data_type => 'File',
+        description => 'File to upload',
+        required => '1',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'upload' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesUploadResult',
+        };
+}
+# @return FilesUploadResult
+#
+sub upload {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'} && defined $args{'path'} && $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling upload");
+    }
+
+    # verify the required parameter 'file' is set
+    unless (exists $args{'file'} && defined $args{'file'} && $args{'file'}) {
+      croak("Missing the required parameter 'file' when calling upload");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/async/storage/file/{path}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'storage_name'} && defined $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'file'} && $args{'file'}) {
+        push(@$files, $args{'file'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesUploadResult', $response);
     return $_response_object;
 }
 

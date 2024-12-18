@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 keywords:
   - HTTP
   - security
@@ -29,25 +29,23 @@ name: HTTP-CSPHeader
 provides:
   HTTP::CSPHeader:
     file: lib/HTTP/CSPHeader.pm
-    version: v0.3.4
+    version: v0.4.0
 recommends:
-  Math::Random::ISAAC::XS: '0'
   Ref::Util::XS: '0'
   Type::Tiny::XS: '0'
 requires:
-  Crypt::URandom: '0.37'
   Fcntl: '0'
   List::Util: '1.29'
-  Math::Random::ISAAC: '0'
   Moo: '0'
+  Session::Token: '0'
   Types::Common: '2.000000'
   namespace::autoclean: '0'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/robrwo/perl-HTTP-CSPHeader/issues
   repository: git://github.com/robrwo/perl-HTTP-CSPHeader.git
-version: v0.3.4
+version: v0.4.0
 x_authority: cpan:RRWO
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.34.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

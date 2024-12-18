@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.417';
+our $VERSION = '2.418';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.417
+Version 2.418
 
 =head1 SYNOPSIS
 
@@ -517,9 +517,6 @@ If a column is not empty but has no header name, the header is named temporarily
 
 Use only selected rows of the imported data.
 
-If the data has empty rows, the non-empty rows are preselected. Rows are regarded as empty if the values of all fields
-in the row have no length.
-
 =item Range Rows
 
 Use only a range of rows.
@@ -529,6 +526,10 @@ Use only a range of rows.
 If the input has rows with different numbers of columns, I<Row Groups> sorts rows with the same number of columns into a
 group. The user can then choose one or more groups of rows. There is only one group if all rows have the same column
 count.
+
+=item Empty Rows
+
+Remove empty rows or remove rows where all fields are empty or undefined (includes empty rows).
 
 =item Remove Cell
 

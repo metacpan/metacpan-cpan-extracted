@@ -20,7 +20,7 @@ Net::SSLeay::X509_STORE_CTX class in L<SPVM> represents L<X509_STORE_CTX|https:/
 
 =head2 get1_issuer
 
-C<method get1_issuer : int ($issuer_ref : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>[], $ctx : L<Net::SSLeay::X509_STORE_CTX|SPVM::Net::SSLeay::X509_STORE_CTX>, $x : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>);>
+C<static method get1_issuer : int ($issuer_ref : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>[], $ctx : L<Net::SSLeay::X509_STORE_CTX|SPVM::Net::SSLeay::X509_STORE_CTX>, $x : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>);>
 
 Calls native L<X509_STORE_CTX_get1_issuer|https://docs.openssl.org/master/man3/X509_STORE_set_verify_cb_func> function given $issuer_ref, $ctx, $x.
 

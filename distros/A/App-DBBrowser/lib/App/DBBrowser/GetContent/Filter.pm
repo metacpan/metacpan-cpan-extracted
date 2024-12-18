@@ -38,6 +38,7 @@ sub input_filter {
     my $merge_rows    = 'Merge_Rows';
     my $range_rows    = 'Range_Rows';
     my $row_groups    = 'Row_Groups';
+    my $empty_rows    = 'Empty_Rows';
     my $choose_rows   = 'Choose_Rows';
     my $remove_cell   = 'Remove_Cell';
     my $insert_cell   = 'Insert_Cell';
@@ -61,7 +62,7 @@ sub input_filter {
         my $skip = ' ';
         my $menu = [
             undef,          $choose_rows,   $range_rows,   $row_groups,
-            $confirm,       $choose_cols,   $skip,         $skip,
+            $confirm,       $choose_cols,   $empty_rows,   $skip,
             $reset,         $s_and_replace, $convert_date, $skip,
             $reparse,       $remove_cell,   $insert_cell,  $skip,
             $empty_to_null, $join_columns,  $split_column, $append_col,
@@ -117,6 +118,9 @@ sub input_filter {
         }
         elsif ( $filter eq $row_groups ) {
             $sf->__row_groups( $sql, $filter_str, $working );
+        }
+        elsif ( $filter eq $empty_rows ) {
+            $sf->__remove_empty_rows( $sql, $filter_str, $working );
         }
         elsif ( $filter eq $remove_cell ) {
             $sf->__remove_cell( $sql, $filter_str, $working );
@@ -219,22 +223,53 @@ sub __choose_columns {
 }
 
 
+sub __remove_empty_rows {
+    my ( $sf, $sql, $filter_str, $working ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $menu = [ undef, '- Remove empty rows', '- Remove rows where all fields are empty or undef' ];
+    my $info = $sf->__get_filter_info( $sql, $filter_str );
+    my $choice = $tc->choose(
+        $menu,
+        { info => $info, index => 1, layout => 2, busy_string => $working }
+    );
+    $sf->__print_busy_string( $working );
+    if ( ! $choice ) {
+        return;
+    }
+    else {
+        my $aoa = $sql->{insert_args};
+        my $tmp = [];
+
+        ROW: for my $row ( @$aoa ) {
+            if ( $choice == 1 && @$row > 1 ) {
+                push @$tmp, $row;
+                next ROW;
+            }
+            for my $col ( @$row ) {
+                if ( length $col ) {
+                    push @$tmp, $row;
+                    next ROW;
+                }
+            }
+        }
+        $sql->{insert_args} = $tmp;
+    }
+    return 1;
+}
+
+
 sub __choose_rows {
     my ( $sf, $sql, $filter_str, $working ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $aoa = $sql->{insert_args};
     my @pre = ( undef, $sf->{i}{ok} );
     my $stringified_rows = [];
-    my $non_empty_rows = [];
+    $sf->__print_busy_string( $working );
     {
         no warnings 'uninitialized';
         for my $i ( 0 .. $#$aoa ) {
-            push @$non_empty_rows, $i + @pre if length join '', @{$aoa->[$i]};
             push @$stringified_rows, join ',', @{$aoa->[$i]};
         }
-    }
-    if ( @$non_empty_rows == @$stringified_rows ) {
-        $non_empty_rows = undef;
     }
     my $prompt = 'Choose rows:';
     $sql->{insert_args} = []; # $sql->{insert_args} refers to a new empty array - this doesn't delete $aoa
@@ -245,8 +280,7 @@ sub __choose_rows {
         my @idx = $tc->choose(
             [ @pre, @$stringified_rows ],
             { %{$sf->{i}{lyt_v}}, prompt => $prompt, info => $info, meta_items => [ 0 .. $#pre ],
-              include_highlighted => 2, index => 1, undef => $sf->{i}{s_back}, busy_string => $working,
-              mark => $non_empty_rows }
+              include_highlighted => 2, index => 1, undef => $sf->{i}{s_back}, busy_string => $working }
         );
         $sf->__print_busy_string( $working );
         if ( ! $idx[0] ) {
@@ -846,8 +880,7 @@ sub __choose_a_row_idx {
     # Choose
     my $row_idx = $tc->choose(
         [ @pre, @stringified_rows ],
-        { layout => 2, index => 1, info => $info, prompt => $prompt,
-          busy_string => $working }
+        { layout => 2, index => 1, info => $info, prompt => $prompt, busy_string => $working }
     );
     $sf->__print_busy_string( $working );
     if ( ! $row_idx ) {

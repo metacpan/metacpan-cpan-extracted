@@ -37,6 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::DrawingGuide;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -104,16 +105,25 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'drawing_guides' => {
+    	datatype => 'ARRAY[DrawingGuide]',
+    	base_name => 'DrawingGuides',
+    	description => 'Drawing guides',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
     'scale' => 'int',
-    'variable_scale' => 'boolean'
+    'variable_scale' => 'boolean',
+    'drawing_guides' => 'ARRAY[DrawingGuide]'
 } );
 
 __PACKAGE__->attribute_map( {
     'scale' => 'Scale',
-    'variable_scale' => 'VariableScale'
+    'variable_scale' => 'VariableScale',
+    'drawing_guides' => 'DrawingGuides'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

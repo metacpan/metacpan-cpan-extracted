@@ -103,6 +103,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'delete_embedded_binary_objects' => {
+    	datatype => 'boolean',
+    	base_name => 'DeleteEmbeddedBinaryObjects',
+    	description => 'True to delete delete all embedded binary objects.',
+    	format => '',
+    	read_only => '',
+    		},
     'gradient_style' => {
     	datatype => 'string',
     	base_name => 'GradientStyle',
@@ -257,10 +264,18 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'include_ole_data' => {
+    	datatype => 'boolean',
+    	base_name => 'IncludeOleData',
+    	description => 'True to convert all OLE data from the presentation to embedded files in the resulting PDF.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
     'default_regular_font' => 'string',
+    'delete_embedded_binary_objects' => 'boolean',
     'gradient_style' => 'string',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'font_subst_rules' => 'ARRAY[FontSubstRule]',
@@ -282,11 +297,13 @@ __PACKAGE__->swagger_types( {
     'access_permissions' => 'AccessPermissions',
     'hide_ink' => 'boolean',
     'interpret_mask_op_as_opacity' => 'boolean',
-    'rasterize_unsupported_font_styles' => 'boolean'
+    'rasterize_unsupported_font_styles' => 'boolean',
+    'include_ole_data' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
     'default_regular_font' => 'DefaultRegularFont',
+    'delete_embedded_binary_objects' => 'DeleteEmbeddedBinaryObjects',
     'gradient_style' => 'GradientStyle',
     'font_fallback_rules' => 'FontFallbackRules',
     'font_subst_rules' => 'FontSubstRules',
@@ -308,7 +325,8 @@ __PACKAGE__->attribute_map( {
     'access_permissions' => 'AccessPermissions',
     'hide_ink' => 'HideInk',
     'interpret_mask_op_as_opacity' => 'InterpretMaskOpAsOpacity',
-    'rasterize_unsupported_font_styles' => 'RasterizeUnsupportedFontStyles'
+    'rasterize_unsupported_font_styles' => 'RasterizeUnsupportedFontStyles',
+    'include_ole_data' => 'IncludeOleData'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -59,6 +59,7 @@ lib/AsposeSlidesCloud/Object/Document.pm
 lib/AsposeSlidesCloud/Object/DocumentProperties.pm
 lib/AsposeSlidesCloud/Object/DocumentProperty.pm
 lib/AsposeSlidesCloud/Object/DocumentReplaceResult.pm
+lib/AsposeSlidesCloud/Object/DrawingGuide.pm
 lib/AsposeSlidesCloud/Object/DuotoneEffect.pm
 lib/AsposeSlidesCloud/Object/Effect.pm
 lib/AsposeSlidesCloud/Object/EffectFormat.pm

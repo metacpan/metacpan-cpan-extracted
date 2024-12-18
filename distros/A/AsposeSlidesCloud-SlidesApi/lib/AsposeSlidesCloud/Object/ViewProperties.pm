@@ -171,6 +171,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'grid_spacing' => {
+    	datatype => 'double',
+    	base_name => 'GridSpacing',
+    	description => 'The grid spacing that should be used for the grid underlying the presentation document, in points.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -184,7 +191,8 @@ __PACKAGE__->swagger_types( {
     'restored_top' => 'NormalViewRestoredProperties',
     'slide_view_properties' => 'CommonSlideViewProperties',
     'notes_view_properties' => 'CommonSlideViewProperties',
-    'show_comments' => 'string'
+    'show_comments' => 'string',
+    'grid_spacing' => 'double'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -198,7 +206,8 @@ __PACKAGE__->attribute_map( {
     'restored_top' => 'RestoredTop',
     'slide_view_properties' => 'SlideViewProperties',
     'notes_view_properties' => 'NotesViewProperties',
-    'show_comments' => 'ShowComments'
+    'show_comments' => 'ShowComments',
+    'grid_spacing' => 'GridSpacing'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

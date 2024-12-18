@@ -37,7 +37,7 @@ int32_t SPVM__Net__SSLeay__X509_STORE_CTX__get1_issuer(SPVM_ENV* env, SPVM_VALUE
   X509* issuer_ref_tmp[1] = {0};
   int32_t status = X509_STORE_CTX_get1_issuer(issuer_ref_tmp, ctx, x);
   
-  if (!(status == -1)) {
+  if (!(status >= 0)) {
     int64_t ssl_error = ERR_peek_last_error();
     
     char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);

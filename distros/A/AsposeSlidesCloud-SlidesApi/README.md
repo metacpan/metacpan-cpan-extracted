@@ -27,6 +27,20 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
 
+## Enhancements in Version 24.12
+
+* Added **CompressImage** method. **DeletePictureCroppedAreas** method is deprecated and will be removed after 25.2 release.
+* The **Paragraphs** property of **Shape** class is now a list of **Paragraph** objects instead of ResourceURIs.
+* Added **TileScaleX**, **TileScaleY**, **TileOffsetX**, **TileOffsetY**, **TileAlignment** and **TileFlip** properties to **PictureFill** class.
+* Added **DrawingGuides** property to **CommonSlideViewProperty** class.
+* Added **DeleteEmbeddedBinaryObjects** boolean property to **ExportOptions** class.
+* Added **IncludeOleData** boolean property to **PdfExportOptions** class.
+* Added **GridSpacing** property to **ViewProperties** class.
+
+## Enhancements in Version 24.9
+
+* Added **Upload** and **Download** methods to async API. They are identical to **UploadFile** and **DownloadFile** methods of the regular API, but file size is not restricted for them.
+
 ## Enhancements in Version 24.8
 
 * Added **StartSplit** and **StartUploadAndSplit** methods to async API.

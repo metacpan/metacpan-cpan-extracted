@@ -41,7 +41,11 @@ sub commit_sql {
         $ax->print_sql_info( $ax->get_sql_info( $sql ), $waiting );
         my $all_arrayref = [];
         if ( ! eval {
-            my $sth = $dbh->prepare( "SELECT * FROM $sql->{table} " . $sql->{where_stmt} );
+            my $stmt = "SELECT * FROM $sql->{table}";
+            if ( length $sql->{where_stmt} ) {
+                $stmt .= ' ' . $sql->{where_stmt};
+            }
+            my $sth = $dbh->prepare( $stmt );
             $sth->execute();
             my $col_names = $sth->{NAME};
             $all_arrayref = $sth->fetchall_arrayref;

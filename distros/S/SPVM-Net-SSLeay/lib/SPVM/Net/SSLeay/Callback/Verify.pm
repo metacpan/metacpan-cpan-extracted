@@ -18,7 +18,7 @@ Net::SSLeay::Callback::Verify interface in L<SPVM> represents L<SSL_verify_cb|ht
 
 =head1 Interface Methods
 
-C<required method : int ($preverify_ok : int, $x509_ctx : L<Net::SSLeay::X509_STORE_CTX|SPVM::Net::SSLeay::X509_STORE_CTX>);>
+C<required method : int ($preverify_ok : int, $x509_store_ctx : L<Net::SSLeay::X509_STORE_CTX|SPVM::Net::SSLeay::X509_STORE_CTX>, $arg : object = undef);>
 
 This method represents L<SSL_verify_cb|https://docs.openssl.org/master/man3/SSL_CTX_set_verify/> function pointer type.
 

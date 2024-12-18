@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 24;
+use Test::Most tests => 28;
 use Test::NoWarnings;
 
 BEGIN {
@@ -54,4 +54,11 @@ BASICS: {
 
 	ok(defined($u->{province2code}{$province_fr}));
 	ok($u->{province2code}{$province_fr} eq $code);
+
+	local $ENV{'LANG'} = 'C';
+	$u = new_ok('Locale::CA');
+	ok($u->{code2province}{$code} eq $province_en);
+	local $ENV{'LANGUAGE'} = 'fr';
+	$u = new_ok('Locale::CA');
+	ok($u->{code2province}{$code} eq $province_fr);
 }

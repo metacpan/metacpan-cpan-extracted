@@ -1,6 +1,6 @@
 package WebService::Chroma;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use 5.006;
 use strict;
@@ -18,8 +18,25 @@ validate_subs (
 		params => {
 			name => [Str]
 		}
+	},
+	get_tenant => {
+		params => {
+			name => [Str]
+		}
+	},
+	get_database => {
+		params => {
+			tenant => [Str],
+			name => [Str]
+		}
+	},
+	get_collection => {
+		params => {
+			tenant => [Str],
+			db => [Str],
+			name => [Str]
+		}
 	}
-
 );
 
 has base_url => (
@@ -28,11 +45,29 @@ has base_url => (
 	default => sub { 'http://localhost:8000' }
 );
 
+has embeddings_class => (
+	is => 'ro',
+	lazy => 1,
+);
+
+has embeddings_base_url => (
+	is => 'ro',
+	lazy => 1,
+);
+
+has embeddings_model => (
+	is => 'ro',
+	lazy => 1,
+);
+
 has ua => (
 	is => 'ro',
 	builder => sub {
 		WebService::Chroma::UA->new(
-			base_url => $_[0]->base_url
+			base_url => $_[0]->base_url,
+			embeddings_class => $_[0]->embeddings_class,
+			embeddings_model => $_[0]->embeddings_model,
+			embeddings_base_url => $_[0]->embeddings_base_url
 		);
 	}
 );
@@ -84,6 +119,16 @@ sub get_tenant {
 	);
 }
 
+sub get_database {
+	my ($self, %data) = @_;
+	return $self->get_tenant(name => $data{tenant})->get_database(name => $data{name});
+}
+
+sub get_collection {
+	my ($self, %data) = @_;
+	return $self->get_tenant(name => $data{tenant})->get_database(name => $data{db})->get_collection(name => $data{name});
+}
+
 1;
 
 __END__
@@ -94,7 +139,7 @@ WebService::Chroma - chromadb client
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -102,7 +147,10 @@ Version 0.02
 
 	use WebService::Chroma;
 
-	my $chroma = WebService::Chroma->new();
+	my $chroma = WebService::Chroma->new(
+		embeddings_class => 'Ollama',
+		embeddings_model => 'nomic-embed-text'
+	);
 
 	my $version = $chroma->version();
 
@@ -131,10 +179,6 @@ Version 0.02
 	);
 
 	$collection->add(
-		embeddings => [
-			[1.1, 2.3, 3.2],
-			[2.1, 3.3, 4.2],
-		],
 		documents => [
 			'a blue scarf, a red hat, a woolly jumper, black gloves',
 			'a pink scarf, a blue hat, a woolly jumper, green gloves'
@@ -146,8 +190,8 @@ Version 0.02
 	);
 
 	$collection->query(
-		query_embeddings => [
-			[2.1, 3.3, 4.2]
+		query_texts => [
+			'a pink scarf, a blue hat, green gloves'
 		],
 		n_results => 1
 	);
@@ -169,6 +213,8 @@ L<http://localhost:8000/docs>
 
 =cut
 
+=head2 new
+
 =head2 version
 
 =head2 reset
@@ -182,6 +228,10 @@ L<http://localhost:8000/docs>
 =head2 create_tenant
 
 =head2 get_tenant
+
+=head2 get_database
+
+=head2 get_collection
 
 =head1 AUTHOR
 

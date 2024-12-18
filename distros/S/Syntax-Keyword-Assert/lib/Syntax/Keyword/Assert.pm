@@ -1,4 +1,4 @@
-package Syntax::Keyword::Assert 0.13;
+package Syntax::Keyword::Assert 0.16;
 
 use v5.14;
 use warnings;
@@ -44,41 +44,39 @@ __END__
 
 =head1 NAME
 
-Syntax::Keyword::Assert - assert keyword for Perl with zero runtime cost in production
+Syntax::Keyword::Assert - assert keyword for Perl with zero runtime cost
 
 =head1 SYNOPSIS
 
     use Syntax::Keyword::Assert;
 
-    my $name = 'Alice';
-    assert( $name eq 'Bob' );
-    # => Assertion failed ("Alice" eq "Bob")
+    my $obj = bless {}, "Foo";
+    assert($obj isa "Bar");
+    # => Assertion failed (Foo=HASH(0x11e022818) isa "Bar")
 
 =head1 DESCRIPTION
 
-Syntax::Keyword::Assert introduces a lightweight assert keyword to Perl, designed to provide runtime assertions with minimal overhead.
+Syntax::Keyword::Assert provides a syntax extension for Perl that introduces a C<assert> keyword.
 
-=over 4
+By default assertions are enabled, but can be disabled by setting C<$ENV{PERL_ASSERT_ENABLED}> to false before this module is loaded:
 
-=item B<STRICT Mode>
+    BEGIN { $ENV{PERL_ASSERT_ENABLED} = 0 }  # Disable assertions
 
-When STRICT mode is enabled, assert statements are checked at runtime. Default is enabled. If the assertion fails (i.e., the block returns false), the program dies with an error. This is particularly useful for catching errors during development or testing.
+When assertions are disabled, the C<assert> are completely ignored at compile phase, resulting in zero runtime cost. This makes Syntax::Keyword::Assert ideal for use in production environments, as it does not introduce any performance penalties when assertions are not needed.
 
-C<$ENV{PERL_ASSERT_ENABLED}> can be used to control STRICT mode.
+=head1 KEYWORDS
 
-    BEGIN { $ENV{PERL_ASSERT_ENABLED} = 0 }  # Disable STRICT mode
+=head2 assert
 
-=item B<Zero Runtime Cost>
+    assert(EXPR)
 
-When STRICT mode is disabled, the assert blocks are completely ignored at compile phase, resulting in zero runtime cost. This makes Syntax::Keyword::Assert ideal for use in production environments, as it does not introduce any performance penalties when assertions are not needed.
+If EXPR is truthy in scalar context, then happens nothing. Otherwise, it dies with a user-friendly error message.
 
-=item B<Simple Syntax>
+Here are some examples:
 
-The syntax is dead simple. Just use the assert keyword followed by a block that returns a boolean value.
-
-    assert( $name eq 'Bob' );
-
-=back
+    assert("apple" eq "banana");  # => Assertion failed ("apple" eq "banana")
+    assert(123 != 123);           # => Assertion failed (123 != 123)
+    assert(1 > 10);               # => Assertion failed (1 > 10)
 
 =head1 SEE ALSO
 
@@ -86,7 +84,7 @@ The syntax is dead simple. Just use the assert keyword followed by a block that 
 
 =item L<PerlX::Assert>
 
-This module also uses keyword plugin, but it depends on L<Keyword::Simple>.
+This module also uses keyword plugin, but it depends on L<Keyword::Simple>. And this module's error message does not include the failed expression.
 
 =item L<Devel::Assert>
 

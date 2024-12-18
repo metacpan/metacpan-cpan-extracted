@@ -10,7 +10,9 @@
 
 #include "newUNOP_CUSTOM.c.inc"
 #include "sv_numeq.c.inc"
+#include "sv_numcmp.c.inc"
 #include "sv_streq.c.inc"
+#include "sv_isa.c.inc"
 
 static bool assert_enabled = TRUE;
 
@@ -60,8 +62,17 @@ enum BinopType {
     BINOP_NONE,
     BINOP_NUM_EQ,
     BINOP_NUM_NE,
+    BINOP_NUM_LT,
+    BINOP_NUM_GT,
+    BINOP_NUM_LE,
+    BINOP_NUM_GE,
     BINOP_STR_EQ,
     BINOP_STR_NE,
+    BINOP_STR_LT,
+    BINOP_STR_GT,
+    BINOP_STR_LE,
+    BINOP_STR_GE,
+    BINOP_ISA,
 };
 
 static enum BinopType classify_binop(int type)
@@ -69,8 +80,17 @@ static enum BinopType classify_binop(int type)
   switch(type) {
     case OP_EQ:  return BINOP_NUM_EQ;
     case OP_NE:  return BINOP_NUM_NE;
+    case OP_LT:  return BINOP_NUM_LT;
+    case OP_GT:  return BINOP_NUM_GT;
+    case OP_LE:  return BINOP_NUM_LE;
+    case OP_GE:  return BINOP_NUM_GE;
     case OP_SEQ: return BINOP_STR_EQ;
     case OP_SNE: return BINOP_STR_NE;
+    case OP_SLT: return BINOP_STR_LT;
+    case OP_SGT: return BINOP_STR_GT;
+    case OP_SLE: return BINOP_STR_LE;
+    case OP_SGE: return BINOP_STR_GE;
+    case OP_ISA: return BINOP_ISA;
   }
   return BINOP_NONE;
 }
@@ -100,6 +120,34 @@ static OP *pp_assertbin(pTHX)
       op_str = "!=";
       break;
 
+    case BINOP_NUM_LT:
+      if(sv_numcmp(lhs, rhs) == -1)
+        goto ok;
+
+      op_str = "<";
+      break;
+
+    case BINOP_NUM_GT:
+      if(sv_numcmp(lhs, rhs) == 1)
+        goto ok;
+
+      op_str = ">";
+      break;
+
+    case BINOP_NUM_LE:
+      if(sv_numcmp(lhs, rhs) != 1)
+        goto ok;
+
+      op_str = "<=";
+      break;
+
+    case BINOP_NUM_GE:
+      if(sv_numcmp(lhs, rhs) != -1)
+        goto ok;
+
+      op_str = ">=";
+      break;
+
     case BINOP_STR_EQ:
       if(sv_streq(lhs, rhs))
         goto ok;
@@ -112,6 +160,41 @@ static OP *pp_assertbin(pTHX)
           goto ok;
 
       op_str = "ne";
+      break;
+
+    case BINOP_STR_LT:
+      if(sv_cmp(lhs, rhs) == -1)
+        goto ok;
+
+      op_str = "lt";
+      break;
+
+    case BINOP_STR_GT:
+      if(sv_cmp(lhs, rhs) == 1)
+        goto ok;
+
+      op_str = "gt";
+      break;
+
+    case BINOP_STR_LE:
+      if(sv_cmp(lhs, rhs) != 1)
+        goto ok;
+
+      op_str = "le";
+      break;
+
+    case BINOP_STR_GE:
+      if(sv_cmp(lhs, rhs) != -1)
+        goto ok;
+
+      op_str = "ge";
+      break;
+
+    case BINOP_ISA:
+      if(sv_isa_sv(lhs, rhs))
+        goto ok;
+
+      op_str = "isa";
       break;
 
     default:

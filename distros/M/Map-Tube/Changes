@@ -1,5 +1,11 @@
 Revision history for Map::Tube
 
+3.89  2024-12-18T10:00:00+00:00
+      - Updated pod to reflect the recent changes.
+
+3.88  2024-12-17T12:35:00+00:00
+      - Strip space from start/end before lookup station name.
+
 3.87  2024-12-13T19:05:00+00:00
       - Added test for unidirection map.
 

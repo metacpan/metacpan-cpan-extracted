@@ -2,6 +2,70 @@ package WebService::Chroma::Collection;
 
 use Moo;
 
+use MooX::ValidateSubs;
+use Types::Standard qw/Str Int ArrayRef HashRef ScalarRef/;
+
+validate_subs (
+	add => {
+		params => {
+			embeddings => [ArrayRef, 1],
+			metadatas => [ArrayRef, 1],
+			uris => [ArrayRef, 1],
+  			documents => [ArrayRef],
+  			ids => [ArrayRef],
+		}
+	},
+	upsert => {
+		params => {
+			embeddings => [ArrayRef, 1],
+			metadatas => [ArrayRef, 1],
+			uris => [ArrayRef, 1],
+  			documents => [ArrayRef],
+  			ids => [ArrayRef],
+		}
+	},
+	update => {
+		params => {
+			embeddings => [ArrayRef, 1],
+			metadatas => [ArrayRef, 1],
+			uris => [ArrayRef, 1],
+  			documents => [ArrayRef],
+  			ids => [ArrayRef],
+		}
+	},
+	get => {
+		params => {
+			ids => [ArrayRef, 1],
+			where => [HashRef, 1],
+			where_document => [HashRef, 1],
+			sort => [Str, 1],
+			limit => [Int, 1],
+			offset => [Int, 1],
+			include => [ArrayRef, 1]
+		}
+	},
+	delete => {
+		params => {
+			ids => [ArrayRef, 1],
+			where => [HashRef, 1],
+			where_document => [HashRef, 1],
+		}
+	},
+	query => {
+		params => {
+			query_texts => [ArrayRef, 1],
+			query_embeddings => [ArrayRef, 1],
+			n_results => [Int, 1],
+			include => [ArrayRef, 1],
+			where => [HashRef, 1],
+			where_document => [HashRef, 1],
+		}
+	},
+	count => {
+		params => {}
+	}
+);
+
 has ua => (
 	is => 'ro',
 	required => 1,
@@ -27,8 +91,22 @@ has name => (
 	required => 1,
 );
 
+
+sub _automagic_embeddings {
+	my ($self, $data) = @_;
+
+	if (! $data->{embeddings} && $self->ua->embeddings) {
+		$data->{embeddings} = [];
+		for (@{ $data->{documents} }) {
+			push @{$data->{embeddings}}, $self->ua->embeddings->get($_);
+		}
+	}
+}
+
 sub add {
 	my ($self, %data) = @_; 
+	
+	$self->_automagic_embeddings(\%data);
 
 	return $self->ua->post(
 		url => sprintf('/api/v2/tenants/%s/databases/%s/collections/%s/add', $self->tenant, $self->db, $self->id),
@@ -38,6 +116,8 @@ sub add {
 
 sub upsert {
 	my ($self, %data) = @_; 
+
+	$self->_automagic_embeddings(\%data);
 	
 	return $self->ua->post(
 		url => sprintf('/api/v2/tenants/%s/databases/%s/collections/%s/upsert', $self->tenant, $self->db, $self->id),
@@ -47,6 +127,8 @@ sub upsert {
 
 sub update {
 	my ($self, %data) = @_; 
+	
+	$self->_automagic_embeddings(\%data);
 	
 	return $self->ua->post(
 		url => sprintf('/api/v2/tenants/%s/databases/%s/collections/%s/update', $self->tenant, $self->db, $self->id),
@@ -66,6 +148,10 @@ sub get {
 sub query {
 	my ($self, %data) = @_;
 
+	if ($data{query_texts} && $self->ua->embeddings) {
+		$data{query_embeddings} = [ map { $self->ua->embeddings->get($_) } @{ delete $data{query_texts} } ];
+	}
+
 	return $self->ua->post(
 		url => sprintf('/api/v2/tenants/%s/databases/%s/collections/%s/query', $self->tenant, $self->db, $self->id),
 		data => \%data
@@ -81,6 +167,14 @@ sub delete {
 	);
 }
 
+sub count {
+	my ($self, %data) = @_;
+
+	return $self->ua->get(
+		url => sprintf('/api/v2/tenants/%s/databases/%s/collections/%s/count', $self->tenant, $self->db, $self->id),
+	)
+}
+
 1;
 
 __END__
@@ -91,7 +185,7 @@ WebService::Chroma::Collection - chromadb collection
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -122,6 +216,8 @@ Version 0.02
 =head2 query
 
 =head2 delete
+
+=head2 count
 
 =head1 AUTHOR
 

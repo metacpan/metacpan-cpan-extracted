@@ -42,6 +42,7 @@ use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::GeometryShape;
 use AsposeSlidesCloud::Object::Hyperlink;
 use AsposeSlidesCloud::Object::LineFormat;
+use AsposeSlidesCloud::Object::Paragraph;
 use AsposeSlidesCloud::Object::ResourceUri;
 use AsposeSlidesCloud::Object::TextFrameFormat;
 use AsposeSlidesCloud::Object::ThreeDFormat;
@@ -247,7 +248,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'paragraphs' => {
-    	datatype => 'ResourceUri',
+    	datatype => 'ARRAY[Paragraph]',
     	base_name => 'Paragraphs',
     	description => 'Get or sets list to paragraphs list',
     	format => '',
@@ -284,7 +285,7 @@ __PACKAGE__->swagger_types( {
     'type' => 'string',
     'shape_type' => 'string',
     'text' => 'string',
-    'paragraphs' => 'ResourceUri',
+    'paragraphs' => 'ARRAY[Paragraph]',
     'text_frame_format' => 'TextFrameFormat'
 } );
 

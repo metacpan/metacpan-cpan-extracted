@@ -7,6 +7,8 @@ bench/compare-no-assertion.pl
 builder/MyBuilder.pm
 cpanfile
 hax/newUNOP_CUSTOM.c.inc
+hax/sv_isa.c.inc
+hax/sv_numcmp.c.inc
 hax/sv_numeq.c.inc
 hax/sv_streq.c.inc
 lib/Syntax/Keyword/Assert.pm
@@ -14,6 +16,9 @@ lib/Syntax/Keyword/Assert.xs
 minil.toml
 t/00_compile.t
 t/01_assert.t
+t/01_assert/isa.t
+t/01_assert/number_comparison.t
+t/01_assert/string_comparison.t
 t/02_assert_disabled.t
 t/03_unimport.t
 t/10-integration/Data-Checks.t
@@ -21,5 +26,6 @@ t/10-integration/Syntax-Operator-Is.t
 t/10-integration/Type-Tiny.t
 t/10-integration/signatures.t
 t/99_synopsis.t
+t/lib/TestUtil.pm
 META.yml
 MANIFEST

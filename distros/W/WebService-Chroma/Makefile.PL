@@ -20,6 +20,10 @@ my %WriteMakefileArgs = (
 	'Moo' => 0,
 	'LWP::UserAgent' => 0,
 	'JSON' => 0,
+	'OpenAI::API' => 0,
+	'MooX::ValidateSubs' => 0,
+	'Type::Tiny' => 0,
+	'Module::Load' => 0
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'WebService-Chroma-*' },

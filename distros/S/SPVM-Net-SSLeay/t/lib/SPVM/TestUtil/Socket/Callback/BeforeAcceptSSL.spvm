@@ -1,0 +1,9 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class TestUtil::Socket::Callback::BeforeAcceptSSL : interface_t {
+  use Net::SSLeay;
+  
+  required method : void ($ssl : Net::SSLeay);
+  
+}

@@ -3,6 +3,8 @@ ignore.txt
 lib/WebService/Chroma.pm
 lib/WebService/Chroma/Collection.pm
 lib/WebService/Chroma/DB.pm
+lib/WebService/Chroma/Embeddings/Ollama.pm
+lib/WebService/Chroma/Embeddings/OpenAI.pm
 lib/WebService/Chroma/Tenant.pm
 lib/WebService/Chroma/UA.pm
 Makefile.PL

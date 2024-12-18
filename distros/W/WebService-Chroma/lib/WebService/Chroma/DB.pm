@@ -117,7 +117,7 @@ WebService::Chroma::DB - chromadb database
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 

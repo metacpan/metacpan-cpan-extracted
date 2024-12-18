@@ -1,0 +1,44 @@
+---
+abstract: 'Validate JWT from Google IAP'
+author:
+  - 'Kobayasi, Hiroaki <buribullet@gmail.com>'
+build_requires:
+  Plack::Test: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Validate_Google_IAP_JWT
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::Validate_Google_IAP_JWT:
+    file: lib/Plack/Middleware/Validate_Google_IAP_JWT.pm
+    version: '0.02'
+requires:
+  Crypt::JWT: '0.035'
+  HTTP::Tiny: '0'
+  MOP4Import::Declare: '0.060'
+  Plack::Middleware: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  repository: git://gitlab-test.ssri.co.jp/devteam/infra/Plack-Middleware-Validate_Google_IAP_JWT.git
+version: '0.02'
+x_contributors:
+  - 'Kobayasi, Hiroaki <hkoba@ssri.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

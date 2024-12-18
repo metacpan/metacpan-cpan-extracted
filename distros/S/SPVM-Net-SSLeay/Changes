@@ -1,3 +1,12 @@
+0.030 2024-12-18
+  [Bug Fix]
+    * Fix bugs of Net::SSLeay#get_SSL_CTX method.
+    * Fix bugs of Net::SSLeay#set_msg_callback method.
+    * Fix bugs of Net::SSLeay::X509_STORE_CTX#get1_issuer method.
+  [Requirement Changes]
+    * Require SPVM 0.990033.
+  [Test Improvement]
+    * Add many tests.
 0.029 2024-12-16
   [Bug Fix]
     * Fix bugs of Net::SSLeay#get_certificate method.

@@ -1,0 +1,5 @@
+name = "Plack-Middleware-Validate_Google_IAP_JWT"
+badges = ["github-actions/test.yml"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

@@ -1,5 +1,14 @@
 Revision history for Perl extension Syntax-Keyword-Assert
 
+0.16 2024-12-18T09:01:18Z
+    - Fixed `isa` operator #9
+
+0.15 2024-12-18T00:45:00Z
+    - Added `isa` operator error messages #8
+
+0.14 2024-12-17T22:26:00Z
+    - Added comparison operator error messages such as < > <= >= lt gt le ge. #5
+
 0.13 2024-12-15T14:04:56Z
     - [BREAKING CHANGE] Improve error message and change assert syntax. #4 (PEVANS helped me. Thanks!)
 
