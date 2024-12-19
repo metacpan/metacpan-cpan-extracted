@@ -8,6 +8,7 @@ build_requires:
   Test::More: '0'
   Test::Most: '0'
   if: '0'
+  strict: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -26,21 +27,23 @@ name: Object-Signature-Portable
 provides:
   Object::Signature::Portable:
     file: lib/Object/Signature/Portable.pm
-    version: v1.2.0
+    version: v1.2.2
 recommends:
   Crypt::Digest: '0.062'
 requires:
+  Carp: '0'
   Crypt::Digest: '0'
   Exporter: '5.57'
   JSON::MaybeXS: '0'
   perl: v5.14.0
+  warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/Object-Signature-Portable/issues
   repository: git://github.com/robrwo/Object-Signature-Portable.git
-version: v1.2.0
+version: v1.2.2
 x_authority: cpan:RRWO
 x_contributors:
   - 'Slaven Rezić <slaven@rezic.de>'
 x_generated_by_perl: v5.34.3
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

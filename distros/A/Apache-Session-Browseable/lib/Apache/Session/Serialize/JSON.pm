@@ -60,20 +60,6 @@ and C<from_json>. The serialized data is UTF-8 text.
 
 L<JSON>, L<Apache::Session>
 
-=head1 AUTHORS
-
-=over
-
-=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=item François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
-
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
-
-=back
-
 =head1 BUG REPORT
 
 Use OW2 system to report bug or ask for features:
@@ -83,9 +69,15 @@ L<http://jira.ow2.org>
 
 =over
 
-=item Copyright (C) 2015-2017 by Clément Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item 2009-2023 by Xavier Guimard
 
-=item Copyright (C) 2015-2017 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item 2013-2023 by Clément Oudot
+
+=item 2019-2023 by Maxime Besson
+
+=item 2013-2023 by Worteks
+
+=item 2023 by Linagora
 
 =back
 

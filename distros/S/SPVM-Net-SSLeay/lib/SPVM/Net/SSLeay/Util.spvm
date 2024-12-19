@@ -4,6 +4,6 @@
 class Net::SSLeay::Util {
   
   # Class Methods
-  native static method convert_to_wire_format : byte[] ($protocols : string[]);
+  native static method convert_to_wire_format : string ($protocols : string[]);
   
 }

@@ -15,7 +15,7 @@ use Try::Tiny;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.2';
+our $VERSION = 'v0.2.3';
 
 
 sub serve_static_file {
@@ -75,7 +75,7 @@ Catalyst::Plugin::Static::File - Serve a specific static file
 
 =head1 VERSION
 
-version v0.2.2
+version v0.2.3
 
 =head1 SYNOPSIS
 
@@ -169,13 +169,18 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.  Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Robert Rothenberg.
+This software is Copyright (c) 2023-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -4,7 +4,7 @@ use true;
 use experimental qw( signatures );
 use stable qw( postderef );
 
-package Data::Section::Pluggable 0.03 {
+package Data::Section::Pluggable 0.04 {
 
     # ABSTRACT: Read structured data from __DATA__
 
@@ -13,6 +13,7 @@ package Data::Section::Pluggable 0.03 {
     use Exporter qw( import );
     use Ref::Util qw( is_ref is_plain_hashref is_coderef is_plain_arrayref );
     use MIME::Base64 qw( decode_base64 );
+    use Path::Tiny ();
     use Carp ();
 
     our @EXPORT_OK = qw( get_data_section );
@@ -172,6 +173,29 @@ package Data::Section::Pluggable 0.03 {
         $plugin->can('does') && $plugin->does('Data::Section::Pluggable::Role::ContentProcessorPlugin');
     }
 
+
+    sub extract ($self, $dir=undef) {
+        $dir = Path::Tiny->new($dir // '.');
+
+        my $all = $self->_get_all_data_sections;
+
+        foreach my $key (keys %$all) {
+            my $path = $dir->child($key);
+            $path->parent->mkdir;
+            my($content,$encoding) = $all->{$key}->@*;
+
+            if(defined $encoding) {
+                if($encoding eq 'base64') {
+                    $path->spew_raw(decode_base64($content));
+                } else {
+                    Carp::croak("unknown encoding: $encoding");
+                }
+            } else {
+                $path->spew_utf8($content);
+            }
+        }
+    }
+
 }
 
 __END__
@@ -186,7 +210,7 @@ Data::Section::Pluggable - Read structured data from __DATA__
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -295,6 +319,13 @@ called in the order that they were added.
 Applies the plugin with C<$name>.  If the plugin supports instance mode (that is: it has a constructor
 named C<new>), then C<%args> will be passed to the constructor.  For included plugins see L</CORE PLUGINS>.
 To write your own see L</PLUGIN ROLES>.
+
+=head2 extract
+
+ $dsp->extract($dir);
+ $dsp->extract;
+
+Extract all files in Data section to the given C<$dir>, or if not provided the current directory.
 
 =head1 CORE PLUGINS
 

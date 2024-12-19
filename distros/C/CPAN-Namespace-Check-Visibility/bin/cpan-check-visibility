@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+
+use CPAN::Namespace::Check::Visibility;
+
+exit is_not_public(@ARGV);

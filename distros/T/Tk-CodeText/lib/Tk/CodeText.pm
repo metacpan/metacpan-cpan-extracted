@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.56';
+$VERSION = '0.58';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -1189,11 +1189,12 @@ sub highlightLoop {
 }
 
 sub highlightPurge {
-	my ($self, $line) = @_;
+	my ($self, $line, $remove) = @_;
 	$line = 1 unless defined $line;
+	$remove = 0 unless defined $remove;
 
 	#purge highlightinfo
-#	$self->highlightRemove($line);
+	$self->highlightRemove($line) if $remove;
 	$self->Colored($line);
 	my $cli = $self->ColorInf;
 	if (@$cli) { splice(@$cli, $line) };
@@ -1495,7 +1496,7 @@ sub syntax {
 	my $kam = $self->Kamelon;
 	if (defined($new)) {
 		$self->NoHighlighting(1);
-		$self->highlightPurge;
+		$self->highlightPurge(1, 1);
 		$self->Subwidget('XText')->configure(
 			-mlcommentend => undef,
 			-mlcommentstart => undef,

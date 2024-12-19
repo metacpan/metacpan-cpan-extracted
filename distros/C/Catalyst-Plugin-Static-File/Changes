@@ -1,5 +1,16 @@
 Revision history for Catalyst-Plugin-Static-File:
 
+v0.2.3    2024-12-18 16:15:14+00:00 Europe/London
+  [Documentation]
+  - Added a security policy.
+
+  - Updated copyright year.
+
+  [Tests]
+  - Adjusted tests to ignore extra keys in logged messages.
+
+  - Added author tests.
+
 v0.2.2    2023-12-29 15:59:54+00:00 Europe/London
   [Tests]
   - Switched package used for the release manifest.

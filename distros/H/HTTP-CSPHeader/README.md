@@ -4,7 +4,7 @@ HTTP::CSPHeader - manage dynamic content security policy headers
 
 # VERSION
 
-version v0.4.0
+version v0.4.1
 
 # SYNOPSIS
 
@@ -157,6 +157,11 @@ and in your templates, you can use the following for inline scripts:
 
 If you do not need the nonce, then you might consider using [Mojolicious::Plugin::CSPHeader](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ACSPHeader).
 
+# SECURITY CONSIDERATIONS
+
+If this is used in a forked environment, the object should not be initialised before forking if nonces are
+used. Otherwise the nonces may be shared between forks.
+
 # SUPPORT FOR OLDER PERL VERSIONS
 
 This module requires Perl v5.14 or later.
@@ -184,6 +189,11 @@ Please report any bugs or feature requests on the bugtracker website
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+## Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.  Please see `SECURITY.md` for instructions how to
+report security vulnerabilities
 
 # AUTHOR
 

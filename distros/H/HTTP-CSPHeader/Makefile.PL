@@ -9,6 +9,10 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "manage dynamic content security policy headers",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "7.22",
+    "Module::Metadata" => "1.000015"
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -26,7 +30,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
-    "Module::Metadata" => 0,
+    "Module::Metadata" => "1.000015",
     "Plack::Middleware::ContentLength" => 0,
     "Plack::Middleware::Head" => 0,
     "Test2::V0" => 0,
@@ -34,7 +38,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.4.0",
+  "VERSION" => "v0.4.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,10 +46,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "ExtUtils::MakeMaker" => "7.22",
   "Fcntl" => 0,
   "File::Spec" => 0,
   "List::Util" => "1.29",
-  "Module::Metadata" => 0,
+  "Module::Metadata" => "1.000015",
   "Moo" => 0,
   "Plack::Middleware::ContentLength" => 0,
   "Plack::Middleware::Head" => 0,

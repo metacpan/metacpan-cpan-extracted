@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/PerlFFI/FFI-Platypus/issues
   homepage: https://pl.atypus.org
   repository: git://github.com/PerlFFI/FFI-Platypus.git
-version: '2.09'
+version: '2.10'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Bakkiaraj Murugesan (bakkiaraj)'

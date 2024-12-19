@@ -47,43 +47,37 @@ subtest "basic header with amendment" => sub {
 
 };
 
-SKIP: {
+subtest 'nonce' => sub {
 
-    skip "no /dev/urandom" unless -r "/dev/urandom";
+    my $h = HTTP::CSPHeader->new(
+        nonces_for => [qw/ script-src style-src /],
+        policy     => {
+            "script-src" => q['self'],
+            "style-src"  => q['self'],
+        },
+    );
 
-    subtest 'nonce' => sub {
+    isa_ok $h, 'HTTP::CSPHeader';
 
-        my $h = HTTP::CSPHeader->new(
-            nonces_for => [qw/ script-src style-src /],
-            policy     => {
-                "script-src" => q['self'],
-                "style-src"  => q['self'],
-            },
-        );
+    ok my $n1 = $h->nonce, 'nonce';
 
-        isa_ok $h, 'HTTP::CSPHeader';
+    note $h->header;
 
-        ok my $n1 = $h->nonce, 'nonce';
+    like $h->header, qr[\bscript-src 'self' 'nonce-$n1'(; |\z)], 'script-src';
+    like $h->header, qr[\bstyle-src 'self' 'nonce-$n1'(; |\z)],  'style-src';
 
-        note $h->header;
+    $h->reset;
 
-        like $h->header, qr[\bscript-src 'self' 'nonce-$n1'(; |\z)], 'script-src';
-        like $h->header, qr[\bstyle-src 'self' 'nonce-$n1'(; |\z)],  'style-src';
+    ok my $n2 = $h->nonce, 'nonce';
 
-        $h->reset;
+    isnt $n2, $n1, "nonce changed after reset";
 
-        ok my $n2 = $h->nonce, 'nonce';
+    note $h->header;
 
-        isnt $n2, $n1, "nonce changed after reset";
+    like $h->header, qr[\bscript-src 'self' 'nonce-$n2'(; |\z)], 'script-src';
+    like $h->header, qr[\bstyle-src 'self' 'nonce-$n2'(; |\z)],  'style-src';
 
-        note $h->header;
-
-        like $h->header, qr[\bscript-src 'self' 'nonce-$n2'(; |\z)], 'script-src';
-        like $h->header, qr[\bstyle-src 'self' 'nonce-$n2'(; |\z)],  'style-src';
-
-    };
-
-}
+};
 
 subtest 'corce nonces_for' => sub {
 

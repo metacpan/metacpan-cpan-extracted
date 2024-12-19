@@ -17,18 +17,21 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Object::Signature::Portable",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Crypt::Digest" => 0,
     "Exporter" => "5.57",
-    "JSON::MaybeXS" => 0
+    "JSON::MaybeXS" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "Module::Metadata" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
-    "if" => 0
+    "if" => 0,
+    "strict" => 0
   },
-  "VERSION" => "v1.2.0",
+  "VERSION" => "v1.2.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,6 +39,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Crypt::Digest" => 0,
   "Exporter" => "5.57",
   "File::Spec" => 0,
@@ -43,7 +47,9 @@ my %FallbackPrereqs = (
   "Module::Metadata" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
-  "if" => 0
+  "if" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

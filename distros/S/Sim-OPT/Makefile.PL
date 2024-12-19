@@ -14,6 +14,7 @@ WriteMakefile(
 			'List::AllUtils' => '0',
 			'List::MoreUtils' => '0',
 			'List::Compare'  => '0',
+			'Moose'  => '0',
 			'Statistics::Basic'  => '0',
 			'IO::Tee'  => '0',
 			'Set::Intersection'  => '0',
@@ -25,6 +26,7 @@ WriteMakefile(
 			'Devel::REPL' => '0',
 			'Regexp::Common' => '0',
 			#'Parallel::ForkManager' => '0',
+			'MCE::Loop' => '0',
 			'Scalar::Util' => '0',
 			}, # e.g., Module::Name => 1.1
     ($] >= 5.014 ?     ## Add these new keywords supported since 5.005

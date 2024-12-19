@@ -4,6 +4,6 @@
 class Net::SSLeay::Callback::Verify : interface_t {
   use Net::SSLeay::X509_STORE_CTX;
   
-  required method : int ($preverify_ok : int, $x509_store_ctx : Net::SSLeay::X509_STORE_CTX, $arg : object = undef);
+  required method : int ($preverify_ok : int, $x509_store_ctx : Net::SSLeay::X509_STORE_CTX);
   
 }

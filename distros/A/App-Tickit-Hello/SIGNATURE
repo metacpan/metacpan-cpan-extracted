@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 ed6b629207e0942c4d21287710f46b31ff11f307fed1c5f168c4e1da68cf0dd3 CONCEPT
+SHA256 036b8c52f561627b8c077c125f5bf33a3fbd9243232ad7ca025e53cfd0326295 Changes
+SHA256 72ebb5970f890787680878970816f31433bf1aef5d3744b7167adadd8f95a211 Hello.pm
+SHA256 e9721661dbfb60dadebf3cd197cbc00239895aa73fb3431e19490cfad301cf99 LICENSE
+SHA256 3c53d9cf0c4bd611d287a938b5da839a3e4108f2e5d0fdbb3cee2e2be058a659 MANIFEST
+SHA256 f9f1c7c34f08696def1b770164b9606b443ed4122e120f486228da5ce7b0addd META.yml
+SHA256 385d1d538d1ae659be063635594a9d40d8eda910f20fcea1ab5672116d5541d5 Makefile.PL
+SHA256 73e36184241438cd199c6c01d29024bc39e5519dbc34a4057362ece812a5aaca README
+SHA256 60635b1226b9c5e622e2cfaf3b9c41b93cfcda7409a2905bc0a5ba4f30da1307 bin/tickit-hello
+SHA256 c9ce03611fe921b3d1c4095df816e70edb88fe382f0efbd303fa0c3bd506b7b1 examples/hello_default.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 63ec8405523ae67c33823dcf4b136a46f0711fb17a8b58b49ddd922ed6b69611 inc/Module/Install/Scripts.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 cc8344dff78843d01b70bb1cd9a3a3331c8c14e9a5e5f69b47e51450496bc90f t/App-Tickit-Hello/01-use.t
+SHA256 ca046e69f7930bbf64b5b966050d6eecdf8a59832a40a02d3705a1a2fdd89296 t/App-Tickit-Hello/02-version.t
+SHA256 3ad96c3d77c358365ceecc748d9924f5bf69183c99550c195fc43f5746ef4a6c t/App-Tickit-Hello/03-new.t
+SHA256 d5c849df5359ec7e7c6f9efb817435ee5b9a1dacb1ca9f5e4d8d9caf1a11b7c2 t/App-Tickit-Hello/04-run.t
+SHA256 dc470e607628d1c3435753bc0733f9be9285b87c37eaaf642c644902a9f31cc4 xt/App-Tickit-Hello/01-pod_coverage.t
+SHA256 18a71427ba0fefa292be398cf8e1b13ef2de78c5e8ced1d61c59daada7928ac5 xt/App-Tickit-Hello/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEbhzVZugfHqSVNvE7YSp92FNcjtAFAmdjH48ACgkQYSp92FNc
+jtDaUQv/fRwG96f/xFTM9qZfbmccWmdOic3CLOhe/rreoCKcrSPtp+lCSDPK10J4
+QrI90v3BaAOtgoIIgi/UnIgfB7OjnJtQ7VvQ3xDl0iercorOr4+YGrp49nZuc2tW
+JMLzKb2OFOptadbTJxjk2Ql+azaOqhUkJ+HYHvT/cI4IRGUV31CbwUDROP5resLc
+DH2oxAr0UeToJehQEsDTtKSXlsiV9U2HkbXYUwK/ECSwAuIk8qk6cPDEEWXasG8b
+rUvXy53iQwGHadsm98/UIPA/JeEoegybfGrhGte2ncNTtxPWHG+xBpp26C8bEBp1
+lZ2DWZ0zl9xlPQREWefNElNdOasRVInyJSvl8blxR+OYkDGg+/xQKaF3XhS6VEWa
+GHYPly6rZpehaqVVAekXo4Ywn9PWrxVdzKQVcr7M3s/WZw9X57JcdwbymXxn8+tO
+QSkwfGKGgT541VluuYQ5WLFzds0n+ALt022lkLJJtPu8FXcuU+Z6FQNcdisO2+Hp
+HyoOh5uV
+=W/Ne
+-----END PGP SIGNATURE-----

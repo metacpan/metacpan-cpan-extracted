@@ -8,6 +8,9 @@ described as a package manager helper.
 **sbokeeper** should be able to run on most Unix-like systems, although it
 probably won't have much use outside a Slackware system.
 
+**sbokeeper** now has a
+[slackbuild on SlackBuilds.org](https://slackbuilds.org/repository/15.0/system/sbokeeper/?search=sbokeeper).
+
 **sbokeeper** depends on the following:
 * Perl (>= 5.16)
 
@@ -55,8 +58,9 @@ If you are using one of the following SlackBuild package managers and are using
 the default repo location then you do not have to do any sort of configuration,
 **sbokeeeper** will find the repo itself.
 * `sbopkg`
-* `sbotools`
+* `sbotools`/`sbotools2`
 * `sbpkg`
+* `slpkg`
 * `sboui`
 
 Now you should be ready to use **sbokeeper**.

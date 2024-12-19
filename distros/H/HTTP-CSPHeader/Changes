@@ -1,5 +1,19 @@
 Revision history for HTTP-CSPHeader
 
+v0.4.1    2024-12-18 14:32:49+00:00 Europe/London
+  [Documentation]
+  - Documented security considerations.
+
+  - Add reference to the security policy in the module POD.
+
+  [Tests]
+  - Added more author tests.
+
+  - Removed unnecessary skip from tests.
+
+  [Other]
+  - Dist::Zilla::Plugin::Generate::ManifestSkip is no longer used.
+
 v0.4.0    2024-12-17 16:58:27+00:00 Europe/London
   [Enhancements]
   - The nonce is longer and contains mixed-case letters and numbers.

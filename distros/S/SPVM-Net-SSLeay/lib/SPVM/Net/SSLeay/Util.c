@@ -47,9 +47,9 @@ int32_t SPVM__Net__SSLeay__Util__convert_to_wire_format(SPVM_ENV* env, SPVM_VALU
   
   int32_t wire_format_length = wire_format_index;
   
-  void* obj_wire_format = env->new_byte_array(env, stack, wire_format_length);
+  void* obj_wire_format = env->new_string(env, stack, NULL, wire_format_length);
   
-  unsigned char* wire_format = (unsigned char*)env->get_elems_byte(env, stack, obj_wire_format);
+  unsigned char* wire_format = (unsigned char*)env->get_chars(env, stack, obj_wire_format);
   
   wire_format_index = 0;
   for(int32_t i = 0; i < protocols_length; i++) {

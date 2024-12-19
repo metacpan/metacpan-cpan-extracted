@@ -1,12 +1,13 @@
-package Dist::Zilla::Plugin::FFI::CheckLib 1.07 {
+use 5.020;
+use true;
 
-  use strict;
-  use warnings;
-  use 5.020;
+package Dist::Zilla::Plugin::FFI::CheckLib 1.08 {
 
   # ABSTRACT: FFI::CheckLib alternative to Dist::Zilla::Plugin::CheckLib
 
   use Moose;
+  use experimental qw( signatures );
+
   with
     'Dist::Zilla::Role::FileMunger',
     'Dist::Zilla::Role::InstallTool',
@@ -52,8 +53,7 @@ package Dist::Zilla::Plugin::FFI::CheckLib 1.07 {
     $config
   };
 
-  sub register_prereqs {
-    my ($self) = @_;
+  sub register_prereqs ($self) {
     $self->zilla->register_prereqs( +{
         phase => 'configure',
         type  => 'requires',
@@ -63,9 +63,7 @@ package Dist::Zilla::Plugin::FFI::CheckLib 1.07 {
   }
 
   my %files;
-  sub munge_files {
-    my ($self) = @_;
-
+  sub munge_files ($self) {
     my @mfpl = grep
       {; $_->name eq 'Makefile.PL' or $_->name eq 'Build.PL' }
         @{ $self->zilla->files };
@@ -79,9 +77,7 @@ package Dist::Zilla::Plugin::FFI::CheckLib 1.07 {
     ()
   }
 
-  sub setup_installer {
-    my ($self) = @_;
-
+  sub setup_installer ($self) {
     my @mfpl = grep
       {; $_->name eq 'Makefile.PL' or $_->name eq 'Build.PL' }
         @{ $self->zilla->files };
@@ -103,9 +99,7 @@ package Dist::Zilla::Plugin::FFI::CheckLib 1.07 {
     ()
   }
 
-  sub _munge_file {
-    my ($self, $file) = @_;
-
+  sub _munge_file ($self, $file) {
     my $orig_content = $file->content;
     $self->log_fatal('could not find position in ' . $file->name . ' to modify!')
       unless $orig_content =~ m/use strict;\nuse warnings;\n\n/g;
@@ -152,7 +146,7 @@ Dist::Zilla::Plugin::FFI::CheckLib - FFI::CheckLib alternative to Dist::Zilla::P
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

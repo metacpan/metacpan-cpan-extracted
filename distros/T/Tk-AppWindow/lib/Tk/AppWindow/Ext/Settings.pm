@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Tk;
 use vars qw($VERSION);
-$VERSION="0.08";
+$VERSION="0.18";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
@@ -179,12 +179,20 @@ sub dialogCreate {
 	);
 
 	my %qopts = ();
-	my $fil = $self->getArt('text-x-plain');
-	$qopts{'-fileimage'} = $fil if defined $fil;
-	my $fol = $self->getArt('folder');
-	$qopts{'-folderimage'} = $fol if defined $fol;
-	my $fon = $self->getArt('gtk-select-font');
-	$qopts{'-fontimage'} = $fon if defined $fon;
+	my @images = (
+		['-fileimage', 'text-x-plain', 16],
+		['-folderimage', 'folder', 16],
+		['-fontimage', 'gtk-select-font', 16],
+		['-msgimage', 'dialog-question', 32],
+		['-newfolderimage', 'folder-new', 16],
+		['-reloadimage', 'appointment-recurring', 16],
+		['-warnimage', 'dialog-warning', 32],
+	);
+	for (@images) {
+		my ($opt, $icon, $size) = @$_;
+		my $img = $self->getArt($icon, $size);
+		$qopts{$opt} = $img if defined $img;
+	}
 
 	$f = $m->QuickForm(%qopts,
 		-acceptempty => 1,

@@ -10,7 +10,7 @@ Tk::AppWindow::Ext::Art - Use icon libraries quick & easy
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.16";
+$VERSION="0.18";
 use Config;
 my $mswin = 0;
 $mswin = 1 if $Config{'osname'} eq 'MSWin32';
@@ -19,7 +19,7 @@ my $osname = $Config{'osname'};
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
 use File::Basename;
-use File::MimeInfo::Magic qw( magic );
+use File::MimeInfo::Magic qw( magic mimetype);
 use Imager;
 use MIME::Base64;
 require FreeDesktop::Icons;
@@ -453,18 +453,31 @@ icon is returned.
 
 =cut
 
+my %genicons = (
+	audio => 'audio-x-generic',
+	image => 'image-x-generic',
+	package => 'package-x-generic',
+	video => 'video-x-generic',
+);
+
 sub getFileIcon {
 	my $self = shift;
 	my $file = shift;
-	my $mime = magic($file);
+	my $mime = mimetype($file);
 	if (defined $mime) {
-#		print "$file: $mime\n";
+		if ($mime =~ /^([^\/]+)\//) {
+			my $ico = $genicons{$1};
+			if (defined $ico) {
+				my $icon = $self->getIcon($ico, @_);
+				return $icon if defined $icon
+			}
+		}
 		$mime =~ s/\//-/;
 		my $icon = $self->getIcon($mime, @_);
-#		print "found $mime\n" if defined $icon;
-		return $icon if defined $icon
+		return $icon if defined $icon;
 	}
-	return $self->getIcon('text-plain', @_)
+	return $self->getIcon('text-x-generic', @_) if -T $file;
+	return $self->getIcon('text-plain', @_);
 }
 
 =item B<getIcon>I<($name>, [ I<$size, $context> ] I<);>
@@ -488,6 +501,36 @@ sub getIcon {
 		return $self->loadImage($file, $size);
 	}
 	return undef
+}
+
+=item B<imagerFont>I<($tkfontobject);>
+
+Takes a Tk::Font object and returns it as a Imager::Font object.
+
+=cut
+
+sub imagerFont {
+	my ($self, $fnt) = @_;
+	my $font;
+	my $fontsize = abs($self->fontActual($fnt, '-size'));
+	if ($mswin) {
+		my $fontdesc = $self->fontActual($fnt, '-family');
+		my $fontweight = $self->fontActual($fnt, '-weight');
+		$fontdesc = "$fontdesc bold" if $fontweight eq 'bold';
+		my $fontslant = $self->fontActual($fnt, '-slant');
+		$fontdesc = "$fontdesc italic" if $fontslant eq 'italic';
+		$font = Imager::Font->new(
+			face  => $fontdesc,
+			size  => $fontsize,
+		) or die Imager->errstr;
+	} else {
+		my $fontfile = $self->fontFile($fnt);
+		$font = Imager::Font->new(
+			file  => $fontfile,
+			size  => $fontsize,
+		) or die Imager->errstr;
+	}
+	return $font
 }
 
 sub isSVG {
@@ -579,24 +622,7 @@ sub text2image {
 	
 	$color = Imager::Color->new($color) or die "Color";
 
-	my $font;	
-	if ($mswin) {
-		my $fontdesc = $self->fontActual($fnt, '-family');
-		my $fontweight = $l->fontActual($fnt, '-weight');
-		$fontdesc = "$fontdesc bold" if $fontweight eq 'bold';
-		my $fontslant = $l->fontActual($fnt, '-slant');
-		$fontdesc = "$fontdesc italic" if $fontslant eq 'italic';
-		$font = Imager::Font->new(
-			face  => $fontdesc,
-			size  => $fontsize,
-		) or die Imager->errstr;
-	} else {
-		my $fontfile = $self->fontFile($fnt);
-		$font = Imager::Font->new(
-			file  => $fontfile,
-			size  => $fontsize,
-		) or die Imager->errstr;
-	}
+	my $font = $self->imagerFont($fnt);	
 	
 	$img->string(
 		x => 1,

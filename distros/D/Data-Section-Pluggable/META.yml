@@ -3,7 +3,6 @@ abstract: 'Read structured data from __DATA__'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Path::Tiny: '0'
   Test2::V0: '0.000121'
   Test::More: '0.98'
   Test::Script: '0'
@@ -27,6 +26,7 @@ recommends:
 requires:
   Class::Tiny: '0'
   JSON::MaybeXS: '0'
+  Path::Tiny: '0'
   Ref::Util: '0'
   Role::Tiny: '1.003001'
   perl: v5.20.0
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/uperl/Data-Section-Pluggable/issues
   homepage: https://metacpan.org/pod/Data::Section::Pluggable
   repository: git://github.com/uperl/Data-Section-Pluggable.git
-version: '0.03'
+version: '0.04'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

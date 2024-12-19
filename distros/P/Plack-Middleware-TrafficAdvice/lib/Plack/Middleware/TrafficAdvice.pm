@@ -15,7 +15,7 @@ use HTTP::Date;
 use HTTP::Status qw/ :constants /;
 use JSON::MaybeXS 1.004000;
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.3.1';
 
 
 sub prepare_app {
@@ -111,7 +111,7 @@ Plack::Middleware::TrafficAdvice - handle requests for /.well-known/traffic-advi
 
 =head1 VERSION
 
-version v0.3.0
+version v0.3.1
 
 =head1 SYNOPSIS
 
@@ -165,7 +165,7 @@ valid JSON, or that the JSON conforms to the specification.
 
 This module requires Perl v5.12 or later.
 
-Future releases may only support Perl versions released in the last ten years.
+Future releases may only support Perl versions released in the last ten (10) years.
 
 =head1 SEE ALSO
 
@@ -185,13 +185,18 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021-2023 by Robert Rothenberg.
+This software is Copyright (c) 2021-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

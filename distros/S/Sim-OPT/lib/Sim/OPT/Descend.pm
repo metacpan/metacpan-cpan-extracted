@@ -1765,7 +1765,7 @@ The objective function for rating the performances of the candidate solutions ca
 
 =head1 SEE ALSO
 
-An example of configuration file for block search ("des.pl") is packed in "optw.tar.gz" file in "examples" directory in this distribution. But mostly, reference to the source code may be made.
+An example of configuration file for block search ("des.pl") is packed in "optw.zip" file in "examples" directory in this distribution. But mostly, reference to the source code may be made.
 
 =head1 AUTHOR
 

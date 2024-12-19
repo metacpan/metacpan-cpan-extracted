@@ -4,6 +4,6 @@
 class Net::SSLeay::Callback::AlpnSelect : interface_t {
   use Net::SSLeay;
   
-  required method : int ($ssl : Net::SSLeay, $out_ref : string[], $outlen_ref : byte*, $in : string, $inlen : int, $arg : object);
+  required method : int ($ssl : Net::SSLeay, $out_ref : string[], $outlen_ref : byte*, $in : string, $inlen : int);
   
 }

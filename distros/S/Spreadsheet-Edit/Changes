@@ -1,5 +1,6 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1000.025 : Require Data::Dumper::Interp 7.012 to get portability fixes
 1000.023 : Yet more debug code to diagnose Windows smoker failures...
 1000.022 : Small changes, hunting for Windows smoker failures.
 1000.021 : Allow completely-redundant alias definitions; Added btw* test cases.

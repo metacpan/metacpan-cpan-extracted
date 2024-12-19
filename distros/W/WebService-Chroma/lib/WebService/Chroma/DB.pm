@@ -30,6 +30,9 @@ validate_subs (
 		params => {
 			name => [Str],
 		}
+	},
+	count_collections => {
+		params => { }
 	}
 );
 
@@ -107,6 +110,15 @@ sub delete_collection {
 	return $collection;
 }
 
+sub count_collections {
+	my ($self, %data) = @_;
+	return $self->ua->get(
+		url => sprintf('/api/v2/tenants/%s/databases/%s/collections_count', $self->tenant, $self->name),
+	);
+}
+
+
+
 1;
 
 __END__
@@ -117,19 +129,24 @@ WebService::Chroma::DB - chromadb database
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
 =head1 SYNOPSIS
 
-	use WebService::Chroma::Collection;
+	use WebService::Chroma::DB;
 
-	my $collection = WebService::Chroma::DB->new(
+	my $db = WebService::Chroma::DB->new(
 		ua => WebService::Chroma::UA->new(...),
 		tenant => '...',
 		name => '...',
 	);
+
+	my $collection = $db->create_collection(
+		name => 'test-collection'
+	);
+
 
 =head1 Methods
 
@@ -137,11 +154,45 @@ Version 0.04
 
 =head2 create_collection
 
+Create a new collection. This returns an L<WebService::Chroma::Collection> object.
+
+	$db->create_collection(
+		name => 'test-collection',
+  		configuration => { ... },
+  		metadata => { ... },
+  		get_or_create => \1
+	);
+
+=head2 count_collections
+
+Count all collections related to the current database.
+
+	$db->count_collections();
+
 =head2 get_collections
+
+Retrieve all collections related to the current database. This returns a list of L<WebService::Chroma::Collection> objects.
+
+	$db->get_collections(
+		limit => 10,
+		offset => 0
+	);
 
 =head2 get_collection
 
+Retrieve an existing collection. This returns a L<WebService::Chroma::Collection> object.
+
+	$db->get_collection(
+		name => 'test-collection'
+	);
+
 =head2 delete_collection
+
+Delete an existing collection.
+
+	$db->delete_collection(
+		name => 'test-collection'
+	);
 
 =head1 AUTHOR
 

@@ -20,7 +20,7 @@ Net::SSLeay::Callback::AlpnSelect interface in L<SPVM> represents the function p
 
 =head2 Anon Method
 
-C<required method : int ($ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $out_ref : string[], $outlen_ref : byte*, $in : string, $inlen : int, $arg : object);>
+C<required method : int ($ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $out_ref : string[], $outlen_ref : byte*, $in : string, $inlen : int);>
 
 This method represents the function pointer type of L<SSL_CTX_set_alpn_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb/> function's callback argument in OpenSSL.
 

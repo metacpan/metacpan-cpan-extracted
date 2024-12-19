@@ -9,7 +9,7 @@ Tk::FileBrowser - Multi column file system explorer
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = 0.06;
+$VERSION = 0.07;
 
 use base qw(Tk::Derived Tk::Frame);
 Construct Tk::Widget 'FileBrowser';
@@ -985,12 +985,12 @@ sub GetDirHandle {
 
 sub GetDirIcon {
 	my ($self, $name) = @_;
-	return $self->Callback('-diriconcall', $name);
+	return $self->Callback('-diriconcall', $self->GetFullName($name));
 }
 
 sub GetFileIcon {
 	my ($self, $name) = @_;
-	return $self->Callback('-fileiconcall', $name);
+	return $self->Callback('-fileiconcall', $self->GetFullName($name));
 }
 
 sub GetFullName {
@@ -1008,7 +1008,7 @@ sub GetFullName {
 
 sub GetLinkIcon {
 	my ($self, $name) = @_;
-	return $self->Callback('-linkiconcall', $name);
+	return $self->Callback('-linkiconcall', $self->GetFullName($name));
 }
 
 sub GetParent {

@@ -1,5 +1,29 @@
 Revision history for sbokeeper.
 
+2.00 (12/18/2024):
+  This release I intended to refactor sbokeeper so that it would be less
+  monolithic and easier to use some of its components in other projects. This
+  shouldn't have much of an impact on its usage other than the deprecation of
+  the PkgtoolLogs configuration option.
+  Added:
+    * 'print' command now accepts category aliases as argument.
+    * sbotools2 is now a detected SlackBuild package manager (for determining
+      default repo path).
+  Improvements:
+    * Completely refactored project structure; trying to structure sbokeeper so
+      that it's less monolithic. Shouldn't have any effect noticable to the
+      user.
+    * Completely refactored test suite. Components other than the database
+      stuff are now tested.
+    * Better error message when a data file is required but not found.
+  Fixes:
+    * Documented slpkg as a detected package manager.
+  Removed:
+    * Deprecated PkgtoolLogs configuration option and friends. Should only
+      affect non-Slackware users trying the 'diff' or 'pull' commands.
+    * Removed included SlackBuild script. Please use the SlackBuild script
+      available on SlackBuilds.org.
+
 1.02 (12/9/2024):
   Added:
     * 'clean' command (equivalent to 'rm @unnecessary').

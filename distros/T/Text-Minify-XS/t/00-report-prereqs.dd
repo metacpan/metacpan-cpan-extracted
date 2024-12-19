@@ -1,4 +1,10 @@
 do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'ExtUtils::MakeMaker' => '7.22',
+                                    'Module::Metadata' => '1.000015'
+                                  }
+                  },
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
@@ -9,6 +15,7 @@ do { my $x = {
                                       'Devel::PPPort' => '3.68',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Test::CPAN::Changes' => '0.500002',
+                                      'Test::CVE' => '0.08',
                                       'Test::CleanNamespaces' => '0.15',
                                       'Test::DistManifest' => '0',
                                       'Test::EOF' => '0',
@@ -25,7 +32,8 @@ do { my $x = {
                                       'Test::Pod::LinkCheck' => '0',
                                       'Test::Portability::Files' => '0',
                                       'Test::TrailingSpace' => '0.0203',
-                                      'Test::Vars' => '0.015'
+                                      'Test::Vars' => '0.015',
+                                      'Test::XS::Check' => '0'
                                     }
                     },
        'runtime' => {
@@ -42,9 +50,9 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'Encode' => '0',
+                                   'Encode' => '2.85',
                                    'File::Spec' => '0',
-                                   'Module::Metadata' => '0',
+                                   'Module::Metadata' => '1.000015',
                                    'Test2::Tools::Exception' => '0',
                                    'Test2::Tools::Warnings' => '0',
                                    'Test2::V0' => '0',

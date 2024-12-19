@@ -2,8 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 40;
-use Test::NoWarnings;
+use Test::Most tests => 39;
 use lib 't/lib';
 use MyLogger;
 

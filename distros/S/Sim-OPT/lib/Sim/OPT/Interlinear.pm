@@ -1,7 +1,7 @@
 package Sim::OPT::Interlinear;
 # NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE DELETED.
 # Author: Gian Luca Brunetti, Politecnico di Milano. (gianluca.brunetti@polimi.it)
-# Copyright reserved.  2018-2022.
+# Copyright reserved.  2018-2024.
 # GPL License 3.0 or newer.
 # This is a program for filling a design space multivariate discrete dataseries
 # through a strategy entailing distance-weighting the nearest-neihbouring gradients.
@@ -31,7 +31,7 @@ use Sim::OPT::Parcoord3d;
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
-$VERSION = '0.189';
+$VERSION = '0.191';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete multivariate discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -2315,7 +2315,7 @@ Sim::OPT::Interlinear
 
 
 Interlinear is a program for metamodelling the missing instance values in multivariate datasieries by distance-weighting the nearest-neihbouring gradients between points.
-The strategy weights the known gradients in a manner inversely proportional to the distance between the points they are taken from to the missing nearest-neighbouring points they are going to be used for. It is a zero-order instance-based method. In it, the space curvatures are reconstructed by utilizing a local sample of the near-neighbouring gradients. The method has been presented in the following publication: http://doi.org/10.1080/19401493.2019.1707875, where is has been named Distance-Weighted Gradient Network (DWGN), and has been shown capable of outperforming the Kriging method, the MARS method, and polynomial methods.
+The strategy weights the known gradients in a manner inversely proportional to the distance between the points they are taken from to the missing nearest-neighbouring points they are going to be used for. It is a zero-order instance-based method. In it, the space curvatures are reconstructed by utilizing a local sample of the near-neighbouring gradients. The method has been presented in the following publication: L<Gian Luca Brunetti (2020). “Increasing the efficiency of simulation-based design explorations via metamodelling”. Journal of Building Performance Simulation, 13:1, pp. 79-99. DOI: 10.1080/19401493.2019.1707875|http://doi.org/10.1080/19401493.2019.1707875>, where is has been named Distance-Weighted Gradient Network (DWGN), and has been shown capable of outperforming the Kriging method, the MARS method, and polynomial methods.
 The DWGN is active by default when calling Intelinear. Another version of the procedure, in which the derived points are calculated on a global rather than a local basis, allowing faster computations, but entailing less accurate results, can be activated by setting @modality = ( "simple" ) in the configuration file.
 Besides strategies the DWGN and the DWGN-simple, two alternative metamodelling strategies can be utilized in Interlinear: pure linear interpolation (one may want to use this just in some occasions: for example, on factorials), and pure nearest neighbour (a strategy of last resort: one may want to use a pass of it to unlock a computation which is based on data which are too sparse to proceed, or when nothing else works).
 
@@ -2350,7 +2350,7 @@ Here below is an example of multivatiate dataseries of 3 parameters assuming 3 l
 3,3,3,3
 
 
-The program converts this format into the one preferred by Sim::OPTS, which is the following:
+The program converts this format into the one preferred by Sim::OPT, which is the following:
 
 
 1-1_2-1_3-1,9.234
@@ -2394,7 +2394,8 @@ This dataseries can be used by OPT for the optimization of one or more blocks. T
 
 The number of computations required for the creation of a metamodel in OPT increases exponentially with the number of instances in the metamodel. To reduce the exponential, a limit has to be set for the size of the net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$nfiltergrads", a limit with adaptive effects (putting a ceiling to the number of originary gradients utilized to derive the points), as well as "$limit_checkdistgrads" and "$limit_checkdistpoints" (putting a limit to the number of derived gradients and points from which the calculations are further propagated at each computation pass). By default they are unspecified. If they are unspecified (i.e. a null value ("") is specified for them), no limit is assumed. "$nfiltergrads" may be set to the double of the square root of the number of instances of a problem space. "$limit_checkdistgrads" and "$limit_checkdistpoints" may be set to a part of the total number of instances, for example that number divided by 1/5, or 1/10. "$limit_checkdistgrads" and "$limit_checkdistpoints" may be given the same value. An example of configuration file with more information in the comments is embedded in this source code, where it sets the defaults.
 
-By utilizing the metamodelling procedure at point (a), Interlinear can also weld two related problem space models together, provided that they share the same parametric structure. This welding is not a mere merge. It is a neighbour-by-neighbour action, much wholler and, yes, cooler. The procedure has been presented in the following publication: http://doi.org/10.1080/19401493.2020.1712477. The action of procedure is controlled by the following settings in the configuration file:
+By utilizing the metamodelling procedure at point (a), Interlinear can also weld two related problem space models together, provided that they share the same parametric structure. This welding is not a mere merge. It is a neighbour-by-neighbour action, much wholler and, yes, cooler. The procedure has been presented in the following publication: L<Gian Luca Brunetti (2020). “Grafting of design-space models onto models of different scope or resolution”. Journal of Building Performance Simulation, 13:3, pp. 227-246. DOI: 10.1080/19401493.2019.1707875
+|http://doi.org/10.1080/19401493.2020.1712477>. The action of procedure is controlled by the following settings in the configuration file:
 1) @weldsprepared = ( "/home/luca/ffexpexps_full/minmissionsprep.csv" ); #The path to the second dataseries.
 2) @parswelds = ( [ 1, 4 ] ); #The parameter numbers of which the welding action has to take place.
 3) @recedes = ( 1, 4 ); #This signals with respect to which parameters the first dataseries gives way to the second. (Otherwise, the obtained points would be averaged one-to-one with those of first dataseries. Usually you do not want that.)
@@ -2439,7 +2440,7 @@ interlinear, interstart.
 =head1 AUTHOR
 
 
-Gian Luca Brunetti (2018-22) E<lt>gianluca.brunetti@polimi.itE<gt>
+Gian Luca Brunetti (2018-24) E<lt>gianluca.brunetti@polimi.itE<gt>
 
 
 =head1 COPYRIGHT AND LICENSE

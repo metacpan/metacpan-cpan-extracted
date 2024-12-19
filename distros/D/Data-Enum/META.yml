@@ -3,8 +3,9 @@ abstract: 'immutable enumeration classes'
 author:
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '7.22'
   File::Spec: '0'
-  Module::Metadata: '0'
+  Module::Metadata: '1.000015'
   Test::More: '0'
   Test::Most: '0'
   strict: '0'
@@ -25,7 +26,7 @@ name: Data-Enum
 provides:
   Data::Enum:
     file: lib/Data/Enum.pm
-    version: v0.5.0
+    version: v0.6.0
 recommends:
   Package::Stash::XS: '0'
 requires:
@@ -33,14 +34,15 @@ requires:
   Package::Stash: '0'
   Scalar::Util: '0'
   constant: '0'
+  experimental: '0'
   overload: '0'
-  perl: v5.14.0
+  perl: v5.20.0
   warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/perl-Data-Enum/issues
   repository: git://github.com/robrwo/perl-Data-Enum.git
-version: v0.5.0
+version: v0.6.0
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.34.3
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

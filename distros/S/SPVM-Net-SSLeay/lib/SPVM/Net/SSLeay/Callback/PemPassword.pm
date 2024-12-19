@@ -18,7 +18,7 @@ Net::SSLeay::Callback::PemPassword interface in L<SPVM> represents L<pem_passwor
 
 =head1 Interface Methods
 
-C<required method : int ($ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $rwflag : int, $arg : object);>
+C<required method : int ($ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $rwflag : int);>
 
 This method represents L<pem_password_cb|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_default_passwd_cb> function pointer type in OpenSSL.
 

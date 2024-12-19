@@ -170,13 +170,14 @@ sub import {
   require Guard;
   Guard->import::into($target, qw(scope_guard guard));
 
-  use Data::Dumper::Interp 7.009 ();
-  unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
-    # Unless we are testing DDI
-    no warnings 'once';
-    # Don't follow overloads e.g. stringify
-    $Data::Dumper::Interp::Objects = {overloads => "ignore"};
-  }
+  use Data::Dumper::Interp 7.012 ();
+#OTOH, we _do_ want show stringified value of things like Path::Tiny
+#  unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
+#    # Unless we are testing DDI
+#    no warnings 'once';
+#    # Don't follow overloads e.g. stringify
+#    $Data::Dumper::Interp::Objects = {overloads => "ignore"};
+#  }
 
   unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
     # unless we are testing DDI

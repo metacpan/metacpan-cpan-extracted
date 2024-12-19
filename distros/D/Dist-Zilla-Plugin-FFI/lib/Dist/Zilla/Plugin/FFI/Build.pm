@@ -1,7 +1,10 @@
-package Dist::Zilla::Plugin::FFI::Build 1.07 {
+use 5.020;
+use true;
 
-  use 5.020;
+package Dist::Zilla::Plugin::FFI::Build 1.08 {
+
   use Moose;
+  use experimental qw( signatures );
   use List::Util qw( first );
 
   # ABSTRACT: Add FFI::Build to your Makefile.PL
@@ -55,9 +58,8 @@ EOF2
     isa => 'Maybe[Str]',
   );
 
-  sub munge_files
+  sub munge_files ($self)
   {
-    my($self) = @_;
     my $file = first { $_->name eq 'Makefile.PL' } @{ $self->zilla->files };
     $self->log_fatal("unable to find Makefile.PL")
       unless $file;
@@ -69,8 +71,7 @@ EOF2
     $file->content($content);
   }
 
-  sub register_prereqs {
-    my ($self) = @_;
+  sub register_prereqs ($self) {
     $self->zilla->register_prereqs( +{
         phase => 'configure',
         type  => 'requires',
@@ -86,6 +87,14 @@ EOF2
         },
         "FFI::Platypus::Lang::@{[ $self->lang ]}" => 0,
       );
+      if($self->lang eq 'V') {
+         $self->zilla->register_prereqs( +{
+             phase => 'runtime',
+             type  => 'requires',
+           },
+           "FFI::Build" => '2.10',
+         )
+      }
     }
 
     if($self->build)
@@ -96,21 +105,25 @@ EOF2
         },
         "FFI::Build::File::@{[ $self->build ]}" => 0,,
       );
+      if($self->build eq 'VMod') {
+         $self->zilla->register_prereqs( +{
+             phase => 'runtime',
+             type  => 'requires',
+           },
+           "FFI::Build" => '2.10',
+         )
+      }
     }
-
   }
 
-  sub metadata
+  sub metadata ($self)
   {
-    my($self) = @_;
     my %meta = ( dynamic_config => 1 );
     \%meta;
   }
 
-  sub prune_files
+  sub prune_files ($self)
   {
-    my($self) = @_;
-
     my $lang = $self->lang;
 
     foreach my $file ((), @{ $self->zilla->files })
@@ -135,8 +148,6 @@ EOF2
   __PACKAGE__->meta->make_immutable;
 }
 
-1;
-
 __END__
 
 =pod
@@ -149,7 +160,7 @@ Dist::Zilla::Plugin::FFI::Build - Add FFI::Build to your Makefile.PL
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

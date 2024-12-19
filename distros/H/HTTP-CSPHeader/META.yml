@@ -3,8 +3,9 @@ abstract: 'manage dynamic content security policy headers'
 author:
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '7.22'
   File::Spec: '0'
-  Module::Metadata: '0'
+  Module::Metadata: '1.000015'
   Plack::Middleware::ContentLength: '0'
   Plack::Middleware::Head: '0'
   Test2::V0: '0'
@@ -29,7 +30,7 @@ name: HTTP-CSPHeader
 provides:
   HTTP::CSPHeader:
     file: lib/HTTP/CSPHeader.pm
-    version: v0.4.0
+    version: v0.4.1
 recommends:
   Ref::Util::XS: '0'
   Type::Tiny::XS: '0'
@@ -44,7 +45,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-HTTP-CSPHeader/issues
   repository: git://github.com/robrwo/perl-HTTP-CSPHeader.git
-version: v0.4.0
+version: v0.4.1
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.34.3
 x_serialization_backend: 'YAML::Tiny version 1.76'

@@ -12,6 +12,7 @@ README.md
 t/00-load.t
 t/10-compile.t
 t/20-new.t
+t/30-basics.t
 t/allow.t
 t/apoc.t
 t/as_string.t

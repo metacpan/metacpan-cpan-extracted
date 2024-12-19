@@ -32,7 +32,7 @@ class TestCase::Net::SSLeay::Online {
     
     my $ssl_ctx = $socket->ssl_ctx;
     
-    $ssl_ctx->set_verify(SSL->SSL_VERIFY_PEER, method : int ($preverify_ok : int, $x509_store_ctx : Net::SSLeay::X509_STORE_CTX, $arg : object) {
+    $ssl_ctx->set_verify(SSL->SSL_VERIFY_PEER, method : int ($preverify_ok : int, $x509_store_ctx : Net::SSLeay::X509_STORE_CTX) {
       
       my $verify_ok = 1;
       
@@ -41,10 +41,6 @@ class TestCase::Net::SSLeay::Online {
       }
       
       unless ($x509_store_ctx is_type Net::SSLeay::X509_STORE_CTX) {
-        $verify_ok = 0;
-      }
-      
-      unless ($arg->(int) == 1) {
         $verify_ok = 0;
       }
       
@@ -80,7 +76,7 @@ class TestCase::Net::SSLeay::Online {
       }
       
       return $verify_ok;
-    }, Int->new(1));
+    });
     
     if (Sys::OS->is_windows) {
       $ssl_ctx->set_default_verify_paths_windows;

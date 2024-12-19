@@ -170,7 +170,7 @@
       "x_IRC" : "irc://irc.perl.org/#native",
       "x_twitter" : "https://fosstodon.org/@PerlFFI"
    },
-   "version" : "2.09",
+   "version" : "2.10",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",

@@ -1,8 +1,8 @@
-package EAI::File 1.916;
+package EAI::File 1.917;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
-use Exporter qw(import);use Text::CSV();use Data::XLSX::Parser();use Spreadsheet::ParseExcel();use Spreadsheet::WriteExcel();use Excel::Writer::XLSX();use Data::Dumper qw(Dumper);use XML::LibXML();use XML::LibXML::Debugging();
-use Log::Log4perl qw(get_logger);use Time::localtime;use Scalar::Util qw(looks_like_number);use EAI::DateUtil;use EAI::Common;
+use Exporter qw(import); use Text::CSV(); use Data::XLSX::Parser(); use Spreadsheet::ParseExcel(); use Spreadsheet::WriteExcel(); use Excel::Writer::XLSX(); use XML::LibXML(); use XML::LibXML::Debugging();
+use Carp qw(confess longmess); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger); use Time::localtime; use Scalar::Util qw(looks_like_number); use EAI::DateUtil; use EAI::Common;
 
 our @EXPORT = qw(readText readExcel readXML writeText writeExcel);
 
@@ -32,7 +32,7 @@ sub readText ($$$;$$) {
 	my $logger = get_logger();
 	my @filenames = @{$filenames} if $filenames;
 	if (!@filenames) {
-		$logger->error("no filenames passed");
+		$logger->error("no filenames passed".longmess());
 		return 0;
 	}
 	# read format configuration
@@ -43,20 +43,20 @@ sub readText ($$$;$$) {
 		# positions/length definitions from poslen definition: e.g. "format_poslen => [[0,3],[3,3]]"
 		$poslen = $File->{format_poslen};
 		if (!$poslen) {
-			$logger->error("no format_poslen array given for parsing fix length format");
+			$logger->error("no format_poslen array given for parsing fix length format".longmess());
 			return 0;
 		}
 		$isFixLen = 1;
 	} else {
 		if (!$sep) {
-			$logger->error("no separator set in ".Dumper($File));
+			$logger->error("no separator set in ".Dumper($File).longmess());
 			return 0;
 		}
 		if ($File->{format_quotedcsv} and ref($sep) eq "Regexp") {
-			$logger->error("no regex separator allowed with format_quotedcsv");
+			$logger->error("no regex separator allowed with format_quotedcsv".longmess());
 			return 0;
 		}
-		$logger->warn("string separator assumed to be a regular expression for splitting textfile without format_quotedcsv, this may produce unexpected results") if (!$File->{format_quotedcsv} and !$File->{format_autoheader} and !(ref($sep) eq "Regexp"));
+		$logger->warn("string separator assumed to be a regular expression for splitting textfile without format_quotedcsv, this may produce unexpected results".longmess()) if (!$File->{format_quotedcsv} and !$File->{format_autoheader} and !(ref($sep) eq "Regexp"));
 	}
 	my $autoheader = $File->{format_autoheader} if $File->{format_autoheader};
 	@targetheader = @header if !@targetheader; # if no specific targetheader defined use header instead
@@ -71,10 +71,10 @@ sub readText ($$$;$$) {
 		$logger->debug("reading $redoSubDir$filename");
 		open (FILE, "<".$File->{format_encoding}, $redoSubDir.$filename) or do { #
 			if (! -e $redoSubDir.$filename) {
-				$logger->error("no file $redoSubDir$filename to process...") unless ($File->{optional});
-				$logger->warn("no file $redoSubDir$filename found... ");
+				$logger->error("no file $redoSubDir$filename to process...".longmess()) unless ($File->{optional});
+				$logger->warn("no file $redoSubDir$filename found... ".longmess());
 			} else {
-				$logger->error("file open error: $!");
+				$logger->error("file open error: $!".longmess());
 			}
 			return 0;
 		};
@@ -100,7 +100,7 @@ sub readText ($$$;$$) {
 			if ($firstLineProc) {
 				$_ = <FILE>;
 				eval $firstLineProc;
-				$logger->error("eval firstLineProc: ".$firstLineProc.$@) if ($@);
+				$logger->error("eval firstLineProc: ".$firstLineProc.$@.longmess()) if ($@);
 				$logger->debug("evaled: ".$firstLineProc);
 				$lines--;
 			}
@@ -147,7 +147,7 @@ LINE:
 						if ($sv->parse($_)) {
 							@line = $sv->fields();
 						} else {
-							$logger->error("couldn't parse quoted csv row: ".$sv->error_diag());
+							$logger->error("couldn't parse quoted csv row: ".$sv->error_diag().longmess());
 						}
 					} else {
 						@line = split $sep;
@@ -163,9 +163,9 @@ LINE:
 	}
 	if (!$data or !@{$data}) {
 		if ($File->{emptyOK}) {
-			$logger->warn("no data retrieved from file(s): @filenames, will be ignored because \$File{emptyOK}");
+			$logger->warn("no data retrieved from file(s): @filenames, will be ignored because \$File{emptyOK}".longmess());
 		} else {
-			$logger->error("no data retrieved from file(s): @filenames");
+			$logger->error("no data retrieved from file(s): @filenames".longmess());
 		}
 		return 0;
 	}
@@ -200,7 +200,7 @@ sub cell_handler {
 	return unless $sheet_index eq $worksheet; # only parse desired worksheet
 	if ($headerColumn{$col}) {
 		if (($stopOnEmptyValueColumn eq $col && !$cell) || $stoppedOnEmptyValue) {
-			$logger->warn("empty cell in row $row / column $col and stopOnEmptyValueColumn is set to $col, skipping from here now") if !$stoppedOnEmptyValue; # pass warning only once
+			$logger->warn("empty cell in row $row / column $col and stopOnEmptyValueColumn is set to $col, skipping from here now".longmess()) if !$stoppedOnEmptyValue; # pass warning only once
 			$stoppedOnEmptyValue = 1;
 		} else {
 			$logger->trace("Row $row, Column $col:\n".Dumper($cell)) if $logger->is_trace;
@@ -234,7 +234,7 @@ sub row_handlerXLSX {
 		my $value = $cellDetail->{"v"};
 		if ($headerColumn{$col}) {
 			if (($stopOnEmptyValueColumn eq $col && !$value) || $stoppedOnEmptyValue) {
-				$logger->warn("empty cell in row $row / column $col and stopOnEmptyValueColumn is set to $col, skipping from here now") if !$stoppedOnEmptyValue; # pass warning only once
+				$logger->warn("empty cell in row $row / column $col and stopOnEmptyValueColumn is set to $col, skipping from here now".longmess()) if !$stoppedOnEmptyValue; # pass warning only once
 				$stoppedOnEmptyValue = 1;
 			} else {
 				$logger->trace("Row $row, Column $col:\n".Dumper($cellDetail)) if $logger->is_trace;
@@ -261,7 +261,7 @@ sub readExcel ($$$;$$) {
 	$stoppedOnEmptyValue = 0; # reset
 	my @filenames = @{$filenames} if $filenames;
 	if (!@filenames) {
-		$logger->error("no filenames passed");
+		$logger->error("no filenames passed".longmess());
 		return 0;
 	}
 	# reset module global variables
@@ -271,7 +271,7 @@ sub readExcel ($$$;$$) {
 	my ($lineProcessing,$fieldProcessing,$firstLineProc,$thousandsep,$decimalsep,$sep,$skip,$header,$targetheader) = getcommon($File);
 	my @header = @$header; my @targetheader = @$targetheader;
 	if (!@targetheader) {
-		$logger->error("no targetheader defined"); # targetheader has to be given, excel source header (@header) optional
+		$logger->error("no targetheader defined".longmess()); # targetheader has to be given, excel source header (@header) optional
 		return 0;
 	}
 	$logger->debug("skip: $skip,headerskip: ". $File->{format_headerskip}.", header: @header \ntargetheader: @targetheader\ndateColumns: ".($File->{format_dateColumns} ? @{$File->{format_dateColumns}} : "")."\nheaderColumns: ".($File->{format_headerColumns} ? @{$File->{format_headerColumns}} : ""));
@@ -284,7 +284,7 @@ sub readExcel ($$$;$$) {
 	# prepare headerColumn definition
 	if ($File->{format_headerColumns} and ref($File->{format_headerColumns}) eq "ARRAY") {
 		if (@{$File->{format_headerColumns}} != @header or @{$File->{format_headerColumns}} != @targetheader) {
-			$logger->error("format_headerColumns has different length than format_header or format_targetheader definitions");
+			$logger->error("format_headerColumns has different length than format_header or format_targetheader definitions".longmess());
 			return 0;
 		}
 		for my $col (@{$File->{format_headerColumns}}) {
@@ -292,7 +292,7 @@ sub readExcel ($$$;$$) {
 		}
 	} else {
 		if (@header and @header != @targetheader) {
-			$logger->error("format_header has different length than format_targetheader definition");
+			$logger->error("format_header has different length than format_targetheader definition".longmess());
 			return 0;
 		}
 		$logger->debug("no format_headerColumns given, assuming simple list starting with column 1, having \@header length columns and a header row") if @header;
@@ -325,7 +325,7 @@ sub readExcel ($$$;$$) {
 		# check excel file existence
 		if (! -e $redoSubDir.$filename) {
 			$logger->error("no excel file ($filename) to process: $!") unless ($File->{optional});
-			$logger->warn("no file $redoSubDir$filename found"); 
+			$logger->warn("no file $redoSubDir$filename found".longmess()); 
 			return 0;
 		}
 		# read in excel file/sheet completely, both formats utilize read handlers (row_handlerXLSX or cell_handler)
@@ -338,23 +338,23 @@ sub readExcel ($$$;$$) {
 			if ($File->{format_worksheet}) {
 				$worksheet = $parser->workbook->sheet_id($File->{format_worksheet});
 				if (!$worksheet) {
-					$logger->error("no xlsx worksheet found named ".$File->{format_worksheet}.", maybe try {format_worksheetID} (numerically ordered place)");
+					$logger->error("no xlsx worksheet found named ".$File->{format_worksheet}.", maybe try {format_worksheetID} (numerically ordered place)".longmess());
 					return 0;
 				}
 			} elsif ($File->{format_worksheetID}) {
 				$worksheet = $File->{format_worksheetID};
 			} else {
-				$logger->error("neither worksheetname nor worksheetID (numerically ordered place) given for xlsx workbook");
+				$logger->error("neither worksheetname nor worksheetID (numerically ordered place) given for xlsx workbook".longmess());
 				return 0;
 			}
 			$logger->debug("starting parser for xlsx sheet name: ".$File->{format_worksheet}.", id:".$worksheet);
 			eval { $parser->sheet_by_id($worksheet); };
 			if ($@) {
-				$logger->error("Error parsing xlsx sheet: ".$@);
+				$logger->error("Error parsing xlsx sheet: ".$@.longmess());
 				return 0;
 			}
 		} elsif ($File->{format_xlformat} =~ /^xls$/i) {
-			$logger->warn("worksheets can't be found by name for the old xls format, please pass numerically ordered place in {format_worksheetID}") if ($File->{format_worksheet});
+			$logger->warn("worksheets can't be found by name for the old xls format, please pass numerically ordered place in {format_worksheetID}".longmess()) if ($File->{format_worksheet});
 			$worksheet = $File->{format_worksheetID} if $File->{format_worksheetID};
 			$logger->debug("starting parser for xls file $redoSubDir$filename ... ");
 			$parser = Spreadsheet::ParseExcel->new(
@@ -363,11 +363,11 @@ sub readExcel ($$$;$$) {
 			);
 			my $workbook = $parser->parse($redoSubDir.$filename);
 			if (!defined $workbook) {
-				$logger->error("excel xls parsing error: ".$parser->error());
+				$logger->error("excel xls parsing error: ".$parser->error().longmess());
 				return 0;
 			}
 		} else {
-			$logger->error("unrecognised excel format passed in \$File->{format_xlformat}:".$File->{format_xlformat});
+			$logger->error("unrecognised excel format passed in \$File->{format_xlformat}:".$File->{format_xlformat}.longmess());
 			return 0;
 		}
 		# check header row if format_header given
@@ -376,12 +376,12 @@ sub readExcel ($$$;$$) {
 			if ($File->{format_headerColumns}) {
 				my $i = 0;
 				for (@{$File->{format_headerColumns}}) {
-					$logger->error("expected header '".$header[$i]."' not in column ".$_.", instead got:".$dataRows{$startRowHeader}{$_}) if $header[$i] ne $dataRows{$startRowHeader}{$_};
+					$logger->error("expected header '".$header[$i]."' not in column ".$_.", instead got:".$dataRows{$startRowHeader}{$_}.longmess()) if $header[$i] ne $dataRows{$startRowHeader}{$_};
 					$i++;
 				}
 			} else {
 				for (my $i = 0; $i < @header; $i++) {
-					$logger->error("expected header '".$header[$i]."' not in column ".($i+1).", instead got:".$dataRows{$startRowHeader}{$i+1}) if $header[$i] ne $dataRows{$startRowHeader}{$i+1};
+					$logger->error("expected header '".$header[$i]."' not in column ".($i+1).", instead got:".$dataRows{$startRowHeader}{$i+1}.longmess()) if $header[$i] ne $dataRows{$startRowHeader}{$i+1};
 				}
 			}
 		}
@@ -411,7 +411,7 @@ LINE:
 		}
 		close FILE;
 		if (scalar(@{$data}) == 0 and !$File->{emptyOK}) {
-			$logger->error("Empty file: $filename, no data returned !!");
+			$logger->error("Empty file: $filename, no data returned !!".longmess());
 			return 0;
 		}
 	}
@@ -426,14 +426,14 @@ sub readXML ($$$;$) {
 	my $logger = get_logger();
 	my @filenames = @{$filenames} if $filenames;
 	if (!@filenames) {
-		$logger->error("no filenames passed");
+		$logger->error("no filenames passed".longmess());
 		return 0;
 	}
 	# read format configuration
 	my ($lineProcessing,$fieldProcessing,$firstLineProc,$thousandsep,$decimalsep,$sep,$skip,$header,$targetheader) = getcommon($File);
 	my @header = @$header; my @targetheader = @$targetheader;
 	if (!@header) {
-		$logger->error("no header defined"); # targetheader has to be given, excel source header (@header) optional
+		$logger->error("no header defined".longmess()); # targetheader has to be given, excel source header (@header) optional
 		return 0;
 	}
 	$Data::Dumper::Terse = 1;
@@ -443,8 +443,8 @@ sub readXML ($$$;$) {
 	# read all files with same format
 	for my $filename (@filenames) {
 		if (! -e $redoSubDir.$filename) {
-			$logger->error("no XML file ($redoSubDir$filename) found to process") unless ($File->{optional});
-			$logger->warn("file $redoSubDir$filename not found");
+			$logger->error("no XML file ($redoSubDir$filename) found to process".longmess()) unless ($File->{optional});
+			$logger->warn("file $redoSubDir$filename not found".longmess());
 			return 0;
 		}
 		my $xmldata = XML::LibXML->load_xml(location => $redoSubDir.$filename, no_blanks => 1);
@@ -452,12 +452,12 @@ sub readXML ($$$;$) {
 		if (ref($File->{format_namespaces}) eq 'HASH') {
 			$xpc->registerNs($_, $File->{format_namespaces}{$_}) for keys (%{$File->{format_namespaces}});
 		}
-		$logger->error("no format_xpathRecordLevel passed") unless ($File->{format_xpathRecordLevel});
-		$logger->error("no format_fieldXpath hash passed") unless ($File->{format_fieldXpath} && ref($File->{format_fieldXpath}) eq 'HASH');
+		$logger->error("no format_xpathRecordLevel passed".longmess()) unless ($File->{format_xpathRecordLevel});
+		$logger->error("no format_fieldXpath hash passed".longmess()) unless ($File->{format_fieldXpath} && ref($File->{format_fieldXpath}) eq 'HASH');
 		$logger->trace("format_xpathRecordLevel: ".$File->{format_xpathRecordLevel}) if $logger->is_trace;
 		$logger->trace("format_fieldXpath: ".Dumper($File->{format_fieldXpath})) if $logger->is_trace;
 		my @records = $xpc->findnodes($File->{format_xpathRecordLevel});
-		$logger->warn("no records found") if @records == 0;
+		$logger->warn("no records found".longmess()) if @records == 0;
 		$logger->trace("total document content: ".$xpc->getContextNode->toClarkML()) if $logger->is_trace;
 		# iterate through all rows of file
 		my $lineno = 0;
@@ -484,7 +484,7 @@ sub readXML ($$$;$) {
 			readRow($data,\@line,\@header,\@targetheader,$xpc,$lineProcessing,$fieldProcessing,$thousandsep,$decimalsep,$lineno);
 		}
 		if (!$data and !$File->{emptyOK}) {
-			$logger->error("empty file: $filename, no data returned");
+			$logger->error("empty file: $filename, no data returned".longmess());
 			return 0;
 		}
 	}
@@ -533,7 +533,7 @@ sub readRow ($$$$$$$$$$) {
 			} else {
 				eval $fieldProcessing->{$targetheader[$i]};
 			}
-			$logger->error("eval of ".(ref($fieldProcessing->{$targetheader[$i]}) eq "CODE" ? "defined sub" : "'".$fieldProcessing->{$targetheader[$i]}."'")." returned error:$@") if ($@);
+			$logger->error("eval of ".(ref($fieldProcessing->{$targetheader[$i]}) eq "CODE" ? "defined sub" : "'".$fieldProcessing->{$targetheader[$i]}."'")." returned error:$@".longmess()) if ($@);
 		} elsif ($fieldProcessing->{""}) { # special case: if empty key is defined with processing code, do for all fields
 			$logger->trace('general fieldProcessing: $targetheader['.$i.']:'.$targetheader[$i].',$line{'.$targetheader[$i].']:'.$line{$targetheader[$i]}.',fieldProcessing{',$targetheader[$i],'}:'.$fieldProcessing->{$targetheader[$i]}) if $logger->is_trace;
 			if (ref($fieldProcessing->{""}) eq "CODE") {
@@ -541,7 +541,7 @@ sub readRow ($$$$$$$$$$) {
 			} else {
 				eval $fieldProcessing->{""};
 			}
-			$logger->error("eval of ".(ref($fieldProcessing->{""}) eq "CODE" ? "defined sub" : "'".$fieldProcessing->{""}."'")." returned error:$@") if ($@);
+			$logger->error("eval of ".(ref($fieldProcessing->{""}) eq "CODE" ? "defined sub" : "'".$fieldProcessing->{""}."'")." returned error:$@".longmess()) if ($@);
 		}
 	}
 	# additional row processing defined
@@ -551,7 +551,7 @@ sub readRow ($$$$$$$$$$) {
 		} else {
 			eval $lineProcessing;
 		}
-		$logger->error("eval of ".(ref($lineProcessing) eq "CODE" ? "defined sub" : "'".$lineProcessing."'")." returned error:$@") if ($@);
+		$logger->error("eval of ".(ref($lineProcessing) eq "CODE" ? "defined sub" : "'".$lineProcessing."'")." returned error:$@".longmess()) if ($@);
 	}
 	$logger->trace("\$skipLineAssignment: $skipLineAssignment, \%line:\n".Dumper(\%line)) if $logger->is_trace;
 	# add reference to created line (don't do push @{$data}, \%line here as then subsequent lines will overwrite all before!)
@@ -567,7 +567,7 @@ sub writeText ($$;$) {
 	my $writemode = ($File->{append} ? ">>" : ">");
 	$logger->debug("sepHead: ".Data::Dumper::qquote($File->{format_sepHead}).", sep: ".Data::Dumper::qquote($File->{format_sep}));
 	if (ref($data) ne 'ARRAY') {
-		$logger->error("passed data in \$data is not a ref to array (you have to initialize it as an array):".Dumper($data));
+		$logger->error("passed data in \$data is not a ref to array (you have to initialize it as an array):".Dumper($data).longmess());
 		return 0;
 	}
 	# in case we need to print out csv/quoted values
@@ -586,7 +586,7 @@ sub writeText ($$;$) {
 	} elsif (ref($File->{columns}) eq 'ARRAY') {
 		@columnnames = @{$File->{columns}};
 	} else {
-		$logger->error("no field information given (columns should be ref to array or ref to hash, you have to initialize it as that)");
+		$logger->error("no field information given (columns should be ref to array or ref to hash, you have to initialize it as that)".longmess());
 		return 0;
 	}
 	if (ref($File->{format_padding}) eq 'ARRAY') {
@@ -595,7 +595,7 @@ sub writeText ($$;$) {
 		@paddings = map {$File->{format_padding}{$_}} sort keys %{$File->{format_padding}};
 	} else {
 		if ($File->{format_fix}) {
-			$logger->error("no padding information given for fixed length format (padding => ref to array or hash)");
+			$logger->error("no padding information given for fixed length format (padding => ref to array or hash)".longmess());
 			return 0;
 		}
 	}
@@ -620,7 +620,7 @@ sub writeText ($$;$) {
 	# open file for writing
 	$logger->info("writing to $filename ($writemode)");
 	open (FHOUT, $writemode.$File->{format_encoding},$filename) or do {
-		$logger->error("couldn't open $filename for writing (writemode $writemode): $!");
+		$logger->error("couldn't open $filename for writing (writemode $writemode): $!".longmess());
 		return 0;
 	};
 	# write header
@@ -628,7 +628,7 @@ sub writeText ($$;$) {
 	unless ($File->{format_suppressHeader}) {
 		if ($File->{format_quotedcsv}) {
 			if (!$sv->print(\*FHOUT, $headerRow)) {
-				$logger->error("error writing quoted csv header row: ".$sv->error_diag());
+				$logger->error("error writing quoted csv header row: ".$sv->error_diag().longmess());
 				return 0;
 			}
 		} else {
@@ -647,7 +647,7 @@ sub writeText ($$;$) {
 		for my $colname (@columnnames) {
 			if (!$File->{columnskip}{$colname}) {
 				if (ref($row) ne "HASH") {
-					$logger->error("row passed in (\$data) is no ref to hash! should be \$VAR1 = {'key' => 'value', ...}:\n".Dumper($row));
+					$logger->error("row passed in (\$data) is no ref to hash! should be \$VAR1 = {'key' => 'value', ...}:\n".Dumper($row).longmess());
 					return 0;
 				}
 				$value = $row->{$colname};
@@ -655,7 +655,7 @@ sub writeText ($$;$) {
 				if ($File->{addtlProcessingTrigger} && $File->{addtlProcessing}) {
 					my $doAddtlProcessing = eval $File->{addtlProcessingTrigger};
 					if ($@) {
-						$logger->error("error in eval addtlProcessingTrigger: ".$File->{addtlProcessingTrigger}.":".$@);
+						$logger->error("error in eval addtlProcessingTrigger: ".$File->{addtlProcessingTrigger}.":".$@.longmess());
 						return 0;
 					}
 					if ($doAddtlProcessing) {
@@ -665,7 +665,7 @@ sub writeText ($$;$) {
 							eval $File->{addtlProcessing};
 						}
 						if ($@) {
-							$logger->error("error in eval addtlProcessing: ".$File->{addtlProcessing}.":".$@);
+							$logger->error("error in eval addtlProcessing: ".$File->{addtlProcessing}.":".$@.longmess());
 							return 0;
 						}
 						$logger->trace("\$value after addtlProcessing: $value") if $logger->is_trace;
@@ -685,7 +685,7 @@ sub writeText ($$;$) {
 		}
 		if ($File->{format_quotedcsv}) {
 			if (!$sv->print(\*FHOUT, $lineRow)) {
-				$logger->error("error writing quoted csv row: ".$sv->error_diag());
+				$logger->error("error writing quoted csv row: ".$sv->error_diag().longmess());
 				return 0;
 			}
 			$logger->trace("row: @$lineRow") if $logger->is_trace;
@@ -705,7 +705,7 @@ sub writeExcel ($$;$) {
 	my $logger = get_logger();
 	
 	if (ref($data) ne 'ARRAY') {
-		$logger->error("passed data in \$data is not a ref to array:".Dumper($data));
+		$logger->error("passed data in \$data is not a ref to array:".Dumper($data).longmess());
 		return 0;
 	}
 	my @columnnames;
@@ -714,24 +714,24 @@ sub writeExcel ($$;$) {
 	} elsif (ref($File->{columns}) eq 'ARRAY') {
 		@columnnames = @{$File->{columns}}; 
 	} else {
-		$logger->error("no field information given (columns should be ref to array or ref to hash, you have to initialize it as that)");
+		$logger->error("no field information given (columns should be ref to array or ref to hash, you have to initialize it as that)".longmess());
 		return 0;
 	}
 	my ($workbook,$worksheet);
 	if ($File->{format_xlformat} =~ /^xls$/i) {
 		$logger->debug("writing to xls format file ".$File->{filename});
 		$workbook = Spreadsheet::WriteExcel->new($File->{filename}) or do {
-			$logger->error("xls file creation error: $!");
+			$logger->error("xls file creation error: $!".longmess());
 			return 0;
 		};
 	} elsif ($File->{format_xlformat} =~ /^xlsx$/i) {
 		$logger->debug("writing to xlsx format file ".$File->{filename});
 		$workbook = Excel::Writer::XLSX->new($File->{filename}) or do {
-			$logger->error("xlsx file creation error: $!");
+			$logger->error("xlsx file creation error: $!".longmess());
 			return 0;
 		};
 	} else {
-		$logger->error("unrecognised excel format passed in \$File->{format_xlformat}:".$File->{format_xlformat}." (allowed: xls and xlsx)");
+		$logger->error("unrecognised excel format passed in \$File->{format_xlformat}:".$File->{format_xlformat}." (allowed: xls and xlsx)".longmess());
 		return 0;
 	}
 	# Add a worksheet
@@ -759,12 +759,12 @@ sub writeExcel ($$;$) {
 		# chain all data in a row
 		for my $colname (@columnnames) {
 			if (!$File->{columnskip}{$colname}) {
-				$logger->error("row passed in (\$data) is no ref to hash! should be \$VAR1 = {'key' => 'value', ...}:\n".Dumper($row)) if (ref($row) ne "HASH");
+				$logger->error("row passed in (\$data) is no ref to hash! should be \$VAR1 = {'key' => 'value', ...}:\n".Dumper($row).longmess()) if (ref($row) ne "HASH");
 				my $value = $row->{$colname};
 				$logger->trace("\$value for \$colname $colname: $value") if $logger->is_trace;
 				if ($File->{addtlProcessingTrigger} && $File->{addtlProcessing}) {
 					eval $File->{addtlProcessingTrigger} if (eval $File->{addtlProcessingTrigger});
-					$logger->error("error in eval addtlProcessing: ".$File->{addtlProcessingTrigger}.":".$@) if ($@);
+					$logger->error("error in eval addtlProcessing: ".$File->{addtlProcessingTrigger}.":".$@.longmess()) if ($@);
 				}
 				push @lineRow, $value;
 			}

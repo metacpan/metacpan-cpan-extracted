@@ -1,4 +1,10 @@
 do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'ExtUtils::MakeMaker' => '7.22',
+                                    'Module::Metadata' => '1.000015'
+                                  }
+                  },
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
@@ -50,7 +56,7 @@ do { my $x = {
                                    'FindBin' => '0',
                                    'HTTP::Request::Common' => '0',
                                    'HTTP::Status' => '0',
-                                   'Module::Metadata' => '0',
+                                   'Module::Metadata' => '1.000015',
                                    'Moose' => '0',
                                    'Path::Tiny' => '0',
                                    'Plack::Builder' => '0',

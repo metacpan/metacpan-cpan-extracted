@@ -1,7 +1,7 @@
-package EAI::DB 1.916;
+package EAI::DB 1.917;
 
 use strict; use feature 'unicode_strings'; use warnings;
-use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger);
+use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger); use Carp qw(confess longmess);
 
 our @EXPORT = qw(newDBH beginWork commit rollback readFromDB readFromDBHash doInDB storeInDB deleteFromDB updateInDB getConn setConn);
 
@@ -18,7 +18,7 @@ sub newDBH ($$) {
 		$dbh->disconnect() if defined($dbh);
 		# AutoCommit=>0 is not done here, as beginWork calls $dbh->begin_work, which does this.
 		$dbh = DBI->connect("dbi:ODBC:$DSN",undef,undef,{PrintError=>0,RaiseError=>0}) or do {
-			$logger->error("DB connection error:".$DBI::errstr.",DSN:".$DSN);
+			$logger->error("DB connection error:".$DBI::errstr.",DSN:".$DSN.longmess());
 			undef $dbh;
 			return 0;
 		};
@@ -34,10 +34,10 @@ sub newDBH ($$) {
 sub beginWork {
 	my $logger = get_logger();
 	if (!defined($dbh)) {
-		$logger->error("no valid dbh connection available");
+		$logger->error("no valid dbh connection available".longmess());
 		return 0;
 	}
-	$dbh->begin_work or do {$logger->error($DBI::errstr); return 0};
+	$dbh->begin_work or do {$logger->error($DBI::errstr.longmess()); return 0};
 	return 1;
 }
 
@@ -45,10 +45,10 @@ sub beginWork {
 sub commit {
 	my $logger = get_logger();
 	if (!defined($dbh)) {
-		$logger->error("no valid dbh connection available");
+		$logger->error("no valid dbh connection available".longmess());
 		return 0;
 	}
-	$dbh->commit or do {$logger->error($DBI::errstr); return 0};
+	$dbh->commit or do {$logger->error($DBI::errstr.longmess()); return 0};
 	return 1;
 }
 
@@ -56,10 +56,10 @@ sub commit {
 sub rollback {
 	my $logger = get_logger();
 	if (!defined($dbh)) {
-		$logger->error("no valid dbh connection available");
+		$logger->error("no valid dbh connection available".longmess());
 		return 0;
 	}
-	$dbh->rollback or do {$logger->error($DBI::errstr); return 0};
+	$dbh->rollback or do {$logger->error($DBI::errstr.longmess()); return 0};
 	return 1;
 }
 
@@ -68,11 +68,12 @@ sub readFromDB ($$) {
 	my ($DB, $data) = @_;
 	my $logger = get_logger();
 	my $statement = $DB->{query};
+
 	eval {
-		die "no ref to hash argument param given ({query=>''})" if ref($DB) ne "HASH";
-		die "no ref to array argument data (for returning data) given" if ref($data) ne "ARRAY";
-		die "no valid dbh connection available" if !defined($dbh);
-		die "no statement (hashkey query) given" if (!$statement);
+		confess "no ref to hash argument param given ({query=>''})" if ref($DB) ne "HASH";
+		confess "no ref to array argument data (for returning data) given" if ref($data) ne "ARRAY";
+		confess "no valid dbh connection available" if !defined($dbh);
+		confess "no statement (hashkey query) given" if (!$statement);
 		$logger->debug("statement: ".$statement);
 		$dbh->{RaiseError} = 1; # to enable following try/catch (eval)
 		eval {
@@ -81,7 +82,7 @@ sub readFromDB ($$) {
 			@{$DB->{columnnames}} = @{$sth->{NAME}} if $sth->{NAME}; # take field names from the statement handle of query, used for later processing
 			@$data = @{$sth->fetchall_arrayref({})};
 		};
-		die "$@, executed statement: $statement" if ($@);
+		confess "$@, executed statement: $statement " if ($@);
 	};
 	$dbh->{RaiseError} = 0;
 	if ($@) {
@@ -100,11 +101,11 @@ sub readFromDBHash ($$) {
 	my $statement = $DB->{query};
 	my @keyfields = @{$DB->{keyfields}} if $DB->{keyfields} and ref($DB->{keyfields}) eq "ARRAY";
 	eval {
-		die "no ref to hash argument param given ({query=>'',keyfields=>[]})" if ref($DB) ne "HASH";
-		die "no ref to hash argument data (for returning data) given" if ref($data) ne "HASH";
-		die "no valid dbh connection available" if !defined($dbh);
-		die "no statement (hashkey query) given" if (!$statement);
-		die "no key fields list (hashkey keyfields) given" if (!@keyfields);
+		confess "no ref to hash argument param given ({query=>'',keyfields=>[]})" if ref($DB) ne "HASH";
+		confess "no ref to hash argument data (for returning data) given" if ref($data) ne "HASH";
+		confess "no valid dbh connection available" if !defined($dbh);
+		confess "no statement (hashkey query) given" if (!$statement);
+		confess "no key fields list (hashkey keyfields) given" if (!@keyfields);
 		$logger->debug("statement: ".$statement);
 		$dbh->{RaiseError} = 1; # to enable following try/catch (eval)
 		eval {
@@ -113,7 +114,7 @@ sub readFromDBHash ($$) {
 			@{$DB->{columnnames}} = @{$sth->{NAME}} if $sth->{NAME}; # take field names from the statement handle of query, used for later processing
 			%$data = %{$sth->fetchall_hashref(@keyfields)};
 		};
-		die $@.",DB error: ".$DBI::errstr." executed statement: ".$statement if ($@);
+		confess $@.",DB error: ".$DBI::errstr." executed statement: ".$statement if ($@);
 	};
 	$dbh->{RaiseError} = 0;
 	if ($@) {
@@ -130,26 +131,27 @@ sub doInDB ($;$) {
 	my ($DB, $data) = @_;
 	my $logger = get_logger();
 	eval {
-		die "no param hash argument ({doString=>'',parameters=>...}) given" if ref($DB) ne "HASH";
-		die "no valid dbh connection available" if !defined($dbh);
-		die "no sql statement doString given" if !$DB->{doString};
+		confess "no param hash argument ({doString=>'',parameters=>...}) given" if ref($DB) ne "HASH";
+		confess "no valid dbh connection available" if !defined($dbh);
+		confess "no sql statement doString given" if !$DB->{doString};
 		my $doString = $DB->{doString};
 		my @parameters;
 		if ($DB->{parameters}) {
 			if (ref($DB->{parameters}) eq "ARRAY") {
 				@parameters = @{$DB->{parameters}};
 			} else {
-				die "sub argument parameters not ref to array";
+				confess "sub argument parameters not ref to array";
 			}
 		}
-		$logger->debug("do in DB: $doString, parameters: @parameters");
+		$logger->debug("do in DB: ".Dumper($DB));
+		$dbh->{odbc_ignore_named_placeholders} = 1 if $DB->{odbc_ignore_named_placeholders};
 		my $sth = $dbh->prepare($doString);
 		if (@parameters == 0) {
 			$sth->execute();
 		} else {
 			$sth->execute(@parameters);
 		}
-		die $@.",DB error: ".$sth->errstr." statement: ".$doString if $sth->err;
+		confess $@.",DB error: ".$sth->errstr." statement: ".$doString if $sth->err;
 		# return record set of statement if possible/required
 		if (defined($data)) {
 			if (ref($data) eq "ARRAY") {
@@ -158,7 +160,7 @@ sub doInDB ($;$) {
 					push @$data, $sth->fetchall_arrayref({});
 				} while ($sth->{odbc_more_results});
 			} else {
-				die "argument \$data not ref to array, can't pass back results";
+				confess "argument \$data not ref to array, can't pass back results";
 			}
 		}
 	};
@@ -191,23 +193,23 @@ sub storeInDB ($$;$) {
 		my @keycolumns = split "AND", $primkey;
 		map { s/=//; s/\?//; s/ //g;} @keycolumns;
 		$logger->debug("tableName:$tableName,addID:$addID,upsert:$upsert,primkey:$primkey,ignoreDuplicateErrs:$ignoreDuplicateErrs,deleteBeforeInsertSelector:$deleteBeforeInsertSelector,incrementalStore:$incrementalStore,doUpdateBeforeInsert:$doUpdateBeforeInsert,debugKeyIndicator:$debugKeyIndicator");
-		die "no valid dbh connection available" if !defined($dbh);
-		die "no tablename given" if !$tableName;
-		die "no primkey given for upsert" if (!$primkey and $upsert);
-		die "neither primkey nor deleteBeforeInsertSelector given" if (!$primkey and !$deleteBeforeInsertSelector and !$dontKeepContent);
+		confess "no valid dbh connection available" if !defined($dbh);
+		confess "no tablename given" if !$tableName;
+		confess "no primkey given for upsert" if (!$primkey and $upsert);
+		confess "neither primkey nor deleteBeforeInsertSelector given" if (!$primkey and !$deleteBeforeInsertSelector and !$dontKeepContent);
 		my $schemaName = $DB->{schemaName};
 		if ($tableName =~ /\./) {
 			$logger->debug("getting schema from $tableName (contains dot)");
 			($schemaName, $tableName) = ($tableName =~ /(.*)\.(.*)/);
 		}
-		die "no schemaName available (neither from tablename containing schema nor from parameter schemaName" if !$schemaName;
+		confess "no schemaName available (neither from tablename containing schema nor from parameter schemaName" if !$schemaName;
 		my $colh = $dbh->column_info('', $schemaName, $tableName, "%");
 		my $coldefs = $colh->fetchall_hashref("COLUMN_NAME");
-		die "no field definitions found for $schemaName.$tableName using DSN $DSN" if scalar(keys %{$coldefs}) == 0; # no more information can be given as column_info is just a select on information store..
+		confess "no field definitions found for $schemaName.$tableName using DSN $DSN" if scalar(keys %{$coldefs}) == 0; # no more information can be given as column_info is just a select on information store..
 		$logger->trace("coldefs:\n".Dumper($coldefs)) if $logger->is_trace;
 		my %IDName;
 		if ($addID) {
-			die "no valid addID given (needs to be ref to hash, key=fieldname, value=ID)!" if ref($addID) ne 'HASH';
+			confess "no valid addID given (needs to be ref to hash, key=fieldname, value=ID)!" if ref($addID) ne 'HASH';
 			$IDName{$_} = 1 for (keys %{$addID});
 		}
 		my $i=0; my @columns;
@@ -338,13 +340,13 @@ sub storeInDB ($$;$) {
 					$debugKey =~ s/$colName\s*=\s*\?/$colName = $colVal/ if ($debugKey =~ /$colName\s*=\s*\?/); # fill debug field display (for error messages)
 				}
 				# log collected errors during building of statement
-				die $errorIndicator.", at [".$debugKey."]" if $errorIndicator and $severity>=1;
+				confess $errorIndicator.", at [".$debugKey."]" if $errorIndicator and $severity>=1;
 				$logger->warn($errorIndicator.", at [".$debugKey."]") if $errorIndicator and $severity==0;
 				# delete relevant data before insert. only done once for first row that fulfills $deleteBeforeInsertSelector
 				if ($deleteBeforeInsertSelector && !$beforeInsert{$deleteBeforeInsertSelector}) {
 					$logger->info("deleting data from $schemaName.$tableName, criteria: $deleteBeforeInsertSelector");
 					my $dostring = "delete from $schemaName.$tableName WHERE $deleteBeforeInsertSelector";
-					my $affectedRows = $dbh->do($dostring) or die $DBI::errstr." with $dostring ".$debugKeyIndicator;
+					my $affectedRows = $dbh->do($dostring) or confess $DBI::errstr." with $dostring ".$debugKeyIndicator;
 					$affectedRows =~ s/E0//;
 					# mark deleteBeforeInsertSelector as executed for these data
 					$beforeInsert{$deleteBeforeInsertSelector} = 1;
@@ -372,7 +374,7 @@ sub storeInDB ($$;$) {
 									my $datatype = $coldefs->{$columns[$j]}{"TYPE_NAME"}."(".$coldefs->{$columns[$j]}{"COLUMN_SIZE"}.")";
 									$errRec.= $columns[$j]."[".$datatype."]:".$dataArray[$j].", ";
 								}
-								die $DBI::errstr." when inserting data: $errRec, executed statement: $dostring";
+								confess $DBI::errstr." when inserting data: $errRec, executed statement: $dostring";
 							}
 						# error message not needed to suppress for update errors without upsert flag
 						} else {
@@ -381,7 +383,7 @@ sub storeInDB ($$;$) {
 								my $datatype = $coldefs->{$columns[$j]}{"TYPE_NAME"}."(".$coldefs->{$columns[$j]}{"COLUMN_SIZE"}.")";
 								$errRec.= $columns[$j]."[".$datatype."]:".$dataArray[$j].", ";
 							}
-							die $DBI::errstr." when inserting data: $errRec, executed statement: $dostring";
+							confess $DBI::errstr." when inserting data: $errRec, executed statement: $dostring";
 						}
 					};
 				} else {
@@ -399,7 +401,7 @@ sub storeInDB ($$;$) {
 									my $datatype = $coldefs->{$columns[$j]}{"TYPE_NAME"}."(".$coldefs->{$columns[$j]}{"COLUMN_SIZE"}.")";
 									$errRec.= $columns[$j]."[".$datatype."]:".$dataArray[$j].", ";
 								}
-								die $DBI::errstr." when updating data: $errRec, executed statement: $dostring";
+								confess $DBI::errstr." when updating data: $errRec, executed statement: $dostring";
 							}
 						# error message if needed
 						} elsif (($DBI::errstr =~ /cannot insert duplicate key/i and !$ignoreDuplicateErrs) or $DBI::errstr !~ /cannot insert duplicate key/i) {
@@ -408,14 +410,14 @@ sub storeInDB ($$;$) {
 								my $datatype = $coldefs->{$columns[$j]}{"TYPE_NAME"}."(".$coldefs->{$columns[$j]}{"COLUMN_SIZE"}.")";
 								$errRec.= $columns[$j]."[".$datatype."]:".$dataArray[$j].", ";
 							}
-							die $DBI::errstr." when updating data: $errRec, executed statement: $dostring";
+							confess $DBI::errstr." when updating data: $errRec, executed statement: $dostring";
 						}
 					};
 				}
 				print "EAI::DB::storeInDB stored ".($i+1)." of $lines\r" if $countPercent and (($i+1) % (int($lines * ($countPercent / 100)) == 0 ? 1 : int($lines * ($countPercent / 100))) == 0);
 			}
 		} else {
-			die "no data to store";
+			confess "no data to store";
 		}
 	};
 	if ($@) {
@@ -434,9 +436,9 @@ sub deleteFromDB ($$) {
 	my $tableName = $DB->{tablename};
 	my @keycolumns = @{$DB->{keyfields}} if $DB->{keyfields};
 	eval {
-		die "no tablename given" if !$tableName;
-		die "no keyfields given" if !@keycolumns;
-		die "no valid dbh connection available" if !defined($dbh);
+		confess "no tablename given" if !$tableName;
+		confess "no keyfields given" if !@keycolumns;
+		confess "no valid dbh connection available" if !defined($dbh);
 		if ((@{$data}) > 0) {
 			# prepare statement
 			my $whereclause; map {$whereclause = "[$_] = ? AND "} @keycolumns;
@@ -445,10 +447,10 @@ sub deleteFromDB ($$) {
 			# execute with data
 			for my $primkey (@{$data}) {
 				$logger->trace("deleting data for $primkey") if $logger->is_trace;
-				$sth->execute(($primkey)) or die "couldn't delete data for $primkey:".$DBI::errstr;
+				$sth->execute(($primkey)) or confess "couldn't delete data for $primkey:".$DBI::errstr;
 			}
 		} else {
-			$logger->error("no data to delete");
+			$logger->error("no data to delete".longmess());
 			return 0;
 		}
 	};
@@ -468,11 +470,11 @@ sub updateInDB ($$) {
 	my $tableName = $DB->{tablename};
 	my @keycolumns = @{$DB->{keyfields}} if $DB->{keyfields};
 	eval {
-		die "no tablename given" if !$tableName;
-		die "no keyfields given" if !@keycolumns;
-		die "no valid dbh connection available" if !defined($dbh);
+		confess "no tablename given" if !$tableName;
+		confess "no keyfields given" if !@keycolumns;
+		confess "no valid dbh connection available" if !defined($dbh);
 		my $firstrecordID = (keys %{$data})[0];
-		die "no valid data passed (couldn't find keys in data hashes)" if !$firstrecordID;
+		confess "no valid data passed (couldn't find keys in data hashes)" if !$firstrecordID;
 		$logger->trace("passed data:\n".Dumper($data)) if $logger->is_trace;
 		my @columns = sort keys %{$data->{$firstrecordID}}; # sort to ensure deterministic ordering of fieldnames !
 		my $schemaName = $DB->{schemaName};
@@ -480,7 +482,7 @@ sub updateInDB ($$) {
 			$logger->debug("getting schema from $tableName (contains dot)");
 			($schemaName, $tableName) = ($tableName =~ /(.*)\.(.*)/);
 		}
-		die "no schemaName available (neither from tablename containing schema nor from parameter schemaName" if !$schemaName;
+		confess "no schemaName available (neither from tablename containing schema nor from parameter schemaName" if !$schemaName;
 		my $colh = $dbh->column_info ('', $schemaName, $tableName, "%");
 		my $coldefs = $colh->fetchall_hashref ("COLUMN_NAME");
 		
@@ -514,11 +516,11 @@ sub updateInDB ($$) {
 						my $datatype = $coldefs->{$columns[$j]}{"TYPE_NAME"}."(".$coldefs->{$columns[$j]}{"COLUMN_SIZE"}.")";
 						$errRec.= $columns[$j]."[".$datatype."]:".$dataArray[$j].", ";
 					}
-					die $DBI::errstr." with record: $errRec";
+					confess $DBI::errstr." with record: $errRec";
 				}
 			}
 		} else {
-			die "no data to update";
+			confess "no data to update";
 		}
 	};
 	if ($@) {
@@ -535,7 +537,7 @@ sub setConn ($;$) {
 	my ($handle,$setDSN) = shift;
 	my $logger = get_logger();
 	eval {
-		die "no DBI::db handle passed to setHandle, argument is '".(defined($handle) ? ref($handle) : "undefined")."'" unless $handle && blessed $handle && $handle->isa('DBI::db') ;
+		confess "no DBI::db handle passed to setHandle, argument is '".(defined($handle) ? ref($handle) : "undefined")."'" unless $handle && blessed $handle && $handle->isa('DBI::db') ;
 		$dbh = $handle;
 		$DSN = $setDSN;
 	};

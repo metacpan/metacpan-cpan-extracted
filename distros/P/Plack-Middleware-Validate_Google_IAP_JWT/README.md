@@ -1,4 +1,4 @@
-
+[![Actions Status](https://github.com/hkoba/perl-Plack-Middleware-Validate_Google_IAP_JWT/actions/workflows/test.yml/badge.svg)](https://github.com/hkoba/perl-Plack-Middleware-Validate_Google_IAP_JWT/actions)
 # NAME
 
 Plack::Middleware::Validate\_Google\_IAP\_JWT - Validate JWT from Google IAP

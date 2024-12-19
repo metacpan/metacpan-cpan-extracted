@@ -3,7 +3,7 @@
 #==============================================================================
 
 %define real_name Apache-Session-Browseable
-%define real_version 1.3.9
+%define real_version 1.3.14
 
 #==============================================================================
 # Main package
@@ -65,6 +65,8 @@ rm -rf %{buildroot}
 %{perl_vendorlib}/auto/Apache/Session/*
 
 %changelog
+* Thu Dec 19 2024 Clement Oudot <clem.oudot@gmail.com> - 1.3.14-1
+- Update to 1.3.14
 * Wed Aug 18 2021 Clement Oudot <clem.oudot@gmail.com> - 1.3.9-1
 - Update to 1.3.9
 * Sun Sep 06 2020 Clement Oudot <clem.oudot@gmail.com> - 1.3.8-1

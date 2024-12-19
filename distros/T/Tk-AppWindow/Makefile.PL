@@ -21,10 +21,10 @@ my %prereq = (
 	'Tk'                   	 => '804.032',
 	'Tk::DocumentTree'       => '0.08',
 	'Tk::DynaMouseWheelBind' => '0.07',
-	'Tk::FileBrowser'        => '0.06',
+	'Tk::FileBrowser'        => '0.07',
 	'Tk::FontDialog'	   				 => '0.18',
 	'Tk::PodViewer'          => '0.03',
-	'Tk::QuickForm'          => '0.05',
+	'Tk::QuickForm'          => '0.06',
 	'Tk::YADialog'           => '0.04',
 	'Tk::YANoteBook'         => '0.09',
 );

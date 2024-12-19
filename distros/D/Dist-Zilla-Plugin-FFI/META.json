@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
             "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
             "Dist::Zilla::Plugin::RemovePrereqs" : "0",
-            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.69",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.77",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidGrep" : "0",
@@ -113,8 +113,10 @@
             "Dist::Zilla::Role::PrereqSource" : "0",
             "List::Util" : "0",
             "Moose" : "0",
+            "experimental" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.020"
+            "perl" : "5.020",
+            "true" : "0"
          }
       },
       "test" : {
@@ -139,15 +141,16 @@
          "url" : "git://github.com/PerlFFI/Dist-Zilla-Plugin-FFI.git",
          "web" : "https://github.com/PerlFFI/Dist-Zilla-Plugin-FFI"
       },
-      "x_IRC" : "irc://irc.perl.org/#native"
+      "x_IRC" : "irc://irc.perl.org/#native",
+      "x_twitter" : "https://fosstodon.org/@PerlFFI"
    },
-   "version" : "1.07",
+   "version" : "1.08",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Zaki Mughal (zmughal)"
    ],
-   "x_generated_by_perl" : "v5.37.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

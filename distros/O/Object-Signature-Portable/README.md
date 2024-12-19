@@ -4,7 +4,7 @@ Object::Signature::Portable - generate portable fingerprints of objects
 
 # VERSION
 
-version v1.2.0
+version v1.2.2
 
 # SYNOPSIS
 
@@ -109,7 +109,7 @@ The following options are supported:
 
     - JSON is a simple, text-based format. The output is not likely to
     change between module versions.
-    - Consistent encoding of integers are strings.
+    - Consistent encoding of integers and strings.
     - Classes can be extended with hooks for JSON serialization.
     - Speed is not a factor.
 
@@ -247,7 +247,7 @@ feature.
 ## Reporting Security Vulnerabilities
 
 Security issues should not be reported on the bugtracker website.
-Please see `SECURITY-POLICY.md` for instructions how to report
+Please see `SECURITY.md` for instructions how to report
 security vulnerabilities
 
 # AUTHOR

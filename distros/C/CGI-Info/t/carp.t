@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;
 use Test::Carp;
-use Test::Most tests => 15;
+use Test::Most tests => 16;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -39,8 +39,11 @@ CARP: {
 			ok(!defined($p{fred}));
 			is($p{'foo'}, 'bar', 'foo=bar');
 			close $fin;
+
+			my @warnings = map { $_->{'warning'} } @{$i->warnings()};
+			cmp_ok(join(';', @warnings), 'eq', 'POST failed: something else may have read STDIN', 'warnings()');
 		},
-		qr/^POST failed/
+		qr/^POST failed: something else may have read STDIN/
 	);
 
 	does_carp_that_matches(sub { CGI::Info->new({ expect => 'foo' }); }, qr/must be a reference to an array/);

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-FFI
 
+1.08      2024-12-18 20:30:19 -0700
+  - Add support for FFI::Platypus::Lang::V (gh#15)
+
 1.07      2022-10-16 04:37:01 -0600
   - Removed mostly harmless warning (gh#10)
   - Fix bug where some files aren't being pruned that should (gh#10)

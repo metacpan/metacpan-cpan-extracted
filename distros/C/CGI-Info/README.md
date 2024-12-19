@@ -11,7 +11,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.86
+Version 0.87
 
 # SYNOPSIS
 
@@ -167,11 +167,13 @@ Expect will be removed in a later version.
 
 Upload\_dir is a string containing a directory where files being uploaded are to
 be stored.
+It must be a writeable directory in the temporary area.
 
 Takes optional parameter logger, an object which is used for warnings and
 traces.
 This logger object is an object that understands warn() and trace() messages,
-such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object.
+such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object,
+or a reference to code.
 
 The allow, expect, logger and upload\_dir arguments can also be passed to the
 constructor.
@@ -399,7 +401,15 @@ otherwise an HTTP error code
 
 ## warnings
 
-Returns the warnings that the object has generated
+Returns the warnings that the object has generated as a ref to an array of hashes.
+
+    my @warnings;
+    if(my $w = $info->warnings()) {
+        @warnings = map { $_->{'warning'} } @{$w};
+    } else {
+        @warnings = ();
+    }
+    print STDERR join(';', @warnings), "\n";
 
 ## set\_logger
 

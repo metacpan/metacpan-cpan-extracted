@@ -20,7 +20,7 @@ Net::SSLeay::Callback::Msg interface in L<SPVM> represents the function pointer 
 
 =head2 Anon Method
 
-C<required method : void ($write_p : int, $version : int, $content_type : int, $buf : string, $len : int, $ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $arg : object);>
+C<required method : void ($write_p : int, $version : int, $content_type : int, $buf : string, $len : int, $ssl : L<Net::SSLeay|SPVM::Net::SSLeay>);>
 
 This method represents the function pointer type of L<SSL_CTX_set_msg_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_msg_callback> function's callback argument in OpenSSL.
 

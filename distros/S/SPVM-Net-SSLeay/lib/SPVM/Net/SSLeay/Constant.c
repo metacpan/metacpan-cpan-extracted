@@ -7578,3 +7578,63 @@ int32_t SPVM__Net__SSLeay__Constant__SSL_MODE_SEND_FALLBACK_SCSV(SPVM_ENV* env, 
 #endif
   
 }
+
+int32_t SPVM__Net__SSLeay__Constant__SSL_TLSEXT_ERR_OK(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef SSL_TLSEXT_ERR_OK
+  stack[0].ival = SSL_TLSEXT_ERR_OK;
+  return 0;
+#else
+  env->die(env, stack, "SSL_TLSEXT_ERR_OK is not defined on the system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__SSL_TLSEXT_ERR_ALERT_FATAL(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef SSL_TLSEXT_ERR_ALERT_FATAL
+  stack[0].ival = SSL_TLSEXT_ERR_ALERT_FATAL;
+  return 0;
+#else
+  env->die(env, stack, "SSL_TLSEXT_ERR_ALERT_FATAL is not defined on the system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__SSL_TLSEXT_ERR_NOACK(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef SSL_TLSEXT_ERR_NOACK
+  stack[0].ival = SSL_TLSEXT_ERR_NOACK;
+  return 0;
+#else
+  env->die(env, stack, "SSL_TLSEXT_ERR_NOACK is not defined on the system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_NPN_NEGOTIATED(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_NPN_NEGOTIATED
+  stack[0].ival = OPENSSL_NPN_NEGOTIATED;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_NPN_NEGOTIATED is not defined on the system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}
+
+int32_t SPVM__Net__SSLeay__Constant__OPENSSL_NPN_NO_OVERLAP(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef OPENSSL_NPN_NO_OVERLAP
+  stack[0].ival = OPENSSL_NPN_NO_OVERLAP;
+  return 0;
+#else
+  env->die(env, stack, "OPENSSL_NPN_NO_OVERLAP is not defined on the system", __func__, FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS;
+#endif
+  
+}

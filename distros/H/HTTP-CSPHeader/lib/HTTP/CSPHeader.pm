@@ -16,7 +16,7 @@ use Types::Common 2.000000 qw/ ArrayRef is_ArrayRef Bool HashRef IntRange Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.1';
 
 
 has _base_policy => (
@@ -156,7 +156,7 @@ HTTP::CSPHeader - manage dynamic content security policy headers
 
 =head1 VERSION
 
-version v0.4.0
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -301,6 +301,11 @@ and in your templates, you can use the following for inline scripts:
 
 If you do not need the nonce, then you might consider using L<Mojolicious::Plugin::CSPHeader>.
 
+=head1 SECURITY CONSIDERATIONS
+
+If this is used in a forked environment, the object should not be initialised before forking if nonces are
+used. Otherwise the nonces may be shared between forks.
+
 =head1 SUPPORT FOR OLDER PERL VERSIONS
 
 This module requires Perl v5.14 or later.
@@ -328,6 +333,11 @@ L<https://github.com/robrwo/perl-HTTP-CSPHeader/issues>
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.  Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package SPVM::Net::SSLeay;
 
-our $VERSION = "0.030";
+our $VERSION = "0.031";
 
 1;
 
@@ -177,6 +177,14 @@ Exceptions:
 The file $file must be defined. Otherwise an exception is thrown.
 
 If load_client_CA_file failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
+=head2 select_next_proto
+
+C<static method select_next_proto : int ($out_ref : string[], $outlen_ref : byte*, $server : string, $server_len : int, $client : string, $client_len : int);>
+
+Calls native L<SSL_select_next_proto|https://docs.openssl.org/3.0/man3/SSL_CTX_set_alpn_select_cb> function given the pointer value of the instance, the pointer of a native temporary variable C<out_ref>, $outlen_ref, $server, $server_len, $client, $client_len, and returns its return value.
+
+If a string is returned in C<out_ref>, creates a new string from it and C<*outlen_ref>, sets C<$out_ref->[0]> to the string.
 
 =head1 Instance Methods
 
@@ -366,7 +374,7 @@ method get_SSL_CTX : Net::SSLeay::SSL_CTX ();
 
 =head2 set_msg_callback
 
-C<method set_msg_callback : void ($cb : L<Net::SSLeay::Callback::Msg|SPVM::Net::SSLeay::Callback::Msg>, $arg : object = undef);>
+C<method set_msg_callback : void ($cb : L<Net::SSLeay::Callback::Msg|SPVM::Net::SSLeay::Callback::Msg>);>
 
 Calls native L<SSL_set_msg_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_msg_callback> function given the pointer value of the instance, $cb, $arg, and returns its return value.
 

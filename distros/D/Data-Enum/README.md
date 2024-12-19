@@ -4,7 +4,7 @@ Data::Enum - immutable enumeration classes
 
 # VERSION
 
-version v0.5.0
+version v0.6.0
 
 # SYNOPSIS
 
@@ -174,9 +174,9 @@ strings.  When using this in production code, you may want to benchmark performa
 
 # SUPPORT FOR OLDER PERL VERSIONS
 
-This module requires Perl v5.14 or later.
+This module requires Perl v5.20 or later.
 
-Future releases may only support Perl versions released in the last ten years.
+Future releases may only support Perl versions released in the last ten (10) years.
 
 # SEE ALSO
 
@@ -203,6 +203,11 @@ Please report any bugs or feature requests on the bugtracker website
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+## Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see `SECURITY.md` for instructions how to
+report security vulnerabilities
 
 # AUTHOR
 

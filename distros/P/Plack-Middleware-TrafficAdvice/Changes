@@ -1,5 +1,14 @@
 Revision history for Plack-Middleware-TrafficAdvice:
 
+v0.3.1    2024-12-18 15:08:22+00:00 Europe/London
+  [Documentation]
+  - Add a security policy.
+
+  - Update copyright year.
+
+  [Other]
+  - Dist::Zilla::Plugin::Generate::ManifestSkip is no longer used.
+
 v0.3.0    2023-11-07 13:00:52+00:00 Europe/London
   [Documentation]
   - Correct typo in Changes for v0.2.5: Plack minimum version has not changed.

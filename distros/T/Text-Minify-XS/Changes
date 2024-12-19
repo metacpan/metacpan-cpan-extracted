@@ -1,5 +1,14 @@
 Revision history for Text-Minify-XS:
 
+v0.7.5    2024-12-18 14:34:20+00:00 Europe/London
+  [Documentation]
+  - Added security policy.
+
+  - Updated Perl version support policy.
+
+  [Tests]
+  - Added and improved author tests.
+
 v0.7.4    2024-04-10 13:26:32+01:00 Europe/London
   [Documentation]
   - Updated copyright year.

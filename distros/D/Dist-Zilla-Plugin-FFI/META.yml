@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.020'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,18 +30,21 @@ requires:
   Dist::Zilla::Role::PrereqSource: '0'
   List::Util: '0'
   Moose: '0'
+  experimental: '0'
   namespace::autoclean: '0'
   perl: '5.020'
+  'true': '0'
 resources:
   IRC: irc://irc.perl.org/#native
+  Twitter: https://fosstodon.org/@PerlFFI
   bugtracker: https://github.com/PerlFFI/Dist-Zilla-Plugin-FFI/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::FFI
   repository: git://github.com/PerlFFI/Dist-Zilla-Plugin-FFI.git
-version: '1.07'
+version: '1.08'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Zaki Mughal (zmughal)'
-x_generated_by_perl: v5.37.3
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

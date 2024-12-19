@@ -1,5 +1,23 @@
 Revision history for Data-Enum:
 
+v0.6.0    2024-12-18 14:31:30+00:00 Europe/London
+  [Enhancements]
+  - Add false predicate methods to subclasses to improve performance.
+
+  - Code was adapted to use newer syntax features.
+
+  [Incompatible Changes]
+  - Bumped minimum version of Perl to v5.20.
+
+  [Documentation]
+  - Added a security policy `SECURITY.md` to the distribution.
+
+  [Tests]
+  - Added author tests.
+
+  [Other]
+  - Dist::Zilla::Plugin::Generate::ManifestSkip is no longer used.
+
 v0.5.0    2024-06-21 21:19:12+01:00 Europe/London
   [Enhancements]
   - Add option to assign a name to a class.

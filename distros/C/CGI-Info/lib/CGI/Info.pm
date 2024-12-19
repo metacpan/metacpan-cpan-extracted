@@ -27,11 +27,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.86
+Version 0.87
 
 =cut
 
-our $VERSION = '0.86';
+our $VERSION = '0.87';
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,7 @@ sub new
 	# Handle hash or hashref arguments
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	if($args{expect}) {
+	if(defined($args{expect})) {
 		if(ref($args{expect}) ne 'ARRAY') {
 			Carp::carp(__PACKAGE__, ': expect must be a reference to an array');
 			return;
@@ -96,10 +96,11 @@ sub new
 	}
 
 	if(!defined($class)) {
-		# Using CGI::Info->new(), not CGI::Info::new()
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
-
+		if((scalar keys %args) > 0) {
+			# Using CGI::Info->new(), not CGI::Info::new()
+			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			return;
+		}
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
@@ -286,8 +287,9 @@ sub _find_site_details
 {
 	my $self = shift;
 
-	# Log entry if logger is present
-	$self->{logger} && $self->{logger}->trace('Entering _find_site_details');
+	# Log entry to the routine
+	$self->_trace('Entering _find_site_details');
+
 	return if $self->{site} && $self->{cgi_site};
 
 	# Import necessary modules
@@ -305,7 +307,7 @@ sub _find_site_details
 			$self->{cgi_site} =~ s/^http/$protocol/;
 		}
 	} else {
-		$self->{logger} && $self->{logger}->debug('Falling back to using hostname');
+		$self->_debug('Falling back to using hostname');
 		$self->{cgi_site} = Sys::Hostname::hostname();
 	}
 
@@ -316,10 +318,10 @@ sub _find_site_details
 		unless $self->{cgi_site} =~ /^https?:\/\//;
 
 	# Warn if site details could not be determined
-	$self->_warn('Could not determine site name') unless $self->{site} && $self->{cgi_site};
+	$self->_warn('Could not determine site name') unless($self->{site} && $self->{cgi_site});
 
 	# Log exit
-	$self->{logger} && $self->{logger}->trace('Leaving _find_site_details');
+	$self->_trace('Leaving _find_site_details');
 }
 
 =head2 domain_name
@@ -399,11 +401,13 @@ Expect will be removed in a later version.
 
 Upload_dir is a string containing a directory where files being uploaded are to
 be stored.
+It must be a writeable directory in the temporary area.
 
 Takes optional parameter logger, an object which is used for warnings and
 traces.
 This logger object is an object that understands warn() and trace() messages,
-such as a L<Log::Log4perl> or L<Log::Any> object.
+such as a L<Log::Log4perl> or L<Log::Any> object,
+or a reference to code.
 
 The allow, expect, logger and upload_dir arguments can also be passed to the
 constructor.
@@ -486,9 +490,7 @@ sub params {
 	if(defined($params->{logger})) {
 		$self->{logger} = $params->{logger};
 	}
-	if($self->{logger}) {
-		$self->{logger}->trace('Entering params');
-	}
+	$self->_trace('Entering params');
 
 	my @pairs;
 	my $content_type = $ENV{'CONTENT_TYPE'};
@@ -579,6 +581,12 @@ sub params {
 				});
 				return;
 			}
+
+			# Validate 'upload_dir'
+			# Ensure the upload directory is safe and accessible
+			# - Check permissions
+			# - Validate path to prevent directory traversal attacks
+			# TODO: Consider using a temporary directory for uploads and moving them later
 			if(!File::Spec->file_name_is_absolute($self->{upload_dir})) {
 				$self->_warn({
 					warning => "upload_dir $self->{upload_dir} isn't a full pathname"
@@ -597,6 +605,14 @@ sub params {
 				delete $self->{paramref};
 				$self->_warn({
 					warning => "upload_dir $self->{upload_dir} isn't writeable"
+				});
+				delete $self->{upload_dir};
+				return;
+			}
+			my $tmpdir = $self->tmpdir();
+			if($self->{'upload_dir'} !~ /^\Q$tmpdir\E/) {
+				$self->_warn({
+					warning => 'upload_dir ' . $self->{'upload_dir'} . " isn't somewhere in the temporary area $tmpdir"
 				});
 				delete $self->{upload_dir};
 				return;
@@ -708,9 +724,7 @@ sub params {
 		if($self->{allow}) {
 			# Is this a permitted argument?
 			if(!exists($self->{allow}->{$key})) {
-				if($self->{logger}) {
-					$self->{logger}->info("discard $key");
-				}
+				$self->_info("discard $key");
 				$self->status(422);
 				next;
 			}
@@ -718,9 +732,7 @@ sub params {
 			# Do we allow any value, or must it be validated?
 			if(defined($self->{allow}->{$key})) {
 				if($value !~ $self->{allow}->{$key}) {
-					if($self->{logger}) {
-						$self->{logger}->info("block $key = $value");
-					}
+					$self->_info("block $key = $value");
 					$self->status(422);
 					next;
 				}
@@ -745,28 +757,22 @@ sub params {
 			   ($value =~ /\sOR\s.+\sAND\s/) ||
 			   ($value =~ /\/\*\*\/ORDER\/\*\*\/BY\/\*\*/ix) ||
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
-				if($self->{logger}) {
-					if($ENV{'REMOTE_ADDR'}) {
-						$self->{logger}->warn($ENV{'REMOTE_ADDR'}, ": SQL injection attempt blocked for '$value'");
-					} else {
-						$self->{logger}->warn("SQL injection attempt blocked for '$value'");
-					}
+				if($ENV{'REMOTE_ADDR'}) {
+					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$value'");
+				} else {
+					$self->_warn("SQL injection attempt blocked for '$value'");
 				}
 				$self->status(403);
 				return;
 			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
 			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
-				if($self->{logger}) {
-					$self->{logger}->warn("XSS injection attempt blocked for '$value'");
-				}
+				$self->_warn("XSS injection attempt blocked for '$value'");
 				$self->status(403);
 				return;
 			}
 			if($value eq '../') {
-				if($self->{logger}) {
-					$self->{logger}->warn("Blocked directory traversal attack for $key");
-				}
+				$self->_warn("Blocked directory traversal attack for $key");
 				$self->status(403);
 				return;
 			}
@@ -787,8 +793,7 @@ sub params {
 
 	if($self->{logger}) {
 		while(my ($key,$value) = each %FORM) {
-			$self->{logger}->debug("$key=$value");
-			$log->debug("$key=$value");
+			$self->_debug("$key=$value");
 		}
 	}
 
@@ -842,45 +847,8 @@ sub param {
 	return;
 }
 
-# Emit a warning message somewhere
-sub _warn {
-	my $self = shift;
-
-	my $params = $self->_get_params('warning', @_);
-
-	my $warning = $params->{'warning'};
-
-	return unless($warning);
-
-	if($self eq __PACKAGE__) {
-		# Called from class method
-		carp($warning);
-		return;
-	}
-	# return if($self eq __PACKAGE__);  # Called from class method
-
-	push @{$self->{'warnings'}}, { warning => $warning };
-
-	if($self->{syslog}) {
-		require Sys::Syslog;
-
-		Sys::Syslog->import();
-		if(ref($self->{syslog} eq 'HASH')) {
-			Sys::Syslog::setlogsock($self->{syslog});
-		}
-		openlog($self->script_name(), 'cons,pid', 'user');
-		syslog('warning', $warning);
-		closelog();
-	}
-
-	if($self->{logger}) {
-		$self->{logger}->warn($warning);
-	} elsif(!defined($self->{syslog})) {
-		Carp::carp($warning);
-	}
-}
-
-# Helper routine to parse the arguments given to a function,
+# Helper routine to parse the arguments given to a function.
+# Processes arguments passed to methods and ensures they are in a usable format,
 #	allowing the caller to call the function in anyway that they want
 #	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
 #	when called _get_params('arg', @_);
@@ -930,14 +898,12 @@ sub _sanitise_input($) {
 sub _multipart_data {
 	my ($self, $args) = @_;
 
-	if($self->{logger}) {
-		$self->{logger}->trace('Entering _multipart_data');
-	}
+	$self->_trace('Entering _multipart_data');
+
 	my $total_bytes = $$args{length};
 
-	if($self->{logger}) {
-		$self->{logger}->trace("_multipart_data: total_bytes = $total_bytes");
-	}
+	$self->_debug("_multipart_data: total_bytes = $total_bytes");
+
 	if($total_bytes == 0) {
 		return;
 	}
@@ -1061,6 +1027,7 @@ sub is_mobile {
 			return 1;
 		}
 	}
+
 	if($ENV{'HTTP_X_WAP_PROFILE'}) {
 		# E.g. Blackberry
 		# TODO: Check the sanity of this variable
@@ -1094,9 +1061,11 @@ sub is_mobile {
 				$self->{browser_detect} = HTTP::BrowserDetect->new($agent);
 			}
 		}
+
 		if($self->{browser_detect}) {
 			my $device = $self->{browser_detect}->device();
-			my $is_mobile = (defined($device) && ($device =~ /blackberry|webos|iphone|ipod|ipad|android/i));
+			# Without the ?1:0 it will set to the empty string not 0
+			my $is_mobile = (defined($device) && ($device =~ /blackberry|webos|iphone|ipod|ipad|android/i)) ? 1 : 0;
 			if($is_mobile && $self->{cache} && defined($remote)) {
 				$self->{cache}->set("$remote/$agent", 'mobile', '1 day');
 			}
@@ -1150,7 +1119,7 @@ sub as_string
 			"$_=$value"
 		} sort keys %$params;
 
-	$self->{logger}->debug("as_string: returning '$rc'") if($rc && $self->{logger});
+	$self->_trace("as_string: returning '$rc'") if($rc);
 
 	return $rc;
 }
@@ -1392,12 +1361,10 @@ sub is_robot {
 	if(($agent =~ /SELECT.+AND.+/) || ($agent =~ /ORDER BY /) || ($agent =~ / OR NOT /) || ($agent =~ / AND \d+=\d+/) || ($agent =~ /THEN.+ELSE.+END/) || ($agent =~ /.+AND.+SELECT.+/) || ($agent =~ /\sAND\s.+\sAND\s/)) {
 		$self->status(403);
 		$self->{is_robot} = 1;
-		if($self->{logger}) {
-			if($ENV{'REMOTE_ADDR'}) {
-				$self->{logger}->warn($ENV{'REMOTE_ADDR'}, ": SQL injection attempt blocked for '$agent'");
-			} else {
-				$self->{logger}->warn("SQL injection attempt blocked for '$agent'");
-			}
+		if($ENV{'REMOTE_ADDR'}) {
+			$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$agent'");
+		} else {
+			$self->_warn("SQL injection attempt blocked for '$agent'");
 		}
 		return 1;
 	}
@@ -1451,9 +1418,8 @@ sub is_robot {
 		);
 		$referrer =~ s/\\/_/g;
 		if(($referrer =~ /\)/) || (List::MoreUtils::any { $_ =~ /^$referrer/ } @crawler_lists)) {
-			if($self->{logger}) {
-				$self->{logger}->debug("is_robot: blocked trawler $referrer");
-			}
+			$self->_debug("is_robot: blocked trawler $referrer");
+
 			if($self->{cache}) {
 				$self->{cache}->set($key, 'robot', '1 day');
 			}
@@ -1488,13 +1454,11 @@ sub is_robot {
 	}
 	if($self->{browser_detect}) {
 		my $is_robot = $self->{browser_detect}->robot();
-		if(defined($is_robot) && $self->{logger}) {
-			$self->{logger}->debug("HTTP::BrowserDetect '$ENV{HTTP_USER_AGENT}' returns $is_robot");
+		if(defined($is_robot)) {
+			$self->_debug("HTTP::BrowserDetect '$ENV{HTTP_USER_AGENT}' returns $is_robot");
 		}
 		$is_robot = (defined($is_robot) && ($is_robot)) ? 1 : 0;
-		if($self->{logger}) {
-			$self->{logger}->debug("is_robot: $is_robot");
-		}
+		$self->_debug("is_robot: $is_robot");
 
 		if($is_robot) {
 			if($self->{cache}) {
@@ -1737,7 +1701,15 @@ sub status
 
 =head2 warnings
 
-Returns the warnings that the object has generated
+Returns the warnings that the object has generated as a ref to an array of hashes.
+
+    my @warnings;
+    if(my $w = $info->warnings()) {
+        @warnings = map { $_->{'warning'} } @{$w};
+    } else {
+        @warnings = ();
+    }
+    print STDERR join(';', @warnings), "\n";
 
 =cut
 
@@ -1762,6 +1734,81 @@ sub set_logger {
 	$self->{logger} = $params->{'logger'};
 
 	return $self;
+}
+
+# Helper routines for logger()
+sub _log {
+	my ($self, $level, @messages) = @_;
+
+	if(my $logger = $self->{'logger'}) {
+		if(ref($logger) eq 'CODE') {
+			$logger->({ level => $level, message => \@messages });
+		} else {
+			$logger->$level(@messages);
+		}
+	}
+}
+
+sub _debug {
+	my $self = shift;
+	$self->_log('debug', @_);
+}
+
+sub _info {
+	my $self = shift;
+	$self->_log('info', @_);
+}
+
+sub _trace {
+	my $self = shift;
+	$self->_log('trace', @_);
+}
+
+# Emit a warning message somewhere
+sub _warn {
+	my $self = shift;
+
+	my $params = $self->_get_params('warning', @_);
+
+	# Validate input parameters
+	return unless($params && (ref($params) eq 'HASH'));
+	my $warning = $params->{'warning'};
+	return unless($warning);
+
+	if($self eq __PACKAGE__) {
+		# Called from class method
+		carp($warning);
+		return;
+	}
+	# return if($self eq __PACKAGE__);  # Called from class method
+
+	# FIXME: add caller's function
+	push @{$self->{'warnings'}}, { warning => $warning };
+
+	# Handle syslog-based logging
+	if($self->{syslog}) {
+		require Sys::Syslog;
+
+		Sys::Syslog->import();
+		if(ref($self->{syslog} eq 'HASH')) {
+			Sys::Syslog::setlogsock($self->{syslog});
+		}
+		openlog($self->script_name(), 'cons,pid', 'user');
+		syslog('warning', $warning);
+		closelog();
+	}
+
+	# Handle logger-based logging
+	if(my $logger = $self->{logger}) {
+		if(ref($logger) eq 'CODE') {
+			$logger->({ level => 'warn', message => [ $warning ] });
+		} else {
+			$logger->warn($warning);
+		}
+	} elsif(!defined($self->{syslog})) {
+		# Fallback to Carp warnings
+		Carp::carp($warning);
+	}
 }
 
 =head2 reset

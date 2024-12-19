@@ -1,0 +1,56 @@
+NAME
+
+    FFI::Platypus::Lang::V - Documentation and tools for using Platypus
+    with the V programming language
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+    V:
+
+     module foo
+     
+     pub fn add(a, b i32) i32 {
+         return a + b
+     }
+
+    Perl:
+
+     use FFI::Platypus 2.00;
+     my $ffi = FFI::Platypus->new( api => 2, lang => 'V', lib => 'foo.so' );
+     $ffi->mangle(sub ($sym) { "foo__$sym" });
+     $ffi->attach( add => ['i32','i32'] => 'i32');
+     
+     say add(1,2);
+
+    Prints:
+
+     3
+
+DESCRIPTION
+
+    This module provides types and documentation for using the V
+    programming language with FFI::Platypus.
+
+METHODS
+
+ native_type_map
+
+     my $hashref = FFI::Platypus::Lang::V->native_type_map;
+
+    Returns a mapping of V primitive types to Platypus types.
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2024 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

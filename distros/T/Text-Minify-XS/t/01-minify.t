@@ -7,7 +7,7 @@ use Test2::V0;
 use Test2::Tools::Exception qw( lives );
 use Test2::Tools::Warnings qw( warning );
 
-use Encode qw/ encode_utf8 /;
+use Encode 2.85 qw/ encode_utf8 /;
 
 use Text::Minify::XS "minify";
 

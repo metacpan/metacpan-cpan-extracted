@@ -64,17 +64,21 @@ WebService::Chroma::Tenant - chromadb tenant
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
 =head1 SYNOPSIS
 
-	use WebService::Chroma::Collection;
+	use WebService::Chroma::Tenant;
 
-	my $collection = WebService::Chroma::Tenant->new(
+	my $tenant = WebService::Chroma::Tenant->new(
 		ua => WebService::Chroma::UA->new(...),
 		name => '...',
+	);
+
+	my $db = $tenant->create_database(
+		name => 'test-database'
 	);
 
 =head1 Methods
@@ -83,7 +87,20 @@ Version 0.04
 
 =head2 create_database
 
+Create a new database. This returns a L<WebService::Chroma::DB> object.
+
+	$tenant->create_database(
+		name => 'test-database'
+	);
+
+
 =head2 get_database
+
+Retrieve an existing database. This returns a L<WebService::Chroma::DB> object.
+
+	$tenant->get_database(
+		name => 'test-database'
+	);
 
 =head1 AUTHOR
 

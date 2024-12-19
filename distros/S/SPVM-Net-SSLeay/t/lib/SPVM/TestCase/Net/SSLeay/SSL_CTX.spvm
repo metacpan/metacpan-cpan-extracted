@@ -45,7 +45,7 @@ class TestCase::Net::SSLeay::SSL_CTX {
         return 0;
       }
       
-      $ssl_ctx->set_default_passwd_cb(method : int ($buf : mutable string, $size : int, $rwflag : int, $arg : object) { return 0; }, undef);
+      $ssl_ctx->set_default_passwd_cb(method : int ($buf : mutable string, $size : int, $rwflag : int) { return 0; });
       
     }
     
@@ -59,7 +59,7 @@ class TestCase::Net::SSLeay::SSL_CTX {
         return 0;
       }
       
-      $ssl_ctx->set_alpn_select_cb(method : int ($ssl : Net::SSLeay, $out_ref : string[], $outlen_ref : byte*, $in : string, $inlen : int, $arg : object) { return 0; }, undef);
+      $ssl_ctx->set_alpn_select_cb(method : int ($ssl : Net::SSLeay, $out_ref : string[], $outlen_ref : byte*, $in : string, $inlen : int) { return 0; });
       
     }
     
@@ -73,7 +73,7 @@ class TestCase::Net::SSLeay::SSL_CTX {
         return 0;
       }
       
-      $ssl_ctx->set_tlsext_servername_callback(method : int ($ssl : Net::SSLeay, $al_ref : int*, $arg : object) { return 0; }, undef);
+      $ssl_ctx->set_tlsext_servername_callback(method : int ($ssl : Net::SSLeay, $al_ref : int*) { return 0; });
       
     }
     

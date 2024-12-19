@@ -1,5 +1,9 @@
 Revision history for Perl extension Plack-Middleware-Validate_Google_IAP_JWT
 
+0.04 2024-12-18T11:59:15Z
+
+    - Allow plain array as the PSGI app for debugging aid. See <https://hkoba.hatenablog.com/entry/perl-adventcal2024-1220>.
+
 0.02 2024-12-18T05:31:10Z
 
     - original version

@@ -1,6 +1,7 @@
 use Test2::V0 -no_srand => 1;
 use experimental qw( signatures );
 use Data::Section::Pluggable;
+use Path::Tiny ();
 
 is(
     Data::Section::Pluggable->new,
@@ -67,9 +68,34 @@ is(
     'constructor with hash ref',
 );
 
+my $dir = Path::Tiny->tempdir;
+
+Data::Section::Pluggable
+  ->new
+  ->extract($dir);
+
+is(
+    $dir,
+    object {
+        call [child => 'etc/foo.yml'] => object {
+            call slurp_utf8 => "---\na: config\n";
+        };
+        call [child => 'foo.txt'] => object {
+            call slurp_utf8 => "plain hello world\n";
+        };
+        call [child => 'foo.bin'] => object {
+            call slurp_raw => "Hello world\n";
+        }
+    },
+    'extract',
+);
+
 done_testing;
 
 __DATA__
+@@ etc/foo.yml
+---
+a: config
 @@ foo.txt
 plain hello world
 @@ foo.bin (base64)

@@ -1,0 +1,79 @@
+NAME
+    tickit-hello - Tickit application with hello world.
+
+SYNOPSIS
+     tickit-hello [-a horiz_align] [-b bg_color] [-f fg_color] [-h] [-v vert_align] [--version] [message]
+
+DESCRIPTION
+    This application is Tickit hello world demo.
+
+    Application could present text string in screen.
+
+ARGUMENTS
+    *       "-a horiz_align"
+
+            Horizontal align.
+
+            Possible values are:
+
+            *   left
+
+            *   center (default)
+
+            *   right
+
+    *       "-b bg_color"
+
+            Background color.
+
+            Default value is black.
+
+    *       "-f fg_color"
+
+            Foreground color.
+
+            Default value is green.
+
+    *       "-h"
+
+            Print help.
+
+    *       "-v vert_align"
+
+            Vertical align.
+
+            Possible values are:
+
+            *   top
+
+            *   middle (default)
+
+            *   bottom
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "message"
+
+            Text message to present on screen.
+
+EXAMPLE
+     tickit-hello "Hello world!"
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Tickit-Hello>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

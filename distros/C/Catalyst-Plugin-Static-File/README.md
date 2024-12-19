@@ -4,7 +4,7 @@ Catalyst::Plugin::Static::File - Serve a specific static file
 
 # VERSION
 
-version v0.2.2
+version v0.2.3
 
 # SYNOPSIS
 
@@ -86,13 +86,18 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+## Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.  Please see `SECURITY.md` for instructions how to
+report security vulnerabilities
+
 # AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by Robert Rothenberg.
+This software is Copyright (c) 2023-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

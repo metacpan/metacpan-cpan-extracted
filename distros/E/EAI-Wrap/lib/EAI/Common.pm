@@ -1,7 +1,8 @@
-package EAI::Common 1.916;
+package EAI::Common 1.917;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
-use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number);
+use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number); 
+use Carp qw(confess longmess);
 # to make use of colored logs with Log::Log4perl::Appender::ScreenColoredLevels on windows we have to use that (special "use" to make this optional on non-win environments)
 BEGIN {
 	if ($^O =~ /MSWin/) {require Win32::Console::ANSI; Win32::Console::ANSI->import();}
@@ -161,7 +162,7 @@ my %hashCheck = (
 	FTP => { # FTP specific configs
 		additionalParamsGet => {}, # additional parameters for Net::SFTP::Foreign get.
 		additionalMoreArgs => [], # additional more args for Net::SFTP::Foreign new (args passed to ssh command).
-		additionalParamsNew => {}, # additional parameters for Net::SFTP::Foreign new.
+		additionalParamsNew => {}, # additional parameters for Net::SFTP::Foreign new (args passed to Net::SFTP::Foreign).
 		additionalParamsPut => {}, # additional parameters for Net::SFTP::Foreign put.
 		archiveDir => "", # folder for archived files on the FTP server
 		dontMoveTempImmediately => 1, # if 0 oder missing: rename/move files immediately after writing to FTP to the final name, otherwise/1: a call to EAI::FTP::moveTempFiles is required for that
@@ -252,15 +253,15 @@ our $logConfig;
 sub readConfigFile ($) {
 	my $configfilename = shift;
 	my $siteCONFIGFILE;
-	open (CONFIGFILE, "<$configfilename") or die("couldn't open $configfilename: $@ $!, caller ".(caller(1))[3].", line ".(caller(1))[2]." in ".(caller(1))[1]);
+	open (CONFIGFILE, "<$configfilename") or confess("couldn't open $configfilename: $@ $!, caller ".(caller(1))[3].", line ".(caller(1))[2]." in ".(caller(1))[1]);
 	{
 		local $/=undef;
 		$siteCONFIGFILE = <CONFIGFILE>;
 		close CONFIGFILE;
 	}
 	unless (my $return = eval $siteCONFIGFILE) {
-		die("Error parsing config file $configfilename for script $execute{homedir}/$execute{scriptname}: $@") if $@;
-		die("Error executing config file $configfilename for script $execute{homedir}/$execute{scriptname}: $!") unless defined $return;
+		confess("Error parsing config file $configfilename for script $execute{homedir}/$execute{scriptname}: $@") if $@;
+		confess("Error executing config file $configfilename for script $execute{homedir}/$execute{scriptname}: $!") unless defined $return;
 	}
 	print STDOUT "included $configfilename\n";
 }
@@ -317,9 +318,9 @@ sub setupConfigMerge {
 		}
 	}
 	# do check before the merging below removes all nonconforming entries.
-	checkHash(\%config,"config") or $logger->error($@);
-	checkHash(\%common,"common") or $logger->error($@);
-	for my $i (0..$#loads) {checkHash($loads[$i],"load") or $logger->error($@);}
+	checkHash(\%config,"config") or $logger->error($@.longmess());
+	checkHash(\%common,"common") or $logger->error($@.longmess());
+	for my $i (0..$#loads) {checkHash($loads[$i],"load") or $logger->error($@.longmess());}
 
 	# merge cmdline option overrides into toplevel global config (DB, FTP, File and process overrides are merged directly into common below)...
 	%config=(%config,%{$opt{config}}) if $opt{config};
@@ -388,7 +389,7 @@ sub getOptions {
 				$availabeOpts.="--$hashName $defkey=<value>\n" if ref($hashCheck{$hashName}{$defkey}) ne "HASH" and ref($hashCheck{$hashName}{$defkey}) ne "ARRAY";
 			}
 		}
-		die $errStr."===> available options (use --load<N><group> instead of --<group> for load specific settings):\n".$availabeOpts;
+		confess $errStr."===> available options (use --load<N><group> instead of --<group> for load specific settings):\n".$availabeOpts;
 	}
 }
 
@@ -403,12 +404,10 @@ sub extractConfigs ($$$;@) {
 	if (ref($arg) eq "HASH") {
 		for my $req (@required) {
 			push(@ret, \%{$arg->{$req}}); # return the required subhash into the list of hashes
-			checkHash($ret[$#ret],$req) or $logger->error($@); # check last added hash after adding it...
+			checkHash($ret[$#ret],$req) or $logger->error($@.longmess()); # check last added hash after adding it...
 		}
 	} else {
-		my $errStr = "no ref to hash passed when calling ".(caller(0))[3].", line ".(caller(0))[2]." in ".(caller(0))[1];
-		$errStr = "no ref to hash passed when calling ".(caller(1))[3].", line ".(caller(1))[2]." in ".(caller(1))[1] if caller(1);
-		$logger->error($errStr);
+		$logger->error("no ref to hash passed".longmess());
 	}
 	return @ret;
 }
@@ -416,33 +415,29 @@ sub extractConfigs ($$$;@) {
 # check config hash passed in $hash for validity against hashCheck (valid key entries are there + their valid value types (examples)). returns 0 on error and exception $@ contains details
 sub checkHash ($$) {
 	my ($hash, $hashName) = @_;
-	# try to backtrack as far as possible, maximum 3 calls (script -> function -> extractConfigs):
-	my $locStr = " when calling ".(caller(0))[3].", line ".(caller(0))[2]." in ".(caller(0))[1];
-	$locStr = " when calling ".(caller(1))[3].", line ".(caller(1))[2]." in ".(caller(1))[1] if caller(1);
-	$locStr = " when calling ".(caller(2))[3].", line ".(caller(2))[2]." in ".(caller(2))[1] if caller(2);
 	eval {
 		for my $defkey (keys %{$hash}) {
 			unless ($hashName eq "process" and $defkey =~ /interactive.*/) {
 				if (!exists($hashCheck{$hashName}{$defkey})) {
-					die "key name not allowed: \$".$hashName."{".$defkey."},".$locStr;
+					confess "key name not allowed: \$".$hashName."{".$defkey."},";
 				} else {
 					# check type for existing keys, if explicitly not defined then ignore...
 					if (defined($hash->{$defkey})) {
 						if (ref($hashCheck{$hashName}{$defkey}) ne ref($hash->{$defkey})) {
 							if (!defined($alternateType{$hashName.$defkey}) or (ref($alternateType{$hashName.$defkey}) ne ref($hash->{$defkey}))) {
-								die "wrong reference type for value: \$".$hashName."{".$defkey."}:".ref($hash->{$defkey}).", it should be either:".ref($hashCheck{$hashName}{$defkey})." or:".ref($alternateType{$hashName.$defkey}).",".$locStr;
+								confess "wrong reference type for value: \$".$hashName."{".$defkey."}:".ref($hash->{$defkey}).", it should be either:".ref($hashCheck{$hashName}{$defkey})." or:".ref($alternateType{$hashName.$defkey}).",";
 							}
 						}
 						# numeric check: either hashcheck is same looks_like_number as given key or alternateType is same looks_like_number
 						if (looks_like_number($hash->{$defkey}) and !looks_like_number($hashCheck{$hashName}{$defkey})) {
 							if (!defined($alternateType{$hashName.$defkey}) or (looks_like_number($hash->{$defkey}) and !looks_like_number($alternateType{$hashName.$defkey}))) {
-								die "wrong numeric type for value: \$".$hashName."{".$defkey."},".$locStr;
+								confess "wrong numeric type for value: \$".$hashName."{".$defkey."},";
 							}
 						}
 						# non-numeric check: if non-numeric type given, then check if either hashcheck looks like a number or hashcheck was a ref type and alternateType looks like a number
 						if (!looks_like_number($hash->{$defkey}) and !ref($hash->{$defkey}) and looks_like_number($hashCheck{$hashName}{$defkey})) {
 							if (!defined($alternateType{$hashName.$defkey}) or (!looks_like_number($hash->{$defkey}) and looks_like_number($alternateType{$hashName.$defkey}))) {
-								die "wrong non-numeric type for value: \$".$hashName."{".$defkey."},".$locStr;
+								confess "wrong non-numeric type for value: \$".$hashName."{".$defkey."},";
 							}
 						}
 					}
@@ -459,16 +454,16 @@ sub checkParam ($$) {
 	my ($subhash,$keytoCheck) = @_;
 	my $logger = get_logger();
 	if (ref($subhash) ne "HASH") {
-		$logger->error("passed argument subhash to checkParam is not a hash");
+		$logger->error("passed argument subhash to checkParam is not a hash".longmess());
 		return 0;
 	}
 	my ($subhashname) = split /=/, Dumper($subhash);
 	$subhashname =~ s/\$//;
 	if (!defined($subhash->{$keytoCheck})) {
-		$logger->error("key $keytoCheck not defined in subhash ".dumpFlat($subhash,1));
+		$logger->error("key $keytoCheck not defined in subhash ".dumpFlat($subhash,1).longmess());
 		return 0;
 	} elsif (!$subhash->{$keytoCheck} and !looks_like_number($hashCheck{$subhashname}{$keytoCheck})) {
-		$logger->error("value of key $keytoCheck empty in subhash ".dumpFlat($subhash,1));
+		$logger->error("value of key $keytoCheck empty in subhash ".dumpFlat($subhash,1).longmess());
 		return 0;
 	}
 	return 1;
@@ -540,7 +535,7 @@ sub setupLogging {
 	$LogFPath = $logFolder."/".$extendedScriptname.".log";
 	$logConfig = $EAI_WRAP_CONFIG_PATH."/".$execute{env}."/log.config"; # environment dependent log config, Prod is either in EAI_WRAP_CONFIG_PATH/.$execute{env} or EAI_WRAP_CONFIG_PATH
 	$logConfig = $EAI_WRAP_CONFIG_PATH."/log.config" if (! -e $logConfig); # fall back to main config log.config
-	die "log.config neither in $logConfig nor in ".$EAI_WRAP_CONFIG_PATH."/log.config" if (! -e $logConfig);
+	confess "log.config neither in $logConfig nor in ".$EAI_WRAP_CONFIG_PATH."/log.config" if (! -e $logConfig);
 	Log::Log4perl::init($logConfig);
 	# workaround for utf8 problems with Win32::Console::ANSI
 	if ($^O =~ /MSWin/) {
@@ -586,9 +581,9 @@ sub setupLogging {
 			# Production: no errmailaddress found, error message to Testerrmailaddress (if set)
 			Log::Log4perl->appenders()->{"MAIL"}->{"appender"}->{"to"} = [$config{testerrmailaddress}] if $config{testerrmailaddress};
 			if ($execute{envraw}) {
-				$logger->error("no errmailaddress found, no entry found in \$config{testerrmailaddress}");
+				$logger->error("no errmailaddress found, no entry found in \$config{testerrmailaddress}".longmess());
 			} else {
-				$logger->error("no errmailaddress found for ".$extendedScriptname.", no entry found in \$config{checkLookup}{$extendedScriptname}");
+				$logger->error("no errmailaddress found for ".$extendedScriptname.", no entry found in \$config{checkLookup}{$extendedScriptname}".longmess());
 			}
 		}
 		setErrSubject("Setting up EAI::Wrap"); # general context after logging initialization: setup of EAI::Wrap by script
@@ -604,6 +599,7 @@ sub setupEAIWrap {
 	setupConfigMerge(); # %config (from site.config, amended with command line options) and %common (from process script, amended with command line options) are merged into %common and all @loads (amended with command line options)
 	# starting log entry: process script name + %common parameters, used for process monitoring (%config is not written due to sensitive information, $execute is stripped down to standard keys to avoid potentially sensitve information there as well)
 	$logger->info("==============================================================================================");
+	$execute{startingTime} = get_curtime("%02d%02d%02d");
 	my %executeDump; my %configDump;
 	for my $key (keys %{$hashCheck{execute}}) {
 		$executeDump{$key} = $execute{$key};
@@ -611,13 +607,13 @@ sub setupEAIWrap {
 	for my $key (keys %config) {
 		$configDump{$key} = $config{$key} if $key ne "sensitive";
 	}
-	$logger->info("started $execute{scriptname} in $execute{homedir} (environment $execute{env}) ... execute parameters: ".dumpFlat(\%executeDump,1,1)." ... common parameters: ".dumpFlat(\%common,1,1)." ... config parameters: ".dumpFlat(\%configDump,1,1));
+	$logger->info("started $execute{scriptname} in $execute{homedir} (environment $execute{env}) ... execute parameters: ".dumpFlat(\%executeDump,1,1)." ... common parameters: ".dumpFlat(\%common,1,1));
 	if ($logger->is_debug) {
+		$logger->debug("config parameters: ".dumpFlat(\%configDump,1,1));
 		$logger->debug("load $_ parameters: ".dumpFlat($loads[$_],1,1)) for (0..$#loads);
 	}
 	# check starting conditions and exit if met (returned true)
 	checkStartingCond(\%common) and exit 0;
-	$execute{startingTime} = get_curtime("%02d%02d%02d");
 	setErrSubject("General EAI::Wrap script execution"); # general context after setup of EAI::Wrap
 }
 
@@ -685,30 +681,30 @@ sub checkStartingCond ($) {
 }
 
 # general mail sending for notifying of conditions/sending reports (for use in user specific code)
-sub sendGeneralMail ($$$$$$;$$$$) {
-	my ($From, $To, $Cc, $Bcc, $Subject, $Data, $Type, $Encoding, $AttachType, $AttachFile) = @_;
+sub sendGeneralMail ($$$$$$;$$$$$) {
+	my ($From, $To, $Cc, $Bcc, $Subject, $Data, $Type, $Encoding, $AttachType, $AttachFile, $enforceToAddressInTest) = @_;
 	my $logger = get_logger();
-	$logger->error("cannot send mail as \$config{smtpServer} not set") if !$config{smtpServer};
-	$logger->info("sending general mail From:".($From ? $From : $config{fromaddress}).", To:".($execute{envraw} ? $config{testerrmailaddress} : $To).", CC:".($execute{envraw} ? "" : $Cc).", Bcc:".($execute{envraw} ? "" : $Bcc).", Subject:".($execute{envraw} ? $execute{envraw}.": " : "").$Subject.", Type:".($Type ? $Type : "TEXT").", Encoding:".($Type eq 'multipart/related' ? undef : $Encoding));
+	$logger->error("cannot send mail as \$config{smtpServer} not set".longmess()) if !$config{smtpServer};
+	$logger->info("sending general mail From:".($From ? $From : $config{fromaddress}).", To:".($execute{envraw} and !$enforceToAddressInTest ? $config{testerrmailaddress} : $To).", CC:".($execute{envraw} ? "" : $Cc).", Bcc:".($execute{envraw} ? "" : $Bcc).", Subject:".($execute{envraw} ? $execute{envraw}.": " : "").$Subject.", Type:".($Type ? $Type : "TEXT").", Encoding:".($Type eq 'multipart/related' ? undef : $Encoding)."AttachType: $AttachType, AttachFile: $AttachFile, enforceToAddressInTest: $enforceToAddressInTest");
 	$logger->debug("Mailbody: $Data");
 	my $msg = MIME::Lite->new(
 			From    => ($From ? $From : $config{fromaddress}),
-			To      => ($execute{envraw} ? $config{testerrmailaddress} : $To),
+			To      => ($execute{envraw} and !$enforceToAddressInTest ? $config{testerrmailaddress} : $To),
 			Cc      => ($execute{envraw} ? "" : $Cc),
 			Bcc     => ($execute{envraw} ? "" : $Bcc),
 			Subject => ($execute{envraw} ? $execute{envraw}.": " : "").$Subject,
 			Type    => ($Type ? $Type : "TEXT"),
 			Data    => ($Type eq 'multipart/related' ? undef : $Data),
-			Encoding => ($Type eq 'multipart/related' ? undef : $Encoding)
+			Encoding => ($Type eq 'multipart/related' ? undef : $Encoding),
 		);
-	$logger->error("couldn't create msg for mail sending..") unless $msg;
+	$logger->error("couldn't create msg for mail sending..".longmess()) unless $msg;
 	if ($Type eq 'multipart/related') {
 		if (ref($AttachFile) ne 'ARRAY') {
-			$logger->error("argument $AttachFile needs to be ref to array for type multipart/related");
+			$logger->error("argument $AttachFile needs to be ref to array for type multipart/related".longmess());
 			return 0;
 		}
 		if (!$AttachType) {
-			$logger->error("no AttachType given for type multipart/related");
+			$logger->error("no AttachType given for type multipart/related".longmess());
 			return 0;
 		}
 		$msg->attach(
@@ -732,10 +728,10 @@ sub sendGeneralMail ($$$$$$;$$$$) {
 		);
 	}
 	if ($AttachFile and !$AttachType) {
-		$logger->error("no AttachType given for attachment $AttachFile");
+		$logger->error("no AttachType given for attachment $AttachFile".longmess());
 		return 0;
 	}
-	$msg->send();
+	$msg->send('smtp', $config{smtpServer}) or $logger->error("\$msg->send failed: $@".longmess());
 	if ($msg->last_send_successful()) {
 		$logger->info("Mail sent");
 		$logger->trace("sent message: ".$msg->as_string) if $logger->is_trace();
@@ -752,7 +748,7 @@ sub send_email {
 	my $self = shift;
 	my %p    = @_;
 	# catch wide non utf8 characters to avoid die in MIME::Lite
-	#eval {decode('UTF-8',$p{message},$Encode::FB_CROAK )} or $p{message} =~ s/[^\x00-\x7f]/?/g;
+	#eval {decode('UTF-8',$p{message},$Encode::FB_confess )} or $p{message} =~ s/[^\x00-\x7f]/?/g;
 	my $msg = MIME::Lite->new(
 			From    => $self->{from},
 			To      => ( join ',', @{ $self->{to} } ),
@@ -892,14 +888,14 @@ argument $task .. config information
 
 check starting conditions from process config information and return 1 if met
 
-=item sendGeneralMail ($$$$$$;$$$$)
+=item sendGeneralMail ($$$$$$;$$$$$)
 
 arguments are
 
  $From .. sender
  $To .. recipient
- $Cc .. cc recipient (optional, but need arg)
- $Bcc .. mcc recipient  (optional, but need arg)
+ $Cc .. cc recipient (empty in test environment)
+ $Bcc .. bcc recipient (empty in test environment)
  $Subject .. mail subject
  $Data .. the mail body, either plain text or html.
  $Type .. mail mime type (eg text/plain, text/html oder 'multipart/related'), if 'multipart/related', then a ref to array to the filenames (path), that should be attached is expected to be set in $AttachFile. 
@@ -907,6 +903,7 @@ arguments are
  $Encoding .. encoding for mail body, optional (eg quoted-printable)
  $AttachType .. mime type for attachment(s) (eg text/csv or image/png), optional
  $AttachFile .. file name/path(s) for attachment(s), optional (hat to be ref to array, if $Type = 'multipart/related')
+ $enforceToAddressInTest .. usually $To is set to $config{testerrmailaddress} in a test environment ($execute{envraw} non-empty). This flag prevents this and sets the passed $To instead.
 
 send general mail, either simple text or html mails, mails with an attachment or multipart mails for "in-body" attachments (eg pictures). 
 In this case the mail body needs to be HTML, attachments are referred to inside the HTML code and are passed as a ref to array of paths in $AttachFile.

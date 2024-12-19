@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-$Acme::Glue::VERSION = "2024.11";
+$Acme::Glue::VERSION = "2024.12";
 
 =encoding utf8
 
@@ -14,7 +14,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 =head1 VERSION
 
-2024.11
+2024.12
 
 =head1 DESCRIPTION
 
@@ -175,6 +175,21 @@ Here are the snippets that may accompany the photo project
 			audio->audio = NULL;
 		}
 	}
+
+=head2 LEEJO (only compiles on a Friday)
+
+    # general idea shamelessly stolen from Randal L. Schwartz:
+    # https://www.perlmonks.org/index.pl?node_id=44722
+
+    use Time::Piece;
+
+    BEGIN {
+        *f = (localtime->wdayname eq 'Fri')
+            ? sub() {}
+            : sub {};
+    }
+
+    f/1;#/+
 
 =head2 MIKESTOK (soundex "joke")
 

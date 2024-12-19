@@ -12,7 +12,7 @@ use JSON::MaybeXS;
 
 # RECOMMEND PREREQ: Crypt::Digest 0.062
 
-our $VERSION = 'v1.2.0';
+our $VERSION = 'v1.2.2';
 
 our @EXPORT    = qw/ signature /;
 our @EXPORT_OK = @EXPORT;
@@ -67,7 +67,7 @@ Object::Signature::Portable - generate portable fingerprints of objects
 
 =head1 VERSION
 
-version v1.2.0
+version v1.2.2
 
 =head1 SYNOPSIS
 
@@ -183,7 +183,7 @@ change between module versions.
 
 =item *
 
-Consistent encoding of integers are strings.
+Consistent encoding of integers and strings.
 
 =item *
 
@@ -337,7 +337,7 @@ feature.
 =head2 Reporting Security Vulnerabilities
 
 Security issues should not be reported on the bugtracker website.
-Please see F<SECURITY-POLICY.md> for instructions how to report
+Please see F<SECURITY.md> for instructions how to report
 security vulnerabilities
 
 =head1 AUTHOR

@@ -11,9 +11,9 @@ use File::Which;
 
 #<<<
 use constant PACKAGE_NAME    =>  'nlopt';
-use constant PACKAGE_VERSION =>  '2.7.1';
+use constant PACKAGE_VERSION =>  '2.9.1';
 
-our $VERSION = 'v2.7.1.1';
+our $VERSION = 'v2.9.1.0';
 
 #>>>
 

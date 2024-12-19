@@ -216,13 +216,21 @@ This module use either L<Redis::Fast> or L<Redis>.
 
 L<Apache::Session>
 
-=head1 AUTHOR
-
-Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2018 by Xavier Guimard
+=over
+
+=item 2009-2023 by Xavier Guimard
+
+=item 2013-2023 by Clément Oudot
+
+=item 2019-2023 by Maxime Besson
+
+=item 2013-2023 by Worteks
+
+=item 2023 by Linagora
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

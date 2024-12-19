@@ -1,5 +1,8 @@
 Tk::CodeText module changes log
 
+0.57 18 Dec 2024
+	- Fixed highlight clear when syntax is set to None.
+
 0.56 13 Dec 2024
 	- Got rid of all classic Tk::Text keybindings.
 	- Codefolding encompasses the entire section.

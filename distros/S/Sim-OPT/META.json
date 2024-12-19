@@ -41,9 +41,11 @@
             "List::Compare" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
+            "MCE::Loop" : "0",
             "Math::Polygon::Tree" : "0",
             "Math::Round" : "0",
             "Math::Trig" : "0",
+            "Moose" : "0",
             "Regexp::Common" : "0",
             "Scalar::Util" : "0",
             "Set::Intersection" : "0",
@@ -55,6 +57,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.737",
+   "version" : "0.739",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

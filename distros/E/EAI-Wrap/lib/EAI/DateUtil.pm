@@ -1,7 +1,7 @@
-package EAI::DateUtil 1.916;
+package EAI::DateUtil 1.917;
 
 use strict; use warnings; use feature 'unicode_strings'; use utf8;
-use Exporter qw(import); use Time::Local qw( timelocal_modern timegm_modern ); use Time::localtime; use POSIX qw(mktime);
+use Exporter qw(import); use Time::Local qw( timelocal_modern timegm_modern ); use Time::localtime; use POSIX qw(mktime); use Carp qw(cluck);
 
 our @EXPORT = qw(monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addDatePart subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD convertJulianToYYYYMMDD make_time formatTime get_curtime_epochs localtime timelocal_modern);
 
@@ -51,11 +51,11 @@ sub addLocaleMonths ($$) {
 	return undef if !$locale or !$monthList;
 	$locale = lc($locale);
 	if (defined($monthsToInt{$locale})) {
-		warn("locale <$locale> already implemented for monthsToInt !");
+		cluck("locale <$locale> already implemented for monthsToInt !");
 		return 0;
 	}
 	if (defined($intTomonths{$locale})) {
-		warn("locale <$locale> already implemented for intTomonths !");
+		cluck("locale <$locale> already implemented for intTomonths !");
 		return 0;
 	}
 	$intTomonths{$locale} = $monthList;
@@ -276,15 +276,15 @@ sub addCalendar ($$$$) {
 	my ($cal,$fixHol,$eastHol,$specialHolSub) = @_;
 	return undef if !$cal or !$fixHol or !$eastHol or !$specialHolSub;
 	if (defined($fixedHol{$cal})) {
-		warn("calender <$cal> already implemented for fixed holidays !");
+		cluck("calender <$cal> already implemented for fixed holidays !");
 		return 0;
 	}
 	if (defined($easterHol{$cal})) {
-		warn("calender <$cal> already implemented for easter holidays !");
+		cluck("calender <$cal> already implemented for easter holidays !");
 		return 0;
 	}
 	if (defined($specialHol{$cal})) {
-		warn("calender <$cal> already implemented for additional calculations !");
+		cluck("calender <$cal> already implemented for additional calculations !");
 		return 0;
 	}
 	$fixedHol{$cal} = ($fixHol ? $fixHol : "");
@@ -323,7 +323,7 @@ sub is_holiday ($$) {
 	return 1 if is_easter($cal,$_[1]);
 	return 1 if $specialHol{$cal} and $specialHol{$cal}->($_[1]);
 	unless ($fixedHol{$cal} or $easterHol{$cal} or $specialHol{$cal}) {
-		warn("calender <$cal> neither implemented in \$fixedHol{$cal} nor \$easterHol{$cal} nor \$specialHol{$cal} !");
+		cluck("calender <$cal> neither implemented in \$fixedHol{$cal} nor \$easterHol{$cal} nor \$specialHol{$cal} !");
 		return 0;
 	}
 	return 0;
@@ -334,7 +334,7 @@ sub first_week ($$$$;$) {
 	return undef if !$y or !$m or !$d or !defined($day);
 	$month = $m if !$month;
 	unless ((0 <= $day) && ( $day <= 6)) {
-		warn("day <$day> is out of range 0 - 6  (sunday==0)");
+		cluck("day <$day> is out of range 0 - 6  (sunday==0)");
 		return 0;
 	}
 	my $date = localtime(timelocal_modern(0,0,12,$d,$m-1,$y));
@@ -359,7 +359,7 @@ sub last_week ($$$$;$) {
 	return undef if !$y or !$m or !$d or !defined($day);
 	$month = $m if !$month;
 	unless ((0 <= $day) && ( $day <= 6)) {
-		warn("day <$day> is out of range 0 - 6  (sunday==0)");
+		cluck("day <$day> is out of range 0 - 6  (sunday==0)");
 		return 0;
 	}
 	my $date = localtime(timelocal_modern(0,0,12,$d,$m-1,$y));

@@ -185,7 +185,7 @@ WebService::Chroma::Collection - chromadb collection
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -201,23 +201,111 @@ Version 0.04
 		name => '...',
 	);
 
+        $collection->add(
+                documents => [
+                        'a blue scarf, a red hat, a woolly jumper, black gloves',
+                        'a pink scarf, a blue hat, a woolly jumper, green gloves'
+                ],
+                ids => [
+                        "1",
+                        "2"
+                ]
+        );
+
+        $collection->query(
+                query_texts => [
+                        'a pink scarf, a blue hat, green gloves'
+                ],
+                n_results => 1
+        );
+
 =head1 Methods
 
 =cut
 
 =head2 add
 
+Add items to the collection.
+
+	$collection->add(
+		documents => [
+			'a blue scarf, a red hat, a woolly jumper, black gloves',
+			'a pink scarf, a blue hat, a woolly jumper, green gloves'
+		],
+		ids => [
+			"1",
+			"2"
+		]
+	);
+
 =head2 upsert
+
+Update or insert items into the collection.
+
+	$collection->upsert(
+		documents => [
+			'a blue scarf, a red hat, a woolly jumper, black gloves',
+			'a pink scarf, a blue hat, a woolly jumper, green gloves'
+		],
+		ids => [
+			"1",
+			"2"
+		]
+	);
 
 =head2 update
 
+Update items in the collection.
+
+	$collection->update(
+		documents => [
+			'a blue scarf, a red hat, a woolly jumper, black gloves',
+			'a pink scarf, a blue hat, a woolly jumper, green gloves'
+		],
+		ids => [
+			"1",
+			"2"
+		]
+	);
+
 =head2 get
+
+Retrieve items from the collection.
+
+	$collection->get(
+		ids => [
+			"1",
+			"2"
+		]
+	);
 
 =head2 query
 
+Retrieve items from the collection by query.
+
+	 $collection->query(
+                query_texts => [
+                        'a pink scarf, a blue hat, green gloves'
+                ],
+                n_results => 1
+        );
+
 =head2 delete
 
+Delete items from the collection.
+
+	$collection->delete(
+		ids => [
+			"1",
+			"2"
+		]
+	);
+
 =head2 count
+
+Returns the count for total number of items in the collection.
+
+	$collection->count();
 
 =head1 AUTHOR
 

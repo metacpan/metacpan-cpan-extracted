@@ -7,7 +7,7 @@ use parent qw( Exporter );
 our @EXPORT_OK = qw( plugin_data );
 
 # ABSTRACT: Platform and local customizations of FFI::Build
-our $VERSION = '2.09'; # VERSION
+our $VERSION = '2.10'; # VERSION
 
 
 sub plugin_data
@@ -39,7 +39,7 @@ FFI::Build::PluginData - Platform and local customizations of FFI::Build
 
 =head1 VERSION
 
-version 2.09
+version 2.10
 
 =head1 SYNOPSIS
 

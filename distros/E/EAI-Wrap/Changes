@@ -66,3 +66,7 @@
 	- counting progress without precentage works now by setting countPercent to >= 100, fixed fallback to config level defined settings with prefix (in config subhash "lookups") also for loads, fixed unicode problems in log error mails, fixed problem in parsing scientific numer notations in DB.pm, caching of ftp handles in FTP.pm, additional folderEnvironmentMapping via accessed module's folder (if in test -> test), reset error mail filter ONLY for planned tasks, don't connect to FTP if redo from local file
 1.915  Wed Jul 23 00:00:00 2024
 	- fixed retry ending problem with executions running over midnight, made retry ending over midnight configurable with task{retryEndsAfterMidnight}, restricted execute info on start parameter dump (setupEAIWrap) to configured entries (sensitive info), also display now config hash on start parameter dump (without sensitive info), fixed time type parsing in DB.pm
+1.916  Sat Oct 19 00:00:00 2024
+	- DateUtil.pm: added convertJulianToYYYYMMDD, Wrap.pm/INIT: moved info print after setting $execute{envraw}, File.pm/writeText: added debug info
+1.917  Thu Dec 19 01:00:00 2024
+	- switched from "die/warn" to "confess/cluck", fixed plink verbose (-v) argument problem in FTP.pm

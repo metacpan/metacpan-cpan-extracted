@@ -46,10 +46,10 @@ subtest "bad file" => sub {
 
     cmp_deeply $c->log->msgs,
       [
-        {
+        superhashof( {
             level   => "error",
             message => all( isa('Catalyst::Exception'), methods( message => re( "^" . quotemeta($msg) ) ) ),
-        }
+        } )
       ],
       "logged exception";
 

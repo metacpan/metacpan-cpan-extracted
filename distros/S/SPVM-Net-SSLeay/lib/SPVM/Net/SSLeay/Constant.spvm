@@ -1265,4 +1265,14 @@ class Net::SSLeay::Constant {
 
   native static method SSL_MODE_SEND_FALLBACK_SCSV : int ();
 
+  native static method SSL_TLSEXT_ERR_OK : int ();
+
+  native static method SSL_TLSEXT_ERR_ALERT_FATAL : int ();
+
+  native static method SSL_TLSEXT_ERR_NOACK : int ();
+
+  native static method OPENSSL_NPN_NEGOTIATED : int ();
+
+  native static method OPENSSL_NPN_NO_OVERLAP : int ();
+
 }

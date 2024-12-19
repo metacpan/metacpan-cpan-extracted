@@ -1,3 +1,38 @@
+0.031 2024-12-19
+  [New Features]
+    * Add Net::SSLeay#select_next_proto method.
+    * Add the following methods to Net::SSLeay::Constant class.
+    
+      static method SSL_TLSEXT_ERR_OK : int ();
+
+      static method SSL_TLSEXT_ERR_ALERT_FATAL : int ();
+
+      static method SSL_TLSEXT_ERR_NOACK : int ();
+
+      static method OPENSSL_NPN_NEGOTIATED : int ();
+
+      static method OPENSSL_NPN_NO_OVERLAP : int ();
+
+  [Changes]
+    * Change the definition of Net::SSLeay::SSL_CTX#set_alpn_select_cb method
+      [Before]
+        method set_alpn_select_cb : void ($cb : Net::SSLeay::Callback::AlpnSelect);
+      [After]
+        method set_alpn_select_cb : void ($cb : Net::SSLeay::Callback::AlpnSelect, $arg : object = undef);
+  [Incompatible Changes]
+    * Change the definition of Net::SSLeay::SSL_CTX#set_alpn_protos method
+      [Before]
+      method set_alpn_protos : int ($protos : byte[], $protos_len : int = -1);
+      [After]
+      method set_alpn_protos : int ($protos : string, $protos_len : int = -1);
+    * Change the definition of Net::SSLeay::Util#convert_to_wire_format method
+      [Before]
+      static method convert_to_wire_format : byte[] ($protocols : string[]);
+      [After]
+      static method convert_to_wire_format : string ($protocols : string[]);
+    * Remove all $arg argument in callback interfaces and callback setter methods.
+  [Test Improvement]
+    * Add many tests for callbacks.
 0.030 2024-12-18
   [Bug Fix]
     * Fix bugs of Net::SSLeay#get_SSL_CTX method.

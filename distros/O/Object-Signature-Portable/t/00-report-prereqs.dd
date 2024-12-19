@@ -6,6 +6,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Perl::Critic' => '1.156',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
@@ -26,10 +27,12 @@ do { my $x = {
                                         'Crypt::Digest' => '0.062'
                                       },
                       'requires' => {
+                                      'Carp' => '0',
                                       'Crypt::Digest' => '0',
                                       'Exporter' => '5.57',
                                       'JSON::MaybeXS' => '0',
-                                      'perl' => 'v5.14.0'
+                                      'perl' => 'v5.14.0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -41,7 +44,8 @@ do { my $x = {
                                    'Module::Metadata' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
-                                   'if' => '0'
+                                   'if' => '0',
+                                   'strict' => '0'
                                  }
                  }
      };

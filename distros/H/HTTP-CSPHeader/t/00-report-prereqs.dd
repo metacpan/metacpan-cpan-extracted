@@ -1,4 +1,10 @@
 do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'ExtUtils::MakeMaker' => '7.22',
+                                    'Module::Metadata' => '1.000015'
+                                  }
+                  },
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
@@ -6,8 +12,10 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Perl::Critic' => '1.156',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Test::CPAN::Changes' => '0.500002',
+                                      'Test::CVE' => '0.08',
                                       'Test::CleanNamespaces' => '0.15',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
@@ -44,7 +52,7 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'File::Spec' => '0',
-                                   'Module::Metadata' => '0',
+                                   'Module::Metadata' => '1.000015',
                                    'Plack::Middleware::ContentLength' => '0',
                                    'Plack::Middleware::Head' => '0',
                                    'Test2::V0' => '0',

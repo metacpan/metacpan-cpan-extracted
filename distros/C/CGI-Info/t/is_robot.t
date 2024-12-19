@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 34;
-use Test::NoWarnings;
+use Test::Most tests => 33;
 use Data::Dumper;
 
 use lib 't/lib';

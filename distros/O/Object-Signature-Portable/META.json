@@ -28,6 +28,7 @@
       },
       "develop" : {
          "requires" : {
+            "Perl::Critic" : "1.156",
             "Pod::Coverage::TrustPod" : "0",
             "Test::EOF" : "0",
             "Test::EOL" : "0",
@@ -48,10 +49,12 @@
             "Crypt::Digest" : "0.062"
          },
          "requires" : {
+            "Carp" : "0",
             "Crypt::Digest" : "0",
             "Exporter" : "5.57",
             "JSON::MaybeXS" : "0",
-            "perl" : "v5.14.0"
+            "perl" : "v5.14.0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -63,14 +66,15 @@
             "Module::Metadata" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
-            "if" : "0"
+            "if" : "0",
+            "strict" : "0"
          }
       }
    },
    "provides" : {
       "Object::Signature::Portable" : {
          "file" : "lib/Object/Signature/Portable.pm",
-         "version" : "v1.2.0"
+         "version" : "v1.2.2"
       }
    },
    "release_status" : "stable",
@@ -84,7 +88,7 @@
          "web" : "https://github.com/robrwo/Object-Signature-Portable"
       }
    },
-   "version" : "v1.2.0",
+   "version" : "v1.2.2",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Slaven Rezi\u0107 <slaven@rezic.de>"

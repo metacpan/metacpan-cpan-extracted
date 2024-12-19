@@ -2,7 +2,7 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.030";
+  version "0.031";
   
   use Net::SSLeay::Constant as SSL;
   use Net::SSLeay::SSL_CTX;
@@ -31,8 +31,6 @@ class Net::SSLeay {
   
   has msg_callback : Net::SSLeay::Callback::Msg;
   
-  has msg_callback_arg : object;
-  
   # Class Methods
   native static method new : Net::SSLeay ($ssl_ctx : Net::SSLeay::SSL_CTX);
   
@@ -50,6 +48,8 @@ class Net::SSLeay {
   native static method alert_desc_string_long : string ($value : int);
   
   native static method load_client_CA_file : Net::SSLeay::X509_NAME[] ($file : string);
+  
+  native static method select_next_proto : int ($out_ref : string[], $outlen_ref : byte*, $server : string, $server_len : int, $client : string, $client_len : int);
   
   # Instance Methods
   protected method init : void ($objects : object[] = undef) {
@@ -115,7 +115,7 @@ class Net::SSLeay {
     return $protocol;
   }
   
-  native method set_msg_callback : void ($cb : Net::SSLeay::Callback::Msg, $arg : object = undef);
+  native method set_msg_callback : void ($cb : Net::SSLeay::Callback::Msg);
   
   method dump_peer_certificate : string () {
     

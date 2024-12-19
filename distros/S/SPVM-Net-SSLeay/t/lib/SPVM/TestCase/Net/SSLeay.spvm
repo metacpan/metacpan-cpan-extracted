@@ -68,6 +68,22 @@ class TestCase::Net::SSLeay {
     
     $ssl_ctx->use_certificate_chain_file("$FILE_DIR/simple-cert.certchain.pem");
     
+    my $set_tlsext_servername_callback_result = [0];
+    $ssl_ctx->set_tlsext_servername_callback([$set_tlsext_servername_callback_result : int[]] method : int ($ssl : Net::SSLeay, $al_ref : int*) {
+      
+      $set_tlsext_servername_callback_result->[0] = 1;
+      
+      warn "[Test Output][set_tlsext_servername_callback]\$ssl->get_servername:" . $ssl->get_servername(SSL->TLSEXT_NAMETYPE_host_name);
+      
+      warn "[Test Output][set_tlsext_servername_callback]\$\$al_ref:$$al_ref";
+      
+      return 1;
+    });
+    
+    my $protocols = ["spdy/1", "http/1.1"];
+    
+    $ssl_ctx->set_alpn_select_cb_with_protocols($protocols);
+    
     my $accepted_socket = $server_socket->accept;
     
     $accepted_socket->accept_SSL;
@@ -176,19 +192,35 @@ class TestCase::Net::SSLeay {
         
         my $ssl_ctx = $socket->ssl_ctx;
         
-        $ssl_ctx->use_PrivateKey_file("$FILE_DIR/simple-cert.key.pem");
+        my $default_passwd_cb = [$that : Net::SSLeay::SSL_CTX = $ssl_ctx] method : int ($buf : mutable string, $size : int, $rwflag : int) {
+          
+          my $password = "test";
+          my $password_length = length $password;
+          
+          Fn->memcpy($buf, 0, $password, 0, $password_length);
+          
+          $that->get_mode;
+          
+          return $password_length;
+        };
+        
+        weaken $default_passwd_cb->{that};
+        
+        $ssl_ctx->set_default_passwd_cb($default_passwd_cb);
+        
+        $ssl_ctx->use_PrivateKey_file("$FILE_DIR/simple-cert.key.enc.pem");
         
         $ssl_ctx->use_certificate_file("$FILE_DIR/simple-cert.cert.pem");
         
         $ssl_ctx->set_post_handshake_auth(1);
         
-        $ssl_ctx->set_alpn_protos_with_protocols(["http1.1"]);
+        $ssl_ctx->set_alpn_protos_with_protocols(["http/1.1"]);
         
         my $msg_callback_results = new object[10];
         
-        my $msg_callback = [$msg_callback_results : object[]]method : void ($write_p : int, $version : int, $content_type : int, $buf : string, $len : int, $ssl : Net::SSLeay, $arg : object) {          
+        my $msg_callback = [$msg_callback_results : object[]]method : void ($write_p : int, $version : int, $content_type : int, $buf : string, $len : int, $ssl : Net::SSLeay) {          
           unless ($msg_callback_results->[0]) {
-            warn "[Test Output]\$write_p:$write_p,\$version:$version,\$content_type:$content_type,\$buf:" . dump $buf . ",\$len:$len,\$ssl:" . type_name($ssl) . ",\$arg:" . $arg->(int);
+            warn "[Test Output]\$write_p:$write_p,\$version:$version,\$content_type:$content_type,\$buf:" . dump $buf . ",\$len:$len,\$ssl:" . type_name($ssl);
             
             $msg_callback_results->[0] = $write_p;
             $msg_callback_results->[1] = $version;
@@ -201,15 +233,19 @@ class TestCase::Net::SSLeay {
             $ssl_hash->weaken("ssl");
             
             $msg_callback_results->[5] = $ssl_hash;
-            $msg_callback_results->[6] = $arg;
             
           }
         };
         
-        my $msg_callback_arg = Int->new(10);
+        my $host_name = "localhost";
         
-        $socket->add_before_connect_SSL_cb([$msg_callback : Net::SSLeay::Callback::Msg, $msg_callback_arg : object] method : void ($ssl : Net::SSLeay) {
-          $ssl->set_msg_callback($msg_callback, $msg_callback_arg);
+        my $verify_param = $ssl_ctx->get0_param;
+        
+        $verify_param->set1_host($host_name);
+        
+        $socket->add_before_connect_SSL_cb([$msg_callback : Net::SSLeay::Callback::Msg, $host_name : string] method : void ($ssl : Net::SSLeay) {
+          $ssl->set_msg_callback($msg_callback);
+          $ssl->set_tlsext_host_name($host_name);
         });
         
         $socket->connect_SSL;
@@ -241,10 +277,6 @@ class TestCase::Net::SSLeay {
         }
         
         unless ($msg_callback_results->[5]->(Hash)->get("ssl") is_type Net::SSLeay) {
-          $success_ref->[0] = 0;
-        }
-        
-        unless ($msg_callback_results->[6]->(int) == 10) {
           $success_ref->[0] = 0;
         }
         
@@ -285,6 +317,10 @@ class TestCase::Net::SSLeay {
         }
         
         my $alpn_selected_protocol = $ssl->get0_alpn_selected_return_string;
+        
+        unless ($alpn_selected_protocol eq "http/1.1") {
+          $success_ref->[0] = 0;
+        }
         
         my $cipher = $ssl->get_cipher;
         

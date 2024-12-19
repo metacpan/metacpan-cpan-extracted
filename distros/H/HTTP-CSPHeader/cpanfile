@@ -11,9 +11,14 @@ requires "perl" => "v5.14.0";
 recommends "Ref::Util::XS" => "0";
 recommends "Type::Tiny::XS" => "0";
 
+on 'build' => sub {
+  requires "ExtUtils::MakeMaker" => "7.22";
+  requires "Module::Metadata" => "1.000015";
+};
+
 on 'test' => sub {
   requires "File::Spec" => "0";
-  requires "Module::Metadata" => "0";
+  requires "Module::Metadata" => "1.000015";
   requires "Plack::Middleware::ContentLength" => "0";
   requires "Plack::Middleware::Head" => "0";
   requires "Test2::V0" => "0";
@@ -31,8 +36,10 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "Perl::Critic" => "1.156";
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Test::CPAN::Changes" => "0.500002";
+  requires "Test::CVE" => "0.08";
   requires "Test::CleanNamespaces" => "0.15";
   requires "Test::EOF" => "0";
   requires "Test::EOL" => "0";

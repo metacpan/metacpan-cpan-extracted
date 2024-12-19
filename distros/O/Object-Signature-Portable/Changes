@@ -1,5 +1,24 @@
 Revision history for perl distribution Object-Signature-Portable:
 
+v1.2.2    2024-12-18 14:33:43+00:00 Europe/London
+  [Documentation]
+  - Fixed a typo that references the security policy.
+
+  [Tests]
+  - Add more author tests.
+
+v1.2.1    2024-12-18 11:53:57+00:00 Europe/London
+  [Documentation]
+  - Fixed typo.
+
+  - Renamed SECURITY-POLICY.md to SECURITY.md
+
+  [Tests]
+  - Added Perl::Critic configuration.
+
+  [Other]
+  - Include core modules in prerequisites.
+
 v1.2.0    2024-12-06 19:31:53+00:00 Europe/London
   [Incompatible Changes]
   - Bumped minimum supported Perl version to v5.14.

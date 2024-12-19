@@ -198,14 +198,17 @@ sub do_encoding_tests($) {
     ### try to show enough information to debug it...
     my sub _passthru_test(@) {
       my %debug_opts = @_;
+      oops unless exists($debug_opts{debug});
+      oops unless exists($debug_opts{verbose});
 
       # Call convert_spreadsheet() directly, passing inpath as an option
-  ##    my $h_cs = doconvert(inpath => $input_csvpath, cvt_to => 'csv',
-  ##                         @inenc_opts, @outenc_opts, %debug_opts);
-warn "#------------ _passthru_test ------------------\n" if $debug_opts{debug};
+warn "#------------ _passthru_test ---(exp=$exp_passthru)--------\n" if $debug_opts{debug};
+warn "#------------ ",qsh($input_csvpath),"\n" if $debug_opts{debug};
+#warn "Using tempdir => /tmp/J ...\n";
       my $h_cs = convert_spreadsheet(
-                   debug => $debug, verbose => $verbose, silent => $silent,
+                   silent => $silent,
                    inpath => $input_csvpath, cvt_to => 'csv',
+#tempdir => "/tmp/J",  ####TEMP TEMP TEMP
                    @inenc_opts, @outenc_opts, %debug_opts);
       my $got_passthru = ($h_cs->{outpath} eq $input_csvpath);
       if (!!$got_passthru ne !!$exp_passthru) {
@@ -269,7 +272,9 @@ warn "#------------ _passthru_test ------------------\n" if $debug_opts{debug};
 
     eval { _passthru_test(debug => $debug, verbose => $verbose) };
     if ($@) {
-      warn __FILE__,":",__LINE__," - failed: $@\nRE_TRYING WITH DEBUG...\n";
+      warn __FILE__,":",__LINE__," - failed: $@\n";
+      die "died" if $debug && $verbose;
+      warn "RE_TRYING WITH DEBUG...\n";
       $Carp::Verbose = 1; # redundant with Carp::Always
       require Carp::Always;
       Carp::Always->import();

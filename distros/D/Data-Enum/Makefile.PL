@@ -2,36 +2,41 @@
 use strict;
 use warnings;
 
-use 5.014000;
+use 5.020000;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "immutable enumeration classes",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "7.22",
+    "Module::Metadata" => "1.000015"
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Data-Enum",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.014000",
+  "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "Data::Enum",
   "PREREQ_PM" => {
     "List::Util" => "1.45",
     "Package::Stash" => 0,
     "Scalar::Util" => 0,
     "constant" => 0,
+    "experimental" => 0,
     "overload" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
-    "Module::Metadata" => 0,
+    "Module::Metadata" => "1.000015",
     "Test::More" => 0,
     "Test::Most" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.5.0",
+  "VERSION" => "v0.6.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,14 +44,16 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "ExtUtils::MakeMaker" => "7.22",
   "File::Spec" => 0,
   "List::Util" => "1.45",
-  "Module::Metadata" => 0,
+  "Module::Metadata" => "1.000015",
   "Package::Stash" => 0,
   "Scalar::Util" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
   "constant" => 0,
+  "experimental" => 0,
   "overload" => 0,
   "strict" => 0,
   "warnings" => 0

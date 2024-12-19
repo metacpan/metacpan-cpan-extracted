@@ -1,8 +1,8 @@
-package EAI::FTP 1.916;
+package EAI::FTP 1.917;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Net::SFTP::Foreign (); use Net::SFTP::Foreign::Constants qw( SFTP_ERR_LOCAL_UTIME_FAILED ); use Net::FTP (); use Text::Glob qw(match_glob);
-use Log::Log4perl qw(get_logger); use File::Temp qw(tempfile); use Data::Dumper qw(Dumper); use Scalar::Util 'blessed'; use Fcntl ':mode'; # for S_ISREG check in removeFilesOlderX
+use Carp qw(confess longmess); use Log::Log4perl qw(get_logger); use File::Temp qw(tempfile); use Data::Dumper qw(Dumper); use Scalar::Util 'blessed'; use Fcntl ':mode'; # for S_ISREG check in removeFilesOlderX
 use EAI::DateUtil qw(get_curdatetime get_curdate addDatePart parseFromYYYYMMDD);
 # for passwords that contain <#|>% we have to use shell quoting on windows (special "use" to make this optional on non-win environments)
 BEGIN {
@@ -150,27 +150,27 @@ sub removeFilesOlderX ($) {
 			my $remoteDir = ($param->{remoteDir} ? $param->{remoteDir} : "");
 			$logger->debug(($remoteDir ? "changing into ".$remoteDir : "remaining in home"));
 			if (substr($remoteDir,0,1) eq "/" and $param->{noDirectRemoteDirChange}) {
-				_setcwd(undef) or $logger->error("can't change into home (\$param->{noDirectRemoteDirChange} is set, first changing to home)"); # starting / means start from home...
+				_setcwd(undef) or $logger->error("can't change into home (\$param->{noDirectRemoteDirChange} is set, first changing to home)".longmess()); # starting / means start from home...
 			}
 			$remoteDir = substr($remoteDir,1) if substr($remoteDir,0,1) eq "/" and $param->{noDirectRemoteDirChange};
 			if (_setcwd($remoteDir.$folder)) {
 				$logger->debug("changed into $remoteDir$folder");
-				my $files = _ls_age($mtimeToKeep) or $logger->error("can't get file list, reason: "._error().", status: "._status());
+				my $files = _ls_age($mtimeToKeep) or $logger->error("can't get file list, reason: "._error().", status: "._status().longmess());
 				for my $file (@$files) {
 					$logger->info("$remoteDir$folder:".($param->{simulate} ? "simulate removal of: " : "removing: ").$file->{filename});
 					unless ($param->{simulate}) {
-						_remove($file->{filename}) or $logger->error("can't remove $file->{filename}: "._error().", status: "._status());
+						_remove($file->{filename}) or $logger->error("can't remove $file->{filename}: "._error().", status: "._status().longmess());
 					}
 				}
 				$logger->info("$remoteDir$folder: no Files to remove !") if !@$files;
 			} else {
-				$logger->error("can't change into remote-directory $remoteDir$folder: "._error().", status: "._status());
+				$logger->error("can't change into remote-directory $remoteDir$folder: "._error().", status: "._status().longmess());
 				return 0;
 			}
 		}
 		$logger->info("remove files finished ...");
 	} else {
-		$logger->error("no ftp connection opened!");
+		$logger->error("no ftp connection opened!".longmess());
 		return 0;
 	}
 	return 1;
@@ -188,7 +188,7 @@ sub fetchFiles ($$) {
 		my $remoteDir = ($FTP->{remoteDir} ? $FTP->{remoteDir} : "");
 		$logger->debug(($remoteDir ? "changing into ".$remoteDir : "remaining in home"));
 		if (substr($remoteDir,0,1) eq "/" and $FTP->{noDirectRemoteDirChange}) {
-			_setcwd(undef) or $logger->error("can't change into home (\$FTP->{noDirectRemoteDirChange} is set, first changing to home)"); # starting / means start from home...
+			_setcwd(undef) or $logger->error("can't change into home (\$FTP->{noDirectRemoteDirChange} is set, first changing to home)".longmess()); # starting / means start from home...
 		}
 		$remoteDir = substr($remoteDir,1) if substr($remoteDir,0,1) eq "/" and $FTP->{noDirectRemoteDirChange};
 		if (_setcwd($remoteDir)) {
@@ -211,7 +211,7 @@ sub fetchFiles ($$) {
 								no warnings 'uninitialized';
 								$logger->debug("can't get remote-file ".$multipleRemoteFiles[$i].", reason: "._error().", error message suppressed because of \$param{firstRunSuccess}(".$param->{firstRunSuccess}.") or \$param{fileToRetrieveOptional}(".$param->{fileToRetrieveOptional}.")");
 							} else {
-								$logger->error("error: can't get remote-file ".$multipleRemoteFiles[$i]." from glob $remoteFile, reason: "._error().", status: "._status());
+								$logger->error("error: can't get remote-file ".$multipleRemoteFiles[$i]." from glob $remoteFile, reason: "._error().", status: "._status().longmess());
 							}
 							@{$param->{retrievedFiles}} = ();
 							return 0;
@@ -230,7 +230,7 @@ sub fetchFiles ($$) {
 							no warnings 'uninitialized';
 							$logger->debug("can't get remote-file $remoteFile, reason: "._error().", error message suppressed because of \$param{firstRunSuccess}(".$param->{firstRunSuccess}.") or \$param{fileToRetrieveOptional}(".$param->{fileToRetrieveOptional}.")");
 						} else {
-							$logger->error("can't get remote-file $remoteFile, reason: "._error().", status: "._status());
+							$logger->error("can't get remote-file $remoteFile, reason: "._error().", status: "._status().longmess());
 						}
 						@{$param->{retrievedFiles}} = ();
 						return 0;
@@ -242,11 +242,11 @@ sub fetchFiles ($$) {
 				}
 			}
 		} else {
-			$logger->error("can't change into remote-directory $remoteDir, reason: "._error());
+			$logger->error("can't change into remote-directory $remoteDir, reason: "._error().longmess());
 			return 0;
 		}
 	} else {
-		$logger->error("no ftp connection opened!");
+		$logger->error("no ftp connection opened!".longmess());
 		return 0;
 	}
 	return 1;
@@ -260,7 +260,7 @@ sub putFile ($$) {
 	@localFiles = @{$param->{filesToWrite}} if $param->{filesToWrite} and ref($param->{filesToWrite}) eq "ARRAY";
 	$localFile = $param->{fileToWrite} if $param->{fileToWrite};
 	if (!$localFile and @localFiles == 0) {
-		$logger->error("no file(s) to upload (fileToWrite or filesToWrite parameter) !");
+		$logger->error("no file(s) to upload (fileToWrite or filesToWrite parameter) !".longmess());
 		return 0;
 	};
 	push @localFiles, $localFile if $localFile;
@@ -269,7 +269,7 @@ sub putFile ($$) {
 		my $remoteDir = ($FTP->{remoteDir} ? $FTP->{remoteDir} : "");
 		$logger->debug(($remoteDir ? "changing into ".$remoteDir : "remaining in home"));
 		if (substr($remoteDir,0,1) eq "/" and $FTP->{noDirectRemoteDirChange}) {
-			_setcwd(undef) or $logger->error("can't change into home (\$FTP->{noDirectRemoteDirChange} is set, first changing to home)"); # starting / means start from home...
+			_setcwd(undef) or $logger->error("can't change into home (\$FTP->{noDirectRemoteDirChange} is set, first changing to home)".longmess()); # starting / means start from home...
 		}
 		$remoteDir = substr($remoteDir,1) if substr($remoteDir,0,1) eq "/" and $FTP->{noDirectRemoteDirChange};
 		if (_setcwd($remoteDir)) {
@@ -278,16 +278,16 @@ sub putFile ($$) {
 				if ($FTP->{dontUseTempFile}) {
 					$logger->info("uploading file $localFile \$doSetStat: $doSetStat");
 					if (!_put($localFile, $doSetStat, $FTP->{additionalParamsPut})) {
-						$logger->error("can't upload local file $localFile to remote dir $FTP->{remoteDir}, reason: "._error());
+						$logger->error("can't upload local file $localFile to remote dir $FTP->{remoteDir}, reason: "._error().longmess());
 						return 0;
 					}
 				} else {
 					# safe method for uploading in case a monitor "listens": upload temp file, then rename remotely to final name
 					# first rename to temp... locally
-					rename $localFile, "temp.".$localFile or $logger->error("can't rename local file $localFile to temp.$localFile, reason: $!") ;
+					rename $localFile, "temp.".$localFile or $logger->error("can't rename local file $localFile to temp.$localFile, reason: $!".longmess()) ;
 					$logger->info("uploading file temp.$localFile, \$doSetStat: $doSetStat");
 					if (!_put("temp.$localFile", $doSetStat, $FTP->{additionalParamsPut})) {
-						$logger->error("error: can't upload local file temp.$localFile to ${remoteDir}/temp.$localFile, reason: "._error());
+						$logger->error("error: can't upload local file temp.$localFile to ${remoteDir}/temp.$localFile, reason: "._error().longmess());
 						return 0;
 					}
 					$logger->info("uploaded file temp.$localFile");
@@ -297,7 +297,7 @@ sub putFile ($$) {
 						if ($ftp->rename("temp.".$localFile,$localFile)) {
 							$logger->debug("Sftp: temporary file $remoteDir/temp.$localFile renamed to $localFile");
 						} else {
-							$logger->error("can't rename remote-file $remoteDir/temp.$localFile to $localFile, reason: "._error()) ;
+							$logger->error("can't rename remote-file $remoteDir/temp.$localFile to $localFile, reason: "._error().longmess()) ;
 						}
 					}
 					# last rename temp locally as well for further processing
@@ -305,11 +305,11 @@ sub putFile ($$) {
 				}
 			}
 		} else {
-			$logger->error("can't change into remote-directory $remoteDir, reason: "._error());
+			$logger->error("can't change into remote-directory $remoteDir, reason: "._error().longmess());
 			return 0;
 		}
 	} else {
-		$logger->error("no ftp connection opened!");
+		$logger->error("no ftp connection opened!".longmess());
 		return 0;
 	}
 	$logger->info("finished uploading file(s) @localFiles ".($FTP->{dontUseTempFile} ? "" : "(as temp. files)"));
@@ -321,7 +321,7 @@ sub moveTempFile ($$) {
 	my ($FTP, $param) = @_;
 	my $logger = get_logger();
 	my $localFile = $param->{fileToWrite} or do {
-		$logger->error("no file to upload (fileToWrite parameter) !");
+		$logger->error("no file to upload (fileToWrite parameter) !".longmess());
 		return 0;
 	};
 	$logger->info("final rename of temp Files for $localFile");
@@ -329,7 +329,7 @@ sub moveTempFile ($$) {
 		my $remoteDir = ($FTP->{remoteDir} ? $FTP->{remoteDir} : "");
 		$logger->debug(($remoteDir ? "changing into ".$remoteDir : "remaining in home"));
 		if (substr($remoteDir,0,1) eq "/" and $FTP->{noDirectRemoteDirChange}) {
-			_setcwd(undef) or $logger->error("can't change into home (\$FTP->{noDirectRemoteDirChange} is set, first changing to home)"); # starting / means start from home...
+			_setcwd(undef) or $logger->error("can't change into home (\$FTP->{noDirectRemoteDirChange} is set, first changing to home)".longmess()); # starting / means start from home...
 		}
 		$remoteDir = substr($remoteDir,1) if substr($remoteDir,0,1) eq "/" and $FTP->{noDirectRemoteDirChange};
 		if (_setcwd($remoteDir)) {
@@ -337,15 +337,15 @@ sub moveTempFile ($$) {
 			if ($ftp->rename("temp.".$localFile,$localFile)) {
 				$logger->debug("temporary file ${remoteDir}/temp.$localFile renamed to $localFile");
 			} else {
-				$logger->error("error: can't rename remote-file ${remoteDir}/temp.$localFile to $localFile, reason:"._error());
+				$logger->error("error: can't rename remote-file ${remoteDir}/temp.$localFile to $localFile, reason:"._error().longmess());
 				return 0;
 			}
 		} else {
-			$logger->error("can't change into remote-directory ${remoteDir}, reason: "._error());
+			$logger->error("can't change into remote-directory ${remoteDir}, reason: "._error().longmess());
 			return 0;
 		}
 	} else {
-		$logger->error("no ftp connection opened!");
+		$logger->error("no ftp connection opened!".longmess());
 		return 0;
 	}
 	return 1;
@@ -363,7 +363,7 @@ sub archiveFiles ($) {
 		my $remoteDir = ($param->{remoteDir} ? $param->{remoteDir} : "");
 		$logger->debug(($remoteDir ? "changing into ".$remoteDir : "remaining in home"));
 		if (substr($remoteDir,0,1) eq "/" and $param->{noDirectRemoteDirChange}) {
-			_setcwd(undef) or $logger->error("can't change into home (\$param->{noDirectRemoteDirChange} is set, first changing to home)"); # starting / means start from home...
+			_setcwd(undef) or $logger->error("can't change into home (\$param->{noDirectRemoteDirChange} is set, first changing to home)".longmess()); # starting / means start from home...
 		}
 		$remoteDir = substr($remoteDir,1) if substr($remoteDir,0,1) eq "/" and $param->{noDirectRemoteDirChange};
 		my $archiveDir = ((substr($param->{archiveDir},-1) eq "/" or $param->{archiveDir} eq "") ? $param->{archiveDir} : $param->{archiveDir}."/") if $param->{archiveDir}; $archiveDir.="";
@@ -381,8 +381,8 @@ sub archiveFiles ($) {
 							$logger->debug("remote-file $specFile archived to $specFilePathOnly$archiveDir$archiveTimestamp$specFileNameOnly");
 						} else {
 							my $errmsg = _error();
-							$logger->error("error: can't rename remote-file $specFile to $specFilePathOnly$archiveDir$archiveTimestamp$specFileNameOnly, reason: $errmsg") if $errmsg !~ /No such file or directory/;
-							$logger->warn("error: $errmsg") if $errmsg =~ /No such file or directory/;
+							$logger->error("error: can't rename remote-file $specFile to $specFilePathOnly$archiveDir$archiveTimestamp$specFileNameOnly, reason: $errmsg".longmess()) if $errmsg !~ /No such file or directory/;
+							$logger->warn("error: $errmsg".longmess()) if $errmsg =~ /No such file or directory/;
 						}
 					}
 				} else {
@@ -390,17 +390,17 @@ sub archiveFiles ($) {
 						$logger->debug("remote-file $remoteDir/$remoteFile archived to $archiveDir$archiveTimestamp$remoteFile");
 					} else {
 						my $errmsg = _error();
-						$logger->error("error: can't rename remote-file $remoteDir/$remoteFile to $archiveDir$archiveTimestamp$remoteFile, reason: $errmsg") if $errmsg !~ /no such file or directory/i and $errmsg !~ /does not exist/i;
-						$logger->warn("error: $errmsg") if $errmsg =~ /no such file or directory/i or $errmsg !~ /does not exist/i;
+						$logger->error("error: can't rename remote-file $remoteDir/$remoteFile to $archiveDir$archiveTimestamp$remoteFile, reason: $errmsg".longmess()) if $errmsg !~ /no such file or directory/i and $errmsg !~ /does not exist/i;
+						$logger->warn("error: $errmsg".longmess()) if $errmsg =~ /no such file or directory/i or $errmsg !~ /does not exist/i;
 					}
 				}
 			}
 		} else {
-			$logger->error("can't change into remote-directory ${remoteDir}, reason: "._error());
+			$logger->error("can't change into remote-directory ${remoteDir}, reason: "._error().longmess());
 		}
 	} else {
-		$logger->error("no ftp connection opened") unless $ftp;
-		$logger->error("no files to archive given") unless @filesToArchive;
+		$logger->error("no ftp connection opened".longmess()) unless $ftp;
+		$logger->error("no files to archive given".longmess()) unless @filesToArchive;
 		return 0;
 	}
 	return 1;
@@ -416,7 +416,7 @@ sub removeFiles ($) {
 		my $remoteDir = ($param->{remoteDir} ? $param->{remoteDir} : "");
 		$logger->debug(($remoteDir ? "changing into ".$remoteDir : "remaining in home"));
 		if (substr($remoteDir,0,1) eq "/" and $param->{noDirectRemoteDirChange}) {
-			_setcwd(undef) or $logger->error("can't change into home (\$param->{noDirectRemoteDirChange} is set, first changing to home)"); # starting / means start from home...
+			_setcwd(undef) or $logger->error("can't change into home (\$param->{noDirectRemoteDirChange} is set, first changing to home)".longmess()); # starting / means start from home...
 		}
 		$remoteDir = substr($remoteDir,1) if substr($remoteDir,0,1) eq "/" and $param->{noDirectRemoteDirChange};
 		if (_setcwd($remoteDir)) {
@@ -426,16 +426,16 @@ sub removeFiles ($) {
 					$logger->debug("removed remote-file $remoteFile");
 				} else {
 					my $errmsg = _error();
-					$logger->error("error: can't remove remote-file $remoteFile, reason: $errmsg") if $errmsg !~ /no such file/i and $errmsg !~ /does not exist/i;
-					$logger->warn("error: can't remove remote-file $remoteFile, reason: $errmsg") if $errmsg =~ /no such file/i or $errmsg !~ /does not exist/i;
+					$logger->error("error: can't remove remote-file $remoteFile, reason: $errmsg".longmess()) if $errmsg !~ /no such file/i and $errmsg !~ /does not exist/i;
+					$logger->warn("error: can't remove remote-file $remoteFile, reason: $errmsg".longmess()) if $errmsg =~ /no such file/i or $errmsg !~ /does not exist/i;
 				}
 			}
 		} else {
-			$logger->error("can't change into remote-directory $remoteDir, reason: "._error());
+			$logger->error("can't change into remote-directory $remoteDir, reason: "._error().longmess());
 		}
 	} else {
-		$logger->error("no ftp connection opened") unless $ftp;
-		$logger->error("no files to remove given") unless @filesToRemove;
+		$logger->error("no ftp connection opened".longmess()) unless $ftp;
+		$logger->error("no files to remove given".longmess()) unless @filesToRemove;
 		return 0;
 	}
 	return 1;
@@ -446,7 +446,7 @@ sub login ($$;$) {
 	my ($FTP,$setRemoteHost,$enforceConn) = @_;
 	my $logger = get_logger();
 	(!$setRemoteHost) and do {
-		$logger->error("remote host not set in \$setRemoteHost");
+		$logger->error("remote host not set in \$setRemoteHost".longmess());
 		return 0;
 	};
 	$RemoteHost = $setRemoteHost;
@@ -460,7 +460,7 @@ sub login ($$;$) {
 		if (_setcwd(undef)) {
 			return 1;
 		} else {
-			$logger->warn("reconnecting because existing connection had a problem: "._error());
+			$logger->warn("reconnecting because existing connection had a problem: "._error().longmess());
 			undef $ftpHandles{$RemoteHost};
 		}
 	}
@@ -475,31 +475,31 @@ sub login ($$;$) {
 	my $debugLevel = $FTP->{FTPdebugLevel};
 	if (defined($FTP->{hostkey}) || defined($FTP->{privKey}) || $FTP->{SFTP}) {
 		if (!$FTP->{sshInstallationPath}) {
-			$logger->error("no \$FTP->{sshInstallationPath} defined!");
+			$logger->error("no \$FTP->{sshInstallationPath} defined!".longmess());
 			return 0;
 		}
 		if (!defined($FTP->{pwd}) and !$FTP->{privKey}) {
-			$logger->error("neither \$FTP->{pwd} nor \$FTP->{privKey} defined!");
+			$logger->error("neither \$FTP->{pwd} nor \$FTP->{privKey} defined!".longmess());
 			return 0;
 		}
 		if ($FTP->{additionalParamsNew} and ref($FTP->{additionalParamsNew}) ne "HASH") {
-			$logger->error("\$FTP->{additionalParamsNew} is not ref to hash");
+			$logger->error("\$FTP->{additionalParamsNew} is not ref to hash".longmess());
 			return 0;
 		}
 		if ($FTP->{additionalMoreArgs} and ref($FTP->{additionalMoreArgs}) ne "ARRAY") {
-			$logger->error("\$FTP->{additionalMoreArgs} is not ref to array");
+			$logger->error("\$FTP->{additionalMoreArgs} is not ref to array".longmess());
 			return 0;
 		}
 		$logger->info("connecting to $RemoteHost using SSH FTP");
 		my @moreparams;
+		push @moreparams, "-v" if $debugLevel;
 		push @moreparams, ("-hostkey", $FTP->{hostkey}) if $FTP->{hostkey};
 		push @moreparams, ("-hostkey", $FTP->{hostkey2}) if $FTP->{hostkey2};
 		push @moreparams, ("-i", $FTP->{privKey}) if $FTP->{privKey};
-		push @moreparams, ("-v", "") if $debugLevel;
 		push @moreparams, @{$FTP->{additionalMoreArgs}} if $FTP->{additionalMoreArgs};
 		do {
-			$logger->debug("connection try: $connectionTries");
-			my $ssherr = File::Temp::tempfile() or $logger->error("couldn't open temp file for ftperrlog");
+			$logger->debug("connection try: $connectionTries ".Dumper($FTP));
+			my $ssherr = File::Temp::tempfile() or $logger->error("couldn't open temp file for ftperrlog".longmess());
 			# separate setting of debug level, additional to "-v" verbose
 			$Net::SFTP::Foreign::debug = $debugLevel;
 			no warnings 'Net::SFTP::Foreign'; # suppress warning on using insecure password authentication with plink
@@ -509,27 +509,25 @@ sub login ($$;$) {
 				password => $pwd,
 				port => ($FTP->{port} ? $FTP->{port} : '22'),
 				ssh_cmd => $FTP->{sshInstallationPath},
+				ssh_cmd_interface => 'plink',
 				more => \@moreparams,
-				stderr_fh => $ssherr,
 				($FTP->{additionalParamsNew} ? %{$FTP->{additionalParamsNew}} : ())
 			);
 			$connectionTries++;
 			$ftp->error and do {
-				$logger->warn("connection failed: ".$ftp->error.", output from Net::SFTP::Foreign:");
-				seek($ssherr, 0, 0);
-				$logger->warn($_) while (<$ssherr>);
-				close($ssherr);
+				$logger->warn("connection failed: ".$ftp->error);
 				# after first failure set full debug ...
 				if ($connectionTries == 1) {
-					$logger->warn("first call to Net::SFTP::Foreign->new failed, redoing with full debug..");
-					$debugLevel = -1;
+					$logger->warn("first call to Net::SFTP::Foreign->new failed, redoing with full debug and verbose setting..");
+					push @moreparams, "-v";
+					$debugLevel = 1|2|4|8|16|32|64|128|256|4096|8192|16384|32768; # exclude hexdumps (bits 10 and 11) and sensitive information (bit 16)
 				} else {
 					$debugLevel = $FTP->{FTPdebugLevel};
 				}
 			};
 		} until (!$ftp->error or $connectionTries == $maxConnectionTries);
 		if ($connectionTries == $maxConnectionTries and $ftp->error) {
-			$logger->error("connection finally failed after $maxConnectionTries connection tries: ".$ftp->error);
+			$logger->error("connection finally failed after $maxConnectionTries connection tries: ".$ftp->error.longmess());
 			undef $ftp;
 			return 0;
 		}
@@ -540,30 +538,30 @@ sub login ($$;$) {
 		do {
 			$ftp = Net::FTP->new($RemoteHost,Debug => $FTP->{FTPdebugLevel}, Port => ($FTP->{port} ? $FTP->{port} : '21'));
 			if (! defined($ftp)) {
-				$logger->error("connection to ".$RemoteHost." failed, reason: $@ $!");
+				$logger->error("connection to ".$RemoteHost." failed, reason: $@ $!".longmess());
 			} else {
 				$loginSuccess = $ftp->login($FTP->{user},$FTP->{pwd});
 				if (!$loginSuccess) { 
-					$logger->error("login failed, reason: ".$ftp->message);
+					$logger->error("login failed, reason: ".$ftp->message.longmess());
 					undef $ftp;
 				}
 			}
 			$connectionTries++;
 		} until ($loginSuccess or $connectionTries == $maxConnectionTries);
 		if ($connectionTries == $maxConnectionTries and !$loginSuccess) {
-			$logger->error("connection finally failed after $maxConnectionTries connection tries");
+			$logger->error("connection finally failed after $maxConnectionTries connection tries".longmess());
 			undef $ftp; $ftpHandles{$RemoteHost} = $ftp;
 			return 0;
 		}
 		if (defined($FTP->{type})) {
 			if ($FTP->{type} eq "A") {
 				if (!$ftp->ascii()) {
-					$logger->error("can't switch to ascii, reason: ".$ftp->message);
+					$logger->error("can't switch to ascii, reason: ".$ftp->message.longmess());
 					undef $ftp;
 				}
 			} else {
 				if (!$ftp->binary()) {
-					$logger->error("can't switch to binary, reason: ".$ftp->message);
+					$logger->error("can't switch to binary, reason: ".$ftp->message.longmess());
 					undef $ftp;
 				}
 			}
@@ -583,7 +581,7 @@ sub setHandle ($;$) {
 	my ($handle,$rhost) = @_;
 	my $logger = get_logger();
 	eval {
-		die "neither Net::SFTP::Foreign nor Net::FTP handle passed to setHandle, argument is '".(defined($handle) ? ref($handle) : "undefined")."'" unless $handle && blessed $handle && ($handle->isa('Net::SFTP::Foreign') or $handle->isa('Net::FTP')) ;
+		confess "neither Net::SFTP::Foreign nor Net::FTP handle passed to setHandle, argument is '".(defined($handle) ? ref($handle) : "undefined")."'" unless $handle && blessed $handle && ($handle->isa('Net::SFTP::Foreign') or $handle->isa('Net::FTP')) ;
 		$ftp = $handle;
 		$RemoteHost = $rhost;
 	};

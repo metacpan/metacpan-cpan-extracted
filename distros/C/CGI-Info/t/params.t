@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 use Test::Most tests => 192;
-use Test::NoWarnings;
 use File::Spec;
 use lib 't/lib';
 use MyLogger;
@@ -20,6 +19,7 @@ PARAMS: {
 	$ENV{'QUERY_STRING'} = 'foo=bar';
 
 	my $i = new_ok('CGI::Info');
+	ok(!defined($i->warnings()));
 	my %p = %{$i->params()};
 	ok($p{foo} eq 'bar');
 	ok(!defined($p{fred}));

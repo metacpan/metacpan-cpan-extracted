@@ -72,10 +72,6 @@ chosen module documentation carefully to set the indexes.
 L<Apache::Session>, L<http://lemonldap-ng.org>,
 L<https://lemonldap-ng.org/documentation/2.0/performances#performance_test>
 
-=head1 AUTHOR
-
-Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
 =head1 COPYRIGHT AND LICENSE
 
 =encoding utf8
@@ -84,9 +80,15 @@ Copyright (C):
 
 =over
 
-=item 2009-2017 by Xavier Guimard
+=item 2009-2023 by Xavier Guimard
 
-=item 2013-2017 by Clément Oudot
+=item 2013-2023 by Clément Oudot
+
+=item 2019-2023 by Maxime Besson
+
+=item 2013-2023 by Worteks
+
+=item 2023 by Linagora
 
 =back
 

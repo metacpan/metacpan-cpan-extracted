@@ -1,5 +1,12 @@
 Revision history for CGI-Info
 
+0.87	Wed Dec 18 11:06:09 EST 2024
+	Test warnings()
+	Allow the logger to be a ref to code
+	Fix is_mobile() default return code
+	Added t/30-basics.t
+	upload_dir must now be in, or a subdir of, tmpdir()
+
 0.86	Mon Nov 25 09:17:30 EST 2024
 	Ensure correct message is logged on SQL injection attempt
 	Remember warnings in the warnings array - added warnings() method

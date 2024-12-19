@@ -13,7 +13,7 @@ use File::Copy ();
 use ExtUtils::MakeMaker 7.12;
 
 # ABSTRACT: FFI::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '2.09'; # VERSION
+our $VERSION = '2.10'; # VERSION
 
 
 sub new
@@ -131,9 +131,9 @@ sub load_build
     $options = {
       source => ["$dir/*.c", "$dir/*.cxx", "$dir/*.cpp"],
     };
-    # if we see a Go, Rust or Zig control file then we assume the
+    # if we see a Go, V, Rust or Zig control file then we assume the
     # ffi mod is written in that language.
-    foreach my $control_file ("$dir/Cargo.toml", "$dir/go.mod", "$dir/build.zig")
+    foreach my $control_file ("$dir/Cargo.toml", "$dir/go.mod", "$dir/v.mod", "$dir/build.zig")
     {
       if(-f $control_file)
       {
@@ -308,7 +308,7 @@ FFI::Build::MM - FFI::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 2.09
+version 2.10
 
 =head1 SYNOPSIS
 

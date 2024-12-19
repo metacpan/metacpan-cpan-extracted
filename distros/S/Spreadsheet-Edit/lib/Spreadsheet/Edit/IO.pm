@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.023'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-15'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.025'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-18'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -59,7 +59,7 @@ use Digest::MD5 qw/md5_base64/;
 use Data::Hexify qw/Hexify/;
 use Text::CSV ();
 # DDI 5.025 is needed for Windows-aware qsh()
-use Data::Dumper::Interp 5.025 qw/vis visq dvis dvisq ivis ivisq avis qsh qshlist u/;
+use Data::Dumper::Interp 5.025 qw/vis visq visO dvis dvisq dvisO ivis ivisq avis qsh qshlist u visnew/;
 
 use Spreadsheet::Edit::Log qw/log_call fmt_call log_methcall fmt_methcall oops/,
                            ':btw=IO${lno}:';
@@ -650,10 +650,11 @@ sub _fmt_outpath_contents($) {
          .join(", ",map{qsh basename $_} path($outpath)->children);
 }
 
-my $tempdir;
-sub _create_tempdir_if_needed($) {
+my ($proctempdir, $rm_proctempdir_at_exit);
+sub _create_proctempdir_ifneeded($) {
   my $opts = shift;
-  # Keep a per-process persistent temp directory, deleted at process exit.
+  # Keep a per-process persistent temp directory, deleted at process exit
+  # (except if $opts{tempdir} was passed).
   # It contains result files when the user did not specify {outpath},
   # plus a cache of as-yet unrequested sheet .csv files, used when the
   # external tool can only extract all sheets, not a single sheet by name:
@@ -666,23 +667,30 @@ sub _create_tempdir_if_needed($) {
   # <ifbase> is derived from the intput file name, and <sig> is a fingerprint
   # based on input file's dev, inode, and modification timestamp.
   #
-  $tempdir //= do{
-    #(my $template = __PACKAGE__."_XXXXX") =~ s/::/-/g;
-    #Path::Tiny->tempdir($template)
+  $proctempdir //= do{
     my $pid = $$;
     my $user = _get_username();
-    (my $dname = __PACKAGE__."_${user}_${pid}_tempdir") =~ s/::/-/g;
-    (my $path = path(File::Spec->tmpdir)->child($dname))->mkpath;
-    $path
+    my $dname = (__PACKAGE__."_${user}_${pid}_tempdir") =~ s/::/-/gr;
+    my $parent;
+    if ($opts->{tempdir}) {
+      $parent = path($opts->{tempdir})->mkdir;
+    } else {
+      $parent = path(File::Spec->tmpdir);
+      $rm_proctempdir_at_exit = 1;
+    }
+    $parent->child($dname)->mkdir
   };
 }
-END{ $tempdir->remove_tree if $tempdir; }
+END{
+  local($., $@, $!, $^E, $?);
+  $proctempdir->remove_tree if $proctempdir && $rm_proctempdir_at_exit;
+}
 
-# Compose a unique path under $tempdir.
+# Compose a unique path under $proctempdir.
 # This is *not* a "tempfile" or "tempdir" object which auto-destructs,
 # in fact it does not even exist yet and we don't know here whether it will
 # be a file or subdirectory.  The user must remove it when they are done
-# with it, or it will be removed when $tempdir is removed at process exit.
+# with it, or it will be removed when $proctempdir is removed at process exit.
 #
 sub _uniqpath_under_tempdir($@) {
   my $opts = shift;
@@ -698,7 +706,7 @@ sub _uniqpath_under_tempdir($@) {
     $bname .= "_".$seqnums->{$bname};  # append unique sequence number
   }
   $bname .= ".$args{suf}" if $args{suf};
-  return $tempdir->child($bname);
+  return $proctempdir->child($bname);
 }
 
 # Compose csv cache subdir path
@@ -1031,7 +1039,7 @@ sub _convert_using_ssconvert($$$) {
 ##    if ($opts->{sheetname} && $opts->{inpath} =~ /.csv$/i) {
 ##      # Control generated sheet name by using a symlink to the input file
 ##      # See http://stackoverflow.com/questions/22550050/how-to-convert-csv-to-xls-with-ssconvert
-##      my $td = catdir($tempdir // oops, "Gnumeric");
+##      my $td = catdir($proctempdir // oops, "Gnumeric");
 ##      remove_tree($td); mkdir($td) or die $!;
 ##      $eff_inpath = catfile($td, $opts->{sheetname});
 ##      symlink $opts->{inpath}, $eff_inpath or die $!;
@@ -1124,7 +1132,6 @@ sub _process_args($;@) {
               cvt_from => "",
               cvt_to => "",
               @_,
-              #verbose => 999, tempdir => "/tmp/J",
             );
   if (defined $opts{inpath}) {
     croak "Initial INPATH arg specified as well as inpath => ... in options"
@@ -1176,20 +1183,32 @@ sub _process_args($;@) {
   %opts
 }#_process_args
 
-sub _slurp_ifnotslurped($$) {
-  my ($fh, $ref2octets) = @_;
-  return if defined $$ref2octets;
+sub _binmode_slurp_and_log($$$) { # *without trying to seek*
+  my ($fh, $ref2octets, $debug) = @_;
   binmode($fh);
-  seek($fh, 0, SEEK_SET) or die $!;
   local $/ = undef;
-  $$ref2octets = <$fh>//"";  # Now known to not have a BOM.
-                             # ^^^^ IS THIS REALLY TRUE???
+  #$$ref2octets = <$fh>//"";  # Now known to not have a BOM.  <<< IS THIS REALLY TRUE???
+  $$ref2octets = <$fh>;
+  btwN \3,"Raw slurp-from-0 fh=$fh: ",(defined($$ref2octets) ? visO(substr($$ref2octets,0,300)) : "*undef*")
+    if $debug;
+  $$ref2octets //= "";
+}
+sub _slurp_ifnotslurped($$$) {
+  my ($fh, $ref2octets, $debug) = @_;
+  return if defined $$ref2octets;
+  seek($fh, 0, SEEK_SET) or die $!;
+  _binmode_slurp_and_log($fh, $ref2octets, $debug);
 }
 sub _decode_slurped_data($$$;$) {
   my ($enc, $ref2octets, $start_pos, $check) = @_;
   oops unless defined $$ref2octets;
-  decode($enc, substr($$ref2octets, $start_pos),
+  # More attempts to find cause of mysterious failures on Windows smokers...
+  my $chars = eval {
+    decode($enc, substr($$ref2octets, $start_pos),
                $check // (Encode::FB_CROAK|Encode::LEAVE_SRC) )
+  };
+  die($@,visnew->Useqq(0)->dvis('\n$enc $start_pos $ref2octets')) if $@;
+  $chars
 }
 
 
@@ -1255,8 +1274,7 @@ sub _preprocess($$) {
     }
     if (! seek($fh, 0, SEEK_SET)) {
       oops if defined $$ref2octets;
-      local $/ = undef;
-      $$ref2octets = <$fh>//"";  # N.B. includes possible BOM
+      _binmode_slurp_and_log($fh, $ref2octets, $debug);
       close $fh;
       $fh = undef;
       open $fh, "<:raw", $ref2octets or confess "BUG:in-mem open:$!";
@@ -1280,7 +1298,7 @@ sub _preprocess($$) {
     my @enclist = split m#,#, $opts->{input_encoding};
     return
       if @enclist == 1;
-    _slurp_ifnotslurped($fh, $ref2octets);
+    _slurp_ifnotslurped($fh, $ref2octets, $debug);
     for my $enc (@enclist) {
       eval { _decode_slurped_data($enc, $ref2octets, $start_pos) };
 
@@ -1360,9 +1378,9 @@ sub _preprocess($$) {
     unless (defined($$r2rows)) {
       #confess "Input file is not valid CSV (or we have a bug)\n"
       seek($fh, $start_pos, SEEK_SET) or die $!; # skip over possible BOM
-      # <$fh> returns undef (i.e. EOF) if the input file is empty!
-      my $somechars = substr(do {local $/; <$fh>//""}, 0, 100);
-      if ($somechars eq "") {
+      my $n = read($fh, my $somechars, 100);
+      croak "ERROR READING input: $!" unless defined($n);
+      if ($n == 0) {
         warn "File has NO CONTENT.  Treating it like an (empty) CSV\n"
           if $debug;
         $$r2rows = [];
@@ -1462,8 +1480,7 @@ sub _preprocess($$) {
       $opts->{cvt_to} = $1;
     }
     croak "outpath ",qsh($opts->{outpath}),
-          " has no suffix and 'cvt_to' was not specified",
-          ,dvis('\n### $opts')  ###TEMP
+          " has no suffix and 'cvt_to' was not specified"
       unless $opts->{cvt_to};
   }
   unless ($opts->{cvt_from}) {
@@ -1671,7 +1688,7 @@ sub _write_spreadsheet($) {
   _tool_write_spreadsheet($opts, $outpath);
 }
 
-# If {outpath} is not set, set it to a unique output path in $tempdir
+# If {outpath} is not set, set it to a unique output path in $proctempdir
 # Always returns {outpath} as a Path::Tiny object.
 sub _finalize_outpath($) {
   my $opts = shift;
@@ -1691,7 +1708,7 @@ sub convert_spreadsheet(@) {
   btw dvis('>>> convert_spreadsheet %opts\n') if $opts{debug};
   my %input_opts = %opts;
 
-  _create_tempdir_if_needed(\%opts);
+  _create_proctempdir_ifneeded(\%opts);
 
   # intuit cvt_from & cvt_to, detect encoding, and pre-process .csv input
   # if needed to avoid corruption of leading zeroes.
@@ -1732,9 +1749,9 @@ sub convert_spreadsheet(@) {
       #   (which we never want in the output).
       #   With {allsheets} the output will be inside the {outpath} directory.
       my $dst = get_outcsv_path();
-      warn "> Transcoding csv:  $input_enc -> $output_enc in ",qsh($dst),"\n"
+      warn "> Transcoding csv:  $input_enc -> $output_enc into ",qsh($dst),"\n"
         if $opts{debug};
-      _slurp_ifnotslurped($fh, \$octets);
+      _slurp_ifnotslurped($fh, \$octets, $opts{debug});
       my $chars = _decode_slurped_data($input_enc, \$octets, $start_pos,
                                        Encode::FB_CROAK);
       $octets = encode($output_enc, $chars, Encode::FB_CROAK);

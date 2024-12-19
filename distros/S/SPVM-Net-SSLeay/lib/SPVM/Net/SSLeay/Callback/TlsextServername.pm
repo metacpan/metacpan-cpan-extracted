@@ -18,7 +18,7 @@ Net::SSLeay::Callback::TlsextServername interface in L<SPVM> represents the func
 
 =head1 Interface Methods
 
-C<required method : int ($ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $al_ref : int*, $arg : object);>
+C<required method : int ($ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $al_ref : int*);>
 
 This method represents the function pointer type of L<SSL_CTX_set_tlsext_servername_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_servername_callback> function's callback argument in OpenSSL.
 

@@ -1,5 +1,8 @@
 Revision history for Data-Section-Pluggable
 
+0.04      2024-12-18 09:54:22 -0700
+  - Added extract method (gh#6)
+
 0.03      2024-12-15 08:05:51 -0700
   - Alter Data::Section::Pluggable::Plugin::Json to use pretty mode when invoked via
     Data::Section::Writer (gh#5)

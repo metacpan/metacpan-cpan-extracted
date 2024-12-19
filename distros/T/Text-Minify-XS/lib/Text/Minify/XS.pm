@@ -10,11 +10,12 @@ use XSLoader;
 
 our @EXPORT_OK = qw(minify minify_utf8 minify_ascii);
 
-our $VERSION = 'v0.7.4';
+our $VERSION = 'v0.7.5';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
 {
+    ## no critic (TestingAndDebugging::ProhibitNoStrict)
     no strict 'refs';
     *minify_utf8 = \&minify;
 }
@@ -33,7 +34,7 @@ Text::Minify::XS - Remove indentation and trailing whitespace from multi-line te
 
 =head1 VERSION
 
-version v0.7.4
+version v0.7.5
 
 =head1 SYNOPSIS
 
@@ -104,11 +105,7 @@ encoded.
 
 Since v0.7.0, this module requires Perl v5.14 or later.
 
-Future releases may only support Perl versions released in the last ten years.
-
-If you need this module on Perl v5.9.3, please use one of the v0.6.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
+Future releases may only support Perl versions released in the last ten (10) years.
 
 =head1 KNOWN ISSUES
 
@@ -137,6 +134,11 @@ L<https://github.com/robrwo/Text-Minify-XS/issues>
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
 
 =head1 AUTHOR
 

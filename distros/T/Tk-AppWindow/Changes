@@ -1,11 +1,18 @@
 Revision history for Perl extension Tk::AppWindow.
 
+0.18 Wed Dec 18 2024
+	- Added method popForm to Tk::AppWindow.
+	- Added method imagerFont to extension Art.
+	- Improved File icon generation in extension Art.
+	- Extension Settings supports new version of Tk::QuickForm.
+
 0.17 Mon Dec 02 2024
 	- Repaired output for checking updates.
 	- Added file dialog widget Tk::FilePicker to Tk::AppWindow;
 	- Opening multiple files in MDI.
 	- Changed bugtracker.
 	- Updated documentation.
+	- Tk::DynaMouseWheelBind became a prerequisite.
 
 0.16 Sat Nov 09 2024
 	- Removed extensions Navigator NavigatorPanel and ToolPanel, they are obsolete.

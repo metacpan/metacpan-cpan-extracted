@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -141,11 +141,11 @@
    "provides" : {
       "Alien::NLopt" : {
          "file" : "lib/Alien/NLopt.pm",
-         "version" : "v2.7.1.1"
+         "version" : "v2.9.1.0"
       },
       "Alien::NLopt::Install::Files" : {
          "file" : "lib/Alien/NLopt/Install/Files.pm",
-         "version" : "v2.7.1.1"
+         "version" : "v2.9.1.0"
       }
    },
    "release_status" : "stable",
@@ -160,7 +160,7 @@
          "web" : "https://gitlab.com/djerius/alien-nlopt"
       }
    },
-   "version" : "v2.7.1.1",
+   "version" : "v2.9.1.0",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
@@ -174,8 +174,8 @@
          "system" : {}
       }
    },
-   "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

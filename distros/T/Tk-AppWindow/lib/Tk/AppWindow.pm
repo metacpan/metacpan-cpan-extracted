@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.17";
+$VERSION="0.18";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
@@ -18,8 +18,9 @@ Construct Tk::Widget 'AppWindow';
 use File::Basename;
 require Tk::AppWindow::BaseClasses::Callback;
 require Tk::Balloon;
-require Tk::FilePicker;
 require Tk::DynaMouseWheelBind;
+require Tk::FilePicker;
+require Tk::QuickForm;
 require Tk::YAMessage;
 use Tk::PNG;
 
@@ -780,7 +781,7 @@ sub getDirIcon {
 sub getFileIcon {
 	my ($self, $name) = @_;
 	my $art = $self->extGet('Art');
-	my $icon = $art->getFileIcon($name);
+	my $icon = $art->getFileIcon($name) if defined $art;
 	return $icon if defined $icon;
 	return $self->Subwidget('FilePicker')->Subwidget('Browser')->DefaultFileIcon;
 }
@@ -959,10 +960,110 @@ sub popEntry {
 	my $result;
 	my $answer = $q->Show(-popover => $self);
 	$result = $e->get if $answer eq 'Ok';
-# 	print "Result $result\n";
 
 	$q->destroy;
 	return $result
+}
+
+=item B<popForm>I<(%options)>
+
+This method uses L<Tk::QuickForm> to pop up a form for the user to fill out.
+Returns a hash with all defined keys if the user clicks the Ok button,
+Returns an empty hash if the user clicks cancel.
+It can take the following options:
+
+=over 4
+
+=item B<-acceptempty>
+
+Boolean. By default false. If set, empty fields will not evaluate as error.
+
+=item B<-initialvalues>
+
+A reference to a hash with default values to be loaded.
+
+=item B<-oktext>
+
+By default 'Ok'. You can change it to any text you like.
+
+=item B<-structure>
+
+Same option as in L<Tk::QuickForm>. See there.
+
+=item B<-title>
+
+The window title.
+
+=back
+
+=cut
+
+sub popForm {
+	my ($self, %args) = @_;
+
+	my $structure = delete $args{'-structure'};
+	croak "Option -structure not set" unless defined $structure;
+
+	my $initial = delete $args{'-initialvalues'};
+
+	my $oktext = delete $args{'-oktext'};
+	$oktext = 'Ok' unless defined $oktext;
+
+	my $acceptempty = delete $args{'-acceptempty'};
+	$acceptempty = 0 unless defined $acceptempty;
+
+	my $q = $self->YADialog(%args,
+		-buttons => ['Cancel'],
+	);
+	my $b = $q->Subwidget('buttonframe')->Button(
+		-text => $oktext,
+		-command => sub {
+			$q->Pressed('Ok')
+		}
+	);
+	$q->ButtonPack($b);
+
+	#getting icons for Tk::QuickForm
+	my %qopts = ();
+	my @images = (
+		['-fileimage', 'text-x-plain', 16],
+		['-folderimage', 'folder', 16],
+		['-fontimage', 'gtk-select-font', 16],
+		['-msgimage', 'dialog-question', 32],
+		['-newfolderimage', 'folder-new', 16],
+		['-reloadimage', 'appointment-recurring', 16],
+		['-warnimage', 'dialog-warning', 32],
+	);
+	for (@images) {
+		my ($opt, $icon, $size) = @$_;
+		my $img = $self->getArt($icon, $size);
+		$qopts{$opt} = $img if defined $img;
+	}
+
+	my $form = $q->QuickForm(%qopts,
+		-acceptempty => $acceptempty,
+		-diriconcall => ['getDirIcon', $self],
+		-fileiconcall => ['getFileIcon', $self],
+		-linkiconcall => ['getLinkIcon', $self],
+		-structure => $structure,
+		-postvalidatecall => sub {
+			my $flag = shift;
+			if ($flag) {
+				$b->configure('-state', 'normal')
+			} else {
+				$b->configure('-state', 'disabled')
+			}
+		},
+	)->pack(-expand => 1, -fill => 'both', -padx => 2, -pady => 2);
+	$form->createForm;
+	$form->put(%$initial) if defined $initial;
+
+	my %result = ();
+	my $answer = $q->Show(-popover => $self);
+	%result = $form->get if $answer eq 'Ok';
+
+	$q->destroy;
+	return %result
 }
 
 =item B<popMessage>I<($message, $icon, ?$size?)>
@@ -1071,7 +1172,7 @@ sub progressAdd {
 
 =item B<progressRemove>I<($name)>
 
-Remves a progress bar from the status bar.
+Removes a progress bar from the status bar.
 Extension B<StatusBar> must be loaded for this to work.
 
 =cut
@@ -1198,7 +1299,7 @@ Same as Perl.
 
 =head1 BUGS
 
-Unknown. Probably plenty. If you find any, please contact the author.
+If you find any, please contact the author.
 
 =cut
 

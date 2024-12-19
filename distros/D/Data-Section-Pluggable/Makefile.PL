@@ -56,18 +56,18 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Class::Tiny"   => 0,
     "JSON::MaybeXS" => 0,
+    "Path::Tiny"    => 0,
     "Ref::Util"     => 0,
     "Role::Tiny"    => "1.003001",
     "stable"        => 0,
     "true"          => 0
   },
   "TEST_REQUIRES" => {
-    "Path::Tiny"   => 0,
     "Test2::V0"    => "0.000121",
     "Test::More"   => "0.98",
     "Test::Script" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test"    => {
     "TESTS" => "t/*.t"
   }

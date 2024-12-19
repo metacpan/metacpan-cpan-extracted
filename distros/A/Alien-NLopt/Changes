@@ -1,5 +1,11 @@
 Revision history for Alien-NLopt
 
+v2.9.1.0  2024-12-18 15:08:47-05:00 America/New_York
+
+   [ENHANCEMENT]
+
+     * upgrade to NLopt 2.9.1
+
 v2.7.1.1  2024-05-01 00:58:56-04:00 America/New_York
 
    [BUILD]
@@ -8,7 +14,7 @@ v2.7.1.1  2024-05-01 00:58:56-04:00 America/New_York
 
    [MISC]
 
-     * rename to Alien::NLopt.  The library is NLopt, not NLopt.
+     * rename to Alien::NLopt.  The library is NLopt, not NLOpt.
 
 v2.7.1.0  2024-04-27 21:25:38-04:00 America/New_York
 

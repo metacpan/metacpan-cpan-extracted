@@ -1,0 +1,125 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::Tickit::Hello;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::Tickit::Hello->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+tickit-hello - Tickit application with hello world.
+
+=head1 SYNOPSIS
+
+ tickit-hello [-a horiz_align] [-b bg_color] [-f fg_color] [-h] [-v vert_align] [--version] [message]
+
+=head1 DESCRIPTION
+
+This application is L<Tickit> hello world demo.
+
+Application could present text string in screen.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-a horiz_align>
+
+Horizontal align.
+
+Possible values are:
+
+=over
+
+=item * left
+
+=item * center (default)
+
+=item * right
+
+=back
+
+=item * C<-b bg_color>
+
+Background color.
+
+Default value is black.
+
+=item * C<-f fg_color>
+
+Foreground color.
+
+Default value is green.
+
+=item * C<-h>
+
+Print help.
+
+=item * C<-v vert_align>
+
+Vertical align.
+
+Possible values are:
+
+=over
+
+=item * top
+
+=item * middle (default)
+
+=item * bottom
+
+=back
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<message>
+
+Text message to present on screen.
+
+=back
+
+=head1 EXAMPLE
+
+ tickit-hello "Hello world!"
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-Tickit-Hello>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2024 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

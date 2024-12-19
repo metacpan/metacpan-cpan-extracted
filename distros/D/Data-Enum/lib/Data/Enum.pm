@@ -2,7 +2,7 @@ package Data::Enum;
 
 # ABSTRACT: immutable enumeration classes
 
-use v5.14;
+use v5.20;
 use warnings;
 
 use Package::Stash;
@@ -10,6 +10,8 @@ use List::Util 1.45 qw/ any uniqstr /;
 use Scalar::Util qw/ blessed refaddr /;
 
 # RECOMMEND PREREQ: Package::Stash::XS
+
+use experimental qw/ lexical_subs postderef signatures /;
 
 use overload
   q{""} => \&as_string,
@@ -19,16 +21,15 @@ use overload
 use constant TRUE  => 1;
 use constant FALSE => 0;
 
-our $VERSION = 'v0.5.0';
+our $VERSION = 'v0.6.0';
 
 
-sub new {
-    my $this = shift;
+sub new ( $this, @args ) {
 
-    my $opts   = ref( $_[0] ) eq "HASH" ? shift : {};
+    my $opts   = ref( $args[0] ) eq "HASH" ? shift @args : {};
     my $prefix = $opts->{prefix} // "is_";
 
-    my @values = uniqstr( sort map { "$_" } @_ );
+    my @values = uniqstr( sort map { "$_" } @args );
 
     die "has no values" unless @values;
 
@@ -47,72 +48,68 @@ sub new {
 
     my $base = Package::Stash->new($name);
 
-    my $_make_symbol = sub {
-        my ($value) = @_;
+    my sub _make_symbol($value) {
         my $self    = bless \$value, "${name}::${value}";
         Internals::SvREADONLY( $value, 1 );
         return $self;
     };
 
-    my $_make_predicate = sub {
-        my ($value) = @_;
+    my sub _make_predicate($value) {
         return $prefix . $value;
     };
 
     $base->add_symbol(
         '&new',
-        sub {
-            my ( $class, $value ) = @_;
+        sub( $class, $value ) {
             state $symbols = {
-                map { $_ => $_make_symbol->($_) } @values
+                map { $_ => _make_symbol($_) } @values
             };
             exists $symbols->{"$value"} or die "invalid value: '$value'";
             return $symbols->{"$value"};
         }
     );
 
-    $base->add_symbol( '&values', sub { return @values } );
+    $base->add_symbol( '&values', sub($) { return @values } );
 
     $base->add_symbol(
         '&predicates',
-        sub {
-            return map { $_make_predicate->($_) } @values;
+        sub($) {
+            return map { _make_predicate($_) } @values;
         }
     );
 
-    $base->add_symbol( '&prefix', sub { $prefix } );
+    $base->add_symbol( '&prefix', sub($) { $prefix } );
 
     for my $value (@values) {
-        my $predicate = $_make_predicate->($value);
+        my $predicate = _make_predicate($value);
         $base->add_symbol( '&' . $predicate, \&FALSE );
         my $elem    = "${name}::${value}";
         my $subtype = Package::Stash->new($elem);
-        $subtype->add_symbol( '@ISA',           [ __PACKAGE__, $name ] );
-        $subtype->add_symbol( '&' . $predicate, \&TRUE );
+        $subtype->add_symbol( '@ISA', [ __PACKAGE__, $name ] );
+        for my $other (@values) {
+            $subtype->add_symbol( '&' . _make_predicate($other), $other eq $value ? \&TRUE : \&FALSE );
+        }
     }
 
     return $Cache{$key} = $name;
 }
 
-sub _NOT_MATCH {
-    my ( $self, $arg ) = @_;
+sub _NOT_MATCH( $self, $arg, @ ) {
     return blessed($arg)
       ? refaddr($arg) != refaddr($self)
-      : $arg ne $$self;
+      : $arg ne $self->$*; # as_string
 }
 
 
-sub MATCH {
-    my ( $self, $arg ) = @_;
+sub MATCH( $self, $arg, @ ) {
     return blessed($arg)
       ? refaddr($arg) == refaddr($self)
-      : $arg eq $$self;
+      : $arg eq $self->$*; # as_string
 }
 
 
-sub as_string {
-    my ($self) = @_;
-    return $$self;
+sub as_string($self, @) {
+    return $self->$*;
 }
 
 
@@ -130,7 +127,7 @@ Data::Enum - immutable enumeration classes
 
 =head1 VERSION
 
-version v0.5.0
+version v0.6.0
 
 =head1 SYNOPSIS
 
@@ -296,9 +293,9 @@ strings.  When using this in production code, you may want to benchmark performa
 
 =head1 SUPPORT FOR OLDER PERL VERSIONS
 
-This module requires Perl v5.14 or later.
+This module requires Perl v5.20 or later.
 
-Future releases may only support Perl versions released in the last ten years.
+Future releases may only support Perl versions released in the last ten (10) years.
 
 =head1 SEE ALSO
 
@@ -325,6 +322,11 @@ L<https://github.com/robrwo/perl-Data-Enum/issues>
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
 
 =head1 AUTHOR
 

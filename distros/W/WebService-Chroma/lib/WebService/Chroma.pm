@@ -1,6 +1,6 @@
 package WebService::Chroma;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use 5.006;
 use strict;
@@ -139,7 +139,7 @@ WebService::Chroma - chromadb client
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -148,8 +148,7 @@ Version 0.04
 	use WebService::Chroma;
 
 	my $chroma = WebService::Chroma->new(
-		embeddings_class => 'Ollama',
-		embeddings_model => 'nomic-embed-text'
+		embeddings_class => 'OpenAI', # you will need OPENAI_API_KEY env variable set
 	);
 
 	my $version = $chroma->version();
@@ -215,24 +214,98 @@ L<http://localhost:8000/docs>
 
 =head2 new
 
+Instantiate a new L<WebService::Chroma> object.
+
+	my $chroma = WebService::Chroma->new(
+		base_url => 'http://localhost:8000',
+		embeddings_class => 'Ollama',
+		embeddings_model => 'nomic-embed-text',
+		embeddings_base_url => 'http://localhost:11434'
+	);
+
+
+=head3 base_url
+
+The base url for chroma default is http://localhost:8000.
+
+=head3 embeddings_class
+
+The embeddings class used to generate embeddings current built in options are Ollama or OpenAI.
+
+=head3 embeddings_model
+
+The embeddings class model the default for Ollama is nomic-embed-text and the default for OpenAI is text-embedding-3-large.
+
+=head3 embeddings_base_url
+
+The embeddings class base url, this defaults to http://localhost:11434 for Ollama.
+
 =head2 version
+
+Retrieve chroma version.
+
+	$chroma->version();
 
 =head2 reset
 
+Reset chroma instance.
+
+	$chroma->reset();
+
 =head2 heartbeat
+
+Heartbeat of chroma.
+
+	$chroma->heartbeat();
 
 =head2 pre_flight_checks
 
+Check status of pre flight checks.
+
+	$chroma->pre_flight_checks();
+
 =head2 auth_identity
+
+Get user identity.
+
+	$chroma->auth_identity();
 
 =head2 create_tenant
 
+Create a new tenant. This returns a L<WebService::Chroma::Tenant> object.
+
+	$chroma->create_tenant(
+		name => 'test-tenant'
+	);
+
+
 =head2 get_tenant
+
+Retrieve an existing tenant. This returns a L<WebService::Chroma::Tenant> object.
+
+	$chroma->get_tenant(
+		name => 'test-tenant'
+	);
 
 =head2 get_database
 
+Retrieve an existing database. This returns a L<WebService::Chroma::DB> object.
+
+	$chroma->get_database(
+		tenant => 'test-tenant',
+		name => 'test-database',
+	);
+
 =head2 get_collection
 
+Retrieve an existing collection. This return a L<WebService::Chroma::Collection> object.
+
+	$chroma->get_collection(
+		tenant => 'test-tenant',
+		db => 'test-database',
+		name => 'test-collection'
+	);
+	
 =head1 AUTHOR
 
 LNATION, C<< <email at lnation.org> >>

@@ -75,7 +75,12 @@ check_numeric("mumble", 0);
 check_numeric("-1",     0);
 check_numeric(1,        1);
 check_numeric(-1,       1);
-check_numeric(3 < 4,    0); # is_bool
+
+SKIP: {
+  skip "is_bool() not supported on this platform"
+    unless defined &builtin::is_bool;
+  check_numeric(3 < 4,    0); # is_bool
+}
 
 diag "=== numerics ===";
 for my $v (-1, 0, 1, 42, $nan, $inf, $minf) {

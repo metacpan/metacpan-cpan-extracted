@@ -26,6 +26,7 @@ my @files = (
     't/author-changes.t',
     't/author-clean-namespaces.t',
     't/author-critic.t',
+    't/author-cve.t',
     't/author-eof.t',
     't/author-eol.t',
     't/author-minimum-version.t',

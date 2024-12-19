@@ -3800,6 +3800,36 @@ C<static method SSL_MODE_SEND_FALLBACK_SCSV : int ();>
 
 Returns the value of C<SSL_MODE_SEND_FALLBACK_SCSV>. If this constant is not defined on the system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
+=head2 SSL_TLSEXT_ERR_OK
+
+C<static method SSL_TLSEXT_ERR_OK : int ();>
+
+Returns the value of C<SSL_TLSEXT_ERR_OK>. If this constant is not defined on the system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 SSL_TLSEXT_ERR_ALERT_FATAL
+
+C<static method SSL_TLSEXT_ERR_ALERT_FATAL : int ();>
+
+Returns the value of C<SSL_TLSEXT_ERR_ALERT_FATAL>. If this constant is not defined on the system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 SSL_TLSEXT_ERR_NOACK
+
+C<static method SSL_TLSEXT_ERR_NOACK : int ();>
+
+Returns the value of C<SSL_TLSEXT_ERR_NOACK>. If this constant is not defined on the system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_NPN_NEGOTIATED
+
+C<static method OPENSSL_NPN_NEGOTIATED : int ();>
+
+Returns the value of C<OPENSSL_NPN_NEGOTIATED>. If this constant is not defined on the system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 OPENSSL_NPN_NO_OVERLAP
+
+C<static method OPENSSL_NPN_NO_OVERLAP : int ();>
+
+Returns the value of C<OPENSSL_NPN_NO_OVERLAP>. If this constant is not defined on the system, an exception is thrown with the error id set to the basic type ID of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
 =head1 See Also
 
 =over 2

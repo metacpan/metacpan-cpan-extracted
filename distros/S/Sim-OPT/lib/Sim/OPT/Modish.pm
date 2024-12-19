@@ -1,8 +1,8 @@
-package Sim::OPT::Modish;
+#package Sim::OPT::Modish;
 #NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE ERASED OR TURNED INTO A COMMENT.
 #!/usr/bin/perl
 # Modish
-$VERSION = '0.5';
+$VERSION = '0.4.2.3';
 # Author: Gian Luca Brunetti, Politecnico di Milano - gianluca.brunetti@polimi.it.
 # An intermediate version of the subroutine createconstrdbfile has been modified by ESRU (2038),
 # University of Strathclyde, Glasgow.
@@ -20,6 +20,7 @@ $VERSION = '0.5';
 # reintroduced the possibility of non-embedded use; added the possibility of choosing which zones and surfaces to operate on.
 # In versions 0.4.1 (28.09.2022): bug fix.
 # In versions 0.4.2.1 (12.06.2023): updated the subprocedure "createfictgeofile "for creating fictitious obstruction files to the new obstruction file format.
+# In versions 0.4.2.3 (15.12.2024): improved the procedure to get parallel multicore computations.
 
 use v5.14;
 use Exporter;
@@ -5422,7 +5423,7 @@ sub createfictgeofile
     {
       chomp $line;
       my @elts = split ( /,|\s+/, $geoline );
-      
+
       if ( scalar( @elts ) < 15 )
       {
 	  if ( $count == 0 )
@@ -8904,7 +8905,7 @@ modish( "/home/x/model/cfg/model.cfg", 1, 7, 9 );  (Which means: calculate for z
 =head1 DESCRIPTION
 
 modish is a program for altering the shading values calculated by the ESP-r building simulation platform to take into account reflections from obstructions.
-More precisely, modish brings into account the reflective effect of solar obstructions on solar gains on building models on the basis of irradiance ratios. Those ratios are obtained combining the direct radiation on a surface and the total radiation calculated by the means of a raytracer (Radiance) on the same surface.
+More precisely, modish brings into account the reflective effect of solar obstructions on solar gains on building models on the basis of irradiance ratios. Those ratios are obtained combining the direct radiation on a surface and the total radiation calculated by the means of a raytracer (Radiance) on the same surface. The radional for the procedure is presented in the following paper: L<Gian Luca Brunetti (2020). “Utilization of irradiance ratios for calculating the effect of reflections from obstructions in building energy simulation”. Building Simulation. DOI: 10.1007/s12273-020-0722-2|https://link.springer.com/article/10.1007/s12273-020-0722-2>.
 
 The effect of solar reflections is taken into account at each hour on the basis of the ratios between the irradiances measured at the models' surfaces in a model anologue of the original one, and a twin fictiotious model derived from that. The irradiances are calculated through Radiance and derive from a model in which the solar obstructions have their true reflectivity and a model in which the solar obstructions are black.
 
@@ -8988,6 +8989,6 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>. The subroutine "creat
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2024 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 =cut

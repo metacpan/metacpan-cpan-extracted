@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -112,6 +112,14 @@ METHODS
     (that is: it has a constructor named new), then %args will be passed to
     the constructor. For included plugins see "CORE PLUGINS". To write your
     own see "PLUGIN ROLES".
+
+ extract
+
+     $dsp->extract($dir);
+     $dsp->extract;
+
+    Extract all files in Data section to the given $dir, or if not provided
+    the current directory.
 
 CORE PLUGINS
 

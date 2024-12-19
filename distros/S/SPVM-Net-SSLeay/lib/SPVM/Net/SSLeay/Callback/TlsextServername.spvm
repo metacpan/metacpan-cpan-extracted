@@ -4,6 +4,6 @@
 class Net::SSLeay::Callback::TlsextServername : interface_t {
   use Net::SSLeay;
   
-  required method : int ($ssl : Net::SSLeay, $al_ref : int*, $arg : object);
+  required method : int ($ssl : Net::SSLeay, $al_ref : int*);
   
 }

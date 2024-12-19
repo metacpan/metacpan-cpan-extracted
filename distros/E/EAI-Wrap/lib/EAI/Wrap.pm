@@ -1,7 +1,7 @@
-package EAI::Wrap 1.916;
+package EAI::Wrap 1.917;
 
 use strict; use feature 'unicode_strings'; use warnings;
-use Exporter qw(import); use Data::Dumper qw(Dumper); use File::Copy qw(copy move); use Cwd qw(chdir); use Archive::Extract ();
+use Exporter qw(import); use Data::Dumper qw(Dumper); use File::Copy qw(copy move); use Cwd qw(chdir); use Archive::Extract (); use Carp qw(confess longmess);
 # we make $EAI::Common::common/config/execute/loads/optload/opt an alias for $EAI::Wrap::common/config/execute/loads/optload/opt so that the user can set it without knowing anything about the Common package!
 our %common;our %config;our @loads;our %execute;our @optload;our %opt;
 
@@ -78,7 +78,7 @@ sub doExecuteOnInit () {
 		} else {
 			eval $config{executeOnInit};
 		}
-		die("Error parsing config{executeOnInit} ".(ref($config{executeOnInit}) eq "CODE" ? "defined sub" : "'".$config{executeOnInit}."'").": $@") if $@;
+		confess("Error parsing config{executeOnInit} ".(ref($config{executeOnInit}) eq "CODE" ? "defined sub" : "'".$config{executeOnInit}."'").": $@") if $@;
 	}
 }
 
@@ -103,23 +103,23 @@ sub openDBConn ($;$) {
 		return 1 if $process->{successfullyDone} and $process->{successfullyDone} =~ /\QopenDBConn$DSNeval/ and $execute{retryBecauseOfError};
 	}
 	unless ($DSNeval) {
-		$logger->error("no DSN available in \$DB->{DSN}");
+		$logger->error("no DSN available in \$DB->{DSN}".longmess());
 		$process->{hadErrors} = 1;
 		return 0;
 	}
 	(!$DB->{user} && $DSNeval =~ /\$DB->\{user\}/) and do {
-		$logger->error("specified DSN ('".$DSNeval."') contains \$DB->{user}, which is neither set in \$DB->{user} nor in \$config{sensitive}{".$DB->{prefix}."}{user} !");
+		$logger->error("specified DSN ('".$DSNeval."') contains \$DB->{user}, which is neither set in \$DB->{user} nor in \$config{sensitive}{".$DB->{prefix}."}{user} !".longmess());
 		$process->{hadErrors} = 1;
 		return 0;
 	};
 	$newDSN = eval qq{"$DSNeval"};
 	if (!$newDSN) {
-		$logger->error("error parsing \$DB->{DSN}(".$DSNeval."), couldn't interpolate all values:".$@);
+		$logger->error("error parsing \$DB->{DSN}(".$DSNeval."), couldn't interpolate all values:".$@.longmess());
 		$process->{hadErrors} = 1;
 		return 0;
 	}
 	EAI::DB::newDBH($DB,$newDSN) or do {
-		$logger->error("couldn't open database connection for $newDSN");
+		$logger->error("couldn't open database connection for $newDSN".longmess());
 		$process->{hadErrors} = 1;
 		return 0; # false means error in connection and signal to die...
 	};
@@ -150,14 +150,14 @@ sub openFTPConn ($;$) {
 		$FTP->{privKey} = EAI::Common::getSensInfo($FTP->{prefix},"privKey");
 	}
 	(!$FTP->{user}) and do {
-		$logger->error("ftp user neither set in \$FTP->{user} nor in \$config{sensitive}{".$FTP->{prefix}."}{user} !");
+		$logger->error("ftp user neither set in \$FTP->{user} nor in \$config{sensitive}{".$FTP->{prefix}."}{user} !".longmess());
 		$process->{hadErrors} = 1;
 		return 0;
 	};
 	no warnings 'uninitialized';
 	$logger->debug("\$FTP->{user}:$FTP->{user}, \$FTP->{privKey}:$FTP->{privKey}, \$FTP->{hostkey}:$FTP->{hostkey}");
 	EAI::FTP::login($FTP,$hostname,$enforceConn) or do {
-		$logger->error("couldn't open ftp connection for $hostname");
+		$logger->error("couldn't open ftp connection for $hostname".longmess());
 		$process->{hadErrors} = 1;
 		return 0; # false means error in connection and signal to die...
 	};
@@ -192,7 +192,7 @@ sub redoFiles ($) {
 		$ext = $File->{extension}; # if no dots in filename (e.g. because of glob) -> no file extension retrievable -> take from here
 	}
 	if (!$ext) {
-		$logger->error("redoFile set, no file extension for renaming redo files! should be either retrievable in filename as .<ext> or be set separately in File=>extension");
+		$logger->error("redoFile set, no file extension for renaming redo files! should be either retrievable in filename as .<ext> or be set separately in File=>extension".longmess());
 		return 0;
 	}
 	$logger->info("redoFile set, redoing files in ".$redoDir.", looking for files with extension ".$ext);
@@ -208,7 +208,7 @@ sub redoFiles ($) {
 			my $redoTimestampPatternPart = $common{task}{redoTimestampPatternPart};
 			if (!$redoTimestampPatternPart) {
 				$redoTimestampPatternPart = '[\d_]'; # sensible default, but warn...
-				$logger->warn('missing $common{task}{redoTimestampPatternPart}, set to [\d_]');
+				$logger->warn('missing $common{task}{redoTimestampPatternPart}, set to [\d_]'.longmess());
 			}
 			# check against barename with additional timestamp pattern (e.g. numbers and _) and \.$ext only if defined
 			# anything after barename (and before ".$ext" if extension defined) is regarded as a timestamp
@@ -218,7 +218,7 @@ sub redoFiles ($) {
 				$logger->info("file $redofile available for redo, matched regex $barename.*");
 				# only rename if not prohibited and not a glob, else just push into retrievedFiles
 				if (!$File->{avoidRenameForRedo} and $File->{filename} !~ /\*/) {
-					rename $redofile, "$barename.$ext" or $logger->error("error renaming file $redofile to $barename.$ext : $!");
+					rename $redofile, "$barename.$ext" or $logger->error("error renaming file $redofile to $barename.$ext : $!".longmess());
 					push @{$execute{retrievedFiles}}, "$barename.$ext";
 				} else {
 					push @{$execute{retrievedFiles}}, $redofile;
@@ -226,7 +226,7 @@ sub redoFiles ($) {
 			}
 		}
 	} else {
-		$logger->error("couldn't change into redo folder ".$redoDir." !");
+		$logger->error("couldn't change into redo folder ".$redoDir.longmess());
 		return 0;
 	}
 	chdir($execute{homedir});
@@ -252,7 +252,7 @@ sub getLocalFiles ($) {
 					@multipleFiles = glob qq{"$File->{filename}"};
 					chdir($execute{homedir});
 				} else {
-					$logger->error("couldn't change into folder ".$localFilesystemPath." !");
+					$logger->error("couldn't change into folder ".$localFilesystemPath.longmess());
 					$process->{hadErrors} = 1;
 					return 0;
 				}
@@ -265,7 +265,7 @@ sub getLocalFiles ($) {
 				unless ($File->{localFilesystemPath} eq ".") {
 					$logger->info("copying local file: ".$localFilesystemPath.$localfile." to ".$execute{homedir});
 					copy ($localFilesystemPath.$localfile, ".") or do {
-						$logger->error("couldn't copy ".$localFilesystemPath.$localfile.": $!");
+						$logger->error("couldn't copy ".$localFilesystemPath.$localfile.": $!".longmess());
 						@{$execute{retrievedFiles}} = ();
 						$process->{hadErrors} = 1;
 						return 0;
@@ -276,7 +276,7 @@ sub getLocalFiles ($) {
 			}
 		}
 	} else {
-		$logger->error("no \$File->{localFilesystemPath} parameter given");
+		$logger->error("no \$File->{localFilesystemPath} parameter given".longmess());
 		$process->{hadErrors} = 1;
 		return 0;
 	}
@@ -297,16 +297,16 @@ sub getFilesFromFTP ($) {
 		} else {
 			if ($File->{filename}) {
 				unless (EAI::FTP::fetchFiles($FTP,{firstRunSuccess=>$execute{firstRunSuccess},homedir=>$execute{homedir},fileToRetrieve=>$File->{filename},fileToRetrieveOptional=>$File->{optional},retrievedFiles=>$execute{retrievedFiles}})) {
-					$logger->warn("EAI::FTP::fetchFiles not successful");
+					$logger->warn("EAI::FTP::fetchFiles not successful".longmess());
 				}
 			} else {
-				$logger->error("no \$File->{filename} given, can't get it from FTP");
+				$logger->error("no \$File->{filename} given, can't get it from FTP".longmess());
 				$process->{hadErrors} = 1;
 				return 0;
 			}
 		}
 	} else {
-		$logger->error("no \$FTP->{remoteDir} parameter defined");
+		$logger->error("no \$FTP->{remoteDir} parameter defined".longmess());
 		$process->{hadErrors} = 1;
 		return 0;
 	}
@@ -350,17 +350,17 @@ sub checkFiles ($) {
 		# exceptions from error message and return false for not continuing with readFile/whatever
 		if ($File->{optional} || ($execute{firstRunSuccess} && $common{task}{plannedUntil}) || $common{task}{redoFile}) {
 			if ($execute{firstRunSuccess} && $common{task}{plannedUntil}) {
-				$logger->warn("file ".$File->{filename}." missing with planned execution until ".$common{task}{plannedUntil}." and first run successful, skipping");
+				$logger->warn("file ".$File->{filename}." missing with planned execution until ".$common{task}{plannedUntil}." and first run successful, skipping".longmess());
 			} elsif ($File->{optional}) {
-				$logger->warn("file ".$File->{filename}." missing being marked as optional, skipping");
+				$logger->warn("file ".$File->{filename}." missing being marked as optional, skipping".longmess());
 			} elsif ($common{task}{redoFile}) {
-				$logger->warn("file ".$File->{filename}." missing being retried, skipping");
+				$logger->warn("file ".$File->{filename}." missing being retried, skipping".longmess());
 			}
 		} else {
 			if (!$execute{retrievedFiles} or @{$execute{retrievedFiles}} == 0) {
-				$logger->error("file ".$File->{filename}." was not retrieved (maybe no successful call done to getFilesFromFTP or getLocalFiles ?)");
+				$logger->error("file ".$File->{filename}." was not retrieved (maybe no successful call done to getFilesFromFTP or getLocalFiles ?)".longmess());
 			} else {
-				$logger->error("file ".$File->{filename}." doesn't exist and is not marked as optional!");
+				$logger->error("file ".$File->{filename}." doesn't exist and is not marked as optional!".longmess());
 			}
 			$process->{hadErrors} = 1;
 		}
@@ -373,7 +373,7 @@ sub checkFiles ($) {
 			$logger->info("file to be extracted exists, now extracting archive");
 			return extractArchives($arg);
 		} else {
-			$logger->error("multiple files returned (probably glob passed as filename), extracting not supported in this case");
+			$logger->error("multiple files returned (probably glob passed as filename), extracting not supported in this case".longmess());
 			$process->{hadErrors} = 1;
 			return 0;
 		}
@@ -384,7 +384,7 @@ sub checkFiles ($) {
 		$logger->info("files checked: @{$process->{filenames}}");
 		return 1;
 	} else {
-		$logger->error("no files retrieved for checking");
+		$logger->error("no files retrieved for checking".longmess());
 		return 0;
 	}
 }
@@ -399,12 +399,12 @@ sub extractArchives ($) {
 	if ($execute{retrievedFiles}) { 
 		my $filename = $execute{retrievedFiles}[0]; # only one file expected.
 		if (! -e $redoDir.$filename) {
-			$logger->error($redoDir.$filename." doesn't exist for extraction");
+			$logger->error($redoDir.$filename." doesn't exist for extraction".longmess());
 			$process->{hadErrors} = 1;
 			return 0;
 		}
 		$logger->info("extracting file(s) from archive package: $redoDir$filename");
-		local $SIG{__WARN__} = sub { $logger->error("opening archive: ".$_[0]); }; # capturing warnings...
+		local $SIG{__WARN__} = sub { $logger->error("opening archive: ".$_[0].longmess()); }; # capturing warnings...
 		my $ae;
 		eval {
 			$ae = Archive::Extract->new(archive => $redoDir.$filename);
@@ -414,7 +414,7 @@ sub extractArchives ($) {
 			return 0;
 		}
 		if (!$ae->extract(to => ($redoDir ? $redoDir : "."))) {
-			$logger->error("extracting files: ".$ae->error());
+			$logger->error("extracting files: ".$ae->error().longmess());
 			$process->{hadErrors} = 1;
 			return 0;
 		}
@@ -424,7 +424,7 @@ sub extractArchives ($) {
 		# reset retrievedFiles to get rid of fetched archives (not to be processed further)
 		@{$execute{retrievedFiles}} = ();
 	} else {
-		$logger->error("no files available to extract..");
+		$logger->error("no files available to extract..".longmess());
 		$process->{hadErrors} = 1;
 		return 0;
 	}
@@ -441,7 +441,7 @@ sub getAdditionalDBData ($;$) {
 	# reset additionalLookupData to avoid strange errors in retrying run. Also needed to pass data back as reference
 	%{$process->{additionalLookupData}} = ();
 	if ($refToDataHash and ref($refToDataHash) ne "HASH") {
-		$logger->error("passed second argument \$refToDataHash is not a ref to a hash");
+		$logger->error("passed second argument \$refToDataHash is not a ref to a hash".longmess());
 		return 0;
 	}
 	return 0 if !checkParam($DB,"additionalLookup");
@@ -487,7 +487,7 @@ sub dumpDataIntoDB ($) {
 			# Transaction begin
 			unless ($DB->{noDBTransaction}) {
 				EAI::DB::beginWork() or do {
-					$logger->error ("couldn't start DB transaction");
+					$logger->error ("couldn't start DB transaction".longmess());
 					$hadDBErrors=1;
 				};
 			}
@@ -498,7 +498,7 @@ sub dumpDataIntoDB ($) {
 			}
 			$logger->info("dumping data to table $table");
 			if (! EAI::DB::storeInDB($DB, $process->{data},$process->{countPercent})) {
-				$logger->error("error storing DB data.. ");
+				$logger->error("error storing DB data.. ".longmess());
 				$hadDBErrors=1;
 			}
 			# post processing (Perl code) for config, where postDumpProcessing is defined
@@ -517,7 +517,7 @@ sub dumpDataIntoDB ($) {
 						$dopostdumpexec = eval $postDumpExec->{condition};
 					}
 					if ($@) {
-						$logger->error("error parsing postDumpExec condition: ".(ref($postDumpExec->{condition}) eq "CODE" ? "defined sub" : "'".$postDumpExec->{condition}."'").": $@");
+						$logger->error("error parsing postDumpExec condition: ".(ref($postDumpExec->{condition}) eq "CODE" ? "defined sub" : "'".$postDumpExec->{condition}."'").": $@".longmess());
 						$hadDBErrors = 1;
 						last;
 					}
@@ -529,7 +529,7 @@ sub dumpDataIntoDB ($) {
 								$exec = eval qq{"$exec"} if $exec =~ /$/; # only interpolate if perl scalars are contained
 								$logger->info("post execute: $exec");
 								if (!EAI::DB::doInDB({doString => $exec})) {
-									$logger->error("error executing postDumpExec: '".$exec."' .. ");
+									$logger->error("error executing postDumpExec: '".$exec."' .. ".longmess());
 									$hadDBErrors=1;
 									last;
 								}
@@ -546,25 +546,25 @@ sub dumpDataIntoDB ($) {
 					if (EAI::DB::commit()) {
 						$logger->info("data stored into table $table successfully");
 					} else {
-						$logger->error("error when committing");
+						$logger->error("error when committing".longmess());
 						$hadDBErrors = 1;
 					};
 				}
 			} else { # error dumping to DB or during pre/postDumpExecs
 				unless ($DB->{noDBTransaction}) {
 					$logger->info("Rollback because of error when storing into database");
-					EAI::DB::rollback() or $logger->error("error with rollback ...");
+					EAI::DB::rollback() or $logger->error("error with rollback ...".longmess());
 				}
-				$logger->error("error storing data into database");
+				$logger->error("error storing data into database".longmess());
 				$hadDBErrors = 1;
 			}
 		}
 	} else {
 		if ($File->{emptyOK}) {
-			$logger->warn("received empty data, will be ignored as \$File{emptyOK}=1");
+			$logger->warn("received empty data, will be ignored as \$File{emptyOK}=1".longmess());
 		} else {
 			my @filesdone = @{$process->{filenames}} if $process->{filenames};
-			$logger->error("error as none of the following files contained any data: @filesdone !");
+			$logger->error("error as none of the following files contained any data: @filesdone".longmess());
 			$hadDBErrors = 1;
 		}
 	}
@@ -585,7 +585,7 @@ sub evalCustomCode ($$;$) {
 		eval $customCode;
 		$$hadDBErrorsRef = $hadDBErrors;
 	}
-	$logger->error("eval of $processingName ".(ref($customCode) eq "CODE" ? "defined sub" : "'".$customCode."'")." returned error:$@") if $@;
+	$logger->error("eval of $processingName ".(ref($customCode) eq "CODE" ? "defined sub" : "'".$customCode."'")." returned error:$@".longmess()) if $@;
 }
 
 
@@ -624,13 +624,13 @@ sub writeFileFromDB ($) {
 	@{$DB->{columnnames}} = (); # reset columnnames to pass data back as reference
 	@{$process->{data}} = (); # reset data to pass data back as reference
 	EAI::DB::readFromDB($DB,\@{$process->{data}}) or do {
-		$logger->error("couldn' read from DB");
+		$logger->error("couldn' read from DB".longmess());
 		$process->{hadErrors} = 1;
 		return 0;
 	};
 	# pass column information from database, if not explicitly set
 	$File->{columns} = $DB->{columnnames} if !$File->{columns};
-	$logger->warn("no data retrieved from database for file ".$File->{filename}.", query: ".$DB->{query}) if ($process->{data} and @{$process->{data}} == 0);
+	$logger->warn("no data retrieved from database for file ".$File->{filename}.", query: ".$DB->{query}.longmess()) if ($process->{data} and @{$process->{data}} == 0);
 	# prepare for all configs, where postReadProcessing is defined
 	if ($DB->{postReadProcessing}) {
 		evalCustomCode($DB->{postReadProcessing},"postReadProcessing");
@@ -653,8 +653,8 @@ sub writeFileFromMemory ($$) {
 	my $logger = get_logger();
 	my ($File,$process) = EAI::Common::extractConfigs("creating/writing file from Memory",$arg,"File","process");
 	return 1 if $process->{successfullyDone} and $process->{successfullyDone} =~ /writeFileFromMem/ and $execute{retryBecauseOfError};
-	$logger->warn("no columns given for file ".$File->{filename}) if !$File->{columns};
-	$logger->warn("no data available for writing") if !$data or ($data and @{$data} == 0);
+	$logger->warn("no columns given for file ".$File->{filename}.longmess()) if !$File->{columns};
+	$logger->warn("no data available for writing".longmess()) if !$data or ($data and @{$data} == 0);
 	my $writeSuccess;
 	if ($File->{format_xlformat}) {
 		$writeSuccess = EAI::File::writeExcel($File,$data,$process->{countPercent});
@@ -675,7 +675,7 @@ sub putFileInLocalDir ($) {
 	if ($File->{localFilesystemPath} and $File->{localFilesystemPath} ne '.') {
 		$logger->info("moving file '".$File->{filename}."' into local dir ".$File->{localFilesystemPath});
 		move($File->{filename}, $File->{localFilesystemPath}."/".$File->{filename}) or do {
-			$logger->error("couldn't move ".$File->{filename}." into ".$File->{localFilesystemPath}.": ".$!);
+			$logger->error("couldn't move ".$File->{filename}." into ".$File->{localFilesystemPath}.": $!".longmess());
 			$process->{hadErrors} = 1;
 			return 0;
 		};
@@ -683,7 +683,7 @@ sub putFileInLocalDir ($) {
 		if ($File->{localFilesystemPath} eq '.') {
 			$logger->info("\$File->{localFilesystemPath} is '.', didn't move files");
 		} else {
-			$logger->error("no \$File->{localFilesystemPath} defined, therefore no files processed with putFileInLocalDir");
+			$logger->error("no \$File->{localFilesystemPath} defined, therefore no files processed with putFileInLocalDir".longmess());
 			return 0;
 		}
 	}
@@ -718,7 +718,7 @@ sub uploadFileToFTP ($) {
 			return 0;
 		}
 	} else {
-		$logger->warn("no \$FTP->{remoteDir} defined, therefore no files processed with uploadFileToFTP");
+		$logger->warn("no \$FTP->{remoteDir} defined, therefore no files processed with uploadFileToFTP".longmess());
 	}
 	$process->{successfullyDone}.="uploadFileToFTP";
 	return 1;
@@ -737,32 +737,32 @@ sub uploadFileCMD ($) {
 		system $process->{uploadCMD};
 		my $errHappened;
 		if ($? == -1) {
-			$logger->error($process->{uploadCMD}." failed: $!");
+			$logger->error($process->{uploadCMD}." failed: $!".longmess());
 			$errHappened = 1;
 		} elsif ($? & 127) {
-			$logger->error($process->{uploadCMD}." unexpected finished returning ".($? & 127).", ".(($? & 128) ? 'with' : 'without')." coredump");
+			$logger->error($process->{uploadCMD}." unexpected finished returning ".($? & 127).", ".(($? & 128) ? 'with' : 'without')." coredump".longmess());
 			$errHappened = 1;
 		} elsif ($? != 0) {
-			$logger->error($process->{uploadCMD}." finished returning ".($? >> 8).", err: $!");
+			$logger->error($process->{uploadCMD}." finished returning ".($? >> 8).", err: $!".longmess());
 			$errHappened = 1;
 		} else {
 			$logger->info("finished upload using ".$process->{uploadCMD});
 		}
 		# remove produced files
-		unlink ($process->{uploadCMDPath}."/".$File->{filename}) or $logger->error("couldn't remove $File->{filename} in ".$process->{uploadCMDPath}.": ".$!);
+		unlink ($process->{uploadCMDPath}."/".$File->{filename}) or $logger->error("couldn't remove $File->{filename} in ".$process->{uploadCMDPath}.": $!".longmess());
 		# take error log from uploadCMD
 		if (-e $process->{uploadCMDLogfile} && $errHappened) {
 			my $err = do {
 				local $/ = undef;
-				open (FHERR, "<".$process->{uploadCMDLogfile}) or $logger->error("couldn't read uploadCMD log file ".$process->{uploadCMDLogfile}.":".$!);
+				open (FHERR, "<".$process->{uploadCMDLogfile}) or $logger->error("couldn't read uploadCMD log file ".$process->{uploadCMDLogfile}.": $!".longmess());
 				<FHERR>;
 			};
-			$logger->error($process->{uploadCMD}." returned following: $err");
+			$logger->error($process->{uploadCMD}." returned following: $err".longmess());
 			$process->{hadErrors} = 1;
 			return 0;
 		}
 	} else {
-		$logger->error("no \$process->{uploadCMD} defined, therefore no files processed with uploadFileCMD");
+		$logger->error("no \$process->{uploadCMD} defined, therefore no files processed with uploadFileCMD".longmess());
 		return 0;
 	}
 	$process->{successfullyDone}.="uploadFileCMD";
@@ -791,7 +791,7 @@ sub processingEnd {
 	# incremental checking for errors in processes
 	$processFailed = ($common{process}{hadErrors} ? 1 : 0) unless @loads;
 	$processFailed += ($_->{process}{hadErrors} ? 1 : 0) for @loads;
-	$logger->debug("processingEnd: \$processFailed: $processFailed");
+	$logger->info("processingEnd: \$processFailed: $processFailed");
 	unless ($processFailed) {
 		# archiving/removing on the FTP server only if not a local redo
 		if (!$common{task}{redoFile}) {
@@ -863,6 +863,7 @@ sub processingEnd {
 		}
 		$logger->debug("processingEnd: process failed, \$retrySeconds $retrySeconds, \$execute{failcount}: $execute{failcount}");
 	}
+	# $execute{processEnd} is only set unless ($processFailed) or $common{task}{plannedUntil} is set
 	unless ($execute{processEnd}) {
 		# refresh config for getting changes, also refresh changes in logging configuration
 		$logger->info("process has not ended, refreshing configs, planning next execution");
@@ -885,7 +886,9 @@ sub processingEnd {
 		$endTime = "235959" if !$endTime and $processFailed; # set to retry until end of day for failed processes (can be shortened with $common{task}{retrySecondsXfails})
 		$endTime = "000000->not set" if !$endTime; # if neither planned nor process failed then endtime is undefined and needs to be lower than any currentTime for next decision
 		if ($failcountFinish or $nextStartTime >= $endTime or ($common{task}{retryEndsAfterMidnight} and ($nextStartTime =~ /1....../ or (substr($execute{startingTime},0,2) > substr($currentTime,0,2))))) {
-			$logger->info("finished processing due ".($failcountFinish ? "to reaching set error count \$common{task}{retrySecondsXfails} $common{task}{retrySecondsXfails} and \$common{task}{retrySecondsErrAfterXfails} is false" : ($common{task}{retryEndsAfterMidnight} ? "to ending retry after midnight: nextStartTime=$nextStartTime, startingTime=$execute{startingTime}, currentTime=$currentTime" : "to time out: next start time(".$nextStartTime.") >= endTime(".$endTime.")")));
+			$logger->info("finished processing due to reaching set error count \$common{task}{retrySecondsXfails} $common{task}{retrySecondsXfails} and \$common{task}{retrySecondsErrAfterXfails} is false") if $failcountFinish;
+			$logger->info("finished processing due to defined ending retry after midnight: nextStartTime=$nextStartTime, startingTime=$execute{startingTime}, currentTime=$currentTime, \$common{task}{retryEndsAfterMidnight}=$common{task}{retryEndsAfterMidnight}") if ($common{task}{retryEndsAfterMidnight} and ($nextStartTime =~ /1....../ or (substr($execute{startingTime},0,2) > substr($currentTime,0,2))));
+			$logger->info("finished processing due to time out: next start time($nextStartTime) >= endTime($endTime)") if $nextStartTime >= $endTime;
 			moveFilesToHistory($common{task}{customHistoryTimestamp});
 			deleteFiles($execute{filesToDelete}) if $execute{filesToDelete};
 			deleteFiles($execute{uploadFilesToDelete},1) if $execute{uploadFilesToDelete};
@@ -933,10 +936,10 @@ sub standardLoop (;$) {
 	my $logger = get_logger();
 	while (processingContinues()) {
 		if ($common{DB}{DSN}) {
-			openDBConn(\%common,1) or $logger->error("failed opening DB connection");
+			openDBConn(\%common,1) or $logger->error("failed opening DB connection".longmess());
 		}
 		if ($common{FTP}{remoteHost}) {
-			openFTPConn(\%common,1) or $logger->error("failed opening FTP connection");
+			openFTPConn(\%common,1) or $logger->error("failed opening FTP connection".longmess());
 		}
 		if (@loads) {
 			for my $load (@loads) {
@@ -997,7 +1000,7 @@ sub moveFilesToHistory (;$) {
 			if (!$execute{alreadyMovedOrDeleted}{$_}) {
 				my $histTarget = $execute{$histFolder}."/".$strippedName."_".$cutOffSpec.".".$ext;
 				$logger->info("moving file $redoDir$_ into $histTarget");
-				rename $redoDir.$_, $histTarget or $logger->error("error when moving file $redoDir$_ into $histTarget: $!");
+				rename $redoDir.$_, $histTarget or $logger->error("error when moving file $redoDir$_ into $histTarget: $!".longmess());
 				$execute{alreadyMovedOrDeleted}{$_} = 1;
 			}
 		}
@@ -1014,7 +1017,7 @@ sub deleteFiles ($;$) {
 	for (@$filenames) {
 		if (!$execute{alreadyMovedOrDeleted}{$_}) {
 			$logger->info("removing ".($common{task}{redoFile} ? "re-done " : "")."file $redoDir$_ ");
-			unlink $redoDir.$_ or $logger->error("error when removing file $redoDir".$_." : $!");
+			unlink $redoDir.$_ or $logger->error("error when removing file $redoDir".$_." : $!".longmess());
 			$execute{alreadyMovedOrDeleted}{$_} = 1;
 		}
 	}
@@ -1941,7 +1944,7 @@ additional more args for Net::SFTP::Foreign new (args passed to ssh command).
 
 =item additionalParamsNew
 
-additional parameters for Net::SFTP::Foreign new.
+additional parameters for Net::SFTP::Foreign new (args passed to Net::SFTP::Foreign).
 
 =item additionalParamsPut
 

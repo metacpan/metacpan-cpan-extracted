@@ -60,17 +60,22 @@
    "provides" : {
       "Plack::Middleware::Validate_Google_IAP_JWT" : {
          "file" : "lib/Plack/Middleware/Validate_Google_IAP_JWT.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hkoba/perl-Plack-Middleware-Validate_Google_IAP_JWT/issues"
+      },
+      "homepage" : "https://github.com/hkoba/perl-Plack-Middleware-Validate_Google_IAP_JWT",
       "repository" : {
          "type" : "git",
-         "url" : "git://gitlab-test.ssri.co.jp/devteam/infra/Plack-Middleware-Validate_Google_IAP_JWT.git"
+         "url" : "https://github.com/hkoba/perl-Plack-Middleware-Validate_Google_IAP_JWT.git",
+         "web" : "https://github.com/hkoba/perl-Plack-Middleware-Validate_Google_IAP_JWT"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_contributors" : [
       "Kobayasi, Hiroaki <hkoba@ssri.com>"
    ],

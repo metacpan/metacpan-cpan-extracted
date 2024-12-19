@@ -27,7 +27,7 @@ no_index:
 provides:
   Plack::Middleware::Validate_Google_IAP_JWT:
     file: lib/Plack/Middleware/Validate_Google_IAP_JWT.pm
-    version: '0.02'
+    version: '0.04'
 requires:
   Crypt::JWT: '0.035'
   HTTP::Tiny: '0'
@@ -36,8 +36,10 @@ requires:
   URI: '0'
   perl: '5.008001'
 resources:
-  repository: git://gitlab-test.ssri.co.jp/devteam/infra/Plack-Middleware-Validate_Google_IAP_JWT.git
-version: '0.02'
+  bugtracker: https://github.com/hkoba/perl-Plack-Middleware-Validate_Google_IAP_JWT/issues
+  homepage: https://github.com/hkoba/perl-Plack-Middleware-Validate_Google_IAP_JWT
+  repository: https://github.com/hkoba/perl-Plack-Middleware-Validate_Google_IAP_JWT.git
+version: '0.04'
 x_contributors:
   - 'Kobayasi, Hiroaki <hkoba@ssri.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

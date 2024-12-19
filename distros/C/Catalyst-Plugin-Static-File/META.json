@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Catalyst",
       "static",
@@ -19,6 +19,12 @@
    },
    "name" : "Catalyst-Plugin-Static-File",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.22",
+            "Module::Metadata" : "1.000015"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -70,7 +76,7 @@
             "FindBin" : "0",
             "HTTP::Request::Common" : "0",
             "HTTP::Status" : "0",
-            "Module::Metadata" : "0",
+            "Module::Metadata" : "1.000015",
             "Moose" : "0",
             "Path::Tiny" : "0",
             "Plack::Builder" : "0",
@@ -90,7 +96,7 @@
    "provides" : {
       "Catalyst::Plugin::Static::File" : {
          "file" : "lib/Catalyst/Plugin/Static/File.pm",
-         "version" : "v0.2.2"
+         "version" : "v0.2.3"
       }
    },
    "release_status" : "stable",
@@ -104,10 +110,10 @@
          "web" : "https://github.com/robrwo/Catalyst-Plugin-Static-File"
       }
    },
-   "version" : "v0.2.2",
+   "version" : "v0.2.3",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

@@ -267,14 +267,21 @@ Example:
         ldapRaw              => '(?i:^jpegPhoto|;binary)',
     };
 
-=head1 AUTHOR
-
-Xavier Guimard, E<lt>guimard@E<gt>
-
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2017 by Xavier Guimard
-Copyright (C) 2015-2017 by Clement Oudot
+=over
+
+=item 2009-2023 by Xavier Guimard
+
+=item 2013-2023 by Clément Oudot
+
+=item 2019-2023 by Maxime Besson
+
+=item 2013-2023 by Worteks
+
+=item 2023 by Linagora
+
+=back
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

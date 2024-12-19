@@ -262,9 +262,9 @@ Calls native L<SSL_CTX_set_verify|https://docs.openssl.org/master/man3/SSL_CTX_s
 
 =head2 set_alpn_select_cb
 
-C<method set_alpn_select_cb : void ($cb : Net::SSLeay::Callback::AlpnSelect, $arg : object);>
+C<method set_alpn_select_cb : void ($cb : Net::SSLeay::Callback::AlpnSelect);>
 
-Calls native L<SSL_CTX_set_alpn_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb> function given $cb, $arg.
+Calls native L<SSL_CTX_set_alpn_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb> function given $cb, NULL.
 
 =head2 set_alpn_select_cb_with_protocols
 
@@ -274,17 +274,17 @@ Calls native L<SSL_CTX_set_alpn_select_cb|https://docs.openssl.org/1.1.1/man3/SS
 
 =head2 set_default_passwd_cb
 
-C<method set_default_passwd_cb : void ($cb : L<Net::SSLeay::Callback::PemPassword|SPVM::Net::SSLeay::Callback::PemPassword>, $arg : object = undef);>
+C<method set_default_passwd_cb : void ($cb : L<Net::SSLeay::Callback::PemPassword|SPVM::Net::SSLeay::Callback::PemPassword>);>
 
-Calls native L<SSL_CTX_set_default_passwd_cb|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_default_passwd_cb> function given $cb, and returns its return value.
+Calls native L<SSL_CTX_set_default_passwd_cb|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_default_passwd_cb> function given $cb, NULL, and returns its return value.
 
 $arg is expected to be passed to native L<SSL_CTX_set_default_passwd_cb_userdata|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_default_passwd_cb> function.
 
 =head2 set_tlsext_servername_callback
 
-C<method set_tlsext_servername_callback : long ($cb : L<Net::SSLeay::Callback::TlsextServername|SPVM::Net::SSLeay::Callback::TlsextServername>, $arg : object = undef);>
+C<method set_tlsext_servername_callback : long ($cb : L<Net::SSLeay::Callback::TlsextServername|SPVM::Net::SSLeay::Callback::TlsextServername>);>
 
-Calls native L<SSL_CTX_set_tlsext_servername_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_servername_callback> function given $cb, and returns its return value.
+Calls native L<SSL_CTX_set_tlsext_servername_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_servername_callback> function given $cb, NULL, and returns its return value.
 
 $arg is expected to be passed to native L<SSL_CTX_set_tlsext_servername_arg|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_servername_callback> function.
 

@@ -58,6 +58,6 @@
          "web" : "https://codeberg.org/1-1sam/sbokeeper"
       }
    },
-   "version" : "1.02",
+   "version" : "2.00",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }
