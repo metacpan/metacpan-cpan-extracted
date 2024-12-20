@@ -1,5 +1,9 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.2.0 2024-12-20T06:27:46+0900
+    - Release for updated Unicode data release version 46.1
+      See CLDR release notes for details: <https://cldr.unicode.org/downloads/cldr-46>
+
 v1.1.0 2024-11-09T11:45:17+0900
     - Release for updated Unicode data release version 46.0
     - Changed minimum perl required version from v5.10 to v5.10.1

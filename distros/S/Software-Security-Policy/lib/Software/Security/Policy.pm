@@ -3,7 +3,7 @@ use warnings;
 package Software::Security::Policy;
 # ABSTRACT: packages that provide templated Security Policys
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 use Data::Section -setup => { header_re => qr/\A__([^_]+)__\Z/ };
 use Text::Template ();
@@ -22,7 +22,13 @@ sub url { $_[0]->{url} || 'SECURITY.md' }
 
 sub support_years { $_[0]->{support_years} || '10'}
 
-sub timeframe { $_[0]->{timeframe} || '5 days'    }
+sub timeframe {
+    return $_[0]->{timeframe} if defined $_[0]->{timeframe};
+    return $_[0]->{timeframe_quantity} . ' ' . $_[0]->{timeframe_units}
+        if defined $_[0]->{timeframe_quantity} &&
+            defined $_[0]->{timeframe_units};
+    return '5 days';
+}
 
 sub maintainer { $_[0]->{maintainer}     }
 
@@ -61,23 +67,6 @@ sub version  {
   return join '.', @vparts;
 }
 
-
-# sub meta1_name    { return undef; } # sort this out later, should be easy
-sub meta_name     { return undef; }
-
-# FIXME : are there any meta attributes for this?
-sub meta2_name {
-  my ($self) = @_;
-  my $meta1 = $self->meta_name;
-
-  return undef unless defined $meta1;
-
-  return $meta1
-    if $meta1 =~ /\A(?:open_source|restricted|unrestricted|unknown)\z/;
-
-  return undef;
-}
-
 sub _fill_in {
   my ($self, $which) = @_;
 
@@ -104,30 +93,94 @@ Software::Security::Policy - packages that provide templated Security Policys
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
   my $policy = Software::Security::Policy::Individual->new({
-    maintainer => 'Timothy Legge',
+    maintainer => 'security@example.com',
   });
 
   print $output_fh $policy->fulltext;
 
 =head1 METHODS
 
-=head2 new
+=over
+
+=item new
 
   my $policy = $subclass->new(\%arg);
 
 This method returns a new security policy object for the given
 security policy class.  Valid arguments are:
 
+=back
+
+=head2 ATTRIBUTES
+
+=over
+
+=item maintainer
+
+the current maintainer for the distibrution; required
+
+=item timeframe
+
+the time to expect acknowledgement of a security issue.  Should
+include the units such as '5 days or 2 weeks'; defaults to 5 days
+
+=item timeframe_quantity
+
+the amount of time to expect an acknowledgement of a security issue.
+Only used if timeframe is undefined and timeframe_units is defined
+(eg. '5')
+
+=item timeframe_units
+
+the units of time to expect an acknowledgement of a security issue.
+Only used if timeframe is undefined and timeframe_quantity is defined
+(eg. 'days')
+
+=item url
+
+a url where the most current security policy can be found.
+
+=item support_years
+
+the number of years for which past major versions of Perl would be
+supported
+
+=item program
+
+the name of software for use in the middle of a sentence
+
+=item Program
+
+the name of software for use in the beginning of a sentence
+
+C<program> and C<Program> arguments may be specified both, either one or none.
+Each argument, if not specified, is defaulted to another one, or to properly
+capitalized "this program", if both arguments are omitted.
+
+=back
+
 =head2 support_years
+
+Get the number of years of support to be expected
 
 =head2 timeframe
 
+Get the expected response time. Defaults to 5 days and uses
+timeframe_quantity and timeframe_units if the timeframe attribute
+us undefined.
+
 =head2 maintainer
+
+Get the maintainer that should be contacted for security issues.
+
+=head2 url
+
+Get the URL of the latest security policy version.
 
 These methods are attribute readers.
 
@@ -173,44 +226,8 @@ This method returns the complete text of the policy.
 
 =head2 version
 
-This method returns the version of the policy.  If the security policy is not
-versioned, this method will return false.
-
-=head2 meta_name
-
-This method returns the string that should be used for this security policy in the CPAN
-META.yml file, according to the CPAN Meta spec v1, or undef if there is no
-known string to use.
-
-=head2 meta2_name
-
-This method returns the string that should be used for this security policy in the CPAN
-META.json or META.yml file, according to the CPAN Meta spec v2, or undef if
-there is no known string to use.  If this method does not exist, and
-C<meta_name> returns open_source, restricted, unrestricted, or unknown, that
-value will be used.
-
-=for :list = maintainer
-the current maintainer for the distibrution; required
-= program
-the name of software for use in the middle of a sentence
-= Program
-the name of software for use in the beginning of a sentence
-
-C<program> and C<Program> arguments may be specified both, either one or none.
-Each argument, if not specified, is defaulted to another one, or to properly
-capitalized "this program", if both arguments are omitted.
-
-=head1 LOOKING UP LICENSE CLASSES
-
-FIXME: Remove - unneeded
-If you have an entry in a F<META.yml> or F<META.json> file, or similar
-metadata, and want to look up the Software::Security::Policy class to use, there are
-useful tools in L<Software::Security::Policy::Utils>.
-
-=head1 TODO
-
-=for :list * register policys with aliases to allow $registry->get('gpl', 2);
+This method returns the version of the policy.  If the security
+policy is not versioned, this method will return false.
 
 =head1 SEE ALSO
 
@@ -219,11 +236,6 @@ The specific policy:
 =for :list * L<Software::Security::Policy::Individual>
 
 Extra policys are maintained on CPAN in separate modules.
-
-FIXME Remove
-The L<App::Software::Security::Policy> module comes with a script
-L<software-policy|https://metacpan.org/pod/distribution/App-Software-Security::Policy/script/software-policy>,
-which provides a command-line interface to Software::Security::Policy.
 
 =head1 COPYRIGHT
 

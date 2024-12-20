@@ -2,10 +2,9 @@ package Test2::EventFacet::Meta;
 use strict;
 use warnings;
 
-our $VERSION = '1.302204';
+our $VERSION = '1.302206';
 
 BEGIN { require Test2::EventFacet; our @ISA = qw(Test2::EventFacet) }
-use vars qw/$AUTOLOAD/;
 
 # replace set_details
 {
@@ -35,7 +34,7 @@ sub can {
 }
 
 sub AUTOLOAD {
-    my $name = $AUTOLOAD;
+    my $name = our $AUTOLOAD;
     $name =~ s/^.*:://g;
     my $sub = $_[0]->can($name);
     goto &$sub;

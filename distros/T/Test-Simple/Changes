@@ -4,6 +4,17 @@
 * merged distributions can be found further down in the file.                 *
 *******************************************************************************
 
+1.302206  2024-12-19 17:51:07-08:00 America/Los_Angeles
+
+    - Remove Test::Builder::IO::Scalar
+    - Fix #1016
+
+1.302205  2024-12-19 09:28:05-08:00 America/Los_Angeles
+
+    - Use our instead of 'use vars'
+    - Fix $[ usage
+    - Doc updates
+
 1.302204  2024-09-14 10:32:25-07:00 America/Los_Angeles
 
     - Add pending diagnostics functionality

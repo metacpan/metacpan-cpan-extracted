@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::X509_STORE - X509_STORE data structure in OpenSSL
 
 =head1 Description
 
-Net::SSLeay::X509_STORE in L<SPVM> represetns L<X509_STORE|https://docs.openssl.org/1.1.1/man3/X509_STORE_new/> data structure in OpenSSL.
+Net::SSLeay::X509_STORE in L<SPVM> represetns C<X509_STORE> data structure in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::X509_STORE in L<SPVM> represetns L<X509_STORE|https://docs.openssl.
 
 C<static method new : L<Net::SSLeay::X509_STORE|SPVM::Net::SSLeay::X509_STORE> ();>
 
-Calls native L<X509_STORE_new|https://docs.openssl.org/1.1.1/man3/X509_STORE_new/> function, creates a new  L<Net::SSLeay::X509_STORE|SPVM::Net::SSLeay::X509_STORE> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
+Calls native L<X509_STORE_new|https://docs.openssl.org/master/man3/X509_STORE_new> function, creates a new  L<Net::SSLeay::X509_STORE|SPVM::Net::SSLeay::X509_STORE> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
 
 Exceptions:
 
@@ -34,7 +34,7 @@ If X509_STORE_new failed, an exception is thrown with C<eval_error_id> set to th
 
 C<method set_flags : void ($flags : long);>
 
-Calls native L<X509_STORE_set_flags|https://docs.openssl.org/master/man3/X509_STORE_set_flags/> function given $flags.
+Calls native L<X509_STORE_set_flags|https://docs.openssl.org/master/man3/X509_STORE_set_flags> function given $flags.
 
 Exceptions:
 
@@ -44,7 +44,7 @@ If X509_STORE_set_flags failed, an exception is thrown with C<eval_error_id> set
 
 C<method add_cert : int ($x : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>);>
 
-Calls native L<X509_STORE_add_cert|https://docs.openssl.org/1.1.1/man3/X509_STORE_add_cert/> function given the pointer value of $x.
+Calls native L<X509_STORE_add_cert|https://docs.openssl.org/master/man3/X509_STORE_add_cert> function given the pointer value of $x.
 
 Exceptions:
 
@@ -54,7 +54,7 @@ If X509_STORE_add_cert failed, an exception is thrown with C<eval_error_id> set 
 
 C<method add_crl : void ($x : L<Net::SSLeay::X509_CRL|SPVM::Net::SSLeay::X509_CRL>);>
 
-Calls native L<X509_STORE_add_crl|https://docs.openssl.org/3.0/man3/X509_STORE_add_crl/> function given the pointer value of $x.
+Calls native L<X509_STORE_add_crl|https://docs.openssl.org/master/man3/X509_STORE_add_crl> function given the pointer value of $x.
 
 Exceptions:
 
@@ -64,7 +64,7 @@ If X509_STORE_add_crl failed, an exception is thrown with C<eval_error_id> set t
 
 C<method DESTROY : void ();>
 
-Calls native L<X509_STORE_free|https://docs.openssl.org/3.1/man3/X509_STORE_free/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+Calls native L<X509_STORE_free|https://docs.openssl.org/master/man3/X509_STORE_free> function given the pointer value of the instance unless C<no_free> flag of the instance is a true value.
 
 =head1 FAQ
 

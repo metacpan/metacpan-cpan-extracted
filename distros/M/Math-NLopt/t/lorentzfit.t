@@ -143,19 +143,19 @@ sub main {
             0, 0, 1e-6, undef, 0, 0 );
 
         is( {
-                count => $count,
-                minf  => $minf,
-                A     => $p[0],
-                w     => $p[1],
-                G     => $p[2],
+                # count => $count,
+                minf => $minf,
+                A    => $p[0],
+                w    => $p[1],
+                G    => $p[2],
             },
 
             {
-                count => 94,
-                minf  => float( 0.00639855,   precision => 5 ),
-                A     => float( 1.00146,      precision => 5 ),
-                w     => float( -0.000287406, precision => 5 ),
-                G     => float( 1.00039,      precision => 5 ),
+                # count => 94,
+                minf => float(  0.00639855,  precision => 5 ),
+                A    => float(  1.00146,     precision => 5 ),
+                w    => float( -0.000287406, precision => 5 ),
+                G    => float(  1.00039,     precision => 5 ),
             },
         );
     };
@@ -168,19 +168,19 @@ sub main {
             1e-6, undef, 0, 0 );
 
         is( {
-                count => $count,
-                minf  => $minf,
-                A     => $p[0],
-                w     => $p[1],
-                G     => $p[2],
+                # count => $count,
+                minf => $minf,
+                A    => $p[0],
+                w    => $p[1],
+                G    => $p[2],
             },
 
             {
-                count => 137,
-                minf  => float( 0.00639851,   precision => 5 ),
-                A     => float( 1.00137,      precision => 5 ),
-                w     => float( -0.000287383, precision => 5 ),
-                G     => float( 1.00033,      precision => 5 ),
+                # count => 137,
+                minf => float(  0.00639851,  precision => 5 ),
+                A    => float(  1.00137,     precision => 5 ),
+                w    => float( -0.000287383, precision => 5 ),
+                G    => float(  1.00033,     precision => 5 ),
             },
         );
     };
@@ -191,19 +191,19 @@ sub main {
         nlopt_minimize( NLOPT_LN_NELDERMEAD, 3, \&lorentzerr, $d, \@lb, \@ub, \@p, \$minf, -HUGE_VAL(), 0,
             0, 1e-6, undef, 0, 0 );
         is( {
-                count => $count,
-                minf  => $minf,
-                A     => $p[0],
-                w     => $p[1],
-                G     => $p[2],
+                # count => $count,
+                minf => $minf,
+                A    => $p[0],
+                w    => $p[1],
+                G    => $p[2],
             },
 
             {
-                count => 118,
-                minf  => float( 0.00639851,   precision => 5 ),
-                A     => float( 1.00135,      precision => 5 ),
-                w     => float( -0.000277813, precision => 5 ),
-                G     => float( 1.00032,      precision => 5 ),
+                # count => 118,
+                minf => float(  0.00639851,  precision => 5 ),
+                A    => float(  1.00135,     precision => 5 ),
+                w    => float( -0.000277813, precision => 5 ),
+                G    => float(  1.00032,     precision => 5 ),
             },
         );
     };
@@ -215,19 +215,19 @@ sub main {
         nlopt_minimize( NLOPT_LN_SBPLX, 3, \&lorentzerr, $d, \@lb, \@ub, \@p, \$minf, -HUGE_VAL(), 0, 0,
             1e-6, undef, 0, 0 );
         is( {
-                count => $count,
-                minf  => $minf,
-                A     => $p[0],
-                w     => $p[1],
-                G     => $p[2],
+                # count => $count,
+                minf => $minf,
+                A    => $p[0],
+                w    => $p[1],
+                G    => $p[2],
             },
 
             {
-                count => 102,
-                minf  => float( 0.00639851,  precision => 5 ),
-                A     => float( 1.00135,     precision => 5 ),
-                w     => float( -0.00027781, precision => 5 ),
-                G     => float( 1.00032,     precision => 5 ),
+                # count => 102,
+                minf => float(  0.00639851, precision => 5 ),
+                A    => float(  1.00135,    precision => 5 ),
+                w    => float( -0.00027781, precision => 5 ),
+                G    => float(  1.00032,    precision => 5 ),
             },
         );
     };

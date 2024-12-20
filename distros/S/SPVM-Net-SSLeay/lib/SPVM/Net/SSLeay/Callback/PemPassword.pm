@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::Callback::PemPassword - pem_password_cb Function Pointer Type
 
 =head1 Description
 
-Net::SSLeay::Callback::PemPassword interface in L<SPVM> represents L<pem_password_cb|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_default_passwd_cb> function pointer type in OpenSSL.
+Net::SSLeay::Callback::PemPassword interface in L<SPVM> represents L<pem_password_cb|https://docs.openssl.org/master/man3/pem_password_cb> function pointer type in OpenSSL.
 
 =head1 Usage
 
@@ -20,7 +20,7 @@ Net::SSLeay::Callback::PemPassword interface in L<SPVM> represents L<pem_passwor
 
 C<required method : int ($ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $rwflag : int);>
 
-This method represents L<pem_password_cb|https://docs.openssl.org/1.0.2/man3/SSL_CTX_set_default_passwd_cb> function pointer type in OpenSSL.
+This method represents L<pem_password_cb|https://docs.openssl.org/master/man3/pem_password_cb> function pointer type in OpenSSL.
 
 =head1 See Also
 

@@ -3,7 +3,7 @@ NAME
     programs
 
 VERSION
-    version 0.48
+    version 0.50
 
 SYNOPSIS
       use Capture::Tiny ':all';
@@ -94,7 +94,7 @@ USAGE
     capture), provide custom filehandles as a trailing list of option pairs:
 
       my $out_fh = IO::File->new("out.txt", "w+");
-      my $err_fh = IO::File->new("out.txt", "w+");
+      my $err_fh = IO::File->new("err.txt", "w+");
       capture { ... } stdout => $out_fh, stderr => $err_fh;
 
     The filehandles must be read/write and seekable. Modifying the files or
@@ -137,7 +137,7 @@ USAGE
     captured as well as passed on to the original STDOUT and STDERR.
 
     When called in void context, "tee" saves memory and time by not reading
-    back from the capture handles, except when the original STDOUT OR STDERR
+    back from the capture handles, except when the original STDOUT or STDERR
     were tied or opened to a scalar handle.
 
   tee_stdout
@@ -288,7 +288,7 @@ SEE ALSO
     This module was inspired by IO::CaptureOutput, which provides similar
     functionality without the ability to tee output and with more
     complicated code and API. IO::CaptureOutput does not handle layers or
-    most of the unusual cases described in the "Limitations" section and I
+    most of the unusual cases described in the "LIMITATIONS" section and I
     no longer recommend it.
 
     There are many other CPAN modules that provide some sort of output
@@ -360,11 +360,19 @@ CONTRIBUTORS
 
     *   David E. Wheeler <david@justatheory.com>
 
+    *   Ed Sabol <esabol@users.noreply.github.com>
+
     *   fecundf <not.com+github@gmail.com>
 
     *   Graham Knop <haarg@haarg.org>
 
+    *   Karen Etheridge <ether@cpan.org>
+
+    *   Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
     *   Peter Rabbitson <ribasushi@cpan.org>
+
+    *   Sven Kirmess <sven.kirmess@kzone.ch>
 
 COPYRIGHT AND LICENSE
     This software is Copyright (c) 2009 by David Golden.

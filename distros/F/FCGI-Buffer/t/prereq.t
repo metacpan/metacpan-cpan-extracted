@@ -1,12 +1,11 @@
-#!perl -w
+#!/usr/bin/env perl
 
 use strict;
+use warnings;
+
+use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs 'Test::Prereq';
 
-unless($ENV{RELEASE_TESTING}) {
-	plan(skip_all => 'Author tests not required for installation');
-}
-
-eval 'use Test::Prereq';
-plan(skip_all => 'Test::Prereq required to test dependencies') if $@;
+Test::Prereq->import();
 prereq_ok();

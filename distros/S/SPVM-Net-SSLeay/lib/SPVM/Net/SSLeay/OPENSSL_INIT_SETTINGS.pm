@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::OPENSSL_INIT_SETTINGS - OPENSSL_INIT_SETTINGS Data Structure 
 
 =head1 Description
 
-Net::SSLeay::OPENSSL_INIT_SETTINGS class in L<SPVM> represents L<OPENSSL_INIT_SETTINGS|https://docs.openssl.org/1.1.1/man3/OPENSSL_init_crypto> data structure in OpenSSL.
+Net::SSLeay::OPENSSL_INIT_SETTINGS class in L<SPVM> represents C<OPENSSL_INIT_SETTINGS> data structure in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::OPENSSL_INIT_SETTINGS class in L<SPVM> represents L<OPENSSL_INIT_SE
 
 C<method DESTROY : void ();>
 
-Calls native L<OPENSSL_INIT_free|https://docs.openssl.org/1.1.1/man3/OPENSSL_init_crypto> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+Calls native L<OPENSSL_INIT_free|https://docs.openssl.org/master/man3/OPENSSL_INIT_free> function given the pointer value of the instance unless C<no_free> flag of the instance is a true value.
 
 =head1 See Also
 

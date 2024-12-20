@@ -5166,7 +5166,7 @@ EOD
 	}
 	my($mask) = (isfinite $vals);
 	$mask &= ($vals != $missing) if(defined $missing);
-	$mask->slice("1:-1") &= (($pp->slice("0:-2") != 0) | ($pp->slice("1:-1") != 0));
+	$mask->slice("1:-1") &= long(($pp->slice("0:-2") != 0) | ($pp->slice("1:-1") != 0));
 	my($c,$d) = minmax(where($vals,$mask));
 	$min .= $c;
 	$max .= $d;

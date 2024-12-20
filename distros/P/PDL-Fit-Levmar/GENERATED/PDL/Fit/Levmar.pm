@@ -1,9 +1,9 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from levmar.pd! Don't modify!
 #
 package PDL::Fit::Levmar;
 
-our @EXPORT_OK = qw(levmar levmar_report levmar_chkjac levmar_der_ levmar_der_lb levmar_der_ub levmar_der_lb_ub levmar_diff_ levmar_diff_lb levmar_diff_ub levmar_diff_lb_ub _levmar_chkjac _levmar_chkjac_no_t );
+our @EXPORT_OK = qw(levmar levmar_report levmar_chkjac levmar_der_lb_ub levmar_der_lb levmar_der_ levmar_der_ub levmar_diff_lb_ub levmar_diff_lb levmar_diff_ levmar_diff_ub _levmar_chkjac _levmar_chkjac_no_t );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -11,10 +11,11 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.0106';
+   our $VERSION = '0.0107';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Fit::Levmar $VERSION;
+
 
 
 
@@ -80,9 +81,7 @@ Don't confuse this module with, but see also,  L<PDL::Fit::LM>.
                       x = p0 * exp(-t*t * p1);');
     print levmar_report($result_hash);
 
-
 =head1 EXAMPLES
-
 
 A number of examples of invocations of C<levmar> follow. The test
 directory C<./t> in the module distribution contains many more examples.
@@ -192,7 +191,6 @@ with C<FLOAT> expanded to double and once expanded to float)
 The correct version is used automatically depending on the
 type of pdls you give levmar.
 
-
 =item example--4
 
 We supply an analytic derivative ( analytic jacobian).
@@ -249,7 +247,6 @@ have hard coded them to double, in which case both the float
 and double code versions would have used type double for them.
 This is ok, because it doesn't cost any storage or cause
 a memory fault because of incorrect pointer arithmetic.
-
 
 =item example--5
 
@@ -311,7 +308,6 @@ and fit it all in one function call.
   [         3        0.3]
  ]
 
-
 =item example--7
 
 This example shows how to fit a bivariate Gaussian. Here
@@ -326,7 +322,6 @@ is the fit function.
     my $x = $xin->splitdim(0,$n);
     $x .= $p0 * exp( -$p1*$t1*$t1 - $p2*$t2*$t2);
  }
-
 
 We would prefer a function that maps t(n,n) --> x(n,n) (with
 p viewed as parameters.) But the levmar library expects one
@@ -515,7 +510,6 @@ box constraints, or both. That is, you may specify A, B, UB, and LB.
 
 See C<UB>.
 
-
 =item WGHTS
 
 Penalty weights can be given optionally when box and linear equality
@@ -600,7 +594,6 @@ Send a pdl reference for the output hash element C<INFO>.
 Send a pdl reference for the output hash element C<RET>.
 (see C<COVAR>)
 
-
 =item MAXITS
 
 Maximum number of iterations to try before giving up. The default
@@ -631,7 +624,6 @@ at the current estimate for C<p> and the data.
 This is a step size used in computing numeric derivatives. It is
 not used if the analytic jacobian is used.
 
-
 =item MKOBJ
 
 command to compile source into object code. This option is actually set in
@@ -655,7 +647,6 @@ written by Levmar::Func. This can be used to include headers and so forth.
 This option is actually set in the Levmar::Func object. This code is also written
 at the top of c code translated from lpp code.
 
-
 =item FVERBOSE
 
 If true (eg 1) Print the compiling and linking commands to STDERR when compiling fit functions.
@@ -665,7 +656,6 @@ This option is actually passed to Levmar::Func. Default is 0.
 
 Here are the default values
 of some options
-
 
  $Levmar_defaults = {
    FUNC => undef,  # Levmar::Func object, or function def, or ...
@@ -693,7 +683,6 @@ of some options
    };
 
 =back
-
 
 =head1 OUTPUT
 
@@ -735,7 +724,6 @@ find an explanation somewhere here.)
  4  singular matrix. Restart from current p with increased \mu
  5  no further error reduction is possible. Restart with increased \mu
  6  stopped by small ||e||_2
-
 
 =item ERRI, ERR1, ERR2, ERR3, ERR4
 
@@ -825,12 +813,10 @@ untouched.
 
 where q is a sequence of digits.
 
-
 =item xq -> x[q]  
 
 where q is a sequence of digits. This is applied only in the fit function,
 not in the jacobian.
-
 
 =item dq[r] -> d[q+m*r]
 
@@ -843,7 +829,6 @@ small number of data points since this is outside a
 loop. Some provisions should be added to C<lpp>, say C<m=3> to
 hard code the value of C<m>. But m is only explicitly used in
 constructions involving this substitution.
-
 
 =back
 
@@ -859,16 +844,13 @@ i in the fit function and i and j in the jacobian.
 (literal "i")  You can also write t[i] or t[expression involving i] by hand.
 Example: t*t -> t[i]*t[i].
 
-
 =item pq -> p[q]  
 
 where q is a sequence of digits. Example p3 -> p[3].
 
-
 =item x -> x[i]   
 
 only in fit function, not in jacobian.
-
 
 =item (dr or dr[i]) -> d[j++] 
 
@@ -884,10 +866,7 @@ assign the derivative functions.
 
 =back
 
-
 =back
-
-
 
 =item C Code
 
@@ -904,7 +883,6 @@ jacobian function name.
 We should make it possible to pass the function names as a separate option
 rather than parsing the C code. This will allow auxiallary functions to
 be defined in the C code; something that is currently not possible.
-
 
 =item Perl_Subroutines
 
@@ -935,10 +913,7 @@ has dimensions (m,n). For example
     $d((2)) .= 1.0;
  }
 
-
-
 =back
-
 
 =head1 PDL::Fit::Levmar::Func Objects
 
@@ -951,7 +926,6 @@ if you do
 then $outh->{LFUNC} will contain a ref to the function object. The .so
 file, if it exists, will not be deleted until the object is destroyed.
 This will happen, for instance if you do C<$outh = undef>.
-
 
 =head1 IMPLEMENTATION
 
@@ -966,7 +940,6 @@ compiler.  The C compiler options are taken from
 %Config. This is mostly because I had already written those
 parts before I found the modules. I imagine the
 implementation here has less overhead, but is less portable.
-
 
 =item perl subroutine fit functions
 
@@ -1038,7 +1011,6 @@ pressed into the service of delivering other parameters to
 the fit routine. (Formally, even if you use t(n), they are
 parameters.) 
 
-
 =head2 levmar_chkjac()
 
 =for ref
@@ -1051,7 +1023,6 @@ the derivatives numerically.
     p(m); t(n); [o] err(n);
     This is the relevant part of the signature of the
     routine that does the work.
-
 
 =for usage
 
@@ -1085,7 +1056,6 @@ number n as a perl scalar in place of t. For example
 
    $err = levmar_chkjac($Gh,$p,5);
 
-
 in the case that f is hardcoded to return five values.
 
 Need to put the description from the C code in here.
@@ -1104,7 +1074,6 @@ by levmar().
  $h = levmar($p,$x,$t, $func);
 
  print levmar_report($h);
-
 
 =head1 BUGS
 
@@ -1134,27 +1103,12 @@ $DBLMAX = get_dbl_max();
 
 $LPPEXT = ".lpp";
 
-
 sub deb { print STDERR $_[0],"\n"}
-#line 1140 "Levmar.pm"
-
-
 
 #line 1131 "levmar.pd"
-
 $PDL::Fit::Levmar::HAVE_LAPACK=0;
-#line 1147 "Levmar.pm"
-
-
-
-
-
-
 
 #line 1166 "levmar.pd"
-
-
-
 # check if dims are equal in two pdls
 sub chk_eq_dims {
     my ($x,$y) = @_;
@@ -1216,7 +1170,6 @@ $Levmar_defaults_order =  qw [
     
 
     ];
-
 
 $Levmar_defaults = {
     MAXITS => 100,   # maximum iterations
@@ -1306,25 +1259,16 @@ sub levmar {
     $inh->{FUNC} = $infunc if defined $infunc;
     die "levmar: neither FUNC nor CSRC defined"
         unless defined $inh->{FUNC} or defined $inh->{CSRC};
-#line 1310 "Levmar.pm"
-
-
 
 #line 1323 "levmar.pd"
-
  
     foreach (qw( A B C D FIX WGHT )) {
         barf "PDL::Fit::Levmar not built with lapack. Found parameter $_"
             if exists $inh->{$_};
     }
    
-#line 1322 "Levmar.pm"
-
-
 
 #line 1332 "levmar.pd"
-
-
         
 ########  Handle parameters
     my $h = {}; # parameter hash to be built from $inh and defaults
@@ -1559,7 +1503,6 @@ sub levmar {
  
 } # end levmar()
 
-
 sub PDL::Fit::Levmar::check_levmar_args {
     my ($h) = @_;
     my @refargs = qw( LB UB A B C D );
@@ -1621,12 +1564,10 @@ sub PDL::Fit::Levmar::make_hash_key_from_arg_comb {
     return join( '_', @$arg_comb);
 }
 
-
 sub PDL::Fit::Levmar::make_pdl_levmar_func_key {
     my ($arg_str, $deriv_type) = @_;
     return  $deriv_type . '_' . $arg_str;
 }
-
 
 %PDL::Fit::Levmar::PDL_Levmar_funcs = (
   DER_ => \&PDL::levmar_der_,
@@ -1662,9 +1603,6 @@ sub PDL::Fit::Levmar::make_pdl_levmar_func_key {
   DER_C_D => \&PDL::levmar_der_C_d,
   DIFF_C_D => \&PDL::levmar_diff_C_d,
 );
-
-
-
 
 sub levmar_chkjac {
     my ($f,$p,$t)  = @_;
@@ -1707,85 +1645,62 @@ sub levmar_chkjac {
     DFP_free($DFP);
     return $err;
 }
-#line 1711 "Levmar.pm"
-
-
-
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
-*levmar_der_ = \&PDL::levmar_der_;
-#line 1718 "Levmar.pm"
-
-
-
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
-*levmar_der_lb = \&PDL::levmar_der_lb;
-#line 1725 "Levmar.pm"
-
-
-
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
-*levmar_der_ub = \&PDL::levmar_der_ub;
-#line 1732 "Levmar.pm"
-
-
-
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 1649 "Levmar.pm"
 
 *levmar_der_lb_ub = \&PDL::levmar_der_lb_ub;
-#line 1739 "Levmar.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
-*levmar_diff_ = \&PDL::levmar_diff_;
-#line 1746 "Levmar.pm"
+*levmar_der_lb = \&PDL::levmar_der_lb;
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+*levmar_der_ = \&PDL::levmar_der_;
+
+
+
+
+*levmar_der_ub = \&PDL::levmar_der_ub;
+
+
+
+
+*levmar_diff_lb_ub = \&PDL::levmar_diff_lb_ub;
+
+
+
 
 *levmar_diff_lb = \&PDL::levmar_diff_lb;
-#line 1753 "Levmar.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+*levmar_diff_ = \&PDL::levmar_diff_;
+
+
+
 
 *levmar_diff_ub = \&PDL::levmar_diff_ub;
-#line 1760 "Levmar.pm"
 
-
-
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
-*levmar_diff_lb_ub = \&PDL::levmar_diff_lb_ub;
-#line 1767 "Levmar.pm"
-
-
-
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
-*_levmar_chkjac = \&PDL::_levmar_chkjac;
-#line 1774 "Levmar.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+*_levmar_chkjac = \&PDL::_levmar_chkjac;
+
+
+
 
 *_levmar_chkjac_no_t = \&PDL::_levmar_chkjac_no_t;
-#line 1781 "Levmar.pm"
+
+
 
 
 
 
 
 #line 1133 "levmar.pd"
-
-
 
 =head1 AUTHORS
 
@@ -1801,10 +1716,7 @@ distribution, the copyright notice should be included in the
 file.
 
 =cut
-#line 1805 "Levmar.pm"
-
-
-
+#line 1720 "Levmar.pm"
 
 # Exit with OK status
 

@@ -40,9 +40,10 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "POSIX" => 0,
     "Test2::V0" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "constant" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -68,6 +69,7 @@ my %FallbackPrereqs = (
   "Test2::V0" => 0,
   "Test::More" => 0,
   "XSLoader" => 0,
+  "constant" => 0,
   "strict" => 0,
   "warnings" => 0
 );

@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::InlineKeyboardMarkup;
-$Telegram::Bot::Object::InlineKeyboardMarkup::VERSION = '0.026';
+$Telegram::Bot::Object::InlineKeyboardMarkup::VERSION = '0.027';
 # ABSTRACT: The base class for Telegram 'InlineKeyboardMarkup' type objects
 
 
@@ -31,7 +31,7 @@ Telegram::Bot::Object::InlineKeyboardMarkup - The base class for Telegram 'Inlin
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 
@@ -53,6 +53,10 @@ James Green <jkg@earth.li>
 =item *
 
 Julien Fiegehenn <simbabque@cpan.org>
+
+=item *
+
+Jess Robinson <jrobinson@cpan.org>
 
 =item *
 

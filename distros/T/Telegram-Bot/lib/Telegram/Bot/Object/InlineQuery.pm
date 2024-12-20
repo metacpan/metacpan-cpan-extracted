@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::InlineQuery;
-$Telegram::Bot::Object::InlineQuery::VERSION = '0.026';
+$Telegram::Bot::Object::InlineQuery::VERSION = '0.027';
 # ABSTRACT: The base class for Telegram 'Invoice' type objects
 
 
@@ -52,7 +52,7 @@ Telegram::Bot::Object::InlineQuery - The base class for Telegram 'Invoice' type 
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 
@@ -116,6 +116,10 @@ James Green <jkg@earth.li>
 =item *
 
 Julien Fiegehenn <simbabque@cpan.org>
+
+=item *
+
+Jess Robinson <jrobinson@cpan.org>
 
 =item *
 

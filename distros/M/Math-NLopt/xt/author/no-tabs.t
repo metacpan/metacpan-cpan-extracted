@@ -13,7 +13,8 @@ my @files = (
     't/00-report-prereqs.t',
     't/constants.t',
     't/lorentzfit.t',
-    't/perl.t'
+    't/perl.t',
+    't/tempdata.t'
 );
 
 notabs_ok($_) foreach @files;

@@ -7,7 +7,6 @@ use warnings;
 use Test::Most;
 use Storable;
 use Capture::Tiny ':all';
-use CGI::Info;
 use autodie qw(:all);
 use lib 't/lib';
 use MyLogger;

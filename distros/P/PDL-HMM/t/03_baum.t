@@ -85,9 +85,9 @@ sub wantmodel1 {
   ##-- test: want: a
   my ($tmp);
   $ea_want = pdl(double, [[0,2], [4,0]])->log;
-  ($tmp=$ea_want->where($ea_want->isfinite->not)) .= logzero;
+  ($tmp=$ea_want->where($ea_want->isfinite->not)) .= logzero->double;
   $eb_want = pdl(double, [[6,0], [0,6]])->log;
-  ($tmp=$eb_want->where($eb_want->isfinite->not)) .= logzero;
+  ($tmp=$eb_want->where($eb_want->isfinite->not)) .= logzero->double;
   $epi_want = pdl(double, [4,2])->log;
   $eomega_want = pdl(double, [2,4])->log;
 
@@ -98,12 +98,12 @@ sub wantmodel1 {
   ##-- model 2: want: maximized
   $ahat_want  = pdl(double,   [[0,  1/3],
 			       [2/3,  0]])->log;
-  ($tmp=$ahat_want->where($ahat_want->isfinite->not)) .= logzero;
+  ($tmp=$ahat_want->where($ahat_want->isfinite->not)) .= logzero->double;
 
   $omegahat_want = pdl(double, [1/3,2/3])->log;
 
   $bhat_want  = pdl(double, [[1,0],[0,1]])->log;
-  ($tmp=$bhat_want->where($bhat_want->isfinite->not)) .= logzero;
+  ($tmp=$bhat_want->where($bhat_want->isfinite->not)) .= logzero->double;
 
   $pihat_want = pdl(double, [2/3,1/3])->log;
 }

@@ -2,7 +2,7 @@ package Test2::Tools::Spec;
 use strict;
 use warnings;
 
-our $VERSION = '1.302204';
+our $VERSION = '1.302206';
 
 use Carp qw/croak/;
 use Test2::Workflow qw/parse_args build current_build root_build init_root build_stack/;
@@ -15,7 +15,7 @@ use Test2::Workflow::Task::Group();
 use Test2::Tools::Mock();
 use Test2::Util::Importer();
 
-use vars qw/@EXPORT @EXPORT_OK/;
+our (@EXPORT, @EXPORT_OK);
 push @EXPORT => qw{describe cases};
 push @EXPORT_OK => qw{include_workflow include_workflows spec_defaults};
 

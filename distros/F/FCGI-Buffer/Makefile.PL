@@ -21,12 +21,23 @@ my %prereq_pm = (
 	'HTML::Lint' => 0,
 	'Storable' => 0,
 	'HTTP::Status' => 0,
-	'DBI' => 0
+	'DBI' => 0,
+	'Readonly' => 0
 );
 
-if(($^O ne 'MSWin32') && ($^O ne 'openbsd')) {
-	# Doesn't work on Windows or compile on OpenBSD
-	$prereq_pm{'IO::Compress::Brotli'} = 0.003;
+if(($^O ne 'MSWin32') && ($^O ne 'openbsd') && ($^O ne 'freebsd')) {
+	# Doesn't work on Windows or compile on OpenBSD/FreeBSD
+	# Also doesn't compile on Arm on Linux, so let's give up
+	# $prereq_pm{'IO::Compress::Brotli'} = 0.003;
+}
+
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
 }
 
 WriteMakefile(
@@ -41,7 +52,9 @@ WriteMakefile(
     PL_FILES            => {},
     TEST_REQUIRES => {
 	'Test::Most' => 0,
+	'Test::DescribeMe' => 0,
 	'Test::NoWarnings' => 0,
+	'Test::Needs' => 0,
 	'Capture::Tiny' => 0,
 	'DateTime' => 0,
 	'DateTime::Format::HTTP' => 0,
@@ -51,10 +64,9 @@ WriteMakefile(
 	'Directory::Scratch' => 0,
 	'CGI::Lingua' => 0,
 	'HTTP::Response' => 0,
-	'HTTP::Headers' => 0,
-    },
-    PREREQ_PM  => \%prereq_pm,
-    dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	'HTTP::Headers' => 0
+    }, PREREQ_PM  => \%prereq_pm,
+	dist => $dist,
     clean      => { FILES => 'FCGI-Buffer-*' },
     META_MERGE => {
     	'meta-spec' => { version => 2 },

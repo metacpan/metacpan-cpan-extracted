@@ -6,10 +6,10 @@ build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  PDL: '2.082'
+  PDL: '2.081'
   Test::More: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,12 @@ no_index:
     - t
     - inc
 requires:
-  PDL: '2.082'
+  PDL: '2.081'
   Test::More: '0'
-version: '0.06008'
+resources:
+  IRC: irc://irc.perl.org/#pdl
+  bugtracker: https://github.com/moocow-the-bovine/PDL-HMM/issues
+  homepage: http://pdl.perl.org/
+  repository: git://github.com/moocow-the-bovine/PDL-HMM.git
+version: '0.06009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

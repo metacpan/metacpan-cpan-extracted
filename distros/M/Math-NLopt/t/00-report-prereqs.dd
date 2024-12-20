@@ -99,7 +99,8 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'POSIX' => '0',
                                    'Test2::V0' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'constant' => '0'
                                  }
                  }
      };

@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::Error::PEM_R_NO_START_LINE - The Error indicated by PEM_R_NO_
 
 =head1 Description
 
-Net::SSLeay::Error::PEM_R_NO_START_LINE class in L<SPVM> represents the error indicated by L<PEM_R_NO_START_LINE|https://docs.openssl.org/1.1.1/man3/PEM_read> in OpenSSL.
+Net::SSLeay::Error::PEM_R_NO_START_LINE class in L<SPVM> represents the error indicated by L<PEM_R_NO_START_LINE|https://docs.openssl.org/master/man3/PEM_R_NO_START_LINE> in OpenSSL.
 
 =head1 Usage
 

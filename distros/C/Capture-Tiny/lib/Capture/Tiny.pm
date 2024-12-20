@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Capture::Tiny;
 # ABSTRACT: Capture STDOUT and STDERR from Perl, XS or external programs
-our $VERSION = '0.48';
+our $VERSION = '0.50';
 use Carp ();
 use Exporter ();
 use IO::Handle ();
@@ -436,7 +436,7 @@ Capture::Tiny - Capture STDOUT and STDERR from Perl, XS or external programs
 
 =head1 VERSION
 
-version 0.48
+version 0.50
 
 =head1 SYNOPSIS
 
@@ -529,7 +529,7 @@ capture via a named file (e.g. to externally monitor a long-running capture),
 provide custom filehandles as a trailing list of option pairs:
 
   my $out_fh = IO::File->new("out.txt", "w+");
-  my $err_fh = IO::File->new("out.txt", "w+");
+  my $err_fh = IO::File->new("err.txt", "w+");
   capture { ... } stdout => $out_fh, stderr => $err_fh;
 
 The filehandles must be read/write and seekable.  Modifying the files or
@@ -577,7 +577,7 @@ as well as passed on to the original STDOUT and STDERR.
 
 When called in void context, C<tee> saves memory and time by
 not reading back from the capture handles, except when the
-original STDOUT OR STDERR were tied or opened to a scalar
+original STDOUT or STDERR were tied or opened to a scalar
 handle.
 
 =head2 tee_stdout
@@ -743,7 +743,7 @@ waiting for its child processes to be ready to proceed.
 This module was inspired by L<IO::CaptureOutput>, which provides
 similar functionality without the ability to tee output and with more
 complicated code and API.  L<IO::CaptureOutput> does not handle layers
-or most of the unusual cases described in the L</Limitations> section and
+or most of the unusual cases described in the L</LIMITATIONS> section and
 I no longer recommend it.
 
 There are many other CPAN modules that provide some sort of output capture,
@@ -839,7 +839,7 @@ L<Test::Output>
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -864,7 +864,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Dagfinn Ilmari Mannsåker David E. Wheeler fecundf Graham Knop Peter Rabbitson
+=for stopwords Dagfinn Ilmari Mannsåker David E. Wheeler Ed Sabol fecundf Graham Knop Karen Etheridge Mohammad S Anwar Peter Rabbitson Sven Kirmess
 
 =over 4
 
@@ -878,6 +878,10 @@ David E. Wheeler <david@justatheory.com>
 
 =item *
 
+Ed Sabol <esabol@users.noreply.github.com>
+
+=item *
+
 fecundf <not.com+github@gmail.com>
 
 =item *
@@ -886,7 +890,19 @@ Graham Knop <haarg@haarg.org>
 
 =item *
 
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
 Peter Rabbitson <ribasushi@cpan.org>
+
+=item *
+
+Sven Kirmess <sven.kirmess@kzone.ch>
 
 =back
 

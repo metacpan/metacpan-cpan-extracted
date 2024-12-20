@@ -1,3 +1,6 @@
+v0.06009 Fri, 20 Dec 2024 11:40:10 +0100 mohawk2
+	* PR#5 fixups for https://github.com/PDLPorters/pdl/issues/511
+
 v0.06008 Fri, 14 Apr 2023 23:09:19 +0200 moocow
 	* restrict GenericTypes to floating-point (F D E)
 	  - E in lieu of LD (long double)

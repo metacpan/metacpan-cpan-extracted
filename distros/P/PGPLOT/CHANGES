@@ -1,3 +1,6 @@
+2.35 2024-12-20
+- be more careful with datatypes (https://github.com/PDLPorters/pdl/issues/511)
+
 2.34 2024-11-25
 - minimum Perl 5.10.1
 - add PGPLOT::set_debugging

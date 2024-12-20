@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '1.23.25';
+   our $VERSION = '1.23.27';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Ufunc $VERSION;
@@ -1205,7 +1205,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
     missing();
     indx N();
     indx [o]ixOut(Ndims,NnzOut);
-    int+ [o]nzvalsOut(NnzOut);
+    indx [o]nzvalsOut(NnzOut);
     indx [o]nOut();
     )
 
@@ -1563,7 +1563,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
-#line 615 "ccsufunc.pd"
+#line 623 "ccsufunc.pd"
 
 
 =pod
@@ -1595,7 +1595,7 @@ zcover, intover, minmaximum
 
 
 
-#line 651 "ccsufunc.pd"
+#line 659 "ccsufunc.pd"
 
 
 ##---------------------------------------------------------------------

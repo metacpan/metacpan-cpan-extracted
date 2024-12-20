@@ -67,8 +67,8 @@ sub rosenbrock {
     my $rderiv = sub {
        my ($p,$d,$t) = @_;
        my ($p0,$p1) = list $p;
-       $d((0)) .= (-2 + 2 * $p0-4 *$ROSD*($p1-$p0*$p0)*$p0);
-       $d((1)) .= (2*$ROSD*($p1-$p0*$p0));
+       $d((0)) .= pdl($d->type, (-2 + 2 * $p0-4 *$ROSD*($p1-$p0*$p0)*$p0));
+       $d((1)) .= pdl($d->type, 2*$ROSD*($p1-$p0*$p0));
     };
     my $rf = sub {
        my ($p,$x,$t) = @_;
@@ -667,14 +667,14 @@ register int j=0;
    my $pd = sub {
        my ($p,$d,$t) = @_;
        my ($p0,$p1,$p2,$p3) = list $p;
-       $d .= 0;
-       $d(0,0) .= 1.0;
-       $d(0,1) .= 1.0;
-       $d(1,1) .= -.5 / sqrt($p((1)) );
-       $d(1,2) .= 1.;
-       $d(2,2) .= -.5 / sqrt($p((2)) );
-       $d(2,3) .= 1;
-       $d(3,3) .= -.5 / sqrt($p((3)) );
+       $d .= pdl($d->type, 0);
+       $d(0,0) .= pdl($d->type, 1.0);
+       $d(0,1) .= pdl($d->type, 1.0);
+       $d(1,1) .= pdl($d->type, -.5 / sqrt $p1);
+       $d(1,2) .= pdl($d->type, 1.);
+       $d(2,2) .= pdl($d->type, -.5 / sqrt $p2);
+       $d(2,3) .= pdl($d->type, 1);
+       $d(3,3) .= pdl($d->type, -.5 / sqrt $p3);
    };
 
 my $defst = '
@@ -718,7 +718,7 @@ my $defst = '
   my $dmax = PDL::Fit::Levmar::get_dbl_max();
   my $ub = ones($Type, 4);  
   $ub *=  $dmax;  
-  $ub(1) .= 0.8;
+  $ub(1) .= pdl($ub->type, 0.8);
 
   my $correct_minimum = pdl $Type, [0.947214, 0.8, 0.64, 0.4096];
    

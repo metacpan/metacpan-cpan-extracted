@@ -2,7 +2,7 @@
 # MIT License
 
 class Net::SSLeay {
-  version "0.031";
+  version "0.032";
   
   use Net::SSLeay::Constant as SSL;
   use Net::SSLeay::SSL_CTX;
@@ -29,7 +29,7 @@ class Net::SSLeay {
   # Fields
   has operation_error : ro int;
   
-  has msg_callback : Net::SSLeay::Callback::Msg;
+  has msg_callback : ro Net::SSLeay::Callback::Msg;
   
   # Class Methods
   native static method new : Net::SSLeay ($ssl_ctx : Net::SSLeay::SSL_CTX);
@@ -52,7 +52,7 @@ class Net::SSLeay {
   native static method select_next_proto : int ($out_ref : string[], $outlen_ref : byte*, $server : string, $server_len : int, $client : string, $client_len : int);
   
   # Instance Methods
-  protected method init : void ($objects : object[] = undef) {
+  protected method init : void ($options : object[] = undef) {
     
     $self->_init_native;
   }
@@ -60,6 +60,8 @@ class Net::SSLeay {
   native private method _init_native : void ($objects : object[] = undef);
   
   native method version : int ();
+  
+  native method get_version : string ();
   
   native method get_mode : long ();
   
@@ -73,7 +75,7 @@ class Net::SSLeay {
   
   native method get_SSL_CTX : Net::SSLeay::SSL_CTX ();
   
-  native method set_SSL_CTX : Net::SSLeay::SSL_CTX ($ctx : Net::SSLeay::SSL_CTX);
+  native method set_SSL_CTX : void ($ssl_ctx : Net::SSLeay::SSL_CTX);
   
   native method set_fd : int ($fd : int);
   
@@ -115,14 +117,12 @@ class Net::SSLeay {
     return $protocol;
   }
   
-  native method set_msg_callback : void ($cb : Net::SSLeay::Callback::Msg);
-  
   method dump_peer_certificate : string () {
     
     my $cert = $self->get_peer_certificate;
     
     unless ($cert) {
-      die "No cert is defined.";
+      die "The return value of get_peer_certificate method must be defined.";
     }
     
     my $subject_name = $cert->get_subject_name->oneline;
@@ -133,6 +133,8 @@ class Net::SSLeay {
     
     return $dump;
   }
+  
+  native method set_msg_callback : void ($cb : Net::SSLeay::Callback::Msg);
   
   native method DESTROY : void ();
   

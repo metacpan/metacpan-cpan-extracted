@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::EVP_PKEY - EVP_PKEY Data Structure in OpenSSL
 
 =head1 Description
 
-Net::SSLeay::EVP_PKEY class in L<SPVM> represents L<EVP_PKEY|https://docs.openssl.org/3.0/man3/EVP_PKEY_new/> data structure in OpenSSL.
+Net::SSLeay::EVP_PKEY class in L<SPVM> represents C<EVP_PKEY> data structure in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::EVP_PKEY class in L<SPVM> represents L<EVP_PKEY|https://docs.openss
 
 C<static method new : L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY> ();>
 
-Calls native L<EVP_PKEY_new|https://docs.openssl.org/3.0/man3/EVP_PKEY_new/> function, creates a new  L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
+Calls native L<EVP_PKEY_new|https://docs.openssl.org/master/man3/EVP_PKEY_new> function, creates a new  L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
 
 Exceptions:
 
@@ -34,7 +34,7 @@ If EVP_PKEY_new failed, an exception is thrown with C<eval_error_id> set to the 
 
 C<method DESTROY : void ();>
 
-Calls native L<EVP_PKEY_free|https://docs.openssl.org/3.0/man3/EVP_PKEY_new/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+Calls native L<EVP_PKEY_free|https://docs.openssl.org/master/man3/EVP_PKEY_free> function given the pointer value of the instance unless C<no_free> flag of the instance is a true value.
 
 =head1 See Also
 

@@ -14,6 +14,14 @@ use CGI::Info;
 use Carp;
 use HTTP::Date;
 use DBI;
+use Readonly;
+
+Readonly my $DEFAULT_GENERATE_304 => 1;
+Readonly my $DEFAULT_GENERATE_LAST_MODIFIED => 1;
+Readonly my $DEFAULT_COMPRESS_CONTENT => 1;
+Readonly my $DEFAULT_OPTIMISE_CONTENT => 0;
+Readonly my $DEFAULT_LINT_CONTENT => 0;
+Readonly my $MIN_GZIP_LEN => 32;
 
 =head1 NAME
 
@@ -21,11 +29,11 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 =head1 SYNOPSIS
 
@@ -52,9 +60,9 @@ to your server asking for the same data:
 	# ...
     }
 
-To also make use of server caches, that is to say to save regenerating
-output when different clients ask you for the same data, you will need
-to create a cache.
+To also make use of server caches, that is to say,
+to save regenerating output when different clients ask you for the same data,
+you will need to create a cache.
 But that's simple:
 
     use FCGI;
@@ -78,12 +86,12 @@ But that's simple:
 	}
     }
 
-To temporarily prevent the use of server-side caches, for example whilst
+To temporarily prevent the use of server-side caches, for example, whilst
 debugging before publishing a code change, set the NO_CACHE environment variable
 to any non-zero value.
-This will also stop ETag being added to the header.
-If you get errors about Wide characters in print it means that you've
-forgotten to emit pure HTML on non-ASCII characters.
+This will also stop ETag from being added to the header.
+If you get errors about Wide characters in print,
+you've forgotten to emit pure HTML on non-ASCII characters.
 See L<HTML::Entities>.
 As a hack work around you could also remove accents and the like by using
 L<Text::Unidecode>,
@@ -93,45 +101,54 @@ which works well but isn't really what you want.
 
 =cut
 
-use constant MIN_GZIP_LEN => 32;
-
 =head2 new
 
-Create an FCGI::Buffer object.  Do one of these for each FCGI::Accept.
+Create an FCGI::Buffer object.
+Do one of these for each FCGI::Accept.
 
 =cut
 
 # FIXME: Call init() on any arguments that are given
-sub new {
+sub new
+{
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
 	# Use FCGI::Buffer->new(), not FCGI::Buffer::new()
 	if(!defined($class)) {
-		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		carp(__PACKAGE__, ': use ->new() not ::new() to instantiate');
 		return;
 	}
 
-	my $buf = IO::String->new();
+	# Handle hash or hashref arguments
+	my %args;
+	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
+		%args = %{$_[0]};
+	} elsif((@_ % 2) == 0) {
+		%args = @_;
+	} else {
+		carp(__PACKAGE__, ': Invalid arguments passed to new()');
+		return;
+	}
 
+	# Initialize buffer and object properties
+	my $buf = IO::String->new() or croak(__PACKAGE__, ': Failed to initialize IO::String');
 	my $rc = {
 		buf => $buf,
 		old_buf => select($buf),
-		generate_304 => 1,
-		generate_last_modified => 1,
-		compress_content => 1,
-		optimise_content => 0,
-		lint_content => 0,
+		generate_304 => $DEFAULT_GENERATE_304,
+		generate_last_modified => $DEFAULT_GENERATE_LAST_MODIFIED,
+		compress_content => $DEFAULT_COMPRESS_CONTENT,
+		optimise_content => $DEFAULT_OPTIMISE_CONTENT,
+		lint_content => $DEFAULT_LINT_CONTENT,
+		%args,
 	};
 	# $rc->{o} = ();
 
-	if($ENV{'SERVER_PROTOCOL'} &&
-	  (($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') || ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/2.0'))) {
-		$rc->{generate_etag} = 1;
-	} else {
-		$rc->{generate_etag} = 0;
-	}
+	# Set generate_etag based on server protocol
+	$rc->{generate_etag} = ($ENV{'SERVER_PROTOCOL'} || '') =~ /^(HTTP\/1\.1|HTTP\/2\.0)$/ ? 1 : 0;
 
+	# Return the blessed object
 	return bless $rc, $class;
 }
 
@@ -179,7 +196,11 @@ sub DESTROY {
 			HTTP::Status->import();
 
 			if(!defined($self->{'status'})) {
-				$self->{'status'} = 200;
+				if($self->{'info'}) {
+					$self->{'status'} = $self->{'info'}->status();
+				} else {
+					$self->{'status'} = 200;
+				}
 			}
 			print 'Status: ', $self->{status}, ' ',
 				HTTP::Status::status_message($self->{status}),
@@ -392,6 +413,9 @@ sub DESTROY {
 				}
 				$unzipped_body = $self->{body};
 				$self->{'status'} = 206;
+				if($self->{'info'}) {
+					$self->{'info'}->status(206);
+				}
 			}
 		}
 		$self->_compress({ encoding => $encoding });
@@ -399,6 +423,11 @@ sub DESTROY {
 
 	if($self->{cache}) {
 		require Storable;
+
+		if($self->{'cache_age'}) {
+			# Legacy
+			$self->{'cache_duration'} = $self->{'cache_age'};
+		}
 
 		my $cache_hash;
 		my $key = $self->_generate_key();
@@ -414,11 +443,9 @@ sub DESTROY {
 					@{$self->{o}} = ("X-FCGI-Buffer-$VERSION: Hit");
 					if($self->{info}) {
 						my $host_name = $self->{info}->host_name();
-						push @{$self->{o}}, "X-Cache: HIT from $host_name";
-						push @{$self->{o}}, "X-Cache-Lookup: HIT from $host_name";
+						push @{$self->{o}}, "X-Cache: HIT from $host_name", "X-Cache-Lookup: HIT from $host_name";
 					} else {
-						push @{$self->{o}}, 'X-Cache: HIT';
-						push @{$self->{o}}, 'X-Cache-Lookup: HIT';
+						push @{$self->{o}}, 'X-Cache: HIT', 'X-Cache-Lookup: HIT';
 					}
 				} elsif($self->{logger}) {
 					$self->{logger}->warn("Error retrieving data for key $key");
@@ -485,6 +512,9 @@ sub DESTROY {
 					}
 					$self->{send_body} = 0;
 					$self->{status} = 500;
+					if($self->{'info'}) {
+						$self->{'info'}->status(500);
+					}
 				}
 			}
 			if($self->{send_body} && $ENV{'SERVER_PROTOCOL'} &&
@@ -534,15 +564,15 @@ sub DESTROY {
 				}
 			}
 		} else {
-			# Not in the server side cache
+			# Not in the server-side cache
 			if($self->{status} == 200) {
 				my $changes = $self->_save_to($unzipped_body, $dbh);
 
-				unless($self->{cache_age}) {
+				unless($self->{cache_duration}) {
 					# It would be great if CHI::set()
 					# allowed the time to be 'lru' for least
 					# recently used.
-					$self->{cache_age} = '10 minutes';
+					$self->{cache_duration} = '10 minutes';
 				}
 				$cache_hash->{'body'} = $unzipped_body;
 				if($changes && $encoding) {
@@ -581,9 +611,9 @@ sub DESTROY {
 				# if($headers !~ /^Expires: /m))) {
 				# }
 				if($self->{logger}) {
-					$self->{logger}->debug("Store $key in the cache, age = ", $self->{cache_age}, ' ', length($cache_hash->{'body'}), ' bytes');
+					$self->{logger}->debug("Store $key in the cache, age = ", $self->{cache_duration}, ' ', length($cache_hash->{'body'}), ' bytes');
 				}
-				$self->{cache}->set($key, Storable::freeze($cache_hash), $self->{cache_age});
+				$self->{cache}->set($key, Storable::freeze($cache_hash), $self->{cache_duration});
 
 				# Create a static page with the information and link to that in the output
 				# HTML
@@ -797,6 +827,9 @@ sub DESTROY {
 			HTTP::Status->import();
 
 			push @{$self->{o}}, 'Status: ' . $self->{status} . ' ' . HTTP::Status::status_message($self->{status});
+			if($self->{'info'}) {
+				$self->{'info'}->status($self->{'status'});
+			}
 		}
 	} else {
 		push @{$self->{o}}, "X-FCGI-Buffer-$VERSION: No headers";
@@ -909,6 +942,9 @@ sub _check_modified_since {
 	if($$params{modified} <= $s) {
 		push @{$self->{o}}, 'Status: 304 Not Modified';
 		$self->{status} = 304;
+		if($self->{'info'}) {
+			$self->{'info'}->status(304);
+		}
 		$self->{send_body} = 0;
 		if($self->{logger}) {
 			$self->{logger}->debug('Set status to 304');
@@ -1045,7 +1081,7 @@ Set various options and override default values.
 	optimise_content => 0,	# optimise your program's HTML, CSS and JavaScript
 	cache => CHI->new(driver => 'File'),	# cache requests
 	cache_key => 'string',	# key for the cache
-	cache_age => '10 minutes',	# how long to store responses in the cache
+	cache_duration => '10 minutes',	# how long to store responses in the cache
 	logger => $self->{logger},
 	lint_content => 0,	# Pass through HTML::Lint
 	generate_304 => 1,	# When appropriate, generate 304: Not modified
@@ -1064,7 +1100,7 @@ used as a server-side cache to reduce the need to rerun database accesses.
 
 Items stay in the server-side cache by default for 10 minutes.
 This can be overridden by the cache_control HTTP header in the request, and
-the default can be changed by the cache_age argument to init().
+the default can be changed by the cache_duration argument to init().
 
 Save_to is feature which stores output of dynamic pages to your
 htdocs tree and replaces future links that point to that page with static links
@@ -1102,7 +1138,7 @@ Generally speaking, passing by reference is better since it copies less on to
 the stack.
 
 If you give a cache to init() then later give cache => undef,
-the server side cache is no longer used.
+the server-side cache is no longer used.
 This is useful when you find an error condition when creating your HTML
 and decide that you no longer wish to store the output in the cache.
 
@@ -1183,13 +1219,13 @@ sub init {
 			if($control =~ /^max-age\s*=\s*(\d+)$/) {
 				# There is an argument not to do this
 				# since one client will affect others
-				$self->{cache_age} = "$1 seconds";
+				$self->{cache_duration} = "$1 seconds";
 				if(defined($self->{logger})) {
-					$self->{logger}->debug("cache_age = $self->{cache_age}");
+					$self->{logger}->debug("cache_duration = $self->{cache_duration}");
 				}
 			}
 		}
-		$self->{cache_age} ||= $params{cache_age};
+		$self->{cache_duration} ||= $params{cache_duration};
 		if((!defined($params{cache})) && defined($self->{cache})) {
 			if(defined($self->{logger})) {
 				if($self->{cache_key}) {
@@ -1285,7 +1321,7 @@ the result stored in the cache.
     my $i = CGI::Info->new();
     my $l = CGI::Lingua->new(supported => ['en']);
 
-    # To use server side caching you must give the cache argument, however
+    # To use server-side caching you must give the cache argument, however
     # the cache_key argument is optional - if you don't give one then one will
     # be generated for you
     my $buffer = FCGI::Buffer->new();
@@ -1370,6 +1406,7 @@ sub is_cached {
 	return 1;
 }
 
+# Determine the last modification time of the script and cache it for subsequent calls
 sub _my_age {
 	my $self = shift;
 
@@ -1378,19 +1415,22 @@ sub _my_age {
 	}
 	unless(defined($self->{info})) {
 		if($self->{cache}) {
-			$self->{info} = CGI::Info->new({ cache => $self->{cache} });
+			$self->{info} = CGI::Info->new({ cache => $self->{cache} })
+				or croak 'Failed to create CGI::Info object with cache';
 		} else {
-			$self->{info} = CGI::Info->new();
+			$self->{info} = CGI::Info->new()
+				or croak 'Failed to create CGI::Info object';
 		}
 	}
 
 	my $path = $self->{info}->script_path();
 	unless(defined($path)) {
+		croak 'Failed to retrieve script path';
 		return;
 	}
 
 	my @statb = stat($path);
-	$self->{script_mtime} = $statb[9];
+	$self->{'script_mtime'} = $statb[9];	# Set script_mtime to the modification time of the script
 	return $self->{script_mtime};
 }
 
@@ -1437,7 +1477,7 @@ sub _compress()
 	return unless(defined($self->{'body'}));
 	my $encoding = $params{encoding};
 
-	if((length($encoding) == 0) || (length($self->{body}) < MIN_GZIP_LEN)) {
+	if((length($encoding) == 0) || (length($self->{body}) < $MIN_GZIP_LEN)) {
 		return;
 	}
 
@@ -1461,21 +1501,27 @@ sub _compress()
 			}
 		}
 	} elsif($encoding eq 'br') {
-		require IO::Compress::Brotli;
-		IO::Compress::Brotli->import();
+		if(eval { require IO::Compress::Brotli }) {
+			IO::Compress::Brotli->import();
 
-		unless($self->{_encode_loaded}) {
-			require Encode;
-			$self->{_encode_loaded} = 1;
-		}
-		my $nbody = IO::Compress::Brotli::bro(Encode::encode_utf8($self->{body}));
-		if(length($nbody) < length($self->{body})) {
-			$self->{body} = $nbody;
-			unless(grep(/^Content-Encoding: br/, @{$self->{o}})) {
-				push @{$self->{o}}, 'Content-Encoding: br';
+			unless($self->{_encode_loaded}) {
+				require Encode;
+				$self->{_encode_loaded} = 1;
 			}
-			unless(grep(/^Vary: Accept-Encoding/, @{$self->{o}})) {
-				push @{$self->{o}}, 'Vary: Accept-Encoding';
+			my $nbody = IO::Compress::Brotli::bro(Encode::encode_utf8($self->{body}));
+			if(length($nbody) < length($self->{body})) {
+				$self->{body} = $nbody;
+				unless(grep(/^Content-Encoding: br/, @{$self->{o}})) {
+					push @{$self->{o}}, 'Content-Encoding: br';
+				}
+				unless(grep(/^Vary: Accept-Encoding/, @{$self->{o}})) {
+					push @{$self->{o}}, 'Vary: Accept-Encoding';
+				}
+			}
+		} else {
+			$self->{status} = 406;
+			if($self->{'info'}) {
+				$self->{'info'}->status(406);
 			}
 		}
 	}
@@ -1491,6 +1537,9 @@ sub _check_if_none_match {
 		push @{$self->{o}}, 'Status: 304 Not Modified';
 		$self->{send_body} = 0;
 		$self->{status} = 304;
+		if($self->{'info'}) {
+			$self->{'info'}->status(304);
+		}
 		if($self->{logger}) {
 			$self->{logger}->debug('Set status to 304');
 		}
@@ -1661,13 +1710,14 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
-FCGI::Buffer should be safe even in scripts which produce lots of different
+FCGI::Buffer should be safe even in scripts that produce lots of different
 output, e.g. e-commerce situations.
-On such pages, however, I strongly urge to setting generate_304 to 0 and
+On such pages, however, I strongly urge setting generate_304 to 0 and
 sending the HTTP header "Cache-Control: no-cache".
 
 When using L<Template>, ensure that you don't use it to output to STDOUT,
-instead you will need to capture into a variable and print that.
+instead,
+you will need to capture into a variable and print that.
 For example:
 
     my $output;
@@ -1685,31 +1735,34 @@ Ensure that deflation is off for .pl files:
 If you request compressed output then uncompressed output (or vice
 versa) on input that produces the same output, the status will be 304.
 The letter of the spec says that's wrong, so I'm noting it here, but
-in practice you should not see this happen or have any difficulties
+in practice, you should not see this happen or have any difficulties
 because of it.
 
 FCGI::Buffer has not been tested against FastCGI.
 
 I advise adding FCGI::Buffer as the last use statement so that it is
-cleared up first.  In particular it should be loaded after
+cleared up first.  In particular, it should be loaded after
 L<Log::Log4perl>, if you're using that, so that any messages it
 produces are printed after the HTTP headers have been sent by
 FCGI::Buffer;
 
 Save_to doesn't understand links in JavaScript, which means that if you use self-calling
-CGIs which are loaded as a static page they may point to the wrong place.
+CGIs loaded as a static page,
+they may point to the wrong place.
 The workaround is to avoid self-calling CGIs in JavaScript
 
-Please report any bugs or feature requests to C<bug-fcgi-buffer at rt.cpan.org>,
+Please report any bugs or feature requests to C<bug-fcgi-buffer at rt.cpan.org>
 or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FCGI-Buffer>.
-I will be notified, and then you'll automatically be notified of progress on
+I will be notified, and then you'll automatically be notified of the progress on
 your bug as I make changes.
 
 The lint operation only works on HTML4, because of a restriction in L<HTML::Lint>.
 
 =head1 SEE ALSO
 
-CGI::Buffer, HTML::Packer, HTML::Lint
+L<CGI::Buffer>,
+L<HTML::Packer>,
+L<HTML::Lint>
 
 =head1 SUPPORT
 
@@ -1724,10 +1777,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=FCGI-Buffer>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/FCGI-Buffer>
 
 =item * Search CPAN
 
@@ -1751,7 +1800,7 @@ The licence for cgi_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2023 Nigel Horne,
+The rest of the program is Copyright 2015-2024 Nigel Horne,
 and is released under the following licence: GPL2
 
 =cut

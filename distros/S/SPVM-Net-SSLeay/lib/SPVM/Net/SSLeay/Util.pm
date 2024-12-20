@@ -22,7 +22,7 @@ Net::SSLeay::Util class in L<SPVM> has utility methods for OpenSSL.
 
 C<static method convert_to_wire_format : byte[] ($protocols : string[]);>
 
-Converts to the protocols $protocols to a L<wire format|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb>, and returns it.
+Converts to the protocols $protocols to a L<wire format|https://docs.openssl.org/master/man3/SSL_CTX_set_alpn_select_cb>, and returns it.
 
 Exceptions:
 

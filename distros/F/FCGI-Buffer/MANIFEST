@@ -29,9 +29,9 @@ t/js.t
 t/kwalitee.t
 t/last_mod.t
 t/lib/MyLogger.pm
-t/links.t
 t/manifest.t
 t/metrics.t
+t/modules-used.t
 t/namespaces.t
 t/no404s.t
 t/nocache.t
@@ -39,16 +39,16 @@ t/noopentickets.t
 t/noplan.t
 t/output.t
 t/pod-cm.t
+t/pod-links.t
+t/pod-snippets.t
 t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/prereq.t
-t/snippets.t
 t/strict.t
 t/too_late.t
 t/unused.t
-t/used.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

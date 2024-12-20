@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 my $class = 'Software::Security::Policy::Individual';
 require_ok($class);
@@ -31,3 +31,11 @@ like($policy->name, qr/individual/i, "Individual Security Policy");
 like($policy->fulltext, qr/5 days/i, 'timeframe updated in policy');
 like($policy->fulltext, qr/10 years/i, 'support_years updated in policy');
 like($policy->fulltext, qr/maintained by a single person/i, 'Individual Security Policy');
+
+$policy = $class->new({
+        maintainer  => 'X. Ample <x.example@example.com>',
+        timeframe_units => 'months',
+        timeframe_quantity => '23',
+    });
+
+like($policy->fulltext, qr/23 months/i, 'timeframe updated form units and quantity');

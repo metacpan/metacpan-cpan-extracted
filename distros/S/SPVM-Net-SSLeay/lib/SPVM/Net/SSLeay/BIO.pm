@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::BIO - BIO Data Strucutre in OpenSSL
 
 =head1 Description
 
-Net::SSLeay::BIO class of L<SPVM> represents L<BIO|https://docs.openssl.org/1.0.2/man3/BIO_new> data structure in OpenSSL.
+Net::SSLeay::BIO class of L<SPVM> represents C<BIO> data structure in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::BIO class of L<SPVM> represents L<BIO|https://docs.openssl.org/1.0.
 
 C<static method new : L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO> ();>
 
-Calls L<BIO_new|https://docs.openssl.org/1.0.2/man3/BIO_new/> function given the return value of native L<BIO_s_mem|https://docs.openssl.org/1.0.2/man3/BIO_s_mem/> function as the first argument, creates a new L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
+Calls L<BIO_new|https://docs.openssl.org/master/man3/BIO_new> function given the return value of native L<BIO_s_mem|https://docs.openssl.org/master/man3/BIO_s_mem> function as the first argument, creates a new L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
 
 Exceptions:
 
@@ -32,7 +32,7 @@ If BIO_new failed, an exception is thrown with C<eval_error_id> set to the basic
 
 C<static method new_file : Net::SSLeay::BIO ($filename : string, $mode : string);>
 
-Calls native L<BIO_new_file|https://docs.openssl.org/1.0.2/man3/BIO_new_file/> function given the file name $filename and the mode $mode, creates a new L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
+Calls native L<BIO_new_file|https://docs.openssl.org/master/man3/BIO_new_file> function given the file name $filename and the mode $mode, creates a new L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
 
 Exceptions:
 
@@ -44,7 +44,7 @@ If BIO_new_file failed, an exception is thrown with C<eval_error_id> set to the 
 
 C<method read : int ($data : mutable string, $dlen : int = -1);>
 
-Calls native L<BIO_read|https://docs.openssl.org/1.0.2/man3/BIO_read/> function given the pointer value of the instance, $data and $dlen, and returns its return value.
+Calls native L<BIO_read|https://docs.openssl.org/master/man3/BIO_read> function given the pointer value of the instance, $data and $dlen, and returns its return value.
 
 If $dlen is lower than 0, it is set to the length of $data.
 
@@ -60,7 +60,7 @@ If BIO_read failed, an exception is thrown with C<eval_error_id> set to the basi
 
 C<method write : int ($data : string, $dlen : int = -1);>
 
-Calls native L<BIO_write|https://docs.openssl.org/1.0.2/man3/BIO_write/> function given the pointer value of the instance, $data and $dlen, and returns its return value.
+Calls native L<BIO_write|https://docs.openssl.org/master/man3/BIO_write> function given the pointer value of the instance, $data and $dlen, and returns its return value.
 
 If $dlen is lower than 0, it is set to the length of $data.
 
@@ -76,7 +76,7 @@ If BIO_write failed, an exception is thrown with C<eval_error_id> set to the bas
 
 C<method DESTROY : void ();>
 
-Calls native L<BIO_free|https://docs.openssl.org/1.0.2/man3/BIO_free> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+Calls native L<BIO_free|https://docs.openssl.org/master/man3/BIO_free> function given the pointer value of the instance unless C<no_free> flag of the instance is a true value.
 
 =head1 See Also
 

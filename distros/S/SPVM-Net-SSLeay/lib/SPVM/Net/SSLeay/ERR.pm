@@ -6,11 +6,11 @@ package SPVM::Net::SSLeay::ERR;
 
 =head1 Name
 
-SPVM::Net::SSLeay::ERR - OpenSSL Errors
+SPVM::Net::SSLeay::ERR - ERR Name Space in OpenSSL
 
 =head1 Description
 
-Net::SSLeay::ERR class in L<SPVM> has methods to manipulate OpenSSL Errors.
+Net::SSLeay::ERR class in L<SPVM> has represents C<ERR> name space in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::ERR class in L<SPVM> has methods to manipulate OpenSSL Errors.
 
 C<static method error_string_n : void ($e : long, $buf : mutable string, $len : int = -1);>
 
-Calls native L<error_string_n|https://docs.openssl.org/1.1.1/man3/ERR_error_string/> function.
+Calls native L<ERR_error_string_n|https://docs.openssl.org/master/man3/ERR_error_string_n> function.
 
 Exceptions:
 
@@ -42,19 +42,19 @@ The returned string is cut just before C<\0>.
 
 C<method get_error : long ();>
 
-Returns the earliest error code from the thread's error queue and removes the entry by calling native L<ERR_get_error|https://docs.openssl.org/3.1/man3/ERR_get_error/#synopsis> function.
+Returns the earliest error code from the thread's error queue and removes the entry by calling native L<ERR_get_error|https://docs.openssl.org/master/man3/ERR_get_error> function.
 
 =head2 peek_error
 
 C<method peek_error : long ();>
 
-Returns the earliest error code from the thread's error queue and removes the entry by calling native L<ERR_peek_error|https://docs.openssl.org/3.1/man3/ERR_get_error/#synopsis> function.
+Returns the earliest error code from the thread's error queue and removes the entry by calling native L<ERR_peek_error|https://docs.openssl.org/master/man3/ERR_peek_error> function.
 
 =head2 peek_last_error
 
 C<method peek_last_error : long ();>
 
-Returns the earliest error code from the thread's error queue and removes the entry by calling native L<ERR_peek_last_error|https://docs.openssl.org/3.1/man3/ERR_get_error/#synopsis> function.
+Returns the earliest error code from the thread's error queue and removes the entry by calling native L<ERR_peek_last_error|https://docs.openssl.org/master/man3/ERR_peek_last_error> function.
 
 =head1 See Also
 

@@ -1,5 +1,5 @@
 package Telegram::Bot::Brain;
-$Telegram::Bot::Brain::VERSION = '0.026';
+$Telegram::Bot::Brain::VERSION = '0.027';
 # ABSTRACT: A base class to make your very own Telegram bot
 
 
@@ -17,6 +17,10 @@ use Data::Dumper;
 
 use Telegram::Bot::Object::Message;
 use Telegram::Bot::Object::InlineQuery;
+use Telegram::Bot::Object::CallbackQuery;
+use Telegram::Bot::Object::ChatJoinRequest;
+use Telegram::Bot::Object::ChatMemberUpdated;
+use Telegram::Bot::Object::ChatMember;
 
 # base class for building telegram robots with Mojolicious
 has longpoll_time => 60;
@@ -103,7 +107,13 @@ sub sendMessage {
   $send_args->{parse_mode} = $args->{parse_mode} if exists $args->{parse_mode};
   $send_args->{disable_web_page_preview} = $args->{disable_web_page_preview} if exists $args->{disable_web_page_preview};
   $send_args->{disable_notification} = $args->{disable_notification} if exists $args->{disable_notification};
-  $send_args->{reply_to_message_id}  = $args->{reply_to_message_id}  if exists $args->{reply_to_message_id};
+  $send_args->{reply_parameters}     = encode_json($args->{reply_parameters}->as_hashref)
+      if exists $args->{reply_parameters};
+  # deprecated reply_to_message_id
+  if (exists $args->{reply_to_message_id}) {
+      $send_args->{reply_parameters} = encode_json({message_id => $args->{reply_to_message_id}});
+  }
+  # $send_args->{reply_to_message_id}  = $args->{reply_to_message_id}  if exists $args->{reply_to_message_id};
 
   # check reply_markup is the right kind
   if (exists $args->{reply_markup}) {
@@ -152,9 +162,6 @@ sub deleteMessage {
   my $self = shift;
   my $args = shift || {};
   my $send_args = {};
-  croak "no chat_id supplied" unless $args->{chat_id};
-  $send_args->{chat_id} = $args->{chat_id};
- 
   croak "no message_id supplied" unless $args->{message_id};
   $send_args->{message_id} = $args->{message_id};
   
@@ -163,6 +170,37 @@ sub deleteMessage {
   my $api_response = $self->_post_request($url, $send_args);
  
   return $api_response;
+}
+
+sub editMessageText {
+  my $self = shift;
+  my $args = shift || {};
+  my $send_args = {};
+  croak "no chat_id supplied" unless $args->{chat_id};
+  $send_args->{chat_id} = $args->{chat_id};
+  croak "no message_id supplied"    unless $args->{message_id};
+  $send_args->{message_id}    = $args->{message_id};
+
+  # these are optional, send if they are supplied
+  $send_args->{text} = $args->{text} if exists $args->{text};
+  $send_args->{parse_mode} = $args->{parse_mode} if exists $args->{parse_mode};
+  $send_args->{disable_web_page_preview} = $args->{disable_web_page_preview} if exists $args->{disable_web_page_preview};
+
+  if (exists $args->{reply_markup}) {
+    my $reply_markup = $args->{reply_markup};
+    die "bad reply_markup supplied"
+      if ( ref($reply_markup) ne 'Telegram::Bot::Object::InlineKeyboardMarkup' &&
+           ref($reply_markup) ne 'Telegram::Bot::Object::ReplyKeyboardMarkup'  &&
+           ref($reply_markup) ne 'Telegram::Bot::Object::ReplyKeyboardRemove'  &&
+           ref($reply_markup) ne 'Telegram::Bot::Object::ForceReply' );
+    $send_args->{reply_markup} = encode_json($reply_markup->as_hashref);
+  }
+  my $token = $self->token || croak "no token?";
+  my $url = "https://api.telegram.org/bot${token}/editMessageText";
+  my $api_response = $self->_post_request($url, $send_args);
+
+  return Telegram::Bot::Object::Message->create_from_hash($api_response, $self);
+
 }
 
 
@@ -246,7 +284,7 @@ sub answerInlineQuery {
   return $api_response;
 }
 
-sub setMyCommands {		# after v0.025
+sub setMyCommands {
   my $self = shift;
   my $args = shift || {};
   
@@ -257,6 +295,123 @@ sub setMyCommands {		# after v0.025
   my $token = $self->token || croak "no token?";
   my $url = "https://api.telegram.org/bot${token}/setMyCommands";
   return $self->_post_request($url, $send_args);
+}
+
+sub answerCallbackQuery {
+  my $self = shift;
+  my $args = shift || {};
+
+  my $answer_args = {};
+  croak "no callback_query_id supplied" unless $args->{callback_query_id};
+  $answer_args->{callback_query_id} = $args->{callback_query_id};
+
+  # optional args
+  $answer_args->{text} = $args->{text} if exists $args->{text};
+  $answer_args->{show_alert} = $args->{show_alert} if exists $args->{show_alert};
+  $answer_args->{url} = $args->{url} if exists $args->{url};
+  $answer_args->{cache_time} = $args->{cache_time} if exists $args->{cache_time};
+  my $token = $self->token || croak "no token?";
+  my $url = "https://api.telegram.org/bot${token}/answerCallbackQuery";
+  my $api_response = $self->_post_request($url, $answer_args);
+
+  return 1;
+}
+
+sub getChatMember {
+  my $self = shift;
+  my $chat_id = shift;
+  my $user_id = shift;
+
+  my $gcm_args = {};
+  croak "no chat_id supplied to getChatMember" unless $chat_id;
+  croak "no user_id supplied to getChatMember" unless $user_id;
+  $gcm_args->{user_id} = $user_id;
+  $gcm_args->{chat_id} = $chat_id;
+
+  my $token = $self->token || croak "no token?";
+  my $url = "https://api.telegram.org/bot${token}/getChatMember";
+  my $api_response = $self->_post_request($url, $gcm_args);
+
+  return Telegram::Bot::Object::ChatMember->create_from_hash($api_response, $self);
+}
+
+sub approveChatJoinRequest {
+  my $self = shift;
+  my $args = shift || {};
+
+  my $answer_args = {};
+  croak "no chat_id supplied" unless $args->{chat_id};
+  $answer_args->{chat_id} = $args->{chat_id};
+  croak "no user_id supplied" unless $args->{user_id};
+  $answer_args->{user_id} = $args->{user_id};
+
+  # no optional args
+
+  my $token = $self->token || croak "no token?";
+  my $url =  "https://api.telegram.org/bot${token}/approveChatJoinRequest";
+  my $api_response = $self->_post_request($url, $answer_args);
+
+  return 1;
+}
+
+sub declineChatJoinRequest {
+  my $self = shift;
+  my $args = shift || {};
+
+  my $answer_args = {};
+  croak "no chat_id supplied" unless $args->{chat_id};
+  $answer_args->{chat_id} = $args->{chat_id};
+  croak "no user_id supplied" unless $args->{user_id};
+  $answer_args->{user_id} = $args->{user_id};
+
+  # no optional args
+
+  my $token = $self->token || croak "no token?";
+  my $url =  "https://api.telegram.org/bot${token}/declineChatJoinRequest";
+  my $api_response = $self->_post_request($url, $answer_args);
+
+  return 1;
+}
+
+sub banChatMember {
+  my $self = shift;
+  my $args = shift || {};
+
+  my $answer_args = {};
+  croak "no chat_id supplied" unless $args->{chat_id};
+  $answer_args->{chat_id} = $args->{chat_id};
+  croak "no user_id supplied" unless $args->{user_id};
+  $answer_args->{user_id} = $args->{user_id};
+
+  # optional args
+  $answer_args->{until_date} = $args->{until_date} if exists $args->{until_date};
+  $answer_args->{revoke_messages} = $args->{revoke_messages} if exists $args->{revoke_messages};
+  
+  my $token = $self->token || croak "no token?";
+  my $url =  "https://api.telegram.org/bot${token}/banChatMember";
+  my $api_response = $self->_post_request($url, $answer_args);
+
+  return 1;
+}
+
+sub unbanChatMember {
+  my $self = shift;
+  my $args = shift || {};
+
+  my $answer_args = {};
+  croak "no chat_id supplied" unless $args->{chat_id};
+  $answer_args->{chat_id} = $args->{chat_id};
+  croak "no user_id supplied" unless $args->{user_id};
+  $answer_args->{user_id} = $args->{user_id};
+
+  # optional args
+  $answer_args->{only_if_banned} = $args->{only_if_banned} if exists $args->{only_if_banned};
+
+  my $token = $self->token || croak "no token?";
+  my $url =  "https://api.telegram.org/bot${token}/unbanChatMember";
+  my $api_response = $self->_post_request($url, $answer_args);
+
+  return 1;
 }
 
 sub _add_getUpdates_handler {
@@ -308,11 +463,17 @@ sub _process_message {
     $update = Telegram::Bot::Object::Message->create_from_hash($item->{edited_channel_post}, $self) if $item->{edited_channel_post};
     $update = Telegram::Bot::Object::InlineQuery->create_from_hash($item->{inline_query}, $self)    if $item->{inline_query};
     $update = Telegram::Bot::Object::Message->create_from_hash($item->{my_chat_member}, $self)      if $item->{my_chat_member};		# after v0.025
+    $update = Telegram::Bot::Object::CallbackQuery->create_from_hash($item->{callback_query}, $self) if $item->{callback_query};
+    $update = Telegram::Bot::Object::ChatJoinRequest->create_from_hash($item->{chat_join_request}, $self) if $item->{chat_join_request};
+    $update = Telegram::Bot::Object::ChatMemberUpdated->create_from_hash($item->{chat_member}, $self) if $item->{chat_member};
+    $update = Telegram::Bot::Object::ChatMemberUpdated->create_from_hash($item->{my_chat_member}, $self) if $item->{my_chat_member};
+    # chat_member => someone else
+    # my_chat_member => actually us
 
     # if we got to this point without creating a response, it must be a type we
     # don't handle yet
     if (! $update) {
-      warn "Telegram::Bot::Brain does not know how to handle this update: " . Dumper($item);
+      warn "Do not know how to handle this update: " . Dumper($item);
       return;
     }
 
@@ -330,7 +491,7 @@ sub _post_request {
 
   my $res = $self->ua->post($url, form => $form_args)->result;
   if    ($res->is_success) { return $res->json->{result}; }
-  elsif ($res->is_error)   { die "Failed to post: " . $res->json->{description}; }
+  elsif ($res->is_error)   { warn "Failed to post: " . $res->json->{description} . "\n" . Data::Dumper::Dumper($form_args); }
   else                     { die "Not sure what went wrong"; }
 }
 
@@ -349,7 +510,7 @@ Telegram::Bot::Brain - A base class to make your very own Telegram bot
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 
@@ -592,6 +753,10 @@ James Green <jkg@earth.li>
 =item *
 
 Julien Fiegehenn <simbabque@cpan.org>
+
+=item *
+
+Jess Robinson <jrobinson@cpan.org>
 
 =item *
 

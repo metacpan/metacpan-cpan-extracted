@@ -12,8 +12,9 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 282;
-use DateTime;
+use Test::Most tests => 283;
+# use DateTime;
+use HTTP::Date;
 use Capture::Tiny ':all';
 use CGI::Info;
 use Digest::MD5;
@@ -121,7 +122,7 @@ OUTPUT: {
 
 	$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
 	delete($ENV{'HTTP_ACCEPT_ENCODING'});
-	if(($^O eq 'MSWin32') || ($^O eq 'openbsd')) {
+	if(($^O eq 'MSWin32') || ($^O eq 'openbsd') || ($^O eq 'freebsd')) {
 		$ENV{'HTTP_TE'} = 'gzip';
 	} else {
 		$ENV{'HTTP_TE'} = 'br,gzip';
@@ -153,24 +154,32 @@ OUTPUT: {
 
 	ok(defined($body));
 	ok(length($body) eq $length);
-	if(($^O eq 'MSWin32') || ($^O eq 'openbsd')) {
+
+	if(($^O eq 'MSWin32') || ($^O eq 'openbsd') || ($^O eq 'freebsd')) {
 		TODO: {
-			local $TODO = "IO::Compress::Brotli doesn't support Windows";
+			local $TODO = "IO::Compress::Brotli doesn't support Windows or OpenBSD";
 			ok($headers =~ /^Content-Encoding: br/m);
 
 			# $body = IO::Compress::Brotli::unbro($body, 1024);
+			ok(defined($body));
 			ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
 			html_ok($body, 'HTML:Lint shows no errors');
 		}
-	} else {
+	} elsif(eval { require IO::Compress::Brotli }) {
 		ok($headers =~ /^Content-Encoding: br/m);
 
-		require IO::Compress::Brotli;
 		IO::Compress::Brotli->import();
 
 		$body = IO::Compress::Brotli::unbro($body, 1024);
+		ok(defined($body));
 		ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
 		html_ok($body, 'HTML:Lint shows no errors');
+	} else {
+		SKIP: {
+			ok($headers =~ /^Status: 406/m);
+
+			skip('Install IO::Compress::Brotli to test Brotli compression', 3);
+		}
 	}
 
 	#..........................................
@@ -600,7 +609,8 @@ OUTPUT: {
 
 	#..........................................
 	delete $ENV{'HTTP_IF_NONE_MATCH'};
-	$ENV{'HTTP_IF_MODIFIED_SINCE'} = DateTime->now();
+	# my $t = $ENV{'HTTP_IF_MODIFIED_SINCE'} = DateTime->now();
+	my $t = $ENV{'HTTP_IF_MODIFIED_SINCE'} = HTTP::Date::time2str(time);
 
 	sub test14 {
 		my $b = new_ok('FCGI::Buffer');

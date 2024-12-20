@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.014;
-our $VERSION = '2.418';
+our $VERSION = '2.419';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.418
+Version 2.419
 
 =head1 SYNOPSIS
 
@@ -519,7 +519,7 @@ Use only selected rows of the imported data.
 
 =item Range Rows
 
-Use only a range of rows.
+Use only ranges of rows.
 
 =item Row Groups
 

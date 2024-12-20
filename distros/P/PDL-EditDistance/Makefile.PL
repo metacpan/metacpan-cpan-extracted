@@ -1,12 +1,12 @@
+use strict;
+use warnings;
 use PDL::Core::Dev;
 use ExtUtils::MakeMaker;
-PDL::Core::Dev->import();
 
-use lib '.'; ##-- fix RT bug #121661?
-require "pdlmaker.plm";
+require "./pdlmaker.plm";
 
-$package = ["EditDistance.pd",EditDistance,PDL::EditDistance];
-%hash = pdlmaker_init($package);
+my $package = [qw(EditDistance.pd EditDistance PDL::EditDistance)];
+my %hash = pdlmaker_init($package);
 
 ##-- preqrequistes (for PREREQ_PM)
 my %prereq = (
@@ -14,7 +14,6 @@ my %prereq = (
 	      'ExtUtils::MakeMaker' => 0,
 	      'Test::More' => 0,
 	     );
-
 
 $hash{AUTHOR} = 'Bryan Jurish';
 $hash{ABSTRACT} = 'Compute Wagner-Fischer edit distance and alignment matrices on PDLs';
@@ -26,5 +25,22 @@ $hash{DIR} = [];
 #$hash{OBJECT} .= '';
 $hash{VERSION_FROM} = 'EditDistance.pd';
 $hash{realclean}{FILES} .= '*~ *.tmp README.txt';
+
+my $package_name = $package->[2];
+(my $repo = $package_name) =~ s#::#-#g;
+$repo = "moocow-the-bovine/$repo";
+$hash{META_MERGE} = {
+  "meta-spec" => { version => 2 },
+  resources => {
+    homepage => 'http://pdl.perl.org/',
+    bugtracker  => {web=>"https://github.com/$repo/issues"},
+    repository  => {
+      url => "git://github.com/$repo.git",
+      type => 'git',
+      web => "https://github.com/$repo",
+    },
+    x_IRC => 'irc://irc.perl.org/#pdl',
+  },
+};
 
 WriteMakefile(%hash);

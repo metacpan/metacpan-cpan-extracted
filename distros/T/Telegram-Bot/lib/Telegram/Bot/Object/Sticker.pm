@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Sticker;
-$Telegram::Bot::Object::Sticker::VERSION = '0.026';
+$Telegram::Bot::Object::Sticker::VERSION = '0.027';
 # ABSTRACT: The base class for Telegram message 'Sticker' type.
 
 
@@ -36,7 +36,7 @@ Telegram::Bot::Object::Sticker - The base class for Telegram message 'Sticker' t
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 
@@ -58,6 +58,10 @@ James Green <jkg@earth.li>
 =item *
 
 Julien Fiegehenn <simbabque@cpan.org>
+
+=item *
+
+Jess Robinson <jrobinson@cpan.org>
 
 =item *
 

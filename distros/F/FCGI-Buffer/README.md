@@ -4,7 +4,7 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 # VERSION
 
-Version 0.19
+Version 0.20
 
 # SYNOPSIS
 
@@ -31,9 +31,9 @@ to your server asking for the same data:
         # ...
     }
 
-To also make use of server caches, that is to say to save regenerating
-output when different clients ask you for the same data, you will need
-to create a cache.
+To also make use of server caches, that is to say,
+to save regenerating output when different clients ask you for the same data,
+you will need to create a cache.
 But that's simple:
 
     use FCGI;
@@ -57,12 +57,12 @@ But that's simple:
         }
     }
 
-To temporarily prevent the use of server-side caches, for example whilst
+To temporarily prevent the use of server-side caches, for example, whilst
 debugging before publishing a code change, set the NO\_CACHE environment variable
 to any non-zero value.
-This will also stop ETag being added to the header.
-If you get errors about Wide characters in print it means that you've
-forgotten to emit pure HTML on non-ASCII characters.
+This will also stop ETag from being added to the header.
+If you get errors about Wide characters in print,
+you've forgotten to emit pure HTML on non-ASCII characters.
 See [HTML::Entities](https://metacpan.org/pod/HTML%3A%3AEntities).
 As a hack work around you could also remove accents and the like by using
 [Text::Unidecode](https://metacpan.org/pod/Text%3A%3AUnidecode),
@@ -72,7 +72,8 @@ which works well but isn't really what you want.
 
 ## new
 
-Create an FCGI::Buffer object.  Do one of these for each FCGI::Accept.
+Create an FCGI::Buffer object.
+Do one of these for each FCGI::Accept.
 
 ## init
 
@@ -91,7 +92,7 @@ Set various options and override default values.
         optimise_content => 0,  # optimise your program's HTML, CSS and JavaScript
         cache => CHI->new(driver => 'File'),    # cache requests
         cache_key => 'string',  # key for the cache
-        cache_age => '10 minutes',      # how long to store responses in the cache
+        cache_duration => '10 minutes', # how long to store responses in the cache
         logger => $self->{logger},
         lint_content => 0,      # Pass through HTML::Lint
         generate_304 => 1,      # When appropriate, generate 304: Not modified
@@ -110,7 +111,7 @@ used as a server-side cache to reduce the need to rerun database accesses.
 
 Items stay in the server-side cache by default for 10 minutes.
 This can be overridden by the cache\_control HTTP header in the request, and
-the default can be changed by the cache\_age argument to init().
+the default can be changed by the cache\_duration argument to init().
 
 Save\_to is feature which stores output of dynamic pages to your
 htdocs tree and replaces future links that point to that page with static links
@@ -148,7 +149,7 @@ Generally speaking, passing by reference is better since it copies less on to
 the stack.
 
 If you give a cache to init() then later give cache => undef,
-the server side cache is no longer used.
+the server-side cache is no longer used.
 This is useful when you find an error condition when creating your HTML
 and decide that you no longer wish to store the output in the cache.
 
@@ -179,7 +180,7 @@ the result stored in the cache.
     my $i = CGI::Info->new();
     my $l = CGI::Lingua->new(supported => ['en']);
 
-    # To use server side caching you must give the cache argument, however
+    # To use server-side caching you must give the cache argument, however
     # the cache_key argument is optional - if you don't give one then one will
     # be generated for you
     my $buffer = FCGI::Buffer->new();
@@ -204,13 +205,14 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
 
-FCGI::Buffer should be safe even in scripts which produce lots of different
+FCGI::Buffer should be safe even in scripts that produce lots of different
 output, e.g. e-commerce situations.
-On such pages, however, I strongly urge to setting generate\_304 to 0 and
+On such pages, however, I strongly urge setting generate\_304 to 0 and
 sending the HTTP header "Cache-Control: no-cache".
 
 When using [Template](https://metacpan.org/pod/Template), ensure that you don't use it to output to STDOUT,
-instead you will need to capture into a variable and print that.
+instead,
+you will need to capture into a variable and print that.
 For example:
 
     my $output;
@@ -228,31 +230,34 @@ Ensure that deflation is off for .pl files:
 If you request compressed output then uncompressed output (or vice
 versa) on input that produces the same output, the status will be 304.
 The letter of the spec says that's wrong, so I'm noting it here, but
-in practice you should not see this happen or have any difficulties
+in practice, you should not see this happen or have any difficulties
 because of it.
 
 FCGI::Buffer has not been tested against FastCGI.
 
 I advise adding FCGI::Buffer as the last use statement so that it is
-cleared up first.  In particular it should be loaded after
+cleared up first.  In particular, it should be loaded after
 [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl), if you're using that, so that any messages it
 produces are printed after the HTTP headers have been sent by
 FCGI::Buffer;
 
 Save\_to doesn't understand links in JavaScript, which means that if you use self-calling
-CGIs which are loaded as a static page they may point to the wrong place.
+CGIs loaded as a static page,
+they may point to the wrong place.
 The workaround is to avoid self-calling CGIs in JavaScript
 
-Please report any bugs or feature requests to `bug-fcgi-buffer at rt.cpan.org`,
+Please report any bugs or feature requests to `bug-fcgi-buffer at rt.cpan.org`
 or through the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FCGI-Buffer](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=FCGI-Buffer).
-I will be notified, and then you'll automatically be notified of progress on
+I will be notified, and then you'll automatically be notified of the progress on
 your bug as I make changes.
 
 The lint operation only works on HTML4, because of a restriction in [HTML::Lint](https://metacpan.org/pod/HTML%3A%3ALint).
 
 # SEE ALSO
 
-CGI::Buffer, HTML::Packer, HTML::Lint
+[CGI::Buffer](https://metacpan.org/pod/CGI%3A%3ABuffer),
+[HTML::Packer](https://metacpan.org/pod/HTML%3A%3APacker),
+[HTML::Lint](https://metacpan.org/pod/HTML%3A%3ALint)
 
 # SUPPORT
 
@@ -265,10 +270,6 @@ You can also look for information at:
 - RT: CPAN's request tracker
 
     [http://rt.cpan.org/NoAuth/Bugs.html?Dist=FCGI-Buffer](http://rt.cpan.org/NoAuth/Bugs.html?Dist=FCGI-Buffer)
-
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/FCGI-Buffer](http://cpanratings.perl.org/d/FCGI-Buffer)
 
 - Search CPAN
 
@@ -290,5 +291,5 @@ The licence for cgi\_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2023 Nigel Horne,
+The rest of the program is Copyright 2015-2024 Nigel Horne,
 and is released under the following licence: GPL2

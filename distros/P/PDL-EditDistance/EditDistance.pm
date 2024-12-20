@@ -1,25 +1,27 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::EditDistance;
 
-@EXPORT_OK  = qw(   edit_costs  _edit_costs  edit_costs_static  edit_distance_full  _edit_distance_full PDL::PP _edit_distance_full  edit_align_full  _edit_align_full PDL::PP _edit_align_full  edit_distance_static  _edit_distance_static PDL::PP _edit_distance_static  edit_align_static  _edit_align_static PDL::PP _edit_align_static  align_op_insert1 PDL::PP align_op_insert1  align_op_insert2 PDL::PP align_op_insert2  align_op_match PDL::PP align_op_match  align_op_substitute PDL::PP align_op_substitute  align_op_insert  align_op_delete  align_ops  edit_bestpath  _edit_bestpath PDL::PP _edit_bestpath  edit_pathtrace  _edit_pathtrace PDL::PP _edit_pathtrace  edit_lcs  _edit_lcs PDL::PP _edit_lcs  lcs_backtrace  _lcs_backtrace PDL::PP _lcs_backtrace );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw( edit_costs _edit_costs edit_costs_static edit_distance_full _edit_distance_full _edit_distance_full edit_align_full _edit_align_full _edit_align_full edit_distance_static _edit_distance_static _edit_distance_static edit_align_static _edit_align_static _edit_align_static align_op_insert1 align_op_insert1 align_op_insert2 align_op_insert2 align_op_match align_op_match align_op_substitute align_op_substitute align_op_insert align_op_delete align_ops edit_bestpath _edit_bestpath _edit_bestpath edit_pathtrace _edit_pathtrace _edit_pathtrace edit_lcs _edit_lcs _edit_lcs lcs_backtrace _lcs_backtrace _lcs_backtrace );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   $PDL::EditDistance::VERSION = 0.09;
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '0.10';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::EditDistance $VERSION;
 
 
 
+
+
+
+#line 12 "EditDistance.pd"
 
 use strict;
 use version;
@@ -84,7 +86,7 @@ PDL::EditDistance - Wagner-Fischer edit distance and alignment for PDLs.
  ($ai,$bi,$lcslen) = lcs_backtrace($a,$b,$lcs);
 
 =cut
-
+#line 90 "EditDistance.pm"
 
 
 
@@ -93,12 +95,12 @@ PDL::EditDistance - Wagner-Fischer edit distance and alignment for PDLs.
 
 =head1 FUNCTIONS
 
-
-
 =cut
 
 
 
+
+#line 124 "EditDistance.pd"
 
 
 
@@ -128,8 +130,11 @@ sub _edit_pdl {
   }
   return pdl([0,@{$_[0]}]);
 }
+#line 134 "EditDistance.pm"
 
 
+
+#line 159 "EditDistance.pd"
 
 
 
@@ -151,8 +156,11 @@ of length N and M.
 sub edit_costs {
   return _edit_costs($_[0],$_[1]+1,$_[2]+1,@_[3..$#_]);
 }
+#line 160 "EditDistance.pm"
 
 
+
+#line 187 "EditDistance.pd"
 
 
 
@@ -185,8 +193,11 @@ sub _edit_matrix {
   $_[3]->reshape(@_[1,2]) if ($_[3]->ndims != 2 || $_[3]->dim(0) != $_[1] || $_[3]->dim(1) != $_[2]);
   return $_[3]->type == $_[0] ? $_[3] : $_[3]->convert($_[0]);
 }
+#line 197 "EditDistance.pm"
 
 
+
+#line 226 "EditDistance.pd"
 
 
 =pod
@@ -209,8 +220,11 @@ sub edit_costs_static {
   $costs[$_] .= $_[$_+3] foreach (0..3);
   return @costs;
 }
+#line 224 "EditDistance.pm"
 
 
+
+#line 258 "EditDistance.pd"
 
 
 =pod
@@ -233,8 +247,11 @@ $a() and $b() may be specified as PDLs, arrays of numbers, or as strings.
 sub edit_distance_full {
   return _edit_distance_full(_edit_pdl($_[0]), _edit_pdl($_[1]), @_[2..$#_]);
 }
+#line 251 "EditDistance.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -255,19 +272,22 @@ The first elements of $a1() and $b1() are ignored.
 =for bad
 
 _edit_distance_full does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 280 "EditDistance.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *_edit_distance_full = \&PDL::_edit_distance_full;
+#line 287 "EditDistance.pm"
 
 
+
+#line 349 "EditDistance.pd"
 
 
 =pod
@@ -290,8 +310,11 @@ $a() and $b() may be specified as PDLs, arrays of numbers, or as strings.
 sub edit_align_full {
   return _edit_align_full(_edit_pdl($_[0]), _edit_pdl($_[1]), @_[2..$#_]);
 }
+#line 314 "EditDistance.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -312,19 +335,22 @@ The first elements of $a1() and $b1() are ignored.
 =for bad
 
 _edit_align_full does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 343 "EditDistance.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *_edit_align_full = \&PDL::_edit_align_full;
+#line 350 "EditDistance.pm"
 
 
+
+#line 451 "EditDistance.pd"
 
 
 =pod
@@ -349,8 +375,11 @@ but slightly faster.
 sub edit_distance_static {
   return _edit_distance_static(_edit_pdl($_[0]), _edit_pdl($_[1]), @_[2..$#_]);
 }
+#line 379 "EditDistance.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -373,19 +402,22 @@ The first elements of $a1() and $b1() are ignored.
 =for bad
 
 _edit_distance_static does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 410 "EditDistance.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *_edit_distance_static = \&PDL::_edit_distance_static;
+#line 417 "EditDistance.pm"
 
 
+
+#line 540 "EditDistance.pd"
 
 
 =pod
@@ -410,8 +442,11 @@ but slightly faster.
 sub edit_align_static {
   return _edit_align_static(_edit_pdl($_[0]), _edit_pdl($_[1]), @_[2..$#_]);
 }
+#line 446 "EditDistance.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -434,19 +469,22 @@ The first elements of $a1() and $b1() are ignored.
 =for bad
 
 _edit_align_static does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 477 "EditDistance.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *_edit_align_static = \&PDL::_edit_align_static;
+#line 484 "EditDistance.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -463,19 +501,22 @@ Alignment matrix value constant for insertion operations on $a() string.
 =for bad
 
 align_op_insert1 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 509 "EditDistance.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *align_op_insert1 = \&PDL::align_op_insert1;
+#line 516 "EditDistance.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -492,19 +533,22 @@ Alignment matrix value constant for insertion operations on $a() string.
 =for bad
 
 align_op_insert2 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 541 "EditDistance.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *align_op_insert2 = \&PDL::align_op_insert2;
+#line 548 "EditDistance.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -521,19 +565,22 @@ Alignment matrix value constant for matches.
 =for bad
 
 align_op_match does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 573 "EditDistance.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *align_op_match = \&PDL::align_op_match;
+#line 580 "EditDistance.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -550,19 +597,22 @@ Alignment matrix value constant for substitution operations.
 =for bad
 
 align_op_substitute does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 605 "EditDistance.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *align_op_substitute = \&PDL::align_op_substitute;
+#line 612 "EditDistance.pm"
 
 
+
+#line 672 "EditDistance.pd"
 
 
 =pod
@@ -579,8 +629,11 @@ Alias for align_op_insert2()
 
 *align_op_delete = \&align_op_insert1;
 *align_op_insert = \&align_op_insert2;
+#line 633 "EditDistance.pm"
 
 
+
+#line 693 "EditDistance.pd"
 
 =pod
 
@@ -595,8 +648,11 @@ Alignment matrix value constants 4-element pdl (match,insert1,insert2,substitute
 =cut
 
 sub align_ops { return PDL->sequence(PDL::byte(),4); }
+#line 652 "EditDistance.pm"
 
 
+
+#line 716 "EditDistance.pd"
 
 
 =pod
@@ -626,8 +682,11 @@ sub edit_bestpath {
   _edit_bestpath($align, $apath, $bpath, $len, $align->dim(0)-1, $align->dim(1)-1);
   return ($apath,$bpath,$len);
 }
+#line 686 "EditDistance.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -649,19 +708,22 @@ On completion, $pathlen() holds the actual length of the paths.
 =for bad
 
 _edit_bestpath does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 716 "EditDistance.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *_edit_bestpath = \&PDL::_edit_bestpath;
+#line 723 "EditDistance.pm"
 
 
+
+#line 811 "EditDistance.pd"
 
 
 =pod
@@ -694,8 +756,11 @@ sub edit_pathtrace {
   my $lens = ($len->sclr-1);
   return ((map { $_->slice("0:$lens") } ($ai,$bi,$ops)), $len);
 }
+#line 760 "EditDistance.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -717,19 +782,22 @@ Returned pdls ($ai,$bi,$ops) are trimmed to the appropriate path length.
 =for bad
 
 _edit_pathtrace does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 790 "EditDistance.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *_edit_pathtrace = \&PDL::_edit_pathtrace;
+#line 797 "EditDistance.pm"
 
 
+
+#line 905 "EditDistance.pd"
 
 
 =pod
@@ -751,8 +819,11 @@ length of the LCS between $a() and $b().
 sub edit_lcs {
   return _edit_lcs(_edit_pdl($_[0]), _edit_pdl($_[1]), @_[2..$#_]);
 }
+#line 823 "EditDistance.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -774,19 +845,22 @@ length of the LCS between $a1() and $b1().
 =for bad
 
 _edit_lcs does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 853 "EditDistance.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *_edit_lcs = \&PDL::_edit_lcs;
+#line 860 "EditDistance.pm"
 
 
+
+#line 970 "EditDistance.pd"
 
 
 =pod
@@ -818,8 +892,11 @@ sub lcs_backtrace {
   my $lens = ($len->sclr-1);
   return ($ai->slice("0:$lens"),$bi->slice("0:$lens"), $len);
 }
+#line 896 "EditDistance.pm"
 
 
+
+#line 949 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 
 
@@ -840,19 +917,22 @@ respectively.
 =for bad
 
 _lcs_backtrace does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
+#line 925 "EditDistance.pm"
 
 
 
-
-
+#line 951 "/usr/lib/x86_64-linux-gnu/perl5/5.36/PDL/PP.pm"
 
 *_lcs_backtrace = \&PDL::_lcs_backtrace;
+#line 932 "EditDistance.pm"
 
 
+
+#line 1063 "EditDistance.pd"
 
 
 ##---------------------------------------------------------------------
@@ -897,15 +977,13 @@ version of Perl 5.
 perl(1), PDL(3perl).
 
 =cut
+#line 981 "EditDistance.pm"
 
 
 
-;
 
 
 
 # Exit with OK status
 
 1;
-
-		   

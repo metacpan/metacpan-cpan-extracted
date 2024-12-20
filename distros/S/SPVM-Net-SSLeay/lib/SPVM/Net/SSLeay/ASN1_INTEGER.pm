@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::ASN1_INTEGER - ASN1_INTEGER Data Structure in OpenSSL
 
 =head1 Description
 
-Net::SSLeay::ASN1_INTEGER class in L<SPVM> represents L<ASN1_INTEGER|https://docs.openssl.org/3.1/man3/ASN1_INTEGER_get_int64/> data structure in OpenSSL
+Net::SSLeay::ASN1_INTEGER class in L<SPVM> represents C<ASN1_INTEGER> data structure in OpenSSL
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::ASN1_INTEGER class in L<SPVM> represents L<ASN1_INTEGER|https://doc
 
 C<static method new : L<Net::SSLeay::ASN1_INTEGER|SPVM::Net::SSLeay::ASN1_INTEGER> ();>
 
-Calls native L<ASN1_INTEGER_new|https://github.com/google/boringssl/blob/master/include/openssl/asn1.h> function, creates a new  L<Net::SSLeay::ASN1_INTEGER|SPVM::Net::SSLeay::ASN1_INTEGER> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
+Calls native L<ASN1_INTEGER_new|https://docs.openssl.org/master/man3/ASN1_INTEGER_new> function, creates a new  L<Net::SSLeay::ASN1_INTEGER|SPVM::Net::SSLeay::ASN1_INTEGER> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
 
 =head1 Instance Methods
 
@@ -39,7 +39,7 @@ If ASN1_INTEGER_get_int64 failed, an exception is thrown with C<eval_error_id> s
 
 C<method set_int64 : void ($r : long);>
 
-Calls native L<ASN1_INTEGER_set_int64|https://docs.openssl.org/master/man3/ASN1_INTEGER_get_int64> function given the pointer value of the instance, $r.
+Calls native L<ASN1_INTEGER_set_int64|https://docs.openssl.org/master/man3/ASN1_INTEGER_set_int64> function given the pointer value of the instance, $r.
 
 Exceptions:
 
@@ -49,7 +49,7 @@ If ASN1_INTEGER_set_int64 failed, an exception is thrown with C<eval_error_id> s
 
 C<method DESTROY : void ();>
 
-Calls native L<ASN1_INTEGER_free|https://github.com/google/boringssl/blob/master/include/openssl/asn1.h> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+Calls native L<ASN1_INTEGER_free|https://docs.openssl.org/master/man3/ASN1_INTEGER_free> function given the pointer value of the instance unless C<no_free> flag of the instance is a true value.
 
 =head1 See Also
 

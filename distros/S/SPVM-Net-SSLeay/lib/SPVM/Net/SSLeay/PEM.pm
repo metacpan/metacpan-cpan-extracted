@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::PEM - OpenSSL PEM data structure
 
 =head1 Description
 
-Net::SSLeay::PEM class in L<SPVM> represents OpenSSL PEM data structure.
+Net::SSLeay::PEM class in L<SPVM> represents C<PEM> name space in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::PEM class in L<SPVM> represents OpenSSL PEM data structure.
 
 C<static method read_bio_X509 : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> ($bp : L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO>);>
 
-Calls native L<PEM_read_bio_X509|https://docs.openssl.org/3.0/man3/PEM_read_bio_PrivateKey/> function, creates a new L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
+Calls native L<PEM_read_bio_X509|https://docs.openssl.org/master/man3/PEM_read_bio_X509> function, creates a new L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
 
 Exceptions:
 
@@ -34,7 +34,7 @@ If PEM_read_bio_X509 failed and the error is C<PEM_R_NO_START_LINE>, an exceptio
 
 C<static method read_bio_X509_CRL : L<Net::SSLeay::X509_CRL|SPVM::Net::SSLeay::X509_CRL> ($bp : L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO>);>
 
-Calls native L<read_bio_X509_CRL|https://docs.openssl.org/3.0/man3/PEM_read_bio_PrivateKey/> function, creates a new L<Net::SSLeay::X509_CRL|SPVM::Net::SSLeay::X509_CRL> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
+Calls native L<PEM_read_bio_X509_CRL|https://docs.openssl.org/master/man3/PEM_read_bio_X509_CRL> function, creates a new L<Net::SSLeay::X509_CRL|SPVM::Net::SSLeay::X509_CRL> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
 
 Exceptions:
 
@@ -46,7 +46,7 @@ If PEM_read_bio_X509_CRL failed and the error is C<PEM_R_NO_START_LINE>, an exce
 
 C<static method read_bio_PrivateKey : L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY> ($bp : L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO>);>
 
-Calls native L<PEM_read_bio_PrivateKey|https://docs.openssl.org/3.1/man3/PEM_read_bio_PrivateKey> function, creates a new L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
+Calls native L<PEM_read_bio_PrivateKey|https://docs.openssl.org/master/man3/PEM_read_bio_PrivateKey> function, creates a new L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
 
 Exceptions:
 

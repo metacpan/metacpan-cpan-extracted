@@ -1,3 +1,19 @@
+0.032 2024-12-20
+  [New Features]
+    * Add Net::SSLeay#get_version method.
+  [Test Improvment]
+    * Add tests for Net::SSLeay.
+  [Document Improvement]
+    * Improve docs for Net::SSLeay.
+    * Fix links to OpenSSL document.
+  
+  [Bug Fix]
+    * Fix a bug of reference counting of Net::SSLeay#set_SSL_CTX method.
+  
+  [Incompatible Changes]
+    * Net::SSLeay#set_SSL_CTX throws an exception if the argument is undef.
+    * The return type of Net::SSLeay#set_SSL_CTX method becomes void.
+
 0.031 2024-12-19
   [New Features]
     * Add Net::SSLeay#select_next_proto method.

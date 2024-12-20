@@ -19,7 +19,7 @@ BEGIN {
   *can = \&UNIVERSAL::can;
 }
 
-our $VERSION = '1.23.25'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.27'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = qw();
 our %EXPORT_TAGS =
   (
@@ -1070,8 +1070,6 @@ sub _ufuncsub {
       $which1   = $which1->dice_axis(1,$sorti);
       $vals1    = $vals->index($sorti);
     }
-    confess "\$vals1 is empty: \$which=".$which->info.", \$vals1=".$vals1->info.", \$vals=".$vals->info
-      if $vals1->isempty;
     ##
     ##-- guts
     my ($which2,$nzvals2) = $accumsub->($which1,$vals1,

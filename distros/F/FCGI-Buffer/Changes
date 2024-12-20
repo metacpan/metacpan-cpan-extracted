@@ -1,7 +1,18 @@
 Revision history for FCGI-Buffer
  
+0.20	Thu Dec 19 07:12:02 EST 2024
+	Use Readonly
+	cache_age is now known as cache_duration
+	IO::Compress::Brotli doesn't work on FreeBSD or Arm Linux
+	Set CGI::Info::status() if available
+	Added CircleCI integration
+	Improve setting CGI::Info status
+	Use Test::DescribeMe to simplify tests
+	Use Test::Needs
+	Use gtar to create a distribution on Macs
+
 0.19	Fri Sep  1 21:28:40 EDT 2023
-	Fix uninitialisd variable
+	Fix uninitialised variable
 	Ensure 403 statuses are printed
 	IO::Compress::Brotli doesn't work on OpenBSD
 

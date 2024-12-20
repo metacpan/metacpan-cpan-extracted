@@ -1,3 +1,11 @@
+v1.23.27 Fri, 20 Dec 2024 11:10:00 +0100 mohawk2
+	+ PR #15 assign "wanted" data of correct type in _ind and qsorti tests
+
+v1.23.26 Fri, 20 Dec 2024 10:55:18 +0100
+	+ allow ccs_accum_sumover() to accept empty nzValsIn
+	+ add tests for https://github.com/moocow-the-bovine/PDL-CCS/issues/14
+	+ set out_type=>indx for ccs_accum_nbad() - https://github.com/moocow-the-bovine/PDL-CCS/issues/6
+
 v1.23.25 Thu, 14 Nov 2024 16:29:14 +0100
 	+ fix embarrassing typo in ChangeLog
 

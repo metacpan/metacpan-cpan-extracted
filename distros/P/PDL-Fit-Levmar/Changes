@@ -1,3 +1,6 @@
+0.0107 2024-12-20
+- update test data to match types more carefully (https://github.com/PDLPorters/pdl/issues/511)
+
 0.0106 2022-02-23
 - fix setting HAVE_LAPACK to 1 - thanks @YuryPakhomov for report
 

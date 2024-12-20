@@ -2,13 +2,13 @@ use strict;
 use warnings;
 package Software::Security::Policy::Individual;
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 use parent 'Software::Security::Policy';
 # ABSTRACT: The Individual Security Policy
 
 sub name { 'individual' }
-sub meta_name  { 'individual' }
+sub version {'0.1.8' }
 
 1;
 
@@ -22,7 +22,7 @@ Software::Security::Policy::Individual - The Individual Security Policy
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

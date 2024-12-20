@@ -237,4 +237,13 @@ for my $tuple (@tuples) {
   }
 }
 
+##--------------------------------------------------------------
+## specific tests
+
+##-- matmult with empty row -- https://github.com/moocow-the-bovine/PDL-CCS/issues/14
+my $m = identity(3)->set(2,2,0);  # [[1,0,0],[0,1,0],[0,0,0]]
+my $v = zeroes(1,3)->set(0,2,1);  # [[0],[0],[1]]
+pdlok('matmult with empty row', ($m->toccs x $v)->decode, ($m x $v));
+
+
 done_testing;

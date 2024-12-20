@@ -4,6 +4,6 @@
 class TestUtil::Socket::Callback::BeforeAcceptSSL : interface_t {
   use Net::SSLeay;
   
-  required method : void ($ssl : Net::SSLeay);
+  required method : void ($socket : TestUtil::Socket, $ssl : Net::SSLeay);
   
 }

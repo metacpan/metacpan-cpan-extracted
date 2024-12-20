@@ -123,11 +123,18 @@ class TestCase::Net::SSLeay {
           return 0;
         }
         
+        $ssl->set_SSL_CTX($ssl_ctx1);
+        
+        unless (Fn->eq_pointer($ssl->get_SSL_CTX, $ssl_ctx1)) {
+          return 0;
+        }
+        
         $ssl->set_SSL_CTX($ssl_ctx2);
         
         unless (Fn->eq_pointer($ssl->get_SSL_CTX, $ssl_ctx2)) {
           return 0;
         }
+        
       }
     }
     
@@ -243,7 +250,7 @@ class TestCase::Net::SSLeay {
         
         $verify_param->set1_host($host_name);
         
-        $socket->add_before_connect_SSL_cb([$msg_callback : Net::SSLeay::Callback::Msg, $host_name : string] method : void ($ssl : Net::SSLeay) {
+        $socket->add_before_connect_SSL_cb([$msg_callback : Net::SSLeay::Callback::Msg, $host_name : string] method : void ($socket : TestUtil::Socket, $ssl : Net::SSLeay) {
           $ssl->set_msg_callback($msg_callback);
           $ssl->set_tlsext_host_name($host_name);
         });
@@ -251,6 +258,14 @@ class TestCase::Net::SSLeay {
         $socket->connect_SSL;
         
         my $ssl = $socket->ssl;
+        
+        my $version = $ssl->version;
+        
+        warn "[Test Output][Net::SSLeay#version]$version";
+        
+        my $version_string = $ssl->get_version;
+        
+        warn "[Test Output][Net::SSLeay#get_version]$version_string";
         
         $ssl = $socket->ssl;
         

@@ -52,11 +52,11 @@ sub test_ufunc {
 
   if ($ufunc_name =~ /_ind$/) {
     ##-- hack: adjust $dense_rc for maximum_ind, minimum_ind
-    $dense_rc->where( $a->index2d($dense_rc,sequence($a->dim(1))) == $missing_val ) .= -1;
+    $dense_rc->where( $a->index2d($dense_rc,sequence($a->dim(1))) == $missing_val ) .= indx(-1);
   } elsif ($ufunc_name =~ /qsorti$/) {
     ##-- hack: adjust $dense_rc for qsorti()
     my $ccs_mask = $dense_rc->zeroes;
-    $ccs_mask->indexND( scalar($ccs_rc->whichND) ) .= 1;
+    $ccs_mask->indexND( scalar($ccs_rc->whichND) ) .= indx(1);
     $dense_rc->where( $ccs_mask->not ) .= $ccs_rc->missing;
   }
   my $label = "${ufunc_name}:missing=$missing_val";
@@ -81,7 +81,7 @@ sub test_ufunc {
 
 
 ##--------------------------------------------------------------
-## all tests
+## generic tests
 for my $missing (0,1,255,$BAD) { ##-- *4
   for my $ufunc (
 		  qw(sumover prodover dsumover dprodover),  ## *17
@@ -96,5 +96,13 @@ for my $missing (0,1,255,$BAD) { ##-- *4
       test_ufunc($ufunc,$missing);
     }
 }
+
+##--------------------------------------------------------------
+## specific tests
+
+##-- sumover empty nzValsIn: https://github.com/moocow-the-bovine/PDL-CCS/issues/14
+my $pdl = zeroes(3,1,3);
+pdlok("sumover(empty)", $pdl->toccs->sumover->decode, $pdl->sumover);
+
 
 done_testing;

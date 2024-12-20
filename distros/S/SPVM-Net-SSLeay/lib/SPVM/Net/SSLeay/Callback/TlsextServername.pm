@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::Callback::TlsextServername - Function Pointer Type of SSL_CTX
 
 =head1 Description
 
-Net::SSLeay::Callback::TlsextServername interface in L<SPVM> represents the function pointer type of L<SSL_CTX_set_tlsext_servername_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_servername_callback> function's callback argument in OpenSSL.
+Net::SSLeay::Callback::TlsextServername interface in L<SPVM> represents the function pointer type of L<SSL_CTX_set_tlsext_servername_callback|https://docs.openssl.org/master/man3/SSL_CTX_set_tlsext_servername_callback> function's callback argument in OpenSSL.
 
 =head1 Usage
 
@@ -20,7 +20,7 @@ Net::SSLeay::Callback::TlsextServername interface in L<SPVM> represents the func
 
 C<required method : int ($ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $al_ref : int*);>
 
-This method represents the function pointer type of L<SSL_CTX_set_tlsext_servername_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_tlsext_servername_callback> function's callback argument in OpenSSL.
+This method represents the function pointer type of L<SSL_CTX_set_tlsext_servername_callback|https://docs.openssl.org/master/man3/SSL_CTX_set_tlsext_servername_callback> function's callback argument in OpenSSL.
 
 =head1 See Also
 

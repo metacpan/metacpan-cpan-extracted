@@ -1,3 +1,6 @@
+v0.10 Fri, 20 Dec 2024 11:31:32 +0100 mohawk2
+	+ PR#1 fixups for https://github.com/PDLPorters/pdl/issues/511
+
 v0.09 Tue, 06 Jun 2017 10:46:31 +0200 moocow
 	+ added 'use lib "."' to Makefile.PL (RT bug #121661)
 

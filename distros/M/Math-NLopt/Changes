@@ -1,5 +1,22 @@
 Revision history for Math-NLopt
 
+0.04      2024-12-19 22:20:41-05:00 America/New_York
+
+  [BUG FIX]
+
+    * $opt->last-optimize_result was incorrect if ->optimize resulted
+      in a negative result code
+
+    * the user data structure passed via e.g. set_min_objective, wasn't
+      properly tracked, leading to the possibility that it could
+      be destroyed before the NLopt objective method was called,
+      causing hilarity when the user's object method was invoked.
+
+
+  [TEST]
+
+    * comparing iteration counts is too noisy; ignore them in tests
+
 0.03      2024-05-01 13:36:25-04:00 America/New_York
 
   [BUG FIX]

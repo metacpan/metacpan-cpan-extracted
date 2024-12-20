@@ -5,7 +5,7 @@ BEGIN
     use warnings;
     use lib './lib';
     use open ':std' => ':utf8';
-    use vars qw( $DEBUG );
+    use vars qw( $DEBUG $CLDR_VERSION );
     use utf8;
     use version;
     use Config;
@@ -20,6 +20,7 @@ BEGIN
         plan skip_all => 'Weird memory bug out of my control on OpenBSD for v5.12.0 to 5';
     }
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
+    our $CLDR_VERSION = '46.1';
 };
 
 BEGIN
@@ -234,7 +235,7 @@ SKIP:
     is_deeply( \@tables, $expected, 'tables' );
 };
 my $vers = $cldr->cldr_version;
-is( $vers, '46.0', 'CLDR version' );
+is( $vers, $CLDR_VERSION, 'CLDR version' );
 
 my $tests =
 {
@@ -685,7 +686,7 @@ my $tests =
     [
         {
             method  => 'calendar_format_l10n',
-            args    => [qw( locale ja calendar gregorian format_type date format_length full format_id yMEEEEd )],
+            args    => [qw( locale ja calendar gregorian format_type date format_length full format_id yMMMEEEEd )],
             expect  => 
             {
                 locale          => 'ja',
@@ -693,7 +694,7 @@ my $tests =
                 format_type     => 'date',
                 format_length   => 'full',
                 alt             => undef,
-                format_id       => 'yMEEEEd',
+                format_id       => 'yMMMEEEEd',
                 format_pattern  => 'y年M月d日EEEE',
             },
         },
@@ -1199,7 +1200,7 @@ my $tests =
                 type        => 'calendar_format',
                 locale      => 'ja',
                 calendar    => 'gregorian',
-                format_id   => 'yMEEEEd',
+                format_id   => 'yMMMEEEEd',
             ],
             expect =>
             [{
@@ -1208,7 +1209,7 @@ my $tests =
                 format_type     => 'date',
                 format_length   => 'full',
                 alt             => undef,
-                format_id       => 'yMEEEEd',
+                format_id       => 'yMMMEEEEd',
                 format_pattern  => 'y年M月d日EEEE',
             }],
         },

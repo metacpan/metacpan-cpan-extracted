@@ -1,5 +1,5 @@
 ---
-abstract: 'OpenSSL Binding and SSL data strcuture.'
+abstract: 'OpenSSL Binding to SPVM'
 author:
   - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
@@ -25,5 +25,5 @@ requires:
   SPVM::Sys: '0.528'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Net-SSLeay.git
-version: '0.031'
+version: '0.032'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

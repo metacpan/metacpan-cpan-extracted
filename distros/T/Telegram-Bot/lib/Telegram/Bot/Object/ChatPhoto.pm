@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::ChatPhoto;
-$Telegram::Bot::Object::ChatPhoto::VERSION = '0.026';
+$Telegram::Bot::Object::ChatPhoto::VERSION = '0.027';
 # ABSTRACT: The base class for Telegram 'ChatPhoto' type objects
 
 
@@ -28,7 +28,7 @@ Telegram::Bot::Object::ChatPhoto - The base class for Telegram 'ChatPhoto' type 
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 
@@ -50,6 +50,10 @@ James Green <jkg@earth.li>
 =item *
 
 Julien Fiegehenn <simbabque@cpan.org>
+
+=item *
+
+Jess Robinson <jrobinson@cpan.org>
 
 =item *
 

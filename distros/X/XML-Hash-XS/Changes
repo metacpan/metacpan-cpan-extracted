@@ -1,5 +1,8 @@
 Revision history for perl module XML::Hash::XS
 
+0.58    2024-12-20
+    - Fix for big endian architecture
+
 0.57    2024-09-27
     - Use "keep_root" option to generate XML via "hash2xml"
     - Change default value of "keep_root" option to "1"

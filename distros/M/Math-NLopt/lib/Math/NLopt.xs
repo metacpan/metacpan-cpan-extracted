@@ -215,7 +215,13 @@ new_ProxyFunc( pTHX_ NLopt opt, SV* sub, unsigned n, SV* data ) {
     proxy->perl_sub = dup_subref( aTHX_ sub);
     av_push(opt->proxies, proxy->perl_sub );
 
-    proxy->data = NULL == data ? &PL_sv_undef : data;
+    if ( NULL == data ) {
+        proxy->data = &PL_sv_undef;
+    }
+    else {
+        proxy->data = data;
+        av_push( opt->proxies, SvREFCNT_inc_simple_NN(data) );
+    }
 
     proxy->x = new_array( aTHX_ n );
     av_push( opt->proxies, proxy->x );
@@ -297,7 +303,14 @@ new_ProxyMFunc( pTHX_ NLopt opt, SV* sub, unsigned n, unsigned m, SV* data ) {
 
     proxy->perl_sub = dup_subref( aTHX_ sub);
     av_push(opt->proxies, proxy->perl_sub );
-    proxy->data = NULL == data ? &PL_sv_undef : data;
+
+    if ( NULL == data ) {
+        proxy->data = &PL_sv_undef;
+    }
+    else {
+        proxy->data = data;
+        av_push( opt->proxies, SvREFCNT_inc_simple_NN(data) );
+    }
 
     proxy->x = new_array( aTHX_ n );
     av_push( opt->proxies, proxy->x );
@@ -376,7 +389,14 @@ new_ProxyPreCondFunc( pTHX_ NLopt opt, SV* sub, unsigned n, SV* data ) {
     ProxyPreCondFunc * proxy = (ProxyPreCondFunc*) SvPVX( sv_proxy );
 
     proxy->perl_sub = dup_subref( aTHX_ sub);
-    proxy->data = NULL == data ? &PL_sv_undef : data;
+
+    if ( NULL == data ) {
+        proxy->data = &PL_sv_undef;
+    }
+    else {
+        proxy->data = data;
+        av_push( opt->proxies, SvREFCNT_inc_simple_NN(data) );
+    }
 
     proxy->x = new_array( aTHX_ n );
     av_push( opt->proxies, proxy->x );
@@ -845,8 +865,11 @@ nlopt_optimize(opt, x)
     CODE:
         n = opt->dimension;
         c_x = AV_to_double( aTHX_  n, (SV*) x, NULL );
-        opt->optimize_result = validate_result( aTHX_ opt,
-                                        nlopt_optimize( opt->self, c_x, &(opt->optimum_value) ) );
+        /* store result first, then validate it, so that if validate_result throws
+           the result is available via last_optimize_result
+         */
+        opt->optimize_result = nlopt_optimize( opt->self, c_x, &(opt->optimum_value) );
+        validate_result( aTHX_ opt, opt->optimize_result );
         RETVAL = (AV*) double_to_AV( aTHX_  n, c_x, NULL );
     OUTPUT:
         RETVAL
@@ -917,6 +940,7 @@ nlopt_set_lower_bounds(opt, lb)
      PREINIT:
         double* c_lb;
      CODE:
+        /* NLopt makes a copy of c_lb, so don't need to keep it around */
         c_lb = AV_to_double( aTHX_  opt->dimension, (SV*) lb, NULL );
         RETVAL = nlopt_set_lower_bounds( opt->self, c_lb);
      OUTPUT:
@@ -1042,6 +1066,7 @@ nlopt_set_upper_bounds(opt, ub)
      PREINIT:
         double* c_ub;
      CODE:
+        /* NLopt makes a copy of c_ub, so don't need to keep it around */
         c_ub = AV_to_double( aTHX_  opt->dimension, (SV*) ub, NULL );
         RETVAL = nlopt_set_upper_bounds( opt->self, c_ub);
      OUTPUT:

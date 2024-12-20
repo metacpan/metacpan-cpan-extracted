@@ -35,7 +35,7 @@ sub gauss2d {
     my $t1 = $t(:,*$n); # first coordinate
     my $t2 = $t(*$n,:); # second coordinate
     my $x = $xin->splitdim(0,$n);
-    $x .= $p0 * exp( -$p1*$t1*$t1 - $p2*$t2*$t2);
+    $x .= ($p0 * exp( -$p1*$t1*$t1 - $p2*$t2*$t2))->convert($x->type->enum);
 }
 
 sub fit_gauss2d {

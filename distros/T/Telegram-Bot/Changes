@@ -1,3 +1,11 @@
+0.027     2024-12-19 19:53:28+00:00 Europe/London
+
+    - handle both chat_member (them) and my_chat_member (us) updates
+    - add support for CallbackQuery and InlineKeyboard
+    - support for message editing
+    - ChatJoinRequest handling, with convenience methods for approve/decline
+    - ForceReply support for user commands
+
 0.026     2024-09-02 14:04:35+01:00 Europe/London
 
     - add support for the chatmember update type

@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::ReplyKeyboardMarkup;
-$Telegram::Bot::Object::ReplyKeyboardMarkup::VERSION = '0.026';
+$Telegram::Bot::Object::ReplyKeyboardMarkup::VERSION = '0.027';
 # ABSTRACT: The base class for Telegram 'ReplyKeyboardMarkup' type objects
 
 
@@ -35,7 +35,7 @@ Telegram::Bot::Object::ReplyKeyboardMarkup - The base class for Telegram 'ReplyK
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 
@@ -57,6 +57,10 @@ James Green <jkg@earth.li>
 =item *
 
 Julien Fiegehenn <simbabque@cpan.org>
+
+=item *
+
+Jess Robinson <jrobinson@cpan.org>
 
 =item *
 

@@ -1,5 +1,16 @@
 Revision history for Perl extension Software::Security::Policy
 
+0.03 -- Thu Dec 19 21:06:37 AST 2024
+
+    [Major items]
+    - Allow quantity and units for timeframe
+    - cleanup unnecessary sections
+
+    [Detailed Change Log]
+    - 135f22d Allow quantity and units for timeframe and cleanup unneeded code
+    - 5e35821 Remove BumpVersionAfterRelease plugin
+    - f62f414 v0.02
+
 0.02 -- Mon Dec 16 18:58:38 AST 2024
 
     [Major items]

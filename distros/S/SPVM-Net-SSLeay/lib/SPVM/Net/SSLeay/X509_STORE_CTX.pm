@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::X509_STORE_CTX - X509_STORE_CTX Data Structure in OpenSSL
 
 =head1 Description
 
-Net::SSLeay::X509_STORE_CTX class in L<SPVM> represents L<X509_STORE_CTX|https://docs.openssl.org/3.1/man3/X509_STORE_CTX_new/> data structure in OpenSSL.
+Net::SSLeay::X509_STORE_CTX class in L<SPVM> represents C<X509_STORE_CTX> data structure in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::X509_STORE_CTX class in L<SPVM> represents L<X509_STORE_CTX|https:/
 
 C<static method get1_issuer : int ($issuer_ref : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>[], $ctx : L<Net::SSLeay::X509_STORE_CTX|SPVM::Net::SSLeay::X509_STORE_CTX>, $x : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>);>
 
-Calls native L<X509_STORE_CTX_get1_issuer|https://docs.openssl.org/master/man3/X509_STORE_set_verify_cb_func> function given $issuer_ref, $ctx, $x.
+Calls native L<X509_STORE_CTX_get1_issuer|https://docs.openssl.org/master/man3/X509_STORE_CTX_get1_issuer> function given $issuer_ref, $ctx, $x.
 
 And if its return value is 1, creates a new L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> object, sets the pointer value of the new object to the value of the native output argument C<*issuer>, and sets C<$issuer_ref-E<gt>[0]> to the new object.
 
@@ -44,7 +44,7 @@ If X509_STORE_CTX_get1_issuer failed, an exception is thrown with C<eval_error_i
 
 C<method set_error : void ($s : int);>
 
-Calls native L<X509_STORE_CTX_set_error|https://docs.openssl.org/master/man3/X509_STORE_CTX_get_error> function given the pointer value of the instance, $s.
+Calls native L<X509_STORE_CTX_set_error|https://docs.openssl.org/master/man3/X509_STORE_CTX_set_error> function given the pointer value of the instance, $s.
 
 =head2 get_error
 
@@ -62,11 +62,11 @@ Calls native L<X509_STORE_CTX_get_error_depth|https://docs.openssl.org/master/ma
 
 C<method get_current_cert : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> ();>
 
-Calls native L<X509_STORE_CTX_get_current_cert|https://docs.openssl.org/master/man3/X509_STORE_CTX_get_error_depth> function given the pointer value of the instance.
+Calls native L<X509_STORE_CTX_get_current_cert|https://docs.openssl.org/master/man3/X509_STORE_CTX_get_current_cert> function given the pointer value of the instance.
 
 If its return value is NULL, returns undef.
 
-Otherwise, increments the refernece count of its return value using native L<X509_up_ref|https://docs.openssl.org/3.0/man3/X509_new/> function, creates a new L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
+Otherwise, increments the refernece count of its return value using native L<X509_up_ref|https://docs.openssl.org/master/man3/X509_up_ref> function, creates a new L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
 
 =head1 See Also
 

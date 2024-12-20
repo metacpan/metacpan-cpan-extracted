@@ -3,25 +3,71 @@ NAME
     Policys
 
 VERSION
-    version 0.02
+    version 0.03
 
 SYNOPSIS
       my $policy = Software::Security::Policy::Individual->new({
-        maintainer => 'Timothy Legge',
+        maintainer => 'security@example.com',
       });
 
       print $output_fh $policy->fulltext;
 
 METHODS
-  new
-      my $policy = $subclass->new(\%arg);
+    new
+          my $policy = $subclass->new(\%arg);
 
-    This method returns a new security policy object for the given security
-    policy class. Valid arguments are:
+        This method returns a new security policy object for the given
+        security policy class. Valid arguments are:
+
+  ATTRIBUTES
+    maintainer
+        the current maintainer for the distibrution; required
+
+    timeframe
+        the time to expect acknowledgement of a security issue. Should
+        include the units such as '5 days or 2 weeks'; defaults to 5 days
+
+    timeframe_quantity
+        the amount of time to expect an acknowledgement of a security issue.
+        Only used if timeframe is undefined and timeframe_units is defined
+        (eg. '5')
+
+    timeframe_units
+        the units of time to expect an acknowledgement of a security issue.
+        Only used if timeframe is undefined and timeframe_quantity is
+        defined (eg. 'days')
+
+    url a url where the most current security policy can be found.
+
+    support_years
+        the number of years for which past major versions of Perl would be
+        supported
+
+    program
+        the name of software for use in the middle of a sentence
+
+    Program
+        the name of software for use in the beginning of a sentence
+
+        "program" and "Program" arguments may be specified both, either one
+        or none. Each argument, if not specified, is defaulted to another
+        one, or to properly capitalized "this program", if both arguments
+        are omitted.
 
   support_years
+    Get the number of years of support to be expected
+
   timeframe
+    Get the expected response time. Defaults to 5 days and uses
+    timeframe_quantity and timeframe_units if the timeframe attribute us
+    undefined.
+
   maintainer
+    Get the maintainer that should be contacted for security issues.
+
+  url
+    Get the URL of the latest security policy version.
+
     These methods are attribute readers.
 
   program
@@ -63,39 +109,10 @@ METHODS
     This method returns the version of the policy. If the security policy is
     not versioned, this method will return false.
 
-  meta_name
-    This method returns the string that should be used for this security
-    policy in the CPAN META.yml file, according to the CPAN Meta spec v1, or
-    undef if there is no known string to use.
-
-  meta2_name
-    This method returns the string that should be used for this security
-    policy in the CPAN META.json or META.yml file, according to the CPAN
-    Meta spec v2, or undef if there is no known string to use. If this
-    method does not exist, and "meta_name" returns open_source, restricted,
-    unrestricted, or unknown, that value will be used.
-
-    "program" and "Program" arguments may be specified both, either one or
-    none. Each argument, if not specified, is defaulted to another one, or
-    to properly capitalized "this program", if both arguments are omitted.
-
-LOOKING UP LICENSE CLASSES
-    FIXME: Remove - unneeded If you have an entry in a META.yml or META.json
-    file, or similar metadata, and want to look up the
-    Software::Security::Policy class to use, there are useful tools in
-    Software::Security::Policy::Utils.
-
-TODO
 SEE ALSO
     The specific policy:
 
     Extra policys are maintained on CPAN in separate modules.
-
-    FIXME Remove The App::Software::Security::Policy module comes with a
-    script software-policy
-    <https://metacpan.org/pod/distribution/App-Software-Security::Policy/scr
-    ipt/software-policy>, which provides a command-line interface to
-    Software::Security::Policy.
 
 COPYRIGHT
     This module is based extensively on Software::License. Only the changes

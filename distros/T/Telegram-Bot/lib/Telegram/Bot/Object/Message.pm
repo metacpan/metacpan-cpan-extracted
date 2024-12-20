@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Message;
-$Telegram::Bot::Object::Message::VERSION = '0.026';
+$Telegram::Bot::Object::Message::VERSION = '0.027';
 # ABSTRACT: The base class for the Telegram type "Message".
 
 
@@ -29,7 +29,8 @@ use Telegram::Bot::Object::PassportData;
 use Telegram::Bot::Object::InlineKeyboardMarkup;
 use Telegram::Bot::Object::ReplyKeyboardMarkup;
 use Telegram::Bot::Object::InlineQuery;
-use Telegram::Bot::Object::Member;		# after v0.026
+use Telegram::Bot::Object::ForceReply;
+use Telegram::Bot::Object::ReplyParameters;
 
 use Data::Dumper;
 
@@ -41,6 +42,7 @@ has 'chat';  # Chat
 
 has 'forward_from'; # User
 has 'forward_from_chat'; # Chat
+has 'sender_chat'; # Chat
 has 'forward_from_message_id';
 has 'forward_signature';
 has 'forward_sender_name';
@@ -86,6 +88,7 @@ has 'connected_website';
 has 'passport_data'; # PassportData
 has 'reply_markup'; # Array of InlineKeyboardMarkup/ReplyKeyboardMarkup
 has 'inline_query'; # InlineQuery
+has 'reply_parameters';
 
 sub fields {
   return {
@@ -98,9 +101,8 @@ sub fields {
                                                             channel_chat_created migrate_to_chat_id
                                                             migrate_from_chat_id connected_website/],
           'Telegram::Bot::Object::User'                 => [qw/from forward_from new_chat_members left_chat_member /],
-	  'Telegram::Bot::Object::Member'               => [qw/new_chat_member old_chat_member /],		# after v0.021
 
-          'Telegram::Bot::Object::Chat'                 => [qw/chat forward_from_chat/],
+          'Telegram::Bot::Object::Chat'                 => [qw/chat forward_from_chat sender_chat/],
           'Telegram::Bot::Object::Message'              => [qw/reply_to_message pinned_message/],
           'Telegram::Bot::Object::MessageEntity'        => [qw/entities caption_entities /],
 
@@ -126,6 +128,8 @@ sub fields {
           'Telegram::Bot::Object::InlineKeyboardMarkup' => [qw/reply_markup/],
           'Telegram::Bot::Object::ReplyKeyboardMarkup'  => [qw/reply_markup/],
           'Telegram::Bot::Object::InlineQuery'          => [qw/inline_query/],
+          'Telegram::Bot::Object::ForceReply'           => [qw/reply_markup/],
+          'Telegram::Bot::Object::ReplyParameters'      => [qw/reply_parameters/],
 
   };
 }
@@ -140,6 +144,7 @@ sub reply {
   my $text = shift;
   my $args = shift // {};
 
+  $args->{reply_parameters} ||= Telegram::Bot::Object::ReplyParameters->new({message_id => $self->message_id });
   return $self->_brain->sendMessage({chat_id => $self->chat->id, text => $text, %$args });
 }
 
@@ -157,7 +162,7 @@ Telegram::Bot::Object::Message - The base class for the Telegram type "Message".
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 
@@ -166,7 +171,7 @@ attributes available for L<Telegram::Bot::Object::Message> objects.
 
 =head1 METHODS
 
-=head2
+=head2 reply
 
 A convenience method to reply to a message with text.
 
@@ -188,6 +193,10 @@ James Green <jkg@earth.li>
 =item *
 
 Julien Fiegehenn <simbabque@cpan.org>
+
+=item *
+
+Jess Robinson <jrobinson@cpan.org>
 
 =item *
 

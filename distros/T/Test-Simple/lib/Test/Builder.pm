@@ -4,13 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.302204';
-
-BEGIN {
-    if( $] < 5.008 ) {
-        require Test::Builder::IO::Scalar;
-    }
-}
+our $VERSION = '1.302206';
 
 use Scalar::Util qw/blessed reftype weaken/;
 
@@ -1366,27 +1360,19 @@ sub todo_output {
 
 sub _new_fh {
     my $self = shift;
-    my($file_or_fh) = shift;
+    my ($file_or_fh) = shift;
 
     my $fh;
-    if( $self->is_fh($file_or_fh) ) {
+    if ($self->is_fh($file_or_fh)) {
         $fh = $file_or_fh;
     }
-    elsif( ref $file_or_fh eq 'SCALAR' ) {
-        # Scalar refs as filehandles was added in 5.8.
-        if( $] >= 5.008 ) {
-            open $fh, ">>", $file_or_fh
-              or $self->croak("Can't open scalar ref $file_or_fh: $!");
-        }
-        # Emulate scalar ref filehandles with a tie.
-        else {
-            $fh = Test::Builder::IO::Scalar->new($file_or_fh)
-              or $self->croak("Can't tie scalar ref $file_or_fh");
-        }
+    elsif (ref $file_or_fh eq 'SCALAR') {
+        open $fh, ">>", $file_or_fh
+            or $self->croak("Can't open scalar ref $file_or_fh: $!");
     }
     else {
         open $fh, ">", $file_or_fh
-          or $self->croak("Can't open test output log $file_or_fh: $!");
+            or $self->croak("Can't open test output log $file_or_fh: $!");
         _autoflush($fh);
     }
 

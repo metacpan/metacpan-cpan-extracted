@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::X509 - X509 data structure in OpenSSL
 
 =head1 Description
 
-Net::SSLeay::X509 class in L<SPVM> represents L<X509|https://docs.openssl.org/3.1/man3/X509_new/> data structure in OpenSSL.
+Net::SSLeay::X509 class in L<SPVM> represents C<X509> data structure in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::X509 class in L<SPVM> represents L<X509|https://docs.openssl.org/3.
 
 C<static method new : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> ();>
 
-Calls native L<X509_new|https://docs.openssl.org/1.0.2/man3/X509_new/> function, creates a new  L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
+Calls native L<X509_new|https://docs.openssl.org/master/man3/X509_new> function, creates a new  L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
 
 Exceptions:
 
@@ -32,7 +32,7 @@ If X509_new failed, an exception is thrown with C<eval_error_id> set to the basi
 
 C<static method check_issued : int ($issuer : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>, $subject : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>);>
 
-Calls native L<X509_check_issued|https://docs.openssl.org/1.1.1/man3/X509_check_issued> function given the pointer value of $issuer, the pointer value of $subject, and returns its return value.
+Calls native L<X509_check_issued|https://docs.openssl.org/master/man3/X509_check_issued> function given the pointer value of $issuer, the pointer value of $subject, and returns its return value.
 
 Exceptions:
 
@@ -46,19 +46,19 @@ The X509 object $subject must be defined. Otherwise an exception is thrown.
 
 C<method get_serialNumber : L<Net::SSLeay::ASN1_INTEGER|SPVM::Net::SSLeay::ASN1_INTEGER> ()>
 
-Calls native L<X509_get_serialNumber|https://docs.openssl.org/3.2/man3/X509_get_serialNumber/> function given the pointer value of the instance, copies its return value using native L<ASN1_INTEGER_dup|https://docs.openssl.org/master/man3/X509_dup/> function, creates a new L<Net::SSLeay::ASN1_INTEGER|SPVM::Net::SSLeay::X509_NAME> object, sets the pointer value of the new object to the native copied value, and returns the new object.
+Calls native L<X509_get_serialNumber|https://docs.openssl.org/master/man3/X509_get_serialNumber> function given the pointer value of the instance, copies its return value using native L<ASN1_INTEGER_dup|https://docs.openssl.org/master/man3/ASN1_INTEGER_dup> function, creates a new L<Net::SSLeay::ASN1_INTEGER|SPVM::Net::SSLeay::X509_NAME> object, sets the pointer value of the new object to the native copied value, and returns the new object.
 
 =head2 get_issuer_name
 
 C<method get_issuer_name : L<Net::SSLeay::X509_NAME|SPVM::Net::SSLeay::X509_NAME> ();>
 
-Calls native L<X509_get_issuer_name|https://docs.openssl.org/3.3/man3/X509_get_subject_name> function given the pointer value of the instance, copies its return value using native L<X509_NAME_dup|https://docs.openssl.org/master/man3/X509_dup/> function, creates a new L<Net::SSLeay::X509_NAME|SPVM::Net::SSLeay::X509_NAME> object, sets the pointer value of the new object to the native copied value, and returns the new object.
+Calls native L<X509_get_issuer_name|https://docs.openssl.org/master/man3/X509_get_issuer_name> function given the pointer value of the instance, copies its return value using native L<X509_NAME_dup|https://docs.openssl.org/master/man3/X509_NAME_dup> function, creates a new L<Net::SSLeay::X509_NAME|SPVM::Net::SSLeay::X509_NAME> object, sets the pointer value of the new object to the native copied value, and returns the new object.
 
 =head2 get_subject_name
 
 C<method get_subject_name : L<Net::SSLeay::X509_NAME|SPVM::Net::SSLeay::X509_NAME> ();>
 
-Calls native L<X509_get_subject_name|https://docs.openssl.org/3.3/man3/X509_get_subject_name> function given the pointer value of the instance, copies its return value using native L<X509_NAME_dup|https://docs.openssl.org/master/man3/X509_dup/> function, creates a new L<Net::SSLeay::X509_NAME|SPVM::Net::SSLeay::X509_NAME> object, sets the pointer value of the new object to the native copied value, and returns the new object.
+Calls native L<X509_get_subject_name|https://docs.openssl.org/master/man3/X509_get_subject_name> function given the pointer value of the instance, copies its return value using native L<X509_NAME_dup|https://docs.openssl.org/master/man3/X509_NAME_dup> function, creates a new L<Net::SSLeay::X509_NAME|SPVM::Net::SSLeay::X509_NAME> object, sets the pointer value of the new object to the native copied value, and returns the new object.
 
 =head2 get_pubkey
 
@@ -96,7 +96,7 @@ Calls L</"pubkey_digest"> method given appropriate arguments, and returns the ou
 
 C<method get_ext_by_NID : int ($nid : int, $lastpos : int);>
 
-Calls native L<X509_get_ext_by_NID|https://docs.openssl.org/1.1.1/man3/X509v3_get_ext_by_NID> function given the pointer value of the instance, $nid, $lastpos, and returns its return value.
+Calls native L<X509_get_ext_by_NID|https://docs.openssl.org/master/man3/X509_get_ext_by_NID> function given the pointer value of the instance, $nid, $lastpos, and returns its return value.
 
 Exceptions:
 
@@ -106,13 +106,13 @@ If X509_get_ext_by_NID failed, an exception is thrown with C<eval_error_id> set 
 
 C<method get_ext_count : int ();>
 
-Calls native L<X509_get_ext_count|https://docs.openssl.org/1.1.1/man3/X509v3_get_ext_by_NID> function given the pointer value of the instance, and returns its return value.
+Calls native L<X509_get_ext_count|https://docs.openssl.org/master/man3/X509_get_ext_count> function given the pointer value of the instance, and returns its return value.
 
 =head2 get_ext
 
 C<method get_ext : L<Net::SSLeay::X509_EXTENSION|SPVM::Net::SSLeay::X509_EXTENSION> ($loc : int);>
 
-Calls native L<X509_get_ext|https://docs.openssl.org/1.1.1/man3/X509v3_get_ext_by_NID> function given the pointer value of the instance, $loc, copies its return value using native L<X509_EXTENSION_dup|https://docs.openssl.org/3.0/man3/X509_dup/> function, creates a new L<Net::SSLeay::X509_EXTENSION|SPVM::Net::SSLeay::X509_EXTENSION> object, sets the pointer value of the new object to the native copied value, and returns the new object.
+Calls native L<X509_get_ext|https://docs.openssl.org/master/man3/X509_get_ext> function given the pointer value of the instance, $loc, copies its return value using native L<X509_EXTENSION_dup|https://docs.openssl.org/master/man3/X509_EXTENSION_dup> function, creates a new L<Net::SSLeay::X509_EXTENSION|SPVM::Net::SSLeay::X509_EXTENSION> object, sets the pointer value of the new object to the native copied value, and returns the new object.
 
 Exceptions:
 
@@ -134,7 +134,7 @@ Gets C<STACK_OF(GENERAL_NAME)> data by the following native C codes. C<self> is 
 
 And creates a new L<Net::SSLeay::GENERAL_NAME|SPVM::Net::SSLeay::GENERAL_NAME> array,
 
-And runs the following loop: copies the element at index $i of the return value(C<STACK_OF(GENERAL_NAME)>) of the native function using native L<GENERAL_NAME_dup|https://docs.openssl.org/1.1.1/man3/X509_dup/>, creates a new L<Net::SSLeay::GENERAL_NAME|SPVM::Net::SSLeay::GENERAL_NAME> object, sets the pointer value of the new object to the native copied value, and puses the new object to the new array.
+And performs the following loop: copies the element at index $i of the return value(C<STACK_OF(GENERAL_NAME)>) of the native function using native L<GENERAL_NAME_dup|https://docs.openssl.org/master/man3/GENERAL_NAME_dup>, creates a new L<Net::SSLeay::GENERAL_NAME|SPVM::Net::SSLeay::GENERAL_NAME> object, sets the pointer value of the new object to the native copied value, and puses the new object to the new array.
 
 And returns the new array.
 
@@ -164,19 +164,13 @@ Calls L</"digest"> method given appropriate arguments, and returns the output st
 
 C<method dup : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> ();>
 
-Calls native L<X509_dup|https://docs.openssl.org/3.3/man3/X509_dup> function given the pointer value of the instance, creates a new L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
+Calls native L<X509_dup|https://docs.openssl.org/master/man3/X509_dup> function given the pointer value of the instance, creates a new L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> object, sets the pointer value of the new object to the return value of the native function, and returns the new object.
 
 =head2 DESTROY
 
 C<method DESTROY : void ();>
 
-Calls native L<X509_free|https://docs.openssl.org/3.1/man3/X509_free/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
-
-=head1 FAQ
-
-=head2 How to create a new Net::SSLeay::X509 object?
-
-A way is reading PEM file by calling native L<Net::SSLeay::PEM#read_bio_X509|SPVM::Net::SSLeay::PEM/"read_bio_X509"> method.
+Calls native L<X509_free|https://docs.openssl.org/master/man3/X509_free> function given the pointer value of the instance unless C<no_free> flag of the instance is a true value.
 
 =head1 See Also
 

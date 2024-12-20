@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::EVP_MD - EVP_MD Data Structure in OpenSSL
 
 =head1 Description
 
-Net::SSLeay::EVP_MD class in L<SPVM> represents L<EVP_MD|https://docs.openssl.org/3.0/man3/EVP_sha224/> Data Structure in OpenSSL
+Net::SSLeay::EVP_MD class in L<SPVM> represents C<EVP_MD> data structure in OpenSSL
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::EVP_MD class in L<SPVM> represents L<EVP_MD|https://docs.openssl.or
 
 C<method DESTROY : void ();>
 
-Calls native L<EVP_MD_free|https://docs.openssl.org/master/man3/EVP_DigestInit/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+Calls native L<EVP_MD_free|https://docs.openssl.org/master/man3/EVP_MD_free> function given the pointer value of the instance unless C<no_free> flag of the instance is a true value.
 
 Requirement:
 

@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Base;
-$Telegram::Bot::Object::Base::VERSION = '0.026';
+$Telegram::Bot::Object::Base::VERSION = '0.027';
 # ABSTRACT: The base class for all Telegram::Bot::Object objects.
 
 
@@ -38,6 +38,7 @@ sub create_from_hash {
   my $brain = shift || die "no brain supplied";
   my $obj   = $class->new(_brain => $brain);
 
+  return if ref($hash) ne 'HASH';
   # deal with each type of field
   foreach my $type (keys %{ $class->fields }) {
     my @fields_of_this_type = @{ $class->fields->{$type} };
@@ -80,7 +81,9 @@ sub create_from_hash {
           $obj->$field(\@sub_array);
         }
         elsif ($obj->_field_is_array_of_arrays($field)) {
-          die "not yet implemented for objects";
+          # Need to skip over this for CallbackQueries (or implement!)
+          $obj->$field([]);
+          warn "not yet implemented for objects";
         }
         else {
           $obj->$field($type->create_from_hash($hash->{$field}, $brain));
@@ -161,7 +164,7 @@ Telegram::Bot::Object::Base - The base class for all Telegram::Bot::Object objec
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 
@@ -209,6 +212,10 @@ James Green <jkg@earth.li>
 =item *
 
 Julien Fiegehenn <simbabque@cpan.org>
+
+=item *
+
+Jess Robinson <jrobinson@cpan.org>
 
 =item *
 

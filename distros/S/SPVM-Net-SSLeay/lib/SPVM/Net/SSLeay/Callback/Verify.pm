@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::Callback::Verify - SSL_verify_cb Function Pointer Type in Ope
 
 =head1 Description
 
-Net::SSLeay::Callback::Verify interface in L<SPVM> represents L<SSL_verify_cb|https://docs.openssl.org/master/man3/SSL_CTX_set_verify/> function pointer type in OpenSSL.
+Net::SSLeay::Callback::Verify interface in L<SPVM> represents L<SSL_verify_cb|https://docs.openssl.org/master/man3/SSL_verify_cb> function pointer type in OpenSSL.
 
 =head1 Usage
 
@@ -20,7 +20,7 @@ Net::SSLeay::Callback::Verify interface in L<SPVM> represents L<SSL_verify_cb|ht
 
 C<required method : int ($preverify_ok : int, $x509_store_ctx : L<Net::SSLeay::X509_STORE_CTX|SPVM::Net::SSLeay::X509_STORE_CTX>);>
 
-This method represents L<SSL_verify_cb|https://docs.openssl.org/master/man3/SSL_CTX_set_verify/> function pointer type.
+This method represents L<SSL_verify_cb|https://docs.openssl.org/master/man3/SSL_verify_cb> function pointer type.
 
 =head1 See Also
 

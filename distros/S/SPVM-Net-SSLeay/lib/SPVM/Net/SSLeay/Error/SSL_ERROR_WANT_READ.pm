@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::Error::SSL_ERROR_WANT_READ - The Error indicated by SSL_ERROR
 
 =head1 Description
 
-Net::SSLeay::Error::SSL_ERROR_WANT_READ class in L<SPVM> represents the error indicated by L<SSL_ERROR_WANT_READ|https://docs.openssl.org/1.0.2/man3/SSL_write> in OpenSSL.
+Net::SSLeay::Error::SSL_ERROR_WANT_READ class in L<SPVM> represents the error indicated by L<SSL_ERROR_WANT_READ|https://docs.openssl.org/master/man3/SSL_ERROR_WANT_READ> in OpenSSL.
 
 =head1 Usage
 

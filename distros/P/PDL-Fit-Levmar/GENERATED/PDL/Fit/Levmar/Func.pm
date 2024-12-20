@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from func.pd! Don't modify!
 #
 package PDL::Fit::Levmar::Func;
 
@@ -15,6 +15,7 @@ use DynaLoader;
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Fit::Levmar::Func $VERSION;
+
 
 
 
@@ -100,7 +101,6 @@ OPTIONS:
   written by Levmar::Func. This can be used to include headers and so forth.
   This option is actually set in the Levmar::Func object.
 
-
 =head2 call()
 
 =for ref
@@ -137,7 +137,6 @@ Call (evaluate) the fit function in a Levmar::Func object.
 
 =cut 
 
-
 use strict;
 use Carp;
 use Config;
@@ -168,16 +167,8 @@ $MKOBJ = $Config{cc} . " -c " . $Config{optimize} . " " .
 $MKSO = $Config{ld} . " " . $Config{lddlflags} ." %o -o %s ";
 
 use File::Temp qw(tempdir);
-#line 172 "Func.pm"
-
-
-
-
-
-
 
 #line 181 "func.pd"
-
 
 =head2 new
 
@@ -333,7 +324,6 @@ sub levmar_func { my $self = new PDL::Fit::Levmar::Func(@_);
 		  return $self;
 }
 
-
 sub make_build_names {
     my $self = shift;
     die "Levmar::Func::levmar_func:  no name for function"
@@ -352,8 +342,6 @@ sub make_build_names {
     $self->{SONAME} = $son;
     $self->{OBJNAME} = $objn;
 }
-
-
 
 # change this to identity, can remove sometime
 sub mfqp {
@@ -667,7 +655,6 @@ sub load_fit_library {
     $self->{LIBHANDLE} = $lib_handle;
 }
 
-
 # End of methods
 # (Actually there are some more methods near the bottom
 #  that are close to the corresponding pp_defs)
@@ -792,7 +779,6 @@ sub generate_C_source {
 	"/* This file automatically created and deleted. Do not edit. */\n" .
 	"#include<math.h>\n#include <stdio.h>\n\n" .
 	join('',@$prefunc);
-
 
     my $kode1 = '';
 
@@ -967,35 +953,27 @@ sub jac_of_t1 {
     _callj1($p,$t,$jac, $self->{JPOINTER});
     return($jac);
 }
-#line 971 "Func.pm"
-
-
-
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+#line 957 "Func.pm"
 
 *_callf = \&PDL::Fit::Levmar::Func::_callf;
-#line 978 "Func.pm"
 
-
-
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
-
-*_callj = \&PDL::Fit::Levmar::Func::_callj;
-#line 985 "Func.pm"
 
 
 
-#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+*_callj = \&PDL::Fit::Levmar::Func::_callj;
+
+
+
 
 *_callj1 = \&PDL::Fit::Levmar::Func::_callj1;
-#line 992 "Func.pm"
+
+
 
 
 
 
 
 #line 158 "func.pd"
-
 
 =head1 AUTHORS
 
@@ -1007,10 +985,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1011 "Func.pm"
-
-
-
+#line 989 "Func.pm"
 
 # Exit with OK status
 

@@ -5,7 +5,7 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.23.25'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.23.27'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##------------------------------------------------------
@@ -97,6 +97,7 @@ pp_addhdr( $PDL::CCS::Config::ccsConfig{INDX_TYPEDEF} );
 ##    #tmp_isgood     => $ppcode_or_undef,  ##-- if defined, checks whether C var (tmp) should be considered "good"
 ##    tmp_addval      => $ppcode_or_undef,   ##-- add PP value $nzvalsIn(NnzIn=>nnzii) to tmp
 ##    tmp_reset       => $ppcode_or_undef,   ##-- reset tmp on index change (default: tmp=$nzvalsIn(NnzIn=>nnzii)) --> QUITE USELESS
+##    tmp_init        => $ppcode_or_undef,   ##-- special case for $tmp_reset with nzii==0; default CROAKs on empty nzValsIn
 ##    doc_addmissing  => $addmissing_doc,    ##-- doc for 'addmissing'
 ##    copybad_ix      => $ppcode_or_undef,   ##-- CopyBadStatusCode ppcode for ix
 ##    copybad_nzvals  => $ppcode_or_undef,   ##-- CopyBadStatusCode ppcode for nzvals
@@ -168,7 +169,10 @@ sub ccs_accum_hash {
  ).($args{init_missingOut} || 'missingOut = $missing();').q(
  nMissingInit = $N()-1;
  nMissing     = nMissingInit;
- ).(defined($args{tmp_reset}) ? $args{tmp_reset} :  'if ($SIZE(NnzIn) == 0) $CROAK("called with empty nzvalsIn"); tmp = $nzvalsIn(NnzIn=>0);').q( /* initialize tmp */
+ ).(defined($args{tmp_init}) ? $args{tmp_init}
+   : (defined($args{tmp_reset}) ? $args{tmp_reset}
+      : 'if ($SIZE(NnzIn) == 0) $CROAK("called with empty nzvalsIn"); tmp = $nzvalsIn(NnzIn=>0);')
+  ).q( /* initialize tmp */
  //
  //-- loop
  for (nnzii_prev=0,nnzii=1; nnzii<sizeNnzIn && nnzoi<sizeNnzOut; nnzii_prev=nnzii++) {
@@ -200,9 +204,13 @@ sub ccs_accum_hash {
  //
  //-- set final computed output values
  ).($args{tmp_addmissing}||'').q(
- loop (Ndims) %{ $ixOut(NnzOut=>nnzoi) = $ixIn(NnzIn=>nnzii_prev); %}
- $nzvalsOut(NnzOut=>nnzoi) = tmp;
- nnzoi++;
+ if (nnzii_prev >= 0 && nnzii_prev < $SIZE(NnzIn)) {
+   loop (Ndims) %{ $ixOut(NnzOut=>nnzoi) = $ixIn(NnzIn=>nnzii_prev); %}
+ }
+ if ($SIZE(NnzOut) > 0) {
+   $nzvalsOut(NnzOut=>nnzoi) = tmp;
+   nnzoi++;
+ }
  $nOut() = nnzoi;
  //
  //-- set any remaining output values to 0 (indices) or "N*missing" (values)
@@ -307,11 +315,11 @@ EOMD
 ##--------------------------------------------------------------
 ## Operations: Accumulators (Ufuncs): sum
 ccs_accum_def('sum', 'sum',
-	      init_missingOut=>'if ($N() > 0) { missingOut = $N() * missingVal; } else { missingOut = missingVal; }',
-	      tmp_addmissing =>'if (nMissing > 0) { tmp += nMissing * missingVal; }',
-	      #tmp_isgood     =>'tmp != missingOut',
-	      tmp_addval     =>'tmp += $nzvalsIn(NnzIn=>nnzii);',
-	      doc_addmissing => <<'EOMD',
+              init_missingOut=>'if ($N() > 0) { missingOut = $N() * missingVal; } else { missingOut = missingVal; }',
+              tmp_init       => 'tmp = $SIZE(NnzIn) == 0 ? 0 : $nzvalsIn(NnzIn=>0);',
+              tmp_addmissing =>'if (nMissing > 0) { tmp += nMissing * missingVal; }',
+              tmp_addval     =>'tmp += $nzvalsIn(NnzIn=>nnzii);',
+              doc_addmissing => <<'EOMD',
 
 If $N() is specified and greater than zero, then the quantity:
 
@@ -500,7 +508,7 @@ EOMD
 require PDL::Bad;
 ccs_accum_def('nbad', 'number of bad values',
 	      extra          =>{HandleBad=>1},
-	      out_type       =>'int+',
+	      out_type       =>'indx',
 	      max_type_perl  =>'ccs_indx', #$PDL::CCS::Config::ccsConfig{INT_TYPE_MAX_IONAME},
 	      #
 	      #init_missingOut=>'missingOut=$N();',

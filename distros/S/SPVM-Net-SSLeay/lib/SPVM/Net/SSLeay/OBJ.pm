@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::OBJ - OBJ Name Space in OpenSSL
 
 =head1 Description
 
-Net::SSLeay::OBJ class in L<SPVM> represents OBJ name space in OpenSSL
+Net::SSLeay::OBJ class in L<SPVM> represents C<OBJ> name space in OpenSSL
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::OBJ class in L<SPVM> represents OBJ name space in OpenSSL
 
 C<static method txt2nid : int ($s : string);>
 
-Calls native L<OBJ_txt2nid|https://docs.openssl.org/master/man3/OBJ_nid2obj> function, and returns its return value.
+Calls native L<OBJ_txt2nid|https://docs.openssl.org/master/man3/OBJ_txt2nid> function, and returns its return value.
 
 Exceptions:
 
@@ -42,7 +42,7 @@ If OBJ_nid2obj failed, an exception is thrown with C<eval_error_id> set to the b
 
 C<static method obj2nid : int ($o : L<Net::SSLeay::ASN1_OBJECT|SPVM::Net::SSLeay::ASN1_OBJECT>);>
 
-Calls native L<OBJ_obj2nid|https://docs.openssl.org/master/man3/OBJ_nid2obj> function given the pointer value of $o, and returns its return value.
+Calls native L<OBJ_obj2nid|https://docs.openssl.org/master/man3/OBJ_obj2nid> function given the pointer value of $o, and returns its return value.
 
 =head1 See Also
 

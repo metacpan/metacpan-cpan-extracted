@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::Error::SSL_ERROR_WANT_WRITE - The Error indicated by SSL_ERRO
 
 =head1 Description
 
-Net::SSLeay::Error::SSL_ERROR_WANT_WRITE class in L<SPVM> represents the error indicated by L<SSL_ERROR_WANT_WRITE|https://docs.openssl.org/1.0.2/man3/SSL_write> in OpenSSL.
+Net::SSLeay::Error::SSL_ERROR_WANT_WRITE class in L<SPVM> represents the error indicated by L<SSL_ERROR_WANT_WRITE|https://docs.openssl.org/master/man3/SSL_ERROR_WANT_WRITE> in OpenSSL.
 
 =head1 Usage
 

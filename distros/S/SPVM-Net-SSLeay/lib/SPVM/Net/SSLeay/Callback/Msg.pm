@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::Callback::Msg - Function Pointer Type of SSL_CTX_set_msg_call
 
 =head1 Description
 
-Net::SSLeay::Callback::Msg interface in L<SPVM> represents the function pointer type of L<SSL_CTX_set_msg_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_msg_callback> function's callback argument in OpenSSL.
+Net::SSLeay::Callback::Msg interface in L<SPVM> represents the function pointer type of L<SSL_CTX_set_msg_callback|https://docs.openssl.org/master/man3/SSL_CTX_set_msg_callback> function's callback argument in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::Callback::Msg interface in L<SPVM> represents the function pointer 
 
 C<required method : void ($write_p : int, $version : int, $content_type : int, $buf : string, $len : int, $ssl : L<Net::SSLeay|SPVM::Net::SSLeay>);>
 
-This method represents the function pointer type of L<SSL_CTX_set_msg_callback|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_msg_callback> function's callback argument in OpenSSL.
+This method represents the function pointer type of L<SSL_CTX_set_msg_callback|https://docs.openssl.org/master/man3/SSL_CTX_set_msg_callback> function's callback argument in OpenSSL.
 
 =head1 See Also
 

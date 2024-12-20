@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::ASN1_GENERALIZEDTIME - ASN1_GENERALIZEDTIME Data Structure in
 
 =head1 Description
 
-Net::SSLeay::ASN1_GENERALIZEDTIME class in L<SPVM> represents L<ASN1_GENERALIZEDTIME|https://pub.sortix.org/sortix/release/cross-volatile/man/man3/ASN1_GENERALIZEDTIME_new.3.html> data structure in OpenSSL
+Net::SSLeay::ASN1_GENERALIZEDTIME class in L<SPVM> represents C<ASN1_GENERALIZEDTIME> data structure in OpenSSL
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::ASN1_GENERALIZEDTIME class in L<SPVM> represents L<ASN1_GENERALIZED
 
 C<static method new : L<Net::SSLeay::ASN1_GENERALIZEDTIME|SPVM::Net::SSLeay::ASN1_GENERALIZEDTIME> ();>
 
-Calls native L<ASN1_GENERALIZEDTIME_new|https://pub.sortix.org/sortix/release/cross-volatile/man/man3/ASN1_GENERALIZEDTIME_new.3.html> function, creates a new  L<Net::SSLeay::ASN1_GENERALIZEDTIME|SPVM::Net::SSLeay::ASN1_GENERALIZEDTIME> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
+Calls native L<ASN1_GENERALIZEDTIME_new|https://docs.openssl.org/master/man3/ASN1_GENERALIZEDTIME_new> function, creates a new  L<Net::SSLeay::ASN1_GENERALIZEDTIME|SPVM::Net::SSLeay::ASN1_GENERALIZEDTIME> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
 
 Exceptions:
 
@@ -34,7 +34,7 @@ If ASN1_GENERALIZEDTIME_new failed, an exception is thrown with C<eval_error_id>
 
 C<static method set : void ($t : long);>
 
-Calls native L<ASN1_GENERALIZEDTIME_set|https://docs.openssl.org/1.1.1/man3/ASN1_GENERALIZEDTIME_set> function given the pointer value of the instance, $t.
+Calls native L<ASN1_GENERALIZEDTIME_set|https://docs.openssl.org/master/man3/ASN1_GENERALIZEDTIME_set> function given the pointer value of the instance, $t.
 
 Exceptions:
 
@@ -44,13 +44,13 @@ If ASN1_GENERALIZEDTIME_new failed, an exception is thrown with C<eval_error_id>
 
 C<method check : int ();>
 
-Calls native L<ASN1_GENERALIZEDTIME_check|https://docs.openssl.org/1.1.1/man3/ASN1_GENERALIZEDTIME_set> function given the pointer value of the instance, and returns its return value.
+Calls native L<ASN1_GENERALIZEDTIME_check|https://docs.openssl.org/master/man3/ASN1_GENERALIZEDTIME_check> function given the pointer value of the instance, and returns its return value.
 
 =head2 print
 
 C<method print : int ($b : L<Net::SSLeay::BIO|SPVM::Net::SSLeay::BIO>);>
 
-Calls native L<ASN1_GENERALIZEDTIME_print|https://docs.openssl.org/1.1.1/man3/ASN1_GENERALIZEDTIME_set> function given $b, the pointer value of the instance.
+Calls native L<ASN1_GENERALIZEDTIME_print|https://docs.openssl.org/master/man3/ASN1_GENERALIZEDTIME_print> function given $b, the pointer value of the instance.
 
 Exceptions:
 
@@ -60,7 +60,7 @@ If ASN1_GENERALIZEDTIME_print failed, an exception is thrown with C<eval_error_i
 
 C<method DESTROY : void ();>
 
-Calls native L<ASN1_GENERALIZEDTIME_free|https://pub.sortix.org/sortix/release/nightly/man/man3/ASN1_GENERALIZEDTIME_free.3.html> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+Calls native L<ASN1_GENERALIZEDTIME_free|https://docs.openssl.org/master/man3/ASN1_GENERALIZEDTIME_free> function given the pointer value of the instance unless C<no_free> flag of the instance is a true value.
 
 =head1 See Also
 

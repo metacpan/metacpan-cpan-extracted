@@ -22,6 +22,7 @@
 #else
 #include <sys/mman.h>
 #endif
+#include <endian.h>
 
 #ifndef MUTABLE_PTR
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)

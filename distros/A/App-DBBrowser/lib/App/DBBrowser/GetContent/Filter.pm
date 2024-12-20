@@ -308,28 +308,53 @@ sub __choose_rows {
 
 sub __range_of_rows {
     my ( $sf, $sql, $filter_str, $working ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $aoa = $sql->{insert_args};
     $sql->{insert_args} = []; # temporarily for the info output
-    my $prompt = "Choose first row:";
-    my $info = $sf->__get_filter_info( $sql, $filter_str );
-    # Stop
-    my $idx_first_row = $sf->__choose_a_row_idx( $aoa, $info, $prompt, $working );
-    if ( ! defined $idx_first_row ) {
-        $sql->{insert_args} = $aoa;
-        return;
+    my @last_indexes;
+    my ( $back, $confirm, $add_range ) = ( '  Back', '  Confirm', '- Add Range' );
+
+    while ( 1 ) {
+        my $info = $sf->__get_filter_info( $sql, $filter_str );
+        # Choose
+        my $choice = $tc->choose(
+            [ undef, $confirm, $add_range ],
+            { %{$sf->{i}{lyt_v}}, info => $info, undef => $back }
+        );
+        $sf->__print_busy_string( $working );
+        if ( ! $choice ) {
+            if ( @last_indexes ) {
+                my $li = pop @last_indexes;
+                $#{$sql->{insert_args}} = $li;
+                next;
+            }
+            $sql->{insert_args} = $aoa;
+            return;
+        }
+        elsif ( $choice eq $confirm ) {
+            return 1;
+        }
+        else {
+            my $info = $sf->__get_filter_info( $sql, $filter_str );
+            my $prompt = "Begin range:";
+            # Stop
+            my $idx_first_row = $sf->__choose_a_row_idx( $aoa, $info, $prompt, $working );
+            if ( ! defined $idx_first_row ) {
+                next;
+            }
+            push @{$sql->{insert_args}}, $aoa->[$idx_first_row]; # temporarily for the info output
+            $info = $sf->__get_filter_info( $sql, $filter_str );
+            pop @{$sql->{insert_args}};
+            $prompt = "End range:";
+            # Stop
+            my $idx_last_row = $sf->__choose_a_row_idx( [ @{$aoa}[$idx_first_row .. $#$aoa] ], $info, $prompt, $working );
+            if ( defined $idx_last_row ) {
+                push @last_indexes, $#{$sql->{insert_args}};
+                $idx_last_row += $idx_first_row;
+                push @{$sql->{insert_args}}, @{$aoa}[$idx_first_row .. $idx_last_row];
+            }
+        }
     }
-    $sql->{insert_args} = [ $aoa->[$idx_first_row] ]; # temporarily for the info output
-    $prompt = "Choose last row:";
-    $info = $sf->__get_filter_info( $sql, $filter_str );
-    # Stop
-    my $idx_last_row = $sf->__choose_a_row_idx( [ @{$aoa}[$idx_first_row .. $#$aoa] ], $info, $prompt, $working );
-    if ( ! defined $idx_last_row ) {
-        $sql->{insert_args} = $aoa;
-        return;
-    }
-    $idx_last_row += $idx_first_row;
-    $sql->{insert_args} = [ @{$aoa}[$idx_first_row .. $idx_last_row] ];
-    return 1;
 }
 
 

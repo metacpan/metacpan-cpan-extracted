@@ -442,7 +442,7 @@ constant_22 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      NLOPT_GN_DIRECT_L_RAND NLOPT_GN_DIRECT_NOSCAL NLOPT_GN_ORIG_DIRECT_L
-     NLOPT_LD_LBFGS_NOCEDAL NLOPT_MINF_MAX_REACHED NLOPT_ROUNDOFF_LIMITED */
+     NLOPT_MINF_MAX_REACHED NLOPT_ROUNDOFF_LIMITED */
   /* Offset 16 gives the best switch position.  */
   switch (name[16]) {
   case 'E':
@@ -474,13 +474,6 @@ constant_22 (pTHX_ const char *name, IV *iv_return) {
     if (memEQ(name, "NLOPT_GN_DIRECT_NOSCAL", 22)) {
     /*                               ^            */
       *iv_return = NLOPT_GN_DIRECT_NOSCAL;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'O':
-    if (memEQ(name, "NLOPT_LD_LBFGS_NOCEDAL", 22)) {
-    /*                               ^            */
-      *iv_return = NLOPT_LD_LBFGS_NOCEDAL;
       return PERL_constant_ISIV;
     }
     break;
@@ -576,7 +569,6 @@ my @names = (qw(NLOPT_MINF_MAX_REACHED ),
             {name=>"NLOPT_LD_AUGLAG_EQ", type=>"IV", macro=>"1"},
             {name=>"NLOPT_LD_CCSAQ", type=>"IV", macro=>"1"},
             {name=>"NLOPT_LD_LBFGS", type=>"IV", macro=>"1"},
-            {name=>"NLOPT_LD_LBFGS_NOCEDAL", type=>"IV", macro=>"1"},
             {name=>"NLOPT_LD_MMA", type=>"IV", macro=>"1"},
             {name=>"NLOPT_LD_SLSQP", type=>"IV", macro=>"1"},
             {name=>"NLOPT_LD_TNEWTON", type=>"IV", macro=>"1"},

@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::X509_VERIFY_PARAM - X509_VERIFY_PARAM Data Structure in OpenS
 
 =head1 Description
 
-Net::SSLeay::X509_VERIFY_PARAM class in L<SPVM> represents L<X509_VERIFY_PARAM|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> data structure in OpenSSL.
+Net::SSLeay::X509_VERIFY_PARAM class in L<SPVM> represents C<X509_VERIFY_PARAM> data structure in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::X509_VERIFY_PARAM class in L<SPVM> represents L<X509_VERIFY_PARAM|h
 
 C<static method new : L<Net::SSLeay::X509_VERIFY_PARAM|SPVM::Net::SSLeay::X509_VERIFY_PARAM> ();>
 
-Calls native L<X509_VERIFY_PARAM_new|https://man.openbsd.org/X509_VERIFY_PARAM_inherit.3> function, creates a new  L<Net::SSLeay::X509_VERIFY_PARAM|SPVM::Net::SSLeay::X509_VERIFY_PARAM> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
+Calls native L<X509_VERIFY_PARAM_new|https://docs.openssl.org/master/man3/X509_VERIFY_PARAM_new> function, creates a new  L<Net::SSLeay::X509_VERIFY_PARAM|SPVM::Net::SSLeay::X509_VERIFY_PARAM> object, sets the pointer value of the object to the return value of the native function, and returns the new object.
 
 Exceptions:
 
@@ -34,7 +34,7 @@ If X509_VERIFY_PARAM_new failed, an exception is thrown with C<eval_error_id> se
 
 C<method get_flags : long ();>
 
-Calls native L<X509_VERIFY_PARAM_get_flags|https://docs.openssl.org/master/man3/X509_VERIFY_PARAM_clear_flags> function given the pointer value of the instance, and returns its return value.
+Calls native L<X509_VERIFY_PARAM_get_flags|https://docs.openssl.org/master/man3/X509_VERIFY_PARAM_get_flags> function given the pointer value of the instance, and returns its return value.
 
 =head2 set_flags
 
@@ -60,19 +60,19 @@ If X509_VERIFY_PARAM_clear_flags failed, an exception is thrown with C<eval_erro
 
 C<method get_hostflags : int ();>
 
-Calls native L<X509_VERIFY_PARAM_get_hostflags|https://docs.openssl.org/master/man3/X509_VERIFY_PARAM_clear_flags> function given the pointer value of the instance, and returns its return value.
+Calls native L<X509_VERIFY_PARAM_get_hostflags|https://docs.openssl.org/master/man3/X509_VERIFY_PARAM_get_hostflags> function given the pointer value of the instance, and returns its return value.
 
 =head2 set_hostflags
 
 C<method set_hostflags : void ($flags : int);>
 
-Calls native L<X509_VERIFY_PARAM_set_hostflags|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function given the pointer value of the instance, $flags.
+Calls native L<X509_VERIFY_PARAM_set_hostflags|https://docs.openssl.org/master/man3/X509_VERIFY_PARAM_set_hostflags> function given the pointer value of the instance, $flags.
 
 =head2 set1_host
 
 C<method set1_host : int ($name : string, $namelen : int = -1);>
 
-Calls native L<X509_VERIFY_PARAM_set1_host|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function given the pointer value of the instance, $name, $namelen, and returns its return value.
+Calls native L<X509_VERIFY_PARAM_set1_host|https://docs.openssl.org/master/man3/X509_VERIFY_PARAM_set1_host> function given the pointer value of the instance, $name, $namelen, and returns its return value.
 
 If $namelen is less than 0, it is set to the length of $name.
 
@@ -88,7 +88,7 @@ If X509_VERIFY_PARAM_set1_host failed, an exception is thrown with C<eval_error_
 
 C<method set1_ip_asc : int ($ipasc : string);>
 
-Calls native L<X509_VERIFY_PARAM_set1_ip_asc|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function given the pointer value of the instance, $ipasc, and returns its return value.
+Calls native L<X509_VERIFY_PARAM_set1_ip_asc|https://docs.openssl.org/master/man3/X509_VERIFY_PARAM_set1_ip_asc> function given the pointer value of the instance, $ipasc, and returns its return value.
 
 Exceptions:
 
@@ -100,7 +100,7 @@ If X509_VERIFY_PARAM_set1_email failed, an exception is thrown with C<eval_error
 
 C<method set1_email : int ($email : string, $emaillen : int = -1);>
 
-Calls native L<X509_VERIFY_PARAM_set1_email|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function given the pointer value of the instance, $email, $emaillen, and returns its return value.
+Calls native L<X509_VERIFY_PARAM_set1_email|https://docs.openssl.org/master/man3/<X509_VERIFY_PARAM_set1_email/> function given the pointer value of the instance, $email, $emaillen, and returns its return value.
 
 If $namelen is less than 0, it is set to the length of $name.
 
@@ -116,13 +116,7 @@ If X509_VERIFY_PARAM_set1_email failed, an exception is thrown with C<eval_error
 
 C<method DESTROY : void ();>
 
-Calls native L<X509_VERIFY_PARAM_free|https://docs.openssl.org/1.0.2/man3/X509_VERIFY_PARAM_set_flags/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
-
-=head1 FAQ
-
-=head2 How to get a Net::SSLeay::X509_VERIFY_PARAM object?
-
-A way is using L<Net::SSLeay::SSL_CTX#get0_param|SPVM::Net::SSLeay::SSL_CTX/"get0_param"> method.
+Calls native L<X509_VERIFY_PARAM_free|https://docs.openssl.org/master/man3/X509_VERIFY_PARAM_free> function given the pointer value of the instance unless C<no_free> flag of the instance is a true value.
 
 =head1 See Also
 

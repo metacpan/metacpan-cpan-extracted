@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::EVP_CIPHER_CTX - EVP_CIPHER_CTX Data Structure in OpenSSL
 
 =head1 Description
 
-Net::SSLeay::EVP_CIPHER_CTX class in L<SPVM> represents L<EVP_CIPHER_CTX|https://docs.openssl.org/3.1/man3/EVP_EncryptInit/> data structure in OpenSSL.
+Net::SSLeay::EVP_CIPHER_CTX class in L<SPVM> represents C<EVP_CIPHER_CTX> data structure in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::EVP_CIPHER_CTX class in L<SPVM> represents L<EVP_CIPHER_CTX|https:/
 
 C<method DESTROY : void ();>
 
-Calls native L<EVP_CIPHER_CTX_free|https://docs.openssl.org/3.1/man3/EVP_EncryptInit/> function given the pointer value of the instance if C<no_free> flag of the instance is not a true value.
+Calls native L<EVP_CIPHER_CTX_free|https://docs.openssl.org/master/man3/EVP_CIPHER_CTX_free> function given the pointer value of the instance unless C<no_free> flag of the instance is a true value.
 
 =head1 See Also
 

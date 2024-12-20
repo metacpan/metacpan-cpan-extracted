@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -124,14 +124,15 @@
             "IPC::Open3" : "0",
             "POSIX" : "0",
             "Test2::V0" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "constant" : "0"
          }
       }
    },
    "provides" : {
       "Math::NLopt" : {
          "file" : "lib/Math/NLopt.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -146,9 +147,9 @@
          "web" : "https://gitlab.com/djerius/math-nlopt"
       }
    },
-   "version" : "0.03",
-   "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "version" : "0.04",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

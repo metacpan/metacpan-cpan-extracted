@@ -16,10 +16,10 @@ name: Software-Security-Policy
 provides:
   Software::Security::Policy:
     file: lib/Software/Security/Policy.pm
-    version: '0.02'
+    version: '0.03'
   Software::Security::Policy::Individual:
     file: lib/Software/Security/Policy/Individual.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Data::Section: '0'
   Text::Template: '0'
@@ -28,7 +28,7 @@ requires:
 resources:
   bugtracker: https://github.com/timlegge/Software-Security-Policy/issues
   repository: git://github.com/timlegge/Software-Security-Policy.git
-version: '0.02'
+version: '0.03'
 x_generated_by_perl: v5.38.2
 x_maintainers:
   - 'Timothy Legge <timlegge@gmail.com>'

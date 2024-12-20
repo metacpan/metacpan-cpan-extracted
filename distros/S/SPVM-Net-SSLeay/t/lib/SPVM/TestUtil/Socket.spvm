@@ -71,7 +71,7 @@ class TestUtil::Socket extends IO::Socket::IP  {
     my $before_connect_SSL_cbs_length = $before_connect_SSL_cbs_list->length;
     for (my $i = 0; $i < $before_connect_SSL_cbs_length; $i++) {
       my $cb = (TestUtil::Socket::Callback::BeforeConnectSSL)$before_connect_SSL_cbs_list->get($i);
-      $cb->($ssl);
+      $cb->($self, $ssl);
     }
     
     while (1) {
@@ -128,7 +128,7 @@ class TestUtil::Socket extends IO::Socket::IP  {
     my $before_accept_SSL_cbs_length = $before_accept_SSL_cbs_list->length;
     for (my $i = 0; $i < $before_accept_SSL_cbs_length; $i++) {
       my $cb = (TestUtil::Socket::Callback::BeforeAcceptSSL)$before_accept_SSL_cbs_list->get($i);
-      $cb->($ssl);
+      $cb->($self, $ssl);
     }
     
     while (1) {

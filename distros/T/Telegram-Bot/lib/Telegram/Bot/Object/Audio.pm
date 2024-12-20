@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Audio;
-$Telegram::Bot::Object::Audio::VERSION = '0.026';
+$Telegram::Bot::Object::Audio::VERSION = '0.027';
 # ABSTRACT: The base class for Telegram 'Audio' type objects
 
 
@@ -33,7 +33,7 @@ Telegram::Bot::Object::Audio - The base class for Telegram 'Audio' type objects
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 
@@ -55,6 +55,10 @@ James Green <jkg@earth.li>
 =item *
 
 Julien Fiegehenn <simbabque@cpan.org>
+
+=item *
+
+Jess Robinson <jrobinson@cpan.org>
 
 =item *
 

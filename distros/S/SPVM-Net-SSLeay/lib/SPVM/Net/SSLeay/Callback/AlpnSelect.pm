@@ -10,7 +10,7 @@ SPVM::Net::SSLeay::Callback::AlpnSelect - Function Pointer Type of SSL_CTX_set_a
 
 =head1 Description
 
-Net::SSLeay::Callback::AlpnSelect interface in L<SPVM> represents the function pointer type of L<SSL_CTX_set_alpn_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb/> function's callback argument in OpenSSL.
+Net::SSLeay::Callback::AlpnSelect interface in L<SPVM> represents the function pointer type of L<SSL_CTX_set_alpn_select_cb|https://docs.openssl.org/master/man3/SSL_CTX_set_alpn_select_cb> function's callback argument in OpenSSL.
 
 =head1 Usage
 
@@ -22,7 +22,7 @@ Net::SSLeay::Callback::AlpnSelect interface in L<SPVM> represents the function p
 
 C<required method : int ($ssl : L<Net::SSLeay|SPVM::Net::SSLeay>, $out_ref : string[], $outlen_ref : byte*, $in : string, $inlen : int);>
 
-This method represents the function pointer type of L<SSL_CTX_set_alpn_select_cb|https://docs.openssl.org/1.1.1/man3/SSL_CTX_set_alpn_select_cb/> function's callback argument in OpenSSL.
+This method represents the function pointer type of L<SSL_CTX_set_alpn_select_cb|https://docs.openssl.org/master/man3/SSL_CTX_set_alpn_select_cb> function's callback argument in OpenSSL.
 
 =head1 See Also
 
