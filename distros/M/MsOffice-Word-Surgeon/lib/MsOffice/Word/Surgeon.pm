@@ -15,7 +15,7 @@ sub has_inner ($@) {my $attr = shift; has_lazy($attr => @_, init_arg => undef)}
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 
 #======================================================================
@@ -321,7 +321,7 @@ regex replacements within text, for example for :
 
 =item *
 
-anonymization, i.e. replacement of names or adresses by aliases;
+anonymization, i.e. replacement of names or addresses by aliases;
 
 =item *
 

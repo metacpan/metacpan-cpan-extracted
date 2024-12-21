@@ -1,5 +1,16 @@
 Revision history for CGI-Buffer
 
+0.87	Fri Dec 20 08:33:19 EST 2024
+	Use Readonly
+	Support CircleCI
+	Use gtar to create a distribution on Macs
+	Set CGI::Info::status() if available
+	IO::Compress::Brotli doesn't work on FreeBSD or Arm Linux
+	Improve setting CGI::Info status
+	Refactor _compress
+	Use Test::DescribeMe to simplify tests
+	Use Test::Needs
+
 0.86	Tue Jun  4 20:20:38 EDT 2024
 	cache_age is now known as cache_duration
 

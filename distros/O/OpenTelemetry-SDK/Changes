@@ -1,5 +1,23 @@
 Revision history for OpenTelemetry-SDK
 
+0.025     2024-12-21 10:23:35+00:00 Europe/London
+
+    * Marked OpenTelemetry::Exporter::OTLP as a dependency instead
+      of a recommended distribution. Since OTLP is the default
+      exporter for the SDK, it doesn't make sense to ship without it.
+      The reason it was released as a separate distribution was
+      initially because it depended on Google::ProtocolBuffers::Dynamic,
+      but now it doesn't: it will use that distribution if it is
+      available but use JSON otherwise.
+    * BREAKING CHANGE: the SDK will now die if it encounters an error
+      during initialisation. This will only affect the code executed
+      during import. Once the SDK has been loaded, it will never
+      intentionally raise an exception.
+    * Add 'isa' as a dependency and reduce the minimum supported Perl
+      version to 5.30. If you are running 5.30 please consider installing
+      Type::Tiny::XS which should improve the performance of these 'isa'
+      checks.
+
 0.024     2024-08-02 15:28:11+01:00 Europe/London
 
     * Use bigfloat instead of bignum in TraceIDRatioBased sampler

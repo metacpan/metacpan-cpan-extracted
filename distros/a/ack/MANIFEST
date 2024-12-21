@@ -77,6 +77,8 @@ t/ack-x.t
 t/anchored.t
 t/bad-ackrc-opt.t
 t/basic.t
+t/boolean.t
+t/build_regex.t
 t/command-line-files.t
 t/config-backwards-compat.t
 t/config-finder.t
@@ -227,6 +229,7 @@ t/text/amontillado.txt
 t/text/bill-of-rights.txt
 t/text/constitution.txt
 t/text/gettysburg.txt
+t/text/movies.txt
 t/text/number.txt
 t/text/numbered-text.txt
 t/text/ozymandias.txt

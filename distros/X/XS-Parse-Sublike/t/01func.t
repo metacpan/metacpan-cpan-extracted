@@ -42,4 +42,15 @@ BEGIN { $^H{"t::func/func"}++ }
    is( $modify_invoked, 1, 'MODIFY_CODE_ATTRIBUTES invoked' );
 }
 
+# named func in another package
+{
+   func Some::Other::Package::example { return 456; }
+
+   is( Some::Other::Package->example, 456, 'named func in another package' );
+
+   my $e = defined eval 'nopkgfunc Some::Other::Package::example2 { }; 1' ? undef : $@;
+   like( $e, qr/^Declaring this sub-like function in another package is not permitted /,
+      'nopkgfunc does not permit other package name' );
+}
+
 done_testing;

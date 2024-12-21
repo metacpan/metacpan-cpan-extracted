@@ -8,7 +8,7 @@ use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces is_at_run_level enco
 use namespace::clean -except => 'meta';
 
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 #======================================================================
 # ATTRIBUTES

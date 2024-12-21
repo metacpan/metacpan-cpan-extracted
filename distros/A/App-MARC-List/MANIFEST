@@ -1,7 +1,7 @@
 bin/marc-list
 Changes
 CONCEPT
-examples/ex1.pl
+examples/list_cnb_ids_from_example_marc.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

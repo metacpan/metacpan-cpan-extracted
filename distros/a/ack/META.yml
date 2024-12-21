@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.143240'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -44,5 +44,4 @@ resources:
   homepage: https://beyondgrep.com/
   license: https://www.perlfoundation.org/artistic-license-20.html
   repository: git://github.com/beyondgrep/ack3.git
-version: v3.7.0
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: v3.8.0

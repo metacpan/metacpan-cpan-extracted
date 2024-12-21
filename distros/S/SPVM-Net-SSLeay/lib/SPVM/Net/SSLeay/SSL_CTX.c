@@ -64,7 +64,18 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   env->call_instance_method_by_name(env, stack, "init", 0, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
-  thread_env = env;
+  stack[0].oval = obj_self;
+  
+  return 0;
+}
+
+int32_t SPVM__Net__SSLeay__SSL_CTX___init_native(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  SSL* self = env->get_pointer(env, stack, obj_self);
   
   thread_env = env;
   
@@ -75,8 +86,6 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   stack[1].oval = obj_self;
   env->call_class_method_by_name(env, stack, "Net::SSLeay::SSL_CTX", "INIT_INSTANCE", 2, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
-  
-  stack[0].oval = obj_self;
   
   return 0;
 }
@@ -123,6 +132,8 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__get0_param(SPVM_ENV* env, SPVM_VALUE* stack)
   
   X509_VERIFY_PARAM* x509_verify_param = SSL_CTX_get0_param(self);
   
+  assert(x509_verify_param);
+  
   void* obj_address_x509_verify_param = env->new_pointer_object_by_name(env, stack, "Address", x509_verify_param, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   stack[0].oval = obj_address_x509_verify_param;
@@ -130,7 +141,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__get0_param(SPVM_ENV* env, SPVM_VALUE* stack)
   if (error_id) { return error_id; }
   void* obj_x509_verify_param = stack[0].oval;
   
-  // X509_VERIFY_PARAM_up_ref, X509_VERIFY_PARAM_dup does not exists.
+  // The native object must be a internal pointer, but X509_VERIFY_PARAM_up_ref does not exists.
   env->set_no_free(env, stack, obj_x509_verify_param, 1);
   env->set_field_object_by_name(env, stack, obj_x509_verify_param, "ref_ssl_ctx", obj_self, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
@@ -275,7 +286,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__use_certificate_file(SPVM_ENV* env, SPVM_VAL
     char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
     ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
     
-    env->die(env, stack, "[OpenSSL Error]SSL_CTX_use_certificate_file failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[OpenSSL Error]SSL_CTX_use_certificate_file failed:%s. $file:%s.", ssl_error_string, file, __func__, FILE_NAME, __LINE__);
     
     int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
     if (error_id) { return error_id; }
@@ -314,7 +325,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__use_certificate_chain_file(SPVM_ENV* env, SP
     char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
     ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
     
-    env->die(env, stack, "[OpenSSL Error]SSL_CTX_use_certificate_chain_file failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[OpenSSL Error]SSL_CTX_use_certificate_chain_file failed:%s. $file:%s", ssl_error_string, file, __func__, FILE_NAME, __LINE__);
     
     int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
     if (error_id) { return error_id; }
@@ -341,7 +352,6 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__use_PrivateKey_file(SPVM_ENV* env, SPVM_VALU
   }
   
   char* file = (char*)env->get_chars(env, stack, obj_file);
-  int32_t file_length = env->length(env, stack, obj_file);
   
   int32_t type = stack[2].ival;
   
@@ -359,7 +369,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__use_PrivateKey_file(SPVM_ENV* env, SPVM_VALU
     char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
     ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
     
-    env->die(env, stack, "[OpenSSL Error]SSL_CTX_use_PrivateKey_file failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[OpenSSL Error]SSL_CTX_use_PrivateKey_file failed:%s. $file:%s.", ssl_error_string, file, __func__, FILE_NAME, __LINE__);
     
     int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
     if (error_id) { return error_id; }
@@ -499,23 +509,23 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__load_verify_locations(SPVM_ENV* env, SPVM_VA
   
   void* obj_self = stack[0].oval;
   
-  void* obj_file = stack[1].oval;
+  void* obj_CAfile = stack[1].oval;
   
-  void* obj_path = stack[2].oval;
+  void* obj_CApath = stack[2].oval;
   
   SSL_CTX* self = env->get_pointer(env, stack, obj_self);
   
-  const char* file = NULL;
-  if (obj_file) {
-    file = env->get_chars(env, stack, obj_file);
+  const char* CAfile = NULL;
+  if (obj_CAfile) {
+    CAfile = env->get_chars(env, stack, obj_CAfile);
   }
   
-  const char* path = NULL;
-  if (obj_path) {
-    path = env->get_chars(env, stack, obj_path);
+  const char* CApath = NULL;
+  if (obj_CApath) {
+    CApath = env->get_chars(env, stack, obj_CApath);
   }
   
-  int32_t status = SSL_CTX_load_verify_locations(self, file, path);
+  int32_t status = SSL_CTX_load_verify_locations(self, CAfile, CApath);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -523,7 +533,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__load_verify_locations(SPVM_ENV* env, SPVM_VA
     char* ssl_error_string = env->get_stack_tmp_buffer(env, stack);
     ERR_error_string_n(ssl_error, ssl_error_string, SPVM_NATIVE_C_STACK_TMP_BUFFER_SIZE);
     
-    env->die(env, stack, "[OpenSSL Error]SSL_CTX_load_verify_locations failed:%s.", ssl_error_string, __func__, FILE_NAME, __LINE__);
+    env->die(env, stack, "[OpenSSL Error]SSL_CTX_load_verify_locations failed:%s. $CAfile:%s. $CApath:%s", ssl_error_string, CAfile, CApath, __func__, FILE_NAME, __LINE__);
     
     int32_t tmp_error_id = env->get_basic_type_id_by_name(env, stack, "Net::SSLeay::Error", &error_id, __func__, FILE_NAME, __LINE__);
     if (error_id) { return error_id; }
@@ -568,6 +578,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_options(SPVM_ENV* env, SPVM_VALUE* stack
   int32_t error_id = 0;
   
   void* obj_self = stack[0].oval;
+  
   SSL_CTX* self = env->get_pointer(env, stack, obj_self);
   
   int64_t options = stack[1].lval;
@@ -584,6 +595,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__get_options(SPVM_ENV* env, SPVM_VALUE* stack
   int32_t error_id = 0;
   
   void* obj_self = stack[0].oval;
+  
   SSL_CTX* self = env->get_pointer(env, stack, obj_self);
   
   int64_t ret = SSL_CTX_get_options(self);
@@ -598,6 +610,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__clear_options(SPVM_ENV* env, SPVM_VALUE* sta
   int32_t error_id = 0;
   
   void* obj_self = stack[0].oval;
+  
   SSL_CTX* self = env->get_pointer(env, stack, obj_self);
   
   int64_t options = stack[1].lval;
@@ -621,7 +634,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_alpn_protos(SPVM_ENV* env, SPVM_VALUE* s
     return env->die(env, stack, "The protocols $protos must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
-  const char* protos = (const char*)env->get_elems_byte(env, stack, obj_protos);
+  const char* protos = (const char*)env->get_chars(env, stack, obj_protos);
   
   int32_t protos_len = stack[2].ival;
   
@@ -669,7 +682,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set1_groups_list(SPVM_ENV* env, SPVM_VALUE* 
   
   SSL_CTX* self = env->get_pointer(env, stack, obj_self);
   
-  int64_t status = SSL_CTX_set1_groups_list(self, list);
+  int32_t status = SSL_CTX_set1_groups_list(self, list);
   
   if (!(status == 1)) {
     int64_t ssl_error = ERR_peek_last_error();
@@ -686,7 +699,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set1_groups_list(SPVM_ENV* env, SPVM_VALUE* 
     return error_id;
   }
   
-  stack[0].lval = status;
+  stack[0].ival = status;
   
   return 0;
 }
@@ -823,7 +836,8 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__add_extra_chain_cert(SPVM_ENV* env, SPVM_VAL
   
   X509* x509 = env->get_pointer(env, stack, obj_x509);
   
-  // SSL_CTX destructor calls X509_free on x509.
+  // The x509 certificate provided to SSL_CTX_add_extra_chain_cert() will be freed by the library when the SSL_CTX is destroyed.
+  // An application should not free the x509 object.
   int32_t status = SSL_CTX_add_extra_chain_cert(self, x509);
   
   if (!(status == 1)) {
@@ -848,7 +862,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__add_extra_chain_cert(SPVM_ENV* env, SPVM_VAL
   return 0;
 }
 
-static int SPVM__Net__SSLeay__SSL_CTX__my__verify_cb(int preverify_ok, X509_STORE_CTX* x509_store_ctx) {
+static int SPVM__Net__SSLeay__SSL_CTX__my__verify_callback(int preverify_ok, X509_STORE_CTX* x509_store_ctx) {
   
   int32_t error_id = 0;
   
@@ -953,7 +967,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_verify(SPVM_ENV* env, SPVM_VALUE* stack)
   
   SSL_verify_cb native_cb = NULL;
   if (obj_cb) {
-    native_cb = &SPVM__Net__SSLeay__SSL_CTX__my__verify_cb;
+    native_cb = &SPVM__Net__SSLeay__SSL_CTX__my__verify_callback;
     
     env->set_field_object_by_name(env, stack, obj_self, "verify_callback", obj_cb, &error_id, __func__, FILE_NAME, __LINE__);
     if (error_id) { return error_id; }
@@ -1049,7 +1063,7 @@ static int SPVM__Net__SSLeay__SSL_CTX__my__alpn_select_cb(SSL* ssl, const unsign
   const char* out = env->get_chars(env, stack, obj_out);
   *out_ref = out;
   
-  env->set_field_string_by_name(env, stack, obj_self, "ref_output_for_set_alpn_select_cb", obj_out, &error_id, __func__, FILE_NAME, __LINE__);
+  env->set_field_string_by_name(env, stack, obj_self, "alpn_select_cb_output", obj_out, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) {
     env->print_exception_to_stderr(env, stack);
     goto END_OF_FUNC;
@@ -1083,7 +1097,7 @@ int32_t SPVM__Net__SSLeay__SSL_CTX__set_alpn_select_cb(SPVM_ENV* env, SPVM_VALUE
     if (error_id) { return error_id; }
   }
   
-  SSL_CTX_set_alpn_select_cb(self, native_cb, self);
+  SSL_CTX_set_alpn_select_cb(self, native_cb, NULL);
   
   return 0;
 }

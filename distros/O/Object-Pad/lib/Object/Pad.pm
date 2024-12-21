@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.816;
+package Object::Pad 0.817;
 
 use v5.18;
 use warnings;
@@ -291,6 +291,26 @@ role.
 
 The package will be loaded in a similar way to how the L</:isa> attribute is
 handled.
+
+=head3 :abstract
+
+   :abstract
+
+I<Since version 0.817.>
+
+Declares that this class is I<abstract>. An abstract class is permitted to
+define required methods (i.e. named methods without a body definition).
+
+Instances may not be created of this class type directly. Instead, a subclass
+of this class must be derived that provides method bodies for any of the named
+required methods. Any subclass of an abstract class must either provide bodies
+for all remaining required methods, or themselves be declared C<:abstract> as
+well.
+
+This provides a way in which a generic type of class can be created, that is
+intended for multiple different specialisations to further define different
+kinds of behaviour by providing bodies for those named methods. Being abstract
+means that instances cannot be created of this as-yet-incomplete class type.
 
 =head3 :repr(TYPE)
 
@@ -839,9 +859,10 @@ which contains the invocant object directly; it will already have been shifted
 from the C<@_> array.
 
 If the method has no body and is given simply as a name, this declares a
-I<required> method for a role. Such a method must be provided by any class
-that implements the role. It will be a compiletime error to combine the role
-with a class that does not provide this.
+I<required> method for a role or abstract class. Such a method must be
+provided by any class that wishes to be non-abstract. It will be a compiletime
+error to apply the role to a class, or derive from an abstract class, that
+does not provide this.
 
 The C<signatures> feature is automatically enabled for method declarations. In
 this case the signature does not have to account for the invocant instance; 
@@ -929,9 +950,9 @@ This effectively provides the ability to define B<private> methods, as they
 are inaccessible from outside the block that defines the class. In addition,
 there is no chance of a name collision because lexical variables in different
 scopes are independent, even if they share the same name. This is particularly
-useful in roles, to create internal helper methods without letting those
-methods be visible to callers, or risking their names colliding with other
-named methods defined on the consuming class.
+useful in roles or abstract base classes, to create internal helper methods
+without letting those methods be visible to callers, or risking their names
+colliding with other named methods defined on the consuming class.
 
 =head2 my method
 

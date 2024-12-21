@@ -1,3 +1,18 @@
+0.033 2024-12-21
+  
+  [Stability Improvement]
+    * Unit tests and documentation are finised.
+  [New Features]
+    * Add the following fields to Net::SSLeay::SSL_CTX.
+    
+      has verify_callback : ro Net::SSLeay::Callback::Verify;
+      
+      has default_passwd_cb : ro Net::SSLeay::Callback::PemPassword;
+      
+      has alpn_select_cb : ro Net::SSLeay::Callback::AlpnSelect;
+      
+      has tlsext_servername_callback : ro Net::SSLeay::Callback::TlsextServername;
+    
 0.032 2024-12-20
   [New Features]
     * Add Net::SSLeay#get_version method.

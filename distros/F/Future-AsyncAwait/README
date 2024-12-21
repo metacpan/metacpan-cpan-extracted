@@ -90,6 +90,11 @@ DESCRIPTION
     
        my $f = lexfunc(@args);
 
+    Since version 0.70 this module supports using the async keyword to
+    declare named subs in other packages.
+
+       async sub Some::Other::Package::myfunc { ... }
+
  await
 
     The await keyword forms an expression which takes a Future instance as

@@ -19,7 +19,7 @@ BEGIN {
   *can = \&UNIVERSAL::can;
 }
 
-our $VERSION = '1.23.27'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.28'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = qw();
 our %EXPORT_TAGS =
   (
@@ -164,7 +164,7 @@ sub fromWhich :lvalue {
   if (!$opts{steal}) {
     ##-- not stolen: copy or sever
     if (!$opts{sorted}) {
-      my $wi   = $wnd->isempty ? PDL->null->ccs_indx() : $wnd->vv_qsortveci;
+      my $wi   = $wnd->qsortveci;
       $wnd     = $wnd->dice_axis(1,$wi);
       $nzvals  = $nzvals->index($wi);
     }
@@ -1407,7 +1407,7 @@ sub _ccsnd_binary_op_mia {
       $avalsr = $avals;
     } else {
       $ixar          = $ixa->dice_axis(0,$ra);
-      my $ixar_sorti = $ixar->isempty ? PDL->null->ccs_indx() : $ixar->vv_qsortveci;
+      my $ixar_sorti = $ixar->qsortveci;
       $ixa           = $ixa->dice_axis(1,$ixar_sorti);
       $ixar          = $ixar->dice_axis(1,$ixar_sorti);
       $avalsr        = $avals->index($ixar_sorti);
@@ -1428,7 +1428,7 @@ sub _ccsnd_binary_op_mia {
       $bvalsr = $bvals;
     } else {
       $ixbr          = $ixb->dice_axis(0,$rb);
-      my $ixbr_sorti = $ixbr->isempty ? PDL->null->ccs_indx() : $ixbr->vv_qsortveci;
+      my $ixbr_sorti = $ixbr->qsortveci;
       $ixb           = $ixb->dice_axis(1,$ixbr_sorti);
       $ixbr          = $ixbr->dice_axis(1,$ixbr_sorti);
       $bvalsr        = $bvals->index($ixbr_sorti);

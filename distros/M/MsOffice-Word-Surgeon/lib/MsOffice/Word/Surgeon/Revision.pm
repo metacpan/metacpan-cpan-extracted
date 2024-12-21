@@ -8,7 +8,7 @@ use MsOffice::Word::Surgeon::Carp;
 use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces encode_entities);
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 subtype 'Date_ISO',
   as      'Str',

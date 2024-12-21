@@ -1,5 +1,8 @@
 Revision history of Data-Frame
 
+0.006004    2024-12-20
+    - update assignments etc so types match (https://github.com/PDLPorters/pdl/issues/511)
+
 0.006003    2024-10-24
     - allow PDL::{Factor,Logical,SV} "initialize" to be instance methods
 

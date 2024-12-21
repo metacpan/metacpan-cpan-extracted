@@ -9,7 +9,7 @@ is_deeply(\%hash, { one => 'a', two => ['b'], three => { four => 'ahh' }, four =
 eval { $maybe->hello_hash };
 my $error = $@;
 like( $error, qr/^Missing required parameter/, "hello hash fails");
-print $error;
+
 my $hashref = $maybe->hello_hashref({ one => 'a', two => ['b'], three => { four => 'ahh' } });
 is_deeply($hashref, { one => 'a', two => ['b'], three => { four => 'ahh' }, four => 'd' });
 eval { $maybe->hello_hashref };

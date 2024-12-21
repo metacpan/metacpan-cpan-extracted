@@ -1,5 +1,5 @@
 package PDL::Factor::Ordered;
-$PDL::Factor::Ordered::VERSION = '0.006003';
+$PDL::Factor::Ordered::VERSION = '0.006004';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ PDL::Factor::Ordered
 
 =head1 VERSION
 
-version 0.006003
+version 0.006004
 
 =head1 AUTHORS
 

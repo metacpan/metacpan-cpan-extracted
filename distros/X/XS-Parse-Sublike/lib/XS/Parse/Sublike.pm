@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike 0.30;
+package XS::Parse::Sublike 0.32;
 
 use v5.14;
 use warnings;
@@ -108,6 +108,37 @@ stage functions when they are invoked.
 Note that this function is now vaguely discouraged, in favour of using a
 prefixing keyword instead, by using the C<XS_PARSE_SUBLIKE_FLAG_PREFIX> flag.
 
+=head2 xps_signature_add_param
+
+   void xps_signature_add_param(struct XSParseSublikeContext *ctx,
+      struct XPSSignatureParamDetails *details);
+
+I<Since version 0.31; experimental.>
+
+This B<experimental> function may only be called during the C<start_signature>
+or C<finish_signature> hook stages. It is used to insert extra signature
+parameters, either at the beginning (when called by the start hook), or at the
+end (when called by the finish hook). It takes details of the parameter to add
+from an addressed structure, which has the following fields.
+
+   struct XPSSignatureParamDetails {
+      U32 ver;
+
+      char sigil;
+      PADOFFSET padix;
+   };
+
+The caller must set the I<ver> field equal to C<XSPARSESUBLIKE_ABI_VERSION>.
+
+The I<sigil> field gives the leading sigil of the parameter; C<$> for
+mandatory scalars, C<@> or C<%> for a final slurpy. The I<padix> field gives
+the pad offset for a pad variable to store the value into. The caller is
+(currently) responsible for creating that pad variable.
+
+At the present version, this API cannot create optional, or named parameters.
+These abilities may be added in a later version which expands on the
+structure's definition to add new fields to support this.
+
 =head1 PARSE CONTEXT
 
 The various hook stages all share state about the ongoing parse process using
@@ -208,6 +239,15 @@ become optional.
 If set, the keyword is considered to be a prefix that can be placed in front
 of C<sub> or another sub-like keyword, to add its set of hooks in addition to
 those of the following keyword. These prefices may be further stacked.
+
+=item XS_PARSE_SUBLIKE_FLAG_ALLOW_PKGNAME
+
+I<Since version 0.31.>
+
+If B<not> set, then fully-qualified identifiers that include a package name
+are not allowed when declaring a named function. If all hooks agree by all
+setting the flag, then the name may be fully-qualified to add the
+newly-declared function into a different package.
 
 =item XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS
 
@@ -352,12 +392,27 @@ may wish to perform any alterations of C<PL_compcv> or related, inspect or
 alter the lexical pad, provide hints hash values, or any other tasks before
 the signature and code body are parsed.
 
+=head2 Parse Signature
+
+If the perl version supports subroutine signatures, and the feature is enabled
+at this point, then an optional signatured is expected. 
+
+I<Since version 0.31>: if the open parenthesis of a signature declaration is
+found, then the C<start_signature> stage is invoked. Once the signature has
+been parsed, the C<finish_signature> stage is invoked.
+
+   void (*start_signature)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
+
+   void (*finish_signature)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
+
+Code in either of these hook stages is permitted to call
+L</xps_signature_add_param>.
+
 =head2 Parse Body
 
 At this point, the main body of the function is parsed and the optree is
-stored in the C<body> field of the context. If the perl version supports sub
-signatures and they are enabled and found, the body will be prefixed with the
-signature ops as well.
+stored in the C<body> field of the context. If a subroutine signature was
+found, the body will be prefixed with the signature ops as well.
 
 =head2 The C<pre_blockend> Stage
 

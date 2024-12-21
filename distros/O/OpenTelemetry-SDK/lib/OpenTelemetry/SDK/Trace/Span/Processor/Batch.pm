@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Trace::Span::Processor::Batch;
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 class OpenTelemetry::SDK::Trace::Span::Processor::Batch
     :does(OpenTelemetry::Trace::Span::Processor)

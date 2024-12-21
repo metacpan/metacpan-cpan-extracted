@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Marker for artificial self-loops
-our $VERSION = '0.2.0'; # VERSION
+our $VERSION = '0.3.0'; # VERSION
 
 sub new
 {

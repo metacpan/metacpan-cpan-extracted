@@ -53,8 +53,17 @@ the environment.
 =head1 CONFIGURATION
 
 When loaded, the SDK will read its configuration from the environment and
-automatically apply those settings. This section lists the environment
-variables that are supported by the SDK and the way they are interpreted.
+automatically apply those settings. Starting with version 0.025, if an error
+is encountered during import, the SDK will raise an
+L<OpenTelemetry::X::Invalid> exception and terminate. While the
+L<specification|https://opentelemetry.io/docs/specs/otel/error-handling/#basic-error-handling-principles>
+is clear that "OpenTelemetry implementations MUST NOT
+throw unhandled exceptions at runtime" it explicitly states that the SDK
+"MAY I<fail fast> and cause the application to fail on initialization". This
+is the only scenario in which the SDK will potentially terminate a program.
+
+The remainder of this section lists the environment variables that are
+supported by the SDK and the way they are interpreted.
 
 The OpenTelemetry specification has
 L<a full list of variables|https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md>,

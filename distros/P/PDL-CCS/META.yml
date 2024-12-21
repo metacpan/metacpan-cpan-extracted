@@ -28,5 +28,5 @@ requires:
   PDL::VectorValued: v1.0.4
 resources:
   repository: git://github.com/moocow-the-bovine/PDL-CCS.git
-version: v1.23.27
+version: v1.23.28
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

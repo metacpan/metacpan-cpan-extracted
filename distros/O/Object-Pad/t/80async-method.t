@@ -14,7 +14,7 @@ BEGIN {
    # versions will crash
    if( eval { require Future::XS } ) {
       plan skip_all => "Future::XS is installed but it is older than 0.08"
-         unless eval { Future::AsyncAwait->VERSION( '0.08' ); };
+         unless eval { Future::XS->VERSION( '0.08' ); };
    }
 }
 

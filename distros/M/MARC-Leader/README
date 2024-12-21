@@ -35,6 +35,9 @@ ERRORS
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
 
+     parse():
+             Bad length of MARC leader.
+
      serialize():
              Bad 'Data::MARC::Leader' instance to serialize.
 
@@ -185,10 +188,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023 Michal Josef Špaček
+    © 2023-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

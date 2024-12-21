@@ -1,5 +1,7 @@
 /* vi: set ft=c : */
 
+#include "xps_internals.h"
+
 /* Some experimental extension flags. Not (currently) part of core perl API
 */
 enum {
@@ -19,8 +21,14 @@ enum {
 #define boot_parse_subsignature_ex()  XPS_boot_parse_subsignature_ex(aTHX)
 void XPS_boot_parse_subsignature_ex(pTHX);
 
-#define parse_subsignature_ex(flags)  XPS_parse_subsignature_ex(aTHX_ flags)
-OP *XPS_parse_subsignature_ex(pTHX_ int flags);
+#define signature_add_param(ctx, details)  XPS_signature_add_param(aTHX_ ctx, details)
+void XPS_signature_add_param(pTHX_ struct XSParseSublikeContext *ctx, struct XPSSignatureParamDetails *details);
+
+#define parse_subsignature_ex(flags, ctx, hd, nhooks)  XPS_parse_subsignature_ex(aTHX_ flags, ctx, hd, nhooks)
+OP *XPS_parse_subsignature_ex(pTHX_ int flags,
+  struct XPSContextWithPointer *ctx,
+  struct HooksAndData hooksanddata[],
+  size_t nhooks);
 
 #define register_subsignature_attribute(name, funcs, funcdata)  XPS_register_subsignature_attribute(aTHX_ name, funcs, funcdata)
 void XPS_register_subsignature_attribute(pTHX_ const char *name, const struct XPSSignatureAttributeFuncs *funcs, void *funcdata);

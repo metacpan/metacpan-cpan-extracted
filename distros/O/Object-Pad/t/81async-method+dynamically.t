@@ -8,7 +8,7 @@ use Test2::V0;
 use Test2::Require::Module 'Future' => '0.49';
 use Test2::Require::Module 'Future::AsyncAwait' => '0.40';
 use Test2::Require::Module 'Object::Pad' => '0.800';
-use Test2::Require::Module 'Syntax::Keyword::Dynamically';
+use Test2::Require::Module 'Syntax::Keyword::Dynamically' => '0.04';
 
 use Future::AsyncAwait;
 use Object::Pad;

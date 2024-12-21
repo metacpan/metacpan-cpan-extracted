@@ -1,5 +1,5 @@
 package Data::Frame::Indexer;
-$Data::Frame::Indexer::VERSION = '0.006003';
+$Data::Frame::Indexer::VERSION = '0.006004';
 # ABSTRACT: Function interface for indexer
 
 use Data::Frame::Setup;
@@ -52,7 +52,7 @@ Data::Frame::Indexer - Function interface for indexer
 
 =head1 VERSION
 
-version 0.006003
+version 0.006004
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 #ifndef __XS_PARSE_SUBLIKE_H__
 #define __XS_PARSE_SUBLIKE_H__
 
-#define XSPARSESUBLIKE_ABI_VERSION 6
+#define XSPARSESUBLIKE_ABI_VERSION 7
 
 struct XSParseSublikeContext {
   SV *name;  /* may be NULL for anon subs */
@@ -27,6 +27,8 @@ enum {
 
   XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS = 1<<3,
   XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES = 1<<4,
+
+  XS_PARSE_SUBLIKE_FLAG_ALLOW_PKGNAME = 1<<5,
 
   /* Back-compat flags we hope to remove in the next ABI version */
   XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS = 1<<15,
@@ -63,6 +65,10 @@ struct XSParseSublikeHooks {
   void (*post_blockstart)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
   void (*pre_blockend)   (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
   void (*post_newcv)     (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
+
+  /* if ver >= 7: */
+  void (*start_signature) (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
+  void (*finish_signature)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
 };
 
 static int (*parse_xs_parse_sublike_func)(pTHX_ const struct XSParseSublikeHooks *hooks, void *hookdata, OP **op_ptr);
@@ -95,6 +101,28 @@ static int S_xs_parse_sublike_any(pTHX_ const struct XSParseSublikeHooks *hooks,
   return (*parseany_xs_parse_sublike_func)(aTHX_ hooks, hookdata, op_ptr);
 }
 
+/* arguments to the signature_add_param function */
+struct XPSSignatureParamDetails {
+  U32  ver;  /* caller must initialise to XSPARSESUBLIKE_ABI_VERSION */
+
+  /* TODO: Right now this is entirely ABI-unstable and prone to change between versions
+   * For now this can only add mandatory positional scalar, or final slurpy
+   * params whose pad variable has already been declared, and that have no
+   * attributes attached.
+   */
+  char sigil;
+  PADOFFSET padix;
+};
+
+static void (*signature_add_param_func)(pTHX_ struct XSParseSublikeContext *ctx, struct XPSSignatureParamDetails *details);
+#define xps_signature_add_param(ctx, details)  S_xps_signature_add_param(aTHX_ ctx, details)
+static void S_xps_signature_add_param(pTHX_ struct XSParseSublikeContext *ctx, struct XPSSignatureParamDetails *details)
+{
+  if(!signature_add_param_func)
+    croak("Must call boot_xs_parse_sublike() first");
+
+  (*signature_add_param_func)(aTHX_ ctx, details);
+}
 
 /* Experimental support for subroutine parameter attributes.
  * Only supported on Perl v5.26 or later
@@ -108,6 +136,11 @@ struct XPSSignatureParamContext {
   OP *defop;
   OP *op;
   /* post_defop phase runs here */
+
+  /* TODO: in next ABI-breaking change, move this to the top */
+  char sigil;
+  const char *namepv;
+  STRLEN namelen;
 };
 
 struct XPSSignatureAttributeFuncs {
@@ -164,6 +197,9 @@ static void S_boot_xs_parse_sublike(pTHX_ double ver) {
 
   register_xps_signature_attribute_func = INT2PTR(void (*)(pTHX_ const char *, const struct XPSSignatureAttributeFuncs *, void *),
       SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register_sigattr()@5", 0)));
+
+  signature_add_param_func = INT2PTR(void (*)(pTHX_ struct XSParseSublikeContext *ctx, struct XPSSignatureParamDetails *details),
+      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/signature_add_param()@7", 0)));
 }
 
 #endif

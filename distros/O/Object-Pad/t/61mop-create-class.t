@@ -24,6 +24,18 @@ use Object::Pad 0.800 ':experimental(mop)';
       '->begin_class can create a class' );
 }
 
+{
+   package BClass {
+      BEGIN {
+         Object::Pad->import_into( "BClass" );
+
+         my $classmeta = Object::Pad::MOP::Class->begin_class( "BClass", abstract => 1 );
+
+         ::ok( $classmeta->is_abstract, '$classmeta->is_abstract for abstract class' );
+      }
+   }
+}
+
 class Parent { field $thing = "parent"; }
 
 {

@@ -3,7 +3,7 @@ do { my $x = {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
                                         'File::ShareDir::Install' => '0.06',
-                                        'perl' => 'v5.32.0'
+                                        'perl' => 'v5.30.0'
                                       }
                       },
        'develop' => {
@@ -33,7 +33,8 @@ do { my $x = {
                                       'Syntax::Keyword::Dynamically' => '0',
                                       'Syntax::Keyword::Match' => '0',
                                       'Time::Piece' => '0',
-                                      'perl' => 'v5.32.0'
+                                      'isa' => '0',
+                                      'perl' => 'v5.30.0'
                                     }
                     },
        'test' => {
@@ -45,7 +46,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Test2::V0' => '0',
                                    'Test::More' => '0',
-                                   'perl' => 'v5.32.0'
+                                   'perl' => 'v5.30.0'
                                  }
                  }
      };

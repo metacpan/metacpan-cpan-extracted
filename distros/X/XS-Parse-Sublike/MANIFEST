@@ -15,6 +15,7 @@ hax/sv_setrv.c.inc
 hax/wrap_keyword_plugin.c.inc
 inc/Module/Build/with/XSTests.pm
 include/parse_subsignature_ex.h
+include/xps_internals.h
 lib/Sublike/Extended.pm
 lib/XS/Parse/Sublike.pm
 lib/XS/Parse/Sublike.xs
@@ -41,6 +42,7 @@ t/12stages-post_blockstart.t
 t/13stages-pre_blockend.t
 t/14stages-post_newcv.t
 t/15stages-filter_attr.t
+t/16stages-signature.t
 t/20registrations.t
 t/30any.t
 t/31prefix.t

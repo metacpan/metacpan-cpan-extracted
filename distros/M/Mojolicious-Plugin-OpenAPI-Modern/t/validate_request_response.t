@@ -111,7 +111,7 @@ YAML
             instanceLocation => '/request/uri/path',
             keywordLocation => '/paths',
             absoluteKeywordLocation => $t->$abs_uri->fragment('/paths')->to_string,
-            error => 'no match found for URI "/foo/hi/there"',
+            error => 'no match found for request URI "/foo/hi/there"',
           },
         ],
       },
@@ -149,8 +149,8 @@ YAML
         errors => [
           {
             instanceLocation => '/request/method',
-            keywordLocation => jsonp(qw(/paths /foo/{foo_id} get)),
-            absoluteKeywordLocation => $t->$abs_uri->fragment(jsonp(qw(/paths /foo/{foo_id} get)))->to_string,
+            keywordLocation => jsonp(qw(/paths /foo/{foo_id})),
+            absoluteKeywordLocation => $t->$abs_uri->fragment(jsonp(qw(/paths /foo/{foo_id})))->to_string,
             error => 'missing operation for HTTP method "get"',
           },
         ],

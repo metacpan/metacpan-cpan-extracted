@@ -98,13 +98,14 @@
   <br>CanonCameraInfo1100D
   <br>CanonCameraInfo1200D
   <br>CanonCameraInfoR6
+  <br>CanonCameraInfoR6m2
   <br>CanonCameraInfoG5XII
   <br>CanonCameraInfoPowerShot
   <br>CanonCameraInfoPowerShot2
   <br>CanonCameraInfoUnknown32
   <br>CanonCameraInfoUnknown16
   <br>CanonCameraInfoUnknown</td>
-<td class=c>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
+<td class=c>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='Canon.html#CameraInfo1D'>Canon CameraInfo1D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo1DmkII'>Canon CameraInfo1DmkII Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo1DmkIIN'>Canon CameraInfo1DmkIIN Tags</a>
@@ -133,6 +134,7 @@
   <br>--&gt; <a href='Canon.html#CameraInfo600D'>Canon CameraInfo600D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo60D'>Canon CameraInfo60D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfoR6'>Canon CameraInfoR6 Tags</a>
+  <br>--&gt; <a href='Canon.html#CameraInfoR6m2'>Canon CameraInfoR6m2 Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfoG5XII'>Canon CameraInfoG5XII Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfoPowerShot'>Canon CameraInfoPowerShot Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfoPowerShot2'>Canon CameraInfoPowerShot2 Tags</a>
@@ -1916,6 +1918,9 @@ others use a range of 0 to 7 where 0 is no sharpening)</span></span></td></tr>
 </tr><tr><td>61182</td><td>= Canon RF 24-105mm F2.8 L IS USM Z</td>
 </tr><tr><td>61182</td><td>= Canon RF-S 10-18mm F4.5-6.3 IS STM</td>
 </tr><tr><td>61182</td><td>= Canon RF 35mm F1.4 L VCM</td>
+</tr><tr><td>61182</td><td>= Canon RF 70-200mm F2.8 L IS USM Z</td>
+</tr><tr><td>61182</td><td>= Canon RF 50mm F1.4 L VCM</td>
+</tr><tr><td>61182</td><td>= Canon RF 24mm F1.4 L VCM</td>
 </tr><tr><td>61491</td><td>= Canon CN-E 14mm T3.1 L F</td>
 </tr><tr><td>61492</td><td>= Canon CN-E 24mm T1.5 L F</td>
 </tr><tr><td>61494</td><td>= Canon CN-E 85mm T1.3 L F</td>
@@ -5776,6 +5781,20 @@ versions 1.0.x, but they may be different for other firmware versions.</p>
 <td><span class=s><span class=n>(includes electronic + mechanical shutter)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='CameraInfoR6m2'>Canon CameraInfoR6m2 Tags</a></h2>
+<p>CameraInfo tags for the EOS R6 Mark II.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='3369 = 0xd29'>3369</td>
+<td>ShutterCount</td>
+<td class=c>int32u</td>
+<td><span class=s><span class=n>(includes electronic + mechanical shutter)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='CameraInfoG5XII'>Canon CameraInfoG5XII Tags</a></h2>
 <p>CameraInfo tags for the PowerShot G5 X Mark II.</p>
 <blockquote>
@@ -6701,7 +6720,10 @@ valid for all camera models)</span></span></td></tr>
   <br>315 = Canon RF-S 10-18mm F4.5-6.3 IS STM
   <br>316 = Canon RF 35mm F1.4 L VCM
   <br>317 = Canon RF-S 3.9mm F3.5 STM DUAL FISHEYE
-  <br>318 = Canon RF 28-70mm F2.8 IS STM</span></td></tr>
+  <br>318 = Canon RF 28-70mm F2.8 IS STM
+  <br>319 = Canon RF 70-200mm F2.8 L IS USM Z
+  <br>325 = Canon RF 50mm F1.4 L VCM
+  <br>326 = Canon RF 24mm F1.4 L VCM</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SerialInfo'>Canon SerialInfo Tags</a></h2>
@@ -12285,7 +12307,7 @@ SX280, and CR3 images from cameras such as the EOS M50.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 12, 2024</i>
+<br><i>Last revised Dec 12, 2024</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

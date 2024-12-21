@@ -1,5 +1,13 @@
 Revision history for OpenTelemetry
 
+0.027     2024-12-20 17:31:04+00:00 Europe/London
+
+    * Fixed some minor nits in the documentation
+    * Add 'isa' as a dependency and reduce the minimum supported Perl
+      version to 5.30. If you are running 5.30 please consider installing
+      Type::Tiny::XS which should improve the performance of these 'isa'
+      checks.
+
 0.026     2024-12-16 09:02:42+00:00 Europe/London
 
     * Added some practical documentation in the OpenTelemetry::Guides

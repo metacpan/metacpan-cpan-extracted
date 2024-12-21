@@ -33,14 +33,13 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
             "Module::Build::Tiny" : "0.034",
             "perl" : "5.020"
          }
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.163",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.164",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -63,7 +62,7 @@
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Portability::Files" : "0",
-            "Test::Spelling" : "0.12",
+            "Test::Spelling" : "0.17",
             "Test::Warnings" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -76,7 +75,7 @@
             "JSON::Schema::Modern::Document::OpenAPI" : "0.024",
             "Mojo::Base" : "0",
             "Mojo::JSON" : "0",
-            "OpenAPI::Modern" : "0.068",
+            "OpenAPI::Modern" : "0.074",
             "Path::Tiny" : "0",
             "Safe::Isa" : "0",
             "YAML::PP" : "0",
@@ -141,7 +140,6 @@
             "Dist::Zilla::Plugin::InstallGuide" : "1.200005",
             "Dist::Zilla::Plugin::Keywords" : "0.004",
             "Dist::Zilla::Plugin::License" : "5.038",
-            "Dist::Zilla::Plugin::MakeMaker::Fallback" : "0.029",
             "Dist::Zilla::Plugin::Manifest" : "0",
             "Dist::Zilla::Plugin::MetaConfig" : "0",
             "Dist::Zilla::Plugin::MetaJSON" : "0",
@@ -150,7 +148,7 @@
             "Dist::Zilla::Plugin::MetaTests" : "0",
             "Dist::Zilla::Plugin::MetaYAML" : "0",
             "Dist::Zilla::Plugin::MinimumPerl" : "1.006",
-            "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback" : "0.018",
+            "Dist::Zilla::Plugin::ModuleBuildTiny" : "0.012",
             "Dist::Zilla::Plugin::MojibakeTests" : "0.8",
             "Dist::Zilla::Plugin::NextRelease" : "5.033",
             "Dist::Zilla::Plugin::PodCoverageTests" : "5.040",
@@ -189,7 +187,7 @@
    "provides" : {
       "Mojolicious::Plugin::OpenAPI::Modern" : {
          "file" : "lib/Mojolicious/Plugin/OpenAPI/Modern.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -204,10 +202,10 @@
          "web" : "https://github.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.041003"
+         "version" : "5.041007"
       },
       "plugins" : [
          {
@@ -411,7 +409,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::MinimumVersion",
-            "version" : "2.000010"
+            "version" : "2.000011"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
@@ -442,7 +440,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::PodSpelling",
-            "version" : "2.007005"
+            "version" : "2.007006"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Kwalitee",
@@ -473,7 +471,7 @@
                }
             },
             "name" : "@Author::ETHER/Test::Portability",
-            "version" : "2.001001"
+            "version" : "2.001003"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::CleanNamespaces",
@@ -732,60 +730,14 @@
             "version" : "1.006"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MakeMaker::Fallback",
+            "class" : "Dist::Zilla::Plugin::ModuleBuildTiny",
             "config" : {
-               "Dist::Zilla::Plugin::MakeMaker" : {
-                  "make_path" : "make",
-                  "version" : "6.032"
-               },
-               "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
-                  "version" : "0.49"
-               },
-               "Dist::Zilla::Plugin::MakeMaker::Fallback" : {
-                  "skip_release_testing" : 0
-               },
-               "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 9,
-                  "version" : "6.032"
-               }
-            },
-            "name" : "@Author::ETHER/MakeMaker::Fallback",
-            "version" : "0.032"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback",
-            "config" : {
-               "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback" : {
-                  "mb_version" : "0.28",
-                  "plugins" : [
-                     {
-                        "class" : "Dist::Zilla::Plugin::ModuleBuild",
-                        "config" : {
-                           "Dist::Zilla::Role::TestRunner" : {
-                              "default_jobs" : 9
-                           }
-                        },
-                        "name" : "ModuleBuild, via ModuleBuildTiny::Fallback",
-                        "version" : "6.032"
-                     },
-                     {
-                        "class" : "Dist::Zilla::Plugin::ModuleBuildTiny",
-                        "config" : {
-                           "Dist::Zilla::Role::TestRunner" : {
-                              "default_jobs" : 9
-                           }
-                        },
-                        "name" : "ModuleBuildTiny, via ModuleBuildTiny::Fallback",
-                        "version" : "0.017"
-                     }
-                  ]
-               },
                "Dist::Zilla::Role::TestRunner" : {
                   "default_jobs" : 9
                }
             },
-            "name" : "@Author::ETHER/ModuleBuildTiny::Fallback",
-            "version" : "0.027"
+            "name" : "@Author::ETHER/ModuleBuildTiny",
+            "version" : "0.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
@@ -882,7 +834,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20240829"
+                  "Module::CoreList" : "5.20241220"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1100,7 +1052,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.012",
+                  "tag" : "v0.013",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1336,8 +1288,8 @@
       }
    },
    "x_authority" : "cpan:ETHER",
-   "x_generated_by_perl" : "v5.41.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.41.7",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1,
    "x_use_unsafe_inc" : 0

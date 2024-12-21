@@ -39,15 +39,15 @@ class Net::SSLeay::SSL_CTX : pointer {
   }
   
   # Fields
-  has verify_callback : Net::SSLeay::Callback::Verify;
+  has verify_callback : ro Net::SSLeay::Callback::Verify;
   
-  has default_passwd_cb : Net::SSLeay::Callback::PemPassword;
+  has default_passwd_cb : ro Net::SSLeay::Callback::PemPassword;
   
-  has alpn_select_cb : Net::SSLeay::Callback::AlpnSelect;
+  has alpn_select_cb : ro Net::SSLeay::Callback::AlpnSelect;
   
-  has ref_output_for_set_alpn_select_cb : string;
+  has alpn_select_cb_output : string;
   
-  has tlsext_servername_callback : Net::SSLeay::Callback::TlsextServername;
+  has tlsext_servername_callback : ro Net::SSLeay::Callback::TlsextServername;
   
   # Class Methods
   native static method new : Net::SSLeay::SSL_CTX ($method : Net::SSLeay::SSL_METHOD);
@@ -58,12 +58,17 @@ class Net::SSLeay::SSL_CTX : pointer {
     
     Fn->set_pointer($self, $pointer);
     
+    $self->init($options);
+    
     return $self;
   }
   
   protected method init : void ($options : object[] = undef) {
     
+    $self->_init_native;
   }
+  
+  native private method _init_native : void ($objects : object[] = undef);
   
   # Instance Methods
   native method get_mode : long ();
@@ -150,7 +155,7 @@ class Net::SSLeay::SSL_CTX : pointer {
     $self->set_alpn_select_cb($cb);
   }
   
-  native method set_tlsext_servername_callback : long ($cb : Net::SSLeay::Callback::TlsextServername);
+  native method set_tlsext_servername_callback : long ($callback : Net::SSLeay::Callback::TlsextServername);
   
   native method DESTROY : void ();
   

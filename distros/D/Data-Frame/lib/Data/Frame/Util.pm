@@ -1,5 +1,5 @@
 package Data::Frame::Util;
-$Data::Frame::Util::VERSION = '0.006003';
+$Data::Frame::Util::VERSION = '0.006004';
 # ABSTRACT: Utility functions
 
 use Data::Frame::Setup;
@@ -60,7 +60,10 @@ fun ifelse ($test, $yes, $no) {
     }
 
     $no = $no->repeat_to_length($l);
-    $yes->slice($idx) .= $no->slice($idx);
+    my $no_sliced = $no->slice($idx);
+    $no_sliced = $no_sliced->convert($yes->type->enum)
+        if $yes->type != $no->type;
+    $yes->slice($idx) .= $no_sliced;
 
     return $yes;
 }
@@ -181,7 +184,7 @@ Data::Frame::Util - Utility functions
 
 =head1 VERSION
 
-version 0.006003
+version 0.006004
 
 =head1 DESCRIPTION
 
@@ -226,7 +229,7 @@ it returns a piddle of the same length as C<$test>, and is filled with
 elements selected from C<$yes> or C<$no> depending on whether the
 corresponding element in C<$test> is true or false.
 
-C<$test>, C<$yes>, C<$no> should ideally be piddles or cocere-able to
+C<$test>, C<$yes>, C<$no> should ideally be piddles or coerce-able to
 piddles. 
 
 =head2 is_discrete

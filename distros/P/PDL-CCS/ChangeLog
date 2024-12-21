@@ -1,3 +1,7 @@
+v1.23.28 Fri, 20 Dec 2024 20:12:18 +0100
+	+ fix 'Runtime error: Tried to convert(null)' when multiplying all-missing CCS::Nd
+	  - reported as https://github.com/moocow-the-bovine/PDL-CCS/issues/14#issuecomment-2556862635
+
 v1.23.27 Fri, 20 Dec 2024 11:10:00 +0100 mohawk2
 	+ PR #15 assign "wanted" data of correct type in _ind and qsorti tests
 

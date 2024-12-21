@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Define and roll musical dice
 
-our $VERSION = '0.0201';
+our $VERSION = '0.0202';
 
 use Moo;
 use strictures 2;
@@ -16,6 +16,13 @@ use Music::Scales qw(get_scale_notes get_scale_nums);
 use Music::ToRoman ();
 use Types::Standard qw(ArrayRef Int Str);
 use namespace::clean;
+
+
+has semitones => (
+    is      => 'ro',
+    isa     => sub { croak "$_[0] is not an integer" unless $_[0] =~ /^\d+$/ },
+    default => sub { 12 },
+);
 
 
 has scale_note => (
@@ -88,9 +95,20 @@ sub _build_intervals {
     my ($self) = @_;
     my @nums = get_scale_nums($self->scale_name);
     my @intervals = map { $nums[$_] - $nums[$_ - 1] } 1 .. $#nums;
-    push @intervals, 12 - $nums[-1];
+    push @intervals, $self->semitones - $nums[-1];
+    if ($self->identity) {
+        unshift @intervals, 0;
+        push @intervals, $self->semitones;
+    }
     return \@intervals;
 }
+
+
+has identity => (
+    is      => 'ro',
+    isa     => sub { croak "$_[0] is not a boolean" unless $_[0] =~ /^[01]$/ },
+    default => sub { 0 },
+);
 
 
 has chord_triads => (
@@ -371,7 +389,7 @@ sub note_chromatic {
 sub interval_chromatic {
     my ($self) = @_;
     my $d = sub {
-        my $choices = [ (1) x 12 ];
+        my $choices = [ (1) x $self->semitones ];
         return choose_weighted($choices, $choices);
     };
     return Games::Dice::Advanced->new($d);
@@ -680,7 +698,7 @@ Music::Dice - Define and roll musical dice
 
 =head1 VERSION
 
-version 0.0201
+version 0.0202
 
 =head1 SYNOPSIS
 
@@ -730,6 +748,14 @@ version 0.0201
 C<Music::Dice> defines and rolls musical dice.
 
 =head1 ATTRIBUTES
+
+=head2 semitones
+
+  $semitones = $d->semitones;
+
+The number of semitones in the notes of the chromatic scale.
+
+Default: C<12>
 
 =head2 scale_note
 
@@ -826,7 +852,16 @@ Return the note B<intervals>.
 This list is computed, if the B<scale_name> is given, and the
 B<intervals> are I<not> given in the object constructor.
 
-Default: 12 C<1>s (for the chromatic scale)
+Default: C<1> for each of the defined B<semitones>
+
+=head2 identity
+
+  $identity = $d->identity;
+
+To include unison (C<0>) and the octave (the number of B<semitones>),
+in the list of intervals.
+
+Default: C<0>
 
 =head2 chord_triads
 
@@ -1080,14 +1115,16 @@ Default: C<[3,4,5]>
 
   $d = Music::Dice->new;
   $d = Music::Dice->new( # override defaults
+    semitones                   => $semitones,
     scale_note                  => $note,
     scale_name                  => $name,
-    flats                       => $bool,
+    flats                       => $flats,
     beats                       => $beats,
     phrase_pool                 => \@pool, # or 'all'
     phrase_weights              => \@weights,
     phrase_groups               => \@groups,
     notes                       => \@notes,
+    identity                    => $identity,
     intervals                   => \@intervals,
     chord_triads                => \@triads,
     chord_triad_weights         => \@triad_weights,
@@ -1137,8 +1174,7 @@ B<scale_note>, with equal probability.
 
   $result = $d->interval_chromatic->roll;
 
-Return one of the chromatic intervals (12 C<1>s), with equal
-probability.
+Return one of the chromatic intervals, with equal probability.
 
 =head2 note_major
 

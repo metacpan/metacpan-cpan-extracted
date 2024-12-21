@@ -36,7 +36,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Dice
   repository: https://github.com/ology/Music-Dice.git
-version: '0.0201'
+version: '0.0202'
 x_Dist_Zilla:
   perl:
     version: '5.040000'

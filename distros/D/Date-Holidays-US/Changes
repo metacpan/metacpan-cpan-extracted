@@ -1,5 +1,11 @@
 Revision history for Perl extension Date::Holidays::US.
 
+0.05 2024-12-20
+  - Fixed Inauguration Day logic when Jan 20th falls on a Sunday. Impacted 1985, 2041, ...
+
+0.04 2024-12-20
+  - Added Tuesday, December 24, 2024, the Day before Christmas Day per Executive Order
+
 0.03 2022-09-06
   - Updated holidays function to dynamically calculate dates in the year as we expand is_holiday logic
 

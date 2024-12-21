@@ -31,7 +31,7 @@ my $build = Module::Build->new(
          # Technically probably would work on 5.16 but doesn't:
          #   https://rt.cpan.org/Ticket/Display.html?id=132930
       'XS::Parse::Keyword' => '0.46',
-      'XS::Parse::Sublike' => '0.25',
+      'XS::Parse::Sublike' => '0.31',
    },
    test_requires => {
       'Test2::V0' => '0.000148',
@@ -39,7 +39,7 @@ my $build = Module::Build->new(
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
       'XS::Parse::Keyword::Builder' => '0.46',
-      'XS::Parse::Sublike::Builder' => '0.25',
+      'XS::Parse::Sublike::Builder' => '0.31',
    },
    share_dir => {
       module => { 'Object::Pad' => [ 'share' ] },

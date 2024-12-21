@@ -1,7 +1,7 @@
 package Graph::MoreUtils::Smooth;
 
 # ABSTRACT: Generate smoothed graphs
-our $VERSION = '0.2.0'; # VERSION
+our $VERSION = '0.3.0'; # VERSION
 
 use strict;
 use warnings;

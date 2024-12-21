@@ -1,5 +1,18 @@
 Revision history for XS-Parse-Sublike
 
+0.32    2024-12-20
+        [BUGFIXES]
+         * Ensure that signature start+finish hooks are run if present even on
+           empty signatures
+
+0.31    2024-12-20
+        [CHANGES]
+         * Optionally permit named function declarations in fully-qualified
+           packages if all hooks agree
+         * Added experimental `start_signature` and `finish_signature` hook
+           stages
+         * Added experimental `xps_signature_add_param()` API
+
 0.30    2024-10-18
         [BUGFIXES]
          * Ensure that named parameter variables are introduced before the

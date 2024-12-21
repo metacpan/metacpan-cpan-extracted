@@ -50,7 +50,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 require Exporter;
 
-$VERSION = '3.67';
+$VERSION = '3.70';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -203,9 +203,12 @@ my %xmpNS = (
     hdr_metadata => 'http://ns.adobe.com/hdr-metadata/1.0/',
     hdrgm     => 'http://ns.adobe.com/hdr-gain-map/1.0/',
     xmpDSA    => 'http://leica-camera.com/digital-shift-assistant/1.0/',
+    seal      => 'http://ns.seal/2024/1.0/',
     # Note: Google uses a prefix of 'Container', but this conflicts with the
     # Device Container namespace, also by Google.  So call this one GContainer
     GContainer=> 'http://ns.google.com/photos/1.0/container/',
+    HDRGainMap=> 'http://ns.apple.com/HDRGainMap/1.0/',
+    apdi      => 'http://ns.apple.com/pixeldatainfo/1.0/',
 );
 
 # build reverse namespace lookup
@@ -932,6 +935,18 @@ my %sRangeMask = (
     xmpDSA => {
         Name => 'xmpDSA',
         SubDirectory => { TagTable => 'Image::ExifTool::Panasonic::DSA' },
+    },
+    HDRGainMap => {
+        Name => 'HDRGainMap',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::HDRGainMap' },
+    },
+    apdi => {
+        Name => 'apdi',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::apdi' },
+    },
+    seal => {
+        Name => 'seal',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::seal' },
     },
     GContainer => {
         Name => 'GContainer',
@@ -2834,7 +2849,7 @@ sub FullEscapeXML($)
     $str =~ s/\\/&#92;/sg;                  # escape backslashes too
     # then use C-escape sequences for invalid characters
     if ($str =~ /[\0-\x1f]/ or Image::ExifTool::IsUTF8(\$str) < 0) {
-        $str =~ s/([\0-\x1f\x80-\xff])/sprintf("\\x%.2x",ord $1)/sge;
+        $str =~ s/([\0-\x1f\x7f-\xff])/sprintf("\\x%.2x",ord $1)/sge;
     }
     return $str;
 }
@@ -3615,9 +3630,9 @@ NoLoop:
         }
         if ($$et{XmpValidate} and $fmt and $fmt eq 'boolean' and $val!~/^True|False$/) {
             if ($val =~ /^true|false$/) {
-                $et->WarnOnce("Boolean value for XMP-$ns:$$tagInfo{Name} should be capitalized",1);
+                $et->Warn("Boolean value for XMP-$ns:$$tagInfo{Name} should be capitalized",1);
             } else {
-                $et->WarnOnce(qq(Boolean value for XMP-$ns:$$tagInfo{Name} should be "True" or "False"),1);
+                $et->Warn(qq(Boolean value for XMP-$ns:$$tagInfo{Name} should be "True" or "False"),1);
             }
         }
         # protect against large binary data in unknown tags
@@ -3626,7 +3641,7 @@ NoLoop:
     # store the value for this tag
     my $key = $et->FoundTag($tagInfo, $val) or return 0;
     # save original components of rational numbers (used when copying)
-    $$et{RATIONAL}{$key} = $rational if defined $rational;
+    $$et{TAG_EXTRA}{$key}{Rational} = $rational if defined $rational;
     # save structure/list information if necessary
     if (@structProps and (@structProps > 1 or defined $structProps[0][1]) and
         not $$et{NO_STRUCT})
@@ -3808,7 +3823,7 @@ sub ParseXMPElement($$$;$$$$)
                         $stdNS = $uri2ns{$try};
                         if ($stdNS) {
                             $val = $try;
-                            $et->WarnOnce("Fixed incorrect URI for xmlns:$ns", 1);
+                            $et->Warn("Fixed incorrect URI for xmlns:$ns", 1);
                         } elsif ($val =~ m(^http://ns.nikon.com/BASIC_PARAM)) {
                             $et->OverrideFileType('NXD','application/x-nikon-nxd');
                         } else {
@@ -3889,9 +3904,9 @@ sub ParseXMPElement($$$;$$$$)
             if ($nItems == 1000) {
                 my ($tg,$ns) = GetXMPTagID($propList);
                 if ($isWriting) {
-                    $et->WarnOnce("Excessive number of items for $ns:$tg. Processing may be slow", 1);
+                    $et->Warn("Excessive number of items for $ns:$tg. Processing may be slow", 1);
                 } elsif (not $$et{OPTIONS}{IgnoreMinorErrors}) {
-                    $et->WarnOnce("Extracted only 1000 $ns:$tg items. Ignore minor errors to extract all", 2);
+                    $et->Warn("Extracted only 1000 $ns:$tg items. Ignore minor errors to extract all", 2);
                     last;
                 }
             }
@@ -3991,12 +4006,12 @@ sub ParseXMPElement($$$;$$$$)
                 } elsif ($$et{XmpAbout} ne $attrs{$shortName}) {
                     if ($isWriting) {
                         my $str = "Different 'rdf:about' attributes not handled";
-                        unless ($$et{WARNED_ONCE}{$str}) {
+                        unless ($$et{WAS_WARNED}{$str}) {
                             $et->Error($str, 1);
-                            $$et{WARNED_ONCE}{$str} = 1;
+                            $$et{WAS_WARNED}{$str} = 1;
                         }
                     } elsif ($$et{XmpValidate}) {
-                        $et->WarnOnce("Different 'rdf:about' attributes");
+                        $et->Warn("Different 'rdf:about' attributes");
                     }
                 }
             }
@@ -4142,7 +4157,7 @@ sub ParseXMPElement($$$;$$$$)
 
 #------------------------------------------------------------------------------
 # Process XMP data
-# Inputs: 0) ExifTool object reference, 1) DirInfo reference, 2) Pointer to tag table
+# Inputs: 0) ExifTool ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success
 # Notes: The following flavours of XMP files are currently recognized:
 # - standard XMP with xpacket, x:xmpmeta and rdf:RDF elements

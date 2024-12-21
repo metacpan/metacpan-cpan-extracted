@@ -1,5 +1,5 @@
 package Test2::Tools::DataFrame;
-$Test2::Tools::DataFrame::VERSION = '0.006003';
+$Test2::Tools::DataFrame::VERSION = '0.006004';
 # ABSTRACT: Tools for verifying Data::Frame data frames
 
 use 5.010;
@@ -108,7 +108,7 @@ Test2::Tools::DataFrame - Tools for verifying Data::Frame data frames
 
 =head1 VERSION
 
-version 0.006003
+version 0.006004
 
 =head1 SYNOPSIS
 

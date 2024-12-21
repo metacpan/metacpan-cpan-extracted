@@ -18,9 +18,9 @@ t/01_use.t
 t/SSSR/01_simple.t
 t/line/01_use.t
 t/line/02_simple.t
-t/line/03_type_check.t
-t/line/04_triangle.t
-t/line/05_S3.t
-t/line/06_multiedged.t
+t/line/03_triangle.t
+t/line/04_S3.t
+t/line/05_multiedged.t
+t/line/06_directed.t
 t/smoothed/01_use.t
 t/smoothed/02_simple.t

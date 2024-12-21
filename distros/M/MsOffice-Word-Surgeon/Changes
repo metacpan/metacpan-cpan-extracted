@@ -1,6 +1,10 @@
 Revision history for MsOffice-Word-Surgeon
 
-2.08    28.098.2024
+
+2.09    21.12.2024
+  - plain_text() should decode XML entities
+
+2.08    28.09.2024
   - unification of licensing terms
 
 2.07    28.06.2024

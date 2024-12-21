@@ -1,5 +1,8 @@
 Revision history for PDL-IO-Touchstone
 
+1.016	2024-12-20T10:39:12-08:00
+	- Preserve input type in _to_diagonal (PR #8)
+
 1.015	2024-06-18T13:06:19-07:00
 	- Fix false-negative test error (issue #6)
 

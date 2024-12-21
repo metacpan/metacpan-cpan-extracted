@@ -10,8 +10,11 @@ t/001_load.t
 t/002_export.t
 t/003_no_export.t
 t/011_Veterans_Day.t
+t/200_year_1985.t
 t/200_year_2021.t
+t/200_year_2024.t
 t/200_year_2025.t
 t/200_year_2030.t
+t/200_year_2041.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -245,5 +245,10 @@ my $m = identity(3)->set(2,2,0);  # [[1,0,0],[0,1,0],[0,0,0]]
 my $v = zeroes(1,3)->set(0,2,1);  # [[0],[0],[1]]
 pdlok('matmult with empty row', ($m->toccs x $v)->decode, ($m x $v));
 
+##-- no more type conversion support for null PDLs -- https://github.com/moocow-the-bovine/PDL-CCS/issues/14#issuecomment-2556862635
+my $u = zeroes(1, 3);
+my $z = ones(1, 3);
+pdlok('u*z all missing', ($u->toccs * $z->toccs)->decode, ($u * $z));
+pdlok('z*u all missing', ($z->toccs * $u->toccs)->decode, ($z * $u));
 
 done_testing;

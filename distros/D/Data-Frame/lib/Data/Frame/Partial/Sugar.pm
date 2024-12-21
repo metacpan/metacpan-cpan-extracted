@@ -1,12 +1,12 @@
 package Data::Frame::Partial::Sugar;
-$Data::Frame::Partial::Sugar::VERSION = '0.006003';
+$Data::Frame::Partial::Sugar::VERSION = '0.006004';
 # ABSTRACT: Partial class for data frame syntax sugar
 
 use Data::Frame::Role;
 use namespace::autoclean;
 
 package Tie::Data::Frame {
-$Tie::Data::Frame::VERSION = '0.006003';
+$Tie::Data::Frame::VERSION = '0.006004';
 
     use Scalar::Util qw(weaken);
     use Types::PDL qw(Piddle);
@@ -82,7 +82,9 @@ use overload (
         if ( $caller eq 'Method::Generate::Accessor::_Generated' ) {
             return $self;
         }
-        return ( $self->_tie_hash // $self );
+        my $tmp = $self->_tie_hash; # avoid // as breaks Devel::Cover
+        $tmp = $self if !defined $tmp;
+        $tmp;
     },
     fallback => 1
 );
@@ -109,7 +111,7 @@ Data::Frame::Partial::Sugar - Partial class for data frame syntax sugar
 
 =head1 VERSION
 
-version 0.006003
+version 0.006004
 
 =head1 SYNOPSIS
 

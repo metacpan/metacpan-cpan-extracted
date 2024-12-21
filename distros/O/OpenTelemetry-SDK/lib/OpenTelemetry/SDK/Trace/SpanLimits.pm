@@ -3,15 +3,16 @@ use Object::Pad ':experimental( init_expr mop )';
 
 package OpenTelemetry::SDK::Trace::SpanLimits;
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 class OpenTelemetry::SDK::Trace::SpanLimits {
-    use Ref::Util 'is_arrayref';
     use List::Util 'first';
-
-    use OpenTelemetry;
-    use Scalar::Util 'looks_like_number';
+    use Log::Any;
     use OpenTelemetry::Common 'config';
+    use Ref::Util 'is_arrayref';
+    use Scalar::Util 'looks_like_number';
+
+    my $logger = Log::Any->get_logger( category => 'OpenTelemetry');
 
     field        $attribute_count_limit :reader = config(qw(  SPAN_ATTRIBUTE_COUNT_LIMIT ATTRIBUTE_COUNT_LIMIT )) // 128;
     field  $event_attribute_count_limit :reader = config(qw( EVENT_ATTRIBUTE_COUNT_LIMIT ATTRIBUTE_COUNT_LIMIT )) // 128;
@@ -25,7 +26,6 @@ class OpenTelemetry::SDK::Trace::SpanLimits {
     field             $link_count_limit :reader = config(qw(  SPAN_LINK_COUNT_LIMIT )) // 128;
 
     ADJUST {
-        my $logger = OpenTelemetry->logger;
         my $meta   = Object::Pad::MOP::Class->for_caller;
 
         my $optional_number_with_min = sub ( $name, $min ) {

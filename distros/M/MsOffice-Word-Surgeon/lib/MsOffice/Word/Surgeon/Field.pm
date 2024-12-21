@@ -6,7 +6,7 @@ use MooseX::StrictConstructor;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 #======================================================================
 # ATTRIBUTES

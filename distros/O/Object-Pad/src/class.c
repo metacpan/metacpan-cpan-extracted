@@ -711,10 +711,10 @@ FieldMeta *ObjectPad_get_field_for_padix(pTHX_ PADOFFSET padix)
   return fieldmeta;
 }
 
-#define make_methstart_ops(meta, outerscope)  S_make_methstart_ops(aTHX_ meta, outerscope)
-static OP *S_make_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope)
+#define prepend_methstart_ops(meta, outerscope, body)  S_prepend_methstart_ops(aTHX_ meta, outerscope, body)
+static OP *S_prepend_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope, OP *body)
 {
-  U8 opf_special_if_role = (meta->type == METATYPE_ROLE) ? OPf_SPECIAL : 0;
+  U32 opflags_if_role = (meta->type == METATYPE_ROLE) ? OPfMETHSTART_ROLE : 0;
   AV *fields = meta->fields;
   I32 nfields = av_count(fields);
 
@@ -723,9 +723,59 @@ static OP *S_make_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope)
 
   OP *ops = NULL, *methstartop;
 
-  ops = op_append_list(OP_LINESEQ, ops,
-    methstartop = newMETHSTARTOP(opf_special_if_role | (meta->repr << 8))
-  );
+#if HAVE_PERL_VERSION(5, 26, 0)
+  /* If we're on a perl with signatures, we will already have inserted an
+   * OP_ARGELEM to perform the `$self = shift` behaviour rather than letting
+   * OP_METHSTART do it. We need to put OP_METHSTART immediately after this,
+   * so that its field bindings are visible to subsequent param defaulting
+   * expressions that use field vars.
+   */
+  OP *argcheck = NULL;
+  {
+    OP *o = body;
+    while(o) {
+      if(o->op_type == OP_ARGCHECK) {
+        argcheck = o;
+        break;
+      }
+      else if(o->op_type == OP_NEXTSTATE || o->op_type == OP_DBSTATE)
+        o = OpSIBLING(o);
+      else if(o->op_flags & OPf_KIDS)
+        o = cUNOPo->op_first;
+      else
+        break;
+    }
+  }
+
+  if(argcheck) {
+    OP *next;
+
+    next = OpSIBLING(argcheck);
+    if(next->op_type == OP_NEXTSTATE || next->op_type == OP_DBSTATE)
+      next = OpSIBLING(next);
+
+    /* next ought to be the $self OP_ARGELEM we inserted */
+    assert(next);
+    assert(next->op_type == OP_ARGELEM);
+    assert(next->op_targ == PADIX_SELF);
+    assert(PTR2UV(cUNOP_AUXx(next)->op_aux) == 0);
+
+    OP *selfargelem = next;
+    next = OpSIBLING(selfargelem);
+
+    /* Insert an OP_METHSTART without OPf_STACKED */
+    methstartop = newMETHSTARTOP(0 | opflags_if_role | (meta->repr << 8));
+    OpMORESIB_set(selfargelem, methstartop);
+
+    OpMORESIB_set(methstartop, next);
+  }
+  else
+#endif
+  {
+    ops = op_append_list(OP_LINESEQ, ops,
+      methstartop = newMETHSTARTOP(OPf_STACKED | opflags_if_role | (meta->repr << 8))
+    );
+  }
 
 #ifdef METHSTART_CONTAINS_FIELD_BINDINGS
   AV *fieldmap = newAV();
@@ -774,7 +824,7 @@ static OP *S_make_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope)
     }
 
 #ifdef METHSTART_CONTAINS_FIELD_BINDINGS
-    PERL_UNUSED_VAR(opf_special_if_role);
+    PERL_UNUSED_VAR(opflags_if_role);
     assert((fieldix & ~FIELDIX_MASK) == 0);
     av_store(fieldmap, padix, newSVuv(((UV)private << FIELDIX_TYPE_SHIFT) | fieldix));
     fieldcount++;
@@ -783,7 +833,7 @@ static OP *S_make_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope)
 #else
     ops = op_append_list(OP_LINESEQ, ops,
       /* alias the padix from the field */
-      newFIELDPADOP(private << 8 | opf_special_if_role, padix, fieldix));
+      newFIELDPADOP(private << 8 | opflags_if_role, padix, fieldix));
 #endif
 
 #if HAVE_PERL_VERSION(5, 22, 0)
@@ -823,7 +873,7 @@ static OP *S_make_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope)
   }
 #endif
 
-return ops;
+  return op_append_list(OP_LINESEQ, ops, body);
 }
 
 OP *ObjectPad__finish_method_parse(pTHX_ ClassMeta *meta, bool is_common, OP *body)
@@ -863,9 +913,7 @@ OP *ObjectPad__finish_method_parse(pTHX_ ClassMeta *meta, bool is_common, OP *bo
       LEAVE;
     }
 
-    body = op_append_list(OP_LINESEQ,
-      make_methstart_ops(meta, meta->methodscope),
-      body);
+    body = prepend_methstart_ops(meta, meta->methodscope, body);
   }
   else if(body && is_common) {
     body = op_append_list(OP_LINESEQ,
@@ -1261,8 +1309,8 @@ void ObjectPad_mop_class_add_APPLY(pTHX_ ClassMeta *meta, CV *cv)
 
 void ObjectPad_mop_class_add_required_method(pTHX_ ClassMeta *meta, SV *methodname)
 {
-  if(meta->type != METATYPE_ROLE)
-    croak("Can only add a required method to a role");
+  if(!meta->abstract)
+    croak("Can only add a required method to a role or abstract class");
 
   if(!meta->begun)
     croak("Cannot add a new required method to a class that is not yet begun");
@@ -1301,6 +1349,15 @@ static bool S_mop_class_implements_role(pTHX_ ClassMeta *meta, ClassMeta *roleme
   }
 
   return false;
+}
+
+#define copy_requiremethods_from(dst, src)  S_copy_requiremethods_from(aTHX_ dst, src)
+static void S_copy_requiremethods_from(pTHX_ ClassMeta *dst, ClassMeta *src)
+{
+  U32 nmethods = av_count(src->requiremethods);
+  for(U32 i = 0; i < nmethods; i++) {
+    av_push(dst->requiremethods, SvREFCNT_inc(AvARRAY(src->requiremethods)[i]));
+  }
 }
 
 #define embed_role(class, role)  S_embed_role(aTHX_ class, role)
@@ -1391,10 +1448,7 @@ static RoleEmbedding *S_embed_role(pTHX_ ClassMeta *classmeta, ClassMeta *roleme
       GvCV_set(*gvp, (CV *)SvREFCNT_inc((SV *)cv));
   }
 
-  nmethods = av_count(rolemeta->requiremethods);
-  for(i = 0; i < nmethods; i++) {
-    av_push(classmeta->requiremethods, SvREFCNT_inc(AvARRAY(rolemeta->requiremethods)[i]));
-  }
+  copy_requiremethods_from(classmeta, rolemeta);
 
   return embedding;
 }
@@ -1667,13 +1721,7 @@ static void S_generate_initfields_method(pTHX_ ClassMeta *meta)
   CopLINE_set(PL_curcop, __LINE__);
 #endif
 
-  /* TODO: This will create a method start op that appears to capture every
-   * field except the final one. There's not a lot we can do about this
-   * without duplicating a lot of the `methodscope` structure for initfields,
-   * except more complex due to the multiple suspend/resume nature of parsing
-   * it.
-   */
-  OP *ops = make_methstart_ops(meta, NULL);
+  OP *ops = NULL;
 
   ops = op_append_list(OP_LINESEQ, ops,
     newSTATEOP(0, NULL, NULL));
@@ -1743,6 +1791,14 @@ static void S_generate_initfields_method(pTHX_ ClassMeta *meta)
     }
   }
 
+  /* TODO: This will create a method start op that appears to capture every
+   * field except the final one. There's not a lot we can do about this
+   * without duplicating a lot of the `methodscope` structure for initfields,
+   * except more complex due to the multiple suspend/resume nature of parsing
+   * it.
+   */
+  ops = prepend_methstart_ops(meta, NULL, ops);
+
   SvREFCNT_inc(PL_compcv);
   ops = block_end(save_ix, ops);
 
@@ -1782,7 +1838,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
   if(meta->type == METATYPE_CLASS)
     S_apply_roles(aTHX_ meta, meta);
 
-  if(meta->type == METATYPE_CLASS) {
+  if(!meta->abstract) {
     U32 nmethods = av_count(meta->requiremethods);
     U32 i;
     for(i = 0; i < nmethods; i++) {
@@ -1795,7 +1851,9 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
       croak("Class %" SVf " does not provide a required method named '%" SVf "'",
         SVfARG(meta->name), SVfARG(mname));
     }
+  }
 
+  if(meta->type == METATYPE_CLASS) {
     GV *gv = gv_fetchmeth_pvs(meta->stash, "BUILDARGS", -1, 0);
     assert(gv); assert(SvTYPE(gv) == SVt_PVGV);
 
@@ -1916,6 +1974,9 @@ XS_INTERNAL(injected_constructor)
   SV *self = NULL;
 
   assert(meta->type == METATYPE_CLASS);
+  if(meta->abstract)
+    croak("Cannot directly construct an instance of abstract class '%" SVf "'",
+      SVfARG(meta->name));
   if(!meta->sealed)
     croak("Cannot yet invoke '%" SVf "' constructor before the class is complete", SVfARG(class));
 
@@ -2403,6 +2464,9 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
     .repr = REPR_AUTOSELECT,
     .name = SvREFCNT_inc(name),
 
+    /* all roles are abstract */
+    .abstract = (type == METATYPE_ROLE),
+
     .stash = stash,
 
     .next_fieldix = -1,
@@ -2626,6 +2690,9 @@ void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *meta, SV *superclassnam
       }
     }
 
+    if(supermeta->abstract)
+      copy_requiremethods_from(meta, supermeta);
+
     if(supermeta->has_adjust)
       meta->has_adjust = true;
 
@@ -2826,6 +2893,24 @@ static const struct ClassHookFuncs classhooks_does = {
   .apply = &classhook_does_apply,
 };
 
+/* :abstract */
+
+static bool classhook_abstract_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
+{
+  if(classmeta->type == METATYPE_ROLE)
+    warn("All roles are already abstract; there is no need to declare them as such");
+
+  classmeta->abstract = TRUE;
+
+  return FALSE;
+}
+
+static const struct ClassHookFuncs classhooks_abstract = {
+  .ver   = OBJECTPAD_ABIVERSION,
+  .flags = OBJECTPAD_FLAG_ATTR_NO_VALUE,
+  .apply = &classhook_abstract_apply,
+};
+
 /* :repr */
 
 static bool classhook_repr_apply(pTHX_ ClassMeta *classmeta, SV *value, SV **attrdata, void *_funcdata)
@@ -2911,11 +2996,12 @@ static const struct ClassHookFuncs classhooks_strict = {
 
 void ObjectPad__boot_classes(pTHX)
 {
-  register_class_attribute("isa",    &classhooks_isa,    NULL);
-  register_class_attribute("does",   &classhooks_does,   NULL);
-  register_class_attribute("repr",   &classhooks_repr,   NULL);
-  register_class_attribute("compat", &classhooks_compat, NULL);
-  register_class_attribute("strict", &classhooks_strict, NULL);
+  register_class_attribute("isa",      &classhooks_isa,      NULL);
+  register_class_attribute("does",     &classhooks_does,     NULL);
+  register_class_attribute("abstract", &classhooks_abstract, NULL);
+  register_class_attribute("repr",     &classhooks_repr,     NULL);
+  register_class_attribute("compat",   &classhooks_compat,   NULL);
+  register_class_attribute("strict",   &classhooks_strict,   NULL);
 
 #ifdef HAVE_DMD_HELPER
   DMD_ADD_ROOT((SV *)&vtbl_backingav, "the Object::Pad backing AV VTBL");

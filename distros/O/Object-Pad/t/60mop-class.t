@@ -15,6 +15,8 @@ is( $meta->name, "Example", '$meta->name' );
 ok(  $meta->is_class, '$meta->is_class true' );
 ok( !$meta->is_role, '$meta->is_role false' );
 
+ok( !$meta->is_abstract, '$meta->is_abstract false' );
+
 is( [ $meta->superclasses ], [], '$meta->superclasses' );
 
 is( [ $meta->direct_roles ], [], '$meta->direct_roles' );
@@ -28,6 +30,11 @@ is( [ Object::Pad::MOP::Class->for_class( "Example2" )->superclasses ],
 
 is( Object::Pad::MOP::Class->try_for_class( "main" ), undef,
    '->try_for_class does not throw' );
+
+class Example3 :abstract { }
+
+ok( Object::Pad::MOP::Class->for_class( "Example3" )->is_abstract,
+   '$meta->is_abstract on abstract class' );
 
 package NotObjectPad {
    use base qw( Example );

@@ -1,7 +1,7 @@
 package Graph::MoreUtils::Smooth::Intermediate;
 
 # ABSTRACT: Container for intermediate vertices
-our $VERSION = '0.2.0'; # VERSION
+our $VERSION = '0.3.0'; # VERSION
 
 use strict;
 use warnings;

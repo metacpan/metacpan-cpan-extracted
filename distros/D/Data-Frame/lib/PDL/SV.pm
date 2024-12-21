@@ -1,5 +1,5 @@
 package PDL::SV;
-$PDL::SV::VERSION = '0.006003';
+$PDL::SV::VERSION = '0.006004';
 # ABSTRACT: PDL subclass for keeping scalar data (like strings)
 
 use 5.016;
@@ -105,7 +105,7 @@ sub new {
     my $self = $class->initialize();
     my $pdl  = $self->{PDL};
     $pdl .= PDL::Core::indx($faked_data);
-    $pdl .= PDL->sequence( $self->dims );
+    $pdl .= PDL->sequence( PDL::Core::indx(), $self->dims );
 
     if ($self->ndims == 1) {    # for speed 
         $self->_internal($data);
@@ -207,7 +207,7 @@ sub sever {
     my ($self) = @_;
 
     $self->_internal( $self->_effective_internal );
-    my $p = PDL->sequence( $self->dims );
+    my $p = PDL->sequence( $self->type, $self->dims );
     $p = $p->setbadif( $self->isbad ) if $self->badflag;
     $self->{PDL} = $p;
     return $self;
@@ -276,7 +276,7 @@ sub copy {
     my ($self) = @_;
 
     my $new = PDL::SV->new( [] );
-    $new->{PDL} = PDL->sequence( $self->dims );
+    $new->{PDL} = PDL->sequence( $self->type, $self->dims );
     $new->_internal( $self->_effective_internal );
     if ( $self->badflag ) {
         $new->{PDL} = $new->{PDL}->setbadif( $self->isbad );
@@ -444,7 +444,7 @@ PDL::SV - PDL subclass for keeping scalar data (like strings)
 
 =head1 VERSION
 
-version 0.006003
+version 0.006004
 
 =head1 SYNOPSIS
 
@@ -459,7 +459,7 @@ of strings.
 
 While this class is a subclass of L<PDL>, its internals are quite different
 from other normal PDL types. So basically what's not documented are not
-guarenteed to work.
+guaranteed to work.
 
 =head1 METHODS / BASIC
 
@@ -562,7 +562,7 @@ These methods exist not in PDL but only in this class.
 
     match_regexp($pattern)
 
-Match against a plain a regular expression.
+Match against a plain regular expression.
 Returns a piddle of the same dimension.
 
 =head1 SEE ALSO

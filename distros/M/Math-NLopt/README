@@ -44,7 +44,7 @@ as retrieving their final values. The final value of the optimization
 function is stored in opt_f. A code specifying the success or failure of
 the process is returned.
 
-The Perl interface (similar to the Python and C+ versions) is
+The Perl interface (similar to the Python and C++ versions) is
 
    \@final = $opt->optimize( \@initial_pars );
    $opt_f = $opt->last_optimum_value;
@@ -78,13 +78,12 @@ As are the utility subroutines:
 
   Callbacks
 
-While NLopt performs the optimization of the objective function, it
-requires callback subroutines which return the value of the objective
-function or non-linear constraints. Such callback subroutines have a
-required calling signature documented below. The user can provide their
-own data structure containing additional information which will be
-passed to the callbacks, or they can access that information from
-closures.
+NLopt handles the optimization of the objective function. The user must
+provide subroutines which return the value of the objective function or
+non-linear constraints. Such callback subroutines have a required
+calling signature, documented below. The user can provide their own data
+structure containing additional information which will be passed to the
+callbacks, or they can access that information from closures.
 
    Objective Functions
 
@@ -100,11 +99,11 @@ The objective function has the signature
 
   $value = sub ( \@params, \@gradient, $data ) { ... }
 
-It returns is the value of the optimization function for the passed set
+It returns the value of the optimization function for the passed set
 parameters, @params.
 
-if \@gradient is not "undef", it must be filled in by the by the
-objective function.
+if \@gradient is not "undef", it must be filled in by the objective
+function.
 
 $data is the structure registered with the callback. It will be "undef"
 if none was provided.

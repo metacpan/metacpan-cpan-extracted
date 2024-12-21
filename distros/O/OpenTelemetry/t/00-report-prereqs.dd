@@ -2,7 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'Module::Build::Tiny' => '0.034',
-                                        'perl' => 'v5.32.0'
+                                        'perl' => 'v5.30.0'
                                       }
                       },
        'develop' => {
@@ -36,7 +36,8 @@ do { my $x = {
                                       'URL::Encode' => '0',
                                       'UUID::URandom' => '0',
                                       'X::Tiny' => '0',
-                                      'perl' => 'v5.32.0'
+                                      'isa' => '0',
+                                      'perl' => 'v5.30.0'
                                     }
                     },
        'test' => {
@@ -50,7 +51,7 @@ do { my $x = {
                                    'Metrics::Any' => '0',
                                    'Test2::V0' => '0',
                                    'Test::More' => '0',
-                                   'perl' => 'v5.32.0'
+                                   'perl' => 'v5.30.0'
                                  }
                  }
      };

@@ -29,6 +29,8 @@ our @EXPORT = qw(
     is_empty_array
     is_nonempty_array
 
+    regex_eq
+
     first_line_like
     build_ack_invocation
     adjust_executable
@@ -73,6 +75,8 @@ our @EXPORT = qw(
 
     msg
     subtest_name
+
+    permutate
 );
 
 my $orig_wd;
@@ -1229,6 +1233,45 @@ sub adjust_executable {
     }
 
     return @cmd;
+}
+
+
+sub regex_eq {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my $got = shift;
+    my $exp = shift;
+    my $msg = shift;
+
+    if ( "$]" ge '5.014' ) {
+        # Passed in expressions are in Perl 5.10 format. If we are running newer
+        # than that, convert the expected string representations.
+        for my $re ( $got, $exp ) {
+            if ( defined($re) ) {
+                $re =~ s/^\(\?([xism]*)-[xism]*:/(?^$1:/;
+            }
+        }
+    }
+
+    return is( $got, $exp, $msg );
+}
+
+
+# From https://stackoverflow.com/questions/635768/how-can-i-generate-all-permutations-of-an-array-in-perl
+sub permutate {
+    return [@_] if @_ <= 1;
+
+    return map {
+        my ($f, @r) = list_with_x_first($_, @_);
+        map [$f, @$_], permutate(@r);
+    } 0..$#_;
+}
+
+
+sub list_with_x_first {
+    return if @_ == 1;
+    my $i = shift;
+    return @_[$i, 0..$i-1, $i+1..$#_];
 }
 
 

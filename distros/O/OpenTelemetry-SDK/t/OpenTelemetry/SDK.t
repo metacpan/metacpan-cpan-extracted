@@ -37,37 +37,39 @@ it 'Can be disabled' => sub {
     is $tracer_provider, U, 'Leaves tracer provider unchanged';
 };
 
-it 'Handles broken modules' => sub {
+it 'Dies on broken modules' => sub {
     local %ENV = (
         OTEL_TRACES_EXPORTER => 'console',
         OTEL_PROPAGATORS     => 'baggage',
     );
 
+    my $orig = \&Module::Runtime::require_module;
     $require_mock->override(
-        require_module => sub ($) { die 'oops' },
+        require_module => sub ($) {
+            goto $orig
+                if $_[0] !~ /^OpenTelemetry/
+                || $_[0] =~ /^OpenTelemetry::X/;
+            die 'oops';
+        },
     );
 
-    is messages { OpenTelemetry::SDK->import }, [
-        [ warning => OpenTelemetry => match qr/Error configuring 'baggage'/ ],
-        [ warning => OpenTelemetry => match qr/Error configuring 'console'/ ],
-    ], 'Logged unknown propagator';
-
-    is $propagator, object {
-        prop isa => 'OpenTelemetry::Propagator::Composite';
-        call_list keys => [];
-    }, 'Ignored unknown propagator';
+    like dies { OpenTelemetry::SDK->import },
+        qr/^Error configuring 'baggage' propagator: oops/;
 
     $require_mock->reset_all;
 };
 
-it 'Handles unexpected errors' => sub {
-    my $die = mock 'OpenTelemetry' => override => [ logger => sub { die 'boom' } ];
-    is messages { OpenTelemetry::SDK->import }, [
-        [
-            error => 'OpenTelemetry',
-            match qr/OpenTelemetry error: Unexpected configuration error - boom/,
-        ],
-    ], 'Logged unknown propagator';
+it 'Dies on errors during import' => sub {
+    my $orig = \&OpenTelemetry::SDK::config;
+    my $die = mock 'OpenTelemetry::SDK' => override => [
+        config => sub {
+            goto $orig if $_[0] eq 'SDK_DISABLED';
+            die 'boom';
+        },
+    ];
+
+    like dies { OpenTelemetry::SDK->import },
+        qr/^Unexpected error initialising OpenTelemetry::SDK: boom/;
 };
 
 describe 'Propagators' => sub {

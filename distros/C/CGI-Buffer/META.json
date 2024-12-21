@@ -43,10 +43,11 @@
             "HTML::Packer" : "1",
             "HTTP::Date" : "0",
             "HTTP::Status" : "0",
-            "IO::Compress::Brotli" : "0.003",
             "IO::String" : "0",
             "JavaScript::Packer" : "2",
+            "Readonly" : "0",
             "Storable" : "0",
+            "Text::Diff" : "0",
             "Time::localtime" : "0",
             "perl" : "5.014000"
          }
@@ -54,10 +55,10 @@
       "test" : {
          "requires" : {
             "DateTime" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::TempDir::Tiny" : "0",
-            "WWW::RT::CPAN" : "0",
             "autodie" : "0"
          }
       }
@@ -75,6 +76,6 @@
          "web" : "https://github.com/nigelhorne/CGI-Buffer"
       }
    },
-   "version" : "0.86",
+   "version" : "0.87",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -16,8 +16,8 @@ A container for functions for the ack program.
 our $VERSION;
 our $COPYRIGHT;
 BEGIN {
-    $VERSION = 'v3.7.0'; # Check https://beyondgrep.com/ for updates
-    $COPYRIGHT = 'Copyright 2005-2023 Andy Lester.';
+    $VERSION = 'v3.8.0'; # Check https://beyondgrep.com/ for updates
+    $COPYRIGHT = 'Copyright 2005-2024 Andy Lester.';
 }
 our $STANDALONE = 0;
 our $ORIGINAL_PROGRAM_NAME;
@@ -246,7 +246,11 @@ Searching:
   --range-start PATTERN         Specify PATTERN as the start of a match range.
   --range-end PATTERN           Specify PATTERN as the end of a match range.
   --match PATTERN               Specify PATTERN explicitly. Typically omitted.
-  --not PATTERN                 Specifies PATTERN that must not be found on
+  --and PATTERN                 Specifies PATTERN that MUST also be found on
+                                the line for a match to occur. Repeatable.
+  --or PATTERN                  Specifies PATTERN that MAY also be found on
+                                the line for a match to occur. Repeatable.
+  --not PATTERN                 Specifies PATTERN that must NOT be found on
                                 the line for a match to occur. Repeatable.
 
 Search output:
@@ -731,6 +735,165 @@ sub is_lowercase {
     return 1 if lc($pat) eq $pat;
 
     return 0;
+}
+
+
+# Returns a regex object based on a string and command-line options.
+# Dies when the regex $str is undefined (i.e. not given on command line).
+
+sub build_regex {
+    my $str = shift;
+    my $opt = shift;
+
+    # Check for lowercaseness before we do any modifications.
+    my $regex_is_lc = App::Ack::is_lowercase( $str );
+
+    if ( $opt->{Q} ) {
+        $str = quotemeta( $str );
+    }
+    else {
+        # Compile the regex to see if it dies or throws warnings.
+        local $SIG{__WARN__} = sub { CORE::die @_ };  # Anything that warns becomes a die.
+        my $scratch_regex = eval { qr/$str/ };
+        if ( not $scratch_regex ) {
+            my $err = $@;
+            chomp $err;
+
+            if ( $err =~ m{^(.+?); marked by <-- HERE in m/(.+?) <-- HERE} ) {
+                my ($why, $where) = ($1,$2);
+                my $pointy = ' ' x (6+length($where)) . '^---HERE';
+                App::Ack::die( "Invalid regex '$str'\nRegex: $str\n$pointy $why" );
+            }
+            else {
+                App::Ack::die( "Invalid regex '$str'\n$err" );
+            }
+        }
+    }
+
+    my $scan_str = $str;
+
+    # Whole words only.
+    if ( $opt->{w} ) {
+        my $ok = 1;
+
+        if ( $str =~ /^\\[wd]/ ) {
+            # Explicit \w is good.
+        }
+        else {
+            # Can start with \w, (, [ or dot.
+            if ( $str !~ /^[\w\(\[\.]/ ) {
+                $ok = 0;
+            }
+        }
+
+        # Can end with \w, }, ), ], +, *, or dot.
+        if ( $str !~ /[\w\}\)\]\+\*\?\.]$/ ) {
+            $ok = 0;
+        }
+        # ... unless it's escaped.
+        elsif ( $str =~ /\\[\}\)\]\+\*\?\.]$/ ) {
+            $ok = 0;
+        }
+
+        if ( !$ok ) {
+            App::Ack::die( '-w will not do the right thing if your regex does not begin and end with a word character.' );
+        }
+
+        if ( $str =~ /^\w+$/ ) {
+            # No need for fancy regex if it's a simple word.
+            $str = sprintf( '\b(?:%s)\b', $str );
+        }
+        else {
+            $str = sprintf( '(?:^|\b|\s)\K(?:%s)(?=\s|\b|$)', $str );
+        }
+    }
+
+    if ( $opt->{i} || ($opt->{S} && $regex_is_lc) ) {
+        $_ = "(?i)$_" for ( $str, $scan_str );
+    }
+
+    my $scan_regex = undef;
+    my $regex = eval { qr/$str/ };
+    if ( $regex ) {
+        if ( $scan_str !~ /\$/ ) {
+            # No line_scan is possible if there's a $ in the regex.
+            $scan_regex = eval { qr/$scan_str/m };
+        }
+    }
+    else {
+        my $err = $@;
+        chomp $err;
+        App::Ack::die( "Invalid regex '$str':\n  $err" );
+    }
+
+    return ($regex, $scan_regex);
+}
+
+
+sub build_all_regexes {
+    my $opt_regex = shift;
+    my $opt = shift;
+
+    my $re_match;
+    my $re_not;
+    my $re_hilite;
+    my $re_scan;
+
+    my @parts;
+
+    # AND: alpha and beta
+    if ( @parts = @{$opt->{and}} ) {
+        my @match_parts;
+        my @hilite_parts;
+
+        for my $part ( @parts ) {
+            my ($match, undef) = build_regex( $part, $opt );
+            push @match_parts, "(?=.*$match)";
+            push @hilite_parts, $match;
+        }
+
+        my ($match, $scan) = build_regex( $opt_regex, $opt );
+        push @match_parts, ".*$match";
+        push @hilite_parts, $match;
+
+        $re_match  = join( '', @match_parts );
+        $re_hilite = join( '|', @hilite_parts );
+        $re_scan   = $scan;
+    }
+    # OR: alpha OR beta
+    elsif ( @parts = @{$opt->{or}} ) {
+        my @match_parts;
+        my @scan_parts;
+
+        for my $part ( $opt_regex, @parts ) {
+            my ($match, $scan) = build_regex( $part, $opt );
+            push @match_parts, $match;
+            push @scan_parts, $scan;
+        }
+
+        $re_match  = join( '|', @match_parts );
+        $re_hilite = $re_match;
+        $re_scan   = join( '|', @scan_parts );
+    }
+    # NOT: alpha NOT beta
+    elsif ( @parts = @{$opt->{not}} ) {
+        ($re_match, $re_scan) = build_regex( $opt_regex, $opt );
+        $re_hilite = $re_match;
+
+        my @not_parts;
+        for my $part ( @parts ) {
+            (my $re, undef) = build_regex( $part, $opt );
+            push @not_parts, $re;
+        }
+        $re_not = join( '|', @not_parts );
+    }
+    # No booleans.
+    else {
+        ($re_match, $re_scan) = build_regex( $opt_regex, $opt );
+        $re_hilite = $re_match;
+    }
+
+    return ($re_match, $re_not, $re_hilite, $re_scan);
 }
 
 

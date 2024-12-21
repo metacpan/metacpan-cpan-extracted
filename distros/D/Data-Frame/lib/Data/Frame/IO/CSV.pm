@@ -1,5 +1,5 @@
 package Data::Frame::IO::CSV;
-$Data::Frame::IO::CSV::VERSION = '0.006003';
+$Data::Frame::IO::CSV::VERSION = '0.006004';
 # ABSTRACT: Partial class for data frame's conversion from/to CSV
 
 use Data::Frame::Role;
@@ -220,7 +220,7 @@ Data::Frame::IO::CSV - Partial class for data frame's conversion from/to CSV
 
 =head1 VERSION
 
-version 0.006003
+version 0.006004
 
 =head1 METHODS
 

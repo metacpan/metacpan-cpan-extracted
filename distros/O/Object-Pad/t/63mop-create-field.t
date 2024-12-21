@@ -37,8 +37,11 @@ class AClass {
          qr/^Cannot add another field named \$field /,
          'Failure from ->add_field duplicate' );
 
-      ok( *field = eval( 'method :lvalue { $field }' ),
-         'Can compile method with lexical $field' );
+      my $mref = eval( 'method :lvalue { $field }' );
+      my $e = $@;
+      ok( defined $mref, 'Can compile method with lexical $field' ) or
+         diag( "eval failed: $e" );
+      *field = $mref;
 
       my $anonfield = $classmeta->add_field( '$' );
       *anonfield = sub :lvalue { $anonfield->value( shift ) };

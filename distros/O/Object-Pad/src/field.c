@@ -402,6 +402,8 @@ static OP *S_newFIELDSVOP(pTHX_ U32 flags, FIELDOFFSET fieldix)
 {
   OP *o = newOP_CUSTOM(&pp_fieldsv, flags);
   o->op_targ = fieldix;
+  if(flags & OPfMETHSTART_ROLE)
+    o->op_flags |= OPf_SPECIAL;
   return o;
 }
 
@@ -409,7 +411,7 @@ static OP *S_newFIELDSVOP(pTHX_ U32 flags, FIELDOFFSET fieldix)
 static OP *S_gen_field_init_op(pTHX_ FieldMeta *fieldmeta)
 {
   ClassMeta *classmeta = fieldmeta->class;
-  U8 opf_special_if_role = (classmeta->type == METATYPE_ROLE) ? OPf_SPECIAL : 0;
+  U32 opflags_if_role = (classmeta->type == METATYPE_ROLE) ? OPfMETHSTART_ROLE : 0;
 
   char sigil = SvPV_nolen(fieldmeta->name)[0];
   OP *op = NULL;
@@ -452,7 +454,7 @@ static OP *S_gen_field_init_op(pTHX_ FieldMeta *fieldmeta)
         op = newBINOP(OP_SASSIGN, 0,
           valueop,
           /* $fields[$idx] */
-          newFIELDSVOP(OPf_MOD | opf_special_if_role, fieldmeta->fieldix));
+          newFIELDSVOP(OPf_MOD | opflags_if_role, fieldmeta->fieldix));
 
         /* Can't just
          *   MOP_FIELD_RUN_HOOKS(fieldmeta, gen_valueassert_op, ...)
@@ -465,7 +467,7 @@ static OP *S_gen_field_init_op(pTHX_ FieldMeta *fieldmeta)
             continue;
 
           OP *assertop = (*h->funcs->gen_valueassert_op)(aTHX_ fieldmeta, h->attrdata, h->funcdata,
-            newFIELDSVOP(opf_special_if_role, fieldmeta->fieldix));
+            newFIELDSVOP(opflags_if_role, fieldmeta->fieldix));
 
           if(!assertop)
             continue;
@@ -490,7 +492,7 @@ static OP *S_gen_field_init_op(pTHX_ FieldMeta *fieldmeta)
       if(valueop) {
         /* $fields[$idx]->@* or ->%* */
         OP *lhs = force_list_keeping_pushmark(newUNOP(coerceop, OPf_MOD|OPf_REF,
-                    newFIELDSVOP(opf_special_if_role, fieldmeta->fieldix)));
+                    newFIELDSVOP(opflags_if_role, fieldmeta->fieldix)));
 
         op = newBINOP(OP_AASSIGN, 0,
             force_list_keeping_pushmark(valueop),
@@ -626,7 +628,7 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
   ENTER;
 
   ClassMeta *classmeta = fieldmeta->class;
-  U8 opf_special_if_role = (classmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0);
+  U32 opflags_if_role = (classmeta->type == METATYPE_ROLE) ? OPfMETHSTART_ROLE : 0;
   char sigil = SvPVX(fieldmeta->name)[0];
 
   SV *mname_fq = newSVpvf("%" SVf "::%" SVf, classmeta->name, mname);
@@ -653,8 +655,8 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
     newSTATEOP(0, NULL, NULL));
   OP *methstartop;
   ops = op_append_list(OP_LINESEQ, ops,
-    methstartop = newMETHSTARTOP(0 |
-      opf_special_if_role |
+    methstartop = newMETHSTARTOP(OPf_STACKED |
+      opflags_if_role |
       (classmeta->repr << 8)));
 
   int req_args = 0;
@@ -701,7 +703,7 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
 #else
   {
     ops = op_append_list(OP_LINESEQ, ops,
-      newFIELDPADOP(private << 8 | opf_special_if_role, padix, fieldix));
+      newFIELDPADOP(private << 8 | opflags_if_role, padix, fieldix));
   }
 #endif
 

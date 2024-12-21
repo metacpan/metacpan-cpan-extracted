@@ -81,6 +81,17 @@ use Future::AsyncAwait;
    isa_ok( shift @ret, [ "Future" ], 'Single result was a Future' );
 }
 
+# async sub can be declared in another package
+{
+   async sub Some::Other::Package::asub { return 123; }
+
+   ok( defined Some::Other::Package->can( "asub" ),
+      'async sub can be declared in another package' );
+
+   is( Some::Other::Package::asub->get, 123,
+      'async sub in another package runs OK' );
+}
+
 # unimport
 {
    no Future::AsyncAwait;

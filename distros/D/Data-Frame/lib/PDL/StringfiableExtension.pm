@@ -1,5 +1,5 @@
 package PDL::StringfiableExtension;
-$PDL::StringfiableExtension::VERSION = '0.006003';
+$PDL::StringfiableExtension::VERSION = '0.006004';
 use strict;
 use warnings;
 use PDL::Lite ();
@@ -18,8 +18,7 @@ use List::AllUtils ();
 			return $_pdl_stringify_temp_single->set(0, $element)->string;
 		}
 		# otherwise
-		my $string = $_pdl_stringify_temp->set(0,0, $element)->string;
-		( $_pdl_stringify_temp->string =~ /\[(.*)\]/ )[0];
+		( $_pdl_stringify_temp->set(0,0, $element)->string =~ /\[(.*)\]/ )[0];
 	}
 }
 
@@ -44,7 +43,7 @@ PDL::StringfiableExtension
 
 =head1 VERSION
 
-version 0.006003
+version 0.006004
 
 =head1 AUTHORS
 

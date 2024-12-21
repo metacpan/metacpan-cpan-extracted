@@ -1,7 +1,7 @@
 package Graph::MoreUtils;
 
 # ABSTRACT: Utilities for graphs
-our $VERSION = '0.2.0'; # VERSION
+our $VERSION = '0.3.0'; # VERSION
 
 =head1 NAME
 
@@ -64,14 +64,15 @@ sub graph_replace { &Graph::MoreUtils::Replace::replace }
 
 =head2 C<line( $graph )>
 
-Generates line graphs for L<Graph::Undirected> objects.
+Generates line graphs for L<Graph> objects.
 Line graph is constructed nondestructively and returned from the call.
-Both simple and multiedged graphs are supported.
+Both simple and multiedged, undirected and directed graphs are supported.
 
 Call accepts additional options hash.
 Currently only one option is supported, C<loop_end_vertices>, which treats the input graph as having self-loops on pendant vertices, that is, increasing the degrees of vertices having degrees of 1.
 Thus they are not "lost" during line graph construction.
 In the resulting line graph these self-loops are represented as instances of L<Graph::MoreUtils::Line::SelfLoopVertex>.
+This does not work with directed graphs yet.
 
 =cut
 

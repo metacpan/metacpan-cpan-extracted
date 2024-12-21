@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.69;
+package Future::AsyncAwait 0.70;
 
 use v5.14;
 use warnings;
@@ -105,6 +105,11 @@ Note that the C<my> keyword has to come first:
    my async sub lexfunc { ... }
 
    my $f = lexfunc(@args);
+
+I<Since version 0.70> this module supports using the C<async> keyword to
+declare named subs in other packages.
+
+   async sub Some::Other::Package::myfunc { ... }
 
 =head2 C<await>
 

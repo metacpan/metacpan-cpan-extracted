@@ -139,6 +139,11 @@ void ObjectPad_extend_pad_vars(pTHX_ const ClassMeta *meta);
 #define get_field_for_padix(padix)  ObjectPad_get_field_for_padix(aTHX_ padix)
 FieldMeta *ObjectPad_get_field_for_padix(pTHX_ PADOFFSET padix);
 
+enum {
+  /* Common flags for newMETHSTARTOP, newFIELDPADOP and newFIELDSVOP */
+  OPfMETHSTART_ROLE = (1 << 16),
+};
+
 #define newMETHSTARTOP(flags)  ObjectPad_newMETHSTARTOP(aTHX_ flags)
 OP *ObjectPad_newMETHSTARTOP(pTHX_ U32 flags);
 

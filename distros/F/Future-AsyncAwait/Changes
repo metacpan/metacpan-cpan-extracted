@@ -1,5 +1,11 @@
 Revision history for Future-AsyncAwait
 
+0.70    2024-12-20
+        [CHANGES]
+         * Allow `async sub` declarations that put named functions into other
+           packages
+         * Update to latest copies of shared t/80*.t cross-module test files
+
 0.69    2024-09-18
         [CHANGES]
          * Support asynchonous lexical subs declared with `my async sub`

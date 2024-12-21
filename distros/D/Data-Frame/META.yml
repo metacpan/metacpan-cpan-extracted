@@ -80,7 +80,7 @@ resources:
   IRC: irc://irc.perl.org/#pdl
   homepage: https://github.com/EntropyOrg/p5-Data-Frame
   repository: https://github.com/EntropyOrg/p5-Data-Frame.git
-version: '0.006003'
+version: '0.006004'
 x_contributors:
   - 'Andreas Marienborg (omega)'
   - 'Mohammad S Anwar <manwar@cpan.org>'

@@ -1,5 +1,5 @@
 package Data::Frame::Setup;
-$Data::Frame::Setup::VERSION = '0.006003';
+$Data::Frame::Setup::VERSION = '0.006004';
 # ABSTRACT: Import stuffs into Data::Frame classes
 
 use 5.016;
@@ -109,7 +109,7 @@ Data::Frame::Setup - Import stuffs into Data::Frame classes
 
 =head1 VERSION
 
-version 0.006003
+version 0.006004
 
 =head1 SYNOPSIS
 

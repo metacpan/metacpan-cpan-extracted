@@ -6,7 +6,7 @@ use POSIX; #strftime to calculate wday
 
 our @EXPORT_OK = qw(is_holiday holidays is_us_holiday us_holidays);
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ Date::Holidays::US - Date::Holidays Adapter for US Federal holidays
 
 =head1 DESCRIPTION
 
-Date::Holidays Adapter for US Federal holidays back to 1880 with updates from 2022.
+Date::Holidays Adapter for US Federal holidays back to 1880 with updates from 2024.
 
 =head1 METHODS
 
@@ -42,7 +42,7 @@ sub is_holiday {
   my $year  = shift;
   my $month = shift;
   my $day   = shift;
-  my $wday  = POSIX::strftime(qq{%w}, 0, 0, 0, $day, $month-1, $year-1900); #12:00 am
+  my $wday  = POSIX::strftime(qq{%w}, 0, 0, 0, $day, $month-1, $year-1900); #12:00 am (0-6 starting on Sunday)
 
   #Ref: https://sgp.fas.org/crs/misc/R41990.pdf
 
@@ -51,17 +51,19 @@ sub is_holiday {
   if ($year > 1870 and $month == 1 and $day == 1) {
     return q{New Year's Day};                                          #January 1
   } elsif ($year > 1909 and $month == 1 and $day == 2 and $wday == 1) { #Executive Order 1076 (May 22, 1909)
-    return q{New Year's Day Observed};                                 #Monday afer January 1
+    return q{New Year's Day Observed};                                 #Monday after January 1
 
   #observed for the first time on January 20, 1986. - Pub.L. 98–399, 98 Stat. 1475, enacted November 2, 1983
   } elsif ($year >= 1986 and $month == 1 and $day >= 15 and $day <= 21 and $wday == 1) {
     return 'Birthday of Martin Luther King, Jr.'                       #the third Monday in January
 
-  #Inauguration Day - Really only DC and few
-  } elsif ($year >= 1965 and $month == 1 and $day == 20 and $year % 4 == 1) {                #5 U.S. Code 6103(c)
-    return 'Inauguration Day'                       #January 20 of each fourth year after 1965
-  } elsif ($year >= 1965 and $month == 1 and $day == 21 and $year % 4 == 1 and $wday == 1) { #5 U.S. Code 6103(c)
-    return 'Inauguration Day Observed'              #When January 20 ... falls on Sunday, the next succeeding day ... observance
+  #Inauguration Day - Only DC Area
+  #Purposefully processed after MLK day. In the case of concurrency, MLK is returned.
+  } elsif ($year >= 1965 and $month == 1 and $day == 20 and $year % 4 == 1 and $wday != 0) { #5 U.S. Code 6103(c)
+    return 'Inauguration Day'                       #January 20 of each fourth year after 1965 unless Sunday
+  #Note 5 U.S. Code 6103(c) provides for Monday Jan 21 to be Inauguration Day but this package reutrns MKL day after 1985
+  } elsif ($year == 1985 and $month == 1 and $day == 21) { #5 U.S. Code 6103(c)
+    return 'Inauguration Day'              #When January 20 ... falls on Sunday, the next succeeding day...
 
   # Washington's Birthday was celebrated on February 22 from 1879 until 1970.
   # in 1968 the Uniform Monday Holiday Act moved it to the third Monday in February
@@ -88,7 +90,7 @@ sub is_holiday {
   } elsif ($year >= 2021 and $month == 6 and $day == 19) {                #Juneteenth National Independence Day Act (June 17, 2021)
     return 'Juneteenth National Independence Day';                        #June 19
   } elsif ($year >= 2021 and $month == 6 and $day == 20 and $wday == 1) { #Executive Order 11582 (Feb. 11, 1971)
-    return 'Juneteenth National Independence Day Observed';               #Monday afer June 19
+    return 'Juneteenth National Independence Day Observed';               #Monday after June 19
 
   #Independence Day
 
@@ -97,7 +99,7 @@ sub is_holiday {
   } elsif ($year >= 1870 and $month == 7 and $day == 4) {
     return 'Independence Day';                                           #July 4
   } elsif ($year >= 1909 and $month == 7 and $day == 5 and $wday == 1) { #Executive Order 1076 (May 22, 1909)
-    return 'Independence Day Observed';                                  #Monday afer July 4
+    return 'Independence Day Observed';                                  #Monday after July 4
 
   ## Labor Day
   # By 1894, thirty U.S. states were already officially celebrating Labor Day. In that year,
@@ -119,12 +121,12 @@ sub is_holiday {
   } elsif ($year >= 1938 and $year < 1954 and $month == 11 and $day == 11) {
     return 'Armistice Day';                                            #November 11
   } elsif ($year >= 1945 and $year < 1954 and $month == 11 and $day == 12 and $wday == 1) { #Executive Order 9636 (October 3, 1945)
-    return 'Armistice Day Observed';                                   #Monday afer November 11
+    return 'Armistice Day Observed';                                   #Monday after November 11
 
   } elsif ($year >= 1954 and $year < 1971 and $month == 11 and $day == 11) {
     return 'Veterans Day';                                            #November 11
   } elsif ($year >= 1954 and $year < 1971 and $month == 11 and $day == 12 and $wday == 1) { #Executive Order 9636 (October 3, 1945)
-    return 'Veterans Day Observed';                                   #Monday afer November 11
+    return 'Veterans Day Observed';                                   #Monday after November 11
 
   } elsif ($year >= 1971 and $year < 1978 and $month == 10 and $day >= 22 and $day <= 28 and $wday == 1) {
     return 'Veterans Day';                                            #fourth Monday in October
@@ -134,11 +136,15 @@ sub is_holiday {
   } elsif ($year >= 1978 and $month == 11 and $day == 11) {
     return 'Veterans Day';                                            #November 11
   } elsif ($year >= 1978 and $month == 11 and $day == 12 and $wday == 1) { #Executive Order 11582 (Feb. 11, 1971)
-    return 'Veterans Day Observed';                                   #Monday afer November 11
+    return 'Veterans Day Observed';                                   #Monday after November 11
 
   ##Thanksgiving Day
   } elsif ($year >= 1870 and $month == 11 and $day >= 22 and $day <= 28 and $wday == 4) {
     return 'Thanksgiving Day';                                        #the fourth Thursday in November.
+
+  ##Day before Christmas Day
+  } elsif ($year == 2024 and $month == 12 and $day == 24) {
+    return 'Day before Christmas Day';                                #Executive Order on Providing for the Closing of Executive Departments and Agencies of the Federal Government on December 24, 2024
 
   ##Christmas Day
   } elsif ($year >= 1971 and $month == 12 and $day == 24 and $wday == 5) { #Executive Order 11582 (Feb. 11, 1971)
@@ -146,7 +152,7 @@ sub is_holiday {
   } elsif ($year >= 1870 and $month == 12 and $day == 25) {
     return 'Christmas Day';                                           #December 25
   } elsif ($year >= 1909 and $month == 12 and $day == 26 and $wday == 1) { #Executive Order 1076 (May 22, 1909)
-    return 'Christmas Day Observed';                                  #Monday afer December 25
+    return 'Christmas Day Observed';                                  #Monday after December 25
 
   } elsif ($year >= 1971 and $month == 12 and $day == 31 and $wday == 5) { #Executive Order 11582 (Feb. 11, 1971)
     return q{New Year's Day Observed};                                 #Friday before January 1
@@ -208,7 +214,7 @@ Add Federal Holidays for President mark of respect holidays (e.g. 2007-01-02 for
 
 =head1 SEE ALSO
 
-L<Date::Holidays>, L<Date::Holidays::USFederal>
+L<Date::Holidays> (wrapper), L<Date::Holidays::USFederal> (defunct), L<Date::Holidays::USExtended> (e.g., Valentine's Day, Mother's Day, etc.)
 
 =head1 AUTHOR
 

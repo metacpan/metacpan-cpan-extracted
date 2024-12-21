@@ -14,7 +14,8 @@ use warnings;
 use Test::Most tests => 101;
 use Compress::Zlib;
 use Test::TempDir::Tiny;
-use DateTime;
+# use DateTime;
+use HTTP::Date;
 use Test::HTML::Lint;
 # use Test::NoWarnings;	# HTML::Clean has them
 eval 'use autodie qw(:all)';	# Test for open/close failures
@@ -164,9 +165,9 @@ OUTPUT: {
         ok(defined($body));
         ok(length($body) eq $length);
 
-        if(($^O eq 'MSWin32') || ($^O eq 'openbsd')) {
+	if(($^O eq 'MSWin32') || ($^O eq 'openbsd') || ($^O eq 'freebsd')) {
                 TODO: {
-                        local $TODO = "IO::Compress::Brotli doesn't support Windows or OpenBSD";
+			local $TODO = "IO::Compress::Brotli doesn't support Windows or OpenBSD";
                         ok($headers =~ /^Content-Encoding: br/m);
 
                         # $body = IO::Compress::Brotli::unbro($body, 1024);
@@ -174,16 +175,22 @@ OUTPUT: {
                         ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
                         html_ok($body, 'HTML:Lint shows no errors');
                 }
-        } else {
+	} elsif(eval { require IO::Compress::Brotli }) {
                 ok($headers =~ /^Content-Encoding: br/m);
-		require IO::Compress::Brotli;
+
 		IO::Compress::Brotli->import();
 
                 $body = IO::Compress::Brotli::unbro($body, 1024);
 		ok(defined($body));
                 ok($body =~ /<HTML><HEAD><TITLE>Hello, world<\/TITLE><\/HEAD><BODY><P>The quick brown fox jumped over the lazy dog.<\/P><\/BODY><\/HTML>\n$/);
                 html_ok($body, 'HTML:Lint shows no errors');
-        }
+	} else {
+		SKIP: {
+			ok($headers =~ /^Status: 406/m);
+
+			skip('Install IO::Compress::Brotli to test Brotli compression', 3);
+		}
+	}
 
 	#..........................................
 	delete $ENV{'SERVER_PROTOCOL'};
@@ -566,7 +573,9 @@ OUTPUT: {
 
 	close $tmp;
 
-	my $t = $ENV{'HTTP_IF_MODIFIED_SINCE'} = DateTime->now();
+	# my $t = $ENV{'HTTP_IF_MODIFIED_SINCE'} = DateTime->now();
+	# Debug https://github.com/nigelhorne/CGI-Buffer/issues/5
+	my $t = $ENV{'HTTP_IF_MODIFIED_SINCE'} = HTTP::Date::time2str(time);
 
 	open($fin, '-|', "$^X -Iblib/lib $filename");
 
@@ -577,13 +586,14 @@ OUTPUT: {
 
 	if($output !~ /Status: 304 Not Modified/mi) {
 		# Track https://www.cpantesters.org/cpan/report/cbb57c6a-bf6b-11ed-b310-26e96d8775ea
+		# https://github.com/nigelhorne/CGI-Buffer/issues/5
 		diag("$t:\n\t$output");
 	}
 
-	ok($output !~ /ETag: "([A-Za-z0-F0-f]{32})"/m);
-	like($output, qr/^Status: 304 Not Modified/mi, '304 not modified');
-
 	($headers, $body) = split /\r?\n\r?\n/, $output, 2;
+
+	ok($headers !~ /ETag: "([A-Za-z0-F0-f]{32})"/m);
+	like($headers, qr/^Status: 304 Not Modified/mi, '304 not modified');
 
 	unlike($headers, qr/^Content-Length:/m, '304 does not contain content-length');
 
@@ -599,10 +609,10 @@ OUTPUT: {
 			print $tmp "use lib '$_';\n";
 		}
 	}
-	print $tmp "use CGI::Buffer { optimise_content => 1, generate_etag => 0 };\n";
-	print $tmp "print \"Content-type: text/html; charset=ISO-8859-1\";\n";
-	print $tmp "print \"\\n\\n\";\n";
-	print $tmp "print \"<HTML><BODY><TABLE><TR><TD>foo</TD>   <TD>bar</TD></TR></TABLE></BODY></HTML>\\n\";\n";
+	print $tmp "use CGI::Buffer { optimise_content => 1, generate_etag => 0 };\n",
+		"print \"Content-type: text/html; charset=ISO-8859-1\";\n",
+		"print \"\\n\\n\";\n",
+		"print \"<HTML><BODY><TABLE><TR><TD>foo</TD>   <TD>bar</TD></TR></TABLE></BODY></HTML>\\n\";\n";
 
 	open($fin, '-|', "$^X -Iblib/lib $filename");
 

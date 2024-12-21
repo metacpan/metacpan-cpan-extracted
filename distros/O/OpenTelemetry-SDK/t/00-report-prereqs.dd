@@ -2,7 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'Module::Build::Tiny' => '0.034',
-                                        'perl' => 'v5.32.0'
+                                        'perl' => 'v5.30.0'
                                       }
                       },
        'develop' => {
@@ -15,9 +15,6 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
-                      'recommends' => {
-                                        'OpenTelemetry::Exporter::OTLP' => '0'
-                                      },
                       'requires' => {
                                       'Feature::Compat::Try' => '0',
                                       'Future::AsyncAwait' => '0.38',
@@ -26,8 +23,10 @@ do { my $x = {
                                       'Mutex' => '0',
                                       'Object::Pad' => '0.74',
                                       'OpenTelemetry' => '0.010',
+                                      'OpenTelemetry::Exporter::OTLP' => '0',
                                       'bigfloat' => '0.65',
-                                      'perl' => 'v5.32.0'
+                                      'isa' => '0',
+                                      'perl' => 'v5.30.0'
                                     }
                     },
        'test' => {
@@ -42,7 +41,7 @@ do { my $x = {
                                    'Syntax::Keyword::Dynamically' => '0',
                                    'Test2::V0' => '0',
                                    'Test::More' => '0',
-                                   'perl' => 'v5.32.0'
+                                   'perl' => 'v5.30.0'
                                  }
                  }
      };

@@ -2361,7 +2361,7 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
 static struct XSParseSublikeHooks hooks_async = {
   .ver            = XSPARSESUBLIKE_ABI_VERSION,
   .permit_hintkey = "Future::AsyncAwait/async",
-  .flags = XS_PARSE_SUBLIKE_FLAG_PREFIX|XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL,
+  .flags = XS_PARSE_SUBLIKE_FLAG_PREFIX|XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL|XS_PARSE_SUBLIKE_FLAG_ALLOW_PKGNAME,
 
   .post_blockstart = parse_post_blockstart,
   .pre_blockend    = parse_pre_blockend,
@@ -2505,7 +2505,7 @@ BOOT:
   Perl_custom_op_register(aTHX_ &pp_pushcancel, &xop_pushcancel);
 
   boot_xs_parse_keyword(0.13);
-  boot_xs_parse_sublike(0.24);
+  boot_xs_parse_sublike(0.31);
 
   register_xs_parse_sublike("async", &hooks_async, NULL);
 

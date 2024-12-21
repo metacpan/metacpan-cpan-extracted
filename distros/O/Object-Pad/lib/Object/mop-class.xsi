@@ -12,6 +12,7 @@ _create_class(pkg, name, ...)
     dKWARG(2);
     SV *superclassname = NULL;
     bool set_compclassmeta = false;
+    bool set_abstract = false;
 
     {
       const COP *cop;
@@ -40,6 +41,7 @@ _create_class(pkg, name, ...)
       "extends",
       "isa",
       "_set_compclassmeta",
+      "abstract",
       NULL
     };
     while(KWARG_NEXT(args)) {
@@ -54,6 +56,10 @@ _create_class(pkg, name, ...)
         case 2: /* _set_compclassmeta */
           set_compclassmeta = SvTRUE(kwval);
           break;
+
+        case 3: /* abstract */
+          set_abstract = SvTRUE(kwval);
+          break;
       }
     }
 
@@ -61,6 +67,9 @@ _create_class(pkg, name, ...)
 
     if(superclassname && SvOK(superclassname))
       mop_class_set_superclass(meta, superclassname);
+
+    if(set_abstract)
+      meta->abstract = true;
 
     mop_class_begin(meta);
 
@@ -88,6 +97,13 @@ is_class(ClassMeta *self)
     is_role  = METATYPE_ROLE
   CODE:
     RETVAL = (self->type == ix);
+  OUTPUT:
+    RETVAL
+
+bool
+is_abstract(ClassMeta *self)
+  CODE:
+    RETVAL = self->abstract;
   OUTPUT:
     RETVAL
 

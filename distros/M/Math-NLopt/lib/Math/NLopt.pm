@@ -8,7 +8,7 @@ use warnings;
 
 #<<<
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 #>>>
 
@@ -51,7 +51,6 @@ our %EXPORT_TAGS = (
           NLOPT_LD_AUGLAG_EQ
           NLOPT_LD_CCSAQ
           NLOPT_LD_LBFGS
-          NLOPT_LD_LBFGS_NOCEDAL
           NLOPT_LD_MMA
           NLOPT_LD_SLSQP
           NLOPT_LD_TNEWTON
@@ -161,7 +160,7 @@ Math::NLopt - Math::NLopt - Perl interface to the NLopt optimization library
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -169,7 +168,7 @@ version 0.04
 
   my $opt = Math::NLopt->new( NLOPT_LD_MMA, 2 );
   $opt->set_lower_bounds( [ -HUGE_VAL(), 0 ] );
-  $opt->set_min_objective( sub ( $x, $grad, $data { ... }  );
+  $opt->set_min_objective( sub ( $x, $grad, $data ) { ... } );
   $opt->set_xtol_rel( ... );
   my $output_pars = $opt->optimize( \@input_pars );
 
@@ -219,7 +218,7 @@ well as retrieving their final values. The final value of the
 optimization function is stored in B<opt_f>. A code specifying the
 success or failure of the process is returned.
 
-The Perl interface (similar to the Python and C+ versions) is
+The Perl interface (similar to the Python and C++ versions) is
 
    \@final = $opt->optimize( \@initial_pars );
    $opt_f = $opt->last_optimum_value;
@@ -253,10 +252,10 @@ As are the utility subroutines:
 
 =head2 Callbacks
 
-While B<NLopt> performs the optimization of the objective function, it
-requires callback subroutines which return the value of the objective
+B<NLopt> handles the optimization of the objective function. The
+user must provide subroutines which return the value of the objective
 function or non-linear constraints.  Such callback subroutines
-have a required calling signature documented below.  The user can
+have a required calling signature, documented below.  The user can
 provide their own data structure containing additional information
 which will be passed to the callbacks, or they can access that
 information from closures.
@@ -275,10 +274,10 @@ The objective function has the signature
 
   $value = sub ( \@params, \@gradient, $data ) { ... }
 
-It returns is the value of the optimization function for the
+It returns the value of the optimization function for the
 passed set parameters, B<@params>.
 
-if B<\@gradient> is not C<undef>, it must be filled in by the by the
+if B<\@gradient> is not C<undef>, it must be filled in by the
 objective function.
 
 C<$data> is the structure registered with the callback. It will be
@@ -616,7 +615,7 @@ C<@tol> has length C<$n>.
   my $opt = Math::NLopt->new( $algorithm, $n );
 
 Create an optimization object for the given algorithm and number of parameters.
-B<$algorith> is one of the algorithm constants, e.g.
+B<$algorithm> is one of the algorithm constants, e.g.
 
   use Math::NLopt 'NLOPT_LD_MMA';
   my $opt = Math::NLopt->new( NLOPT_LD_MMA, 3 );

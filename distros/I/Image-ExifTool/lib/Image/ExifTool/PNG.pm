@@ -36,7 +36,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD %stdCase);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.68';
+$VERSION = '1.70';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -371,6 +371,10 @@ my %noLeapFrog = ( SAVE => 1, SEEK => 1, IHDR => 1, JHDR => 1, IEND => 1, MEND =
             IgnoreProp => { meta => 1 }, # ignore 'meta' container
         },
     },
+    seAl => {
+        Name => 'SEAL',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::SEAL' },
+    },
     # mkBF,mkTS,mkBS,mkBT ? - written by Adobe FireWorks
 );
 
@@ -431,6 +435,7 @@ my %noLeapFrog = ( SAVE => 1, SEEK => 1, IHDR => 1, JHDR => 1, IEND => 1, MEND =
 %Image::ExifTool::PNG::PhysicalPixel = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     WRITABLE => 1,
     GROUPS => { 1 => 'PNG-pHYs', 2 => 'Image' },
     WRITE_GROUP => 'PNG-pHYs',
@@ -961,7 +966,7 @@ sub FoundPNG($$$$;$$$$)
         my $processed;
         if ($$tagInfo{SubDirectory}) {
             if ($$et{OPTIONS}{Validate} and $$tagInfo{NonStandard}) {
-                $et->WarnOnce("Non-standard $$tagInfo{NonStandard} in PNG $tag chunk", 1);
+                $et->Warn("Non-standard $$tagInfo{NonStandard} in PNG $tag chunk", 1);
             }
             my $subdir = $$tagInfo{SubDirectory};
             my $dirName = $$subdir{DirName} || $tagName;
@@ -980,8 +985,15 @@ sub FoundPNG($$$$;$$$$)
                 my $processProc = $$subdir{ProcessProc};
                 # nothing more to do if writing and subdirectory is not writable
                 my $subTable = GetTagTable($$subdir{TagTable});
-                return 1 if $outBuff and not $$subTable{WRITE_PROC};
-                my $dirName = $$subdir{DirName} || $tagName;
+                if ($outBuff and not $$subTable{WRITE_PROC}) {
+                    if ($$et{DEL_GROUP}{$dirName}) {
+                        # non-writable directories may be deleted as a group (eg. SEAL)
+                        $et->VPrint(0, "  Deleting $dirName\n");
+                        $$outBuff = '';
+                        ++$$et{CHANGED};
+                    }
+                    return 1;
+                }
                 my %subdirInfo = (
                     DataPt   => \$val,
                     DirStart => 0,
@@ -1460,7 +1472,7 @@ sub ProcessPNG($$)
 
         if ($wasEnd) {
             last unless $n; # stop now if normal end of PNG
-            $et->WarnOnce("Trailer data after $fileType $endChunk chunk", 1);
+            $et->Warn("Trailer data after $fileType $endChunk chunk", 1);
             $wasTrailer = 1;
             last if $n < 8;
             $$et{SET_GROUP1} = 'Trailer';
@@ -1489,7 +1501,7 @@ sub ProcessPNG($$)
             } elsif ($hdrChunk eq 'IHDR' and $chunk eq 'CgBI') {
                 $et->Warn('Non-standard PNG image (Apple iPhone format)');
             } else {
-                $et->WarnOnce("$fileType image did not start with $hdrChunk");
+                $et->Warn("$fileType image did not start with $hdrChunk");
             }
         }
         if ($outfile and ($isDatChunk{$chunk} or $chunk eq $endChunk) and @txtOffset) {
@@ -1583,7 +1595,7 @@ sub ProcessPNG($$)
             } else {
                 $msg = 'fixed';
             }
-            $et->WarnOnce("Text/EXIF chunk(s) found after $$et{FileType} $wasDat ($msg)", 1);
+            $et->Warn("Text/EXIF chunk(s) found after $$et{FileType} $wasDat ($msg)", 1);
         }
         # read chunk data and CRC
         unless ($raf->Read($dbuf,$len)==$len and $raf->Read($cbuf, 4)==4) {

@@ -9,7 +9,7 @@ use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use MARC::Leader;
 use MARC::Leader::Print;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -29,6 +29,12 @@ sub new {
 sub run {
 	my $self = shift;
 
+	my $marc_leader;
+	# XXX Naive detect of MARC leader before getopts.
+	if (defined $ARGV[-1] && length($ARGV[-1]) eq 24) {
+		$marc_leader = pop @ARGV;
+	}
+
 	# Process arguments.
 	$self->{'_opts'} = {
 		'a' => undef,
@@ -37,7 +43,7 @@ sub run {
 		'h' => 0,
 	};
 	if (! getopts('adf:h', $self->{'_opts'})
-		|| (! $self->{'_opts'}->{'f'} && @ARGV < 1)
+		|| (! $self->{'_opts'}->{'f'} && ! defined $marc_leader)
 		|| $self->{'_opts'}->{'h'}) {
 
 		print STDERR "Usage: $0 [-a] [-d] [-f marc_xml_file] [-h] [--version] [leader_string]\n";
@@ -50,10 +56,7 @@ sub run {
 		return 1;
 	}
 
-	my $marc_leader;
-	if (! $self->{'_opts'}->{'f'}) {
-		$marc_leader = $ARGV[0];
-	} else {
+	if ($self->{'_opts'}->{'f'}) {
 		my $marc_file = MARC::File::XML->in($self->{'_opts'}->{'f'});
 		# XXX Check
 		$marc_leader = $marc_file->next->leader;
@@ -381,6 +384,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

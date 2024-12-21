@@ -100,12 +100,17 @@ static void S_bind_field_to_pad(pTHX_ SV *sv, FIELDOFFSET fieldix, U8 private, P
   save_freesv(val);
 }
 
-static XOP xop_methstart;
-static OP *pp_methstart(pTHX)
+#define methstart_common(is_role)  S_methstart_common(aTHX_ is_role)
+static void S_methstart_common(pTHX_ bool is_role)
 {
-  SV *self = av_shift(GvAV(PL_defgv));
   bool create = PL_op->op_flags & OPf_MOD;
-  bool is_role = PL_op->op_flags & OPf_SPECIAL;
+  bool do_shift = PL_op->op_flags & OPf_STACKED;
+
+  SV *self;
+  if(do_shift)
+    self = av_shift(GvAV(PL_defgv));
+  else
+    self = PAD_SVl(PADIX_SELF);
 
   if(!SvROK(self) || !SvOBJECT(SvRV(self)))
     croak("Cannot invoke method on a non-instance");
@@ -145,8 +150,10 @@ static OP *pp_methstart(pTHX)
       croak("Cannot invoke foreign method on non-derived instance");
   }
 
-  save_clearsv(&PAD_SVl(PADIX_SELF));
-  sv_setsv(PAD_SVl(PADIX_SELF), self);
+  if(do_shift) {
+    save_clearsv(&PAD_SVl(PADIX_SELF));
+    sv_setsv(PAD_SVl(PADIX_SELF), self);
+  }
 
   SV *fieldstore;
 
@@ -194,20 +201,36 @@ static OP *pp_methstart(pTHX)
 #else
   PERL_UNUSED_VAR(offset);
 #endif
+}
 
+static XOP xop_methstart;
+static OP *pp_methstart(pTHX)
+{
+  methstart_common(false);
+  return PL_op->op_next;
+}
+
+static XOP xop_rolemethstart;
+static OP *pp_rolemethstart(pTHX)
+{
+  methstart_common(true);
   return PL_op->op_next;
 }
 
 OP *ObjectPad_newMETHSTARTOP(pTHX_ U32 flags)
 {
+  OP *(*ppaddr)(pTHX) = (flags & OPfMETHSTART_ROLE) ? &pp_rolemethstart : &pp_methstart;
+
 #ifdef METHSTART_CONTAINS_FIELD_BINDINGS
   /* We know we're on 5.22 or above, so no worries about assert failures */
   OP *op = newUNOP_AUX(OP_CUSTOM, flags, NULL, NULL);
-  op->op_ppaddr = &pp_methstart;
+  op->op_ppaddr = ppaddr;
 #else
-  OP *op = newOP_CUSTOM(&pp_methstart, flags);
+  OP *op = newOP_CUSTOM(ppaddr, flags);
 #endif
   op->op_private = (U8)(flags >> 8);
+  if(flags & OPfMETHSTART_ROLE)
+    op->op_flags |= OPf_SPECIAL;
   return op;
 }
 
@@ -272,6 +295,8 @@ OP *ObjectPad_newFIELDPADOP(pTHX_ U32 flags, PADOFFSET padix, FIELDOFFSET fieldi
 #endif
   op->op_targ = padix;
   op->op_private = (U8)(flags >> 8);
+  if(flags & OPfMETHSTART_ROLE)
+    op->op_flags |= OPf_SPECIAL;
   op->op_ppaddr = &pp_fieldpad;
 
   return op;
@@ -957,6 +982,22 @@ static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, v
   hv_stores(hints, "Object::Pad/__CLASS__", newSVsv(&PL_sv_yes));
 }
 
+static void parse_method_start_signature(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
+{
+  /* reserve argidx=0 for $self */
+  xps_signature_add_param(ctx, (&(struct XPSSignatureParamDetails){
+    .ver = XSPARSESUBLIKE_ABI_VERSION,
+
+    .sigil = '$',
+    .padix = PADIX_SELF,
+  }));
+}
+
+/* TODO: It'd be nice to do the rest of the signature op manipulation in a
+ * finish_signature hook function, but currently XPS does not expose enough of
+ * the signature ops in a visible way for us to do that.
+ */
+
 static void parse_classphaser_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   ClassMeta *meta = compclassmeta;
@@ -1239,6 +1280,7 @@ static void parse_classphaser_post_newcv(pTHX_ struct XSParseSublikeContext *ctx
 }
 
 static struct XSParseSublikeHooks parse_method_hooks = {
+  .ver = 7,
   .flags           = XS_PARSE_SUBLIKE_FLAG_FILTERATTRS |
                      XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS |
                      XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL,
@@ -1249,9 +1291,12 @@ static struct XSParseSublikeHooks parse_method_hooks = {
   .post_blockstart = parse_method_post_blockstart,
   .pre_blockend    = parse_method_pre_blockend,
   .post_newcv      = parse_method_post_newcv,
+
+  .start_signature = parse_method_start_signature,
 };
 
 static struct XSParseSublikeHooks parse_phaser_hooks = {
+  .ver = 7,
   .flags           = XS_PARSE_SUBLIKE_FLAG_FILTERATTRS |
                      XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS,
   .skip_parts      = XS_PARSE_SUBLIKE_PART_NAME,
@@ -1261,6 +1306,8 @@ static struct XSParseSublikeHooks parse_phaser_hooks = {
   .post_blockstart = parse_method_post_blockstart,
   .pre_blockend    = parse_method_pre_blockend,
   .post_newcv      = parse_method_post_newcv,
+
+  .start_signature = parse_method_start_signature,
 };
 
 static struct XSParseSublikeHooks parse_classphaser_hooks = {
@@ -2028,6 +2075,15 @@ BOOT:
 #endif
   Perl_custom_op_register(aTHX_ &pp_methstart, &xop_methstart);
 
+  XopENTRY_set(&xop_rolemethstart, xop_name, "rolemethstart");
+  XopENTRY_set(&xop_rolemethstart, xop_desc, "enter role method");
+#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+  XopENTRY_set(&xop_rolemethstart, xop_class, OA_UNOP_AUX);
+#else
+  XopENTRY_set(&xop_rolemethstart, xop_class, OA_BASEOP);
+#endif
+  Perl_custom_op_register(aTHX_ &pp_rolemethstart, &xop_rolemethstart);
+
   XopENTRY_set(&xop_commonmethstart, xop_name, "commonmethstart");
   XopENTRY_set(&xop_commonmethstart, xop_desc, "enter method :common");
   XopENTRY_set(&xop_commonmethstart, xop_class, OA_BASEOP);
@@ -2067,7 +2123,7 @@ BOOT:
 
   register_xs_parse_keyword("requires", &kwhooks_requires, NULL);
 
-  boot_xs_parse_sublike(0.25); /* bugfix RT155630 */
+  boot_xs_parse_sublike(0.31); /* start_signature */
 
   register_xs_parse_sublike("method", &parse_method_hooks, (void *)PHASER_NONE);
 

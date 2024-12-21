@@ -37,7 +37,7 @@
 #  include "make_argcheck_aux.c.inc"
 
 #  if !HAVE_PERL_VERSION(5, 31, 3)
-#    define parse_subsignature(flags)  parse_subsignature_ex(0) /* ignore core flags as there are none */
+#    define parse_subsignature(flags)  parse_subsignature_ex(0, NULL, NULL, 0) /* ignore core flags as there are none */
 #  endif
 
 #  define HAVE_PARSE_SUBSIGNATURE
@@ -57,21 +57,6 @@
 #define QUOTED_PVNf             "\"%.*s\"%s"
 #define QUOTED_PVNfARG(pv,len)  ((len) <= 255 ? (int)(len) : 255), (pv), ((len) <= 255 ? "" : "...")
 
-struct HooksAndData {
-  const struct XSParseSublikeHooks *hooks;
-  void *data;
-};
-
-#define FOREACH_HOOKS_FORWARD \
-  for(hooki = 0; \
-    (hooki < nhooks) && (hooks = hooksanddata[hooki].hooks, hookdata = hooksanddata[hooki].data), (hooki < nhooks); \
-    hooki++)
-
-#define FOREACH_HOOKS_REVERSE \
-  for(hooki = nhooks - 1; \
-    (hooki >= 0) && (hooks = hooksanddata[hooki].hooks, hookdata = hooksanddata[hooki].data), (hooki >= 0); \
-    hooki--)
-
 /* Non-documented internal flags we use for our own purposes */
 enum {
   XS_PARSE_SUBLIKE_ACTION_CVf_IsMETHOD = (1<<31),  /* do we set CVf_IsMETHOD? */
@@ -82,7 +67,12 @@ static int parse(pTHX_
   size_t nhooks,
   OP **op_ptr)
 {
-  struct XSParseSublikeContext ctx = { 0 };
+  /* We need to reserve extra space in here for the sigctx pointer. To
+   * simplify much code here lets just pretend `ctx` is the actual context
+   * struct stored within
+   */
+  struct XPSContextWithPointer ctx_with_ptr = { 0 };
+#define ctx  (ctx_with_ptr.ctx)
 
   IV hooki;
   const struct XSParseSublikeHooks *hooks;
@@ -108,11 +98,20 @@ static int parse(pTHX_
   }
 
   if(!(skip_parts & XS_PARSE_SUBLIKE_PART_NAME)) {
-    ctx.name = lex_scan_ident();
+    ctx.name = lex_scan_packagename();
     lex_read_space(0);
   }
   if((require_parts & XS_PARSE_SUBLIKE_PART_NAME) && !ctx.name)
     croak("Expected name for sub-like construction");
+
+  if(ctx.name && strstr(SvPV_nolen(ctx.name), "::")) {
+    FOREACH_HOOKS_FORWARD {
+      if(hooks->flags & XS_PARSE_SUBLIKE_FLAG_ALLOW_PKGNAME)
+        continue;
+
+      croak("Declaring this sub-like function in another package is not permitted");
+    }
+  }
 
   /* Initial idea of actions are determined by whether we have a name */
   ctx.actions = ctx.name
@@ -240,48 +239,50 @@ static int parse(pTHX_
 #endif
     }
 
+    U32 flags = 0;
+    bool have_sighooks = false;
+    FOREACH_HOOKS_FORWARD {
+      if(hooks->flags & XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS)
+        flags |= PARSE_SUBSIGNATURE_NAMED_PARAMS;
+      if(hooks->flags & XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES)
+        flags |= PARSE_SUBSIGNATURE_PARAM_ATTRIBUTES;
+      if(hooks->ver >= 7 && (hooks->start_signature || hooks->finish_signature))
+        have_sighooks = true;
+    }
+
+    if(flags || have_sighooks)
+      sigop = parse_subsignature_ex(flags, &ctx_with_ptr, hooksanddata, nhooks);
+    else {
 #if HAVE_PERL_VERSION(5, 31, 3)
     /* core's parse_subsignature doesn't seem able to handle empty sigs
      *   RT132284
      *   https://github.com/Perl/perl5/issues/17689
      */
-    if(lex_peek_unichar(0) == ')') {
-      /* Inject an empty OP_ARGCHECK much as core would do if it encountered
-       * an empty signature */
-      UNOP_AUX_item *aux = make_argcheck_aux(0, 0, 0);
+      if(lex_peek_unichar(0) == ')') {
+        /* Inject an empty OP_ARGCHECK much as core would do if it encountered
+         * an empty signature */
+        UNOP_AUX_item *aux = make_argcheck_aux(0, 0, 0);
 
-      sigop = op_prepend_elem(OP_LINESEQ, newSTATEOP(0, NULL, NULL),
-        newUNOP_AUX(OP_ARGCHECK, 0, NULL, aux));
+        sigop = op_prepend_elem(OP_LINESEQ, newSTATEOP(0, NULL, NULL),
+          newUNOP_AUX(OP_ARGCHECK, 0, NULL, aux));
 
-      /* a nextstate at the end handles context correctly for an empty
-       * sub body */
-      sigop = op_append_elem(OP_LINESEQ, sigop, newSTATEOP(0, NULL, NULL));
+        /* a nextstate at the end handles context correctly for an empty
+         * sub body */
+        sigop = op_append_elem(OP_LINESEQ, sigop, newSTATEOP(0, NULL, NULL));
 
-#if HAVE_PERL_VERSION(5,31,5)
-      /* wrap the list of arg ops in a NULL aux op.  This serves two
-       * purposes. First, it makes the arg list a separate subtree
-       * from the body of the sub, and secondly the null op may in
-       * future be upgraded to an OP_SIGNATURE when implemented. For
-       * now leave it as ex-argcheck
-       */
-      sigop = newUNOP_AUX(OP_ARGCHECK, 0, sigop, NULL);
-      op_null(sigop);
-#endif
-    }
-    else
-#endif
-    {
-      U32 flags = 0;
-      FOREACH_HOOKS_FORWARD {
-        if(hooks->flags & XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS)
-          flags |= PARSE_SUBSIGNATURE_NAMED_PARAMS;
-        if(hooks->flags & XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES)
-          flags |= PARSE_SUBSIGNATURE_PARAM_ATTRIBUTES;
+  #if HAVE_PERL_VERSION(5,31,5)
+        /* wrap the list of arg ops in a NULL aux op.  This serves two
+         * purposes. First, it makes the arg list a separate subtree
+         * from the body of the sub, and secondly the null op may in
+         * future be upgraded to an OP_SIGNATURE when implemented. For
+         * now leave it as ex-argcheck
+         */
+        sigop = newUNOP_AUX(OP_ARGCHECK, 0, sigop, NULL);
+        op_null(sigop);
+  #endif
       }
-
-      if(flags)
-        sigop = parse_subsignature_ex(flags);
       else
+#endif
         sigop = parse_subsignature(0);
 
       if(PL_parser->error_count) {
@@ -466,6 +467,7 @@ static int parse(pTHX_
   }
 
   return (ctx.actions & XS_PARSE_SUBLIKE_ACTION_RET_EXPR) ? KEYWORD_PLUGIN_EXPR : KEYWORD_PLUGIN_STMT;
+#undef ctx
 }
 
 static int IMPL_xs_parse_sublike_v6(pTHX_ const struct XSParseSublikeHooks *hooks, void *hookdata, OP **op_ptr)
@@ -883,6 +885,7 @@ BOOT:
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register()@4", 1), PTR2UV(&IMPL_register_xs_parse_sublike_v4));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parseany()@4", 1), PTR2UV(&IMPL_xs_parse_sublike_any_v4));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parseany()@6", 1), PTR2UV(&IMPL_xs_parse_sublike_any_v6));
+  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/signature_add_param()@7", 1), PTR2UV(&XPS_signature_add_param));
 
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register_sigattr()@5", 1), PTR2UV(&IMPL_register_xps_signature_attribute));
 #ifdef HAVE_FEATURE_CLASS

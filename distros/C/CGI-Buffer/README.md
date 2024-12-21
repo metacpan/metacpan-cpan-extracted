@@ -14,7 +14,7 @@ CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 # VERSION
 
-Version 0.86
+Version 0.87
 
 # SYNOPSIS
 

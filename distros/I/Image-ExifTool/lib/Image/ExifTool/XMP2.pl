@@ -25,6 +25,7 @@ use strict;
 use Image::ExifTool qw(:Utils);
 use Image::ExifTool::XMP;
 
+sub ProcessSEAL($$;$);
 sub Init_crd($);
 
 #------------------------------------------------------------------------------
@@ -2249,6 +2250,44 @@ my %sACDSeeRegionStruct = (
     Gamma               => { Writable => 'real', List => 'Seq', Avoid => 1 },
 );
 
+%Image::ExifTool::XMP::HDRGainMap = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-HDRGainMap', 2 => 'Unknown' },
+    NAMESPACE   => 'HDRGainMap',
+    NOTES => 'Used in Apple HDR GainMap images.',
+    HDRGainMapVersion => {
+        PrintConv => 'IsInt($val) ? join(".",unpack("C*", pack "N", $val)) : $val',
+        PrintConvInv => q{
+            return $val unless $val =~ /^\d+\.\d+\.\d+\.\d+$/;
+            return unpack('N', pack('C*', split /\./, $val));
+        },
+    },
+);
+
+%Image::ExifTool::XMP::apdi = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-apdi', 2 => 'Image' },
+    NAMESPACE   => 'apdi',
+    NOTES => 'Used in Apple HDR GainMap images.',
+    NativeFormat => {
+        PrintConv => q{
+            return $val unless IsInt($val);
+            my $tmp = pack("N", $val);
+            $tmp =~ /^\w{4}$/ ? $tmp : $val;
+        },
+        PrintConvInv => '$val =~ /^\w{4}$/ ? unpack("N", $val) : $val',
+    },
+    AuxiliaryImageType => { },
+    StoredFormat => {
+        PrintConv => q{
+            return $val unless IsInt($val);
+            my $tmp = pack("N", $val);
+            $tmp =~ /^\w{4}$/ ? $tmp : $val;
+        },
+        PrintConvInv => '$val =~ /^\w{4}$/ ? unpack("N", $val) : $val',
+    },
+);
+
 # SVG namespace properties (ref 9)
 %Image::ExifTool::XMP::SVG = (
     GROUPS => { 0 => 'SVG', 1 => 'SVG', 2 => 'Image' },
@@ -2289,6 +2328,69 @@ my %sACDSeeRegionStruct = (
         },
     },
 );
+
+%Image::ExifTool::XMP::seal = (
+    GROUPS => { 0 => 'XMP', 1 => 'XMP-seal', 2 => 'Image' },
+    NAMESPACE => 'seal',
+    WRITABLE => 'string',
+    NOTES => 'SEAL embedded in XMP.',
+    seal => {
+        Name => 'Seal',
+        Binary => 1,
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::SEAL' },
+    },
+);
+
+%Image::ExifTool::XMP::SEAL = (
+    GROUPS => { 0 => 'XML', 1 => 'SEAL', 2 => 'Document' },
+    PROCESS_PROC => \&ProcessSEAL,
+    NOTES => q{
+        These tags are used in SEAL (Secure Evidence Attribution Label) content
+        authentification, which is actually XML format, not XMP.  ExifTool has
+        read/delete support for SEAL information in JPG, TIFF, XMP, PNG, WEBP, HEIC,
+        PPM, MOV and MP4 files, and read-only support in PDF, MKV and WAV.  Use
+        C<-seal:all=> on the command line to delete SEAL information in supported
+        formats.  See L<https://github.com/hackerfactor/SEAL> for the specification.
+    },
+    seal=> 'SEALVersion',
+    ka  => 'KeyAlgorithm',
+    kv  => 'KeyVersion',
+    da  => 'DigestAlgorithm',
+    b   => 'ByteRange',
+    d   => 'Domain',
+    uid => 'UniqueIdentifier',
+    id  => 'Identifier',
+    sf  => 'SignatureFormat',
+    sl  => 'SignatureLength',
+   's'  => 'Signature',
+    info=> 'SEALComment',
+    copyright => { Name => 'Copyright', Groups => { 2 => 'Author' } },
+);
+
+#------------------------------------------------------------------------------
+# We found a SEAL property name/value
+# Inputs: 0) ExifTool ref, 1) tag table ref, 2) xmp property list ref
+#         3) property value, 4) attribute hash ref
+# Returns: 1 if valid tag was found
+sub FoundSEAL($$$$;$)
+{
+    my ($et, $tagTablePtr, $props, $val, $attrs) = @_;
+    # remove 'seal' container property from name
+    my @sealProps = @$props;
+    shift @sealProps if @sealProps and $sealProps[0] eq 'seal';
+    return FoundXMP($et, $tagTablePtr, \@sealProps, $val, $attrs);
+}
+
+#------------------------------------------------------------------------------
+# Process SEAL XML
+# Inputs: 0) ExifTool ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessSEAL($$;$)
+{
+    my ($et, $dirInfo, $tagTablePtr) = @_;
+    $$dirInfo{XMPParseOpts}{FoundProc} = \&FoundSEAL;
+    return ProcessXMP($et, $dirInfo, $tagTablePtr);
+}
 
 #------------------------------------------------------------------------------
 # Generate crd tags

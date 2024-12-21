@@ -1,3 +1,8 @@
+0.05 2024-12-20T15:20:44+01:00
+ - Add check for MARC leader size.
+ - Add support from parsing of leader with '-' instead of space.
+ - Update copyright years.
+
 0.04 2023-11-20T16:14:23+01:00
  - Regen README file.
  - Rewrite to new Data::MARC::Leader data object.

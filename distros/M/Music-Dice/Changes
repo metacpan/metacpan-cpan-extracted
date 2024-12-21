@@ -1,5 +1,9 @@
 Revision history for Music-Dice
 
+0.0202 2024-12-20 23:35:03
+    - Add the semitones attribute.
+    - Add the identity attribute and intervals.
+
 0.0201 2024-12-09 16:01:03
     - Improve the eg/melody program a bit.
 

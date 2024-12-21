@@ -20,6 +20,8 @@ is( $meta->name, "Example", '$meta->name' );
 ok(  $meta->is_role, '$meta->is_role true' );
 ok( !$meta->is_class, '$meta->is_class false' );
 
+ok( $meta->is_abstract, '$meta->is_abstract true' );
+
 is( [ $meta->required_method_names ], [qw( a_method b_method )],
    '$meta->required_method_names' );
 

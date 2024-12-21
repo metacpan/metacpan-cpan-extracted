@@ -16,14 +16,16 @@ my %WriteMakefileArgs = (
   "LICENSE" => "lgpl",
   "NAME" => "Graph::MoreUtils",
   "PREREQ_PM" => {
+    "Algorithm::Combinatorics" => 0,
     "Graph" => 0,
     "Scalar::Util" => 0,
     "Set::Object" => 0
   },
   "TEST_REQUIRES" => {
+    "List::Util" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.2.0",
+  "VERSION" => "0.3.0",
   "test" => {
     "TESTS" => "t/*.t t/SSSR/*.t t/line/*.t t/smoothed/*.t"
   }
@@ -31,7 +33,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Algorithm::Combinatorics" => 0,
   "Graph" => 0,
+  "List::Util" => 0,
   "Scalar::Util" => 0,
   "Set::Object" => 0,
   "Test::More" => 0

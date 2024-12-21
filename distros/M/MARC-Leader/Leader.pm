@@ -8,7 +8,7 @@ use Data::MARC::Leader;
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -25,6 +25,13 @@ sub new {
 
 sub parse {
 	my ($self, $leader) = @_;
+
+	# Check length.
+	if (length($leader) != 24) {
+		err 'Bad length of MARC leader.';
+	}
+
+	$leader =~ s/\-/\ /msg;
 
 	my %params = (
 		'length' => $self->_int($leader, 0, 5),,
@@ -138,6 +145,9 @@ Returns string.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+
+ parse():
+         Bad length of MARC leader.
 
  serialize():
          Bad 'Data::MARC::Leader' instance to serialize.
@@ -312,12 +322,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023 Michal Josef Špaček
+© 2023-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

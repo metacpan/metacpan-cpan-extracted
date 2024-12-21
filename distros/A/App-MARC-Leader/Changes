@@ -1,3 +1,7 @@
+0.07 2024-12-20T15:25:06+01:00
+ - Add parsing support for '-----nam-a22------ia4500' string.
+ - Fix practical issue with »marc-leader '-----nam-a22------ia4500'«.
+
 0.06 2024-11-14T00:48:58+01:00
  - Add tests.
  - Fix minimal dependency to MARC::Leader.

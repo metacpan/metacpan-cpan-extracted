@@ -10,10 +10,10 @@ build_requires:
   Syntax::Keyword::Dynamically: '0'
   Test2::V0: '0'
   Test::More: '0'
-  perl: v5.32.0
+  perl: v5.30.0
 configure_requires:
   Module::Build::Tiny: '0.034'
-  perl: v5.32.0
+  perl: v5.30.0
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -32,57 +32,55 @@ no_index:
 provides:
   OpenTelemetry::SDK:
     file: lib/OpenTelemetry/SDK.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Exporter::Console:
     file: lib/OpenTelemetry/SDK/Exporter/Console.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::InstrumentationScope:
     file: lib/OpenTelemetry/SDK/InstrumentationScope.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Resource:
     file: lib/OpenTelemetry/SDK/Resource.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Trace::Sampler:
     file: lib/OpenTelemetry/SDK/Trace/Sampler.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Trace::Sampler::AlwaysOff:
     file: lib/OpenTelemetry/SDK/Trace/Sampler/AlwaysOff.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Trace::Sampler::AlwaysOn:
     file: lib/OpenTelemetry/SDK/Trace/Sampler/AlwaysOn.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Trace::Sampler::ParentBased:
     file: lib/OpenTelemetry/SDK/Trace/Sampler/ParentBased.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Trace::Sampler::Result:
     file: lib/OpenTelemetry/SDK/Trace/Sampler/Result.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Trace::Sampler::TraceIDRatioBased:
     file: lib/OpenTelemetry/SDK/Trace/Sampler/TraceIDRatioBased.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Trace::Span:
     file: lib/OpenTelemetry/SDK/Trace/Span.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Trace::Span::Processor::Batch:
     file: lib/OpenTelemetry/SDK/Trace/Span/Processor/Batch.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Trace::Span::Processor::Simple:
     file: lib/OpenTelemetry/SDK/Trace/Span/Processor/Simple.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Trace::Span::Readable:
     file: lib/OpenTelemetry/SDK/Trace/Span/Readable.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Trace::SpanLimits:
     file: lib/OpenTelemetry/SDK/Trace/SpanLimits.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Trace::Tracer:
     file: lib/OpenTelemetry/SDK/Trace/Tracer.pm
-    version: '0.024'
+    version: '0.025'
   OpenTelemetry::SDK::Trace::TracerProvider:
     file: lib/OpenTelemetry/SDK/Trace/TracerProvider.pm
-    version: '0.024'
-recommends:
-  OpenTelemetry::Exporter::OTLP: '0'
+    version: '0.025'
 requires:
   Feature::Compat::Try: '0'
   Future::AsyncAwait: '0.38'
@@ -91,12 +89,14 @@ requires:
   Mutex: '0'
   Object::Pad: '0.74'
   OpenTelemetry: '0.010'
+  OpenTelemetry::Exporter::OTLP: '0'
   bigfloat: '0.65'
-  perl: v5.32.0
+  isa: '0'
+  perl: v5.30.0
 resources:
   bugtracker: https://github.com/jjatria/perl-opentelemetry-sdk/issues
   repository: git://github.com/jjatria/perl-opentelemetry-sdk.git
-version: '0.024'
+version: '0.025'
 x_Dist_Zilla:
   perl:
     version: '5.040000'
@@ -272,7 +272,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.024'
+          tag: '0.025'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:

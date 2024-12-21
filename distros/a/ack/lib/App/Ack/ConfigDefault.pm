@@ -418,6 +418,11 @@ sub _options_block {
 --type-add=python:ext:py
 --type-add=python:firstlinematch:/^#!.*\bpython/
 
+# Pytest
+# https://pytest.org/
+--type-add=pytest:match:_test[.]py$
+--type-add=pytest:match:^test_.*[.]py$
+
 # R
 # https://www.r-project.org/
 # https://r4ds.had.co.nz/r-markdown.html
@@ -481,6 +486,10 @@ sub _options_block {
 # Tcl
 # https://www.tcl.tk/
 --type-add=tcl:ext:tcl,itcl,itk
+
+# Terraform
+# https://github.com/hashicorp/terraform
+--type-add=terraform=.tf,.tfvars
 
 # TeX & LaTeX
 # https://www.latex-project.org/

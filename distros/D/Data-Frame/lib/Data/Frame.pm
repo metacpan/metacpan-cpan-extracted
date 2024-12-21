@@ -1,5 +1,5 @@
 package Data::Frame;
-$Data::Frame::VERSION = '0.006003';
+$Data::Frame::VERSION = '0.006004';
 # ABSTRACT: data frame implementation
 
 use 5.016;
@@ -770,8 +770,10 @@ method split (ColumnLike $factor) {
     if ($factor->$_DOES('PDL::Factor')) {
         $factor = $factor->{PDL};
     }
-    my $uniq_values = $factor->$_call_if_can('uniq')
-      // [ List::AllUtils::uniq( $factor->flatten ) ];
+    # avoid // as breaks Devel::Cover
+    my $uniq_values = $factor->$_call_if_can('uniq');
+    $uniq_values = [ List::AllUtils::uniq( $factor->flatten ) ]
+      if !defined $uniq_values;
 
     my @rslt = map {
         my $indices = PDL::Primitive::which( $factor == $_ );
@@ -960,7 +962,9 @@ method _compare ($other, $mode) {
         return sub {
             my ( $col, $x ) = @_;
             my $col_isbad = $col->isbad;
-            my $x_isbad   = $x->$_call_if_can('isbad') // 1;
+            # avoid // as breaks Devel::Cover
+            my $x_isbad = $x->$_call_if_can('isbad');
+            $x_isbad = 1 if !defined $x_isbad;
             my $both_bad  = ( $col_isbad & $x_isbad );
 
             my $rslt = $f->( $col, $x );
@@ -1096,7 +1100,7 @@ Data::Frame - data frame implementation
 
 =head1 VERSION
 
-version 0.006003
+version 0.006004
 
 =head1 STATUS
 

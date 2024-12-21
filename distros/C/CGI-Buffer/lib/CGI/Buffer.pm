@@ -10,6 +10,15 @@ use CGI::Info;
 use Carp;
 use HTTP::Date;
 use Text::Diff;	# For debugging
+use Readonly;
+
+Readonly my $DEFAULT_GENERATE_ETAG => 1;
+Readonly my $DEFAULT_GENERATE_304 => 1;
+Readonly my $DEFAULT_GENERATE_LAST_MODIFIED => 1;
+Readonly my $DEFAULT_COMPRESS_CONTENT => 1;
+Readonly my $DEFAULT_OPTIMISE_CONTENT => 0;
+Readonly my $DEFAULT_LINT_CONTENT => 0;
+Readonly my $MIN_GZIP_LEN => 32;
 
 =head1 NAME
 
@@ -17,11 +26,11 @@ CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 =head1 VERSION
 
-Version 0.86
+Version 0.87
 
 =cut
 
-our $VERSION = '0.86';
+our $VERSION = '0.87';
 
 =head1 SYNOPSIS
 
@@ -72,14 +81,13 @@ which works well but isn't really what you want.
 
 =cut
 
-use constant MIN_GZIP_LEN => 32;
+our $generate_etag = $DEFAULT_GENERATE_ETAG;
+our $generate_304 = $DEFAULT_GENERATE_304;
+our $generate_last_modified = $DEFAULT_GENERATE_LAST_MODIFIED;
+our $compress_content = $DEFAULT_COMPRESS_CONTENT;
+our $optimise_content = $DEFAULT_OPTIMISE_CONTENT;
+our $lint_content = $DEFAULT_LINT_CONTENT;
 
-our $generate_etag = 1;
-our $generate_304 = 1;
-our $generate_last_modified = 1;
-our $compress_content = 1;
-our $optimise_content = 0;
-our $lint_content = 0;
 our $cache;
 our $cache_duration;
 our $cache_key;
@@ -141,7 +149,11 @@ END {
 			HTTP::Status->import();
 
 			if(!defined($status)) {
-				$status = 200;
+				if($info) {
+					$status = $info->status();
+				} else {
+					$status = 200;
+				}
 			}
 			print "Status: $status ",
 				HTTP::Status::status_message($status),
@@ -307,7 +319,7 @@ END {
 				$logger->debug("Compare $ENV{HTTP_IF_NONE_MATCH} with $etag");
 			}
 			if($ENV{'HTTP_IF_NONE_MATCH'} eq $etag) {
-				push @o, "Status: 304 Not Modified";
+				push @o, 'Status: 304 Not Modified';
 				$send_body = 0;
 				$status = 304;
 				if($logger) {
@@ -337,6 +349,9 @@ END {
 				}
 				$unzipped_body = $body;
 				$status = 206;
+				if($info) {
+					$info->status(206);
+				}
 			}
 		}
 		_compress({ encoding => $encoding });
@@ -359,11 +374,10 @@ END {
 					@o = ("X-CGI-Buffer-$VERSION: Hit");
 					if($info) {
 						my $host_name = $info->host_name();
-						push @o, "X-Cache: HIT from $host_name";
-						push @o, "X-Cache-Lookup: HIT from $host_name";
+						push @o, "X-Cache: HIT from $host_name",
+							"X-Cache-Lookup: HIT from $host_name";
 					} else {
-						push @o, 'X-Cache: HIT';
-						push @o, 'X-Cache-Lookup: HIT';
+						push @o, 'X-Cache: HIT', 'X-Cache-Lookup: HIT';
 					}
 				} elsif($logger) {
 					$logger->warn("Error retrieving data for key $key");
@@ -376,13 +390,11 @@ END {
 			# OK to send 304 if possible
 			if($send_body && $ENV{'SERVER_PROTOCOL'} &&
 			  (($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') || ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/2.0')) &&
-			  $generate_304 && ($status == 200)) {
-				if($ENV{'HTTP_IF_MODIFIED_SINCE'}) {
-					_check_modified_since({
-						since => $ENV{'HTTP_IF_MODIFIED_SINCE'},
-						modified => $cobject->created_at()
-					});
-				}
+			  $generate_304 && ($status == 200) && $ENV{'HTTP_IF_MODIFIED_SINCE'}) {
+				_check_modified_since({
+					since => $ENV{'HTTP_IF_MODIFIED_SINCE'},
+					modified => $cobject->created_at()
+				});
 			}
 			if($send_body && ($status == 200) && defined($cache_hash)) {
 				$body = $cache_hash->{'body'};
@@ -404,6 +416,9 @@ END {
 					}
 					$send_body = 0;
 					$status = 500;
+					if($info) {
+						$info->status(500);
+					}
 				}
 			}
 			if($send_body && $ENV{'SERVER_PROTOCOL'} &&
@@ -421,7 +436,7 @@ END {
 						$logger->debug("Compare etags $ENV{HTTP_IF_NONE_MATCH} and $etag");
 					}
 					if(($ENV{'HTTP_IF_NONE_MATCH'} eq $etag) && $generate_304) {
-						push @o, "Status: 304 Not Modified";
+						push @o, 'Status: 304 Not Modified';
 						$status = 304;
 						$send_body = 0;
 						if($logger) {
@@ -452,9 +467,12 @@ END {
 					$logger->debug("Compare $ENV{HTTP_IF_NONE_MATCH} with $etag");
 				}
 				if(defined($etag) && ($etag eq $ENV{'HTTP_IF_NONE_MATCH'}) && ($status == 200)) {
-					push @o, "Status: 304 Not Modified";
+					push @o, 'Status: 304 Not Modified';
 					$send_body = 0;
 					$status = 304;
+					if($info) {
+						$info->status(304);
+					}
 					if($logger) {
 						$logger->debug('Set status to 304');
 					}
@@ -473,7 +491,7 @@ END {
 					if($logger) {
 						$logger->debug('Set Last-Modified to ', HTTP::Date::time2str($cobject->created_at()));
 					}
-					push @o, "Last-Modified: " . HTTP::Date::time2str($cobject->created_at());
+					push @o, 'Last-Modified: ' . HTTP::Date::time2str($cobject->created_at());
 				}
 			}
 		} else {
@@ -522,9 +540,9 @@ END {
 				if($generate_last_modified) {
 					$cobject = $cache->get_object($key);
 					if(defined($cobject)) {
-						push @o, "Last-Modified: " . HTTP::Date::time2str($cobject->created_at());
+						push @o, 'Last-Modified: ' . HTTP::Date::time2str($cobject->created_at());
 					} else {
-						push @o, "Last-Modified: " . HTTP::Date::time2str(time);
+						push @o, 'Last-Modified: ' . HTTP::Date::time2str(time);
 					}
 				}
 			}
@@ -601,6 +619,9 @@ END {
 			HTTP::Status->import();
 
 			push @o, "Status: $status " . HTTP::Status::status_message($status);
+			if($info) {
+				$info->status($status);
+			}
 		}
 	} else {
 		push @o, "X-CGI-Buffer-$VERSION: No headers";
@@ -686,7 +707,7 @@ sub _check_modified_since {
 		$logger->debug("_check_modified_since: Compare $$params{modified} with $s");
 	}
 	if($$params{modified} <= $s) {
-		push @o, "Status: 304 Not Modified";
+		push @o, 'Status: 304 Not Modified';
 		$status = 304;
 		$send_body = 0;
 		if($logger) {
@@ -1089,25 +1110,28 @@ sub is_cached {
 	return 1;
 }
 
+# Determine the last modification time of the script and cache it for subsequent calls
 sub _my_age {
 	if($script_mtime) {
 		return $script_mtime;
 	}
 	unless(defined($info)) {
 		if($cache) {
-			$info = CGI::Info->new({ cache => $cache });
+			$info = CGI::Info->new({ cache => $cache })
+				or croak 'Failed to create CGI::Info object with cache';
 		} else {
-			$info = CGI::Info->new();
+			$info = CGI::Info->new() or croak 'Failed to create CGI::Info object';
 		}
 	}
 
 	my $path = $info->script_path();
 	unless(defined($path)) {
+		croak 'Failed to retrieve script path';
 		return;
 	}
 
 	my @statb = stat($path);
-	$script_mtime = $statb[9];
+	$script_mtime = $statb[9];	# Set script_mtime to the modification time of the script
 	return $script_mtime;
 }
 
@@ -1144,48 +1168,52 @@ sub _set_content_type
 }
 
 sub _compress {
-	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
-
-	return unless(defined($body));
+	my %params = ref $_[0] eq 'HASH' ? %{ $_[0] } : @_;
+	return unless defined $body;
 
 	my $encoding = $params{encoding};
+	return if(!$encoding || length($body) < $MIN_GZIP_LEN);
 
-	if((length($encoding) == 0) || (length($body) < MIN_GZIP_LEN)) {
-		return;
-	}
+	# Ensure UTF-8 encoding is handled
+	my $encode_utf8 = sub {
+		# Avoid 'Wide character in memGzip'
+		# state $encode_loaded = do {
+			# require Encode;
+			# 1;
+		# };
+		require Encode;
+		Encode::encode_utf8(shift);
+	};
 
+	# Common logic for setting headers
+	my $set_headers = sub {
+		my ($encoding) = @_;
+		push @o, "Content-Encoding: $encoding", 'Vary: Accept-Encoding';
+	};
+
+	# Gzip compression
 	if($encoding eq 'gzip') {
 		require Compress::Zlib;
-		Compress::Zlib->import;
-
-		# Avoid 'Wide character in memGzip'
-		unless($encode_loaded) {
-			require Encode;
-			$encode_loaded = 1;
-		}
-		my $nbody = Compress::Zlib::memGzip(\Encode::encode_utf8($body));
-		if(length($nbody) < length($body)) {
-			$body = $nbody;
-			push @o, "Content-Encoding: $encoding";
-			push @o, "Vary: Accept-Encoding";
+		my $compressed_body = Compress::Zlib::memGzip($encode_utf8->($body));
+		if(length($compressed_body) < length($body)) {
+			$body = $compressed_body;
+			$set_headers->($encoding);
 		}
 	} elsif($encoding eq 'br') {
-		require IO::Compress::Brotli;
-		IO::Compress::Brotli->import();
-
-		# Avoid 'Wide character in memGzip'
-		unless($encode_loaded) {
-			require Encode;
-			$encode_loaded = 1;
-		}
-		my $nbody = IO::Compress::Brotli::bro(Encode::encode_utf8($body));
-		if(length($nbody) < length($body)) {
-			$body = $nbody;
-			push @o, "Content-Encoding: $encoding";
-			push @o, "Vary: Accept-Encoding";
+		# Brotli compression
+		if(eval { require IO::Compress::Brotli; 1 }) {
+			my $compressed_body = IO::Compress::Brotli::bro($encode_utf8->($body));
+			if(length($compressed_body) < length($body)) {
+				$body = $compressed_body;
+				$set_headers->($encoding);
+			}
+		} else {
+			$status = 406;
+			$info->status(406) if($info);
 		}
 	}
 }
+
 
 =head1 AUTHOR
 

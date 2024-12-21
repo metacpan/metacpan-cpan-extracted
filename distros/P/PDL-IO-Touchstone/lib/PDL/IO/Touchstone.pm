@@ -20,7 +20,7 @@
 #  respective owners and no grant or license is provided thereof.
 
 package PDL::IO::Touchstone;
-our $VERSION = '1.015';
+our $VERSION = '1.016';
 
 use 5.010;
 use strict;
@@ -1308,7 +1308,7 @@ sub _to_diagonal
 
 	if (!@dims || (@dims == 1 && $dims[0] == 1))
 	{
-		$ret = zeroes($n_ports,$n_ports);
+		$ret = zeroes($v->type,$n_ports,$n_ports);
 		$ret->diagonal(0,1) .= $v;
 	}
 	elsif (@dims == 1 && $dims[0] == $n_ports)

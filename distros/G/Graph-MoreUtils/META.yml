@@ -3,6 +3,7 @@ abstract: 'Utilities for graphs'
 author:
   - 'Andrius Merkys <merkys@cpan.org>'
 build_requires:
+  List::Util: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -14,6 +15,7 @@ meta-spec:
   version: '1.4'
 name: Graph-MoreUtils
 requires:
+  Algorithm::Combinatorics: '0'
   Graph: '0'
   Scalar::Util: '0'
   Set::Object: '0'
@@ -21,6 +23,6 @@ resources:
   bugtracker: https://github.com/merkys/graph-moreutils/issues
   homepage: https://search.cpan.org/dist/Graph-MoreUtils
   repository: git://github.com/merkys/graph-moreutils.git
-version: 0.2.0
+version: 0.3.0
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

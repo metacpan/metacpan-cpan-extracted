@@ -22,21 +22,33 @@ my %prereq_pm = (
 	'JavaScript::Packer' => 2.00,
 	'HTTP::Date' => 0,
 	'File::Spec' => 0,
+	'Readonly' => 0,
+	'Text::Diff' => 0,
 	'Time::localtime' => 0,
 	'HTML::Lint' => 0,
 	'Storable' => 0,
 	'HTTP::Status' => 0,
 );
 
-if(($^O ne 'MSWin32') && ($^O ne 'openbsd')) {
-	# Doesn't work on Windows or compile on OpenBSD
-	$prereq_pm{'IO::Compress::Brotli'} = 0.003;
+if(($^O ne 'MSWin32') && ($^O ne 'openbsd') && ($^O ne 'freebsd')) {
+	# Doesn't work on Windows or compile on OpenBSD/FreeBSD
+	# Also doesn't compile on Arm on Linux, so let's give up
+	# $prereq_pm{'IO::Compress::Brotli'} = 0.003;
+}
+
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
 }
 
 WriteMakefile(
 	NAME	=> 'CGI::Buffer',
 	AUTHOR	=> q{Nigel Horne <njh@bandsman.co.uk>},
-	VERSION_FROM				=> 'lib/CGI/Buffer.pm',
+	VERSION_FROM			=> 'lib/CGI/Buffer.pm',
 	ABSTRACT_FROM			 => 'lib/CGI/Buffer.pm',
 		((defined($ExtUtils::MakeMaker::VERSION) &&
 		 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
@@ -45,16 +57,16 @@ WriteMakefile(
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
 		'autodie' => 0,
+		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		# 'Test::NoWarnings' => 0,
 		'Test::TempDir::Tiny' => 0,
-		'DateTime' => 0,
+		'DateTime' => 0
 		# 'Test::Kwalitee' => 0,
-		'WWW::RT::CPAN' => 0
 	}, PREREQ_PM  => \%prereq_pm,
-	dist	=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-	clean	 => { FILES => 'CGI-Buffer-*' },
+	clean => { FILES => 'CGI-Buffer-*'
+	}, dist => $dist,
 	META_MERGE		=> {
 		'meta-spec' => { version => 2 },
 		resources => {

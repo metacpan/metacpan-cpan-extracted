@@ -13,6 +13,7 @@ struct ClassMeta {
   enum MetaType type : 8;
   enum ReprType repr : 8;
 
+  unsigned int abstract : 1;
   unsigned int begun : 1;
   unsigned int sealed : 1;
   unsigned int role_is_invokable : 1;
@@ -188,6 +189,7 @@ void ObjectPad__boot_classes(pTHX);
 extern struct RoleEmbedding ObjectPad__embedding_standalone;
 
 #ifdef HAVE_UNOP_AUX
+/*  this was only added in Perl 5.22.0 */
 #  define METHSTART_CONTAINS_FIELD_BINDINGS
 
 /* We'll reserve the top two bits of a UV for storing the `type` value for a

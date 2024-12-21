@@ -1,5 +1,13 @@
 Revision history for Object-Pad
 
+0.817   2024-12-20
+        [CHANGES]
+         * Initial attempt at supporting an `:abstract` attribute on classes.
+           Similar to roles but much simpler and easier to implement
+         * Much internal reärrangement of the way OP_METHSTART is set up, to
+           hopefully allow more seamless integration with upcoming core perl
+           `faster-signatures` branch work
+
 0.816   2024-11-25
         [CHANGES]
          * Rewrote module introduction documentation, emphasising the relating

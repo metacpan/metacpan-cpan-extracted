@@ -1,3 +1,10 @@
+0.03 2024-12-20T13:26:01+01:00
+ - Add tests.
+ - Improve order of check in argument condition.
+ - Rename example file to better name.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.02 2022-05-19T17:00:17+02:00
  - Add tests for missing input values (field and subfield).
  - Fix test dependencies.

@@ -1,5 +1,12 @@
 Revision history for OpenTelemetry-Exporter-OTLP
 
+0.020     2024-12-20 22:56:46+00:00 Europe/London
+
+    * Add 'isa' as a dependency and reduce the minimum supported Perl
+      version to 5.30. If you are running 5.30 please consider installing
+      Type::Tiny::XS which should improve the performance of these 'isa'
+      checks.
+
 0.019     2024-12-13 23:20:04+00:00 Europe/London
 
     * Fix an issue with the default value of the retries parameter

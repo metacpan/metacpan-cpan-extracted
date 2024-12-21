@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.816;
+package Object::Pad::MOP::Class 0.817;
 
 use v5.18;
 use warnings;
@@ -155,6 +155,12 @@ An optional name of a superclass that this class will extend. These options
 are synonyms; new code should use C<isa>, as C<extends> will eventually be
 removed.
 
+=item abstract => BOOL
+
+Optionally; if given a true value the newly-created class will be declared as
+abstract, as if the L<C<:abstract>|Object::Pad/:abstract> attribute had been
+applied.
+
 =back
 
 Once created, this metaclass must be sealed using the L</seal> method before
@@ -214,6 +220,13 @@ sub begin_role  { shift->_create_role ( shift, _set_compclassmeta => 1, @_ ); }
 
 Exactly one of these methods will return true, depending on whether this
 metaclass instance represents a true C<class>, or a C<role>.
+
+=head2 is_abstract
+
+   $bool = $metaclass->is_abstract;
+
+True on a C<role>, or a C<class> that was declared with the C<:abstract>
+attribute.
 
 =head2 name
 

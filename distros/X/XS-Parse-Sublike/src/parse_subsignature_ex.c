@@ -496,16 +496,105 @@ struct SignatureParsingContext {
   OP *slurpy_elem;
 };
 
-static void free_parsing_ctx(pTHX_ void *_ctx)
+static void free_parsing_ctx(pTHX_ void *_sigctx)
 {
-  struct SignatureParsingContext *ctx = _ctx;
+  struct SignatureParsingContext *sigctx = _sigctx;
   /* TODO the rest */
-  if(ctx->named_details)
-    SvREFCNT_dec((SV *)ctx->named_details);
+  if(sigctx->named_details)
+    SvREFCNT_dec((SV *)sigctx->named_details);
 }
 
-#define parse_sigelem(ctx, flags)  S_parse_sigelem(aTHX_ ctx, flags)
-static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
+#define sigctx_add_param(sigctx, paramctx) S_sigctx_add_param(aTHX_ sigctx, paramctx)
+static void S_sigctx_add_param(pTHX_ struct SignatureParsingContext *sigctx, struct XPSSignatureParamContext *paramctx)
+{
+  if(paramctx->is_named) {
+    /* A named scalar */
+
+    if(paramctx->namelen) {
+      if(!sigctx->named_details)
+        sigctx->named_details = newHV();
+
+      struct NamedParamDetails *details;
+      Newx(details, 1, struct NamedParamDetails);
+      *details = (struct NamedParamDetails){
+        .padix       = paramctx->padix,
+        .is_required = !paramctx->defop,
+      };
+
+      hv_store(sigctx->named_details, paramctx->namepv, paramctx->namelen, newSVpvx(details), 0);
+    }
+
+    sigctx->named_elem_defops = op_append_elem(OP_LINESEQ, sigctx->named_elem_defops,
+        paramctx->op);
+
+    /* Introduce the named parameter variable so later expressions can see it.
+     * This is done implicitly by newSTATEOP() for positional ones, but we
+     * must do it manually here.
+     */
+    intro_my();
+  }
+  else if(paramctx->sigil == '$') {
+    /* A positional scalar */
+
+    /* This call to newSTATEOP() must come AFTER parsing the defaulting
+     * expression because it involves an implicit intro_my() and so we must
+     * not introduce the new parameter variable beforehand (RT155630)
+     */
+    if(paramctx->op)
+      sigctx->positional_elems = op_append_list(OP_LINESEQ, sigctx->positional_elems,
+          newSTATEOP(0, NULL, paramctx->op));
+
+    PL_parser->sig_elems++;
+    if(paramctx->defop)
+      PL_parser->sig_optelems++;
+  }
+  else {
+    /* The final slurpy */
+    assert(paramctx->sigil == '@' || paramctx->sigil == '%');
+
+    if(paramctx->varop)
+      sigctx->slurpy_elem = newSTATEOP(0, NULL, paramctx->varop);
+
+    PL_parser->sig_slurpy = paramctx->sigil;
+  }
+}
+
+void XPS_signature_add_param(pTHX_ struct XSParseSublikeContext *ctx, struct XPSSignatureParamDetails *details)
+{
+  /* We know that ctx is really a struct XPSContextWithPointer */
+  struct SignatureParsingContext *sigctx = ((struct XPSContextWithPointer *)ctx)->sigctx;
+
+  if(details->ver != XSPARSESUBLIKE_ABI_VERSION)
+    croak("ABI version mismatch in .ver of XPSSignatureParamDetails structure passed to xps_signature_add_param()");
+
+  struct XPSSignatureParamContext paramctx = {
+    .is_named = false,
+    .sigil = details->sigil,
+    .padix = details->padix,
+    .varop = NULL, /* wil be set below */
+    .defop = NULL,
+  };
+
+  char padname_sigil = PadnamePV(PadnamelistARRAY(PL_comppad_name)[details->padix])[0];
+  assert(padname_sigil == details->sigil);
+  PERL_UNUSED_VAR(padname_sigil);
+
+  paramctx.varop = newUNOP_AUX(OP_ARGELEM, 0, NULL, INT2PTR(UNOP_AUX_item *, (PL_parser->sig_elems)));
+  switch(details->sigil) {
+    case '$': paramctx.varop->op_private |= OPpARGELEM_SV; break;
+    case '@': paramctx.varop->op_private |= OPpARGELEM_AV; break;
+    case '%': paramctx.varop->op_private |= OPpARGELEM_HV; break;
+  }
+  paramctx.varop->op_targ = details->padix;
+
+  if(details->sigil == '$')
+    paramctx.op = paramctx.varop;
+
+  sigctx_add_param(sigctx, &paramctx);
+}
+
+#define parse_sigelem(sigctx, flags)  S_parse_sigelem(aTHX_ sigctx, flags)
+static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *sigctx, U32 flags)
 {
   bool permit_attributes = flags & PARSE_SUBSIGNATURE_PARAM_ATTRIBUTES;
 
@@ -525,8 +614,8 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags
     c = lex_peek_unichar(0);
   }
 
-  char sigil = c;
-  switch(sigil) {
+  paramctx.sigil = c;
+  switch(paramctx.sigil) {
     case '$': private = OPpARGELEM_SV; break;
     case '@': private = OPpARGELEM_AV; break;
     case '%': private = OPpARGELEM_HV; break;
@@ -542,7 +631,6 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags
   lex_read_unichar(0);
 
   STRLEN lexname_len = 0;
-  struct NamedParamDetails *details = NULL;
 
   if(isIDFIRST_uni(lex_peek_unichar(0))) {
     lex_read_unichar(0);
@@ -557,16 +645,10 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags
     paramctx.padix = pad_add_name_pvn(lexname, lexname_len, 0, NULL, NULL);
 
     if(paramctx.is_named) {
-      if(!ctx->named_details)
-        ctx->named_details = newHV();
+      paramctx.namepv = lexname + 1;
+      paramctx.namelen = lexname_len - 1;
 
-      Newx(details, 1, struct NamedParamDetails);
-      *details = (struct NamedParamDetails){
-        .padix       = paramctx.padix,
-        .is_required = true,
-      };
-
-      hv_store(ctx->named_details, lexname + 1, lexname_len - 1, newSVpvx(details), 0);
+      /* named params don't get an individual varop */
     }
     else {
       paramctx.varop = newUNOP_AUX(OP_ARGELEM, 0, NULL, INT2PTR(UNOP_AUX_item *, (parser->sig_elems)));
@@ -618,23 +700,18 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags
     }
   }
 
-  if(sigil == '$') {
+  if(paramctx.sigil == '$') {
     if(paramctx.is_named) {
     }
     else {
       if(parser->sig_slurpy)
         yyerror("Slurpy parameters not last");
-
-      parser->sig_elems++;
     }
 
     bool default_if_undef = false, default_if_false = false;
     if(lex_consume("=") ||
         (default_if_undef = lex_consume("//=")) ||
         (default_if_false = lex_consume("||="))) {
-      if(!paramctx.is_named)
-        parser->sig_optelems++;
-
       OP *defexpr = parse_termexpr(0);
 
       if(paramctx.is_named) {
@@ -657,8 +734,6 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags
         defop->op_next = existsop; /* start of this fragment */
         assignop->op_next = defop; /* after assign, stop this fragment */
 
-        details->is_required = false;
-
         paramctx.op    = defop;
         paramctx.defop = defop;
       }
@@ -676,7 +751,7 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags
 #endif
 
         OP *defop = (OP *)alloc_LOGOP(OP_ARGDEFELEM, defexpr, LINKLIST(defexpr));
-        defop->op_targ = (PADOFFSET)(parser->sig_elems - 1);
+        defop->op_targ = (PADOFFSET)parser->sig_elems;
         defop->op_private = private;
 
         paramctx.varop->op_flags |= OPf_STACKED;
@@ -706,10 +781,6 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags
     if(parser->sig_slurpy)
       yyerror("Multiple slurpy parameters not allowed");
 
-    ctx->slurpy_elem = newSTATEOP(0, NULL, paramctx.varop);
-
-    parser->sig_slurpy = sigil;
-
     if(lex_peek_unichar(0) == '=')
       yyerror("A slurpy parameter may not have a default value");
   }
@@ -726,37 +797,26 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags
   /* Only after we've run the post_defop hooks can we actually consume the
    * result in paramctx.op
    */
-  if(paramctx.is_named) {
-    ctx->named_elem_defops = op_append_elem(OP_LINESEQ, ctx->named_elem_defops,
-        paramctx.op);
-
-    /* Introduce the named parameter variable so later expressions can see it.
-     * This is done implicitly by newSTATEOP() for positional ones, but we
-     * must do it manually here.
-     */
-    intro_my();
-  }
-  else {
-    /* This call to newSTATEOP() must come AFTER parsing the defaulting
-     * expression because it involves an implicit intro_my() and so we must
-     * not introduce the new parameter variable beforehand (RT155630)
-     */
-    ctx->positional_elems = op_append_list(OP_LINESEQ, ctx->positional_elems,
-        newSTATEOP(0, NULL, paramctx.op));
-  }
+  sigctx_add_param(sigctx, &paramctx);
 }
 
-OP *XPS_parse_subsignature_ex(pTHX_ int flags)
+OP *XPS_parse_subsignature_ex(pTHX_ int flags,
+  struct XPSContextWithPointer *ctx,
+  struct HooksAndData hooksanddata[],
+  size_t nhooks)
 {
   /* Mostly reconstructed logic from perl 5.28.0's toke.c and perly.y
    */
   yy_parser *parser = PL_parser;
-  struct SignatureParsingContext ctx = { 0 };
+  struct SignatureParsingContext sigctx = { 0 };
+
+  if(ctx)
+    ctx->sigctx = &sigctx;
 
   assert((flags & ~(PARSE_SUBSIGNATURE_NAMED_PARAMS|PARSE_SUBSIGNATURE_PARAM_ATTRIBUTES)) == 0);
 
   ENTER;
-  SAVEDESTRUCTOR_X(&free_parsing_ctx, &ctx);
+  SAVEDESTRUCTOR_X(&free_parsing_ctx, &sigctx);
 
   SAVEIV(parser->sig_elems);
   SAVEIV(parser->sig_optelems);
@@ -766,9 +826,18 @@ OP *XPS_parse_subsignature_ex(pTHX_ int flags)
   parser->sig_optelems = 0;
   parser->sig_slurpy = 0;
 
+  IV hooki;
+  const struct XSParseSublikeHooks *hooks;
+  void *hookdata;
+
+  FOREACH_HOOKS_FORWARD {
+    if(hooks->ver >= 7 && hooks->start_signature)
+      (*hooks->start_signature)(aTHX_ &(ctx->ctx), hookdata);
+  }
+
   while(lex_peek_unichar(0) != ')') {
     lex_read_space(0);
-    parse_sigelem(&ctx, flags);
+    parse_sigelem(&sigctx, flags);
 
     if(PL_parser->error_count) {
       LEAVE;
@@ -799,8 +868,13 @@ endofelems:
     "The signatures feature is experimental");
 #endif
 
+  FOREACH_HOOKS_REVERSE {
+    if(hooks->ver >= 7 && hooks->finish_signature)
+      (*hooks->finish_signature)(aTHX_ &(ctx->ctx), hookdata);
+  }
+
   char sig_slurpy = parser->sig_slurpy;
-  if(!sig_slurpy && ctx.named_details)
+  if(!sig_slurpy && sigctx.named_details)
     sig_slurpy = '%';
 
   UNOP_AUX_item *aux = make_argcheck_aux(
@@ -811,10 +885,10 @@ endofelems:
   OP *checkop = newUNOP_AUX(OP_ARGCHECK, 0, NULL, aux);
 
   OP *ops = op_prepend_elem(OP_LINESEQ, newSTATEOP(0, NULL, NULL),
-      op_prepend_elem(OP_LINESEQ, checkop, ctx.positional_elems));
+      op_prepend_elem(OP_LINESEQ, checkop, sigctx.positional_elems));
 
-  if(ctx.named_details) {
-    UV n_params = HvKEYS(ctx.named_details);
+  if(sigctx.named_details) {
+    UV n_params = HvKEYS(sigctx.named_details);
 
     struct ArgElemsNamedAux *aux = safemalloc(
       sizeof(struct ArgElemsNamedAux) + n_params * sizeof(struct ArgElemsNamedParam)
@@ -825,9 +899,9 @@ endofelems:
 
     struct ArgElemsNamedParam *param = &aux->params[0];
 
-    hv_iterinit(ctx.named_details);
+    hv_iterinit(sigctx.named_details);
     HE *iter;
-    while((iter = hv_iternext(ctx.named_details))) {
+    while((iter = hv_iternext(sigctx.named_details))) {
       STRLEN namelen;
       const char *namepv = HePV(iter, namelen);
       struct NamedParamDetails *details = (struct NamedParamDetails *)SvPVX(HeVAL(iter));
@@ -853,10 +927,9 @@ endofelems:
     OP *argelems_named_op = newUNOP_AUX(OP_CUSTOM, 0, NULL, (UNOP_AUX_item *)aux);
     argelems_named_op->op_ppaddr = &pp_argelems_named;
     if(PL_parser->sig_slurpy) {
-      assert(ctx.slurpy_elem);
-      if(ctx.slurpy_elem->op_type == OP_LINESEQ) {
+      if(sigctx.slurpy_elem && sigctx.slurpy_elem->op_type == OP_LINESEQ) {
         /* A real named slurpy variable */
-        OP *o = OpSIBLING(cLISTOPx(ctx.slurpy_elem)->op_first);
+        OP *o = OpSIBLING(cLISTOPx(sigctx.slurpy_elem)->op_first);
         assert(o);
         assert(o->op_type == OP_ARGELEM);
 
@@ -874,8 +947,10 @@ endofelems:
                                                                          0;
       }
 
-      op_free(ctx.slurpy_elem);
-      ctx.slurpy_elem = NULL;
+      if(sigctx.slurpy_elem) {
+        op_free(sigctx.slurpy_elem);
+        sigctx.slurpy_elem = NULL;
+      }
     }
 
     ops = op_append_list(OP_LINESEQ, ops,
@@ -883,13 +958,13 @@ endofelems:
     ops = op_append_list(OP_LINESEQ, ops,
         argelems_named_op);
 
-    if(ctx.named_elem_defops)
+    if(sigctx.named_elem_defops)
       /* TODO: append each elem individually */
       ops = op_append_list(OP_LINESEQ, ops,
-          ctx.named_elem_defops);
+          sigctx.named_elem_defops);
   }
-  else if(ctx.slurpy_elem) {
-    ops = op_append_list(OP_LINESEQ, ops, ctx.slurpy_elem);
+  else if(sigctx.slurpy_elem) {
+    ops = op_append_list(OP_LINESEQ, ops, sigctx.slurpy_elem);
   }
 
   /* a nextstate at the end handles context correctly for an empty
@@ -941,6 +1016,10 @@ void XPS_boot_parse_subsignature_ex(pTHX)
 }
 
 #else /* !HAVE_PERL_VERSION(5, 26, 0) */
+
+void XPS_signature_add_param(pTHX_ struct XSParseSublikeContext *ctx, struct XPSSignatureParamDetails *details)
+{
+}
 
 void XPS_register_subsignature_attribute(pTHX_ const char *name, const struct XPSSignatureAttributeFuncs *funcs, void *funcdata)
 {

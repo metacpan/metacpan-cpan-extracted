@@ -1,34 +1,25 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.18;
 use warnings;
 
 use Test2::V0 0.000148; # is_refcount
 
-BEGIN {
-   plan skip_all => "Future >= 0.49 is not available"
-      unless eval { require Future;
-                    Future->VERSION( '0.49' ) };
-   plan skip_all => "Future::AsyncAwait >= 0.45 is not available"
-      unless eval { require Future::AsyncAwait;
-                    Future::AsyncAwait->VERSION( '0.45' ) };
-   plan skip_all => "Object::Pad >= 0.800 is not available"
-      unless eval { require Object::Pad;
-                    Object::Pad->VERSION( '0.800' ) };
+use Test2::Require::Module 'Future' => '0.49';
+use Test2::Require::Module 'Future::AsyncAwait' => '0.45';
+use Test2::Require::Module 'Object::Pad' => '0.800';
 
+BEGIN {
    # If Future::XS is installed, then check it's at least 0.08; earlier
    # versions will crash
    if( eval { require Future::XS } ) {
       plan skip_all => "Future::XS is installed but it is older than 0.08"
          unless eval { Future::AsyncAwait->VERSION( '0.08' ); };
    }
-
-   Future::AsyncAwait->import;
-   Object::Pad->import;
-
-   diag( "Future::AsyncAwait $Future::AsyncAwait::VERSION, " .
-         "Object::Pad $Object::Pad::VERSION" );
 }
+
+use Future::AsyncAwait;
+use Object::Pad;
 
 # async method
 {
@@ -80,7 +71,7 @@ BEGIN {
    my $waitf;
 
    role Role { async method m { await $waitf = Future->new } }
-   class Class :does(Role) {}
+   class Class { apply Role; }
 
    my $obj = Class->new;
 

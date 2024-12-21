@@ -1,5 +1,5 @@
 package Data::Frame::Indexer::Role;
-$Data::Frame::Indexer::Role::VERSION = '0.006003';
+$Data::Frame::Indexer::Role::VERSION = '0.006004';
 # ABSTRACT: Role for Data::Frame indexer
 
 use Data::Frame::Role;
@@ -33,7 +33,7 @@ Data::Frame::Indexer::Role - Role for Data::Frame indexer
 
 =head1 VERSION
 
-version 0.006003
+version 0.006004
 
 =head1 ATTRIBUTES
 

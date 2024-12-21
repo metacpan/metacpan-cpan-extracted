@@ -22,7 +22,7 @@ use constant XML_SIMPLE_INDENT => 1;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 #======================================================================
 # ATTRIBUTES
@@ -231,6 +231,9 @@ sub plain_text {
 
   # remove all remaining XML tags
   $txt =~ s/<[^>]+>//g;
+
+  # decode entities
+  decode_entities($txt);
 
   return $txt;
 }
@@ -913,7 +916,7 @@ added for having a complete Zip member name.
 =item images
 
 a hashref of images within this package part. Keys of the hash are image I<alternative texts>.
-If present, the alternative I<title> will be prefered; otherwise the alternative I<description> will be taken
+If present, the alternative I<title> will be preferred; otherwise the alternative I<description> will be taken
 (note : the I<title> field was displayed in Office 2013 and 2016, but more recent versions only display
 the I<description> field -- see
 L<MsOffice documentation|https://support.microsoft.com/en-us/office/add-alternative-text-to-a-shape-picture-chart-smartart-graphic-or-other-object-44989b2a-903c-4d9a-b742-6a75b451c669>).
@@ -1169,7 +1172,7 @@ Options to this method are :
 
 =item color
 
-The highligting color for visible marks. This should be a valid
+The highlighting color for visible marks. This should be a valid
 highlighting color, i.e black, blue, cyan, darkBlue, darkCyan,
 darkGray, darkGreen, darkMagenta, darkRed, darkYellow, green,
 lightGray, magenta, none, red, white or yellow. Default is yellow.
@@ -1192,7 +1195,7 @@ Default is C<< </%s> >>.
 
 =item ignore
 
-A regexp for deciding wich bookmarks will not be revealed. Default is C<< qr/^_/ >>,
+A regexp for deciding which bookmarks will not be revealed. Default is C<< qr/^_/ >>,
 because bookmarks with an initial underscore are usually technical bookmarks inserted
 automatically by MsWord, such as C<_GoBack> or C<_Toc53196147>.
 

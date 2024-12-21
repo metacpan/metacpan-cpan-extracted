@@ -66,6 +66,7 @@ t/80await+defer.t
 t/80await+dynamically.t
 t/80await+matchcase.t
 t/80await+SKT.t
+t/80extended+async.t
 t/81async-method+dynamically.t
 t/81memory-growth.t
 t/82devel-mat-dumper-helper.t

@@ -15,7 +15,7 @@ my @ccs_binops = qw(
   and2 or2 xor shiftleft shiftright
 );
 
-our $VERSION = '1.23.27'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.28'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (

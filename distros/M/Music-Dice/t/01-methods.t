@@ -10,12 +10,14 @@ subtest defaults => sub {
     my $obj = new_ok 'Music::Dice';
     is $obj->flats, 1, 'flats';
     is $obj->beats, 4, 'beats';
+    is $obj->semitones, 12, 'semitones';
     is_deeply $obj->phrase_pool, [qw(wn dhn hn dqn qn den en)], 'phrase_pool';
     is_deeply $obj->phrase_weights, [(1) x @{$obj->phrase_pool } ], 'phrase_weights';
     is_deeply $obj->phrase_groups, [(1) x @{$obj->phrase_pool } ], 'phrase_groups';
     is_deeply $obj->octaves, [2 .. 6], 'octaves';
     is_deeply $obj->notes, [qw(C Db D Eb E F Gb G Ab A Bb B)], 'notes';
-    is_deeply $obj->intervals, [ (1) x 12 ], 'intervals';
+    is $obj->identity, 0, 'identity';
+    is_deeply $obj->intervals, [ (1) x $obj->semitones ], 'intervals';
     is_deeply $obj->chord_triads, [qw(major minor diminished augmented custom)], 'chord_triads';
     is_deeply $obj->chord_triad_weights, [qw(2 2 1 1 1)], 'chord_triad_weights';
     is_deeply $obj->chord_qualities_major, [qw(add2 sus2 add4 sus4 -5 -6 6 M7 7 add9)], 'chord_qualities_major';
@@ -29,6 +31,9 @@ subtest defaults => sub {
     is_deeply $obj->tonnetzen, [qw(P R L N S H)], 'tonnetzen';
     is_deeply $obj->tonnetzen_7, [qw(S23 S32 S34 S43 S56 S65 C32 C34 C65)], 'tonnetzen_7';
     is_deeply $obj->rhythmic_phrase_constraints, [3,4,5], 'rhythmic_phrase_constraints';
+    $obj = new_ok 'Music::Dice' => [ identity => 1 ];
+    is $obj->identity, 1, 'identity';
+    is_deeply $obj->intervals, [ 0, ((1) x $obj->semitones), $obj->semitones ], 'intervals';
     $obj = new_ok 'Music::Dice' => [ phrase_pool => 'all' ];
     is @{ $obj->phrase_pool }, 32, 'all phrase_pool';
 };
@@ -56,6 +61,8 @@ subtest scales => sub {
     is_deeply $obj->intervals, [5], 'C-F only interval';
     $obj = new_ok 'Music::Dice' => [ notes => [qw(60 62 64 65 67 69 71)] ];
     is_deeply $obj->notes, [qw(60 62 64 65 67 69 71)], 'midinum notes';
+    $obj = new_ok 'Music::Dice' => [ identity => 1, scale_name => 'major' ];
+    is_deeply $obj->intervals, [ 0, @$maj, $obj->semitones ], 'major identity intervals';
 };
 
 subtest rolls => sub {
