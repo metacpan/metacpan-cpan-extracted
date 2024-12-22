@@ -20,5 +20,6 @@ t/12_number.t
 t/13_object.t
 t/14_array.t
 t/15_enum.t
+t/21_complex.t
 META.yml
 MANIFEST

@@ -97,7 +97,7 @@ my %WriteMakefileArgs = (
     "File::chdir"                             => 0,
     "IPC::System::Simple"                     => "1.25",
     "Moose"                                   => 0,
-    "Path::Tiny"                              => 0,
+    "Path::Tiny"                              => "0.130",
     "Perl::Tidy"                              => 0,
     "PerlX::Maybe"                            => "0.003",
     "Pod::Markdown"                           => "1.400",
@@ -116,7 +116,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"    => "0.000121",
     "Test::Script" => "1.10"
   },
-  "VERSION" => "2.77",
+  "VERSION" => "2.78",
   "test"    => {
     "TESTS" => "t/*.t"
   }

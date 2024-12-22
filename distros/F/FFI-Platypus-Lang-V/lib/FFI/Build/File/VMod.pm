@@ -4,7 +4,7 @@ use experimental qw( signatures );
 use stable qw( postderef );
 use true;
 
-package FFI::Build::File::VMod 0.01 {
+package FFI::Build::File::VMod 0.02 {
 
     # ABSTRACT: Class to track V source in FFI::Build
 
@@ -13,7 +13,7 @@ package FFI::Build::File::VMod 0.01 {
     use constant default_encoding => ':utf8';
     use File::Which qw( which );
     use PerlX::Maybe qw( maybe );
-    use Path::Tiny ();
+    use Path::Tiny 0.130 ();
     use File::chdir;
 
 
@@ -132,7 +132,7 @@ FFI::Build::File::VMod - Class to track V source in FFI::Build
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -147,9 +147,9 @@ Makefile.PL:
  
  WriteMakefile($fbmm->mm_args(
      ABSTRACT => 'Perl/V Extension',
-     DISTNAME => 'V-FFI',
-     NAME => "V::FFI",
-     VERSION => '1.00',
+     DISTNAME => 'Foo',
+     NAME     => "Foo",
+     VERSION  => '1.00',
  ));
  
  sub MY::postamble {

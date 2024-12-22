@@ -1,5 +1,8 @@
 Revision history for perl module XML::Hash::XS
 
+0.59    2024-12-21
+    - Fix typo
+
 0.58    2024-12-20
     - Fix for big endian architecture
 

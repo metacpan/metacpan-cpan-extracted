@@ -87,7 +87,35 @@ is(
             call slurp_raw => "Hello world\n";
         }
     },
-    'extract',
+    'method ->extract',
+);
+
+$dir->child('etc/foo.yml')->spew_raw("---\nb: config\n");
+$dir->child('foo.txt')->remove;
+$dir->child('foo.bin')->spew_raw("Replaced Hello world\n");
+
+is(
+    Data::Section::Pluggable->new(prefer_filesystem => $dir),
+    object {
+        call get_data_section => hash {
+            field 'foo.txt' => "plain hello world\n";
+            field 'foo.bin' => "Replaced Hello world\n";
+            field 'etc/foo.yml' => "---\nb: config\n";
+            etc;
+        };
+    },
+    'attribute ->prefer_filesystem',
+);
+
+is(
+    Data::Section::Pluggable->new(filename => "corpus/lib/Bugs.pm"),
+    object {
+        call get_data_section => hash {
+            field 'foo.txt' => "Hello World!\n";
+            end;
+        };
+    },
+    'attribute ->filename',
 );
 
 done_testing;

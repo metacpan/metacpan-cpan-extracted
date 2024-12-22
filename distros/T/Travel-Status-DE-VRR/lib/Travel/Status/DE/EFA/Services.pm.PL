@@ -34,6 +34,7 @@ sub load_instance {
 # GVH: 403
 # Rolph: 404
 # VRT: Encoding issues
+# VVSt: NXDOMAIN
 my %efa_instance = (
 	BSVG => {
 		url  => 'https://bsvg.efa.de/bsvagstd',
@@ -54,6 +55,10 @@ my %efa_instance = (
 	NVBW => {
 		url  => 'https://www.efa-bw.de/nvbw',
 		name => 'Nahverkehrsgesellschaft Baden-Württemberg',
+	},
+	NWL => {
+		url  => 'https://westfalenfahrplan.de/nwl-efa',
+		name => 'Nahverkehr Westfalen-Lippe',
 	},
 	VAG => {
 		url  => 'https://efa.vagfr.de/vagfr3',
@@ -95,7 +100,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '3.03';
+our $VERSION = '3.04';
 
 # Most of these have been adapted from
 # <https://github.com/public-transport/transport-apis> and

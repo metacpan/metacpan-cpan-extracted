@@ -4,7 +4,7 @@ use experimental qw( signatures );
 use stable qw( postderef );
 use true;
 
-package FFI::Platypus::Lang::V 0.01 {
+package FFI::Platypus::Lang::V 0.02 {
 
     # ABSTRACT: Documentation and tools for using Platypus with the V programming language
 
@@ -39,7 +39,7 @@ FFI::Platypus::Lang::V - Documentation and tools for using Platypus with the V p
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,9 @@ Prints:
 =head1 DESCRIPTION
 
 This module provides types and documentation for using the V
-programming language with L<FFI::Platypus>.
+programming language with L<FFI::Platypus>.  For details on
+bundling a V project with your Perl distribution see
+L<FFI::Build::File::VMod>.
 
 =head1 METHODS
 
@@ -76,6 +78,18 @@ programming language with L<FFI::Platypus>.
  my $hashref = FFI::Platypus::Lang::V->native_type_map;
 
 Returns a mapping of V primitive types to Platypus types.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<https://vlang.io/>
+
+=item L<FFI::Platypus>
+
+=item L<FFI::Build::File::VMod>
+
+=back
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package App::expskip ;  
-our $VERSION = '0.113' ; 
-our $DATE = '2022-10-26T18:46+09:00' ; 
+our $VERSION = '0.114' ; 
+our $DATE = '2024-12-22T13:46+09:00' ; 
 
 =encoding utf8
 

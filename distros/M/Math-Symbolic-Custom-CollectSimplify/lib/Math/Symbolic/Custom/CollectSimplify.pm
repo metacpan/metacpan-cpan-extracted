@@ -15,11 +15,11 @@ Math::Symbolic::Custom::CollectSimplify - Simplify Math::Symbolic expressions us
 
 =head1 VERSION
 
-Version 0.1
+Version 0.2
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use Math::Symbolic qw(:all);
 use base 'Math::Symbolic::Custom::Simplification';
@@ -69,18 +69,20 @@ use Math::Symbolic::Custom::Collect 0.21;
 =head1 DESCRIPTION
 
 Redefines L<Math::Symbolic>'s "simplify()" method using the Math::Symbolic module extension class L<Math::Symbolic::Custom::Simplification>. This new simplify() method uses
-"to_collected()" in L<Math::Symbolic::Custom::Collect>. Because "to_collected()" doesn't always produce a simpler expression,
-this module uses a measure of expression complexity based on the number of constants, variables and operators to try to determine 
-if the resultant expression is any simpler; if not it will return the expression passed to it.
+"to_collected()" in L<Math::Symbolic::Custom::Collect>. 
+
+Be aware that "to_collected()" doesn't always produce a simpler expression from the inputted expression, because it does not factorize expressions. Setting the package variable
+C<$Math::Symbolic::Custom::CollectSimplify::TEST_COMPLEXITY> to 1 will make the simplify() routine check to see if the resultant expression is any simpler (using a measure 
+of expression complexity based on the number of constants, variables and operators) and if not it will return the expression passed to it. Use this if you want to make sure you
+are getting the simplest possible expression. This behaviour is off by default.
 
 =cut
+
+our $TEST_COMPLEXITY = 0;
 
 sub simplify {
     my $f1 = shift;
     
-    # calculate the complexity of the input expression
-    my $f1_score = test_complexity($f1);
-
     # use to_collected() to (potentially) simplify it
     my $f2 = $f1->to_collected();
 
@@ -90,9 +92,17 @@ sub simplify {
 
     # compare on complexity and pass through the input expression
     # if the collected one is no simpler.
-    my $f2_score = test_complexity($f2);
 
-    return $f1_score > $f2_score ? $f2 : $f1;
+    if ( $TEST_COMPLEXITY ) {
+
+        my $f1_score = test_complexity($f1);
+        my $f2_score = test_complexity($f2);
+
+        return $f1_score > $f2_score ? $f2 : $f1;
+    }
+    else {
+        return $f2;
+    }
 }
 
 

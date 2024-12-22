@@ -49,6 +49,11 @@ sub gte {
     return $self;
 }
 
+sub min {
+    my ($self, $min, $opts) = @_;
+    return $self->gte($min, $opts);
+}
+
 sub lt {
     my ($self, $max, $opts) = @_;
     $opts = $opts || {};
@@ -71,6 +76,11 @@ sub lte {
         return;
     };
     return $self;
+}
+
+sub max {
+    my ($self, $max, $opts) = @_;
+    return $self->lte($max, $opts);
 }
 
 # value must be an integer

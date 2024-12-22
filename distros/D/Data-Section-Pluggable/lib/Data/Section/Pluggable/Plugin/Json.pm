@@ -3,7 +3,7 @@ use 5.020;
 use true;
 use experimental qw( signatures );
 
-package Data::Section::Pluggable::Plugin::Json 0.04 {
+package Data::Section::Pluggable::Plugin::Json 0.08 {
 
     # ABSTRACT: Data::Section::Pluggable Plugin for JSON
 
@@ -41,7 +41,7 @@ Data::Section::Pluggable::Plugin::Json - Data::Section::Pluggable Plugin for JSO
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 

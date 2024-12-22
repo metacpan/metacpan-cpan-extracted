@@ -42,6 +42,7 @@ sub safe_parse {
 
     my ($self, $data) = @_;
     my @errors = ();
+    my $valid = {};
     if (ref($data) ne 'HASH') {
         push @errors, {
             key   => undef,
@@ -51,6 +52,14 @@ sub safe_parse {
         for my $key (sort keys %{$self->{__struct__}}) {
             my $v = $self->{__struct__}{$key};
             my $val = $data->{$key};
+            
+            # if the value is not defined, try to transform it
+            if (!defined $val && scalar(@{$v->{transform}}) > 0) {
+                for my $transformer (@{$v->{transform}}) {
+                    $val = $transformer->($v, $val);
+                }
+            }
+
             try {
                 $v->parse($val);
             } catch {
@@ -60,14 +69,15 @@ sub safe_parse {
                     key   => $key,
                     error => $error_message,
                 };
-            }
+            };
+            $valid->{$key} = $val;
         }
     }
     if (scalar(@errors) > 0) {
         return (undef, [@errors])
     }
     my $classname = $self->{__as__};
-    my $valid = $classname ? bless {%$data}, $classname : {%$data};
+    $valid = bless $valid, $classname if $classname;
     return ($valid, undef);
 }
 

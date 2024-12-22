@@ -9,6 +9,7 @@ Makefile.PL
 README
 author.yml
 binary.txt
+corpus/lib/Bugs.pm
 corpus/lib/DataInCode.pm
 corpus/lib/DataOnly.pm
 corpus/lib/Foo.pm

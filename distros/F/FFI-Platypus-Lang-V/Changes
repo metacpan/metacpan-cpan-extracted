@@ -1,5 +1,8 @@
 Revision history for FFI-Platypus-Lang-V
 
+0.02      2024-12-21 04:43:04 -0700
+  - Bump required Path::Tiny to 0.130 for ->mkdir
+
 0.01      2024-12-18 18:15:08 -0700
   - initial version
 

@@ -1,5 +1,18 @@
 Revision history for Data-Section-Pluggable
 
+0.08      2024-12-21 08:20:14 -0700
+  - Add filename attribute (gh#10)
+
+0.07      2024-12-21 05:25:44 -0700
+  - Add prefer_filesystem attribute (gh#9)
+
+0.06      2024-12-21 05:23:36 -0700
+  - released by mistake, no changes
+
+0.05      2024-12-21 04:37:37 -0700
+  - Require Path::Tiny 0.130.  Older versions lack or have a buggy ->mkdir method
+    (gh#7, gh#8)
+
 0.04      2024-12-18 09:54:22 -0700
   - Added extract method (gh#6)
 

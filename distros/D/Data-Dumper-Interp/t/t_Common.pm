@@ -170,7 +170,7 @@ sub import {
   require Guard;
   Guard->import::into($target, qw(scope_guard guard));
 
-  use Data::Dumper::Interp 7.011 ();
+  use Data::Dumper::Interp 7.012 ();
 #OTOH, we _do_ want show stringified value of things like Path::Tiny
 #  unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
 #    # Unless we are testing DDI

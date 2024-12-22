@@ -1,6 +1,6 @@
 package Template::EmbeddedPerl;
 
-our $VERSION = '0.001011';
+our $VERSION = '0.001012';
 $VERSION = eval $VERSION;
 
 use warnings;
@@ -335,7 +335,7 @@ sub parse_template {
       $segment =~ s/\\${expr_marker}${close_tag}/${expr_marker}${close_tag}/g;
 
       # check the segment for comment lines 
-      $segment =~ s/^[ \t]*?${comment_mark}.*$/\\/mg;
+      $segment =~ s/^[ \t]*?${comment_mark}.*?(\\?)$/$1/mg; 
       $segment =~ s/^[ \t]*?\\${comment_mark}/${comment_mark}/mg;
 
       if($self->{interpolation}) {

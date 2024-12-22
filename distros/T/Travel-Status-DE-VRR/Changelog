@@ -1,3 +1,7 @@
+Travel::Status::DE::VRR 3.04 - Sun Dec 22 2024
+
+    * EFA: Add NWL service definition
+
 Travel::Status::DE::VRR 3.03 - Sat Nov 09 2024
 
     * efa-m: handle undefined platforms

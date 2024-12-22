@@ -18,7 +18,7 @@
     ((((uint32_t *) (p))[0] & 0xffff0000) == ((c0 << 24) | c1))
 
 #define xh_str_equal3(p, c0, c1, c2)                                    \
-    ((((uint32_t *) (p))[0] & 0xffffff00) == ((c0 << 24) | (c1 << 16) | (c2 << 8))
+    ((((uint32_t *) (p))[0] & 0xffffff00) == ((c0 << 24) | (c1 << 16) | (c2 << 8)))
 
 #define xh_str_equal4(p, c0, c1, c2, c3)                                \
     (*(uint32_t *) (p) == ((c0 << 24) | (c1 << 16) | (c2 << 8) | c3))

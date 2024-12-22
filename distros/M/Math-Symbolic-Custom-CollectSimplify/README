@@ -3,10 +3,9 @@ Math::Symbolic::Custom::CollectSimplify
 
 Simplify Math::Symbolic expressions using Math::Symbolic::Custom::Collect
 
-Redefines Math::Symbolic's "simplify()" method using the Math::Symbolic module extension class Math::Symbolic::Custom::Simplification. 
-This new simplify() method uses "to_collected()" in Math::Symbolic::Custom::Collect. Because "to_collected()" doesn't always produce a 
-simpler expression, this module uses a measure of expression complexity based on the number of constants, variables and operators to 
-try to determine if the resultant expression is any simpler; if not it will return the expression passed to it.
+Redefines Math::Symbolic's "simplify()" method using the Math::Symbolic module extension class Math::Symbolic::Custom::Simplification. This new simplify() method uses "to_collected()" in Math::Symbolic::Custom::Collect. 
+
+Be aware that "to_collected()" doesn't always produce a simpler expression from the inputted expression, because it does not factorize expressions. Setting the package variable $Math::Symbolic::Custom::CollectSimplify::TEST_COMPLEXITY to 1 will make the simplify() routine check to see if the resultant expression is any simpler (using a measure of expression complexity based on the number of constants, variables and operators) and if not it will return the expression passed to it. Use this if you want to make sure you are getting the simplest possible expression. This behaviour is off by default.
 
 INSTALLATION
 

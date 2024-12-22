@@ -34,11 +34,13 @@
             "Data::Structure::Util" : "0",
             "Data::Visitor" : "0.32",
             "Exporter" : "5.57",
+            "File::Basename" : "0",
             "List::Util" : "1.45",
             "Moose" : "0",
             "POSIX" : "0",
             "Regexp::Common" : "0",
             "Scalar::Util" : "0",
+            "Sub::Identify" : "0",
             "Term::ReadKey" : "0",
             "bigrat" : "0.65",
             "constant" : "0",
@@ -60,7 +62,6 @@
             "Encode" : "0",
             "English" : "0",
             "Env" : "0",
-            "File::Basename" : "0",
             "File::Path" : "0",
             "File::Spec" : "0",
             "File::Spec::Functions" : "0",
@@ -96,7 +97,7 @@
    "provides" : {
       "Data::Dumper::Interp" : {
          "file" : "lib/Data/Dumper/Interp.pm",
-         "version" : "7.012"
+         "version" : "7.013"
       }
    },
    "release_status" : "stable",
@@ -111,7 +112,7 @@
          "web" : "https://github.com/jimav/Data-Dumper-Interp"
       }
    },
-   "version" : "7.012",
+   "version" : "7.013",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "CC0-1.0"

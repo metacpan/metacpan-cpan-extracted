@@ -36,6 +36,12 @@ sub date {
     return $self->string({invalid_type_error => 'Not a date', %$opts})->date;
 }
 
+sub datetime {
+    my ($self, $opts) = @_;
+    $opts = $opts || {};
+    return $self->string({invalid_type_error => 'Not a datetime', %$opts})->datetime;
+}
+
 sub number {
     my ($self, $opts) = @_;
     $opts = $opts || {};

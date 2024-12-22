@@ -38,14 +38,27 @@ my $f2 = parse_from_string('(6*x+2)*(4+x)');
 my $f3 = parse_from_string('3*x+(2*(x+1))');
 
 my $f4 = $f1 + $f2 + $f3;
+my $f5 = parse_from_string('(x+1)*(x+2)*(x+3)');    # this expression will get longer, not shorter
 
 my $f4_s1 = $f4->simplify(); # default simplify() method
+my $f5_s1 = $f5->simplify();
 
 Math::Symbolic::Custom::CollectSimplify->register();
 
 my $f4_s2 = $f4->simplify(); # new simplify() method
+my $f5_s2 = $f5->simplify();
 
-ok(defined $f4_s2, "Simplify routine returns output");
-ok(length($f4_s2->to_string()) < length($f4_s1->to_string()), "New simplify routine returns shorter string than default");
+$Math::Symbolic::Custom::CollectSimplify::TEST_COMPLEXITY = 1;  # enable complexity check
+my $f5_s3 = $f5->simplify();
+
+ok(defined $f4_s2, "Simplify routine returns output 1");
+ok(length($f4_s2->to_string()) < length($f4_s1->to_string()), "New simplify routine returns shorter string than default 1");
+
+ok(defined $f5_s2, "Simplify routine returns output 2.1");
+ok(length($f5_s2->to_string()) > length($f4_s2->to_string()), "New simplify routine returns longer string than default 2.1");
+
+ok(defined $f5_s3, "Simplify routine returns output 2.2");
+ok(length($f5_s3->to_string()) <= length($f4_s2->to_string()), "New simplify routine returns shorter or equal string than default 2.2");
+
 
 

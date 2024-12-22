@@ -1,5 +1,9 @@
 The following logs changes for the CPAN distribution Template-EmbeddedPerl
 
+0.001012 21 December 2024
+          - Fixes for when you have multiline comments and it messes up
+            the line numbering for error messages.
+
 0.001011 05 December 2024
           - fixed issue with if/else/elsif not working properly
 

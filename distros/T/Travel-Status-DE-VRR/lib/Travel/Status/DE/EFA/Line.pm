@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.03';
+our $VERSION = '3.04';
 
 Travel::Status::DE::EFA::Line->mk_ro_accessors(
 	qw(direction mot name number operator route type valid));
@@ -57,7 +57,7 @@ requested station
 
 =head1 VERSION
 
-version 3.03
+version 3.04
 
 =head1 DESCRIPTION
 

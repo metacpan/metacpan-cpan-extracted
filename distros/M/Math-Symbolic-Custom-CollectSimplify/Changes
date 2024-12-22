@@ -1,5 +1,9 @@
 Revision history for Math-Symbolic-Custom-CollectSimplify
 
+0.2     Sat Dec 21 15:00 2024
+
+        - Made the complexity check optional and off by default
+
 0.1     Fri Dec 13 09:29 2024
 
         - First version

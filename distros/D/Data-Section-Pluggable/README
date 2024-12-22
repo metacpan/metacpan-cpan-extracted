@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.04
+    version 0.08
 
 SYNOPSIS
 
@@ -75,6 +75,20 @@ ATTRIBUTES
 
     The name of the package to read from __DATA__. If not specified, then
     the current package will be used.
+
+ prefer_filesystem
+
+    If provided, this is a directory containing files from where content
+    will be preferred over what is in the __DATA__ section, if available.
+    This file still must still exist in the __DATA__ section to be found.
+    This can be useful to do local testing with files on the filesystem,
+    but release a script or test a just one combined file.
+
+ filename
+
+    Read from the __DATA__ section of the given file instead of the current
+    Perl process. This can be useful for reading the __DATA__ section of a
+    Perl script or module without parsing or running it first.
 
 METHODS
 

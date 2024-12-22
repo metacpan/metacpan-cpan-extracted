@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.77 {
+package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.78 {
 
   use 5.020;
   use Moose;
@@ -47,6 +47,7 @@ package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.77 {
       PerlX::Maybe                          0.003
       AnyEvent::Open3::Simple               0.83
       Path::Class                           0.26
+      Path::Tiny                            0.130
       Mojolicious                           4.31
       Role::Tiny                            1.003001
       Test::More                            0.98
@@ -293,7 +294,7 @@ Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs - Special prereq handling
 
 =head1 VERSION
 
-version 2.77
+version 2.78
 
 =head1 SYNOPSIS
 
@@ -339,6 +340,10 @@ Require 0.83 for deprecation removals
 =item Path::Class
 
 Require 0.26 for spew
+
+=item Path::Tiny
+
+Require 0.130 for mkdir
 
 =item Mojolicious
 

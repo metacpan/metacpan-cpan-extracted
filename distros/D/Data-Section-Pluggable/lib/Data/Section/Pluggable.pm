@@ -4,16 +4,16 @@ use true;
 use experimental qw( signatures );
 use stable qw( postderef );
 
-package Data::Section::Pluggable 0.04 {
+package Data::Section::Pluggable 0.08 {
 
     # ABSTRACT: Read structured data from __DATA__
 
 
-    use Class::Tiny qw( package _formats _cache );
+    use Class::Tiny qw( package prefer_filesystem filename _formats _cache );
     use Exporter qw( import );
-    use Ref::Util qw( is_ref is_plain_hashref is_coderef is_plain_arrayref );
-    use MIME::Base64 qw( decode_base64 );
-    use Path::Tiny ();
+    use Ref::Util qw( is_ref is_plain_hashref is_coderef is_plain_arrayref is_blessed_ref );
+    use MIME::Base64 qw( decode_base64 encode_base64 );
+    use Path::Tiny 0.130 ();
     use Carp ();
 
     our @EXPORT_OK = qw( get_data_section );
@@ -32,6 +32,13 @@ package Data::Section::Pluggable 0.04 {
         unless(defined $self->package) {
             my $package = caller 2;
             $self->package($package);
+        }
+        foreach my $attr (qw( prefer_filesystem filename )) {
+            if(defined $self->$attr) {
+                unless(is_blessed_ref($self->$attr) && $self->$attr->isa('Path::Tiny')) {
+                    $self->$attr(Path::Tiny->new($self->$attr)->absolute);
+                }
+            }
         }
         $self->_formats({});
     }
@@ -89,7 +96,13 @@ package Data::Section::Pluggable 0.04 {
     sub _get_all_data_sections ($self) {
         return $self->_cache if $self->_cache;
 
-        my $fh = do { no strict 'refs'; \*{$self->package."::DATA"} };
+        my $fh;
+
+        if($self->filename) {
+            $fh = $self->filename->openr_raw;
+        } else {
+            $fh = do { no strict 'refs'; \*{$self->package."::DATA"} };
+        }
 
         return undef unless defined fileno $fh;
 
@@ -115,6 +128,9 @@ package Data::Section::Pluggable 0.04 {
                 $encoding = $2;
             } else {
                 $name = $name_encoding;
+            }
+            if($self->prefer_filesystem && -f (my $path = $self->prefer_filesystem->child($name))) {
+                $content = $encoding ? encode_base64($path->slurp_raw) : $path->slurp_utf8;
             }
             $all->{$name} = [ $content, $encoding ];
         }
@@ -210,7 +226,7 @@ Data::Section::Pluggable - Read structured data from __DATA__
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -284,6 +300,20 @@ where as this module returns C<undef>, in order to keep the return value more co
 
 The name of the package to read from C<__DATA__>.  If not specified, then
 the current package will be used.
+
+=head2 prefer_filesystem
+
+If provided, this is a directory containing files from where  content will be
+preferred over what is in the C<__DATA__> section, if available.  This file
+still must still exist in the C<__DATA__> section to be found. This can be
+useful to do local testing with files on the filesystem, but release a script
+or test a just one combined file.
+
+=head2 filename
+
+Read from the C<__DATA__> section of the given file instead of the current
+Perl process.  This can be useful for reading the C<__DATA__> section of a
+Perl script or module without parsing or running it first.
 
 =head1 METHODS
 

@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest
 
+0.001016  21 December 2024
+          - Updated dependencies to take advantage of downstream fixes
+
 0.001015 05 December 2024
           - Use latest version of Template::EmbeddedPerl for important
             bug fixes

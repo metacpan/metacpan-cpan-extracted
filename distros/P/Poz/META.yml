@@ -28,7 +28,7 @@ no_index:
 provides:
   Poz:
     file: lib/Poz.pm
-    version: '0.02'
+    version: '0.03'
   Poz::Builder:
     file: lib/Poz/Builder.pm
   Poz::Types:
@@ -58,7 +58,7 @@ resources:
   bugtracker: https://github.com/ytnobody/p5-Poz/issues
   homepage: https://github.com/ytnobody/p5-Poz
   repository: https://github.com/ytnobody/p5-Poz.git
-version: '0.02'
+version: '0.03'
 x_contributors:
   - 'kobaken <kentafly88@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

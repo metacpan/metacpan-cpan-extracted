@@ -127,8 +127,8 @@ syntax error at unknown line 3
 # Test 9: Commenting and escaped comments
 {
     my $template_str = <<'END_TEMPLATE';
-# This is a comment1
-# This is a comment2
+# This is a comment1\
+# This is a comment2\
 Test1
 # This is a comment2
 # This is a comment2
@@ -139,7 +139,7 @@ END_TEMPLATE
 
     my $compiled = $template->from_string($template_str);
     my $output   = $compiled->render();
-    is( $output, "Test1\nTest2\n", 'Testing comments, 1' );
+    is( $output, "Test1\n\n\n\nTest2\n\n", 'Testing comments, 1' );
 }
 
 # Test 10: Commenting and escaped comments, part 2
@@ -153,12 +153,12 @@ Test1
 \# This is a comment2
 # This is a comment2
 Test2
-# This is a comment3
+# This is a comment3\
 END_TEMPLATE
 
     my $compiled = $template->from_string($template_str);
     my $output   = $compiled->render();
-    is( $output, "Test1\n# This is a comment2\nTest2\n", 'Testing comments, 2' );
+    is( $output, "\n\nTest1\n\n# This is a comment2\n\nTest2\n", 'Testing comments, 2' );
 }
 
 # Test 11: Commenting and escaped comments, part 3
@@ -172,7 +172,36 @@ END_TEMPLATE
 
     my $compiled = $template->from_string($template_str);
     my $output   = $compiled->render();
-    is( $output, "Test1\n# Not a comment\n", 'Testing comments, 3' );
+    is( $output, "Test1\n\n# Not a comment\n", 'Testing comments, 3' );
+}
+
+# Test 12: Multiline comments with errors
+
+{
+    my $template_str = <<'END_TEMPLATE';
+# This is a comment
+# This is a comment\
+# This is a comment
+# This is a comment
+<% my $aaa = 1; %>\
+<% my $bbb = 1; %>\
+<% if ($undefined_var) { %>
+Condition is true.
+<% } %>
+END_TEMPLATE
+
+    my $compiled;
+    my $error = 'Global symbol "$condition" requires explicit package name (did you forget to declare "my $condition"?) at unknown line 1
+
+1: <% if ($condition) { %>
+2: Condition is true.
+';
+
+    eval { $compiled = $template->from_string($template_str); };
+    warn $@;
+    ok( $@, 'Expected syntax error' );
+    ## Leave this out for now, error messaging is too variale between versions of perl
+    ##is( $@, $error, 'Error message contains expected lines' );
 }
 
 done_testing();

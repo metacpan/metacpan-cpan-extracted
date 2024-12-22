@@ -27,8 +27,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.012'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-18'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.013'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-21'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # Arrgh!  Moose forcibly enables experimental feature warnings!
 # So import Moose first and then adjust warnings...
@@ -56,6 +56,8 @@ use List::Util 1.45 qw(min max first none all any sum0);
 use Data::Structure::Util qw/circular_off/;
 use Regexp::Common qw/RE_balanced/;
 use Term::ReadKey ();
+use Sub::Identify qw/sub_name sub_fullname get_code_location/;
+use File::Basename qw/basename/;
 use overload ();
 
 ############################ Exports #######################################
@@ -799,11 +801,11 @@ sub _prefix_refaddr($;$) {
            && ($listform ? ($my_visit_depth > 0) # Not on our argument container
                          : 1);                   # Else always if not a (list)
   my $pfx = addrvis(refaddr($original//$item));
-  my $ix = index($item,$pfx);
-say "_prefix_refaddr: ior=$in_overload_replacement pfx=$pfx ix=$ix original=",_dbvis1($original)," item=$item" if $debug;
   # However don't do this if $item already has an addrvis() substituted,
   # which happens if an object does not stringify or provide another overload
   # replacement -- see _object_subst().
+  my $ix = index($item,$pfx);
+say "_prefix_refaddr: ior=$in_overload_replacement pfx=$pfx ix=$ix original=",_dbvis1($original)," item=$item" if $debug;
   return $item if $ix >= 0;
   $item = [ _MAGIC_REFPFX.$pfx, $item, _MAGIC_ELIDE_NEXT ];
   btwN 1, '@@@addrvis-prefixed object:',_dbvis2($item) if $debug;
@@ -1002,11 +1004,27 @@ sub visit_ref {
     return $item
   }
 
+  # Show name of sub for CODE refs (using Sub::Identify)
+  if (ref($item) eq 'CODE' && ! $self->Deparse()) {
+    #$item = _MAGIC_NOQUOTES_PFX.addrvis($item);
+    my $subname = sub_fullname($item);
+    if ($subname =~ /__ANON__/) {  # add more info
+      my ($file, $line) = get_code_location($item);
+      $subname .= " from ".basename($file).":$line";
+    }
+    $item = _MAGIC_NOQUOTES_PFX.'\&'.$subname;
+    say "!       CODEref without DEPARSE, returning ",_dbvis2($item) if $debug;
+    #return $item;
+  }
+
   # First descend into the structure, probably returning a clone
   local $my_visit_depth = $my_visit_depth + 1;
-  my $nitem = $self->SUPER::visit_ref($item);
-  say "!       (ref) new: ",_dbvis2($item), " --> ",_dbvis2($nitem) if $debug;
-  $item = $nitem;
+  if (ref($item)) { # not replaced above...
+    #my $nitem = $self->SUPER::visit_ref($item);
+    my $nitem = $self->SUPER::visit_ref($item);
+    say "!       (ref) new: ",_dbvis2($item), " --> ",_dbvis2($nitem) if $debug;
+    $item = $nitem;
+  }
 
   # Prepend the original address to whatever the representation is now
   $item = _prefix_refaddr($item, $original);
@@ -2174,35 +2192,36 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
 
   @ARGV = ('-i', '/file/path');
   my %hash = (abc => [1,2,3,4,5], def => undef);
-  my $ref = \%hash;
+  my $href = \%hash;
+  my $coderef = \&mysub;
   my $obj = bless {}, "Foo::Bar";
 
   # Interpolate variables in strings with Data::Dumper output
-  say ivis 'FYI ref is $ref\nThat hash is: %hash\nArgs are @ARGV';
+  say ivis 'FYI ref is $href\nThat hash is: %hash\nArgs are @ARGV';
 
     # -->FYI ref is {abc => [1,2,3,4,5], def => undef}
     #    That hash is: (abc => [1,2,3,4,5], def => undef)
     #    Args are ("-i","/file/path")
 
   # Label interpolated values with "expr="
-  say dvis '$ref\nand @ARGV';
+  say dvis '$coderef  $href\nand @ARGV';
 
-    #-->ref={abc => [1,2,3,4,5], def => undef}
+    #-->coderef=\&main::mysub  href={abc => [1,2,3,4,5], def => undef}
     #   and @ARGV=("-i","/file/path")
 
   # Functions to format one thing
-  say vis $ref;      # {abc => [1,2,3,4,5], def => undef}
+  say vis $href;     # {abc => [1,2,3,4,5], def => undef}
   say vis \@ARGV;    # ["-i", "/file/path"]  # any scalar
   say avis @ARGV;    # ("-i", "/file/path")
   say hvis %hash;    # (abc => [1,2,3,4,5], def => undef)
 
   # Format a reference with abbreviated referent address
-  say visr $ref;     # HASH<457:1c9>{abc => [1,2,3,4,5], ...}
+  say visr $href;     # HASH<457:1c9>{abc => [1,2,3,4,5], ...}
 
   # Just abbreviate a referent address or arbitrary number
-  say addrvis refaddr($ref);  # 457:1c9
-  say addrvis $ref;           # HASH<457:1c9>
-  say addrvis $obj;           # Foo::Bar<984:ef8>
+  say addrvis refaddr($href);  # 457:1c9
+  say addrvis $href;           # HASH<457:1c9>
+  say addrvis $obj;            # Foo::Bar<984:ef8>
 
   # Stringify objects
   { use bigint;
@@ -2259,9 +2278,11 @@ with pre- and post-processing to "improve" the results:
 
 =over 2
 
-=item * One line if possible, else folded to terminal with, WITHOUT newline.
+=item * One line if possible, else folded to terminal width, WITHOUT newline.
 
 =item * Safely printable Unicode characters appear as themselves.
+
+=item * Code refs show the name of the referenced sub.
 
 =item * Objects like Math:BigInt etc. are stringified (by default).
 
@@ -2596,7 +2617,7 @@ Space characters are shown as '·' (Middle Dot).
 
 =item "condense"
 
-Repeated sequences in strings are shown as "⸨I<char>xI<repcount>⸩".
+Repeated characters in strings are shown as "⸨I<char>xI<repcount>⸩".
 For example
 
   vec(my $s, 31, 1) = 1;
@@ -2778,6 +2799,13 @@ Depending on options, spaces·may·be·shown·visibly
 and '␤' may be shown for newline (and similarly for other ASCII controls).
 
 "White space" characters in qr/compiled regex/ are shown as \t, \n etc.
+
+=item *
+
+Unless B<Deparse> is enabled,
+CODE refs show the name of the referenced sub using L<Sub::Identify>
+instead of C<sub{ "DUMMY" }>.  If the sub is anonymous, the file:lineno
+where it was defined is shown.
 
 =item *
 
