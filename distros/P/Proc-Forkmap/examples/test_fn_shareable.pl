@@ -2,7 +2,7 @@ use lib './lib';
 use Proc::Forkmap qw(forkmap);
 use IPC::Shareable;
 
-$Proc::Forkmap::MAX_PROC = 4;
+$Proc::Forkmap::MAX_PROCS = 4;
 
 my %opts = (create => 1);
 tie @sv, 'IPC::Shareable', 'data', { %opts };

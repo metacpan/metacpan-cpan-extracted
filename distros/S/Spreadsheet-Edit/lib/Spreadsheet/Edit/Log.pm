@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.025'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-18'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.026'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-22'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Scalar::Util qw/reftype refaddr blessed weaken openhandle/;
@@ -91,7 +91,8 @@ sub _btwTN($$@) {
     $sep = " ⇐ ";
   }
   elsif (ref($N) eq 'ARRAY' && all{defined} @$N) {
-    @levels = @$N
+    @levels = sort { $a <=> $b } @$N;
+    $sep = " ⇐ " if $#levels == ($levels[-1] - $levels[0]);
   }
   else {
     confess "Invalid N arg to btwN: $N"
@@ -136,8 +137,8 @@ BEGIN {
 sub oops(@) {
   my $pkg = caller;
   my $pfx = "\nOOPS";
-  $pfx .= " in pkg '$pkg'" unless $pkg eq 'main';
-  $pfx .= ":\n";
+  #$pfx .= " in pkg '$pkg'" unless $pkg eq 'main';
+  $pfx .= ": ";
   if (defined(&Spreadsheet::Edit::logmsg)) {
     # Show current apply sheet & row if any.
     @_=($pfx, &Spreadsheet::Edit::logmsg(@_));

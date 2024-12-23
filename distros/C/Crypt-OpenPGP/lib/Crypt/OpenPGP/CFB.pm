@@ -4,6 +4,9 @@
 
 package Crypt::OpenPGP::CFB;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 sub new {
     my $class = shift;

@@ -3,7 +3,7 @@ use Test::More tests => 2;
 
 use Crypt::OpenPGP;
 
-use vars qw( $SAMPLES );
+our $SAMPLES;
 unshift @INC, 't/';
 require 'test-common.pl';
 use File::Spec;

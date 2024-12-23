@@ -1,0 +1,16 @@
+{
+  "database": {
+    "system": {
+      "connector": "Daje::Workflow::Database::Pg",
+      "dsn": ""
+    },
+    "application": {
+      "connector": "Daje::Workflow::Database::Pg",
+      "dsn": ""
+    },
+    "history": {
+      "connector": "Daje::Workflow::Database::Pg",
+      "dsn": ""
+    }
+  }
+}

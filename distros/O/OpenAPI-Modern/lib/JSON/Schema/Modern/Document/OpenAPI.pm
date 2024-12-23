@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.074';
+our $VERSION = '0.075';
 
 use 5.020;
 use Moo;
@@ -28,20 +28,20 @@ use namespace::clean;
 
 extends 'JSON::Schema::Modern::Document';
 
-use constant DEFAULT_DIALECT => 'https://spec.openapis.org/oas/3.1/dialect/base';
+# schema files to add by default
+# these are also available as URIs with 'latest' instead of the timestamp.
+use constant DEFAULT_SCHEMAS => [
+  'oas/dialect/base.schema.json', # metaschema for json schemas contained within openapi documents
+  'oas/meta/base.schema.json',    # vocabulary definition
+  'oas/schema-base.json',         # the main openapi document schema + draft2020-12 jsonSchemaDialect
+  'oas/schema.json',              # the main openapi document schema + permissive jsonSchemaDialect
+  'strict-schema.json',
+  'strict-dialect.json',
+];
 
-use constant DEFAULT_SCHEMAS => {
-  # local filename => identifier to add the schema as
-  'oas/dialect/base.schema.json' => 'https://spec.openapis.org/oas/3.1/dialect/base', # metaschema for json schemas contained within openapi documents
-  'oas/meta/base.schema.json' => 'https://spec.openapis.org/oas/3.1/meta/base',  # vocabulary definition
-  'oas/schema-base.json' => 'https://spec.openapis.org/oas/3.1/schema-base',  # the main openapi document schema + draft2020-12 jsonSchemaDialect
-  'oas/schema.json' => 'https://spec.openapis.org/oas/3.1/schema', # the main openapi document schema + permissive jsonSchemaDialect
-  'strict-schema.json' => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-schema.json',
-  'strict-dialect.json' => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-dialect.json',
-};
-
-use constant DEFAULT_BASE_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema-base/2022-10-07';
-use constant DEFAULT_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07';
+use constant DEFAULT_DIALECT => 'https://spec.openapis.org/oas/3.1/dialect/2024-10-25';
+use constant DEFAULT_BASE_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema-base/2024-11-14';
+use constant DEFAULT_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2024-11-14';
 
 # warning: this is weak_ref'd, so it may not exist after construction/traverse time
 has '+evaluator' => (
@@ -59,6 +59,8 @@ has json_schema_dialect => (
 );
 
 # json pointer => entity name (indexed by integer); overrides parent
+# these aren't all the different types of objects; for now we only track those that are the valid
+# target of a $ref keyword in an openapi document.
 sub __entities { qw(schema response parameter example request-body header security-scheme link callbacks path-item) }
 
 # operationId => document path
@@ -114,6 +116,7 @@ sub traverse ($self, $evaluator) {
     $schema, $top_schema,
     {
       effective_base_uri => DEFAULT_METASCHEMA,
+      collect_annotations => 0,
       callbacks => {
         pattern => sub ($data, $schema, $state) {
           return $data =~ /^3\.1\.[0-9]+(-.+)?$/ ? 1 : E($state, 'unrecognized openapi version %s', $data);
@@ -127,7 +130,7 @@ sub traverse ($self, $evaluator) {
     return $state;
   }
 
-  # /jsonSchemaDialect: https://spec.openapis.org/oas/v3.1.0#specifying-schema-dialects
+  # /jsonSchemaDialect: https://spec.openapis.org/oas/v3.1#specifying-schema-dialects
   {
     my $json_schema_dialect = $self->json_schema_dialect // $schema->{jsonSchemaDialect};
 
@@ -153,13 +156,14 @@ sub traverse ($self, $evaluator) {
 
   # evaluate the document against its metaschema to find any errors, to identify all schema
   # resources within to add to the global resource index, and to extract all operationIds
-  my (@json_schema_paths, @operation_paths, @servers_paths);
+  my (@json_schema_paths, @operation_paths, @path_item_refs, @servers_paths);
   my $result = $self->evaluator->evaluate(
     $schema, $self->metaschema_uri,
     {
       short_circuit => 1,
+      collect_annotations => 0,
       callbacks => {
-        # Note that if we are using the default metaschema https://spec.openapis.org/oas/3.1/schema,
+        # Note that if we are using the default metaschema https://spec.openapis.org/oas/3.1/schema/latest,
         # we will only find the root of each schema, not all subschemas. We will traverse each
         # of these schemas later using jsonSchemaDialect to find all subschemas and their $ids.
         '$dynamicRef' => sub ($, $schema, $state) {
@@ -167,11 +171,17 @@ sub traverse ($self, $evaluator) {
           return 1;
         },
         '$ref' => sub ($data, $schema, $state) {
-          my ($entity) = ($schema->{'$ref'} =~ m{#/\$defs/([^/]+?)(?:-or-reference)$});
+          # we only need to special-case path-item, because this is the only entity that is
+          # referenced in the schema without an -or-reference
+          my ($entity) = (($schema->{'$ref'} =~ m{#/\$defs/([^/]+?)(?:-or-reference)$}),
+            ($schema->{'$ref'} =~ m{#/\$defs/(path-item)$}));
           $self->_add_entity_location($state->{data_path}, $entity) if $entity;
 
           push @operation_paths, [ $data->{operationId} => $state->{data_path} ]
             if $schema->{'$ref'} eq '#/$defs/operation' and defined $data->{operationId};
+
+          # for now, we will reject all uses of $ref in a path-item
+          push @path_item_refs, $state->{data_path} if $entity and $entity eq 'path-item' and exists $data->{'$ref'};
 
           # will contain duplicates; filter out later
           push @servers_paths, ($state->{data_path} =~ s{/[0-9]+$}{}r)
@@ -199,7 +209,6 @@ sub traverse ($self, $evaluator) {
         ()= E({ %$state, data_path => jsonp('/paths', $path),
           initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
           'duplicate path template variable "%s"', $name);
-        $state->{errors}[-1]->mode('evaluate');
       }
     }
 
@@ -208,10 +217,15 @@ sub traverse ($self, $evaluator) {
       ()= E({ %$state, data_path => jsonp('/paths', $path),
         initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
         'duplicate of templated path "%s"', $first_path);
-      $state->{errors}[-1]->mode('evaluate');
       next;
     }
     $seen_path{$normalized} = $path;
+  }
+
+  foreach my $path_item (sort @path_item_refs) {
+    ()= E({ %$state, data_path => $path_item,
+      initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
+      'use of $ref in a path-item is not currently supported');
   }
 
   my %seen_servers;
@@ -229,7 +243,6 @@ sub traverse ($self, $evaluator) {
         ()= E({ %$state, data_path => jsonp($servers_location, $server_idx, 'url'),
           initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
           'duplicate of templated server url "%s"', $first_url);
-        $state->{errors}[-1]->mode('evaluate');
       }
       $seen_url{$normalized} = $servers->[$server_idx]{url};
 
@@ -239,7 +252,6 @@ sub traverse ($self, $evaluator) {
         ()= E({ %$state, data_path => jsonp($servers_location, $server_idx),
           initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
           '"variables" property is required for templated server urls');
-        $state->{errors}[-1]->mode('evaluate');
         next;
       }
 
@@ -251,7 +263,6 @@ sub traverse ($self, $evaluator) {
           ()= E({ %$state, data_path => jsonp($servers_location, $server_idx, 'variables', $varname, 'default'),
             initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
             'servers default is not a member of enum');
-          $state->{errors}[-1]->mode('evaluate');
         }
       }
 
@@ -261,12 +272,14 @@ sub traverse ($self, $evaluator) {
           initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
           'missing "variables" definition for templated variable%s "%s"',
           @missing_definitions > 1 ? 's' : '', join('", "', @missing_definitions));
-        $state->{errors}[-1]->mode('evaluate');
       }
     }
   }
 
-  return $state if $state->{errors}->@*;
+  if ($state->{errors}->@*) {
+    $_->mode('evaluate') foreach $state->{errors}->@*;
+    return $state;
+  }
 
   # disregard paths that are not the root of each embedded subschema.
   # Because the callbacks are executed after the keyword has (recursively) finished evaluating,
@@ -333,15 +346,18 @@ sub _add_vocab_and_default_schemas ($self) {
   $js->add_format_validation(double => +{ type => 'number', sub => sub ($x) { 1 } });
   $js->add_format_validation(password => +{ type => 'string', sub => sub ($) { 1 } });
 
-  foreach my $pairs (pairs DEFAULT_SCHEMAS->%*) {
-    my ($filename, $uri) = @$pairs;
-    my $document = $js->add_schema($uri,
-      $js->_json_decoder->decode(path(dist_dir('OpenAPI-Modern'), $filename)->slurp_raw));
-    $js->add_document($uri.'/latest', $document) if $uri =~ /schema(-base)?$/;
+  foreach my $filename (DEFAULT_SCHEMAS->@*) {
+    my $document = $js->add_schema($js->_json_decoder->decode(path(dist_dir('OpenAPI-Modern'), $filename)->slurp_raw));
+
+    if ($document->canonical_uri =~ m{/\d{4}-\d{2}-\d{2}$}) {
+      my $base = $`;
+      $js->add_document($base, $document) if $base =~ m{/schema$};
+      $js->add_document($base.'/latest', $document);
+    }
   }
 }
 
-# https://spec.openapis.org/oas/v3.1.0#schema-object
+# https://spec.openapis.org/oas/v3.1#schema-object
 sub _traverse_schema ($self, $schema, $state) {
   return if not is_plain_hashref($schema) or not keys %$schema;
 
@@ -385,7 +401,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.074
+version 0.075
 
 =head1 SYNOPSIS
 
@@ -408,7 +424,7 @@ request and response validation, code generation or form generation.
 The provided document must be a valid OpenAPI document, as specified by the schema identified by
 C<https://spec.openapis.org/oas/3.1/schema-base/latest> (an alias for the latest document available)
 
-and the L<OpenAPI v3.1 specification|https://spec.openapis.org/oas/v3.1.0>.
+and the L<OpenAPI v3.1 specification|https://spec.openapis.org/oas/v3.1>.
 
 =for Pod::Coverage THAW get_entity_at_location
 
@@ -490,7 +506,7 @@ L<https://learn.openapis.org/>
 
 =item *
 
-L<https://spec.openapis.org/oas/v3.1.0>
+L<https://spec.openapis.org/oas/v3.1>
 
 =back
 

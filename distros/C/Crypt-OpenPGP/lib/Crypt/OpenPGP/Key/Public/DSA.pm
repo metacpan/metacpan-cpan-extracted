@@ -1,6 +1,8 @@
 package Crypt::OpenPGP::Key::Public::DSA;
 use strict;
 
+our $VERSION = '1.19'; # VERSION
+
 use Crypt::DSA::Key;
 use Crypt::OpenPGP::Key::Public;
 use Crypt::OpenPGP::ErrorHandler;

@@ -4,13 +4,13 @@
       "Steffen Winkler <steffenw at cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Locale-TextDomain-OO-Extract",
    "prereqs" : {
@@ -55,7 +55,7 @@
    "provides" : {
       "Locale::TextDomain::OO::Extract" : {
          "file" : "lib/Locale/TextDomain/OO/Extract.pm",
-         "version" : "2.015"
+         "version" : "2.016"
       },
       "Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor" : {
          "file" : "lib/Locale/TextDomain/OO/Extract/Base/RegexBasedExtractor.pm",
@@ -63,7 +63,7 @@
       },
       "Locale::TextDomain::OO::Extract::HTML" : {
          "file" : "lib/Locale/TextDomain/OO/Extract/HTML.pm",
-         "version" : "2.011"
+         "version" : "2.016"
       },
       "Locale::TextDomain::OO::Extract::JavaScript" : {
          "file" : "lib/Locale/TextDomain/OO/Extract/JavaScript.pm",
@@ -104,6 +104,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.015",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "2.016",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

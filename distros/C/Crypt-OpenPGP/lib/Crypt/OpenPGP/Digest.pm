@@ -1,11 +1,13 @@
 package Crypt::OpenPGP::Digest;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::ErrorHandler;
 use base qw( Crypt::OpenPGP::ErrorHandler );
 
-use vars qw( %ALG %ALG_BY_NAME );
-%ALG = (
+our %ALG = (
     1 => 'MD5',
     2 => 'SHA1',
     3 => 'RIPEMD160',
@@ -14,7 +16,7 @@ use vars qw( %ALG %ALG_BY_NAME );
     10 => 'SHA512',
     11 => 'SHA224',
 );
-%ALG_BY_NAME = map { $ALG{$_} => $_ } keys %ALG;
+our %ALG_BY_NAME = map { $ALG{$_} => $_ } keys %ALG;
 
 sub new {
     my $class = shift;
@@ -53,6 +55,8 @@ sub supported {
 
 package Crypt::OpenPGP::Digest::MD5;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Digest );
 
 sub init {
@@ -64,6 +68,8 @@ sub init {
 
 package Crypt::OpenPGP::Digest::SHA1;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Digest );
 
 sub init {
@@ -75,6 +81,8 @@ sub init {
 
 package Crypt::OpenPGP::Digest::RIPEMD160;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Digest );
 
 sub init {
@@ -86,6 +94,8 @@ sub init {
 
 package Crypt::OpenPGP::Digest::SHA224;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Digest );
 
 sub init {
@@ -97,6 +107,8 @@ sub init {
 
 package Crypt::OpenPGP::Digest::SHA256;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Digest );
 
 sub init {
@@ -108,6 +120,8 @@ sub init {
 
 package Crypt::OpenPGP::Digest::SHA384;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Digest );
 
 sub init {
@@ -119,6 +133,8 @@ sub init {
 
 package Crypt::OpenPGP::Digest::SHA512;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Digest );
 
 sub init {

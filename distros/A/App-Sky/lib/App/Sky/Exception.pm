@@ -1,5 +1,5 @@
 package App::Sky::Exception;
-$App::Sky::Exception::VERSION = '0.4.3';
+$App::Sky::Exception::VERSION = '0.6.0';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ App::Sky::Exception - provides various exception classes for App::Sky
 
 =head1 VERSION
 
-version 0.4.3
+version 0.6.0
 
 =head1 SYNOPSIS
 

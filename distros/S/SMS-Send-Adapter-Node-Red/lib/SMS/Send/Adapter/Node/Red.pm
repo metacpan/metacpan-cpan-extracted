@@ -6,8 +6,9 @@ use JSON qw{decode_json encode_json};
 use SMS::Send;
 use CGI;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 our $PACKAGE = __PACKAGE__;
+our $DRIVER  = $ENV{'SMS_SEND_ADAPTER_NODE_RED_DRIVER'};
 
 =head1 NAME
 
@@ -278,7 +279,7 @@ sub SMS {
   my $self   = shift;
   my $input  = $self->input; #undef on error
   if (defined $input) {
-    my $driver = $input->{'driver'};
+    my $driver = $input->{'driver'} || $DRIVER;
     if ($driver) {
       my $options = $input->{'options'} || {};
       if (ref($options) eq 'HASH') {

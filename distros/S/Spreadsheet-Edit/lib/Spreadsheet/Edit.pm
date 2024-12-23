@@ -16,8 +16,8 @@ package Spreadsheet::Edit;
 # Allow "use <thismodule> <someversion>;" in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
 
-our $VERSION = '1000.025'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-18'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.026'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-22'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # FIXME: cmd_nesting does nothing except prefix >s to log messages.
 #        Shouldn't it skip that many "public" call frames???
@@ -222,7 +222,7 @@ our @CARP_NOT = qw(
 
 use Scalar::Util qw(looks_like_number openhandle reftype refaddr blessed);
 use List::Util qw(min max sum0 first any all pairs pairgrep);
-use Path::Tiny qw/path/;
+use Path::Tiny 0.146 qw/path/;
 #use File::Temp qw(tempfile tempdir);
 use File::Basename qw(basename dirname fileparse);
 use File::Find ();

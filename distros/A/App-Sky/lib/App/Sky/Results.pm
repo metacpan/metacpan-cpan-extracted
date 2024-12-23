@@ -1,5 +1,5 @@
 package App::Sky::Results;
-$App::Sky::Results::VERSION = '0.4.3';
+$App::Sky::Results::VERSION = '0.6.0';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ App::Sky::Results - results of an upload.
 
 =head1 VERSION
 
-version 0.4.3
+version 0.6.0
 
 =head1 METHODS
 

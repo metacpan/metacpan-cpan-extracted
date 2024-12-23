@@ -1,5 +1,8 @@
 package Crypt::OpenPGP::Key::Public;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::Key;
 use Crypt::OpenPGP::ErrorHandler;

@@ -17,7 +17,7 @@ use Helper;
 my $openapi = OpenAPI::Modern->new(
   openapi_uri => 'http://localhost:1234/api',
   openapi_schema => {
-    openapi => '3.1.0',
+    openapi => OAS_VERSION,
     info => { title => 'Test API', version => '1.2.3' },
     components => {
       schemas => {

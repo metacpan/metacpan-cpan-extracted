@@ -18,7 +18,7 @@ Moose::Util::MetaRole::apply_metaroles(
 
 extends 'Catalyst::View::BasePerRequest';
 
-our $VERSION = 0.001016;
+our $VERSION = 0.001017;
 eval $VERSION;
 
 # Args that get passed cleanly to Template::EmbeddedPerl

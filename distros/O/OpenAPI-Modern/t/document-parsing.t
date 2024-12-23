@@ -14,25 +14,15 @@ use Test::Fatal;
 use lib 't/lib';
 use Helper;
 
-# the document where most constraints are defined
-use constant SCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07';
-
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
-my $openapi_preamble = <<'YAML';
----
-openapi: 3.1.0
-info:
-  title: Test API
-  version: 1.2.3
-YAML
 
 subtest 'bad subschemas' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
     schema => {
-      $yamlpp->load_string($openapi_preamble)->%*,
-      jsonSchemaDialect => JSON::Schema::Modern::Document::OpenAPI->DEFAULT_DIALECT,
+      $yamlpp->load_string(OPENAPI_PREAMBLE)->%*,
+      jsonSchemaDialect => DEFAULT_DIALECT,
       components => {
         schemas => {
           alpha_schema => {
@@ -58,11 +48,7 @@ subtest 'bad subschemas' => sub {
     'subschemas identified, and error found',
   );
 
-  is(
-    index(document_result($doc), "'/components/schemas/alpha_schema/not/minimum': got string, not number\n"), 0,
-    'errors serialize using the instance locations within the document',
-  );
-  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors use the instance locations');
 '/components/schemas/alpha_schema/not/minimum': got string, not number
 '/components/schemas/alpha_schema/not': not all properties are valid
 '/components/schemas/alpha_schema/not': subschema 3 is not valid
@@ -79,71 +65,80 @@ ERRORS
 subtest 'identify subschemas and other entities' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
+    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema/latest',
     evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
-    schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:
     beta_schema:
-      \$id: beta
+      $id: beta
       not:
-        \$id: gamma
-        \$schema: https://json-schema.org/draft/2019-09/schema
+        $id: gamma
+        $schema: https://json-schema.org/draft/2019-09/schema
   parameters:
     my_param1:
       name: param1
       in: query
       schema:
-        \$id: parameter1_id
+        $id: parameter1_id
     my_param2:
       name: param2
       in: query
       content:
         media_type_0:
           schema:
-            \$id: parameter2_id
+            $id: parameter2_id
   responses:
     my_response4:
       description: bad response
       content:
         media_type_4:
           schema:
-            \$comment: nothing to see here
+            $comment: nothing to see here
   pathItems:
     path0:
       parameters:
         - name: param0
           in: query
           schema:
-            \$id: pathItem0_param_id
+            $id: pathItem0_param_id
         # TODO param2 with content/media_type_0
       get:
         parameters:
           - name: param1
             in: query
             schema:
-              \$id: pathItem0_get_param_id
+              $id: pathItem0_get_param_id
         requestBody:
           content:
             media_type_1:
               schema:
-                \$id: pathItem0_get_requestBody_id
+                $id: pathItem0_get_requestBody_id
         responses:
           200:
             description: normal response
             content:
               media_type_2:
                 schema:
-                  \$id: pathItem0_get_responses2_id
+                  $id: pathItem0_get_responses2_id
               media_type_3:
                 schema:
-                  \$id: pathItem0_get_responses3_id
+                  $id: pathItem0_get_responses3_id
           default:
-            \$ref: '#/components/responses/my_response4'
+            $ref: '#/components/responses/my_response4'
+        callbacks:
+          my_callback:
+            '{$request.query.queryUrl}':
+              post: {}
+paths:
+  /foo/alpha: {}
+  /foo/beta: {}
+webhooks:
+  foo: {}
+  bar: {}
 YAML
 
-  is($doc->errors, 0, 'no errors during traversal');
+  cmp_result([$doc->errors], [], 'no errors during traversal');
   cmp_deeply(
     my $index = { $doc->resource_index },
     {
@@ -231,6 +226,8 @@ YAML
       '/components/parameters/my_param2' => 2,
       '/components/parameters/my_param2/content/media_type_0/schema' => 0,
       '/components/pathItems/path0' => 9,
+      '/components/pathItems/path0/get/callbacks/my_callback' => 8,
+      '/components/pathItems/path0/get/callbacks/my_callback/{$request.query.queryUrl}' => 9,
       '/components/pathItems/path0/get/parameters/0' => 2,
       '/components/pathItems/path0/get/parameters/0/schema' => 0,
       '/components/pathItems/path0/get/requestBody' => 4,
@@ -245,13 +242,17 @@ YAML
       '/components/responses/my_response4/content/media_type_4/schema' => 0,
       '/components/schemas/beta_schema' => 0,
       '/components/schemas/beta_schema/not' => 0,
+      '/paths/~1foo~1alpha' => 9,
+      '/paths/~1foo~1beta' => 9,
+      '/webhooks/foo' => 9,
+      '/webhooks/bar' => 9,
     },
     'all entity locations are identified',
   );
 };
 
 subtest 'invalid servers entries' => sub {
-  my $servers = $yamlpp->load_string(<<YAML);
+  my $servers = $yamlpp->load_string(<<'YAML');
 servers:
   - url: https://example.com/{version}/{greeting}
     variables:
@@ -275,12 +276,12 @@ YAML
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
+    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema/latest',
     # Note: OpenAPI::Modern sets this value to true, but the current 3.1 schema disallows templated
     # server urls (via the uri-reference format requirement).
     evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 0),
     schema => {
-      $yamlpp->load_string($openapi_preamble)->%*,
+      $yamlpp->load_string(OPENAPI_PREAMBLE)->%*,
       %$servers,
       components => {
         pathItems => {
@@ -300,37 +301,99 @@ YAML
         methods(TO_JSON => {
           instanceLocation => $_.'/servers/0/variables/version/default',
           keywordLocation => '',
-          absoluteKeywordLocation => SCHEMA,
+          absoluteKeywordLocation => DEFAULT_METASCHEMA,
           error => 'servers default is not a member of enum',
         }),
         methods(TO_JSON => {
           instanceLocation => $_.'/servers/1/url',
           keywordLocation => '',
-          absoluteKeywordLocation => SCHEMA,
+          absoluteKeywordLocation => DEFAULT_METASCHEMA,
           error => 'duplicate of templated server url "https://example.com/{version}/{greeting}"',
         }),
         methods(TO_JSON => {
           instanceLocation => $_.'/servers/1',
           keywordLocation => '',
-          absoluteKeywordLocation => SCHEMA,
+          absoluteKeywordLocation => DEFAULT_METASCHEMA,
           error => '"variables" property is required for templated server urls',
         }),
         methods(TO_JSON => {
           instanceLocation => $_.'/servers/2/variables',
           keywordLocation => '',
-          absoluteKeywordLocation => SCHEMA,
+          absoluteKeywordLocation => DEFAULT_METASCHEMA,
           error => 'missing "variables" definition for templated variable "foo"',
         }),
         methods(TO_JSON => {
           instanceLocation => $_.'/servers/3/variables/version/default',
           keywordLocation => '',
-          absoluteKeywordLocation => SCHEMA,
+          absoluteKeywordLocation => DEFAULT_METASCHEMA,
           error => 'servers default is not a member of enum',
         }),
       ), '', '/components/pathItems/path0', '/components/pathItems/path0/get',
     ],
     'all issues with server entries found',
   );
+
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors use the instance locations');
+'/servers/0/variables/version/default': servers default is not a member of enum
+'/servers/1/url': duplicate of templated server url "https://example.com/{version}/{greeting}"
+'/servers/1': "variables" property is required for templated server urls
+'/servers/2/variables': missing "variables" definition for templated variable "foo"
+'/servers/3/variables/version/default': servers default is not a member of enum
+'/components/pathItems/path0/servers/0/variables/version/default': servers default is not a member of enum
+'/components/pathItems/path0/servers/1/url': duplicate of templated server url "https://example.com/{version}/{greeting}"
+'/components/pathItems/path0/servers/1': "variables" property is required for templated server urls
+'/components/pathItems/path0/servers/2/variables': missing "variables" definition for templated variable "foo"
+'/components/pathItems/path0/servers/3/variables/version/default': servers default is not a member of enum
+'/components/pathItems/path0/get/servers/0/variables/version/default': servers default is not a member of enum
+'/components/pathItems/path0/get/servers/1/url': duplicate of templated server url "https://example.com/{version}/{greeting}"
+'/components/pathItems/path0/get/servers/1': "variables" property is required for templated server urls
+'/components/pathItems/path0/get/servers/2/variables': missing "variables" definition for templated variable "foo"
+'/components/pathItems/path0/get/servers/3/variables/version/default': servers default is not a member of enum
+ERRORS
+};
+
+subtest 'disallowed $refs in path-items' => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
+    evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo/alpha: {}
+  /foo/beta: {}
+YAML
+
+  cmp_result([$doc->errors], [], 'no errors during traversal');
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
+    evaluator => $js,
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  callbacks:
+    my_callback0:
+      '{$request.query.queryUrl}': # note this is a path-item
+        $ref: '#/components/pathItems/path0'
+  pathItems:
+    path0:
+      $ref: '#/components/pathItems/path1'
+    path1:
+      description: my second path
+paths:
+  /foo/{foo_id}:
+    $ref: '#/components/pathItems/path0'
+webhooks:
+  my_webhook0:
+    $ref: '#/components/pathItems/path0'
+YAML
+
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
+'/components/callbacks/my_callback0/{$request.query.queryUrl}': use of $ref in a path-item is not currently supported
+'/components/pathItems/path0': use of $ref in a path-item is not currently supported
+'/paths/~1foo~1{foo_id}': use of $ref in a path-item is not currently supported
+'/webhooks/my_webhook0': use of $ref in a path-item is not currently supported
+ERRORS
 };
 
 done_testing;

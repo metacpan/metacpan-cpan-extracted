@@ -1,7 +1,10 @@
 package Crypt::OpenPGP::ErrorHandler;
 use strict;
+use warnings;
 
-use vars qw( $ERROR );
+our $VERSION = '1.19'; # VERSION
+
+our $ERROR;
 
 sub new    { bless {}, shift }
 sub error  {

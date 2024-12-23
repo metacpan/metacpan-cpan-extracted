@@ -1,5 +1,8 @@
 package Crypt::OpenPGP::SessionKey;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::Constants qw( DEFAULT_CIPHER );
 use Crypt::OpenPGP::Key::Public;

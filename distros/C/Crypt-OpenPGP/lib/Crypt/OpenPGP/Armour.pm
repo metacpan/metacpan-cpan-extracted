@@ -1,5 +1,8 @@
 package Crypt::OpenPGP::Armour;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP;
 use MIME::Base64;

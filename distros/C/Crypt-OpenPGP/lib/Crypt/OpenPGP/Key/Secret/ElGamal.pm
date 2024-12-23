@@ -1,5 +1,8 @@
 package Crypt::OpenPGP::Key::Secret::ElGamal;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::Key::Public::ElGamal;
 use Crypt::OpenPGP::Key::Secret;
@@ -23,6 +26,7 @@ sub decrypt { $_[0]->{key_data}->decrypt(@_[1..$#_]) }
 
 package Crypt::OpenPGP::ElGamal::Private;
 use strict;
+use warnings;
 
 use Crypt::OpenPGP::Util qw( mod_exp mod_inverse );
 use Math::BigInt;

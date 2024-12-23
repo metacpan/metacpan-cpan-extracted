@@ -1,0 +1,52 @@
+{
+  "workflow": [
+    {
+      "name": "INITIAL",
+      "auto": 1,
+      "state": {
+        "pre_checks": [
+          {
+            "check": ""
+          }
+        ],
+        "activities": [
+          {
+            "name": "sql",
+            "activity": "Daje::Plugin::GenerateSQL"
+          }
+        ],
+        "post_checks": [
+          {
+            "check": ""
+          }
+        ]
+      },
+      "next_state": "generatePerl"
+    },
+    {
+      "name": "generatePerl",
+      "auto": 1,
+      "state": {
+
+        "pre_checks": [
+          {
+            "check": ""
+          }
+        ],
+        "activities": [
+          {
+            "name": "perl",
+            "activity": "Daje::Plugin::GeneratePerl"
+          }
+        ],
+        "post_checks": [
+          {
+            "check": ""
+          }
+        ]
+      },
+      "next_state": "DONE"
+    }
+  ]
+}
+

@@ -4,7 +4,7 @@ use Test::More tests => 38;
 use Crypt::OpenPGP;
 use Crypt::OpenPGP::Message;
 
-use vars qw( $SAMPLES );
+our $SAMPLES;
 unshift @INC, 't/';
 require 'test-common.pl';
 use File::Spec;

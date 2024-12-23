@@ -15,7 +15,7 @@ use lib 't/lib';
 use Helper;
 
 my $preamble = {
-  openapi => '3.1.0',
+  openapi => OAS_VERSION,
   info => {
     title => 'my title',
     version => '1.2.3',
@@ -25,7 +25,7 @@ my $preamble = {
 subtest recursive_get => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
+    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema/latest',
     evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
     schema => {
       %$preamble,
@@ -63,7 +63,7 @@ subtest recursive_get => sub {
     },
   );
 
-  is($doc->errors, 0, 'no errors during traversal');
+  cmp_result([$doc->errors], [], 'no errors during traversal');
 
   my $openapi = OpenAPI::Modern->new(
     openapi_document => $doc,
@@ -71,7 +71,7 @@ subtest recursive_get => sub {
 
   my $doc2 = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://far_far_away/api2',
-    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
+    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema/latest',
     evaluator => $js,
     schema => {
       %$preamble,
@@ -87,7 +87,7 @@ subtest recursive_get => sub {
     },
   );
 
-  is($doc2->errors, 0, 'no errors during traversal');
+  cmp_result([$doc2->errors], [], 'no errors during traversal');
   $openapi->evaluator->add_document($doc2);
 
   like(

@@ -1,5 +1,8 @@
 package Crypt::OpenPGP::Config;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::ErrorHandler;
 use base qw( Crypt::OpenPGP::ErrorHandler );
@@ -60,6 +63,8 @@ sub _set_str { $_[0]->{o}{$_[1]} = $_[2] }
 }
 
 package Crypt::OpenPGP::Config::GnuPG;
+use strict;
+use warnings;
 sub directives {
     {
         armor => [ 'bool', 'Armour' ],
@@ -92,6 +97,8 @@ sub directives {
 }
 
 package Crypt::OpenPGP::Config::PGP2;
+use strict;
+use warnings;
 sub directives {
     {
         armor => [ 'bool', 'Armour' ],
@@ -104,6 +111,8 @@ sub directives {
 }
 
 package Crypt::OpenPGP::Config::PGP5;
+use strict;
+use warnings;
 *directives = \&Crypt::OpenPGP::Config::PGP2::directives;
 
 1;

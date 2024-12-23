@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Carp-Assert-More",
    "no_index" : {
@@ -50,5 +50,5 @@
          "https://opensource.org/licenses/artistic-license-2.0.php"
       ]
    },
-   "version" : "v2.5.0"
+   "version" : "v2.6.0"
 }

@@ -16,7 +16,7 @@ use constant STRICT_DIALECT_URI => 'https://raw.githubusercontent.com/karenether
 use constant STRICT_METASCHEMA_URI => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-schema.json';
 
 my $schema = {
-  openapi => '3.1.0',
+  openapi => OAS_VERSION,
   info => {
     title => 'my title',
     version => '1.2.3',

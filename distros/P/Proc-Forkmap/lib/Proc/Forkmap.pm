@@ -10,8 +10,8 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(forkmap);
 
-our $MAX_PROC = 4;
-our $VERSION = '0.2008';
+our $MAX_PROCS = 4;
+our $VERSION = '0.2100';
 our $TIMEOUT = 0;
 
 sub new {
@@ -23,16 +23,16 @@ sub new {
 
 sub _init {
   my $self = shift;
-  $self->{max_kids} //= 4;
+  $self->{max_procs} //= 4;
   $self->{ipc} //= 0;
   $self->{non_blocking} //= 1;
   $self->{timeout} //= 0;
 }
 
-sub max_kids {
+sub max_procs {
   my ($self, $n) = @_;
-  $n // return $self->{max_kids};
-  $self->{max_kids} = $n;
+  $n // return $self->{max_procs};
+  $self->{max_procs} = $n;
 }
 
 sub non_blocking {
@@ -57,13 +57,13 @@ sub fmap {
   my ($self, $code) = (shift, shift);
   my %pids = ();
   my @rs = ();  # result set of child return values
-  my $max = $self->max_kids;
+  my $max = $self->max_procs;
   my $ipc = $self->ipc;
   my $timeout = $self->timeout;
   my $non_blocking = $self->non_blocking;
   for my $proc (@_) {
     my $pipe = $ipc ? IO::Pipe->new : {};
-    # max kids?
+    # max procs?
     while ($max == keys %pids) {
       # free a spot in queue when a process completes
       for my $pid (keys %pids) {
@@ -133,7 +133,7 @@ sub fmap {
 sub forkmap (&@) {
   my ($code, @args) = @_;
   my %pids = ();
-  my $max = $MAX_PROC;
+  my $max = $MAX_PROCS;
   for my $proc (@args) {
     while ($max == keys %pids) {
       for my $pid (keys %pids) {
@@ -193,7 +193,7 @@ EXAMPLE:
 
   use Proc::Forkmap qw(forkmap);
 
-  $Proc::Forkmap::MAX_PROC = 4;
+  $Proc::Forkmap::MAX_PROCS = 4;
 
   sub foo {
     my $n = shift;
@@ -205,7 +205,7 @@ EXAMPLE:
 
   forkmap { foo($_) } @x;
 
-  # Or OO interface, if you like that sort of thing
+  # Object interface
 
   use Proc::Forkmap;
 
@@ -234,11 +234,11 @@ This module provides mapping with built-in forking.
 
 These C<our> variables control only the functional interface.
 
-=head2 MAX_PROC
+=head2 MAX_PROCS
 
 Max parallelism.
 
-  $Proc::Forkmap::MAX_PROC = 4;
+  $Proc::Forkmap::MAX_PROCS = 4;
 
 =head2 TIMEOUT
 
@@ -250,13 +250,13 @@ Max time in seconds any single child process can run.
 
 =head2 new
 
-  my $p = Proc::Forkmap->new(max_kids => 4);
+  my $p = Proc::Forkmap->new(max_procs => 4);
 
 =over 4
 
-=item B<max_kids>
+=item B<max_procs>
 
-Maximum number of kids allowed in the pool. The default is 4.
+Maximum number of procs allowed in the pool. The default is 4.
 
 =item B<ipc>
 
@@ -268,11 +268,11 @@ Defaults to 1, and falsy to block.
 
 =back
 
-=head2 max_kids
+=head2 max_procs
 
-  $p->max_kids(4);
+  $p->max_procs(4);
 
-max_kids setter/getter.
+max_procs setter/getter.
 
 =head2 fmap
 
@@ -315,7 +315,7 @@ bug as I make changes.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 Andrew Shapiro.
+Copyright 2024 Andrew Shapiro.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

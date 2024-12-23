@@ -4,7 +4,7 @@ use Moose::Role;
 
 # You only really need to change this if you change the code in this file
 # but syncing it to the main version is ok as well.
-our $VERSION = 0.001016;
+our $VERSION = 0.001017;
 eval $VERSION;
 
 has 'exported_to_template' => (is=>'ro');

@@ -12,15 +12,12 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use lib 't/lib';
 use Helper;
 
-# the document where most constraints are defined
-use constant SCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07';
-
 subtest 'basic construction' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
     schema => {
-      openapi => '3.1.0',
+      openapi => OAS_VERSION,
       info => {
         title => 'my title',
         version => '1.2.3',
@@ -58,7 +55,7 @@ subtest 'top level document fields' => sub {
       {
         instanceLocation => '',
         keywordLocation => '/type',
-        absoluteKeywordLocation => SCHEMA.'#/type',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/type',
         error => 'got integer, not object',
       },
     ],
@@ -83,7 +80,7 @@ subtest 'top level document fields' => sub {
       {
         instanceLocation => '',
         keywordLocation => '/required',
-        absoluteKeywordLocation => SCHEMA.'#/required',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/required',
         error => 'object is missing property: openapi',
       },
     ],
@@ -100,7 +97,7 @@ subtest 'top level document fields' => sub {
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
     schema => {
-      openapi => '3.1.0',
+      openapi => OAS_VERSION,
       info => {},
       paths => {},
     },
@@ -111,13 +108,13 @@ subtest 'top level document fields' => sub {
       {
         instanceLocation => '/info',
         keywordLocation => '/$ref/properties/info/$ref/required',
-        absoluteKeywordLocation => SCHEMA.'#/$defs/info/required',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/$defs/info/required',
         error => 'object is missing properties: title, version',
       },
       {
         instanceLocation => '',
         keywordLocation => '/$ref/properties',
-        absoluteKeywordLocation => SCHEMA.'#/properties',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
         error => 'not all properties are valid',
       },
     ],
@@ -143,13 +140,13 @@ ERRORS
       {
         instanceLocation => '/openapi',
         keywordLocation => '/properties/openapi/pattern',
-        absoluteKeywordLocation => SCHEMA.'#/properties/openapi/pattern',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties/openapi/pattern',
         error => 'unrecognized openapi version 2.1.3',
       },
       {
         instanceLocation => '',
         keywordLocation => '/properties',
-        absoluteKeywordLocation => SCHEMA.'#/properties',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
         error => 'not all properties are valid',
       },
     ],
@@ -161,7 +158,7 @@ ERRORS
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
     schema => {
-      openapi => '3.1.0',
+      openapi => OAS_VERSION,
       info => {
         title => 'my title',
         version => '1.2.3',
@@ -175,13 +172,13 @@ ERRORS
       {
         instanceLocation => '/jsonSchemaDialect',
         keywordLocation => '/properties/jsonSchemaDialect/type',
-        absoluteKeywordLocation => SCHEMA.'#/properties/jsonSchemaDialect/type',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties/jsonSchemaDialect/type',
         error => 'got null, not string',
       },
       {
         instanceLocation => '',
         keywordLocation => '/properties',
-        absoluteKeywordLocation => SCHEMA.'#/properties',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
         error => 'not all properties are valid',
       },
     ],
@@ -205,7 +202,7 @@ ERRORS
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
     schema => {
-      openapi => '3.1.0',
+      openapi => OAS_VERSION,
       info => {
         title => 'my title',
         version => '1.2.3',
@@ -243,7 +240,7 @@ ERRORS
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
     schema => {
-      openapi => '3.1.0',
+      openapi => OAS_VERSION,
       info => {
         title => 'my title',
         version => '1.2.3',
@@ -258,13 +255,13 @@ ERRORS
       (map +{
         instanceLocation => '',
         keywordLocation => '/$ref/anyOf/'.$iter.'/required',
-        absoluteKeywordLocation => SCHEMA.'#/anyOf/'.$iter++.'/required',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/anyOf/'.$iter++.'/required',
         error => 'object is missing property: '.$_,
       }, qw(paths components webhooks)),
       {
         instanceLocation => '',
         keywordLocation => '/$ref/anyOf',
-        absoluteKeywordLocation => SCHEMA.'#/anyOf',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/anyOf',
         error => 'no subschemas are valid',
       },
       (map +{
@@ -276,7 +273,7 @@ ERRORS
       {
         instanceLocation => '',
         keywordLocation => "/\$ref/properties",
-        absoluteKeywordLocation => SCHEMA.'#/properties',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
         error => 'not all properties are valid',
       },
     ],
@@ -300,7 +297,7 @@ ERRORS
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
     schema => {
-      openapi => '3.1.0',
+      openapi => OAS_VERSION,
       info => {
         title => 'my title',
         version => '1.2.3',
@@ -320,7 +317,7 @@ ERRORS
       {
         instanceLocation => '',
         keywordLocation => '/$ref/properties',
-        absoluteKeywordLocation => SCHEMA.'#/properties',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
         error => 'not all properties are valid',
       },
     ],
@@ -339,7 +336,7 @@ ERRORS
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
     schema => {
-      openapi => '3.1.0',
+      openapi => OAS_VERSION,
       info => {
         title => 'my title',
         version => '1.2.3',
@@ -350,7 +347,7 @@ ERRORS
   );
 
   cmp_deeply([ $doc->errors ], [], 'no errors with default jsonSchemaDialect');
-  is($doc->json_schema_dialect, 'https://spec.openapis.org/oas/3.1/dialect/base', 'default jsonSchemaDialect is saved in the document');
+  is($doc->json_schema_dialect, DEFAULT_DIALECT, 'default jsonSchemaDialect is saved in the document');
 
   $js->add_document($doc);
   cmp_deeply(
@@ -368,21 +365,21 @@ ERRORS
       },
       # the oas vocabulary, and the dialect that uses it
       (map +($_ => {
-        canonical_uri => str('https://spec.openapis.org/oas/3.1/dialect/base'),
+        canonical_uri => str(DEFAULT_DIALECT),
         path => '',
         specification_version => 'draft2020-12',
         document => ignore,
         vocabularies => ignore,
         configs => {},
-      }), 'https://spec.openapis.org/oas/3.1/dialect/base', 'https://spec.openapis.org/oas/3.1/dialect/base#meta'),
+      }), DEFAULT_DIALECT, DEFAULT_DIALECT.'#meta'),
       (map +($_ => {
-        canonical_uri => str('https://spec.openapis.org/oas/3.1/meta/base'),
+        canonical_uri => str(OAS_VOCABULARY),
         path => '',
         specification_version => 'draft2020-12',
         document => ignore,
         vocabularies => ignore,
         configs => {},
-      }), 'https://spec.openapis.org/oas/3.1/meta/base', 'https://spec.openapis.org/oas/3.1/meta/base#meta'),
+      }), OAS_VOCABULARY, OAS_VOCABULARY.'#meta'),
     }),
     'resources are properly stored on the evaluator',
   );
@@ -402,7 +399,7 @@ ERRORS
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
     schema => {
-      openapi => '3.1.0',
+      openapi => OAS_VERSION,
       info => {
         title => 'my title',
         version => '1.2.3',
@@ -410,7 +407,7 @@ ERRORS
       jsonSchemaDialect => 'https://mymetaschema',
       paths => {},
     },
-    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema', # '#meta' is now just {"type": ["object","boolean"]}
+    metaschema_uri => DEFAULT_METASCHEMA, # '#meta' is now just {"type": ["object","boolean"]}
   );
   cmp_deeply([], [ map $_->TO_JSON, $doc->errors ], 'no errors with a custom jsonSchemaDialect');
   is($doc->json_schema_dialect, 'https://mymetaschema', 'custom jsonSchemaDialect is saved in the document');

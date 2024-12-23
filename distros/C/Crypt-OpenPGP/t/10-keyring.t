@@ -4,7 +4,7 @@ use Test::Exception;
 
 use_ok 'Crypt::OpenPGP::KeyRing';
 
-use vars qw( $SAMPLES );
+our $SAMPLES;
 unshift @INC, 't/';
 require 'test-common.pl';
 use File::Spec;

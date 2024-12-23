@@ -1,7 +1,9 @@
 package App::Sky::CmdLine;
-$App::Sky::CmdLine::VERSION = '0.4.3';
+$App::Sky::CmdLine::VERSION = '0.6.0';
 use strict;
 use warnings;
+use 5.020;
+use utf8;
 
 
 use Carp ();
@@ -20,6 +22,45 @@ use YAML::XS qw(LoadFile);
 use Scalar::Util qw(reftype);
 
 has 'argv' => ( isa => 'ArrayRef[Str]', is => 'rw', required => 1, );
+
+# Better than DATA , IMHO
+my $INIT_YAML_CONFIG_CONTENTS = <<"ENDFILE";
+---
+default_site: homepage
+sites:
+    homepage:
+        base_upload_cmd:
+            - 'rsync'
+            - '-a'
+            - '-v'
+            - '--progress'
+            - '--inplace'
+        dest_upload_prefix: 'hostgator:public_html/'
+        dest_upload_url_prefix: 'https://www.destsite.tld/'
+        dirs_section: 'dirs'
+        sections:
+            archives:
+                basename_re: '\\.(?:7z|AppImage\\.xz|ova(?:\\.xz)?|tar|tar\\.bz2|tar\\.gz|tar\\.xz|tar\\.zst|zip|exe|rpm)(?:\\.zsync)?\\z'
+                target_dir: 'Files/files/arcs/'
+            code:
+                basename_re: '\\.(?:bash|c|cpp|diff|hs|js|json|log|p6|patch|pl|pm|py|rb|rs|s|scm|spec|ts|vim|yaml|yml)(?:\\.bz2|\\.gz|\\.xz\\|\\.zst)?\\z'
+                target_dir: 'Files/files/code/'
+            dirs:
+                basename_re: '\\.(MYDIR)\\z'
+                target_dir: 'Files/files/dirs/'
+            images:
+                basename_re: '\\.(?:bmp|gif|jpeg|jpg|kra|png|(?:ai|svg|xcf)(?:\\.bz2|\\.gz|\\.xz\\|\\.zst)?|svgz|webp)\\z'
+                target_dir: 'Files/files/images/'
+            music:
+                basename_re: '\\.(?:aac|aup3|m4a|mod|mp3|ogg|s3m|wav|xm)\\z'
+                target_dir: 'Files/files/music/mp3-ogg/'
+            text:
+                basename_re: '\\.(?:asciidoc|docx|epub|html|md|mkdn|ods|odt|pdf|tsv|txt|xml|xhtml|xlsx)(?:\\.bz2|\\.gz|\\.xz\\|\\.zst)?\\z'
+                target_dir: 'Files/files/text/'
+            video:
+                basename_re: '\\.(?:avi|flv|mkv|mp4|mpeg|mpg|ogv|srt|webm)\\z'
+                target_dir: 'Files/files/video/'
+ENDFILE
 
 
 sub _basic_help
@@ -58,6 +99,20 @@ sub _shift
     return shift( @{ $self->argv() } );
 }
 
+sub _write_utf8_file
+{
+    my ( $out_path, $contents ) = @_;
+
+    open my $out_fh, '>:encoding(utf8)', $out_path
+        or die "Cannot open '$out_path' for writing - $!";
+
+    print {$out_fh} $contents;
+
+    close($out_fh);
+
+    return;
+}
+
 sub run
 {
     my ($self) = @_;
@@ -89,6 +144,13 @@ sub run
 
         my $config_fn =
             File::Spec->catfile( $dist_config_dir, 'app_sky_conf.yml' );
+
+        if ( not( -e $config_fn ) )
+        {
+            _write_utf8_file( $config_fn, $INIT_YAML_CONFIG_CONTENTS );
+            warn
+qq#Populated the "$config_fn" configuration file with initial contents. You should review it.#;
+        }
 
         my $config = LoadFile($config_fn);
 
@@ -208,7 +270,7 @@ App::Sky::CmdLine - command line program
 
 =head1 VERSION
 
-version 0.4.3
+version 0.6.0
 
 =head1 METHODS
 

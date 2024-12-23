@@ -18,7 +18,7 @@ use Data::Dumper qw/Dumper/;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('1.0.5');
+our $VERSION = version->new('1.0.6');
 our $NAME    = 'sessions';
 our $OPTIONS = [
     'dest|d=s',  'global|g', 'session|source|s=s', 'verbose|v+',
@@ -131,6 +131,10 @@ sub session_shift {
     return $self->modify_session(
         sub {
             my ($session) = @_;
+            if ( !$session->[0] ) {
+                warn "No more sessions to run!\n";
+                exit 0;
+            }
             warn "running $session->[0][0]\n";
             return shift @$session;
         }
@@ -235,7 +239,7 @@ App::VTide::Command::Sessions - Create/Update/List saved vtide sessions
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Sessions version 1.0.5
+This documentation refers to App::VTide::Command::Sessions version 1.0.6
 
 =head1 SYNOPSIS
 

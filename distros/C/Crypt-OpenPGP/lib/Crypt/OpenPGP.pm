@@ -1,8 +1,9 @@
 package Crypt::OpenPGP;
 use strict;
+use warnings;
 use 5.008_001;
 
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::Constants qw( DEFAULT_CIPHER );
 use Crypt::OpenPGP::KeyRing;
@@ -18,7 +19,7 @@ use base qw( Crypt::OpenPGP::ErrorHandler );
 use File::HomeDir;
 use File::Spec;
 
-use vars qw( %COMPAT );
+our %COMPAT;
 
 ## pgp2 and pgp5 do not trim trailing whitespace from "canonical text"
 ## signatures, only from cleartext signatures.

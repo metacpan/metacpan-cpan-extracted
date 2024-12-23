@@ -23,6 +23,7 @@ MANIFEST.SKIP
 MYMETA.json
 MYMETA.yml
 scripts/mc-encode
+t/aac_channels.t
 t/av1.t
 t/avsync.t
 t/codecs.t

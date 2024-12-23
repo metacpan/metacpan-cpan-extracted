@@ -1,12 +1,14 @@
 package Crypt::OpenPGP::Cipher;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::CFB;
 use Crypt::OpenPGP::ErrorHandler;
 use base qw( Crypt::OpenPGP::ErrorHandler );
 
-use vars qw( %ALG %ALG_BY_NAME );
-%ALG = (
+our %ALG = (
     1 => 'IDEA',
     2 => 'DES3',
     3 => 'CAST5',
@@ -16,7 +18,7 @@ use vars qw( %ALG %ALG_BY_NAME );
     9 => 'Rijndael256',
     10 => 'Twofish',
 );
-%ALG_BY_NAME = map { $ALG{$_} => $_ } keys %ALG;
+our %ALG_BY_NAME = map { $ALG{$_} => $_ } keys %ALG;
 
 sub new {
     my $class = shift;
@@ -75,6 +77,8 @@ sub supported {
 
 package Crypt::OpenPGP::Cipher::IDEA;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Cipher );
 
 sub init {
@@ -93,6 +97,8 @@ sub blocksize { 8 }
 
 package Crypt::OpenPGP::Cipher::Blowfish;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Cipher );
 
 sub crypt_class { 'Crypt::Blowfish' }
@@ -101,6 +107,8 @@ sub blocksize { 8 }
 
 package Crypt::OpenPGP::Cipher::DES3;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Cipher );
 
 sub crypt_class { 'Crypt::DES_EDE3' }
@@ -109,14 +117,18 @@ sub blocksize { 8 }
 
 package Crypt::OpenPGP::Cipher::CAST5;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Cipher );
 
-sub crypt_class { 'Crypt::CAST5_PP' }
+sub crypt_class { ['Crypt::CAST5_PP', 'Crypt::CAST5'] }
 sub keysize { 16 }
 sub blocksize { 8 }
 
 package Crypt::OpenPGP::Cipher::Twofish;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Cipher );
 
 sub crypt_class { 'Crypt::Twofish' }
@@ -125,6 +137,8 @@ sub blocksize { 16 }
 
 package Crypt::OpenPGP::Cipher::Rijndael;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Cipher );
 
 sub crypt_class { 'Crypt::Rijndael' }
@@ -133,6 +147,8 @@ sub blocksize { 16 }
 
 package Crypt::OpenPGP::Cipher::Rijndael192;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Cipher );
 
 sub crypt_class { 'Crypt::Rijndael' }
@@ -141,6 +157,8 @@ sub blocksize { 16 }
 
 package Crypt::OpenPGP::Cipher::Rijndael256;
 use strict;
+use warnings;
+
 use base qw( Crypt::OpenPGP::Cipher );
 
 sub crypt_class { 'Crypt::Rijndael' }

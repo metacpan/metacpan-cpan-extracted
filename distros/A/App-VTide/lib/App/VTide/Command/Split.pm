@@ -15,7 +15,7 @@ use YAML::Syck;
 
 extends 'App::VTide::Command::Start';
 
-our $VERSION = version->new('1.0.5');
+our $VERSION = version->new('1.0.6');
 our $NAME    = 'split';
 our $OPTIONS = [ 'test|t!', 'verbose|v+', ];
 our $LOCAL   = 1;
@@ -24,15 +24,15 @@ sub details_sub { return ( $NAME, $OPTIONS, $LOCAL ) }
 sub run {
     my ($self) = @_;
 
-    my $split = shift @ARGV;
+    my $split = shift @{ $self->options->files };
     my $v     = $self->defaults->{verbose} ? '--verbose' : '';
     my $term  = $ENV{VTIDE_TERM};
     my $cmd   = $term ? "vtide run $v" : 'bash';
     my $out   = $self->tmux_window( $term, $cmd, undef, $split );
 
-    if ( $self->defaults->{test} ) {
+    if ( $self->defaults->{test} || $self->defaults->{verbose} ) {
         print "tmux $out\n";
-        return 1;
+        return 0 if $self->defaults->{test};
     }
 
     system "tmux $out";
@@ -54,7 +54,7 @@ App::VTide::Command::Split - Split tmux terminal helper
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Split version 1.0.5
+This documentation refers to App::VTide::Command::Split version 1.0.6
 
 =head1 SYNOPSIS
 

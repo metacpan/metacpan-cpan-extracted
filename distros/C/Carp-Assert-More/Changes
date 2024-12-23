@@ -1,6 +1,15 @@
 Revision history for Perl extension Carp::Assert::More.
 
 
+2.6.0   Sun Dec 22 23:37:00 CST 2024
+        [ENHANCEMENTS]
+        Add assert(), the same as assert() in Carp::Assert, as a
+        convenience.
+
+        Add assert_and(), assert_or() and assert_xor() for more helpful
+        stacktraces.
+
+
 2.5.0   Fri Oct 25 14:46:06 CDT 2024
         [ENHANCEMENTS]
         Add assert_context_list() function.

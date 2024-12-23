@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Import::Into" => 0,
     "List::Util" => 0,
     "POSIX" => 0,
-    "Path::Tiny" => 0,
+    "Path::Tiny" => "0.146",
     "Scalar::Util" => 0,
     "Symbol" => 0,
     "Text::CSV" => "1.90_01",
@@ -83,7 +83,7 @@ my %WriteMakefileArgs = (
     "multidimensional" => 0,
     "open" => 0
   },
-  "VERSION" => "1000.025",
+  "VERSION" => "1000.026",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -125,7 +125,7 @@ my %FallbackPrereqs = (
   "JSON" => 0,
   "List::Util" => 0,
   "POSIX" => 0,
-  "Path::Tiny" => 0,
+  "Path::Tiny" => "0.146",
   "Scalar::Util" => 0,
   "Symbol" => 0,
   "Test2::Plugin::BailOnFail" => 0,

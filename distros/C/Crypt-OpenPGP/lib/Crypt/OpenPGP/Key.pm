@@ -1,17 +1,19 @@
 package Crypt::OpenPGP::Key;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Carp qw( confess );
 use Crypt::OpenPGP::ErrorHandler;
 use base qw( Crypt::OpenPGP::ErrorHandler );
 
-use vars qw( %ALG %ALG_BY_NAME );
-%ALG = (
+our %ALG = (
     1 => 'RSA',
     16 => 'ElGamal',
     17 => 'DSA',
 );
-%ALG_BY_NAME = map { $ALG{$_} => $_ } keys %ALG;
+our %ALG_BY_NAME = map { $ALG{$_} => $_ } keys %ALG;
 
 sub new {
     my $class = shift;
@@ -62,7 +64,7 @@ sub can_sign { 0 }
 
 sub DESTROY { }
 
-use vars qw( $AUTOLOAD );
+our $AUTOLOAD;
 sub AUTOLOAD {
     my $key = shift;
     (my $meth = $AUTOLOAD) =~ s/.*:://;

@@ -8,8 +8,7 @@
 <ul class="breadcrumb">
   <li>
     <a href="<%= url_for($sprefix ? $sprefix : '/') %>">
-      <i class="icon-home"></i>
-    </a>
+      <span class="unicon">&#x2302;</span></a>
     <span class="divider">/</span>
   </li>
   <li>

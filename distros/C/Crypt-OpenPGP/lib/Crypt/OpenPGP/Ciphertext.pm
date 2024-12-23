@@ -1,5 +1,8 @@
 package Crypt::OpenPGP::Ciphertext;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::Util;
 use Crypt::OpenPGP::Cipher;

@@ -126,7 +126,7 @@ my @content
     "de-at/LC_MESSAGES/example1.po (clean)\n\n",
     $content[1];
 
-# $Id: 22_process_extended_skip_utf-8.pl 709 2017-11-03 10:40:26Z steffenw $
+# $Id: 22_process_extended_skip_utf-8.pl 720 2018-09-21 13:05:54Z steffenw $
 
 __END__
 

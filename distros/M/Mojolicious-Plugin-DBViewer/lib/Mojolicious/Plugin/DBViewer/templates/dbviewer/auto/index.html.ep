@@ -14,7 +14,7 @@
     % for my $database (sort @$databases) {
       <li>
         <a href="<%= url_for("$sprefix/tables")->query(database => $database) %>">
-          <i class="icon-circle-arrow-right"></i> <%= $database %>
+          <span class="unicon">&#x2B8A;</span> <%= $database %>
           %= $current_database eq $database ? '(current)' : ''
         </a>
       </li>

@@ -18,14 +18,6 @@ use Test::Warnings 0.033 qw(:no_end_test allow_patterns);
 use lib 't/lib';
 use Helper;
 
-my $openapi_preamble = <<'YAML';
----
-openapi: 3.1.0
-info:
-  title: Test API
-  version: 1.2.3
-YAML
-
 my $doc_uri = Mojo::URL->new('http://example.com/api');
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
@@ -38,8 +30,7 @@ note 'REQUEST/RESPONSE TYPE: '.$::TYPE;
 subtest 'missing or invalid arguments' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths: {}
 YAML
 
@@ -78,8 +69,7 @@ YAML
 subtest 'path lookup' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   pathItems:
     my_path_item:
@@ -88,20 +78,20 @@ components:
         operationId: my_components_pathItem_operation
         callbacks:
           my_callback:
-            '{\$request.query.queryUrl}': # note this is a path-item
+            '{$request.query.queryUrl}': # note this is a path-item
               post:
                 operationId: my_components_pathItem_callback_operation
     my_path_item2:
-      description: this should be useable, as it is \$ref'd by a /paths/<template> path item
+      description: this should be useable, as it is $ref'd by a /paths/<template> path item
       post:
         operationId: my_reffed_component_operation
 paths:
-  /foo: {}  # TODO: \$ref to #/components/pathItems/my_path_item2
+  /foo: {}  # TODO: $ref to #/components/pathItems/my_path_item2
   /foo/bar:
     post:
       callbacks:
         my_callback:
-          '{\$request.query.queryUrl}': # note this is a path-item
+          '{$request.query.queryUrl}': # note this is a path-item
             post:
               operationId: my_paths_pathItem_callback_operation
 webhooks:
@@ -235,8 +225,7 @@ YAML
 subtest 'validation errors, request uri paths' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get:
@@ -245,7 +234,7 @@ paths:
         in: path
         required: true
         schema:
-          pattern: ^[0-9]+\$
+          pattern: ^[0-9]+$
 YAML
 
   cmp_result(
@@ -282,8 +271,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     get:
@@ -292,7 +280,7 @@ paths:
         in: path
         required: true
         schema:
-          pattern: ^[0-9]+\$
+          pattern: ^[0-9]+$
 YAML
 
   cmp_result(
@@ -314,8 +302,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     get:
@@ -357,8 +344,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     get:
@@ -407,8 +393,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}/bar/{bar_id}:
     parameters:
@@ -416,12 +401,12 @@ paths:
       in: path
       required: true
       schema:
-        pattern: ^[0-9]+\$
+        pattern: ^[0-9]+$
     - name: bar_id
       in: path
       required: true
       schema:
-        pattern: ^[0-9]+\$
+        pattern: ^[0-9]+$
     get:
       parameters:
       - name: foo_id
@@ -462,13 +447,12 @@ YAML
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => do {
-      YAML::PP->new(boolean => 'JSON::PP')->load_string(<<YAML);
-$openapi_preamble
+      $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML');
 paths:
   /foo/{foo_id}:
     get: {}
 YAML
-      },
+    },
   );
 
   cmp_result(
@@ -491,8 +475,7 @@ YAML
 subtest 'validation errors in requests' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post: {}
@@ -507,13 +490,12 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
       parameters:
-      - \$ref: '#/i_do_not_exist'
+      - $ref: '#/i_do_not_exist'
 YAML
 
   cmp_result(
@@ -535,12 +517,11 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     parameters:
-    - \$ref: '#/i_do_not_exist'
+    - $ref: '#/i_do_not_exist'
     post: {}
 YAML
 
@@ -563,17 +544,16 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     foo:
-      \$ref: '#/i_do_not_exist'
+      $ref: '#/i_do_not_exist'
 paths:
   /foo:
     post:
       parameters:
-      - \$ref: '#/components/parameters/foo'
+      - $ref: '#/components/parameters/foo'
 YAML
 
   cmp_result(
@@ -595,8 +575,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -627,8 +606,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     foo-header:
@@ -636,15 +614,15 @@ components:
       in: header
       required: true
       schema:
-        pattern: ^[0-9]+\$
+        pattern: ^[0-9]+$
     bar-header-ref:
-      \$ref: '#/components/parameters/bar-header'
+      $ref: '#/components/parameters/bar-header'
     bar-header:
       name: Beta
       in: header
       required: true
       schema:
-        pattern: ^[0-9]+\$
+        pattern: ^[0-9]+$
 paths:
   /foo:
     parameters:
@@ -658,8 +636,8 @@ paths:
         in: query
         required: true
         schema:
-          pattern: ^[0-9]+\$
-      - \$ref: '#/components/parameters/foo-header'
+          pattern: ^[0-9]+$
+      - $ref: '#/components/parameters/foo-header'
       - name: beta
         in: query
         required: false
@@ -692,7 +670,7 @@ paths:
           iMAgE/*:
             schema:
               not: true
-      - \$ref: '#/components/parameters/bar-header-ref'
+      - $ref: '#/components/parameters/bar-header-ref'
 YAML
   # note that bar_id is not listed as a path parameter
 
@@ -829,8 +807,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get:
@@ -902,8 +879,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     parameters:
@@ -911,22 +887,22 @@ paths:
       in: query
       required: true
       schema:
-        pattern: ^[0-9]+\$
+        pattern: ^[0-9]+$
     - name: beta
       in: query
       required: true
       schema:
-        pattern: ^[0-9]+\$
+        pattern: ^[0-9]+$
     - name: alpha
       in: header
       required: true
       schema:
-        pattern: ^[0-9]+\$
+        pattern: ^[0-9]+$
     - name: beta
       in: header
       required: true
       schema:
-        pattern: ^[0-9]+\$
+        pattern: ^[0-9]+$
     get:
       parameters:
       - name: alpha
@@ -979,13 +955,12 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get:
       requestBody:
-        \$ref: '#/i_do_not_exist'
+        $ref: '#/i_do_not_exist'
 YAML
 
   cmp_result(
@@ -1007,8 +982,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -1021,7 +995,7 @@ paths:
               properties:
                 alpha:
                   type: string
-                  pattern: ^[0-9]+\$
+                  pattern: ^[0-9]+$
                 beta:
                   type: string
                   const: éclair
@@ -1336,8 +1310,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -1385,8 +1358,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -1432,8 +1404,7 @@ subtest 'document errors' => sub {
   my $request = request('GET', 'http://example.com/foo?alpha=1');
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     alpha:
@@ -1444,8 +1415,8 @@ components:
 paths:
   /foo:
     parameters:
-    - \$ref: '#/components/parameters/alpha'
-    - \$ref: '#/components/parameters/alpha'
+    - $ref: '#/components/parameters/alpha'
+    - $ref: '#/components/parameters/alpha'
     get: {}
 YAML
 
@@ -1467,8 +1438,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     alpha:
@@ -1480,8 +1450,8 @@ paths:
   /foo:
     get:
       parameters:
-      - \$ref: '#/components/parameters/alpha'
-      - \$ref: '#/components/parameters/alpha'
+      - $ref: '#/components/parameters/alpha'
+      - $ref: '#/components/parameters/alpha'
 YAML
 
   cmp_result(
@@ -1503,8 +1473,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -1563,8 +1532,7 @@ YAML
 subtest 'type handling of values for evaluation' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     parameters:
@@ -1573,7 +1541,7 @@ paths:
       required: true
       schema:
         maximum: 10
-        pattern: ^[a-z]\$
+        pattern: ^[a-z]$
     post:
       parameters:
       - name: bar
@@ -1581,20 +1549,20 @@ paths:
         required: false
         schema:
           maximum: 10
-          pattern: ^[a-z]\$
+          pattern: ^[a-z]$
       - name: Foo-Bar
         in: header
         required: false
         schema:
           maximum: 10
-          pattern: ^[a-z]\$
+          pattern: ^[a-z]$
       requestBody:
         required: true
         content:
           text/plain:
             schema:
               maximum: 10
-              pattern: ^[a-z]\$
+              pattern: ^[a-z]$
 YAML
 
   my $request = request('POST', 'http://example.com/foo/123?bar=456',
@@ -1664,8 +1632,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     parameters:
@@ -1710,8 +1677,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     parameters:
@@ -1765,8 +1731,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{path_plain}/bar/{path_encoded}:
     parameters:
@@ -1913,8 +1878,7 @@ YAML
 subtest 'parameter parsing' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get:
@@ -1968,16 +1932,16 @@ paths:
       - name: ArrayWithRef
         in: header
         schema:
-          \$ref: '#/paths/~1foo/get/parameters/2/schema'
+          $ref: '#/paths/~1foo/get/parameters/2/schema'
       - name: ArrayWithRefAndOtherKeywords
         in: header
         schema:
-          \$ref: '#/paths/~1foo/get/parameters/2/schema'
+          $ref: '#/paths/~1foo/get/parameters/2/schema'
           not: true
       - name: ArrayWithBrokenRef
         in: header
         schema:
-          \$ref: '#/components/schemas/i_do_not_exist'
+          $ref: '#/components/schemas/i_do_not_exist'
       - name: MultipleValuesAsRawString
         in: header
         schema:
@@ -2098,19 +2062,18 @@ subtest 'max_depth' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(max_traversal_depth => 15, validate_formats => 1),
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     foo:
-      \$ref: '#/components/parameters/bar'
+      $ref: '#/components/parameters/bar'
     bar:
-      \$ref: '#/components/parameters/foo'
+      $ref: '#/components/parameters/foo'
 paths:
   /foo:
     post:
       parameters:
-      - \$ref: '#/components/parameters/foo'
+      - $ref: '#/components/parameters/foo'
 YAML
 
   my $request = request('POST', 'http://example.com/foo');
@@ -2135,8 +2098,7 @@ subtest 'unevaluatedProperties and annotations' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -2178,8 +2140,7 @@ subtest 'readOnly' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -2229,8 +2190,7 @@ subtest 'no bodies in GET or HEAD requests without requestBody' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     head: {}
@@ -2297,8 +2257,7 @@ subtest 'custom error messages for false schemas' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     evaluator => JSON::Schema::Modern->new(validate_formats => 1),
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     post:

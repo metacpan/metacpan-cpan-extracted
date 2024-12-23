@@ -12,21 +12,12 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use lib 't/lib';
 use Helper;
 
-my $openapi_preamble = <<'YAML';
----
-openapi: 3.1.0
-info:
-  title: Test API
-  version: 1.2.3
-YAML
-
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
 subtest 'use discriminator to determine petType' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
   description: 'runtime: use discriminator to determine petType'
 components:
   schemas:
@@ -34,10 +25,10 @@ components:
       discriminator:
         propertyName: petType
         mapping:
-          fish: '#/components/schemas/definitions/\$defs/aquatic'
+          fish: '#/components/schemas/definitions/$defs/aquatic'
       anyOf:
-      - \$ref: '#/components/schemas/cat'
-      - \$ref: '#/components/schemas/definitions/\$defs/aquatic'
+      - $ref: '#/components/schemas/cat'
+      - $ref: '#/components/schemas/definitions/$defs/aquatic'
 
     cat:
       required: [ meow ]
@@ -47,7 +38,7 @@ components:
         meow:
           const: true
     definitions:
-      \$defs:
+      $defs:
         aquatic:
           required: [ swims ]
           properties:
@@ -182,8 +173,7 @@ YAML
 subtest 'discriminator in a parent definition' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
   description: 'runtime: use discriminator to determine petType'
 components:
   schemas:
@@ -202,7 +192,7 @@ components:
           type: string
     Cat:
       allOf:
-      - \$ref: '#/components/schemas/Pet'
+      - $ref: '#/components/schemas/Pet'
       - type: object
         # all other properties specific to a `Cat`
         properties:
@@ -212,7 +202,7 @@ components:
             const: meow
     Dog:
       allOf:
-      - \$ref: '#/components/schemas/Pet'
+      - $ref: '#/components/schemas/Pet'
       - type: object
         # all other properties specific to a `Dog`
         properties:
@@ -221,14 +211,14 @@ components:
     dog:
       description: this is not the dog you're looking for
       allOf:
-      - \$ref: '#/components/schemas/Pet'
+      - $ref: '#/components/schemas/Pet'
       - type: object
         properties:
           sound:
             const: yipyip
     Lizard:
       allOf:
-      - \$ref: '#/components/schemas/Pet'
+      - $ref: '#/components/schemas/Pet'
       - type: object
         # all other properties specific to a `Lizard`
         properties:

@@ -21,7 +21,7 @@ use_ok 'Catalyst::View::EmbeddedPerl::PerRequest';
 {
   ok my $res = request GET '/hello_name';
   ok my $data = $res->content; 
-  is $data, "\n<html>
+  is $data, "\n\n\n<html>
   <head>
     <title>Example</title>
     <style>
@@ -63,6 +63,8 @@ use_ok 'Catalyst::View::EmbeddedPerl::PerRequest';
 {
   ok my $res = request GET '/inherit';
   ok my $data = $res->content;
+
+
   is $data, "<html>
   <head>
     <title>Inherited Title: 1</title>
@@ -71,7 +73,10 @@ use_ok 'Catalyst::View::EmbeddedPerl::PerRequest';
     </style>
   </head>
   <body>ccc1
-    Inherited Title    
+    Inherited Title
+    
+
+
 joe1
 joe2
 joe3

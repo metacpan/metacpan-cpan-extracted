@@ -5,7 +5,7 @@ use Test::Exception;
 use Crypt::OpenPGP;
 use Crypt::OpenPGP::Config;
 
-use vars qw( $SAMPLES );
+our $SAMPLES;
 unshift @INC, 't/';
 require 'test-common.pl';
 use File::Spec;

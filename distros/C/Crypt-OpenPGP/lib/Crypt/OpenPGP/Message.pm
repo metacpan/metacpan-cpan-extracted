@@ -1,5 +1,8 @@
 package Crypt::OpenPGP::Message;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::Buffer;
 use Crypt::OpenPGP::PacketFactory;

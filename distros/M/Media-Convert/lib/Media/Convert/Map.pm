@@ -185,14 +185,17 @@ sub arguments {
 		if($self->choice eq "both") {
 			return ('-ac', '1');
 		}
-                my $channel_layout = $self->input->channel_layouts->[0];
-                if($self->choice ne "left" && $self->choice ne "right") {
+                my $choice;
+                if($self->choice eq "left") {
+                        $choice = "FL";
+                } elsif($self->choice eq "right") {
+                        $choice = "FR";
+                } else {
                         # not supported
                         croak("Invalid audio channel choice");
                 }
 		$stream_id = $self->input->astream_id;
-                my $choice = $self->choice eq "left" ? 1 : 2;
-                return ("-filter_complex", "[$index:$stream_id]channelsplit=channel_layout=" . $channel_layout . ":channels=${choice}" . "[out]", "-map", "[out]");
+                return ("-filter_complex", "[$index:$stream_id]channelmap=channel_layout=mono:map=${choice}-0[out]", "-map", "[out]");
 	} elsif($self->type eq "stream") {
 		if($self->choice eq 'audio') {
 			return ('-map', "$index:a");

@@ -1,6 +1,9 @@
 package Crypt::OpenPGP::Buffer;
 
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use base qw( Data::Buffer );
 

@@ -1,5 +1,8 @@
 package Crypt::OpenPGP::MDC;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::Digest;
 use Crypt::OpenPGP::ErrorHandler;

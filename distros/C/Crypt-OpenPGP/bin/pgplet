@@ -1,6 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 
+our $VERSION = '1.19'; # VERSION
+
 use lib 'lib';
 
 use Term::ReadKey;

@@ -1,5 +1,5 @@
 {
-   "abstract" : "database abstraction layer",
+   "abstract" : "read-only database abstraction layer",
    "author" : [
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
@@ -39,6 +39,7 @@
             "File::Spec" : "0",
             "File::Temp" : "0",
             "File::pfopen" : "0.03",
+            "Scalar::Util" : "0",
             "autodie" : "0",
             "perl" : "5.008",
             "strict" : "0",
@@ -76,6 +77,6 @@
          "x_repository" : "https://github.com/nigelhorne/Database-Abstraction"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

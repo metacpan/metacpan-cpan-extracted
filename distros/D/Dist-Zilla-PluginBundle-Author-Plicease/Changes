@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.79      2024-12-22 09:20:54 -0700
+  - Update linux workflow to test back to 5.20 by default
+  - Add .vscode/settings.json to minted dist
+  - Add app template
+
 2.78      2024-12-21 04:34:19 -0700
   - Bump minimum required version of Path::Tiny to get ->mkdir method
 

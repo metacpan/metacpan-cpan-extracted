@@ -1,15 +1,17 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.78 {
+use 5.020;
+use stable qw( postderef );
+use true;
 
-  use 5.020;
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.79 {
+
   use Moose;
   use Dist::Zilla::File::InMemory;
   use Dist::Zilla::File::FromCode;
   use Sub::Exporter::ForMethods qw( method_installer );
-  use Data::Section { installer => method_installer }, -setup;
+  use Data::Section { installer => method_installer }, -setup => { header_re => qr/^@@ (.*?)$/ };
   use Dist::Zilla::MintingProfile::Author::Plicease;
   use JSON::PP qw( encode_json );
   use Encode qw( encode_utf8 );
-  use experimental qw( postderef );
 
   # ABSTRACT: Dist::Zilla initialization tasks for Plicease
 
@@ -63,6 +65,19 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.78 {
       my $alien = $name =~ /^Alien-[A-Za-z0-9]+$/ ? 1 : 0;
       $alien = 0 if $name =~ /^Alien-(Build|Base|Role)-/;
       $alien;
+    },
+  );
+
+  has type_app => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+      my $name = shift->zilla->name;
+      if($name =~ /^App-([a-z0-9]+)$/) {
+        return $1;
+      } else {
+        return undef;
+      }
     },
   );
 
@@ -149,6 +164,10 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.78 {
     {
       $template_name = 'Alien.pm';
     }
+    elsif($self->type_app)
+    {
+      $template_name = 'App.pm';
+    }
     elsif($self->perl_version >= 5.020)
     {
       $template_name = 'P5020.pm';
@@ -164,6 +183,12 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.78 {
 
     (my $filename = $arg->{name}) =~ s{::}{/}g;
     $self->gather_file_template($template_name => "lib/$filename.pm");
+
+    if($template_name eq 'App.pm') {
+      $self->gather_file_template("bin.pl" => "bin/@{[ $self->type_app ]}");
+      $self->gather_file_template("AppCommand.pm" => "lib/$filename/Command.pm");
+      $self->gather_file_template("AppCommandImpl.pm" => "lib/$filename/Command/foo.pm");
+    }
   }
 
   sub experimental
@@ -206,6 +231,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.78 {
     $self->gather_file_dist_ini($arg);
 
     $self->gather_file_simple  ('.gitattributes');
+    $self->gather_file_simple  ('.vscode/settings.json');
     $self->gather_file_template('.gitignore');
     $self->gather_file_simple  ('alienfile') if $self->type_alien;
     $self->gather_file_simple  ('author.yml');
@@ -223,11 +249,12 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.78 {
   sub gather_file_simple
   {
     my($self, $filename) = @_;
-    my $content = $self->section_data("dist/$filename");
+    my $content = $self->section_data("dist/$filename")->$*;
+    $content =~ s/\s*\z/"\n"/e;
     $self->log_fatal("no bundled file dist/$filename") unless $content;
     my $file = Dist::Zilla::File::InMemory->new({
       name    => $filename,
-      content => $$content,
+      content => $content,
     });
     $self->add_file($file);
   }
@@ -236,7 +263,8 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.78 {
   {
     my($self, $template_name, $filename) = @_;
     $filename //= $template_name;
-    my $template = ${ $self->section_data("template/$template_name") };
+    my $template = $self->section_data("template/$template_name")->$*;
+    $template =~ s/\s*\z/"\n"/e;
     $self->log_fatal("no bundled template: template/$template_name") unless $template;
     my $content = $self->fill_in_string($template, {
       name         => $self->zilla->name,
@@ -269,6 +297,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.78 {
       workflow       => $self->workflow,
       irc            => $self->irc,
       default_branch => 'main',
+      is_app         => !!$self->type_app,
     };
 
     my $code = sub {
@@ -419,8 +448,6 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.78 {
   __PACKAGE__->meta->make_immutable;
 }
 
-1;
-
 package Dist::Zilla::Plugin::Author::Plicease::Init2;
 
 =pod
@@ -433,7 +460,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.78
+version 2.79
 
 =head1 DESCRIPTION
 
@@ -454,8 +481,7 @@ the same terms as the Perl 5 programming language system itself.
 
 __DATA__
 
-
-__[ dist/alienfile ]__
+@@ dist/alienfile
 use alienfile;
 plugin 'PkgConfig' => 'libfoo';
 share {
@@ -469,7 +495,7 @@ share {
 };
 
 
-__[ dist/author.yml ]__
+@@ dist/author.yml
 ---
 pod_spelling_system:
   skip: 0
@@ -486,7 +512,16 @@ pod_coverage:
   private: []
 
 
-__[ dist/perlcriticrc ]__
+@@ dist/.vscode/settings.json
+{
+    "pls.perlcritic.perlcriticrc": "perlcriticrc",
+    "pls.inc": [
+        "$ROOT_PATH/lib"
+    ]
+}
+
+
+@@ dist/perlcriticrc
 severity = 1
 only = 1
 
@@ -548,7 +583,7 @@ allow_leading_tabs = 0
 [Variables::ProhibitUnusedVariables]
 
 
-__[ dist/xt/author/critic.t ]__
+@@ dist/xt/author/critic.t
 use Test2::Require::Module 'Test2::Tools::PerlCritic';
 use Test2::Require::Module 'Perl::Critic';
 use Test2::Require::Module 'Perl::Critic::Community';
@@ -565,20 +600,20 @@ perl_critic_ok ['lib','t'], $critic;
 done_testing;
 
 
-__[ dist/.gitattributes ]__
+@@ dist/.gitattributes
 *.pm linguist-language=Perl
 *.t linguist-language=Perl
 *.h linguist-language=C
 
 
-__[ dist/Changes ]__
+@@ dist/Changes
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
   - initial version
 
 
-__[ template/dist.ini ]__
+@@ template/dist.ini
 name             = {{$name}}
 author           = Graham Ollis <plicease@cpan.org>
 license          = Perl_5
@@ -605,22 +640,26 @@ test2_v0       = 1
   $extra .= "version_plugin = $version_plugin\n" if $version_plugin;
   $extra .= "irc            = $irc\n" if $irc;
 
+  if($is_app) {
+      $extra .= "\n[SetScriptShebang]\n[CommentOut]"
+  }
+
   $extra;
 
 }}
 [Author::Plicease::Core]
 
 [Author::Plicease::Upload]
-cpan = 0
+cpan = 1
 
 
-__[ template/.gitignore ]__
+@@ template/.gitignore
 {{ $name }}-*
 /.build/
 *.swp
 
 
-__[ template/t/main_class.t ]__
+@@ template/t/main_class.t
 use Test2::V0 -no_srand => 1;
 use {{ $name =~ s/-/::/gr }};
 
@@ -629,7 +668,7 @@ ok 1, 'todo';
 done_testing;
 
 
-__[ template/Default.pm ]__
+@@ template/Default.pm
 package {{ $name =~ s/-/::/gr }};
 
 use strict;
@@ -642,7 +681,7 @@ use {{ $perl_version }};
 1;
 
 
-__[ template/Alien.pm ]__
+@@ template/Alien.pm
 package {{ $name =~ s/-/::/gr }};
 
 use strict;
@@ -655,50 +694,117 @@ use base qw( Alien::Base );
 
 1;
 
-
-__[ template/Dzil.pm ]__
+@@ template/Dzil.pm
 use warnings;
 use {{ $perl_version }};
 use experimental qw( {{ $experimental }} );
+use true;
 
 package {{ $name =~ s/-/::/gr }} {
 
-  use Moose;
-  use namespace::autoclean;
+    use Moose;
+    use namespace::autoclean;
 
-  # ABSTRACT: {{ $abstract }}
+    # ABSTRACT: {{ $abstract }}
 
-  __PACKAGE__->meta->make_immutable;
+    __PACKAGE__->meta->make_immutable;
 }
 
-1;
 
-
-__[ template/P5014.pm ]__
+@@ template/P5014.pm
 use warnings;
 use {{ $perl_version }};
+use true;
 
 package {{ $name =~ s/-/::/gr }} {
 
-  # ABSTRACT: {{ $abstract }}
+    # ABSTRACT: {{ $abstract }}
 }
 
-1;
 
-
-__[ template/P5020.pm ]__
+@@ template/P5020.pm
 use warnings;
 use {{ $perl_version }};
 use experimental qw( {{ $experimental }} );
+use true;
 
 package {{ $name =~ s/-/::/gr }} {
 
-  # ABSTRACT: {{ $abstract }}
+    # ABSTRACT: {{ $abstract }}
 }
 
-1;
 
-__[ dist/.github/workflows/static.yml ]__
+@@ template/bin.pl
+use warnings;
+use {{ $perl_version }};
+use lib::findbin '../lib'; # dev-only
+use {{ $name =~ s/-/::/gr }};
+
+{{ $name =~ s/-/::/gr }}->run;
+
+# PODNAME: {{ $name =~ s/^.*-//gr }}
+# ABSTRACT: {{ $abstract }}
+
+
+@@ template/App.pm
+use warnings;
+use {{ $perl_version }};
+use experimental qw( {{ $experimental }} );
+use true;
+
+package {{ $name =~ s/-/::/gr }} {
+
+    # ABSTRACT: {{ $abstract }}
+
+    use App::Cmd::Setup -app;
+
+}
+
+
+@@ template/AppCommand.pm
+use warnings;
+use {{ $perl_version }};
+use experimental qw( {{ $experimental }} );
+use true;
+
+package {{ $name =~ s/-/::/gr }}::Command {
+
+    # ABSTRACT: {{ $abstract }}
+
+    use App::Cmd::Setup -command;
+
+    sub opt_spec ($self) {
+    }
+
+    sub validate_args ($self, $opt, $args) {
+    }
+}
+
+
+@@ template/AppCommandImpl.pm
+use warnings;
+use {{ $perl_version }};
+use experimental qw( {{ $experimental }} );
+use true;
+
+package {{ $name =~ s/-/::/gr }}::Command::foo {
+
+    # ABSTRACT: {{ $abstract }}
+
+    use App::Cmd::Setup -command;
+
+    sub opt_spec ($self) {
+    }
+
+    sub validate_args ($self, $opt, $args) {
+    }
+
+    sub execute ($self, $opt, $args) {
+    }
+}
+
+
+@@ dist/.github/workflows/static.yml
 name: static
 
 on:
@@ -729,7 +835,7 @@ jobs:
           cip script
 
 
-__[ dist/.github/workflows/linux.yml ]__
+@@ dist/.github/workflows/linux.yml
 name: linux
 
 on:
@@ -761,8 +867,6 @@ jobs:
           - "5.24"
           - "5.22"
           - "5.20"
-          - "5.18"
-          - "5.16"
 
     env:
       CIP_TAG: ${{ matrix.cip_tag }}
@@ -810,7 +914,7 @@ jobs:
           cip exec bash -c 'cat $HOME/.cpanm/latest-build/build.log'
 
 
-__[ dist/.github/workflows/windows.yml ]__
+@@ dist/.github/workflows/windows.yml
 name: windows
 
 on:
@@ -881,7 +985,7 @@ jobs:
         run: dzil test -v
 
 
-__[ dist/.github/workflows/macos.yml ]__
+@@ dist/.github/workflows/macos.yml
 name: macos
 
 on:
@@ -949,7 +1053,7 @@ jobs:
           cat ~/.cpanm/latest-build/build.log
 
 
-__[ dist/.github/workflows/cygwin.yml ]__
+@@ dist/.github/workflows/cygwin.yml
 name: cygwin
 
 on:
@@ -1042,7 +1146,7 @@ jobs:
 
 
 
-__[ dist/.github/workflows/msys2-mingw.yml ]__
+@@ dist/.github/workflows/msys2-mingw.yml
 name: msys2-mingw
 
 on:

@@ -1,7 +1,7 @@
 use lib './lib';
 use Proc::Forkmap qw(forkmap);
 
-$Proc::Forkmap::MAX_PROC = 4;
+$Proc::Forkmap::MAX_PROCS = 4;
 
 sub foo {
   my $n = shift;

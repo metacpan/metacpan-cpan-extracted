@@ -2,7 +2,7 @@ package Database::Abstraction;
 
 =head1 NAME
 
-Database::Abstraction - database abstraction layer
+Database::Abstraction - read-only database abstraction layer
 
 =cut
 
@@ -38,26 +38,32 @@ use File::pfopen 0.03;	# For $mode and list context
 use File::Temp;
 # use Error::Simple;	# A nice idea to use this but it doesn't play well with "use lib"
 use Carp;
+use Scalar::Util;
 
 our %defaults;
 use constant	DEFAULT_MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size are read into memory
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
-Abstract class giving read-only access to CSV, XML and SQLite databases via Perl without writing any SQL.
+Abstract class giving read-only access to CSV, XML and SQLite databases via Perl without writing any SQL,
+using caching for performance optimization.
+It offers functionalities like opening the database and fetching data based on various criteria,
+
 Look for databases in $directory in this order:
 1) SQLite (file ends with .sql)
 2) PSV (pipe separated file, file ends with .psv)
 3) CSV (file ends with .csv or .db, can be gzipped) (note the default sep_char is '!' not ',')
 4) XML (file ends with .xml)
+
+The AUTOLOAD feature allows for convenient access to database columns using method calls.
 
 If the table has a key column,
 entries are keyed on that and sorts are based on it.
@@ -79,16 +85,17 @@ For example, you can access the files in /var/db/foo.csv via this class:
     # Regular CSV: There is no entry column and the separators are commas
     sub new
     {
-	my $class = shift;
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+        my $class = shift;
+        my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
+        return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
     }
 
 You can then access the data using:
 
     my $foo = MyPackageName::Database::Foo->new(directory => '/var/dat');
     print 'Customer name ', $foo->name(customer_id => 'plugh'), "\n";
+
     my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
     print Data::Dumper->new([$row])->Dump();
 
@@ -96,9 +103,9 @@ You can then access the data using:
 
 =head2 init
 
-Set some class level defaults.
+Initializes the abstraction class and its subclasses with optional arguments for configuration.
 
-    MyPackageName::Database::init(directory => '../data');
+    Database::Abstraction::init(directory => '../data');
 
 See the documentation for new to see what variables can be set.
 
@@ -132,6 +139,8 @@ Create an object to point to a read-only database.
 
 Arguments:
 
+Takes different argument formats (hash or positional)
+
 cache => place to store results;
 cache_duration => how long to store results in the cache (default is 1 hour);
 directory => where the database file is held
@@ -139,12 +148,23 @@ max_slurp_size => CSV/PSV/XML files smaller than this are held in RAM (default i
 
 If the arguments are not set, tries to take from class level defaults.
 
+Checks for abstract class usage.
+
+Slurp mode assumes that the key column (entry) is unique.
+If it isn't, searches will be incomplete.
+Turn off slurp mode on those databases,
+by setting a low value for max_slurp_size.
+
+Clones existing objects with or without modifications.
+Uses Carp::carp to log warnings for incorrect usage or potential mistakes.
+
 =cut
 
 sub new {
 	my $class = shift;
 	my %args;
 
+	# Handle hash or hashref arguments
 	if(ref($_[0]) eq 'HASH') {
 		%args = %{$_[0]};
 	} elsif((scalar(@_) % 2) == 0) {
@@ -154,16 +174,17 @@ sub new {
 	}
 
 	if(!defined($class)) {
-		# Using Database::Abstraction->new(), not Database::Abstraction::new()
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
-
+		if((scalar keys %args) > 0) {
+			# Using Database::Abstraction->new(), not Database::Abstraction::new()
+			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			return;
+		}
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
 	} elsif($class eq __PACKAGE__) {
 		croak("$class: abstract class");
-	} elsif(ref($class)) {
-		# clone the given object
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
 	}
 
@@ -211,7 +232,8 @@ sub set_logger
 	Carp::croak('Usage: set_logger(logger => $logger)')
 }
 
-# Open the database.
+# Open the database connection based on the specified type (e.g., SQLite, CSV).
+# Read the data into memory or establish a connection to the database file.
 
 sub _open {
 	my $self = shift;
@@ -435,6 +457,8 @@ the given criteria.
 Note that since this returns an array ref,
 optimisations such as "LIMIT 1" will not be used.
 
+Use caching if that is available.
+
 =cut
 
 sub selectall_hashref {
@@ -446,7 +470,7 @@ sub selectall_hashref {
 
 =head2	selectall_hash
 
-Returns an array of hash references
+Similar to selectall_hashref but returns an array of hash references.
 
 =cut
 
@@ -568,7 +592,8 @@ sub selectall_hash
 
 =head2	fetchrow_hashref
 
-Returns a hash reference for one row in a table.
+Returns a hash reference for a single row in a table.
+
 Special argument: table: determines the table to read from if not the default,
 which is worked out from the class name
 
@@ -670,7 +695,7 @@ sub fetchrow_hashref {
 
 =head2	execute
 
-Execute the given SQL on the data.
+Execute the given SQL query on the database.
 In an array context, returns an array of hash refs,
 in a scalar context returns a hash of the first row
 
@@ -725,7 +750,7 @@ sub execute
 
 =head2 updated
 
-Time that the database was last updated
+Returns the timestamp of the last database update.
 
 =cut
 
@@ -737,14 +762,18 @@ sub updated {
 
 =head2 AUTOLOAD
 
-Return the contents of an arbitrary column in the database which match the
-given criteria
+Directly access a database column.
+
+Returns all entries in a column, a single entry based on criteria.
+Uses cached data if available.
+
 Returns an array of the matches,
 or only the first when called in scalar context
 
 If the database has a column called "entry" you can do a quick lookup with
 
     my $value = $foo->column('123');	# where "column" is the value you're after
+
     my @entries = $foo->entry();
     print 'There are ', scalar(@entries), " entries in the database\n";
 
@@ -787,7 +816,7 @@ sub AUTOLOAD {
 			return map { $_->{$column} } values %{$data};
 		}
 		if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
-			$query = "SELECT $column FROM $table WHERE " . $self->{'id'} . "IS NOT NULL AND entry NOT LIKE '#%'";
+			$query = "SELECT $column FROM $table WHERE " . $self->{'id'} . " IS NOT NULL AND entry NOT LIKE '#%'";
 			$done_where = 1;
 		} else {
 			$query = "SELECT $column FROM $table";
@@ -854,7 +883,7 @@ sub AUTOLOAD {
 			return
 		}
 		if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
-			$query = "SELECT DISTINCT $column FROM $table WHERE " . $self->{'id'} . "IS NOT NULL AND entry NOT LIKE '#%'";
+			$query = "SELECT DISTINCT $column FROM $table WHERE " . $self->{'id'} . " IS NOT NULL AND entry NOT LIKE '#%'";
 			$done_where = 1;
 		} else {
 			$query = "SELECT DISTINCT $column FROM $table";
@@ -917,46 +946,35 @@ sub DESTROY {
 }
 
 # Helper routines for logger()
-sub _fatal
-{
-	my $self = shift;
+sub _log {
+	my ($self, $level, @messages) = @_;
 
-	return unless($self->{'logger'});
-
-	if(ref($self->{'logger'}) eq 'CODE') {
-		$self->{'logger'}->({ level => 'fatal', message => \@_ });
-	} else {
-		$self->{'logger'}->fatal(@_);
+	if(my $logger = $self->{'logger'}) {
+		if(ref($logger) eq 'CODE') {
+			$logger->({ level => $level, message => \@messages });
+		} else {
+			$logger->$level(@messages);
+		}
 	}
 }
 
-sub _trace
-{
+sub _fatal {
 	my $self = shift;
-
-	return unless($self->{'logger'});
-
-	if(ref($self->{'logger'}) eq 'CODE') {
-		$self->{'logger'}->({ level => 'trace', message => \@_ });
-	} else {
-		$self->{'logger'}->trace(@_);
-	}
+	$self->_log('fatal', @_);
 }
 
-sub _debug
-{
+sub _trace {
 	my $self = shift;
-
-	return unless($self->{'logger'});
-
-	if(ref($self->{'logger'}) eq 'CODE') {
-		$self->{'logger'}->({ level => 'debug', message => \@_ });
-	} else {
-		$self->{'logger'}->debug(@_);
-	}
+	$self->_log('trace', @_);
 }
 
-# Helper routine to parse the arguments given to a function,
+sub _debug {
+	my $self = shift;
+	$self->_log('debug', @_);
+}
+
+# Helper routine to parse the arguments given to a function.
+# Processes arguments passed to methods and ensures they are in a usable format,
 #	allowing the caller to call the function in anyway that they want
 #	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
 #	when called _get_params('arg', @_);
@@ -1004,8 +1022,8 @@ XML slurping is hard,
 so if XML fails for you on a small file force non-slurping mode with
 
     $foo = MyPackageName::Database::Foo->new({
-	directory => '/var/db',
-	# max_slurp_size => 1	# force to not use slurp and therefore to use SQL
+        directory => '/var/db',
+        max_slurp_size => 1	# force to not use slurp and therefore to use SQL
     });
 
 =head1 LICENSE AND COPYRIGHT

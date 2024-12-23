@@ -1,5 +1,8 @@
 package Crypt::OpenPGP::S2k;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::Buffer;
 use Crypt::OpenPGP::Digest;
@@ -7,8 +10,7 @@ use Crypt::OpenPGP::ErrorHandler;
 use Crypt::OpenPGP::Util;
 use base qw( Crypt::OpenPGP::ErrorHandler );
 
-use vars qw( %TYPES );
-%TYPES = (
+our %TYPES = (
     0 => 'Simple',
     1 => 'Salted',
     3 => 'Salt_Iter',

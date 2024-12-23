@@ -1,5 +1,5 @@
 package App::Sky::Config::Validate;
-$App::Sky::Config::Validate::VERSION = '0.4.3';
+$App::Sky::Config::Validate::VERSION = '0.6.0';
 use strict;
 use warnings;
 
@@ -127,7 +127,7 @@ App::Sky::Config::Validate - validate the configuration.
 
 =head1 VERSION
 
-version 0.4.3
+version 0.6.0
 
 =head1 METHODS
 

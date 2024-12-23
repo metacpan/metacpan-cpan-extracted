@@ -1,3 +1,7 @@
+0.31 2024-12-23
+  [Changes]
+    *  Replace image icons by Unicode characters.
+    
 0.30 2021-03-08
   - Catch up with the latest Mojolicious changes. 
     Mojolicious 8.67  2020-12-04

@@ -12,11 +12,11 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Safe::Isa;
 use List::Util 'pairs';
+use Ref::Util 'is_hashref';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 use Test2::API 'context_do';
 use Test::Needs;
-
 use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep; # import symbols: ignore, re etc
@@ -25,6 +25,23 @@ use OpenAPI::Modern;
 use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 use constant { true => JSON::PP::true, false => JSON::PP::false };
 use YAML::PP 0.005;
+
+use constant DEFAULT_DIALECT => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_DIALECT;
+use constant DEFAULT_BASE_METASCHEMA => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_BASE_METASCHEMA;
+use constant DEFAULT_METASCHEMA => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_METASCHEMA;
+use constant OAS_VOCABULARY => 'https://spec.openapis.org/oas/3.1/meta/2024-10-25';
+
+# technically all 3.1.x versions should be supported, but this is all we have tested for, and the
+# version of the schemas we're bundling.
+use constant OAS_VERSION => '3.1.1';
+
+use constant OPENAPI_PREAMBLE => <<'YAML';
+---
+openapi: 3.1.1
+info:
+  title: Test API
+  version: 1.2.3
+YAML
 
 # type can be
 # 'mojo': classes of type Mojo::URL, Mojo::Headers, Mojo::Message::Request, Mojo::Message::Response
@@ -245,7 +262,7 @@ sub cmp_result ($got, $expected, $test_name) {
 
     # dirty hack to check we always set operation_uri on success
     $ctx->fail('missing operation_uri on successful call')
-      if $expected->{errors} and $expected->{method} and not $expected->{errors}->@*
+      if is_hashref($expected) and $expected->{errors} and $expected->{method} and not $expected->{errors}->@*
       and not exists $expected->{operation_uri};
 
     my ($equal, $stack) = Test::Deep::cmp_details($got, $expected);

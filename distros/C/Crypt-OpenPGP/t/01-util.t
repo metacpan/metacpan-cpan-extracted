@@ -4,8 +4,7 @@ use Test::More tests => 63;
 use Math::BigInt;
 use Crypt::OpenPGP::Util qw( bin2bigint bigint2bin bitsize mod_exp mod_inverse );
 
-use vars qw( @TESTS );
-@TESTS = (
+my @TESTS = (
     [ 'abcdefghijklmnopqrstuvwxyz-0123456789',
       '48431489725691895261376655659836964813311343892465012587212197286379595482592365885470777',
       295 ],

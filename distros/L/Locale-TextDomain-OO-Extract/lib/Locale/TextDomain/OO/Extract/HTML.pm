@@ -6,7 +6,7 @@ use Moo;
 use MooX::Types::MooseLike::Base qw(ArrayRef Str);
 use namespace::autoclean;
 
-our $VERSION = '2.011';
+our $VERSION = '2.016';
 
 extends qw(
     Locale::TextDomain::OO::Extract::Base::RegexBasedExtractor
@@ -306,7 +306,7 @@ sub stack_item_mapping {
     while ( my $string = shift @{$match} ) {
         $string =~ s{ \s+ \z }{}xms;
         my ( $msgctxt, $msgid )
-            = $string =~ m{ \A (?: ( .*? ) \s* \Q{CONTEXT_SEPARATOR}\E )? \s* ( .* ) \z }xms;
+            = $string =~ m{ \A \s* (?: ( [^\n]+ ) \Q{CONTEXT_SEPARATOR}\E )? ( .* ) \z }xms;
         $self->add_message({
             reference => ( sprintf '%s:%s', $self->filename, $_->{line_number} ),
             msgctxt   => $msgctxt,
@@ -341,13 +341,9 @@ __END__
 Locale::TextDomain::OO::Extract::HTML
 - Extracts internationalization data from HTML
 
-$Id: HTML.pm 693 2017-09-02 09:20:30Z steffenw $
-
-$HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trunk/lib/Locale/TextDomain/OO/Extract/HTML.pm $
-
 =head1 VERSION
 
-2.011
+2.016
 
 =head1 DESCRIPTION
 
@@ -477,7 +473,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2017,
+Copyright (c) 2014 - 2024,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

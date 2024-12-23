@@ -16,7 +16,7 @@ use App::VTide::Config;
 use Path::Tiny;
 use YAML::Syck qw/ LoadFile DumpFile /;
 
-our $VERSION = version->new('1.0.5');
+our $VERSION = version->new('1.0.6');
 
 our $global_file = path $ENV{HOME}, '.vtide/sessions.yml';
 our $local_file  = path( $ENV{VTIDE_DIR} || $ENV{TMP} || $ENV{TMPDIR} || '.',
@@ -84,7 +84,7 @@ App::VTide::Sessions - Manage start and edit session
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Sessions version 1.0.5
+This documentation refers to App::VTide::Sessions version 1.0.6
 
 =head1 SYNOPSIS
 

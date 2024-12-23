@@ -89,4 +89,22 @@ subtest 'safe_parse must handle error' => sub {
     throws_ok(sub { $array->safe_parse([]) }, qr/^Must handle error/, 'Must handle error');
 };
 
+subtest 'optional array' => sub {
+    my $array = z->array(z->number)->optional;
+    is($array->parse(undef), undef, 'undef');
+    is_deeply($array->parse([1, 2, 3]), [1, 2, 3], 'Array of numbers');
+};
+
+subtest 'default of array' => sub {
+    my $array = z->array(z->number)->default([1, 2, 3]);
+    is_deeply($array->parse(undef), [1, 2, 3], 'undef');
+    is_deeply($array->parse([4, 5, 6]), [4, 5, 6], 'Array of numbers');
+};
+
+subtest 'default and optional of array' => sub {
+    my $array = z->array(z->number)->default([1, 2, 3])->optional;
+    is_deeply($array->parse(undef), [1, 2, 3], 'undef');
+    is_deeply($array->parse([4, 5, 6]), [4, 5, 6], 'Array of numbers');
+};
+
 done_testing;

@@ -1,11 +1,13 @@
 package Crypt::OpenPGP::Signature::SubPacket;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::ErrorHandler;
 use base qw( Crypt::OpenPGP::ErrorHandler );
 
-use vars qw( %SUBPACKET_TYPES );
-%SUBPACKET_TYPES = (
+our %SUBPACKET_TYPES = (
     2  => { name => 'Signature creation time',
             r    => sub { $_[0]->get_int32 },
             w    => sub { $_[0]->put_int32($_[1]) } },

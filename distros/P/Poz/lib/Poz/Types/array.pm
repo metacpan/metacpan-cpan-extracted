@@ -15,6 +15,8 @@ sub new {
         __validator__ => $validator,
         __as__        => undef,
         __rules__     => [],
+        __optional__  => 0,
+        __default__   => undef,
     }, $class;
     return $self;
 }
@@ -40,7 +42,19 @@ sub safe_parse {
 
     my ($self, $data) = @_;
     my @errors = ();
-    if (ref($data) ne 'ARRAY') {
+    if (defined $self->{__default__} && !defined $data) {
+        $data = $self->{__default__};
+    }
+    if (!defined $data) {
+        if ($self->{__optional__}) {
+            return (undef, undef);
+        } else {
+            push @errors, {
+                key   => undef,
+                error => "Required"
+            };
+        }
+    } elsif (ref($data) ne 'ARRAY') {
         push @errors, {
             key   => undef,
             error => "Invalid data: is not arrayref"
@@ -134,6 +148,19 @@ sub element {
     my ($self) = @_;
     return $self->{__validator__};
 }
+
+sub optional {
+    my ($self) = @_;
+    $self->{__optional__} = 1;
+    return $self;
+}
+
+sub default {
+    my ($self, $default) = @_;
+    $self->{__default__} = $default;
+    return $self;
+}
+
 1;
 
 =head1 NAME

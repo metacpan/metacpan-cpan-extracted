@@ -1,5 +1,5 @@
 Name:           perl-SMS-Send-Adapter-Node-Red
-Version:        0.07
+Version:        0.08
 Release:        1%{?dist}
 Summary:        SMS::Send Adapter to Node-RED JSON HTTP request
 License:        mit
@@ -48,8 +48,8 @@ find $RPM_BUILD_ROOT -depth -type d -exec rmdir {} 2>/dev/null \;
 
 %{_fixperms} $RPM_BUILD_ROOT/*
 
-mkdir -p               $RPM_BUILD_ROOT%{_localstatedir}/www/cgi-bin/cgi-bin
-cp scripts/%{name}.cgi $RPM_BUILD_ROOT%{_localstatedir}/www/cgi-bin/cgi-bin/
+mkdir -p               $RPM_BUILD_ROOT%{_localstatedir}/www/cgi-bin/
+cp scripts/%{name}.cgi $RPM_BUILD_ROOT%{_localstatedir}/www/cgi-bin/
 mkdir -p               $RPM_BUILD_ROOT/%{_datadir}/%{name}/
 cp scripts/*.psgi      $RPM_BUILD_ROOT/%{_datadir}/%{name}/
 
@@ -68,7 +68,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files cgi
 %defattr(0755,root,root,-)
-%{_localstatedir}/www/cgi-bin/cgi-bin/%{name}.cgi
+%{_localstatedir}/www/cgi-bin/%{name}.cgi
 
 %changelog
 * Sun Dec 27 2020 Michael R. Davis <mdavis@stopllc.com> 0.03-1

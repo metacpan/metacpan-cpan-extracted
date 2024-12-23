@@ -6,7 +6,9 @@ Makefile.PL
 More.pm
 README.md
 t/00-load.t
+t/assert.t
 t/assert_all_keys_in.t
+t/assert_and.t
 t/assert_aoh.t
 t/assert_arrayref.t
 t/assert_arrayref_all.t
@@ -45,10 +47,12 @@ t/assert_nonref.t
 t/assert_nonzero_integer.t
 t/assert_nonzero.t
 t/assert_numeric.t
+t/assert_or.t
 t/assert_positive_integer.t
 t/assert_positive.t
 t/assert_undefined.t
 t/assert_unlike.t
+t/assert_xor.t
 t/pod.t
 t/pod-coverage.t
 t/test-coverage.t

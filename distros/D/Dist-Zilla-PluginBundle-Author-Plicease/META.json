@@ -162,7 +162,9 @@
             "URI::Escape" : "0",
             "YAML" : "1.15",
             "namespace::autoclean" : "0",
-            "perl" : "5.020"
+            "perl" : "5.020",
+            "stable" : "0",
+            "true" : "0"
          }
       },
       "test" : {
@@ -185,7 +187,7 @@
          "web" : "https://github.com/uperl/Dist-Zilla-PluginBundle-Author-Plicease"
       }
    },
-   "version" : "2.78",
+   "version" : "2.79",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",

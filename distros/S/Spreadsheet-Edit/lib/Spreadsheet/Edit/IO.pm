@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.025'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-18'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.026'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-22'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -36,7 +36,7 @@ use File::Copy ();
 use File::Copy::Recursive ();
 use File::Glob qw/bsd_glob/;
 
-use Path::Tiny qw/path/;
+use Path::Tiny 0.146 qw/path/;
 
 # Path::Tiny OBVIATES NEED for many but we still need this
 use File::Spec ();

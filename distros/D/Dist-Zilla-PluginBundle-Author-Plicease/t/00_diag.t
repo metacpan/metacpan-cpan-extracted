@@ -58,6 +58,8 @@ $modules{$_} = $_ for qw(
   URI::Escape
   YAML
   namespace::autoclean
+  stable
+  true
 );
 
 $post_diag = sub {

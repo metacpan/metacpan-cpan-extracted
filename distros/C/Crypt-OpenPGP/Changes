@@ -1,5 +1,20 @@
 Revision history for Perl module Crypt::OpenPGP
 
+1.19 -- Sun Dec 22 19:19:35 AST 2024
+
+    [Changes since 1.18]
+    - Mostly small fixes
+    - Actually show missing module if Crypt::DSA is not installed
+    - Merge GH https://github.com/perl-Crypt-OpenPGP/Crypt-OpenPGP/pull/10 from @JRaspass
+
+    [Detailed Changelog]
+    - 46eef52 Add use warnings
+    - d5a6d7e Fixes RT#12237: Crypt::OpenPGP::PacketFactory::parse doesn't catch errors
+    - ed584f1 Fixes RT#82315: Add support for Crypt::CAST5
+    - 31f3378 Update the version in each file
+    - 524ef39 Replace "use vars" with "our"
+    - bbe3894 v1.18
+
 1.18 -- Mon Oct 14 22:09:32 ADT 2024
 
     [Changes since 1.17]

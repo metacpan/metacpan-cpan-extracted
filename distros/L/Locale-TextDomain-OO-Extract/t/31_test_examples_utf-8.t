@@ -1186,9 +1186,15 @@ $lexicon_ref = {
         "files_to_extract/gettext.html:10" => undef,
         "files_to_extract/gettext.html:13" => undef,
         "files_to_extract/gettext_loc.html:10" => undef,
-        "files_to_extract/gettext_loc.html:13" => undef,
+        "files_to_extract/gettext_loc.html:16" => undef,
         "files_to_extract/maketext_loc.html:10" => undef,
         "files_to_extract/maketext_loc.html:13" => undef
+      }
+    },
+    "This is an a text.\4context1 context2" => {
+      reference => {
+        "files_to_extract/gettext_loc.html:13" => undef,
+        "files_to_extract/gettext_loc.html:17" => undef
       }
     }
   }

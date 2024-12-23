@@ -166,7 +166,6 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.006',
                                            'Dist::Zilla::Plugin::Run::AfterBuild' => '0.041',
                                            'Dist::Zilla::Plugin::Run::AfterRelease' => '0.038',
-                                           'Dist::Zilla::Plugin::Run::BeforeRelease' => '0',
                                            'Dist::Zilla::Plugin::RunExtraTests' => '0.024',
                                            'Dist::Zilla::Plugin::ShareDir' => '0',
                                            'Dist::Zilla::Plugin::StaticInstall' => '0.005',

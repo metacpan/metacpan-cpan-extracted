@@ -17,7 +17,7 @@ use lib 't/lib';
 use Helper;
 
 my $minimal_document = {
-  openapi => '3.1.0',
+  openapi => OAS_VERSION,
   info => {
     title => 'Test API',
     version => '1.2.3',
@@ -108,7 +108,7 @@ subtest 'document errors' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/type',
-          absoluteKeywordLocation => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07#/type',
+          absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/type',
           error => 'got array, not object',
         },
       ],
@@ -126,7 +126,7 @@ subtest 'document errors' => sub {
 subtest 'construct with document' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
+    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema/latest',
     evaluator => my $js = JSON::Schema::Modern->new(validate_formats => 1),
     schema => {
       %$minimal_document,
@@ -138,7 +138,7 @@ subtest 'construct with document' => sub {
     },
   );
 
-  is($doc->errors, 0, 'no errors during traversal');
+  cmp_result([$doc->errors], [], 'no errors during traversal');
 
   my $openapi = OpenAPI::Modern->new(
     openapi_document => $doc,

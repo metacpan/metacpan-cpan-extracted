@@ -5,6 +5,7 @@ data/test3.xml
 data/test4.csv
 data/test5.csv
 data/test6.xml
+data/test7.csv
 lib/Database/Abstraction.pm
 LICENSE
 Makefile.PL
@@ -14,6 +15,7 @@ README.md
 t/00-load.t
 t/10-compile.t
 t/20-new.t
+t/30-basics.t
 t/chi.t
 t/comment-spelling.t
 t/csv.t
@@ -28,6 +30,7 @@ t/lib/Database/test3.pm
 t/lib/Database/test4.pm
 t/lib/Database/test5.pm
 t/lib/Database/test6.pm
+t/lib/Database/test7.pm
 t/lib/MyLogger.pm
 t/logger.t
 t/no_entry.t
@@ -40,6 +43,7 @@ t/pod-synopsis.t
 t/pod.t
 t/psv.t
 t/tabs.t
+t/test7.t
 t/two_databases.t
 t/vars.t
 t/version.t

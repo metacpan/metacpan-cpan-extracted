@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Preload;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 998.999; }
-our $VERSION = '1000.025'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-18'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.026'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-12-22'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Import::Into;
@@ -27,17 +27,25 @@ sub import {
   # Import Spreadsheet::Edit and the usual variables for the user
   Spreadsheet::Edit->import::into($callpkg, ':all');
 
-  # Load the spreadsheet
+  # We specially handle option 'verbose' (without 'debug') to only show
+  # the spreadsheet name, rather than tracing all the calls.
+  #
   my $opthash = ref($_[0]) eq "HASH" ? shift(@_) : {};
 
-  # Create new sheet, setting verbose, etc. from options
+#use Data::Dumper::Interp;
+  my $my_verbose = !$opthash->{debug} && delete($opthash->{verbose});
+
+  # Create new sheet, possibly specifying title_rx
   my $sh = Spreadsheet::Edit->new(
-             map{ exists($opthash->{$_}) ? ($_ => delete $opthash->{$_}) : () }
-             qw/verbose silent debug/
-           );
+         map{ $_ => $opthash->{$_} } qw/verbose silent debug/
+  );
 
   # Read the content
   $sh->read_spreadsheet($opthash, @_);
+
+  if ($my_verbose) {
+    warn "> Read ",$sh->data_source(),"\n";
+  }
 
   # Tie variables in the caller's package
   $sh->tie_column_vars({package => $callpkg}, ':all', ':safe');
@@ -106,7 +114,7 @@ specified, the title row is auto-detected.
 
 A fatal error occurs if a column letter ('A', 'B' etc.), a title,
 or identifier derived from a title (that is, any COLSPEC)
-clashes with an object already existing in the caller's package
+clashes with something already existing in the caller's package
 or in package "main".
 
 =head1 SEE ALSO

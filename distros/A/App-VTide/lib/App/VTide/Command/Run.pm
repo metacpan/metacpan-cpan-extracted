@@ -18,11 +18,10 @@ use File::chdir;
 use IO::Prompt qw/prompt/;
 use Algorithm::Cron;
 use List::MoreUtils qw/uniq/;
-use Data::Dumper    qw/Dumper/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('1.0.5');
+our $VERSION = version->new('1.0.6');
 our $NAME    = 'run';
 our $OPTIONS = [ 'name|n=s', 'test|T!', 'save|s=s', 'verbose|v+', ];
 our $LOCAL   = 1;
@@ -114,7 +113,7 @@ sub run {
 }
 
 sub restart {
-    my ( $self, $cmd, $no_watch ) = @_;
+    my ( $self, $cmd, $no_watch, $default ) = @_;
 
     my $params = $self->params($cmd);
 
@@ -165,9 +164,20 @@ sub restart {
     }
     print $menu;
 
-    # get answer
-    my $answer = <ARGV>;
+    local $SIG{ALRM} = sub {
+        warn "Re-running...\n";
+        $self->run;
+    };
+    if ( $params->{timeout} ) {
+        my ($time) = localtime( time + $params->{timeout} ) =~ /(\d+:\d+:\d+)/;
+        warn "Will run default in $params->{timeout} ($time)\n";
+        alarm $params->{timeout};
+    }
 
+    # get answer
+    my $answer = $default || <ARGV> || '';
+
+    delete $SIG{ALARM};
     return if !$answer;
 
     chomp $answer if $answer;
@@ -460,9 +470,12 @@ sub runit {
 
 sub log {
     my ( $self, @msg ) = @_;
+
     my $fh = path( $self->base, '.vtide', 'run.log' )->opena;
-    print {$fh} '[' . localtime . "] RUN $ENV{VTIDE_TERM} " . join ' ',
-      @msg . "\n";
+    print {$fh} '['
+      . localtime
+      . "] RUN $ENV{VTIDE_TERM} "
+      . ( join ' ', @msg ) . "\n";
 }
 
 sub auto_complete {
@@ -486,7 +499,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 1.0.5
+This documentation refers to App::VTide::Command::Run version 1.0.6
 
 =head1 SYNOPSIS
 

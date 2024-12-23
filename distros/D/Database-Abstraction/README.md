@@ -1,19 +1,24 @@
 # NAME
 
-Database::Abstraction - database abstraction layer
+Database::Abstraction - read-only database abstraction layer
 
 # VERSION
 
-Version 0.12
+Version 0.13
 
 # SYNOPSIS
 
-Abstract class giving read-only access to CSV, XML and SQLite databases via Perl without writing any SQL.
+Abstract class giving read-only access to CSV, XML and SQLite databases via Perl without writing any SQL,
+using caching for performance optimization.
+It offers functionalities like opening the database and fetching data based on various criteria,
+
 Look for databases in $directory in this order:
 1) SQLite (file ends with .sql)
 2) PSV (pipe separated file, file ends with .psv)
 3) CSV (file ends with .csv or .db, can be gzipped) (note the default sep\_char is '!' not ',')
 4) XML (file ends with .xml)
+
+The AUTOLOAD feature allows for convenient access to database columns using method calls.
 
 If the table has a key column,
 entries are keyed on that and sorts are based on it.
@@ -45,6 +50,7 @@ You can then access the data using:
 
     my $foo = MyPackageName::Database::Foo->new(directory => '/var/dat');
     print 'Customer name ', $foo->name(customer_id => 'plugh'), "\n";
+
     my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
     print Data::Dumper->new([$row])->Dump();
 
@@ -52,9 +58,9 @@ You can then access the data using:
 
 ## init
 
-Set some class level defaults.
+Initializes the abstraction class and its subclasses with optional arguments for configuration.
 
-    MyPackageName::Database::init(directory => '../data');
+    Database::Abstraction::init(directory => '../data');
 
 See the documentation for new to see what variables can be set.
 
@@ -70,12 +76,24 @@ Create an object to point to a read-only database.
 
 Arguments:
 
+Takes different argument formats (hash or positional)
+
 cache => place to store results;
 cache\_duration => how long to store results in the cache (default is 1 hour);
 directory => where the database file is held
 max\_slurp\_size => CSV/PSV/XML files smaller than this are held in RAM (default is 16K)
 
 If the arguments are not set, tries to take from class level defaults.
+
+Checks for abstract class usage.
+
+Slurp mode assumes that the key column (entry) is unique.
+If it isn't, searches will be incomplete.
+Turn off slurp mode on those databases,
+by setting a low value for max\_slurp\_size.
+
+Clones existing objects with or without modifications.
+Uses Carp::carp to log warnings for incorrect usage or potential mistakes.
 
 ## set\_logger
 
@@ -89,19 +107,22 @@ the given criteria.
 Note that since this returns an array ref,
 optimisations such as "LIMIT 1" will not be used.
 
+Use caching if that is available.
+
 ## selectall\_hash
 
-Returns an array of hash references
+Similar to selectall\_hashref but returns an array of hash references.
 
 ## fetchrow\_hashref
 
-Returns a hash reference for one row in a table.
+Returns a hash reference for a single row in a table.
+
 Special argument: table: determines the table to read from if not the default,
 which is worked out from the class name
 
 ## execute
 
-Execute the given SQL on the data.
+Execute the given SQL query on the database.
 In an array context, returns an array of hash refs,
 in a scalar context returns a hash of the first row
 
@@ -114,18 +135,22 @@ this will still work by accessing that actual database.
 
 ## updated
 
-Time that the database was last updated
+Returns the timestamp of the last database update.
 
 ## AUTOLOAD
 
-Return the contents of an arbitrary column in the database which match the
-given criteria
+Directly access a database column.
+
+Returns all entries in a column, a single entry based on criteria.
+Uses cached data if available.
+
 Returns an array of the matches,
 or only the first when called in scalar context
 
 If the database has a column called "entry" you can do a quick lookup with
 
     my $value = $foo->column('123');    # where "column" is the value you're after
+
     my @entries = $foo->entry();
     print 'There are ', scalar(@entries), " entries in the database\n";
 
@@ -150,7 +175,7 @@ so if XML fails for you on a small file force non-slurping mode with
 
     $foo = MyPackageName::Database::Foo->new({
         directory => '/var/db',
-        # max_slurp_size => 1   # force to not use slurp and therefore to use SQL
+        max_slurp_size => 1     # force to not use slurp and therefore to use SQL
     });
 
 # LICENSE AND COPYRIGHT

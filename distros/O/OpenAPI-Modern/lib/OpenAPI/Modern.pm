@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.073-19-gb954060
+package OpenAPI::Modern; # git description: v0.074-16-g8e9b53f
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.074';
+our $VERSION = '0.075';
 
 use 5.020;
 use utf8;
@@ -176,7 +176,7 @@ sub validate_request ($self, $request, $options = {}) {
     $state->{data_path} = '/request/body';
 
     if (my $body_obj = $operation->{requestBody}) {
-      $state->{schema_path} = jsonp($state->{schema_path}, 'requestBody');
+      $state->{schema_path} = $state->{schema_path}.'/requestBody';
 
       while (my $ref = $body_obj->{'$ref'}) {
         $body_obj = $self->_resolve_ref('request-body', $ref, $state);
@@ -245,7 +245,7 @@ sub validate_response ($self, $response, $options = {}) {
         'RFC9112 §6.1-10: A server MUST NOT send a Transfer-Encoding header field in any response with a status code of 1xx (Informational) or 204 (No Content)')
         if $response->is_info or $response->code == 204;
 
-      # connect method is not supported in openapi 3.1.0, but this may be possible in the future
+      # connect method is not supported in openapi 3.1.1, but this may be possible in the future
       ()= E({ %$state, data_path => '/response/header/Transfer-Encoding' },
         'RFC9112 §6.1-10: A server MUST NOT send a Transfer-Encoding header field in any 2xx (Successful) response to a CONNECT request')
         if $response->is_success and $method eq 'connect';
@@ -272,7 +272,7 @@ sub validate_response ($self, $response, $options = {}) {
       $response->code, substr(sprintf('%03s', $response->code), 0, -2).'XX', 'default';
 
     if (not $response_name) {
-      ()= E({ %$state, keyword => 'responses', data_path => jsonp($state->{data_path}, 'code') },
+      ()= E({ %$state, keyword => 'responses', data_path => $state->{data_path}.'/code' },
         'no response object found for code %s', $response->code);
       return $self->_result($state, 0, 1);
     }
@@ -563,12 +563,12 @@ sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
   return E({ %$state, keyword => 'style' }, 'only style: simple is supported in path parameters')
     if ($param_obj->{style}//'simple') ne 'simple';
 
-  my $types = $self->_type_in_schema($param_obj->{schema}, { %$state, schema_path => jsonp($state->{schema_path}) });
+  my $types = $self->_type_in_schema($param_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema' });
   if (grep $_ eq 'array', @$types or grep $_ eq 'object', @$types) {
     return E($state, 'deserializing to non-primitive types is not yet supported in path parameters');
   }
 
-  $self->_evaluate_subschema(\$value, $param_obj->{schema}, { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1, depth => $state->{depth}+1 });
+  $self->_evaluate_subschema(\$value, $param_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema', stringy_numbers => 1, depth => $state->{depth}+1 });
 }
 
 sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
@@ -601,12 +601,12 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
   return E({ %$state, keyword => 'style' }, 'only style: form is supported in query parameters')
     if ($param_obj->{style}//'form') ne 'form';
 
-  my $types = $self->_type_in_schema($param_obj->{schema}, { %$state, schema_path => jsonp($state->{schema_path}) });
+  my $types = $self->_type_in_schema($param_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema' });
   if (grep $_ eq 'array', @$types or grep $_ eq 'object', @$types) {
     return E($state, 'deserializing to non-primitive types is not yet supported in query parameters');
   }
 
-  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1, depth => $state->{depth}+1 };
+  $state = { %$state, schema_path => $state->{schema_path}.'/schema', stringy_numbers => 1, depth => $state->{depth}+1 };
   $self->_evaluate_subschema(\ $query_params->{$param_obj->{name}}, $param_obj->{schema}, $state);
 }
 
@@ -630,7 +630,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   # line value from a field line."
   my @values = map s/^\s*//r =~ s/\s*$//r, map split(/,/, $_), $headers->every_header($header_name)->@*;
 
-  my $types = $self->_type_in_schema($header_obj->{schema}, { %$state, schema_path => jsonp($state->{schema_path}, 'schema') });
+  my $types = $self->_type_in_schema($header_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema' });
 
   # RFC9112 §5.3-1: "A recipient MAY combine multiple field lines within a field section that have
   # the same field name into one field line, without changing the semantics of the message, by
@@ -658,7 +658,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
     $data = join ', ', map s/^\s*//r =~ s/\s*$//r, $headers->every_header($header_name)->@*;
   }
 
-  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1, depth => $state->{depth}+1 };
+  $state = { %$state, schema_path => $state->{schema_path}.'/schema', stringy_numbers => 1, depth => $state->{depth}+1 };
   $self->_evaluate_subschema(\ $data, $header_obj->{schema}, $state);
 }
 
@@ -782,7 +782,7 @@ sub _resolve_ref ($self, $entity_type, $ref, $state) {
     if $schema_info->{document}->get_entity_at_location($schema_info->{document_path}) ne $entity_type;
 
   $state->{initial_schema_uri} = $schema_info->{canonical_uri};
-  $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path}.jsonp('/$ref');
+  $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path}.'/$ref';
   $state->{schema_path} = '';
 
   return $schema_info->{schema};
@@ -923,14 +923,14 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.074
+version 0.075
 
 =head1 SYNOPSIS
 
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(<<'YAML'));
-  openapi: 3.1.0
+  openapi: 3.1.1
   info:
     title: Test API
     version: 1.2.3
@@ -1031,7 +1031,7 @@ prints:
 =head1 DESCRIPTION
 
 This module provides various tools for working with an
-L<OpenAPI Specification v3.1 document|https://spec.openapis.org/oas/v3.1.0#openapi-document> within
+L<OpenAPI Specification v3.1 document|https://spec.openapis.org/oas/v3.1#openapi-document> within
 your application. The JSON Schema evaluator is fully specification-compliant; the OpenAPI evaluator
 aims to be but some features are not yet available. My belief is that missing features are better
 than features that seem to work but actually cut corners for simplicity.
@@ -1058,7 +1058,7 @@ along with the request's C<Host> header and scheme (e.g. C<https>), when availab
 =head2 openapi_schema
 
 The data structure describing the OpenAPI v3.1 document (as specified at
-L<https://spec.openapis.org/oas/v3.1.0>). Ignored if L</openapi_document> is provided.
+L<https://spec.openapis.org/oas/v3.1>). Ignored if L</openapi_document> is provided.
 
 =head2 openapi_document
 
@@ -1079,7 +1079,7 @@ The URI that identifies the OpenAPI document.
 
 =head2 openapi_schema
 
-The data structure describing the OpenAPI document. See L<the specification/https://spec.openapis.org/oas/v3.1.0>.
+The data structure describing the OpenAPI document. See L<the specification/https://spec.openapis.org/oas/v3.1>.
 
 =head2 openapi_document
 
@@ -1170,7 +1170,7 @@ C<request>: the object representing the HTTP request. Should be provided when av
 
 =item *
 
-C<path_template>: a string representing the request URI, with placeholders in braces (e.g. C</pets/{petId}>); see L<https://spec.openapis.org/oas/v3.1.0#paths-object>.
+C<path_template>: a string representing the request URI, with placeholders in braces (e.g. C</pets/{petId}>); see L<https://spec.openapis.org/oas/v3.1#paths-object>.
 
 =item *
 
@@ -1204,7 +1204,7 @@ In addition, these values are populated in the options hash (when available):
 
 =item *
 
-C<operation_uri>: a URI indicating the document location of the operation object for the request, after following any references (usually something under C</paths/>, but may be in another document). Use C<< $openapi->evaluator->get($uri) >> to fetch this content (see L<JSON::Schema::Modern/get>). Note that this is the same as C<< $openapi->recursive_get(Mojo::URL->new->fragment(JSON::Schema::Modern::Utilities::jsonp('/paths', $options->{path_template}{$options->{method}}))) >>. (See the documentation for an operation at L<https://learn.openapis.org/specification/paths.html#the-endpoints-list> or in the specification at L<§4.8.10 of the specification|https://spec.openapis.org/oas/v3.1.0#operation-object>.)
+C<operation_uri>: a URI indicating the document location of the operation object for the request, after following any references (usually something under C</paths/>, but may be in another document). Use C<< $openapi->evaluator->get($uri) >> to fetch this content (see L<JSON::Schema::Modern/get>). Note that this is the same as C<< $openapi->recursive_get(Mojo::URL->new->fragment(JSON::Schema::Modern::Utilities::jsonp('/paths', $options->{path_template}{$options->{method}}))) >>. (See the documentation for an operation at L<https://learn.openapis.org/specification/paths.html#the-endpoints-list> or in the specification at L<§4.8.10 of the specification|https://spec.openapis.org/oas/v3.1#operation-object>.)
 
 =item *
 
@@ -1217,7 +1217,7 @@ or by calling C<< $openapi->openapi_document->get_operationId_path($operation_id
 (see L<JSON::Schema::Modern::Document::OpenAPI/get_operationId_path>) (note that the latter will
 be removed in a subsequent release, in order to support operations existing in other documents).
 
-Note that the L<C</servers>|https://spec.openapis.org/oas/v3.1.0#server-object> section of the
+Note that the L<C</servers>|https://spec.openapis.org/oas/v3.1#server-object> section of the
 OpenAPI document is not used for path matching at this time, for either scheme and host matching nor
 path prefixes. For now, if you use a path prefix in C<servers> entries you will need to add this to
 the path templates under `/paths`.
@@ -1298,10 +1298,10 @@ See also L<JSON::Schema::Modern/CACHING>.
 
 Embedded JSON Schemas, through the use of the C<schema> keyword, are fully draft2020-12-compliant,
 as per the spec, and implemented with L<JSON::Schema::Modern>. Unless overridden with the use of the
-L<jsonSchemaDialect|https://spec.openapis.org/oas/v3.1.0#specifying-schema-dialects> keyword, their
+L<jsonSchemaDialect|https://spec.openapis.org/oas/v3.1#specifying-schema-dialects> keyword, their
 metaschema is L<https://spec.openapis.org/oas/3.1/dialect/base>, which allows for use of the
 OpenAPI-specific keywords (C<discriminator>, C<xml>, C<externalDocs>, and C<example>), as defined in
-L<the specification/https://spec.openapis.org/oas/v3.1.0#schema-object>. Format validation is turned
+L<the specification/https://spec.openapis.org/oas/v3.1#schema-object>. Format validation is turned
 B<on>, and the use of content* keywords is off (see
 L<JSON::Schema::Modern/validate_content_schemas>).
 
@@ -1400,7 +1400,7 @@ L<https://learn.openapis.org/>
 
 =item *
 
-L<https://spec.openapis.org/oas/v3.1.0>
+L<https://spec.openapis.org/oas/v3.1>
 
 =back
 

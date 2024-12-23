@@ -35,4 +35,4 @@ __DATA__
   %= $aaa
   %= bbb()
   %= ccc()
-  <p>hello <%= $name %></p>   \
+  <p>hello <%= $name %></p>\

@@ -24,12 +24,7 @@ my $doc_uri = Mojo::URL->new('http://example.com/api');
 subtest 'full end-to-end test of transmitted request and response' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<'YAML'));
----
-openapi: 3.1.0
-info:
-  title: Test API
-  version: 1.2.3
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     parameters:

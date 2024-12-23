@@ -17,7 +17,7 @@ use App::VTide::Sessions;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('1.0.5');
+our $VERSION = version->new('1.0.6');
 our $NAME    = 'edit';
 our $OPTIONS =
   [ 'add|add-to-session|a', 'recurse|r!', 'test|T!', 'save|s=s', 'verbose|v+',
@@ -116,7 +116,7 @@ App::VTide::Command::Edit - Run an edit command (like Run but without a terminal
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Edit version 1.0.5
+This documentation refers to App::VTide::Command::Edit version 1.0.6
 
 =head1 SYNOPSIS
 

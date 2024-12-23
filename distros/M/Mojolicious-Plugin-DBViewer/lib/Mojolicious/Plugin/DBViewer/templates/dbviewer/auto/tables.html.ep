@@ -45,8 +45,7 @@
       % my $title = $utility->{title};
       <li>
         <a href="<%= url_for("$sprefix/$path")->query(database => $database) %>">
-          <i class="icon-circle-arrow-right"></i>
-          <%= $title %>
+          <span class="unicon">&#x2B8A;</span> <%= $title %>
         </a>
       </li>
     % }

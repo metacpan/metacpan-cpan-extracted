@@ -41,7 +41,7 @@ __DATA__
     % })\
   </head>
   <body><%= ccc() %>
-    <%= $self->title %>\
+    <%= $self->title %>
     <%= $content =%>
   </body>
 </html>

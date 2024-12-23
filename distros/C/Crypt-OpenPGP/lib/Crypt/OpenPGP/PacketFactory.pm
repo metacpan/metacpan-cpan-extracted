@@ -1,12 +1,14 @@
 package Crypt::OpenPGP::PacketFactory;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::Constants qw( :packet );
 use Crypt::OpenPGP::ErrorHandler;
 use base qw( Crypt::OpenPGP::ErrorHandler );
 
-use vars qw( %PACKET_TYPES %PACKET_TYPES_BY_CLASS );
-%PACKET_TYPES = (
+our %PACKET_TYPES = (
     PGP_PKT_PUBKEY_ENC()    => { class => 'Crypt::OpenPGP::SessionKey' },
     PGP_PKT_SIGNATURE()     => { class => 'Crypt::OpenPGP::Signature' },
     PGP_PKT_SYMKEY_ENC()    => { class => 'Crypt::OpenPGP::SKSessionKey' },
@@ -31,7 +33,7 @@ use vars qw( %PACKET_TYPES %PACKET_TYPES_BY_CLASS );
     PGP_PKT_MDC()           => { class => 'Crypt::OpenPGP::MDC' },
 );
 
-%PACKET_TYPES_BY_CLASS = map { $PACKET_TYPES{$_}{class} => $_ } keys %PACKET_TYPES;
+our %PACKET_TYPES_BY_CLASS = map { $PACKET_TYPES{$_}{class} => $_ } keys %PACKET_TYPES;
 
 sub parse {
     my $class = shift;

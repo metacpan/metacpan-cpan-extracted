@@ -110,13 +110,15 @@ my %WriteMakefileArgs = (
     "Test::Version"                           => "2.00",
     "URI::Escape"                             => 0,
     "YAML"                                    => "1.15",
-    "namespace::autoclean"                    => 0
+    "namespace::autoclean"                    => 0,
+    "stable"                                  => 0,
+    "true"                                    => 0
   },
   "TEST_REQUIRES" => {
     "Test2::V0"    => "0.000121",
     "Test::Script" => "1.10"
   },
-  "VERSION" => "2.78",
+  "VERSION" => "2.79",
   "test"    => {
     "TESTS" => "t/*.t"
   }

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-use Exporter;
+use parent 'Exporter';
 use Scalar::Util qw( looks_like_number );;
 
 use vars qw( $VERSION @ISA @EXPORT );
@@ -15,59 +15,60 @@ Carp::Assert::More - Convenience assertions for common situations
 
 =head1 VERSION
 
-Version 2.5.0
+Version 2.6.0
 
 =cut
 
-BEGIN {
-    $VERSION = '2.5.0';
-    @ISA = qw(Exporter);
-    @EXPORT = qw(
-        assert_all_keys_in
-        assert_aoh
-        assert_arrayref
-        assert_arrayref_nonempty
-        assert_arrayref_of
-        assert_arrayref_all
-        assert_cmp
-        assert_coderef
-        assert_context_list
-        assert_context_nonvoid
-        assert_context_scalar
-        assert_context_void
-        assert_datetime
-        assert_defined
-        assert_empty
-        assert_exists
-        assert_fail
-        assert_hashref
-        assert_hashref_nonempty
-        assert_in
-        assert_integer
-        assert_is
-        assert_isa
-        assert_isa_in
-        assert_isnt
-        assert_keys_are
-        assert_lacks
-        assert_like
-        assert_listref
-        assert_negative
-        assert_negative_integer
-        assert_nonblank
-        assert_nonempty
-        assert_nonnegative
-        assert_nonnegative_integer
-        assert_nonref
-        assert_nonzero
-        assert_nonzero_integer
-        assert_numeric
-        assert_positive
-        assert_positive_integer
-        assert_undefined
-        assert_unlike
-    );
-}
+our $VERSION = '2.6.0';
+our @EXPORT = qw(
+    assert
+    assert_all_keys_in
+    assert_and
+    assert_aoh
+    assert_arrayref
+    assert_arrayref_nonempty
+    assert_arrayref_of
+    assert_arrayref_all
+    assert_cmp
+    assert_coderef
+    assert_context_list
+    assert_context_nonvoid
+    assert_context_scalar
+    assert_context_void
+    assert_datetime
+    assert_defined
+    assert_empty
+    assert_exists
+    assert_fail
+    assert_hashref
+    assert_hashref_nonempty
+    assert_in
+    assert_integer
+    assert_is
+    assert_isa
+    assert_isa_in
+    assert_isnt
+    assert_keys_are
+    assert_lacks
+    assert_like
+    assert_listref
+    assert_negative
+    assert_negative_integer
+    assert_nonblank
+    assert_nonempty
+    assert_nonnegative
+    assert_nonnegative_integer
+    assert_nonref
+    assert_nonzero
+    assert_nonzero_integer
+    assert_numeric
+    assert_or
+    assert_positive
+    assert_positive_integer
+    assert_undefined
+    assert_unlike
+    assert_xor
+);
 
 my $INTEGER = qr/^-?\d+$/;
 
@@ -101,6 +102,24 @@ My intent here is to make common assertions easy so that we as programmers
 have no excuse to not use them.
 
 =head1 SIMPLE ASSERTIONS
+
+=head2 assert( $condition [, $name] )
+
+Asserts that C<$condition> is a true value.  This is the same as C<assert>
+in C<Carp::Assert>, provided as a convenience.
+
+=cut
+
+sub assert($;$) {
+    my $condition = shift;
+    my $name = shift;
+
+    return if $condition;
+
+    require Carp;
+    &Carp::confess( _failure_msg($name) );
+}
+
 
 =head2 assert_is( $string, $match [,$name] )
 
@@ -361,6 +380,84 @@ sub assert_nonblank($;$) {
 
     require Carp;
     &Carp::confess( _failure_msg($name, $why) );
+}
+
+
+=head1 BOOLEAN ASSERTIONS
+
+These boolean assertions help make diagnostics more useful.
+
+If you use C<assert> with a boolean condition:
+
+    assert( $x && $y, 'Both X and Y should be true' );
+
+you can't tell why it failed:
+
+    Assertion (Both X and Y should be true) failed!
+     at .../Carp/Assert/More.pm line 123
+            Carp::Assert::More::assert(undef, 'Both X and Y should be true') called at foo.pl line 16
+
+But if you use C<assert_and>:
+
+    assert_and( $x, $y, 'Both X and Y should be true' );
+
+the stacktrace tells you which half of the expression failed.
+
+    Assertion (Both X and Y should be true) failed!
+     at .../Carp/Assert/More.pm line 123
+            Carp::Assert::More::assert_and('thing', undef, 'Both X and Y should be true') called at foo.pl line 16
+
+=head2 assert_and( $x, $y [, $name] )
+
+Asserts that both C<$x> and C<$y> are true.
+
+=cut
+
+sub assert_and($$;$) {
+    my $x    = shift;
+    my $y    = shift;
+    my $name = shift;
+
+    return if $x && $y;
+
+    require Carp;
+    &Carp::confess( _failure_msg($name) );
+}
+
+
+=head2 assert_or( $x, $y [, $name] )
+
+Asserts that at least one of C<$x> or C<$y> are true.
+
+=cut
+
+sub assert_or($$;$) {
+    my $x    = shift;
+    my $y    = shift;
+    my $name = shift;
+
+    return if $x || $y;
+
+    require Carp;
+    &Carp::confess( _failure_msg($name) );
+}
+
+=head2 assert_xor( $x, $y [, $name] )
+
+Asserts that C<$x> is true, or C<$y> is true, but not both.
+
+=cut
+
+sub assert_xor($$;$) {
+    my $x    = shift;
+    my $y    = shift;
+    my $name = shift;
+
+    return if $x && !$y;
+    return if $y && !$x;
+
+    require Carp;
+    &Carp::confess( _failure_msg($name) );
 }
 
 

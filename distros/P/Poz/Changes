@@ -1,5 +1,13 @@
 Revision history for Perl extension Poz
 
+0.05 2024-12-23T08:26:58Z
+
+    - supports default of array
+
+0.04 2024-12-23T08:19:23Z
+
+    - supports optional array
+
 0.03 2024-12-22T01:34:04Z
 
     - bugfix: Fixed a bug where the default values of the object were not being assigned. 

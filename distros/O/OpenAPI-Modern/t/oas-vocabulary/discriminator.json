@@ -2,7 +2,7 @@
     {
         "description": "bad syntax (validated against metaschema)",
         "schema": {
-            "$ref": "https://spec.openapis.org/oas/3.1/dialect/base"
+            "$ref": "https://spec.openapis.org/oas/3.1/dialect/latest"
         },
         "tests": [
             {
@@ -70,7 +70,7 @@
     {
         "description": "discriminator value is not an object (evaluated)",
         "schema": {
-            "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
+            "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
             "discriminator": "not an object"
         },
         "tests": [
@@ -84,7 +84,7 @@
     {
         "description": "missing required field propertyName (evaluated)",
         "schema": {
-            "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
+            "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
             "discriminator": {}
         },
         "tests": [
@@ -98,7 +98,7 @@
     {
         "description": "discriminator propertyName is not a string (evaluated)",
         "schema": {
-            "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
+            "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
             "discriminator": {
                 "propertyName": [ "not a string" ]
             }
@@ -114,7 +114,7 @@
     {
         "description": "missing oneOf, anyOf, allOf (evaluated)",
         "schema": {
-            "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
+            "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
             "discriminator": {
                 "propertyName": "petType"
             }
@@ -130,7 +130,7 @@
     {
         "description": "discriminator mapping is not an object (evaluated)",
         "schema": {
-            "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
+            "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
             "discriminator": {
                 "propertyName": "petType",
                 "mapping": "not an object"
@@ -150,7 +150,7 @@
     {
         "description": "discriminator mapping value is not a string (evaluated)",
         "schema": {
-            "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
+            "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
             "discriminator": {
                 "propertyName": "petType",
                 "mapping": {

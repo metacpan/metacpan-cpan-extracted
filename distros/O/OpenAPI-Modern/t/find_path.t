@@ -17,14 +17,6 @@ use JSON::Schema::Modern::Utilities qw(jsonp get_type);
 use lib 't/lib';
 use Helper;
 
-my $openapi_preamble = <<'YAML';
----
-openapi: 3.1.0
-info:
-  title: Test API
-  version: 1.2.3
-YAML
-
 # the absolute uri we will see in errors
 my $doc_uri_rel = Mojo::URL->new('/api');
 my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
@@ -33,8 +25,7 @@ my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 subtest 'invalid request type, bad conversion to Mojo::Message::Request' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths: {}
 YAML
 
@@ -90,8 +81,7 @@ note 'REQUEST/RESPONSE TYPE: '.$::TYPE;
 subtest 'request is parsed to get path information' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     post:
@@ -542,8 +532,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     get:
@@ -691,8 +680,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo.bar: # dot sorts higher than /, so this will match if we are sloppy with regexes
     get:
@@ -795,8 +783,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     get: {}
@@ -837,8 +824,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /:
     get: {}
@@ -871,8 +857,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $lots_of_options = $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $lots_of_options = $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   pathItems:
     my_path_item:
@@ -881,20 +866,20 @@ components:
         operationId: my_components_pathItem_operation
         callbacks:
           my_callback:
-            '{\$request.query.queryUrl}': # note this is a path-item
+            '{$request.query.queryUrl}': # note this is a path-item
               post:
                 operationId: my_components_pathItem_callback_operation
     my_path_item2:
-      description: this should be useable, as it is \$ref'd by a /paths/<template> path item
+      description: this should be useable, as it is $ref'd by a /paths/<template> path item
       post:
         operationId: my_reffed_component_operation
 paths:
-  /foo: {}  # TODO: \$ref to #/components/pathItems/my_path_item2
+  /foo: {}  # TODO: $ref to #/components/pathItems/my_path_item2
   /foo/bar:
     post:
       callbacks:
         my_callback:
-          '{\$request.query.queryUrl}': # note this is a path-item
+          '{$request.query.queryUrl}': # note this is a path-item
             post:
               operationId: my_paths_pathItem_callback_operation
 webhooks:
@@ -1024,8 +1009,7 @@ YAML
 subtest 'no request is provided: options are relied on as the sole source of truth' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     get:
@@ -1277,8 +1261,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     get: {}

@@ -1,5 +1,8 @@
 package Crypt::OpenPGP::Key::Secret::RSA;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::RSA::Key::Private;
 use Crypt::OpenPGP::Key::Public::RSA;

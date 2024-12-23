@@ -1,5 +1,8 @@
 package Crypt::OpenPGP::KeyRing;
 use strict;
+use warnings;
+
+our $VERSION = '1.19'; # VERSION
 
 use Crypt::OpenPGP::Constants qw( PGP_PKT_USER_ID
                                   PGP_PKT_PUBLIC_KEY

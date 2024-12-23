@@ -10,13 +10,13 @@ use Moo;
 use warnings;
 use version;
 use Carp;
-use English qw/ -no_match_vars /;
-use YAML::Syck qw/ Dump /;
+use English      qw/ -no_match_vars /;
+use YAML::Syck   qw/ Dump /;
 use Array::Utils qw/intersect/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('1.0.5');
+our $VERSION = version->new('1.0.6');
 our $NAME    = 'conf';
 our $OPTIONS = [ 'env|e', 'terms|t', 'which|w=s', 'test|T!', 'verbose|v+', ];
 sub details_sub { return ( $NAME, $OPTIONS ) }
@@ -35,7 +35,8 @@ sub run {
     if ( $self->defaults->{env} ) {
         my %env = (
             %{ $self->config->get->{default}{env} || {} },
-            %{  $self->config->get->{terminals}{ $ENV{VTIDE_TERM} }{env} || {}
+            %{
+                $self->config->get->{terminals}{ $ENV{VTIDE_TERM} }{env} || {}
             }
         );
         for my $env ( sort keys %ENV ) {
@@ -49,15 +50,15 @@ sub run {
         return $self->which( $self->defaults->{which} );
     }
 
-    my $data
-        = $self->defaults->{terms}
-        ? $self->config->get->{terminals}
-        : $self->config->get->{editor}{files};
+    my $data =
+        $self->defaults->{terms}
+      ? $self->config->get->{terminals}
+      : $self->config->get->{editor}{files};
     my @files = sort _alphanum keys %{$data};
 
     print $self->defaults->{terms}
-        ? "Terminals configured:\n"
-        : "File groups:\n";
+      ? "Terminals configured:\n"
+      : "File groups:\n";
     if ( $self->defaults->{verbose} ) {
         for my $file (@files) {
             my $data = Dump( $data->{$file} );
@@ -79,9 +80,9 @@ sub which {
     my ( %files, %groups, %terms );
 
     for my $group ( keys %$file ) {
-        my @found = grep {/$which/}
-            @{ $file->{$group} },
-            map { $self->_dglob($_) } @{ $file->{$group} };
+        my @found = grep { /$which/ }
+          @{ $file->{$group} },
+          map { $self->_dglob($_) } @{ $file->{$group} };
         next if !@found;
 
         for my $found (@found) {
@@ -94,13 +95,13 @@ sub which {
     my @groups = sort keys %groups;
     my @terms;
     for my $terminal ( sort keys %$term ) {
-        my $edit
-            = !$term->{$terminal}{edit}     ? []
-            : !ref $term->{$terminal}{edit} ? [ $term->{$terminal}{edit} ]
-            :                                 $term->{$terminal}{edit};
+        my $edit =
+            !$term->{$terminal}{edit}     ? []
+          : !ref $term->{$terminal}{edit} ? [ $term->{$terminal}{edit} ]
+          :                                 $term->{$terminal}{edit};
 
-        my @found = ( ( intersect @files, @$edit ),
-            ( intersect @groups, @$edit ), );
+        my @found =
+          ( ( intersect @files, @$edit ), ( intersect @groups, @$edit ), );
         next if !@found;
         push @terms, $terminal;
     }
@@ -138,7 +139,7 @@ App::VTide::Command::Conf - Show the current VTide configuration and environment
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Conf version 1.0.5
+This documentation refers to App::VTide::Command::Conf version 1.0.6
 
 =head1 SYNOPSIS
 
