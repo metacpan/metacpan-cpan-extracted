@@ -1,9 +1,10 @@
 ---
-abstract: 'Sockets for SSL.'
+abstract: 'Sockets for SSL Communication.'
 author:
   - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  SPVM::Mozilla::CA: '0.002'
 configure_requires:
   SPVM: '0.990032'
 dynamic_config: 1
@@ -20,10 +21,10 @@ no_index:
 requires:
   SPVM: '0.990032'
   SPVM::IO: '0.229'
-  SPVM::Mozilla::CA: '0.002'
-  SPVM::Net::SSLeay: '0.026'
+  SPVM::Net::SSLeay: '0.034'
+  SPVM::Regex: '0.244'
   SPVM::Sys: '0.528'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-IO-Socket-SSL.git
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

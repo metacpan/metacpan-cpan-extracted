@@ -23,7 +23,7 @@ SYNOPSIS
 
 VERSION
 
-    0.16
+    0.18
 
 WARNING
 
@@ -62,7 +62,7 @@ REPOSITORY
 
 COPYRIGHT
 
-    Copyright (C) 2013-2022. Vikas N Kumar <vikas@cpan.org>. All Rights
+    Copyright (C) 2013-2025. Vikas N Kumar <vikas@cpan.org>. All Rights
     Reserved.
 
 LICENSE

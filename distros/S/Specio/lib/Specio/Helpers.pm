@@ -7,7 +7,7 @@ use Carp qw( croak );
 use Exporter 'import';
 use overload ();
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Scalar::Util qw( blessed );
 
@@ -131,7 +131,7 @@ Specio::Helpers - Helper subs for the Specio distro
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 DESCRIPTION
 
@@ -153,7 +153,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

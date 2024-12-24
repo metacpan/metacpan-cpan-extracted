@@ -3,19 +3,19 @@ package Specio::Constraint::Intersection;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
-use List::Util qw( all );
+use Clone ();
+use List::Util 1.33 qw( all );
 use Role::Tiny::With;
 use Specio::OO;
-use Storable qw( dclone );
 
 use Specio::Constraint::Role::Interface;
 with 'Specio::Constraint::Role::Interface';
 
 {
     ## no critic (Subroutines::ProtectPrivateSubs)
-    my $attrs = dclone( Specio::Constraint::Role::Interface::_attrs() );
+    my $attrs = Clone::clone( Specio::Constraint::Role::Interface::_attrs() );
     ## use critic
 
     for my $name (qw( _constraint _inline_generator )) {
@@ -133,7 +133,7 @@ Specio::Constraint::Intersection - A class for intersection constraints
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -185,7 +185,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

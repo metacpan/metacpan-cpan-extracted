@@ -62,7 +62,7 @@
    "provides" : {
       "Log::GELF::Util" : {
          "file" : "lib/Log/GELF/Util.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,7 @@
          "web" : "https://github.com/logicly-au/log-gelf-util"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

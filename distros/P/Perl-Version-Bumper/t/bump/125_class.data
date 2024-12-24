@@ -8,3 +8,11 @@ no feature 'class';
 ---
 use VERSION;
 no feature 'class';
+########## use Feature::Compat::Class;
+use Feature::Compat::Class;
+---
+use VERSION;
+use Feature::Compat::Class;
+--- v5.38
+use VERSION;
+use feature 'class';

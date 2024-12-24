@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use Test::Fatal;
 use Test::More 0.96;
 use Test::Specio qw( test_constraint :vars );
 
@@ -345,5 +346,39 @@ is(
     'Dict{ bar => Int, baz => Num?, foo => UCStr, HashRef... }',
     'got expected name for slurpy Dict with optional key'
 );
+
+## no critic (Modules::ProhibitMultiplePackages)
+{
+    package Declarer;
+
+    use Specio::Declare;
+    use Specio::Library::Builtins;
+    use Specio::Library::Structured;
+
+    use parent 'Specio::Exporter';
+
+    declare(
+        'SomeDict',
+        'parent' => t(
+            'Dict',
+            of => {
+                kv => {
+                    foo => t('Str'),
+                    bar => t('Int'),
+                },
+            },
+        ),
+    );
+}
+
+{
+    package ImportInto;
+
+    ::is(
+        ::exception { Declarer->import },
+        undef,
+        'No exception thrown when importing a Map type',
+    );
+}
 
 done_testing();

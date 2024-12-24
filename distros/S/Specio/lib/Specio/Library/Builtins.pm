@@ -3,14 +3,14 @@ package Specio::Library::Builtins;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use parent 'Specio::Exporter';
 
 use List::Util 1.33 ();
-use overload     ();
-use re           ();
-use Scalar::Util ();
+use overload        ();
+use re              ();
+use Scalar::Util    ();
 use Specio::Constraint::Parameterizable;
 use Specio::Declare;
 use Specio::Helpers ();
@@ -459,7 +459,7 @@ Specio::Library::Builtins - Implements type constraint objects for Perl's built-
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 DESCRIPTION
 
@@ -584,7 +584,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -376,6 +376,22 @@ class TestCase::Net::SSLeay::SSL_CTX {
       }
     }
     
+    # use_certificate
+    {
+      {
+        my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
+        
+        my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
+        
+        my $bio = Net::SSLeay::BIO->new_file("$FILE_DIR/simple-cert.cert.pem", "r");
+        
+        my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
+        
+        $ssl_ctx->use_certificate($x509);
+        
+      }
+    }
+    
     # add_extra_chain_cert
     {
       {

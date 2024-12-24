@@ -19,6 +19,16 @@ use VERSION;
 use experimental 'try';
 --- v5.40
 use VERSION;
+########## Feature::Compat::Try
+use Feature::Compat::Try;
+---
+use VERSION;
+use Feature::Compat::Try;
+--- v5.34
+use VERSION;
+use feature 'try';
+--- v5.40
+use VERSION;
 ########## Syntax::Keyword::Try
 use Syntax::Keyword::Try;
 ---

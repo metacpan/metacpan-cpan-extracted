@@ -1,5 +1,5 @@
 package Util::Medley::Package;
-$Util::Medley::Package::VERSION = '0.061';
+$Util::Medley::Package::VERSION = '0.062';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -13,7 +13,7 @@ Util::Medley::Package - Utility methods for packages.
 
 =head1 VERSION
 
-version 0.061
+version 0.062
 
 =cut
 

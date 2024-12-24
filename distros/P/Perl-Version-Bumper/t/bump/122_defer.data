@@ -5,3 +5,19 @@ no warnings 'experimental::defer';
 use VERSION;
 use feature 'defer';
 no warnings 'experimental::defer';
+########## use Feature::Compat::Defer
+use Feature::Compat::Defer;
+---
+use VERSION;
+use Feature::Compat::Defer;
+--- v5.36
+use VERSION;
+use feature 'defer';
+########## use Syntax::Keyword::Defer
+use Syntax::Keyword::Defer;
+---
+use VERSION;
+use Syntax::Keyword::Defer;
+--- v5.36
+use VERSION;
+use feature 'defer';

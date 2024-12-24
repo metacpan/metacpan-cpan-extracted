@@ -48,18 +48,18 @@ use v5.10;
 use VERSION;
 ...;
 no strict 'refs';
-########## move version after package
+########## leave version before package
 use v5.10;
 package Foo;
 ---
-package Foo;
 use VERSION;
-########## version remain after package
+package Foo;
+########## move remain before package
 package Foo;
 use v5.10;
 ---
-package Foo;
 use VERSION;
+package Foo;
 ########## move to the top if package is not first
 use utf8;
 package Bar;

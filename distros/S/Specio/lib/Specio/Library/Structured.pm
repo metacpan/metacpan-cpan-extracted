@@ -3,12 +3,11 @@ package Specio::Library::Structured;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use parent 'Specio::Exporter';
 
-use Carp qw( confess );
-use List::Util ();
+use Carp         qw( confess );
 use Scalar::Util qw( blessed );
 use Specio::Constraint::Structurable;
 use Specio::Declare;
@@ -84,7 +83,7 @@ Specio::Library::Structured - Structured types for Specio (Dict, Map, Tuple)
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -114,10 +113,6 @@ version 0.48
     );
 
 =head1 DESCRIPTION
-
-B<This particular library should be considered in an alpha state. The syntax
-for defining structured types may change, as well as some of the internals of
-its implementation.>
 
 This library provides a set of structured types for Specio, C<Dict>, C<Map>,
 and C<Tuple>. This library also exports two helper subs used for some types,
@@ -235,7 +230,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -198,7 +198,6 @@ END_TEMPLATE
 ';
 
     eval { $compiled = $template->from_string($template_str); };
-    warn $@;
     ok( $@, 'Expected syntax error' );
     ## Leave this out for now, error messaging is too variale between versions of perl
     ##is( $@, $error, 'Error message contains expected lines' );

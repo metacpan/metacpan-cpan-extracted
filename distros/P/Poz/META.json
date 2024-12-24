@@ -64,7 +64,7 @@
    "provides" : {
       "Poz" : {
          "file" : "lib/Poz.pm",
-         "version" : "0.05"
+         "version" : "0.07"
       },
       "Poz::Builder" : {
          "file" : "lib/Poz/Builder.pm"
@@ -89,6 +89,9 @@
       },
       "Poz::Types::string" : {
          "file" : "lib/Poz/Types/string.pm"
+      },
+      "Poz::Types::union" : {
+         "file" : "lib/Poz/Types/union.pm"
       }
    },
    "release_status" : "stable",
@@ -103,7 +106,7 @@
          "web" : "https://github.com/ytnobody/p5-Poz"
       }
    },
-   "version" : "0.05",
+   "version" : "0.07",
    "x_contributors" : [
       "kobaken <kentafly88@gmail.com>"
    ],

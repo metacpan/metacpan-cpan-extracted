@@ -711,8 +711,8 @@ FieldMeta *ObjectPad_get_field_for_padix(pTHX_ PADOFFSET padix)
   return fieldmeta;
 }
 
-#define prepend_methstart_ops(meta, outerscope, body)  S_prepend_methstart_ops(aTHX_ meta, outerscope, body)
-static OP *S_prepend_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope, OP *body)
+#define prepend_methstart_ops(meta, outerscope, body, is_common)  S_prepend_methstart_ops(aTHX_ meta, outerscope, body, is_common)
+static OP *S_prepend_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope, OP *body, bool is_common)
 {
   U32 opflags_if_role = (meta->type == METATYPE_ROLE) ? OPfMETHSTART_ROLE : 0;
   AV *fields = meta->fields;
@@ -763,8 +763,11 @@ static OP *S_prepend_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope, OP *bo
     OP *selfargelem = next;
     next = OpSIBLING(selfargelem);
 
-    /* Insert an OP_METHSTART without OPf_STACKED */
-    methstartop = newMETHSTARTOP(0 | opflags_if_role | (meta->repr << 8));
+    if(!is_common)
+      methstartop = newMETHSTARTOP(0 | opflags_if_role | (meta->repr << 8));
+    else
+      methstartop = newCOMMONMETHSTARTOP(0 | (meta->repr << 8));
+
     OpMORESIB_set(selfargelem, methstartop);
 
     OpMORESIB_set(methstartop, next);
@@ -772,106 +775,112 @@ static OP *S_prepend_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope, OP *bo
   else
 #endif
   {
-    ops = op_append_list(OP_LINESEQ, ops,
-      methstartop = newMETHSTARTOP(OPf_STACKED | opflags_if_role | (meta->repr << 8))
-    );
+    if(!is_common)
+      ops = op_append_list(OP_LINESEQ, ops,
+        methstartop = newMETHSTARTOP(OPf_STACKED | opflags_if_role | (meta->repr << 8))
+      );
+    else
+      ops = op_append_list(OP_LINESEQ, ops,
+        methstartop = newCOMMONMETHSTARTOP(OPf_STACKED | (meta->repr << 8)));
   }
 
+  if(!is_common) {
 #ifdef METHSTART_CONTAINS_FIELD_BINDINGS
-  AV *fieldmap = newAV();
-  U32 fieldcount = 0, max_fieldix = 0;
+    AV *fieldmap = newAV();
+    U32 fieldcount = 0, max_fieldix = 0;
 
-  SAVEFREESV((SV *)fieldmap);
+    SAVEFREESV((SV *)fieldmap);
 #endif
 
 #if HAVE_PERL_VERSION(5, 22, 0)
-  PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
-  U32 cop_seq_low = COP_SEQ_RANGE_LOW(padnames[PADIX_SELF]);
+    PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
+    U32 cop_seq_low = COP_SEQ_RANGE_LOW(padnames[PADIX_SELF]);
 #endif
 
-  int i;
-  for(i = 0; i < nfields; i++) {
-    FieldMeta *fieldmeta = MUST_FIELDMETA(AvARRAY(fields)[i]);
+    int i;
+    for(i = 0; i < nfields; i++) {
+      FieldMeta *fieldmeta = MUST_FIELDMETA(AvARRAY(fields)[i]);
 
-    if(snames) {
-      PADNAME *fieldname = snames[i + 1];
+      if(snames) {
+        PADNAME *fieldname = snames[i + 1];
 
-      if(!fieldname
+        if(!fieldname
 #if HAVE_PERL_VERSION(5, 22, 0)
-        /* On perl 5.22 and above we can use PadnameREFCNT to detect which pad
-         * slots are actually being used
-         */
-         || PadnameREFCNT(fieldname) < 2
+          /* On perl 5.22 and above we can use PadnameREFCNT to detect which pad
+           * slots are actually being used
+           */
+           || PadnameREFCNT(fieldname) < 2
 #endif
-        )
-          continue;
-    }
+          )
+            continue;
+      }
 
-    /* TODO: Find a better test for initfields so it doesn't think we capture
-     * every field declared up til now. */
-    FIELDOFFSET fieldix = fieldmeta->fieldix;
-    PADOFFSET padix = outerscope ? find_padix_for_field(fieldmeta)
-                                 : pad_findmy_pv(SvPVX(fieldmeta->name), 0);
+      /* TODO: Find a better test for initfields so it doesn't think we capture
+       * every field declared up til now. */
+      FIELDOFFSET fieldix = fieldmeta->fieldix;
+      PADOFFSET padix = outerscope ? find_padix_for_field(fieldmeta)
+                                   : pad_findmy_pv(SvPVX(fieldmeta->name), 0);
 
-    if(padix == NOT_IN_PAD)
-      continue;
-
-    U8 private = 0;
-    switch(SvPV_nolen(fieldmeta->name)[0]) {
-      case '$': private = OPpFIELDPAD_SV; break;
-      case '@': private = OPpFIELDPAD_AV; break;
-      case '%': private = OPpFIELDPAD_HV; break;
-    }
-
-#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
-    PERL_UNUSED_VAR(opflags_if_role);
-    assert((fieldix & ~FIELDIX_MASK) == 0);
-    av_store(fieldmap, padix, newSVuv(((UV)private << FIELDIX_TYPE_SHIFT) | fieldix));
-    fieldcount++;
-    if(fieldix > max_fieldix)
-      max_fieldix = fieldix;
-#else
-    ops = op_append_list(OP_LINESEQ, ops,
-      /* alias the padix from the field */
-      newFIELDPADOP(private << 8 | opflags_if_role, padix, fieldix));
-#endif
-
-#if HAVE_PERL_VERSION(5, 22, 0)
-    if(snames) {
-      PADNAME *fieldname = snames[i + 1];
-
-      /* Unshare the padname so the one in the methodscope pad returns to refcount 1 */
-      PADNAME *newpadname = newPADNAMEpvn(PadnamePV(fieldname), PadnameLEN(fieldname));
-      PadnameREFCNT_dec(padnames[padix]);
-      padnames[padix] = newpadname;
-
-      /* Turn off OUTER and set a valid COP sequence range, so the lexical is
-       * visible to eval(), PadWalker, perldb, etc.. */
-      PadnameOUTER_off(newpadname);
-      COP_SEQ_RANGE_LOW(newpadname) = cop_seq_low;
-      COP_SEQ_RANGE_HIGH(newpadname) = PL_cop_seqmax;
-    }
-#endif
-  }
-
-#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
-  if(fieldcount) {
-    UNOP_AUX_item *aux;
-    Newx(aux, 2 + fieldcount*2, UNOP_AUX_item);
-    cUNOP_AUXx(methstartop)->op_aux = aux;
-
-    (aux++)->uv = fieldcount;
-    (aux++)->uv = max_fieldix;
-
-    for(Size_t i = 0; i < av_count(fieldmap); i++) {
-      if(!AvARRAY(fieldmap)[i] || !SvOK(AvARRAY(fieldmap)[i]))
+      if(padix == NOT_IN_PAD)
         continue;
 
-      (aux++)->uv = i;
-      (aux++)->uv = SvUV(AvARRAY(fieldmap)[i]);
-    }
-  }
+      U8 private = 0;
+      switch(SvPV_nolen(fieldmeta->name)[0]) {
+        case '$': private = OPpFIELDPAD_SV; break;
+        case '@': private = OPpFIELDPAD_AV; break;
+        case '%': private = OPpFIELDPAD_HV; break;
+      }
+
+#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+      PERL_UNUSED_VAR(opflags_if_role);
+      assert((fieldix & ~FIELDIX_MASK) == 0);
+      av_store(fieldmap, padix, newSVuv(((UV)private << FIELDIX_TYPE_SHIFT) | fieldix));
+      fieldcount++;
+      if(fieldix > max_fieldix)
+        max_fieldix = fieldix;
+#else
+      ops = op_append_list(OP_LINESEQ, ops,
+        /* alias the padix from the field */
+        newFIELDPADOP(private << 8 | opflags_if_role, padix, fieldix));
 #endif
+
+#if HAVE_PERL_VERSION(5, 22, 0)
+      if(snames) {
+        PADNAME *fieldname = snames[i + 1];
+
+        /* Unshare the padname so the one in the methodscope pad returns to refcount 1 */
+        PADNAME *newpadname = newPADNAMEpvn(PadnamePV(fieldname), PadnameLEN(fieldname));
+        PadnameREFCNT_dec(padnames[padix]);
+        padnames[padix] = newpadname;
+
+        /* Turn off OUTER and set a valid COP sequence range, so the lexical is
+         * visible to eval(), PadWalker, perldb, etc.. */
+        PadnameOUTER_off(newpadname);
+        COP_SEQ_RANGE_LOW(newpadname) = cop_seq_low;
+        COP_SEQ_RANGE_HIGH(newpadname) = PL_cop_seqmax;
+      }
+#endif
+    }
+
+#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+    if(fieldcount) {
+      UNOP_AUX_item *aux;
+      Newx(aux, 2 + fieldcount*2, UNOP_AUX_item);
+      cUNOP_AUXx(methstartop)->op_aux = aux;
+
+      (aux++)->uv = fieldcount;
+      (aux++)->uv = max_fieldix;
+
+      for(Size_t i = 0; i < av_count(fieldmap); i++) {
+        if(!AvARRAY(fieldmap)[i] || !SvOK(AvARRAY(fieldmap)[i]))
+          continue;
+
+        (aux++)->uv = i;
+        (aux++)->uv = SvUV(AvARRAY(fieldmap)[i]);
+      }
+    }
+#endif
+  }
 
   return op_append_list(OP_LINESEQ, ops, body);
 }
@@ -913,12 +922,10 @@ OP *ObjectPad__finish_method_parse(pTHX_ ClassMeta *meta, bool is_common, OP *bo
       LEAVE;
     }
 
-    body = prepend_methstart_ops(meta, meta->methodscope, body);
+    body = prepend_methstart_ops(meta, meta->methodscope, body, false);
   }
   else if(body && is_common) {
-    body = op_append_list(OP_LINESEQ,
-      newCOMMONMETHSTARTOP(0 | (meta->repr << 8)),
-      body);
+    body = prepend_methstart_ops(meta, meta->methodscope, body, true);
   }
 
   meta->methodscope = NULL;
@@ -1797,7 +1804,7 @@ static void S_generate_initfields_method(pTHX_ ClassMeta *meta)
    * except more complex due to the multiple suspend/resume nature of parsing
    * it.
    */
-  ops = prepend_methstart_ops(meta, NULL, ops);
+  ops = prepend_methstart_ops(meta, NULL, ops, false);
 
   SvREFCNT_inc(PL_compcv);
   ops = block_end(save_ix, ops);

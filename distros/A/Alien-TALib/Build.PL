@@ -12,12 +12,15 @@ my $build = Alien::Build::MB->new(
         'Module::Build' => 0,
         'Alien::Build' => 0,
         'Alien::Build::MB' => 0,
+        'Alien::Build::Plugin::Download::GitHub' => 0,
+        'Software::License' => 0,
     },
     build_requires => {
         'Alien::Build::MB' => 0,
         'Module::Build' => 0,
         'Path::Tiny' => 0,
         'HTTP::Tiny' => 0,
+        'Alien::Build::Plugin::Download::GitHub' => 0,
     },
     test_requires => {
         'Test::More'        => 0,
@@ -26,20 +29,29 @@ my $build = Alien::Build::MB->new(
         'Test::Alien::Diag' => 0,
     },
     requires => {
-        'perl' => '5.10.0',
+        'perl' => '5.16.0',
     },
     meta_merge => {
         'meta-spec' => {
             version => 2
         },
         resources => {
-            repository => "https://github.com/vikasnkumar/Alien-TALib",
-            bugtracker => "https://github.com/vikasnkumar/Alien-TALib/issues",
+            repository => {
+                url => 'git://github.com/vikasnkumar/Alien-TALib',
+                type => 'git',
+                web => 'https://github.com/vikasnkumar/Alien-TALib',
+            },
+            x_IRC => 'irc://irc.perl.org/#pdl',
+            bugtracker => { web => "https://github.com/vikasnkumar/Alien-TALib/issues" },
         },
         prereqs => {
             develop => {
                 requires => {
                     'Software::License' => 0,
+                    'Alien::Build' => 0,
+                    'Module::Build' => 0,
+                    'Alien::Build::MB' => 0,
+                    'Alien::Build::Plugin::Download::GitHub' => 0,
                 },
             },
         },

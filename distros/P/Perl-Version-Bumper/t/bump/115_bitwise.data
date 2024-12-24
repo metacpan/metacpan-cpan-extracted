@@ -21,8 +21,8 @@ use VERSION;
 
 # IMPORTANT: Please double-check the use of bitwise operators
 # before removing the `no feature 'bitwise';` line below.
-# See manual pages perlfeature (section "The 'bitwise' feature")
-# and perlop (section "Bitwise String Operators") for details.
+# See manual pages 'feature' (section "The 'bitwise' feature")
+# and 'perlop' (section "Bitwise String Operators") for details.
 no feature 'bitwise';
 my $z = $x | $y;
 ########## bitwise ops + bitwise feature before v5.28
@@ -47,8 +47,8 @@ use VERSION;
 
 # IMPORTANT: Please double-check the use of bitwise operators
 # before removing the `no feature 'bitwise';` line below.
-# See manual pages perlfeature (section "The 'bitwise' feature")
-# and perlop (section "Bitwise String Operators") for details.
+# See manual pages 'feature' (section "The 'bitwise' feature")
+# and 'perlop' (section "Bitwise String Operators") for details.
 no feature 'bitwise';
 my $z |= $x;
 ########## bitwise op= + bitwise feature before v5.28

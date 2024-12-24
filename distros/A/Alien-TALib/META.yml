@@ -4,13 +4,18 @@ author:
   - 'Vikas N. Kumar <vikas@cpan.org>'
 build_requires:
   Alien::Build::MB: '0.01'
+  Alien::Build::Plugin::Download::GitHub: '0'
+  Alien::Build::Plugin::Download::Negotiate: '1.30'
   Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
   Alien::cmake3: '0.02'
-  Archive::Zip: '0'
+  Archive::Tar: '0'
   Config: '0'
+  Devel::FindPerl: '0'
   HTTP::Tiny: '0.044'
   IO::Socket::SSL: '1.56'
+  IO::Zlib: '0'
   Module::Build: '0.36'
+  Mojo::DOM58: '1.00'
   Mozilla::CA: '0'
   Net::SSLeay: '1.49'
   Path::Tiny: '0'
@@ -19,12 +24,15 @@ build_requires:
   Test::Alien::Diag: '0'
   Test::More: '0'
   URI: '0'
+  URI::Escape: '0'
 configure_requires:
   Alien::Build: '1.40'
   Alien::Build::MB: '0.01'
   Alien::Build::Plugin::Build::CMake: '0.99'
+  Alien::Build::Plugin::Download::GitHub: '0'
   ExtUtils::CBuilder: '0'
   Module::Build: '0.36'
+  Software::License: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -35,24 +43,32 @@ name: Alien-TALib
 provides:
   Alien::TALib:
     file: lib/Alien/TALib.pm
-    version: '0.16'
+    version: '0.18'
 requires:
-  perl: v5.10.0
+  perl: v5.16.0
 resources:
+  IRC: irc://irc.perl.org/#pdl
+  bugtracker: https://github.com/vikasnkumar/Alien-TALib/issues
   license: http://dev.perl.org/licenses/
-version: '0.16'
+  repository: git://github.com/vikasnkumar/Alien-TALib
+version: '0.18'
 x_alienfile:
   generated_by: 'Alien::Build::MB version 0.09'
   requires:
     share:
+      Alien::Build::Plugin::Download::Negotiate: '1.30'
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
       Alien::cmake3: '0.02'
-      Archive::Zip: '0'
+      Archive::Tar: '0'
       Config: '0'
+      Devel::FindPerl: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mojo::DOM58: '1.00'
       Mozilla::CA: '0'
       Net::SSLeay: '1.49'
       URI: '0'
+      URI::Escape: '0'
     system: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

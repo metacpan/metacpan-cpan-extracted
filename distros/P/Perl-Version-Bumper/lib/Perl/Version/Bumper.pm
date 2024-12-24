@@ -1,7 +1,7 @@
 use v5.10;
 
 package Perl::Version::Bumper;
-$Perl::Version::Bumper::VERSION = '0.162';
+$Perl::Version::Bumper::VERSION = '0.175';
 
 use strict;
 use warnings;
@@ -344,8 +344,12 @@ my %feature_shine = (
             }
         );
 
-        # the `use VERSION` inserted earlier is always the last one in the doc
-        my $insert_point = ( _version_stmts($doc) )[-1];
+        # the `use VERSION` inserted earlier is always the first one in the doc
+        my $insert_point = ( _version_stmts($doc) )[0];
+        my $indent = $insert_point->previous_sibling
+          && $insert_point->previous_sibling->isa('PPI::Token::Whitespace')
+          ? $insert_point->previous_sibling
+          : '';
         my $no_feature_bitwise =
           PPI::Document->new( \"no feature 'bitwise';\n" );
         $insert_point->insert_after( $_->remove )
@@ -354,14 +358,15 @@ my %feature_shine = (
         # also add an IMPORTANT comment to warn users
         $insert_point = $insert_point->snext_sibling;
         my $todo_comment =
-          PPI::Document->new( \( << 'TODO_COMMENT' ) );
+          PPI::Document->new( \( << "TODO_COMMENT" ) );
 
-# IMPORTANT: Please double-check the use of bitwise operators
-# before removing the `no feature 'bitwise';` line below.
-# See manual pages perlfeature (section "The 'bitwise' feature")
-# and perlop (section "Bitwise String Operators") for details.
+$indent# IMPORTANT: Please double-check the use of bitwise operators
+$indent# before removing the `no feature 'bitwise';` line below.
+$indent# See manual pages 'feature' (section "The 'bitwise' feature")
+$indent# and 'perlop' (section "Bitwise String Operators") for details.
 TODO_COMMENT
         $insert_point->insert_before( $_->remove ) for $todo_comment->elements;
+        $insert_point->insert_before( $indent->clone ) if $indent;
     },
 
     # the 'signatures' feature needs prototypes to be updated.
@@ -542,21 +547,19 @@ sub _insert_version_stmt {
     my $insert_point = $doc->schild(0) // $doc->child(0);
     return unless defined $insert_point;    # empty document
 
-    # insert before the next significant sibling
-    # if the first element is a use VERSION
-    $insert_point = $insert_point->snext_sibling
-      if $insert_point->isa('PPI::Statement::Include')
-      && $insert_point->version
-      && $insert_point->snext_sibling;
+    # record the indent before the next significant sibling
+    # (unless it's a version statement: it will be removed,
+    # and this version statement will replace it)
+    my $indent;
+    $indent = $insert_point->previous_sibling
+      if $insert_point->previous_sibling
+      && $insert_point->previous_sibling->isa('PPI::Token::Whitespace')
+      && !($insert_point->isa('PPI::Statement::Include') && $insert_point->version );
 
-    # because of Perl::Critic::Policy::Modules::RequireExplicitPackage
-    # we have to put the use VERSION line after the package line,
-    # if that's the first significant thing in the document
-    if ( $insert_point->isa('PPI::Statement::Package') ) {
-        $insert_point->insert_after( $_->remove ) for $version_stmt->elements;
-    }
-    elsif ( $insert_point->significant ) {
+    # put the use VERSION LINE at the top of the file
+    if ( $insert_point->significant ) {
         $insert_point->insert_before( $_->remove ) for $version_stmt->elements;
+        $insert_point->insert_before( $indent->clone ) if $indent;
     }
     else {
         $doc->add_element( $_->remove ) for $version_stmt->elements;
@@ -1072,8 +1075,8 @@ __DATA__
                        isa   5.032    5.036
       bareword_filehandles   5.034    5.010    5.038  bareword::filehandles 0
           multidimensional   5.034    5.010    5.036  multidimensional 0
-                       try   5.034    5.040           Syntax::Feature::Try 0 Syntax::Keyword::Try 0
-                     defer   5.036
+                       try   5.034    5.040           Feature::Compat::Try 1 Syntax::Feature::Try 0 Syntax::Keyword::Try 0
+                     defer   5.036                    Feature::Compat::Defer 1 Syntax::Keyword::Defer 0
    extra_paired_delimiters   5.036
-                     class   5.038
+                     class   5.038                    Feature::Compat::Class 1
                module_true   5.038    5.038

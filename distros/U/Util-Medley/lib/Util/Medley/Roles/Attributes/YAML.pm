@@ -1,5 +1,5 @@
 package Util::Medley::Roles::Attributes::YAML;
-$Util::Medley::Roles::Attributes::YAML::VERSION = '0.061';
+$Util::Medley::Roles::Attributes::YAML::VERSION = '0.062';
 use Modern::Perl;
 use Moose::Role;
 use Util::Medley::YAML;
@@ -10,7 +10,7 @@ Util::Medley::Roles::Attributes::YAML
 
 =head1 VERSION
 
-version 0.061
+version 0.062
 
 =cut
 

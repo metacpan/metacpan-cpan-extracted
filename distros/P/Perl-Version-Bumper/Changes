@@ -1,5 +1,13 @@
 Revision history for Perl-Version-Bumper
 
+0.175 2024-12-23 BOOK
+    - properly preserve indentation when replacing a `use VERSION`
+    - put the `use VERSION` line as the first statement of the
+      file, before the `package` line (starting with version
+      1.154, Perl::Critic won't count this as a violation of
+      Perl::Critic::Policy::Modules::RequireExplicitPackage)
+    - add support for several compatibility modules
+
 0.162 2024-12-07 BOOK
     - add a CLI tool for bumping files: perl-version-bump
 

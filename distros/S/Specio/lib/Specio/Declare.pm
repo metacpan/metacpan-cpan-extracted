@@ -5,13 +5,13 @@ use warnings;
 
 use parent 'Exporter';
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Carp qw( croak );
 use Specio::Coercion;
 use Specio::Constraint::Simple;
 use Specio::DeclaredAt;
-use Specio::Helpers qw( install_t_sub _STRINGLIKE );
+use Specio::Helpers  qw( install_t_sub _STRINGLIKE );
 use Specio::Registry qw( internal_types_for_package register );
 
 ## no critic (Modules::ProhibitAutomaticExportation)
@@ -317,7 +317,7 @@ Specio::Declare - Specio declaration subroutines
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -654,7 +654,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

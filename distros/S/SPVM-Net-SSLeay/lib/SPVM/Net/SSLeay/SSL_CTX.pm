@@ -316,6 +316,18 @@ The X509 object $cacert must be defined. Otherwise an exception is thrown.
 
 If add_client_CA failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
 
+=head2 use_certificate
+
+C<method use_certificate : int ($x : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>);>
+
+Calls native L<SSL_CTX_use_certificate|https://docs.openssl.org/master/man3/SSL_CTX_use_certificate> function given the pointer value of the instance, the pointer value of $x, and returns its return value.
+
+Exceptions:
+
+The X509 object $x must be defined. Otherwise an exception is thrown.
+
+If SSL_CTX_use_certificate failed, an exception is thrown with C<eval_error_id> set to the basic type ID of L<Net::SSLeay::Error|SPVM::Net::SSLeay::Error> class.
+
 =head2 add_extra_chain_cert
 
 C<method add_extra_chain_cert : long ($x509 : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>);>

@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright::Statement;
-$Software::Copyright::Statement::VERSION = '0.013';
+$Software::Copyright::Statement::VERSION = '0.014';
 use 5.20.0;
 use warnings;
 
@@ -69,6 +69,10 @@ sub __clean_copyright ($c) {
     $c =~ s/[^a-z0-9\s,.'"]+copyright[^a-z0-9\s,.'"]+//i;
     # libuv1 has copyright like "2000, -present"
     $c =~ s![,\s]*-present!'-'.(localtime->year() + 1900)!e;
+    # texlive-extra has year range like 2023-20**
+    $c =~ s!(\d+)-2\d\*\*!"$1-".(localtime->year() + 1900)!e;
+    # texlive-extra has year range like 2011-..
+    $c =~ s!(\d+)-\.+!"$1-".(localtime->year() + 1900)!e;
     # cleanup markdown copyright
     $c =~ s/\[([\w\s]+)\]\(mailto:([\w@.+-]+)\)/$1 <$2>/;
     return $c;
@@ -180,7 +184,7 @@ Software::Copyright::Statement - a copyright statement for one owner
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

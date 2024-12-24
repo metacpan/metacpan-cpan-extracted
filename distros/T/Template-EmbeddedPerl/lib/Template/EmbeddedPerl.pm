@@ -1,6 +1,6 @@
 package Template::EmbeddedPerl;
 
-our $VERSION = '0.001012';
+our $VERSION = '0.001013';
 $VERSION = eval $VERSION;
 
 use warnings;
@@ -42,7 +42,7 @@ my $variable_regex = qr/
       )
       (?:                             # Non-capturing group for operators
         (?:
-          ->                          # Dereference operator
+          (\s*)->(\s*)                # Dereference operator
           (?:
             \$? \w+                   # Method name, possibly starting with $
             (?: $balanced_parens )?   # Optional method arguments
@@ -939,8 +939,45 @@ This will output:
   Hello, JohnXXX
 
 You can nest method calls and the methods can contain arguments of varying complexity, including
-anonymous subroutines.  However you cannot span lines, you must close all open parens and braces
-on the same line.  You can review the existing test case at C<t/interpolation.t> for examples.
+anonymous subroutines.  There is a limited ability to span lines; you make break lines across the 
+deference operator and in many cases across balanced parenthesis, square and curly brackets.  If you
+do so you cannot mix 'template text' with the Perl code.  For example:
+
+  <div class="name">
+    $person->profile
+      ->first_name
+  </div>
+
+and
+
+  $obj->compute(
+    sub {
+      my $arg = shift;
+      return $arg * 2;
+    }
+  )
+
+are both valid.  But this will fail:
+
+  <p>
+    $arg->compute(sub {
+      my $value = shift;
+      $value = $value * 5
+      <div>$value</div>
+    })
+  </p>
+
+For this case you need to use the C<%= ... %> syntax or %= and %:
+
+  <p>
+    %= $arg->compute(sub {
+      % my $value = shift;
+      % $value = $value * 5
+      <div>$value</div>
+    % })
+  </p>
+
+You can review the existing test case at C<t/interpolation.t> for examples.
 
 This works by noticing a '$' followed by a Perl variable name (and method calls, etc). So if you
 need to put a real '$' in your code you will need to escape it with C<\$>.  It does not work

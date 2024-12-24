@@ -1,5 +1,5 @@
 package Util::Medley::List;
-$Util::Medley::List::VERSION = '0.061';
+$Util::Medley::List::VERSION = '0.062';
 #########################################################################################
 
 use v5.16;
@@ -18,7 +18,7 @@ Util::Medley::List - utility methods for working with lists
 
 =head1 VERSION
 
-version 0.061
+version 0.062
 
 =cut
 
@@ -436,7 +436,7 @@ multi method nsort (ArrayRef :$list!) {
 		else {
 			# Consume the string.
 			while ( length $x ) {
-				push @bit, ( $x =~ s/^(\D+)//s ) ? fc($1) : '';
+				push @bit, ( $x =~ s/^(\D+)//s ) ? CORE::fc($1) : '';
 				push @bit, ( $x =~ s/^(\d+)//s ) ? $1     : 0;
 			}
 		}

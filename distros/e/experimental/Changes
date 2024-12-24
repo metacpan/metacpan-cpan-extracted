@@ -1,5 +1,8 @@
 Revision history for experimental
 
+0.033     2024-12-24 00:50:41+01:00 Europe/Brussels
+          - feature extra_paired_delimiters not considered stable
+
 0.032     2024-04-25 22:30:41+01:00 Europe/Lisbon
           - Add the newly-stable features to stable.pm - extra_paired_delimiters, const_attr, for_list
 

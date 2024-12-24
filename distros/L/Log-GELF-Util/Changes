@@ -1,5 +1,9 @@
 Revision history for Perl extension Log-GELF-Util
 
+1.03 2024-12-23T23:59:25Z
+
+   - test _additional_fields 
+
 1.02 2024-10-04T00:23:06Z
 
    - reflect Logicly rebrand of Strategic Data

@@ -16,6 +16,7 @@ class List {
 
    method push ( @more ) { push @values, @more }
    method nshift ( $n )  { splice @values, 0, $n }
+   method empty ()       { @values = (); }
 }
 
 {
@@ -70,6 +71,22 @@ class Greeter {
 
    like( $warnings, qr/^Use of ADJUST \(signature\) \{BLOCK\} is now deprecated at \S+ line $LINE\./,
       'ADJUST (signature) { BLOCK } raises a warning' );
+}
+
+# RT158048
+{
+   my @args;
+   my $class_during_method;
+   class WithCommonMethods {
+      method cmeth :common ( @rest ) {
+         $class_during_method = $class;
+         @args = @rest;
+      }
+   }
+
+   WithCommonMethods->cmeth( 1, 2, 3 );
+   is( \@args, [ 1 .. 3 ], 'args to :common method' );
+   is( $class_during_method, "WithCommonMethods", '$class during :common method' );
 }
 
 done_testing;

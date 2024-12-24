@@ -1,5 +1,13 @@
 Revision history for Perl extension Poz
 
+0.07 2024-12-24T08:26:23Z
+
+    - bugfix: add enum and union as internal of Poz
+
+0.06 2024-12-24T08:24:45Z
+
+    - add union value feature
+
 0.05 2024-12-23T08:26:58Z
 
     - supports default of array

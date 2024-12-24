@@ -124,6 +124,8 @@ class Net::SSLeay::SSL_CTX : pointer {
   
   native method add_client_CA : int ($cacert : Net::SSLeay::X509);
   
+  native method use_certificate : int ($x : Net::SSLeay::X509);
+  
   native method add_extra_chain_cert : long ($x509 : Net::SSLeay::X509);
   
   native method set_verify : void ($mode : int, $verify_callback : Net::SSLeay::Callback::Verify = undef);

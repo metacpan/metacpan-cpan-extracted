@@ -3,7 +3,7 @@ package Test::Specio;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use IO::File;
 use Scalar::Util qw( blessed looks_like_number openhandle );
@@ -117,8 +117,8 @@ our $STR_OVERLOAD_CLASS_NAME = _T::StrOverload->new('_T::StrOverload');
     }
 }
 
-our $NUM_OVERLOAD_ZERO        = _T::NumOverload->new(0);
-our $NUM_OVERLOAD_ONE         = _T::NumOverload->new(1);
+our $NUM_OVERLOAD_ZERO        = _T::NumOverload->new( 0);
+our $NUM_OVERLOAD_ONE         = _T::NumOverload->new( 1);
 our $NUM_OVERLOAD_NEG         = _T::NumOverload->new(-42);
 our $NUM_OVERLOAD_DECIMAL     = _T::NumOverload->new(42.42);
 our $NUM_OVERLOAD_NEG_DECIMAL = _T::NumOverload->new(42.42);
@@ -1298,7 +1298,7 @@ Test::Specio - Test helpers for Specio
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -1545,7 +1545,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

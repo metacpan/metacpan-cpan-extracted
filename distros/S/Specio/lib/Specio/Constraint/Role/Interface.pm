@@ -3,14 +3,14 @@ package Specio::Constraint::Role::Interface;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
-use Carp qw( confess );
-use Eval::Closure qw( eval_closure );
+use Carp            qw( confess );
+use Eval::Closure   qw( eval_closure );
 use List::Util 1.33 qw( all any first );
 use Specio::Exception;
 use Specio::PartialDump qw( partial_dump );
-use Specio::TypeChecks qw( is_CodeRef );
+use Specio::TypeChecks  qw( is_CodeRef );
 
 use Role::Tiny 1.003003;
 
@@ -549,6 +549,7 @@ sub _build_signature {
     # address and stringifies to the same value. XXX - will this break under
     # threads?
     return join "\n",
+        ## no critic (Subroutines::ProtectPrivateSubs)
         ( $self->_has_parent ? $self->parent->_signature : () ),
         (
         defined $self->_constraint
@@ -628,7 +629,7 @@ Specio::Constraint::Role::Interface - The interface all type constraints should 
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 DESCRIPTION
 
@@ -663,7 +664,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

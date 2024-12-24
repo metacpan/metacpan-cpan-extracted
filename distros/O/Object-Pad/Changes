@@ -1,5 +1,10 @@
 Revision history for Object-Pad
 
+0.818   2024-12-23
+        [BUGFIXES]
+         * Ensure that `method :common` works with the new `OP_ARGELEM` code
+           in the signature handling code (RT158048)
+
 0.817   2024-12-20
         [CHANGES]
          * Initial attempt at supporting an `:abstract` attribute on classes.

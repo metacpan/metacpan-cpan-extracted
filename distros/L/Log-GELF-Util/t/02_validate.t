@@ -2,6 +2,7 @@ use strict;
 use Test::More 0.98;
 use Test::Exception;
 use Test::Warnings 0.005 qw(warning allow_warnings);
+use JSON::MaybeXS qw(encode_json);
 
 use Log::GELF::Util qw(validate_message);
 
@@ -50,6 +51,27 @@ throws_ok{
 }
 qr/invalid field 'bad'.*/,
 'bad field check';
+
+lives_ok{
+    validate_message(
+        host           => 1,
+        short_message  => 1,
+        _good          => 'dog.',
+    );
+}
+'additional field passes';
+
+lives_ok{
+    validate_message(
+        host           => 1,
+        short_message  => 1,
+        _good => encode_json([
+                    {a=>1},
+                    {b=>{c=>'three'}},
+                 ]),
+    );
+}
+'additional field as json passes';
 
 throws_ok{
     validate_message(
@@ -171,4 +193,4 @@ ok(exists $msg->{line}, 'line exists');
 is($msg->{line}, '1', 'correct line');
 allow_warnings 0;
 
-done_testing(26);
+done_testing(28);

@@ -3,10 +3,10 @@ package Specio::Library::Structured::Map;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 use Carp qw( confess );
-use List::Util ();
+use List::Util 1.33 ();
 use Specio::Library::Builtins;
 use Specio::TypeChecks qw( does_role );
 
@@ -88,7 +88,7 @@ Specio::Library::Structured::Map - Guts of Map structured type
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 DESCRIPTION
 
@@ -110,7 +110,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

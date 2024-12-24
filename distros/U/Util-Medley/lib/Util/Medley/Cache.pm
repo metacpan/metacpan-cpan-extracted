@@ -1,5 +1,5 @@
 package Util::Medley::Cache;
-$Util::Medley::Cache::VERSION = '0.061';
+$Util::Medley::Cache::VERSION = '0.062';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;

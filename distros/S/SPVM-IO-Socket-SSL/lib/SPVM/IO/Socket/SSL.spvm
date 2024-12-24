@@ -2,7 +2,7 @@
 # MIT License
 
 class IO::Socket::SSL extends IO::Socket::IP {
-  version "0.005";
+  version "0.006";
   
   use IO::Socket::INET;
   use Net::SSLeay;
@@ -17,14 +17,26 @@ class IO::Socket::SSL extends IO::Socket::IP {
   use Net::SSLeay::X509;
   use Net::SSLeay::EVP;
   use Fn;
+  use Net::SSLeay::EVP_PKEY;
+  use Net::SSLeay::Error::SSL_ERROR_WANT_READ;
+  use Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
+  use IO::Socket::SSL::Callback::BeforeConnectSSL;
+  use IO::Socket::SSL::Callback::BeforeAcceptSSL;
+  use Net::SSLeay::Callback::Verify;
+  use List;
+  use Regex;
   
-  has ref_x509s_list : List of Net::SSLeay::X509;
+  has ssl_ctx : ro Net::SSLeay::SSL_CTX;
   
   has ssl : ro Net::SSLeay;
   
-  has SSL_version : string;
+  has before_connect_SSL_cbs_list : ro List of IO::Socket::SSL::Callback::BeforeConnectSSL;
+  
+  has before_accept_SSL_cbs_list : ro List of IO::Socket::SSL::Callback::BeforeAcceptSSL;
   
   has SSL_verify_mode : int;
+  
+  has SSL_verify_callback : Net::SSLeay::Callback::Verify;
   
   has SSL_verify_mode_specified : int;
   
@@ -50,6 +62,20 @@ class IO::Socket::SSL extends IO::Socket::IP {
   
   has SSL_honor_cipher_order_specified : int;
   
+  has SSL_ca_file : string;
+  
+  has SSL_ca_path : string;
+  
+  has SSL_ca : Net::SSLeay::X509[];
+  
+  has SSL_cert_file : string;
+  
+  has SSL_cert : Net::SSLeay::X509[];
+  
+  has SSL_key_file : string;
+  
+  has SSL_key : Net::SSLeay::EVP_PKEY;
+  
   # Class Methods
   static method new : IO::Socket::SSL ($options : object[] = undef) {
     
@@ -68,8 +94,8 @@ class IO::Socket::SSL extends IO::Socket::IP {
     my $option_names = Array->merge_string(
       $self->SUPER::option_names,
       [
-        "SSL_version", 
         "SSL_verify_mode",
+        "SSL_verify_callback",
         "SSL_hostname",
         "SSL_cipher_list",
         "SSL_ciphersuites",
@@ -79,6 +105,13 @@ class IO::Socket::SSL extends IO::Socket::IP {
         "SSL_alpn_protocols",
         "SSL_startHandshake",
         "SSL_honor_cipher_order",
+        "SSL_ca_file",
+        "SSL_ca_path",
+        "SSL_ca",
+        "SSL_cert_file",
+        "SSL_cert",
+        "SSL_key_file",
+        "SSL_key"
       ],
     );
     
@@ -87,15 +120,13 @@ class IO::Socket::SSL extends IO::Socket::IP {
   
   protected method init : void ($options : object[] = undef) {
     
-    $self->{ref_x509s_list} = List->new(new Net::SSLeay::X509[0]);
-    
     my $options_h = Hash->new($options);
     
     $self->SUPER::init($options);
     
-    my $SSL_version = $options_h->get_or_default_string("SSL_version", "SSLv23:!TLSv1:!TLSv1_1:!SSLv3:!SSLv2");
+    $self->{before_connect_SSL_cbs_list} = List->new(new IO::Socket::SSL::Callback::BeforeConnectSSL[0]);
     
-    $self->{SSL_version} = $SSL_version;
+    $self->{before_accept_SSL_cbs_list} = List->new(new IO::Socket::SSL::Callback::BeforeAcceptSSL[0]);
     
     if ($options_h->exists("SSL_verify_mode")) {
       $self->{SSL_verify_mode_specified} = 1;
@@ -103,6 +134,9 @@ class IO::Socket::SSL extends IO::Socket::IP {
       my $SSL_verify_mode = $options_h->get_int("SSL_verify_mode");
       $self->{SSL_verify_mode} = $SSL_verify_mode;
     }
+    
+    my $SSL_verify_callback = (Net::SSLeay::Callback::Verify)$options_h->get_or_default("SSL_verify_callback", undef);
+    $self->{SSL_verify_callback} = $SSL_verify_callback;
     
     my $SSL_hostname = $options_h->get_or_default_string("SSL_hostname", undef);
     
@@ -143,6 +177,40 @@ class IO::Socket::SSL extends IO::Socket::IP {
       my $SSL_honor_cipher_order = $options_h->get_int("SSL_honor_cipher_order");
       $self->{SSL_honor_cipher_order} = $SSL_honor_cipher_order;
     }
+    
+    my $SSL_ca_file = $options_h->get_or_default_string("SSL_ca_file", undef);
+    $self->{SSL_ca_file} = $SSL_ca_file;
+    
+    my $SSL_ca_path = $options_h->get_or_default_string("SSL_ca_path", undef);
+    $self->{SSL_ca_path} = $SSL_ca_path;
+    
+    my $SSL_ca = (Net::SSLeay::X509[])$options_h->get_or_default("SSL_ca", undef);
+    $self->{SSL_ca} = $SSL_ca;
+    
+    if ($SSL_ca && ($SSL_ca_file || $SSL_ca_path)) {
+      die "If SSL_ca option is specified, SSL_ca_file option or SSL_ca_path option cannot be specified.";
+    }
+    
+    my $SSL_cert_file = $options_h->get_or_default_string("SSL_cert_file", undef);
+    $self->{SSL_cert_file} = $SSL_cert_file;
+    
+    my $SSL_cert = (Net::SSLeay::X509[])$options_h->get_or_default("SSL_cert", undef);
+    $self->{SSL_cert} = $SSL_cert;
+    
+    if ($SSL_cert && $SSL_cert_file) {
+      die "If SSL_cert option is specified, SSL_cert_file option cannot be specified.";
+    }
+    
+    my $SSL_key_file = $options_h->get_or_default_string("SSL_key_file", undef);
+    $self->{SSL_key_file} = $SSL_key_file;
+    
+    my $SSL_key = $options_h->get_or_default("SSL_key", undef);
+    $self->{SSL_key} = (Net::SSLeay::EVP_PKEY)$SSL_key;
+    
+    if ($SSL_key && $SSL_key_file) {
+      die "If SSL_key option is specified, SSL_key_file option cannot be specified.";
+    }
+    
   }
   
   protected method configure : void () {
@@ -181,58 +249,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
       }
     }
     
-    my $ssl_method = (Net::SSLeay::SSL_METHOD)undef;
-    my $ssl_method_name = (string)undef;
-    
-    my $SSL_version_option = $self->{SSL_version};
-    
-    my $SSL_versions = Fn->split(":", $SSL_version_option);
-    
-    my $ssl_op_no_options = 0;
-    for my $SSL_version (@$SSL_versions) {
-      
-      if ($SSL_version eq "TLS") {
-        if ($ssl_method) {
-          die "SSL_METHOD is already set to ${ssl_method_name}_method.";
-        }
-        
-        $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
-        $ssl_method_name = $SSL_version;
-      }
-      elsif ($SSL_version eq "SSLv23") {
-        if ($ssl_method) {
-          die "SSL_METHOD is already set to ${ssl_method_name}_method.";
-        }
-        
-        $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
-        $ssl_method_name = $SSL_version;
-      }
-      elsif ($SSL_version eq "!SSLv2") {
-        $ssl_op_no_options |= SSL->SSL_OP_NO_SSLv2;
-      }
-      elsif ($SSL_version eq "!SSLv3") {
-        $ssl_op_no_options |= SSL->SSL_OP_NO_SSLv3;
-      }
-      elsif ($SSL_version eq "!TLSv1") {
-        $ssl_op_no_options |= SSL->SSL_OP_NO_TLSv1;
-      }
-      elsif ($SSL_version eq "!TLSv1_1") {
-        $ssl_op_no_options |= SSL->SSL_OP_NO_TLSv1_1;
-      }
-      elsif ($SSL_version eq "!TLSv1_2") {
-        $ssl_op_no_options |= SSL->SSL_OP_NO_TLSv1_2;
-      }
-      elsif ($SSL_version eq "!TLSv1_3") {
-        $ssl_op_no_options |= SSL->SSL_OP_NO_TLSv1_3;
-      }
-      else {
-        die "SSL_option contains an invalid value:$SSL_version.";
-      }
-    }
-    
-    unless ($ssl_method) {
-      die "SSL_version must contain TLS or SSLv23.";
-    }
+    my $ssl_method = Net::SSLeay::SSL_METHOD->TLS_method;
     
     my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
     
@@ -258,44 +275,74 @@ class IO::Socket::SSL extends IO::Socket::IP {
         $SSL_verify_mode = SSL->SSL_VERIFY_PEER;
       }
     }
-    $ssl_ctx->set_verify($SSL_verify_mode);
     
-    my $SSL_hostname = $self->{SSL_hostname};
+    my $SSL_verify_callback = $self->{SSL_verify_callback};
     
-    unless ($SSL_hostname) {
-      if ($peer_addr) {
-        $SSL_hostname = $peer_addr;
-      }
-    }
+    $ssl_ctx->set_verify($SSL_verify_mode, $SSL_verify_callback);
     
     my $default_ssl_options = SSL->SSL_OP_ALL | SSL->SSL_OP_SINGLE_DH_USE | SSL->SSL_OP_SINGLE_ECDH_USE;
     
     my $ssl_options = $default_ssl_options;
     
+    my $ssl_op_no_options = 0;
     $ssl_options |= $ssl_op_no_options;
-    
-    $ssl_ctx->set_default_verify_paths;
     
     my $x509_store = $ssl_ctx->get_cert_store;
     
-=begin comment
-
-    {
-      my $ca = Mozilla::CA->SSL_ca;
-      
-      my $bio = Net::SSLeay::BIO->new;
-      
-      $bio->write($ca);
-      
-      my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
-      
-      $x509_store->add_cert($x509);
+    my $SSL_ca_file = $self->{SSL_ca_file};
+    
+    my $SSL_ca_path = $self->{SSL_ca_path};
+    
+    my $SSL_ca = $self->{SSL_ca};
+    
+    if ($SSL_ca) {
+      for (my $i = 0; $i < @$SSL_ca; $i++) {
+        my $x509 = $SSL_ca->[$i];
+        $x509_store->add_cert($x509);
+      }
     }
-
-=end comment
-
-=cut
-
+    elsif ($SSL_ca_file || $SSL_ca_path) {
+      $ssl_ctx->load_verify_locations($SSL_ca_file, $SSL_ca_path);
+    }
+    else {
+      if (Sys::OS->is_windows) {
+        $ssl_ctx->set_default_verify_paths_windows;
+      }
+      else {
+        $ssl_ctx->set_default_verify_paths;
+      }
+    }
+    
+    my $SSL_cert_file = $self->{SSL_cert_file};
+    
+    my $SSL_cert = $self->{SSL_cert};
+    
+    if ($SSL_cert_file) {
+      $ssl_ctx->use_certificate_chain_file($SSL_cert_file);
+    }
+    elsif ($SSL_cert) {
+      for (my $i = 0; $i < @$SSL_cert; $i++) {
+        my $x509 = $SSL_cert->[$i];
+        if ($i == 0) {
+          $ssl_ctx->use_certificate($x509);
+        }
+        else {
+          $ssl_ctx->add_extra_chain_cert($x509);
+        }
+      }
+    }
+    
+    my $SSL_key_file = $self->{SSL_key_file};
+    
+    my $SSL_key = $self->{SSL_key};
+    
+    if ($SSL_key_file) {
+      $ssl_ctx->use_PrivateKey_file($SSL_key_file, SSL->SSL_FILETYPE_PEM);
+    }
+    elsif ($SSL_key) {
+      $ssl_ctx->use_PrivateKey($SSL_key);
+    }
+    
     my $SSL_check_crl = $self->{SSL_check_crl};
     
     my $SSL_crl_file = $self->{SSL_crl_file};
@@ -321,9 +368,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
       if ($SSL_server) {
         $ssl_ctx->set_alpn_select_cb_with_protocols($SSL_alpn_protocols);
       } else {
-        die "[TODO]";
-        # TODO
-        # $ssl_ctx->set_alpn_protos($SSL_alpn_protocols);
+        $ssl_ctx->set_alpn_protos_with_protocols($SSL_alpn_protocols);
       }
     }
     
@@ -331,7 +376,38 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     $verify_param->set_hostflags(SSL->X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
     
-    $verify_param->set1_host($peer_addr);
+    my $peer_addr_is_ip_address = 0;
+    if ($peer_addr) {
+      # Maybe IPv6
+      if (Fn->contains($peer_addr, ":")) {
+        $peer_addr_is_ip_address = 1;
+      }
+      # IPv4
+      elsif (Regex->new("^(\d+)(?:\.(\d+)\.(\d+)\.(\d+)|[\d\.]*)$")->match($peer_addr)) {
+        $peer_addr_is_ip_address = 1;
+      }
+      
+      if ($peer_addr_is_ip_address) {
+        $verify_param->set1_ip_asc($peer_addr);
+      }
+      else {
+        $verify_param->set1_host($peer_addr);
+      }
+    }
+    
+    my $SSL_hostname = $self->{SSL_hostname};
+    
+    unless ($SSL_hostname) {
+      if ($peer_addr && !$peer_addr_is_ip_address) {
+        $SSL_hostname = $peer_addr;
+      }
+    }
+    
+    if ($SSL_hostname && $SSL_hostname ne "") {
+      $self->add_before_connect_SSL_cb([$SSL_hostname : string] method : void ($socket : IO::Socket::SSL, $ssl : Net::SSLeay) {
+        $ssl->set_tlsext_host_name($SSL_hostname);
+      });
+    }
     
     my $SSL_honor_cipher_order = 0;
     if ($self->{SSL_honor_cipher_order_specified}) {
@@ -348,34 +424,42 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     $ssl_ctx->set_options($ssl_options);
     
-    my $ssl = Net::SSLeay->new($ssl_ctx);
+    $self->{ssl_ctx} = $ssl_ctx;
     
-    my $socket_fileno = $self->fileno;
-    
-    $ssl->set_fd($socket_fileno);
-    
-    if (!$SSL_server && $SSL_hostname && $SSL_hostname ne "") {
-      $ssl->set_tlsext_host_name($SSL_hostname);
-    }
-    
-    $self->{ssl} = $ssl;
   }
   
   method connect_SSL : void () {
-    
-    my $ssl = $self->{ssl};
     
     my $timeout = $self->{Timeout};
     
     my $fd = $self->{FD};
     
+    my $ssl_ctx = $self->{ssl_ctx};
+    
+    my $ssl = Net::SSLeay->new($ssl_ctx);
+    
+    $ssl->set_fd($fd);
+    
+    my $before_connect_SSL_cbs_list = $self->{before_connect_SSL_cbs_list};
+    my $before_connect_SSL_cbs_length = $before_connect_SSL_cbs_list->length;
+    for (my $i = 0; $i < $before_connect_SSL_cbs_length; $i++) {
+      my $cb = (IO::Socket::SSL::Callback::BeforeConnectSSL)$before_connect_SSL_cbs_list->get($i);
+      $cb->($self, $ssl);
+    }
+    
     while (1) {
       eval { $ssl->connect; }
       
       if ($@) {
-        my $again = Sys::Socket::Errno->is_connect_again(Sys::Socket::Errno->errno);
+        my $again_read = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_READ;
         
-        if ($again) {
+        my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
+        
+        if ($again_read) {
+          Go->gosched_io_read($fd, $timeout);
+          next;
+        }
+        elsif ($again_write) {
           Go->gosched_io_write($fd, $timeout);
           next;
         }
@@ -387,24 +471,44 @@ class IO::Socket::SSL extends IO::Socket::IP {
         last;
       }
     }
+    
+    $self->{ssl} = $ssl;
+    
   }
   
   method accept_SSL : void () {
-    
-    my $ssl = $self->{ssl};
     
     my $fd = $self->{FD};
     
     my $timeout = $self->{Timeout};
     
+    my $ssl_ctx = $self->{ssl_ctx};
+    
+    my $ssl = Net::SSLeay->new($ssl_ctx);
+    
+    $ssl->set_fd($fd);
+    
+    my $before_accept_SSL_cbs_list = $self->{before_accept_SSL_cbs_list};
+    my $before_accept_SSL_cbs_length = $before_accept_SSL_cbs_list->length;
+    for (my $i = 0; $i < $before_accept_SSL_cbs_length; $i++) {
+      my $cb = (IO::Socket::SSL::Callback::BeforeAcceptSSL)$before_accept_SSL_cbs_list->get($i);
+      $cb->($self, $ssl);
+    }
+    
     while (1) {
       eval { $ssl->accept; }
       
       if ($@) {
-        my $again = Sys::Socket::Errno->is_accept_again(Sys::Socket::Errno->errno);
+        my $again_read = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_READ;
         
-        if ($again) {
+        my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
+        
+        if ($again_read) {
           Go->gosched_io_read($fd, $timeout);
+          next;
+        }
+        elsif ($again_write) {
+          Go->gosched_io_write($fd, $timeout);
           next;
         }
         else {
@@ -415,6 +519,8 @@ class IO::Socket::SSL extends IO::Socket::IP {
         last;
       }
     }
+    
+    $self->{ssl} = $ssl;
   }
   
   method accept : IO::Socket::SSL ($peer_ref : Sys::Socket::Sockaddr[] = undef) {
@@ -442,10 +548,16 @@ class IO::Socket::SSL extends IO::Socket::IP {
       eval { $read_length = $ssl->read($buffer, $length, $offset); }
       
       if ($@) {
-        my $again = Sys::Socket::Errno->is_read_again(Sys::Socket::Errno->errno);
+        my $again_read = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_READ;
         
-        if ($again) {
+        my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
+        
+        if ($again_read) {
           Go->gosched_io_read($fd, $timeout);
+          next;
+        }
+        elsif ($again_write) {
+          Go->gosched_io_write($fd, $timeout);
           next;
         }
         else {
@@ -474,9 +586,15 @@ class IO::Socket::SSL extends IO::Socket::IP {
       eval { $write_length = $ssl->write($buffer, $length, $offset); }
       
       if ($@) {
-        my $again = Sys::Socket::Errno->is_write_again(Sys::Socket::Errno->errno);
+        my $again_read = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_READ;
         
-        if ($again) {
+        my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
+        
+        if ($again_read) {
+          Go->gosched_io_read($fd, $timeout);
+          next;
+        }
+        elsif ($again_write) {
           Go->gosched_io_write($fd, $timeout);
           next;
         }
@@ -492,34 +610,59 @@ class IO::Socket::SSL extends IO::Socket::IP {
     return $write_length;
   }
   
+  method shutdown_SSL : int () {
+    
+    my $ssl = $self->{ssl};
+    
+    my $fd = $self->{FD};
+    
+    my $timeout = $self->{Timeout};
+    
+    my $status = -1;
+    while (1) {
+      
+      eval { $status = $ssl->shutdown; }
+      
+      if ($@) {
+        my $again_read = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_READ;
+        
+        my $again_write = eval_error_id isa_error Net::SSLeay::Error::SSL_ERROR_WANT_WRITE;
+        
+        if ($again_read) {
+          Go->gosched_io_read($fd, $timeout);
+          next;
+        }
+        elsif ($again_write) {
+          Go->gosched_io_write($fd, $timeout);
+          next;
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+    
+    return $status;
+  }
+  
   method close : void () {
     
     my $ssl = $self->{ssl};
     
-    $ssl->shutdown;
+    if ($ssl) {
+      my $listen = $self->{Listen};
+      
+      # Only client sockets and accpected sockets
+      unless ($listen > 0) {
+        $self->shutdown_SSL;
+      }
+    }
     
     $self->SUPER::close;
     
-  }
-  
-  method stat : Sys::IO::Stat () {
-    die "This method is not allowed in IO::Scoekt::SSL.";
-  }
-  
-  method send : int ($buffer : string, $flags : int = 0, $length : int = -1, $offset : int = 0) {
-    die "This method is not allowed in IO::Scoekt::SSL.";
-  }
-  
-  method sendto : int ($buffer : string, $flags : int, $to : Sys::Socket::Sockaddr, $length : int = -1, $offset : int = 0) {
-    die "This method is not allowed in IO::Scoekt::SSL.";
-  }
-  
-  method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0, $offset : int = 0) {
-    die "This method is not allowed in IO::Scoekt::SSL.";
-  }
-  
-  method recvfrom : int ($buffer : mutable string, $length : int, $flags : int, $from_ref : Sys::Socket::Sockaddr[], $offset : int = 0) {
-    die "This method is not allowed in IO::Scoekt::SSL.";
   }
   
   method dump_peer_certificate : string () {
@@ -535,14 +678,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     my $ssl = $self->{ssl};
     
-    my $protocol_ref = [(string)undef];
-    my $protocol_length = 0;
-    
-    $ssl->get0_alpn_selected($protocol_ref, \$protocol_length);
-    
-    my $protocol = (mutable string)$protocol_ref->[0];
-    
-    Fn->shorten($protocol, $protocol_length);
+    my $protocol = $ssl->get0_alpn_selected_return_string;
     
     return $protocol;
   }
@@ -551,33 +687,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     my $ssl = $self->{ssl};
     
-    my $version = $self->get_sslversion_int;
-    
-    my $version_string = (string)undef;
-    if ($version == 0x0304) {
-      $version_string = "TLSv1_3";
-    }
-    elsif ($version == 0x0303) {
-      $version_string = "TLSv1_2";
-    }
-    elsif ($version == 0x0302) {
-      $version_string = "TLSv1_1";
-    }
-    elsif ($version == 0x0301) {
-      $version_string = "TLSv1";
-    }
-    elsif ($version == 0x0300) {
-      $version_string = "SSLv3";
-    }
-    elsif ($version == 0x0002) {
-      $version_string = "SSLv2";
-    }
-    elsif ($version == 0xfeff) {
-      $version_string = "DTLS1";
-    }
-    else {
-      die "The version number is unknown.";
-    }
+    my $version_string = $ssl->get_version;
     
     return $version_string;
   }
@@ -604,7 +714,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     my $ssl = $self->{ssl};
     
-    my $servername = $ssl->get_servername(0); # SSL->TLSEXT_NAMETYPE_host_name
+    my $servername = $ssl->get_servername(SSL->TLSEXT_NAMETYPE_host_name);
     
     return $servername;
   }  
@@ -613,9 +723,7 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     my $ssl = $self->{ssl};
     
-    # TODO: use SSL_get1_peer_certificate
     my $cert = $ssl->get_peer_certificate;
-    $self->{ref_x509s_list}->push($cert);
     
     return $cert;
   }
@@ -653,48 +761,40 @@ class IO::Socket::SSL extends IO::Socket::IP {
     return $cert;
   }
   
-  method get_fingerprint_bin : string ($algo : string = undef, $cert : Net::SSLeay::X509 = undef, $key_only : int = 0) {
+  method add_before_connect_SSL_cb : void ($cb : IO::Socket::SSL::Callback::BeforeConnectSSL) {
     
-    unless ($cert) {
-      $cert = $self->peer_certificate;
-    }
+    my $before_connect_SSL_cbs_list = $self->{before_connect_SSL_cbs_list};
     
-    unless ($algo) {
-      $algo = "sha256";
-    }
+    $before_connect_SSL_cbs_list->push($cb);
     
-    my $algo_evp = Net::SSLeay::EVP->get_digestbyname($algo);
-    
-    # TODO: use EVP_MAX_MD_SIZE
-    my $fingerprint_bin = (mutable string)new_string_len 64;
-    my $fingerprint_bin_length = 0;
-    if ($key_only) {
-      $fingerprint_bin = $cert->pubkey_digest($algo_evp, $fingerprint_bin, \$fingerprint_bin_length);
-    }
-    else {
-      $fingerprint_bin = $cert->digest($algo_evp, $fingerprint_bin, \$fingerprint_bin_length);
-    }
-    
-    Fn->shorten($fingerprint_bin, $fingerprint_bin_length);
-    
-    return $fingerprint_bin;
   }
   
-  method get_fingerprint : string ($algo : string = undef, $cert : Net::SSLeay::X509 = undef, $key_only : int = 0) {
+  method add_before_accept_SSL_cb : void ($cb : IO::Socket::SSL::Callback::BeforeAcceptSSL) {
     
-    my $fingerprint = "$algo$";
+    my $before_accept_SSL_cbs_list = $self->{before_accept_SSL_cbs_list};
     
-    if ($key_only) {
-      $fingerprint .= "pub$";
-    }
+    $before_accept_SSL_cbs_list->push($cb);
     
-    my $fingerprint_bin = $self->get_fingerprint_bin($algo, $cert, $key_only);
-    
-    my $unpacked_objects = Fn->unpack("H*", $fingerprint_bin);
-    
-    $fingerprint .= (string)$unpacked_objects->[0];
-    
-    return $fingerprint;
+  }
+  
+  method stat : Sys::IO::Stat () {
+    die "This method is not allowed in IO::Scoekt::SSL.";
+  }
+  
+  method send : int ($buffer : string, $flags : int = 0, $length : int = -1, $offset : int = 0) {
+    die "This method is not allowed in IO::Scoekt::SSL.";
+  }
+  
+  method sendto : int ($buffer : string, $flags : int, $to : Sys::Socket::Sockaddr, $length : int = -1, $offset : int = 0) {
+    die "This method is not allowed in IO::Scoekt::SSL.";
+  }
+  
+  method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0, $offset : int = 0) {
+    die "This method is not allowed in IO::Scoekt::SSL.";
+  }
+  
+  method recvfrom : int ($buffer : mutable string, $length : int, $flags : int, $from_ref : Sys::Socket::Sockaddr[], $offset : int = 0) {
+    die "This method is not allowed in IO::Scoekt::SSL.";
   }
   
 }

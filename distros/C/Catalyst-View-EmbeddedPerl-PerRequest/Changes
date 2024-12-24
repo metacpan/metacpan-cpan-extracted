@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest
 
+0.001018  23 December 2024
+          - Updated dependencies to take advantage of downstream improvements
+
 0.001017  22 December 2024
           - Fixed broken test regression in previous release
 

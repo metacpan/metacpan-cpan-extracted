@@ -6,7 +6,7 @@ use Poz::Builder;
 use Exporter 'import';
 use Carp;
 
-our $VERSION = "0.05";
+our $VERSION = "0.07";
 
 our @EXPORT_OK = qw/z/;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -19,6 +19,8 @@ $Carp::Internal{'Poz::Types::string'}++;
 $Carp::Internal{'Poz::Types::number'}++;
 $Carp::Internal{'Poz::Types::object'}++;
 $Carp::Internal{'Poz::Types::array'}++;
+$Carp::Internal{'Poz::Types::enum'}++;
+$Carp::Internal{'Poz::Types::union'}++;
 
 sub z {
     return Poz::Builder->new;
@@ -62,6 +64,14 @@ Poz - A simple, composable, and extensible data validation library for Perl.
     $otherBook; # undef
     $err; # [{key => "", error => "Not a date"}]
 
+    my $bookOrNumberSchema = z->union($bookSchema, z->number);
+    my $bookOrNumber = $bookOrNumberSchema->parse(123);
+    $bookOrNumber = $bookOrNumberSchema->parse({
+        title => "Perl Best Practices",
+        date => "2005-07-01",
+        author => "Damian Conway",
+    }); 
+    
 =head1 DESCRIPTION
 
 Poz is a simple, composable, and extensible data validation library for Perl. It is inspired heavily from Zod L<https://zod.dev/> in TypeScript.
@@ -126,6 +136,12 @@ Creates a new array schema object.
 
 Creates a new enum schema object.
 
+=head2 z->union
+
+    my $schema = z->union(@schemas);
+
+Creates a new union schema object.
+
 =head1 SEE ALSO
 
 L<Zod|https://zod.dev/>
@@ -136,6 +152,7 @@ L<Poz::Types::number>
 L<Poz::Types::object>
 L<Poz::Types::array>
 L<Poz::Types::enum>
+L<Poz::Types::union>
 
 =head1 HOW TO CONTRIBUTE
 

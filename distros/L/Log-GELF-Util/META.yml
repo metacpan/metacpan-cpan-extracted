@@ -28,7 +28,7 @@ no_index:
 provides:
   Log::GELF::Util:
     file: lib/Log/GELF/Util.pm
-    version: '1.02'
+    version: '1.03'
 requires:
   JSON::MaybeXS: '0'
   Math::Random::MT: '0'
@@ -41,6 +41,6 @@ resources:
   bugtracker: https://github.com/logicly-au/log-gelf-util/issues
   homepage: https://github.com/logicly-au/log-gelf-util
   repository: https://github.com/logicly-au/log-gelf-util.git
-version: '1.02'
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

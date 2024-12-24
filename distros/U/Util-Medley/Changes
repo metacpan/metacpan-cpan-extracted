@@ -1,10 +1,22 @@
 ==================================================
-Changes from 2020-12-17 00:00:00 +0000 to present.
+Changes from 2023-12-24 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.061 at 2021-12-17 01:54:39 +0000
+version 0.062 at 2024-12-23 18:12:00 +0000
 ------------------------------------------
+
+  Change: 1fc2d0142179ca0c4e9a4626558643ee5473518e
+  Author: John Gravatt <gravattj@serv01.gravatt.org>
+  Date : 2024-12-23 12:10:45 +0000
+
+    updated lib/Util/Medley/List.pm to use CORE::fc 
+
+  Change: 06baaf6298c17900b23c8c8d3e1b1d85793db487
+  Author: John Gravatt <john.gravatt@stuzo.com>
+  Date : 2021-12-16 19:56:28 +0000
+
+    updating LICENSE and README.md 
 
   Change: c96f84dcb3422a742b565f653f5b3ccac9700251
   Author: John Gravatt <john.gravatt@stuzo.com>

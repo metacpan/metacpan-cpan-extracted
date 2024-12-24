@@ -1,0 +1,10 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class IO::Socket::SSL::Callback::BeforeAcceptSSL : interface_t {
+  use IO::Socket::SSL;
+  use Net::SSLeay;
+  
+  required method : void ($socket : IO::Socket::SSL, $ssl : Net::SSLeay);
+  
+}

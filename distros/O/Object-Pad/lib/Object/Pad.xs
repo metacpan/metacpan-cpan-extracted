@@ -237,14 +237,22 @@ OP *ObjectPad_newMETHSTARTOP(pTHX_ U32 flags)
 static XOP xop_commonmethstart;
 static OP *pp_commonmethstart(pTHX)
 {
-  SV *self = av_shift(GvAV(PL_defgv));
+  bool do_shift = PL_op->op_flags & OPf_STACKED;
+
+  SV *self;
+  if(do_shift)
+    self = av_shift(GvAV(PL_defgv));
+  else
+    self = PAD_SVl(PADIX_SELF);
 
   if(SvROK(self))
     /* TODO: Should handle this somehow */
     croak("Cannot invoke common method on an instance");
 
-  save_clearsv(&PAD_SVl(PADIX_SELF));
-  sv_setsv(PAD_SVl(PADIX_SELF), self);
+  if(do_shift) {
+    save_clearsv(&PAD_SVl(PADIX_SELF));
+    sv_setsv(PAD_SVl(PADIX_SELF), self);
+  }
 
   return PL_op->op_next;
 }

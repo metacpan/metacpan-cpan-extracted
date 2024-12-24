@@ -1,27 +1,43 @@
 package SPVM::IO::Socket::SSL;
 
-our $VERSION = "0.005";
+our $VERSION = "0.006";
 
 1;
 
 =head1 Name
 
-SPVM::IO::Socket::SSL - Sockets for SSL.
+SPVM::IO::Socket::SSL - Sockets for SSL Communication.
 
 =head1 Description
 
 B<This class is highly experimental and not yet implemented completly and not tested well and not yet documented.>
 
-IO::Socket::SSL class in L<SPVM> has methods for SSL sockets.
+IO::Socket::SSL class in L<SPVM> represents sockets for SSL communication.
 
 =head1 Usage
 
   use IO::Socket::SSL;
-
+  
   # Client
-  my $client_socket = IO::Socket::SSL->new({
-    PeerAddr => "www.google.com:443"
-  });
+  my $host = "www.google.com";
+  my $port = 443;
+  my $socket = IO::Socket::SSL->new({PeerAddr => $host, PeerPort => $port});
+  
+  my $write_buffer = "GET / HTTP/1.0\r\nHost: $host\r\n\r\n";
+  $socket->write($write_buffer);
+  
+  my $read_buffer = (mutable string)new_string_len 100000;
+  while (1) {
+    my $read_length = $socket->read($read_buffer);
+    
+    if ($read_length < 0) {
+      die "Read error";
+    }
+    
+    if ($read_length < length $read_buffer) {
+      last;
+    }
+  }
   
   # Server
   my $server_socket = IO::Socket::SSL->new({
@@ -35,19 +51,33 @@ L<IO::Socket::IP|SPVM::IO::Socket::IP>
 
 =head1 Fields
 
+=head2 ssl_ctx
+
+C<has ssl_ctx : ro L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX>;>
+
+A L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX> object.
+
 =head2 ssl
 
 C<has ssl : ro L<Net::SSLeay|SPVM::Net::SSLeay>;>
 
-A L<Net::SSLeay|SPVM::Net::SSLeay> object.
+A L<Net::SSLeay|SPVM::Net::SSLeay> object. This object is set after L</"connect_SSL"> method or L</"accept_SSL"> method succeeds.
 
-=head2 SSL_version
+=head2 before_connect_SSL_cbs_list
 
-C<has SSL_version : string;>
+C<has before_connect_SSL_cbs_list : ro List of L<IO::Socket::SSL::Callback::BeforeConnectSSL|SPVM::IO::Socket::SSL::Callback::BeforeConnectSSL>;>
+
+=head2 before_accept_SSL_cbs_list
+
+C<has before_accept_SSL_cbs_list : ro List of L<IO::Socket::SSL::Callback::BeforeAcceptSSL|SPVM::IO::Socket::SSL::Callback::BeforeAcceptSSL>;>
 
 =head2 SSL_verify_mode
 
 C<has SSL_verify_mode : int;>
+
+=head2 SSL_verify_callback
+
+C<has SSL_verify_callback : L<Net::SSLeay::Callback::Verify|SPVM::Net::SSLeay::Callback::Verify>;>
 
 =head2 SSL_hostname
 
@@ -89,6 +119,34 @@ C<has SSL_startHandshake : int;>
 
 C<has SSL_honor_cipher_order : int;>
 
+=head2 SSL_ca_file
+
+C<has SSL_ca_file : string;>
+
+=head2 SSL_ca_path
+
+C<has SSL_ca_path : string;>
+
+=head2 SSL_ca
+
+C<has SSL_ca : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>[];>
+
+=head2 SSL_cert_file
+
+C<has SSL_cert_file : string;>
+
+=head2 SSL_cert
+
+C<has SSL_cert : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>[];>
+
+=head2 SSL_key_file
+
+C<has SSL_key_file : string;>
+
+=head2 SSL_key
+
+C<has SSL_key : L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY>;>
+
 =head1 Class Methods
 
 =head2 new
@@ -109,9 +167,9 @@ Options:
 
 =over 2
 
-=item * SSL_version : string
-
 =item * SSL_verify_mode : Int
+
+=item * SSL_verify_callback : L<Net::SSLeay::Callback::Verify|SPVM::Net::SSLeay::Callback::Verify> = undef
 
 =item * SSL_hostname : string
 
@@ -130,6 +188,20 @@ Options:
 =item * SSL_startHandshake : Int = 1
 
 =item * SSL_honor_cipher_order : Int = 0;
+
+=item * SSL_ca_file : string = undef
+
+=item * SSL_ca_path : string = undef
+
+=item * SSL_ca : Net::SSLeay::X509[] = undef
+
+=item * SSL_cert_file : string = undef
+
+=item * SSL_cert : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>[] = undef
+
+=item * SSL_key_file : string = undef
+
+=item * SSL_key : L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY> = undef
 
 =back
 
@@ -161,59 +233,13 @@ C<method read : int ($buffer : mutable string, $length : int = -1, $offset : int
 
 C<method write : int ($buffer : string, $length : int = -1, $offset : int = 0);>
 
+=head2 shutdown_SSL
+
+C<method shutdown_SSL : int ();>
+
 =head2 close
 
 C<method close : void ();>
-
-=head2 stat
-
-C<method stat : L<Sys::IO::Stat|SPVM::Sys::IO::Stat> ();
-
-This method is not allowed in IO::Scoekt::SSL.
-
-Exceptions:
-
-An exception is thrown.
-
-=head2 send
-
-C<method send : int ($buffer : string, $flags : int = 0, $length : int = -1, $offset : int = 0);>
-
-This method is not allowed in IO::Scoekt::SSL.
-
-Exceptions:
-
-An exception is thrown.
-
-=head2 sendto
-
-C<method sendto : int ($buffer : string, $flags : int, $to : Sys::Socket::Sockaddr, $length : int = -1, $offset : int = 0);>
-
-This method is not allowed in IO::Scoekt::SSL.
-
-Exceptions:
-
-An exception is thrown.
-
-=head2 recv
-
-C<method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0, $offset : int = 0);>
-
-This method is not allowed in IO::Scoekt::SSL.
-
-Exceptions:
-
-An exception is thrown.
-
-=head2 recvfrom
-
-C<method recvfrom : int ($buffer : mutable string, $length : int, $flags : int, $from_ref : Sys::Socket::Sockaddr[], $offset : int = 0);>
-
-This method is not allowed in IO::Scoekt::SSL.
-
-Exceptions:
-
-An exception is thrown.
 
 =head2 dump_peer_certificate
 
@@ -293,25 +319,108 @@ Exceptions:
 
 Exceptions thrown by L<Net::SSLeay#get_certificate|SPVM::Net::SSLeay/"get_certificate"> method could be thrown.
 
-=head2 get_fingerprint_bin
+=head2 add_before_connect_SSL_cb
 
-C<method get_fingerprint_bin : string ($algo : string = undef, $cert : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> = undef, $key_only : int = 0);>
+C<method add_before_connect_SSL_cb : void ($cb : L<IO::Socket::SSL::Callback::BeforeConnectSSL|SPVM::IO::Socket::SSL::Callback::BeforeConnectSSL>);>
 
-Returns the same output of Perl's L<IO::Socket::SSL|/"get_fingerprint_bin"> method.
+=head2 add_before_accept_SSL_cb
 
-=head2 get_fingerprint
+C<method add_before_accept_SSL_cb : void ($cb : L<IO::Socket::SSL::Callback::BeforeAcceptSSL|SPVM::IO::Socket::SSL::Callback::BeforeAcceptSSL>);>
 
-C<method get_fingerprint : string ($algo : string = undef, $cert : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> = undef, $key_only : int = 0);>
+=head2 stat
 
-Returns the same output of Perl's L<IO::Socket::SSL|/"get_fingerprint"> method.
+C<method stat : L<Sys::IO::Stat|SPVM::Sys::IO::Stat> ();>
+
+This method is not supported in L<IO::Socket::SSL|SPVM::IO::Socket::SSL>.
+
+Exceptions:
+
+An exception is thrown.
+
+=head2 send
+
+C<method send : int ($buffer : string, $flags : int = 0, $length : int = -1, $offset : int = 0);>
+
+This method is not supported in L<IO::Socket::SSL|SPVM::IO::Socket::SSL>.
+
+Exceptions:
+
+An exception is thrown.
+
+=head2 sendto
+
+C<method sendto : int ($buffer : string, $flags : int, $to : Sys::Socket::Sockaddr, $length : int = -1, $offset : int = 0);>
+
+This method is not supported in L<IO::Socket::SSL|SPVM::IO::Socket::SSL>.
+
+Exceptions:
+
+An exception is thrown.
+
+=head2 recv
+
+C<method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0, $offset : int = 0);>
+
+This method is not supported in L<IO::Socket::SSL|SPVM::IO::Socket::SSL>.
+
+Exceptions:
+
+An exception is thrown.
+
+=head2 recvfrom
+
+C<method recvfrom : int ($buffer : mutable string, $length : int, $flags : int, $from_ref : Sys::Socket::Sockaddr[], $offset : int = 0);>
+
+This method is not supported in L<IO::Socket::SSL|SPVM::IO::Socket::SSL>.
+
+Exceptions:
+
+An exception is thrown.
 
 =head1 FAQ
 
-=head2 How to create a Net::SSLeay::X509 object for SSL_ca option from the return value of Mozilla::CA#SSL_ca method.
+=head2 How to customize L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX> object?
+
+Sets L</"SSL_startHandshake"> option to 0, gets a L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX> object by L</"ssl_ctx"> getter, customizes it, and calls L</"connect_SSL"> method in a client or calls L</"accept_SSL"> method.
+
+Client:
+
+  use Net::SSLeay::Constant as SSL;
   
+  my $host = "www.google.com";
+  my $port = 443;
+  my $socket = IO::Socket::SSL->new({PeerAddr => $host, PeerPort => $port, SSL_startHandshake => 0});
+  
+  my $ssl_ctx = $socket->ssl_ctx;
+  
+  $ssl_ctx->set_min_proto_version(SSL->TLS1_1_VERSION);
+  
+  $socket->connect_SSL;
+  
+  my $ssl = $socket->ssl;
+
+Server:
+
+  use Net::SSLeay::Constant as SSL;
+  
+  my $host = "www.google.com";
+  my $port = 443;
+  my $socket = IO::Socket::SSL->new({Listen => 1, SSL_startHandshake => 0});
+  
+  my $ssl_ctx = $socket->ssl_ctx;
+  
+  $ssl_ctx->set_min_proto_version(SSL->TLS1_1_VERSION);
+  
+  my $accepted_socket = $socket->accept;
+  
+  $accepted_socket->accept_SSL;
+
+=head2 How to create L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509> objects for C<SSL_ca> option from the return value of L<Mozilla::CA#SSL_ca|SPVM::Mozilla::CA/"SSL_ca"> method?
+
   use Mozilla::CA;
   use Net::SSLeay::BIO;
   use Net::SSLeay::PEM;
+  use List;
   
   my $ca = Mozilla::CA->SSL_ca;
   
@@ -319,9 +428,27 @@ Returns the same output of Perl's L<IO::Socket::SSL|/"get_fingerprint"> method.
   
   $bio->write($ca);
   
-  my $x509 = Net::SSLeay::PEM->read_bio_X509($bio);
+  my $x509s_list = List->new(new Net::SSLeay::X509[0]);
+  while (1) {
+    my $x509 = (Net::SSLeay::X509)undef;
+    
+    eval { $x509 = Net::SSLeay::PEM->read_bio_X509($bio); }
+    
+    if ($@) {
+      if (eval_error_id isa_error Net::SSLeay::Error::PEM_R_NO_START_LINE) {
+        last;
+      }
+      else {
+        die $@;
+      }
+    }
+    
+    $x509s_list->push($x509);
+  }
   
-  my $SSL_ca = $x509;
+  my $x509s = (Net::SSLeay::X509[])$x509s_list->to_array;
+  
+  my $SSL_ca_option = $x509x;
 
 =head1 See Also
 

@@ -13,6 +13,7 @@ lib/Poz/Types/number.pm
 lib/Poz/Types/object.pm
 lib/Poz/Types/scalar.pm
 lib/Poz/Types/string.pm
+lib/Poz/Types/union.pm
 minil.toml
 t/00_compile.t
 t/11_string.t
@@ -20,6 +21,7 @@ t/12_number.t
 t/13_object.t
 t/14_array.t
 t/15_enum.t
+t/16_union.t
 t/21_complex.t
 META.yml
 MANIFEST

@@ -210,7 +210,7 @@ ok my $template = Template::EmbeddedPerl->new(
         $My::Package::var = 'World';
     }
     my $output = $compiled->render();
-    is( $output, '<p>Hello World</p>');
+    is( $output, "<p>Hello ${My::Package::var}</p>");
 }
 
 {
@@ -221,7 +221,7 @@ ok my $template = Template::EmbeddedPerl->new(
         $My::Package::obj = Test::Template::EmbeddedPerl::Object->new();
     }
     my $output = $compiled->render();
-    is( $output, '<p>Hello John</p>');
+    is( $output, "<p>Hello @{[ $My::Package::obj->name ]}</p>");
 }
 
 {
@@ -304,6 +304,81 @@ ok my $template = Template::EmbeddedPerl->new(
     is( $output, '<p>Hello JohnNap</p>');
 }
 
+{
+    my $obj = Test::Template::EmbeddedPerl::Object->new();
+    my $template_str = '<p>Hello $arg'."\n".'->{name}['."\n".'$arg2->()]->'."\n".'name("Joe")</p>';
+    my $compiled     = $template->from_string($template_str);
+    my $output       = $compiled->render({name=>[1,$obj]},sub {1});
+    is( $output, '<p>Hello Joe</p>');
+}
+
+{
+    my $template_str = '<p>Result: $arg->compute(sub {'."\n".' $_[0] * 2 })</p>';
+    my $compiled     = $template->from_string($template_str);
+    my $obj          = Test::Template::EmbeddedPerl::Object->new();
+    my $output       = $compiled->render($obj);
+    is( $output, '<p>Result: 10</p>');
+}
+
+{
+    my $template_str = '\
+    <p>Result: $arg->compute(sub {
+        my $arg = shift;
+        return $arg * 5;
+    })</p>';
+    my $compiled     = $template->from_string($template_str);
+    my $obj          = Test::Template::EmbeddedPerl::Object->new();
+    my $output       = $compiled->render($obj);
+    is( $output, '    <p>Result: 25</p>');
+}
+
+{
+    my $template_str = '\
+    <p>\
+        %= $arg->compute(sub {\
+            % my $value = shift\
+            % $value = $value * 5\
+            <div>$value</div>\
+        % })\
+    </p>';
+    my $compiled     = $template->from_string($template_str);
+    my $obj          = Test::Template::EmbeddedPerl::Object->new();
+    my $output       = $compiled->render($obj);
+    is( $output, '    <p>            <div>25</div>    </p>');
+}
+
+{
+    my $template_str = '\
+    <p>\
+        %= $arg->two(sub {\
+            <div>1</div>\
+        % }, sub {\
+            <div>2</div>\
+        % })\
+    </p>';
+    my $compiled     = $template->from_string($template_str);
+    my $obj          = Test::Template::EmbeddedPerl::Object->new();
+    my $output       = $compiled->render($obj);
+    is( $output, '    <p>CB1:            <div>1</div>CB2:            <div>2</div>    </p>');
+}
+
+{
+    my $template_str = '\
+    <p>\
+        %= $arg->two(sub {\
+            <div>1</div>
+        <% }
+        ,
+        sub { %>\
+            <div>2</div>\
+        % })\
+    </p>';
+    my $compiled     = $template->from_string($template_str);
+    my $obj          = Test::Template::EmbeddedPerl::Object->new();
+    my $output       = $compiled->render($obj);
+    is( $output, "    <p>CB1:            <div>1</div>\n        CB2:            <div>2</div>    </p>");
+}
+
 done_testing();
 
 package Test::Template::EmbeddedPerl::Object;
@@ -328,3 +403,10 @@ sub compute {
     my ($self, $code) = @_;
     return $code->(5);
 }
+
+sub two {
+    my ($self, $cb1, $cb2) = @_;
+    return 'CB1:'. $cb1->() .'CB2:'. $cb2->();
+}
+
+__END__

@@ -3,11 +3,11 @@ package Specio::TypeChecks;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
-use Exporter qw( import );
+use Exporter        qw( import );
 use Specio::Helpers qw( is_class_loaded );
-use Scalar::Util qw( blessed );
+use Scalar::Util    qw( blessed );
 
 our @EXPORT_OK = qw(
     does_role
@@ -71,7 +71,7 @@ Specio::TypeChecks - Type checks used internally for Specio classes (it's not se
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 DESCRIPTION
 
@@ -93,7 +93,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

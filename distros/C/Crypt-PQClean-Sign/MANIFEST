@@ -1,0 +1,17 @@
+Changes
+PQClean.xs
+Makefile.PL
+MANIFEST
+README
+t/falcon512.t
+t/falcon1024.t
+t/mldsa44.t
+t/mldsa65.t
+t/mldsa87.t
+t/sphincs-shake-128f.t
+t/sphincs-shake-128s.t
+t/sphincs-shake-192f.t
+t/sphincs-shake-192s.t
+t/sphincs-shake-256f.t
+t/sphincs-shake-256s.t
+lib/Crypt/PQClean/Sign.pm

@@ -1,5 +1,5 @@
 package Util::Medley::Hash;
-$Util::Medley::Hash::VERSION = '0.061';
+$Util::Medley::Hash::VERSION = '0.062';
 #########################################################################################
 
 use Modern::Perl;
@@ -15,7 +15,7 @@ Util::Medley::Hash - utility methods for working with hashes
 
 =head1 VERSION
 
-version 0.061
+version 0.062
 
 =cut
 

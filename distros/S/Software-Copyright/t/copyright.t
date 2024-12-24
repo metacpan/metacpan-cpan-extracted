@@ -8,6 +8,9 @@ use warnings  qw(FATAL utf8);    # fatalize encoding glitches
 use Unicode::Normalize;
 use open ':std', ':encoding(utf8)';
 
+use Time::localtime;
+my $current_year = (localtime->year() + 1900);
+
 use feature qw/postderef signatures/;
 no warnings qw/experimental::postderef experimental::signatures/;
 
@@ -19,6 +22,16 @@ my @tests = (
     [
         '2002-06 Charles Kerr <charles@rebelbase.com>',
         '2002-2006, Charles Kerr <charles@rebelbase.com>'
+    ],
+    [
+        # found in texlive-extra
+        '2022 -20** by Romain NOEL <romainoel@free.fr>',
+        "2022-$current_year, Romain NOEL <romainoel\@free.fr>",
+    ],
+    [
+        # found in texlive-extra
+        '2011-.. Maïeul Rouquette',
+        "2011-$current_year, Maïeul Rouquette",
     ],
     [
         '2011 Heinrich Muller <henmull@src.gnome.org> / 2002-2006 Charles Kerr <charles@rebelbase.com>',

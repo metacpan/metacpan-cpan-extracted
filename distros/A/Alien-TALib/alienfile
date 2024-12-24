@@ -8,10 +8,10 @@ use Path::Tiny qw(path);
 if ($^O !~ /freebsd|openbsd|netbsd/i) {
 plugin 'Probe::CBuilder' => (
     lang => 'C',
-    cflags => $ENV{TALIB_INCLUDES} ? "-I$ENV{TALIB_INCLUDES}": "",
-    libs => $ENV{TALIB_LIBDIRS} ? "-L$ENV{TALIB_LIBDIRS} -lta_lib -lm" : "-lta_lib -lm",
+    cflags => $ENV{TALIB_INCLUDES} ? "-I$ENV{TALIB_INCLUDES} -I$ENV{TALIB_INCLUDES}/ta-lib": "",
+    libs => $ENV{TALIB_LIBDIRS} ? "-L$ENV{TALIB_LIBDIRS} -lta-lib -lm" : "-lta-lib -lm",
     program => <<'EOF');
-#include <ta-lib/ta_libc.h>
+#include <ta_libc.h>
 int main(int argc, char **argv)
 {
   TA_Initialize();
@@ -22,63 +22,20 @@ EOF
 }
 
 share {
-    my $REV = '1562';
-    start_url "https://sourceforge.net/code-snapshots/svn/t/ta/ta-lib/code/ta-lib-code-r${REV}-trunk.zip";
-    plugin 'Download';
-    meta->before_hook( download => sub {
-        my $build = shift;
-        my $tries = 0;
-        my $max_tries = 3;
-        my $http = HTTP::Tiny->new;
-        my $response;
-
-        while( $tries++ < $max_tries ) {
-            $build->log("Requesting snapshot r${REV}: attempt $tries/$max_tries");
-            # Need to request snapshot first.
-            $response = $http->post(
-                "https://sourceforge.net/p/ta-lib/code/$REV/tarball",
-                {
-                    headers => {
-                        'Content-Type' => 'application/x-www-form-urlencoded',
-                        'Referer'      => "https://sourceforge.net/p/ta-lib/code/$REV/tree/trunk/",
-                    },
-                    content => 'path=%2Ftrunk',
-                },
-            );
-            unless($response->{success}) {
-                $build->log("Request attempt not successful");
-                sleep $tries * 4; # wait a bit before requesting again
-                next;
-            } else {
-                $build->log("Request attempt successful");
-            }
-
-            sleep $tries * 4; # wait a bit before trying the .zip file
-
-            $build->log("Checking that .zip is available after request");
-            $response = $http->head( meta->{prop}{start_url} );
-            if( $response->{success} ) {
-                $build->log("The .zip is available now");
-                last;
-            } else {
-                $build->log("The .zip is not yet available");
-            }
-        }
-
-        unless ($response->{success}) {
-            print "HTTP Response: " . $response->{status} .
-                  " Reason: " . $response->{reason} . "\n";
-            die "Could not request snapshot from $response->{url}";
-        }
-    });
-    plugin 'Extract' => 'zip';
+    plugin 'Download::GitHub' => (
+        github_user => 'TA-Lib',
+        github_repo => 'ta-lib',
+    );
+    plugin 'Extract' => 'tar.gz';
     plugin 'Build::CMake';
+    patch [ '%{perl} -p -i -e "s/CMAKE_MINIMUM_REQUIRED.*/cmake_minimum_required(VERSION 3.18)/gi" %{.install.extract}/CMakeLists.txt'],
     build [
         # this is the default build step, if you do not specify one.
         [ '%{cmake}',
             @{ meta->prop->{plugin_build_cmake}->{args} },
             # ... put extra cmake args here ...
-            '%{.install.extract}/ta-lib/'
+            '-DCMAKE_MINIMUM_REQUIRED_VERSION=3.1',
+            '%{.install.extract}/'
         ],
         '%{make}',
         '%{make} install',
@@ -90,8 +47,8 @@ share {
         my $prefix = path($build->install_prop->{prefix})->absolute;
 
         # for MSWin32 which creates a 'libta_lib_a.a' by default
-        my $static_libta_lib_a = $prefix->child( 'lib', 'libta_lib_a.a' );
-        my $static_libta_lib   = $prefix->child( 'lib', 'libta_lib.a'   );
+        my $static_libta_lib_a = $prefix->child( 'lib', 'libta-lib-static.a' );
+        my $static_libta_lib   = $prefix->child( 'lib', 'libta-lib.a'   );
         if( -f $static_libta_lib_a && ! -f $static_libta_lib ) {
             $build->log("move " . join(" => ", map $_->relative($prefix),
                 $static_libta_lib_a,
@@ -106,8 +63,8 @@ share {
         my $include2 = $prefix->child('include', 'ta-lib');
         my $dynamic = $prefix->child('dynamic');
         $build->runtime_prop->{cflags} = "-I$include -I$include2";
-        $build->runtime_prop->{libs} = "-L$dynamic -lta_lib -lm";
-        $build->runtime_prop->{libs_static} = "-L$lib -lta_lib -lm";
+        $build->runtime_prop->{libs} = "-L$dynamic -lta-lib -lm";
+        $build->runtime_prop->{libs_static} = "-L$lib -lta-lib -lm";
         $build->runtime_prop->{inline_auto_include} = [ 'ta_libc.h' ];
     };
 };

@@ -3,10 +3,10 @@ package Specio::Subs;
 use strict;
 use warnings;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
-use Carp qw( croak );
-use Eval::Closure qw( eval_closure );
+use Carp            qw( croak );
+use Eval::Closure   qw( eval_closure );
 use Module::Runtime qw( use_package_optimistically );
 use Specio::Library::Perl;
 use Specio::Registry qw( exportable_types_for_package );
@@ -186,7 +186,7 @@ Specio::Subs - Make validation and coercion subs from Specio types
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -268,7 +268,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2024 by Dave Rolsky.
 
 This is free software, licensed under:
 

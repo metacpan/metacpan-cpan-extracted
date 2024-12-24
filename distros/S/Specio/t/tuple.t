@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use Test::Fatal;
 use Test::More 0.96;
 use Test::Specio qw( test_constraint :vars );
 
@@ -319,5 +320,37 @@ is(
     'Tuple[ UCStr, Int, Str... ]',
     'got expected generated name for Tuple with slurpy'
 );
+
+## no critic (Modules::ProhibitMultiplePackages)
+{
+    package Declarer;
+
+    use Specio::Declare;
+    use Specio::Library::Builtins;
+    use Specio::Library::Structured;
+
+    use parent 'Specio::Exporter';
+
+    declare(
+        'SomeTuple',
+        'parent' => t(
+            'Tuple',
+            'of' => [
+                t('Str'),
+                t('Str'),
+            ],
+        )
+    );
+}
+
+{
+    package ImportInto;
+
+    ::is(
+        ::exception { Declarer->import },
+        undef,
+        'No exception thrown when importing a Map type',
+    );
+}
 
 done_testing();
