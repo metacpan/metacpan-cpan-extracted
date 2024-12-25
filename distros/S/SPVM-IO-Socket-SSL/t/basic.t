@@ -12,11 +12,15 @@ use SPVM 'IO::Socket::SSL';
 use SPVM::IO::Socket::SSL;
 use SPVM 'Fn';
 
+use Test::SPVM::Sys::Socket::Util;
+
 my $api = SPVM::api();
 
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
-ok(SPVM::TestCase::IO::Socket::SSL->test);
+my $port = Test::SPVM::Sys::Socket::Util::get_available_port();
+
+ok(SPVM::TestCase::IO::Socket::SSL->client_and_server_basic($port));
 
 # Version check
 {

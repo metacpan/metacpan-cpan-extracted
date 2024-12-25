@@ -1,3 +1,16 @@
+0.007 2024-12-25
+  [New Features]
+    * Add IO::Socket::SSL#DESTROY method.
+    * Add SSL_passwd_cb option.
+  [Incompatible Changes]
+    * Remove IO::Socket::SSL#close method.
+    * Remove SSL_server option.
+    * Remove SSL_cipherlist option.
+    * Remove SSL_ciphersuites option.
+    * Default cipherlist is used.
+    * Default SSL options are used.
+    * Remove SSL_honor_cipher_order option.
+    * Use TSL_server_method for server sockets. Use TSL_client_method for client sockets.
 0.006 2024-12-24
   [New Features]
     * Add IO::Socket::SSL#shutdown_SSL method. And IO::Socket::SSL#close method calls this method if the socket is client socket or accepted socket.

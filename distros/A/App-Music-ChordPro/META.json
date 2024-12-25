@@ -50,16 +50,22 @@
       "runtime" : {
          "requires" : {
             "Data::Printer" : "1.001001",
+            "File::Copy" : "2.32",
             "File::HomeDir" : "1.004",
             "File::LoadLines" : "1.044",
+            "HarfBuzz::Shaper" : "0.026",
             "Image::Info" : "1.41",
             "JSON::PP" : "2.27203",
             "JSON::XS" : "4.03",
             "JavaScript::QuickJS" : "0.18",
+            "LWP::Protocol::https" : "6.14",
             "List::Util" : "1.46",
+            "Mozilla::CA" : "20230801",
             "Object::Pad" : "0.78",
             "PDF::API2" : "2.043",
             "Pod::Usage" : "2.03",
+            "Ref::Util" : "0.204",
+            "Scalar::Util" : "1.63",
             "Storable" : "3.08",
             "String::Interpolate::Named" : "1.03",
             "Text::Layout" : "0.038",
@@ -71,6 +77,8 @@
             "JSON::PP" : "2.27203",
             "Object::Pad" : "0.78",
             "PDF::API2" : "2.043",
+            "Ref::Util" : "0.204",
+            "Scalar::Util" : "1.63",
             "Storable" : "3.08",
             "String::Interpolate::Named" : "1.01",
             "Test::More" : "0"
@@ -80,11 +88,11 @@
    "provides" : {
       "App::Music::ChordPro" : {
          "file" : "lib/ChordPro.pm",
-         "version" : "6.060"
+         "version" : "6.070"
       },
       "chordpro" : {
          "file" : "script/chordpro",
-         "version" : "6.060"
+         "version" : "6.070"
       }
    },
    "release_status" : "stable",
@@ -103,6 +111,6 @@
          "web" : "https://github.com/ChordPro/chordpro"
       }
    },
-   "version" : "6.060",
+   "version" : "6.070",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

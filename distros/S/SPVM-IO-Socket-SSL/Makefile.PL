@@ -57,6 +57,7 @@ WriteMakefile(
   },
   TEST_REQUIRES => {
     'SPVM::Mozilla::CA' => '0.002',
+    'SPVM::FindBin' => '0.031',
   },
 );
 

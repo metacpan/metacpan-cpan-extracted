@@ -3,7 +3,8 @@ use Test::More;
 use_ok('HTML::Selector::Element', qw(find));
 require_ok('HTML::TreeBuilder');
 
-package HTML::TreeBuilder::Html5 {
+{
+    package HTML::TreeBuilder::Html5;
     @ISA = qw(HTML::TreeBuilder);
     # All elements new in html5 require a closing tag except these two:
     $HTML::Tagset::emptyElement{$_} = 1 foreach qw(keygen menuitem);

@@ -1,0 +1,31 @@
+=head1 NAME
+
+CommonsLang - Commonly used functions for Perl language
+
+=head1 SYNOPSIS
+use CommonsLang;
+
+print s_pad("a", 5, "0") . "\n";
+# > "a0000"
+
+print s_left("abc", 1) . "\n";
+# > "a"
+
+print s_right("abc", 1) . "\n";
+# > "c"
+
+print s_starts_with("abc", "ab") . "\n";
+# > 1
+
+print s_ends_with("abc", "bc") . "\n";
+# > 1
+
+=head1 DESCRIPTION
+
+Commonly used functions for Perl language
+
+=head1 AUTHOR
+
+YUPEN 12/23/24 - new
+
+=cut

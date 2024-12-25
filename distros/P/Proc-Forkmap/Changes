@@ -14,3 +14,7 @@ Revision history for Proc-Forkmap
 
 0.2100  2024-12-23
         field name changes
+
+0.2200  2024-12-24
+        refactored. removed object interface. simplified functional
+        interface. now supports non-blocking IPC with scalar return values.

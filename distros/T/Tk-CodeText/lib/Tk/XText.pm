@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.56';
+$VERSION = '0.59';
 use strict;
 use warnings;
 use Carp;
@@ -48,6 +48,10 @@ within the L<Tk::CodeText> context. Otherwise see there.
 .
 
 =item Switch: B<-contextmenu>
+
+.
+
+=item Switch: B<-findoptions>
 
 .
 
@@ -141,6 +145,7 @@ sub Populate {
 	$self->{BUFFERMODIFIED} = 0;
 	$self->{BUFFERSTART} = '1.0';
 	$self->{BUFFERREPLACE} = '';
+	$self->{FINDCLEARENABLED} = 1;
 	$self->{REDOSTACK} = [];
 	$self->{UNDOSTACK} = [];
 
@@ -152,10 +157,11 @@ sub Populate {
 		-autoindent => ['PASSIVE', 'autoIndent', 'AutoIndent', 0],
 		-contextmenu => ['PASSIVE'],
 		-findandreplacecall => ['PASSIVE'],
+		-findoptions	=> ['METHOD', undef, undef, [-background => '#C0FFC0', -foreground => '#000000']],
 		-indentstyle => ['PASSIVE', 'indentStyle', 'IndentStyle', "tab"],
 		-logcall => ['CALLBACK', undef, undef, sub {}],
 		-match => ['PASSIVE', 'match', 'Match', '[]{}()'],
-		-matchoptions	=> ['METHOD', undef, undef, [-background => 'blue', -foreground => 'yellow']],
+		-matchoptions	=> ['METHOD', undef, undef, [-background => '#0000FF', -foreground => '#FFFF00']],
 		-menuitems => ['PASSIVE'],
 		-mlcommentend => ['PASSIVE'],
 		-mlcommentstart => ['PASSIVE'],
@@ -333,7 +339,7 @@ sub ClassInit {
 	$mw->bind($class,'<Return>', ['Insert',"\n"]);
 	$mw->bind($class,'<Delete>','Delete');
 	$mw->bind($class,'<BackSpace>','Backspace');
-	$mw->bind($class,'<Insert>', \&ToggleInsertMode ) ;
+	$mw->bind($class,'<Insert>', 'ToggleInsertMode' ) ;
 	$mw->bind($class,'<KeyPress>',['InsertKeypress',Ev('A')]);
 	$class->clipboardOperations($mw,'Copy', 'Cut', 'Paste');
 	
@@ -524,6 +530,64 @@ sub EditMenuItems {
 
 sub EmptyDocument { $_[0]->clear }
 
+sub FindAll {
+	my ($self, $mode, $case, $pattern) = @_;
+	$self->FindClear;
+	my @all = ();
+	for (1 .. $self->linenumber('end - 1c')) {
+		my @hits = $self->FindInLine($_, $mode, $case, $pattern);
+		for (@hits) {
+			push @all, $_;
+			my ($begin, $end) = @$_;
+			$self->tagAdd('Find', $begin, $end);
+			$self->tagRaise('Find');
+		}
+	}
+	return @all
+}
+
+sub FindandReplace {
+	my ($self, $mode, $case, $find, $replace) = @_;
+	my $insert = $self->index('insert');
+	my $line = $self->linenumber($insert);
+	my @hits = $self->FindInLine($line, $mode, $case, $find);
+	for (@hits) {
+		my ($begin, $end, $captures) = @$_;
+		if ($begin eq $insert) {
+			if (@$captures) {
+				my $num = 1;
+				for (@$captures) {
+					my $cap = $_;
+					$replace =~ s/\$$num/$cap/g;
+					$num ++
+				}
+			}
+			$self->replace($begin, $end, $replace);
+			last;
+		}
+	}
+	$self->FindNext('-forward', $mode, $case, $find);
+}
+
+sub FindandReplaceAll {
+	my ($self, $mode, $case, $find, $replace) = @_;
+	my @hits = $self->FindAll($mode, $case, $find);
+	for (@hits) {
+		my ($begin, $end, $captures) = @$_;
+		my $repl = $replace;
+		if (@$captures) {
+			my $num = 1;
+			for (@$captures) {
+				my $cap = $_;
+				$repl =~ s/\$$num/$cap/g;
+				$num ++
+			}
+		}
+		$self->replace($begin, $end, $repl);
+	}
+	$self->FindClear;
+}
+
 sub findandreplacepopup {
 	my $self = shift;
 	my $call = $self->cget('-findandreplacecall');
@@ -534,28 +598,118 @@ sub findandreplacepopup {
 	}
 }
 
-sub FindAll {
-	my ($self, $mode, $case, $pattern) = @_;
-	if ($mode eq '-regexp') {
-		return unless $self->FindValidateReg($pattern);
-	}
-	$self->SUPER::FindAll($mode, $case, $pattern);
+sub FindClear {
+	my $self = shift;
+	$self->tagRemove('Find', '1.0', 'end');
 }
 
-sub FindandReplaceAll {
-	my ($self, $mode, $case, $find, $replace) = @_;
-	if ($mode eq '-regexp') {
-		return unless $self->FindValidateReg($find);
+sub FindInLine {
+	my ($self, $linenum, $mode, $case, $search) = @_;
+	my $srch;
+	if ($mode eq '-exact') {
+		$srch = quotemeta($search)
+	} else {
+		eval "\$srch = qr/$search/";
+		my $error = $@;
+		if ($error ne '') {
+			$error =~ s/\n//;
+			$self->log($error);
+			return undef
+		}
 	}
-	return $self->SUPER::FindandReplaceAll($mode, $case, $find, $replace);
+	my $linestart = "$linenum.0";
+	my $lineend = $self->index("$linestart lineend");
+	my $line = $self->get($linestart, $lineend);
+	my @hits = ();
+	if ($case eq '-case') {
+		while ($line =~ /($srch)/g) {
+			my $end = pos($line);
+			my $begin = $end - length($1);
+			my @cap = ();
+			if ($#- > 1) {
+				no strict 'refs';
+				@cap = map {$$_} 2 .. $#-;
+			}
+			push @hits, ["$linenum.$begin", "$linenum.$end", \@cap];
+		}
+	} else {
+		while ($line =~ /($srch)/gi) {
+			my $end = pos($line);
+			my $begin = $end - length($1);
+			my @cap = ();
+			if ($#- > 1) {
+				no strict 'refs';
+				@cap = map {$$_} 2 .. $#-;
+			}
+			push @hits, ["$linenum.$begin", "$linenum.$end", \@cap];
+		}
+	}	
+	return @hits;
 }
 
 sub FindNext {
-	my ($self, $direction, $mode, $case, $pattern) = @_;
-	if ($mode eq '-regexp') {
-		return unless $self->FindValidateReg($pattern);
+	my ($self, $direction, $mode, $case, $pattern, $first) = @_;
+	$first = 1 unless defined $first;
+	$self->FindClear;
+	my $pos = $self->index('insert');
+	my $start = $self->linenumber($pos);
+	my $last =  $self->linenumber('end - 1c');
+	if ($direction eq '-forward') {
+		for ($self->linenumber($pos) .. $last) {
+			my $linenum = $_;
+			my @hits = $self->FindInLine($linenum, $mode, $case, $pattern);
+			if (@hits) {
+				while ((@hits) and ($self->compare($pos, '>=', $hits[0]->[0]))) { shift @hits	}
+				if (@hits) {
+					my $hit = $hits[0];
+					my ($begin, $end) = @$hit;
+					$self->tagAdd('Find', $begin, $end);
+					$self->tagRaise('Find');
+					$self->goTo($hit->[0]);
+					return $hit->[0]
+				}
+			}
+		}
+		$self->markSet('insert', '1.0') if $first; 
+		
+	} else {
+		for (reverse ('1.0' .. $self->linenumber($pos))) {
+			my $linenum = $_;
+			my @hits = $self->FindInLine($linenum, $mode, $case, $pattern, 0);
+			if (@hits) {
+				while ((@hits) and ($self->compare($pos, '<=', $hits[@hits - 1]->[0]))) { pop @hits }
+				if (@hits) {
+					my $hit = $hits[@hits - 1];
+					my ($begin, $end) = @$hit;
+					$self->tagAdd('Find', $begin, $end);
+					$self->tagRaise('Find');
+					$self->goTo($hit->[0]);
+					return $hit->[0]
+				}
+			}
+		}
+		$self->markSet('insert', 'end - 1c') if $first;
 	}
-	$self->SUPER::FindNext($direction, $mode, $case, $pattern);
+	#retry from begin or end of document
+	if ($first) {
+		my $hit = $self->FindNext($direction, $mode, $case, $pattern, 0);
+		return $hit if defined $hit;
+		$self->markSet('insert', $pos);
+	}
+	return undef
+}
+
+sub findoptions {
+	my $self = shift;
+	if (my $o = shift) {
+		my @op = ();
+		if (ref($o)) {
+			@op = @$o;
+		} else {
+			@op = split(/\s+/, $o);
+		}
+		$self->tagConfigure('Find', @op);
+	}
 }
 
 sub FindValidateReg {
@@ -654,7 +808,6 @@ sub HomeEndKey {
 	my ($self, $flag) = @_;
 	my $index = $self->index('insert');
 	my $text = $self->get("$index linestart", "$index lineend");
-#	print "index $index\n";
 	$index =~ /^(\d+)\.(\d+)/;
 	my $pos = $2;
 	my $line = $1;
@@ -679,7 +832,6 @@ sub HomeEndKey {
 	} else {
 		$self->SetCursor("$index linestart");
 	}
-#	print "HomeEndKey $flag\n";
 }
 
 =item B<indent>
@@ -855,10 +1007,8 @@ sub matchFind {
 		$dir, '-regexp', '-nocase', '--', $pattern, $start, $stop
 	))) {
 		my $k = $self->get($i, "$i + 1 chars");
-#		print "found $k at $i and count is $count\n";
 		if ($k eq $ochar) {
 			if ($count > 0) {
-#				print "decrementing count\n";
 				$count--;
 				if ($dir eq '-forwards') {
 					$start = $self->index("$i + 1 chars");
@@ -866,14 +1016,12 @@ sub matchFind {
 					$start = $i;
 				}
 			} else {
-#				print "Found !!!\n";
 				$self->markSet('match', $i);
 				$self->tagAdd('Match', $i, "$i + 1 chars");
 				$self->tagRaise('Match');
 				$found = 1;
 			}
 		} elsif ($k eq $char) {
-#			print "incrementing count\n";
 			$count++;
 			if ($dir eq '-forwards') {
 				$start = $self->index("$i + 1 chars");
@@ -1099,6 +1247,15 @@ sub RedoStack {
 	return $_[0]->{REDOSTACK}
 }
 
+sub replace {
+	my ($self, $begin, $end, $replace) = @_;
+	my $orig = $self->get($begin, $end);
+	$self->SUPER::delete($begin, $end);
+	$self->SUPER::insert($begin, $replace);
+	$self->RecordUndo('replace', $self->editModified, $begin, $orig, $replace);
+	
+}
+
 sub ReplaceSelectionsWith {
 	my ($self,$new_text ) = @_;
 
@@ -1183,9 +1340,6 @@ sub saveExport {
 		print OUTFILE $line;
 	}
 	close OUTFILE;
-#	my $text = $self->get('1.0', 'end - 1c');
-#	print OUTFILE $text;
-#	close OUTFILE;
 	return 1
 }
 

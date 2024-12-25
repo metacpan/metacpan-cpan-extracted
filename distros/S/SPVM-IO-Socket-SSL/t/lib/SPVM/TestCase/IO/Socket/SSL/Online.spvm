@@ -1,0 +1,109 @@
+class TestCase::IO::Socket::SSL::Online {
+  
+  use IO::Socket::SSL;
+  
+  static method https_google : int () {
+    
+    {
+      # Socket
+      my $host = "www.google.com";
+      my $port = 443;
+      my $socket = IO::Socket::SSL->new({PeerAddr => $host, PeerPort => $port});
+      
+      my $write_buffer = "GET / HTTP/1.0\r\nHost: $host\r\n\r\n";
+      $socket->write($write_buffer);
+      
+      my $read_buffer = (mutable string)new_string_len 100000;
+      while (1) {
+        my $read_length = $socket->read($read_buffer);
+        
+        if ($read_length < 0) {
+          die "Read error";
+        }
+        
+        if ($read_length < length $read_buffer) {
+          last;
+        }
+      }
+      
+      unless (Fn->contains($read_buffer, "200")) {
+        return 0;
+      }
+      
+      
+      unless (Fn->contains($read_buffer, "OK")) {
+        return 0;
+      }
+      
+      unless (Fn->contains($read_buffer, "google")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method https_google_SSL_startHandshake_false : int () {
+    
+    {
+      # Socket
+      my $host = "www.google.com";
+      my $port = 443;
+      my $socket = IO::Socket::SSL->new({PeerAddr => $host, PeerPort => $port, SSL_startHandshake => 0});
+      
+      my $ssl_ctx = $socket->ssl_ctx;
+      
+      unless ($ssl_ctx is_type Net::SSLeay::SSL_CTX) {
+        return 0;
+      }
+      
+      $socket->connect_SSL;
+      
+      my $ssl = $socket->ssl;
+      
+      warn "[Test Output][IO::Socket::IO#get_sslversion]" . $socket->get_sslversion;
+      
+      warn "[Test Output][IO::Socket::IO#get_sslversion_int]" . $socket->get_sslversion_int;
+      
+      
+      unless ($ssl) {
+        return 0;
+      }
+      
+      unless ($ssl is_type Net::SSLeay) {
+        return 0;
+      }
+      
+      my $write_buffer = "GET / HTTP/1.0\r\nHost: $host\r\n\r\n";
+      $socket->write($write_buffer);
+      
+      my $read_buffer = (mutable string)new_string_len 100000;
+      while (1) {
+        my $read_length = $socket->read($read_buffer);
+        
+        if ($read_length < 0) {
+          die "Read error";
+        }
+        
+        if ($read_length < length $read_buffer) {
+          last;
+        }
+      }
+      
+      unless (Fn->contains($read_buffer, "200")) {
+        return 0;
+      }
+      
+      
+      unless (Fn->contains($read_buffer, "OK")) {
+        return 0;
+      }
+      
+      unless (Fn->contains($read_buffer, "google")) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+}

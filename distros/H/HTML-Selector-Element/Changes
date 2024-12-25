@@ -1,3 +1,7 @@
+2024-12-24
+    * Carp must report errors as coming from the user's code instead of in HTML::Selector::Element
+    * released as version 0.97
+
 2023-12-25
     * fixed a small oopsie that reared its ugly head when using a rule with alternatives
     * optimized handling of a fewcommon special cases

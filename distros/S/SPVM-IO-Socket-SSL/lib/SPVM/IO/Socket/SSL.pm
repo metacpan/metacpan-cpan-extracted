@@ -1,6 +1,6 @@
 package SPVM::IO::Socket::SSL;
 
-our $VERSION = "0.006";
+our $VERSION = "0.007";
 
 1;
 
@@ -71,147 +71,121 @@ C<has before_connect_SSL_cbs_list : ro List of L<IO::Socket::SSL::Callback::Befo
 
 C<has before_accept_SSL_cbs_list : ro List of L<IO::Socket::SSL::Callback::BeforeAcceptSSL|SPVM::IO::Socket::SSL::Callback::BeforeAcceptSSL>;>
 
-=head2 SSL_verify_mode
-
-C<has SSL_verify_mode : int;>
-
-=head2 SSL_verify_callback
-
-C<has SSL_verify_callback : L<Net::SSLeay::Callback::Verify|SPVM::Net::SSLeay::Callback::Verify>;>
-
-=head2 SSL_hostname
-
-C<has SSL_hostname : string;>
-
-=head2 SSL_cipher_list
-
-C<has SSL_cipher_list : string;>
-
-=head2 SSL_ciphersuites
-
-C<has SSL_ciphersuites : string;>
-
-=head2 SSL_check_crl
-
-C<has SSL_check_crl : int;>
-
-=head2 SSL_crl_file
-
-C<has SSL_crl_file : string;>
-
-=head2 SSL_server
-
-C<has SSL_server : int;>
-
-=head2 SSL_server_specified
-
-C<has SSL_server_specified : int;>
-
-=head2 SSL_alpn_protocols
-
-C<has SSL_alpn_protocols : string[];>
-
-=head2 SSL_startHandshake
-
-C<has SSL_startHandshake : int;>
-
-=head2 SSL_honor_cipher_order
-
-C<has SSL_honor_cipher_order : int;>
-
-=head2 SSL_ca_file
-
-C<has SSL_ca_file : string;>
-
-=head2 SSL_ca_path
-
-C<has SSL_ca_path : string;>
-
-=head2 SSL_ca
-
-C<has SSL_ca : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>[];>
-
-=head2 SSL_cert_file
-
-C<has SSL_cert_file : string;>
-
-=head2 SSL_cert
-
-C<has SSL_cert : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>[];>
-
-=head2 SSL_key_file
-
-C<has SSL_key_file : string;>
-
-=head2 SSL_key
-
-C<has SSL_key : L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY>;>
-
 =head1 Class Methods
 
 =head2 new
 
-C<static method new : IO::Socket::SSL ($options : object[] = undef);>
-  
+C<static method new : L<IO::Socket::SSL|SPVM::IO::Socket::SSL> ($options : object[] = undef);>
+
+Creates a new L<IO::Socket::SSL|SPVM::IO::Socket::SSL> object, calls L</"init"> method given the options $options, calls L</"configure"> method, and return the new object.
+
 =head1 Instance Methods
-
-=head2 option_names
-
-C<protected method option_names : string[] ();>
 
 =head2 init
 
 C<protected method init : void ($options : object[] = undef);>
 
+Initialize the instance given the options $options.
+
 Options:
 
-=over 2
+=head3 SSL_startHandshake
 
-=item * SSL_verify_mode : Int
+Type: L<Int|SPVM::Int>
 
-=item * SSL_verify_callback : L<Net::SSLeay::Callback::Verify|SPVM::Net::SSLeay::Callback::Verify> = undef
+Default: 1
 
-=item * SSL_hostname : string
+It this option is a true value, L</"configure"> method calls L</"connect_SSL"> method in the case that the instance is a client socket, and L</"accept"> method calls L</"accept_SSL">.
 
-=item * SSL_cipher_list : string
+=head3 SSL_verify_mode
 
-=item * SSL_ciphersuites : string
+Type: L<Int|SPVM::Int>
 
-=item * SSL_check_crl : Int
+If the option is not specified and the instance is a client socket, the option value is set to C<SSL_VERIFY_PEER|SPVM::Net::SSLeay::Constant#/"SSL_VERIFY_PEER">.
 
-=item * SSL_crl_file : string
+Otherwise it is set to C<SSL_VERIFY_NONE|SPVM::Net::SSLeay::Constant#/"SSL_VERIFY_NONE">.
 
-=item * SSL_server : Int
+L</"configure_SSL"> method calls L<set_verify|Net::SSLeay::SSL_CTX#set_verify> method given the option value and the value of C<SSL_verify_callback> option.
 
-=item * SSL_alpn_protocols : string[]
+=head3 SSL_verify_callback
 
-=item * SSL_startHandshake : Int = 1
+Type: L<Net::SSLeay::Callback::Verify|SPVM::Net::SSLeay::Callback::Verify>
 
-=item * SSL_honor_cipher_order : Int = 0;
+See C<SSL_verify_mode> option about its beheivior.
 
-=item * SSL_ca_file : string = undef
+=head3 SSL_passwd_cb
 
-=item * SSL_ca_path : string = undef
+Type: L<Net::SSLeay::Callback::PemPassword|SPVM::Net::SSLeay::Callback::PemPassword>
 
-=item * SSL_ca : Net::SSLeay::X509[] = undef
+If the option value is defined, L</"configure_SSL"> method calls L<set_default_passwd_cb|Net::SSLeay::SSL_CTX#set_default_passwd_cb> method given the option value.
 
-=item * SSL_cert_file : string = undef
+=head3 SSL_check_crl
 
-=item * SSL_cert : L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>[] = undef
+Type: L<Int|SPVM::Int>
 
-=item * SSL_key_file : string = undef
+The option value is a true value, C<X509_V_FLAG_CRL_CHECK|SPVM::Net::SSLeay::Constant#/"X509_V_FLAG_CRL_CHECK"> flag is set to the L<Net::SSLeay::X509_VERIFY_PARAM|SPVM::Net::SSLeay::X509_VERIFY_PARAM> object stored in the L<Net::SSLeay::SSL_CTX> object.
 
-=item * SSL_key : L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY> = undef
+=head3 SSL_crl_file
 
-=back
+Type: string
+
+=head3 SSL_ca_file
+
+Type: string
+
+=head3 SSL_ca_path
+
+Type: string
+
+=head3 SSL_ca
+
+Type: L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>[]
+
+=head3 SSL_cert_file
+
+Type: string
+
+=head3 SSL_cert
+
+Type: L<Net::SSLeay::X509|SPVM::Net::SSLeay::X509>[]
+
+=head3 SSL_key_file
+
+Type: string
+
+=head3 SSL_key
+
+Type: L<Net::SSLeay::EVP_PKEY|SPVM::Net::SSLeay::EVP_PKEY>
+
+=head3 SSL_hostname
+
+Type: string
+
+=head3 SSL_alpn_protocols
+
+Type: string[]
+
+=head2 option_names
+
+C<protected method option_names : string[] ();>
+
+Returns available option names in L</"init"> method.
 
 =head2 configure
 
 C<protected method configure : void ();>
 
+Congigures the instance by the following way.
+
+Calls L<configure|SPVM::IO::Socket::IP> method in the super class, and calls L</"configure_SSL"> method.
+
+If the value of L</"SSL_startHandshake"> option is a true value and the instance is a client socket, calls L</"connect_SSL"> method.
+
 =head2 configure_SSL
 
 C<protected method configure_SSL : void ();>
+
+Configures this instacne and a L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX> object using options passed from L</"init"> method.
 
 =head2 connect_SSL
 
@@ -236,10 +210,6 @@ C<method write : int ($buffer : string, $length : int = -1, $offset : int = 0);>
 =head2 shutdown_SSL
 
 C<method shutdown_SSL : int ();>
-
-=head2 close
-
-C<method close : void ();>
 
 =head2 dump_peer_certificate
 
@@ -376,6 +346,10 @@ This method is not supported in L<IO::Socket::SSL|SPVM::IO::Socket::SSL>.
 Exceptions:
 
 An exception is thrown.
+
+=head2 DESTROY
+
+C<method DESTROY : void ();>
 
 =head1 FAQ
 

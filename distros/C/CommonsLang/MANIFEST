@@ -1,0 +1,35 @@
+CommonsLang.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-use.t
+t/02-version.t
+t/10-v_cmp.t
+t/11-v_max.t
+t/21-s_pad.t
+t/22-s_left.t
+t/23-s_right.t
+t/24-s_starts_with.t
+t/25-s_trim.t
+t/26-s_ellipsis.t
+t/27-s_match_glob.t
+t/27-s_split.t
+t/31-a_join.t
+t/32-a_concat.t
+t/33-a_push_pop.t
+t/34-a_unshift_shift.t
+t/35-a_find_index.t
+t/36-a_find.t
+t/37-a_index_of.t
+t/40-a_every_some.t
+t/41-a_map.t
+t/42-a_reduce.t
+t/44-a_slice.t
+t/45-a_splice.t
+t/46-a_filter.t
+t/47-a_sort.t
+t/48-a_left_right.t
+t/51-h_keys.t
+t/91-x_log.t
+t/91-x_now_ms.t
+META.yml                                 Module meta-data (added by MakeMaker)

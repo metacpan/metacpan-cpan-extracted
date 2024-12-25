@@ -95869,3 +95869,10 @@ K/KI/KIMOTO/SPVM-Net-SSLeay-0.034.tar.gz
 J/JJ/JJNAPIORK/Template-EmbeddedPerl-0.001013.tar.gz
 P/PL/PLICEASE/Tie-Hash-DataSection-0.01.tar.gz
 G/GR/GRAVATTJ/Util-Medley-0.062.tar.gz
+J/JV/JV/App-Music-ChordPro-6.070.tar.gz
+Y/YU/YUPEN/CommonsLang-0.01.tar.gz
+J/JA/JANESKIL/Tools/Daje-Workflow-Database-0.02.tar.gz
+B/BA/BARTL/HTML-Selector-Element-0.97.tar.gz
+H/HA/HANJE/Tk-CodeText-0.59.tar.gz
+T/TR/TRSKI/Proc-Forkmap-0.2201.tar.gz
+K/KI/KIMOTO/SPVM-IO-Socket-SSL-0.007.tar.gz

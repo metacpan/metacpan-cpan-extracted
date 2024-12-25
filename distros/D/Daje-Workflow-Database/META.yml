@@ -1,0 +1,47 @@
+---
+abstract: "It's new $module"
+author:
+  - 'janeskil1525 <janeskil1525@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daje-Workflow-Database
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Daje::Workflow::Database:
+    file: lib/Daje/Workflow/Database.pm
+    version: '0.02'
+  Daje::Workflow::Database::Connector:
+    file: lib/Daje/Workflow/Database/Connector.pm
+  Daje::Workflow::Database::Model::Context:
+    file: lib/Daje/Workflow/Database/Model/Context.pm
+  Daje::Workflow::Database::Model::History:
+    file: lib/Daje/Workflow/Database/Model/History.pm
+  Daje::Workflow::Database::Model::Workflow:
+    file: lib/Daje/Workflow/Database/Model/Workflow.pm
+requires:
+  Mojo::Pg: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/janeskil1525/Daje-Workflow-Database/issues
+  homepage: https://github.com/janeskil1525/Daje-Workflow-Database
+  repository: https://github.com/janeskil1525/Daje-Workflow-Database.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

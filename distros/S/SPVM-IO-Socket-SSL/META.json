@@ -41,6 +41,7 @@
       },
       "test" : {
          "requires" : {
+            "SPVM::FindBin" : "0.031",
             "SPVM::Mozilla::CA" : "0.002"
          }
       }
@@ -53,6 +54,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-IO-Socket-SSL"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

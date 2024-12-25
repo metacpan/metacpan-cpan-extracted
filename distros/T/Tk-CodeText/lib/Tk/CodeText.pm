@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.58';
+$VERSION = '0.59';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -162,6 +162,11 @@ If you do not specify it, the B<-menuitems> option is checked.
 =item Switch: B<-disablemenu>
 
 By default 0. If set the right-click context menu is disabled.
+
+=item Switch: B<-findoptions>
+
+Default: [-background => '#C0FFC0', -foreground => '#000000'](light green and black). 
+Specifies the options for the find tag.
 
 =item Name: B<highlightInterval>
 
@@ -420,6 +425,10 @@ sub Populate {
 		-text => 'All',
 		-command => sub { $self->FindAll($reg, $case, $find) },
 	)->pack(@pack);
+	$sframe->Button(
+		-text => 'Clear',
+		-command => sub { $self->FindClear },
+	)->pack(@pack);
 	$sframe->Checkbutton(
 		-text => 'Case',
 		-onvalue => '-case',
@@ -455,10 +464,7 @@ sub Populate {
 	});
 	$rframe->Button(
 		-text => 'Replace',
-		-command => sub {
-			$self->ReplaceSelectionsWith($replace) if $self->SelectionExists;
-			$self->FindNext('-forward', $reg, $case, $find);
-		},
+		-command => sub { $self->FindandReplace($reg, $case, $find, $replace) },
 	)->pack(@pack); 
 	$rframe->Button(
 		-text => 'Skip',
@@ -466,23 +472,7 @@ sub Populate {
 	)->pack(@pack); 
 	$rframe->Button(
 		-text => 'Replace all',
-		-command => sub {
-			my $pos = $self->index('insert');
-			$self->unselectAll;
-			$self->goTo('1.0');
-			my $count = 0;
-			$self->FindNext('-forward', $reg, $case, $find);
-			while ($self->selectionExists) {
-				if ($self->SelectionExists) {
-					$self->ReplaceSelectionsWith($replace);
-					$count ++
-				}
-				$self->FindNext('-forward', $reg, $case, $find);
-			}
-			$self->goTo($pos);
-			$self->see($pos);
-			$self->log("Made $count replaces");
-		},
+		-command =>  sub { $self->FindandReplaceAll($reg, $case, $find, $replace) },
 	)->pack(@pack);
 
 	#create the statusbar
@@ -898,6 +888,7 @@ sub FindAndOrReplace {
 
 sub FindClose {
 	my $self = shift;
+	$self->FindClear;
 	$self->Subwidget('XText')->focus;
 	$self->Subwidget('SandR')->packForget;
 }

@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               CommonsLang
+version:            0.01
+abstract:           Commonly used functions for Perl language
+author:
+    - YUPEN
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    perl:      5.010001
+    strict:    0
+    warnings:  0
+resources:
+    repository:
+        type:  git
+        url:   https://github.com/dnmfarrell/foo.git
+        web:   https://github.com/dnmfarrell/foo
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  2

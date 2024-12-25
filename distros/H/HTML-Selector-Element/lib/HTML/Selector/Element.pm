@@ -1,5 +1,5 @@
 package HTML::Selector::Element;
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 ## Adapted from HTML::Selector::XPath
 ## The parser is basically the same, the difference is in what it produces.
@@ -518,6 +518,7 @@ require Carp;
 use Exporter 'import';
 our @EXPORT = qw(&find is closest);
 our @EXPORT_OK = qw(look_self siblings children &select &query);
+our @CARP_NOT = qw(HTML::Selector::Element);
 
 sub children {  # child elements, no fake elements
     my($this) = @_;
