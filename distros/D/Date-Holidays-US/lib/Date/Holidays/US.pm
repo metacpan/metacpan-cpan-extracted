@@ -6,7 +6,7 @@ use POSIX; #strftime to calculate wday
 
 our @EXPORT_OK = qw(is_holiday holidays is_us_holiday us_holidays);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -61,7 +61,7 @@ sub is_holiday {
   #Purposefully processed after MLK day. In the case of concurrency, MLK is returned.
   } elsif ($year >= 1965 and $month == 1 and $day == 20 and $year % 4 == 1 and $wday != 0) { #5 U.S. Code 6103(c)
     return 'Inauguration Day'                       #January 20 of each fourth year after 1965 unless Sunday
-  #Note 5 U.S. Code 6103(c) provides for Monday Jan 21 to be Inauguration Day but this package reutrns MKL day after 1985
+  #Note 5 U.S. Code 6103(c) provides for Monday Jan 21 to be Inauguration Day but this package returns MKL day after 1985
   } elsif ($year == 1985 and $month == 1 and $day == 21) { #5 U.S. Code 6103(c)
     return 'Inauguration Day'              #When January 20 ... falls on Sunday, the next succeeding day...
 
@@ -157,6 +157,27 @@ sub is_holiday {
   } elsif ($year >= 1971 and $month == 12 and $day == 31 and $wday == 5) { #Executive Order 11582 (Feb. 11, 1971)
     return q{New Year's Day Observed};                                 #Friday before January 1
 
+  # Beginning with the death of President Kennedy in 1963, the incumbent President has issued an Executive order closing
+  # Government offices throughout the world as a mark of respect upon the death of each President or former President.
+  } elsif ($year == 1963 and $month == 11 and $day == 25) {
+    #35 November 25, 1963, National Day of Mourning for President John F. Kennedy
+    return 'National Day of Mourning for President John F. Kennedy';
+  } elsif ($year == 1973 and $month == 1 and $day == 25) {
+    #36 January 25 1973, National Day of Mourning for President Lyndon B. Johnson
+    return 'National Day of Mourning for President Lyndon B. Johnson';
+  } elsif ($year == 1994 and $month == 4 and $day == 27) {
+    #37 April 27, 1994, National Day of Mourning for President Richard Nixon
+    return 'National Day of Mourning for President Richard Nixon';
+  } elsif ($year == 2007 and $month == 1 and $day == 2) {
+    #38 January 2, 2007 National Day of Mourning for President Gerald R. Ford
+    return 'National Day of Mourning for President Gerald R. Ford';
+  } elsif ($year == 2004 and $month == 6 and $day == 11) {
+    #40 June 11, 2004, National Day of Mourning for President Ronald W. Reagan
+    return 'National Day of Mourning for President Ronald W. Reagan';
+  } elsif ($year == 2018 and $month == 12 and $day == 5) {
+    #41 December 5, 2018, National Day of Mourning for President George H. W. Bush
+    return 'National Day of Mourning for President George H. W. Bush';
+
   } else {
     return undef;
   }
@@ -209,8 +230,6 @@ Wrapper around holidays function per the API specification. See L<Date::Holidays
 sub us_holidays {return holidays(@_)};
 
 =head1 TODO
-
-Add Federal Holidays for President mark of respect holidays (e.g. 2007-01-02 for Gerald R. Ford, the thirty-eighth President of the United States)
 
 =head1 SEE ALSO
 

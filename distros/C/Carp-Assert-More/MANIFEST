@@ -29,6 +29,7 @@ t/assert_hashref.t
 t/assert_hashref_nonempty.t
 t/assert_in.t
 t/assert_integer.t
+t/assert_integer_between.t
 t/assert_is.t
 t/assert_isa.t
 t/assert_isa_in.t
@@ -47,6 +48,7 @@ t/assert_nonref.t
 t/assert_nonzero_integer.t
 t/assert_nonzero.t
 t/assert_numeric.t
+t/assert_numeric_between.t
 t/assert_or.t
 t/assert_positive_integer.t
 t/assert_positive.t

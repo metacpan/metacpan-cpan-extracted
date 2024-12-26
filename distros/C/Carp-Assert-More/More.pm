@@ -15,11 +15,11 @@ Carp::Assert::More - Convenience assertions for common situations
 
 =head1 VERSION
 
-Version 2.6.0
+Version 2.7.0
 
 =cut
 
-our $VERSION = '2.6.0';
+our $VERSION = '2.7.0';
 our @EXPORT = qw(
     assert
     assert_all_keys_in
@@ -44,6 +44,7 @@ our @EXPORT = qw(
     assert_hashref_nonempty
     assert_in
     assert_integer
+    assert_integer_between
     assert_is
     assert_isa
     assert_isa_in
@@ -62,6 +63,7 @@ our @EXPORT = qw(
     assert_nonzero
     assert_nonzero_integer
     assert_numeric
+    assert_numeric_between
     assert_or
     assert_positive
     assert_positive_integer
@@ -684,6 +686,58 @@ sub assert_negative_integer($;$) {
 
     if ( defined($this) && ($this =~ $INTEGER) ) {
         return if $this < 0;
+    }
+
+    require Carp;
+    &Carp::confess( _failure_msg($name) );
+}
+
+
+=head2 assert_numeric_between( $n, $lo, $hi [, $name ] )
+
+Asserts that the value of I<$this> is defined, numeric and between C<$lo>
+and C<$hi>, inclusive.
+
+    assert_numeric_between( 15, 10, 100 );  # pass
+    assert_numeric_between( 10, 15, 100 );  # FAIL
+    assert_numeric_between( 3.14, 1, 10 );  # pass
+
+=cut
+
+sub assert_numeric_between($$$;$) {
+    my $n    = shift;
+    my $lo   = shift;
+    my $hi   = shift;
+    my $name = shift;
+
+    if ( Scalar::Util::looks_like_number( $n ) ) {
+        return if $lo <= $n && $n <= $hi;
+    }
+
+    require Carp;
+    &Carp::confess( _failure_msg($name) );
+}
+
+
+=head2 assert_integer_between( $n, $lo, $hi [, $name ] )
+
+Asserts that the value of I<$this> is defined, an integer, and between C<$lo>
+and C<$hi>, inclusive.
+
+    assert_integer_between( 15, 10, 100 );  # pass
+    assert_integer_between( 10, 15, 100 );  # FAIL
+    assert_integer_between( 3.14, 1, 10 );  # FAIL
+
+=cut
+
+sub assert_integer_between($$$;$) {
+    my $n    = shift;
+    my $lo   = shift;
+    my $hi   = shift;
+    my $name = shift;
+
+    if ( defined($n) && $n =~ $INTEGER ) {
+        return if $lo <= $n && $n <= $hi;
     }
 
     require Carp;

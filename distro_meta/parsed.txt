@@ -95876,3 +95876,5 @@ B/BA/BARTL/HTML-Selector-Element-0.97.tar.gz
 H/HA/HANJE/Tk-CodeText-0.59.tar.gz
 T/TR/TRSKI/Proc-Forkmap-0.2201.tar.gz
 K/KI/KIMOTO/SPVM-IO-Socket-SSL-0.007.tar.gz
+P/PE/PETDANCE/Carp-Assert-More-2.7.0.tar.gz
+M/MR/MRDVT/Date-Holidays-US-0.06.tar.gz

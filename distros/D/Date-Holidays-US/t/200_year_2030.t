@@ -1,11 +1,8 @@
 # - perl -
 use strict;
 use warnings;
-use Data::Dumper qw{Dumper};
-use Test::More tests => 12;
-use Date::Holidays::US qw{is_holiday};
-
-my $expect = 'Veterans Day';
+use Test::More tests => 13;
+use Date::Holidays::US qw{is_holiday holidays};
 
 #From: https://www.opm.gov/policy-data-oversight/pay-leave/federal-holidays/#url=2030
 
@@ -21,3 +18,5 @@ is(is_holiday(2030, 10, 14), q{Columbus Day});
 is(is_holiday(2030, 11, 11), q{Veterans Day});
 is(is_holiday(2030, 11, 28), q{Thanksgiving Day});
 is(is_holiday(2030, 12, 25), q{Christmas Day});
+
+is(scalar(keys %{holidays(2030)}), 11);

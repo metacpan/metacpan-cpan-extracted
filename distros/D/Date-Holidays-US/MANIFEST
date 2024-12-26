@@ -11,6 +11,8 @@ t/002_export.t
 t/003_no_export.t
 t/011_Veterans_Day.t
 t/200_year_1985.t
+t/200_year_2013.t
+t/200_year_2018.t
 t/200_year_2021.t
 t/200_year_2024.t
 t/200_year_2025.t

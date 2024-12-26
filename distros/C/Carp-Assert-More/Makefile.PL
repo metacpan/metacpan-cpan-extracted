@@ -4,7 +4,7 @@ use 5.010;
 
 use strict;
 use warnings;
-use ExtUtils::MakeMaker 6.46;
+use ExtUtils::MakeMaker 6.64;
 
 my %parms = (
     NAME                => 'Carp::Assert::More',
@@ -19,8 +19,15 @@ my %parms = (
     PREREQ_PM   => {
         Carp                => 0,
         'Scalar::Util'      => 0,
+    },
+
+    BUILD_REQUIRES => {
+        'ExtUtils::MakeMaker' => 6.64,
+    },
+
+    TEST_REQUIRES => {
         'Test::Exception'   => 0,
-        'Test::More'        => 0.18,
+        'Test::More'        => 0.72,
     },
 
     dist => {

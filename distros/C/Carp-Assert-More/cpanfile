@@ -4,8 +4,12 @@
 requires 'Carp' => 0;
 requires 'Scalar::Util' => 0;
 
+on 'build' => sub {
+    requires 'ExtUtils::MakeMaker' => 6.64;
+};
+
 on 'test' => sub {
-    requires 'Test::More', '0.94';  # So we can run subtests on v5.10
+    requires 'Test::More', '0.72';
     requires 'Test::Exception', 0;
 };
 

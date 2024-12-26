@@ -1,5 +1,5 @@
 Name:           perl-Date-Holidays-US
-Version:        0.05
+Version:        0.06
 Release:        1%{?dist}
 Summary:        Date::Holidays Adapter for US Federal holidays
 License:        mit

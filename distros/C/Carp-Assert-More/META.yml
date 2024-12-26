@@ -3,7 +3,9 @@ abstract: unknown
 author:
   - unknown
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
+  Test::Exception: '0'
+  Test::More: '0.72'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -20,11 +22,9 @@ no_index:
 requires:
   Carp: '0'
   Scalar::Util: '0'
-  Test::Exception: '0'
-  Test::More: '0.18'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/petdance/carp-assert-more/issues
   homepage: https://github.com/petdance/carp-assert-more
   license: https://opensource.org/licenses/artistic-license-2.0.php
-version: v2.6.0
+version: v2.7.0

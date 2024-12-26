@@ -1,4 +1,4 @@
-#!perl -Tw
+#!perl
 
 package Foo;
 

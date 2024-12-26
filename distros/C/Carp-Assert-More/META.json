@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Carp-Assert-More",
    "no_index" : {
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "configure" : {
@@ -34,9 +34,13 @@
          "requires" : {
             "Carp" : "0",
             "Scalar::Util" : "0",
-            "Test::Exception" : "0",
-            "Test::More" : "0.18",
             "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.72"
          }
       }
    },
@@ -50,5 +54,5 @@
          "https://opensource.org/licenses/artistic-license-2.0.php"
       ]
    },
-   "version" : "v2.6.0"
+   "version" : "v2.7.0"
 }
